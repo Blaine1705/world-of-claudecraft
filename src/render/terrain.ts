@@ -26,6 +26,16 @@ import { renderLayerDisabled } from './render_dev_flags';
 // switch (render_dev_flags.ts).
 const terrainReliefLevel = (): number => (renderLayerDisabled('trelief') ? 0 : GFX.terrainRelief);
 
+// The rich splat-albedo profile (multi-octave grass/dirt/rock, wall plate
+// mixes, fine detail-normal octaves) rides the relief gate: together they are
+// what doubled the terrain fragment's tap count over the merge base, and the
+// round-10 medium ladder measured that as -15..-33% on the tier with the
+// least PBR frame budget. The no-relief tiers keep a single-octave splat
+// close to the pre-overhaul look. ?talbedo=off forces the simple profile at
+// any tier (dev perf attribution).
+const richTerrainSplat = (): boolean =>
+  terrainReliefLevel() >= 1 && !renderLayerDisabled('talbedo');
+
 import { idleSlot } from './idle_queue';
 import { impactCraterTerrainBlend } from './impact_terrain';
 import {
@@ -742,7 +752,16 @@ function buildSplatMaterial(
         // leaning toward the coarse octave softens the uniform blade stipple
         // that read as repeating noise underfoot, without losing the lush
         // and dark patch structure the macro terms carry.
-        // Per-octave scale jitter: a slow (~36yd) two-channel drift field
+        ${
+          // The rich grass stack (scale jitter, combed anisotropy, mid
+          // octave, hue drift: 5 extra taps on the fragments that cover most
+          // of a meadow frame) rides the relief gate: it exists to give the
+          // relief-lit turf its directional grain, and the round-10 medium
+          // bench measured the meadow tier gap with relief already off, so
+          // the no-relief tiers keep the plain two-octave anti-tiling mix.
+          // ?talbedo=off is the dev perf-attribution kill switch.
+          richTerrainSplat()
+            ? `// Per-octave scale jitter: a slow (~36yd) two-channel drift field
         // nudges each octave's sample position a different amount and sign,
         // so the tilings slide against each other across the map and their
         // repeats never line up into one fixed cadence. The warp gradient is
@@ -783,7 +802,21 @@ function buildSplatMaterial(
         // yellow-green and cool blue-green. Value-neutral endpoints, so it
         // adds randomness you feel across a field without a patch to point at.
         float grassHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
-        grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT);
+        grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT);`
+            : `// No-relief tiers: the plain two-octave anti-tiling mix (the
+        // 90-degree-rotated coarse octave still kills the shared repeat).
+        // The comb-frame locals stay declared at IDENTITY for the detail
+        // normal chunk (which samples the grass normal through them on every
+        // tier) and the compile-time-disabled tussock shade.
+        vec2 combT = tuv;
+        vec2 grassJitter = vec2(0.0);
+        vec2 combDir = vec2(1.0, 0.0);
+        vec2 combPerp = vec2(0.0, 1.0);
+        vec3 grassAlb = mix(
+          texture2D(uGrass, tuv).rgb,
+          texture2D(uGrass, vec2(-tuv.y, tuv.x) * 0.31).rgb,
+          0.56 + (macro2 - 0.5) * 0.3);`
+        }
         // Tussock height-shade (the worn_stone round-7 idiom): sd-normalized
         // R-channel height, clamped at 1.5 sd; recesses darken and saturate a
         // touch (shaded turf reads damp), crests lift, so the grass height
@@ -805,7 +838,9 @@ function buildSplatMaterial(
         // player stands right next to), so it takes its own wall blend with a
         // gentler onset than rock's cliff threshold
         float dirtWallW = smoothstep(0.1, 0.42, 1.0 - an.y);
-        // --- de-carpeted dirt: multi-scale soil instead of one speckle ---
+        ${
+          richTerrainSplat()
+            ? `// --- de-carpeted dirt: multi-scale soil instead of one speckle ---
         // A rotated second dirt octave (0.63x the base 0.8 scale, 37 degrees:
         // cos 0.799 and sin 0.601 folded into the constants), lerped by a
         // ~9yd macro mask: the two scales can never phase-align into one
@@ -831,7 +866,11 @@ function buildSplatMaterial(
         float dirtMac20 = texture2D(uMacro, vWPos.xz * 0.052 + 0.13).r - 0.5;
         dirtFlat *= 1.0 + dirtMac6 * 0.11 + dirtMac20 * 0.15;
         vec3 dirtGrey = vec3(dot(dirtFlat, vec3(0.35, 0.45, 0.2))) * vec3(1.0, 0.97, 0.9);
-        dirtFlat = mix(dirtFlat, dirtGrey, clamp(0.24 + dirtMac20 * 0.4, 0.0, 0.65));
+        dirtFlat = mix(dirtFlat, dirtGrey, clamp(0.24 + dirtMac20 * 0.4, 0.0, 0.65));`
+            : `// Simple-splat tiers: one dirt tap; the wear bands below still
+        // apply so trails keep their compacted-core read.
+        vec3 dirtFlat = texture2D(uDirt, tuv * 0.55).rgb;`
+        }
         // Path wear across the trail: the vertex dirt weight sits near 0.85
         // at a trail's core and feathers out over ~1.4yd at the margin, so it
         // doubles as a smooth cross-path coordinate. The core reads compacted
@@ -844,21 +883,27 @@ function buildSplatMaterial(
         float pathEdge = vSplatR.y * (1.0 - pathCore) * (1.0 - vExtra.x);
         dirtFlat *= 1.0 + pathCore * 0.07 - pathEdge * 0.05;
         dirtFlat = mix(dirtFlat, texture2D(uMud, tuv * 0.8).rgb, vExtra.x);
-        // Trails read as packed grit, not smooth brown paint: fold a
+        ${
+          richTerrainSplat()
+            ? `// Trails read as packed grit, not smooth brown paint: fold a
         // high-frequency rock tap into the dry dirt (no new sampler, the
         // material sits at 15 of 16). The weight fades with the marsh mud
         // swap so wet mud keeps its smooth sheen. 0.10 (was 0.16): with the
         // macro soil structure above, the old weight let single-scale
         // micro-grain dominate the read again, the exact carpet failure.
         float gravelW = 0.07 * (1.0 - vExtra.x);
-        dirtFlat = mix(dirtFlat, texture2D(uRock, tuv * 1.8).rgb, gravelW);
+        dirtFlat = mix(dirtFlat, texture2D(uRock, tuv * 1.8).rgb, gravelW);`
+            : 'float gravelW = 0.0;'
+        }
         vec3 dirtWall = mix(
           texture2D(uDirt, vWPos.xy * 0.176).rgb,
           texture2D(uDirt, vWPos.zy * 0.176).rgb,
           axisW);
         // marsh swaps packed dirt for wet mud (roads, hub discs included)
         vec3 dirtAlb = mix(dirtFlat, dirtWall, dirtWallW);
-        // Flat rock (scree, summits, outcrops) mottles between two scales the
+        ${
+          richTerrainSplat()
+            ? `// Flat rock (scree, summits, outcrops) mottles between two scales the
         // way grass and dirt do: a second tap of the same rock at 0.55x the
         // base 0.6 scale, rotated 52 degrees (cos 0.616 and sin 0.788 folded
         // into the constants), lerped by a ~30yd macro mask so no two
@@ -868,7 +913,9 @@ function buildSplatMaterial(
         vec3 rockFlat = mix(
           texture2D(uRock, tuv * 0.6).rgb,
           texture2D(uRock, rockUv2).rgb,
-          0.2 + rockOctMask * 0.5);
+          0.2 + rockOctMask * 0.5);`
+            : 'vec3 rockFlat = texture2D(uRock, tuv * 0.6).rgb;'
+        }
         // macro2 (hoisted above the grass blend) also drives the wall plate
         // mix, so plate zones vary across a mountainside without spending a
         // second uMacro tap on cliff fragments
@@ -884,7 +931,9 @@ function buildSplatMaterial(
         // rockDrift (~25yd) varies the plate-octave ratio span by span on top
         // of macro2's hill-scale wander, and drives the stone hue drift after
         // the wall blend, so adjacent cliff spans stop reading as copies.
-        float rockDrift = texture2D(uMacro, vWPos.xz * 0.041 + 0.47).r;
+        ${
+          richTerrainSplat()
+            ? `float rockDrift = texture2D(uMacro, vWPos.xz * 0.041 + 0.47).r;
         float plateMix = 0.58 + (macro2 - 0.5) * 0.55 + (rockDrift - 0.5) * 0.3;
         vec3 rockWall = mix(
           mix(texture2D(uRock, vWPos.xy * 0.132).rgb,
@@ -912,7 +961,18 @@ function buildSplatMaterial(
           axisW) - 0.623;
         groundShade *= mix(
           1.0, clamp(1.0 + wallCav * 2.6, 0.58, 1.18),
-          vSplatR.z * wallW * (1.0 - vExtra.y));
+          vSplatR.z * wallW * (1.0 - vExtra.y));`
+            : `// Simple-splat tiers: one wall tap per plane (the swapped-axis
+        // ZY sample still breaks corner stripe alignment), no plate mix, no
+        // cliff cavity resample (wallCav stays declared for the roughness
+        // plate term, folded to zero).
+        vec3 rockWall = mix(
+          texture2D(uRock, vWPos.xy * 0.132).rgb,
+          texture2D(uRock, vWPos.yz * 0.132).rgb,
+          axisW);
+        vec3 rockAlb = mix(rockFlat, rockWall, wallW);
+        float wallCav = 0.0;`
+        }
         vec3 alb = grassAlb * vSplatR.x
                  + dirtAlb * vSplatR.y
                  + rockAlb * vSplatR.z
@@ -1013,7 +1073,9 @@ function buildSplatMaterial(
         vec3 dN = texture2D(uDirtN, tuv * 0.55).xyz * 2.0 - 1.0;
         vec3 rN = texture2D(uRockN, tuv * 0.6).xyz * 2.0 - 1.0;
         vec3 sN = texture2D(uSandN, tuv).xyz * 2.0 - 1.0;
-        // A second octave at 4x the base tiling: without it the ground is one
+        ${
+          richTerrainSplat()
+            ? `// A second octave at 4x the base tiling: without it the ground is one
         // blurred frequency underfoot and reads as plastic. Two taps rather
         // than one per layer, since the octave only supplies grain and its
         // source map is indistinguishable once summed into a layer's normal:
@@ -1027,7 +1089,14 @@ function buildSplatMaterial(
         // gravel grain at the trail albedo's own tap scale, so the grit a
         // path shows is lit rather than painted (gravelW already fades it
         // with the marsh mud swap)
-        vec2 gvN = texture2D(uRockN, tuv * 1.8).xy * 2.0 - 1.0;
+        vec2 gvN = texture2D(uRockN, tuv * 1.8).xy * 2.0 - 1.0;`
+            : `// Simple-splat tiers: base-scale detail normals only (the
+        // merge-base budget); the fine octaves fold to zero and every term
+        // below compiles out.
+        vec2 fineHard = vec2(0.0);
+        vec2 fineSoft = vec2(0.0);
+        vec2 gvN = vec2(0.0);`
+        }
         // wet mud lumps smoothly where dry dirt crumbles; footworn trail
         // cores are packed smoother than their kicked-up margins (pathCore
         // from the albedo chunk)

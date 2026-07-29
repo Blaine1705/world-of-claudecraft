@@ -165,7 +165,11 @@ export function buildComposer(
   // GFX.smaa is high-tier only: ultra's 2.5 pixelRatioCap already suppresses
   // edge crawl and SMAA at that pixel count costs ~1.5ms; high runs a 1.75
   // cap where aliasing is visible and the pass is cheap.
-  if (GFX.composer && GFX.smaa) composer.addPass(new SMAAPass(size.x, size.y));
+  // ?smaa=off is the dev-only perf-attribution kill switch: SMAA is new on
+  // this branch (the merge-base high tier shipped no AA pass), so its cost
+  // needs to be attributable against the high-tier ladder budget.
+  if (GFX.composer && GFX.smaa && !renderLayerDisabled('smaa'))
+    composer.addPass(new SMAAPass(size.x, size.y));
 
   // EffectComposer defaults its logical size to drawing-buffer pixels and
   // then multiplies by pixelRatio again when sizing passes — N8AO/bloom would
