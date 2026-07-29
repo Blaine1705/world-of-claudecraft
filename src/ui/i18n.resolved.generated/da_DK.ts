@@ -6514,6 +6514,7 @@ export const da_DK: EnTranslations = {
       "requiresLevel": "Kræver niveau {level}",
       "requiresForm": "Kræver {form}-form",
       "requiresStealth": "Kræver snigen",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Forbruger combopoint",
       "requiresTargetHealthBelow": "Kræver mål under {percent}% liv",
       "requiresDodge": "Kan kun bruges efter målet undviger",

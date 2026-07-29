@@ -6514,6 +6514,7 @@ export const id_ID: EnTranslations = {
       "requiresLevel": "Membutuhkan level {level}",
       "requiresForm": "Membutuhkan Wujud {form}",
       "requiresStealth": "Membutuhkan siluman",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Menghabiskan poin kombo",
       "requiresTargetHealthBelow": "Membutuhkan nyawa target di bawah {percent}%",
       "requiresDodge": "Hanya bisa dipakai setelah target mengelak",

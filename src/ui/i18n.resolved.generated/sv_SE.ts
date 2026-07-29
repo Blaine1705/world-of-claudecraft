@@ -6514,6 +6514,7 @@ export const sv_SE: EnTranslations = {
       "requiresLevel": "Kräver nivå {level}",
       "requiresForm": "Kräver {form}form",
       "requiresStealth": "Kräver smygande",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Förbrukar kombopoäng",
       "requiresTargetHealthBelow": "Kräver att målet är under {percent}% hälsa",
       "requiresDodge": "Endast användbar efter att målet väjer",

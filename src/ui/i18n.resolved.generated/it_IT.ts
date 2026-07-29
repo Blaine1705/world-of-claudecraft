@@ -6514,6 +6514,7 @@ export const it_IT: EnTranslations = {
       "requiresLevel": "Richiede livello {level}",
       "requiresForm": "Richiede Forma di {form}",
       "requiresStealth": "Richiede furtività",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Consuma punti combo",
       "requiresTargetHealthBelow": "Richiede il bersaglio sotto il {percent}% di salute",
       "requiresDodge": "Utilizzabile solo dopo una schivata del bersaglio",

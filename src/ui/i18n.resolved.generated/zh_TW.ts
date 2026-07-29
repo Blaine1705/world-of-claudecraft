@@ -6514,6 +6514,7 @@ export const zh_TW: EnTranslations = {
       "requiresLevel": "需要等級 {level}",
       "requiresForm": "需要{form}形態",
       "requiresStealth": "需要潛行",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "消耗連擊點",
       "requiresTargetHealthBelow": "需要目標生命值低於 {percent}%",
       "requiresDodge": "只能在目標閃避後使用",

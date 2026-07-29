@@ -252,7 +252,7 @@ import {
   grantQtyText,
   harvestLineKey,
 } from './grant_line_view';
-import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
+import { abilityRequirementKeys } from './hud/action_bar/ability_requirement_keys';
 import {
   handleShiftClearContextMenu,
   handleShiftClearKeydown,
@@ -5179,7 +5179,7 @@ export class Hud {
         });
       }
     }
-    const requirements = abilityRequirementLines(a);
+    const requirements = abilityRequirementLines(a, this.sim.talents.spec);
     if (requirements.length) {
       html += requirements.map((line) => `<div class="tt-sub">${esc(line)}</div>`).join('');
     }
@@ -14628,27 +14628,39 @@ function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
   return t('abilityUi.tooltip.instant');
 }
 
-export function abilityRequirementLines(def: AbilityDef): string[] {
-  const lines: string[] = [];
-  if (def.requiresForm)
-    lines.push(t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[def.requiresForm]) }));
-  if (def.requiresStealth) lines.push(t('abilityUi.tooltip.requiresStealth'));
-  if (def.spendsCombo) lines.push(t('abilityUi.tooltip.requiresCombo'));
-  if (def.requiresDodgeProc) lines.push(t('abilityUi.tooltip.requiresDodge'));
-  if (def.requiresOutOfCombat) lines.push(t('abilityUi.tooltip.requiresOutOfCombat'));
-  if (def.requiresTargetHpBelow !== undefined) {
-    lines.push(
-      t('abilityUi.tooltip.requiresTargetHealthBelow', {
-        percent: formatAbilityNumber(def.requiresTargetHpBelow * 100),
-      }),
-    );
-  }
-  if (def.onNextSwing) lines.push(t('abilityUi.tooltip.onNextSwing'));
-  if (def.offGcd) lines.push(t('abilityUi.tooltip.offGlobalCooldown'));
-  if (def.targetType === 'friendly') lines.push(t('abilityUi.tooltip.friendlyTarget'));
-  else if (def.requiresTarget) lines.push(t('abilityUi.tooltip.enemyTarget'));
-  else if (isSelfOnlyAbility(def)) lines.push(t('abilityUi.tooltip.selfOnly'));
-  return lines;
+// Thin i18n mapper over the pure resolver (ability_requirement_keys.ts), which
+// owns the truth table incl. the Skulduggery-only stealth-bypass line.
+export function abilityRequirementLines(def: AbilityDef, spec?: string | null): string[] {
+  return abilityRequirementKeys(def, spec).map((req) => {
+    switch (req.key) {
+      case 'requiresForm':
+        return t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[req.form!]) });
+      case 'requiresStealth':
+        return t('abilityUi.tooltip.requiresStealth');
+      case 'requiresStealthSkulduggery':
+        return t('abilityUi.tooltip.requiresStealthSkulduggery');
+      case 'requiresCombo':
+        return t('abilityUi.tooltip.requiresCombo');
+      case 'requiresDodge':
+        return t('abilityUi.tooltip.requiresDodge');
+      case 'requiresOutOfCombat':
+        return t('abilityUi.tooltip.requiresOutOfCombat');
+      case 'requiresTargetHealthBelow':
+        return t('abilityUi.tooltip.requiresTargetHealthBelow', {
+          percent: formatAbilityNumber(req.percent!),
+        });
+      case 'onNextSwing':
+        return t('abilityUi.tooltip.onNextSwing');
+      case 'offGlobalCooldown':
+        return t('abilityUi.tooltip.offGlobalCooldown');
+      case 'friendlyTarget':
+        return t('abilityUi.tooltip.friendlyTarget');
+      case 'enemyTarget':
+        return t('abilityUi.tooltip.enemyTarget');
+      case 'selfOnly':
+        return t('abilityUi.tooltip.selfOnly');
+    }
+  });
 }
 
 // Builds the `$d` damage string for an ability tooltip. When `scaling` (the live

@@ -6514,6 +6514,7 @@ export const ko_KR: EnTranslations = {
       "requiresLevel": "{level}레벨 필요",
       "requiresForm": "{form} 변신 필요",
       "requiresStealth": "은신 필요",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "연계 점수 소비",
       "requiresTargetHealthBelow": "대상 생명력이 {percent}% 미만이어야 함",
       "requiresDodge": "대상이 회피한 뒤에만 사용 가능",

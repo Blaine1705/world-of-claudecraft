@@ -6514,6 +6514,7 @@ export const ru_RU: EnTranslations = {
       "requiresLevel": "Требуется уровень {level}",
       "requiresForm": "Требуется облик {form}",
       "requiresStealth": "Требуется незаметность",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Расходует приемы серии",
       "requiresTargetHealthBelow": "Требуется цель ниже {percent}% здоровья",
       "requiresDodge": "Можно использовать только после уклонения цели",

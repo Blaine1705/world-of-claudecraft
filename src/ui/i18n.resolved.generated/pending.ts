@@ -11,6 +11,7 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",
@@ -134,6 +135,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "es_ES": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",
@@ -257,6 +259,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_FR": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",
@@ -380,6 +383,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_CA": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",
@@ -504,6 +508,7 @@ export const pending: Record<string, readonly string[]> = {
   "en_CA": [],
   "it_IT": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",
@@ -627,6 +632,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "de_DE": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",
@@ -749,6 +755,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.verdance"
   ],
   "zh_CN": [
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.backstab.specNote_assassination",
     "entities.abilities.cheap_shot.specNote_subtlety",
@@ -772,6 +779,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.wrath.specNote_balance"
   ],
   "zh_TW": [
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.backstab.specNote_assassination",
     "entities.abilities.cheap_shot.specNote_subtlety",
@@ -795,6 +803,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.wrath.specNote_balance"
   ],
   "ko_KR": [
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.backstab.specNote_assassination",
     "entities.abilities.cheap_shot.specNote_subtlety",
@@ -818,6 +827,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.wrath.specNote_balance"
   ],
   "ja_JP": [
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.backstab.specNote_assassination",
     "entities.abilities.cheap_shot.specNote_subtlety",
@@ -842,6 +852,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pt_BR": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",
@@ -964,6 +975,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.verdance"
   ],
   "ru_RU": [
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.backstab.specNote_assassination",
     "entities.abilities.cheap_shot.specNote_subtlety",
@@ -988,6 +1000,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "cs_CZ": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",
@@ -1111,6 +1124,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "nl_NL": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",
@@ -1234,6 +1248,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",
@@ -1357,6 +1372,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",
@@ -1480,6 +1496,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",
@@ -1603,6 +1620,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",
@@ -1726,6 +1744,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",
@@ -1849,6 +1868,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "abilityUi.resources.focus",
+    "abilityUi.tooltip.requiresStealthSkulduggery",
     "classDetails.resources.focus",
     "entities.abilities.ambush.specNote_subtlety",
     "entities.abilities.ancestor_return.description",

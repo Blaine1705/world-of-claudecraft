@@ -6514,6 +6514,7 @@ export const nl_NL: EnTranslations = {
       "requiresLevel": "Vereist niveau {level}",
       "requiresForm": "Vereist {form}-gedaante",
       "requiresStealth": "Vereist sluiptocht",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Verbruikt combopunten",
       "requiresTargetHealthBelow": "Vereist doelwit onder {percent}% gezondheid",
       "requiresDodge": "Alleen bruikbaar nadat het doelwit ontwijkt",

@@ -65,6 +65,7 @@ export type TranslationKeyFlat =
   | 'abilityUi.tooltip.requiresLevel'
   | 'abilityUi.tooltip.requiresOutOfCombat'
   | 'abilityUi.tooltip.requiresStealth'
+  | 'abilityUi.tooltip.requiresStealthSkulduggery'
   | 'abilityUi.tooltip.requiresTargetHealthBelow'
   | 'abilityUi.tooltip.selfOnly'
   | 'abilityUi.tooltip.unavailable'

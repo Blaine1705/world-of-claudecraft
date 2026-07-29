@@ -6514,6 +6514,7 @@ export const vi_VN: EnTranslations = {
       "requiresLevel": "Yêu cầu cấp {level}",
       "requiresForm": "Yêu cầu Hình {form}",
       "requiresStealth": "Yêu cầu ẩn thân",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Tiêu hao điểm combo",
       "requiresTargetHealthBelow": "Yêu cầu mục tiêu dưới {percent}% máu",
       "requiresDodge": "Chỉ dùng được sau khi mục tiêu né đòn",

@@ -6514,6 +6514,7 @@ export const tr_TR: EnTranslations = {
       "requiresLevel": "{level}. seviye gerektirir",
       "requiresForm": "{form} Formu gerektirir",
       "requiresStealth": "Gizlenme gerektirir",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Kombo puanı tüketir",
       "requiresTargetHealthBelow": "Hedefin canının %{percent} altında olmasını gerektirir",
       "requiresDodge": "Yalnızca hedef sıyrıldıktan sonra kullanılabilir",

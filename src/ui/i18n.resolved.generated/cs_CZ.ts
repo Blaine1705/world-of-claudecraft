@@ -6514,6 +6514,7 @@ export const cs_CZ: EnTranslations = {
       "requiresLevel": "Vyžaduje úroveň {level}",
       "requiresForm": "Vyžaduje podobu: {form}",
       "requiresStealth": "Vyžaduje plížení",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Spotřebuje combo body",
       "requiresTargetHealthBelow": "Vyžaduje cíl pod {percent}% zdraví",
       "requiresDodge": "Použitelné jen poté, co se cíl vyhne",

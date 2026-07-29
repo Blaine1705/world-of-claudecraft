@@ -6514,6 +6514,7 @@ export const pl_PL: EnTranslations = {
       "requiresLevel": "Wymaga poziomu {level}",
       "requiresForm": "Wymaga postaci: {form}",
       "requiresStealth": "Wymaga skradania się",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Zużywa punkty kombinacji",
       "requiresTargetHealthBelow": "Wymaga celu poniżej {percent}% zdrowia",
       "requiresDodge": "Użyteczne tylko po uniku celu",

@@ -6514,6 +6514,7 @@ export const ja_JP: EnTranslations = {
       "requiresLevel": "レベル{level}が必要",
       "requiresForm": "{form}フォームが必要",
       "requiresStealth": "ステルスが必要",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "コンボポイントを消費",
       "requiresTargetHealthBelow": "対象の体力が{percent}%未満である必要があります",
       "requiresDodge": "対象が回避した後にのみ使用可能",
