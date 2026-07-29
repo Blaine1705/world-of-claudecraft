@@ -2133,7 +2133,10 @@ export function pathCrossesFence(
 // travel before the first occluder (1 = unobstructed). Open-world colliders
 // carry precomputed `cameraTopY` values, so large rocks still pull the camera
 // in only when the ray passes below their visual top. Hideable props are
-// flagged `camGhost` and skipped entirely (the renderer hides them instead).
+// flagged `camGhost` and skipped entirely (the renderer hides them instead),
+// which is ALSO how exterior clutter opts out of driving zoom: there is no
+// separate interior-only rule, and an exterior-wide bypass would take the
+// Eastbrook town wall and its lantern pylons with it.
 
 // First entry param t along a->b for a circle (radius already padded).
 // Infinity = no hit; we also bail when `a` is already inside (never slam the
@@ -2333,9 +2336,9 @@ export function cameraOcclusion(
 }
 
 // Eye height (yards above the ground) for the spell line-of-sight ray. An
-// open-world obstacle whose visual top (`cameraTopY`, the same precomputed top
-// the camera occlusion uses) sits at or below the sight line no longer blocks a
-// cast: a campfire (top 1.45), a crate (1.35), or a small rock is something you
+// open-world obstacle whose precomputed visual top (`cameraTopY`) sits at or
+// below the sight line no longer blocks a cast: a campfire (top 1.45), a crate
+// (1.35), or a small rock is something you
 // see and cast OVER, while buildings, trees, tents, and fences still block.
 // Colliders without a known top (the interior wall layouts) always block, the
 // conservative default, and MOVEMENT collision is untouched everywhere.

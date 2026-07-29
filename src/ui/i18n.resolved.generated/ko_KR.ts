@@ -906,7 +906,12 @@ export const ko_KR: EnTranslations = {
       "breakdownOther": "기타 ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "근접 공격"
+      "melee": "근접 공격",
+      "move": "드래그하여 이 미터를 이동",
+      "resize": "드래그하여 이 미터의 크기 조절",
+      "dock": "이 미터를 미터 창으로 되돌리기",
+      "separate": "{meter} 분리",
+      "regroup": "{meter} 통합"
     },
     "petFeed": {
       "disabledFullHp": "펫의 체력이 가득 찼습니다",
@@ -970,13 +975,13 @@ export const ko_KR: EnTranslations = {
     "mountRace": {
       "startButton": "레이스 시작",
       "cancelButton": "경기 취소",
-      "go": "GO!",
+      "go": "출발!",
       "start": "출발! 모든 장애물을 뛰어넘고 아치로 돌아가 통과하라.",
       "toFinish": "아치로 돌아가 통과하라!",
       "finished": "{seconds}초 만에 완주!",
       "timeout": "레이스 실패",
       "progress": "장애물 {n} / {total}",
-      "timeLeft": "{seconds}s"
+      "timeLeft": "{seconds}초"
     },
     "vcup": {
       "title": "베일 컵",
@@ -1508,6 +1513,10 @@ export const ko_KR: EnTranslations = {
       "twoFactorRecoveryTitle": "복구 코드를 저장하세요",
       "twoFactorRecoveryHint": "각 코드는 한 번만 사용할 수 있습니다. 안전한 곳에 보관하세요. 인증 앱을 잃어버렸을 때 다시 로그인할 수 있는 유일한 방법입니다.",
       "twoFactorDownloadCodes": "코드 다운로드",
+      "recoveryCodesFileHeader": "{brand} 복구 코드",
+      "recoveryCodesFileAccount": "계정: {username}",
+      "recoveryCodesFileHint": "인증 앱에 접근할 수 없게 되면 각 코드는 한 번만 사용할 수 있습니다.",
+      "recoveryCodesFileWarn": "이 파일은 안전하고 개인적인 곳에 보관하세요.",
       "twoFactorDone": "완료",
       "twoFactorDisableHint": "2단계 인증을 끄려면 비밀번호를 입력하세요. 복구 코드는 폐기됩니다.",
       "twoFactorDisableBtn": "2단계 인증 끄기",
@@ -2815,7 +2824,7 @@ export const ko_KR: EnTranslations = {
       "title": "세계 지도",
       "summary": "세계 지도. 지역을 선택하면 해당 지도가 열립니다.",
       "toWorld": "세계 지도",
-      "toZone": "Zone map",
+      "toZone": "지역 지도",
       "toggleAria": "세계 지도와 지역 지도 전환",
       "levels": "레벨 {min}부터 {max}까지"
     }
@@ -5742,7 +5751,7 @@ export const ko_KR: EnTranslations = {
     },
     "augment": {
       "choose": "증강 선택",
-      "cardAria": "{name} ({category}) - {description}",
+      "cardAria": "{name} ({category}): {description}",
       "aug_brutality": {
         "name": "잔혹함",
         "desc": "당신의 물리 공격이 15% 더 강하게 적중합니다."
@@ -6367,6 +6376,8 @@ export const ko_KR: EnTranslations = {
       "floatingDodge": "회피",
       "floatingParry": "무기 막기",
       "floatingResist": "저항",
+      "floatingHealFull": "가득 참",
+      "floatingHealAbsorbed": "흡수됨",
       "cannotMove": "이동 불가!",
       "attack": "공격",
       "damageDone": "{ability}이 {target}에게 {amount}의 피해를 입혔습니다.",
@@ -6381,6 +6392,10 @@ export const ko_KR: EnTranslations = {
       "healSelfCrit": "{ability}이 자신을 치명타 치유로 {amount}만큼 회복했습니다.",
       "healOther": "{ability}이 {target}을 {amount}만큼 치유했습니다.",
       "healOtherCrit": "{ability}이 {target}을 치명타 치유로 {amount}만큼 회복했습니다.",
+      "healSelfFull": "{ability}이 적중했지만 이미 생명력이 가득합니다.",
+      "healOtherFull": "{ability}이 {target}에게 적중했지만 대상은 이미 생명력이 가득합니다.",
+      "healSelfAbsorbed": "당신의 {ability}이(가) 당신에게 걸린 부패에 삼켜졌습니다.",
+      "healOtherAbsorbed": "당신의 {ability}이(가) {target}에게 걸린 부패에 삼켜졌습니다.",
       "death": "{name} 사망.",
       "auraGain": "{name} 효과를 얻었습니다.",
       "auraFade": "{name} 효과가 사라졌습니다.",
@@ -6740,22 +6755,22 @@ export const ko_KR: EnTranslations = {
       "gathering": "채집",
       "demonHeal": "악마 치유",
       "thunzharrStormcall": "폭풍의 부름",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "빙하의 무덤",
+      "rift_frost_strike": "절대 영도",
+      "rift_ember_execution": "마그마 우물",
+      "rift_ember_strike": "핵심 용해",
+      "rift_venom_execution": "독액 웅덩이",
+      "rift_venom_strike": "여왕 거미의 낙인",
+      "rift_necro_execution": "영혼의 무덤",
+      "rift_necro_strike": "사망 선고",
+      "rift_brute_execution": "대지 분쇄",
+      "rift_brute_strike": "최후의 심판",
+      "rift_arcane_execution": "공허 균열",
+      "rift_arcane_strike": "비전 소멸",
+      "rift_storm_execution": "피뢰침",
+      "rift_storm_strike": "폭풍 소환사의 분노",
+      "rift_tide_execution": "심연의 아가리",
+      "rift_tide_strike": "분쇄의 심연"
     }
   },
   "questUi": {

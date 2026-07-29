@@ -906,7 +906,12 @@ export const ru_RU: EnTranslations = {
       "breakdownOther": "Прочее ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Ближний бой"
+      "melee": "Ближний бой",
+      "move": "Перетащите, чтобы переместить счётчик",
+      "resize": "Перетащите, чтобы изменить размер счётчика",
+      "dock": "Вернуть счётчик в окно счётчиков",
+      "separate": "Отделить: {meter}",
+      "regroup": "Вернуть: {meter}"
     },
     "petFeed": {
       "disabledFullHp": "Питомец полностью здоров",
@@ -970,13 +975,13 @@ export const ru_RU: EnTranslations = {
     "mountRace": {
       "startButton": "Начать заезд",
       "cancelButton": "Отменить заезд",
-      "go": "GO!",
+      "go": "Вперёд!",
       "start": "Вперёд! Бери все препятствия и скачи назад через арку.",
       "toFinish": "Скачи назад через арку!",
       "finished": "Финиш за {seconds} с!",
       "timeout": "Заезд провален",
       "progress": "Барьеры {n} из {total}",
-      "timeLeft": "{seconds}s"
+      "timeLeft": "{seconds} сек."
     },
     "vcup": {
       "title": "Кубок Долины",
@@ -1508,6 +1513,10 @@ export const ru_RU: EnTranslations = {
       "twoFactorRecoveryTitle": "Сохраните коды восстановления",
       "twoFactorRecoveryHint": "Каждый код работает один раз. Храните их в надёжном месте: это единственный способ войти, если вы потеряете приложение-аутентификатор.",
       "twoFactorDownloadCodes": "Скачать коды",
+      "recoveryCodesFileHeader": "Коды восстановления {brand}",
+      "recoveryCodesFileAccount": "Аккаунт: {username}",
+      "recoveryCodesFileHint": "Каждый код можно использовать один раз, если вы потеряете доступ к приложению-аутентификатору.",
+      "recoveryCodesFileWarn": "Храните этот файл в надёжном и защищённом месте.",
       "twoFactorDone": "Готово",
       "twoFactorDisableHint": "Введите пароль, чтобы отключить двухфакторную аутентификацию. Ваши коды восстановления будут удалены.",
       "twoFactorDisableBtn": "Отключить двухфакторную аутентификацию",
@@ -2815,7 +2824,7 @@ export const ru_RU: EnTranslations = {
       "title": "Карта мира",
       "summary": "Карта мира. Выберите зону, чтобы открыть её карту.",
       "toWorld": "Карта мира",
-      "toZone": "Zone map",
+      "toZone": "Карта региона",
       "toggleAria": "Переключение между картой мира и картой региона",
       "levels": "Уровни {min} до {max}"
     }
@@ -5742,7 +5751,7 @@ export const ru_RU: EnTranslations = {
     },
     "augment": {
       "choose": "Выберите усиление",
-      "cardAria": "{name} ({category}) - {description}",
+      "cardAria": "{name} ({category}): {description}",
       "aug_brutality": {
         "name": "Жестокость",
         "desc": "Твои физические удары бьют на 15% сильнее."
@@ -6367,6 +6376,8 @@ export const ru_RU: EnTranslations = {
       "floatingDodge": "Уклон",
       "floatingParry": "Парировано",
       "floatingResist": "Сопротивление",
+      "floatingHealFull": "Полное",
+      "floatingHealAbsorbed": "Поглощено",
       "cannotMove": "Не двигается!",
       "attack": "атака",
       "damageDone": "Ваше {ability} поражает {target} на {amount}.",
@@ -6381,6 +6392,10 @@ export const ru_RU: EnTranslations = {
       "healSelfCrit": "Ваше {ability} критически исцеляет вас на {amount}.",
       "healOther": "Ваше {ability} исцеляет {target} на {amount}.",
       "healOtherCrit": "Ваше {ability} критически исцеляет {target} на {amount}.",
+      "healSelfFull": "Ваше {ability} срабатывает, но у вас уже полное здоровье.",
+      "healOtherFull": "Ваше {ability} срабатывает на {target}, но у цели уже полное здоровье.",
+      "healSelfAbsorbed": "Ваше «{ability}» поглощено порчей на вас.",
+      "healOtherAbsorbed": "Ваше «{ability}» поглощено порчей на цели {target}.",
       "death": "{name} умирает.",
       "auraGain": "Вы получаете {name}.",
       "auraFade": "{name} спадает с вас.",
@@ -6740,22 +6755,22 @@ export const ru_RU: EnTranslations = {
       "gathering": "Сбор ресурсов",
       "demonHeal": "Исцеление демона",
       "thunzharrStormcall": "Зов бури",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "Ледяная могила",
+      "rift_frost_strike": "Абсолютный ноль",
+      "rift_ember_execution": "Магматический колодец",
+      "rift_ember_strike": "Расплавление ядра",
+      "rift_venom_execution": "Ядовитая лужа",
+      "rift_venom_strike": "Метка паучьей матки",
+      "rift_necro_execution": "Могила душ",
+      "rift_necro_strike": "Смертный приговор",
+      "rift_brute_execution": "Разрушитель земли",
+      "rift_brute_strike": "Окончательный приговор",
+      "rift_arcane_execution": "Разлом пустоты",
+      "rift_arcane_strike": "Тайное уничтожение",
+      "rift_storm_execution": "Громоотвод",
+      "rift_storm_strike": "Гнев призывателя бурь",
+      "rift_tide_execution": "Пасть бездны",
+      "rift_tide_strike": "Сокрушающая глубина"
     }
   },
   "questUi": {
