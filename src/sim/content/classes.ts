@@ -5092,6 +5092,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   bear_form: {
     id: 'bear_form',
+    tooltipOmitEffectLines: true,
     name: 'Bruin Form',
     class: 'druid',
     learnLevel: 8,
@@ -5199,6 +5200,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   cat_form: {
     id: 'cat_form',
+    tooltipOmitEffectLines: true,
     name: 'Wolf Form',
     class: 'druid',
     learnLevel: 5,
@@ -5214,6 +5216,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   prowl: {
     id: 'prowl',
+    tooltipOmitEffectLines: true,
     name: 'Stalk',
     class: 'druid',
     learnLevel: 5,
@@ -5377,6 +5380,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // rides into dodgeChance in recalcPlayerStats.
   primal_reflexes: {
     id: 'primal_reflexes',
+    tooltipOmitEffectLines: true,
     name: 'Primal Reflexes',
     class: 'druid',
     learnLevel: 20,
@@ -5417,6 +5421,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   travel_form: {
     id: 'travel_form',
+    tooltipOmitEffectLines: true,
     name: 'Fleet Form',
     class: 'druid',
     learnLevel: 11,
@@ -5473,7 +5478,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: true,
     effects: [{ type: 'faerieFire', duration: 40 }],
-    description: "Decreases the target's armor by $d% for 40 sec. Does not stack with Armor Shear.",
+    description:
+      "Decreases the target's armor by $d% for 40 sec. Only the strongest armor-reducing debuff counts, so it does not add to a warrior's Armor Shear or a rogue's Armor Breach.",
   },
   hibernate: {
     id: 'hibernate',
@@ -5491,6 +5497,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   dash: {
     id: 'dash',
+    tooltipOmitEffectLines: true,
     name: 'Dash',
     class: 'druid',
     learnLevel: 18,
@@ -5539,6 +5546,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   tigers_fury: {
     id: 'tigers_fury',
+    tooltipOmitEffectLines: true,
     name: 'Wolfsblood',
     class: 'druid',
     learnLevel: 20,
@@ -6348,6 +6356,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   moonkin_form: {
     id: 'moonkin_form',
+    tooltipOmitEffectLines: true,
     name: 'Moonwing Form',
     class: 'druid',
     learnLevel: 10,

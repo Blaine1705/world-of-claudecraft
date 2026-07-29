@@ -1455,7 +1455,7 @@ const classAbilityNamesEn = {
       [
         'faerie_fire',
         'Witchlight',
-        "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Armor Shear.",
+        "Decreases the target's armor by {damage}% for 40 sec. Only the strongest armor-reducing debuff counts, so it does not add to a warrior's Armor Shear or a rogue's Armor Breach.",
       ],
       [
         'hibernate',
