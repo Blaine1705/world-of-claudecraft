@@ -22,6 +22,9 @@
 // ROD_FEE_RECIPE_IDS). Nothing per-player (account id,
 // character id, name, ip) is ever a label. The tick-phase series count is fixed at
 // WOC_TICK_PHASES.length * 2, independent of the profiler's internal phase set.
+// Operator migration note: woc_gather_harvests_total gained the tier label in
+// this release, so the one live series per zone became three; sum() panels
+// keep their totals, a panel selecting the bare band label must aggregate.
 //
 // THE `band` LABEL MEANS TWO DIFFERENT THINGS, and deliberately so: on
 // woc_gather_harvests_total it is the node's ZONE (R3 re-keyed it there and

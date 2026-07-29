@@ -441,9 +441,10 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // min(proficiency band, best band the owned rod tier covers). The cap is
   // SILENT by design: no event and no denial, the cast still lands a
   // band-capped catch (the effective band does ride the owner's own outcome
-  // events for the telemetry, so "silent" means no denial, not secret). All of this is pure
-  // state resolved before the single rng draw below, so the one-draw-per-catch
-  // contract and every existing seed's catch sequence are untouched.
+  // events for the telemetry, so "silent" means no denial, not secret). All
+  // of this is pure state resolved before the single rng draw below, so the
+  // one-draw-per-catch contract and every existing seed's catch sequence are
+  // untouched.
   //
   // TWO ROD RULES, KEPT SEPARATE ON PURPOSE, because they answer different
   // questions and a player reads them differently. The zone gate in

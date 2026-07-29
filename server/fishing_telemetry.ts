@@ -17,7 +17,12 @@
 // hit, a teleport, or the angler's own movement, plus the once-ever
 // codfather quest catch, which returns before any outcome event), so the
 // residual grows in steady state and is a cancellation gauge, never a
-// zero-check.
+// zero-check. One accepted band edge, unlike the zone (which the session
+// pins on fishCastZoneId): the cast samples the effective band at cast time
+// while the outcome events re-resolve it at completion, so a mid-session
+// rod change (discarding the rod during the bite wait has no casting guard)
+// can put a cast and its catch in different band cells. Per-band totals
+// absorb it as residual noise; it cannot mint an off-vocabulary series.
 //
 // THE ZONE VOCABULARY IS HARVEST_BANDS, deliberately reused rather than
 // re-derived: a fishing zone and a harvest zone are the same ZoneDef list, and
