@@ -318,3 +318,38 @@ describe('bags_window: per-copy instance tooltip forwarding (Professions 2.0)', 
     expect(painter).toContain('this.deps.itemTooltip(item, s.instance)');
   });
 });
+
+describe('bags_window: unknown-id stacks stay visible (stale-client guard, R34)', () => {
+  // The keep/exclude decision lives in bag_filter.ts (pinned in
+  // bag_filter.test.ts); these pins hold the painter to rendering what the
+  // core keeps. Comment-stripped so prose naming an arm cannot satisfy a pin.
+  const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+
+  it('paints an unknown-id stack through buildUnknownStackCell in BOTH grid views', () => {
+    // The pristine view used to paint it as an EMPTY square; the list view
+    // used to drop the row entirely (`if (!item) continue`).
+    expect(code).toContain('this.buildUnknownStackCell(stack, cell)');
+    expect(code).toContain('this.buildUnknownStackCell(s, null)');
+    expect(code).not.toContain('if (!item) continue');
+  });
+
+  it('renders the fallback icon and the raw id, with no action wiring', () => {
+    const start = code.indexOf('private buildUnknownStackCell(');
+    const end = code.indexOf('private bindBagCellDrop(');
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const body = code.slice(start, end);
+    expect(body).toContain('unknownItemIconHtml(s.itemId)');
+    // The raw id is the accessible label and the tooltip title.
+    expect(body).toContain("t('itemUi.bags.itemAria', {");
+    expect(body).toContain('item: s.itemId,');
+    expect(body).toContain("t('itemUi.bags.unknownItem')");
+    // Focusable no-op (the backpack-socket precedent): with no def there is
+    // no action to run, so the cell wires no click listener.
+    expect(body).toContain("row.setAttribute('aria-disabled', 'true')");
+    expect(body).not.toContain('addEventListener');
+    // Still a drop target in the pristine view, so re-parking other stacks
+    // around the unknown one keeps working.
+    expect(body).toContain('this.bindBagCellDrop(row, cell)');
+  });
+});

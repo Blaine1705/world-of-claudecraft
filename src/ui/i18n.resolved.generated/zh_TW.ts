@@ -6701,7 +6701,8 @@ export const zh_TW: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "摧毀 {item}",
       "destroyConfirm": "摧毀",
-      "destroyCancel": "取消"
+      "destroyCancel": "取消",
+      "unknownItem": "未知物品"
     },
     "equipment": {
       "empty": "空",

@@ -6701,7 +6701,8 @@ export const cs_CZ: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "Zničit {item}",
       "destroyConfirm": "Zničit",
-      "destroyCancel": "Zrušit"
+      "destroyCancel": "Zrušit",
+      "unknownItem": "Unknown item"
     },
     "equipment": {
       "empty": "Prázdné",

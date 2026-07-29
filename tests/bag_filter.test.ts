@@ -87,10 +87,32 @@ describe('applyBagFilter — category filtering', () => {
     expect(ids(out)).toEqual(['keystone']);
   });
 
-  it('drops slots whose item is missing from the table', () => {
+  it('keeps an unknown-id slot visible in the everything view (stale-client guard, R34)', () => {
+    // Inventory is server truth: a bundle one deploy behind the server can
+    // hold ids it predates, and each one still occupies a real, counted bag
+    // slot. Dropping it from the everything view is how a counted slot turns
+    // invisible, the exact failure the phase 11 guard removes.
     const inv: InvSlot[] = [...INV, { itemId: 'ghost', count: 1 }];
     const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'recent', search: '' });
-    expect(ids(out)).not.toContain('ghost');
+    expect(ids(out)).toEqual([...ids(INV), 'ghost']);
+  });
+
+  it('excludes an unknown-id slot from every category chip and from a name search', () => {
+    // With no def there is no kind to classify and no display name to match;
+    // only the everything view keeps the slot. The search arm also proves a
+    // query does not match the raw id (a player searches names, not ids).
+    const inv: InvSlot[] = [...INV, { itemId: 'ghost', count: 1 }];
+    for (const category of BAG_CATEGORIES) {
+      if (category === 'all') continue;
+      const out = applyBagFilter(inv, lookup, { category, sort: 'recent', search: '' });
+      expect(ids(out), category).not.toContain('ghost');
+    }
+    const searched = applyBagFilter(inv, lookup, {
+      category: 'all',
+      sort: 'recent',
+      search: 'ghost',
+    });
+    expect(ids(searched)).not.toContain('ghost');
   });
 });
 
@@ -150,6 +172,43 @@ describe('applyBagFilter — sorting', () => {
     const before = ids(INV);
     applyBagFilter(INV, lookup, { category: 'all', sort: 'quality', search: '' });
     expect(ids(INV)).toEqual(before);
+  });
+
+  it('ranks an unknown-id slot below poor in the quality sort, never a throw', () => {
+    // The unknown slot is prepended so landing LAST proves ranking, not
+    // stable-order luck; before the guard this sort dereferenced the missing
+    // def through a non-null assertion.
+    const inv: InvSlot[] = [{ itemId: 'ghost', count: 1 }, ...INV];
+    const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'quality', search: '' });
+    expect(ids(out)).toEqual([
+      'relic',
+      'helm',
+      'blade',
+      'potion',
+      'keystone',
+      'bread',
+      'dagger',
+      'rod',
+      'pelt',
+      'ghost',
+    ]);
+  });
+
+  it('name-sorts an unknown-id slot by its raw id', () => {
+    const inv: InvSlot[] = [{ itemId: 'ghost', count: 1 }, ...INV];
+    const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'name', search: '' });
+    expect(ids(out)).toEqual([
+      'relic',
+      'bread',
+      'keystone',
+      'rod',
+      'ghost',
+      'helm',
+      'potion',
+      'blade',
+      'dagger',
+      'pelt',
+    ]);
   });
 });
 

@@ -51,6 +51,7 @@ import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
+import { unknownItemIconHtml } from './unknown_item_icon';
 
 // The unranked quality fallback as a CSS custom property. The shared QUALITY_COLOR
 // map carries the real per-quality hex; this token covers an item with no quality
@@ -386,8 +387,10 @@ export class BankWindow {
       return;
     }
     // Apply the window-local filter/sort. slotIndex rides through, so a filtered or
-    // sorted cell still acts on its ORIGINAL bank slot; filterBankSlots drops unknown-id
-    // (dormant) slots exactly as the bags filter does.
+    // sorted cell still acts on its ORIGINAL bank slot; filterBankSlots keeps
+    // unknown-id slots visible in the everything view (bank contents are server
+    // truth, so a stale bundle can hold ids it predates, R34) and excludes them
+    // only from category chips and name searches, exactly as the bags filter does.
     const isDefault = bagFilterIsDefault(this.filter);
     const visible = filterBankSlots(
       slots,
@@ -405,18 +408,22 @@ export class BankWindow {
     }
     for (const slot of visible) {
       const item = ITEMS[slot.itemId];
-      if (!item) continue;
       const cell = document.createElement('button');
       cell.type = 'button';
       cell.className = `bank-item q-${slot.qualityKey}`;
       const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
       cell.style.setProperty('--bank-slot-quality', qColor);
-      const itemName = itemDisplayName(item);
+      // Stale-client guard (R34): an id this bundle predates still holds a
+      // real, counted bank slot, so it renders (fallback icon, raw id as the
+      // label) instead of vanishing. The withdraw click stays live because the
+      // server resolves it by slotIndex, no def needed; only the def-derived
+      // tooltip body is replaced.
+      const itemName = item ? itemDisplayName(item) : slot.itemId;
       cell.setAttribute(
         'aria-label',
         t('itemUi.bags.itemAria', { item: itemName, count: this.fmt(slot.count) }),
       );
-      cell.innerHTML = `${this.deps.itemIcon(item)}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: this.fmt(slot.count) })) : ''}</span>`;
+      cell.innerHTML = `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: this.fmt(slot.count) })) : ''}</span>`;
       cell.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the slot (its
         // tooltip is already shown) instead of withdrawing: the release dismisses
@@ -431,7 +438,10 @@ export class BankWindow {
         const partial = slot.showCount
           ? `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawPartialHint'))}</div>`
           : '';
-        return `${this.deps.itemTooltip(item, slot.instance)}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
+        const body = item
+          ? this.deps.itemTooltip(item, slot.instance)
+          : `<div class="tt-title">${esc(slot.itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`;
+        return `${body}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
       });
       grid.appendChild(cell);
     }
@@ -452,8 +462,8 @@ export class BankWindow {
   }
 
   // Localized display name, used for search matching AND the name-sort so both agree
-  // with the visible cell. An unknown id (already dropped by filterBankSlots) falls back
-  // to the raw id defensively.
+  // with the visible cell. An unknown id falls back to the raw id: that is the label
+  // its cell renders (the stale-client guard above), so sort and search stay agreed.
   private itemNameOf(itemId: string): string {
     const item = ITEMS[itemId];
     return item ? itemDisplayName(item) : itemId;

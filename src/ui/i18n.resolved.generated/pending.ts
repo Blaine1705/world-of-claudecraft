@@ -37,7 +37,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ],
   "es_ES": [
     "entities.items.fine_ashwood_log.name",
@@ -67,7 +68,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ],
   "fr_FR": [
     "entities.items.fine_ashwood_log.name",
@@ -97,7 +99,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ],
   "fr_CA": [
     "entities.items.fine_ashwood_log.name",
@@ -127,7 +130,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ],
   "en_CA": [],
   "it_IT": [
@@ -158,7 +162,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ],
   "de_DE": [
     "entities.items.fine_ashwood_log.name",
@@ -188,7 +193,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ],
   "zh_CN": [
     "fiesta.augment.cardAria",
@@ -246,7 +252,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ],
   "ru_RU": [
     "fiesta.augment.cardAria",
@@ -283,7 +290,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ],
   "nl_NL": [
     "entities.items.fine_ashwood_log.name",
@@ -313,7 +321,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ],
   "pl_PL": [
     "entities.items.fine_ashwood_log.name",
@@ -343,7 +352,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ],
   "id_ID": [
     "entities.items.fine_ashwood_log.name",
@@ -373,7 +383,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ],
   "tr_TR": [
     "entities.items.fine_ashwood_log.name",
@@ -403,7 +414,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ],
   "sv_SE": [
     "entities.items.fine_ashwood_log.name",
@@ -433,7 +445,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ],
   "vi_VN": [
     "entities.items.fine_ashwood_log.name",
@@ -463,7 +476,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ],
   "da_DK": [
     "entities.items.fine_ashwood_log.name",
@@ -493,6 +507,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectSpent"
+    "hudChrome.professions.toolEffectSpent",
+    "itemUi.bags.unknownItem"
   ]
 };

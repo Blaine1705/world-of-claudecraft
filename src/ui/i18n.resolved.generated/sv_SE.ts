@@ -6701,7 +6701,8 @@ export const sv_SE: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "Förstör {item}",
       "destroyConfirm": "Förstör",
-      "destroyCancel": "Avbryt"
+      "destroyCancel": "Avbryt",
+      "unknownItem": "Unknown item"
     },
     "equipment": {
       "empty": "Tom",

@@ -6701,7 +6701,8 @@ export const vi_VN: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "Tiêu hủy {item}",
       "destroyConfirm": "Tiêu Hủy",
-      "destroyCancel": "Hủy"
+      "destroyCancel": "Hủy",
+      "unknownItem": "Unknown item"
     },
     "equipment": {
       "empty": "Trống",

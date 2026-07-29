@@ -2240,6 +2240,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.bags.empty': '你的背包是空的。',
   'itemUi.bags.itemAria': '{item}，数量 {count}',
   'itemUi.bags.stackCount': 'x{count}',
+  'itemUi.bags.unknownItem': '未知物品',
   'itemUi.bags.destroyTitle': '摧毁 {item}',
   'itemUi.bags.destroyConfirm': '摧毁',
   'itemUi.bags.destroyCancel': '取消',

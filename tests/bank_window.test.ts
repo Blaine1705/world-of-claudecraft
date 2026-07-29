@@ -714,3 +714,31 @@ describe('bank_window: bonus-slot breakdown footer', () => {
     expect(grid).not.toContain('min-height');
   });
 });
+
+describe('bank_window: unknown-id slots stay visible (stale-client guard, R34)', () => {
+  // The keep/exclude decision lives in bank_filter.ts (pinned in
+  // bank_filter.test.ts); these pins hold the painter to rendering what the
+  // core keeps. Comment-stripped so prose naming an arm cannot satisfy a pin.
+  const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+
+  it('renders an unknown-id slot with the fallback icon and its raw id as the label', () => {
+    // The grid loop used to drop the row entirely (`if (!item) continue`),
+    // which is how a counted bank slot turned invisible.
+    expect(code).not.toContain('if (!item) continue');
+    expect(code).toContain('item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)');
+    expect(code).toContain('const itemName = item ? itemDisplayName(item) : slot.itemId;');
+  });
+
+  it('keeps the withdraw click def-free and swaps only the tooltip body', () => {
+    // Withdraw resolves server-side by slotIndex, so the click stays wired
+    // for an unknown slot; the def-derived tooltip body is what falls back.
+    const start = code.indexOf('for (const slot of visible)');
+    const end = code.indexOf('private appendEmptyCells(');
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const body = code.slice(start, end);
+    expect(body).toContain('this.onSlotClick(slot.slotIndex, ev.shiftKey)');
+    expect(body).toContain('? this.deps.itemTooltip(item, slot.instance)');
+    expect(body).toContain("t('itemUi.bags.unknownItem')");
+  });
+});

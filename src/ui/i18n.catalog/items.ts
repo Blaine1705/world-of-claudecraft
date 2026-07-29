@@ -93,6 +93,9 @@ const itemStringsEn = {
       destroyTitle: 'Destroy {item}',
       destroyConfirm: 'Destroy',
       destroyCancel: 'Cancel',
+      // Tooltip sub-line for a stack whose item id this bundle cannot resolve
+      // (a client one deploy behind the server, R34); the title is the raw id.
+      unknownItem: 'Unknown item',
     },
     equipment: {
       empty: 'Empty',
@@ -293,6 +296,7 @@ export const itemStrings = {
         clickDestroy: 'Haz clic para destruir',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Bolsas',
         close: 'Cerrar bolsas',
         empty: 'Tus bolsas están vacías.',
@@ -455,6 +459,7 @@ export const itemStrings = {
         clickDestroy: 'Cliquer pour détruire',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Sacs',
         close: 'Fermer les sacs',
         empty: 'Vos sacs sont vides.',
@@ -617,6 +622,7 @@ export const itemStrings = {
         clickDestroy: 'Clicca per distruggere',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Borse',
         close: 'Chiudi borse',
         empty: 'Le tue borse sono vuote.',
@@ -777,6 +783,7 @@ export const itemStrings = {
         clickDestroy: 'Zum Zerstören klicken',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Taschen',
         close: 'Taschen schließen',
         empty: 'Eure Taschen sind leer.',
@@ -936,6 +943,7 @@ export const itemStrings = {
         clickDestroy: '点击摧毁',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: '背包',
         close: '关闭背包',
         empty: '你的背包是空的。',
@@ -1090,6 +1098,7 @@ export const itemStrings = {
         clickDestroy: '點擊摧毀',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: '背包',
         close: '關閉背包',
         empty: '你的背包是空的。',
@@ -1246,6 +1255,7 @@ export const itemStrings = {
         clickDestroy: '클릭하여 파괴',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: '가방',
         close: '가방 닫기',
         empty: '가방이 비어 있습니다.',
@@ -1404,6 +1414,7 @@ export const itemStrings = {
         clickDestroy: 'クリックして破棄',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'バッグ',
         close: 'バッグを閉じる',
         empty: 'バッグは空です。',
@@ -1562,6 +1573,7 @@ export const itemStrings = {
         clickDestroy: 'Clique para destruir',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Bolsas',
         close: 'Fechar bolsas',
         empty: 'Suas bolsas estão vazias.',
@@ -1720,6 +1732,7 @@ export const itemStrings = {
         clickDestroy: 'Нажмите, чтобы уничтожить',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Сумки',
         close: 'Закрыть сумки',
         empty: 'Ваши сумки пусты.',

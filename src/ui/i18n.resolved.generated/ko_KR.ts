@@ -6701,7 +6701,8 @@ export const ko_KR: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "{item} 파괴",
       "destroyConfirm": "파괴",
-      "destroyCancel": "취소"
+      "destroyCancel": "취소",
+      "unknownItem": "알 수 없는 아이템"
     },
     "equipment": {
       "empty": "비어 있음",

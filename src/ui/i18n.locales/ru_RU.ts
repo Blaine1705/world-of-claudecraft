@@ -2367,6 +2367,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.bags.empty': 'Ваши сумки пусты.',
   'itemUi.bags.itemAria': '{item}, количество {count}',
   'itemUi.bags.stackCount': 'x{count}',
+  'itemUi.bags.unknownItem': 'Неизвестный предмет',
   'itemUi.bags.destroyTitle': 'Уничтожить {item}',
   'itemUi.bags.destroyConfirm': 'Уничтожить',
   'itemUi.bags.destroyCancel': 'Отмена',

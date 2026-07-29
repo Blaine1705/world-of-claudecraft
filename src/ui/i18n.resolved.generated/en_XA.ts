@@ -6701,7 +6701,8 @@ export const en_XA: EnTranslations = {
       "stackCount": "[ẋ{count}]",
       "destroyTitle": "[Ðéšţŕóý {item}]",
       "destroyConfirm": "[Ðéšţŕóý]",
-      "destroyCancel": "[Çáñçéļ]"
+      "destroyCancel": "[Çáñçéļ]",
+      "unknownItem": "[Úñķñóŵñ íţéɱ]"
     },
     "equipment": {
       "empty": "[Éɱþţý]",

@@ -64,6 +64,7 @@ import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
 import { svgIcon, type UiIconName } from './ui_icons';
+import { unknownItemIconHtml } from './unknown_item_icon';
 import { totalHeldCount } from './vendor_sell_quantity';
 import { dropOnWorld } from './world_drop_target';
 
@@ -567,16 +568,24 @@ export class BagsWindow {
       for (let cell = 0; cell < model.cells.length; cell++) {
         const stack = model.cells[cell];
         const item = stack ? ITEMS[stack.itemId] : undefined;
+        // Stale-client guard (R34): a stack whose id this bundle predates is
+        // still an OCCUPIED slot; painting it as an empty square is how a
+        // counted slot turns invisible.
         grid.appendChild(
-          stack && item ? this.buildStackCell(stack, item, cell) : this.buildEmptyCell(cell),
+          stack && item
+            ? this.buildStackCell(stack, item, cell)
+            : stack
+              ? this.buildUnknownStackCell(stack, cell)
+              : this.buildEmptyCell(cell),
         );
       }
       return;
     }
     for (const s of model.visible) {
       const item = ITEMS[s.itemId];
-      if (!item) continue;
-      grid.appendChild(this.buildStackCell(s, item, null));
+      grid.appendChild(
+        item ? this.buildStackCell(s, item, null) : this.buildUnknownStackCell(s, null),
+      );
     }
     for (let i = 0; i < model.emptyCells; i++) grid.appendChild(this.buildEmptyCell(null));
   }
@@ -793,6 +802,38 @@ export class BagsWindow {
       this.bindBagCellDrop(el, cell);
     }
     return el;
+  }
+
+  // An occupied square whose def this bundle cannot resolve (stale-client
+  // guard, R34): inventory is server truth, so an id minted by content this
+  // bundle predates still holds a real, counted slot. The cell renders the
+  // fallback icon, its count badge, and the raw id as its label, following
+  // the backpack socket's focusable no-op precedent: with no def there is no
+  // action to run (use / sell / equip all need one), so it exposes none, and
+  // it stays a drop target in the pristine view so re-parking other stacks
+  // around it keeps working. Everything acts again once the client updates.
+  private buildUnknownStackCell(s: InvSlot, cell: number | null): HTMLElement {
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'bag-item q-common';
+    row.style.setProperty('--bag-slot-quality', QUALITY_DEFAULT_COLOR);
+    row.setAttribute('aria-disabled', 'true');
+    row.setAttribute(
+      'aria-label',
+      t('itemUi.bags.itemAria', {
+        item: s.itemId,
+        count: formatNumber(s.count, { maximumFractionDigits: 0 }),
+      }),
+    );
+    if (cell !== null) row.dataset.bagIndex = String(cell);
+    this.bindBagCellDrop(row, cell);
+    row.innerHTML = `${unknownItemIconHtml(s.itemId)}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+    this.deps.attachTooltip(
+      row,
+      () =>
+        `<div class="tt-title">${esc(s.itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`,
+    );
+    return row;
   }
 
   // A bag square as a drop target for a stack dragged out of the SAME bag. `cell` is the

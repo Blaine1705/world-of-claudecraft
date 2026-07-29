@@ -6701,7 +6701,8 @@ export const ja_JP: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "{item}を破棄",
       "destroyConfirm": "破棄",
-      "destroyCancel": "キャンセル"
+      "destroyCancel": "キャンセル",
+      "unknownItem": "不明なアイテム"
     },
     "equipment": {
       "empty": "空",

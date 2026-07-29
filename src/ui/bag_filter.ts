@@ -88,6 +88,11 @@ export function qualityRank(item: ItemDef): number {
   return QUALITY_RANK[item.quality ?? 'common'] ?? QUALITY_RANK.common;
 }
 
+// Where a slot with no resolvable def sorts in a quality view: below poor, so
+// server-truth ids this bundle predates (R34) gather at the end rather than
+// interleaving with known items. Shared with bank_filter.ts like qualityRank.
+export const UNKNOWN_QUALITY_RANK = QUALITY_RANK.poor + 1;
+
 // Filter, then sort. Returns a new array; never mutates the input. Sorts are
 // stable (Array.prototype.sort is spec-stable), so ties preserve insertion order
 // and the 'recent' sort is simply the unsorted filtered list.
@@ -99,15 +104,27 @@ export function applyBagFilter(
   const query = state.search.trim().toLowerCase();
   const filtered = slots.filter((slot) => {
     const item = lookup(slot.itemId);
-    if (!item) return false;
+    // Stale-client guard (R34): a slot whose id this bundle predates stays
+    // VISIBLE in the everything view (it occupies a real, counted bag slot;
+    // dropping it here is how a stack turns invisible), but a category chip
+    // or a name search excludes it, because with no def there is no kind to
+    // classify and no name to match.
+    if (!item) return state.category === 'all' && !query;
     if (!matchesCategory(item, state.category)) return false;
     if (query && !item.name.toLowerCase().includes(query)) return false;
     return true;
   });
+  // Sort keys tolerate the unknown-def slots the 'all' view now keeps: they
+  // rank below poor and name-sort by their raw id.
   if (state.sort === 'quality') {
-    filtered.sort((a, b) => qualityRank(lookup(a.itemId)!) - qualityRank(lookup(b.itemId)!));
+    const rank = (slot: InvSlot) => {
+      const item = lookup(slot.itemId);
+      return item ? qualityRank(item) : UNKNOWN_QUALITY_RANK;
+    };
+    filtered.sort((a, b) => rank(a) - rank(b));
   } else if (state.sort === 'name') {
-    filtered.sort((a, b) => lookup(a.itemId)!.name.localeCompare(lookup(b.itemId)!.name));
+    const name = (slot: InvSlot) => lookup(slot.itemId)?.name ?? slot.itemId;
+    filtered.sort((a, b) => name(a).localeCompare(name(b)));
   }
   return filtered;
 }

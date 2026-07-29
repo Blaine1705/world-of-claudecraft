@@ -6701,7 +6701,8 @@ export const it_IT: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "Distruggi {item}",
       "destroyConfirm": "Distruggi",
-      "destroyCancel": "Annulla"
+      "destroyCancel": "Annulla",
+      "unknownItem": "Unknown item"
     },
     "equipment": {
       "empty": "Vuoto",

@@ -173,14 +173,62 @@ describe('filterBankSlots: sorting preserves slotIndex', () => {
 });
 
 describe('filterBankSlots: unknown ids', () => {
-  it('excludes a dormant unknown-id slot from every view (mirrors the bag filter)', () => {
-    const withGhost: BankSlotModel[] = [
-      ...MODELS,
-      { slotIndex: 9, itemId: 'ghost', count: 1, showCount: false, qualityKey: 'common' },
-    ];
-    expect(ids(filterBankSlots(withGhost, lookup, state(), nameOf))).not.toContain('ghost');
-    // Unknown ids carry no name, so a nonempty search never surfaces them either.
+  // Bank contents are server truth, so a stale bundle can hold ids it
+  // predates (R34). The everything view keeps such a slot visible (its
+  // slotIndex intact, since withdraw acts on it); chips and searches still
+  // exclude it, mirroring the bag filter.
+  const withGhost: BankSlotModel[] = [
+    { slotIndex: 9, itemId: 'ghost', count: 1, showCount: false, qualityKey: 'common' },
+    ...MODELS,
+  ];
+
+  it('keeps an unknown-id slot visible in the everything view, slotIndex intact', () => {
+    const out = filterBankSlots(withGhost, lookup, state(), nameOf);
+    expect(ids(out)).toEqual([
+      'ghost',
+      'potion',
+      'blade',
+      'keystone',
+      'pelt',
+      'relic',
+      'helm',
+      'rod',
+    ]);
+    expect(indices(out)[0]).toBe(9);
+  });
+
+  it('excludes an unknown-id slot from category chips and from search', () => {
+    expect(
+      ids(filterBankSlots(withGhost, lookup, state({ category: 'material' }), nameOf)),
+    ).not.toContain('ghost');
+    // The injected resolver falls back to the raw id, but search is a NAME
+    // match: a query equal to the id must not surface the slot.
     expect(filterBankSlots(withGhost, lookup, state({ search: 'ghost' }), nameOf)).toEqual([]);
+  });
+
+  it('ranks an unknown-id slot below poor in the quality sort, never a throw', () => {
+    // Prepended above, so landing LAST proves ranking, not stable-order luck;
+    // before the guard this sort dereferenced the missing def through a
+    // non-null assertion.
+    const out = filterBankSlots(withGhost, lookup, state({ sort: 'quality' }), nameOf);
+    expect(ids(out)[out.length - 1]).toBe('ghost');
+    expect(ids(out).indexOf('pelt')).toBeLessThan(ids(out).indexOf('ghost'));
+  });
+
+  it('name-sorts an unknown-id slot by what the resolver returns for it (the raw id)', () => {
+    const out = filterBankSlots(withGhost, lookup, state({ sort: 'name' }), nameOf);
+    // Localized order with 'ghost' (raw id) collated in: Aardhelm, Bontvel,
+    // ghost, Hengel, Mirakel, Relikwie, Sleutelsteen, Zwaard.
+    expect(ids(out)).toEqual([
+      'helm',
+      'pelt',
+      'ghost',
+      'rod',
+      'potion',
+      'relic',
+      'keystone',
+      'blade',
+    ]);
   });
 });
 
