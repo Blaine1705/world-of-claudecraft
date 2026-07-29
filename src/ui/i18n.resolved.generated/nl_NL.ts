@@ -7174,18 +7174,18 @@ export const nl_NL: EnTranslations = {
         "name": "Kwaadaardige Houw",
         "description": "Een ogenblikkelijke slag voor wapenschade plus {damage}. Levert 1 combopunt op.",
         "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
-        "specNote_combat": "While Redline is active, this button becomes Body Blow."
+        "specNote_combat": "While Redline is active, this button becomes Body Blow: a heavier strike that awards 2 combo points and builds Redline."
       },
       "eviscerate": {
         "name": "Zandslaap",
         "description": "Afmaakzet die {damage} veroorzaakt.",
-        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend.",
-        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec, changing both your attack buttons."
+        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
+        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: your strike becomes Body Blow and this button becomes Knockout Blow (spend it before Redline ends)."
       },
       "backstab": {
         "name": "Laffe Steek",
         "description": "Steek het doelwit in de rug voor 150% wapenschade plus {damage}. Je moet achter het doelwit staan. Vereist een dolk. Levert 1 combopunt op.",
-        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend."
+        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
       },
       "gouge": {
         "name": "Oogstoot",

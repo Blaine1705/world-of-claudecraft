@@ -7174,18 +7174,18 @@ export const tr_TR: EnTranslations = {
         "name": "Kötücül Kesik",
         "description": "Silah hasarı artı {damage} için anlık bir vuruş. 1 kombo puanı kazandırır.",
         "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
-        "specNote_combat": "While Redline is active, this button becomes Body Blow."
+        "specNote_combat": "While Redline is active, this button becomes Body Blow: a heavier strike that awards 2 combo points and builds Redline."
       },
       "eviscerate": {
         "name": "Toprak Uykusu",
         "description": "{damage} veren bitirici hamle.",
-        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend.",
-        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec, changing both your attack buttons."
+        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
+        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: your strike becomes Body Blow and this button becomes Knockout Blow (spend it before Redline ends)."
       },
       "backstab": {
         "name": "Korkakça Saplama",
         "description": "Hedefe %150 silah hasarı artı {damage} ile sırttan bıçakla. Hedefin arkasında olmalısın. Bir hançer gerektirir. 1 kombo puanı kazandırır.",
-        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend."
+        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
       },
       "gouge": {
         "name": "Göz Dürtme",

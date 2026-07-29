@@ -934,7 +934,8 @@ const classAbilityNamesEn = {
         'An instant strike for weapon damage plus {damage}. Awards 1 combo point.',
         {
           assassination: 'Adds 1 Venom Ritual (max 6).',
-          combat: 'While Redline is active, this button becomes Body Blow.',
+          combat:
+            'While Redline is active, this button becomes Body Blow: a heavier strike that awards 2 combo points and builds Redline.',
         },
       ],
       [
@@ -942,9 +943,10 @@ const classAbilityNamesEn = {
         'Dirt Nap',
         'Finishing move that causes {damage}.',
         {
-          assassination: 'At 6 Venom Ritual, this button becomes Venomrend.',
+          assassination:
+            'At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.',
           combat:
-            'Landing this with 4 or more combo points starts Redline for 8 sec, changing both your attack buttons.',
+            'Landing this with 4 or more combo points starts Redline for 8 sec: your strike becomes Body Blow and this button becomes Knockout Blow (spend it before Redline ends).',
         },
       ],
       [
@@ -953,7 +955,7 @@ const classAbilityNamesEn = {
         "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
         {
           assassination:
-            'Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend.',
+            'Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once).',
         },
       ],
       [
