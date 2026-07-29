@@ -1297,10 +1297,19 @@ quality-slot suppression is one definition with two readers
 (usableToolEffectSlot); tEntity's Record arms read through ownEntry so
 peer-typed prototype keys render as raw ids everywhere (the itemSet
 arm used to throw); the tracker labels an unknown quest with a
-localizable sentence. Mutation pass: 24 mutations on the committed
-tree, all killed; three initially survivable pins were hardened first
-(the tracker sentence, a prototype-key loot drop, the pristine bags
-branch).
+localizable sentence. The fix round was itself re-reviewed by a fresh
+qa-checklist pass, which caught one blocker and two real gaps: the new
+tracker key shipped English-only (M16; the five non-Latin fills landed
+with it), and the interlock's other-direction claim missed the two
+lesson-mount routes that skip useItem (the riding-lesson summon toggle
+and the race-start instant mount), both now refusing on a live
+profession cast with the registered busy line and driven in the
+interlock suite; the spectating moderation dispatch gained its own
+drained-lane drop arm and the pristine bags branch a behavioral
+prototype-key arm. Mutation pass: 28 mutations on the committed tree,
+all killed; four initially survivable pins were hardened first (the
+tracker sentence, a prototype-key loot drop, the pristine bags branch
+twice, textually then behaviorally).
 
 Deferred, recorded: a rift entry/exit leg for a parity scenario (the
 draw-order gate is blind at the five new teleport arms; a scenario
