@@ -94,6 +94,7 @@ const KNOWN_CODES = [
   'seeker.genesis_token_claimed',
   'seeker.genesis_token_required',
   'seeker.native_only',
+  'seeker.solana_artifact_required',
   'seeker.wallet_required',
   'two_factor.already_enabled',
   'two_factor.code_invalid',

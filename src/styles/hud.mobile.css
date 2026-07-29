@@ -1445,7 +1445,7 @@
     #mobile-combat-controls
     #mobile-daily-rewards:focus-visible {
     border-radius: 8px;
-    outline: 2px solid var(--gold, #ffd65a);
+    outline: 2px solid var(--gold);
     outline-offset: 2px;
   }
   /* Idle-fade (mobile_chrome_fade.ts arms .mobile-chrome-idle on body after a
