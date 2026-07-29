@@ -48,7 +48,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Księga Czynów kroczy obok każdego kroku tej drogi. Pierwsze dostrojenie przynosi czyn Zaprzysiężony Rzemiosłu, a pierwsze arcydzieło - Mistrz Wyrobu, oba do noszenia jako tytuły. Każde z ośmiu rzemiosł możliwych do zdobycia zaznacza kamień milowy przy 50 umiejętności i uwieńcza swój limit tytułem Arcymistrza, podczas gdy wędkarstwo dostaje Starego Solonego przy 100 biegłości i tytuł Mistrza Wędkarstwa przy 200.\n\nSą też spokojniejsze strony: czyny za pierwsze zebranie i pierwsze wytworzenie, za rzadkie znaleziska, które los przynosi w terenie, i za wzięcie się za salvage. Wszystko jest kosmetyczne: tytuły i Renoma wyłącznie. Czyn nie daje mocy; tylko udowadnia, że tam byłeś.',
   'guide.professions.startHeading': 'Od czego zacząć',
   'guide.professions.startBody':
-    'Świeżo przybyły do Wschodniego Potoku? Znajdź Brygadzistę Odella i przyjmij zadanie Fach dla Każdej Ręki: wskaże ci żyły rudy wokół Miedzianego Wykopu na południowym zachodzie od miasta i da ci pierwsze odciski. Od tej chwili zbieraj każdą żyłę, drzewostan i łan ziół, które mijasz przy zadaniach; biegłość przychodzi naturalnie do podróżników.\n\nZ powrotem w mieście naciśnij T, by otworzyć okno wytwarzania, i pracuj na pospolitych przepisach znanych każdej postaci od początku. Odwiedź mistrzów przy kuźni, kuchni, krosnach i warsztacie, by zobaczyć, czego uczą, i przyjmij ich zlecenia na stały dochód. Zanim list Gildii cię odnajdzie, już będziesz wiedział, która para czuje się jak dom.',
+    'Świeżo przybyły do Wschodniego Potoku? Znajdź Brygadzistę Odella i przyjmij zadanie Fach dla Każdej Ręki: wskaże ci żyły rudy wokół Miedzianego Wykopu na południowym wschodzie od miasta i da ci pierwsze odciski. Od tej chwili zbieraj każdą żyłę, drzewostan i łan ziół, które mijasz przy zadaniach; biegłość przychodzi naturalnie do podróżników.\n\nZ powrotem w mieście naciśnij T, by otworzyć okno wytwarzania, i pracuj na pospolitych przepisach znanych każdej postaci od początku. Odwiedź mistrzów przy kuźni, kuchni, krosnach i warsztacie, by zobaczyć, czego uczą, i przyjmij ich zlecenia na stały dochód. Zanim list Gildii cię odnajdzie, już będziesz wiedział, która para czuje się jak dom.',
   'guide.professions.colStation': 'Stacja',
   'guide.professions.colHub': 'Centrum',
   'guide.professions.colMaster': 'Mistrz',
@@ -503,12 +503,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Widzisz? Ruda zebrana i odciski na rękach. Nie przerywaj wydobycia, ścinki drzew i zbierania ziół w trakcie podróży po drogach, a gdy wrócisz do miasta, zerknij na Tablicę Skupienia przy rynku i pobliskie stoisko rzemieślnicze. Jest w tym uczciwy zarobek, jeśli go zechcesz.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Żyła rudy wydobyta',
   'entities.quests.q_prof_intro.text':
-    'Każda dusza w Eastbrook uprawia jakiś fach oprócz miecza, {playerName}. W skałach wokół Miedzianego Wykopu, na południowym zachodzie od miasta, są żyły rudy. Idź i wydobądź własnoręcznie 5 z nich; poznam różnicę.',
+    'Każda dusza w Eastbrook uprawia jakiś fach oprócz miecza, {playerName}. W skałach wokół Miedzianego Wykopu, na południowym wschodzie od miasta, są żyły rudy. Idź i wydobądź własnoręcznie 5 z nich; poznam różnicę.',
   'entities.quests.q_prof_amends_apothecary.completion':
     'Stary smak powraca. Alchemia i Gotowanie wróciły do twojego pieca jako specjalizacje. Tym razem zostań trochę dłużej.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Dziki dzik upolowany',
   'entities.quests.q_prof_amends_apothecary.text':
-    'A, kto tu wraca do mojego garnka. Bez urazy, {playerName}, kuchnia zawsze ma miejsce, ale wiesz, że rachunek rośnie za każdym razem, gdy z niej wychodzisz. Idź przerzedzić dziki dziki na wschodniej łące, bo uczciwy pot jest pierwszym składnikiem i przypomni twoim rękom o pracy.',
+    'A, kto tu wraca do mojego garnka. Bez urazy, {playerName}, kuchnia zawsze ma miejsce, ale wiesz, że rachunek rośnie za każdym razem, gdy z niej wychodzisz. Idź przerzedzić dziki dziki na zachodniej łące, bo uczciwy pot jest pierwszym składnikiem i przypomni twoim rękom o pracy.',
   'entities.quests.q_prof_amends_apothecary.title': 'Z powrotem do pieca',
   'entities.quests.q_prof_amends_bombardier.completion':
     'No i jest ta nerwowość rąk. Inżynieria i Alchemia znowu twoimi specjalizacjami, no dawaj, idź zrób huk. Tym razem zostań, co?',
@@ -520,7 +520,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Znowu ustabilizowany. Garbarstwo i Krawiectwo wracają do twoich rąk jako specjalizacje. Mierz dwa razy nim znowu pójdziesz w świat.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Pająk sieciowy wybity',
   'entities.quests.q_prof_amends_outfitter.text':
-    'Znowu przy moim warsztacie po tym wszystkim. Nie mam urazy, {playerName}, ale nić pamięta rękę, która ją puściła, i koszt jej ponownego podjęcia jest z każdym razem odrobinę wyższy. Wybij pająki sieciowe tłoczące się w zachodnich lasach, a praca ustabilizuje twoje ręce zanim dotkną ponownie dobrego jedwabiu.',
+    'Znowu przy moim warsztacie po tym wszystkim. Nie mam urazy, {playerName}, ale nić pamięta rękę, która ją puściła, i koszt jej ponownego podjęcia jest z każdym razem odrobinę wyższy. Wybij pająki sieciowe tłoczące się we wschodnich lasach, a praca ustabilizuje twoje ręce zanim dotkną ponownie dobrego jedwabiu.',
   'entities.quests.q_prof_amends_outfitter.title': 'Powrót do warsztatu',
   'entities.quests.q_prof_amends_smith.completion':
     'Rytm wrócił do twoich rąk. Wytwarzanie Broni i Wytwarzanie Pancerzy znowu twoimi specjalizacjami. Nie rób z tego nawyku.',
@@ -2044,7 +2044,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Nareszcie padł. Górale przysięgali, że ten kot przeżyje sam mur. Tropiciele będą się teraz trzymać swoich wysokich śniegów, {playerName}, a moje patrole przejdą drogą bez krwawienia. Cała grań jest cichsza dzięki twojej pracy.',
   'entities.quests.q_old_cragmaw.objectives.0.label': 'Zabity Stary Skalogryz',
   'entities.quests.q_old_cragmaw.text':
-    'Górale nadali imię śladom, które znalazła moja zwiadowczyni: Stary Skalogryz, pokryty bliznami tyran wśród kotów, który przeżył trzy pokolenia własnego stada. To przez niego tropiciele zalewają moją drogę, {playerName}. Jego legowisko leży na zachodniej grani nad drogą na południe. Weź towarzysza i połóż starego diabła.',
+    'Górale nadali imię śladom, które znalazła moja zwiadowczyni: Stary Skalogryz, pokryty bliznami tyran wśród kotów, który przeżył trzy pokolenia własnego stada. To przez niego tropiciele zalewają moją drogę, {playerName}. Jego legowisko leży na wschodniej grani nad drogą na południe. Weź towarzysza i połóż starego diabła.',
   'entities.quests.q_old_cragmaw.title': 'Stary Skalogryz',
   'entities.quests.q_stalker_cloaks.completion':
     'Dziesięć dobrych skór, grubych jak mało która... nie, spójrz na nie, {playerName}. Połowa rozdarta, i to nie ostrzem ani włócznią. Ślady pazurów szerokie jak moja dłoń, na wylot przez zimowe futro. Coś na tej grani szarpie własny gatunek.',
@@ -4029,7 +4029,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Mogger w końcu nie żyje. Pola Eastbrook są bezpieczniejsze, a ty opuszczasz Dolinę z kolejną opowieścią wartą powtarzania.',
   'entities.quests.q_mogger.objectives.0.label': 'Mogger pokonany',
   'entities.quests.q_mogger.text':
-    'Mogger rozłupywał wozy, równał z ziemią płoty i wybił dość bydła, by ogołocić pół Doliny. Nie stawaj mu czoła w pojedynkę. Weź dwóch krzepkich towarzyszy na wschodnią łąkę i ubij tego brutala raz na zawsze.',
+    'Mogger rozłupywał wozy, równał z ziemią płoty i wybił dość bydła, by ogołocić pół Doliny. Nie stawaj mu czoła w pojedynkę. Weź dwóch krzepkich towarzyszy na zachodnią łąkę i ubij tego brutala raz na zawsze.',
   'entities.quests.q_mogger.title': 'Mogger musi paść',
   'entities.quests.q_murlocs.completion': 'Ha! To ich nauczy, by pilnowały własnych bajor.',
   'entities.quests.q_murlocs.objectives.0.label': 'Czaiciel z Błotnopłetwych pokonany',
@@ -4070,8 +4070,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_graves.objectives.1.label': 'Wizja przy grobie arcykapłana Malrica',
   'entities.quests.q_nythraxis_graves.objectives.2.label':
     'Wizja przy grobie królewskiego skrytobójcy Vossa',
-  'entities.quests.q_nythraxis_graves.text':
-    'Widziałem już te znaki, na trzech starych grobach wokół północnego pola bitwy. Kapitan Aldren spoczywa na wschodnim wzniesieniu, arcykapłan Malric przy środkowej zerwanej drodze, a królewski skrytobójca Voss przy zachodnim urwisku. Dotknij każdego grobu i posłuchaj, {playerName}. Zmarli mogą pamiętać to, o czym żywi zapomnieli.',
   'entities.quests.q_nythraxis_graves.title': 'Groby zapomnianych',
   'entities.quests.q_nythraxis_restless_dead.completion':
     'Ten sam znak widnieje na każdym odłamku... korona. Widziałem to już wcześniej, wyryte w starych grobach, których żadna kronika Eastbrook nie pamięta.',
@@ -4091,7 +4089,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_sealed_crypt.objectives.1.label': 'Dolna połowa klucza krypty',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.2.label': 'Pradawny dziennik',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    'Wizje wskazują na opuszczoną kryptę w zachodnim urwisku. Jest stara legenda, że w krypcie złożono króla. Być może Ciernisty Szczyt zapieczętował go w dole po tym, jak rytuał Malrica wypaczył go w coś nieśmiertelnego. Wejdź do krypty i zobacz, co pozostało w środku.',
+    'Wizje wskazują na opuszczoną kryptę we wschodnim urwisku. Jest stara legenda, że w krypcie złożono króla. Być może Ciernisty Szczyt zapieczętował go w dole po tym, jak rytuał Malrica wypaczył go w coś nieśmiertelnego. Wejdź do krypty i zobacz, co pozostało w środku.',
   'entities.quests.q_nythraxis_sealed_crypt.title': 'Opuszczona krypta',
   'entities.quests.q_ogre_bounty.completion':
     'Nagroda wypłacona w pełni. W podgórzu jest ciszej - teraz zajmiemy się tymi, którzy ich przekupują.',
@@ -4216,7 +4214,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_supplies.completion': 'Moje skrzynie! Ledwie zarysowane. Jesteś cudem.',
   'entities.quests.q_supplies.objectives.0.label': 'Skradziona skrzynia z zaopatrzeniem',
   'entities.quests.q_supplies.text':
-    'Ci bandyci napadli na mój ostatni wóz i zwiali z czterema skrzyniami towarów - narzędziami, solą, dobrym płótnem z Eastbrook. Skrzynie są ułożone wokół ich obozu na południowo-wschodnich wzgórzach. Ukradnij mi je z powrotem, dobrze?',
+    'Ci bandyci napadli na mój ostatni wóz i zwiali z czterema skrzyniami towarów - narzędziami, solą, dobrym płótnem z Eastbrook. Skrzynie są ułożone wokół ich obozu na południowo-zachodnich wzgórzach. Ukradnij mi je z powrotem, dobrze?',
   'entities.quests.q_supplies.title': 'Skradzione zaopatrzenie',
   'entities.quests.q_tarn_waders.completion':
     'Dziesięć z powrotem w wodzie. Nie czują zimna, {playerName}, ani strachu — jedynie przyciąganie tych wrót. Cokolwiek im śpiewa, śpiewa głośno.',
@@ -4227,8 +4225,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_the_codfather.completion':
     'Na wilgotnych świętych... Sam Dorszny Ojciec. Spójrz na te wąsy. Fenbridge będzie się zajadać opowieściami o tym połowie przez rok, {playerName}.',
   'entities.quests.q_the_codfather.objectives.0.label': 'Dorszny Ojciec',
-  'entities.quests.q_the_codfather.text':
-    'Dorszny Ojciec to nie jest zwykła ryba, {playerName}, to zimnokrwisty zabójca. Starzy ludzie przysięgają, że pożera Czaicieli z trzęsawiska na śniadanie, a nawet Wdowy z Mokrzawia nie przędą sieci w pobliżu Głębokich Płycizn ze szczerego przerażenia. On rządzi tymi wodami. Chwyć wędkę, wywlecz tego starego diabła z jego wód, a przyznam, że dołączyłeś do rodziny.',
   'entities.quests.q_the_codfather.title': 'Dorszny Ojciec',
   'entities.quests.q_troll_fetishes.completion':
     'Ten sam wytwórca, co sztandary w obozie kultu. Trolle to najemne łopaty, nic więcej. Dobra robota, {playerName}.',

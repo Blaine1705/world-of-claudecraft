@@ -48,7 +48,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Bedrifternes Bog går ved siden af hvert skridt af dette. Din første afstemning optjener Håndværkssvoren og dit første mesterværk optjener Mesterbygger, begge kan bæres som titler. Hvert af de otte optjenbare håndværk markerer en milepæls-bedrift ved 50 færdighed og kroner sin grænse med en Grandmestertitel, mens Fiskeri får Gammel Søulk ved 100 færdighed og Mesterangler-titlen ved 200.\n\nDer er stille sider også: bedrifter for din første høst og første fremstilling, for de sjældne fund, som held bringer frem i felten, og for at tage fat på ophug. Alt dette er kosmetisk, titler og Hæder alene. En bedrift giver aldrig magt; den beviser kun, at du var der.',
   'guide.professions.startHeading': 'Hvor du begynder',
   'guide.professions.startBody':
-    'Frisk ankommet til Østbæk? Find Formand Odell og tag Et Håndværk til Hver Hånd: han peger dig mod malmårerne omkring Kobbergraven sydvest for byen og giver dig dine første hårde hænder. Fra da af, høst enhver åre, tømmerstamme og urterand, du passerer, mens du løser opgaver; færdighed kommer naturligt til rejsende.\n\nTilbage i byen trykker du T for at åbne håndværksvinduet og arbejde de almindelige opskrifter, enhver karakter kender fra starten. Besøg mestrene ved essen, køkkenerne, vævsstolen og værkstedet for at se, hvad de underviser, og tag deres arbejdsopgaver for stabil møntindtægt. Inden Laugets brev finder dig, vil du allerede vide, hvilket par der føles som hjemme.',
+    'Frisk ankommet til Østbæk? Find Formand Odell og tag Et Håndværk til Hver Hånd: han peger dig mod malmårerne omkring Kobbergraven sydøst for byen og giver dig dine første hårde hænder. Fra da af, høst enhver åre, tømmerstamme og urterand, du passerer, mens du løser opgaver; færdighed kommer naturligt til rejsende.\n\nTilbage i byen trykker du T for at åbne håndværksvinduet og arbejde de almindelige opskrifter, enhver karakter kender fra starten. Besøg mestrene ved essen, køkkenerne, vævsstolen og værkstedet for at se, hvad de underviser, og tag deres arbejdsopgaver for stabil møntindtægt. Inden Laugets brev finder dig, vil du allerede vide, hvilket par der føles som hjemme.',
   'guide.professions.colStation': 'Station',
   'guide.professions.colHub': 'Knudepunkt',
   'guide.professions.colMaster': 'Mester',
@@ -497,7 +497,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Der er den gamle smag. Alkymi og Madlavning er tilbage på dit komfur som hovedfag. Bliv lidt denne gang.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Vildsvin jagtet',
   'entities.quests.q_prof_amends_apothecary.text':
-    'Se hvem der er tilbage ved min gryde. Ingen hårde følelser, {playerName}, et køkken har altid plads, men du ved, at regningen løber højere, hver gang du går. Gå til østmarken og tyn vildsvinene, for ærligt sved er den første ingrediens, og det vil minde dine hænder om arbejdet.',
+    'Se hvem der er tilbage ved min gryde. Ingen hårde følelser, {playerName}, et køkken har altid plads, men du ved, at regningen løber højere, hver gang du går. Gå til vestmarken og tyn vildsvinene, for ærligt sved er den første ingrediens, og det vil minde dine hænder om arbejdet.',
   'entities.quests.q_prof_amends_apothecary.title': 'Tilbage på komfuret',
   'entities.quests.q_prof_amends_bombardier.completion':
     'DER er den, kløen er tilbage i dine hænder. Ingeniørkunst og Alkymi, hovedfag igen, gå nu, gå og lav et brag. Prøv at blive sat denne gang, hvad?',
@@ -509,7 +509,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Stødig igen. Lærbearbejdning og Skrædderkunst vender tilbage til dine hænder som hovedfag. Mål to gange, inden du vandrer næste gang.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Nettedskov-Edderkop dræbt',
   'entities.quests.q_prof_amends_outfitter.text':
-    'Tilbage ved min væv alligevel. Jeg bærer intet nag, {playerName}, men tråden husker en hånd, der slap den, og prisen for at tage den op igen måles ud længere, hver gang. Dræb nettedskov-edderkopperne i den vestlige skov, og arbejdet vil sætte dine hænder til ro, inden de rører god silke igen.',
+    'Tilbage ved min væv alligevel. Jeg bærer intet nag, {playerName}, men tråden husker en hånd, der slap den, og prisen for at tage den op igen måles ud længere, hver gang. Dræb nettedskov-edderkopperne i den østlige skov, og arbejdet vil sætte dine hænder til ro, inden de rører god silke igen.',
   'entities.quests.q_prof_amends_outfitter.title': 'Tråde genforenet',
   'entities.quests.q_prof_amends_smith.completion':
     'Rytmen er tilbage i dine hænder. Våbensmedning og Rustningssmedning er dine hovedfag endnu engang. Gør ikke det til en vane at forlade.',
@@ -551,7 +551,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Se? Malm indsamlet og hård hud på hænderne. Bliv ved med minedriften, skovhugsten og urtesamlingen, når du rejser vejene, og når du er tilbage i byen, hold øje med Byfokus-opslagstavlen ved markedet og den nærliggende håndværksbænk. Der er en god handel at finde i alt dette, hvis du vil have det.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Malmåre høstet',
   'entities.quests.q_prof_intro.text':
-    'Enhver sjæl i Østbæk arbejder med et håndværk udover sværdet, {playerName}. Der er malmårer i klipperne omkring Kobbergraven, sydvest for byen. Gå sving en hakke og bearbejd 5 af dem selv, forstået; jeg vil kende forskel.',
+    'Enhver sjæl i Østbæk arbejder med et håndværk udover sværdet, {playerName}. Der er malmårer i klipperne omkring Kobbergraven, sydøst for byen. Gå sving en hakke og bearbejd 5 af dem selv, forstået; jeg vil kende forskel.',
   'gpuNotice.bodyDesktop':
     'Spillet kører uden GPU-acceleration og vil være langsomt. Opdater dine grafikdrivere og genstart derefter spillet. På Windows skal du også indstille spillet til Høj ydeevne under Indstillinger, System, Skærm, Grafik.',
   'gpuNotice.bodyWeb':
@@ -1889,7 +1889,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Endelig nede. Bjergfolket svor, at den kat ville overleve selve muren. Snigerne holder sig til deres høje sne nu, {playerName}, og mine patruljer kan gå ad vejen uden at bløde for det. Hele bjergkammen er mere stille takket være dit arbejde.',
   'entities.quests.q_old_cragmaw.objectives.0.label': 'Gamle Klippekæft dræbt',
   'entities.quests.q_old_cragmaw.text':
-    'Bjergfolket satte navn på de spor, min spejder fandt: Gamle Klippekæft, en arret tyran af en kat, der har overlevet tre generationer af sin egen flok. Den er grunden til, at snigerne oversvømmer min vej, {playerName}. Dens hule ligger på den vestlige bjergkam over vejen mod syd. Tag en ven med, og læg den gamle djævel ned.',
+    'Bjergfolket satte navn på de spor, min spejder fandt: Gamle Klippekæft, en arret tyran af en kat, der har overlevet tre generationer af sin egen flok. Den er grunden til, at snigerne oversvømmer min vej, {playerName}. Dens hule ligger på den østlige bjergkam over vejen mod syd. Tag en ven med, og læg den gamle djævel ned.',
   'entities.quests.q_old_cragmaw.title': 'Gamle Klippekæft',
   'entities.quests.q_stalker_cloaks.completion':
     'Ti gode pelse, tykke som nogen, jeg har... nej, se på de her, {playerName}. Flåede, halvdelen af dem, og ikke af nogen klinge eller noget spyd. Klomærker brede som min hånd, lige gennem vinterpelsen. Noget på den bjergkam mishandler sine egne.',
@@ -3904,7 +3904,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Mogger er endelig død. Østbæks marker er tryggere, og du forlader Dalen med endnu en fortælling værd at genfortælle.',
   'entities.quests.q_mogger.objectives.0.label': 'Mogger dræbt',
   'entities.quests.q_mogger.text':
-    'Mogger har kløvet vogne, jævnet hegn og dræbt nok kvæg til at tømme halvdelen af Dalen. Mød ham ikke alene. Tag to stærke ledsagere med ud på den østlige eng og læg det udyr ned for stedse.',
+    'Mogger har kløvet vogne, jævnet hegn og dræbt nok kvæg til at tømme halvdelen af Dalen. Mød ham ikke alene. Tag to stærke ledsagere med ud på den vestlige eng og læg det udyr ned for stedse.',
   'entities.quests.q_mogger.title': 'Mogger Skal Falde',
   'entities.quests.q_murlocs.completion':
     'Hah! Det skal lære dem at passe deres egne mudderhuller.',
@@ -3945,8 +3945,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_graves.objectives.0.label': 'Syn ved Kaptajn Aldrens Grav',
   'entities.quests.q_nythraxis_graves.objectives.1.label': 'Syn ved Ypperstepræst Malrics Grav',
   'entities.quests.q_nythraxis_graves.objectives.2.label': "Syn ved Kongelig Snigmorder Voss' Grav",
-  'entities.quests.q_nythraxis_graves.text':
-    'Jeg har set disse mærker før, på tre gamle grave omkring den nordlige slagmark. Kaptajn Aldren ligger på den østlige højderyg, Ypperstepræst Malric nær den centrale brudte vej, og Kongelig Snigmorder Voss ved den vestlige klippe. Rør ved hver grav og lyt, {playerName}. De døde husker måske, hvad de levende glemte.',
   'entities.quests.q_nythraxis_graves.title': 'De Glemtes Grave',
   'entities.quests.q_nythraxis_restless_dead.completion':
     'Det samme mærke optræder på hvert skår... en krone. Jeg har set det før, hugget ind i gamle grave, som ingen optegnelse i Østbæk husker.',
@@ -3966,7 +3964,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_sealed_crypt.objectives.1.label': 'Kryptnøglesten, Nedre',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.2.label': 'Ældgammel Dagbog',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    'Synerne peger på den forladte krypt i den vestlige klippe. Der er et gammelt sagn om, at krypten husede en konge. Måske forseglede Tornetop ham dernede, efter Malrics ritual fordrejede ham til noget dødløst. Træd ind i krypten og se, hvad der er tilbage derinde.',
+    'Synerne peger på den forladte krypt i den østlige klippe. Der er et gammelt sagn om, at krypten husede en konge. Måske forseglede Tornetop ham dernede, efter Malrics ritual fordrejede ham til noget dødløst. Træd ind i krypten og se, hvad der er tilbage derinde.',
   'entities.quests.q_nythraxis_sealed_crypt.title': 'Den Forladte Krypt',
   'entities.quests.q_ogre_bounty.completion':
     'Dusør betalt fuldt ud. Bjergfoden er roligere - nu tager vi os af dem, der står for opkøbet.',
@@ -4093,7 +4091,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_supplies.completion': 'Mine kasser! Knap en skramme på dem. Du er et under.',
   'entities.quests.q_supplies.objectives.0.label': 'Stjålet Forsyningskasse',
   'entities.quests.q_supplies.text':
-    'De banditter ramte min sidste vogn og stak af med fire kasser varer - værktøj, salt, godt Østbæk-linned. Kasserne er stablet rundt om deres lejr i bakkerne mod sydøst. Stjæl dem tilbage for mig, vil du ikke?',
+    'De banditter ramte min sidste vogn og stak af med fire kasser varer - værktøj, salt, godt Østbæk-linned. Kasserne er stablet rundt om deres lejr i bakkerne mod sydvest. Stjæl dem tilbage for mig, vil du ikke?',
   'entities.quests.q_supplies.title': 'Stjålne Forsyninger',
   'entities.quests.q_tarn_waders.completion':
     'Ti tilbage i vandet. De føler ingen kulde, {playerName}, og ingen frygt — kun trækket fra den port. Hvad end der synger for dem, synger det højt.',
@@ -4104,8 +4102,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_the_codfather.completion':
     'Ved de fugtige helgener... Selveste Torskefaren. Se de knurhår. Fenbridge vil tære på historier om denne fangst i et år, {playerName}.',
   'entities.quests.q_the_codfather.objectives.0.label': 'Torskefaren',
-  'entities.quests.q_the_codfather.text':
-    'Torskefaren er ikke bare en fisk, {playerName}, han er en koldblodig morder. De gamle sværger på, at han æder Sumpstrejfere til morgenmad, og selv Mosekær-Enkerne vil ikke spinde deres væv nær Dybsumps-Lavvandet af ren rædsel. Han hersker over de vande. Grib en fiskestang, slæb den gamle djævel op af sit vand, og jeg vil indrømme, at du er blevet en del af familien.',
   'entities.quests.q_the_codfather.title': 'Torskefaren',
   'entities.quests.q_troll_fetishes.completion':
     'Samme mager som bannerne i kultens lejr. Troldene er lejede skovle, intet mere. Godt arbejde, {playerName}.',

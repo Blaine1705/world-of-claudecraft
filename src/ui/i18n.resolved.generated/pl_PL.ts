@@ -3967,7 +3967,7 @@ export const pl_PL: EnTranslations = {
       "deedsHeading": "Czyny pamiętające drogę",
       "deedsBody": "Księga Czynów kroczy obok każdego kroku tej drogi. Pierwsze dostrojenie przynosi czyn Zaprzysiężony Rzemiosłu, a pierwsze arcydzieło - Mistrz Wyrobu, oba do noszenia jako tytuły. Każde z ośmiu rzemiosł możliwych do zdobycia zaznacza kamień milowy przy 50 umiejętności i uwieńcza swój limit tytułem Arcymistrza, podczas gdy wędkarstwo dostaje Starego Solonego przy 100 biegłości i tytuł Mistrza Wędkarstwa przy 200.\n\nSą też spokojniejsze strony: czyny za pierwsze zebranie i pierwsze wytworzenie, za rzadkie znaleziska, które los przynosi w terenie, i za wzięcie się za salvage. Wszystko jest kosmetyczne: tytuły i Renoma wyłącznie. Czyn nie daje mocy; tylko udowadnia, że tam byłeś.",
       "startHeading": "Od czego zacząć",
-      "startBody": "Świeżo przybyły do Wschodniego Potoku? Znajdź Brygadzistę Odella i przyjmij zadanie Fach dla Każdej Ręki: wskaże ci żyły rudy wokół Miedzianego Wykopu na południowym zachodzie od miasta i da ci pierwsze odciski. Od tej chwili zbieraj każdą żyłę, drzewostan i łan ziół, które mijasz przy zadaniach; biegłość przychodzi naturalnie do podróżników.\n\nZ powrotem w mieście naciśnij T, by otworzyć okno wytwarzania, i pracuj na pospolitych przepisach znanych każdej postaci od początku. Odwiedź mistrzów przy kuźni, kuchni, krosnach i warsztacie, by zobaczyć, czego uczą, i przyjmij ich zlecenia na stały dochód. Zanim list Gildii cię odnajdzie, już będziesz wiedział, która para czuje się jak dom.",
+      "startBody": "Świeżo przybyły do Wschodniego Potoku? Znajdź Brygadzistę Odella i przyjmij zadanie Fach dla Każdej Ręki: wskaże ci żyły rudy wokół Miedzianego Wykopu na południowym wschodzie od miasta i da ci pierwsze odciski. Od tej chwili zbieraj każdą żyłę, drzewostan i łan ziół, które mijasz przy zadaniach; biegłość przychodzi naturalnie do podróżników.\n\nZ powrotem w mieście naciśnij T, by otworzyć okno wytwarzania, i pracuj na pospolitych przepisach znanych każdej postaci od początku. Odwiedź mistrzów przy kuźni, kuchni, krosnach i warsztacie, by zobaczyć, czego uczą, i przyjmij ich zlecenia na stały dochód. Zanim list Gildii cię odnajdzie, już będziesz wiedział, która para czuje się jak dom.",
       "colStation": "Stacja",
       "colHub": "Centrum",
       "colMaster": "Mistrz",
@@ -11673,7 +11673,7 @@ export const pl_PL: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Fach dla każdej dłoni",
-        "text": "Każda dusza w Eastbrook uprawia jakiś fach oprócz miecza, {playerName}. W skałach wokół Miedzianego Wykopu, na południowym zachodzie od miasta, są żyły rudy. Idź i wydobądź własnoręcznie 5 z nich; poznam różnicę.",
+        "text": "Każda dusza w Eastbrook uprawia jakiś fach oprócz miecza, {playerName}. W skałach wokół Miedzianego Wykopu, na południowym wschodzie od miasta, są żyły rudy. Idź i wydobądź własnoręcznie 5 z nich; poznam różnicę.",
         "completion": "Widzisz? Ruda zebrana i odciski na rękach. Nie przerywaj wydobycia, ścinki drzew i zbierania ziół w trakcie podróży po drogach, a gdy wrócisz do miasta, zerknij na Tablicę Skupienia przy rynku i pobliskie stoisko rzemieślnicze. Jest w tym uczciwy zarobek, jeśli go zechcesz.",
         "objectives": {
           "0": {
@@ -11756,7 +11756,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_supplies": {
         "title": "Skradzione zaopatrzenie",
-        "text": "Ci bandyci napadli na mój ostatni wóz i zwiali z czterema skrzyniami towarów - narzędziami, solą, dobrym płótnem z Eastbrook. Skrzynie są ułożone wokół ich obozu na południowo-wschodnich wzgórzach. Ukradnij mi je z powrotem, dobrze?",
+        "text": "Ci bandyci napadli na mój ostatni wóz i zwiali z czterema skrzyniami towarów - narzędziami, solą, dobrym płótnem z Eastbrook. Skrzynie są ułożone wokół ich obozu na południowo-zachodnich wzgórzach. Ukradnij mi je z powrotem, dobrze?",
         "completion": "Moje skrzynie! Ledwie zarysowane. Jesteś cudem.",
         "objectives": {
           "0": {
@@ -12138,7 +12138,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Stary Skalogryz",
-        "text": "Górale nadali imię śladom, które znalazła moja zwiadowczyni: Stary Skalogryz, pokryty bliznami tyran wśród kotów, który przeżył trzy pokolenia własnego stada. To przez niego tropiciele zalewają moją drogę, {playerName}. Jego legowisko leży na zachodniej grani nad drogą na południe. Weź towarzysza i połóż starego diabła.",
+        "text": "Górale nadali imię śladom, które znalazła moja zwiadowczyni: Stary Skalogryz, pokryty bliznami tyran wśród kotów, który przeżył trzy pokolenia własnego stada. To przez niego tropiciele zalewają moją drogę, {playerName}. Jego legowisko leży na wschodniej grani nad drogą na południe. Weź towarzysza i połóż starego diabła.",
         "completion": "Nareszcie padł. Górale przysięgali, że ten kot przeżyje sam mur. Tropiciele będą się teraz trzymać swoich wysokich śniegów, {playerName}, a moje patrole przejdą drogą bez krwawienia. Cała grań jest cichsza dzięki twojej pracy.",
         "objectives": {
           "0": {
@@ -12377,7 +12377,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "Dorszny Ojciec",
-        "text": "Dorszny Ojciec to nie jest zwykła ryba, {playerName}, to zimnokrwisty zabójca. Starzy ludzie przysięgają, że pożera Czaicieli z trzęsawiska na śniadanie, a nawet Wdowy z Mokrzawia nie przędą sieci w pobliżu Głębokich Płycizn ze szczerego przerażenia. On rządzi tymi wodami. Chwyć wędkę, wywlecz tego starego diabła z jego wód, a przyznam, że dołączyłeś do rodziny.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "Na wilgotnych świętych... Sam Dorszny Ojciec. Spójrz na te wąsy. Fenbridge będzie się zajadać opowieściami o tym połowie przez rok, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12397,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Groby zapomnianych",
-        "text": "Widziałem już te znaki, na trzech starych grobach wokół północnego pola bitwy. Kapitan Aldren spoczywa na wschodnim wzniesieniu, arcykapłan Malric przy środkowej zerwanej drodze, a królewski skrytobójca Voss przy zachodnim urwisku. Dotknij każdego grobu i posłuchaj, {playerName}. Zmarli mogą pamiętać to, o czym żywi zapomnieli.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren pozostał wierny, Malric nie chciał przyjąć śmierci, a Voss dostrzegł niebezpieczeństwo wcześniej niż ktokolwiek inny. Cała trójka służyła temu samemu zapomnianemu królowi.",
         "objectives": {
           "0": {
@@ -12413,7 +12413,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "Opuszczona krypta",
-        "text": "Wizje wskazują na opuszczoną kryptę w zachodnim urwisku. Jest stara legenda, że w krypcie złożono króla. Być może Ciernisty Szczyt zapieczętował go w dole po tym, jak rytuał Malrica wypaczył go w coś nieśmiertelnego. Wejdź do krypty i zobacz, co pozostało w środku.",
+        "text": "Wizje wskazują na opuszczoną kryptę we wschodnim urwisku. Jest stara legenda, że w krypcie złożono króla. Być może Ciernisty Szczyt zapieczętował go w dole po tym, jak rytuał Malrica wypaczył go w coś nieśmiertelnego. Wejdź do krypty i zobacz, co pozostało w środku.",
         "completion": "Połowy klucza pasują do siebie, a dziennik Vossa nazywa to, co zapieczętowali: sygnet króla Nythraxis. Jeśli dziennik mówi prawdę, ten sygnet jest kluczem do jego grobowca.",
         "objectives": {
           "0": {
@@ -12455,7 +12455,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger musi paść",
-        "text": "Mogger rozłupywał wozy, równał z ziemią płoty i wybił dość bydła, by ogołocić pół Doliny. Nie stawaj mu czoła w pojedynkę. Weź dwóch krzepkich towarzyszy na wschodnią łąkę i ubij tego brutala raz na zawsze.",
+        "text": "Mogger rozłupywał wozy, równał z ziemią płoty i wybił dość bydła, by ogołocić pół Doliny. Nie stawaj mu czoła w pojedynkę. Weź dwóch krzepkich towarzyszy na zachodnią łąkę i ubij tego brutala raz na zawsze.",
         "completion": "Mogger w końcu nie żyje. Pola Eastbrook są bezpieczniejsze, a ty opuszczasz Dolinę z kolejną opowieścią wartą powtarzania.",
         "objectives": {
           "0": {
@@ -12515,7 +12515,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Powrót do warsztatu",
-        "text": "Znowu przy moim warsztacie po tym wszystkim. Nie mam urazy, {playerName}, ale nić pamięta rękę, która ją puściła, i koszt jej ponownego podjęcia jest z każdym razem odrobinę wyższy. Wybij pająki sieciowe tłoczące się w zachodnich lasach, a praca ustabilizuje twoje ręce zanim dotkną ponownie dobrego jedwabiu.",
+        "text": "Znowu przy moim warsztacie po tym wszystkim. Nie mam urazy, {playerName}, ale nić pamięta rękę, która ją puściła, i koszt jej ponownego podjęcia jest z każdym razem odrobinę wyższy. Wybij pająki sieciowe tłoczące się we wschodnich lasach, a praca ustabilizuje twoje ręce zanim dotkną ponownie dobrego jedwabiu.",
         "completion": "Znowu ustabilizowany. Garbarstwo i Krawiectwo wracają do twoich rąk jako specjalizacje. Mierz dwa razy nim znowu pójdziesz w świat.",
         "objectives": {
           "0": {
@@ -12525,7 +12525,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Z powrotem do pieca",
-        "text": "A, kto tu wraca do mojego garnka. Bez urazy, {playerName}, kuchnia zawsze ma miejsce, ale wiesz, że rachunek rośnie za każdym razem, gdy z niej wychodzisz. Idź przerzedzić dziki dziki na wschodniej łące, bo uczciwy pot jest pierwszym składnikiem i przypomni twoim rękom o pracy.",
+        "text": "A, kto tu wraca do mojego garnka. Bez urazy, {playerName}, kuchnia zawsze ma miejsce, ale wiesz, że rachunek rośnie za każdym razem, gdy z niej wychodzisz. Idź przerzedzić dziki dziki na zachodniej łące, bo uczciwy pot jest pierwszym składnikiem i przypomni twoim rękom o pracy.",
         "completion": "Stary smak powraca. Alchemia i Gotowanie wróciły do twojego pieca jako specjalizacje. Tym razem zostań trochę dłużej.",
         "objectives": {
           "0": {

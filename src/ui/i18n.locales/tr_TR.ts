@@ -48,7 +48,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Yiğitlikler Kitabı her adımda yanındadır. İlk bağlanman Zanaat Yeminlisi'ni ve ilk şaheser Şaheser Ustası'nı kazandırır; her ikisi de unvan olarak takılabilir. Sekiz kazanılabilir zanaatın her biri 50 beceri için bir dönüm noktası yiğitliği işaretler ve tavanını Büyük Usta unvanıyla taçlandırır; Balık Tutma ise 100 yetkinlikte Eski Denizci'yi ve 200'de Usta Olta Ustası unvanını alır.\n\nDaha sakin sayfalar da vardır: ilk hasat ve ilk üretim, sahada şansın ortaya çıkardığı nadir bulgular ve hurda işleme için yiğitlikler. Hepsi kozmetiktir, yalnızca unvanlar ve Ün. Bir yiğitlik hiçbir zaman güç vermez; yalnızca orada olduğunu kanıtlar.",
   'guide.professions.startHeading': 'Nereden başlanır',
   'guide.professions.startBody':
-    "Doğudere'de yoldan yeni mi çıktın? Ustabaşı Odell'i bul ve Her El İçin Bir Meslek'i al: seni kasabanın güneybatısındaki Bakır Kazısı çevresindeki cevher damarlarına yönlendirecek ve ilk nasırlarını sana verecek. Oradan itibaren, görev yaparken geçtiğin her damarı, ağaç kümesini ve ot yamasını topla; yetkinlik gezginlere doğal olarak gelir.\n\nKasabaya dönünce, zanaat penceresini açmak için T'ye bas ve her karakterin başlangıçtan bildiği yaygın tarifleri çalış. Forge, mutfaklar, dokuma tezgahı ve alet atölyesindeki ustalara onların öğrettiklerini görmeye git ve düzenli para için iş emirlerini al. Lonca'nın mektubu sana ulaşana kadar hangi çiftin ev gibi hissettirdiğini zaten biliyor olacaksın.",
+    "Doğudere'de yoldan yeni mi çıktın? Ustabaşı Odell'i bul ve Her El İçin Bir Meslek'i al: seni kasabanın güneydoğusundaki Bakır Kazısı çevresindeki cevher damarlarına yönlendirecek ve ilk nasırlarını sana verecek. Oradan itibaren, görev yaparken geçtiğin her damarı, ağaç kümesini ve ot yamasını topla; yetkinlik gezginlere doğal olarak gelir.\n\nKasabaya dönünce, zanaat penceresini açmak için T'ye bas ve her karakterin başlangıçtan bildiği yaygın tarifleri çalış. Forge, mutfaklar, dokuma tezgahı ve alet atölyesindeki ustalara onların öğrettiklerini görmeye git ve düzenli para için iş emirlerini al. Lonca'nın mektubu sana ulaşana kadar hangi çiftin ev gibi hissettirdiğini zaten biliyor olacaksın.",
   'guide.professions.colStation': 'İstasyon',
   'guide.professions.colHub': 'Merkez',
   'guide.professions.colMaster': 'Usta',
@@ -503,7 +503,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Gördün mü? Cevher toplandı ve ellerin nasırlandı. Yollarda gezerken madenciliğe, odun kesimine ve ot toplamaya devam et; kasabaya döndüğünde çarşının yanındaki Kasaba Odak Panosuna ve yakınındaki zanaat tezgahına dikkat et. İstersen hepsinde adil bir kazanç var.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Maden damarı işlendi',
   'entities.quests.q_prof_intro.text':
-    "Eastbrook'taki her ruh kılıcın yanı sıra bir zanaat da icra eder, {playerName}. Kasabanın güneybatısındaki Bakır Kazısı'nın çevresindeki kayalarda maden damarları var. Git bir kazma salla ve bunlardan 5'ini kendin işle; dikkat et, farkı anlayabilirim.",
+    "Eastbrook'taki her ruh kılıcın yanı sıra bir zanaat da icra eder, {playerName}. Kasabanın güneydoğusundaki Bakır Kazısı'nın çevresindeki kayalarda maden damarları var. Git bir kazma salla ve bunlardan 5'ini kendin işle; dikkat et, farkı anlayabilirim.",
   'gpuNotice.bodyDesktop':
     "Oyun GPU hızlandırması olmadan çalışıyor ve yavaş olacak. Grafik sürücülerini güncelleyip oyunu yeniden başlat. Windows'ta ayrıca Ayarlar > Sistem > Ekran > Grafikler altında oyunu Yüksek performans olarak ayarla.",
   'gpuNotice.bodyWeb':
@@ -1003,7 +1003,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Eski lezzet geri geldi. Simya ve Aşçılık yeniden ana dalın olarak ocağında. Bu sefer kal bir süre.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Yaban Domuzu avlandı',
   'entities.quests.q_prof_amends_apothecary.text':
-    'Bak bak, kim geldi mutfağıma. Kırgınlık yok, {playerName}, bir mutfağın her zaman yeri vardır, ama bilirsin ki her defasında dışarı çıkıp geri dönersen hesap birikir. Git doğu çayırındaki yaban domuzlarını azalt, çünkü dürüst ter ilk malzemedir ve bu, ellerini işe alıştırır.',
+    'Bak bak, kim geldi mutfağıma. Kırgınlık yok, {playerName}, bir mutfağın her zaman yeri vardır, ama bilirsin ki her defasında dışarı çıkıp geri dönersen hesap birikir. Git batı çayırındaki yaban domuzlarını azalt, çünkü dürüst ter ilk malzemedir ve bu, ellerini işe alıştırır.',
   'entities.quests.q_prof_amends_apothecary.title': 'Yeniden Ocakta',
   'entities.quests.q_prof_amends_bombardier.completion':
     'İşte bu, ellerindeki kaşıntı geri döndü. Mühendislik ve Simya yeniden ana dalın, hadi git bir patlama yap. Bu sefer kal, tamam mı?',
@@ -1015,7 +1015,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Yeniden sabit. Deri İşleme ve Terzilik yeniden ellerinde ana dal olarak. Başıboş dolaşmadan önce bu sefer iki kez düşün.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Ağ Ağacı Örümceği imha edildi',
   'entities.quests.q_prof_amends_outfitter.text':
-    'Demek tezgahıma döndün sonunda. Kırgınlık beslemem, {playerName}, ama iplik bırakıp giden eli hatırlar ve onu yeniden almak her seferinde daha uzun ölçülür. Batı ormanlarını sıkan ağ ağacı örümceklerini imha et; bu emek, ellerin iyi ipliğe değmeden önce onları yerli yerine oturtur.',
+    'Demek tezgahıma döndün sonunda. Kırgınlık beslemem, {playerName}, ama iplik bırakıp giden eli hatırlar ve onu yeniden almak her seferinde daha uzun ölçülür. Doğu ormanlarını sıkan ağ ağacı örümceklerini imha et; bu emek, ellerin iyi ipliğe değmeden önce onları yerli yerine oturtur.',
   'entities.quests.q_prof_amends_outfitter.title': 'Yeniden Bağlanan İplikler',
   'entities.quests.q_prof_amends_smith.completion':
     'Ritim ellerine geri döndü. Silah Yapımı ve Zırh Yapımı yeniden ana daların. Gitme alışkanlığı edinme.',
@@ -1983,7 +1983,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Sonunda devrildi. Dağ halkı o kedinin surdan bile uzun yaşayacağına yemin ederdi. Sinsiler artık yüksek karlarında kalacak, {playerName}, ve devriyelerim yolda kan dökmeden yürüyecek. Senin sayende bütün sırt daha sessiz.',
   'entities.quests.q_old_cragmaw.objectives.0.label': 'İhtiyar Cragmaw öldürüldü',
   'entities.quests.q_old_cragmaw.text':
-    'Dağ halkı, gözcümün bulduğu izlere bir ad koydu: İhtiyar Cragmaw, kendi sürüsünün üç kuşağından uzun yaşamış, postu yara izleriyle kaplı zorba bir kedi. Sinsilerin yolumu doldurmasının nedeni o, {playerName}. İni, güneye giden yolun üstündeki batı sırtında. Yanına bir arkadaş al ve o yaşlı şeytanı yere ser.',
+    'Dağ halkı, gözcümün bulduğu izlere bir ad koydu: İhtiyar Cragmaw, kendi sürüsünün üç kuşağından uzun yaşamış, postu yara izleriyle kaplı zorba bir kedi. Sinsilerin yolumu doldurmasının nedeni o, {playerName}. İni, güneye giden yolun üstündeki doğu sırtında. Yanına bir arkadaş al ve o yaşlı şeytanı yere ser.',
   'entities.quests.q_old_cragmaw.title': 'İhtiyar Cragmaw',
   'entities.quests.q_stalker_cloaks.completion':
     'On sağlam post, elimdekiler kadar kalın... hayır, şunlara bak, {playerName}. Yarısı yırtılmış, hem de ne bıçakla ne mızrakla. Elim kadar geniş pençe izleri, kış tüyünün ta içinden geçmiş. O sırtta bir şey kendi türünü parçalıyor.',
@@ -3990,7 +3990,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Mogger sonunda öldü. Doğudere'nin tarlaları artık daha güvenli ve Vadi'den anlatılmaya değer bir hikâye daha bırakarak ayrılıyorsun.",
   'entities.quests.q_mogger.objectives.0.label': 'Mogger öldürüldü',
   'entities.quests.q_mogger.text':
-    "Mogger arabaları parçaladı, çitleri yerle bir etti ve Vadi'nin yarısını boşaltacak kadar çiftlik hayvanı öldürdü. Onunla yalnız yüzleşme. İki güçlü yoldaşı yanına alıp doğudaki çayıra git ve o canavarı temelli yere ser.",
+    "Mogger arabaları parçaladı, çitleri yerle bir etti ve Vadi'nin yarısını boşaltacak kadar çiftlik hayvanı öldürdü. Onunla yalnız yüzleşme. İki güçlü yoldaşı yanına alıp batıdaki çayıra git ve o canavarı temelli yere ser.",
   'entities.quests.q_mogger.title': 'Mogger Düşmeli',
   'entities.quests.q_murlocs.completion': 'Ha! Bu, kendi çamur çukurlarına bakmayı öğretir onlara.',
   'entities.quests.q_murlocs.objectives.0.label': 'Çamuryüzgeç Sinsisi öldürüldü',
@@ -4031,8 +4031,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_graves.objectives.1.label': "Başrahip Malric'in Mezarındaki İmge",
   'entities.quests.q_nythraxis_graves.objectives.2.label':
     "Kraliyet Suikastçısı Voss'un Mezarındaki İmge",
-  'entities.quests.q_nythraxis_graves.text':
-    'Bu işaretleri daha önce gördüm; kuzeydeki savaş meydanının çevresindeki üç eski mezarda. Yüzbaşı Aldren doğudaki yükseltide yatıyor, Başrahip Malric ortadaki kırık yolun yakınında ve Kraliyet Suikastçısı Voss batıdaki uçurumun kenarında. Her mezara dokun ve dinle, {playerName}. Ölüler, dirilerin unuttuğunu hatırlıyor olabilir.',
   'entities.quests.q_nythraxis_graves.title': 'Unutulmuşların Mezarları',
   'entities.quests.q_nythraxis_restless_dead.completion':
     'Aynı işaret her parçada beliriyor... bir taç. Bunu daha önce gördüm, hiçbir Doğudere kaydının hatırlamadığı eski mezarlara kazınmış hâlde.',
@@ -4052,7 +4050,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_sealed_crypt.objectives.1.label': 'Mahzen Kilittaşı Alt Yarısı',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.2.label': 'Kadim Günlük',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    "İmgeler batıdaki uçurumda bulunan terk edilmiş mahzeni işaret ediyor. Mahzenin bir kralı barındırdığına dair eski bir efsane var. Belki de Malric'in ayini onu ölümsüz bir şeye dönüştürdükten sonra Dikenzirve onu aşağıya mühürledi. Mahzene gir ve içeride ne kaldığını gör.",
+    "İmgeler doğudaki uçurumda bulunan terk edilmiş mahzeni işaret ediyor. Mahzenin bir kralı barındırdığına dair eski bir efsane var. Belki de Malric'in ayini onu ölümsüz bir şeye dönüştürdükten sonra Dikenzirve onu aşağıya mühürledi. Mahzene gir ve içeride ne kaldığını gör.",
   'entities.quests.q_nythraxis_sealed_crypt.title': 'Terk Edilmiş Mahzen',
   'entities.quests.q_ogre_bounty.completion':
     'Ödül tam olarak ödendi. Dağ etekleri artık daha sessiz; şimdi sıra satın alanlarla uğraşmakta.',
@@ -4179,7 +4177,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Sandıklarım! Üzerlerinde neredeyse tek çizik bile yok. Sen bir harikasın.',
   'entities.quests.q_supplies.objectives.0.label': 'Çalınmış Erzak Sandığı',
   'entities.quests.q_supplies.text':
-    'O haydutlar son arabamı bastı ve dört sandık malı alıp kaçtı; aletler, tuz, kaliteli Doğudere keteni. Sandıklar, güneydoğudaki tepelerde bulunan kamplarının çevresine yığılmış. Onları benim için geri çalar mısın?',
+    'O haydutlar son arabamı bastı ve dört sandık malı alıp kaçtı; aletler, tuz, kaliteli Doğudere keteni. Sandıklar, güneybatıdaki tepelerde bulunan kamplarının çevresine yığılmış. Onları benim için geri çalar mısın?',
   'entities.quests.q_supplies.title': 'Çalınan Erzak',
   'entities.quests.q_tarn_waders.completion':
     'On tanesi yeniden suda. Soğuk hissetmiyorlar, {playerName} ve korku da; yalnızca o kapının çekimini hissediyorlar. Onlara her ne şarkı söylüyorsa, yüksek sesle söylüyor.',
@@ -4190,8 +4188,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_the_codfather.completion':
     "Rutubetli azizler aşkına... Codfather'ın ta kendisi. Şu bıyıklara bak. Fenbridge bu avın hikâyesini bir yıl boyunca dilinden düşürmez, {playerName}.",
   'entities.quests.q_the_codfather.objectives.0.label': 'Codfather',
-  'entities.quests.q_the_codfather.text':
-    "Codfather sıradan bir balık değil, {playerName}, soğukkanlı bir katil. Eskiler, kahvaltıda Bataklık Avcıları yediğine yemin eder ve Mirefen Dulları bile katıksız bir dehşetle Deepfen Sığlıkları'nın yakınında ağ örmez. O sulara o hükmediyor. Bir olta kap, o yaşlı şeytanı sularından çek çıkar, ben de aileye katıldığını kabul edeyim.",
   'entities.quests.q_the_codfather.title': 'Codfather',
   'entities.quests.q_troll_fetishes.completion':
     'Tarikat kampındaki sancaklarla aynı yapımcı. Troller kiralık küreklerden başka bir şey değil. İyi iş, {playerName}.',

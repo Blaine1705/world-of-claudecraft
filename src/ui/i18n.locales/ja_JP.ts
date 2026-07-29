@@ -3526,7 +3526,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'この沼は月光を飲み干し、{className}よ、溺れし者を吐き返すのだ。私はあの門を三十夜も見張ってきた——そして今宵、門は開いている。',
   'entities.quests.q_prof_intro.title': '剣以外にも稼ぎはある',
   'entities.quests.q_prof_intro.text':
-    'イーストブルックでは誰もが剣のほかに生業を持つ、{playerName}。町の南西、カッパー・ディグ周辺の岩場には鉱脈がある。つるはしを振るい、自分の手で5か所採掘してこい。ごまかしても分かるぞ。',
+    'イーストブルックでは誰もが剣のほかに生業を持つ、{playerName}。町の南東、カッパー・ディグ周辺の岩場には鉱脈がある。つるはしを振るい、自分の手で5か所採掘してこい。ごまかしても分かるぞ。',
   'entities.quests.q_prof_intro.completion':
     'どうだ？ 鉱石を採り、手にはまめができた。旅の途中でも採掘、伐採、薬草採集を続けるんだ。町へ戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も忘れるな。望むなら、どの仕事にもまっとうな稼ぎが待っている。',
   'entities.quests.q_prof_intro.objectives.0.label': '鉱脈を採掘',
@@ -3571,7 +3571,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_bones.objectives.0.label': '安らがぬ骨を安息させる',
   'entities.quests.q_supplies.title': '盗まれた物資',
   'entities.quests.q_supplies.text':
-    '盗賊が最後の荷車を奪いました。道具、塩、上等なイーストブルックの麻です。南東の野営地から箱を4つ取り戻してください。',
+    '盗賊が最後の荷車を奪いました。道具、塩、上等なイーストブルックの麻です。南西の野営地から箱を4つ取り戻してください。',
   'entities.quests.q_supplies.completion':
     '私の箱です！傷もほとんどありません。あなたは大した人です。',
   'entities.quests.q_supplies.objectives.0.label': '盗まれた補給箱',
@@ -3792,7 +3792,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_stalker_cloaks.objectives.0.label': '尾根の追跡者の毛皮',
   'entities.quests.q_old_cragmaw.title': '老いたるクラッグモウ',
   'entities.quests.q_old_cragmaw.text':
-    '山の民は、斥候が見つけた足跡の主を知っていました。老いたるクラッグモウ。傷だらけの毛皮をまとい、群れの三世代を生き延びた暴君の大猫です。追跡者が街道に溢れるのはこいつのせいです、{playerName}。ねぐらは南街道を見下ろす西の尾根。仲間を連れて、あの老いた悪魔を仕留めてください。',
+    '山の民は、斥候が見つけた足跡の主を知っていました。老いたるクラッグモウ。傷だらけの毛皮をまとい、群れの三世代を生き延びた暴君の大猫です。追跡者が街道に溢れるのはこいつのせいです、{playerName}。ねぐらは南街道を見下ろす東の尾根。仲間を連れて、あの老いた悪魔を仕留めてください。',
   'entities.quests.q_old_cragmaw.completion':
     'ついに倒れましたか。山の民は、あの猫は壁より長生きすると誓っていたものです。これで追跡者は高い雪に留まるでしょう、{playerName}。巡察も血を流さずに街道を歩けます。あなたの働きで、尾根全体が静かになりました。',
   'entities.quests.q_old_cragmaw.objectives.0.label': '老いたるクラッグモウを討伐',
@@ -3929,7 +3929,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gravewyrm.objectives.0.label': '墓ワームのコルズルを討伐',
   'entities.quests.q_mogger.title': 'モガーを倒せ',
   'entities.quests.q_mogger.text':
-    'モガーは荷車を裂き、柵を潰し、谷の半分を空にするほど家畜を殺しました。ひとりで挑んではいけません。強い仲間を二人連れ、東の草地であの巨獣を完全に倒してください。',
+    'モガーは荷車を裂き、柵を潰し、谷の半分を空にするほど家畜を殺しました。ひとりで挑んではいけません。強い仲間を二人連れ、西の草地であの巨獣を完全に倒してください。',
   'entities.quests.q_mogger.completion':
     'モガーはついに死にました。イーストブルックの畑は安全になり、あなたは語る価値のある物語をもう一つ抱えて谷を去ります。',
   'entities.quests.q_mogger.objectives.0.label': 'モガーを討伐',
@@ -4351,7 +4351,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.the_codfather.name': 'タラのゴッドファーザー',
   'entities.quests.q_the_codfather.title': 'タラのゴッドファーザー',
   'entities.quests.q_the_codfather.text':
-    'タラのゴッドファーザーはただの魚ではない、{playerName}。冷血の殺し屋だ。古老たちは、奴がミレの徘徊者を朝飯に食うと誓っているし、ミレフェンのウィドウでさえ恐怖のあまりディープフェン浅瀬の近くには巣を張らぬ。あの水域は奴のものだ。釣り竿を手に取り、その老いた悪魔を奴の水域から引きずり出せ。そうすれば、お前もファミリーの一員と認めよう。',
+    'タラのゴッドファーザーはただの魚ではない、{playerName}。冷血の殺し屋だ。古老たちは、奴がミレの徘徊者を朝飯に食うと誓っているし、ミレフェンのウィドウでさえ恐怖のあまりディープフェン浅瀬の近くには巣を張らぬ。あの水域は奴のものだ。それに湿地の水で釣るなら、他でもない鉄リールの釣り竿が要る。うちのカウンターで売っているぞ。一本手にして、その老いた悪魔を奴の水域から引きずり出せ。そうすれば、お前もファミリーの一員と認めよう。',
   'entities.quests.q_the_codfather.completion':
     '湿った聖人たちよ……タラのゴッドファーザーそのものだ。あのヒゲを見ろ。フェンブリッジはこの一匹の話で一年は食っていけるぞ、{playerName}。',
   'entities.quests.q_the_codfather.objectives.0.label': 'タラのゴッドファーザー',
@@ -4438,7 +4438,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_restless_dead.objectives.0.label': 'ルーン刻みの骨片',
   'entities.quests.q_nythraxis_graves.title': '忘れられし者の墓',
   'entities.quests.q_nythraxis_graves.text':
-    'この印を以前にも見ました。北の戦場を囲む三つの古い墓です。アルドレン隊長は東の高台に、大神官マルリックは中央の壊れた道の近くに、王家の暗殺者ヴォスは西の崖のそばに眠っています。それぞれの墓に触れて耳を澄ませてください、{playerName}。死者は生者が忘れたことを覚えているかもしれません。',
+    'この印を以前にも見ました。北の戦場を囲む三つの古い墓です。アルドレン隊長は西の高台に、大神官マルリックはそこから西の縁に沿ってさらに南に、王家の暗殺者ヴォスは東の崖のそばに眠っています。それぞれの墓に触れて耳を澄ませてください、{playerName}。死者は生者が忘れたことを覚えているかもしれません。',
   'entities.quests.q_nythraxis_graves.completion':
     'オルドレンは忠義を守り、マルリックは死を受け入れず、ヴォスは誰よりも早く危険を見抜きました。三人は同じ忘れられた王に仕えていました。',
   'entities.quests.q_nythraxis_graves.objectives.0.label': '隊長オルドレンの墓での幻視',
@@ -4446,7 +4446,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_graves.objectives.2.label': '王家の暗殺者ヴォスの墓での幻視',
   'entities.quests.q_nythraxis_sealed_crypt.title': '放棄された地下墓所',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    '幻視は、西の崖にある廃棄された墓所を示しています。その墓所には王がいたという古い伝説があります。マルリックの儀式が王を死なぬものへ歪めた後、ソーンピークが彼を地下に封じたのかもしれません。墓所へ入り、中に何が残っているか確かめてください。',
+    '幻視は、東の崖にある廃棄された墓所を示しています。その墓所には王がいたという古い伝説があります。マルリックの儀式が王を死なぬものへ歪めた後、ソーンピークが彼を地下に封じたのかもしれません。墓所へ入り、中に何が残っているか確かめてください。',
   'entities.quests.q_nythraxis_sealed_crypt.completion':
     '要石の二つの半分が合わさり、ヴォスの日誌はそれらが封じたものの名を示しています。ニスラクシス王の印章指輪です。日誌が真実なら、その指輪こそ彼の墓への鍵です。',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.0.label': '墓所の要石上部',
@@ -10117,13 +10117,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_amends_smith.objectives.0.label': '森の狼を討伐',
   'entities.quests.q_prof_amends_outfitter.title': '再びつなぐ糸',
   'entities.quests.q_prof_amends_outfitter.text':
-    '結局、私の織機に戻ってきましたね。恨みはありません、{playerName}。けれど糸は、手放した手を覚えているものです。そして取り直す代償は、毎回長く測り出されます。西の森にひしめくセイブルウェブの潜伏者を間引きなさい。その労苦が、よい絹に再び触れる前に、あなたの手を落ち着かせてくれるでしょう。',
+    '結局、私の織機に戻ってきましたね。恨みはありません、{playerName}。けれど糸は、手放した手を覚えているものです。そして取り直す代償は、毎回長く測り出されます。東の森にひしめくセイブルウェブの潜伏者を間引きなさい。その労苦が、よい絹に再び触れる前に、あなたの手を落ち着かせてくれるでしょう。',
   'entities.quests.q_prof_amends_outfitter.completion':
     'また落ち着きましたね。皮革加工と裁縫は、主専攻としてあなたの手に戻ります。今度こそ、さまよう前に二度測りなさい。',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'セイブルウェブの潜伏者を討伐',
   'entities.quests.q_prof_amends_apothecary.title': 'また竈の前へ',
   'entities.quests.q_prof_amends_apothecary.text':
-    'おや、誰かと思えば俺の鍋の前に戻ってきたな。悪く思っちゃいないさ、{playerName}、台所にはいつだって席がある。だが出ていくたびに勘定が長くなるのは知ってるだろ。東の野原の野生の猪を間引いてこい。まっとうな汗こそ最初の材料だ、それがお前の手に仕事を思い出させてくれる。',
+    'おや、誰かと思えば俺の鍋の前に戻ってきたな。悪く思っちゃいないさ、{playerName}、台所にはいつだって席がある。だが出ていくたびに勘定が長くなるのは知ってるだろ。西の野原の野生の猪を間引いてこい。まっとうな汗こそ最初の材料だ、それがお前の手に仕事を思い出させてくれる。',
   'entities.quests.q_prof_amends_apothecary.completion':
     'ほら、昔なじみの味だ。錬金術と料理は、主専攻としてお前の竈に戻ってきた。今度はしばらくいてくれよ。',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': '野生の猪を狩る',
@@ -10511,7 +10511,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '功績の書が歩みに寄り添います。初めての調律で技巧に誓いし者、初めての傑作でMasterwrightを獲得し、どちらも称号として身につけられます。八つの製作職はそれぞれスキル50で節目の功績、上限125でGrandmaster称号を戴き、釣りは熟練100でOld Salt、200でMaster Angler称号を得ます。初めての採集や製作、野外の幸運な発見、サルベージにも静かなページがあります。すべて装飾のみ。称号と名声だけで、功績が力を与えることはありません。',
   'guide.professions.startHeading': 'どこから始めるか',
   'guide.professions.startBody':
-    'Eastbrookに着いたばかりなら、Foreman Odellを訪ねてA Trade for Every Handを受けましょう。町の南西Copper Digの鉱脈を教えてくれます。以後は旅の途中で見かける鉱脈や木立、薬草をすべて採ること。町ではTキーで製作ウィンドウを開き、誰もが知る初期レシピを作り、鍛冶場、厨房、織機、工作場の師匠たちを訪ね、作業依頼で堅実に稼ぎましょう。ギルドの手紙が届く頃には、どの対が我が家か分かっているはずです。',
+    'Eastbrookに着いたばかりなら、Foreman Odellを訪ねてA Trade for Every Handを受けましょう。町の南東Copper Digの鉱脈を教えてくれます。以後は旅の途中で見かける鉱脈や木立、薬草をすべて採ること。町ではTキーで製作ウィンドウを開き、誰もが知る初期レシピを作り、鍛冶場、厨房、織機、工作場の師匠たちを訪ね、作業依頼で堅実に稼ぎましょう。ギルドの手紙が届く頃には、どの対が我が家か分かっているはずです。',
   'guide.profPages.yieldsHeading': '採集の実り',
   'guide.profPages.yieldsBody':
     '採集のたびに品質が抽選され、その確率は熟練度がすべてです。始めたばかりの採集者は常にコモン品ですが、熟練が上がるほど高い等級へ重みが移り、決して後退しません。上限100ではコモンが完全に消え、60%が良質、30%がレア、8%がエピック、2%が伝説になります。品質は量でもあります。コモンは1個、良質とレアは2個、エピックは3個、伝説は4個。レア以上の収穫はあなたの署名入り（Gathered by）で届き、上限では十回に四回、名前が刻まれます。',

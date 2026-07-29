@@ -3967,7 +3967,7 @@ export const vi_VN: EnTranslations = {
       "deedsHeading": "Thành tích ghi nhớ hành trình",
       "deedsBody": "Sách Kỳ Công đồng hành với từng bước của hành trình này. Lần gắn kết đầu tiên của bạn đạt được thành tích Thề Nguyện Thủ Công và kiệt tác đầu tiên của bạn đạt được thành tích Thợ Đại Tài, cả hai đều có thể đeo như danh hiệu. Mỗi trong tám nghề thủ công có thể kiếm được đánh dấu một thành tích cột mốc ở kỹ năng 50 và đăng quang giới hạn của nó bằng danh hiệu Đại Sư, trong khi Câu Cá nhận được Lão Muối ở 100 thành thạo và danh hiệu Ngư Sư Thành Thạo ở 200.\n\nCó những trang lặng lẽ hơn: thành tích cho lần thu hoạch và chế tạo đầu tiên của bạn, cho những phát hiện hiếm may mắn tìm thấy ở thực địa, và cho việc bắt đầu tháo dỡ. Tất cả là trang trí, danh hiệu và Danh Vọng mà thôi. Thành tích không bao giờ ban sức mạnh; nó chỉ chứng minh bạn đã ở đó.",
       "startHeading": "Bắt đầu từ đâu",
-      "startBody": "Vừa đến Eastbrook từ đường cái? Tìm Đốc Công Odell và nhận nhiệm vụ Một Nghề Cho Mỗi Đôi Tay: ông ấy sẽ chỉ bạn đến các mạch quặng xung quanh Hố Đồng phía tây nam thị trấn và trao cho bạn những vết chai đầu tiên. Từ đó trở đi, hãy khai thác mọi mạch quặng, bãi gỗ, và bụi thảo dược bạn đi qua khi làm nhiệm vụ; thành thạo đến tự nhiên với những người lữ hành.\n\nTrở lại thị trấn, nhấn T để mở cửa sổ chế tác và làm các công thức thông thường mà mọi nhân vật đều biết từ đầu. Ghé thăm các bậc thầy tại lò rèn, bếp, khung cửi, và xưởng dụng cụ để xem họ dạy gì, và nhận đơn đặt hàng của họ để kiếm tiền vàng đều đặn. Đến khi thư của Hiệp Hội tìm đến bạn, bạn sẽ đã biết cặp nào cảm thấy như nhà.",
+      "startBody": "Vừa đến Eastbrook từ đường cái? Tìm Đốc Công Odell và nhận nhiệm vụ Một Nghề Cho Mỗi Đôi Tay: ông ấy sẽ chỉ bạn đến các mạch quặng xung quanh Hố Đồng phía đông nam thị trấn và trao cho bạn những vết chai đầu tiên. Từ đó trở đi, hãy khai thác mọi mạch quặng, bãi gỗ, và bụi thảo dược bạn đi qua khi làm nhiệm vụ; thành thạo đến tự nhiên với những người lữ hành.\n\nTrở lại thị trấn, nhấn T để mở cửa sổ chế tác và làm các công thức thông thường mà mọi nhân vật đều biết từ đầu. Ghé thăm các bậc thầy tại lò rèn, bếp, khung cửi, và xưởng dụng cụ để xem họ dạy gì, và nhận đơn đặt hàng của họ để kiếm tiền vàng đều đặn. Đến khi thư của Hiệp Hội tìm đến bạn, bạn sẽ đã biết cặp nào cảm thấy như nhà.",
       "colStation": "Trạm",
       "colHub": "Thị trấn",
       "colMaster": "Bậc thầy",
@@ -11673,7 +11673,7 @@ export const vi_VN: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Nghề Cho Mọi Đôi Tay",
-        "text": "Mỗi người ở Eastbrook đều làm một nghề ngoài kiếm, {playerName}. Có những mỏ quặng trong các tảng đá quanh Hố Đồng, phía tây nam thị trấn. Hãy cầm cuốc và tự tay khai thác 5 mỏ, nhé; ta sẽ biết sự khác biệt.",
+        "text": "Mỗi người ở Eastbrook đều làm một nghề ngoài kiếm, {playerName}. Có những mỏ quặng trong các tảng đá quanh Hố Đồng, phía đông nam thị trấn. Hãy cầm cuốc và tự tay khai thác 5 mỏ, nhé; ta sẽ biết sự khác biệt.",
         "completion": "Thấy chưa? Quặng đã thu thập và tay đã có vết chai. Tiếp tục khai thác mỏ, chặt gỗ và hái thảo dược khi bạn đi trên đường, và khi trở lại thị trấn, chú ý đến bảng Trọng Tâm Thị Trấn gần chợ và bàn thủ công gần đó. Có một giao dịch công bằng chờ đợi trong tất cả, nếu bạn muốn.",
         "objectives": {
           "0": {
@@ -11756,7 +11756,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_supplies": {
         "title": "Hàng Tiếp Tế Bị Đánh Cắp",
-        "text": "Bọn cướp ấy đã đột kích chiếc xe ngựa cuối cùng của ta và cuỗm đi bốn thùng hàng - dụng cụ, muối, vải lanh Eastbrook hảo hạng. Những thùng hàng được chất đống quanh trại của chúng nơi vùng đồi đông nam. Lấy cắp chúng về cho ta, được chứ?",
+        "text": "Bọn cướp ấy đã đột kích chiếc xe ngựa cuối cùng của ta và cuỗm đi bốn thùng hàng - dụng cụ, muối, vải lanh Eastbrook hảo hạng. Những thùng hàng được chất đống quanh trại của chúng nơi vùng đồi tây nam. Lấy cắp chúng về cho ta, được chứ?",
         "completion": "Những thùng hàng của ta! Gần như chẳng có lấy một vết xước. Ngươi thật phi thường.",
         "objectives": {
           "0": {
@@ -12138,7 +12138,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Lão Cragmaw",
-        "text": "Dân miền núi đã gọi tên những dấu chân mà trinh sát của ta tìm thấy: Lão Cragmaw, một bạo chúa mèo lông đầy sẹo đã sống lâu hơn ba thế hệ của chính bầy đàn nó. Nó chính là lý do lũ rình mồi tràn xuống con đường của ta, {playerName}. Hang ổ của nó nằm trên sườn núi phía tây, bên trên con đường về nam. Hãy dẫn theo một người bạn, và hạ gục con quỷ già ấy.",
+        "text": "Dân miền núi đã gọi tên những dấu chân mà trinh sát của ta tìm thấy: Lão Cragmaw, một bạo chúa mèo lông đầy sẹo đã sống lâu hơn ba thế hệ của chính bầy đàn nó. Nó chính là lý do lũ rình mồi tràn xuống con đường của ta, {playerName}. Hang ổ của nó nằm trên sườn núi phía đông, bên trên con đường về nam. Hãy dẫn theo một người bạn, và hạ gục con quỷ già ấy.",
         "completion": "Cuối cùng nó cũng gục ngã. Dân miền núi từng thề rằng con mèo ấy sẽ sống lâu hơn cả bức tường. Giờ lũ rình mồi sẽ chịu ở yên trên vùng tuyết cao của chúng, {playerName}, và các đội tuần tra của ta sẽ đi trên đường mà không phải đổ máu. Cả dải sườn núi yên ắng hơn nhờ công của ngươi.",
         "objectives": {
           "0": {
@@ -12377,7 +12377,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "The Codfather",
-        "text": "The Codfather không chỉ là một con cá, {playerName}, hắn là một sát thủ máu lạnh. Các bậc kỳ cựu thề rằng hắn xơi Mãnh Thú Đầm Lầy cho bữa sáng, và ngay cả lũ Góa Phụ Mirefen cũng không dám giăng tơ gần Vùng Nước Nông Deepfen vì quá khiếp sợ. Hắn ngự trị vùng nước ấy. Hãy vớ lấy cần câu, lôi con quỷ già ấy ra khỏi vùng nước của hắn, và ta sẽ thừa nhận ngươi đã gia nhập gia đình này.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "Lạy các vị thánh ẩm ướt... Chính là The Codfather. Nhìn bộ râu kia kìa. Fenbridge sẽ kể chuyện về mẻ cá này suốt cả năm cho mà xem, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12397,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Những Ngôi Mộ Của Kẻ Bị Lãng Quên",
-        "text": "Ta đã từng thấy những dấu này, trên ba ngôi mộ cổ quanh chiến trường phía bắc. Đội Trưởng Aldren nằm ở gò đất phía đông, Thượng Tế Malric gần con đường gãy nát ở trung tâm, và Sát Thủ Hoàng Gia Voss bên vách đá phía tây. Hãy chạm vào từng ngôi mộ và lắng nghe, {playerName}. Người chết có thể nhớ những gì người sống đã quên.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren vẫn trung thành, Malric chối từ chấp nhận cái chết, và Voss đã thấy hiểm họa trước mọi người. Cả ba đều phụng sự cùng một vị vua đã bị lãng quên.",
         "objectives": {
           "0": {
@@ -12413,7 +12413,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "Hầm Mộ Hoang Phế",
-        "text": "Những linh ảnh chỉ về hầm mộ hoang phế nơi vách đá phía tây. Có một truyền thuyết cổ kể rằng hầm mộ từng là nơi an nghỉ của một vị vua. Có lẽ Đỉnh Gai đã phong ấn hắn bên dưới sau khi nghi lễ của Malric biến hắn thành một thứ bất tử. Hãy vào hầm mộ và xem những gì còn sót lại bên trong.",
+        "text": "Những linh ảnh chỉ về hầm mộ hoang phế nơi vách đá phía đông. Có một truyền thuyết cổ kể rằng hầm mộ từng là nơi an nghỉ của một vị vua. Có lẽ Đỉnh Gai đã phong ấn hắn bên dưới sau khi nghi lễ của Malric biến hắn thành một thứ bất tử. Hãy vào hầm mộ và xem những gì còn sót lại bên trong.",
         "completion": "Hai nửa đá khóa khớp với nhau, và cuốn nhật ký của Voss gọi tên thứ chúng đã phong ấn: ấn tín của Vua Nythraxis. Nếu cuốn nhật ký nói thật, chiếc ấn tín ấy chính là chìa khóa vào lăng mộ của hắn.",
         "objectives": {
           "0": {
@@ -12455,7 +12455,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger Phải Gục Ngã",
-        "text": "Mogger đã phá nát xe kéo, san phẳng hàng rào, và giết đủ gia súc để làm trống một nửa Thung Lũng. Đừng đối đầu hắn một mình. Hãy dẫn hai đồng đội khỏe mạnh vào đồng cỏ phía đông và hạ gục con quái vật ấy một lần dứt điểm.",
+        "text": "Mogger đã phá nát xe kéo, san phẳng hàng rào, và giết đủ gia súc để làm trống một nửa Thung Lũng. Đừng đối đầu hắn một mình. Hãy dẫn hai đồng đội khỏe mạnh vào đồng cỏ phía tây và hạ gục con quái vật ấy một lần dứt điểm.",
         "completion": "Cuối cùng thì Mogger cũng đã chết. Đồng ruộng Eastbrook đã an toàn hơn, và ngươi rời Thung Lũng với thêm một câu chuyện đáng để kể lại.",
         "objectives": {
           "0": {
@@ -12515,7 +12515,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Sợi Chỉ Nối Lại",
-        "text": "Trở lại khung cửi của tôi rốt cuộc rồi. Tôi không giữ oán giận, {playerName}, nhưng sợi chỉ nhớ một bàn tay đã buông nó, và cái giá để lấy lại ngày càng dài hơn mỗi lần. Hãy tỉa đàn nhện gỗ lưới đang chen chúc ở khu rừng phía tây, và lao động sẽ ổn định đôi tay bạn trước khi chúng chạm lại vào tơ tốt.",
+        "text": "Trở lại khung cửi của tôi rốt cuộc rồi. Tôi không giữ oán giận, {playerName}, nhưng sợi chỉ nhớ một bàn tay đã buông nó, và cái giá để lấy lại ngày càng dài hơn mỗi lần. Hãy tỉa đàn nhện gỗ lưới đang chen chúc ở khu rừng phía đông, và lao động sẽ ổn định đôi tay bạn trước khi chúng chạm lại vào tơ tốt.",
         "completion": "Vững tay lại rồi. Thuộc Da và May Vá trở lại tay bạn là chuyên ngành. Hãy đo hai lần trước khi lang thang lần này.",
         "objectives": {
           "0": {
@@ -12525,7 +12525,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Trở Lại Nồi",
-        "text": "Ồ, nhìn xem ai trở lại nồi của tôi. Không có gì khó chịu đâu, {playerName}, nhà bếp luôn có chỗ, nhưng bạn biết cái hóa đơn cứ dài thêm mỗi lần bạn bước ra ngoài. Hãy đi tỉa đàn lợn rừng hoang ở đồng cỏ phía đông, vì mồ hôi lao động trung thực là thành phần đầu tiên, và nó sẽ nhắc nhở đôi bàn tay bạn về công việc.",
+        "text": "Ồ, nhìn xem ai trở lại nồi của tôi. Không có gì khó chịu đâu, {playerName}, nhà bếp luôn có chỗ, nhưng bạn biết cái hóa đơn cứ dài thêm mỗi lần bạn bước ra ngoài. Hãy đi tỉa đàn lợn rừng hoang ở đồng cỏ phía tây, vì mồ hôi lao động trung thực là thành phần đầu tiên, và nó sẽ nhắc nhở đôi bàn tay bạn về công việc.",
         "completion": "Đây rồi, hương vị quen thuộc. Giả Kim và Nấu Ăn trở lại là chuyên ngành của bạn. Ở lại lâu hơn lần này.",
         "objectives": {
           "0": {

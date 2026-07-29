@@ -3385,7 +3385,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '湖水飲盡了月光，{className}，再將溺者吐還。我已守望那道門三十夜——而今夜，它開了。',
   'entities.quests.q_prof_intro.title': '人人都有一技之長',
   'entities.quests.q_prof_intro.text':
-    '東溪人人除了舞刀弄劍，還得有門手藝，{playerName}。鎮子西南的銅礦坑周圍岩石裡有礦脈。拿起礦鎬，親手開採5處；別想蒙我，我看得出差別。',
+    '東溪人人除了舞刀弄劍，還得有門手藝，{playerName}。鎮子東南的銅礦坑周圍岩石裡有礦脈。拿起礦鎬，親手開採5處；別想蒙我，我看得出差別。',
   'entities.quests.q_prof_intro.completion':
     '看吧？礦石採到了，手上也磨出了繭。趕路時繼續採礦、伐木和採藥；回城後，別忘了市場旁的城鎮專注告示板和附近的製作台。只要你願意，這些手藝都能換來公道的生計。',
   'entities.quests.q_prof_intro.objectives.0.label': '已開採礦脈',
@@ -3426,7 +3426,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_bones.objectives.0.label': '讓不寧骸骨安息',
   'entities.quests.q_supplies.title': '被盜的補給',
   'entities.quests.q_supplies.text':
-    '強盜搶走了我的最後一輛貨車，工具、鹽和東溪亞麻都在裡面。去東南山丘的營地奪回4個補給箱。',
+    '強盜搶走了我的最後一輛貨車，工具、鹽和東溪亞麻都在裡面。去西南山丘的營地奪回4個補給箱。',
   'entities.quests.q_supplies.completion': '我的箱子！幾乎沒有刮痕。你真讓人驚喜。',
   'entities.quests.q_supplies.objectives.0.label': '被盜補給箱',
   'entities.quests.q_whispers.title': '地下低語',
@@ -3636,7 +3636,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_stalker_cloaks.objectives.0.label': '山脊潛獵者毛皮',
   'entities.quests.q_old_cragmaw.title': '老裂顎',
   'entities.quests.q_old_cragmaw.text':
-    '山民給我斥候找到的爪印起過名字：老裂顎，一隻滿身傷疤的暴君巨貓，熬死了自己族群的三代。潛獵者湧上我的道路，就是因為牠，{playerName}。牠的巢穴在南路上方的西側山脊。帶個幫手去，了結那老魔頭。',
+    '山民給我斥候找到的爪印起過名字：老裂顎，一隻滿身傷疤的暴君巨貓，熬死了自己族群的三代。潛獵者湧上我的道路，就是因為牠，{playerName}。牠的巢穴在南路上方的東側山脊。帶個幫手去，了結那老魔頭。',
   'entities.quests.q_old_cragmaw.completion':
     '牠終於倒下了。山民曾發誓那隻貓會比城牆活得還久。如今潛獵者會守在高處的雪原了，{playerName}，我的巡邏隊走這條路也不必再流血。整條山脊都因你安靜了下來。',
   'entities.quests.q_old_cragmaw.objectives.0.label': '擊敗老裂顎',
@@ -3772,7 +3772,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gravewyrm.objectives.0.label': '擊敗墓龍科祖爾',
   'entities.quests.q_mogger.title': '莫格必須倒下',
   'entities.quests.q_mogger.text':
-    '莫格劈裂貨車，踏平柵欄，殺死的牲口足以讓半個谷地空掉。不要獨自面對牠。帶兩名強壯同伴去東邊草地，把那蠻獸徹底放倒。',
+    '莫格劈裂貨車，踏平柵欄，殺死的牲口足以讓半個谷地空掉。不要獨自面對牠。帶兩名強壯同伴去西邊草地，把那蠻獸徹底放倒。',
   'entities.quests.q_mogger.completion':
     '莫格終於死了。東溪的田地更安全了，而你離開谷地時又多了一個值得傳頌的故事。',
   'entities.quests.q_mogger.objectives.0.label': '擊敗莫格',
@@ -4181,7 +4181,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.the_codfather.name': '鱈魚教父',
   'entities.quests.q_the_codfather.title': '鱈魚教父',
   'entities.quests.q_the_codfather.text':
-    '鱈魚教父不只是一條魚，{playerName}，牠是個冷血殺手。老人們發誓說牠拿濕地徘徊者當早飯，就連米爾芬寡婦也會因恐懼而不敢在深沼淺灘附近結網。那片水域歸牠統治。拿上釣竿，把那個老惡魔從牠的水域裡拖出來，我就承認你入了這個家族。',
+    '鱈魚教父不只是一條魚，{playerName}，牠是個冷血殺手。老人們發誓說牠拿濕地徘徊者當早飯，就連米爾芬寡婦也會因恐懼而不敢在深沼淺灘附近結網。那片水域歸牠統治，而沼澤水域非得用鐵輪釣竿不可；我的櫃檯就有賣。拿上一根，把那個老惡魔從牠的水域裡拖出來，我就承認你入了這個家族。',
   'entities.quests.q_the_codfather.completion':
     '濕地諸聖在上……鱈魚教父本尊。看看那些鬚。芬橋會把這次收穫講上一整年，{playerName}。',
   'entities.quests.q_the_codfather.objectives.0.label': '鱈魚教父',
@@ -4268,7 +4268,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_restless_dead.objectives.0.label': '符文骨片',
   'entities.quests.q_nythraxis_graves.title': '被遺忘者的墳墓',
   'entities.quests.q_nythraxis_graves.text':
-    '我以前見過這些標記，就在北方戰場周圍的三座舊墳上。奧德倫隊長葬在東側高地，馬爾里克大祭司在中央破路旁，皇家刺客沃斯則在西側峭壁邊。觸碰每座墳墓並傾聽，{playerName}。死者或許記得生者遺忘的事。',
+    '我以前見過這些標記，就在北方戰場周圍的三座舊墳上。奧德倫隊長葬在西側高地，馬爾里克大祭司在沿西側邊緣更往南處，皇家刺客沃斯則在東側峭壁邊。觸碰每座墳墓並傾聽，{playerName}。死者或許記得生者遺忘的事。',
   'entities.quests.q_nythraxis_graves.completion':
     '阿爾德倫依舊忠誠，馬爾里克拒絕接受死亡，而沃斯比任何人都更早看見危險。他們三人都侍奉同一位被遺忘的國王。',
   'entities.quests.q_nythraxis_graves.objectives.0.label': '奧德倫隊長之墓的幻象',
@@ -4276,7 +4276,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_graves.objectives.2.label': '皇家刺客沃斯之墓的幻象',
   'entities.quests.q_nythraxis_sealed_crypt.title': '廢棄墓穴',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    '幻象指向西側峭壁中的廢棄墓穴。古老傳說稱，那座墓穴曾安置一位國王。也許在馬爾里克的儀式把他扭曲成不死之物後，荊峰將他封在了下面。進入墓穴，看看裡面還剩下什麼。',
+    '幻象指向東側峭壁中的廢棄墓穴。古老傳說稱，那座墓穴曾安置一位國王。也許在馬爾里克的儀式把他扭曲成不死之物後，荊峰將他封在了下面。進入墓穴，看看裡面還剩下什麼。',
   'entities.quests.q_nythraxis_sealed_crypt.completion':
     '鑰石的兩半合在了一起，而沃斯的日記寫明了它們封印之物：尼思拉克西斯國王的印戒。如果日記屬實，那枚印戒就是通往他陵墓的鑰匙。',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.0.label': '墓穴鑰石上半部',
@@ -9654,13 +9654,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_amends_smith.objectives.0.label': '已擊殺森林狼',
   'entities.quests.q_prof_amends_outfitter.title': '重接的線',
   'entities.quests.q_prof_amends_outfitter.text':
-    '終究還是回到我的織機前了。我不記恨，{playerName}，但線記得曾放手的那雙手，而重新拾起它的代價，每一次都量得更長。去剿除擠滿西邊林子的玄網潛伏者，這番勞作會先安定你的雙手，然後才讓它們再碰上好絲。',
+    '終究還是回到我的織機前了。我不記恨，{playerName}，但線記得曾放手的那雙手，而重新拾起它的代價，每一次都量得更長。去剿除擠滿東邊林子的玄網潛伏者，這番勞作會先安定你的雙手，然後才讓它們再碰上好絲。',
   'entities.quests.q_prof_amends_outfitter.completion':
     '又穩住了。製皮與裁縫作為主修重回你的手中。這一次，在你動念遊蕩之前，先量兩遍。',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': '已剿除玄網潛伏者',
   'entities.quests.q_prof_amends_apothecary.title': '重回爐灶',
   'entities.quests.q_prof_amends_apothecary.text':
-    '瞧瞧，這不是又回到我的鍋邊了嗎。不記仇，{playerName}，廚房裡總有位子，但你也清楚，你每撂下它一次，這筆帳就記得更長。去把東邊草地上的野豬清一清，因為踏實的汗水才是第一味食材，它會讓你的雙手重新記起這門活計。',
+    '瞧瞧，這不是又回到我的鍋邊了嗎。不記仇，{playerName}，廚房裡總有位子，但你也清楚，你每撂下它一次，這筆帳就記得更長。去把西邊草地上的野豬清一清，因為踏實的汗水才是第一味食材，它會讓你的雙手重新記起這門活計。',
   'entities.quests.q_prof_amends_apothecary.completion':
     '這才是熟悉的老味道。鍊金術與烹飪作為主修回到了你的爐灶上。這一回，多留一陣子吧。',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': '已獵殺野豬',
@@ -10040,7 +10040,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '功業之書伴隨這一切：首次調諧獲得Craftsworn，首次傑作獲得Masterwright，均可作為頭銜佩戴。八種可修行業各在技能50設有里程碑功業，並在上限125加冕Grandmaster頭銜；釣魚在100熟練獲得Old Salt，200獲得Master Angler頭銜。此外還有首次採集、首次製作、野外奇遇與拆解回收的功業。這一切皆為裝飾：只有頭銜與聲望，功業永不賦予力量。',
   'guide.professions.startHeading': '從哪裡開始',
   'guide.professions.startBody':
-    '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他會指給你鎮西南Copper Dig一帶的礦脈。此後旅途中經過的每處礦脈、樹木與藥草都值得採集。回到鎮上按T打開製作視窗，先做人人都會的普通配方，再去鍛造坊、廚房、織布機與工坊拜訪諸位大師，順便接下他們的工作訂單換取穩定的銅板。等公會的信找到你時，你早已知道哪一對行業才是歸宿。',
+    '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他會指給你鎮東南Copper Dig一帶的礦脈。此後旅途中經過的每處礦脈、樹木與藥草都值得採集。回到鎮上按T打開製作視窗，先做人人都會的普通配方，再去鍛造坊、廚房、織布機與工坊拜訪諸位大師，順便接下他們的工作訂單換取穩定的銅板。等公會的信找到你時，你早已知道哪一對行業才是歸宿。',
   'guide.profPages.yieldsHeading': '一次採集的收穫',
   'guide.profPages.yieldsBody':
     '每次採集都會擲出品質，而熟練度決定一切：新手永遠採到普通品，熟練度越高，權重越向高品質移動，絕不倒退。到100上限時普通品完全消失：60%優秀、30%精良、8%史詩、2%傳說。品質也意味著數量：普通1個，優秀與精良2個，史詩3個，傳說4個。精良及以上的收穫都會以你的名字署名（Gathered by），封頂時十次採集有四次帶著你的名字。',

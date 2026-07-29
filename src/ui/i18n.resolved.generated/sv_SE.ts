@@ -3967,7 +3967,7 @@ export const sv_SE: EnTranslations = {
       "deedsHeading": "Bedrifter som minns resan",
       "deedsBody": "Bedriftboken vandrar bredvid varje steg av detta. Din första inriktning förtjänar Hantverkssvuren och ditt första mästerverk förtjänar Mästerhantverkaren, båda bärbara som titlar. Var och en av de åtta hantverken med innehåll markerar en milstolpebedrift vid 50 skicklighet och kröner sitt tak med en Stormästare-titel, medan Fiske får Gamla saltet vid 100 skicklighet och titeln Mästarfiskare vid 200.\n\nDet finns tystare sidor också: bedrifter för din första skörd och ditt första hantverk, för de sällsynta fynd som turen bjuder på i fält, och för att ta upp avförtrollning. Allt är kosmetiskt, titlar och Ryktbarhet enbart. En bedrift ger aldrig kraft; den bevisar bara att du var där.",
       "startHeading": "Var börjar man",
-      "startBody": "Nyss anländ i Östbäck? Hitta Förman Odell och ta En handel för varje hand: han visar dig malmådrorna runt Koppargropen sydväst om staden och ger dig dina första valkar. Från och med då, skörda varje åder, timmerbestånd och örtfläck du passerar under uppdragens gång; skicklighet kommer naturligt för resenärer.\n\nTillbaka i staden, tryck T för att öppna hantverksfönstret och arbeta med de vanliga recept varje karaktär kan från start. Besök mästarna vid smedjan, köket, vävstolen och verkstaden för att se vad de lär ut, och ta deras arbetsorder för stabila mynt. När Gillets brev hittar dig vet du redan vilket par som känns som hemma.",
+      "startBody": "Nyss anländ i Östbäck? Hitta Förman Odell och ta En handel för varje hand: han visar dig malmådrorna runt Koppargropen sydöst om staden och ger dig dina första valkar. Från och med då, skörda varje åder, timmerbestånd och örtfläck du passerar under uppdragens gång; skicklighet kommer naturligt för resenärer.\n\nTillbaka i staden, tryck T för att öppna hantverksfönstret och arbeta med de vanliga recept varje karaktär kan från start. Besök mästarna vid smedjan, köket, vävstolen och verkstaden för att se vad de lär ut, och ta deras arbetsorder för stabila mynt. När Gillets brev hittar dig vet du redan vilket par som känns som hemma.",
       "colStation": "Station",
       "colHub": "Ort",
       "colMaster": "Mästare",
@@ -11673,7 +11673,7 @@ export const sv_SE: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Ett yrke för varje hand",
-        "text": "Varje själ i Östbäck arbetar ett hantverk utöver svärdet, {playerName}. Det finns malmådrar i klipporna runt Koppargropen, sydväst om staden. Gå och sving en hacka och arbeta 5 av dem själv; jag ska kunna se skillnaden.",
+        "text": "Varje själ i Östbäck arbetar ett hantverk utöver svärdet, {playerName}. Det finns malmådrar i klipporna runt Koppargropen, sydöst om staden. Gå och sving en hacka och arbeta 5 av dem själv; jag ska kunna se skillnaden.",
         "completion": "Ser du? Malm samlad och valkar på händerna. Håll på med gruvdrift, skogsavverkning och örtskörd när du reser längs vägarna, och när du är tillbaka i staden, håll koll på Stadsanslagstavlan vid marknaden och hantverksbordet i närheten. Det finns en rättvis handel i allt av det, om du vill ha det.",
         "objectives": {
           "0": {
@@ -11756,7 +11756,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_supplies": {
         "title": "Stulna förråd",
-        "text": "De där banditerna slog till mot min senaste vagn och kom undan med fyra lådor varor - verktyg, salt, fint Östbäckslinne. Lådorna är staplade runt deras läger i de sydöstra kullarna. Stjäl tillbaka dem åt mig, är du snäll?",
+        "text": "De där banditerna slog till mot min senaste vagn och kom undan med fyra lådor varor - verktyg, salt, fint Östbäckslinne. Lådorna är staplade runt deras läger i de sydvästra kullarna. Stjäl tillbaka dem åt mig, är du snäll?",
         "completion": "Mina lådor! Knappt en repa på dem. Du är ett under.",
         "objectives": {
           "0": {
@@ -12138,7 +12138,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Gamle Klippkäft",
-        "text": "Bergsfolket satte ett namn på spåren min spejare fann: Gamle Klippkäft, en ärrpälsad tyrann till katt som har överlevt tre generationer av sin egen flock. Det är han som är skälet till att smygarna översvämmar min väg, {playerName}. Hans lya ligger på västra åsen ovanför vägen söderut. Ta med en vän och gör slut på den gamle djävulen.",
+        "text": "Bergsfolket satte ett namn på spåren min spejare fann: Gamle Klippkäft, en ärrpälsad tyrann till katt som har överlevt tre generationer av sin egen flock. Det är han som är skälet till att smygarna översvämmar min väg, {playerName}. Hans lya ligger på östra åsen ovanför vägen söderut. Ta med en vän och gör slut på den gamle djävulen.",
         "completion": "Fälld till sist. Bergsfolket svor på att den katten skulle överleva själva muren. Smygarna håller sig till sina höga snöfält nu, {playerName}, och mina patruller kan gå vägen utan att blöda för det. Hela åsen är tystare tack vare ditt verk.",
         "objectives": {
           "0": {
@@ -12377,7 +12377,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "Torskfadern",
-        "text": "Torskfadern är inte bara en fisk, {playerName}, han är en kallblodig mördare. Gamlingarna svär på att han äter kärrströvare till frukost, och inte ens Dykärrsänkorna vågar spinna sina nät nära Djupkärrsgrunden av ren skräck. Han härskar över de vattnen. Greppa ett metspö, dra upp den gamle djävulen ur sitt vatten, så ska jag erkänna att du har blivit en del av familjen.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "Vid de fuktiga helgonen... Torskfadern själv. Se på de morrhåren. Fenbron kommer att leva på historier om den här fångsten i ett år, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12397,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "De bortglömdas gravar",
-        "text": "Jag har sett dessa tecken förut, på tre gamla gravar runt det norra slagfältet. Kapten Aldren ligger på den östra höjden, överstepräst Malric nära den centrala brutna vägen, och kunglig lönnmördare Voss vid den västra klippan. Rör vid varje grav och lyssna, {playerName}. De döda kanske minns vad de levande glömde.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren förblev lojal, Malric vägrade acceptera döden, och Voss såg faran före någon annan. Alla tre tjänade samma bortglömda kung.",
         "objectives": {
           "0": {
@@ -12413,7 +12413,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "Den övergivna kryptan",
-        "text": "Synerna pekar mot den övergivna kryptan i den västra klippan. Det finns en gammal legend om att kryptan hyste en kung. Kanske förseglade Törntopp honom därnere efter att Malrics ritual förvred honom till något odödligt. Träd in i kryptan och se vad som finns kvar därinne.",
+        "text": "Synerna pekar mot den övergivna kryptan i den östra klippan. Det finns en gammal legend om att kryptan hyste en kung. Kanske förseglade Törntopp honom därnere efter att Malrics ritual förvred honom till något odödligt. Träd in i kryptan och se vad som finns kvar därinne.",
         "completion": "Slutstenens halvor passar ihop, och Voss dagbok namnger vad de förseglade: kung Nythraxis signetring. Om dagboken talar sanning är den signetringen nyckeln till hans grav.",
         "objectives": {
           "0": {
@@ -12455,7 +12455,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger måste falla",
-        "text": "Mogger har splittrat kärror, jämnat staket med marken och dödat nog med boskap för att tömma halva dalen. Möt honom inte ensam. Ta med två starka följeslagare till den östra ängen och lägg odjuret för gott.",
+        "text": "Mogger har splittrat kärror, jämnat staket med marken och dödat nog med boskap för att tömma halva dalen. Möt honom inte ensam. Ta med två starka följeslagare till den västra ängen och lägg odjuret för gott.",
         "completion": "Mogger är äntligen död. Östbäcks fält är tryggare, och du lämnar dalen med ännu en berättelse värd att återberätta.",
         "objectives": {
           "0": {
@@ -12515,7 +12515,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Trådar åter sammanfogade",
-        "text": "Tillbaka vid min vävstol trots allt. Jag bär inget agg, {playerName}, men tråden minns en hand som lät den gå, och kostnaden att ta upp den igen mäts ut längre varje gång. Döda spindelvävsedderkopparna som tränger sig på västra skogen, och arbetet lugnar dina händer innan de rör god siden igen.",
+        "text": "Tillbaka vid min vävstol trots allt. Jag bär inget agg, {playerName}, men tråden minns en hand som lät den gå, och kostnaden att ta upp den igen mäts ut längre varje gång. Döda spindelvävsedderkopparna som tränger sig på östra skogen, och arbetet lugnar dina händer innan de rör god siden igen.",
         "completion": "Stadigt igen. Läderbearbetning och Skrädderi återvänder till dina händer som ämnen. Mät dubbelt den här gången innan du vandrar.",
         "objectives": {
           "0": {
@@ -12525,7 +12525,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Tillbaka på spisen",
-        "text": "Nå, se vem som är tillbaka vid min gryta. Inga hårda känslor, {playerName}, ett kök har alltid plats, men du vet att notan löper längre varje gång du går ut på den. Gå och tunna ut vildsvinsstammen på östängen, för ärlig svett är den första ingrediensen, och det kommer påminna dina händer om arbetet.",
+        "text": "Nå, se vem som är tillbaka vid min gryta. Inga hårda känslor, {playerName}, ett kök har alltid plats, men du vet att notan löper längre varje gång du går ut på den. Gå och tunna ut vildsvinsstammen på västängen, för ärlig svett är den första ingrediensen, och det kommer påminna dina händer om arbetet.",
         "completion": "Där är den gamla smaken. Alkemi och Matlagning är tillbaka på din spis som ämnen. Stanna ett tag den här gången.",
         "objectives": {
           "0": {

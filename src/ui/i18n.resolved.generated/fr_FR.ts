@@ -3967,7 +3967,7 @@ export const fr_FR: EnTranslations = {
       "deedsHeading": "Les hauts faits qui gardent la mémoire du chemin",
       "deedsBody": "Le Livre des hauts faits accompagne chaque étape de tout cela. Votre première harmonisation vous vaut le titre Juré-métier et votre premier chef-d'oeuvre vous vaut Maître-artisan, tous deux portables comme titres. Chacun des huit métiers d'artisanat disponibles marque un haut fait à 50 de compétence et couronne son plafond d'un titre de Grand Maître, tandis que la Pêche obtient Vieux Sel à 100 de maîtrise et le titre Grand Pêcheur à 200.\n\nIl y a aussi des pages plus discrètes : des hauts faits pour votre première récolte et votre première fabrication, pour les trouvailles rares que la chance réserve sur le terrain, et pour vous initier à la récupération. Tout cela est cosmétique, titres et Renommée seulement. Un haut fait n'accorde jamais de puissance ; il prouve seulement que vous étiez là.",
       "startHeading": "Par où commencer",
-      "startBody": "Fraîchement arrivé à Eastbrook ? Trouvez le Contremaître Odell et prenez la quête Un métier pour chaque main : il vous guidera vers les filons de minerai autour de la Mine de cuivre au sud-ouest de la ville et vous donnera vos premières callosités. Dès lors, récoltez chaque filon, bosquet de bois et parcelle d'herbes que vous croisez en quêtant ; la maîtrise vient naturellement aux voyageurs.\n\nDe retour en ville, appuyez sur T pour ouvrir la fenêtre d'artisanat et travaillez les recettes communes que tout personnage connaît dès le départ. Rendez visite aux maîtres à la forge, aux cuisines, au métier à tisser et à l'outillage pour voir ce qu'ils enseignent, et prenez leurs bons de travail pour un revenu régulier. Au moment où la lettre de la Guilde vous parvient, vous saurez déjà quelle paire vous convient.",
+      "startBody": "Fraîchement arrivé à Eastbrook ? Trouvez le Contremaître Odell et prenez la quête Un métier pour chaque main : il vous guidera vers les filons de minerai autour de la Mine de cuivre au sud-est de la ville et vous donnera vos premières callosités. Dès lors, récoltez chaque filon, bosquet de bois et parcelle d'herbes que vous croisez en quêtant ; la maîtrise vient naturellement aux voyageurs.\n\nDe retour en ville, appuyez sur T pour ouvrir la fenêtre d'artisanat et travaillez les recettes communes que tout personnage connaît dès le départ. Rendez visite aux maîtres à la forge, aux cuisines, au métier à tisser et à l'outillage pour voir ce qu'ils enseignent, et prenez leurs bons de travail pour un revenu régulier. Au moment où la lettre de la Guilde vous parvient, vous saurez déjà quelle paire vous convient.",
       "colStation": "Station",
       "colHub": "Camp de base",
       "colMaster": "Maître",
@@ -11673,7 +11673,7 @@ export const fr_FR: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Un métier pour chaque main",
-        "text": "Chaque âme à Eastbrook exerce un métier en plus de l'épée, {playerName}. Il y a des filons de minerai dans les rochers autour de la Mine de cuivre, au sud-ouest de la ville. Allez manier un pic et travailler 5 d'entre eux de vos propres mains ; je verrai la différence.",
+        "text": "Chaque âme à Eastbrook exerce un métier en plus de l'épée, {playerName}. Il y a des filons de minerai dans les rochers autour de la Mine de cuivre, au sud-est de la ville. Allez manier un pic et travailler 5 d'entre eux de vos propres mains ; je verrai la différence.",
         "completion": "Vous voyez ? Du minerai récolté et des callosités sur les mains. Continuez à miner, couper du bois et cueillir des plantes en parcourant les routes, et quand vous serez de retour en ville, consultez le panneau Focus du bourg près du marché et l'établi à proximité. Un bon échange vous y attend, si vous le souhaitez.",
         "objectives": {
           "0": {
@@ -11756,7 +11756,7 @@ export const fr_FR: EnTranslations = {
       },
       "q_supplies": {
         "title": "Fournitures volées",
-        "text": "Les bandits ont pris mon dernier chariot: outils, sel et bon lin d'Eastbrook. Reprenez 4 caisses dans leur camp du sud-est.",
+        "text": "Les bandits ont pris mon dernier chariot: outils, sel et bon lin d'Eastbrook. Reprenez 4 caisses dans leur camp du sud-ouest.",
         "completion": "Mes caisses! À peine une égratignure. Vous êtes prodigieux.",
         "objectives": {
           "0": {
@@ -12138,7 +12138,7 @@ export const fr_FR: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Vieux Cragmaw",
-        "text": "Les gens de la montagne ont mis un nom sur les empreintes que mon éclaireuse a trouvées : le vieux Cragmaw, un tyran de félin au pelage balafré qui a survécu à trois générations de sa propre harde. C'est à cause de lui que les traqueurs inondent ma route, {playerName}. Sa tanière se trouve sur la crête ouest, au-dessus de la route du sud. Amenez un ami, et abattez ce vieux démon.",
+        "text": "Les gens de la montagne ont mis un nom sur les empreintes que mon éclaireuse a trouvées : le vieux Cragmaw, un tyran de félin au pelage balafré qui a survécu à trois générations de sa propre harde. C'est à cause de lui que les traqueurs inondent ma route, {playerName}. Sa tanière se trouve sur la crête est, au-dessus de la route du sud. Amenez un ami, et abattez ce vieux démon.",
         "completion": "Enfin à terre. Les gens de la montagne juraient que ce félin survivrait au rempart lui-même. Les traqueurs resteront désormais dans leurs hautes neiges, {playerName}, et mes patrouilles marcheront sur la route sans saigner pour elle. Toute la crête est plus calme grâce à votre travail.",
         "objectives": {
           "0": {
@@ -12377,7 +12377,7 @@ export const fr_FR: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "Capitaine brochet",
-        "text": "Capitaine brochet n'est pas qu'un poisson, {playerName}, c'est un tueur à sang froid. Les anciens jurent qu'il mange des rôdeurs du bourbier au petit-déjeuner, et même les veuves de Mirefen ne tissent pas leurs toiles près des hauts-fonds de Deepfen, tant elles le craignent. Il règne sur ces eaux. Prenez une canne à pêche, tirez ce vieux démon hors de ses eaux, et j'admettrai que vous faites partie de la famille.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "Je n'en crois pas mes yeux ! Capitaine brochet lui-même. Regardez moi ces moustaches diaboliques ! Tout Fenbridge parlera de votre belle prise durant un bon moment, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12397,7 @@ export const fr_FR: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Tombes des oubliés",
-        "text": "J'ai déjà vu ces marques, sur trois vieilles tombes autour du champ de bataille du nord. Le capitaine Aldren repose sur la hauteur orientale, le grand prêtre Malric près de la route centrale brisée, et l'assassin royal Voss près de la falaise occidentale. Touchez chaque tombe et écoutez, {playerName}. Les morts peuvent se souvenir de ce que les vivants ont oublié.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren resta loyal, Malric refusa d'accepter la mort, et Voss vit le danger avant tous les autres. Tous trois servaient le même roi oublié.",
         "objectives": {
           "0": {
@@ -12413,7 +12413,7 @@ export const fr_FR: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "La crypte abandonnée",
-        "text": "Les visions indiquent la crypte abandonnée dans la falaise occidentale. Une vieille légende dit que la crypte abritait un roi. Peut-être Thornpeak l'a-t-il scellé là-dessous après que le rituel de Malric l'eut tordu en quelque chose d'immortel. Entrez dans la crypte et voyez ce qu'il reste à l'intérieur.",
+        "text": "Les visions indiquent la crypte abandonnée dans la falaise orientale. Une vieille légende dit que la crypte abritait un roi. Peut-être Thornpeak l'a-t-il scellé là-dessous après que le rituel de Malric l'eut tordu en quelque chose d'immortel. Entrez dans la crypte et voyez ce qu'il reste à l'intérieur.",
         "completion": "Les deux moitiés de la clef s'assemblent, et le journal de Voss nomme ce qu'elles ont scellé : la chevalière du roi Nythraxis. Si le journal dit vrai, cette chevalière est la clef de sa tombe.",
         "objectives": {
           "0": {
@@ -12455,7 +12455,7 @@ export const fr_FR: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger doit tomber",
-        "text": "Mogger a brisé des chariots, aplati des clôtures et tué assez de bétail pour vider la moitié du Val. Ne l'affrontez pas seul. Emmenez deux compagnons solides au pré de l'est et abattez la brute pour de bon.",
+        "text": "Mogger a brisé des chariots, aplati des clôtures et tué assez de bétail pour vider la moitié du Val. Ne l'affrontez pas seul. Emmenez deux compagnons solides au pré de l'ouest et abattez la brute pour de bon.",
         "completion": "Mogger est enfin mort. Les champs d'Eastbrook sont plus sûrs, et vous quittez le Val avec une histoire de plus à raconter.",
         "objectives": {
           "0": {
@@ -12515,7 +12515,7 @@ export const fr_FR: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Fils rejoints",
-        "text": "De retour à mon métier à tisser, finalement. Je ne vous en veux pas, {playerName}, mais le fil se souvient d'une main qui l'a lâché, et le coût de le reprendre s'allonge chaque fois. Abattez les araignées des bois qui envahissent les forêts de l'ouest, et le labeur apaisera vos mains avant qu'elles touchent de nouveau la bonne soie.",
+        "text": "De retour à mon métier à tisser, finalement. Je ne vous en veux pas, {playerName}, mais le fil se souvient d'une main qui l'a lâché, et le coût de le reprendre s'allonge chaque fois. Abattez les araignées des bois qui envahissent les forêts de l'est, et le labeur apaisera vos mains avant qu'elles touchent de nouveau la bonne soie.",
         "completion": "Stable de nouveau. Le Travail du cuir et la Couture reviennent entre vos mains en tant que majeures. Mesurez deux fois avant de partir à l'aventure.",
         "objectives": {
           "0": {
@@ -12525,7 +12525,7 @@ export const fr_FR: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Retour sur le feu",
-        "text": "Tiens, regardez qui revient à ma marmite. Sans rancune, {playerName}, une cuisine a toujours de la place, mais vous savez que la note s'allonge à chaque fois que vous claquiez la porte. Allez tuer les sangliers sauvages dans la prairie de l'est, car la sueur honnête est le premier ingrédient, et ça rappellera à vos mains ce qu'est le travail.",
+        "text": "Tiens, regardez qui revient à ma marmite. Sans rancune, {playerName}, une cuisine a toujours de la place, mais vous savez que la note s'allonge à chaque fois que vous claquiez la porte. Allez tuer les sangliers sauvages dans la prairie de l'ouest, car la sueur honnête est le premier ingrédient, et ça rappellera à vos mains ce qu'est le travail.",
         "completion": "Voilà l'ancienne saveur. L'Alchimie et la Cuisine reviennent dans votre marmite en tant que majeures. Restez un peu cette fois.",
         "objectives": {
           "0": {

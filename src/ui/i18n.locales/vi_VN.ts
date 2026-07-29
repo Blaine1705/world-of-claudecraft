@@ -48,7 +48,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Sách Kỳ Công đồng hành với từng bước của hành trình này. Lần gắn kết đầu tiên của bạn đạt được thành tích Thề Nguyện Thủ Công và kiệt tác đầu tiên của bạn đạt được thành tích Thợ Đại Tài, cả hai đều có thể đeo như danh hiệu. Mỗi trong tám nghề thủ công có thể kiếm được đánh dấu một thành tích cột mốc ở kỹ năng 50 và đăng quang giới hạn của nó bằng danh hiệu Đại Sư, trong khi Câu Cá nhận được Lão Muối ở 100 thành thạo và danh hiệu Ngư Sư Thành Thạo ở 200.\n\nCó những trang lặng lẽ hơn: thành tích cho lần thu hoạch và chế tạo đầu tiên của bạn, cho những phát hiện hiếm may mắn tìm thấy ở thực địa, và cho việc bắt đầu tháo dỡ. Tất cả là trang trí, danh hiệu và Danh Vọng mà thôi. Thành tích không bao giờ ban sức mạnh; nó chỉ chứng minh bạn đã ở đó.',
   'guide.professions.startHeading': 'Bắt đầu từ đâu',
   'guide.professions.startBody':
-    'Vừa đến Eastbrook từ đường cái? Tìm Đốc Công Odell và nhận nhiệm vụ Một Nghề Cho Mỗi Đôi Tay: ông ấy sẽ chỉ bạn đến các mạch quặng xung quanh Hố Đồng phía tây nam thị trấn và trao cho bạn những vết chai đầu tiên. Từ đó trở đi, hãy khai thác mọi mạch quặng, bãi gỗ, và bụi thảo dược bạn đi qua khi làm nhiệm vụ; thành thạo đến tự nhiên với những người lữ hành.\n\nTrở lại thị trấn, nhấn T để mở cửa sổ chế tác và làm các công thức thông thường mà mọi nhân vật đều biết từ đầu. Ghé thăm các bậc thầy tại lò rèn, bếp, khung cửi, và xưởng dụng cụ để xem họ dạy gì, và nhận đơn đặt hàng của họ để kiếm tiền vàng đều đặn. Đến khi thư của Hiệp Hội tìm đến bạn, bạn sẽ đã biết cặp nào cảm thấy như nhà.',
+    'Vừa đến Eastbrook từ đường cái? Tìm Đốc Công Odell và nhận nhiệm vụ Một Nghề Cho Mỗi Đôi Tay: ông ấy sẽ chỉ bạn đến các mạch quặng xung quanh Hố Đồng phía đông nam thị trấn và trao cho bạn những vết chai đầu tiên. Từ đó trở đi, hãy khai thác mọi mạch quặng, bãi gỗ, và bụi thảo dược bạn đi qua khi làm nhiệm vụ; thành thạo đến tự nhiên với những người lữ hành.\n\nTrở lại thị trấn, nhấn T để mở cửa sổ chế tác và làm các công thức thông thường mà mọi nhân vật đều biết từ đầu. Ghé thăm các bậc thầy tại lò rèn, bếp, khung cửi, và xưởng dụng cụ để xem họ dạy gì, và nhận đơn đặt hàng của họ để kiếm tiền vàng đều đặn. Đến khi thư của Hiệp Hội tìm đến bạn, bạn sẽ đã biết cặp nào cảm thấy như nhà.',
   'guide.professions.colStation': 'Trạm',
   'guide.professions.colHub': 'Thị trấn',
   'guide.professions.colMaster': 'Bậc thầy',
@@ -504,7 +504,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Thấy chưa? Quặng đã thu thập và tay đã có vết chai. Tiếp tục khai thác mỏ, chặt gỗ và hái thảo dược khi bạn đi trên đường, và khi trở lại thị trấn, chú ý đến bảng Trọng Tâm Thị Trấn gần chợ và bàn thủ công gần đó. Có một giao dịch công bằng chờ đợi trong tất cả, nếu bạn muốn.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Mỏ quặng đã khai thác',
   'entities.quests.q_prof_intro.text':
-    'Mỗi người ở Eastbrook đều làm một nghề ngoài kiếm, {playerName}. Có những mỏ quặng trong các tảng đá quanh Hố Đồng, phía tây nam thị trấn. Hãy cầm cuốc và tự tay khai thác 5 mỏ, nhé; ta sẽ biết sự khác biệt.',
+    'Mỗi người ở Eastbrook đều làm một nghề ngoài kiếm, {playerName}. Có những mỏ quặng trong các tảng đá quanh Hố Đồng, phía đông nam thị trấn. Hãy cầm cuốc và tự tay khai thác 5 mỏ, nhé; ta sẽ biết sự khác biệt.',
   'gpuNotice.bodyDesktop':
     'Trò chơi đang chạy mà không có tăng tốc GPU và sẽ chậm. Hãy cập nhật trình điều khiển đồ họa, sau đó khởi động lại trò chơi. Trên Windows, hãy đặt trò chơi thành Hiệu suất cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa.',
   'gpuNotice.bodyWeb':
@@ -1034,7 +1034,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đây rồi, hương vị quen thuộc. Giả Kim và Nấu Ăn trở lại là chuyên ngành của bạn. Ở lại lâu hơn lần này.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Lợn Rừng Hoang đã săn',
   'entities.quests.q_prof_amends_apothecary.text':
-    'Ồ, nhìn xem ai trở lại nồi của tôi. Không có gì khó chịu đâu, {playerName}, nhà bếp luôn có chỗ, nhưng bạn biết cái hóa đơn cứ dài thêm mỗi lần bạn bước ra ngoài. Hãy đi tỉa đàn lợn rừng hoang ở đồng cỏ phía đông, vì mồ hôi lao động trung thực là thành phần đầu tiên, và nó sẽ nhắc nhở đôi bàn tay bạn về công việc.',
+    'Ồ, nhìn xem ai trở lại nồi của tôi. Không có gì khó chịu đâu, {playerName}, nhà bếp luôn có chỗ, nhưng bạn biết cái hóa đơn cứ dài thêm mỗi lần bạn bước ra ngoài. Hãy đi tỉa đàn lợn rừng hoang ở đồng cỏ phía tây, vì mồ hôi lao động trung thực là thành phần đầu tiên, và nó sẽ nhắc nhở đôi bàn tay bạn về công việc.',
   'entities.quests.q_prof_amends_apothecary.title': 'Trở Lại Nồi',
   'entities.quests.q_prof_amends_bombardier.completion':
     'ĐÓ RỒI, cơn ngứa ngáy đã trở lại trong tay bạn. Cơ Khí và Giả Kim, lại là chuyên ngành, đi thôi, đi tạo ra tiếng nổ đi. Cố gắng ở lại lần này nhé?',
@@ -1046,7 +1046,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Vững tay lại rồi. Thuộc Da và May Vá trở lại tay bạn là chuyên ngành. Hãy đo hai lần trước khi lang thang lần này.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Nhện Gỗ Lưới đã diệt',
   'entities.quests.q_prof_amends_outfitter.text':
-    'Trở lại khung cửi của tôi rốt cuộc rồi. Tôi không giữ oán giận, {playerName}, nhưng sợi chỉ nhớ một bàn tay đã buông nó, và cái giá để lấy lại ngày càng dài hơn mỗi lần. Hãy tỉa đàn nhện gỗ lưới đang chen chúc ở khu rừng phía tây, và lao động sẽ ổn định đôi tay bạn trước khi chúng chạm lại vào tơ tốt.',
+    'Trở lại khung cửi của tôi rốt cuộc rồi. Tôi không giữ oán giận, {playerName}, nhưng sợi chỉ nhớ một bàn tay đã buông nó, và cái giá để lấy lại ngày càng dài hơn mỗi lần. Hãy tỉa đàn nhện gỗ lưới đang chen chúc ở khu rừng phía đông, và lao động sẽ ổn định đôi tay bạn trước khi chúng chạm lại vào tơ tốt.',
   'entities.quests.q_prof_amends_outfitter.title': 'Sợi Chỉ Nối Lại',
   'entities.quests.q_prof_amends_smith.completion':
     'Nhịp điệu đã trở lại trong tay bạn. Rèn Vũ Khí và Rèn Giáp một lần nữa là chuyên ngành của bạn. Đừng tạo thói quen bỏ đi.',
@@ -2006,7 +2006,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Cuối cùng nó cũng gục ngã. Dân miền núi từng thề rằng con mèo ấy sẽ sống lâu hơn cả bức tường. Giờ lũ rình mồi sẽ chịu ở yên trên vùng tuyết cao của chúng, {playerName}, và các đội tuần tra của ta sẽ đi trên đường mà không phải đổ máu. Cả dải sườn núi yên ắng hơn nhờ công của ngươi.',
   'entities.quests.q_old_cragmaw.objectives.0.label': 'Đã hạ Lão Cragmaw',
   'entities.quests.q_old_cragmaw.text':
-    'Dân miền núi đã gọi tên những dấu chân mà trinh sát của ta tìm thấy: Lão Cragmaw, một bạo chúa mèo lông đầy sẹo đã sống lâu hơn ba thế hệ của chính bầy đàn nó. Nó chính là lý do lũ rình mồi tràn xuống con đường của ta, {playerName}. Hang ổ của nó nằm trên sườn núi phía tây, bên trên con đường về nam. Hãy dẫn theo một người bạn, và hạ gục con quỷ già ấy.',
+    'Dân miền núi đã gọi tên những dấu chân mà trinh sát của ta tìm thấy: Lão Cragmaw, một bạo chúa mèo lông đầy sẹo đã sống lâu hơn ba thế hệ của chính bầy đàn nó. Nó chính là lý do lũ rình mồi tràn xuống con đường của ta, {playerName}. Hang ổ của nó nằm trên sườn núi phía đông, bên trên con đường về nam. Hãy dẫn theo một người bạn, và hạ gục con quỷ già ấy.',
   'entities.quests.q_old_cragmaw.title': 'Lão Cragmaw',
   'entities.quests.q_stalker_cloaks.completion':
     'Mười tấm da tốt, dày chẳng kém bất kỳ tấm nào ta có... khoan, nhìn những tấm này xem, {playerName}. Một nửa bị xé rách, mà chẳng phải do lưỡi kiếm hay ngọn giáo nào. Vết vuốt rộng bằng bàn tay ta, xuyên thẳng qua lớp lông mùa đông. Có thứ gì đó trên sườn núi ấy đang cắn xé chính đồng loại của nó.',
@@ -4095,7 +4095,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Cuối cùng thì Mogger cũng đã chết. Đồng ruộng Eastbrook đã an toàn hơn, và ngươi rời Thung Lũng với thêm một câu chuyện đáng để kể lại.',
   'entities.quests.q_mogger.objectives.0.label': 'Đã hạ Mogger',
   'entities.quests.q_mogger.text':
-    'Mogger đã phá nát xe kéo, san phẳng hàng rào, và giết đủ gia súc để làm trống một nửa Thung Lũng. Đừng đối đầu hắn một mình. Hãy dẫn hai đồng đội khỏe mạnh vào đồng cỏ phía đông và hạ gục con quái vật ấy một lần dứt điểm.',
+    'Mogger đã phá nát xe kéo, san phẳng hàng rào, và giết đủ gia súc để làm trống một nửa Thung Lũng. Đừng đối đầu hắn một mình. Hãy dẫn hai đồng đội khỏe mạnh vào đồng cỏ phía tây và hạ gục con quái vật ấy một lần dứt điểm.',
   'entities.quests.q_mogger.title': 'Mogger Phải Gục Ngã',
   'entities.quests.q_murlocs.completion':
     'Hà! Thế là chúng sẽ biết mà lo cho mấy vũng bùn của mình thôi.',
@@ -4140,8 +4140,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Linh ảnh tại Ngôi Mộ của Thượng Tế Malric',
   'entities.quests.q_nythraxis_graves.objectives.2.label':
     'Linh ảnh tại Ngôi Mộ của Sát Thủ Hoàng Gia Voss',
-  'entities.quests.q_nythraxis_graves.text':
-    'Ta đã từng thấy những dấu này, trên ba ngôi mộ cổ quanh chiến trường phía bắc. Đội Trưởng Aldren nằm ở gò đất phía đông, Thượng Tế Malric gần con đường gãy nát ở trung tâm, và Sát Thủ Hoàng Gia Voss bên vách đá phía tây. Hãy chạm vào từng ngôi mộ và lắng nghe, {playerName}. Người chết có thể nhớ những gì người sống đã quên.',
   'entities.quests.q_nythraxis_graves.title': 'Những Ngôi Mộ Của Kẻ Bị Lãng Quên',
   'entities.quests.q_nythraxis_restless_dead.completion':
     'Cùng một dấu hiệu xuất hiện trên mọi mảnh vỡ... một vương miện. Ta đã từng thấy nó, được khắc trên những ngôi mộ cổ mà không một ghi chép nào của Eastbrook còn nhớ tới.',
@@ -4161,7 +4159,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_sealed_crypt.objectives.1.label': 'Đá Khóa Hầm Mộ Phần Dưới',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.2.label': 'Nhật Ký Cổ',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    'Những linh ảnh chỉ về hầm mộ hoang phế nơi vách đá phía tây. Có một truyền thuyết cổ kể rằng hầm mộ từng là nơi an nghỉ của một vị vua. Có lẽ Đỉnh Gai đã phong ấn hắn bên dưới sau khi nghi lễ của Malric biến hắn thành một thứ bất tử. Hãy vào hầm mộ và xem những gì còn sót lại bên trong.',
+    'Những linh ảnh chỉ về hầm mộ hoang phế nơi vách đá phía đông. Có một truyền thuyết cổ kể rằng hầm mộ từng là nơi an nghỉ của một vị vua. Có lẽ Đỉnh Gai đã phong ấn hắn bên dưới sau khi nghi lễ của Malric biến hắn thành một thứ bất tử. Hãy vào hầm mộ và xem những gì còn sót lại bên trong.',
   'entities.quests.q_nythraxis_sealed_crypt.title': 'Hầm Mộ Hoang Phế',
   'entities.quests.q_ogre_bounty.completion':
     'Tiền thưởng đã trả đủ. Vùng chân núi đã yên ắng hơn - giờ ta sẽ lo đến những kẻ đứng sau chi tiền.',
@@ -4290,7 +4288,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Những thùng hàng của ta! Gần như chẳng có lấy một vết xước. Ngươi thật phi thường.',
   'entities.quests.q_supplies.objectives.0.label': 'Thùng Hàng Bị Đánh Cắp',
   'entities.quests.q_supplies.text':
-    'Bọn cướp ấy đã đột kích chiếc xe ngựa cuối cùng của ta và cuỗm đi bốn thùng hàng - dụng cụ, muối, vải lanh Eastbrook hảo hạng. Những thùng hàng được chất đống quanh trại của chúng nơi vùng đồi đông nam. Lấy cắp chúng về cho ta, được chứ?',
+    'Bọn cướp ấy đã đột kích chiếc xe ngựa cuối cùng của ta và cuỗm đi bốn thùng hàng - dụng cụ, muối, vải lanh Eastbrook hảo hạng. Những thùng hàng được chất đống quanh trại của chúng nơi vùng đồi tây nam. Lấy cắp chúng về cho ta, được chứ?',
   'entities.quests.q_supplies.title': 'Hàng Tiếp Tế Bị Đánh Cắp',
   'entities.quests.q_tarn_waders.completion':
     'Mười con đã trở lại dưới nước. Chúng chẳng cảm thấy lạnh, {playerName}, và chẳng biết sợ — chỉ có sức hút của cánh cổng ấy. Bất cứ thứ gì đang hát gọi chúng, nó hát thật to.',
@@ -4301,8 +4299,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_the_codfather.completion':
     'Lạy các vị thánh ẩm ướt... Chính là The Codfather. Nhìn bộ râu kia kìa. Fenbridge sẽ kể chuyện về mẻ cá này suốt cả năm cho mà xem, {playerName}.',
   'entities.quests.q_the_codfather.objectives.0.label': 'The Codfather',
-  'entities.quests.q_the_codfather.text':
-    'The Codfather không chỉ là một con cá, {playerName}, hắn là một sát thủ máu lạnh. Các bậc kỳ cựu thề rằng hắn xơi Mãnh Thú Đầm Lầy cho bữa sáng, và ngay cả lũ Góa Phụ Mirefen cũng không dám giăng tơ gần Vùng Nước Nông Deepfen vì quá khiếp sợ. Hắn ngự trị vùng nước ấy. Hãy vớ lấy cần câu, lôi con quỷ già ấy ra khỏi vùng nước của hắn, và ta sẽ thừa nhận ngươi đã gia nhập gia đình này.',
   'entities.quests.q_the_codfather.title': 'The Codfather',
   'entities.quests.q_troll_fetishes.completion':
     'Cùng người làm với những lá cờ trong trại của giáo phái. Lũ troll chỉ là những kẻ cuốc đất được thuê, không hơn. Làm tốt lắm, {playerName}.',

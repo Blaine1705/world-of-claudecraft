@@ -3967,7 +3967,7 @@ export const id_ID: EnTranslations = {
       "deedsHeading": "Jasa yang mengingat perjalanan",
       "deedsBody": "Kitab Jasa berjalan bersama setiap langkah ini. Penyelarasan pertamamu meraih jasa Tersumpah Karya dan karya master pertamamu meraih jasa Pandai Karya, keduanya bisa dipakai sebagai gelar. Setiap delapan kerajinan yang bisa diraih menandai jasa tonggak pada keahlian 50 dan memahkotai capnya dengan gelar Grandmaster, sementara Memancing mendapat jasa Garam Tua pada keahlian 100 dan gelar Pemancing Mahir pada keahlian 200.\n\nAda halaman yang lebih tenang juga: jasa untuk panen pertama dan pembuatan pertamamu, untuk temuan langka yang muncul di lapangan, dan untuk mengambil salvasi. Semua itu bersifat kosmetik, hanya gelar dan Kemasyhuran. Jasa tidak pernah memberikan kekuatan; ia hanya membuktikan bahwa kamu pernah ada di sana.",
       "startHeading": "Dari mana memulai",
-      "startBody": "Baru tiba di Eastbrook? Temukan Mandor Odell dan ambil misi Perdagangan untuk Setiap Tangan: ia akan menunjukkanmu ke urat bijih di sekitar Galian Tembaga di barat daya kota dan menyerahkan kapalan pertamamu. Dari situ, panen setiap urat bijih, tegakan kayu, dan petak herba yang kamu lewati saat menjalani misi; keahlian datang secara alami bagi para petualang.\n\nKembali di kota, tekan T untuk membuka jendela kerajinan dan kerjakan resep umum yang diketahui setiap karakter dari awal. Kunjungi para master di tempa, dapur, alat tenun, dan bengkel alat untuk melihat apa yang mereka ajarkan, dan ambil pesanan kerja mereka untuk koin yang stabil. Saat surat Serikat menemukanmu, kamu sudah tahu pasangan mana yang terasa seperti rumah.",
+      "startBody": "Baru tiba di Eastbrook? Temukan Mandor Odell dan ambil misi Perdagangan untuk Setiap Tangan: ia akan menunjukkanmu ke urat bijih di sekitar Galian Tembaga di tenggara kota dan menyerahkan kapalan pertamamu. Dari situ, panen setiap urat bijih, tegakan kayu, dan petak herba yang kamu lewati saat menjalani misi; keahlian datang secara alami bagi para petualang.\n\nKembali di kota, tekan T untuk membuka jendela kerajinan dan kerjakan resep umum yang diketahui setiap karakter dari awal. Kunjungi para master di tempa, dapur, alat tenun, dan bengkel alat untuk melihat apa yang mereka ajarkan, dan ambil pesanan kerja mereka untuk koin yang stabil. Saat surat Serikat menemukanmu, kamu sudah tahu pasangan mana yang terasa seperti rumah.",
       "colStation": "Stasiun",
       "colHub": "Hub",
       "colMaster": "Master",
@@ -11673,7 +11673,7 @@ export const id_ID: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Pekerjaan untuk Setiap Tangan",
-        "text": "Setiap jiwa di Eastbrook menekuni perdagangan selain pedang, {playerName}. Ada urat bijih di bebatuan sekitar Galian Tembaga, barat daya kota. Pergi ayunkan beliung dan kerjakan 5 di antaranya sendiri, ingat; aku tahu bedanya.",
+        "text": "Setiap jiwa di Eastbrook menekuni perdagangan selain pedang, {playerName}. Ada urat bijih di bebatuan sekitar Galian Tembaga, tenggara kota. Pergi ayunkan beliung dan kerjakan 5 di antaranya sendiri, ingat; aku tahu bedanya.",
         "completion": "Sudah, kan? Bijih terkumpul dan tanganmu sudah kapalan. Terus galilah, tebang, dan petik herba saat kamu menjelajah jalan-jalan, dan ketika kamu kembali ke kota, perhatikan papan Fokus Kota di dekat pasar dan bangku kerajinan di sana. Ada perdagangan adil yang menanti di semuanya, jika kamu mau.",
         "objectives": {
           "0": {
@@ -11756,7 +11756,7 @@ export const id_ID: EnTranslations = {
       },
       "q_supplies": {
         "title": "Perbekalan Curian",
-        "text": "Para bandit itu menyergap gerobak terakhirku dan melarikan empat peti barang - peralatan, garam, linen Eastbrook yang bagus. Peti-peti itu ditumpuk di sekitar kemah mereka di perbukitan tenggara. Curi kembali untukku, maukah?",
+        "text": "Para bandit itu menyergap gerobak terakhirku dan melarikan empat peti barang - peralatan, garam, linen Eastbrook yang bagus. Peti-peti itu ditumpuk di sekitar kemah mereka di perbukitan barat daya. Curi kembali untukku, maukah?",
         "completion": "Peti-petiku! Nyaris tanpa goresan. Kau sungguh menakjubkan.",
         "objectives": {
           "0": {
@@ -12138,7 +12138,7 @@ export const id_ID: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Cragmaw Tua",
-        "text": "Orang-orang gunung memberi nama pada jejak yang ditemukan peninjauku: Cragmaw Tua, kucing tiran berbulu penuh bekas luka yang telah hidup melampaui tiga generasi kawanannya sendiri. Dialah alasan para pengintai membanjiri jalanku, {playerName}. Sarangnya berada di punggung bukit barat di atas jalan ke selatan. Bawalah seorang kawan, dan habisi iblis tua itu.",
+        "text": "Orang-orang gunung memberi nama pada jejak yang ditemukan peninjauku: Cragmaw Tua, kucing tiran berbulu penuh bekas luka yang telah hidup melampaui tiga generasi kawanannya sendiri. Dialah alasan para pengintai membanjiri jalanku, {playerName}. Sarangnya berada di punggung bukit timur di atas jalan ke selatan. Bawalah seorang kawan, dan habisi iblis tua itu.",
         "completion": "Akhirnya tumbang juga. Orang-orang gunung bersumpah kucing itu akan hidup lebih lama dari temboknya sendiri. Para pengintai kini akan bertahan di salju tinggi mereka, {playerName}, dan patroliku akan menyusuri jalan tanpa harus berdarah karenanya. Seluruh punggung bukit menjadi lebih tenang berkat kerjamu.",
         "objectives": {
           "0": {
@@ -12377,7 +12377,7 @@ export const id_ID: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "Sang Codfather",
-        "text": "Sang Codfather bukan sekadar ikan, {playerName}, ia pembunuh berdarah dingin. Para orang tua bersumpah ia memakan Mire Prowler untuk sarapan, dan bahkan para Mirefen Widow tak mau memintal jaring dekat Perairan Dangkal Deepfen karena saking takutnya. Ia menguasai perairan itu. Ambil joran, seret iblis tua itu keluar dari perairannya, dan aku akan mengakui kau telah bergabung dengan keluarga.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "Demi para santo lembap... Sang Codfather sendiri. Lihat sungut-sungut itu. Fenbridge akan menyantap kisah dari tangkapan ini selama setahun, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12397,7 @@ export const id_ID: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Makam Para Terlupakan",
-        "text": "Aku pernah melihat tanda-tanda ini sebelumnya, pada tiga makam tua di sekitar medan tempur utara. Kapten Aldren terbaring di gundukan timur, Imam Agung Malric dekat jalan rusak di tengah, dan Pembunuh Kerajaan Voss di tepi tebing barat. Sentuh setiap makam dan dengarkan, {playerName}. Para mati mungkin mengingat apa yang dilupakan yang hidup.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren tetap setia, Malric menolak menerima kematian, dan Voss melihat bahaya sebelum orang lain mana pun. Ketiganya mengabdi pada raja terlupakan yang sama.",
         "objectives": {
           "0": {
@@ -12413,7 +12413,7 @@ export const id_ID: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "Kripta Terbengkalai",
-        "text": "Penglihatan-penglihatan itu mengarah ke kripta terbengkalai di tebing barat. Ada sebuah legenda lama bahwa kripta itu menyemayamkan seorang raja. Mungkin Thornpeak menyegelnya di bawah setelah ritual Malric memelintirnya menjadi sesuatu yang baka. Masuki kripta dan lihat apa yang tersisa di dalam.",
+        "text": "Penglihatan-penglihatan itu mengarah ke kripta terbengkalai di tebing timur. Ada sebuah legenda lama bahwa kripta itu menyemayamkan seorang raja. Mungkin Thornpeak menyegelnya di bawah setelah ritual Malric memelintirnya menjadi sesuatu yang baka. Masuki kripta dan lihat apa yang tersisa di dalam.",
         "completion": "Kedua belahan batu kunci itu cocok, dan buku harian Voss menyebut apa yang mereka segel: cincin meterai Raja Nythraxis. Jika buku harian itu benar, cincin meterai itu adalah kunci ke makamnya.",
         "objectives": {
           "0": {
@@ -12455,7 +12455,7 @@ export const id_ID: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger Harus Tumbang",
-        "text": "Mogger telah membelah gerobak, meratakan pagar, dan membunuh ternak yang cukup untuk mengosongkan separuh Lembah. Jangan hadapi dia sendirian. Bawa dua rekan yang kuat ke padang rumput timur dan habisi si bengis itu untuk selamanya.",
+        "text": "Mogger telah membelah gerobak, meratakan pagar, dan membunuh ternak yang cukup untuk mengosongkan separuh Lembah. Jangan hadapi dia sendirian. Bawa dua rekan yang kuat ke padang rumput barat dan habisi si bengis itu untuk selamanya.",
         "completion": "Mogger akhirnya tewas. Ladang-ladang Eastbrook lebih aman sekarang, dan kau meninggalkan Lembah dengan satu lagi kisah yang layak diceritakan ulang.",
         "objectives": {
           "0": {
@@ -12515,7 +12515,7 @@ export const id_ID: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Benang Disambung Kembali",
-        "text": "Kembali ke alat tenunku setelah semua. Aku tidak dendam, {playerName}, tetapi benang itu mengingat tangan yang melepaskannya, dan biaya mengambilnya kembali diukur lebih panjang setiap kalinya. Basmi laba-laba webwood yang berkerumun di hutan barat, dan pekerjaan itu akan menenangkan tanganmu sebelum menyentuh sutra yang baik lagi.",
+        "text": "Kembali ke alat tenunku setelah semua. Aku tidak dendam, {playerName}, tetapi benang itu mengingat tangan yang melepaskannya, dan biaya mengambilnya kembali diukur lebih panjang setiap kalinya. Basmi laba-laba webwood yang berkerumun di hutan timur, dan pekerjaan itu akan menenangkan tanganmu sebelum menyentuh sutra yang baik lagi.",
         "completion": "Stabil kembali. Pengolahan Kulit dan Menjahit kembali ke tanganmu sebagai bidang utama. Ukur dua kali kali ini sebelum mengembara.",
         "objectives": {
           "0": {
@@ -12525,7 +12525,7 @@ export const id_ID: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Kembali ke Dapur",
-        "text": "Nah, lihat siapa yang kembali ke periukku. Tidak ada dendam, {playerName}, dapur selalu punya tempat, tetapi kamu tahu tagihan makin panjang setiap kali kamu pergi. Pergi kurangi kawanan babi hutan liar di padang timur, karena keringat jujur adalah bahan pertama, dan itu akan mengingatkan tanganmu akan pekerjaan ini.",
+        "text": "Nah, lihat siapa yang kembali ke periukku. Tidak ada dendam, {playerName}, dapur selalu punya tempat, tetapi kamu tahu tagihan makin panjang setiap kali kamu pergi. Pergi kurangi kawanan babi hutan liar di padang barat, karena keringat jujur adalah bahan pertama, dan itu akan mengingatkan tanganmu akan pekerjaan ini.",
         "completion": "Itulah cita rasa lama. Alkimia dan Memasak kembali ke dapur sebagai bidang utamamu. Tinggallah lebih lama kali ini.",
         "objectives": {
           "0": {

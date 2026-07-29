@@ -3967,7 +3967,7 @@ export const tr_TR: EnTranslations = {
       "deedsHeading": "Yolculuğu hatırlayan yiğitlikler",
       "deedsBody": "Yiğitlikler Kitabı her adımda yanındadır. İlk bağlanman Zanaat Yeminlisi'ni ve ilk şaheser Şaheser Ustası'nı kazandırır; her ikisi de unvan olarak takılabilir. Sekiz kazanılabilir zanaatın her biri 50 beceri için bir dönüm noktası yiğitliği işaretler ve tavanını Büyük Usta unvanıyla taçlandırır; Balık Tutma ise 100 yetkinlikte Eski Denizci'yi ve 200'de Usta Olta Ustası unvanını alır.\n\nDaha sakin sayfalar da vardır: ilk hasat ve ilk üretim, sahada şansın ortaya çıkardığı nadir bulgular ve hurda işleme için yiğitlikler. Hepsi kozmetiktir, yalnızca unvanlar ve Ün. Bir yiğitlik hiçbir zaman güç vermez; yalnızca orada olduğunu kanıtlar.",
       "startHeading": "Nereden başlanır",
-      "startBody": "Doğudere'de yoldan yeni mi çıktın? Ustabaşı Odell'i bul ve Her El İçin Bir Meslek'i al: seni kasabanın güneybatısındaki Bakır Kazısı çevresindeki cevher damarlarına yönlendirecek ve ilk nasırlarını sana verecek. Oradan itibaren, görev yaparken geçtiğin her damarı, ağaç kümesini ve ot yamasını topla; yetkinlik gezginlere doğal olarak gelir.\n\nKasabaya dönünce, zanaat penceresini açmak için T'ye bas ve her karakterin başlangıçtan bildiği yaygın tarifleri çalış. Forge, mutfaklar, dokuma tezgahı ve alet atölyesindeki ustalara onların öğrettiklerini görmeye git ve düzenli para için iş emirlerini al. Lonca'nın mektubu sana ulaşana kadar hangi çiftin ev gibi hissettirdiğini zaten biliyor olacaksın.",
+      "startBody": "Doğudere'de yoldan yeni mi çıktın? Ustabaşı Odell'i bul ve Her El İçin Bir Meslek'i al: seni kasabanın güneydoğusundaki Bakır Kazısı çevresindeki cevher damarlarına yönlendirecek ve ilk nasırlarını sana verecek. Oradan itibaren, görev yaparken geçtiğin her damarı, ağaç kümesini ve ot yamasını topla; yetkinlik gezginlere doğal olarak gelir.\n\nKasabaya dönünce, zanaat penceresini açmak için T'ye bas ve her karakterin başlangıçtan bildiği yaygın tarifleri çalış. Forge, mutfaklar, dokuma tezgahı ve alet atölyesindeki ustalara onların öğrettiklerini görmeye git ve düzenli para için iş emirlerini al. Lonca'nın mektubu sana ulaşana kadar hangi çiftin ev gibi hissettirdiğini zaten biliyor olacaksın.",
       "colStation": "İstasyon",
       "colHub": "Merkez",
       "colMaster": "Usta",
@@ -11673,7 +11673,7 @@ export const tr_TR: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Her Ele Bir Zanaat",
-        "text": "Eastbrook'taki her ruh kılıcın yanı sıra bir zanaat da icra eder, {playerName}. Kasabanın güneybatısındaki Bakır Kazısı'nın çevresindeki kayalarda maden damarları var. Git bir kazma salla ve bunlardan 5'ini kendin işle; dikkat et, farkı anlayabilirim.",
+        "text": "Eastbrook'taki her ruh kılıcın yanı sıra bir zanaat da icra eder, {playerName}. Kasabanın güneydoğusundaki Bakır Kazısı'nın çevresindeki kayalarda maden damarları var. Git bir kazma salla ve bunlardan 5'ini kendin işle; dikkat et, farkı anlayabilirim.",
         "completion": "Gördün mü? Cevher toplandı ve ellerin nasırlandı. Yollarda gezerken madenciliğe, odun kesimine ve ot toplamaya devam et; kasabaya döndüğünde çarşının yanındaki Kasaba Odak Panosuna ve yakınındaki zanaat tezgahına dikkat et. İstersen hepsinde adil bir kazanç var.",
         "objectives": {
           "0": {
@@ -11756,7 +11756,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_supplies": {
         "title": "Çalınan Erzak",
-        "text": "O haydutlar son arabamı bastı ve dört sandık malı alıp kaçtı; aletler, tuz, kaliteli Doğudere keteni. Sandıklar, güneydoğudaki tepelerde bulunan kamplarının çevresine yığılmış. Onları benim için geri çalar mısın?",
+        "text": "O haydutlar son arabamı bastı ve dört sandık malı alıp kaçtı; aletler, tuz, kaliteli Doğudere keteni. Sandıklar, güneybatıdaki tepelerde bulunan kamplarının çevresine yığılmış. Onları benim için geri çalar mısın?",
         "completion": "Sandıklarım! Üzerlerinde neredeyse tek çizik bile yok. Sen bir harikasın.",
         "objectives": {
           "0": {
@@ -12138,7 +12138,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "İhtiyar Cragmaw",
-        "text": "Dağ halkı, gözcümün bulduğu izlere bir ad koydu: İhtiyar Cragmaw, kendi sürüsünün üç kuşağından uzun yaşamış, postu yara izleriyle kaplı zorba bir kedi. Sinsilerin yolumu doldurmasının nedeni o, {playerName}. İni, güneye giden yolun üstündeki batı sırtında. Yanına bir arkadaş al ve o yaşlı şeytanı yere ser.",
+        "text": "Dağ halkı, gözcümün bulduğu izlere bir ad koydu: İhtiyar Cragmaw, kendi sürüsünün üç kuşağından uzun yaşamış, postu yara izleriyle kaplı zorba bir kedi. Sinsilerin yolumu doldurmasının nedeni o, {playerName}. İni, güneye giden yolun üstündeki doğu sırtında. Yanına bir arkadaş al ve o yaşlı şeytanı yere ser.",
         "completion": "Sonunda devrildi. Dağ halkı o kedinin surdan bile uzun yaşayacağına yemin ederdi. Sinsiler artık yüksek karlarında kalacak, {playerName}, ve devriyelerim yolda kan dökmeden yürüyecek. Senin sayende bütün sırt daha sessiz.",
         "objectives": {
           "0": {
@@ -12377,7 +12377,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "Codfather",
-        "text": "Codfather sıradan bir balık değil, {playerName}, soğukkanlı bir katil. Eskiler, kahvaltıda Bataklık Avcıları yediğine yemin eder ve Mirefen Dulları bile katıksız bir dehşetle Deepfen Sığlıkları'nın yakınında ağ örmez. O sulara o hükmediyor. Bir olta kap, o yaşlı şeytanı sularından çek çıkar, ben de aileye katıldığını kabul edeyim.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "Rutubetli azizler aşkına... Codfather'ın ta kendisi. Şu bıyıklara bak. Fenbridge bu avın hikâyesini bir yıl boyunca dilinden düşürmez, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12397,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Unutulmuşların Mezarları",
-        "text": "Bu işaretleri daha önce gördüm; kuzeydeki savaş meydanının çevresindeki üç eski mezarda. Yüzbaşı Aldren doğudaki yükseltide yatıyor, Başrahip Malric ortadaki kırık yolun yakınında ve Kraliyet Suikastçısı Voss batıdaki uçurumun kenarında. Her mezara dokun ve dinle, {playerName}. Ölüler, dirilerin unuttuğunu hatırlıyor olabilir.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren sadık kaldı, Malric ölümü kabul etmeyi reddetti ve Voss tehlikeyi herkesten önce gördü. Üçü de aynı unutulmuş krala hizmet etmişti.",
         "objectives": {
           "0": {
@@ -12413,7 +12413,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "Terk Edilmiş Mahzen",
-        "text": "İmgeler batıdaki uçurumda bulunan terk edilmiş mahzeni işaret ediyor. Mahzenin bir kralı barındırdığına dair eski bir efsane var. Belki de Malric'in ayini onu ölümsüz bir şeye dönüştürdükten sonra Dikenzirve onu aşağıya mühürledi. Mahzene gir ve içeride ne kaldığını gör.",
+        "text": "İmgeler doğudaki uçurumda bulunan terk edilmiş mahzeni işaret ediyor. Mahzenin bir kralı barındırdığına dair eski bir efsane var. Belki de Malric'in ayini onu ölümsüz bir şeye dönüştürdükten sonra Dikenzirve onu aşağıya mühürledi. Mahzene gir ve içeride ne kaldığını gör.",
         "completion": "Kilittaşının yarımları birbirine oturuyor ve Voss'un günlüğü neyi mühürlediklerini adlandırıyor: Kral Nythraxis'in mühür yüzüğü. Günlük doğruysa, o mühür yüzüğü mezarının anahtarı.",
         "objectives": {
           "0": {
@@ -12455,7 +12455,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger Düşmeli",
-        "text": "Mogger arabaları parçaladı, çitleri yerle bir etti ve Vadi'nin yarısını boşaltacak kadar çiftlik hayvanı öldürdü. Onunla yalnız yüzleşme. İki güçlü yoldaşı yanına alıp doğudaki çayıra git ve o canavarı temelli yere ser.",
+        "text": "Mogger arabaları parçaladı, çitleri yerle bir etti ve Vadi'nin yarısını boşaltacak kadar çiftlik hayvanı öldürdü. Onunla yalnız yüzleşme. İki güçlü yoldaşı yanına alıp batıdaki çayıra git ve o canavarı temelli yere ser.",
         "completion": "Mogger sonunda öldü. Doğudere'nin tarlaları artık daha güvenli ve Vadi'den anlatılmaya değer bir hikâye daha bırakarak ayrılıyorsun.",
         "objectives": {
           "0": {
@@ -12515,7 +12515,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Yeniden Bağlanan İplikler",
-        "text": "Demek tezgahıma döndün sonunda. Kırgınlık beslemem, {playerName}, ama iplik bırakıp giden eli hatırlar ve onu yeniden almak her seferinde daha uzun ölçülür. Batı ormanlarını sıkan ağ ağacı örümceklerini imha et; bu emek, ellerin iyi ipliğe değmeden önce onları yerli yerine oturtur.",
+        "text": "Demek tezgahıma döndün sonunda. Kırgınlık beslemem, {playerName}, ama iplik bırakıp giden eli hatırlar ve onu yeniden almak her seferinde daha uzun ölçülür. Doğu ormanlarını sıkan ağ ağacı örümceklerini imha et; bu emek, ellerin iyi ipliğe değmeden önce onları yerli yerine oturtur.",
         "completion": "Yeniden sabit. Deri İşleme ve Terzilik yeniden ellerinde ana dal olarak. Başıboş dolaşmadan önce bu sefer iki kez düşün.",
         "objectives": {
           "0": {
@@ -12525,7 +12525,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Yeniden Ocakta",
-        "text": "Bak bak, kim geldi mutfağıma. Kırgınlık yok, {playerName}, bir mutfağın her zaman yeri vardır, ama bilirsin ki her defasında dışarı çıkıp geri dönersen hesap birikir. Git doğu çayırındaki yaban domuzlarını azalt, çünkü dürüst ter ilk malzemedir ve bu, ellerini işe alıştırır.",
+        "text": "Bak bak, kim geldi mutfağıma. Kırgınlık yok, {playerName}, bir mutfağın her zaman yeri vardır, ama bilirsin ki her defasında dışarı çıkıp geri dönersen hesap birikir. Git batı çayırındaki yaban domuzlarını azalt, çünkü dürüst ter ilk malzemedir ve bu, ellerini işe alıştırır.",
         "completion": "Eski lezzet geri geldi. Simya ve Aşçılık yeniden ana dalın olarak ocağında. Bu sefer kal bir süre.",
         "objectives": {
           "0": {

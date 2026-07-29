@@ -3967,7 +3967,7 @@ export const pt_BR: EnTranslations = {
       "deedsHeading": "Feitos que lembram a jornada",
       "deedsBody": "O Livro dos Feitos caminha ao lado de cada passo disso. Sua primeira sintonização conquista Jurado do Ofício e sua primeira obra-prima conquista Mestre Artesão, ambos usáveis como títulos. Cada um dos oito ofícios que podem ser conquistados marca um feito de marco nos 50 de habilidade e coroa seu limite com um título de Grão-Mestre, enquanto a Pesca recebe Sal Velho aos 100 de proficiência e o título de Pescador Mestre aos 200.\n\nHá páginas mais discretas também: feitos para sua primeira coleta e primeira criação, pelos achados raros que a sorte traz no campo, e por começar a desmontar. Tudo é cosmético, apenas títulos e Renome. Um feito nunca concede poder; ele apenas prova que você esteve lá.",
       "startHeading": "Por onde começar",
-      "startBody": "Chegou fresquinho na estrada em Eastbrook? Encontre o Capataz Odell e pegue Uma Profissão para Cada Mão: ele vai te apontar as veias de minério ao redor da Escavação de Cobre a sudoeste da cidade e te dar seus primeiros calos. A partir daí, colete cada veia, tora de madeira e erva que encontrar enquanto faz missões; a proficiência vem naturalmente aos viajantes.\n\nDe volta na cidade, pressione T para abrir a janela de criação e trabalhe as receitas comuns que todo personagem conhece desde o início. Visite os mestres na forja, nas cozinhas, no tear e na oficina de ferramentas para ver o que ensinam, e aceite seus pedidos de trabalho por moedas estáveis. Quando a carta da Guilda chegar até você, você já saberá qual par parece seu lar.",
+      "startBody": "Chegou fresquinho na estrada em Eastbrook? Encontre o Capataz Odell e pegue Uma Profissão para Cada Mão: ele vai te apontar as veias de minério ao redor da Escavação de Cobre a sudeste da cidade e te dar seus primeiros calos. A partir daí, colete cada veia, tora de madeira e erva que encontrar enquanto faz missões; a proficiência vem naturalmente aos viajantes.\n\nDe volta na cidade, pressione T para abrir a janela de criação e trabalhe as receitas comuns que todo personagem conhece desde o início. Visite os mestres na forja, nas cozinhas, no tear e na oficina de ferramentas para ver o que ensinam, e aceite seus pedidos de trabalho por moedas estáveis. Quando a carta da Guilda chegar até você, você já saberá qual par parece seu lar.",
       "colStation": "Bancada",
       "colHub": "Centro",
       "colMaster": "Mestre",
@@ -11673,7 +11673,7 @@ export const pt_BR: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Um ofício para cada mão",
-        "text": "Toda alma em Eastbrook exerce um ofício além da espada, {playerName}. Há veios de minério nas rochas ao redor da Escavação de Cobre, a sudoeste da cidade. Vá bater com uma picareta e trabalhe 5 deles você mesmo; eu saberei a diferença.",
+        "text": "Toda alma em Eastbrook exerce um ofício além da espada, {playerName}. Há veios de minério nas rochas ao redor da Escavação de Cobre, a sudeste da cidade. Vá bater com uma picareta e trabalhe 5 deles você mesmo; eu saberei a diferença.",
         "completion": "Viu? Minério coletado e calos nas mãos. Continue com a mineração, a lenharia e a colheita de ervas durante suas viagens, e quando estiver de volta à cidade, observe o quadro do Foco do Vilarejo perto do mercado e a bancada de artesanato por perto. Há uma troca justa esperando em tudo isso, se você quiser.",
         "objectives": {
           "0": {
@@ -11756,7 +11756,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_supplies": {
         "title": "Suprimentos roubados",
-        "text": "Os bandidos levaram minha última carroça: ferramentas, sal e bom linho de Eastbrook. Recupere 4 caixas no acampamento sudeste.",
+        "text": "Os bandidos levaram minha última carroça: ferramentas, sal e bom linho de Eastbrook. Recupere 4 caixas no acampamento sudoeste.",
         "completion": "Minhas caixas! Quase sem arranhões. Você é uma maravilha.",
         "objectives": {
           "0": {
@@ -12138,7 +12138,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "O Velho Cragmaw",
-        "text": "O povo da montanha deu nome às pegadas que minha batedora encontrou: Velho Cragmaw, um tirano felino de pelagem marcada que sobreviveu a três gerações do próprio bando. É por causa dele que os rastreadores inundam minha estrada, {playerName}. A toca dele fica na crista oeste, acima da estrada ao sul. Leve um amigo e acabe com o velho demônio.",
+        "text": "O povo da montanha deu nome às pegadas que minha batedora encontrou: Velho Cragmaw, um tirano felino de pelagem marcada que sobreviveu a três gerações do próprio bando. É por causa dele que os rastreadores inundam minha estrada, {playerName}. A toca dele fica na crista leste, acima da estrada ao sul. Leve um amigo e acabe com o velho demônio.",
         "completion": "Abatido, enfim. O povo da montanha jurava que aquele felino sobreviveria à própria muralha. Os rastreadores vão se manter nas neves altas agora, {playerName}, e minhas patrulhas percorrerão a estrada sem sangrar por isso. A crista inteira está mais quieta graças ao seu trabalho.",
         "objectives": {
           "0": {
@@ -12377,7 +12377,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "O Bacalhau-Padrinho",
-        "text": "O Bacalhau-Padrinho não é só um peixe, {playerName}, é um assassino de sangue frio. Os veteranos juram que ele come espreitadores do pântano no café da manhã, e nem as viúvas de Mirefen tecem suas teias perto dos Baixios de Deepfen de tanto terror. Ele manda nessas águas. Pegue uma vara de pesca, arranque esse velho demônio das águas dele e admitirei que você entrou para a família.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "Pelos santos encharcados... O Bacalhau-Padrinho em pessoa. Veja esses bigodes. Fenbridge vai viver um ano inteiro de histórias com essa pescaria, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12397,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Túmulos dos esquecidos",
-        "text": "Já vi estas marcas antes, em três túmulos antigos ao redor do campo de batalha ao norte. O capitão Aldren jaz na elevação leste, o sumo sacerdote Malric perto da estrada central quebrada, e o assassino real Voss junto ao penhasco oeste. Toque cada túmulo e escute, {playerName}. Os mortos podem lembrar o que os vivos esqueceram.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren permaneceu leal, Malric se recusou a aceitar a morte e Voss viu o perigo antes de todos. Os três serviram ao mesmo rei esquecido.",
         "objectives": {
           "0": {
@@ -12413,7 +12413,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "A cripta abandonada",
-        "text": "As visões apontam para a cripta abandonada no penhasco oeste. Há uma velha lenda de que a cripta abrigava um rei. Talvez Thornpeak o tenha selado lá embaixo depois que o ritual de Malric o transformou em algo imortal. Entre na cripta e veja o que restou lá dentro.",
+        "text": "As visões apontam para a cripta abandonada no penhasco leste. Há uma velha lenda de que a cripta abrigava um rei. Talvez Thornpeak o tenha selado lá embaixo depois que o ritual de Malric o transformou em algo imortal. Entre na cripta e veja o que restou lá dentro.",
         "completion": "As metades da pedra-chave se encaixam, e o diário de Voss nomeia o que elas selaram: o anel-sinete do rei Nythraxis. Se o diário for verdadeiro, esse anel é a chave para sua tumba.",
         "objectives": {
           "0": {
@@ -12455,7 +12455,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger deve cair",
-        "text": "Mogger partiu carroças, achatou cercas e matou gado suficiente para esvaziar metade do Vale. Não o enfrente só. Leve dois companheiros fortes ao prado leste e derrube a fera de vez.",
+        "text": "Mogger partiu carroças, achatou cercas e matou gado suficiente para esvaziar metade do Vale. Não o enfrente só. Leve dois companheiros fortes ao prado oeste e derrube a fera de vez.",
         "completion": "Mogger está morto enfim. Os campos de Eastbrook estão mais seguros, e você deixa o Vale com mais uma história digna de ser contada.",
         "objectives": {
           "0": {
@@ -12515,7 +12515,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Fios Reunidos",
-        "text": "De volta ao meu tear afinal. Não guardo rancor, {playerName}, mas o fio lembra uma mão que o largou, e o custo de retomá-lo se mede cada vez mais longo. Abata as aranhas da web que lotam os bosques a oeste, e o trabalho vai assentar suas mãos antes de tocarem boa seda de novo.",
+        "text": "De volta ao meu tear afinal. Não guardo rancor, {playerName}, mas o fio lembra uma mão que o largou, e o custo de retomá-lo se mede cada vez mais longo. Abata as aranhas da web que lotam os bosques a leste, e o trabalho vai assentar suas mãos antes de tocarem boa seda de novo.",
         "completion": "Estável de novo. Couraria e Alfaiataria voltam às suas mãos como principais. Meça duas vezes desta vez antes de se afastar.",
         "objectives": {
           "0": {
@@ -12525,7 +12525,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "De Volta ao Fogão",
-        "text": "Veja quem voltou à minha panela. Sem ressentimentos, {playerName}, uma cozinha sempre tem espaço, mas sabe que a conta fica maior cada vez que você vai embora. Vá diminuir os javalis selvagens no prado a leste, porque suor honesto é o primeiro ingrediente, e vai lembrar suas mãos do trabalho.",
+        "text": "Veja quem voltou à minha panela. Sem ressentimentos, {playerName}, uma cozinha sempre tem espaço, mas sabe que a conta fica maior cada vez que você vai embora. Vá diminuir os javalis selvagens no prado a oeste, porque suor honesto é o primeiro ingrediente, e vai lembrar suas mãos do trabalho.",
         "completion": "O velho sabor voltou. Alquimia e Culinária estão de volta ao seu fogo como principais. Fique um tempo desta vez.",
         "objectives": {
           "0": {

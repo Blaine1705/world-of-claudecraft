@@ -59,7 +59,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'El Libro de Gestas acompaña cada paso de esto. Tu primera sintonización gana Juramentado del Oficio y tu primera obra maestra gana Gran Artesano, ambos usables como títulos. Cada uno de los ocho oficios con gestas marca una gesta hito a los 50 de habilidad y corona su tope con un título de Gran Maestro, mientras que la Pesca recibe Viejo Sal a los 100 de pericia y el título de Pescador Maestro a los 200.\n\nHay páginas más silenciosas también: gestas por tu primera cosecha y primera elaboración, por los hallazgos raros que la suerte te da en el campo, y por empezar el salvamento. Todo es cosmético, títulos y Renombre únicamente. Una gesta nunca otorga poder; solo prueba que estuviste allí.',
   'guide.professions.startHeading': 'Por dónde empezar',
   'guide.professions.startBody':
-    '¿Recién llegado a Eastbrook? Busca al Capataz Odell y acepta Un oficio para cada mano: te señalará las vetas de mineral alrededor de la Excavación de Cobre al suroeste del pueblo y te dará tus primeros callos. A partir de entonces, cosecha cada veta, arboleda y mata de hierba que encuentres mientras haces misiones; la pericia llega de forma natural a los viajeros.\n\nDe vuelta en el pueblo, pulsa T para abrir la ventana de artesanía y trabaja las recetas comunes que cada personaje conoce desde el principio. Visita a los maestros en la fragua, las cocinas, el telar y el taller de herramientas para ver qué enseñan, y acepta sus encargos de trabajo para obtener monedas constantes. Para cuando la carta del Gremio te encuentre, ya sabrás qué par se siente como hogar.',
+    '¿Recién llegado a Eastbrook? Busca al Capataz Odell y acepta Un oficio para cada mano: te señalará las vetas de mineral alrededor de la Excavación de Cobre al sureste del pueblo y te dará tus primeros callos. A partir de entonces, cosecha cada veta, arboleda y mata de hierba que encuentres mientras haces misiones; la pericia llega de forma natural a los viajeros.\n\nDe vuelta en el pueblo, pulsa T para abrir la ventana de artesanía y trabaja las recetas comunes que cada personaje conoce desde el principio. Visita a los maestros en la fragua, las cocinas, el telar y el taller de herramientas para ver qué enseñan, y acepta sus encargos de trabajo para obtener monedas constantes. Para cuando la carta del Gremio te encuentre, ya sabrás qué par se siente como hogar.',
   'guide.professions.colStation': 'Estación',
   'guide.professions.colHub': 'Centro',
   'guide.professions.colMaster': 'Maestro',
@@ -503,7 +503,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     '¿Lo ves? Mineral recogido y callos en las manos. Sigue con la minería, la tala y la herboristería mientras recorres los caminos, y cuando estés de vuelta en el pueblo, fíjate en el Tablón de Enfoque junto al mercado y el banco de artesanía cercano. Hay un trato justo en cada parte, si lo quieres.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Veta de mineral extraída',
   'entities.quests.q_prof_intro.text':
-    'Cada alma en Eastbrook trabaja un oficio además de la espada, {playerName}. Hay vetas de mineral en las rocas alrededor de la Excavación de Cobre, al suroeste del pueblo. Ve a golpear con el pico y trabaja 5 de ellas tú mismo; lo sabré.',
+    'Cada alma en Eastbrook trabaja un oficio además de la espada, {playerName}. Hay vetas de mineral en las rocas alrededor de la Excavación de Cobre, al sureste del pueblo. Ve a golpear con el pico y trabaja 5 de ellas tú mismo; lo sabré.',
   'gpuNotice.bodyDesktop':
     'El juego se ejecuta sin aceleración de GPU y será lento. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.',
   'gpuNotice.bodyWeb':
@@ -1868,7 +1868,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Abatido al fin. La gente de la montaña juraba que ese felino sobreviviría al propio muro. Ahora los acechadores se quedarán en sus nieves altas, {playerName}, y mis patrullas recorrerán el camino sin sangrar por ello. Toda la cresta está más tranquila gracias a tu trabajo.',
   'entities.quests.q_old_cragmaw.objectives.0.label': 'Viejo Cragmaw abatido',
   'entities.quests.q_old_cragmaw.text':
-    'La gente de la montaña puso nombre a las huellas que encontró mi exploradora: el Viejo Cragmaw, un felino tirano de pelaje lleno de cicatrices que ha sobrevivido a tres generaciones de su propia manada. Es la razón de que los acechadores inunden mi camino, {playerName}. Su guarida está en la cresta occidental, sobre el camino del sur. Lleva a un amigo y acaba con el viejo demonio.',
+    'La gente de la montaña puso nombre a las huellas que encontró mi exploradora: el Viejo Cragmaw, un felino tirano de pelaje lleno de cicatrices que ha sobrevivido a tres generaciones de su propia manada. Es la razón de que los acechadores inunden mi camino, {playerName}. Su guarida está en la cresta oriental, sobre el camino del sur. Lleva a un amigo y acaba con el viejo demonio.',
   'entities.quests.q_old_cragmaw.title': 'El Viejo Cragmaw',
   'entities.quests.q_stalker_cloaks.completion':
     'Diez buenas pieles, tan gruesas como cualquiera que yo haya... no, mira estas, {playerName}. Desgarradas, la mitad, y no por hoja ni lanza. Marcas de garra anchas como mi mano, atravesando el pelaje de invierno. Algo en esa cresta está destrozando a los de su propia especie.',
@@ -4778,7 +4778,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_bones.objectives.0.label': 'Huesos inquietos devuelto al descanso',
   'entities.quests.q_supplies.title': 'Suministros robados',
   'entities.quests.q_supplies.text':
-    'Los bandidos robaron mi último carro: herramientas, sal y lino de Eastbrook. Recupera 4 cajas de su campamento de las colinas del sudeste.',
+    'Los bandidos robaron mi último carro: herramientas, sal y lino de Eastbrook. Recupera 4 cajas de su campamento de las colinas del sudoeste.',
   'entities.quests.q_supplies.completion':
     '¡Mis cajas! Apenas tienen un rasguño. Eres una maravilla.',
   'entities.quests.q_supplies.objectives.0.label': 'Caja de suministros robada',
@@ -5126,7 +5126,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gravewyrm.objectives.0.label': 'Korzul el Gravewyrm abatido',
   'entities.quests.q_mogger.title': 'Mogger debe caer',
   'entities.quests.q_mogger.text':
-    'Mogger ha partido carretas, aplastado cercas y matado tanto ganado como para vaciar medio Valle. No lo enfrentes a solas. Lleva dos compañeros fuertes al prado oriental y acaba con la bestia para siempre.',
+    'Mogger ha partido carretas, aplastado cercas y matado tanto ganado como para vaciar medio Valle. No lo enfrentes a solas. Lleva dos compañeros fuertes al prado occidental y acaba con la bestia para siempre.',
   'entities.quests.q_mogger.completion':
     'Mogger ha muerto por fin. Los campos de Eastbrook son más seguros, y sales del Valle con otra historia digna de contarse.',
   'entities.quests.q_mogger.objectives.0.label': 'Mogger abatido',
@@ -5226,8 +5226,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Todas las instancias de {name} están ocupadas. Inténtalo de nuevo pronto.',
   'entities.items.the_codfather.name': 'El Bacaladrino',
   'entities.quests.q_the_codfather.title': 'El Bacaladrino',
-  'entities.quests.q_the_codfather.text':
-    'El Bacaladrino no es solo un pez, {playerName}, es un asesino de sangre fría. Los veteranos juran que desayuna merodeadores del lodazal, e incluso las viudas de Mirefen no tejen sus redes cerca de los Bajíos de Deepfen por puro terror. Gobierna esas aguas. Toma una caña de pescar, arranca a ese viejo demonio de sus aguas y admitiré que ya eres de la familia.',
   'entities.quests.q_the_codfather.completion':
     'Por los santos húmedos... El Bacaladrino en persona. Mira esos bigotes. Fenbridge vivirá un año entero contando historias de esta captura, {playerName}.',
   'entities.quests.q_the_codfather.objectives.0.label': 'El Bacaladrino',
@@ -5260,8 +5258,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'El mismo símbolo aparece en cada fragmento... una corona. Ya lo he visto antes, tallado en viejas tumbas que ningún registro de Eastbrook recuerda.',
   'entities.quests.q_nythraxis_restless_dead.objectives.0.label': 'Fragmento óseo rúnico',
   'entities.quests.q_nythraxis_graves.title': 'Tumbas de los olvidados',
-  'entities.quests.q_nythraxis_graves.text':
-    'He visto estas marcas antes, en tres viejas tumbas alrededor del campo de batalla del norte. El capitán Aldren yace en la elevación oriental, el sumo sacerdote Malric cerca del camino central roto, y el asesino real Voss junto al acantilado occidental. Toca cada tumba y escucha, {playerName}. Los muertos pueden recordar lo que los vivos olvidaron.',
   'entities.quests.q_nythraxis_graves.completion':
     'Aldren siguió siendo leal, Malric se negó a aceptar la muerte y Voss vio el peligro antes que nadie. Los tres sirvieron al mismo rey olvidado.',
   'entities.quests.q_nythraxis_graves.objectives.0.label': 'Visión en la tumba del capitán Aldren',
@@ -5271,7 +5267,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Visión en la tumba del asesino real Voss',
   'entities.quests.q_nythraxis_sealed_crypt.title': 'La cripta abandonada',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    'Las visiones señalan la cripta abandonada en el acantilado occidental. Hay una vieja leyenda que dice que la cripta albergaba a un rey. Tal vez Thornpeak lo selló abajo después de que el ritual de Malric lo torciera en algo inmortal. Entra en la cripta y mira qué queda dentro.',
+    'Las visiones señalan la cripta abandonada en el acantilado oriental. Hay una vieja leyenda que dice que la cripta albergaba a un rey. Tal vez Thornpeak lo selló abajo después de que el ritual de Malric lo torciera en algo inmortal. Entra en la cripta y mira qué queda dentro.',
   'entities.quests.q_nythraxis_sealed_crypt.completion':
     'Las mitades de la piedra clave encajan, y el diario de Voss nombra lo que sellaron: el anillo del rey Nythraxis. Si el diario dice la verdad, ese anillo es la llave de su tumba.',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.0.label':
@@ -5298,7 +5294,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Ahí está el sabor de antes. Alquimia y Cocina vuelven a tu hornillo como especializaciones. Quédate esta vez.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Jabalí salvaje cazado',
   'entities.quests.q_prof_amends_apothecary.text':
-    'Mira quién vuelve a mi puchero. Sin rencores, {playerName}, una cocina siempre tiene sitio, aunque sabes que la cuenta crece cada vez que te vas. Ve a reducir los jabalíes salvajes de la pradera del este, porque el sudor honesto es el primer ingrediente, y le recordará a tus manos en qué consiste el trabajo.',
+    'Mira quién vuelve a mi puchero. Sin rencores, {playerName}, una cocina siempre tiene sitio, aunque sabes que la cuenta crece cada vez que te vas. Ve a reducir los jabalíes salvajes de la pradera del oeste, porque el sudor honesto es el primer ingrediente, y le recordará a tus manos en qué consiste el trabajo.',
   'entities.quests.q_prof_amends_apothecary.title': 'De vuelta al hornillo',
   'entities.quests.q_prof_amends_bombardier.completion':
     'AHÍ está, el picor ha vuelto a tus manos. Ingeniería y Alquimia, especializaciones de nuevo. Haz tu estruendo. Intenta quedarte esta vez, ¿eh?',
@@ -5310,7 +5306,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Firme de nuevo. Peletería y Sastrería regresan a tus manos como especializaciones. Mide dos veces antes de volverte a ir.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Araña de Sableweb eliminada',
   'entities.quests.q_prof_amends_outfitter.text':
-    'De vuelta a mi telar después de todo. No guardo rencor, {playerName}, pero el hilo recuerda la mano que lo soltó, y el costo de volver a tomarlo se mide más largo cada vez. Elimina las arañas de Sableweb que se agolpan en los bosques del oeste, y la labor calmará tus manos antes de que toquen buena seda de nuevo.',
+    'De vuelta a mi telar después de todo. No guardo rencor, {playerName}, pero el hilo recuerda la mano que lo soltó, y el costo de volver a tomarlo se mide más largo cada vez. Elimina las arañas de Sableweb que se agolpan en los bosques del este, y la labor calmará tus manos antes de que toquen buena seda de nuevo.',
   'entities.quests.q_prof_amends_outfitter.title': 'Hilos reunidos',
   'entities.quests.q_prof_amends_smith.completion':
     'El ritmo ha vuelto a tus manos. Fabricación de armas y Fabricación de armaduras son tus especializaciones de nuevo. No lo hagas un hábito.',

@@ -48,7 +48,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Kitab Jasa berjalan bersama setiap langkah ini. Penyelarasan pertamamu meraih jasa Tersumpah Karya dan karya master pertamamu meraih jasa Pandai Karya, keduanya bisa dipakai sebagai gelar. Setiap delapan kerajinan yang bisa diraih menandai jasa tonggak pada keahlian 50 dan memahkotai capnya dengan gelar Grandmaster, sementara Memancing mendapat jasa Garam Tua pada keahlian 100 dan gelar Pemancing Mahir pada keahlian 200.\n\nAda halaman yang lebih tenang juga: jasa untuk panen pertama dan pembuatan pertamamu, untuk temuan langka yang muncul di lapangan, dan untuk mengambil salvasi. Semua itu bersifat kosmetik, hanya gelar dan Kemasyhuran. Jasa tidak pernah memberikan kekuatan; ia hanya membuktikan bahwa kamu pernah ada di sana.',
   'guide.professions.startHeading': 'Dari mana memulai',
   'guide.professions.startBody':
-    'Baru tiba di Eastbrook? Temukan Mandor Odell dan ambil misi Perdagangan untuk Setiap Tangan: ia akan menunjukkanmu ke urat bijih di sekitar Galian Tembaga di barat daya kota dan menyerahkan kapalan pertamamu. Dari situ, panen setiap urat bijih, tegakan kayu, dan petak herba yang kamu lewati saat menjalani misi; keahlian datang secara alami bagi para petualang.\n\nKembali di kota, tekan T untuk membuka jendela kerajinan dan kerjakan resep umum yang diketahui setiap karakter dari awal. Kunjungi para master di tempa, dapur, alat tenun, dan bengkel alat untuk melihat apa yang mereka ajarkan, dan ambil pesanan kerja mereka untuk koin yang stabil. Saat surat Serikat menemukanmu, kamu sudah tahu pasangan mana yang terasa seperti rumah.',
+    'Baru tiba di Eastbrook? Temukan Mandor Odell dan ambil misi Perdagangan untuk Setiap Tangan: ia akan menunjukkanmu ke urat bijih di sekitar Galian Tembaga di tenggara kota dan menyerahkan kapalan pertamamu. Dari situ, panen setiap urat bijih, tegakan kayu, dan petak herba yang kamu lewati saat menjalani misi; keahlian datang secara alami bagi para petualang.\n\nKembali di kota, tekan T untuk membuka jendela kerajinan dan kerjakan resep umum yang diketahui setiap karakter dari awal. Kunjungi para master di tempa, dapur, alat tenun, dan bengkel alat untuk melihat apa yang mereka ajarkan, dan ambil pesanan kerja mereka untuk koin yang stabil. Saat surat Serikat menemukanmu, kamu sudah tahu pasangan mana yang terasa seperti rumah.',
   'guide.professions.colStation': 'Stasiun',
   'guide.professions.colHub': 'Hub',
   'guide.professions.colMaster': 'Master',
@@ -506,7 +506,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Sudah, kan? Bijih terkumpul dan tanganmu sudah kapalan. Terus galilah, tebang, dan petik herba saat kamu menjelajah jalan-jalan, dan ketika kamu kembali ke kota, perhatikan papan Fokus Kota di dekat pasar dan bangku kerajinan di sana. Ada perdagangan adil yang menanti di semuanya, jika kamu mau.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Urat bijih dipanen',
   'entities.quests.q_prof_intro.text':
-    'Setiap jiwa di Eastbrook menekuni perdagangan selain pedang, {playerName}. Ada urat bijih di bebatuan sekitar Galian Tembaga, barat daya kota. Pergi ayunkan beliung dan kerjakan 5 di antaranya sendiri, ingat; aku tahu bedanya.',
+    'Setiap jiwa di Eastbrook menekuni perdagangan selain pedang, {playerName}. Ada urat bijih di bebatuan sekitar Galian Tembaga, tenggara kota. Pergi ayunkan beliung dan kerjakan 5 di antaranya sendiri, ingat; aku tahu bedanya.',
   'gpuNotice.bodyDesktop':
     'Permainan berjalan tanpa akselerasi GPU dan akan lambat. Perbarui driver grafismu, lalu nyalakan ulang permainan. Di Windows, juga atur permainan ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis.',
   'gpuNotice.bodyWeb':
@@ -1016,7 +1016,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Itulah cita rasa lama. Alkimia dan Memasak kembali ke dapur sebagai bidang utamamu. Tinggallah lebih lama kali ini.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Babi Hutan Liar diburu',
   'entities.quests.q_prof_amends_apothecary.text':
-    'Nah, lihat siapa yang kembali ke periukku. Tidak ada dendam, {playerName}, dapur selalu punya tempat, tetapi kamu tahu tagihan makin panjang setiap kali kamu pergi. Pergi kurangi kawanan babi hutan liar di padang timur, karena keringat jujur adalah bahan pertama, dan itu akan mengingatkan tanganmu akan pekerjaan ini.',
+    'Nah, lihat siapa yang kembali ke periukku. Tidak ada dendam, {playerName}, dapur selalu punya tempat, tetapi kamu tahu tagihan makin panjang setiap kali kamu pergi. Pergi kurangi kawanan babi hutan liar di padang barat, karena keringat jujur adalah bahan pertama, dan itu akan mengingatkan tanganmu akan pekerjaan ini.',
   'entities.quests.q_prof_amends_apothecary.title': 'Kembali ke Dapur',
   'entities.quests.q_prof_amends_bombardier.completion':
     'ITU dia, rasa gatal kembali ke tanganmu. Rekayasa dan Alkimia, bidang utama lagi, ayo, pergi buat sesuatu yang menggelegar. Coba bertahan kali ini, ya?',
@@ -1028,7 +1028,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Stabil kembali. Pengolahan Kulit dan Menjahit kembali ke tanganmu sebagai bidang utama. Ukur dua kali kali ini sebelum mengembara.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Laba-laba Webwood dibasmi',
   'entities.quests.q_prof_amends_outfitter.text':
-    'Kembali ke alat tenunku setelah semua. Aku tidak dendam, {playerName}, tetapi benang itu mengingat tangan yang melepaskannya, dan biaya mengambilnya kembali diukur lebih panjang setiap kalinya. Basmi laba-laba webwood yang berkerumun di hutan barat, dan pekerjaan itu akan menenangkan tanganmu sebelum menyentuh sutra yang baik lagi.',
+    'Kembali ke alat tenunku setelah semua. Aku tidak dendam, {playerName}, tetapi benang itu mengingat tangan yang melepaskannya, dan biaya mengambilnya kembali diukur lebih panjang setiap kalinya. Basmi laba-laba webwood yang berkerumun di hutan timur, dan pekerjaan itu akan menenangkan tanganmu sebelum menyentuh sutra yang baik lagi.',
   'entities.quests.q_prof_amends_outfitter.title': 'Benang Disambung Kembali',
   'entities.quests.q_prof_amends_smith.completion':
     'Ritme kembali ke tanganmu. Pembuatan Senjata dan Pembuatan Zirah adalah bidang utamamu sekali lagi. Jangan biasakan pergi.',
@@ -1994,7 +1994,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Akhirnya tumbang juga. Orang-orang gunung bersumpah kucing itu akan hidup lebih lama dari temboknya sendiri. Para pengintai kini akan bertahan di salju tinggi mereka, {playerName}, dan patroliku akan menyusuri jalan tanpa harus berdarah karenanya. Seluruh punggung bukit menjadi lebih tenang berkat kerjamu.',
   'entities.quests.q_old_cragmaw.objectives.0.label': 'Cragmaw Tua terbunuh',
   'entities.quests.q_old_cragmaw.text':
-    'Orang-orang gunung memberi nama pada jejak yang ditemukan peninjauku: Cragmaw Tua, kucing tiran berbulu penuh bekas luka yang telah hidup melampaui tiga generasi kawanannya sendiri. Dialah alasan para pengintai membanjiri jalanku, {playerName}. Sarangnya berada di punggung bukit barat di atas jalan ke selatan. Bawalah seorang kawan, dan habisi iblis tua itu.',
+    'Orang-orang gunung memberi nama pada jejak yang ditemukan peninjauku: Cragmaw Tua, kucing tiran berbulu penuh bekas luka yang telah hidup melampaui tiga generasi kawanannya sendiri. Dialah alasan para pengintai membanjiri jalanku, {playerName}. Sarangnya berada di punggung bukit timur di atas jalan ke selatan. Bawalah seorang kawan, dan habisi iblis tua itu.',
   'entities.quests.q_old_cragmaw.title': 'Cragmaw Tua',
   'entities.quests.q_stalker_cloaks.completion':
     'Sepuluh kulit bulu yang bagus, setebal apa pun yang pernah kumiliki... tidak, lihat ini, {playerName}. Separuhnya robek, dan bukan oleh bilah atau tombak. Bekas cakar selebar tanganku, menembus bulu musim dingin. Sesuatu di punggung bukit itu sedang mencabik bangsanya sendiri.',
@@ -4030,7 +4030,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Mogger akhirnya tewas. Ladang-ladang Eastbrook lebih aman sekarang, dan kau meninggalkan Lembah dengan satu lagi kisah yang layak diceritakan ulang.',
   'entities.quests.q_mogger.objectives.0.label': 'Mogger dibunuh',
   'entities.quests.q_mogger.text':
-    'Mogger telah membelah gerobak, meratakan pagar, dan membunuh ternak yang cukup untuk mengosongkan separuh Lembah. Jangan hadapi dia sendirian. Bawa dua rekan yang kuat ke padang rumput timur dan habisi si bengis itu untuk selamanya.',
+    'Mogger telah membelah gerobak, meratakan pagar, dan membunuh ternak yang cukup untuk mengosongkan separuh Lembah. Jangan hadapi dia sendirian. Bawa dua rekan yang kuat ke padang rumput barat dan habisi si bengis itu untuk selamanya.',
   'entities.quests.q_mogger.title': 'Mogger Harus Tumbang',
   'entities.quests.q_murlocs.completion':
     'Hah! Itu akan mengajari mereka untuk mengurus lubang lumpur mereka sendiri.',
@@ -4073,8 +4073,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_graves.objectives.1.label': 'Penglihatan di Makam Imam Agung Malric',
   'entities.quests.q_nythraxis_graves.objectives.2.label':
     'Penglihatan di Makam Pembunuh Kerajaan Voss',
-  'entities.quests.q_nythraxis_graves.text':
-    'Aku pernah melihat tanda-tanda ini sebelumnya, pada tiga makam tua di sekitar medan tempur utara. Kapten Aldren terbaring di gundukan timur, Imam Agung Malric dekat jalan rusak di tengah, dan Pembunuh Kerajaan Voss di tepi tebing barat. Sentuh setiap makam dan dengarkan, {playerName}. Para mati mungkin mengingat apa yang dilupakan yang hidup.',
   'entities.quests.q_nythraxis_graves.title': 'Makam Para Terlupakan',
   'entities.quests.q_nythraxis_restless_dead.completion':
     'Tanda yang sama muncul pada setiap serpihan... sebuah mahkota. Aku pernah melihat ini sebelumnya, terukir pada makam tua yang tak diingat oleh catatan Eastbrook mana pun.',
@@ -4094,7 +4092,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_sealed_crypt.objectives.1.label': 'Batu Kunci Kripta Bawah',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.2.label': 'Buku Harian Purba',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    'Penglihatan-penglihatan itu mengarah ke kripta terbengkalai di tebing barat. Ada sebuah legenda lama bahwa kripta itu menyemayamkan seorang raja. Mungkin Thornpeak menyegelnya di bawah setelah ritual Malric memelintirnya menjadi sesuatu yang baka. Masuki kripta dan lihat apa yang tersisa di dalam.',
+    'Penglihatan-penglihatan itu mengarah ke kripta terbengkalai di tebing timur. Ada sebuah legenda lama bahwa kripta itu menyemayamkan seorang raja. Mungkin Thornpeak menyegelnya di bawah setelah ritual Malric memelintirnya menjadi sesuatu yang baka. Masuki kripta dan lihat apa yang tersisa di dalam.',
   'entities.quests.q_nythraxis_sealed_crypt.title': 'Kripta Terbengkalai',
   'entities.quests.q_ogre_bounty.completion':
     'Sayembara dibayar penuh. Kaki bukit lebih tenang sekarang - sekarang kita urus mereka yang menjadi pembeli.',
@@ -4222,7 +4220,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Peti-petiku! Nyaris tanpa goresan. Kau sungguh menakjubkan.',
   'entities.quests.q_supplies.objectives.0.label': 'Peti Perbekalan Curian',
   'entities.quests.q_supplies.text':
-    'Para bandit itu menyergap gerobak terakhirku dan melarikan empat peti barang - peralatan, garam, linen Eastbrook yang bagus. Peti-peti itu ditumpuk di sekitar kemah mereka di perbukitan tenggara. Curi kembali untukku, maukah?',
+    'Para bandit itu menyergap gerobak terakhirku dan melarikan empat peti barang - peralatan, garam, linen Eastbrook yang bagus. Peti-peti itu ditumpuk di sekitar kemah mereka di perbukitan barat daya. Curi kembali untukku, maukah?',
   'entities.quests.q_supplies.title': 'Perbekalan Curian',
   'entities.quests.q_tarn_waders.completion':
     'Sepuluh kembali ke air. Mereka tak merasakan dingin, {playerName}, dan tak merasakan takut — hanya tarikan gerbang itu. Apa pun yang bernyanyi pada mereka, ia bernyanyi keras.',
@@ -4233,8 +4231,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_the_codfather.completion':
     'Demi para santo lembap... Sang Codfather sendiri. Lihat sungut-sungut itu. Fenbridge akan menyantap kisah dari tangkapan ini selama setahun, {playerName}.',
   'entities.quests.q_the_codfather.objectives.0.label': 'Sang Codfather',
-  'entities.quests.q_the_codfather.text':
-    'Sang Codfather bukan sekadar ikan, {playerName}, ia pembunuh berdarah dingin. Para orang tua bersumpah ia memakan Mire Prowler untuk sarapan, dan bahkan para Mirefen Widow tak mau memintal jaring dekat Perairan Dangkal Deepfen karena saking takutnya. Ia menguasai perairan itu. Ambil joran, seret iblis tua itu keluar dari perairannya, dan aku akan mengakui kau telah bergabung dengan keluarga.',
   'entities.quests.q_the_codfather.title': 'Sang Codfather',
   'entities.quests.q_troll_fetishes.completion':
     'Pembuat yang sama dengan panji-panji di kemah sekte. Para troll hanyalah penggali bayaran, tak lebih. Kerja bagus, {playerName}.',

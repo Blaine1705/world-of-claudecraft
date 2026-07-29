@@ -3967,7 +3967,7 @@ export const en_CA: EnTranslations = {
       "deedsHeading": "Deeds that remember the journey",
       "deedsBody": "The Book of Deeds walks beside every step of this. Your first attunement earns Craftsworn and your first masterwork earns Masterwright, both wearable as titles. Each of the eight earnable crafts marks a milestone deed at 50 skill and crowns its cap with a Grandmaster title, while Fishing gets Old Salt at 100 proficiency and the Master Angler title at 200.\n\nThere are quieter pages too: deeds for your first harvest and first craft, for the rare finds luck turns up in the field, and for taking up salvage. All of it is cosmetic, titles and Renown only. A deed never grants power; it only proves you were there.",
       "startHeading": "Where to start",
-      "startBody": "Fresh off the road in Eastbrook? Find Foreman Odell and take A Trade for Every Hand: he will point you at the ore veins around the Copper Dig southwest of town and hand you your first calluses. From then on, harvest every vein, timber stand, and herb patch you pass while questing; proficiency comes naturally to travelers.\n\nBack in town, press T to open the crafting window and work the common recipes every character knows from the start. Visit the masters at the forge, kitchens, loom, and toolworks to see what they teach, and take their work orders for steady coin. By the time the Guild's letter finds you, you will already know which pair feels like home.",
+      "startBody": "Fresh off the road in Eastbrook? Find Foreman Odell and take A Trade for Every Hand: he will point you at the ore veins around the Copper Dig southeast of town and hand you your first calluses. From then on, harvest every vein, timber stand, and herb patch you pass while questing; proficiency comes naturally to travelers.\n\nBack in town, press T to open the crafting window and work the common recipes every character knows from the start. Visit the masters at the forge, kitchens, loom, and toolworks to see what they teach, and take their work orders for steady coin. By the time the Guild's letter finds you, you will already know which pair feels like home.",
       "colStation": "Station",
       "colHub": "Hub",
       "colMaster": "Master",
@@ -11673,7 +11673,7 @@ export const en_CA: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There are ore veins in the rocks around the Copper Dig, southwest of town. Go swing a pick and work 5 of them yourself, mind; I'll know the difference.",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There are ore veins in the rocks around the Copper Dig, southeast of town. Go swing a pick and work 5 of them yourself, mind; I'll know the difference.",
         "completion": "See? Ore gathered and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
         "objectives": {
           "0": {
@@ -11756,7 +11756,7 @@ export const en_CA: EnTranslations = {
       },
       "q_supplies": {
         "title": "Stolen Supplies",
-        "text": "Those bandits hit my last wagon and made off with four crates of goods - tools, salt, good Eastbrook linen. The crates are stacked around their camp in the southeast hills. Steal them back for me, would you?",
+        "text": "Those bandits hit my last wagon and made off with four crates of goods - tools, salt, good Eastbrook linen. The crates are stacked around their camp in the southwest hills. Steal them back for me, would you?",
         "completion": "My crates! Barely a scratch on them. You are a wonder.",
         "objectives": {
           "0": {
@@ -12138,7 +12138,7 @@ export const en_CA: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Old Cragmaw",
-        "text": "The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, {playerName}. Its den sits on the western ridge above the road south. Bring a friend, and put the old devil down.",
+        "text": "The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, {playerName}. Its den sits on the eastern ridge above the road south. Bring a friend, and put the old devil down.",
         "completion": "Down at last. The mountain folk swore that cat would outlive the wall itself. The stalkers will keep to their high snows now, {playerName}, and my patrols will walk the road without bleeding for it. The whole ridge is quieter for your work.",
         "objectives": {
           "0": {
@@ -12377,7 +12377,7 @@ export const en_CA: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "The Codfather",
-        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters. Grab a fishing pole, drag that old devil out of his waters, and I will admit you have joined the family.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "By the damp saints... The Codfather himself. Look at those whiskers. Fenbridge will eat stories off this catch for a year, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12397,7 @@ export const en_CA: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Graves of the Forgotten",
-        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the eastern rise, High Priest Malric near the central broken road, and Royal Assassin Voss by the western cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren remained loyal, Malric refused to accept death, and Voss saw the danger before anyone else. All three served the same forgotten king.",
         "objectives": {
           "0": {
@@ -12413,7 +12413,7 @@ export const en_CA: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "The Abandoned Crypt",
-        "text": "The visions point to the abandoned crypt in the western cliff. There is an old legend that the crypt housed a king. Perhaps Thornpeak sealed him below after Malric's ritual twisted him into something deathless. Enter the crypt and see what remains inside.",
+        "text": "The visions point to the abandoned crypt in the eastern cliff. There is an old legend that the crypt housed a king. Perhaps Thornpeak sealed him below after Malric's ritual twisted him into something deathless. Enter the crypt and see what remains inside.",
         "completion": "The keystone halves fit together, and Voss's diary names what they sealed: the signet of King Nythraxis. If the diary is true, that signet is the key to his tomb.",
         "objectives": {
           "0": {
@@ -12515,7 +12515,7 @@ export const en_CA: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Threads Rejoined",
-        "text": "Back at my loom after all. I hold no grudge, {playerName}, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the webwood spiders crowding the western woods, and the labor will settle your hands before they touch good silk again.",
+        "text": "Back at my loom after all. I hold no grudge, {playerName}, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the webwood spiders crowding the eastern woods, and the labor will settle your hands before they touch good silk again.",
         "completion": "Steady again. Leatherworking and Tailoring return to your hands as majors. Measure twice this time before you wander.",
         "objectives": {
           "0": {
@@ -12525,7 +12525,7 @@ export const en_CA: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Back on the Stove",
-        "text": "Well, look who is back at my pot. No hard feelings, {playerName}, a kitchen always has room, but you know the tab runs longer every time you walk out on it. Go thin the wild boars in the east meadow, because honest sweat is the first ingredient, and it will remind your hands of the work.",
+        "text": "Well, look who is back at my pot. No hard feelings, {playerName}, a kitchen always has room, but you know the tab runs longer every time you walk out on it. Go thin the wild boars in the west meadow, because honest sweat is the first ingredient, and it will remind your hands of the work.",
         "completion": "There is the old flavor. Alchemy and Cooking are back on your stove as majors. Stay a while this time.",
         "objectives": {
           "0": {

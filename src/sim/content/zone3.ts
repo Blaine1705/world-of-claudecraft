@@ -1398,7 +1398,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Old Cragmaw',
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
-    text: 'The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, $N. Its den sits on the western ridge above the road south. Bring a friend, and put the old devil down.',
+    text: 'The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, $N. Its den sits on the eastern ridge above the road south. Bring a friend, and put the old devil down.',
     completionText:
       'Down at last. The mountain folk swore that cat would outlive the wall itself. The stalkers will keep to their high snows now, $N, and my patrols will walk the road without bleeding for it. The whole ridge is quieter for your work.',
     objectives: [
@@ -1855,7 +1855,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Graves of the Forgotten',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the eastern rise, High Priest Malric near the central broken road, and Royal Assassin Voss by the western cliff. Touch each grave and listen, $N. The dead may remember what the living forgot.',
+    text: 'I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, $N. The dead may remember what the living forgot.',
     completionText:
       'Aldren remained loyal, Malric refused to accept death, and Voss saw the danger before anyone else. All three served the same forgotten king.',
     objectives: [
@@ -1889,7 +1889,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Abandoned Crypt',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: "The visions point to the abandoned crypt in the western cliff. There is an old legend that the crypt housed a king. Perhaps Thornpeak sealed him below after Malric's ritual twisted him into something deathless. Enter the crypt and see what remains inside.",
+    text: "The visions point to the abandoned crypt in the eastern cliff. There is an old legend that the crypt housed a king. Perhaps Thornpeak sealed him below after Malric's ritual twisted him into something deathless. Enter the crypt and see what remains inside.",
     completionText:
       "The keystone halves fit together, and Voss's diary names what they sealed: the signet of King Nythraxis. If the diary is true, that signet is the key to his tomb.",
     objectives: [

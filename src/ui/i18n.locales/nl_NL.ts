@@ -48,7 +48,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     "Het Boek der Daden loopt naast elke stap hiervan mee. Je eerste afstemming verdient Ambachtsgetrouwe en je eerste meesterwerk verdient Meestersmaker, beide te dragen als titels. Elk van de acht te verdienen ambachten markeert een mijlpaaldaad bij vaardigheid 50 en kroont zijn grens met een Grootmeesters-titel, terwijl Vissen Oude Zout krijgt bij 100 vaardigheid en de titel Meesterhengelaar bij 200.\n\nEr zijn ook stillere pagina's: daden voor je eerste oogst en eerste vervaardiging, voor de zeldzame vondsten die geluk in het veld oplevert, en voor het oppakken van salvage. Dit alles is cosmetisch, alleen titels en Roem. Een daad schenkt nooit macht; het bewijst alleen dat je er was.",
   'guide.professions.startHeading': 'Waar te beginnen',
   'guide.professions.startBody':
-    'Vers van de weg in Eastbrook? Vind Voorman Odell en neem Een Vak voor Elke Hand: hij wijst je op de ertsaders rondom de Kopergat ten zuidwesten van de stad en geeft je je eerste eelt. Oogst daarna elke ader, boomstand en kruidentuin die je tegenkomt tijdens het questen; vaardigheid komt vanzelf aan reizigers.\n\nTerug in de stad druk je op T om het vervaardigingsvenster te openen en werk je de gewone recepten die elk personage al kent vanaf het begin. Bezoek de meesters bij de smederij, keukens, weefgetouw en gereedschapsmakerij om te zien wat ze leren, en neem hun werkopdrachten voor een stabiel inkomen. Tegen de tijd dat de brief van het Gilde je bereikt, weet je al welk paar als thuis aanvoelt.',
+    'Vers van de weg in Eastbrook? Vind Voorman Odell en neem Een Vak voor Elke Hand: hij wijst je op de ertsaders rondom de Kopergat ten zuidoosten van de stad en geeft je je eerste eelt. Oogst daarna elke ader, boomstand en kruidentuin die je tegenkomt tijdens het questen; vaardigheid komt vanzelf aan reizigers.\n\nTerug in de stad druk je op T om het vervaardigingsvenster te openen en werk je de gewone recepten die elk personage al kent vanaf het begin. Bezoek de meesters bij de smederij, keukens, weefgetouw en gereedschapsmakerij om te zien wat ze leren, en neem hun werkopdrachten voor een stabiel inkomen. Tegen de tijd dat de brief van het Gilde je bereikt, weet je al welk paar als thuis aanvoelt.',
   'guide.professions.colStation': 'Station',
   'guide.professions.colHub': 'Hub',
   'guide.professions.colMaster': 'Meester',
@@ -503,7 +503,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Dat is de oude smaak. Alchemie en Koken zijn weer als hoofdvakken op je fornuis. Blijf deze keer wat langer.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Wilde Everzwijn gedood',
   'entities.quests.q_prof_amends_apothecary.text':
-    'Wel, kijk wie er terug is bij mijn pot. Geen wrok, {playerName}, een keuken heeft altijd ruimte, maar weet dat de rekening langer wordt elke keer dat je weggaat. Ga de wilde everzwijnen in het oostelijke weide uitdunnen, want eerlijk zweet is het eerste ingrediënt, en het zal je handen herinneren aan het werk.',
+    'Wel, kijk wie er terug is bij mijn pot. Geen wrok, {playerName}, een keuken heeft altijd ruimte, maar weet dat de rekening langer wordt elke keer dat je weggaat. Ga de wilde everzwijnen in het westelijke weide uitdunnen, want eerlijk zweet is het eerste ingrediënt, en het zal je handen herinneren aan het werk.',
   'entities.quests.q_prof_amends_apothecary.title': 'Terug op het Fornuis',
   'entities.quests.q_prof_amends_bombardier.completion':
     'DAT is het, de kriebels zijn terug in je handen. Techniek en Alchemie, weer als hoofdvakken. Vooruit, ga een knal maken. Probeer deze keer te blijven, hm?',
@@ -515,7 +515,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Stabiel weer. Leerbewerking en Kleermakerij keren terug naar je handen als hoofdvakken. Meet twee keer voordat je weer gaat dwalen.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Webhout Spin gevangen',
   'entities.quests.q_prof_amends_outfitter.text':
-    'Toch terug bij mijn weefgetouw. Ik koester geen wrok, {playerName}, maar de draad herinnert een hand die hem losliet, en de kosten om hem weer op te pakken worden elke keer gemeten aan een langere maat. Maai de webhoutspin nen die het westelijke woud verdringen, en de inspanning zal je handen kalmeren voordat ze goede zijde aanraken.',
+    'Toch terug bij mijn weefgetouw. Ik koester geen wrok, {playerName}, maar de draad herinnert een hand die hem losliet, en de kosten om hem weer op te pakken worden elke keer gemeten aan een langere maat. Maai de webhoutspin nen die het oostelijke woud verdringen, en de inspanning zal je handen kalmeren voordat ze goede zijde aanraken.',
   'entities.quests.q_prof_amends_outfitter.title': 'Draden Hernomen',
   'entities.quests.q_prof_amends_smith.completion':
     'Het ritme is terug in je handen. Wapensmeden en Pantserbouw zijn opnieuw je hoofdvakken. Maak er geen gewoonte van te vertrekken.',
@@ -557,7 +557,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Zie je? Erts verzameld en eelt op je handen. Ga door met het mijnen, houtkappen en kruidenplukken terwijl je de wegen afloopt, en als je terug in de stad bent, let dan op het Stadsfocusbord bij de markt en de nabijgelegen knutselbank. Er zit een eerlijke handel in dit alles, als je dat wilt.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Ertsslagader geoogst',
   'entities.quests.q_prof_intro.text':
-    'Elke ziel in Oostbeekdal beoefent een ambacht naast het zwaard, {playerName}. Er zijn ertsslagaders in de rotsen rond de Kopergat, ten zuidwesten van de stad. Ga zelf een houweel zwaaien en bewerk er 5; ik zie het verschil.',
+    'Elke ziel in Oostbeekdal beoefent een ambacht naast het zwaard, {playerName}. Er zijn ertsslagaders in de rotsen rond de Kopergat, ten zuidoosten van de stad. Ga zelf een houweel zwaaien en bewerk er 5; ik zie het verschil.',
   'entities.quests.q_prof_workorder_apothecary.completion':
     'Aanvaardbaar. Krachtig en goed behandeld. Je betaling, tot op de muntstuk nauwkeurig. Laat het niet naar je hoofd stijgen, dat is een ander reagens.',
   'entities.quests.q_prof_workorder_apothecary.objectives.0.label': 'Goudblad-Kruid afgeleverd',
@@ -2121,7 +2121,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Eindelijk geveld. Het bergvolk zwoer dat die kat de muur zelf zou overleven. De sluipers houden zich nu bij hun hoge sneeuw, {playerName}, en mijn patrouilles lopen de weg zonder ervoor te bloeden. De hele bergkam is stiller door jouw werk.',
   'entities.quests.q_old_cragmaw.objectives.0.label': 'Oude Cragmaw gedood',
   'entities.quests.q_old_cragmaw.text':
-    'Het bergvolk gaf een naam aan de afdrukken die mijn verkenner vond: Oude Cragmaw, een tiran van een kat met een littekenvacht, die drie generaties van zijn eigen roedel heeft overleefd. Hij is de reden dat de sluipers mijn weg overspoelen, {playerName}. Zijn leger ligt op de westelijke bergkam boven de zuidelijke weg. Neem een vriend mee en leg de oude duivel om.',
+    'Het bergvolk gaf een naam aan de afdrukken die mijn verkenner vond: Oude Cragmaw, een tiran van een kat met een littekenvacht, die drie generaties van zijn eigen roedel heeft overleefd. Hij is de reden dat de sluipers mijn weg overspoelen, {playerName}. Zijn leger ligt op de oostelijke bergkam boven de zuidelijke weg. Neem een vriend mee en leg de oude duivel om.',
   'entities.quests.q_old_cragmaw.title': 'Oude Cragmaw',
   'entities.quests.q_stalker_cloaks.completion':
     'Tien goede pelzen, zo dik als ik er ooit... nee, kijk hier eens naar, {playerName}. De helft gescheurd, en niet door kling of speer. Klauwsporen zo breed als mijn hand, dwars door de wintervacht. Iets op die bergkam verscheurt zijn eigen soort.',
@@ -4122,7 +4122,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Mogger is eindelijk dood. De velden van Eastbrook zijn veiliger, en je verlaat het Dal met nog een verhaal dat het navertellen waard is.',
   'entities.quests.q_mogger.objectives.0.label': 'Mogger gedood',
   'entities.quests.q_mogger.text':
-    'Mogger heeft karren gespleten, hekken platgewalst en genoeg vee gedood om het halve Dal leeg te maken. Sta hem niet alleen tegenover. Neem twee sterke metgezellen mee de oostelijke weide in en leg het beest voorgoed neer.',
+    'Mogger heeft karren gespleten, hekken platgewalst en genoeg vee gedood om het halve Dal leeg te maken. Sta hem niet alleen tegenover. Neem twee sterke metgezellen mee de westelijke weide in en leg het beest voorgoed neer.',
   'entities.quests.q_mogger.title': 'Mogger Moet Vallen',
   'entities.quests.q_murlocs.completion':
     'Hah! Dat leert ze om zich met hun eigen modderpoelen te bemoeien.',
@@ -4166,8 +4166,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Visioen bij het Graf van Hogepriester Malric',
   'entities.quests.q_nythraxis_graves.objectives.2.label':
     'Visioen bij het Graf van Koninklijke Sluipmoordenaar Voss',
-  'entities.quests.q_nythraxis_graves.text':
-    'Ik heb deze tekens eerder gezien, op drie oude graven rond het noordelijke slagveld. Kapitein Aldren ligt op de oostelijke heuvel, Hogepriester Malric bij de centrale gebroken weg, en Koninklijke Sluipmoordenaar Voss bij de westelijke klif. Raak elk graf aan en luister, {playerName}. De doden herinneren zich misschien wat de levenden vergaten.',
   'entities.quests.q_nythraxis_graves.title': 'Graven van de Vergetenen',
   'entities.quests.q_nythraxis_restless_dead.completion':
     'Hetzelfde teken verschijnt op elke scherf... een kroon. Ik heb dit eerder gezien, gekerfd in oude graven die geen enkel verslag uit Eastbrook zich herinnert.',
@@ -4187,7 +4185,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_sealed_crypt.objectives.1.label': 'Crypte-Sluitsteen Onder',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.2.label': 'Oeroud Dagboek',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    'De visioenen wijzen naar de verlaten crypte in de westelijke klif. Er bestaat een oude legende dat de crypte een koning herbergde. Misschien verzegelde Doorntop hem eronder nadat Malrics ritueel hem in iets dodeloos veranderde. Betreed de crypte en zie wat er binnen overblijft.',
+    'De visioenen wijzen naar de verlaten crypte in de oostelijke klif. Er bestaat een oude legende dat de crypte een koning herbergde. Misschien verzegelde Doorntop hem eronder nadat Malrics ritueel hem in iets dodeloos veranderde. Betreed de crypte en zie wat er binnen overblijft.',
   'entities.quests.q_nythraxis_sealed_crypt.title': 'De Verlaten Crypte',
   'entities.quests.q_ogre_bounty.completion':
     'Premie volledig betaald. De heuvels zijn rustiger - nu pakken we degenen aan die de inkopen doen.',
@@ -4315,7 +4313,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Mijn kratten! Amper een schram erop. Je bent een wonder.',
   'entities.quests.q_supplies.objectives.0.label': 'Gestolen Voorraadkrat',
   'entities.quests.q_supplies.text':
-    'Die bandieten overvielen mijn laatste wagen en gingen ervandoor met vier kratten goederen - gereedschap, zout, goed Eastbrook-linnen. De kratten staan opgestapeld rond hun kamp in de zuidoostelijke heuvels. Steel ze voor me terug, wil je?',
+    'Die bandieten overvielen mijn laatste wagen en gingen ervandoor met vier kratten goederen - gereedschap, zout, goed Eastbrook-linnen. De kratten staan opgestapeld rond hun kamp in de zuidwestelijke heuvels. Steel ze voor me terug, wil je?',
   'entities.quests.q_supplies.title': 'Gestolen Voorraden',
   'entities.quests.q_tarn_waders.completion':
     'Tien terug in het water. Ze voelen geen kou, {playerName}, en geen angst — alleen de trekking van die poort. Wat hen ook toezingt, het zingt luid.',
@@ -4326,8 +4324,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_the_codfather.completion':
     'Bij de vochtige heiligen... De Codfather zelf. Kijk naar die snorharen. Fenbridge zal een jaar lang verhalen smullen van deze vangst, {playerName}.',
   'entities.quests.q_the_codfather.objectives.0.label': 'De Codfather',
-  'entities.quests.q_the_codfather.text':
-    'De Codfather is niet zomaar een vis, {playerName}, hij is een koelbloedige moordenaar. Oudgedienden zweren dat hij Veensluipers als ontbijt eet, en zelfs de Slijkveen-Weduwen weven hun webben niet in de buurt van de Deepfen-Ondiepten uit pure angst. Hij heerst over die wateren. Pak een hengel, sleep die oude duivel uit zijn wateren, en ik zal toegeven dat je bij de familie hoort.',
   'entities.quests.q_the_codfather.title': 'De Codfather',
   'entities.quests.q_troll_fetishes.completion':
     'Dezelfde maker als de banieren in het sektekamp. De trollen zijn ingehuurde scheppen, niets meer. Goed werk, {playerName}.',

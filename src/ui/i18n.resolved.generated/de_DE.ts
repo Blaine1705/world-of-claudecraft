@@ -3967,7 +3967,7 @@ export const de_DE: EnTranslations = {
       "deedsHeading": "Taten, die die Reise erinnern",
       "deedsBody": "Das Buch der Taten begleitet jeden Schritt davon. Deine erste Einstimmung verdient Handwerksgeschworen und dein erstes Meisterwerk verdient Meisterwerk-Macher, beides als Titel tragbar. Jeder der acht erwerbbaren Berufe verzeichnet eine Meilenstein-Tat bei 50 Fertigkeit und krönt seine Obergrenze mit einem Großmeister-Titel, während Angeln ab 100 Fertigkeit den Alten Salzfisch und den Meisterangler-Titel ab 200 erhält.\n\nEs gibt auch ruhigere Seiten: Taten für deine erste Ernte und erste Herstellung, für die seltenen Funde, die das Glück im Feld aufdeckt, und für das Aufnehmen von Zerlegen. All das ist kosmetisch, nur Titel und Ansehen. Eine Tat verleiht nie Macht; sie beweist nur, dass du dabei warst.",
       "startHeading": "Wo man anfängt",
-      "startBody": "Frisch von der Straße in Eastbrook? Finde Vormann Odell und nimm Ein Handwerk für jede Hand: Er wird dich zu den Erzadern rund um die Kupferschürfe südwestlich der Stadt führen und dir deine ersten Schwielen einbringen. Von da an ernte jede Ader, jeden Baumstand und jeden Kräuterfleck, an dem du beim Questen vorbeikommst; Fertigkeit kommt Reisenden von selbst.\n\nZurück in der Stadt drückst du T, um das Handwerksfenster zu öffnen, und bearbeitest die gewöhnlichen Rezepte, die jeder Charakter von Anfang an kennt. Besuche die Meister an der Schmiede, in der Küche, am Webstuhl und in der Werkzeugmacherei, um zu sehen, was sie lehren, und nimm ihre Arbeitsaufträge für stetigen Coin. Wenn der Brief der Gilde dich findet, wirst du bereits wissen, welches Paar sich wie zu Hause anfühlt.",
+      "startBody": "Frisch von der Straße in Eastbrook? Finde Vormann Odell und nimm Ein Handwerk für jede Hand: Er wird dich zu den Erzadern rund um die Kupferschürfe südöstlich der Stadt führen und dir deine ersten Schwielen einbringen. Von da an ernte jede Ader, jeden Baumstand und jeden Kräuterfleck, an dem du beim Questen vorbeikommst; Fertigkeit kommt Reisenden von selbst.\n\nZurück in der Stadt drückst du T, um das Handwerksfenster zu öffnen, und bearbeitest die gewöhnlichen Rezepte, die jeder Charakter von Anfang an kennt. Besuche die Meister an der Schmiede, in der Küche, am Webstuhl und in der Werkzeugmacherei, um zu sehen, was sie lehren, und nimm ihre Arbeitsaufträge für stetigen Coin. Wenn der Brief der Gilde dich findet, wirst du bereits wissen, welches Paar sich wie zu Hause anfühlt.",
       "colStation": "Station",
       "colHub": "Knotenpunkt",
       "colMaster": "Meister",
@@ -11673,7 +11673,7 @@ export const de_DE: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Ein Handwerk für jede Hand",
-        "text": "Jede Seele in Eastbrook betreibt neben dem Schwert noch ein Handwerk, {playerName}. Im Gestein rund um die Kupferschürfe südwestlich der Stadt gibt es Erzadern. Geh selbst mit der Spitzhacke ran und bearbeite 5 davon; ich werde den Unterschied merken.",
+        "text": "Jede Seele in Eastbrook betreibt neben dem Schwert noch ein Handwerk, {playerName}. Im Gestein rund um die Kupferschürfe südöstlich der Stadt gibt es Erzadern. Geh selbst mit der Spitzhacke ran und bearbeite 5 davon; ich werde den Unterschied merken.",
         "completion": "Siehst du? Erz gesammelt und Schwielen an den Händen. Betreibe Bergbau, Holzfällen und Kräutersammeln weiter auf deinen Reisen, und wenn du wieder in der Stadt bist, schau auf das Stadtfokus-Brett beim Markt und die Werkbank in der Nähe. Da steckt ein fairer Handel drin, wenn du ihn willst.",
         "objectives": {
           "0": {
@@ -11756,7 +11756,7 @@ export const de_DE: EnTranslations = {
       },
       "q_supplies": {
         "title": "Gestohlene Vorräte",
-        "text": "Die Banditen raubten meinen letzten Wagen: Werkzeug, Salz und gutes Eastbrook-Leinen. Hol 4 Kisten aus ihrem Lager im Südosten zurück.",
+        "text": "Die Banditen raubten meinen letzten Wagen: Werkzeug, Salz und gutes Eastbrook-Leinen. Hol 4 Kisten aus ihrem Lager im Südwesten zurück.",
         "completion": "Meine Kisten! Kaum ein Kratzer. Du bist ein Wunder.",
         "objectives": {
           "0": {
@@ -12138,7 +12138,7 @@ export const de_DE: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Der Alte Cragmaw",
-        "text": "Das Bergvolk hat den Spuren, die meine Späherin fand, einen Namen gegeben: der Alte Cragmaw, ein narbenfelliger Tyrann von einer Katze, der drei Generationen seines eigenen Rudels überlebt hat. Er ist der Grund, warum die Pirscher meine Straße überfluten, {playerName}. Sein Bau liegt auf dem Westgrat über der Straße nach Süden. Bring einen Freund mit und streck den alten Teufel nieder.",
+        "text": "Das Bergvolk hat den Spuren, die meine Späherin fand, einen Namen gegeben: der Alte Cragmaw, ein narbenfelliger Tyrann von einer Katze, der drei Generationen seines eigenen Rudels überlebt hat. Er ist der Grund, warum die Pirscher meine Straße überfluten, {playerName}. Sein Bau liegt auf dem Ostgrat über der Straße nach Süden. Bring einen Freund mit und streck den alten Teufel nieder.",
         "completion": "Endlich erlegt. Das Bergvolk schwor, diese Katze würde die Mauer selbst überdauern. Die Pirscher bleiben nun in ihren hohen Schneefeldern, {playerName}, und meine Patrouillen gehen die Straße, ohne dafür zu bluten. Der ganze Grat ist dank deiner Arbeit stiller.",
         "objectives": {
           "0": {
@@ -12377,7 +12377,7 @@ export const de_DE: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "Der Kabeljaupate",
-        "text": "Der Kabeljaupate ist nicht nur ein Fisch, {playerName}, er ist ein kaltblütiger Mörder. Die Alten schwören, er frisst Moorpirscher zum Frühstück, und selbst die Mirefen-Witwen spinnen aus blanker Furcht keine Netze nahe den Deepfen-Untiefen. Er herrscht über diese Wasser. Schnapp dir eine Angel, zieh diesen alten Teufel aus seinen Gewässern, und ich gebe zu, dass du zur Familie gehörst.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "Bei den klammen Heiligen... Der Kabeljaupate höchstpersönlich. Sieh dir diese Barteln an. Fenbridge wird ein Jahr lang Geschichten von diesem Fang erzählen, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12397,7 @@ export const de_DE: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Gräber der Vergessenen",
-        "text": "Ich habe diese Zeichen schon gesehen, auf drei alten Gräbern rund um das nördliche Schlachtfeld. Hauptmann Aldren liegt auf der östlichen Anhöhe, Hohepriester Malric nahe der zerbrochenen mittleren Straße und der königliche Assassine Voss an der westlichen Klippe. Berühre jedes Grab und lausche, {playerName}. Die Toten erinnern sich vielleicht an das, was die Lebenden vergessen haben.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren blieb treu, Malric weigerte sich, den Tod zu akzeptieren, und Voss erkannte die Gefahr vor allen anderen. Alle drei dienten demselben vergessenen König.",
         "objectives": {
           "0": {
@@ -12413,7 +12413,7 @@ export const de_DE: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "Die verlassene Krypta",
-        "text": "Die Visionen weisen auf die verlassene Krypta in der westlichen Klippe. Eine alte Legende sagt, die Krypta habe einen König beherbergt. Vielleicht versiegelte Thornpeak ihn dort unten, nachdem Malrics Ritual ihn zu etwas Todeslosem verzerrt hatte. Betritt die Krypta und sieh nach, was darin geblieben ist.",
+        "text": "Die Visionen weisen auf die verlassene Krypta in der östlichen Klippe. Eine alte Legende sagt, die Krypta habe einen König beherbergt. Vielleicht versiegelte Thornpeak ihn dort unten, nachdem Malrics Ritual ihn zu etwas Todeslosem verzerrt hatte. Betritt die Krypta und sieh nach, was darin geblieben ist.",
         "completion": "Die beiden Schlüsselhälften passen zusammen, und Voss Tagebuch nennt, was sie versiegelten: den Siegelring von König Nythraxis. Wenn das Tagebuch wahr ist, ist dieser Ring der Schlüssel zu seinem Grab.",
         "objectives": {
           "0": {
@@ -12455,7 +12455,7 @@ export const de_DE: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger muss fallen",
-        "text": "Mogger hat Karren gespalten, Zäune plattgewalzt und genug Vieh getötet, um das halbe Tal zu leeren. Stell dich ihm nicht allein. Nimm zwei starke Gefährten zur östlichen Wiese und leg den Grobian endgültig um.",
+        "text": "Mogger hat Karren gespalten, Zäune plattgewalzt und genug Vieh getötet, um das halbe Tal zu leeren. Stell dich ihm nicht allein. Nimm zwei starke Gefährten zur westlichen Wiese und leg den Grobian endgültig um.",
         "completion": "Mogger ist endlich tot. Eastbrooks Felder sind sicherer, und du verlässt das Tal mit einer weiteren Geschichte, die es wert ist erzählt zu werden.",
         "objectives": {
           "0": {
@@ -12515,7 +12515,7 @@ export const de_DE: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Fäden wiederverknüpft",
-        "text": "Doch wieder an meinem Webstuhl. Ich hege keinen Groll, {playerName}, aber der Faden erinnert sich an eine Hand, die ihn losgelassen hat, und die Kosten, ihn wieder aufzunehmen, werden jedesmal länger bemessen. Lichte die Webholz-Spinnen, die den westlichen Wald bevölkern, und die Mühe wird deine Hände beruhigen, bevor sie wieder gute Seide berühren.",
+        "text": "Doch wieder an meinem Webstuhl. Ich hege keinen Groll, {playerName}, aber der Faden erinnert sich an eine Hand, die ihn losgelassen hat, und die Kosten, ihn wieder aufzunehmen, werden jedesmal länger bemessen. Lichte die Webholz-Spinnen, die den östlichen Wald bevölkern, und die Mühe wird deine Hände beruhigen, bevor sie wieder gute Seide berühren.",
         "completion": "Wieder stabil. Lederverarbeitung und Schneiderei kehren als Hauptberufe in deine Hände zurück. Miss zweimal ab, bevor du das nächste Mal wanderst.",
         "objectives": {
           "0": {
@@ -12525,7 +12525,7 @@ export const de_DE: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Zurück am Herd",
-        "text": "Schau an, wer wieder an meinem Herd steht. Keine harten Gefühle, {playerName}, eine Küche hat immer Platz, aber du weißt, dass die Rechnung bei jeder Rückkehr länger wird. Geh, lichte die Wildschweine auf der östlichen Wiese, denn ehrlicher Schweiß ist die erste Zutat, und es wird deinen Händen die Arbeit wieder in Erinnerung rufen.",
+        "text": "Schau an, wer wieder an meinem Herd steht. Keine harten Gefühle, {playerName}, eine Küche hat immer Platz, aber du weißt, dass die Rechnung bei jeder Rückkehr länger wird. Geh, lichte die Wildschweine auf der westlichen Wiese, denn ehrlicher Schweiß ist die erste Zutat, und es wird deinen Händen die Arbeit wieder in Erinnerung rufen.",
         "completion": "Da ist der alte Geschmack. Alchemie und Kochen sind wieder als Hauptberufe auf deinem Herd. Bleib diesmal eine Weile.",
         "objectives": {
           "0": {

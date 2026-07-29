@@ -824,7 +824,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'The Codfather',
     giverNpcId: 'provisioner_hale',
     turnInNpcId: 'provisioner_hale',
-    text: "The Codfather isn't just a fish, $N, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters. Grab a fishing pole, drag that old devil out of his waters, and I will admit you have joined the family.",
+    text: "The Codfather isn't just a fish, $N, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
     completionText:
       'By the damp saints... The Codfather himself. Look at those whiskers. Fenbridge will eat stories off this catch for a year, $N.',
     objectives: [{ type: 'collect', itemId: 'the_codfather', count: 1, label: 'The Codfather' }],

@@ -3967,7 +3967,7 @@ export const it_IT: EnTranslations = {
       "deedsHeading": "Imprese che ricordano il viaggio",
       "deedsBody": "Il Libro delle Imprese cammina accanto a ogni passo di questo. La tua prima sintonizzazione guadagna Giurato del Mestiere e il tuo primo capolavoro guadagna Mastro Artefice, entrambi indossabili come titoli. Ognuno degli otto mestieri conseguibili segna un'impresa traguardo a 50 di abilita e corona il suo massimo con un titolo di Gran Maestro, mentre la Pesca ottiene Vecchio Sale a 100 di competenza e il titolo di Maestro Pescatore a 200.\n\nCi sono anche pagine piu tranquille: imprese per il tuo primo raccolto e la tua prima fabbricazione, per i ritrovamenti rari che la fortuna porta sul campo, e per aver intrapreso lo smantellamento. Tutto e cosmetico, solo titoli e Rinomanza. Un'impresa non concede mai potere; prova solo che eri li.",
       "startHeading": "Da dove iniziare",
-      "startBody": "Appena arrivato a Eastbrook? Trova il Caposquadra Odell e prendi Un Mestiere per Ogni Mano: ti indichera i filoni di minerale intorno allo Scavo di Rame a sudovest della citta e ti dara i tuoi primi calli. Da quel momento, raccogli ogni filone, bosco e piantagione di erbe che incontri durante le missioni; la competenza viene naturalmente ai viaggiatori.\n\nDi ritorno in citta, premi T per aprire la finestra di fabbricazione e lavora le ricette comuni che ogni personaggio conosce dall'inizio. Visita i maestri alla forgia, alle cucine, al telaio e all'officina per vedere cosa insegnano, e prendi i loro ordini di lavoro per monete costanti. Quando la lettera della Gilda ti raggiungera, saprai gia quale coppia senti come casa.",
+      "startBody": "Appena arrivato a Eastbrook? Trova il Caposquadra Odell e prendi Un Mestiere per Ogni Mano: ti indichera i filoni di minerale intorno allo Scavo di Rame a sudest della citta e ti dara i tuoi primi calli. Da quel momento, raccogli ogni filone, bosco e piantagione di erbe che incontri durante le missioni; la competenza viene naturalmente ai viaggiatori.\n\nDi ritorno in citta, premi T per aprire la finestra di fabbricazione e lavora le ricette comuni che ogni personaggio conosce dall'inizio. Visita i maestri alla forgia, alle cucine, al telaio e all'officina per vedere cosa insegnano, e prendi i loro ordini di lavoro per monete costanti. Quando la lettera della Gilda ti raggiungera, saprai gia quale coppia senti come casa.",
       "colStation": "Stazione",
       "colHub": "Hub",
       "colMaster": "Maestro",
@@ -11673,7 +11673,7 @@ export const it_IT: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Un mestiere per ogni mano",
-        "text": "Ogni anima di Eastbrook lavora un mestiere oltre alla spada, {playerName}. Ci sono filoni di minerale nelle rocce intorno alla Cava di Rame, a sudovest della città. Vai a dare qualche picconata e lavorane 5 tu stesso, intendiamoci; saprò vedere la differenza.",
+        "text": "Ogni anima di Eastbrook lavora un mestiere oltre alla spada, {playerName}. Ci sono filoni di minerale nelle rocce intorno alla Cava di Rame, a sudest della città. Vai a dare qualche picconata e lavorane 5 tu stesso, intendiamoci; saprò vedere la differenza.",
         "completion": "Visto? Minerale raccolto e calli sulle mani. Continua a scavare, tagliare legna e raccogliere erbe mentre percorri le strade, e quando sei di ritorno in città, tieni d'occhio la Bacheca del Focus della Città vicino al mercato e il banco di fabbricazione vicino. C'è un buon affare che ti aspetta in tutto ciò, se lo vuoi.",
         "objectives": {
           "0": {
@@ -11756,7 +11756,7 @@ export const it_IT: EnTranslations = {
       },
       "q_supplies": {
         "title": "Scorte rubate",
-        "text": "I banditi hanno preso il mio ultimo carro: attrezzi, sale e buon lino di Eastbrook. Riprendi 4 casse dal loro campo a sud-est.",
+        "text": "I banditi hanno preso il mio ultimo carro: attrezzi, sale e buon lino di Eastbrook. Riprendi 4 casse dal loro campo a sud-ovest.",
         "completion": "Le mie casse! Quasi senza graffi. Sei una meraviglia.",
         "objectives": {
           "0": {
@@ -12138,7 +12138,7 @@ export const it_IT: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Il Vecchio Cragmaw",
-        "text": "La gente di montagna ha dato un nome alle impronte trovate dalla mia esploratrice: il Vecchio Cragmaw, un felino tiranno dal manto sfregiato che è sopravvissuto a tre generazioni del suo stesso branco. È lui il motivo per cui i braccatori inondano la mia strada, {playerName}. La sua tana è sulla cresta occidentale sopra la strada verso sud. Porta con te un compagno, e abbatti quel vecchio demonio.",
+        "text": "La gente di montagna ha dato un nome alle impronte trovate dalla mia esploratrice: il Vecchio Cragmaw, un felino tiranno dal manto sfregiato che è sopravvissuto a tre generazioni del suo stesso branco. È lui il motivo per cui i braccatori inondano la mia strada, {playerName}. La sua tana è sulla cresta orientale sopra la strada verso sud. Porta con te un compagno, e abbatti quel vecchio demonio.",
         "completion": "Abbattuto, finalmente. La gente di montagna giurava che quel felino sarebbe sopravvissuto al muro stesso. Ora i braccatori se ne staranno sulle loro alte nevi, {playerName}, e le mie pattuglie percorreranno la strada senza sanguinare per farlo. L'intera cresta è più quieta grazie al tuo lavoro.",
         "objectives": {
           "0": {
@@ -12377,7 +12377,7 @@ export const it_IT: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "Il Pescadrino",
-        "text": "Il Pescadrino non è solo un pesce, {playerName}, è un assassino a sangue freddo. I vecchi giurano che mangi predatori del pantano a colazione, e persino le vedove di Mirefen non tessono le loro ragnatele vicino ai bassifondi di Deepfen per puro terrore. Governa quelle acque. Prendi una canna da pesca, trascina quel vecchio demonio fuori dalle sue acque e ammetterò che sei entrato nella famiglia.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "Per i santi fradici... Il Pescadrino in persona. Guarda quei baffi. Fenbridge vivrà per un anno raccontando storie su questa cattura, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12397,7 @@ export const it_IT: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Tombe dei dimenticati",
-        "text": "Ho già visto questi segni, su tre vecchie tombe attorno al campo di battaglia settentrionale. Il capitano Aldren giace sull'altura orientale, l'alto sacerdote Malric vicino alla strada centrale spezzata e l'assassino reale Voss presso la scogliera occidentale. Tocca ogni tomba e ascolta, {playerName}. I morti possono ricordare ciò che i vivi hanno dimenticato.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren rimase leale, Malric rifiutò di accettare la morte e Voss vide il pericolo prima di chiunque altro. Tutti e tre servirono lo stesso re dimenticato.",
         "objectives": {
           "0": {
@@ -12413,7 +12413,7 @@ export const it_IT: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "La cripta abbandonata",
-        "text": "Le visioni indicano la cripta abbandonata nella scogliera occidentale. Una vecchia leggenda dice che la cripta ospitasse un re. Forse Thornpeak lo sigillò lì sotto dopo che il rituale di Malric lo trasformò in qualcosa di immortale. Entra nella cripta e guarda cosa resta dentro.",
+        "text": "Le visioni indicano la cripta abbandonata nella scogliera orientale. Una vecchia leggenda dice che la cripta ospitasse un re. Forse Thornpeak lo sigillò lì sotto dopo che il rituale di Malric lo trasformò in qualcosa di immortale. Entra nella cripta e guarda cosa resta dentro.",
         "completion": "Le due metà della chiave combaciano, e il diario di Voss nomina ciò che sigillarono: l'anello del re Nythraxis. Se il diario dice il vero, quell'anello è la chiave della sua tomba.",
         "objectives": {
           "0": {
@@ -12455,7 +12455,7 @@ export const it_IT: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger deve cadere",
-        "text": "Mogger ha spaccato carri, schiacciato recinti e ucciso bestiame quanto basta per svuotare mezzo Valle. Non affrontarlo da solo. Porta due compagni forti nel prato orientale e abbatti il bruto per sempre.",
+        "text": "Mogger ha spaccato carri, schiacciato recinti e ucciso bestiame quanto basta per svuotare mezzo Valle. Non affrontarlo da solo. Porta due compagni forti nel prato occidentale e abbatti il bruto per sempre.",
         "completion": "Mogger è morto finalmente. I campi di Eastbrook sono più sicuri, e lasci il Valle con un'altra storia da raccontare.",
         "objectives": {
           "0": {
@@ -12515,7 +12515,7 @@ export const it_IT: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Fili riuniti",
-        "text": "Tornato al mio telaio, dopotutto. Nessun rancore, {playerName}, ma il filo ricorda una mano che lo ha lasciato andare, e il costo di riprenderlo si misura sempre piu lungo ogni volta. Abbatti i ragni della foresta di rovi che affollano i boschi occidentali, e la fatica stanchera le tue mani prima che tocchino di nuovo la seta pregiata.",
+        "text": "Tornato al mio telaio, dopotutto. Nessun rancore, {playerName}, ma il filo ricorda una mano che lo ha lasciato andare, e il costo di riprenderlo si misura sempre piu lungo ogni volta. Abbatti i ragni della foresta di rovi che affollano i boschi orientali, e la fatica stanchera le tue mani prima che tocchino di nuovo la seta pregiata.",
         "completion": "Di nuovo stabili. Conciatura e Sartoria tornano alle tue mani come specializzazioni principali. Misura due volte prima di vagare.",
         "objectives": {
           "0": {
@@ -12525,7 +12525,7 @@ export const it_IT: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Tornato ai fornelli",
-        "text": "Guarda chi e tornato al mio tegame. Nessun rancore, {playerName}, una cucina ha sempre posto, ma sai che il conto cresce ogni volta che te ne vai. Vai a sfoltire i cinghiali selvatici nel prato orientale, perche il sudore onesto e il primo ingrediente, e ricordara alle tue mani il lavoro.",
+        "text": "Guarda chi e tornato al mio tegame. Nessun rancore, {playerName}, una cucina ha sempre posto, ma sai che il conto cresce ogni volta che te ne vai. Vai a sfoltire i cinghiali selvatici nel prato occidentale, perche il sudore onesto e il primo ingrediente, e ricordara alle tue mani il lavoro.",
         "completion": "Eccolo, il sapore di prima. Alchimia e Cucina tornano ai tuoi fornelli come specializzazioni principali. Resta un po' questa volta.",
         "objectives": {
           "0": {

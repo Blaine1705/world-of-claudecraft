@@ -3967,7 +3967,7 @@ export const cs_CZ: EnTranslations = {
       "deedsHeading": "Skutky, které pamatují cestu",
       "deedsBody": "Kniha skutků kráčí vedle každého kroku tohoto. Tvé první nalaďování získá titul Přísežný řemeslu a tvé první mistrovské dílo získá Velmistr řemesla, oba nositelné jako tituly. Každé ze osmi dosažitelných řemesel zaznamená milníkový skutek na dovednosti 50 a korunuje svůj limit titulem Velmistr, zatímco Rybaření dostane Starého Solanáře na dovednosti 100 a titul Mistrného rybáře na 200.\n\nExistují i tišší stránky: skutky za první sklizeň a první výrobu, za vzácné nálezy, které štěstí přinese v terénu, a za převzetí rozebírání. Vše je kosmetické, jen tituly a Věhlas. Skutek nikdy nedá moc; jen dokazuje, že jsi byl přítomen.",
       "startHeading": "Kde začít",
-      "startBody": "Čerstvě přijel do Eastbrooku? Najdi Předáka Odella a vezmi úkol Živnost pro každou ruku: ukáže ti na rudné žíly kolem Měděného Výkopu jihozápadně od města a předá ti první mozoly. Od té chvíle sklízej každou žílu, kmen stromů a bylinkový porost, kolem kterého projdeš při plnění úkolů; dovednost přichází cestovatelům přirozeně.\n\nZpátky ve městě stiskni T pro otevření okna výroby a pracuj na běžných receptech, které každá postava zná od začátku. Navštiv mistry u kovárny, kuchyní, tkalcovského stavu a dílny, aby sis prohlédl, co učí, a ber jejich pracovní objednávky pro stabilní příjem. Než tě cechovní dopis najde, budeš už vědět, který pár se cítí jako domov.",
+      "startBody": "Čerstvě přijel do Eastbrooku? Najdi Předáka Odella a vezmi úkol Živnost pro každou ruku: ukáže ti na rudné žíly kolem Měděného Výkopu jihovýchodně od města a předá ti první mozoly. Od té chvíle sklízej každou žílu, kmen stromů a bylinkový porost, kolem kterého projdeš při plnění úkolů; dovednost přichází cestovatelům přirozeně.\n\nZpátky ve městě stiskni T pro otevření okna výroby a pracuj na běžných receptech, které každá postava zná od začátku. Navštiv mistry u kovárny, kuchyní, tkalcovského stavu a dílny, aby sis prohlédl, co učí, a ber jejich pracovní objednávky pro stabilní příjem. Než tě cechovní dopis najde, budeš už vědět, který pár se cítí jako domov.",
       "colStation": "Stanice",
       "colHub": "Centrum",
       "colMaster": "Mistr",
@@ -11673,7 +11673,7 @@ export const cs_CZ: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Řemeslo pro každou ruku",
-        "text": "Každá duše v Eastbrooku pracuje kromě meče i v nějakém řemesle, {playerName}. V skalách kolem Měděného dolu jihozápadně od města jsou rudné žíly. Jdi si sám zamasat krumpáčem a vytěž jich 5; věř mi, poznám rozdíl.",
+        "text": "Každá duše v Eastbrooku pracuje kromě meče i v nějakém řemesle, {playerName}. V skalách kolem Měděného dolu jihovýchodně od města jsou rudné žíly. Jdi si sám zamasat krumpáčem a vytěž jich 5; věř mi, poznám rozdíl.",
         "completion": "Vidíš? Ruda vytěžena a mozoly na rukách. Pokračuj v dolování, těžbě dřeva a sběru bylin cestou po silnicích, a až se vrátíš do města, mrkni na Nástěnku obecního středu u tržiště a na řemeslný stůl poblíž. Je v tom poctivý obchod, pokud ho chceš.",
         "objectives": {
           "0": {
@@ -11756,7 +11756,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_supplies": {
         "title": "Ukradené zásoby",
-        "text": "Ti bandité přepadli můj poslední vůz a odnesli čtyři bedny zboží: nástroje, sůl, dobré eastbrookské plátno. Bedny jsou naskládané kolem jejich tábora v jihovýchodních kopcích. Ukradneš je pro mě zpátky?",
+        "text": "Ti bandité přepadli můj poslední vůz a odnesli čtyři bedny zboží: nástroje, sůl, dobré eastbrookské plátno. Bedny jsou naskládané kolem jejich tábora v jihozápadních kopcích. Ukradneš je pro mě zpátky?",
         "completion": "Moje bedny! Sotva škrábnutí. Jsi zázrak.",
         "objectives": {
           "0": {
@@ -12138,7 +12138,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Starý Skalní chřtán",
-        "text": "Horští lidé dali jméno stopám, které našla má zvědka: Starý Skalní chřtán, zjizvený tyran mezi kočkami, který přežil tři generace vlastní smečky. Kvůli němu se slídilové valí na mou cestu, {playerName}. Jeho doupě leží na západním hřebeni nad jižní cestou. Přiveď přítele a polož starého ďábla.",
+        "text": "Horští lidé dali jméno stopám, které našla má zvědka: Starý Skalní chřtán, zjizvený tyran mezi kočkami, který přežil tři generace vlastní smečky. Kvůli němu se slídilové valí na mou cestu, {playerName}. Jeho doupě leží na východním hřebeni nad jižní cestou. Přiveď přítele a polož starého ďábla.",
         "completion": "Konečně dole. Horští lidé přísahali, že ta kočka přežije samotnou zeď. Slídilové zůstanou ve vysokých snězích, {playerName}, a mé hlídky projdou cestou, aniž by za ni krvácely. Celý hřeben je díky tobě tišší.",
         "objectives": {
           "0": {
@@ -12377,7 +12377,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "Tresčí kmotr",
-        "text": "Tresčí kmotr není jen ryba, {playerName}, je to chladnokrevný zabiják. Staří pamětníci přísahají, že snídá slídily z močálu, a dokonce mirefenské vdovy z pouhého děsu netkají pavučiny u mělčin Deepfenu. Vládne těm vodám. Vezmi rybářský prut, vytáhni toho starého ďábla z jeho vod a uznám, že ses přidal k rodině.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "U vlhkých svatých... Sám Tresčí kmotr. Podívej na ty vousy. Fenbridge bude z toho úlovku jíst příběhy celý rok, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12397,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Hroby zapomenutých",
-        "text": "Tyhle značky jsem už viděl, na třech starých hrobech kolem severního bojiště. Kapitán Aldren leží na východním návrší, velekněz Malric u rozbité cesty uprostřed a královský asasín Voss u západního útesu. Dotkni se každého hrobu a poslouchej, {playerName}. Mrtví si možná pamatují, co živí zapomněli.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren zůstal věrný, Malric odmítl přijmout smrt a Voss viděl nebezpečí dřív než kdokoli jiný. Všichni tři sloužili stejnému zapomenutému králi.",
         "objectives": {
           "0": {
@@ -12413,7 +12413,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "Opuštěná krypta",
-        "text": "Vidění ukazují k opuštěné kryptě v západním útesu. Stará legenda říká, že krypta ukrývala krále. Možná ho Thornpeak zapečetil dole poté, co ho Malricův rituál zkroutil v něco nesmrtelného. Vstup do krypty a zjisti, co uvnitř zůstalo.",
+        "text": "Vidění ukazují k opuštěné kryptě ve východním útesu. Stará legenda říká, že krypta ukrývala krále. Možná ho Thornpeak zapečetil dole poté, co ho Malricův rituál zkroutil v něco nesmrtelného. Vstup do krypty a zjisti, co uvnitř zůstalo.",
         "completion": "Poloviny klíče zapadly do sebe a Vossův deník jmenuje, co pečetily: pečetní prsten krále Nythraxise. Jestli je deník pravdivý, ten prsten je klíčem k jeho hrobce.",
         "objectives": {
           "0": {
@@ -12455,7 +12455,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger musí padnout",
-        "text": "Mogger rozštípal vozy, srovnal ploty a zabil dost dobytka, aby vyprázdnil půl údolí. Nestav se mu sám. Vezmi dva silné společníky na východní louku a toho surovce polož navždy.",
+        "text": "Mogger rozštípal vozy, srovnal ploty a zabil dost dobytka, aby vyprázdnil půl údolí. Nestav se mu sám. Vezmi dva silné společníky na západní louku a toho surovce polož navždy.",
         "completion": "Mogger je konečně mrtvý. Pole Eastbrooku jsou bezpečnější a ty opouštíš údolí s dalším příběhem hodným vyprávění.",
         "objectives": {
           "0": {
@@ -12515,7 +12515,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Opět spojená vlákna",
-        "text": "Zpátky u mého stavu po všem. Zášť nepěstuji, {playerName}, ale nit si pamatuje ruku, která ji pustila, a cena za nové uchopení se měří delší pokaždé. Vyhub pavouky lesního pavučníku přeplňující západní lesy, a práce ti usadí ruce, než se dotknou dobrého hedvábí.",
+        "text": "Zpátky u mého stavu po všem. Zášť nepěstuji, {playerName}, ale nit si pamatuje ruku, která ji pustila, a cena za nové uchopení se měří delší pokaždé. Vyhub pavouky lesního pavučníku přeplňující východní lesy, a práce ti usadí ruce, než se dotknou dobrého hedvábí.",
         "completion": "Opět stabilní. Kožedělnictví a Krejčovství se vrací do tvých rukou jako hlavní obory. Tentokrát dvakrát měř, než se zatoulá.",
         "objectives": {
           "0": {
@@ -12525,7 +12525,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Zpátky na sporák",
-        "text": "No, pohleďme, kdo se vrátil k mému hrnci. Nenesu zášť, {playerName}, kuchyně má vždy místo, ale víš, že účet roste pokaždé, když odejdeš. Jdi proredukovat divoké kance na východní louce, protože poctivý pot je první přísada, a to tvým rukám připomene tu práci.",
+        "text": "No, pohleďme, kdo se vrátil k mému hrnci. Nenesu zášť, {playerName}, kuchyně má vždy místo, ale víš, že účet roste pokaždé, když odejdeš. Jdi proredukovat divoké kance na západní louce, protože poctivý pot je první přísada, a to tvým rukám připomene tu práci.",
         "completion": "Tady je ta stará chuť. Alchymie a Vaření jsou zpět na tvém sporáku jako hlavní obory. Tentokrát zůstaň.",
         "objectives": {
           "0": {

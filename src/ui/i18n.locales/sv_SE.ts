@@ -48,7 +48,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Bedriftboken vandrar bredvid varje steg av detta. Din första inriktning förtjänar Hantverkssvuren och ditt första mästerverk förtjänar Mästerhantverkaren, båda bärbara som titlar. Var och en av de åtta hantverken med innehåll markerar en milstolpebedrift vid 50 skicklighet och kröner sitt tak med en Stormästare-titel, medan Fiske får Gamla saltet vid 100 skicklighet och titeln Mästarfiskare vid 200.\n\nDet finns tystare sidor också: bedrifter för din första skörd och ditt första hantverk, för de sällsynta fynd som turen bjuder på i fält, och för att ta upp avförtrollning. Allt är kosmetiskt, titlar och Ryktbarhet enbart. En bedrift ger aldrig kraft; den bevisar bara att du var där.',
   'guide.professions.startHeading': 'Var börjar man',
   'guide.professions.startBody':
-    'Nyss anländ i Östbäck? Hitta Förman Odell och ta En handel för varje hand: han visar dig malmådrorna runt Koppargropen sydväst om staden och ger dig dina första valkar. Från och med då, skörda varje åder, timmerbestånd och örtfläck du passerar under uppdragens gång; skicklighet kommer naturligt för resenärer.\n\nTillbaka i staden, tryck T för att öppna hantverksfönstret och arbeta med de vanliga recept varje karaktär kan från start. Besök mästarna vid smedjan, köket, vävstolen och verkstaden för att se vad de lär ut, och ta deras arbetsorder för stabila mynt. När Gillets brev hittar dig vet du redan vilket par som känns som hemma.',
+    'Nyss anländ i Östbäck? Hitta Förman Odell och ta En handel för varje hand: han visar dig malmådrorna runt Koppargropen sydöst om staden och ger dig dina första valkar. Från och med då, skörda varje åder, timmerbestånd och örtfläck du passerar under uppdragens gång; skicklighet kommer naturligt för resenärer.\n\nTillbaka i staden, tryck T för att öppna hantverksfönstret och arbeta med de vanliga recept varje karaktär kan från start. Besök mästarna vid smedjan, köket, vävstolen och verkstaden för att se vad de lär ut, och ta deras arbetsorder för stabila mynt. När Gillets brev hittar dig vet du redan vilket par som känns som hemma.',
   'guide.professions.colStation': 'Station',
   'guide.professions.colHub': 'Ort',
   'guide.professions.colMaster': 'Mästare',
@@ -498,7 +498,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Där är den gamla smaken. Alkemi och Matlagning är tillbaka på din spis som ämnen. Stanna ett tag den här gången.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Vildsvin jagat',
   'entities.quests.q_prof_amends_apothecary.text':
-    'Nå, se vem som är tillbaka vid min gryta. Inga hårda känslor, {playerName}, ett kök har alltid plats, men du vet att notan löper längre varje gång du går ut på den. Gå och tunna ut vildsvinsstammen på östängen, för ärlig svett är den första ingrediensen, och det kommer påminna dina händer om arbetet.',
+    'Nå, se vem som är tillbaka vid min gryta. Inga hårda känslor, {playerName}, ett kök har alltid plats, men du vet att notan löper längre varje gång du går ut på den. Gå och tunna ut vildsvinsstammen på västängen, för ärlig svett är den första ingrediensen, och det kommer påminna dina händer om arbetet.',
   'entities.quests.q_prof_amends_apothecary.title': 'Tillbaka på spisen',
   'entities.quests.q_prof_amends_bombardier.completion':
     'DÄR är det, klian är tillbaka i dina händer. Ingenjörskonst och Alkemi, ämnen igen, sätt igång, gör en smäll. Försök stanna den här gången, va?',
@@ -510,7 +510,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Stadigt igen. Läderbearbetning och Skrädderi återvänder till dina händer som ämnen. Mät dubbelt den här gången innan du vandrar.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Spindelvävsedderkopp dödad',
   'entities.quests.q_prof_amends_outfitter.text':
-    'Tillbaka vid min vävstol trots allt. Jag bär inget agg, {playerName}, men tråden minns en hand som lät den gå, och kostnaden att ta upp den igen mäts ut längre varje gång. Döda spindelvävsedderkopparna som tränger sig på västra skogen, och arbetet lugnar dina händer innan de rör god siden igen.',
+    'Tillbaka vid min vävstol trots allt. Jag bär inget agg, {playerName}, men tråden minns en hand som lät den gå, och kostnaden att ta upp den igen mäts ut längre varje gång. Döda spindelvävsedderkopparna som tränger sig på östra skogen, och arbetet lugnar dina händer innan de rör god siden igen.',
   'entities.quests.q_prof_amends_outfitter.title': 'Trådar åter sammanfogade',
   'entities.quests.q_prof_amends_smith.completion':
     'Rytmen är tillbaka i dina händer. Vapentillverkning och Rustningssmide är dina ämnen igen. Gör inte en vana av att gå.',
@@ -552,7 +552,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ser du? Malm samlad och valkar på händerna. Håll på med gruvdrift, skogsavverkning och örtskörd när du reser längs vägarna, och när du är tillbaka i staden, håll koll på Stadsanslagstavlan vid marknaden och hantverksbordet i närheten. Det finns en rättvis handel i allt av det, om du vill ha det.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Malmåder skördad',
   'entities.quests.q_prof_intro.text':
-    'Varje själ i Östbäck arbetar ett hantverk utöver svärdet, {playerName}. Det finns malmådrar i klipporna runt Koppargropen, sydväst om staden. Gå och sving en hacka och arbeta 5 av dem själv; jag ska kunna se skillnaden.',
+    'Varje själ i Östbäck arbetar ett hantverk utöver svärdet, {playerName}. Det finns malmådrar i klipporna runt Koppargropen, sydöst om staden. Gå och sving en hacka och arbeta 5 av dem själv; jag ska kunna se skillnaden.',
   'gpuNotice.bodyDesktop':
     'Spelet körs utan GPU-acceleration och kommer att vara långsamt. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.',
   'gpuNotice.bodyWeb':
@@ -1886,7 +1886,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Fälld till sist. Bergsfolket svor på att den katten skulle överleva själva muren. Smygarna håller sig till sina höga snöfält nu, {playerName}, och mina patruller kan gå vägen utan att blöda för det. Hela åsen är tystare tack vare ditt verk.',
   'entities.quests.q_old_cragmaw.objectives.0.label': 'Gamle Klippkäft dräpt',
   'entities.quests.q_old_cragmaw.text':
-    'Bergsfolket satte ett namn på spåren min spejare fann: Gamle Klippkäft, en ärrpälsad tyrann till katt som har överlevt tre generationer av sin egen flock. Det är han som är skälet till att smygarna översvämmar min väg, {playerName}. Hans lya ligger på västra åsen ovanför vägen söderut. Ta med en vän och gör slut på den gamle djävulen.',
+    'Bergsfolket satte ett namn på spåren min spejare fann: Gamle Klippkäft, en ärrpälsad tyrann till katt som har överlevt tre generationer av sin egen flock. Det är han som är skälet till att smygarna översvämmar min väg, {playerName}. Hans lya ligger på östra åsen ovanför vägen söderut. Ta med en vän och gör slut på den gamle djävulen.',
   'entities.quests.q_old_cragmaw.title': 'Gamle Klippkäft',
   'entities.quests.q_stalker_cloaks.completion':
     'Tio goda pälsar, tjocka som några jag har... nej, se på de här, {playerName}. Sönderrivna, hälften av dem, och inte av någon klinga eller något spjut. Klomärken breda som min hand, rakt genom vinterpälsen. Något på den där åsen sliter sönder sina egna.',
@@ -3905,7 +3905,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Mogger är äntligen död. Östbäcks fält är tryggare, och du lämnar dalen med ännu en berättelse värd att återberätta.',
   'entities.quests.q_mogger.objectives.0.label': 'Mogger dräpt',
   'entities.quests.q_mogger.text':
-    'Mogger har splittrat kärror, jämnat staket med marken och dödat nog med boskap för att tömma halva dalen. Möt honom inte ensam. Ta med två starka följeslagare till den östra ängen och lägg odjuret för gott.',
+    'Mogger har splittrat kärror, jämnat staket med marken och dödat nog med boskap för att tömma halva dalen. Möt honom inte ensam. Ta med två starka följeslagare till den västra ängen och lägg odjuret för gott.',
   'entities.quests.q_mogger.title': 'Mogger måste falla',
   'entities.quests.q_murlocs.completion': 'Hah! Det ska lära dem att sköta sina egna lerhål.',
   'entities.quests.q_murlocs.objectives.0.label': 'Lerfenslurkare dräpt',
@@ -3945,8 +3945,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_graves.objectives.0.label': 'Syn vid kapten Aldrens grav',
   'entities.quests.q_nythraxis_graves.objectives.1.label': 'Syn vid överstepräst Malrics grav',
   'entities.quests.q_nythraxis_graves.objectives.2.label': 'Syn vid kunglig lönnmördare Voss grav',
-  'entities.quests.q_nythraxis_graves.text':
-    'Jag har sett dessa tecken förut, på tre gamla gravar runt det norra slagfältet. Kapten Aldren ligger på den östra höjden, överstepräst Malric nära den centrala brutna vägen, och kunglig lönnmördare Voss vid den västra klippan. Rör vid varje grav och lyssna, {playerName}. De döda kanske minns vad de levande glömde.',
   'entities.quests.q_nythraxis_graves.title': 'De bortglömdas gravar',
   'entities.quests.q_nythraxis_restless_dead.completion':
     'Samma tecken finns på varje skärva... en krona. Jag har sett detta förut, inristat i gamla gravar som ingen uppteckning i Östbäck minns.',
@@ -3966,7 +3964,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_sealed_crypt.objectives.1.label': 'Kryptans slutsten, nedre',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.2.label': 'Uråldrig dagbok',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    'Synerna pekar mot den övergivna kryptan i den västra klippan. Det finns en gammal legend om att kryptan hyste en kung. Kanske förseglade Törntopp honom därnere efter att Malrics ritual förvred honom till något odödligt. Träd in i kryptan och se vad som finns kvar därinne.',
+    'Synerna pekar mot den övergivna kryptan i den östra klippan. Det finns en gammal legend om att kryptan hyste en kung. Kanske förseglade Törntopp honom därnere efter att Malrics ritual förvred honom till något odödligt. Träd in i kryptan och se vad som finns kvar därinne.',
   'entities.quests.q_nythraxis_sealed_crypt.title': 'Den övergivna kryptan',
   'entities.quests.q_ogre_bounty.completion':
     'Belöningen betald till fullo. Foten av bergen är tystare nu - härnäst tar vi itu med dem som köper.',
@@ -4093,7 +4091,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_supplies.completion': 'Mina lådor! Knappt en repa på dem. Du är ett under.',
   'entities.quests.q_supplies.objectives.0.label': 'Stulen förrådslåda',
   'entities.quests.q_supplies.text':
-    'De där banditerna slog till mot min senaste vagn och kom undan med fyra lådor varor - verktyg, salt, fint Östbäckslinne. Lådorna är staplade runt deras läger i de sydöstra kullarna. Stjäl tillbaka dem åt mig, är du snäll?',
+    'De där banditerna slog till mot min senaste vagn och kom undan med fyra lådor varor - verktyg, salt, fint Östbäckslinne. Lådorna är staplade runt deras läger i de sydvästra kullarna. Stjäl tillbaka dem åt mig, är du snäll?',
   'entities.quests.q_supplies.title': 'Stulna förråd',
   'entities.quests.q_tarn_waders.completion':
     'Tio tillbaka i vattnet. De känner ingen kyla, {playerName}, och ingen rädsla — bara dragningen från den porten. Vad det än är som sjunger till dem, så sjunger det högt.',
@@ -4104,8 +4102,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_the_codfather.completion':
     'Vid de fuktiga helgonen... Torskfadern själv. Se på de morrhåren. Fenbron kommer att leva på historier om den här fångsten i ett år, {playerName}.',
   'entities.quests.q_the_codfather.objectives.0.label': 'Torskfadern',
-  'entities.quests.q_the_codfather.text':
-    'Torskfadern är inte bara en fisk, {playerName}, han är en kallblodig mördare. Gamlingarna svär på att han äter kärrströvare till frukost, och inte ens Dykärrsänkorna vågar spinna sina nät nära Djupkärrsgrunden av ren skräck. Han härskar över de vattnen. Greppa ett metspö, dra upp den gamle djävulen ur sitt vatten, så ska jag erkänna att du har blivit en del av familjen.',
   'entities.quests.q_the_codfather.title': 'Torskfadern',
   'entities.quests.q_troll_fetishes.completion':
     'Samma tillverkare som banéren i sektlägret. Trollen är inhyrda spadar, inget mer. Bra jobbat, {playerName}.',

@@ -3967,7 +3967,7 @@ export const nl_NL: EnTranslations = {
       "deedsHeading": "Daden die de reis herinneren",
       "deedsBody": "Het Boek der Daden loopt naast elke stap hiervan mee. Je eerste afstemming verdient Ambachtsgetrouwe en je eerste meesterwerk verdient Meestersmaker, beide te dragen als titels. Elk van de acht te verdienen ambachten markeert een mijlpaaldaad bij vaardigheid 50 en kroont zijn grens met een Grootmeesters-titel, terwijl Vissen Oude Zout krijgt bij 100 vaardigheid en de titel Meesterhengelaar bij 200.\n\nEr zijn ook stillere pagina's: daden voor je eerste oogst en eerste vervaardiging, voor de zeldzame vondsten die geluk in het veld oplevert, en voor het oppakken van salvage. Dit alles is cosmetisch, alleen titels en Roem. Een daad schenkt nooit macht; het bewijst alleen dat je er was.",
       "startHeading": "Waar te beginnen",
-      "startBody": "Vers van de weg in Eastbrook? Vind Voorman Odell en neem Een Vak voor Elke Hand: hij wijst je op de ertsaders rondom de Kopergat ten zuidwesten van de stad en geeft je je eerste eelt. Oogst daarna elke ader, boomstand en kruidentuin die je tegenkomt tijdens het questen; vaardigheid komt vanzelf aan reizigers.\n\nTerug in de stad druk je op T om het vervaardigingsvenster te openen en werk je de gewone recepten die elk personage al kent vanaf het begin. Bezoek de meesters bij de smederij, keukens, weefgetouw en gereedschapsmakerij om te zien wat ze leren, en neem hun werkopdrachten voor een stabiel inkomen. Tegen de tijd dat de brief van het Gilde je bereikt, weet je al welk paar als thuis aanvoelt.",
+      "startBody": "Vers van de weg in Eastbrook? Vind Voorman Odell en neem Een Vak voor Elke Hand: hij wijst je op de ertsaders rondom de Kopergat ten zuidoosten van de stad en geeft je je eerste eelt. Oogst daarna elke ader, boomstand en kruidentuin die je tegenkomt tijdens het questen; vaardigheid komt vanzelf aan reizigers.\n\nTerug in de stad druk je op T om het vervaardigingsvenster te openen en werk je de gewone recepten die elk personage al kent vanaf het begin. Bezoek de meesters bij de smederij, keukens, weefgetouw en gereedschapsmakerij om te zien wat ze leren, en neem hun werkopdrachten voor een stabiel inkomen. Tegen de tijd dat de brief van het Gilde je bereikt, weet je al welk paar als thuis aanvoelt.",
       "colStation": "Station",
       "colHub": "Hub",
       "colMaster": "Meester",
@@ -11673,7 +11673,7 @@ export const nl_NL: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Een ambacht voor iedere hand",
-        "text": "Elke ziel in Oostbeekdal beoefent een ambacht naast het zwaard, {playerName}. Er zijn ertsslagaders in de rotsen rond de Kopergat, ten zuidwesten van de stad. Ga zelf een houweel zwaaien en bewerk er 5; ik zie het verschil.",
+        "text": "Elke ziel in Oostbeekdal beoefent een ambacht naast het zwaard, {playerName}. Er zijn ertsslagaders in de rotsen rond de Kopergat, ten zuidoosten van de stad. Ga zelf een houweel zwaaien en bewerk er 5; ik zie het verschil.",
         "completion": "Zie je? Erts verzameld en eelt op je handen. Ga door met het mijnen, houtkappen en kruidenplukken terwijl je de wegen afloopt, en als je terug in de stad bent, let dan op het Stadsfocusbord bij de markt en de nabijgelegen knutselbank. Er zit een eerlijke handel in dit alles, als je dat wilt.",
         "objectives": {
           "0": {
@@ -11756,7 +11756,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_supplies": {
         "title": "Gestolen Voorraden",
-        "text": "Die bandieten overvielen mijn laatste wagen en gingen ervandoor met vier kratten goederen - gereedschap, zout, goed Eastbrook-linnen. De kratten staan opgestapeld rond hun kamp in de zuidoostelijke heuvels. Steel ze voor me terug, wil je?",
+        "text": "Die bandieten overvielen mijn laatste wagen en gingen ervandoor met vier kratten goederen - gereedschap, zout, goed Eastbrook-linnen. De kratten staan opgestapeld rond hun kamp in de zuidwestelijke heuvels. Steel ze voor me terug, wil je?",
         "completion": "Mijn kratten! Amper een schram erop. Je bent een wonder.",
         "objectives": {
           "0": {
@@ -12138,7 +12138,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Oude Cragmaw",
-        "text": "Het bergvolk gaf een naam aan de afdrukken die mijn verkenner vond: Oude Cragmaw, een tiran van een kat met een littekenvacht, die drie generaties van zijn eigen roedel heeft overleefd. Hij is de reden dat de sluipers mijn weg overspoelen, {playerName}. Zijn leger ligt op de westelijke bergkam boven de zuidelijke weg. Neem een vriend mee en leg de oude duivel om.",
+        "text": "Het bergvolk gaf een naam aan de afdrukken die mijn verkenner vond: Oude Cragmaw, een tiran van een kat met een littekenvacht, die drie generaties van zijn eigen roedel heeft overleefd. Hij is de reden dat de sluipers mijn weg overspoelen, {playerName}. Zijn leger ligt op de oostelijke bergkam boven de zuidelijke weg. Neem een vriend mee en leg de oude duivel om.",
         "completion": "Eindelijk geveld. Het bergvolk zwoer dat die kat de muur zelf zou overleven. De sluipers houden zich nu bij hun hoge sneeuw, {playerName}, en mijn patrouilles lopen de weg zonder ervoor te bloeden. De hele bergkam is stiller door jouw werk.",
         "objectives": {
           "0": {
@@ -12377,7 +12377,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "De Codfather",
-        "text": "De Codfather is niet zomaar een vis, {playerName}, hij is een koelbloedige moordenaar. Oudgedienden zweren dat hij Veensluipers als ontbijt eet, en zelfs de Slijkveen-Weduwen weven hun webben niet in de buurt van de Deepfen-Ondiepten uit pure angst. Hij heerst over die wateren. Pak een hengel, sleep die oude duivel uit zijn wateren, en ik zal toegeven dat je bij de familie hoort.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "Bij de vochtige heiligen... De Codfather zelf. Kijk naar die snorharen. Fenbridge zal een jaar lang verhalen smullen van deze vangst, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12397,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Graven van de Vergetenen",
-        "text": "Ik heb deze tekens eerder gezien, op drie oude graven rond het noordelijke slagveld. Kapitein Aldren ligt op de oostelijke heuvel, Hogepriester Malric bij de centrale gebroken weg, en Koninklijke Sluipmoordenaar Voss bij de westelijke klif. Raak elk graf aan en luister, {playerName}. De doden herinneren zich misschien wat de levenden vergaten.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren bleef trouw, Malric weigerde de dood te aanvaarden, en Voss zag het gevaar eerder dan wie ook. Alle drie dienden ze dezelfde vergeten koning.",
         "objectives": {
           "0": {
@@ -12413,7 +12413,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "De Verlaten Crypte",
-        "text": "De visioenen wijzen naar de verlaten crypte in de westelijke klif. Er bestaat een oude legende dat de crypte een koning herbergde. Misschien verzegelde Doorntop hem eronder nadat Malrics ritueel hem in iets dodeloos veranderde. Betreed de crypte en zie wat er binnen overblijft.",
+        "text": "De visioenen wijzen naar de verlaten crypte in de oostelijke klif. Er bestaat een oude legende dat de crypte een koning herbergde. Misschien verzegelde Doorntop hem eronder nadat Malrics ritueel hem in iets dodeloos veranderde. Betreed de crypte en zie wat er binnen overblijft.",
         "completion": "De helften van de sluitsteen passen samen, en Voss' dagboek noemt wat ze verzegelden: de zegelring van Koning Nythraxis. Als het dagboek waar is, is die zegelring de sleutel tot zijn tombe.",
         "objectives": {
           "0": {
@@ -12455,7 +12455,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger Moet Vallen",
-        "text": "Mogger heeft karren gespleten, hekken platgewalst en genoeg vee gedood om het halve Dal leeg te maken. Sta hem niet alleen tegenover. Neem twee sterke metgezellen mee de oostelijke weide in en leg het beest voorgoed neer.",
+        "text": "Mogger heeft karren gespleten, hekken platgewalst en genoeg vee gedood om het halve Dal leeg te maken. Sta hem niet alleen tegenover. Neem twee sterke metgezellen mee de westelijke weide in en leg het beest voorgoed neer.",
         "completion": "Mogger is eindelijk dood. De velden van Eastbrook zijn veiliger, en je verlaat het Dal met nog een verhaal dat het navertellen waard is.",
         "objectives": {
           "0": {
@@ -12515,7 +12515,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Draden Hernomen",
-        "text": "Toch terug bij mijn weefgetouw. Ik koester geen wrok, {playerName}, maar de draad herinnert een hand die hem losliet, en de kosten om hem weer op te pakken worden elke keer gemeten aan een langere maat. Maai de webhoutspin nen die het westelijke woud verdringen, en de inspanning zal je handen kalmeren voordat ze goede zijde aanraken.",
+        "text": "Toch terug bij mijn weefgetouw. Ik koester geen wrok, {playerName}, maar de draad herinnert een hand die hem losliet, en de kosten om hem weer op te pakken worden elke keer gemeten aan een langere maat. Maai de webhoutspin nen die het oostelijke woud verdringen, en de inspanning zal je handen kalmeren voordat ze goede zijde aanraken.",
         "completion": "Stabiel weer. Leerbewerking en Kleermakerij keren terug naar je handen als hoofdvakken. Meet twee keer voordat je weer gaat dwalen.",
         "objectives": {
           "0": {
@@ -12525,7 +12525,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Terug op het Fornuis",
-        "text": "Wel, kijk wie er terug is bij mijn pot. Geen wrok, {playerName}, een keuken heeft altijd ruimte, maar weet dat de rekening langer wordt elke keer dat je weggaat. Ga de wilde everzwijnen in het oostelijke weide uitdunnen, want eerlijk zweet is het eerste ingrediënt, en het zal je handen herinneren aan het werk.",
+        "text": "Wel, kijk wie er terug is bij mijn pot. Geen wrok, {playerName}, een keuken heeft altijd ruimte, maar weet dat de rekening langer wordt elke keer dat je weggaat. Ga de wilde everzwijnen in het westelijke weide uitdunnen, want eerlijk zweet is het eerste ingrediënt, en het zal je handen herinneren aan het werk.",
         "completion": "Dat is de oude smaak. Alchemie en Koken zijn weer als hoofdvakken op je fornuis. Blijf deze keer wat langer.",
         "objectives": {
           "0": {

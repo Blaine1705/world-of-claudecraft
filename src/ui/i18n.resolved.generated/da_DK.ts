@@ -3967,7 +3967,7 @@ export const da_DK: EnTranslations = {
       "deedsHeading": "Bedrifter, der husker rejsen",
       "deedsBody": "Bedrifternes Bog går ved siden af hvert skridt af dette. Din første afstemning optjener Håndværkssvoren og dit første mesterværk optjener Mesterbygger, begge kan bæres som titler. Hvert af de otte optjenbare håndværk markerer en milepæls-bedrift ved 50 færdighed og kroner sin grænse med en Grandmestertitel, mens Fiskeri får Gammel Søulk ved 100 færdighed og Mesterangler-titlen ved 200.\n\nDer er stille sider også: bedrifter for din første høst og første fremstilling, for de sjældne fund, som held bringer frem i felten, og for at tage fat på ophug. Alt dette er kosmetisk, titler og Hæder alene. En bedrift giver aldrig magt; den beviser kun, at du var der.",
       "startHeading": "Hvor du begynder",
-      "startBody": "Frisk ankommet til Østbæk? Find Formand Odell og tag Et Håndværk til Hver Hånd: han peger dig mod malmårerne omkring Kobbergraven sydvest for byen og giver dig dine første hårde hænder. Fra da af, høst enhver åre, tømmerstamme og urterand, du passerer, mens du løser opgaver; færdighed kommer naturligt til rejsende.\n\nTilbage i byen trykker du T for at åbne håndværksvinduet og arbejde de almindelige opskrifter, enhver karakter kender fra starten. Besøg mestrene ved essen, køkkenerne, vævsstolen og værkstedet for at se, hvad de underviser, og tag deres arbejdsopgaver for stabil møntindtægt. Inden Laugets brev finder dig, vil du allerede vide, hvilket par der føles som hjemme.",
+      "startBody": "Frisk ankommet til Østbæk? Find Formand Odell og tag Et Håndværk til Hver Hånd: han peger dig mod malmårerne omkring Kobbergraven sydøst for byen og giver dig dine første hårde hænder. Fra da af, høst enhver åre, tømmerstamme og urterand, du passerer, mens du løser opgaver; færdighed kommer naturligt til rejsende.\n\nTilbage i byen trykker du T for at åbne håndværksvinduet og arbejde de almindelige opskrifter, enhver karakter kender fra starten. Besøg mestrene ved essen, køkkenerne, vævsstolen og værkstedet for at se, hvad de underviser, og tag deres arbejdsopgaver for stabil møntindtægt. Inden Laugets brev finder dig, vil du allerede vide, hvilket par der føles som hjemme.",
       "colStation": "Station",
       "colHub": "Knudepunkt",
       "colMaster": "Mester",
@@ -11673,7 +11673,7 @@ export const da_DK: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Et håndværk til hver hånd",
-        "text": "Enhver sjæl i Østbæk arbejder med et håndværk udover sværdet, {playerName}. Der er malmårer i klipperne omkring Kobbergraven, sydvest for byen. Gå sving en hakke og bearbejd 5 af dem selv, forstået; jeg vil kende forskel.",
+        "text": "Enhver sjæl i Østbæk arbejder med et håndværk udover sværdet, {playerName}. Der er malmårer i klipperne omkring Kobbergraven, sydøst for byen. Gå sving en hakke og bearbejd 5 af dem selv, forstået; jeg vil kende forskel.",
         "completion": "Se? Malm indsamlet og hård hud på hænderne. Bliv ved med minedriften, skovhugsten og urtesamlingen, når du rejser vejene, og når du er tilbage i byen, hold øje med Byfokus-opslagstavlen ved markedet og den nærliggende håndværksbænk. Der er en god handel at finde i alt dette, hvis du vil have det.",
         "objectives": {
           "0": {
@@ -11756,7 +11756,7 @@ export const da_DK: EnTranslations = {
       },
       "q_supplies": {
         "title": "Stjålne Forsyninger",
-        "text": "De banditter ramte min sidste vogn og stak af med fire kasser varer - værktøj, salt, godt Østbæk-linned. Kasserne er stablet rundt om deres lejr i bakkerne mod sydøst. Stjæl dem tilbage for mig, vil du ikke?",
+        "text": "De banditter ramte min sidste vogn og stak af med fire kasser varer - værktøj, salt, godt Østbæk-linned. Kasserne er stablet rundt om deres lejr i bakkerne mod sydvest. Stjæl dem tilbage for mig, vil du ikke?",
         "completion": "Mine kasser! Knap en skramme på dem. Du er et under.",
         "objectives": {
           "0": {
@@ -12138,7 +12138,7 @@ export const da_DK: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Gamle Klippekæft",
-        "text": "Bjergfolket satte navn på de spor, min spejder fandt: Gamle Klippekæft, en arret tyran af en kat, der har overlevet tre generationer af sin egen flok. Den er grunden til, at snigerne oversvømmer min vej, {playerName}. Dens hule ligger på den vestlige bjergkam over vejen mod syd. Tag en ven med, og læg den gamle djævel ned.",
+        "text": "Bjergfolket satte navn på de spor, min spejder fandt: Gamle Klippekæft, en arret tyran af en kat, der har overlevet tre generationer af sin egen flok. Den er grunden til, at snigerne oversvømmer min vej, {playerName}. Dens hule ligger på den østlige bjergkam over vejen mod syd. Tag en ven med, og læg den gamle djævel ned.",
         "completion": "Endelig nede. Bjergfolket svor, at den kat ville overleve selve muren. Snigerne holder sig til deres høje sne nu, {playerName}, og mine patruljer kan gå ad vejen uden at bløde for det. Hele bjergkammen er mere stille takket være dit arbejde.",
         "objectives": {
           "0": {
@@ -12377,7 +12377,7 @@ export const da_DK: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "Torskefaren",
-        "text": "Torskefaren er ikke bare en fisk, {playerName}, han er en koldblodig morder. De gamle sværger på, at han æder Sumpstrejfere til morgenmad, og selv Mosekær-Enkerne vil ikke spinde deres væv nær Dybsumps-Lavvandet af ren rædsel. Han hersker over de vande. Grib en fiskestang, slæb den gamle djævel op af sit vand, og jeg vil indrømme, at du er blevet en del af familien.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "Ved de fugtige helgener... Selveste Torskefaren. Se de knurhår. Fenbridge vil tære på historier om denne fangst i et år, {playerName}.",
         "objectives": {
           "0": {
@@ -12397,7 +12397,7 @@ export const da_DK: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "De Glemtes Grave",
-        "text": "Jeg har set disse mærker før, på tre gamle grave omkring den nordlige slagmark. Kaptajn Aldren ligger på den østlige højderyg, Ypperstepræst Malric nær den centrale brudte vej, og Kongelig Snigmorder Voss ved den vestlige klippe. Rør ved hver grav og lyt, {playerName}. De døde husker måske, hvad de levende glemte.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren forblev loyal, Malric nægtede at acceptere døden, og Voss så faren før nogen anden. Alle tre tjente den samme glemte konge.",
         "objectives": {
           "0": {
@@ -12413,7 +12413,7 @@ export const da_DK: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "Den Forladte Krypt",
-        "text": "Synerne peger på den forladte krypt i den vestlige klippe. Der er et gammelt sagn om, at krypten husede en konge. Måske forseglede Tornetop ham dernede, efter Malrics ritual fordrejede ham til noget dødløst. Træd ind i krypten og se, hvad der er tilbage derinde.",
+        "text": "Synerne peger på den forladte krypt i den østlige klippe. Der er et gammelt sagn om, at krypten husede en konge. Måske forseglede Tornetop ham dernede, efter Malrics ritual fordrejede ham til noget dødløst. Træd ind i krypten og se, hvad der er tilbage derinde.",
         "completion": "Nøglestenshalvdelene passer sammen, og Voss' dagbog navngiver, hvad de forseglede: Kong Nythraxis' signetring. Hvis dagbogen taler sandt, er den signetring nøglen til hans grav.",
         "objectives": {
           "0": {
@@ -12455,7 +12455,7 @@ export const da_DK: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger Skal Falde",
-        "text": "Mogger har kløvet vogne, jævnet hegn og dræbt nok kvæg til at tømme halvdelen af Dalen. Mød ham ikke alene. Tag to stærke ledsagere med ud på den østlige eng og læg det udyr ned for stedse.",
+        "text": "Mogger har kløvet vogne, jævnet hegn og dræbt nok kvæg til at tømme halvdelen af Dalen. Mød ham ikke alene. Tag to stærke ledsagere med ud på den vestlige eng og læg det udyr ned for stedse.",
         "completion": "Mogger er endelig død. Østbæks marker er tryggere, og du forlader Dalen med endnu en fortælling værd at genfortælle.",
         "objectives": {
           "0": {
@@ -12515,7 +12515,7 @@ export const da_DK: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Tråde genforenet",
-        "text": "Tilbage ved min væv alligevel. Jeg bærer intet nag, {playerName}, men tråden husker en hånd, der slap den, og prisen for at tage den op igen måles ud længere, hver gang. Dræb nettedskov-edderkopperne i den vestlige skov, og arbejdet vil sætte dine hænder til ro, inden de rører god silke igen.",
+        "text": "Tilbage ved min væv alligevel. Jeg bærer intet nag, {playerName}, men tråden husker en hånd, der slap den, og prisen for at tage den op igen måles ud længere, hver gang. Dræb nettedskov-edderkopperne i den østlige skov, og arbejdet vil sætte dine hænder til ro, inden de rører god silke igen.",
         "completion": "Stødig igen. Lærbearbejdning og Skrædderkunst vender tilbage til dine hænder som hovedfag. Mål to gange, inden du vandrer næste gang.",
         "objectives": {
           "0": {
@@ -12525,7 +12525,7 @@ export const da_DK: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Tilbage på komfuret",
-        "text": "Se hvem der er tilbage ved min gryde. Ingen hårde følelser, {playerName}, et køkken har altid plads, men du ved, at regningen løber højere, hver gang du går. Gå til østmarken og tyn vildsvinene, for ærligt sved er den første ingrediens, og det vil minde dine hænder om arbejdet.",
+        "text": "Se hvem der er tilbage ved min gryde. Ingen hårde følelser, {playerName}, et køkken har altid plads, men du ved, at regningen løber højere, hver gang du går. Gå til vestmarken og tyn vildsvinene, for ærligt sved er den første ingrediens, og det vil minde dine hænder om arbejdet.",
         "completion": "Der er den gamle smag. Alkymi og Madlavning er tilbage på dit komfur som hovedfag. Bliv lidt denne gang.",
         "objectives": {
           "0": {

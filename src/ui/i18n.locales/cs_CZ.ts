@@ -48,7 +48,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Kniha skutků kráčí vedle každého kroku tohoto. Tvé první nalaďování získá titul Přísežný řemeslu a tvé první mistrovské dílo získá Velmistr řemesla, oba nositelné jako tituly. Každé ze osmi dosažitelných řemesel zaznamená milníkový skutek na dovednosti 50 a korunuje svůj limit titulem Velmistr, zatímco Rybaření dostane Starého Solanáře na dovednosti 100 a titul Mistrného rybáře na 200.\n\nExistují i tišší stránky: skutky za první sklizeň a první výrobu, za vzácné nálezy, které štěstí přinese v terénu, a za převzetí rozebírání. Vše je kosmetické, jen tituly a Věhlas. Skutek nikdy nedá moc; jen dokazuje, že jsi byl přítomen.',
   'guide.professions.startHeading': 'Kde začít',
   'guide.professions.startBody':
-    'Čerstvě přijel do Eastbrooku? Najdi Předáka Odella a vezmi úkol Živnost pro každou ruku: ukáže ti na rudné žíly kolem Měděného Výkopu jihozápadně od města a předá ti první mozoly. Od té chvíle sklízej každou žílu, kmen stromů a bylinkový porost, kolem kterého projdeš při plnění úkolů; dovednost přichází cestovatelům přirozeně.\n\nZpátky ve městě stiskni T pro otevření okna výroby a pracuj na běžných receptech, které každá postava zná od začátku. Navštiv mistry u kovárny, kuchyní, tkalcovského stavu a dílny, aby sis prohlédl, co učí, a ber jejich pracovní objednávky pro stabilní příjem. Než tě cechovní dopis najde, budeš už vědět, který pár se cítí jako domov.',
+    'Čerstvě přijel do Eastbrooku? Najdi Předáka Odella a vezmi úkol Živnost pro každou ruku: ukáže ti na rudné žíly kolem Měděného Výkopu jihovýchodně od města a předá ti první mozoly. Od té chvíle sklízej každou žílu, kmen stromů a bylinkový porost, kolem kterého projdeš při plnění úkolů; dovednost přichází cestovatelům přirozeně.\n\nZpátky ve městě stiskni T pro otevření okna výroby a pracuj na běžných receptech, které každá postava zná od začátku. Navštiv mistry u kovárny, kuchyní, tkalcovského stavu a dílny, aby sis prohlédl, co učí, a ber jejich pracovní objednávky pro stabilní příjem. Než tě cechovní dopis najde, budeš už vědět, který pár se cítí jako domov.',
   'guide.professions.colStation': 'Stanice',
   'guide.professions.colHub': 'Centrum',
   'guide.professions.colMaster': 'Mistr',
@@ -504,7 +504,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Vidíš? Ruda vytěžena a mozoly na rukách. Pokračuj v dolování, těžbě dřeva a sběru bylin cestou po silnicích, a až se vrátíš do města, mrkni na Nástěnku obecního středu u tržiště a na řemeslný stůl poblíž. Je v tom poctivý obchod, pokud ho chceš.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Vytěžena rudná žíla',
   'entities.quests.q_prof_intro.text':
-    'Každá duše v Eastbrooku pracuje kromě meče i v nějakém řemesle, {playerName}. V skalách kolem Měděného dolu jihozápadně od města jsou rudné žíly. Jdi si sám zamasat krumpáčem a vytěž jich 5; věř mi, poznám rozdíl.',
+    'Každá duše v Eastbrooku pracuje kromě meče i v nějakém řemesle, {playerName}. V skalách kolem Měděného dolu jihovýchodně od města jsou rudné žíly. Jdi si sám zamasat krumpáčem a vytěž jich 5; věř mi, poznám rozdíl.',
   'gpuNotice.bodyDesktop':
     'Hra běží bez grafické akcelerace a bude pomalá. Aktualizuj ovladače grafiky a restartuj hru. Ve Windows nastav hru na Vysoký výkon v Nastavení, Systém, Displej, Grafika.',
   'gpuNotice.bodyWeb':
@@ -6442,7 +6442,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Mogger je konečně mrtvý. Pole Eastbrooku jsou bezpečnější a ty opouštíš údolí s dalším příběhem hodným vyprávění.',
   'entities.quests.q_mogger.objectives.0.label': 'Mogger zabit',
   'entities.quests.q_mogger.text':
-    'Mogger rozštípal vozy, srovnal ploty a zabil dost dobytka, aby vyprázdnil půl údolí. Nestav se mu sám. Vezmi dva silné společníky na východní louku a toho surovce polož navždy.',
+    'Mogger rozštípal vozy, srovnal ploty a zabil dost dobytka, aby vyprázdnil půl údolí. Nestav se mu sám. Vezmi dva silné společníky na západní louku a toho surovce polož navždy.',
   'entities.quests.q_mogger.title': 'Mogger musí padnout',
   'entities.quests.q_murlocs.completion': 'Ha! To je naučí hledět si svých bahnitých děr.',
   'entities.quests.q_murlocs.objectives.0.label': 'Bahennoploutvý plíživec zabit',
@@ -6483,8 +6483,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_graves.objectives.1.label': 'Vidění u hrobu velekněze Malrica',
   'entities.quests.q_nythraxis_graves.objectives.2.label':
     'Vidění u hrobu královského asasína Vosse',
-  'entities.quests.q_nythraxis_graves.text':
-    'Tyhle značky jsem už viděl, na třech starých hrobech kolem severního bojiště. Kapitán Aldren leží na východním návrší, velekněz Malric u rozbité cesty uprostřed a královský asasín Voss u západního útesu. Dotkni se každého hrobu a poslouchej, {playerName}. Mrtví si možná pamatují, co živí zapomněli.',
   'entities.quests.q_nythraxis_graves.title': 'Hroby zapomenutých',
   'entities.quests.q_nythraxis_restless_dead.completion':
     'Na každém střepu se objevuje stejná značka... koruna. Viděl jsem ji už dřív, vyrytou do starých hrobů, které si žádný eastbrookský záznam nepamatuje.',
@@ -6504,7 +6502,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_sealed_crypt.objectives.1.label': 'Dolní část klíče od krypty',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.2.label': 'Starobylý deník',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    'Vidění ukazují k opuštěné kryptě v západním útesu. Stará legenda říká, že krypta ukrývala krále. Možná ho Thornpeak zapečetil dole poté, co ho Malricův rituál zkroutil v něco nesmrtelného. Vstup do krypty a zjisti, co uvnitř zůstalo.',
+    'Vidění ukazují k opuštěné kryptě ve východním útesu. Stará legenda říká, že krypta ukrývala krále. Možná ho Thornpeak zapečetil dole poté, co ho Malricův rituál zkroutil v něco nesmrtelného. Vstup do krypty a zjisti, co uvnitř zůstalo.',
   'entities.quests.q_nythraxis_sealed_crypt.title': 'Opuštěná krypta',
   'entities.quests.q_ogre_bounty.completion':
     'Odměna vyplacena v plné výši. Podhůří je tišší, teď se vypořádáme s těmi, kdo platí.',
@@ -6528,7 +6526,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Konečně dole. Horští lidé přísahali, že ta kočka přežije samotnou zeď. Slídilové zůstanou ve vysokých snězích, {playerName}, a mé hlídky projdou cestou, aniž by za ni krvácely. Celý hřeben je díky tobě tišší.',
   'entities.quests.q_old_cragmaw.objectives.0.label': 'Starý Skalní chřtán zabit',
   'entities.quests.q_old_cragmaw.text':
-    'Horští lidé dali jméno stopám, které našla má zvědka: Starý Skalní chřtán, zjizvený tyran mezi kočkami, který přežil tři generace vlastní smečky. Kvůli němu se slídilové valí na mou cestu, {playerName}. Jeho doupě leží na západním hřebeni nad jižní cestou. Přiveď přítele a polož starého ďábla.',
+    'Horští lidé dali jméno stopám, které našla má zvědka: Starý Skalní chřtán, zjizvený tyran mezi kočkami, který přežil tři generace vlastní smečky. Kvůli němu se slídilové valí na mou cestu, {playerName}. Jeho doupě leží na východním hřebeni nad jižní cestou. Přiveď přítele a polož starého ďábla.',
   'entities.quests.q_old_cragmaw.title': 'Starý Skalní chřtán',
   'entities.quests.q_olen.completion':
     'Pak je jeho hlídka konečně u konce. Jeho jméno nechám sama vytesat do brány. Děkuji ti, {playerName}.',
@@ -6647,7 +6645,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_supplies.completion': 'Moje bedny! Sotva škrábnutí. Jsi zázrak.',
   'entities.quests.q_supplies.objectives.0.label': 'Ukradená bedna zásob',
   'entities.quests.q_supplies.text':
-    'Ti bandité přepadli můj poslední vůz a odnesli čtyři bedny zboží: nástroje, sůl, dobré eastbrookské plátno. Bedny jsou naskládané kolem jejich tábora v jihovýchodních kopcích. Ukradneš je pro mě zpátky?',
+    'Ti bandité přepadli můj poslední vůz a odnesli čtyři bedny zboží: nástroje, sůl, dobré eastbrookské plátno. Bedny jsou naskládané kolem jejich tábora v jihozápadních kopcích. Ukradneš je pro mě zpátky?',
   'entities.quests.q_supplies.title': 'Ukradené zásoby',
   'entities.quests.q_tarn_waders.completion':
     'Deset zpátky ve vodě. Necítí chlad, {playerName}, ani strach, jen tah té brány. Cokoli jim zpívá, zpívá hlasitě.',
@@ -6658,8 +6656,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_the_codfather.completion':
     'U vlhkých svatých... Sám Tresčí kmotr. Podívej na ty vousy. Fenbridge bude z toho úlovku jíst příběhy celý rok, {playerName}.',
   'entities.quests.q_the_codfather.objectives.0.label': 'Tresčí kmotr',
-  'entities.quests.q_the_codfather.text':
-    'Tresčí kmotr není jen ryba, {playerName}, je to chladnokrevný zabiják. Staří pamětníci přísahají, že snídá slídily z močálu, a dokonce mirefenské vdovy z pouhého děsu netkají pavučiny u mělčin Deepfenu. Vládne těm vodám. Vezmi rybářský prut, vytáhni toho starého ďábla z jeho vod a uznám, že ses přidal k rodině.',
   'entities.quests.q_the_codfather.title': 'Tresčí kmotr',
   'entities.quests.q_troll_fetishes.completion':
     'Stejný výrobce jako prapory v táboře kultu. Trollové jsou najaté lopaty, nic víc. Dobrá práce, {playerName}.',
@@ -7990,7 +7986,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Tady je ta stará chuť. Alchymie a Vaření jsou zpět na tvém sporáku jako hlavní obory. Tentokrát zůstaň.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Ulovený divocí kanci',
   'entities.quests.q_prof_amends_apothecary.text':
-    'No, pohleďme, kdo se vrátil k mému hrnci. Nenesu zášť, {playerName}, kuchyně má vždy místo, ale víš, že účet roste pokaždé, když odejdeš. Jdi proredukovat divoké kance na východní louce, protože poctivý pot je první přísada, a to tvým rukám připomene tu práci.',
+    'No, pohleďme, kdo se vrátil k mému hrnci. Nenesu zášť, {playerName}, kuchyně má vždy místo, ale víš, že účet roste pokaždé, když odejdeš. Jdi proredukovat divoké kance na západní louce, protože poctivý pot je první přísada, a to tvým rukám připomene tu práci.',
   'entities.quests.q_prof_amends_apothecary.title': 'Zpátky na sporák',
   'entities.quests.q_prof_amends_bombardier.completion':
     'TAM je to, svědění se vrátilo do tvých rukou. Strojírenství a Alchymie, opět hlavní obory, hurá, jdi udělat rámus. Tentokrát zůstaň, eh?',
@@ -8002,7 +7998,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Opět stabilní. Kožedělnictví a Krejčovství se vrací do tvých rukou jako hlavní obory. Tentokrát dvakrát měř, než se zatoulá.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Vyhuben pavouci lesního pavučníku',
   'entities.quests.q_prof_amends_outfitter.text':
-    'Zpátky u mého stavu po všem. Zášť nepěstuji, {playerName}, ale nit si pamatuje ruku, která ji pustila, a cena za nové uchopení se měří delší pokaždé. Vyhub pavouky lesního pavučníku přeplňující západní lesy, a práce ti usadí ruce, než se dotknou dobrého hedvábí.',
+    'Zpátky u mého stavu po všem. Zášť nepěstuji, {playerName}, ale nit si pamatuje ruku, která ji pustila, a cena za nové uchopení se měří delší pokaždé. Vyhub pavouky lesního pavučníku přeplňující východní lesy, a práce ti usadí ruce, než se dotknou dobrého hedvábí.',
   'entities.quests.q_prof_amends_outfitter.title': 'Opět spojená vlákna',
   'entities.quests.q_prof_amends_smith.completion':
     'Rytmus se vrátil do tvých rukou. Kovářství zbraní a Zbrojnictví jsou opět tvé hlavní obory. Nedělejte z odcházení zvyk.',
