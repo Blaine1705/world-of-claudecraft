@@ -19,6 +19,11 @@ CREATE INDEX IF NOT EXISTS guild_moderation_actions_guild_created
   ON guild_moderation_actions(realm, guild_id, created_at DESC, id DESC);
 CREATE INDEX IF NOT EXISTS guild_moderation_actions_admin_account
   ON guild_moderation_actions(admin_account_id);
+-- The realm-wide Moderation history page unions this table in ordered by
+-- (created_at DESC, id DESC) with no guild filter, so the guild-keyed index above
+-- cannot serve it. Mirrors account_moderation_actions_created.
+CREATE INDEX IF NOT EXISTS guild_moderation_actions_realm_created
+  ON guild_moderation_actions(realm, created_at DESC, id DESC);
 
 -- Enforce folded-name uniqueness for every writer, including an older binary
 -- still serving during a rolling deploy. This trigger does not scan or rewrite

@@ -139,6 +139,14 @@
     {#if detail.members.length === 0}
       <div class="empty">{t('guilds.membersEmpty')}</div>
     {:else}
+      {#if detail.guild.memberCount > detail.members.length}
+        <p class="members-truncated">
+          {t('guilds.membersTruncated', {
+            shown: fmtNumber(detail.members.length),
+            total: fmtNumber(detail.guild.memberCount),
+          })}
+        </p>
+      {/if}
       <div class="table-scroll">
         <table>
           <thead>
@@ -256,6 +264,12 @@
   button.danger {
     border-color: var(--color-danger-border);
     color: var(--color-danger);
+  }
+
+  .members-truncated {
+    margin: 0 0 12px;
+    color: var(--text-dim);
+    font-size: 12px;
   }
 
   @media (max-width: 640px) {

@@ -2,9 +2,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   ADMIN_GUILD_LIST_CACHE_MAX_ENTRIES,
   ADMIN_GUILD_LIST_CACHE_TTL_MS,
-  ADMIN_GUILD_LIST_MAX_CONCURRENT_READS,
+  ADMIN_GUILD_LIST_MAX_CONCURRENT_AGGREGATE_READS,
+  ADMIN_GUILD_LIST_MAX_CONCURRENT_PAGE_READS,
   AdminGuildListBusyError,
   adminGuildListCacheSizeForTests,
+  adminGuildListReadClass,
   bustAdminGuildListReads,
   readAdminGuildList,
   resetAdminGuildListReadsForTests,
@@ -58,8 +60,8 @@ describe('admin guild list read admission', () => {
     await expect(Promise.all([first, second])).resolves.toEqual(['result', 'result']);
   });
 
-  it('rejects excess distinct reads instead of saturating the shared pool', async () => {
-    const pending = Array.from({ length: ADMIN_GUILD_LIST_MAX_CONCURRENT_READS }, () =>
+  it('rejects excess distinct aggregating reads instead of saturating the shared pool', async () => {
+    const pending = Array.from({ length: ADMIN_GUILD_LIST_MAX_CONCURRENT_AGGREGATE_READS }, () =>
       deferred<string>(),
     );
     const admitted = pending.map(({ promise }, index) =>
@@ -68,7 +70,7 @@ describe('admin guild list read admission', () => {
 
     await expect(
       readAdminGuildList(
-        { ...baseRequest, page: ADMIN_GUILD_LIST_MAX_CONCURRENT_READS + 1 },
+        { ...baseRequest, page: ADMIN_GUILD_LIST_MAX_CONCURRENT_AGGREGATE_READS + 1 },
         async () => 'not reached',
       ),
     ).rejects.toBeInstanceOf(AdminGuildListBusyError);
@@ -77,6 +79,59 @@ describe('admin guild list read admission', () => {
       resolve(`result-${index}`);
     });
     await expect(Promise.all(admitted)).resolves.toEqual(['result-0', 'result-1']);
+  });
+
+  it('classifies only the member_count branch as the aggregating read', () => {
+    expect(adminGuildListReadClass(baseRequest)).toBe('aggregate');
+    expect(adminGuildListReadClass({ ...baseRequest, sort: 'name' })).toBe('page');
+    expect(adminGuildListReadClass({ ...baseRequest, sort: 'created_at' })).toBe('page');
+  });
+
+  it('still admits a cheap paged read while the aggregating class is saturated', async () => {
+    const aggregating = Array.from(
+      { length: ADMIN_GUILD_LIST_MAX_CONCURRENT_AGGREGATE_READS },
+      () => deferred<string>(),
+    );
+    const admitted = aggregating.map(({ promise }, index) =>
+      readAdminGuildList({ ...baseRequest, page: index + 1 }, () => promise),
+    );
+
+    // The directory's default view: several operators loading it at once must not
+    // collide with a saturated member_count sort.
+    await expect(
+      readAdminGuildList({ ...baseRequest, sort: 'name', dir: 'asc' }, async () => 'directory'),
+    ).resolves.toBe('directory');
+
+    aggregating.forEach(({ resolve }, index) => {
+      resolve(`aggregate-${index}`);
+    });
+    await expect(Promise.all(admitted)).resolves.toEqual(['aggregate-0', 'aggregate-1']);
+  });
+
+  it('gives the paged class its own, wider cap', async () => {
+    expect(ADMIN_GUILD_LIST_MAX_CONCURRENT_PAGE_READS).toBeGreaterThan(
+      ADMIN_GUILD_LIST_MAX_CONCURRENT_AGGREGATE_READS,
+    );
+    const pending = Array.from({ length: ADMIN_GUILD_LIST_MAX_CONCURRENT_PAGE_READS }, () =>
+      deferred<string>(),
+    );
+    const admitted = pending.map(({ promise }, index) =>
+      readAdminGuildList({ ...baseRequest, sort: 'name', page: index + 1 }, () => promise),
+    );
+
+    await expect(
+      readAdminGuildList(
+        { ...baseRequest, sort: 'name', page: ADMIN_GUILD_LIST_MAX_CONCURRENT_PAGE_READS + 1 },
+        async () => 'not reached',
+      ),
+    ).rejects.toBeInstanceOf(AdminGuildListBusyError);
+
+    pending.forEach(({ resolve }, index) => {
+      resolve(`page-${index}`);
+    });
+    await expect(Promise.all(admitted)).resolves.toHaveLength(
+      ADMIN_GUILD_LIST_MAX_CONCURRENT_PAGE_READS,
+    );
   });
 
   it('releases its admission slot after the read settles', async () => {

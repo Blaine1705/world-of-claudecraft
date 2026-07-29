@@ -1185,12 +1185,21 @@ export async function dailyRewardPointEvents(
 
 export type ModerationHistoryTab = 'all' | 'mine' | 'notes';
 
+// The one action kind the guild arm can carry. Guild moderation writes exactly one
+// row shape (a rename), so the audit query stamps the discriminator as a literal
+// rather than reading a stored column; a second guild action would add the column
+// and this constant goes away. The dashboard's label table keys off it, and
+// tests/admin_account_db.test.ts pins the SQL literal against it.
+export const GUILD_RENAME_ACTION = 'guild_rename';
+
 export interface ModerationActionHistoryEntry {
-  source: 'account' | 'ip';
+  source: 'account' | 'ip' | 'guild';
   id: number;
   accountId: number | null;
   username: string | null;
   ip: string | null;
+  guildId: number | null;
+  guildName: string | null;
   action: string;
   reason: string;
   createdAt: string;
@@ -1213,17 +1222,27 @@ export async function listModerationActions(
   limit: number,
 ): Promise<ModerationActionHistoryPage> {
   const offset = (page - 1) * limit;
-  const params: unknown[] = [];
+  // $1 is always the realm: only the guild arm is realm-scoped (accounts and
+  // blocked IPs are global), and pinning it first keeps the tab parameter at a
+  // fixed $2 across all three tabs.
+  const params: unknown[] = [REALM];
   let accountWhereSql = '';
   let ipWhereSql = '';
+  let guildWhereSql = 'WHERE guild_action.realm = $1';
   if (tab === 'mine') {
     params.push(adminAccountId);
-    accountWhereSql = 'WHERE action_log.admin_account_id = $1';
-    ipWhereSql = 'WHERE ip_action.admin_account_id = $1';
+    accountWhereSql = 'WHERE action_log.admin_account_id = $2';
+    ipWhereSql = 'WHERE ip_action.admin_account_id = $2';
+    guildWhereSql = 'WHERE guild_action.realm = $1 AND guild_action.admin_account_id = $2';
   } else if (tab === 'notes') {
     params.push(adminAccountId);
-    accountWhereSql = "WHERE action_log.admin_account_id = $1 AND action_log.action = 'note'";
+    accountWhereSql = "WHERE action_log.admin_account_id = $2 AND action_log.action = 'note'";
     ipWhereSql = 'WHERE false';
+    // A guild rename is never a note, so the notes tab excludes the arm outright.
+    // The realm predicate stays in front of the constant: it is the only place
+    // $1 appears, and Postgres refuses to parse a statement carrying a parameter
+    // no arm references ("could not determine data type of parameter $1").
+    guildWhereSql = 'WHERE guild_action.realm = $1 AND false';
   }
   const pageParams = [...params, limit, offset];
   const limitParam = params.length + 1;
@@ -1240,7 +1259,9 @@ export async function listModerationActions(
                 action_log.created_at,
                 action_log.expires_at,
                 action_log.admin_account_id,
-                admin.username AS admin_username
+                admin.username AS admin_username,
+                NULL::int AS guild_id,
+                NULL::text AS guild_name
          FROM account_moderation_actions action_log
          JOIN accounts target ON target.id = action_log.account_id
          LEFT JOIN accounts admin ON admin.id = action_log.admin_account_id
@@ -1256,10 +1277,31 @@ export async function listModerationActions(
                 ip_action.created_at,
                 NULL::timestamptz AS expires_at,
                 ip_action.admin_account_id,
-                admin.username AS admin_username
+                admin.username AS admin_username,
+                NULL::int AS guild_id,
+                NULL::text AS guild_name
          FROM blocked_ip_actions ip_action
          LEFT JOIN accounts admin ON admin.id = ip_action.admin_account_id
          ${ipWhereSql}
+         UNION ALL
+         SELECT 'guild' AS source,
+                guild_action.id,
+                NULL::int AS account_id,
+                NULL::text AS username,
+                NULL::text AS ip,
+                'guild_rename' AS action,
+                guild_action.reason,
+                guild_action.created_at,
+                NULL::timestamptz AS expires_at,
+                guild_action.admin_account_id,
+                admin.username AS admin_username,
+                guild_action.guild_id,
+                COALESCE(guild.name, guild_action.new_name) AS guild_name
+         FROM guild_moderation_actions guild_action
+         LEFT JOIN accounts admin ON admin.id = guild_action.admin_account_id
+         LEFT JOIN guilds guild
+                ON guild.id = guild_action.guild_id AND guild.realm = guild_action.realm
+         ${guildWhereSql}
        ) audit_log`;
   const [rows, total] = await Promise.all([
     pool.query(
@@ -1281,6 +1323,8 @@ export async function listModerationActions(
       accountId: entry.account_id === null ? null : Number(entry.account_id),
       username: entry.username ?? null,
       ip: entry.ip ?? null,
+      guildId: entry.guild_id === null ? null : Number(entry.guild_id),
+      guildName: entry.guild_name ?? null,
       action: entry.action,
       reason: entry.reason,
       createdAt: entry.created_at,

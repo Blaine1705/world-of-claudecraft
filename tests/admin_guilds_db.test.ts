@@ -394,7 +394,36 @@ describe('admin guild database access', () => {
     expect(client.query).toHaveBeenLastCalledWith('ROLLBACK');
   });
 
-  it('rolls back missing, case-only unchanged, and oversized guilds', async () => {
+  it('accepts a case-only rename, the remediation for a historical folded collision', async () => {
+    // The folded-name trigger deliberately leaves pre-existing case-only collisions
+    // in place, and re-casing one apart is the least disruptive way to remediate it.
+    // Rejecting it as "same name" would close the only cheap remediation path.
+    const client = transactionClient();
+    client.query
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [{ id: 4, name: 'HISTORICAL NAME' }] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [], rowCount: 1 })
+      .mockResolvedValueOnce({ rows: [{ character_id: 7 }] })
+      .mockResolvedValueOnce({ rows: [], rowCount: 1 })
+      .mockResolvedValueOnce({ rows: [] });
+    mocks.connect.mockResolvedValueOnce(client as unknown as PoolClient);
+
+    await expect(renameAdminGuild(4, 'Historical Name', 'de-collide', 3)).resolves.toEqual({
+      result: {
+        guildId: 4,
+        oldName: 'HISTORICAL NAME',
+        newName: 'Historical Name',
+        memberCharacterIds: [7],
+      },
+    });
+    // Self-exclusion is what makes this safe: the collision probe passes the guild id.
+    expect(client.query.mock.calls[3][1]).toEqual(['test-realm', 'Historical Name', 4]);
+    expect(client.query).toHaveBeenLastCalledWith('COMMIT');
+  });
+
+  it('rolls back missing, byte-identical unchanged, and oversized guilds', async () => {
     const missing = transactionClient();
     missing.query
       .mockResolvedValueOnce({ rows: [] })
@@ -411,7 +440,7 @@ describe('admin guild database access', () => {
       .mockResolvedValueOnce({ rows: [{ id: 4, name: 'Old Name' }] })
       .mockResolvedValueOnce({ rows: [] });
     mocks.connect.mockResolvedValueOnce(unchanged as unknown as PoolClient);
-    await expect(renameAdminGuild(4, 'old name', 'reason', 3)).resolves.toEqual({
+    await expect(renameAdminGuild(4, '  Old Name  ', 'reason', 3)).resolves.toEqual({
       error: 'same_name',
     });
 

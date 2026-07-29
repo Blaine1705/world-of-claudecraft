@@ -958,7 +958,7 @@ describe('guild administration', () => {
     });
   });
 
-  it('returns 503 before a third distinct guild-list read can occupy the pool', async () => {
+  it('returns 503 before a third distinct member-count read can occupy the pool', async () => {
     const resolvers: Array<
       (value: { rows: never[]; total: number; page: number; limit: number }) => void
     > = [];
@@ -972,17 +972,17 @@ describe('guild administration', () => {
     installAdminRuntime();
 
     const first = runRoute('GET', '/admin/api/guilds', {
-      url: '/admin/api/guilds?page=1',
+      url: '/admin/api/guilds?sort=member_count&page=1',
       headers: { authorization: BEARER },
     });
     const second = runRoute('GET', '/admin/api/guilds', {
-      url: '/admin/api/guilds?page=2',
+      url: '/admin/api/guilds?sort=member_count&page=2',
       headers: { authorization: BEARER },
     });
     await vi.waitFor(() => expect(listAdminGuilds).toHaveBeenCalledTimes(2));
 
     const rejected = await runRoute('GET', '/admin/api/guilds', {
-      url: '/admin/api/guilds?page=3',
+      url: '/admin/api/guilds?sort=member_count&page=3',
       headers: { authorization: BEARER },
     });
     expect(rejected.status).toBe(503);
@@ -993,9 +993,19 @@ describe('guild administration', () => {
     });
     expect(listAdminGuilds).toHaveBeenCalledTimes(2);
 
+    // The admission control exists for the aggregating sort, so the default
+    // name-sorted directory must still load while that class is saturated.
+    const directory = runRoute('GET', '/admin/api/guilds', {
+      url: '/admin/api/guilds?page=1',
+      headers: { authorization: BEARER },
+    });
+    await vi.waitFor(() => expect(listAdminGuilds).toHaveBeenCalledTimes(3));
+
     resolvers.forEach((resolve, index) => {
       resolve({ rows: [], total: 0, page: index + 1, limit: 25 });
     });
+    const settled = await directory;
+    expect(settled.status).not.toBe(503);
     await Promise.all([first, second]);
   });
 

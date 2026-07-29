@@ -391,10 +391,15 @@ export interface ModerationHistoryEntry {
 }
 
 export interface ModerationActionHistoryRow extends ModerationHistoryEntry {
-  source: 'account' | 'ip';
+  source: 'account' | 'ip' | 'guild';
   accountId: number | null;
   username: string | null;
   ip: string | null;
+  // Guild renames are audited realm-wide, not per account. guildId is the snapshot
+  // id the audit row carries, so it stays set even after the guild is deleted;
+  // guildName is the guild's current name, falling back to the recorded new name.
+  guildId: number | null;
+  guildName: string | null;
 }
 
 export interface ModerationQueueRow {

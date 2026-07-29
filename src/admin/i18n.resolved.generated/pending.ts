@@ -43,6 +43,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -64,6 +65,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "es_ES": [
@@ -99,6 +101,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -120,6 +123,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "fr_FR": [
@@ -155,6 +159,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -176,6 +181,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "fr_CA": [
@@ -211,6 +217,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -232,6 +239,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "en_CA": [],
@@ -268,6 +276,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -289,6 +298,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "de_DE": [
@@ -324,6 +334,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -345,6 +356,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "zh_CN": [
@@ -380,6 +392,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -401,6 +414,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "zh_TW": [
@@ -436,6 +450,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -457,6 +472,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "ko_KR": [
@@ -492,6 +508,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -513,6 +530,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "ja_JP": [
@@ -548,6 +566,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -569,6 +588,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "pt_BR": [
@@ -604,6 +624,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -625,6 +646,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "ru_RU": [
@@ -660,6 +682,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -681,6 +704,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "cs_CZ": [
@@ -716,6 +740,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -737,6 +762,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "nl_NL": [
@@ -772,6 +798,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -793,6 +820,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "pl_PL": [
@@ -828,6 +856,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -849,6 +878,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "id_ID": [
@@ -884,6 +914,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -905,6 +936,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "tr_TR": [
@@ -940,6 +972,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -961,6 +994,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "sv_SE": [
@@ -996,6 +1030,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -1017,6 +1052,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "vi_VN": [
@@ -1052,6 +1088,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -1073,6 +1110,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ],
   "da_DK": [
@@ -1108,6 +1146,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.memberStatus",
     "guilds.membersEmpty",
     "guilds.membersTitle",
+    "guilds.membersTruncated",
     "guilds.offline",
     "guilds.online",
     "guilds.rank.leader",
@@ -1129,6 +1168,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.renaming",
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
+    "moderationHistory.actionGuildRename",
     "nav.guilds"
   ]
 };

@@ -277,7 +277,11 @@ export type MotdResultCode = 'set' | 'notInGuild' | 'notOfficer';
 const FRIEND_LIMIT = 50;
 const BLOCK_LIMIT = 50;
 const IGNORE_LIMIT = 50;
-const GUILD_MEMBER_LIMIT = 100;
+// Exported because the admin guild backoffice enforces the same roster cap: the
+// detail read pages the roster at it and the rename guard refuses above it. Two
+// copies would drift the day the cap moves, leaving guilds between the values
+// un-renameable and silently truncated in the dashboard.
+export const GUILD_MEMBER_LIMIT = 100;
 const GUILD_INVITE_TTL_MS = 60_000;
 const GUILD_MESSAGE_MAX = 200;
 // Guild billboard: the officer-set message pinned atop the Guild tab.

@@ -8,9 +8,8 @@ import {
   guildNameLockKey,
 } from './guild_name_db';
 import { REALM } from './realm';
-import { validateGuildName } from './social';
+import { GUILD_MEMBER_LIMIT, validateGuildName } from './social';
 
-const ADMIN_GUILD_MEMBER_LIMIT = 100;
 const ADMIN_GUILD_HISTORY_LIMIT = 100;
 const ADMIN_GUILD_REASON_MAX = 500;
 
@@ -200,7 +199,7 @@ export async function adminGuildDetail(guildId: number): Promise<AdminGuildDetai
       ORDER BY CASE gm.rank WHEN 'leader' THEN 0 WHEN 'officer' THEN 1 ELSE 2 END,
                lower(c.name), c.id
       LIMIT $3`,
-    [guildId, REALM, ADMIN_GUILD_MEMBER_LIMIT],
+    [guildId, REALM, GUILD_MEMBER_LIMIT],
   );
   const first = result.rows[0];
   if (!first) return null;
@@ -284,7 +283,12 @@ export async function renameAdminGuild(
       await rollback(client);
       return { error: 'not_found' };
     }
-    if (String(guild.name).toLocaleLowerCase('en-US') === newName.toLocaleLowerCase('en-US')) {
+    // Exact comparison, not folded: re-casing a name IS a rename here. It is the
+    // least disruptive remediation for the historical case-only collisions the
+    // folded-name trigger deliberately leaves in place (admin_guilds_schema.ts),
+    // and both the collision check and the trigger exclude the row itself, so a
+    // case-only update never trips the folded-name guard.
+    if (String(guild.name) === newName) {
       await rollback(client);
       return { error: 'same_name' };
     }
@@ -316,9 +320,9 @@ export async function renameAdminGuild(
         WHERE guild_id = $1
         ORDER BY character_id
         LIMIT $2`,
-      [guildId, ADMIN_GUILD_MEMBER_LIMIT + 1],
+      [guildId, GUILD_MEMBER_LIMIT + 1],
     );
-    if (members.rows.length > ADMIN_GUILD_MEMBER_LIMIT) {
+    if (members.rows.length > GUILD_MEMBER_LIMIT) {
       await rollback(client);
       return { error: 'member_limit_exceeded' };
     }

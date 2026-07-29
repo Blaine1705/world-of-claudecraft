@@ -71,6 +71,11 @@ vi.mock('../../src/admin/api', () => ({
       return { ...directory, page: Number(url.searchParams.get('page') ?? '1') };
     }
     if (path === '/admin/api/guilds/12') return detail;
+    // Guild 13 is the legacy oversized roster: the server counts every member but
+    // pages the rows at the cap, so the dashboard must say the list is partial.
+    if (path === '/admin/api/guilds/13') {
+      return { ...detail, guild: { ...detail.guild, id: 13, memberCount: 137 } };
+    }
     if (path === '/admin/api/guilds/12/history') return historyData;
     throw new Error(`unexpected path ${path}`);
   }),
@@ -315,6 +320,28 @@ describe('Guilds page', () => {
     ).not.toBeInTheDocument();
     expect(vi.mocked(apiGet)).toHaveBeenCalledWith('/admin/api/guilds/12');
     expect(vi.mocked(apiGet)).not.toHaveBeenCalledWith('/admin/api/guilds/12/history');
+  });
+
+  it('says the roster is partial when the guild is above the paged member cap', async () => {
+    // adminGuildDetail counts the whole roster but pages the rows at the cap, so a
+    // legacy guild above it would otherwise render "Members: 137" next to 100 rows
+    // with nothing saying the list stops there.
+    grantPermissions(['accounts.read']);
+    render(Guilds, { guildId: 13 });
+
+    expect(
+      await screen.findByText(t('guilds.membersTruncated', { shown: '1', total: '137' })),
+    ).toBeInTheDocument();
+  });
+
+  it('leaves the roster unannotated when every member is listed', async () => {
+    grantPermissions(['accounts.read']);
+    render(Guilds, { guildId: 12 });
+
+    expect(await screen.findByText('Merlin')).toBeInTheDocument();
+    expect(
+      screen.queryByText(t('guilds.membersTruncated', { shown: '1', total: '1' })),
+    ).not.toBeInTheDocument();
   });
 
   it('loads the audit only with moderation.read and submits a confirmed rename with moderation.act', async () => {

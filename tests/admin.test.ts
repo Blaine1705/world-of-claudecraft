@@ -1345,7 +1345,7 @@ describe('legacy guild administration parity', () => {
     });
   });
 
-  it('returns 503 before a third distinct legacy guild-list read can occupy the pool', async () => {
+  it('returns 503 before a third distinct legacy member-count read can occupy the pool', async () => {
     authenticate();
     const resolvers: Array<
       (value: { rows: never[]; total: number; page: number; limit: number }) => void
@@ -1359,13 +1359,13 @@ describe('legacy guild administration parity', () => {
 
     const firstResponse = fakeRes();
     const first = handleAdminApi(
-      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds?page=1' }),
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds?sort=member_count&page=1' }),
       firstResponse,
       fakeGame,
     );
     const secondResponse = fakeRes();
     const second = handleAdminApi(
-      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds?page=2' }),
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds?sort=member_count&page=2' }),
       secondResponse,
       fakeGame,
     );
@@ -1373,7 +1373,7 @@ describe('legacy guild administration parity', () => {
 
     const rejected = fakeRes();
     await handleAdminApi(
-      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds?page=3' }),
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds?sort=member_count&page=3' }),
       rejected,
       fakeGame,
     );
@@ -1385,9 +1385,21 @@ describe('legacy guild administration parity', () => {
     });
     expect(listAdminGuilds).toHaveBeenCalledTimes(2);
 
+    // The admission control exists for the aggregating sort, so the default
+    // name-sorted directory must still load while that class is saturated.
+    const directoryResponse = fakeRes();
+    const directory = handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds?page=1' }),
+      directoryResponse,
+      fakeGame,
+    );
+    await vi.waitFor(() => expect(listAdminGuilds).toHaveBeenCalledTimes(3));
+
     resolvers.forEach((resolve, index) => {
       resolve({ rows: [], total: 0, page: index + 1, limit: 25 });
     });
+    await directory;
+    expect(directoryResponse.statusCode).not.toBe(503);
     await Promise.all([first, second]);
   });
 
