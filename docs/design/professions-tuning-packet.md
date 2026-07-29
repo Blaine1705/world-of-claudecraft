@@ -542,7 +542,13 @@ Its own phase because it is the only one that touches persistence and the wire.
   refuses an unearned tool, which also closes the traded-tool bypass. Rods
   stay exempt (the water gate plus the R19 teaching ceiling pace fishing),
   so the delve rows' clears gate remains their only lock, correctly.
-- **OPEN: the effects have no acquisition path, and the wire command is
+- **OPEN at phase 7 close; RESOLVED by the review worklist's phase 12.** The
+  acquisition craft shipped: the dev gate and its two-direction pin retired
+  with it, slotting consumes a crafted charm through the same resolver, and
+  `craftedBy` is written from the consumed charm's signer. The paragraphs
+  below stand as the historical record of the scope call and the free-grant
+  incident. **As recorded then: the effects have no acquisition path, and
+  the wire command is
   DEV-GATED until they do.** `TOOL_EFFECTS` is catalog only (no item, no
   recipe, no `ItemUse` variant), so no player can obtain an effect and every
   HUD row is empty today. That was a deliberate scope call: the cost list above
@@ -572,7 +578,9 @@ Its own phase because it is the only one that touches persistence and the wire.
   was removed. The machinery in `resolveToolEffectUse` stays, ready for the
   flow.
 
-- **`craftedBy` is left unset at slot time.** Its documented meaning is whoever
+- **`craftedBy` is left unset at slot time** (as of phase 7; phase 12's craft
+  now writes it from the consumed charm's signer, a character name, which is
+  restart-stable where the entity id below was not). Its documented meaning is whoever
   produced the effect through the production craft that made it, and no such
   craft exists. Recording the slotter instead would be a lie AND a permanent
   original-crafter recharge discount for every self-slotted effect, and it
@@ -585,11 +593,17 @@ Its own phase because it is the only one that touches persistence and the wire.
   binary erases anything only the newer binary writes, on the first autosave
   after the rollback. One caveat, several instances, kept together here so a
   rollback decision reads them as one class:
-  - `toolEffectSlots`: a binary that predates the field erases the key.
-    Harmless today (nothing can mint a slot on a production realm, and the
-    field is absent for everyone), but it becomes real player-value loss the
-    moment an acquisition craft with a material cost ships. Whoever lands
-    that craft owns this.
+  - `toolEffectSlots`: a binary that predates the field erases the key, and
+    this is REAL PLAYER-VALUE LOSS now. The acquisition craft shipped (the
+    review worklist's phase 12): a slot costs a crafted charm whose reagents
+    price above three hundred copper of arcane materials, plus any recharges
+    paid into it, and the slot's `craftedBy` provenance (the original-crafter
+    discount) is unrecoverable once erased because the consumed charm no
+    longer exists. A rollback across the acquisition-craft boundary therefore
+    needs the same restore-from-backup posture as a cap raise, and the
+    RELEASE NOTES for the version that ships the craft must carry this
+    caveat (the release-cut checklist in docs/design/professions.md lists
+    it).
   - The clamp-on-load fields make a future V3 cap raise ROLLBACK-DESTRUCTIVE:
     `normalizeGatheringProficiency` and `normalizeCraftSkills` both clamp a
     loaded value DOWN to the binary's own `maxSkill`, so after a cap raise

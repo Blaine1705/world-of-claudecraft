@@ -231,8 +231,12 @@ For off-box safety, sync the directory to S3 occasionally:
   autosave. Across the professions persistence release specifically: node respawn
   timers (`nodeHarvestCooldowns`) are erased, which reopens the node relog exploit
   for the rollback window (accepted trade, no player value lost); slotted tool
-  effects (`toolEffectSlots`) are erased the same way (harmless until an
-  acquisition craft with a material cost ships); the tier-mail acknowledgement
+  effects (`toolEffectSlots`) are erased the same way, and since the
+  acquisition craft shipped that is REAL PLAYER-VALUE LOSS (a slot costs a
+  crafted charm of arcane reagents plus its recharges, and the erased
+  `craftedBy` discount provenance cannot be re-minted), so a rollback across
+  the acquisition-craft boundary needs a restore-from-backup plan and the
+  release notes must carry the caveat; the tier-mail acknowledgement
   prune is a one-way heal that fires on the first UPGRADE load, so a rollback
   cannot undo it and the only recovery is a database backup; and any FUTURE
   proficiency or craft cap raise is rollback-destructive

@@ -178,12 +178,20 @@ functions); at cap, actions still work, only gain stops. A one-time mastery
 reset ran at the curve's deploy behind the persisted `masteryResetApplied`
 flag (`src/sim/professions/mastery_reset.ts`); `normalizeArchetypeState` is
 the single load-time reader of PRE-reset skill values and must keep running
-before `applyMasteryReset`. Tool effects/charges/recharge are WIRED: the
-slot command, the harvest bonuses, and deterministic depletion all run
-(`tools.ts`, `gathering.ts`), with the slot policy (R9,
-`slotToolEffectRefused`) refusing the parked respawn-speed effect and all
-fishing slots until each has real behavior; the acquisition craft is what
-gives the effects a live source.
+before `applyMasteryReset`. Tool effects are LIVE end to end: the
+acquisition craft mints the two charm items through the game's first
+enchanting recipes (`content/recipes.ts` TOOL_EFFECT_RECIPES,
+trainer-taught at the toolworks), the slot command consumes a charm
+through the one mint authority (`resolveSlotToolEffect`, whose consumed
+copy's signer becomes the slot's `craftedBy`), the harvest bonuses spend a
+charge only when they changed the granted outcome (R42, settled at the
+command boundary), and the recharge command prices the arcane material of
+the recharge-time best tool's rarity rung at a count scaled to the charges
+restored (R39) while refilling to that tool's re-derived maximum (R30).
+The slot policy (R9, `slotToolEffectRefused`) still refuses the parked
+respawn-speed effect and all fishing slots until each has real behavior,
+and the craftable set derives from that policy (no Springback charm
+exists).
 
 Character XP from crafting is LEARNING XP: the level-banded curve
 (`craftActionXp`, `src/sim/professions/profession_xp.ts`) scaled at the
@@ -612,8 +620,12 @@ must be re-derived if either number is ever tuned on its own.
   temporarily non-enchantable, no data loss), the fee-free combo re-grant
   window, the mastery-reset strip-refire under rollback (DESTRUCTIVE), the
   bank sanitize count clamp plus the mail returned-flag arm (DESTRUCTIVE),
-  the silent band-cap retroactivity, the pacing acceptance note, and the
-  release-tier fill budget.
+  the silent band-cap retroactivity, the pacing acceptance note, the
+  release-tier fill budget, and the `toolEffectSlots` rollback across the
+  acquisition-craft boundary (DESTRUCTIVE of real player value now: the
+  slot's charm cost, its recharges, and its `craftedBy` provenance all
+  erase on the first autosave under a pre-craft binary; see "Rollback
+  erases newer fields" in docs/design/professions-tuning-packet.md).
 - Drop the one-release `AURA_NAME_KEY` legacy alias for the pre-rename
   Venomfire aura string after v0.29.0 ships (mixed-fleet deploy window
   only; `src/ui/sim_i18n.ts`).

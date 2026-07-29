@@ -207,6 +207,37 @@ Rulings checkpoint additions, settled with the maintainer 2026-07-28
   a phase 9 QA follow-up to packet scope by the maintainer; lands in
   phase 10.
 
+Build-decided rulings (phase 12; recorded per the new-rulings process,
+veto-able by the maintainer, the R32 pattern):
+
+- **R45. The mint's item route.** The two live effects exist as charm ITEMS
+  whose ids equal their effect ids (rare tool-kind defs, sellValue only,
+  never vendor-stocked), minted by the game's first enchanting recipes:
+  enchanting-homed for skill and specialization identity, TOOLWORKS-bound
+  for the station, trainer-taught at tier 1 (skillReq 25) with the trainer
+  route resolving through the recipe's own station binding
+  (`trainingStationTypeFor`), since enchanting keeps no station of its own.
+  Slotting consumes one charm through `resolveSlotToolEffect`, the one mint
+  authority; the copy preference is self-signed, then unsigned, then the
+  first foreign signature, and the consumed copy's `signer` (a character
+  NAME, the craft signing rule's own identity) becomes the slot's
+  `craftedBy`. Rare def quality is load-bearing: it is what makes every
+  crafted copy signed. No Springback item or recipe exists, derived from
+  the R9 policy and pinned both ways. Signed charms trade hand to hand
+  only (instanced copies are market- and mail-excluded by the standing
+  rules), accepted and recorded.
+- **R46. The recharge surface.** Owner-performed, instant behind the shared
+  crafting-action window (the ticks dimension of the old placeholder cost is
+  RETIRED; every enchanting-family action is instant behind that window),
+  no skill gain and no XP. It refuses with no real tool owned for the
+  profession (the R30 rarity cannot resolve), at or above the re-derived
+  maximum (the inflated-mint fill persists but is never renewed), and on
+  the shared throttle; the insufficient-materials refusal carries the
+  priced material and count so the cost is legible without a preview
+  surface. Count formula: ceil((charges restored / 10) x the composed
+  discount), floored at one; the mint-exceeds-recharge inequality is pinned
+  per effect per reachable rarity rung.
+
 ---
 
 ## Phase 8: base repair and review closeout
@@ -1353,6 +1384,104 @@ Pass-1 phase 10 scope plus the pass-2 constraints:
    and HANDED to phase 17 for the wording.
 8. `craftedBy` starts being written by the production craft; the
    original-crafter discount goes live with it.
+
+BUILT 2026-07-29 (Fable, ultracode). Preamble: origin fetched,
+release/v0.32.0 unmoved at a802b4be2 (already merged as a625fe099), no
+re-sync needed; entry tip 8e0006388, docs-only over the merge-settlement
+gate-PASS code tip 399786aaf. Six build commits through the UI slice, then
+the docs slice and the adversarial round below. What each item settled:
+
+1. DONE (verification only): the capacity pre-gate resolves through the
+   slotted quality effect at BOTH cast ends (gathering.ts harvestNode and
+   completeGatherCast via harvestYieldItemId), confirmed in place.
+2. DONE: one mint authority. `resolveSlotToolEffect` gained the charm arm
+   (typed refusals; the six gates in one resolver) and the command body
+   (professions/tool_effect_actions.ts, a new SimContext module with Sim
+   keeping thin delegates) consumes exactly the copy the resolver chose.
+   The load arm was already policy-shared (phase 8); the CRAFTABLE set now
+   derives from the same policy: no path can mint a Springback charm
+   because no item or recipe exists for a policy-refused-everywhere
+   effect, pinned bidirectionally in
+   tests/professions_tool_effect_craft.test.ts. The craft itself is the
+   two TOOL_EFFECT_RECIPES (content/recipes.ts): the game's first
+   enchanting recipes, R45's trainer route, with derived charm icons
+   (scripts/assets/tool_effect_icons.mjs, the fine-material derivation
+   pattern) and the five non-Latin name fills.
+3. DONE: R39 pricing. The flat 4-count RechargeCost is retired for
+   resolveRechargeToolEffect: material identity is the disenchant ladder
+   (DISENCHANT_MATERIAL_BY_QUALITY, moved to the disenchant_reagents leaf
+   so tools.ts shares the ONE table) keyed on the R30-resolved rung, count
+   = ceil((restored / 10) x discount) floored at one (full fills land on
+   the ruling's 2 to 5 band across the shipped rungs), both discounts
+   compose into the count via rechargeDiscountFor (specialization still
+   original-crafter-only). The mint-exceeds-recharge inequality holds with
+   reagents 4 shard + 3 essence + 5 dust (304 copper) against the worst
+   generic fill (5 shards, 275) and is pinned per effect per REACHABLE
+   rung, where reachable derives from the live gatherTool defs: a
+   legendary tool shipping reds the pin until the recipes retune.
+   Residual, accepted: a specialized enchanter's discounted re-mint (about
+   225) can undercut the GENERIC recharge of a foreign-crafted slot (275);
+   that is the crafting perk working, not a bypass of the recharge economy.
+4. DONE: R30 at the command. The fill re-derives from the best tool owned
+   at recharge time and lands on BOTH counters; at or above the re-derived
+   maximum the recharge refuses (already_full), so a borrowed epic pick's
+   inflated mint spends out and is never renewed. Pinned at the resolver
+   and through the real command (tests/professions_tool_effect_recharge).
+5. DONE: R42. applyToolEffectUse (formerly resolveToolEffectUse) applies
+   and never spends; the command boundary settles the charge AFTER the
+   grant against the same-draw counterfactual the resolution carries
+   (granted id differs, or granted count exceeds the base), so a quality
+   charm on an already-sufficient tool and a quantity charm clipped by
+   full bags both keep their charge, each pinned through the real command
+   at exactly two draws. No parity golden moved (no scenario slots an
+   effect; verified by the full parity run).
+6. DONE: the rollback caveat re-checked. The packet doc's toolEffectSlots
+   arm and DEPLOY.md's professions-rollback bullet now state the real
+   player-value loss (charm cost, recharges, craftedBy provenance) and
+   the restore-from-backup posture; "the release notes carry it" is
+   encoded where release notes are actually authored from: the
+   release-cut checklist in docs/design/professions.md gained the caveat
+   as a named DESTRUCTIVE entry.
+7. DONE: the dev gate and its two-direction pin removed together. The
+   online suite's replacement arms pin the new directions: a charm-less
+   hand-built frame on a production realm mints nothing and consumes
+   nothing (the free-grant attack, refused by the resolver with the
+   no_charm event), a charm-holding sender mints and pays. Every refusal
+   is player-visible now: the new text-free personal toolEffectResult
+   event (a HEAVY_SELF_EVENTS member) reports both actions, rendered as
+   localized chat lines with M16 fills. THE ENCHANTING GUIDE PROSE
+   DECISION, handed to phase 17 for wording: the enchanting identityBody's
+   "no station, no trainer, and no recipe list to buy" gains the
+   tool-effect exception (the two charm recipes are trainer-taught at the
+   TOOLWORKS for a tier-1 fee, the one enchanting surface that is); the
+   page promises that the charms are Enchanter-crafted items consumed by
+   slotting, that they trade hand to hand only (signed copies never list
+   on the market and never mail), that recharges price in the arcane
+   material of the recharge-time tool at a count scaled to the fill, at
+   half count for the effect's original crafter and deeper once
+   specialized, and that the Springback Charm stays parked. toolsNote is
+   NOT stale by this phase (its rarity and never-for-coin claims still
+   hold; it stays on phase 17's existing list for its own reasons).
+8. DONE: craftedBy is written by the production craft, structurally: the
+   charm defs are rare, so the existing #1149 signing rule stamps every
+   crafted copy with the crafter's name, and the slot copies the consumed
+   copy's signer. The discount is live through the recharge command
+   (self-crafted slots price at the composed discount; foreign and
+   unsigned copies at the generic rate), and the identity round-trips the
+   character blob (the roundtrip fixture carries a craftedBy row).
+
+Also in this phase: the professions window gained the minimal slot and
+recharge senders (the dev gate's removal would otherwise ship a command
+only hand-built frames can reach), derived through the sim's own resolvers
+so the buttons never offer what the server refuses; desktop and mobile
+captures refreshed under docs/screenshots/prof-tool-effects/ with the
+frame-honesty checks extended to the buttons. Deploy-window deltas against
+the phase 11 census: sendable commands 174 to 175 and dispatched 185 to
+186 (recharge_tool_effect), SimEvents 131 to 132 (toolEffectResult), and
+slot_tool_effect moves from the dev-gated set to reachable-from-shipped-
+surfaces; all additive, and the old bundle ignores unknown event types.
+The R40 comments (the confirm-flow re-widening in world_api/professions.ts
+and the design record) stay untouched for phase 14, per the ruling.
 
 ---
 
