@@ -14,7 +14,6 @@ import {
   DAWNHOLD_COURT,
   DAWNHOLD_COURT_GATE,
   DAWNHOLD_COURT_STATUE,
-  DAWNHOLD_FIELD_R,
   DAWNHOLD_GATES,
   DAWNHOLD_RAMPS,
   DAWNHOLD_TOWERS,
@@ -158,10 +157,7 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
     thick = 0.36,
     mat?: THREE.Material,
   ): void => {
-    const mesh = new THREE.Mesh(
-      castleStoneBox(sx, thick, sz),
-      mat ?? capMat,
-    );
+    const mesh = new THREE.Mesh(castleStoneBox(sx, thick, sz), mat ?? capMat);
     mesh.position.set(cx, topY - thick / 2, cz);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -431,34 +427,44 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
     for (const gx of [DAWNHOLD_COURT_GATE.a0, DAWNHOLD_COURT_GATE.a1]) {
       put('kcasWallPillar', { x: gx, y: padY, z: C.z1, rot: 0, s: 0.9 });
     }
-    // the court's own dressing: benches on the cross axis facing the wolf,
-    // a torch at each inner corner, and warm light over the two fields
+    // The court's own dressing. Benches are AUTHORED rather than derived
+    // from the field ring: with five fields of three different radii the old
+    // "field centre plus radius" formula puts seats inside the curtain wall
+    // and inside neighbouring beds. Each of these backs onto a wall and
+    // faces the fox.
+    for (const [bx, bz, brot] of [
+      [271.3, 937.2, Math.PI],
+      [277.7, 937.2, Math.PI],
+      [270.5, 925.0, 0],
+      [278.3, 925.0, 0],
+    ] as const) {
+      put('kcasBench', { x: bx, y: padY, z: bz, rot: brot, s: 1.3 });
+    }
+    // Warm light over the two MAJOR fields only, reaching far enough to wash
+    // the three smaller ones as well. One light per field would put five here
+    // plus the statue's, which is GFX.maxPointLights exactly on the default
+    // tiers and double the budget on a constrained one.
     for (const f of DAWNHOLD_BEDS) {
-      for (const side of [-1, 1] as const) {
-        put('kcasBench', {
-          x: f.x,
-          y: padY,
-          z: f.z + side * (DAWNHOLD_FIELD_R + 1.4),
-          rot: side === -1 ? 0 : Math.PI,
-          s: 1.3,
-        });
-      }
-      const fieldLight = new THREE.PointLight(0xffe2a8, 3, 12, 2);
-      fieldLight.position.set(f.x, padY + 2.4, f.z);
+      if (f.r < 3) continue;
+      const fieldLight = new THREE.PointLight(0xffe2a8, 3, 14, 2);
+      fieldLight.position.set(f.x, padY + 2.6, f.z);
       fieldLight.userData.baseIntensity = 3;
       glowLights.push(fieldLight);
       group.add(fieldLight);
     }
-    for (const cx of [C.x0 + 2, C.x1 - 2]) {
-      for (const cz of [cz0 + 3, C.z1 - 2]) {
+    // torches pulled out onto the walls: the old inset put two of them
+    // inside the new south beds
+    for (const cx of [C.x0 + 1.4, C.x1 - 1.4]) {
+      for (const cz of [cz0 + 3, C.z1 - 1.3]) {
         put('kcasTorch', { x: cx, y: padY, z: cz, rot: 0, s: 1.5 });
       }
     }
-    const wolfLight = new THREE.PointLight(0xd8f0b0, 2.6, 11, 2);
-    wolfLight.position.set(DAWNHOLD_COURT_STATUE.x, padY + 3, DAWNHOLD_COURT_STATUE.z);
-    wolfLight.userData.baseIntensity = 2.6;
-    glowLights.push(wolfLight);
-    group.add(wolfLight);
+    // the fox stands 4.9 tall, so its light rides higher than the wolf's did
+    const statueLight = new THREE.PointLight(0xd8f0b0, 2.6, 12, 2);
+    statueLight.position.set(DAWNHOLD_COURT_STATUE.x, padY + 4, DAWNHOLD_COURT_STATUE.z);
+    statueLight.userData.baseIntensity = 2.6;
+    glowLights.push(statueLight);
+    group.add(statueLight);
   }
 
   // ---- instance every placed piece ----

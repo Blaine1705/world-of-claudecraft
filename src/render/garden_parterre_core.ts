@@ -16,7 +16,6 @@ import { EVERGARDEN_PROPS, EVERGARDEN_ROADS, EVERGARDEN_ZONE } from '../sim/cont
 import {
   DAWNHOLD_BEDS,
   DAWNHOLD_COURT_STATUE,
-  DAWNHOLD_FIELD_R,
   inDawnholdBailey,
   inDawnholdCourt,
 } from '../sim/dawnhold_layout';
@@ -209,15 +208,23 @@ function plotPalette(p: ParterrePlot): [number, number, number, number] {
   return [GARDEN_BED_TINTS[a], GARDEN_BED_TINTS[b], GARDEN_BED_TINTS[cIdx], GARDEN_BED_TINTS[dIdx]];
 }
 
-// Dawnhold's walled flower court: two round fields banded in the castle's
-// own colors, either side of the hedge wolf. The rest of the court floor
-// (the perimeter walk, the statue's apron, the ground inside both doorways)
+// Dawnhold's walled flower court: five round fields banded in the castle's
+// own colors around the leafy fox. The rest of the court floor (the
+// perimeter walk, the statue's apron, the ground inside both doorways)
 // stays bare so the fields read as planted panels rather than a lawn.
+// One palette per field, in DAWNHOLD_BEDS order; every colour is drawn from
+// the GARDEN_BED_TINTS wheel above, and the two majors keep the colourways
+// they were authored with.
 const COURT_FIELD_PALETTES: readonly (readonly [number, number, number])[] = [
   [0xf7c6d9, 0xffffff, 0xf2c94c], // blush and white around a gold heart
   [0xb07bd8, 0xc9b8e8, 0xffffff], // violet and lavender around a white heart
+  [0xd8385a, 0xf27ba6, 0xffffff], // crimson and rose around a white heart
+  [0xf2c94c, 0xf5a25d, 0xffffff], // gold and apricot around a white heart
+  [0x7b9bd8, 0xc9b8e8, 0xf2c94c], // cornflower and lavender around a gold heart
 ] as const;
-const COURT_STATUE_CLEAR = 2.8;
+// the bare apron around the fox: its collider r 1.8 plus the 1.2yd of clear
+// ground the court's centrepiece has always stood in
+const COURT_STATUE_CLEAR = 3.0;
 
 /**
  * The court's own planting answer, kept separate from the general garden
@@ -229,10 +236,12 @@ function dawnholdCourtTintAt(x: number, z: number): number {
   if (sd < COURT_STATUE_CLEAR) return -1;
   for (const [i, f] of DAWNHOLD_BEDS.entries()) {
     const d = Math.hypot(x - f.x, z - f.z);
-    if (d > DAWNHOLD_FIELD_R) continue;
+    if (d > f.r) continue;
     const [ca, cb, cc] = COURT_FIELD_PALETTES[i % COURT_FIELD_PALETTES.length];
-    if (d < DAWNHOLD_FIELD_R * 0.22) return cc;
-    const band = Math.floor((d - DAWNHOLD_FIELD_R * 0.22) / (DAWNHOLD_FIELD_R * 0.2));
+    // the band math is radius-relative, so the smaller fields keep the same
+    // ring count as the majors rather than reading as flat discs
+    if (d < f.r * 0.22) return cc;
+    const band = Math.floor((d - f.r * 0.22) / (f.r * 0.2));
     return band % 2 === 0 ? ca : cb;
   }
   return -1;

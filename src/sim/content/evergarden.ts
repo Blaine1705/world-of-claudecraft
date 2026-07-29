@@ -672,16 +672,19 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     ...DAWNHOLD_BUILDINGS,
     { key: 'hexCannonballs', x: 276.5, z: 909, scale: 7 },
     { key: 'hexWeaponRack', x: 250, z: 884, rot: 1.2, scale: 9 },
-    // the hedge wolf statue at the centre of the walled flower court off
-    // the south wall (faces the court's south doorway)
+    // the leafy fox at the centre of the walled flower court: the maze
+    // arches' topiary gatekeeper, a size larger as the court's
+    // centrepiece. rot 0 puts its front (+z) on the south doorway, and at
+    // scale 5 it stands 4.9 tall, reading over the 3.2yd court wall from
+    // the lawn outside.
     {
-      key: 'hedgeWolfStatue',
+      key: 'leafyFoxStatue',
       x: DAWNHOLD_COURT_STATUE.x,
       z: DAWNHOLD_COURT_STATUE.z,
-      rot: Math.PI,
-      scale: 3,
-      r: 1.6,
-      h: 3.5,
+      rot: 0,
+      scale: 5,
+      r: 1.8,
+      h: 4.9,
     },
     { key: 'hexBarracks', x: 306, z: 860, rot: -0.9, scale: 8, r: 6, h: 13 },
     // Hedgewick's medieval quarter, spread for easy walking: chapel by the

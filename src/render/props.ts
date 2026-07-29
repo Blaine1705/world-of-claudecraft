@@ -106,14 +106,6 @@ interface PropAssetDef {
   yaw?: number;
   /** drop parts whose material name matches (e.g. the market cart's awning) */
   strip?: RegExp;
-  /**
-   * Leave the parsed GLTF in the loader cache after extraction. Set this
-   * ONLY when another subsystem loads the same url (the hedge wolf statue
-   * reuses the live wolf creature rig): the usual post-extract release
-   * would evict a parse the character system still resolves against,
-   * costing it a silent re-fetch and re-parse mid-session.
-   */
-  sharedSource?: boolean;
 }
 
 // exported for render/castle_features.ts, which instances the kcas castle
@@ -270,14 +262,6 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   // the user-authored leafy fox: a clipped-topiary statue crowning the
   // Evergarden's grandest flower beds (sibling models to the maze hedges)
   leafyFoxStatue: { url: '/models/props/leafy_fox_statue.glb', kit: 'kiron' },
-  // the hedge wolf statue at the centre of Dawnhold's flower court: the
-  // wolf creature model reused as clipped topiary (its own kit so the
-  // strip-map override below never touches the live creature material)
-  hedgeWolfStatue: {
-    url: '/models/creatures/wolf_basic.glb',
-    kit: 'khedge',
-    sharedSource: true,
-  },
   // the Evergarden's modeled flower beds (same maintainer-authored set);
   // their own kit so material dedupe never crosses into the iron props
   flowerBedSquareA: { url: '/models/props/flower_bed_square_a.glb', kit: 'kbeds' },
@@ -550,8 +534,6 @@ const MAT_OVERRIDES: Record<
     emissiveIntensity?: number;
     metalness?: number;
     roughness?: number;
-    /** drop the source texture maps: flat color only (topiary statues) */
-    stripMaps?: boolean;
   }
 > = {
   'village:Windows': { emissive: 0x2a3c55, emissiveIntensity: 1.1, roughness: 0.4 },
@@ -570,10 +552,6 @@ const MAT_OVERRIDES: Record<
   'minerock:_defaultMat': { color: 0x6f7376 },
   // graveyard colormap is near-white; knock it toward weathered stone
   'grave:colormap': { color: 0xd2d2c8 },
-  // the hedge wolf statue: the wolf's baked fur texture is stripped and the
-  // whole body reads as clipped evergreen (the foliage 'garden' hedge green;
-  // the wolf GLB's one material is unnamed, hence the bare kit key)
-  'khedge:': { color: 0x4a8a4e, roughness: 0.95, metalness: 0, stripMaps: true },
 };
 
 // Kits that take the shared triplanar surface-detail layer route through the
@@ -653,7 +631,7 @@ function convertMaterial(
     ov?.color !== undefined
       ? new THREE.Color(ov.color)
       : (s.color?.clone() ?? new THREE.Color(0xffffff));
-  const map = ov?.stripMaps ? null : (s.map ?? null);
+  const map = s.map ?? null;
   // Tripo-generated 'hollow' kit: one baked painterly albedo per model, glow
   // painted in, smooth normals. Two nudges make them sit beside the
   // hand-authored kits: flat shading (faceted low-poly light response) and a
@@ -670,10 +648,10 @@ function convertMaterial(
       side: s.side,
       vertexColors: hasVertexColors,
       flatShading: hollow,
-      normalMap: ov?.stripMaps ? null : (s.normalMap ?? null),
-      roughnessMap: ov?.stripMaps ? null : (s.roughnessMap ?? null),
-      metalnessMap: ov?.stripMaps ? null : (s.metalnessMap ?? null),
-      aoMap: ov?.stripMaps ? null : (s.aoMap ?? null),
+      normalMap: s.normalMap ?? null,
+      roughnessMap: s.roughnessMap ?? null,
+      metalnessMap: s.metalnessMap ?? null,
+      aoMap: s.aoMap ?? null,
       roughness: ov?.roughness ?? (hollow ? 0.85 : s.isMeshStandardMaterial ? s.roughness : 0.9),
       // The kit exporter ships an accidental metallicFactor 0.4 on hundreds
       // of dielectric palette materials (wood carts outshone actual anvils),
@@ -789,10 +767,9 @@ function propAsset(key: PropKey): PropAsset {
   extractCache.set(key, asset);
   // The extracted float geometry and converted materials are now authoritative.
   // Release the parsed scene's duplicate source buffers without disposing shared
-  // textures that the converted materials still reference. A sharedSource def
-  // keeps its cache entry: another subsystem resolves the same url.
+  // textures that the converted materials still reference.
   loadedProps.delete(key);
-  if (!def.sharedSource) releaseGltf(def.url);
+  releaseGltf(def.url);
   return asset;
 }
 

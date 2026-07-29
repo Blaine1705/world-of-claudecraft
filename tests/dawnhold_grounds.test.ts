@@ -121,9 +121,8 @@ describe('Dawnhold Castle grounds', () => {
       [273, 897],
       [258, 886.6],
       [258, 889.8],
-      // the court floor: both flower fields and the statue's ground
-      [DAWNHOLD_BEDS[0].x, DAWNHOLD_BEDS[0].z],
-      [DAWNHOLD_BEDS[1].x, DAWNHOLD_BEDS[1].z],
+      // the court floor: every flower field and the statue's ground
+      ...DAWNHOLD_BEDS.map((f) => [f.x, f.z] as [number, number]),
       [DAWNHOLD_COURT_STATUE.x, DAWNHOLD_COURT_STATUE.z],
       [DAWNHOLD_COURT.x0 + 2, DAWNHOLD_COURT.z1 - 2],
       [DAWNHOLD_COURT.x1 - 2, DAWNHOLD_COURT.z1 - 2],
@@ -133,6 +132,64 @@ describe('Dawnhold Castle grounds', () => {
         Math.abs(groundHeight(x, z, SEED) - DAWNHOLD.pad.h),
         `level at (${x},${z})`,
       ).toBeLessThan(0.05);
+    }
+  });
+
+  it('every flower field fits the court, its doorway lanes, and its neighbours', () => {
+    // Pure geometry: the packing is authored, so pin it rather than letting a
+    // field drift into a wall, a doorway approach, or another bed.
+    const inX0 = DAWNHOLD_COURT.x0 + DAWNHOLD_COURT.th / 2;
+    const inX1 = DAWNHOLD_COURT.x1 - DAWNHOLD_COURT.th / 2;
+    const inZ0 = DAWNHOLD.wz1 + DAWNHOLD.wallTh / 2;
+    const inZ1 = DAWNHOLD_COURT.z1 - DAWNHOLD_COURT.th / 2;
+    // The ground a player needs on stepping through each doorway: the gap
+    // widened by a body either side, running APPROACH_YD in from the wall.
+    // A field further down the court may sit on that x span; what it may
+    // not do is crowd the doorway itself.
+    const APPROACH_YD = 3.5;
+    const approaches = [
+      {
+        name: 'court doorway',
+        x0: DAWNHOLD_COURT_GATE.a0 - 0.6,
+        x1: DAWNHOLD_COURT_GATE.a1 + 0.6,
+        z0: inZ1 - APPROACH_YD,
+        z1: inZ1,
+      },
+      {
+        name: 'garden postern',
+        x0: DAWNHOLD_GATES.postern.a0 - 0.6,
+        x1: DAWNHOLD_GATES.postern.a1 + 0.6,
+        z0: inZ0,
+        z1: inZ0 + APPROACH_YD,
+      },
+    ];
+    // shortest distance from a circle centre to an axis-aligned rect
+    const gap = (
+      f: { x: number; z: number },
+      r: { x0: number; x1: number; z0: number; z1: number },
+    ): number =>
+      Math.hypot(Math.max(r.x0 - f.x, 0, f.x - r.x1), Math.max(r.z0 - f.z, 0, f.z - r.z1));
+    expect(DAWNHOLD_BEDS.length, 'the court is planted').toBeGreaterThanOrEqual(5);
+    for (const [i, f] of DAWNHOLD_BEDS.entries()) {
+      const at = `field ${i} (${f.x},${f.z}) r ${f.r}`;
+      expect(f.x - f.r, `${at} west wall`).toBeGreaterThan(inX0);
+      expect(f.x + f.r, `${at} east wall`).toBeLessThan(inX1);
+      expect(f.z - f.r, `${at} curtain`).toBeGreaterThan(inZ0);
+      expect(f.z + f.r, `${at} south wall`).toBeLessThan(inZ1);
+      // the statue's bare apron
+      const sd = Math.hypot(f.x - DAWNHOLD_COURT_STATUE.x, f.z - DAWNHOLD_COURT_STATUE.z);
+      expect(sd, `${at} clears the statue`).toBeGreaterThan(f.r);
+      // neither doorway's approach is planted over
+      for (const a of approaches) {
+        expect(gap(f, a), `${at} crowds the ${a.name}`).toBeGreaterThan(f.r);
+      }
+      for (const [j, g] of DAWNHOLD_BEDS.entries()) {
+        if (j <= i) continue;
+        expect(
+          Math.hypot(f.x - g.x, f.z - g.z),
+          `${at} overlaps field ${j}`,
+        ).toBeGreaterThanOrEqual(f.r + g.r);
+      }
     }
   });
 

@@ -11,7 +11,7 @@
 // Last Keep there is no terraced ward: one paved garrison bailey with the
 // keep composed against its hall wing on the north side. The flowers live
 // in the walled flower court off the south wall (the garden postern opens
-// into it), parterre beds around a hedge wolf statue.
+// into it), five planted fields around a leafy fox statue.
 // Pure leaf: deterministic, no rng, no SimContext.
 
 export const DAWNHOLD = {
@@ -51,7 +51,7 @@ export const DAWNHOLD_GATES = {
 // The walled flower court off the castle's south wall: the curtain closes
 // its north side, three lower garden walls (sheer both faces, no walk)
 // close the rest, and a south doorway opens onto the parterre lawn. Inside:
-// two round flower fields either side of the hedge wolf statue.
+// five round flower fields around the leafy fox statue.
 // The x span is three wall modules wide so the court's own centre (274.5)
 // lands on a module CENTRE: the south doorway renders as a real arch there
 // and the statue stands on that axis. The west wall stops at x 264, clear
@@ -71,7 +71,7 @@ export const DAWNHOLD_COURT = {
 /** the court's south doorway span (x), on its wall's own module centre */
 export const DAWNHOLD_COURT_GATE = { a0: 273.2, a1: 275.8 } as const;
 
-/** the hedge wolf statue, on the court's centre and its doorway axis */
+/** the leafy fox statue, on the court's centre and its doorway axis */
 export const DAWNHOLD_COURT_STATUE = { x: 274.5, z: 931 } as const;
 
 export interface DawnholdTower {
@@ -145,19 +145,33 @@ export const DAWNHOLD_BUILDINGS: readonly DawnholdBuilding[] = [
   { key: 'hexTowerCatapult', x: 268, z: 915, rot: Math.PI, scale: 7, r: 3.8, h: 12 },
 ] as const;
 
-/**
- * The flower court's two planted fields, either side of the hedge wolf.
- * These are procedural FIELDS (garden_parterre_core paints their ground),
- * not modeled parterre beds: they carry no bed model, no collider, and no
- * level pad, because the castle pad already holds this ground dead flat.
- */
-export const DAWNHOLD_BEDS: readonly { x: number; z: number }[] = [
-  { x: 269.5, z: 931 },
-  { x: 279.5, z: 931 },
-] as const;
+export interface DawnholdField {
+  x: number;
+  z: number;
+  /** planted radius */
+  r: number;
+}
 
-/** the planted radius of each court field (bench and light placement) */
-export const DAWNHOLD_FIELD_R = 4.4;
+/**
+ * The flower court's planted fields, arranged around the leafy fox: two
+ * majors flanking it on the cross axis, a crescent under the curtain, and
+ * a smaller pair in the south corners. These are procedural FIELDS
+ * (garden_parterre_core paints their ground), not modeled parterre beds:
+ * they carry no bed model, no collider, and no level pad, because the
+ * castle pad already holds this ground dead flat.
+ *
+ * The two majors keep indices 0 and 1 so their authored colourways do not
+ * shift when a field is appended. Packing is pinned by
+ * tests/dawnhold_grounds.ts: every field clears the walls, both doorway
+ * lanes, and each other.
+ */
+export const DAWNHOLD_BEDS: readonly DawnholdField[] = [
+  { x: 269.1, z: 931, r: 3.4 },
+  { x: 279.9, z: 931, r: 3.4 },
+  { x: 274.5, z: 926.3, r: 2.4 },
+  { x: 267.5, z: 936.7, r: 2.2 },
+  { x: 281.5, z: 936.7, r: 2.2 },
+] as const;
 
 /**
  * True inside the curtain walls: the paved garrison bailey. The parade
