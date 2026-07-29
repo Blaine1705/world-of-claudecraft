@@ -36,17 +36,18 @@ export interface AbilityAudioOpts {
   finisher?: boolean;
   /** Spec archetype: heal/buff/cc chime gently instead of booming. */
   archetype?: string;
-  /** Authored buff apply style ('raise' | 'morph' | 'veil'). */
+  /** Authored buff apply style ('raise' | 'morph' | 'veil'). Inert while the
+   *  buff landing is carried by the recorded buff_apply cue; kept so a future
+   *  conformed sample pack can style it again without re-plumbing the seam. */
   buffStyle?: string;
-  /** Spec-authored bespoke sample id (impact.sample), wins over the palette
-   *  identity when the sample pack carries it. */
+  /** Spec-authored bespoke sample id (impact.sample). Inert for the same
+   *  reason as buffStyle: no sampled ability pack ships today. */
   sample?: string;
   /** The spirit creature model ('spirit') or motif name ('motif'). */
   name?: string;
-  /** The casting ability id, so the audio engine can apply a per-ability
-   *  identity override (src/game/ability_sfx_samples.ts ABILITY_AUDIO_OVERRIDES)
-   *  when an ability's sound should differ from its palette default - e.g. a
-   *  green nature bolt that must WHOOSH like wind, not crackle like fire. */
+  /** The casting ability id, so the audio engine can resolve the ability's
+   *  school and projectile flag and skip any moment a hand-recorded cue
+   *  already sounds (src/game/ability_sfx_coverage.ts). */
   abilityId?: string;
 }
 
