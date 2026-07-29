@@ -84,6 +84,7 @@ import {
   buildCharacterList,
   configureCharactersRuntime,
   purgeDeletedCharacterWorldState,
+  rekeyReclaimedCharacterWorldState,
 } from './characters';
 import {
   claudiumPreAuthMutationRateLimited,
@@ -1540,8 +1541,23 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           // account, free it (the orphaned character is archived) and retry once;
           // otherwise it is genuinely taken. This is the self-service path that
           // replaces the hidden admin-only reactivate/force-rename recovery.
-          if (!(await reclaimDeactivatedName(name)))
+          const reclaimed = await reclaimDeactivatedName(name);
+          if (!reclaimed)
             return json(res, 409, { error: 'that name is taken', code: 'character.name_taken' });
+          // The SAME post-reclaim world-state rekey the migrated create arm
+          // runs, through the shared helper, so a legacy rollback keeps it.
+          await rekeyReclaimedCharacterWorldState(
+            {
+              rekeyMarketSeller: (id, oldName, newName) =>
+                liveGame().rekeyMarketSeller(id, oldName, newName),
+              saveMarket: () => liveGame().saveMarket(),
+              rekeyMailOwner: (id, oldName, newName) =>
+                liveGame().rekeyMailOwner(id, oldName, newName),
+              saveMail: () => liveGame().saveMail(),
+            },
+            reclaimed,
+            name,
+          );
           try {
             const c = await create();
             if (!c)

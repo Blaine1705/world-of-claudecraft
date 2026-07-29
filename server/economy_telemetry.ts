@@ -158,8 +158,9 @@ export function harvestBandForNode(nodeId: string): HarvestBand {
  * the harvest series.
  *
  * Why the harvest counter needs it (R31): the zone band alone cannot separate a
- * level-1 traveler standing on Eastbrook's tier-1 faucet from a capped player
- * working the tier-2 and tier-3 veins in the same zone, and those two are the
+ * level-1 traveler working Thornpeak's tier-1 faucet from a capped player
+ * working the tier-2 and tier-3 veins beside it (Eastbrook ships tier-1
+ * ground only, so the zones where the question arises are the later two), and those two are the
  * opposite sides of the question the series exists to answer. Zones x tiers is
  * nine series, and the combinations no live node fills (Eastbrook has no tier-3
  * ground) sit at a permanent, honest zero.

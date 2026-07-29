@@ -288,6 +288,27 @@ export function buildCharacterList(
 }
 
 /**
+ * The world-state rekey that follows a successful deactivated-name reclaim: the
+ * orphaned holder was just archived out of the freed name (a rename in effect),
+ * so its legacy name-keyed market rows and mailbox move onto the stable id plus
+ * the archived name, exactly like renameHandler's rekeys. Without this, the
+ * next holder of the display name could claim the orphan's escrow through the
+ * name-fallback read arms. Exported so BOTH create dispatch arms share it.
+ */
+export async function rekeyReclaimedCharacterWorldState(
+  rt: Pick<CharactersRuntime, 'rekeyMarketSeller' | 'saveMarket' | 'rekeyMailOwner' | 'saveMail'>,
+  reclaimed: { id: number; archivedName: string },
+  freedName: string,
+): Promise<void> {
+  if (rt.rekeyMarketSeller(reclaimed.id, freedName, reclaimed.archivedName)) {
+    await rt.saveMarket();
+  }
+  if (rt.rekeyMailOwner(reclaimed.id, freedName, reclaimed.archivedName)) {
+    await rt.saveMail();
+  }
+}
+
+/**
  * The world-state purge that follows a successful character delete (R43). A deleted
  * character can never collect again, so its World Market listings, its Merchant
  * collection, and its Ravenpost mailbox leave the realm's shared books here instead
@@ -302,8 +323,11 @@ export function buildCharacterList(
  * would re-persist its own un-purged copy. The two saves are deliberately NOT one
  * transaction (unlike the leave path, whose atomicity guards an item duplicating
  * between a bag and its escrow): a market listing and a mail parcel are independent
- * escrows, each half is idempotent, and the autosave re-persists both, so a crash
- * between them costs at most half a purge for thirty seconds.
+ * escrows and each half is idempotent. The autosave bounds a SAVE FAILURE (the
+ * wrappers swallow write errors; memory re-persists within thirty seconds); a
+ * process CRASH between the two saves loses the un-saved half permanently, the
+ * same unrecoverable window the delete handler's comment records, because the
+ * committed row delete leaves nothing to re-trigger the purge.
  *
  * Exported so BOTH delete dispatch arms share one behavior: this module's
  * deleteHandler and the retained legacy ladder arm in main.ts (the API_DISPATCH=legacy
@@ -461,10 +485,12 @@ async function createCharacterHandler(ctx: Ctx): Promise<void> {
     if (!isUniqueViolation(err)) throw err;
     // The name collided. Free it if held only by a deactivated account, then retry
     // once; otherwise it is genuinely taken.
-    if (!(await charactersDb.reclaimDeactivatedName(name))) {
+    const reclaimed = await charactersDb.reclaimDeactivatedName(name);
+    if (!reclaimed) {
       json(ctx.res, 409, NAME_TAKEN);
       return;
     }
+    await rekeyReclaimedCharacterWorldState(rt, reclaimed, name);
     try {
       const c = await create();
       if (!c) {

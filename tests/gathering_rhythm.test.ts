@@ -797,6 +797,75 @@ describe('a fully absorbed hit still ends a session (and still pushes no spell b
   });
 });
 
+describe('a BLOCKED swing still ends a session (and still pushes no spell back)', () => {
+  // kind 'block' lands at least one point of damage and still rolls its
+  // knockback rider, so it must end a session exactly like a clean hit;
+  // spell pushback keeps its classic hit-only gate.
+  it('a blocked hit cancels a gather cast', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Blocker');
+    sim.addItem('copper_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, NODE.id);
+    expect(sim.harvestNode(NODE.id, pid)).toBe(true);
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    const template = MOBS.forest_wolf;
+    const wolf = createMob(999906, template, template.maxLevel, { ...p.pos });
+    sim.entities.set(wolf.id, wolf);
+    sim.drainEvents();
+    sim.dealDamage(wolf, p, 1, false, 'physical', null, 'block', true);
+    expect(p.castingAbility).toBe(null);
+    expect(p.gatherCastNodeId).toBe('');
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'castStop', success: false }),
+    );
+  });
+
+  it('a blocked hit cancels a fishing session, absorbed or not', () => {
+    const sim = makeSim();
+    const meta = mustMeta(sim, sim.playerId);
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    p.auras.push({
+      id: 'test_absorb',
+      name: 'Test Barrier',
+      kind: 'absorb',
+      value: 100,
+      remaining: 30,
+      duration: 30,
+      sourceId: p.id,
+      school: 'arcane',
+    } as Entity['auras'][number]);
+    const hpBefore = p.hp;
+    const template = MOBS.forest_wolf;
+    const wolf = createMob(999907, template, template.maxLevel, { ...p.pos });
+    sim.entities.set(wolf.id, wolf);
+    sim.dealDamage(wolf, p, 5, false, 'physical', null, 'block', true);
+    expect(p.hp).toBe(hpBefore); // fully absorbed block
+    expect(p.castingAbility).toBe(null);
+    expect(p.fishCastZoneId).toBe('');
+  });
+
+  it('a blocked hit still pushes no SPELL back', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Chanter');
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    const template = MOBS.forest_wolf;
+    const wolf = createMob(999908, template, template.maxLevel, { ...p.pos });
+    sim.entities.set(wolf.id, wolf);
+    p.castingAbility = 'fireball';
+    p.castTotal = 2;
+    p.castRemaining = 2;
+    sim.dealDamage(wolf, p, 5, false, 'physical', null, 'block', true);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.castRemaining).toBe(2);
+  });
+});
+
 describe('the reel window follows the rod held at BITE time, not cast start', () => {
   // The window re-scans the rod when the bite fires (fishing.ts documents the
   // re-scan); these two arms kill a cached-at-cast-start implementation from

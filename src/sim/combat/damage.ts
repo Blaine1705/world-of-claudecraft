@@ -489,8 +489,11 @@ export function dealDamage(
       target.hp = 1;
       // The duel-terminal early return skips the shared tail below, including
       // the landed-hit session cancel: without this a duel-ending blow left
-      // the loser fishing at 1 hp. Spell casts keep the classic no-cancel
-      // (the tail's pushback never applied to this terminal hit either).
+      // the loser fishing at 1 hp. Unconditional on kind/amount BY DESIGN: a
+      // duel ends only on the opponent's landed clamped blow (blocked or
+      // not), so the tail's gates are implied here. Spell casts keep the
+      // classic no-cancel (the tail's pushback never applied to this
+      // terminal hit either).
       if (isNonSpellCast(target.castingAbility)) ctx.cancelCast(target);
       ctx.emit({
         type: 'damage',
@@ -898,18 +901,23 @@ export function dealDamage(
       source &&
       source.id !== target.id &&
       (amount > 0 || totalAbsorbed > 0) &&
-      kind === 'hit'
+      (kind === 'hit' || kind === 'block')
     ) {
       // A non-spell cast (fishing/gather) cancels outright instead of pushing
-      // back, and the hit counts even when a shield soaked ALL of it: an
-      // absorbed hit still landed, so it ends the session exactly like an
-      // unabsorbed one (its knockback displacement stands regardless; the
-      // physics never branched on absorb). Spell pushback keeps the classic
-      // rule: a fully absorbed hit pushes nothing back. The Demon Heal
-      // channel is deliberately NOT folded in: it takes the normal channel
-      // pushback below, as today.
+      // back, and the hit counts even when a shield soaked ALL of it or a
+      // block took the edge off: a blocked swing still lands at least a
+      // point of damage and still rolls its knockback rider, so it ends the
+      // session exactly like a clean hit (miss/dodge/parry never reach this
+      // arm at all). Spell pushback keeps the classic kind gate below: only
+      // an unblocked, unabsorbed hit pushes a cast back, exactly as before
+      // this arm widened. The Demon Heal channel is deliberately NOT folded
+      // in: it takes the normal channel pushback below, as today.
       if (isNonSpellCast(target.castingAbility)) ctx.cancelCast(target);
-      else if (amount > 0 && !ignoresDamagePushback(ctx, target, target.castingAbility)) {
+      else if (
+        amount > 0 &&
+        kind === 'hit' &&
+        !ignoresDamagePushback(ctx, target, target.castingAbility)
+      ) {
         ctx.pushbackCast(target);
       }
     }

@@ -662,6 +662,16 @@ export class PostOffice {
     const key = String(characterId);
     let changed = false;
     for (const m of this.mail) {
+      // A rename (or a deactivated-name reclaim, which is a rename in
+      // effect) frees oldName for a stranger, so this character's own
+      // pre-senderKey OUTGOING letters get the stable id and the new
+      // display name: a later return flight must follow the character, not
+      // whoever takes the freed name (the purge's stamp, same reasoning).
+      if (m.kind === 'player' && m.senderKey === undefined && m.senderName === oldName) {
+        m.senderKey = key;
+        m.senderName = newName;
+        changed = true;
+      }
       if (m.recipientKey === key || m.recipientKey === oldName || m.recipientKey === newName) {
         if (m.recipientKey !== key || m.recipientName !== newName) changed = true;
         const oldKey = m.recipientKey;
@@ -715,9 +725,20 @@ export class PostOffice {
     let changed = false;
     for (let i = this.mail.length - 1; i >= 0; i--) {
       const m = this.mail[i];
-      // The outgoing stamp (see the header): pre-senderKey mail this
-      // character SENT gets the stable id while the book is being walked.
-      if (m.senderKey === undefined && name !== '' && m.senderName === name) {
+      // The outgoing stamp (see the header): pre-senderKey PLAYER mail this
+      // character sent gets the stable id while the book is being walked.
+      // Player-kind only: system/npc mail has no senderKey by construction
+      // and never returns, and an authored sender name that happens to match
+      // a player name must not be re-attributed. A pre-#2450 letter from a
+      // PRIOR holder of this name is stamped with the wrong id, an accepted
+      // ambiguity: its eventual return then self-destructs on the dead id
+      // instead of reaching whoever holds the name next, the lesser wrong.
+      if (
+        m.kind === 'player' &&
+        m.senderKey === undefined &&
+        name !== '' &&
+        m.senderName === name
+      ) {
         m.senderKey = key;
         changed = true;
       }
@@ -728,6 +749,11 @@ export class PostOffice {
       // for a letter persisted before senderKey existed.
       const homeKey = m.senderKey ?? m.senderName;
       if (m.kind === 'player' && escrowed && !m.returned && !owns(homeKey)) {
+        // Normalize a legacy name-keyed address to the stable id BEFORE the
+        // flight: returnToSender records the outgoing address as the new
+        // senderKey, and that field must never hold a reclaimable display
+        // name (its own comment promises stable-id by construction).
+        m.recipientKey = key;
         this.returnToSender(m, now);
         continue;
       }
@@ -796,14 +822,17 @@ export class PostOffice {
         if (kind === 'player' && ITEMS[item.itemId]?.soulbound) returnedItems.push(item);
         else retainedItems.push(item);
       }
-      // Migration for player parcels sent before an item became soulbound. The
-      // persisted model has no stable sender key, so return only the newly bound
-      // stacks to the senderName-keyed mailbox. Mark the return as system mail so
-      // a serialize/load round trip never returns it again. Ordinary items and
-      // attached coin remain on the original letter.
+      // Migration for player parcels sent before an item became soulbound.
+      // Keyed by the STABLE sender id whenever the row carries one (#2450);
+      // the display-name fallback serves only rows persisted before ids
+      // existed, and a name key here is reclaim-exposed (system mail with
+      // attachments never expires), so the fallback must stay the exception.
+      // Mark the return as system mail so a serialize/load round trip never
+      // returns it again. Ordinary items and attached coin remain on the
+      // original letter.
       if (returnedItems.length > 0) {
         returnedParcels.push({
-          recipientKey: senderName,
+          recipientKey: senderKey ?? senderName,
           recipientName: senderName,
           senderName: recipientName,
           kind: 'system',

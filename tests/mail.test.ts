@@ -689,6 +689,10 @@ describe('purgeMailOwner - deleting a character', () => {
     expect(legacy.recipientKey).toBe(aliceKey);
     expect(legacy.copper).toBe(250);
     expect(legacy.returned).toBe(true);
+    // The NAME-keyed legacy parcel's return identity is the STABLE id: the
+    // purge normalizes the address before the flight, so returnToSender
+    // never records a reclaimable display name as the new senderKey.
+    expect((legacy as { senderKey?: string }).senderKey).toBe(DOOMED_KEY);
     const goods = letterBy(sim, (m) => m.subject === 'Goods', 'goods-only parcel');
     expect(goods.recipientKey).toBe(aliceKey);
     expect(goods.copper).toBe(0);
@@ -783,6 +787,75 @@ describe('purgeMailOwner - deleting a character', () => {
     // id stamped in place of the reclaimable name.
     const outgoing = letterBy(sim, (m) => m.subject === 'OldOutgoing', 'outgoing letter');
     expect(outgoing.senderKey).toBe(DOOMED_KEY);
+    // (d) the returned legacy parcel's new sender identity is the STABLE id,
+    // never the reclaimable display name (returnToSender records the
+    // outgoing address as senderKey, so the purge normalizes it first).
+    const oldParcel = letterBy(sim, (m) => m.subject === 'OldParcel', 'old parcel');
+    expect(oldParcel.senderKey).toBe(DOOMED_KEY);
+  });
+
+  it('the outgoing stamp is player-kind only: authored mail is never re-attributed', () => {
+    // An authored npc letter whose sender NAME matches the purged character
+    // must not be stamped (system/npc senderKey is absent by construction
+    // and never returns), and a purge that finds nothing else reports no
+    // change, so no spurious save fires.
+    const sim = makeWorld();
+    sim.addPlayer('warrior', 'Doomed', { characterId: DOOMED_ID });
+    const bob = sim.addPlayer('rogue', 'Bob', { characterId: 502 });
+    const bobMeta = sim.meta(bob);
+    if (!bobMeta) throw new Error('no meta');
+    sim.postOffice.sendLetter(
+      sim.postOffice.mailKeyFor(bobMeta),
+      'Bob',
+      { ...QUEST_LETTERS.q_wolves },
+      'npc',
+    );
+    for (const m of bookOf(sim)) {
+      if ((m as { letterId?: string }).letterId === QUEST_LETTERS.q_wolves.letterId) {
+        m.senderName = 'Doomed';
+      }
+    }
+
+    // First purge clears the join welcome letter; the SECOND finds only the
+    // name-matched authored letter, which must count as no change (no
+    // stamp, no spurious save).
+    sim.purgeMailOwner(DOOMED_ID, 'Doomed');
+    expect(sim.purgeMailOwner(DOOMED_ID, 'Doomed')).toBe(false);
+    const authored = letterBy(
+      sim,
+      (m) => (m as { letterId?: string }).letterId === QUEST_LETTERS.q_wolves.letterId,
+      'authored letter',
+    );
+    expect(authored.senderKey).toBeUndefined();
+  });
+
+  it('a rename (or name reclaim) stamps the character pre-senderKey outgoing mail', () => {
+    // rekeyMailOwner frees oldName for a stranger exactly like the delete
+    // purge does, so the same outgoing stamp applies: the letter follows
+    // the character (stable id, new display name), not the freed name.
+    const sim = makeWorld();
+    const alice = sim.addPlayer('mage', 'Alice', { characterId: 501 });
+    const bob = sim.addPlayer('rogue', 'Bob', { characterId: 502 });
+    const aliceMeta = sim.meta(alice);
+    const bobMeta = sim.meta(bob);
+    if (!aliceMeta || !bobMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    sim.mailSendResolved(
+      { key: sim.postOffice.mailKeyFor(bobMeta), name: 'Bob' },
+      'FromAlice',
+      'Hello.',
+      50,
+      [],
+      alice,
+    );
+    for (const m of bookOf(sim)) {
+      if (m.subject === 'FromAlice') m.senderKey = undefined; // pre-#2450 shape
+    }
+
+    expect(sim.rekeyMailOwner(501, 'Alice', 'Zelda')).toBe(true);
+    const letter = letterBy(sim, (m) => m.subject === 'FromAlice', 'outgoing letter');
+    expect(letter.senderKey).toBe('501');
+    expect(letter.senderName).toBe('Zelda');
   });
 
   it('deletes a parcel whose return flight already ran rather than sending it round again', () => {

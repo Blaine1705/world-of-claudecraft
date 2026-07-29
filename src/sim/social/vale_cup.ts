@@ -749,6 +749,11 @@ function placeCupFighter(
   e: Entity,
   spot: { x: number; z: number; facing: number },
 ): void {
+  // Every kickoff placement is a hard teleport: match start and teardown
+  // arrive pre-cleared through resetForArena, but the golden-goal restart
+  // and the goal reset do not, and a fighter can legally start a gather
+  // cast on the herb node inside the pitch during the celebrate window.
+  cancelProfessionSessionOnDisplacement(ctx, e);
   e.pos = ctx.groundPos(spot.x, spot.z);
   e.prevPos = { ...e.pos };
   e.facing = spot.facing;

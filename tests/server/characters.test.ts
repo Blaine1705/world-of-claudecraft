@@ -613,7 +613,7 @@ describe('create handler', () => {
       createCharacterCapped: async () => {
         throw { code: '23505' };
       },
-      reclaimDeactivatedName: async () => false,
+      reclaimDeactivatedName: async () => null,
     });
     const res = await callHandler('POST', '/api/characters', {
       account: { accountId: 7, scope: 'full' },
@@ -635,8 +635,13 @@ describe('create handler', () => {
       .fn()
       .mockRejectedValueOnce({ code: '23505' })
       .mockResolvedValueOnce(created);
-    const reclaimDeactivatedName = vi.fn(async () => true);
+    const reclaimDeactivatedName = vi.fn(async () => ({ id: 900, archivedName: 'Valida' }));
     setCharactersDbForTests({ createCharacterCapped, reclaimDeactivatedName });
+    const rekeyMarketSeller = vi.fn(() => true);
+    const rekeyMailOwner = vi.fn(() => true);
+    const saveMarket = vi.fn(async () => {});
+    const saveMail = vi.fn(async () => {});
+    installRuntime({ rekeyMarketSeller, rekeyMailOwner, saveMarket, saveMail });
     const res = await callHandler('POST', '/api/characters', {
       account: { accountId: 7, scope: 'full' },
       body: { name: 'Valid', class: 'warrior' },
@@ -645,6 +650,13 @@ describe('create handler', () => {
     expect(res.body).toMatchObject({ id: 11, name: 'Valid', forceRename: false });
     expect(reclaimDeactivatedName).toHaveBeenCalledTimes(1);
     expect(createCharacterCapped).toHaveBeenCalledTimes(2);
+    // The reclaim is a rename in effect: the orphaned holder's world state
+    // moved onto its archived identity BEFORE the freed name was reissued,
+    // and each changed book was persisted.
+    expect(rekeyMarketSeller).toHaveBeenCalledWith(900, 'Valid', 'Valida');
+    expect(rekeyMailOwner).toHaveBeenCalledWith(900, 'Valid', 'Valida');
+    expect(saveMarket).toHaveBeenCalledTimes(1);
+    expect(saveMail).toHaveBeenCalledTimes(1);
   });
 
   it('409s when the reclaimed name collides AGAIN on the retry (second 23505)', async () => {
@@ -652,7 +664,10 @@ describe('create handler', () => {
       .fn()
       .mockRejectedValueOnce({ code: '23505' })
       .mockRejectedValueOnce({ code: '23505' });
-    setCharactersDbForTests({ createCharacterCapped, reclaimDeactivatedName: async () => true });
+    setCharactersDbForTests({
+      createCharacterCapped,
+      reclaimDeactivatedName: async () => ({ id: 901, archivedName: 'Valida' }),
+    });
     const res = await callHandler('POST', '/api/characters', {
       account: { accountId: 7, scope: 'full' },
       body: { name: 'Valid', class: 'warrior' },
@@ -683,7 +698,10 @@ describe('create handler', () => {
       .fn()
       .mockRejectedValueOnce({ code: '23505' })
       .mockResolvedValueOnce(null);
-    setCharactersDbForTests({ createCharacterCapped, reclaimDeactivatedName: async () => true });
+    setCharactersDbForTests({
+      createCharacterCapped,
+      reclaimDeactivatedName: async () => ({ id: 901, archivedName: 'Valida' }),
+    });
     const res = await callHandler('POST', '/api/characters', {
       account: { accountId: 7, scope: 'full' },
       body: { name: 'Valid', class: 'warrior' },
@@ -701,7 +719,10 @@ describe('create handler', () => {
       .fn()
       .mockRejectedValueOnce({ code: '23505' })
       .mockRejectedValueOnce(new Error('db exploded on retry'));
-    authedDb({ createCharacterCapped, reclaimDeactivatedName: async () => true });
+    authedDb({
+      createCharacterCapped,
+      reclaimDeactivatedName: async () => ({ id: 902, archivedName: 'Valida' }),
+    });
     const r = await runRoute('POST', '/api/characters', {
       body: { name: 'Valid', class: 'warrior' },
     });

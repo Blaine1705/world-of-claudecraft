@@ -426,6 +426,87 @@ the channel pass 2 found missing.
 Build: ultracode (many interacting exit paths; fan out per path and
 adversarially verify). QA: ultracode, new session.
 
+BUILT 2026-07-28 (ultracode). All twelve items landed with tests, every
+sim and server change mutation-checked one at a time. The build ran its
+own adversarial pass per the header: thirteen refuter lenses fanned over
+every session exit path and item claim, plus six domain reviewers
+(architecture, cross-platform-sync, migration-safety,
+database-performance, privacy-security, test-coverage). Every finding of
+every wave was applied, including two real cancel gaps the refuters
+found beyond the enumerated paths (the Vale Cup pitch-police eject,
+which can sweep a bystander harvesting the herb node inside the Sowfield
+bounds, and the duel-terminal 1 hp clamp, whose early return skipped the
+landed-hit cancel), and the fix rounds were re-reviewed by three fresh
+lenses. The fix-round refuters then found and the build closed four
+more: a BLOCKED swing (kind 'block', at least one point of damage, the
+knockback rider still rolling) now ends a session like a clean hit
+(spell pushback keeps its classic hit-only gate); the Vale Cup
+golden-goal and goal-reset kickoff placements run the displacement
+cancel (fighters can legally gather the pitch herb during the goal
+pause); a deactivated-name reclaim now runs the SAME market/mail rekeys
+a rename runs (a reclaim IS a rename of the orphaned holder, and
+without it a name-reclaimer could collect the orphan's escrow through
+the name-fallback read arms, from both create dispatch arms); and the
+mail book's pre-#2450 name exposure was hardened end to end (the rename
+rekey stamps outgoing letters like the purge does, the purge normalizes
+a name-keyed address to the stable id before its return flight, the
+stamp is player-kind only, and the boot-time soulbound migration keys
+its minted return by the stable sender id whenever the row carries
+one).
+
+Item notes beyond the texts: item 5's rod gate pins the probe zone on a
+fourth hidden Entity field (`fishCastZoneId`) consumed by the catch
+table, the deed credit, and the telemetry, and the displacement helper's
+scope is stated exactly (arena-family placements clear sessions in their
+own resets; a same-zone tow, a damage-free knockback, and a flight in
+progress do not cancel, bounded by the pin). Item 8's second clause is a
+persisted per-pair record (`professions/hobby_memory.ts`, the tier-mail
+shape) with a mode-blind restore at all three transition entry points,
+plus a cprof-mirrored `questedHobbies` view field so the attunement
+preview promises the hobby a return will actually restore. Item 10's
+node-tier consideration resolved YES (zones x 3 tiers, nine series);
+casts ride the generic castStart observer (post-tick, accepting a
+one-tick edge on same-tick cancels); the koi counter is a strict subset
+beside the catch counter; the telemetry vocabularies deliberately read
+BUILTIN content as a stated exception to item 9's sweep. Item 12 purges
+the LIVE realm books (a blob-only edit would lose to the 30 s autosave),
+from both dispatch arms through one shared helper; the mail purge
+preserves the return-flight invariant (four delete categories, one
+return category), stamps the deleted character's own pre-#2450 outgoing
+letters with the stable id so a return cannot land on a reclaimed name,
+and its comments state honestly that the senderName fallback is the live
+path for every letter written before this release. A bags-full catch
+now emits the got-away event, giving that branch two player lines on
+purpose (the transient error carries the reason, the durable log line
+records the loss).
+
+SURFACED FOR THE RULINGS LEDGER (found by the adversarial pass, not
+decided in the build, not filed): (a) whether a BLOCKED hit should push
+a SPELL cast back (the session cancel now covers blocks; classic
+pushback stays hit-only, unchanged); (b) the cross-grade spend
+order collides R24 with the base-before-fine grade plan: a SIGNED
+base-grade specimen is consumed while plain fine-grade copies that could
+pay survive, and any reorder must move `consumeOneScratch` and the
+`removePreferFungible` call pattern together or it re-opens the
+over-capacity class; (c) whether a damage-free hostile knockback
+(Typhoon) or a leap/charge flight crossing a zone line should cancel a
+session (the pinned zone bounds the harm today); (d) the daily-reward
+activity loop still accrues for linkdead sessions, R44's sibling
+surface; (e) turn-in consumes a boundTo instanced copy with no exemption
+(latent: no shipped path binds a collect item), where vendor sell and
+trade both spare bound copies.
+
+Recorded-only (pre-existing or operational, no packet change): the five
+unindexed FK columns that dominate the character-delete cost; the
+crash-window between the committed DELETE and the blob saves (the purge
+narrows the pre-existing leak; a boot sweep could close it); a
+pre-feature binary rollback drops `questedHobbies` one way; the
+pre-existing delve member sweep counts any-delve presence as this-run
+presence; `ctx.completeFishing` is a zero-consumer seam member; and one
+shared-worktree interleave swept three concurrent hunks into the
+session-cancel commit (its message amendment was declined, so the note
+lives here).
+
 Implements R24 through R29 on the executable paths:
 
 1. Turn-in spend order (R24): instanced-last consumption at

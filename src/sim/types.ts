@@ -4142,10 +4142,11 @@ export type SimEvent = { pid?: number } & (
   // catch found no bag room (that branch spent its table draw and lost the
   // catch, so it IS a got-away). Personal and text-free like fishingBite:
   // the client renders its own localized got-away line off the type alone,
-  // which on the bags-full branch means TWO lines on purpose: the transient
-  // bags-full error toast carries the reason and this event's durable log
-  // line records the loss. Costs nothing but the ended cast; recast
-  // immediately. zoneId/band mirror fishingResult, for the telemetry.
+  // which on the bags-full branch means DOUBLED feedback on purpose: the
+  // bags-full error (a toast the HUD also mirrors into the chat log)
+  // carries the reason, and this event's line records the loss. Costs
+  // nothing but the ended cast; recast immediately. zoneId/band mirror
+  // fishingResult, for the telemetry.
   | { type: 'fishingGotAway'; pid: number; zoneId: string; band: 0 | 1 | 2 }
   // Fishing empty hook (Professions 2.0): the single table draw resolved
   // the itemId: null row (nothing was biting). Telemetry-only sibling of

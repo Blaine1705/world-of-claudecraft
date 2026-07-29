@@ -2702,7 +2702,9 @@ export async function createCharacterCapped(
 // was released; the caller then retries the create. Race-safe: the holder row
 // is locked FOR UPDATE and the (realm, lower(name)) unique index is the real
 // guard on the subsequent insert.
-export async function reclaimDeactivatedName(name: string): Promise<boolean> {
+export async function reclaimDeactivatedName(
+  name: string,
+): Promise<{ id: number; archivedName: string } | null> {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -2717,7 +2719,7 @@ export async function reclaimDeactivatedName(name: string): Promise<boolean> {
     // Free already, held by a live account, or under a moderation ban: nothing to reclaim.
     if (!row || row.deactivated_at == null || row.banned_at != null) {
       await client.query('ROLLBACK');
-      return false;
+      return null;
     }
     // Find an archival placeholder for the orphaned character that collides with
     // no other name in this realm (case-insensitive), mirroring the dedupe scheme.
@@ -2735,7 +2737,11 @@ export async function reclaimDeactivatedName(name: string): Promise<boolean> {
       [row.id, freed],
     );
     await client.query('COMMIT');
-    return true;
+    // The caller must rekey the freed name's world state (market, mail) to
+    // the archived identity, exactly like a rename: a reclaim IS a rename of
+    // the orphaned holder, and the freed display name is about to belong to
+    // a stranger.
+    return { id: row.id, archivedName: freed };
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     throw err;

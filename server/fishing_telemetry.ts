@@ -14,8 +14,10 @@
 // derived from a catch count alone. Casts are the denominator: casts minus
 // catches minus empty hooks minus got-aways is the sessions still in flight
 // PLUS every session that ended without an outcome event (cancelled by a
-// hit, a teleport, or the angler's own movement), so the residual grows in
-// steady state and is a cancellation gauge, never a zero-check.
+// hit, a teleport, or the angler's own movement, plus the once-ever
+// codfather quest catch, which returns before any outcome event), so the
+// residual grows in steady state and is a cancellation gauge, never a
+// zero-check.
 //
 // THE ZONE VOCABULARY IS HARVEST_BANDS, deliberately reused rather than
 // re-derived: a fishing zone and a harvest zone are the same ZoneDef list, and
@@ -70,8 +72,8 @@ export function fishingBandLabel(band: 0 | 1 | 2): FishingBandLabel {
 }
 
 /**
- * The rod recipes whose training fee is counted, derived from content so the
- * label set cannot drift from what a trainer actually teaches. Exactly the two
+ * The rod recipes whose training fee is counted, derived from the rod recipe
+ * list so the label set cannot drift from the shipped rods. Exactly the two
  * trainer-taught rods today (recipe_stormreel_fishing_rod at skillReq 75 and
  * recipe_tidewrought_fishing_rod at 125); a third rod extends the label set by
  * construction and the exporter pre-seeds it to zero.

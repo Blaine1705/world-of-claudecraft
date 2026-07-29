@@ -269,11 +269,13 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // fully self-guards (only an armed fishing session passes), so hoisting it
   // cannot swallow any other busy state. The hoist also puts the reel above
   // the SWIMMING denial, and that skip is deliberate too: no reachable path
-  // leaves an armed session on a swimming angler (movement cancels the cast,
-  // a landed hit cancels even fully absorbed, and every teleport or /follow
-  // tow cancels through the displacement helper), so re-checking here would
-  // guard a state that cannot occur; if a damage-free displacement ever
-  // ships, wire it into professions/session_teardown.ts rather than here.
+  // leaves an armed session on a swimming angler, and the OPERATIVE
+  // guarantee is the deep-water clamp every displacement walker carries
+  // (the follow walk, applyKnockback, and the leap landing all refuse
+  // ground below waterLevel minus PLAYER_SWIM_DEPTH, the same threshold
+  // isSwimming reads), with self-movement cancelling and every landed hit,
+  // blocked or fully absorbed, cancelling too. A future displacement that
+  // omits that clamp must either keep it or re-check the swim gate here.
   // A re-press BEFORE the bite or AFTER
   // the deadline falls through to the busy error below.
   // Boundary contract (pinned): the reel is valid while ctx.tickCount <=
