@@ -121,7 +121,7 @@ export function hasTerrainSplatAssets(): boolean {
 // (saves four samplers vs. real roughness maps; terrain is never glossy
 // enough for the difference to read at gameplay camera distance).
 const ROUGH_GRASS = 0.8;
-const ROUGH_DIRT = 0.9;
+const ROUGH_DIRT = 0.95; // raised with the gravel blend: packed trail grit, not smooth paint
 const ROUGH_ROCK = 0.75;
 const ROUGH_SAND = 0.85;
 const ROUGH_MUD = 0.62; // wet sheen
@@ -577,6 +577,12 @@ function buildSplatMaterial(
         // gentler onset than rock's cliff threshold
         float dirtWallW = smoothstep(0.1, 0.42, 1.0 - an.y);
         vec3 dirtFlat = mix(texture2D(uDirt, tuv * 0.8).rgb, texture2D(uMud, tuv * 0.8).rgb, vExtra.x);
+        // Trails read as packed grit, not smooth brown paint: fold a
+        // high-frequency rock tap into the dry dirt (no new sampler, the
+        // material sits at 15 of 16). The weight fades with the marsh mud
+        // swap so wet mud keeps its smooth sheen.
+        float gravelW = 0.4 * (1.0 - vExtra.x);
+        dirtFlat = mix(dirtFlat, texture2D(uRock, tuv * 2.8).rgb, gravelW);
         vec3 dirtWall = mix(
           texture2D(uDirt, vWPos.xy * 0.176).rgb,
           texture2D(uDirt, vWPos.zy * 0.176).rgb,
@@ -589,6 +595,20 @@ function buildSplatMaterial(
           texture2D(uRock, vWPos.zy * 0.132).rgb,
           axisW);
         vec3 rockAlb = mix(rockFlat, rockWall, wallW);
+        // Cliff cavity: groundShade's planar AO fades out by slope on purpose
+        // (its XZ projection streaks on banks), which left steep faces
+        // shadeless. Re-sample the rock AO channel through the same
+        // wall-planar frame as the projected rock albedo, so cracks and
+        // ledges darken exactly where the rock says they are. Centred on the
+        // channel's measured mean like wocGroundHeight, so mip averaging
+        // fades it out with distance for free.
+        float wallCav = mix(
+          texture2D(uGroundAO, vWPos.xy * 0.132).b,
+          texture2D(uGroundAO, vWPos.zy * 0.132).b,
+          axisW) - 0.892;
+        groundShade *= mix(
+          1.0, clamp(1.0 + wallCav * 4.5, 0.45, 1.22),
+          vSplatR.z * wallW * (1.0 - vExtra.y));
         vec3 alb = grassAlb * vSplatR.x
                  + dirtAlb * vSplatR.y
                  + rockAlb * vSplatR.z
@@ -628,7 +648,11 @@ function buildSplatMaterial(
         float roughBreak = (macro - 1.0) * (vSplatR.y * 1.4 + vSplatR.z * 0.4 + vSplatR.w * 0.9);
         float roughnessFactor = roughness * clamp(mix(
           dot(vSplatR, vec4(${ROUGH_GRASS}, mix(${ROUGH_DIRT}, ${ROUGH_MUD}, vExtra.x), ${ROUGH_ROCK}, ${ROUGH_SAND})),
-          ${ROUGH_SNOW}, vExtra.y) + roughBreak, 0.35, 1.0);`,
+          ${ROUGH_SNOW}, vExtra.y) + roughBreak, 0.35, 1.0);
+        // Cliff faces at ROUGH_ROCK read sheeny under the low sun: weathered
+        // stone scatters, so steepness pushes rock toward full matte (snow
+        // keeps its own response via the vExtra.y damp).
+        roughnessFactor = mix(roughnessFactor, 0.95, vSplatR.z * wallW * (1.0 - vExtra.y));`,
       )
       .replace(
         '#include <normal_fragment_maps>',
@@ -646,10 +670,14 @@ function buildSplatMaterial(
         // the hard layers share the crisp tap, the soft layers the gentle one.
         vec2 fineHard = texture2D(uRockN, tuv * 2.4).xy * 2.0 - 1.0;
         vec2 fineSoft = texture2D(uGrassN, tuv * 4.0).xy * 2.0 - 1.0;
+        // gravel grain at the trail albedo's own tap scale, so the grit a
+        // path shows is lit rather than painted (gravelW already fades it
+        // with the marsh mud swap)
+        vec2 gvN = texture2D(uRockN, tuv * 2.8).xy * 2.0 - 1.0;
         // wet mud lumps smoothly where dry dirt crumbles
         float dirtDetail = 1.0 - vExtra.x * 0.35;
         vec2 detN = (gN.xy + fineSoft * 0.9) * vSplatR.x * 1.5
-                  + (dN.xy + fineHard * 0.9) * vSplatR.y * 1.8 * dirtDetail
+                  + (dN.xy + fineHard * 0.9 + gvN * gravelW * 1.4) * vSplatR.y * 1.8 * dirtDetail
                   + (rN.xy + fineHard * 0.9) * vSplatR.z * 1.5 * (1.0 - wallW)
                   + (sN.xy + fineSoft * 0.9) * vSplatR.w * 1.1;
         detN *= 1.0 - vExtra.y * 0.7; // snow softens the relief beneath it
@@ -665,7 +693,9 @@ function buildSplatMaterial(
           vec3 rNx = texture2D(uRockN, vWPos.zy * 0.132).xyz * 2.0 - 1.0; // +-x faces
           vec3 rNz = texture2D(uRockN, vWPos.xy * 0.132).xyz * 2.0 - 1.0; // +-z faces
           vec3 wallPerturb = mix(vec3(rNz.x, rNz.y, 0.0), vec3(0.0, rNx.y, rNx.x), axisW);
-          normal = normalize(normal + mat3(viewMatrix) * wallPerturb * (vSplat.z * wallW * 0.8));
+          // 1.1 (was 0.8): the projected relief flattened against the
+          // strengthened planar detail normals and cliffs read smooth
+          normal = normalize(normal + mat3(viewMatrix) * wallPerturb * (vSplat.z * wallW * 1.1));
         }`,
       );
   };
