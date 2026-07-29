@@ -5,7 +5,7 @@
 // the shared types are importable from the barrel without duplication.
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
-import { BUILTIN_WORLD, setActiveWorldContent, STATIONS } from '../src/sim/data';
+import { BUILTIN_WORLD, STATIONS, setActiveWorldContent } from '../src/sim/data';
 import type { ProfessionRecord } from '../src/sim/professions';
 import { emptyCraftSkills } from '../src/sim/professions/wheel';
 import { Sim } from '../src/sim/sim';

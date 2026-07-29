@@ -21,7 +21,6 @@
 
 import type { DelveCompanionInfo } from '../../world_api';
 import { bagsFullError } from '../bags';
-import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { DelveShopGate, DelveShopOffer } from '../data';
 import {
   COMPANION_UPGRADE_COSTS,
@@ -51,6 +50,7 @@ import { isLitanyModuleId, litanyModuleGeometry } from '../delve_litany_layout';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../dungeon_layout';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import { delveExitDropZ } from '../prop_layout';
 import { aurasSurvivingDeath } from '../resurrection';
 import { Rng } from '../rng';

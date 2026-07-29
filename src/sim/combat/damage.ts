@@ -904,10 +904,7 @@ export function dealDamage(
       // channel is deliberately NOT folded in: it takes the normal channel
       // pushback below, as today.
       if (isNonSpellCast(target.castingAbility)) ctx.cancelCast(target);
-      else if (
-        amount > 0 &&
-        !ignoresDamagePushback(ctx, target, target.castingAbility)
-      ) {
+      else if (amount > 0 && !ignoresDamagePushback(ctx, target, target.castingAbility)) {
         ctx.pushbackCast(target);
       }
     }

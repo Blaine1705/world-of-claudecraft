@@ -6,11 +6,11 @@
 // lets these fixtures place a live session where a path needs it.
 
 import { describe, expect, it } from 'vitest';
-import { handleDevChat } from '../src/sim/dev_commands';
-import { advanceDelveModule, ejectToDelveDoor, failDelveRun } from '../src/sim/delves/runs';
-import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { DELVES, LAKE } from '../src/sim/data';
+import { advanceDelveModule, ejectToDelveDoor, failDelveRun } from '../src/sim/delves/runs';
+import { handleDevChat } from '../src/sim/dev_commands';
+import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { startFishing } from '../src/sim/professions/fishing';
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
 import { Sim } from '../src/sim/sim';

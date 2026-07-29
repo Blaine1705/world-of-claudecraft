@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { colliderInternalsForTest, isBlocked, resolveMovement, resolvePosition } from '../src/sim/colliders';
+import {
+  colliderInternalsForTest,
+  isBlocked,
+  resolveMovement,
+  resolvePosition,
+} from '../src/sim/colliders';
 import { BUILTIN_WORLD, PLAYER_START, setActiveWorldContent } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { BlockerDef, PlacedAsset, WorldContent } from '../src/sim/types';

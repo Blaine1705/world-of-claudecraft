@@ -1607,7 +1607,9 @@ describe('the reel is exempt from the in-combat gate', () => {
     expect(draws).toBe(2);
     expect(
       sim.events.some(
-        (e) => (e as { type: string; success?: boolean }).type === 'castStop' && (e as { success?: boolean }).success === true,
+        (e) =>
+          (e as { type: string; success?: boolean }).type === 'castStop' &&
+          (e as { success?: boolean }).success === true,
       ),
     ).toBe(true);
     expect(
@@ -1780,7 +1782,10 @@ describe('fishing telemetry events (empty hook and the bags-full got-away)', () 
   it('a bags-full catch emits fishingGotAway (the draw was spent, the catch was lost)', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
-    const capacity = bagCapacity((sim as unknown as { players: Map<number, { bags: unknown[] }> }).players.get(sim.playerId)!.bags as never);
+    const capacity = bagCapacity(
+      (sim as unknown as { players: Map<number, { bags: unknown[] }> }).players.get(sim.playerId)!
+        .bags as never,
+    );
     const m = sim.meta(sim.playerId)! as unknown as { inventory: unknown[] };
     while (m.inventory.length < capacity) sim.addItem('bone_fragments', 20);
     // Deterministic: walk until a non-null row resolves against full bags.

@@ -27,13 +27,13 @@ import {
 } from './data';
 import { createNpc, recalcPlayerStats } from './entity';
 import { releaseSpiritInDelve } from './entity_roster';
+import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import {
   aurasSurvivingDeath,
   RES_SICKNESS_STAT_MULT,
   RESURRECTION_SICKNESS_ID,
   resSicknessDuration,
 } from './resurrection';
-import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, emptyMoveInput, type Vec3 } from './types';

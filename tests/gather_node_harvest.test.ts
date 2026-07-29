@@ -27,6 +27,7 @@ import { ClientWorld } from '../src/net/online';
 import { bagCapacity } from '../src/sim/bags';
 import { GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { completeFishing } from '../src/sim/professions/fishing';
 import {
   gatherNodeById,
@@ -35,7 +36,6 @@ import {
   NODE_HARVEST_TABLE,
   nodeMaterialFor,
 } from '../src/sim/professions/gathering';
-import { PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import { type Entity, xpForLevel } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';

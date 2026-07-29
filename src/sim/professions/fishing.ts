@@ -19,8 +19,8 @@
 // roll). Band selection is pure state, not a draw, and every deny arm is
 // draw-free.
 
-import { FISHING_RARE_ID, FISHING_TABLES_BY_BAND } from '../content/items';
 import { isActionLockingFormAuraKind } from '../combat/forms';
+import { FISHING_RARE_ID, FISHING_TABLES_BY_BAND } from '../content/items';
 import { DEEPFEN_SHALLOWS_LAKE } from '../content/zone2';
 import { ITEMS, zoneAt } from '../data';
 import { onFishCaughtForDeeds } from '../deeds';
