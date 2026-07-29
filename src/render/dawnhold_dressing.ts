@@ -346,6 +346,67 @@ export function dawnholdFurnishings(): readonly DawnholdDressingSpot[] {
   sconce('solar', 14.35, 42, HALF);
   sconce('solar', 23.5, 44.65, Math.PI);
 
+  // ---- the west guard room: the watch's own mess, benches and a weapon
+  // shelf, all clear of the (-9, -8) door lane into the entrance hall
+  add('kcasTableLong', 'west_guard', -16, -9, 0, 1.3);
+  add('kcasBench', 'west_guard', -16, -11, 0, 1.35);
+  add('kcasBench', 'west_guard', -16, -7, Math.PI, 1.35);
+  add('kcasStool', 'west_guard', -19.6, -9, 0, 1.2);
+  candle('west_guard', -16, -9, { dy: 1.3, light: true });
+  add('kcasBarrel', 'west_guard', -21.4, -12.4, 0.4, 1.2);
+  add('kcasCrateSmall', 'west_guard', -21.6, -5.9, 1.1, 1.2);
+  add('kcasShelfSmall', 'west_guard', -21.65, -9, HALF, 1.3, { dy: 1.5, mounted: true });
+  add('kcasBannerGreenA', 'west_guard', -16, -12.65, 0, 1.5, { dy: 2.0, mounted: true });
+  sconce('west_guard', -21.65, -12, HALF);
+  sconce('west_guard', -12, -12.65, 0);
+
+  // ---- the east guard room: the armoury side, racks and a keg
+  add('kcasTableLong', 'east_guard', 16, -9, 0, 1.3);
+  add('kcasBench', 'east_guard', 16, -11, 0, 1.35);
+  add('kcasStool', 'east_guard', 19.6, -9, 0, 1.2);
+  candle('east_guard', 16, -9, { dy: 1.3, light: true });
+  add('kcasKeg', 'east_guard', 21.4, -12.2, 0.7, 1.2);
+  add('kcasCrateSmall', 'east_guard', 21.5, -6, -0.9, 1.2);
+  add('kcasChest', 'east_guard', 11.6, -12.4, 0.3, 1.2);
+  add('kcasShelfBooks', 'east_guard', 21.65, -9, -HALF, 1.3, { dy: 1.4, mounted: true });
+  add('kcasBannerGreenShield', 'east_guard', 16, -12.65, 0, 1.5, { dy: 2.0, mounted: true });
+  sconce('east_guard', 21.65, -12, -HALF);
+  sconce('east_guard', 12, -12.65, 0);
+
+  // ---- the orangery: the conservatory's long glass wing, planters down
+  // both flanks and a potting bench, clear of the (33, 11) arch
+  planter('flowerBedSquareA', 'orangery', 37, 3.5, 0, 0.42);
+  planter('flowerBedSquareB', 'orangery', 41.5, 8, 0, 0.42);
+  planter('flowerBedRound', 'orangery', 37, 16.5, 0, 0.36);
+  planter('flowerBedRound', 'orangery', 42.5, 16.5, 0, 0.36);
+  add('shrubFlowering', 'orangery', 43.4, 3, 0.8, 1.1);
+  add('shrubFlowering', 'orangery', 35.2, 19, 2.2, 1.0);
+  add('flowerGlow', 'orangery', 39.5, 12.5, 0.4, 1.1);
+  add('kcasTableCloth', 'orangery', 39.5, 6.5, 0, 1.25);
+  add('kcasStool', 'orangery', 39.5, 4.6, 0, 1.2);
+  add('kcasBench', 'orangery', 43.6, 12, -HALF, 1.3);
+  add('kcasBannerGreenTriple', 'orangery', 39, 0.65, 0, 1.6, { dy: 2.2, mounted: true });
+  sconce('orangery', 43.65, 6, -HALF);
+  sconce('orangery', 34.35, 15.5, HALF);
+
+  // ---- the east stair: the second climb to the solar, kept clear down its
+  // middle for the two ramp bands (z 27..33 at x ~14.5, z 31..37 at x ~20.5)
+  add('flowerGlow', 'stair_east', 25.4, 32, 0.6, 1.0);
+  add('kcasBarrel', 'stair_east', 17.4, 31.4, 0.5, 1.15);
+  sconce('stair_east', 25.65, 32.5, -HALF);
+
+  // ---- the north turret: the quiet room at the top of the house
+  add('kcasTableRoundMedium', 'north_turret', -17, 52, 0, 1.3);
+  add('kcasChair', 'north_turret', -18.4, 50.9, 0.7, 1.3);
+  add('kcasChair', 'north_turret', -15.6, 53.1, -2.4, 1.3);
+  candle('north_turret', -17, 52, { dy: 1.35, light: true });
+  add('kcasBookcase', 'north_turret', -23.6, 53.5, HALF, 1.35);
+  add('kcasChest', 'north_turret', -11.6, 54.2, -0.4, 1.2);
+  planter('flowerBedRound', 'north_turret', -20.5, 54.5, 0, 0.34);
+  add('kcasBannerGreenA', 'north_turret', -17, 54.65, Math.PI, 1.5, { dy: 2.0, mounted: true });
+  sconce('north_turret', -23.65, 54, HALF);
+  sconce('north_turret', -10.35, 51, -HALF);
+
   spotsCache = out;
   return out;
 }

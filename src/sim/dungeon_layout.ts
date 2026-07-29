@@ -635,6 +635,25 @@ export const DAWNHOLD_ROOMS: readonly AuthoredRoom[] = [
   { id: 'gallery', x0: -9, x1: 13, z0: 34, z1: 42, lift: DAWNHOLD_SOLAR_LIFT },
   { id: 'bedroom_suite', x0: -25, x1: -9, z0: 34, z1: 48, lift: DAWNHOLD_SOLAR_LIFT },
   { id: 'solar', x0: 13, x1: 27, z0: 34, z1: 46, lift: DAWNHOLD_SOLAR_LIFT },
+  // THE WINGS. Appended, never inserted: the render dressing, the collider
+  // set and the map plate all walk this array in order. Every door below
+  // was sited by scanning its wall for a band where no dressing spot's
+  // clearance circle reaches the opening, counting WALL-MOUNTED fixtures
+  // too (the pinned lane test exempts those, which is how a sconce ends up
+  // hanging in a doorway).
+  // The guard rooms flanking the entrance hall, so the way in opens onto a
+  // choice instead of a corridor.
+  { id: 'west_guard', x0: -23, x1: -9, z0: -14, z1: -4 },
+  { id: 'east_guard', x0: 9, x1: 23, z0: -14, z1: -4 },
+  // The orangery: the conservatory's own long glass wing, east again.
+  { id: 'orangery', x0: 33, x1: 45, z0: 0, z1: 20 },
+  // The east half landing. This is the SECOND way upstairs: the library
+  // climbs to it and it climbs to the solar, so the upper story is a loop
+  // (parlor, solar stair, gallery, solar, east stair, library, garden)
+  // rather than one dead-end staircase.
+  { id: 'stair_east', x0: 13, x1: 27, z0: 30, z1: 34, lift: DAWNHOLD_STAIR_LIFT },
+  // The turret room off the bedroom suite, at the top of the house.
+  { id: 'north_turret', x0: -25, x1: -9, z0: 48, z1: 56, lift: DAWNHOLD_SOLAR_LIFT },
 ];
 
 export const DAWNHOLD_DOORS: readonly AuthoredDoor[] = [
@@ -650,6 +669,13 @@ export const DAWNHOLD_DOORS: readonly AuthoredDoor[] = [
   { x: 13, z: 27, hw: 1, hd: 1.4 }, // solar stair -> library nook (the return loop)
   { x: -9, z: 38, hw: 1, hd: 1.4 }, // gallery -> bedroom suite
   { x: 13, z: 38, hw: 1, hd: 1.4 }, // gallery -> solar
+  // the wings (see the room table for how these positions were sited)
+  { x: -9, z: -8, hw: 1, hd: 1.4 }, // entrance hall -> west guard room
+  { x: 9, z: -9, hw: 1, hd: 1.4 }, // entrance hall -> east guard room
+  { x: 33, z: 11, hw: 1, hd: 1.4 }, // garden room -> orangery
+  { x: 14.5, z: 30, hw: 1.4, hd: 1 }, // library nook -> east stair (+1.5)
+  { x: 20.5, z: 34, hw: 1.4, hd: 1 }, // east stair -> solar (+1.5)
+  { x: -21, z: 48, hw: 1.4, hd: 1 }, // bedroom suite -> north turret
 ];
 
 export const DAWNHOLD_DECOR: readonly AuthoredDecor[] = [
@@ -697,7 +723,7 @@ export const DAWNHOLD_DECOR: readonly AuthoredDecor[] = [
 
 export const DAWNHOLD_LAYOUT: DungeonLayout = {
   zMin: -16,
-  zMax: 48,
+  zMax: 56,
   sideWallZ: 16,
   sideWallHd: 32,
   pillars: [],
@@ -707,9 +733,9 @@ export const DAWNHOLD_LAYOUT: DungeonLayout = {
   // rim decor (drawn from y 0) are entirely buried inside the room's solid 3.0
   // riser, the same trick the Last Keep's throne dais uses.
   dais: { x: 20, z: 40, r: 2.5 },
-  wallX: 33,
-  endWallHw: 34,
-  floorHalfX: 33,
+  wallX: 45,
+  endWallHw: 46,
+  floorHalfX: 45,
   rooms: DAWNHOLD_ROOMS.map((r) => ({ ...r })),
   doors: DAWNHOLD_DOORS.map((d) => ({ ...d })),
   decor: DAWNHOLD_DECOR.map((d) => ({ ...d })),

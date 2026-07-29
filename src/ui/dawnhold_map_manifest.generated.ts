@@ -4,8 +4,8 @@
 // Plates live in public/map_bg/dawnhold_<story>.webp.
 
 export const BAKED_DAWNHOLD_MAP = {
-  fingerprint: '2e39772f',
-  plateWidth: 544,
-  plateHeight: 576,
+  fingerprint: '5f3412d5',
+  plateWidth: 640,
+  plateHeight: 640,
   stories: ["ground","solar"],
 } as const;

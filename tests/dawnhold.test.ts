@@ -323,7 +323,36 @@ describe('Dawnhold Castle layout', () => {
         (room as AuthoredRoom).lift ?? 0,
         5,
       );
-      if (s.mounted) continue; // banners, sconces, and shelves hang above the lanes
+      // A MOUNTED piece hangs above the walking lane, so it is exempt from
+      // the lane rule, but it may never hang in the OPENING itself: a
+      // sconce inside a doorway floats in the gap where the wall is not.
+      // The lane rule cannot see this (it exempts mounted pieces outright),
+      // which is exactly how a wing appended later puts a fixture in a new
+      // door: check the opening on the pierced wall directly.
+      if (s.mounted) {
+        for (const d of doors) {
+          const pair = doorRooms(rooms, d) as [AuthoredRoom, AuthoredRoom];
+          const zWall = pair[0].z1 === d.z || pair[0].z0 === d.z;
+          // the hole in the wall, one wall thickness deep
+          const opening = zWall
+            ? { x0: d.x - d.hw, x1: d.x + d.hw, z0: d.z - d.hd, z1: d.z + d.hd }
+            : { x0: d.x - d.hd, x1: d.x + d.hd, z0: d.z - d.hw, z1: d.z + d.hw };
+          // the MOUNT point plus its bracket, not the lane clearance: a
+          // banner two yards down the wall from an arch is fine, a sconce
+          // bracketed inside the arch is not
+          const BRACKET = 0.5;
+          const inOpening =
+            s.x > opening.x0 - BRACKET &&
+            s.x < opening.x1 + BRACKET &&
+            s.z > opening.z0 - BRACKET &&
+            s.z < opening.z1 + BRACKET;
+          expect(
+            inOpening,
+            `mounted ${s.kind} at (${s.x},${s.z}) hangs in the door opening at (${d.x},${d.z})`,
+          ).toBe(false);
+        }
+        continue;
+      }
       for (const lane of laneRects) {
         expect(
           circleHitsRect(s, lane),
