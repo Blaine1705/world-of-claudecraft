@@ -337,31 +337,31 @@ export const fr_CA: EnTranslations = {
       "healerConfirmCancel": "Annuler"
     },
     "unstuck": {
-      "menuButton": "Unstuck",
-      "help": "Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.",
-      "helpAtGraveyard": "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.",
-      "started": "Unstuck in {seconds} seconds. Moving, fighting, taking damage, or starting another action cancels it.",
-      "countdown": "Unstuck: {seconds}",
-      "completed": "Moved to the nearest reachable safe spot.",
-      "completedAtGraveyard": "Your spirit has returned to the nearest graveyard. Speak to the Pale Keeper to accept The Keeper's Toll.",
-      "revivedAtGraveyard": "You have been returned to the nearest graveyard and revived. The Keeper's Toll weighs on you.",
-      "cancelledMoved": "Unstuck cancelled because you moved.",
-      "cancelledDamaged": "Unstuck cancelled because you took damage.",
-      "cancelledCombat": "Unstuck cancelled because you entered combat.",
-      "cancelledBusy": "Unstuck cancelled because you started another action.",
-      "cancelledState": "Unstuck cancelled because your state changed.",
-      "cancelledDisconnected": "Unstuck cancelled because you disconnected.",
-      "noSafePosition": "No reachable safe spot was found nearby. You were not moved.",
-      "alreadyActive": "Unstuck is already counting down.",
-      "alreadySafe": "You are already in a safe, reachable position.",
-      "cooldown": "Unstuck will be ready in {seconds} seconds.",
-      "dead": "You cannot use Unstuck while dead or in spirit form.",
-      "combat": "You cannot use Unstuck during combat.",
-      "controlled": "You cannot use Unstuck while movement is impaired.",
-      "standStill": "Stand still on solid ground before using Unstuck.",
-      "standStillAnywhere": "Stand still before using Unstuck.",
-      "busy": "Finish your current action before using Unstuck.",
-      "unavailable": "Unstuck is unavailable in your current state."
+      "menuButton": "Déblocage",
+      "help": "Récupération : /unstuck démarre un compte à rebours immobile qui vous déplace vers un endroit sûr et accessible à proximité.",
+      "helpAtGraveyard": "Récupération : /unstuck démarre un compte à rebours immobile, puis envoie votre esprit au cimetière le plus proche. Revenir par le Veilleur pâle exige le Glas du Veilleur.",
+      "started": "Déblocage dans {seconds} secondes. Bouger, combattre, subir des dégâts ou commencer une autre action l'annule.",
+      "countdown": "Déblocage: {seconds}",
+      "completed": "Déplacé vers l'endroit sûr accessible le plus proche.",
+      "completedAtGraveyard": "Votre esprit est retourné au cimetière le plus proche. Parlez au Veilleur pâle pour accepter le Glas du Veilleur.",
+      "revivedAtGraveyard": "Vous avez été ramené au cimetière le plus proche et ranimé. Le Glas du Veilleur pèse sur vous.",
+      "cancelledMoved": "Déblocage annulé : vous avez bougé.",
+      "cancelledDamaged": "Déblocage annulé : vous avez subi des dégâts.",
+      "cancelledCombat": "Déblocage annulé : vous êtes entré en combat.",
+      "cancelledBusy": "Déblocage annulé : vous avez commencé une autre action.",
+      "cancelledState": "Déblocage annulé : votre état a changé.",
+      "cancelledDisconnected": "Déblocage annulé : vous avez été déconnecté.",
+      "noSafePosition": "Aucun endroit sûr accessible n'a été trouvé à proximité. Vous n'avez pas été déplacé.",
+      "alreadyActive": "Le déblocage est déjà en compte à rebours.",
+      "alreadySafe": "Vous êtes déjà dans une position sûre et accessible.",
+      "cooldown": "Le Déblocage sera prêt dans {seconds} secondes.",
+      "dead": "Vous ne pouvez pas utiliser le Déblocage tant que vous êtes mort ou sous forme d'esprit.",
+      "combat": "Vous ne pouvez pas utiliser le Déblocage en combat.",
+      "controlled": "Vous ne pouvez pas utiliser le Déblocage tant que vos mouvements sont entravés.",
+      "standStill": "Restez immobile sur un sol stable avant d'utiliser le Déblocage.",
+      "standStillAnywhere": "Restez immobile avant d'utiliser le Déblocage.",
+      "busy": "Terminez votre action en cours avant d'utiliser le Déblocage.",
+      "unavailable": "Le Déblocage n'est pas disponible dans votre état actuel."
     },
     "fct": {
       "absorbed": "Absorbé : {amount}",
@@ -903,10 +903,10 @@ export const fr_CA: EnTranslations = {
       "autoShowHint": "Les lignes apparaissent automatiquement dès que votre groupe inflige des dégâts ou des soins, et ce panneau se ferme quelques secondes après la fin du combat.",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
-      "breakdownOther": "Other ({count})",
+      "breakdownOther": "Autres ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Melee"
+      "melee": "Mêlée"
     },
     "petFeed": {
       "disabledFullHp": "Le familier est à pleine santé",
@@ -935,7 +935,7 @@ export const fr_CA: EnTranslations = {
       "riding": "En selle",
       "mount": "Monter",
       "dismount": "Descendre",
-      "useToRide": "Use to summon this mount.",
+      "useToRide": "Utiliser pour invoquer cette monture.",
       "emptyTitle": "Aucune monture collectée",
       "emptyStableHint": "Atteignez le niveau 20 et prenez des leçons d’équitation auprès de la Maîtresse d’écurie Marla aux écuries à l’ouest de Highwatch.",
       "emptyDropHint": "Les montures plus rares sont lâchées par les boss de donjon et de raid.",
@@ -960,23 +960,23 @@ export const fr_CA: EnTranslations = {
       "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage."
     },
     "mountTraining": {
-      "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "ownedMountPrompt": "Your reins are in your bags. Use them to ride.",
-      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
-      "begin": "Begin Lesson",
-      "success": "You have tamed the Valorsteed.",
-      "returnToMarla": "Return to Marla at the stables to buy your Valorsteed reins for 10g."
+      "mountPrompt": "Appuyez sur {key} pour monter le Valorsteed d'entraînement.",
+      "ownedMountPrompt": "Vos rênes sont dans vos sacs. Utilisez-les pour chevaucher.",
+      "ridePrompt": "Suivez le repère lumineux jusqu'à la ligne de départ, puis appuyez sur Démarrer la course.",
+      "begin": "Commencer la leçon",
+      "success": "Vous avez dompté le Valorsteed.",
+      "returnToMarla": "Retournez voir Marla aux écuries pour acheter les rênes de votre Valorsteed pour 10 po."
     },
     "mountRace": {
-      "startButton": "Start Race",
-      "cancelButton": "Cancel Race",
-      "go": "GO!",
-      "start": "Go! Clear every jump, then ride back through the arch.",
-      "toFinish": "Ride back through the arch!",
-      "finished": "Finished in {seconds}s!",
-      "timeout": "Race Failed",
-      "progress": "Gates {n} of {total}",
-      "timeLeft": "{seconds}s"
+      "startButton": "Démarrer la course",
+      "cancelButton": "Annuler la course",
+      "go": "PARTEZ !",
+      "start": "Allez ! Franchissez chaque obstacle, puis revenez à cheval par l'arche.",
+      "toFinish": "Revenez à cheval par l'arche !",
+      "finished": "Terminé en {seconds} s !",
+      "timeout": "Course échouée",
+      "progress": "Portes {n} sur {total}",
+      "timeLeft": "{seconds} s"
     },
     "vcup": {
       "title": "La Coupe du Val",
@@ -1864,9 +1864,9 @@ export const fr_CA: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Niveau requis : {level}",
-      "riftTier": "{tier}-rank Rift item",
-      "riftUpgrade": "Rift upgrade {level}/{max}",
-      "riftSockets": "Rift gems {used}/{total}",
+      "riftTier": "Objet de faille de rang {tier}",
+      "riftUpgrade": "Amélioration de faille {level}/{max}",
+      "riftSockets": "Gemmes de faille {used}/{total}",
       "statEnchanted": "+{value} {stat} (Enchanté)",
       "enchantedFallback": "Enchanté"
     },
@@ -2806,12 +2806,12 @@ export const fr_CA: EnTranslations = {
       "titledName": "{name} « {title} »"
     },
     "continentMap": {
-      "title": "World Map",
-      "summary": "World map. Choose a zone to open its map.",
-      "toWorld": "World map",
-      "toZone": "Zone map",
-      "toggleAria": "Switch between the world map and the zone map",
-      "levels": "Levels {min} to {max}"
+      "title": "Carte du monde",
+      "summary": "Carte du monde. Choisissez une zone pour ouvrir sa carte.",
+      "toWorld": "Carte du monde",
+      "toZone": "Carte de la zone",
+      "toggleAria": "Basculer entre la carte du monde et la carte de la zone",
+      "levels": "Niveaux {min} à {max}"
     }
   },
   "gatherEvent": {
@@ -3041,16 +3041,16 @@ export const fr_CA: EnTranslations = {
         "marshBlurb": "Marécages engloutis et ruines rongées par les marées, repaire des Mudfins et de pire encore.",
         "peaksName": "Hauteurs de Thornpeak",
         "peaksBlurb": "Crêtes balayées par le vent grimpant vers les dangers les plus glacials du royaume.",
-        "duskName": "The Veiled Hollow",
-        "duskBlurb": "A realm sealed beneath the mountains, if the whispers of a way in are true.",
-        "emberName": "The Drakelands",
-        "emberBlurb": "Across the Pale Causeway the green gives way to cinder, and something old rules the wastes.",
-        "frostName": "The Frostveil Reach",
-        "frostBlurb": "A snowbound height beyond every map, glimpsed only in the dancing lights.",
-        "amberName": "The Amberfall",
-        "amberBlurb": "Behind the western cliffs an autumn that never ends, and lanterns on a golden mere.",
-        "fenName": "The Willowfen",
-        "fenBlurb": "Past the autumn crown, a bright fen of willows and still water, and a town behind a moat."
+        "duskName": "Le Vallon Voilé",
+        "duskBlurb": "Un royaume scellé sous les montagnes, si les rumeurs d'un chemin d'entrée sont vraies.",
+        "emberName": "Les Terres du Dragon",
+        "emberBlurb": "Passé la Chaussée pâle, le vert cède la place aux cendres, et quelque chose d'ancien règne sur les étendues arides.",
+        "frostName": "Le Voile de Givre",
+        "frostBlurb": "Une hauteur enneigée au-delà de toute carte, aperçue seulement dans les lumières dansantes.",
+        "amberName": "La Chute d'Ambre",
+        "amberBlurb": "Derrière les falaises de l'ouest, un automne qui ne finit jamais, et des lanternes sur un lac doré.",
+        "fenName": "Le Marais des Saules",
+        "fenBlurb": "Passé la couronne d'automne, un marais lumineux de saules et d'eau calme, et une ville derrière ses douves."
       },
       "group": {
         "heading": "Formez un groupe pour les passages difficiles",
@@ -3521,16 +3521,16 @@ export const fr_CA: EnTranslations = {
         "desc": "Des chasseurs à sang froid dotés d'un sifflement et d'un claquement qui leur sont propres, distincts des créatures à sang chaud."
       },
       "murloc": {
-        "name": "Croakfins",
-        "desc": "Croaking fish-folk of lake shore and tide pool, quick to swarm anything that wades too close."
+        "name": "Coasse-Palmes",
+        "desc": "Peuple-poisson coassant des rives et des bassins de marée, prompt à submerger quiconque s'aventure trop près."
       },
       "kobold": {
-        "name": "Scamps",
-        "desc": "Skittering scavengers and sprites of glade and hedgerow, more nuisance than menace until they gather in numbers."
+        "name": "Chenapans",
+        "desc": "Charognards agiles et lutins des clairières et des haies, plus nuisance que menace, jusqu'à ce qu'ils se regroupent en nombre."
       },
       "demon": {
-        "name": "Demons",
-        "desc": "Invaders from beyond the rifts, all fire and spite. Where one stands, a breach is never far."
+        "name": "Démons",
+        "desc": "Des envahisseurs venus d'au-delà des failles, tout de feu et de rancune. Là où l'un se dresse, une brèche n'est jamais loin."
       }
     },
     "worldPage": {
@@ -3544,55 +3544,55 @@ export const fr_CA: EnTranslations = {
       "valeBlurb": "La verdoyante vallée de départ, où les nouveaux héros se font les dents sur les loups et les bandits autour de la ville d'Eastbrook.",
       "marshBlurb": "Une contrée noyée de brume et de ruines. Les Mudfins pullulent dans les hauts-fonds et quelque chose de plus ancien s'agite sous l'eau, surveillé depuis la ville-pont de Fenbridge.",
       "peaksBlurb": "Crêtes balayées par le vent et vieilles exploitations minières grimpant vers les dangers les plus glacials et les plus élevés du royaume, tenus par l'avant-poste de Highwatch.",
-      "duskBlurb": "A valley of permanent dusk beneath the great tree of Eldergleam, where crystal ruins glow and the air hums with old magic.",
-      "emberBlurb": "Storm-lit wastes of ash and bloodglass where drakes wheel over the caldera and troll fires burn among the dunes, watched from the gate-town of Wyrmwatch.",
-      "frostBlurb": "A hush of snow and dark pines under the aurora, where the cold itself feels awake and Icemantle keeps its fires burning.",
-      "amberBlurb": "An eternal autumn of gold and red leaves that never fall, gathered around the lantern-lit town of Lanternmere.",
-      "fenBlurb": "A bright, humming wetland of lilies and slow water, crossed on old boardwalks from the bridge-town of Bridgemere.",
-      "nightBlurb": "A realm of starry midnight where flowers light the paths and Moonrest keeps a quiet vigil under a dreaming sky.",
-      "hauntBlurb": "A haunted forest under giant canopies, where the lanterns of Gallowmere are the only honest light on the road.",
-      "galeBlurb": "Sea-cliffs and howling downs where the wind never rests, the Old Beacon never goes out, and Wickharbor shuts its doors tight.",
-      "jungleBlurb": "A tropical tangle of palms, white sand, and loud birds, with the beach-town of Drifthaven keeping a fire lit on the strand.",
-      "gardenBlurb": "A hedge-maze garden realm still trimmed by no gardener anyone has seen, entered past Hedgewick and its fountain courts.",
+      "duskBlurb": "Une vallée de crépuscule perpétuel sous le grand arbre d'Eldergleam, où des ruines de cristal luisent et où l'air résonne d'une magie ancienne.",
+      "emberBlurb": "Des étendues battues par la tempête, de cendre et de verre-de-sang, où des drakes tournoient au-dessus de la caldeira et où des feux trolls brûlent parmi les dunes, veillées depuis la ville-porte de Wyrmwatch.",
+      "frostBlurb": "Un silence de neige et de pins sombres sous l'aurore, où le froid lui-même semble éveillé et où Icemantle garde ses feux allumés.",
+      "amberBlurb": "Un automne éternel d'or et de rouge qui ne tombe jamais, rassemblé autour de la ville éclairée aux lanternes de Lanternmere.",
+      "fenBlurb": "Un marécage lumineux et bourdonnant de lys et d'eau calme, traversé par de vieilles passerelles depuis la ville-pont de Bridgemere.",
+      "nightBlurb": "Un royaume de minuit étoilé où des fleurs éclairent les chemins et où Moonrest maintient une veille silencieuse sous un ciel qui rêve.",
+      "hauntBlurb": "Une forêt hantée sous des canopées géantes, où les lanternes de Gallowmere sont la seule lumière honnête sur la route.",
+      "galeBlurb": "Falaises marines et landes hurlantes où le vent ne se repose jamais, où le Vieux Phare ne s'éteint jamais, et où Wickharbor ferme bien ses portes.",
+      "jungleBlurb": "Un enchevêtrement tropical de palmiers, de sable blanc, et d'oiseaux bruyants, où la ville de plage de Drifthaven garde un feu allumé sur la grève.",
+      "gardenBlurb": "Un royaume-jardin en labyrinthe de haies, encore taillé par nul jardinier vu de quiconque, dont l'entrée passe par Hedgewick et ses cours de fontaines.",
       "valeGreeting": "Gardez votre lame à portée. Le Val n'est plus ce qu'il était.",
       "valeGreeter": "Maréchal Redbrook, Eastbrook",
       "marshGreeting": "Restez à la porte. Au-delà de ces roseaux, la fagne tue à notre place.",
       "marshGreeter": "Gardien Fenwick, Fenbridge",
       "peaksGreeting": "Deux cents ans que ce mur tient. Il ne cédera pas sous ma garde, mais il gémit.",
       "peaksGreeter": "Capitaine Thessaly, Highwatch",
-      "duskGreeting": "Few of your kind have stood beneath these boughs. Walk gently, and be welcome.",
-      "duskGreeter": "Keeper Saelwyn, Eldergleam",
-      "emberGreeting": "Hot wind off the wastes, dragons over the Drakemaw, and troll fires in the dunes. Drink before you walk out there.",
-      "emberGreeter": "The gatewarden, Wyrmwatch",
-      "frostGreeting": "Snow swallows every sound out past the wall. If the lights start dancing, keep your voice down and your fire lit.",
-      "frostGreeter": "The hearthkeeper, Icemantle",
-      "amberGreeting": "Every leaf here burns gold and red, yet none ever fall. The lanterns are lit for you; mind the Goldmelt on your way up.",
-      "amberGreeter": "The lanternwright, Lanternmere",
-      "fenGreeting": "The fen hums with dragonflies and bees. Cross the bridge, rest your feet awhile, and stay on the boards past the pools.",
-      "fenGreeter": "The bridgekeeper, Bridgemere",
-      "nightGreeting": "Past the Nightgate the air itself dreams. Follow the flower-light, and mind the sleeping world that hangs in the sky.",
-      "nightGreeter": "The vigil-warden, Moonrest",
-      "hauntGreeting": "Keep to the lanterns, traveler. And if the wood calls your name from off the road, do not answer it.",
-      "hauntGreeter": "The lamplighter, Gallowmere",
-      "galeGreeting": "The wind has never once stopped here, and the Old Beacon has never once gone out. Close the inn door behind you.",
-      "galeGreeter": "The beacon-keeper, Wickharbor",
-      "jungleGreeting": "Warm sand, loud birds, and a jungle that eats the horizon. We keep a fire lit on the beach; try to come back to it.",
-      "jungleGreeter": "The harbormistress, Drifthaven",
-      "gardenGreeting": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.",
-      "gardenGreeter": "The gatekeeper, Hedgewick",
+      "duskGreeting": "Peu de gens de votre espèce se sont tenus sous ces frondaisons. Marchez avec douceur : on vous accueille ici.",
+      "duskGreeter": "La Gardienne Saelwyn, Eldergleam",
+      "emberGreeting": "Vent brûlant venu des étendues arides, dragons au-dessus du Drakemaw, et feux trolls dans les dunes. Buvez un coup avant de sortir là-bas.",
+      "emberGreeter": "Le gardien de porte, Wyrmwatch",
+      "frostGreeting": "La neige engloutit tous les sons au-delà du mur. Si les lumières se mettent à danser, baissez la voix et gardez votre feu allumé.",
+      "frostGreeter": "Le gardien du foyer, Icemantle",
+      "amberGreeting": "Ici, chaque feuille brûle d'or et de rouge, et pourtant aucune ne tombe jamais. Les lanternes sont allumées pour vous ; méfiez-vous du Goldmelt en montant.",
+      "amberGreeter": "Le lanternier, Lanternmere",
+      "fenGreeting": "Le marais bourdonne de libellules et d'abeilles. Traversez le pont, reposez vos pieds un moment, et restez sur les planches au-delà des mares.",
+      "fenGreeter": "Le gardien du pont, Bridgemere",
+      "nightGreeting": "Passé la Porte de la Nuit, l'air lui-même rêve. Suivez la lumière des fleurs, et prenez garde au monde endormi suspendu dans le ciel.",
+      "nightGreeter": "La gardienne de la veille, Moonrest",
+      "hauntGreeting": "Restez près des lanternes, voyageur. Et si le bois appelle votre nom hors de la route, ne répondez pas.",
+      "hauntGreeter": "Le lampiste, Gallowmere",
+      "galeGreeting": "Le vent ne s'est jamais arrêté ici, pas une seule fois, et le Vieux Phare ne s'est jamais éteint. Refermez la porte de l'auberge derrière vous.",
+      "galeGreeter": "Le gardien du phare, Wickharbor",
+      "jungleGreeting": "Sable chaud, oiseaux bruyants, et une jungle qui dévore l'horizon. Nous gardons un feu allumé sur la plage ; essayez d'y revenir.",
+      "jungleGreeter": "La capitaine du port, Drifthaven",
+      "gardenGreeting": "Quelqu'un taille encore les haies, bien qu'aucun jardinier n'ait été vu depuis cent ans. Prenez garde au labyrinthe : il vous surveille aussi.",
+      "gardenGreeter": "Le gardien de porte, Hedgewick",
       "valePlaceNotes": "Eastbrook est votre premier camp de base. La Course du Loup et le Pré du Sanglier sont des terrains de chasse cléments ; le lac Miroir est une bonne eau de pêche, même si les mudfins grouillent dans ses bas-fonds ; le Sableweb et la Mine de cuivre cachent araignées et fouisseurs avides de minerai ; un Camp de bandits et la Chapelle déchue gardent des besognes plus rudes ; la colline du Reliquaire descend dans le Reliquaire effondré, le premier gouffre du royaume ; Brightwood Glade est un paisible bosquet ensoleillé au nord ; et le Pré de la Truie est le terrain clos de balle au sanglier d'Eastbrook, où se joue la Coupe du Val sous une trêve des moissons.",
       "marshPlaceNotes": "Fenbridge garde la seule route sèche. Les Roseaux du Rôdeur et les Hauts-fonds de Deepfen grouillent de bêtes des marais et de Mudfins ; le Fourré de la Veuve est tissé d'une épaisse toile ; la Chapelle noyée et les Tertres des trolls gardent des dangers plus anciens, avec La Litanie noyée, le gouffre propre au marais, qui s'ouvre juste au nord des tertres ; le Campement de Gravecaller est le culte retranché, et le Bastion englouti est le cœur en instance du marais.",
       "peaksPlaceNotes": "Highwatch tient le rempart. La Crête du Traqueur et les Terriers de Deeprock appartiennent aux félins des crêtes et aux fouisseurs ; les Contreforts des ogres et le Camp de guerre de Drogmar à des brutes à gages ; Stormcrag crépite d'élémentaires, et en contrebas luit le Glimmermere, le lac de montagne dont la rive garde la porte de lumière pâle menant au Temple noyé ; les Tentes du culte du Ver et les Champs des revenants ceignent les hauteurs du culte, avec le Sanctuaire du Gravewyrm à son sommet.",
-      "duskPlaceNotes": "Eldergleam gathers beneath the great tree. The Duskfall Cave and its overlook are the way in and the first sight of the valley; Elder Grove and Starfall Basin keep the quiet south; the Sunken Court holds overgrown ruins in the east; and the Gleaming Deep and Crystalline Shallows glow across the north.",
-      "emberPlaceNotes": "Wyrmwatch holds the gate. The Gatewood is the last green before the waste; the Cinder Dunes drift with ash and worse; the Trollmoot is where the dune trolls gather their fires; the Bloodglass Fields glitter with razor shards; and the Drakemaw Caldera is the smoking crown the drakes circle.",
-      "frostPlaceNotes": "Icemantle keeps the last warm hearth. The Snowline marks where the drifts take over; Glacier Tarn is black, still water under the ice; the Aurora Steps climb beneath the dancing lights; the Shiverfen is a frozen mire that never quite sleeps; and the Howling Terraces earn their name every night.",
-      "amberPlaceNotes": "Lanternmere glows at the heart of the harvest. The Goldmelt is the amber-slick pass in; the Gilded Orchard and Harvest Hollow keep the sweetest pickings and the boldest thieves; the Great Mere mirrors the burning leaves; Cindermaple Rise stands tallest and reddest; and the Leaning Monolith remembers something older than autumn.",
-      "fenPlaceNotes": "Bridgemere sits astride the slow water. The Amberfen Steps come down from the harvest country; the Lilymoors and Bogshine Pools glitter with wisps and dragonflies; Willowweep trails its branches into the mere; and the Drowsy Flats are as gentle as this land gets.",
-      "nightPlaceNotes": "Moonrest keeps the vigil. The Nightgate is the way into the midnight country; the Moonwell holds starlight you can stand beside; Gloamfield blooms in the dark; the Standing Vigil watches without ever moving; and the Sleepless Barrow is the one place here that never dreams.",
-      "hauntPlaceNotes": "Gallowmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
-      "galePlaceNotes": "Wickharbor leans into the wind. The Windway is the cliff road in; the Howling Downs roll treeless under the gale; the Old Beacon has burned for as long as anyone can say; the Shear drops sheer to the water; the Wreckfields keep the coast honest; and the Mirror Tarn is the one still thing in the whole realm.",
-      "junglePlaceNotes": "Drifthaven keeps its fire on the beach. The Tanglemouth is where the river meets the green wall; the Palmstrand runs white and warm along the surf; the Emerald Tangle and the Vinefall swallow the interior; the Sapphire Lagoon glows clear and deep; and the Sunken Idol watches from beneath the water.",
-      "gardenPlaceNotes": "Hedgewick waits at the Garden Gate. The Parterre Walk blooms in clipped color; Dawnhold Castle drills its knights behind new walls; the Petal Pond drifts pink the year round; the Old Mill turns over its own ring beds; the Great Maze rearranges its manners for every guest, its arches watched by leafy foxes; the North Watch keeps the exit road; the Lily Basin rests beyond it all; and the Fountain Court still runs clear at the garden heart.",
+      "duskPlaceNotes": "Eldergleam se rassemble sous le grand arbre. La Grotte du Crépuscule et son belvédère sont le chemin d'entrée et la première vue sur la vallée ; le Bosquet Ancien et le Bassin des Étoiles Filantes gardent le sud paisible ; la Cour Engloutie renferme des ruines envahies de végétation à l'est ; et les Profondeurs Scintillantes et les Hauts-fonds Cristallins luisent à travers le nord.",
+      "emberPlaceNotes": "Wyrmwatch tient la porte. Le Gatewood est le dernier vert avant l'étendue aride ; les Dunes de Cendre dérivent de cendres et pire encore ; Trollmoot est où les trolls des dunes rassemblent leurs feux ; les Champs de Bloodglass scintillent d'éclats tranchants ; et la Caldeira de Drakemaw est la couronne fumante que les drakes survolent en cercles.",
+      "frostPlaceNotes": "Icemantle garde le dernier âtre chaud. La Ligne de Neige marque où les congères prennent le dessus ; le Lac du Glacier est une eau noire et immobile sous la glace ; les Marches de l'Aurore grimpent sous les lumières dansantes ; le Shiverfen est une tourbière gelée qui ne dort jamais tout à fait ; et les Terrasses Hurlantes méritent leur nom chaque nuit.",
+      "amberPlaceNotes": "Lanternmere brille au cœur de la moisson. Le Goldmelt est le col ambré qui mène ici ; le Verger doré et le Creux des Moissons gardent les meilleures cueillettes et les voleurs les plus audacieux ; le Grand Lac reflète les feuilles brûlantes ; les Hauteurs de Cindermaple se dressent, plus hautes et plus rouges que tout ; et le Monolithe penché se souvient de quelque chose de plus vieux que l'automne.",
+      "fenPlaceNotes": "Bridgemere se dresse à cheval sur l'eau calme. Les Marches de l'Amberfen descendent du pays des moissons ; les Lilymoors et les Mares Chatoyantes scintillent de feux follets et de libellules ; Willowweep traîne ses branches dans le marais ; et les Étendues Somnolentes sont ce que cette terre offre de plus paisible.",
+      "nightPlaceNotes": "Moonrest tient la veille. La Porte de la Nuit est le chemin vers le pays de minuit ; le Puits de Lune retient une lumière stellaire près de laquelle on peut se tenir ; Gloamfield fleurit dans l'obscurité ; la Vigie immobile observe sans jamais bouger ; et le Tertre Sans Sommeil est le seul endroit ici qui ne rêve jamais.",
+      "hauntPlaceNotes": "Gallowmere se blottit dans ses lanternes. La Porte aux Corbeaux est la porte funeste du bois ; le Fourré des Veuves est tissé épais de toiles ; la Clairière Pendue et la Chapelle de Mournstone gardent les plus vieux chagrins de la forêt ; et la Clairière du Chasseur appartient à ce qui y chasse encore.",
+      "galePlaceNotes": "Wickharbor se penche dans le vent. La Voie du Vent est la route de falaise qui mène ici ; les Landes Hurlantes roulent, sans arbres, sous la tempête ; le Vieux Phare brûle depuis aussi longtemps que quiconque s'en souvienne ; le Surplomb tombe à pic vers l'eau ; les Champs d'Épaves gardent la côte honnête ; et le Lac Miroir est la seule chose immobile dans tout le royaume.",
+      "junglePlaceNotes": "Drifthaven garde son feu sur la plage. L'Embouchure emmêlée est là où la rivière rencontre le mur vert ; la Grève des Palmes court blanche et chaude le long du ressac ; l'Enchevêtrement d'Émeraude et la Chute de Lianes engloutissent l'intérieur des terres ; le Lagon de Saphir luit clair et profond ; et l'Idole engloutie observe depuis sous l'eau.",
+      "gardenPlaceNotes": "Hedgewick attend à la Porte du Jardin. L'Allée du Parterre fleurit en couleurs taillées ; le Château de Dawnhold entraîne ses chevaliers derrière des murs neufs ; le Bassin aux Pétales dérive en rose toute l'année ; le Vieux Moulin retourne son propre lit de fleurs ; le Grand Labyrinthe réarrange ses manières pour chaque visiteur, ses arcades surveillées par des renards feuillus ; le Guet du Nord garde la route de sortie ; le Bassin des Lys repose au-delà de tout cela ; et la Cour des Fontaines coule encore claire au cœur du jardin.",
       "gladeTitle": "Un coin paisible : la clairière de Brightwood",
       "gladeBody": "Toutes les histoires du Val ne parlent pas des morts. Au nord, un bosquet ensoleillé appelé Brightwood Glade garde son propre rythme plus doux, tout en sentiers calmes et en lumière mouchetée sous les frondaisons. C'est un contrepoint apaisé à la piste que vous suivez, et il mérite le détour quand la route vous laisse le temps de flâner.",
       "worldBossTitle": "Quand le pic s'éveille : le boss de monde",
@@ -3666,7 +3666,7 @@ export const fr_CA: EnTranslations = {
       "bastionBody": "Une forteresse inondée perdue dans le marais, tenue par des défenseurs noyés et par la marée montante elle-même.",
       "templeBody": "Un sanctuaire englouti à l'écart de la route du marais, un détour pour les curieux et les bien préparés.",
       "sanctumBody": "Le cœur ténébreux de Thornpeak, où la longue œuvre du culte atteint son terrible apogée.",
-      "wildheartBody": "A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to face Zulgar.",
+      "wildheartBody": "Une caldeira de jungle détrempée par la pluie où deux sentiers de chasse surélevés encerclent un cénote de jade. Traversez tanières de bêtes et ruines ancestrales, puis gravissez la pyramide rituelle pour affronter Zulgar.",
       "raidName": "Le raid de fin de jeu",
       "raidBody": "Au-delà d'une porte royale scellée attend une épreuve à dix joueurs : un combat en plusieurs phases et un pouvoir immortel que tout le raid doit neutraliser de concert. Méritez votre entrée, puis amenez neuf compagnons.",
       "heroicTitle": "Mode héroïque",
@@ -5202,55 +5202,55 @@ export const fr_CA: EnTranslations = {
   },
   "sim": {
     "rift": {
-      "allUnstable": "All rifts are unstable right now. Try again soon.",
-      "enterFloor": "You step through the rift into {name}.",
-      "descendFloor": "You descend deeper into {name}.",
-      "stepBack": "You step back through the rift.",
-      "pylonLit": "A rune pylon flares to life ({lit}/{total}).",
-      "wayDownOpens": "The way down tears open.",
-      "exitOpens": "The rift shudders. A way home tears open behind the fallen.",
-      "portalOpens": "A {tier}-rank rift tears open in {zone}!",
-      "portalSealed": "The {tier}-rank rift in {zone} has been sealed.",
-      "portalCollapses": "The {tier}-rank rift in {zone} collapses.",
-      "levelGate": "Only adventurers of level {level} or higher may enter this rift.",
-      "deadEntry": "You cannot enter a rift while dead.",
-      "deadEntryCombat": "Your party is still in combat. The dead may re-enter once the fighting stops.",
-      "iceGoalLit": "The frost sigil blazes. The way stirs.",
-      "socketsShut": "The sockets grind shut. The way stirs.",
-      "seqProgress": "The runes answer in turn ({step}/{total}).",
-      "seqReset": "The runes go dark. Begin again.",
-      "gateOpen": "The gate grinds open.",
-      "orbSealed": "The orb is sealed by the ritual below.",
-      "orbWakes": "The pentagram's flame gutters out. Something wakes on the altar.",
-      "orbOpensGate": "The Blood Orb flares. The gates of the temple grind open.",
-      "alreadyCleared": "This rift has already been cleared by {names}.",
-      "raceLost": "The rift has already been cleared by {names}. Your run ends.",
-      "raceWorldWin": "{names} won the {tier}-rank Rift race in {seconds}s!",
-      "raceWinBanner": "Rift Race Won - {seconds}s",
-      "raceLostBanner": "Rift Already Cleared",
-      "forgeUpgraded": "Rift upgrade completed for {name}.",
-      "forgeEnchanted": "Rift enchant completed for {name}.",
-      "forgeSocketed": "Rift gem socketed for {name}.",
-      "detonateGlacialGrave": "Glacial Grave detonates!",
-      "detonateAbsoluteZero": "Absolute Zero erupts!",
-      "detonateMagmaWell": "Magma Well erupts!",
-      "detonateCoreMeltdown": "Core Meltdown detonates!",
-      "detonateVenomPool": "Venom Pool erupts!",
-      "detonateBroodmothersMark": "Broodmother's Mark detonates!",
-      "detonateSoulGrave": "Soul Grave detonates!",
-      "detonateDeathSentence": "Death Sentence falls!",
-      "detonateEarthshatter": "Earthshatter detonates!",
-      "detonateFinalJudgment": "Final Judgment lands!",
-      "detonateVoidRift": "Void Rift detonates!",
-      "detonateArcaneAnnihilation": "Arcane Annihilation erupts!",
-      "detonateLightningRod": "Lightning Rod strikes!",
-      "detonateStormcallersWrath": "Stormcaller's Wrath erupts!",
-      "detonateAbyssalMaw": "Abyssal Maw closes!",
-      "detonateCrushingDepth": "Crushing Depth crushes!",
-      "detonatePactSeal": "Pact Seal detonates!",
-      "detonateBloodRite": "Blood Rite falls!",
-      "detonatePitSentence": "Pit Sentence detonates!",
-      "detonateHellfireBrand": "Hellfire Brand detonates!"
+      "allUnstable": "Toutes les failles sont instables pour le moment. Réessayez bientôt.",
+      "enterFloor": "Vous franchissez la faille et pénétrez dans {name}.",
+      "descendFloor": "Vous descendez plus profondément dans {name}.",
+      "stepBack": "Vous repassez par la faille.",
+      "pylonLit": "Un pylône runique s'embrase ({lit}/{total}).",
+      "wayDownOpens": "Le chemin vers le bas se déchire.",
+      "exitOpens": "La faille frémit. Un chemin vers le foyer se déchire derrière les tombés.",
+      "portalOpens": "Une faille de rang {tier} se déchire dans {zone} !",
+      "portalSealed": "La faille de rang {tier} dans {zone} a été scellée.",
+      "portalCollapses": "La faille de rang {tier} dans {zone} s'effondre.",
+      "levelGate": "Seuls les aventuriers de niveau {level} ou plus peuvent entrer dans cette faille.",
+      "deadEntry": "Vous ne pouvez pas entrer dans une faille tant que vous êtes mort.",
+      "deadEntryCombat": "Votre groupe est encore en combat. Les morts peuvent entrer à nouveau une fois le combat terminé.",
+      "iceGoalLit": "Le sceau de givre s'embrase. Le passage frémit.",
+      "socketsShut": "Les sertissures grincent et se referment. Le passage frémit.",
+      "seqProgress": "Les runes répondent tour à tour ({step}/{total}).",
+      "seqReset": "Les runes s'éteignent. Recommencez.",
+      "gateOpen": "La porte grince et s'ouvre.",
+      "orbSealed": "L'orbe est scellé par le rituel en contrebas.",
+      "orbWakes": "La flamme du pentagramme vacille et s'éteint. Quelque chose s'éveille sur l'autel.",
+      "orbOpensGate": "L'Orbe de sang s'embrase. Les portes du temple grincent et s'ouvrent.",
+      "alreadyCleared": "Cette faille a déjà été nettoyée par {names}.",
+      "raceLost": "La faille a déjà été nettoyée par {names}. Votre course s'achève.",
+      "raceWorldWin": "{names} a remporté la course de faille de rang {tier} en {seconds} s !",
+      "raceWinBanner": "Course de faille remportée : {seconds} s",
+      "raceLostBanner": "Faille déjà nettoyée",
+      "forgeUpgraded": "Amélioration de faille terminée pour {name}.",
+      "forgeEnchanted": "Enchantement de faille terminé pour {name}.",
+      "forgeSocketed": "Gemme de faille sertie pour {name}.",
+      "detonateGlacialGrave": "La Tombe glaciale explose !",
+      "detonateAbsoluteZero": "Zéro absolu se déchaîne !",
+      "detonateMagmaWell": "Le Puits de magma jaillit !",
+      "detonateCoreMeltdown": "La Fusion du noyau explose !",
+      "detonateVenomPool": "La Mare de venin jaillit !",
+      "detonateBroodmothersMark": "La Marque de la Mère des couvées explose !",
+      "detonateSoulGrave": "La Tombe des âmes explose !",
+      "detonateDeathSentence": "La Sentence de mort s'abat !",
+      "detonateEarthshatter": "Brise-Terre explose !",
+      "detonateFinalJudgment": "Le Jugement final s'abat !",
+      "detonateVoidRift": "La Faille du Vide explose !",
+      "detonateArcaneAnnihilation": "L'Anéantissement arcanique se déchaîne !",
+      "detonateLightningRod": "Paratonnerre frappe !",
+      "detonateStormcallersWrath": "La Colère de l'Invocateur des tempêtes se déchaîne !",
+      "detonateAbyssalMaw": "La Gueule abyssale se referme !",
+      "detonateCrushingDepth": "La Profondeur écrasante écrase !",
+      "detonatePactSeal": "Le Sceau du pacte explose !",
+      "detonateBloodRite": "Le Rite du sang s'abat !",
+      "detonatePitSentence": "La Sentence de la fosse explose !",
+      "detonateHellfireBrand": "Le Brandon infernal explose !"
     },
     "delve": {
       "cannotEnterNow": "Vous ne pouvez pas entrer dans une excavation pour l'instant.",
@@ -6361,7 +6361,7 @@ export const fr_CA: EnTranslations = {
       "floatingParry": "Parade",
       "floatingResist": "Résisté",
       "floatingHealFull": "Plein",
-      "floatingHealAbsorbed": "Absorbed",
+      "floatingHealAbsorbed": "Absorbé",
       "cannotMove": "Immobilisé !",
       "attack": "attaque",
       "damageDone": "Votre {ability} touche {target} pour {amount}.",
@@ -6378,8 +6378,8 @@ export const fr_CA: EnTranslations = {
       "healOtherCrit": "Votre {ability} soigne {target} d'un coup critique pour {amount}.",
       "healSelfFull": "Votre {ability} aboutit, mais vous avez déjà toute votre santé.",
       "healOtherFull": "Votre {ability} aboutit sur {target}, mais la cible a déjà toute sa santé.",
-      "healSelfAbsorbed": "Your {ability} is devoured by the blight on you.",
-      "healOtherAbsorbed": "Your {ability} is devoured by the blight on {target}.",
+      "healSelfAbsorbed": "La flétrissure qui vous ronge dévore votre {ability}.",
+      "healOtherAbsorbed": "La flétrissure qui ronge {target} dévore votre {ability}.",
       "death": "{name} meurt.",
       "auraGain": "Vous gagnez {name}.",
       "auraFade": "{name} se dissipe de vous.",
@@ -6739,22 +6739,22 @@ export const fr_CA: EnTranslations = {
       "gathering": "Collecte",
       "demonHeal": "Soin démoniaque",
       "thunzharrStormcall": "Appel de la tempête",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "Tombe glaciale",
+      "rift_frost_strike": "Zéro absolu",
+      "rift_ember_execution": "Puits de magma",
+      "rift_ember_strike": "Fusion du noyau",
+      "rift_venom_execution": "Mare de venin",
+      "rift_venom_strike": "Marque de la Mère des couvées",
+      "rift_necro_execution": "Tombe des âmes",
+      "rift_necro_strike": "Sentence de mort",
+      "rift_brute_execution": "Brise-Terre",
+      "rift_brute_strike": "Jugement final",
+      "rift_arcane_execution": "Faille du Vide",
+      "rift_arcane_strike": "Anéantissement arcanique",
+      "rift_storm_execution": "Paratonnerre",
+      "rift_storm_strike": "Colère de l'Invocateur des tempêtes",
+      "rift_tide_execution": "Gueule abyssale",
+      "rift_tide_strike": "Profondeur écrasante"
     }
   },
   "questUi": {
@@ -9477,250 +9477,250 @@ export const fr_CA: EnTranslations = {
         "name": "Robe de toile voilée"
       },
       "rift_essence": {
-        "name": "Rift Essence"
+        "name": "Essence de faille"
       },
       "rift_gem_crimson": {
-        "name": "Crimson Rift Gem"
+        "name": "Gemme de faille cramoisie"
       },
       "rift_gem_azure": {
-        "name": "Azure Rift Gem"
+        "name": "Gemme de faille azur"
       },
       "rift_gem_verdant": {
-        "name": "Verdant Rift Gem"
+        "name": "Gemme de faille verte"
       },
       "riftbound_band_of_might": {
-        "name": "Riftbound Band of Might"
+        "name": "Anneau de Puissance lié à la faille"
       },
       "riftbound_band_of_insight": {
-        "name": "Riftbound Band of Insight"
+        "name": "Anneau de Perspicacité lié à la faille"
       },
       "riftbound_band_of_guile": {
-        "name": "Riftbound Band of Guile"
+        "name": "Anneau de Ruse lié à la faille"
       },
       "hoarfrost_edge": {
-        "name": "Hoarfrost Edge"
+        "name": "Lame de givre"
       },
       "emberforge_gauntlets": {
-        "name": "Emberforge Gauntlets"
+        "name": "Gantelets d'Emberforge"
       },
       "broodmother_carapace": {
-        "name": "Broodmother Carapace"
+        "name": "Carapace de la Mère des couvées"
       },
       "bonelord_mantle": {
-        "name": "Bonelord Mantle"
+        "name": "Mantelet du Seigneur des ossements"
       },
       "graskbreaker_girdle": {
-        "name": "Graskbreaker Girdle"
+        "name": "Ceinturon Brise-Grask"
       },
       "voidscar_handwraps": {
-        "name": "Voidscar Handwraps"
+        "name": "Bandes de mains Cicatrice-du-Vide"
       },
       "stormscale_treads": {
-        "name": "Stormscale Treads"
+        "name": "Bottines Écaille-de-tempête"
       },
       "abyssal_loop": {
-        "name": "Abyssal Loop"
+        "name": "Anneau abyssal"
       },
       "pactbound_vestments": {
-        "name": "Pactbound Vestments"
+        "name": "Vêtements liés au pacte"
       },
       "pitlords_cleaver": {
-        "name": "Pit Lord's Cleaver"
+        "name": "Fendoir du Seigneur de la Fosse"
       },
       "emberforged_bulwark": {
-        "name": "Emberforged Bulwark"
+        "name": "Rempart forgé dans la braise"
       },
       "stormsunder_hood": {
-        "name": "Stormsunder Hood"
+        "name": "Capuche Brise-tempête"
       },
       "voidweave_mantle": {
-        "name": "Voidweave Mantle"
+        "name": "Manteau Tissé-du-Vide"
       },
       "abysswrought_band": {
-        "name": "Abysswrought Band"
+        "name": "Anneau forgé des abysses"
       },
       "heart_of_the_rift": {
-        "name": "Heart of the Rift"
+        "name": "Coeur de la Faille"
       },
       "voidsong_dirk": {
-        "name": "Voidsong, Dirk of the Sundered Veil"
+        "name": "Chant-du-Vide, dague du Voile déchiré"
       },
       "wildheart_tuskblade": {
-        "name": "Wildheart Tuskblade"
+        "name": "Lame-défense du Wildheart"
       },
       "wildheart_hexwood_staff": {
-        "name": "Hexwood Staff of the Basin"
+        "name": "Bâton de Bois-maudit du Bassin"
       },
       "wildheart_fangknife": {
-        "name": "Fangknife of Zulgar"
+        "name": "Couteau-croc de Zulgar"
       },
       "thick_winter_pelt": {
-        "name": "Thick Winter Pelt"
+        "name": "Épaisse fourrure d'hiver"
       },
       "aurora_mote": {
-        "name": "Aurora Mote"
+        "name": "Poussière d'aurore"
       },
       "hearth_ember_cache": {
-        "name": "Ember Cache"
+        "name": "Réserve de braises"
       },
       "sprung_trap": {
-        "name": "Sprung Fen Trap"
+        "name": "Piège des tourbières déclenché"
       },
       "hearthlined_treads": {
-        "name": "Hearth-Lined Treads"
+        "name": "Bottines doublées de l'âtre"
       },
       "frostmane_mantle": {
-        "name": "Mantle of the Frostmane"
+        "name": "Manteau des Crins-de-givre"
       },
       "ashbone_war_brand": {
-        "name": "Ashbone War-Brand"
+        "name": "Tison de guerre Ashbone"
       },
       "emberwing_scale": {
-        "name": "Emberwing Scale"
+        "name": "Écaille Aile-de-braise"
       },
       "scorched_supply_crate": {
-        "name": "Scorched Supply Crate"
+        "name": "Caisse de ravitaillement calcinée"
       },
       "wyrmwatch_warning_banner": {
-        "name": "Wyrmwatch Warning Banner"
+        "name": "Bannière d'alerte de Wyrmwatch"
       },
       "cinderwalk_treads": {
-        "name": "Cinderwalk Treads"
+        "name": "Bottines Pas-de-cendre"
       },
       "mawscale_pauldrons": {
-        "name": "Mawscale Pauldrons"
+        "name": "Spallières Écaille-de-gueule"
       },
       "gilded_sap_clot": {
-        "name": "Gilded Sap Clot"
+        "name": "Caillot de sève doré"
       },
       "amberfall_sap_bucket": {
-        "name": "Sap-Tap Bucket"
+        "name": "Seau à sève"
       },
       "mere_ferry_lantern": {
-        "name": "Ferry Lantern"
+        "name": "Lanterne du bac"
       },
       "orchard_sapbinder_grips": {
-        "name": "Sapbinder Grips"
+        "name": "Poignes du Lieur de sève"
       },
       "mantle_of_the_meredark": {
-        "name": "Mantle of the Meredark"
+        "name": "Manteau du Meredark"
       },
       "plump_fen_eel": {
-        "name": "Plump Fen Eel"
+        "name": "Anguille dodue des tourbières"
       },
       "wisplight_globe": {
-        "name": "Wisplight Globe"
+        "name": "Globe Lumière-follette"
       },
       "fenway_mooring_line": {
-        "name": "Cut Mooring Line"
+        "name": "Amarre tranchée"
       },
       "bridgemere_toll_chest": {
-        "name": "Sunken Toll-Chest"
+        "name": "Coffre à péage englouti"
       },
       "eelskin_mudwaders": {
-        "name": "Eelskin Mudwaders"
+        "name": "Cuissardes Peau-d'anguille"
       },
       "lilybed_mantle": {
-        "name": "Mantle of the Lily-Bed"
+        "name": "Manteau du Lit de Lys"
       },
       "moonfleece_tuft": {
-        "name": "Moonfleece Tuft"
+        "name": "Touffe Toison-de-lune"
       },
       "gloamfield_nightbloom": {
-        "name": "Nightbloom Blossom"
+        "name": "Fleur du Nightbloom"
       },
       "vigil_star_chart": {
-        "name": "Vigil Star Chart"
+        "name": "Carte stellaire de la Vigie"
       },
       "barrow_grave_offering": {
-        "name": "Scattered Grave Offering"
+        "name": "Offrande funéraire éparpillée"
       },
       "moonfleece_mitts": {
-        "name": "Moonfleece Mitts"
+        "name": "Mitaines Toison-de-lune"
       },
       "barrowshade_mantle": {
-        "name": "Barrowshade Mantle"
+        "name": "Mantelet Ombre-des-tertres"
       },
       "widowsilk_skein": {
-        "name": "Widowsilk Skein"
+        "name": "Écheveau de soie-de-veuve"
       },
       "gallowmere_grave_candle": {
-        "name": "Grave-Candle"
+        "name": "Bougie funéraire"
       },
       "silkbound_remains": {
-        "name": "Silkbound Remains"
+        "name": "Restes liés de soie"
       },
       "gravebound_silk_wraps": {
-        "name": "Gravebound Silk Wraps"
+        "name": "Bandes de soie liées à la tombe"
       },
       "mantle_of_the_unhorsed": {
-        "name": "Mantle of the Unhorsed"
+        "name": "Manteau du Désarçonné"
       },
       "pearlwake_cargo_crate": {
-        "name": "Pearlwake Cargo Crate"
+        "name": "Caisse de cargaison Sillage-de-perle"
       },
       "canopy_silk_hank": {
-        "name": "Canopy Silk Hank"
+        "name": "Écheveau de soie de canopée"
       },
       "sunken_offering_bowl": {
-        "name": "Refilled Offering Bowl"
+        "name": "Bol d'offrande à nouveau rempli"
       },
       "saltwalker_sandals": {
-        "name": "Saltwalker Sandals"
+        "name": "Sandales Marche-sel"
       },
       "sunken_idol_mantle": {
-        "name": "Mantle of the Sunken Idol"
+        "name": "Manteau de l'Idole engloutie"
       },
       "hedgewick_shears": {
-        "name": "Stolen Hedgewick Shears"
+        "name": "Cisailles volées de Hedgewick"
       },
       "evergarden_bloom_clipping": {
-        "name": "Pruned Bloom Clipping"
+        "name": "Bouture taillée"
       },
       "hedgewick_tool_cart": {
-        "name": "Spilled Tool Cart"
+        "name": "Chariot à outils renversé"
       },
       "evergarden_statue_rubbing": {
-        "name": "Statue Rubbing"
+        "name": "Frottis de statue"
       },
       "shearkeeper_gloves": {
-        "name": "Shearkeeper Gloves"
+        "name": "Gants du Gardien du Surplomb"
       },
       "fountain_court_mantle": {
-        "name": "Mantle of the Fountain Court"
+        "name": "Manteau de la Cour des Fontaines"
       },
       "galecrest_ram_wool": {
-        "name": "Greasy Ram Wool"
+        "name": "Laine de bélier grasse"
       },
       "shear_storm_lantern": {
-        "name": "Doused Storm-Lantern"
+        "name": "Lanterne-tempête éteinte"
       },
       "wreckfield_flotsam_crate": {
-        "name": "Flotsam Crate"
+        "name": "Caisse d'épaves flottantes"
       },
       "wickspun_treads": {
-        "name": "Wickspun Treads"
+        "name": "Bottines Mèche-filée"
       },
       "wreck_wardens_mantle": {
-        "name": "Mantle of the Wreck Warden"
+        "name": "Manteau du Gardien de l'épave"
       },
       "breakscarred_steel": {
-        "name": "Break-Scarred Steel"
+        "name": "Acier balafré"
       },
       "farshore_salt_moss": {
-        "name": "Farshore Salt Moss"
+        "name": "Mousse salée du Farshore"
       },
       "gullhaven_watchbell": {
-        "name": "Coastal Watchbell"
+        "name": "Cloche de guet côtière"
       },
       "saltforged_grips": {
-        "name": "Saltforged Grips"
+        "name": "Poignes forgées de sel"
       },
       "mantle_of_the_unbroken_shore": {
-        "name": "Mantle of the Unbroken Shore"
+        "name": "Manteau du Rivage inviolé"
       },
       "last_keep_signet": {
-        "name": "Signet of the Last Keep"
+        "name": "Chevalière de The Last Keep"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"
@@ -10455,7 +10455,7 @@ export const fr_CA: EnTranslations = {
         "name": "Protège-taille d'Appel-tempête"
       },
       "riding_training": {
-        "name": "Riding Training"
+        "name": "Entraînement d'équitation"
       },
       "reins_valorsteed": {
         "name": "Rênes du Destrier de Bravoure"
@@ -10730,307 +10730,307 @@ export const fr_CA: EnTranslations = {
         "name": "Cheval d'écurie"
       },
       "rift_spawnling": {
-        "name": "Rift Spawnling"
+        "name": "Rejeton de faille"
       },
       "rift_bonewalker": {
-        "name": "Risen Bonewalker"
+        "name": "Marche-os relevé"
       },
       "rift_frost_revenant": {
-        "name": "Frostbound Revenant"
+        "name": "Revenant lié au givre"
       },
       "rift_rime_elemental": {
-        "name": "Rime Elemental"
+        "name": "Élémentaire de givre"
       },
       "rift_ember_fiend": {
-        "name": "Ember Fiend"
+        "name": "Démon de braise"
       },
       "rift_magma_brute": {
-        "name": "Magma Brute"
+        "name": "Brute de magma"
       },
       "rift_venom_weaver": {
-        "name": "Venom Weaver"
+        "name": "Tisseur de venin"
       },
       "rift_thornback": {
-        "name": "Thornback Stalker"
+        "name": "Traqueur au dos épineux"
       },
       "rift_boneclad": {
-        "name": "Boneclad Warrior"
+        "name": "Guerrier caparaçonné d'os"
       },
       "rift_marrow_troll": {
-        "name": "Marrow Troll"
+        "name": "Troll de moelle"
       },
       "rift_void_acolyte": {
-        "name": "Voidscar Acolyte"
+        "name": "Acolyte de la Cicatrice du Vide"
       },
       "rift_dread_stalker": {
-        "name": "Dread Stalker"
+        "name": "Traqueur de l'effroi"
       },
       "rift_storm_caller": {
-        "name": "Storm Caller"
+        "name": "Invocateur des tempêtes"
       },
       "rift_stormscale": {
-        "name": "Stormscale Drake"
+        "name": "Drake Écaille-de-tempête"
       },
       "rift_tide_thrall": {
-        "name": "Tide Thrall"
+        "name": "Serviteur de la marée"
       },
       "rift_deep_lurker": {
-        "name": "Deep Lurker"
+        "name": "Rôdeur des profondeurs"
       },
       "rift_stone_ogre": {
-        "name": "Stone Ogre"
+        "name": "Ogre de pierre"
       },
       "rift_boss_frost": {
-        "name": "Hoarfrost Warden"
+        "name": "Gardien du givre"
       },
       "rift_boss_ember": {
-        "name": "Emberforge Tyrant"
+        "name": "Tyran d'Emberforge"
       },
       "rift_boss_venom": {
-        "name": "Broodmother Vysska"
+        "name": "Mère des couvées Vysska"
       },
       "rift_boss_necro": {
-        "name": "Bonelord Xarreth"
+        "name": "Seigneur des ossements Xarreth"
       },
       "rift_boss_brute": {
-        "name": "Warlord Grask"
+        "name": "Seigneur de guerre Grask"
       },
       "rift_boss_arcane": {
-        "name": "Archon Nyxaris"
+        "name": "Archonte Nyxaris"
       },
       "rift_boss_storm": {
-        "name": "Tempest Vharok"
+        "name": "Tempête Vharok"
       },
       "rift_boss_tide": {
-        "name": "Abyssal Maw"
+        "name": "Gueule abyssale"
       },
       "glimmerwisp": {
-        "name": "Glimmerwisp"
+        "name": "Feu follet scintillant"
       },
       "duskwisp": {
-        "name": "Duskwisp"
+        "name": "Feu follet du crépuscule"
       },
       "veiled_stag": {
-        "name": "Veiled Stag"
+        "name": "Cerf voilé"
       },
       "veiled_doe": {
-        "name": "Veiled Doe"
+        "name": "Biche voilée"
       },
       "gleamstag": {
-        "name": "The Gleamstag"
+        "name": "Le Cerf luisant"
       },
       "sporeling_gatherer": {
-        "name": "Sporeling Gatherer"
+        "name": "Sporelin cueilleur"
       },
       "corrupted_sporeling": {
-        "name": "Corrupted Sporeling"
+        "name": "Sporelin corrompu"
       },
       "mushroom_pixie": {
-        "name": "Gleamfolk Pixie"
+        "name": "Farfadet du Peuple luisant"
       },
       "treant_elder": {
-        "name": "Treant Elder"
+        "name": "Treant ancien"
       },
       "ancient_guardian": {
-        "name": "Ancient Guardian"
+        "name": "Gardien antique"
       },
       "waking_warden": {
-        "name": "The Waking Warden"
+        "name": "Le Gardien éveillé"
       },
       "old_marrowshell": {
-        "name": "Old Marrowshell"
+        "name": "Vieux Marrowshell"
       },
       "aurelhorn": {
-        "name": "Aurelhorn, First of the Herd"
+        "name": "Aurelhorn, Premier du Troupeau"
       },
       "snowdrift_wolf": {
-        "name": "Snowdrift Wolf"
+        "name": "Loup des congères"
       },
       "ice_wisp": {
-        "name": "Ice Wisp"
+        "name": "Feu follet de glace"
       },
       "rime_elemental": {
-        "name": "Rime Elemental"
+        "name": "Élémentaire de givre"
       },
       "fen_sprite": {
-        "name": "Fen Sprite"
+        "name": "Lutin des tourbières"
       },
       "frostmane_yeti": {
-        "name": "Frostmane Yeti"
+        "name": "Yeti Crin-de-givre"
       },
       "terrace_howler": {
-        "name": "Terrace Howler"
+        "name": "Hurleur des terrasses"
       },
       "apprentice_wren": {
-        "name": "Apprentice Wren"
+        "name": "Apprentie Wren"
       },
       "emberwing_drake": {
-        "name": "Emberwing Drake"
+        "name": "Drake Aile-de-braise"
       },
       "ashbone_raider": {
-        "name": "Ashbone Raider"
+        "name": "Pillard Ashbone"
       },
       "ashbone_warcaller": {
-        "name": "Ashbone Warcaller"
+        "name": "Héraut de guerre Ashbone"
       },
       "dune_troll": {
-        "name": "Dune Troll"
+        "name": "Troll des dunes"
       },
       "cindraleth_maw_matriarch": {
-        "name": "Cindraleth the Maw Matriarch"
+        "name": "Cindraleth, Matriarche de la Gueule"
       },
       "gilded_stag": {
-        "name": "Gilded Stag"
+        "name": "Cerf doré"
       },
       "gloam_fox": {
-        "name": "Gloam Fox"
+        "name": "Renard du crépuscule"
       },
       "orchard_treant": {
-        "name": "Orchard Treant"
+        "name": "Treant du verger"
       },
       "the_meredark": {
-        "name": "The Meredark"
+        "name": "Le Meredark"
       },
       "harvest_sprite": {
-        "name": "Harvest Sprite"
+        "name": "Lutin des moissons"
       },
       "mere_lurker": {
-        "name": "Mere Lurker"
+        "name": "Rôdeur du lac"
       },
       "bogtoad": {
-        "name": "Bogtoad"
+        "name": "Crapaud des tourbières"
       },
       "drowsy_croaker": {
-        "name": "The Drowsy Croaker"
+        "name": "Le Coasseur somnolent"
       },
       "lily_wisp": {
-        "name": "Lily Wisp"
+        "name": "Feu follet des lys"
       },
       "willow_sprite": {
-        "name": "Willow Sprite"
+        "name": "Lutin du saule"
       },
       "moonfleece_grazer": {
-        "name": "Moonfleece Grazer"
+        "name": "Brouteur Toison-de-lune"
       },
       "gloam_strider": {
-        "name": "Gloam Strider"
+        "name": "Arpenteur du crépuscule"
       },
       "nightkin_stargazer": {
-        "name": "Nightkin Stargazer"
+        "name": "Astrologue nocturnien"
       },
       "barrow_king": {
-        "name": "The Barrow King"
+        "name": "Le Roi des tertres"
       },
       "barrow_wight": {
-        "name": "Barrow Wight"
+        "name": "Spectre des tertres"
       },
       "widowsilk_spinner": {
-        "name": "Widowsilk Spinner"
+        "name": "Fileuse Soie-de-veuve"
       },
       "wood_wraith": {
-        "name": "Wood Wraith"
+        "name": "Spectre des bois"
       },
       "gravenbark_shambler": {
-        "name": "Gravenbark Shambler"
+        "name": "Traînard à l'écorce burinée"
       },
       "pale_huntsman": {
-        "name": "The Pale Huntsman"
+        "name": "Le Chasseur pâle"
       },
       "gravedigger_mosley": {
-        "name": "Gravedigger Mosley"
+        "name": "Fossoyeur Mosley"
       },
       "tide_scuttler": {
-        "name": "Tide Scuttler"
+        "name": "Coureur de la marée"
       },
       "thicket_boar": {
-        "name": "Thicket Boar"
+        "name": "Sanglier du fourré"
       },
       "canopy_weaver": {
-        "name": "Canopy Weaver"
+        "name": "Tisseuse de canopée"
       },
       "idol_guardian": {
-        "name": "The Idol Guardian"
+        "name": "Le Gardien de l'idole"
       },
       "castaway_navigator": {
-        "name": "Navigator Suli"
+        "name": "Navigatrice Suli"
       },
       "topiary_stag": {
-        "name": "Topiary Stag"
+        "name": "Cerf topiaire"
       },
       "topiary_wolf": {
-        "name": "Topiary Wolf"
+        "name": "Loup topiaire"
       },
       "hedge_gnome": {
-        "name": "Hedge Gnome"
+        "name": "Gnome des haies"
       },
       "hedge_knight": {
-        "name": "Dawnhold Knight"
+        "name": "Chevalier de Dawnhold"
       },
       "the_topiary_bull": {
-        "name": "The Topiary Bull"
+        "name": "Le Taureau topiaire"
       },
       "moor_ram": {
-        "name": "Moor Ram"
+        "name": "Bélier de la lande"
       },
       "gale_wisp": {
-        "name": "Gale Wisp"
+        "name": "Feu follet des bourrasques"
       },
       "shoal_scuttler": {
-        "name": "Shoal Scuttler"
+        "name": "Coureur des hauts-fonds"
       },
       "downs_bandit": {
-        "name": "Downs Bandit"
+        "name": "Bandit des Landes"
       },
       "wreck_thief": {
-        "name": "Wreckfield Thief"
+        "name": "Voleur des champs d'épaves"
       },
       "the_wreck_warden": {
-        "name": "The Wreck Warden"
+        "name": "Le Gardien de l'épave"
       },
       "drowned_deckhand": {
-        "name": "Drowned Deckhand"
+        "name": "Matelot noyé"
       },
       "riftspawn": {
-        "name": "Riftspawn"
+        "name": "Engeance de faille"
       },
       "breach_wretch": {
-        "name": "Breach Wretch"
+        "name": "Miséreux de la brèche"
       },
       "void_stalker": {
-        "name": "Void Stalker"
+        "name": "Traqueur du Vide"
       },
       "sundered_horror": {
-        "name": "The Sundered Horror"
+        "name": "L'Horreur déchirée"
       },
       "fisher_bram": {
-        "name": "Fisher Bram"
+        "name": "Pêcheur Bram"
       },
       "rift_hellguard": {
-        "name": "Hellguard"
+        "name": "Garde infernal"
       },
       "rift_pact_acolyte": {
-        "name": "Pact Acolyte"
+        "name": "Acolyte du pacte"
       },
       "rift_boss_ritualist": {
-        "name": "Magus Vel'Kor the Pactbound"
+        "name": "Mage Vel'Kor le Lié au pacte"
       },
       "rift_boss_pitlord": {
-        "name": "Azgorath, Lord of the Pit"
+        "name": "Azgorath, Seigneur de la Fosse"
       },
       "wildheart_stalker": {
-        "name": "Vineclaw Stalker"
+        "name": "Traqueur Griffe-de-liane"
       },
       "wildheart_ravager": {
-        "name": "Bloodmane Ravager"
+        "name": "Ravageur Crin-de-sang"
       },
       "wildheart_hexcaller": {
-        "name": "Sunbone Hexcaller"
+        "name": "Envoûteur Os-solaire"
       },
       "wildheart_beastmaster": {
-        "name": "Fanglord Beastmaster"
+        "name": "Maître des bêtes, Seigneur des crocs"
       },
       "wildheart_high_priest": {
-        "name": "Zulgar, Voice of the Basin"
+        "name": "Zulgar, Voix du Bassin"
       },
       "ironvein_foreman": {
         "name": "Contremaître Veinefer"
@@ -11321,244 +11321,244 @@ export const fr_CA: EnTranslations = {
         "greeting": "La montagne n'oublie rien, {playerName}, et moi non plus. Voyons ce que vous avez accompli."
       },
       "keeper_saelwyn": {
-        "name": "Keeper Saelwyn",
-        "title": "Keeper of the Hollow",
-        "greeting": "Few of your kind have stood beneath these boughs, {className}. Walk gently, and be welcome."
+        "name": "Gardienne Saelwyn",
+        "title": "Gardienne du Creux",
+        "greeting": "Peu de gens de votre espèce se sont tenus sous ces frondaisons, {className}. Marchez avec douceur : on vous accueille ici."
       },
       "loremother_bryn": {
-        "name": "Loremother Bryn",
-        "title": "Voice of the Shrine",
-        "greeting": "Every light in this valley remembers something, {playerName}. Help me listen."
+        "name": "Matrone du Savoir Bryn",
+        "title": "Voix du Sanctuaire",
+        "greeting": "Chaque lumière de cette vallée se souvient de quelque chose, {playerName}. Aidez-moi à écouter."
       },
       "provisioner_fenna": {
-        "name": "Provisioner Fenna",
-        "title": "Eldergleam Provisioner",
-        "greeting": "Bread still warm, water still sweet. The Hollow provides, and so do I."
+        "name": "Ravitailleuse Fenna",
+        "title": "Ravitailleuse d'Eldergleam",
+        "greeting": "Le pain est encore chaud, l'eau encore douce. Le Creux pourvoit, et moi aussi."
       },
       "wardsmith_orun": {
-        "name": "Wardsmith Orun",
-        "title": "Keeper of the Old Forges",
-        "greeting": "These forges cooled centuries ago, {className}, but their work still holds an edge."
+        "name": "Forgeron de protections Orun",
+        "title": "Gardien des Vieilles Forges",
+        "greeting": "Ces forges se sont éteintes il y a des siècles, {className}, mais leur ouvrage garde encore du tranchant."
       },
       "archivist_tullo": {
-        "name": "Archivist Tullo",
-        "title": "Reader of Stones",
-        "greeting": "The monuments out there have not spoken to anyone in an age. Perhaps they were waiting for fresh ears."
+        "name": "Archiviste Tullo",
+        "title": "Lecteur de pierres",
+        "greeting": "Les monuments là-dehors n'ont parlé à personne depuis une éternité. Peut-être attendaient-ils des oreilles neuves."
       },
       "huntsman_deral": {
-        "name": "Huntsman Deral",
-        "title": "Warden of the Herds",
-        "greeting": "Quiet now. The herd knows every sound this valley makes, and so do I."
+        "name": "Chasseur Deral",
+        "title": "Gardien des Troupeaux",
+        "greeting": "Silence. Le troupeau connaît chaque bruit que fait cette vallée, et moi aussi."
       },
       "warden_kaldra": {
-        "name": "Warden Kaldra",
-        "title": "Warden of Icemantle",
-        "greeting": "Mind the benches, stranger. The snow keeps what it takes."
+        "name": "Gardien Kaldra",
+        "title": "Gardien d'Icemantle",
+        "greeting": "Attention aux bancs, étranger. La neige garde ce qu'elle prend."
       },
       "hearthkeeper_maeve": {
-        "name": "Hearthkeeper Maeve",
-        "title": "Keeper of the Hearth-Lodge",
-        "greeting": "Come in off the cold. The lodge fire never goes out, so long as I draw breath."
+        "name": "Gardienne-du-foyer Maeve",
+        "title": "Gardienne du Pavillon du Foyer",
+        "greeting": "Entrez, loin du froid. Le feu du pavillon ne s'éteint jamais tant que je respire encore."
       },
       "scout_einna": {
-        "name": "Scout Einna",
-        "title": "Snowline Scout",
-        "greeting": "You walked the pass alive. Good. Icemantle should hear of it."
+        "name": "Éclaireuse Einna",
+        "title": "Éclaireuse de la Ligne de Neige",
+        "greeting": "Vous avez traversé le col vivant. Bien. Icemantle devrait l'apprendre."
       },
       "aurorist_veyla": {
-        "name": "Aurorist Veyla",
-        "title": "Reader of the Lights",
-        "greeting": "Hush. The lights are speaking tonight, and they do not repeat themselves."
+        "name": "Auroriste Veyla",
+        "title": "Lectrice des lumières",
+        "greeting": "Silence. Les lumières parlent ce soir, et elles ne se répètent jamais."
       },
       "trapper_brosk": {
-        "name": "Trapper Brosk",
-        "title": "Shiverfen Trapper",
-        "greeting": "Fen took three of my lines this week. Fen never took a line in twenty years."
+        "name": "Trappeur Brosk",
+        "title": "Trappeur du Shiverfen",
+        "greeting": "Le marais m'a pris trois lignes cette semaine. Le marais n'avait jamais pris une ligne en vingt ans."
       },
       "gatecaptain_brannoc": {
-        "name": "Gatecaptain Brannoc",
-        "title": "Commander of Wyrmwatch",
-        "greeting": "Wyrmwatch holds the gate. Has held it forty years. It will hold it tonight."
+        "name": "Capitaine-de-porte Brannoc",
+        "title": "Commandant de Wyrmwatch",
+        "greeting": "Wyrmwatch tient la porte. Elle la tient depuis quarante ans. Elle la tiendra encore ce soir."
       },
       "quartermaster_sela": {
-        "name": "Quartermaster Sela",
-        "title": "Keeper of the Garrison Stores",
-        "greeting": "Every crate in this yard crossed forty miles of ash to get here. Treat them kindly."
+        "name": "Intendante Sela",
+        "title": "Gardienne des Réserves de la Garnison",
+        "greeting": "Chaque caisse de cette cour a traversé quarante miles de cendres pour arriver ici. Traitez-les avec soin."
       },
       "scout_yerrin": {
-        "name": "Scout Yerrin",
-        "title": "Far-Dune Watcher",
-        "greeting": "Keep low. Sound carries strangely off the glass, and the gate below has ears."
+        "name": "Éclaireur Yerrin",
+        "title": "Guetteur des Dunes lointaines",
+        "greeting": "Restez baissé. Le son porte étrangement sur le verre, et la porte en contrebas a des oreilles."
       },
       "reeve_ottoline": {
-        "name": "Reeve Ottoline",
-        "title": "Reeve of Lanternmere",
-        "greeting": "Welcome to Lanternmere, where the harvest never ends and neither does the work."
+        "name": "Prévôte Ottoline",
+        "title": "Prévôte de Lanternmere",
+        "greeting": "Bienvenue à Lanternmere, où la moisson ne finit jamais, et le travail non plus."
       },
       "waywatcher_sorrel": {
-        "name": "Waywatcher Sorrel",
-        "title": "Watcher of the Goldmelt",
-        "greeting": "Snow behind you, gold ahead. Few walk the Goldmelt twice, so make the crossing count."
+        "name": "Guetteur-des-chemins Sorrel",
+        "title": "Guetteur du Goldmelt",
+        "greeting": "La neige derrière vous, l'or devant. Peu nombreux sont ceux qui traversent le Goldmelt deux fois, alors faites que cette traversée compte."
       },
       "ferrymaster_caddow": {
-        "name": "Ferrymaster Caddow",
-        "title": "Keeper of the Lantern Ferries",
-        "greeting": "Fog is on the Mere again. When the lanterns go out on the water, wise folk stay ashore."
+        "name": "Maître-passeur Caddow",
+        "title": "Gardien des bacs-lanternes",
+        "greeting": "Le brouillard revient sur le Lac. Quand les lanternes s'éteignent sur l'eau, les gens sensés restent à terre."
       },
       "orchardist_pomeline": {
-        "name": "Orchardist Pomeline",
-        "title": "Keeper of the Gilded Rows",
-        "greeting": "Mind where you step. Every root in these rows is older than the town, and they remember."
+        "name": "Arboricultrice Pomeline",
+        "title": "Gardienne des Rangées dorées",
+        "greeting": "Attention où vous mettez les pieds. Chaque racine de ces rangées est plus vieille que la ville, et elles s'en souviennent."
       },
       "waykeeper_pell": {
-        "name": "Waykeeper Pell",
-        "title": "Keeper of the Amberfen Steps",
-        "greeting": "Down the Steps and into the soft country. Mind where you plant your boots."
+        "name": "Gardien-du-chemin Pell",
+        "title": "Gardien des Marches de l'Amberfen",
+        "greeting": "En bas des Marches, et dans le pays des tourbes molles. Faites attention où vous posez vos bottes."
       },
       "bridgewright_alden": {
-        "name": "Bridgewright Alden",
-        "title": "Master of the Fenway",
-        "greeting": "Every plank in this town is mine to keep, and the fen chews on all of them."
+        "name": "Charpentier-de-pont Alden",
+        "title": "Maître du Fenway",
+        "greeting": "Chaque planche de cette ville est à mon entretien, et le marais les ronge toutes."
       },
       "netter_maris": {
-        "name": "Netter Maris",
-        "title": "Eel-Netter of Bridgemere",
-        "greeting": "Smell that? Smoked eel. Half this town stands on stilts I bought with it."
+        "name": "Poseuse de filets Maris",
+        "title": "Piégeuse d'anguilles de Bridgemere",
+        "greeting": "Vous sentez ça ? De l'anguille fumée. La moitié de cette ville tient sur des pilotis que j'ai payés avec."
       },
       "mother_sedge": {
-        "name": "Mother Sedge",
-        "title": "Fen-Witch of Willowweep",
-        "greeting": "The willows told me you were coming before your boots left the bridge."
+        "name": "Mère Sedge",
+        "title": "Sorcière des tourbières de Willowweep",
+        "greeting": "Les saules m'ont dit que vous arriviez avant même que vos bottes ne quittent le pont."
       },
       "lamplighter_sorrel": {
-        "name": "Lamplighter Sorrel",
-        "title": "Keeper of the Nightgate",
-        "greeting": "Mind the lamps, friend. Past this gate the sun gives up and the flowers take over."
+        "name": "Allumeur-de-lanternes Sorrel",
+        "title": "Gardien de la Porte de la Nuit",
+        "greeting": "Surveillez les lanternes, l'ami. Passé cette porte, le soleil abandonne et les fleurs prennent le relais."
       },
       "lira_dewsong": {
-        "name": "Lira Dewsong",
-        "title": "Night-Gardener of Moonrest",
-        "greeting": "Welcome to Moonrest, where the flowers do our dawning for us."
+        "name": "Lira Chant-de-rosée",
+        "title": "Jardinière de nuit de Moonrest",
+        "greeting": "Bienvenue à Moonrest, où les fleurs se chargent de notre aube à notre place."
       },
       "weaver_amelle": {
-        "name": "Weaver Amelle",
-        "title": "Moonfleece Weaver",
-        "greeting": "Feel that? Moonfleece on the loom. Warmer than any fire you have sat beside."
+        "name": "Tisserande Amelle",
+        "title": "Tisserande de Moonfleece",
+        "greeting": "Vous sentez ça ? Du Moonfleece sur le métier à tisser. Plus chaud que n'importe quel feu près duquel vous vous soyez assis."
       },
       "astronomer_cassian": {
-        "name": "Astronomer Cassian",
-        "title": "Watcher at the Vigil",
-        "greeting": "Hush now. The sky never dawns here, so it never stops talking either."
+        "name": "Astronome Cassian",
+        "title": "Veilleur de la Vigie",
+        "greeting": "Silence. Le ciel ne se lève jamais ici, alors il ne cesse jamais de parler non plus."
       },
       "lampman_cobb": {
-        "name": "Lampman Cobb",
-        "title": "Keeper of the Crowgate Lanterns",
-        "greeting": "Stay in the lamplight, friend. The wood counts everyone who passes the gate."
+        "name": "Lampiste Cobb",
+        "title": "Gardien des Lanternes de la Porte aux Corbeaux",
+        "greeting": "Restez dans la lumière des lampes, l'ami. Le bois compte tous ceux qui passent la porte."
       },
       "sexton_marrow": {
-        "name": "Sexton Marrow",
-        "title": "Sexton of Gallowmere",
-        "greeting": "We bury them deep here, and we ring the bells so they remember to stay down."
+        "name": "Sacristain Marrow",
+        "title": "Sacristain de Gallowmere",
+        "greeting": "Nous les enterrons profondément ici, et nous sonnons les cloches pour qu'ils se souviennent de rester couchés."
       },
       "widow_tansy": {
-        "name": "Widow Tansy",
-        "title": "Candlewright of Gallowmere",
-        "greeting": "A candle for every grave, and not one may go out. Not one, do you hear me?"
+        "name": "Veuve Tansy",
+        "title": "Cirière de Gallowmere",
+        "greeting": "Une bougie pour chaque tombe, et pas une ne doit s'éteindre. Pas une, vous m'entendez ?"
       },
       "vicar_creel": {
-        "name": "Vicar Creel",
-        "title": "Last Vicar of the Mournstone",
-        "greeting": "The chapel fell years ago. The dead beneath it did not notice, and so I stayed."
+        "name": "Vicaire Creel",
+        "title": "Dernier Vicaire du Mournstone",
+        "greeting": "La chapelle s'est effondrée il y a des années. Les morts en dessous ne l'ont pas remarqué, alors je suis resté."
       },
       "strandwatcher_pell": {
-        "name": "Strandwatcher Pell",
-        "title": "Watcher of the Tanglemouth",
-        "greeting": "Out of the black trees at last. Breathe, stranger, the sun holds this side of the pass."
+        "name": "Guetteur-de-grève Pell",
+        "title": "Guetteur de l'Embouchure emmêlée",
+        "greeting": "Enfin sorti des arbres noirs. Respirez, étranger, le soleil tient ce côté du col."
       },
       "salvage_boss_ryna": {
-        "name": "Salvage-Boss Ryna",
-        "title": "Mistress of the Wreck Line",
-        "greeting": "A {className} with working arms, good. The wreck line pays well, if the crabs leave you enough fingers to count it."
+        "name": "Patronne du sauvetage Ryna",
+        "title": "Maîtresse de la Ligne d'épaves",
+        "greeting": "Un {className} avec des bras qui fonctionnent, bien. La ligne d'épaves paie bien, si les crabes vous laissent assez de doigts pour compter."
       },
       "pearlmother_isha": {
-        "name": "Pearl-Mother Isha",
-        "title": "Elder of the Divers",
-        "greeting": "The sea gives, the sand keeps, and the jungle takes. Stay on the strand, stranger."
+        "name": "Mère-des-perles Isha",
+        "title": "Ancienne des plongeurs",
+        "greeting": "La mer donne, le sable garde, et la jungle prend. Restez sur la grève, étranger."
       },
       "hermit_okku": {
         "name": "Okku",
-        "title": "The Man Who Went In",
-        "greeting": "Quiet now. The drums count everything that walks under the trees, and they have already counted you."
+        "title": "L'Homme qui est entré",
+        "greeting": "Silence, maintenant. Les tambours comptent tout ce qui marche sous les arbres, et ils vous ont déjà compté."
       },
       "gatewarden_pell": {
-        "name": "Gatewarden Pell",
-        "title": "Keeper of the Garden Gate",
-        "greeting": "Mind how you go on the lawns. The garden keeps them trimmed, and it likes them tidy."
+        "name": "Gardien-de-porte Pell",
+        "title": "Gardien de la Porte du Jardin",
+        "greeting": "Attention où vous marchez sur les pelouses. Le jardin les garde tondues, et il les aime bien nettes."
       },
       "head_gardener_amaranth": {
-        "name": "Head Gardener Amaranth",
-        "title": "Head Gardener of the Evergarden",
-        "greeting": "Do not mind the shadows under my eyes. Someone has to stay awake while the garden dreams."
+        "name": "Jardinière en chef Amaranth",
+        "title": "Jardinière en chef de l'Evergarden",
+        "greeting": "Ne faites pas attention aux cernes sous mes yeux. Quelqu'un doit rester éveillé pendant que le jardin rêve."
       },
       "wickmother_sorrel": {
-        "name": "Wickmother Sorrel",
-        "title": "Keeper of the Hedgewick Inn",
-        "greeting": "Come in, sit, there is cordial on the fire. Just keep a hand on anything iron: the gnomes are light-fingered of late."
+        "name": "Mère Mèche Sorrel",
+        "title": "Tenancière de l'Auberge de Hedgewick",
+        "greeting": "Entrez, asseyez-vous, il y a du cordial sur le feu. Gardez juste une main sur tout ce qui est en fer : les gnomes ont les doigts crochus ces derniers temps."
       },
       "gardener_yew": {
-        "name": "Gardener Yew",
-        "title": "The Last Gardener",
-        "greeting": "Hand me that barrow, would you? These lawns do not walk themselves, whatever the hamlet thinks."
+        "name": "Jardinier Yew",
+        "title": "Le Dernier Jardinier",
+        "greeting": "Passe-moi cette brouette, tu veux bien ? Ces pelouses ne se tondent pas toutes seules, quoi qu'en pense le hameau."
       },
       "watcher_maren": {
-        "name": "Watcher Maren",
-        "title": "The Windway Watch",
-        "greeting": "Mind your footing past the gate. The wind up here takes hats first and questions never."
+        "name": "Guetteuse Maren",
+        "title": "La Vigie de la Voie du Vent",
+        "greeting": "Surveillez vos pas passé la porte. Le vent ici emporte les chapeaux d'abord, et ne pose jamais de questions."
       },
       "harbormaster_odile": {
-        "name": "Harbormaster Odile",
-        "title": "Harbormaster of Wickharbor",
-        "greeting": "Every boat in this cove owes the Old Beacon its keel. Speak quick, the tide will not wait."
+        "name": "Capitaine du port Odile",
+        "title": "Capitaine du port de Wickharbor",
+        "greeting": "Chaque bateau de cette crique doit sa quille au Vieux Phare. Parlez vite, la marée n'attend pas."
       },
       "keeper_bram": {
-        "name": "Keeper Bram",
-        "title": "Keeper of the Old Beacon",
-        "greeting": "Nine and thirty years this lamp has burned on my watch. It will not go dark on yours."
+        "name": "Gardien Bram",
+        "title": "Gardien du Vieux Phare",
+        "greeting": "Trente-neuf ans que cette lampe brûle sous ma garde. Elle ne s'éteindra pas sous la vôtre."
       },
       "salvager_edda": {
-        "name": "Salvager Edda",
-        "title": "Wreckfield Salvager",
-        "greeting": "Wreckwood, rope, and dead men's cargo. The sea pays my wage, when the Warden lets it."
+        "name": "Récupératrice Edda",
+        "title": "Récupératrice du Wreckfield",
+        "greeting": "Bois d'épave, corde, et cargaison de marins morts. La mer paie mon salaire, quand le Gardien le permet."
       },
       "warden_coalfast": {
-        "name": "Warden Coalfast",
-        "title": "Redoubt Commander",
-        "greeting": "The breaks do not care that Gullhaven is small, {className}. We hold this shore, or there is no shore left to hold. Stand with us and I will not forget it."
+        "name": "Gardien Coalfast",
+        "title": "Commandant de la Redoute",
+        "greeting": "Les brèches se moquent que Gullhaven soit petite, {className}. Nous tenons ce rivage, ou il n'en restera plus à tenir. Tenez-vous à nos côtés, et je ne l'oublierai pas."
       },
       "riftwatch_ollun": {
-        "name": "Riftwatch Ollun",
-        "title": "Breach Scholar",
-        "greeting": "Every break sings before it opens, if you have the ear for it. I can hear three of them stirring on the island right now, and one of them is close."
+        "name": "Guetteur des failles Ollun",
+        "title": "Érudit des brèches",
+        "greeting": "Chaque brèche chante avant de s'ouvrir, si on a l'oreille pour l'entendre. J'en entends trois qui s'agitent sur l'île en ce moment, et l'une d'elles est proche."
       },
       "quartermaster_edda": {
-        "name": "Quartermaster Edda",
-        "title": "Redoubt Armorer",
-        "greeting": "Steel and salt, {className}, it is all I have left to hand out. Take it and make the breaks regret opening where I could reach them."
+        "name": "Intendante Edda",
+        "title": "Armurière de la Redoute",
+        "greeting": "Acier et sel, {className}, c'est tout ce qu'il me reste à distribuer. Prenez-les et faites regretter aux brèches de s'être ouvertes à ma portée."
       },
       "mender_saul": {
-        "name": "Mender Saul",
-        "title": "Field Surgeon",
-        "greeting": "I have set more bones this one month than in ten years of mending fishing falls. The breaks do not leave much of what they take. Come back to me whole, if you can manage it."
+        "name": "Rebouteux Saul",
+        "title": "Chirurgien de campagne",
+        "greeting": "J'ai ressoudé plus d'os ce mois-ci qu'en dix ans à soigner des chutes de pêcheurs. Les brèches ne laissent pas grand-chose de ce qu'elles prennent. Revenez me voir entier, si vous y arrivez."
       },
       "bellkeeper_tam": {
-        "name": "Bellkeeper Tam",
-        "title": "Watchbell Keeper",
-        "greeting": "The bell is the only warning the breaks give us, {className}. One toll for the fields, two for the cliffs, three when it is close enough that running will not help. Keep an ear on it, and it may keep you whole."
+        "name": "Gardien des cloches Tam",
+        "title": "Gardien de la cloche de guet",
+        "greeting": "La cloche est le seul avertissement que nous donnent les brèches, {className}. Un coup pour les champs, deux pour les falaises, trois quand c'est assez proche pour que courir ne serve à rien. Gardez l'oreille dessus, elle pourrait bien vous garder entier."
       },
       "fisher_nell": {
-        "name": "Frightened Nell",
-        "title": "Gullhaven Fisher",
-        "greeting": "It opened right where the nets dry. Right there, where I stood every morning of my life. I do not go down to the shore anymore. I do not go much of anywhere anymore."
+        "name": "Nell l'Effrayée",
+        "title": "Pêcheuse de Gullhaven",
+        "greeting": "Ça s'est ouvert juste là où sèchent les filets. Juste là, où je me tenais chaque matin de ma vie. Je ne descends plus jusqu'au rivage. Je ne vais plus beaucoup nulle part, en fait."
       },
       "forgemistress_darva": {
         "name": "Maîtresse des forges Darva",
@@ -12540,178 +12540,178 @@ export const fr_CA: EnTranslations = {
         }
       },
       "q_veil_thinned": {
-        "title": "The Thinned Veil",
-        "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
-        "completion": "Cold, every one of them. The Hollow has perhaps a season before the tear becomes a rift. We have work to do, you and I.",
+        "title": "Le voile aminci",
+        "text": "Ainsi la grotte s'est ouverte pour vous. Alors le sceau est plus faible que je ne le craignais, {playerName}. Là où le voile se déchire, les feux follets deviennent sombres et froids. Rapportez-moi huit essences des feux follets du crépuscule et je lirai la profondeur de la blessure.",
+        "completion": "Froides, toutes. Le Creux a peut-être une saison devant lui avant que la déchirure ne devienne une faille. Nous avons du travail, vous et moi.",
         "objectives": {
           "0": {
-            "label": "Duskwisp Essence"
+            "label": "Essence de feu follet du crépuscule"
           }
         }
       },
       "q_gleaming_antlers": {
-        "title": "Gleaming Antlers",
-        "text": "The veiled stags shed light where they graze, and their cast antlers hold it for years. Five of them, from the herds in the open glade at the heart of the valley, and my lanterns burn through the winter without oil. The stags need not be harmed, but they do not part with them easily.",
-        "completion": "Look how they hold the light! No flame, no smoke, just the glow. The Hollow provides.",
+        "title": "Bois luisants",
+        "text": "Les cerfs voilés répandent la lumière là où ils paissent, et leurs bois tombés la conservent pendant des années. Cinq d'entre eux, pris aux troupeaux de la clairière ouverte au cœur de la vallée, et mes lanternes brûleront tout l'hiver sans huile. Les cerfs n'ont pas à être blessés, mais ils ne s'en séparent pas facilement.",
+        "completion": "Regardez comme ils retiennent la lumière ! Pas de flamme, pas de fumée, juste la lueur. Le Creux pourvoit.",
         "objectives": {
           "0": {
-            "label": "Gleaming Antler"
+            "label": "Bois luisant"
           }
         }
       },
       "q_wisp_lights": {
-        "title": "Lights of the Shallows",
-        "text": "The glimmerwisps carry motes of the old starlight that fell here when the Hollow was sealed. Six motes, and the shrine lamps will burn for a year. Take only from those that fade; the Hollow gives enough without greed.",
-        "completion": "Soft as the first stars. Set them here by the altar; the shrine will do the rest.",
+        "title": "Lumières des hauts-fonds",
+        "text": "Les feux follets scintillants portent des poussières de la vieille lumière stellaire tombée ici quand le Creux fut scellé. Six poussières, et les lampes du sanctuaire brûleront pendant un an. Ne prenez que sur ceux qui s'estompent ; le Creux donne assez sans qu'on ait besoin d'être cupide.",
+        "completion": "Douces comme les premières étoiles. Posez-les ici près de l'autel ; le sanctuaire fera le reste.",
         "objectives": {
           "0": {
-            "label": "Wisp Mote"
+            "label": "Poussière de feu follet"
           }
         }
       },
       "q_calming_the_deep": {
-        "title": "Calming the Deep",
-        "text": "The sporelings of the Gleaming Deep were gentle folk before the tear touched their rings. What the corruption takes, it does not give back. Grant the corrupted ones rest, {playerName}: ten of them, in the north of the Deep.",
-        "completion": "You did what I could not bear to. The gatherers still sing in the south rings; because of you, they will keep singing.",
+        "title": "Apaiser les Profondeurs",
+        "text": "Les sporelins des Profondeurs Scintillantes étaient un peuple paisible avant que la déchirure ne touche leurs anneaux. Ce que la corruption prend, elle ne le rend jamais. Accordez le repos aux corrompus, {playerName} : dix d'entre eux, au nord des Profondeurs.",
+        "completion": "Vous avez fait ce que je ne pouvais me résoudre à faire. Les cueilleurs chantent encore dans les anneaux du sud ; grâce à vous, ils continueront de chanter.",
         "objectives": {
           "0": {
-            "label": "Corrupted Sporeling laid to rest"
+            "label": "Sporelin corrompu mis au repos"
           }
         }
       },
       "q_spore_hearts": {
-        "title": "Hearts of the Ring",
-        "text": "When a sporeling falls to the dark, its heart keeps beating with borrowed shadow. Four of those hearts, cleansed at the shrine, may teach us how the corruption spreads. It is grim work, {playerName}, but it is mending work.",
-        "completion": "There. Cleansed, and quiet. Each one shows the same mark: the shadow flows FROM the Sunken Court. Tell Saelwyn.",
+        "title": "Cœurs de l'anneau",
+        "text": "Quand un sporelin tombe dans les ténèbres, son cœur continue de battre d'une ombre empruntée. Quatre de ces cœurs, purifiés au sanctuaire, pourraient nous apprendre comment la corruption se propage. C'est un travail sinistre, {playerName}, mais c'est un travail qui répare.",
+        "completion": "Voilà. Purifiés, et silencieux. Chacun porte la même marque : l'ombre s'écoule DEPUIS la Cour Engloutie. Dites-le à Saelwyn.",
         "objectives": {
           "0": {
-            "label": "Spore Heart"
+            "label": "Cœur de sporelin"
           }
         }
       },
       "q_monument_tour": {
-        "title": "What the Stones Remember",
-        "text": "Three monuments still stand from before the sealing: one at the Duskfall Overlook, one in the Sunken Court, and one lost in the far northeast where nobody walks. Read them for me, {playerName}. My knees gave out two centuries of stairs ago.",
-        "completion": "An overlook, a court, and a forgotten corner... and all three verses of the sealing song, together for the first time since it was sung. You have made an old reader very happy.",
+        "title": "Ce dont les pierres se souviennent",
+        "text": "Trois monuments tiennent encore depuis avant le scellement : un au Belvédère du Crépuscule, un dans la Cour Engloutie, et un perdu loin au nord-est où personne ne marche. Lisez-les pour moi, {playerName}. Mes genoux ont abandonné il y a deux siècles d'escaliers.",
+        "completion": "Un belvédère, une cour, et un coin oublié... et les trois strophes du chant du scellement, réunies pour la première fois depuis qu'il a été chanté. Vous avez rendu une vieille lectrice très heureuse.",
         "objectives": {
           "0": {
-            "label": "The Overlook monument read"
+            "label": "Monument du Belvédère lu"
           },
           "1": {
-            "label": "The Court monument read"
+            "label": "Monument de la Cour lu"
           },
           "2": {
-            "label": "The forgotten monument read"
+            "label": "Monument oublié lu"
           }
         }
       },
       "q_grove_menace": {
-        "title": "Menace in the Glade",
-        "text": "Duskwisps have started drifting in among my stalls after dark, {playerName}, and their chill spoils everything it touches. Thin them out for me: ten of them, wherever the veil has torn.",
-        "completion": "The night market can open again. You have a customer for life, or at least a discount.",
+        "title": "Menace dans la clairière",
+        "text": "Des feux follets du crépuscule ont commencé à dériver parmi mes étals après la tombée de la nuit, {playerName}, et leur froid gâte tout ce qu'il touche. Réduisez-en le nombre pour moi : dix, où que le voile se soit déchiré.",
+        "completion": "Le marché nocturne peut rouvrir. Vous avez une cliente à vie, ou du moins une remise.",
         "objectives": {
           "0": {
-            "label": "Duskwisp dispersed"
+            "label": "Feu follet du crépuscule dispersé"
           }
         }
       },
       "q_shards_of_starfall": {
-        "title": "Shards of Starfall",
-        "text": "When the duskwisps pass over the crystal fields, slivers of old starlight cling to them like burrs. Six shards, {playerName}, and I can date the sealing to the very season it was sung.",
-        "completion": "Look at the striations! Autumn. The Hollow was sealed in autumn. Two hundred years of argument, settled by six little stones.",
+        "title": "Éclats d'étoiles filantes",
+        "text": "Quand les feux follets du crépuscule passent au-dessus des champs de cristal, des éclats de vieille lumière stellaire s'accrochent à eux comme des chardons. Six éclats, {playerName}, et je pourrai dater le scellement à la saison même où il fut chanté.",
+        "completion": "Regardez ces striations ! Automne. Le Creux a été scellé en automne. Deux cents ans de dispute, réglés par six petites pierres.",
         "objectives": {
           "0": {
-            "label": "Starfall Shard"
+            "label": "Éclat d'étoile filante"
           }
         }
       },
       "q_treant_accord": {
-        "title": "The Treant Accord",
-        "text": "The elders of the Grove shed their outer bark as the corruption gnaws at their roots. Four lengths of it, and I can brew a salve for the whole Grove. They will not thank you while you pry it loose, {playerName}, but they will stand a century longer for it.",
-        "completion": "Thick and sound, all four. The salve will take a week to brew and a hundred years to finish its work. Trees measure kindness differently.",
+        "title": "L'accord des treants",
+        "text": "Les anciens du Bosquet perdent leur écorce externe tandis que la corruption ronge leurs racines. Quatre morceaux, et je pourrai préparer un onguent pour tout le Bosquet. Ils ne vous remercieront pas pendant que vous l'arrachez, {playerName}, mais ils tiendront un siècle de plus grâce à cela.",
+        "completion": "Épaisses et saines, toutes les quatre. L'onguent prendra une semaine à préparer et cent ans à achever son œuvre. Les arbres mesurent la bonté différemment.",
         "objectives": {
           "0": {
-            "label": "Elder Bark"
+            "label": "Écorce ancestrale"
           }
         }
       },
       "q_spore_tide": {
-        "title": "Against the Spore Tide",
-        "text": "The salve holds the Grove, but the corruption presses harder at the Deep with every dusk. Twelve more of the corrupted must be laid to rest before the gatherers can reclaim their north rings, {playerName}.",
-        "completion": "The rings in the north are singing again tonight. Quietly, but singing.",
+        "title": "Contre la marée des spores",
+        "text": "L'onguent protège le Bosquet, mais la corruption presse davantage les Profondeurs à chaque crépuscule. Douze corrompus de plus doivent être mis au repos avant que les cueilleurs ne puissent reprendre leurs anneaux du nord, {playerName}.",
+        "completion": "Les anneaux du nord chantent de nouveau ce soir. Doucement, mais ils chantent.",
         "objectives": {
           "0": {
-            "label": "Corrupted Sporeling laid to rest"
+            "label": "Sporelin corrompu mis au repos"
           }
         }
       },
       "q_sunken_court": {
-        "title": "The Sunken Court",
-        "text": "Bryn read the hearts true: the tear runs through the old court in the east, and its guardians have woken wrong. They were built to protect the seal; now they will crush anyone who nears it. Clear eight of them from the ruins.",
-        "completion": "Eight guardians, stilled. I remember when they were raised, {playerName}. Do not look so surprised; the Hollow keeps its keepers a long time.",
+        "title": "La Cour Engloutie",
+        "text": "Bryn a lu les cœurs avec justesse : la déchirure traverse la vieille cour à l'est, et ses gardiens se sont éveillés de travers. Ils furent bâtis pour protéger le sceau ; désormais ils écraseront quiconque s'en approche. Débarrassez-en huit dans les ruines.",
+        "completion": "Huit gardiens, immobilisés. Je me souviens de leur érection, {playerName}. Ne prenez pas cet air surpris ; le Creux garde ses gardiens longtemps.",
         "objectives": {
           "0": {
-            "label": "Ancient Guardian stilled"
+            "label": "Gardien antique immobilisé"
           }
         }
       },
       "q_wardens_echoes": {
-        "title": "Echoes of the Warden",
-        "text": "Even with their master silenced, the court guardians repeat its last command like an echo that will not fade. Until the seal is set back, they will keep waking, {playerName}. Still ten more of them so the masons can reach the sealstone.",
-        "completion": "The echo grows fainter each time. Soon the court will hold nothing but wind and ivy, the way a ruin should.",
+        "title": "Échos du Gardien",
+        "text": "Même avec leur maître réduit au silence, les gardiens de la cour répètent son dernier ordre comme un écho qui ne s'estompe pas. Tant que le sceau ne sera pas remis en place, ils continueront de s'éveiller, {playerName}. Immobilisez-en dix de plus pour que les maçons puissent atteindre la pierre-sceau.",
+        "completion": "L'écho s'affaiblit un peu plus chaque fois. Bientôt la cour ne contiendra plus que du vent et du lierre, comme il sied à une ruine.",
         "objectives": {
           "0": {
-            "label": "Ancient Guardian stilled"
+            "label": "Gardien antique immobilisé"
           }
         }
       },
       "q_waking_warden": {
-        "title": "The Waking Warden",
-        "text": "The court is quiet, but its master is not. The Warden that holds the seal has woken twisted, and while it stands, the seal cannot be mended. It will not fall easily; bring a friend if you can find one, {playerName}. Bring two if you can find two.",
-        "completion": "The bell of its voice is silent. I felt it from here, like a weight lifted off the whole valley.",
+        "title": "Le Gardien éveillé",
+        "text": "La cour est silencieuse, mais son maître ne l'est pas. Le Gardien qui tient le sceau s'est éveillé corrompu, et tant qu'il se dresse, le sceau ne peut être réparé. Il ne tombera pas facilement ; amenez un ami si vous pouvez en trouver un, {playerName}. Amenez-en deux si vous pouvez en trouver deux.",
+        "completion": "La cloche de sa voix s'est tue. Je l'ai senti d'ici, comme un poids soulevé de toute la vallée.",
         "objectives": {
           "0": {
-            "label": "The Waking Warden defeated"
+            "label": "Le Gardien éveillé vaincu"
           }
         }
       },
       "q_seal_restored": {
-        "title": "The Seal Restored",
-        "text": "Take the Warden's seal to the sealstone at the heart of the court and set it back where it was struck loose. Then the Hollow can begin to heal, and you, {playerName}, will have done what no one of your kind has done before.",
-        "completion": "I felt it close from here, gentle as dusk. The Hollow remembers its friends, {playerName}. However far you travel, there will always be a light for you beneath the great tree.",
+        "title": "Le sceau restauré",
+        "text": "Portez le sceau du Gardien à la pierre-sceau au cœur de la cour et remettez-le là où il a été délogé. Alors le Creux pourra commencer à guérir, et vous, {playerName}, aurez accompli ce qu'aucun être de votre espèce n'a jamais fait.",
+        "completion": "Je l'ai senti se refermer d'ici, doux comme le crépuscule. Le Creux se souvient de ses amis, {playerName}. Aussi loin que vous voyagiez, il y aura toujours une lumière pour vous sous le grand arbre.",
         "objectives": {
           "0": {
-            "label": "The seal set back in the sealstone"
+            "label": "Le sceau remis dans la pierre-sceau"
           }
         }
       },
       "q_hollow_the_huntsman": {
-        "title": "The Warden of the Herds",
-        "text": "You look like someone who can handle more than wisps, {playerName}. Huntsman Deral keeps his lookout among the stag meadows east of here, and he has been asking after capable hands for weeks. Whatever he is tracking out there, he will not say it aloud in the village.",
-        "completion": "Fenna sent you? Good. Then she trusts you, and I have two names that need crossing out.",
+        "title": "Le Gardien des Troupeaux",
+        "text": "Vous avez l'air de quelqu'un capable de gérer plus que de simples feux follets, {playerName}. Le chasseur Deral tient son poste de guet parmi les prés à cerfs à l'est d'ici, et il réclame des mains capables depuis des semaines. Quoi qu'il traque là-bas, il refuse de le dire tout haut au village.",
+        "completion": "Fenna vous envoie ? Bien. Alors elle vous fait confiance, et j'ai deux noms à rayer.",
         "objectives": {
           "0": {
-            "label": "Find Huntsman Deral"
+            "label": "Trouver le chasseur Deral"
           }
         }
       },
       "q_hollow_old_marrowshell": {
-        "title": "The Old Shell of the Shallows",
-        "text": "The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldergleam had a gate. It wanders, {playerName}, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.",
-        "completion": "The shallows are just water again. I have watched that shell break better hunters than me, {playerName}. Not you.",
+        "title": "La vieille carapace des hauts-fonds",
+        "text": "Le premier nom est Vieux Marrowshell, un crabe de la taille d'un chariot qui chasse dans les hauts-fonds de l'est depuis avant qu'Eldergleam n'ait de porte. Il erre, {playerName}, alors vous devrez parcourir le rivage jusqu'à croiser sa trace. N'y allez pas seul, et ne vous fiez pas à son immobilité.",
+        "completion": "Les hauts-fonds ne sont plus que de l'eau à nouveau. J'ai vu cette carapace briser de meilleurs chasseurs que moi, {playerName}. Pas vous.",
         "objectives": {
           "0": {
-            "label": "Old Marrowshell slain"
+            "label": "Vieux Marrowshell abattu"
           }
         }
       },
       "q_hollow_first_of_the_herd": {
-        "title": "First of the Herd",
-        "text": "The second name is harder to say. Aurelhorn led these herds when my grandmother kept this lookout, and whatever woke in the Hollow woke him wrong. He tramples what he once warded, and the herd will not survive his madness. He roams the meadows near the old court roads. End him with mercy, {playerName}, and bring a friend to share the weight of it.",
-        "completion": "So the First falls to the last. The herd is already calmer, do you feel it? You did the Hollow a kindness today, even if it does not look like one.",
+        "title": "Premier du Troupeau",
+        "text": "Le second nom est plus dur à prononcer. Aurelhorn menait ces troupeaux quand ma grand-mère tenait déjà ce poste de guet, et ce qui s'est réveillé dans le Creux l'a réveillé de travers. Il piétine ce qu'il protégeait autrefois, et le troupeau ne survivra pas à sa folie. Il erre dans les prés près des vieilles routes de la cour. Achevez-le avec pitié, {playerName}, et amenez un ami pour partager ce fardeau.",
+        "completion": "Ainsi le Premier tombe sous le dernier venu. Le troupeau est déjà plus calme, le sentez-vous ? Vous avez fait une bonté au Creux aujourd'hui, même si elle n'en a pas l'air.",
         "objectives": {
           "0": {
-            "label": "Aurelhorn given peace"
+            "label": "Aurelhorn apaisé"
           }
         }
       },
@@ -12726,912 +12726,912 @@ export const fr_CA: EnTranslations = {
         }
       },
       "q_fv_snowline_report": {
-        "title": "Word from the Snowline",
-        "text": "Every soul who climbs out of the Drakelands passes my fire, {playerName}, and fewer climb every week. Warden Kaldra holds Icemantle up the north road. Tell her the pass is still open, and tell her a stranger walked it alone.",
-        "completion": "The pass holds, then. Einna sits that waycamp through storms that bury the road markers, and she has never once sent me idle news. Welcome to Icemantle, {playerName}.",
+        "title": "Des nouvelles de la Ligne de Neige",
+        "text": "Chaque âme qui grimpe hors des Drakelands passe par mon feu, {playerName}, et elles sont de moins en moins nombreuses chaque semaine. Le Gardien Kaldra tient Icemantle sur la route du nord. Dites-lui que le col est toujours ouvert, et qu'un étranger l'a traversé seul.",
+        "completion": "Le col tient bon, alors. Einna occupe ce campement à travers des tempêtes qui ensevelissent les bornes routières, et elle ne m'a jamais envoyé de nouvelles pour rien. Bienvenue à Icemantle, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Report to Warden Kaldra"
+            "label": "Faire un rapport au Gardien Kaldra"
           }
         }
       },
       "q_fv_wolves_at_the_door": {
-        "title": "Wolves at the Door",
-        "text": "The snowdrift packs used to keep to the high benches. Now they cross the tarn road in daylight and my woodcutters will not leave the walls. Thin the packs, {playerName}, ten of them, and the road is a road again.",
-        "completion": "Ten fewer shadows between here and the tarn. The woodcutters are already arguing over who goes out first.",
+        "title": "Des loups à la porte",
+        "text": "Les meutes des congères se tenaient autrefois sur les hauteurs. Maintenant elles traversent la route du lac en plein jour, et mes bûcherons refusent de quitter les murs. Réduisez les meutes, {playerName}, dix d'entre eux, et la route redeviendra une route.",
+        "completion": "Dix ombres de moins entre ici et le lac. Les bûcherons se disputent déjà pour savoir qui sort en premier.",
         "objectives": {
           "0": {
-            "label": "Snowdrift Wolf slain"
+            "label": "Loup des congères abattu"
           }
         }
       },
       "q_fv_winter_pelts": {
-        "title": "Pelts for the Lodge",
-        "text": "Firewood keeps a body alive, {playerName}, but wool will not turn this cold, only wolf-fur will. Six thick winter pelts off the snowdrift packs and I can line bedrolls for everyone the lodge shelters.",
-        "completion": "Fur like this is the only argument winter listens to. Take these treads, they are lined with the last batch.",
+        "title": "Des fourrures pour le pavillon",
+        "text": "Le bois de chauffage garde un corps en vie, {playerName}, mais la laine ne repoussera pas ce froid, seule la fourrure de loup le peut. Six épaisses fourrures d'hiver prises aux meutes des congères et je pourrai doubler des couchages pour tous ceux que le pavillon abrite.",
+        "completion": "Une fourrure comme celle-ci est le seul argument que l'hiver écoute. Prenez ces bottines, elles sont doublées du dernier lot.",
         "objectives": {
           "0": {
-            "label": "Thick Winter Pelt"
+            "label": "Épaisse fourrure d'hiver"
           }
         }
       },
       "q_fv_ember_caches": {
-        "title": "Embers on the Tarn Road",
-        "text": "A sledge of ember caches overturned on the tarn road in last night: iron kettles that hold a banked fire alive for a month. Three of them are still lying in the snow, {playerName}, and the lodge cannot spare what they hold. Bring the fire home.",
-        "completion": "Still warm, every one. You have bought the lodge a whole winter of mercy, {playerName}.",
+        "title": "Des braises sur la route du lac",
+        "text": "Un traîneau de réserves de braises s'est renversé sur la route du lac cette nuit : des marmites de fer qui gardent un feu couvant vivant pendant un mois. Trois d'entre elles gisent encore dans la neige, {playerName}, et le pavillon ne peut se passer de ce qu'elles contiennent. Ramenez le feu à la maison.",
+        "completion": "Encore chaudes, toutes. Vous avez acheté au pavillon tout un hiver de répit, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Ember Cache recovered"
+            "label": "Réserve de braises récupérée"
           }
         }
       },
       "q_fv_lights_over_steps": {
-        "title": "Lights over the Steps",
-        "text": "The aurora has burned green every night this month, and the old folk will not walk under it. One woman might know why: Veyla, the Aurorist. She camps alone on the Aurora Steps, southeast past the tarn. Find her camp, {playerName}, and hear what the lights have told her.",
-        "completion": "Kaldra sent you? Then she is finally worried, and she is right to be. Sit, {playerName}. Watch the sky with me a while.",
+        "title": "Des lumières sur les marches",
+        "text": "L'aurore a brûlé verte chaque nuit ce mois-ci, et les anciens refusent de marcher sous elle. Une femme pourrait savoir pourquoi : Veyla, l'Auroriste. Elle campe seule sur les Marches de l'Aurore, au sud-est au-delà du lac. Trouvez son camp, {playerName}, et écoutez ce que les lumières lui ont dit.",
+        "completion": "Kaldra vous envoie ? Alors elle s'inquiète enfin, et elle a raison. Asseyez-vous, {playerName}. Observez le ciel avec moi un moment.",
         "objectives": {
           "0": {
-            "label": "Find Aurorist Veyla"
+            "label": "Trouver l'Auroriste Veyla"
           }
         }
       },
       "q_fv_silent_trapline": {
-        "title": "The Silent Trapline",
-        "text": "Old Brosk works the Shiverfen trapline west of here, and every week for eleven years he has sent a bundle of furs up with the wood sledge. Two weeks now, nothing. He is too stubborn to freeze and too careful to drown, {playerName}, so something else is wrong. Find his camp at the fen and see him breathing.",
-        "completion": "Maeve sent you? Ha. Eleven years and the woman still thinks the fen will eat me. Well... this year she might be right. Look at what it's done to my lines.",
+        "title": "La ligne de pièges silencieuse",
+        "text": "Le vieux Brosk tient la ligne de pièges du Shiverfen à l'ouest d'ici, et chaque semaine depuis onze ans il a envoyé un ballot de fourrures avec le traîneau de bois. Voilà deux semaines, rien. Il est trop têtu pour geler et trop prudent pour se noyer, {playerName}, donc autre chose ne va pas. Trouvez son camp dans la tourbière et assurez-vous qu'il respire encore.",
+        "completion": "Maeve vous envoie ? Ha. Onze ans, et cette femme croit encore que la tourbière va me dévorer. Enfin... cette année, elle pourrait bien avoir raison. Regardez ce que ça a fait à mes lignes.",
         "objectives": {
           "0": {
-            "label": "Find Trapper Brosk"
+            "label": "Trouver le trappeur Brosk"
           }
         }
       },
       "q_fv_aurora_motes": {
-        "title": "Motes of the Aurora",
-        "text": "The wisps that drift these steps are shed by the lights themselves, and each carries a mote of the aurora in its heart. I need six to read what the sky is writing, {playerName}. The wisps do not fight back. Whether that makes the work easier or harder is between you and your conscience.",
-        "completion": "Six motes, still glowing. Look at them, {playerName}: they pulse in time with each other. The lights are not weather. They are a signal.",
+        "title": "Poussières d'aurore",
+        "text": "Les feux follets qui dérivent sur ces marches sont détachés des lumières elles-mêmes, et chacun porte une poussière d'aurore en son cœur. J'en ai besoin de six pour lire ce que le ciel écrit, {playerName}. Les feux follets ne se défendent pas. Que cela rende la tâche plus facile ou plus difficile ne regarde que votre conscience.",
+        "completion": "Six poussières, encore luminescentes. Regardez-les, {playerName} : elles pulsent à l'unisson. Les lumières ne sont pas un phénomène météorologique. Ce sont un signal.",
         "objectives": {
           "0": {
-            "label": "Aurora Mote"
+            "label": "Poussière d'aurore"
           }
         }
       },
       "q_fv_rime_unbound": {
-        "title": "Rime Unbound",
-        "text": "When the aurora burns this bright, the cold stands up and walks: rime elementals, frost given a will. They gather where the lights touch the benches, and they are wandering closer to my camp each night. Break eight of them apart, {playerName}, before one of them breaks me.",
-        "completion": "The night feels thinner already. Whatever wakes them is not done, but you have bought the Steps some quiet.",
+        "title": "Le givre délié",
+        "text": "Quand l'aurore brûle aussi vive, le froid se redresse et se met à marcher : des élémentaires de givre, du gel doté d'une volonté. Ils se rassemblent là où les lumières touchent les terrasses, et ils s'approchent un peu plus de mon camp chaque nuit. Brisez-en huit, {playerName}, avant que l'un d'eux ne me brise.",
+        "completion": "La nuit semble déjà plus légère. Ce qui les réveille n'a pas fini son œuvre, mais vous avez acheté un peu de calme aux Marches.",
         "objectives": {
           "0": {
-            "label": "Rime Elemental slain"
+            "label": "Élémentaire de givre abattu"
           }
         }
       },
       "q_fv_sprung_traps": {
-        "title": "Sprites in the Traps",
-        "text": "Fen sprites, {playerName}. The little devils spring my traps for sport and scatter the iron in the reeds. Drive them off, eight should teach the rest, and gather up what is left of my traplines while you are out there.",
-        "completion": "Four good traps back and the reeds gone quiet. You trap with a heavier hand than I do, {playerName}, but I cannot argue with the results.",
+        "title": "Des lutins dans les pièges",
+        "text": "Des lutins des tourbières, {playerName}. Les petits diables déclenchent mes pièges pour s'amuser et éparpillent le fer dans les roseaux. Chassez-les, huit devraient suffire à instruire les autres, et récupérez ce qu'il reste de mes lignes de piégeage pendant que vous y êtes.",
+        "completion": "Quatre bons pièges récupérés et les roseaux redevenus silencieux. Vous piégez avec une main plus lourde que la mienne, {playerName}, mais je ne peux pas contester les résultats.",
         "objectives": {
           "0": {
-            "label": "Fen Sprite driven off"
+            "label": "Lutin des tourbières chassé"
           },
           "1": {
-            "label": "Trap recovered"
+            "label": "Piège récupéré"
           }
         }
       },
       "q_fv_howl_above": {
-        "title": "The Howl on the Terraces",
-        "text": "You hear it at dusk, {playerName}: a howl off the Howling Terraces that is not the snowdrift packs. Bigger throats. The terrace howlers have come down from the peaks for the first time since my grandmother held this post, and they are what pushed the wolves onto my road. Cull eight and push them back.",
-        "completion": "Eight, and the dusk chorus is thinner for it. But howlers do not leave the peaks for nothing. Something up there moved them, and I fear it has a name.",
+        "title": "Le hurlement sur les terrasses",
+        "text": "Vous l'entendez au crépuscule, {playerName} : un hurlement venu des Terrasses Hurlantes qui n'est pas celui des meutes des congères. Des gorges plus grandes. Les hurleurs des terrasses sont descendus des cimes pour la première fois depuis que ma grand-mère tenait ce poste, et ce sont eux qui ont poussé les loups sur ma route. Abattez-en huit et repoussez-les.",
+        "completion": "Huit, et le chœur du crépuscule s'en trouve amenuisé. Mais les hurleurs ne quittent pas les cimes pour rien. Quelque chose là-haut les a fait fuir, et je crains que cela ait un nom.",
         "objectives": {
           "0": {
-            "label": "Terrace Howler slain"
+            "label": "Hurleur des terrasses abattu"
           }
         }
       },
       "q_fv_seeing_wren_home": {
-        "title": "Seeing Wren Home",
-        "text": "My apprentice Wren went out to walk the Goldmelt line two days ago and never came back. I found her tracks, she is holed up under the road markers southwest of the Aurora Steps, too scared of the wolves to move. I cannot leave the fen, {playerName}. Walk her to Veyla's camp on the Steps. She will be safe under the lights.",
-        "completion": "The girl is inside, wrapped in half my blankets and talking the stars out of the sky. You did a kind thing today, {playerName}. The Reach doesn't see many of those.",
+        "title": "Ramener Wren à bon port",
+        "text": "Mon apprentie Wren est partie parcourir la ligne du Goldmelt il y a deux jours et n'est jamais revenue. J'ai trouvé ses traces, elle s'est terrée sous les bornes routières au sud-ouest des Marches de l'Aurore, trop effrayée par les loups pour bouger. Je ne peux quitter la tourbière, {playerName}. Ramenez-la au camp de Veyla sur les Marches. Elle sera en sécurité sous les lumières.",
+        "completion": "La fille est à l'intérieur, enroulée dans la moitié de mes couvertures, à discourir sur les étoiles. Vous avez fait une bonne chose aujourd'hui, {playerName}. Le Reach n'en voit pas beaucoup.",
         "objectives": {
           "0": {
-            "label": "Apprentice Wren seen safely to the Aurora Steps"
+            "label": "Apprentie Wren ramenée saine et sauve aux Marches de l'Aurore"
           }
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "The Frostmane Tyrant",
-        "text": "The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Frostmane, and even the packs will not share a slope with it. It has to end, {playerName}, before winter drives it down to my walls. Bring a friend. Bring two.",
-        "completion": "When the wind dropped last night the whole village heard the silence where the Frostmane used to be. The Reach owes you a debt it will be years in paying, {playerName}. Wear this, and every door in Icemantle is open to you.",
+        "title": "Le tyran Frostmane",
+        "text": "Les hurleurs ne chassaient pas quand ils sont descendus des terrasses. Ils fuyaient. Un yeti s'est emparé des hauteurs, les gens de la montagne l'appellent le Frostmane, et même les meutes refusent de partager une pente avec lui. Il faut en finir, {playerName}, avant que l'hiver ne le pousse jusqu'à mes murs. Amenez un ami. Amenez-en deux.",
+        "completion": "Quand le vent est tombé la nuit dernière, tout le village a entendu le silence là où se tenait autrefois le Frostmane. Le Reach vous doit une dette qu'il mettra des années à payer, {playerName}. Portez ceci, et chaque porte d'Icemantle vous sera ouverte.",
         "objectives": {
           "0": {
-            "label": "The Frostmane slain"
+            "label": "Le Frostmane abattu"
           }
         }
       },
       "q_dk_ash_on_the_wind": {
-        "title": "Ash on the Wind",
-        "text": "Look south off the palisade, {playerName}. Those fires in the dunes are not troll cookfires, they are ashbone musters, and every night there are more. The dead come up out of the bonefields with sand still in their teeth. Cut down ten raiders before they cut a road to my gate.",
-        "completion": "Ten fewer blades in the dunes, and the muster fires burned lower last night. My sentries slept, which they have not done in a week. Well cut, {playerName}.",
+        "title": "De la cendre dans le vent",
+        "text": "Regardez au sud de la palissade, {playerName}. Ces feux dans les dunes ne sont pas des feux de cuisine trolls, ce sont des rassemblements Ashbone, et chaque nuit il y en a davantage. Les morts sortent des champs d'ossements avec du sable encore entre les dents. Abattez dix pillards avant qu'ils ne se taillent un chemin jusqu'à ma porte.",
+        "completion": "Dix lames de moins dans les dunes, et les feux de rassemblement ont brûlé plus bas la nuit dernière. Mes sentinelles ont dormi, ce qu'elles n'avaient pas fait depuis une semaine. Bien tranché, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Ashbone Raider slain"
+            "label": "Pillard Ashbone abattu"
           }
         }
       },
       "q_dk_trolls_on_the_road": {
-        "title": "Trolls on the Road",
-        "text": "The dune trolls have learned the sound of a supply wagon, {playerName}. They hit the Cinder Dunes road three times this month, and the last driver walked in carrying nothing but the reins. Eight trolls off that road and my wagons roll again.",
-        "completion": "Eight, and my drivers have stopped writing farewell letters before every run. The garrison eats because of you, {playerName}.",
+        "title": "Des trolls sur la route",
+        "text": "Les trolls des dunes ont appris à reconnaître le bruit d'un chariot de ravitaillement, {playerName}. Ils ont frappé la route des Dunes de Cendre trois fois ce mois-ci, et le dernier cocher est revenu à pied, sans rien d'autre que ses rênes. Débarrassez cette route de huit trolls et mes chariots repartiront.",
+        "completion": "Huit, et mes cochers ont cessé d'écrire des lettres d'adieu avant chaque trajet. La garnison mange grâce à vous, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Dune Troll slain"
+            "label": "Troll des dunes abattu"
           }
         }
       },
       "q_dk_scorched_stores": {
-        "title": "Scorched Stores",
-        "text": "The last wagon burned, {playerName}, but iron-strapped crates do not burn through. Four of them are still lying scorched along the dunes road with a season of salt, nails, and bowstrings inside. Bring my stores home before the trolls work out how to open them.",
-        "completion": "Scorched black and every latch still holding. The smith gets his nails, the fletcher her strings, and you get the boots I was saving for whoever brought my crates back, {playerName}.",
+        "title": "Réserves calcinées",
+        "text": "Le dernier chariot a brûlé, {playerName}, mais les caisses cerclées de fer ne brûlent pas de part en part. Quatre d'entre elles gisent encore, calcinées, le long de la route des dunes, avec une saison de sel, de clous et de cordes d'arbalète à l'intérieur. Ramenez mes réserves avant que les trolls ne comprennent comment les ouvrir.",
+        "completion": "Noircies par le feu, et chaque loquet tient encore bon. Le forgeron a ses clous, l'archère ses cordes, et vous avez les bottes que je gardais pour quiconque me ramènerait mes caisses, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Scorched supply crate recovered"
+            "label": "Caisse de ravitaillement calcinée récupérée"
           }
         }
       },
       "q_dk_banners_over_the_dunes": {
-        "title": "Banners over the Dunes",
-        "text": "The ashbone muster at the old bonefield graves, {playerName}, and my patrols cannot read the dunes the way they read a wall. Kill five of their warcallers, the ones that scream the dead upright, and plant a warning banner on each muster ground so my sentries can mark it from the ridge.",
-        "completion": "Three banners snapping in the hot wind, right where my glass can find them. With five warcallers silenced, whatever answers their call will come slower. You bought us time, {playerName}.",
+        "title": "Des bannières sur les dunes",
+        "text": "Les Ashbone se rassemblent aux anciennes tombes des champs d'ossements, {playerName}, et mes patrouilles ne savent pas lire les dunes comme elles liraient un mur. Tuez cinq de leurs hérauts de guerre, ceux qui hurlent pour redresser les morts, et plantez une bannière d'alerte sur chaque terrain de rassemblement afin que mes sentinelles puissent le repérer depuis la crête.",
+        "completion": "Trois bannières qui claquent dans le vent brûlant, juste là où ma lunette peut les trouver. Avec cinq hérauts de guerre réduits au silence, ce qui répond à leur appel viendra plus lentement. Vous nous avez acheté du temps, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Ashbone Warcaller slain"
+            "label": "Héraut de guerre Ashbone abattu"
           },
           "1": {
-            "label": "Warning banner planted"
+            "label": "Bannière d'alerte plantée"
           }
         }
       },
       "q_dk_watcher_at_the_wargate": {
-        "title": "The Watcher at the Wargate",
-        "text": "Something is pulling the ashbone east, {playerName}, and I sent my best to learn what. Scout Yerrin has camped a month in the far dunes past Trollmoot, in sight of a gate nobody built in my lifetime. Her reports stopped ten days ago. Find her camp and get me her eyes.",
-        "completion": "Brannoc sent you? Then my last runner never made it. Keep your voice down and sit, {playerName}. You see that gate below? Count the war-banners in front of it, and you will understand why I stopped writing things down.",
+        "title": "La guetteuse à la porte de guerre",
+        "text": "Quelque chose attire les Ashbone vers l'est, {playerName}, et j'ai envoyé ma meilleure éclaireuse pour découvrir quoi. L'éclaireuse Yerrin campe depuis un mois dans les dunes lointaines au-delà de Trollmoot, en vue d'une porte que personne n'a bâtie de mon vivant. Ses rapports se sont arrêtés il y a dix jours. Trouvez son camp et ramenez-moi ses observations.",
+        "completion": "Brannoc vous a envoyé ? Alors mon dernier messager n'est jamais arrivé. Baissez la voix et asseyez-vous, {playerName}. Vous voyez cette porte en contrebas ? Comptez les bannières de guerre devant elle, et vous comprendrez pourquoi j'ai cessé de tout noter.",
         "objectives": {
           "0": {
-            "label": "Find Scout Yerrin"
+            "label": "Trouver l'éclaireuse Yerrin"
           }
         }
       },
       "q_dk_marrow_and_ash": {
-        "title": "Marrow and Ash",
-        "text": "Every ashbone raider carries a war-brand, {playerName}: a scorched tally of the host it marches under. I have counted four hosts from this ridge, but guesses are not intelligence. Bring me six brands off the raiders and their warcallers, and I will give Brannoc the shape of the war that is coming.",
-        "completion": "Six brands, and one mark burned into every one of them. This is no raid muster, {playerName}. Every host in the dunes answers to the wargate below us, the trolls call it Orkadia, and no five soldiers I ever served with could break what drums behind that door. Perhaps five like you.",
+        "title": "Moelle et cendre",
+        "text": "Chaque pillard Ashbone porte un tison de guerre, {playerName} : une marque calcinée de l'armée sous laquelle il marche. J'ai compté quatre armées depuis cette crête, mais des suppositions ne sont pas des renseignements. Rapportez-moi six tisons pris aux pillards et à leurs hérauts, et je donnerai à Brannoc la forme de la guerre qui s'annonce.",
+        "completion": "Six tisons, et une même marque brûlée dans chacun d'eux. Ce n'est pas un simple rassemblement de pillards, {playerName}. Chaque armée des dunes répond à la porte de guerre en contrebas, les trolls l'appellent Orkadia, et aucun des cinq soldats avec qui j'ai jamais servi n'aurait pu briser ce qui tambourine derrière cette porte. Peut-être cinq comme vous, en revanche.",
         "objectives": {
           "0": {
-            "label": "Ashbone War-Brand"
+            "label": "Tison de guerre Ashbone"
           }
         }
       },
       "q_dk_scales_of_the_maw": {
-        "title": "Scales of the Maw",
-        "text": "When the wind turns off the Drakemaw, the emberwing drakes ride it over my camp low enough to count their teeth, {playerName}. They range farther every day, and something in that crater drives them. Bring me three of their scales. Scales remember heat, and I can read where a drake has been roosting by the burn.",
-        "completion": "Look at the underside of this one, {playerName}: scorched in a spiral, and only one thing nests in circles. These drakes are brood-guards. Something in the Drakemaw is a mother.",
+        "title": "Les écailles de la Gueule",
+        "text": "Quand le vent tourne depuis le Drakemaw, les drakes-braise le chevauchent au-dessus de mon camp, assez bas pour qu'on compte leurs dents, {playerName}. Ils s'aventurent plus loin chaque jour, et quelque chose dans ce cratère les pousse. Apportez-moi trois de leurs écailles. Les écailles se souviennent de la chaleur, et je peux lire où un drake a niché grâce aux marques de brûlure.",
+        "completion": "Regardez le dessous de celle-ci, {playerName} : calcinée en spirale, et une seule chose niche en cercles. Ces drakes sont des gardiens de couvée. Quelque chose dans le Drakemaw est une mère.",
         "objectives": {
           "0": {
-            "label": "Emberwing Scale"
+            "label": "Écaille Aile-de-braise"
           }
         }
       },
       "q_dk_matriarch_of_the_maw": {
-        "title": "Matriarch of the Maw",
-        "text": "The scales told it true, {playerName}. I climbed the rim at dawn and saw her on the crater floor: Cindraleth, the matriarch every emberwing in this sky was hatched under, gold as a coal about to catch. While she broods, the drakes grow bolder, and Wyrmwatch cannot fight dragons and the ashbone both. End her in her crater, then carry the word to Gatecaptain Brannoc. Do not go alone.",
-        "completion": "The sky over the Drakemaw has been empty for two days, and now you walk through my gate with a matriarch's blood on your boots. Wyrmwatch has stood forty years on watch for exactly this, {playerName}. Take these pauldrons, mawscale, worked by our own smith. Wear them where the drakes can see.",
+        "title": "La Matriarche de la Gueule",
+        "text": "Les écailles disaient vrai, {playerName}. J'ai grimpé au bord du cratère à l'aube et je l'ai vue au fond : Cindraleth, la matriarche sous laquelle chaque drake-braise de ce ciel est né, dorée comme une braise sur le point de prendre. Tant qu'elle couve, les drakes deviennent plus audacieux, et Wyrmwatch ne peut combattre à la fois les dragons et les Ashbone. Achevez-la dans son cratère, puis portez la nouvelle au Capitaine-de-porte Brannoc. N'y allez pas seul.",
+        "completion": "Le ciel au-dessus du Drakemaw est vide depuis deux jours, et vous voilà qui franchissez ma porte avec le sang d'une matriarche sur vos bottes. Wyrmwatch monte la garde depuis quarante ans exactement pour cela, {playerName}. Prenez ces spallières, en écaille-de-gueule, façonnées par notre propre forgeron. Portez-les là où les drakes pourront les voir.",
         "objectives": {
           "0": {
-            "label": "Cindraleth the Maw Matriarch slain"
+            "label": "Cindraleth, Matriarche de la Gueule, abattue"
           }
         }
       },
       "q_af_goldmelt_road": {
-        "title": "The Gold Road Down",
-        "text": "You came over the Goldmelt, {playerName}, snow still on your boots. I keep this shrine so Lanternmere knows who walks in from the cold, and lately I have had little to report. Take the gold road down to the town, find Reeve Ottoline by the well, and tell her the pass is quiet.",
-        "completion": "Quiet on the Goldmelt, and a traveler with snow in their hair to prove it. Sorrel keeps her watch too well to send idle word. Be welcome in Lanternmere, {playerName}. The lanterns burn for you.",
+        "title": "La route dorée vers la vallée",
+        "text": "Vous avez traversé le Goldmelt, {playerName}, la neige encore sur vos bottes. Je garde ce sanctuaire pour que Lanternmere sache qui arrive du froid, et dernièrement je n'ai pas eu grand-chose à rapporter. Descendez la route dorée jusqu'à la ville, trouvez la Prévôte Ottoline près du puits, et dites-lui que le col est calme.",
+        "completion": "Calme sur le Goldmelt, et un voyageur avec de la neige dans les cheveux pour le prouver. Sorrel monte trop bien la garde pour envoyer des nouvelles en l'air. Que Lanternmere vous accueille, {playerName}. Les lanternes brûlent pour vous.",
         "objectives": {
           "0": {
-            "label": "Report to Reeve Ottoline"
+            "label": "Faire un rapport à la Prévôte Ottoline"
           }
         }
       },
       "q_af_foxes_in_the_lamplight": {
-        "title": "Foxes in the Lamplight",
-        "text": "The gloam foxes have learned what the lantern stores are worth, {playerName}. Every dusk they slip the fences and carry off the tallow we press for the ferry lamps. Soft paws, softer conscience. Cull ten of them and the rest will remember to fear the town.",
-        "completion": "Ten, and the stores went untouched last night for the first time this season. The lamplighters send their thanks, {playerName}.",
+        "title": "Des renards à la lueur des lanternes",
+        "text": "Les renards du crépuscule ont appris la valeur de nos réserves de lanternes, {playerName}. Chaque soir, ils se faufilent par les clôtures et emportent le suif que nous pressons pour les lanternes des bacs. Pattes douces, conscience plus douce encore. Abattez-en dix et les autres se souviendront de craindre la ville.",
+        "completion": "Dix, et les réserves sont restées intactes la nuit dernière pour la première fois de la saison. Les allumeurs de lanternes vous envoient leurs remerciements, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Gloam Fox slain"
+            "label": "Renard du crépuscule abattu"
           }
         }
       },
       "q_af_lanterns_on_the_water": {
-        "title": "Lanterns on the Water",
-        "text": "Every ferry on the Mere carries a stern lantern, {playerName}, and three of my boats came back at dawn without theirs. The fog took them, or something in the fog did. They wash up along the east shore when the wind turns. Walk the shore road and bring my lanterns home.",
-        "completion": "All three, and still burning. Ferry lanterns do not go out in water, {playerName}. That is the point of them. What worries me is what pulled them loose.",
+        "title": "Des lanternes sur l'eau",
+        "text": "Chaque bac sur le Lac porte une lanterne de poupe, {playerName}, et trois de mes bateaux sont revenus à l'aube sans la leur. Le brouillard les a prises, ou quelque chose dans le brouillard. Elles s'échouent sur la rive est quand le vent tourne. Suivez la route du rivage et ramenez-moi mes lanternes.",
+        "completion": "Toutes les trois, et toujours allumées. Les lanternes des bacs ne s'éteignent pas dans l'eau, {playerName}. C'est bien tout leur intérêt. Ce qui m'inquiète, c'est ce qui les a arrachées.",
         "objectives": {
           "0": {
-            "label": "Ferry Lantern recovered"
+            "label": "Lanterne du bac récupérée"
           }
         }
       },
       "q_af_orchard_call": {
-        "title": "A Cart for the Orchard",
-        "text": "Orchardist Pomeline keeps the Gilded Orchard on the west road, and her sap carts are three days overdue. The whole town runs on that amber sap, {playerName}: lamp resin, sweetening, the harvest ale. Walk the west road and find out what keeps her.",
-        "completion": "The Reeve counts her carts, does she? Well, she can count them missing a while longer. Look at my rows, {playerName}. I have greater troubles than a late delivery.",
+        "title": "Un chariot pour le verger",
+        "text": "L'arboricultrice Pomeline tient le Verger doré sur la route de l'ouest, et ses chariots de sève ont trois jours de retard. Toute la ville tourne grâce à cette sève ambrée, {playerName} : résine à lampe, édulcorant, bière de la moisson. Suivez la route de l'ouest et découvrez ce qui la retient.",
+        "completion": "La Prévôte compte ses chariots, n'est-ce pas ? Eh bien, elle peut continuer à les compter absents encore un moment. Regardez mes rangées, {playerName}. J'ai des soucis plus grands qu'une livraison en retard.",
         "objectives": {
           "0": {
-            "label": "Find Orchardist Pomeline"
+            "label": "Trouver l'arboricultrice Pomeline"
           }
         }
       },
       "q_af_amber_from_the_herd": {
-        "title": "Amber off the Herd",
-        "text": "The gilded stags bed down beneath my oldest trees, and the sap drips gold into their coats all night. Combed clots of it are the purest amber in the weald. Bring me six, {playerName}. The stags will not thank you, but they will not miss it either.",
-        "completion": "Six clots, clean as poured honey. These gloves are stitched with the last batch, {playerName}: sap-stiffened, and warmer than they look.",
+        "title": "De l'ambre du troupeau",
+        "text": "Les cerfs dorés se couchent sous mes arbres les plus anciens, et la sève leur dégouline en or sur le pelage toute la nuit. Les caillots qu'on en peigne sont l'ambre le plus pur de la forêt. Apportez-m'en six, {playerName}. Les cerfs ne vous remercieront pas, mais ils ne le regretteront pas non plus.",
+        "completion": "Six caillots, propres comme du miel versé. Ces gants sont cousus avec le dernier lot, {playerName} : raidis par la sève, et plus chauds qu'ils n'en ont l'air.",
         "objectives": {
           "0": {
-            "label": "Gilded Sap Clot"
+            "label": "Caillot de sève doré"
           }
         }
       },
       "q_af_what_took_the_moorings": {
-        "title": "What Took the Moorings",
-        "text": "Now I will tell you what I did not say in front of the town. The moorings were not slipped, they were bitten through. Mere lurkers, bolder every night, dragging at the ropes and the rudders. Put eight of them back under the water for good, {playerName}, before a ferryman goes with them.",
-        "completion": "Eight fewer shapes in the shallows, and the crossing ran on time today for the first time in a fortnight. But bold lurkers are driven lurkers, {playerName}. Something beneath the Mere is moving them.",
+        "title": "Ce qui a pris les amarres",
+        "text": "Maintenant je vais vous dire ce que je n'ai pas dit devant la ville. Les amarres n'ont pas glissé, elles ont été rongées. Des rôdeurs du lac, plus audacieux chaque nuit, qui tirent sur les cordes et les gouvernails. Renvoyez-en huit sous l'eau pour de bon, {playerName}, avant qu'un passeur n'y passe aussi.",
+        "completion": "Huit silhouettes de moins dans les hauts-fonds, et la traversée s'est faite à l'heure aujourd'hui pour la première fois depuis quinze jours. Mais des rôdeurs audacieux sont des rôdeurs poussés, {playerName}. Quelque chose sous le Lac les fait bouger.",
         "objectives": {
           "0": {
-            "label": "Mere Lurker slain"
+            "label": "Rôdeur du lac abattu"
           }
         }
       },
       "q_af_sprites_and_spigots": {
-        "title": "Sprites and Spigots",
-        "text": "Harvest sprites, {playerName}. They pry my sap-taps from the trunks for the sweetness inside and fling the buckets into the grass. Drive off eight of the little thieves and bring back four of my buckets, and the carts roll again.",
-        "completion": "Four buckets back on their hooks and the rows gone quiet. You have a heavier hand with sprites than I do, {playerName}, and today I am glad of it.",
+        "title": "Des lutins et des robinets",
+        "text": "Des lutins des moissons, {playerName}. Ils arrachent mes robinets à sève des troncs pour la douceur qu'ils contiennent, et jettent les seaux dans l'herbe. Chassez huit de ces petits voleurs et rapportez-moi quatre de mes seaux, et les chariots repartiront.",
+        "completion": "Quatre seaux de retour à leurs crochets, et les rangées redevenues calmes. Vous avez la main plus lourde que moi avec les lutins, {playerName}, et aujourd'hui je m'en réjouis.",
         "objectives": {
           "0": {
-            "label": "Harvest Sprite driven off"
+            "label": "Lutin des moissons chassé"
           },
           "1": {
-            "label": "Sap-Tap Bucket recovered"
+            "label": "Seau à sève récupéré"
           }
         }
       },
       "q_af_the_meredark": {
-        "title": "The Meredark",
-        "text": "The old ferrymen have a name they only say ashore: the Meredark, the first lurker, old as the lake and twice as patient. It rose once before, the year the drowned jetty went under, and it is rising now. At dusk it suns itself on the jetty ruin off the south shore, {playerName}. Take a friend, take two, and end it while it can still be ended.",
-        "completion": "The fog lifted off the Mere this morning, {playerName}, and the whole town saw it. The ferries will run the night crossing again, and every lantern on the water will burn in your name. Take this: it was dredged from the drowned jetty, and no one has better right to wear it.",
+        "title": "Le Meredark",
+        "text": "Les vieux passeurs ont un nom qu'ils ne disent qu'à terre : le Meredark, le premier rôdeur, aussi vieux que le lac et deux fois plus patient. Il s'est levé une fois déjà, l'année où l'appontement englouti a sombré, et il se lève à nouveau. Au crépuscule, il se chauffe sur les ruines de l'appontement au large de la rive sud, {playerName}. Prenez un ami, prenez-en deux, et achevez-le tant qu'il peut encore l'être.",
+        "completion": "Le brouillard s'est levé sur le Lac ce matin, {playerName}, et toute la ville l'a vu. Les bacs referont la traversée de nuit, et chaque lanterne sur l'eau brûlera en votre nom. Prenez ceci : cela a été repêché de l'appontement englouti, et personne n'a plus le droit de le porter que vous.",
         "objectives": {
           "0": {
-            "label": "The Meredark slain"
+            "label": "Le Meredark abattu"
           }
         }
       },
       "q_wf_across_the_fenway": {
-        "title": "Across the Fenway",
-        "text": "A gentle country, the Willowfen, but gentle is not the same as safe, {playerName}. Follow the road north to the Fenway causeway and cross into Bridgemere. Tell Bridgewright Alden the Steps are open and the waycamp fire is lit.",
-        "completion": "Pell keeps that fire burning through every fog the fen can breathe at her. If she says the Steps are open, they are open. Welcome to Bridgemere, {playerName}. Watch your step on my planks and we will get along fine.",
+        "title": "À travers le Fenway",
+        "text": "Un pays paisible, le Willowfen, mais paisible n'est pas synonyme de sûr, {playerName}. Suivez la route vers le nord jusqu'à la chaussée du Fenway et traversez jusqu'à Bridgemere. Dites au Charpentier-de-pont Alden que les Marches sont ouvertes et que le feu du campement est allumé.",
+        "completion": "Pell garde ce feu allumé à travers chaque brouillard que la tourbière peut lui souffler. Si elle dit que les Marches sont ouvertes, elles le sont. Bienvenue à Bridgemere, {playerName}. Surveillez vos pas sur mes planches et tout ira bien entre nous.",
         "objectives": {
           "0": {
-            "label": "Report to Bridgewright Alden"
+            "label": "Faire un rapport au Charpentier-de-pont Alden"
           }
         }
       },
       "q_wf_rope_chewers": {
-        "title": "The Rope-Chewers",
-        "text": "Bogtoads, {playerName}. They haul up out of the moat at night and chew through my mooring ropes like they were reed stems. Three skiffs went drifting last week, and one of them had my good winch aboard. Thin them out, ten of the fat things, and the boats stay where we tie them.",
-        "completion": "Ten fewer sets of teeth in my moat. The skiffs sat their moorings all night for the first time in a month, {playerName}. You have the thanks of every netter in town.",
+        "title": "Les rongeurs de corde",
+        "text": "Des crapauds des tourbières, {playerName}. Ils sortent du fossé la nuit et rongent mes cordes d'amarrage comme si c'étaient des tiges de roseau. Trois esquifs sont partis à la dérive la semaine dernière, et l'un d'eux avait mon bon treuil à bord. Réduisez leur nombre, dix de ces grosses bêtes, et les bateaux resteront où nous les attachons.",
+        "completion": "Dix dentitions de moins dans mon fossé. Les esquifs sont restés à leurs amarres toute la nuit pour la première fois depuis un mois, {playerName}. Vous avez les remerciements de tous les pêcheurs de la ville.",
         "objectives": {
           "0": {
-            "label": "Bogtoad slain"
+            "label": "Crapaud des tourbières abattu"
           }
         }
       },
       "q_wf_eels_for_the_smokehouse": {
-        "title": "Eels for the Smokehouse",
-        "text": "The bogtoads are not just eating my ropes, {playerName}, they are eating my catch: they gulp the eels down whole, straight out of the traps. Cut six plump ones free of the greedy things before the meat spoils, and the smokehouse fires stay lit.",
-        "completion": "Six good eels, barely bruised. The smokehouse will smell like money by morning. Here, these waders were mine when I was quicker: eelskin turns the wet like nothing else.",
+        "title": "Des anguilles pour le fumoir",
+        "text": "Les crapauds des tourbières ne se contentent pas de manger mes cordes, {playerName}, ils mangent aussi ma pêche : ils engloutissent les anguilles tout entières, directement sorties des pièges. Libérez six belles anguilles dodues de ces gloutons avant que la viande ne s'abîme, et les feux du fumoir resteront allumés.",
+        "completion": "Six bonnes anguilles, à peine abîmées. Le fumoir sentira l'argent d'ici demain matin. Tenez, ces cuissardes étaient les miennes quand j'étais plus vif : la peau d'anguille repousse l'humidité comme rien d'autre.",
         "objectives": {
           "0": {
-            "label": "Plump Fen Eel"
+            "label": "Anguille dodue des tourbières"
           }
         }
       },
       "q_wf_mind_the_moorings": {
-        "title": "Mind the Moorings",
-        "text": "Good rope is dear out here, {playerName}: every line the toads bite through is a week of eel-money gone. The cut ends are still lying along the moat shore where the boats slipped them. Walk the boardwalks and bring me back four lines, and I can splice them good as new.",
-        "completion": "Look at that: clean bites, every one, but there is rope enough left to splice. You have saved me a month of coin and the netters a month of grumbling, {playerName}.",
+        "title": "Attention aux amarres",
+        "text": "La bonne corde est chère par ici, {playerName} : chaque ligne que les crapauds rongent, c'est une semaine d'argent d'anguilles envolée. Les bouts tranchés gisent encore le long de la rive du fossé, là où les bateaux les ont perdus. Parcourez les passerelles et rapportez-m'en quatre lignes, et je pourrai les épisser comme neuves.",
+        "completion": "Regardez-moi ça : des morsures nettes, toutes, mais il reste assez de corde pour épisser. Vous m'avez épargné un mois de dépenses et aux pêcheurs un mois de grognements, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Cut Mooring Line recovered"
+            "label": "Amarre tranchée récupérée"
           }
         }
       },
       "q_wf_witch_of_willowweep": {
-        "title": "The Witch of Willowweep",
-        "text": "You have heard it by now, {playerName}: the snore. Slow and heavy, out past the Drowsy Flats, like the fen itself turning over in its sleep. The toads, the sprites, the wisps burning at noon: it all started when that sound did. One soul might know what it is. Mother Sedge keeps a camp at Willowweep, west around the moat and down the far shore. Find her, and ask her what sleeps at the middle of my fen.",
-        "completion": "Alden sent you all this way to ask about the snoring? Then the bridge-folk are finally listening. Sit down out of the damp, {playerName}. That sound has a name, and a throat, and I have been waiting for someone fool enough to help me quiet it.",
+        "title": "La sorcière de Willowweep",
+        "text": "Vous l'avez entendu maintenant, {playerName} : le ronflement. Lent et lourd, au-delà des Étendues Somnolentes, comme si la tourbière elle-même se retournait dans son sommeil. Les crapauds, les lutins, les feux follets qui brûlent en plein midi : tout a commencé avec ce bruit. Une âme pourrait savoir ce que c'est. Mère Sedge tient un camp à Willowweep, à l'ouest en contournant le fossé et le long de la rive lointaine. Trouvez-la, et demandez-lui ce qui dort au milieu de ma tourbière.",
+        "completion": "Alden vous a envoyé jusqu'ici pour vous renseigner sur le ronflement ? Alors les gens du pont écoutent enfin. Asseyez-vous, loin de l'humidité, {playerName}. Ce bruit a un nom, et une gorge, et j'attendais quelqu'un d'assez fou pour m'aider à le faire taire.",
         "objectives": {
           "0": {
-            "label": "Find Mother Sedge"
+            "label": "Trouver Mère Sedge"
           }
         }
       },
       "q_wf_toll_and_tangle": {
-        "title": "Toll and Tangle",
-        "text": "The willow sprites think it is a fine game to cut a ferry loose, {playerName}, and last week the toll skiff went over on the east track with a season of bridge-toll aboard. The chests went down in the shallows and the sprites dance on the boardwalks like they own them. Drive off eight and haul up three toll-chests, and Bridgemere eats this winter.",
-        "completion": "Three chests, and the coin still dry inside. The sprites will sulk in the withies for a week, {playerName}, and the town owes you its winter bread.",
+        "title": "Péage et enchevêtrement",
+        "text": "Les lutins du saule trouvent que couper un bac est un beau jeu, {playerName}, et la semaine dernière l'esquif du péage a chaviré sur la voie est avec toute une saison de péage du pont à bord. Les coffres ont sombré dans les hauts-fonds, et les lutins dansent sur les passerelles comme s'ils en étaient propriétaires. Chassez-en huit et remontez trois coffres à péage, et Bridgemere mangera cet hiver.",
+        "completion": "Trois coffres, et la monnaie encore sèche à l'intérieur. Les lutins bouderont dans les oseraies pendant une semaine, {playerName}, et la ville vous doit son pain d'hiver.",
         "objectives": {
           "0": {
-            "label": "Willow Sprite driven off"
+            "label": "Lutin du saule chassé"
           },
           "1": {
-            "label": "Toll-Chest recovered"
+            "label": "Coffre à péage récupéré"
           }
         }
       },
       "q_wf_wisplight_charms": {
-        "title": "Wisplight Charms",
-        "text": "The wisps over the pools are the fen dreaming out loud, {playerName}, and their light is the only thing that holds against the Croaker's lull. I weave it into willow charms: one round your neck and the snore cannot drag your eyelids down. Bring me six wisplight globes. The wisps will not fight you for them, which makes it a kindness or a theft, depending on how you carry it.",
-        "completion": "Six globes, still warm with dreaming. Give me till moonrise and I will have charms woven for you and whoever is brave enough to stand beside you.",
+        "title": "Amulettes lumière-follette",
+        "text": "Les feux follets au-dessus des mares sont la tourbière qui rêve à voix haute, {playerName}, et leur lumière est la seule chose qui résiste à l'engourdissement du Coasseur. Je la tisse en amulettes de saule : une autour du cou et le ronflement ne pourra plus alourdir vos paupières. Rapportez-moi six globes lumière-follette. Les feux follets ne vous les disputeront pas, ce qui en fait une gentillesse ou un vol, selon la façon dont vous le portez.",
+        "completion": "Six globes, encore chauds de rêve. Laissez-moi jusqu'au lever de la lune et j'aurai des amulettes tissées pour vous et quiconque sera assez brave pour se tenir à vos côtés.",
         "objectives": {
           "0": {
-            "label": "Wisplight Globe"
+            "label": "Globe Lumière-follette"
           }
         }
       },
       "q_wf_croakers_hush": {
-        "title": "The Croaker's Hush",
-        "text": "Now you know the snorer's name, {playerName}: the Drowsy Croaker, the old toad-king out on the Drowsy Flats. Every year his croak grows heavier, and every year more of the fen forgets to wake. The charms will keep your eyes open, but his bulk is another matter: bring a friend, and do not fight him in the water. Put the old king to a quieter sleep.",
-        "completion": "Listen, {playerName}. Nothing. The first true silence over this fen in thirty years, and half the town will not sleep tonight for the strangeness of it. The willows say thank you, in their way. Wear this, woven from his own lily-bed, and the fen will know you for a friend wherever the water reaches.",
+        "title": "Le silence du Coasseur",
+        "text": "Maintenant vous connaissez le nom du ronfleur, {playerName} : le Coasseur somnolent, le vieux roi-crapaud des Étendues Somnolentes. Chaque année son coassement s'alourdit, et chaque année une plus grande part de la tourbière oublie de se réveiller. Les charmes garderont vos yeux ouverts, mais sa carrure est une autre affaire : amenez un ami, et ne le combattez pas dans l'eau. Endormez le vieux roi d'un sommeil plus tranquille.",
+        "completion": "Écoutez, {playerName}. Rien. Le premier vrai silence sur cette tourbière depuis trente ans, et la moitié de la ville ne dormira pas ce soir tant cela leur semble étrange. Les saules vous disent merci, à leur manière. Portez ceci, tissé de son propre lit de lys, et la tourbière vous reconnaîtra pour une amie partout où l'eau s'étend.",
         "objectives": {
           "0": {
-            "label": "The Drowsy Croaker slain"
+            "label": "Le Coasseur somnolent abattu"
           }
         }
       },
       "q_nb_road_of_lanterns": {
-        "title": "The Road of Lanterns",
-        "text": "Up here the sun never follows, {playerName}, only the lamps I keep lit along the climb. Moonrest lies north where the flower-light gathers. Find Lira Dewsong among her gardens and tell her the Nightgate lamps still burn.",
-        "completion": "The lamps still burn, and the road still carries strangers to us. Sorrel has kept that gate longer than anyone in Moonrest remembers. Welcome, {playerName}, to the realm that never dawns.",
+        "title": "La route des lanternes",
+        "text": "Ici en haut, le soleil ne nous suit jamais, {playerName}, seules les lampes que je garde allumées le long de la montée. Moonrest se trouve au nord, là où la lumière des fleurs se rassemble. Trouvez Lira Chant-de-rosée parmi ses jardins et dites-lui que les lampes de la Porte de la Nuit brûlent toujours.",
+        "completion": "Les lampes brûlent toujours, et la route nous amène toujours des étrangers. Sorrel garde cette porte depuis plus longtemps que quiconque à Moonrest ne s'en souvienne. Bienvenue, {playerName}, dans le royaume qui ne connaît jamais l'aube.",
         "objectives": {
           "0": {
-            "label": "Find Lira Dewsong in Moonrest"
+            "label": "Trouver Lira Chant-de-rosée à Moonrest"
           }
         }
       },
       "q_nb_striders_in_the_dark": {
-        "title": "Striders in the Dark",
-        "text": "The gloam striders were always patient hunters, {playerName}, but of late they slip right into the flower beds and take moonfleece lambs beneath our lanterns. Cull ten of them and give the downs back their quiet.",
-        "completion": "Ten striders fewer, and the herds already graze easier. The gardens keep their own hours, but tonight they keep them in peace.",
+        "title": "Des arpenteurs dans le noir",
+        "text": "Les arpenteurs du crépuscule ont toujours été des chasseurs patients, {playerName}, mais dernièrement ils se glissent jusque dans les parterres de fleurs et prennent des agneaux toison-de-lune sous nos lanternes. Abattez-en dix et rendez leur calme aux landes.",
+        "completion": "Dix arpenteurs de moins, et les troupeaux paissent déjà plus tranquillement. Les jardins gardent leurs propres heures, mais ce soir ils les gardent en paix.",
         "objectives": {
           "0": {
-            "label": "Gloam Strider slain"
+            "label": "Arpenteur du crépuscule abattu"
           }
         }
       },
       "q_nb_wool_by_moonlight": {
-        "title": "Wool by Moonlight",
-        "text": "Nothing warms like moonfleece, {playerName}, and nothing spins so fine. The grazers carry their silver wool loose in tufts as they drift the downs. Bring me six good tufts off the herds and I will weave you something worth the walking.",
-        "completion": "Silver as starlight and twice as soft. Here, {playerName}: mitts from the last batch, lined the way only moonfleece lines.",
+        "title": "De la laine au clair de lune",
+        "text": "Rien ne réchauffe comme le moonfleece, {playerName}, et rien ne se file aussi fin. Les brouteurs portent leur laine argentée en touffes lâches en dérivant sur les landes. Rapportez-moi six bonnes touffes des troupeaux et je vous tisserai quelque chose qui vaudra la marche.",
+        "completion": "Argentée comme la lumière des étoiles, et deux fois plus douce. Tenez, {playerName} : des mitaines du dernier lot, doublées comme seul le moonfleece sait le faire.",
         "objectives": {
           "0": {
-            "label": "Moonfleece Tuft"
+            "label": "Touffe Toison-de-lune"
           }
         }
       },
       "q_nb_night_gardens": {
-        "title": "The Night Gardens",
-        "text": "The nightbloom opens only under this sky, and Gloamfield holds the oldest beds in the realm. I need four fresh blossoms for the shrine garlands, {playerName}. Cut them gently: a bed remembers a rough hand for a season.",
-        "completion": "Still glowing, every petal. The shrine will smell of night for a week, and Moonrest sleeps easier for it.",
+        "title": "Les jardins de nuit",
+        "text": "Le nightbloom ne s'ouvre que sous ce ciel, et Gloamfield abrite les plus anciens parterres du royaume. J'ai besoin de quatre fleurs fraîches pour les guirlandes du sanctuaire, {playerName}. Coupez-les doucement : un parterre se souvient d'une main brutale pendant toute une saison.",
+        "completion": "Encore luminescentes, chaque pétale. Le sanctuaire sentira la nuit pendant une semaine, et Moonrest en dormira plus paisiblement.",
         "objectives": {
           "0": {
-            "label": "Nightbloom Blossom gathered"
+            "label": "Fleur du Nightbloom cueillie"
           }
         }
       },
       "q_nb_eyes_on_the_vigil": {
-        "title": "Eyes on the Vigil",
-        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the nightkin drift among the stones. Find him, and ask what the stars are saying.",
-        "completion": "Lira sent you? Then the gardens feel it too. Sit by the glass a moment, {playerName}. The stars have been restless for a month, and every chart I draw leans north toward the barrow.",
+        "title": "Des yeux sur la Vigie",
+        "text": "Quelque chose rend les arpenteurs audacieux et les troupeaux nerveux, {playerName}, et je ne peux pas le lire dans les fleurs. Cassian, lui, peut le lire dans le ciel. Il tient son camp d'observation près de la Vigie immobile à l'est d'ici, où les nocturniens dérivent parmi les pierres. Trouvez-le, et demandez-lui ce que disent les étoiles.",
+        "completion": "Lira vous envoie ? Alors les jardins le ressentent aussi. Asseyez-vous près de la lunette un instant, {playerName}. Les étoiles sont agitées depuis un mois, et chaque carte que je dresse penche vers le nord, vers le tertre.",
         "objectives": {
           "0": {
-            "label": "Find Astronomer Cassian at the Standing Vigil"
+            "label": "Trouver l'Astronome Cassian à la Vigie immobile"
           }
         }
       },
       "q_nb_charts_of_the_stones": {
-        "title": "The Charts in the Stones",
-        "text": "The Vigil stones are older than Moonrest, older than the nightkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
-        "completion": "No doubt is left. Every bearing has crept toward the Sleepless Barrow, as if the sky itself leans over that mound to watch. The old kings were buried under aligned stars for a reason, {playerName}.",
+        "title": "Les cartes dans les pierres",
+        "text": "Les pierres de la Vigie sont plus anciennes que Moonrest, plus anciennes que les nocturniens qui les entretiennent, et leurs faces sont gravées de cartes stellaires que j'ai passé ma vie à apprendre à lire. Le ciel a dérivé, {playerName}, et je dois savoir de combien. Lisez les cartes sur trois des pierres et rapportez-moi leurs relèvements.",
+        "completion": "Il ne reste plus aucun doute. Chaque relèvement a dérivé vers le Tertre Sans Sommeil, comme si le ciel lui-même se penchait sur ce tertre pour observer. Les vieux rois n'ont pas été enterrés sous des étoiles alignées par hasard, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Star chart read"
+            "label": "Carte stellaire lue"
           }
         }
       },
       "q_nb_restless_mounds": {
-        "title": "The Restless Mounds",
-        "text": "The charts were a warning, and the barrow field proves it: the mounds are opening from beneath. Wights walk the grave rows wearing the old honors, and the offerings that kept them sleeping lie scattered in the grass. Put eight of them down, {playerName}, and gather four of the offerings back to me.",
-        "completion": "Grave gold, still cold from the soil. The wights are not rising on their own, {playerName}: something beneath the great mound is calling them out, and I fear the charts have already told us its name.",
+        "title": "Les tertres agités",
+        "text": "Les cartes étaient un avertissement, et le champ de tertres le prouve : les tertres s'ouvrent par en dessous. Des spectres arpentent les rangées de tombes, parés de leurs vieux honneurs, et les offrandes qui les gardaient endormis gisent éparpillées dans l'herbe. Abattez-en huit, {playerName}, et rapportez-moi quatre des offrandes.",
+        "completion": "De l'or funéraire, encore froid de la terre. Les spectres ne se relèvent pas tout seuls, {playerName} : quelque chose sous le grand tertre les appelle, et je crains que les cartes ne nous en aient déjà donné le nom.",
         "objectives": {
           "0": {
-            "label": "Barrow Wight slain"
+            "label": "Spectre des tertres abattu"
           },
           "1": {
-            "label": "Grave offering recovered"
+            "label": "Offrande funéraire récupérée"
           }
         }
       },
       "q_nb_the_barrow_king": {
-        "title": "The Barrow King Wakes",
-        "text": "Every bearing, every restless star, every opened mound points to one thing: the Barrow King is waking beneath the great mound, and this realm has no dawn to hold him back. He must be put to rest before he remembers his crown, {playerName}. Do not go alone: bring a friend, and keep the flower-light at your back.",
-        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the nightkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
+        "title": "Le Roi des tertres s'éveille",
+        "text": "Chaque relèvement, chaque étoile agitée, chaque tertre ouvert pointe vers une seule chose : le Roi des tertres s'éveille sous le grand tertre, et ce royaume n'a pas d'aube pour le retenir. Il doit être mis au repos avant qu'il ne se souvienne de sa couronne, {playerName}. N'y allez pas seul : amenez un ami, et gardez la lumière des fleurs dans votre dos.",
+        "completion": "Les étoiles se sont apaisées pour la première fois depuis une saison, {playerName}. Les tertres sont refermés, les nocturniens se sont immobilisés à leurs pierres, et le roi dort de nouveau en dessous. Portez ce manteau : Moonrest l'a taillé pour qui la nuit finirait par accorder sa confiance.",
         "objectives": {
           "0": {
-            "label": "The Barrow King put to rest"
+            "label": "Le Roi des tertres mis au repos"
           }
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "The Bells of Gallowmere",
-        "text": "Hear that tolling, {playerName}? That is Gallowmere, up the north road, ringing its dead to sleep. Sexton Marrow keeps the count of every soul under the canopy, living and buried. Go and be counted, before the wood counts you itself.",
-        "completion": "Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gallowmere, {playerName}. Mind the bells.",
+        "title": "Les cloches de Gallowmere",
+        "text": "Vous entendez ce glas, {playerName} ? C'est Gallowmere, sur la route du nord, qui sonne pour endormir ses morts. Le Sacristain Marrow tient le compte de chaque âme sous la canopée, vivante ou enterrée. Allez vous faire compter, avant que le bois ne vous compte lui-même.",
+        "completion": "Cobb vous a envoyé sur la route entier, n'est-ce pas ? Brave homme. Il garde ces lanternes de porte allumées depuis trente ans, et le bois n'est jamais passé devant lui. Bienvenue à Gallowmere, {playerName}. Prenez garde aux cloches.",
         "objectives": {
           "0": {
-            "label": "Report to Sexton Marrow"
+            "label": "Faire un rapport au Sacristain Marrow"
           }
         }
       },
       "q_ww_silk_in_the_eaves": {
-        "title": "Silk in the Eaves",
-        "text": "Look up when you walk the west road, {playerName}, and you will see them: wrapped shapes in the canopy, swaying where no wind reaches. The widowsilk spinners have crept out of the Thicket and strung their larders over my lanterns. Kill ten, and the road is a road again.",
-        "completion": "Ten fewer weavers in the eaves. The lamplighters will walk their rounds tonight without looking up, and that is worth more here than you know.",
+        "title": "De la soie dans les auvents",
+        "text": "Levez les yeux en marchant sur la route de l'ouest, {playerName}, et vous les verrez : des formes enveloppées dans la canopée, se balançant là où aucun vent n'atteint. Les fileuses soie-de-veuve ont rampé hors du Fourré et tendu leurs garde-manger au-dessus de mes lanternes. Tuez-en dix, et la route redeviendra une route.",
+        "completion": "Dix fileuses de moins dans les auvents. Les allumeurs de lanternes feront leur tournée ce soir sans lever les yeux, et cela vaut plus ici que vous ne le pensez.",
         "objectives": {
           "0": {
-            "label": "Widowsilk Spinner slain"
+            "label": "Fileuse Soie-de-veuve abattue"
           }
         }
       },
       "q_ww_widows_skeins": {
-        "title": "The Widow's Skeins",
-        "text": "The spinners take our dead for their larders, {playerName}, so I take their silk for our shrouds. It burns clean and it holds a blessing better than linen ever did. Bring me six skeins of widowsilk, and the next soul we bury goes down wrapped and warded.",
-        "completion": "Six skeins, soft as a held breath. The dead will lie easier in this. Take these wraps, I sewed them from the last batch, and the wood has never once bitten through them.",
+        "title": "Les écheveaux de la veuve",
+        "text": "Les fileuses prennent nos morts pour leurs garde-manger, {playerName}, alors je prends leur soie pour nos linceuls. Elle brûle proprement et retient une bénédiction mieux que le lin ne l'a jamais fait. Rapportez-moi six écheveaux de soie-de-veuve, et la prochaine âme que nous enterrerons descendra enveloppée et protégée.",
+        "completion": "Six écheveaux, doux comme un souffle retenu. Les morts reposeront plus paisiblement dedans. Prenez ces bandages, je les ai cousus du dernier lot, et le bois n'y a jamais mordu.",
         "objectives": {
           "0": {
-            "label": "Widowsilk Skein"
+            "label": "Écheveau de soie-de-veuve"
           }
         }
       },
       "q_ww_candles_at_the_bounds": {
-        "title": "Candles at the Bounds",
-        "text": "Four boundary stones ring Gallowmere, {playerName}, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.",
-        "completion": "All four burning? Then breathe, {playerName}. You did not hear it, but the whole village did: the bells rang easier the moment the last wick caught.",
+        "title": "Des bougies aux limites",
+        "text": "Quatre pierres limitrophes entourent Gallowmere, {playerName}, une sur chaque route de sortie, et une bougie funéraire brûle sur chaque pierre. Tant qu'elles brûlent, les enterrés restent enterrés. La bruine les a noyées, toutes les quatre, et je suis trop vieux pour parcourir les limites seul. Prenez mon cierge et rallumez-les, vite.",
+        "completion": "Toutes les quatre allumées ? Alors respirez, {playerName}. Vous ne l'avez pas entendu, mais tout le village si : les cloches ont sonné plus doucement à l'instant où la dernière mèche a pris.",
         "objectives": {
           "0": {
-            "label": "Grave-candle relit"
+            "label": "Bougie funéraire rallumée"
           }
         }
       },
       "q_ww_the_last_vicar": {
-        "title": "The Last Vicar",
-        "text": "South of here the Mournstone Chapel moulders by its black tarn, and one man still tends it: Vicar Creel, who would not leave when the roof came down. He knows the old rites better than my bells do, {playerName}, and he has not sent word in a month. Walk the chapel road and see him breathing.",
-        "completion": "Marrow worries after me? That is new. Tell him the Mournstone stands, after a fashion, and so do I. Stay a while, {playerName}. The tarn has been whispering, and I would rather not listen alone.",
+        "title": "Le dernier vicaire",
+        "text": "Au sud d'ici, la Chapelle de Mournstone moisit près de son lac noir, et un homme l'entretient encore : le Vicaire Creel, qui a refusé de partir quand le toit s'est effondré. Il connaît les vieux rites mieux que mes cloches, {playerName}, et il n'a pas donné de nouvelles depuis un mois. Suivez la route de la chapelle et assurez-vous qu'il respire encore.",
+        "completion": "Marrow s'inquiète pour moi ? Voilà qui est nouveau. Dites-lui que le Mournstone tient debout, d'une certaine manière, et moi aussi. Restez un moment, {playerName}. Le lac chuchote ces derniers temps, et je préférerais ne pas écouter seul.",
         "objectives": {
           "0": {
-            "label": "Find Vicar Creel"
+            "label": "Trouver le Vicaire Creel"
           }
         }
       },
       "q_ww_wraiths_of_the_tarn": {
-        "title": "Wraiths of the Tarn",
-        "text": "The wood wraiths were the chapel wardens once, {playerName}, grown from trees planted over the honored dead. Since the tarn turned black they have forgotten their office, and now they drift through my graveyard pulling at the soil. Break eight of them apart before they finish what they have started.",
-        "completion": "Eight wardens laid down at last. I will not call it a mercy in daylight, but between us, {playerName}, it was one.",
+        "title": "Spectres du lac",
+        "text": "Les spectres des bois étaient autrefois les gardiens de la chapelle, {playerName}, nés d'arbres plantés sur les morts honorés. Depuis que le lac est devenu noir, ils ont oublié leur office, et maintenant ils dérivent dans mon cimetière en tirant sur la terre. Brisez-en huit avant qu'ils n'achèvent ce qu'ils ont commencé.",
+        "completion": "Huit gardiens enfin abattus. Je n'appellerai pas cela une pitié en plein jour, mais entre nous, {playerName}, s'en était une.",
         "objectives": {
           "0": {
-            "label": "Wood Wraith slain"
+            "label": "Spectre des bois abattu"
           }
         }
       },
       "q_ww_what_the_bark_holds": {
-        "title": "What the Bark Holds",
-        "text": "In the Hanging Glade east of Gallowmere the spinners hang their silk-wrapped dead from the boughs, and the gravenbark shamblers stand guard beneath like patient pallbearers. Those are our people up there, {playerName}. Break five shamblers, cut down three of the wrapped dead, and bring them home to soil.",
-        "completion": "Three souls back under honest ground before nightfall. The shamblers will grow back, bark always does, but tonight the glade hangs empty, and that is enough.",
+        "title": "Ce que retient l'écorce",
+        "text": "Dans la Clairière Pendue à l'est de Gallowmere, les fileuses suspendent leurs morts enveloppés de soie aux branches, et les traînards à l'écorce burinée montent la garde en dessous comme de patients porteurs de cercueil. Ce sont nos gens, là-haut, {playerName}. Brisez cinq traînards, décrochez trois des morts enveloppés, et ramenez-les à la terre.",
+        "completion": "Trois âmes de retour sous une terre honnête avant la tombée de la nuit. Les traînards repousseront, l'écorce le fait toujours, mais ce soir la clairière est vide, et cela suffit.",
         "objectives": {
           "0": {
-            "label": "Gravenbark Shambler felled"
+            "label": "Traînard à l'écorce burinée terrassé"
           },
           "1": {
-            "label": "Silkbound remains cut down"
+            "label": "Restes liés de soie décrochés"
           }
         }
       },
       "q_ww_walking_mosley_home": {
-        "title": "Walking Mosley Home",
-        "text": "My gravedigger Mosley took the chapel road three days ago to open a plot in the old yard, and the dig came down on top of him. He clawed his way out, the fool is alive, but he is huddled by the chapel graves and will not move for spinners on the road. Walk him home, {playerName}. I cannot ring the bells for a living man.",
-        "completion": "He came through the gate on his own two feet, swearing he will dig nothing deeper than a turnip bed from now on. He will be back at the yard by Sunday, they always are. Thank you, {playerName}. Gallowmere keeps its people, that is the whole of our law.",
+        "title": "Ramener Mosley chez lui",
+        "text": "Mon fossoyeur Mosley a pris la route de la chapelle il y a trois jours pour ouvrir une parcelle dans le vieux cimetière, et la fosse s'est effondrée sur lui. Il s'est extirpé en griffant, l'idiot est vivant, mais il est recroquevillé près des tombes de la chapelle et refuse de bouger à cause des fileuses sur la route. Ramenez-le, {playerName}. Je ne peux pas sonner les cloches pour un homme vivant.",
+        "completion": "Il a franchi la porte sur ses deux jambes, jurant qu'il ne creusera plus rien de plus profond qu'un carré de navets désormais. Il sera de retour au cimetière dimanche, ils le sont toujours. Merci, {playerName}. Gallowmere garde ses gens, c'est là toute notre loi.",
         "objectives": {
           "0": {
-            "label": "Gravedigger Mosley walked safely back to Gallowmere"
+            "label": "Fossoyeur Mosley ramené sain et sauf à Gallowmere"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
-        "title": "The Horn of the Huntsman",
-        "text": "You have heard the horn by now, {playerName}, thin and far off, the sound the whole wood holds its breath for. The Pale Huntsman rides his clearing north of here, and every grave he passes grows shallower. He was a man once, and he was buried wrong, and I am done pretending prayer will do it. Take a friend, take two, and unhorse him.",
-        "completion": "The horn stopped mid-note. Every bell in Gallowmere rang once, on its own, and then the wood went quieter than I have heard it in thirty years. You have done the rite I could not, {playerName}. Wear this, and walk under the canopy unafraid.",
+        "title": "Le cor du chasseur",
+        "text": "Vous avez entendu le cor à présent, {playerName}, ténu et lointain, le son pour lequel tout le bois retient son souffle. Le Chasseur pâle chevauche sa clairière au nord d'ici, et chaque tombe qu'il traverse devient plus superficielle. C'était un homme autrefois, et il fut mal enterré, et j'ai cessé de prétendre que la prière suffirait. Prenez un ami, prenez-en deux, et désarçonnez-le.",
+        "completion": "Le cor s'est arrêté en pleine note. Chaque cloche de Gallowmere a sonné une fois, d'elle-même, puis le bois est devenu plus silencieux que je ne l'ai entendu depuis trente ans. Vous avez accompli le rite que je ne pouvais accomplir, {playerName}. Portez ceci, et marchez sous la canopée sans crainte.",
         "objectives": {
           "0": {
-            "label": "The Pale Huntsman unhorsed"
+            "label": "Le Chasseur pâle désarçonné"
           }
         }
       },
       "q_pr_down_to_drifthaven": {
-        "title": "Down to Drifthaven",
-        "text": "Out of the black trees and into the sun, {playerName}. Follow the shore road north and you will strike Drifthaven before the tide turns. Ask for Salvage-Boss Ryna, she has work for any pair of hands since the storm, and tell her the Tanglemouth road is still open.",
-        "completion": "Pell sent you? Then you walked the whole Tanglemouth road alone, and that is reference enough for me. Welcome to Drifthaven, {playerName}. Grab a rope, we are short-handed.",
+        "title": "En descendant vers Drifthaven",
+        "text": "Hors des arbres noirs et dans la lumière, {playerName}. Suivez la route du rivage vers le nord et vous atteindrez Drifthaven avant que la marée ne tourne. Demandez la Patronne du sauvetage Ryna, elle a du travail pour toute paire de mains depuis la tempête, et dites-lui que la route de l'Embouchure emmêlée est toujours ouverte.",
+        "completion": "Pell vous envoie ? Alors vous avez parcouru toute la route de l'Embouchure emmêlée seul, et cela me suffit comme référence. Bienvenue à Drifthaven, {playerName}. Attrapez une corde, nous manquons de bras.",
         "objectives": {
           "0": {
-            "label": "Report to Salvage-Boss Ryna"
+            "label": "Faire un rapport à la Patronne du sauvetage Ryna"
           }
         }
       },
       "q_pr_wreck_line_cargo": {
-        "title": "The Wreck Line",
-        "text": "The storm three nights back drove the Pearlwake onto the reef, and her cargo is strewn the whole length of the wreck line between here and the Palmstrand. Three crates of trade goods are still lying in the surf, {playerName}. Bring them in before the tide, or the crabs, claim what is left.",
-        "completion": "Salt-stained but sound, all three. The divers eat this month because of you, {playerName}.",
+        "title": "La ligne d'épaves",
+        "text": "La tempête d'il y a trois nuits a échoué le Pearlwake sur le récif, et sa cargaison est répandue sur toute la longueur de la ligne d'épaves entre ici et la Grève des Palmes. Trois caisses de marchandises gisent encore dans le ressac, {playerName}. Ramenez-les avant que la marée, ou les crabes, ne réclament ce qu'il en reste.",
+        "completion": "Tachées de sel mais intactes, toutes les trois. Les plongeurs mangeront ce mois-ci grâce à vous, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Pearlwake Cargo recovered"
+            "label": "Cargaison du Pearlwake récupérée"
           }
         }
       },
       "q_pr_scuttler_cull": {
-        "title": "Shellbacked Thieves",
-        "text": "Every wreck on this coast draws the tide scuttlers, and the Pearlwake has drawn half the reef. My salvage crews will not work a line with those claws in the shallows. Crack ten of them, {playerName}, and the wreck line is ours again.",
-        "completion": "Ten fewer claws in the surf. My crews are already wading back out, and not one of them said thank you, so I will: thank you, {playerName}.",
+        "title": "Voleurs à carapace",
+        "text": "Chaque épave de cette côte attire les coureurs de la marée, et le Pearlwake en a attiré la moitié du récif. Mes équipes de sauvetage refusent de travailler une ligne avec ces pinces dans les hauts-fonds. Brisez-en dix, {playerName}, et la ligne d'épaves sera de nouveau à nous.",
+        "completion": "Dix pinces de moins dans le ressac. Mes équipes pataugent déjà de nouveau dehors, et aucune d'elles n'a dit merci, alors je le ferai : merci, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Tide Scuttler cracked"
+            "label": "Coureur de la marée brisé"
           }
         }
       },
       "q_pr_boars_in_the_gardens": {
-        "title": "Boars in the Gardens",
-        "text": "Whatever stirs in the deep green, it pushes the thicket boars out onto our strand. They have rooted up the garden terraces twice this week, and they will have the drying racks next. Ten boars, {playerName}, and push the rest back under the trees.",
-        "completion": "The racks stand and the gardens can be replanted. The boars did not choose to come onto the sand, {playerName}. Remember that: something moved them.",
+        "title": "Des sangliers dans les jardins",
+        "text": "Quoi que ce soit qui s'agite dans la verdure profonde, cela pousse les sangliers du fourré jusque sur notre grève. Ils ont retourné les terrasses du jardin deux fois cette semaine, et ils s'attaqueront aux claies de séchage ensuite. Dix sangliers, {playerName}, et repoussez le reste sous les arbres.",
+        "completion": "Les claies tiennent debout et les jardins peuvent être replantés. Les sangliers n'ont pas choisi de venir sur le sable, {playerName}. Souvenez-vous-en : quelque chose les a poussés.",
         "objectives": {
           "0": {
-            "label": "Thicket Boar driven off"
+            "label": "Sanglier du fourré chassé"
           }
         }
       },
       "q_pr_the_man_who_went_in": {
-        "title": "The Man Who Went In",
-        "text": "The divers will not step past the treeline, {playerName}, and I will not ask them to. You have heard the drums by now: everyone does, by the second night. One man on this island ever walked toward that sound and came back. Okku. He camps under the great banyans at the Vinefall, deep up the Tangle road. Find him, and ask him what the green is hiding.",
-        "completion": "Isha sent you? The Pearl-Mother has not spoken my name in years. Sit out of the vines' reach, {playerName}, and I will tell you what I know: the drums are not the danger. They are the warning.",
+        "title": "L'homme qui est entré",
+        "text": "Les plongeurs refusent de dépasser la lisière des arbres, {playerName}, et je ne leur demanderai pas de le faire. Vous avez entendu les tambours à présent : tout le monde les entend, dès la deuxième nuit. Un seul homme sur cette île a jamais marché vers ce son et en est revenu. Okku. Il campe sous les grands banians de la Chute de Lianes, loin sur la route de l'Enchevêtrement. Trouvez-le, et demandez-lui ce que cache la verdure.",
+        "completion": "Isha vous envoie ? La Mère-des-perles n'a pas prononcé mon nom depuis des années. Asseyez-vous hors de portée des lianes, {playerName}, et je vous dirai ce que je sais : les tambours ne sont pas le danger. Ils sont l'avertissement.",
         "objectives": {
           "0": {
-            "label": "Find Okku at the Vinefall"
+            "label": "Trouver Okku à la Chute de Lianes"
           }
         }
       },
       "q_pr_canopy_silk": {
-        "title": "Silk from the Canopy",
-        "text": "Look up, {playerName}. Every canopy from here to the idol is webbed like a fishing net, and the weavers grow bolder each season. I string their own silk across the paths, tripline bells, so the jungle cannot creep up on me. Six good hanks off the canopy weavers will restring my lines.",
-        "completion": "Good, strong silk. My bells will sing a while longer, and nothing walks these paths at night without me knowing, {playerName}. Lately, something has been walking often.",
+        "title": "De la soie de la canopée",
+        "text": "Regardez en l'air, {playerName}. Chaque canopée d'ici à l'idole est tissée comme un filet de pêche, et les tisseuses deviennent plus audacieuses chaque saison. Je tends leur propre soie à travers les sentiers, des cloches à fil-piège, pour que la jungle ne puisse pas me surprendre. Six bons écheveaux pris aux tisseuses de canopée retendront mes lignes.",
+        "completion": "Bonne soie, solide. Mes cloches chanteront encore un moment, et rien ne marchera sur ces sentiers la nuit sans que je le sache, {playerName}. Dernièrement, quelque chose y marche souvent.",
         "objectives": {
           "0": {
-            "label": "Canopy Silk Hank"
+            "label": "Écheveau de soie de canopée"
           }
         }
       },
       "q_pr_the_lost_navigator": {
-        "title": "The Lost Navigator",
-        "text": "We pulled every hand off the Pearlwake but one: Navigator Suli, who swam for the far strand and never walked in. A diver spotted her holed up in the bow wreckage past the Palmstrand, alive, and too spent to run the gauntlet alone. Walk her home along the shore road, {playerName}. The crabs will not like it, and the jungle likes it less.",
-        "completion": "Suli is by the fire, still swearing she could have swum it. You brought back the only chart-reader on this coast, {playerName}. These are from her sea chest, with her blessing.",
+        "title": "La navigatrice perdue",
+        "text": "Nous avons sorti tout le monde du Pearlwake sauf une : la Navigatrice Suli, qui a nagé vers la grève lointaine et n'en est jamais revenue à pied. Un plongeur l'a repérée terrée dans l'épave de la proue au-delà de la Grève des Palmes, vivante, mais trop épuisée pour affronter seule le trajet. Ramenez-la par la route du rivage, {playerName}. Les crabes n'aimeront pas ça, et la jungle encore moins.",
+        "completion": "Suli est près du feu, jurant encore qu'elle aurait pu nager jusque-là. Vous avez ramené la seule lectrice de cartes marines de cette côte, {playerName}. Ceci vient de son coffre de marin, avec sa bénédiction.",
         "objectives": {
           "0": {
-            "label": "Navigator Suli seen safely to Drifthaven"
+            "label": "Navigatrice Suli ramenée saine et sauve à Drifthaven"
           }
         }
       },
       "q_pr_what_the_drums_guard": {
-        "title": "What the Drums Guard",
-        "text": "I have walked as near the Sunken Idol as a living man dares, and I saw two things: the weavers have curtained the idol road in web, and the old offering bowls along it have been filled again. Freshly, {playerName}. Cut eight weavers off the road and bring me three of those offerings. I would know what hand still feeds a dead god.",
-        "completion": "Moss, pearl-shell, and boar blood, packed by fingers. Something in that ruin still keeps its rites, {playerName}, and the Guardian keeps everything else out. It is time we spoke of it plainly.",
+        "title": "Ce que gardent les tambours",
+        "text": "J'ai marché aussi près de l'Idole engloutie qu'un homme vivant l'ose, et j'ai vu deux choses : les tisseuses ont tendu la route de l'idole de toiles, et les vieux bols d'offrande le long du chemin ont été remplis de nouveau. Fraîchement, {playerName}. Abattez huit tisseuses sur la route et rapportez-moi trois de ces offrandes. J'aimerais savoir quelle main nourrit encore un dieu mort.",
+        "completion": "Mousse, nacre, et sang de sanglier, tassés par des doigts. Quelque chose dans cette ruine maintient encore ses rites, {playerName}, et le Gardien tient tout le reste à l'écart. Il est temps que nous en parlions clairement.",
         "objectives": {
           "0": {
-            "label": "Canopy Weaver cut down"
+            "label": "Tisseuse de canopée abattue"
           },
           "1": {
-            "label": "Refilled Offering Bowl gathered"
+            "label": "Bol d'offrande à nouveau rempli récupéré"
           }
         }
       },
       "q_pr_idol_guardian": {
-        "title": "The Idol Guardian",
-        "text": "The idol is older than the island, {playerName}. Older than the drums, older than the name Palmreach. Its Guardian has stood in that drowned ring since before the palms grew, and now it wakes and walks the columns at night. Whatever the offerings feed, the Guardian is its door-ward. Bring a friend, and break it.",
-        "completion": "You felled a thing the jungle itself would not touch. Look there, behind the idol: the Guardian was never guarding the columns, {playerName}, it was guarding the steps beneath them. The drums have gone quiet tonight. Whatever sleeps below the Wildheart Basin now knows your name.",
+        "title": "Le Gardien de l'idole",
+        "text": "L'idole est plus vieille que l'île, {playerName}. Plus vieille que les tambours, plus vieille que le nom de Palmreach. Son Gardien se tient dans cet anneau englouti depuis avant que les palmiers ne poussent, et maintenant il s'éveille et arpente les colonnes la nuit. Quoi que nourrissent ces offrandes, le Gardien en est le portier. Amenez un ami, et brisez-le.",
+        "completion": "Vous avez terrassé une chose que la jungle elle-même n'osait toucher. Regardez là-bas, derrière l'idole : le Gardien n'a jamais gardé les colonnes, {playerName}, il gardait les marches en dessous. Les tambours se sont tus ce soir. Quoi que ce soit qui dorme sous The Wildheart Basin connaît maintenant votre nom.",
         "objectives": {
           "0": {
-            "label": "The Idol Guardian broken"
+            "label": "Le Gardien de l'idole brisé"
           }
         }
       },
       "q_eg_gate_report": {
-        "title": "Word Through the Gate",
-        "text": "The lawns past this gate have trimmed themselves for a hundred years, {playerName}, and lately they have started trimming visitors. Head Gardener Amaranth keeps the books in Hedgewick, up the road past the gate lawns. Tell her another traveler has come through, and tell her the hedges by the gate moved last night.",
-        "completion": "Moved, did they. Pell reports that every week, and every week he is right. Forgive my eyes, {playerName}, I have not slept a whole night in years: someone has to watch the garden watch us. Welcome to Hedgewick.",
+        "title": "Un message par la porte",
+        "text": "Les pelouses au-delà de cette porte se taillent seules depuis cent ans, {playerName}, et dernièrement elles ont commencé à tailler les visiteurs aussi. La Jardinière en chef Amaranth tient les registres à Hedgewick, sur la route au-delà des pelouses de la porte. Dites-lui qu'un nouveau voyageur est passé, et que les haies près de la porte ont bougé cette nuit.",
+        "completion": "Elles ont bougé, dites-vous. Pell rapporte cela chaque semaine, et chaque semaine il a raison. Pardonnez mes yeux, {playerName}, je n'ai pas dormi une nuit entière depuis des années : quelqu'un doit surveiller le jardin qui nous surveille. Bienvenue à Hedgewick.",
         "objectives": {
           "0": {
-            "label": "Report to Head Gardener Amaranth"
+            "label": "Faire un rapport à la Jardinière en chef Amaranth"
           }
         }
       },
       "q_eg_hungry_shapes": {
-        "title": "Pruned into Hunger",
-        "text": "Whoever shapes this garden has grown careless, or cruel. The wolf shapes out in the Rose Wilds were clipped for show, yet lately they hunt: green jaws, no bellies, and no reason ever to stop. Cut down ten topiary wolves, {playerName}, and let the lawns be lawns again for a while.",
-        "completion": "Ten heaps of clippings where ten wolves stood. It should feel like gardening, {playerName}. Why does it feel like war?",
+        "title": "Taillés jusqu'à la faim",
+        "text": "Quiconque façonne ce jardin est devenu négligent, ou cruel. Les silhouettes de loups des Friches Roses étaient taillées pour le spectacle, et pourtant dernièrement elles chassent : mâchoires vertes, sans ventre, sans jamais de raison de s'arrêter. Abattez dix loups topiaires, {playerName}, et laissez les pelouses redevenir de simples pelouses, un moment.",
+        "completion": "Dix tas de branchages là où se tenaient dix loups. Cela devrait ressembler à du jardinage, {playerName}. Pourquoi cela ressemble-t-il à la guerre ?",
         "objectives": {
           "0": {
-            "label": "Topiary Wolf slain"
+            "label": "Loup topiaire abattu"
           }
         }
       },
       "q_eg_stolen_shears": {
-        "title": "The Stolen Shears",
-        "text": "Every pair of shears in Hedgewick has walked off in a fortnight, {playerName}: off the pegs, out of locked sheds, one pair out of my own apron while I dozed. It is the hedge gnomes, the little groundskeepers who hate us walking their lawns. Get six pairs back before the whole hamlet is down to kitchen knives.",
-        "completion": "Six pairs, and my own among them, I would know the nick in the blade anywhere. Here, these gloves were knitted for pruning work. Warm hands make steady shears.",
+        "title": "Les cisailles volées",
+        "text": "Chaque paire de cisailles de Hedgewick a disparu en quinze jours, {playerName} : décrochées des clous, sorties de cabanes fermées à clé, une paire même hors de mon propre tablier pendant que je somnolais. Ce sont les gnomes des haies, ces petits jardiniers qui détestent nous voir fouler leurs pelouses. Récupérez-en six paires avant que tout le hameau n'en soit réduit aux couteaux de cuisine.",
+        "completion": "Six paires, et la mienne parmi elles, je reconnaîtrais cette encoche dans la lame entre mille. Tenez, ces gants ont été tricotés pour la taille. Des mains chaudes font des cisailles stables.",
         "objectives": {
           "0": {
-            "label": "Stolen Hedgewick Shears"
+            "label": "Cisailles volées de Hedgewick"
           }
         }
       },
       "q_eg_who_trims_the_hedges": {
-        "title": "Who Trims the Hedges",
-        "text": "I have kept the ledgers thirty years, {playerName}, and not slept properly for ten of them, because the sums will not close. Grass wants cutting and hedges want shaping, and nobody here does either, yet every dawn the garden stands trimmed. Lately the woodfolk swear they see an old man with a barrow on the far south lawns, past the maze by the Lily Basin. Find him. If he is real, I can finally sleep. If he is not, I suppose I never will.",
-        "completion": "So the house finally sent someone. A hundred years I have walked these lawns, {playerName}, and the garden and I have an understanding: I trim what asks to be trimmed. Sit. The hedges can spare you an hour.",
+        "title": "Qui taille les haies",
+        "text": "Je tiens les registres depuis trente ans, {playerName}, et je ne dors plus vraiment depuis dix, parce que les comptes ne tombent jamais juste. L'herbe demande à être coupée et les haies à être façonnées, et personne ici ne fait ni l'un ni l'autre, pourtant chaque aube le jardin se retrouve taillé. Dernièrement, les gens des bois jurent voir un vieil homme avec une brouette sur les pelouses du grand sud, au-delà du labyrinthe près du Bassin des Lys. Trouvez-le. S'il est réel, je pourrai enfin dormir. Sinon, je suppose que je ne dormirai jamais.",
+        "completion": "Alors la maison a fini par envoyer quelqu'un. Cela fait cent ans que je parcours ces pelouses, {playerName}, et le jardin et moi avons un accord : je taille ce qui demande à être taillé. Asseyez-vous. Les haies peuvent bien vous accorder une heure.",
         "objectives": {
           "0": {
-            "label": "Find the gardener by the Lily Basin"
+            "label": "Trouver le jardinier près du Bassin des Lys"
           }
         }
       },
       "q_eg_gnomes_in_the_green": {
-        "title": "The Groundskeepers Grudge",
-        "text": "The shears were only the start, {playerName}. Last night the gnomes tipped our tool carts into the green, one out by their warren west of the maze, one clean across the garden on the pond walk, and scattered a hundred years of good iron in the grass. Drive off eight of the little devils and haul the spilled carts home.",
-        "completion": "Three carts back and the pegs full again. Let the little devils sulk in their hedges: Hedgewick works these lawns too.",
+        "title": "La rancune des jardiniers",
+        "text": "Les cisailles n'étaient qu'un début, {playerName}. La nuit dernière, les gnomes ont renversé nos chariots à outils dans la verdure, un près de leur terrier à l'ouest du labyrinthe, un tout au bout du jardin sur l'allée de l'étang, éparpillant cent ans de bon fer dans l'herbe. Chassez huit de ces petits diables et ramenez les chariots renversés.",
+        "completion": "Trois chariots de retour et les crochets à nouveau pleins. Que les petits diables boudent dans leurs haies : Hedgewick travaille ces pelouses aussi.",
         "objectives": {
           "0": {
-            "label": "Hedge Gnome driven off"
+            "label": "Gnome des haies chassé"
           },
           "1": {
-            "label": "Tool cart recovered"
+            "label": "Chariot à outils récupéré"
           }
         }
       },
       "q_eg_bloom_clippings": {
-        "title": "Clippings from the Living Green",
-        "text": "You want to understand this garden? Then read it the way I do. The stags that graze the lawns grow the truest green: every leaf on them is a page. Bring me six fresh clippings from the topiary stags, {playerName}. They will not thank you for the pruning, but they will regrow. Everything here regrows.",
-        "completion": "Look here: the leaves are curling in on themselves, every clipping the same. The garden is afraid, {playerName}. In a hundred years I have never once known it afraid.",
+        "title": "Boutures de la verdure vivante",
+        "text": "Vous voulez comprendre ce jardin ? Alors lisez-le comme je le fais. Les cerfs qui broutent les pelouses portent le vert le plus véridique : chaque feuille sur eux est une page. Apportez-moi six boutures fraîches des cerfs topiaires, {playerName}. Ils ne vous remercieront pas pour la taille, mais ils repousseront. Tout repousse ici.",
+        "completion": "Regardez ici : les feuilles se recroquevillent sur elles-mêmes, chaque bouture pareille. Le jardin a peur, {playerName}. En cent ans, je ne l'avais jamais vu ainsi effrayé.",
         "objectives": {
           "0": {
-            "label": "Pruned Bloom Clipping"
+            "label": "Bouture taillée"
           }
         }
       },
       "q_eg_four_statues": {
-        "title": "The Four Quiet Sisters",
-        "text": "When the garden was young, the first gardeners raised four marble sisters to watch its quarters: one above the Rose Wilds, one on the pond walk east of the maze, one on the west lawn where the gnomes keep their warren, and one on the south lawn past the hedges. The maze grew up between them, and most folk never see all four. Walk the quarters, {playerName}, and press your palm to each sister. When the garden has looked you over from all four sides, it will open places it keeps from strangers.",
-        "completion": "Four rubbings, four sisters, and not one of them wept marble. The garden has taken your measure, {playerName}, and it did not find you wanting. Now I can send you where the trouble truly lives.",
+        "title": "Les quatre sœurs silencieuses",
+        "text": "Quand le jardin était jeune, les premiers jardiniers ont élevé quatre sœurs de marbre pour veiller sur ses quartiers : une au-dessus des Friches Roses, une sur l'allée de l'étang à l'est du labyrinthe, une sur la pelouse ouest où les gnomes tiennent leur terrier, et une sur la pelouse sud passé les haies. Le labyrinthe a grandi entre elles, et rares sont ceux qui les voient toutes les quatre. Parcourez les quartiers, {playerName}, et posez la paume sur chaque sœur. Quand le jardin vous aura observé des quatre côtés, il ouvrira des lieux qu'il cache aux étrangers.",
+        "completion": "Quatre frottis, quatre sœurs, et aucune n'a pleuré le marbre. Le jardin a pris votre mesure, {playerName}, et il ne vous a pas trouvé indigne. Maintenant je peux vous envoyer là où réside vraiment le mal.",
         "objectives": {
           "0": {
-            "label": "Garden statue visited"
+            "label": "Statue du jardin visitée"
           }
         }
       },
       "q_eg_bull_of_the_court": {
-        "title": "The Bull of the Fountain Court",
-        "text": "Now the truth, {playerName}. The bull at the heart of the maze was my masterwork: I shaped him to guard the Fountain Court, and for a hundred years he did. But the fear in the green has reached him, and he guards nothing now, he hunts. The maze feeds him whoever wanders in. I am too old to unmake him, and it must be unmaking, root and branch. Bring a friend, walk the maze to the court, and cut my bull down.",
-        "completion": "I felt it, here, when he came apart. A hundred years of work, and you were right to end it. Take this mantle: I cut it for whoever proved stronger than my best. The court is only a fountain tonight, {playerName}, and the garden is only a garden. Perhaps now the Head Gardener and I can both sleep.",
+        "title": "Le Taureau de la Cour des Fontaines",
+        "text": "Maintenant, la vérité, {playerName}. Le taureau au cœur du labyrinthe était mon chef-d'œuvre : je l'ai façonné pour garder la Cour des Fontaines, et pendant cent ans il l'a fait. Mais la peur qui ronge la verdure l'a atteint, et il ne garde plus rien désormais, il chasse. Le labyrinthe lui offre quiconque s'y égare. Je suis trop vieux pour le défaire, et il faut le défaire, racine et branche. Amenez un ami, traversez le labyrinthe jusqu'à la cour, et abattez mon taureau.",
+        "completion": "Je l'ai senti, ici, quand il s'est défait. Cent ans de travail, et vous avez eu raison d'y mettre fin. Prenez ce manteau : je l'ai taillé pour qui se montrerait plus fort que mon meilleur ouvrage. La cour n'est plus qu'une fontaine ce soir, {playerName}, et le jardin n'est plus qu'un jardin. Peut-être que la Jardinière en chef et moi pourrons enfin dormir.",
         "objectives": {
           "0": {
-            "label": "The Topiary Bull unmade"
+            "label": "Le Taureau topiaire défait"
           }
         }
       },
       "q_fs_bell_at_the_landing": {
-        "title": "The Bell at the Landing",
-        "text": "You came over the Ferrywalk, {playerName}? Then you are the first in a week, and the Warden will want to look you over. Gullhaven sits up the shore road, past the drying racks nobody tends anymore. Tell Warden Coalfast the causeway still stands, and that Tam has not rung a three-toll today. Yet.",
-        "completion": "The causeway holds, and Tam still has breath enough to joke about the three-toll. Good. We are an island under siege, {playerName}, and every pair of hands that crosses that sandbar is a pair the breaks must get through before they reach my people. Welcome to Gullhaven.",
+        "title": "La cloche du Débarcadère",
+        "text": "Vous avez traversé le Ferrywalk, {playerName} ? Alors vous êtes le premier en une semaine, et le Gardien voudra vous examiner. Gullhaven se trouve plus haut sur la route du rivage, au-delà des claies de séchage que plus personne n'entretient. Dites au Gardien Coalfast que la chaussée tient toujours, et que Tam n'a pas encore sonné les trois coups aujourd'hui. Pas encore.",
+        "completion": "La chaussée tient, et Tam a encore assez de souffle pour plaisanter sur les trois coups. Bien. Nous sommes une île assiégée, {playerName}, et chaque paire de mains qui traverse ce banc de sable est une paire que les brèches devront franchir avant d'atteindre mon peuple. Bienvenue à Gullhaven.",
         "objectives": {
           "0": {
-            "label": "Report to Warden Coalfast"
+            "label": "Faire un rapport au Gardien Coalfast"
           }
         }
       },
       "q_fs_hold_the_riftfields": {
-        "title": "Hold the Riftfields",
-        "text": "East of town the grain rows have gone to wrack, and the wretches that came through the Riftfields break now pick them clean. My people cannot tend a field they cannot stand in, {playerName}. Cull ten of the wretches and give the farmers back their ground.",
-        "completion": "Ten fewer, and the field hands are already arguing over who walks out first. It will not last, the breaks never rest long, but a town that eats is a town that holds.",
+        "title": "Tenir les Champs de la Faille",
+        "text": "À l'est de la ville, les rangées de blé sont à l'abandon, et les miséreux venus par la brèche des Champs de la Faille les dépouillent maintenant entièrement. Mon peuple ne peut entretenir un champ où il ne peut pas se tenir, {playerName}. Abattez dix miséreux et rendez leur terre aux fermiers.",
+        "completion": "Dix de moins, et les ouvriers agricoles se disputent déjà pour savoir qui sort en premier. Cela ne durera pas, les brèches ne se reposent jamais longtemps, mais une ville qui mange est une ville qui tient.",
         "objectives": {
           "0": {
-            "label": "Breach Wretch slain"
+            "label": "Miséreux de la brèche abattu"
           }
         }
       },
       "q_fs_steel_for_the_redoubt": {
-        "title": "Steel for the Redoubt",
-        "text": "Every blade I hand out is one the sea gave back or one I pried off the dead, {playerName}. The wretches carry scrap through the breaks, hinges, hooks, broken sword-steel, magpie stuff, but it hammers out true. Bring me six pieces of their scavenged steel and the barricade line gets its teeth back.",
-        "completion": "Salt-pitted and break-scarred, and it will hold an edge all the same. Here, I lined these grips myself. Steel for steel, {playerName}: it is the only trade the Farshore runs these days.",
+        "title": "De l'acier pour la redoute",
+        "text": "Chaque lame que je distribue est une que la mer a rendue, ou une que j'ai arrachée à un mort, {playerName}. Les miséreux transportent des ferrailles à travers les brèches, gonds, crochets, acier d'épée brisé, un vrai butin de pie, mais cela se forge bien tout de même. Rapportez-moi six morceaux de leur acier récupéré et la ligne de barricade retrouvera ses crocs.",
+        "completion": "Piqué par le sel et balafré par les brèches, mais il tiendra un tranchant tout de même. Tenez, j'ai doublé ces poignées moi-même. Acier pour acier, {playerName} : c'est le seul commerce que le Farshore pratique de nos jours.",
         "objectives": {
           "0": {
-            "label": "Break-Scarred Steel"
+            "label": "Acier balafré"
           }
         }
       },
       "q_fs_the_three_bells": {
-        "title": "The Three Bells",
-        "text": "Three watchbells stand the coast beyond my own: one on the Landing point, one on the south strand, one out by the Riftfields shore. If a rope has rotted or a clapper has been carried off, the town learns of a break when it is already in the streets. Walk the coast, {playerName}, and ring each bell once, so I know it still has a voice.",
-        "completion": "Three voices, three answers, carried clean over the water. Sleep in Gullhaven tonight, {playerName}, and know that if a bell wakes you, it will be by my hand and in good time.",
+        "title": "Les trois cloches",
+        "text": "Trois cloches de guet veillent sur la côte au-delà de la mienne : une à la pointe du Débarcadère, une sur la grève sud, une du côté du rivage des Champs de la Faille. Si une corde a pourri ou qu'un battant a été emporté, la ville n'apprend l'existence d'une brèche que lorsqu'elle est déjà dans les rues. Parcourez la côte, {playerName}, et faites sonner chaque cloche une fois, pour que je sache qu'elle a encore une voix.",
+        "completion": "Trois voix, trois réponses, portées clairement au-dessus de l'eau. Dormez à Gullhaven ce soir, {playerName}, et sachez que si une cloche vous réveille, ce sera de ma main et en temps voulu.",
         "objectives": {
           "0": {
-            "label": "Watchbell rung"
+            "label": "Cloche de guet sonnée"
           }
         }
       },
       "q_fs_song_before_the_break": {
-        "title": "The Song Before the Break",
-        "text": "There is a man who hears the breaks before they open. Riftwatch Ollun: a scholar, or a madman, and lately I cannot afford the difference. He keeps his vigil at the Watch Meadow, up the road southeast of town. Find him, {playerName}, and ask him what the island is about to do to us next.",
-        "completion": "The Warden sent you? Good. That means the town has finally started listening. Now be still a moment, {playerName}. There, under the wind, do you hear it? The cliffs are singing, and I do not like the tune.",
+        "title": "Le chant avant la brèche",
+        "text": "Il y a un homme qui entend les brèches avant qu'elles ne s'ouvrent. Le guetteur des failles Ollun : un érudit, ou un fou, et dernièrement je n'ai plus les moyens de faire la différence. Il monte sa veille au Pré du Guet, sur la route au sud-est de la ville. Trouvez-le, {playerName}, et demandez-lui ce que l'île s'apprête à nous faire subir.",
+        "completion": "Le Gardien vous a envoyé ? Bien. Cela veut dire que la ville a enfin commencé à écouter. Restez tranquille un instant, {playerName}. Là, sous le vent, vous l'entendez ? Les falaises chantent, et je n'aime pas l'air.",
         "objectives": {
           "0": {
-            "label": "Find Riftwatch Ollun"
+            "label": "Trouver le guetteur des failles Ollun"
           }
         }
       },
       "q_fs_moss_and_mending": {
-        "title": "Moss and Mending",
-        "text": "The salt moss that grows along the tideline is the best wound-packing I know, and the riftspawn have claimed every stretch of shore it grows on. They carry tufts of it snagged on their hides, of all things. Clear six of them off the east reaches, {playerName}, and pull me four good handfuls of moss from what they have trampled through.",
-        "completion": "Moss in one hand and a quieter shoreline in the other. You have restocked my whole surgery, {playerName}. Do me the kindness of not becoming my next patient.",
+        "title": "Mousse et rapiéçage",
+        "text": "La mousse salée qui pousse le long de la laisse de marée est le meilleur pansement que je connaisse, et l'engeance de faille s'est emparée de chaque étendue de rivage où elle pousse. Ils en portent des touffes accrochées à leur peau, comme par ironie. Débarrassez-en six sur les étendues est, {playerName}, et arrachez-moi quatre bonnes poignées de mousse là où ils sont passés.",
+        "completion": "De la mousse dans une main et un rivage plus calme dans l'autre. Vous avez réapprovisionné toute mon infirmerie, {playerName}. Faites-moi la gentillesse de ne pas devenir mon prochain patient.",
         "objectives": {
           "0": {
-            "label": "Riftspawn slain"
+            "label": "Engeance de faille abattue"
           },
           "1": {
-            "label": "Farshore Salt Moss"
+            "label": "Mousse salée du Farshore"
           }
         }
       },
       "q_fs_bram_come_home": {
-        "title": "Bram Come Home",
-        "text": "My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, {playerName}, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the north shore. Walk him home to me.",
-        "completion": "Bram! You brought him back to me whole, {playerName}. We both wept and neither of us is ashamed. Whatever the breaks take from this island next, they do not get my family. Not anymore.",
+        "title": "Que Bram revienne",
+        "text": "Mon Bram a pris le bateau le matin où la brèche-des-filets s'est ouverte, et la mer l'a rejeté quelque part au-delà de la pointe du Débarcadère. Je l'ai entendu il y a trois nuits, {playerName}, appeler par-dessus l'eau, et j'étais trop effrayée pour y aller. Je le suis encore. Je vous en prie. Son bateau gît naufragé sur la rive nord. Ramenez-le-moi.",
+        "completion": "Bram ! Vous me l'avez ramené entier, {playerName}. Nous avons tous les deux pleuré, et aucun de nous n'en a honte. Quoi que les brèches prennent ensuite à cette île, elles n'auront pas ma famille. Plus jamais.",
         "objectives": {
           "0": {
-            "label": "Fisher Bram seen safely home to Gullhaven"
+            "label": "Pêcheur Bram ramené sain et sauf à Gullhaven"
           }
         }
       },
       "q_fs_stalkers_off_the_light": {
-        "title": "Stalkers off the Light",
-        "text": "The stalkers hunt the dark between the watchfires, and every night they circle my meadow a little closer. They are not mindless, {playerName}, they are patient, and patience is the one thing I cannot outlast. Kill eight and push the dark back to the cliffs it came through.",
-        "completion": "Eight nights of circling, ended in one. The fires burn steadier already, or perhaps that is only my hands. Either way the meadow is mine again, and I can hear the island think.",
+        "title": "Des traqueurs hors de la lumière",
+        "text": "Les traqueurs chassent l'obscurité entre les feux de guet, et chaque nuit ils encerclent mon pré d'un peu plus près. Ils ne sont pas stupides, {playerName}, ils sont patients, et la patience est la seule chose que je ne peux surpasser. Tuez-en huit et repoussez l'obscurité vers les falaises d'où elle est venue.",
+        "completion": "Huit nuits d'encerclement, terminées en une seule. Les feux brûlent déjà plus régulièrement, ou peut-être n'est-ce que mes mains. Quoi qu'il en soit, le pré est de nouveau à moi, et je peux entendre l'île penser.",
         "objectives": {
           "0": {
-            "label": "Void Stalker slain"
+            "label": "Traqueur du Vide abattu"
           }
         }
       },
       "q_fs_the_great_break": {
-        "title": "The Great Break",
-        "text": "Every song this island sings ends on the same low note, and it comes from the Sundered Cliffs. Something came through the great break there, {playerName}, something the cliffs themselves cracked open to admit, and it is still growing. If it walks north, no bell will matter. Take a friend, take two, and end it. Then tell Coalfast the tune has changed.",
-        "completion": "Ollun sent word ahead: the singing stopped. My whole town heard the quiet, {playerName}, and half of them wept at the sound of nothing at all. Wear this mantle. The Farshore does not forget who held its shore.",
+        "title": "La Grande Brèche",
+        "text": "Chaque chant que cette île entonne finit sur la même note grave, et elle vient des Falaises rompues. Quelque chose est passé par la grande brèche là-bas, {playerName}, quelque chose que les falaises elles-mêmes se sont fendues pour laisser entrer, et cela continue de grandir. Si cela marche vers le nord, aucune cloche n'y changera rien. Prenez un ami, prenez-en deux, et achevez-le. Puis dites à Coalfast que l'air a changé.",
+        "completion": "Ollun a fait passer le mot : le chant s'est arrêté. Toute ma ville a entendu le silence, {playerName}, et la moitié d'entre eux ont pleuré au bruit du néant. Portez ce manteau. Le Farshore n'oublie pas qui a tenu son rivage.",
         "objectives": {
           "0": {
-            "label": "The Sundered Horror slain"
+            "label": "L'Horreur déchirée abattue"
           }
         }
       },
       "q_gc_down_the_windway": {
-        "title": "Down the Windway",
-        "text": "You made the climb, {playerName}, so the wind has decided to keep you. Wickharbor sits east along the downs road, tucked in the lee of its cove. Harbormaster Odile counts every soul who comes over the pass, and she will want to count you. Tell her the Windway is still open.",
-        "completion": "Over the pass on foot, in this weather? Maren sends me few enough names, and fewer still walk in to answer for themselves. Welcome to Wickharbor, {playerName}. Close the inn door behind you.",
+        "title": "En descendant la Voie du Vent",
+        "text": "Vous avez fait l'ascension, {playerName}, alors le vent a décidé de vous garder. Wickharbor se trouve à l'est le long de la route des landes, blottie sous le vent de sa crique. La Capitaine du port Odile compte chaque âme qui franchit le col, et elle voudra vous compter aussi. Dites-lui que la Voie du Vent est toujours ouverte.",
+        "completion": "Par le col à pied, par ce temps ? Maren m'envoie déjà peu de noms, et moins encore viennent répondre d'eux-mêmes. Bienvenue à Wickharbor, {playerName}. Refermez la porte de l'auberge derrière vous.",
         "objectives": {
           "0": {
-            "label": "Report to Harbormaster Odile"
+            "label": "Faire un rapport à la Capitaine du port Odile"
           }
         }
       },
       "q_gc_wool_off_the_downs": {
-        "title": "Wool off the Downs",
-        "text": "My boat crews row into a gale that cuts through oilskin like paper, {playerName}. Only one thing turns this wind: the greasy wool off the moor rams, spun thick the Wickharbor way. The herds graze the Howling Downs west of town. Six good fleeces and every crew rows warm this season.",
-        "completion": "Fleece like this is why the rams stand out there fat and smug in weather that kills men. The spinners will be at it by lamplight. Take these treads, {playerName}, they are lined from the last shearing.",
+        "title": "De la laine des landes",
+        "text": "Mes équipages rament dans une tempête qui traverse la toile cirée comme du papier, {playerName}. Une seule chose repousse ce vent : la laine grasse des béliers de la lande, filée épaisse à la manière de Wickharbor. Les troupeaux paissent sur les Landes Hurlantes à l'ouest de la ville. Six bonnes toisons et chaque équipage ramera au chaud cette saison.",
+        "completion": "Une toison comme celle-ci explique pourquoi les béliers restent là-bas, gras et satisfaits, par un temps qui tue les hommes. Les fileuses s'y mettront à la lueur des lampes. Prenez ces bottines, {playerName}, elles sont doublées de la dernière tonte.",
         "objectives": {
           "0": {
-            "label": "Greasy Ram Wool"
+            "label": "Laine de bélier grasse"
           }
         }
       },
       "q_gc_scuttlers_in_the_pots": {
-        "title": "Scuttlers in the Pots",
-        "text": "The shoal scuttlers have learned to climb the cliff road and crack our crab pots open on the stones, {playerName}. Half the catch gone this week, and one potman with a hand he will not be using for a month. Break ten of them and the rest will remember why they kept to the shoals.",
-        "completion": "Ten fewer shells on my road, and the pots came up full this morning. The potmen are calling you a good omen, {playerName}. In Wickharbor that is as warm as praise gets.",
+        "title": "Des coureurs dans les casiers",
+        "text": "Les coureurs des hauts-fonds ont appris à grimper la route de falaise et à fracasser nos casiers à crabes sur les rochers, {playerName}. La moitié de la pêche envolée cette semaine, et un poseur de casiers avec une main qu'il ne pourra pas utiliser avant un mois. Brisez-en dix et les autres se souviendront pourquoi ils restaient dans les hauts-fonds.",
+        "completion": "Dix carapaces de moins sur ma route, et les casiers sont remontés pleins ce matin. Les poseurs de casiers vous disent porte-bonheur, {playerName}. À Wickharbor, c'est le compliment le plus chaleureux qui existe.",
         "objectives": {
           "0": {
-            "label": "Shoal Scuttler slain"
+            "label": "Coureur des hauts-fonds abattu"
           }
         }
       },
       "q_gc_keeper_of_the_flame": {
-        "title": "The Keeper of the Flame",
-        "text": "Old Bram keeps the Beacon on the high head northeast of town, and he has not come down for his stores in two weeks. The lamp still burns, so he lives, but a man his age alone on that head in this wind, {playerName}. Climb the beacon road and see him standing.",
-        "completion": "Odile sent you all this way to see if the wind had taken me? Ha. Tell her the lamp burns and so do I. But since you have made the climb, {playerName}, stay a moment. The Beacon has work only a stranger seems fit to do.",
+        "title": "Le gardien de la flamme",
+        "text": "Le vieux Bram tient le Phare sur le promontoire au nord-est de la ville, et il n'est pas redescendu chercher ses provisions depuis deux semaines. La lampe brûle encore, donc il vit, mais un homme de son âge, seul sur ce promontoire par ce vent, {playerName}... Grimpez la route du phare et assurez-vous qu'il tient debout.",
+        "completion": "Odile vous a envoyé jusqu'ici pour voir si le vent m'avait emporté ? Ha. Dites-lui que la lampe brûle, et moi aussi. Mais puisque vous avez fait l'ascension, {playerName}, restez un moment. Le Phare a un travail que seul un étranger semble apte à faire.",
         "objectives": {
           "0": {
-            "label": "Find Keeper Bram"
+            "label": "Trouver le Gardien Bram"
           }
         }
       },
       "q_gc_lanterns_on_the_shear": {
-        "title": "Lanterns on the Shear",
-        "text": "The Beacon is the great light, {playerName}, but it is the storm-lanterns that walk a night traveler down the cliff road above the Shear. Last night the gale doused every one of them, and that road in the dark is a long fall with a short ending. Take my striker and relight the four along the cliff.",
-        "completion": "Four points of light on the cliff road, right where they belong. From up here it looks like the coast has opened its eyes again. You have the makings of a keeper, {playerName}.",
+        "title": "Des lanternes sur le Surplomb",
+        "text": "Le Phare est la grande lumière, {playerName}, mais ce sont les lanternes-tempête qui guident un voyageur nocturne sur la route de falaise au-dessus du Surplomb. La nuit dernière, la tempête les a toutes éteintes, et cette route dans le noir, c'est une longue chute pour une fin bien courte. Prenez mon briquet et rallumez les quatre le long de la falaise.",
+        "completion": "Quatre points de lumière sur la route de falaise, exactement où ils doivent être. D'ici, on dirait que la côte a rouvert les yeux. Vous avez l'étoffe d'un gardien de phare, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Storm-lantern relit"
+            "label": "Lanterne-tempête rallumée"
           }
         }
       },
       "q_gc_wind_against_the_wick": {
-        "title": "Wind Against the Wick",
-        "text": "The gale wisps are the wind gone spiteful, {playerName}. They gather on the high downs by the Mirror Tarn, and every flame they find, they snuff, a lantern, a hearth, one day this lamp. Thirty-nine years I have kept the Beacon lit, and I will not lose it to weather with a grudge. Scatter eight of them.",
-        "completion": "The lamp did not so much as gutter last night, first time in a month. The wind still hates us, {playerName}, but it has gone back to hating us fairly.",
+        "title": "Le vent contre la mèche",
+        "text": "Les feux follets des bourrasques sont le vent devenu malveillant, {playerName}. Ils se rassemblent sur les landes hautes près du Lac Miroir, et chaque flamme qu'ils trouvent, ils l'éteignent, une lanterne, un âtre, un jour cette lampe. Trente-neuf ans que je garde le Phare allumé, et je ne le perdrai pas face à un temps rancunier. Dispersez-en huit.",
+        "completion": "La lampe n'a même pas vacillé la nuit dernière, première fois depuis un mois. Le vent nous déteste toujours, {playerName}, mais il est revenu à une haine plus équitable.",
         "objectives": {
           "0": {
-            "label": "Gale Wisp scattered"
+            "label": "Feu follet des bourrasques dispersé"
           }
         }
       },
       "q_gc_the_far_shore": {
-        "title": "The Far Shore",
-        "text": "From this lamp room I can see the whole coast, {playerName}, and what I see in the north I do not like. Green lights walking the Wreckfields at low tide, hull by hull. One woman works that shore alone: Edda, the salvager. Follow the cliff road north past the Shear until the wrecks begin, and see that she still draws breath.",
-        "completion": "Bram watches my shore from his tower now, does he? The old man is right to worry, {playerName}. The dead have been walking their own wrecks at night, and lately they have stopped caring whether the sun is up.",
+        "title": "Le rivage lointain",
+        "text": "Depuis cette salle de la lampe, je vois toute la côte, {playerName}, et ce que je vois au nord ne me plaît pas. Des lumières vertes qui marchent sur les Champs d'Épaves à marée basse, coque après coque. Une femme travaille seule sur ce rivage : Edda, la récupératrice. Suivez la route de falaise vers le nord au-delà du Surplomb jusqu'à ce que les épaves commencent, et assurez-vous qu'elle respire encore.",
+        "completion": "Bram surveille mon rivage depuis sa tour, maintenant ? Le vieil homme a raison de s'inquiéter, {playerName}. Les morts arpentent leurs propres épaves la nuit, et dernièrement ils ne se soucient même plus de savoir si le soleil est levé.",
         "objectives": {
           "0": {
-            "label": "Find Salvager Edda"
+            "label": "Trouver la récupératrice Edda"
           }
         }
       },
       "q_gc_dead_mens_cargo": {
-        "title": "Dead Men's Cargo",
-        "text": "Salvage law is simple, {playerName}: what the sea gives the beach is mine. The drowned deckhands disagree. They rise from their hulls and drag every crate I stack back below the tideline. Put six of them down for good, and while the beach is quiet, haul in three flotsam crates before the tide files its counterclaim.",
-        "completion": "Six crews quieter and three crates high and dry. You salvage with a heavier hand than I do, {playerName}, but the ledger does not care. Half of this is yours by law, and by law I mean I say so.",
+        "title": "La cargaison des morts",
+        "text": "La loi du sauvetage est simple, {playerName} : ce que la mer donne à la plage m'appartient. Les matelots noyés ne sont pas d'accord. Ils se relèvent de leurs coques et traînent chaque caisse que j'empile de nouveau sous la laisse de marée. Abattez-en six pour de bon, et tant que la plage est calme, ramenez trois caisses d'épaves flottantes avant que la marée ne dépose sa contre-réclamation.",
+        "completion": "Six équipages plus calmes et trois caisses bien au sec. Vous sauvez avec une main plus lourde que la mienne, {playerName}, mais le registre s'en moque. La moitié de tout ceci est à vous de droit, et par droit j'entends que c'est moi qui le dis.",
         "objectives": {
           "0": {
-            "label": "Drowned Deckhand laid to rest"
+            "label": "Matelot noyé mis au repos"
           },
           "1": {
-            "label": "Flotsam Crate salvaged"
+            "label": "Caisse d'épaves flottantes récupérée"
           }
         }
       },
       "q_gc_the_wreck_warden": {
-        "title": "The Wreck Warden",
-        "text": "Now you know why the deckhands rise, {playerName}. Something wears the barnacled plate of the first wreck ever to break on this shore, and it wardens every hull on the beach like a graveyard it was hired to keep. It holds a hoard I have coveted for ten years and a crew I would rather see resting. End the Wreck Warden. Bring a friend, the dead keep good watch.",
-        "completion": "The beach went silent the moment it fell, {playerName}. First silence I have heard on this shore in ten years of working it. The crews are just bones now, resting bones. Take the mantle off the top of the hoard, it was always going to fit a living back better.",
+        "title": "Le Gardien de l'épave",
+        "text": "Maintenant vous savez pourquoi les matelots se relèvent, {playerName}. Quelque chose porte la plaque couverte de bernacles de la toute première épave à s'être brisée sur ce rivage, et cela garde chaque coque de la plage comme un cimetière qu'on l'aurait engagé à surveiller. Cela détient un trésor que je convoite depuis dix ans et un équipage que je préférerais voir reposer. Achevez le Gardien de l'épave. Amenez un ami, les morts montent bonne garde.",
+        "completion": "La plage s'est tue à l'instant où il est tombé, {playerName}. Premier silence que j'entends sur ce rivage en dix ans de labeur. Les équipages ne sont plus que des os désormais, des os au repos. Prenez le manteau au sommet du trésor, il a toujours été destiné à mieux aller à un dos vivant.",
         "objectives": {
           "0": {
-            "label": "The Wreck Warden felled"
+            "label": "Le Gardien de l'épave terrassé"
           }
         }
       },
@@ -13738,7 +13738,7 @@ export const fr_CA: EnTranslations = {
             "label": "Le Pré de la Truie"
           },
           "11": {
-            "label": "The Farshore Causeway"
+            "label": "La Chaussée du Farshore"
           }
         }
       },
@@ -13809,296 +13809,296 @@ export const fr_CA: EnTranslations = {
         }
       },
       "veiled_hollow": {
-        "name": "The Veiled Hollow",
-        "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldergleam.",
+        "name": "Le Vallon Voilé",
+        "welcome": "L'air résonne d'une magie ancienne. Cherchez la Gardienne Saelwyn sous le grand arbre d'Eldergleam.",
         "pois": {
           "0": {
             "label": "Eldergleam"
           },
           "1": {
-            "label": "Duskfall Cave"
+            "label": "La Grotte du Crépuscule"
           },
           "2": {
-            "label": "Duskfall Overlook"
+            "label": "Le Belvédère du Crépuscule"
           },
           "3": {
-            "label": "Elder Grove"
+            "label": "Le Bosquet Ancien"
           },
           "4": {
-            "label": "Starfall Basin"
+            "label": "Le Bassin des Étoiles Filantes"
           },
           "5": {
-            "label": "The Sunken Court"
+            "label": "La Cour Engloutie"
           },
           "6": {
-            "label": "Crystalline Shallows"
+            "label": "Les Hauts-fonds Cristallins"
           },
           "7": {
-            "label": "The Gleaming Deep"
+            "label": "Les Profondeurs Scintillantes"
           }
         }
       },
       "drakelands": {
-        "name": "The Drakelands",
-        "welcome": "Hot wind rolls off the wastes ahead. Dragons wheel over the Drakemaw, and troll fires burn in the dunes.",
+        "name": "Les Terres du Dragon",
+        "welcome": "Un vent brûlant souffle depuis les terres désolées. Des dragons tournoient au-dessus du Drakemaw, et des feux trolls brûlent dans les dunes.",
         "pois": {
           "0": {
             "label": "Wyrmwatch"
           },
           "1": {
-            "label": "The Gatewood"
+            "label": "Le Gatewood"
           },
           "2": {
-            "label": "Cinder Dunes"
+            "label": "Dunes de Cendre"
           },
           "3": {
             "label": "Trollmoot"
           },
           "4": {
-            "label": "The Last Keep"
+            "label": "Le Dernier Donjon"
           },
           "5": {
-            "label": "Bloodglass Fields"
+            "label": "Champs de Bloodglass"
           },
           "6": {
-            "label": "Drakemaw Caldera"
+            "label": "Caldeira de Drakemaw"
           }
         }
       },
       "frostveil": {
-        "name": "The Frostveil Reach",
-        "welcome": "Snow swallows every sound. Under the dancing lights, the cold itself feels awake.",
+        "name": "Le Voile de Givre",
+        "welcome": "La neige engloutit tous les sons. Sous les lumières dansantes, le froid lui-même semble éveillé.",
         "pois": {
           "0": {
             "label": "Icemantle"
           },
           "1": {
-            "label": "The Snowline"
+            "label": "La Ligne de Neige"
           },
           "2": {
-            "label": "Glacier Tarn"
+            "label": "Le Lac du Glacier"
           },
           "3": {
-            "label": "The Aurora Steps"
+            "label": "Les Marches de l'Aurore"
           },
           "4": {
-            "label": "The Shiverfen"
+            "label": "Le Shiverfen"
           },
           "5": {
-            "label": "The Howling Terraces"
+            "label": "Les Terrasses Hurlantes"
           }
         }
       },
       "amberfall": {
-        "name": "The Amberfall",
-        "welcome": "Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternmere are lit for you.",
+        "name": "La Chute d'Ambre",
+        "welcome": "Ici, chaque feuille brûle d'or et de rouge, et pourtant aucune ne tombe jamais. Les lanternes de Lanternmere sont allumées pour vous.",
         "pois": {
           "0": {
             "label": "Lanternmere"
           },
           "1": {
-            "label": "The Goldmelt"
+            "label": "Le Goldmelt"
           },
           "2": {
-            "label": "The Gilded Orchard"
+            "label": "Le Verger doré"
           },
           "3": {
-            "label": "Harvest Hollow"
+            "label": "Creux des Moissons"
           },
           "4": {
-            "label": "The Great Mere"
+            "label": "Le Grand Lac"
           },
           "5": {
-            "label": "Cindermaple Rise"
+            "label": "Hauteurs de Cindermaple"
           },
           "6": {
-            "label": "The Leaning Monolith"
+            "label": "Le Monolithe penché"
           }
         }
       },
       "willowfen": {
-        "name": "The Willowfen",
-        "welcome": "The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and rest your feet awhile.",
+        "name": "Le Marais des Saules",
+        "welcome": "Le marais bourdonne de libellules et d'abeilles. Traversez le pont jusqu'à Bridgemere et reposez-vous un moment.",
         "pois": {
           "0": {
             "label": "Bridgemere"
           },
           "1": {
-            "label": "The Amberfen Steps"
+            "label": "Les Marches de l'Amberfen"
           },
           "2": {
-            "label": "The Lilymoors"
+            "label": "Les Lilymoors"
           },
           "3": {
-            "label": "Bogshine Pools"
+            "label": "Les Mares Chatoyantes"
           },
           "4": {
             "label": "Willowweep"
           },
           "5": {
-            "label": "The Drowsy Flats"
+            "label": "Les Étendues Somnolentes"
           }
         }
       },
       "nightbloom": {
-        "name": "The Nightbloom",
-        "welcome": "Past the Nightgate the air itself dreams. Follow the flower-light to Moonrest, and mind the sleeping world that hangs in the sky.",
+        "name": "La Fleur de Nuit",
+        "welcome": "Passé la Porte de la Nuit, l'air lui-même rêve. Suivez la lueur des fleurs jusqu'à Moonrest, et prenez garde au monde endormi suspendu dans le ciel.",
         "pois": {
           "0": {
             "label": "Moonrest"
           },
           "1": {
-            "label": "The Nightgate"
+            "label": "La Porte de la Nuit"
           },
           "2": {
-            "label": "The Moonwell"
+            "label": "Le Puits de Lune"
           },
           "3": {
             "label": "Gloamfield"
           },
           "4": {
-            "label": "The Standing Vigil"
+            "label": "La Vigie immobile"
           },
           "5": {
-            "label": "The Sleepless Barrow"
+            "label": "Le Tertre Sans Sommeil"
           }
         }
       },
       "wraithwood": {
-        "name": "The Wraithwood",
-        "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name.",
+        "name": "Le Bois des Spectres",
+        "welcome": "La canopée se referme sur la route comme un couvercle. Restez près des lanternes de Gallowmere, et ne répondez pas si la forêt appelle votre nom.",
         "pois": {
           "0": {
             "label": "Gallowmere"
           },
           "1": {
-            "label": "The Crowgate"
+            "label": "La Porte aux Corbeaux"
           },
           "2": {
-            "label": "Widow's Thicket"
+            "label": "Le Fourré des Veuves"
           },
           "3": {
-            "label": "The Hanging Glade"
+            "label": "La Clairière Pendue"
           },
           "4": {
-            "label": "The Mournstone Chapel"
+            "label": "La Chapelle de Mournstone"
           },
           "5": {
-            "label": "The Huntsman's Clearing"
+            "label": "La Clairière du Chasseur"
           }
         }
       },
       "palmreach": {
-        "name": "The Palmreach",
-        "welcome": "Warm sand, loud birds, and a jungle that eats the horizon. Drifthaven keeps a fire lit on the beach for you.",
+        "name": "La Baie des Palmes",
+        "welcome": "Sable chaud, oiseaux bruyants, et une jungle qui dévore l'horizon. Drifthaven garde un feu allumé sur la plage pour vous.",
         "pois": {
           "0": {
             "label": "Drifthaven"
           },
           "1": {
-            "label": "The Tanglemouth"
+            "label": "L'Embouchure emmêlée"
           },
           "2": {
-            "label": "The Palmstrand"
+            "label": "La Grève des Palmes"
           },
           "3": {
-            "label": "The Emerald Tangle"
+            "label": "L'Enchevêtrement d'Émeraude"
           },
           "4": {
-            "label": "The Vinefall"
+            "label": "La Chute de Lianes"
           },
           "5": {
-            "label": "The Sapphire Lagoon"
+            "label": "Le Lagon de Saphir"
           },
           "6": {
-            "label": "The Sunken Idol"
+            "label": "L'Idole engloutie"
           }
         }
       },
       "evergarden": {
-        "name": "The Evergarden",
-        "welcome": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.",
+        "name": "Le Jardin Éternel",
+        "welcome": "Quelqu'un taille encore les haies, bien qu'aucun jardinier n'ait été vu depuis cent ans. Prenez garde au labyrinthe : il vous surveille aussi.",
         "pois": {
           "0": {
             "label": "Hedgewick"
           },
           "1": {
-            "label": "The Garden Gate"
+            "label": "La Porte du Jardin"
           },
           "2": {
-            "label": "The Parterre Walk"
+            "label": "L'Allée du Parterre"
           },
           "3": {
-            "label": "Dawnhold Castle"
+            "label": "Château de Dawnhold"
           },
           "4": {
-            "label": "The Petal Pond"
+            "label": "Le Bassin aux Pétales"
           },
           "5": {
-            "label": "The Great Maze"
+            "label": "Le Grand Labyrinthe"
           },
           "6": {
-            "label": "The Fountain Court"
+            "label": "La Cour des Fontaines"
           },
           "7": {
-            "label": "The Old Mill"
+            "label": "Le Vieux Moulin"
           },
           "8": {
-            "label": "The North Watch"
+            "label": "Le Guet du Nord"
           },
           "9": {
-            "label": "The Lily Basin"
+            "label": "Le Bassin des Lys"
           }
         }
       },
       "galecrest": {
-        "name": "The Galecrest",
-        "welcome": "The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you.",
+        "name": "La Crête du Vent",
+        "welcome": "Le vent ne s'est jamais arrêté ici, et le Vieux Phare ne s'est jamais éteint. Wickharbor vous demande seulement de refermer la porte de l'auberge derrière vous.",
         "pois": {
           "0": {
             "label": "Wickharbor"
           },
           "1": {
-            "label": "The Windway"
+            "label": "La Voie du Vent"
           },
           "2": {
-            "label": "The Howling Downs"
+            "label": "Les Landes Hurlantes"
           },
           "3": {
-            "label": "The Old Beacon"
+            "label": "Le Vieux Phare"
           },
           "4": {
-            "label": "The Shear"
+            "label": "Le Surplomb"
           },
           "5": {
-            "label": "The Wreckfields"
+            "label": "Les Champs d'Épaves"
           },
           "6": {
-            "label": "The Mirror Tarn"
+            "label": "Le Lac Miroir"
           },
           "7": {
-            "label": "The Galecrest Stables"
+            "label": "Les Écuries du Galecrest"
           }
         }
       },
       "farshore_isle": {
-        "name": "The Farshore",
-        "welcome": "Cross the sandbar and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
+        "name": "Le Rivage Lointain",
+        "welcome": "Traversez le banc de sable et la cloche de Gullhaven vous trouvera avant la ville elle-même. Les brèches s'ouvrent sans prévenir, et la redoute défend son rivage contre tout ce qui en jaillit. Ils vous attendent depuis longtemps.",
         "pois": {
           "0": {
             "label": "Gullhaven"
           },
           "1": {
-            "label": "The Landing"
+            "label": "Le Débarcadère"
           },
           "2": {
-            "label": "The Watch Meadow"
+            "label": "Le Pré du Guet"
           },
           "3": {
-            "label": "The Sundered Cliffs"
+            "label": "Les Falaises rompues"
           },
           "4": {
-            "label": "The Riftfields"
+            "label": "Les Champs de la Faille"
           }
         }
       }
@@ -14130,14 +14130,14 @@ export const fr_CA: EnTranslations = {
         "leaveText": "Vous retrouvez l'air froid de Thornpeak."
       },
       "wildheart_basin": {
-        "name": "The Wildheart Basin",
-        "enterText": "Warm rain hisses on old stone. The Wildheart Basin opens before you.",
-        "leaveText": "You pass back beneath the stone fangs into the Palmreach sun."
+        "name": "Le Bassin du Cœur Sauvage",
+        "enterText": "Une pluie tiède crépite sur la pierre ancienne. The Wildheart Basin s'ouvre devant vous.",
+        "leaveText": "Vous repassez sous les crocs de pierre pour retrouver le soleil du Palmreach."
       },
       "the_last_keep": {
-        "name": "The Last Keep",
-        "enterText": "You step into the cold, silent halls of the Last Keep.",
-        "leaveText": "You pull the keep door shut and step back into the Drakelands wind."
+        "name": "Le Dernier Donjon",
+        "enterText": "Vous pénétrez dans les salles froides et silencieuses de The Last Keep.",
+        "leaveText": "Vous refermez la porte du donjon et retrouvez le vent des Drakelands."
       },
       "drowned_temple": {
         "name": "Le Temple noyé",

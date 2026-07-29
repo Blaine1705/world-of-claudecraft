@@ -901,11 +901,11 @@ export const zh_TW: EnTranslations = {
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
       "autoShowHint": "一旦你的小隊造成傷害或治療，行數就會自動出現，此區段會在戰鬥結束幾秒後關閉。",
-      "breakdownSummary": "{tab}: {value}",
-      "breakdownRow": "{value} ({percent})",
+      "breakdownSummary": "{tab}：{value}",
+      "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "其他（{count}）",
       "percent": "{value}%",
-      "petAbility": "{pet}: {ability}",
+      "petAbility": "{pet}：{ability}",
       "melee": "近戰"
     },
     "petFeed": {
@@ -970,13 +970,13 @@ export const zh_TW: EnTranslations = {
     "mountRace": {
       "startButton": "開始比賽",
       "cancelButton": "取消比賽",
-      "go": "GO!",
+      "go": "出發！",
       "start": "出發！跳過每一道障礙，再騎回拱門衝線。",
       "toFinish": "騎回拱門衝線！",
       "finished": "完成！用時 {seconds} 秒！",
       "timeout": "比賽失敗",
       "progress": "障礙 {n} / {total}",
-      "timeLeft": "{seconds}s"
+      "timeLeft": "{seconds}秒"
     },
     "vcup": {
       "title": "溪谷盃",
@@ -2809,7 +2809,7 @@ export const zh_TW: EnTranslations = {
       "title": "世界地圖",
       "summary": "世界地圖。選擇一個地區以開啟其地圖。",
       "toWorld": "世界地圖",
-      "toZone": "Zone map",
+      "toZone": "地區地圖",
       "toggleAria": "在世界地圖與地區地圖之間切換",
       "levels": "等級 {min} 至 {max}"
     }
@@ -5735,7 +5735,7 @@ export const zh_TW: EnTranslations = {
     },
     "augment": {
       "choose": "選擇一項強化",
-      "cardAria": "{name} ({category}) - {description}",
+      "cardAria": "{name}（{category}）：{description}",
       "aug_brutality": {
         "name": "殘暴",
         "desc": "你的物理打擊造成的傷害提高15%。"
@@ -6739,22 +6739,22 @@ export const zh_TW: EnTranslations = {
       "gathering": "採集",
       "demonHeal": "惡魔治療",
       "thunzharrStormcall": "風暴召喚",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "冰川之墓",
+      "rift_frost_strike": "絕對零度",
+      "rift_ember_execution": "岩漿泉",
+      "rift_ember_strike": "核心熔毀",
+      "rift_venom_execution": "毒液池",
+      "rift_venom_strike": "蜘蛛母后之印",
+      "rift_necro_execution": "靈魂之墓",
+      "rift_necro_strike": "死亡判決",
+      "rift_brute_execution": "碎地之力",
+      "rift_brute_strike": "終極審判",
+      "rift_arcane_execution": "虛空裂隙",
+      "rift_arcane_strike": "奧術湮滅",
+      "rift_storm_execution": "避雷針",
+      "rift_storm_strike": "風暴召喚者之怒",
+      "rift_tide_execution": "深淵之口",
+      "rift_tide_strike": "粉碎深淵"
     }
   },
   "questUi": {

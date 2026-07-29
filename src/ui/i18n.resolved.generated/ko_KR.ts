@@ -970,13 +970,13 @@ export const ko_KR: EnTranslations = {
     "mountRace": {
       "startButton": "레이스 시작",
       "cancelButton": "경기 취소",
-      "go": "GO!",
+      "go": "출발!",
       "start": "출발! 모든 장애물을 뛰어넘고 아치로 돌아가 통과하라.",
       "toFinish": "아치로 돌아가 통과하라!",
       "finished": "{seconds}초 만에 완주!",
       "timeout": "레이스 실패",
       "progress": "장애물 {n} / {total}",
-      "timeLeft": "{seconds}s"
+      "timeLeft": "{seconds}초"
     },
     "vcup": {
       "title": "베일 컵",
@@ -2809,7 +2809,7 @@ export const ko_KR: EnTranslations = {
       "title": "세계 지도",
       "summary": "세계 지도. 지역을 선택하면 해당 지도가 열립니다.",
       "toWorld": "세계 지도",
-      "toZone": "Zone map",
+      "toZone": "지역 지도",
       "toggleAria": "세계 지도와 지역 지도 전환",
       "levels": "레벨 {min}부터 {max}까지"
     }
@@ -5735,7 +5735,7 @@ export const ko_KR: EnTranslations = {
     },
     "augment": {
       "choose": "증강 선택",
-      "cardAria": "{name} ({category}) - {description}",
+      "cardAria": "{name} ({category}): {description}",
       "aug_brutality": {
         "name": "잔혹함",
         "desc": "당신의 물리 공격이 15% 더 강하게 적중합니다."
@@ -6739,22 +6739,22 @@ export const ko_KR: EnTranslations = {
       "gathering": "채집",
       "demonHeal": "악마 치유",
       "thunzharrStormcall": "폭풍의 부름",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "빙하의 무덤",
+      "rift_frost_strike": "절대 영도",
+      "rift_ember_execution": "마그마 우물",
+      "rift_ember_strike": "핵심 용해",
+      "rift_venom_execution": "독액 웅덩이",
+      "rift_venom_strike": "여왕 거미의 낙인",
+      "rift_necro_execution": "영혼의 무덤",
+      "rift_necro_strike": "사망 선고",
+      "rift_brute_execution": "대지 분쇄",
+      "rift_brute_strike": "최후의 심판",
+      "rift_arcane_execution": "공허 균열",
+      "rift_arcane_strike": "비전 소멸",
+      "rift_storm_execution": "피뢰침",
+      "rift_storm_strike": "폭풍 소환사의 분노",
+      "rift_tide_execution": "심연의 아가리",
+      "rift_tide_strike": "분쇄의 심연"
     }
   },
   "questUi": {

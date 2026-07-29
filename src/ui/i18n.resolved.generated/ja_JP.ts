@@ -901,11 +901,11 @@ export const ja_JP: EnTranslations = {
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
       "autoShowHint": "パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。",
-      "breakdownSummary": "{tab}: {value}",
-      "breakdownRow": "{value} ({percent})",
+      "breakdownSummary": "{tab}：{value}",
+      "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "その他（{count}）",
       "percent": "{value}%",
-      "petAbility": "{pet}: {ability}",
+      "petAbility": "{pet}：{ability}",
       "melee": "近接攻撃"
     },
     "petFeed": {
@@ -970,13 +970,13 @@ export const ja_JP: EnTranslations = {
     "mountRace": {
       "startButton": "レース開始",
       "cancelButton": "レースをキャンセル",
-      "go": "GO!",
+      "go": "スタート！",
       "start": "スタート！すべての障害を跳び越え、アーチへ戻って駆け抜けろ。",
       "toFinish": "アーチへ戻って駆け抜けろ！",
       "finished": "{seconds}秒でゴール！",
       "timeout": "レース失敗",
       "progress": "障害 {n} / {total}",
-      "timeLeft": "{seconds}s"
+      "timeLeft": "{seconds}秒"
     },
     "vcup": {
       "title": "ヴェイルカップ",
@@ -2809,7 +2809,7 @@ export const ja_JP: EnTranslations = {
       "title": "ワールドマップ",
       "summary": "ワールドマップ。地域を選ぶとその地図が開きます。",
       "toWorld": "ワールドマップ",
-      "toZone": "Zone map",
+      "toZone": "ゾーンマップ",
       "toggleAria": "ワールドマップとゾーンマップを切り替える",
       "levels": "レベル {min} から {max}"
     }
@@ -5735,7 +5735,7 @@ export const ja_JP: EnTranslations = {
     },
     "augment": {
       "choose": "オーグメントを選択",
-      "cardAria": "{name} ({category}) - {description}",
+      "cardAria": "{name}（{category}）：{description}",
       "aug_brutality": {
         "name": "蛮勇",
         "desc": "物理攻撃の威力が15%上昇する。"
@@ -6739,22 +6739,22 @@ export const ja_JP: EnTranslations = {
       "gathering": "採集",
       "demonHeal": "悪魔の治癒",
       "thunzharrStormcall": "嵐の呼び声",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "氷河の墓",
+      "rift_frost_strike": "絶対零度",
+      "rift_ember_execution": "マグマの泉",
+      "rift_ember_strike": "コアメルトダウン",
+      "rift_venom_execution": "毒の沼",
+      "rift_venom_strike": "蜘蛛母の刻印",
+      "rift_necro_execution": "魂の墓",
+      "rift_necro_strike": "死の宣告",
+      "rift_brute_execution": "大地砕き",
+      "rift_brute_strike": "最後の審判",
+      "rift_arcane_execution": "虚空の裂け目",
+      "rift_arcane_strike": "秘術の殲滅",
+      "rift_storm_execution": "避雷針",
+      "rift_storm_strike": "嵐の使者の怒り",
+      "rift_tide_execution": "深淵の顎",
+      "rift_tide_strike": "粉砕の深淵"
     }
   },
   "questUi": {

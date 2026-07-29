@@ -970,13 +970,13 @@ export const ru_RU: EnTranslations = {
     "mountRace": {
       "startButton": "Начать заезд",
       "cancelButton": "Отменить заезд",
-      "go": "GO!",
+      "go": "Вперёд!",
       "start": "Вперёд! Бери все препятствия и скачи назад через арку.",
       "toFinish": "Скачи назад через арку!",
       "finished": "Финиш за {seconds} с!",
       "timeout": "Заезд провален",
       "progress": "Барьеры {n} из {total}",
-      "timeLeft": "{seconds}s"
+      "timeLeft": "{seconds} сек."
     },
     "vcup": {
       "title": "Кубок Долины",
@@ -2809,7 +2809,7 @@ export const ru_RU: EnTranslations = {
       "title": "Карта мира",
       "summary": "Карта мира. Выберите зону, чтобы открыть её карту.",
       "toWorld": "Карта мира",
-      "toZone": "Zone map",
+      "toZone": "Карта региона",
       "toggleAria": "Переключение между картой мира и картой региона",
       "levels": "Уровни {min} до {max}"
     }
@@ -5735,7 +5735,7 @@ export const ru_RU: EnTranslations = {
     },
     "augment": {
       "choose": "Выберите усиление",
-      "cardAria": "{name} ({category}) - {description}",
+      "cardAria": "{name} ({category}): {description}",
       "aug_brutality": {
         "name": "Жестокость",
         "desc": "Твои физические удары бьют на 15% сильнее."
@@ -6739,22 +6739,22 @@ export const ru_RU: EnTranslations = {
       "gathering": "Сбор ресурсов",
       "demonHeal": "Исцеление демона",
       "thunzharrStormcall": "Зов бури",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "Ледяная могила",
+      "rift_frost_strike": "Абсолютный ноль",
+      "rift_ember_execution": "Магматический колодец",
+      "rift_ember_strike": "Расплавление ядра",
+      "rift_venom_execution": "Ядовитая лужа",
+      "rift_venom_strike": "Метка паучьей матки",
+      "rift_necro_execution": "Могила душ",
+      "rift_necro_strike": "Смертный приговор",
+      "rift_brute_execution": "Разрушитель земли",
+      "rift_brute_strike": "Окончательный приговор",
+      "rift_arcane_execution": "Разлом пустоты",
+      "rift_arcane_strike": "Тайное уничтожение",
+      "rift_storm_execution": "Громоотвод",
+      "rift_storm_strike": "Гнев призывателя бурь",
+      "rift_tide_execution": "Пасть бездны",
+      "rift_tide_strike": "Сокрушающая глубина"
     }
   },
   "questUi": {
