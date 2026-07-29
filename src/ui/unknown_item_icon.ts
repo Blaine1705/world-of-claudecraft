@@ -26,7 +26,7 @@ import { iconDataUrl } from './icons';
 // icon art goes blank. Real browsers always have a canvas; this is what keeps
 // the "never a throw" contract true even where they do not (jsdom, a context
 // lost to memory pressure).
-const BLANK_PIXEL =
+export const BLANK_PIXEL =
   'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
 /** The `<img>` for an item id with no local ItemDef: the procedural fallback
@@ -41,5 +41,9 @@ export function unknownItemIconHtml(itemId: string, quality: string = 'common'):
     // these surfaces rather than surfacing; the never-a-throw contract is
     // worth that trade here.
   }
-  return `<img class="item-icon q-${esc(quality)}" src="${esc(src)}" alt="" draggable="false">`;
+  // The quality rides a CLASS attribute: esc() stops quote breakout but not
+  // token injection (a space would append a second class), so the rung is
+  // allowlisted to the known ladder and anything else paints common.
+  const rung = /^[a-z]+$/.test(quality) ? quality : 'common';
+  return `<img class="item-icon q-${rung}" src="${esc(src)}" alt="" draggable="false">`;
 }

@@ -5,6 +5,7 @@ import type { IWorld } from '../../../world_api';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
+import { knownItemDef } from '../../known_item';
 import { svgIcon } from '../../ui_icons';
 import { unknownItemIconHtml } from '../../unknown_item_icon';
 import { corpseHarvestView } from './corpse_harvest_view';
@@ -174,7 +175,7 @@ export class LootWindowController {
     // unguarded deref here used to throw before this popup's innerHTML was
     // assigned, leaving the corpse un-lootable (and, on the chest arm, the
     // throw aborted the rest of that frame's event batch).
-    const item: ItemDef | undefined = ITEMS[stack.itemId];
+    const item: ItemDef | undefined = knownItemDef(ITEMS, stack.itemId);
     const count =
       stack.count > 1
         ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(stack.count, { maximumFractionDigits: 0 }) }))}`
@@ -185,7 +186,7 @@ export class LootWindowController {
   private attachItemTooltips(): void {
     this.deps.element.querySelectorAll<HTMLElement>('[data-item]').forEach((row) => {
       const itemId = row.dataset.item ?? '';
-      const item: ItemDef | undefined = ITEMS[itemId];
+      const item: ItemDef | undefined = knownItemDef(ITEMS, itemId);
       // An unknown id gets the same minimal tooltip its bag and bank
       // siblings render (raw id plus the unknown sub-line), never the
       // def-derived body.

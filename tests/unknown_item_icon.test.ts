@@ -30,13 +30,16 @@ describe('unknownItemIconHtml', () => {
     expect(unknownItemIconHtml('future_item_id', 'mythic')).toContain('class="item-icon q-mythic"');
   });
 
-  it('escapes a hostile quality string out of the class attribute', () => {
-    // Defense in depth per the unconditional esc() rule: today's wire quality
-    // is a sim union member, but the parameter is deliberately a plain string
-    // and this helper is where a wider future caller would land.
-    const html = unknownItemIconHtml('future_item_id', 'x" onerror="alert(1)');
-    expect(html).not.toContain('" onerror');
-    expect(html).toContain('&quot;');
+  it('allowlists the quality rung out of the class attribute (no token injection)', () => {
+    // Stronger than escaping: esc() stops quote breakout but a SPACE would
+    // still append a second class token, so anything outside the lowercase
+    // rung alphabet paints common. Both attack shapes pinned.
+    const quoted = unknownItemIconHtml('future_item_id', 'x" onerror="alert(1)');
+    expect(quoted).not.toContain('onerror');
+    expect(quoted).toContain('class="item-icon q-common"');
+    const spaced = unknownItemIconHtml('future_item_id', 'common evil');
+    expect(spaced).toContain('class="item-icon q-common"');
+    expect(spaced).not.toContain('evil');
   });
 
   it('keeps the never-a-throw contract on a canvas-less host (blank pixel src)', () => {

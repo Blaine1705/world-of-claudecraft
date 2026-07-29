@@ -74,6 +74,7 @@ describe('retention sweep wiring in server/main.ts', () => {
       'pruneSitePresenceSessionsBatch(',
       'prunePlaySessionsBatch(',
       'pruneAccountIpAssociationsBatch(',
+      'pruneUnstuckReportsBatch(',
       'foldOnlinePeak(',
       'distinctOnlineSampleRealms(',
       'dailyRewardEventsCutoffDay(',
@@ -118,6 +119,7 @@ describe('retention sweep wiring in server/main.ts', () => {
     expect(MAIN).toContain(
       'pruneAccountIpAssociationsBatch(pool, config.accountIpAssociationRetentionDays, n)',
     );
+    expect(MAIN).toContain('pruneUnstuckReportsBatch(pool, config.unstuckReportRetentionDays, n)');
   });
 
   it('sweeps the play-session fold before the association ager', () => {

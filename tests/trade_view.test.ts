@@ -70,6 +70,17 @@ describe('buildTradeItemRow (stale-client guard, R34)', () => {
     expect(row.label).toBe('no_such_item_id');
   });
 
+  it('keeps a PROTOTYPE-KEY id on the unknown arm (the adversarial counter-example)', () => {
+    // ITEMS is a prototype-bearing Record, so a bare items[id] resolves
+    // 'constructor' to a truthy FUNCTION and the known arm throws in the
+    // display-name sink; knownItemDef is what keeps these on the fallback.
+    for (const key of ['constructor', '__proto__', 'toString', 'valueOf', 'hasOwnProperty']) {
+      const row = buildTradeItemRow({ itemId: key, count: 1 }, ITEMS);
+      expect(row.item, key).toBeUndefined();
+      expect(row.label, key).toBe(key);
+    }
+  });
+
   it('keeps the stack count on an unknown-id row', () => {
     const row = buildTradeItemRow({ itemId: 'no_such_item_id', count: 5 }, ITEMS);
     expect(row.item).toBeUndefined();

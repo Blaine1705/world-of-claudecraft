@@ -518,13 +518,14 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     expect(mainSrc).not.toContain('setTimeout(r, 2000)');
   });
 
-  it('wires the bounded unstuck retention prune at boot and daily maintenance', () => {
-    expect(unstuckDbSrc).toContain(
-      'export const UNSTUCK_REPORT_RETENTION_DAYS = UNSTUCK_REPORT_MAX_DAYS;',
-    );
-    expect(unstuckDbSrc).toContain('export const UNSTUCK_REPORT_PRUNE_BATCH_SIZE = 10_000;');
-    expect(unstuckDbSrc).toContain('export const UNSTUCK_REPORT_PRUNE_MAX_BATCHES = 10;');
-    expect(unstuckDbSrc).toContain('pg_try_advisory_lock($1::int)');
+  it('routes the unstuck retention prune through the shared sweep, and ONLY there', () => {
+    // The retention knob lives on the CONFIG (unstuckReportRetentionDays);
+    // the module keeps only the ADMIN VIEW ceiling. The old whole-backlog
+    // prune, its advisory lock, and its private batch constants are retired
+    // with the boot one-shot; the sweep primitive carries the bounded LIMIT.
+    expect(unstuckDbSrc).toContain('export const UNSTUCK_REPORT_MAX_DAYS = 90;');
+    expect(unstuckDbSrc).not.toContain('UNSTUCK_REPORT_PRUNE_BATCH_SIZE');
+    expect(unstuckDbSrc).not.toContain('pg_try_advisory_lock');
     expect(unstuckDbSrc).toContain('LIMIT $2');
     // Rewired at the v0.32.0 merge: the release shipped a boot-blocking
     // one-shot plus a bare interval, and the retention sweep's guard
@@ -534,7 +535,10 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
       'pruneBatch: (n) => pruneUnstuckReportsBatch(pool, config.unstuckReportRetentionDays, n)',
     );
     expect(count(mainSrc, 'pruneUnstuckReportsBatch(pool')).toBe(1);
-    expect(mainSrc).not.toContain('await pruneUnstuckReports(pool)');
+    // The retired whole-backlog name at zero occurrences, the retired-name
+    // idiom: the '(' suffix cannot match the Batch name, so a re-added
+    // one-shot in ANY spelling (await or void .catch) reds here.
+    expect(count(mainSrc, 'pruneUnstuckReports(')).toBe(0);
   });
 
   it('bounds unstuck inserts and the shutdown drain with named timeouts', () => {

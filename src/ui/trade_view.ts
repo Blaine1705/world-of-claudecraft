@@ -17,6 +17,7 @@
 import type { InvSlot, ItemDef } from '../sim/types';
 import { itemDisplayName } from './entity_i18n';
 import { formatNumber, t } from './i18n';
+import { knownItemDef } from './known_item';
 
 /** Total held count of `itemId` across every bag slot: the trade offer
  *  stepper's ceiling. */
@@ -41,7 +42,9 @@ export function buildTradeItemRow(
   slot: InvSlot,
   items: Readonly<Record<string, ItemDef>>,
 ): TradeItemRowModel {
-  const item: ItemDef | undefined = items[slot.itemId];
+  // knownItemDef, not a bare index: a prototype-key id must take the
+  // unknown arm here, or the fallback below never runs (R34 family).
+  const item: ItemDef | undefined = knownItemDef(items, slot.itemId);
   const name = item ? itemDisplayName(item) : slot.itemId;
   const label =
     slot.count > 1

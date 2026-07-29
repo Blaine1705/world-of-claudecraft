@@ -174,6 +174,13 @@ for (const byTier of Object.values(MASTER_TIER_LETTERS)) {
   for (const letter of Object.values(byTier)) LETTERS_BY_ID[letter.letterId] = letter;
 }
 
+/** Whether THIS bundle ships the authored letter (stale-client guard, R34):
+ *  the mail window falls back to the WIRE-shipped sender/subject/body for an
+ *  id this bundle predates, instead of rendering the raw letter id. */
+export function knownLetterId(letterId: string): boolean {
+  return Object.hasOwn(LETTERS_BY_ID, letterId);
+}
+
 function entityPathSegment(value: string): string {
   return value.replace(/[^A-Za-z0-9_]/g, '_');
 }

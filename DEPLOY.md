@@ -558,10 +558,13 @@ For off-box safety, sync the directory to S3 occasionally:
     not a capacity estimate: what a realm can actually carry depends on the host, so
     measure yours and set the number you measured.
   - `DAILY_REWARD_EVENTS_RETENTION_DAYS=`, `ONLINE_SAMPLES_RETENTION_DAYS=`,
-    `SITE_PRESENCE_RETENTION_DAYS=`, `PLAY_SESSION_RETENTION_DAYS=`, and
-    `ACCOUNT_IP_ASSOCIATION_RETENTION_DAYS=` (empty) follow the
+    `SITE_PRESENCE_RETENTION_DAYS=`, `PLAY_SESSION_RETENTION_DAYS=`,
+    `ACCOUNT_IP_ASSOCIATION_RETENTION_DAYS=`, and
+    `UNSTUCK_REPORT_RETENTION_DAYS=` (empty) follow the
     `CHAT_LOG_RETENTION_DAYS` contract exactly: an empty line means the default,
-    and an explicit `0` is keep-forever.
+    and an explicit `0` is keep-forever. The unstuck table carries account and
+    character ids plus positions, so audit its window with the same care as
+    the IP tables.
   - `RETENTION_SWEEP_UTC_HOUR=` and `RETENTION_SWEEP_MAX_ROWS_PER_RUN=` are NOT
     keep-forever-shaped: their raw value is trimmed, so an empty or whitespace line
     also reads as the DEFAULT, but an explicit `0` is a live value: a 00:00 UTC

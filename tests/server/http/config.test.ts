@@ -43,6 +43,7 @@ describe('loadConfig', () => {
     expect(cfg.playSessionRetentionDays).toBe(180);
     expect(cfg.accountIpAssociationRetentionDays).toBe(730);
     expect(cfg.playerActivityRetentionDays).toBe(400);
+    expect(cfg.unstuckReportRetentionDays).toBe(90);
     expect(cfg.retentionSweepUtcHour).toBe(5);
     expect(cfg.retentionSweepMaxRowsPerRun).toBe(50000);
     expect(cfg.requireWebLogin).toBe(false);
@@ -289,6 +290,7 @@ describe('loadConfig', () => {
         dflt: 730,
       },
       { key: 'PLAYER_ACTIVITY_RETENTION_DAYS', field: 'playerActivityRetentionDays', dflt: 400 },
+      { key: 'UNSTUCK_REPORT_RETENTION_DAYS', field: 'unstuckReportRetentionDays', dflt: 90 },
     ] as const;
     for (const { key, field, dflt } of cases) {
       // A set value overrides the default.

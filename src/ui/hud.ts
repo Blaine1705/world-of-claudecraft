@@ -226,6 +226,7 @@ import {
   classDisplayName,
   dungeonDisplayName,
   itemDisplayName,
+  knownLetterId,
   tEntity,
   zoneDisplayName,
   zonePoiLabel,
@@ -390,6 +391,7 @@ import {
 } from './item_instance_tooltip';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
+import { knownItemDef, ownEntry } from './known_item';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
@@ -538,7 +540,7 @@ import { type UnitFrameDescriptor, unitFrameView } from './unit_frame';
 import { UnitFramePainter } from './unit_frame_painter';
 import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
-import { unknownItemIconHtml } from './unknown_item_icon';
+import { BLANK_PIXEL as BLANK_PIXEL_ICON, unknownItemIconHtml } from './unknown_item_icon';
 import { unstuckFeedback } from './unstuck_feedback';
 import { ValeCupBetting } from './vale_cup_betting';
 import { buildVcupBettingView } from './vale_cup_betting_view';
@@ -811,7 +813,7 @@ const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
 };
 // Ravenpost mailResult refusal codes to their toast lines. `sent`/`collected`
 // are successes rendered as chat-log lines in handleEvents, but they map here
-// too so every code resolves without a fallback.
+// too; codes outside THIS bundle's union take the fallback below.
 const MAIL_RESULT_ERROR_KEYS: Record<MailResultCode, TranslationKey> = {
   sent: 'hudChrome.mailbox.result.sent',
   collected: 'hudChrome.mailbox.result.collected',
@@ -849,6 +851,14 @@ const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
   fiesta_complete: 'hudChrome.warfare.reasons.fiestaComplete',
   fiesta_win: 'hudChrome.warfare.reasons.fiestaWin',
 };
+// The wire-union fallbacks (R34's enum axis): every code above is a SERVER
+// value a newer deploy can widen, and t() throws on an undefined key, so an
+// off-vocabulary code degrades to the family's most generic line instead of
+// killing the event batch (the RAID_MARKER_LABEL_KEYS idiom below).
+const MAIL_RESULT_FALLBACK_KEY: TranslationKey = 'hudChrome.mailbox.result.letterGone';
+const CALENDAR_RESULT_FALLBACK_KEY: TranslationKey = 'hudChrome.calendar.result.badInput';
+const MOTD_RESULT_FALLBACK_KEY: TranslationKey = 'hudChrome.social.billboard.result.notOfficer';
+const HONOR_REASON_FALLBACK_KEY: TranslationKey = 'hudChrome.warfare.reasons.arenaWin';
 const RAID_MARKER_LABEL_KEYS = [
   'hud.markers.names.star',
   'hud.markers.names.circle',
@@ -4475,7 +4485,17 @@ export class Hud {
 
   private itemIcon(item: ItemDef): string {
     const q = item.quality ?? 'common';
-    return `<img class="item-icon q-${q}" src="${iconDataUrl('item', item.id)}" alt="" draggable="false">`;
+    // The same canvas swallow unknownItemIconHtml carries: every guarded
+    // surface paints at least one KNOWN item, so without this a
+    // canvas-exhausted host threw on the known arm first and the fallback
+    // family's never-a-throw contract was unreachable in practice.
+    let src = BLANK_PIXEL_ICON;
+    try {
+      src = iconDataUrl('item', item.id);
+    } catch {
+      // Canvas-less host: blank art, never a throw.
+    }
+    return `<img class="item-icon q-${q}" src="${src}" alt="" draggable="false">`;
   }
 
   moneyHtml(copper: number): string {
@@ -9769,7 +9789,7 @@ export class Hud {
           const amount = formatNumber(ev.amount, { maximumFractionDigits: 0 });
           const honorMessage = t('hudChrome.warfare.honorGain', {
             amount,
-            reason: t(HONOR_REASON_KEYS[ev.reason]),
+            reason: t(HONOR_REASON_KEYS[ev.reason] ?? HONOR_REASON_FALLBACK_KEY),
           });
           const honorShape = fctSpawnShape({ type: 'honor' });
           if (honorShape) {
@@ -10334,9 +10354,10 @@ export class Hud {
           // Player names splice verbatim; authored letters carry their
           // letterId, so the sender localizes through the entity dictionary
           // exactly like the mailbox window does.
-          const sender = ev.letterId
-            ? tEntity({ kind: 'letter', id: ev.letterId, field: 'sender' })
-            : ev.senderName;
+          const sender =
+            ev.letterId && knownLetterId(ev.letterId)
+              ? tEntity({ kind: 'letter', id: ev.letterId, field: 'sender' })
+              : ev.senderName;
           audio.whisper();
           this.showBanner(t('hudChrome.mailbox.arrivedBanner', { name: sender }));
           this.log(t('hudChrome.mailbox.arrivedLog', { name: sender }), '#c8f7c5');
@@ -10356,7 +10377,10 @@ export class Hud {
           } else if (ev.code === 'collected') {
             this.log(t('hudChrome.mailbox.result.collected', values), '#c8f7c5');
           } else {
-            this.showError(t(MAIL_RESULT_ERROR_KEYS[ev.code], values));
+            // ?? the generic row: t() throws on an undefined key, and the code
+            // is a WIRE union a newer server can widen (the R34 family's enum
+            // axis); an unknown code degrades to the generic failure line.
+            this.showError(t(MAIL_RESULT_ERROR_KEYS[ev.code] ?? MAIL_RESULT_FALLBACK_KEY, values));
           }
           this.mailboxWindow.onMailResult(ev.code);
           this.lastMailUnread = -1;
@@ -10366,7 +10390,7 @@ export class Hud {
           if (ev.code === 'created' || ev.code === 'removed') {
             this.log(t(CALENDAR_RESULT_KEYS[ev.code]), '#c8f7c5');
           } else {
-            this.showError(t(CALENDAR_RESULT_KEYS[ev.code]));
+            this.showError(t(CALENDAR_RESULT_KEYS[ev.code] ?? CALENDAR_RESULT_FALLBACK_KEY));
           }
           this.calendarWindow.onCalendarResult(ev.code);
           break;
@@ -10375,7 +10399,7 @@ export class Hud {
           if (ev.code === 'set') {
             this.log(t(MOTD_RESULT_KEYS[ev.code]), '#c8f7c5');
           } else {
-            this.showError(t(MOTD_RESULT_KEYS[ev.code]));
+            this.showError(t(MOTD_RESULT_KEYS[ev.code] ?? MOTD_RESULT_FALLBACK_KEY));
           }
           break;
         }
@@ -11716,7 +11740,10 @@ export class Hud {
   // Hover/focus shows the same item tooltip the bags window uses; an unknown id
   // (e.g. content drift between players) degrades to a plain [?].
   private appendChatItemLink(parent: HTMLElement, itemId: string): void {
-    const item = ITEMS[itemId];
+    // knownItemDef, not bare truthiness: the token charset admits prototype
+    // keys ([[i:constructor]] is peer-typed text), and the bare read sent
+    // them down the known arm to throw inside the event batch.
+    const item = knownItemDef(ITEMS, itemId);
     if (!item) {
       parent.append(document.createTextNode(this.maskChat('[?]')));
       return;
@@ -11737,10 +11764,10 @@ export class Hud {
       .map((s) => {
         if (s.kind === 'text') return s.value;
         if (s.kind === 'item') {
-          const item = ITEMS[s.itemId];
+          const item = knownItemDef(ITEMS, s.itemId);
           return `[${item ? itemDisplayName(item) : '?'}]`;
         }
-        return `[${QUESTS[s.questId] ? questTitle(s.questId) : '?'}]`;
+        return `[${ownEntry(QUESTS, s.questId) ? questTitle(s.questId) : '?'}]`;
       })
       .join('');
   }
@@ -12440,6 +12467,13 @@ export class Hud {
     // preview and the sweep must agree on soulbound defs and bound copies or
     // the button can promise coin the sweep will not pay.
     const junk = this.sim.inventory.filter((slot) => junkSellableSlot(ITEMS[slot.itemId], slot));
+    // Unknown-id slots (a bundle behind the server, R34): the server resolves
+    // sell_all_junk against ITS OWN item table, so grays this bundle cannot
+    // classify still sell. The button stays live when any such slot exists;
+    // the quoted total keeps counting only what this bundle can price.
+    const hasUnknownSlots = this.sim.inventory.some(
+      (slot) => knownItemDef(ITEMS, slot.itemId) === undefined,
+    );
     const junkProceeds = junk.reduce(
       (sum, slot) => sum + ITEMS[slot.itemId]?.sellValue * slot.count,
       0,
@@ -12475,7 +12509,7 @@ export class Hud {
         onSellJunk: () => buyAndRefresh(() => this.sim.sellAllJunk()),
         onClose: () => this.closeVendor(),
         sellJunk: {
-          enabled: junk.length > 0,
+          enabled: junk.length > 0 || hasUnknownSlots,
           proceeds: junkProceeds,
         },
       },
@@ -15040,6 +15074,11 @@ export class Hud {
       this.stagedTrade,
     ]);
     if (sig === this.lastTradeSig) return;
+    // Visible BEFORE the render body: the panel's CSS default is
+    // display:none, and a throw on the FIRST paint used to leave a live
+    // trade with no panel at all (no Accept, no Cancel). A partial paint
+    // the player can see and escape beats an invisible one.
+    el.style.display = 'block';
 
     // The whole render sits in one try: it is throw-free by construction
     // (buildTradeItemRow resolves unknown ids), so the catch is the blast
@@ -15124,7 +15163,6 @@ export class Hud {
       [goldInput, silverInput, copperInput].forEach((input) => {
         input?.addEventListener('change', syncTradeMoney);
       });
-      el.style.display = 'block';
     } catch (err) {
       console.error('[hud] trade window render failed', err);
     } finally {

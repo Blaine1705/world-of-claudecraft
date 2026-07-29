@@ -49,6 +49,7 @@ import { esc } from './esc';
 import { FOCUSABLE_SELECTOR } from './focus_manager';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
+import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
@@ -291,7 +292,7 @@ export class BankWindow {
     // every rebuild, so capture its scroll offset and reapply it to the fresh one,
     // else a withdraw snaps the list back to the top (the bags idiom).
     const prevScrollTop = el.querySelector('.bank-scroll')?.scrollTop ?? 0;
-    const model = buildBankView(this.deps.world().bankInfo, (id) => ITEMS[id]);
+    const model = buildBankView(this.deps.world().bankInfo, (id) => knownItemDef(ITEMS, id));
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('hudChrome.bank.title'))} <span class="panel-subtitle">${esc(t('hudChrome.bank.subtitle'))}</span></span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.bank.close'))}">${svgIcon('close')}</button></div>`;
@@ -395,7 +396,7 @@ export class BankWindow {
     const isDefault = bagFilterIsDefault(this.filter);
     const visible = filterBankSlots(
       slots,
-      (id) => ITEMS[id],
+      (id) => knownItemDef(ITEMS, id),
       this.filter,
       (id) => this.itemNameOf(id),
     );
@@ -408,7 +409,7 @@ export class BankWindow {
       return;
     }
     for (const slot of visible) {
-      const item = ITEMS[slot.itemId];
+      const item = knownItemDef(ITEMS, slot.itemId);
       const cell = document.createElement('button');
       cell.type = 'button';
       cell.className = `bank-item q-${slot.qualityKey}`;
@@ -467,7 +468,7 @@ export class BankWindow {
   // with the visible cell. An unknown id falls back to the raw id: that is the label
   // its cell renders (the stale-client guard above), so sort and search stay agreed.
   private itemNameOf(itemId: string): string {
-    const item = ITEMS[itemId];
+    const item = knownItemDef(ITEMS, itemId);
     return item ? itemDisplayName(item) : itemId;
   }
 
@@ -480,7 +481,7 @@ export class BankWindow {
     if (!grid) return;
     const info = this.deps.world().bankInfo;
     if (!info) return; // walked away; refreshIfChanged owns the grace-close
-    const model = buildBankView(info, (id) => ITEMS[id]);
+    const model = buildBankView(info, (id) => knownItemDef(ITEMS, id));
     if (model.kind !== 'bank') return;
     // The offset lives on the .bank-scroll wrapper; emptying the grid momentarily
     // collapses the wrapper's scroll height (clamping scrollTop to 0), so capture
@@ -569,7 +570,7 @@ export class BankWindow {
     deposit.textContent = t('hudChrome.bank.depositAll');
     deposit.disabled =
       this.depositAllPending ||
-      !hasDepositableMaterials(this.deps.world().inventory, (id) => ITEMS[id]);
+      !hasDepositableMaterials(this.deps.world().inventory, (id) => knownItemDef(ITEMS, id));
     deposit.addEventListener('click', () => this.onDepositAll());
     tools.appendChild(deposit);
 
@@ -593,11 +594,8 @@ export class BankWindow {
     const world = this.deps.world();
     const info = world.bankInfo;
     if (!info) return; // walked away between render and click
-    const plan = planDepositAllMaterials(
-      world.inventory,
-      info.slots,
-      info.capacity,
-      (id) => ITEMS[id],
+    const plan = planDepositAllMaterials(world.inventory, info.slots, info.capacity, (id) =>
+      knownItemDef(ITEMS, id),
     );
     if (plan.sends.length === 0 && !plan.full) return; // nothing to do (button was disabled)
     for (const send of plan.sends) world.bankDeposit(send.slot, send.count);

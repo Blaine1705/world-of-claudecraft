@@ -59,6 +59,7 @@ import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';
 import { resolveDropTargetAt } from './item_drop_hit_test';
+import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { tSim } from './sim_i18n';
@@ -565,7 +566,12 @@ export class BagsWindow {
   // without rebuilding the filter bar and stealing input focus.
   private fillGrid(grid: HTMLElement): void {
     const world = this.deps.world();
-    const model = buildBagGrid(world.inventory, (id) => ITEMS[id], this.filter, world.bagCapacity);
+    const model = buildBagGrid(
+      world.inventory,
+      (id) => knownItemDef(ITEMS, id),
+      this.filter,
+      world.bagCapacity,
+    );
     if (model.state === 'empty') {
       grid.innerHTML = `<div class="bag-empty">${esc(t('itemUi.bags.empty'))}</div>`;
       return;
@@ -597,7 +603,7 @@ export class BagsWindow {
       return;
     }
     for (const s of model.visible) {
-      const item = ITEMS[s.itemId];
+      const item = knownItemDef(ITEMS, s.itemId);
       grid.appendChild(
         item ? this.buildStackCell(s, item, null) : this.buildUnknownStackCell(s, null),
       );
@@ -1026,7 +1032,7 @@ export class BagsWindow {
   /** What dropping `itemId` on the world does right now (pure decision, shared with
    *  the tooltip hint). Public for the HUD-installed canvas drop target. */
   destroyAction(itemId: string): BagDestroyAction {
-    const item = ITEMS[itemId];
+    const item = knownItemDef(ITEMS, itemId);
     if (!item) return 'none';
     return bagDestroyAction(item, this.bagMode());
   }
@@ -1332,7 +1338,7 @@ export class BagsWindow {
       el.remove();
     });
     const opener = document.activeElement as HTMLElement | null;
-    const item = ITEMS[itemId];
+    const item = knownItemDef(ITEMS, itemId);
     const stack = document.getElementById('prompt-stack');
     if (!stack) return;
     const prompt = document.createElement('div');
@@ -1399,7 +1405,7 @@ export class BagsWindow {
       el.remove();
     });
     const opener = document.activeElement as HTMLElement | null;
-    const item = ITEMS[itemId];
+    const item = knownItemDef(ITEMS, itemId);
     const stack = document.getElementById('prompt-stack');
     if (!stack) return;
     const prompt = document.createElement('div');
@@ -1454,7 +1460,7 @@ export class BagsWindow {
   private showDepositQuantityPrompt(index: number, captured: InvSlot, maxCount: number): void {
     dismissBagPrompts();
     const opener = document.activeElement as HTMLElement | null;
-    const item = ITEMS[captured.itemId];
+    const item = knownItemDef(ITEMS, captured.itemId);
     const stack = document.getElementById('prompt-stack');
     if (!stack) return;
     const prompt = document.createElement('div');

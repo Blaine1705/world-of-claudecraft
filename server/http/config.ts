@@ -172,6 +172,7 @@ const DEFAULT_MAX_PLAYERS_PER_REALM = 5000;
 const DEFAULT_GITHUB_REPO = 'levy-street/world-of-claudecraft';
 const DEFAULT_GITHUB_TOKEN = '';
 const DEFAULT_CHAT_LOG_RETENTION_DAYS = 90;
+const DEFAULT_UNSTUCK_REPORT_RETENTION_DAYS = 90;
 const DEFAULT_PERF_REPORT_RETENTION_DAYS = 14;
 const DEFAULT_DAILY_REWARD_EVENTS_RETENTION_DAYS = 400;
 const DEFAULT_ONLINE_SAMPLES_RETENTION_DAYS = 90;
@@ -344,7 +345,10 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     githubRepo: env.GITHUB_REPO ?? DEFAULT_GITHUB_REPO,
     githubToken: env.GITHUB_TOKEN ?? DEFAULT_GITHUB_TOKEN,
     chatLogRetentionDays: numberOr(env.CHAT_LOG_RETENTION_DAYS, DEFAULT_CHAT_LOG_RETENTION_DAYS),
-    unstuckReportRetentionDays: numberOr(env.UNSTUCK_REPORT_RETENTION_DAYS, 90),
+    unstuckReportRetentionDays: numberOr(
+      env.UNSTUCK_REPORT_RETENTION_DAYS,
+      DEFAULT_UNSTUCK_REPORT_RETENTION_DAYS,
+    ),
     perfReportRetentionDays: numberOr(
       env.PERF_REPORT_RETENTION_DAYS,
       DEFAULT_PERF_REPORT_RETENTION_DAYS,

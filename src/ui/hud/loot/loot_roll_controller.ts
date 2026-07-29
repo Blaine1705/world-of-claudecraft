@@ -5,6 +5,7 @@ import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
+import { knownItemDef } from '../../known_item';
 import type { PainterHostWriters } from '../../painter_host';
 import { unknownItemIconHtml } from '../../unknown_item_icon';
 import { reconcileLootRolls } from './loot_roll_reconcile';
@@ -304,7 +305,6 @@ export class LootRollController {
     );
     const fingerprint = lootRollStatusFingerprint(rows);
     if (fingerprint === this.statusFingerprint) return;
-    this.statusFingerprint = fingerprint;
     this.statusRows = rows;
     const live = new Set(rows.map((row) => row.rollId));
     for (const rollId of this.watchTimers.keys()) {
@@ -313,7 +313,18 @@ export class LootRollController {
     for (const row of rows) {
       if (!this.watchTimers.has(row.rollId)) this.watchTimers.set(row.rollId, now);
     }
-    this.render();
+    // The trade window's own hard-won shape (R34 review): render inside a
+    // try, commit the elision fingerprint in a FINALLY. Committing before an
+    // unprotected render meant one throw (a canvas-exhausted host is enough)
+    // cleared the container AND froze it cleared for the rest of the roll
+    // window, eating every concurrent need/greed prompt.
+    try {
+      this.render();
+    } catch (err) {
+      console.error('[hud] loot roll render failed', err);
+    } finally {
+      this.statusFingerprint = fingerprint;
+    }
   }
 
   private updateTimers(now: number): void {
@@ -423,7 +434,7 @@ export class LootRollController {
     }
     for (const [rollId, roll] of this.activeRolls) {
       const event = roll.event;
-      const item = ITEMS[event.itemId];
+      const item = knownItemDef(ITEMS, event.itemId);
       const itemName = item ? itemDisplayName(item) : event.itemName;
       const quality = item?.quality ?? event.quality ?? 'common';
       const status = statusByRoll.get(rollId);
@@ -460,7 +471,7 @@ export class LootRollController {
     for (const status of this.statusRows) {
       if (this.activeRolls.has(status.rollId) || this.activeMasterRolls.has(status.rollId))
         continue;
-      const item = ITEMS[status.itemId];
+      const item = knownItemDef(ITEMS, status.itemId);
       const itemName = item ? itemDisplayName(item) : status.itemName;
       const quality = item?.quality ?? status.quality ?? 'common';
       const row = this.deps.document.createElement('div');
@@ -492,7 +503,7 @@ export class LootRollController {
     event: MasterLootEvent,
     checked?: Set<number>,
   ): void {
-    const item = ITEMS[event.itemId];
+    const item = knownItemDef(ITEMS, event.itemId);
     const itemName = item ? itemDisplayName(item) : event.itemName;
     const quality = item?.quality ?? event.quality ?? 'common';
     const row = this.deps.document.createElement('div');
