@@ -358,6 +358,7 @@ describe('bags_window: unknown-id stacks stay visible (stale-client guard, R34)'
     expect(body).not.toContain("addEventListener('click'");
     expect(body).not.toContain('runBagAction');
     expect(body).not.toContain('onclick');
+    expect(body).toContain('row.draggable = !this.deps.tradeOpen() && !this.deps.vendorOpen()');
     expect(body).toContain("row.addEventListener('dragstart'");
     expect(body).toContain("row.addEventListener('dragend'");
     expect(body).toContain('bindTouchItemDrag(row, {');

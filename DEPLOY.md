@@ -252,10 +252,12 @@ For off-box safety, sync the directory to S3 occasionally:
     bank; profession grant lines name the raw id; vendor rows show the old
     bundle's stock and prices while the purchase path charges the server's own
     truth (a mismatch is display-only); denial toasts fall back to their generic
-    wording. Gather nodes the server moved keep rendering at their old spots
-    (walk-through props) while their real positions collide invisibly, and nodes
-    the server added are invisible but still collide. All of it is cosmetic and
-    self-heals when the client updates.
+    wording. Gather-node skew depends on the node family, because each side
+    collides against its own bundle's positions: moved or added ORE and WOOD
+    collide invisibly at their server spots and stand as solid stale props at
+    their old client spots (both read as rubber-band corrections), while HERB
+    skew is walk-through phantom props only (herb clusters carry no collider).
+    All of it is cosmetic and self-heals when the client updates.
   - NEW client on OLD server (the bounded direction): every gather node the
     release relocated is unusable, because the client shows it where the old
     server does not have it (the worst case on the professions tuning release is
@@ -283,8 +285,14 @@ For off-box safety, sync the directory to S3 occasionally:
   live. Stale sessions are ended by the pre-deploy restart countdown, but a
   reconnect rides the same stale page: only a page reload picks up the new
   bundle.
-  Per-surface analysis for the professions tuning release: the stale-client
-  compatibility phase of `docs/design/professions-tuning-packet-review.md`.
+  The caveats above assume production runs the release/v0.32.0 tip this
+  branch measured its wire delta against; if the live server is older,
+  re-run the compatibility diff against the commit actually deployed before
+  trusting any "one new X" claim. The loot-table exclusion is enforced by
+  `tests/stale_client_rollout.test.ts` for the deploy window (delete that
+  pin once clients have rolled). Per-surface analysis for the professions
+  tuning release: the stale-client compatibility phase of
+  `docs/design/professions-tuning-packet-review.md`.
 - **Bank ledger audit**: `node scripts/bank_audit.mjs` (reads `DATABASE_URL` from the
   environment) replays the append-only `bank_ledger` against live character bank state
   and exits non-zero on any discrepancy. Run it after an economy incident or a restore.

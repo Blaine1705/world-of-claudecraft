@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../src/ui/icons', () => ({
   iconDataUrl: (kind: string, id: string) => {
     if (id === 'canvasless_id') throw new Error('2D canvas context is unavailable');
+    if (id === 'hostile_url_id') return 'x" onerror="alert(1)';
     return `stub:${kind}:${id}`;
   },
 }));
@@ -49,6 +50,15 @@ describe('unknownItemIconHtml', () => {
     }).not.toThrow();
     expect(html).toContain('src="data:image/gif;base64,');
     expect(html).toContain('class="item-icon q-common"');
+  });
+
+  it('escapes a hostile icon URL out of the src attribute', () => {
+    // Same defense-in-depth as the quality arm: every REAL pipeline return is
+    // a manifest URL or a base64 data URL, but the esc() is what makes the
+    // attribute safe by construction rather than by that inventory holding.
+    const html = unknownItemIconHtml('hostile_url_id');
+    expect(html).not.toContain('" onerror');
+    expect(html).toContain('src="x&quot;');
   });
 
   it('asks the icon pipeline for the ITEM kind under the raw id', () => {

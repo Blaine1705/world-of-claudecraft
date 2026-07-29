@@ -434,6 +434,12 @@ describe('unknown item ids resolve to the shared fallback recipe (stale-client p
     for (const hostile of ['__proto__', 'constructor', 'toString', 'hasOwnProperty']) {
       expect(isUnknownIconRecipe(itemIconRecipe(hostile)), hostile).toBe(true);
     }
+    // The weapon-art arm shares the gate: without it, a prototype key
+    // stringifies a prototype member into a garbage /ui/weapons/ URL before
+    // the recipe layer is ever consulted (canvas-bound at runtime, so pinned
+    // at the source).
+    const iconsSource = readFileSync(new URL('../src/ui/icons.ts', import.meta.url), 'utf8');
+    expect(iconsSource).toContain('Object.hasOwn(ITEM_ICON_IMAGES, id)');
     // A real def without committed art takes its DERIVED recipe, not the
     // fallback, so this pin cannot pass by everything falling through.
     const derived = Object.values(ITEMS).find(

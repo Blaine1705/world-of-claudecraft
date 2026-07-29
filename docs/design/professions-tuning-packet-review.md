@@ -659,10 +659,13 @@ What each item settled:
    controller's three identical inline copies), never a throw; the repaint
    signature commits in a finally behind the render's try, which states the
    KNOWN throw eliminated and the UNKNOWN one bounded: on such a throw the
-   panel keeps its last complete paint until the offer data next changes
-   (one log per attempt, the callers banded after the trade window keep
-   running), the deliberate trade against re-running a deterministic throw
-   every band tick. The fallback img src is
+   panel keeps its last paint until the offer data next changes (one log
+   per attempt, the callers banded after the trade window keep running),
+   the deliberate trade against re-running a deterministic throw every
+   band tick. One precision: a tail throw AFTER the innerHTML assignment
+   (listener attach) would leave that new partial paint showing, handlers
+   missing, until the next data change; only a throw during string
+   building leaves the previous complete paint. The fallback img src is
    safe against a hostile id by construction, with the mechanism stated
    exactly (the review corrected an overstatement here): the id-interpolating
    static-URL arm is Set-gated to bundle-known ids, the weapon-art arm is a
@@ -707,15 +710,21 @@ What each item settled:
      that surface from the literal 1 to the zone ladder, so the old copy
      tells a rod-carrying player they have no tackle. Misleading, never
      a throw.
-   - Market browse and collect drop unknown-id rows (deliberate and
-     commented in `market_view.ts`), and the browse pager under-counts by
-     the dropped rows: a stale client can neither name nor price them,
-     and collect-all still collects invisibly held items into the bags,
-     where the new unknown cell makes them visible.
+   - Market browse and collect drop unknown-id rows (the browse drop is
+     commented in `market_view.ts`; the collect drop is a bare skip), a
+     staged unknown sell id renders the pick-empty state, and the
+     dropped rows skew the browse pager BOTH ways (a dropped stranger
+     row under-counts; a dropped own row inflates the derived others
+     total). The sharpest edge: a page of only-unknown listings renders
+     the no-match empty state with NO pager, so the stale client cannot
+     page past it. Collect-all still collects invisibly held items into
+     the bags, where the new unknown cell makes them visible.
    - The vendor buyback arm drops an unknown-id row the same way
      (`vendor_view.ts`), so an item sold on a current client cannot be
      repurchased from a stale one; reachable only cross-device inside
-     the deploy window, and the sale price is already banked.
+     the deploy window, the sale price is already banked, and the loss
+     can become permanent (the buyback ring holds twelve rows, so
+     twelve more sales evict the invisible one for good).
    - The character sheet and the inspect window render an unknown
      equipped id as an empty slot (their guarded ternaries treat no-def
      as empty), and an unknown equipped BAG renders as an empty socket
@@ -744,9 +753,11 @@ What each item settled:
    (`slot_tool_effect`, dev-gated with NO shipped sender; an old server
    would log a protocol anomaly to the bot detector and spend a
    rate-limit token), ZERO removed or reshaped wire keys (ALL_DELTA_KEYS
-   57 to 58, purely additive), ZERO REST registry changes, four new
-   sim error literals ALL already carried by the base bundle's matcher
-   rows, and the world-seed dedup pins the same shipped value
+   57 to 58, purely additive), ZERO REST registry changes, four
+   error literals newly EMITTED from the new deny paths but all present
+   in the sim at the base and matched by the base bundle (two via the
+   hud matcher, two via sim_i18n), and the world-seed dedup pins the
+   same shipped value
    (`src/sim/world_seed.ts`). Server-first therefore suffices for every
    packet surface; the one surface no order can cover on its own is the
    node-position skew below.
@@ -766,12 +777,16 @@ What each item settled:
    restart countdown and reconnect; only a page reload updates it.
 4. RECORDED, both directions accepted (they resolve once both sides are
    current; the runbook note names them and the deploy order bounds the
-   window). Direction detail from the collider table: ore and wood nodes
-   are solid bodies while herb clusters are deliberately soft
-   (`src/sim/colliders.ts`), so a stale client walks through relocated
-   herb props and hits invisible collision only where ore or wood
-   actually moved or was added; phantom props at old spots are the herb
-   arm's whole failure. A new client against an old server advertises
+   window). Direction detail from the collider table (GATHER_NODE_BODIES
+   in `src/sim/prop_layout.ts`, walked by `src/sim/colliders.ts`): ore
+   and wood nodes are solid bodies while herb clusters are deliberately
+   soft, and each side collides against ITS OWN bundle's positions. For
+   a stale client that means relocated or added ore and wood collide
+   invisibly at their server spots AND stand as solid stale props at
+   their old client spots (the server lets the player walk where the
+   client predicts a block, and vice versa, so both read as rubber-band
+   corrections); herb skew is phantom-prop cosmetics only, with no
+   collider on either side. A new client against an old server advertises
    nodes, items, and minimap markers the server denies, and every
    relocated node is unusable there; the measured worst case is Eastbrook
    herbalism, whose three tier-1 herb nodes all moved, leaving that
@@ -789,17 +804,20 @@ tier label "in this release" and told operators to migrate live panels;
 the metric's whole history is this branch (absent at 9d7a1a021 and on
 release/v0.32.0), so there is no live panel to migrate and the note now
 states the label as a fact of the metric's first shipped release. The
-two-meanings-of-band warning beside it was independently verified
-correct and stands.
+two-meanings-of-band warning beside it kept the same false live-dashboard
+premise and understated the fishing band (it is the EFFECTIVE band,
+proficiency capped by the rod); the claims round caught both and the
+warning now states the two vocabularies without either.
 
 SURFACED FOR THE RULINGS LEDGER (deploy decision, not decided here):
 whether this deploy should force stale web sessions onto the new bundle
 (a version prompt or forced reload at reconnect) or accept the
-stale-tab window the runbook now describes. R34 ruled out a hard
-version floor for CLIENTS DEGRADING GRACEFULLY; the deployed bundle's
-trade-throw arm is the one place the old bundle does not degrade
-gracefully, and only the maintainer can weigh a forced refresh against
-that ruling's intent.
+stale-tab window the runbook now describes. R34 DEFERRED a hard
+version floor as a separate later decision on the premise that clients
+degrade gracefully; the deployed bundle's trade-throw arm is the one
+place the old bundle does not, so the forced-refresh question sits
+beside that open decision rather than against a settled prohibition,
+and it is the maintainer's to make.
 
 REVIEW ROUND (same sitting): five fresh lenses over the build diff
 (qa-checklist, frontend-seam, test-coverage, privacy-security, and an
@@ -913,6 +931,30 @@ five-category wire sweep, every finding applied:
   carries this round's behavioral pin; a bags/bank jsdom harness would
   be new infra), and no test drives the trade window's catch with a
   real throw (that needs a Hud instance the suite deliberately avoids).
+- The claims verifier's late pass then re-checked every factual sentence
+  in the record and runbook against the tree and its findings were
+  applied in turn: the loot-table exclusion became an enforced pin
+  (`tests/stale_client_rollout.test.ts`, the 11 new ids swept out of
+  mob/dungeon loot and the delve chest feeders, release-scoped and
+  deletable once clients roll); the weapon-art arm gained the same
+  own-property gate as its siblings (a prototype key used to stringify
+  into a garbage /ui/weapons/ URL); the esc() on the src interpolation
+  and the draggable gating literal gained their missing pins; the
+  metrics band warning dropped the false live-dashboard premise it
+  still carried and now names the EFFECTIVE (rod-capped) fishing band;
+  the R34 paraphrase was corrected (a floor is DEFERRED, not ruled
+  out); the wood-collider, market-pager, buyback-permanence, and
+  error-literal sentences were made exact (details in place above);
+  and the collider-table citation now names prop_layout.ts.
+- Also from that pass, recorded-only: /metrics gained ten families of
+  pre-seeded series this release (operator-token-gated, not a RouteDef,
+  zero in-repo consumers, so outside the registry claim by
+  construction); the phase 10 delete/reclaim purges change OTHER
+  players' visible mail and market data at deploy (release-notes
+  material, not a stale-client arm); `stationPlacements` became an
+  active-content getter (byte-identical on shipped hosts, `?? []`
+  guarded); and the whole wire verification assumes production runs
+  the measured merge base, an assumption the runbook now states.
 
 1. Guard the trade-window unknown-item path at HEAD (the old client
    throws in `itemIcon` on any unknown id and the early-set signature

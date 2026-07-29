@@ -3659,7 +3659,11 @@ const ITEM_ICON_IMAGES = ITEM_WEAPON_VARIANTS;
 
 /** Static URL of a weapon's rendered thumbnail, or null if it uses a recipe. */
 function weaponIconUrl(id: string): string | null {
-  const model = ITEM_ICON_IMAGES[id];
+  // Own-property gate (the resolveRecipe item-arm rule): ITEM_ICON_IMAGES is
+  // a prototype-bearing object literal, so a raw server id like
+  // 'constructor' would otherwise stringify a prototype member into a
+  // garbage /ui/weapons/ URL instead of falling through to the fallback.
+  const model = Object.hasOwn(ITEM_ICON_IMAGES, id) ? ITEM_ICON_IMAGES[id] : undefined;
   return model ? `${WEAPON_ICON_DIR}/${model}.jpg` : null;
 }
 

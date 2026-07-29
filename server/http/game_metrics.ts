@@ -27,11 +27,13 @@
 // panel predates the label); sum() panels aggregate across tiers as usual.
 //
 // THE `band` LABEL MEANS TWO DIFFERENT THINGS, and deliberately so: on
-// woc_gather_harvests_total it is the node's ZONE (R3 re-keyed it there and
-// external dashboards already point at those values), while on the woc_fishing_*
-// family the zone rides its own `zone` label and `band` is the fishing
-// proficiency rung 0/1/2. Renaming either would break a live dashboard for a
-// cosmetic win; read the label against its metric, never across families.
+// woc_gather_harvests_total it is the node's ZONE (the R3 re-key), while on
+// the woc_fishing_* family the zone rides its own `zone` label and `band` is
+// the EFFECTIVE fishing rung 0/1/2 (proficiency capped by the rod,
+// effectiveFishingBand in src/sim/professions/fishing.ts). Both vocabularies
+// ship together in this metric family's first release, so nothing live
+// depends on either yet; they still must not be renamed apart later, and the
+// label reads against its metric, never across families.
 
 import { Counter, Gauge, type Registry } from 'prom-client';
 import {
