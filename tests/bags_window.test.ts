@@ -331,6 +331,12 @@ describe('bags_window: unknown-id stacks stay visible (stale-client guard, R34)'
     expect(code).toContain('this.buildUnknownStackCell(stack, cell)');
     expect(code).toContain('this.buildUnknownStackCell(s, null)');
     expect(code).not.toContain('if (!item) continue');
+    // BOTH branches resolve through the own-property predicate: a bare
+    // ITEMS read sends a prototype key down the known arm (the merge
+    // settlement caught the pristine branch keeping one).
+    expect(code).toContain('knownItemDef(ITEMS, stack.itemId)');
+    expect(code).toContain('knownItemDef(ITEMS, s.itemId)');
+    expect(code).not.toContain('stack ? ITEMS[stack.itemId] : undefined');
   });
 
   it('renders the fallback icon, the raw id, and an UNKNOWN accessible name', () => {
