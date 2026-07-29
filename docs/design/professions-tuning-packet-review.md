@@ -1119,9 +1119,15 @@ colliders and renderer chunk streaming, phase 17's release fill now
 sizes expansion content, phase 15 is unaffected (bot/ byte-identical).
 
 Cadence: six review lenses plus three fix-round sub-reviews over the QA
-commits; roughly 60 findings applied across seven fix waves, every new
+commits; roughly 60 findings applied across nine fix waves, every new
 pin mutation-checked decisive, gate green at 427829018 mid-stream and
-re-run at the final tip. The forced-refresh ledger entry now carries
+PASS (all 11 steps) at the final tip db1e860b5. The closing wave laddered
+the unknown bag cell's deposit behind the same mode precedence as
+bagItemAction, pinned the mntOwn heavy-gate placement and the rift
+upgrader intake cap (32, drop-newest, unmarked refusals retryable, one
+slot refilled per in-flight dispatch), and recorded the metrics
+zone-label growth (3 to 14 zones, 42 series per family) in DEPLOY.md.
+The forced-refresh ledger entry now carries
 the four verified non-degrading surfaces and the layout-version lever;
 it remains the maintainer's, as does pulling the heroic reins for the
 deploy window.
