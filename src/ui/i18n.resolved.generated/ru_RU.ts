@@ -1621,15 +1621,15 @@ export const ru_RU: EnTranslations = {
       "freeCast": "Следующее заклинание ничего не стоит",
       "instantCast": "Следующее заклинание с временем чтения станет мгновенным",
       "cheapCast": "Следующее заклинание стоит на {pct}% меньше",
-      "venomRitual": "Venom Ritual {stacks}/{max}. Craven Thrust, Wicked Slash, and Venom Dart each add 1. At {max}, Dirt Nap becomes Venomrend",
-      "gloam": "Gloam {stacks}/{max}. Openers used from Duskveil each add 1. At {max}, your openers work without stealth, and the next one is free, spends all 3, and starts the Shadow Veil",
-      "redline": "Redline {stacks}/{max}. Each Haymaker adds 1. Lights Out hits {pct}% harder for each one and ends Redline. If the timer runs out first, the knockout is lost",
+      "venomRitual": "Ядовитый ритуал: этап {stacks} из {max}. «Трусливый выпад», «Злодейский разрез» и «Ядовитый дротик» добавляют по 1 этапу; на этапе {max} «Вечный сон» превращается в «Ядовитый разрыв»",
+      "gloam": "Сумрак: этап {stacks} из {max}. Приемы открытия из «Сумеречной завесы» добавляют по 1 этапу; на этапе {max} приемы открытия работают без незаметности, а следующий из них ничего не стоит, тратит все 3 этапа и окутывает вас тенью",
+      "redline": "Redline: деление {stacks} из {max}. Каждый «Удар с размаху» добавляет 1 деление; «Отключка» бьет на {pct}% сильнее за каждое деление и завершает Redline. Если время выйдет раньше, нокаут пропадет",
       "veilstrikeWindow": "Окутан тенью: скрытные приемы можно использовать в открытую с любого угла, наносимый урон увеличен на {pct}%",
       "veiledEdge": "Следующий «Удар скрытня» нанесет двойной урон",
       "duskEconomy": "Способности стоят на {pct}% меньше энергии",
-      "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
-      "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form",
-      "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Swiftmend becomes Overbloom",
+      "moontide": "Лунный прилив: стадия {stacks} из {max}. Применения Дикой стрелы, Падения небес и Лунного семени в облике Лунного крыла добавляют по 1 стадии. На {max}: Лунное семя становится Лунным всплеском, а Падение небес — Пробуждением солнца; любое из них тратит все 3 стадии",
+      "oldBlood": "Старая кровь: стадия {stacks} из {max}. Попавшие удары Рвущего когтя, Свежевания, Кровавого разлома, Кровавого укуса, Разящих когтей и Костолома добавляют по 1 стадии. На {max}: Кровавый укус становится Кровавой жатвой в облике волка, а Костолом — Дроблением костей в облике бурого",
+      "verdance": "Зелень: стадия {stacks} из {max}. Каждый НОВЫЙ посаженный Дикий расцвет или Второй расцвет добавляет 1 стадию; на {max} Быстрое восстановление становится Сверхцветением",
       "increase": {
         "ap": "Повышает силу атаки на {value}",
         "sp": "Повышает силу заклинаний на {value}",
@@ -6513,8 +6513,8 @@ export const ru_RU: EnTranslations = {
       "unavailable": "Недоступно",
       "requiresLevel": "Требуется уровень {level}",
       "requiresForm": "Требуется облик {form}",
-      "requiresStealth": "Requires stealth",
-      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
+      "requiresStealth": "Требуется незаметность",
+      "requiresStealthSkulduggery": "Требуется незаметность (не нужна при 3 этапах Сумрака и пока вы окутаны тенью)",
       "requiresCombo": "Расходует приемы серии",
       "requiresTargetHealthBelow": "Требуется цель ниже {percent}% здоровья",
       "requiresDodge": "Можно использовать только после уклонения цели",
@@ -7173,20 +7173,20 @@ export const ru_RU: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Злодейский разрез",
-        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
-        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
-        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
+        "description": "Мгновенный удар, наносящий урон оружием плюс {damage}. Дает 1 прием серии.",
+        "specNote_assassination": "Добавляет 1 этап Ядовитого ритуала (максимум 6).",
+        "specNote_combat": "Пока действует Redline, эта кнопка становится «Ударом с размаху»: 130% урона от оружия плюс 10, дает 2 очка серии приемов и добавляет 1 деление Redline (максимум 4)."
       },
       "eviscerate": {
         "name": "Вечный сон",
-        "description": "Finishing move that causes {damage}.",
-        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
-        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
+        "description": "Завершающий прием, наносящий {damage}.",
+        "specNote_assassination": "При 6 этапах Ядовитого ритуала эта кнопка становится «Ядовитым разрывом»: удар, который мгновенно наносит весь урон, что еще нанесли бы ваши кровотечения, наносит новую ядовитую рану и восстанавливает 20 ед. энергии.",
+        "specNote_combat": "Попадание этим приемом при 4 и более очках серии приемов запускает Redline на 8 сек.: «Злодейский разрез» становится «Ударом с размаху», а эта кнопка — «Отключкой» (45 плюс 35 за каждое очко серии приемов, на 25% сильнее за каждое накопленное деление Redline, восстанавливает 25 ед. энергии). Потратьте ее до окончания Redline."
       },
       "backstab": {
         "name": "Трусливый выпад",
-        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
+        "description": "Бьет цель в спину, нанося 150% урона оружием плюс {damage}. Нужно находиться позади цели. Требуется кинжал. Дает 1 прием серии.",
+        "specNote_assassination": "Каждый удар добавляет 1 этап Ядовитого ритуала (максимум 6) и возвращает 15 ед. энергии. При 6 этапах «Вечный сон» становится «Ядовитым разрывом» (он мгновенно наносит весь оставшийся урон ваших кровотечений)."
       },
       "gouge": {
         "name": "Тычок в глаз",
@@ -7198,7 +7198,7 @@ export const ru_RU: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Ритм головореза",
-        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
+        "description": "Завершающий прием, повышающий скорость атаки в ближнем бою на 30% на 12 сек. плюс 4 сек. за каждый прием серии (5 приемов серии: 32 сек.)."
       },
       "sprint": {
         "name": "Быстрые пятки",
@@ -7206,17 +7206,17 @@ export const ru_RU: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Подлый удар",
-        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
+        "description": "Завершающий прием, оглушающий цель на 1 сек. плюс 1 сек. за каждый прием серии (5 приемов серии: 6 сек.)."
       },
       "ambush": {
         "name": "Удар скрытня",
-        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
+        "description": "Нападает из засады, нанося 250% урона оружием плюс {damage}. Нужно быть в незаметности и позади цели. Требуется кинжал. Дает 1 прием серии.",
+        "specNote_subtlety": "Применение из «Сумеречной завесы» добавляет 1 этап Сумрака (максимум 3). При 3 этапах Сумрака способность можно использовать БЕЗ незаметности и с любого угла: такое применение ничего не стоит, тратит все 3 этапа, на 6 сек. окутывает вас тенью и наносит двойной урон."
       },
       "stealth": {
         "name": "Сумеречная завеса",
-        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
-        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
+        "description": "Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 50% медленнее. Атака или получение урона прерывает Сумеречную завесу. Примените снова, чтобы выйти.",
+        "specNote_subtlety": "Каждый прием открытия, использованный из Сумеречной завесы, добавляет 1 этап Сумрака (максимум 3)."
       },
       "adrenaline_rush": {
         "name": "Ускоренная кровь",
@@ -7224,13 +7224,13 @@ export const ru_RU: EnTranslations = {
       },
       "garrote": {
         "name": "Удавка",
-        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Душит врага гарротой, нанося {damage} ед. урона сразу и {overTime} от кровотечения в течение 18 сек. Требуется незаметность. Дает 1 очко серии.",
+        "specNote_subtlety": "Применение из «Сумеречной завесы» добавляет 1 этап Сумрака (максимум 3). При 3 этапах Сумрака способность можно использовать БЕЗ незаметности: такое применение ничего не стоит, тратит все 3 этапа и на 6 сек. окутывает вас тенью."
       },
       "cheap_shot": {
         "name": "Удар под дых",
-        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "description": "Бьет цель, нанося {damage} ед. урона и оглушая ее на 4 сек. Требуется незаметность. Дает 2 очка серии.",
+        "specNote_subtlety": "Применение из «Сумеречной завесы» добавляет 1 этап Сумрака (максимум 3). При 3 этапах Сумрака способность можно использовать БЕЗ незаметности: такое применение ничего не стоит, тратит все 3 этапа и на 6 сек. окутывает вас тенью."
       },
       "sap": {
         "name": "Ошеломление",
@@ -7242,11 +7242,11 @@ export const ru_RU: EnTranslations = {
       },
       "expose_armor": {
         "name": "Пролом брони",
-        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
+        "description": "Завершающий прием, который оголяет цель на 30 сек.: каждый потраченный прием серии снижает ее броню на 2% (5 приемов серии: {damage}%)."
       },
       "rupture": {
         "name": "Истечение кровью",
-        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
+        "description": "Завершающий прием, который ранит цель: она истекает кровью каждые 2 сек. в течение 6 сек. плюс 2 сек. за каждый прием серии (5 приемов серии: 16 сек. и {damage} ед. урона в сумме)."
       },
       "vanish": {
         "name": "Дымный шаг",
@@ -7510,8 +7510,8 @@ export const ru_RU: EnTranslations = {
       },
       "wrath": {
         "name": "Дикая стрела",
-        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "description": "Метает сгусток природной энергии, нанося {damage} ед. урона от сил природы.",
+        "specNote_balance": "В облике Лунного крыла каждое завершенное применение добавляет 1 стадию Лунного прилива (максимум 3). При 3 стадиях Лунного прилива Лунное семя становится Лунным всплеском, а Падение небес — Пробуждением солнца."
       },
       "healing_touch": {
         "name": "Дикое заживление",
@@ -7523,17 +7523,17 @@ export const ru_RU: EnTranslations = {
       },
       "moonfire": {
         "name": "Лунная буря",
-        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
-        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
+        "description": "Сжигает врага лунным огнем, нанося {damage} ед. урона от тайной магии и периодический урон.",
+        "specNote_balance": "Поддерживайте горение Лунной бури: Лунное семя продлевает её на 6 сек."
       },
       "moonseed": {
         "name": "Лунное семя",
-        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 240 to 285 Arcane damage that spends all 3."
+        "description": "Только в облике Лунного крыла. Наносит {damage} ед. урона от тайной магии, добавляет 1 стадию Лунного прилива (максимум 3) и продлевает вашу Лунную бурю на 6 сек. Не более 6 сек за одно наложение. При 3 стадиях Лунного прилива эта кнопка становится Лунным всплеском: мгновенный удар, наносящий от 240 до 285 ед. урона от тайной магии и расходующий все 3 стадии."
       },
       "rejuvenation": {
         "name": "Дикий расцвет",
-        "description": "Heals the target for {damage} over 12 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
+        "description": "Исцеляет цель на {damage} за 12 сек.",
+        "specNote_restoration": "Посадка НОВОГО расцвета добавляет 1 стадию Зелени (максимум 5). При 5 стадиях Зелени Быстрое восстановление становится Сверхцветением."
       },
       "thorns": {
         "name": "Терновая защита",
@@ -7549,8 +7549,8 @@ export const ru_RU: EnTranslations = {
       },
       "maul": {
         "name": "Костолом",
-        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
+        "description": "Свирепая атака, увеличивающая урон в ближнем бою на {damage} и создающая много угрозы. Срабатывает при следующем взмахе. Только в облике бурого.",
+        "specNote_feral": "Каждый попавший удар добавляет 1 стадию Старой крови; при 3 стадиях эта кнопка становится Дроблением костей: удар, наносящий от 78 до 96 ед. урона с высокой угрозой; ниже половины здоровья вместо удара он поглощает урон в размере 18% максимального здоровья и возвращает 15 ед. ярости."
       },
       "growl": {
         "name": "Устрашение",
@@ -7562,23 +7562,23 @@ export const ru_RU: EnTranslations = {
       },
       "claw": {
         "name": "Рвущий коготь",
-        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Царапает врага, нанося урон оружием плюс {damage}. Дает 1 прием серии. Только в облике волка.",
+        "specNote_feral": "Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3)."
       },
       "ferocious_bite": {
         "name": "Кровавый укус",
-        "description": "Finishing move that causes {damage}. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 91 plus 55 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
+        "description": "Завершающий прием, наносящий {damage}. Только в облике волка.",
+        "specNote_feral": "Каждый попавший удар добавляет 1 стадию Старой крови; при 3 стадиях эта кнопка становится Кровавой жатвой: укус на 91 плюс 55 за каждый прием серии, который также мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, и восстанавливает 30 ед. энергии."
       },
       "swipe": {
         "name": "Разящие когти",
-        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Размахивает когтями по ближайшим врагам, нанося {damage} ед. урона. Создает дополнительную угрозу. Только в облике бурого.",
+        "specNote_feral": "Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3)."
       },
       "regrowth": {
         "name": "Второй расцвет",
-        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
+        "description": "Исцеляет дружественную цель на {damage} и дополнительно в течение 21 сек.",
+        "specNote_restoration": "Посадка НОВОГО расцвета добавляет 1 стадию Зелени (максимум 5)."
       },
       "barkskin": {
         "name": "Дубовая шкура",
@@ -7594,8 +7594,8 @@ export const ru_RU: EnTranslations = {
       },
       "starfire": {
         "name": "Падение небес",
-        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 160 to 190 Nature damage plus a 75 burn over 9 sec, restoring 35 mana and spending all 3."
+        "description": "Обрушивает вспышку звездного огня, нанося {damage} ед. урона от тайной магии.",
+        "specNote_balance": "В облике Лунного крыла каждое завершенное применение добавляет 1 стадию Лунного прилива (максимум 3). При 3 стадиях Лунного прилива эта кнопка становится Пробуждением солнца: мгновенный удар, наносящий от 160 до 190 ед. урона от сил природы плюс 75 ед. ожога за 9 сек., восстанавливающий 35 ед. маны и расходующий все 3 стадии."
       },
       "travel_form": {
         "name": "Форма скорохода",
@@ -7611,7 +7611,7 @@ export const ru_RU: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Ведьмин огонь",
-        "description": "Decreases the target's armor by {damage}% for 40 sec."
+        "description": "Снижает броню цели на {damage}% на 40 сек."
       },
       "hibernate": {
         "name": "Дремота",
@@ -7635,8 +7635,8 @@ export const ru_RU: EnTranslations = {
       },
       "rip": {
         "name": "Кровавый разлом",
-        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
-        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
+        "description": "Завершающий прием, вызывающий у цели кровотечение каждые 2 сек. в течение 24 сек.: 36 ед. урона плюс 24 за каждый потраченный прием серии (5 приемов серии: {damage} в сумме). Только в облике волка.",
+        "specNote_feral": "Попавший удар добавляет 1 стадию Старой крови (максимум 3)."
       },
       "mortal_strike": {
         "name": "Калечащий удар",
@@ -7740,15 +7740,15 @@ export const ru_RU: EnTranslations = {
       },
       "cold_blood": {
         "name": "Хладнокровие",
-        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
+        "description": "Сосредоточивает убийственное намерение, чтобы следующая атака стала критической. (знаковое умение Ликвидации)"
       },
       "blade_flurry": {
         "name": "Шквал клинков",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
+        "description": "Обрушивает шквал клинков, повышая скорость атаки на 20% на 12 сек. (знаковое умение Боя)"
       },
       "hemorrhage": {
         "name": "Кровоизлияние",
-        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
+        "description": "Бьет врага, нанося урон оружием плюс {damage}, вызывает кровотечение на 12 сек. и увеличивает получаемый целью урон от кровотечений на 40%. Дает 1 прием серии. Каждое 2-е применение добавляет 1 этап Сумрака (максимум 3). (знаковое умение Скрытности)"
       },
       "power_infusion": {
         "name": "Придание сил",
@@ -7784,27 +7784,27 @@ export const ru_RU: EnTranslations = {
       },
       "swiftmend": {
         "name": "Быстрое восстановление",
-        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Поглощает эффект периодического исцеления на дружественной цели и исцеляет ее на {damage}. Посадки Дикого расцвета и Второго расцвета копят Зелень; при 5 стадиях Зелени эта кнопка становится Сверхцветением, которое мгновенно исцеляет каждого союзника с вашими эффектами периодического исцеления на 60% оставшегося в них исцеления. (знаковое умение Исцеления)"
       },
       "moonlash": {
         "name": "Лунный всплеск",
-        "description": "Spends your 3 Moontide for a heavy strike of {damage} Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one."
+        "description": "Расходует ваши 3 стадии Лунного прилива на мощный удар, наносящий {damage} ед. урона от тайной магии: выбор в пользу урона. Пробуждение солнца тратит те же 3 стадии, так что выбирайте одно."
       },
       "sunlance": {
         "name": "Пробуждение солнца",
-        "description": "Spends your 3 Moontide for a strike of {damage} Nature damage plus a {overTime} burn over 9 sec, and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one."
+        "description": "Расходует ваши 3 стадии Лунного прилива на удар, наносящий {damage} ед. урона от сил природы плюс {overTime} ед. ожога за 9 сек., и восстанавливает 35 ед. маны: выбор в пользу экономии. Лунный всплеск тратит те же 3 стадии, так что выбирайте одно."
       },
       "redharvest": {
         "name": "Кровавая жатва",
-        "description": "Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points."
+        "description": "Расходует ваши 3 стадии Старой крови: удар на {damage} ед. урона, который мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, снимает оба кровотечения и восстанавливает 30 ед. энергии. Работает даже без очков серии приемов."
       },
       "marrowbreak": {
         "name": "Дробление костей",
-        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
+        "description": "Расходует ваши 3 стадии Старой крови на мощный удар с высокой угрозой, наносящий {damage} ед. урона. Ниже половины здоровья вместо удара он поглощает урон в размере 18% максимального здоровья на 8 сек. и возвращает 15 ед. ярости."
       },
       "overbloom": {
         "name": "Сверхцветение",
-        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom."
+        "description": "Расходует ваши 5 стадий Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на 60% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новый Дикий расцвет."
       },
       "summon_imp": {
         "name": "Призыв Уголька",
@@ -8048,7 +8048,7 @@ export const ru_RU: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Призрачный удар",
-        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
+        "description": "Наносит противнику урон от оружия плюс {damage} и повышает ваш шанс уклонения на 15% на 7 сек. Дает 1 прием серии. (талант разбойника)"
       },
       "hammer_of_wrath": {
         "name": "Звонкий молот",
@@ -8212,24 +8212,24 @@ export const ru_RU: EnTranslations = {
       },
       "venom_dart": {
         "name": "Ядовитый дротик",
-        "description": "Flick a poisoned dart for {damage} Nature damage. Awards 1 combo point.",
-        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
+        "description": "Метает отравленный дротик, нанося {damage} ед. урона от сил природы. Дает 1 очко серии приемов.",
+        "specNote_assassination": "Добавляет 1 этап Ядовитого ритуала и продлевает вашу ядовитую рану на 6 сек. (но не дольше 20 сек.)."
       },
       "body_blow": {
-        "name": "Haymaker",
-        "description": "A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)"
+        "name": "Удар с размаху",
+        "description": "Тяжелый удар, наносящий 130% урона от оружия плюс 10. Дает 2 очка серии приемов и добавляет 1 деление Redline (максимум 4). (механика Боя)"
       },
       "knockout_blow": {
-        "name": "Lights Out",
-        "description": "Ends Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder for each Redline you built, and recover 25 energy. Use it before Redline runs out or the knockout is lost. (Thuggery)"
+        "name": "Отключка",
+        "description": "Завершает Redline нокаутом: наносит 45 плюс 35 за каждое очко серии приемов, на 25% сильнее за каждое накопленное деление Redline, и восстанавливает 25 ед. энергии. Используйте ее до окончания Redline, иначе нокаут пропадет. (механика Боя)"
       },
       "veilstrike": {
         "name": "Удар завесы",
-        "description": "For 6 sec: your Duskveil openers work without stealth and from any angle, you deal 10% more damage, and your first Lurker's Strike inside it hits for double. (Skulduggery)"
+        "description": "На 6 сек.: ваши приемы открытия из «Сумеречной завесы» работают без незаметности и с любого угла, вы наносите на 10% больше урона, а первый «Удар скрытня» за это время наносит двойной урон. (механика Скрытности)"
       },
       "venomrend": {
         "name": "Ядовитый разрыв",
-        "description": "Spends your 6 Venom Ritual: strike for 100 plus 55 per combo point, instantly deal all the damage your bleeds would still have dealt, then apply a fresh venom wound (120 damage over 20 sec). Restores 20 energy. (Knifework)"
+        "description": "Расходует ваши 6 этапов Ядовитого ритуала: наносит 100 плюс 55 за каждое очко серии приемов, мгновенно наносит весь урон, что еще нанесли бы ваши кровотечения, а затем наносит новую ядовитую рану (120 ед. урона за 20 сек.). Восстанавливает 20 ед. энергии. (механика Ликвидации)"
       },
       "typhoon": {
         "name": "Тайфун",
@@ -8277,8 +8277,8 @@ export const ru_RU: EnTranslations = {
       },
       "rake": {
         "name": "Свежевание",
-        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "description": "Свежует врага, нанося урон оружием плюс {damage} и вызывая кровотечение в течение 18 сек. Даёт 1 очко серии приёмов. Только в облике волка.",
+        "specNote_feral": "Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3)."
       },
       "revive_pet": {
         "name": "Подлатать",

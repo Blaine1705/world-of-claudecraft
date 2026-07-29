@@ -170,8 +170,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Теневой шаг',
   'entities.abilities.silence.name': 'Безмолвие',
   'entities.abilities.venomrend.name': 'Ядовитый разрыв',
+  'entities.abilities.venomrend.description':
+    'Расходует ваши 6 этапов Ядовитого ритуала: наносит 100 плюс 55 за каждое очко серии приемов, мгновенно наносит весь урон, что еще нанесли бы ваши кровотечения, а затем наносит новую ядовитую рану (120 ед. урона за 20 сек.). Восстанавливает 20 ед. энергии. (механика Ликвидации)',
   'entities.abilities.veilstrike.name': 'Удар завесы',
+  'entities.abilities.veilstrike.description':
+    'На 6 сек.: ваши приемы открытия из «Сумеречной завесы» работают без незаметности и с любого угла, вы наносите на 10% больше урона, а первый «Удар скрытня» за это время наносит двойной урон. (механика Скрытности)',
+  'entities.abilities.body_blow.name': 'Удар с размаху',
+  'entities.abilities.body_blow.description':
+    'Тяжелый удар, наносящий 130% урона от оружия плюс 10. Дает 2 очка серии приемов и добавляет 1 деление Redline (максимум 4). (механика Боя)',
+  'entities.abilities.knockout_blow.name': 'Отключка',
+  'entities.abilities.knockout_blow.description':
+    'Завершает Redline нокаутом: наносит 45 плюс 35 за каждое очко серии приемов, на 25% сильнее за каждое накопленное деление Redline, и восстанавливает 25 ед. энергии. Используйте ее до окончания Redline, иначе нокаут пропадет. (механика Боя)',
   'entities.abilities.venom_dart.name': 'Ядовитый дротик',
+  'entities.abilities.venom_dart.description':
+    'Метает отравленный дротик, нанося {damage} ед. урона от сил природы. Дает 1 очко серии приемов.',
+  'entities.abilities.venom_dart.specNote_assassination':
+    'Добавляет 1 этап Ядовитого ритуала и продлевает вашу ядовитую рану на 6 сек. (но не дольше 20 сек.).',
   'entities.abilities.smoke_screen.name': 'Дымовая завеса',
   'entities.abilities.smoke_screen.description':
     'Вы скрываетесь в облаке дыма, повышая шанс уклонения на 30% на 8 сек.',
@@ -473,6 +487,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_hourglass.name': 'Песочные часы остановки',
   'entities.abilities.temporal_hourglass.description':
     'Помещает временные песочные часы в выбранную точку. Под врагом они останавливают его на {hostilePveDuration} сек. в PvE или на {hostilePvpDuration} сек. в PvP; любой урон снимает эффект. Под вами или союзником из группы они создают стазис на {duration} сек., защищают от урона, запрещают действовать и восстанавливают {healing}% максимального здоровья. Ваши способности восстанавливаются на {selfCooldownRecovery}% быстрее, а способности союзника на {allyCooldownRecovery}% быстрее. На пустой земле часы ждут {groundDuration} сек. и воздействуют на первую допустимую цель, которая на них наступит. Положительный эффект можно снять вручную.',
+  'hudChrome.auraEffect.venomRitual':
+    'Ядовитый ритуал: этап {stacks} из {max}. «Трусливый выпад», «Злодейский разрез» и «Ядовитый дротик» добавляют по 1 этапу; на этапе {max} «Вечный сон» превращается в «Ядовитый разрыв»',
+  'hudChrome.auraEffect.gloam':
+    'Сумрак: этап {stacks} из {max}. Приемы открытия из «Сумеречной завесы» добавляют по 1 этапу; на этапе {max} приемы открытия работают без незаметности, а следующий из них ничего не стоит, тратит все 3 этапа и окутывает вас тенью',
+  'hudChrome.auraEffect.redline':
+    'Redline: деление {stacks} из {max}. Каждый «Удар с размаху» добавляет 1 деление; «Отключка» бьет на {pct}% сильнее за каждое деление и завершает Redline. Если время выйдет раньше, нокаут пропадет',
   'hudChrome.auraEffect.veilstrikeWindow':
     'Окутан тенью: скрытные приемы можно использовать в открытую с любого угла, наносимый урон увеличен на {pct}%',
   'hudChrome.auraEffect.veiledEdge': 'Следующий «Удар скрытня» нанесет двойной урон',
@@ -2221,6 +2241,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.unavailable': 'Недоступно',
   'abilityUi.tooltip.requiresLevel': 'Требуется уровень {level}',
   'abilityUi.tooltip.requiresForm': 'Требуется облик {form}',
+  'abilityUi.tooltip.requiresStealth': 'Требуется незаметность',
+  'abilityUi.tooltip.requiresStealthSkulduggery':
+    'Требуется незаметность (не нужна при 3 этапах Сумрака и пока вы окутаны тенью)',
   'abilityUi.tooltip.requiresCombo': 'Расходует приемы серии',
   'abilityUi.tooltip.requiresTargetHealthBelow': 'Требуется цель ниже {percent}% здоровья',
   'abilityUi.tooltip.requiresDodge': 'Можно использовать только после уклонения цели',
@@ -2656,24 +2679,59 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_barrier.description':
     'Защищает вас льдом, поглощая {damage} ед. урона в течение 60 сек.',
   'entities.abilities.sinister_strike.name': 'Злодейский разрез',
+  'entities.abilities.sinister_strike.description':
+    'Мгновенный удар, наносящий урон оружием плюс {damage}. Дает 1 прием серии.',
+  'entities.abilities.sinister_strike.specNote_assassination':
+    'Добавляет 1 этап Ядовитого ритуала (максимум 6).',
+  'entities.abilities.sinister_strike.specNote_combat':
+    'Пока действует Redline, эта кнопка становится «Ударом с размаху»: 130% урона от оружия плюс 10, дает 2 очка серии приемов и добавляет 1 деление Redline (максимум 4).',
   'entities.abilities.eviscerate.name': 'Вечный сон',
+  'entities.abilities.eviscerate.description': 'Завершающий прием, наносящий {damage}.',
+  'entities.abilities.eviscerate.specNote_assassination':
+    'При 6 этапах Ядовитого ритуала эта кнопка становится «Ядовитым разрывом»: удар, который мгновенно наносит весь урон, что еще нанесли бы ваши кровотечения, наносит новую ядовитую рану и восстанавливает 20 ед. энергии.',
+  'entities.abilities.eviscerate.specNote_combat':
+    'Попадание этим приемом при 4 и более очках серии приемов запускает Redline на 8 сек.: «Злодейский разрез» становится «Ударом с размаху», а эта кнопка — «Отключкой» (45 плюс 35 за каждое очко серии приемов, на 25% сильнее за каждое накопленное деление Redline, восстанавливает 25 ед. энергии). Потратьте ее до окончания Redline.',
   'entities.abilities.backstab.name': 'Трусливый выпад',
+  'entities.abilities.backstab.description':
+    'Бьет цель в спину, нанося 150% урона оружием плюс {damage}. Нужно находиться позади цели. Требуется кинжал. Дает 1 прием серии.',
+  'entities.abilities.backstab.specNote_assassination':
+    'Каждый удар добавляет 1 этап Ядовитого ритуала (максимум 6) и возвращает 15 ед. энергии. При 6 этапах «Вечный сон» становится «Ядовитым разрывом» (он мгновенно наносит весь оставшийся урон ваших кровотечений).',
   'entities.abilities.gouge.name': 'Тычок в глаз',
   'entities.abilities.gouge.description':
     'Поражает цель, нанося {damage} ед. урона, и выводит ее из строя на 4 сек. Любой урон прерывает эффект. Дает 1 прием серии.',
   'entities.abilities.evasion.name': 'Призрачная поступь',
   'entities.abilities.evasion.description': 'Повышает вероятность уклонения на 50% на 15 сек.',
   'entities.abilities.slice_and_dice.name': 'Ритм головореза',
+  'entities.abilities.slice_and_dice.description':
+    'Завершающий прием, повышающий скорость атаки в ближнем бою на 30% на 12 сек. плюс 4 сек. за каждый прием серии (5 приемов серии: 32 сек.).',
   'entities.abilities.sprint.name': 'Быстрые пятки',
   'entities.abilities.sprint.description': 'Повышает скорость передвижения на 70% на 15 сек.',
   'entities.abilities.kidney_shot.name': 'Подлый удар',
+  'entities.abilities.kidney_shot.description':
+    'Завершающий прием, оглушающий цель на 1 сек. плюс 1 сек. за каждый прием серии (5 приемов серии: 6 сек.).',
   'entities.abilities.ambush.name': 'Удар скрытня',
+  'entities.abilities.ambush.description':
+    'Нападает из засады, нанося 250% урона оружием плюс {damage}. Нужно быть в незаметности и позади цели. Требуется кинжал. Дает 1 прием серии.',
+  'entities.abilities.ambush.specNote_subtlety':
+    'Применение из «Сумеречной завесы» добавляет 1 этап Сумрака (максимум 3). При 3 этапах Сумрака способность можно использовать БЕЗ незаметности и с любого угла: такое применение ничего не стоит, тратит все 3 этапа, на 6 сек. окутывает вас тенью и наносит двойной урон.',
   'entities.abilities.stealth.name': 'Сумеречная завеса',
+  'entities.abilities.stealth.description':
+    'Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 50% медленнее. Атака или получение урона прерывает Сумеречную завесу. Примените снова, чтобы выйти.',
+  'entities.abilities.stealth.specNote_subtlety':
+    'Каждый прием открытия, использованный из Сумеречной завесы, добавляет 1 этап Сумрака (максимум 3).',
   'entities.abilities.adrenaline_rush.name': 'Ускоренная кровь',
   'entities.abilities.adrenaline_rush.description':
     'Кровь закипает, мгновенно восстанавливая 60 энергии.',
   'entities.abilities.garrote.name': 'Удавка',
+  'entities.abilities.garrote.description':
+    'Душит врага гарротой, нанося {damage} ед. урона сразу и {overTime} от кровотечения в течение 18 сек. Требуется незаметность. Дает 1 очко серии.',
+  'entities.abilities.garrote.specNote_subtlety':
+    'Применение из «Сумеречной завесы» добавляет 1 этап Сумрака (максимум 3). При 3 этапах Сумрака способность можно использовать БЕЗ незаметности: такое применение ничего не стоит, тратит все 3 этапа и на 6 сек. окутывает вас тенью.',
   'entities.abilities.cheap_shot.name': 'Удар под дых',
+  'entities.abilities.cheap_shot.description':
+    'Бьет цель, нанося {damage} ед. урона и оглушая ее на 4 сек. Требуется незаметность. Дает 2 очка серии.',
+  'entities.abilities.cheap_shot.specNote_subtlety':
+    'Применение из «Сумеречной завесы» добавляет 1 этап Сумрака (максимум 3). При 3 этапах Сумрака способность можно использовать БЕЗ незаметности: такое применение ничего не стоит, тратит все 3 этапа и на 6 сек. окутывает вас тенью.',
   'entities.abilities.sap.name': 'Ошеломление',
   'entities.abilities.sap.description':
     'Выводит цель из строя на 8 сек. Требуется незаметность и нахождение вне боя. Любой урон прерывает эффект.',
@@ -2681,7 +2739,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.description':
     'Поражает цель свинцовым ядом, нанося {damage} ед. урона от сил природы и замедляя ее скорость передвижения на 50% на 12 сек.',
   'entities.abilities.expose_armor.name': 'Пролом брони',
+  'entities.abilities.expose_armor.description':
+    'Завершающий прием, который оголяет цель на 30 сек.: каждый потраченный прием серии снижает ее броню на 2% (5 приемов серии: {damage}%).',
   'entities.abilities.rupture.name': 'Истечение кровью',
+  'entities.abilities.rupture.description':
+    'Завершающий прием, который ранит цель: она истекает кровью каждые 2 сек. в течение 6 сек. плюс 2 сек. за каждый прием серии (5 приемов серии: 16 сек. и {damage} ед. урона в сумме).',
   'entities.abilities.vanish.name': 'Дымный шаг',
   'entities.abilities.vanish.description':
     'Исчезает из виду, входя в Сумеречную завесу даже в бою. Пока вы скрыты, вы двигаетесь на 50% медленнее. Длится до 10 сек.',
@@ -2879,13 +2941,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.description':
     'Мгновенно поражает цель жгучей тьмой, нанося {damage} ед. урона от тёмной магии.',
   'entities.abilities.wrath.name': 'Дикая стрела',
+  'entities.abilities.wrath.description':
+    'Метает сгусток природной энергии, нанося {damage} ед. урона от сил природы.',
+  'entities.abilities.wrath.specNote_balance':
+    'В облике Лунного крыла каждое завершенное применение добавляет 1 стадию Лунного прилива (максимум 3). При 3 стадиях Лунного прилива Лунное семя становится Лунным всплеском, а Падение небес — Пробуждением солнца.',
   'entities.abilities.healing_touch.name': 'Дикое заживление',
   'entities.abilities.healing_touch.description': 'Исцеляет дружественную цель на {damage}.',
   'entities.abilities.mark_of_the_wild.name': 'Оберег дикой природы',
   'entities.abilities.mark_of_the_wild.description':
     'Накладывает Оберег дикой природы на дружественную цель, повышая броню на {buff} на 30 мин.',
   'entities.abilities.moonfire.name': 'Лунная буря',
+  'entities.abilities.moonfire.description':
+    'Сжигает врага лунным огнем, нанося {damage} ед. урона от тайной магии и периодический урон.',
+  'entities.abilities.moonfire.specNote_balance':
+    'Поддерживайте горение Лунной бури: Лунное семя продлевает её на 6 сек.',
   'entities.abilities.rejuvenation.name': 'Дикий расцвет',
+  'entities.abilities.rejuvenation.description': 'Исцеляет цель на {damage} за 12 сек.',
+  'entities.abilities.rejuvenation.specNote_restoration':
+    'Посадка НОВОГО расцвета добавляет 1 стадию Зелени (максимум 5). При 5 стадиях Зелени Быстрое восстановление становится Сверхцветением.',
   'entities.abilities.thorns.name': 'Терновая защита',
   'entities.abilities.thorns.description':
     'Из цели вырастают шипы: атакующие в ближнем бою получают {buff} ед. урона от сил природы.',
@@ -2896,6 +2969,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bear_form.description':
     'Вы принимаете облик медведя: броня +130%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя.',
   'entities.abilities.maul.name': 'Костолом',
+  'entities.abilities.maul.description':
+    'Свирепая атака, увеличивающая урон в ближнем бою на {damage} и создающая много угрозы. Срабатывает при следующем взмахе. Только в облике бурого.',
+  'entities.abilities.maul.specNote_feral':
+    'Каждый попавший удар добавляет 1 стадию Старой крови; при 3 стадиях эта кнопка становится Дроблением костей: удар, наносящий от 78 до 96 ед. урона с высокой угрозой; ниже половины здоровья вместо удара он поглощает урон в размере 18% максимального здоровья и возвращает 15 ед. ярости.',
   'entities.abilities.growl.name': 'Устрашение',
   'entities.abilities.growl.description':
     'Рычит на цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек. Только в облике бурого.',
@@ -2903,9 +2980,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cat_form.description':
     'Вы принимаете облик волка: ловкость растет с уровнем, сила атаки повышается на 8 плюс 2 за уровень, атаки используют энергию и приемы серии, а угроза снижается на 29%. Примените снова, чтобы вернуться к облику заклинателя.',
   'entities.abilities.claw.name': 'Рвущий коготь',
+  'entities.abilities.claw.description':
+    'Царапает врага, нанося урон оружием плюс {damage}. Дает 1 прием серии. Только в облике волка.',
+  'entities.abilities.claw.specNote_feral':
+    'Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3).',
   'entities.abilities.ferocious_bite.name': 'Кровавый укус',
+  'entities.abilities.ferocious_bite.description':
+    'Завершающий прием, наносящий {damage}. Только в облике волка.',
+  'entities.abilities.ferocious_bite.specNote_feral':
+    'Каждый попавший удар добавляет 1 стадию Старой крови; при 3 стадиях эта кнопка становится Кровавой жатвой: укус на 91 плюс 55 за каждый прием серии, который также мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, и восстанавливает 30 ед. энергии.',
   'entities.abilities.swipe.name': 'Разящие когти',
+  'entities.abilities.swipe.description':
+    'Размахивает когтями по ближайшим врагам, нанося {damage} ед. урона. Создает дополнительную угрозу. Только в облике бурого.',
+  'entities.abilities.swipe.specNote_feral':
+    'Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3).',
   'entities.abilities.regrowth.name': 'Второй расцвет',
+  'entities.abilities.regrowth.description':
+    'Исцеляет дружественную цель на {damage} и дополнительно в течение 21 сек.',
+  'entities.abilities.regrowth.specNote_restoration':
+    'Посадка НОВОГО расцвета добавляет 1 стадию Зелени (максимум 5).',
   'entities.abilities.barkskin.name': 'Дубовая шкура',
   'entities.abilities.barkskin.description':
     'Ваша кожа твердеет, как кора, повышая броню на 150 на 15 сек.',
@@ -2916,6 +3009,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.primal_reflexes.description':
     'Ваши инстинкты обостряются, повышая шанс уклонения на 50% на 6 сек.',
   'entities.abilities.starfire.name': 'Падение небес',
+  'entities.abilities.starfire.description':
+    'Обрушивает вспышку звездного огня, нанося {damage} ед. урона от тайной магии.',
+  'entities.abilities.starfire.specNote_balance':
+    'В облике Лунного крыла каждое завершенное применение добавляет 1 стадию Лунного прилива (максимум 3). При 3 стадиях Лунного прилива эта кнопка становится Пробуждением солнца: мгновенный удар, наносящий от 160 до 190 ед. урона от сил природы плюс 75 ед. ожога за 9 сек., восстанавливающий 35 ед. маны и расходующий все 3 стадии.',
   'entities.abilities.travel_form.name': 'Форма скорохода',
   'entities.abilities.travel_form.description':
     'Мгновенно принимает быструю форму скорохода, повышая скорость передвижения на 40%. В этой форме нельзя использовать другие способности, но переход доступен и в бою: идеально для бегства.',
@@ -2925,6 +3022,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': 'Контузия',
   'entities.abilities.bash.description': 'Оглушает цель на 2 сек. Только в облике бурого.',
   'entities.abilities.faerie_fire.name': 'Ведьмин огонь',
+  'entities.abilities.faerie_fire.description': 'Снижает броню цели на {damage}% на 40 сек.',
   'entities.abilities.hibernate.name': 'Дремота',
   'entities.abilities.hibernate.description':
     'Погружает цель в глубокий сон на срок до 8 сек. Любой урон пробуждает ее.',
@@ -2941,6 +3039,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.description':
     'Повышает силу атаки на {buff} на {duration} сек. Только в облике волка.',
   'entities.abilities.rip.name': 'Кровавый разлом',
+  'entities.abilities.rip.description':
+    'Завершающий прием, вызывающий у цели кровотечение каждые 2 сек. в течение 24 сек.: 36 ед. урона плюс 24 за каждый потраченный прием серии (5 приемов серии: {damage} в сумме). Только в облике волка.',
+  'entities.abilities.rip.specNote_feral':
+    'Попавший удар добавляет 1 стадию Старой крови (максимум 3).',
   'entities.abilities.mortal_strike.name': 'Калечащий удар',
   'entities.abilities.mortal_strike.description':
     'Жестокий удар, наносящий урон оружием плюс {damage}. (ключевая способность ветки «Оружие»)',
@@ -2987,6 +3089,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description':
     'Переход в скрытность в облике волка: вы двигаетесь на 50% медленнее. Нельзя использовать в бою.',
   'entities.abilities.rake.name': 'Свежевание',
+  'entities.abilities.rake.description':
+    'Свежует врага, нанося урон оружием плюс {damage} и вызывая кровотечение в течение 18 сек. Даёт 1 очко серии приёмов. Только в облике волка.',
+  'entities.abilities.rake.specNote_feral':
+    'Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3).',
   'entities.abilities.revive_pet.name': 'Подлатать',
   'entities.abilities.revive_pet.description':
     'Подлечивает питомца: если он жив, восстанавливает ему {overTime} ед. здоровья за 12 сек. с шагом в 3 сек. Если питомец мёртв, воскрешает его с 35% здоровья.',
@@ -3015,8 +3121,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     'Повышает скорость заклинаний на 30% и предотвращает прерывание и задержку произнесения на 10 сек. (знаковое умение Льда)',
   'entities.abilities.cold_blood.name': 'Хладнокровие',
+  'entities.abilities.cold_blood.description':
+    'Сосредоточивает убийственное намерение, чтобы следующая атака стала критической. (знаковое умение Ликвидации)',
   'entities.abilities.blade_flurry.name': 'Шквал клинков',
+  'entities.abilities.blade_flurry.description':
+    'Обрушивает шквал клинков, повышая скорость атаки на 20% на 12 сек. (знаковое умение Боя)',
   'entities.abilities.hemorrhage.name': 'Кровоизлияние',
+  'entities.abilities.hemorrhage.description':
+    'Бьет врага, нанося урон оружием плюс {damage}, вызывает кровотечение на 12 сек. и увеличивает получаемый целью урон от кровотечений на 40%. Дает 1 прием серии. Каждое 2-е применение добавляет 1 этап Сумрака (максимум 3). (знаковое умение Скрытности)',
   'entities.abilities.power_infusion.name': 'Придание сил',
   'entities.abilities.power_infusion.description':
     'Наполняет дружественную цель силой, повышая ее силу заклинаний на 28 на 15 сек. (знаковое умение Послушания)',
@@ -3042,6 +3154,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Вы бросаетесь к врагу и обездвиживаете его на 1 сек. Дистанция 8-25 м. (знаковое умение Силы зверя)',
   'entities.abilities.swiftmend.name': 'Быстрое восстановление',
+  'entities.abilities.swiftmend.description':
+    'Поглощает эффект периодического исцеления на дружественной цели и исцеляет ее на {damage}. Посадки Дикого расцвета и Второго расцвета копят Зелень; при 5 стадиях Зелени эта кнопка становится Сверхцветением, которое мгновенно исцеляет каждого союзника с вашими эффектами периодического исцеления на 60% оставшегося в них исцеления. (знаковое умение Исцеления)',
   'entities.abilities.crusader_strike.name': 'Удар воина Света',
   'entities.abilities.crusader_strike.description':
     'Бьет цель, нанося урон оружием плюс {damage} ед. урона от Света. (талант паладина)',
@@ -8221,6 +8335,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Восстанавливает 180 ед. здоровья за 10 сек. Только в облике медведя. (талант друида)',
   'entities.abilities.frost_trap.description':
     'Замораживает противников в выбранной области на 3 сек., не позволяя им двигаться или действовать. (талант охотника)',
+  'entities.abilities.ghostly_strike.description':
+    'Наносит противнику урон от оружия плюс {damage} и повышает ваш шанс уклонения на 15% на 7 сек. Дает 1 прием серии. (талант разбойника)',
   'entities.abilities.hammer_of_wrath.description':
     'Бросает священный молот в раненого противника, нанося {damage} ед. урона от Света. Можно использовать только при запасе здоровья ниже 20%. (талант паладина)',
   'entities.abilities.healing_stream.description':
@@ -9439,12 +9555,30 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': 'Высвобождение оружия',
   'entities.abilities.unleash_weapon.description':
     'Высвобождает активное зачарование оружия. Пламенное клеймо наносит 54-64 ед. урона от огня с прибавкой 30% силы заклинаний и дает 2 заряда Грома. Сердце бури наносит удар оружием, продвигает Ритм духа войны и повышает скорость атаки на 20% на 6 сек. Каменные узы наносят 75% урона оружия, заставляют цель атаковать вас и снижают получаемый урон на 20% на 4 сек. Живой источник расходует Поток исцеления, мгновенно восстанавливает 125% оставшегося объема и в течение 8 сек. уменьшает урон от следующего удара на 50% фактически восстановленного здоровья.',
+  'hudChrome.auraEffect.moontide':
+    'Лунный прилив: стадия {stacks} из {max}. Применения Дикой стрелы, Падения небес и Лунного семени в облике Лунного крыла добавляют по 1 стадии. На {max}: Лунное семя становится Лунным всплеском, а Падение небес — Пробуждением солнца; любое из них тратит все 3 стадии',
+  'hudChrome.auraEffect.oldBlood':
+    'Старая кровь: стадия {stacks} из {max}. Попавшие удары Рвущего когтя, Свежевания, Кровавого разлома, Кровавого укуса, Разящих когтей и Костолома добавляют по 1 стадии. На {max}: Кровавый укус становится Кровавой жатвой в облике волка, а Костолом — Дроблением костей в облике бурого',
+  'hudChrome.auraEffect.verdance':
+    'Зелень: стадия {stacks} из {max}. Каждый НОВЫЙ посаженный Дикий расцвет или Второй расцвет добавляет 1 стадию; на {max} Быстрое восстановление становится Сверхцветением',
   'entities.abilities.moonseed.name': 'Лунное семя',
+  'entities.abilities.moonseed.description':
+    'Только в облике Лунного крыла. Наносит {damage} ед. урона от тайной магии, добавляет 1 стадию Лунного прилива (максимум 3) и продлевает вашу Лунную бурю на 6 сек. Не более 6 сек за одно наложение. При 3 стадиях Лунного прилива эта кнопка становится Лунным всплеском: мгновенный удар, наносящий от 240 до 285 ед. урона от тайной магии и расходующий все 3 стадии.',
   'guide.abilityHook.moonseed':
     'В облике Лунного крыла добавляет стадию Лунного прилива и продлевает Лунную бурю.',
   'entities.abilities.moonlash.name': 'Лунный всплеск',
+  'entities.abilities.moonlash.description':
+    'Расходует ваши 3 стадии Лунного прилива на мощный удар, наносящий {damage} ед. урона от тайной магии: выбор в пользу урона. Пробуждение солнца тратит те же 3 стадии, так что выбирайте одно.',
   'entities.abilities.sunlance.name': 'Пробуждение солнца',
+  'entities.abilities.sunlance.description':
+    'Расходует ваши 3 стадии Лунного прилива на удар, наносящий {damage} ед. урона от сил природы плюс {overTime} ед. ожога за 9 сек., и восстанавливает 35 ед. маны: выбор в пользу экономии. Лунный всплеск тратит те же 3 стадии, так что выбирайте одно.',
   'entities.abilities.redharvest.name': 'Кровавая жатва',
+  'entities.abilities.redharvest.description':
+    'Расходует ваши 3 стадии Старой крови: удар на {damage} ед. урона, который мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, снимает оба кровотечения и восстанавливает 30 ед. энергии. Работает даже без очков серии приемов.',
   'entities.abilities.marrowbreak.name': 'Дробление костей',
+  'entities.abilities.marrowbreak.description':
+    'Расходует ваши 3 стадии Старой крови на мощный удар с высокой угрозой, наносящий {damage} ед. урона. Ниже половины здоровья вместо удара он поглощает урон в размере 18% максимального здоровья на 8 сек. и возвращает 15 ед. ярости.',
   'entities.abilities.overbloom.name': 'Сверхцветение',
+  'entities.abilities.overbloom.description':
+    'Расходует ваши 5 стадий Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на 60% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новый Дикий расцвет.',
 };
