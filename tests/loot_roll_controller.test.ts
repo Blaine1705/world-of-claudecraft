@@ -532,6 +532,48 @@ describe('LootRollController', () => {
     test.controller.update(test.now());
     expect(test.writerCounts).toEqual({ writes: 2, skips: 2 });
   });
+
+  it('a render throw is contained, never retried on identical data, and heals on the next change', () => {
+    // The catch/finally contract at the status fingerprint commit: one throw
+    // must not abort the update (the old shape ate every concurrent prompt),
+    // identical data must not re-render (no per-frame throw storm on a
+    // persistently-throwing host), and the NEXT data change must render
+    // because the committed fingerprint differs.
+    const test = harness();
+    const status = (choice: 'need' | null): LootRollGroupStatus => ({
+      rollId: 7,
+      itemId: 'greyjaw_hide_boots',
+      itemName: 'Greyjaw Hide Boots',
+      quality: 'uncommon',
+      expiresAt: 60_000,
+      entries: [{ pid: 2, name: 'Aki', choice }],
+    });
+    const target = test.controller as unknown as { render: () => void };
+    const real = target.render.bind(test.controller);
+    const render = vi
+      .spyOn(target, 'render')
+      .mockImplementationOnce(() => {
+        throw new Error('canvas exhausted');
+      })
+      .mockImplementation(real);
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      test.setStatuses([status(null)]);
+      test.controller.update(test.now());
+      expect(render).toHaveBeenCalledTimes(1);
+      expect(errors).toHaveBeenCalled();
+      // Identical data: elided, not retried.
+      test.controller.update(test.now());
+      expect(render).toHaveBeenCalledTimes(1);
+      // A real change renders again: the throw did not freeze the panel.
+      test.setStatuses([status('need')]);
+      test.controller.update(test.now());
+      expect(render).toHaveBeenCalledTimes(2);
+    } finally {
+      errors.mockRestore();
+      render.mockRestore();
+    }
+  });
 });
 
 describe('stale-client fallback wiring (source pins)', () => {

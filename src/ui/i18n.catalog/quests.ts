@@ -9,6 +9,10 @@ const questStringsEn = {
       complete: 'Complete',
       showOnMap: 'Show {name} on the map',
       hideFromMap: 'Hide {name} from the map',
+      // Stale-client fallback (R34): a log entry whose quest id this bundle
+      // predates keeps its tracker position, labeled as unknown rather than
+      // as a bare content slug.
+      unknownQuest: 'Unknown quest ({id})',
     },
     log: {
       title: 'Quest Log',

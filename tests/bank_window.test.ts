@@ -137,6 +137,15 @@ describe('bank_window: modal prompt a11y contract', () => {
     );
   });
 
+  it('the withdraw prompt resolves its def through knownItemDef (R34, prototype keys)', () => {
+    // The one bare ITEMS read the stale-client conversion missed: the prompt
+    // title falls back to the raw id for an unknown or prototype-key slot id
+    // instead of dereferencing a Function's fields.
+    const promptBody = painter.slice(painter.indexOf('private showWithdrawQuantityPrompt('));
+    expect(promptBody.slice(0, 400)).toContain('knownItemDef(ITEMS, slot.itemId)');
+    expect(promptBody.slice(0, 400)).not.toContain('? ITEMS[slot.itemId]');
+  });
+
   it('re-validates the live slot at quantity-prompt submit (stale-index guard)', () => {
     // The prompt captures slotIndex at open; the bank can repaint under it. Sending
     // the captured index blind would withdraw whatever now sits there, so submit

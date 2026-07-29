@@ -36,7 +36,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ],
   "es_ES": [
     "entities.items.fine_ashwood_log.name",
@@ -65,7 +66,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ],
   "fr_FR": [
     "entities.items.fine_ashwood_log.name",
@@ -94,7 +96,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ],
   "fr_CA": [
     "entities.items.fine_ashwood_log.name",
@@ -123,7 +126,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ],
   "en_CA": [],
   "it_IT": [
@@ -153,7 +157,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ],
   "de_DE": [
     "entities.items.fine_ashwood_log.name",
@@ -182,12 +187,21 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "questUi.tracker.unknownQuest"
+  ],
+  "zh_TW": [
+    "questUi.tracker.unknownQuest"
+  ],
+  "ko_KR": [
+    "questUi.tracker.unknownQuest"
+  ],
+  "ja_JP": [
+    "questUi.tracker.unknownQuest"
+  ],
   "pt_BR": [
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -215,9 +229,12 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "questUi.tracker.unknownQuest"
+  ],
   "cs_CZ": [
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -245,7 +262,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ],
   "nl_NL": [
     "entities.items.fine_ashwood_log.name",
@@ -274,7 +292,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ],
   "pl_PL": [
     "entities.items.fine_ashwood_log.name",
@@ -303,7 +322,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ],
   "id_ID": [
     "entities.items.fine_ashwood_log.name",
@@ -332,7 +352,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ],
   "tr_TR": [
     "entities.items.fine_ashwood_log.name",
@@ -361,7 +382,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ],
   "sv_SE": [
     "entities.items.fine_ashwood_log.name",
@@ -390,7 +412,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ],
   "vi_VN": [
     "entities.items.fine_ashwood_log.name",
@@ -419,7 +442,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ],
   "da_DK": [
     "entities.items.fine_ashwood_log.name",
@@ -448,6 +472,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaBound",
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
-    "itemUi.bags.unknownItemAriaMasterwork"
+    "itemUi.bags.unknownItemAriaMasterwork",
+    "questUi.tracker.unknownQuest"
   ]
 };

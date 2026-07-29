@@ -6778,7 +6778,8 @@ export const en_XA: EnTranslations = {
       "title": "[Ɋúéšţš]",
       "complete": "[Çóɱþļéţé]",
       "showOnMap": "[Šĥóŵ {name} óñ ţĥé ɱáþ]",
-      "hideFromMap": "[Ĥíðé {name} ƒŕóɱ ţĥé ɱáþ]"
+      "hideFromMap": "[Ĥíðé {name} ƒŕóɱ ţĥé ɱáþ]",
+      "unknownQuest": "[Úñķñóŵñ ɋúéšţ ({id})]"
     },
     "log": {
       "title": "[Ɋúéšţ Ļóĝ]",

@@ -6778,7 +6778,8 @@ export const nl_NL: EnTranslations = {
       "title": "Quests",
       "complete": "Voltooid",
       "showOnMap": "Toon {name} op de kaart",
-      "hideFromMap": "Verberg {name} op de kaart"
+      "hideFromMap": "Verberg {name} op de kaart",
+      "unknownQuest": "Unknown quest ({id})"
     },
     "log": {
       "title": "Questlogboek",

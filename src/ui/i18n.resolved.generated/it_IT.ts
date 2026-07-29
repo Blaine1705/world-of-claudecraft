@@ -6778,7 +6778,8 @@ export const it_IT: EnTranslations = {
       "title": "Missioni",
       "complete": "Completata",
       "showOnMap": "Mostra {name} sulla mappa",
-      "hideFromMap": "Nascondi {name} dalla mappa"
+      "hideFromMap": "Nascondi {name} dalla mappa",
+      "unknownQuest": "Unknown quest ({id})"
     },
     "log": {
       "title": "Registro missioni",

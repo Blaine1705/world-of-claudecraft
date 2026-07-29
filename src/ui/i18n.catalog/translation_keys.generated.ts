@@ -8473,6 +8473,7 @@ export type TranslationKeyFlat =
   | 'questUi.tracker.hideFromMap'
   | 'questUi.tracker.showOnMap'
   | 'questUi.tracker.title'
+  | 'questUi.tracker.unknownQuest'
   | 'realm.characterCountOne'
   | 'realm.characterCountOther'
   | 'realm.checkingStatus'

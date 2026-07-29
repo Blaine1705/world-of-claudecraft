@@ -129,6 +129,17 @@ export function bagItemAction(item: BagItemInfo, mode: BagMode): BagAction {
   return 'use';
 }
 
+/** The unknown (def-less) cell's one possible click action, derived from the
+ *  SAME mode ladder bagItemAction walks: every def-needing mode that outranks
+ *  the bank deposit there (trade, mail-attach, market-sell, vendor) means NO
+ *  action on a def-less stack, never a deposit that jumps the ladder. One
+ *  definition so the unknown cell cannot silently diverge when the ladder
+ *  gains a mode or reorders. */
+export function bagUnknownAction(mode: BagMode): 'bankDeposit' | 'none' {
+  if (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen) return 'none';
+  return mode.bankDeposit ? 'bankDeposit' : 'none';
+}
+
 /** Whether a shift-click on a bag item should link it into chat (classic
  *  shift-click-to-link). True in every mode except at a vendor or the open bank,
  *  where shift-click already owns the split-stack sell / deposit prompt; those

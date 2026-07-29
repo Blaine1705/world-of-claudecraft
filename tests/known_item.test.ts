@@ -12,7 +12,9 @@ const PROTO_KEYS = ['constructor', '__proto__', 'toString', 'valueOf', 'hasOwnPr
 
 describe('knownItemDef', () => {
   it('resolves a real shipped id to its def', () => {
-    expect(knownItemDef(ITEMS, 'copper_ore')?.name).toBe(ITEMS.copper_ore.name);
+    // Reference identity, not a field self-comparison: the claim is that the
+    // predicate returns THE table row, undefined being the failure shape.
+    expect(knownItemDef(ITEMS, 'copper_ore')).toBe(ITEMS.copper_ore);
   });
 
   it('refuses every prototype key and a plain unknown id', () => {

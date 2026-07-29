@@ -29,6 +29,23 @@ import { iconDataUrl } from './icons';
 export const BLANK_PIXEL =
   'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
+/** The `<img>` for a KNOWN item def: the same markup and the same canvas
+ *  swallow as the unknown arm below, because every guarded surface paints at
+ *  least one known item, and without this a canvas-exhausted host threw on
+ *  the known arm first and the fallback family's never-a-throw contract was
+ *  unreachable in practice. The def's own quality feeds the class, so no
+ *  allowlist is needed on this arm (the union is bundle-local). */
+export function knownItemIconHtml(item: { id: string; quality?: string }): string {
+  const q = item.quality ?? 'common';
+  let src = BLANK_PIXEL;
+  try {
+    src = iconDataUrl('item', item.id);
+  } catch {
+    // Canvas-less host: blank art, never a throw.
+  }
+  return `<img class="item-icon q-${q}" src="${esc(src)}" alt="" draggable="false">`;
+}
+
 /** The `<img>` for an item id with no local ItemDef: the procedural fallback
  *  icon, quality-classed, never a throw. */
 export function unknownItemIconHtml(itemId: string, quality: string = 'common'): string {

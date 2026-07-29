@@ -45,6 +45,7 @@ import {
   bagStackIndex,
   bagsMoneyRowStale,
   bagTooltipHintKey,
+  bagUnknownAction,
   bankDepositOpensPrompt,
   buildBagBar,
   buildBagGrid,
@@ -588,7 +589,7 @@ export class BagsWindow {
     if (model.cells.length > 0) {
       for (let cell = 0; cell < model.cells.length; cell++) {
         const stack = model.cells[cell];
-        const item = stack ? ITEMS[stack.itemId] : undefined;
+        const item = stack ? knownItemDef(ITEMS, stack.itemId) : undefined;
         // Stale-client guard (R34): a stack whose id this bundle predates is
         // still an OCCUPIED slot; painting it as an empty square is how a
         // counted slot turns invisible.
@@ -850,14 +851,10 @@ export class BagsWindow {
     // The known cell's ladder gives trade, mail-attach, market-sell, and
     // vendor precedence over the deposit; those four all need a def, so on
     // the unknown cell an active higher mode means NO action (the honest
-    // aria-disabled no-op), never a deposit that jumps the ladder.
-    const mode = this.bagMode();
-    const canDeposit =
-      mode.bankDeposit &&
-      !mode.tradeOpen &&
-      !mode.mailAttach &&
-      !mode.marketSell &&
-      !mode.vendorOpen;
+    // aria-disabled no-op), never a deposit that jumps the ladder. The
+    // decision itself lives beside bagItemAction (bags_view.ts
+    // bagUnknownAction) so the two ladders cannot drift apart.
+    const canDeposit = bagUnknownAction(this.bagMode()) === 'bankDeposit';
     if (!canDeposit) row.setAttribute('aria-disabled', 'true');
     // The accessible name says UNKNOWN, not just the raw id: the hover
     // tooltip is mouse-only, and the two channels must agree (the glyph
@@ -918,17 +915,41 @@ export class BagsWindow {
         }
       });
     }
+    // A touch long-press belongs to the tooltip peek here exactly as on the
+    // known cell (Chromium synthesizes contextmenu at ~500ms, beating the
+    // peek timer, and this cell's tooltip is the only channel that explains
+    // it to a sighted touch player); desktop right-click stays inert since
+    // the cell has no secondary action to offer.
+    row.addEventListener('contextmenu', (ev) => {
+      const pointerType = (ev as PointerEvent).pointerType;
+      if (
+        pointerType === 'touch' ||
+        pointerType === 'pen' ||
+        (document.body.classList.contains('mobile-touch') && pointerType !== 'mouse')
+      ) {
+        ev.preventDefault();
+      }
+    });
+    // A fresh press clears any stale suppression, mirroring the known cell's
+    // contract: the flag only ever swallows the ONE synthetic click trailing
+    // the drag that set it, and a drag that ends without that click (release
+    // over another element, a rebuild destroying the source row) must never
+    // eat a later, real deposit tap.
+    row.addEventListener('pointerdown', () => {
+      this.suppressNextClick = false;
+    });
     this.deps.attachTooltip(
       row,
       () =>
         `<div class="tt-title">${esc(s.itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`,
     );
     // The drag source, trimmed from buildStackCell's wiring: no hotbar
-    // payload (a hotbar action needs a def) and no click-suppression dance
-    // (this cell has no click handler for a trailing synthetic click to
-    // trigger). markEquipDropTargets is def-gated and lights nothing for an
-    // unknown id; the world/paperdoll drop arms no-op the same way, leaving
-    // the bag-cell move as the one live target, which is the point.
+    // payload (a hotbar action needs a def), and markEquipDropTargets is
+    // def-gated and lights nothing for an unknown id; the world/paperdoll
+    // drop arms no-op the same way, leaving the bag-cell move as the one
+    // live target, which is the point. The click-suppression dance IS here
+    // (the deposit click above, the onDrop flag below, and the pointerdown
+    // reset): with the bank open this cell has a real click action now.
     const index = bagStackIndex(this.deps.world().inventory, s);
     row.draggable = !this.deps.tradeOpen() && !this.deps.vendorOpen();
     row.addEventListener('dragstart', (e) => {

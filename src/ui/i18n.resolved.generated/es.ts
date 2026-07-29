@@ -6778,7 +6778,8 @@ export const es: EnTranslations = {
       "title": "Misiones",
       "complete": "Completada",
       "showOnMap": "Mostrar {name} en el mapa",
-      "hideFromMap": "Ocultar {name} del mapa"
+      "hideFromMap": "Ocultar {name} del mapa",
+      "unknownQuest": "Unknown quest ({id})"
     },
     "log": {
       "title": "Diario de misiones",

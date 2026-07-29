@@ -6778,7 +6778,8 @@ export const zh_TW: EnTranslations = {
       "title": "任務",
       "complete": "完成",
       "showOnMap": "在地圖上顯示{name}",
-      "hideFromMap": "在地圖上隱藏{name}"
+      "hideFromMap": "在地圖上隱藏{name}",
+      "unknownQuest": "Unknown quest ({id})"
     },
     "log": {
       "title": "任務日誌",

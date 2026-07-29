@@ -358,10 +358,11 @@ describe('bags_window: unknown-id stacks stay visible (stale-client guard, R34)'
     // DRAG source stays live, because a move works on indices alone; both
     // drag arms and the touch drop's bag-cell move are pinned so the
     // capability cannot silently vanish.
-    // Whitespace-collapsed: biome wraps the conjunction across lines at 100 cols.
-    expect(body.replace(/\s+/g, ' ')).toContain(
-      'mode.bankDeposit && !mode.tradeOpen && !mode.mailAttach && !mode.marketSell && !mode.vendorOpen',
-    );
+    // The ladder decision itself moved into the pure core (bags_view.ts
+    // bagUnknownAction, unit-tested against bagItemAction's mode fixtures in
+    // tests/bags_window_unknown_cell.test.ts); the cell must read THAT one
+    // definition, never re-inline its own copy of the conjunction.
+    expect(body).toContain("bagUnknownAction(this.bagMode()) === 'bankDeposit'");
     expect(body).toContain("if (!canDeposit) row.setAttribute('aria-disabled', 'true')");
     expect(body).toContain('if (canDeposit) {');
     expect(body).toContain('this.deps.world().bankDeposit(index)');

@@ -160,6 +160,29 @@ describe('LootWindowController', () => {
     expect(test.hideTooltip).toHaveBeenCalledTimes(1);
   });
 
+  it('renders an unknown-id drop as an occupied row instead of throwing (R34)', () => {
+    // Corpse loot is server truth: a bundle one deploy behind can be handed
+    // an id with no local def. The row must still paint (raw id label,
+    // fallback icon markup) and carry its tooltip, because the unguarded
+    // deref used to throw before innerHTML was assigned, leaving the corpse
+    // un-lootable.
+    const mob = entity(10, {
+      kind: 'mob',
+      templateId: harvestMobId,
+      loot: {
+        copper: 0,
+        items: [{ itemId: 'future_expansion_drop_x', count: 2, personalFor: [7] }],
+      },
+    });
+    const test = harness([mob]);
+    test.controller.openCorpse(10, 400, 300);
+    expect(test.element.style.display).toBe('block');
+    expect(test.element.innerHTML).toContain('data-item="future_expansion_drop_x"');
+    expect(test.element.innerHTML).toContain('future_expansion_drop_x');
+    // The unknown row rides the same tooltip idiom as a known one.
+    expect(test.attachTooltip).toHaveBeenCalled();
+  });
+
   it('uses the shared corpse availability gate before opening', () => {
     const mob = entity(12, {
       kind: 'mob',

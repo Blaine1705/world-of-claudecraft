@@ -6778,7 +6778,8 @@ export const cs_CZ: EnTranslations = {
       "title": "Úkoly",
       "complete": "Dokončeno",
       "showOnMap": "Zobrazit {name} na mapě",
-      "hideFromMap": "Skrýt {name} na mapě"
+      "hideFromMap": "Skrýt {name} na mapě",
+      "unknownQuest": "Unknown quest ({id})"
     },
     "log": {
       "title": "Deník úkolů",

@@ -6778,7 +6778,8 @@ export const ja_JP: EnTranslations = {
       "title": "クエスト",
       "complete": "完了",
       "showOnMap": "{name}をマップに表示",
-      "hideFromMap": "{name}をマップから隠す"
+      "hideFromMap": "{name}をマップから隠す",
+      "unknownQuest": "Unknown quest ({id})"
     },
     "log": {
       "title": "クエストログ",

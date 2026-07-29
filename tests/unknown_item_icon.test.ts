@@ -13,7 +13,7 @@ vi.mock('../src/ui/icons', () => ({
   },
 }));
 
-const { unknownItemIconHtml } = await import('../src/ui/unknown_item_icon');
+const { knownItemIconHtml, unknownItemIconHtml } = await import('../src/ui/unknown_item_icon');
 
 describe('unknownItemIconHtml', () => {
   it('renders the item-icon img at common quality by default', () => {
@@ -69,5 +69,22 @@ describe('unknownItemIconHtml', () => {
     // recipe, keyed by the id so distinct unknowns stay distinct.
     expect(unknownItemIconHtml('a')).toContain('src="stub:item:a"');
     expect(unknownItemIconHtml('b')).toContain('src="stub:item:b"');
+  });
+});
+
+describe('knownItemIconHtml (the known arm of the same swallow)', () => {
+  it('renders the def-quality class with the resolved icon', () => {
+    expect(knownItemIconHtml({ id: 'copper_ore', quality: 'rare' })).toBe(
+      '<img class="item-icon q-rare" src="stub:item:copper_ore" alt="" draggable="false">',
+    );
+    expect(knownItemIconHtml({ id: 'copper_ore' })).toContain('q-common');
+  });
+
+  it('degrades to the blank pixel on a canvas-less host, never a throw', () => {
+    // Every guarded surface paints at least one KNOWN item, so this arm is
+    // what makes the family's never-a-throw contract reachable at all.
+    const html = knownItemIconHtml({ id: 'canvasless_id', quality: 'epic' });
+    expect(html).toContain('data:image/gif;base64');
+    expect(html).toContain('q-epic');
   });
 });

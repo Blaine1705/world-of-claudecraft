@@ -6778,7 +6778,8 @@ export const tr_TR: EnTranslations = {
       "title": "Görevler",
       "complete": "Tamamlandı",
       "showOnMap": "{name} görevini haritada göster",
-      "hideFromMap": "{name} görevini haritadan gizle"
+      "hideFromMap": "{name} görevini haritadan gizle",
+      "unknownQuest": "Unknown quest ({id})"
     },
     "log": {
       "title": "Görev Kaydı",

@@ -807,7 +807,7 @@ export class BankWindow {
     dismissBankPrompts();
     const opener = document.activeElement as HTMLElement | null;
     const slot = this.deps.world().bankInfo?.slots[slotIndex];
-    const item = slot ? ITEMS[slot.itemId] : undefined;
+    const item = slot ? knownItemDef(ITEMS, slot.itemId) : undefined;
     const stack = document.getElementById('prompt-stack');
     if (!stack) return;
     const prompt = document.createElement('div');

@@ -40,7 +40,12 @@ export class QuestTrackerController {
       quests.push({
         id: progress.questId,
         number: quests.length + 1,
-        title: quest ? this.deps.questTitle(progress.questId) : progress.questId,
+        // The unknown title SAYS unknown (a localizable sentence carrying the
+        // raw id) instead of handing the player a bare content slug; the raw
+        // id stays present so the row still matches a bug report.
+        title: quest
+          ? this.deps.questTitle(progress.questId)
+          : t('questUi.tracker.unknownQuest', { id: progress.questId }),
         complete: progress.state === 'ready',
         objectives: quest
           ? quest.objectives.map((_objective, objectiveIndex) => ({

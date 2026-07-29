@@ -6778,7 +6778,8 @@ export const en_CA: EnTranslations = {
       "title": "Quests",
       "complete": "Complete",
       "showOnMap": "Show {name} on the map",
-      "hideFromMap": "Hide {name} from the map"
+      "hideFromMap": "Hide {name} from the map",
+      "unknownQuest": "Unknown quest ({id})"
     },
     "log": {
       "title": "Quest Log",

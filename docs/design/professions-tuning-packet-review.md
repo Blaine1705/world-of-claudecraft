@@ -740,6 +740,12 @@ What each item settled:
    - The opened-mail attachment chip already degrades to raw-id text (no
      icon); the compose-parcel picker skips unknown ids, unreachable
      while unknown bag cells expose no attach action.
+   - An unknown-id stack cannot be shift-click linked into chat from the
+     bags (outside bank mode the unknown cell has no click handler at
+     all): the link needs only the id and a peer's newer bundle could
+     resolve it, but adding a click arm for the one gesture would grow
+     the cell's surface for a window the deploy order already bounds
+     (merge-settlement checkpoint observation).
 3. DONE: DEPLOY.md gains "Client/server deploy order for content
    releases" (Operational notes): server first, clients after; the iOS
    binary is approved and released BEFORE the server moves (R34) and the

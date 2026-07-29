@@ -65,7 +65,6 @@ import { specialRoleColor } from '../sim/discord_roles';
 import { canEquipItem, weaponHand } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
-import { junkSellableSlot } from '../sim/items';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
 import { FOCUS_POINT_BUDGET, isInTownZone } from '../sim/professions/focus';
@@ -369,7 +368,7 @@ import { buildTrainView, isRecipeKnownForViewer } from './hud/vendor/train_view'
 import { renderTrainWindow } from './hud/vendor/train_window';
 import { buildUnbindView } from './hud/vendor/unbind_view';
 import { renderUnbindWindow } from './hud/vendor/unbind_window';
-import { buildVendorView } from './hud/vendor/vendor_view';
+import { buildVendorView, sellJunkButtonState } from './hud/vendor/vendor_view';
 import { renderVendorWindow } from './hud/vendor/vendor_window';
 import {
   formatMoney as formatLocalizedMoney,
@@ -548,7 +547,7 @@ import { type UnitFrameDescriptor, unitFrameView } from './unit_frame';
 import { UnitFramePainter } from './unit_frame_painter';
 import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
-import { BLANK_PIXEL as BLANK_PIXEL_ICON, unknownItemIconHtml } from './unknown_item_icon';
+import { knownItemIconHtml, unknownItemIconHtml } from './unknown_item_icon';
 import { unstuckFeedback } from './unstuck_feedback';
 import { ValeCupBetting } from './vale_cup_betting';
 import { buildVcupBettingView } from './vale_cup_betting_view';
@@ -4506,18 +4505,7 @@ export class Hud {
   }
 
   private itemIcon(item: ItemDef): string {
-    const q = item.quality ?? 'common';
-    // The same canvas swallow unknownItemIconHtml carries: every guarded
-    // surface paints at least one KNOWN item, so without this a
-    // canvas-exhausted host threw on the known arm first and the fallback
-    // family's never-a-throw contract was unreachable in practice.
-    let src = BLANK_PIXEL_ICON;
-    try {
-      src = iconDataUrl('item', item.id);
-    } catch {
-      // Canvas-less host: blank art, never a throw.
-    }
-    return `<img class="item-icon q-${q}" src="${src}" alt="" draggable="false">`;
+    return knownItemIconHtml(item);
   }
 
   moneyHtml(copper: number): string {
@@ -12488,21 +12476,13 @@ export class Hud {
     if (this.openVendorNpcId === null) return;
     const npc = this.sim.entities.get(this.openVendorNpcId);
     if (!npc) return;
-    // The ONE sweep-eligibility rule, shared with the sim's sellAllJunk: the
-    // preview and the sweep must agree on soulbound defs and bound copies or
-    // the button can promise coin the sweep will not pay.
-    const junk = this.sim.inventory.filter((slot) => junkSellableSlot(ITEMS[slot.itemId], slot));
-    // Unknown-id slots (a bundle behind the server, R34): the server resolves
-    // sell_all_junk against ITS OWN item table, so grays this bundle cannot
-    // classify still sell. The button stays live when any such slot exists;
-    // the quoted total keeps counting only what this bundle can price.
-    const hasUnknownSlots = this.sim.inventory.some(
-      (slot) => knownItemDef(ITEMS, slot.itemId) === undefined,
-    );
-    const junkProceeds = junk.reduce(
-      (sum, slot) => sum + ITEMS[slot.itemId]?.sellValue * slot.count,
-      0,
-    );
+    // The Sell Junk decision is ONE pure helper (vendor_view.ts
+    // sellJunkButtonState): eligibility shares the sim's junkSellableSlot so
+    // the quote and the sweep agree on what this bundle can price, and the
+    // unknown-id arm (R34) keeps the button live for grays only the server's
+    // newer table can classify; that helper's doc owns the
+    // enabled-quoting-zero trade the two rules compose into.
+    const sellJunkState = sellJunkButtonState(this.sim.inventory, ITEMS);
     const buyAndRefresh = (buy: () => void) => {
       buy();
       if ($('#bags').style.display !== 'none') this.renderBags();
@@ -12533,10 +12513,7 @@ export class Hud {
           buyAndRefresh(() => this.sim.buyBackItem(itemId, index, instance, craftedRecipeId)),
         onSellJunk: () => buyAndRefresh(() => this.sim.sellAllJunk()),
         onClose: () => this.closeVendor(),
-        sellJunk: {
-          enabled: junk.length > 0 || hasUnknownSlots,
-          proceeds: junkProceeds,
-        },
+        sellJunk: sellJunkState,
       },
     );
   }

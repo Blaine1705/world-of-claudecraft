@@ -255,15 +255,24 @@ describe('teleports cancel a live session', () => {
   it('the rift descend and /dev mountquest sites carry the teardown call (source pins)', () => {
     // The descend loop needs a cleared floor and the mountquest hop a dev
     // flag, so these two sites are pinned at the source beside their
-    // displacement writes rather than driven; the entry/exit and portal
-    // cases above prove the helper itself live.
-    const riftSrc = readFileSync(new URL('../src/sim/rift/runs.ts', import.meta.url), 'utf8');
+    // displacement writes; tests/professions_mount_interlock.test.ts and the
+    // merge-settlement drive also exercise both live (descentOpen forced,
+    // dev sim), so these are the placement half, not the only coverage.
+    // Comment-stripped first: a comment quoting the call syntax inside the
+    // proximity window must not satisfy a CALL pin (the source-scrape trap).
+    const strip = (code: string): string =>
+      code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    const riftSrc = strip(
+      readFileSync(new URL('../src/sim/rift/runs.ts', import.meta.url), 'utf8'),
+    );
     const descendAt = riftSrc.indexOf('for (const id of descenders)');
     expect(descendAt).toBeGreaterThan(-1);
     const cancelAt = riftSrc.indexOf('cancelProfessionSessionOnDisplacement(ctx, e)', descendAt);
     expect(cancelAt).toBeGreaterThan(descendAt);
     expect(cancelAt).toBeLessThan(riftSrc.indexOf('e.pos = ctx.groundPos', descendAt));
-    const devSrc = readFileSync(new URL('../src/sim/dev_commands.ts', import.meta.url), 'utf8');
+    const devSrc = strip(
+      readFileSync(new URL('../src/sim/dev_commands.ts', import.meta.url), 'utf8'),
+    );
     const hopAt = devSrc.indexOf('groundPos(marla.pos.x + 2');
     expect(hopAt).toBeGreaterThan(-1);
     const devCancelAt = devSrc.lastIndexOf(

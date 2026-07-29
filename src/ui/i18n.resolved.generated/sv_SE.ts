@@ -6778,7 +6778,8 @@ export const sv_SE: EnTranslations = {
       "title": "Uppdrag",
       "complete": "Slutfört",
       "showOnMap": "Visa {name} på kartan",
-      "hideFromMap": "Dölj {name} på kartan"
+      "hideFromMap": "Dölj {name} på kartan",
+      "unknownQuest": "Unknown quest ({id})"
     },
     "log": {
       "title": "Uppdragslogg",

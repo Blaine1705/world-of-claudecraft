@@ -585,11 +585,14 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     // Seed 67, re-hunted on this recipe at the v0.32.0 merge (the expansion
     // moved the construction-time draws, so the old 69 window and its spares
     // all collapsed): the single proc draw lands where the 2 percent
-    // signed-reagent term alone decides the outcome. Spares on record: 127,
-    // 133, 337 (50 also works but is the count-1 test's own window below).
-    const SEED = 67;
-    const craftLongsword = (setup: (sim: Sim, pid: number) => void) => {
-      const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: false });
+    // signed-reagent term alone decides the outcome. The spares (127, 133,
+    // 337) RUN below rather than sitting on record, so a draw-order shift
+    // that collapses one window fails loudly instead of quietly narrowing
+    // the pin to a lone seed (50 also works but is the count-1 test's own
+    // window below).
+    const SEEDS = [67, 127, 133, 337];
+    const craftLongsword = (seed: number, setup: (sim: Sim, pid: number) => void) => {
+      const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false });
       const pid = sim.playerId;
       const recipe = recipeById('recipe_ironedge_longsword')!;
       const station = stationsOfType(STATIONS, recipe.stationType as StationType)[0];
@@ -615,21 +618,24 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
         ?.count ?? 0) + 2;
     expect(ORE_COUNT).toBeGreaterThan(2); // the recipe really does declare iron_ore
 
-    const signedFine = craftLongsword((sim, pid) => {
-      reagentsExceptOre(sim, pid);
-      sim.addItemInstance('fine_iron_ore', { signer: 'Gatherer Friend' }, pid, ORE_COUNT);
-    });
-    expect(signedFine.ok).toBe(true);
-    expect(signedFine.masterwork).toBe(true);
+    for (const seed of SEEDS) {
+      const signedFine = craftLongsword(seed, (sim, pid) => {
+        reagentsExceptOre(sim, pid);
+        sim.addItemInstance('fine_iron_ore', { signer: 'Gatherer Friend' }, pid, ORE_COUNT);
+      });
+      expect(signedFine.ok, `seed ${seed}`).toBe(true);
+      expect(signedFine.masterwork, `seed ${seed}`).toBe(true);
 
-    // Control at the SAME seed: identical bag, plain unsigned fine copies. The
-    // draw is the same and must miss, so the proc above is the signed term.
-    const plainFine = craftLongsword((sim, pid) => {
-      reagentsExceptOre(sim, pid);
-      for (let i = 0; i < ORE_COUNT; i++) sim.addItem('fine_iron_ore', 1, pid);
-    });
-    expect(plainFine.ok).toBe(true);
-    expect(plainFine.masterwork).toBeUndefined();
+      // Control at the SAME seed: identical bag, plain unsigned fine copies.
+      // The draw is the same and must miss, so the proc above is the signed
+      // term, at every seed in the window set.
+      const plainFine = craftLongsword(seed, (sim, pid) => {
+        reagentsExceptOre(sim, pid);
+        for (let i = 0; i < ORE_COUNT; i++) sim.addItem('fine_iron_ore', 1, pid);
+      });
+      expect(plainFine.ok, `seed ${seed}`).toBe(true);
+      expect(plainFine.masterwork, `seed ${seed}`).toBeUndefined();
+    }
   });
 
   it('a count-1 signed reagent feeds the proc chance (decoupled from the quantity-discount flag)', () => {

@@ -93,6 +93,9 @@ describe('new release item ids stay out of loot containers (deploy window)', () 
     // entering HEROIC_BOSS_LOOT while stale bundles live is a new
     // deployed-bundle throw arm and must be a deliberate decision recorded
     // here. Release-scoped like the file: delete with it once clients roll.
+    // The snapshot is `vitest -u`-updatable, so the literal reins array
+    // below is the real teeth: NEVER blanket-update this snapshot while the
+    // deploy window is open; a diff here IS the finding.
     const heroicIds = [...new Set(collectItemIds(Object.values(HEROIC_BOSS_LOOT), []))].sort();
     const reins = heroicIds.filter((id) => id.startsWith('reins_'));
     expect(reins).toEqual([

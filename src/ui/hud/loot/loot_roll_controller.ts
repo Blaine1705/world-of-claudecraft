@@ -313,11 +313,14 @@ export class LootRollController {
     for (const row of rows) {
       if (!this.watchTimers.has(row.rollId)) this.watchTimers.set(row.rollId, now);
     }
-    // The trade window's own hard-won shape (R34 review): render inside a
-    // try, commit the elision fingerprint in a FINALLY. Committing before an
-    // unprotected render meant one throw (a canvas-exhausted host is enough)
-    // cleared the container AND froze it cleared for the rest of the roll
-    // window, eating every concurrent need/greed prompt.
+    // The CATCH is the fix (R34 review): an uncontained render throw (a
+    // canvas-exhausted host is enough) used to abort the whole event batch,
+    // eating every concurrent need/greed prompt. The finally commits the
+    // fingerprint on the throwing path too, which is the last-complete-paint
+    // trade, deliberately NOT a retry: identical data never re-renders (so a
+    // persistently-throwing host cannot become a per-frame throw storm), and
+    // the next DATA change re-renders because the committed fingerprint
+    // differs. tests/loot_roll_controller.test.ts pins both halves.
     try {
       this.render();
     } catch (err) {

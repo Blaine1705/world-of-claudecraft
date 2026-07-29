@@ -30,6 +30,7 @@ import {
   t,
   tOptional,
 } from './i18n';
+import { ownEntry } from './known_item';
 
 export type EntityTranslationGroup = 'classAbility' | 'item' | 'itemSet' | 'world';
 export type EntityTranslationKind =
@@ -242,24 +243,31 @@ function canonicalEntityText(request: EntityTranslationRequest): string {
     }
     case 'item':
       return ITEMS[request.id]?.name ?? request.id;
+    // Every Record-indexed arm below reads through ownEntry (known_item.ts):
+    // these ids can arrive from the wire (the quest log, chat links, snapshot
+    // template ids), and on a prototype-bearing Record a bare truthiness test
+    // sends 'constructor' down the known arm, where the Function's missing
+    // fields render as "Object"/undefined or throw (set.bonuses.find). The
+    // raw-id fallback is the R34 contract for every unknown id, prototype
+    // keys included.
     case 'itemSet': {
-      const set = ITEM_SETS[request.id];
+      const set = ownEntry(ITEM_SETS, request.id);
       if (!set) return request.id;
       if (request.field === 'name') return set.name;
       const pieces = request.field === 'bonus2' ? 2 : request.field === 'bonus3' ? 3 : 4;
       return set.bonuses.find((b) => b.pieces === pieces)?.text ?? request.id;
     }
     case 'mob':
-      return MOBS[request.id]?.name ?? request.id;
+      return ownEntry(MOBS, request.id)?.name ?? request.id;
     case 'npc': {
-      const npc = NPCS[request.id];
+      const npc = ownEntry(NPCS, request.id);
       if (!npc) return request.id;
       if (request.field === 'title') return npc.title;
       if (request.field === 'greeting') return npc.greeting;
       return npc.name;
     }
     case 'quest': {
-      const quest = QUESTS[request.id];
+      const quest = ownEntry(QUESTS, request.id);
       if (!quest) return request.id;
       if (request.field === 'text') return quest.text;
       if (request.field === 'completion') return quest.completionText;
@@ -267,7 +275,7 @@ function canonicalEntityText(request: EntityTranslationRequest): string {
     }
     case 'questObjective':
       return (
-        QUESTS[request.questId]?.objectives[request.objectiveIndex]?.label ??
+        ownEntry(QUESTS, request.questId)?.objectives[request.objectiveIndex]?.label ??
         `${request.questId}.${request.objectiveIndex}`
       );
     case 'zone': {

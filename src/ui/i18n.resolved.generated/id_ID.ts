@@ -6778,7 +6778,8 @@ export const id_ID: EnTranslations = {
       "title": "Misi",
       "complete": "Selesai",
       "showOnMap": "Tampilkan {name} di peta",
-      "hideFromMap": "Sembunyikan {name} dari peta"
+      "hideFromMap": "Sembunyikan {name} dari peta",
+      "unknownQuest": "Unknown quest ({id})"
     },
     "log": {
       "title": "Catatan Misi",

@@ -10,8 +10,10 @@
 // DOM-free and i18n-free so tests/vendor_view.test.ts can drive it directly.
 
 import { resolveVendorRowGate, type VendorRowGate } from '../../../sim/content/vendor_row_gates';
+import { junkSellableSlot } from '../../../sim/items';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import { vendorStackSize } from '../../../sim/vendor_stack';
+import { knownItemDef } from '../../known_item';
 
 export interface VendorGoodsRow {
   itemId: string;
@@ -138,5 +140,32 @@ export function buildVendorView(
     buyback,
     honorBalance: Math.max(0, Math.floor(balances.honor)),
     hasHonorGoods: goods.some((row) => row.price.honor > 0),
+  };
+}
+
+/**
+ * The Sell Junk button's enablement and quote as ONE pure decision. The two
+ * halves deliberately diverge on unknown-id slots (a bundle behind the
+ * server, R34): the server resolves sell_all_junk against ITS OWN table, so
+ * grays this bundle cannot classify still sell, and the button stays live
+ * whenever such a slot exists, while the quoted total keeps counting only
+ * what this bundle can price. A player holding ONLY unknown non-gray items
+ * therefore sees a live button quoting zero that sells nothing, the accepted
+ * cosmetic cost of never stranding real junk unsellable on a stale bundle.
+ */
+export function sellJunkButtonState(
+  inventory: readonly InvSlot[],
+  items: Readonly<Record<string, ItemDef>>,
+): { enabled: boolean; proceeds: number } {
+  const junk = inventory.filter((slot) => junkSellableSlot(items[slot.itemId], slot));
+  const hasUnknownSlots = inventory.some((slot) => knownItemDef(items, slot.itemId) === undefined);
+  return {
+    enabled: junk.length > 0 || hasUnknownSlots,
+    // junkSellableSlot only passes defs that carry a sell value, so the ?? 0
+    // is unreachable belt-and-braces, never a quote change.
+    proceeds: junk.reduce(
+      (sum, slot) => sum + (items[slot.itemId]?.sellValue ?? 0) * slot.count,
+      0,
+    ),
   };
 }

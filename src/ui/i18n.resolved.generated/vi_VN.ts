@@ -6778,7 +6778,8 @@ export const vi_VN: EnTranslations = {
       "title": "Nhiệm Vụ",
       "complete": "Hoàn Thành",
       "showOnMap": "Hiện {name} trên bản đồ",
-      "hideFromMap": "Ẩn {name} khỏi bản đồ"
+      "hideFromMap": "Ẩn {name} khỏi bản đồ",
+      "unknownQuest": "Unknown quest ({id})"
     },
     "log": {
       "title": "Nhật Ký Nhiệm Vụ",
