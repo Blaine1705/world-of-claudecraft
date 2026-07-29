@@ -624,8 +624,12 @@ must be re-derived if either number is ever tuned on its own.
   release-tier fill budget, and the `toolEffectSlots` rollback across the
   acquisition-craft boundary (DESTRUCTIVE of real player value now: the
   slot's charm cost, its recharges, and its `craftedBy` provenance all
-  erase on the first autosave under a pre-craft binary; see "Rollback
-  erases newer fields" in docs/design/professions-tuning-packet.md).
+  erase on the first autosave under a binary that predates the
+  `toolEffectSlots` field itself, release/v0.32.0 and earlier, because
+  such a binary rebuilds the character state without the key; a
+  mid-packet binary that knows the field preserves it losslessly. See
+  "Rollback erases newer fields" in
+  docs/design/professions-tuning-packet.md).
 - Drop the one-release `AURA_NAME_KEY` legacy alias for the pre-rename
   Venomfire aura string after v0.29.0 ships (mixed-fleet deploy window
   only; `src/ui/sim_i18n.ts`).

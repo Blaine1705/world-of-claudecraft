@@ -274,6 +274,44 @@ veto-able by the maintainer, the R32 pattern):
   the earned maximum a permanent price floor, a stronger reading of "never
   a permanent ceiling" than R30 wrote; the alternative (accept the
   arbitrage) was not taken because it guts the ruling's stated sink.
+  QA AMENDMENTS (phase 12 QA, same veto-ability): (1) the use-time arm
+  reads BOTH ends of the cast, a start capture plus the completion bags,
+  because trade has no casting gate and a mid-cast handoff could
+  otherwise fire the bonus with the pick already gone ("node access
+  forces the pick to be CARRIED" is true only at cast start); the QA
+  round's economics analysis found the dodge also forfeits the
+  completion-read fine grade, so its payoff was marginal, and the
+  capture closes the class structurally (trade, bank, or mail, solo or
+  two-client) rather than leaving the premise false. (2) The ACCEPTED
+  transient-courier residual covers the HARVEST-TIME sibling too: a
+  courier's better pick in bags while the bonus fires latches the
+  ceiling on that harvest, same acceptance grounds (no gain for anyone,
+  self-inflicted, escapable by the re-slot toll, preview is phase 14).
+  (3) Confirmed as the ruling's letter: the ratchet fires on every
+  APPLIED use, mattered or not (an Artisan's Eye that changed nothing
+  still latches), the same family as the courier residual.
+- **R48. The no_gain provenance arm is DIRECTIONAL, and the viewer's own
+  provenance crosses the wire as a boolean.** QA-round-decided, veto-able
+  (the R45 pattern). Recharging is owner-performed (R46), so
+  `isOriginalCrafter` can only ever match the OWNER: a craftedBy rewrite
+  is economically real only TOWARD the slotter's own signature. The
+  security pass found the symmetric compare let a double-click whose
+  first click consumed the last self-signed copy burn a FOREIGN copy
+  next and silently retire the owner's discount; the arm now lands a
+  full-slot re-slot on a provenance change only when the consumed copy's
+  signer IS the slotter and the slot's recorded crafter is not
+  (downgrades and laterals refuse as no_gain, including the
+  formerly-accepted unsigned-copy provenance clear). Because the
+  directional compare only ever tests craftedBy against the viewer's own
+  name, the window's affordance achieves EXACT resolver parity from a
+  privacy-preserving `selfCrafted` boolean on the tslot projection (the
+  name itself still never crosses; the identity-free pin stands), which
+  closed the phantom-button drift three review streams found
+  independently. The window's focus fallback also stops re-parking on a
+  DIFFERENT action button (every row action spends; a held Enter's
+  repeats once retargeted from a vanished Recharge onto Slot and burned
+  a charm): the ladder is now the same control, then Close, with a
+  sent-guard on each painted button.
 
 ---
 
