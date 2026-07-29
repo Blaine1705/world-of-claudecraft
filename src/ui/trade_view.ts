@@ -1,6 +1,6 @@
-// Pure view-core for the Trade window (#trade-window). Currently owns only
-// the offer stepper's ceiling: how many of one item id the player may stage
-// into a trade offer.
+// Pure view-core for the Trade window (#trade-window). Owns the offer
+// stepper's ceiling (how many of one item id the player may stage into a
+// trade offer) and the per-row item resolution the offer columns render.
 //
 // addItemToTrade (hud.ts) used to read the FIRST matching bag slot's count
 // (Array.find) as that ceiling, so a fungible item split across multiple bag
@@ -14,10 +14,40 @@
 // tradeOfferCeiling gives the trade window the same total.
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
-import type { InvSlot } from '../sim/types';
+import type { InvSlot, ItemDef } from '../sim/types';
+import { itemDisplayName } from './entity_i18n';
+import { formatNumber, t } from './i18n';
 
 /** Total held count of `itemId` across every bag slot: the trade offer
  *  stepper's ceiling. */
 export function tradeOfferCeiling(inventory: InvSlot[], itemId: string): number {
   return inventory.filter((s) => s.itemId === itemId).reduce((n, s) => n + s.count, 0);
+}
+
+/** One offer row, resolved for rendering. `item` is undefined for an id this
+ *  bundle cannot resolve; the label then shows the raw id and the painter must
+ *  swap its icon for the unknown-item fallback rather than dereferencing. */
+export interface TradeItemRowModel {
+  item: ItemDef | undefined;
+  label: string;
+}
+
+/** Resolve one offer slot into its row model (stale-client guard, R34). The
+ *  OTHER side's offer is server truth: it can carry item ids minted by content
+ *  this bundle predates, and the shipped failure shape was an itemIcon throw
+ *  on exactly that slot, freezing the whole offer display. An unknown id keeps
+ *  its raw id as the label, so the row still names what is on the table. */
+export function buildTradeItemRow(
+  slot: InvSlot,
+  items: Readonly<Record<string, ItemDef>>,
+): TradeItemRowModel {
+  const item: ItemDef | undefined = items[slot.itemId];
+  const name = item ? itemDisplayName(item) : slot.itemId;
+  const label =
+    slot.count > 1
+      ? `${name} ${t('itemUi.bags.stackCount', {
+          count: formatNumber(slot.count, { maximumFractionDigits: 0 }),
+        })}`
+      : name;
+  return { item, label };
 }

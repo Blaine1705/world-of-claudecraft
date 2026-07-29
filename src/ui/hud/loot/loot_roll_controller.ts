@@ -4,8 +4,9 @@ import type { IWorld } from '../../../world_api';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
-import { iconDataUrl, QUALITY_COLOR } from '../../icons';
+import { QUALITY_COLOR } from '../../icons';
 import type { PainterHostWriters } from '../../painter_host';
+import { unknownItemIconHtml } from '../../unknown_item_icon';
 import { reconcileLootRolls } from './loot_roll_reconcile';
 import {
   computeLootRollStatusRows,
@@ -432,7 +433,7 @@ export class LootRollController {
       this.deps.writers.setStyleProp(row, '--loot-roll-frac', '1.000');
       row.innerHTML = `
         <div class="loot-roll-item">
-          ${item ? this.deps.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', event.itemId)}" alt="" draggable="false">`}
+          ${item ? this.deps.itemIcon(item) : unknownItemIconHtml(event.itemId, quality)}
           <div class="loot-roll-copy">
             <div class="loot-roll-title">${esc(t('itemUi.lootRoll.title'))}</div>
             <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
@@ -469,7 +470,7 @@ export class LootRollController {
       this.deps.writers.setStyleProp(row, '--loot-roll-frac', '1.000');
       row.innerHTML = `
         <div class="loot-roll-item">
-          ${item ? this.deps.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', status.itemId)}" alt="" draggable="false">`}
+          ${item ? this.deps.itemIcon(item) : unknownItemIconHtml(status.itemId, quality)}
           <div class="loot-roll-copy">
             <div class="loot-roll-title">${esc(t('itemUi.lootRoll.title'))}</div>
             <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
@@ -507,7 +508,7 @@ export class LootRollController {
       .join('');
     row.innerHTML = `
       <div class="loot-roll-item">
-        ${item ? this.deps.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', event.itemId)}" alt="" draggable="false">`}
+        ${item ? this.deps.itemIcon(item) : unknownItemIconHtml(event.itemId, quality)}
         <div class="loot-roll-copy">
           <div class="loot-roll-title">${esc(t('hudChrome.masterLoot.assignPrompt', { item: itemName }))}</div>
           <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>

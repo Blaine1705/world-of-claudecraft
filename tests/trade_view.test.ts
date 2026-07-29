@@ -5,9 +5,12 @@
 // in 3 slots: 20 + 20 + 5) must offer up to the TOTAL held, not just
 // whichever single slot the old Array.find()-based lookup happened to hit.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import type { InvSlot } from '../src/sim/types';
-import { tradeOfferCeiling } from '../src/ui/trade_view';
+import { itemDisplayName } from '../src/ui/entity_i18n';
+import { buildTradeItemRow, tradeOfferCeiling } from '../src/ui/trade_view';
 
 describe('tradeOfferCeiling (trade offer stepper cap)', () => {
   it('sums an item split across multiple bag slots instead of capping at one slot', () => {
@@ -39,5 +42,72 @@ describe('tradeOfferCeiling (trade offer stepper cap)', () => {
   it('returns 0 when the item is not held at all', () => {
     const inventory: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 20 }];
     expect(tradeOfferCeiling(inventory, 'mat_wool_cloth')).toBe(0);
+  });
+});
+
+describe('buildTradeItemRow (stale-client guard, R34)', () => {
+  // A real content id, resolved from the table rather than hardcoded, so a
+  // content rename cannot leave this file pinning a phantom.
+  const KNOWN_ID = Object.keys(ITEMS)[0];
+
+  it('resolves a known id to its def and localized name', () => {
+    const row = buildTradeItemRow({ itemId: KNOWN_ID, count: 1 }, ITEMS);
+    expect(row.item).toBe(ITEMS[KNOWN_ID]);
+    expect(row.label).toBe(itemDisplayName(ITEMS[KNOWN_ID]));
+  });
+
+  it('appends the stack count past one unit', () => {
+    const row = buildTradeItemRow({ itemId: KNOWN_ID, count: 3 }, ITEMS);
+    expect(row.label).toBe(`${itemDisplayName(ITEMS[KNOWN_ID])} x3`);
+  });
+
+  it('falls back to the raw id for an id the bundle cannot resolve, never a throw', () => {
+    // The other side's offer is server truth: it can carry ids minted by
+    // content this bundle predates. The shipped failure shape dereferenced
+    // the missing def and froze the offer display.
+    const row = buildTradeItemRow({ itemId: 'no_such_item_id', count: 1 }, ITEMS);
+    expect(row.item).toBeUndefined();
+    expect(row.label).toBe('no_such_item_id');
+  });
+
+  it('keeps the stack count on an unknown-id row', () => {
+    const row = buildTradeItemRow({ itemId: 'no_such_item_id', count: 5 }, ITEMS);
+    expect(row.item).toBeUndefined();
+    expect(row.label).toBe('no_such_item_id x5');
+  });
+});
+
+describe('trade window painter wiring (source pins, hud.ts updateTradeWindow)', () => {
+  // The pure core decides; these pins hold the painter to consuming it. The
+  // method body is comment-stripped first so a comment naming the assignment
+  // cannot satisfy an ordering pin.
+  const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+  const start = hud.indexOf('private updateTradeWindow(');
+  const end = hud.indexOf('attachOptions(hooks: OptionsHooks)');
+  const body = hud
+    .slice(start, end)
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\/\/[^\n]*/g, '');
+
+  it('brackets the method slice it pins', () => {
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+  });
+
+  it('resolves offer rows through buildTradeItemRow and guards the icon', () => {
+    expect(body).toContain('buildTradeItemRow(s, ITEMS)');
+    expect(body).toContain('item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)');
+  });
+
+  it('commits the repaint signature only AFTER the render', () => {
+    // The shipped failure shape set lastTradeSig before painting, so a throw
+    // mid-render froze the stale offer for the rest of the trade: every later
+    // frame compared equal and returned early.
+    const compare = body.indexOf('if (sig === this.lastTradeSig) return;');
+    const render = body.indexOf('el.innerHTML');
+    const commit = body.indexOf('this.lastTradeSig = sig;');
+    expect(compare).toBeGreaterThan(-1);
+    expect(render).toBeGreaterThan(compare);
+    expect(commit).toBeGreaterThan(render);
   });
 });

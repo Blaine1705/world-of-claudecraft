@@ -509,7 +509,7 @@ import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
-import { tradeOfferCeiling } from './trade_view';
+import { buildTradeItemRow, tradeOfferCeiling } from './trade_view';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
@@ -517,6 +517,7 @@ import { type UnitFrameDescriptor, unitFrameView } from './unit_frame';
 import { UnitFramePainter } from './unit_frame_painter';
 import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
+import { unknownItemIconHtml } from './unknown_item_icon';
 import { ValeCupBetting } from './vale_cup_betting';
 import { buildVcupBettingView } from './vale_cup_betting_view';
 import { ValeCupBriefing } from './vale_cup_briefing';
@@ -14243,12 +14244,15 @@ export class Hud {
       this.stagedTrade,
     ]);
     if (sig === this.lastTradeSig) return;
-    this.lastTradeSig = sig;
 
     const itemRow = (s: InvSlot, mine: boolean) => {
-      const item = ITEMS[s.itemId];
-      const label = `${item ? itemDisplayName(item) : s.itemId}${s.count > 1 ? ` x${formatNumber(s.count, { maximumFractionDigits: 0 })}` : ''}`;
-      const inner = `${this.itemIcon(item)}<span>${esc(label)}</span>`;
+      // Stale-client guard (R34): the other side's offer is server truth and
+      // can carry an id this bundle predates; buildTradeItemRow keeps the raw
+      // id as the label and the icon falls back instead of dereferencing the
+      // missing def (the shipped failure shape threw here and froze the offer
+      // display behind the already-set repaint signature).
+      const { item, label } = buildTradeItemRow(s, ITEMS);
+      const inner = `${item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)}<span>${esc(label)}</span>`;
       return mine
         ? `<button type="button" class="trade-item mine" data-item="${esc(s.itemId)}">${inner}</button>`
         : `<div class="trade-item">${inner}</div>`;
@@ -14310,6 +14314,11 @@ export class Hud {
       input?.addEventListener('change', syncTradeMoney);
     });
     el.style.display = 'block';
+    // The repaint signature commits only after a complete paint: setting it
+    // before the render (the old order) meant a throw mid-render froze the
+    // stale offer on screen for the rest of the trade, because every later
+    // frame compared equal and returned early.
+    this.lastTradeSig = sig;
   }
 
   // -------------------------------------------------------------------------
