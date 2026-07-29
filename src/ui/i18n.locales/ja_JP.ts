@@ -9043,7 +9043,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'より希少なマウントはヒロイックダンジョンのボスからドロップするか、リフトの完了で入手できます。',
   'hudChrome.mounts.clickManage': 'クリックしてマウントを選択',
   'hudChrome.mountTraining.mountPrompt': '{key} キーを押して訓練用ヴァロースティードに騎乗する。',
-  'hudChrome.mountTraining.ownedMountPrompt': '手綱はバッグの中にあります。使用すると騎乗できます。',
+  'hudChrome.mountTraining.ownedMountPrompt':
+    '手綱はバッグの中にあります。使用すると騎乗できます。',
   'hudChrome.mounts.useToRide': '使用してこの騎乗生物を呼び出します。',
   'hudChrome.mountTraining.ridePrompt':
     '光る目印をたどってスタートラインへ向かい、「レース開始」を押そう。',
