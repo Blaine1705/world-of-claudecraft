@@ -986,8 +986,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Hvízdnutý signál povzbudí tvou skupinu: rychlost útoku, sesílání a kanálování se zvýší o 10% na 10 s. Spojenci nedávno zasažení skupinovým zrychlením jsou příliš vyčerpaní, aby z toho těžili. (lotrovský talent)',
   'entities.abilities.venomrend.name': 'Jedová trhlina',
   'entities.abilities.veilstrike.name': 'Úder závoje',
-  'entities.abilities.body_blow.name': 'Úder na tělo',
-  'entities.abilities.knockout_blow.name': 'Nokautující úder',
   'entities.abilities.venom_dart.name': 'Jedová šipka',
   'entities.abilities.smoke_screen.name': 'Kouřová clona',
   'entities.abilities.smoke_screen.description':

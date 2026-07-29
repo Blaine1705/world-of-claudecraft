@@ -1116,8 +1116,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Gwizdnięty sygnał zagrzewa twoją grupę: szybkość ataku, rzucania zaklęć i kanałowania zwiększona o 10% na 10 sek. Sojusznicy niedawno objęci grupowym przyspieszeniem są zbyt wyczerpani, by skorzystać. (talent Łotrzyka)',
   'entities.abilities.venomrend.name': 'Jadowite rozdarcie',
   'entities.abilities.veilstrike.name': 'Cios zasłony',
-  'entities.abilities.body_blow.name': 'Cios w korpus',
-  'entities.abilities.knockout_blow.name': 'Cios nokautujący',
   'entities.abilities.venom_dart.name': 'Jadowita strzałka',
   'entities.abilities.smoke_screen.name': 'Zasłona Dymna',
   'entities.abilities.smoke_screen.description':

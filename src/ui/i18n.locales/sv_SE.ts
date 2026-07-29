@@ -1021,8 +1021,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'En visslad signal sporrar din grupp: attack-, besvärjelse- och kanaliseringstakt ökad med 10% i 10 sek. Allierade som nyligen fått en grupphastighetsvåg är för utmattade för att gynnas. (skurktalang)',
   'entities.abilities.venomrend.name': 'Giftrivning',
   'entities.abilities.veilstrike.name': 'Slöjhugg',
-  'entities.abilities.body_blow.name': 'Kroppsslag',
-  'entities.abilities.knockout_blow.name': 'Knockoutslag',
   'entities.abilities.venom_dart.name': 'Giftpil',
   'entities.abilities.smoke_screen.name': 'Rökridå',
   'entities.abilities.smoke_screen.description':

@@ -1080,8 +1080,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ein gepfiffenes Signal spornt eure Gruppe an: Angriffs-, Zauber- und Kanalisierungstempo für 10 Sek. um 10% erhöht. Verbündete, die kürzlich einen Gruppentempo-Schub erhielten, sind zu erschöpft, um zu profitieren. (Schurkentalent)',
   'entities.abilities.venomrend.name': 'Giftriss',
   'entities.abilities.veilstrike.name': 'Schleierstoß',
-  'entities.abilities.body_blow.name': 'Körpertreffer',
-  'entities.abilities.knockout_blow.name': 'K.o.-Schlag',
   'entities.abilities.venom_dart.name': 'Giftpfeil',
   'entities.abilities.smoke_screen.name': 'Rauchvorhang',
   'entities.abilities.smoke_screen.description':

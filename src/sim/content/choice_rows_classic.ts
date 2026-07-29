@@ -960,7 +960,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
           // Wicked Slash is Thuggery's builder (Knifework thrusts, Skulduggery
           // ribbons), so this is the combat-flavored pick; tuned so it beats
           // the generic poison economy for the spec that actually slashes.
-          // Body Blow counts: it IS Wicked Slash while the Redline window
+          // Haymaker counts: it IS Wicked Slash while the Redline window
           // runs, and the window starving itself would kill the sprint.
           description: 'Every 3rd Wicked Slash restores 50 energy.',
           icon: 'sinister_strike',

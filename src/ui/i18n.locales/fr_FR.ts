@@ -1145,8 +1145,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un signal sifflé galvanise votre groupe : vitesse d’attaque, d’incantation et de canalisation augmentée de 10% pendant 10 s. Les alliés récemment touchés par une accélération de groupe sont trop épuisés pour en profiter. (talent de Voleur)',
   'entities.abilities.venomrend.name': 'Déchirure venimeuse',
   'entities.abilities.veilstrike.name': 'Frappe du voile',
-  'entities.abilities.body_blow.name': 'Coup au corps',
-  'entities.abilities.knockout_blow.name': 'Coup de K.-O.',
   'entities.abilities.venom_dart.name': 'Dard venimeux',
   'entities.abilities.smoke_screen.name': 'Écran de fumée',
   'entities.abilities.smoke_screen.description':

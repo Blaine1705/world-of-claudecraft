@@ -201,7 +201,7 @@ const ROGUE_SPECS: SpecDef[] = [
     'Thuggery',
     'dps',
     '/',
-    'A stand-up brawler. A 4+ combo Dirt Nap starts Redline for 8 sec: your strikes become Body Blows that build it up, and Knockout Blow spends it all before the timer ends.',
+    'A stand-up brawler. A 4+ combo Dirt Nap starts Redline for 8 sec: your strikes become Haymakers that build it up, and Lights Out spends it all before the timer ends.',
     'blade_flurry',
     // Balance pass (maintainer sheet): the only mastery in the game with a
     // penalty loses it.

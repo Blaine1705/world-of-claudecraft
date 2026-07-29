@@ -308,7 +308,7 @@ export const TALENT_ABILITIES_V2_A = {
   },
   body_blow: {
     id: 'body_blow',
-    name: 'Body Blow',
+    name: 'Haymaker',
     class: 'rogue',
     learnLevel: 10,
     cost: 35,
@@ -327,7 +327,7 @@ export const TALENT_ABILITIES_V2_A = {
   },
   knockout_blow: {
     id: 'knockout_blow',
-    name: 'Knockout Blow',
+    name: 'Lights Out',
     class: 'rogue',
     learnLevel: 10,
     cost: 30,

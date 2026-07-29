@@ -171,8 +171,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.silence.name': 'Безмолвие',
   'entities.abilities.venomrend.name': 'Ядовитый разрыв',
   'entities.abilities.veilstrike.name': 'Удар завесы',
-  'entities.abilities.body_blow.name': 'Удар по корпусу',
-  'entities.abilities.knockout_blow.name': 'Нокаутирующий удар',
   'entities.abilities.venom_dart.name': 'Ядовитый дротик',
   'entities.abilities.smoke_screen.name': 'Дымовая завеса',
   'entities.abilities.smoke_screen.description':

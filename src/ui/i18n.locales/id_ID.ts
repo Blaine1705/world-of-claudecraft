@@ -988,8 +988,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Sinyal siulan memacu kelompokmu: kecepatan serangan, rapalan, dan kanal meningkat 10% selama 10 detik. Sekutu yang baru saja terkena lonjakan percepatan kelompok terlalu lelah untuk mendapat manfaat. (talenta Rogue)',
   'entities.abilities.venomrend.name': 'Koyak Bisa',
   'entities.abilities.veilstrike.name': 'Hantaman Tabir',
-  'entities.abilities.body_blow.name': 'Pukulan Tubuh',
-  'entities.abilities.knockout_blow.name': 'Pukulan Nokaut',
   'entities.abilities.venom_dart.name': 'Damak Bisa',
   'entities.abilities.smoke_screen.name': 'Tabir Asap',
   'entities.abilities.smoke_screen.description':

@@ -651,7 +651,7 @@ export function runEffects(
           eff.perCombo * spentCombo +
           ctx.rng.range(0, eff.variance) +
           ctx.effectiveAttackPower(p) / 14;
-        // Knockout Blow (rogue combat engine): cash out the Redline window,
+        // Lights Out (rogue combat engine): cash out the Redline window,
         // hitting harder per pip; consuming the window here ENDS the run.
         dmg *= knockoutRedlineMult(ctx, p, ability.id);
         dmg *= druidApexPayoffMult(ctx, p, ability.id);

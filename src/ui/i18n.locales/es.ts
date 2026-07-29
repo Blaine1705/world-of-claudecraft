@@ -972,8 +972,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Una señal silbada espolea a tu grupo: la velocidad de ataque, lanzamiento y canalización aumenta un 10% durante 10 s. Los aliados afectados hace poco por un impulso de celeridad de grupo están demasiado exhaustos para beneficiarse. (talento de Pícaro)',
   'entities.abilities.venomrend.name': 'Desgarro venenoso',
   'entities.abilities.veilstrike.name': 'Golpe del velo',
-  'entities.abilities.body_blow.name': 'Golpe al cuerpo',
-  'entities.abilities.knockout_blow.name': 'Golpe de nocaut',
   'entities.abilities.venom_dart.name': 'Dardo venenoso',
   'entities.abilities.smoke_screen.name': 'Cortina de Humo',
   'entities.abilities.smoke_screen.description':

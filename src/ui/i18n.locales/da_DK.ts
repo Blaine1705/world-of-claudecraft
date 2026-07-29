@@ -1023,8 +1023,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Et fløjtet signal ansporer din gruppe: angrebs-, besværgelses- og kanaliseringshastighed øget med 10% i 10 sek. Allierede, der for nylig fik et gruppehast-udbrud, er for udmattede til at få gavn. (slyngeltalent)',
   'entities.abilities.venomrend.name': 'Giftflænge',
   'entities.abilities.veilstrike.name': 'Slørstød',
-  'entities.abilities.body_blow.name': 'Kropsstød',
-  'entities.abilities.knockout_blow.name': 'Knockoutstød',
   'entities.abilities.venom_dart.name': 'Giftpil',
   'entities.abilities.smoke_screen.name': 'Røgslør',
   'entities.abilities.smoke_screen.description':

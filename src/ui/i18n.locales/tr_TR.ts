@@ -976,8 +976,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Islıkla verilen işaret grubu coşturur: saldırı, büyü ve kanal hızı 10 sn boyunca %10 artar. Yakın zamanda grup hızlandırması alan müttefikler yararlanamayacak kadar bitkindir. (Haydut yeteneği)',
   'entities.abilities.venomrend.name': 'Zehir Yarığı',
   'entities.abilities.veilstrike.name': 'Perde Vuruşu',
-  'entities.abilities.body_blow.name': 'Gövde Darbesi',
-  'entities.abilities.knockout_blow.name': 'Nakavt Darbesi',
   'entities.abilities.venom_dart.name': 'Zehirli Dart',
   'entities.abilities.smoke_screen.name': 'Duman Perdesi',
   'entities.abilities.smoke_screen.description':

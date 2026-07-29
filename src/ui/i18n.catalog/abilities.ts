@@ -937,7 +937,7 @@ const classAbilityNamesEn = {
         {
           assassination: 'Adds 1 Venom Ritual (max 6).',
           combat:
-            'While Redline is active, this button becomes Body Blow: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4).',
+            'While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4).',
         },
       ],
       [
@@ -948,7 +948,7 @@ const classAbilityNamesEn = {
           assassination:
             'At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.',
           combat:
-            'Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Body Blow (130% weapon damage plus 10, awards 2 combo points, adds 1 Redline) and this button becomes Knockout Blow (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends.',
+            'Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends.',
         },
       ],
       [
@@ -2195,12 +2195,12 @@ const classAbilityNamesEn = {
       ],
       [
         'body_blow',
-        'Body Blow',
+        'Haymaker',
         'A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)',
       ],
       [
         'knockout_blow',
-        'Knockout Blow',
+        'Lights Out',
         'Ends Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder for each Redline you built, and recover 25 energy. Use it before Redline runs out or the knockout is lost. (Thuggery)',
       ],
       [

@@ -2584,7 +2584,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     awardsCombo: 1,
     // Thuggery engine (combat/rogue_engines.ts): while the Redline window
-    // runs, the builder button is Body Blow, the pip-deepening heavy hit.
+    // runs, the builder button is Haymaker, the pip-deepening heavy hit.
     actionReplacement: { abilityId: 'body_blow', auraKind: 'redline', minStacks: 1 },
     effects: [{ type: 'weaponStrike', bonus: 3 }],
     ranks: [
@@ -2596,7 +2596,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specNotes: {
       assassination: 'Adds 1 Venom Ritual (max 6).',
       combat:
-        'While Redline is active, this button becomes Body Blow: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4).',
+        'While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4).',
     },
   },
   eviscerate: {
@@ -2615,7 +2615,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // the button transforms into Venomrend, the detonation finisher (six
     // against a five-thrust cycle alternates Dirt Nap and Venomrend).
     // Thuggery engine: while the Redline window runs the same button is
-    // Knockout Blow, the cash-out that ends the run. The aura kinds are
+    // Lights Out, the cash-out that ends the run. The aura kinds are
     // spec-gated, so at most one rule can match.
     actionReplacement: [
       { abilityId: 'venomrend', auraKind: 'venom_ritual', minStacks: 6 },
@@ -2641,7 +2641,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       assassination:
         'At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.',
       combat:
-        'Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Body Blow (130% weapon damage plus 10, awards 2 combo points, adds 1 Redline) and this button becomes Knockout Blow (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends.',
+        'Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends.',
     },
   },
   backstab: {

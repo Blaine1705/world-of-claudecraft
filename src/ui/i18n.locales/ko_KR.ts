@@ -175,8 +175,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.silence.description': '대상을 4초 동안 침묵시킵니다. (사제 특성)',
   'entities.abilities.venomrend.name': '맹독 찢기',
   'entities.abilities.veilstrike.name': '장막 일격',
-  'entities.abilities.body_blow.name': '보디 블로',
-  'entities.abilities.knockout_blow.name': '녹아웃 블로',
   'entities.abilities.venom_dart.name': '맹독 다트',
   'entities.abilities.smoke_screen.name': '연막',
   'entities.abilities.smoke_screen.description':

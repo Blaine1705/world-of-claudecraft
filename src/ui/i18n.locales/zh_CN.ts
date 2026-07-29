@@ -174,8 +174,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.silence.name': '沉默',
   'entities.abilities.venomrend.name': '蚀毒撕裂',
   'entities.abilities.veilstrike.name': '罩影突袭',
-  'entities.abilities.body_blow.name': '击体重拳',
-  'entities.abilities.knockout_blow.name': '击倒重拳',
   'entities.abilities.venom_dart.name': '毒镖',
   'entities.abilities.smoke_screen.name': '烟幕',
   'entities.abilities.smoke_screen.description': '遁入烟雾之中，使你的躲闪几率提高30%，持续8秒。',

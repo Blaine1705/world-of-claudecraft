@@ -172,8 +172,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.silence.name': '沈黙',
   'entities.abilities.venomrend.name': '毒裂き',
   'entities.abilities.veilstrike.name': 'ヴェールストライク',
-  'entities.abilities.body_blow.name': 'ボディブロー',
-  'entities.abilities.knockout_blow.name': 'ノックアウトブロー',
   'entities.abilities.venom_dart.name': '毒針',
   'entities.abilities.smoke_screen.name': 'スモークスクリーン',
   'entities.abilities.smoke_screen.description': '煙幕に紛れ、8秒間、回避率を30%上昇させる。',

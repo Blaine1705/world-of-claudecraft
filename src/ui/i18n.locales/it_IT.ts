@@ -1095,8 +1095,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un fischio d’intesa sprona il tuo gruppo: velocità di attacco, lancio e canalizzazione aumentata del 10% per 10 s. Gli alleati colpiti di recente da uno slancio di celerità di gruppo sono troppo esausti per beneficiarne. (talento del Ladro)',
   'entities.abilities.venomrend.name': 'Squarcio velenoso',
   'entities.abilities.veilstrike.name': 'Colpo del velo',
-  'entities.abilities.body_blow.name': 'Colpo al corpo',
-  'entities.abilities.knockout_blow.name': 'Colpo da knockout',
   'entities.abilities.venom_dart.name': 'Dardo velenoso',
   'entities.abilities.smoke_screen.name': 'Cortina Fumogena',
   'entities.abilities.smoke_screen.description':

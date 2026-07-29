@@ -1083,8 +1083,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um assobio de sinal incita seu grupo: velocidade de ataque, lançamento e canalização aumentada em 10% por 10 s. Aliados afetados há pouco por um surto de aceleração de grupo estão exaustos demais para se beneficiar. (talento de Ladino)',
   'entities.abilities.venomrend.name': 'Dilaceração Venenosa',
   'entities.abilities.veilstrike.name': 'Golpe do Véu',
-  'entities.abilities.body_blow.name': 'Golpe no Corpo',
-  'entities.abilities.knockout_blow.name': 'Golpe de Nocaute',
   'entities.abilities.venom_dart.name': 'Dardo Venenoso',
   'entities.abilities.smoke_screen.name': 'Cortina de Fumaça',
   'entities.abilities.smoke_screen.description':

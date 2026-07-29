@@ -1006,8 +1006,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tiếng huýt sáo hiệu lệnh thúc giục cả nhóm: tốc độ đánh, niệm chú và duy trì tăng 10% trong 10 giây. Đồng minh vừa nhận hiệu ứng tăng tốc nhóm quá kiệt sức để hưởng lợi. (thiên phú Đạo tặc)',
   'entities.abilities.venomrend.name': 'Xé Độc',
   'entities.abilities.veilstrike.name': 'Đòn Màn Che',
-  'entities.abilities.body_blow.name': 'Đòn Thân',
-  'entities.abilities.knockout_blow.name': 'Đòn Nốc Ao',
   'entities.abilities.venom_dart.name': 'Phi Tiêu Độc',
   'entities.abilities.smoke_screen.name': 'Màn Khói',
   'entities.abilities.smoke_screen.description':

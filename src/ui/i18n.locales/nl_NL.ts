@@ -1114,8 +1114,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een gefloten signaal vuurt je groep aan: aanvals-, wierp- en kanaliseersnelheid 10 sec. lang met 10% verhoogd. Bondgenoten die onlangs een groepsversnelling kregen, zijn te uitgeput om ervan te profiteren. (schurkentalent)',
   'entities.abilities.venomrend.name': 'Gifscheur',
   'entities.abilities.veilstrike.name': 'Sluierstoot',
-  'entities.abilities.body_blow.name': 'Lichaamsstoot',
-  'entities.abilities.knockout_blow.name': 'Knock-outslag',
   'entities.abilities.venom_dart.name': 'Gifpijltje',
   'entities.abilities.smoke_screen.name': 'Rookgordijn',
   'entities.abilities.smoke_screen.description':
