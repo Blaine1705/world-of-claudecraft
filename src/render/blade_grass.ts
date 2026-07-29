@@ -26,11 +26,11 @@ import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 // Denser and finer than the first cut (blades were reading as sparse
 // standalone clumps): tighter cells, smaller blades, and a wider ring so
 // the carpet blends into the card tufts instead of ending at your feet.
-const CELL = 0.52; // yards between clusters
+const CELL = 0.46; // yards between clusters
 const RADIUS = 34; // carpet radius (world units)
 const GRID_W = Math.ceil((RADIUS * 2) / CELL); // slots per axis
 const POOL = GRID_W * GRID_W;
-const PLACE_BUDGET = 460; // re-placements per frame while moving
+const PLACE_BUDGET = 560; // re-placements per frame while moving
 const FADE_START = 0.8; // of RADIUS: outer ring shrinks blades to nothing
 
 export interface BladeGrassView {
@@ -190,7 +190,7 @@ export function buildBladeGrass(seed: number): BladeGrassView {
       const biomeDensity = GRASS_BIOME_DENSITY[zoneBiomeAt(x, z)] ?? 1;
       // higher floor + gain than the tufts: coverage is the carpet's job,
       // the patch structure just modulates it
-      ok = r1 < (0.34 + 1.7 * lush * lush) * 1.05 * Math.min(biomeDensity, 1.2);
+      ok = r1 < (0.44 + 1.7 * lush * lush) * 1.05 * Math.min(biomeDensity, 1.2);
       if (ok) ok = roadDistance(x, z) > 2.4;
       if (ok) ok = !isInSowfieldShell(x, z);
       if (ok) ok = !insideGrassHubExclusion(getActiveWorldContent().zones, x, z);
@@ -202,9 +202,13 @@ export function buildBladeGrass(seed: number): BladeGrassView {
         if (ok) ok = Math.abs(terrainHeight(x + 0.9, z, seed) - h) < 0.55;
         if (ok) {
           // smaller blades at higher count: ground COVER, not standalone
-          // clumps — the meadow reads as one grown surface
+          // clumps, so the meadow reads as one grown surface. A hash-gated
+          // size class turns ~10% of cells into taller tufts (x1.5 to x1.8)
+          // that punctuate the fine carpet the rest of the cells lay down.
           const lushHere = 0.5 + lush * 0.6;
-          const s = (0.34 + hash(ci, cj, 3) * 0.4) * lushHere;
+          let s = (0.22 + hash(ci, cj, 3) * 0.34) * lushHere;
+          const rTuft = hash(ci, cj, 4);
+          if (rTuft < 0.1) s *= 1.5 + rTuft * 3.0;
           q.setFromAxisAngle(up, r1 * 12.9);
           m.compose(v.set(x, h - 0.02, z), q, sv.set(s, s * (0.85 + lush * 0.5), s));
           im.setMatrixAt(slot, m);
