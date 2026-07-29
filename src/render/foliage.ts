@@ -413,6 +413,7 @@ export interface FoliageView {
     atmosFogNear: number,
     atmosFogFar: number,
     dt: number,
+    reducedMotion?: boolean,
   ): void;
   setGrassQuality(level: number): void;
   setModelQuality(level: number): void;
@@ -2673,6 +2674,7 @@ function updateTreeHides(
   camY: number,
   camZ: number,
   dt: number,
+  reducedMotion: boolean,
 ): void {
   // This scans every world tree each frame (3k+ in the shipped field). An
   // indexed loop avoids one iterator result allocation per tree per frame.
@@ -2697,7 +2699,7 @@ function updateTreeHides(
         t.ghosts.push(ghosts.acquire(part.mesh, part.index, part.visibleMatrix));
       }
     }
-    t.alpha = stepOccluderFade(t.alpha, hide, dt);
+    t.alpha = stepOccluderFade(t.alpha, hide, dt, reducedMotion);
     for (let j = 0; j < t.ghosts.length; j++) ghosts.setAlpha(t.ghosts[j], t.alpha);
     if (!hide && occluderFadeSettled(t.alpha, false)) {
       for (let j = 0; j < t.parts.length; j++) {
@@ -2786,9 +2788,21 @@ export function buildFoliage(seed: number): FoliageView {
       atmosFogNear: number,
       atmosFogFar: number,
       dt: number,
+      reducedMotion = false,
     ): void {
       grass.update(px, pz);
-      updateTreeHides(treeHideables, treeGhosts, eyeX, eyeY, eyeZ, camX, camY, camZ, dt);
+      updateTreeHides(
+        treeHideables,
+        treeGhosts,
+        eyeX,
+        eyeY,
+        eyeZ,
+        camX,
+        camY,
+        camZ,
+        dt,
+        reducedMotion,
+      );
       // Buckets fully behind the fog wall are pure overdraw. The windows
       // themselves, including the real-model -> impostor swap (which follows the
       // zone's fog rather than a build-time constant, so a cone is never caught

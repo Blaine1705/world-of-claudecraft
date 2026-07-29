@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import { SCREE_CELL, screeSinkY, screeSpotAt } from '../sim/scree';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { SCREE_CELL, screeSinkY, screeSpotAt } from './cliff_scree_core';
 import { GFX } from './gfx';
 import { applySurfaceDetail } from './worn_stone';
 
@@ -31,9 +31,9 @@ import { applySurfaceDetail } from './worn_stone';
 const MODEL_DIR = 'models/foliage/';
 const MODEL_URLS = [1, 2, 3].map((i) => `${MODEL_DIR}rock_${i}.glb`);
 
-// Placement tunables and the placement itself live in sim/scree.ts. Only the
-// presentation grid stays here; the tier-gated dressing is intentionally
-// non-solid so lower tiers never collide with invisible rocks.
+// Placement tunables and pure policy live in cliff_scree_core.ts. Only the
+// Three presentation grid stays here; the tier-gated dressing is intentionally
+// small and non-solid so lower tiers never collide with invisible rocks.
 const CELL = SCREE_CELL; // yards between candidate spots
 const RADIUS = 65; // scatter radius (world units)
 const GRID_W = Math.ceil((RADIUS * 2) / CELL); // slots per axis
@@ -43,6 +43,7 @@ const PLACE_BUDGET = 60; // re-placements per frame while moving
 export interface CliffScreeView {
   group: THREE.Group;
   update(px: number, pz: number): void;
+  invalidate(): void;
 }
 
 // kick off fetches at import (the loader cache shares them with foliage.ts's
@@ -132,9 +133,8 @@ function bakeRocks(): BakedRocks | null {
       // natural geological fracture, never the ashlar masonry pattern.
       applySurfaceDetail(material, 'rock', { strength: 0.5 });
     }
-    // origin sink comes from sim/scree.ts's baked dims (screeSinkY), not a
-    // live bounds measurement: the sim's walkable dome and this mesh must
-    // agree on where the rock sits to the millimetre
+    // Origin sink comes from cliff_scree_core.ts's baked dimensions, avoiding
+    // a live bounds measurement and keeping every placement deterministic.
     variants.push({ geometry: rock.geometry });
   }
   if (!material) return null; // unreachable: MODEL_URLS is non-empty
@@ -155,7 +155,7 @@ export function buildCliffScree(seed: number): CliffScreeView {
   // Medium keeps its pre-overhaul look and frame budget (the round-10 medium
   // regate). The omitted dressing does not alter the shared walkable surface.
   if (!GFX.cliffScree) {
-    return { group, update: () => undefined };
+    return { group, update: () => undefined, invalidate: () => undefined };
   }
 
   const meshes: THREE.InstancedMesh[] = [];
@@ -214,10 +214,9 @@ export function buildCliffScree(seed: number): CliffScreeView {
     qYaw.setFromAxisAngle(up, spot.yaw);
     const glen = Math.hypot(spot.gx, spot.gz);
     if (glen > 1e-4) {
-      // slight settle-lean downhill about the cross-slope axis, stronger on
-      // steeper ground; the sink hides the lifted edge. Presentation only:
-      // the walkable dome stays radially symmetric, and at these angles the
-      // visual crown moves less than the dome's flat-crown tolerance.
+      // Slight settle-lean downhill about the cross-slope axis, stronger on
+      // steeper ground; the sink hides the lifted edge. Collision is
+      // deliberately absent because this tier-gated rubble stays small.
       axis.set(-spot.gz / glen, 0, spot.gx / glen);
       qTilt.setFromAxisAngle(
         axis,
@@ -233,6 +232,9 @@ export function buildCliffScree(seed: number): CliffScreeView {
 
   return {
     group,
+    invalidate(): void {
+      slotCell.fill(0x7fffffff);
+    },
     update(px: number, pz: number): void {
       if (!ready) return;
       // target cell block: the GRID_W x GRID_W square centred on the player

@@ -9,14 +9,8 @@ import {
 const DT = 1 / 60;
 
 describe('stepOccluderFade', () => {
-  it('eases toward the 20% target while occluded and snaps exactly onto it', () => {
-    let alpha = 1;
-    const first = stepOccluderFade(alpha, true, DT);
-    expect(first).toBeLessThan(1);
-    expect(first).toBeGreaterThan(OCCLUDER_FADE_ALPHA);
-    alpha = first;
-    for (let i = 0; i < 300; i++) alpha = stepOccluderFade(alpha, true, DT);
-    expect(alpha).toBe(OCCLUDER_FADE_ALPHA);
+  it('reveals subjects immediately when an occluder enters the camera ray', () => {
+    expect(stepOccluderFade(1, true, DT)).toBe(OCCLUDER_FADE_ALPHA);
   });
 
   it('eases back to exactly 1 once the occluder clears', () => {
@@ -42,6 +36,11 @@ describe('stepOccluderFade', () => {
       expect(next).toBeGreaterThanOrEqual(up);
       up = next;
     }
+  });
+
+  it('snaps both directions when reduced motion is active', () => {
+    expect(stepOccluderFade(1, true, DT, true)).toBe(OCCLUDER_FADE_ALPHA);
+    expect(stepOccluderFade(OCCLUDER_FADE_ALPHA, false, DT, true)).toBe(1);
   });
 
   it('settles in one step given a large dt', () => {

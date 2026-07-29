@@ -1,7 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { screeSpotAt, screeSpotsInBounds } from '../src/render/cliff_scree_core';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
-import { screeSpotAt, screeSpotsInBounds, screeSurfaceHeight } from '../src/sim/scree';
-import { groundHeight, roadDistance, terrainHeight, WATER_LEVEL } from '../src/sim/world';
+import type { WorldContent } from '../src/sim/types';
+import {
+  groundHeight,
+  invalidateTerrainEditIndex,
+  roadDistance,
+  terrainHeight,
+  waterLevel,
+} from '../src/sim/world';
 
 // The scree module is the renderer's single pure placement source. The rocks
 // are tier-gated visual dressing and must not alter shared simulation ground.
@@ -22,7 +29,8 @@ describe('cliff scree placement', () => {
       const again = screeSpotAt(SEED, Math.round(s.x / 6.5), Math.round(s.z / 6.5));
       expect(again).not.toBeNull();
       expect(again?.x).toBe(s.x);
-      expect(again?.topY).toBe(s.topY);
+      expect(again?.baseY).toBe(s.baseY);
+      expect(again?.scale).toBe(s.scale);
     }
   });
 
@@ -30,7 +38,7 @@ describe('cliff scree placement', () => {
     const spots = screeSpotsInBounds(SEED, BOUNDS);
     for (const s of spots) {
       expect(roadDistance(s.x, s.z)).toBeGreaterThanOrEqual(3);
-      expect(s.baseY).toBeGreaterThanOrEqual(WATER_LEVEL + 0.5);
+      expect(s.baseY).toBeGreaterThanOrEqual(waterLevel() + 0.5);
       for (const zone of BUILTIN_WORLD.zones) {
         const d = Math.hypot(s.x - zone.hub.x, s.z - zone.hub.z);
         expect(d).toBeGreaterThanOrEqual(15);
@@ -40,24 +48,50 @@ describe('cliff scree placement', () => {
 
   it('keeps tier-gated visual scree out of the shared walkable heightfield', () => {
     const spots = screeSpotsInBounds(SEED, BOUNDS);
-    const s = spots.find((spot) => spot.topY - terrainHeight(spot.x, spot.z, SEED) > 1);
+    const s = spots[0];
     expect(s).toBeDefined();
     if (!s) return;
-    const atCrown = screeSurfaceHeight(s.x, s.z, SEED);
-    expect(atCrown).toBeCloseTo(s.topY, 5);
     // Cliff scree only renders on tiers that enable the detail layer. Folding
-    // its crown into groundHeight would create invisible walls on lower tiers
+    // it into groundHeight would create invisible walls on lower tiers
     // and perturb every deterministic sim consumer of the shared heightfield.
     expect(groundHeight(s.x, s.z, SEED)).toBeCloseTo(terrainHeight(s.x, s.z, SEED), 5);
-    expect(groundHeight(s.x, s.z, SEED)).toBeLessThan(s.topY);
-    // just past the rim the dome contributes nothing
-    const out = screeSurfaceHeight(s.x + s.footR + 0.05, s.z, SEED);
-    expect(out === Number.NEGATIVE_INFINITY || out < s.topY).toBe(true);
   });
 
-  it('keeps a varied boulder scale distribution', () => {
+  it('keeps walk-through dressing below human-scale wall size', () => {
     const spots = screeSpotsInBounds(SEED, BOUNDS);
-    expect(spots.some((s) => s.scale < 0.8)).toBe(true);
-    expect(spots.some((s) => s.scale > 1.2)).toBe(true);
+    expect(spots.some((s) => s.scale < 0.4)).toBe(true);
+    expect(Math.max(...spots.map((s) => s.scale))).toBeLessThanOrEqual(0.55);
+  });
+
+  it('honours a custom world water level', () => {
+    setActiveWorldContent({ ...BUILTIN_WORLD, waterLevel: 20 });
+    const spots = screeSpotsInBounds(SEED, BOUNDS);
+    expect(spots.length).toBeGreaterThan(0);
+    expect(spots.every((spot) => spot.baseY >= 20.5)).toBe(true);
+  });
+
+  it('recomputes placement after an in-place terrain edit', () => {
+    const world: WorldContent = {
+      ...BUILTIN_WORLD,
+      terrainEdits: [...(BUILTIN_WORLD.terrainEdits ?? [])],
+    };
+    setActiveWorldContent(world);
+    const before = screeSpotsInBounds(SEED, BOUNDS)[0];
+    expect(before).toBeDefined();
+    if (!before) return;
+
+    world.terrainEdits?.push({
+      x: before.x,
+      z: before.z,
+      radius: 20,
+      delta: 20,
+      falloff: 'flat',
+      mode: 'add',
+    });
+    invalidateTerrainEditIndex();
+
+    const ci = Math.round(before.x / 6.5);
+    const cj = Math.round(before.z / 6.5);
+    expect(screeSpotAt(SEED, ci, cj)?.baseY).toBeCloseTo(before.baseY + 20, 8);
   });
 });

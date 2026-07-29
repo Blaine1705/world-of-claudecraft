@@ -1,11 +1,9 @@
-import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
-import type { WorldContent } from './types';
-import { roadDistance, terrainHeight, WATER_LEVEL } from './world';
+import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
+import { roadDistance, terrainHeight, waterLevel } from '../sim/world';
 
-// Cliff-scree placement, pure and shared by the renderer's moving detail
-// grid. The rocks are tier-gated visual dressing, so they deliberately do
-// not alter groundHeight or deterministic simulation. Making them solid
-// would create invisible walls on tiers that omit this detail layer.
+// Cliff-scree placement for the renderer's moving detail grid. The rocks are
+// tier-gated, walk-through visual dressing, so this policy belongs render-side
+// and deliberately does not alter groundHeight or deterministic simulation.
 
 // Placement tunables. These MUST stay identical to the renderer's read of
 // them (it imports from here); re-tuning them re-seats every boulder.
@@ -23,12 +21,12 @@ const HUB_EXCLUSION_RADIUS = 15; // same radius the grass hub exclusion uses
 
 // Kit rock dimensions at scale 1, baked from the shipped GLBs
 // (models/foliage/rock_1..3) via gltf-transform getBounds — constants so the
-// sim never parses a model. The renderer derives its origin sink from the
-// same rows, keeping the visual mesh and the walkable dome in agreement.
+// renderer never parses a model just to recover bounds. The painter derives
+// its origin sink from these same rows.
 export const SCREE_ROCK_DIMS = [
-  { minY: -0.271, maxY: 1.989, halfW: 1.613 },
-  { minY: -0.051, maxY: 1.848, halfW: 1.524 },
-  { minY: -0.316, maxY: 2.001, halfW: 1.738 },
+  { minY: -0.271, maxY: 1.989 },
+  { minY: -0.051, maxY: 1.848 },
+  { minY: -0.316, maxY: 2.001 },
 ] as const;
 
 /** Origin y-offset that buries SCREE_SINK of the rock's height at scale 1. */
@@ -51,10 +49,6 @@ export interface ScreeSpot {
   gz: number;
   /** local relief at the spot, for the visual lean strength */
   slope: number;
-  /** absolute world y of the rendered boulder crown */
-  topY: number;
-  /** approximate rendered footprint radius */
-  footR: number;
 }
 
 const hash = (i: number, j: number, k: number): number => {
@@ -62,27 +56,6 @@ const hash = (i: number, j: number, k: number): number => {
   h = Math.imul(h ^ (h >>> 13), 1274126177);
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 };
-
-// Spot cache: keyed on the active WorldContent identity (hub exclusions come
-// from its zones; editor swaps drop the whole cache with the object, the
-// collider-grid idiom), then seed, then packed cell. Bounded by world area /
-// CELL^2 and filled lazily around live actors.
-const spotCache = new WeakMap<WorldContent, Map<number, Map<number, ScreeSpot | null>>>();
-
-function cellsFor(seed: number): Map<number, ScreeSpot | null> {
-  const content = getActiveWorldContent();
-  let bySeed = spotCache.get(content);
-  if (!bySeed) {
-    bySeed = new Map();
-    spotCache.set(content, bySeed);
-  }
-  let cells = bySeed.get(seed);
-  if (!cells) {
-    cells = new Map();
-    bySeed.set(seed, cells);
-  }
-  return cells;
-}
 
 function computeSpot(seed: number, ci: number, cj: number): ScreeSpot | null {
   const r1 = hash(ci, cj, 1);
@@ -95,7 +68,7 @@ function computeSpot(seed: number, ci: number, cj: number): ScreeSpot | null {
     return null;
   }
   const h = terrainHeight(x, z, seed);
-  if (h < WATER_LEVEL + 0.5) return null; // shorelines keep their own dressing
+  if (h < waterLevel() + 0.5) return null; // shorelines keep their own dressing
   // local relief: max height delta over four short probes, the same signal
   // the terrain shader's slope treatment keys from
   const hE = terrainHeight(x + PROBE, z, seed);
@@ -136,11 +109,10 @@ function computeSpot(seed: number, ci: number, cj: number): ScreeSpot | null {
     SCREE_ROCK_DIMS.length - 1,
     Math.floor(hash(ci, cj, 4) * SCREE_ROCK_DIMS.length),
   );
-  // apron rubble runs smaller (and so mostly hop- or mount-able); the band
-  // itself holds the boulders, which read as walls by design
-  const scale = apron ? 0.45 + hash(ci, cj, 5) * 0.55 : 0.5 + hash(ci, cj, 5) * 1.3;
+  // Tier-gated dressing has no collider, so it must remain visibly small
+  // enough to read as loose walk-through rubble rather than as a wall.
+  const scale = apron ? 0.25 + hash(ci, cj, 5) * 0.2 : 0.3 + hash(ci, cj, 5) * 0.25;
   const yaw = hash(ci, cj, 6) * Math.PI * 2;
-  const d = SCREE_ROCK_DIMS[variant];
   return {
     x,
     z,
@@ -152,48 +124,11 @@ function computeSpot(seed: number, ci: number, cj: number): ScreeSpot | null {
     gx,
     gz,
     slope,
-    topY: h + (d.maxY - d.minY) * (1 - SCREE_SINK) * scale,
-    // tighter than the visual half-width: the mesh silhouette narrows toward
-    // the crown, and a dome wider than the rock would float feet in air
-    footR: d.halfW * scale * 0.85,
   };
 }
 
 export function screeSpotAt(seed: number, ci: number, cj: number): ScreeSpot | null {
-  const cells = cellsFor(seed);
-  const key = ((ci & 0xffff) << 16) | (cj & 0xffff);
-  const cached = cells.get(key);
-  if (cached !== undefined) return cached;
-  const spot = computeSpot(seed, ci, cj);
-  cells.set(key, spot);
-  return spot;
-}
-
-// Approximate visual envelope used by placement tests: a dome from the
-// rendered crown to the terrain at the footprint rim. It is not part of the
-// shared walkable heightfield because the detail layer is tier-gated.
-export function screeSurfaceHeight(x: number, z: number, seed: number): number {
-  const ci0 = Math.round(x / SCREE_CELL);
-  const cj0 = Math.round(z / SCREE_CELL);
-  let best = Number.NEGATIVE_INFINITY;
-  for (let cj = cj0 - 1; cj <= cj0 + 1; cj++) {
-    for (let ci = ci0 - 1; ci <= ci0 + 1; ci++) {
-      const spot = screeSpotAt(seed, ci, cj);
-      if (!spot) continue;
-      const dx = x - spot.x;
-      const dz = z - spot.z;
-      const dSq = dx * dx + dz * dz;
-      if (dSq >= spot.footR * spot.footR) continue;
-      const t = Math.sqrt(dSq) / spot.footR;
-      // dome: (1 - t^2)^0.3 — flat-ish crown, near-vertical rim. On sloped
-      // ground the uphill flank sits nearly flush and CAN be stepped onto,
-      // like real embedded rubble; the downhill flank is always a refusal.
-      const dome = (1 - t * t) ** 0.3;
-      const y = spot.baseY + (spot.topY - spot.baseY) * dome;
-      if (y > best) best = y;
-    }
-  }
-  return best;
+  return computeSpot(seed, ci, cj);
 }
 
 /** Every spot whose centre lies inside the bounds (renderer/tools/tests). */

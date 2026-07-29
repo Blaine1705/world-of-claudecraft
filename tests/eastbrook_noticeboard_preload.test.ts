@@ -10,6 +10,14 @@ const mocks = vi.hoisted(() => ({
   registerPreload: vi.fn(),
 }));
 
+function deferred<T>(): { promise: Promise<T>; resolve: (value: T) => void } {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
 vi.mock('../src/render/assets/loader', () => ({
   loadGltf: mocks.loadGltf,
   loadTexture: mocks.loadTexture,
@@ -67,9 +75,12 @@ describe('Eastbrook noticeboard tier-independent preload', () => {
     async (_tier, search, MaterialType) => {
       vi.stubGlobal('window', { location: { search } });
       vi.stubGlobal('location', { search });
-      mocks.loadGltf.mockResolvedValue({ scene: sourceScene() });
+      const scene = sourceScene();
+      const gltfLoad = deferred<{ scene: THREE.Group }>();
+      mocks.loadGltf.mockReturnValue(gltfLoad.promise);
       const atlas = new THREE.Texture();
-      mocks.loadTexture.mockResolvedValue(atlas);
+      const textureLoad = deferred<THREE.Texture>();
+      mocks.loadTexture.mockReturnValue(textureLoad.promise);
 
       const module = await import('../src/render/noticeboard');
 
@@ -85,7 +96,19 @@ describe('Eastbrook noticeboard tier-independent preload', () => {
       const registrationOrders = new Set(mocks.registerPreload.mock.invocationCallOrder);
       expect(registrationOrders).toContain(mocks.loadGltf.mock.invocationCallOrder[0] + 1);
       expect(registrationOrders).toContain(atlasLoads[0].order + 1);
-      await Promise.all(mocks.registerPreload.mock.calls.map(([registered]) => registered));
+      let gateSettled = false;
+      const gate = Promise.all(
+        mocks.registerPreload.mock.calls.map(([registered]) => registered),
+      ).then(() => {
+        gateSettled = true;
+      });
+      await Promise.resolve();
+      expect(gateSettled).toBe(false);
+      gltfLoad.resolve({ scene });
+      await Promise.resolve();
+      expect(gateSettled).toBe(false);
+      textureLoad.resolve(atlas);
+      await gate;
 
       const first = module.buildEastbrookNoticeboard().group;
       const second = module.buildEastbrookNoticeboard().group;

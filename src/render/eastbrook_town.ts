@@ -929,7 +929,7 @@ function buildFromTemplates(
         if (!roofVisibilityPlan.visible) continue;
         target.hidden = roofVisibilityPlan.hidden;
         if (occluderFadeSettled(target.alpha, target.hidden)) continue;
-        target.alpha = stepOccluderFade(target.alpha, target.hidden, dt);
+        target.alpha = stepOccluderFade(target.alpha, target.hidden, dt, reducedMotion);
         applyOccluderFade(target.mats, target.alpha);
       }
     },

@@ -8,6 +8,14 @@ const mocks = vi.hoisted(() => ({
   registerPreload: vi.fn(),
 }));
 
+function deferred<T>(): { promise: Promise<T>; resolve: (value: T) => void } {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
 vi.mock('../src/render/assets/loader', () => ({
   loadGltf: mocks.loadGltf,
   loadTexture: mocks.loadTexture,
@@ -32,9 +40,11 @@ describe('Eastbrook Grand Armoury preload', () => {
     const stone = new THREE.MeshStandardMaterial({ vertexColors: true });
     stone.name = 'ArmouryStone';
     scene.add(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), stone));
-    mocks.loadGltf.mockReturnValue(Promise.resolve({ scene }));
+    const gltfLoad = deferred<{ scene: THREE.Group }>();
+    mocks.loadGltf.mockReturnValue(gltfLoad.promise);
     const atlas = new THREE.Texture();
-    mocks.loadTexture.mockResolvedValue(atlas);
+    const textureLoad = deferred<THREE.Texture>();
+    mocks.loadTexture.mockReturnValue(textureLoad.promise);
 
     const module = await import('../src/render/eastbrook_grand_armoury');
 
@@ -52,7 +62,17 @@ describe('Eastbrook Grand Armoury preload', () => {
     expect(registrationOrders).toContain(atlasLoads[0].order + 1);
     const registered = mocks.registerPreload.mock.calls.map(([promise]) => promise);
     expect(registered.every((promise) => promise instanceof Promise)).toBe(true);
-    await Promise.all(registered);
+    let gateSettled = false;
+    const gate = Promise.all(registered).then(() => {
+      gateSettled = true;
+    });
+    await Promise.resolve();
+    expect(gateSettled).toBe(false);
+    gltfLoad.resolve({ scene });
+    await Promise.resolve();
+    expect(gateSettled).toBe(false);
+    textureLoad.resolve(atlas);
+    await gate;
 
     const building = {
       kind: 'inn',

@@ -63,8 +63,7 @@ export interface PropsResult {
   /**
    * Hides merged/instanced prop bands that sit entirely past the fog far plane,
    * and fades any camera-ghost prop crossing the current eye-to-camera segment
-   * toward 20% opacity (animated) so the chase cam sees through props instead
-   * of zooming in or blanking them.
+   * to 20% opacity so the chase cam sees through props without blanking them.
    */
   update(
     camX: number,
@@ -75,6 +74,7 @@ export interface PropsResult {
     eyeZ: number,
     fogFar: number,
     dt: number,
+    reducedMotion?: boolean,
   ): void;
 }
 
@@ -1015,7 +1015,6 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh) return;
       keepFromMerge.add(mesh);
-      if (lowProps) return;
       const src = mesh.material as THREE.Material;
       let tm = matMap.get(src);
       if (!tm) {
@@ -2136,6 +2135,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       eyeZ: number,
       fogFar: number,
       dt: number,
+      reducedMotion = false,
     ): void {
       const fogFarSq = fogFar * fogFar;
       for (let i = 0; i < cullables.length; i++) {
@@ -2151,19 +2151,13 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
           h.group.visible = false; // fully fogged: drop it (shadow is out of range too)
           continue;
         }
-        // Fade toward 20% opacity while the structure blocks the view, keeping
-        // its shadow; the low tier has no per-structure material clones, so it
-        // keeps the instant show/hide toggle instead.
+        // Ghost on every tier with the same timing while keeping the obstacle's
+        // silhouette and shadow. Per-structure clones keep the change local.
         const hide = cameraSegmentHitsFootprint(h, eyeX, eyeY, eyeZ, camX, camY, camZ);
-        if (h.mats.length === 0) {
-          h.hidden = hide;
-          h.group.visible = !hide;
-          continue;
-        }
         h.group.visible = true;
         h.hidden = hide;
         if (occluderFadeSettled(h.alpha, hide)) continue;
-        h.alpha = stepOccluderFade(h.alpha, hide, dt);
+        h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion);
         applyOccluderFade(h.mats, h.alpha);
       }
     },

@@ -8,6 +8,14 @@ const mocks = vi.hoisted(() => ({
   registerPreload: vi.fn(),
 }));
 
+function deferred<T>(): { promise: Promise<T>; resolve: (value: T) => void } {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
 vi.mock('../src/render/assets/loader', () => ({
   loadGltf: mocks.loadGltf,
   loadTexture: mocks.loadTexture,
@@ -37,9 +45,11 @@ describe('Eastbrook town preload', () => {
       const material = new THREE.MeshStandardMaterial({ vertexColors: true });
       material.name = 'TownOpaque';
       scene.add(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material));
-      mocks.loadGltf.mockReturnValue(Promise.resolve({ scene }));
+      const gltfLoad = deferred<{ scene: THREE.Group }>();
+      mocks.loadGltf.mockReturnValue(gltfLoad.promise);
       const atlas = new THREE.Texture();
-      mocks.loadTexture.mockResolvedValue(atlas);
+      const textureLoad = deferred<THREE.Texture>();
+      mocks.loadTexture.mockReturnValue(textureLoad.promise);
 
       const module = await import('../src/render/eastbrook_town');
       const allUrls = [...module.EASTBROOK_TOWN_ASSET_URLS];
@@ -68,7 +78,17 @@ describe('Eastbrook town preload', () => {
         expect(registrationOrders).toContain(order + 1);
       }
       const registered = mocks.registerPreload.mock.calls.map(([promise]) => promise);
-      await Promise.all(registered);
+      let gateSettled = false;
+      const gate = Promise.all(registered).then(() => {
+        gateSettled = true;
+      });
+      await Promise.resolve();
+      expect(gateSettled).toBe(false);
+      gltfLoad.resolve({ scene });
+      await Promise.resolve();
+      expect(gateSettled).toBe(false);
+      textureLoad.resolve(atlas);
+      await gate;
 
       const data = await import('../src/sim/data');
       data.setActiveWorldContent({ ...data.BUILTIN_WORLD, zones: [] });

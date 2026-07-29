@@ -117,6 +117,7 @@ export interface YumiMazeView {
     eyeY: number,
     eyeZ: number,
     dt: number,
+    reducedMotion?: boolean,
   ): void;
   /**
    * Fold a yumiTeleport event's landing spot into the beacon immediately.
@@ -187,6 +188,7 @@ export function buildYumiMaze(
     eyeY: number,
     eyeZ: number,
     dt: number,
+    reducedMotion: boolean,
   ): void => {
     const topY = floorY + YUMI_MAZE_WALL_HEIGHT;
     const ex = eyeX - origin.x;
@@ -207,7 +209,7 @@ export function buildYumiMaze(
         walls.instanceMatrix.needsUpdate = true;
         h.ghost = wallGhosts.acquire(walls, h.index, h.visibleMatrix);
       }
-      h.alpha = stepOccluderFade(h.alpha, hide, dt);
+      h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion);
       wallGhosts.setAlpha(h.ghost, h.alpha);
       if (!hide && occluderFadeSettled(h.alpha, false)) {
         walls.setMatrixAt(h.index, h.visibleMatrix);
@@ -430,12 +432,13 @@ export function buildYumiMaze(
       eyeY: number,
       eyeZ: number,
       dt: number,
+      reducedMotion = false,
     ): void {
       const yumi = world.arenaInfo?.match?.yumi;
       if (!yumi && teleported.size > 0) teleported.clear();
       place(beaconA, lastA, yumi?.yumiA);
       place(beaconB, lastB, yumi?.yumiB);
-      updateWallFades(camX, camY, camZ, eyeX, eyeY, eyeZ, dt);
+      updateWallFades(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion);
     },
     noteTeleport(catId: number, x: number, z: number): void {
       teleported.set(catId, { x, z });

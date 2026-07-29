@@ -920,12 +920,13 @@ export class DungeonInteriors {
     eyeY: number,
     eyeZ: number,
     dt: number,
+    reducedMotion = false,
   ): void {
     for (const h of this.arenaHideables) {
       const hide = arenaWallSegmentHits(h.footprint, eyeX, eyeY, eyeZ, camX, camY, camZ);
       h.hidden = hide;
       if (occluderFadeSettled(h.alpha, hide)) continue;
-      h.alpha = stepOccluderFade(h.alpha, hide, dt);
+      h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion);
       applyOccluderFade(h.mats, h.alpha);
     }
   }

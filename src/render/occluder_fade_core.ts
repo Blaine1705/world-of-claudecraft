@@ -1,15 +1,10 @@
-// Pure per-frame fade policy for objects that cross the eye-to-camera segment.
-// The chase camera never pulls in for an occluder anymore: whatever blocks the
-// view of the player fades toward OCCLUDER_FADE_ALPHA instead, and fades back
-// to opaque once the segment is clear. This module is the single animation
-// policy every occluder-fade painter shares (props, foliage tree ghosts,
-// dungeon walls, Eastbrook roofs); the Three side owns the materials and
-// applies the returned alpha.
+// Pure per-frame fade policy for hideable objects that cross the eye-to-camera
+// segment. Subjects behind an occluder become readable immediately; restoration
+// eases back to opaque once the segment clears. Non-hideable solid geometry is
+// still handled by the chase-camera collision sweep.
 
 /** Opacity an occluding structure settles at while it blocks the view. */
 export const OCCLUDER_FADE_ALPHA = 0.2;
-/** Ease rate toward the faded alpha (fast, so the view clears quickly). */
-export const OCCLUDER_FADE_OUT_RATE = 10;
 /** Ease rate back to opaque (slower, so reappearing structures read calm). */
 export const OCCLUDER_FADE_IN_RATE = 6;
 // Snap distance: within this of the target the fade completes exactly, so
@@ -17,16 +12,21 @@ export const OCCLUDER_FADE_IN_RATE = 6;
 const SNAP = 0.01;
 
 /**
- * Advance one occluder's fade alpha toward its target: OCCLUDER_FADE_ALPHA
- * while the structure occludes the player, 1 while it is clear. Exponential
- * ease, snapped to the exact target once close.
+ * Advance one occluder's fade alpha. Occlusion snaps to the ghost target on
+ * the first frame so information timing is tier-independent; restoration is
+ * exponential unless reduced motion asks for a direct state change.
  */
-export function stepOccluderFade(alpha: number, occluded: boolean, dt: number): number {
+export function stepOccluderFade(
+  alpha: number,
+  occluded: boolean,
+  dt: number,
+  reducedMotion = false,
+): number {
   const target = occluded ? OCCLUDER_FADE_ALPHA : 1;
   const start = Number.isFinite(alpha) ? Math.min(1, Math.max(0, alpha)) : 1;
   if (dt <= 0) return start;
-  const rate = occluded ? OCCLUDER_FADE_OUT_RATE : OCCLUDER_FADE_IN_RATE;
-  const next = start + (target - start) * (1 - Math.exp(-rate * dt));
+  if (occluded || reducedMotion) return target;
+  const next = start + (target - start) * (1 - Math.exp(-OCCLUDER_FADE_IN_RATE * dt));
   return Math.abs(next - target) <= SNAP ? target : next;
 }
 
