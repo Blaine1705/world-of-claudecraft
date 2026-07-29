@@ -167,7 +167,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "es_ES": [
     "abilityUi.resources.focus",
@@ -327,7 +328,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "fr_FR": [
     "abilityUi.resources.focus",
@@ -487,7 +489,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "fr_CA": [
     "abilityUi.resources.focus",
@@ -647,7 +650,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "en_CA": [],
   "it_IT": [
@@ -808,7 +812,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "de_DE": [
     "abilityUi.resources.focus",
@@ -968,7 +973,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -1132,7 +1138,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -1293,7 +1300,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "nl_NL": [
     "abilityUi.resources.focus",
@@ -1453,7 +1461,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "pl_PL": [
     "abilityUi.resources.focus",
@@ -1613,7 +1622,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "id_ID": [
     "abilityUi.resources.focus",
@@ -1773,7 +1783,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "tr_TR": [
     "abilityUi.resources.focus",
@@ -1933,7 +1944,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "sv_SE": [
     "abilityUi.resources.focus",
@@ -2093,7 +2105,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "vi_VN": [
     "abilityUi.resources.focus",
@@ -2253,7 +2266,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "da_DK": [
     "abilityUi.resources.focus",
@@ -2413,6 +2427,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.veiledEdge",
     "hudChrome.auraEffect.veilstrikeWindow",
     "hudChrome.auraEffect.venomRitual",
-    "hudChrome.auraEffect.verdance"
+    "hudChrome.auraEffect.verdance",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ]
 };
