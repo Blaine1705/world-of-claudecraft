@@ -1315,8 +1315,11 @@ Deferred, recorded: a rift entry/exit leg for a parity scenario (the
 draw-order gate is blind at the five new teleport arms; a scenario
 plus golden mint, phase 16's neighbor); farshore water authoring
 (phase 13); the maintainer's three levers stay surfaced and untouched.
-Final gate: FILL-AFTER-GATE (result, steps, code tip; docs and memory
-close-out follow it).
+Final gate: PASS, all 11 steps, on the committed idle tree at
+399786aaf (the code tip; its one prior red was the sell-junk sweep-rule
+pin still anchored on the pre-extraction hud.ts consumer, re-anchored
+onto both links of the extracted chain). The checkpoint is CLOSED;
+phase 12 (the acquisition craft, ultracode) builds on this tree.
 
 ---
 
