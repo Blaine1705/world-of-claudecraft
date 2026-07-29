@@ -911,6 +911,14 @@ function applyWeaponMaterialPolish(
     std.roughness = Math.min(std.roughness, 0.55);
     std.metalness = Math.max(std.metalness, 0.12);
     std.emissive.copy(mat.color).multiplyScalar(0.025);
+    // Metal blades/heads get a per-material env boost so they pick up the sky
+    // and dungeon IBL: scene.environment ships dim by design (~0.4 outdoors,
+    // 0.05 in dungeons) and metals read as dull plastic under it. Per-material
+    // envMapIntensity multiplies the scene value, so only metal brightens; the
+    // 0.3 gate keeps leather grips and wood hafts out of the boost. VFX skins
+    // stash and neutralize this while a rig owns the material (weapon_vfx.ts
+    // deriveEmissive), so the boost never fights an active skin.
+    if (std.metalness > 0.3) std.envMapIntensity = 1.6;
   }
 }
 
@@ -968,7 +976,16 @@ export function tintedMaterial(
     sm.emissiveIntensity = 1.0;
     sm.needsUpdate = true;
   }
-  if (role === 'weapon') applyWeaponMaterialPolish(mat);
+  if (role === 'weapon') {
+    applyWeaponMaterialPolish(mat);
+  } else if ((mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
+    // Body/armor: clamp the authored roughness into a matte cloth/leather band.
+    // Some kit materials ship near-zero roughness (reads wet/plastic under the
+    // key light) and others at 1.0 (dead flat); the band keeps every character
+    // in one coherent painted-surface response without touching metalness.
+    const std = mat as THREE.MeshStandardMaterial;
+    std.roughness = Math.min(Math.max(std.roughness, 0.55), 0.9);
+  }
   if (!GFX.standardMaterials) applyLowReadabilityLift(mat, role);
   matCache.set(key, mat);
   return mat;

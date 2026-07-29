@@ -82,6 +82,37 @@ function loader(): GLTFLoader {
   return gltfLoader;
 }
 
+// Central GLB texture polish: 4-tap anisotropic filtering on every color and
+// normal map sharpens ground-adjacent props and walls at oblique camera angles
+// for free (mip selection alone smears them). Runs once per parsed GLB, right
+// after parse and before first upload, so no texture ever needs a re-upload;
+// three clamps the value to the device's max anisotropy at bind time. Terrain
+// splats keep their own higher-tap setting (terrain.ts loads via loadTexture,
+// not through here).
+const GLB_TEXTURE_ANISOTROPY = 4;
+
+function polishGltfTextures(gltf: GLTF): void {
+  // Fail soft on partial GLTF shapes (test doubles, exotic parses): the polish
+  // is cosmetic and must never sink an otherwise successful load.
+  if (typeof gltf.scene?.traverse !== 'function') return;
+  const seen = new Set<THREE.Texture>();
+  const lift = (tex: THREE.Texture | null): void => {
+    if (!tex || seen.has(tex)) return;
+    seen.add(tex);
+    tex.anisotropy = Math.max(tex.anisotropy, GLB_TEXTURE_ANISOTROPY);
+  };
+  gltf.scene.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    for (const m of mats) {
+      const std = m as THREE.MeshStandardMaterial;
+      lift(std.map ?? null);
+      lift(std.normalMap ?? null);
+    }
+  });
+}
+
 /** Load + parse a .glb once; subsequent calls share the same parsed scene.
  *  Consumers must treat the result as immutable — clone before mutating. */
 export function loadGltf(url: string): Promise<GLTF> {
@@ -100,6 +131,7 @@ export function loadGltf(url: string): Promise<GLTF> {
       ),
     ).then(
       (gltf) => {
+        polishGltfTextures(gltf);
         recordAssetLoad('gltf', resolved, startedAt);
         return gltf;
       },

@@ -54,8 +54,9 @@ import {
   placeMarshTombs,
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
+import { STONE_DETAIL_NORMAL_SCALE, stoneDetailNormal } from './detail_normals';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
-import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
+import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { radialGlowTexture } from './textures';
@@ -1308,6 +1309,19 @@ export class DungeonInteriors {
       mat = std;
     } else {
       mat = new THREE.MeshStandardMaterial({ color: 0x777788, roughness: 0.95 });
+    }
+    // The dungeon packs are flat-palette GLBs (solid-color swatch textures),
+    // so the walls read as untextured plastic under the interior lights. One
+    // gently tiling rock detail normal, shared by every pack material (and by
+    // the delve/castle stone families), gives them a faint stone grain while
+    // roughness stays matte. The tinted marsh/drowned clones inherit it.
+    if (GFX.standardMaterials && (mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
+      const std = mat as THREE.MeshStandardMaterial;
+      const detail = stoneDetailNormal();
+      if (detail && !std.normalMap) {
+        std.normalMap = detail;
+        std.normalScale.set(STONE_DETAIL_NORMAL_SCALE, STONE_DETAIL_NORMAL_SCALE);
+      }
     }
     this.packMats.set(pack, mat);
     return mat;

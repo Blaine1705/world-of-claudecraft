@@ -477,6 +477,11 @@ interface PropAsset {
 const extractCache = new Map<string, PropAsset>();
 const matConvCache = new Map<string, THREE.Material>();
 
+/** Kit materials whose NAME marks them as metal (measured across the shipped
+ *  kits: MI_Trim_Metal, WornIron, ArmouryMetal, MailboxMetal). Kept in
+ *  lockstep with quest_objects.ts. */
+export const METAL_MAT_NAME = /metal|iron|gold|steel/i;
+
 /** denormalized float copy — meshopt/quantized attrs must not be transformed in place */
 function toFloatAttr(
   attr: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
@@ -532,6 +537,12 @@ function convertMaterial(
       emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),
       emissiveMap: hollowEmissive ? map : null,
       emissiveIntensity: hollowEmissive ? 0.3 : (ov?.emissiveIntensity ?? 1),
+      // Metal-named kit materials (MI_Trim_Metal, WornIron, ...) get a mild
+      // per-material env boost so anvils/fittings catch the sky IBL; the name
+      // is already part of the cache key above. Everything else keeps the
+      // default 1, and the colorful palette props deliberately get NO detail
+      // normals: grain would read as noise on the toy-like style.
+      envMapIntensity: METAL_MAT_NAME.test(s.name) ? 1.3 : 1,
     });
   } else {
     mat = new THREE.MeshLambertMaterial({

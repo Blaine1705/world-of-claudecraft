@@ -22,7 +22,8 @@ import {
 } from '../sim/castle_layout';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { surfaceMat } from './gfx';
+import { STONE_DETAIL_NORMAL_SCALE, stoneDetailNormal } from './detail_normals';
+import { GFX, surfaceMat } from './gfx';
 import { PROP_ASSET_DEFS } from './props';
 
 // the castle set: every key resolves through the shared prop registry so
@@ -158,9 +159,23 @@ export function buildCastleFeatures(): CastleFeaturesView {
     list.push(p);
   };
 
-  // stone slab helper: the visible floor caps and stair masses
-  const slabMat = surfaceMat({ color: 0x8a7568, roughness: 0.95 });
-  const capMat = surfaceMat({ color: 0x97826f, roughness: 0.9 });
+  // stone slab helper: the visible floor caps and stair masses. Both carry the
+  // shared rock detail normal (same texture as the dungeon/delve stone
+  // families, one extra bind total) at a subtle scale so the big flat caps
+  // pick up a faint grain instead of reading as painted plastic.
+  const stoneDetail = GFX.standardMaterials ? stoneDetailNormal() : null;
+  const stoneSlab = (color: number, roughness: number): THREE.Material => {
+    const mat = surfaceMat({ color, roughness, normalMap: stoneDetail ?? undefined });
+    if (stoneDetail && (mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
+      (mat as THREE.MeshStandardMaterial).normalScale.set(
+        STONE_DETAIL_NORMAL_SCALE,
+        STONE_DETAIL_NORMAL_SCALE,
+      );
+    }
+    return mat;
+  };
+  const slabMat = stoneSlab(0x8a7568, 0.95);
+  const capMat = stoneSlab(0x97826f, 0.9);
   const slab = (
     cx: number,
     cz: number,
