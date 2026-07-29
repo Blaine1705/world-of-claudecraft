@@ -2020,7 +2020,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (!callerToken)
         return json(res, 401, { error: 'not authenticated', code: 'auth.required' });
       return handleAccountChangePassword(req, res, accountId, callerToken, {
-        disconnectAccount: (id, reason) => liveGame().disconnectAccount(id, reason),
+        disconnectAccount: (id, reason, exceptToken) =>
+          liveGame().disconnectAccount(id, reason, exceptToken),
       });
     }
     // Password reset is for users who are locked out, so both routes are
