@@ -393,11 +393,18 @@ const SUN_UV_STEP = (() => {
 })();
 
 const GROUND_RELIEF_GLSL = /* glsl */ `
-// 0.16 (was 0.14): with Ground048's near-flat crumble AO the dirt offset read
-// as a decal slide; Ground023's AO carries real clod/stone height, and the
-// bump keeps paths visibly standing up at grazing chase-camera angles.
-const float WOC_PARALLAX_SCALE = 0.16;
-const float WOC_PARALLAX_CLAMP = 0.04;   // UV units, ~0.18 world: past this it swims
+// Per-layer parallax amplitudes (replacing the one global WOC_PARALLAX_SCALE
+// 0.16): one amplitude across height fields with different contrast means the
+// weak layers show nothing, because effective depth = amplitude x channel sd.
+// Measured sds of GroundAO_Packed (remeasured from the shipped 512px file):
+// R grass 0.0775, G dirt 0.1168, B rock 0.1136, A sand 0.0559. Each
+// amplitude below = target depth / sd, so one sd of a layer's height signal
+// walks the projection by that layer's TARGET depth (UV units): grass 0.010
+// (soft turf, gentle tussocks), dirt 0.022 (clods and stones stand up),
+// rock 0.026 (strongest), sand 0.006 (subtle). The old global scale handed
+// grass 0.007 effective and dirt 0.019, so "height maps on grass" read flat.
+const vec4 WOC_PARALLAX_AMP = vec4(0.129, 0.188, 0.229, 0.107);
+const float WOC_PARALLAX_CLAMP = 0.04;   // UV units, ~0.18 world (radial, see pOff)
 float wocGroundHeight(vec2 uv, vec4 sw) {
   vec4 aoBase = texture2D(uGroundAO, uv);      // grass + sand share the base tiling
   float aoDirt = texture2D(uGroundAO, uv * 0.8).g;
@@ -414,9 +421,9 @@ float wocGroundHeight(vec2 uv, vec4 sw) {
 // lives at the texture's native tiling, where mip averaging pulls it to zero
 // within chase-camera distance — this octave's features are ~6x larger, so
 // they keep shading the mid-field where the player actually looks. Uses the
-// dirt channel for every layer: grass's own AO is near-uniform (sd 0.018),
-// and BSL-style ground reads come from soil structure under the grass, not
-// from the grass sheet itself.
+// dirt channel for every layer: grass's own AO is the weakest of the pack
+// (measured sd 0.078 vs dirt 0.117), and BSL-style ground reads come from
+// soil structure under the grass, not from the grass sheet itself.
 float wocGroundMacroRelief(vec2 uv) {
   return texture2D(uGroundAO, uv * 0.16).g - 0.897;
 }
@@ -438,9 +445,11 @@ const float WOC_MACRO_SHADE_KNEE = 1.2;
 // across the map and never settle into one fixed cadence.
 const float WOC_GRASS_SCALE_JITTER = 0.6;
 // WOC_GRASS_MID_OCTAVE: blend weight of the third grass octave (0.57x scale,
-// rotated 23 degrees, own seed offset). Keep LOW: it exists to add an
-// uncorrelated voice against the fine/coarse pair, never patches of its own.
-const float WOC_GRASS_MID_OCTAVE = 0.14;
+// rotated 23 degrees, own seed offset). 0.22 (was 0.14): the de-spot pass
+// moved tonal contrast off the fine octave onto the mid/coarse pair, so the
+// mid voice earns real weight now — still the smallest of the three, it must
+// never form patches of its own.
+const float WOC_GRASS_MID_OCTAVE = 0.22;
 // WOC_GRASS_HUE_DRIFT_FREQ and the endpoints: ~42yd meadow hue rotation
 // between warm yellow-green and cool blue-green, a few percent either way.
 // Both endpoints average ~1.0 so the drift is value-neutral: it can never
@@ -448,6 +457,25 @@ const float WOC_GRASS_MID_OCTAVE = 0.14;
 const float WOC_GRASS_HUE_DRIFT_FREQ = 0.024;
 const vec3 WOC_GRASS_HUE_WARM = vec3(1.035, 1.012, 0.955);
 const vec3 WOC_GRASS_HUE_COOL = vec3(0.968, 0.995, 1.042);
+// WOC_COMB_*: combed-turf anisotropy. The finest grass detail (the fine
+// albedo octave, the blade normal, the 3x fine-soft grain) samples through a
+// locally-rotating anisotropic transform: features stretch 1/COMPRESS
+// (~2.4x) along a direction whose angle swings with the existing macro noise
+// (~17yd field, SWING radians across its range). Close-up grass reads as
+// brushed growth with directional grain, patchy streaks, instead of the
+// isotropic dot-scale stipple that read as spots.
+const float WOC_COMB_FREQ = 0.058;
+const float WOC_COMB_SWING = 3.4;
+const float WOC_COMB_COMPRESS = 0.42;
+// Grass height-shade (the worn_stone round-7 idiom): the packed R channel's
+// sd-normalized tussock height, clamped at +-1.5 sd, darkens and slightly
+// saturates recesses so turf relief reads head-on where a grazing-angle
+// parallax offset does nothing. Sampled through the comb transform so the
+// shading grain runs with the growth direction, not as dots.
+const float WOC_GRASS_H_MEAN = 0.812;   // measured R-channel mean
+const float WOC_GRASS_H_INV_SD = 12.9;  // 1 / measured R-channel sd 0.0775
+const float WOC_GRASS_HEIGHT_SHADE = 0.10;
+const float WOC_GRASS_RECESS_SAT = 0.12;
 `;
 
 function buildSplatMaterial(
@@ -542,28 +570,45 @@ function buildSplatMaterial(
         }
         // Offset parallax: slide the ground UVs along the view ray by the
         // AO height proxy, so the painted clods and stones stand up at
-        // grazing angles instead of reading as a decal on flat ground. Rock and
-        // dirt carry it hardest, grass and sand take a light pass. Faded by
-        // slope (planar-XZ UVs stretch on cliffs, the same reason the detail
-        // normals fade below) and by distance, where mips have averaged the
-        // relief away and an offset would only shimmer. Everything below
-        // reuses tuv, so the detail normals follow the same height proxy and
-        // lighting agrees with the displacement.
+        // grazing angles instead of reading as a decal on flat ground. Each
+        // layer takes its sd-normalized amplitude (WOC_PARALLAX_AMP), so rock
+        // and dirt walk deep while grass and sand stay gentle BY TARGET, not
+        // by accident of channel contrast. Faded by slope (planar-XZ UVs
+        // stretch on cliffs, the same reason the detail normals fade below),
+        // by incidence, and by distance, where mips have averaged the relief
+        // away and an offset would only shimmer. Everything below reuses tuv,
+        // so the detail normals follow the same height proxy and lighting
+        // agrees with the displacement. Derived octave UVs (the rotated dirt/
+        // rock second octaves, the grass coarse/mid/comb taps) all transform
+        // the post-offset tuv, which preserves the same WORLD-space shift per
+        // tap: the octaves move together and cannot ghost against each other.
         vec3 pRay = cameraPosition - vWPos;
         float pDist = length(pRay);
         float upW = normalize(vWNorm).y;
-        float pRelief = (vSplatR.x * 0.55 + vSplatR.y + vSplatR.z * 0.9 + vSplatR.w * 0.35)
-          * (1.0 - vExtra.y)
+        // Grazing fade: at low N dot V the view-ray offset grows past what a
+        // 1-2 tap parallax can refine and the texture smears into a liquid
+        // blur, exactly where the depth cue is weakest anyway. Fade the whole
+        // effect out as N dot V drops below ~0.38.
+        float pNdv = dot(normalize(vWNorm), pRay) / max(pDist, 1e-3);
+        // Distance fade tightened (was 16..44yd): past ~36yd mip selection
+        // has blurred the 512px packed height field, and offsetting UVs by a
+        // blurry height signal reads as smear, not relief.
+        float pFade = (1.0 - vExtra.y)
           * smoothstep(0.55, 0.85, upW)
-          * (1.0 - smoothstep(16.0, 44.0, pDist));
-        if (pRelief > 0.015) {
+          * smoothstep(0.15, 0.38, pNdv)
+          * (1.0 - smoothstep(14.0, 36.0, pDist));
+        if (pFade > 0.015) {
           // planar-XZ UVs put the tangent frame on world x/z with world y as
-          // the surface normal, so the ray projects without a TBN; the divisor
-          // floor is the grazing-angle limiter (an unclamped 1/y diverges)
-          vec2 pDir = pRay.xz / max(pRay.y, pDist * 0.3);
-          vec2 pOff = clamp(
-            pDir * wocGroundHeight(tuv, vSplatR) * WOC_PARALLAX_SCALE * pRelief,
-            -WOC_PARALLAX_CLAMP, WOC_PARALLAX_CLAMP);
+          // the surface normal, so the ray projects without a TBN. Offset
+          // limiting: the divisor floor 0.45 (was 0.3) caps |pDir| near 2.2
+          // so a grazing ray cannot stretch the UVs into a smear; the radial
+          // renormalization below replaces the old per-component box clamp,
+          // which distorted the offset DIRECTION exactly at the diagonal
+          // grazing angles where it engaged most.
+          vec2 pDir = pRay.xz / max(pRay.y, pDist * 0.45);
+          vec4 pAmp = vSplatR * WOC_PARALLAX_AMP;
+          vec2 pOff = pDir * wocGroundHeight(tuv, pAmp) * pFade;
+          pOff /= max(1.0, length(pOff) / WOC_PARALLAX_CLAMP);
           ${
             // refine on high as well as ultra: the second wocGroundHeight read
             // is three taps of the 512^2 packed AO texture, far under the high
@@ -572,9 +617,8 @@ function buildSplatMaterial(
             GFX.tier === 'ultra' || GFX.tier === 'high'
               ? `// second iteration: re-read the height where the first offset
           // landed, which keeps steep clod edges from overshooting
-          pOff = clamp(
-            pDir * wocGroundHeight(tuv + pOff, vSplatR) * WOC_PARALLAX_SCALE * pRelief,
-            -WOC_PARALLAX_CLAMP, WOC_PARALLAX_CLAMP);`
+          pOff = pDir * wocGroundHeight(tuv + pOff, pAmp) * pFade;
+          pOff /= max(1.0, length(pOff) / WOC_PARALLAX_CLAMP);`
               : ''
           }
           tuv += pOff;
@@ -584,7 +628,13 @@ function buildSplatMaterial(
         // and stones still read from the high pitched-down chase camera where
         // a grazing-angle offset does nothing. Mip averaging pulls the signal
         // to zero with distance, so the far field keeps its painted colour.
-        float cavH = wocGroundHeight(tuv, vSplatR);
+        // Grass is demoted to 0.35x here: its fine-tiling AO stipple is
+        // isotropic dots, half of the "spotty ground" read; the combed
+        // height-shade on grassAlb below carries the tussock shading with
+        // directional grain instead. The ultra micro-shadow taps reuse
+        // swShade so their height differences stay DC-free.
+        vec4 swShade = vSplatR * vec4(0.35, 1.0, 1.0, 1.0);
+        float cavH = wocGroundHeight(tuv, swShade);
         // tighter slope fade than before: the AO/relief signal lives in the
         // planar-XZ projection, which stretches on banks — full-strength
         // cavity there amplified the stretch into vertical streaking
@@ -622,8 +672,8 @@ function buildSplatMaterial(
         {
           vec2 sunStep = vec2(${SUN_UV_STEP.x}, ${SUN_UV_STEP.y});
           float occl = max(
-            wocGroundHeight(tuv + sunStep, vSplatR) - cavH - 0.02,
-            (wocGroundHeight(tuv + sunStep * 2.2, vSplatR) - cavH) * 0.55 - 0.02);
+            wocGroundHeight(tuv + sunStep, swShade) - cavH - 0.02,
+            (wocGroundHeight(tuv + sunStep * 2.2, swShade) - cavH) * 0.55 - 0.02);
           groundShade *= 1.0 - min(max(occl, 0.0) * 4.5, 0.42) * cavW;
         }`
             : ''
@@ -649,10 +699,25 @@ function buildSplatMaterial(
         vec2 grassJitter = (vec2(
             texture2D(uMacro, vWPos.xz * 0.028 + 0.07).r,
             texture2D(uMacro, vWPos.xz * 0.028 + 0.63).r) - 0.5) * WOC_GRASS_SCALE_JITTER;
+        // Combed growth direction: the finest grass detail samples through a
+        // locally-rotating ANISOTROPIC transform (comb frame: compressed
+        // WOC_COMB_COMPRESS along combDir, unit across), so its features
+        // stretch ~2.4x along a direction that wanders with the macro noise.
+        // This is what turns the residual dot-scale stipple into streaky
+        // brushed turf: the dots elongate into grain that follows a local
+        // growth direction. Built on the post-parallax tuv so the combed taps
+        // shift with the same world-space offset as every other layer.
+        float combA = (texture2D(uMacro, vWPos.xz * WOC_COMB_FREQ + 0.19).r - 0.5) * WOC_COMB_SWING;
+        vec2 combDir = vec2(cos(combA), sin(combA));
+        vec2 combPerp = vec2(-combDir.y, combDir.x);
+        vec2 combT = vec2(dot(tuv, combDir) * WOC_COMB_COMPRESS, dot(tuv, combPerp));
+        // fine octave combed; blend base 0.56 (was 0.50): with the fine
+        // octave's job reduced to directional grain, the coarse and mid
+        // octaves carry more of the tonal variation (patchy turf, not dots)
         vec3 grassAlb = mix(
-          texture2D(uGrass, tuv + grassJitter).rgb,
+          texture2D(uGrass, combT + grassJitter).rgb,
           texture2D(uGrass, vec2(-tuv.y, tuv.x) * 0.31 - grassJitter * 0.6).rgb,
-          0.50 + (macro2 - 0.5) * 0.3);
+          0.56 + (macro2 - 0.5) * 0.3);
         // Third, LOW-amplitude mid octave between the fine (1.0x) and coarse
         // (0.31x) tilings: 0.57x scale rotated 23 degrees (cos 0.9205 and
         // sin 0.3907 folded into the constants), with its own seed offset so
@@ -668,6 +733,18 @@ function buildSplatMaterial(
         // adds randomness you feel across a field without a patch to point at.
         float grassHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
         grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT);
+        // Tussock height-shade (the worn_stone round-7 idiom): sd-normalized
+        // R-channel height, clamped at 1.5 sd; recesses darken and saturate a
+        // touch (shaded turf reads damp), crests lift, so the grass height
+        // field reads from the pitched-down chase camera where the parallax
+        // walk does nothing. Sampled through the comb frame so the shading is
+        // directional streaks, never the isotropic dots this pass removes;
+        // cavW gates it off banks with the rest of the planar relief.
+        float grassH = clamp(
+          (texture2D(uGroundAO, combT).r - WOC_GRASS_H_MEAN) * WOC_GRASS_H_INV_SD, -1.5, 1.5);
+        grassAlb *= 1.0 + grassH * WOC_GRASS_HEIGHT_SHADE * cavW;
+        grassAlb = mix(vec3(dot(grassAlb, vec3(0.299, 0.587, 0.114))), grassAlb,
+          1.0 + max(-grassH, 0.0) * WOC_GRASS_RECESS_SAT * cavW);
         // rock: top-down projection smears into vertical streaks on cliffs,
         // so steep faces blend toward wall-planar (world XY/ZY) samples
         vec3 an = abs(normalize(vWNorm));
@@ -869,10 +946,14 @@ function buildSplatMaterial(
         '#include <normal_fragment_maps>',
         `#include <normal_fragment_maps>
         // per-layer detail normals (GL-convention), weighted by splat: rock
-        // carries the hardest relief, then dirt, grass moderate, sand soft
-        // grassJitter (from the albedo chunk) keeps the blade normal in phase
-        // with the jittered fine grass albedo tap
-        vec3 gN = texture2D(uGrassN, tuv + grassJitter).xyz * 2.0 - 1.0;
+        // carries the hardest relief, then dirt, grass moderate, sand soft.
+        // The blade normal follows the combed fine albedo tap (combT, same
+        // jitter), and its comb-frame perturbation rotates back into ground-UV
+        // space; the chain rule scales the along-comb slope by the
+        // compression, which IS the combed look: smooth along the growth
+        // direction, ridged across it.
+        vec3 gN = texture2D(uGrassN, combT + grassJitter).xyz * 2.0 - 1.0;
+        vec2 gNxy = gN.x * WOC_COMB_COMPRESS * combDir + gN.y * combPerp;
         vec3 dN = texture2D(uDirtN, tuv * 0.8).xyz * 2.0 - 1.0;
         vec3 rN = texture2D(uRockN, tuv * 0.6).xyz * 2.0 - 1.0;
         vec3 sN = texture2D(uSandN, tuv).xyz * 2.0 - 1.0;
@@ -882,9 +963,11 @@ function buildSplatMaterial(
         // source map is indistinguishable once summed into a layer's normal:
         // the hard layers share the crisp tap, the soft layers the gentle one.
         vec2 fineHard = texture2D(uRockN, tuv * 2.4).xy * 2.0 - 1.0;
-        // 3.0 (was 4.0): slightly larger blotches so the finest grass octave
-        // stops reading as one uniform repeating stipple underfoot
-        vec2 fineSoft = texture2D(uGrassN, tuv * 3.0).xy * 2.0 - 1.0;
+        // The fine-soft grain is combed like the blade normal (the 3x tiling
+        // was the single loudest dot-scale voice): elongated micro-grain for
+        // grass, and on sand it reads as wind-swept ripple rather than dots.
+        vec2 fineSoftRaw = texture2D(uGrassN, combT * 3.0).xy * 2.0 - 1.0;
+        vec2 fineSoft = fineSoftRaw.x * WOC_COMB_COMPRESS * combDir + fineSoftRaw.y * combPerp;
         // gravel grain at the trail albedo's own tap scale, so the grit a
         // path shows is lit rather than painted (gravelW already fades it
         // with the marsh mud swap)
@@ -895,9 +978,10 @@ function buildSplatMaterial(
         float dirtDetail = (1.0 - vExtra.x * 0.35) * (1.0 - pathCore * 0.3);
         // dirt micro-grain eased (1.55/0.7/0.5, were 1.8/0.9/0.7): the macro
         // soil octaves own the mid-scale read now, and the old weights let
-        // single-frequency speckle dominate again; grass fine octave down to
-        // 0.65 for the same reason, its blade normal gN keeps full weight
-        vec2 detN = (gN.xy + fineSoft * 0.65) * vSplatR.x * 1.5
+        // single-frequency speckle dominate again; grass fine grain down to
+        // 0.45 (was 0.65): with the comb stretch it supplies direction, not
+        // contrast, and the combed blade normal gNxy keeps full weight
+        vec2 detN = (gNxy + fineSoft * 0.45) * vSplatR.x * 1.5
                   + (dN.xy + fineHard * 0.7 + gvN * gravelW * 0.5) * vSplatR.y * 1.55 * dirtDetail
                   + (rN.xy + fineHard * 0.9) * vSplatR.z * 1.5 * (1.0 - wallW)
                   + (sN.xy + fineSoft * 0.9) * vSplatR.w * 1.1;
