@@ -3039,6 +3039,11 @@ export class ClientWorld implements IWorld {
           // order on cooldown shows unavailable on the client too. The ?? []
           // keeps an older server's payload (without the field) loading cleanly.
           cadenceBlockedQuests: [...(cprof.cadenceBlockedQuests ?? [])],
+          // The quested-hobby record, mirrored so the attunement preview can
+          // promise the hobby a return will actually restore. Conditional
+          // spread: absent stays absent (older server payloads, characters
+          // without the feature).
+          ...(cprof.questedHobbies ? { questedHobbies: { ...cprof.questedHobbies } } : {}),
         };
       }
       // camera follows server-side facing changes when not mouselooking

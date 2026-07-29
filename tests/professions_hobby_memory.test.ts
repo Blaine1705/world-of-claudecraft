@@ -254,3 +254,31 @@ describe('quested-hobby memory: persistence', () => {
     expect([...reloadedMeta.questedHobbies.entries()]).toEqual([[PAIR, QUESTED_HOBBY]]);
   });
 });
+
+describe('the crafting identity view carries the quested-hobby record', () => {
+  // The attunement dialog's pre-commit preview reads it through IWorld
+  // (offline) and the cprof mirror (online, the one shared Sim builder), so
+  // a make-amends return's preview names the hobby the restore will set.
+  it('craftingIdentityFor includes the KEY-SORTED record once one exists, and omits it while empty', () => {
+    const sim = makeSim(7331);
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid) as PlayerMeta;
+    // Zero-default omission: no field at all for a character without one, so
+    // the cprof delta signature never moves for the featureless majority.
+    expect('questedHobbies' in sim.craftingIdentityFor(pid)).toBe(false);
+
+    meta.questedHobbies.set('weaponcrafting+armorcrafting', 'tailoring');
+    meta.questedHobbies.set('tailoring+leatherworking', 'cooking');
+    const view = sim.craftingIdentityFor(pid);
+    expect(view.questedHobbies).toEqual({
+      'tailoring+leatherworking': 'cooking',
+      'weaponcrafting+armorcrafting': 'tailoring',
+    });
+    // KEY-SORTED for a stable cprof JSON signature, regardless of insertion
+    // order (the Map above deliberately inserts out of sort order).
+    expect(Object.keys(view.questedHobbies ?? {})).toEqual([
+      'tailoring+leatherworking',
+      'weaponcrafting+armorcrafting',
+    ]);
+  });
+});

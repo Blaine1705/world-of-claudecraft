@@ -131,6 +131,32 @@ describe('buildAttunementPreview', () => {
     });
   });
 
+  it('a remembered quested hobby wins over the skill default for its pair', () => {
+    // The pair-transition restore (professions/hobby_memory.ts) will set the
+    // remembered hobby, so the pre-commit preview must promise the same.
+    const preview = buildAttunementPreview(
+      'weaponcrafting+armorcrafting',
+      baseIdentity.craftSkills,
+      1,
+      { 'weaponcrafting+armorcrafting': 'tailoring' },
+    );
+    expect(preview?.hobbyCraft).toBe('tailoring');
+    // A record for a DIFFERENT pair changes nothing here.
+    expect(
+      buildAttunementPreview('weaponcrafting+armorcrafting', baseIdentity.craftSkills, 1, {
+        'tailoring+leatherworking': 'cooking',
+      })?.hobbyCraft,
+    ).toBe('leatherworking');
+  });
+
+  it('an invalid remembered hobby falls back to the skill default (the restore rule)', () => {
+    expect(
+      buildAttunementPreview('weaponcrafting+armorcrafting', baseIdentity.craftSkills, 0, {
+        'weaponcrafting+armorcrafting': 'weaponcrafting', // a major, never a candidate
+      })?.hobbyCraft,
+    ).toBe('leatherworking');
+  });
+
   it('escalates the return cost with the switch count (requiredAmendsProgress)', () => {
     // 5 + 3 * switchCount, the shared switch-cost-at-rest formula.
     expect(

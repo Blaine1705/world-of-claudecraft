@@ -477,7 +477,12 @@ export class QuestDialogController {
             crestUrl: null,
           };
         }
-        const preview = buildAttunementPreview(target, identity.craftSkills, identity.switchCount);
+        const preview = buildAttunementPreview(
+          target,
+          identity.craftSkills,
+          identity.switchCount,
+          identity.questedHobbies,
+        );
         if (!preview) return { text: '', crestUrl: null };
         // The pre-commit picture: majors, hobby, and retained-but-dormant
         // knowledge, PLUS the escalating make-amends return cost (closing the

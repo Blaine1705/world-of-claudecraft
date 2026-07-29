@@ -367,3 +367,35 @@ describe('tier mail over the live GameServer wire (session routing)', () => {
     ONLINE_SUITE_TIMEOUT_MS,
   );
 });
+
+describe('the quested-hobby record rides the cprof mirror', () => {
+  it('a recorded hobby reaches the owner wire frame, and an empty record stays absent', () => {
+    const server = new GameServer();
+    const fcOwner = fakeWs();
+    const so = joinServer(server, fcOwner, 131, 'Rememberer');
+    const meta = playersOf(server).get(so.pid)!;
+
+    // Featureless baseline: the field is ABSENT from the cprof frame (the
+    // zero-default omission that keeps the delta signature still).
+    (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
+    const before = fcOwner.sent
+      .filter((m) => m.t === 'snap' && m.self?.cprof)
+      .map((m) => m.self!.cprof!);
+    expect(before.length).toBeGreaterThan(0);
+    expect('questedHobbies' in before[before.length - 1]).toBe(false);
+
+    // The record appears (the hobby-switch quest writes it in real flow;
+    // written directly here, the per-pid state idiom) and the next broadcast
+    // diffs a NEW cprof frame carrying it.
+    meta.questedHobbies.set('weaponcrafting+armorcrafting', 'tailoring');
+    routeOf(server)(server.sim.tick());
+    (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
+    const after = fcOwner.sent
+      .filter((m) => m.t === 'snap' && m.self?.cprof)
+      .map((m) => m.self!.cprof!);
+    expect(after.length).toBeGreaterThan(before.length);
+    expect(after[after.length - 1].questedHobbies).toEqual({
+      'weaponcrafting+armorcrafting': 'tailoring',
+    });
+  });
+});

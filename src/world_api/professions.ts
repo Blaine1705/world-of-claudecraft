@@ -41,6 +41,15 @@ export interface CraftingIdentityView {
   // too. Offline the Sim ignores this field and re-derives the set from live
   // PlayerMeta.questCadence. Absent on an older server payload.
   cadenceBlockedQuests?: readonly string[];
+  // Hobbies explicitly chosen through the hobby-switch quest, keyed by
+  // canonical pair id (src/sim/professions/hobby_memory.ts). The
+  // pair-transition restore reads the same record, so the attunement
+  // dialog's pre-commit preview can promise the SAME hobby a make-amends
+  // return will actually set instead of the skill default. KEY-SORTED so
+  // the JSON form is a stable cprof signature; ABSENT (zero-default
+  // omission) for characters that never quested a hobby and on an older
+  // server's payload.
+  questedHobbies?: Readonly<Record<string, string>>;
 }
 
 // Static content read: the common-tier recipe list (issue #1127). A plain

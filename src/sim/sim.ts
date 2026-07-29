@@ -539,6 +539,7 @@ import {
   type ItemInstancePayload,
   isConsuming,
   isDungeonDifficulty,
+  isNonSpellCast,
   isPetClass,
   isQuestTurnInNpc,
   LEASH_DISTANCE,
@@ -5209,8 +5210,10 @@ export class Sim {
     // follow walk skips stepPlayerMotion (whose move-input cancel guards
     // every self-propelled crossing), so without this a leader could carry
     // an angler into another zone mid-session and fish it against the
-    // wrong zone's rules.
-    if (zoneAt(fromZ).id !== zoneAt(p.pos.z).id) {
+    // wrong zone's rules. The session check leads: it is the cheap common
+    // case (almost no towed player is mid-session), so the two zone walks
+    // run only when there is something to cancel.
+    if (isNonSpellCast(p.castingAbility) && zoneAt(fromZ).id !== zoneAt(p.pos.z).id) {
       cancelProfessionSessionOnDisplacement(this.ctx, p);
     }
     return true;
@@ -9711,6 +9714,18 @@ export class Sim {
         this.players.get(pid)?.questCadence ?? new Map(),
         this.tickCount,
       ),
+      // Quested-hobby record (professions/hobby_memory.ts), KEY-SORTED for a
+      // stable cprof signature and omitted while empty, so the delta diff
+      // never fires for characters without the feature.
+      ...(() => {
+        const quested = this.players.get(pid)?.questedHobbies;
+        if (!quested || quested.size === 0) return {};
+        return {
+          questedHobbies: Object.fromEntries(
+            [...quested.entries()].sort(([a], [b]) => (a < b ? -1 : 1)),
+          ),
+        };
+      })(),
     };
   }
 

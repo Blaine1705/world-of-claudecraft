@@ -3,6 +3,7 @@ import {
   archetypePairId,
   craftsForPairTarget,
   defaultHobbyForPair,
+  hobbyCandidatesForPair,
   requiredAmendsProgress,
 } from '../sim/professions/archetype';
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
@@ -160,13 +161,24 @@ export function buildAttunementPreview(
   target: string,
   craftSkills: Readonly<Record<string, number>>,
   switchCount = 0,
+  questedHobbies?: Readonly<Record<string, string>>,
 ): AttunementPreview | null {
   const pair = craftsForPairTarget(target);
   if (!pair) return null;
+  // The hobby the transition will ACTUALLY set: a hobby this character once
+  // quested for the target pair wins over the skill default (the
+  // pair-transition restore, professions/hobby_memory.ts), validated against
+  // the pair's candidates exactly like the restore itself, so the pre-commit
+  // sentence and the outcome cannot disagree.
+  const remembered = questedHobbies?.[target];
+  const hobbyCraft =
+    remembered !== undefined && hobbyCandidatesForPair(pair[0], pair[1]).includes(remembered)
+      ? remembered
+      : defaultHobbyForPair(pair[0], pair[1], { ...craftSkills });
   return {
     target,
     majors: pair,
-    hobbyCraft: defaultHobbyForPair(pair[0], pair[1], { ...craftSkills }),
+    hobbyCraft,
     majorCeiling: 'unlimited',
     hobbyCeiling: 'rare',
     otherCeiling: 'common',
