@@ -772,10 +772,14 @@ What each item settled:
    measured by the phase 11 QA): delta keys 57 to 63 (the packet's tslot
    plus the release's einst, mntOwn, mntRtd, mntLesson, mntRace; mloot
    already existed at the base), sendable commands 164 to 174 and
-   dispatched 173 to 185 (the release's eleven, nine with shipped senders,
-   none dev-gated), SimEvents 118 to 131 (twelve release additions, two of
-   them pid-less), REST routes 184 to 185 (one admin-only unstuck-reports
-   route; the registry file itself is byte-identical). Still true and
+   dispatched 173 to 185 (the release's eleven, none dev-gated, of which
+   FOUR are reachable from the shipped client's own surfaces: the mount
+   key, the two race controls, and the Settings unstuck; the rift forge
+   and riding-training senders exist on ClientWorld but nothing shipped
+   calls them yet), SimEvents 118 to 131 (twelve release additions, two of
+   them pid-less), registered RouteDefs 180 to 181 and surface-inventory
+   rows 195 to 196 (one admin-only unstuck-reports route; the registry
+   file itself is byte-identical). Still true and
    verified at the base: every addition is purely additive, no key was
    removed or reshaped, and the base client ignores unknown event types
    (no default arm on any of its three event switches, no wire allowlist).
@@ -845,17 +849,20 @@ whether this deploy should force stale web sessions onto the new bundle
 stale-tab window the runbook now describes. R34 DEFERRED a hard
 version floor as a separate later decision on the premise that clients
 degrade gracefully; that premise is materially weaker after the
-v0.32.0 re-sync. The old bundle now fails to degrade in FOUR places:
+v0.32.0 re-sync. The old bundle now fails to degrade in FOUR verified
+places (the runtime rift-loot arm above is excluded from this count only
+because a stale tab's path INTO a rift is unverified either way):
 the trade-throw arm, the heroic-reins loot-window arm, the void world
 past the old terrain rectangle (the server rim moved outward, so a
 stale tab can walk onto ground its renderer has no mesh for), and the
 rebased instance plane (INSTANCE_X_BASE moved every dungeon, delve,
 and arena interior to coordinates a stale renderer draws as a
 collider-less void until relog). The release left the fail-closed gate
-at ONLINE_WORLD_LAYOUT_VERSION 3 through both layout changes, so
-bumping it to 4 is the one-line mechanical lever if the answer is to
-refuse stale sessions; the question, now with that lever named, stays
-the maintainer's to make.
+at its current ONLINE_WORLD_LAYOUT_VERSION (pinned by
+tests/security.test.ts) through both layout changes, so bumping it is
+the one-line mechanical lever if the answer is to refuse stale
+sessions; the question, now with that lever named, stays the
+maintainer's to make.
 
 REVIEW ROUND (same sitting): five fresh lenses over the build diff
 (qa-checklist, frontend-seam, test-coverage, privacy-security, and an

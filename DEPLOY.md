@@ -259,8 +259,8 @@ For off-box safety, sync the directory to S3 occasionally:
     skew is walk-through phantom props only (herb clusters carry no collider).
     All of THAT is cosmetic and self-heals when the client updates. Two
     v0.32.0 surfaces on this leg are NOT cosmetic: the world grew far past
-    the old bundle's terrain rectangle, so a stale tab can walk east or
-    north into ground its renderer has no mesh for (a void with the wrong
+    the old bundle's terrain rectangle, so a stale tab can walk east,
+    west, or north into ground its renderer has no mesh for (a void with the wrong
     zone name and music, walkable because the server's rim moved outward);
     and the instance plane REBASED (INSTANCE_X_BASE), so a stale tab that
     enters any dungeon, delve, or arena after the deploy is teleported to
@@ -281,24 +281,26 @@ For off-box safety, sync the directory to S3 occasionally:
     surfaces advertise nodes, items, and minimap markers the old server
     denies.
     This window exists only between a client release and the server deploy, so
-    close it by deploying the server as soon as the clients are staged. (An old
-    server answers a command it does not know by logging a protocol anomaly to
-    the bot detector and spending a rate-limit token. The professions tuning
-    packet itself adds exactly one command, dev-gated with no shipped sender,
-    but the v0.32.0 expansion it merged with adds eleven more (the mount,
-    rift forge, and unstuck families), nine with real shipped senders and
-    none dev-gated. On this leg
-    an ordinary player pressing the mount key or using unstuck spends
-    rate-limit tokens and logs anomalies until the server deploys, one more
-    reason to keep the binary-to-server gap short.)
+    close it by deploying the server as soon as the clients are staged. (An
+    old server answers a command it does not know by logging a protocol
+    anomaly to the bot detector and spending a rate-limit token. The
+    professions tuning packet itself adds exactly one command, dev-gated and
+    called by nothing shipped; the v0.32.0 expansion it merged with adds
+    eleven more, none dev-gated, of which FOUR are reachable from the
+    shipped client's own surfaces: the mount key, the two race controls,
+    and the Settings unstuck action. On this leg an ordinary player
+    pressing the mount key or using unstuck spends rate-limit tokens and
+    logs anomalies until the server deploys, one more reason to keep the
+    binary-to-server gap short.)
   Release-specific caveat for the professions tuning deploy: the guards above
   describe bundles built from this release onward. The bundle DEPLOYED TODAY
   predates them, and its trade window throws while rendering an offer that
   stages ANY item id the bundle predates (the packet's fine-grade materials
   and rods, and equally the expansion's whole tradeable catalog: rift
   essence and gems, the new-zone gear, none of it soulbound), freezing that
-  trade panel for the stale session until the page reloads. The sibling loot-window throw is unreachable through the PACKET's
-  ids as long as they remain gathering, recipe, vendor, and delve-shop
+  trade panel for the stale session until the page reloads. The sibling
+  loot-window throw is unreachable through the PACKET's ids as long as
+  they remain gathering, recipe, vendor, and delve-shop
   content only, out of every mob and chest loot table, so keep them out
   until clients have rolled; it is NOT unreachable for the merged release as
   a whole, because the v0.32.0 expansion put four mount reins into the

@@ -8,9 +8,10 @@
 // the deploy window, instead of living only as a runbook sentence.
 //
 // The v0.32.0 merge narrowed what this file can promise. The expansion
-// itself put four mount reins into HEROIC_BOSS_LOOT on bosses that exist at
-// the deployed base, so the loot-popup throw is NOT unreachable for the
-// merged branch as a whole: a solo or FFA heroic clear of those four bosses
+// itself put four mount reins into HEROIC_BOSS_LOOT on FIVE encounters that
+// exist at the deployed base (the four heroic finales plus the Nythraxis
+// raid), so the loot-popup throw is NOT unreachable for the merged branch
+// as a whole: a solo or FFA heroic clear of any of them
 // can hand a stale bundle an id it cannot resolve. That residual arm is the
 // release's own, recorded in DEPLOY.md beside the surfaced forced-refresh
 // question; the exception arm below pins it to EXACTLY those four ids so a
