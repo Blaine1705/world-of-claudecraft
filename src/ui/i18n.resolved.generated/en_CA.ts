@@ -693,7 +693,7 @@ export const en_CA: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% off",
+      "railWocDiscount": "{percent}% off",
       "railWocUnavailable": "WOC pricing is unavailable right now.",
       "railNativeUnavailable": "Crypto off.",
       "amountLabel": "Amount",
@@ -929,9 +929,7 @@ export const en_CA: EnTranslations = {
       "riding": "Riding",
       "mount": "Mount",
       "dismount": "Dismount",
-      "requiresLevel": "Requires level {level}",
-      "pickFirst": "Pick a mount to ride.",
-      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "useToRide": "Use to summon this mount.",
       "emptyTitle": "No mounts collected",
       "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
       "emptyDropHint": "Rarer mounts drop from heroic dungeon bosses and Rift completions.",
@@ -957,7 +955,7 @@ export const en_CA: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "ownedMountPrompt": "Press {key} to mount",
+      "ownedMountPrompt": "Your reins are in your bags. Use them to ride.",
       "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
       "success": "You have tamed the Valorsteed.",
@@ -1382,10 +1380,10 @@ export const en_CA: EnTranslations = {
     },
     "plurals": {
       "guildMembers": {
-        "one": "you are {rank}, {count} member",
-        "few": "you are {rank}, {count} members",
-        "many": "you are {rank}, {count} members",
-        "other": "you are {rank}, {count} members"
+        "one": "your guild rank is {rank}; {count} member",
+        "few": "your guild rank is {rank}; {count} members",
+        "many": "your guild rank is {rank}; {count} members",
+        "other": "your guild rank is {rank}; {count} members"
       },
       "finderPartySize": {
         "one": "{count} player",
@@ -1546,6 +1544,7 @@ export const en_CA: EnTranslations = {
       "harvestButton": "Harvest",
       "harvestTooltip": "Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.",
       "concentrateHint": "Fewer chosen components yield a higher tier each.",
+      "nothingSelectedYields": "Nothing you selected can be harvested from this corpse.",
       "alreadyHarvested": "This corpse has already been harvested.",
       "componentAria": "Harvest {component}",
       "components": {
@@ -2109,8 +2108,8 @@ export const en_CA: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "World Market collection waiting",
-      "tip": "Gold or items are waiting for you at the Merchant."
+      "aria": "World Market proceeds or items waiting",
+      "tip": "Sale proceeds or returned items are waiting for you at the Merchant."
     },
     "noticeboard": {
       "empty": "Nothing seems posted."
@@ -2254,6 +2253,9 @@ export const en_CA: EnTranslations = {
       "notReady": "This resource node has not respawned for you yet.",
       "gatherLine": "You gather: {name}.",
       "gatherLineQty": "You gather: {name} x{qty}.",
+      "harvestLine": "You harvest: {name}.",
+      "harvestLineQty": "You harvest: {name} x{qty}.",
+      "harvestSpecimenLine": "You also recover {name}.",
       "catchLine": "You reel in: {name}",
       "biteLine": "Something takes the bait!",
       "gotAwayLine": "It got away.",
@@ -2435,6 +2437,7 @@ export const en_CA: EnTranslations = {
       "empty": "No recipes known yet.",
       "resultAria": "Craft {name}",
       "craftedToast": "Crafted: {name}",
+      "craftedToastQty": "Crafted: {name} x{qty}",
       "insufficientMaterials": "You do not have the materials for that.",
       "unknownRecipe": "That recipe does not exist.",
       "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe.",
@@ -2527,7 +2530,13 @@ export const en_CA: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "You disenchant {item}.",
+      "disenchantedYield": "You disenchant {item} into {material}.",
+      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
+      "disenchantedAlso": "You also recover {material}.",
+      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
       "salvagedLine": "You salvage {item}.",
+      "salvagedYield": "You salvage {item} into {material}.",
+      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
       "enchantAppliedLine": "You enchant {item} with {enchant}.",
       "notHeld": "You do not have that item.",
       "notDisenchantable": "You cannot disenchant that.",
@@ -2564,9 +2573,14 @@ export const en_CA: EnTranslations = {
       "sameEnchant": "That item already has that enchant.",
       "replaceTag": "Replaces {enchant}",
       "sameEnchantTag": "Already applied",
+      "plainTag": "Not enchanted",
       "replaceConfirmTitle": "Replace the enchant on {item}?",
       "replaceConfirmBody": "This replaces {old} on {item} with {new}.",
       "replaceConfirmNoRefund": "The old enchant is destroyed. Its materials are not refunded. This cannot be undone.",
+      "replaceConfirmKeeps": "Kept: {kept}",
+      "replaceConfirmKeepsSigner": "Maker's mark",
+      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
+      "replaceConfirmKeepsBond": "Commission bond",
       "replaceConfirmCost": "Cost: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Replace"
@@ -6941,6 +6955,7 @@ export const en_CA: EnTranslations = {
       "filterTypeAll": "All types",
       "filterTypeWeapon": "Weapons",
       "filterTypeArmor": "Armor",
+      "filterTypeBag": "Bags",
       "filterTypeConsumable": "Consumables",
       "filterTypeMaterial": "Materials",
       "filterTypeCosmetic": "Cosmetics",
@@ -6954,6 +6969,8 @@ export const en_CA: EnTranslations = {
       "armorMail": "Mail",
       "filterWeaponType": "Weapon type",
       "filterWeaponAll": "All weapons",
+      "filterBagSize": "Bag size",
+      "filterBagAll": "All bags",
       "filterPrimaryStat": "Primary stat",
       "filterPrimaryStatAll": "Any primary stat",
       "filterRarity": "Rarity",
@@ -9504,6 +9521,9 @@ export const en_CA: EnTranslations = {
       },
       "heart_of_the_rift": {
         "name": "Heart of the Rift"
+      },
+      "voidsong_dirk": {
+        "name": "Voidsong, Dirk of the Sundered Veil"
       },
       "wildheart_tuskblade": {
         "name": "Wildheart Tuskblade"

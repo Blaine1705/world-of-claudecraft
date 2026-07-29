@@ -14,6 +14,7 @@
 // bailey sits at padH and the inner ward, the keep's raised terrace,
 // 2.6 above it behind a retaining edge with two stair cuts. Pure leaf:
 // deterministic, no rng, no SimContext.
+import type { BlockerDef } from './types';
 
 export const CASTLE = {
   // the graded grounds (terrain levels to the local pad target; the skirt
@@ -39,6 +40,12 @@ export const CASTLE = {
   /** mid-wall tower half-width */
   midTowerHw: 2.8,
 } as const;
+
+/** The ward's retaining edge blend: how far inside the ward rect the terrace
+ *  reaches full height. Sheer enough for the climb gate to refuse it, but not
+ *  a numeric wall. Anything that must MEET the edge (the alley flight's mass)
+ *  has to reach the far side of this band or it leaves a crack. */
+export const WARD_EDGE_BLEND = 0.7;
 
 // The three ways in. Every opening is a gap in the wall riser; spans are in
 // the wall's run coordinate (z for the west/east walls, x for north/south).
@@ -138,8 +145,19 @@ export const CASTLE_RAMPS: readonly CastleRamp[] = [
   // ...and its flat landing, bridging the flight top onto the SW bastion
   { axis: 'z', b0: 361.0, b1: 363.6, a0: 2058.6, a1: 2069, h0: CASTLE.walkAbs, h1: CASTLE.walkAbs },
   // the alley flight: squeezed between the north wall and the ward's
-  // retaining edge, climbing east to the NE walk
-  { axis: 'x', b0: 1989.0, b1: 1991.3, a0: 414, a1: 433.6, h0: 6, h1: CASTLE.walkAbs },
+  // retaining edge, climbing east to the NE walk. The band runs THROUGH the
+  // ward's retaining blend (the overlap rule above): stopping at the rect line
+  // left a sliver of bailey floor between the stair mass and the terrace that
+  // a walker fell up to 6.8yd into and could not climb out of.
+  {
+    axis: 'x',
+    b0: 1989.0,
+    b1: CASTLE.ward.z0 + WARD_EDGE_BLEND,
+    a0: 414,
+    a1: 433.6,
+    h0: 6,
+    h1: CASTLE.walkAbs,
+  },
   // the watch flight: the far wall-walk itself climbs to the SE chamber
   {
     axis: 'x',
@@ -195,6 +213,26 @@ export const CASTLE_BUILDINGS: readonly CastleBuilding[] = [
   { key: 'hexrTavern', x: 421, z: 2043, rot: Math.PI, scale: 7.5, r: 5.5, h: 10.5 },
 ] as const;
 
+// The keep and the great hall stand 1.2yd apart on the ward terrace, closer
+// than a player body can use. Their collision circles are INSCRIBED in square
+// meshes, so that slot's floor sits inside both rendered buildings: a player
+// who squeezed in stood under the stonework (it reads as being underground)
+// with barely room to turn around. Two invisible blocker walls close the neck
+// at the point where the gap is still wide enough to stand in, so the slot can
+// never be entered from either end. The terrace east of the keep (2.4yd clear)
+// stays the way around to the ward's north yard.
+//
+// Same idiom as JAIL_BLOCKERS: fence-width, camera-ghost, never jumpable, and
+// pure static data (no rng, no tick-order effect). Merged into the built-in
+// world's blockers in data.ts, so all three hosts collide identically.
+export const CASTLE_BLOCKERS: readonly BlockerDef[] = [
+  // the slot's north mouth: from inside the great hall's circle to inside the
+  // keep's, so neither end can be walked around
+  { x1: 410.2, z1: 2003.9, x2: 412.6, z2: 2003.9 },
+  // the slot's south mouth
+  { x1: 410.2, z1: 2006.1, x2: 412.6, z2: 2006.1 },
+] as const;
+
 // Ember crystals of varying sizes around the grounds and approach (drawn by
 // render/ember_features.ts with the shared crystal model).
 export const CASTLE_CRYSTALS: readonly { x: number; z: number; fp: number }[] = [
@@ -243,7 +281,44 @@ export function castleClear(x: number, z: number): boolean {
 // the Last Spring pool sits off the pad's northeast apron; the pad yields
 // to the lake's graded escape shore there (the fade completes before the
 // curtain wall corner, so the walls and courtyard stay dead level)
-const LAST_SPRING = { x: 456, z: 1988 } as const;
+export const LAST_SPRING = { x: 456, z: 1988 } as const;
+
+/**
+ * The inner ward terrace's rise above the bailey floor: the full 2.6 inside
+ * its rect, blended down over WARD_EDGE_BLEND at the retaining edge, and
+ * ramping back down over WARD_STEP_RUN inside the two stair cuts. Zero
+ * everywhere else.
+ *
+ * Split out because the RENDER has to subtract it. The retaining blend is
+ * 0.7yd, far narrower than the terrain mesh's vertex lattice (1.2yd at the
+ * densest LOD band, 3.0yd on the low tier), so a mesh built straight off
+ * terrainHeight smears this cliff into a ramp that climbs up to 1.7yd above
+ * the bailey floor the sim actually stands players on: they sink into the
+ * drawn ground along the ward's faces. The terrace is therefore drawn as a
+ * built mass instead (render/castle_features.ts) over a flat mesh, the same
+ * way the curtain walls, bastions and stair flights already are. See
+ * render/terrain_mesh_height.ts.
+ */
+export function wardTerraceRise(x: number, z: number): number {
+  const w = CASTLE.ward;
+  if (x < w.x0 || x > w.x1 || z < w.z0 || z > w.z1 + WARD_STEP_RUN) return 0;
+  const rise = CASTLE.ward.h - CASTLE.pad.h;
+  if (z <= w.z1) {
+    // the terrace proper; a narrow blend at the rect edge keeps the riser
+    // sheer enough to refuse the climb gate but not a numeric wall
+    const edge = Math.min(x - w.x0, w.x1 - x, z - w.z0);
+    return rise * Math.min(1, edge / WARD_EDGE_BLEND);
+  }
+  // south of the terrace edge: bailey, except inside a stair cut where the
+  // surface ramps down over WARD_STEP_RUN
+  for (const cut of WARD_STEPS) {
+    if (x >= cut.x0 && x <= cut.x1) {
+      const t = (z - w.z1) / WARD_STEP_RUN;
+      return rise * (1 - Math.min(1, t));
+    }
+  }
+  return 0;
+}
 
 /**
  * The local pad TARGET height: the inner ward terrace inside its rect
@@ -251,35 +326,31 @@ const LAST_SPRING = { x: 456, z: 1988 } as const;
  * everywhere else inside the pad.
  */
 export function castlePadTarget(x: number, z: number): number {
-  const w = CASTLE.ward;
-  if (x < w.x0 || x > w.x1 || z < w.z0 || z > w.z1 + WARD_STEP_RUN) return CASTLE.pad.h;
-  const rise = CASTLE.ward.h - CASTLE.pad.h;
-  if (z <= w.z1) {
-    // the terrace proper; a narrow blend at the rect edge keeps the riser
-    // sheer enough to refuse the climb gate but not a numeric wall
-    const edge = Math.min(x - w.x0, w.x1 - x, z - w.z0);
-    return CASTLE.pad.h + rise * Math.min(1, edge / 0.7);
-  }
-  // south of the terrace edge: bailey, except inside a stair cut where the
-  // surface ramps down over WARD_STEP_RUN
-  for (const cut of WARD_STEPS) {
-    if (x >= cut.x0 && x <= cut.x1) {
-      const t = (z - w.z1) / WARD_STEP_RUN;
-      return CASTLE.pad.h + rise * (1 - Math.min(1, t));
-    }
-  }
-  return CASTLE.pad.h;
+  return CASTLE.pad.h + wardTerraceRise(x, z);
 }
 
-/** The graded pad weight: level grounds, gentle skirt back to the waste. */
-export function castlePadWeight(x: number, z: number): number {
+/**
+ * The pad SKIRT's own reach: 1 over the graded rect, easing out to nothing
+ * over the 9yd skirt, with no pool yield in it. Split out because the skirt's
+ * reach is also what bounds the shore bank world.ts grades into the Last
+ * Spring (applyLastSpringBank): the bank is the pad's skirt meeting the water,
+ * so it must stop exactly where the skirt does and nowhere else.
+ */
+export function castleSkirtWeight(x: number, z: number): number {
   const p = CASTLE.pad;
   const dx = Math.max(p.x0 - x, 0, x - p.x1);
   const dz = Math.max(p.z0 - z, 0, z - p.z1);
   const d = Math.hypot(dx, dz);
   if (d >= 9) return 0;
   const t = 1 - d / 9;
-  return t * t * (3 - 2 * t) * sstepv(11, 18, Math.hypot(x - LAST_SPRING.x, z - LAST_SPRING.z));
+  return t * t * (3 - 2 * t);
+}
+
+/** The graded pad weight: level grounds, gentle skirt back to the waste. */
+export function castlePadWeight(x: number, z: number): number {
+  const skirt = castleSkirtWeight(x, z);
+  if (skirt <= 0) return 0;
+  return skirt * sstepv(11, 18, Math.hypot(x - LAST_SPRING.x, z - LAST_SPRING.z));
 }
 
 const HT = CASTLE.wallTh / 2;

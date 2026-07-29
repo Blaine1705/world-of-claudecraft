@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isBlocked } from '../src/sim/colliders';
+import { isBlocked, resolvePosition } from '../src/sim/colliders';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 
 const captureContract =
@@ -359,9 +359,12 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Repinned: eastbrook_town.ts (a hashed provenance input) intentionally
-      // changed when the conservative triplanar layer joined townMaterial.
-      fingerprint: 'ee4314f90f49cd009b5664aa853b71f71e3127994cf9f71f0346806f86563be3',
+      // Repinned on the graphics-overhaul x chunk-streaming merge: BOTH
+      // hashed inputs moved — eastbrook_town.ts (conservative triplanar layer
+      // in townMaterial) and renderer.ts (streaming/zone-cull coordinator).
+      // Composite recomputed on the merged tree; accepted evidence unchanged
+      // (every Eastbrook line is byte-identical across the renderer delta).
+      fingerprint: 'c95ee00aa621cc33062463592ad740e1b2af0d4379081c5196c339535d2de576',
       components: {
         captureContract: {
           id: 'polish-v2',
@@ -609,8 +612,22 @@ describe('Eastbrook polish capture contract', () => {
         isBlocked(EASTBROOK_ARMOURY_CAPTURE_SEED, view.target.x, view.target.z, 0.5),
         `${view.name} target`,
       ).toBe(false);
+      // The camera is an ELEVATED point: a low standable prop (a headstone, a
+      // bench) whose top sits below the camera's altitude does not contain it.
+      // Route the check through the height-aware resolver so only full-height
+      // geometry and props reaching the camera's y count as blockers.
+      const cameraResolved = resolvePosition(
+        EASTBROOK_ARMOURY_CAPTURE_SEED,
+        view.camera.x,
+        view.camera.z,
+        0.5,
+        false,
+        undefined,
+        { y: view.camera.y, lift: 0 },
+      );
       expect(
-        isBlocked(EASTBROOK_ARMOURY_CAPTURE_SEED, view.camera.x, view.camera.z, 0.5),
+        Math.abs(cameraResolved.x - view.camera.x) > 1e-4 ||
+          Math.abs(cameraResolved.z - view.camera.z) > 1e-4,
         `${view.name} camera`,
       ).toBe(false);
     }

@@ -693,7 +693,7 @@ export const tr_TR: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "%20 indirim",
+      "railWocDiscount": "%{percent} indirim",
       "railWocUnavailable": "WOC fiyatlandırması şu anda mevcut değil.",
       "railNativeUnavailable": "SOL/WOC şu anda kullanılamıyor.",
       "amountLabel": "Miktar",
@@ -929,9 +929,7 @@ export const tr_TR: EnTranslations = {
       "riding": "Riding",
       "mount": "Mount",
       "dismount": "Dismount",
-      "requiresLevel": "Requires level {level}",
-      "pickFirst": "Pick a mount to ride.",
-      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "useToRide": "Use to summon this mount.",
       "emptyTitle": "No mounts collected",
       "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
       "emptyDropHint": "Rarer mounts drop from heroic dungeon bosses and Rift completions.",
@@ -957,7 +955,7 @@ export const tr_TR: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "ownedMountPrompt": "Press {key} to mount",
+      "ownedMountPrompt": "Your reins are in your bags. Use them to ride.",
       "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
       "success": "You have tamed the Valorsteed.",
@@ -1546,6 +1544,7 @@ export const tr_TR: EnTranslations = {
       "harvestButton": "Topla",
       "harvestTooltip": "İşaretlenmiş bileşenleri toplar. Her leş yalnızca bir kez toplanabilir, ilk gelen alır. Yağmayı almaz.",
       "concentrateHint": "Ne kadar az parça seçersen, her biri o kadar yüksek kademede olur.",
+      "nothingSelectedYields": "Bu leşten seçtiklerinin hiçbiri toplanamaz.",
       "alreadyHarvested": "Bu leş zaten toplandı.",
       "componentAria": "{component} topla",
       "components": {
@@ -2109,8 +2108,8 @@ export const tr_TR: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Dünya Pazarı toplaması bekliyor",
-      "tip": "Tüccar'da senin için bekleyen altın ya da eşyalar var."
+      "aria": "Dünya Pazarı gelirleri veya eşyaları bekliyor",
+      "tip": "Satış gelirleri veya iade edilen eşyalar Tüccar'da seni bekliyor."
     },
     "noticeboard": {
       "empty": "Görünüşe göre hiçbir şey asılmamış."
@@ -2254,6 +2253,9 @@ export const tr_TR: EnTranslations = {
       "notReady": "Bu kaynak noktası senin için henüz yeniden oluşmadı.",
       "gatherLine": "Topladığınız şey: {name}.",
       "gatherLineQty": "Şunu toplarsınız: {name} x{qty}.",
+      "harvestLine": "Yüzersiniz: {name}.",
+      "harvestLineQty": "Yüzersiniz: {name} x{qty}.",
+      "harvestSpecimenLine": "Ayrıca {name} elde edersiniz.",
       "catchLine": "Çekiyorsunuz: {name}",
       "biteLine": "Bir şey yemi aldı!",
       "gotAwayLine": "Kaçtı gitti.",
@@ -2435,6 +2437,7 @@ export const tr_TR: EnTranslations = {
       "empty": "Henüz bilinen bir tarif yok.",
       "resultAria": "{name} zanaatı",
       "craftedToast": "Hazırlanma Tarihi: {name}",
+      "craftedToastQty": "Hazırlandı: {name} x{qty}",
       "insufficientMaterials": "Bunun için malzemeleriniz yok.",
       "unknownRecipe": "O tarif mevcut değil.",
       "comboRequirementUnmet": "O tarif için gereken iki zanaata da gereken kademede sahip değilsin.",
@@ -2527,7 +2530,13 @@ export const tr_TR: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "{item} büyüsünü bozdunuz.",
+      "disenchantedYield": "{item} büyüsünü bozup {material} elde ettiniz.",
+      "disenchantedYieldQty": "{item} büyüsünü bozup {material} x{qty} elde ettiniz.",
+      "disenchantedAlso": "Ayrıca {material} elde ettiniz.",
+      "disenchantedAlsoQty": "Ayrıca {material} x{qty} elde ettiniz.",
       "salvagedLine": "{item} parçaladınız.",
+      "salvagedYield": "{item} parçalayıp {material} elde ettiniz.",
+      "salvagedYieldQty": "{item} parçalayıp {material} x{qty} elde ettiniz.",
       "enchantAppliedLine": "{item} üzerine {enchant} büyüsü uyguladınız.",
       "notHeld": "O eşya elinizde yok.",
       "notDisenchantable": "Bunun büyüsünü bozamazsınız.",
@@ -2564,9 +2573,14 @@ export const tr_TR: EnTranslations = {
       "sameEnchant": "O eşyada zaten bu büyü var.",
       "replaceTag": "{enchant} yerine geçer",
       "sameEnchantTag": "Zaten uygulandı",
+      "plainTag": "Büyüsüz",
       "replaceConfirmTitle": "{item} üzerindeki büyü değiştirilsin mi?",
       "replaceConfirmBody": "{item} üzerindeki {old} büyüsü {new} ile değiştirilir.",
       "replaceConfirmNoRefund": "Eski büyü yok edilir. Malzemeleri iade edilmez. Bu geri alınamaz.",
+      "replaceConfirmKeeps": "Korunan: {kept}",
+      "replaceConfirmKeepsSigner": "Yapımcı işareti",
+      "replaceConfirmKeepsMasterwork": "Ustalık bonusu",
+      "replaceConfirmKeepsBond": "Komisyon bağı",
       "replaceConfirmCost": "Maliyet: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Değiştir"
@@ -6941,6 +6955,7 @@ export const tr_TR: EnTranslations = {
       "filterTypeAll": "Tüm türler",
       "filterTypeWeapon": "Silahlar",
       "filterTypeArmor": "Zırh",
+      "filterTypeBag": "Çantalar",
       "filterTypeConsumable": "Sarf Malzemeleri",
       "filterTypeMaterial": "Malzemeler",
       "filterTypeCosmetic": "Kozmetikler",
@@ -6954,6 +6969,8 @@ export const tr_TR: EnTranslations = {
       "armorMail": "Zincir",
       "filterWeaponType": "Silah türü",
       "filterWeaponAll": "Tüm silahlar",
+      "filterBagSize": "Çanta boyutu",
+      "filterBagAll": "Tüm çantalar",
       "filterPrimaryStat": "Birincil nitelik",
       "filterPrimaryStatAll": "Herhangi bir birincil nitelik",
       "filterRarity": "Nadirlik",
@@ -9504,6 +9521,9 @@ export const tr_TR: EnTranslations = {
       },
       "heart_of_the_rift": {
         "name": "Heart of the Rift"
+      },
+      "voidsong_dirk": {
+        "name": "Voidsong, Dirk of the Sundered Veil"
       },
       "wildheart_tuskblade": {
         "name": "Wildheart Tuskblade"

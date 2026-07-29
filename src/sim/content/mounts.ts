@@ -20,24 +20,25 @@ export type MountKey =
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler';
 
-export type MountRarity = 'common' | 'rare' | 'epic';
+export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
 export interface MountDef {
   key: MountKey;
   /** Canonical English display name (the HUD localizes via hudChrome.mounts.*). */
   name: string;
   rarity: MountRarity;
-  /** Required player level to select or ride (the card's "Mount Level"). */
-  level: number;
   /** Additive move-speed fraction while mounted (0.6 = +60% extra mobility). */
   moveSpeedPct: number;
 }
 
-// Speed/stat tiers (design directive): the purchasable horse is the 60% base;
-// the loot-only specials tier above it (70% commons, 75% rares with a little
-// crit, the 80% epics, the griffin and the gobbler, with the most block and
-// crit). The horse's level gate (20) matches the stablemaster's buy gate; the
-// loot commons ride earlier (10), the rares at 15, the epics at 20.
+// Speed tiers: the purchasable horse is the 60% base, and the loot-only specials
+// tier above it at 70 / 75 / 80% by rarity. Speed is the only stat a mount grants.
+//
+// There is NO per-mount level gate. It used to exist and never once fired: the
+// reins items carry no requiredLevel, the vendor path has its own hardcoded
+// level-20 buy gate, and every drop source is level-20 content, so a character
+// could not hold a mount before its gate anyway. The single real gate is
+// ridingTrained (purchased from Marla), enforced in src/sim/mounts.ts.
 export const MOUNTS: Record<MountKey, MountDef> = {
   // The base mount: first in the catalog, the natural default pick, sold by the
   // stablemaster (the only purchasable mount). Level 20 to match the buy gate.
@@ -45,54 +46,52 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     key: 'valorsteed',
     name: 'Valorsteed',
     rarity: 'common',
-    level: 20,
     moveSpeedPct: 0.6,
   },
-  grag_bear: {
-    key: 'grag_bear',
-    name: 'Goliath Grag-Bear',
-    rarity: 'common',
-    level: 10,
+  // Uncommon tier (70%): the griffin and the toad. These are the five-man heroic
+  // drops, so they are the first specials most players collect.
+  stormfeather_griffin: {
+    key: 'stormfeather_griffin',
+    name: 'Sky-Reach Stormfeather',
+    rarity: 'uncommon',
     moveSpeedPct: 0.7,
-  },
-  stalkglider_snail: {
-    key: 'stalkglider_snail',
-    name: 'Moss-Shell Stalk-Glider',
-    rarity: 'common',
-    level: 10,
-    moveSpeedPct: 0.7,
-  },
-  aether_hover_cycle: {
-    key: 'aether_hover_cycle',
-    name: 'Aether-Jouster Hover-Cycle',
-    rarity: 'rare',
-    level: 15,
-    moveSpeedPct: 0.75,
   },
   shadowjump_toad: {
     key: 'shadowjump_toad',
     name: 'Kama-Kage the Shadow-Jump Toad',
+    rarity: 'uncommon',
+    moveSpeedPct: 0.7,
+  },
+  // Rare tier (75%): the bear and the snail.
+  grag_bear: {
+    key: 'grag_bear',
+    name: 'Goliath Grag-Bear',
     rarity: 'rare',
-    level: 15,
     moveSpeedPct: 0.75,
   },
-  stormfeather_griffin: {
-    key: 'stormfeather_griffin',
-    name: 'Sky-Reach Stormfeather',
+  stalkglider_snail: {
+    key: 'stalkglider_snail',
+    name: 'Moss-Shell Stalk-Glider',
+    rarity: 'rare',
+    moveSpeedPct: 0.75,
+  },
+  // Epic tier (80%): the hover-cycle and the gobbler. Rift S clears are their
+  // only source; nothing static drops them.
+  aether_hover_cycle: {
+    key: 'aether_hover_cycle',
+    name: 'Aether-Jouster Hover-Cycle',
     rarity: 'epic',
-    level: 20,
     moveSpeedPct: 0.8,
   },
   thunderstrut_gobbler: {
     key: 'thunderstrut_gobbler',
     name: 'Thunderstrut the Grand Gobbler',
     rarity: 'epic',
-    level: 20,
     moveSpeedPct: 0.8,
   },
 };
 
-/** Catalog order for the mount picker: level tier, then declaration order. */
+/** Catalog order: rarity tier, then declaration order. */
 export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
 
 /** The horse: the default stable pick and the fallback for every unknown/legacy

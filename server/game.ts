@@ -584,7 +584,6 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',
-  'mount_select',
   'mount_toggle',
   'change_weapon_skin',
   'prestige',
@@ -1110,6 +1109,15 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.mountCastKey) out.mck = e.mountCastKey;
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
   if (e.riftSliding) out.sld = 1; // ice-slide: render a frozen gliding pose
+  // Ledge climb: quantized progress (1..99), not the arc. The client never
+  // re-simulates the pull (the server owns it and streams the resulting
+  // positions); it needs to know a climb is running, to stop predicting a
+  // fall, and how far through it is so the pull-up pose tracks the motion.
+  // Any non-zero value reads as "climbing" on older clients.
+  if (e.climb) {
+    const t = e.climb.elapsed / e.climb.duration;
+    out.cl = Math.max(1, Math.min(99, Math.round(t * 100)));
+  }
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
   if (e.forcedTargetId !== null) out.ft = e.forcedTargetId;
@@ -4425,7 +4433,14 @@ export class GameServer {
         }
         break;
       case 'buyback':
-        if (typeof msg.item === 'string') sim.buyBackItem(msg.item, pid);
+        if (typeof msg.item === 'string')
+          sim.buyBackItem(
+            msg.item,
+            typeof msg.index === 'number' ? msg.index : undefined,
+            msg.instance && typeof msg.instance === 'object' ? msg.instance : undefined,
+            pid,
+            typeof msg.craftedRecipeId === 'string' ? msg.craftedRecipeId : undefined,
+          );
         break;
       case 'harvest_node':
         this.sendCommandOutcome(
@@ -4452,7 +4467,10 @@ export class GameServer {
       // why `enchantResult` is itself a HEAVY_SELF_EVENTS member (the unbindResult
       // precedent): otherwise the spent reagents would linger in the bag mirror.
       case 'disenchant_item':
-        if (typeof msg.item === 'string') sim.disenchantItem(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.disenchantItem(msg.item, pid, slot);
+        }
         break;
       case 'apply_enchant':
         if (typeof msg.item === 'string' && typeof msg.enchant === 'string') {
@@ -4552,9 +4570,6 @@ export class GameServer {
         break;
       // Rideable mounts: the Sim re-validates everything (catalog key, level
       // gate, combat gate); the entity mirror + self `mnt` field carry the result.
-      case 'mount_select':
-        if (typeof msg.mount === 'string') sim.selectMountFor(pid, msg.mount);
-        break;
       case 'mount_toggle':
         sim.toggleMountFor(pid);
         break;
@@ -5920,6 +5935,8 @@ export class GameServer {
       sh: p.spellHaste,
       crit: p.critChance,
       dodge: p.dodgeChance,
+      blk: p.blockChance,
+      bval: p.blockValue,
       crat: p.critRating,
       hrat: p.hasteRating,
       hirat: p.hitRating,
@@ -6194,12 +6211,6 @@ export class GameServer {
     // shape used by the `/dev gather` chat cheat and existing consumers. Wire
     // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
     maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
-    // The persisted mount pick (IWorldMounts.selectedMount; always a valid
-    // catalog key, the horse by default). Kept per-tick like the other small
-    // scalars: one short string, negligible diff. Wire key `mntSel`; `mnt`
-    // remains the separate active-mount identity field. See
-    // TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
-    maybe('mntSel', meta.selectedMount);
     // The owned mount collection (IWorldMounts.ownedMounts): the horse plus
     // every mount whose reins item sits in bags or bank. A handful of short
     // strings whose serialized form only changes on a loot/bank move, so the

@@ -119,9 +119,12 @@ describe('generated chunk geometry is stable', () => {
     expect(inRect.length).toBe(36);
     expect(gapFill.length).toBe(12);
 
-    // The original 36-chunk pin, unchanged since before the worker move: the
-    // gap-cell fill must not perturb a single byte of the in-rect geometry.
-    expect(digestOf(inRect)).toBe('6f7fb63da247a5eb272dd9d7a42a5fcd');
+    // Re-minted for the Eastbrook camp respacing (PR #2584, maintainer-ordered):
+    // camp radii drive the terrain flatten aprons, so the deliberate, reviewed
+    // spread of the starter camps regrades the Vale rect. The prior pin
+    // (6f7fb63da247a5eb272dd9d7a42a5fcd) dated from before that change; the
+    // gap-cell fill must still not perturb a single byte of in-rect geometry.
+    expect(digestOf(inRect)).toBe('987a8787d8d0101698ed259f73aa557b');
     // The gap super-chunks' own pin. Re-mint ONLY for a deliberate, reviewed
     // visual change.
     expect(digestOf(gapFill)).toBe('1da89b363fda0dcac73d4d5a24c1760d');

@@ -693,7 +693,7 @@ export const zh_CN: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "优惠 20%",
+      "railWocDiscount": "优惠 {percent}%",
       "railWocUnavailable": "WOC 定价暂时不可用。",
       "railNativeUnavailable": "SOL/WOC 不可用",
       "amountLabel": "数量",
@@ -929,9 +929,7 @@ export const zh_CN: EnTranslations = {
       "riding": "骑乘中",
       "mount": "骑乘",
       "dismount": "下骑",
-      "requiresLevel": "需要等级{level}",
-      "pickFirst": "选择一个要骑乘的坐骑。",
-      "keybindHint": "按下骑乘 / 下骑键即可骑乘。",
+      "useToRide": "使用以召唤该坐骑。",
       "emptyTitle": "尚未收集坐骑",
       "emptyStableHint": "升到20级，前往高望以西的马厩，向马厩总管玛拉学习骑术。",
       "emptyDropHint": "较稀有的坐骑由英雄地下城首领掉落或完成裂隙获得。",
@@ -957,7 +955,7 @@ export const zh_CN: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 键骑上训练用英勇战马。",
-      "ownedMountPrompt": "按 {key} 键骑乘",
+      "ownedMountPrompt": "你的缰绳已在背包中，使用它即可骑乘。",
       "ridePrompt": "跟随发光的标记前往起点线，然后点击开始比赛。",
       "begin": "开始课程",
       "success": "你已经驯服了英勇战马。",
@@ -1546,6 +1544,7 @@ export const zh_CN: EnTranslations = {
       "harvestButton": "采集",
       "harvestTooltip": "采集勾选的部位。每具尸体只能被采集一次，先到先得。不会拾取战利品。",
       "concentrateHint": "选择的部位越少，每个部位的品质越高。",
+      "nothingSelectedYields": "你选择的部位都无法从这具尸体上采集。",
       "alreadyHarvested": "这具尸体已经被采集过了。",
       "componentAria": "采集{component}",
       "components": {
@@ -2109,8 +2108,8 @@ export const zh_CN: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "世界市场待领取物品",
-      "tip": "有金币或物品正在商人处等待你领取。"
+      "aria": "世界市场收益或物品待领取",
+      "tip": "销售收益或退回物品正在商人处等待你领取。"
     },
     "noticeboard": {
       "empty": "看起来没有张贴任何内容。"
@@ -2254,6 +2253,9 @@ export const zh_CN: EnTranslations = {
       "notReady": "这个资源节点尚未为你重新生成。",
       "gatherLine": "你采集了：{name}。",
       "gatherLineQty": "你采集了：{name} x{qty}。",
+      "harvestLine": "你剥取了：{name}。",
+      "harvestLineQty": "你剥取了：{name} x{qty}。",
+      "harvestSpecimenLine": "你还获得了{name}。",
       "catchLine": "你钓上了：{name}",
       "biteLine": "有东西上钩了！",
       "gotAwayLine": "它跑掉了。",
@@ -2435,6 +2437,7 @@ export const zh_CN: EnTranslations = {
       "empty": "尚无已知配方。",
       "resultAria": "制作{name}",
       "craftedToast": "已制作:{name}",
+      "craftedToastQty": "已制作:{name} x{qty}",
       "insufficientMaterials": "你没有足够的材料。",
       "unknownRecipe": "该配方不存在。",
       "comboRequirementUnmet": "你没有达到该配方所需组合的两项制造技能等级。",
@@ -2527,7 +2530,13 @@ export const zh_CN: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "你分解了{item}。",
+      "disenchantedYield": "你将{item}分解为{material}。",
+      "disenchantedYieldQty": "你将{item}分解为{material} x{qty}。",
+      "disenchantedAlso": "你还获得了{material}。",
+      "disenchantedAlsoQty": "你还获得了{material} x{qty}。",
       "salvagedLine": "你拆解了{item}。",
+      "salvagedYield": "你将{item}拆解为{material}。",
+      "salvagedYieldQty": "你将{item}拆解为{material} x{qty}。",
       "enchantAppliedLine": "你用{enchant}为{item}附魔。",
       "notHeld": "你没有那件物品。",
       "notDisenchantable": "你无法分解那件物品。",
@@ -2564,9 +2573,14 @@ export const zh_CN: EnTranslations = {
       "sameEnchant": "那件物品已经拥有该附魔。",
       "replaceTag": "替换{enchant}",
       "sameEnchantTag": "已施加",
+      "plainTag": "未附魔",
       "replaceConfirmTitle": "替换{item}上的附魔？",
       "replaceConfirmBody": "这会将{item}上的{old}替换为{new}。",
       "replaceConfirmNoRefund": "旧附魔将被摧毁，材料不予退还。此操作无法撤销。",
+      "replaceConfirmKeeps": "保留：{kept}",
+      "replaceConfirmKeepsSigner": "制作者印记",
+      "replaceConfirmKeepsMasterwork": "杰作加成",
+      "replaceConfirmKeepsBond": "委托绑定",
       "replaceConfirmCost": "费用：{cost}",
       "replaceConfirmCostItem": "{name} {count} 个",
       "replaceConfirmAccept": "替换"
@@ -6941,6 +6955,7 @@ export const zh_CN: EnTranslations = {
       "filterTypeAll": "全部类型",
       "filterTypeWeapon": "武器",
       "filterTypeArmor": "护甲",
+      "filterTypeBag": "背包",
       "filterTypeConsumable": "消耗品",
       "filterTypeMaterial": "材料",
       "filterTypeCosmetic": "外观",
@@ -6954,6 +6969,8 @@ export const zh_CN: EnTranslations = {
       "armorMail": "锁甲",
       "filterWeaponType": "武器类型",
       "filterWeaponAll": "全部武器",
+      "filterBagSize": "背包容量",
+      "filterBagAll": "全部背包",
       "filterPrimaryStat": "主属性",
       "filterPrimaryStatAll": "任意主属性",
       "filterRarity": "稀有度",
@@ -9505,6 +9522,9 @@ export const zh_CN: EnTranslations = {
       "heart_of_the_rift": {
         "name": "裂隙之心"
       },
+      "voidsong_dirk": {
+        "name": "虚空之歌，裂帷短匕"
+      },
       "wildheart_tuskblade": {
         "name": "荒野之心獠牙巨刃"
       },
@@ -9680,7 +9700,7 @@ export const zh_CN: EnTranslations = {
         "name": "不破之岸披风"
       },
       "last_keep_signet": {
-        "name": "Signet of the Last Keep"
+        "name": "最后的堡垒印戒"
       },
       "conjured_water4": {
         "name": "魔法泉水"

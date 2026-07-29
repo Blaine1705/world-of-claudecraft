@@ -693,7 +693,7 @@ export const fr_CA: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20 % de réduction",
+      "railWocDiscount": "{percent} % de réduction",
       "railWocUnavailable": "Les prix en WOC sont indisponibles pour le moment.",
       "railNativeUnavailable": "SOL/WOC désactivé.",
       "amountLabel": "Montant",
@@ -929,9 +929,7 @@ export const fr_CA: EnTranslations = {
       "riding": "En selle",
       "mount": "Monter",
       "dismount": "Descendre",
-      "requiresLevel": "Niveau {level} requis",
-      "pickFirst": "Choisissez une monture à chevaucher.",
-      "keybindHint": "Appuyez sur la touche Monter / Descendre pour chevaucher.",
+      "useToRide": "Use to summon this mount.",
       "emptyTitle": "Aucune monture collectée",
       "emptyStableHint": "Atteignez le niveau 20 et prenez des leçons d’équitation auprès de la Maîtresse d’écurie Marla aux écuries à l’ouest de Highwatch.",
       "emptyDropHint": "Les montures plus rares sont lâchées par les boss de donjon et de raid.",
@@ -957,7 +955,7 @@ export const fr_CA: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "ownedMountPrompt": "Press {key} to mount",
+      "ownedMountPrompt": "Your reins are in your bags. Use them to ride.",
       "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
       "success": "You have tamed the Valorsteed.",
@@ -1546,6 +1544,7 @@ export const fr_CA: EnTranslations = {
       "harvestButton": "Dépecer",
       "harvestTooltip": "Récupère les composants cochés. Chaque cadavre ne peut être dépecé qu'une fois, premier arrivé. Ne prend pas le butin.",
       "concentrateHint": "Moins vous choisissez de composants, plus la qualité de chacun est élevée.",
+      "nothingSelectedYields": "Ce cadavre n'a rien à dépecer parmi les composants cochés.",
       "alreadyHarvested": "Ce cadavre a déjà été dépecé.",
       "componentAria": "Prélever {component}",
       "components": {
@@ -2109,8 +2108,8 @@ export const fr_CA: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Collecte du Marché mondial en attente",
-      "tip": "De l'or ou des objets vous attendent chez le Marchand."
+      "aria": "Produit ou objets du Marché mondial en attente",
+      "tip": "Le produit de vos ventes ou des objets retournés vous attendent chez le Marchand."
     },
     "noticeboard": {
       "empty": "Rien ne semble affiché."
@@ -2254,6 +2253,9 @@ export const fr_CA: EnTranslations = {
       "notReady": "Ce nœud de ressource n'a pas encore réapparu pour vous.",
       "gatherLine": "Vous rassemblez : {name}.",
       "gatherLineQty": "Vous rassemblez : {name} x{qty}.",
+      "harvestLine": "Vous dépècez : {name}.",
+      "harvestLineQty": "Vous dépècez : {name} x{qty}.",
+      "harvestSpecimenLine": "Vous récupérez aussi {name}.",
       "catchLine": "Vous remontez : {name}",
       "biteLine": "Quelque chose mord à l'hameçon !",
       "gotAwayLine": "Il s'est échappé.",
@@ -2435,6 +2437,7 @@ export const fr_CA: EnTranslations = {
       "empty": "Aucune recette connue pour l'instant.",
       "resultAria": "Artisanat {name}",
       "craftedToast": "Fabriqué$1 {name}",
+      "craftedToastQty": "Fabriqué : {name} x{qty}",
       "insufficientMaterials": "Vous n'avez pas le matériel pour cela.",
       "unknownRecipe": "Cette recette n'existe pas.",
       "comboRequirementUnmet": "Vous ne possédez pas les deux métiers requis au palier nécessaire pour cette recette.",
@@ -2527,7 +2530,13 @@ export const fr_CA: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Vous désenchantez {item}.",
+      "disenchantedYield": "Vous désenchantez {item} en {material}.",
+      "disenchantedYieldQty": "Vous désenchantez {item} en {material} x{qty}.",
+      "disenchantedAlso": "Vous récupérez aussi {material}.",
+      "disenchantedAlsoQty": "Vous récupérez aussi {material} x{qty}.",
       "salvagedLine": "Vous récupérez {item}.",
+      "salvagedYield": "Vous récupérez {item} en {material}.",
+      "salvagedYieldQty": "Vous récupérez {item} en {material} x{qty}.",
       "enchantAppliedLine": "Vous enchantez {item} avec {enchant}.",
       "notHeld": "Vous n'avez pas cet objet.",
       "notDisenchantable": "Vous ne pouvez pas désenchanter cela.",
@@ -2564,9 +2573,14 @@ export const fr_CA: EnTranslations = {
       "sameEnchant": "Cet objet a déjà cet enchantement.",
       "replaceTag": "Remplace {enchant}",
       "sameEnchantTag": "Déjà appliqué",
+      "plainTag": "Non enchanté",
       "replaceConfirmTitle": "Remplacer l'enchantement sur {item} ?",
       "replaceConfirmBody": "Cela remplace {old} sur {item} par {new}.",
       "replaceConfirmNoRefund": "L'ancien enchantement est détruit sans remboursement. Cette action est irréversible.",
+      "replaceConfirmKeeps": "Conservé : {kept}",
+      "replaceConfirmKeepsSigner": "Marque du fabricant",
+      "replaceConfirmKeepsMasterwork": "Bonus d'ouvrage de maître",
+      "replaceConfirmKeepsBond": "Lien de commande",
       "replaceConfirmCost": "Coût : {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Remplacer"
@@ -6941,6 +6955,7 @@ export const fr_CA: EnTranslations = {
       "filterTypeAll": "Tous les types",
       "filterTypeWeapon": "Armes",
       "filterTypeArmor": "Armure",
+      "filterTypeBag": "Sacs",
       "filterTypeConsumable": "Consommables",
       "filterTypeMaterial": "Matériaux",
       "filterTypeCosmetic": "Cosmétiques",
@@ -6954,6 +6969,8 @@ export const fr_CA: EnTranslations = {
       "armorMail": "Mailles",
       "filterWeaponType": "Type d'arme",
       "filterWeaponAll": "Toutes les armes",
+      "filterBagSize": "Taille de sac",
+      "filterBagAll": "Tous les sacs",
       "filterPrimaryStat": "Caractéristique principale",
       "filterPrimaryStatAll": "Toute caractéristique principale",
       "filterRarity": "Rareté",
@@ -9504,6 +9521,9 @@ export const fr_CA: EnTranslations = {
       },
       "heart_of_the_rift": {
         "name": "Heart of the Rift"
+      },
+      "voidsong_dirk": {
+        "name": "Voidsong, Dirk of the Sundered Veil"
       },
       "wildheart_tuskblade": {
         "name": "Wildheart Tuskblade"

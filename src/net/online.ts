@@ -2592,6 +2592,10 @@ export class ClientWorld implements IWorld {
       e.mountCastKey = w.mck ?? '';
       e.sitting = !!w.sit;
       e.riftSliding = !!w.sld;
+      e.climbing = !!w.cl;
+      // Quantized 1..99 progress through the pull (see server snapshot);
+      // undefined when not climbing so the visual falls back to its own clock.
+      e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.weaponStowed = !!w.ws;
       e.aggroTargetId = w.aggro ?? null;
@@ -2873,6 +2877,8 @@ export class ClientWorld implements IWorld {
       e.spellHaste = s.sh ?? 0;
       e.critChance = s.crit ?? 0.05;
       e.dodgeChance = s.dodge ?? 0.05;
+      e.blockChance = s.blk ?? 0;
+      e.blockValue = s.bval ?? 0;
       // Crit/haste/hit RATING are informational paper-doll stats (combat values ride
       // crit/sh above, and hit resolves server-side); sent always like the other self
       // stats so the online character sheet shows them instead of the blankEntity 0.
@@ -2951,12 +2957,11 @@ export class ClientWorld implements IWorld {
         this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
-      // IWorldMounts self-decode: mntSel/mntOwn are delta-guarded (omitted keeps
-      // the prior mirror; an unknown or null pick falls back to the horse). The
-      // owned collection is mirrored VERBATIM (no horse prepend): the horse is no
-      // longer auto-owned, so an empty owned list is legal and the server is the
-      // sole authority on what is collected.
-      if (s.mntSel !== undefined) this.selfSelectedMount = normalizeSelectedMount(s.mntSel);
+      // IWorldMounts self-decode: mntOwn is delta-guarded (omitted keeps the prior
+      // mirror). The owned collection is mirrored VERBATIM (no horse prepend): the
+      // horse is no longer auto-owned, so an empty owned list is legal and the
+      // server is the sole authority on what is collected. There is no `mntSel`
+      // any more; a legacy server still sending it is simply ignored.
       if (Array.isArray(s.mntOwn)) {
         this.selfOwnedMounts = (s.mntOwn as unknown[])
           .map((k) => normalizeMountKey(typeof k === 'string' ? k : ''))
@@ -3525,8 +3530,12 @@ export class ClientWorld implements IWorld {
   // never predicted. The server re-validates ownership/eligibility/throttle in
   // the sim resolvers and answers with the personal disenchantResult/
   // enchantResult/salvageResult event plus the denc/ench/salv self-delta.
-  disenchantItem(itemId: string): void {
-    this.cmd({ cmd: 'disenchant_item', item: itemId });
+  disenchantItem(itemId: string, target?: { slotIndex: number }): void {
+    if (target === undefined) {
+      this.cmd({ cmd: 'disenchant_item', item: itemId });
+    } else {
+      this.cmd({ cmd: 'disenchant_item', item: itemId, slot: target.slotIndex });
+    }
   }
   // `slot` rides only when the target is a WORN piece (the in-place arm); a
   // bagged target sends a message byte-identical to the pre-feature form. The
@@ -3565,8 +3574,13 @@ export class ClientWorld implements IWorld {
   sellAllJunk(): void {
     this.cmd({ cmd: 'sell_all_junk' });
   }
-  buyBackItem(itemId: string): void {
-    this.cmd({ cmd: 'buyback', item: itemId });
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    instance?: ItemInstancePayload,
+    craftedRecipeId?: string,
+  ): void {
+    this.cmd({ cmd: 'buyback', item: itemId, index, instance, craftedRecipeId });
   }
   // --- IWorldCosmetics: skin + mech-chroma equips. Optimistic local nudge, then
   // the snake_case cmd (change_skin/claim_event_skin/unequip_mech_chroma); the
@@ -3587,27 +3601,15 @@ export class ClientWorld implements IWorld {
     const idx = Math.max(0, Math.floor(skin));
     this.cmd({ cmd: 'claim_event_skin', skin: idx });
   }
-  // --- IWorldMounts: collection + pick + mount/dismount. The pick gets an
-  // optimistic local nudge (ownership- and level-checked, like changeSkin); the
-  // toggle stays authoritative because the server's combat gate can refuse it,
-  // and the separate active identity mirror (mnt) lands on the next snapshot
-  // either way; the persisted pick rides self.mntSel. ---
-  selectedMount(): MountKey {
-    return this.selfSelectedMount;
-  }
+  // --- IWorldMounts: collection + dismount. Summoning a specific mount is an
+  // item use, not a mount command, so nothing here sends one. The toggle stays
+  // authoritative because the server's combat gate can refuse it, and the active
+  // identity mirror (mnt) lands on the next snapshot either way. ---
   ownedMounts(): readonly MountKey[] {
     return this.selfOwnedMounts;
   }
   ridingTrained(): boolean {
     return this.selfRidingTrained;
-  }
-  selectMount(key: MountKey): void {
-    const def = mountDef(key);
-    const p = this.entities.get(this.playerId);
-    if (!def || !p || p.level < def.level) return;
-    if (!this.selfOwnedMounts.includes(def.key)) return;
-    this.selfSelectedMount = def.key;
-    this.cmd({ cmd: 'mount_select', mount: def.key });
   }
   toggleMounted(): void {
     this.cmd({ cmd: 'mount_toggle' });
@@ -3617,9 +3619,9 @@ export class ClientWorld implements IWorld {
   learnRiding(npcId: number): void {
     this.cmd({ cmd: 'learn_riding', npc: npcId });
   }
-  // --- riding lesson: fully server-authoritative, no optimistic local nudge
-  // (unlike selectMount above); feedback rides the mountTrain* events straight to
-  // the HUD (drainEvents), no mirrored state. ---
+  // --- riding lesson: fully server-authoritative, no optimistic local nudge;
+  // feedback rides the mountTrain* events straight to the HUD (drainEvents), no
+  // mirrored state. ---
   mountTrainBegin(): void {
     this.cmd({ cmd: 'mount_train_begin' });
   }
@@ -4295,8 +4297,6 @@ export class ClientWorld implements IWorld {
   // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
   // remaining time is derived locally so the countdown ticks down without traffic.
   private selfLockouts: Record<string, number> = {};
-  // The persisted mount pick, mirrored from the snapshot `s.mntSel` (IWorldMounts).
-  private selfSelectedMount: MountKey = DEFAULT_MOUNT;
   // The owned collection, mirrored from `s.mntOwn`. Starts empty: nothing is owned
   // until the server says so (the horse is no longer auto-granted), so an empty list
   // is the correct pre-snapshot state.

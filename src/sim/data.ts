@@ -27,6 +27,7 @@ import type {
 
 export type { FishingEntry } from './content/items';
 
+import { CASTLE_BLOCKERS } from './castle_layout';
 import {
   AMBERFALL_CAMPS,
   AMBERFALL_ITEMS,
@@ -591,6 +592,7 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     mines: sets.flatMap((s) => s.mines),
     docks: sets.flatMap((s) => s.docks),
     tents: sets.flatMap((s) => s.tents),
+    marshReeds: sets.flatMap((s) => s.marshReeds),
     crates: sets.flatMap((s) => s.crates),
     campfires: sets.flatMap((s) => s.campfires),
     mudHuts: sets.flatMap((s) => s.mudHuts),
@@ -707,7 +709,9 @@ export const BUILTIN_WORLD: WorldContent = {
     noticeboards: NOTICEBOARDS,
     graveyards: OVERWORLD_GRAVEYARDS,
   },
-  blockers: JAIL_BLOCKERS,
+  // invisible collision walls: the moderation cage plus the Last Keep's
+  // sealed building slot (castle_layout.ts CASTLE_BLOCKERS)
+  blockers: [...JAIL_BLOCKERS, ...CASTLE_BLOCKERS],
   terrainEdits: JAIL_TERRAIN_EDITS,
 };
 
@@ -871,8 +875,14 @@ export const DUNGEONS: Record<string, DungeonDef> = {
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);
 
+// Indexed lookup: dungeonAt runs inside groundHeight's dungeon branch (per
+// entity per tick in a populated instance), so the per-call find() scan and
+// its closure are not welcome there.
+const DUNGEON_BY_INDEX: (DungeonDef | undefined)[] = [];
+for (const d of DUNGEON_LIST) DUNGEON_BY_INDEX[d.index] = d;
+
 export function dungeonByIndex(index: number): DungeonDef | null {
-  return DUNGEON_LIST.find((d) => d.index === index) ?? null;
+  return DUNGEON_BY_INDEX[index] ?? null;
 }
 
 // Which dungeon a far-off instance position belongs to, by x-band.

@@ -693,7 +693,7 @@ export const ja_JP: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20%オフ",
+      "railWocDiscount": "{percent}%オフ",
       "railWocUnavailable": "WOC価格は現在利用できません。",
       "railNativeUnavailable": "SOL/WOCは利用不可",
       "amountLabel": "数量",
@@ -929,9 +929,7 @@ export const ja_JP: EnTranslations = {
       "riding": "騎乗中",
       "mount": "騎乗",
       "dismount": "降りる",
-      "requiresLevel": "レベル{level}が必要",
-      "pickFirst": "騎乗するマウントを選んでください。",
-      "keybindHint": "騎乗 / 降車キーで騎乗します。",
+      "useToRide": "使用してこの騎乗生物を呼び出します。",
       "emptyTitle": "マウントは未入手",
       "emptyStableHint": "レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。",
       "emptyDropHint": "より希少なマウントはヒロイックダンジョンのボスからドロップするか、リフトの完了で入手できます。",
@@ -957,7 +955,7 @@ export const ja_JP: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
-      "ownedMountPrompt": "{key} キーを押して騎乗する",
+      "ownedMountPrompt": "手綱はバッグの中にあります。使用すると騎乗できます。",
       "ridePrompt": "光る目印をたどってスタートラインへ向かい、「レース開始」を押そう。",
       "begin": "レッスン開始",
       "success": "ヴァロースティードを乗りこなした。",
@@ -1546,6 +1544,7 @@ export const ja_JP: EnTranslations = {
       "harvestButton": "採取",
       "harvestTooltip": "チェックした部位を採取します。各死体は早い者勝ちで一度だけ採取できます。戦利品は取りません。",
       "concentrateHint": "選ぶ部位が少ないほど、各部位の品質が高くなります。",
+      "nothingSelectedYields": "選んだ部位はどれも、この死体から採取できません。",
       "alreadyHarvested": "この死体はすでに採取されています。",
       "componentAria": "{component}を採取",
       "components": {
@@ -2109,8 +2108,8 @@ export const ja_JP: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "世界市場の受け取り待ち",
-      "tip": "ゴールドやアイテムが商人のもとで受け取りを待っています。"
+      "aria": "世界市場の売上またはアイテムが受け取り待ち",
+      "tip": "売上金または返品アイテムが商人のもとで受け取りを待っています。"
     },
     "noticeboard": {
       "empty": "何も貼られていないようだ。"
@@ -2254,6 +2253,9 @@ export const ja_JP: EnTranslations = {
       "notReady": "この資源ノードはまだあなたのために再生していません。",
       "gatherLine": "{name}を採集した。",
       "gatherLineQty": "{name}を{qty}個採集した。",
+      "harvestLine": "{name}を剥ぎ取った。",
+      "harvestLineQty": "{name}を{qty}個剥ぎ取った。",
+      "harvestSpecimenLine": "さらに{name}を得た。",
       "catchLine": "{name}を釣り上げた",
       "biteLine": "何かが食いついた！",
       "gotAwayLine": "逃げられてしまった。",
@@ -2435,6 +2437,7 @@ export const ja_JP: EnTranslations = {
       "empty": "既知のレシピはありません。",
       "resultAria": "{name}を製作",
       "craftedToast": "製作しました:{name}",
+      "craftedToastQty": "製作しました:{name} x{qty}",
       "insufficientMaterials": "材料が不足しています。",
       "unknownRecipe": "そのレシピは存在しません。",
       "comboRequirementUnmet": "その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。",
@@ -2527,7 +2530,13 @@ export const ja_JP: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "{item}を魔力分解した。",
+      "disenchantedYield": "{item}を魔力分解して{material}にした。",
+      "disenchantedYieldQty": "{item}を魔力分解して{material}{qty}個にした。",
+      "disenchantedAlso": "さらに{material}を得た。",
+      "disenchantedAlsoQty": "さらに{material}を{qty}個得た。",
       "salvagedLine": "{item}を解体した。",
+      "salvagedYield": "{item}を解体して{material}にした。",
+      "salvagedYieldQty": "{item}を解体して{material}{qty}個にした。",
       "enchantAppliedLine": "{item}に{enchant}をエンチャントした。",
       "notHeld": "そのアイテムを所持していません。",
       "notDisenchantable": "それは魔力分解できません。",
@@ -2564,9 +2573,14 @@ export const ja_JP: EnTranslations = {
       "sameEnchant": "そのアイテムにはすでに同じエンチャントが付与されています。",
       "replaceTag": "{enchant}を置き換え",
       "sameEnchantTag": "付与済み",
+      "plainTag": "エンチャントなし",
       "replaceConfirmTitle": "{item}のエンチャントを置き換えますか？",
       "replaceConfirmBody": "{item}の{old}を{new}に置き換えます。",
       "replaceConfirmNoRefund": "古いエンチャントは破棄され、素材は返却されません。この操作は取り消せません。",
+      "replaceConfirmKeeps": "保持: {kept}",
+      "replaceConfirmKeepsSigner": "製作者の刻印",
+      "replaceConfirmKeepsMasterwork": "傑作ボーナス",
+      "replaceConfirmKeepsBond": "受注品のバインド",
       "replaceConfirmCost": "費用: {cost}",
       "replaceConfirmCostItem": "{name} {count}個",
       "replaceConfirmAccept": "置き換える"
@@ -6941,6 +6955,7 @@ export const ja_JP: EnTranslations = {
       "filterTypeAll": "すべての種類",
       "filterTypeWeapon": "武器",
       "filterTypeArmor": "防具",
+      "filterTypeBag": "バッグ",
       "filterTypeConsumable": "消耗品",
       "filterTypeMaterial": "素材",
       "filterTypeCosmetic": "外見",
@@ -6954,6 +6969,8 @@ export const ja_JP: EnTranslations = {
       "armorMail": "鎖防具",
       "filterWeaponType": "武器の種類",
       "filterWeaponAll": "すべての武器",
+      "filterBagSize": "バッグの容量",
+      "filterBagAll": "すべてのバッグ",
       "filterPrimaryStat": "メイン能力値",
       "filterPrimaryStatAll": "すべてのメイン能力値",
       "filterRarity": "レア度",
@@ -9505,6 +9522,9 @@ export const ja_JP: EnTranslations = {
       "heart_of_the_rift": {
         "name": "リフトの心臓"
       },
+      "voidsong_dirk": {
+        "name": "ヴォイドソング、裂かれし帳の短剣"
+      },
       "wildheart_tuskblade": {
         "name": "ワイルドハートの牙大剣"
       },
@@ -9680,7 +9700,7 @@ export const ja_JP: EnTranslations = {
         "name": "揺るがぬ岸のマント"
       },
       "last_keep_signet": {
-        "name": "Signet of the Last Keep"
+        "name": "最後の砦の印章"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

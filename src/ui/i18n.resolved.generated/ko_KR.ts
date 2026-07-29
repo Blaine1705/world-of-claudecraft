@@ -693,7 +693,7 @@ export const ko_KR: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% 할인",
+      "railWocDiscount": "{percent}% 할인",
       "railWocUnavailable": "현재 WOC 가격을 이용할 수 없습니다.",
       "railNativeUnavailable": "SOL/WOC 사용 불가",
       "amountLabel": "수량",
@@ -929,9 +929,7 @@ export const ko_KR: EnTranslations = {
       "riding": "탑승 중",
       "mount": "탑승",
       "dismount": "내리기",
-      "requiresLevel": "{level}레벨 필요",
-      "pickFirst": "탈 탈것을 선택하세요.",
-      "keybindHint": "탑승 / 하차 키를 눌러 탑승합니다.",
+      "useToRide": "사용하여 이 탈것을 소환합니다.",
       "emptyTitle": "보유한 탈것 없음",
       "emptyStableHint": "20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.",
       "emptyDropHint": "더 희귀한 탈것은 영웅 던전 우두머리나 균열 완료를 통해 얻을 수 있습니다.",
@@ -957,7 +955,7 @@ export const ko_KR: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
-      "ownedMountPrompt": "{key} 키를 눌러 탑승하세요",
+      "ownedMountPrompt": "고삐가 가방에 있습니다. 사용하면 탈 수 있습니다.",
       "ridePrompt": "빛나는 표식을 따라 출발선으로 간 뒤 레이스 시작을 누르세요.",
       "begin": "수업 시작",
       "success": "발러스티드를 길들였다.",
@@ -1546,6 +1544,7 @@ export const ko_KR: EnTranslations = {
       "harvestButton": "채집",
       "harvestTooltip": "선택한 부위를 채집합니다. 각 시체는 선착순으로 한 번만 채집할 수 있습니다. 전리품은 가져가지 않습니다.",
       "concentrateHint": "선택한 부위가 적을수록 부위당 등급이 더 높아집니다.",
+      "nothingSelectedYields": "선택한 부위는 이 시체에서 채집할 수 없습니다.",
       "alreadyHarvested": "이 시체는 이미 채집되었습니다.",
       "componentAria": "{component} 채집",
       "components": {
@@ -2109,8 +2108,8 @@ export const ko_KR: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "세계 시장 수령 대기",
-      "tip": "골드나 아이템이 상인에게서 수령을 기다리고 있습니다."
+      "aria": "세계 시장 판매 대금이나 아이템 수령 대기",
+      "tip": "판매 대금이나 반송된 아이템이 상인에게서 수령을 기다리고 있습니다."
     },
     "noticeboard": {
       "empty": "게시된 내용이 없는 것 같습니다."
@@ -2254,6 +2253,9 @@ export const ko_KR: EnTranslations = {
       "notReady": "이 자원 채집지는 아직 당신을 위해 재생성되지 않았습니다.",
       "gatherLine": "{name}을(를) 채집했습니다.",
       "gatherLineQty": "{name}을(를) {qty}개 채집했습니다.",
+      "harvestLine": "{name}을(를) 채취했습니다.",
+      "harvestLineQty": "{name}을(를) {qty}개 채취했습니다.",
+      "harvestSpecimenLine": "추가로 {name}을(를) 얻었습니다.",
       "catchLine": "{name}을(를) 낚아 올렸습니다",
       "biteLine": "무언가 미끼를 물었습니다!",
       "gotAwayLine": "놓쳐 버렸습니다.",
@@ -2435,6 +2437,7 @@ export const ko_KR: EnTranslations = {
       "empty": "알려진 제작법이 없습니다.",
       "resultAria": "{name} 제작",
       "craftedToast": "제작 완료:{name}",
+      "craftedToastQty": "제작 완료:{name} x{qty}",
       "insufficientMaterials": "재료가 부족합니다.",
       "unknownRecipe": "해당 제작법이 존재하지 않습니다.",
       "comboRequirementUnmet": "이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.",
@@ -2527,7 +2530,13 @@ export const ko_KR: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "{item}의 마력을 추출했습니다.",
+      "disenchantedYield": "{item}의 마력을 추출하여 {material}(으)로 만들었습니다.",
+      "disenchantedYieldQty": "{item}의 마력을 추출하여 {material} {qty}개로 만들었습니다.",
+      "disenchantedAlso": "추가로 {material}을(를) 얻었습니다.",
+      "disenchantedAlsoQty": "추가로 {material}을(를) {qty}개 얻었습니다.",
       "salvagedLine": "{item}을(를) 분해했습니다.",
+      "salvagedYield": "{item}을(를) 분해하여 {material}(으)로 만들었습니다.",
+      "salvagedYieldQty": "{item}을(를) 분해하여 {material} {qty}개로 만들었습니다.",
       "enchantAppliedLine": "{item}에 {enchant}을(를) 부여했습니다.",
       "notHeld": "해당 아이템을 가지고 있지 않습니다.",
       "notDisenchantable": "해당 아이템은 마력을 추출할 수 없습니다.",
@@ -2564,9 +2573,14 @@ export const ko_KR: EnTranslations = {
       "sameEnchant": "해당 아이템에는 이미 같은 마법부여가 되어 있습니다.",
       "replaceTag": "{enchant} 대체",
       "sameEnchantTag": "이미 적용됨",
+      "plainTag": "마법부여 없음",
       "replaceConfirmTitle": "{item}의 마법부여를 대체하시겠습니까?",
       "replaceConfirmBody": "{item}의 {old}을(를) {new}(으)로 대체합니다.",
       "replaceConfirmNoRefund": "기존 마법부여는 파괴되며 재료는 환불되지 않습니다. 되돌릴 수 없습니다.",
+      "replaceConfirmKeeps": "유지: {kept}",
+      "replaceConfirmKeepsSigner": "제작자 각인",
+      "replaceConfirmKeepsMasterwork": "걸작 보너스",
+      "replaceConfirmKeepsBond": "주문 제작품 귀속",
       "replaceConfirmCost": "비용: {cost}",
       "replaceConfirmCostItem": "{name} {count}개",
       "replaceConfirmAccept": "대체"
@@ -6941,6 +6955,7 @@ export const ko_KR: EnTranslations = {
       "filterTypeAll": "모든 유형",
       "filterTypeWeapon": "무기",
       "filterTypeArmor": "방어구",
+      "filterTypeBag": "가방",
       "filterTypeConsumable": "소모품",
       "filterTypeMaterial": "재료",
       "filterTypeCosmetic": "외형",
@@ -6954,6 +6969,8 @@ export const ko_KR: EnTranslations = {
       "armorMail": "사슬 방어구",
       "filterWeaponType": "무기 유형",
       "filterWeaponAll": "모든 무기",
+      "filterBagSize": "가방 크기",
+      "filterBagAll": "모든 가방",
       "filterPrimaryStat": "주 능력치",
       "filterPrimaryStatAll": "모든 주 능력치",
       "filterRarity": "희귀도",
@@ -9505,6 +9522,9 @@ export const ko_KR: EnTranslations = {
       "heart_of_the_rift": {
         "name": "균열의 심장"
       },
+      "voidsong_dirk": {
+        "name": "공허의 노래, 찢겨진 장막의 단검"
+      },
       "wildheart_tuskblade": {
         "name": "야생심장 엄니대검"
       },
@@ -9680,7 +9700,7 @@ export const ko_KR: EnTranslations = {
         "name": "부서지지 않은 해안의 어깨덮개"
       },
       "last_keep_signet": {
-        "name": "Signet of the Last Keep"
+        "name": "마지막 요새의 인장"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

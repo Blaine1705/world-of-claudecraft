@@ -3087,7 +3087,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     name: 'Reins of Kama-Kage the Shadow-Jump Toad',
     kind: 'mount',
     mount: 'shadowjump_toad',
-    quality: 'rare',
+    quality: 'uncommon',
     soulbound: true,
     noDiscard: true,
     sellValue: 0,
@@ -3097,7 +3097,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     name: 'Reins of the Sky-Reach Stormfeather',
     kind: 'mount',
     mount: 'stormfeather_griffin',
-    quality: 'epic',
+    quality: 'uncommon',
     soulbound: true,
     noDiscard: true,
     sellValue: 0,
@@ -3854,6 +3854,7 @@ export const ZONE3_PROPS: ZonePropsDef = {
     [28, 847],
   ],
   mudHuts: [],
+  marshReeds: [],
   ruinRings: [
     { x: -40, z: 830, ringR: 7, columns: 6 }, // Revenant Fields battlefield
     { x: 141, z: 712, ringR: 7, columns: 6 }, // Malric grave ruins

@@ -693,7 +693,7 @@ export const en_XA: EnTranslations = {
       "railSol": "[ŠÓĻ]",
       "railUsdc": "[ÚŠÐÇ]",
       "railWoc": "[ŴÓÇ]",
-      "railWocDiscount": "[20% óƒƒ]",
+      "railWocDiscount": "[{percent}% óƒƒ]",
       "railWocUnavailable": "[ŴÓÇ þŕíçíñĝ íš úñáʋáíļáƀļé ŕíĝĥţ ñóŵ.]",
       "railNativeUnavailable": "[Çŕýþţó óƒƒ.]",
       "amountLabel": "[Áɱóúñţ]",
@@ -929,9 +929,7 @@ export const en_XA: EnTranslations = {
       "riding": "[Ŕíðíñĝ]",
       "mount": "[Ɱóúñţ]",
       "dismount": "[Ðíšɱóúñţ]",
-      "requiresLevel": "[Ŕéɋúíŕéš ļéʋéļ {level}]",
-      "pickFirst": "[Þíçķ á ɱóúñţ ţó ŕíðé.]",
-      "keybindHint": "[Þŕéšš ţĥé Ɱóúñţ / Ðíšɱóúñţ ķéý ţó ŕíðé.]",
+      "useToRide": "[Úšé ţó šúɱɱóñ ţĥíš ɱóúñţ.]",
       "emptyTitle": "[Ñó ɱóúñţš çóļļéçţéð]",
       "emptyStableHint": "[Ŕéáçĥ ļéʋéļ 20 áñð ţáķé ŕíðíñĝ ļéššóñš ŵíţĥ Šţáƀļéɱášţéŕ Ɱáŕļá áţ ţĥé Ĥíĝĥŵáţçĥ Šţáƀļéš, ŵéšţ óƒ Ĥíĝĥŵáţçĥ.]",
       "emptyDropHint": "[Ŕáŕéŕ ɱóúñţš ðŕóþ ƒŕóɱ ĥéŕóíç ðúñĝéóñ ƀóššéš áñð Ŕíƒţ çóɱþļéţíóñš.]",
@@ -957,7 +955,7 @@ export const en_XA: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "[Þŕéšš {key} ţó ɱóúñţ ţĥé ţŕáíñíñĝ Ʋáļóŕšţééð.]",
-      "ownedMountPrompt": "[Þŕéšš {key} ţó ɱóúñţ]",
+      "ownedMountPrompt": "[Ýóúŕ ŕéíñš áŕé íñ ýóúŕ ƀáĝš. Úšé ţĥéɱ ţó ŕíðé.]",
       "ridePrompt": "[Ƒóļļóŵ ţĥé ĝļóŵíñĝ ɱáŕķéŕ ţó ţĥé šţáŕţ ļíñé, ţĥéñ þŕéšš Šţáŕţ Ŕáçé.]",
       "begin": "[Ɓéĝíñ Ļéššóñ]",
       "success": "[Ýóú ĥáʋé ţáɱéð ţĥé Ʋáļóŕšţééð.]",
@@ -1382,10 +1380,10 @@ export const en_XA: EnTranslations = {
     },
     "plurals": {
       "guildMembers": {
-        "one": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕ]",
-        "few": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕš]",
-        "many": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕš]",
-        "other": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕš]"
+        "one": "[ýóúŕ ĝúíļð ŕáñķ íš {rank}; {count} ɱéɱƀéŕ]",
+        "few": "[ýóúŕ ĝúíļð ŕáñķ íš {rank}; {count} ɱéɱƀéŕš]",
+        "many": "[ýóúŕ ĝúíļð ŕáñķ íš {rank}; {count} ɱéɱƀéŕš]",
+        "other": "[ýóúŕ ĝúíļð ŕáñķ íš {rank}; {count} ɱéɱƀéŕš]"
       },
       "finderPartySize": {
         "one": "[{count} þļáýéŕ]",
@@ -1546,6 +1544,7 @@ export const en_XA: EnTranslations = {
       "harvestButton": "[Ĥáŕʋéšţ]",
       "harvestTooltip": "[Ĝáţĥéŕš ţĥé çĥéçķéð çóɱþóñéñţš. Éáçĥ çóŕþšé çáñ ƀé ĥáŕʋéšţéð óñçé, ƒíŕšţ çóɱé. Ðóéš ñóţ ţáķé ţĥé ļóóţ.]",
       "concentrateHint": "[Ƒéŵéŕ çĥóšéñ çóɱþóñéñţš ýíéļð á ĥíĝĥéŕ ţíéŕ éáçĥ.]",
+      "nothingSelectedYields": "[Ñóţĥíñĝ ýóú šéļéçţéð çáñ ƀé ĥáŕʋéšţéð ƒŕóɱ ţĥíš çóŕþšé.]",
       "alreadyHarvested": "[Ţĥíš çóŕþšé ĥáš áļŕéáðý ƀééñ ĥáŕʋéšţéð.]",
       "componentAria": "[Ĥáŕʋéšţ {component}]",
       "components": {
@@ -2109,8 +2108,8 @@ export const en_XA: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "[Ŵóŕļð Ɱáŕķéţ çóļļéçţíóñ ŵáíţíñĝ]",
-      "tip": "[Ĝóļð óŕ íţéɱš áŕé ŵáíţíñĝ ƒóŕ ýóú áţ ţĥé Ɱéŕçĥáñţ.]"
+      "aria": "[Ŵóŕļð Ɱáŕķéţ þŕóçééðš óŕ íţéɱš ŵáíţíñĝ]",
+      "tip": "[Šáļé þŕóçééðš óŕ ŕéţúŕñéð íţéɱš áŕé ŵáíţíñĝ ƒóŕ ýóú áţ ţĥé Ɱéŕçĥáñţ.]"
     },
     "noticeboard": {
       "empty": "[Ñóţĥíñĝ šééɱš þóšţéð.]"
@@ -2254,6 +2253,9 @@ export const en_XA: EnTranslations = {
       "notReady": "[Ţĥíš ŕéšóúŕçé ñóðé ĥáš ñóţ ŕéšþáŵñéð ƒóŕ ýóú ýéţ.]",
       "gatherLine": "[Ýóú ĝáţĥéŕ: {name}.]",
       "gatherLineQty": "[Ýóú ĝáţĥéŕ: {name} ẋ{qty}.]",
+      "harvestLine": "[Ýóú ĥáŕʋéšţ: {name}.]",
+      "harvestLineQty": "[Ýóú ĥáŕʋéšţ: {name} ẋ{qty}.]",
+      "harvestSpecimenLine": "[Ýóú áļšó ŕéçóʋéŕ {name}.]",
       "catchLine": "[Ýóú ŕééļ íñ: {name}]",
       "biteLine": "[Šóɱéţĥíñĝ ţáķéš ţĥé ƀáíţ!]",
       "gotAwayLine": "[Íţ ĝóţ áŵáý.]",
@@ -2435,6 +2437,7 @@ export const en_XA: EnTranslations = {
       "empty": "[Ñó ŕéçíþéš ķñóŵñ ýéţ.]",
       "resultAria": "[Çŕáƒţ {name}]",
       "craftedToast": "[Çŕáƒţéð: {name}]",
+      "craftedToastQty": "[Çŕáƒţéð: {name} ẋ{qty}]",
       "insufficientMaterials": "[Ýóú ðó ñóţ ĥáʋé ţĥé ɱáţéŕíáļš ƒóŕ ţĥáţ.]",
       "unknownRecipe": "[Ţĥáţ ŕéçíþé ðóéš ñóţ éẋíšţ.]",
       "comboRequirementUnmet": "[Ýóú ðó ñóţ ĥáʋé ƀóţĥ ŕéɋúíŕéð çŕáƒţš áţ ţĥé ŕéɋúíŕéð ţíéŕ ƒóŕ ţĥáţ ŕéçíþé.]",
@@ -2527,7 +2530,13 @@ export const en_XA: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "[Ýóú ðíšéñçĥáñţ {item}.]",
+      "disenchantedYield": "[Ýóú ðíšéñçĥáñţ {item} íñţó {material}.]",
+      "disenchantedYieldQty": "[Ýóú ðíšéñçĥáñţ {item} íñţó {material} ẋ{qty}.]",
+      "disenchantedAlso": "[Ýóú áļšó ŕéçóʋéŕ {material}.]",
+      "disenchantedAlsoQty": "[Ýóú áļšó ŕéçóʋéŕ {material} ẋ{qty}.]",
       "salvagedLine": "[Ýóú šáļʋáĝé {item}.]",
+      "salvagedYield": "[Ýóú šáļʋáĝé {item} íñţó {material}.]",
+      "salvagedYieldQty": "[Ýóú šáļʋáĝé {item} íñţó {material} ẋ{qty}.]",
       "enchantAppliedLine": "[Ýóú éñçĥáñţ {item} ŵíţĥ {enchant}.]",
       "notHeld": "[Ýóú ðó ñóţ ĥáʋé ţĥáţ íţéɱ.]",
       "notDisenchantable": "[Ýóú çáññóţ ðíšéñçĥáñţ ţĥáţ.]",
@@ -2564,9 +2573,14 @@ export const en_XA: EnTranslations = {
       "sameEnchant": "[Ţĥáţ íţéɱ áļŕéáðý ĥáš ţĥáţ éñçĥáñţ.]",
       "replaceTag": "[Ŕéþļáçéš {enchant}]",
       "sameEnchantTag": "[Áļŕéáðý áþþļíéð]",
+      "plainTag": "[Ñóţ éñçĥáñţéð]",
       "replaceConfirmTitle": "[Ŕéþļáçé ţĥé éñçĥáñţ óñ {item}?]",
       "replaceConfirmBody": "[Ţĥíš ŕéþļáçéš {old} óñ {item} ŵíţĥ {new}.]",
       "replaceConfirmNoRefund": "[Ţĥé óļð éñçĥáñţ íš ðéšţŕóýéð. Íţš ɱáţéŕíáļš áŕé ñóţ ŕéƒúñðéð. Ţĥíš çáññóţ ƀé úñðóñé.]",
+      "replaceConfirmKeeps": "[Ķéþţ: {kept}]",
+      "replaceConfirmKeepsSigner": "[Ɱáķéŕ'š ɱáŕķ]",
+      "replaceConfirmKeepsMasterwork": "[Ɱášţéŕŵóŕķ ƀóñúš]",
+      "replaceConfirmKeepsBond": "[Çóɱɱíššíóñ ƀóñð]",
       "replaceConfirmCost": "[Çóšţ: {cost}]",
       "replaceConfirmCostItem": "[{name} ẋ{count}]",
       "replaceConfirmAccept": "[Ŕéþļáçé]"
@@ -6941,6 +6955,7 @@ export const en_XA: EnTranslations = {
       "filterTypeAll": "[Áļļ ţýþéš]",
       "filterTypeWeapon": "[Ŵéáþóñš]",
       "filterTypeArmor": "[Áŕɱóŕ]",
+      "filterTypeBag": "[Ɓáĝš]",
       "filterTypeConsumable": "[Çóñšúɱáƀļéš]",
       "filterTypeMaterial": "[Ɱáţéŕíáļš]",
       "filterTypeCosmetic": "[Çóšɱéţíçš]",
@@ -6954,6 +6969,8 @@ export const en_XA: EnTranslations = {
       "armorMail": "[Ɱáíļ]",
       "filterWeaponType": "[Ŵéáþóñ ţýþé]",
       "filterWeaponAll": "[Áļļ ŵéáþóñš]",
+      "filterBagSize": "[Ɓáĝ šížé]",
+      "filterBagAll": "[Áļļ ƀáĝš]",
       "filterPrimaryStat": "[Þŕíɱáŕý šţáţ]",
       "filterPrimaryStatAll": "[Áñý þŕíɱáŕý šţáţ]",
       "filterRarity": "[Ŕáŕíţý]",
@@ -9504,6 +9521,9 @@ export const en_XA: EnTranslations = {
       },
       "heart_of_the_rift": {
         "name": "[Ĥéáŕţ óƒ ţĥé Ŕíƒţ]"
+      },
+      "voidsong_dirk": {
+        "name": "[Ʋóíðšóñĝ, Ðíŕķ óƒ ţĥé Šúñðéŕéð Ʋéíļ]"
       },
       "wildheart_tuskblade": {
         "name": "[Ŵíļðĥéáŕţ Ţúšķƀļáðé]"

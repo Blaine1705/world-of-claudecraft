@@ -3132,6 +3132,8 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   // Heroic Quartermaster jewelry (marks-vendor rings and pendants); a coin
   // base reads as the band, the overlay carries the stat identity.
   seal_of_the_nine_oaths: r('fury', 'blood', ['coin', 'gem'], ['glow']),
+  // the Last Keep's flavor signet: a gold seal disc set with an ember-red stone
+  last_keep_signet: r('treasure', 'gold', ['coin', { p: 'gem', pal: 'blood' }], ['glow']),
   nielas_coldlight_band: r('arcane', 'arcanePink', ['coin', 'gem'], ['glow']),
   sutils_gambit: r('nature', 'leafGreen', ['coin', 'gem'], ['sparkle']),
   oath_of_the_round_table: r('earth', 'earthBrown', ['coin', 'gem'], ['glow']),

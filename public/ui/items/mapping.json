@@ -2432,6 +2432,15 @@
         "zense_meridian",
         "zyzzs_deathless_signet"
       ]
+    },
+    {
+      "source": "World of ClaudeCraft procedural icon compositor (renderProceduralIconPng)",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "in-game procedural icon recipe (icons.ts last_keep_signet: gold seal disc, ember gem)",
+      "commonPrompt": "not applicable: deterministic compositor render, no image model",
+      "itemIds": [
+        "last_keep_signet"
+      ]
     }
   ]
 }

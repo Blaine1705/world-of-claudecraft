@@ -693,7 +693,7 @@ export const id_ID: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "Diskon 20%.",
+      "railWocDiscount": "Diskon {percent}%.",
       "railWocUnavailable": "Harga WOC tidak tersedia saat ini.",
       "railNativeUnavailable": "SOL/WOC tidak tersedia.",
       "amountLabel": "Jumlah",
@@ -929,9 +929,7 @@ export const id_ID: EnTranslations = {
       "riding": "Riding",
       "mount": "Mount",
       "dismount": "Dismount",
-      "requiresLevel": "Requires level {level}",
-      "pickFirst": "Pick a mount to ride.",
-      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "useToRide": "Use to summon this mount.",
       "emptyTitle": "No mounts collected",
       "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
       "emptyDropHint": "Rarer mounts drop from heroic dungeon bosses and Rift completions.",
@@ -957,7 +955,7 @@ export const id_ID: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "ownedMountPrompt": "Press {key} to mount",
+      "ownedMountPrompt": "Your reins are in your bags. Use them to ride.",
       "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
       "success": "You have tamed the Valorsteed.",
@@ -1546,6 +1544,7 @@ export const id_ID: EnTranslations = {
       "harvestButton": "Panen",
       "harvestTooltip": "Mengumpulkan komponen yang dicentang. Setiap bangkai hanya bisa dipanen sekali, siapa cepat dia dapat. Tidak mengambil jarahan.",
       "concentrateHint": "Semakin sedikit bagian yang dipilih, semakin tinggi tingkat mutu tiap bagian.",
+      "nothingSelectedYields": "Tidak ada pilihanmu yang bisa dipanen dari bangkai ini.",
       "alreadyHarvested": "Bangkai ini sudah dipanen.",
       "componentAria": "Panen {component}",
       "components": {
@@ -2109,8 +2108,8 @@ export const id_ID: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Pengambilan Pasar Dunia menanti",
-      "tip": "Emas atau barang menantimu di Sang Pedagang."
+      "aria": "Hasil atau barang Pasar Dunia menanti",
+      "tip": "Hasil penjualan atau barang yang dikembalikan menantimu di Sang Pedagang."
     },
     "noticeboard": {
       "empty": "Sepertinya tidak ada yang ditempel."
@@ -2254,6 +2253,9 @@ export const id_ID: EnTranslations = {
       "notReady": "Simpul sumber daya ini belum muncul kembali untukmu.",
       "gatherLine": "Anda mengumpulkan: {name}.",
       "gatherLineQty": "Anda mengumpulkan: {name} x{qty}.",
+      "harvestLine": "Anda memanen: {name}.",
+      "harvestLineQty": "Anda memanen: {name} x{qty}.",
+      "harvestSpecimenLine": "Anda juga mendapatkan {name}.",
       "catchLine": "Kamu menarik: {name}",
       "biteLine": "Sesuatu menggigit umpannya!",
       "gotAwayLine": "Ikannya kabur.",
@@ -2435,6 +2437,7 @@ export const id_ID: EnTranslations = {
       "empty": "Belum ada resep yang diketahui.",
       "resultAria": "Kerajinan {name}",
       "craftedToast": "Dibuat: {name}",
+      "craftedToastQty": "Dibuat: {name} x{qty}",
       "insufficientMaterials": "Anda tidak memiliki bahan untuk itu.",
       "unknownRecipe": "Resep itu tidak ada.",
       "comboRequirementUnmet": "Kamu tidak memiliki kedua keahlian yang diperlukan pada tingkat yang disyaratkan untuk resep itu.",
@@ -2527,7 +2530,13 @@ export const id_ID: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Kamu menghancurkan pemantraan {item}.",
+      "disenchantedYield": "Kamu menghancurkan pemantraan {item} menjadi {material}.",
+      "disenchantedYieldQty": "Kamu menghancurkan pemantraan {item} menjadi {material} x{qty}.",
+      "disenchantedAlso": "Kamu juga memulihkan {material}.",
+      "disenchantedAlsoQty": "Kamu juga memulihkan {material} x{qty}.",
       "salvagedLine": "Kamu menyalvasi {item}.",
+      "salvagedYield": "Kamu menyalvasi {item} menjadi {material}.",
+      "salvagedYieldQty": "Kamu menyalvasi {item} menjadi {material} x{qty}.",
       "enchantAppliedLine": "Kamu memantrai {item} dengan {enchant}.",
       "notHeld": "Kamu tidak memiliki barang itu.",
       "notDisenchantable": "Kamu tidak bisa menghancurkan pemantraan itu.",
@@ -2564,9 +2573,14 @@ export const id_ID: EnTranslations = {
       "sameEnchant": "Barang itu sudah memiliki mantra itu.",
       "replaceTag": "Menggantikan {enchant}",
       "sameEnchantTag": "Sudah diterapkan",
+      "plainTag": "Belum dimantrai",
       "replaceConfirmTitle": "Ganti mantra pada {item}?",
       "replaceConfirmBody": "Ini mengganti {old} pada {item} dengan {new}.",
       "replaceConfirmNoRefund": "Mantra lama dihancurkan. Bahannya tidak dikembalikan. Tindakan ini tidak dapat dibatalkan.",
+      "replaceConfirmKeeps": "Dipertahankan: {kept}",
+      "replaceConfirmKeepsSigner": "Tanda pembuat",
+      "replaceConfirmKeepsMasterwork": "Bonus mahakarya",
+      "replaceConfirmKeepsBond": "Ikatan komisi",
       "replaceConfirmCost": "Biaya: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Ganti"
@@ -6941,6 +6955,7 @@ export const id_ID: EnTranslations = {
       "filterTypeAll": "Semua jenis",
       "filterTypeWeapon": "Senjata",
       "filterTypeArmor": "Zirah",
+      "filterTypeBag": "Tas",
       "filterTypeConsumable": "Konsumabel",
       "filterTypeMaterial": "Bahan",
       "filterTypeCosmetic": "Kosmetik",
@@ -6954,6 +6969,8 @@ export const id_ID: EnTranslations = {
       "armorMail": "Rantai",
       "filterWeaponType": "Jenis senjata",
       "filterWeaponAll": "Semua senjata",
+      "filterBagSize": "Ukuran tas",
+      "filterBagAll": "Semua tas",
       "filterPrimaryStat": "Stat utama",
       "filterPrimaryStatAll": "Stat utama apa pun",
       "filterRarity": "Kelangkaan",
@@ -9504,6 +9521,9 @@ export const id_ID: EnTranslations = {
       },
       "heart_of_the_rift": {
         "name": "Heart of the Rift"
+      },
+      "voidsong_dirk": {
+        "name": "Voidsong, Dirk of the Sundered Veil"
       },
       "wildheart_tuskblade": {
         "name": "Wildheart Tuskblade"

@@ -693,7 +693,7 @@ export const cs_CZ: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "Sleva 20 %",
+      "railWocDiscount": "Sleva {percent} %",
       "railWocUnavailable": "Cena ve WOC nyní není dostupná.",
       "railNativeUnavailable": "SOL/WOC nedostupné",
       "amountLabel": "Množství",
@@ -929,9 +929,7 @@ export const cs_CZ: EnTranslations = {
       "riding": "Riding",
       "mount": "Mount",
       "dismount": "Dismount",
-      "requiresLevel": "Requires level {level}",
-      "pickFirst": "Pick a mount to ride.",
-      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "useToRide": "Use to summon this mount.",
       "emptyTitle": "No mounts collected",
       "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
       "emptyDropHint": "Rarer mounts drop from heroic dungeon bosses and Rift completions.",
@@ -957,7 +955,7 @@ export const cs_CZ: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "ownedMountPrompt": "Press {key} to mount",
+      "ownedMountPrompt": "Your reins are in your bags. Use them to ride.",
       "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
       "success": "You have tamed the Valorsteed.",
@@ -1546,6 +1544,7 @@ export const cs_CZ: EnTranslations = {
       "harvestButton": "Sklidit",
       "harvestTooltip": "Sbírá zaškrtnuté součásti. Každou mrtvolu lze sklidit pouze jednou, kdo dřív přijde. Nepobírá kořist.",
       "concentrateHint": "Méně vybraných komponent dá každé vyšší stupeň.",
+      "nothingSelectedYields": "Z této mrtvoly nelze sklidit nic z vybraných komponent.",
       "alreadyHarvested": "Tato mrtvola už byla sklizena.",
       "componentAria": "Sklidit {component}",
       "components": {
@@ -2109,8 +2108,8 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Čeká vyzvednutí ze Světového trhu",
-      "tip": "U Obchodníka na tebe čekají zlato nebo předměty."
+      "aria": "Čekají výnosy nebo předměty ze Světového trhu",
+      "tip": "U Obchodníka na tebe čekají výnosy z prodeje nebo vrácené předměty."
     },
     "noticeboard": {
       "empty": "Zdá se, že tu nic nevisí."
@@ -2254,6 +2253,9 @@ export const cs_CZ: EnTranslations = {
       "notReady": "Tento zdroj pro tebe ještě neobnovil zásoby.",
       "gatherLine": "Shromažďujete: {name}.",
       "gatherLineQty": "Shromažďujete: {name} x{qty}.",
+      "harvestLine": "Sklízíte: {name}.",
+      "harvestLineQty": "Sklízíte: {name} x{qty}.",
+      "harvestSpecimenLine": "Také získáváte {name}.",
       "catchLine": "Vytahuješ: {name}",
       "biteLine": "Něco zabralo!",
       "gotAwayLine": "Ta ti unikla.",
@@ -2435,6 +2437,7 @@ export const cs_CZ: EnTranslations = {
       "empty": "Zatím nejsou známy žádné recepty.",
       "resultAria": "Vyrobit {name}",
       "craftedToast": "Vyrobeno: {name}",
+      "craftedToastQty": "Vyrobeno: {name} x{qty}",
       "insufficientMaterials": "Na to nemáš materiály.",
       "unknownRecipe": "Tento recept neexistuje.",
       "comboRequirementUnmet": "Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept.",
@@ -2527,7 +2530,13 @@ export const cs_CZ: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Rozzačaruješ {item}.",
+      "disenchantedYield": "Rozzačaruješ {item} na {material}.",
+      "disenchantedYieldQty": "Rozzačaruješ {item} na {material} x{qty}.",
+      "disenchantedAlso": "Získáš také {material}.",
+      "disenchantedAlsoQty": "Získáš také {material} x{qty}.",
       "salvagedLine": "Rozebereš {item}.",
+      "salvagedYield": "Rozebereš {item} na {material}.",
+      "salvagedYieldQty": "Rozebereš {item} na {material} x{qty}.",
       "enchantAppliedLine": "Okouzlíš {item} pomocí {enchant}.",
       "notHeld": "Tento předmět nemáš.",
       "notDisenchantable": "Toto nelze rozzačarovat.",
@@ -2564,9 +2573,14 @@ export const cs_CZ: EnTranslations = {
       "sameEnchant": "Tento předmět už má toto okouzlení.",
       "replaceTag": "Nahradí {enchant}",
       "sameEnchantTag": "Již aplikováno",
+      "plainTag": "Bez okouzlení",
       "replaceConfirmTitle": "Nahradit okouzlení na {item}?",
       "replaceConfirmBody": "Tímto nahradíš {old} na {item} za {new}.",
       "replaceConfirmNoRefund": "Staré okouzlení bude zničeno. Materiály se nevrací. Tuto akci nelze vrátit.",
+      "replaceConfirmKeeps": "Zůstane: {kept}",
+      "replaceConfirmKeepsSigner": "Značka výrobce",
+      "replaceConfirmKeepsMasterwork": "Bonus mistrovského díla",
+      "replaceConfirmKeepsBond": "Vazba zakázky",
       "replaceConfirmCost": "Cena: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Nahradit"
@@ -6941,6 +6955,7 @@ export const cs_CZ: EnTranslations = {
       "filterTypeAll": "Všechny typy",
       "filterTypeWeapon": "Zbraně",
       "filterTypeArmor": "Brnění",
+      "filterTypeBag": "Batohy",
       "filterTypeConsumable": "Spotřební předměty",
       "filterTypeMaterial": "Materiály",
       "filterTypeCosmetic": "Kosmetika",
@@ -6954,6 +6969,8 @@ export const cs_CZ: EnTranslations = {
       "armorMail": "Kroužková zbroj",
       "filterWeaponType": "Typ zbraně",
       "filterWeaponAll": "Všechny zbraně",
+      "filterBagSize": "Velikost batohu",
+      "filterBagAll": "Všechny batohy",
       "filterPrimaryStat": "Hlavní atribut",
       "filterPrimaryStatAll": "Libovolný hlavní atribut",
       "filterRarity": "Vzácnost",
@@ -9504,6 +9521,9 @@ export const cs_CZ: EnTranslations = {
       },
       "heart_of_the_rift": {
         "name": "Heart of the Rift"
+      },
+      "voidsong_dirk": {
+        "name": "Voidsong, Dirk of the Sundered Veil"
       },
       "wildheart_tuskblade": {
         "name": "Wildheart Tuskblade"

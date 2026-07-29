@@ -346,10 +346,8 @@ export const IWORLD_MEMBERS = [
   { name: 'switchLoadout', kind: 'method' },
   { name: 'deleteLoadout', kind: 'method' },
   // --- rideable ground mounts (IWorldMounts) ---
-  { name: 'selectedMount', kind: 'method' }, // read-returning
   { name: 'ownedMounts', kind: 'method' }, // read-returning
   { name: 'ridingTrained', kind: 'method' }, // read-returning
-  { name: 'selectMount', kind: 'method' },
   { name: 'toggleMounted', kind: 'method' },
   // --- riding skill purchase (IWorldMounts) ---
   { name: 'learnRiding', kind: 'method' },
@@ -491,10 +489,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // surface, the mobile-station pair (placeMobileStation +
     // activeMobileStationCraft), the commissions unbindItem command, and the
     // Rift + mounts surface. The v0.31.0 base merge adds the release's three
-    // new members on top of the branch's 272.
-    expect(IWORLD_MEMBERS.length).toBe(275);
+    // new members on top of the branch's 272; making reins usable items then
+    // removed two (selectedMount + selectMount), leaving 273.
+    expect(IWORLD_MEMBERS.length).toBe(273);
     expect(DATA_MEMBERS.length).toBe(72);
-    expect(METHOD_MEMBERS.length).toBe(203);
+    expect(METHOD_MEMBERS.length).toBe(201);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -723,9 +722,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'saveActionBarLayout',
       'saveLoadout',
       'searchCharacters',
-      'selectMount',
       'selectTalentRow',
-      'selectedMount',
       'sellAllJunk',
       'sellItem',
       'setActiveTitle',
@@ -1018,9 +1015,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'saveActionBarLayout',
       'saveLoadout',
       'searchCharacters',
-      'selectMount',
       'selectTalentRow',
-      'selectedMount',
       'sellAllJunk',
       'sellItem',
       'setActiveTitle',
@@ -1464,10 +1459,8 @@ const FACET_VALE_CUP = [
 type _ExhaustValeCup = AssertNever<Exclude<keyof IWorldValeCup, (typeof FACET_VALE_CUP)[number]>>;
 
 const FACET_MOUNTS = [
-  'selectedMount',
   'ownedMounts',
   'ridingTrained',
-  'selectMount',
   'toggleMounted',
   'learnRiding',
   'mountTrainBegin',
@@ -1604,8 +1597,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(275);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(275);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(273);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(273);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

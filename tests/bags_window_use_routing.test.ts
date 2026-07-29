@@ -74,7 +74,6 @@ function harness(
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
     openItemActionMenu: noop,
-    openMountPicker: noop,
   };
   new BagsWindow(deps).render();
   return { root, usedItems, gatherToolCalls };
