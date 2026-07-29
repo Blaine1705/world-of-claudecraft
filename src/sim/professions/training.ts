@@ -26,7 +26,7 @@
 
 import { recipeById } from '../content/recipes';
 import type { PlayerMeta } from '../sim';
-import type { StationDef } from '../types';
+import type { StationDef, StationType } from '../types';
 import { isRecipeKnown } from './crafting';
 import { isAtStation, stationTypeForCraft } from './stations';
 import type { ProfessionRecipeRecord } from './types';
@@ -70,6 +70,27 @@ export function trainingFeeFor(recipe: ProfessionRecipeRecord): number {
  *  orthogonal gates, see crafting.ts isRecipeKnown). */
 export function teachTierMet(recipe: ProfessionRecipeRecord, craftSkills: CraftSkills): boolean {
   return tierForSkill(craftSkills[recipe.professionId] ?? 0) >= tierForSkill(recipe.skillReq);
+}
+
+/**
+ * The station where a trainer-taught recipe is learned: the recipe's OWN
+ * station binding when it has one, else the station serving its home craft.
+ * One definition, three readers (resolveTrain's range arm, the trainer
+ * window's teach list in src/ui/hud/vendor/train_view.ts, and the crafting
+ * window's where-to-learn hint in src/ui/crafting_view.ts), so what the UI
+ * lists and what the sim teaches can never name different masters.
+ *
+ * The fallback order matters for the crafts with no physical station
+ * (enchanting/jewelcrafting/inscription, stations.ts stationTypeForCraft):
+ * their recipes are teachable exactly when they carry an explicit
+ * `stationType` (the tool-effect charms bind to the toolworks: the charms
+ * are Enchanter work SOLD as tool upgrades, so the tool master teaches
+ * them). For every recipe of a stationed craft the two arms agree today
+ * (each such recipe's stationType, when present, IS its craft's station),
+ * so this is a widening, not a change, for shipped content.
+ */
+export function trainingStationTypeFor(recipe: ProfessionRecipeRecord): StationType | undefined {
+  return recipe.stationType ?? stationTypeForCraft(recipe.professionId);
 }
 
 // Stable deny reasons, not player-facing prose (the client renders localized
@@ -125,7 +146,7 @@ export function resolveTrain(
   if (!recipe.acquisition?.includes('trainer')) {
     return { ok: false, recipeId, reason: 'train_not_taught_here', fee };
   }
-  const stationType = stationTypeForCraft(recipe.professionId);
+  const stationType = trainingStationTypeFor(recipe);
   if (!stationType || !pos || !isAtStation(stations, pos, stationType)) {
     return { ok: false, recipeId, reason: 'train_out_of_range', fee };
   }

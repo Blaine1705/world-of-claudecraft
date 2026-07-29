@@ -9778,6 +9778,12 @@ export const vi_VN: EnTranslations = {
       "last_keep_signet": {
         "name": "Nhẫn Ấn Của The Last Keep"
       },
+      "gatherers_cache": {
+        "name": "Gatherer's Cache"
+      },
+      "artisans_eye": {
+        "name": "Artisan's Eye"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },

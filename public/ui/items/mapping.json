@@ -2468,6 +2468,16 @@
       "itemIds": [
         "last_keep_signet"
       ]
+    },
+    {
+      "source": "scripts/assets/tool_effect_icons.mjs (deterministic derivation from the arcane material art in this same directory)",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "each charm derives from the arcane material it is condensed from (essence for the Cache, shard for the Eye), so the craft and its reagents stay one visual family",
+      "commonPrompt": "No prompt: a tool-effect charm is Enchanter work condensed from the arcane ladder, so the icon is its source art under a fixed hue turn, a bound ring and an effect glyph. Re-derive with `node scripts/assets/tool_effect_icons.mjs`; verify with --check.",
+      "itemIds": [
+        "gatherers_cache",
+        "artisans_eye"
+      ]
     }
   ]
 }

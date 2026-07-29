@@ -3152,6 +3152,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_dust.name': 'Пыль перезвона',
   'entities.items.arcane_essence.name': 'Эссенция перезвона',
   'entities.items.arcane_shard.name': 'Осколок перезвона',
+  'entities.items.gatherers_cache.name': 'Сумка собирателя',
+  'entities.items.artisans_eye.name': 'Глаз ремесленника',
   'entities.items.linen_scrap.name': 'Лоскут льна',
   'entities.items.fen_muster_order.name': 'Приказ о сборе в Фенбридже',
   'entities.items.mire_prowler_pelt.name': 'Шкура болотного хищника',

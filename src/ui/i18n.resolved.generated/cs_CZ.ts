@@ -9778,6 +9778,12 @@ export const cs_CZ: EnTranslations = {
       "last_keep_signet": {
         "name": "Signet Poslední tvrze"
       },
+      "gatherers_cache": {
+        "name": "Gatherer's Cache"
+      },
+      "artisans_eye": {
+        "name": "Artisan's Eye"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },

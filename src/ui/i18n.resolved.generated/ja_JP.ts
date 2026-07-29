@@ -9778,6 +9778,12 @@ export const ja_JP: EnTranslations = {
       "last_keep_signet": {
         "name": "最後の砦の印章"
       },
+      "gatherers_cache": {
+        "name": "採集者の貯蔵袋"
+      },
+      "artisans_eye": {
+        "name": "職人の眼"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

@@ -9778,6 +9778,12 @@ export const ko_KR: EnTranslations = {
       "last_keep_signet": {
         "name": "마지막 요새의 인장"
       },
+      "gatherers_cache": {
+        "name": "채집가의 주머니"
+      },
+      "artisans_eye": {
+        "name": "장인의 눈"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

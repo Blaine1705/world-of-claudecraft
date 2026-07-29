@@ -6737,7 +6737,76 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       "at": 75,
       "materialDiscountPct": 20
     },
-    "recipes": []
+    "recipes": [
+      {
+        "id": "recipe_gatherers_cache",
+        "name": "Gatherer's Cache",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Chime Shard",
+            "count": 4
+          },
+          {
+            "name": "Chime Essence",
+            "count": 3
+          },
+          {
+            "name": "Chime Dust",
+            "count": 5
+          }
+        ],
+        "output": {
+          "name": "Gatherer's Cache",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_artisans_eye",
+        "name": "Artisan's Eye",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Chime Shard",
+            "count": 4
+          },
+          {
+            "name": "Chime Essence",
+            "count": 3
+          },
+          {
+            "name": "Chime Dust",
+            "count": 5
+          }
+        ],
+        "output": {
+          "name": "Artisan's Eye",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      }
+    ]
   },
   {
     "id": "weaponcrafting",

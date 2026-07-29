@@ -9778,6 +9778,12 @@ export const en_XA: EnTranslations = {
       "last_keep_signet": {
         "name": "[Šíĝñéţ óƒ ţĥé Ļášţ Ķééþ]"
       },
+      "gatherers_cache": {
+        "name": "[Ĝáţĥéŕéŕ'š Çáçĥé]"
+      },
+      "artisans_eye": {
+        "name": "[Áŕţíšáñ'š Éýé]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

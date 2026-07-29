@@ -2994,6 +2994,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_dust.name': '鈴音之塵',
   'entities.items.arcane_essence.name': '鈴音精華',
   'entities.items.arcane_shard.name': '鈴音碎片',
+  'entities.items.gatherers_cache.name': '採集者儲囊',
+  'entities.items.artisans_eye.name': '匠人之眼',
   'entities.items.linen_scrap.name': '亞麻碎布',
   'entities.items.fen_muster_order.name': '芬橋集結令',
   'entities.items.mire_prowler_pelt.name': '泥沼潛伏者毛皮',

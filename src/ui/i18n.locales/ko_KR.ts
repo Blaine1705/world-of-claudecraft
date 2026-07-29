@@ -3108,6 +3108,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_dust.name': '울림 가루',
   'entities.items.arcane_essence.name': '울림 정수',
   'entities.items.arcane_shard.name': '울림 파편',
+  'entities.items.gatherers_cache.name': '채집가의 주머니',
+  'entities.items.artisans_eye.name': '장인의 눈',
   'entities.items.linen_scrap.name': '아마포 조각',
   'entities.items.fen_muster_order.name': '펜브리지 소집 명령서',
   'entities.items.mire_prowler_pelt.name': '수렁 배회자 가죽',

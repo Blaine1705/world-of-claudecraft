@@ -9778,6 +9778,12 @@ export const nl_NL: EnTranslations = {
       "last_keep_signet": {
         "name": "Zegel van de Laatste Burcht"
       },
+      "gatherers_cache": {
+        "name": "Gatherer's Cache"
+      },
+      "artisans_eye": {
+        "name": "Artisan's Eye"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },

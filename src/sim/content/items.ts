@@ -1908,6 +1908,42 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 55,
   },
 
+  // --- Tool-effect charms (the acquisition craft) ---------------------------
+  // The item form of the two live TOOL_EFFECTS entries
+  // (src/sim/content/professions.ts): Enchanter work, minted by the
+  // TOOL_EFFECT_RECIPES (content/recipes.ts) and consumed by the
+  // slot_tool_effect command through resolveSlotToolEffect
+  // (src/sim/professions/tools.ts). Item id deliberately EQUALS the effect id:
+  // one identity, one icon key, one display name. `quality: 'rare'` is
+  // load-bearing, not cosmetic: the craft signing rule (crafting.ts, #1149)
+  // mints every rare-or-better output as a signed instance carrying
+  // `{ signer: crafterName }`, and the slot copies that signer into the slot's
+  // `craftedBy`, which is what the original-crafter recharge discount reads. A
+  // signed instance is also non-fungible, so charms move by player trade only
+  // (never the World Market, never mail). No Springback (quickening_charm)
+  // item exists ON PURPOSE: the R9 slot policy refuses that effect everywhere,
+  // and no path may mint what another path refuses (the craftable set is
+  // derived from these defs against the policy in
+  // tests/professions_tool_effect_craft.test.ts). `kind: 'tool'` (not 'junk'):
+  // a charm is an implement accessory, and the tool kind's stack size of 1
+  // keeps each signed copy its own provenance-carrying slot entry.
+  gatherers_cache: {
+    id: 'gatherers_cache',
+    name: "Gatherer's Cache",
+    kind: 'tool',
+    quality: 'rare',
+    use: { type: 'toolEffect', effectId: 'gatherers_cache' },
+    sellValue: 60,
+  },
+  artisans_eye: {
+    id: 'artisans_eye',
+    name: "Artisan's Eye",
+    kind: 'tool',
+    quality: 'rare',
+    use: { type: 'toolEffect', effectId: 'artisans_eye' },
+    sellValue: 60,
+  },
+
   // --- Typed disenchant secondaries (Professions 2.0) -------------
   // A rare-or-better disenchant yields, alongside the universal ladder material
   // above, exactly one typed secondary keyed by the salvaged piece's material

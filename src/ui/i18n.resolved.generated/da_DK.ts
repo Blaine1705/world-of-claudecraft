@@ -9778,6 +9778,12 @@ export const da_DK: EnTranslations = {
       "last_keep_signet": {
         "name": "Segl fra Den Sidste Borg"
       },
+      "gatherers_cache": {
+        "name": "Gatherer's Cache"
+      },
+      "artisans_eye": {
+        "name": "Artisan's Eye"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },

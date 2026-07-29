@@ -16,12 +16,13 @@ import {
   LADDER_RECIPES,
   ROD_RECIPES,
   recipeById,
+  TOOL_EFFECT_RECIPES,
 } from '../src/sim/content/recipes';
 import { ITEMS, NPCS, STATIONS } from '../src/sim/data';
 import { requiredReagentCountFor } from '../src/sim/professions/crafting';
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { stationsOfType, stationTypeForCraft } from '../src/sim/professions/stations';
-import { PRE_TRAINING_RECIPE_IDS } from '../src/sim/professions/training';
+import { PRE_TRAINING_RECIPE_IDS, trainingStationTypeFor } from '../src/sim/professions/training';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 
 // --- economy math (the locked reagent-value rule) --------------------------
@@ -224,12 +225,16 @@ describe('THE ECONOMY INVARIANT', () => {
 
 describe('REFERENTIAL INTEGRITY', () => {
   // The real trainer-home rule (professions/training.ts resolveTrain): a train
-  // attempt locates the station via stationTypeForCraft(recipe.professionId),
-  // NOT via recipe.stationType. That is how the three station-free COMBO_RECIPES
-  // (no stationType field) still resolve a home: their professionId maps to a
-  // station type in STATION_TYPE_BY_CRAFT. So the teachable-home check walks
-  // professionId, and every trainer recipe must map to an existing station type
-  // that has at least one placed station with an existing master NPC.
+  // attempt locates the station via trainingStationTypeFor(recipe): the
+  // recipe's OWN stationType when it has one, else the station serving its
+  // craft. The fallback arm is how the three station-free COMBO_RECIPES (no
+  // stationType field) resolve a home (their professionId maps to a station
+  // type in STATION_TYPE_BY_CRAFT); the explicit arm is how the
+  // enchanting-home TOOL_EFFECT_RECIPES resolve one (enchanting has no
+  // station, the charms bind to the toolworks). So the teachable-home check
+  // walks the same shared resolution the sim and the trainer window use, and
+  // every trainer recipe must resolve an existing station type that has at
+  // least one placed station with an existing master NPC.
   const RUNTIME_STATION_TYPES = new Set(Object.values(STATION_TYPE_BY_CRAFT));
 
   it('every recipe reagent and result resolves to a real ItemDef', () => {
@@ -246,10 +251,11 @@ describe('REFERENTIAL INTEGRITY', () => {
     for (const recipe of ALL_RECIPES) {
       if (!recipe.acquisition?.includes('trainer')) continue;
       trainerRecipes += 1;
-      const type = stationTypeForCraft(recipe.professionId);
+      const type = trainingStationTypeFor(recipe);
       expect(
         type,
-        `${recipe.id}: professionId ${recipe.professionId} has no station type`,
+        `${recipe.id}: no teachable home (no stationType, and professionId ` +
+          `${recipe.professionId} has no station type)`,
       ).toBeDefined();
       const stations = stationsOfType(STATIONS, type as NonNullable<typeof type>);
       expect(stations.length, `${recipe.id}: no station of type ${type}`).toBeGreaterThan(0);
@@ -261,10 +267,17 @@ describe('REFERENTIAL INTEGRITY', () => {
       }
     }
     // The 54 ladder recipes plus the 3 grandfathered combos all carry
-    // 'trainer', and so do the two crafted rods: the pre-training id list is
-    // frozen, so anything authored after that switch has to be learned.
-    expect(trainerRecipes).toBe(LADDER_RECIPES.length + COMBO_RECIPES.length + ROD_RECIPES.length);
+    // 'trainer', and so do the two crafted rods and the two tool-effect
+    // charms: the pre-training id list is frozen, so anything authored after
+    // that switch has to be learned.
+    expect(trainerRecipes).toBe(
+      LADDER_RECIPES.length +
+        COMBO_RECIPES.length +
+        ROD_RECIPES.length +
+        TOOL_EFFECT_RECIPES.length,
+    );
     expect(ROD_RECIPES).toHaveLength(2);
+    expect(TOOL_EFFECT_RECIPES).toHaveLength(2);
   });
 
   it('the three station-free combo recipes resolve a home via professionId, not stationType', () => {

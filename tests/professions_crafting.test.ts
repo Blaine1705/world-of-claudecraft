@@ -7,6 +7,7 @@ import {
   LADDER_RECIPES,
   ROD_RECIPES,
   recipeById,
+  TOOL_EFFECT_RECIPES,
   TOOL_RECIPES,
 } from '../src/sim/content/recipes';
 import { STATIONS } from '../src/sim/data';
@@ -410,6 +411,7 @@ describe('craftItem command (#1127)', () => {
       ...COMMON_RECIPES,
       ...TOOL_RECIPES,
       ...ROD_RECIPES,
+      ...TOOL_EFFECT_RECIPES,
       ...CASTER_HUB_RECIPES,
       ...COMBO_RECIPES,
       ...LADDER_RECIPES,
@@ -420,6 +422,7 @@ describe('craftItem command (#1127)', () => {
       COMMON_RECIPES.length +
         TOOL_RECIPES.length +
         ROD_RECIPES.length +
+        TOOL_EFFECT_RECIPES.length +
         CASTER_HUB_RECIPES.length +
         COMBO_RECIPES.length +
         LADDER_RECIPES.length,

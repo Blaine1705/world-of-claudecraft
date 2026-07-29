@@ -420,6 +420,68 @@ export const ROD_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// Tool-effect charms (the acquisition craft): the game's first enchanting
+// recipes, minting the item form of the two live TOOL_EFFECTS entries
+// (content/items.ts gatherers_cache / artisans_eye; the ids match). The slot
+// command consumes the item through resolveSlotToolEffect, so THESE recipes
+// are the only production path for a slotted effect.
+//
+// - `professionId: 'enchanting'` is identity, not listing convenience: the
+//   effects are Enchanter work (TOOL_EFFECTS craftId), so the craft gains
+//   ENCHANTING skill and the specialization recharge discount keys off the
+//   same craft. Enchanting has no station of its own, so the recipes bind to
+//   the TOOLWORKS (`stationType`), and the trainer route follows the binding
+//   (training.ts trainingStationTypeFor): the tool master teaches the tool
+//   upgrades.
+// - `acquisition: ['trainer']` per the authoring default (the pre-training
+//   grandfather list is frozen); skillReq 25 resolves to tier 1, so learning
+//   needs enchanting 25 (a real disenchant/enchant climb) and the tier-1
+//   training fee.
+// - REAGENTS ARE THE PRICE FLOOR, not flavor: re-slotting a fresh charm
+//   resets charges to full, so the mint MUST cost more than the most
+//   expensive generic recharge (a full epic-rung fill priced in shards) or
+//   re-crafting would bypass recharging outright. The whole arcane ladder is
+//   consumed (shards the bulk of the value), which also gives the shard its
+//   second sink beside the Greater enchants. The inequality is pinned in
+//   tests/professions_tool_effect_craft.test.ts; retune BOTH sides together.
+// - NO Springback (quickening_charm) recipe: the R9 slot policy refuses that
+//   effect everywhere, and no path may mint what another path refuses (same
+//   guard test derives this from the policy).
+export const TOOL_EFFECT_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_gatherers_cache',
+    professionId: 'enchanting',
+    resultItemId: 'gatherers_cache',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'arcane_shard', count: 4 },
+      { itemId: 'arcane_essence', count: 3 },
+      { itemId: 'arcane_dust', count: 5 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 15,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_artisans_eye',
+    professionId: 'enchanting',
+    resultItemId: 'artisans_eye',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'arcane_shard', count: 4 },
+      { itemId: 'arcane_essence', count: 3 },
+      { itemId: 'arcane_dust', count: 5 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 15,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+];
+
 // Station-tier caster-stat (int/spi) recipes (crafting content follow-up to
 // the COMMON_RECIPES caster pieces above): one per tailoring/leatherworking/
 // armorcrafting, at the same osmium tier as TOOL_RECIPES, each bound to its
@@ -1460,6 +1522,7 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...COMMON_RECIPES,
   ...TOOL_RECIPES,
   ...ROD_RECIPES,
+  ...TOOL_EFFECT_RECIPES,
   ...CASTER_HUB_RECIPES,
   ...COMBO_RECIPES,
   ...LADDER_RECIPES,

@@ -9778,6 +9778,12 @@ export const sv_SE: EnTranslations = {
       "last_keep_signet": {
         "name": "Sista fästets signetring"
       },
+      "gatherers_cache": {
+        "name": "Gatherer's Cache"
+      },
+      "artisans_eye": {
+        "name": "Artisan's Eye"
+      },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
       },

@@ -9778,6 +9778,12 @@ export const en: EnTranslations = {
       "last_keep_signet": {
         "name": "Signet of the Last Keep"
       },
+      "gatherers_cache": {
+        "name": "Gatherer's Cache"
+      },
+      "artisans_eye": {
+        "name": "Artisan's Eye"
+      },
       "conjured_water4": {
         "name": "Conjured Springwater"
       },

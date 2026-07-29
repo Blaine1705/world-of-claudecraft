@@ -2,7 +2,7 @@
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
-import type { GatheringProfessionId } from './content/professions';
+import type { GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { HarvestYield } from './professions/harvest_yields';
 
@@ -639,7 +639,16 @@ export type ItemUse =
   // it can gather: see src/sim/professions/tools.ts (canGatherTier). This item
   // type never carries a durability field (this repo has no durability
   // mechanic anywhere), so a base tool can never become unusable.
-  | { type: 'gatherTool'; professionId: GatheringProfessionId; tier: number };
+  | { type: 'gatherTool'; professionId: GatheringProfessionId; tier: number }
+  // A crafted tool-effect charm (the acquisition craft): the item form of one
+  // TOOL_EFFECTS entry. Consumed by the slot_tool_effect command through
+  // resolveSlotToolEffect (src/sim/professions/tools.ts), never by useItem:
+  // the resolver is the ONE validation authority for minting a slot, so the
+  // item declares WHICH effect it carries and nothing else. The def is the
+  // single source of the effect-to-item mapping; a guard derives the craftable
+  // set from these defs against the R9 slot policy so no item can exist for an
+  // effect the policy refuses everywhere.
+  | { type: 'toolEffect'; effectId: ToolEffectId };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).

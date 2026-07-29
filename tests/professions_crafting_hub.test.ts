@@ -157,13 +157,24 @@ describe('station content', () => {
     for (const recipe of TOOL_RECIPES) {
       expect(recipe.stationType, recipe.id).toBe('toolworks');
     }
+    // Every stamped type is the one serving that recipe's own craft, with ONE
+    // ruled exception class: a craft with no station of its own (enchanting/
+    // jewelcrafting/inscription) may bind a recipe to a foreign station, and
+    // that binding then IS the recipe's teaching home (training.ts
+    // trainingStationTypeFor). The tool-effect charms are the whole class
+    // today: enchanting home, toolworks binding, pinned literally so a new
+    // foreign binding is a deliberate edit here, not a drive-by.
+    const foreignBound: string[] = [];
     for (const recipe of ALL_RECIPES) {
-      if (recipe.stationType) {
-        expect(recipe.stationType, `${recipe.id} station/craft mismatch`).toBe(
-          stationTypeForCraft(recipe.professionId),
-        );
+      if (!recipe.stationType) continue;
+      const ownStation = stationTypeForCraft(recipe.professionId);
+      if (ownStation === undefined) {
+        foreignBound.push(recipe.id);
+        continue;
       }
+      expect(recipe.stationType, `${recipe.id} station/craft mismatch`).toBe(ownStation);
     }
+    expect(foreignBound.sort()).toEqual(['recipe_artisans_eye', 'recipe_gatherers_cache']);
   });
 });
 

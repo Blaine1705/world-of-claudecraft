@@ -9778,6 +9778,12 @@ export const zh_CN: EnTranslations = {
       "last_keep_signet": {
         "name": "最后的堡垒印戒"
       },
+      "gatherers_cache": {
+        "name": "采集者储囊"
+      },
+      "artisans_eye": {
+        "name": "匠人之眼"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

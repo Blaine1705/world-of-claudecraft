@@ -9778,6 +9778,12 @@ export const tr_TR: EnTranslations = {
       "last_keep_signet": {
         "name": "Son Kale Mührü"
       },
+      "gatherers_cache": {
+        "name": "Gatherer's Cache"
+      },
+      "artisans_eye": {
+        "name": "Artisan's Eye"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },

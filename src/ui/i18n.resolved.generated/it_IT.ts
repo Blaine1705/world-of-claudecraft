@@ -9778,6 +9778,12 @@ export const it_IT: EnTranslations = {
       "last_keep_signet": {
         "name": "Sigillo dell’Ultima Rocca"
       },
+      "gatherers_cache": {
+        "name": "Gatherer's Cache"
+      },
+      "artisans_eye": {
+        "name": "Artisan's Eye"
+      },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
       },

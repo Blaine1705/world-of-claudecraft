@@ -3126,6 +3126,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_dust.name': '鈴音の粉塵',
   'entities.items.arcane_essence.name': '鈴音の精髄',
   'entities.items.arcane_shard.name': '鈴音のかけら',
+  'entities.items.gatherers_cache.name': '採集者の貯蔵袋',
+  'entities.items.artisans_eye.name': '職人の眼',
   'entities.items.linen_scrap.name': 'リネンの切れ端',
   'entities.items.fen_muster_order.name': 'フェンブリッジ召集令',
   'entities.items.mire_prowler_pelt.name': '沼の徘徊者の毛皮',

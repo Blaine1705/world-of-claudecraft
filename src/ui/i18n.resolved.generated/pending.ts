@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -19,6 +20,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",
@@ -40,6 +42,7 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.tracker.unknownQuest"
   ],
   "es_ES": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -49,6 +52,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",
@@ -70,6 +74,7 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.tracker.unknownQuest"
   ],
   "fr_FR": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -79,6 +84,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",
@@ -100,6 +106,7 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.tracker.unknownQuest"
   ],
   "fr_CA": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -109,6 +116,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",
@@ -131,6 +139,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -140,6 +149,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",
@@ -161,6 +171,7 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.tracker.unknownQuest"
   ],
   "de_DE": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -170,6 +181,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",
@@ -195,6 +207,7 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -204,6 +217,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",
@@ -226,6 +240,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -235,6 +250,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",
@@ -256,6 +272,7 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.tracker.unknownQuest"
   ],
   "nl_NL": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -265,6 +282,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",
@@ -286,6 +304,7 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.tracker.unknownQuest"
   ],
   "pl_PL": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -295,6 +314,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",
@@ -316,6 +336,7 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.tracker.unknownQuest"
   ],
   "id_ID": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -325,6 +346,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",
@@ -346,6 +368,7 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.tracker.unknownQuest"
   ],
   "tr_TR": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -355,6 +378,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",
@@ -376,6 +400,7 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.tracker.unknownQuest"
   ],
   "sv_SE": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -385,6 +410,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",
@@ -406,6 +432,7 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.tracker.unknownQuest"
   ],
   "vi_VN": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -415,6 +442,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",
@@ -436,6 +464,7 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.tracker.unknownQuest"
   ],
   "da_DK": [
+    "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
     "entities.items.fine_elderwood_log.name",
@@ -445,6 +474,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_silverleaf_herb.name",
     "entities.items.fine_sunpetal_herb.name",
     "entities.items.fine_thorium_ore.name",
+    "entities.items.gatherers_cache.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
     "guide.profPages.toolCraftedOrMarks",

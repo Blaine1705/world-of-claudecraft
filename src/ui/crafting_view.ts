@@ -19,7 +19,8 @@ import {
 import { isCommissionEligible } from '../sim/professions/commission';
 import { holdsSelfSignedInstance, requiredReagentCountFor } from '../sim/professions/crafting';
 import { countAcrossGrades, materialGradeIds } from '../sim/professions/material_grades';
-import { type StationType, stationsOfType, stationTypeForCraft } from '../sim/professions/stations';
+import { type StationType, stationsOfType } from '../sim/professions/stations';
+import { trainingStationTypeFor } from '../sim/professions/training';
 import { MINIMAL_TIER_MULTIPLIER, REDUCED_TIER_MULTIPLIER } from '../sim/professions/wheel';
 import type { InvSlot, ItemDef, StationDef } from '../sim/types';
 import { isRecipeKnownForViewer } from './hud/vendor/train_view';
@@ -379,16 +380,17 @@ export interface CraftLearnHint {
 
 /**
  * Crafts that have at least one trainer-taught recipe the viewer has NOT
- * learned, mapped to the station type serving that craft (stationTypeForCraft)
- * and the resident master (the station registry). Drives the crafting window's
+ * learned, mapped to that recipe's teaching home (trainingStationTypeFor:
+ * the recipe's own stationType, else the station serving its craft) and the
+ * resident master (the station registry). Drives the crafting window's
  * per-section "learnable at a master" discoverability hint: a section renders
  * the hint iff its craft is in this map.
  *
  * Uses the SHARED isRecipeKnownForViewer predicate (train_view.ts), never a
  * second knownness rule, so the hint can never disagree with the train ladder
- * or the crafting window's known-recipe filter. A craft with no physical
- * station (or no seated master) is never hinted: trainer recipes only exist for
- * stationed crafts, and there would be no master to point at. Read-only over
+ * or the crafting window's known-recipe filter. A recipe with no resolvable
+ * teaching home (no stationType and an unstationed craft) is never hinted:
+ * there would be no master to point at. Read-only over
  * static content plus the viewer's mirrored known set (both hosts carry
  * knownRecipes on cprof, so no new IWorld member is needed).
  */
@@ -402,7 +404,11 @@ export function craftLearnHints(
     if (hints.has(recipe.professionId)) continue;
     if (!recipe.acquisition?.includes('trainer')) continue;
     if (isRecipeKnownForViewer(recipe, known)) continue;
-    const stationType = stationTypeForCraft(recipe.professionId);
+    // The recipe's own teaching home (its stationType, else its craft's
+    // station), shared with resolveTrain and the trainer list: an
+    // enchanting-home charm recipe hints at the toolworks master who
+    // actually teaches it, not at a station its craft does not have.
+    const stationType = trainingStationTypeFor(recipe);
     if (!stationType) continue;
     const station = stationsOfType(stations, stationType)[0];
     if (!station) continue;

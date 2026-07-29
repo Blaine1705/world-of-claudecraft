@@ -9778,6 +9778,12 @@ export const pl_PL: EnTranslations = {
       "last_keep_signet": {
         "name": "Sygnet Ostatniej Twierdzy"
       },
+      "gatherers_cache": {
+        "name": "Gatherer's Cache"
+      },
+      "artisans_eye": {
+        "name": "Artisan's Eye"
+      },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
       },

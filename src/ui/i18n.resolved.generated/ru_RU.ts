@@ -9778,6 +9778,12 @@ export const ru_RU: EnTranslations = {
       "last_keep_signet": {
         "name": "Печатка Последнего оплота"
       },
+      "gatherers_cache": {
+        "name": "Сумка собирателя"
+      },
+      "artisans_eye": {
+        "name": "Глаз ремесленника"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

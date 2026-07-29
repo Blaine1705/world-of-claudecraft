@@ -9778,6 +9778,12 @@ export const id_ID: EnTranslations = {
       "last_keep_signet": {
         "name": "Cincin Stempel Last Keep"
       },
+      "gatherers_cache": {
+        "name": "Gatherer's Cache"
+      },
+      "artisans_eye": {
+        "name": "Artisan's Eye"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
