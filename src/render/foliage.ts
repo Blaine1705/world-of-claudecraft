@@ -1790,16 +1790,45 @@ interface GrassChunk {
   flowerMesh?: THREE.InstancedMesh;
 }
 
+// Tags every vertex of a tuft/flower card part with the aCap attribute the
+// grass shader reads: 1 on the near-horizontal cap card, 0 on upright cards
+// and flowers. Every merged part carries the attribute so mergeGeometries
+// keeps a uniform layout across parts.
+function tagCapVertices(g: THREE.BufferGeometry, cap: 0 | 1): THREE.BufferGeometry {
+  const arr = new Float32Array(g.getAttribute('position').count);
+  if (cap) arr.fill(1);
+  g.setAttribute('aCap', new THREE.BufferAttribute(arr, 1));
+  return g;
+}
+
 // wind sway + masked edge fade for the grass tufts; the fade keys off the
 // tuft's instance origin so alphaTest thins whole tufts without blending
 function applyGrassShader(
   mat: THREE.Material,
   uniforms: { uPlayerPos: { value: THREE.Vector2 }; uFadeFar: { value: number } },
 ): void {
+  // On tiers where the solid blade carpet runs (the exact buildBladeGrass
+  // condition in blade_grass.ts), the carpet owns the near-field ground
+  // cover read, and the near-horizontal cap card reads as a lattice of
+  // long flat blades floating above the finer carpet. Collapse cap verts
+  // to the tuft root near the player and grow them back where the carpet
+  // fades out (its fade band runs 27.2 to 34). Tiers without the carpet
+  // keep the cap everywhere: there it is still the only top-down read.
+  const capNearCollapse = GFX.standardMaterials && !GFX.leanFoliage;
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = sharedUniforms.uTime;
     sh.uniforms.uPlayerPos = uniforms.uPlayerPos;
     sh.uniforms.uFadeFar = uniforms.uFadeFar;
+    const capDecl = capNearCollapse
+      ? `
+        attribute float aCap;
+        uniform vec2 uPlayerPos;`
+      : '';
+    const capCollapse = capNearCollapse
+      ? `
+        float capKeep = smoothstep(22.0, 30.0, distance(tuftBase, uPlayerPos));
+        transformed *= mix(1.0, capKeep, aCap);`
+      : '';
     const wind = GFX.windSway
       ? `
         float windPhase = tuftBase.x * 0.31 + tuftBase.y * 0.27;
@@ -1814,7 +1843,7 @@ function applyGrassShader(
         '#include <common>',
         `#include <common>
         uniform float uTime;
-        varying vec2 vTuftWorld;`,
+        varying vec2 vTuftWorld;${capDecl}`,
       )
       .replace(
         '#include <beginnormal_vertex>',
@@ -1831,7 +1860,7 @@ function applyGrassShader(
           vec2 tuftBase = vec2(instanceMatrix[3][0], instanceMatrix[3][2]);
         #else
           vec2 tuftBase = vec2(0.0);
-        #endif
+        #endif${capCollapse}
         ${wind}
         vTuftWorld = tuftBase;`,
       );
@@ -1961,9 +1990,9 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   const quadCap = lush
     ? new THREE.PlaneGeometry(1.05, 1.05).rotateX(-Math.PI / 2 + 0.18).translate(0, 0.34, 0)
     : null;
-  const parts = [quad, quad2];
-  if (quad3) parts.push(quad3);
-  if (quadCap) parts.push(quadCap);
+  const parts = [tagCapVertices(quad, 0), tagCapVertices(quad2, 0)];
+  if (quad3) parts.push(tagCapVertices(quad3, 0));
+  if (quadCap) parts.push(tagCapVertices(quadCap, 1));
   const geo = mergeGeometries(parts);
 
   const tuftTex = grassTuftTexture(lush ? 30 : 18);
@@ -1996,7 +2025,9 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   const fquad = new THREE.PlaneGeometry(0.95, 0.8);
   fquad.translate(0, 0.38, 0);
   const fquad2 = fquad.clone().rotateY(Math.PI / 2);
-  const flowerGeo = mergeGeometries([fquad, fquad2]);
+  // flowers share the grass shader, so they carry the cap tag too (all 0:
+  // no flower card ever collapses)
+  const flowerGeo = mergeGeometries([tagCapVertices(fquad, 0), tagCapVertices(fquad2, 0)]);
   const FLOWER_PALETTES: Partial<Record<BiomeId, FlowerKind[]>> = {
     // the Veiled Hollow: pinks, purples, whites
     dusk: [
