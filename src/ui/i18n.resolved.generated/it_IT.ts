@@ -7175,13 +7175,13 @@ export const it_IT: EnTranslations = {
         "name": "Fendente Malvagio",
         "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
         "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
-        "specNote_combat": "While Redline is active, this button becomes Body Blow: a heavier strike that awards 2 combo points and builds Redline."
+        "specNote_combat": "While Redline is active, this button becomes Body Blow: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
       },
       "eviscerate": {
         "name": "Sonno Eterno",
         "description": "Finishing move that causes {damage}.",
         "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
-        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: your strike becomes Body Blow and this button becomes Knockout Blow (spend it before Redline ends)."
+        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Body Blow (130% weapon damage plus 10, awards 2 combo points, adds 1 Redline) and this button becomes Knockout Blow (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
       },
       "backstab": {
         "name": "Affondo Codardo",
@@ -7511,7 +7511,7 @@ export const it_IT: EnTranslations = {
       "wrath": {
         "name": "Dardo Silvano",
         "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (240 to 285 Arcane damage) or Skyfall becomes Sunwake (160 to 190 Nature damage plus a 75 burn over 9 sec, and restores 35 mana)."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
       },
       "healing_touch": {
         "name": "Rammendo Selvaggio",
