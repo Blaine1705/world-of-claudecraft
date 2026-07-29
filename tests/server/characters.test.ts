@@ -635,8 +635,23 @@ describe('create handler', () => {
       .fn()
       .mockRejectedValueOnce({ code: '23505' })
       .mockResolvedValueOnce(created);
-    const reclaimDeactivatedName = vi.fn(async () => ({ id: 900, archivedName: 'Valida' }));
-    setCharactersDbForTests({ createCharacterCapped, reclaimDeactivatedName });
+    // The orphan's STORED casing deliberately differs from the requested
+    // 'Valid': the db lookup is case-insensitive and every book match is
+    // exact, so the rekeys must run with the stored name or a case-variant
+    // reclaim strands the orphan's name-keyed rows for a future exact-case
+    // holder to adopt.
+    const orphanState = st({
+      inventory: [{ itemId: 'iron_ore', count: 2, instance: { signer: 'VALID' } }],
+    });
+    const reclaimDeactivatedName = vi.fn(async () => ({
+      id: 900,
+      archivedName: 'VALIDa',
+      freedName: 'VALID',
+      level: 3,
+      state: orphanState,
+    }));
+    const saveCharacterState = vi.fn(async () => true);
+    setCharactersDbForTests({ createCharacterCapped, reclaimDeactivatedName, saveCharacterState });
     const rekeyMarketSeller = vi.fn(() => true);
     const rekeyMailOwner = vi.fn(() => true);
     const saveMarket = vi.fn(async () => {});
@@ -652,11 +667,56 @@ describe('create handler', () => {
     expect(createCharacterCapped).toHaveBeenCalledTimes(2);
     // The reclaim is a rename in effect: the orphaned holder's world state
     // moved onto its archived identity BEFORE the freed name was reissued,
-    // and each changed book was persisted.
-    expect(rekeyMarketSeller).toHaveBeenCalledWith(900, 'Valid', 'Valida');
-    expect(rekeyMailOwner).toHaveBeenCalledWith(900, 'Valid', 'Valida');
+    // each changed book was persisted, and every rekey used the STORED
+    // casing, never the requester's typed one.
+    expect(rekeyMarketSeller).toHaveBeenCalledWith(900, 'VALID', 'VALIDa');
+    expect(rekeyMailOwner).toHaveBeenCalledWith(900, 'VALID', 'VALIDa');
     expect(saveMarket).toHaveBeenCalledTimes(1);
     expect(saveMail).toHaveBeenCalledTimes(1);
+    // The rename path's third rekey runs here too: the orphan's own signed
+    // instances follow the archived identity, and the swept blob is saved.
+    expect(saveCharacterState).toHaveBeenCalledTimes(1);
+    expect(saveCharacterState).toHaveBeenCalledWith(900, 3, orphanState);
+    expect(
+      (orphanState as unknown as { inventory: { instance: { signer: string } }[] }).inventory[0]
+        .instance.signer,
+    ).toBe('VALIDa');
+  });
+
+  it('a reclaim whose books and blob need no rekey saves nothing', async () => {
+    // The save-skip arms: both book rekeys report no change and the orphan
+    // carries no self-signed instance, so no blob write amplifies the create.
+    const createCharacterCapped = vi
+      .fn()
+      .mockRejectedValueOnce({ code: '23505' })
+      .mockResolvedValueOnce(charRow({ id: 12, name: 'Valid', class: 'warrior', level: 1 }));
+    const saveCharacterState = vi.fn(async () => true);
+    setCharactersDbForTests({
+      createCharacterCapped,
+      reclaimDeactivatedName: async () => ({
+        id: 902,
+        archivedName: 'Valida',
+        freedName: 'Valid',
+        level: 1,
+        state: st({ inventory: [{ itemId: 'iron_ore', count: 1 }] }),
+      }),
+      saveCharacterState,
+    });
+    const rekeyMarketSeller = vi.fn(() => false);
+    const rekeyMailOwner = vi.fn(() => false);
+    const saveMarket = vi.fn(async () => {});
+    const saveMail = vi.fn(async () => {});
+    installRuntime({ rekeyMarketSeller, rekeyMailOwner, saveMarket, saveMail });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior' },
+    });
+    expect(res.status).toBe(200);
+    expect(rekeyMarketSeller).toHaveBeenCalledTimes(1);
+    expect(rekeyMailOwner).toHaveBeenCalledTimes(1);
+    expect(saveMarket).not.toHaveBeenCalled();
+    expect(saveMail).not.toHaveBeenCalled();
+    expect(saveCharacterState).not.toHaveBeenCalled();
   });
 
   it('409s when the reclaimed name collides AGAIN on the retry (second 23505)', async () => {
@@ -666,7 +726,13 @@ describe('create handler', () => {
       .mockRejectedValueOnce({ code: '23505' });
     setCharactersDbForTests({
       createCharacterCapped,
-      reclaimDeactivatedName: async () => ({ id: 901, archivedName: 'Valida' }),
+      reclaimDeactivatedName: async () => ({
+        id: 901,
+        archivedName: 'Valida',
+        freedName: 'Valid',
+        level: 1,
+        state: null,
+      }),
     });
     const res = await callHandler('POST', '/api/characters', {
       account: { accountId: 7, scope: 'full' },
@@ -700,7 +766,13 @@ describe('create handler', () => {
       .mockResolvedValueOnce(null);
     setCharactersDbForTests({
       createCharacterCapped,
-      reclaimDeactivatedName: async () => ({ id: 901, archivedName: 'Valida' }),
+      reclaimDeactivatedName: async () => ({
+        id: 901,
+        archivedName: 'Valida',
+        freedName: 'Valid',
+        level: 1,
+        state: null,
+      }),
     });
     const res = await callHandler('POST', '/api/characters', {
       account: { accountId: 7, scope: 'full' },
@@ -721,7 +793,13 @@ describe('create handler', () => {
       .mockRejectedValueOnce(new Error('db exploded on retry'));
     authedDb({
       createCharacterCapped,
-      reclaimDeactivatedName: async () => ({ id: 902, archivedName: 'Valida' }),
+      reclaimDeactivatedName: async () => ({
+        id: 902,
+        archivedName: 'Valida',
+        freedName: 'Valid',
+        level: 1,
+        state: null,
+      }),
     });
     const r = await runRoute('POST', '/api/characters', {
       body: { name: 'Valid', class: 'warrior' },
@@ -1307,6 +1385,39 @@ describe('legacy DELETE dispatch arm (main.ts)', () => {
     const purgeCall = arm.slice(purgeAt, arm.indexOf(');', purgeAt));
     expect(purgeCall).toContain('characterId');
     expect(purgeCall).toContain('character.name');
+  });
+
+  it('the legacy CREATE arm runs the same shared reclaim rekey, before the retry', () => {
+    // The symmetric pin to the delete arm above: an API_DISPATCH=legacy
+    // rollback must not lose the post-reclaim world-state rekey, or the next
+    // holder of a freed name can adopt the orphan's name-keyed escrow.
+    const src = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
+    const stripComments = (s: string): string => s.replace(/(^|[^:])\/\/.*$/gm, '$1');
+    const start = src.indexOf("if (url === '/api/characters') {");
+    expect(start).toBeGreaterThan(-1);
+    const end = src.indexOf('publicSheetMatch', start);
+    expect(end).toBeGreaterThan(start);
+    const arm = stripComments(src.slice(start, end));
+    const reclaimAt = arm.indexOf('await reclaimDeactivatedName(name)');
+    expect(reclaimAt).toBeGreaterThan(-1);
+    // AFTER the null-reclaim 409 guard's return, so it only runs on success.
+    const guard409At = arm.indexOf('character.name_taken', reclaimAt);
+    expect(guard409At).toBeGreaterThan(reclaimAt);
+    const rekeyAt = arm.indexOf('await rekeyReclaimedCharacterWorldState(');
+    expect(rekeyAt).toBeGreaterThan(guard409At);
+    // BEFORE the retry create: the freed name's world state must be off the
+    // name before the name is reissued.
+    const retryAt = arm.indexOf('await create()', rekeyAt);
+    expect(retryAt).toBeGreaterThan(rekeyAt);
+    // Bound to the LIVE sim books through the same seam the migrated arm's
+    // injected runtime uses, and handed the WHOLE reclaimed identity (the
+    // stored-casing freedName rides in it).
+    const rekeyCall = arm.slice(rekeyAt, retryAt);
+    expect(rekeyCall).toContain('liveGame().rekeyMarketSeller(');
+    expect(rekeyCall).toContain('liveGame().rekeyMailOwner(');
+    expect(rekeyCall).toContain('liveGame().saveMarket()');
+    expect(rekeyCall).toContain('liveGame().saveMail()');
+    expect(rekeyCall).toContain('reclaimed,');
   });
 });
 

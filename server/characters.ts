@@ -290,21 +290,45 @@ export function buildCharacterList(
 /**
  * The world-state rekey that follows a successful deactivated-name reclaim: the
  * orphaned holder was just archived out of the freed name (a rename in effect),
- * so its legacy name-keyed market rows and mailbox move onto the stable id plus
- * the archived name, exactly like renameHandler's rekeys. Without this, the
+ * so ALL THREE of renameHandler's rekeys run here too. The market rows and the
+ * mailbox move onto the stable id plus the archived name; without that, the
  * next holder of the display name could claim the orphan's escrow through the
- * name-fallback read arms. Exported so BOTH create dispatch arms share it.
+ * name-fallback read arms. The orphan's OWN signed item instances (bags, bank,
+ * equipped) are swept to the archived name; without that, their persisted blob
+ * keeps signing a name that now belongs to a stranger (the #1145 self-signed
+ * discount, Battlefield Experience attribution, and the eqi inspect wire all
+ * compare signer to a live display name). Every rekey matches the holder's
+ * STORED casing (reclaimed.freedName), never the requester's typed casing: the
+ * db lookup is case-insensitive and the book matches are exact. The no-nonce
+ * blob save is safe for the same reason renameHandler's is: a deactivated
+ * account cannot hold a live session, so no lease fence is in play. Like the
+ * DB reclaim itself, this runs BEFORE the create retry; a crash between the
+ * committed reclaim and these rekeys leaves the orphan archived with its
+ * world state still name-keyed (the same class of unrecoverable window the
+ * delete purge documents below; nothing re-triggers the rekey).
+ * Exported so BOTH create dispatch arms share it.
  */
 export async function rekeyReclaimedCharacterWorldState(
   rt: Pick<CharactersRuntime, 'rekeyMarketSeller' | 'saveMarket' | 'rekeyMailOwner' | 'saveMail'>,
-  reclaimed: { id: number; archivedName: string },
-  freedName: string,
+  reclaimed: {
+    id: number;
+    archivedName: string;
+    freedName: string;
+    level: number;
+    state: CharacterState | null;
+  },
 ): Promise<void> {
-  if (rt.rekeyMarketSeller(reclaimed.id, freedName, reclaimed.archivedName)) {
+  if (rt.rekeyMarketSeller(reclaimed.id, reclaimed.freedName, reclaimed.archivedName)) {
     await rt.saveMarket();
   }
-  if (rt.rekeyMailOwner(reclaimed.id, freedName, reclaimed.archivedName)) {
+  if (rt.rekeyMailOwner(reclaimed.id, reclaimed.freedName, reclaimed.archivedName)) {
     await rt.saveMail();
+  }
+  if (
+    reclaimed.state &&
+    rekeyInstanceSigner(reclaimed.state, reclaimed.freedName, reclaimed.archivedName)
+  ) {
+    await charactersDb.saveCharacterState(reclaimed.id, reclaimed.level, reclaimed.state);
   }
 }
 
@@ -490,7 +514,7 @@ async function createCharacterHandler(ctx: Ctx): Promise<void> {
       json(ctx.res, 409, NAME_TAKEN);
       return;
     }
-    await rekeyReclaimedCharacterWorldState(rt, reclaimed, name);
+    await rekeyReclaimedCharacterWorldState(rt, reclaimed);
     try {
       const c = await create();
       if (!c) {

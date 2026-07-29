@@ -118,7 +118,14 @@ describe('reclaimDeactivatedName', () => {
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
       .mockResolvedValueOnce({
         rows: [
-          { id: 99, name: 'SturdyStubs', deactivated_at: '2026-01-01T00:00:00Z', banned_at: null },
+          {
+            id: 99,
+            name: 'SturdyStubs',
+            level: 4,
+            state: { skin: 2 },
+            deactivated_at: '2026-01-01T00:00:00Z',
+            banned_at: null,
+          },
         ],
         rowCount: 1,
       } as any) // holder lookup
@@ -127,17 +134,24 @@ describe('reclaimDeactivatedName', () => {
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
 
     // The archived identity comes back so the caller can rekey the freed
-    // name's world state (market, mail) exactly like a rename.
-    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toEqual({
+    // name's world state (market, mail, the orphan's own signed instances)
+    // exactly like a rename. freedName is the holder's STORED name (the
+    // lookup below is case-insensitive), and the blob rides along for the
+    // signer sweep.
+    await expect(reclaimDeactivatedName('sturdystubs')).resolves.toEqual({
       id: 99,
       archivedName: 'SturdyStubsa',
+      freedName: 'SturdyStubs',
+      level: 4,
+      state: { skin: 2 },
     });
 
     const calls = client.query.mock.calls;
     expect(calls[0][0]).toBe('BEGIN');
     expect(calls[1][0]).toMatch(/deactivated_at/);
     expect(calls[1][0]).toMatch(/FOR UPDATE/);
-    expect(calls[1][1]).toEqual([REALM, 'SturdyStubs']);
+    expect(calls[1][0]).toMatch(/lower\(c\.name\)\s*=\s*lower\(\$2\)/);
+    expect(calls[1][1]).toEqual([REALM, 'sturdystubs']);
     const updateCall = calls.find((c) => /UPDATE characters/i.test(c[0]));
     expect(updateCall).toBeDefined();
     expect(updateCall![0]).toMatch(/force_rename\s*=\s*TRUE/i);

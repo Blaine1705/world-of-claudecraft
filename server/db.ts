@@ -2707,14 +2707,18 @@ export async function createCharacterCapped(
 // was released; the caller then retries the create. Race-safe: the holder row
 // is locked FOR UPDATE and the (realm, lower(name)) unique index is the real
 // guard on the subsequent insert.
-export async function reclaimDeactivatedName(
-  name: string,
-): Promise<{ id: number; archivedName: string } | null> {
+export async function reclaimDeactivatedName(name: string): Promise<{
+  id: number;
+  archivedName: string;
+  freedName: string;
+  level: number;
+  state: CharacterState | null;
+} | null> {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
     const holder = await client.query(
-      `SELECT c.id, c.name, a.deactivated_at, a.banned_at
+      `SELECT c.id, c.name, c.level, c.state, a.deactivated_at, a.banned_at
          FROM characters c JOIN accounts a ON a.id = c.account_id
         WHERE c.realm = $1 AND lower(c.name) = lower($2)
         FOR UPDATE OF c`,
@@ -2742,11 +2746,19 @@ export async function reclaimDeactivatedName(
       [row.id, freed],
     );
     await client.query('COMMIT');
-    // The caller must rekey the freed name's world state (market, mail) to
-    // the archived identity, exactly like a rename: a reclaim IS a rename of
-    // the orphaned holder, and the freed display name is about to belong to
-    // a stranger.
-    return { id: row.id, archivedName: freed };
+    // The caller must rekey the freed name's world state (market, mail, the
+    // orphan's own signed item instances) to the archived identity, exactly
+    // like a rename: a reclaim IS a rename of the orphaned holder, and the
+    // freed display name is about to belong to a stranger. freedName is the
+    // holder's STORED name: the lookup above is case-insensitive, so the
+    // requested casing can differ, and every book rekey matches exactly.
+    return {
+      id: row.id,
+      archivedName: freed,
+      freedName: row.name,
+      level: row.level,
+      state: row.state,
+    };
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     throw err;

@@ -1556,7 +1556,6 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
               saveMail: () => liveGame().saveMail(),
             },
             reclaimed,
-            name,
           );
           try {
             const c = await create();
