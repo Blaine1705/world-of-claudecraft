@@ -83,20 +83,24 @@ export const GATHER_NODES: GatherNodeDef[] = [
   // outcrops from the trio above so the dig is a short circuit rather than one
   // spot. All six stay inside the 20-yard ring tests/gather_nodes.test.ts holds
   // every Eastbrook vein to (the ore has to be findable from the landmark
-  // q_prof_intro names), and these three sit 17 to 18 yards out, so the ring is
-  // not being ridden.
+  // q_prof_intro names), and these three sit 18 to 20 yards out, with the
+  // Grix clearance below deciding their exact spots.
   //
-  // One of the three is placed AWAY from the obvious spot on purpose. Grix the
-  // Tunnelking, the zone's rare elite, spawns at (-95, -78) with a 4-yard ring
-  // and a 13-yard aggro radius, and the natural vein position on that side of
-  // the outcrops sat 2.2 yards from his spawn centre. q_prof_intro is the first
-  // quest in the game, taken at level 1, and damage cancels a gather cast
-  // outright, so that would have put a fresh character inside a level-7 elite's
-  // aggro to finish the tutorial. This vein sits 30 yards off instead, matching
-  // the 19 to 22 yards the rest of the field keeps. No arm pins camp clearance
-  // (a third of all nodes sit inside an ordinary camp on purpose, which is
-  // fine: those are grey trash, not a rare), so this is a judgement recorded
-  // here rather than a rule.
+  // The whole field keeps clear of Grix the Tunnelking, the zone's rare
+  // elite, who spawns at (-95, -78) with a 4-yard ring and a 13-yard BASE
+  // aggro radius. Base is not the real reach: aggro is level-scaled
+  // (src/sim/mob/locomotion.ts, 1.5 yards per level over the player, clamped
+  // at MAX_AGGRO_RADIUS), so against the level-1 characters q_prof_intro
+  // sends here Grix detects at the 20-yard clamp. Damage cancels a gather
+  // cast outright, so a vein whose 5-yard harvest disc overlaps that reach
+  // forces the named fight to finish the tutorial at ANY level, which is not
+  // "level up first" (R33's stated exception to the deliberate-danger rule).
+  // Every vein therefore keeps its whole harvest disc outside the scaled
+  // reach plus the spawn ring (29 yards from the camp centre), pinned for
+  // every named mob in every zone by the placement-margin arm in
+  // tests/gather_node_placement.test.ts. Ordinary camps stay deliberate
+  // gathering risk (a third of all nodes sit inside one on purpose: grey
+  // trash, not a rare).
   {
     id: 'ore_eastbrook_4',
     zoneId: 'eastbrook_vale',
@@ -105,19 +109,26 @@ export const GATHER_NODES: GatherNodeDef[] = [
     level: 4,
     tier: 1,
   },
+  // Moved off (-99, -56): 22.4 yards from Grix's camp centre read as safe
+  // under his 13-yard base aggro, but the level-scaled clamp reaches 24 from
+  // the ring and the harvest disc closes another 5. Now 34.0 yards out on the
+  // north side of the outcrops, 19.2 from the dig.
   {
     id: 'ore_eastbrook_5',
     zoneId: 'eastbrook_vale',
     type: 'ore',
-    pos: { x: -99, z: -56 },
+    pos: { x: -87, z: -45 },
     level: 4,
     tier: 1,
   },
+  // Moved off (-76, -79): 19.0 yards from Grix's camp centre, inside even a
+  // generous reading of the scaled reach. Now 31.3 yards out on the
+  // town-facing side, 19.7 from the dig, keeping the field's circuit shape.
   {
     id: 'ore_eastbrook_6',
     zoneId: 'eastbrook_vale',
     type: 'ore',
-    pos: { x: -76, z: -79 },
+    pos: { x: -65, z: -69 },
     level: 4,
     tier: 1,
   },

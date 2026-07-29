@@ -36,6 +36,7 @@ import {
   zoneAt,
 } from '../src/sim/data';
 import { POI_VISIT_RADIUS } from '../src/sim/deeds';
+import { MAX_AGGRO_RADIUS } from '../src/sim/mob/aggro_ranges';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
 import { GATHER_NODE_BODIES } from '../src/sim/prop_layout';
@@ -51,6 +52,7 @@ import {
   terrainSteepnessAt,
   waterLevelAt,
 } from '../src/sim/world';
+import { WORLD_BOSSES } from '../src/sim/world_boss';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // The live shipped seed (src/sim/world_seed.ts, the one both hosts build
@@ -816,48 +818,132 @@ describe('gather node placement: every node sits on ground a player can work', (
     ).toBeLessThan(worldCampPct);
   });
 
-  it('the starting zone keeps its nodes clear of a rare elite', () => {
-    // A vein once shipped 2.2 yards from Grix the Tunnelking's spawn centre, and
-    // Grix is level 7, rare, elite, cc-immune, with a 13-yard aggro radius. That
-    // vein is one of the six q_prof_intro sends a level-1 character to, and a
-    // 2.5-second harvest cast inside a rare elite's aggro is a death rather than a
-    // fight, since damage cancels the cast outright. Nothing caught it: the arms
-    // in this file ask whether ground is workable, not whether it is survivable.
-    //
-    // Scoped to eastbrook_vale on purpose, and the unscoped version is not simply
-    // omitted for convenience: it would fail on shipped tier-2 and tier-3 content
-    // in the level-17 zone (ore_thornpeak_t2 sits 2.8 yards from the
-    // ironvein_foreman rare), which is flavour aimed at a player who can survive
-    // it. The starting zone is where the danger is asymmetric, so that is where
-    // the rule holds.
-    const rares = CAMPS.filter((camp) => {
-      const mob = MOBS[camp.mobId];
-      return mob?.rare === true && mob?.elite === true;
-    });
-    expect(rares.length, 'no rare elite camps found, so this arm proves nothing').toBeGreaterThan(
-      0,
-    );
-    const starting = ZONES[0];
-    expect(starting.id).toBe('eastbrook_vale');
-    const startingRares = rares.filter(
-      (camp) => zoneAt(camp.center.x, camp.center.z).id === starting.id,
-    );
-    expect(
-      startingRares.length,
-      'no rare elite in the starting zone, so this arm proves nothing',
-    ).toBeGreaterThan(0);
-    for (const node of GATHER_NODES.filter((n) => n.zoneId === starting.id)) {
-      for (const camp of startingRares) {
-        // Spawn ring plus the mob's own detection reach: the worst case is a mob
-        // rolled to the near edge of its ring noticing a player at the node.
-        const danger = camp.radius + (MOBS[camp.mobId]?.aggroRadius ?? 0);
+  // Placement margin (the R33 arm). A vein once shipped 2.2 yards from Grix
+  // the Tunnelking's spawn centre; the first arm that closed it measured BASE
+  // aggro against the node CENTRE, in the starting zone only. Both halves
+  // undershot the real reach: aggro is level-scaled (src/sim/mob/locomotion.ts,
+  // base + 1.5 yards per level the mob has over the player, floored at 4,
+  // clamped at MAX_AGGRO_RADIUS), and a gatherer may legally stand
+  // INTERACT_RANGE from the node centre, so it is the whole harvest disc that
+  // has to clear the reach. Measured for the zone's own leveling player
+  // (levelRange floor), the level the zone's content is authored for: against
+  // a level-1 at the Copper Dig, Grix's 13-yard base scales to the 20-yard
+  // clamp, which is what made the old tutorial vein spots a forced fight at
+  // any level (R33's stated exception; those veins moved).
+  //
+  // Scope: NAMED mobs only (rare: true camps plus the WORLD_BOSSES registry).
+  // Ordinary and generic-elite camps are deliberate gathering risk (a third
+  // of all nodes sit inside one on purpose: grey trash, not a named fight).
+  const scaledAggro = (base: number, mobLevel: number, playerLevel: number) =>
+    Math.max(4, Math.min(MAX_AGGRO_RADIUS, base + (mobLevel - playerLevel) * 1.5));
+
+  // Every node-versus-named-mob pairing with the margin rule's clearance:
+  // distance minus spawn ring minus scaled reach minus the harvest disc.
+  // Negative means the disc overlaps the reach (the pairing is "hot").
+  function namedMobClearances(): { key: string; clearance: number }[] {
+    const out: { key: string; clearance: number }[] = [];
+    for (const node of GATHER_NODES) {
+      const playerLevel = zoneAt(node.pos.x, node.pos.z).levelRange[0];
+      for (const camp of CAMPS) {
+        const mob = MOBS[camp.mobId];
+        if (!mob?.rare) continue;
+        const reach = camp.radius + scaledAggro(mob.aggroRadius, mob.maxLevel, playerLevel);
         const d = Math.hypot(node.pos.x - camp.center.x, node.pos.z - camp.center.z);
-        expect(
-          d,
-          `${node.id} is ${d.toFixed(2)}yd from the rare ${camp.mobId}, inside its ${danger}yd reach`,
-        ).toBeGreaterThan(danger);
+        out.push({ key: `${node.id}:${camp.mobId}`, clearance: d - reach - REACH });
+      }
+      for (const boss of WORLD_BOSSES) {
+        const mob = MOBS[boss.templateId];
+        if (!mob) continue;
+        const reach = scaledAggro(mob.aggroRadius, mob.maxLevel, playerLevel);
+        const d = Math.hypot(node.pos.x - boss.pos.x, node.pos.z - boss.pos.z);
+        out.push({ key: `${node.id}:${boss.templateId}`, clearance: d - reach - REACH });
       }
     }
+    return out;
+  }
+
+  // The deliberate dangers, node:mob, sorted. Every entry is a placement the
+  // design wants hot, with the intent named; the exact-set pin below prunes
+  // any entry that cools off and reds any new pairing that heats up, so both
+  // directions require a human decision here. R33 names the two t3 entries
+  // outright; the rest were measured hot when the scaled rule landed and are
+  // kept as the same risk-beside-a-named-mob flavour, recorded in the packet
+  // review doc as build-judged.
+  const DELIBERATE_DANGERS = [
+    // Mogger's meadow: the herb patch beside the group boss is optional side
+    // content, never a quest target; level-first is the path (R32 family).
+    'herb_eastbrook_5:mogger',
+    // The drowned bank: t2 ore beside the marsh's named lurker.
+    'ore_mirefen_4:sloomtooth_the_drowned',
+    // The cult side of the marsh: t2 ore inside Sister Nhalia's vigil.
+    'ore_mirefen_t2b:sister_nhalia',
+    // The ironvein dig is the foreman's own story: all three veins sit in his
+    // shadow, flavour aimed at a player who can survive the level-17 zone
+    // (ore_thornpeak_t2 at 2.8 yards was the old arm's named example).
+    'ore_thornpeak_1:ironvein_foreman',
+    'ore_thornpeak_2:ironvein_foreman',
+    'ore_thornpeak_t2:ironvein_foreman',
+    // Stormcrag, among the elementals: exactly on the world boss's scaled
+    // reach (R33 names it deliberate).
+    'ore_thornpeak_t3b:thunzharr_waking_peak',
+    // Old Greyjaw's woods hold an optional stand; a level-4 named wolf is the
+    // zone's intended first rare fight, not a tutorial blocker.
+    'wood_eastbrook_4:old_greyjaw',
+    // Brutok's treeline: both stands sit against the ogre warcamp.
+    'wood_thornpeak_1:brutok_skullsmasher',
+    'wood_thornpeak_t2:brutok_skullsmasher',
+    // The Revenant Fields treeline, inside Sethrael's coils.
+    'wood_thornpeak_t3:sethrael_palecoil',
+    // Inside Marrowlord Varkas's aggro on purpose (R33 names it deliberate).
+    'wood_thornpeak_t3b:marrowlord_varkas',
+  ];
+
+  it('hot node-versus-named-mob pairings are exactly the pinned deliberate dangers', () => {
+    const rareCamps = CAMPS.filter((camp) => MOBS[camp.mobId]?.rare === true);
+    expect(rareCamps.length, 'no rare camps found, so this arm proves nothing').toBeGreaterThan(0);
+    expect(WORLD_BOSSES.length, 'no world bosses, so the boss half proves nothing').toBeGreaterThan(
+      0,
+    );
+    const all = namedMobClearances();
+    expect(all.length, 'no pairings measured, so this arm proves nothing').toBeGreaterThan(100);
+    const hot = [...new Set(all.filter((p) => p.clearance < 0).map((p) => p.key))].sort();
+    expect(hot).toEqual(DELIBERATE_DANGERS);
+    // Sorted-input guard: an unsorted insertion would make the equality above
+    // fail confusingly, so pin the list's own order too.
+    expect([...DELIBERATE_DANGERS].sort()).toEqual(DELIBERATE_DANGERS);
+  });
+
+  it('every allowlisted pair names a real node and a real named mob', () => {
+    const nodeIds = new Set(GATHER_NODES.map((n) => n.id));
+    const namedIds = new Set([
+      ...CAMPS.filter((c) => MOBS[c.mobId]?.rare === true).map((c) => c.mobId),
+      ...WORLD_BOSSES.map((b) => b.templateId),
+    ]);
+    for (const entry of DELIBERATE_DANGERS) {
+      const [nodeId, mobId] = entry.split(':');
+      expect(nodeIds.has(nodeId), `${entry} names a node that does not exist`).toBe(true);
+      expect(namedIds.has(mobId), `${entry} names a mob that is not a named rare or boss`).toBe(
+        true,
+      );
+    }
+  });
+
+  it('counter-example: the old Grix-side vein spots fail the margin rule; the moved spots clear it', () => {
+    const grix = CAMPS.find((c) => c.mobId === 'grix_the_tunnelking');
+    expect(grix).toBeDefined();
+    if (!grix) throw new Error('missing Grix camp');
+    const mob = MOBS[grix.mobId];
+    const reach = grix.radius + scaledAggro(mob.aggroRadius, mob.maxLevel, 1);
+    const clearanceAt = (x: number, z: number) =>
+      Math.hypot(x - grix.center.x, z - grix.center.z) - reach - REACH;
+    // The shipped-then-moved spots: both inside the scaled reach.
+    expect(clearanceAt(-99, -56)).toBeLessThan(0);
+    expect(clearanceAt(-76, -79)).toBeLessThan(0);
+    // Their replacements clear it with real margin.
+    const five = GATHER_NODES.find((n) => n.id === 'ore_eastbrook_5');
+    const six = GATHER_NODES.find((n) => n.id === 'ore_eastbrook_6');
+    expect(five && clearanceAt(five.pos.x, five.pos.z)).toBeGreaterThan(0);
+    expect(six && clearanceAt(six.pos.x, six.pos.z)).toBeGreaterThan(0);
   });
 
   it('the road band holds exactly the four deliberately-exempt nodes', () => {
