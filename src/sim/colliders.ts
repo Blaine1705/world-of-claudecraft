@@ -28,7 +28,6 @@ import {
   isArenaPos,
   isDelvePos,
   isYumiMazePos,
-  NPCS,
   yumiMazeOriginAt,
 } from './data';
 import { ROCK_COLLIDER_MIN_SCALE, rockHeight, rockRadius } from './decoration_dims';
@@ -1033,7 +1032,9 @@ function staticWorldColliders(seed: number): Collider[] {
     const res = resolveAgainst(out, x, z, r, ignoreFences);
     return Math.abs(res.x - x) > 1e-4 || Math.abs(res.z - z) > 1e-4;
   };
-  for (const npc of Object.values(NPCS)) {
+  // The ACTIVE content's roster, like the npc veto above: a custom map's own
+  // banker gets a chest and a builtin banker absent from that map gets none.
+  for (const npc of Object.values(content.npcs)) {
     const rec = npc as { pos?: { x: number; z: number }; facing?: number; banker?: true };
     if (!rec.banker || !rec.pos) continue;
     const seat = resolveAgainst(out, rec.pos.x, rec.pos.z, 0.6);

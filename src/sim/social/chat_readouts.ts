@@ -38,7 +38,6 @@ import { threatEntries } from '../threat';
 import {
   type ArenaFormat,
   type Aura,
-  type AuraKind,
   dist2d,
   type Entity,
   type EquipSlot,

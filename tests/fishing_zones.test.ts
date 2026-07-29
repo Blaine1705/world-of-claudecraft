@@ -39,6 +39,7 @@ import {
 } from '../src/sim/professions/fishing_zones';
 import { isGatherToolUse } from '../src/sim/professions/tools';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
+import { zonesReadout } from '../src/sim/social/chat_readouts';
 import {
   DT,
   FISHING_CAST_ID,
@@ -919,6 +920,45 @@ describe('the rod gate reads the WATER zone at the probe point', () => {
       expect(mirefenIds.has(id), `${id} is not on mirefen_marsh's table`).toBe(true);
     }
   });
+
+  it('a successful REEL books the outcome under the pinned zone, then clears the pin', () => {
+    // The one end path the direct completeFishing drive above cannot cover:
+    // the reel re-press inside startFishing, whose contract is clear-AFTER-
+    // completion (the completion reads the pinned zone for the table, the
+    // deed credit, and the outcome event). Every other reel fixture sits
+    // where the pinned zone and the position zone coincide, so hoisting the
+    // clear above completeFishing would pass the rest of the suite while
+    // silently rebooking a cross-boundary catch onto the caster's zone.
+    setActiveWorldContent(borderLakeContent());
+    const sim = makeSim();
+    const meta = sim.meta(sim.playerId) as PlayerMeta;
+    sim.addItem('ironreel_fishing_rod', 1);
+    meta.gatheringProficiency.fishing = 200; // prof band 2; rod band 1 caps it
+    placeAtBorderShore(sim);
+    const p = sim.player;
+    startFishing(sim.ctx, p, meta);
+    expect(p.fishCastZoneId).toBe('mirefen_marsh');
+    // Drive the bite, then re-press inside the live reel window.
+    sim.tickCount = p.fishBiteAtTick;
+    updateCasting(sim.ctx, p, meta);
+    expect(p.fishReelDeadlineTick).toBeGreaterThan(0);
+    sim.events = [];
+    startFishing(sim.ctx, p, meta);
+    // The reel landed: castStop success, and the one outcome event (a catch
+    // or the honest empty hook, whichever the draw yields) carries the
+    // PINNED mirefen zone at band 1, never the caster's eastbrook.
+    expect(sim.events).toContainEqual({ type: 'castStop', entityId: p.id, success: true });
+    const outcomes = sim.events.filter(
+      (e): e is Extract<SimEvent, { type: 'fishingResult' | 'fishingEmptyHook' }> =>
+        e.type === 'fishingResult' || e.type === 'fishingEmptyHook',
+    );
+    expect(outcomes).toHaveLength(1);
+    expect(outcomes[0].zoneId).toBe('mirefen_marsh');
+    expect(outcomes[0].band).toBe(1);
+    // And the pin is gone only AFTER the completion consumed it.
+    expect(p.fishCastZoneId).toBe('');
+    expect(p.castingAbility).toBeNull();
+  });
 });
 
 describe('zoneAt resolves the ACTIVE zones (the swappable-content read)', () => {
@@ -953,5 +993,37 @@ describe('zoneAt resolves the ACTIVE zones (the swappable-content read)', () => 
       FISHING_ZONE_ROD_TIERS.thornpeak_heights,
     );
     expect(p.castingAbility).toBeNull();
+  });
+
+  it('the /zones readout lists the ACTIVE roster with the you-are-here tag', () => {
+    // The one sibling of the unification sweep with no swap test of its own:
+    // the readout's count, roster, and tag must resolve the same world the
+    // gate does, or a custom map's /zones lies about where the player is.
+    const [vale, marsh] = ZONES;
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      zones: [
+        { ...vale, id: 'custom_south', name: 'Custom South', zMax: 100 },
+        { ...marsh, id: 'custom_north', name: 'Custom North', zMax: 900 },
+      ],
+    });
+    const line = zonesReadout(150); // past custom_south's zMax: the north zone
+    expect(line).toContain('Zones (2):');
+    expect(line).toContain('Custom South');
+    expect(line).toContain('Custom North');
+    expect(line).toContain('Custom North (Lvl');
+    expect(line).toMatch(/Custom North \(Lvl \d+-\d+\) \[you are here\]/);
+    expect(line).not.toMatch(/Custom South[^,]*\[you are here\]/);
+  });
+
+  it('zoneAt stays total on a zero-zone content (builtin fallback)', () => {
+    // A hand-built WorldContent can carry zones: [] (the editor rejects one,
+    // but tests in this repo already ship the shape); the declared non-null
+    // ZoneDef return must hold rather than throwing at every .id caller.
+    setActiveWorldContent({ ...BUILTIN_WORLD, zones: [] });
+    const zone = zoneAt(0);
+    expect(zone).toBeDefined();
+    expect(zone.id).toBe(ZONES[0].id);
+    expect(zoneAt(1e9).id).toBe(ZONES[ZONES.length - 1].id);
   });
 });

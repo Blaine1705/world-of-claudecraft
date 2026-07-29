@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  bankerChestSpots,
   colliderInternalsForTest,
   isBlocked,
   resolveMovement,
@@ -189,6 +190,51 @@ describe('station furniture colliders follow the active bundle', () => {
       masterNpcId: builtin.stations[0].masterNpcId,
     };
     setActiveWorldContent(world({ services: { ...builtin, stations: [custom] } }));
-    expect(circlesNear(0, -960, 10)).toBeGreaterThan(0);
+    const pieces = furnitureNear(0, -960, 10);
+    expect(pieces.length).toBeGreaterThan(0);
+    // The OBSERVABLE production path once, through the cached grid isBlocked
+    // reads (the internals drive above never touches staticColliderGrid):
+    // a furniture piece blocks in THIS bundle's grid, and the same point is
+    // open in a services-stripped bundle's grid (per-content cache keying).
+    expect(isBlocked(SEED, pieces[0].x, pieces[0].z, 0.4)).toBe(true);
+    setActiveWorldContent(world({ services: undefined }));
+    expect(isBlocked(SEED, pieces[0].x, pieces[0].z, 0.4)).toBe(false);
+  });
+});
+
+describe('the banker chest follows the ACTIVE npc roster', () => {
+  const noBankerNpcs = (): WorldContent['npcs'] =>
+    Object.fromEntries(
+      Object.entries(BUILTIN_WORLD.npcs).filter(([, n]) => !(n as { banker?: true }).banker),
+    ) as WorldContent['npcs'];
+
+  it('a bundle whose roster has no banker gets NO chest (and no ghost OBB)', () => {
+    // Builtin control first: the vale bursar's strongbox resolves.
+    setActiveWorldContent(null);
+    const builtinSpots = bankerChestSpots(SEED);
+    expect(builtinSpots.length).toBeGreaterThan(0);
+    // Same map, bankers stripped from the roster: the pre-fix builtin-NPCS
+    // walk would still emit every builtin chest into a world whose bankers
+    // do not exist.
+    setActiveWorldContent(world({ npcs: noBankerNpcs() }));
+    expect(bankerChestSpots(SEED)).toHaveLength(0);
+  });
+
+  it("a custom map's OWN banker gets a chest at ITS anchor", () => {
+    const npcs = {
+      ...noBankerNpcs(),
+      custom_banker: {
+        id: 'custom_banker',
+        name: 'Custom Banker',
+        pos: { x: 0, z: -960 }, // the open simulation lane
+        facing: 0,
+        banker: true,
+      },
+    } as unknown as WorldContent['npcs'];
+    setActiveWorldContent(world({ npcs }));
+    const spots = bankerChestSpots(SEED);
+    expect(spots).toHaveLength(1);
+    expect(spots[0].anchorX).toBe(0);
+    expect(spots[0].anchorZ).toBe(-960);
   });
 });

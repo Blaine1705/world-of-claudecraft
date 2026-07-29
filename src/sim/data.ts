@@ -395,9 +395,13 @@ export function setActiveWorldContent(world: WorldContent | null): void {
 // Walks the ACTIVE content's zones, not the builtin const, so every consumer
 // (the fishing rod gate, catch tables, deed credit, chat readouts) resolves
 // the same world the water and terrain reads resolve. Byte-identical on
-// every shipped host: BUILTIN_WORLD.zones IS the ZONES reference.
+// every shipped host: BUILTIN_WORLD.zones IS the ZONES reference. A content
+// with an EMPTY zone list (the editor rejects one, but a hand-built
+// WorldContent can carry it) falls back to the builtin zones so the declared
+// non-null return stays true, exactly the totality the builtin walk had.
 export function zoneAt(z: number): ZoneDef {
-  const zones = getActiveWorldContent().zones;
+  const active = getActiveWorldContent().zones;
+  const zones = active.length > 0 ? active : BUILTIN_WORLD.zones;
   for (const zone of zones) {
     if (z < zone.zMax) return zone;
   }
