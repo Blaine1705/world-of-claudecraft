@@ -6,6 +6,7 @@ import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
 import { METAL_MAT_NAME } from './props';
+import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
 /** Target max height after normalization (~sparkle anchor at 1.35). */
 const TARGET_HEIGHT = 1.35;
@@ -166,6 +167,14 @@ function decorateScroll(root: THREE.Object3D, itemId: string): void {
 // per itemId, so this stays a handful of materials for the whole session.
 const metalBoostCache = new Map<string, THREE.Material>();
 
+// Quest materials named for wood/stone/plaster take the shared triplanar
+// surface-detail layer via the same family table as the props kits ('qprops'
+// routing in worn_stone.ts wornFamilyFor, matched on the SOURCE material
+// name). surfaceMat's cache is shared app-wide, so the detailed variant is a
+// one-time CLONE cached here by source material, never a mutation of the
+// shared instance (the metalBoostCache pattern).
+const surfaceDetailCache = new Map<string, THREE.Material>();
+
 function convertMaterial(src: THREE.Material, itemId: string): THREE.Material {
   const s = src as THREE.MeshStandardMaterial;
   const ov = ITEM_MAT_OVERRIDES[itemId];
@@ -199,6 +208,21 @@ function convertMaterial(src: THREE.Material, itemId: string): THREE.Material {
       metalBoostCache.set(cacheKey, boosted);
     }
     return boosted;
+  }
+  if (GFX.standardMaterials && (mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
+    const worn = wornFamilyFor('qprops', s.name);
+    if (worn) {
+      const cacheKey = `${itemId}|${mat.uuid}|${worn.family}`;
+      let detailed = surfaceDetailCache.get(cacheKey);
+      if (!detailed) {
+        detailed = mat.clone();
+        applySurfaceDetail(detailed as THREE.MeshStandardMaterial, worn.family, {
+          strength: worn.strength,
+        });
+        surfaceDetailCache.set(cacheKey, detailed);
+      }
+      return detailed;
+    }
   }
   return mat;
 }

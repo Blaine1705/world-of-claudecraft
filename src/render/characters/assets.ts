@@ -21,6 +21,7 @@ import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { addRimGlow, EMISSIVE_GLOW, GFX } from '../gfx';
+import { applySurfaceDetail } from '../worn_stone';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
@@ -887,6 +888,8 @@ const sourceMaterials = new WeakMap<THREE.Mesh, THREE.Material | THREE.Material[
 const tintScratch = new THREE.Color();
 const lowReadabilityWhite = new THREE.Color(0xffffff);
 const weaponHighlight = new THREE.Color(0xfff0c2);
+/** KayKit weapon materials whose NAME marks them as a wooden part. */
+const WOOD_WEAPON_NAME = /handle|wood|shaft|bow|staff/i;
 type MaterialRole = 'body' | 'weapon';
 
 function applyLowReadabilityLift(
@@ -919,6 +922,15 @@ function applyWeaponMaterialPolish(
     // stash and neutralize this while a rig owns the material (weapon_vfx.ts
     // deriveEmissive), so the boost never fights an active skin.
     if (std.metalness > 0.3) std.envMapIntensity = 1.6;
+    // Wood-named weapon parts (hafts, bow limbs, staves) on materials that
+    // ship NO roughness map get the shared wood surface-detail layer, in
+    // OBJECT space so the grain rides the held weapon instead of swimming
+    // through the world projection (AO + roughness only; see worn_stone.ts).
+    // Metal blades without maps keep just the polish above, and faces/bodies
+    // never take the layer: this helper only runs for role === 'weapon'.
+    if (!std.roughnessMap && WOOD_WEAPON_NAME.test(std.name)) {
+      applySurfaceDetail(std, 'wood', { strength: 0.3, tileScale: 1.6, objectSpace: true });
+    }
   }
 }
 

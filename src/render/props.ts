@@ -24,7 +24,7 @@ import {
   isEastbrookRebuildWell,
 } from './eastbrook_town';
 import { EMISSIVE_LIGHT, GFX, sharedUniforms, surfaceMat } from './gfx';
-import { applyWornStone } from './worn_stone';
+import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -458,18 +458,12 @@ const MAT_OVERRIDES: Record<
   'grave:colormap': { color: 0xd2d2c8 },
 };
 
-// Stone-architecture kits that take the shared world-space triplanar worn
-// layer (see worn_stone.ts), keyed to a per-kit normal strength. khex (hex
-// curtain walls) and kiron (the Evergarden gate arch) sample palette gradient
-// strips, so the layer must stay additive over their existing map; the
-// minerock boulders are untextured MAT_OVERRIDES colors and can carry a
-// slightly stronger normal. Kit membership is already part of the material
-// cache key, so application is deterministic per cached material.
-const WORN_STONE_KITS: Record<string, number> = {
-  khex: 0.45,
-  kiron: 0.45,
-  minerock: 0.6,
-};
+// Kits that take the shared triplanar surface-detail layer route through the
+// one family table in worn_stone.ts (wornFamilyFor): kit-wide stone entries
+// (khex, kiron, minerock) plus per-material-NAME wood/stone/plaster routing
+// for the village-architecture kits. Kit membership and the SOURCE material
+// name are already part of the material cache key below, so application is
+// deterministic per cached material.
 
 // ---------------------------------------------------------------------------
 // Extraction: GLTF scene -> world-baked float-attribute geometry + converted
@@ -569,11 +563,16 @@ function convertMaterial(
       emissiveIntensity: hollowEmissive ? 0.2 : (ov?.emissiveIntensity ?? 1) * 0.6,
     });
   }
-  // Worn-stone triplanar layer for the allowlisted stone kits, applied before
+  // Triplanar surface-detail layer for the allowlisted kits, applied before
   // caching so every consumer of the shared per-key material carries it (the
   // helper self-gates to standard materials, so the Lambert branch is a no-op).
-  const worn = WORN_STONE_KITS[kit];
-  if (worn !== undefined) applyWornStone(mat as THREE.MeshStandardMaterial, { strength: worn });
+  // Routing matches on the SOURCE material name (s.name), which keys the cache.
+  const worn = wornFamilyFor(kit, s.name);
+  if (worn) {
+    applySurfaceDetail(mat as THREE.MeshStandardMaterial, worn.family, {
+      strength: worn.strength,
+    });
+  }
   mat.name = `${kit}:${s.name}`;
   matConvCache.set(key, mat);
   return mat;
