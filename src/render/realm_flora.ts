@@ -35,6 +35,7 @@ import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
 import { MIST_DRIFT_AMPLITUDE, SEA_LIGHT_RAYS, SEA_MIST_BANKS } from './sea_mist_core';
+import { applyWornStone } from './worn_stone';
 
 const MUSHROOM_URLS = ['/models/props/mushroom_red.glb', '/models/props/mushroom_tan.glb'];
 const BOULDER_URL = '/models/props/rock_large_d.glb';
@@ -867,6 +868,9 @@ export function buildRealmFlora(seed: number): RealmFloraView {
         const nm = (part.material.name || '').toLowerCase();
         mat.color.set(nm.includes('grass') ? 0x6f7a76 : 0x8a8e93);
       }
+      // untextured kit rock: the worn triplanar layer can run a touch
+      // stronger here without fighting a palette map (the minerock strength)
+      applyWornStone(mat, { strength: 0.6 });
       instance(part.geometry, mat, spots.boulders, { sink: 0.12, castShadow: true });
     }
   }
@@ -884,6 +888,9 @@ export function buildRealmFlora(seed: number): RealmFloraView {
         const mat = part.material.clone() as THREE.MeshStandardMaterial;
         if ('color' in mat) mat.color.multiply(new THREE.Color(SEA_STONE));
         if ('roughness' in mat) mat.roughness = 0.95;
+        // sea-worn stone: default subtle strength, mortar grime reads as salt
+        // staining at the waterline
+        applyWornStone(mat);
         instance(part.geometry, mat, rocks, {
           sink: 0.18,
           castShadow: true,

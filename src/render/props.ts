@@ -24,6 +24,7 @@ import {
   isEastbrookRebuildWell,
 } from './eastbrook_town';
 import { EMISSIVE_LIGHT, GFX, sharedUniforms, surfaceMat } from './gfx';
+import { applyWornStone } from './worn_stone';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -457,6 +458,19 @@ const MAT_OVERRIDES: Record<
   'grave:colormap': { color: 0xd2d2c8 },
 };
 
+// Stone-architecture kits that take the shared world-space triplanar worn
+// layer (see worn_stone.ts), keyed to a per-kit normal strength. khex (hex
+// curtain walls) and kiron (the Evergarden gate arch) sample palette gradient
+// strips, so the layer must stay additive over their existing map; the
+// minerock boulders are untextured MAT_OVERRIDES colors and can carry a
+// slightly stronger normal. Kit membership is already part of the material
+// cache key, so application is deterministic per cached material.
+const WORN_STONE_KITS: Record<string, number> = {
+  khex: 0.45,
+  kiron: 0.45,
+  minerock: 0.6,
+};
+
 // ---------------------------------------------------------------------------
 // Extraction: GLTF scene -> world-baked float-attribute geometry + converted
 // shared materials. Geometries are CLONES — the cached GLTF stays pristine
@@ -555,6 +569,11 @@ function convertMaterial(
       emissiveIntensity: hollowEmissive ? 0.2 : (ov?.emissiveIntensity ?? 1) * 0.6,
     });
   }
+  // Worn-stone triplanar layer for the allowlisted stone kits, applied before
+  // caching so every consumer of the shared per-key material carries it (the
+  // helper self-gates to standard materials, so the Lambert branch is a no-op).
+  const worn = WORN_STONE_KITS[kit];
+  if (worn !== undefined) applyWornStone(mat as THREE.MeshStandardMaterial, { strength: worn });
   mat.name = `${kit}:${s.name}`;
   matConvCache.set(key, mat);
   return mat;
