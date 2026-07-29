@@ -21,7 +21,8 @@
 // tiles below they read as 0.3-0.7yd foliage clumps, not noise. Measured over
 // the shipped 1K maps: AO mean 0.474, sd 0.117, row/col isotropy 0.73;
 // NormalGL x/y sd 0.104/0.103 (isotropy 1.00).
-// Cost: 6 texture taps per fragment, zero per-frame CPU work. Gated to the
+// Cost: 6 texture taps per fragment inside CANOPY_FADE_END, zero past it
+// (distance fade below), zero per-frame CPU work. Gated to the
 // standard-material tiers (medium and up) and skipped with leanFoliage, the
 // worn_stone precedent; there is intentionally no parallax here, a cutout
 // canopy has no coherent view-ray height field to walk.
@@ -42,6 +43,27 @@ const CANOPY_AO_SPAN = 0.62;
  *  points below the horizon by START and saturates at FULL. */
 const CANOPY_CREVICE_DOWN_START = 0.15;
 const CANOPY_CREVICE_DOWN_FULL = 0.7;
+/** Distance fade (perf): the 6 taps per leaf fragment exist to break up NEAR
+ *  canopies; past ~50yd a 0.3-0.7yd clump projects a handful of pixels and
+ *  the break-up is carried by the canopy geometry itself. Across the band
+ *  the AO term eases back to 1.0, which IS its value at the measured map
+ *  mean (the remap is mean-centered, see MOSS002_AO_MEAN), and the normal
+ *  blend eases to identity, so a distant canopy's brightness and silhouette
+ *  cannot shift; past the end all 6 taps are branch-skipped. The geometric
+ *  crevice term (no taps) keeps running at every distance so stacked tiers
+ *  never re-merge. Verified by screenshot A/B via the shared ?wornfade dev
+ *  override (scripts/round9_fade_shots.mjs). */
+const CANOPY_FADE_START = 34;
+const CANOPY_FADE_END = 55;
+const CANOPY_FADE_SCALE = ((): number => {
+  if (typeof location === 'undefined') return 1;
+  const v = new URLSearchParams(location.search).get('wornfade');
+  if (!v) return 1;
+  if (v === 'off') return 1e5;
+  const m = /^x([\d.]+)$/.exec(v);
+  const k = m ? Number(m[1]) : 1;
+  return Number.isFinite(k) && k > 0 ? k : 1;
+})();
 
 export interface CanopyDetailSpec {
   /** shading-normal blend toward the triplanar clump normal (0 = off) */
@@ -70,8 +92,20 @@ export interface CanopyDetailSpec {
  */
 export const CANOPY_DETAIL_SPECS: Record<string, CanopyDetailSpec> = {
   Leaves_Pine: { strength: 0.6, tileScale: 1 / 10, aoDepth: 1.2, creviceShade: 0.4, desat: 0.06 },
-  Leaves_NormalTree: { strength: 0.5, tileScale: 1 / 10, aoDepth: 1, creviceShade: 0.26, desat: 0.08 },
-  Leaves_TwistedTree: { strength: 0.5, tileScale: 1 / 10, aoDepth: 1, creviceShade: 0.26, desat: 0.08 },
+  Leaves_NormalTree: {
+    strength: 0.5,
+    tileScale: 1 / 10,
+    aoDepth: 1,
+    creviceShade: 0.26,
+    desat: 0.08,
+  },
+  Leaves_TwistedTree: {
+    strength: 0.5,
+    tileScale: 1 / 10,
+    aoDepth: 1,
+    creviceShade: 0.26,
+    desat: 0.08,
+  },
   // dressing bushes read closest and greenest: the strongest desat lives here
   Leaves: { strength: 0.4, tileScale: 1 / 5, aoDepth: 0.7, creviceShade: 0.15, desat: 0.18 },
 };
@@ -194,10 +228,18 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
         vec3 canopyP = vCanopyWorldPos * uCanopyTile;
         vec3 canopyW = pow( abs( normalize( vCanopyWorldNormal ) ), vec3( 4.0 ) );
         canopyW /= ( canopyW.x + canopyW.y + canopyW.z );
-        float canopyAo = texture2D( uCanopyAoTex, canopyP.zy ).r * canopyW.x
-          + texture2D( uCanopyAoTex, canopyP.xz ).r * canopyW.y
-          + texture2D( uCanopyAoTex, canopyP.xy ).r * canopyW.z;
-        float canopyShade = ( uCanopyAoLo + canopyAo * uCanopyAoSpan )
+        float canopyDetK = 1.0 - smoothstep( ${(CANOPY_FADE_START * CANOPY_FADE_SCALE).toFixed(1)}, ${(CANOPY_FADE_END * CANOPY_FADE_SCALE).toFixed(1)},
+          distance( vCanopyWorldPos, cameraPosition ) );
+        float canopyAoTerm = 1.0;
+        if ( canopyDetK > 0.0 ) {
+          float canopyAo = texture2D( uCanopyAoTex, canopyP.zy ).r * canopyW.x
+            + texture2D( uCanopyAoTex, canopyP.xz ).r * canopyW.y
+            + texture2D( uCanopyAoTex, canopyP.xy ).r * canopyW.z;
+          // mean-centered remap: exactly 1.0 at the measured map mean, so
+          // easing back to 1.0 with distance cannot shift canopy brightness
+          canopyAoTerm = mix( 1.0, uCanopyAoLo + canopyAo * uCanopyAoSpan, canopyDetK );
+        }
+        float canopyShade = canopyAoTerm
           * ( 1.0 - uCanopyCrevice * smoothstep( ${CANOPY_CREVICE_DOWN_START.toFixed(2)}, ${CANOPY_CREVICE_DOWN_FULL.toFixed(2)}, vCanopyDown ) );
         diffuseColor.rgb *= canopyShade;
         diffuseColor.rgb = mix( diffuseColor.rgb,
@@ -222,7 +264,7 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
         // hook's double-sided treatment (it undoes the backface flip).
         '#include <normal_fragment_maps>',
         `#include <normal_fragment_maps>
-        {
+        if ( canopyDetK > 0.0 ) {
           vec3 canopyGN = normalize( vCanopyWorldNormal );
           vec3 canopyNx = texture2D( uCanopyNormalTex, canopyP.zy ).xyz * 2.0 - 1.0;
           vec3 canopyNy = texture2D( uCanopyNormalTex, canopyP.xz ).xyz * 2.0 - 1.0;
@@ -233,7 +275,7 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
           vec3 canopyWorldN = normalize(
             canopyNx.zyx * canopyW.x + canopyNy.xzy * canopyW.y + canopyNz.xyz * canopyW.z );
           vec3 canopyViewN = normalize( ( viewMatrix * vec4( canopyWorldN, 0.0 ) ).xyz );
-          normal = normalize( mix( normal, canopyViewN, uCanopyStrength ) );
+          normal = normalize( mix( normal, canopyViewN, uCanopyStrength * canopyDetK ) );
         }`,
       );
   };
@@ -243,5 +285,5 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
   // texture-ready state keys too: before the preload resolves the hook
   // compiles to a plain pass-through.
   mat.customProgramCacheKey = () =>
-    `canopy-detail|${TEX.normal && TEX.ao ? 'on' : 'off'}|${prevKey ? prevKey() : ''}`;
+    `canopy-detail|${TEX.normal && TEX.ao ? 'on' : 'off'}|f${(CANOPY_FADE_START * CANOPY_FADE_SCALE).toFixed(1)},${(CANOPY_FADE_END * CANOPY_FADE_SCALE).toFixed(1)}|${prevKey ? prevKey() : ''}`;
 }
