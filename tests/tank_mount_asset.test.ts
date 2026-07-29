@@ -13,10 +13,19 @@ import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/mounts/tank.glb');
-const SHIPPING_BUDGET = 320 * 1024;
+// The textured surface layer (UVs, per-vertex baked shading, six embedded maps)
+// roughly doubled the asset, which puts it alongside the other authored mounts
+// rather than above them: valorsteed 562 KiB, gobbler 555 KiB, toad 499 KiB.
+const SHIPPING_BUDGET = 576 * 1024;
 const EXPECTED_SOURCE_FINGERPRINT =
-  '28b0fdf7bc2e6a2723474e6d06e92ee134abad79a226f8697a5057fc7c218248';
-const EXPECTED_ASSET_SHA256 = '0c4633fd9484f4791a016add19b5ef9bc58ebf63c5d04c8531d35fbc1cbcdb79';
+  'd8581f73a4c4d49b72392f3cf7bb340ef74b2af20ad6a9c03789dae8b4c29f74';
+const EXPECTED_ASSET_SHA256 = '1cb5da1c9cb9a8893cc5e8760ce586797231f682649528ccb651b7416fe865b5';
+/** Midtone the ORM map's roughness and metalness channels encode; the material
+ *  factors divide the authored target by it. */
+const ORM_CENTER = 230 / 255;
+/** Whole-repeat scale KHR_texture_transform restores after the exporter folds
+ *  the world-space UVs into the [0, 1] range `quantize()` will accept. */
+const EXPECTED_UV_RANGE = 6;
 
 describe('tank mount asset pipeline', () => {
   it('pins the deterministic source inventory and optimizer specification', () => {
@@ -24,6 +33,8 @@ describe('tank mount asset pipeline', () => {
       'docs/design/tank-mount/reference-metadata.json',
       'docs/design/tank-mount/object-sculpt-spec.json',
       'scripts/assets/tank_mount/model.js',
+      'scripts/assets/tank_mount/surface_shading.mjs',
+      'scripts/assets/tank_mount/surface_maps.mjs',
       'scripts/assets/tank_mount/export_entry.js',
       'scripts/assets/tank_mount/export_tank_mount.mjs',
       'scripts/assets/tank_mount/source_fingerprint.mjs',
@@ -57,7 +68,7 @@ describe('tank mount asset pipeline', () => {
     const mutated = Buffer.from(bytes);
     mutated[Math.floor(mutated.length / 2)] ^= 1;
     expect(createHash('sha256').update(mutated).digest('hex')).not.toBe(EXPECTED_ASSET_SHA256);
-    expect(bytes.length).toBeGreaterThan(250 * 1024);
+    expect(bytes.length).toBeGreaterThan(512 * 1024);
     expect(bytes.length).toBeLessThanOrEqual(SHIPPING_BUDGET);
     expect(MEDIA_ASSETS['models/mounts/tank.glb']).toBe(
       `/media/models/mounts/tank.${sha256.slice(0, 12)}.glb`,
@@ -75,10 +86,30 @@ describe('tank mount asset pipeline', () => {
         .listExtensionsRequired()
         .map((extension) => extension.extensionName)
         .sort(),
-    ).toEqual(['EXT_meshopt_compression', 'KHR_mesh_quantization']);
+    ).toEqual([
+      'EXT_meshopt_compression',
+      'EXT_texture_webp',
+      'KHR_mesh_quantization',
+      'KHR_texture_transform',
+    ]);
     expect(root.getExtras()).toEqual({ sourceFingerprint });
     expect(root.getAsset().extras).toEqual({ sourceFingerprint });
-    expect(root.listTextures()).toHaveLength(0);
+    expect(
+      root
+        .listTextures()
+        .map(
+          (texture) =>
+            `${texture.getName()} ${texture.getSize()?.join('x')} ${texture.getMimeType()}`,
+        )
+        .sort(),
+    ).toEqual([
+      'tank_fabric_albedo 512x512 image/webp',
+      'tank_fabric_normal 256x256 image/webp',
+      'tank_fabric_orm 256x256 image/webp',
+      'tank_metal_albedo 1024x1024 image/webp',
+      'tank_metal_normal 512x512 image/webp',
+      'tank_metal_orm 512x512 image/webp',
+    ]);
     expect(root.listSkins()).toHaveLength(0);
     expect(root.listCameras()).toHaveLength(0);
     expect(root.listScenes()).toHaveLength(1);
@@ -94,7 +125,18 @@ describe('tank mount asset pipeline', () => {
     let triangles = 0;
     for (const primitive of primitives) {
       expect(primitive.getMode()).toBe(Primitive.Mode.TRIANGLES);
-      expect(primitive.listSemantics().sort()).toEqual(['COLOR_0', 'NORMAL', 'POSITION']);
+      expect(primitive.listSemantics().sort()).toEqual([
+        'COLOR_0',
+        'NORMAL',
+        'POSITION',
+        'TEXCOORD_0',
+      ]);
+      const uv = primitive.getAttribute('TEXCOORD_0');
+      // Folded into the unit range so the optimizer quantizes the accessor
+      // instead of leaving it float32; the transform scale below puts the
+      // repeats back.
+      expect(Math.min(...(uv?.getMinNormalized([]) ?? [-1]))).toBeGreaterThanOrEqual(0);
+      expect(Math.max(...(uv?.getMaxNormalized([]) ?? [2]))).toBeLessThanOrEqual(1);
       const positions = primitive.getAttribute('POSITION');
       expect(positions).not.toBeNull();
       triangles += (primitive.getIndices()?.getCount() ?? positions?.getCount() ?? 0) / 3;
@@ -112,19 +154,40 @@ describe('tank mount asset pipeline', () => {
       'TankTextile',
       'TankVioletPaint',
     ]);
-    expect(materials.get('TankCreamPaint')?.getRoughnessFactor()).toBeCloseTo(0.62);
-    expect(materials.get('TankVioletPaint')?.getMetallicFactor()).toBeCloseTo(0.38);
-    expect(materials.get('TankDarkIron')?.getMetallicFactor()).toBeCloseTo(0.68);
-    expect(materials.get('TankBronze')?.getMetallicFactor()).toBeCloseTo(0.72);
+    // The shipped factor times the ORM map's midtone has to land back on the
+    // authored target from TANK_MATERIAL_CONTRACT.
+    const authored = {
+      TankCreamPaint: { roughness: 0.62, metalness: 0.34 },
+      TankVioletPaint: { roughness: 0.58, metalness: 0.38 },
+      TankDarkIron: { roughness: 0.66, metalness: 0.68 },
+      TankBronze: { roughness: 0.44, metalness: 0.72 },
+      TankLeather: { roughness: 0.76, metalness: 0 },
+      TankTextile: { roughness: 0.86, metalness: 0 },
+    };
+    for (const [name, target] of Object.entries(authored)) {
+      const material = materials.get(name);
+      expect((material?.getRoughnessFactor() ?? 0) * ORM_CENTER, `${name} roughness`).toBeCloseTo(
+        target.roughness,
+        5,
+      );
+      expect((material?.getMetallicFactor() ?? -1) * ORM_CENTER, `${name} metalness`).toBeCloseTo(
+        target.metalness,
+        5,
+      );
+    }
+    expect(materials.get('TankCreamPaint')?.getRoughnessFactor()).toBeCloseTo(0.687391, 5);
+    expect(materials.get('TankBronze')?.getMetallicFactor()).toBeCloseTo(0.798261, 5);
     expect(materials.get('TankLeather')?.getMetallicFactor()).toBe(0);
-    expect(materials.get('TankTextile')?.getRoughnessFactor()).toBeCloseTo(0.86);
+    // Dark iron, leather and textile sit higher than the original blockout
+    // palette at the same hue: the baked occlusion, contact and grime bands need
+    // headroom below the base colour or the treads and cannon crush to black.
     const expectedPalette = {
       TankVioletPaint: [0.254152, 0.111932, 0.386429],
       TankCreamPaint: [0.871367, 0.730461, 0.445201],
-      TankDarkIron: [0.059511, 0.043735, 0.07036],
+      TankDarkIron: [0.104616, 0.078187, 0.124772],
       TankBronze: [0.637597, 0.323143, 0.076185],
-      TankLeather: [0.254152, 0.093059, 0.039546],
-      TankTextile: [0.090842, 0.181164, 0.102242],
+      TankLeather: [0.341914, 0.132868, 0.05448],
+      TankTextile: [0.124772, 0.238398, 0.144128],
     };
     for (const [name, expected] of Object.entries(expectedPalette)) {
       const actual = materials.get(name)?.getBaseColorFactor().slice(0, 3);
@@ -136,11 +199,111 @@ describe('tank mount asset pipeline', () => {
 
     const bounds = getBounds(root.listScenes()[0]);
     expect(bounds.min[0]).toBeCloseTo(-1.445, 3);
+
     expect(bounds.min[1]).toBeCloseTo(0, 3);
     expect(bounds.min[2]).toBeCloseTo(-1.355, 3);
     expect(bounds.max[0]).toBeCloseTo(1.445, 3);
     expect(bounds.max[1]).toBeCloseTo(2.446, 3);
     expect(bounds.max[2]).toBeCloseTo(2.223, 3);
+  });
+
+  it('binds each material to its surface family and keeps the UV transform intact', async () => {
+    await MeshoptDecoder.ready;
+    const io = new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+    const document = await io.readBinary(readFileSync(ASSET_PATH));
+    const families: Record<string, 'metal' | 'fabric'> = {
+      TankCreamPaint: 'metal',
+      TankVioletPaint: 'metal',
+      TankDarkIron: 'metal',
+      TankBronze: 'metal',
+      TankLeather: 'fabric',
+      TankTextile: 'fabric',
+    };
+
+    for (const material of document.getRoot().listMaterials()) {
+      const name = material.getName();
+      const family = families[name];
+      expect(family, `${name} has a surface family`).toBeDefined();
+      expect(material.getBaseColorTexture()?.getName(), `${name} albedo`).toBe(
+        `tank_${family}_albedo`,
+      );
+      expect(material.getNormalTexture()?.getName(), `${name} normal`).toBe(
+        `tank_${family}_normal`,
+      );
+      expect(material.getNormalScale(), `${name} normal scale`).toBeCloseTo(0.85, 6);
+      // One packed map serves both slots: R occlusion, G roughness, B metalness.
+      const orm = material.getMetallicRoughnessTexture();
+      expect(orm?.getName(), `${name} metallic-roughness`).toBe(`tank_${family}_orm`);
+      expect(material.getOcclusionTexture(), `${name} reuses the ORM map for occlusion`).toBe(orm);
+
+      for (const [slot, info] of [
+        ['base color', material.getBaseColorTextureInfo()],
+        ['normal', material.getNormalTextureInfo()],
+        ['metallic-roughness', material.getMetallicRoughnessTextureInfo()],
+        ['occlusion', material.getOcclusionTextureInfo()],
+      ] as const) {
+        // World-space projected detail only tiles if the sampler repeats, and
+        // only lands at the authored density if the folded scale is restored.
+        expect(info?.getWrapS(), `${name} ${slot} wrapS`).toBe(10497);
+        expect(info?.getWrapT(), `${name} ${slot} wrapT`).toBe(10497);
+        const transform = info?.getExtension('KHR_texture_transform') as
+          | { getScale(): [number, number] }
+          | null
+          | undefined;
+        expect(transform?.getScale(), `${name} ${slot} uv scale`).toEqual([
+          EXPECTED_UV_RANGE,
+          EXPECTED_UV_RANGE,
+        ]);
+      }
+    }
+  });
+
+  it('bakes the macro shading band into COLOR_0 rather than one flat value per part', async () => {
+    await MeshoptDecoder.ready;
+    const io = new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+    const document = await io.readBinary(readFileSync(ASSET_PATH));
+
+    // The tracks are the largest primitive and span the full height of the
+    // model, so they carry the widest slice of the bake.
+    const tracks = document
+      .getRoot()
+      .listMeshes()
+      .flatMap((mesh) => mesh.listPrimitives())
+      .find(
+        (primitive) =>
+          (primitive.getIndices()?.getCount() ??
+            primitive.getAttribute('POSITION')?.getCount() ??
+            0) /
+            3 ===
+          6256,
+      );
+    expect(tracks, 'track primitive').toBeDefined();
+    const colors = tracks?.getAttribute('COLOR_0');
+    expect(colors).toBeDefined();
+
+    const element: number[] = [];
+    const values = new Set<number>();
+    let min = Infinity;
+    let max = -Infinity;
+    for (let index = 0; index < (colors?.getCount() ?? 0); index++) {
+      colors?.getElement(index, element);
+      for (const channel of element.slice(0, 3)) {
+        values.add(Math.round(channel * 255));
+        min = Math.min(min, channel);
+        max = Math.max(max, channel);
+      }
+    }
+    // A flat per-part tint would collapse to a handful of levels; the baked
+    // occlusion, contact, grime, dust, wear and mottle bands spread it out.
+    expect(values.size).toBeGreaterThan(24);
+    expect(max - min).toBeGreaterThan(0.1);
+    // Nothing may exceed the zone tint or crush past the bake's floor.
+    expect(max).toBeLessThanOrEqual(1);
+    expect(min).toBeGreaterThan(0.05);
   });
 
   it('retains the rider, exhaust, wheel, and animation contracts', async () => {

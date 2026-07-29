@@ -10,6 +10,8 @@ export const TANK_SOURCE_FILES = Object.freeze([
   'docs/design/tank-mount/reference-metadata.json',
   'docs/design/tank-mount/object-sculpt-spec.json',
   'scripts/assets/tank_mount/model.js',
+  'scripts/assets/tank_mount/surface_shading.mjs',
+  'scripts/assets/tank_mount/surface_maps.mjs',
   'scripts/assets/tank_mount/export_entry.js',
   'scripts/assets/tank_mount/export_tank_mount.mjs',
   'scripts/assets/tank_mount/source_fingerprint.mjs',

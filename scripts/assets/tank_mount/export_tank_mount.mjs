@@ -9,8 +9,8 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { getBounds, NodeIO } from '@gltf-transform/core';
-import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { getBounds, NodeIO, TextureInfo } from '@gltf-transform/core';
+import { ALL_EXTENSIONS, EXTTextureWebP, KHRTextureTransform } from '@gltf-transform/extensions';
 import * as esbuild from 'esbuild';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 import puppeteer from 'puppeteer-core';
@@ -23,6 +23,8 @@ import {
   TANK_STAGES,
 } from './model.js';
 import { tankSourceFingerprint } from './source_fingerprint.mjs';
+import { buildTankSurfaceMaps, NORMAL_SCALE } from './surface_maps.mjs';
+import { ORM_CENTER } from './surface_shading.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..', '..');
@@ -43,6 +45,14 @@ const rawOnly = process.argv.includes('--raw-only');
 const noPreview = process.argv.includes('--no-preview');
 const rawOut = path.join(ROOT, `tmp/asset_src/tank_mount/tank-${stage}.glb`);
 const sourceFingerprint = tankSourceFingerprint(ROOT);
+
+/** Two families (metal, fabric) times albedo, normal, and packed ORM. */
+const TANK_SURFACE_MAP_COUNT = 6;
+/** Shipping ceiling. The textured surface layer roughly doubled the asset (UVs,
+ *  per-vertex baked shading, and six embedded maps), which puts it alongside the
+ *  other authored mounts rather than above them: valorsteed 562 KiB, gobbler
+ *  555 KiB, toad 499 KiB. */
+const SHIPPING_BYTE_CEILING = 576 * 1024;
 
 function assertCondition(condition, message) {
   if (!condition) throw new Error(message);
@@ -69,6 +79,113 @@ async function stampSourceFingerprint(glbPath) {
       : {};
   asset.extras = { ...extras, sourceFingerprint };
   await io.write(glbPath, document);
+}
+
+/**
+ * Fold every TEXCOORD_0 into [0, 1] and hand the discarded scale to
+ * KHR_texture_transform.
+ *
+ * The model projects UVs in world space, so they span several repeats, and
+ * `quantize()` refuses any texcoord outside [0, 1] (it would clamp) and leaves
+ * it float32. That single accessor cost more than the rest of the geometry put
+ * together. Normalizing here lets the optimizer quantize it like every other
+ * attribute and the sampler's repeat wrap plus the transform scale reproduce the
+ * original tiling exactly. One shared scale for every material, so the loader
+ * needs one texture-transform variant per map rather than one per material.
+ */
+function normalizeTexcoords(document) {
+  const accessors = new Set();
+  let extent = 0;
+  for (const mesh of document.getRoot().listMeshes()) {
+    for (const primitive of mesh.listPrimitives()) {
+      const uv = primitive.getAttribute('TEXCOORD_0');
+      if (!uv || accessors.has(uv)) continue;
+      accessors.add(uv);
+      const min = uv.getMin([]);
+      const max = uv.getMax([]);
+      assertCondition(
+        Math.min(...min) >= 0,
+        `TEXCOORD_0 must be folded non-negative, saw ${Math.min(...min)}`,
+      );
+      extent = Math.max(extent, ...max);
+    }
+  }
+  const range = Math.max(1, Math.ceil(extent));
+  for (const uv of accessors) {
+    const array = uv.getArray();
+    for (let index = 0; index < array.length; index++) array[index] /= range;
+    uv.setArray(array);
+  }
+  return range;
+}
+
+/**
+ * Attach the procedural PBR map sets to the exported materials.
+ *
+ * Authored here rather than in the browser factory for two reasons: the maps
+ * are rastered by sharp (Node only), and writing the exact webp bytes through
+ * gltf-transform keeps the export byte-reproducible instead of depending on a
+ * canvas encoder. Each family's ORM map serves as BOTH the metallicRoughness
+ * and the occlusion texture, which is why the material factors are divided by
+ * the map midtone: factor times sampled channel lands back on the authored
+ * target from TANK_MATERIAL_CONTRACT.
+ */
+async function attachSurfaceMaps(glbPath) {
+  const maps = await buildTankSurfaceMaps();
+  const io = await createNodeIo();
+  const document = await io.read(glbPath);
+  const root = document.getRoot();
+  document.createExtension(EXTTextureWebP).setRequired(true);
+  const uvRange = normalizeTexcoords(document);
+  const uvTransform = document
+    .createExtension(KHRTextureTransform)
+    .setRequired(true)
+    .createTransform()
+    .setScale([uvRange, uvRange]);
+
+  const textures = new Map();
+  const textureFor = (family, channel) => {
+    const key = `${family}_${channel}`;
+    const existing = textures.get(key);
+    if (existing) return existing;
+    const texture = document
+      .createTexture(`tank_${key}`)
+      .setMimeType('image/webp')
+      .setImage(maps[family][channel]);
+    textures.set(key, texture);
+    return texture;
+  };
+
+  const materialsByName = new Map(
+    root.listMaterials().map((material) => [material.getName(), material]),
+  );
+  for (const contract of TANK_MATERIAL_CONTRACT) {
+    const material = materialsByName.get(contract.name);
+    assertCondition(Boolean(material), `${contract.name} is missing from the exported document`);
+    const orm = textureFor(contract.surface, 'orm');
+    material.setBaseColorTexture(textureFor(contract.surface, 'albedo'));
+    material.setNormalTexture(textureFor(contract.surface, 'normal'));
+    material.setNormalScale(NORMAL_SCALE);
+    material.setMetallicRoughnessTexture(orm);
+    material.setOcclusionTexture(orm);
+    material.setRoughnessFactor(Math.min(1, contract.roughness / ORM_CENTER));
+    material.setMetallicFactor(Math.min(1, contract.metalness / ORM_CENTER));
+    for (const info of [
+      material.getBaseColorTextureInfo(),
+      material.getNormalTextureInfo(),
+      material.getMetallicRoughnessTextureInfo(),
+      material.getOcclusionTextureInfo(),
+    ]) {
+      // World-space projected UVs run far outside [0, 1); the detail only tiles
+      // if the sampler repeats.
+      info.setWrapS(TextureInfo.WrapMode.REPEAT);
+      info.setWrapT(TextureInfo.WrapMode.REPEAT);
+      info.setExtension('KHR_texture_transform', uvTransform);
+    }
+  }
+
+  await io.write(glbPath, document);
+  return { ...maps, uvRange };
 }
 
 async function inspectGlb(glbPath) {
@@ -110,7 +227,12 @@ async function inspectGlb(glbPath) {
       roughness: material.getRoughnessFactor(),
       metalness: material.getMetallicFactor(),
     })),
-    textures: root.listTextures().length,
+    textures: root.listTextures().map((texture) => ({
+      name: texture.getName(),
+      mimeType: texture.getMimeType(),
+      size: texture.getSize(),
+      bytes: texture.getImage()?.byteLength ?? 0,
+    })),
     animations: root.listAnimations().map((animation) => ({
       name: animation.getName(),
       duration: Math.max(
@@ -147,13 +269,27 @@ async function inspectGlb(glbPath) {
 }
 
 function verifyContract(stats, optimized) {
-  const expectedExtensions = optimized ? ['EXT_meshopt_compression', 'KHR_mesh_quantization'] : [];
+  const expectedExtensions = optimized
+    ? [
+        'EXT_meshopt_compression',
+        'EXT_texture_webp',
+        'KHR_mesh_quantization',
+        'KHR_texture_transform',
+      ]
+    : ['EXT_texture_webp', 'KHR_texture_transform'];
   assertCondition(stats.scenes === 1, `${stats.path} must contain one scene`);
   assertCondition(
     JSON.stringify(stats.sceneChildren) === JSON.stringify(['Tank']),
     `${stats.path} scene root must be Tank`,
   );
-  assertCondition(stats.textures === 0, `${stats.path} must contain zero textures`);
+  assertCondition(
+    stats.textures.length === TANK_SURFACE_MAP_COUNT,
+    `${stats.path} must ship ${TANK_SURFACE_MAP_COUNT} surface maps, found ${stats.textures.length}`,
+  );
+  assertCondition(
+    stats.textures.every((texture) => texture.mimeType === 'image/webp' && texture.bytes > 0),
+    `${stats.path} surface maps must all be non-empty webp`,
+  );
   assertCondition(stats.skins === 0, `${stats.path} must contain zero skins`);
   assertCondition(stats.cameras === 0, `${stats.path} must contain zero cameras`);
   assertCondition(stats.triangles <= 14_000, `${stats.path} exceeds 14,000 triangles`);
@@ -196,7 +332,10 @@ function verifyContract(stats, optimized) {
     `${stats.path} extensions changed: ${stats.extensions.join(', ')}`,
   );
   if (optimized) {
-    assertCondition(stats.bytes <= 320 * 1024, `${stats.path} exceeds 320 KiB`);
+    assertCondition(
+      stats.bytes <= SHIPPING_BYTE_CEILING,
+      `${stats.path} exceeds ${SHIPPING_BYTE_CEILING / 1024} KiB`,
+    );
   }
 }
 
@@ -242,6 +381,17 @@ try {
 } finally {
   await browser.close();
 }
+
+const surfaceMaps = await attachSurfaceMaps(rawOut);
+const materialEvidence = path.join(PREVIEW_ROOT, 'material');
+mkdirSync(materialEvidence, { recursive: true });
+const previewSheet = path.join(materialEvidence, 'surface-maps.png');
+writeFileSync(previewSheet, surfaceMaps.preview);
+console.log(
+  `surface maps: metal ${surfaceMaps.metal.albedoSize}/${surfaceMaps.metal.reliefSize}, ` +
+    `fabric ${surfaceMaps.fabric.albedoSize}/${surfaceMaps.fabric.reliefSize}, ` +
+    `uv range ${surfaceMaps.uvRange}, sheet ${path.relative(ROOT, previewSheet)}`,
+);
 
 await stampSourceFingerprint(rawOut);
 const rawStats = await inspectGlb(rawOut);

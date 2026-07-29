@@ -466,6 +466,36 @@ future asset genuinely needs a patterned finish, add a cell to the shared atlas 
 sibling shared atlas) with the same derivation-and-pin treatment; per-asset embedded
 textures remain the last resort and need a fresh performance case.
 
+**The one asset that made that case: the tank mount.** It is a rideable hero mount the
+player looks at from the chase camera for the whole session, so a shared grayscale grain
+cell could not carry it: it needs an independent roughness and normal response per material
+family, which vertex colors cannot express at all. It embeds six procedurally generated maps
+(metal and fabric, each albedo + tangent normal + packed occlusion/roughness/metalness) built
+by `scripts/assets/tank_mount/surface_maps.mjs`, plus a baked macro band in `COLOR_0`
+(`surface_shading.mjs`: cavity occlusion against the neighbouring parts, ground contact and
+grime, settled dust, thinned paint on up-facing bevels and seam darkening on the rest). Read
+the shape of that solution before copying it:
+
+- **World-space box projection, not UV islands.** UVs are projected per triangle from the
+  dominant face-normal axis, so texel density is fixed in yards and one shared map set serves
+  parts of wildly different size. There is no unwrap to maintain.
+- **Fold the UVs, then restore the scale.** `quantize()` skips any texcoord outside [0, 1] and
+  leaves it float32, which cost more than the rest of the geometry put together. Fold each
+  projection group back by whole repeats (free: the maps tile with period 1), normalize into
+  the unit range, and hand the discarded scale to `KHR_texture_transform`.
+- **Resolution is per channel, not per material.** The albedo carries the scratch and chip
+  detail and costs a few KiB; the relief fields are band-limited well below their own Nyquist
+  frequency and ship at half resolution.
+- **Author every channel from its own field.** Aliasing albedo into roughness or normal is on
+  the object-sculpt spec's `mustAvoid` list, and it looks like it.
+- **Give the dark families headroom.** The baked darkening bands need somewhere to go: at the
+  original blockout values the treads and cannon crushed to flat black, so those palette
+  entries were lifted at the same hue.
+
+Cost: 275 KiB to 572 KiB, which sits alongside the other authored mounts (valorsteed 562 KiB,
+gobbler 555 KiB) rather than above them, and mounts load lazily per visual key. A prop or a
+building still has no case for this; do not read the tank as a general licence.
+
 ### Budgets that held up
 
 Per-asset budgets plus a wave-wide ceiling (town: 30,000 triangles and 1.25 MiB across

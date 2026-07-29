@@ -1,6 +1,13 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import {
+  boxProjectUvInto,
+  buildOccluderIndex,
+  SURFACE_TUNING,
+  shadeSurfaceInto,
+  UV_SCALE,
+} from './surface_shading.mjs';
 
 export const TANK_STAGES = Object.freeze([
   'blockout',
@@ -37,14 +44,65 @@ export const TANK_SOCKET_DEFINITIONS = Object.freeze([
   }),
 ]);
 
+// `roughness`/`metalness` are the AUTHORED TARGETS. The exporter divides them by
+// the ORM map's midtone when it attaches the maps, so the shipped factor times
+// the sampled channel lands back on the target (see export_tank_mount.mjs).
+// `surface` picks which of the two procedural map families a material samples,
+// and `uvScale` its world-space repeats per yard.
 export const TANK_MATERIAL_CONTRACT = Object.freeze([
-  Object.freeze({ name: 'TankCreamPaint', color: 0xf0deb2, roughness: 0.62, metalness: 0.34 }),
-  Object.freeze({ name: 'TankVioletPaint', color: 0x8a5ea7, roughness: 0.58, metalness: 0.38 }),
-  Object.freeze({ name: 'TankDarkIron', color: 0x453b4b, roughness: 0.66, metalness: 0.68 }),
-  Object.freeze({ name: 'TankBronze', color: 0xd19a4e, roughness: 0.44, metalness: 0.72 }),
-  Object.freeze({ name: 'TankLeather', color: 0x8a5638, roughness: 0.76, metalness: 0 }),
-  Object.freeze({ name: 'TankTextile', color: 0x55765a, roughness: 0.86, metalness: 0 }),
+  Object.freeze({
+    name: 'TankCreamPaint',
+    color: 0xf0deb2,
+    roughness: 0.62,
+    metalness: 0.34,
+    surface: 'metal',
+    uvScale: UV_SCALE.creamPaint,
+  }),
+  Object.freeze({
+    name: 'TankVioletPaint',
+    color: 0x8a5ea7,
+    roughness: 0.58,
+    metalness: 0.38,
+    surface: 'metal',
+    uvScale: UV_SCALE.violetPaint,
+  }),
+  Object.freeze({
+    name: 'TankDarkIron',
+    color: 0x5b4f63,
+    roughness: 0.66,
+    metalness: 0.68,
+    surface: 'metal',
+    uvScale: UV_SCALE.darkIron,
+  }),
+  Object.freeze({
+    name: 'TankBronze',
+    color: 0xd19a4e,
+    roughness: 0.44,
+    metalness: 0.72,
+    surface: 'metal',
+    uvScale: UV_SCALE.bronze,
+  }),
+  Object.freeze({
+    name: 'TankLeather',
+    color: 0x9e6642,
+    roughness: 0.76,
+    metalness: 0,
+    surface: 'fabric',
+    uvScale: UV_SCALE.leather,
+  }),
+  Object.freeze({
+    name: 'TankTextile',
+    color: 0x63866a,
+    roughness: 0.86,
+    metalness: 0,
+    surface: 'fabric',
+    uvScale: UV_SCALE.textile,
+  }),
 ]);
+
+const MATERIAL_BY_NAME = new Map(
+  TANK_MATERIAL_CONTRACT.map((contract) => [contract.name, contract]),
+);
 
 const PALETTE = Object.freeze({
   cream: 0xe0cd9f,
@@ -53,18 +111,23 @@ const PALETTE = Object.freeze({
   violet: 0x6f488b,
   violetLight: 0x8a5ea7,
   violetShade: 0x4b3264,
-  iron: 0x29252f,
-  ironLight: 0x453b4b,
-  ironDeep: 0x17161c,
+  // The dark families sit high enough for the baked occlusion, contact and
+  // grime bands to have somewhere to go: at the old values the treads and the
+  // cannon crushed to flat black under the surface pass, losing the tread
+  // rhythm and the barrel's cylindrical falloff that the reference sheet reads
+  // by. Hues are unchanged.
+  iron: 0x3b3542,
+  ironLight: 0x5b4f63,
+  ironDeep: 0x24222a,
   bronze: 0xb47c37,
   bronzeLight: 0xd19a4e,
   bronzeShade: 0x704421,
-  leather: 0x663c28,
-  leatherLight: 0x8a5638,
-  leatherShade: 0x3d261f,
-  textile: 0x395940,
-  textileLight: 0x55765a,
-  textileShade: 0x253d2d,
+  leather: 0x7a4a31,
+  leatherLight: 0x9e6642,
+  leatherShade: 0x4e3128,
+  textile: 0x44684c,
+  textileLight: 0x63866a,
+  textileShade: 0x2f4a37,
   blockoutPrimary: 0x87909b,
   blockoutSecondary: 0x59616d,
 });
@@ -114,33 +177,63 @@ function matrixFor(position, rotation = [0, 0, 0], scale = [1, 1, 1]) {
   );
 }
 
-function prepareGeometry(source, color, matrix = null) {
+/** The two-pass surface state: every part authored so far, in the one flat
+ *  registry the baked pass walks. */
+function createSurface(stage) {
+  return { stage, parts: [] };
+}
+
+/** A bucket is the per-material geometry list, tagged with the material whose
+ *  surface family and UV scale every part pushed into it inherits, and with the
+ *  surface registry those parts also join. Tagging the list (instead of
+ *  threading two more arguments through sixty call sites) keeps the
+ *  part-authoring code below unchanged. */
+function surfaceBucket(surface, materialName) {
+  const bucket = [];
+  bucket.surface = surface;
+  bucket.materialName = materialName;
+  return bucket;
+}
+
+/** Semantic zone ratio: the part colour expressed as a multiplier over the
+ *  material's base colour, so one material paints several authored shades. */
+function zoneTint(color) {
+  const tint = new THREE.Color(color);
+  const base = new THREE.Color(VERTEX_COLOR_BASES.get(color) ?? 0xffffff);
+  return [
+    THREE.MathUtils.clamp(tint.r / base.r, 0, 1),
+    THREE.MathUtils.clamp(tint.g / base.g, 0, 1),
+    THREE.MathUtils.clamp(tint.b / base.b, 0, 1),
+  ];
+}
+
+function prepareGeometry(source, matrix = null) {
   const geometry = source.index ? source.toNonIndexed() : source.clone();
   geometry.deleteAttribute('uv');
   geometry.deleteAttribute('uv1');
   if (matrix) geometry.applyMatrix4(matrix);
   if (!geometry.getAttribute('normal')) geometry.computeVertexNormals();
-  const tint = new THREE.Color(color);
-  const base = new THREE.Color(VERTEX_COLOR_BASES.get(color) ?? 0xffffff);
-  const colors = new Float32Array(geometry.getAttribute('position').count * 3);
-  for (let index = 0; index < geometry.getAttribute('position').count; index++) {
-    colors[index * 3] = THREE.MathUtils.clamp(tint.r / base.r, 0, 1);
-    colors[index * 3 + 1] = THREE.MathUtils.clamp(tint.g / base.g, 0, 1);
-    colors[index * 3 + 2] = THREE.MathUtils.clamp(tint.b / base.b, 0, 1);
-  }
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   return geometry;
 }
 
+/** Record a part. The UV and COLOR_0 attributes are deliberately NOT written
+ *  here: the baked surface pass needs every part's placement first, so it can
+ *  occlude each one against its neighbours. `surface.parts` is the flat registry
+ *  that second pass walks. */
 function addGeometry(bucket, geometry, color, options = {}) {
-  bucket.push(
-    prepareGeometry(
+  const part = {
+    geometry: prepareGeometry(
       geometry,
-      color,
       matrixFor(options.position ?? [0, 0, 0], options.rotation, options.scale),
-      options.variation ?? 0,
     ),
-  );
+    materialName: bucket.materialName,
+    tint: zoneTint(color),
+    offset: options.offset ?? [0, 0, 0],
+    variation: SURFACE_TUNING.mottleBase + (options.variation ?? 0),
+  };
+  bucket.push(part);
+  bucket.surface.parts.push(part);
+  return part;
 }
 
 function addBox(bucket, size, position, color, options = {}) {
@@ -153,6 +246,7 @@ function addBox(bucket, size, position, color, options = {}) {
     position,
     rotation: options.rotation,
     variation: options.variation,
+    offset: options.offset,
   });
 }
 
@@ -169,6 +263,7 @@ function addCylinder(bucket, radius, length, position, color, options = {}) {
     position,
     rotation: options.rotation ?? [0, 0, Math.PI / 2],
     variation: options.variation,
+    offset: options.offset,
   });
 }
 
@@ -177,6 +272,7 @@ function addSphere(bucket, radius, position, color, options = {}) {
     position,
     scale: options.scale,
     variation: options.variation,
+    offset: options.offset,
   });
 }
 
@@ -297,11 +393,81 @@ function makeShield(width, height, depth) {
 
 function mergeBucket(bucket, label) {
   if (bucket.length === 0) return null;
-  const merged = mergeGeometries(bucket, false);
+  const merged = mergeGeometries(
+    bucket.map((part) => part.geometry),
+    false,
+  );
   if (!merged) throw new Error(`could not merge tank ${label} geometry`);
   merged.computeBoundingBox();
   merged.computeBoundingSphere();
   return merged;
+}
+
+/** Which surface bands each authoring stage has brought in. The material stage
+ *  sets the base colours, `surface` adds the wear/grime/mottle bands, and
+ *  `lighting` adds the baked occlusion, contact and dust. */
+function surfaceWeights(stage) {
+  const surfaced = atLeast(stage, 'surface');
+  const lit = atLeast(stage, 'lighting');
+  return {
+    midtone: atLeast(stage, 'material') ? SURFACE_TUNING.midtone : 1,
+    grime: surfaced ? 1 : 0,
+    wear: surfaced ? 1 : 0,
+    seam: surfaced ? 1 : 0,
+    mottle: surfaced ? 1 : 0,
+    occlusion: lit ? 1 : 0,
+    contact: lit ? 1 : 0,
+    dust: lit ? 1 : 0,
+  };
+}
+
+function partBounds(part, ownerId) {
+  const positions = part.geometry.getAttribute('position').array;
+  const [ox, oy, oz] = part.offset;
+  const min = [Infinity, Infinity, Infinity];
+  const max = [-Infinity, -Infinity, -Infinity];
+  for (let index = 0; index < positions.length; index += 3) {
+    const point = [positions[index] + ox, positions[index + 1] + oy, positions[index + 2] + oz];
+    for (let axis = 0; axis < 3; axis++) {
+      if (point[axis] < min[axis]) min[axis] = point[axis];
+      if (point[axis] > max[axis]) max[axis] = point[axis];
+    }
+  }
+  return { min, max, ownerId };
+}
+
+/** Second pass: with every part placed, project world-space UVs and bake the
+ *  macro shading band (occlusion against the neighbouring parts, contact
+ *  darkening, ground grime, settled dust, bevel wear, mottle) into COLOR_0.
+ *  Touches no vertex position, so the silhouette is exactly the blockout's. */
+function bakeSurface(surface) {
+  const weights = surfaceWeights(surface.stage);
+  const occluders = buildOccluderIndex(
+    surface.parts.map((part, ownerId) => partBounds(part, ownerId)),
+  );
+  for (let ownerId = 0; ownerId < surface.parts.length; ownerId++) {
+    const part = surface.parts[ownerId];
+    const positions = part.geometry.getAttribute('position');
+    const normals = part.geometry.getAttribute('normal');
+    const contract = MATERIAL_BY_NAME.get(part.materialName);
+    if (!contract) throw new Error(`tank part has no material: ${part.materialName}`);
+
+    const uv = new Float32Array(positions.count * 2);
+    boxProjectUvInto(positions.array, normals.array, uv, contract.uvScale, part.offset);
+    part.geometry.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+
+    const colors = new Float32Array(positions.count * 3);
+    shadeSurfaceInto(positions.array, normals.array, colors, {
+      tint: part.tint,
+      offset: part.offset,
+      occluders,
+      ownerId,
+      variation: part.variation,
+      seed: 1_009 + ownerId * 37,
+      weights,
+    });
+    part.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  }
 }
 
 function createMaterial(contract, stage, blockoutColor) {
@@ -344,12 +510,17 @@ function addTrackPads(bucket, stage, sideX) {
   }
 }
 
-function createWheelGeometry(stage, side, index) {
+/** A road wheel's parts, authored in the wheel node's local frame. `offset` is
+ *  its world placement, which the surface pass needs so occlusion, grime, and
+ *  the UV projection all resolve in world space (the wheel geometry itself
+ *  stays local, because the node is what the clips spin). */
+function createWheelBucket(surface, stage, side, index, offset) {
   const violet = stageColor(stage, PALETTE.violet, PALETTE.blockoutSecondary);
-  const bucket = [];
+  const bucket = surfaceBucket(surface, 'TankVioletPaint');
   addCylinder(bucket, 0.335, 0.16, [0, 0, 0], violet, {
     radialSegments: atLeast(stage, 'form') ? 14 : 10,
     variation: atLeast(stage, 'surface') ? 0.012 : 0,
+    offset,
   });
   if (atLeast(stage, 'form')) {
     for (let spoke = 0; spoke < 5; spoke++) {
@@ -362,14 +533,15 @@ function createWheelGeometry(stage, side, index) {
         {
           radius: 0,
           rotation: [angle, 0, 0],
+          offset,
         },
       );
     }
   }
-  return mergeBucket(bucket, `${side} wheel ${index}`);
+  return bucket;
 }
 
-function addRunningGear(root, buckets, stage, wheelNodes, wheelMaterial) {
+function addRunningGear(root, surface, buckets, stage, wheelNodes, wheelPlans) {
   const iron = stageColor(stage, PALETTE.iron, PALETTE.blockoutSecondary);
   const bronze = stageColor(stage, PALETTE.bronze, PALETTE.blockoutSecondary);
   const violetShade = stageColor(stage, PALETTE.violetShade, PALETTE.blockoutSecondary);
@@ -388,14 +560,18 @@ function addRunningGear(root, buckets, stage, wheelNodes, wheelMaterial) {
     for (let index = 0; index < wheelZ.length; index++) {
       const node = new THREE.Group();
       node.name = `Wheel_${side}_${index}`;
-      node.position.set(x + (side === 'L' ? -0.225 : 0.225), 0.62, wheelZ[index]);
-      const mesh = new THREE.Mesh(createWheelGeometry(stage, side, index), wheelMaterial);
-      mesh.name = `TankWheel_${side}_${index}`;
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      node.add(mesh);
+      const offset = [x + (side === 'L' ? -0.225 : 0.225), 0.62, wheelZ[index]];
+      node.position.set(...offset);
       root.add(node);
       wheelNodes.push(node);
+      // The mesh is attached after the surface bake, which needs every part in
+      // place before it can shade any of them.
+      wheelPlans.push({
+        node,
+        name: `TankWheel_${side}_${index}`,
+        label: `${side} wheel ${index}`,
+        bucket: createWheelBucket(surface, stage, side, index, offset),
+      });
 
       if (atLeast(stage, 'structural')) {
         const outwardX = x + (side === 'L' ? -0.33 : 0.33);
@@ -709,22 +885,43 @@ export function createTankMount({ stage = 'final', sourceFingerprint = null } = 
       createMaterial(contract, stage, PALETTE.blockoutPrimary),
     ]),
   );
+  const surface = createSurface(stage);
   const wheelNodes = [];
-  const runningBuckets = { dark: [], violet: [], bronze: [] };
-  addRunningGear(root, runningBuckets, stage, wheelNodes, materialByName.get('TankVioletPaint'));
+  const wheelPlans = [];
+  const runningBuckets = {
+    dark: surfaceBucket(surface, 'TankDarkIron'),
+    violet: surfaceBucket(surface, 'TankVioletPaint'),
+    bronze: surfaceBucket(surface, 'TankBronze'),
+  };
+  addRunningGear(root, surface, runningBuckets, stage, wheelNodes, wheelPlans);
 
   const hullPivot = new THREE.Group();
   hullPivot.name = 'HullPivot';
   root.add(hullPivot);
   const hullBuckets = {
-    cream: [],
-    violet: [],
-    dark: [],
-    bronze: [],
-    leather: [],
-    textile: [],
+    cream: surfaceBucket(surface, 'TankCreamPaint'),
+    violet: surfaceBucket(surface, 'TankVioletPaint'),
+    dark: surfaceBucket(surface, 'TankDarkIron'),
+    bronze: surfaceBucket(surface, 'TankBronze'),
+    leather: surfaceBucket(surface, 'TankLeather'),
+    textile: surfaceBucket(surface, 'TankTextile'),
   };
   addHull(hullBuckets, stage);
+
+  // Every part is placed: project the UVs and bake the macro shading band
+  // before anything gets merged into a draw.
+  bakeSurface(surface);
+
+  for (const plan of wheelPlans) {
+    const mesh = new THREE.Mesh(
+      mergeBucket(plan.bucket, plan.label),
+      materialByName.get('TankVioletPaint'),
+    );
+    mesh.name = plan.name;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    plan.node.add(mesh);
+  }
 
   addSemanticMesh(root, runningBuckets.dark, materialByName.get('TankDarkIron'), 'TankTracks');
   addSemanticMesh(root, runningBuckets.bronze, materialByName.get('TankBronze'), 'TankWheelHubs');

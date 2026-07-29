@@ -329,7 +329,8 @@
       "The saddle supports the 2.6-yard player rig with a stable seat, grab hoop, clear cannon silhouette, and no visible rider intersection.",
       "Road wheels, track assemblies, suspension, and engine idle carry authored Idle, Walk, Run, and Death clips through the existing mount animation path.",
       "Cream and violet armor, dark tracks, bronze hardware, brown leather, and green textile remain distinct on both Standard and Low-tier materials.",
-      "The shipped GLB stays below 14,000 triangles, 320 KiB, 24 primitives, 6 materials, with zero textures and a live source fingerprint."
+      "The shipped GLB stays below 14,000 triangles, 576 KiB, 24 primitives, 6 materials, with six embedded procedural maps (two families times albedo, normal, packed ORM) and a live source fingerprint.",
+      "Every material carries an independent albedo, roughness, normal, and occlusion response, and the baked macro bands separate each armour plate from the next without crushing the darkest families to black. Verified against the neutral, studio, and grazing-light look-dev renders under docs/screenshots/tank-mount/authoring/material/."
     ],
     "minimumSpecDepth": {
       "macroComponents": 4,
@@ -636,8 +637,8 @@
       "roughnessVariationRequired": true,
       "normalOrBumpRequired": true,
       "localOverridesRequired": true,
-      "minimumTextureResolution": 1024,
-      "preferredTextureResolution": 2048,
+      "minimumTextureResolution": 512,
+      "preferredTextureResolution": 1024,
       "independentMapChannels": ["albedo", "roughness", "height", "normal", "ambient-occlusion"],
       "requiredSurfaceFrequencyBands": ["macro", "meso", "micro"],
       "geometryReliefRequiredWhenSilhouetteAffected": true,
@@ -646,7 +647,7 @@
         "targetThreshold": 0.7,
         "stopOnLowConfidence": true,
         "script": "forge/stage1_intake/extract_pbr_evidence.py",
-        "acceptedLimitation": "The admitted source is a lit stylized illustration rather than a material scan. Palette and response are analyzed per material, but inferred PBR maps are not implementation authority and no texture ships in the GLB."
+        "acceptedLimitation": "The admitted source is a lit stylized illustration rather than a material scan. Palette and response are analyzed per material, and no inferred map from the illustration ships; the maps that DO ship are generated procedurally, per channel, from independent noise fields."
       },
       "mustAvoid": [
         "single flat albedo per material",
@@ -656,7 +657,8 @@
         "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
         "local color/detail described only in prose without material masks",
         "claiming exact PBR recovery when confidence is below the target threshold"
-      ]
+      ],
+      "resolutionRationale": "World-space box projection makes resolution a texel-density question rather than a UV-island one: at the shipped repeats per yard the albedo runs near 1200 px per yard and the relief fields are band-limited well below their own Nyquist frequency, so a larger map would add bytes and no detail."
     },
     "lightingPass": {
       "requiredTerms": [
@@ -988,7 +990,11 @@
         "units": "yards",
         "confidence": 0.94
       },
-      "transform": { "position": [0, 0.45, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1] },
+      "transform": {
+        "position": [0, 0.45, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
       "actionProfile": {
         "animationRole": "hull-bounce",
         "pivot": {
@@ -1074,7 +1080,11 @@
         "units": "yards",
         "confidence": 0.96
       },
-      "transform": { "position": [0, 0.08, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1] },
+      "transform": {
+        "position": [0, 0.08, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
       "actionProfile": {
         "animationRole": "track-loop",
         "pivot": {
@@ -1139,7 +1149,11 @@
         "units": "yards",
         "confidence": 0.92
       },
-      "transform": { "position": [0, 1.18, -0.08], "rotation": [0, 0, 0], "scale": [1, 1, 1] },
+      "transform": {
+        "position": [0, 1.18, -0.08],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
       "actionProfile": {
         "animationRole": "turret-idle",
         "pivot": {
@@ -1190,7 +1204,9 @@
         "gapTolerance": 0.004,
         "evidenceRefs": ["hero", "front"]
       },
-      "actionProfile": { "animationRole": "track-pod" },
+      "actionProfile": {
+        "animationRole": "track-pod"
+      },
       "material": "dark-iron",
       "localFeatures": [],
       "evidenceRefs": ["hero", "front"],
@@ -1222,7 +1238,9 @@
         "gapTolerance": 0.004,
         "evidenceRefs": ["front"]
       },
-      "actionProfile": { "animationRole": "track-pod" },
+      "actionProfile": {
+        "animationRole": "track-pod"
+      },
       "material": "dark-iron",
       "localFeatures": [],
       "evidenceRefs": ["front", "hero"],
@@ -1310,7 +1328,9 @@
         "gapTolerance": 0.004,
         "evidenceRefs": ["hero", "front"]
       },
-      "actionProfile": { "animationRole": "static-armor" },
+      "actionProfile": {
+        "animationRole": "static-armor"
+      },
       "material": "cream-steel",
       "localFeatures": [],
       "evidenceRefs": ["hero", "front"],
@@ -1342,7 +1362,9 @@
         "gapTolerance": 0.003,
         "evidenceRefs": ["front"]
       },
-      "actionProfile": { "animationRole": "static-armor" },
+      "actionProfile": {
+        "animationRole": "static-armor"
+      },
       "material": "violet-steel",
       "localFeatures": [],
       "evidenceRefs": ["front", "hero"],
@@ -1374,7 +1396,9 @@
         "gapTolerance": 0.004,
         "evidenceRefs": ["hero", "side"]
       },
-      "actionProfile": { "animationRole": "static-armor" },
+      "actionProfile": {
+        "animationRole": "static-armor"
+      },
       "material": "violet-steel",
       "localFeatures": [],
       "evidenceRefs": ["hero", "side"],
@@ -1406,7 +1430,9 @@
         "gapTolerance": 0.005,
         "evidenceRefs": ["side", "hero"]
       },
-      "actionProfile": { "animationRole": "engine-idle" },
+      "actionProfile": {
+        "animationRole": "engine-idle"
+      },
       "material": "cream-steel",
       "materialLayers": ["cream-steel", "violet-steel", "dark-iron"],
       "localFeatures": [
@@ -1454,7 +1480,9 @@
         "gapTolerance": 0.004,
         "evidenceRefs": ["side"]
       },
-      "actionProfile": { "animationRole": "static-cargo" },
+      "actionProfile": {
+        "animationRole": "static-cargo"
+      },
       "material": "leather",
       "localFeatures": [],
       "evidenceRefs": ["side", "hero"],
@@ -1495,7 +1523,11 @@
           "confidence": 0.99
         },
         "sockets": [
-          { "id": "Socket_Rider", "localPosition": [0, 0.84, -0.12], "localRotation": [0, 0, 0] }
+          {
+            "id": "Socket_Rider",
+            "localPosition": [0, 0.84, -0.12],
+            "localRotation": [0, 0, 0]
+          }
         ]
       },
       "material": "leather",
@@ -1545,7 +1577,9 @@
         "gapTolerance": 0.003,
         "evidenceRefs": ["saddle"]
       },
-      "actionProfile": { "animationRole": "static-guard" },
+      "actionProfile": {
+        "animationRole": "static-guard"
+      },
       "material": "bronze",
       "localFeatures": [],
       "evidenceRefs": ["saddle", "hero"],
@@ -1640,7 +1674,9 @@
         "gapTolerance": 0.003,
         "evidenceRefs": ["hero", "front"]
       },
-      "actionProfile": { "animationRole": "cannon-recoil" },
+      "actionProfile": {
+        "animationRole": "cannon-recoil"
+      },
       "material": "cream-steel",
       "localFeatures": [],
       "evidenceRefs": ["hero", "front"],
@@ -1672,7 +1708,9 @@
         "gapTolerance": 0.002,
         "evidenceRefs": ["front", "side"]
       },
-      "actionProfile": { "animationRole": "cannon-recoil" },
+      "actionProfile": {
+        "animationRole": "cannon-recoil"
+      },
       "material": "dark-iron",
       "localFeatures": [],
       "evidenceRefs": ["front", "side"],
@@ -1707,7 +1745,11 @@
       "actionProfile": {
         "animationRole": "exhaust-emitter",
         "sockets": [
-          { "id": "Socket_Exhaust", "localPosition": [0, 0.82, 0], "localRotation": [0, 0, 0] }
+          {
+            "id": "Socket_Exhaust",
+            "localPosition": [0, 0.82, 0],
+            "localRotation": [0, 0, 0]
+          }
         ]
       },
       "material": "dark-iron",
@@ -1741,7 +1783,9 @@
         "gapTolerance": 0.002,
         "evidenceRefs": ["hero", "side", "front"]
       },
-      "actionProfile": { "animationRole": "static-hardware" },
+      "actionProfile": {
+        "animationRole": "static-hardware"
+      },
       "material": "bronze",
       "localFeatures": [
         {
@@ -1782,10 +1826,11 @@
       },
       "textureResolution": 1024,
       "textureProjection": {
-        "mode": "uv",
-        "repeat": [2.0, 2.0],
+        "mode": "world-space-box-projected-uv",
+        "family": "metal",
+        "repeatsPerYard": 1.15,
         "anisotropy": 8,
-        "texelDensityIntent": "Preserve stable world/object-scale detail; do not stretch micro detail with component scale."
+        "texelDensityIntent": "Projected in world space per triangle from the dominant face-normal axis, so texel density is fixed in yards and never stretches with component scale. UVs are folded to whole repeats per projection group and normalized with KHR_texture_transform so the optimizer can quantize them."
       },
       "surfaceFrequencyBands": [
         {
@@ -1864,7 +1909,21 @@
         "Use normal/bump/displacement only when they map to observed surface relief.",
         "Use displacement geometry when the observed relief changes the close-up silhouette; texture-only relief is insufficient there."
       ],
-      "notes": "Project runtime uses geometry and vertex colors with independent scalar response. No reference crop or inferred map ships in the GLB."
+      "notes": "Runtime ships procedural PBR maps generated by scripts/assets/tank_mount/surface_maps.mjs (no reference crop or inferred map from the source illustration), plus the semantic vertex zones and the baked macro bands above. Every channel is authored from its own field.",
+      "shippedMaps": {
+        "albedoDetail": "tank_metal_albedo, 1024 px, grayscale webp, sRGB-encoded multiplier over baseColorFactor",
+        "normal": "tank_metal_normal, 512 px, tangent space, derived from an independent height field",
+        "occlusionRoughnessMetalness": "tank_metal_orm, 512 px, R occlusion, G roughness, B metalness; bound as BOTH occlusionTexture and metallicRoughnessTexture",
+        "factorConvention": "roughnessFactor and metallicFactor are the authored target divided by the ORM midtone (230/255), so factor times sampled channel equals the target"
+      },
+      "bakedVertexBands": [
+        "cavity occlusion against the neighbouring parts",
+        "contact darkening at the ground",
+        "ground-thrown grime with a warm dust cast",
+        "settled dust on high upward faces",
+        "thinned paint on the up-facing bevels, seam darkening on the rest",
+        "per-part mottle"
+      ]
     },
     {
       "id": "violet-steel",
@@ -1885,15 +1944,31 @@
       },
       "textureResolution": 1024,
       "textureProjection": {
-        "mode": "vertex-color-no-shipping-texture",
-        "repeat": [1, 1],
+        "mode": "world-space-box-projected-uv",
+        "family": "metal",
+        "repeatsPerYard": 1.3,
         "anisotropy": 4,
-        "texelDensityIntent": "geometry-scale facet variation"
+        "texelDensityIntent": "Projected in world space per triangle from the dominant face-normal axis, so texel density is fixed in yards and never stretches with component scale. UVs are folded to whole repeats per projection group and normalized with KHR_texture_transform so the optimizer can quantize them."
       },
       "surfaceFrequencyBands": [
-        { "id": "macro", "frequency": 1, "amplitude": 0.16, "role": "armor color blocking" },
-        { "id": "meso", "frequency": 10, "amplitude": 0.06, "role": "panel wear" },
-        { "id": "micro", "frequency": 48, "amplitude": 0.018, "role": "grazing breakup" }
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.16,
+          "role": "armor color blocking"
+        },
+        {
+          "id": "meso",
+          "frequency": 10,
+          "amplitude": 0.06,
+          "role": "panel wear"
+        },
+        {
+          "id": "micro",
+          "frequency": 48,
+          "amplitude": 0.018,
+          "role": "grazing breakup"
+        }
       ],
       "roughness": {
         "base": 0.58,
@@ -1901,7 +1976,10 @@
         "map": "independent-semantic-scalar-field",
         "localResponse": "worn bevels slightly smoother than recesses"
       },
-      "metalness": { "base": 0.38, "variation": 0.08 },
+      "metalness": {
+        "base": 0.38,
+        "variation": 0.08
+      },
       "normal": {
         "pattern": "geometry bevels and weighted normals",
         "strength": 0.1,
@@ -1913,8 +1991,16 @@
         "contactShadowBias": 0.32,
         "notes": "Only panel seams and overlaps darken."
       },
-      "wear": { "edgeWear": 0.08, "scratches": [], "chips": [] },
-      "dirt": { "amount": 0.04, "cavityBias": 0.8, "color": "#29232D" },
+      "wear": {
+        "edgeWear": 0.08,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.04,
+        "cavityBias": 0.8,
+        "color": "#29232D"
+      },
       "localOverrides": [
         {
           "id": "armor-zones",
@@ -1927,36 +2013,68 @@
       "shaderNotes": [
         "COLOR_0 is authoritative on all quality tiers.",
         "No source art, text, crest, or embedded texture ships."
-      ]
+      ],
+      "shippedMaps": {
+        "albedoDetail": "tank_metal_albedo, 1024 px, grayscale webp, sRGB-encoded multiplier over baseColorFactor",
+        "normal": "tank_metal_normal, 512 px, tangent space, derived from an independent height field",
+        "occlusionRoughnessMetalness": "tank_metal_orm, 512 px, R occlusion, G roughness, B metalness; bound as BOTH occlusionTexture and metallicRoughnessTexture",
+        "factorConvention": "roughnessFactor and metallicFactor are the authored target divided by the ORM midtone (230/255), so factor times sampled channel equals the target"
+      },
+      "bakedVertexBands": [
+        "cavity occlusion against the neighbouring parts",
+        "contact darkening at the ground",
+        "ground-thrown grime with a warm dust cast",
+        "settled dust on high upward faces",
+        "thinned paint on the up-facing bevels, seam darkening on the rest",
+        "per-part mottle"
+      ],
+      "notes": "Runtime ships procedural PBR maps generated by scripts/assets/tank_mount/surface_maps.mjs (no reference crop or inferred map from the source illustration), plus the semantic vertex zones and the baked macro bands above. Every channel is authored from its own field."
     },
     {
       "id": "dark-iron",
       "name": "Dark iron tracks and cannon",
       "type": "standard",
       "shaderModel": "MeshStandardMaterial with Lambert-compatible Low path",
-      "baseColor": "#29252F",
+      "baseColor": "#5B4F63",
       "albedo": {
-        "dominant": "#29252F",
-        "secondary": ["#453B4B", "#17161C"],
-        "samplingNotes": "Near-black purple iron preserves tread and muzzle readability."
+        "dominant": "#5B4F63",
+        "secondary": ["#3B3542", "#24222A"],
+        "samplingNotes": "Near-black purple iron preserves tread and muzzle readability.",
+        "revision": "Lifted from #453B4B (and #29252F, #17161C) at the same hue. The baked occlusion, contact and grime bands need headroom below the base; at the old values this family crushed to flat black and lost the detail the reference sheet reads by."
       },
       "colorVariation": {
-        "palette": ["#29252F", "#453B4B", "#17161C"],
+        "palette": ["#5B4F63", "#3B3542", "#24222A"],
         "pattern": "bounded tread-pad and cannon-ring variation",
         "amplitude": 0.12,
         "heightCorrelation": 0.02
       },
       "textureResolution": 1024,
       "textureProjection": {
-        "mode": "vertex-color-no-shipping-texture",
-        "repeat": [1, 1],
+        "mode": "world-space-box-projected-uv",
+        "family": "metal",
+        "repeatsPerYard": 1.75,
         "anisotropy": 4,
-        "texelDensityIntent": "per-pad and per-ring semantic variation"
+        "texelDensityIntent": "Projected in world space per triangle from the dominant face-normal axis, so texel density is fixed in yards and never stretches with component scale. UVs are folded to whole repeats per projection group and normalized with KHR_texture_transform so the optimizer can quantize them."
       },
       "surfaceFrequencyBands": [
-        { "id": "macro", "frequency": 1, "amplitude": 0.14, "role": "track and cannon grouping" },
-        { "id": "meso", "frequency": 12, "amplitude": 0.07, "role": "contact wear" },
-        { "id": "micro", "frequency": 52, "amplitude": 0.022, "role": "iron highlight breakup" }
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.14,
+          "role": "track and cannon grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 12,
+          "amplitude": 0.07,
+          "role": "contact wear"
+        },
+        {
+          "id": "micro",
+          "frequency": 52,
+          "amplitude": 0.022,
+          "role": "iron highlight breakup"
+        }
       ],
       "roughness": {
         "base": 0.66,
@@ -1964,7 +2082,10 @@
         "map": "independent-semantic-scalar-field",
         "localResponse": "tread contact faces smoother, bore and cavities rougher"
       },
-      "metalness": { "base": 0.68, "variation": 0.12 },
+      "metalness": {
+        "base": 0.68,
+        "variation": 0.12
+      },
       "normal": {
         "pattern": "real tread geometry and restrained facet normals",
         "strength": 0.12,
@@ -1976,8 +2097,16 @@
         "contactShadowBias": 0.38,
         "notes": "Wheel, tread, bore, and collar contacts only."
       },
-      "wear": { "edgeWear": 0.12, "scratches": [], "chips": [] },
-      "dirt": { "amount": 0.08, "cavityBias": 0.85, "color": "#1C191D" },
+      "wear": {
+        "edgeWear": 0.12,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.08,
+        "cavityBias": 0.85,
+        "color": "#1C191D"
+      },
       "localOverrides": [
         {
           "id": "tread-contact-wear",
@@ -1990,7 +2119,22 @@
       "shaderNotes": [
         "Tread segmentation remains geometry, never a painted stripe.",
         "The muzzle bore remains non-emissive and deeply recessed."
-      ]
+      ],
+      "shippedMaps": {
+        "albedoDetail": "tank_metal_albedo, 1024 px, grayscale webp, sRGB-encoded multiplier over baseColorFactor",
+        "normal": "tank_metal_normal, 512 px, tangent space, derived from an independent height field",
+        "occlusionRoughnessMetalness": "tank_metal_orm, 512 px, R occlusion, G roughness, B metalness; bound as BOTH occlusionTexture and metallicRoughnessTexture",
+        "factorConvention": "roughnessFactor and metallicFactor are the authored target divided by the ORM midtone (230/255), so factor times sampled channel equals the target"
+      },
+      "bakedVertexBands": [
+        "cavity occlusion against the neighbouring parts",
+        "contact darkening at the ground",
+        "ground-thrown grime with a warm dust cast",
+        "settled dust on high upward faces",
+        "thinned paint on the up-facing bevels, seam darkening on the rest",
+        "per-part mottle"
+      ],
+      "notes": "Runtime ships procedural PBR maps generated by scripts/assets/tank_mount/surface_maps.mjs (no reference crop or inferred map from the source illustration), plus the semantic vertex zones and the baked macro bands above. Every channel is authored from its own field."
     },
     {
       "id": "bronze",
@@ -2011,15 +2155,31 @@
       },
       "textureResolution": 1024,
       "textureProjection": {
-        "mode": "vertex-color-no-shipping-texture",
-        "repeat": [1, 1],
+        "mode": "world-space-box-projected-uv",
+        "family": "metal",
+        "repeatsPerYard": 2.6,
         "anisotropy": 4,
-        "texelDensityIntent": "small hardware facets"
+        "texelDensityIntent": "Projected in world space per triangle from the dominant face-normal axis, so texel density is fixed in yards and never stretches with component scale. UVs are folded to whole repeats per projection group and normalized with KHR_texture_transform so the optimizer can quantize them."
       },
       "surfaceFrequencyBands": [
-        { "id": "macro", "frequency": 1, "amplitude": 0.12, "role": "warm accent grouping" },
-        { "id": "meso", "frequency": 14, "amplitude": 0.05, "role": "handled wear" },
-        { "id": "micro", "frequency": 58, "amplitude": 0.016, "role": "metal highlight breakup" }
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.12,
+          "role": "warm accent grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 14,
+          "amplitude": 0.05,
+          "role": "handled wear"
+        },
+        {
+          "id": "micro",
+          "frequency": 58,
+          "amplitude": 0.016,
+          "role": "metal highlight breakup"
+        }
       ],
       "roughness": {
         "base": 0.44,
@@ -2027,7 +2187,10 @@
         "map": "independent-semantic-scalar-field",
         "localResponse": "handled hoop and hub crests smoother than rivet cavities"
       },
-      "metalness": { "base": 0.72, "variation": 0.12 },
+      "metalness": {
+        "base": 0.72,
+        "variation": 0.12
+      },
       "normal": {
         "pattern": "raised geometry and weighted facet normals",
         "strength": 0.06,
@@ -2039,8 +2202,16 @@
         "contactShadowBias": 0.34,
         "notes": "Hub, rivet, collar, and hoop contacts only."
       },
-      "wear": { "edgeWear": 0.14, "scratches": [], "chips": [] },
-      "dirt": { "amount": 0.03, "cavityBias": 0.8, "color": "#302017" },
+      "wear": {
+        "edgeWear": 0.14,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.03,
+        "cavityBias": 0.8,
+        "color": "#302017"
+      },
       "localOverrides": [
         {
           "id": "handled-facets",
@@ -2053,36 +2224,68 @@
       "shaderNotes": [
         "All small hardware is instanced then merged by material.",
         "Bronze remains readable on the Low material path."
-      ]
+      ],
+      "shippedMaps": {
+        "albedoDetail": "tank_metal_albedo, 1024 px, grayscale webp, sRGB-encoded multiplier over baseColorFactor",
+        "normal": "tank_metal_normal, 512 px, tangent space, derived from an independent height field",
+        "occlusionRoughnessMetalness": "tank_metal_orm, 512 px, R occlusion, G roughness, B metalness; bound as BOTH occlusionTexture and metallicRoughnessTexture",
+        "factorConvention": "roughnessFactor and metallicFactor are the authored target divided by the ORM midtone (230/255), so factor times sampled channel equals the target"
+      },
+      "bakedVertexBands": [
+        "cavity occlusion against the neighbouring parts",
+        "contact darkening at the ground",
+        "ground-thrown grime with a warm dust cast",
+        "settled dust on high upward faces",
+        "thinned paint on the up-facing bevels, seam darkening on the rest",
+        "per-part mottle"
+      ],
+      "notes": "Runtime ships procedural PBR maps generated by scripts/assets/tank_mount/surface_maps.mjs (no reference crop or inferred map from the source illustration), plus the semantic vertex zones and the baked macro bands above. Every channel is authored from its own field."
     },
     {
       "id": "leather",
       "name": "Deep brown saddle leather",
       "type": "standard",
       "shaderModel": "MeshStandardMaterial with Lambert-compatible Low path",
-      "baseColor": "#663C28",
+      "baseColor": "#9E6642",
       "albedo": {
-        "dominant": "#663C28",
-        "secondary": ["#3D261F", "#8A5638"],
-        "samplingNotes": "Warm deep saddle and cargo leather separated from bronze."
+        "dominant": "#9E6642",
+        "secondary": ["#7A4A31", "#4E3128"],
+        "samplingNotes": "Warm deep saddle and cargo leather separated from bronze.",
+        "revision": "Lifted from #8A5638 (and #663C28, #3D261F) at the same hue. The baked occlusion, contact and grime bands need headroom below the base; at the old values this family crushed to flat black and lost the detail the reference sheet reads by."
       },
       "colorVariation": {
-        "palette": ["#663C28", "#3D261F", "#8A5638"],
+        "palette": ["#9E6642", "#7A4A31", "#4E3128"],
         "pattern": "seat-panel and edge variation",
         "amplitude": 0.12,
         "heightCorrelation": 0.1
       },
-      "textureResolution": 1024,
+      "textureResolution": 512,
       "textureProjection": {
-        "mode": "vertex-color-no-shipping-texture",
-        "repeat": [1, 1],
+        "mode": "world-space-box-projected-uv",
+        "family": "fabric",
+        "repeatsPerYard": 5.2,
         "anisotropy": 4,
-        "texelDensityIntent": "panel-scale leather breakup"
+        "texelDensityIntent": "Projected in world space per triangle from the dominant face-normal axis, so texel density is fixed in yards and never stretches with component scale. UVs are folded to whole repeats per projection group and normalized with KHR_texture_transform so the optimizer can quantize them."
       },
       "surfaceFrequencyBands": [
-        { "id": "macro", "frequency": 1, "amplitude": 0.12, "role": "seat and cargo grouping" },
-        { "id": "meso", "frequency": 9, "amplitude": 0.06, "role": "panel compression" },
-        { "id": "micro", "frequency": 44, "amplitude": 0.018, "role": "soft grazing breakup" }
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.12,
+          "role": "seat and cargo grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.06,
+          "role": "panel compression"
+        },
+        {
+          "id": "micro",
+          "frequency": 44,
+          "amplitude": 0.018,
+          "role": "soft grazing breakup"
+        }
       ],
       "roughness": {
         "base": 0.76,
@@ -2090,7 +2293,10 @@
         "map": "independent-semantic-scalar-field",
         "localResponse": "seat center slightly smoother than stitched edges"
       },
-      "metalness": { "base": 0, "variation": 0 },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
       "normal": {
         "pattern": "geometry seams plus restrained independent grain",
         "strength": 0.1,
@@ -2102,8 +2308,16 @@
         "contactShadowBias": 0.3,
         "notes": "Seat pan, bolster, and strap contacts."
       },
-      "wear": { "edgeWear": 0.07, "scratches": [], "chips": [] },
-      "dirt": { "amount": 0.025, "cavityBias": 0.7, "color": "#2B201B" },
+      "wear": {
+        "edgeWear": 0.07,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.025,
+        "cavityBias": 0.7,
+        "color": "#2B201B"
+      },
       "localOverrides": [
         {
           "id": "seat-compression",
@@ -2116,41 +2330,68 @@
       "shaderNotes": [
         "No leather texture ships; curvature, seams, palette, and roughness carry the read.",
         "Seat remains non-metallic on every tier."
-      ]
+      ],
+      "shippedMaps": {
+        "albedoDetail": "tank_fabric_albedo, 512 px, grayscale webp, sRGB-encoded multiplier over baseColorFactor",
+        "normal": "tank_fabric_normal, 256 px, tangent space, derived from an independent height field",
+        "occlusionRoughnessMetalness": "tank_fabric_orm, 256 px, R occlusion, G roughness, B metalness; bound as BOTH occlusionTexture and metallicRoughnessTexture",
+        "factorConvention": "roughnessFactor and metallicFactor are the authored target divided by the ORM midtone (230/255), so factor times sampled channel equals the target"
+      },
+      "bakedVertexBands": [
+        "cavity occlusion against the neighbouring parts",
+        "contact darkening at the ground",
+        "ground-thrown grime with a warm dust cast",
+        "settled dust on high upward faces",
+        "thinned paint on the up-facing bevels, seam darkening on the rest",
+        "per-part mottle"
+      ],
+      "notes": "Runtime ships procedural PBR maps generated by scripts/assets/tank_mount/surface_maps.mjs (no reference crop or inferred map from the source illustration), plus the semantic vertex zones and the baked macro bands above. Every channel is authored from its own field."
     },
     {
       "id": "green-textile",
       "name": "Forest green saddle textile",
       "type": "standard",
       "shaderModel": "MeshStandardMaterial with Lambert-compatible Low path",
-      "baseColor": "#395940",
+      "baseColor": "#63866A",
       "albedo": {
-        "dominant": "#395940",
-        "secondary": ["#253D2D", "#55765A"],
-        "samplingNotes": "Muted original green panels beneath the saddle and on side utility areas."
+        "dominant": "#63866A",
+        "secondary": ["#44684C", "#2F4A37"],
+        "samplingNotes": "Muted original green panels beneath the saddle and on side utility areas.",
+        "revision": "Lifted from #55765A (and #395940, #253D2D) at the same hue. The baked occlusion, contact and grime bands need headroom below the base; at the old values this family crushed to flat black and lost the detail the reference sheet reads by."
       },
       "colorVariation": {
-        "palette": ["#395940", "#253D2D", "#55765A"],
+        "palette": ["#63866A", "#44684C", "#2F4A37"],
         "pattern": "panel-scale vertex color",
         "amplitude": 0.1,
         "heightCorrelation": 0.04
       },
-      "textureResolution": 1024,
+      "textureResolution": 512,
       "textureProjection": {
-        "mode": "vertex-color-no-shipping-texture",
-        "repeat": [1, 1],
+        "mode": "world-space-box-projected-uv",
+        "family": "fabric",
+        "repeatsPerYard": 7.5,
         "anisotropy": 4,
-        "texelDensityIntent": "stable textile panel scale"
+        "texelDensityIntent": "Projected in world space per triangle from the dominant face-normal axis, so texel density is fixed in yards and never stretches with component scale. UVs are folded to whole repeats per projection group and normalized with KHR_texture_transform so the optimizer can quantize them."
       },
       "surfaceFrequencyBands": [
-        { "id": "macro", "frequency": 1, "amplitude": 0.1, "role": "green panel identity" },
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.1,
+          "role": "green panel identity"
+        },
         {
           "id": "meso",
           "frequency": 10,
           "amplitude": 0.05,
           "role": "bounded fabric value variation"
         },
-        { "id": "micro", "frequency": 46, "amplitude": 0.016, "role": "matte grazing breakup" }
+        {
+          "id": "micro",
+          "frequency": 46,
+          "amplitude": 0.016,
+          "role": "matte grazing breakup"
+        }
       ],
       "roughness": {
         "base": 0.86,
@@ -2158,7 +2399,10 @@
         "map": "independent-semantic-scalar-field",
         "localResponse": "panel creases stay darker and fully matte"
       },
-      "metalness": { "base": 0, "variation": 0 },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
       "normal": {
         "pattern": "restrained independent weave response without shipped map",
         "strength": 0.08,
@@ -2170,8 +2414,16 @@
         "contactShadowBias": 0.28,
         "notes": "Only saddle-frame contacts and panel creases."
       },
-      "wear": { "edgeWear": 0.03, "scratches": [], "chips": [] },
-      "dirt": { "amount": 0.02, "cavityBias": 0.7, "color": "#202A22" },
+      "wear": {
+        "edgeWear": 0.03,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.02,
+        "cavityBias": 0.7,
+        "color": "#202A22"
+      },
       "localOverrides": [
         {
           "id": "saddle-side-panels",
@@ -2184,7 +2436,22 @@
       "shaderNotes": [
         "Textile identity relies on color, silhouette seams, and matte response.",
         "No source emblem or exact heraldic layout is reproduced."
-      ]
+      ],
+      "shippedMaps": {
+        "albedoDetail": "tank_fabric_albedo, 512 px, grayscale webp, sRGB-encoded multiplier over baseColorFactor",
+        "normal": "tank_fabric_normal, 256 px, tangent space, derived from an independent height field",
+        "occlusionRoughnessMetalness": "tank_fabric_orm, 256 px, R occlusion, G roughness, B metalness; bound as BOTH occlusionTexture and metallicRoughnessTexture",
+        "factorConvention": "roughnessFactor and metallicFactor are the authored target divided by the ORM midtone (230/255), so factor times sampled channel equals the target"
+      },
+      "bakedVertexBands": [
+        "cavity occlusion against the neighbouring parts",
+        "contact darkening at the ground",
+        "ground-thrown grime with a warm dust cast",
+        "settled dust on high upward faces",
+        "thinned paint on the up-facing bevels, seam darkening on the rest",
+        "per-part mottle"
+      ],
+      "notes": "Runtime ships procedural PBR maps generated by scripts/assets/tank_mount/surface_maps.mjs (no reference crop or inferred map from the source illustration), plus the semantic vertex zones and the baked macro bands above. Every channel is authored from its own field."
     }
   ],
   "repetitionSystems": [
@@ -2767,18 +3034,18 @@
     "maxDrawCalls": 24,
     "maxPrimitives": 24,
     "maxMaterials": 6,
-    "maxCompressedBytes": 327680,
-    "textureSize": 0,
-    "embeddedTextures": 0,
+    "maxCompressedBytes": 589824,
+    "textureSize": 1024,
+    "embeddedTextures": 6,
     "animationClips": 4,
     "actualTriangles": 12448,
     "actualPrimitives": 19,
     "actualMaterials": 6,
-    "actualCompressedBytes": 281728,
-    "actualTextures": 0,
+    "actualCompressedBytes": 585356,
+    "actualTextures": 6,
     "actualAnimations": 4,
     "fpsTarget": 60,
-    "optimizationPolicy": "Preserve silhouette, rider clearance, wheel and tread rhythm, cannon steps, and material separation. Instance repeated construction, merge static geometry by material, use baked node animation, and ship no textures."
+    "optimizationPolicy": "Preserve silhouette, rider clearance, wheel and tread rhythm, cannon steps, and material separation. Instance repeated construction, merge static geometry by material, use baked node animation, and ship one shared procedural map set per surface family (metal, fabric) rather than per-material textures."
   },
   "lightingFromPhoto": [
     "Key light: broad warm-white front-left key at 35 degrees elevation and intensity 2.2, separated from the illustrated source lighting.",

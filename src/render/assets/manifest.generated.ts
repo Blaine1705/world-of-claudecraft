@@ -734,7 +734,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/mounts/shadowjump_toad.glb": "/media/models/mounts/shadowjump_toad.98deaae3f36a.glb",
   "models/mounts/stalkglider_snail.glb": "/media/models/mounts/stalkglider_snail.eafb953dfdab.glb",
   "models/mounts/stormfeather_griffin.glb": "/media/models/mounts/stormfeather_griffin.ab6ab6fcd14e.glb",
-  "models/mounts/tank.glb": "/media/models/mounts/tank.0c4633fd9484.glb",
+  "models/mounts/tank.glb": "/media/models/mounts/tank.1cb5da1c9cb9.glb",
   "models/mounts/thunderstrut_gobbler.glb": "/media/models/mounts/thunderstrut_gobbler.14c562c1e2d9.glb",
   "models/mounts/valorsteed.glb": "/media/models/mounts/valorsteed.d63c2617a090.glb",
   "models/props/alchemy_cauldron.glb": "/media/models/props/alchemy_cauldron.61f9362616b7.glb",
