@@ -10,6 +10,15 @@
 // one text-free personal `toolEffectResult` event so no refusal is ever
 // silent on a player-reachable path. Every arm is draw-free: nothing in this
 // module can move the rng stream a harvest walks.
+//
+// Throttling is deliberately ASYMMETRIC: the recharge draws the shared
+// craft-action window (it consumes fungible materials, the same pacing every
+// enchanting action pays), while the slot draws none, because every
+// successful slot burns a whole crafted charm (the mint IS the price, and it
+// self-limits harder than any window would) and a denied slot mutates
+// nothing. Both are still under the wire command lane, and denial spam buys
+// nothing the HEAVY_SELF_CMDS members do not already offer (the dispatch
+// comment in server/game.ts records that acceptance).
 
 import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from '../content/professions';
 import { ITEMS } from '../data';
@@ -161,13 +170,11 @@ export function rechargeToolEffectAction(
     deny(resolved.reason, slot.effectId);
     return;
   }
-  // The shared action window, checked before any consumption and spent on
-  // success only (the crafting.ts order); a denied recharge never paces the
-  // player's next craft.
-  if (!withinActionThrottle(r.meta, ctx.time)) {
-    deny('throttled', slot.effectId);
-    return;
-  }
+  // Materials BEFORE the throttle, the family order (crafting.ts,
+  // enchanting.ts, salvage.ts all validate the action's own inputs first and
+  // check the shared window last, right before consumption): a player who is
+  // both throttled and short still gets the insufficient_materials deny,
+  // which is the one surface carrying the price.
   if (ctx.countItem(resolved.materialItemId, r.meta.entityId) < resolved.count) {
     ctx.emit({
       type: 'toolEffectResult',
@@ -180,6 +187,12 @@ export function rechargeToolEffectAction(
       count: resolved.count,
       pid: r.meta.entityId,
     });
+    return;
+  }
+  // The shared action window, checked before any consumption and spent on
+  // success only; a denied recharge never paces the player's next craft.
+  if (!withinActionThrottle(r.meta, ctx.time)) {
+    deny('throttled', slot.effectId);
     return;
   }
   ctx.removeItem(resolved.materialItemId, resolved.count, r.meta.entityId);
