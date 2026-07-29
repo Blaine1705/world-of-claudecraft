@@ -28,11 +28,11 @@
 // tests/architecture.test.ts.
 
 import { isDispellableAura } from '../aura_classify';
-import { ITEMS, isDelvePos, MOBS } from '../data';
+import { ITEMS, isDelvePos, MOBS, zoneAt } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
 import { instanceInfoAt } from '../instances/dungeons';
-import { fishReelWindowSecFor } from '../professions/fishing';
+import { effectiveFishingBand, fishReelWindowSecFor } from '../professions/fishing';
 import { bestOwnedGatherToolFor } from '../professions/tools';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
@@ -313,7 +313,13 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       // The miss ("it got away"), firing at deadline + 1: the reel re-press
       // stays valid while tickCount <= deadline (startFishing's reel arm).
       // Ends the cast with zero draws and no loss; recast immediately.
-      ctx.emit({ type: 'fishingGotAway', pid: p.id });
+      // zoneId/band resolve BEFORE the fields clear, both draw-free.
+      ctx.emit({
+        type: 'fishingGotAway',
+        pid: p.id,
+        zoneId: p.fishCastZoneId || zoneAt(p.pos.z).id,
+        band: effectiveFishingBand(meta),
+      });
       p.castingAbility = null;
       p.castRemaining = 0;
       p.fishBiteAtTick = 0;
@@ -380,7 +386,12 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     // ticks a fishing cast out simply gets away, same shape as the miss arm
     // above. The catch table is never rolled here anymore.
     if (castId === FISHING_CAST_ID) {
-      ctx.emit({ type: 'fishingGotAway', pid: p.id });
+      ctx.emit({
+        type: 'fishingGotAway',
+        pid: p.id,
+        zoneId: p.fishCastZoneId || zoneAt(p.pos.z).id,
+        band: effectiveFishingBand(meta),
+      });
       p.fishBiteAtTick = 0;
       p.fishReelDeadlineTick = 0;
       p.fishCastZoneId = '';

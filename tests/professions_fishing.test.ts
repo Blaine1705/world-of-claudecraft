@@ -424,7 +424,12 @@ describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
       updateCasting(sim.ctx, p, meta); // the miss fires at deadline + 1
       expect(draws).toBe(1); // no table roll ever happened
       expect(p.castingAbility).toBe(null);
-      expect(sim.events).toContainEqual({ type: 'fishingGotAway', pid: sim.playerId });
+      expect(sim.events).toContainEqual({
+        type: 'fishingGotAway',
+        pid: sim.playerId,
+        zoneId: 'eastbrook_vale',
+        band: 0,
+      });
       expect(sim.events).toContainEqual(
         expect.objectContaining({ type: 'castStop', success: false }),
       );
@@ -1068,6 +1073,8 @@ describe('fishingResult event (pin 7)', () => {
       pid: sim.playerId,
       itemId: PERCH,
       quality: 'common',
+      zoneId: 'eastbrook_vale',
+      band: 0,
     });
     // The loot grant still happens alongside the event.
     expect(sim.countItem(PERCH)).toBe(1);
@@ -1745,5 +1752,57 @@ describe('fishing breaks stealth and action-locked forms refuse it', () => {
     expect(p.auras.some((a) => a.kind === 'stealth')).toBe(false);
     expect(p.stealthed).toBe(false);
     expect(draws).toBe(1);
+  });
+});
+
+describe('fishing telemetry events (empty hook and the bags-full got-away)', () => {
+  it('an empty hook emits the structured fishingEmptyHook beside the log line', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    // Walk the deterministic band-0 table until the null row resolves.
+    let sawEmpty = false;
+    for (let i = 0; i < 60 && !sawEmpty; i++) {
+      const { caught, events } = castOnce(sim, meta);
+      const empties = events.filter((e) => (e as { type: string }).type === 'fishingEmptyHook');
+      if (caught === null && events.some((e) => (e as { type: string }).type === 'log')) {
+        sawEmpty = true;
+        expect(empties).toEqual([
+          { type: 'fishingEmptyHook', pid: sim.playerId, zoneId: 'eastbrook_vale', band: 0 },
+        ]);
+      } else {
+        // Non-empty outcomes never emit it.
+        expect(empties).toHaveLength(0);
+      }
+    }
+    expect(sawEmpty, 'the band-0 walk never resolved an empty hook').toBe(true);
+  });
+
+  it('a bags-full catch emits fishingGotAway (the draw was spent, the catch was lost)', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    const capacity = bagCapacity((sim as unknown as { players: Map<number, { bags: unknown[] }> }).players.get(sim.playerId)!.bags as never);
+    const m = sim.meta(sim.playerId)! as unknown as { inventory: unknown[] };
+    while (m.inventory.length < capacity) sim.addItem('bone_fragments', 20);
+    // Deterministic: walk until a non-null row resolves against full bags.
+    let sawGotAway = false;
+    for (let i = 0; i < 60 && !sawGotAway; i++) {
+      const { caught, events } = castOnce(sim, meta);
+      expect(caught).toBeNull(); // nothing can land in full bags
+      const aways = events.filter((e) => (e as { type: string }).type === 'fishingGotAway');
+      if (aways.length > 0) {
+        sawGotAway = true;
+        expect(aways).toEqual([
+          { type: 'fishingGotAway', pid: sim.playerId, zoneId: 'eastbrook_vale', band: 0 },
+        ]);
+        expect(
+          events.some(
+            (e) =>
+              (e as { type: string; text?: string }).type === 'error' &&
+              (e as { text?: string }).text === 'Your bags are full.',
+          ),
+        ).toBe(true);
+      }
+    }
+    expect(sawGotAway, 'no non-null row resolved against full bags').toBe(true);
   });
 });

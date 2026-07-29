@@ -86,7 +86,7 @@ describe('professions contracts (#1164)', () => {
   it('ClientWorld station placements follow an active-content swap', () => {
     const client = makeClientWorld();
     const builtin = BUILTIN_WORLD.services;
-    if (!builtin) throw new Error('builtin services missing');
+    if (!builtin?.stations?.length) throw new Error('builtin services missing');
     const custom = {
       id: 's_swap_test',
       type: builtin.stations[0].type,

@@ -167,6 +167,18 @@ export function fishingRodBandFor(rodTier: number): 0 | 1 | 2 {
 // to band 0 (see proficiencyBandFor).
 export const fishingBandFor = proficiencyBandFor;
 
+// The band a session actually fishes: min(proficiency band, best band the
+// owned rod tier covers). THE one definition (completeFishing's table pick
+// and every telemetry-bearing fishing event resolve it here), pure state,
+// draw-free: a bag scan plus two ladder reads.
+export function effectiveFishingBand(meta: PlayerMeta): 0 | 1 | 2 {
+  const rodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
+  return Math.min(
+    fishingBandFor(meta.gatheringProficiency.fishing ?? 0),
+    fishingRodBandFor(rodTier),
+  ) as 0 | 1 | 2;
+}
+
 // Per-catch proficiency gain schedule (Professions 2.0): fishing has
 // no per-node tier to score against, so its gain is proficiency-relative by
 // design. The effective fishing band is min(profBand, rodBand), so a
@@ -428,10 +440,8 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // PROFICIENCY. In other words the silent cap can only ever cost a player
   // who is over-rodded for where they stand, never one whose rod is illegal
   // for the water: that case was already refused, in words, before the cast.
-  const rodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
-  const allowedBand = fishingRodBandFor(rodTier);
-  const profBand = fishingBandFor(meta.gatheringProficiency.fishing ?? 0);
-  const bandTables = FISHING_TABLES_BY_BAND[Math.min(profBand, allowedBand) as 0 | 1 | 2];
+  const band = effectiveFishingBand(meta);
+  const bandTables = FISHING_TABLES_BY_BAND[band];
   // The zone the rod gate validated, pinned at cast start; the position
   // fallback keeps direct test/parity drives (no startFishing) working.
   const zoneId = p.fishCastZoneId || zoneAt(p.pos.z).id;
@@ -448,12 +458,17 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   }
   if (caught === null) {
     ctx.emit({ type: 'log', text: 'No fish are biting.', color: '#999', pid: p.id });
+    // Telemetry-only structured sibling of the log line above (the
+    // empty-hook rate cannot be derived from a text event). Draw-free.
+    ctx.emit({ type: 'fishingEmptyHook', pid: p.id, zoneId, band });
     return;
   }
   // Capacity gate AFTER the table roll so the rng draw order never depends
-  // on bag state; a catch with no room to land simply gets away.
+  // on bag state; a catch with no room to land simply gets away, and the
+  // got-away event carries that truth (the table draw was spent).
   if (!ctx.canAddItem(caught, 1, meta.entityId)) {
     ctx.error(meta.entityId, 'Your bags are full.');
+    ctx.emit({ type: 'fishingGotAway', pid: p.id, zoneId, band });
     return;
   }
   if (caught === FISHING_RARE_ID) {
@@ -484,6 +499,8 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
     pid: meta.entityId,
     itemId: caught,
     quality: ITEMS[caught]?.quality ?? 'common',
+    zoneId,
+    band,
   });
   // Book of Deeds: a real fish (never weeds or boots) from this zone's
   // waters feeds the per-zone first-cast mark.

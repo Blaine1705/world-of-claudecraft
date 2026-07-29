@@ -4118,11 +4118,16 @@ export type SimEvent = { pid?: number } & (
   // structured fields, so no sim/server i18n matcher rule is needed.
   // `quality` is the caught ItemDef's quality (poor for junk catches,
   // uncommon for the rare koi) so the line colors like an item name.
+  // zoneId and band carry the session's pinned water zone and the effective
+  // catch band (min of proficiency band and rod band) for the server-side
+  // fishing telemetry; both resolve draw-free from pure state.
   | {
       type: 'fishingResult';
       pid: number;
       itemId: string;
       quality: NonNullable<ItemDef['quality']>;
+      zoneId: string;
+      band: 0 | 1 | 2;
     }
   // Fishing bite (Professions 2.0): the hidden seeded bite fired
   // for this angler's running fishing session. Personal (pid = the angler)
@@ -4133,10 +4138,20 @@ export type SimEvent = { pid?: number } & (
   // wire never reveals the delay distribution.
   | { type: 'fishingBite'; pid: number }
   // Fishing miss (Professions 2.0): the reel window closed with no
-  // re-press ("it got away"), or a session defensively timed out. Personal
-  // and text-free like fishingBite: the client renders its own localized
-  // got-away line. Costs nothing but the ended cast; recast immediately.
-  | { type: 'fishingGotAway'; pid: number }
+  // re-press ("it got away"), a session defensively timed out, or a landed
+  // catch found no bag room (that branch spent its table draw and lost the
+  // catch, so it IS a got-away; its player feedback stays the bags-full
+  // error line). Personal and text-free like fishingBite: the client
+  // renders its own localized got-away line off the type alone. Costs
+  // nothing but the ended cast; recast immediately. zoneId/band mirror
+  // fishingResult, for the telemetry.
+  | { type: 'fishingGotAway'; pid: number; zoneId: string; band: 0 | 1 | 2 }
+  // Fishing empty hook (Professions 2.0): the single table draw resolved
+  // the itemId: null row (nothing was biting). Telemetry-only sibling of
+  // fishingResult: the player feedback stays the existing localized log
+  // line, and old clients ignore the unknown type. Emitted exactly where
+  // the null row resolves, draw-free.
+  | { type: 'fishingEmptyHook'; pid: number; zoneId: string; band: 0 | 1 | 2 }
   // Rare gather event (Professions 2.0): a harvest struck a pristine
   // vein / ancient heartwood / moonlit bloom. Soft zone broadcast: one copy is
   // emitted per player currently in the node's zone, `pid` being the RECIPIENT

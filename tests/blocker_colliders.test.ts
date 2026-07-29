@@ -106,7 +106,8 @@ describe('station furniture colliders follow the active bundle', () => {
       ).length;
 
   it('a bundle without services gets NO builtin station furniture', () => {
-    const anchor = BUILTIN_WORLD.services!.stations[0].pos;
+    const anchor = BUILTIN_WORLD.services?.stations?.[0]?.pos;
+    if (!anchor) throw new Error('builtin stations missing');
     setActiveWorldContent(world({}));
     const withStations = circlesNear(anchor.x, anchor.z, 8);
     expect(withStations).toBeGreaterThan(0);
@@ -117,7 +118,8 @@ describe('station furniture colliders follow the active bundle', () => {
   });
 
   it('a custom station collides at ITS anchor', () => {
-    const builtin = BUILTIN_WORLD.services!;
+    const builtin = BUILTIN_WORLD.services;
+    if (!builtin?.stations?.length) throw new Error('builtin stations missing');
     const custom = {
       id: 's_custom_test',
       type: builtin.stations[0].type,

@@ -260,7 +260,12 @@ describe('reel deadline boundary', () => {
     sim.tickCount = p.fishReelDeadlineTick + 1;
     sim.events = [];
     updateCasting(sim.ctx, p, meta); // the miss fires here, before any press
-    expect(sim.events).toContainEqual({ type: 'fishingGotAway', pid: sim.playerId });
+    expect(sim.events).toContainEqual({
+      type: 'fishingGotAway',
+      pid: sim.playerId,
+      zoneId: 'eastbrook_vale',
+      band: 0,
+    });
     expect(p.castingAbility).toBe(null);
     expect(p.fishReelDeadlineTick).toBe(0);
     // The very next press starts a fresh session, not a reel.
@@ -1055,7 +1060,12 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
       sim.rng.setObserver(null);
     }
     expect(draws).toBe(0);
-    expect(sim.events).toContainEqual({ type: 'fishingGotAway', pid: sim.playerId });
+    expect(sim.events).toContainEqual({
+      type: 'fishingGotAway',
+      pid: sim.playerId,
+      zoneId: 'eastbrook_vale',
+      band: 0,
+    });
     expect(sim.events).toContainEqual(
       expect.objectContaining({ type: 'castStop', success: false }),
     );
