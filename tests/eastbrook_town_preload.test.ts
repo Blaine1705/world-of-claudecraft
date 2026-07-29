@@ -49,7 +49,8 @@ describe('Eastbrook town preload', () => {
       expect(allUrls).toHaveLength(11);
       expect(mocks.loadGltf.mock.calls.map(([url]) => url)).toEqual(allUrls);
       expect(mocks.loadTexture).toHaveBeenCalledWith('/textures/eastbrook_surface_atlas.webp');
-      expect(mocks.registerPreload).toHaveBeenCalledTimes(allUrls.length + 1);
+      // GLBs + the color atlas + the baked normal/roughness atlases
+      expect(mocks.registerPreload).toHaveBeenCalledTimes(allUrls.length + 3);
       await Promise.all(mocks.registerPreload.mock.calls.map(([registered]) => registered));
 
       const data = await import('../src/sim/data');

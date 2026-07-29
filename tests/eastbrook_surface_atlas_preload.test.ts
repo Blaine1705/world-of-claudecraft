@@ -31,9 +31,10 @@ describe('Eastbrook surface atlas preload', () => {
     mocks.loadTexture.mockResolvedValue(atlas);
 
     const module = await import('../src/render/eastbrook_surface_atlas');
-    expect(mocks.loadTexture).toHaveBeenCalledTimes(1);
+    // color atlas + baked normal atlas + baked roughness atlas
+    expect(mocks.loadTexture).toHaveBeenCalledTimes(3);
     expect(mocks.loadTexture).toHaveBeenCalledWith(module.EASTBROOK_SURFACE_ATLAS_URL);
-    expect(mocks.registerPreload).toHaveBeenCalledTimes(1);
+    expect(mocks.registerPreload).toHaveBeenCalledTimes(3);
     await mocks.registerPreload.mock.calls[0][0];
     expect(module.eastbrookSurfaceAtlasTexture()).toBe(atlas);
     expect(atlas.colorSpace).toBe(THREE.NoColorSpace);
