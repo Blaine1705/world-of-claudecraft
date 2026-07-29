@@ -1570,6 +1570,22 @@ surfaces; all additive, and the old bundle ignores unknown event types.
 The R40 comments (the confirm-flow re-widening in world_api/professions.ts
 and the design record) stay untouched for phase 14, per the ruling.
 
+Mutation pass: 12 targeted mutations over the fix-round pins (the ratchet
+body and its settle call, the three no_gain conjuncts, the rename sweep,
+the keyed focus ladder, the rung inverse clamp, the ceiling price floor,
+the recharge high-water write, the reagent counts, the apply-half spend),
+all applied with the prove-application guard and all KILLED on the
+committed idle tree. The first full-gate run then caught three repairs
+the targeted suites could not see: the four CJK overlay fills wrapped to
+the biome line width, the toolEffectResult arm moved out of the
+trainResult source-pin span (several hud.ts pins slice the event switch
+between named cases; the hud_update_drive registry row and its
+resolved-guard golden respelled to the professions window's inline guard
+in the same change), and the wiki regen the reagent retune had skipped.
+Final gate: PASS, all 11 steps, on the committed idle tree at 8e8ebc868
+(the code tip). Phase 12 is BUILT; its QA runs in a new session, per the
+cadence.
+
 ---
 
 ## Phase 13: content, zone progression, and onboarding
