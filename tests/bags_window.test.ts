@@ -356,6 +356,8 @@ describe('bags_window: unknown-id stacks stay visible (stale-client guard, R34)'
     // pinned so the capability cannot silently vanish.
     expect(body).toContain("row.setAttribute('aria-disabled', 'true')");
     expect(body).not.toContain("addEventListener('click'");
+    expect(body).not.toContain('runBagAction');
+    expect(body).not.toContain('onclick');
     expect(body).toContain("row.addEventListener('dragstart'");
     expect(body).toContain("row.addEventListener('dragend'");
     expect(body).toContain('bindTouchItemDrag(row, {');
@@ -363,6 +365,20 @@ describe('bags_window: unknown-id stacks stay visible (stale-client guard, R34)'
     // Still a drop target in the pristine view, so re-parking other stacks
     // around the unknown one keeps working.
     expect(body).toContain('this.bindBagCellDrop(row, cell)');
+  });
+
+  it('styles the unknown cell without the click affordance (both CSS arms)', () => {
+    // The hover lift is suppressed outright; the cursor rule covers the
+    // non-draggable state only, because the later [draggable="true"] grab
+    // rule deliberately wins while the drag is available. Pinning both rules
+    // keeps that interplay from being "cleaned up" into a dead declaration.
+    expect(components).toContain('.bag-item[aria-disabled="true"]:hover');
+    expect(components).toMatch(
+      /\.bag-item\[aria-disabled="true"\]\s*\{\s*cursor:\s*var\(--cursor-arrow\);/,
+    );
+    expect(components).toMatch(
+      /\.bag-item\[draggable="true"\]\s*\{\s*cursor:\s*var\(--cursor-grab\);/,
+    );
   });
 
   it('never skips a slot in the grid fill (no continue of any wording)', () => {

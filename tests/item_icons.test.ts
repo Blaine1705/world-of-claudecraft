@@ -423,10 +423,11 @@ describe('unknown item ids resolve to the shared fallback recipe (stale-client p
   it('lands every unresolvable id on the fallback, prototype keys included, never a throw', () => {
     // Every stale-client fallback surface funnels unknown server ids into
     // iconDataUrl; this is the canvas-free pin that the recipe layer under it
-    // tolerates ANY string. ITEMS is a prototype-bearing Record, so keys like
-    // __proto__ resolve to truthy non-defs; the shape guard in itemFallback
-    // must send them to the fallback recipe rather than throwing on a missing
-    // name.
+    // tolerates ANY string. ITEMS and ITEM_RECIPES are prototype-bearing
+    // Records, so keys like __proto__ resolve truthy non-defs (and
+    // 'constructor' resolves a function whose .name IS a string): the
+    // OWN-PROPERTY gates in resolveRecipe's item arm and itemFallback are
+    // what send every one of them to the fallback recipe.
     const unknown = itemIconRecipe('no_such_item_id_v1');
     expect(isUnknownIconRecipe(unknown)).toBe(true);
     expect(isUnknownIconRecipe(itemIconRecipe('no_such_item_id_v2'))).toBe(true);

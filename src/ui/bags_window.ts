@@ -814,9 +814,11 @@ export class BagsWindow {
   // and it is a DRAG SOURCE, because moveInventoryItem acts on indices alone
   // (the same argument that keeps the bank's withdraw live), so the player
   // can still re-organize around and with the stack. Shift-click chat
-  // linking is deliberately withheld: the link renderer degrades an unknown
-  // id to a bare "[?]", the exact regression grantItemToken's raw-id
-  // fallback exists to avoid. Everything acts again once the client updates.
+  // linking is not wired because it would be a silent no-op anyway: the
+  // send path (insertItemLink) refuses an id with no resolvable display
+  // name. (The "[?]" a stale client can see in chat is the RECEIVER's
+  // degradation of a link a current client sent; nothing here affects it.)
+  // Everything acts again once the client updates.
   private buildUnknownStackCell(s: InvSlot, cell: number | null): HTMLElement {
     const row = document.createElement('button');
     row.type = 'button';

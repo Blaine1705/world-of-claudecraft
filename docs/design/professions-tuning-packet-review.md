@@ -657,8 +657,12 @@ What each item settled:
    raw id as the label and the painter swaps in the shared fallback icon
    (`src/ui/unknown_item_icon.ts`, extracted from the loot roll
    controller's three identical inline copies), never a throw; the repaint
-   signature now commits only AFTER a complete paint, so no future
-   mid-render throw can freeze a stale offer again. The fallback img src is
+   signature commits in a finally behind the render's try, which states the
+   KNOWN throw eliminated and the UNKNOWN one bounded: on such a throw the
+   panel keeps its last complete paint until the offer data next changes
+   (one log per attempt, the callers banded after the trade window keep
+   running), the deliberate trade against re-running a deterministic throw
+   every band tick. The fallback img src is
    safe against a hostile id by construction, with the mechanism stated
    exactly (the review corrected an overstatement here): the id-interpolating
    static-URL arm is Set-gated to bundle-known ids, the weapon-art arm is a
@@ -672,15 +676,17 @@ What each item settled:
 2. DONE where a client-side fallback exists: bag cells (both grid views;
    `applyBagFilter` keeps unknown-id slots visible in the everything view,
    ranks them below poor in the quality sort, name-sorts them by raw id;
-   the pristine cell stays a drop target and exposes no action, the
-   backpack-socket precedent) and bank cells (the same family via
-   `filterBankSlots`; withdraw stays live because it resolves server-side
-   by slot index). Grant lines were ALREADY guarded (`grantItemToken`
-   returns the raw id for an id absent from ITEMS, pinned with an
-   unknown-id arm in `tests/grant_line_view.test.ts`); verified, no
-   change. A new `itemUi.bags.unknownItem` tooltip sub-line ships with its
-   non-Latin fills (the completeness gate enforces those in-change; Latin
-   locales pend to the release fill as usual).
+   the pristine cell stays a drop target, exposes no CLICK action, and is
+   a DRAG SOURCE for the index-based move, the review round's capability
+   addition) and bank cells (the same family via `filterBankSlots`;
+   withdraw stays live because it resolves server-side by slot index).
+   Grant lines were ALREADY guarded (`grantItemToken` returns the raw id
+   for an id absent from ITEMS, pinned with an unknown-id arm in
+   `tests/grant_line_view.test.ts`); verified, no change. Two new keys
+   ship with their non-Latin fills (the completeness gate enforces those
+   in-change; Latin locales pend to the release fill as usual): the
+   `itemUi.bags.unknownItem` tooltip sub-line and the
+   `itemUi.bags.unknownItemAria` accessible name.
 
    ACCEPTED STALE-CLIENT COSMETICS (no graceful client-side fallback
    exists; every arm self-heals when the client updates, and the runbook
@@ -818,12 +824,19 @@ five-category wire sweep, every finding applied:
 - Capability and a11y: the unknown bag cell is now a DRAG SOURCE
   (moveInventoryItem acts on indices alone, the same argument that kept
   bank withdraw live), with the touch drop honoring only the bag-cell
-  move; shift-click chat linking stays withheld (the link renderer
-  degrades an unknown id to a bare "[?]"); a new
+  move; shift-click chat linking is not wired because the send path
+  already refuses an unresolvable display name, so it would be a silent
+  no-op (the "[?]" a stale client sees is the receiver's degradation of
+  a link a CURRENT client sent, which nothing here affects); a new
   `itemUi.bags.unknownItemAria` key carries the UNKNOWN signal on the
   aria channel for bags and bank (the tooltip is hover-only), filled in
   the five non-Latin overlays; and `.bag-item[aria-disabled='true']`
-  drops the click cursor and hover lift it was falsely wearing.
+  suppresses the hover lift outright while its themed-arrow cursor
+  covers only the NON-draggable state, since the later
+  `[draggable="true"]` grab rule deliberately wins whenever the drag
+  (the cell's one live action) is available; both rules and the
+  interplay are pinned. Like every bag cell, the drag has no keyboard
+  path (pre-existing, window-wide).
 - The trade render now sits in try/catch/finally: throw-free by
   construction, and an unknown future throw logs once per data change
   instead of aborting the update() calls banded after it.
@@ -855,6 +868,51 @@ five-category wire sweep, every finding applied:
   not name-searchable (search matches display names); and the catalog
   spread idiom means future English-only adds under `itemUi.bags`
   compile without locale edits, the same trade the market block made.
+- The full gate then caught two integration gaps in the fix round
+  itself, both closed: the new aria key's `{id}` placeholder was
+  missing from the localization coverage harness's shared value bag,
+  and the fallback icon THREW on any host without a working 2d canvas
+  (the procedural icon is canvas-composited), surfaced by the bags
+  money-row suite the moment its synthetic inventory ids started
+  rendering as unknown cells. The helper now swallows a canvas failure
+  and ships a transparent pixel, keeping its never-a-throw contract
+  true by construction, with the catch arm pinned by a throwing-mock
+  test and mutation-checked.
+- A second fresh lens then reviewed the fix round itself and its
+  findings were applied in turn: the record's trade-throw sentence
+  contradicted the shipped finally (rewritten above to state the real
+  semantics: last complete paint until the data changes, never a
+  silent every-tick retry); item 2's settled text still denied the drag
+  capability the same round added; the unknown cell's cursor rule was
+  DEAD for the draggable state (the pre-existing grab rule wins at
+  equal specificity by source order, which is the right affordance;
+  the rule now covers the non-draggable state via the themed arrow
+  token, with both rules and the interplay pinned); the runbook gained
+  the deployed-bundle bags/bank arm below; the loot popup's unknown
+  row gained the same minimal tooltip its bag and bank siblings render;
+  the shift-click rationale was corrected (send-path refusal, not the
+  receiver's "[?]"); and the pin set was tightened (a runBagAction/
+  onclick negative beside the click-listener pin, a comment-stripped
+  total-count pin on the loot-roll call sites, and honest guard
+  attribution in the prototype-key test).
+- The runbook omission that lens caught, now fixed in DEPLOY.md: the
+  fine grades are minted by HARVESTING with an outclassing tool, no
+  loot table involved, so on the deployed bundle a stale tab's own
+  freshly gathered fine materials land in INVISIBLE bag and bank cells
+  (the shipped `if (!item) continue` arms) until the page reloads. The
+  keep-out-of-loot-tables instruction bounds only the loot-popup
+  throw; the vanishing-ore reports come from this arm and are
+  cosmetic, self-healing on reload.
+- Recorded-only additions from that lens (pre-existing, same class as
+  the delve_buy entry): `abilityFallback` and the aura recipe arm share
+  the ungated prototype-key lookup the item arm was gated for
+  (`ABILITIES['__proto__']` is truthy and its missing name would throw)
+  and aura ids do ride server events; no realistic server mints such an
+  id, so the item-arm gate is the one shipped. Accepted with reasons:
+  the bags drag wiring is pinned by source text only (the loot window
+  carries this round's behavioral pin; a bags/bank jsdom harness would
+  be new infra), and no test drives the trade window's catch with a
+  real throw (that needs a Hud instance the suite deliberately avoids).
 
 1. Guard the trade-window unknown-item path at HEAD (the old client
    throws in `itemIcon` on any unknown id and the early-set signature

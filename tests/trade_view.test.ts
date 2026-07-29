@@ -111,10 +111,13 @@ describe('trade window painter wiring (source pins, hud.ts updateTradeWindow)', 
     expect(body).toContain('item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)');
   });
 
-  it('commits the repaint signature only AFTER the render', () => {
-    // The shipped failure shape set lastTradeSig before painting, so a throw
-    // mid-render froze the stale offer for the rest of the trade: every later
-    // frame compared equal and returned early.
+  it('commits the repaint signature in a finally behind the render try', () => {
+    // The shipped failure shape set lastTradeSig BEFORE the render outside
+    // any try, so each data change re-threw into the band and every other
+    // frame skipped the repaint. The structure pinned here bounds an unknown
+    // future throw instead: the panel shows its last complete paint until
+    // the offer data next changes, and the callers banded after the trade
+    // window keep running.
     const compare = body.indexOf('if (sig === this.lastTradeSig) return;');
     const render = body.indexOf('el.innerHTML');
     const commit = body.indexOf('this.lastTradeSig = sig;');

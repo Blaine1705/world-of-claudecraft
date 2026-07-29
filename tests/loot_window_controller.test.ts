@@ -2,9 +2,11 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// The unknown-id row renders the shared fallback icon, whose real
-// iconDataUrl needs a canvas; stub ONLY that export so the ghost-id test
-// below runs under jsdom without one.
+// The unknown-id row renders the shared fallback icon. The helper itself
+// now survives a canvas-less host (it ships a blank pixel), so this stub is
+// for determinism, not survival: the ghost test asserts a stable stub URL
+// instead of whichever arm the environment happens to take. File-wide, so
+// any future test here asserting a REAL icon URL must un-mock first.
 vi.mock('../src/ui/icons', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../src/ui/icons')>()),
   iconDataUrl: (kind: string, id: string) => `stub:${kind}:${id}`,
@@ -429,8 +431,13 @@ describe('LootWindowController', () => {
     expect(ghost?.querySelector('img.item-icon')).toBeTruthy();
     // The known sibling still renders through the injected itemIcon dep.
     expect(rows.some((row) => row.dataset.item === itemIds[0])).toBe(true);
-    // The tooltip attach skips the def-less row instead of dereferencing.
-    const attachedRows = h.attachTooltip.mock.calls.map((call) => call[0]);
-    expect(attachedRows).not.toContain(ghost);
+    // The def-less row gets the same minimal tooltip its bag and bank
+    // siblings render (raw id + unknown sub-line), never the def-derived
+    // body (the injected itemTooltip dep would throw on undefined).
+    const ghostAttach = h.attachTooltip.mock.calls.find((call) => call[0] === ghost);
+    expect(ghostAttach).toBeTruthy();
+    const tooltipHtml = (ghostAttach?.[1] as () => string)();
+    expect(tooltipHtml).toContain('ghost_future_item');
+    expect(tooltipHtml).not.toContain('tooltip:');
   });
 });

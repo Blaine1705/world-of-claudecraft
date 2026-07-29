@@ -186,8 +186,14 @@ export class LootWindowController {
     this.deps.element.querySelectorAll<HTMLElement>('[data-item]').forEach((row) => {
       const itemId = row.dataset.item ?? '';
       const item: ItemDef | undefined = ITEMS[itemId];
-      if (!item) return;
-      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item));
+      // An unknown id gets the same minimal tooltip its bag and bank
+      // siblings render (raw id plus the unknown sub-line), never the
+      // def-derived body.
+      this.deps.attachTooltip(row, () =>
+        item
+          ? this.deps.itemTooltip(item)
+          : `<div class="tt-title">${esc(itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`,
+      );
     });
   }
 

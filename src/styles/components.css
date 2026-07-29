@@ -5735,11 +5735,13 @@
     filter: brightness(1.25);
   }
   /* An unknown-id stack (stale-client fallback cell) exposes no click action,
-     so it must not wear the click affordance: default cursor, no hover lift
-     (the .bag-socket.backpack focusable no-op precedent). It stays a drag
-     source, and the native drag cursor covers that affordance on its own. */
+     so it must not wear the click affordance: no hover lift, and the themed
+     arrow cursor WHENEVER the cell is not draggable (trade or vendor open).
+     While it IS draggable, the later .bag-item[draggable="true"] rule wins at
+     equal specificity by source order, deliberately: the grab cursor is the
+     honest affordance for the cell's one live action. */
   .bag-item[aria-disabled="true"] {
-    cursor: default;
+    cursor: var(--cursor-arrow);
   }
   .bag-item[aria-disabled="true"]:hover {
     filter: none;

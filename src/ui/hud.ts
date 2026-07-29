@@ -14249,11 +14249,16 @@ export class Hud {
     // (buildTradeItemRow resolves unknown ids), so the catch is the blast
     // radius bound for an UNKNOWN future throw, which would otherwise abort
     // every update() call banded after this one (arena, fiesta, the Vale
-    // Cup surfaces). The finally commits the repaint signature only after
-    // the paint (the shipped failure set it BEFORE, so a mid-render throw
-    // froze the stale offer: every later frame compared equal and returned
-    // early); committing it even on the throw path means a failed render
-    // logs once per DATA change instead of retrying every band tick.
+    // Cup surfaces). The finally commits the repaint signature on BOTH
+    // paths, deliberately: on success that is commit-after-complete-paint;
+    // on a throw it means the panel shows its last complete paint until the
+    // OFFER DATA next changes (which re-derives the signature and retries),
+    // with one console.error per attempt. The alternative, committing on
+    // success only, would re-run a deterministic throw every band tick for
+    // pure log spam. What the shipped bug did that this does not: the
+    // signature committed BEFORE the render outside any try, so each data
+    // change re-threw straight into the band (aborting the callers after
+    // this one) and every other frame skipped the repaint entirely.
     try {
       const itemRow = (s: InvSlot, mine: boolean) => {
         // Stale-client guard (R34): the other side's offer is server truth and

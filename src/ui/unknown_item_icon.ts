@@ -36,7 +36,10 @@ export function unknownItemIconHtml(itemId: string, quality: string = 'common'):
   try {
     src = iconDataUrl('item', itemId);
   } catch {
-    // canvas-less host: keep the blank pixel
+    // Canvas-less host: keep the blank pixel. The swallow is unconditional,
+    // so a genuine icon-pipeline regression also degrades to blank art on
+    // these surfaces rather than surfacing; the never-a-throw contract is
+    // worth that trade here.
   }
   return `<img class="item-icon q-${esc(quality)}" src="${esc(src)}" alt="" draggable="false">`;
 }

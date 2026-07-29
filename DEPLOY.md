@@ -274,7 +274,13 @@ For off-box safety, sync the directory to S3 occasionally:
   reloads; the sibling loot-window throw stays unreachable as long as those
   new ids remain gathering, recipe, vendor, and delve-shop content only, out
   of every mob and chest loot table, so keep them out until clients have
-  rolled. Stale sessions are ended by the pre-deploy restart countdown, but a
+  rolled. Two more deployed-bundle arms need no loot table at all, because the
+  fine grades are minted by HARVESTING with an outclassing tool: a stale tab
+  that gathers one sees it land in an INVISIBLE bag cell (and bank cell after
+  a deposit) that still consumes capacity, and the profession chat line names
+  the raw id. Cosmetic and self-healing on reload, but they will read as
+  "my ore vanished" in reports, so expect them for as long as stale tabs
+  live. Stale sessions are ended by the pre-deploy restart countdown, but a
   reconnect rides the same stale page: only a page reload picks up the new
   bundle.
   Per-surface analysis for the professions tuning release: the stale-client

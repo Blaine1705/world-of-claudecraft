@@ -546,9 +546,13 @@ describe('stale-client fallback wiring (source pins)', () => {
       new URL('../src/ui/hud/loot/loot_roll_controller.ts', import.meta.url),
       'utf8',
     );
-    const eventArms = source.split('unknownItemIconHtml(event.itemId, quality)').length - 1;
-    const statusArms = source.split('unknownItemIconHtml(status.itemId, quality)').length - 1;
+    const code = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    const eventArms = code.split('unknownItemIconHtml(event.itemId, quality)').length - 1;
+    const statusArms = code.split('unknownItemIconHtml(status.itemId, quality)').length - 1;
     expect(eventArms).toBe(2);
     expect(statusArms).toBe(1);
+    // Total-count pin: a FOURTH call site added without the quality argument
+    // would leave the two shape counts green; the total closes that door.
+    expect(code.split('unknownItemIconHtml(').length - 1).toBe(3);
   });
 });

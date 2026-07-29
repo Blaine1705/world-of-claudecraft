@@ -4351,10 +4351,12 @@ function resolveRecipe(kind: IconKind, id: string): IconRecipe {
   if (kind === 'ability') {
     recipe = ABILITY_RECIPES[id] ?? abilityFallback(id);
   } else if (kind === 'item') {
-    // Own-property gate: item ids are the one kind fed raw server strings
-    // (the stale-client fallback surfaces), and a prototype key like
-    // '__proto__' would otherwise resolve Object.prototype as a truthy
-    // "recipe". The other kinds take bundle-content ids only.
+    // Own-property gate: a prototype key like '__proto__' would otherwise
+    // resolve Object.prototype as a truthy "recipe". Item ids are the kind
+    // the stale-client fallback surfaces funnel raw server strings into,
+    // hence the gate here first; the ability and aura arms also see
+    // server-sent ids and share the ungated-lookup shape (recorded, not
+    // fixed here: no realistic server mints a prototype-key ability id).
     recipe = (Object.hasOwn(ITEM_RECIPES, id) ? ITEM_RECIPES[id] : null) ?? itemFallback(id);
   } else if (kind === 'crest') {
     recipe = CREST_RECIPES[id] ?? null;
