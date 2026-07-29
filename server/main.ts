@@ -2538,7 +2538,8 @@ configureAccountRuntime({
     [...liveGame().clients.values()].some(
       (s) => s.characterId != null && characterIds.includes(s.characterId),
     ),
-  disconnectAccount: (id, reason) => liveGame().disconnectAccount(id, reason),
+  disconnectAccount: (id, reason, exceptToken) =>
+    liveGame().disconnectAccount(id, reason, exceptToken),
 });
 
 // Inject the one main.ts-local singleton the ported wallet handlers
