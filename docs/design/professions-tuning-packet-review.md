@@ -1104,7 +1104,12 @@ ledger); the HUD event switch has no union-coverage pin; /metrics
 zone-labeled series grew ~4.7x with no cardinality bound; the base
 bundle's idle Sim.tick measured 2.34ms on the merged tree against a
 reported ~0.3ms at the branch parent (unmemoized groundHeight vs its
-memoized steepness sibling), a phase 16 input; and fishingEmptyHook's
+memoized steepness sibling), a phase 16 input; the chronomancy DPS-gap
+floor reads 20.7 percent min-over-seeds against the owner's 22 percent
+target on the merged world (the test asserts the measured minimum and
+restates the target: the class owner's re-tune, not a fixture edit);
+the mastery window's low arm is knowingly blind to expansion supply
+until phase 13 re-derives the model; and fishingEmptyHook's
 telemetry-only asymmetry is by design, its online routing arm now
 pinned. Later-phase premises shifted by the merge: phase 13 inherits
 eleven concrete starter zones plus the scoped-down circuit floors,
