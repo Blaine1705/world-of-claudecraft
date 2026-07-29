@@ -451,8 +451,17 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     expect(items.junkSellableSlot(gray, { count: 1, instance: { boundTo: 7 } })).toBe(false);
     expect(items.junkSellableSlot(gray, { count: 1, instance: { signer: 'Ana' } })).toBe(true);
 
+    // The preview consumer moved behind the pure core at the merge
+    // settlement: hud.ts renderVendor reads sellJunkButtonState
+    // (hud/vendor/vendor_view.ts), and THAT is where the shared predicate
+    // is consumed, so the chain is pinned at both links.
     const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
-    expect(hud).toContain('junkSellableSlot(ITEMS[slot.itemId], slot)');
+    expect(hud).toContain('sellJunkButtonState(this.sim.inventory, ITEMS)');
+    const vendorView = readFileSync(
+      path.resolve(process.cwd(), 'src/ui/hud/vendor/vendor_view.ts'),
+      'utf8',
+    );
+    expect(vendorView).toContain('junkSellableSlot(items[slot.itemId], slot)');
   });
 
   it('buyBackItem repurchases via the silent add, spends copper, and clears the buyback slot', () => {
