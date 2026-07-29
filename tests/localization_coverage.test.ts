@@ -378,6 +378,7 @@ describe('i18n Localization Key Coverage', () => {
     fps: 60,
     guild: 'Night Watch',
     index: 2,
+    id: 'fine_example_ore',
     interactKey: 'F',
     moveKeys: 'W/A/S/D',
     questKey: 'L',

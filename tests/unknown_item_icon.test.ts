@@ -6,7 +6,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../src/ui/icons', () => ({
-  iconDataUrl: (kind: string, id: string) => `stub:${kind}:${id}`,
+  iconDataUrl: (kind: string, id: string) => {
+    if (id === 'canvasless_id') throw new Error('2D canvas context is unavailable');
+    return `stub:${kind}:${id}`;
+  },
 }));
 
 const { unknownItemIconHtml } = await import('../src/ui/unknown_item_icon');
@@ -33,6 +36,19 @@ describe('unknownItemIconHtml', () => {
     const html = unknownItemIconHtml('future_item_id', 'x" onerror="alert(1)');
     expect(html).not.toContain('" onerror');
     expect(html).toContain('&quot;');
+  });
+
+  it('keeps the never-a-throw contract on a canvas-less host (blank pixel src)', () => {
+    // The procedural fallback icon is canvas-composited, so a host with no
+    // working 2d context would throw INSIDE the fallback that exists to
+    // prevent throws; the helper swallows it and ships a transparent pixel
+    // (the quality frame and count badge still render).
+    let html = '';
+    expect(() => {
+      html = unknownItemIconHtml('canvasless_id');
+    }).not.toThrow();
+    expect(html).toContain('src="data:image/gif;base64,');
+    expect(html).toContain('class="item-icon q-common"');
   });
 
   it('asks the icon pipeline for the ITEM kind under the raw id', () => {

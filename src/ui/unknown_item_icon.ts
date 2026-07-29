@@ -20,8 +20,23 @@
 import { esc } from './esc';
 import { iconDataUrl } from './icons';
 
+// The src of last resort: a transparent pixel, for a host with no working 2d
+// canvas (the procedural fallback icon is canvas-composited). The quality
+// frame and count badge still render, so the cell stays visible; only the
+// icon art goes blank. Real browsers always have a canvas; this is what keeps
+// the "never a throw" contract true even where they do not (jsdom, a context
+// lost to memory pressure).
+const BLANK_PIXEL =
+  'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
 /** The `<img>` for an item id with no local ItemDef: the procedural fallback
  *  icon, quality-classed, never a throw. */
 export function unknownItemIconHtml(itemId: string, quality: string = 'common'): string {
-  return `<img class="item-icon q-${esc(quality)}" src="${esc(iconDataUrl('item', itemId))}" alt="" draggable="false">`;
+  let src = BLANK_PIXEL;
+  try {
+    src = iconDataUrl('item', itemId);
+  } catch {
+    // canvas-less host: keep the blank pixel
+  }
+  return `<img class="item-icon q-${esc(quality)}" src="${esc(src)}" alt="" draggable="false">`;
 }
