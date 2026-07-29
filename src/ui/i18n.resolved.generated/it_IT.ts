@@ -38,6 +38,14 @@ export const it_IT: EnTranslations = {
     "filterLabel": "Filtra comandi",
     "filterPlaceholder": "Cerca in questa categoria",
     "noMatches": "Nessun comando corrispondente.",
+    "itemSearchPlaceholder": "Cerca per nome o ID",
+    "itemResultsAria": "Oggetti corrispondenti",
+    "itemNoMatches": "Nessun oggetto corrispondente.",
+    "itemMore": "Mostrati {shown} di {total}. Continua a digitare per restringere la ricerca.",
+    "itemChosen": "Selezionato: {name}",
+    "itemUnknown": "Nessun oggetto ha quell'ID.",
+    "itemHeroicTag": "Eroico",
+    "kitCurrentSpec": "Specializzazione attuale",
     "serverRequirement": "I trucchi del server richiedono comunque ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Scegli valori validi prima di eseguire questo comando.",
     "sent": "Inviato: {command}",
@@ -55,7 +63,8 @@ export const it_IT: EnTranslations = {
       "z": "Z",
       "dungeon": "Dungeon",
       "difficulty": "Difficoltà",
-      "name": "Nome"
+      "name": "Nome",
+      "spec": "Specializzazione"
     },
     "difficulty": {
       "normal": "Normale",
@@ -113,6 +122,10 @@ export const it_IT: EnTranslations = {
       "give": {
         "label": "Dai oggetto",
         "description": "Aggiunge un oggetto all’inventario del giocatore."
+      },
+      "kit": {
+        "label": "Equipaggia kit livello 20",
+        "description": "Equipaggia il preset di livello 20 pre-Santuario per una specializzazione, prima le borse. Solo equipaggiamento."
       },
       "gold": {
         "label": "Aggiungi oro",
@@ -653,7 +666,7 @@ export const it_IT: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% di sconto",
+      "railWocDiscount": "{percent}% di sconto",
       "railWocUnavailable": "I prezzi WOC non sono disponibili al momento.",
       "railNativeUnavailable": "SOL/WOC non disponibile.",
       "amountLabel": "Quantità",
@@ -859,7 +872,13 @@ export const it_IT: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}m {s}s",
       "seconds": "{s}s",
-      "autoShowHint": "Le righe appaiono automaticamente non appena il tuo gruppo infligge danni o cura, e questo pannello si chiude qualche secondo dopo la fine del combattimento."
+      "autoShowHint": "Le righe appaiono automaticamente non appena il tuo gruppo infligge danni o cura, e questo pannello si chiude qualche secondo dopo la fine del combattimento.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee"
     },
     "petFeed": {
       "disabledFullHp": "Il famiglio e a salute piena",
@@ -1049,6 +1068,7 @@ export const it_IT: EnTranslations = {
       "walkByAutoloot": "Raccolta automatica al passaggio",
       "groundReticle": "Reticolo di puntamento a terra",
       "mouseoverCast": "Lancio al passaggio del mouse sui riquadri del gruppo",
+      "stickyTarget": "Mantieni il bersaglio al clic a terra",
       "showItemLevel": "Mostra livello oggetto",
       "itemLevelLine": "Livello oggetto {level}",
       "itemScoreLine": "Punteggio {score}",
@@ -1449,9 +1469,12 @@ export const it_IT: EnTranslations = {
       "title": "Raccolta",
       "harvestButton": "Raccogli",
       "harvestTooltip": "Raccoglie i componenti selezionati. Ogni carcassa puo essere raccolta una volta, chi prima arriva. Non prende il bottino.",
-      "concentrateHint": "Meno componenti scegli, più alta sarà la qualità di ciascuno.",
+      "yieldTierHint": "Meno componenti prende una raccolta, più alto sarà il livello di raccolta di ciascuno.",
+      "nothingSelectedYields": "Questo cadavere non ha nulla da raccogliere tra i componenti selezionati.",
       "alreadyHarvested": "Questo cadavere è già stato raccolto.",
       "componentAria": "Raccogli {component}",
+      "componentNoYield": "ancora nulla",
+      "componentAriaNoYield": "Raccogli {component}: {note}",
       "components": {
         "hide": "Pelle",
         "fang": "Zanna",
@@ -1529,6 +1552,8 @@ export const it_IT: EnTranslations = {
       "dragDestroyHint": "Trascina nel mondo per distruggere",
       "reorderNeedsRecent": "Rimuovi il filtro e ordina per Recenti per riorganizzare le borse",
       "itemAriaInstanced": "{item}, quantita {count}, copia con marchio del creatore",
+      "itemAriaEnchanted": "{item}, quantita {count}, copia incantata",
+      "itemAriaBound": "{item}, quantita {count}, copia vincolata",
       "itemAriaMasterwork": "{item}, quantita {count}, capolavoro",
       "filterGroupAria": "Filtra le borse per categoria",
       "filterAll": "Tutti",
@@ -1753,7 +1778,19 @@ export const it_IT: EnTranslations = {
       "label": "Ripristina le posizioni dei riquadri"
     },
     "itemTooltip": {
-      "requiresLevel": "Richiede livello {level}"
+      "requiresLevel": "Richiede livello {level}",
+      "statEnchanted": "+{value} {stat} (Incantato)",
+      "enchantedFallback": "Incantato"
+    },
+    "materialHint": {
+      "arcaneDust": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento comune e non comune.",
+      "arcaneEssence": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento raro.",
+      "arcaneShard": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento epico e leggendario.",
+      "resonantThread": "Reagente dell'incantamento. Si ottiene disincantando armatura di stoffa rara o superiore.",
+      "resonantHide": "Reagente dell'incantamento. Si ottiene disincantando armatura di cuoio rara o superiore.",
+      "resonantLinks": "Reagente dell'incantamento. Si ottiene disincantando armatura di maglia rara o superiore.",
+      "resonantSteel": "Reagente dell'incantamento. Si ottiene disincantando armi da mischia rare o superiori.",
+      "resonantTimber": "Reagente dell'incantamento. Si ottiene disincantando bastoni, bacchette, archi e balestre rari o superiori."
     },
     "discord": {
       "title": "Discord",
@@ -1994,6 +2031,10 @@ export const it_IT: EnTranslations = {
         "takeParcelsFirst": "Ritira i pacchi prima di scartare la lettera."
       }
     },
+    "marketIndicator": {
+      "aria": "Ricavi o oggetti del Mercato Mondiale in attesa",
+      "tip": "Ricavi di vendita o oggetti restituiti ti aspettano dal Mercante."
+    },
     "noticeboard": {
       "empty": "Non sembra esserci nulla di affisso."
     },
@@ -2113,7 +2154,19 @@ export const it_IT: EnTranslations = {
       "onlineHeader": "Online ({n})",
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Nascondi offline",
-      "hideOfflineTitle": "Nascondi i membri della gilda offline"
+      "hideOfflineTitle": "Nascondi i membri della gilda offline",
+      "billboard": {
+        "label": "Bacheca della Gilda",
+        "empty": "Non c'è ancora nulla sulla bacheca.",
+        "setBy": "Impostato da {name}",
+        "save": "Salva",
+        "placeholder": "Scrivi un messaggio per la gilda",
+        "inputLabel": "Messaggio della bacheca della gilda",
+        "result": {
+          "set": "La bacheca della gilda è stata aggiornata.",
+          "notOfficer": "Solo gli ufficiali e il capo gilda possono modificare la bacheca."
+        }
+      }
     },
     "gathering": {
       "title": "Raccolta",
@@ -2124,6 +2177,9 @@ export const it_IT: EnTranslations = {
       "notReady": "Questo nodo di risorse non e ancora rispawnato per te.",
       "gatherLine": "Raccogli: {name}.",
       "gatherLineQty": "Raccogli: {name} x {qty}.",
+      "harvestLine": "Scuoi: {name}.",
+      "harvestLineQty": "Scuoi: {name} x {qty}.",
+      "harvestSpecimenLine": "Recuperi anche {name}.",
       "catchLine": "Riporti in superficie: {name}",
       "biteLine": "Qualcosa abbocca alla lenza!",
       "gotAwayLine": "E' fuggito.",
@@ -2305,6 +2361,7 @@ export const it_IT: EnTranslations = {
       "empty": "Nessuna ricetta ancora conosciuta.",
       "resultAria": "Crea {name}",
       "craftedToast": "Realizzato: {name}",
+      "craftedToastQty": "Realizzato: {name} x{qty}",
       "insufficientMaterials": "Non hai i materiali per quello.",
       "unknownRecipe": "Quella ricetta non esiste.",
       "comboRequirementUnmet": "Non possiedi entrambe le professioni richieste al livello necessario per quella ricetta.",
@@ -2383,7 +2440,6 @@ export const it_IT: EnTranslations = {
       "makersMark": "Realizzato da {name}",
       "gatheredBy": "Raccolto da {name}",
       "masterworkSeal": "Capolavoro",
-      "enchantedLine": "Incantato",
       "commissionToggle": "Pezzo su commissione",
       "commissionToggleHint": "Si lega al primo personaggio che lo riceve in uno scambio.",
       "commissionUnbound": "Pezzo su commissione: si lega al primo destinatario",
@@ -2398,7 +2454,13 @@ export const it_IT: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Disincanti {item}.",
+      "disenchantedYield": "Disincanti {item} in {material}.",
+      "disenchantedYieldQty": "Disincanti {item} in {material} x{qty}.",
+      "disenchantedAlso": "Recuperi anche {material}.",
+      "disenchantedAlsoQty": "Recuperi anche {material} x{qty}.",
       "salvagedLine": "Smantelli {item}.",
+      "salvagedYield": "Smantelli {item} in {material}.",
+      "salvagedYieldQty": "Smantelli {item} in {material} x{qty}.",
       "enchantAppliedLine": "Incanti {item} con {enchant}.",
       "notHeld": "Non possiedi quell'oggetto.",
       "notDisenchantable": "Non puoi disincantare quello.",
@@ -2421,7 +2483,32 @@ export const it_IT: EnTranslations = {
       "pickerTitle": "Applica Incantesimo",
       "targetTitle": "Scegli un oggetto da incantare",
       "noEnchants": "Nessun incantesimo utilizza questo reagente.",
-      "noTargets": "Nessun oggetto idoneo da incantare."
+      "noTargets": "Nessun oggetto idoneo da incantare.",
+      "wornTag": "Indossato ({slot})",
+      "wornTagIndexed": "Indossato ({slot} {index})",
+      "tier": {
+        "base": "Incanti Base",
+        "runed": "Incanti Runici",
+        "greater": "Incanti Superiori"
+      },
+      "yieldHeader": "Materiali previsti:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "Da {min} a {max} {item}",
+      "alreadyEnchanted": "Quell'oggetto è già incantato.",
+      "sameEnchant": "Quell'oggetto ha già quell'incantesimo.",
+      "replaceTag": "Sostituisce {enchant}",
+      "sameEnchantTag": "Già applicato",
+      "plainTag": "Non incantato",
+      "replaceConfirmTitle": "Sostituisci l'incantesimo su {item}?",
+      "replaceConfirmBody": "Questo sostituisce {old} su {item} con {new}.",
+      "replaceConfirmNoRefund": "Il vecchio incantesimo viene distrutto. I suoi materiali non vengono rimborsati. L'azione non può essere annullata.",
+      "replaceConfirmKeeps": "Conserva: {kept}",
+      "replaceConfirmKeepsSigner": "Marchio del creatore",
+      "replaceConfirmKeepsMasterwork": "Bonus capolavoro",
+      "replaceConfirmKeepsBond": "Vincolo di commissione",
+      "replaceConfirmCost": "Costo: {cost}",
+      "replaceConfirmCostItem": "{name} x{count}",
+      "replaceConfirmAccept": "Sostituisci"
     },
     "training": {
       "title": "Formazione: {name}",
@@ -3664,7 +3751,7 @@ export const it_IT: EnTranslations = {
     "professions": {
       "intro": "Oltre al combattimento e alle missioni, il mondo ti ricompensa per il lavoro della terra e della forgia: raccogliere materie prime, trasformarle in equipaggiamento e beni attraverso dieci mestieri artigiani e assumere un'identità come uno dei dieci archetipi che quei mestieri rappresentano.",
       "harvestTitle": "Raccogliere dalla caccia stessa",
-      "harvestBody": "La raccolta non si ferma ai nodi. Molte bestie uccise possono essere raccolte una volta ciascuna, primo arrivato primo servito, per pelli, zanne, seta e carne, direttamente dalla carcassa insieme al bottino ordinario; una pressione apre entrambi. La scelta e tua ogni volta: prendi tutto quello che la carcassa offre, oppure concentrati su meno componenti e ottieni una qualita misurabilmente superiore di cio che scegli di prendere.\n\nUn tiro di raccolto raro o superiore su una famiglia che porta esemplari concede anche un esemplare puro firmato (una Pelle Pura, Seta Pura, Ghiandola di Veleno Pura o Taglio Pregiato) in aggiunta alla resa ordinaria, e registra Un Esemplare Perfetto nel tuo Libro delle Imprese. Qualunque personaggio puo raccogliere, senza alcun addestramento richiesto, e qualsiasi strumento di raccolta che possiedi conta verso il bonus avanzato, indipendentemente dal mestiere a cui appartiene.",
+      "harvestBodyChoice": "La raccolta non si ferma ai nodi. Molte bestie uccise possono essere raccolte una volta ciascuna, primo arrivato primo servito, per pelli, zanne, seta e carne, direttamente dalla carcassa insieme al bottino ordinario; una pressione apre entrambi. Quando una bestia porta piu di un componente lavorabile, la scelta e tua: prendi tutto quello che puo dare, oppure concentrati su meno componenti e ottieni una qualita misurabilmente superiore di cio che scegli di prendere.\n\nUn tiro di raccolto raro o superiore su una famiglia che porta esemplari concede anche un esemplare puro firmato (una Pelle Pura, Seta Pura, Ghiandola di Veleno Pura o Taglio Pregiato) in aggiunta alla resa ordinaria, e registra Un Esemplare Perfetto nel tuo Libro delle Imprese. Qualunque personaggio puo raccogliere, senza alcun addestramento richiesto, e qualsiasi strumento di raccolta che possiedi conta verso il bonus avanzato, indipendentemente dal mestiere a cui appartiene.",
       "focusTitle": "Focus Cittadino",
       "focusBody": "Ogni città principale tiene un pannello Focus Cittadino per i raccoglitori di passaggio: fermati in città, aprilo da accanto alla minimappa e indirizza un piccolo budget di punti focus verso i tipi di componente che ti interessano. Più focus dai a un componente, più fine e ricco esce da ogni cadavere successivo; la tua ripartizione segue il personaggio ovunque vada, e puoi rielaborarla, gratis, a ogni successiva visita in città.",
       "craftHowTitle": "La finestra di creazione",
@@ -3819,7 +3906,7 @@ export const it_IT: EnTranslations = {
           "levelingHeading": "Come avanza l'incantamento",
           "levelingBody": "Due azioni fanno avanzare la competenza: disincantare un pezzo e applicare un incantamento. Ogni successo vale fino a un punto, scalato in base alla seriosita del lavoro: la rarita del pezzo che scomponi, o il livello dei reagenti dell'incantamento che applichi. I disincanti comuni e gli incantamenti solo con polvere contano come lavoro comune; i disincanti non comuni e gli incantamenti con essenza come non comuni; i disincanti rari e ogni incantamento Runato o Superiore come rari; i disincanti epici e leggendari ancora di piu.\n\nLa familiare diminuzione della maestria si applica per fasce di 25 punti, quindi il lavoro di grado comune diventa grigio alla competenza 75, il lavoro non comune a 100, e il lavoro di grado raro esattamente al limite di 125. L'incantamento ha anche una gentilezza tutta sua: gli input superiori al soffitto del tuo archetipo vengono arrotondati verso il basso a quel soffitto invece di azzerarsi, quindi prima della sintonizzazione un disincanto epico conta semplicemente come raro invece di non insegnare nulla. Se l'Incantamento finisce dormiente dietro un'altra identita, tutto conta come lavoro comune e la scalata si blocca a 75; tienilo come passatempo e il lavoro di grado raro paga ancora, solo piu lentamente oltre il 75.",
           "marketHeading": "Copie incantate, provenienza e il mercato",
-          "marketBody": "Applicare un incantamento consuma una copia insacchettata e non equipaggiata dell'oggetto piu i reagenti, e restituisce una copia distinta incantata; equipaggiarla e il bonus segue il pezzo per sempre, attraverso rimozioni, viaggi in banca e scambi. Un incantamento per pezzo: una copia incantata non puo mai essere incantata di nuovo o disincantata, e vendere, scartare e disincantare preferiscono sempre prima le copie semplici, cosi il tuo pezzo finito non viene consumato per errore. Le copie incantate in modo identico si accumulano persino insieme nelle borse.\n\nL'equipaggiamento capolavoro e l'incantamento vanno d'accordo: un pezzo capolavoro rimane completamente incantabile, e l'incantamento si aggiunge in cima al bonus del capolavoro senza disturbarlo o la firma del produttore. Sommando ogni fonte, un capolavoro firmato con un incantamento Superiore e il meglio che un pezzo artigianale possa ottenere, e rimane comunque al di sotto del bottino delle incursioni per scelta di design.\n\nSul mercato, il Mercato Mondiale intermedia solo merce semplice e non modificata, quindi i pezzi incantati e firmati cambiano mano faccia a faccia attraverso la finestra di scambio. I materiali sono la meta commerciabile del mestiere: Polvere, Essenza e Frammenti si elencano liberamente, l'inserzione non costa nulla, e il Mercante prende il 5 percento solo di una vendita completata. Questo rende i due classici guadagni dell'incantatore: vendere materiali sul mercato, e prendere il pezzo di un cliente in scambio, incantarlo e restituirglielo."
+          "marketBody": "Applicare un incantamento consuma i reagenti e contrassegna una copia specifica dell'oggetto. Puntalo su una copia nelle borse e ricevi una copia incantata distinta; puntalo su un pezzo che indossi gia e viene incantato sul posto, senza toglierlo e rimetterlo. In ogni caso il bonus segue il pezzo per sempre, attraverso rimozioni, viaggi in banca e scambi. Un incantamento per pezzo: applicare un incantamento diverso a una copia incantata chiede prima conferma e poi sostituisce direttamente il vecchio incantamento, che viene distrutto senza rimborso dei materiali. Vendere, scartare e disincantare preferiscono sempre prima le copie semplici, cosi il tuo pezzo finito non viene consumato per errore. Le copie incantate in modo identico si accumulano persino insieme nelle borse.\n\nL'equipaggiamento capolavoro e l'incantamento vanno d'accordo: un pezzo capolavoro rimane completamente incantabile, e l'incantamento si aggiunge in cima al bonus del capolavoro senza disturbarlo o la firma del produttore. Sommando ogni fonte, un capolavoro firmato con un incantamento Superiore e il meglio che un pezzo artigianale possa ottenere, e rimane comunque al di sotto del bottino delle incursioni per scelta di design.\n\nSul mercato, il Mercato Mondiale intermedia solo merce semplice e non modificata, quindi i pezzi incantati e firmati cambiano mano faccia a faccia attraverso la finestra di scambio. I materiali sono la meta commerciabile del mestiere: Polvere, Essenza e Frammenti si elencano liberamente, l'inserzione non costa nulla, e il Mercante prende il 5 percento solo di una vendita completata. Questo rende i due classici guadagni dell'incantatore: vendere materiali sul mercato, e prendere il pezzo di un cliente in scambio, incantarlo e restituirglielo."
         }
       },
       "howHeading": "Come funziona la fabbricazione",
@@ -5438,6 +5525,7 @@ export const it_IT: EnTranslations = {
     },
     "augment": {
       "choose": "Scegli un potenziamento",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutalità",
         "desc": "I tuoi colpi fisici infliggono il 15% di danni in più."
@@ -6181,6 +6269,7 @@ export const it_IT: EnTranslations = {
       "arenaJoin": "Ti unisci alla coda del Colosseo Cinereo. Attendi un avversario degno...",
       "arenaLeave": "Esci dalla coda del Colosseo Cinereo.",
       "arenaSands": "Metti piede sulle sabbie del Colosseo Cinereo.",
+      "arenaSandsDrowned": "Metti piede sulle pietre allagate della Corte Annegata.",
       "tradeRequestSent": "Hai richiesto uno scambio con {name}.",
       "tradeOpened": "Finestra di scambio aperta.",
       "tradeComplete": "Scambio completato.",
@@ -6349,6 +6438,11 @@ export const it_IT: EnTranslations = {
       "playerLevelClassTitle": "{name} - Liv {level} {className}",
       "noChallengers": "Nessun contendente in classifica - sii il primo.",
       "matchInProgress": "Incontro in corso contro {name}.",
+      "mapName": "Mappa: {name}",
+      "map": {
+        "coliseum": "Colosseo Cinereo",
+        "drownedCourt": "La Corte Annegata"
+      },
       "leaveQueue": "Lascia coda",
       "searching": "Ricerca avversario... ({count} in coda)",
       "enterQueue": "Entra in coda",
@@ -6641,18 +6735,29 @@ export const it_IT: EnTranslations = {
       "pageNextAria": "Pagina successiva del mercato",
       "pageStatus": "Pagina {current} di {total}",
       "filters": "Filtri del mercato",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Tipo",
       "filterTypeAll": "Tutti i tipi",
       "filterTypeWeapon": "Armi",
       "filterTypeArmor": "Armatura",
+      "filterTypeBag": "Borse",
       "filterTypeConsumable": "Consumabili",
       "filterTypeMaterial": "Materiali",
       "filterTypeCosmetic": "Cosmetici",
       "filterTypeOther": "Altro",
       "filterArmorType": "Tipo armatura",
       "filterArmorAll": "Tutte le armature",
+      "filterArmorSlot": "Slot armatura",
+      "filterArmorClassAll": "Tutti i tipi di armatura",
+      "armorCloth": "Stoffa",
+      "armorLeather": "Cuoio",
+      "armorMail": "Maglia",
       "filterWeaponType": "Tipo arma",
       "filterWeaponAll": "Tutte le armi",
+      "filterBagSize": "Dimensione borsa",
+      "filterBagAll": "Tutte le borse",
+      "filterPrimaryStat": "Statistica principale",
+      "filterPrimaryStatAll": "Qualsiasi statistica principale",
       "filterRarity": "Rarità",
       "filterRarityAll": "Tutte le rarità",
       "weaponSword": "Spade",

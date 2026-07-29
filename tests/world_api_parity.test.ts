@@ -130,6 +130,7 @@ export const IWORLD_MEMBERS = [
   { name: 'submitLootRoll', kind: 'method' },
   { name: 'activeLootRolls', kind: 'method' }, // read-returning (2/6)
   { name: 'lootRollGroupStatus', kind: 'method' }, // read-returning
+  { name: 'activeMasterLootRolls', kind: 'method' }, // read-returning
   { name: 'pickUpObject', kind: 'method' },
   { name: 'townFocus', kind: 'data' },
   { name: 'setTownFocus', kind: 'method' },
@@ -186,6 +187,7 @@ export const IWORLD_MEMBERS = [
   { name: 'forfeitCardDuel', kind: 'method' },
   { name: 'cupInfo', kind: 'data' },
   { name: 'marketInfo', kind: 'data' },
+  { name: 'marketCollectPending', kind: 'data' },
   // --- party / raid commands + marker read ---
   { name: 'partyInvite', kind: 'method' },
   { name: 'partyAccept', kind: 'method' },
@@ -231,6 +233,7 @@ export const IWORLD_MEMBERS = [
   { name: 'guildDisband', kind: 'method' },
   { name: 'guildEventCreate', kind: 'method' },
   { name: 'guildEventRemove', kind: 'method' },
+  { name: 'guildSetMotd', kind: 'method' },
   { name: 'searchCharacters', kind: 'method' }, // async (1/2)
   { name: 'characterProfile', kind: 'method' }, // async
   // Operator-set account flair, by name. A pure LOCAL read (the flair rides the entity
@@ -465,9 +468,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, the mobile-station pair (placeMobileStation +
     // activeMobileStationCraft), and the commissions unbindItem command.
-    expect(IWORLD_MEMBERS.length).toBe(254);
-    expect(DATA_MEMBERS.length).toBe(68);
-    expect(METHOD_MEMBERS.length).toBe(186);
+    expect(IWORLD_MEMBERS.length).toBe(257);
+    expect(DATA_MEMBERS.length).toBe(69);
+    expect(METHOD_MEMBERS.length).toBe(188);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -487,6 +490,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeFrostRings',
       'activeLoadout',
       'activeLootRolls',
+      'activeMasterLootRolls',
       'activeMobileStationCraft',
       'activeTemporalHourglasses',
       'activeTitle',
@@ -593,6 +597,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildLeaderboard',
       'guildLeave',
       'guildPromote',
+      'guildSetMotd',
       'guildTransfer',
       'harvestCorpse',
       'harvestNode',
@@ -633,6 +638,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketBuy',
       'marketCancel',
       'marketCollect',
+      'marketCollectPending',
       'marketInfo',
       'marketList',
       'marketSearch',
@@ -782,6 +788,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'lockpickState',
       'mailInfo',
       'mailUnread',
+      'marketCollectPending',
       'marketInfo',
       'moveInput',
       'partyInfo',
@@ -816,6 +823,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'acceptQuest',
       'accountFlair',
       'activeLootRolls',
+      'activeMasterLootRolls',
       'applyEnchant',
       'applyTalents',
       'arenaAugmentPick',
@@ -895,6 +903,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildLeaderboard',
       'guildLeave',
       'guildPromote',
+      'guildSetMotd',
       'guildTransfer',
       'harvestCorpse',
       'harvestNode',
@@ -1112,6 +1121,7 @@ const FACET_LOOT = [
   'submitLootRoll',
   'activeLootRolls',
   'lootRollGroupStatus',
+  'activeMasterLootRolls',
 ] as const satisfies readonly (keyof IWorldLoot)[];
 type _ExhaustLoot = AssertNever<Exclude<keyof IWorldLoot, (typeof FACET_LOOT)[number]>>;
 
@@ -1291,6 +1301,7 @@ const FACET_SOCIAL_GRAPH = [
   'guildDisband',
   'guildEventCreate',
   'guildEventRemove',
+  'guildSetMotd',
   'searchCharacters',
   'characterProfile',
   'accountFlair',
@@ -1301,6 +1312,7 @@ type _ExhaustSocialGraph = AssertNever<
 
 const FACET_MARKET = [
   'marketInfo',
+  'marketCollectPending',
   'marketSearch',
   'marketList',
   'marketBuy',
@@ -1510,8 +1522,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 28 fa
 
   it('the union of the facets equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(254);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(254);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(257);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(257);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

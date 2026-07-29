@@ -1841,8 +1841,11 @@ describe('client HTML shell', () => {
     // reach it. The window now scrolls the whole sheet (tabs, controls, and the
     // listing body together) instead of clipping, and #market-body sizes to its
     // natural content height rather than flexing to fill a fixed remainder.
+    // height: auto releases the desktop height clamp on the mobile sheet's
+    // standalone arm too (the market docking pair's mobile fix), so the sheet
+    // owns its height on every arm rather than inheriting min(640px, ...).
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #market-window {\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow-y: auto;\n    overflow-x: hidden;',
+      'body.mobile-touch #market-window {\n    height: auto;\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow-y: auto;\n    overflow-x: hidden;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #market-body {\n    flex: none;\n    overflow-y: visible;\n    min-height: 0;',
@@ -1853,10 +1856,24 @@ describe('client HTML shell', () => {
     expect(marketWindowTs).toContain('data-market-page="next"');
     expect(marketWindowTs).toContain('itemUi.market.pageRange');
     expect(marketWindowTs).toContain('class="mkt-filters"');
+    // Search and every visible filter must participate in the same responsive grid.
+    // A nested wrapping flex row makes the search align against the full filter block,
+    // so it drops beside the last filter row as the window narrows.
+    expect(componentsCss).toContain(
+      '.mkt-controls {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));',
+    );
+    expect(componentsCss).toContain('.mkt-filters {\n    display: contents;');
+    expect(componentsCss).toContain('.mkt-search {\n    width: 100%;\n    max-width: none;');
+    expect(componentsCss).toContain(
+      '.mkt-filter {\n    display: flex;\n    flex-direction: column;\n    gap: 3px;\n    max-width: none;',
+    );
+    expect(marketWindowTs).toContain('`<div class="mkt-controls" role="group" aria-label="');
     // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
     expect(marketWindowTs).toContain('data-market-filter-menu="${menu}"');
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'itemType'/);
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'subtype'/);
+    expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'armorClass'/);
+    expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'primaryStat'/);
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'rarity'/);
     expect(marketWindowTs).not.toContain('<select data-market-filter=');
     // The load-bearing claim of the landscape refactor: `.mkt-controls` (search +
@@ -1867,7 +1884,7 @@ describe('client HTML shell', () => {
     // other test catching it. controlsHtml (built with `.mkt-controls` as its own
     // top-level div) is spliced into el.innerHTML as a sibling ahead of the
     // `#market-body` div, never inside it.
-    expect(marketWindowTs).toContain('`<div class="mkt-controls">`');
+    expect(marketWindowTs).toContain('`<div class="mkt-controls" role="group"');
     const markupIdx = marketWindowTs.indexOf('el.innerHTML =');
     const controlsHtmlIdx = marketWindowTs.indexOf('controlsHtml +', markupIdx);
     const bodyIdx = marketWindowTs.indexOf('<div id="market-body">', markupIdx);
@@ -1879,11 +1896,10 @@ describe('client HTML shell', () => {
     // multi-column landscape grid would otherwise go undetected.
     expect(componentsCss).toContain('.mkt-list {');
     expect(marketWindowTs).toContain("list.className = 'mkt-list';");
-    // Mobile stacks the controls row to one column (the flex-basis-neutralizing
-    // fix depends on this direction flip actually happening) and forces the
-    // listing grid back to a single column instead of relying on auto-fill alone.
+    // Mobile reduces the shared controls grid to one column and forces the listing
+    // grid back to a single column instead of relying on auto-fill alone.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch .mkt-controls {\n    flex-direction: column;\n    align-items: stretch;',
+      'body.mobile-touch .mkt-controls {\n    grid-template-columns: 1fr;\n    align-items: stretch;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch .mkt-list {\n    grid-template-columns: 1fr;',
@@ -2033,7 +2049,7 @@ describe('client HTML shell', () => {
     expect(mainTs).not.toContain('online === null');
     expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');
     expect(mainTs).toContain(
-      'isClickMoveButton &&\n        shouldApproachPickedEntity(world.player, e, didInteractImmediately)',
+      'isClickMoveButton &&\n        shouldApproachPickedEntity(\n          world.player,\n          e,\n          didInteractImmediately,\n          true,\n          localPartyMemberIds(world.partyInfo),\n        )',
     );
     expect(mainTs).toContain(
       'stopAutorunForInteraction(interactionOutcome, input, mobileControls);',

@@ -31,6 +31,7 @@ import { isDispellableAura } from '../aura_classify';
 import { ITEMS, isDelvePos, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
+import { instanceInfoAt } from '../instances/dungeons';
 import { FISH_REEL_WINDOW_ROD_BONUS_SEC, FISH_REEL_WINDOW_SEC } from '../professions/fishing';
 import { bestOwnedGatherToolTier } from '../professions/tools';
 import { scheduleProjectile } from '../projectile_travel';
@@ -202,6 +203,34 @@ function hasAbilityCharge(
   return !!state && state.charges > 0;
 }
 
+type ActiveCastRestriction = 'combat' | 'instance';
+
+function activeCastRestriction(
+  ctx: SimContext,
+  player: Entity,
+  ability: AbilityDef,
+): ActiveCastRestriction | null {
+  if (ability.requiresOutOfCombat && player.inCombat) {
+    return 'combat';
+  }
+  if (ability.requiresOutsideInstance && instanceInfoAt(ctx, player.pos)) {
+    return 'instance';
+  }
+  return null;
+}
+
+function emitActiveCastRestrictionError(
+  ctx: SimContext,
+  playerId: number,
+  restriction: ActiveCastRestriction,
+): void {
+  if (restriction === 'combat') {
+    ctx.error(playerId, "You can't do that while in combat.");
+  } else {
+    ctx.error(playerId, 'Leave the dungeon first.');
+  }
+}
+
 export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (!p.castingAbility) {
     // a queued press held back by a still-running GCD (see fireQueuedCast) retries
@@ -215,6 +244,14 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     return;
   }
   const activeCast = ctx.resolvedAbility(p.castingAbility, p.id);
+  if (activeCast) {
+    const restriction = activeCastRestriction(ctx, p, activeCast.def);
+    if (restriction) {
+      cancelCast(ctx, p);
+      emitActiveCastRestrictionError(ctx, p.id, restriction);
+      return;
+    }
+  }
   if (activeCast && isMassResurrectionAbility(activeCast.def)) {
     if (p.inCombat) {
       cancelCast(ctx, p);
@@ -516,6 +553,27 @@ function resolveDeadAllyTarget(
   return party && party.members.includes(t.id) ? t : null;
 }
 
+function vanishedLowBlowFallbackTarget(
+  ctx: SimContext,
+  p: Entity,
+  ability: AbilityDef,
+): Entity | null {
+  if (ability.id !== 'kidney_shot') return null;
+  if (p.targetId !== null) return null;
+  if (!p.auras.some((a) => a.kind === 'stealth')) return null;
+
+  let nearest: Entity | null = null;
+  let nearestDist = Infinity;
+  for (const entity of ctx.entities.values()) {
+    if (entity.id === p.id || entity.dead || !ctx.isHostileTo(p, entity)) continue;
+    const d = dist2d(p.pos, entity.pos);
+    if (d > MELEE_RANGE || d >= nearestDist) continue;
+    nearest = entity;
+    nearestDist = d;
+  }
+  return nearest;
+}
+
 export function castAbility(
   ctx: SimContext,
   abilityId: string,
@@ -602,6 +660,7 @@ export function castAbility(
   const sharedCooldown = isShamanShock(ability.id)
     ? SHAMAN_SHOCK_COOLDOWN_IDS.find((id) => p.cooldowns.has(id))
     : undefined;
+  const leavingRestrictedToggle = togglingOff && ability.requiresOutsideInstance;
   // Charge-limited abilities (the abilityCharges recharge model, driven by
   // bonusCharges: Double Charge, extra Blink/Frost Nova/Ice Block): a running
   // cooldown is only the RECHARGE timer; the cast is blocked only once every
@@ -682,8 +741,9 @@ export function castAbility(
     ctx.error(p.id, 'You must be stealthed.');
     return;
   }
-  if (ability.requiresOutOfCombat && p.inCombat) {
-    ctx.error(p.id, "You can't do that while in combat.");
+  const restriction = leavingRestrictedToggle ? null : activeCastRestriction(ctx, p, ability);
+  if (restriction) {
+    emitActiveCastRestrictionError(ctx, p.id, restriction);
     return;
   }
   if (isMassResurrectionAbility(ability) && !hasDeadGroupMember(ctx, p)) {
@@ -745,7 +805,10 @@ export function castAbility(
       return;
     }
   } else if (ability.requiresTarget) {
-    target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
+    target =
+      p.targetId !== null
+        ? (ctx.entities.get(p.targetId) ?? null)
+        : vanishedLowBlowFallbackTarget(ctx, p, ability);
     if (!target || target.dead || !ctx.isHostileTo(p, target)) {
       ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
       return;
@@ -1124,6 +1187,7 @@ const MAGE_DEFENSIVE_COOLDOWNS = [
   'blink',
   'ice_barrier',
   'blazing_barrier',
+  'temporal_barrier',
   'greater_invisibility',
 ] as const;
 const OVERFLOW_CAP_SECONDS = 10;

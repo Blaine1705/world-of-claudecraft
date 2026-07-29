@@ -286,6 +286,7 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     mines: sets.flatMap((s) => s.mines),
     docks: sets.flatMap((s) => s.docks),
     tents: sets.flatMap((s) => s.tents),
+    marshReeds: sets.flatMap((s) => s.marshReeds),
     crates: sets.flatMap((s) => s.crates),
     campfires: sets.flatMap((s) => s.campfires),
     mudHuts: sets.flatMap((s) => s.mudHuts),
@@ -433,8 +434,14 @@ export const DUNGEONS: Record<string, DungeonDef> = { ...DUNGEON_DEFS, ...TEMPLE
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);
 
+// Indexed lookup: dungeonAt runs inside groundHeight's dungeon branch (per
+// entity per tick in a populated instance), so the per-call find() scan and
+// its closure are not welcome there.
+const DUNGEON_BY_INDEX: (DungeonDef | undefined)[] = [];
+for (const d of DUNGEON_LIST) DUNGEON_BY_INDEX[d.index] = d;
+
 export function dungeonByIndex(index: number): DungeonDef | null {
-  return DUNGEON_LIST.find((d) => d.index === index) ?? null;
+  return DUNGEON_BY_INDEX[index] ?? null;
 }
 
 // Which dungeon a far-off instance position belongs to, by x-band.
@@ -459,7 +466,7 @@ export const ARENA_X = 4200; // arena instances share this x; slots stack along 
 export const ARENA_X_MIN = ARENA_X - (DUNGEON_WALL_X + DUNGEON_WALL_HW + 1);
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
 const ARENA_Z0 = -1250;
-const ARENA_SLOT_SPACING = 120; // > the pit footprint (~44yd) so slots never overlap
+const ARENA_SLOT_SPACING = 120; // > the pit footprint (~52yd) so slots never overlap
 
 export function arenaOrigin(slot: number): { x: number; z: number } {
   return { x: ARENA_X, z: ARENA_Z0 + slot * ARENA_SLOT_SPACING };
