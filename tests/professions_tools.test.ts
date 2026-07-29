@@ -1071,21 +1071,27 @@ describe('effect recharge with original-crafter discount (#1137, priced by R39, 
     expect(resolved.count).toBe(1); // ceil(5/10), floored at 1
   });
 
-  it('R30: the maximum re-derives from the CURRENT best tool, so an inflated mint is one fill at most', () => {
+  it('R30: the FILL re-derives from the CURRENT best tool, so an inflated mint is one fill at most', () => {
     // Minted on a borrowed epic pick: 50 charges. The owner now holds only a
-    // common pick, so the re-derived max is 20: while charges sit above it,
-    // the recharge refuses outright (already_full), and once they spend to 12
-    // a recharge restores to 20, never back to 50.
+    // common pick, so the re-derived fill target is 20: while charges sit
+    // above it the recharge refuses as tool_capped (the slot is not full, it
+    // is beyond what this tool can fill), and once they spend to 12 a
+    // recharge restores to 20, never back to 50. R47 keeps the CEILING at 50
+    // so the price rung cannot fall with the carried tool.
     const slot = slotEffect('gatherers_cache', { toolRarity: 'epic' });
     expect(slot.maxDurability).toBe(50);
     slot.durability = 30;
     const inventory = holding('copper_mining_pick');
     const refused = resolveRechargeToolEffect(inventory, 'mining', slot, 'Anyone', {}, ITEMS);
-    expect(refused).toEqual({ ok: false, reason: 'already_full' });
+    expect(refused).toEqual({ ok: false, reason: 'tool_capped' });
     slot.durability = 12;
     const resolved = resolveRechargeToolEffect(inventory, 'mining', slot, 'Anyone', {}, ITEMS);
     if (!resolved.ok) throw new Error('should price');
     expect(resolved.newMax).toBe(20);
+    expect(resolved.ceiling).toBe(50);
+    expect(resolved.materialItemId, 'billed at the ceiling rung, not the pick in hand').toBe(
+      'arcane_shard',
+    );
     expect(resolved.restored).toBe(8);
   });
 

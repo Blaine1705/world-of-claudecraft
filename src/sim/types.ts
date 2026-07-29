@@ -4448,8 +4448,10 @@ export type SimEvent = { pid?: number } & (
         | 'invalid_request'
         | 'no_tool'
         | 'no_charm'
+        | 'no_gain'
         | 'no_slot'
         | 'already_full'
+        | 'tool_capped'
         | 'insufficient_materials'
         | 'throttled';
     }

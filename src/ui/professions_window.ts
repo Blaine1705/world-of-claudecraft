@@ -13,6 +13,7 @@ import type { IWorld } from '../world_api';
 import { archetypeTitleText, craftNameText } from './char_window';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
+import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { GATHERING_PROFESSION_NAME_KEYS } from './gathering_profession_name';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { professionIconUrl } from './icons';
@@ -130,17 +131,25 @@ export class ProfessionsWindow {
    *  dimension stays unit-pinned. */
   refreshIfChanged(): void {
     if (!this.opened) return;
-    const sig = professionsRefreshSig(this.buildInput());
-    if (sig === this.lastSig) return;
-    this.lastSig = sig;
+    if (professionsRefreshSig(this.buildInput()) === this.lastSig) return;
+    // render() re-latches the signature itself, so a forced repaint from
+    // anywhere (the toolEffectResult arm) cannot leave a stale one behind for
+    // this band to act on a second time.
     this.render();
   }
 
   render(): void {
     const el = this.deps.root();
     if (!this.opened) return;
-    const active = document.activeElement as HTMLElement | null;
-    const hadFocus = el.contains(active);
+    // The focused control's own identity, carried across the rebuild through
+    // the shared seam (focus_restore.ts) rather than a hand-rolled
+    // activeElement read. This window is FocusManager-registered, so the
+    // keyboard path is real, and it now has action buttons beside Close: a
+    // repaint that parked focus on Close would make the next Enter close the
+    // window instead of repeating the action (the #2377 double-fire family).
+    // Close stays the FALLBACK only, for a control the rebuild removed.
+    const focusKey = captureFocusKey(el);
+    const hadFocus = focusedWithin(el) !== null;
     this.deps.hideTooltip();
     markDialogRoot(el, { label: t('hudChrome.professions.title') });
     const prevScrollTop = el.querySelector('.prof-scroll')?.scrollTop ?? 0;
@@ -155,9 +164,25 @@ export class ProfessionsWindow {
     this.wire(el);
     const scroll = el.querySelector('.prof-scroll');
     if (scroll) scroll.scrollTop = prevScrollTop;
-    // The close button is the only interactive control, so it is also the
-    // whole stable-identity refocus story (the deeds fallback arm).
-    if (hadFocus) (el.querySelector('[data-close]') as HTMLElement | null)?.focus();
+    if (hadFocus) {
+      // Matched by SCANNING the keyed controls rather than building an
+      // attribute selector out of the key: the key embeds wire-supplied ids,
+      // and a selector string is the one place those could throw
+      // (querySelector SyntaxError) or escape their quotes. A comparison
+      // cannot do either.
+      const keyed =
+        focusKey === null
+          ? null
+          : ([...el.querySelectorAll<HTMLElement>('[data-focus-key]')].find(
+              (node) => node.dataset.focusKey === focusKey,
+            ) ?? null);
+      restoreFirstEnabled([keyed, el.querySelector<HTMLElement>('[data-close]')]);
+    }
+    // Re-latch the signature to what was just painted: a forced render (the
+    // toolEffectResult arm) that left it stale would buy a second identical
+    // rebuild on the next refreshIfChanged tick, which is exactly the
+    // relocalize contract's warning.
+    this.lastSig = professionsRefreshSig(this.buildInput());
   }
 
   private buildInput(): ProfessionsViewInput {
@@ -466,7 +491,7 @@ export class ProfessionsWindow {
               max: this.fmt(effect.maxCharges),
             });
         const recharge = effect.rechargeable
-          ? `<button type="button" class="btn prof-effect-btn" data-recharge-profession="${esc(row.professionId)}">${esc(
+          ? `<button type="button" class="btn prof-effect-btn" data-recharge-profession="${esc(row.professionId)}" data-focus-key="recharge:${esc(row.professionId)}">${esc(
               t('hudChrome.professions.toolEffectRechargeButton'),
             )}</button>`
           : '';
@@ -480,7 +505,7 @@ export class ProfessionsWindow {
       .map((effectId) => {
         const nameKey = TOOL_EFFECT_NAME_KEYS[effectId];
         if (nameKey === undefined) return '';
-        return `<button type="button" class="btn prof-effect-btn" data-slot-profession="${esc(row.professionId)}" data-slot-effect="${esc(effectId)}">${esc(
+        return `<button type="button" class="btn prof-effect-btn" data-slot-profession="${esc(row.professionId)}" data-slot-effect="${esc(effectId)}" data-focus-key="slot:${esc(row.professionId)}:${esc(effectId)}">${esc(
           t('hudChrome.professions.toolEffectSlotButton', { effect: t(nameKey) }),
         )}</button>`;
       })

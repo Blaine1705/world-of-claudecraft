@@ -236,7 +236,32 @@ veto-able by the maintainer, the R32 pattern):
   priced material and count so the cost is legible without a preview
   surface. Count formula: ceil((charges restored / 10) x the composed
   discount), floored at one; the mint-exceeds-recharge inequality is pinned
-  per effect per reachable rarity rung.
+  per effect per reachable rarity rung, at the DISCOUNTED mint price (a
+  specialized enchanter's floor(count x 0.8) consumption is the arm that
+  actually competes with a recharge, and pricing only the listed counts let
+  it undercut the epic recharge until the adversarial pass caught it).
+  A byte-equal re-slot is refused outright (`no_gain`): a re-slot that
+  changes nothing would burn a whole charm, and a double-click reaches it.
+- **R47. The recharge PRICE rung is floored at the slot's own ceiling, and
+  the ceiling is a high-water mark.** R39 read alone made the price a
+  bag-state choice, because the per-charge price climbs steeply with rarity
+  while the charge buys the same bonus at every rung: the adversarial pass
+  found that an epic-tool owner could bank the pick, refill at the dust rung
+  for about a ninth per charge, and withdraw it (and, staged as ascending
+  partial fills, complete an epic-cap refill for a third of its price),
+  which retires the shard sink R39 exists to feed. So the FILL stays R30's
+  (sized by the tool held now) while the PRICE rung is the higher of that
+  tool's and the one the slot's stored maximum implies, and a lesser tool no
+  longer lowers that maximum. Consequences, all deliberate: a downgraded
+  owner pays their old rung until they re-slot a fresh charm (the charm is
+  the toll, and it costs more than any recharge); a slot beyond what the
+  carried tool can fill refuses as `tool_capped` rather than "already full",
+  so the line can point at the tool; and R30's own guarantee is unchanged,
+  since a borrowed epic pick still buys exactly one inflated fill. SURFACED
+  for the maintainer: this makes the stored maximum a permanent price floor,
+  which is a stronger reading of "never a permanent ceiling" than R30 wrote;
+  the alternative (accept the arbitrage) was not taken because it guts the
+  ruling's stated sink.
 
 ---
 
@@ -1469,6 +1494,31 @@ the docs slice and the adversarial round below. What each item settled:
    (self-crafted slots price at the composed discount; foreign and
    unsigned copies at the generic rate), and the identity round-trips the
    character blob (the roundtrip fixture carries a craftedBy row).
+
+ADVERSARIAL ROUND (same sitting, the phase header's mandate): six lenses
+over every grant, mint, and recharge path plus a fresh architecture
+reviewer, then two independent verifiers per finding. 19 findings confirmed
+and ALL applied; the architecture pass found no determinism, seam, or purity
+break (draw order, tick phases, the SimContext contract, sim purity,
+move-not-rewrite and the R42 predicate all verified clean, parity untouched).
+The load-bearing one was the recharge rung arbitrage three lenses found
+independently, now closed by R47; beside it: the specialized-crafter mint
+undercut (reagents retuned to 5 shard / 4 essence / 6 dust so the DISCOUNTED
+mint still out-costs the worst generic recharge, and the pin now prices
+through the real consumption resolver), the byte-equal re-slot that ate a
+charm on a double-click (`no_gain`), the rename sweep missing `craftedBy`
+(a renamed crafter silently lost their own discount forever), the charm
+consume skipping the quest-inventory hook, deny events rendering an empty
+effect name, the repaint parking focus on Close (the #2377 double-fire
+family, now the stable-identity refocus seam) and never re-latching its
+signature, a prototype-key slot lookup, missing hasOwn guards on
+server-echoed ids, the charm's silent right-click no-op, the slottable
+catalog-order drift, and the four comments R42 had falsified. Recorded as
+ACCEPTED rather than fixed: reclaimed character names inherit the crafter
+discount (the settled name-as-identity ruling, now stated at
+`isOriginalCrafter`); a persisted 'prompt' row still loads as-is because
+phase 14 owns that mode; and the deny event forcing a heavy self re-diff,
+which is exactly what every sibling result event already does.
 
 Also in this phase: the professions window gained the minimal slot and
 recharge senders (the dev gate's removal would otherwise ship a command

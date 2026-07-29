@@ -13,12 +13,17 @@ import {
   craftMaxSkillFor,
   oppositeCraft,
   PERK_THRESHOLDS,
+  TOOL_EFFECT_IDS,
   TOOL_EFFECTS,
   type ToolEffectId,
 } from '../sim/content/professions';
 import { ITEMS } from '../sim/data';
 import { requiredAmendsProgress } from '../sim/professions/archetype';
-import { resolveRechargeToolEffect, resolveSlotToolEffect } from '../sim/professions/tools';
+import {
+  resolveRechargeToolEffect,
+  resolveSlotToolEffect,
+  type ToolEffectSlot,
+} from '../sim/professions/tools';
 import {
   type CraftSkills,
   isSpecialized,
@@ -375,17 +380,34 @@ function buildSimplifiedCallToAction(identity: ProfessionIdentityModel): Simplif
   };
 }
 
-/** Distinct effect ids of tool-effect charms in bags, in catalog (ITEMS
- *  declaration) order: the candidate set the per-row slot affordance filters
- *  through the resolver. Pure bag scan. */
+/** Distinct effect ids of tool-effect charms in bags, in TOOL_EFFECT_IDS
+ *  catalog order: the candidate set the per-row slot affordance filters
+ *  through the resolver. Catalog order rather than bag order on purpose, so
+ *  the buttons do not reshuffle when the player moves items around. Pure bag
+ *  scan. */
 function heldCharmEffectIds(inventory: readonly InvSlot[]): string[] {
-  const held: string[] = [];
+  const held = new Set<string>();
   for (const entry of inventory) {
     const use = ITEMS[entry.itemId]?.use;
-    if (!use || use.type !== 'toolEffect') continue;
-    if (!held.includes(use.effectId)) held.push(use.effectId);
+    if (use?.type === 'toolEffect') held.add(use.effectId);
   }
-  return held;
+  return TOOL_EFFECT_IDS.filter((effectId) => held.has(effectId));
+}
+
+/** A wire slot row as the sim-side `ToolEffectSlot` the resolvers read.
+ *  Undefined for an absent row or one naming an effect this build's catalog
+ *  retired (the unknown-id doctrine: the resolvers index TOOL_EFFECTS, so a
+ *  stale id must never reach them from a projection). */
+function liveSlotFor(
+  row: ProfessionsViewInput['toolEffects'][number] | undefined,
+): ToolEffectSlot | undefined {
+  if (!row || !Object.hasOwn(TOOL_EFFECTS, row.effectId)) return undefined;
+  return {
+    effectId: row.effectId as ToolEffectId,
+    durability: row.charges,
+    maxDurability: row.maxCharges,
+    confirmMode: row.confirmMode,
+  };
 }
 
 export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsViewModel {
@@ -428,29 +450,30 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
             // effect this build's catalog lacks renders un-rechargeable
             // instead of throwing mid-paint (the resolver's charge math
             // indexes the catalog).
-            rechargeable:
-              Object.hasOwn(TOOL_EFFECTS, slot.effectId) &&
-              resolveRechargeToolEffect(
-                input.inventory,
-                row.professionId,
-                {
-                  effectId: slot.effectId as ToolEffectId,
-                  durability: slot.charges,
-                  maxDurability: slot.maxCharges,
-                  confirmMode: slot.confirmMode,
-                },
-                '',
-                {},
-                ITEMS,
-              ).ok,
+            rechargeable: (() => {
+              const live = liveSlotFor(slot);
+              return (
+                live !== undefined &&
+                resolveRechargeToolEffect(input.inventory, row.professionId, live, '', {}, ITEMS).ok
+              );
+            })(),
           }
         : null,
       // The slot affordance asks the SAME resolver the command runs, per held
-      // charm effect: one authority, so the button set can never drift from
-      // what the server accepts.
+      // charm effect, INCLUDING the live slot: one authority, so the button
+      // set can never drift from what the server accepts, and a re-slot the
+      // resolver would refuse as no-gain never renders a button at all.
       slottable: heldEffectIds.filter(
         (effectId) =>
-          resolveSlotToolEffect(input.inventory, row.professionId, effectId, 'always', ITEMS).ok,
+          resolveSlotToolEffect(
+            input.inventory,
+            row.professionId,
+            effectId,
+            'always',
+            ITEMS,
+            undefined,
+            liveSlotFor(slot),
+          ).ok,
       ),
     };
   });

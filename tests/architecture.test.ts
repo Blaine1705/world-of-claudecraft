@@ -1124,7 +1124,10 @@ const UI_DOM_MODULES = [
   'src/ui/proc_overlay_drag.ts',
   'src/ui/profession_identity_card.ts',
   'src/ui/profession_tutorial_window.ts',
-  'src/ui/professions_window.ts',
+  // professions_window.ts is deliberately ABSENT: its only browser-global
+  // reach was a hand-rolled document.activeElement read, and moving that onto
+  // the shared focus_restore.ts seam left it host-free, so the default bucket
+  // scans it now.
   'src/ui/reconnect_overlay.ts',
   'src/ui/settings_controls.ts',
   'src/ui/social_window.ts',

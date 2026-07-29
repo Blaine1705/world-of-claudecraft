@@ -10153,6 +10153,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.gatherersCache': 'Сумка собирателя',
   'hudChrome.professions.toolEffectSlotButton': 'Установить {effect}',
   'hudChrome.professions.toolEffectRechargeButton': 'Перезарядить',
+  'hudChrome.professions.toolEffectNoGain': '{effect} уже установлен и полностью заряжен.',
+  'hudChrome.professions.toolEffectRechargeToolCapped': 'Чтобы зарядить {effect} дальше, возьмите инструмент получше ({profession}).',
   'hudChrome.professions.toolEffectSlotted': '{effect} установлен: {profession}.',
   'hudChrome.professions.toolEffectSlotInvalid': '{effect} нельзя установить сюда.',
   'hudChrome.professions.toolEffectNoTool': 'Сначала нужен настоящий инструмент ({profession}).',

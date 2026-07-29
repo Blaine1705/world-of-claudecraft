@@ -81,9 +81,11 @@ export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = [
 // Tool effect slotting (#1136): a slottable bonus layered on top of a base
 // gathering tool's tier (see ../professions/tools.ts). Each effect carries its
 // own starting durability, separate from the base tool's tier gating.
-// Depletion is DETERMINISTIC: every use that applies the bonus spends exactly
-// one charge (depleteEffect draws no rng; the #1139 rolled-consumption idea
-// was retired so the harvest path could keep its pinned two-draw contract),
+// Depletion is DETERMINISTIC and CONDITIONAL: a use spends exactly one charge
+// when the bonus actually changed the granted outcome (R42, settled at the
+// gather command boundary), and never draws rng to decide it (the #1139
+// rolled-consumption idea was retired so the harvest path could keep its
+// pinned two-draw contract),
 // and the tool's rarity enters at MINT time instead, as extra starting
 // charges (startingDurabilityFor). `kind` selects which harvest/craft outcome
 // field the bonus adjusts.
@@ -170,9 +172,9 @@ export const HARVEST_COMPONENT_SPECIMENS: Readonly<Record<string, string>> = {
 // Tool effect slotting (#1136): a slottable bonus layered on top of a base
 // gathering tool's tier (see ../professions/tools.ts). Each effect carries its
 // own starting durability, separate from the base tool's tier gating. A use
-// that applies the bonus spends exactly one charge, deterministically
-// (depleteEffect, rng-free); tool rarity buys extra STARTING charges rather
-// than cheaper spends. `kind` selects which harvest/craft outcome field the
+// spends exactly one charge, deterministically (depleteEffect, rng-free) and
+// only when the bonus changed the granted outcome (R42); tool rarity buys
+// extra STARTING charges rather than cheaper spends. `kind` selects which harvest/craft outcome field the
 // bonus adjusts.
 export type ToolEffectId = 'gatherers_cache' | 'artisans_eye' | 'quickening_charm';
 

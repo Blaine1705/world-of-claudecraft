@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import type { TOOL_EFFECT_IDS } from '../src/sim/content/professions';
 import { TOOL_EFFECT_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
+import { requiredReagentCountFor } from '../src/sim/professions/crafting';
 import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/disenchant_reagents';
 import {
   RECHARGE_CHARGES_PER_MATERIAL,
@@ -128,13 +129,15 @@ describe('the recharge command: price, consume, refill', () => {
     expect(pSlot.durability).toBe(0);
   });
 
-  it('R30 at the command: the inflated mint refuses until spent below the honest max', () => {
+  it('R30 at the command: a lesser tool fills only to its own rung, and pays the ceiling rung', () => {
     // Minted on an epic pick (50 charges), pick then traded away for a common
-    // one: while charges sit above 20 the recharge refuses, and the fill that
-    // finally lands restores to 20, shrinking maxDurability with it.
+    // one. R30: the fill is sized by the tool held NOW (20). R47: the PRICE
+    // rung is floored at the slot's own ceiling, which the lesser tool never
+    // lowers, so the cheap-tool fill is billed in SHARDS, not dust, and
+    // stashing a good pick can never buy a cheap refill.
     const sim = makeSim();
     sim.addItem('arcanite_mining_pick', 1);
-    sim.addItemInstance('artisans_eye', { signer: metaOf(sim).name }, sim.playerId, 1);
+    sim.addItemInstance('artisans_eye', { signer: 'Elsewhere' }, sim.playerId, 1);
     sim.slotToolEffect('mining', 'artisans_eye');
     const slot = metaOf(sim).toolEffectSlots?.mining;
     if (!slot) throw new Error('slot minted');
@@ -142,16 +145,78 @@ describe('the recharge command: price, consume, refill', () => {
     sim.removeItem('arcanite_mining_pick', 1);
     sim.addItem('copper_mining_pick', 1);
     sim.addItem('arcane_dust', 10);
+    sim.addItem('arcane_shard', 10);
+    // Above what this tool can fill, below the ceiling: the honest distinction.
     slot.durability = 30;
     sim.rechargeToolEffect('mining');
-    expect(lastToolEffectResult(sim.tick())).toMatchObject({ ok: false, reason: 'already_full' });
+    expect(lastToolEffectResult(sim.tick())).toMatchObject({ ok: false, reason: 'tool_capped' });
     expect(slot.durability).toBe(30);
     expect(slot.maxDurability).toBe(50);
+    // Below it: the fill lands at 20, and it costs 2 SHARDS (the ceiling
+    // rung), never the 2 dust the carried pick alone would have priced.
     slot.durability = 5;
     sim.rechargeToolEffect('mining');
-    sim.tick();
+    expect(lastToolEffectResult(sim.tick())).toMatchObject({
+      ok: true,
+      materialItemId: 'arcane_shard',
+      count: 2,
+    });
     expect(slot.durability).toBe(20);
-    expect(slot.maxDurability).toBe(20);
+    expect(slot.maxDurability).toBe(50);
+    expect(sim.countItem('arcane_dust')).toBe(10);
+    expect(sim.countItem('arcane_shard')).toBe(8);
+    // At the tool's own fill target with the ceiling above: tool_capped, not
+    // "already fully charged", so the line can point at the tool.
+    sim.rechargeToolEffect('mining');
+    expect(lastToolEffectResult(sim.tick())).toMatchObject({ ok: false, reason: 'tool_capped' });
+    // Carrying the epic pick again fills to the ceiling at the same rung.
+    sim.addItem('arcanite_mining_pick', 1);
+    sim.rechargeToolEffect('mining');
+    expect(lastToolEffectResult(sim.tick())).toMatchObject({
+      ok: true,
+      materialItemId: 'arcane_shard',
+      count: 3,
+    });
+    expect(slot.durability).toBe(50);
+    expect(slot.maxDurability).toBe(50);
+  });
+
+  it('R47: the split-fill and stash-the-pick arbitrages both price at the ceiling rung', () => {
+    // The exploit the adversarial pass found: derive the price rung from bag
+    // state alone and an epic-cap refill completes at roughly a third its
+    // price (ascending partial fills), or every fill prices in dust forever
+    // (stash the pick). Both are now strictly worse than filling honestly.
+    const sim = makeSim();
+    sim.addItem('arcanite_mining_pick', 1);
+    sim.addItemInstance('gatherers_cache', { signer: 'Elsewhere' }, sim.playerId, 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    const slot = metaOf(sim).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    slot.durability = 0;
+    sim.addItem('arcane_dust', 50);
+    sim.addItem('arcane_essence', 50);
+    sim.addItem('arcane_shard', 50);
+    // Step one of the ascending ladder: the epic pick stashed, a common pick
+    // carried. The fill is common-sized (20) but billed in shards.
+    sim.removeItem('arcanite_mining_pick', 1);
+    sim.addItem('copper_mining_pick', 1);
+    sim.rechargeToolEffect('mining');
+    sim.tick();
+    expect(sim.countItem('arcane_dust')).toBe(50);
+    expect(sim.countItem('arcane_essence')).toBe(50);
+    expect(sim.countItem('arcane_shard')).toBe(48);
+    // Running the ladder to the top costs the SAME five shards the honest
+    // single fill costs (2 + 3, every step billed at the ceiling rung), never
+    // the 3 dust + 1 essence + 1 shard the bag-state pricing allowed. Ceil
+    // rounding can only make a finer split cost more, never less, so there is
+    // no ladder that beats filling honestly.
+    sim.addItem('arcanite_mining_pick', 1);
+    sim.rechargeToolEffect('mining');
+    sim.tick();
+    expect(slot.durability).toBe(50);
+    expect(sim.countItem('arcane_shard')).toBe(45);
+    expect(sim.countItem('arcane_dust')).toBe(50);
+    expect(sim.countItem('arcane_essence')).toBe(50);
   });
 
   it('slotting and recharging draw no rng at all', () => {
@@ -193,13 +258,30 @@ describe('the R39 economics inequality: a fresh mint always out-costs a generic 
     ),
   ];
 
-  it('holds for every craftable effect at every reachable rung', () => {
+  /** The mint's real reagent value for a crafter, priced through the sim's
+   *  OWN consumption resolver rather than the listed counts: a specialized
+   *  enchanter consumes floor(count x 0.8) of each reagent, and that is the
+   *  arm that competes with a recharge. The listed-count arm is `{}` skills. */
+  const mintValue = (
+    recipe: (typeof TOOL_EFFECT_RECIPES)[number],
+    skills: Record<string, number>,
+  ): number =>
+    recipe.reagents.reduce((total, reagent) => {
+      const { count } = requiredReagentCountFor(false, reagent, skills, recipe.professionId);
+      return total + count * unitValue(reagent.itemId);
+    }, 0);
+
+  it('holds for every craftable effect at every reachable rung, discounted or not', () => {
     expect(reachableRungs.length).toBeGreaterThanOrEqual(3); // non-vacuity
+    // Specialized in the recipe's own craft: the cheapest mint a player can
+    // actually perform. Pricing only the listed counts is what let a
+    // specialized crafter's 225-copper re-mint undercut the 275-copper
+    // generic epic recharge while this test stayed green.
+    const specialized = { enchanting: 125 };
     for (const recipe of TOOL_EFFECT_RECIPES) {
-      const mintValue = recipe.reagents.reduce(
-        (total, reagent) => total + reagent.count * unitValue(reagent.itemId),
-        0,
-      );
+      const listed = mintValue(recipe, {});
+      const cheapest = mintValue(recipe, specialized);
+      expect(cheapest, `${recipe.id}: the discount must really bite`).toBeLessThan(listed);
       for (const rung of reachableRungs) {
         const fill = startingDurabilityFor(
           recipe.resultItemId as (typeof TOOL_EFFECT_IDS)[number],
@@ -211,9 +293,9 @@ describe('the R39 economics inequality: a fresh mint always out-costs a generic 
         ];
         const rechargeValue = genericCount * unitValue(DISENCHANT_MATERIAL_BY_QUALITY[ladderRung]);
         expect(
-          mintValue,
-          `${recipe.id} at the ${String(rung)} rung: mint ${mintValue} must exceed ` +
-            `the generic full-fill recharge ${rechargeValue}, or re-slotting a fresh ` +
+          cheapest,
+          `${recipe.id} at the ${String(rung)} rung: the CHEAPEST mint ${cheapest} must ` +
+            `exceed the generic full-fill recharge ${rechargeValue}, or re-crafting a fresh ` +
             `charm becomes the cheap recharge`,
         ).toBeGreaterThan(rechargeValue);
       }
@@ -221,13 +303,11 @@ describe('the R39 economics inequality: a fresh mint always out-costs a generic 
   });
 
   it('pins the shipped constants so a one-sided retune cannot drift silently', () => {
-    // 4 shards (55) + 3 essence (18) + 5 dust (6) = 304 copper of reagents.
     for (const recipe of TOOL_EFFECT_RECIPES) {
-      const mintValue = recipe.reagents.reduce(
-        (total, reagent) => total + reagent.count * unitValue(reagent.itemId),
-        0,
-      );
-      expect(mintValue).toBe(304);
+      // 5 shards (55) + 4 essence (18) + 6 dust (6) = 383 copper listed,
+      // 4 + 3 + 4 = 298 for a specialized enchanter.
+      expect(mintValue(recipe, {})).toBe(383);
+      expect(mintValue(recipe, { enchanting: 125 })).toBe(298);
     }
     // The worst generic recharge a shipped tool can price: an epic tool's
     // 50-charge fill at 5 shards.
@@ -236,5 +316,24 @@ describe('the R39 economics inequality: a fresh mint always out-costs a generic 
     expect(Math.ceil(worstFill / RECHARGE_CHARGES_PER_MATERIAL) * unitValue('arcane_shard')).toBe(
       275,
     );
+    // The self-signed reduction (crafting.ts, one unit off before the
+    // multiplier) would drop the specialized mint to 225 and break the bound,
+    // and it is unreachable ONLY because no path mints a signed arcane
+    // material: the disenchant primary grants plain, and node yields are
+    // never arcane. Pinned so a future signed-material source has to face
+    // this bound rather than quietly slipping under it.
+    const selfSigned = TOOL_EFFECT_RECIPES[0].reagents.reduce((total, reagent) => {
+      const { count } = requiredReagentCountFor(true, reagent, { enchanting: 125 }, 'enchanting');
+      return total + count * unitValue(reagent.itemId);
+    }, 0);
+    expect(selfSigned).toBeLessThan(275);
+    for (const reagent of TOOL_EFFECT_RECIPES[0].reagents) {
+      expect(
+        Object.values(ITEMS).some(
+          (def) => def.id === reagent.itemId && typeof def.buyValue === 'number',
+        ),
+        `${reagent.itemId} must stay off the copper counters`,
+      ).toBe(false);
+    }
   });
 });

@@ -489,6 +489,15 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     else useGatherToolItem(ctx, def.use.professionId, meta.entityId);
     return;
   }
+  // A tool-effect charm is slotted from the professions window, never used
+  // from the bag, but the natural first gesture with a new rare item IS a
+  // right-click: without this arm the click is a silent no-op with no path
+  // from the item to its function (the same reason the gatherTool arm above
+  // has gatherToolNoNode). Text-only, no state change.
+  if (def.use?.type === 'toolEffect') {
+    ctx.error(meta.entityId, 'Open Professions to slot that.');
+    return;
+  }
   if (def.use?.type === 'mechChroma') {
     return ctx.unlockMechChromaFromItem(meta, itemId, def.use.chromaId);
   }

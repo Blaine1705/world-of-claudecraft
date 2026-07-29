@@ -29,14 +29,23 @@ function rekeySigner(
 
 /**
  * Rewrite `instance.signer === oldName` to `newName` across the character's
- * carried inventory, bank inventory, and equipped-instance map. Touches
+ * carried inventory, bank inventory, and equipped-instance map, PLUS the
+ * signer-derived `craftedBy` on every slotted tool effect. Touches
  * nothing else: foreign signers, every other payload field, slot order, the
  * manual `slot` placements, and stack counts all pass through untouched, and
  * the sweep never merges slots (two slots left byte-equal by the rewrite stay
  * separate; the identical-payload merge points unify them on a future add).
  *
+ * The tool-effect arm is the fourth signer-derived identity rather than a
+ * fourth collection: the acquisition craft stamps a slot's `craftedBy` from
+ * the consumed charm's signer (professions/tools.ts), and
+ * `isOriginalCrafter` compares it to the LIVE character name, so a rename
+ * that skipped it would silently retire the original-crafter recharge
+ * discount on effects the renamer really did craft, with no way back short
+ * of consuming another charm.
+ *
  * Mutates `state` IN PLACE (the rename handler owns the loaded blob and
- * persists it whole right after) and returns whether any signer was
+ * persists it whole right after) and returns whether anything was
  * rewritten, so the caller can skip the save when nothing matched.
  */
 export function rekeyInstanceSigner(
@@ -53,6 +62,12 @@ export function rekeyInstanceSigner(
   }
   for (const instance of Object.values(state.equipmentInstance ?? {})) {
     if (rekeySigner(instance, oldName, newName)) changed = true;
+  }
+  for (const slot of Object.values(state.toolEffectSlots ?? {})) {
+    if (slot && slot.craftedBy === oldName) {
+      slot.craftedBy = newName;
+      changed = true;
+    }
   }
   return changed;
 }

@@ -11,6 +11,7 @@
 // silent on a player-reachable path. Every arm is draw-free: nothing in this
 // module can move the rng stream a harvest walks.
 
+import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from '../content/professions';
 import { ITEMS } from '../data';
 import type { SimContext } from '../sim_context';
 import { recordAction, withinActionThrottle } from './action_throttle';
@@ -44,6 +45,12 @@ export function slotToolEffectAction(
     confirmMode,
     ITEMS,
     r.meta.name,
+    // The live slot, so the resolver can refuse a re-slot that would change
+    // nothing. Read through hasOwn-safe indexing: professionId is a wire
+    // string and toolEffectSlots is a plain object literal.
+    (GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)
+      ? r.meta.toolEffectSlots?.[professionId as GatheringProfessionId]
+      : undefined,
   );
   if (!resolved.ok) {
     ctx.emit({
@@ -64,6 +71,12 @@ export function slotToolEffectAction(
   const entry = r.meta.inventory[resolved.consumeIndex];
   if (entry.count > 1) entry.count -= 1;
   else r.meta.inventory.splice(resolved.consumeIndex, 1);
+  // The hub's own post-removal duty, which a targeted splice would otherwise
+  // skip: bump wireRev and re-derive collect-quest counts from live bags
+  // (sim.ts removeItem and the enchanting targeted removals all do this). No
+  // shipped quest collects a charm today; the seam contract is what matters,
+  // so the first one that does cannot be quietly stale.
+  ctx.onInventoryChangedForQuests(r.meta);
   // Created lazily HERE, never in makeMeta: the absent-by-default field is
   // what keeps a player who has never slotted an effect byte-identical in
   // the parity digest (every deny arm above returns before this line).
@@ -81,13 +94,15 @@ export function slotToolEffectAction(
 
 /**
  * Recharge `professionId`'s slotted effect for its owner, at the R39 price
- * (the arcane material of the recharge-time best tool's rarity rung, count
- * scaled to the charges restored, the original-crafter and specialization
- * discounts composed into the count) and the R30 fill (the maximum re-derived
- * from the best tool owned NOW, so a borrowed epic pick's inflated mint buys
- * one fill at most). Owner-performed and instant behind the shared
- * crafting-action window: the same pacing every enchanting action pays, with
- * the window spent on success only.
+ * (the arcane material of the resolved rarity rung, count scaled to the
+ * charges restored, the original-crafter and specialization discounts
+ * composed into the count) and the R30 fill (sized by the best tool owned
+ * NOW, so a borrowed epic pick's inflated mint buys one fill at most). The
+ * price rung is floored at the slot's own ceiling per R47, so stashing a
+ * good tool cannot buy a cheap fill; the resolver owns that whole decision.
+ * Owner-performed and instant behind the shared crafting-action window: the
+ * same pacing every enchanting action pays, with the window spent on success
+ * only.
  */
 export function rechargeToolEffectAction(
   ctx: SimContext,
@@ -96,19 +111,40 @@ export function rechargeToolEffectAction(
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
+  // `effectId` rides every deny that HAS a slot resolved: the client renders
+  // the effect's name into the line, and an omitted id renders an empty
+  // name ("  is already fully charged.").
   const deny = (
-    reason: 'invalid_request' | 'no_slot' | 'no_tool' | 'already_full' | 'throttled',
+    reason:
+      | 'invalid_request'
+      | 'no_slot'
+      | 'no_tool'
+      | 'already_full'
+      | 'tool_capped'
+      | 'throttled',
+    effectId?: string,
   ): void => {
     ctx.emit({
       type: 'toolEffectResult',
       action: 'recharge',
       ok: false,
       professionId,
+      ...(effectId === undefined ? {} : { effectId }),
       reason,
       pid: r.meta.entityId,
     });
   };
-  const slot = r.meta.toolEffectSlots?.[professionId as keyof typeof r.meta.toolEffectSlots];
+  // Validate the profession id BEFORE indexing the slot record:
+  // toolEffectSlots is a plain object literal, so a wire string like
+  // 'constructor' would otherwise resolve a prototype member as a truthy
+  // slot and carry it into the resolver (harmless only by the resolver's
+  // internal check order). The repo's hasOwn doctrine for plain-object
+  // tables, applied structurally.
+  if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) {
+    deny('invalid_request');
+    return;
+  }
+  const slot = r.meta.toolEffectSlots?.[professionId as GatheringProfessionId];
   if (!slot) {
     deny('no_slot');
     return;
@@ -122,14 +158,14 @@ export function rechargeToolEffectAction(
     ITEMS,
   );
   if (!resolved.ok) {
-    deny(resolved.reason);
+    deny(resolved.reason, slot.effectId);
     return;
   }
   // The shared action window, checked before any consumption and spent on
   // success only (the crafting.ts order); a denied recharge never paces the
   // player's next craft.
   if (!withinActionThrottle(r.meta, ctx.time)) {
-    deny('throttled');
+    deny('throttled', slot.effectId);
     return;
   }
   if (ctx.countItem(resolved.materialItemId, r.meta.entityId) < resolved.count) {
@@ -147,10 +183,12 @@ export function rechargeToolEffectAction(
     return;
   }
   ctx.removeItem(resolved.materialItemId, resolved.count, r.meta.entityId);
-  // The R30 re-derive lands on BOTH counters: the maximum tracks the tool
-  // the owner holds at recharge time, and the fill restores to exactly that.
-  slot.maxDurability = resolved.newMax;
+  // The fill is the R30 re-derive (the tool held right now); the ceiling is
+  // the R47 high-water mark, raised by a better tool and never lowered by a
+  // lesser one, which is what keeps the price rung from resetting on every
+  // cheap fill.
   slot.durability = resolved.newMax;
+  slot.maxDurability = resolved.ceiling;
   recordAction(r.meta);
   ctx.emit({
     type: 'toolEffectResult',

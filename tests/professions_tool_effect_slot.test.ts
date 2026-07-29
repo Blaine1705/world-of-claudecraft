@@ -222,6 +222,46 @@ describe('the mint consumes a crafted charm (the acquisition craft price)', () =
     expect(metaOf(sim).toolEffectSlots).toBeUndefined();
   });
 
+  it('refuses a re-slot that would change nothing, so a double-click costs no charm', () => {
+    // The zero-benefit refusal (the R9 doctrine at the mint): the button and
+    // the command both round-trip, so a second click landing before the
+    // repaint used to eat a whole charm for a byte-equal slot.
+    const sim = simHolding('copper_mining_pick');
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(sim.countItem('gatherers_cache')).toBe(4);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(sim.countItem('gatherers_cache')).toBe(4);
+    // Every re-slot that DOES move something still lands: a different effect,
+    // and a top-up of a partially spent slot.
+    sim.slotToolEffect('mining', 'artisans_eye');
+    expect(metaOf(sim).toolEffectSlots?.mining?.effectId).toBe('artisans_eye');
+    expect(sim.countItem('artisans_eye')).toBe(4);
+    const slot = metaOf(sim).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    slot.durability -= 1;
+    sim.slotToolEffect('mining', 'artisans_eye');
+    expect(sim.countItem('artisans_eye')).toBe(3);
+    expect(metaOf(sim).toolEffectSlots?.mining?.durability).toBe(
+      startingDurabilityFor('artisans_eye', 'common'),
+    );
+  });
+
+  it('a better tool re-slots a full slot, because the charge ceiling really moves', () => {
+    const sim = simHolding('copper_mining_pick');
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.maxDurability).toBe(
+      startingDurabilityFor('gatherers_cache', 'common'),
+    );
+    // The same full slot, now with an epic pick carried: the re-slot is worth
+    // a charm because it mints three rungs more charges.
+    sim.addItem('arcanite_mining_pick', 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(sim.countItem('gatherers_cache')).toBe(3);
+    expect(metaOf(sim).toolEffectSlots?.mining?.maxDurability).toBe(
+      startingDurabilityFor('gatherers_cache', 'epic'),
+    );
+  });
+
   it('re-slotting consumes another charm: the reset-to-full is never free', () => {
     // This is the R39 bypass math made concrete: a fresh mint resets charges
     // to full, so it must always cost a whole charm (whose reagents exceed
@@ -246,6 +286,12 @@ describe('the mint consumes a crafted charm (the acquisition craft price)', () =
     sim.addItemInstance('gatherers_cache', { signer: 'Elsewhere' }, sim.playerId, 1);
     sim.addItem('gatherers_cache', 1);
     sim.addItemInstance('gatherers_cache', { signer: own }, sim.playerId, 1);
+    // Each re-slot spends a charge first, so it is a real top-up rather than
+    // the byte-equal re-slot the resolver now refuses outright.
+    const spendOne = (): void => {
+      const slot = metaOf(sim).toolEffectSlots?.mining;
+      if (slot) slot.durability -= 1;
+    };
     sim.slotToolEffect('mining', 'gatherers_cache');
     expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe(own);
     // The self-signed copy is gone; the other two survive.
@@ -254,13 +300,17 @@ describe('the mint consumes a crafted charm (the acquisition craft price)', () =
       .map((entry) => entry.instance?.signer);
     expect(held.sort()).toEqual(['Elsewhere', undefined]);
     // Next slot takes the unsigned copy (no provenance) over the foreign one.
+    spendOne();
     sim.slotToolEffect('mining', 'gatherers_cache');
     expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBeUndefined();
     // Last copy standing: the foreign signature, faithfully recorded.
+    spendOne();
     sim.slotToolEffect('mining', 'gatherers_cache');
     expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe('Elsewhere');
     expect(sim.countItem('gatherers_cache')).toBe(0);
-    // And with the bags dry, the mint refuses.
+    // And with the bags dry, the mint refuses (spend one first, so it is the
+    // NO-CHARM arm refusing rather than the no-gain one).
+    spendOne();
     sim.slotToolEffect('mining', 'gatherers_cache');
     expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe('Elsewhere');
   });

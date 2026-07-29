@@ -638,8 +638,12 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   'summonDemon',
   // The acquisition craft's slot/recharge outcome: a successful slot consumes
   // a charm copy and a successful recharge consumes arcane materials, neither
-  // through a loot-event path, so the self inv mirror re-diffs off this event
-  // (deny arms ride along harmlessly: the diff finds nothing changed).
+  // through a loot-event path, so the self inv mirror re-diffs off this event.
+  // Deny arms ride along and force the same re-diff for no state change,
+  // ACCEPTED as the family's standing shape: enchantResult/unbindResult are
+  // members on the same terms, and HEAVY_SELF_CMDS already dirties on receipt
+  // regardless of outcome, so a denial-spamming client buys nothing another
+  // command does not already offer it.
   'toolEffectResult',
   // Maker's Bond unbind (Professions 2.0): a successful unbind can
   // clear boundTo IN PLACE (the single-copy arm emits no loot event), so the

@@ -2777,9 +2777,14 @@ export const hudChromeStrings = {
     toolEffectSlotInvalid: '{effect} cannot be slotted there.',
     toolEffectNoTool: 'You need a real {profession} tool first.',
     toolEffectNoCharm: 'You need a crafted {effect} charm in your bags.',
+    toolEffectNoGain: '{effect} is already slotted and fully charged.',
     toolEffectRecharged: '{effect} recharged: {material} x{count} consumed.',
     toolEffectRechargeNoSlot: 'No effect is slotted on {profession}.',
     toolEffectRechargeFull: '{effect} is already fully charged.',
+    // The R47 distinction: the slot is at everything the carried tool can
+    // fill, but its own ceiling is higher, so the line points at the tool
+    // rather than claiming the slot is full.
+    toolEffectRechargeToolCapped: 'Carry a better {profession} tool to charge {effect} further.',
     toolEffectRechargeMaterials: 'Recharging {effect} needs {material} x{count}.',
     tierPipAria: 'Tier {tier}',
     nextUnlockTier: '{points} points to the next tier: masterwork odds improve',

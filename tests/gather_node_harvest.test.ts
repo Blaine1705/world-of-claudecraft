@@ -1123,7 +1123,7 @@ describe('fine material grades on the live harvest path', () => {
 
   it('the pre-gate and the grant agree for every confirm mode a save can carry', () => {
     // The pre-gate resolves through applyEffectBonus bare; the grant resolves
-    // through resolveToolEffectUse, which gates the bonus behind
+    // through applyToolEffectUse, which gates the bonus behind
     // `confirmMode === 'prompt' && !confirmed`. They agree today because the
     // grant passes confirmed: true unconditionally, and the mint refuses
     // 'prompt', but normalizeToolEffectSlots PRESERVES a persisted 'prompt'

@@ -297,9 +297,10 @@ export function slotEffect(
 /** Stable deny vocabulary for one slot request (the trainResult idiom: ids,
  *  not prose; the client renders localized copy). `invalid_request` covers the
  *  shapes an honest client never sends (unknown profession/effect, a
- *  policy-refused pair, a mode outside the union); `no_tool` and `no_charm`
- *  are the two an honest player can hit. */
-export type SlotToolEffectDenyReason = 'invalid_request' | 'no_tool' | 'no_charm';
+ *  policy-refused pair, a mode outside the union); `no_tool`, `no_charm` and
+ *  `no_gain` (the byte-equal re-slot, which would burn a charm for nothing)
+ *  are the three an honest player can hit. */
+export type SlotToolEffectDenyReason = 'invalid_request' | 'no_tool' | 'no_charm' | 'no_gain';
 
 export type ResolvedSlotToolEffect =
   | {
@@ -364,6 +365,7 @@ export function resolveSlotToolEffect(
   confirmMode: ToolEffectConfirmMode,
   items: Readonly<Record<string, ItemDef>>,
   slotterName?: string,
+  live?: ToolEffectSlot,
 ): ResolvedSlotToolEffect {
   if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) {
     return { ok: false, reason: 'invalid_request' };
@@ -376,6 +378,23 @@ export function resolveSlotToolEffect(
   const profession = professionId as GatheringProfessionId;
   const best = bestOwnedGatherToolFor(inventory, profession, items);
   if (best.ownedTier === NO_TOOL_OWNED) return { ok: false, reason: 'no_tool' };
+  // The zero-benefit refusal, the R9 doctrine applied to the mint itself: a
+  // re-slot that would replace the live slot with a byte-equal one buys the
+  // player nothing and costs them a whole charm (four hundred copper of
+  // reagents). Only the exact no-change case refuses; every re-slot that
+  // moves something (a different effect, more charges after a tool upgrade,
+  // or topping a partially spent slot back up) still lands. This is what
+  // makes a double-click safe: the second command answers no_gain instead of
+  // eating a second charm.
+  if (
+    live !== undefined &&
+    live.effectId === effectId &&
+    live.confirmMode === confirmMode &&
+    live.durability >= startingDurabilityFor(effectId as ToolEffectId, best.rarity) &&
+    live.durability >= live.maxDurability
+  ) {
+    return { ok: false, reason: 'no_gain' };
+  }
   const consumeIndex = charmIndexToConsume(inventory, effectId, items, slotterName);
   if (consumeIndex === -1) return { ok: false, reason: 'no_charm' };
   return {
@@ -425,11 +444,13 @@ function charmIndexToConsume(
  * - Every respawnSpeed-kind effect (today Springback Charm), on every
  *   profession: that bonus arm is a deliberate no-op (`applyEffectBonus`
  *   returns the outcome unchanged, pinned in tests/professions_tools.test.ts)
- *   while depletion runs unconditionally, so a slotted charm burns charges
- *   for zero benefit and the catalog description still promises respawn
- *   shortening. Keyed off the catalog KIND, not the id, so a renamed charm
- *   cannot slip past the policy while the unknown-id arm refuses the old
- *   name. Refused until the bonus arm is wired for real.
+ *   while the catalog description still promises respawn shortening, so a
+ *   slotted charm would be a permanently inert row advertising a bonus it
+ *   never delivers. (It would not even burn charges under R42, which makes
+ *   it quieter than the old unconditional-depletion reading of this policy,
+ *   not more honest.) Keyed off the catalog KIND, not the id, so a renamed
+ *   charm cannot slip past the policy while the unknown-id arm refuses the
+ *   old name. Refused until the bonus arm is wired for real.
  * - fishing, for every effect: `completeFishing` never consults the effect
  *   system, so a fishing slot would be mintable, HUD-rendered, and inert:
  *   never fires, never spends. Refused until an effect has real fishing
@@ -450,9 +471,10 @@ export function slotToolEffectRefused(professionId: string, effectId: string): b
 
 /**
  * Deep-copy slots on the way OUT to a save, so the persisted snapshot can never
- * alias the live counters. `depleteEffect` mutates `durability` IN PLACE on
- * every harvest, so a shallow spread would hand the save layer the same objects
- * the sim keeps decrementing.
+ * alias the live counters. `depleteEffect` mutates `durability` IN PLACE (on
+ * every harvest the bonus mattered for, and the recharge rewrites both
+ * counters), so a shallow spread would hand the save layer the same objects
+ * the sim keeps mutating.
  */
 export function structuredCloneToolEffectSlots(
   slots: Partial<Record<GatheringProfessionId, ToolEffectSlot>>,
@@ -518,6 +540,13 @@ export function normalizeToolEffectSlots(
       durability: Math.min(maxDurability, Math.max(0, Math.floor(row.durability) || 0)),
       maxDurability,
       craftedBy: typeof row.craftedBy === 'string' ? row.craftedBy : undefined,
+      // A persisted 'prompt' row is PRESERVED even though the mint refuses
+      // that mode. No live path can write one (the resolver has refused
+      // prompt since the mode existed, so only a hand-edited row or a
+      // dev-era offline save carries it), and phase 14 ships the confirm
+      // flow whole, which is what makes such a row honest rather than a slot
+      // that claims to ask and never does. Coercing it to 'always' here
+      // would silently retire a row that flow is about to honor.
       confirmMode: row.confirmMode === 'prompt' ? 'prompt' : 'always',
     };
   }
@@ -677,6 +706,14 @@ const ORIGINAL_CRAFTER_DISCOUNT = 0.5;
 // NAME the production craft signed the consumed charm with; a slot with no
 // recorded crafter (an unsigned charm copy) is never eligible for the
 // discount, so it always costs the generic rate.
+//
+// Name-as-identity carries the settled ecosystem's known edge, ACCEPTED
+// here: names are freeable, so whoever later registers a retired name
+// inherits the discount on slots and charms that name signed. The rename
+// flow keeps a LIVE crafter's own discount working
+// (src/sim/character_rename.ts sweeps craftedBy beside every signer), and
+// the payoff for a name-reuser is a bounded material discount, never power
+// or a dupe.
 export function isOriginalCrafter(slot: ToolEffectSlot, rechargerId: string): boolean {
   return slot.craftedBy !== undefined && slot.craftedBy === rechargerId;
 }
@@ -689,32 +726,63 @@ export function isOriginalCrafter(slot: ToolEffectSlot, rechargerId: string): bo
  *  one's OWN work. Generic rate is exactly 1. */
 export function rechargeDiscountFor(
   slot: ToolEffectSlot,
-  rechargerId: string,
+  rechargerName: string,
   rechargerSkills: CraftSkillState = {},
 ): number {
-  if (!isOriginalCrafter(slot, rechargerId)) return 1;
+  if (!isOriginalCrafter(slot, rechargerName)) return 1;
   return (
     ORIGINAL_CRAFTER_DISCOUNT *
     rechargeDiscountMultiplier(rechargerSkills, TOOL_EFFECTS[slot.effectId].craftId)
   );
 }
 
+/**
+ * The rarity rung a stored `maxDurability` implies: the inverse of
+ * `startingDurabilityFor`, clamped into the ladder. A slot minted on an epic
+ * tool carries 50 charges, which is rung 3, whatever the owner happens to be
+ * carrying later.
+ *
+ * This exists for the PRICING half of R47: a stored max above the catalog
+ * base is proof the slot has been maintained at that rung, and the price
+ * must not fall below it just because a cheaper tool is in the bags for one
+ * command. A stored max the ladder cannot explain (a legacy or hand-edited
+ * row) floors at the common rung rather than throwing: pricing must never be
+ * the thing that breaks a load.
+ */
+export function rarityRungForMaxDurability(effectId: ToolEffectId, maxDurability: number): number {
+  const base = TOOL_EFFECTS[effectId].startingDurability;
+  const rungs = Math.floor((maxDurability - base) / RARITY_DURABILITY_BONUS);
+  if (!Number.isFinite(rungs) || rungs < 0) return 0;
+  return Math.min(rungs, RARITY_ORDER.length - 1);
+}
+
 /** Stable deny vocabulary for one recharge request. `no_tool` mirrors the
  *  slot gate (a profession the owner holds no real tool for cannot resolve
- *  the R30 rarity, so it cannot price or size the fill); `already_full`
- *  covers durability at or ABOVE the re-derived maximum, which is how a
- *  borrowed epic pick's inflated mint stays one fill at most: the inflated
- *  charges keep spending, but no recharge renews them. */
-export type RechargeToolEffectDenyReason = 'invalid_request' | 'no_tool' | 'already_full';
+ *  the R30 rarity, so it cannot price or size the fill); `already_full` is
+ *  the slot sitting at its own ceiling; `tool_capped` is the honest
+ *  distinction R47 needs, the slot already at everything the CURRENTLY held
+ *  tool can fill while its ceiling sits higher, which is how a borrowed epic
+ *  pick's inflated mint stays one fill at most (the inflated charges keep
+ *  spending, and no lesser tool renews them). */
+export type RechargeToolEffectDenyReason =
+  | 'invalid_request'
+  | 'no_tool'
+  | 'already_full'
+  | 'tool_capped';
 
 export type ResolvedRechargeToolEffect =
   | {
       ok: true;
-      /** The R30 re-derived maximum: what this fill restores BOTH counters to. */
+      /** The R30 re-derived FILL target: what this recharge restores the
+       *  charges to, sized by the best tool owned right now. */
       newMax: number;
+      /** The slot's ceiling AFTER this fill: the high-water maximum, raised
+       *  when a better tool fills past it and never lowered by a lesser one
+       *  (R47: lowering it would reset the price floor every cheap fill). */
+      ceiling: number;
       /** Charges this fill actually restores (newMax minus current). */
       restored: number;
-      /** The R39 material identity for the resolved rarity rung. */
+      /** The R39 material identity for the resolved price rung. */
       materialItemId: string;
       /** Materials consumed: ceil((restored / RECHARGE_CHARGES_PER_MATERIAL)
        *  times the composed discount), floored at 1. */
@@ -728,19 +796,33 @@ export type ResolvedRechargeToolEffect =
  * command body in tool_effect_actions.ts) owns consuming `count` of
  * `materialItemId` and writing `newMax` onto the slot's two counters.
  *
- * R30 is the load-bearing arm: the maximum is re-derived from the best tool
- * owned NOW (`bestOwnedGatherToolFor`), never read back from the slot's
- * minted value, so the slot-time mint stands as-is and a borrowed epic pick
- * buys one inflated fill at most, never a permanent ceiling. The same
- * resolved rarity picks the R39 material rung, so the price and the fill can
- * never name different tools.
+ * The fill and the price read DIFFERENT rungs, deliberately (R47):
+ *   - The FILL is R30's: sized by the best tool owned NOW, never read back
+ *     from the slot's minted value, so the slot-time mint stands as-is and a
+ *     borrowed epic pick buys one inflated fill at most.
+ *   - The PRICE rung is the HIGHER of the owned tool's and the one the
+ *     slot's CEILING implies, and the ceiling is a high-water mark a lesser
+ *     tool never lowers. R39 read alone made the price a bag-state choice:
+ *     the per-charge price climbs steeply with rarity while the charge buys
+ *     the same bonus at every rung, so an epic-tool owner could bank the
+ *     pick, refill at the dust rung, and withdraw it again, paying about a
+ *     ninth per charge and retiring the shard sink the ruling exists to feed
+ *     (staged as ascending partial fills, the same trick completed an
+ *     epic-cap refill at a third of its price). With the high-water floor
+ *     both collapse: stashing the good tool buys a SMALLER fill at the SAME
+ *     price rung, which is strictly worse than filling honestly, and the
+ *     ascending ladder pays the top rung at every step. The honest cases are
+ *     untouched: a slot filled by the tool that minted it prices exactly as
+ *     before, and a player who genuinely wants a cheaper maintenance tier
+ *     re-slots a fresh charm, which re-mints the ceiling at the new tool's
+ *     rung (that charm is the toll, and it costs more than any recharge).
  */
 export function resolveRechargeToolEffect(
   inventory: readonly InvSlot[],
   professionId: string,
   slot: ToolEffectSlot,
-  rechargerId: string,
-  rechargerSkills: CraftSkillState = {},
+  rechargerName: string,
+  rechargerSkills: CraftSkillState,
   items: Readonly<Record<string, ItemDef>>,
 ): ResolvedRechargeToolEffect {
   if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) {
@@ -750,15 +832,39 @@ export function resolveRechargeToolEffect(
   if (best.ownedTier === NO_TOOL_OWNED) return { ok: false, reason: 'no_tool' };
   const newMax = startingDurabilityFor(slot.effectId, best.rarity);
   const restored = newMax - slot.durability;
-  if (restored <= 0) return { ok: false, reason: 'already_full' };
-  // The rarity that sized the fill also names the material: normalize the
-  // def-quality union through the ladder index so 'poor'/undefined price at
-  // the common rung, exactly as they mint there.
-  const rung = RARITY_ORDER[rarityLadderIndex(best.rarity)];
+  if (restored <= 0) {
+    // Two honest ways to have nothing to restore, and they are different
+    // player situations: at the ceiling (nothing to do), or at everything
+    // this tool can fill while the ceiling sits higher (carry the better
+    // tool). Collapsing them would tell a downgraded owner their half-empty
+    // slot is full.
+    return {
+      ok: false,
+      reason: slot.durability >= slot.maxDurability ? 'already_full' : 'tool_capped',
+    };
+  }
+  // The price rung: the owned tool's, floored at the one the slot's ceiling
+  // implies (R47 above). `rarityLadderIndex` normalizes the def-quality
+  // union so 'poor'/undefined price at the common rung, exactly as they mint
+  // there.
+  const rung =
+    RARITY_ORDER[
+      Math.max(
+        rarityLadderIndex(best.rarity),
+        rarityRungForMaxDurability(slot.effectId, slot.maxDurability),
+      )
+    ];
   const materialItemId = DISENCHANT_MATERIAL_BY_QUALITY[rung];
-  const discount = rechargeDiscountFor(slot, rechargerId, rechargerSkills);
+  const discount = rechargeDiscountFor(slot, rechargerName, rechargerSkills);
   const count = Math.max(1, Math.ceil((restored / RECHARGE_CHARGES_PER_MATERIAL) * discount));
-  return { ok: true, newMax, restored, materialItemId, count };
+  return {
+    ok: true,
+    newMax,
+    ceiling: Math.max(slot.maxDurability, newMax),
+    restored,
+    materialItemId,
+    count,
+  };
 }
 
 // The outcome of applying a slotted effect to one harvest/craft action,

@@ -442,8 +442,14 @@ export const ROD_RECIPES: ProfessionRecipeRecord[] = [
 //   expensive generic recharge (a full epic-rung fill priced in shards) or
 //   re-crafting would bypass recharging outright. The whole arcane ladder is
 //   consumed (shards the bulk of the value), which also gives the shard its
-//   second sink beside the Greater enchants. The inequality is pinned in
-//   tests/professions_tool_effect_craft.test.ts; retune BOTH sides together.
+//   second sink beside the Greater enchants. The counts clear the bound at
+//   the DISCOUNTED price, not just the listed one: a specialized enchanter
+//   consumes floor(count x 0.8) of each reagent (crafting.ts
+//   requiredReagentCountFor), which is the arm that actually competes with a
+//   recharge, so the listed 383 copper is sized so the discounted 298 still
+//   sits above the 275 the worst generic recharge costs. The inequality is
+//   pinned BOTH ways in tests/professions_tool_effect_recharge.test.ts;
+//   retune both sides together.
 // - NO Springback (quickening_charm) recipe: the R9 slot policy refuses that
 //   effect everywhere, and no path may mint what another path refuses (same
 //   guard test derives this from the policy).
@@ -454,9 +460,9 @@ export const TOOL_EFFECT_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'gatherers_cache',
     resultCount: 1,
     reagents: [
-      { itemId: 'arcane_shard', count: 4 },
-      { itemId: 'arcane_essence', count: 3 },
-      { itemId: 'arcane_dust', count: 5 },
+      { itemId: 'arcane_shard', count: 5 },
+      { itemId: 'arcane_essence', count: 4 },
+      { itemId: 'arcane_dust', count: 6 },
     ],
     skillReq: 25,
     itemLevelBudget: 15,
@@ -470,9 +476,9 @@ export const TOOL_EFFECT_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'artisans_eye',
     resultCount: 1,
     reagents: [
-      { itemId: 'arcane_shard', count: 4 },
-      { itemId: 'arcane_essence', count: 3 },
-      { itemId: 'arcane_dust', count: 5 },
+      { itemId: 'arcane_shard', count: 5 },
+      { itemId: 'arcane_essence', count: 4 },
+      { itemId: 'arcane_dust', count: 6 },
     ],
     skillReq: 25,
     itemLevelBudget: 15,

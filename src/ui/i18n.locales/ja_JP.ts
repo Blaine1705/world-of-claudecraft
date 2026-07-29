@@ -9979,6 +9979,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.gatherersCache': '採集者の貯蔵袋',
   'hudChrome.professions.toolEffectSlotButton': '{effect}を装着',
   'hudChrome.professions.toolEffectRechargeButton': '再充填',
+  'hudChrome.professions.toolEffectNoGain': '{effect}はすでに装着され、充填も満タンだ。',
+  'hudChrome.professions.toolEffectRechargeToolCapped': '{effect}をさらに充填するには、より上質な{profession}用ツールが必要だ。',
   'hudChrome.professions.toolEffectSlotted': '{effect}を{profession}に装着した。',
   'hudChrome.professions.toolEffectSlotInvalid': '{effect}はそこには装着できない。',
   'hudChrome.professions.toolEffectNoTool': 'まず本物の{profession}用ツールが必要だ。',

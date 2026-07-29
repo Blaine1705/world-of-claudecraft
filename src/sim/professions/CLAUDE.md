@@ -81,11 +81,20 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `tools.ts` / `stations.ts` / `focus.ts` / `mobile_station.ts`: pure-leaf
   gates and bonuses (gather-tool tier, per-type crafting stations
   (superseding the retired level-20 hub), town focus allocation, field
-  crafting station). Tool effects/charges in `tools.ts` are LIVE (the tuning
-  packet wired them: slot command, quality/quantity bonuses on the harvest
-  path, deterministic depletion, recharge); the R9 slot policy
-  (`slotToolEffectRefused`) keeps Springback and fishing slots refused until
-  their arms have real behavior.
+  crafting station). Tool effects in `tools.ts` are LIVE end to end and this
+  leaf owns every DECISION: `resolveSlotToolEffect` is the one mint
+  authority (it also picks WHICH crafted charm copy the mint consumes, whose
+  signer becomes the slot's `craftedBy`) and `resolveRechargeToolEffect`
+  prices and sizes a refill (R30 fill from the tool held now, R39 material
+  identity, R47 price rung floored at the slot's own ceiling). The R9 slot
+  policy (`slotToolEffectRefused`) keeps Springback and fishing slots
+  refused until their arms have real behavior.
+- `tool_effect_actions.ts`: the slot and recharge COMMAND BODIES behind the
+  seam (`Sim` keeps thin delegates). Everything stateful lives here and
+  every decision in the `tools.ts` leaf above: resolve first, then consume
+  the price (the charm copy by index, the arcane materials), write the slot,
+  and report through the one text-free personal `toolEffectResult` event so
+  no refusal is silent. Draw-free in every arm.
 - `fishing_zones.ts`: the per-zone rod-tier ladder (`rodTierRequiredForZone`,
   water gated by the WATER's zone) the cast gate and the vendor rows read.
 - `mastery_reset.ts`: the one-time skill reset behind `masteryResetApplied`;

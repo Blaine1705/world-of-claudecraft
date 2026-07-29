@@ -10034,9 +10034,19 @@ export class Hud {
           // single-surface rule: no toast, no extra sound cue). Unknown ids
           // render raw rather than crash, the stale-content doctrine: a
           // yet-unknown effect id still names itself legibly.
-          const effectKey = ev.effectId ? TOOL_EFFECT_NAME_KEYS[ev.effectId] : undefined;
+          // hasOwn, not a bare index: the deny arms echo the SENDER's own
+          // command strings back as these ids, so a hand-built frame naming
+          // 'constructor' would otherwise resolve a prototype member and
+          // hand a non-key to t(). Matches the view core's guard on the same
+          // tables.
+          const effectKey =
+            ev.effectId !== undefined && Object.hasOwn(TOOL_EFFECT_NAME_KEYS, ev.effectId)
+              ? TOOL_EFFECT_NAME_KEYS[ev.effectId]
+              : undefined;
           const effectName = effectKey ? t(effectKey) : (ev.effectId ?? '');
-          const professionKey = GATHERING_PROFESSION_NAME_KEYS[ev.professionId];
+          const professionKey = Object.hasOwn(GATHERING_PROFESSION_NAME_KEYS, ev.professionId)
+            ? GATHERING_PROFESSION_NAME_KEYS[ev.professionId]
+            : undefined;
           const professionName = professionKey ? t(professionKey) : ev.professionId;
           const materialToken = ev.materialItemId ? grantItemToken(ev.materialItemId) : '';
           const countText = formatNumber(ev.count ?? 0, { maximumFractionDigits: 0 });
@@ -10060,23 +10070,30 @@ export class Hud {
                 ? t('hudChrome.professions.toolEffectNoTool', { profession: professionName })
                 : ev.reason === 'no_charm'
                   ? t('hudChrome.professions.toolEffectNoCharm', { effect: effectName })
-                  : ev.reason === 'no_slot'
-                    ? t('hudChrome.professions.toolEffectRechargeNoSlot', {
-                        profession: professionName,
-                      })
-                    : ev.reason === 'already_full'
-                      ? t('hudChrome.professions.toolEffectRechargeFull', { effect: effectName })
-                      : ev.reason === 'insufficient_materials'
-                        ? t('hudChrome.professions.toolEffectRechargeMaterials', {
-                            effect: effectName,
-                            material: materialToken,
-                            count: countText,
-                          })
-                        : ev.reason === 'throttled'
-                          ? t('hudChrome.crafting.throttled')
-                          : t('hudChrome.professions.toolEffectSlotInvalid', {
+                  : ev.reason === 'no_gain'
+                    ? t('hudChrome.professions.toolEffectNoGain', { effect: effectName })
+                    : ev.reason === 'no_slot'
+                      ? t('hudChrome.professions.toolEffectRechargeNoSlot', {
+                          profession: professionName,
+                        })
+                      : ev.reason === 'already_full'
+                        ? t('hudChrome.professions.toolEffectRechargeFull', { effect: effectName })
+                        : ev.reason === 'tool_capped'
+                          ? t('hudChrome.professions.toolEffectRechargeToolCapped', {
                               effect: effectName,
-                            }),
+                              profession: professionName,
+                            })
+                          : ev.reason === 'insufficient_materials'
+                            ? t('hudChrome.professions.toolEffectRechargeMaterials', {
+                                effect: effectName,
+                                material: materialToken,
+                                count: countText,
+                              })
+                            : ev.reason === 'throttled'
+                              ? t('hudChrome.crafting.throttled')
+                              : t('hudChrome.professions.toolEffectSlotInvalid', {
+                                  effect: effectName,
+                                }),
               '#ff6b6b',
             );
           }
