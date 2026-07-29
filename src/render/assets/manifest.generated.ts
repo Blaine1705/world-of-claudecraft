@@ -1209,6 +1209,8 @@ export const MEDIA_ASSETS: Record<string, string> =
   "textures/eastbrook_surface_atlas.webp": "/media/textures/eastbrook_surface_atlas.d66f2fab603a.webp",
   "textures/eastbrook_surface_normal.webp": "/media/textures/eastbrook_surface_normal.905e7210b9f3.webp",
   "textures/eastbrook_surface_rough.webp": "/media/textures/eastbrook_surface_rough.c236f266a994.webp",
+  "textures/foliage/Moss002_AmbientOcclusion.jpg": "/media/textures/foliage/Moss002_AmbientOcclusion.bf9f86b24612.jpg",
+  "textures/foliage/Moss002_NormalGL.jpg": "/media/textures/foliage/Moss002_NormalGL.10f00f2bfc8a.jpg",
   "textures/skins/barbarian/alt_a.png": "/media/textures/skins/barbarian/alt_a.3433bfc84448.png",
   "textures/skins/barbarian/alt_b.png": "/media/textures/skins/barbarian/alt_b.23af16cb9251.png",
   "textures/skins/barbarian/alt_c.png": "/media/textures/skins/barbarian/alt_c.5e1f20e038b4.png",

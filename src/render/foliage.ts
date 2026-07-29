@@ -26,6 +26,7 @@ import {
 } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { applyCanopyDetail } from './canopy_detail';
 import {
   applyInstanceCollapse,
   type CollapseRole,
@@ -694,6 +695,9 @@ function foliageMaterial(
   const worn = foliageWornFamilyFor(src.name);
   if (worn)
     applySurfaceDetail(mat as THREE.MeshStandardMaterial, worn.family, { strength: worn.strength });
+  // Leaf names return null above: canopies take their own clump-detail layer
+  // (needle/leaf break-up) instead; unknown names no-op inside.
+  applyCanopyDetail(mat, src.name);
   materialCache.set(key, mat);
   return mat;
 }
