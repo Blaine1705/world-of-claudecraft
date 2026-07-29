@@ -17,6 +17,7 @@ import {
   GATHERING_PROFESSIONS,
   type GatheringProfessionId,
   HARVEST_COMPONENT_ITEMS,
+  TOOL_EFFECTS,
 } from '../content/professions';
 import { ITEMS } from '../data';
 import type { Rng } from '../rng';
@@ -37,7 +38,7 @@ import {
   GATHER_RARE_EVENT_YIELD_MULT,
   rollGatherRareEvent,
 } from './gather_events';
-import { harvestGradeItemId } from './material_grades';
+import { fineGradeReachable, harvestGradeItemId } from './material_grades';
 import { gatherActionXp } from './profession_xp';
 import { proficiencyBandFor } from './proficiency_bands';
 import {
@@ -61,8 +62,11 @@ export type GatheringProficiency = Record<GatheringProfessionId, number>;
 // them): only their node source went away.
 //
 // respawnSeconds is 240 and moved there together with the node count, which
-// doubled to six per type per zone (content/gather_nodes.ts). The pair is one
-// change and has to stay one: the per-zone ceiling is nodes * 3600 / respawn,
+// doubled to six per type per zone across the TUNED strip zones
+// (content/gather_nodes.ts; the v0.32.0 expansion zones ship two starter
+// nodes per type instead, their ceilings un-tuned until phase 13). The pair
+// is one change and has to stay one within that tuned set: the per-zone
+// ceiling is nodes * 3600 / respawn,
 // so 9 nodes at 120 seconds and 18 at 240 are the same 270 harvests an hour,
 // and Mirefen and Thornpeak (12 nodes at 120, 360 an hour) come DOWN onto that
 // same figure rather than up. What the pair buys is circuit length: every zone
@@ -377,8 +381,20 @@ export function resolveHarvest(
   // so an effect can improve what a vein yields and can never open one.
   // `confirmed` is true because no confirmation flow exists yet: every shipped
   // slot is 'always' mode, for which the flag is ignored outright.
+  // Use-time zero-benefit gate (the R9 refusal, at the only place that knows
+  // the node): a QUALITY effect can only ever pay off where the fine grade is
+  // reachable at all (yieldsFineGrade demands node.tier at or above the
+  // material's rung), and the v0.32.0 expansion's starter nodes sit below
+  // every rung 2+ material they grant, so without this gate a slotted
+  // Artisan's Eye would burn a charge per harvest there for a categorically
+  // impossible upgrade. Quantity effects always pay and pass through. Pure
+  // reads only, so the two-draw contract is untouched.
+  const slot = meta.toolEffectSlots?.[entry.professionId];
+  const slotKind = slot ? TOOL_EFFECTS[slot.effectId]?.kind : undefined;
+  const usableSlot =
+    slotKind === 'quality' && !fineGradeReachable(material.itemId, node.tier) ? undefined : slot;
   const effect = resolveToolEffectUse(
-    meta.toolEffectSlots?.[entry.professionId],
+    usableSlot,
     {
       quantity: material.qtyByRarity[rarity] * (rareEvent ? GATHER_RARE_EVENT_YIELD_MULT : 1),
       gradeToolTier: bestOwnedGatherToolTierOrNone(meta.inventory, entry.professionId, ITEMS),

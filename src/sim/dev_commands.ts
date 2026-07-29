@@ -237,6 +237,9 @@ export function handleDevChat(
       const leveled = entity.level < gate;
       if (leveled) ctx.setPlayerLevel(gate, pid);
       meta.copper += 100 * 10000;
+      // Every teleport, the dev ones included, runs the one session teardown
+      // (the same call /dev tp makes above).
+      cancelProfessionSessionOnDisplacement(ctx, entity);
       const pos = ctx.groundPos(marla.pos.x + 2, marla.pos.z + 1);
       entity.pos = pos;
       entity.prevPos = { ...pos };

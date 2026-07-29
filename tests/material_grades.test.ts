@@ -30,6 +30,11 @@ import { isGatherToolUse } from '../src/sim/professions/tools';
 
 const ZONES = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'] as const;
 
+const highestTierIn = (zoneId: string, type: string) =>
+  Math.max(
+    ...GATHER_NODES.filter((n) => n.zoneId === zoneId && n.type === type).map((n) => n.tier),
+  );
+
 describe('MATERIAL_GRADES table', () => {
   it('covers exactly the nine node yields, one grade pair each', () => {
     const liveYields = new Set<string>();
@@ -103,10 +108,9 @@ describe('MATERIAL_GRADES table', () => {
     // The whole point of keying the gate on the MATERIAL rather than the node.
     // Derived from GATHER_NODES, so re-tiering a vein without revisiting the
     // grade table fails here instead of quietly moving who can farm a grade.
-    const highestTierIn = (zoneId: string, type: string) =>
-      Math.max(
-        ...GATHER_NODES.filter((n) => n.zoneId === zoneId && n.type === type).map((n) => n.tier),
-      );
+    // Scoped to the tuned zones: the v0.32.0 expansion zones re-grant rung 2
+    // and 3 materials from tier-1 starter nodes on purpose, and THEIR truth
+    // is the inverse relation the starter-zone arm below pins.
     let checked = 0;
     for (const type of GATHER_NODE_TYPES) {
       for (const zoneId of ZONES) {
@@ -121,6 +125,33 @@ describe('MATERIAL_GRADES table', () => {
     expect(gatherMaterialTier('copper_ore')).toBe(1);
     expect(gatherMaterialTier('iron_ore')).toBe(2);
     expect(gatherMaterialTier('thorium_ore')).toBe(3);
+  });
+
+  it('every starter-zone row sits BELOW its material rung, so no fine grade leaks there', () => {
+    // The v0.32.0 expansion zones grant rung 2 and 3 materials from tier-1
+    // hub-outskirt nodes. That is safe exactly as long as every such zone's
+    // highest node tier stays UNDER the granted material's gatherTier, since
+    // yieldsFineGrade demands nodeTier >= gatherTier: the moment an expansion
+    // zone gains a node at or above its material rung without a deliberate
+    // grade-table decision, fine thorium becomes farmable outside the tuned
+    // ladder and this arm reds first. Swept over every zone with a material
+    // row that is NOT one of the tuned three, derived, with non-vacuity.
+    let checkedStarter = 0;
+    for (const type of GATHER_NODE_TYPES) {
+      for (const [zoneId, row] of Object.entries(NODE_MATERIAL_TABLE[type])) {
+        if ((ZONES as readonly string[]).includes(zoneId)) continue;
+        const highest = highestTierIn(zoneId, type);
+        const rung = gatherMaterialTier(row.itemId);
+        expect(rung, `${type}/${zoneId} grants ungraded ${row.itemId}`).toBeDefined();
+        if (rung === undefined) continue;
+        expect(
+          highest,
+          `${type}/${zoneId} node tier ${highest} reaches material rung ${rung}`,
+        ).toBeLessThan(rung);
+        checkedStarter += 1;
+      }
+    }
+    expect(checkedStarter).toBe(33);
   });
 
   it('resolves both directions, and refuses ids that have no grade', () => {

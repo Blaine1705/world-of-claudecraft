@@ -1587,6 +1587,35 @@ describe('fishing over the live server (pin 8)', () => {
     expect(client.gatheringProficiency.fishing).toBe(1);
   });
 
+  it('an empty-hook reel routes the personal fishingEmptyHook to the angler only', () => {
+    // The telemetry-only sibling of the routed trio above: no client handler
+    // exists by design (the player-visible half is the "No fish are biting."
+    // log line), but the event still rides the same personal routing, and
+    // this is the one arm of the four that had no online pin.
+    const { server, fcA, fcB, sa, angler } = setupAngler();
+    let empty = false;
+    for (let session = 0; session < 100 && !empty; session++) {
+      if (angler.castingAbility !== FISHING_CAST_ID) {
+        server.sim.useItem('simple_fishing_pole', sa.pid);
+        expect(angler.castingAbility).toBe(FISHING_CAST_ID);
+      }
+      fcA.sent.length = 0;
+      fcB.sent.length = 0;
+      let bit = false;
+      for (let i = 0; i < 200 && !bit; i++) {
+        (server as any).routeEvents(server.sim.tick());
+        bit = deliveredEvents(fcA).some((ev) => ev.type === 'fishingBite');
+      }
+      expect(bit).toBe(true);
+      server.sim.useItem('simple_fishing_pole', sa.pid); // the reel
+      (server as any).routeEvents(server.sim.drainEvents());
+      empty = deliveredEvents(fcA).some((ev) => ev.type === 'fishingEmptyHook');
+      expect(deliveredEvents(fcB).some((ev) => ev.type === 'fishingEmptyHook')).toBe(false);
+      server.sim.tick();
+    }
+    expect(empty).toBe(true);
+  });
+
   it('a missed reel window gets away server-side: personal fishingGotAway, no catch, no grant', () => {
     const { server, fcA, fcB, sa, angler, meta } = setupAngler();
     let missed = false;

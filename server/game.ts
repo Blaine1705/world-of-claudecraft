@@ -4716,7 +4716,7 @@ export class GameServer {
       // Riding skill purchase: player buys Riding from Marla for 80g. The Sim
       // re-validates NPC identity, range, level, and funds.
       case 'learn_riding':
-        if (typeof msg.npc === 'number') sim.learnRidingFor(msg.npc, pid);
+        if (Number.isInteger(msg.npc)) sim.learnRidingFor(msg.npc as number, pid);
         break;
       // Show-jumping race: the Sim re-validates the glowing platform, lesson or
       // mount eligibility, and liveness before arming the countdown.
@@ -4789,8 +4789,14 @@ export class GameServer {
           break;
         // Recovery is a gameplay command, not broadcast chat. Keep it usable
         // while muted and outside the chat token bucket, then route through the
-        // same authoritative system as the dedicated Settings action.
+        // same authoritative system as the dedicated Settings action. It still
+        // pays the COMMAND lane the dedicated action pays: riding the chat
+        // case skipped the top-of-dispatch draw (classifyMsgLane says 'chat'),
+        // so without this a /unstuck chat frame reached the sim with zero
+        // tokens drawn on any lane and never tallied toward the flood-kick
+        // verdict (the release-merge audit's finding).
         if (/^\/unstuck\s*$/i.test(text)) {
+          if (!this.consumeLane(session, 'command', receivedAtMs / 1000)) break;
           sim.unstuck(pid);
           break;
         }

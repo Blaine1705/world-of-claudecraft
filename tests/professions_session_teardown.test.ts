@@ -214,6 +214,25 @@ describe('teleports cancel a live session', () => {
     expectSessionEnded(sim, p);
   });
 
+  it('rift entry and rift exit each cancel a session (the v0.32.0 teleport family)', () => {
+    // The rift portals arrived with the v0.32.0 expansion as a whole new
+    // teleport family with the enterDungeon displacement recipe but not the
+    // teardown call; the release-merge audit caught the bypass. A player can
+    // interact with an overworld portal mid-gather, so the entry drives a
+    // REAL session; the exit uses the assigned fixture like the other
+    // instance exits.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const p = startGatherSession(sim, pid);
+    sim.drainEvents();
+    sim.enterRift(4242, 15, pid);
+    expectSessionEnded(sim, p);
+    const p2 = assignFishingSession(sim, pid);
+    sim.drainEvents();
+    sim.leaveRift(pid);
+    expectSessionEnded(sim, p2);
+  });
+
   it('/dev tp cancels a session', () => {
     const sim = makeSim();
     const pid = sim.playerId;

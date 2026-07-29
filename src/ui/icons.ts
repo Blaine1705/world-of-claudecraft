@@ -3453,7 +3453,8 @@ function itemFallback(id: string): IconRecipe | null {
   // FUNCTION whose `.name` is a real string, which a shape check alone would
   // wave through to a garbage derived recipe. This is the unknown-id path
   // every stale-client fallback surface funnels through; today the
-  // weapon-art arm in iconDataUrl happens to short-circuit prototype keys
+  // weapon-art arm (staticIconUrl, extracted from iconDataUrl in v0.32.0)
+  // happens to short-circuit prototype keys
   // first, and this guard makes the fallback's throw-freedom a property of
   // this function rather than of that coincidence surviving refactors.
   const it = Object.hasOwn(ITEMS, id) ? ITEMS[id] : undefined;

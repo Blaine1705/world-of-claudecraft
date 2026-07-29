@@ -1198,6 +1198,35 @@ describe('fine material grades on the live harvest path', () => {
     expect(meta.toolEffectSlots?.mining?.durability).toBe(chargesBefore - 1);
   });
 
+  it('a quality effect keeps its charge where the fine grade is unreachable (starter zones)', () => {
+    // The v0.32.0 expansion's starter nodes are tier 1 while their materials
+    // sit at rung 2 and 3 (veiled_hollow grants thorium_ore, gatherTier 3),
+    // so yieldsFineGrade is false there at EVERY tool tier and a quality
+    // charge can never pay off. The use-time gate (gathering.ts, the R9
+    // zero-benefit refusal) must keep the charge: the harvest still grants
+    // the plain material, still at two draws, and the slot is untouched. The
+    // spend arm on a reachable node is the exactly-two-draws test above.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('copper_mining_pick', 1, pid); // tier 1: opens the tier-1 vein
+    sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
+    const meta = mustMeta(sim, pid);
+    const chargesBefore = meta.toolEffectSlots?.mining?.durability ?? 0;
+    expect(chargesBefore).toBeGreaterThan(0);
+    const STARTER = 'ore_veiled_hollow_1';
+    teleportOntoNode(sim, pid, STARTER);
+    let draws = 0;
+    (sim as any).rng.setObserver(() => {
+      draws++;
+    });
+    expect(castAndComplete(sim, STARTER, pid)).toBe(true);
+    (sim as any).rng.setObserver(null);
+    expect(draws).toBe(2);
+    expect(sim.countItem('thorium_ore', pid)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('fine_thorium_ore', pid)).toBe(0);
+    expect(meta.toolEffectSlots?.mining?.durability).toBe(chargesBefore);
+  });
+
   it('no skilling while dead: a dead player cannot start a harvest at all (R31)', () => {
     // Already enforced (the vendor-family dead gate at the top of
     // harvestNode); pinned here so it cannot rot, because R31 records the

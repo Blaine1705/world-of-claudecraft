@@ -137,6 +137,21 @@ export function yieldsFineGrade(
  * zone whose material row lands before its grade row degrades to the plain
  * yield rather than throwing.
  */
+/**
+ * Whether the fine grade of `baseItemId` is REACHABLE at a node of
+ * `nodeTier` at any tool tier at all: yieldsFineGrade demands the node match
+ * the material's own rung (nodeTier >= gatherTier), so on the v0.32.0
+ * expansion's starter nodes (tier 1 everywhere, materials at rung 2 and 3)
+ * no tool and no slotted bonus can ever mint the grade. The use-time charge
+ * gate in gathering.ts reads this so a quality effect never spends a charge
+ * on a categorically impossible upgrade. A material with no grade row is
+ * never reachable.
+ */
+export function fineGradeReachable(baseItemId: string, nodeTier: number): boolean {
+  const row = MATERIAL_GRADES[baseItemId];
+  return row !== undefined && nodeTier >= row.gatherTier;
+}
+
 export function harvestGradeItemId(
   baseItemId: string,
   nodeTier: number,
