@@ -1624,6 +1624,84 @@ Final gate: PASS, all 11 steps, on the committed idle tree at 8e8ebc868
 (the code tip). Phase 12 is BUILT; its QA runs in a new session, per the
 cadence.
 
+QA'D 2026-07-29 (Fable, ultracode, new session), judging 8e0006388 through
+8e8ebc868 plus the docs close. Preamble: origin fetched, release/v0.32.0
+still the newest release branch and unmoved at a802b4be2 (the merge base),
+no re-sync; opening gate PASS, all 11 steps, at ee8a862f7. The fan-out:
+seven fresh reviewers (qa-checklist, architecture, cross-platform-sync,
+privacy-security, migration-safety, frontend-seam, and test-coverage, the
+last running 678 targeted tests) plus a 26-agent adversarial workflow
+(seven lenses over every grant, mint, recharge, and depletion path, two
+independent refuters per finding, then a completeness critic; the
+hostile-wire lens verified clean end to end), roughly sixty findings in
+all, EVERY one applied, recorded, or explicitly resolved. The fixes were
+then re-reviewed by a fresh five-reviewer panel and its findings applied
+in turn (the fix-round commit), 21 targeted mutations over the new pins
+all KILLED under the prove-application guard on the committed idle tree,
+and the closing gate ran PASS, all 11 steps, at the QA code tip 9a712215a
+(eight QA commits past the build's docs close).
+
+The load-bearing findings, all closed: R48 (ledger above), found as the
+phantom slot button by three streams independently (the view resolver ran
+without craftedBy or the slotter name, so the primary crafter flow offered
+a button the server always refused) and given its sharp edge by the
+security pass (a double-click whose first click consumed the last
+self-signed copy burned a FOREIGN copy next and silently retired the
+owner's discount); the directional conjunct plus the selfCrafted boolean
+projection close both at once, with the name itself still never crossing
+the wire. The mid-cast tool handoff dodged R47's use-time ratchet (trade
+has no casting gate; two workflow lenses found it, and the verification
+split settled honestly: the dodge also forfeits the completion-read fine
+grade, so its payoff was marginal), closed structurally by the cast-start
+capture and the max(start, completion) ratchet, with the fix round then
+closing its own corner (a fresh mid-cast mint retires the stale capture:
+the re-slot toll buys the downgrade). Two zero-coverage arms whose
+deleting mutations survived the whole suite: the recharge ceiling's raise
+arm, whose loss would clamp paid charges away on the next load, and the
+ratchet's raise-only guard, whose loss reopens the arbitrage; both pinned
+with literals. The held-Enter focus retarget (a recharge success repaint
+handed the Enter stream to the row's charm-burning slot button): the
+ladder is now the same control then Close, with sent-guards on both
+buttons and a dropped-frame re-arm timer. The eight tail locales missed
+the charm right-click row one file past the build's hand sweep (the
+BASE_NEW blocks live in the GENERATED newlocales module; the sweep note
+now covers both files). The recharge deny order inverted the family rule
+and hid the price-carrying deny from a throttled player. Beside those:
+the professions.md release-cut line blamed a pre-craft binary for the
+rollback erasure when only a binary predating the toolEffectSlots FIELD
+erases (the deployed release and earlier), the stale trade buyback
+comment misdirected the signed-charm laundering audit, and the nit tail
+(the maxDurability JSDoc rewritten to its R47 semantics, the coupled
+pricing-inverse note, required-param tightening, renames, hasOwn
+consistency in the window, header scoping in tool_effect_name and
+focus_restore) all landed.
+
+Deploy-window delta: the tslot row gained the selfCrafted boolean,
+additive (the deployed bundle's whole-row decode ignores it); no new
+command, event, or route. Parity goldens never moved (the new transient
+Entity capture field is inert outside a live cast and sampled by
+omit-defaults). RECORDED, not changed, each with its owner: the blind
+marginal top-up price (one full material for one charge at 49 of 50; the
+cost preview is ruled phase 14's surface and the marginal case rides with
+it), the capacity-wall unslot gap (deliberate per 8a.1; an unslot or
+suspend affordance handed to phase 14), the trade copy-choice gap
+(removePreferFungible ships the newest copy signer-blind, so a seller can
+ship their own discount-bearing self-signed copy; a copy picker or
+signer-aware preference handed to phase 14), the parity suite's zero
+slotted-effect scenarios (the build's no-golden-moved outcome kept
+deliberately; one scenario handed to phase 13/16), the golden re-mint
+judgment (stands as recorded), ratchet-on-applied (confirmed as R47's
+letter, now in its ledger text), and the standing acceptances (deny
+events force a heavy self re-diff; result lines render unknown ids raw;
+one window rebuild per result event; the normalizer's one-sided max,
+whose refutation both verifiers grounded in the trust boundary, with the
+one overstating doc word fixed). The ru_RU overlay's long rows resolved
+as no-action: biome size-skips the file, so the gate green was real
+evidence. The maintainer's surfaced levers stay surfaced (forced refresh,
+heroic reins, ONLINE_WORLD_LAYOUT_VERSION), and R45, R46, R47 with its QA
+amendments, and R48 remain veto-able rulings. Phase 12 is QA COMPLETE;
+phase 13 (build, ultracode) runs in a new session, per the cadence.
+
 ---
 
 ## Phase 13: content, zone progression, and onboarding
