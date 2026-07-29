@@ -5609,6 +5609,27 @@ export function armorReduction(armor: number, attackerLevel: number): number {
   return Math.min(0.75, a / (a + 85 * attackerLevel + 400));
 }
 
+// Enemy mobs' damage against a player is never mitigated away by armor DR by more
+// than this fraction, mirroring MOB_VS_PLAYER_MAX_MISS's floor on melee miss chance
+// (same value, same directional guard). Without this, a heavily armored higher-level
+// player or player-owned pet could reduce a lower-level hostile mob's already-floored
+// hit chance further into near-zero damage per swing, making defensive-pet AFK farming
+// risk-free (see issue #1050).
+export const MOB_VS_PLAYER_MAX_ARMOR_DR = MOB_VS_PLAYER_MAX_MISS;
+
+// Effective armor-DR fraction for `attacker`'s hit on `target`, floored directionally
+// the same way swingMissChance floors mob miss: a hostile wild mob (or its cleave
+// splash) hitting a player or player-owned pet never gets more than
+// MOB_VS_PLAYER_MAX_ARMOR_DR mitigated away by armor, regardless of how armored the
+// target is. Player/pet -> mob keeps the full armorReduction scaling untouched.
+export function mobArmorReduction(attacker: Entity, target: Entity, armor: number): number {
+  const dr = armorReduction(armor, attacker.level);
+  const mobAttacker = attacker.kind === 'mob' && attacker.hostile && attacker.ownerId === null;
+  const playerSide = target.kind === 'player' || target.ownerId !== null;
+  if (mobAttacker && playerSide) return Math.min(dr, MOB_VS_PLAYER_MAX_ARMOR_DR);
+  return dr;
+}
+
 // ---------------------------------------------------------------------------
 // Spell Power: caster damage scaling (classic-style cast-time / DoT-duration
 // coefficient model). Casters convert Intellect into Spell Power; Spell Power
