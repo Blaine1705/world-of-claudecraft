@@ -33,6 +33,7 @@ vi.mock('../server/db', () => ({
 import { type ClientSession, GameServer } from '../server/game';
 import { bagCapacity } from '../src/sim/bags';
 import { cancelCast, updateCasting } from '../src/sim/combat/casting_lifecycle';
+import { handleDeath } from '../src/sim/combat/damage';
 import { runEffects } from '../src/sim/combat/effect_dispatch';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { ABILITIES, LAKE, MOBS } from '../src/sim/data';
@@ -307,7 +308,7 @@ describe('hidden-state wire invariant', () => {
     expect(a.stream[114][0]).toBe(15);
   });
 
-  it('no wire snapshot carries fishBiteAtTick, fishReelDeadlineTick, fishCastZoneId, or gatherCastNodeId', () => {
+  it('no wire snapshot carries fishBiteAtTick, fishReelDeadlineTick, fishCastZoneId, gatherCastNodeId, or gatherCastToolRarity', () => {
     interface FakeClient {
       sent: any[];
       ws: any;
@@ -359,12 +360,18 @@ describe('hidden-state wire invariant', () => {
     gatherer.pos.y = terrainHeight(NODE.pos.x, NODE.pos.z, server.sim.cfg.seed);
     gatherer.prevPos = { ...gatherer.pos };
     server.sim.addItem('copper_mining_pick', 1, sb.pid); // #2343: node harvest needs the tool
+    // A slotted effect makes the R47 cast-start capture non-inert too, so
+    // the fifth hidden field is provably live at scan time (an inert field
+    // would pass the absence checks vacuously).
+    server.sim.addItemInstance('gatherers_cache', { signer: 'HiddenGatherer' }, sb.pid, 1);
+    server.sim.slotToolEffect('mining', 'gatherers_cache', undefined, sb.pid);
     expect(server.sim.harvestNode(NODE.id, sb.pid)).toBe(true);
     server.sim.tick(); // both casts mid-flight
     // The hidden fields ARE nonzero right now, so an accidental broadcast
     // would be visible in this exact snapshot.
     expect(angler.fishBiteAtTick).toBeGreaterThan(0);
     expect(gatherer.gatherCastNodeId).toBe(NODE.id);
+    expect(gatherer.gatherCastToolRarity).toBe('common');
     (server as any).broadcastSnapshots();
     const payload = fcA.sent.join('\n') + fcB.sent.join('\n');
     // Sanity: we are scanning real snapshot payloads with live cast fields,
@@ -376,6 +383,7 @@ describe('hidden-state wire invariant', () => {
     expect(payload.includes('fishReelDeadlineTick')).toBe(false);
     expect(payload.includes('fishCastZoneId')).toBe(false);
     expect(payload.includes('gatherCastNodeId')).toBe(false);
+    expect(payload.includes('gatherCastToolRarity')).toBe(false);
     // Second scan AFTER the bite fires, so the reel deadline is provably
     // NONZERO at snapshot time too (the review coverage pass: a value-gated
     // leak that serialized the deadline only while armed would have slipped
@@ -393,6 +401,7 @@ describe('hidden-state wire invariant', () => {
     expect(biterPayload.includes('fishReelDeadlineTick')).toBe(false);
     expect(biterPayload.includes('fishCastZoneId')).toBe(false);
     expect(biterPayload.includes('gatherCastNodeId')).toBe(false);
+    expect(biterPayload.includes('gatherCastToolRarity')).toBe(false);
   });
 });
 
@@ -1068,9 +1077,10 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
   // storage decision names (cancelCast, arena reset, fiesta down, the
   // defensive session-cap end), each mutation-decisive: deleting the clear
   // under test reds exactly its arm.
-  it('a fresh entity starts with all four hidden fields inert', () => {
+  it('a fresh entity starts with all five hidden fields inert', () => {
     const sim = makeSim(4242);
     expect(sim.player.gatherCastNodeId).toBe('');
+    expect(sim.player.gatherCastToolRarity).toBe('');
     expect(sim.player.fishBiteAtTick).toBe(0);
     expect(sim.player.fishReelDeadlineTick).toBe(0);
     expect(sim.player.fishCastZoneId).toBe('');
@@ -1087,8 +1097,10 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
     updateCasting(sim.ctx, p, meta); // the bite arms the window
     expect(p.fishReelDeadlineTick).toBeGreaterThan(sim.tickCount);
     expect(p.fishCastZoneId).toBe('eastbrook_vale');
+    p.gatherCastToolRarity = 'epic'; // belt-and-braces: all five clear
     cancelCast(sim.ctx, p);
     expect(p.castingAbility).toBe(null);
+    expect(p.gatherCastToolRarity).toBe('');
     expect(p.fishBiteAtTick).toBe(0);
     expect(p.fishReelDeadlineTick).toBe(0);
     expect(p.fishCastZoneId).toBe('');
@@ -1119,10 +1131,12 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
     teleportToValeShore(sim);
     startFishing(sim.ctx, sim.player, meta);
     expect(sim.player.fishBiteAtTick).toBeGreaterThan(0);
-    sim.player.gatherCastNodeId = NODE.id; // belt-and-braces: all four clear
+    sim.player.gatherCastNodeId = NODE.id; // belt-and-braces: all five clear
+    sim.player.gatherCastToolRarity = 'epic';
     expect(sim.player.fishCastZoneId).toBe('eastbrook_vale');
     readyArenaFighter(sim.ctx, sim.player, { clearPrep: false });
     expect(sim.player.gatherCastNodeId).toBe('');
+    expect(sim.player.gatherCastToolRarity).toBe('');
     expect(sim.player.fishBiteAtTick).toBe(0);
     expect(sim.player.fishReelDeadlineTick).toBe(0);
     expect(sim.player.fishCastZoneId).toBe('');
@@ -1136,9 +1150,32 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
     startFishing(sim.ctx, sim.player, meta);
     expect(sim.player.fishBiteAtTick).toBeGreaterThan(0);
     sim.player.gatherCastNodeId = NODE.id;
+    sim.player.gatherCastToolRarity = 'epic';
     expect(sim.player.fishCastZoneId).toBe('eastbrook_vale');
     fiestaDownEntity(sim.ctx, sim.player, null);
     expect(sim.player.gatherCastNodeId).toBe('');
+    expect(sim.player.gatherCastToolRarity).toBe('');
+    expect(sim.player.fishBiteAtTick).toBe(0);
+    expect(sim.player.fishReelDeadlineTick).toBe(0);
+    expect(sim.player.fishCastZoneId).toBe('');
+  });
+
+  it('the death path clears the hidden fields (a lethal non-hit tick reaches it directly)', () => {
+    // handleDeath is the one cast-exit path cancelCast does not own; the
+    // parity samplers rely on inert values at every at-rest frame, so each
+    // of the five fields must return to inert here too.
+    const sim = makeSim(4242);
+    const meta = mustMeta(sim, sim.playerId);
+    sim.addItem('simple_fishing_pole', 1); // #2343: casting needs an implement
+    teleportToValeShore(sim);
+    startFishing(sim.ctx, sim.player, meta);
+    expect(sim.player.fishBiteAtTick).toBeGreaterThan(0);
+    sim.player.gatherCastNodeId = NODE.id; // belt-and-braces: all five clear
+    sim.player.gatherCastToolRarity = 'epic';
+    handleDeath(sim.ctx, sim.player, null);
+    expect(sim.player.dead).toBe(true);
+    expect(sim.player.gatherCastNodeId).toBe('');
+    expect(sim.player.gatherCastToolRarity).toBe('');
     expect(sim.player.fishBiteAtTick).toBe(0);
     expect(sim.player.fishReelDeadlineTick).toBe(0);
     expect(sim.player.fishCastZoneId).toBe('');

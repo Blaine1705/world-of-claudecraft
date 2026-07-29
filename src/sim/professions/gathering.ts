@@ -627,7 +627,10 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   // no casting gate (deliberately), so without this a mid-cast handoff could
   // take the bonus while dodging the price rung. '' when no slot exists,
   // which keeps the field inert for every slot-less gather cast (and every
-  // existing parity frame byte-identical). Pure bag scan, draw-free.
+  // existing parity frame byte-identical). Pure bag scan, draw-free. The
+  // `?? ''` is a type-level floor only: with a slot present the scan always
+  // returns a concrete rarity (bestOwnedGatherToolFor floors at 'common'),
+  // so the no-slot branch is the one live source of ''.
   p.gatherCastToolRarity = meta.toolEffectSlots?.[professionId]
     ? (bestOwnedGatherToolFor(meta.inventory, professionId, ITEMS).rarity ?? '')
     : '';

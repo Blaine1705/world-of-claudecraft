@@ -90,10 +90,11 @@ export interface FocusRestoreCandidate {
  * The identity is read off `dataset.focusKey` (`data-focus-key="..."` in markup), ONE
  * flat namespace shared by every window, which is exactly why the containment check
  * lives HERE and not in the caller: mailbox_window keys its parcel steppers
- * `<itemId>:<role>` and town_focus_window keys its allocation steppers
- * `<component>:<role>`, the same shape under the same attribute name. A window that read
- * the key without checking containment would let its own repaint pull focus out of
- * another open window.
+ * `<itemId>:<role>`, town_focus_window keys its allocation steppers
+ * `<component>:<role>`, and professions_window keys its action buttons
+ * `recharge:<professionId>` and `slot:<professionId>:<effectId>`, all the same shape
+ * under the same attribute name. A window that read the key without checking
+ * containment would let its own repaint pull focus out of another open window.
  *
  * `instanceof HTMLElement` rather than a cast: `document.activeElement` is typed
  * `Element | null`, and the `dataset` read is only sound on an HTMLElement (an

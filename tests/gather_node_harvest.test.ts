@@ -1444,6 +1444,41 @@ describe('fine material grades on the live harvest path', () => {
     expect(p.gatherCastToolRarity).toBe('');
   });
 
+  it('R47: a fresh mid-cast re-slot RETIRES the stale capture: the toll buys the downgrade', () => {
+    // The re-slot toll is the sanctioned way DOWN off a price rung, paid at
+    // any moment including mid-cast. Without the capture clear on the mint,
+    // a cast started under the epic pick would re-latch the FRESH slot's
+    // ceiling at completion, clawing back the downgrade the player just
+    // paid a whole charm for.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('arcanite_mining_pick', 1, pid);
+    sim.addItem('gatherers_cache', 2, pid);
+    sim.slotToolEffect('mining', 'gatherers_cache', undefined, pid);
+    const meta = mustMeta(sim, pid);
+    expect(meta.toolEffectSlots?.mining?.maxDurability).toBe(50); // minted on the epic pick
+    teleportOntoNode(sim, pid, 'ore_eastbrook_1');
+    despawnMobs(sim);
+    expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(true);
+    const p = mustEntity(sim, pid);
+    expect(p.gatherCastToolRarity).toBe('epic'); // captured at cast start
+    sim.tick();
+    sim.tick();
+    // Mid-cast: the epic pick leaves AND the player pays the re-slot toll.
+    sim.removeItem('arcanite_mining_pick', 1, pid);
+    sim.slotToolEffect('mining', 'gatherers_cache', undefined, pid);
+    const fresh = meta.toolEffectSlots?.mining;
+    if (!fresh) throw new Error('slot minted');
+    expect(fresh.maxDurability).toBe(20); // the downgrade the charm bought
+    expect(p.gatherCastToolRarity).toBe(''); // the stale capture retired
+    for (let i = 0; i < 80 && p.castingAbility; i++) sim.tick();
+    if (p.castingAbility) throw new Error('gather cast never completed');
+    sim.tick();
+    // Completion must NOT re-latch the fresh slot off the old capture.
+    expect(fresh.maxDurability).toBe(20);
+  });
+
   it('the quantity bonus is exactly plus one against the SAME seed without the effect', () => {
     // The floor above (>= before + 2) is satisfiable with the slotted effect
     // deleted: an uncommon-or-better rarity roll or a rare event pays 2+ on

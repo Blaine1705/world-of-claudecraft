@@ -205,10 +205,12 @@ describe('ProfessionsWindow: focus and scroll survive rebuilds', () => {
     // gathering row SPENDS (a slot burns a charm, a recharge consumes
     // materials), and input.ts leaves a focused button's Enter default
     // alone, so re-parking focus on a DIFFERENT action button hands an
-    // Enter key-repeat stream to an action the player never aimed at (a
-    // recharge success repaint used to feed the stream into a charm-burning
-    // re-slot). Close is the one control whose accidental activation costs
-    // nothing, so it is the ONLY fallback rung.
+    // Enter activation to an action the player never aimed at (a recharge
+    // success repaint used to feed the stream into a charm-burning re-slot;
+    // with default binds the chat composer usually absorbs the repeats, but
+    // the hazard is live for a rebound chat key). Close is the one control
+    // whose accidental activation costs nothing, so it is the ONLY fallback
+    // rung.
     const state = baseState();
     state.inventory = [
       { itemId: 'copper_mining_pick', count: 1 },

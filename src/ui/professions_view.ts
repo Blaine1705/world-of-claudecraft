@@ -471,9 +471,21 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
             // indexes the catalog).
             rechargeable: (() => {
               const live = liveSlotFor(slot, input.viewerName);
+              // viewerName for symmetry with the slot call (the ok/deny half
+              // reads neither name nor skills today, they only scale the
+              // count, but the symmetric call cannot rot if that changes);
+              // skills stay {} because the view has no CraftSkillState and
+              // count is unused here.
               return (
                 live !== undefined &&
-                resolveRechargeToolEffect(input.inventory, row.professionId, live, '', {}, ITEMS).ok
+                resolveRechargeToolEffect(
+                  input.inventory,
+                  row.professionId,
+                  live,
+                  input.viewerName,
+                  {},
+                  ITEMS,
+                ).ok
               );
             })(),
           }

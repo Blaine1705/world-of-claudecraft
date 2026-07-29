@@ -416,6 +416,24 @@ describe('the R48 directional provenance arm and the deny-event reasons', () => 
     expect(sim.countItem('gatherers_cache')).toBe(1);
   });
 
+  it('LANDS the upgrade over a slot with NO recorded crafter: the legacy re-sign', () => {
+    // The provenance-upgrade arm's other cell: a dev-era or pre-craft slot
+    // carries no craftedBy at all, and the owner re-signing it with their
+    // own charm is the same real economic move as re-signing a bought one.
+    // The directional compare must read "unset" as not-the-slotter, never as
+    // a wildcard match.
+    const sim = makeSim();
+    sim.addItem('copper_mining_pick', 1);
+    const own = metaOf(sim).name;
+    sim.addItem('gatherers_cache', 1); // unsigned: the legacy/dev-grant shape
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBeUndefined();
+    sim.addItemInstance('gatherers_cache', { signer: own }, sim.playerId, 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe(own);
+    expect(sim.countItem('gatherers_cache')).toBe(0);
+  });
+
   it('names invalid_request and no_tool on the personal event, not only in the resolver', () => {
     // The HUD switches its deny line off `reason`, so a mis-mapped reason
     // renders the wrong copy with every state assertion still green.

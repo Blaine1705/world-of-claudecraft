@@ -16,9 +16,11 @@
 // enchanting action pays), while the slot draws none, because every
 // successful slot burns a whole crafted charm (the mint IS the price, and it
 // self-limits harder than any window would) and a denied slot mutates
-// nothing. Both are still under the wire command lane, and denial spam buys
-// nothing the HEAVY_SELF_CMDS members do not already offer (the dispatch
-// comment in server/game.ts records that acceptance).
+// nothing. Both are still under the wire command lane, and the deny events
+// forcing a heavy self re-diff is the accepted amplification (neither
+// command is a HEAVY_SELF_CMDS member; toolEffectResult's HEAVY_SELF_EVENTS
+// membership is what drives the re-diff, and the dispatch comment in
+// server/game.ts records that acceptance).
 
 import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from '../content/professions';
 import { ITEMS } from '../data';
@@ -91,6 +93,12 @@ export function slotToolEffectAction(
   // the parity digest (every deny arm above returns before this line).
   r.meta.toolEffectSlots ??= {};
   r.meta.toolEffectSlots[resolved.professionId] = resolved.slot;
+  // A fresh mint retires any live gather cast's R47 start-capture: the
+  // re-slot toll (this whole charm) is the sanctioned way DOWN off a price
+  // rung, so a stale capture from the OLD slot's cast must not re-latch the
+  // new slot's ceiling at completion. Draw-free field write, '' is the inert
+  // no-capture value.
+  r.e.gatherCastToolRarity = '';
   ctx.emit({
     type: 'toolEffectResult',
     action: 'slot',

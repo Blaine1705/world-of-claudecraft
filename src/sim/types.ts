@@ -3248,7 +3248,7 @@ export interface Entity extends ClientMirroredEntityFields {
    * `gatherCastNodeId` clears; inert ('') at rest so it stays out of every
    * at-rest parity sample.
    */
-  gatherCastToolRarity: ItemDef['quality'] | '';
+  gatherCastToolRarity: Exclude<ItemDef['quality'], undefined> | '';
   /** Hidden seeded sim tick the fishing bite fires on (0 = no pending bite). */
   fishBiteAtTick: number;
   /** Sim-tick deadline for the fishing reel re-press (0 = window not armed). */

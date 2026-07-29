@@ -46,6 +46,11 @@ const RING_RADIUS_PCT = 40;
 const RING_ICON_SIZE = 64;
 const ROW_ICON_SIZE = 56;
 
+// How long a sent action button stays guarded when NO repaint answers it
+// (a dropped frame: closed socket, spectate, lane refusal). Comfortably
+// above a live round trip, far below "dead until reopen".
+const SENT_GUARD_REARM_MS = 2000;
+
 const ROLE_LABEL_KEYS: Record<ProfessionRole, TranslationKey> = {
   major: 'hudChrome.professions.roleMajor',
   hobby: 'hudChrome.professions.roleHobby',
@@ -138,15 +143,17 @@ export class ProfessionsWindow {
   refreshIfChanged(): void {
     if (!this.opened) return;
     const input = this.buildInput();
-    if (professionsRefreshSig(input) === this.lastSig) return;
+    const sig = professionsRefreshSig(input);
+    if (sig === this.lastSig) return;
     // render() re-latches the signature itself, so a forced repaint from
     // anywhere (the toolEffectResult arm) cannot leave a stale one behind for
-    // this band to act on a second time. Handing the compared input over
-    // keeps the paint and the compare one read.
-    this.render(input);
+    // this band to act on a second time. Handing the compared input AND its
+    // signature over keeps the read and the bag-walking hash one apiece per
+    // changed repaint.
+    this.render(input, sig);
   }
 
-  render(prebuilt?: ProfessionsViewInput): void {
+  render(prebuilt?: ProfessionsViewInput, prebuiltSig?: string): void {
     const el = this.deps.root();
     if (!this.opened) return;
     // The focused control's own identity, carried across the rebuild through
@@ -166,10 +173,11 @@ export class ProfessionsWindow {
     // from a second read would record whatever the world says after the
     // paint, and any listener that moved a signature input in between would
     // leave the DOM stale behind a fresh signature the 500 ms band then
-    // trusts. `prebuilt` lets refreshIfChanged hand over the input it just
-    // signature-compared (a synchronous same-tick call, so the world cannot
-    // have moved between the compare and this paint), sparing the second
-    // full bag walk per changed repaint.
+    // trusts. `prebuilt`/`prebuiltSig` let refreshIfChanged hand over the
+    // input and signature it just compared (a synchronous same-tick call, so
+    // the world cannot have moved in between): the input hand-over spares
+    // the per-access view builders, and the signature hand-over spares the
+    // one real bag walk in the pair (the sig hash itself).
     const input = prebuilt ?? this.buildInput();
     const model = buildProfessionsView(input);
     const body = model.mode === 'simplified' ? this.simplifiedHtml(model) : this.fullHtml(model);
@@ -184,7 +192,7 @@ export class ProfessionsWindow {
     // Re-latch BEFORE the refocus: restoreFirstEnabled's focus() dispatches
     // focus listeners synchronously, and the latch must describe the paint,
     // not whatever those listeners do next.
-    this.lastSig = professionsRefreshSig(input);
+    this.lastSig = prebuiltSig ?? professionsRefreshSig(input);
     if (hadFocus) {
       // Matched by SCANNING the keyed controls rather than building an
       // attribute selector out of the key: the key embeds wire-supplied ids,
@@ -195,12 +203,13 @@ export class ProfessionsWindow {
       // paints SPENDS (a slot burns a crafted charm, a recharge consumes
       // materials), and input.ts leaves a focused button's Enter default
       // alone, so a rung that re-parks focus on a DIFFERENT action button
-      // hands a held Enter's key repeats to an action the player never
-      // aimed at (the adversarial round reproduced exactly that: a recharge
-      // success repaint dropping its button and the old same-row rung
-      // feeding the Enter stream into a charm-burning re-slot). Close is the
-      // one control whose accidental activation costs nothing. A future
-      // non-spending row control may earn a middle rung, deliberately.
+      // hands an Enter activation to an action the player never aimed at
+      // (with the default binds the same press also opens chat, which
+      // usually absorbs the repeat stream, but the hazard is live for a
+      // rebound chat key or an unavailable composer, and the rung is free
+      // to drop). Close is the one control whose accidental activation
+      // costs nothing. A future non-spending row control may earn a middle
+      // rung, deliberately.
       const keyed = [...el.querySelectorAll<HTMLElement>('[data-focus-key]')];
       const exact =
         focusKey === null
@@ -473,7 +482,12 @@ export class ProfessionsWindow {
   private gatheringHtml(model: ProfessionsViewModel): string {
     const rows = model.gathering
       .map((row) => {
-        const key = GATHERING_PROFESSION_NAME_KEYS[row.professionId];
+        // hasOwn, not a bare index: the id is wire-mirrored, and a prototype
+        // key would resolve a function that passes the undefined check and
+        // reaches t(). Same guard as the effect-name table below.
+        const key = Object.hasOwn(GATHERING_PROFESSION_NAME_KEYS, row.professionId)
+          ? GATHERING_PROFESSION_NAME_KEYS[row.professionId]
+          : undefined;
         if (key === undefined) return '';
         const pct = Math.round(row.bar.fillFraction * 100);
         return (
@@ -574,18 +588,24 @@ export class ProfessionsWindow {
     // player who cannot afford it on purpose.
     //
     // The sent-guard: one command per painted button. The repaint that
-    // answers the command replaces the node (fresh dataset), so the guard
-    // never sticks; until it arrives, a double-click or a held Enter's key
-    // repeats on the SAME button send nothing more. Guarding beats
-    // disabling, because disabling the focused button drops keyboard focus
-    // to <body> before the repaint can restore it.
+    // answers the command replaces the node (fresh dataset), and every
+    // server-REACHED refusal emits the event that triggers it; until then, a
+    // double-click or a held Enter's key repeats on the SAME button send
+    // nothing more. Guarding beats disabling, because disabling the focused
+    // button drops keyboard focus to <body> before the repaint can restore
+    // it. THE RESIDUAL: a frame that never reaches the sim (the reconnect
+    // window's closed socket, spectate's command drop, a lane-refused frame)
+    // answers with nothing, so the one-shot timer below re-arms the node
+    // rather than leaving it dead until a reopen; if the real answer then
+    // arrives late, a duplicate send is refused server-side (no_gain or
+    // already_full), so the race costs nothing.
     for (const button of el.querySelectorAll<HTMLElement>('[data-slot-effect]')) {
       button.addEventListener('click', () => {
         if (button.dataset.sent !== undefined) return;
         const professionId = button.getAttribute('data-slot-profession');
         const effectId = button.getAttribute('data-slot-effect');
         if (professionId === null || effectId === null) return;
-        button.dataset.sent = '1';
+        this.armSentGuard(button);
         this.deps.world().slotToolEffect(professionId, effectId);
         audio.click();
       });
@@ -595,11 +615,23 @@ export class ProfessionsWindow {
         if (button.dataset.sent !== undefined) return;
         const professionId = button.getAttribute('data-recharge-profession');
         if (professionId === null) return;
-        button.dataset.sent = '1';
+        this.armSentGuard(button);
         this.deps.world().rechargeToolEffect(professionId);
         audio.click();
       });
     }
+  }
+
+  /** Mark a button as having sent its command, with the dropped-frame
+   *  re-arm: a ONE-SHOT timer (not a repeating driver, so the cold-window
+   *  contract holds) clears the guard if no repaint replaced the node,
+   *  covering the paths where the frame never reaches the sim and no
+   *  toolEffectResult can answer. */
+  private armSentGuard(button: HTMLElement): void {
+    button.dataset.sent = '1';
+    setTimeout(() => {
+      if (button.isConnected) delete button.dataset.sent;
+    }, SENT_GUARD_REARM_MS);
   }
 
   private fmt(n: number): string {

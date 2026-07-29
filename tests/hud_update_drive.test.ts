@@ -1098,7 +1098,8 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
       // The guard compares the freshly built input's signature directly (no
       // local sig binding): render() re-latches lastSig from the one input it
       // painted, so this band never re-acts on a stale one.
-      proof: 'if (professionsRefreshSig(input) === this.lastSig) return;',
+      proof:
+        'const input = this.buildInput(); const sig = professionsRefreshSig(input); if (sig === this.lastSig) return;',
     },
     why: 'the professions window',
   },
@@ -1406,7 +1407,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // The professions guard hashes the freshly built input inline (no local
         // sig binding): render() re-latches lastSig from the one input it
         // painted, so the band never re-acts on a stale signature.
-        'professions_window.ts: if (professionsRefreshSig(input) === this.lastSig) return;',
+        'professions_window.ts: const input = this.buildInput(); const sig = professionsRefreshSig(input); if (sig === this.lastSig) return;',
         'social_window.ts: if (struct !== this.lastStruct) {',
         // #2519 replaced the joined signature string this used to build every frame with
         // an in-place comparison against the retained numbers; same guard, same place, no

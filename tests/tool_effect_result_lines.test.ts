@@ -137,13 +137,27 @@ describe('the toolEffectResult chat arm', () => {
     }
     const rendered = lines(hud);
     expect(rendered).toHaveLength(denies.length);
+    // EVERY reason renders ITS OWN copy, anchored per line: a swap of any
+    // two branch keys keeps counts and distinctness green, so only content
+    // anchors make the reason-to-sentence mapping decisive.
+    const anchors: [number, string][] = [
+      [0, 'need a real'], // no_tool
+      [1, 'crafted'], // no_charm
+      [2, 'already slotted'], // no_gain
+      [3, 'cannot be slotted'], // invalid_request
+      [4, 'No effect is slotted'], // no_slot
+      [5, 'already fully charged'], // already_full
+      [6, 'Carry a better'], // tool_capped
+      [7, 'Recharging'], // insufficient_materials
+      [8, 'crafting too quickly'], // throttled
+    ];
+    for (const [index, anchor] of anchors) {
+      expect(rendered[index], `line for ${denies[index][0]}`).toContain(anchor);
+    }
+    expect(new Set(rendered).size).toBe(denies.length);
     // The price-carrying deny states the cost (the R46 legibility rule).
-    const materials = rendered[7];
-    expect(materials).toContain('[Chime Shard]');
-    expect(materials).toContain('5');
-    // No line collapsed into another's copy: at least the two recharge
-    // capacity denies read differently (already_full vs tool_capped).
-    expect(rendered[5]).not.toBe(rendered[6]);
+    expect(rendered[7]).toContain('[Chime Shard]');
+    expect(rendered[7]).toContain('5');
   });
 
   it('an unknown effect id renders RAW rather than as an empty name or a crash', () => {

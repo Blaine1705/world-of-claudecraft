@@ -48,11 +48,15 @@ interface WorldState {
     charges: number;
     maxCharges: number;
     confirmMode: 'always' | 'prompt';
+    /** The R48 provenance boolean; optional here so the pre-R48 fixtures
+     *  stay untouched (undefined reads as not-self-crafted, the wire's own
+     *  degraded shape). */
+    selfCrafted?: boolean;
   }[];
   // The viewer's bags (IWorld `inventory`), the slot/recharge affordance
   // input. Defaults to empty: no charms, no buttons, so the existing cases
   // keep asserting the button-free surface.
-  inventory?: { itemId: string; count: number }[];
+  inventory?: { itemId: string; count: number; instance?: { signer?: string } }[];
 }
 
 // An attuned, tiered identity so the window opens in full mode (hero band,
@@ -395,6 +399,100 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
     expect(sent).toEqual([['mining', 'artisans_eye']]);
   });
 
+  it('the sent-guard RE-ARMS: a repaint replaces the node, and the timer covers dropped frames', () => {
+    // The guard's safety story has two halves. The ordinary half: the
+    // toolEffectResult repaint rebuilds the subtree, so the fresh node sends
+    // again (a guard keyed on anything but the NODE would leave the button
+    // permanently dead). The residual half: a frame that never reaches the
+    // sim answers with nothing, so a one-shot timer clears the guard on the
+    // SAME node.
+    vi.useFakeTimers();
+    try {
+      const state = baseState();
+      state.inventory = [
+        { itemId: 'copper_mining_pick', count: 1 },
+        { itemId: 'artisans_eye', count: 1 },
+      ];
+      const sent: [string, string][] = [];
+      const { w, el } = makeWindow(state, {
+        world: () =>
+          ({
+            craftingIdentity: state.identity,
+            professionsState: { skills: state.gathering },
+            toolEffectSlots: [],
+            inventory: state.inventory,
+            player: { name: 'Testchar' },
+            slotToolEffect: (professionId: string, effectId: string) => {
+              sent.push([professionId, effectId]);
+            },
+          }) as never,
+      });
+      el.querySelector<HTMLElement>('[data-slot-effect]')?.click();
+      expect(sent).toHaveLength(1);
+      // The repaint half: a rebuilt node sends again.
+      w.render();
+      el.querySelector<HTMLElement>('[data-slot-effect]')?.click();
+      expect(sent).toHaveLength(2);
+      // The timer half: no repaint at all, the guard clears on its own.
+      const stale = el.querySelector<HTMLElement>('[data-slot-effect]');
+      stale?.click();
+      expect(sent).toHaveLength(2); // guarded
+      vi.advanceTimersByTime(2100);
+      stale?.click();
+      expect(sent).toHaveLength(3); // re-armed without any repaint
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('exact affordance parity through the WINDOW: viewerName and selfCrafted are really wired', () => {
+    // The end-to-end half of the R48 parity claim: the core is proven in
+    // professions_view.test.ts, but buildInput's threading of
+    // world.player.name and row.selfCrafted is what the servers-agree
+    // guarantee actually rides on. A full SELF-crafted slot with a spare
+    // self-signed copy is the resolver's no_gain case, so the window must
+    // paint NO slot button; the identical state with foreign provenance is
+    // the sanctioned upgrade, so the button must appear.
+    const noGain = slotted({ charges: 20, maxCharges: 20, selfCrafted: true });
+    noGain.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'gatherers_cache', count: 1, instance: { signer: 'Testchar' } },
+    ];
+    const { el: noGainEl } = makeWindow(noGain);
+    expect(noGainEl.querySelector('[data-slot-effect]')).toBeNull();
+
+    const upgrade = slotted({ charges: 20, maxCharges: 20, selfCrafted: false });
+    upgrade.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'gatherers_cache', count: 1, instance: { signer: 'Testchar' } },
+    ];
+    const { el: upgradeEl } = makeWindow(upgrade);
+    expect(upgradeEl.querySelector('[data-slot-effect="gatherers_cache"]')).not.toBeNull();
+  });
+
+  it('prototype-key ids from the wire drop their rows instead of throwing mid-paint', () => {
+    // Both name tables are plain object literals; a row naming
+    // 'constructor' must fall out at the hasOwn guards, not resolve a
+    // function into t().
+    const state = baseState();
+    state.gathering.push({ professionId: 'constructor', skill: 1, maxSkill: 100 });
+    state.toolEffects = [
+      {
+        professionId: 'mining',
+        effectId: 'constructor',
+        charges: 5,
+        maxCharges: 20,
+        confirmMode: 'always',
+      },
+    ];
+    const { el } = makeWindow(state);
+    // The mining row paints (its effect row is dropped for the unknown id);
+    // the 'constructor' gathering row is dropped whole.
+    expect(el.querySelectorAll('.prof-gather-row').length).toBeGreaterThan(0);
+    expect(el.innerHTML).not.toContain('function Object');
+    expect(el.querySelectorAll('.prof-effect')).toHaveLength(0);
+  });
+
   it('a rechargeable slot paints the recharge button; a full or tool-less one does not', () => {
     const rechargeState = slotted({ charges: 3, maxCharges: 20 });
     rechargeState.inventory = [{ itemId: 'copper_mining_pick', count: 1 }];
@@ -414,6 +512,10 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
     });
     const button = el.querySelector<HTMLElement>('[data-recharge-profession]');
     expect(button?.textContent).toBe('Recharge');
+    button?.click();
+    expect(sent).toEqual(['mining']);
+    // The recharge button carries the same sent-guard as the slot button.
+    button?.click();
     button?.click();
     expect(sent).toEqual(['mining']);
     // Full slot at the re-derived max: no button.
