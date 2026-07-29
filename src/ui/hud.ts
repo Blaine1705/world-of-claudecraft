@@ -10025,6 +10025,73 @@ export class Hud {
           if ($('#crafting-window').style.display === 'flex') this.renderCrafting();
           break;
         }
+        case 'unbindResult': {
+          // Maker's Bond unbind outcome (Professions 2.0). The
+          // event is text-free: the item name derives from itemId plus static
+          // content and the fee formats locally, identical in both worlds.
+          // ONE chat line either way (the trainResult single-surface rule:
+          // no toast, no extra sound cue).
+          const unboundItem = ITEMS[ev.itemId];
+          const unboundName = unboundItem ? itemDisplayName(unboundItem) : ev.itemId;
+          if (ev.ok) {
+            this.log(
+              t('hudChrome.unbind.unbound', {
+                name: unboundName,
+                fee: formatLocalizedMoney(ev.fee),
+              }),
+              '#7fdc4f',
+            );
+          } else if (ev.reason) {
+            // A reason-less deny is the malformed-item-id probe arm
+            // (resolveUnbind's silent arm): nothing legible to render.
+            this.log(
+              t(
+                ev.reason === 'unbind_not_eligible'
+                  ? 'hudChrome.unbind.notEligible'
+                  : ev.reason === 'unbind_not_bound'
+                    ? 'hudChrome.unbind.notBound'
+                    : ev.reason === 'unbind_cannot_afford'
+                      ? 'hudChrome.unbind.cannotAfford'
+                      : ev.reason === 'unbind_no_space'
+                        ? 'hudChrome.unbind.noSpace'
+                        : 'hudChrome.unbind.outOfRange',
+              ),
+              '#ff6b6b',
+            );
+          }
+          // Refresh the service rows and the bags (the single-copy unbind
+          // clears boundTo in place, so no loot event repaints them for us).
+          if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')
+            this.renderUnbind();
+          if ($('#bags').style.display !== 'none') this.renderBags();
+          break;
+        }
+        case 'masterwork': {
+          // Personal masterwork proc (Professions 2.0). The craftResult arm
+          // above already logged the crafted line and played the craft cue,
+          // and since #2430 that line is the only one for the craft grant (the
+          // grant hub's own line and ding stand down for it), so this arm
+          // re-logs no grant and re-cues no lootItem: it only feeds the
+          // drain-end celebration plan (banner + toast + ONE audio.achievement).
+          masterworkItemId = ev.itemId;
+          break;
+        }
+        case 'masterworkZone': {
+          // Soft zone broadcast: every recipient in the crafter's zone,
+          // INCLUDING the crafter, logs the localized line; NO audio cue for
+          // anyone (the crafter's own celebration sound rides the personal
+          // 'masterwork' plan above). The gatherRareEvent render pattern.
+          const item = ITEMS[ev.itemId];
+          this.log(
+            t('hudChrome.crafting.masterworkZoneLine', {
+              crafter: ev.crafterName,
+              name: item ? itemDisplayName(item) : ev.itemId,
+            }),
+            QUALITY_COLOR.epic,
+            MASTERWORK_SEAL_IMAGE_URL,
+          );
+          break;
+        }
         case 'toolEffectResult': {
           // Slot/recharge outcome for the acquisition craft. The event is
           // text-free: the effect and profession names derive from their ids
@@ -10101,73 +10168,6 @@ export class Hud {
           // so charges/effects flip without a manual reopen (the trainResult
           // idiom above).
           if (this.professionsWindow.isOpen) this.professionsWindow.render();
-          break;
-        }
-        case 'unbindResult': {
-          // Maker's Bond unbind outcome (Professions 2.0). The
-          // event is text-free: the item name derives from itemId plus static
-          // content and the fee formats locally, identical in both worlds.
-          // ONE chat line either way (the trainResult single-surface rule:
-          // no toast, no extra sound cue).
-          const unboundItem = ITEMS[ev.itemId];
-          const unboundName = unboundItem ? itemDisplayName(unboundItem) : ev.itemId;
-          if (ev.ok) {
-            this.log(
-              t('hudChrome.unbind.unbound', {
-                name: unboundName,
-                fee: formatLocalizedMoney(ev.fee),
-              }),
-              '#7fdc4f',
-            );
-          } else if (ev.reason) {
-            // A reason-less deny is the malformed-item-id probe arm
-            // (resolveUnbind's silent arm): nothing legible to render.
-            this.log(
-              t(
-                ev.reason === 'unbind_not_eligible'
-                  ? 'hudChrome.unbind.notEligible'
-                  : ev.reason === 'unbind_not_bound'
-                    ? 'hudChrome.unbind.notBound'
-                    : ev.reason === 'unbind_cannot_afford'
-                      ? 'hudChrome.unbind.cannotAfford'
-                      : ev.reason === 'unbind_no_space'
-                        ? 'hudChrome.unbind.noSpace'
-                        : 'hudChrome.unbind.outOfRange',
-              ),
-              '#ff6b6b',
-            );
-          }
-          // Refresh the service rows and the bags (the single-copy unbind
-          // clears boundTo in place, so no loot event repaints them for us).
-          if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')
-            this.renderUnbind();
-          if ($('#bags').style.display !== 'none') this.renderBags();
-          break;
-        }
-        case 'masterwork': {
-          // Personal masterwork proc (Professions 2.0). The craftResult arm
-          // above already logged the crafted line and played the craft cue,
-          // and since #2430 that line is the only one for the craft grant (the
-          // grant hub's own line and ding stand down for it), so this arm
-          // re-logs no grant and re-cues no lootItem: it only feeds the
-          // drain-end celebration plan (banner + toast + ONE audio.achievement).
-          masterworkItemId = ev.itemId;
-          break;
-        }
-        case 'masterworkZone': {
-          // Soft zone broadcast: every recipient in the crafter's zone,
-          // INCLUDING the crafter, logs the localized line; NO audio cue for
-          // anyone (the crafter's own celebration sound rides the personal
-          // 'masterwork' plan above). The gatherRareEvent render pattern.
-          const item = ITEMS[ev.itemId];
-          this.log(
-            t('hudChrome.crafting.masterworkZoneLine', {
-              crafter: ev.crafterName,
-              name: item ? itemDisplayName(item) : ev.itemId,
-            }),
-            QUALITY_COLOR.epic,
-            MASTERWORK_SEAL_IMAGE_URL,
-          );
           break;
         }
         case 'profTrendNudge':
