@@ -101,7 +101,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "es_ES": [
     "abilityUi.resources.devotion",
@@ -195,7 +196,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "fr_FR": [
     "abilityUi.resources.devotion",
@@ -289,7 +291,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "fr_CA": [
     "abilityUi.resources.devotion",
@@ -383,7 +386,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "en_CA": [],
   "it_IT": [
@@ -478,7 +482,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "de_DE": [
     "abilityUi.resources.devotion",
@@ -572,7 +577,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "zh_CN": [
     "hudChrome.auraEffect.dawnsWrath"
@@ -680,7 +686,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "ru_RU": [
     "entities.abilities.veilbound_mark.name",
@@ -778,7 +785,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "nl_NL": [
     "abilityUi.resources.devotion",
@@ -872,7 +880,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "pl_PL": [
     "abilityUi.resources.devotion",
@@ -966,7 +975,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "id_ID": [
     "abilityUi.resources.devotion",
@@ -1060,7 +1070,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "tr_TR": [
     "abilityUi.resources.devotion",
@@ -1154,7 +1165,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "sv_SE": [
     "abilityUi.resources.devotion",
@@ -1248,7 +1260,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "vi_VN": [
     "abilityUi.resources.devotion",
@@ -1342,7 +1355,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ],
   "da_DK": [
     "abilityUi.resources.devotion",
@@ -1436,6 +1450,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.paladin.devotion",
     "hudChrome.paladin.devotionAscensionCharges",
     "hudChrome.paladin.devotionAscensionLast",
-    "hudChrome.paladin.devotionValue"
+    "hudChrome.paladin.devotionValue",
+    "hudChrome.statInfo.effects.manaRegenCombat"
   ]
 };
