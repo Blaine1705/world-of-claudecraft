@@ -666,7 +666,14 @@ export class PostOffice {
       // effect) frees oldName for a stranger, so this character's own
       // pre-senderKey OUTGOING letters get the stable id and the new
       // display name: a later return flight must follow the character, not
-      // whoever takes the freed name (the purge's stamp, same reasoning).
+      // whoever takes the freed name. Same accepted ambiguity as the purge's
+      // stamp (a pre-senderKey letter from a PRIOR holder of oldName is
+      // stamped with the wrong id), with a sharper consequence here: this
+      // id is LIVE, so a mis-stamped letter is re-attributed and its return
+      // flight DELIVERS to this character, where the purge's dead-id stamp
+      // merely self-destructs. Accepted because a pre-senderKey letter
+      // carries no sender identity to distinguish the two, and the current
+      // holder is by far the likelier author.
       if (m.kind === 'player' && m.senderKey === undefined && m.senderName === oldName) {
         m.senderKey = key;
         m.senderName = newName;
@@ -752,7 +759,19 @@ export class PostOffice {
         // Normalize a legacy name-keyed address to the stable id BEFORE the
         // flight: returnToSender records the outgoing address as the new
         // senderKey, and that field must never hold a reclaimable display
-        // name (its own comment promises stable-id by construction).
+        // name (its own comment promises stable-id by construction). Move
+        // the letter's delivered-and-unread contribution with the key (the
+        // rekeyMailOwner shape), because returnToSender's own decrement
+        // reads the field this walk just overwrote; without the move the
+        // name bucket keeps a phantom unread the freed name's next holder
+        // reads forever. No CURRENT producer books a name-keyed unreturned
+        // player letter (returns set `returned`, sends key by id), so this
+        // arm serves blobs loadMail preserves verbatim: legacy defense,
+        // same standing as the dual-key purge arms themselves.
+        if (m.recipientKey !== key && !m.read && now >= m.deliverAt) {
+          this.indexDec(m.recipientKey);
+          this.indexInc(key);
+        }
         m.recipientKey = key;
         this.returnToSender(m, now);
         continue;

@@ -721,6 +721,50 @@ describe('purgeMailOwner - deleting a character', () => {
     expect(inbox.find((m) => m.subject === 'Legacy')?.copper).toBe(250);
   });
 
+  it('purging a DELIVERED unread name-keyed parcel moves its unread count off the name bucket', () => {
+    // The wrong-bucket regression: the purge's return arm normalizes the
+    // legacy name key to the stable id BEFORE returnToSender, whose own
+    // decrement reads the just-overwritten field. Without the index move the
+    // name bucket keeps a phantom +1 that the freed name's NEXT holder reads
+    // through mailUnreadFor forever (an unread badge with no letter). No
+    // current send path books this shape (returns set `returned`, sends key
+    // by id); loadMail preserves it verbatim from a legacy blob, which is
+    // what the raw-book seed below stands in for.
+    const sim = makeWorld();
+    const alice = makeSender(sim);
+    sim.mailSendResolved(
+      { key: DOOMED_KEY, name: 'Doomed' },
+      'LegacyDelivered',
+      'Old address.',
+      250,
+      [],
+      alice,
+    );
+    const legacy = letterBy(sim, (m) => m.subject === 'LegacyDelivered', 'legacy parcel');
+    legacy.recipientKey = 'Doomed'; // the legacy name-keyed shape, pre-stable-id
+    // Deliver it: deliverDue books the unread count under the NAME bucket,
+    // exactly where a legacy blob's load would put it.
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    expect(sim.purgeMailOwner(DOOMED_ID, 'Doomed')).toBe(true);
+    // The parcel flew home to its live sender rather than being destroyed.
+    const flown = letterBy(sim, (m) => m.subject === 'LegacyDelivered', 'returned parcel');
+    expect(flown.returned).toBe(true);
+    expect(flown.copper).toBe(250);
+    // The decisive half: the freed name's next holder inherits NO phantom
+    // unread, and the maintained index still matches the linear-scan oracle.
+    // The purged name's bucket is GONE outright (the phantom would live
+    // here), and the next holder of the name reads exactly the truth (their
+    // own welcome letter, nothing inherited).
+    // biome-ignore lint/suspicious/noExplicitAny: read the raw index directly.
+    expect((sim.postOffice as any).unreadIndex.has('Doomed')).toBe(false);
+    const nextHolder = sim.addPlayer('mage', 'Doomed', { characterId: 999 });
+    expect(sim.mailUnreadFor(nextHolder)).toBe(unreadOracle(sim, nextHolder));
+    expect(sim.mailUnreadFor(alice)).toBe(unreadOracle(sim, alice));
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    expect(sim.mailUnreadFor(nextHolder)).toBe(unreadOracle(sim, nextHolder));
+    expect(sim.mailUnreadFor(alice)).toBe(unreadOracle(sim, alice));
+  });
+
   it('a pre-senderKey letter decides its fate by sender NAME, and the purge stamps outgoing mail', () => {
     // At ship time EVERY letter written before #2450 lacks senderKey, so the
     // name fallback is the live path, not an ancient edge. Three arms:
