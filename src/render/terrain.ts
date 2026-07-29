@@ -420,6 +420,34 @@ float wocGroundHeight(vec2 uv, vec4 sw) {
 float wocGroundMacroRelief(vec2 uv) {
   return texture2D(uGroundAO, uv * 0.16).g - 0.897;
 }
+// --- ground-variety tuning knobs (smoother patches, more uncorrelated octaves)
+// WOC_MACRO_SHADE_AMP: amplitude of the ~28yd soil-clump shade octave in the
+// groundShade term. Grass takes it at (0.5 + grassWeight * 0.5), so full
+// amplitude on meadows and half elsewhere. 2.4 (was 4.2): roughly halves the
+// dark lush-patch swing that read as harsh blotches from above.
+const float WOC_MACRO_SHADE_AMP = 2.4;
+// WOC_MACRO_SHADE_KNEE: rational soft-knee divisor applied to that macro term
+// (x / (1 + |x| * knee)). 0 is linear; higher compresses deep troughs sooner.
+// This replaces the old hard clamp rails as the patch-edge shaper: the clamp
+// turned every deep trough into a flat near-black plateau with a hard edge,
+// the knee feathers the same patch over yards instead.
+const float WOC_MACRO_SHADE_KNEE = 1.2;
+// WOC_GRASS_SCALE_JITTER: ground-UV amplitude of the ~36yd two-channel drift
+// field applied per grass octave (fine +1.0x, coarse -0.6x, mid +0.8x). Each
+// octave slides a different amount and sign, so their tiling repeats de-phase
+// across the map and never settle into one fixed cadence.
+const float WOC_GRASS_SCALE_JITTER = 0.6;
+// WOC_GRASS_MID_OCTAVE: blend weight of the third grass octave (0.57x scale,
+// rotated 23 degrees, own seed offset). Keep LOW: it exists to add an
+// uncorrelated voice against the fine/coarse pair, never patches of its own.
+const float WOC_GRASS_MID_OCTAVE = 0.14;
+// WOC_GRASS_HUE_DRIFT_FREQ and the endpoints: ~42yd meadow hue rotation
+// between warm yellow-green and cool blue-green, a few percent either way.
+// Both endpoints average ~1.0 so the drift is value-neutral: it can never
+// read as light/dark patching, only as hue you feel across a field.
+const float WOC_GRASS_HUE_DRIFT_FREQ = 0.024;
+const vec3 WOC_GRASS_HUE_WARM = vec3(1.035, 1.012, 0.955);
+const vec3 WOC_GRASS_HUE_COOL = vec3(0.968, 0.995, 1.042);
 `;
 
 function buildSplatMaterial(
@@ -564,8 +592,16 @@ function buildSplatMaterial(
         // fine pores + coarse soil clumps: the macro octave carries the read
         // out past the distance where mips flatten the fine one, and grass
         // (whose own AO sheet is near-uniform) takes it at full weight so
-        // meadows undulate instead of rendering as one green wash
-        float relief = cavH * 3.8 + wocGroundMacroRelief(tuv) * (0.5 + vSplatR.x * 0.5) * 4.2;
+        // meadows undulate instead of rendering as one green wash. The macro
+        // term runs through a rational soft knee before it joins the fine
+        // cavity: at the old 4.2 amplitude with hard clamp rails, every deep
+        // trough of the ~28yd octave saturated into a flat near-black blotch
+        // with a hard edge from above. The knee keeps the same patch
+        // STRUCTURE (and so stays in step with the tuft-density coupling)
+        // while halving the visual swing and feathering edges over yards.
+        float reliefMacro = wocGroundMacroRelief(tuv) * (0.5 + vSplatR.x * 0.5) * WOC_MACRO_SHADE_AMP;
+        reliefMacro /= 1.0 + abs(reliefMacro) * WOC_MACRO_SHADE_KNEE;
+        float relief = cavH * 3.8 + reliefMacro;
         // turf lip: where grass feathers into bare soil (roads, patches),
         // shade the transition band so paths sit INTO the meadow as worn
         // hollows instead of lying on it as paint. Broken up by the fine AO
@@ -574,7 +610,9 @@ function buildSplatMaterial(
         // triangle steps — the earlier derivative-based normal tilt made the
         // same triangulation read as hard facets and is gone for that reason).
         float rim = vSplatR.y * (1.0 - vSplatR.y) * 4.0 * clamp(0.55 + cavH * 4.0, 0.2, 1.2);
-        float groundShade = mix(1.0, clamp(1.0 + relief, 0.38, 1.28) * (1.0 - rim * 0.17), cavW);
+        // floor 0.52 (was 0.38): with the macro knee above, the clamp is a
+        // rare safety rail for stacked fine cavity, not the patch shaper
+        float groundShade = mix(1.0, clamp(1.0 + relief, 0.52, 1.28) * (1.0 - rim * 0.17), cavW);
         ${
           GFX.tier === 'ultra'
             ? `// micro sun-shadow: terrain never casts real shadows at any
@@ -603,10 +641,33 @@ function buildSplatMaterial(
         // leaning toward the coarse octave softens the uniform blade stipple
         // that read as repeating noise underfoot, without losing the lush
         // and dark patch structure the macro terms carry.
+        // Per-octave scale jitter: a slow (~36yd) two-channel drift field
+        // nudges each octave's sample position a different amount and sign,
+        // so the tilings slide against each other across the map and their
+        // repeats never line up into one fixed cadence. The warp gradient is
+        // tiny (well under a yard of drift over ~36yd) so nothing smears.
+        vec2 grassJitter = (vec2(
+            texture2D(uMacro, vWPos.xz * 0.028 + 0.07).r,
+            texture2D(uMacro, vWPos.xz * 0.028 + 0.63).r) - 0.5) * WOC_GRASS_SCALE_JITTER;
         vec3 grassAlb = mix(
-          texture2D(uGrass, tuv).rgb,
-          texture2D(uGrass, vec2(-tuv.y, tuv.x) * 0.31).rgb,
+          texture2D(uGrass, tuv + grassJitter).rgb,
+          texture2D(uGrass, vec2(-tuv.y, tuv.x) * 0.31 - grassJitter * 0.6).rgb,
           0.50 + (macro2 - 0.5) * 0.3);
+        // Third, LOW-amplitude mid octave between the fine (1.0x) and coarse
+        // (0.31x) tilings: 0.57x scale rotated 23 degrees (cos 0.9205 and
+        // sin 0.3907 folded into the constants), with its own seed offset so
+        // it shares no phase with either neighbour. Variety without
+        // amplitude: a third uncorrelated voice against the pair's residual
+        // shared repeat, too faint to form patches of its own.
+        vec2 grassUvMid = vec2(tuv.x * 0.525 - tuv.y * 0.223, tuv.x * 0.223 + tuv.y * 0.525);
+        grassAlb = mix(grassAlb,
+          texture2D(uGrass, grassUvMid + vec2(0.41, 0.87) + grassJitter * 0.8).rgb,
+          WOC_GRASS_MID_OCTAVE);
+        // ~42yd hue rotation: meadows drift a few percent between warm
+        // yellow-green and cool blue-green. Value-neutral endpoints, so it
+        // adds randomness you feel across a field without a patch to point at.
+        float grassHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
+        grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT);
         // rock: top-down projection smears into vertical streaks on cliffs,
         // so steep faces blend toward wall-planar (world XY/ZY) samples
         vec3 an = abs(normalize(vWNorm));
@@ -631,10 +692,11 @@ function buildSplatMaterial(
         // Two macro octaves hand the soil the low-frequency structure a photo
         // tile cannot carry: ~6yd value mottling (footworn patches) and ~20yd
         // value plus grey-brown hue drift (damp hollows). Both reuse uMacro;
-        // combined value swing tops out near +-13%.
+        // combined value swing tops out near +-9% (weights 0.11/0.15, were
+        // 0.16/0.22: the +-13% swing jumped too hard across a few yards).
         float dirtMac6 = texture2D(uMacro, vWPos.xz * 0.17 + 0.61).r - 0.5;
         float dirtMac20 = texture2D(uMacro, vWPos.xz * 0.052 + 0.13).r - 0.5;
-        dirtFlat *= 1.0 + dirtMac6 * 0.16 + dirtMac20 * 0.22;
+        dirtFlat *= 1.0 + dirtMac6 * 0.11 + dirtMac20 * 0.15;
         vec3 dirtGrey = vec3(dot(dirtFlat, vec3(0.35, 0.45, 0.2))) * vec3(1.0, 0.97, 0.9);
         dirtFlat = mix(dirtFlat, dirtGrey, clamp(0.18 + dirtMac20 * 0.4, 0.0, 0.6));
         // Path wear across the trail: the vertex dirt weight sits near 0.85
@@ -808,7 +870,9 @@ function buildSplatMaterial(
         `#include <normal_fragment_maps>
         // per-layer detail normals (GL-convention), weighted by splat: rock
         // carries the hardest relief, then dirt, grass moderate, sand soft
-        vec3 gN = texture2D(uGrassN, tuv).xyz * 2.0 - 1.0;
+        // grassJitter (from the albedo chunk) keeps the blade normal in phase
+        // with the jittered fine grass albedo tap
+        vec3 gN = texture2D(uGrassN, tuv + grassJitter).xyz * 2.0 - 1.0;
         vec3 dN = texture2D(uDirtN, tuv * 0.8).xyz * 2.0 - 1.0;
         vec3 rN = texture2D(uRockN, tuv * 0.6).xyz * 2.0 - 1.0;
         vec3 sN = texture2D(uSandN, tuv).xyz * 2.0 - 1.0;
