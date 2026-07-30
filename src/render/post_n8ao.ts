@@ -17,6 +17,13 @@ interface N8AOStaticFrameInternals {
   depthDownsampleQuad?: N8AOFullScreenTriangle | null;
 }
 
+interface N8AOStaticConfiguration {
+  accumulate: boolean;
+  biasMultiplier: number;
+  biasOffset: number;
+  screenSpaceRadius: boolean;
+}
+
 const noClearQuads = new WeakSet<N8AOFullScreenTriangle>();
 
 const ACCUMULATION_QUANTIZE_SHADER = /* glsl */ `
@@ -70,6 +77,127 @@ function preserveAccumulationQuantization(material: ShaderMaterial): void {
   material.needsUpdate = true;
 }
 
+function assertStaticShaderConfiguration(configuration: N8AOStaticConfiguration): void {
+  if (
+    configuration.accumulate ||
+    configuration.biasMultiplier !== 0 ||
+    configuration.biasOffset !== 0 ||
+    configuration.screenSpaceRadius
+  ) {
+    throw new Error(
+      'Static N8AO shaders require accumulation, bias adjustment, and screen-space radius off',
+    );
+  }
+}
+
+/**
+ * The static path fixes frame and bias adjustment at zero and uses world-space
+ * radius on every preset. At full resolution, sceneDepth is nearest-filtered,
+ * so the center texture2D sample is the same texel computeNormal fetched again.
+ * Passing that depth and its reconstructed position removes one depth fetch and
+ * one identical reconstruction without changing any later operation.
+ */
+function specializeStaticEvaluation(material: ShaderMaterial): void {
+  let shader = material.fragmentShader;
+  shader = replacePinned(shader, '      vec4 diffuse = texture2D(sceneDiffuse, vUv);\n', '', 1);
+  shader = replacePinned(
+    shader,
+    '  vec3 computeNormal(vec3 worldPos, vec2 vUv) {',
+    '  vec3 computeNormal(vec3 worldPos, float c0, vec2 vUv) {',
+    1,
+  );
+  shader = replacePinned(shader, '    float c0 = 1.0 - texelFetch(sceneDepth, p, 0).x;\n', '', 1);
+  shader = replacePinned(shader, '    float c0 = texelFetch(sceneDepth, p, 0).x;\n', '', 1);
+  shader = replacePinned(
+    shader,
+    '    vec3 ce = getWorldPos(c0, vUv).xyz;',
+    '    vec3 ce = worldPos;',
+    1,
+  );
+  shader = replacePinned(
+    shader,
+    '        vec3 normal = computeNormal(worldPos, vUv);',
+    '        vec3 normal = computeNormal(worldPos, depth, vUv);',
+    1,
+  );
+  shader = replacePinned(
+    shader,
+    `      vec2 harmoniousNumbers = vec2(
+        1.618033988749895,
+        1.324717957244746
+      );
+      noise.rg += harmoniousNumbers * frame;
+`,
+    '',
+    1,
+  );
+  shader = replacePinned(
+    shader,
+    `      float radiusToUse = screenSpaceRadius ? distance(
+        worldPos,
+        getWorldPos(depth, vUv +
+          vec2(radius, 0.0) / resolution)
+      ) : radius;
+      float distanceFalloffToUse =screenSpaceRadius ?
+          radiusToUse * distanceFalloff
+      : radiusToUse * distanceFalloff * 0.2;
+`,
+    `      float radiusToUse = radius;
+      float distanceFalloffToUse = radius * distanceFalloff * 0.2;
+`,
+    1,
+  );
+  shader = replacePinned(
+    shader,
+    `      float bias = (min(
+        0.1,
+        distanceFalloffToUse * 0.1
+      ) / near) * fwidth(distance(worldPos, cameraPos)) / radiusToUse;
+      bias = biasAdjustment.x + biasAdjustment.y * bias;
+`,
+    '      float bias = 0.0;\n',
+    1,
+  );
+  material.fragmentShader = shader;
+  material.needsUpdate = true;
+}
+
+/**
+ * World-space radius removes the unused screen-space alternative. count starts
+ * at 1 and only receives nonnegative bilateral weights, so its divide guard is
+ * always taken for every finite shipped input.
+ */
+function specializeStaticDenoise(material: ShaderMaterial): void {
+  let shader = material.fragmentShader;
+  shader = replacePinned(
+    shader,
+    `        float radiusToUse = screenSpaceRadius ? distance(
+          worldPos,
+          getWorldPos(d, vUv +
+            vec2(worldRadius, 0.0) / resolution)
+        ) : worldRadius;
+        float distanceFalloffToUse =screenSpaceRadius ?
+        radiusToUse * distanceFalloff
+    : radiusToUse * distanceFalloff * 0.2;
+`,
+    `        float radiusToUse = worldRadius;
+        float distanceFalloffToUse = worldRadius * distanceFalloff * 0.2;
+`,
+    1,
+  );
+  shader = replacePinned(
+    shader,
+    `        if (count > 0.0) {
+          occlusion /= count;
+        }
+`,
+    '        occlusion /= count;\n',
+    1,
+  );
+  material.fragmentShader = shader;
+  material.needsUpdate = true;
+}
+
 function suppressFullCoverageClear(quad: N8AOFullScreenTriangle | null | undefined): void {
   if (!quad || noClearQuads.has(quad)) return;
   const render = quad.render.bind(quad);
@@ -94,8 +222,9 @@ function suppressFullCoverageClear(quad: N8AOFullScreenTriangle | null | undefin
 export class StaticOpaqueN8AOPass extends N8AOPass {
   constructor(scene: Scene, camera: Camera, width: number, height: number) {
     super(scene, camera, width, height);
-    if (this.configuration.accumulate || this.configuration.denoiseIterations !== 2) {
-      throw new Error('Static N8AO path requires accumulation off and exactly two denoise passes');
+    assertStaticShaderConfiguration(this.configuration as unknown as N8AOStaticConfiguration);
+    if (this.configuration.denoiseIterations !== 2) {
+      throw new Error('Static N8AO path requires exactly two denoise passes');
     }
 
     const state = this as unknown as N8AOStaticFrameInternals;
@@ -111,14 +240,18 @@ export class StaticOpaqueN8AOPass extends N8AOPass {
   }
 
   override configureAOPass(depthBufferType?: number, ortho?: boolean): void {
+    assertStaticShaderConfiguration(this.configuration as unknown as N8AOStaticConfiguration);
     super.configureAOPass(depthBufferType, ortho);
     const state = this as unknown as N8AOStaticFrameInternals;
+    if (state.effectShaderQuad) specializeStaticEvaluation(state.effectShaderQuad.material);
     suppressFullCoverageClear(state.effectShaderQuad);
   }
 
   override configureDenoisePass(depthBufferType?: number, ortho?: boolean): void {
+    assertStaticShaderConfiguration(this.configuration as unknown as N8AOStaticConfiguration);
     super.configureDenoisePass(depthBufferType, ortho);
     const state = this as unknown as N8AOStaticFrameInternals;
+    if (state.poissonBlurQuad) specializeStaticDenoise(state.poissonBlurQuad.material);
     suppressFullCoverageClear(state.poissonBlurQuad);
   }
 
