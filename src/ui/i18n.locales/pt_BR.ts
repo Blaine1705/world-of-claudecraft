@@ -3635,6 +3635,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': 'Quem oferece essa missão não está por perto.',
   'questUi.errors.turnInMissing': 'A entrega dessa missão não está por perto.',
   'questUi.errors.tooFar': 'Você está longe demais.',
+  'questUi.errors.escortAway':
+    'Sua escolta não está em seu posto agora. Ela voltará para lá em breve.',
   'itemUi.money.goldShort': 'o',
   'itemUi.money.silverShort': 'p',
   'itemUi.money.copperShort': 'c',
@@ -8183,6 +8185,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Este link de redefinição é inválido ou expirou. Solicite um novo.',
   'apiError.deeds.invalid_input': 'Entrada inválida.',
+  'apiError.ota_updates.invalid_input': 'Entrada inválida.',
   'apiError.steam.account_taken': 'Essa conta Steam já está vinculada a outra conta.',
   'apiError.steam.already_linked': 'Sua conta já tem uma conta Steam vinculada.',
   'apiError.steam.banned': 'Essa conta Steam não pode ser vinculada.',
@@ -8500,7 +8503,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'A calçada resiste, e Tam ainda tem fôlego suficiente para brincar sobre as três badaladas. Bom. Somos uma ilha sitiada, {playerName}, e cada par de mãos que atravessa aquele banco de areia é um par que as brechas precisam superar antes de alcançar meu povo. Bem-vindo a Gullhaven.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Volta para Casa',
   'entities.quests.q_fs_bram_come_home.text':
-    'Meu Bram levou o barco na manhã em que a brecha das redes se abriu, e o mar o jogou de volta em algum lugar além da ponta do Desembarque. Eu o ouvi três noites atrás, {playerName}, chamando sobre a água, e fiquei com medo demais para ir. Ainda estou com medo demais. Por favor. O barco dele jaz naufragado na costa norte. Traga-o de volta para casa comigo.',
+    'Meu Bram levou o barco na manhã em que a brecha das redes se abriu, e o mar o jogou de volta em algum lugar além da ponta do Desembarque. Eu o ouvi três noites atrás, {playerName}, chamando sobre a água, e fiquei com medo demais para ir. Ainda estou com medo demais. Por favor. O barco dele jaz naufragado na costa sul. Traga-o de volta para casa comigo.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Pescador Bram levado em segurança de volta a Gullhaven',
   'entities.quests.q_fs_bram_come_home.completion':
@@ -8587,7 +8590,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'A noite já parece mais leve. O que quer que os desperte não terminou, mas você comprou um pouco de paz para a Escadaria.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Levando Wren para Casa',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Minha aprendiz Wren saiu para percorrer a linha do Goldmelt há dois dias e nunca voltou. Encontrei suas pegadas, ela está escondida sob os marcos da estrada a sudoeste da Escadaria da Aurora, com medo demais dos lobos para se mover. Não posso deixar o pântano, {playerName}. Leve-a até o acampamento de Veyla na Escadaria. Ela estará segura sob as luzes.',
+    'Minha aprendiz Wren saiu para percorrer a linha do Goldmelt há dois dias e nunca voltou. Encontrei suas pegadas, ela está escondida sob os marcos da estrada a nordeste da Escadaria da Aurora, com medo demais dos lobos para se mover. Não posso deixar o pântano, {playerName}. Leve-a até o acampamento de Veyla na Escadaria. Ela estará segura sob as luzes.',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Aprendiz Wren levada em segurança até a Escadaria da Aurora',
   'entities.quests.q_fv_seeing_wren_home.completion':
@@ -10897,11 +10900,17 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Recuperação: /unstuck inicia uma contagem regressiva parado para movê-lo até um local seguro alcançável nas proximidades.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Recuperação: /unstuck inicia uma contagem regressiva parado, depois envia seu espírito ao cemitério mais próximo. Retornar pelo Guardião Pálido exige o Tributo do Guardião.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Recuperação: /unstuck inicia uma contagem regressiva parado, depois leva você ao cemitério mais próximo, reanimando você se havia caído. O Mal do Desbloqueio permanece por até 5 minutos.',
   'hudChrome.unstuck.menuButton': 'Desbloqueio',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Você foi levado ao cemitério mais próximo. O Mal do Desbloqueio pesa sobre você.',
   'hudChrome.unstuck.noSafePosition':
     'Nenhum local seguro alcançável foi encontrado nas proximidades. Você não foi movido.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Você foi levado de volta ao cemitério mais próximo e reanimado. O Tributo do Guardião pesa sobre você.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Você foi levado ao cemitério mais próximo e reanimado. O Mal do Desbloqueio pesa sobre você.',
   'hudChrome.unstuck.standStill': 'Fique parado em terreno firme antes de usar Desbloqueio.',
   'hudChrome.unstuck.standStillAnywhere': 'Fique parado antes de usar Desbloqueio.',
   'hudChrome.unstuck.started':

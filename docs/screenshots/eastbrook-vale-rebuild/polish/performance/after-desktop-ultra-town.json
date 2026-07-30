@@ -7,18 +7,18 @@
   "source": {
     "comparison": "polish-v2-worktree",
     "revision": "feature/physics-engine-v0290@v0.31-wall-parapet",
-    "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+    "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
   },
   "polishProvenance": {
     "schemaVersion": 1,
     "mode": "composite-sha256",
     "algorithm": "sha256",
     "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-    "fingerprint": "51ccd2b721e8de00d57633e06941576b8dda438478bf10485a5f61b40f4e2bcc",
+    "fingerprint": "b4229e747dddb125da926302452166f3e2288bb2536f52964d74547a5ee24f9e",
     "components": {
       "townAsset": {
         "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-        "sourceFingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "sourceFingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "authoritativeLayout": {
         "path": "src/sim/eastbrook_layout.ts",
@@ -52,18 +52,18 @@
       },
       "mailbox": {
         "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-        "sourceFingerprint": "2b7c4ccadf47206173d6dd0106fe9cd59fe5dd4987a71f6d860df5b68335c3a0",
+        "sourceFingerprint": "3c6803552368b495ac05758cf7dbe8dd393f8c6cfd4625c587362898e6db687b",
         "glb": {
           "path": "public/models/props/mailbox_pillar.glb",
-          "sha256": "ae36075f9118d619e6e7239392bcb741e1f3e22d6ea485970498542c9acdfe2c"
+          "sha256": "24678a6bbc8e8b25926b3c17298b959f0cbd149c7641e1a3331a02a3c19c4207"
         }
       },
       "noticeboard": {
         "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-        "sourceFingerprint": "710d294fe63696e041a2465a5ce01a730f4060220be01d6beb309dff8998b72f",
+        "sourceFingerprint": "12435757b245583bb91a26450f5bfcf76c3532399b5d8f024af8dae30078265e",
         "glb": {
           "path": "public/models/props/eastbrook_noticeboard.glb",
-          "sha256": "5577ec46e9127e8f01f9f7c20444d693e1dcac9c16adab81590326a84e46ef3f"
+          "sha256": "a53a3f9818ca57f593ccc448cb1b60862a28bf9cf0d1b17baf43eb6942a0516f"
         }
       },
       "captureContract": {

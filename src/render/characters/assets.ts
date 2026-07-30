@@ -484,7 +484,21 @@ for (const [key, list] of Object.entries(SKINS)) {
   if (VISUALS[key]?.lazyPreload) continue;
   for (const u of list) if (u) bootSkinUrls.add(u);
 }
-for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
+// The packaged iOS shell, plus iOS Safari after a confirmed entry kill, defers
+// the whole alternate-atlas sweep out of the boot gate: ~34 1024x1024 atlases
+// decode to well over 100 MB of RGBA inside the same WebContent process whose
+// jetsam ceiling the entry spike already presses against (the iPhone 13 report),
+// and almost all of them are OTHER players' cosmetics. skinTexture() fails soft
+// to the embedded default and every apply site heals through ensureSkinTexture()
+// (visual.ts constructor + setSkin, portrait.ts before its one-shot snapshot),
+// so a deferred atlas costs a brief fallback, never a crash or a stall. Both
+// profile hints derive from static boot signals (never the tier), so this
+// import-time read cannot drift from the live profile the way an import-time
+// TIER read would (the farmCrate P0).
+const eagerSkinAtlases = !(GFX.nativeIosMemoryProfile || GFX.tightMemory);
+if (eagerSkinAtlases) {
+  for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
+}
 
 /** Resolve once every boot-time character GLB + skin atlas is cached, retrying
  *  whatever is still missing instead of depending on the site-wide assetsReady()
@@ -505,7 +519,11 @@ for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUr
 export async function charactersReady(maxAttempts = 3): Promise<void> {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const missingGltf = preloadUrls.filter((u) => !gltfByUrl.has(assetUrl(u)));
-    const missingSkins = [...bootSkinUrls].filter((u) => !skinTexByUrl.has(u));
+    // Deferred atlases (native iOS) are not boot assets: gating the preview on
+    // them would re-create the exact entry-footprint spike the deferral removes.
+    const missingSkins = eagerSkinAtlases
+      ? [...bootSkinUrls].filter((u) => !skinTexByUrl.has(u))
+      : [];
     if (missingGltf.length === 0 && missingSkins.length === 0) return;
     if (attempt > 1) {
       await new Promise((resolve) => setTimeout(resolve, gltfRetryDelayMs(attempt)));

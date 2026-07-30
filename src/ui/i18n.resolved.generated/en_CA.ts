@@ -340,11 +340,14 @@ export const en_CA: EnTranslations = {
       "menuButton": "Unstuck",
       "help": "Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.",
       "helpAtGraveyard": "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.",
+      "helpUnstuckSickness": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. It leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Unstuck in {seconds} seconds. Moving, fighting, taking damage, or starting another action cancels it.",
       "countdown": "Unstuck: {seconds}",
       "completed": "Moved to the nearest reachable safe spot.",
       "completedAtGraveyard": "Your spirit has returned to the nearest graveyard. Speak to the Pale Keeper to accept The Keeper's Toll.",
       "revivedAtGraveyard": "You have been returned to the nearest graveyard and revived. The Keeper's Toll weighs on you.",
+      "movedToGraveyard": "You have been moved to the nearest graveyard. Unstuck Sickness weighs on you.",
+      "revivedAtGraveyardUnstuck": "You have been moved to the nearest graveyard and revived. Unstuck Sickness weighs on you.",
       "cancelledMoved": "Unstuck cancelled because you moved.",
       "cancelledDamaged": "Unstuck cancelled because you took damage.",
       "cancelledCombat": "Unstuck cancelled because you entered combat.",
@@ -2925,6 +2928,9 @@ export const en_CA: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "That wallet authorization expired or could not be verified. Try again."
+    },
+    "ota_updates": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {
@@ -6832,7 +6838,8 @@ export const en_CA: EnTranslations = {
       "incomplete": "That quest is not complete.",
       "giverMissing": "That quest giver is not nearby.",
       "turnInMissing": "That quest turn-in is not nearby.",
-      "tooFar": "Too far away."
+      "tooFar": "Too far away.",
+      "escortAway": "Your escort is not at their post right now. They will return there shortly."
     }
   },
   "itemUi": {
@@ -12835,7 +12842,7 @@ export const en_CA: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Seeing Wren Home",
-        "text": "My apprentice Wren went out to walk the Goldmelt line two days ago and never came back. I found her tracks, she is holed up under the road markers southwest of the Aurora Steps, too scared of the wolves to move. I cannot leave the fen, {playerName}. Walk her to Veyla's camp on the Steps. She will be safe under the lights.",
+        "text": "My apprentice Wren went out to walk the Goldmelt line two days ago and never came back. I found her tracks, she is holed up under the road markers northeast of the Aurora Steps, too scared of the wolves to move. I cannot leave the fen, {playerName}. Walk her to Veyla's camp on the Steps. She will be safe under the lights.",
         "completion": "The girl is inside, wrapped in half my blankets and talking the stars out of the sky. You did a kind thing today, {playerName}. The Reach doesn't see many of those.",
         "objectives": {
           "0": {
@@ -13519,7 +13526,7 @@ export const en_CA: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Come Home",
-        "text": "My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, {playerName}, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the north shore. Walk him home to me.",
+        "text": "My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, {playerName}, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the south shore. Walk him home to me.",
         "completion": "Bram! You brought him back to me whole, {playerName}. We both wept and neither of us is ashamed. Whatever the breaks take from this island next, they do not get my family. Not anymore.",
         "objectives": {
           "0": {

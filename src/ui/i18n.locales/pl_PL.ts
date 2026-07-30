@@ -7189,6 +7189,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'To zadanie nie jest ukończone.',
   'questUi.errors.notInLog': 'Tego zadania nie ma w twoim dzienniku.',
   'questUi.errors.tooFar': 'Za daleko.',
+  'questUi.errors.escortAway':
+    'Osoba, którą masz eskortować, nie jest teraz na miejscu. Wróci tam wkrótce.',
   'questUi.errors.turnInMissing': 'Miejsca oddania tego zadania nie ma w pobliżu.',
   'questUi.errors.unavailable': 'To zadanie jest niedostępne.',
   'questUi.log.abandon': 'Porzuć zadanie',
@@ -8182,6 +8184,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Ten link do resetowania jest nieprawidłowy lub wygasł. Poproś o nowy.',
   'apiError.deeds.invalid_input': 'Nieprawidłowe dane.',
+  'apiError.ota_updates.invalid_input': 'Nieprawidłowe dane.',
   'apiError.steam.account_taken': 'To konto Steam jest już połączone z innym kontem.',
   'apiError.steam.already_linked': 'Twoje konto ma już połączone konto Steam.',
   'apiError.steam.banned': 'Tego konta Steam nie można połączyć.',
@@ -8485,7 +8488,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Rybak Bram bezpiecznie odprowadzony do Gullhaven',
   'entities.quests.q_fs_bram_come_home.text':
-    'Mój Bram wypłynął łodzią rano, gdy otworzył się Wyłom Sieci, a morze wyrzuciło go gdzieś za Przystanią. Słyszałam go trzy noce temu, {playerName}, wołającego nad wodą, i byłam zbyt przerażona, by iść. Wciąż jestem zbyt przerażona. Proszę. Jego łódź leży rozbita na północnym brzegu. Odprowadź go do mnie do domu.',
+    'Mój Bram wypłynął łodzią rano, gdy otworzył się Wyłom Sieci, a morze wyrzuciło go gdzieś za Przystanią. Słyszałam go trzy noce temu, {playerName}, wołającego nad wodą, i byłam zbyt przerażona, by iść. Wciąż jestem zbyt przerażona. Proszę. Jego łódź leży rozbita na południowym brzegu. Odprowadź go do mnie do domu.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Wraca do Domu',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'Dziesięciu mniej, a robotnicy polowi już kłócą się o to, kto pierwszy wyjdzie. To nie potrwa długo, wyłomy nigdy nie odpoczywają długo, ale miasto, które je, to miasto, które przetrwa.',
@@ -8571,7 +8574,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Uczennica Wren bezpiecznie odprowadzona do Stopni Zorzy',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Moja uczennica Wren wyszła dwa dni temu, by przejść linię Złotego Roztopu, i nigdy nie wróciła. Znalazłam jej ślady, schowała się pod znacznikami drogi na południowy zachód od Stopni Zorzy, zbyt przerażona wilkami, by się ruszyć. Nie mogę opuścić mokradła, {playerName}. Odprowadź ją do obozu Veyli na Stopniach. Będzie bezpieczna pod światłami.',
+    'Moja uczennica Wren wyszła dwa dni temu, by przejść linię Złotego Roztopu, i nigdy nie wróciła. Znalazłam jej ślady, schowała się pod znacznikami drogi na północny wschód od Stopni Zorzy, zbyt przerażona wilkami, by się ruszyć. Nie mogę opuścić mokradła, {playerName}. Odprowadź ją do obozu Veyli na Stopniach. Będzie bezpieczna pod światłami.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Odprowadzenie Wren do Domu',
   'entities.quests.q_fv_silent_trapline.completion':
     'Maeve cię przysłała? Ha. Jedenaście lat, a ta kobieta wciąż myśli, że mokradło mnie pożre. Cóż... w tym roku może mieć rację. Spójrz, co zrobiło z moimi liniami.',
@@ -10830,11 +10833,17 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Ratunek: /unstuck rozpoczyna nieruchome odliczanie, które przeniesie cię do pobliskiego, osiągalnego bezpiecznego miejsca.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Ratunek: /unstuck rozpoczyna nieruchome odliczanie, a następnie wysyła twojego ducha na najbliższy cmentarz. Powrót przez Bladego Strażnika wymaga Opłaty Strażnika.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Ratunek: /unstuck rozpoczyna nieruchome odliczanie, a następnie przenosi cię na najbliższy cmentarz i wskrzesza, jeśli padłeś. Choroba Wyzwolenia pozostaje na tobie do 5 minut.',
   'hudChrome.unstuck.menuButton': 'Wyzwolenie',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Zostałeś przeniesiony na najbliższy cmentarz. Choroba Wyzwolenia ciąży na tobie.',
   'hudChrome.unstuck.noSafePosition':
     'Nie znaleziono w pobliżu żadnego osiągalnego bezpiecznego miejsca. Nie zostałeś przeniesiony.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Zostałeś przeniesiony na najbliższy cmentarz i wskrzeszony. Opłata Strażnika ciąży na tobie.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Zostałeś przeniesiony na najbliższy cmentarz i wskrzeszony. Choroba Wyzwolenia ciąży na tobie.',
   'hudChrome.unstuck.standStill': 'Stój nieruchomo na stałym gruncie, zanim użyjesz Wyzwolenia.',
   'hudChrome.unstuck.standStillAnywhere': 'Stój nieruchomo, zanim użyjesz Wyzwolenia.',
   'hudChrome.unstuck.started':

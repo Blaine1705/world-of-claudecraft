@@ -4463,7 +4463,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Nelayan Bram diantar pulang dengan selamat ke Gullhaven',
   'entities.quests.q_fs_bram_come_home.text':
-    'Bram-ku membawa perahu keluar pagi ketika celah jaring itu terbuka, dan laut melemparkannya kembali entah di mana melewati titik Dermaga. Aku mendengarnya tiga malam lalu, {playerName}, memanggil dari atas air, dan aku terlalu takut untuk pergi. Aku masih terlalu takut. Kumohon. Perahunya terdampar hancur di pesisir utara. Antarkan dia pulang padaku.',
+    'Bram-ku membawa perahu keluar pagi ketika celah jaring itu terbuka, dan laut melemparkannya kembali entah di mana melewati titik Dermaga. Aku mendengarnya tiga malam lalu, {playerName}, memanggil dari atas air, dan aku terlalu takut untuk pergi. Aku masih terlalu takut. Kumohon. Perahunya terdampar hancur di pesisir selatan. Antarkan dia pulang padaku.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Pulang ke Rumah',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'Sepuluh lebih sedikit, dan para buruh ladang sudah berdebat siapa yang keluar duluan. Ini tak akan bertahan lama, celah-celah itu tak pernah beristirahat lama, tapi kota yang bisa makan adalah kota yang bertahan.',
@@ -4549,7 +4549,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Murid Wren diantar dengan selamat ke Tangga Aurora',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Muridku Wren pergi menyusuri jalur Goldmelt dua hari lalu dan tak pernah kembali. Aku menemukan jejaknya, ia bersembunyi di bawah penanda jalan barat daya Tangga Aurora, terlalu takut pada serigala untuk bergerak. Aku tak bisa meninggalkan rawa ini, {playerName}. Antarkan dia ke perkemahan Veyla di Tangga itu. Ia akan aman di bawah cahaya-cahaya itu.',
+    'Muridku Wren pergi menyusuri jalur Goldmelt dua hari lalu dan tak pernah kembali. Aku menemukan jejaknya, ia bersembunyi di bawah penanda jalan timur laut Tangga Aurora, terlalu takut pada serigala untuk bergerak. Aku tak bisa meninggalkan rawa ini, {playerName}. Antarkan dia ke perkemahan Veyla di Tangga itu. Ia akan aman di bawah cahaya-cahaya itu.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Mengantar Wren Pulang',
   'entities.quests.q_fv_silent_trapline.completion':
     'Maeve mengirimmu? Ha. Sebelas tahun dan wanita itu masih mengira rawa ini akan memakanku. Yah... tahun ini mungkin dia benar. Lihatlah apa yang telah dilakukannya pada jalur-jalurku.',
@@ -7780,6 +7780,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Misi itu belum selesai.',
   'questUi.errors.notInLog': 'Misi itu tidak ada di catatan Anda.',
   'questUi.errors.tooFar': 'Terlalu jauh.',
+  'questUi.errors.escortAway':
+    'Orang yang harus kau antar sedang tidak ada di tempatnya. Ia akan segera kembali.',
   'questUi.errors.turnInMissing': 'Tempat penyerahan misi itu tidak ada di dekat sini.',
   'questUi.errors.unavailable': 'Misi itu tidak tersedia.',
   'questUi.log.abandon': 'Tinggalkan Misi',
@@ -8797,6 +8799,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Tautan pengaturan ulang ini tidak valid atau sudah kedaluwarsa. Minta yang baru.',
   'apiError.deeds.invalid_input': 'Masukan tidak valid.',
+  'apiError.ota_updates.invalid_input': 'Masukan tidak valid.',
   'apiError.steam.account_taken': 'Akun Steam itu sudah tertaut ke akun lain.',
   'apiError.steam.already_linked': 'Akunmu sudah memiliki akun Steam yang tertaut.',
   'apiError.steam.banned': 'Akun Steam itu tidak dapat ditautkan.',
@@ -10839,11 +10842,17 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Pemulihan: /unstuck memulai hitung mundur diam di tempat untuk memindahkanmu ke titik aman terjangkau terdekat.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Pemulihan: /unstuck memulai hitung mundur diam di tempat, lalu mengirim rohmu ke kuburan terdekat. Kembali lewat Sang Penjaga Pucat membutuhkan Upeti Sang Penjaga.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Pemulihan: /unstuck memulai hitung mundur diam di tempat, lalu memindahkanmu ke kuburan terdekat dan menghidupkanmu kembali jika kamu telah tumbang. Penyakit Pelepasan tetap membebanimu hingga 5 menit.',
   'hudChrome.unstuck.menuButton': 'Lepaskan Diri',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Kamu telah dipindahkan ke kuburan terdekat. Penyakit Pelepasan membebanimu.',
   'hudChrome.unstuck.noSafePosition':
     'Tidak ditemukan titik aman terjangkau di dekatmu. Kamu tidak dipindahkan.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Kamu telah dikembalikan ke kuburan terdekat dan dihidupkan kembali. Upeti Sang Penjaga membebanimu.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Kamu telah dipindahkan ke kuburan terdekat dan dihidupkan kembali. Penyakit Pelepasan membebanimu.',
   'hudChrome.unstuck.standStill':
     'Berdirilah diam di tanah padat sebelum menggunakan Lepaskan Diri.',
   'hudChrome.unstuck.standStillAnywhere': 'Berdirilah diam sebelum menggunakan Lepaskan Diri.',
