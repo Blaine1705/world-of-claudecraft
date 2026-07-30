@@ -141,6 +141,7 @@ import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from './bag_item_action_menu
 import { bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
+import { type BannerClass, BannerQueue } from './banner_queue';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter } from './cast_bar_painter';
@@ -900,6 +901,21 @@ type ItemQuality = NonNullable<ItemDef['quality']>;
  *  firing an identical gold banner to a real level-up is a known cause of
  *  players reading routine gathering progress as leveling. */
 export type BannerVariant = 'default' | 'deed';
+
+/** Everything one banner paint needs, held whole so a queued banner (R38)
+ *  renders later exactly as it would have rendered immediately. */
+interface BannerPayload {
+  text: string;
+  motion: boolean;
+  decorativeIconUrl?: string;
+  variant: BannerVariant;
+  subtext?: string;
+  durationMs: number;
+  source: 'unstuck' | null;
+}
+
+/** The fade gap between a finished banner and the next queued one. */
+const BANNER_ADVANCE_GAP_MS = 250;
 const ITEM_QUALITY_LABEL_KEYS: Record<ItemQuality, TranslationKey> = {
   poor: 'itemUi.quality.poor',
   common: 'itemUi.quality.common',
@@ -1200,6 +1216,12 @@ export class Hud {
   private errorTimer: number | undefined;
   private lastMirroredErrorText: string | undefined;
   private bannerTimer: number | undefined;
+  // R38: the banner slot's scheduler (celebrations queue, ambient replaces;
+  // the pure policy lives in banner_queue.ts, this class owns the timers).
+  // Lazily created: several test harnesses build a bare Hud prototype
+  // (Object.create) whose field initializers never ran, the established
+  // stableNodeDeadlines fixture shape.
+  private bannerQueue: BannerQueue<BannerPayload> | undefined;
   private mountRaceInstructionTimer: number | undefined;
   private bannerSource: 'unstuck' | null = null;
   private pfLevelEl = $('#pf-level');
@@ -9838,7 +9860,19 @@ export class Hud {
           break;
         }
         case 'levelup': {
-          this.showBanner(t('hud.core.levelBanner', { level: ev.level }));
+          this.showBanner(
+            t('hud.core.levelBanner', { level: ev.level }),
+            true,
+            undefined,
+            'default',
+            undefined,
+            2600,
+            null,
+            // R38: a level-up is a celebration; it queues rather than being
+            // replaced (the deed collision this closes) and files ahead of
+            // queued deeds.
+            'levelup',
+          );
           this.log(t('hud.core.levelLog', { level: ev.level }), '#ffd100');
           audio.levelUp();
           if (isTalentRowUnlockLevel(ev.level)) {
@@ -11671,7 +11705,9 @@ export class Hud {
       // actions, and an identical banner made those read as levels. Copy,
       // lifetime and the announcer push below are untouched: this is
       // presentation only, never information.
-      this.showBanner(bannerText, true, undefined, 'deed');
+      // R38: a deed is a celebration; it queues behind whatever is live
+      // instead of replacing it (the first-level-up collision).
+      this.showBanner(bannerText, true, undefined, 'deed', undefined, 2600, null, 'deed');
       // The banner div carries no live semantics and the chat log is
       // deliberately aria-live off, so the polite #combat-live region is what
       // a screen reader hears (the throttled self-note precedent above).
@@ -12410,6 +12446,9 @@ export class Hud {
   }
 
   private clearUnstuckBanner(): void {
+    // Queued unstuck entries purge unconditionally; the LIVE banner clears
+    // only when it is itself the unstuck one.
+    this.bannerQueue?.retainQueued((p) => p.source !== 'unstuck');
     if (this.bannerSource !== 'unstuck') return;
     clearTimeout(this.bannerTimer);
     this.bannerTimer = undefined;
@@ -12417,6 +12456,10 @@ export class Hud {
     this.bannerEl.replaceChildren();
     this.bannerEl.classList.remove('has-subtext');
     this.bannerEl.style.opacity = '0';
+    // The live slot just ended early: the queue decides what (if anything)
+    // takes it, so a level-up waiting behind the unstuck line still shows.
+    const next = this.bannerQueue?.advance();
+    if (next) this.paintBanner(next);
   }
 
   showBanner(
@@ -12427,7 +12470,31 @@ export class Hud {
     subtext?: string,
     durationMs = 2600,
     source: 'unstuck' | null = null,
+    // R38: celebrations queue instead of last-write-wins; ambient (the
+    // default: zone names, prompts, countdowns) keeps replace semantics.
+    // See src/ui/banner_queue.ts for the whole policy.
+    bannerClass: BannerClass = 'ambient',
   ): void {
+    const payload: BannerPayload = {
+      text,
+      motion,
+      decorativeIconUrl,
+      variant,
+      subtext,
+      durationMs,
+      source,
+    };
+    this.bannerQueue ??= new BannerQueue();
+    if (this.bannerQueue.enqueue(bannerClass, payload) === 'show') {
+      this.paintBanner(payload);
+    }
+  }
+
+  /** The paint half of the banner slot: renders one payload and arms the
+   *  advance chain (duration, fade gap, then the queue's next). Only
+   *  showBanner's 'show' outcome and the advance chain itself call this. */
+  private paintBanner(payload: BannerPayload): void {
+    const { text, motion, decorativeIconUrl, variant, subtext, durationMs, source } = payload;
     this.bannerEl.style.removeProperty('display');
     this.bannerEl.classList.toggle('has-subtext', !!subtext);
     if (subtext) {
@@ -12466,10 +12533,17 @@ export class Hud {
     this.bannerTimer = window.setTimeout(() => {
       this.bannerEl.style.opacity = '0';
       this.bannerSource = null;
+      // The fade gap before the next queued banner, so back-to-back
+      // celebrations read as two banners rather than one changing its text.
+      this.bannerTimer = window.setTimeout(() => {
+        const next = this.bannerQueue?.advance();
+        if (next) this.paintBanner(next);
+      }, BANNER_ADVANCE_GAP_MS);
     }, durationMs);
   }
 
   private hideBannerImmediately(): void {
+    this.bannerQueue?.clear();
     clearTimeout(this.bannerTimer);
     this.bannerTimer = undefined;
     this.bannerSource = null;

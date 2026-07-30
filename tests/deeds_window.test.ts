@@ -178,7 +178,12 @@ describe('hud wiring', () => {
     // Strip line comments first: this method's prose names the 'deed' variant,
     // so an uncommented slice would let a reworded comment satisfy the pin.
     const body = stripLineComments(hud.slice(start, hud.indexOf('log(text: string', start)));
-    expect(body).toContain("this.showBanner(bannerText, true, undefined, 'deed');");
+    // The deed variant AND the R38 'deed' banner class both ride the call:
+    // the variant is the visual split from the level-up gold, the class is
+    // what queues it behind a live level-up instead of replacing it.
+    expect(body).toContain(
+      "this.showBanner(bannerText, true, undefined, 'deed', undefined, 2600, null, 'deed');",
+    );
     expect(body).toContain('this.combatAnnouncer.push(bannerText, performance.now());');
   });
 
@@ -256,6 +261,37 @@ describe('hud wiring', () => {
       vi.advanceTimersByTime(2599);
       expect(h.bannerEl.style.opacity).toBe('1');
       vi.advanceTimersByTime(1);
+      expect(h.bannerEl.style.opacity).toBe('0');
+      // The R38 advance gap: the slot stays claimed for the fade gap, then
+      // frees (an arrival inside the gap would queue, not replace).
+      vi.advanceTimersByTime(250);
+
+      // THE R38 COLLISION, end to end on the real method: a deed landing
+      // while the level-up banner is live queues behind it instead of
+      // replacing it, and takes the slot whole after the gap.
+      (
+        h as unknown as {
+          showBanner(
+            text: string,
+            motion?: boolean,
+            icon?: string,
+            variant?: string,
+            subtext?: string,
+            durationMs?: number,
+            source?: null,
+            bannerClass?: string,
+          ): void;
+        }
+      ).showBanner('Level 2!', true, undefined, 'default', undefined, 2600, null, 'levelup');
+      expect(h.bannerEl.textContent).toBe('Level 2!');
+      h.handleDeedUnlocks([{ deedId: 'prog_first_steps' }]);
+      // Still the level-up: the deed did NOT replace it.
+      expect(h.bannerEl.textContent).toBe('Level 2!');
+      vi.advanceTimersByTime(2600 + 250);
+      // The queued deed now owns the slot, in its own variant.
+      expect(h.bannerEl.textContent).toContain(deedName('prog_first_steps'));
+      expect(h.bannerEl.classList.contains('banner-deed')).toBe(true);
+      vi.advanceTimersByTime(2600 + 250);
       expect(h.bannerEl.style.opacity).toBe('0');
 
       // ...and a default banner through the same slot holds exactly as long.
