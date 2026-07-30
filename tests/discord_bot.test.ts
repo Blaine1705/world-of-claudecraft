@@ -36,6 +36,7 @@ import {
   topSpecialRoleKeyFor,
   voiceMembersForChannel,
 } from '../bot/logic';
+import type { ActivityKind } from '../server/discord_activity';
 import { DEFAULT_JSON_BODY_MAX_BYTES } from '../server/http_util';
 
 describe('gateway protocol helpers', () => {
@@ -680,6 +681,40 @@ describe('significant-activity cards', () => {
       participants: [linked('Aldric', '111')],
     });
     expect(msg).toBeNull();
+  });
+
+  // Server-to-bot kind parity, the drift class that broke vale_cup (the server
+  // enqueued the kind for months while the bot union lacked it, so every card
+  // rendered an author-less empty embed Discord rejects). The wire crosses
+  // processes as unchecked JSON, so tsc alone never sees the drift; this list
+  // is pinned to the server union in BOTH directions at tsc time (a server
+  // kind missing from the list reddens the conditional-type line; a listed
+  // kind the bot cannot take reddens the buildActivityMessage call) and every
+  // kind must render a real card at runtime.
+  const SERVER_KINDS = [
+    'levelup',
+    'rareloot',
+    'duel',
+    'arena',
+    'vale_cup',
+    'masterwork',
+    'deed',
+  ] as const satisfies readonly ActivityKind[];
+  type MissingServerKind = Exclude<ActivityKind, (typeof SERVER_KINDS)[number]>;
+  const noMissingServerKinds: MissingServerKind extends never ? null : MissingServerKind = null;
+
+  it('renders a non-null card for every kind the server can enqueue', () => {
+    expect(noMissingServerKinds).toBeNull();
+    for (const kind of SERVER_KINDS) {
+      const msg = buildActivityMessage({
+        kind,
+        realm: 'Claudemoon',
+        profileUrl: null,
+        level: 20,
+        participants: [linked('Aldric', '111')],
+      });
+      expect(msg, `kind ${kind} must render a card`).not.toBeNull();
+    }
   });
 });
 
