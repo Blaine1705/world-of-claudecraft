@@ -359,15 +359,13 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned for the chunk-streaming base merge: the seal
+      // Deliberately re-pinned for the v0.32.1 main catch-up merge: the seal
       // fingerprints src/render/renderer.ts, so it re-mints whenever the
-      // renderer coordinator moves. Exactly one component leaf moves here,
-      // runtimeRender.renderer.sha256, folding in the streaming, zone-feature
-      // cull, fog and parkour deltas. Every Eastbrook line in renderer.ts is
-      // byte-identical across that delta and the town group is added straight
-      // to the scene, never through the new zone-feature cull, so the accepted
-      // evidence still depicts this tree. No recapture.
-      fingerprint: 'b4229e747dddb125da926302452166f3e2288bb2536f52964d74547a5ee24f9e',
+      // renderer coordinator moves. The class-overhaul and release renderer
+      // deltas fold together here; every Eastbrook line in renderer.ts is
+      // byte-identical across that delta, so the accepted evidence still
+      // depicts this tree. No recapture.
+      fingerprint: '412e5f8360cc63bdb356ad33c44978f8673b88f3ea2fe1cd48e21f78291117b6',
       components: {
         captureContract: {
           id: 'polish-v2',
