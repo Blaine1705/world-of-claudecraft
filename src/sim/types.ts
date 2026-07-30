@@ -1159,6 +1159,12 @@ export interface MobTemplate {
   armorPerLevel: number;
   moveSpeed: number;
   aggroRadius: number; // base, at equal level
+  // Hard tether (yards from spawnPos): past it the mob evades home to a full
+  // reset, whatever its refreshing leashAnchor says. The soft leash measures
+  // from an anchor every hostile action re-seeds, so a patient player can walk
+  // an ordinary mob across the map one leash-length at a time; a mob carrying
+  // this cannot be kited off its ground (mob/combat_profile.ts).
+  hardLeashRadius?: number;
   loot: LootEntry[];
   scale: number; // render hint
   color: number; // render hint
