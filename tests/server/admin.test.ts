@@ -2993,6 +2993,9 @@ describe('R35 professions inspector (GET /admin/api/characters/:id/professions)'
       // enrichment; the load-side filter would drop it in game).
       nodeHarvestCooldowns: { ore_eastbrook_1: 120, retired_node_xyz: 30 },
       archetype: { activeArchetype: 'alchemy', pairedMajor: 'engineering', hobbyCraft: null },
+      masteryResetApplied: true,
+      proficiencyDisplayHealApplied: true,
+      recipesGrandfathered: true,
     },
     updatedAt: '2026-07-30T12:00:00.000Z',
   };
@@ -3011,6 +3014,7 @@ describe('R35 professions inspector (GET /admin/api/characters/:id/professions)'
     expect(sheet.name).toBe('Aldric');
     expect(sheet.live).toBe(false);
     expect(sheet.updatedAt).toBe('2026-07-30T12:00:00.000Z');
+    expect(sheet.preMigration).toBe(false); // the fixture carries all three one-shot flags
     expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 42.5 });
     // Every gathering profession renders, absent ones as 0.
     expect(sheet.gathering).toContainEqual({ professionId: 'fishing', proficiency: 0 });
@@ -3334,5 +3338,117 @@ describe('R35 GM restores: refusal prose arms', () => {
     expect(r.status).toBe(400);
     expect(r.body).toEqual({ success: false, data: null, error: 'unknown tool effect id' });
     expect(recordProfessionsRestore).not.toHaveBeenCalled();
+  });
+});
+
+describe('R35 professions inspector: fix-round edge pins', () => {
+  it('survives a NULL characters.state row (created but never entered)', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        id: 5,
+        name: 'Unborn',
+        class: 'warrior',
+        level: 1,
+        accountId: 9,
+        username: 'alice',
+        state: null,
+        updatedAt: '2026-07-30T12:00:00.000Z',
+      })),
+    });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    expect(r.status).toBe(200);
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 0 });
+    expect(sheet.slots).toEqual([]);
+    expect(sheet.nodeTimers).toEqual([]);
+    expect(sheet.knownRecipes).toBe(0);
+  });
+
+  it('marks a pre-migration blob and clamps a tampered node timer', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        id: 5,
+        name: 'Veteran',
+        class: 'warrior',
+        level: 12,
+        accountId: 9,
+        username: 'alice',
+        // A pre-curve blob: no one-shot flags, an over-cap node timer, and a
+        // fishing slot the loader drops plus a legacy confirm-mode row.
+        state: {
+          gatheringProficiency: { mining: 50 },
+          nodeHarvestCooldowns: { ore_eastbrook_1: 99999 },
+          toolEffectSlots: {
+            fishing: {
+              effectId: 'gatherers_cache',
+              durability: 3,
+              maxDurability: 16,
+              confirmMode: 'always',
+            },
+            mining: { effectId: 'gatherers_cache', durability: 3, maxDurability: 16 },
+          },
+        },
+        updatedAt: '2026-07-30T12:00:00.000Z',
+      })),
+    });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    // The one-shot load migrations have not run: the operator is warned.
+    expect(sheet.preMigration).toBe(true);
+    // The load-side clamp: never display a wait the game would not honor
+    // (ore respawn is 240s).
+    expect(sheet.nodeTimers).toEqual([
+      {
+        nodeId: 'ore_eastbrook_1',
+        zoneId: 'eastbrook_vale',
+        nodeType: 'ore',
+        remainingSeconds: 240,
+      },
+    ]);
+    // The loader's slot rules: the refused fishing row DROPS; the legacy
+    // row without a confirmMode reads 'always'.
+    expect(sheet.slots).toEqual([
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        durability: 3,
+        maxDurability: 16,
+        craftedBy: null,
+        confirmMode: 'always',
+      },
+    ]);
+  });
+
+  it('a LIVE snapshot is never pre-migration even when its flags are absent', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        id: 5,
+        name: 'Live',
+        class: 'warrior',
+        level: 12,
+        accountId: 9,
+        username: 'alice',
+        state: null,
+        updatedAt: '2026-07-30T12:00:00.000Z',
+      })),
+    });
+    installAdminRuntime({
+      adminCharacterState: vi.fn(() => ({ gatheringProficiency: { mining: 1 } })),
+    });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(sheet.live).toBe(true);
+    expect(sheet.preMigration).toBe(false);
   });
 });
