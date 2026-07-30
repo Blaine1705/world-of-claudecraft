@@ -144,6 +144,7 @@ import {
   openNativeDiscordOAuth,
   takeNativeDiscordVerifier,
 } from './net/native_discord';
+import { notifyOtaAppReady } from './net/native_ota';
 import {
   Api,
   ApiError,
@@ -634,6 +635,7 @@ setInterfaceMode(interfaceModeFromSetting(new Settings().get('interfaceMode')));
 syncAppViewport();
 syncBuildInfo();
 scheduleNativeUpdateCheck(__APP_VERSION__);
+void notifyOtaAppReady();
 preventMobileZoom();
 syncPhoneTouchClass();
 window.matchMedia(PHONE_TOUCH_QUERY).addEventListener?.('change', syncPhoneTouchClass);

@@ -2928,6 +2928,9 @@ export const tr_TR: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene."
+    },
+    "ota_updates": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {
