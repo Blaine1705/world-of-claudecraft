@@ -95,6 +95,23 @@ describe('unstuck feedback', () => {
     expect(legacy.key).not.toBe('hudChrome.unstuck.movedToGraveyard');
   });
 
+  it('renders the pre-0.32.1 kill-and-release reason from a stale server on its shipped key', () => {
+    const legacy = unstuckFeedback({
+      type: 'unstuck',
+      phase: 'completed',
+      reason: 'nearest_graveyard',
+      area,
+      origin,
+      destination: { ...origin, z: 1, localZ: 1 },
+      duration: 10,
+      distance: 1,
+    });
+    // A 0.32.0 server really did kill and release the invoker, so the shipped
+    // release copy (go accept the Toll at the Pale Keeper) is the correct text.
+    expect(legacy.key).toBe('hudChrome.unstuck.completedAtGraveyard');
+    expect(t(legacy.key)).toContain('Pale Keeper');
+  });
+
   it('formats visible countdown numbers through the active locale formatter', () => {
     expect(
       unstuckFeedback({ type: 'unstuck', phase: 'countdown', seconds: 1000 }).values?.seconds,

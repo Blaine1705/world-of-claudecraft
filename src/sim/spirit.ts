@@ -185,6 +185,12 @@ export function moveToGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
   p.vx = 0;
   p.vy = 0;
   p.vz = 0;
+  // Land settled, the same recipe as the portal teleport (see portals.ts): no carried-over
+  // jump arc or fall origin from the old position, so a move off a high ledge can never
+  // deal fall damage on arrival.
+  p.jumping = false;
+  p.onGround = true;
+  p.fallStartY = p.pos.y;
   // Everything that pointed at where they used to be is now out of range.
   p.targetId = null;
   p.autoAttack = false;

@@ -11848,6 +11848,10 @@ export class Hud {
       'You must be in a party to start a ready check.': 'hudChrome.readyCheck.notInPartyError',
       'Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. It leaves you with Unstuck Sickness for up to 5 minutes.':
         'hudChrome.unstuck.helpUnstuckSickness',
+      // Pre-0.32.1 wording: still arrives from a not-yet-updated server when an OTA
+      // bundle runs ahead of it, so keep it re-localizable.
+      "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.":
+        'hudChrome.unstuck.helpAtGraveyard',
       'A ready check is already in progress.': 'hudChrome.readyCheck.inProgressError',
       'Only the party leader can change the loot method.': 'hudChrome.masterLoot.leaderOnly',
       'Only the party leader may invite.': 'hud.errors.partyLeaderInvite',

@@ -13,6 +13,7 @@ import {
 import { Sim } from '../src/sim/sim';
 import {
   applyResurrectionSickness,
+  moveToGraveyardForUnstuck,
   nearestOverworldGraveyard,
   RES_HEALER_HP_FRACTION,
 } from '../src/sim/spirit';
@@ -471,6 +472,54 @@ describe('unstuck graveyard move while alive', () => {
     expect(sim.player.dead).toBe(false);
     expect(sim.player.ghost).toBe(false);
     expect(sim.player.corpsePos).toBeNull();
+  });
+
+  it('settles the landing like a portal teleport, so a stale jump arc cannot deal fall damage', () => {
+    const sim = makeWorld();
+    // Below the sickness floor, so the hp math stays untouched by the aura.
+    sim.setPlayerLevel(9);
+    const player = sim.player;
+    // Emulate the state the countdown gates currently forbid (a mid-air invoker with a
+    // high fall origin): the settle contract must hold on its own, not lean on the gates.
+    player.jumping = true;
+    player.onGround = false;
+    player.fallStartY = player.pos.y + 100;
+
+    moveToGraveyardForUnstuck(sim.ctx, player.id);
+
+    const graveyard = nearestOverworldGraveyard(START.x, START.z);
+    expect(player.pos).toMatchObject(graveyard);
+    expect(player.jumping).toBe(false);
+    expect(player.onGround).toBe(true);
+    expect(player.fallStartY).toBe(player.pos.y);
+
+    const hpBefore = player.hp;
+    tickMany(sim, 20);
+    expect(player.hp).toBe(hpBefore);
+    expect(player.onGround).toBe(true);
+  });
+
+  it("swaps Unstuck Sickness for The Keeper's Toll at a Spirit Healer, never stacking them", () => {
+    const { sim, player } = runCompletion(MAX_LEVEL);
+    const drained = player.stats.str;
+    expect(player.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+
+    sim.ctx.dealDamage(null, player, player.maxHp * 10, false, 'physical', null, 'hit');
+    expect(player.dead).toBe(true);
+    sim.releaseSpirit();
+    expect(player.ghost).toBe(true);
+    // Dying sheds nothing: the unstuck drain survives to the healer.
+    expect(player.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+
+    sim.resurrectAtSpiritHealer();
+    expect(player.dead).toBe(false);
+
+    // The healer's Toll displaces the Unstuck drain rather than compounding with it:
+    // strength stays at the quarter either drain produces alone, not a sixteenth.
+    expect(player.auras.filter((aura) => aura.kind === 'buff_allstats_pct')).toHaveLength(1);
+    expect(player.auras.some((aura) => aura.id === RESURRECTION_SICKNESS_ID)).toBe(true);
+    expect(player.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(false);
+    expect(player.stats.str).toBe(drained);
   });
 
   it('resumes the sickness with its saved remaining after a relog', () => {

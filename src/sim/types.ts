@@ -3796,9 +3796,17 @@ export type UnstuckEvent =
       // 'moved_to_graveyard': a living player was moved there and left alive.
       // 'revived_at_graveyard': an already dead or released player was pulled to
       // the graveyard and raised there.
-      // Both charge Unstuck Sickness. 'nearest_safe_position' is the retired
-      // short-range-teleport outcome, kept only so historical telemetry stays typed.
-      reason: 'nearest_safe_position' | 'moved_to_graveyard' | 'revived_at_graveyard';
+      // Both charge Unstuck Sickness. The two retired reasons stay in the union so
+      // the client renders them rather than t(undefined): 'nearest_safe_position'
+      // (the short-range teleport) survives in historical telemetry, and
+      // 'nearest_graveyard' (the pre-0.32.1 kill-and-release outcome) can still
+      // arrive from a not-yet-updated server under an OTA bundle that agrees on
+      // the layout epoch.
+      reason:
+        | 'nearest_safe_position'
+        | 'nearest_graveyard'
+        | 'moved_to_graveyard'
+        | 'revived_at_graveyard';
       area: UnstuckArea;
       origin: UnstuckPosition;
       destination: UnstuckPosition;

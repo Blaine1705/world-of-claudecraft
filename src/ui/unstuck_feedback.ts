@@ -30,8 +30,10 @@ const seconds = (value: number): string => formatNumber(value, { maximumFraction
 
 /**
  * The two live outcomes both end at the graveyard under Unstuck Sickness and differ only in
- * whether a revive happened, so they get their own keys. 'nearest_safe_position' is the
- * retired short-range teleport, still reachable only by replaying historical telemetry.
+ * whether a revive happened, so they get their own keys. The retired reasons keep their
+ * shipped keys: 'nearest_safe_position' (short-range teleport, historical telemetry) and
+ * 'nearest_graveyard' (the pre-0.32.1 kill-and-release outcome, still emitted by a
+ * not-yet-updated server when an OTA bundle runs ahead of it).
  */
 function completedKey(reason: Extract<Event, { phase: 'completed' }>['reason']): TranslationKey {
   switch (reason) {
@@ -39,6 +41,8 @@ function completedKey(reason: Extract<Event, { phase: 'completed' }>['reason']):
       return 'hudChrome.unstuck.movedToGraveyard';
     case 'revived_at_graveyard':
       return 'hudChrome.unstuck.revivedAtGraveyardUnstuck';
+    case 'nearest_graveyard':
+      return 'hudChrome.unstuck.completedAtGraveyard';
     case 'nearest_safe_position':
       return 'hudChrome.unstuck.completed';
   }
