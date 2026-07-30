@@ -3966,6 +3966,9 @@ export class Hud {
     isTouchHud: () => document.body.classList.contains('mobile-touch'),
     markEquipDropTargets: (itemId) => this.charWindow.markDropTargets(itemId),
     dropOnEquipSlot: (itemId, slot) => this.charWindow.dropOnEquipSlot(itemId, slot),
+    dropOnActionSlot: (itemId, slot) => this.placeHotbarItemFromTouch(itemId, slot),
+    dropOnActionRingSlot: (itemId, ringIndex) =>
+      this.placeHotbarItemFromTouch(itemId, this.mobileSourceSlotForButton(ringIndex)),
     openItemActionMenu: (def, itemId, slotIndex, x, y, runDefault) =>
       this.bagItemActionMenu.open(def, itemId, slotIndex, x, y, runDefault),
   });
@@ -5509,6 +5512,21 @@ export class Hud {
   // with separate form/stealth layouts because each state has a different kit.
   private isHotbarItemId(itemId: string): boolean {
     return this.actionBarController.isHotbarItemId(itemId);
+  }
+
+  /** The touch arm of the desktop item-to-hotbar drop (the UX pass's mobile
+   *  angler item): a bag stack released over an action seat places the item
+   *  there, exactly the desktop drop's item branch, including its silent
+   *  refusal of a non-hotbar item. `slot` is the 1-based bar slot (a ring
+   *  release resolves it through the live page before this runs). */
+  private placeHotbarItemFromTouch(itemId: string, slot: number): void {
+    if (!Number.isInteger(slot) || slot < 1) return;
+    if (!this.isHotbarItemId(itemId)) return;
+    this.hotbarActions = placeItemOnSlot(this.hotbarActions, itemId, slot - 1);
+    this.saveSlotMap();
+    // The desktop drop's stale-tooltip rule (#1485): the rearranged seat's
+    // next hover resolves live.
+    this.hideTooltip();
   }
 
   private classHasFormBars(): boolean {

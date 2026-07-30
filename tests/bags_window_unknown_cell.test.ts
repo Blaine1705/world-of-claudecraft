@@ -78,6 +78,8 @@ function harness(inventory: InvSlot[]): {
     isTouchHud: () => false,
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
+    dropOnActionSlot: noop,
+    dropOnActionRingSlot: noop,
     openItemActionMenu: noop,
   };
   const window = new BagsWindow(deps);

@@ -16,6 +16,15 @@ const WORLD_CANVAS_SELECTOR = '#game-canvas';
 export type DropTargetAt =
   | { kind: 'equip'; slot: EquipSlot }
   | { kind: 'bagCell'; index: number }
+  // The action-slot arms (the UX pass): releasing a bag stack over a hotbar
+  // seat places the item there, the touch twin of the desktop drag's item
+  // branch, so a mobile angler parks the rod on the bar once instead of
+  // reeling through bags-row taps inside the 2.5 s window. Desktop rows
+  // stamp data-hotbar-slot (1-based bar slot); the mobile ring stamps
+  // data-mobile-index (a RING position whose underlying bar slot depends on
+  // the live page, so the HUD resolves it at drop time, not here).
+  | { kind: 'actionSlot'; slot: number }
+  | { kind: 'actionRingSlot'; ringIndex: number }
   | { kind: 'world' }
   | { kind: 'none' };
 
@@ -46,6 +55,19 @@ export function resolveDropTargetAt(
   const cellIndex = Number(cell?.dataset.bagIndex);
   if (cell && Number.isInteger(cellIndex) && cellIndex >= 0) {
     return { kind: 'bagCell', index: cellIndex };
+  }
+  // The action-slot arms, validated the equip way (never trusting a stale
+  // attribute into a wrong seat): a desktop row button carries the 1-based
+  // bar slot, a mobile ring button carries its ring position.
+  const actionBtn = el.closest?.('.action-btn[data-hotbar-slot]') as HTMLElement | null;
+  const hotbarSlot = Number(actionBtn?.dataset.hotbarSlot);
+  if (actionBtn && Number.isInteger(hotbarSlot) && hotbarSlot >= 1) {
+    return { kind: 'actionSlot', slot: hotbarSlot };
+  }
+  const ringBtn = el.closest?.('.mobile-action-slot[data-mobile-index]') as HTMLElement | null;
+  const ringIndex = Number(ringBtn?.dataset.mobileIndex);
+  if (ringBtn && Number.isInteger(ringIndex) && ringIndex >= 0) {
+    return { kind: 'actionRingSlot', ringIndex };
   }
   if (el.closest?.(WORLD_CANVAS_SELECTOR)) return { kind: 'world' };
   return { kind: 'none' };

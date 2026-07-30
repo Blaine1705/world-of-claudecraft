@@ -154,6 +154,29 @@ describe('resolveDropTargetAt (touch release)', () => {
     expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'none' });
   });
 
+  it('resolves the action-slot arms: desktop bar seat and mobile ring seat (the UX pass)', () => {
+    // The desktop row button carries the 1-based bar slot...
+    const bar = stubEl('<button class="action-btn" data-hotbar-slot="4"><span></span></button>');
+    expect(resolveDropTargetAt(10, 10, () => bar)).toEqual({ kind: 'actionSlot', slot: 4 });
+    // ...through a child, the finger-lands-on-the-icon shape.
+    document.body.appendChild(bar);
+    const icon = bar.querySelector('span') as Element;
+    expect(resolveDropTargetAt(10, 10, () => icon)).toEqual({ kind: 'actionSlot', slot: 4 });
+    bar.remove();
+    // The mobile ring button carries its RING position; the HUD maps it to
+    // a bar slot through the live page at drop time, never here.
+    const ring = stubEl('<button class="mobile-action-slot" data-mobile-index="2"></button>');
+    expect(resolveDropTargetAt(10, 10, () => ring)).toEqual({
+      kind: 'actionRingSlot',
+      ringIndex: 2,
+    });
+    // Malformed attributes resolve to no target, the equip-arm rule.
+    const bogus = stubEl('<button class="action-btn" data-hotbar-slot="0"></button>');
+    expect(resolveDropTargetAt(10, 10, () => bogus)).toEqual({ kind: 'none' });
+    const bogusRing = stubEl('<button class="mobile-action-slot" data-mobile-index="x"></button>');
+    expect(resolveDropTargetAt(10, 10, () => bogusRing)).toEqual({ kind: 'none' });
+  });
+
   it('resolves a bag cell by its data-bag-index (the manual-order drop)', () => {
     const el = stubEl('<button class="bag-item" data-bag-index="5"></button>');
     expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'bagCell', index: 5 });

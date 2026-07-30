@@ -228,6 +228,15 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  window owns the paperdoll drop (and its refusals); this is the touch arm's way
    *  in, since a finger release has no drop event to land on that window. */
   dropOnEquipSlot(itemId: string, slot: EquipSlot): void;
+  /** Place a touch-dragged stack on a hotbar seat (the desktop drop's item
+   *  branch, reached by finger): `slot` is the 1-based bar slot a desktop
+   *  row button stamps. The HUD owns eligibility (isHotbarItemId) and the
+   *  layout write; an ineligible item is a silent cancel, the desktop rule. */
+  dropOnActionSlot(itemId: string, slot: number): void;
+  /** Same, released over a mobile action-ring button: `ringIndex` is the
+   *  RING position; the HUD resolves the underlying bar slot from the live
+   *  page at drop time (the paged-ring mapping is HUD state). */
+  dropOnActionRingSlot(itemId: string, ringIndex: number): void;
   /** Open the bag-item action menu (Disenchant / Salvage / Apply Enchant)
    *  for a stack at a viewport point. `runDefault` runs the exact classic
    *  left-click action for the clicked slot, so the menu's first row stays
@@ -801,6 +810,9 @@ export class BagsWindow {
           if (target.kind === 'equip') this.deps.dropOnEquipSlot(s.itemId, target.slot);
           else if (target.kind === 'bagCell')
             this.dropOnBagCell(index >= 0 ? index : null, target.index);
+          else if (target.kind === 'actionSlot') this.deps.dropOnActionSlot(s.itemId, target.slot);
+          else if (target.kind === 'actionRingSlot')
+            this.deps.dropOnActionRingSlot(s.itemId, target.ringIndex);
           else if (target.kind === 'world') this.dropOnWorldToDestroy(s.itemId, count);
         },
         onEnd: () => {
