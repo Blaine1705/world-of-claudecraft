@@ -10999,10 +10999,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Pematah Sumsum',
   'entities.abilities.marrowbreak.description':
-    'Menghabiskan 3 Darah Tua untuk serangan berat berancaman tinggi. Di bawah setengah nyawa, sebagai gantinya menyerap 18% nyawa maksimum selama 8 dtk dan memulihkan 15 amarah.',
+    'Menghabiskan 3 Darah Tua milikmu untuk serangan berat berancaman tinggi sebesar {damage} kerusakan. Di bawah setengah nyawa, sebagai gantinya melindungimu dengan perisai sebesar 18% nyawa maksimum selama 8 dtk dan mengembalikan 15 amarah.',
   'entities.abilities.moonlash.name': 'Gelombang Rembulan',
   'entities.abilities.moonlash.description':
-    'Menghabiskan 3 Pasang Rembulan untuk serangan Gaib berat: pilihan kerusakan. Memakai simpanan yang sama dengan Jejak Surya, jadi pilih salah satu.',
+    'Menghabiskan 3 Pasang Rembulan milikmu untuk serangan berat sebesar {damage} kerusakan Gaib: pilihan kerusakan. Jejak Surya menghabiskan 3 Pasang Rembulan yang sama, jadi pilih salah satu.',
   'entities.abilities.moonseed.name': 'Benih Rembulan',
   'entities.abilities.moonseed.description':
     'Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Gaib, menambah satu tahap Pasang Rembulan, dan memperpanjang Badai Rembulan-mu 6 dtk, hingga 6 dtk per penerapan. Saat Pasang Rembulan penuh, Benih Rembulan menjadi Gelombang Rembulan.',
@@ -11011,10 +11011,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghabiskan 5 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar 60% dari penyembuhan tersisa, menghapus efek itu, dan menanam Mekar Liar segar pada sasaran.',
   'entities.abilities.redharvest.name': 'Panen Merah',
   'entities.abilities.redharvest.description':
-    'Menghabiskan 3 Darah Tua, meledakkan semua kerusakan tersisa Kupasan dan Robekan milikmu pada sasaran, dan memulihkan 30 energi. Poin combo yang dipegang memperkuat gigitan tetapi tidak pernah diwajibkan.',
+    'Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan 30 energi. Berfungsi tanpa poin combo.',
   'entities.abilities.sunlance.name': 'Jejak Surya',
   'entities.abilities.sunlance.description':
-    'Menghabiskan 3 Pasang Rembulan untuk serangan Alam dengan bakaran dan memulihkan 35 mana: pilihan hemat. Memakai simpanan yang sama dengan Gelombang Rembulan, jadi pilih salah satu.',
+    'Menghabiskan 3 Pasang Rembulan milikmu untuk serangan sebesar {damage} kerusakan Alam ditambah bakaran {overTime} selama 9 dtk, dan memulihkan 35 mana: pilihan mana. Gelombang Rembulan menghabiskan 3 Pasang Rembulan yang sama, jadi pilih salah satu.',
   'guide.abilityHook.moonseed':
     'Menambah tahap Pasang Rembulan dan memperpanjang Badai Rembulan selama kamu dalam Wujud Burung Bulan.',
   'hudChrome.auraEffect.moontide':

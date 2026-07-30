@@ -7681,7 +7681,7 @@ export const zh_TW: EnTranslations = {
       },
       "divine_protection": {
         "name": "信仰守護",
-        "description": "一道神聖護盾吸收 {damage} 點傷害，持續 10 秒。"
+        "description": "一道神聖結界吸收相當於最大生命值{damage}%的傷害，持續{duration}秒。持久守護可強化該結界。"
       },
       "hammer_of_justice": {
         "name": "裂碎法槌",
@@ -7729,7 +7729,7 @@ export const zh_TW: EnTranslations = {
       },
       "retribution_aura": {
         "name": "報償光環",
-        "description": "以神聖能量環繞自身，持續 30 分鐘，對任何近戰攻擊你的敵人造成 5 點神聖傷害。"
+        "description": "以神聖能量環繞你和你的隊伍，直到死亡或被替換。近戰攻擊受影響盟友的敵人將受到{buff}點神聖傷害，受影響盟友的自動攻擊額外造成{buff}點神聖傷害。"
       },
       "tame_beast": {
         "name": "野性繫絆",
@@ -8119,7 +8119,7 @@ export const zh_TW: EnTranslations = {
       },
       "holy_shield": {
         "name": "神聖之盾",
-        "description": "以神聖之力保護你10秒，護甲提高90，並對近戰攻擊者造成12點神聖傷害。（防護專精招牌）"
+        "description": "獲得30%格擋，以及一面吸收相當於最大生命值{damage}%傷害的護盾，持續{duration}秒，並釋放一股威脅脈衝。昇華可強化並延長這層防禦。"
       },
       "bestial_wrath": {
         "name": "狂野怒火",

@@ -8195,19 +8195,19 @@ export const tr_TR: EnTranslations = {
       },
       "moonlash": {
         "name": "Ay Kabarışı",
-        "description": "Ağır bir Gizem vuruşu için 3 Ay Gelgiti tüketir: hasar seçimi. Güneş İzi ile aynı birikimi harcar, o yüzden birini seç."
+        "description": "3 Ay Gelgitini {damage} Gizem hasarı veren ağır bir vuruş için tüketir: hasar seçimi. Güneş İzi de aynı 3 Ay Gelgitini tüketir, o yüzden birini seç."
       },
       "sunlance": {
         "name": "Güneş İzi",
-        "description": "Yanık veren bir Doğa vuruşu için 3 Ay Gelgiti tüketir ve 35 mana geri kazandırır: tasarruf seçimi. Ay Kabarışı ile aynı birikimi harcar, o yüzden birini seç."
+        "description": "3 Ay Gelgitini, {damage} Doğa hasarı ve 9 saniyede {overTime} yanık veren bir vuruş için tüketir ve 35 mana geri kazandırır: mana seçimi. Ay Kabarışı da aynı 3 Ay Gelgitini tüketir, o yüzden birini seç."
       },
       "redharvest": {
         "name": "Kızıl Hasat",
-        "description": "3 Kadim Kan tüketir, hedefte sahip olduğun kalan tüm Deri Yüzme ve Parçalama hasarını patlatır ve 30 enerji geri kazandırır. Tutulan combo puanları ısırığı güçlendirir ama asla gerekli değildir."
+        "description": "3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve 30 enerji geri kazandırır. Sıfır combo puanıyla da çalışır."
       },
       "marrowbreak": {
         "name": "İlik Kıran",
-        "description": "Ağır, yüksek tehditli bir vuruş için 3 Kadim Kan tüketir. Canın yarısının altındayken bunun yerine 8 sn boyunca azami canın 18% kadarını emer ve 15 öfke geri kazandırır."
+        "description": "3 Kadim Kanı yüksek tehditli, {damage} hasar veren ağır bir vuruş için tüketir. Canın yarısının altındayken bunun yerine 8 sn boyunca azami canının %18 kadarı değerinde bir kalkanla seni korur ve 15 öfke iade eder."
       },
       "overbloom": {
         "name": "Taşkın Çiçeklenme",

@@ -10931,10 +10931,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Märgbräckare',
   'entities.abilities.marrowbreak.description':
-    'Förbrukar 3 Gammalt Blod för ett tungt slag med högt hot. Under halv hälsa absorberar det i stället 18% av maximal hälsa i 8 sek och återställer 15 raseri.',
+    'Förbrukar dina 3 Gammalt Blod för ett tungt slag med högt hot som ger {damage} skada. Under halv hälsa skyddar det dig i stället med en sköld på 18% av din maximala hälsa i 8 sek och återbetalar 15 raseri.',
   'entities.abilities.moonlash.name': 'Månsvall',
   'entities.abilities.moonlash.description':
-    'Förbrukar 3 Månflod för ett tungt arkant slag: skadevalet. Tär på samma förråd som Solspår, så välj ett.',
+    'Förbrukar dina 3 Månflod för ett tungt slag som ger {damage} arkan skada: skadevalet. Solspår förbrukar samma 3 Månflod, så välj ett.',
   'entities.abilities.moonseed.name': 'Månfrö',
   'entities.abilities.moonseed.description':
     'Endast i Månugglaform. Slår för {damage} arkan skada, lägger till ett Månflod-steg och förlänger din Månstorm med 6 sek, upp till 6 sek per användning. Vid full Månflod blir Månfrö Månsvall.',
@@ -10943,10 +10943,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förbrukar 5 Grönska. Skördar varje läkning över tid du äger på alla allierade för 60% av dess återstående läkning, tar bort de effekterna och planterar en färsk Vildblomning på målet.',
   'entities.abilities.redharvest.name': 'Röd Skörd',
   'entities.abilities.redharvest.description':
-    'Förbrukar 3 Gammalt Blod, detonerar all återstående skada från Flå och Riv upp som du äger på målet och återställer 30 energi. Hållna kombopoäng stärker bettet men krävs aldrig.',
+    'Förbrukar dina 3 Gammalt Blod: ett slag för {damage} som omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, tar bort båda blödningarna och återställer 30 energi. Fungerar utan kombopoäng.',
   'entities.abilities.sunlance.name': 'Solspår',
   'entities.abilities.sunlance.description':
-    'Förbrukar 3 Månflod för ett naturslag med brännskada och återställer 35 mana: sparvalet. Tär på samma förråd som Månsvall, så välj ett.',
+    'Förbrukar dina 3 Månflod för ett slag som ger {damage} naturskada plus en brännskada på {overTime} under 9 sek och återställer 35 mana: manavalet. Månsvall förbrukar samma 3 Månflod, så välj ett.',
   'guide.abilityHook.moonseed':
     'Lägger till ett Månflod-steg och förlänger Månstorm medan du är i Månugglaform.',
   'hudChrome.auraEffect.moontide':

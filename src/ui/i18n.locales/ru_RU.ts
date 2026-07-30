@@ -2935,7 +2935,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Накладывает Благословение на дружественную цель, повышая силу атаки на {buff} на 5 мин.',
   'entities.abilities.divine_protection.name': 'Оберег веры',
   'entities.abilities.divine_protection.description':
-    'Защитный оберег поглощает {damage} ед. урона в течение 10 сек.',
+    'Священный оберег поглощает урон в размере {damage}% вашего максимального здоровья в течение {duration} сек. Enduring Protection усиливает оберег.',
   'entities.abilities.hammer_of_justice.name': 'Раскалывающий молот',
   'entities.abilities.hammer_of_justice.description': 'Оглушает цель на {duration} сек.',
   'entities.abilities.lay_on_hands.name': 'Последний обряд',
@@ -2958,7 +2958,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Повышает угрозу от вашего урона светлой магией на 60% на 30 мин. Основа паладина-танка.',
   'entities.abilities.retribution_aura.name': 'Аура возмездия',
   'entities.abilities.retribution_aura.description':
-    'Окружает вас священной энергией на 30 мин и наносит 5 ед. урона светлой магией любому врагу, атакующему вас в ближнем бою.',
+    'Окружает вас и вашу группу священной энергией до смерти или замены. Враги, ударившие затронутого союзника в ближнем бою, получают {buff} ед. урона от Света, а затронутые союзники наносят {buff} ед. дополнительного урона от Света автоатаками.',
   'entities.abilities.tame_beast.name': 'Дикие узы',
   'entities.abilities.tame_beast.description':
     'Начинает приручать зверя в качестве спутника. Он должен быть не выше вашего уровня и не элитным. Ваш питомец следует за вами, атакует врагов и удерживает собственную угрозу. Одновременно можно иметь одного питомца.',
@@ -3265,7 +3265,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Поражает дружественную цель энергией Света и исцеляет ее на {damage}. (знаковое умение Света)',
   'entities.abilities.holy_shield.name': 'Священный щит',
   'entities.abilities.holy_shield.description':
-    'Защищает вас силой Света на 10 сек., повышает броню на 90 и поражает атакующих в ближнем бою на 12 ед. урона от Света. (знаковое умение Защиты)',
+    'Дает 30% блока и щит, поглощающий {damage}% вашего максимального здоровья в течение {duration} сек., и испускает волну угрозы. Вознесение усиливает и продлевает защиту.',
   'entities.abilities.bestial_wrath.name': 'Звериный гнев',
   'entities.abilities.bestial_wrath.description':
     'Повергает вас в звериную ярость, повышая силу атаки на 55 на 15 сек. (знаковое умение Повелителя зверей)',

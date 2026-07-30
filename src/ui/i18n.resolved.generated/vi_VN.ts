@@ -8195,19 +8195,19 @@ export const vi_VN: EnTranslations = {
       },
       "moonlash": {
         "name": "Nguyệt Trào",
-        "description": "Tiêu 3 Triều Nguyệt cho một đòn Bí Thuật nặng: lựa chọn sát thương. Dùng chung một bể với Vệt Dương, nên hãy chọn một."
+        "description": "Tiêu 3 Triều Nguyệt của bạn cho một đòn đánh nặng gây {damage} sát thương Bí Thuật: lựa chọn sát thương. Vệt Dương cũng tiêu đúng 3 Triều Nguyệt đó, nên hãy chọn một."
       },
       "sunlance": {
         "name": "Vệt Dương",
-        "description": "Tiêu 3 Triều Nguyệt cho một đòn Tự Nhiên kèm thiêu đốt và hồi 35 mana: lựa chọn tiết kiệm. Dùng chung một bể với Nguyệt Trào, nên hãy chọn một."
+        "description": "Tiêu 3 Triều Nguyệt của bạn cho một đòn gây {damage} sát thương Tự Nhiên cộng thêm {overTime} thiêu đốt trong 9 giây, và hồi 35 mana: lựa chọn mana. Nguyệt Trào cũng tiêu đúng 3 Triều Nguyệt đó, nên hãy chọn một."
       },
       "redharvest": {
         "name": "Thu Hoạch Đỏ",
-        "description": "Tiêu 3 Huyết Cổ, kích nổ toàn bộ sát thương còn lại của Lóc Xé và Xé Rách của bạn trên mục tiêu và hồi 30 năng lượng. Điểm liên hoàn đang giữ làm cú cắn mạnh hơn nhưng không bao giờ bắt buộc."
+        "description": "Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi 30 năng lượng. Dùng được cả khi không có điểm liên hoàn."
       },
       "marrowbreak": {
         "name": "Đoạn Tủy",
-        "description": "Tiêu 3 Huyết Cổ cho một đòn đánh nặng với uy hiếp cao. Dưới nửa máu, thay vào đó hấp thụ 18% lượng máu tối đa trong 8 giây và hồi 15 nộ."
+        "description": "Tiêu 3 Huyết Cổ của bạn cho một đòn đánh nặng, uy hiếp cao gây {damage} sát thương. Dưới nửa máu, thay vào đó tạo lá chắn bằng 18% máu tối đa của bạn trong 8 giây và hoàn lại 15 nộ."
       },
       "overbloom": {
         "name": "Mãn Khai",

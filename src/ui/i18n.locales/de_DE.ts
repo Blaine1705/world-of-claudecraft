@@ -9848,10 +9848,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Markbrecher',
   'entities.abilities.marrowbreak.description':
-    'Verbraucht 3 Altes Blut für einen schweren Schlag mit hoher Bedrohung. Unter halber Gesundheit absorbiert er stattdessen 18% der maximalen Gesundheit für 8 Sek. und stellt 15 Wut wieder her.',
+    'Verbraucht 3 Altes Blut für einen schweren Schlag mit hoher Bedrohung und {damage} Schaden. Unter halber Gesundheit schützt er Euch stattdessen mit einem Schild von 18% Eurer maximalen Gesundheit für 8 Sek. und erstattet 15 Wut zurück.',
   'entities.abilities.moonlash.name': 'Mondwoge',
   'entities.abilities.moonlash.description':
-    'Verbraucht 3 Mondflut für einen schweren Arkanschlag: die Schadenswahl. Zehrt von derselben Bank wie Sonnenspur, also wählt eine.',
+    'Verbraucht 3 Mondflut für einen schweren Schlag mit {damage} Arkanschaden: die Schadenswahl. Sonnenspur verbraucht dieselben 3 Mondflut, also wählt eine.',
   'entities.abilities.moonseed.name': 'Mondsaat',
   'entities.abilities.moonseed.description':
     'Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt eine Mondflut-Stufe hinzu und verlängert Euren Mondsturm um 6 Sek., bis zu 6 Sek. pro Anwendung. Bei voller Mondflut wird Mondsaat zu Mondwoge.',
@@ -9860,10 +9860,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verbraucht 5 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für 60% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Wildblüte auf das Ziel.',
   'entities.abilities.redharvest.name': 'Rote Ernte',
   'entities.abilities.redharvest.description':
-    'Verbraucht 3 Altes Blut, bringt allen verbleibenden Schinden- und Zerfetzen-Schaden, den Ihr auf dem Ziel besitzt, zur Detonation und stellt 30 Energie wieder her. Gehaltene Combopunkte stärken den Biss, sind aber nie erforderlich.',
+    'Verbraucht 3 Altes Blut: ein Schlag für {damage}, der sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, beide Blutungen entfernt und 30 Energie wiederherstellt. Funktioniert auch ohne Combopunkte.',
   'entities.abilities.sunlance.name': 'Sonnenspur',
   'entities.abilities.sunlance.description':
-    'Verbraucht 3 Mondflut für einen Naturschlag mit Brand und stellt 35 Mana wieder her: die Sparwahl. Zehrt von derselben Bank wie Mondwoge, also wählt eine.',
+    'Verbraucht 3 Mondflut für einen Schlag mit {damage} Naturschaden plus einem Brand von {overTime} über 9 Sek. und stellt 35 Mana wieder her: die Manawahl. Mondwoge verbraucht dieselben 3 Mondflut, also wählt eine.',
   'guide.abilityHook.moonseed':
     'Fügt eine Mondflut-Stufe hinzu und verlängert Mondsturm, solange Ihr in Mondkingestalt seid.',
   'hudChrome.auraEffect.moontide':

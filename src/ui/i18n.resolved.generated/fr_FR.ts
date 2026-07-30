@@ -8195,19 +8195,19 @@ export const fr_FR: EnTranslations = {
       },
       "moonlash": {
         "name": "Déferlante lunaire",
-        "description": "Consomme 3 Marée lunaire pour une frappe d'Arcane lourde : le choix des dégâts. Dépense la même réserve que Sillage solaire, alors choisissez-en un."
+        "description": "Consomme vos 3 Marée lunaire pour une frappe lourde de {damage} points de dégâts d'Arcane : le choix des dégâts. Sillage solaire consomme les mêmes 3 Marée lunaire, alors choisissez-en un."
       },
       "sunlance": {
         "name": "Sillage solaire",
-        "description": "Consomme 3 Marée lunaire pour une frappe de Nature avec brûlure et rend 35 points de mana : le choix de l'économie. Dépense la même réserve que Déferlante lunaire, alors choisissez-en un."
+        "description": "Consomme vos 3 Marée lunaire pour une frappe de {damage} points de dégâts de Nature plus une brûlure de {overTime} sur 9 s, et rend 35 points de mana : le choix du mana. Déferlante lunaire consomme les mêmes 3 Marée lunaire, alors choisissez-en un."
       },
       "redharvest": {
         "name": "Moisson rouge",
-        "description": "Consomme 3 Sang ancien, fait détoner tous les dégâts restants d'Écorcher et de Lacération que vous possédez sur la cible et rend 30 points d'énergie. Les points de combo détenus renforcent la morsure mais ne sont jamais requis."
+        "description": "Consomme vos 3 Sang ancien : frappe pour {damage}, inflige instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, retire les deux saignements et rend 30 points d'énergie. Fonctionne sans aucun point de combo."
       },
       "marrowbreak": {
         "name": "Brise-moelle",
-        "description": "Consomme 3 Sang ancien pour une frappe lourde à haute menace. Sous la moitié des points de vie, absorbe à la place 18% des points de vie maximum pendant 8 s et rend 15 points de rage."
+        "description": "Consomme vos 3 Sang ancien pour une frappe lourde à haute menace de {damage} points de dégâts. Sous la moitié des points de vie, vous protège à la place d'un bouclier égal à 18% de vos points de vie maximum pendant 8 s et rembourse 15 points de rage."
       },
       "overbloom": {
         "name": "Surfloraison",

@@ -2905,7 +2905,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '味方対象に祝福を与え、5分間、攻撃力を{buff}増加させます。',
   'entities.abilities.divine_protection.name': '信仰の守り',
   'entities.abilities.divine_protection.description':
-    '守りの結界が10秒間{damage}ダメージを吸収します。',
+    '聖なる結界が{duration}秒間、最大体力の{damage}%を吸収します。不朽の守護は結界を強化します。',
   'entities.abilities.hammer_of_justice.name': '断裂の裁き槌',
   'entities.abilities.hammer_of_justice.description': '対象を{duration}秒間スタンさせます。',
   'entities.abilities.lay_on_hands.name': '最後の秘跡',
@@ -2928,7 +2928,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '30分間、あなたの神聖ダメージが生成する脅威が60%増加します。タンク役パラディンの要です。',
   'entities.abilities.retribution_aura.name': '報復のオーラ',
   'entities.abilities.retribution_aura.description':
-    '30分間、聖なる力で身を包み、近接攻撃をしてきた敵に5の神聖ダメージを与えます。',
+    '死亡するか置き換えられるまで、自分とパーティを聖なるエネルギーで包みます。影響を受けた味方を近接攻撃した敵は{buff}の神聖ダメージを受け、影響を受けた味方は自動攻撃で{buff}の追加神聖ダメージを与えます。',
   'entities.abilities.tame_beast.name': '野生の絆',
   'entities.abilities.tame_beast.description':
     '獣を仲間にするための調教を始めます。獣はあなたのレベル以下で、エリートであってはなりません。ペットはあなたに従い、敵を攻撃し、独自の脅威を保ちます。同時に連れられるペットは1体だけです。',
@@ -3224,7 +3224,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',
   'entities.abilities.holy_shield.name': 'ホーリーシールド',
   'entities.abilities.holy_shield.description':
-    '10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）',
+    'ブロックが30%上昇し、{duration}秒間、最大体力の{damage}%を吸収する盾を得て、脅威の波動を放ちます。昇天は防御を強化し、延長します。',
   'entities.abilities.bestial_wrath.name': '野獣の怒り',
   'entities.abilities.bestial_wrath.description':
     '野獣の怒りに入り、15秒間攻撃力が55上がります。（ビーストマスタリー特性のシグネチャ）',

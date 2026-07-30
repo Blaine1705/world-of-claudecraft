@@ -8195,19 +8195,19 @@ export const nl_NL: EnTranslations = {
       },
       "moonlash": {
         "name": "Maangolf",
-        "description": "Verbruikt 3 Maanvloed voor een zware Arcane-slag: de schadekeuze. Put uit dezelfde bank als Zonnespoor, dus kies er een."
+        "description": "Verbruikt je 3 Maanvloed voor een zware slag van {damage} Arcane-schade: de schadekeuze. Zonnespoor verbruikt dezelfde 3 Maanvloed, dus kies er een."
       },
       "sunlance": {
         "name": "Zonnespoor",
-        "description": "Verbruikt 3 Maanvloed voor een Natuur-slag met brandwond en herstelt 35 mana: de zuinige keuze. Put uit dezelfde bank als Maangolf, dus kies er een."
+        "description": "Verbruikt je 3 Maanvloed voor een slag van {damage} Natuur-schade plus een brandwond van {overTime} over 9 sec, en herstelt 35 mana: de manakeuze. Maangolf verbruikt dezelfde 3 Maanvloed, dus kies er een."
       },
       "redharvest": {
         "name": "Rode Oogst",
-        "description": "Verbruikt 3 Oud Bloed, laat alle resterende schade van Villen en Verscheuren die je op het doelwit hebt ontploffen en herstelt 30 energie. Vastgehouden combopunten versterken de beet maar zijn nooit vereist."
+        "description": "Verbruikt je 3 Oud Bloed: een slag voor {damage} die meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, beide bloedingen verwijdert en 30 energie herstelt. Werkt ook zonder combopunten."
       },
       "marrowbreak": {
         "name": "Mergbreker",
-        "description": "Verbruikt 3 Oud Bloed voor een zware slag met hoge dreiging. Onder de helft van je gezondheid absorbeert hij in plaats daarvan 18% van je maximale gezondheid gedurende 8 sec en herstelt 15 woede."
+        "description": "Verbruikt je 3 Oud Bloed voor een zware slag met hoge dreiging van {damage} schade. Onder de helft van je gezondheid beschermt hij je in plaats daarvan met een schild van 18% van je maximale gezondheid gedurende 8 sec en geeft 15 woede terug."
       },
       "overbloom": {
         "name": "Overbloei",

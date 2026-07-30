@@ -2785,7 +2785,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '為一個友方目標施加祝福，使攻擊強度提高 {buff}，持續 5 分鐘。',
   'entities.abilities.divine_protection.name': '信仰守護',
   'entities.abilities.divine_protection.description':
-    '一道神聖護盾吸收 {damage} 點傷害，持續 10 秒。',
+    '一道神聖結界吸收相當於最大生命值{damage}%的傷害，持續{duration}秒。持久守護可強化該結界。',
   'entities.abilities.hammer_of_justice.name': '裂碎法槌',
   'entities.abilities.hammer_of_justice.description': '使目標昏迷 {duration} 秒。',
   'entities.abilities.lay_on_hands.name': '臨終聖禮',
@@ -2807,7 +2807,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '使你的神聖傷害產生的威脅值提高 60%，持續 30 分鐘。防護聖騎士的核心技能。',
   'entities.abilities.retribution_aura.name': '報償光環',
   'entities.abilities.retribution_aura.description':
-    '以神聖能量環繞自身，持續 30 分鐘，對任何近戰攻擊你的敵人造成 5 點神聖傷害。',
+    '以神聖能量環繞你和你的隊伍，直到死亡或被替換。近戰攻擊受影響盟友的敵人將受到{buff}點神聖傷害，受影響盟友的自動攻擊額外造成{buff}點神聖傷害。',
   'entities.abilities.tame_beast.name': '野性繫絆',
   'entities.abilities.tame_beast.description':
     '開始馴服一隻野獸作為你的夥伴。牠必須不高於你的等級，且不能是精英。你的寵物會跟隨你、攻擊敵人，並保持自己的威脅值。同一時間只能擁有一隻寵物。',
@@ -3084,7 +3084,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）',
   'entities.abilities.holy_shield.name': '神聖之盾',
   'entities.abilities.holy_shield.description':
-    '以神聖之力保護你10秒，護甲提高90，並對近戰攻擊者造成12點神聖傷害。（防護專精招牌）',
+    '獲得30%格擋，以及一面吸收相當於最大生命值{damage}%傷害的護盾，持續{duration}秒，並釋放一股威脅脈衝。昇華可強化並延長這層防禦。',
   'entities.abilities.bestial_wrath.name': '狂野怒火',
   'entities.abilities.bestial_wrath.description':
     '使你進入野獸怒火狀態，攻擊強度提高55點，持續15秒。（野獸控制專精招牌）',

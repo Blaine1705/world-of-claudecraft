@@ -2885,7 +2885,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '아군 대상에게 축복을 내려 5분 동안 전투력을 {buff}만큼 증가시킵니다.',
   'entities.abilities.divine_protection.name': '신념의 결계',
   'entities.abilities.divine_protection.description':
-    '보호의 결계가 10초 동안 {damage}의 피해를 흡수합니다.',
+    '신성한 결계가 {duration}초 동안 최대 생명력의 {damage}%를 흡수합니다. 영속하는 수호는 결계를 강화합니다.',
   'entities.abilities.hammer_of_justice.name': '분쇄의 망치',
   'entities.abilities.hammer_of_justice.description': '대상을 {duration}초 동안 기절시킵니다.',
   'entities.abilities.lay_on_hands.name': '마지막 의식',
@@ -2908,7 +2908,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '30분 동안 자신의 신성 피해가 생성하는 위협 수준이 60%만큼 증가합니다. 방어 성기사의 핵심입니다.',
   'entities.abilities.retribution_aura.name': '응보의 오라',
   'entities.abilities.retribution_aura.description':
-    '30분 동안 신성한 기운으로 자신을 감싸 근접 공격으로 자신을 타격하는 모든 적에게 5의 신성 피해를 입힙니다.',
+    '죽거나 교체될 때까지 자신과 파티를 신성한 기운으로 감쌉니다. 영향을 받는 아군을 근접 공격으로 타격한 적은 {buff}의 신성 피해를 입고, 영향을 받는 아군은 자동 공격으로 {buff}의 추가 신성 피해를 입힙니다.',
   'entities.abilities.tame_beast.name': '야생의 결속',
   'entities.abilities.tame_beast.description':
     '야수를 길들여 동료로 삼기 시작합니다. 야수는 자신의 레벨 이하이며 정예가 아니어야 합니다. 소환수는 주인을 따르고 적을 공격하며 자체 위협 수준을 유지합니다. 한 번에 하나의 소환수만 둘 수 있습니다.',
@@ -3210,7 +3210,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)',
   'entities.abilities.holy_shield.name': '신성한 방패',
   'entities.abilities.holy_shield.description':
-    '10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)',
+    '막기가 30% 증가하고, {duration}초 동안 최대 생명력의 {damage}%를 흡수하는 보호막을 얻으며 위협의 파동을 방출합니다. 승천은 방어를 강화하고 연장합니다.',
   'entities.abilities.bestial_wrath.name': '야수의 격노',
   'entities.abilities.bestial_wrath.description':
     '야수의 분노에 휩싸여 15초 동안 전투력이 55만큼 증가합니다. (야수 전문화 상징)',

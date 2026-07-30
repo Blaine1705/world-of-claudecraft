@@ -7681,7 +7681,7 @@ export const ko_KR: EnTranslations = {
       },
       "divine_protection": {
         "name": "신념의 결계",
-        "description": "보호의 결계가 10초 동안 {damage}의 피해를 흡수합니다."
+        "description": "신성한 결계가 {duration}초 동안 최대 생명력의 {damage}%를 흡수합니다. 영속하는 수호는 결계를 강화합니다."
       },
       "hammer_of_justice": {
         "name": "분쇄의 망치",
@@ -7729,7 +7729,7 @@ export const ko_KR: EnTranslations = {
       },
       "retribution_aura": {
         "name": "응보의 오라",
-        "description": "30분 동안 신성한 기운으로 자신을 감싸 근접 공격으로 자신을 타격하는 모든 적에게 5의 신성 피해를 입힙니다."
+        "description": "죽거나 교체될 때까지 자신과 파티를 신성한 기운으로 감쌉니다. 영향을 받는 아군을 근접 공격으로 타격한 적은 {buff}의 신성 피해를 입고, 영향을 받는 아군은 자동 공격으로 {buff}의 추가 신성 피해를 입힙니다."
       },
       "tame_beast": {
         "name": "야생의 결속",
@@ -8119,7 +8119,7 @@ export const ko_KR: EnTranslations = {
       },
       "holy_shield": {
         "name": "신성한 방패",
-        "description": "10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)"
+        "description": "막기가 30% 증가하고, {duration}초 동안 최대 생명력의 {damage}%를 흡수하는 보호막을 얻으며 위협의 파동을 방출합니다. 승천은 방어를 강화하고 연장합니다."
       },
       "bestial_wrath": {
         "name": "야수의 격노",

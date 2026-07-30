@@ -8195,19 +8195,19 @@ export const da_DK: EnTranslations = {
       },
       "moonlash": {
         "name": "Månebølge",
-        "description": "Forbruger 3 Måneflod til et tungt arkant slag: skadesvalget. Tærer på samme forråd som Solspor, så vælg et."
+        "description": "Forbruger dine 3 Måneflod til et tungt slag med {damage} arkan skade: skadesvalget. Solspor forbruger de samme 3 Måneflod, så vælg et."
       },
       "sunlance": {
         "name": "Solspor",
-        "description": "Forbruger 3 Måneflod til et naturslag med forbrænding og gendanner 35 mana: sparevalget. Tærer på samme forråd som Månebølge, så vælg et."
+        "description": "Forbruger dine 3 Måneflod til et slag med {damage} naturskade plus en forbrænding på {overTime} over 9 sek. og gendanner 35 mana: manavalget. Månebølge forbruger de samme 3 Måneflod, så vælg et."
       },
       "redharvest": {
         "name": "Rød Høst",
-        "description": "Forbruger 3 Gammelt Blod, detonerer al resterende skade fra Flæns og Sønderriv, som du ejer på målet, og gendanner 30 energi. Holdte kombopoint styrker biddet, men kræves aldrig."
+        "description": "Forbruger dine 3 Gammelt Blod: et slag for {damage}, der øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, fjerner begge blødninger og gendanner 30 energi. Virker uden kombopoint."
       },
       "marrowbreak": {
         "name": "Marvbrækker",
-        "description": "Forbruger 3 Gammelt Blod til et tungt slag med høj trussel. Under halvt helbred absorberer det i stedet 18% af maksimalt helbred i 8 sek. og gendanner 15 raseri."
+        "description": "Forbruger dine 3 Gammelt Blod til et tungt slag med høj trussel og {damage} skade. Under halvt helbred beskytter det dig i stedet med et skjold på 18% af dit maksimale helbred i 8 sek. og refunderer 15 raseri."
       },
       "overbloom": {
         "name": "Overblomstring",

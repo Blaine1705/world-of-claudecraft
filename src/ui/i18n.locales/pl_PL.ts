@@ -10996,10 +10996,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Łamacz szpiku',
   'entities.abilities.marrowbreak.description':
-    'Zużywa 3 Starej Krwi na ciężki cios o wysokim zagrożeniu. Poniżej połowy zdrowia zamiast tego pochłania 18% maksymalnego zdrowia na 8 s i przywraca 15 szału.',
+    'Zużywa twoje 3 Starej Krwi na ciężki cios o wysokim zagrożeniu, zadający {damage} obrażeń. Poniżej połowy zdrowia zamiast tego osłania cię tarczą równą 18% maksymalnego zdrowia na 8 s i zwraca 15 szału.',
   'entities.abilities.moonlash.name': 'Księżycowy przybór',
   'entities.abilities.moonlash.description':
-    'Zużywa 3 Księżycowego przypływu na ciężki tajemny cios: wybór obrażeń. Czerpie z tej samej rezerwy co Słoneczny ślad, więc wybierz jeden.',
+    'Zużywa twoje 3 Księżycowego przypływu na ciężki cios zadający {damage} obrażeń tajemnych: wybór obrażeń. Słoneczny ślad zużywa te same 3 Księżycowego przypływu, więc wybierz jeden.',
   'entities.abilities.moonseed.name': 'Księżycowe nasienie',
   'entities.abilities.moonseed.description':
     'Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń tajemnych, dodaje jeden stopień Księżycowego przypływu i przedłuża twoją Księżycową nawałnicę o 6 s, do 6 s na użycie. Przy pełnym Księżycowym przypływie Księżycowe nasienie staje się Księżycowym przyborem.',
@@ -11008,10 +11008,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zużywa 5 Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za 60% pozostałego leczenia, usuwa te efekty i sadzi świeży Dziki rozkwit na celu.',
   'entities.abilities.redharvest.name': 'Czerwone Żniwa',
   'entities.abilities.redharvest.description':
-    'Zużywa 3 Starej Krwi, detonuje wszystkie pozostałe obrażenia Zdzierania i Rozszarpania, które masz na celu, i przywraca 30 energii. Trzymane punkty combo wzmacniają ukąszenie, ale nigdy nie są wymagane.',
+    'Zużywa twoje 3 Starej Krwi: cios za {damage}, natychmiast zadaje wszystkie obrażenia, które twoje Zdzieranie i Rozszarpanie by jeszcze zadały, usuwa oba krwawienia i przywraca 30 energii. Działa bez punktów combo.',
   'entities.abilities.sunlance.name': 'Słoneczny ślad',
   'entities.abilities.sunlance.description':
-    'Zużywa 3 Księżycowego przypływu na cios natury z podpaleniem i przywraca 35 many: wybór ekonomiczny. Czerpie z tej samej rezerwy co Księżycowy przybór, więc wybierz jeden.',
+    'Zużywa twoje 3 Księżycowego przypływu na cios zadający {damage} obrażeń natury oraz podpalenie zadające {overTime} w ciągu 9 s i przywraca 35 many: wybór many. Księżycowy przybór zużywa te same 3 Księżycowego przypływu, więc wybierz jeden.',
   'guide.abilityHook.moonseed':
     'Dodaje stopień Księżycowego przypływu i przedłuża Księżycową nawałnicę, gdy jesteś w Postaci księżycowej sowy.',
   'hudChrome.auraEffect.moontide':

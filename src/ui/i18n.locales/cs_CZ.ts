@@ -10869,10 +10869,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Lámání morku',
   'entities.abilities.marrowbreak.description':
-    'Spotřebuje 3 Staré krve na těžký úder s vysokou hrozbou. Pod polovinou zdraví místo toho pohltí 18% maximálního zdraví na 8 s a obnoví 15 zuřivosti.',
+    'Spotřebuje 3 Staré krve na těžký úder s vysokou hrozbou za {damage} poškození. Pod polovinou zdraví tě místo toho chrání štítem za 18% maximálního zdraví na 8 s a vrátí 15 zuřivosti.',
   'entities.abilities.moonlash.name': 'Měsíční vzedmutí',
   'entities.abilities.moonlash.description':
-    'Spotřebuje 3 Měsíčního přílivu na těžký tajemný úder: volba poškození. Čerpá ze stejné zásoby jako Sluneční brázda, vyber si tedy jednu.',
+    'Spotřebuje 3 Měsíčního přílivu na těžký úder za {damage} tajemného poškození: volba poškození. Sluneční brázda spotřebuje tytéž 3 Měsíčního přílivu, vyber si tedy jednu.',
   'entities.abilities.moonseed.name': 'Měsíční semeno',
   'entities.abilities.moonseed.description':
     'Pouze v Podobě měsíčního křídla. Zasáhne za {damage} tajemného poškození, přidá jeden stupeň Měsíčního přílivu a prodlouží tvou Měsíční bouři o 6 s, až o 6 s na použití. Při plném Měsíčním přílivu se Měsíční semeno mění v Měsíční vzedmutí.',
@@ -10881,10 +10881,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Spotřebuje 5 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za 60% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Divoký květ.',
   'entities.abilities.redharvest.name': 'Rudá sklizeň',
   'entities.abilities.redharvest.description':
-    'Spotřebuje 3 Staré krve, odpálí veškeré zbývající poškození Stažení z kůže a Roztržení, které na cíli máš, a obnoví 30 energie. Držené combo body kousnutí posílí, ale nikdy nejsou vyžadovány.',
+    'Spotřebuje 3 Staré krve: úder za {damage}, okamžitě způsobí veškeré poškození, které by tvé Stažení z kůže a Roztržení ještě způsobily, odstraní obě krvácení a obnoví 30 energie. Funguje i bez combo bodů.',
   'entities.abilities.sunlance.name': 'Sluneční brázda',
   'entities.abilities.sunlance.description':
-    'Spotřebuje 3 Měsíčního přílivu na přírodní úder s popálením a obnoví 35 many: volba úspory. Čerpá ze stejné zásoby jako Měsíční vzedmutí, vyber si tedy jednu.',
+    'Spotřebuje 3 Měsíčního přílivu na úder za {damage} přírodního poškození plus popálení za {overTime} během 9 s a obnoví 35 many: volba many. Měsíční vzedmutí spotřebuje tytéž 3 Měsíčního přílivu, vyber si tedy jednu.',
   'guide.abilityHook.moonseed':
     'Přidá stupeň Měsíčního přílivu a prodlouží Měsíční bouři, dokud jsi v Podobě měsíčního křídla.',
   'hudChrome.auraEffect.moontide':

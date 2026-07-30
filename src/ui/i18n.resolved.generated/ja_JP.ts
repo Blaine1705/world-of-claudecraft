@@ -7681,7 +7681,7 @@ export const ja_JP: EnTranslations = {
       },
       "divine_protection": {
         "name": "信仰の守り",
-        "description": "守りの結界が10秒間{damage}ダメージを吸収します。"
+        "description": "聖なる結界が{duration}秒間、最大体力の{damage}%を吸収します。不朽の守護は結界を強化します。"
       },
       "hammer_of_justice": {
         "name": "断裂の裁き槌",
@@ -7729,7 +7729,7 @@ export const ja_JP: EnTranslations = {
       },
       "retribution_aura": {
         "name": "報復のオーラ",
-        "description": "30分間、聖なる力で身を包み、近接攻撃をしてきた敵に5の神聖ダメージを与えます。"
+        "description": "死亡するか置き換えられるまで、自分とパーティを聖なるエネルギーで包みます。影響を受けた味方を近接攻撃した敵は{buff}の神聖ダメージを受け、影響を受けた味方は自動攻撃で{buff}の追加神聖ダメージを与えます。"
       },
       "tame_beast": {
         "name": "野生の絆",
@@ -8119,7 +8119,7 @@ export const ja_JP: EnTranslations = {
       },
       "holy_shield": {
         "name": "ホーリーシールド",
-        "description": "10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）"
+        "description": "ブロックが30%上昇し、{duration}秒間、最大体力の{damage}%を吸収する盾を得て、脅威の波動を放ちます。昇天は防御を強化し、延長します。"
       },
       "bestial_wrath": {
         "name": "野獣の怒り",

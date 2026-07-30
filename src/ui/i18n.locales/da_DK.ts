@@ -10756,10 +10756,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Marvbrækker',
   'entities.abilities.marrowbreak.description':
-    'Forbruger 3 Gammelt Blod til et tungt slag med høj trussel. Under halvt helbred absorberer det i stedet 18% af maksimalt helbred i 8 sek. og gendanner 15 raseri.',
+    'Forbruger dine 3 Gammelt Blod til et tungt slag med høj trussel og {damage} skade. Under halvt helbred beskytter det dig i stedet med et skjold på 18% af dit maksimale helbred i 8 sek. og refunderer 15 raseri.',
   'entities.abilities.moonlash.name': 'Månebølge',
   'entities.abilities.moonlash.description':
-    'Forbruger 3 Måneflod til et tungt arkant slag: skadesvalget. Tærer på samme forråd som Solspor, så vælg et.',
+    'Forbruger dine 3 Måneflod til et tungt slag med {damage} arkan skade: skadesvalget. Solspor forbruger de samme 3 Måneflod, så vælg et.',
   'entities.abilities.moonseed.name': 'Månefrø',
   'entities.abilities.moonseed.description':
     'Kun i Månekinform. Rammer for {damage} arkan skade, tilføjer et Måneflod-trin og forlænger din Månestorm med 6 sek., op til 6 sek. pr. anvendelse. Ved fuld Måneflod bliver Månefrø til Månebølge.',
@@ -10768,10 +10768,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Forbruger 5 Grønske. Høster hver af dine helbredelser over tid på alle allierede for 60% af den resterende helbredelse, fjerner de virkninger og planter en frisk Vildblomst på målet.',
   'entities.abilities.redharvest.name': 'Rød Høst',
   'entities.abilities.redharvest.description':
-    'Forbruger 3 Gammelt Blod, detonerer al resterende skade fra Flæns og Sønderriv, som du ejer på målet, og gendanner 30 energi. Holdte kombopoint styrker biddet, men kræves aldrig.',
+    'Forbruger dine 3 Gammelt Blod: et slag for {damage}, der øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, fjerner begge blødninger og gendanner 30 energi. Virker uden kombopoint.',
   'entities.abilities.sunlance.name': 'Solspor',
   'entities.abilities.sunlance.description':
-    'Forbruger 3 Måneflod til et naturslag med forbrænding og gendanner 35 mana: sparevalget. Tærer på samme forråd som Månebølge, så vælg et.',
+    'Forbruger dine 3 Måneflod til et slag med {damage} naturskade plus en forbrænding på {overTime} over 9 sek. og gendanner 35 mana: manavalget. Månebølge forbruger de samme 3 Måneflod, så vælg et.',
   'guide.abilityHook.moonseed':
     'Tilføjer et Måneflod-trin og forlænger Månestorm, mens du er i Månekinform.',
   'hudChrome.auraEffect.moontide':

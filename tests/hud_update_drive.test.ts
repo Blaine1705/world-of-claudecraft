@@ -294,6 +294,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'one-shot latch that reloads the saved action-bar layout once',
   },
   {
+    call: 'this.paladinDevotionPainter.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'write-elided paladin Devotion/Ascension resource widget driven by the paladinDevotionView core',
+  },
+  {
     call: 'this.syncActiveHotbarForm',
     band: 'frame',
     gate: '',
@@ -1337,7 +1344,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 39, chrome: 69, none: 15 });
+    ).toEqual({ window: 39, chrome: 70, none: 15 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

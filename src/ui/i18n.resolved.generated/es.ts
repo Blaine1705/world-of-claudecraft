@@ -8195,19 +8195,19 @@ export const es: EnTranslations = {
       },
       "moonlash": {
         "name": "Oleada Lunar",
-        "description": "Consume 3 de Marea Lunar para un golpe Arcano pesado: la opción de daño. Gasta el mismo banco que Estela Solar, así que elige una."
+        "description": "Consume tus 3 de Marea Lunar para un golpe pesado de {damage} de daño Arcano: la opción de daño. Estela Solar consume los mismos 3 de Marea Lunar, así que elige una."
       },
       "sunlance": {
         "name": "Estela Solar",
-        "description": "Consume 3 de Marea Lunar para un golpe de Naturaleza con quemadura y restaura 35 de maná: la opción de economía. Gasta el mismo banco que Oleada Lunar, así que elige una."
+        "description": "Consume tus 3 de Marea Lunar para un golpe de {damage} de daño de Naturaleza más una quemadura de {overTime} a lo largo de 9 s, y restaura 35 de maná: la opción de maná. Oleada Lunar consume los mismos 3 de Marea Lunar, así que elige una."
       },
       "redharvest": {
         "name": "Cosecha Roja",
-        "description": "Consume 3 de Sangre Antigua, detona todo el daño restante de Desollar y Desgarrar que tengas en el objetivo y restaura 30 de energía. Los puntos de combo retenidos refuerzan el mordisco, pero nunca son necesarios."
+        "description": "Consume tus 3 de Sangre Antigua: golpea por {damage}, inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, elimina ambos sangrados y restaura 30 de energía. Funciona sin puntos de combo."
       },
       "marrowbreak": {
         "name": "Quiebramédula",
-        "description": "Consume 3 de Sangre Antigua para un golpe pesado de alta amenaza. Por debajo de la mitad de salud, en su lugar absorbe un 18% de la salud máxima durante 8 s y restaura 15 de ira."
+        "description": "Consume tus 3 de Sangre Antigua para un golpe pesado de alta amenaza que inflige {damage} de daño. Por debajo de la mitad de salud, en su lugar te protege con un escudo del 18% de tu salud máxima durante 8 s y te devuelve 15 de ira."
       },
       "overbloom": {
         "name": "Sobrefloración",

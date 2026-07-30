@@ -8195,19 +8195,19 @@ export const de_DE: EnTranslations = {
       },
       "moonlash": {
         "name": "Mondwoge",
-        "description": "Verbraucht 3 Mondflut für einen schweren Arkanschlag: die Schadenswahl. Zehrt von derselben Bank wie Sonnenspur, also wählt eine."
+        "description": "Verbraucht 3 Mondflut für einen schweren Schlag mit {damage} Arkanschaden: die Schadenswahl. Sonnenspur verbraucht dieselben 3 Mondflut, also wählt eine."
       },
       "sunlance": {
         "name": "Sonnenspur",
-        "description": "Verbraucht 3 Mondflut für einen Naturschlag mit Brand und stellt 35 Mana wieder her: die Sparwahl. Zehrt von derselben Bank wie Mondwoge, also wählt eine."
+        "description": "Verbraucht 3 Mondflut für einen Schlag mit {damage} Naturschaden plus einem Brand von {overTime} über 9 Sek. und stellt 35 Mana wieder her: die Manawahl. Mondwoge verbraucht dieselben 3 Mondflut, also wählt eine."
       },
       "redharvest": {
         "name": "Rote Ernte",
-        "description": "Verbraucht 3 Altes Blut, bringt allen verbleibenden Schinden- und Zerfetzen-Schaden, den Ihr auf dem Ziel besitzt, zur Detonation und stellt 30 Energie wieder her. Gehaltene Combopunkte stärken den Biss, sind aber nie erforderlich."
+        "description": "Verbraucht 3 Altes Blut: ein Schlag für {damage}, der sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, beide Blutungen entfernt und 30 Energie wiederherstellt. Funktioniert auch ohne Combopunkte."
       },
       "marrowbreak": {
         "name": "Markbrecher",
-        "description": "Verbraucht 3 Altes Blut für einen schweren Schlag mit hoher Bedrohung. Unter halber Gesundheit absorbiert er stattdessen 18% der maximalen Gesundheit für 8 Sek. und stellt 15 Wut wieder her."
+        "description": "Verbraucht 3 Altes Blut für einen schweren Schlag mit hoher Bedrohung und {damage} Schaden. Unter halber Gesundheit schützt er Euch stattdessen mit einem Schild von 18% Eurer maximalen Gesundheit für 8 Sek. und erstattet 15 Wut zurück."
       },
       "overbloom": {
         "name": "Überblüte",

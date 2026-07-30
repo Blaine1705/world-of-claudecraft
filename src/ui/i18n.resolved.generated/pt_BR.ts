@@ -8195,19 +8195,19 @@ export const pt_BR: EnTranslations = {
       },
       "moonlash": {
         "name": "Onda Lunar",
-        "description": "Consome 3 de Maré Lunar para um golpe Arcano pesado: a escolha de dano. Gasta o mesmo banco que Esteira Solar, então escolha um."
+        "description": "Consome seus 3 de Maré Lunar para um golpe pesado de {damage} de dano Arcano: a escolha de dano. Esteira Solar consome os mesmos 3 de Maré Lunar, então escolha um."
       },
       "sunlance": {
         "name": "Esteira Solar",
-        "description": "Consome 3 de Maré Lunar para um golpe de Natureza com queimadura e restaura 35 de mana: a escolha econômica. Gasta o mesmo banco que Onda Lunar, então escolha um."
+        "description": "Consome seus 3 de Maré Lunar para um golpe de {damage} de dano de Natureza mais uma queimadura de {overTime} ao longo de 9 s, e restaura 35 de mana: a escolha de mana. Onda Lunar consome os mesmos 3 de Maré Lunar, então escolha um."
       },
       "redharvest": {
         "name": "Colheita Vermelha",
-        "description": "Consome 3 de Sangue Antigo, detona todo o dano restante de Esfolar e Rasgar que você possui no alvo e restaura 30 de energia. Pontos de combo retidos fortalecem a mordida, mas nunca são exigidos."
+        "description": "Consome seus 3 de Sangue Antigo: golpeia por {damage}, causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, remove os dois sangramentos e restaura 30 de energia. Funciona sem pontos de combo."
       },
       "marrowbreak": {
         "name": "Quebra-Medula",
-        "description": "Consome 3 de Sangue Antigo para um golpe pesado de alta ameaça. Abaixo de metade da vida, em vez disso absorve 18% da vida máxima por 8 s e restaura 15 de fúria."
+        "description": "Consome seus 3 de Sangue Antigo para um golpe pesado de alta ameaça com {damage} de dano. Abaixo de metade da vida, em vez disso protege você com um escudo de 18% da sua vida máxima por 8 s e devolve 15 de fúria."
       },
       "overbloom": {
         "name": "Superflorescência",

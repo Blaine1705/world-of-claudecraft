@@ -8195,19 +8195,19 @@ export const it_IT: EnTranslations = {
       },
       "moonlash": {
         "name": "Ondata Lunare",
-        "description": "Consuma 3 Marea Lunare per un colpo Arcano pesante: la scelta del danno. Spende la stessa riserva di Scia Solare, quindi scegline una."
+        "description": "Consuma 3 Marea Lunare per un colpo pesante da {damage} danni Arcani: la scelta del danno. Scia Solare consuma le stesse 3 Marea Lunare, quindi scegline una."
       },
       "sunlance": {
         "name": "Scia Solare",
-        "description": "Consuma 3 Marea Lunare per un colpo di Natura con bruciatura e ripristina 35 mana: la scelta economica. Spende la stessa riserva di Ondata Lunare, quindi scegline una."
+        "description": "Consuma 3 Marea Lunare per un colpo da {damage} danni di Natura più una bruciatura di {overTime} in 9 sec, e ripristina 35 mana: la scelta del mana. Ondata Lunare consuma le stesse 3 Marea Lunare, quindi scegline una."
       },
       "redharvest": {
         "name": "Mietitura Rossa",
-        "description": "Consuma 3 Sangue Antico, fa detonare tutto il danno restante di Scarnificare e Squartare che possiedi sul bersaglio e ripristina 30 energia. I punti combo trattenuti rafforzano il morso ma non sono mai richiesti."
+        "description": "Consuma 3 Sangue Antico: colpisce per {damage}, infligge all'istante tutto il danno che i tuoi Scarnificare e Squartare avrebbero ancora inflitto, rimuove entrambe le emorragie e ripristina 30 energia. Funziona anche senza punti combo."
       },
       "marrowbreak": {
         "name": "Spezzamidollo",
-        "description": "Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia. Sotto metà salute, assorbe invece il 18% della salute massima per 8 sec e ripristina 15 rabbia."
+        "description": "Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia da {damage} danni. Sotto metà salute, ti protegge invece con uno scudo pari al 18% della tua salute massima per 8 sec e rimborsa 15 rabbia."
       },
       "overbloom": {
         "name": "Sovrafioritura",

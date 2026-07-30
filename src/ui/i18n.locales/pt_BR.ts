@@ -11098,10 +11098,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Quebra-Medula',
   'entities.abilities.marrowbreak.description':
-    'Consome 3 de Sangue Antigo para um golpe pesado de alta ameaça. Abaixo de metade da vida, em vez disso absorve 18% da vida máxima por 8 s e restaura 15 de fúria.',
+    'Consome seus 3 de Sangue Antigo para um golpe pesado de alta ameaça com {damage} de dano. Abaixo de metade da vida, em vez disso protege você com um escudo de 18% da sua vida máxima por 8 s e devolve 15 de fúria.',
   'entities.abilities.moonlash.name': 'Onda Lunar',
   'entities.abilities.moonlash.description':
-    'Consome 3 de Maré Lunar para um golpe Arcano pesado: a escolha de dano. Gasta o mesmo banco que Esteira Solar, então escolha um.',
+    'Consome seus 3 de Maré Lunar para um golpe pesado de {damage} de dano Arcano: a escolha de dano. Esteira Solar consome os mesmos 3 de Maré Lunar, então escolha um.',
   'entities.abilities.moonseed.name': 'Semente Lunar',
   'entities.abilities.moonseed.description':
     'Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona um estágio de Maré Lunar e estende sua Tempestade Lunar em 6 s, até 6 s por aplicação. Com a Maré Lunar cheia, Semente Lunar vira Onda Lunar.',
@@ -11110,10 +11110,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Consome 5 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por 60% da cura restante, remove esses efeitos e planta um Florescer Selvagem novo no alvo.',
   'entities.abilities.redharvest.name': 'Colheita Vermelha',
   'entities.abilities.redharvest.description':
-    'Consome 3 de Sangue Antigo, detona todo o dano restante de Esfolar e Rasgar que você possui no alvo e restaura 30 de energia. Pontos de combo retidos fortalecem a mordida, mas nunca são exigidos.',
+    'Consome seus 3 de Sangue Antigo: golpeia por {damage}, causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, remove os dois sangramentos e restaura 30 de energia. Funciona sem pontos de combo.',
   'entities.abilities.sunlance.name': 'Esteira Solar',
   'entities.abilities.sunlance.description':
-    'Consome 3 de Maré Lunar para um golpe de Natureza com queimadura e restaura 35 de mana: a escolha econômica. Gasta o mesmo banco que Onda Lunar, então escolha um.',
+    'Consome seus 3 de Maré Lunar para um golpe de {damage} de dano de Natureza mais uma queimadura de {overTime} ao longo de 9 s, e restaura 35 de mana: a escolha de mana. Onda Lunar consome os mesmos 3 de Maré Lunar, então escolha um.',
   'guide.abilityHook.moonseed':
     'Adiciona um estágio de Maré Lunar e estende Tempestade Lunar enquanto você está na Forma de Luniscante.',
   'hudChrome.auraEffect.moontide':

@@ -274,7 +274,9 @@ describe('auto_attack meleeSwing: landed talent procs resolve before retaliation
     // chance for 10 energy), so the proc now draws exactly one rng roll per
     // poisoned swing; the roll resolves before the thorns retaliation.
     const run = (active: boolean) => {
-      const { sim, p } = makeSim('rogue', 20, 26014);
+      // Seed re-hunted for the v0.32.1 catch-up (26014 drew a miss on the
+      // shifted stream; the fixture needs the poisoned swing to CONNECT).
+      const { sim, p } = makeSim('rogue', 20, 26015);
       if (active) {
         expect(sim.applyTalents({ spec: null, rows: { 14: 'rog_r14_venom_dividend' } })).toBe(true);
       }

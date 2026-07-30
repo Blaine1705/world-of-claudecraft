@@ -10916,10 +10916,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Đoạn Tủy',
   'entities.abilities.marrowbreak.description':
-    'Tiêu 3 Huyết Cổ cho một đòn đánh nặng với uy hiếp cao. Dưới nửa máu, thay vào đó hấp thụ 18% lượng máu tối đa trong 8 giây và hồi 15 nộ.',
+    'Tiêu 3 Huyết Cổ của bạn cho một đòn đánh nặng, uy hiếp cao gây {damage} sát thương. Dưới nửa máu, thay vào đó tạo lá chắn bằng 18% máu tối đa của bạn trong 8 giây và hoàn lại 15 nộ.',
   'entities.abilities.moonlash.name': 'Nguyệt Trào',
   'entities.abilities.moonlash.description':
-    'Tiêu 3 Triều Nguyệt cho một đòn Bí Thuật nặng: lựa chọn sát thương. Dùng chung một bể với Vệt Dương, nên hãy chọn một.',
+    'Tiêu 3 Triều Nguyệt của bạn cho một đòn đánh nặng gây {damage} sát thương Bí Thuật: lựa chọn sát thương. Vệt Dương cũng tiêu đúng 3 Triều Nguyệt đó, nên hãy chọn một.',
   'entities.abilities.moonseed.name': 'Nguyệt Chủng',
   'entities.abilities.moonseed.description':
     'Chỉ trong Dạng Cú Mặt Trăng. Đánh gây {damage} sát thương Bí Thuật, thêm một tầng Triều Nguyệt và kéo dài Bão Tố Nguyệt của bạn 6 giây, tối đa 6 giây mỗi lần. Khi Triều Nguyệt đầy, Nguyệt Chủng trở thành Nguyệt Trào.',
@@ -10928,10 +10928,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tiêu 5 Sắc Xanh. Thu hoạch mọi hồi máu theo thời gian của bạn trên tất cả đồng minh với 60% lượng hồi còn lại, gỡ bỏ các hiệu ứng đó và trồng một Hoa Nở Hoang Dã mới lên mục tiêu.',
   'entities.abilities.redharvest.name': 'Thu Hoạch Đỏ',
   'entities.abilities.redharvest.description':
-    'Tiêu 3 Huyết Cổ, kích nổ toàn bộ sát thương còn lại của Lóc Xé và Xé Rách của bạn trên mục tiêu và hồi 30 năng lượng. Điểm liên hoàn đang giữ làm cú cắn mạnh hơn nhưng không bao giờ bắt buộc.',
+    'Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi 30 năng lượng. Dùng được cả khi không có điểm liên hoàn.',
   'entities.abilities.sunlance.name': 'Vệt Dương',
   'entities.abilities.sunlance.description':
-    'Tiêu 3 Triều Nguyệt cho một đòn Tự Nhiên kèm thiêu đốt và hồi 35 mana: lựa chọn tiết kiệm. Dùng chung một bể với Nguyệt Trào, nên hãy chọn một.',
+    'Tiêu 3 Triều Nguyệt của bạn cho một đòn gây {damage} sát thương Tự Nhiên cộng thêm {overTime} thiêu đốt trong 9 giây, và hồi 35 mana: lựa chọn mana. Nguyệt Trào cũng tiêu đúng 3 Triều Nguyệt đó, nên hãy chọn một.',
   'guide.abilityHook.moonseed':
     'Thêm một tầng Triều Nguyệt và kéo dài Bão Tố Nguyệt khi bạn ở Dạng Cú Mặt Trăng.',
   'hudChrome.auraEffect.moontide':

@@ -2783,7 +2783,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '为一个友方目标施加祝福，使攻击强度提高 {buff}，持续 5 分钟。',
   'entities.abilities.divine_protection.name': '信仰守护',
   'entities.abilities.divine_protection.description':
-    '一道守护结界吸收 {damage} 点伤害，持续 10 秒。',
+    '一道神圣结界吸收相当于最大生命值{damage}%的伤害，持续{duration}秒。持久守护可强化该结界。',
   'entities.abilities.hammer_of_justice.name': '碎裂法槌',
   'entities.abilities.hammer_of_justice.description': '使目标昏迷 {duration} 秒。',
   'entities.abilities.lay_on_hands.name': '临终圣礼',
@@ -2805,7 +2805,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '使你的神圣伤害产生的威胁值提高 60%，持续 30 分钟。防护圣骑士的核心技能。',
   'entities.abilities.retribution_aura.name': '报偿光环',
   'entities.abilities.retribution_aura.description':
-    '以神圣能量环绕自身，持续 30 分钟，对任何近战攻击你的敌人造成 5 点神圣伤害。',
+    '以神圣能量环绕你和你的队伍，直至死亡或被替换。近战攻击受影响盟友的敌人将受到{buff}点神圣伤害，受影响盟友的自动攻击额外造成{buff}点神圣伤害。',
   'entities.abilities.tame_beast.name': '野性羁绊',
   'entities.abilities.tame_beast.description':
     '开始驯服一只野兽作为你的伙伴。它必须不高于你的等级，且不能是精英。你的宠物会跟随你、攻击敌人，并保持自己的威胁值。同一时间只能拥有一只宠物。',
@@ -3082,7 +3082,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）',
   'entities.abilities.holy_shield.name': '神圣之盾',
   'entities.abilities.holy_shield.description':
-    '以神圣之力保护你10秒，护甲提高90，并对近战攻击者造成12点神圣伤害。（防护专精招牌）',
+    '获得30%格挡，以及一面吸收相当于最大生命值{damage}%伤害的护盾，持续{duration}秒，并释放一股威胁脉冲。升华可强化并延长这层防御。',
   'entities.abilities.bestial_wrath.name': '狂野怒火',
   'entities.abilities.bestial_wrath.description':
     '使你进入野兽怒火状态，攻击强度提高55点，持续15秒。（野兽控制专精招牌）',

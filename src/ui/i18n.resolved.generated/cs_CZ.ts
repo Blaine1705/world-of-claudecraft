@@ -8195,19 +8195,19 @@ export const cs_CZ: EnTranslations = {
       },
       "moonlash": {
         "name": "Měsíční vzedmutí",
-        "description": "Spotřebuje 3 Měsíčního přílivu na těžký tajemný úder: volba poškození. Čerpá ze stejné zásoby jako Sluneční brázda, vyber si tedy jednu."
+        "description": "Spotřebuje 3 Měsíčního přílivu na těžký úder za {damage} tajemného poškození: volba poškození. Sluneční brázda spotřebuje tytéž 3 Měsíčního přílivu, vyber si tedy jednu."
       },
       "sunlance": {
         "name": "Sluneční brázda",
-        "description": "Spotřebuje 3 Měsíčního přílivu na přírodní úder s popálením a obnoví 35 many: volba úspory. Čerpá ze stejné zásoby jako Měsíční vzedmutí, vyber si tedy jednu."
+        "description": "Spotřebuje 3 Měsíčního přílivu na úder za {damage} přírodního poškození plus popálení za {overTime} během 9 s a obnoví 35 many: volba many. Měsíční vzedmutí spotřebuje tytéž 3 Měsíčního přílivu, vyber si tedy jednu."
       },
       "redharvest": {
         "name": "Rudá sklizeň",
-        "description": "Spotřebuje 3 Staré krve, odpálí veškeré zbývající poškození Stažení z kůže a Roztržení, které na cíli máš, a obnoví 30 energie. Držené combo body kousnutí posílí, ale nikdy nejsou vyžadovány."
+        "description": "Spotřebuje 3 Staré krve: úder za {damage}, okamžitě způsobí veškeré poškození, které by tvé Stažení z kůže a Roztržení ještě způsobily, odstraní obě krvácení a obnoví 30 energie. Funguje i bez combo bodů."
       },
       "marrowbreak": {
         "name": "Lámání morku",
-        "description": "Spotřebuje 3 Staré krve na těžký úder s vysokou hrozbou. Pod polovinou zdraví místo toho pohltí 18% maximálního zdraví na 8 s a obnoví 15 zuřivosti."
+        "description": "Spotřebuje 3 Staré krve na těžký úder s vysokou hrozbou za {damage} poškození. Pod polovinou zdraví tě místo toho chrání štítem za 18% maximálního zdraví na 8 s a vrátí 15 zuřivosti."
       },
       "overbloom": {
         "name": "Překvět",

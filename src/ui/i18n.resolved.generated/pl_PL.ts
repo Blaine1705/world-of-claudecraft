@@ -8195,19 +8195,19 @@ export const pl_PL: EnTranslations = {
       },
       "moonlash": {
         "name": "Księżycowy przybór",
-        "description": "Zużywa 3 Księżycowego przypływu na ciężki tajemny cios: wybór obrażeń. Czerpie z tej samej rezerwy co Słoneczny ślad, więc wybierz jeden."
+        "description": "Zużywa twoje 3 Księżycowego przypływu na ciężki cios zadający {damage} obrażeń tajemnych: wybór obrażeń. Słoneczny ślad zużywa te same 3 Księżycowego przypływu, więc wybierz jeden."
       },
       "sunlance": {
         "name": "Słoneczny ślad",
-        "description": "Zużywa 3 Księżycowego przypływu na cios natury z podpaleniem i przywraca 35 many: wybór ekonomiczny. Czerpie z tej samej rezerwy co Księżycowy przybór, więc wybierz jeden."
+        "description": "Zużywa twoje 3 Księżycowego przypływu na cios zadający {damage} obrażeń natury oraz podpalenie zadające {overTime} w ciągu 9 s i przywraca 35 many: wybór many. Księżycowy przybór zużywa te same 3 Księżycowego przypływu, więc wybierz jeden."
       },
       "redharvest": {
         "name": "Czerwone Żniwa",
-        "description": "Zużywa 3 Starej Krwi, detonuje wszystkie pozostałe obrażenia Zdzierania i Rozszarpania, które masz na celu, i przywraca 30 energii. Trzymane punkty combo wzmacniają ukąszenie, ale nigdy nie są wymagane."
+        "description": "Zużywa twoje 3 Starej Krwi: cios za {damage}, natychmiast zadaje wszystkie obrażenia, które twoje Zdzieranie i Rozszarpanie by jeszcze zadały, usuwa oba krwawienia i przywraca 30 energii. Działa bez punktów combo."
       },
       "marrowbreak": {
         "name": "Łamacz szpiku",
-        "description": "Zużywa 3 Starej Krwi na ciężki cios o wysokim zagrożeniu. Poniżej połowy zdrowia zamiast tego pochłania 18% maksymalnego zdrowia na 8 s i przywraca 15 szału."
+        "description": "Zużywa twoje 3 Starej Krwi na ciężki cios o wysokim zagrożeniu, zadający {damage} obrażeń. Poniżej połowy zdrowia zamiast tego osłania cię tarczą równą 18% maksymalnego zdrowia na 8 s i zwraca 15 szału."
       },
       "overbloom": {
         "name": "Nadrozkwit",

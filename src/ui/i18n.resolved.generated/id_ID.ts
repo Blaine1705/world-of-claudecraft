@@ -8195,19 +8195,19 @@ export const id_ID: EnTranslations = {
       },
       "moonlash": {
         "name": "Gelombang Rembulan",
-        "description": "Menghabiskan 3 Pasang Rembulan untuk serangan Gaib berat: pilihan kerusakan. Memakai simpanan yang sama dengan Jejak Surya, jadi pilih salah satu."
+        "description": "Menghabiskan 3 Pasang Rembulan milikmu untuk serangan berat sebesar {damage} kerusakan Gaib: pilihan kerusakan. Jejak Surya menghabiskan 3 Pasang Rembulan yang sama, jadi pilih salah satu."
       },
       "sunlance": {
         "name": "Jejak Surya",
-        "description": "Menghabiskan 3 Pasang Rembulan untuk serangan Alam dengan bakaran dan memulihkan 35 mana: pilihan hemat. Memakai simpanan yang sama dengan Gelombang Rembulan, jadi pilih salah satu."
+        "description": "Menghabiskan 3 Pasang Rembulan milikmu untuk serangan sebesar {damage} kerusakan Alam ditambah bakaran {overTime} selama 9 dtk, dan memulihkan 35 mana: pilihan mana. Gelombang Rembulan menghabiskan 3 Pasang Rembulan yang sama, jadi pilih salah satu."
       },
       "redharvest": {
         "name": "Panen Merah",
-        "description": "Menghabiskan 3 Darah Tua, meledakkan semua kerusakan tersisa Kupasan dan Robekan milikmu pada sasaran, dan memulihkan 30 energi. Poin combo yang dipegang memperkuat gigitan tetapi tidak pernah diwajibkan."
+        "description": "Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan 30 energi. Berfungsi tanpa poin combo."
       },
       "marrowbreak": {
         "name": "Pematah Sumsum",
-        "description": "Menghabiskan 3 Darah Tua untuk serangan berat berancaman tinggi. Di bawah setengah nyawa, sebagai gantinya menyerap 18% nyawa maksimum selama 8 dtk dan memulihkan 15 amarah."
+        "description": "Menghabiskan 3 Darah Tua milikmu untuk serangan berat berancaman tinggi sebesar {damage} kerusakan. Di bawah setengah nyawa, sebagai gantinya melindungimu dengan perisai sebesar 18% nyawa maksimum selama 8 dtk dan mengembalikan 15 amarah."
       },
       "overbloom": {
         "name": "Mekar Raya",
