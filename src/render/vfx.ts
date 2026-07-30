@@ -3,7 +3,7 @@ import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
 import {
-  packActiveParticleSlotsInto,
+  insertActiveParticleSlot,
   pointSpriteBoundingRadius,
   spriteEarlyRejectRadiusSq,
 } from './vfx_pool_core';
@@ -248,9 +248,8 @@ export class Vfx {
   private spriteAttr: Float32Array;
   private rotAttr: Float32Array;
   private activeSlots: Int32Array;
-  private activeSlotIndex: Int32Array;
+  private activeSlotFlags: Uint8Array;
   private activeCount = 0;
-  private renderSlots: Int32Array;
   private drawData: Float32Array;
   private drawBuffer: THREE.InterleavedBuffer;
   private spriteRadiusSq: Float32Array;
@@ -287,9 +286,7 @@ export class Vfx {
     this.spriteAttr = new Float32Array(CAPACITY);
     this.rotAttr = new Float32Array(CAPACITY);
     this.activeSlots = new Int32Array(CAPACITY);
-    this.activeSlotIndex = new Int32Array(CAPACITY);
-    this.activeSlotIndex.fill(-1);
-    this.renderSlots = new Int32Array(CAPACITY);
+    this.activeSlotFlags = new Uint8Array(CAPACITY);
     this.drawData = new Float32Array(CAPACITY * DRAW_STRIDE);
     this.drawBuffer = new THREE.InterleavedBuffer(this.drawData, DRAW_STRIDE);
     this.drawBuffer.setUsage(THREE.DynamicDrawUsage);
@@ -438,7 +435,7 @@ export class Vfx {
     this.size.fill(0);
     this.alphaAttr.fill(0);
     this.activeCount = 0;
-    this.activeSlotIndex.fill(-1);
+    this.activeSlotFlags.fill(0);
     this.points.geometry.setDrawRange(0, 0);
     this.points.visible = !this.cloudWarmed;
   }
@@ -484,9 +481,9 @@ export class Vfx {
   ): void {
     const i = this.head;
     this.head = (this.head + 1) % CAPACITY;
-    if (this.activeSlotIndex[i] < 0) {
-      this.activeSlotIndex[i] = this.activeCount;
-      this.activeSlots[this.activeCount++] = i;
+    if (this.activeSlotFlags[i] === 0) {
+      this.activeSlotFlags[i] = 1;
+      this.activeCount = insertActiveParticleSlot(this.activeSlots, this.activeCount, i);
     }
     this.pos[i * 3] = x;
     this.pos[i * 3 + 1] = y;
@@ -519,10 +516,10 @@ export class Vfx {
     this.cullFrustum.setFromProjectionMatrix(this.cullViewProjection);
     const perspective = (camera as THREE.PerspectiveCamera).isPerspectiveCamera === true;
     const cameraProjectionScale = Math.abs(camera.projectionMatrix.elements[5]);
-    const liveCount = packActiveParticleSlotsInto(this.life, this.renderSlots);
     let count = 0;
-    for (let live = 0; live < liveCount; live++) {
-      const slot = this.renderSlots[live];
+    for (let active = 0; active < this.activeCount; active++) {
+      const slot = this.activeSlots[active];
+      if (this.life[slot] <= 0) continue;
       const src3 = slot * 3;
       const x = this.pos[src3];
       const y = this.pos[src3 + 1];
@@ -1709,11 +1706,11 @@ export class Vfx {
       }
     }
 
-    // Advance only live state slots. Rendering is repacked separately in
-    // ascending slot order so additive blend accumulation stays byte-for-byte
-    // ordered like the original fixed pool.
-    let active = 0;
-    while (active < this.activeCount) {
+    // Advance only live state slots, compacting expired entries in place. The
+    // active prefix stays numerically sorted, so draw packing is the same
+    // ascending physical-slot filter as the original fixed-pool scan.
+    let write = 0;
+    for (let active = 0; active < this.activeCount; active++) {
       const slot = this.activeSlots[active];
       const slot3 = slot * 3;
       this.life[slot] -= dt;
@@ -1724,18 +1721,13 @@ export class Vfx {
       this.pos[slot3 + 2] += this.vel[slot3 + 2] * dt;
       this.alphaAttr[slot] = f < 0.25 ? f * 4 : 1;
       if (this.life[slot] > 0) {
-        active++;
+        this.activeSlots[write++] = slot;
         continue;
       }
 
       this.size[slot] = 0;
-      this.activeSlotIndex[slot] = -1;
-      this.activeCount--;
-      if (active < this.activeCount) {
-        const moved = this.activeSlots[this.activeCount];
-        this.activeSlots[active] = moved;
-        this.activeSlotIndex[moved] = active;
-      }
+      this.activeSlotFlags[slot] = 0;
     }
+    this.activeCount = write;
   }
 }
