@@ -1,17 +1,18 @@
 import * as THREE from 'three';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const disabledLayers = new Set<string>();
+const gfxSettings = vi.hoisted(() => ({
+  ao: true,
+  aoFullRes: true,
+  bloom: true,
+  composer: true,
+  msaaSamples: 4,
+  smaa: false,
+}));
 
 vi.mock('../src/render/gfx', () => ({
-  GFX: {
-    ao: true,
-    aoFullRes: true,
-    bloom: true,
-    composer: true,
-    msaaSamples: 4,
-    smaa: false,
-  },
+  GFX: gfxSettings,
   sharedUniforms: {
     uTime: { value: 0 },
   },
@@ -52,6 +53,12 @@ interface BloomInternals {
 describe('live post pipeline', () => {
   beforeEach(() => {
     disabledLayers.clear();
+    gfxSettings.aoFullRes = true;
+    gfxSettings.smaa = false;
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('constructs the insane chain with one composer buffer and the pinned pass order', async () => {
@@ -72,12 +79,14 @@ describe('live post pipeline', () => {
     expect(post.composer.renderTarget1).toBe(post.composer.renderTarget2);
     expect(post.composer.renderTarget1.samples).toBe(0);
     expect(post.composer.renderTarget1.depthBuffer).toBe(false);
+    expect(post.composer.renderTarget1.resolveDepthBuffer).toBe(true);
 
     const ao = post.ao as unknown as N8AOInternals;
     expect(ao.beautyRenderTarget.width).toBe(1280);
     expect(ao.beautyRenderTarget.height).toBe(720);
     expect(ao.beautyRenderTarget.texture.type).toBe(THREE.HalfFloatType);
     expect(ao.beautyRenderTarget.depthTexture?.type).toBe(THREE.UnsignedIntType);
+    expect(ao.beautyRenderTarget.resolveDepthBuffer).toBe(true);
     expect(ao.writeTargetInternal.texture.type).toBe(THREE.UnsignedByteType);
     expect(ao.readTargetInternal.texture.type).toBe(THREE.UnsignedByteType);
     expect(ao.accumulationRenderTarget).toBe(ao.writeTargetInternal);
@@ -141,5 +150,30 @@ describe('live post pipeline', () => {
     expect(post.composer.renderTarget1).toBe(post.composer.renderTarget2);
     expect(post.composer.renderTarget1.samples).toBe(4);
     expect(post.composer.renderTarget1.depthBuffer).toBe(true);
+    expect(post.composer.renderTarget1.resolveDepthBuffer).toBe(false);
+  });
+
+  it('keeps high half-resolution AO depth available to every AO stage', async () => {
+    gfxSettings.aoFullRes = false;
+    gfxSettings.smaa = true;
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    const post = buildComposer(
+      rendererStub(),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+    );
+    const ao = post.ao as unknown as N8AOInternals & {
+      configuration: { halfRes: boolean };
+    };
+
+    expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
+    expect(post.composer.renderTarget1.resolveDepthBuffer).toBe(true);
+    expect(post.composer.renderTarget2.resolveDepthBuffer).toBe(true);
+    expect(ao.configuration.halfRes).toBe(true);
+    expect(ao.beautyRenderTarget.depthTexture).toBeTruthy();
+    expect(ao.beautyRenderTarget.resolveDepthBuffer).toBe(true);
   });
 });

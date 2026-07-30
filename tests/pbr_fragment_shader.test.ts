@@ -4,68 +4,21 @@ import { describe, expect, it, vi } from 'vitest';
 import { addRimGlow, sharedUniforms } from '../src/render/gfx';
 import {
   installPbrPointLightShaderPruning,
-  patchPbrPointLightFragmentChunk,
   patchPbrRimGlowFragmentShader,
 } from '../src/render/pbr_fragment_shader';
 
-const POINT_INFO = 'getPointLightInfo( pointLight, geometryPosition, directLight );';
-const POINT_DIRECT =
-  'RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );';
-const POINT_PAD_GUARD = `\t\t#ifdef STANDARD
-\t\t// WOC_PBR_SKIP_ZERO_POINT_LIGHT: uniform-coherent pad-light fast path.
-\t\tif ( pointLight.color != vec3( 0.0 ) ) {
-\t\t#endif
-
-`;
-const POINT_DIRECT_GUARD = `\t\t#ifdef STANDARD
-\t\tif ( directLight.visible ) {
-\t\t#endif
-
-`;
-const POINT_GUARD_CLOSE = `
-
-\t\t#ifdef STANDARD
-\t\t}
-\t\t}
-\t\t#endif`;
 const RIM_DECLARATION = `      // WOC_PBR_RIM_REUSE
       uniform float uRimBoost;`;
 const RIM_TERM = `      totalEmissiveRadiance += vec3(0.5, 0.6, 0.8) * 0.12 * uRimBoost *
         pow(1.0 - saturate(dot(normal, geometryViewDir)), 3.0);`;
 
 describe('PBR point-light fragment pruning', () => {
-  it('wraps only mathematically zero point-light work in the pinned Three chunk', () => {
-    const source = THREE.ShaderChunk.lights_fragment_begin;
-    const patched = patchPbrPointLightFragmentChunk(source);
-
-    const pointInfo = patched.indexOf(POINT_INFO);
-    const pointDirect = patched.indexOf(POINT_DIRECT, pointInfo);
-    const spotLights = patched.indexOf('#if ( NUM_SPOT_LIGHTS > 0 )');
-    expect(pointInfo).toBeGreaterThan(patched.indexOf('pointLight.color != vec3( 0.0 )'));
-    expect(pointDirect).toBeGreaterThan(patched.indexOf('if ( directLight.visible )', pointInfo));
-    expect(pointDirect).toBeLessThan(spotLights);
-    expect(patched.match(/getPointLightInfo\(/g)).toHaveLength(
-      source.match(/getPointLightInfo\(/g)?.length ?? 0,
-    );
-    expect(patched.match(/\bRE_Direct\(/g)).toHaveLength(
-      source.match(/\bRE_Direct\(/g)?.length ?? 0,
-    );
-    expect(patched).toContain('#ifdef STANDARD');
-    expect(
-      patched
-        .replace(POINT_PAD_GUARD, '')
-        .replace(POINT_DIRECT_GUARD, '')
-        .replace(POINT_GUARD_CLOSE, ''),
-    ).toBe(source);
-  });
-
-  it('is idempotent and leaves a changed point-light chunk stock', () => {
-    const patched = patchPbrPointLightFragmentChunk(THREE.ShaderChunk.lights_fragment_begin);
+  it('throws instead of silently leaving a changed shared light chunk stock', () => {
     const changedChunks = { lights_fragment_begin: 'void main() {}' };
 
-    expect(patchPbrPointLightFragmentChunk(patched)).toBe(patched);
-    expect(patchPbrPointLightFragmentChunk('void main() {}')).toBe('void main() {}');
-    expect(installPbrPointLightShaderPruning(changedChunks)).toBe(false);
+    expect(() => installPbrPointLightShaderPruning(changedChunks)).toThrow(
+      /Three r165 point-light chunk/,
+    );
     expect(changedChunks.lights_fragment_begin).toBe('void main() {}');
   });
 
@@ -184,7 +137,7 @@ describe('PBR character rim fragment pruning', () => {
 
       expect(shader.fragmentShader).toContain('flat varying vec4 vTerrainSplatPresence;');
       expect(shader.fragmentShader).toContain(RIM_TERM);
-      expect(shader.fragmentShader).toContain('WOC_PBR_SKIP_ZERO_POINT_LIGHT');
+      expect(shader.fragmentShader).toContain('WOC_SKIP_ZERO_POINT_LIGHT');
     } finally {
       vi.doUnmock('../src/render/assets/loader');
       vi.doUnmock('../src/render/assets/preload');
