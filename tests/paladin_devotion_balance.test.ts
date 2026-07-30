@@ -12,10 +12,14 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
   retribution: ['hammer_of_wrath', 'final_edict', 'dawnfall', 'hammer_of_grace'],
 };
 
+// Re-pinned for the v0.32.1 catch-up (both stay inside the 35-65 contract):
+// holy 42.3 to 41.25; retribution 46.85 to 54.35. The retribution slowdown is
+// main's hammer_of_wrath execute gate thinning the rotation's Devotion grants
+// above 20% target health; flagged for the owner's review, band intact.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
-  holy: 42.3,
+  holy: 41.25,
   protection: 38.65,
-  retribution: 46.85,
+  retribution: 54.35,
 };
 
 function addDummy(sim: Sim): Entity {
