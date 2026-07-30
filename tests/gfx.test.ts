@@ -250,6 +250,13 @@ describe('graphics tier resolution', () => {
     expect(insane.pixelRatioCap).toBe(ultra.pixelRatioCap);
     expect(insane.grassRadius).toBe(ultra.grassRadius);
     expect(insane.grassStep).toBe(ultra.grassStep);
+    expect(
+      ['low', 'medium', 'high', 'ultra', 'insane'].map(
+        (tier) =>
+          gfxInternalsForTest.settingsFor(tier as 'low' | 'medium' | 'high' | 'ultra' | 'insane')
+            .farGrassDensityFloor,
+      ),
+    ).toEqual([0.55, 0.62, 0.7, 0.75, 0.8]);
     expect(insane.terrainSplat).toBe(true);
     expect(insane.leanFoliage).toBe(false);
     // The round-10 detail-layer ladder: the overhaul's near-field layers
@@ -315,14 +322,17 @@ describe('graphics tier resolution', () => {
     // layers; Medium buys the reduced carpet; Insane extends the ring.
     const foliageLow = adv({ foliageDensity: 0 });
     expect(foliageLow.grassStep).toBe(3.8);
+    expect(foliageLow.farGrassDensityFloor).toBe(0.5);
     expect(foliageLow.bladeCarpetRadius).toBe(0);
     expect(foliageLow.cliffScree).toBe(false);
     expect(foliageLow.canopyDetail).toBe(false);
     const foliageMedium = adv({ foliageDensity: 0.5 });
+    expect(foliageMedium.farGrassDensityFloor).toBe(0.62);
     expect(foliageMedium.bladeCarpetRadius).toBe(24);
     expect(foliageMedium.cliffScree).toBe(false);
     expect(adv({ foliageDensity: 1 }).bladeCarpetRadius).toBe(34);
     expect(adv({ foliageDensity: 2 }).bladeCarpetRadius).toBe(40);
+    expect(adv({ foliageDensity: 2 }).farGrassDensityFloor).toBe(0.85);
     // Surface Detail (the town-cost dial): Off / Basic / Full / Insane.
     const surfaceOff = adv({ surfaceDetail: 0 });
     expect(surfaceOff.surfaceDetail).toBe(false);
@@ -395,6 +405,7 @@ describe('graphics tier resolution', () => {
     expect(medium.leanFoliage).toBe(false);
     expect(medium.grassRadius).toBe(62);
     expect(medium.grassStep).toBe(2.35);
+    expect(medium.farGrassDensityFloor).toBe(0.55);
     expect(medium.maxPointLights).toBe(3);
     expect(high.composer).toBe(desktopHigh.composer);
     expect(high.ao).toBe(desktopHigh.ao);
@@ -449,6 +460,7 @@ describe('graphics tier resolution', () => {
     expect(medium.pixelRatioCap).toBeLessThanOrEqual(1.25);
     expect(medium.grassRadius).toBeLessThan(62);
     expect(medium.grassStep).toBeGreaterThan(2.35);
+    expect(medium.farGrassDensityFloor).toBe(0.5);
     expect(medium.maxPointLights).toBe(2);
     expect(medium.maxPooledCharacterVisuals).toBe(6);
 

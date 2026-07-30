@@ -304,6 +304,7 @@ const RENDER_PURE_CORES = [
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
   'src/render/opaque_draw_order_core.ts',
+  'src/render/perceptual_lod_core.ts',
   'src/render/race_line_core.ts',
   'src/render/renderer_frame_telemetry_core.ts',
   'src/render/sea_mist_core.ts',

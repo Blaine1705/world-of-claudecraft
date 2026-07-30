@@ -66,6 +66,12 @@ import {
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
 import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import {
+  advanceInstanceCountInto,
+  farFieldDensityFractionForValues,
+  projectedPixelSize,
+  reorderInstanceDataByStableRank,
+} from './perceptual_lod_core';
 import { freezeStaticMatrices } from './static_matrix';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
@@ -132,6 +138,12 @@ const FLOWERLESS_BIOMES: ReadonlySet<BiomeId> = new Set(['frost', 'haunt']);
 const FIELD_BIOMES: ReadonlySet<BiomeId> = new Set(['dusk', 'amber', 'night', 'garden', 'fen']);
 const GRASS_CHUNK_CACHE_LIMIT_LOW = 96;
 const GRASS_CHUNK_CACHE_LIMIT_HIGH = 128;
+const GRASS_RANK_SALT = 17;
+const FLOWER_RANK_SALT = 53;
+const GRASS_CARD_REFERENCE_HEIGHT_LOW = 0.72;
+const GRASS_CARD_REFERENCE_HEIGHT_HIGH = 0.9;
+const FLOWER_CARD_REFERENCE_HEIGHT = 0.82;
+const FLOWER_FAR_DENSITY_FLOOR = 0.75;
 const TREE_WIND_STRENGTH = 0.08;
 const GRASS_WIND_STRENGTH = 0.16;
 // how far leaf normals bend toward the canopy-sphere direction (see addWind);
@@ -419,6 +431,7 @@ export interface FoliageView {
     fogFar: number,
     atmosFogNear: number,
     atmosFogFar: number,
+    projectionPixels: number,
     dt: number,
     reducedMotion?: boolean,
   ): void;
@@ -1850,7 +1863,15 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
 // ---------------------------------------------------------------------------
 
 interface GrassRing {
-  update(px: number, pz: number): void;
+  update(
+    px: number,
+    pz: number,
+    camX: number,
+    camY: number,
+    camZ: number,
+    projectionPixels: number,
+    dt: number,
+  ): void;
   setQuality(level: number): void;
   perfStats(out?: FoliagePerfStats): FoliagePerfStats;
 }
@@ -1860,6 +1881,7 @@ interface GrassChunk {
   cx: number;
   cz: number;
   centerX: number;
+  centerY: number;
   centerZ: number;
   ready: boolean;
   queued: boolean;
@@ -1867,7 +1889,11 @@ interface GrassChunk {
   lastUsed: number;
   prioritySq: number;
   mesh?: THREE.InstancedMesh;
+  grassFullCount?: number;
+  grassTransitionCarry: number;
   flowerMesh?: THREE.InstancedMesh;
+  flowerFullCount?: number;
+  flowerTransitionCarry: number;
 }
 
 // Tags every vertex of a tuft/flower card part with the aCap attribute the
@@ -2254,6 +2280,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   let disposedChunks = 0;
   let buildMs = 0;
   let lastBuildMs = 0;
+  const instanceCountStep = { count: 0, carry: 0 };
 
   const chunkKey = (cx: number, cz: number): string => `${cx}:${cz}`;
   const chunkCenter = (cidx: number): number => (cidx + 0.5) * GRASS_CHUNK_SIZE;
@@ -2264,12 +2291,15 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       cx,
       cz,
       centerX: chunkCenter(cx),
+      centerY: terrainHeight(chunkCenter(cx), chunkCenter(cz), seed),
       centerZ: chunkCenter(cz),
       ready: false,
       queued: false,
       lastSeen: -1,
       lastUsed: -1,
       prioritySq: Infinity,
+      grassTransitionCarry: 0,
+      flowerTransitionCarry: 0,
     };
     chunks.set(chunk.key, chunk);
     return chunk;
@@ -2290,6 +2320,8 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     const chunkCap = Math.ceil(maxChunkCount * Math.max(1, GRASS_BIOME_DENSITY[chunkBiome] ?? 1));
     const im = new THREE.InstancedMesh(geo, mat, chunkCap);
     im.userData.renderCategory = 'grass';
+    im.userData.instanceFamily = 'grass-card';
+    im.userData.grassChunkKey = chunk.key;
     im.frustumCulled = true;
     im.receiveShadow = true; // tufts must darken inside canopy shade, not glow through it
     im.count = 0;
@@ -2320,6 +2352,8 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     );
     const fm = new THREE.InstancedMesh(flowerGeo, flowerMatFor(chunkBiome), flowerCap);
     fm.userData.renderCategory = 'grass';
+    fm.userData.instanceFamily = 'ground-flower';
+    fm.userData.grassChunkKey = chunk.key;
     fm.frustumCulled = true;
     fm.receiveShadow = true;
     fm.count = 0;
@@ -2542,24 +2576,40 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       }
     }
     if (n > 0) {
+      reorderInstanceDataByStableRank(
+        im.instanceMatrix.array as Float32Array,
+        im.instanceColor ? (im.instanceColor.array as Float32Array) : null,
+        n,
+        seed,
+        GRASS_RANK_SALT,
+      );
       im.count = n;
       trimStaticInstanceAttributes(im, n);
       im.instanceMatrix.needsUpdate = true;
       if (im.instanceColor) im.instanceColor.needsUpdate = true;
       im.computeBoundingSphere();
-      im.visible = chunk.lastSeen === generation;
+      im.visible = false;
       chunk.mesh = im;
+      chunk.grassFullCount = n;
       parent.add(im);
       freezeStaticMatrices(im);
     }
     if (fn > 0) {
+      reorderInstanceDataByStableRank(
+        fm.instanceMatrix.array as Float32Array,
+        fm.instanceColor ? (fm.instanceColor.array as Float32Array) : null,
+        fn,
+        seed,
+        FLOWER_RANK_SALT,
+      );
       fm.count = fn;
       trimStaticInstanceAttributes(fm, fn);
       fm.instanceMatrix.needsUpdate = true;
       if (fm.instanceColor) fm.instanceColor.needsUpdate = true;
       fm.computeBoundingSphere();
-      fm.visible = chunk.lastSeen === generation;
+      fm.visible = false;
       chunk.flowerMesh = fm;
+      chunk.flowerFullCount = fn;
       parent.add(fm);
       freezeStaticMatrices(fm);
     }
@@ -2608,17 +2658,136 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     }
   };
 
+  const chunkNearDistance = (chunk: GrassChunk, px: number, pz: number): number => {
+    const minX = chunk.cx * GRASS_CHUNK_SIZE;
+    const minZ = chunk.cz * GRASS_CHUNK_SIZE;
+    const dx = Math.max(minX - px, 0, px - (minX + GRASS_CHUNK_SIZE));
+    const dz = Math.max(minZ - pz, 0, pz - (minZ + GRASS_CHUNK_SIZE));
+    return Math.hypot(dx, dz);
+  };
+
+  const chunkNearCameraDistance = (
+    chunk: GrassChunk,
+    camX: number,
+    camY: number,
+    camZ: number,
+  ): number => {
+    const minX = chunk.cx * GRASS_CHUNK_SIZE;
+    const minZ = chunk.cz * GRASS_CHUNK_SIZE;
+    const dx = Math.max(minX - camX, 0, camX - (minX + GRASS_CHUNK_SIZE));
+    const dz = Math.max(minZ - camZ, 0, camZ - (minZ + GRASS_CHUNK_SIZE));
+    // The centre sample is a conservative vertical approximation for a field
+    // whose cards hug the terrain. A 3u envelope covers normal within-chunk
+    // relief; larger cliff chunks reject grass during construction.
+    const dy = Math.max(0, Math.abs(chunk.centerY - camY) - 3);
+    return Math.hypot(dx, dy, dz);
+  };
+
+  const applyMeshDensity = (
+    chunk: GrassChunk,
+    mesh: THREE.InstancedMesh | undefined,
+    fullCount: number | undefined,
+    referenceHeight: number,
+    densityFloor: number,
+    carryKey: 'grassTransitionCarry' | 'flowerTransitionCarry',
+    nearDistance: number,
+    cameraDistance: number,
+    projectionPixels: number,
+    dt: number,
+    radius: number,
+  ): void => {
+    if (!mesh || !fullCount) return;
+    const fraction = farFieldDensityFractionForValues(
+      nearDistance,
+      radius,
+      projectedPixelSize(referenceHeight, cameraDistance, projectionPixels),
+      densityFloor,
+    );
+    const target = Math.round(fullCount * fraction);
+    // A newly visible cached chunk takes the right prefix before it can
+    // render. Continuously visible chunks change by only a few stable,
+    // spatially scattered instances per frame. A fully faded chunk can drop
+    // immediately because every one of its cards already has zero alpha.
+    if (!mesh.visible || target === 0) {
+      mesh.count = target;
+      chunk[carryKey] = 0;
+    } else {
+      advanceInstanceCountInto(
+        instanceCountStep,
+        mesh.count,
+        target,
+        fullCount,
+        dt,
+        chunk[carryKey],
+      );
+      mesh.count = instanceCountStep.count;
+      chunk[carryKey] = instanceCountStep.carry;
+    }
+  };
+
+  const applyChunkDensity = (
+    chunk: GrassChunk,
+    px: number,
+    pz: number,
+    cameraDistance: number,
+    projectionPixels: number,
+    dt: number,
+  ): void => {
+    const radius = activeRadius();
+    const nearDistance = chunkNearDistance(chunk, px, pz);
+    applyMeshDensity(
+      chunk,
+      chunk.mesh,
+      chunk.grassFullCount,
+      lush ? GRASS_CARD_REFERENCE_HEIGHT_HIGH : GRASS_CARD_REFERENCE_HEIGHT_LOW,
+      GFX.farGrassDensityFloor,
+      'grassTransitionCarry',
+      nearDistance,
+      cameraDistance,
+      projectionPixels,
+      dt,
+      radius,
+    );
+    applyMeshDensity(
+      chunk,
+      chunk.flowerMesh,
+      chunk.flowerFullCount,
+      FLOWER_CARD_REFERENCE_HEIGHT,
+      Math.max(FLOWER_FAR_DENSITY_FLOOR, GFX.farGrassDensityFloor),
+      'flowerTransitionCarry',
+      nearDistance,
+      cameraDistance,
+      projectionPixels,
+      dt,
+      radius,
+    );
+  };
+
   return {
     setQuality(level: number): void {
       quality = Math.min(1, Math.max(0, Number.isFinite(level) ? level : 1));
       uniforms.uFadeFar.value = activeRadius();
     },
-    update(px: number, pz: number): void {
+    update(
+      px: number,
+      pz: number,
+      camX: number,
+      camY: number,
+      camZ: number,
+      projectionPixels: number,
+      dt: number,
+    ): void {
       uniforms.uPlayerPos.value.set(px, pz);
       uniforms.uFadeFar.value = activeRadius();
       if (px > DUNGEON_X_THRESHOLD) {
         // dungeon instances live far outside the strip — no meadow indoors
-        if (parent.visible) parent.visible = false;
+        if (parent.visible) {
+          parent.visible = false;
+          for (const chunk of chunks.values()) {
+            if (chunk.mesh) chunk.mesh.visible = false;
+            if (chunk.flowerMesh) chunk.flowerMesh.visible = false;
+          }
+        }
         return;
       }
       if (!parent.visible) parent.visible = true;
@@ -2642,18 +2811,22 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
           chunk.lastSeen = generation;
           chunk.lastUsed = generation;
           chunk.prioritySq = prioritySq;
-          if (chunk.mesh) chunk.mesh.visible = true;
-          if (chunk.flowerMesh) chunk.flowerMesh.visible = true;
           queueChunk(chunk);
         }
       }
 
-      for (const chunk of chunks.values()) {
-        if (chunk.lastSeen === generation) continue;
-        if (chunk.mesh?.visible) chunk.mesh.visible = false;
-        if (chunk.flowerMesh?.visible) chunk.flowerMesh.visible = false;
-      }
       buildQueuedChunks();
+      for (const chunk of chunks.values()) {
+        if (chunk.lastSeen === generation) {
+          const cameraDistance = chunkNearCameraDistance(chunk, camX, camY, camZ);
+          applyChunkDensity(chunk, px, pz, cameraDistance, projectionPixels, dt);
+          if (chunk.mesh) chunk.mesh.visible = true;
+          if (chunk.flowerMesh) chunk.flowerMesh.visible = true;
+        } else {
+          if (chunk.mesh?.visible) chunk.mesh.visible = false;
+          if (chunk.flowerMesh?.visible) chunk.flowerMesh.visible = false;
+        }
+      }
       retireStaleChunks();
     },
     perfStats(out?: FoliagePerfStats): FoliagePerfStats {
@@ -2679,6 +2852,8 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     },
   };
 }
+
+export const foliageGrassInternalsForTest = { buildGrassRing };
 
 // ---------------------------------------------------------------------------
 // Entry point
@@ -2859,10 +3034,11 @@ export function buildFoliage(seed: number): FoliageView {
       fogFar: number,
       atmosFogNear: number,
       atmosFogFar: number,
+      projectionPixels: number,
       dt: number,
       reducedMotion = false,
     ): void {
-      grass.update(px, pz);
+      grass.update(px, pz, camX, camY, camZ, projectionPixels, dt);
       updateTreeHides(
         treeHideables,
         treeGhosts,

@@ -40,10 +40,10 @@ export const GFX_TIER_RANK: Record<GfxTier, number> = {
 export function gfxTierAtLeast(tier: GfxTier, floor: GfxTier): boolean {
   return GFX_TIER_RANK[tier] >= GFX_TIER_RANK[floor];
 }
-// v18: composer-tier draw counts became real (draw_stats_core accumulator);
-// fleet dashboards segment the rendererCalls/rendererTriangles semantics
-// change on this version (packet 0 ruling R2).
-export const GFX_CONFIG_VERSION = 18;
+// v19: scenery may use projected-size density and cadence LOD. Fleet
+// dashboards segment the relaxed perceptual contract and submitted grass
+// counts from the pixel-exact v18 renderer.
+export const GFX_CONFIG_VERSION = 19;
 
 export const GFX_BUCKET_IDS = [
   'resolution',
@@ -159,6 +159,8 @@ export interface GfxSettings {
   readonly leanFoliage: boolean;
   readonly grassRadius: number;
   readonly grassStep: number;
+  /** Stable-prefix floor for grass cards already inside their far alpha-fade band. */
+  readonly farGrassDensityFloor: number;
   readonly terrainSplat: boolean;
   readonly windSway: boolean;
   readonly maxPointLights: number;
@@ -966,6 +968,19 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
             ? 2.35
             : 2.0
           : 1.8,
+    farGrassDensityFloor: nativeIosMemoryProfile
+      ? 0.5
+      : constrainedMemory
+        ? 0.55
+        : tier === 'low'
+          ? 0.55
+          : tier === 'medium'
+            ? 0.62
+            : tier === 'high'
+              ? 0.7
+              : tier === 'ultra'
+                ? 0.75
+                : 0.8,
     terrainSplat: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
     windSway: true,
     maxPointLights: nativeIosMemoryProfile ? 2 : constrainedMemory ? 3 : 6,
@@ -1002,13 +1017,21 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         ...settings,
         grassRadius: 34,
         grassStep: 3.8,
+        farGrassDensityFloor: 0.5,
         bladeCarpetRadius: 0,
         cliffScree: false,
         canopyDetail: false,
       };
     else if (foliageLevel === 1)
-      settings = { ...settings, bladeCarpetRadius: 24, cliffScree: false, canopyDetail: false };
-    else if (foliageLevel === 3) settings = { ...settings, bladeCarpetRadius: 40 };
+      settings = {
+        ...settings,
+        farGrassDensityFloor: 0.62,
+        bladeCarpetRadius: 24,
+        cliffScree: false,
+        canopyDetail: false,
+      };
+    else if (foliageLevel === 3)
+      settings = { ...settings, farGrassDensityFloor: 0.85, bladeCarpetRadius: 40 };
     // Surface Detail (the town-cost dial): Off sheds the whole worn layer;
     // Basic keeps the detail normals + AO grime without the parallax walk;
     // Full runs the ultra execution (3 taps, 0.85 clamp); Insane the

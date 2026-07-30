@@ -241,6 +241,7 @@ import {
   opaqueMaterialFirstSort,
   shouldUseFrontToBackOpaqueSort,
 } from './opaque_draw_order_core';
+import { projectionScalePixels } from './perceptual_lod_core';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import {
@@ -280,6 +281,7 @@ import {
 } from './renderer_frame_telemetry_core';
 import { buildRiftRankBadge } from './rift_rank';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
+import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
@@ -525,6 +527,7 @@ const hemiOutdoorIntensity = (): number =>
     : GFX.gradePass
       ? HEMI_INTENSITY_GRADE
       : HEMI_INTENSITY_FLAT;
+
 const SUN_INTENSITY = 3.5;
 const ENV_INTENSITY = 0.37;
 // dungeon interiors: kill the daylight so torchlight carries the scene
@@ -1480,6 +1483,7 @@ export class Renderer {
   private dnColorScratch = new THREE.Color();
   private dnMoonScratch = new THREE.Color();
   private flames: THREE.Mesh[];
+  private flamePerceptualStates = new WeakMap<THREE.Mesh, FlamePerceptualState>();
   private windmillFans: THREE.Object3D[] = [];
   private fireLights: THREE.PointLight[];
   // Point lights owned by entity views (e.g. the quest-object glow). These stream
@@ -3752,6 +3756,10 @@ export class Renderer {
     // The foliage LOD swaps real trees for impostors relative to the fog, not at
     // a fixed distance, so it needs both planes (src/render/foliage_lod.ts).
     const fogNear = (this.scene.fog as THREE.Fog).near;
+    const projectionPixels = projectionScalePixels(
+      this.camera.projectionMatrix.elements[5],
+      this.webgl.domElement.height,
+    );
     this.lastWaterSimulationPasses = this.waterView.update(
       this.time,
       this.camera.position.x,
@@ -3795,6 +3803,7 @@ export class Renderer {
       fogFar,
       this.lastRequestedFogNear,
       this.lastRequestedFogFar,
+      projectionPixels,
       dt,
       this.reducedMotion(),
     );
@@ -8447,23 +8456,36 @@ export class Renderer {
     }
 
     let worldStart = performance.now();
+    const projectionPixels = projectionScalePixels(
+      this.camera.projectionMatrix.elements[5],
+      this.webgl.domElement.height,
+    );
+    this.tmpV2.subVectors(this.cameraLookAt, this.camera.position).normalize();
 
     // the mill sails turn in the garden breeze, each at its own phase
     for (let i = 0; i < this.windmillFans.length; i++) {
       this.windmillFans[i].rotation.z = this.time * 0.55 + i * 2.1;
     }
 
-    // fire flicker + rising embers
+    // Fire flicker and rising embers are scenery only. Keep nearby flames at
+    // full cadence, but once the whole flame is under 10 live pixels its
+    // absolute-time scale can refresh at 20 or 10 Hz without a readable phase
+    // error. Sub-10px fires emit no smaller ember cloud.
     for (let i = 0; i < this.flames.length; i++) {
       const f = this.flames[i];
-      const fl =
-        0.85 + Math.sin(this.time * 9 + i * 2.4) * 0.12 + Math.sin(this.time * 23 + i) * 0.06;
-      f.scale.set(fl, fl * (1 + Math.sin(this.time * 13 + i) * 0.12), fl);
-      const mat = f.material as THREE.MeshLambertMaterial;
-      if (mat.color.r > mat.color.b) {
-        f.getWorldPosition(this.tmpV);
-        this.vfx.campfireEmber(this.tmpV, dt);
-      }
+      const priorState = this.flamePerceptualStates.get(f);
+      const state = updateSceneryFlame(
+        f,
+        i,
+        this.time,
+        this.camera.position,
+        this.tmpV2,
+        projectionPixels,
+        priorState,
+      );
+      if (!state) continue;
+      if (!priorState) this.flamePerceptualStates.set(f, state);
+      if (state.emitsEmber) this.vfx.campfireEmber(state.worldPosition, dt);
     }
     this.budgetFireLights(p.pos.x, p.pos.z, true);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'lights', worldStart);
@@ -8574,6 +8596,7 @@ export class Renderer {
       fogFar,
       this.lastRequestedFogNear,
       this.lastRequestedFogFar,
+      projectionPixels,
       dt,
       this.reducedMotion(),
     );
