@@ -525,4 +525,43 @@ describe('gather-node markers: the locked dimension', () => {
   it('both IWorld shapes produce identical gather markers (decision-15 parity)', () => {
     expect(gatherMarkers(makeGatherWorld('sim'))).toEqual(gatherMarkers(makeGatherWorld('client')));
   });
+
+  it('both shapes agree on the R22 wield axis, each locked vector pinned literally', () => {
+    // The toolless parity arm above cannot discriminate on the wield axis: an
+    // empty bag with an empty counter map locks every node in both shapes, so
+    // the two would still agree if the wield filter were wired into only one
+    // of them. These fixtures carry the SAME covering tier-2 pick in BOTH
+    // shapes and differ only in the counter, which is precisely the field a
+    // mirror can drop (the Sim getter copies the live map; ClientWorld
+    // rebuilds it from the gprof wire field). Agreement alone is not the
+    // assertion either: each shape's locked vector is pinned literally, so a
+    // pair that agreed on a WRONG vector still reds.
+    const PICK = [{ itemId: 'iron_mining_pick', count: 1 }];
+    // Covering but unwieldable (R22): mining 0 puts nothing to work, so every
+    // node in the rim stays locked, the tier-1 ores included, even though the
+    // bags hold a pick that covers them.
+    const unearnedSim = gatherMarkers(
+      makeGatherWorld('sim', { inventory: PICK, gatheringProficiency: { mining: 0 } }),
+    );
+    const unearnedClient = gatherMarkers(
+      makeGatherWorld('client', { inventory: PICK, gatheringProficiency: { mining: 0 } }),
+    );
+    expect(unearnedSim.map((m) => m.locked)).toEqual([true, true, true, true, true]);
+    expect(unearnedClient).toEqual(unearnedSim);
+    // The same pick at the pick's own requirement flips the ore rows open
+    // (rim order: ore t1, ore t1, wood t1, herb t1, ore t2 at the centre);
+    // the wood stand and the herb patch keep locking for want of their own
+    // implements, in both shapes.
+    const earnedSim = gatherMarkers(
+      makeGatherWorld('sim', { inventory: PICK, gatheringProficiency: { mining: 40 } }),
+    );
+    const earnedClient = gatherMarkers(
+      makeGatherWorld('client', { inventory: PICK, gatheringProficiency: { mining: 40 } }),
+    );
+    expect(earnedSim.map((m) => m.locked)).toEqual([false, false, true, true, false]);
+    expect(earnedClient).toEqual(earnedSim);
+    // The pair genuinely discriminates: the counter, and nothing else, moved
+    // the vector, so this parity assertion is not two copies of one constant.
+    expect(earnedSim.map((m) => m.locked)).not.toEqual(unearnedSim.map((m) => m.locked));
+  });
 });

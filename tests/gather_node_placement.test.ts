@@ -993,9 +993,14 @@ describe('gather node placement: every node sits on ground a player can work', (
       .replace(/(^|\s)\/\/.*$/gm, '$1')
       .replace(/\s+/g, '')
       .replace(/,\)/g, ')');
-    expect(source).toContain(
-      'Math.max(4,Math.min(MAX_AGGRO_RADIUS,template.aggroRadius+(mob.level-e.level)*1.5))',
-    );
+    const formula =
+      'Math.max(4,Math.min(MAX_AGGRO_RADIUS,template.aggroRadius+(mob.level-e.level)*1.5))';
+    // EXACTLY twice: the boss branch and the general branch each carry a
+    // copy, and a bare toContain would stay green while EITHER copy drifted
+    // (the general branch has a live behavioral kill in
+    // tests/mob_scan_counters.test.ts; the boss copy's slope has no
+    // behavioral pin, so this count is what keeps it honest).
+    expect(source.split(formula).length - 1).toBe(2);
   });
 
   it('every allowlisted pair names a real node and a real named mob', () => {

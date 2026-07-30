@@ -18,9 +18,10 @@
 
 import { describe, expect, it } from 'vitest';
 import { CAMPS, DUNGEONS, QUESTS, ZONES } from '../src/sim/data';
-import { facingToward, pointAtYaw } from '../src/sim/eastbrook_layout';
+import { EASTBROOK_STATIONS_BY_ID, facingToward, pointAtYaw } from '../src/sim/eastbrook_layout';
 import { bearingDegrees, headingLabel } from '../src/ui/compass';
 import { buildContinentMapModel } from '../src/ui/continent_map_view';
+import { guideStrings } from '../src/ui/i18n.catalog/guide';
 import type { IWorld } from '../src/world_api';
 
 interface Point {
@@ -348,5 +349,40 @@ describe('the world direction convention this table reads by', () => {
       expect(step.x).toBeCloseTo(toward.x * 10, 10);
       expect(step.z).toBeCloseTo(toward.z * 10, 10);
     }
+  });
+});
+
+describe('the guide twins of audited direction claims (the wiki cannot drift alone)', () => {
+  // The compass rows above resolve QUESTS text only; these two guide strings
+  // carry the SAME world claims and were hand-fixed in the same phase, so
+  // without an arm here the next reword reds the quest row while the wiki
+  // silently disagrees again (the guard header's own failure mode).
+  it('professions.startBody points at the Copper Dig with the quest row word', () => {
+    const row = ROWS.find((r) => r.id === 'q_prof_intro');
+    expect(row).toBeDefined();
+    const word = (row as CompassRow).word;
+    // The same WHOLE word as the quest sentence: shared truth, not a copy.
+    expect(new RegExp(`\\b${word}\\b`, 'i').test(guideStrings.professions.startBody)).toBe(true);
+    expect(new RegExp(`\\b${word}\\b`, 'i').test(QUESTS.q_prof_intro.text)).toBe(true);
+  });
+
+  it('craftProse.cooking.ladderBody puts the kitchens on the side they stand', () => {
+    // "the Eastbrook kitchens on the east side of the square": the station
+    // record is the placement truth, the hub anchors "the square" exactly as
+    // every other Eastbrook row anchors "town". \beast\b cannot match inside
+    // "southeast" (the h is a word character), so the whole-word test is
+    // honest.
+    const body = guideStrings.profPages.craftProse.cooking.ladderBody;
+    expect(/\beast side of the square\b/.test(body)).toBe(true);
+    const kitchens = EASTBROOK_STATIONS_BY_ID.station_eastbrook_kitchens;
+    expect(kitchens).toBeDefined();
+    const from = hub(VALE);
+    const dx = kitchens.position.x - from.x;
+    const dz = kitchens.position.z - from.z;
+    expect(componentHolds('east', dx, dz), `kitchens at dx ${dx} dz ${dz} (east is -X)`).toBe(true);
+    // NO dominance arm: "the east side of the square" claims a side, not a
+    // bearing, and the station stands a hair off the exact northeast diagonal
+    // (|dx| and |dz| within 4 mm of each other), so a dominance requirement
+    // would flake on placement noise while adding no truth to the side claim.
   });
 });

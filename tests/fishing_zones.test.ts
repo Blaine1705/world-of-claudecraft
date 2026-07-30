@@ -21,6 +21,7 @@ import {
   ZONES,
   zoneAt,
 } from '../src/sim/data';
+import { PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import {
   completeFishing,
   FISH_BITE_DELAY_MAX_SEC,
@@ -29,6 +30,7 @@ import {
   FISH_REEL_WINDOW_RARITY_BONUS_SEC,
   FISH_REEL_WINDOW_ROD_BONUS_SEC,
   FISH_REEL_WINDOW_SEC,
+  fishingTeachingCeilingFor,
   fishReelWindowSecFor,
   startFishing,
 } from '../src/sim/professions/fishing';
@@ -47,7 +49,8 @@ import {
   type ItemDef,
   type SimEvent,
 } from '../src/sim/types';
-import { terrainHeight } from '../src/sim/world';
+import { terrainHeight, waterLevelAt } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 // DERIVED from the authored tables' own keys, never a hand list: the
 // shortfall-schedule sweep below must conscript a NEW zone's catch table the
@@ -981,6 +984,147 @@ describe('the rod gate reads the WATER zone at the probe point', () => {
     // And the pin is gone only AFTER the completion consumed it.
     expect(p.fishCastZoneId).toBe('');
     expect(p.castingAbility).toBeNull();
+  });
+
+  it('the cross-boundary GAIN answers to the water zone: 0.1 at proficiency 120', () => {
+    // The discriminating drive the live map cannot stage: no shipped fishable
+    // water lies within the 24 yd cast reach of a tier-DIFFERING zone line
+    // (the nearest rim is 36 yd out, at the thornpeak/veiled_hollow border),
+    // so the gain amount is discriminated here on the authored border lake.
+    // At fishing 120 the mirefen water ahead teaches 0.1 (tier 2 grays at
+    // 150) while the eastbrook ground underfoot teaches 0 (tier 1 grayed at
+    // 100), so a gain call reading zoneAt(p.pos) instead of the pinned cast
+    // zone zeroes this grant. 100..149 is the whole discriminating window:
+    // below 100 both zones grant alike, at 150 both gray out; 120 matches
+    // the live Mirefen drive in tests/professions_fishing.test.ts.
+    setActiveWorldContent(borderLakeContent());
+    const sim = makeSim();
+    const meta = sim.meta(sim.playerId) as PlayerMeta;
+    sim.addItem('ironreel_fishing_rod', 1);
+    meta.gatheringProficiency.fishing = 120;
+    placeAtBorderShore(sim);
+    expect(zoneAt(sim.player.pos.x, sim.player.pos.z).id).toBe('eastbrook_vale');
+    startFishing(sim.ctx, sim.player, meta);
+    expect(sim.player.fishCastZoneId).toBe('mirefen_marsh');
+    sim.player.fishBiteAtTick = 0;
+    sim.player.fishReelDeadlineTick = 0;
+    sim.player.castingAbility = null;
+    let taught = 0;
+    for (let i = 0; i < 60 && taught === 0; i++) {
+      const before = meta.pendingGatherGrants.length;
+      completeFishing(sim.ctx, sim.player, meta);
+      const gained = meta.pendingGatherGrants.slice(before);
+      if (gained.length > 0) {
+        taught++;
+        expect(gained).toEqual([{ professionId: 'fishing', amount: 0.1 }]);
+      }
+    }
+    expect(taught, 'the drive must land a teaching catch').toBe(1);
+  });
+});
+
+describe('the LIVE map cross-boundary cast site (no content override)', () => {
+  it('at (172,936) a veiled_hollow caster fishes evergarden water across x=180', () => {
+    // The one cross-boundary stand point the shipped map offers: the probe
+    // ring walks due east across the x=180 column line into the east strait
+    // (a programmatic border water), stable across seeds (the dry ring at
+    // d4..d12 and the water at d16 hold on 467, 4242, 1, 99, and 12345).
+    // Both zones are tier 1 today, so only the pinned zoneId discriminates
+    // (catch table, deed, and gain all collapse to the same answer); the
+    // moment either side re-tiers in the zone-4 water pass this same stand
+    // point becomes a full gain discriminator for free, so keep the arm.
+    const sim = makeSim();
+    const meta = sim.meta(sim.playerId) as PlayerMeta;
+    sim.addItem('simple_fishing_pole', 1);
+    teleportTo(sim, 172, 936);
+    sim.player.facing = Math.PI / 2; // due east, across the x=180 line
+    expect(zoneAt(172, 936).id).toBe('veiled_hollow');
+    startFishing(sim.ctx, sim.player, meta);
+    expect(sim.player.castingAbility).toBe(FISHING_CAST_ID);
+    // The pin is the WATER's zone, not the caster's: the shared local that
+    // feeds the catch table, the telemetry events, the deed mark, and the
+    // gain all resolve from the probe point across the line.
+    expect(sim.player.fishCastZoneId).toBe('evergarden');
+  });
+});
+
+describe('every rod-tier row stands on real water and a real schedule row', () => {
+  it('the shipped rod-tier ladder is fully distinguished by the gain schedule', () => {
+    // The wield ladder's completeness arm has this shape for land tools; the
+    // fishing side had none, so a tier-4 rod row could ship while the
+    // teaching derivation silently clamps its water to the tier-3 ceiling.
+    // Every shipped tier must earn its OWN ceiling: strictly higher than the
+    // tier below it, with the top tier reaching the cap the derivation ends
+    // at.
+    const tiers = [...new Set(Object.values(FISHING_ZONE_ROD_TIERS))].sort((a, b) => a - b);
+    for (let i = 1; i < tiers.length; i++) {
+      expect(
+        fishingTeachingCeilingFor(tiers[i]),
+        `tier ${tiers[i]} must teach past tier ${tiers[i - 1]}`,
+      ).toBeGreaterThan(fishingTeachingCeilingFor(tiers[i - 1]));
+    }
+    const top = tiers[tiers.length - 1];
+    expect(fishingTeachingCeilingFor(top)).toBe(fishingTeachingCeilingFor(top + 1));
+    expect(fishingTeachingCeilingFor(top)).toBe(200);
+  });
+
+  it('every zone with declared lakes has water a REAL cast accepts', () => {
+    // The R55 defect class: a zone carrying a live rod-tier row over water no
+    // startFishing accepts (farshore shipped that way; the Crown dome dried
+    // the Hilltop Spring). Zones with no declared lakes are served by the
+    // programmatic border waters and are skipped here with that reason.
+    for (const zone of ZONES) {
+      if (!FISHING_ZONE_ROD_TIERS[zone.id] || zone.lakes.length === 0) continue;
+      const spot = zone.lakes.map((lake) => {
+        try {
+          return fishableSpotOn(lake);
+        } catch {
+          return null;
+        }
+      });
+      expect(
+        spot.some((s) => s !== null),
+        `${zone.id} carries a rod-tier row but none of its ${zone.lakes.length} lakes accepts a cast`,
+      ).toBe(true);
+    }
+  });
+
+  it('Gull Mere is deeply fishable with a walkable dry shore, at the shipped seed', () => {
+    // R55's authored numbers, pinned behaviorally: the census in
+    // tests/water_flora_core.test.ts guards the depth INDIRECTLY (lilies
+    // place only below WATER_LEVEL - 0.7), but a census red reads as a
+    // flora count to re-baseline; this probe names the regression. The
+    // fraction floor is deliberately half the measured 0.82 so terrain
+    // noise never flakes it while a collapse to a puddle (the pre-R55
+    // Hilltop state, or the 1 percent Glimmermere shape) reds it.
+    const farshore = ZONES.find((z) => z.id === 'farshore_isle');
+    const mere = farshore?.lakes.find((l) => l.x === 350 && l.z === 118);
+    expect(mere).toEqual({ x: 350, z: 118, radius: 10 });
+    const lake = mere as { x: number; z: number; radius: number };
+    const seed = WORLD_SEED;
+    let wet = 0;
+    let total = 0;
+    for (let dx = -lake.radius; dx <= lake.radius; dx += 0.5) {
+      for (let dz = -lake.radius; dz <= lake.radius; dz += 0.5) {
+        if (dx * dx + dz * dz > lake.radius * lake.radius) continue;
+        total++;
+        const x = lake.x + dx;
+        const z = lake.z + dz;
+        if (terrainHeight(x, z, seed) < waterLevelAt(x, z) - PLAYER_SWIM_DEPTH) wet++;
+      }
+    }
+    expect(total).toBeGreaterThan(1000); // the grid itself is real
+    expect(wet / total).toBeGreaterThanOrEqual(0.5);
+    // The shore ring an angler stands on: dry all the way around.
+    for (let i = 0; i < 72; i++) {
+      const a = (i / 72) * Math.PI * 2;
+      const x = lake.x + Math.cos(a) * (lake.radius + 1.5);
+      const z = lake.z + Math.sin(a) * (lake.radius + 1.5);
+      expect(
+        terrainHeight(x, z, seed) >= waterLevelAt(x, z) - PLAYER_SWIM_DEPTH,
+        `shore bearing ${i} is swimmable`,
+      ).toBe(true);
+    }
   });
 });
 

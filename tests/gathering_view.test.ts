@@ -160,6 +160,38 @@ describe('tool-tier lock dimension', () => {
     );
   });
 
+  it('a world with NO gatheringProficiency member at all reads 0 and locks (fail-closed)', () => {
+    // Both shipped worlds always expose the member (the Sim getter copies the
+    // live map, ClientWorld rebuilds it from the gprof wire field), so no
+    // other fixture here can drive the ABSENT-MAP arm of the optional read in
+    // viewerUsableToolTier: every one of them supplies at least {}. This arm
+    // drives it, which is what makes the `?.` load-bearing rather than
+    // decorative: dropped to a plain index, a partial mirror would throw
+    // inside the minimap's per-frame build instead of locking. The bags hold a
+    // COVERING tier-2 pick on purpose, so a fail-OPEN regression (absent read
+    // as "no requirement") would unlock the vein and red this arm.
+    const partial = {
+      player: { pos: { x: T2.pos.x, z: T2.pos.z } },
+      inventory: PICK,
+      nodeHarvestableByMe: () => true,
+      professionsState: { skills: [] },
+    };
+    expect('gatheringProficiency' in partial).toBe(false);
+    const world = partial as unknown as IWorld;
+    expect(viewerUsableToolTier(world, 'mining')).toBe(0);
+    expect(isNodeToolLockedFor(world, { type: 'ore', tier: 2 })).toBe(true);
+    expect(buildNearbyGatherNodes(world, 5).find((n) => n.id === T2.id)).toMatchObject({
+      tier: 2,
+      locked: true,
+    });
+    // The denial the hover would name still resolves off the bags, so the
+    // absent map degrades to the wield arm rather than to a null model.
+    expect(buildGatherNodeTooltip(world, T2.id)).toMatchObject({
+      locked: true,
+      wieldSkill: TIER2_TOOL_WIELD_PROFICIENCY,
+    });
+  });
+
   it('buildNearbyGatherNodes carries tier and both lock arms, independent of respawn state', () => {
     const bare = buildNearbyGatherNodes(makeWorld({ pos: T2.pos }), 5);
     const bareT2 = bare.find((n) => n.id === T2.id);

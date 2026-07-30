@@ -932,6 +932,49 @@ describe('node tool gating over the live server', () => {
     expect(client.nodeHarvestableByMe('ore_mirefen_t2')).toBe(false);
     expect(client.nodeHarvestableByMe('ore_mirefen_1')).toBe(true);
   });
+
+  it('the R22 wield deny reaches the session with wieldProficiency intact', () => {
+    // The arm above pins the no-tool shape, where wieldProficiency is ABSENT;
+    // this pins it PRESENT over the SAME delivery path, so the field the
+    // client's wield line reads is proven to survive routing and the
+    // serialize-once fragment end to end. The emit itself is pinned offline in
+    // tests/professions_tool_gate.test.ts; only the wire is new here.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const s = joinServer(server, fc, 73, 'Apprentice');
+    const node = mustNode('ore_mirefen_t2');
+    const e = server.sim.entities.get(s.pid);
+    if (!e) throw new Error('missing server entity');
+    e.pos.x = node.pos.x;
+    e.pos.z = node.pos.z;
+    e.pos.y = terrainHeight(node.pos.x, node.pos.z, server.sim.cfg.seed);
+    e.prevPos = { ...e.pos };
+    server.sim.tick();
+    fc.sent.length = 0;
+
+    // Covering but unwieldable: the tier-2 pick IS in the bags and mining sits
+    // at 0, the state that splits the denial off the plain no-tool arm.
+    server.sim.addItem('iron_mining_pick', 1, s.pid);
+    expect(mustMeta(server.sim, s.pid).gatheringProficiency.mining).toBe(0);
+
+    expect(server.sim.harvestNode('ore_mirefen_t2', s.pid)).toBe(false);
+    (server as any).routeEvents(server.sim.drainEvents());
+    expect(deliveredEvents(fc).filter((ev) => ev.type === 'gatherDenied')).toEqual([
+      {
+        type: 'gatherDenied',
+        pid: s.pid,
+        surface: 'node',
+        professionId: 'mining',
+        requiredTier: 2,
+        wieldProficiency: 40,
+      },
+    ]);
+    // 40 is spelled as a literal above on purpose: the pin is the VALUE that
+    // reaches the client, not a restatement of the constant it comes from. A
+    // ladder retune reds this line, which is the signal to re-record the wire
+    // shape rather than to let a self-comparison absorb the change.
+    expect(TIER2_TOOL_WIELD_PROFICIENCY).toBe(40);
+  });
 });
 
 // The fine-material axis (D8) through the LIVE harvest path: the pure rule is

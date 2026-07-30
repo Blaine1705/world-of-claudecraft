@@ -17,15 +17,28 @@
 // the two-sided guard R37 asks for. Every sweep is DERIVED from the live
 // tables with per-table non-vacuity, never a hand-kept list of what exists.
 import { describe, expect, it } from 'vitest';
+import { GUIDE_PROF_GATHERING } from '../src/guide/content.generated';
+import { DEEDS } from '../src/sim/content/deeds';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
-import { STATIONS } from '../src/sim/content/professions';
+import { GATHERING_PROFESSIONS, STATIONS } from '../src/sim/content/professions';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ZONE1_NPCS } from '../src/sim/content/zone1';
 import { ZONE2_NPCS } from '../src/sim/content/zone2';
 import { ZONE3_NPCS } from '../src/sim/content/zone3';
 import { GATHER_NODE_TYPES, GATHER_NODES, ITEMS, NPCS, ZONES } from '../src/sim/data';
+import { ZONE_FISH } from '../src/sim/deeds';
 import { FISHING_ZONE_ROD_TIERS } from '../src/sim/professions/fishing_zones';
+import {
+  gatherNodeGainMultiplier,
+  NODE_HARVEST_TABLE,
+  NODE_MATERIAL_TABLE,
+} from '../src/sim/professions/gathering';
+import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
+import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
+import { Sim } from '../src/sim/sim';
+import { placeAtHarvestSpot } from './helpers/harvest_spot';
 
 /**
  * The R37 ledger, and deliberately the ONLY hand-kept table in this file.
@@ -257,18 +270,6 @@ describe('the R37 professions zone-rollout guard', () => {
 // the ledger stays the one hand-kept decision.
 // ---------------------------------------------------------------------------
 
-import { GUIDE_PROF_GATHERING } from '../src/guide/content.generated';
-import { DEEDS } from '../src/sim/content/deeds';
-import { ALL_RECIPES } from '../src/sim/content/recipes';
-import { ZONE_FISH } from '../src/sim/deeds';
-import {
-  gatherNodeGainMultiplier,
-  NODE_HARVEST_TABLE,
-  NODE_MATERIAL_TABLE,
-} from '../src/sim/professions/gathering';
-import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
-import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
-
 describe('the new-zone checklist: every complete zone arrives mechanically whole', () => {
   const complete = [...rolledOutFrom(PROFESSIONS_ZONE_ROLLOUT)].sort();
   const zoneOf = (zoneId: string) => {
@@ -445,7 +446,10 @@ describe('the new-zone checklist: every complete zone arrives mechanically whole
   });
 
   it('every wield requirement a zone asks is reachable on the ladder below it (R22 knife-edge)', () => {
-    const cap = 100;
+    // The land cap read from the profession record, never a copied 100: the
+    // sibling ceiling helper (tests/professions_tool_gate.test.ts) reads the
+    // same constant, so a cap retune moves both at once.
+    const cap = GATHERING_PROFESSIONS.mining.maxSkill;
     const teachingCeilingFor = (nodeTier: number): number => {
       for (let proficiency = 0; proficiency <= cap; proficiency++) {
         if (gatherNodeGainMultiplier(proficiency, nodeTier) === 0) return proficiency;
@@ -519,13 +523,111 @@ describe('the new-zone checklist: every complete zone arrives mechanically whole
         (ZONE_FISH[zoneId] ?? []).length,
         `${zoneId} first-cast deed needs ZONE_FISH rows to ever fire`,
       ).toBeGreaterThan(0);
+      // And the rows must be CATCHABLE HERE, not merely real items: the mark
+      // writer fires only for a listed catch the resolver actually drew from
+      // THIS zone's own band tables (src/sim/deeds.ts onFishCaughtForDeeds,
+      // fed by the table draw in professions/fishing.ts). A row naming a fish
+      // this water never yields is the same permanently uncompletable deed as
+      // a missing row, so intersect the two. Read without the resolver's
+      // Vale fallback on purpose: a complete zone that lost its own tables
+      // would fish for Vale rows under its own zone id, and that is a
+      // failure here rather than an accidental pass.
+      const catchableHere = new Set<string>();
+      for (const band of FISHING_TABLES_BY_BAND) {
+        for (const entry of band[zoneId] ?? []) {
+          if (entry.itemId !== null) catchableHere.add(entry.itemId);
+        }
+      }
+      expect(
+        catchableHere.size,
+        `${zoneId} draws no named catch in any band, so the intersection below is vacuous`,
+      ).toBeGreaterThan(0);
       for (const itemId of ZONE_FISH[zoneId] ?? []) {
         expect(
           ITEMS[itemId],
           `${zoneId} ZONE_FISH row ${itemId} must be a real item`,
         ).toBeDefined();
+        expect(
+          catchableHere.has(itemId),
+          `${zoneId} ZONE_FISH row ${itemId} is never drawn by that zone's catch tables`,
+        ).toBe(true);
       }
     }
+  });
+
+  it('the gather mark a REAL harvest writes is the mark the chronicle waits on (live)', () => {
+    // The arm above builds `gather:<zone>:<type>` from its own template and
+    // compares it against a deed trigger built from the same one, so both
+    // sides are DERIVED and the actual producer (professions/gathering.ts,
+    // the markVisited call on the granted harvest path) is never exercised.
+    // Renaming the template there would leave all three gatherer chronicles
+    // permanently uncompletable with nothing red. So drive one real harvest
+    // through a live Sim and read back the mark the producer itself wrote:
+    // the three node types share that single call site, so this pins the
+    // template for the WHOLE gather family. The fish: sibling is pinned live
+    // by the extracted-module deeds arm in tests/professions_fishing.test.ts.
+    const MARK = 'gather:mirefen_marsh:ore';
+    // The fixture is derived, not a node-id literal: the lowest-tier ore node
+    // in the marsh, so the covering tool is the cheapest rung on the ladder.
+    const node = nodesIn('mirefen_marsh')
+      .filter((n) => n.type === 'ore')
+      .sort((a, b) => a.tier - b.tier || a.id.localeCompare(b.id))[0];
+    expect(node, 'the drive needs a mirefen ore node').toBeDefined();
+    expect(`gather:${node.zoneId}:${node.type}`, 'the fixture must spell MARK').toBe(MARK);
+    const professionId = NODE_HARVEST_TABLE[node.type].professionId;
+    // The cheapest land tool of the node's OWN profession that covers its
+    // tier, and exactly the proficiency R22 makes that tool wield at: both
+    // derived, so a ladder retune cannot quietly leave this drive denied.
+    let toolId = '';
+    let toolTier = Number.POSITIVE_INFINITY;
+    for (const [itemId, def] of landTools) {
+      const use = def.use;
+      if (use?.type !== 'gatherTool') continue;
+      if (use.professionId !== professionId || use.tier < node.tier) continue;
+      if (use.tier >= toolTier) continue;
+      toolId = itemId;
+      toolTier = use.tier;
+    }
+    expect(toolId, `${professionId} needs a tool covering tier ${node.tier}`).not.toBe('');
+
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'MarkDrive');
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error(`missing player meta ${pid}`);
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error(`missing player entity ${pid}`);
+    sim.addItem(toolId, 1, pid);
+    meta.gatheringProficiency[professionId] = wieldRequirementForTier(toolTier);
+    placeAtHarvestSpot(sim, pid, node.id);
+    // Mob damage cancels a gather cast mid-drive, so the world is cleared and
+    // kept clear first (the tests/gather_node_harvest.test.ts idiom).
+    for (const e of sim.entities.values()) {
+      if (e.kind !== 'mob') continue;
+      e.dead = true;
+      e.hp = 0;
+      e.aiState = 'dead';
+      e.respawnTimer = 9999;
+      e.corpseTimer = 9999;
+      e.inCombat = false;
+    }
+
+    // Negative control: the mark is absent before the harvest, so the read
+    // below cannot pass off a pre-seeded set as a producer write.
+    expect(meta.deedStats.visited.has(MARK), 'the mark must not pre-exist').toBe(false);
+    expect(sim.harvestNode(node.id, pid), 'the gather cast must be granted').toBe(true);
+    for (let i = 0; i < 80 && p.castingAbility; i++) sim.tick();
+    expect(p.castingAbility, 'the gather cast must finish inside the drive').toBeNull();
+    // The grant really landed: the mark writes only on the granted path, so
+    // without this a silent denial would read as a template rename.
+    const material = NODE_MATERIAL_TABLE[node.type][node.zoneId];
+    const grade = MATERIAL_GRADES[material.itemId];
+    expect(grade, `${material.itemId} needs a fine-grade row`).toBeDefined();
+    expect(
+      sim.countItem(material.itemId, pid) + sim.countItem(grade.fineItemId, pid),
+      `${node.id} granted no ${material.itemId} of either grade`,
+    ).toBeGreaterThanOrEqual(1);
+    // The literal, straight off the producer's own write.
+    expect(meta.deedStats.visited.has(MARK), 'the producer must write MARK').toBe(true);
   });
 
   it('the wiki renders every complete zone in each land gathering table', () => {
