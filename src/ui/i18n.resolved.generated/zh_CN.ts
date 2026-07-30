@@ -2490,6 +2490,7 @@ export const zh_CN: EnTranslations = {
       "craft": "制作",
       "reagentsNeeded": "需要:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "（消耗 {count} 个优质品级）",
       "empty": "尚无已知配方。",
       "resultAria": "制作{name}",
       "craftedToast": "已制作:{name}",

@@ -2490,6 +2490,7 @@ export const fr_CA: EnTranslations = {
       "craft": "Artisanat",
       "reagentsNeeded": "Nécessite$1",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(spends {count} fine-grade)",
       "empty": "Aucune recette connue pour l'instant.",
       "resultAria": "Artisanat {name}",
       "craftedToast": "Fabriqué$1 {name}",

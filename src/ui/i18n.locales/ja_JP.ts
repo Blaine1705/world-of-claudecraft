@@ -8446,6 +8446,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.craftName.tailoring': '裁縫',
   'hudChrome.craftName.leatherworking': '皮革加工',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentFineSub': '（上質な等級を{count}個消費）',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Protect Yumiのバーを折りたたむ',
   'yumi.hud.expand': 'Protect Yumiのバーを展開する',

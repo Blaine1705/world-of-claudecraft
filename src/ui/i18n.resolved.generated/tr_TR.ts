@@ -2490,6 +2490,7 @@ export const tr_TR: EnTranslations = {
       "craft": "Zanaat",
       "reagentsNeeded": "Gereklilikler:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(spends {count} fine-grade)",
       "empty": "Henüz bilinen bir tarif yok.",
       "resultAria": "{name} zanaatı",
       "craftedToast": "Hazırlanma Tarihi: {name}",

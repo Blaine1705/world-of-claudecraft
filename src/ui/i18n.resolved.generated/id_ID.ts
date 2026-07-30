@@ -2490,6 +2490,7 @@ export const id_ID: EnTranslations = {
       "craft": "Keahlian",
       "reagentsNeeded": "Memerlukan:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(spends {count} fine-grade)",
       "empty": "Belum ada resep yang diketahui.",
       "resultAria": "Kerajinan {name}",
       "craftedToast": "Dibuat: {name}",

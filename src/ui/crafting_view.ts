@@ -18,7 +18,11 @@ import {
 } from '../sim/professions/combo_eligibility';
 import { isCommissionEligible } from '../sim/professions/commission';
 import { holdsSelfSignedInstance, requiredReagentCountFor } from '../sim/professions/crafting';
-import { countAcrossGrades, materialGradeIds } from '../sim/professions/material_grades';
+import {
+  countAcrossGrades,
+  materialGradeIds,
+  planGradeRemoval,
+} from '../sim/professions/material_grades';
 import { type StationType, stationsOfType } from '../sim/professions/stations';
 import { trainingStationTypeFor } from '../sim/professions/training';
 import { MINIMAL_TIER_MULTIPLIER, REDUCED_TIER_MULTIPLIER } from '../sim/professions/wheel';
@@ -62,6 +66,12 @@ export interface CraftingReagentRow {
   have: number;
   /** True when the player holds at least `required` of this reagent. */
   satisfied: boolean;
+  /** Units of the FINE grade this craft would consume because base stock
+   *  runs short (the UX pass): resolved through the sim's own
+   *  planGradeRemoval (base drains first, D8), so the warning and the spend
+   *  can never disagree. 0 when the base covers the bill, and 0 while the
+   *  row is unsatisfied (an uncraftable recipe warns about nothing). */
+  fineSubstituted: number;
 }
 
 export interface CraftingRecipeRow {
@@ -203,12 +213,25 @@ export function buildCraftingView(
         skills,
         recipe.professionId,
       ).count;
+      // The substitution signal (the UX pass): what the craft would take
+      // from the FINE grade because base stock ran short, read off the SAME
+      // plan the sim spends (planGradeRemoval drains the base first), so a
+      // silent 2x-value substitution becomes a stated one.
+      const satisfied = have >= required;
+      const fineSubstituted = satisfied
+        ? planGradeRemoval(reagent.itemId, required, (gradeId) =>
+            countInInventory(inventory, gradeId),
+          )
+            .filter((take) => take.itemId !== reagent.itemId)
+            .reduce((sum, take) => sum + take.count, 0)
+        : 0;
       return {
         itemId: reagent.itemId,
         item: items[reagent.itemId],
         required,
         have,
-        satisfied: have >= required,
+        satisfied,
+        fineSubstituted,
       };
     });
     const combo = recipe.comboRequirement;

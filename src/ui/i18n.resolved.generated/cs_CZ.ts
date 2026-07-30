@@ -2490,6 +2490,7 @@ export const cs_CZ: EnTranslations = {
       "craft": "Vyrobit",
       "reagentsNeeded": "Vyžaduje:",
       "reagentLine": "{name} x{have}/{required}",
+      "reagentFineSub": "(spends {count} fine-grade)",
       "empty": "Zatím nejsou známy žádné recepty.",
       "resultAria": "Vyrobit {name}",
       "craftedToast": "Vyrobeno: {name}",

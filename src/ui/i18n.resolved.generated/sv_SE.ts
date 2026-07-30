@@ -2490,6 +2490,7 @@ export const sv_SE: EnTranslations = {
       "craft": "Hantverk",
       "reagentsNeeded": "Kräver:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(spends {count} fine-grade)",
       "empty": "Inga recept kända än.",
       "resultAria": "Hantverk {name}",
       "craftedToast": "Tillverkad: {name}",

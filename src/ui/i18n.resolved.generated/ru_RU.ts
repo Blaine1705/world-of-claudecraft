@@ -2490,6 +2490,7 @@ export const ru_RU: EnTranslations = {
       "craft": "Создать",
       "reagentsNeeded": "Требуется:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(потратит отборный сорт: {count})",
       "empty": "Известных рецептов пока нет.",
       "resultAria": "Создать {name}",
       "craftedToast": "Создано: {name}",

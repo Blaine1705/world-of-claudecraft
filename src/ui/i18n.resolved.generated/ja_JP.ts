@@ -2490,6 +2490,7 @@ export const ja_JP: EnTranslations = {
       "craft": "製作",
       "reagentsNeeded": "必要素材:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "（上質な等級を{count}個消費）",
       "empty": "既知のレシピはありません。",
       "resultAria": "{name}を製作",
       "craftedToast": "製作しました:{name}",

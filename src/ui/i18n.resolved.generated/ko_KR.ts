@@ -2490,6 +2490,7 @@ export const ko_KR: EnTranslations = {
       "craft": "제작",
       "reagentsNeeded": "필요 재료:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(상급 등급 {count}개 소모)",
       "empty": "알려진 제작법이 없습니다.",
       "resultAria": "{name} 제작",
       "craftedToast": "제작 완료:{name}",

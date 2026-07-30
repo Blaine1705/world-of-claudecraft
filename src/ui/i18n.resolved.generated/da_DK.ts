@@ -2490,6 +2490,7 @@ export const da_DK: EnTranslations = {
       "craft": "Håndværk",
       "reagentsNeeded": "Kræver:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(spends {count} fine-grade)",
       "empty": "Ingen opskrifter kendt endnu.",
       "resultAria": "Håndværk {name}",
       "craftedToast": "Udformet: {name}",

@@ -2490,6 +2490,7 @@ export const vi_VN: EnTranslations = {
       "craft": "thủ công",
       "reagentsNeeded": "Yêu cầu:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(spends {count} fine-grade)",
       "empty": "Chưa có công thức nấu ăn nào được biết đến.",
       "resultAria": "Thủ công {name}",
       "craftedToast": "Đã chế tác: {name}",

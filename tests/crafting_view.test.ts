@@ -847,6 +847,34 @@ describe('buildCraftingView spans material grades', () => {
     expect(view.recipes[0].craftable).toBe(false);
   });
 
+  it('fineSubstituted states exactly what the spend plan would take from the fine grade', () => {
+    // The substitution signal (the UX pass): base short by 3 of 4, so the
+    // craft would burn three fine copies, and the row says so.
+    const mixed: InvSlot[] = [
+      { itemId: 'copper_ore', count: 1 },
+      { itemId: 'fine_copper_ore', count: 5 },
+    ];
+    const mixedView = buildCraftingView([gradeRecipe], mixed, GRADE_ITEMS);
+    expect(mixedView.recipes[0].reagents[0]).toMatchObject({
+      satisfied: true,
+      fineSubstituted: 3,
+    });
+    // Base fully covers: no warning, even with fine copies in the bag.
+    const covered: InvSlot[] = [
+      { itemId: 'copper_ore', count: 4 },
+      { itemId: 'fine_copper_ore', count: 5 },
+    ];
+    const coveredView = buildCraftingView([gradeRecipe], covered, GRADE_ITEMS);
+    expect(coveredView.recipes[0].reagents[0]).toMatchObject({
+      satisfied: true,
+      fineSubstituted: 0,
+    });
+    // Unsatisfied rows warn about nothing (the craft will not run).
+    const short: InvSlot[] = [{ itemId: 'fine_copper_ore', count: 3 }];
+    const shortView = buildCraftingView([gradeRecipe], short, GRADE_ITEMS);
+    expect(shortView.recipes[0].reagents[0].fineSubstituted).toBe(0);
+  });
+
   it('the base never counts toward a FINE reagent (the gate stays one-directional)', () => {
     const fineRecipe = recipe('recipe_fine_only', [{ itemId: 'fine_copper_ore', count: 4 }]);
     const plainOnly: InvSlot[] = [{ itemId: 'copper_ore', count: 8 }];

@@ -6484,6 +6484,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.crafting.noProfessionChoice'
   | 'hudChrome.crafting.pairOptionLabel'
   | 'hudChrome.crafting.professionChoice'
+  | 'hudChrome.crafting.reagentFineSub'
   | 'hudChrome.crafting.reagentLine'
   | 'hudChrome.crafting.reagentsNeeded'
   | 'hudChrome.crafting.recipeNotLearned'

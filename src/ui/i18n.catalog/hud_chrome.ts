@@ -2863,6 +2863,11 @@ export const hudChromeStrings = {
     craft: 'Craft',
     reagentsNeeded: 'Requires:',
     reagentLine: '{name} x{have}/{required}',
+    // The fine-substitution suffix (the UX pass): appended to a reagent line
+    // when base stock runs short and the craft would spend fine grades (the
+    // D8 downward substitution, 2x gather value), so the spend is stated
+    // before the click instead of silent after it.
+    reagentFineSub: '(spends {count} fine-grade)',
     empty: 'No recipes known yet.',
     resultAria: 'Craft {name}',
     // The SOLE player-visible line for a craft grant (#2430). The grant hub's

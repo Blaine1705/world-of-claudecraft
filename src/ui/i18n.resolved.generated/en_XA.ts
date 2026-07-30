@@ -2490,6 +2490,7 @@ export const en_XA: EnTranslations = {
       "craft": "[Çŕáƒţ]",
       "reagentsNeeded": "[Ŕéɋúíŕéš:]",
       "reagentLine": "[{name} ẋ{have}/{required}]",
+      "reagentFineSub": "[(šþéñðš {count} ƒíñé-ĝŕáðé)]",
       "empty": "[Ñó ŕéçíþéš ķñóŵñ ýéţ.]",
       "resultAria": "[Çŕáƒţ {name}]",
       "craftedToast": "[Çŕáƒţéð: {name}]",

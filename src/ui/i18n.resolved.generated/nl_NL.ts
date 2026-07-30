@@ -2490,6 +2490,7 @@ export const nl_NL: EnTranslations = {
       "craft": "Ambacht",
       "reagentsNeeded": "Vereist:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(spends {count} fine-grade)",
       "empty": "Nog geen recepten bekend.",
       "resultAria": "Ambacht {name}",
       "craftedToast": "Gemaakt: {name}",

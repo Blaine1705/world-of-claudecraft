@@ -8054,6 +8054,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.craftName.tailoring': '裁缝',
   'hudChrome.craftName.leatherworking': '制皮',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentFineSub': '（消耗 {count} 个优质品级）',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': '折叠Protect Yumi血条',
   'yumi.hud.expand': '展开Protect Yumi血条',

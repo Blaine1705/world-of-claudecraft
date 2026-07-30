@@ -188,13 +188,22 @@ export function renderCraftingWindow(
       const item = document.createElement('div');
       item.className = 'vendor-item crafting-recipe-item';
       const resultName = row.result ? itemDisplayName(row.result) : row.resultItemId;
+      // The fine-substitution suffix (the UX pass): stated in words on both
+      // the visible line and the aria fold, never color alone.
+      const fineSubText = (count: number): string =>
+        count > 0
+          ? ` ${t('hudChrome.crafting.reagentFineSub', {
+              count: formatNumber(count, { maximumFractionDigits: 0 }),
+            })}`
+          : '';
       const reagentLines = row.reagents
-        .map((r) =>
-          t('hudChrome.crafting.reagentLine', {
-            name: r.item ? itemDisplayName(r.item) : r.itemId,
-            have: formatNumber(r.have, { maximumFractionDigits: 0 }),
-            required: formatNumber(r.required, { maximumFractionDigits: 0 }),
-          }),
+        .map(
+          (r) =>
+            t('hudChrome.crafting.reagentLine', {
+              name: r.item ? itemDisplayName(r.item) : r.itemId,
+              have: formatNumber(r.have, { maximumFractionDigits: 0 }),
+              required: formatNumber(r.required, { maximumFractionDigits: 0 }),
+            }) + fineSubText(r.fineSubstituted),
         )
         .join(', ');
       // The inline reagent list marks each unsatisfied reagent (a class the
@@ -209,7 +218,11 @@ export function renderCraftingWindow(
                 have: formatNumber(r.have, { maximumFractionDigits: 0 }),
                 required: formatNumber(r.required, { maximumFractionDigits: 0 }),
               }),
-            )}</span>`,
+            )}${
+              r.fineSubstituted > 0
+                ? `<span class="crafting-fine-sub">${esc(fineSubText(r.fineSubstituted))}</span>`
+                : ''
+            }</span>`,
         )
         .join(', ');
       const comboLine = row.comboRequirement

@@ -2490,6 +2490,7 @@ export const it_IT: EnTranslations = {
       "craft": "Mestiere",
       "reagentsNeeded": "Richiede:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(spends {count} fine-grade)",
       "empty": "Nessuna ricetta ancora conosciuta.",
       "resultAria": "Crea {name}",
       "craftedToast": "Realizzato: {name}",

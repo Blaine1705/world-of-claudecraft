@@ -5519,6 +5519,12 @@
   .crafting-reagent.unsat {
     color: var(--color-text-error);
   }
+  /* The fine-substitution suffix (the UX pass): a tint over words that are
+     already the signal (the color-independence rule), never the signal
+     itself. */
+  .crafting-fine-sub {
+    color: var(--gold-dim);
+  }
   /* The Craft affordance chip: the gold-gradient primary the mailbox send
      button established. It is decoration inside the row-button (the whole row
      is the target); disabled rows desaturate it through the button opacity. */

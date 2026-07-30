@@ -8433,6 +8433,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.craftName.tailoring': '재봉',
   'hudChrome.craftName.leatherworking': '가죽세공',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentFineSub': '(상급 등급 {count}개 소모)',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Protect Yumi 게이지 접기',
   'yumi.hud.expand': 'Protect Yumi 게이지 펼치기',

@@ -8580,6 +8580,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.craftName.tailoring': 'Портняжное дело',
   'hudChrome.craftName.leatherworking': 'Кожевничество',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentFineSub': '(потратит отборный сорт: {count})',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Свернуть полосы Protect Yumi',
   'yumi.hud.expand': 'Развернуть полосы Protect Yumi',
