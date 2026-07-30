@@ -38,8 +38,9 @@ import {
   visualAssetUrlForGraphics,
   weaponSkinModelUrl,
 } from './manifest';
-import { mergeSkinnedParts } from './rig_merge';
+import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
+import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
@@ -661,8 +662,18 @@ const optimizedSceneCache = new Map<string, THREE.Object3D>();
 function optimizedScene(url: string): THREE.Object3D {
   const hit = optimizedSceneCache.get(url);
   if (hit) return hit;
-  const root = cloneSkinned(resolvedGltf(url).scene);
-  mergeSkinnedParts(root);
+  const source = resolvedGltf(url);
+  const clips = [...source.animations];
+  for (const def of Object.values(VISUALS)) {
+    if (def.url !== url) continue;
+    for (const animationUrl of def.animUrls ?? []) {
+      const animationSource = gltfByUrl.get(assetUrl(animationUrl));
+      if (animationSource) clips.push(...animationSource.animations);
+    }
+  }
+  const root = cloneSkinned(source.scene);
+  mergeSkinnedParts(root, animatedNodeNames(clips));
+  optimizeSkinGpuLayout(root);
   primeSkinnedSortSpheres(root);
   optimizedSceneCache.set(url, root);
   return root;
