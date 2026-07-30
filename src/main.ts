@@ -1308,7 +1308,12 @@ async function startGame(
     // Talent row options also use procedural crest ids that are absent from
     // ABILITIES, plus granted abilities not guaranteed to be in the base kit.
     for (const row of rowTreeFor(world.cfg.playerClass) ?? []) {
-      for (const option of row.options) iconPriorities.push(talentRowOptionIconRef(option));
+      for (const option of row.options) {
+        const ref = talentRowOptionIconRef(option);
+        // Paladin talent art is a real .webp the browser fetches directly; only
+        // procedural icon-cache refs participate in the prewarm plan.
+        if (ref.kind !== 'image') iconPriorities.push(ref);
+      }
     }
     for (const recipe of world.recipeList) prioritizeItem(recipe.resultItemId);
     for (const id of finderLootItemIds()) prioritizeItem(id);
