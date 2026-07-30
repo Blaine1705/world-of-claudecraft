@@ -219,8 +219,10 @@ export function hobbyCandidatesForPair(activeArchetype: string, pairedMajor: str
 
 // Craft ids with real, reachable content: at least one recipe in
 // content/recipes.ts (ALL_RECIPES) targets it, or it has an enchanting-style
-// action outside the recipe table (today, only enchanting itself, via
-// disenchanting; see professions/enchanting.ts). Jewelcrafting and
+// action outside the recipe table (only enchanting itself, via disenchanting;
+// see professions/enchanting.ts). Enchanting now also ships recipes in
+// ALL_RECIPES, so its explicit entry is a redundancy that keeps the
+// disenchanting path counted even if those recipes move. Jewelcrafting and
 // Inscription have neither (content/deeds.ts's prog_guildsworn comment: "no
 // live skill-gain path yet, zero recipes, no enchanting-style action"), so
 // defaulting a fresh hobby into either soft-locks the slot: no possible skill
