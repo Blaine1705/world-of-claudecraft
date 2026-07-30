@@ -2342,6 +2342,7 @@ export const ja_JP: EnTranslations = {
       },
       "downgradeMark": "バッグが満杯です：収穫は採集者の印なしで収納されました。",
       "downgradeFind": "バッグが満杯です：極上の獲物を逃してしまいました。",
+      "emptyHookNote": "針には何もなし",
       "stateReady": "採集可能",
       "stateCooldown": "再生中",
       "stateCooldownTimed": "{time}後に再生",

@@ -2342,6 +2342,7 @@ export const zh_CN: EnTranslations = {
       },
       "downgradeMark": "背包已满：这份收获未能留下采集者的印记。",
       "downgradeFind": "背包已满：一件完美的收获溜走了。",
+      "emptyHookNote": "空钩",
       "stateReady": "可采集",
       "stateCooldown": "恢复中",
       "stateCooldownTimed": "{time}后恢复",

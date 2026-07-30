@@ -2342,6 +2342,7 @@ export const tr_TR: EnTranslations = {
       },
       "downgradeMark": "Çantalar dolu: bulgu, toplayıcı işareti olmadan saklandı.",
       "downgradeFind": "Çantalar dolu: pırıl pırıl bir bulgu kayboldu gitti.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Hazır",
       "stateCooldown": "Yeniden Oluşuyor",
       "stateCooldownTimed": "Respawns in {time}",

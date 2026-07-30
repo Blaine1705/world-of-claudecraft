@@ -2342,6 +2342,7 @@ export const fr_CA: EnTranslations = {
       },
       "downgradeMark": "Sacs pleins : la trouvaille a été rangée sans la marque du collecteur.",
       "downgradeFind": "Sacs pleins : une trouvaille de qualité supérieure vous a échappé.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Disponible",
       "stateCooldown": "En repoussement",
       "stateCooldownTimed": "Respawns in {time}",

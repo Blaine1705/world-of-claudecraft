@@ -2342,6 +2342,7 @@ export const de_DE: EnTranslations = {
       },
       "downgradeMark": "Taschen voll: der Fund wurde ohne Sammelzeichen gespeichert.",
       "downgradeFind": "Taschen voll: ein makelloser Fund ist entkommen.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Bereit",
       "stateCooldown": "Nachwachsen",
       "stateCooldownTimed": "Respawns in {time}",

@@ -2342,6 +2342,7 @@ export const es: EnTranslations = {
       },
       "downgradeMark": "Bolsas llenas: el hallazgo se guardó sin la marca del recolector.",
       "downgradeFind": "Bolsas llenas: se perdió un hallazgo prístino.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Listo",
       "stateCooldown": "Reapareciendo",
       "stateCooldownTimed": "Respawns in {time}",

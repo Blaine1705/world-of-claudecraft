@@ -2652,6 +2652,10 @@ export const hudChromeStrings = {
     // renders when the world can put a number on the same timer
     // (IWorldProfessions nodeRespawnSeconds); the plain one stays the
     // fallback for a null read. {time} is the respawnClock template below.
+    // The empty-hook FCT self-note (the UX pass), fired off the
+    // fishingEmptyHook event beside the sim's grey log line: the reel was
+    // timed right, the hook just came up bare.
+    emptyHookNote: 'Nothing on the hook',
     stateReady: 'Ready',
     stateCooldown: 'Respawning',
     stateCooldownTimed: 'Respawns in {time}',

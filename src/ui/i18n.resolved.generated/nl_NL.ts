@@ -2342,6 +2342,7 @@ export const nl_NL: EnTranslations = {
       },
       "downgradeMark": "Tassen vol: de vondst werd opgeslagen zonder verzamelderstempel.",
       "downgradeFind": "Tassen vol: een ongeschonden vondst glipte weg.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Gereed",
       "stateCooldown": "Aan het hergroeien",
       "stateCooldownTimed": "Respawns in {time}",

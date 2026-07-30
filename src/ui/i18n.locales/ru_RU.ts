@@ -8548,6 +8548,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Открывает более богатый улов при навыке рыбалки от {skill}.',
   'hudChrome.gathering.downgradeMark': 'Сумки полны: добыча сохранена без метки сборщика.',
   'hudChrome.gathering.downgradeFind': 'Сумки полны: превосходная находка ускользнула.',
+  'hudChrome.gathering.emptyHookNote': 'Пустой крючок',
   'hudChrome.gathering.stateReady': 'Готово',
   'hudChrome.gathering.stateCooldown': 'Восстанавливается',
   'hudChrome.gathering.stateCooldownTimed': 'Восстановится через {time}',

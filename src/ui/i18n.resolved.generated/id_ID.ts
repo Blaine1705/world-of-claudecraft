@@ -2342,6 +2342,7 @@ export const id_ID: EnTranslations = {
       },
       "downgradeMark": "Tas penuh: temuan disimpan tanpa tanda pengumpulnya.",
       "downgradeFind": "Tas penuh: temuan murni terlewat.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Siap",
       "stateCooldown": "Muncul kembali",
       "stateCooldownTimed": "Respawns in {time}",

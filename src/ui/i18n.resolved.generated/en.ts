@@ -2342,6 +2342,7 @@ export const en: EnTranslations = {
       },
       "downgradeMark": "Bags full: the find was stored without its gatherer's mark.",
       "downgradeFind": "Bags full: a pristine find slipped away.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Ready",
       "stateCooldown": "Respawning",
       "stateCooldownTimed": "Respawns in {time}",

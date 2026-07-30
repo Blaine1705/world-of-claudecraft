@@ -2342,6 +2342,7 @@ export const pt_BR: EnTranslations = {
       },
       "downgradeMark": "Bolsas cheias: a descoberta foi armazenada sem a marca do coletor.",
       "downgradeFind": "Bolsas cheias: uma descoberta imaculada escapou.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Disponível",
       "stateCooldown": "Regenerando",
       "stateCooldownTimed": "Respawns in {time}",

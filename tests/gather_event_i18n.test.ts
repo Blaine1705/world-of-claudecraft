@@ -310,6 +310,20 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
     expect(cueCalls).toEqual(['fishReel']);
   });
 
+  it('the fishingEmptyHook case self-notes and plays exactly the reel cue (the timed press)', () => {
+    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    const caseStart = source.indexOf("case 'fishingEmptyHook'");
+    expect(caseStart).toBeGreaterThan(-1);
+    const block = source.slice(caseStart, source.indexOf('break;', caseStart));
+    expect(block.includes("showSelfNote(t('hudChrome.gathering.emptyHookNote'))")).toBe(true);
+    // Exactly the reel cue: the timing confirmation, and nothing stacking.
+    const cueCalls = [...block.matchAll(/audio\.(\w+)\(/g)].map((m) => m[1]);
+    expect(cueCalls).toEqual(['fishReel']);
+    // The sim's own grey "No fish are biting." line stays the ONLY log line.
+    expect(block.includes('this.log(')).toBe(false);
+    expect(hasTranslation('hudChrome.gathering.emptyHookNote')).toBe(true);
+  });
+
   it('every gathering profession id has a catalog label in the shared name table', () => {
     // The label map is string-keyed (an id with no key renders no row), so tsc
     // does not force exhaustiveness. This is the tripwire a future fifth

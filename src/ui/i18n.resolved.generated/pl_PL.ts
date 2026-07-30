@@ -2342,6 +2342,7 @@ export const pl_PL: EnTranslations = {
       },
       "downgradeMark": "Torby pełne: znalezisko zostało schowane bez znaku zbieracza.",
       "downgradeFind": "Torby pełne: wyjątkowe znalezisko przeszło ci koło nosa.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Gotowy",
       "stateCooldown": "Odnawianie się",
       "stateCooldownTimed": "Respawns in {time}",

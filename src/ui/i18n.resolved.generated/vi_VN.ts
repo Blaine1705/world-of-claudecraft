@@ -2342,6 +2342,7 @@ export const vi_VN: EnTranslations = {
       },
       "downgradeMark": "Túi đầy: phát hiện được lưu mà không có dấu thợ thu thập.",
       "downgradeFind": "Túi đầy: một phát hiện tuyệt vời đã trôi qua.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Sẵn Sàng",
       "stateCooldown": "Đang Hồi Sinh",
       "stateCooldownTimed": "Respawns in {time}",

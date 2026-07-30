@@ -2342,6 +2342,7 @@ export const en_XA: EnTranslations = {
       },
       "downgradeMark": "[Ɓáĝš ƒúļļ: ţĥé ƒíñð ŵáš šţóŕéð ŵíţĥóúţ íţš ĝáţĥéŕéŕ'š ɱáŕķ.]",
       "downgradeFind": "[Ɓáĝš ƒúļļ: á þŕíšţíñé ƒíñð šļíþþéð áŵáý.]",
+      "emptyHookNote": "[Ñóţĥíñĝ óñ ţĥé ĥóóķ]",
       "stateReady": "[Ŕéáðý]",
       "stateCooldown": "[Ŕéšþáŵñíñĝ]",
       "stateCooldownTimed": "[Ŕéšþáŵñš íñ {time}]",

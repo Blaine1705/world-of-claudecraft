@@ -2342,6 +2342,7 @@ export const it_IT: EnTranslations = {
       },
       "downgradeMark": "Borse piene: il ritrovamento e stato conservato senza il marchio del raccoglitore.",
       "downgradeFind": "Borse piene: un ritrovamento pregiato e scivolato via.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Pronto",
       "stateCooldown": "In rigenerazione",
       "stateCooldownTimed": "Respawns in {time}",

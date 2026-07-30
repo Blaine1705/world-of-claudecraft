@@ -10464,6 +10464,19 @@ export class Hud {
           this.log(t('hudChrome.gathering.gotAwayLine'), '#a8a8a8');
           break;
         }
+        case 'fishingEmptyHook': {
+          // Empty-hook feedback (the UX pass): this reel was CORRECTLY
+          // timed, so the press earns the reel cue (the timing
+          // confirmation) and an FCT self-note beside the sim's own grey
+          // "No fish are biting." line; without them a perfect press and a
+          // missed window read identically at the waterline. The absent
+          // catch line and loot ding are what say "empty", so nothing more
+          // stacks (the #2430 one-cue rule holds: this outcome and
+          // fishingResult are mutually exclusive).
+          this.showSelfNote(t('hudChrome.gathering.emptyHookNote'));
+          audio.fishReel();
+          break;
+        }
         case 'gatherRareEvent': {
           // Soft zone broadcast (Professions 2.0): every recipient in
           // the zone logs the localized flavor line; only the finder also gets

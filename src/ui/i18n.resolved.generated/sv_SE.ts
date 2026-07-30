@@ -2342,6 +2342,7 @@ export const sv_SE: EnTranslations = {
       },
       "downgradeMark": "Väskorna fulla: fyndet förvarades utan samlarmärke.",
       "downgradeFind": "Väskorna fulla: ett orört fynd gled undan.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Redo",
       "stateCooldown": "Återspawnning",
       "stateCooldownTimed": "Respawns in {time}",

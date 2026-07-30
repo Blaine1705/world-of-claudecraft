@@ -2342,6 +2342,7 @@ export const cs_CZ: EnTranslations = {
       },
       "downgradeMark": "Plné brašny: nález byl uložen bez značky sběrače.",
       "downgradeFind": "Plné brašny: vzácný nález ti proklouzl.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Připraveno",
       "stateCooldown": "Dobíjení",
       "stateCooldownTimed": "Respawns in {time}",

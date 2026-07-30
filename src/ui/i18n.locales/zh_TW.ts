@@ -8019,6 +8019,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.rodBand': '釣魚技能達到{skill}後可解鎖更豐富的漁獲。',
   'hudChrome.gathering.downgradeMark': '背包已滿：這份收穫未能留下採集者的印記。',
   'hudChrome.gathering.downgradeFind': '背包已滿：一件完美的收穫溜走了。',
+  'hudChrome.gathering.emptyHookNote': '空鉤',
   'hudChrome.gathering.stateReady': '可採集',
   'hudChrome.gathering.stateCooldown': '恢復中',
   'hudChrome.gathering.stateCooldownTimed': '{time}後恢復',

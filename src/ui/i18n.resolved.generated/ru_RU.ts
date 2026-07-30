@@ -2342,6 +2342,7 @@ export const ru_RU: EnTranslations = {
       },
       "downgradeMark": "Сумки полны: добыча сохранена без метки сборщика.",
       "downgradeFind": "Сумки полны: превосходная находка ускользнула.",
+      "emptyHookNote": "Пустой крючок",
       "stateReady": "Готово",
       "stateCooldown": "Восстанавливается",
       "stateCooldownTimed": "Восстановится через {time}",

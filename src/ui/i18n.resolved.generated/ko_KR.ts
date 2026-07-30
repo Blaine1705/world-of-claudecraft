@@ -2342,6 +2342,7 @@ export const ko_KR: EnTranslations = {
       },
       "downgradeMark": "가방이 가득 찼습니다: 수확물이 채집자의 표식 없이 보관되었습니다.",
       "downgradeFind": "가방이 가득 찼습니다: 최상급 수확물을 놓쳐 버렸습니다.",
+      "emptyHookNote": "빈 낚싯바늘",
       "stateReady": "채집 가능",
       "stateCooldown": "재생성 중",
       "stateCooldownTimed": "{time} 후 재생성",

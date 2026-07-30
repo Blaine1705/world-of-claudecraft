@@ -8410,6 +8410,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '釣りスキル{skill}以上でより豊かな釣果が解放されます。',
   'hudChrome.gathering.downgradeMark': 'バッグが満杯です：収穫は採集者の印なしで収納されました。',
   'hudChrome.gathering.downgradeFind': 'バッグが満杯です：極上の獲物を逃してしまいました。',
+  'hudChrome.gathering.emptyHookNote': '針には何もなし',
   'hudChrome.gathering.stateReady': '採集可能',
   'hudChrome.gathering.stateCooldown': '再生中',
   'hudChrome.gathering.stateCooldownTimed': '{time}後に再生',

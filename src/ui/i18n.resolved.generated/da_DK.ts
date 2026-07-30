@@ -2342,6 +2342,7 @@ export const da_DK: EnTranslations = {
       },
       "downgradeMark": "Tasker fyldte: fundet blev gemt uden indsamlerens mærke.",
       "downgradeFind": "Tasker fyldte: et pristint fund slap væk.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Klar",
       "stateCooldown": "Genskabes",
       "stateCooldownTimed": "Respawns in {time}",
