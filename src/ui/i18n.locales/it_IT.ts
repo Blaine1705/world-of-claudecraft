@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const it_IT: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.tradeAlreadyTrading': 'Quel giocatore sta già commerciando.',
   'hudChrome.bags.itemAriaMasterwork': '{item}, quantita {count}, capolavoro',
   'hudChrome.archetypePair.tailoring+inscription': 'Tessitore di Magia',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Incanta Arma - Concentrazione Runica',

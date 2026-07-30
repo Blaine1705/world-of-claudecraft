@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const nl_NL: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.tradeAlreadyTrading': 'Die speler is al aan het handelen.',
   'hudChrome.bags.itemAriaMasterwork': '{item}, hoeveelheid {count}, meesterwerk',
   'hudChrome.archetypePair.tailoring+inscription': 'Inktwever',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Wapen betoveren - Geruned Teken',

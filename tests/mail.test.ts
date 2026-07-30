@@ -15,7 +15,7 @@ import {
   MAIL_POSTAGE,
 } from '../src/sim/mail/post_office';
 import { Sim } from '../src/sim/sim';
-import { dist2d, type SimEvent, type WorldContent } from '../src/sim/types';
+import { type SimEvent, type WorldContent } from '../src/sim/types';
 
 // Mailboxes are system-owned and still spawn with this fixture. Ambient camps,
 // NPCs and quest objects are irrelevant to delivery/index invariants and would
@@ -76,7 +76,7 @@ describe('mailboxes in the world', () => {
         (box) =>
           box?.kind === 'object' &&
           box.templateId === 'mailbox' &&
-          dist2d(box.pos, zone.hub) <= zone.hub.radius,
+          Math.hypot(box.pos.x - zone.hub.x, box.pos.z - zone.hub.z) <= zone.hub.radius,
       );
       if (!mailbox) {
         missingHubNames.push(zone.hub.name);

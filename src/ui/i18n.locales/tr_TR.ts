@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.tradeAlreadyTrading': 'Bu oyuncu zaten takas yapıyor.',
   'hudChrome.bags.itemAriaMasterwork': '{item}, adet {count}, şaheser',
   'hudChrome.archetypePair.tailoring+inscription': 'İplik Yazıcı',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Silah Büyüsü - Runlu Odak',

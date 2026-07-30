@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.tradeAlreadyTrading': 'Pemain itu sudah sedang berdagang.',
   'hudChrome.bags.itemAriaMasterwork': '{item}, jumlah {count}, karya master',
   'hudChrome.archetypePair.tailoring+inscription': 'Penenun Tinta',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Mantrai Senjata - Segel Bersura',

@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.tradeAlreadyTrading': 'Dieser Spieler handelt bereits.',
   'hudChrome.bags.itemAriaMasterwork': '{item}, Menge {count}, Meisterwerk',
   'hudChrome.archetypePair.tailoring+inscription': 'Zauberweber',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Waffe verzaubern - Runenfokus',

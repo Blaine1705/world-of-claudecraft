@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.tradeAlreadyTrading': 'Tento hráč už obchoduje.',
   'hudChrome.bags.itemAriaMasterwork': '{item}, množství {count}, mistrovské dílo',
   'hudChrome.archetypePair.tailoring+inscription': 'Inkoustotkalec',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Okouzlení zbraně - Runová pečeť',

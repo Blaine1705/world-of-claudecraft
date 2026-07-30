@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.tradeAlreadyTrading': 'Ten gracz już handluje.',
   'hudChrome.bags.itemAriaMasterwork': '{item}, ilość {count}, arcydzieło',
   'hudChrome.archetypePair.tailoring+inscription': 'Magotkacz',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Zaklinanie broni - Runowe Ognisko',

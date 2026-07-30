@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const da_DK: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.tradeAlreadyTrading': 'Den spiller handler allerede.',
   'hudChrome.bags.itemAriaMasterwork': '{item}, antal {count}, mesterværk',
   'hudChrome.archetypePair.tailoring+inscription': 'Troldvæver',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Fortryl våben - Runet fokus',

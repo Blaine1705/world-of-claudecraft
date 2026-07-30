@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.tradeAlreadyTrading': 'Den spelaren handlar redan.',
   'hudChrome.bags.itemAriaMasterwork': '{item}, antal {count}, mästerverk',
   'hudChrome.archetypePair.tailoring+inscription': 'Bläckvävare',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Förtrollning Vapen - Runat Sigill',

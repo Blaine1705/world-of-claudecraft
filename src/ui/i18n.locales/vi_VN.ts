@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.tradeAlreadyTrading': 'Người chơi đó đang giao dịch rồi.',
   'hudChrome.bags.itemAriaMasterwork': '{item}, số lượng {count}, kiệt tác',
   'hudChrome.archetypePair.tailoring+inscription': 'Thợ Dệt Chữ',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Pháp Khắc Vũ Khí - Tiêu Điểm Phù Văn',
