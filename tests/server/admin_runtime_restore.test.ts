@@ -87,6 +87,9 @@ describe('R35 GameServer runtime methods', () => {
     // characters row); a fresh serialize reads the live level.
     expect(state?.level).toBe(1);
     expect(server.adminCharacterState(999999)).toBeNull();
+    // The cheap predicate the restore pre-checks ride (no serialize).
+    expect(server.adminCharacterOnline(201)).toBe(true);
+    expect(server.adminCharacterOnline(999999)).toBe(false);
   });
 
   it('adminRestoreItem grants through the real addItem hub and forces a save', async () => {

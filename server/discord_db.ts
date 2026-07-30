@@ -131,6 +131,27 @@ export async function discordForAccount(
   return res.rows[0] ?? null;
 }
 
+/**
+ * Batched form of discordForAccount for the activity drain: ONE query over
+ * the distinct account ids of a drained batch instead of a sequential
+ * per-participant lookup (most players are unlinked, so the N+1 mostly
+ * fetched nulls). Missing ids are simply absent from the map.
+ */
+export async function discordForAccounts(
+  pool: Pool,
+  accountIds: readonly number[],
+): Promise<Map<number, DiscordLinkRow>> {
+  const out = new Map<number, DiscordLinkRow>();
+  if (accountIds.length === 0) return out;
+  const res = await pool.query(
+    `SELECT account_id, discord_user_id, discord_username, discord_avatar, discord_email, guild_member, linked_at
+       FROM discord_links WHERE account_id = ANY($1::int[])`,
+    [[...new Set(accountIds)]],
+  );
+  for (const row of res.rows) out.set(row.account_id, row);
+  return out;
+}
+
 export async function accountForDiscord(pool: Pool, discordUserId: string): Promise<number | null> {
   const res = await pool.query('SELECT account_id FROM discord_links WHERE discord_user_id = $1', [
     discordUserId,

@@ -763,7 +763,7 @@ export async function handleAdminApi(
       const itemId = String(body.itemId);
       const count = Number(body.count);
       try {
-        if (game.adminCharacterState(id) === null) {
+        if (!game.adminCharacterOnline(id)) {
           return fail(res, 400, 'character is not online on this realm');
         }
         await recordProfessionsRestore({
@@ -796,7 +796,7 @@ export async function handleAdminApi(
       const professionId = String(body.professionId);
       const effectId = String(body.effectId);
       try {
-        if (game.adminCharacterState(id) === null) {
+        if (!game.adminCharacterOnline(id)) {
           return fail(res, 400, 'character is not online on this realm');
         }
         await recordProfessionsRestore({
@@ -1273,9 +1273,12 @@ export async function handleAdminApi(
     const characterProfessionsMatch = /^\/admin\/api\/characters\/(\d+)\/professions$/.exec(path);
     if (characterProfessionsMatch) {
       const id = Number(characterProfessionsMatch[1]);
-      const row = await characterProfessionsRow(id);
+      // Live snapshot FIRST (the RouteDef twin's exact shape): a live read
+      // discards the blob, so the query skips fetching it.
+      const liveState = game.adminCharacterState(id);
+      const row = await characterProfessionsRow(id, liveState === null);
       if (!row) return fail(res, 404, 'character not found');
-      return ok(res, characterProfessionsSheetFromRow(row, game.adminCharacterState(id)));
+      return ok(res, characterProfessionsSheetFromRow(row, liveState));
     }
     if (path === '/admin/api/maps') {
       const { page, limit } = parsePageParams(url.searchParams);
@@ -1400,6 +1403,7 @@ export type AdminRuntime = Pick<
   // R35 GM professions tooling: a live character-state snapshot for the
   // inspector, and the two audited restores (item mint, slot re-mint).
   | 'adminCharacterState'
+  | 'adminCharacterOnline'
   | 'adminRestoreItem'
   | 'adminRestoreToolEffectSlot'
 >;
@@ -2203,9 +2207,12 @@ async function accountDetailHandler(ctx: Ctx): Promise<void> {
 async function characterProfessionsHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
   const id = adminTargetId(ctx);
-  const row = await adminDb().characterProfessionsRow(id);
+  // Live snapshot FIRST: when one exists the stored blob is discarded, so
+  // the query skips detoasting the widest column in the schema for nothing.
+  const liveState = rt.adminCharacterState(id);
+  const row = await adminDb().characterProfessionsRow(id, liveState === null);
   if (!row) return fail(ctx.res, 404, 'character not found');
-  ok(ctx.res, characterProfessionsSheetFromRow(row, rt.adminCharacterState(id)));
+  ok(ctx.res, characterProfessionsSheetFromRow(row, liveState));
 }
 
 /** POST /admin/api/moderation/characters/:id/restore-item: the R35 GM item
@@ -2223,7 +2230,7 @@ async function restoreItemHandler(ctx: Ctx): Promise<void> {
   const itemId = String(body.itemId);
   const count = Number(body.count);
   try {
-    if (rt.adminCharacterState(id) === null) {
+    if (!rt.adminCharacterOnline(id)) {
       return fail(ctx.res, 400, 'character is not online on this realm');
     }
     await adminDb().recordProfessionsRestore({
@@ -2259,7 +2266,7 @@ async function restoreSlotHandler(ctx: Ctx): Promise<void> {
   const professionId = String(body.professionId);
   const effectId = String(body.effectId);
   try {
-    if (rt.adminCharacterState(id) === null) {
+    if (!rt.adminCharacterOnline(id)) {
       return fail(ctx.res, 400, 'character is not online on this realm');
     }
     await adminDb().recordProfessionsRestore({

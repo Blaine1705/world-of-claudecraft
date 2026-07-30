@@ -161,7 +161,7 @@ import {
   reconcileCharacterDeeds,
   recordDeedUnlocks,
 } from './deeds_records';
-import { enqueueActivity } from './discord_activity';
+import { claimDedupeKey, enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
@@ -3943,6 +3943,13 @@ export class GameServer {
     return session ? this.sim.serializeCharacter(session.pid) : null;
   }
 
+  // R35: the cheap online predicate the restore pre-checks use. A full
+  // serializeCharacter as an online test is synchronous game-loop work
+  // thrown away; the inspector alone needs the snapshot.
+  adminCharacterOnline(characterId: number): boolean {
+    return this.sessionByCharacterId(characterId) !== null;
+  }
+
   // R35 GM restore: mint a lost item back onto a LIVE character through the
   // sim's normal grant hub (grants reaching addItem always land). The count
   // is re-clamped defensively even though the admin handler validates it
@@ -6832,7 +6839,13 @@ export class GameServer {
         // Bots have no session, so this.clients.get filters them naturally.
         const s = this.clients.get(ev.pid);
         if (!s) continue;
+        // The dedupe key is claimed SYNCHRONOUSLY, ahead of the opt-out read:
+        // procs repeat, and a check inside the enqueue would fire one db read
+        // per proc while all but one card is provably discarded (a same-tick
+        // burst would even pass a plain pre-check together). Claimed = this
+        // proc owns the TTL window; the enqueue then carries a null key.
         const { accountId, name } = s;
+        if (!claimDedupeKey(`masterwork:${accountId}`, now)) continue;
         const profileUrl = this.profileUrlFor(name);
         const itemName = ITEMS[ev.itemId]?.name ?? ev.itemId;
         void getDeedBroadcasts(accountId)
@@ -6847,7 +6860,7 @@ export class GameServer {
                 profileUrl,
                 itemName,
               },
-              `masterwork:${accountId}`,
+              null,
               now,
             );
           })

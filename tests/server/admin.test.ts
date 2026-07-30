@@ -3010,7 +3010,7 @@ describe('R35 professions inspector (GET /admin/api/characters/:id/professions)'
     });
     expect(r.status).toBe(200);
     const sheet = (r.body as { data: Record<string, any> }).data;
-    expect(characterProfessionsRow).toHaveBeenCalledWith(5);
+    expect(characterProfessionsRow).toHaveBeenCalledWith(5, true); // offline: fetch the blob
     expect(sheet.name).toBe('Aldric');
     expect(sheet.live).toBe(false);
     expect(sheet.updatedAt).toBe('2026-07-30T12:00:00.000Z');
@@ -3051,7 +3051,8 @@ describe('R35 professions inspector (GET /admin/api/characters/:id/professions)'
   });
 
   it('overlays a LIVE serializeCharacter snapshot when the character is online here', async () => {
-    authedAdminDb({ characterProfessionsRow: vi.fn(async () => BLOB_ROW) });
+    const characterProfessionsRow = vi.fn(async () => BLOB_ROW);
+    authedAdminDb({ characterProfessionsRow });
     installAdminRuntime({
       adminCharacterState: vi.fn(() => ({ gatheringProficiency: { mining: 43.5 } })),
     });
@@ -3064,6 +3065,8 @@ describe('R35 professions inspector (GET /admin/api/characters/:id/professions)'
     expect(sheet.live).toBe(true);
     expect(sheet.updatedAt).toBeNull(); // a live snapshot is "now"
     expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 43.5 });
+    // A live read discards the blob, so the query must not fetch it.
+    expect(characterProfessionsRow).toHaveBeenCalledWith(5, false);
   });
 
   it('falls back to the legacy pre-rename professions key (dual-key read)', async () => {
@@ -3099,7 +3102,7 @@ describe('R35 GM restores (restore-item / restore-slot)', () => {
     const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
     authedAdminDb({ recordProfessionsRestore });
     const rt = installAdminRuntime({
-      adminCharacterState: vi.fn(() => ({})),
+      adminCharacterOnline: vi.fn(() => true),
       adminRestoreItem: vi.fn(() => 'ok'),
     });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
@@ -3127,7 +3130,7 @@ describe('R35 GM restores (restore-item / restore-slot)', () => {
     const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
     authedAdminDb({ recordProfessionsRestore });
     const rt = installAdminRuntime({
-      adminCharacterState: vi.fn(() => null),
+      adminCharacterOnline: vi.fn(() => false),
       adminRestoreItem: vi.fn(() => 'ok'),
     });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
@@ -3143,13 +3146,14 @@ describe('R35 GM restores (restore-item / restore-slot)', () => {
     });
     expect(recordProfessionsRestore).not.toHaveBeenCalled();
     expect(rt.adminRestoreItem).not.toHaveBeenCalled();
+    expect(rt.adminCharacterOnline).toHaveBeenCalledWith(5);
   });
 
   it('restore-item refuses an unknown item and an out-of-range count pre-audit', async () => {
     const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
     authedAdminDb({ recordProfessionsRestore });
     installAdminRuntime({
-      adminCharacterState: vi.fn(() => ({})),
+      adminCharacterOnline: vi.fn(() => true),
       adminRestoreItem: vi.fn(() => 'ok'),
     });
     const bad = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
@@ -3180,7 +3184,7 @@ describe('R35 GM restores (restore-item / restore-slot)', () => {
       }),
     });
     const rt = installAdminRuntime({
-      adminCharacterState: vi.fn(() => ({})),
+      adminCharacterOnline: vi.fn(() => true),
       adminRestoreItem: vi.fn(() => 'ok'),
     });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
@@ -3201,7 +3205,7 @@ describe('R35 GM restores (restore-item / restore-slot)', () => {
     const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
     authedAdminDb({ recordProfessionsRestore });
     const rt = installAdminRuntime({
-      adminCharacterState: vi.fn(() => ({})),
+      adminCharacterOnline: vi.fn(() => true),
       adminRestoreToolEffectSlot: vi.fn(() => 'ok'),
     });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
@@ -3224,7 +3228,7 @@ describe('R35 GM restores (restore-item / restore-slot)', () => {
   it('restore-slot maps the sim refusals to their own error prose', async () => {
     authedAdminDb({ recordProfessionsRestore: vi.fn(async () => ({ accountId: 9 })) });
     const rt = installAdminRuntime({
-      adminCharacterState: vi.fn(() => ({})),
+      adminCharacterOnline: vi.fn(() => true),
       adminRestoreToolEffectSlot: vi.fn(() => 'no_tool'),
     });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
@@ -3245,7 +3249,7 @@ describe('R35 GM restores (restore-item / restore-slot)', () => {
     const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
     authedAdminDb({ recordProfessionsRestore });
     installAdminRuntime({
-      adminCharacterState: vi.fn(() => ({})),
+      adminCharacterOnline: vi.fn(() => true),
       adminRestoreToolEffectSlot: vi.fn(() => 'ok'),
     });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
@@ -3267,7 +3271,7 @@ describe('R35 GM restores: refusal prose arms', () => {
   it('restore-slot maps already_slotted and invalid_request to their own prose', async () => {
     authedAdminDb({ recordProfessionsRestore: vi.fn(async () => ({ accountId: 9 })) });
     const rt = installAdminRuntime({
-      adminCharacterState: vi.fn(() => ({})),
+      adminCharacterOnline: vi.fn(() => true),
       adminRestoreToolEffectSlot: vi.fn(() => 'already_slotted'),
     });
     const slotted = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
@@ -3299,7 +3303,7 @@ describe('R35 GM restores: refusal prose arms', () => {
     const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
     authedAdminDb({ recordProfessionsRestore });
     installAdminRuntime({
-      adminCharacterState: vi.fn(() => ({})), // online at the pre-check...
+      adminCharacterOnline: vi.fn(() => true), // online at the pre-check...
       adminRestoreItem: vi.fn(() => 'offline'), // ...gone by the mint
       adminRestoreToolEffectSlot: vi.fn(() => 'offline'),
     });
@@ -3327,7 +3331,7 @@ describe('R35 GM restores: refusal prose arms', () => {
     const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
     authedAdminDb({ recordProfessionsRestore });
     installAdminRuntime({
-      adminCharacterState: vi.fn(() => ({})),
+      adminCharacterOnline: vi.fn(() => true),
       adminRestoreToolEffectSlot: vi.fn(() => 'ok'),
     });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {

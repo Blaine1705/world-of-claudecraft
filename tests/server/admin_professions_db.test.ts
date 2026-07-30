@@ -98,7 +98,9 @@ describe('characterProfessionsRow', () => {
     expect(sql).toContain('FROM characters c');
     expect(sql).toContain('JOIN accounts a ON a.id = c.account_id');
     expect(sql).toContain('WHERE c.id = $1');
-    expect(params).toEqual([42]);
+    // The blob column is conditional: a live caller skips the detoast.
+    expect(sql).toContain('CASE WHEN $2::boolean THEN c.state ELSE NULL END');
+    expect(params).toEqual([42, true]);
     expect(row).toEqual({
       id: 42,
       name: 'Merlin',
@@ -113,5 +115,11 @@ describe('characterProfessionsRow', () => {
 
   it('returns null for an unknown character', async () => {
     expect(await characterProfessionsRow(404404)).toBeNull();
+  });
+
+  it('skips fetching the blob when the caller holds a live snapshot', async () => {
+    query.mockImplementationOnce(async () => ({ rows: [] }));
+    await characterProfessionsRow(42, false);
+    expect(query.mock.calls[0][1]).toEqual([42, false]);
   });
 });

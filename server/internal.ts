@@ -9,6 +9,7 @@ import { drainActivity } from './discord_activity';
 import {
   accountForDiscord,
   discordForAccount,
+  discordForAccounts,
   discordIdsWithGuildFlair,
   grantRewardPoints,
   loadRewardState,
@@ -175,18 +176,21 @@ async function handleDiscordInternal(
   // celebrates players who linked Discord).
   if (req.method === 'GET' && url.pathname === '/internal/discord/activity') {
     const items = drainActivity();
+    // ONE batched links read per drain (the RouteDef twin's exact shape).
+    const links = await discordForAccounts(
+      pool,
+      items.flatMap((it) => it.accountIds),
+    );
     const out: unknown[] = [];
     for (const it of items) {
-      const participants = await Promise.all(
-        it.accountIds.map(async (accountId, i) => {
-          const link = await discordForAccount(pool, accountId);
-          return {
-            name: it.names[i] ?? '',
-            discordUserId: link?.discord_user_id ?? null,
-            discordAvatar: link?.discord_avatar ?? null,
-          };
-        }),
-      );
+      const participants = it.accountIds.map((accountId, i) => {
+        const link = links.get(accountId);
+        return {
+          name: it.names[i] ?? '',
+          discordUserId: link?.discord_user_id ?? null,
+          discordAvatar: link?.discord_avatar ?? null,
+        };
+      });
       if (!participants.some((p) => p.discordUserId)) continue; // nobody linked
       const { accountIds: _a, names: _n, ...rest } = it;
       out.push({ ...rest, participants });
@@ -467,18 +471,22 @@ export const routes: RouteDef[] = [
     middleware: [discordGate],
     handler: async (ctx) => {
       const items = drainActivity();
+      // ONE batched links read per drain (most players are unlinked, so the
+      // old per-participant lookup mostly fetched nulls sequentially).
+      const links = await discordForAccounts(
+        pool,
+        items.flatMap((it) => it.accountIds),
+      );
       const out: unknown[] = [];
       for (const it of items) {
-        const participants = await Promise.all(
-          it.accountIds.map(async (accountId, i) => {
-            const link = await discordForAccount(pool, accountId);
-            return {
-              name: it.names[i] ?? '',
-              discordUserId: link?.discord_user_id ?? null,
-              discordAvatar: link?.discord_avatar ?? null,
-            };
-          }),
-        );
+        const participants = it.accountIds.map((accountId, i) => {
+          const link = links.get(accountId);
+          return {
+            name: it.names[i] ?? '',
+            discordUserId: link?.discord_user_id ?? null,
+            discordAvatar: link?.discord_avatar ?? null,
+          };
+        });
         if (!participants.some((p) => p.discordUserId)) continue; // nobody linked
         const { accountIds: _a, names: _n, ...rest } = it;
         out.push({ ...rest, participants });

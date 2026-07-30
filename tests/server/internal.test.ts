@@ -35,6 +35,7 @@ vi.mock('../../server/db', () => ({ pool: { __fake: 'internal-pool' } }));
 vi.mock('../../server/discord_db', () => ({
   accountForDiscord: vi.fn(),
   discordForAccount: vi.fn(),
+  discordForAccounts: vi.fn(async () => new Map()),
   discordIdsWithGuildFlair: vi.fn(),
   grantRewardPoints: vi.fn(),
   loadRewardState: vi.fn(),
@@ -69,6 +70,7 @@ import type { DiscordLinkRow } from '../../server/discord_db';
 import {
   accountForDiscord,
   discordForAccount,
+  discordForAccounts,
   discordIdsWithGuildFlair,
   grantRewardPoints,
   loadRewardState,
@@ -609,9 +611,12 @@ describe('discord/activity', () => {
   it('drops items with no linked participant and strips accountIds/names', async () => {
     process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
     vi.mocked(drainActivity).mockReturnValue([activityItem(1, 'Alice'), activityItem(2, 'Bob')]);
-    vi.mocked(discordForAccount).mockImplementation(async (_pool, accountId) =>
-      accountId === 1 ? linkRow(1) : null,
-    );
+    // The drain now batches ONE links read per poll (the N+1 fix).
+    vi.mocked(discordForAccounts).mockImplementation(async (_pool, accountIds) => {
+      const links = new Map();
+      if ((accountIds as number[]).includes(1)) links.set(1, linkRow(1));
+      return links;
+    });
 
     const r = await runRoute('GET', '/internal/discord/activity', { headers: DISCORD_HEADERS });
 

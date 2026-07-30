@@ -1021,13 +1021,19 @@ export interface AdminCharacterProfessionsRow {
 
 export async function characterProfessionsRow(
   characterId: number,
+  includeState = true,
 ): Promise<AdminCharacterProfessionsRow | null> {
+  // includeState false when the caller holds a LIVE serializeCharacter
+  // snapshot: the stored blob would be discarded, and `state` is the widest
+  // column in the schema (a TOASTed detoast for nothing on the shared box).
   const res = await pool.query(
-    `SELECT c.id, c.name, c.class, c.level, c.account_id, a.username, c.state, c.updated_at
+    `SELECT c.id, c.name, c.class, c.level, c.account_id, a.username,
+            CASE WHEN $2::boolean THEN c.state ELSE NULL END AS state,
+            c.updated_at
      FROM characters c
      JOIN accounts a ON a.id = c.account_id
      WHERE c.id = $1`,
-    [characterId],
+    [characterId, includeState],
   );
   const r = res.rows[0];
   if (!r) return null;

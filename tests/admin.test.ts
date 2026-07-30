@@ -235,6 +235,7 @@ const fakeGameState = {
   reloadBlockedIps: vi.fn(async () => {}),
   disconnectByIp: vi.fn(),
   adminCharacterState: vi.fn((): Record<string, unknown> | null => ({})),
+  adminCharacterOnline: vi.fn(() => true),
   adminRestoreItem: vi.fn(() => 'ok' as const),
   adminRestoreToolEffectSlot: vi.fn(() => 'ok' as const),
 };
@@ -2342,7 +2343,7 @@ describe('admin api R35 professions tooling (LEGACY dispatch arm)', () => {
 
   it('restore-item audits FIRST then mints, mirroring the RouteDef arm', async () => {
     vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
-    vi.mocked(fakeGame.adminCharacterState).mockReturnValue({});
+    vi.mocked(fakeGame.adminCharacterOnline).mockReturnValue(true);
     vi.mocked(fakeGame.adminRestoreItem).mockReturnValue('ok');
     const res = fakeRes();
     await handleAdminApi(
@@ -2372,7 +2373,7 @@ describe('admin api R35 professions tooling (LEGACY dispatch arm)', () => {
 
   it('restore-slot refuses an offline character BEFORE any audit write', async () => {
     vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
-    vi.mocked(fakeGame.adminCharacterState).mockReturnValue(null);
+    vi.mocked(fakeGame.adminCharacterOnline).mockReturnValue(false);
     const res = fakeRes();
     await handleAdminApi(
       fakeReq({

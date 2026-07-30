@@ -71,6 +71,13 @@ async function flushAsync(): Promise<void> {
   await new Promise((resolve) => setImmediate(resolve));
 }
 
+/** The opt-out (accounts.deed_broadcasts) reads issued so far. */
+function optOutReads(): number {
+  return (db.pool.query as ReturnType<typeof vi.fn>).mock.calls.filter(
+    ([sql]) => typeof sql === 'string' && sql.includes('deed_broadcasts'),
+  ).length;
+}
+
 describe('discordFeedDeed: the feed-worthiness gate', () => {
   it('maps a title deed to its name and title text', () => {
     expect(discordFeedDeed('chr_vale_chapter_iii')).toEqual({
@@ -152,10 +159,15 @@ describe('detectActivity: professions arms (GameServer)', () => {
       crafter: session.pid,
       pid: session.pid,
     });
+    (db.pool.query as ReturnType<typeof vi.fn>).mockClear();
     (server as any).detectActivity([ev('eastbrook_arming_sword')]);
     (server as any).detectActivity([ev('eastbrook_chain_vest')]);
     await flushAsync();
     expect(drainActivity()).toHaveLength(1);
+    // The dedupe key is claimed BEFORE the opt-out read: the second proc in
+    // the burst must not fire a second accounts query for a card that the
+    // TTL already spent (the fix-round P1).
+    expect(optOutReads()).toBe(1);
   });
 
   it('a masterwork proc with no session (a bot crafter) enqueues nothing', async () => {
@@ -278,20 +290,29 @@ describe('detectActivity: professions arms (GameServer)', () => {
 
   it('a RETRO unlock never reaches the feed', async () => {
     const session = joinServer(server, fakeWs(), 105, 'Veteran');
+    (db.pool.query as ReturnType<typeof vi.fn>).mockClear();
     (server as any).detectActivity([
       { type: 'deedUnlocked', deedId: 'chr_vale_chapter_iii', retro: true, pid: session.pid },
     ]);
     await flushAsync();
     expect(drainActivity()).toHaveLength(0);
+    // The retro gate must sit BEFORE the opt-out read: a veteran's first
+    // login replays dozens of marquee deeds, and a leaked per-deed query is
+    // a login-storm amplifier even with every card suppressed.
+    expect(optOutReads()).toBe(0);
   });
 
   it('a non-feed-worthy unlock never reaches the feed', async () => {
     const session = joinServer(server, fakeWs(), 106, 'Collector');
+    (db.pool.query as ReturnType<typeof vi.fn>).mockClear();
     (server as any).detectActivity([
       { type: 'deedUnlocked', deedId: 'col_junk_drawer', pid: session.pid },
     ]);
     await flushAsync();
     expect(drainActivity()).toHaveLength(0);
+    // Neither marquee nor feed-worthy: the early return must keep the
+    // per-unlock accounts query at zero, not merely suppress the card.
+    expect(optOutReads()).toBe(0);
   });
 
   it('the deed-broadcasts opt-out suppresses the feed card', async () => {

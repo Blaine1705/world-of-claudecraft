@@ -53,21 +53,33 @@ const DEDUPE_TTL_MS = 30_000;
 const recentKeys = new Map<string, number>();
 
 /**
+ * Atomically claim a dedupe key: true means claimed (proceed), false means the
+ * key was seen within the TTL. Exists so a caller can gate EXPENSIVE work (the
+ * masterwork arm's per-proc opt-out db read) behind the dedupe rather than
+ * only the enqueue: a check-then-read would let a same-tick burst pass the
+ * check together with every read still in flight, so the claim must test and
+ * set in one synchronous step. A caller that claimed passes a NULL key to
+ * enqueueActivity (the key is already spent).
+ */
+export function claimDedupeKey(key: string, now: number): boolean {
+  const last = recentKeys.get(key);
+  if (last !== undefined && now - last < DEDUPE_TTL_MS) return false;
+  recentKeys.set(key, now);
+  if (recentKeys.size > 512) {
+    for (const [k, t] of recentKeys) {
+      if (now - t >= DEDUPE_TTL_MS) recentKeys.delete(k);
+    }
+  }
+  return true;
+}
+
+/**
  * Enqueue an activity for the bot to post. When dedupeKey is given and was seen
  * within the TTL, the item is dropped (so one moment yields one card). `now` is
  * injected so callers pass the server clock (and tests stay deterministic).
  */
 export function enqueueActivity(item: QueuedActivity, dedupeKey: string | null, now: number): void {
-  if (dedupeKey) {
-    const last = recentKeys.get(dedupeKey);
-    if (last !== undefined && now - last < DEDUPE_TTL_MS) return;
-    recentKeys.set(dedupeKey, now);
-    if (recentKeys.size > 512) {
-      for (const [k, t] of recentKeys) {
-        if (now - t >= DEDUPE_TTL_MS) recentKeys.delete(k);
-      }
-    }
-  }
+  if (dedupeKey && !claimDedupeKey(dedupeKey, now)) return;
   QUEUE.push(item);
   if (QUEUE.length > MAX_QUEUE) QUEUE.splice(0, QUEUE.length - MAX_QUEUE);
 }
