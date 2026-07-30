@@ -34,10 +34,12 @@ class FakeSocket {
 
   terminate(): void {
     this.terminated += 1;
+    this.readyState = 3; // CLOSED, as the real ws client does
   }
 
   close(): void {
     this.closed += 1;
+    this.readyState = 3;
   }
 
   // Gateway.reconnect() calls this FIRST; without it the real call throws into
@@ -257,23 +259,41 @@ describe('Gateway heartbeat', () => {
     expect(lastSent(socket)).toEqual({ op: 1, d: 7 });
   });
 
-  it('terminates a zombie socket when a beat goes unacked, and resumes after an ACK', () => {
+  it('terminates a zombie socket when a beat goes unacked', () => {
     const { socket, timers } = rig();
     frame(socket, { op: 10, d: { heartbeat_interval: 30_000 } });
     const beat = timers.intervals[0].fn;
+    const beats = () => socket.sent.filter((f) => JSON.parse(f).op === 1).length;
 
     beat(); // acked starts true: this one sends
     expect(socket.terminated).toBe(0);
+    expect(beats()).toBe(1);
+
     beat(); // no ACK arrived: the connection is a zombie
     expect(socket.terminated).toBe(1);
-    // A terminate must not also send: that is the whole point of the early return.
-    expect(socket.sent.filter((s) => JSON.parse(s).op === 1).length).toBe(1);
+    // A terminate must NOT also send: that is the whole point of the early
+    // return. (The fake goes to readyState CLOSED on terminate, as ws does, so
+    // this also proves the guard rather than the fake's willingness to buffer.)
+    expect(beats()).toBe(1);
+  });
 
-    // op 11 is HEARTBEAT_ACK; once it lands the next beat sends again.
+  it('keeps beating while ACKs keep arriving', () => {
+    // The other half of the same flag, on a socket that stays alive: op 11 is
+    // HEARTBEAT_ACK, and each one has to re-arm the next beat. Without the
+    // reset every second beat would kill a perfectly healthy connection.
+    const { socket, timers } = rig();
+    frame(socket, { op: 10, d: { heartbeat_interval: 30_000 } });
+    const beat = timers.intervals[0].fn;
+    const beats = () => socket.sent.filter((f) => JSON.parse(f).op === 1).length;
+
+    beat();
     frame(socket, { op: 11 });
     beat();
-    expect(socket.terminated).toBe(1);
-    expect(socket.sent.filter((s) => JSON.parse(s).op === 1).length).toBe(2);
+    frame(socket, { op: 11 });
+    beat();
+
+    expect(beats()).toBe(3);
+    expect(socket.terminated).toBe(0);
   });
 
   it('answers a server-requested heartbeat (op 1) immediately', () => {
@@ -284,6 +304,24 @@ describe('Gateway heartbeat', () => {
     frame(socket, { op: 1 });
 
     expect(lastSent(socket)).toEqual({ op: 1, d: 3 });
+  });
+
+  it('does not stack a second interval when a reconnect never saw a close', () => {
+    // op 7 and INVALID_SESSION reconnect WITHOUT a close event, so onClose's
+    // stopHeartbeat never runs and the leading stopHeartbeat() inside
+    // startHeartbeat is the only thing left. Drop it and every reconnect leaves
+    // another live interval beating against a dead socket forever, which is the
+    // request-amplification shape this whole packet exists to stop.
+    const { socket, timers, sockets } = rig();
+    frame(socket, { op: 10, d: { heartbeat_interval: 30_000 } });
+    expect(timers.intervals.length).toBe(1);
+
+    frame(socket, { op: 7 }); // RECONNECT: no close, straight to a new socket
+    frame(sockets[1], { op: 10, d: { heartbeat_interval: 30_000 } });
+
+    // Two armed in total, but the FIRST was cleared before the second started.
+    expect(timers.intervals.length).toBe(2);
+    expect(timers.cleared).toEqual([1]);
   });
 
   it('stops the heartbeat on close, so a reconnect does not stack a second one', () => {

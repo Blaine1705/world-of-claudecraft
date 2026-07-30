@@ -148,114 +148,127 @@ describe('ServerClient request envelope', () => {
   });
 });
 
+const ROUTE_ROWS: {
+  name: string;
+  methodName: string;
+  drive: (c: ServerClient) => Promise<unknown>;
+  method: string;
+  path: string;
+  body: string | undefined;
+  data: unknown;
+}[] = [
+  {
+    name: 'flex',
+    methodName: 'flex',
+    drive: (c) => c.flex('u 1'),
+    method: 'GET',
+    path: '/internal/discord/flex?discord_user_id=u%201',
+    body: undefined,
+    data: { linked: true },
+  },
+  {
+    name: 'roles',
+    methodName: 'roles',
+    drive: (c) => c.roles('u 1'),
+    method: 'GET',
+    path: '/internal/discord/roles?discord_user_id=u%201',
+    body: undefined,
+    data: {},
+  },
+  {
+    name: 'pushPresence',
+    methodName: 'pushPresence',
+    drive: (c) =>
+      c.pushPresence({ onlineCount: 3, memberTotal: 9, voiceChannelName: null, voice: [] }),
+    method: 'POST',
+    path: '/internal/discord/presence',
+    body: '{"onlineCount":3,"memberTotal":9,"voiceChannelName":null,"voice":[]}',
+    data: {},
+  },
+  {
+    name: 'setMember',
+    methodName: 'setMember',
+    drive: (c) => c.setMember('u1', true),
+    method: 'POST',
+    path: '/internal/discord/member',
+    body: '{"discord_user_id":"u1","guildMember":true}',
+    data: {},
+  },
+  {
+    name: 'grant',
+    methodName: 'grant',
+    drive: (c) => c.grant('u1', 'daily', 5, 'k1'),
+    method: 'POST',
+    // The points-granting call: a path swap here silently stops every reward.
+    path: '/internal/discord/grant',
+    body: '{"discord_user_id":"u1","reason":"daily","points":5,"dedupeKey":"k1"}',
+    data: {},
+  },
+  {
+    name: 'markDailyRewardWinners',
+    methodName: 'markDailyRewardWinners',
+    drive: (c) => c.markDailyRewardWinners('2026-07-30'),
+    method: 'POST',
+    path: '/internal/discord/daily-rewards-winners/mark',
+    body: '{"day":"2026-07-30"}',
+    data: {},
+  },
+  {
+    name: 'drainRelay',
+    methodName: 'drainRelay',
+    drive: (c) => c.drainRelay(),
+    method: 'GET',
+    path: '/internal/discord/relay',
+    body: undefined,
+    data: { items: [] },
+  },
+  {
+    name: 'drainActivity',
+    methodName: 'drainActivity',
+    drive: (c) => c.drainActivity(),
+    method: 'GET',
+    path: '/internal/discord/activity',
+    body: undefined,
+    data: { items: [] },
+  },
+  {
+    name: 'dailyRewardWinners',
+    methodName: 'dailyRewardWinners',
+    drive: (c) => c.dailyRewardWinners(),
+    method: 'GET',
+    // limit=2 decides how many days of winners can still be announced after a
+    // missed run; shrinking it silently drops a day.
+    path: '/internal/discord/daily-rewards-winners?limit=2',
+    body: undefined,
+    data: { days: [] },
+  },
+  {
+    name: 'pushMembersMeta',
+    methodName: 'pushMembersMeta',
+    drive: (c) =>
+      c.pushMembersMeta([{ discord_user_id: 'u1', name: 'A', joinedAtMs: 1, role: null }]),
+    method: 'POST',
+    path: '/internal/discord/members-meta',
+    body: '{"members":[{"discord_user_id":"u1","name":"A","joinedAtMs":1,"role":null}]}',
+    data: { updated: 1 },
+  },
+  {
+    name: 'flairedIds',
+    methodName: 'flairedIds',
+    drive: (c) => c.flairedIds(),
+    method: 'GET',
+    path: '/internal/discord/flaired-ids',
+    body: undefined,
+    data: { ids: [] },
+  },
+];
+
 describe('ServerClient per-endpoint routes', () => {
   // Each row is the ONE wire contract only that method can get wrong. A typo in
   // any path 404s, call() returns null, and the drain methods answer with an
   // empty array, so the feed stops with no error surface at all.
-  const ROWS: {
-    name: string;
-    drive: (c: ServerClient) => Promise<unknown>;
-    method: string;
-    path: string;
-    body: string | undefined;
-    data: unknown;
-  }[] = [
-    {
-      name: 'flex',
-      drive: (c) => c.flex('u 1'),
-      method: 'GET',
-      path: '/internal/discord/flex?discord_user_id=u%201',
-      body: undefined,
-      data: { linked: true },
-    },
-    {
-      name: 'roles',
-      drive: (c) => c.roles('u 1'),
-      method: 'GET',
-      path: '/internal/discord/roles?discord_user_id=u%201',
-      body: undefined,
-      data: {},
-    },
-    {
-      name: 'pushPresence',
-      drive: (c) =>
-        c.pushPresence({ onlineCount: 3, memberTotal: 9, voiceChannelName: null, voice: [] }),
-      method: 'POST',
-      path: '/internal/discord/presence',
-      body: '{"onlineCount":3,"memberTotal":9,"voiceChannelName":null,"voice":[]}',
-      data: {},
-    },
-    {
-      name: 'setMember',
-      drive: (c) => c.setMember('u1', true),
-      method: 'POST',
-      path: '/internal/discord/member',
-      body: '{"discord_user_id":"u1","guildMember":true}',
-      data: {},
-    },
-    {
-      name: 'grant',
-      drive: (c) => c.grant('u1', 'daily', 5, 'k1'),
-      method: 'POST',
-      // The points-granting call: a path swap here silently stops every reward.
-      path: '/internal/discord/grant',
-      body: '{"discord_user_id":"u1","reason":"daily","points":5,"dedupeKey":"k1"}',
-      data: {},
-    },
-    {
-      name: 'markDailyRewardWinners',
-      drive: (c) => c.markDailyRewardWinners('2026-07-30'),
-      method: 'POST',
-      path: '/internal/discord/daily-rewards-winners/mark',
-      body: '{"day":"2026-07-30"}',
-      data: {},
-    },
-    {
-      name: 'drainRelay',
-      drive: (c) => c.drainRelay(),
-      method: 'GET',
-      path: '/internal/discord/relay',
-      body: undefined,
-      data: { items: [] },
-    },
-    {
-      name: 'drainActivity',
-      drive: (c) => c.drainActivity(),
-      method: 'GET',
-      path: '/internal/discord/activity',
-      body: undefined,
-      data: { items: [] },
-    },
-    {
-      name: 'dailyRewardWinners',
-      drive: (c) => c.dailyRewardWinners(),
-      method: 'GET',
-      // limit=2 decides how many days of winners can still be announced after a
-      // missed run; shrinking it silently drops a day.
-      path: '/internal/discord/daily-rewards-winners?limit=2',
-      body: undefined,
-      data: { days: [] },
-    },
-    {
-      name: 'pushMembersMeta',
-      drive: (c) =>
-        c.pushMembersMeta([{ discord_user_id: 'u1', name: 'A', joinedAtMs: 1, role: null }]),
-      method: 'POST',
-      path: '/internal/discord/members-meta',
-      body: '{"members":[{"discord_user_id":"u1","name":"A","joinedAtMs":1,"role":null}]}',
-      data: { updated: 1 },
-    },
-    {
-      name: 'flairedIds',
-      drive: (c) => c.flairedIds(),
-      method: 'GET',
-      path: '/internal/discord/flaired-ids',
-      body: undefined,
-      data: { ids: [] },
-    },
-  ];
 
-  for (const row of ROWS) {
+  for (const row of ROUTE_ROWS) {
     it(`${row.name} sends ${row.method} ${row.path}`, async () => {
       const { calls, client } = clientReturning(row.data);
 
@@ -325,6 +338,38 @@ describe('ServerClient envelope handling', () => {
 
     expect(await client.roles('u1')).toBe(null);
     expect(timers.cleared).toEqual([1]); // the finally runs on the throwing path too
+  });
+});
+
+describe('ServerClient response unwrapping', () => {
+  it('returns the payload each accessor is named for, not the envelope', async () => {
+    // The route table above asserts what goes OUT; this asserts what comes back.
+    // Each of these reaches into a differently-named field of `data`, so a
+    // copy-paste slip (activity reading `days`, winners reading `items`) yields
+    // undefined, and the `?? []` fallback then hides it as an empty feed.
+    expect(await clientReturning({ linked: true, level: 12 }).client.flex('u1')).toEqual({
+      linked: true,
+      level: 12,
+    });
+    expect(await clientReturning({ items: [{ id: 'a' }] }).client.drainActivity()).toEqual([
+      { id: 'a' },
+    ]);
+    expect(
+      await clientReturning({ days: [{ day: '2026-07-30' }] }).client.dailyRewardWinners(),
+    ).toEqual([{ day: '2026-07-30' }]);
+    expect(await clientReturning({ ids: ['a'] }).client.flairedIds()).toEqual(['a']);
+  });
+
+  it('covers every public method of the class in the route table', () => {
+    // Ties the table to the SURFACE: a method added to ServerClient without a
+    // row here would otherwise ship with no path assertion at all, which is the
+    // state seven of the twelve were in before this suite grew.
+    const publicMethods = Object.getOwnPropertyNames(ServerClient.prototype)
+      // `call` is the private shared helper; TS `private` is erased at runtime.
+      .filter((n) => n !== 'constructor' && n !== 'call')
+      .sort();
+    const covered = [...new Set(ROUTE_ROWS.map((r) => r.methodName))].sort();
+    expect(covered).toEqual(publicMethods);
   });
 });
 
