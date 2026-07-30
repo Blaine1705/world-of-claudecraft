@@ -286,6 +286,8 @@ const RENDER_PURE_CORES = [
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
+  'src/render/foliage_shadow_core.ts',
+  'src/render/foliage_shader_core.ts',
   'src/render/gfx_override_core.ts',
   'src/render/ground_aim_reticle_core.ts',
   'src/render/stations_core.ts',

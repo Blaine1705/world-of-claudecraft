@@ -51,6 +51,12 @@ import {
   treeDetailDistance,
 } from './foliage_lod';
 import {
+  patchConstantUpNormalVertexShader,
+  patchGrassFragmentShader,
+  reuseDiffuseMapSampleForEmissive,
+} from './foliage_shader_core';
+import { suppressShadowOnlyMainDraw } from './foliage_shadow_core';
+import {
   gardenLushGrassAt,
   gardenMeadowTintAt,
   inParterrePlot,
@@ -638,6 +644,22 @@ function addWind(mat: THREE.Material, strength: number, upNormalBlend = 0): void
   };
 }
 
+// Leaf materials deliberately use their albedo map as a faint ambient floor.
+// Both slots point at the same texture object, UV channel, and transform, so
+// the fragment shader can reuse the map sample with no arithmetic or sampling
+// difference. This hook runs last so canopy emissive shading stays after it.
+function reuseLeafMapSampleForEmissive(mat: THREE.Material): void {
+  const prev = mat.onBeforeCompile;
+  const prevSrc = typeof prev === 'function' ? prev.toString() : '';
+  const prevKey =
+    typeof mat.customProgramCacheKey === 'function' ? mat.customProgramCacheKey.bind(mat) : null;
+  mat.onBeforeCompile = (shader, renderer) => {
+    prev?.call(mat, shader, renderer);
+    shader.fragmentShader = reuseDiffuseMapSampleForEmissive(shader.fragmentShader);
+  };
+  mat.customProgramCacheKey = () => `foliage-shared-map-emissive|${prevKey ? prevKey() : prevSrc}`;
+}
+
 // ---------------------------------------------------------------------------
 // glTF extraction
 // ---------------------------------------------------------------------------
@@ -726,6 +748,7 @@ function foliageMaterial(
   // Leaf names return null above: canopies take their own clump-detail layer
   // (needle/leaf break-up) instead; unknown names no-op inside.
   applyCanopyDetail(mat, src.name);
+  if (pol.leaf && std.map) reuseLeafMapSampleForEmissive(mat);
   materialCache.set(key, mat);
   return mat;
 }
@@ -1191,6 +1214,7 @@ function placeSpecies(
           const shadow = cloneInstancedTo(im, part.geometry, makeShadowOnlyMaterial(part.material));
           shadow.castShadow = true;
           shadow.receiveShadow = false;
+          suppressShadowOnlyMainDraw(shadow);
           parent.add(shadow);
           // The shadow pass does NOT follow the fog-EXTENDED detail distance: a
           // tree's shadow past the old radius contributes nothing the eye can
@@ -1850,10 +1874,28 @@ interface GrassChunk {
 // and flowers. Every merged part carries the attribute so mergeGeometries
 // keeps a uniform layout across parts.
 function tagCapVertices(g: THREE.BufferGeometry, cap: 0 | 1): THREE.BufferGeometry {
-  const arr = new Float32Array(g.getAttribute('position').count);
+  const arr = new Uint8Array(g.getAttribute('position').count);
   if (cap) arr.fill(1);
-  g.setAttribute('aCap', new THREE.BufferAttribute(arr, 1));
+  g.setAttribute('aCap', new THREE.Uint8BufferAttribute(arr, 1));
   return g;
+}
+
+// Streamed chunks are immutable after construction. Trim their instance
+// attributes before the first render so WebGL allocates and uploads only the
+// live byte-identical prefix rather than each biome's conservative capacity.
+function trimStaticInstanceAttributes(mesh: THREE.InstancedMesh, count: number): void {
+  const matrix = mesh.instanceMatrix;
+  mesh.instanceMatrix = new THREE.InstancedBufferAttribute(
+    (matrix.array as Float32Array).slice(0, count * 16),
+    16,
+  ).setUsage(matrix.usage);
+  if (mesh.instanceColor) {
+    const color = mesh.instanceColor;
+    mesh.instanceColor = new THREE.InstancedBufferAttribute(
+      (color.array as Float32Array).slice(0, count * color.itemSize),
+      color.itemSize,
+    ).setUsage(color.usage);
+  }
 }
 
 // wind sway + masked edge fade for the grass tufts; the fade keys off the
@@ -1861,6 +1903,7 @@ function tagCapVertices(g: THREE.BufferGeometry, cap: 0 | 1): THREE.BufferGeomet
 function applyGrassShader(
   mat: THREE.Material,
   uniforms: { uPlayerPos: { value: THREE.Vector2 }; uFadeFar: { value: number } },
+  hasCap: boolean,
 ): void {
   // On tiers where the solid blade carpet runs (the exact buildBladeGrass
   // condition in blade_grass.ts), the carpet owns the near-field ground
@@ -1869,17 +1912,17 @@ function applyGrassShader(
   // to the tuft root near the player and grow them back where the carpet
   // fades out (its fade band runs 27.2 to 34). Tiers without the carpet
   // keep the cap everywhere: there it is still the only top-down read.
-  const capNearCollapse = GFX.standardMaterials && !GFX.leanFoliage;
+  const baseProgramKey = mat.customProgramCacheKey();
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = sharedUniforms.uTime;
     sh.uniforms.uPlayerPos = uniforms.uPlayerPos;
     sh.uniforms.uFadeFar = uniforms.uFadeFar;
-    const capDecl = capNearCollapse
+    const capDecl = hasCap
       ? `
         attribute float aCap;
         uniform vec2 uPlayerPos;`
       : '';
-    const capCollapse = capNearCollapse
+    const capCollapse = hasCap
       ? `
         float capKeep = smoothstep(22.0, 30.0, distance(tuftBase, uPlayerPos));
         transformed *= mix(1.0, capKeep, aCap);`
@@ -1901,14 +1944,6 @@ function applyGrassShader(
         varying vec2 vTuftWorld;${capDecl}`,
       )
       .replace(
-        '#include <beginnormal_vertex>',
-        `#include <beginnormal_vertex>
-        // Light the cards like the ground plane they grow from: a vertical
-        // double-sided card otherwise shades half its faces away from the sun
-        // and the whole tuft reads near-black at distance.
-        objectNormal = vec3(0.0, 1.0, 0.0);`,
-      )
-      .replace(
         '#include <begin_vertex>',
         `#include <begin_vertex>
         #ifdef USE_INSTANCING
@@ -1919,34 +1954,12 @@ function applyGrassShader(
         ${wind}
         vTuftWorld = tuftBase;`,
       );
-    sh.fragmentShader = sh.fragmentShader
-      .replace(
-        '#include <common>',
-        `#include <common>
-        varying vec2 vTuftWorld;
-        uniform vec2 uPlayerPos;
-        uniform float uFadeFar;`,
-      )
-      .replace(
-        '#include <normal_fragment_begin>',
-        `#include <normal_fragment_begin>
-        #ifdef DOUBLE_SIDED
-          // The vertex stage forces up normals so cards shade like the
-          // meadow, but the double-sided chunk flips backfaces to a DOWN
-          // normal: every tuft viewed from its reverse side went black.
-          // faceDirection squared undoes the flip; up stays up on both faces.
-          normal *= faceDirection;
-        #endif`,
-      )
-      .replace(
-        '#include <map_fragment>',
-        `#include <map_fragment>
-        diffuseColor.a *= 1.0 - smoothstep(uFadeFar * 0.7, uFadeFar, distance(vTuftWorld, uPlayerPos));
-        // near fade: a camera brushing the grass otherwise fills the
-        // frame with a single giant card
-        diffuseColor.a *= smoothstep(0.45, 1.35, length(vViewPosition));`,
-      );
+    // Every card used the exact up value here already. Keeping it as a shader
+    // constant lets the static geometry omit 12 bytes of normal input per vertex.
+    sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
+    sh.fragmentShader = patchGrassFragmentShader(sh.fragmentShader);
   };
+  mat.customProgramCacheKey = () => `grass-card|cap:${hasCap ? 'yes' : 'no'}|${baseProgramKey}`;
 }
 
 function loopbackHostname(hostname: string): boolean {
@@ -2021,6 +2034,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   // high tier reads as a lush meadow: wider tufts with more blades; low keeps
   // the legacy sprite size
   const lush = !GFX.leanFoliage;
+  const capNearCollapse = GFX.standardMaterials && !GFX.leanFoliage;
   const lowPlusGrassScale = GFX.lowPlus ? 1.08 : 1;
   const quad = new THREE.PlaneGeometry(
     lush ? 1.45 : 1.1 * lowPlusGrassScale,
@@ -2045,10 +2059,13 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   const quadCap = lush
     ? new THREE.PlaneGeometry(1.05, 1.05).rotateX(-Math.PI / 2 + 0.18).translate(0, 0.34, 0)
     : null;
-  const parts = [tagCapVertices(quad, 0), tagCapVertices(quad2, 0)];
-  if (quad3) parts.push(tagCapVertices(quad3, 0));
-  if (quadCap) parts.push(tagCapVertices(quadCap, 1));
+  const capPart = (part: THREE.BufferGeometry, cap: 0 | 1): THREE.BufferGeometry =>
+    capNearCollapse ? tagCapVertices(part, cap) : part;
+  const parts = [capPart(quad, 0), capPart(quad2, 0)];
+  if (quad3) parts.push(capPart(quad3, 0));
+  if (quadCap) parts.push(capPart(quadCap, 1));
   const geo = mergeGeometries(parts);
+  geo.deleteAttribute('normal');
 
   const tuftTex = grassTuftTexture(lush ? 30 : 18);
   let quality = 1;
@@ -2071,7 +2088,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
           alphaTest: 0.35,
         }),
   );
-  applyGrassShader(mat, uniforms);
+  applyGrassShader(mat, uniforms, capNearCollapse);
 
   // ground-cover flowers: a sparse companion set in the same chunks, sharing
   // the sway/fade shader so they move and thin exactly like the grass.
@@ -2080,9 +2097,10 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   const fquad = new THREE.PlaneGeometry(0.95, 0.8);
   fquad.translate(0, 0.38, 0);
   const fquad2 = fquad.clone().rotateY(Math.PI / 2);
-  // flowers share the grass shader, so they carry the cap tag too (all 0:
-  // no flower card ever collapses)
-  const flowerGeo = mergeGeometries([tagCapVertices(fquad, 0), tagCapVertices(fquad2, 0)]);
+  // Flowers share the sway/fade shader but have no cap card, so they omit the
+  // cap attribute and per-vertex distance/smoothstep path entirely.
+  const flowerGeo = mergeGeometries([fquad, fquad2]);
+  flowerGeo.deleteAttribute('normal');
   const FLOWER_PALETTES: Partial<Record<BiomeId, FlowerKind[]>> = {
     // the Veiled Hollow: pinks, purples, whites
     dusk: [
@@ -2161,7 +2179,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
           ? new THREE.MeshStandardMaterial({ map: tex, alphaTest: 0.3, roughness: 0.85 })
           : new THREE.MeshLambertMaterial({ map: tex, alphaTest: 0.35 }),
       );
-      applyGrassShader(fmMat, uniforms);
+      applyGrassShader(fmMat, uniforms, false);
       flowerMatCache.set(key, fmMat);
     }
     return fmMat;
@@ -2478,6 +2496,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     }
     if (n > 0) {
       im.count = n;
+      trimStaticInstanceAttributes(im, n);
       im.instanceMatrix.needsUpdate = true;
       if (im.instanceColor) im.instanceColor.needsUpdate = true;
       im.computeBoundingSphere();
@@ -2487,6 +2506,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     }
     if (fn > 0) {
       fm.count = fn;
+      trimStaticInstanceAttributes(fm, fn);
       fm.instanceMatrix.needsUpdate = true;
       if (fm.instanceColor) fm.instanceColor.needsUpdate = true;
       fm.computeBoundingSphere();
@@ -2695,6 +2715,7 @@ function updateTreeHides(
       for (let j = 0; j < t.parts.length; j++) {
         const part = t.parts[j];
         part.mesh.setMatrixAt(part.index, part.hiddenMatrix);
+        part.mesh.instanceMatrix.addUpdateRange(part.index * 16, 16);
         part.mesh.instanceMatrix.needsUpdate = true;
         t.ghosts.push(ghosts.acquire(part.mesh, part.index, part.visibleMatrix));
       }
@@ -2705,6 +2726,7 @@ function updateTreeHides(
       for (let j = 0; j < t.parts.length; j++) {
         const part = t.parts[j];
         part.mesh.setMatrixAt(part.index, part.visibleMatrix);
+        part.mesh.instanceMatrix.addUpdateRange(part.index * 16, 16);
         part.mesh.instanceMatrix.needsUpdate = true;
       }
       for (let j = 0; j < t.ghosts.length; j++) ghosts.release(t.ghosts[j]);

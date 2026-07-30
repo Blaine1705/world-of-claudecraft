@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { SCREE_CELL, screeSinkY, screeSpotAt } from './cliff_scree_core';
+import { compactScreeMatrices, SCREE_CELL, screeSinkY, screeSpotAt } from './cliff_scree_core';
 import { GFX } from './gfx';
 import { applySurfaceDetail } from './worn_stone';
 
@@ -13,8 +13,8 @@ import { applySurfaceDetail } from './worn_stone';
 // and a cell only ever grows a rock where the local relief probes say
 // "cliff" (a height-delta band over short probes) or "cliff base" (a
 // moderate incline whose uphill neighbour is in the band: the scree apron).
-// Almost every slot stays a zero-scale empty, which is what lets the pool
-// stay this small.
+// Candidate slots stay in deterministic toroidal order, while only live rock
+// matrices are compacted into each variant's submitted instance prefix.
 //
 // The grid is toroidal: slot (i, j) always owns the world cell congruent to
 // (i, j) mod GRID_W nearest the player, so walking re-places only the ring
@@ -159,6 +159,7 @@ export function buildCliffScree(seed: number): CliffScreeView {
   }
 
   const meshes: THREE.InstancedMesh[] = [];
+  const variantMatrixArrays: Float32Array[] = [];
   const zero = new THREE.Matrix4().makeScale(0, 0, 0);
   let ready = false;
 
@@ -175,7 +176,9 @@ export function buildCliffScree(seed: number): CliffScreeView {
       im.receiveShadow = true;
       im.frustumCulled = false; // pool is centred on the player
       for (let s = 0; s < POOL; s++) im.setMatrixAt(s, zero);
+      im.count = 0;
       meshes.push(im);
+      variantMatrixArrays.push(im.instanceMatrix.array as Float32Array);
       group.add(im);
     }
     ready = true;
@@ -187,6 +190,9 @@ export function buildCliffScree(seed: number): CliffScreeView {
 
   // per-slot current cell (packed); 0x7fffffff = never placed
   const slotCell = new Int32Array(POOL).fill(0x7fffffff);
+  const slotVariant = new Int8Array(POOL).fill(-1);
+  const slotMatrices = new Float32Array(POOL * 16);
+  const denseCounts = new Uint16Array(MODEL_URLS.length);
   const m = new THREE.Matrix4();
   const q = new THREE.Quaternion();
   const qYaw = new THREE.Quaternion();
@@ -203,8 +209,7 @@ export function buildCliffScree(seed: number): CliffScreeView {
   };
 
   function placeSlot(slot: number, ci: number, cj: number): void {
-    // clear every variant's slot first; at most one gets a rock back below
-    for (const im of meshes) im.setMatrixAt(slot, zero);
+    slotVariant[slot] = -1;
     // Placement comes from the pure shared source; these tier-gated rocks are
     // visual dressing and do not alter the simulation heightfield.
     const spot = screeSpotAt(seed, ci, cj);
@@ -227,7 +232,22 @@ export function buildCliffScree(seed: number): CliffScreeView {
       q.copy(qYaw);
     }
     m.compose(v.set(spot.x, spot.baseY - s * screeSinkY(vi), spot.z), q, sv.set(s, s, s));
-    meshes[vi].setMatrixAt(slot, m);
+    slotVariant[slot] = vi;
+    const offset = slot * 16;
+    const elements = m.elements;
+    for (let component = 0; component < 16; component++) {
+      slotMatrices[offset + component] = elements[component];
+    }
+  }
+
+  function uploadLiveInstances(): void {
+    compactScreeMatrices(slotVariant, slotMatrices, variantMatrixArrays, denseCounts);
+    for (let variant = 0; variant < meshes.length; variant++) {
+      const im = meshes[variant];
+      im.count = denseCounts[variant];
+      if (im.count > 0) im.instanceMatrix.addUpdateRange(0, im.count * 16);
+      im.instanceMatrix.needsUpdate = true;
+    }
   }
 
   return {
@@ -258,7 +278,7 @@ export function buildCliffScree(seed: number): CliffScreeView {
         }
       }
       if (dirty) {
-        for (const im of meshes) im.instanceMatrix.needsUpdate = true;
+        uploadLiveInstances();
       }
     },
   };

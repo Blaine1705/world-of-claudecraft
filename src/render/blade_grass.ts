@@ -4,6 +4,7 @@ import { isInSowfieldShell } from '../sim/vale_cup_layout';
 import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { GRASS_BIOME_DENSITY } from './foliage';
 import { insideGrassHubExclusion } from './foliage_core';
+import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
 import { GFX, sharedUniforms } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
@@ -59,7 +60,6 @@ function mulberry32(seed: number): () => number {
 function clusterGeometry(rng: () => number): THREE.BufferGeometry {
   const positions: number[] = [];
   const colors: number[] = [];
-  const normals: number[] = [];
   const indices: number[] = [];
   const BLADES = 5;
   for (let b = 0; b < BLADES; b++) {
@@ -88,7 +88,6 @@ function clusterGeometry(rng: () => number): THREE.BufferGeometry {
       // all-up normals: blades take the terrain's lighting response, the
       // same trick the card tufts use, so the carpet never shades apart
       // from the ground it grows in
-      normals.push(0, 1, 0);
       colors.push(shade, shade, shade);
     };
     put(-w0, 0, 0.62);
@@ -118,7 +117,6 @@ function clusterGeometry(rng: () => number): THREE.BufferGeometry {
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
-  geo.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normals), 3));
   geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
   geo.setIndex(indices);
   return geo;
@@ -178,6 +176,7 @@ export function buildBladeGrass(seed: number): BladeGrassView {
           transformed.z += bgSway * 0.7;
         #endif`,
       );
+    sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
   };
   const uPlayerPos = { value: new THREE.Vector2(1e9, 1e9) };
 

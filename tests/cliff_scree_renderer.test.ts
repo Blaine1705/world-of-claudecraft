@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { SCREE_CELL, screeSpotAt } from '../src/render/cliff_scree_core';
 
 const mocks = vi.hoisted(() => ({
   loadGltf: vi.fn(),
@@ -26,6 +27,23 @@ function rockGltf(): { scene: THREE.Group } {
   const material = new THREE.MeshStandardMaterial({ color: 0x777777 });
   scene.add(new THREE.Mesh(geometry, material));
   return { scene };
+}
+
+function expectedCountsAt(seed: number, px: number, pz: number, variants: number): number[] {
+  const radius = 65;
+  const gridWidth = Math.ceil((radius * 2) / SCREE_CELL);
+  const baseI = Math.floor(px / SCREE_CELL) - (gridWidth >> 1);
+  const baseJ = Math.floor(pz / SCREE_CELL) - (gridWidth >> 1);
+  const expectedCounts = new Array(variants).fill(0);
+  for (let gj = 0; gj < gridWidth; gj++) {
+    for (let gi = 0; gi < gridWidth; gi++) {
+      const ci = baseI + ((((gi - baseI) % gridWidth) + gridWidth) % gridWidth);
+      const cj = baseJ + ((((gj - baseJ) % gridWidth) + gridWidth) % gridWidth);
+      const spot = screeSpotAt(seed, ci, cj);
+      if (spot) expectedCounts[spot.variant]++;
+    }
+  }
+  return expectedCounts;
 }
 
 afterEach(() => {
@@ -55,12 +73,21 @@ describe('cliff scree renderer', () => {
 
       for (let pass = 0; pass < 8; pass++) high.update(0, 0);
       const meshes = high.group.children as THREE.InstancedMesh[];
+      expect(meshes.map((mesh) => mesh.count)).toEqual(expectedCountsAt(1337, 0, 0, meshes.length));
+      expect(
+        meshes.every((mesh) =>
+          mesh.instanceMatrix.updateRanges.some(
+            (range) => range.start === 0 && range.count === mesh.count * 16,
+          ),
+        ),
+      ).toBe(true);
       const matrix = new THREE.Matrix4();
       let visibleInstances = 0;
       for (const mesh of meshes) {
         for (let index = 0; index < mesh.count; index++) {
           mesh.getMatrixAt(index, matrix);
-          if (Math.abs(matrix.determinant()) > 1e-8) visibleInstances++;
+          expect(Math.abs(matrix.determinant())).toBeGreaterThan(1e-8);
+          visibleInstances++;
         }
       }
       expect(visibleInstances).toBeGreaterThan(0);
@@ -68,8 +95,18 @@ describe('cliff scree renderer', () => {
       const versions = meshes.map((mesh) => mesh.instanceMatrix.version);
       high.update(0, 0);
       expect(meshes.map((mesh) => mesh.instanceMatrix.version)).toEqual(versions);
+
+      // Walking reassigns live slots to empty cells as well as the reverse.
+      // Exact second-position counts prove stale matrices cannot survive.
+      const movedX = SCREE_CELL * 7;
+      const movedZ = SCREE_CELL * 5;
+      for (let pass = 0; pass < 8; pass++) high.update(movedX, movedZ);
+      expect(meshes.map((mesh) => mesh.count)).toEqual(
+        expectedCountsAt(1337, movedX, movedZ, meshes.length),
+      );
+
       high.invalidate();
-      high.update(0, 0);
+      high.update(movedX, movedZ);
       expect(meshes.every((mesh, index) => mesh.instanceMatrix.version > versions[index])).toBe(
         true,
       );

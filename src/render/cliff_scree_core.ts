@@ -51,6 +51,33 @@ export interface ScreeSpot {
   slope: number;
 }
 
+/**
+ * Pack live scree matrices by variant while retaining ascending source-slot
+ * order. Empty slots use variant -1. The destination arrays are the backing
+ * stores of the three InstancedMeshes, so lowering mesh.count removes empty
+ * instances without changing any submitted matrix bytes or live ordering.
+ */
+export function compactScreeMatrices(
+  slotVariants: Int8Array,
+  slotMatrices: Float32Array,
+  variantMatrices: readonly Float32Array[],
+  counts: Uint16Array,
+): Uint16Array {
+  counts.fill(0);
+  for (let slot = 0; slot < slotVariants.length; slot++) {
+    const variant = slotVariants[slot];
+    if (variant < 0) continue;
+    const target = variantMatrices[variant];
+    const denseIndex = counts[variant]++;
+    const sourceOffset = slot * 16;
+    const targetOffset = denseIndex * 16;
+    for (let component = 0; component < 16; component++) {
+      target[targetOffset + component] = slotMatrices[sourceOffset + component];
+    }
+  }
+  return counts;
+}
+
 const hash = (i: number, j: number, k: number): number => {
   let h = (i * 374761393 + j * 668265263 + k * 2246822519) | 0;
   h = Math.imul(h ^ (h >>> 13), 1274126177);

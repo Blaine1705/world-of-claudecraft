@@ -21,14 +21,16 @@
 // tiles below they read as 0.3-0.7yd foliage clumps, not noise. Measured over
 // the shipped 1K maps: AO mean 0.474, sd 0.117, row/col isotropy 0.73;
 // NormalGL x/y sd 0.104/0.103 (isotropy 1.00).
-// Cost: 6 texture taps per fragment inside CANOPY_FADE_END, zero past it
-// (distance fade below), zero per-frame CPU work. Gated to HIGH AND UP
+// Cost: alpha-rejected fragments pay zero canopy taps; surviving fragments
+// inside CANOPY_FADE_END pay 6, and fragments past it pay zero (distance fade
+// below). There is no per-frame CPU work. Gated to HIGH AND UP
 // (GFX.detailLayers, the round-10 medium regate: medium keeps its
 // pre-overhaul canopy look and cost); there is intentionally no parallax
 // here, a cutout canopy has no coherent view-ray height field to walk.
 import type * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { patchCanopyDetailShaderSource } from './foliage_shader_core';
 import { GFX } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
 
@@ -197,107 +199,16 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
     shader.uniforms.uCanopyAoSpan = { value: aoSpan };
     shader.uniforms.uCanopyCrevice = { value: spec.creviceShade };
     shader.uniforms.uCanopyDesat = { value: spec.desat };
-    shader.vertexShader = shader.vertexShader
-      .replace(
-        '#include <common>',
-        `#include <common>
-        varying vec3 vCanopyWorldPos;
-        varying vec3 vCanopyWorldNormal;
-        varying float vCanopyDown;`,
-      )
-      .replace(
-        // After the wind hook's beginnormal_vertex bend, objectNormal is the
-        // canopy-sphere shading normal: using it here gives smooth triplanar
-        // weights over the whole canopy instead of per-card discontinuities.
-        // vCanopyDown keeps the RAW geometric downness (tree instances rotate
-        // around Y only, so the attribute's y survives instancing).
-        '#include <project_vertex>',
-        `#include <project_vertex>
-        vec4 canopyPos = vec4( transformed, 1.0 );
-        vec3 canopyNrm = objectNormal;
-        #ifdef USE_INSTANCING
-          canopyPos = instanceMatrix * canopyPos;
-          canopyNrm = mat3( instanceMatrix ) * canopyNrm;
-        #endif
-        vCanopyWorldPos = ( modelMatrix * canopyPos ).xyz;
-        vCanopyWorldNormal = normalize( mat3( modelMatrix ) * canopyNrm );
-        vCanopyDown = max( 0.0, -normalize( normal ).y );`,
-      );
-    shader.fragmentShader = shader.fragmentShader
-      .replace(
-        '#include <common>',
-        `#include <common>
-        varying vec3 vCanopyWorldPos;
-        varying vec3 vCanopyWorldNormal;
-        varying float vCanopyDown;
-        uniform sampler2D uCanopyNormalTex;
-        uniform sampler2D uCanopyAoTex;
-        uniform float uCanopyStrength;
-        uniform float uCanopyTile;
-        uniform float uCanopyAoLo;
-        uniform float uCanopyAoSpan;
-        uniform float uCanopyCrevice;
-        uniform float uCanopyDesat;`,
-      )
-      .replace(
-        // color_fragment runs before the normal chunks, so the projection
-        // locals declared here stay in scope for the normal blend below, and
-        // canopyShade for the emissive floor after it.
-        '#include <color_fragment>',
-        `#include <color_fragment>
-        vec3 canopyP = vCanopyWorldPos * uCanopyTile;
-        vec3 canopyW = pow( abs( normalize( vCanopyWorldNormal ) ), vec3( 4.0 ) );
-        canopyW /= ( canopyW.x + canopyW.y + canopyW.z );
-        float canopyDetK = 1.0 - smoothstep( ${(CANOPY_FADE_START * CANOPY_FADE_SCALE).toFixed(1)}, ${(CANOPY_FADE_END * CANOPY_FADE_SCALE).toFixed(1)},
-          distance( vCanopyWorldPos, cameraPosition ) );
-        float canopyAoTerm = 1.0;
-        if ( canopyDetK > 0.0 ) {
-          float canopyAo = texture2D( uCanopyAoTex, canopyP.zy ).r * canopyW.x
-            + texture2D( uCanopyAoTex, canopyP.xz ).r * canopyW.y
-            + texture2D( uCanopyAoTex, canopyP.xy ).r * canopyW.z;
-          // mean-centered remap: exactly 1.0 at the measured map mean, so
-          // easing back to 1.0 with distance cannot shift canopy brightness
-          canopyAoTerm = mix( 1.0, uCanopyAoLo + canopyAo * uCanopyAoSpan, canopyDetK );
-        }
-        float canopyShade = canopyAoTerm
-          * ( 1.0 - uCanopyCrevice * smoothstep( ${CANOPY_CREVICE_DOWN_START.toFixed(2)}, ${CANOPY_CREVICE_DOWN_FULL.toFixed(2)}, vCanopyDown ) );
-        diffuseColor.rgb *= canopyShade;
-        diffuseColor.rgb = mix( diffuseColor.rgb,
-          vec3( dot( diffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) ) ), uCanopyDesat );`,
-      )
-      .replace(
-        // The leaf materials carry their albedo as an emissive ambient floor
-        // (foliage.ts): modulate it too, or the clump break-up washes out
-        // exactly where it matters most, on the shadowed side of a canopy.
-        // SQUARED: shadowed faces are emissive-and-sky dominated and tone
-        // mapping compresses their dark values, so the floor takes double
-        // contrast to keep clumps readable on a backlit tree, while sunlit
-        // faces (diffuse-dominated) keep the plain remap.
-        '#include <emissivemap_fragment>',
-        `#include <emissivemap_fragment>
-        totalEmissiveRadiance *= canopyShade * canopyShade;`,
-      )
-      .replace(
-        // Whiteout-blend triplanar normal (the worn_stone.ts construction),
-        // mixed into the shading normal AFTER any material normal map. The
-        // base is the unflipped canopy-sphere normal, matching the wind
-        // hook's double-sided treatment (it undoes the backface flip).
-        '#include <normal_fragment_maps>',
-        `#include <normal_fragment_maps>
-        if ( canopyDetK > 0.0 ) {
-          vec3 canopyGN = normalize( vCanopyWorldNormal );
-          vec3 canopyNx = texture2D( uCanopyNormalTex, canopyP.zy ).xyz * 2.0 - 1.0;
-          vec3 canopyNy = texture2D( uCanopyNormalTex, canopyP.xz ).xyz * 2.0 - 1.0;
-          vec3 canopyNz = texture2D( uCanopyNormalTex, canopyP.xy ).xyz * 2.0 - 1.0;
-          canopyNx = vec3( canopyNx.xy + canopyGN.zy, abs( canopyNx.z ) * canopyGN.x );
-          canopyNy = vec3( canopyNy.xy + canopyGN.xz, abs( canopyNy.z ) * canopyGN.y );
-          canopyNz = vec3( canopyNz.xy + canopyGN.xy, abs( canopyNz.z ) * canopyGN.z );
-          vec3 canopyWorldN = normalize(
-            canopyNx.zyx * canopyW.x + canopyNy.xzy * canopyW.y + canopyNz.xyz * canopyW.z );
-          vec3 canopyViewN = normalize( ( viewMatrix * vec4( canopyWorldN, 0.0 ) ).xyz );
-          normal = normalize( mix( normal, canopyViewN, uCanopyStrength * canopyDetK ) );
-        }`,
-      );
+    // The pure patch keeps the RGB-only AO work after the stock alpha test,
+    // while leaving the original visible-fragment operation order intact.
+    const patched = patchCanopyDetailShaderSource(shader.vertexShader, shader.fragmentShader, {
+      fadeStart: CANOPY_FADE_START * CANOPY_FADE_SCALE,
+      fadeEnd: CANOPY_FADE_END * CANOPY_FADE_SCALE,
+      creviceDownStart: CANOPY_CREVICE_DOWN_START,
+      creviceDownFull: CANOPY_CREVICE_DOWN_FULL,
+    });
+    shader.vertexShader = patched.vertexShader;
+    shader.fragmentShader = patched.fragmentShader;
   };
   // The default program cache key stringifies onBeforeCompile, and every
   // chained wrapper here stringifies identically even when the PREVIOUS hook

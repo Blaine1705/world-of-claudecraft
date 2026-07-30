@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { screeSpotAt, screeSpotsInBounds } from '../src/render/cliff_scree_core';
+import {
+  compactScreeMatrices,
+  screeSpotAt,
+  screeSpotsInBounds,
+} from '../src/render/cliff_scree_core';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import type { WorldContent } from '../src/sim/types';
 import {
@@ -18,6 +22,29 @@ const SEED = 1337;
 const BOUNDS = { minX: -360, maxX: 360, minZ: -120, maxZ: 760 };
 
 describe('cliff scree placement', () => {
+  it('compacts live matrices by variant in ascending source-slot order', () => {
+    const variants = new Int8Array([-1, 1, 0, 1, -1, 0]);
+    const slots = new Float32Array(variants.length * 16);
+    for (let slot = 0; slot < variants.length; slot++) {
+      slots.fill(slot + 0.25, slot * 16, slot * 16 + 16);
+    }
+    const targets = [
+      new Float32Array(variants.length * 16),
+      new Float32Array(variants.length * 16),
+    ];
+    const counts = compactScreeMatrices(variants, slots, targets, new Uint16Array(2));
+
+    expect([...counts]).toEqual([2, 2]);
+    expect([...targets[0].slice(0, 32)]).toEqual([
+      ...new Array(16).fill(2.25),
+      ...new Array(16).fill(5.25),
+    ]);
+    expect([...targets[1].slice(0, 32)]).toEqual([
+      ...new Array(16).fill(1.25),
+      ...new Array(16).fill(3.25),
+    ]);
+  });
+
   beforeEach(() => {
     setActiveWorldContent(BUILTIN_WORLD);
   });
