@@ -10011,7 +10011,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectModePrompt': '毎回確認します',
   'hudChrome.professions.toolEffectConfirmTitle': '{effect}を使いますか？',
   'hudChrome.professions.toolEffectConfirmBody':
-    'この採集で残り{charges}回のうち1回分を消費しますか？断っても採集は行われますが、ボーナスは付きません。',
+    'この採集で1回分を消費しますか？断っても採集は行われますが、ボーナスは付きません。残り：{charges}回',
   'hudChrome.professions.toolEffectConfirmAccept': '1回分を使う',
   'hudChrome.professions.toolEffectConfirmDecline': 'そのまま採集',
   'hudChrome.professions.toolEffectCharges': '残り {charges} / {max} 回',

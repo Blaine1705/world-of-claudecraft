@@ -956,7 +956,7 @@ export const TARGETS = [
   {
     key: 'gather-node-hover-tooltip',
     label: 'World hover: gather-node requirement and wield lines (#2343, R22)',
-    when: ['ui/gather_node_tooltip', 'ui/gathering_view', 'professions/gathering'],
+    when: ['ui/gather_node_tooltip_controller', 'ui/gathering_view', 'professions/gathering'],
     // Teleport onto the starter ore vein and sweep the REAL mouse over it: the
     // hover tooltip only paints through the live pointermove raycast, so the
     // sweep proves the actual path. Toolless shows the red requires-a-pick

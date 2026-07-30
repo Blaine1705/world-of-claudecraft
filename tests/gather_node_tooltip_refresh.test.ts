@@ -9,7 +9,10 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GATHER_NODES } from '../src/sim/data';
-import { attachGatherNodeHoverTooltip, RESPAWN_TICK_MS } from '../src/ui/gather_node_tooltip';
+import {
+  attachGatherNodeHoverTooltip,
+  RESPAWN_TICK_MS,
+} from '../src/ui/gather_node_tooltip_controller';
 import type { IWorld } from '../src/world_api';
 
 const NODE = GATHER_NODES[0];
@@ -50,7 +53,9 @@ describe('the cooldown tooltip ticks without pointer movement', () => {
   beforeEach(() => {
     // performance is faked with the timers: the pointermove throttle reads
     // performance.now, and the two hovers below must both clear it.
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] });
+    vi.useFakeTimers({
+      toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'performance'],
+    });
     // Step past the throttle window so the FIRST hover paints (lastPickAt
     // starts 0, and a faked clock also starts 0).
     vi.advanceTimersByTime(200);

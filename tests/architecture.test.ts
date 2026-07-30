@@ -126,6 +126,7 @@ const simFiles = walk(simRoot);
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
   'src/ui/banner_queue.ts',
+  'src/ui/item_kind_label.ts',
   'src/ui/proc_overlay_view.ts',
   'src/ui/camera_prompt_core.ts',
   'src/ui/chat_ignore_core.ts',
@@ -320,6 +321,7 @@ const RENDER_PURE_CORES = [
 // reverse-completeness guard.
 const BARE_NAMED = [
   'src/ui/banner_queue.ts',
+  'src/ui/item_kind_label.ts',
   'src/render/foliage_lod.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
@@ -1071,7 +1073,7 @@ const UI_DOM_MODULES = [
   'src/ui/focus_manager.ts',
   'src/ui/focus_restore.ts',
   'src/ui/form_draft.ts',
-  'src/ui/gather_node_tooltip.ts',
+  'src/ui/gather_node_tooltip_controller.ts',
   'src/ui/gpu_notice_toast.ts',
   'src/ui/hud.ts',
   'src/ui/hud/chat/chat_geometry_controller.ts',

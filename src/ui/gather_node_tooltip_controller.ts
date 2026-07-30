@@ -215,23 +215,30 @@ export function attachGatherNodeHoverTooltip(
 
   const clearRefresh = (): void => {
     if (refreshTimer !== undefined) {
-      clearTimeout(refreshTimer);
+      clearInterval(refreshTimer);
       refreshTimer = undefined;
     }
   };
 
   // The countdown's clock (the phase 14 QA): the paint was pointer-gated,
   // so a stationary hover froze the m:ss line and a node turning ready
-  // under the cursor kept reading "Respawns in ...". One 1 Hz timeout while
-  // a COOLDOWN tip is shown, disposed on hide: not a per-frame painter and
-  // not a cold window's repeating driver, just the tick the painted number
-  // already claims to be. A ready tip arms nothing (its text is static).
+  // under the cursor kept reading "Respawns in ...". One 1 Hz interval
+  // armed only while a COOLDOWN tip is shown, disposed on hide (and by a
+  // ready or unknown re-read), so the module owns no clock at rest. The
+  // hud_perf_budget gate contracts it per tick under this file's
+  // documented allowance; its body cuts at paintAt, whose writes elide
+  // whole on unchanged HTML.
   const armRefresh = (model: GatherNodeTooltipModel): void => {
-    clearRefresh();
-    if (model.state !== 'cooldown') return;
-    refreshTimer = window.setTimeout(() => {
-      refreshTimer = undefined;
-      if (!shown || lastPaint === null) return;
+    if (model.state !== 'cooldown') {
+      clearRefresh();
+      return;
+    }
+    if (refreshTimer !== undefined) return; // one clock; re-paints re-use it
+    refreshTimer = window.setInterval(() => {
+      if (!shown || lastPaint === null) {
+        clearRefresh();
+        return;
+      }
       const next = buildGatherNodeTooltip(world, lastPaint.nodeId);
       if (next === null) {
         hide();
@@ -251,18 +258,38 @@ export function attachGatherNodeHoverTooltip(
     hud.hideTooltip();
   };
 
+  let lastHtml = '';
   const paintAt = (model: GatherNodeTooltipModel, nodeId: string, x: number, y: number): void => {
-    // The paintTooltipAt idiom: drop the mob-tooltip size modifier, fill,
-    // then clamp the author-space box against the viewport (x/y arrive in
-    // visual space, so divide by the UI scale first).
-    tooltipEl.classList.remove('mob-tooltip');
-    tooltipEl.innerHTML = gatherNodeTooltipHtml(model);
-    tooltipEl.style.display = 'block';
-    const z = getUiScale();
-    const tw = tooltipEl.offsetWidth;
-    const th = tooltipEl.offsetHeight;
-    tooltipEl.style.left = `${Math.max(8, Math.min(window.innerWidth / z - tw - 8, x / z + 14))}px`;
-    tooltipEl.style.top = `${Math.max(8, y / z - th - 10)}px`;
+    // Write elision on the tick path (the fix-round review): the 1 Hz
+    // refresh below re-enters here, and when the rendered HTML did not
+    // move (an untimed line, a sub-second world change) the innerHTML
+    // rebuild AND both forced reads are skipped whole. A fresh hover
+    // repaints regardless (`!shown`); a same-content pointer glide keeps
+    // the box where it was, which the +14/-10 offsets make imperceptible.
+    const html = gatherNodeTooltipHtml(model);
+    // `display === 'none'` self-heals the shared-box case: if another owner
+    // blanked #tooltip through hud.hideTooltip while our tip was up, an
+    // unchanged-HTML tick must still repaint rather than skip (an inline
+    // style read, not a layout read).
+    const dirty = html !== lastHtml || !shown || tooltipEl.style.display === 'none';
+    lastHtml = html;
+    if (dirty) {
+      // The paintTooltipAt idiom: drop the mob-tooltip size modifier, fill,
+      // then clamp the author-space box against the viewport (x/y arrive in
+      // visual space, so divide by the UI scale first).
+      tooltipEl.classList.remove('mob-tooltip');
+      tooltipEl.innerHTML = html;
+      tooltipEl.style.display = 'block';
+      const z = getUiScale();
+      const tw = tooltipEl.offsetWidth;
+      const th = tooltipEl.offsetHeight;
+      tooltipEl.style.left = `${Math.max(8, Math.min(window.innerWidth / z - tw - 8, x / z + 14))}px`;
+      tooltipEl.style.top = `${Math.max(8, y / z - th - 10)}px`;
+    }
+    // The tick can write the shared #tooltip box with no pointer movement;
+    // every dismissal path (pointerleave, pointerdown, an entity hit on
+    // move) clears the timer FIRST through hide(), so this module never
+    // steals the box back from another owner after its own tip is gone.
     shown = true;
     lastPaint = { nodeId, x, y };
     armRefresh(model);

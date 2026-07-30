@@ -12614,6 +12614,13 @@ export class Hud {
     // hard reset. Queued celebrations survive to play after the race;
     // only the live element and the stale pending-ambient seat go.
     this.bannerQueue?.hideLive();
+    // Re-arm the advance ourselves (the fix-round review): the takeover
+    // caller paints its own ambient right after, whose paint clears this
+    // timer, but a future caller that hides WITHOUT showing must not leave
+    // surviving celebrations waiting on an unrelated banner.
+    window.setTimeout(() => {
+      if (this.bannerTimer === undefined && this.bannerSource === null) this.advanceBannerSlot();
+    }, BANNER_ADVANCE_GAP_MS);
     clearTimeout(this.bannerTimer);
     this.bannerTimer = undefined;
     this.bannerSource = null;

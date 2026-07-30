@@ -115,17 +115,30 @@
     z-index: 80;
   }
   /* The touch item-drag drop window (the phase 14 QA blocker): while a bag
-     stack is mid-drag the action ring must be REACHABLE over the full-screen
-     bags sheet (z-index 95 below), or every release hit-tests the sheet and
-     the drag-to-slot flow cannot be performed at all. The drag lifecycle
-     stamps body.touch-item-dragging (src/ui/touch_item_drag.ts); raising the
-     controls layer above the sheet for exactly that window floats the ring
-     over the bags corner as the visible drop target, and the release
-     restores normal stacking. Bag-cell drops keep working: between the
-     ring's buttons the controls layer is pointer-events none, so
-     hit-testing falls through to the sheet. */
+     stack is mid-drag the action ring must be REACHABLE over the open
+     window, or every release hit-tests the sheet and the drag-to-slot flow
+     cannot be performed at all. #mobile-controls and #ui are body-level
+     siblings, so the deciding comparison is against #ui's window-open
+     z-index (90, the rule above the backdrop block), not the sheet's own
+     95 inside it; 96 clears both. The drag lifecycle stamps
+     body.touch-item-dragging (src/ui/touch_item_drag.ts); raising the
+     controls layer for exactly that window floats the ring over the bags
+     corner as the visible drop target, and the release restores normal
+     stacking. */
   body.mobile-touch.game-active.touch-item-dragging #mobile-controls {
     z-index: 96;
+  }
+  /* Only the RING is the drop target: the raise lifts the whole controls
+     subtree (a child's z-index cannot escape its parent stacking context),
+     so every other pointer-active control up there (the move zone, the
+     joystick, the menu cluster) would silently eat drops meant for the
+     window beneath it, e.g. an equip socket under the move zone in the
+     paired char+bags layout (the fix-round review's blocker). Neutralize
+     everything but the ring for exactly the drag window; hit-testing then
+     falls through to the sheet and the paperdoll as before. */
+  body.mobile-touch.game-active.touch-item-dragging #mobile-controls > :not(#mobile-action-ring),
+  body.mobile-touch.game-active.touch-item-dragging #mobile-controls > :not(#mobile-action-ring) * {
+    pointer-events: none;
   }
   body.mobile-touch.game-active #ui,
   body.mobile-touch.game-active #nameplates,

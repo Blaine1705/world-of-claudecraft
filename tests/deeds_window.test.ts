@@ -390,6 +390,29 @@ describe('hud wiring', () => {
     }
   });
 
+  it('a takeover that never shows its own banner still advances the queue after the gap', () => {
+    // The fix-round review: hideBannerImmediately freed the slot but armed
+    // no advance, so surviving celebrations waited on an unrelated future
+    // banner. The self-armed gap timer closes it; a takeover that DOES
+    // paint (the mount-race arm above) clears that timer through its own
+    // paint, so this arm drives the hide with no show at all.
+    vi.useFakeTimers();
+    const achievement = vi.spyOn(audio, 'achievement').mockImplementation(() => {});
+    try {
+      const h = bannerRig();
+      h.showCelebrationBanner('Level 2!', 'levelup');
+      h.handleDeedUnlocks([{ deedId: 'prog_first_steps' }]);
+      h.hideBannerImmediately();
+      expect(h.bannerEl.style.opacity).toBe('0');
+      vi.advanceTimersByTime(250);
+      expect(h.bannerEl.textContent).toContain(deedName('prog_first_steps'));
+      expect(achievement).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+    }
+  });
+
   it('clearUnstuckBanner ends the unstuck line early and advances to a waiting celebration', () => {
     // docs/design/banner-queue.md's contract for the unstuck purge, driven
     // on the real methods (the pure retainQueued arm alone cannot see the

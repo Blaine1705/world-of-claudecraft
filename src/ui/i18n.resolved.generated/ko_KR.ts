@@ -2444,7 +2444,7 @@ export const ko_KR: EnTranslations = {
       "toolEffectModeAsk": "사용할 때마다 확인",
       "toolEffectModePrompt": "사용 시마다 확인함",
       "toolEffectConfirmTitle": "{effect}을(를) 사용하시겠습니까?",
-      "toolEffectConfirmBody": "이번 채집에 남은 {charges}회 중 1회를 소모하시겠습니까? 거절해도 채집은 진행되지만 보너스는 없습니다.",
+      "toolEffectConfirmBody": "이번 채집에 1회를 소모하시겠습니까? 거절해도 채집은 진행되지만 보너스는 없습니다. 남은 횟수: {charges}회",
       "toolEffectConfirmAccept": "1회 사용",
       "toolEffectConfirmDecline": "그냥 채집",
       "toolEffectName": {

@@ -7,7 +7,10 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { gatherNodeToolGateFor, gatherNodeTooltipHtml } from '../src/ui/gather_node_tooltip';
+import {
+  gatherNodeToolGateFor,
+  gatherNodeTooltipHtml,
+} from '../src/ui/gather_node_tooltip_controller';
 import type { GatherNodeTooltipModel } from '../src/ui/gathering_view';
 import { hasTranslation } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';

@@ -448,6 +448,12 @@ describe('tool-tier lock dimension', () => {
     expect(
       gatherEffectPrompt(slotted({ auras: [{ kind: 'regrowth_hot' }] }), NODE.id),
     ).not.toBeNull();
+    // The ClientWorld shape (the fix-round review): online mirrors never
+    // set p.inCombat, so the in-combat arm is offline-only and the ONLINE
+    // prompt must still fire mid-fight (the server's combat denial answers
+    // a confirm). This fixture IS that shape: inCombat reads false however
+    // the fight looks, and the ask stands.
+    expect(gatherEffectPrompt(slotted({ inCombat: false }), NODE.id)).not.toBeNull();
     // The capacity mirror: with no room for the CONFIRMED (fine) grade, a
     // confirmed use would be refused at the cast-start pre-gate, so the
     // dialog never asks; the plain harvest command still goes out.

@@ -2806,7 +2806,10 @@ export const hudChromeStrings = {
     // Count-neutral on purpose (the phase 14 QA): "one of {charges}
     // charges" read "one of 1 charges" on the last charge, the moment the
     // prompt matters most. The label form carries the number without
-    // English pluralization; the CJK fills already phrased it this way.
+    // pluralization; the zh fills already phrased it this way, and the
+    // ja/ko/ru fills were re-worded off the same partitive in the fix
+    // round (the reword-staleness rule: an English reword re-reads every
+    // overlay it invalidates).
     toolEffectConfirmBody:
       'Spend a charge on this harvest? Declining still gathers, without the bonus. Charges left: {charges}.',
     toolEffectConfirmAccept: 'Use a Charge',

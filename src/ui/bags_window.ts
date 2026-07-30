@@ -693,8 +693,7 @@ export class BagsWindow {
       // the honest landing anyway. Distinct 'bagu:' prefix on the
       // unknown-cell builder keeps the two families from colliding on a
       // shared miss value.
-      const ordinal = world.inventory.filter((x) => x.itemId === s.itemId).indexOf(s);
-      row.dataset.focusKey = `bag:${s.itemId}:${ordinal}`;
+      row.dataset.focusKey = `bag:${s.itemId}:${this.stackOrdinal(world.inventory, s)}`;
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
@@ -913,11 +912,33 @@ export class BagsWindow {
   // display name. (The "[?]" a stale client can see in chat is the
   // RECEIVER's degradation of a link a current client sent; nothing here
   // affects it.) Everything acts again once the client updates.
+  // The same-item ordinal for the focus keys (the phase 14 QA): stable when
+  // an earlier DIFFERENT-item stack goes, unlike the raw index. Computed as
+  // ONE pass per inventory array and cached on the array's identity (both
+  // worlds hand back a stable array between changes; a world that copied
+  // per access would only degrade this to the per-row cost it replaced).
+  private ordinalCache: { inv: readonly InvSlot[]; map: Map<InvSlot, number> } | null = null;
+  private stackOrdinal(inventory: readonly InvSlot[], s: InvSlot): number {
+    if (this.ordinalCache?.inv !== inventory) {
+      const map = new Map<InvSlot, number>();
+      const counts = new Map<string, number>();
+      for (const slot of inventory) {
+        const n = counts.get(slot.itemId) ?? 0;
+        map.set(slot, n);
+        counts.set(slot.itemId, n + 1);
+      }
+      this.ordinalCache = { inv: inventory, map };
+    }
+    return this.ordinalCache.map.get(s) ?? -1;
+  }
+
   private buildUnknownStackCell(s: InvSlot, cell: number | null): HTMLElement {
     const row = document.createElement('button');
     row.type = 'button';
     row.className = 'bag-item q-common';
-    row.dataset.focusKey = `bagu:${s.itemId}:${cell ?? -1}`;
+    row.dataset.focusKey = `bagu:${s.itemId}:${
+      cell ?? this.stackOrdinal(this.deps.world().inventory, s)
+    }`;
     row.style.setProperty('--bag-slot-quality', QUALITY_DEFAULT_COLOR);
     // The known cell's ladder gives trade, mail-attach, market-sell, and
     // vendor precedence over the deposit; those four all need a def, so on

@@ -63,7 +63,7 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     // The node tooltip carries two actionable lines of its own (the respawn
     // countdown and the fine-grade preview), so it joins the scan (the
     // phase 14 QA).
-    expectProfileFree('src/ui/gather_node_tooltip.ts');
+    expectProfileFree('src/ui/gather_node_tooltip_controller.ts');
   });
 
   it('the node prop tier ladder is static and profile-free', () => {

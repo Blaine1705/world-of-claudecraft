@@ -300,4 +300,18 @@ describe('touch drop reachability (the phase 14 QA blocker)', () => {
     const rule = css.slice(idx, css.indexOf('}', idx));
     expect(rule).toContain('z-index: 96;');
   });
+
+  it('the raise keeps ONLY the ring pointer-active (the fix-round blocker)', () => {
+    // The raise lifts the whole controls subtree above the open windows, so
+    // without this rule the move zone silently ate equip drops in the
+    // paired layout and the menu cluster ate bag-cell drops. Everything but
+    // the ring goes pointer-events none for exactly the drag window.
+    const css = readFileSync(join(__dirname, '../src/styles/hud.mobile.css'), 'utf8');
+    const idx = css.indexOf(
+      'body.mobile-touch.game-active.touch-item-dragging #mobile-controls > :not(#mobile-action-ring)',
+    );
+    expect(idx).toBeGreaterThan(-1);
+    const rule = css.slice(idx, css.indexOf('}', idx));
+    expect(rule).toContain('pointer-events: none;');
+  });
 });

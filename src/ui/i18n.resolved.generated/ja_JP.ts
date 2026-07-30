@@ -2444,7 +2444,7 @@ export const ja_JP: EnTranslations = {
       "toolEffectModeAsk": "毎回確認する",
       "toolEffectModePrompt": "毎回確認します",
       "toolEffectConfirmTitle": "{effect}を使いますか？",
-      "toolEffectConfirmBody": "この採集で残り{charges}回のうち1回分を消費しますか？断っても採集は行われますが、ボーナスは付きません。",
+      "toolEffectConfirmBody": "この採集で1回分を消費しますか？断っても採集は行われますが、ボーナスは付きません。残り：{charges}回",
       "toolEffectConfirmAccept": "1回分を使う",
       "toolEffectConfirmDecline": "そのまま採集",
       "toolEffectName": {

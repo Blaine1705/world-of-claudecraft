@@ -203,13 +203,20 @@ function gradeReadMetaFor(world: IWorld): GradeReadMeta {
  *  plain: no slot, 'always' mode, spent, suppressed, pointless, denied, or
  *  an unknown node id.
  *
- *  The deny mirror covers the sim arms the Entity mirror carries exactly
- *  (dead, in combat, busy casting or consuming, action-locked shapeshift)
- *  plus the confirmed-grade capacity read through the sim's own countFit;
- *  the swimming arm stays server-side (isSwimming is a SimContext
- *  position derivation, and a wrong local guess here would silently skip a
- *  legal use, the harmful direction). A denied state falls through to the
- *  plain harvest command and the server's own toast. */
+ *  The deny mirror covers the sim arms the Entity mirror carries (dead,
+ *  busy casting or consuming, action-locked shapeshift) plus the
+ *  confirmed-grade capacity read through the sim's own countFit. Two
+ *  honest limits (the fix-round review): the in-combat arm bites OFFLINE
+ *  only (online mirrors never set p.inCombat, hud.ts's own note), so
+ *  online it over-asks and the server's combat denial answers; and the
+ *  busy/consuming reads trail the server by one snapshot online, so in
+ *  that window a just-freed player's ask is suppressed and the plain
+ *  harvest silently skips the effect, a one-round-trip loss the charge
+ *  survives. The swimming arm stays server-side entirely (isSwimming is a
+ *  SimContext position derivation, and a wrong local guess here would
+ *  silently skip a legal use, the harmful direction). A denied state
+ *  falls through to the plain harvest command and the server's own
+ *  toast. */
 export function gatherEffectPrompt(
   world: IWorld,
   nodeId: string,
@@ -232,7 +239,10 @@ export function gatherEffectPrompt(
   // The mattered mirror: a quantity effect always adds units; a quality
   // effect matters only when the assisted and unassisted grade resolutions
   // mint DIFFERENT ids (both through the grant's own readers, so the ask
-  // and the spend share one definition).
+  // and the spend share one definition). Capacity aside: the grant's own
+  // predicate runs AFTER truncation, so with room for the base yield but
+  // not the bonus unit this asks and the sim then declines the spend,
+  // which only keeps the charge.
   const assisted = effectiveGradeToolTier(meta, professionId, node, true);
   const unassisted = effectiveGradeToolTier(meta, professionId, node, false);
   const assistedYield = harvestYieldItemIdFor(node, assisted);
@@ -240,7 +250,11 @@ export function gatherEffectPrompt(
   if (!qtyChanges && assistedYield === harvestYieldItemIdFor(node, unassisted)) return null;
   // The confirmed-grade capacity mirror of the cast-start pre-gate: a
   // confirmed use the sim would refuse "Your bags are full." is a use that
-  // will not happen, so it is never asked about.
+  // will not happen, so it is never asked about. The asymmetric corner
+  // (fine stacks, base does not): the ask still fires, confirming works,
+  // and declining sends a plain harvest the sim's own pre-gate refuses
+  // with its bags-full toast; asking is the arm that lets the harvest
+  // succeed at all there.
   if (countFit(world.inventory, bagCapacity(world.bags), assistedYield, 1) < 1) return null;
   return { effectId: slot.effectId, charges: slot.durability };
 }
