@@ -238,28 +238,59 @@ export class RenderBudgetGovernor {
     return this.state();
   }
 
-  state(): RenderBudgetState {
-    return {
-      enabled: this.enabled,
-      mode: this.mode,
-      reason: this.reason,
-      pressure: round2(this.pressure),
-      frameMsEma: round2(this.frameMsEma),
-      submitMsEma: round2(this.submitMsEma),
-      externalFrameCap: this.externalFrameCap,
-      stallPressure: round2(this.stallPressure),
-      recentSubmitStalls: round2(this.recentSubmitStalls),
-      lastSubmitStallMs: round2(this.lastSubmitStallMs),
-      stallHoldSeconds: round2(this.stallHoldSeconds),
-      stableSeconds: round2(this.stableSeconds),
-      cooldownSeconds: round2(this.cooldownSeconds),
-      levels: copyLevels(this.levels),
-      caps: copyCaps(this.caps),
-    };
+  state(out?: RenderBudgetState): RenderBudgetState {
+    const state =
+      out ??
+      ({
+        enabled: this.enabled,
+        mode: this.mode,
+        reason: this.reason,
+        pressure: 0,
+        frameMsEma: 0,
+        submitMsEma: 0,
+        externalFrameCap: false,
+        stallPressure: 0,
+        recentSubmitStalls: 0,
+        lastSubmitStallMs: 0,
+        stallHoldSeconds: 0,
+        stableSeconds: 0,
+        cooldownSeconds: 0,
+        levels: copyLevels(this.levels),
+        caps: copyCaps(this.caps),
+      } satisfies RenderBudgetState);
+    state.enabled = this.enabled;
+    state.mode = this.mode;
+    state.reason = this.reason;
+    state.pressure = round2(this.pressure);
+    state.frameMsEma = round2(this.frameMsEma);
+    state.submitMsEma = round2(this.submitMsEma);
+    state.externalFrameCap = this.externalFrameCap;
+    state.stallPressure = round2(this.stallPressure);
+    state.recentSubmitStalls = round2(this.recentSubmitStalls);
+    state.lastSubmitStallMs = round2(this.lastSubmitStallMs);
+    state.stallHoldSeconds = round2(this.stallHoldSeconds);
+    state.stableSeconds = round2(this.stableSeconds);
+    state.cooldownSeconds = round2(this.cooldownSeconds);
+    state.levels.grass = round2(this.levels.grass);
+    state.levels.foliage = round2(this.levels.foliage);
+    state.levels.vfx = round2(this.levels.vfx);
+    state.levels.lighting = round2(this.levels.lighting);
+    state.levels.resolution = round2(this.levels.resolution);
+    state.caps.targetCalls = this.caps.targetCalls;
+    state.caps.urgentCalls = this.caps.urgentCalls;
+    state.caps.targetTriangles = this.caps.targetTriangles;
+    state.caps.urgentTriangles = this.caps.urgentTriangles;
+    state.caps.targetGrassTufts = this.caps.targetGrassTufts;
+    state.caps.urgentGrassTufts = this.caps.urgentGrassTufts;
+    state.caps.minGrassLevel = this.caps.minGrassLevel;
+    state.caps.minFoliageLevel = this.caps.minFoliageLevel;
+    state.caps.minVfxLevel = this.caps.minVfxLevel;
+    state.caps.minLightingLevel = this.caps.minLightingLevel;
+    return state;
   }
 
-  update(sample: RenderBudgetSample): RenderBudgetState {
-    if (!Number.isFinite(sample.dt) || sample.dt <= 0) return this.state();
+  update(sample: RenderBudgetSample, out?: RenderBudgetState): RenderBudgetState {
+    if (!Number.isFinite(sample.dt) || sample.dt <= 0) return this.state(out);
     const frameMs = Math.min(250, Math.max(0, sample.frameMs));
     const totalMs = Math.min(250, Math.max(0, sample.totalMs));
     const rawSubmitMs = Math.max(0, sample.submitMs);
@@ -277,7 +308,7 @@ export class RenderBudgetGovernor {
       this.reason = 'disabled';
       this.pressure = 0;
       this.externalFrameCap = false;
-      return this.state();
+      return this.state(out);
     }
 
     const minRenderScale = Math.min(sample.maxRenderScale, Math.max(0.5, sample.minRenderScale));
@@ -385,7 +416,7 @@ export class RenderBudgetGovernor {
           : urgent
             ? this.budget.cooldownSeconds * 0.55
             : this.budget.cooldownSeconds;
-        return this.state();
+        return this.state(out);
       }
     }
 
@@ -393,7 +424,7 @@ export class RenderBudgetGovernor {
       this.stableSeconds = 0;
       this.mode = 'degrading';
       this.reason = 'submit-stall';
-      return this.state();
+      return this.state(out);
     }
 
     const canRecover =
@@ -415,7 +446,7 @@ export class RenderBudgetGovernor {
           this.reason = 'recover';
           this.stableSeconds = 0;
           this.cooldownSeconds = this.budget.cooldownSeconds * 1.5;
-          return this.state();
+          return this.state(out);
         }
       }
     } else {
@@ -424,7 +455,7 @@ export class RenderBudgetGovernor {
 
     this.mode = 'stable';
     this.reason = this.externalFrameCap ? 'frame-cap' : 'stable';
-    return this.state();
+    return this.state(out);
   }
 
   private reduceLevel(key: keyof RenderBudgetLevels, floor: number, step: number): boolean {

@@ -64,7 +64,11 @@ describe('constrained renderer integration', () => {
 
   it('gates shadow-only CPU work while retaining the crowd animation bands', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    expect(source).toContain(`const lodBands = characterLodBands(
+    // The band plan is filled into a renderer-owned object rather than
+    // allocated per frame; what this test guards is that it is still computed
+    // from the live rig count, not which of the two entry points computes it.
+    expect(source).toContain(`const lodBands = characterLodBandsInto(
+      this.characterLodPlan,
       this.lastVisibleRigCount,`);
     expect(source).toContain(`const shadowRangeSq = lodBands.shadowRangeSq;
     const shadowsEnabled = this.sun.castShadow;`);
