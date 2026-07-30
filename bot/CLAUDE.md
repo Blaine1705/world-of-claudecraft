@@ -57,7 +57,14 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
   forwarding form reads the global at CALL time, so a test that swaps a global
   after construction is still seen, and the global is never invoked with the
   instance as its `this`. Every shell also has a test that drives the DEFAULT
-  path, not just the injected one; keep that pair when adding a shell.
+  path, not just the injected one; keep that pair when adding a shell, and write
+  it the only two ways that can actually fail:
+  **construct the shell BEFORE stubbing the global** (stub-then-construct passes
+  for a capturing `= fetch`, so it does not guard this rule at all), and
+  **assert every argument the default forwards**, not just the first (a
+  one-parameter stub passes for `(input) => fetch(input)`, which type-checks
+  because TypeScript accepts an arity-reduced function, and which would strip
+  the auth header off every request in production).
 - **Secrets are env only**; never commit them. `DISCORD_BOT_SECRET` must match the server's.
 - **Privileged intents:** `GUILD_MEMBERS` + `GUILD_PRESENCES` must be enabled for the
   application in the Discord developer portal, or IDENTIFY is rejected (close 4014).

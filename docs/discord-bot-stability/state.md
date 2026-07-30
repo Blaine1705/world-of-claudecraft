@@ -149,8 +149,9 @@ vi.mock module fakes + `runRoute`; `tests/discord_db.test.ts` `makePool` fake, w
 `tests/discord_relay.test.ts` covers `src/sim/discord_relay.ts`, NOT the server module
 of the same name.
 
-Config: `tsconfig.json` (`include` carries `bot` as of Phase 1, so all six bot files
-are type-checked and every construction site's arity is compiler-enforced),
+Config: `tsconfig.json` (`include` carries `bot` as of Phase 1, so all SEVEN bot files
+are type-checked, `bot/main.ts` among them; pinned by `tests/deploy_discord_bot.test.ts`
+because dropping the one word is otherwise silent),
 `scripts/gate.mjs` (the `steps` list, which now carries the `bot build` step).
 
 ## Created by this packet (update per phase)
@@ -250,6 +251,20 @@ are type-checked and every construction site's arity is compiler-enforced),
   and the global is never invoked with the instance as its `this`, which is harmless on
   Node today but is a real trap on any other host. New shells follow this. Recorded in
   `bot/CLAUDE.md`.
+- R16 (settled in Phase 1 QA): a default-path test must construct the shell BEFORE
+  stubbing the global, and must observe EVERY argument the default forwards. Both halves
+  are load-bearing and neither is obvious. Stub-then-construct passes for a capture-form
+  default (`= fetch`), so it cannot guard R15 at all. A one-parameter stub passes for
+  `(input) => fetch(input)`, which type-checks because TypeScript accepts an
+  arity-reduced function where a wider signature is expected, and which would strip the
+  auth header off every request in production. Adding `bot` to the tsconfig include does
+  NOT catch either one.
+- R17 (settled in Phase 1 QA): a source-text pin over `scripts/gate.mjs` or
+  `.github/workflows/ci.yml` must be matched against a COMMENT-STRIPPED source and be
+  either line-anchored or name-to-run adjacent. A bare `toContain` is satisfied by the
+  step commented out, by `|| true`, by `continue-on-error`, and by an `if:` slipped
+  between the name and the run line. Keep the whitespace in such a pin tolerant so a
+  biome re-wrap does not red it falsely.
 
 ## OPEN items
 
@@ -275,26 +290,40 @@ route each to a phase or file it.
   which for `flex()` and `roles()` carries `?discord_user_id=<id>`. Low sensitivity
   (a Discord id is pseudonymous and guild-visible) but it is user-identifying data in
   an operator log. Pre-existing.
-- L3 RESOLVED, do not add the pin. The concern was that nothing stops a future call site
-  from passing a wrapping `fetchImpl` that observes the bot token or the shared secret.
-  Ruling: `tsc` now proves the arity of every construction site (that is what adding
-  `bot` to the include bought), which is a stronger guard than a source-text scan and
-  costs nothing, and a text pin would carry the documented source-scrape traps. No pin.
-- L4 CLOSED by Phase 1. `tests/discord_bot_gateway.test.ts` module-mocks `ws` and covers
-  both directions: the DEFAULT factory constructs the real `ws` client at
-  `/?v=10&encoding=json`, and an injected factory is used instead of it. It also
-  exercises HELLO to IDENTIFY, the heartbeat interval, and the fatal-versus-normal close
-  branch. Phases 3 and 7 extend it rather than starting from nothing.
-- L5 (coverage gap, Phase 5 territory): two `bot/server_client.ts` contracts are still
-  unpinned. `flairedIds()` distinguishes null (meaning "change nothing", per its own doc
-  comment) from an empty array, and its `typeof x === 'string'` filter is untested;
-  `pushMembersMeta()` has an untested zero-updated silent-drop warning branch. Both were
-  outside Phase 1's assigned arm list. Phase 5 touches both, so pin them there.
+- L3 RESOLVED (conclusion stands, RATIONALE CORRECTED in Phase 1 QA). Do not add the pin.
+  The concern was that nothing stops a future call site from passing a wrapping
+  `fetchImpl` that observes the bot token or the shared secret. The original rationale
+  said `tsc` "proves the arity of every construction site". **That is false and must not
+  be reasoned from:** the seams are OPTIONAL trailing parameters, so `tsc` accepts two,
+  three, or four arguments equally (the suite itself constructs with all of them). The
+  real reason no pin is needed is the one the security review gave: passing a wrapping
+  `fetchImpl` requires editing `bot/main.ts`, which is code-execution the attacker
+  already has, so this is not a privilege boundary. A text pin would also carry the
+  documented source-scrape traps. No pin.
+- L4 CLOSED, genuinely, as of Phase 1 QA. Phase 1's own claim ("closed outright") was
+  overstated: the file covered the CONNECT handshake only, and 16 of 18 gateway protocol
+  mutants survived it. `tests/discord_bot_gateway.test.ts` now also pins seq tracking,
+  the heartbeat tick including the zombie-terminate and ACK arms, stopHeartbeat on close,
+  RESUME versus IDENTIFY with the session and resume-URL capture, all six fatal close
+  codes plus five reconnecting ones with the reconnect actually fired, INVALID_SESSION
+  both arms, op 7, the send readyState guard, op 8, and the dispatch and parse catches.
+  20 of 20 gateway mutants now die. Phases 3 and 7 extend it.
+- L5 CLOSED by Phase 1 QA rather than deferred to Phase 5: both halves were a few lines.
+  `flairedIds()` has all three arms (the `typeof x === 'string'` filter, a genuinely
+  empty array, and null for an unreachable server or a malformed payload), and
+  `pushMembersMeta()`'s zero-updated warning is pinned on both sides of its non-empty
+  guard. Phase 5 inherits the pins instead of writing them.
+- L6 (nice-to-have, toolchain, OPEN): `bot/` type-checks against the shared tsconfig,
+  whose `lib` is `["ES2022","DOM","DOM.Iterable"]` with `types: ["vite/client","node"]`.
+  A Node-missing DOM global therefore passes BOTH `tsc` and `build:bot` (esbuild does not
+  typecheck) and only fails at runtime in the container. A bot-specific tsconfig would
+  close it; that is a toolchain restructure, not a QA-round edit. Natural home is Phase 7,
+  which already owns the bot's deploy hardening.
 
 ## Known gotchas for implementers
 
-- Only `bot/logic.ts` is currently type-checked; expect latent type errors in the other
-  five bot files when Phase 1 adds `bot` to tsconfig.
+- RESOLVED by Phase 1: all seven bot files are type-checked. The include surfaced ZERO
+  latent type errors, so there were none to fix. Do not plan around the old warning.
 - The bot reuses the `eastbrook-game` image (compose `discord` profile), so bot and
   server always deploy in lockstep; wire-format changes between them need no
   cross-version compatibility story.

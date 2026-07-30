@@ -5,7 +5,7 @@
 | Phase | Status | Started | Completed |
 |---|---|---|---|
 | Phase 1: Bot verification foundation | built | 2026-07-30 | 2026-07-30 |
-| Phase 1 QA | not started | | |
+| Phase 1 QA | done | 2026-07-30 | 2026-07-30 |
 | Phase 2: Discord rate-limit governor | not started | | |
 | Phase 2 QA | not started | | |
 | Phase 3: Loop scheduler + diff-before-write | not started | | |
@@ -27,7 +27,7 @@
 
 ### Phase 1
 - [x] `bot` in tsconfig include, latent type errors fixed behavior-preserving
-      (the include surfaced none; all six bot files are in the checked set)
+      (the include surfaced none; all seven bot files are in the checked set)
 - [x] `build:bot` in `scripts/gate.mjs` (and in both CI jobs that build the server, R7)
 - [x] Injectable fetch/socket/clock seams in `discord_api.ts`, `server_client.ts`, `gateway.ts`
 - [x] Cadence constants extracted into `bot/cadence.ts` as a pure move (R6)
@@ -97,7 +97,7 @@ real TypeScript 7 native binary and a runnable gate.
 
 The tsconfig include surfaced ZERO latent type errors, so the "fix the errors the
 include surfaces" commit collapsed into the include itself. The include was proven
-live two ways rather than assumed: `tsc --noEmit --listFiles` lists all six bot files
+live two ways rather than assumed: `tsc --noEmit --listFiles` lists all seven bot files
 including `bot/main.ts`, and a deliberate type error added to `bot/main.ts` failed the
 check before being reverted.
 
@@ -136,7 +136,7 @@ two counts, so deleting it and adding any other single-shard step kept the suite
 It is now also pinned by name, along with the other three builds and the four gate
 steps. The decoy-swap mutation confirms the hole is closed.
 
-The killed mutants: both cadence constants, the `'0'` nickname arm, the `||` default
+The killed mutants: all three cadence constants, the `'0'` nickname arm, the `||` default
 fallback, the `!v` required guard, the activity ladder rung, two channel key swaps, the
 secret header name, the 8000 ms deadline, the success-flag check, the `finally`
 clearTimeout, the Content-Type header, the non-ok short circuit, the injected-fetch
@@ -148,3 +148,62 @@ and the count-preserving CI decoy swap.
 Worktree note for later phases: this checkout had no `node_modules`, and the main
 checkout's install is stale (TypeScript 5.9.3, no ffmpeg-static). A local `npm ci` in
 the worktree is what gets the real TypeScript 7 native binary and a runnable gate.
+
+### Phase 1 QA (2026-07-30)
+
+Release sync: NO-OP again. `origin/release/v0.33.0` was still `b0acba0adc` on a fresh
+fetch, 0 behind / 7 ahead, so there was nothing to merge and no release-merge audit.
+
+Verdict PASS-WITH-FOLLOWUPS. Zero behavior defects: the diff really is behavior-neutral.
+Every injected default was traced against the code it replaced and each reproduces the
+original exactly, no await or call order moved, no timer handle stopped being cleared,
+the cadence move is verbatim, and `bot/main.ts`'s three construction sites are
+byte-identical to the base. What the audit found was almost entirely a gap between what
+the phase's docs CLAIMED and what its tests ENFORCED, which is the debt a verification
+foundation exists to remove.
+
+Method: 12 read-only finder agents over the diff with one independent skeptic per
+finding (96 agents, 64 confirmed / 20 refuted), plus `qa-checklist`,
+`privacy-security-review`, and `test-coverage-auditor`, plus a mutation pass in an
+ISOLATED worktree at the phase tip with its own `npm ci`. Most of the 20 refutations
+were verify agents racing the fix commits and reading a tree where the finding was
+already closed; none hid a real defect.
+
+Mutation tally, all NEW mutants beyond Phase 1's 31: 79 planted, 79 resolved, and the
+un-mutated baseline re-run green at the end with the worktree clean. 43 of the first 52
+SURVIVED, which is the real story of this QA round. `bot/gateway.ts` was the worst: 16
+of 18 protocol mutants lived, including the zombie-terminate branch, RESUME versus
+IDENTIFY, and seq tracking. After the fixes every one of those dies against a named
+test.
+
+Four traps are worth carrying forward, because each looked like a passing test:
+
+  - The HELLO heartbeat test asked for `heartbeat_interval: 41250`, which is exactly
+    `heartbeatIntervalMs`'s own fallback default, so a gateway that ignored the payload
+    entirely still produced 41250 and the assertion could not fail.
+  - `rejects.toThrow(string)` is a SUBSTRING match in vitest, so the 200-character
+    truncation pin passed with a 300-character message. An Error argument is equality.
+  - The default-path tests stubbed the global BEFORE constructing, which passes for a
+    capture-form default, and stubbed with a ONE-parameter function, which passes for
+    `(input) => fetch(input)`. That second form type-checks and would strip the auth
+    header off every request. Both are now R16.
+  - The gate.mjs step pin was a bare substring, so commenting the step out kept it
+    green. Now R17.
+
+Also corrected: L3's rationale was false (the seams are OPTIONAL parameters, so `tsc`
+proves nothing about construction-site arity; the conclusion still stands for the
+reason the security review gave), L4 was overclaimed as closed when only the connect
+handshake was covered, and the "six bot files" count was stale within its own commit.
+L5 was closed here instead of deferred. L6 is new and open: `bot/` type-checks against
+lib DOM, so a Node-missing DOM global passes both `tsc` and `build:bot`.
+
+Deferred, with reasons: L1 and L2 (the interaction token and the discord_user_id in log
+lines) stay routed to Phase 2, which rewrites `request()` anyway; the security review
+added that the redaction must live in the THROW in `discord_api.ts`, not in the one
+named catch, because 15 other bare `console.error(e)` handlers would re-open it. L6 is
+a toolchain restructure, routed to Phase 7. The cadence constants remain unpinned
+against `bot/main.ts`'s USE of them (a swap survives): `main.ts` calls `main()` at
+module scope so it cannot be imported, and R6 forbids a source-text pin, so this is a
+ruled-acceptable residual rather than a finding.
+
+Gate: PASS, all 12 steps.
