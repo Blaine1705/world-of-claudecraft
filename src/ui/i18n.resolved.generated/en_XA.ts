@@ -2440,6 +2440,7 @@ export const en_XA: EnTranslations = {
       "toolEffectCharges": "[{charges} óƒ {max} çĥáŕĝéš]",
       "toolEffectSpent": "[Šþéñţ, ñééðš ŕéçĥáŕĝíñĝ]",
       "toolEffectDepleted": "[Ţóóļ éƒƒéçţ šþéñţ]",
+      "toolEffectRechargePrice": "[Ŕéçĥáŕĝé: {count} ẋ {material}]",
       "toolEffectModeAsk": "[Ášķ éáçĥ úšé]",
       "toolEffectModePrompt": "[Ášķš éáçĥ úšé]",
       "toolEffectConfirmTitle": "[Úšé {effect}?]",

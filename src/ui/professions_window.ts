@@ -14,9 +14,11 @@
 
 import { audio } from '../game/audio';
 import { GATHERING_PROFESSIONS, type GatheringProfessionId } from '../sim/content/professions';
+import { ITEMS } from '../sim/data';
 import type { IWorld } from '../world_api';
 import { archetypeTitleText, craftNameText } from './char_window';
 import { markDialogRoot } from './dialog_root';
+import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { GATHERING_PROFESSION_NAME_KEYS } from './gathering_profession_name';
@@ -560,8 +562,23 @@ export class ProfessionsWindow {
               charges: this.fmt(effect.charges),
               max: this.fmt(effect.maxCharges),
             });
+        // The cost preview (the UX pass): the priced material and count the
+        // resolver would charge RIGHT NOW, beside the button that sends it.
+        // Ceil-priced, so the blind marginal top-up reads honestly: at 49 of
+        // 50 the line says one full material for the one charge. R46's deny
+        // line stays the affordability surface; this is the price surface.
+        const rechargeDef = effect.recharge ? ITEMS[effect.recharge.materialItemId] : undefined;
+        const price =
+          effect.recharge && rechargeDef
+            ? `<span class="prof-effect-price">${esc(
+                t('hudChrome.professions.toolEffectRechargePrice', {
+                  count: this.fmt(effect.recharge.count),
+                  material: itemDisplayName(rechargeDef),
+                }),
+              )}</span>`
+            : '';
         const recharge = effect.rechargeable
-          ? `<button type="button" class="btn prof-effect-btn" data-recharge-profession="${esc(row.professionId)}" data-focus-key="recharge:${esc(row.professionId)}">${esc(
+          ? `${price}<button type="button" class="btn prof-effect-btn" data-recharge-profession="${esc(row.professionId)}" data-focus-key="recharge:${esc(row.professionId)}">${esc(
               t('hudChrome.professions.toolEffectRechargeButton'),
             )}</button>`
           : '';

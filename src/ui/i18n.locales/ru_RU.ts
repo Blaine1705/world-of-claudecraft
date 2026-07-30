@@ -10180,6 +10180,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeMaterials': 'Для перезарядки {effect} нужно {material} x{count}.',
   'hudChrome.professions.toolEffectSpent': 'Израсходовано, нужна подзарядка',
   'hudChrome.professions.toolEffectDepleted': 'Эффект инструмента израсходован',
+  'hudChrome.professions.toolEffectRechargePrice': 'Подзарядка: {material} x{count}',
   'hudChrome.professions.toolEffectModeAsk': 'Спрашивать при каждом использовании',
   'hudChrome.professions.toolEffectModePrompt': 'Спрашивает при каждом использовании',
   'hudChrome.professions.toolEffectConfirmTitle': 'Использовать {effect}?',

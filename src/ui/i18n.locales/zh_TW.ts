@@ -9547,6 +9547,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeMaterials': '為{effect}充能需要{material}x{count}。',
   'hudChrome.professions.toolEffectSpent': '已耗盡，需要充能',
   'hudChrome.professions.toolEffectDepleted': '工具效果已耗盡',
+  'hudChrome.professions.toolEffectRechargePrice': '充能：{material} x{count}',
   'hudChrome.professions.toolEffectModeAsk': '每次使用前詢問',
   'hudChrome.professions.toolEffectModePrompt': '每次使用前會詢問',
   'hudChrome.professions.toolEffectConfirmTitle': '使用{effect}？',

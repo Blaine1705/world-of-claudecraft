@@ -525,6 +525,32 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
     expect(el.querySelectorAll('.prof-effect')).toHaveLength(0);
   });
 
+  it('the recharge price line previews the resolver count, marginal top-up included', () => {
+    // The phase 12 QA hand-off: the cost preview beside the button. A
+    // copper-pick slot at 3 of 20 restores 17: ceil(17/10) = 2 dust...
+    const deep = slotted({ charges: 3, maxCharges: 20 });
+    deep.inventory = [{ itemId: 'copper_mining_pick', count: 1 }];
+    const { el } = makeWindow(deep);
+    const price = el.querySelector('.prof-effect-price')?.textContent ?? '';
+    expect(price).toContain('Recharge:');
+    expect(price).toContain('2');
+    expect(price).toContain('Chime Dust');
+    // ...and the blind marginal top-up: 19 of 20 restores one charge and
+    // STILL prices one full material (the ceil floor), stated before the
+    // click instead of discovered after it.
+    const marginal = slotted({ charges: 19, maxCharges: 20 });
+    marginal.inventory = [{ itemId: 'copper_mining_pick', count: 1 }];
+    const { el: marginalEl } = makeWindow(marginal);
+    const marginalPrice = marginalEl.querySelector('.prof-effect-price')?.textContent ?? '';
+    expect(marginalPrice).toContain('1');
+    expect(marginalPrice).toContain('Chime Dust');
+    // No preview without a button: the full slot renders neither.
+    const full = slotted({ charges: 20, maxCharges: 20 });
+    full.inventory = [{ itemId: 'copper_mining_pick', count: 1 }];
+    const { el: fullEl } = makeWindow(full);
+    expect(fullEl.querySelector('.prof-effect-price')).toBeNull();
+  });
+
   it('a rechargeable slot paints the recharge button; a full or tool-less one does not', () => {
     const rechargeState = slotted({ charges: 3, maxCharges: 20 });
     rechargeState.inventory = [{ itemId: 'copper_mining_pick', count: 1 }];

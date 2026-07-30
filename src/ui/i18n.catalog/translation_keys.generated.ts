@@ -7536,6 +7536,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.professions.toolEffectRechargeFull'
   | 'hudChrome.professions.toolEffectRechargeMaterials'
   | 'hudChrome.professions.toolEffectRechargeNoSlot'
+  | 'hudChrome.professions.toolEffectRechargePrice'
   | 'hudChrome.professions.toolEffectRechargeToolCapped'
   | 'hudChrome.professions.toolEffectRecharged'
   | 'hudChrome.professions.toolEffectSlotButton'

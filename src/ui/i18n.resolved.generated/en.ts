@@ -2440,6 +2440,7 @@ export const en: EnTranslations = {
       "toolEffectCharges": "{charges} of {max} charges",
       "toolEffectSpent": "Spent, needs recharging",
       "toolEffectDepleted": "Tool effect spent",
+      "toolEffectRechargePrice": "Recharge: {count} x {material}",
       "toolEffectModeAsk": "Ask each use",
       "toolEffectModePrompt": "Asks each use",
       "toolEffectConfirmTitle": "Use {effect}?",

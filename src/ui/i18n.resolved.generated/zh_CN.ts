@@ -2440,6 +2440,7 @@ export const zh_CN: EnTranslations = {
       "toolEffectCharges": "剩余 {charges} / {max} 次",
       "toolEffectSpent": "已耗尽，需要充能",
       "toolEffectDepleted": "工具效果已耗尽",
+      "toolEffectRechargePrice": "充能：{material} x{count}",
       "toolEffectModeAsk": "每次使用前询问",
       "toolEffectModePrompt": "每次使用前会询问",
       "toolEffectConfirmTitle": "使用{effect}？",

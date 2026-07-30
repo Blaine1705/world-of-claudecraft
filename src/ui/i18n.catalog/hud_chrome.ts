@@ -2795,6 +2795,11 @@ export const hudChromeStrings = {
     // per-use ask (accept spends the charge, decline still gathers, and the
     // body says so, because a dialog whose cancel still acts must never
     // surprise).
+    // The recharge cost preview beside the button (the UX pass): the priced
+    // material and count the resolver would charge right now. Ceil-priced,
+    // so the marginal top-up (one charge short) honestly reads one full
+    // material.
+    toolEffectRechargePrice: 'Recharge: {count} x {material}',
     toolEffectModeAsk: 'Ask each use',
     toolEffectModePrompt: 'Asks each use',
     toolEffectConfirmTitle: 'Use {effect}?',

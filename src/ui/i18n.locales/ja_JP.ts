@@ -10006,6 +10006,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{effect}の再充填には{material}x{count}が必要だ。',
   'hudChrome.professions.toolEffectSpent': '使い切りました。再充填が必要です',
   'hudChrome.professions.toolEffectDepleted': '道具の効果を使い切りました',
+  'hudChrome.professions.toolEffectRechargePrice': '再充填: {material} x{count}',
   'hudChrome.professions.toolEffectModeAsk': '毎回確認する',
   'hudChrome.professions.toolEffectModePrompt': '毎回確認します',
   'hudChrome.professions.toolEffectConfirmTitle': '{effect}を使いますか？',

@@ -2440,6 +2440,7 @@ export const ko_KR: EnTranslations = {
       "toolEffectCharges": "{charges} / {max}회 남음",
       "toolEffectSpent": "모두 소모됨, 재충전 필요",
       "toolEffectDepleted": "도구 효과를 모두 소모했습니다",
+      "toolEffectRechargePrice": "재충전: {material} x{count}",
       "toolEffectModeAsk": "사용할 때마다 확인",
       "toolEffectModePrompt": "사용 시마다 확인함",
       "toolEffectConfirmTitle": "{effect}을(를) 사용하시겠습니까?",

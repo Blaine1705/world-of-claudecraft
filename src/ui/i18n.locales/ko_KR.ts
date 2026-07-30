@@ -10001,6 +10001,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{effect} 재충전에는 {material} x{count}이(가) 필요합니다.',
   'hudChrome.professions.toolEffectSpent': '모두 소모됨, 재충전 필요',
   'hudChrome.professions.toolEffectDepleted': '도구 효과를 모두 소모했습니다',
+  'hudChrome.professions.toolEffectRechargePrice': '재충전: {material} x{count}',
   'hudChrome.professions.toolEffectModeAsk': '사용할 때마다 확인',
   'hudChrome.professions.toolEffectModePrompt': '사용 시마다 확인함',
   'hudChrome.professions.toolEffectConfirmTitle': '{effect}을(를) 사용하시겠습니까?',

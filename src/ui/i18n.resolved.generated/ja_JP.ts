@@ -2440,6 +2440,7 @@ export const ja_JP: EnTranslations = {
       "toolEffectCharges": "残り {charges} / {max} 回",
       "toolEffectSpent": "使い切りました。再充填が必要です",
       "toolEffectDepleted": "道具の効果を使い切りました",
+      "toolEffectRechargePrice": "再充填: {material} x{count}",
       "toolEffectModeAsk": "毎回確認する",
       "toolEffectModePrompt": "毎回確認します",
       "toolEffectConfirmTitle": "{effect}を使いますか？",

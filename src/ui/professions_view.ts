@@ -318,6 +318,14 @@ export interface GatheringToolEffectModel {
   /** The slot's live confirm mode (R40): 'prompt' rows chip "Asks each use"
    *  so the per-use dialog never surprises. */
   confirmMode: 'always' | 'prompt';
+  /** The recharge cost preview (the UX pass, the phase 12 QA hand-off):
+   *  the priced material, count, and charges restored for the fill the
+   *  resolver would perform RIGHT NOW, present exactly when `rechargeable`.
+   *  Resolved with the viewer's REAL craft skills, so the specialization
+   *  discount previews at its true count, and re-derived per repaint, which
+   *  is what makes the blind marginal top-up visible: at 49 of 50 the
+   *  ceil-priced count still reads one full material for one charge. */
+  recharge?: { materialItemId: string; count: number; restored: number };
 }
 
 export interface ProfessionsGatheringRow {
@@ -479,24 +487,34 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
             // effect this build's catalog lacks renders un-rechargeable
             // instead of throwing mid-paint (the resolver's charge math
             // indexes the catalog).
-            rechargeable: (() => {
+            ...(() => {
               const live = liveSlotFor(slot, input.viewerName);
-              // viewerName for symmetry with the slot call (the ok/deny half
-              // reads neither name nor skills today, they only scale the
-              // count, but the symmetric call cannot rot if that changes);
-              // skills stay {} because the view has no CraftSkillState and
-              // count is unused here.
-              return (
-                live !== undefined &&
-                resolveRechargeToolEffect(
-                  input.inventory,
-                  row.professionId,
-                  live,
-                  input.viewerName,
-                  {},
-                  ITEMS,
-                ).ok
-              );
+              // The one resolver call now feeds BOTH the affordance and the
+              // cost preview (the UX pass): viewerName decides the
+              // original-crafter half of the discount, and the viewer's
+              // REAL craft skills decide the specialization half, so the
+              // previewed count is the count the command would charge.
+              const resolved =
+                live !== undefined
+                  ? resolveRechargeToolEffect(
+                      input.inventory,
+                      row.professionId,
+                      live,
+                      input.viewerName,
+                      input.identity.craftSkills,
+                      ITEMS,
+                    )
+                  : undefined;
+              return resolved?.ok
+                ? {
+                    rechargeable: true,
+                    recharge: {
+                      materialItemId: resolved.materialItemId,
+                      count: resolved.count,
+                      restored: resolved.restored,
+                    },
+                  }
+                : { rechargeable: false };
             })(),
           }
         : null,

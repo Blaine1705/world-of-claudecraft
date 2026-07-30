@@ -2440,6 +2440,7 @@ export const ru_RU: EnTranslations = {
       "toolEffectCharges": "Осталось зарядов: {charges} из {max}",
       "toolEffectSpent": "Израсходовано, нужна подзарядка",
       "toolEffectDepleted": "Эффект инструмента израсходован",
+      "toolEffectRechargePrice": "Подзарядка: {material} x{count}",
       "toolEffectModeAsk": "Спрашивать при каждом использовании",
       "toolEffectModePrompt": "Спрашивает при каждом использовании",
       "toolEffectConfirmTitle": "Использовать {effect}?",
