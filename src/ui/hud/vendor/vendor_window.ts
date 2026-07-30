@@ -10,6 +10,7 @@
 import type { ItemInstancePayload } from '../../../sim/types';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
+import { captureFocusKey, restoreFirstEnabled } from '../../focus_restore';
 import { GATHERING_PROFESSION_NAME_KEYS } from '../../gathering_profession_name';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
@@ -94,9 +95,14 @@ export function renderVendorWindow(
 ): void {
   // The rebuild replaces the hovered row (its mouseleave never fires) and
   // collapses the scrolled list, drop the tooltip and restore the scroll.
+  // It also replaces the FOCUSED row (a keyboard buy rebuilds under the
+  // finger), so the focus key is captured here and restored at the end per
+  // the focus-across-a-REBUILD contract; requirement-advisory rows are
+  // focusable since the R22 turn, which widened the set exposed to the drop.
   deps.hideTooltip();
+  const focusKey = captureFocusKey(el);
   const scrollTop = el.scrollTop;
-  el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
+  el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
 
   if (view.hasHonorGoods) {
     const balance = document.createElement('div');
@@ -146,6 +152,7 @@ export function renderVendorWindow(
         : t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
     );
     row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${esc(stack)}${requirement ? `<span class="vi-sub">${esc(requirement)}</span>` : ''}</span><span class="vi-price">${goodsPriceHtml(goods, deps)}</span>`;
+    row.dataset.focusKey = `buy:${itemId}`;
     row.addEventListener('click', () => deps.onBuy(itemId));
     // No appended requirement line in the tooltip: the shared item tooltip
     // (deps.itemTooltip -> gatherToolTooltipLines) already renders the same
@@ -174,6 +181,7 @@ export function renderVendorWindow(
         })
       : t('itemUi.vendor.sellJunk'),
   );
+  sellJunk.dataset.focusKey = 'sell-junk';
   sellJunk.addEventListener('click', () => deps.onSellJunk());
   deps.attachTooltip(
     sellJunk,
@@ -210,6 +218,7 @@ export function renderVendorWindow(
     const itemName = itemDisplayName(item);
     row.setAttribute('aria-label', t('itemUi.vendor.buybackAria', { item: itemName, price }));
     row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) }))}` : ''}</span><span class="vi-price">${deps.moneyHtml(priceCopper)}</span>`;
+    row.dataset.focusKey = `buyback:${index}`;
     row.addEventListener('click', () => deps.onBuyBack(itemId, index, instance, craftedRecipeId));
     deps.attachTooltip(
       row,
@@ -228,4 +237,20 @@ export function renderVendorWindow(
   el.querySelector('[data-close]')?.addEventListener('click', () => deps.onClose());
   el.style.display = 'block';
   el.scrollTop = scrollTop;
+  // Scroll first, then restore (the family contract): the exact control when
+  // it survived the rebuild, else the stable neighbors, so a keyboard buy of
+  // the last stack cannot drop focus to <body>.
+  if (focusKey) {
+    // Matched by dataset equality rather than an attribute selector: the keys
+    // are self-minted (buy:<itemId> and friends) but this needs no CSS.escape,
+    // which jsdom does not provide.
+    const exact = [...el.querySelectorAll<HTMLButtonElement>('[data-focus-key]')].find(
+      (b) => b.dataset.focusKey === focusKey,
+    );
+    restoreFirstEnabled([
+      exact,
+      el.querySelector<HTMLButtonElement>('.vendor-sell-junk'),
+      el.querySelector<HTMLButtonElement>('[data-close]'),
+    ]);
+  }
 }

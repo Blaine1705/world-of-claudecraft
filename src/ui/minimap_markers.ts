@@ -259,6 +259,10 @@ export function createMinimapMarkers(): MinimapMarkers {
       // per-build temporary (like the membership Sets above), so a tool
       // picked up between frames re-resolves next build.
       let bestToolTiers: Map<GatheringProfessionId, number> | null = null;
+      // Resolved ONCE beside the memo: the offline gatheringProficiency
+      // getter copies the live map per access, so reading it per profession
+      // would allocate per build. Same lazy shape as the memo itself.
+      let proficiency: Readonly<Record<string, number>> | undefined;
       for (const node of GATHER_NODES) {
         const dx = -(node.pos.x - p.pos.x) * pxPerYard;
         const dz = -(node.pos.z - p.pos.z) * pxPerYard;
@@ -267,7 +271,8 @@ export function createMinimapMarkers(): MinimapMarkers {
         const professionId = NODE_HARVEST_TABLE[node.type].professionId;
         let best = bestToolTiers.get(professionId);
         if (best === undefined) {
-          best = viewerUsableToolTier(world, professionId);
+          proficiency ??= world.gatheringProficiency;
+          best = viewerUsableToolTier(world, professionId, proficiency);
           bestToolTiers.set(professionId, best);
         }
         markers.push({

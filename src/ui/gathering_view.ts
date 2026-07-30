@@ -58,8 +58,17 @@ export function classifyGatherNode(world: IWorld, nodeId: string): GatherNodeSta
  *  read it, so what the client shows can never disagree with what the
  *  sim's wield-filtered harvest gate refuses. Fishing passes through
  *  unfiltered inside the shared resolver (rods are R22-exempt). */
-export function viewerUsableToolTier(world: IWorld, professionId: GatheringProfessionId): number {
-  const skill = world.gatheringProficiency?.[professionId];
+export function viewerUsableToolTier(
+  world: IWorld,
+  professionId: GatheringProfessionId,
+  // A caller resolving several professions in one pass (the minimap's
+  // 10 Hz marker build) hands the map it already read: the offline world's
+  // gatheringProficiency getter COPIES the live map per access, so
+  // re-reading it per profession is per-build garbage the reference probe
+  // cannot see. Single-callers omit it and read through as before.
+  proficiency: Readonly<Record<string, number>> | undefined = world.gatheringProficiency,
+): number {
+  const skill = proficiency?.[professionId];
   return bestWieldableGatherToolTierOrNone(world.inventory, professionId, skill, ITEMS);
 }
 

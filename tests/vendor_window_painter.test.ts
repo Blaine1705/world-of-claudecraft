@@ -380,3 +380,68 @@ describe('#vendor-window desktop width cap: divides by --window-scale and clears
     }
   });
 });
+
+describe('renderVendorWindow: focus across the rebuild (the R22 advisory widening)', () => {
+  function goodsRow(itemId: string): VendorGoodsRow {
+    return {
+      itemId,
+      item: item(itemId),
+      price: { copper: 5, honor: 0 },
+      quantity: 1,
+      affordable: true,
+      requirementUnmet: false,
+    };
+  }
+
+  it('a focused goods row keeps focus when the rebuild repaints it', () => {
+    // The buy path rebuilds the whole grid with fresh elements; before the
+    // capture-and-restore wiring a keyboard buy dropped focus to <body> on
+    // every purchase (pre-existing for affordable rows, widened by the
+    // advisory turn making requirement rows focusable for the first time).
+    const view: VendorView = {
+      goods: [goodsRow('bread'), goodsRow('water')],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+    };
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    try {
+      renderVendorWindow(el, 'Vendor', view, deps());
+      const water = el.querySelector<HTMLButtonElement>('[data-focus-key="buy:water"]');
+      expect(water).not.toBeNull();
+      water?.focus();
+      expect(document.activeElement).toBe(water);
+      renderVendorWindow(el, 'Vendor', view, deps());
+      const rebuilt = el.querySelector<HTMLButtonElement>('[data-focus-key="buy:water"]');
+      expect(rebuilt).not.toBeNull();
+      expect(rebuilt).not.toBe(water); // genuinely a fresh element
+      expect(document.activeElement).toBe(rebuilt);
+    } finally {
+      el.remove();
+    }
+  });
+
+  it('a vanished row falls to the stable neighbors, skipping a disabled sell-junk', () => {
+    const two: VendorView = {
+      goods: [goodsRow('bread'), goodsRow('water')],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+    };
+    const one: VendorView = { ...two, goods: [goodsRow('bread')] };
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    try {
+      renderVendorWindow(el, 'Vendor', two, deps());
+      el.querySelector<HTMLButtonElement>('[data-focus-key="buy:water"]')?.focus();
+      // The focused row is gone from the rebuilt tree; sell-junk is disabled
+      // in the default deps, so the close button is the first enabled
+      // candidate and focus must land there rather than on <body>.
+      renderVendorWindow(el, 'Vendor', one, deps());
+      expect(document.activeElement).toBe(el.querySelector('[data-close]'));
+    } finally {
+      el.remove();
+    }
+  });
+});
