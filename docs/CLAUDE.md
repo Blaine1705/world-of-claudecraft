@@ -29,10 +29,10 @@ feature spec), or its program's dir; the top level is only for a living runbook.
 | `i18n-scaling/` | i18n architecture + workflow docs. `translation-workflow.md` is the canonical contributor/maintainer roles reference (root and `src/ui/CLAUDE.md` point here); `lazy-locales-and-contributor-workflow.md` is the lazy-locale/hygiene design package. |
 | `achievements/` | Book of Deeds handoff: maintainer notes (open decisions, deferrals, follow-ups) and the deed icon art brief. |
 | `release-notes/` | Per-version release notes. |
-| `screenshots/` | Load-bearing image assets only (see below). Not a dumping ground for merged PR shots. |
+| `screenshots/` | README hero images, asset-pipeline evidence, and PR before/after shots (see below). |
 | `api-pipeline/` | Server REST pipeline program packet (spec, progress, rollback runbook). |
 | `architecture/`, `refactor/`, `hud-ux-and-accessibility/`, `ui-architecture-hud-modularization/` | Historical program records (the v0.15.0-era refactor doc, workstream hand-offs, completed phased UX/HUD programs): history, not source of truth. |
-| other top-level `*.md` | One-off reports (`hud-program-roadmap.md`, `performance-feel-audit.md`, `online-movement-latency.md`, ...). Historical image side-cars under this tree were purged; do not reintroduce dead PR evidence. |
+| other top-level `*.md` | One-off reports (`hud-program-roadmap.md`, `performance-feel-audit.md`, `online-movement-latency.md`, ...). |
 
 ## design/ & prd/ contents
 `ls` the dirs for the current set; most filenames say what they are. The non-obvious
@@ -55,19 +55,18 @@ pairs with `prd/FRONTIER_PHASE1_HANDOFF.md`, a slice-by-slice implementation han
 whose slices are specced but NOT yet implemented; read the handoff before starting one.
 
 ## screenshots/
-Permanent, load-bearing assets only. Keep this tree small.
+JPG/PNG assets embedded by the repo-root `README.md` (title screen, zones, dungeons, UI),
+asset-pipeline evidence (`eastbrook-vale-rebuild/`, `eastbrook-grand-armoury/`), living
+design/PRD concepts (for example `wildheart/`), and visual-PR before/after shots.
 
-**Belongs here permanently:**
-- README (and `docs/i18n/README.*`) hero embeds (stable filenames; replace in place).
-- Asset-pipeline evidence that tests and exporters pin: `eastbrook-vale-rebuild/`
-  (fingerprints, materials, turnarounds, capture matrix) and `eastbrook-grand-armoury/`.
-- Living design/PRD concept captures that docs still cite (for example `wildheart/`).
+Replacing a README hero: keep the same filename so README links do not break. Visual PRs
+still commit before/after screenshots here and reference them from the PR body; generate
+them with `scripts/pr_screenshots.mjs` (root workflow rule and the `pr-screenshots` skill).
 
-**Does not belong here after merge:** PR before/after directories, one-off capture
-outputs, or report side-cars. Capture them with `scripts/pr_screenshots.mjs` (or a
-bespoke `*_shot.mjs`) for the PR review, attach them to the PR body or CI bot
-comment, and leave them out of the permanent tree (or delete them in the same PR
-once review is done). Regenerable capture output is not provenance.
+Merged PR evidence is not load-bearing forever. Periodically purge dead before/after
+directories that nothing in tests, README, CREDITS, or asset fingerprints still needs.
+Do not delete `eastbrook-vale-rebuild/`, `eastbrook-grand-armoury/`, README heroes, or
+other paths pinned by tests or provenance.
 
 ## i18n note (the only player/contributor-facing strings under `docs/`)
 The doc *prose* here is dev/design reference, English-only. The exception is `i18n/`:
