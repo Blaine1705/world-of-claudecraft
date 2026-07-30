@@ -121,10 +121,12 @@ export const WOC_FISHING_EMPTY_HOOKS_TOTAL = 'woc_fishing_empty_hooks_total';
 /** Total rod recipes successfully trained, labeled by recipe id (one fee paid each). */
 export const WOC_ROD_FEE_PAYMENTS_TOTAL = 'woc_rod_fee_payments_total';
 
-/** The STATIC training fee in copper for each rod recipe, published so the copper
- *  the rod fees took is woc_rod_fee_payments_total times this, with no hardcoded
- *  gold amount in any dashboard. Content-derived and constant for the process's
- *  life, which is why it carries no collect(). */
+/** The STATIC training fee in copper for each rod recipe, published so no
+ *  dashboard hardcodes a gold amount. Content-derived and constant for the
+ *  process's life, which is why it carries no collect(). Every realm process
+ *  publishes the SAME value, so across realm targets the copper the rod fees
+ *  took is sum(woc_rod_fee_payments_total) * max(woc_rod_fee_copper) per
+ *  recipe; summing the gauge itself overstates by the realm count. */
 export const WOC_ROD_FEE_COPPER = 'woc_rod_fee_copper';
 
 /**
@@ -394,7 +396,7 @@ export function registerGameStateMetrics(
   });
   const rodFeeCopper = new Gauge({
     name: WOC_ROD_FEE_COPPER,
-    help: 'The static training fee in copper for each rod recipe (multiply by the payments counter).',
+    help: 'The static training fee in copper for each rod recipe (multiply the payments counter by max() of this gauge across realms, never its sum).',
     labelNames: ['recipe'],
     registers: [registry],
   });

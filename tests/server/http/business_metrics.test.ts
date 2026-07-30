@@ -247,7 +247,19 @@ describe('registerBusinessMetrics', () => {
         'reached_level_5',
       ]),
     );
-    for (const forbidden of ['account_id', 'character_id', 'player', 'name', 'ip']) {
+    // No per-player label, and no realm dimension either: realm identity is a
+    // scrape-time target label (one process = one realm; the DB queries filter
+    // on REALM instead), the same prohibition the game-state family pins.
+    for (const forbidden of [
+      'account_id',
+      'character_id',
+      'player',
+      'name',
+      'ip',
+      'realm',
+      'realm_name',
+      'server_name',
+    ]) {
       expect(labelValues(forbidden).size).toBe(0);
     }
   });

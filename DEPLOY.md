@@ -471,6 +471,18 @@ For off-box safety, sync the directory to S3 occasionally:
   full cross product is still pre-registered at boot by design (a Prometheus
   counter cannot backfill a scrape), and no per-request cardinality bound
   changed: the vocabularies stay content-derived and bounded.
+- **Multi-realm scraping**: one server process hosts exactly one realm, and no
+  exported series carries a `realm` label (pinned by the exporter tests; the
+  DB-backed business family filters on the realm in its queries instead). Give
+  each realm process its own scrape target and attach realm identity as a
+  target label in the scrape config, e.g.
+  `static_configs: [{ targets: ['127.0.0.1:8787'], labels: { realm: 'emberfall' } }]`
+  per realm port. Counters then sum cleanly across realms
+  (`sum(woc_fishing_catches_total)` is world-wide). The one exception:
+  `woc_rod_fee_copper` is a static content gauge published IDENTICALLY by
+  every realm process, so aggregate it with `max()` (or `avg()`), never
+  `sum()`: the copper the rod fees took across realms is
+  `sum(woc_rod_fee_payments_total) * max(woc_rod_fee_copper)` per recipe.
 - **Game watchdog (wedge recovery)**: `deploy/game_watchdog.sh`, installed as
   `/usr/local/bin/eastbrook-watchdog` and fired every minute from
   `/etc/cron.d/eastbrook-watchdog`. Docker's `restart: unless-stopped` only acts when
