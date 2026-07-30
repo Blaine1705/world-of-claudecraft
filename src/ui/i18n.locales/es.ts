@@ -9295,9 +9295,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Más allá del Nightgate el aire mismo sueña. Sigue la luz de las flores, y cuidado con el mundo dormido que cuelga en el cielo.',
   'guide.worldPage.nightPlaceNotes':
     'Moonrest mantiene la vela. El Nightgate es la entrada al país de la medianoche; el Pozo de Luna guarda luz estelar junto a la que puedes estar de pie; Gloamfield florece en la oscuridad; la Vela Permanente vigila sin moverse jamás; y el Túmulo Insomne es el único lugar aquí que nunca sueña.',
-  'entities.abilities.chain_heal.description':
-    'Sana una gran cantidad a un objetivo amistoso y luego salta a un máximo de 2 aliados cercanos adicionales, sanando un 50 % menos con cada salto. (habilidad distintiva de Restauración)',
-  'entities.abilities.chain_heal.name': 'Sanación en cadena',
   'entities.abilities.counter_shot.description':
     'Un disparo rápido que interrumpe el lanzamiento de hechizos del objetivo y bloquea esa escuela durante 4 s.',
   'entities.abilities.counter_shot.name': 'Disparo silenciador',

@@ -9003,9 +9003,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Bortom Nattporten drömmer själva luften. Följ blomljuset, och se upp för den sovande världen som hänger i skyn.',
   'guide.worldPage.nightPlaceNotes':
     'Månvila håller vakan. Nattporten är vägen in i midnattslandet; Månbrunnen rymmer stjärnljus du kan stå bredvid; Skymningsfältet blommar i mörkret; Den stående vakan vakar utan att någonsin röra sig; och Den sömnlösa gravhögen är den enda platsen här som aldrig drömmer.',
-  'entities.abilities.chain_heal.description':
-    'Läker ett vänligt mål för en stor mängd och hoppar sedan till upp till 2 ytterligare allierade i närheten. Varje hopp läker för 50% mindre. (Återställningssignatur)',
-  'entities.abilities.chain_heal.name': 'Kedjeläkning',
   'entities.abilities.counter_shot.description':
     'Ett snabbt skott som avbryter målets besvärjelse och låser den magiskolan i 4 sek.',
   'entities.abilities.counter_shot.name': 'Dämpande Skott',

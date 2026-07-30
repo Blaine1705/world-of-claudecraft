@@ -9042,9 +9042,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Qua khỏi Nightgate, chính bầu không khí cũng đang chìm trong giấc mộng. Hãy men theo ánh sáng của hoa, và để ý đến thế giới đang say ngủ treo lơ lửng trên bầu trời.',
   'guide.worldPage.nightPlaceNotes':
     'Moonrest giữ vững buổi canh thức. Nightgate là lối vào miền đất nửa đêm; Moonwell lưu giữ ánh sao mà bạn có thể đứng cạnh bên; Gloamfield nở hoa trong bóng tối; Đài Canh Thức Bất Động dõi trông mà chẳng bao giờ lay động; còn Gò Mộ Không Ngủ là nơi duy nhất ở đây chẳng bao giờ chìm vào giấc mộng.',
-  'entities.abilities.chain_heal.description':
-    'Hồi phục một lượng lớn máu cho một mục tiêu đồng minh, sau đó lan sang tối đa 2 đồng minh ở gần; lượng hồi phục giảm 50% sau mỗi lần lan. (Kỹ năng chủ lực của Hồi Phục)',
-  'entities.abilities.chain_heal.name': 'Hồi Máu Liên Hoàn',
   'entities.abilities.counter_shot.description':
     'Một phát bắn nhanh làm gián đoạn quá trình niệm phép của mục tiêu và khóa hệ phép đó trong 4 giây.',
   'entities.abilities.counter_shot.name': 'Phát Bắn Phản Đòn',

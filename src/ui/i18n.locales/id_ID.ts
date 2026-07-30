@@ -9095,9 +9095,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Melewati Gerbang Malam, udara itu sendiri bermimpi. Ikuti cahaya bunga, dan waspadai dunia tidur yang tergantung di langit.',
   'guide.worldPage.nightPlaceNotes':
     'Moonrest menjaga kesunyian malam. Gerbang Malam adalah jalan menuju negeri tengah malam; Sumur Bulan menampung cahaya bintang yang bisa kau berdiri di sampingnya; Gloamfield mekar dalam kegelapan; Sang Penjaga Tegak mengawasi tanpa pernah bergerak; dan Gundukan Tanpa Tidur adalah satu-satunya tempat di sini yang tak pernah bermimpi.',
-  'entities.abilities.chain_heal.description':
-    'Menyembuhkan target sekutu dalam jumlah besar, lalu melompat ke hingga 2 sekutu terdekat lainnya dengan penyembuhan 50% lebih sedikit pada setiap lompatan. (Kemampuan khas Pemulihan)',
-  'entities.abilities.chain_heal.name': 'Penyembuhan Berantai',
   'entities.abilities.counter_shot.description':
     'Sebuah tembakan yang mengganggu perapalan mantra target dan mengunci sekolah itu selama 4 detik.',
   'entities.abilities.counter_shot.name': 'Tembakan Penangkal',

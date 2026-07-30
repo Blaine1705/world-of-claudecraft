@@ -9240,9 +9240,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Além do Portão da Noite, o próprio ar sonha. Siga a luz das flores, e cuidado com o mundo adormecido que paira no céu.',
   'guide.worldPage.nightPlaceNotes':
     'Moonrest mantém a vigília. O Portão da Noite é o caminho para a terra da meia-noite; o Poço da Lua guarda uma luz estelar ao lado da qual você pode ficar; Gloamfield floresce na escuridão; a Vigília Permanente observa sem nunca se mover; e o Túmulo Insone é o único lugar aqui que nunca sonha.',
-  'entities.abilities.chain_heal.description':
-    'Cura bastante um alvo aliado e depois salta para até 2 outros aliados próximos, curando 50% menos a cada salto. (Habilidade característica de Restauração)',
-  'entities.abilities.chain_heal.name': 'Cura em Cadeia',
   'entities.abilities.counter_shot.description':
     'Um disparo rápido que interrompe a conjuração do alvo e bloqueia essa escola por 4 s.',
   'entities.abilities.counter_shot.name': 'Tiro Silenciador',

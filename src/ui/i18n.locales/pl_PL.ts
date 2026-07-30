@@ -9196,9 +9196,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Za Nocną Bramą sam powietrze śni. Podążaj za kwietnym blaskiem i uważaj na uśpiony świat zawieszony na niebie.',
   'guide.worldPage.nightPlaceNotes':
     'Moonrest utrzymuje czuwanie. Nocna Brama to droga do krainy północy; Księżycowa Studnia zawiera światło gwiazd, przy którym możesz stanąć; Gloamfield kwitnie w ciemności; Wieczne Czuwanie obserwuje, nigdy się nie poruszając; a Bezsenny Kurhan to jedyne miejsce tutaj, które nigdy nie śni.',
-  'entities.abilities.chain_heal.description':
-    'Leczy sojusznika za dużą wartość, a następnie przeskakuje do maksymalnie 2 pobliskich sojuszników, lecząc o 50% mniej przy każdym skoku. (Sztandarowa zdolność Odnowy)',
-  'entities.abilities.chain_heal.name': 'Leczenie Łańcuchowe',
   'entities.abilities.counter_shot.description':
     'Szybki strzał, który przerywa rzucanie zaklęć celu i blokuje tę szkołę na 4 sekundy.',
   'entities.abilities.counter_shot.name': 'Uciszający Strzał',

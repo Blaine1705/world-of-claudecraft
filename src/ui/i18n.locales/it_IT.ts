@@ -9408,9 +9408,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Oltre la Porta della Notte, l’aria stessa sogna. Segui la luce dei fiori, e fai attenzione al mondo addormentato che pende nel cielo.',
   'guide.worldPage.nightPlaceNotes':
     'Moonrest mantiene la veglia. La Porta della Notte è la via d’accesso alla terra di mezzanotte; il Pozzo della Luna custodisce una luce stellare accanto alla quale puoi restare; Gloamfield fiorisce nel buio; la Veglia Perenne osserva senza mai muoversi; e il Tumulo Insonne è l’unico luogo qui che non sogna mai.',
-  'entities.abilities.chain_heal.description':
-    'Cura abbondantemente un bersaglio alleato, poi si propaga a un massimo di altri 2 alleati vicini, curando il 50% in meno a ogni salto. (Abilità distintiva di Rigenerazione)',
-  'entities.abilities.chain_heal.name': 'Guarigione a Catena',
   'entities.abilities.counter_shot.description':
     "Un tiro rapido che interrompe il lancio dell'incantesimo del bersaglio e blocca quella scuola per 4 s.",
   'entities.abilities.counter_shot.name': 'Tiro Silenziante',

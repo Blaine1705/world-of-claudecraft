@@ -8979,9 +8979,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Gece Kapısı'nın ardında havanın kendisi rüya görür. Çiçek ışığını takip et ve gökyüzünde asılı duran uykudaki dünyaya dikkat et.",
   'guide.worldPage.nightPlaceNotes':
     'Moonrest nöbeti tutar. Gece Kapısı gece yarısı ülkesine giden yoldur; Ay Kuyusu yanında durabileceğin yıldız ışığını barındırır; Gloamfield karanlıkta çiçek açar; Ebedi Nöbet hiç kımıldamadan gözetler; ve Uykusuz Höyük burada asla rüya görmeyen tek yerdir.',
-  'entities.abilities.chain_heal.description':
-    'Bir müttefiki büyük miktarda iyileştirir, ardından yakındaki en fazla 2 müttefike sıçrar ve her sıçramada %50 daha az iyileştirir. (Restorasyonun simge yeteneği)',
-  'entities.abilities.chain_heal.name': 'Zincirleme İyileştirme',
   'entities.abilities.counter_shot.description':
     'Hedefin büyüsünü kesintiye uğratan ve okulu 4 saniyeliğine kilitleyen anlık atış.',
   'entities.abilities.counter_shot.name': 'Karşı Atış',
