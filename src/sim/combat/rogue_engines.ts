@@ -60,8 +60,8 @@ const REDLINE_DURATION = 8;
 // Combo-chain pass (owner playtest, 2026-07-23 round four): passive echoes
 // and refunds read as NOTHING on screen, so Redline is now a button chain.
 // A full-combo Dirt Nap opens the fixed 8 sec window; inside it Wicked Slash
-// transforms into Body Blow (2 combo points, each landing adds a pip, max 4)
-// and Dirt Nap transforms into Knockout Blow, which hits harder per pip and
+// transforms into Haymaker (2 combo points, each landing adds a pip, max 4)
+// and Dirt Nap transforms into Lights Out, which hits harder per pip and
 // ENDS the window. Cash out early and safe, or squeeze pips against the
 // clock: a window that expires forfeits the Knockout entirely.
 export const REDLINE_MAX_DEPTH = 4;
@@ -165,7 +165,7 @@ export function rogueEngineOnCast(
 ): void {
   const spec = specOf(ctx, p);
   if (spec === 'combat') {
-    // Each Body Blow thrown inside the window deepens the run by one pip;
+    // Each Haymaker thrown inside the window deepens the run by one pip;
     // the pips are what the Knockout cashes out.
     if (abilityId === BODY_BLOW_ID) {
       const run = p.auras.find((aura) => aura.id === REDLINE_ID && aura.sourceId === p.id);

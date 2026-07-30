@@ -48,19 +48,19 @@ button, not a race.
 A full-combo Dirt Nap opens the fixed 8 sec **Redline** window, and inside
 it BOTH buttons transform (the owner verdict that forced this shape: passive
 echoes and refunds read as NOTHING on screen, a combo chain of real buttons
-does not). Wicked Slash becomes **Body Blow**: a heavier hit that awards 2
+does not). Wicked Slash becomes **Haymaker**: a heavier hit that awards 2
 combo points and deepens the run by one pip (max 4). Dirt Nap becomes
-**Knockout Blow**: the cash-out, hitting 25% harder per pip, refunding 25
+**Lights Out**: the cash-out, hitting 25% harder per pip, refunding 25
 energy, and ENDING the window when it lands. A window that expires before
 the Knockout forfeits it entirely, so the clock is the tension. This is the
 Midnight Trickster grammar (finishers set up an empowered Coup de Grace)
 adapted to the transform-in-place infrastructure.
 
-- Loop: slash to 5, pool, Dirt Nap opens, chain Body Blows, Knockout,
+- Loop: slash to 5, pool, Dirt Nap opens, chain Haymakers, Knockout,
   rebuild.
-- Decision: cash out early and safe, or squeeze one more Body Blow against
+- Decision: cash out early and safe, or squeeze one more Haymaker against
   the clock; Mirrored Blades and Flurry of Knives belong inside the window.
-- Presentation: one timed aura whose pips climb per Body Blow; two visible
+- Presentation: one timed aura whose pips climb per Haymaker; two visible
   button transforms bracket the window.
 
 ## Skulduggery: the shadow bank
@@ -125,8 +125,8 @@ collapsed its margin over Venom Dividend and nearly flipped the sub build,
 so the row values stay). The fury probe peer reference on the same machine is 147.2: rogue
 leads the measured band per the owner's explicit buff directive; trimming
 back toward cross-class parity is a PBE knob (values, never shapes). Tuning
-history: Body Blow ships at 130% weapon damage plus 10 (probed at 150 and
-140 on the way down); Knockout Blow ships at 45 plus 35 per combo point
+history: Haymaker ships at 130% weapon damage plus 10 (probed at 150 and
+140 on the way down); Lights Out ships at 45 plus 35 per combo point
 with the 25% per pip multiplier and a 25 energy recovery (the recovery is
 what brings window cadence to roughly one per half minute, three windows a
 fight probed as too rare a payoff); Dusk Economy probed at 0.55 (215 once

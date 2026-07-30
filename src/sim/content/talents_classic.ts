@@ -178,7 +178,7 @@ const ROGUE_SPECS: SpecDef[] = [
     'Knifework',
     'dps',
     'x',
-    'A poisoned burst specialist: builder strikes stack the Venom Ritual, and at 6 stages Dirt Nap becomes Venomrend, detonating every bleed and reopening the wound.',
+    'A poison specialist. Your strikes add Venom Ritual; at 6, Dirt Nap becomes Venomrend, which cashes in all your bleeds at once and plants a fresh wound.',
     'cold_blood',
     // Balance pass (maintainer sheet): the backstab identity (the classic
     // Improved Backstab 30%), not a bleed rider on Subtlety's turf.
@@ -201,7 +201,7 @@ const ROGUE_SPECS: SpecDef[] = [
     'Thuggery',
     'dps',
     '/',
-    'A stand-up brawler: a full-combo Dirt Nap opens the Redline window, where Body Blows deepen the pips and Knockout Blow cashes them out before the clock runs dry.',
+    'A stand-up brawler. A 4+ combo Dirt Nap starts Redline for 8 sec: your strikes become Haymakers that build it up, and Lights Out spends it all before the timer ends.',
     'blade_flurry',
     // Balance pass (maintainer sheet): the only mastery in the game with a
     // penalty loses it.
@@ -218,7 +218,7 @@ const ROGUE_SPECS: SpecDef[] = [
     'Skulduggery',
     'dps',
     '>',
-    "A shadow banker: Duskveil openers and Red Ribbons bank Gloam; a full bank unlocks your openers in the open, and the next one thrown detonates it into a shadow veil led by a doubled Lurker's Strike.",
+    "A stealth striker. Openers from Duskveil add Gloam; at 3 Gloam your openers work without stealth, and the next one is free and starts the Shadow Veil, doubling your first Lurker's Strike inside it.",
     'hemorrhage',
     // Balance pass (maintainer sheet): tuned down from +40% crit damage and
     // +10% Agility; the stealth-speed identity comes in instead (the Duskveil
@@ -371,7 +371,7 @@ const DRUID_SPECS: SpecDef[] = [
     'Moongrove',
     'dps',
     '*',
-    'A Moonwing caster who banks the Moontide and chooses how to spend it: Moonsurge or Sunwake.',
+    'A Moonwing caster whose casts fill the Moontide; at 3 you choose how to spend it: Moonsurge for damage or Sunwake for mana.',
     'moonkin_form',
     'Moonrage',
     'Increases your spell damage by 15% and your spell haste by 10%.',
@@ -383,7 +383,7 @@ const DRUID_SPECS: SpecDef[] = [
     'Wildfang',
     'tank',
     'x',
-    'A shapeshifter who shares Old Blood across Wolf damage and Bruin tanking forms.',
+    'A shapeshifter whose landed hits build Old Blood in both forms: Wolf spends it for damage, Bruin spends it to tank.',
     'feral_charge',
     'Primal Heart',
     // The +15% armor carries the v0.27 Dire Bruin retune (the old feral_choice_bear

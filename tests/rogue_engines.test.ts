@@ -138,7 +138,7 @@ describe('Knifework: Venom Ritual', () => {
 });
 
 describe('Thuggery: the Redline combo chain', () => {
-  it('Dirt Nap opens the window, both buttons transform, and Body Blows deepen the pips', () => {
+  it('Dirt Nap opens the window, both buttons transform, and Haymakers deepen the pips', () => {
     const { sim, p } = rig('combat');
     const mob = addTargetMob(sim, 1_000_000, 2, 9410);
     // Cutthroat Tempo never opens the window: only the real Dirt Nap does.
@@ -158,7 +158,7 @@ describe('Thuggery: the Redline combo chain', () => {
     expect(sim.resolvedAbility('sinister_strike')?.def.id).toBe('body_blow');
     expect(sim.resolvedAbility('eviscerate')?.def.id).toBe('knockout_blow');
 
-    // Each Body Blow deepens the run by a pip, to the cap of 4.
+    // Each Haymaker deepens the run by a pip, to the cap of 4.
     for (let i = 0; i < 3; i++) completeCast(sim, 'body_blow', mob);
     expect(stacksOf(p, 'redline')).toBe(4);
     completeCast(sim, 'body_blow', mob);
@@ -173,10 +173,9 @@ describe('Thuggery: the Redline combo chain', () => {
       sim.events.length = 0;
       p.comboPoints = 5;
       p.resource = p.maxResource;
-      sim.castAbility('eviscerate'); // resolves as Knockout Blow
+      sim.castAbility('eviscerate'); // resolves as Lights Out
       const hit = sim.events.find(
-        (e) =>
-          e.type === 'damage' && (e as { ability?: string | null }).ability === 'Knockout Blow',
+        (e) => e.type === 'damage' && (e as { ability?: string | null }).ability === 'Lights Out',
       ) as (SimEvent & { amount: number }) | undefined;
       for (let i = 0; i < 40; i++) sim.tick(); // clear the global cooldown
       return hit?.amount ?? 0;

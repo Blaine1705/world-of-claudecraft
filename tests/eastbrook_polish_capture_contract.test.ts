@@ -359,11 +359,13 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned for the 0.31.0 version sync: package-lock.json
-      // is in every Eastbrook source inventory, so the release version bump
-      // moved the town, mailbox, and noticeboard fingerprints (and the GLBs
-      // they stamp) even though no pipeline input changed. No recapture.
-      fingerprint: '53c1924dc01e426f0cd2f1ccaf12e2aea59281295c6102b25b885859ea01e4d5',
+      // Deliberately re-pinned for the v0.32.1 main catch-up merge: the seal
+      // fingerprints src/render/renderer.ts, so it re-mints whenever the
+      // renderer coordinator moves. The class-overhaul and release renderer
+      // deltas fold together here; every Eastbrook line in renderer.ts is
+      // byte-identical across that delta, so the accepted evidence still
+      // depicts this tree. No recapture.
+      fingerprint: '412e5f8360cc63bdb356ad33c44978f8673b88f3ea2fe1cd48e21f78291117b6',
       components: {
         captureContract: {
           id: 'polish-v2',

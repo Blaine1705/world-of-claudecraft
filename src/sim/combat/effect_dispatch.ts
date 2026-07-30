@@ -556,7 +556,7 @@ export function runEffects(
         dmg *= druidApexPayoffMult(ctx, p, ability.id);
         const finalDamage = Math.round(dmg);
         lastDirectDamage = finalDamage;
-        ctx.dealDamage(
+        const resolvedDamage = ctx.dealDamage(
           p,
           target,
           finalDamage,
@@ -583,10 +583,18 @@ export function runEffects(
         }
         if (areaEcho) {
           areaEchoDealt = true;
-          echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
+          echoAreaDamage(ctx, p, target, resolvedDamage, ability.school, ability.name, threatOpts);
         }
         if (sweeping)
-          sweepStrikeDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
+          sweepStrikeDamage(
+            ctx,
+            p,
+            target,
+            resolvedDamage,
+            ability.school,
+            ability.name,
+            threatOpts,
+          );
         // Power Echo (mage choice row): the armed echo repeats the SAME
         // resolved amount at its fraction on the same target (already rolled,
         // post crit; no new rng draw), consumed BEFORE the repeat so a copy
@@ -651,7 +659,7 @@ export function runEffects(
           eff.perCombo * spentCombo +
           ctx.rng.range(0, eff.variance) +
           ctx.effectiveAttackPower(p) / 14;
-        // Knockout Blow (rogue combat engine): cash out the Redline window,
+        // Lights Out (rogue combat engine): cash out the Redline window,
         // hitting harder per pip; consuming the window here ENDS the run.
         dmg *= knockoutRedlineMult(ctx, p, ability.id);
         dmg *= druidApexPayoffMult(ctx, p, ability.id);
@@ -1352,27 +1360,44 @@ export function runEffects(
             e.type === 'aoeRoot',
         );
         if (eff.directPct !== undefined && lastDirectDamage <= 0) break;
+        // Combo-point finishers (rupture/rip, spendsCombo: true) add a perCombo
+        // term to the base total, mirroring finisherDamage/finisherHaste/
+        // finisherStun below: spentCombo is already 0 for any ability that
+        // doesn't spend combo, so this is a no-op for every other dot.
         const dotTotal =
-          eff.directPct === undefined ? eff.total : Math.round(lastDirectDamage * eff.directPct);
+          eff.directPct === undefined
+            ? eff.total + (eff.perCombo ?? 0) * spentCombo
+            : Math.round(lastDirectDamage * eff.directPct);
+        // Combo-scaled finisher bleed (classic Rip): fixed duration, the points
+        // spent buy bigger ticks; a 5-point spend equals the canonical total.
+        const comboTotal =
+          eff.perComboTotal !== undefined
+            ? (eff.baseTotal ?? 0) + eff.perComboTotal * spentCombo
+            : dotTotal;
         const dotBase = Math.max(
           1,
           Math.round(
-            (dotTotal / (eff.duration / eff.interval)) * druidApexPayoffMult(ctx, p, ability.id),
+            (comboTotal / (eff.duration / eff.interval)) * druidApexPayoffMult(ctx, p, ability.id),
           ),
         );
+        // Combo-scaled finisher bleed (classic Rupture): the tick value above
+        // stays fixed; the points spent only buy more ticks.
+        const dotDuration = eff.perComboDuration
+          ? (eff.baseDuration ?? 0) + eff.perComboDuration * spentCombo
+          : eff.duration;
         // Physical bleeds (Rend, Rupture, Garrote, Rip) scale off melee Attack
         // Power here just like a spell DoT scales off Spell Power; `hybrid` still
         // suppresses the rider on a DoT that trails its own direct nuke.
         const dotSp = !hybrid
-          ? dotTickBonus(abilityScalingPower(p, ability), ability, eff.duration, eff.interval)
+          ? dotTickBonus(abilityScalingPower(p, ability), ability, dotDuration, eff.interval)
           : 0;
         const dotId = eff.auraId ?? ability.id;
         ctx.applyAura(target, {
           id: dotId,
           name: ABILITIES[dotId]?.name ?? ability.name,
           kind: 'dot',
-          remaining: eff.duration,
-          duration: eff.duration,
+          remaining: dotDuration,
+          duration: dotDuration,
           value: dotBase + dotSp,
           tickInterval: eff.interval,
           tickTimer: eff.interval,
@@ -1700,7 +1725,10 @@ export function runEffects(
           res.castTime,
           true,
         );
-        const baseAmount = ctx.rng.range(eff.min, eff.max) + chainSpBonus;
+        // Resolve the shared primary amount once before applying hop falloff.
+        // Fractional spell-power coefficients must not make later hops round
+        // from a hidden value that differs from the primary damage players saw.
+        const baseAmount = Math.round(ctx.rng.range(eff.min, eff.max) + chainSpBonus);
         const hitsPrimary = eff.hitsPrimary === true && target !== null;
         const hitList: Entity[] = hitsPrimary && target ? [target] : [];
         const excluded = new Set<number>([p.id]);
@@ -2883,10 +2911,12 @@ export function runEffects(
         }
         // Expose Armor (`full`) lands all stacks at once; warrior Sunder adds one.
         const existing = target.auras.find((a) => a.kind === 'sunder');
+        // Classic Expose Armor: the points spent set the stacks outright.
+        const comboStacks = eff.perCombo ? Math.min(eff.maxStacks, Math.max(1, spentCombo)) : null;
         if (existing) {
           existing.stacks = eff.full
             ? eff.maxStacks
-            : Math.min(eff.maxStacks, (existing.stacks ?? 1) + 1);
+            : (comboStacks ?? Math.min(eff.maxStacks, (existing.stacks ?? 1) + 1));
           existing.value = eff.armor;
           existing.remaining = existing.duration;
           ctx.emit({ type: 'aura', targetId: target.id, name: ability.name, gained: true });
@@ -2898,7 +2928,7 @@ export function runEffects(
             remaining: 30,
             duration: 30,
             value: eff.armor,
-            stacks: eff.full ? eff.maxStacks : 1,
+            stacks: eff.full ? eff.maxStacks : (comboStacks ?? 1),
             sourceId: p.id,
             school: 'physical',
           });

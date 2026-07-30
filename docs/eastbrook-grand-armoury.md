@@ -83,9 +83,9 @@ native-iOS path without per-frame model work or dynamic point lights.
 | Compression | `EXT_meshopt_compression` plus `KHR_mesh_quantization` |
 
 The optimized artifact SHA-256 is
-`182ea1aa3741a17a00947b63e1a2e8c7e0dec44f3bfd9165b6f1d9ef93e37595`; its deterministic
+`effeb5b13c9297736dedbac23f57d97538d4e9f735a0eca9a19d15133148f7f0`; its deterministic
 source fingerprint is
-`c484cb30dbe46d4ae5b2991a36974761efa11f7a1661fc05810ae28125481562`.
+`5d59adbb53e2854314f61a46f52b3ce90415cdb8722b5d32ffe02263ddb0b685`.
 The shared runtime atlas SHA-256 is
 `d66f2fab603aa83e6c73c6fc4bdde2d545a6d8c1a0d4a58d42a3fb227e5a3f9b`. Its source image,
 derivation, comparison evidence, and separate asset rights are recorded in
