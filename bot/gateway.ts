@@ -155,6 +155,11 @@ export class Gateway {
   }
 
   private send(obj: Record<string, unknown>): void {
+    // NOTE for anyone injecting a socketFactory: OPEN is read from the `ws`
+    // module imported above, not from the socket this returned. A fake whose
+    // OPEN differs makes every send a silent no-op (no IDENTIFY, no heartbeat,
+    // no error), which reads as a hung gateway rather than a wiring bug. The
+    // suite avoids it by module-mocking `ws` so both sides are the same class.
     if (this.ws?.readyState === WebSocket.OPEN) this.ws.send(JSON.stringify(obj));
   }
 

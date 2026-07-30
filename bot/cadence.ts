@@ -5,7 +5,8 @@
 // env, real Discord REST, a real WebSocket). Keeping them here lets the suite
 // pin the cadences directly.
 //
-// Values only: no env parsing, no derived timers. Every consumer is main.ts.
+// Values only: no env parsing, no derived timers. main.ts is the only RUNTIME
+// consumer; the suite imports them directly to pin them.
 
 export const ROLE_SYNC_INTERVAL_MS = 5 * 60_000;
 export const PRESENCE_DEBOUNCE_MS = 4_000;
