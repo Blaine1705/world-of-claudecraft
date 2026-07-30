@@ -10,7 +10,7 @@
 
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { QUESTS, YUMI_BAND_X_MIN } from '../src/sim/data';
+import { GATHER_NODES, QUESTS, YUMI_BAND_X_MIN } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { MinimapPainter } from '../src/ui/minimap_painter';
 import type { IWorld } from '../src/world_api';
@@ -162,6 +162,10 @@ interface GlyphTrace {
   /** Any `ctx.font` assignment on the MINIMAP context (must stay zero). */
   minimapFontWrites: number;
   color: string;
+  /** Line segments the MINIMAP context path-built, marked when a stroke()
+   *  actually rasterized them (the lock-strike decisiveness rig: a built
+   *  but never-stroked path draws nothing). */
+  segments: Array<{ fromX: number; fromY: number; toX: number; toY: number; stroked: boolean }>;
 }
 
 const NPC_QUEST_TOKEN = '--color-minimap-npc-quest';
@@ -217,7 +221,14 @@ function installGlyphGlobals(trace: GlyphTrace, spriteContext = true): void {
 }
 
 function newTrace(): GlyphTrace {
-  return { blits: [], sprites: [], minimapTextCalls: 0, minimapFontWrites: 0, color: 'quest-a' };
+  return {
+    blits: [],
+    sprites: [],
+    minimapTextCalls: 0,
+    minimapFontWrites: 0,
+    color: 'quest-a',
+    segments: [],
+  };
 }
 
 function fakeMinimapContext(trace: GlyphTrace): CanvasRenderingContext2D {
@@ -250,18 +261,36 @@ function fakeMinimapContext(trace: GlyphTrace): CanvasRenderingContext2D {
     clearRect(): void {},
     save(): void {},
     restore(): void {},
-    beginPath(): void {},
+    beginPath(): void {
+      pathStart = null;
+      pending.length = 0;
+    },
     closePath(): void {},
     clip(): void {},
     arc(): void {},
-    moveTo(): void {},
-    lineTo(): void {},
+    moveTo(x: number, y: number): void {
+      pathStart = { x, y };
+    },
+    lineTo(x: number, y: number): void {
+      if (pathStart !== null) {
+        pending.push({ fromX: pathStart.x, fromY: pathStart.y, toX: x, toY: y, stroked: false });
+      }
+      pathStart = { x, y };
+    },
     fill(): void {},
-    stroke(): void {},
+    stroke(): void {
+      for (const seg of pending) {
+        seg.stroked = true;
+        trace.segments.push(seg);
+      }
+      pending.length = 0;
+    },
     fillRect(): void {},
     translate(): void {},
     rotate(): void {},
   };
+  let pathStart: { x: number; y: number } | null = null;
+  const pending: GlyphTrace['segments'] = [];
   return ctx as unknown as CanvasRenderingContext2D;
 }
 
@@ -324,6 +353,59 @@ function paintMaze(p: MinimapPainter, ctx: CanvasRenderingContext2D, world: IWor
 
 afterEach(() => {
   vi.unstubAllGlobals();
+});
+
+describe('minimap_painter: the lock strike RASTERIZES on both silhouettes (decisive trace)', () => {
+  // The phase 14 QA proved the source-order pin above gameable (moving the
+  // strike inside the cooldown-only branch passed all four assertions).
+  // This drives the real paint through the segment-tracing context: a
+  // stroked up-right diagonal must exist for a locked node on BOTH respawn
+  // silhouettes and never for an unlocked one, which also fails if the
+  // stroke() call is dropped (a built path that never rasterizes).
+  function nodeWorld(over: { locked: boolean; ready: boolean }): IWorld {
+    const node = GATHER_NODES[0];
+    const entities = new Map<number, unknown>();
+    const player = {
+      id: 1,
+      kind: 'player',
+      name: 'Me',
+      pos: { x: node.pos.x, z: node.pos.z },
+      facing: 0,
+    };
+    entities.set(1, player);
+    return {
+      player,
+      entities,
+      partyInfo: null,
+      socialInfo: null,
+      delveRun: null,
+      cfg: { seed: 42, playerClass: 'warrior' },
+      playerId: 1,
+      inventory: over.locked ? [] : [{ itemId: 'copper_mining_pick', count: 1 }],
+      gatheringProficiency: {},
+      stationPlacements: [],
+      nodeHarvestableByMe: () => over.ready,
+      questState: () => 'unavailable',
+    } as unknown as IWorld;
+  }
+  const strikesOf = (trace: GlyphTrace) =>
+    trace.segments.filter(
+      (s) => s.stroked && s.toX - s.fromX > 0 && s.toX - s.fromX === -(s.toY - s.fromY),
+    );
+
+  it('locked-ready and locked-cooldown both strike; unlocked never does', () => {
+    for (const [locked, ready, expected] of [
+      [true, true, true],
+      [true, false, true],
+      [false, true, false],
+    ] as const) {
+      const trace = newTrace();
+      installGlyphGlobals(trace);
+      paint(newPainter(), fakeMinimapContext(trace), nodeWorld({ locked, ready }));
+      expect(strikesOf(trace).length > 0, `locked=${locked} ready=${ready}`).toBe(expected);
+      vi.unstubAllGlobals();
+    }
+  });
 });
 
 describe('minimap_painter: NPC glyphs draw from the sprite cache, never per-marker fillText', () => {

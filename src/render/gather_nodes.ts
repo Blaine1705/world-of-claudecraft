@@ -73,11 +73,23 @@ export function buildGatherNodes(seed: number): GatherNodesView {
   group.name = 'gatherNodes';
   for (const node of GATHER_NODES) {
     const obj = buildNodeMesh(node.type);
+    // The UNSCALED bounds, read before the tier scale lands: the base
+    // anchor below needs the geometry-space minY (a GLB instance is a
+    // Group, so the box is the one shape both paths share). A degenerate
+    // box (no geometry yet) reads 0 and the anchor is a no-op.
+    const bounds = new THREE.Box3().setFromObject(obj);
+    const minY = Number.isFinite(bounds.min.y) ? bounds.min.y : 0;
     // Tier differentiation (the UX pass): size, never hue, identical on
     // every preset (gather_nodes_lookup.ts nodeTierScale).
-    obj.scale.multiplyScalar(nodeTierScale(node.tier));
+    const tierScale = nodeTierScale(node.tier);
+    obj.scale.multiplyScalar(tierScale);
     const y = terrainHeight(node.pos.x, node.pos.z, seed);
-    obj.position.set(node.pos.x, y + NODE_Y_OFFSET[node.type], node.pos.z);
+    // Anchor the scale at the BASE, not the geometry center (the phase 14
+    // QA): the prop geometries are centered in Y, so a center-anchored
+    // upscale pushes the base (s - 1) * |minY| deeper and a tier-3 prop
+    // sinks visibly into the terrain. Compensate so the base sits at the
+    // same height above ground at every tier.
+    obj.position.set(node.pos.x, y + NODE_Y_OFFSET[node.type] - (tierScale - 1) * minY, node.pos.z);
     obj.name = node.id;
     // Click/tap-to-harvest target (#1866): the renderer raycasts clickable node
     // meshes and reads this back to resolve which node was hit, the same

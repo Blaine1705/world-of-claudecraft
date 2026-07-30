@@ -57,6 +57,10 @@ const PLAYER_ARROW_OUTLINE_WIDTH = 1;
 // "actionable" against the dimmer, outline-less cooldown dot.
 const GATHER_NODE_READY_RADIUS = 3;
 const GATHER_NODE_COOLDOWN_RADIUS = 2;
+// How far the lock strike's diagonal overshoots the node disc on each side,
+// so the line reads as a strike THROUGH the dot rather than a chord inside
+// it, at both disc radii.
+const LOCK_STRIKE_OVERREACH = 1.5;
 // Crafting station: an outlined diamond (rotated-square silhouette) so it reads
 // apart from the round gather dots and the axis-aligned loot/mob squares at
 // minimap scale. Half-diagonal in px.
@@ -572,7 +576,7 @@ export class MinimapPainter {
           // silhouettes, so the lock never rides tint alone. Outline-colored,
           // so it reads on either fill at every marker size.
           if (m.locked) {
-            const reach = radius + 1.5;
+            const reach = radius + LOCK_STRIKE_OVERREACH;
             ctx.strokeStyle = colors.outline;
             ctx.lineWidth = MARKER_OUTLINE_WIDTH;
             ctx.beginPath();
