@@ -365,7 +365,9 @@ export interface IWorldProfessions {
   // resolves price, fill, and every refusal off ITS OWN copy of the viewer's
   // bags and slot; ClientWorld sends the recharge_tool_effect command and
   // never decides the outcome (the same toolEffectResult event carries the
-  // price paid, or the price required on an insufficient-materials refusal,
-  // so the HUD can state the cost without a preview surface).
+  // price paid, or the price required on an insufficient-materials refusal).
+  // The professions window ALSO previews the price before the click (the UX
+  // pass): the view runs this same resolver client-side over the mirrored
+  // bags, so the previewed count and the charged count share one authority.
   rechargeToolEffect(professionId: string): void;
 }

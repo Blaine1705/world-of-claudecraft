@@ -593,13 +593,11 @@ export function normalizeToolEffectSlots(
       durability: Math.min(maxDurability, Math.max(0, Math.floor(row.durability) || 0)),
       maxDurability,
       craftedBy: typeof row.craftedBy === 'string' ? row.craftedBy : undefined,
-      // A persisted 'prompt' row is PRESERVED even though the mint refuses
-      // that mode. No live path can write one (the resolver has refused
-      // prompt since the mode existed, so only a hand-edited row or a
-      // dev-era offline save carries it), and phase 14 ships the confirm
-      // flow whole, which is what makes such a row honest rather than a slot
-      // that claims to ask and never does. Coercing it to 'always' here
-      // would silently retire a row that flow is about to honor.
+      // A persisted 'prompt' row is PRESERVED, and since the R40 confirm
+      // flow shipped it is an ordinary live mode: the mint accepts it and
+      // the harvest command carries the per-use consent it asks for.
+      // Coercing it to 'always' here would silently retire a player's
+      // deliberate choice.
       confirmMode: row.confirmMode === 'prompt' ? 'prompt' : 'always',
     };
   }

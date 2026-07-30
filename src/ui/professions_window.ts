@@ -639,9 +639,11 @@ export class ProfessionsWindow {
     // server resolver reads, so a rendered slot button is an action the
     // server accepts barring a race the event then reports). RECHARGEABLE
     // means the resolver accepts; affordability and the shared throttle live
-    // in the command body, and per R46 the deny line carrying the priced
-    // material and count IS the cost surface, so the button renders for a
-    // player who cannot afford it on purpose.
+    // in the command body. The PRICE surface is now split (the UX pass): the
+    // .prof-effect-price line previews the resolver's material and count
+    // before the click, while R46's deny line stays the AFFORDABILITY
+    // surface, so the button still renders for a player who cannot afford
+    // it on purpose.
     //
     // The sent-guard: one command per painted button. The repaint that
     // answers the command replaces the node (fresh dataset), and every

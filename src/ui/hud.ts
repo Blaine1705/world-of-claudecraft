@@ -68,6 +68,7 @@ import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
 import { FOCUS_POINT_BUDGET, isInTownZone } from '../sim/professions/focus';
+import { baseMaterialFor } from '../sim/professions/material_grades';
 import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/stations';
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { type QuestObjectiveRef, questObjectivesForMob } from '../sim/quest_targets';
@@ -142,7 +143,6 @@ import { bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
 import { type BannerClass, BannerQueue } from './banner_queue';
-import { baseMaterialFor } from '../sim/professions/material_grades';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter } from './cast_bar_painter';
@@ -9895,7 +9895,19 @@ export class Hud {
           this.log(t('hud.core.levelLog', { level: ev.level }), '#ffd100');
           audio.levelUp();
           if (isTalentRowUnlockLevel(ev.level)) {
-            this.showBanner(t('game.talents.rowUnlockToast'));
+            // Same 'levelup' class as the level banner above: before the R38
+            // queue this call CLOBBERED it (only the last of the arm's
+            // banners ever showed); queued, all of them play in order.
+            this.showBanner(
+              t('game.talents.rowUnlockToast'),
+              true,
+              undefined,
+              'default',
+              undefined,
+              2600,
+              null,
+              'levelup',
+            );
             // No local gain override: the manifest's resolved gain (keyTrimDb)
             // is the single source of truth, same fix efe124264 already
             // applied to every other quest_ready call site. This one was
@@ -9913,7 +9925,16 @@ export class Hud {
           }
           // First talent point (and spec) unlock — nudge the player to the panel.
           if (ev.level === FIRST_TALENT_LEVEL && talentsFor(this.sim.cfg.playerClass)) {
-            this.showBanner(t('game.talents.unlockBanner'));
+            this.showBanner(
+              t('game.talents.unlockBanner'),
+              true,
+              undefined,
+              'default',
+              undefined,
+              2600,
+              null,
+              'levelup',
+            );
             this.log(t('game.talents.unlockHint'), '#ffd100');
           }
           break;

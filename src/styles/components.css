@@ -4678,6 +4678,13 @@
     background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
     color: #ffe6a8;
   }
+  /* Coarse-pointer touch floor for the whole confirm family (the R40 dialog
+     made this modal a routine mobile surface; the prof-effect-btn idiom). */
+  @media (pointer: coarse) {
+    #confirm-dialog .cd-actions .btn {
+      min-height: 40px;
+    }
+  }
 
   .native-update-backdrop {
     position: fixed;

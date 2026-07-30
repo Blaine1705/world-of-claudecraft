@@ -1888,13 +1888,38 @@ async function startGame(
         hud.toggleCrafting();
         break;
       case 'petStop':
-        // The two pet edges the same offered-but-dropped sweep found beside
-        // Crafting, wired to the exact keyboard handlers (onPet above).
+        // The pet edges, the dungeon finder, and the sheathe toggle: the
+        // same offered-but-dropped sweep that found Crafting (the controller
+        // panel lists every edge keybind action), each wired to its exact
+        // keyboard handler.
         world.setPetMode('passive');
         break;
       case 'petTaunt':
         world.petTaunt();
         break;
+      case 'petAttack':
+        world.petAttack();
+        break;
+      case 'petDefensive':
+        world.setPetMode('defensive');
+        break;
+      case 'petAggressive':
+        world.setPetMode('aggressive');
+        break;
+      case 'dungeonFinder':
+        hud.toggleDungeonFinder();
+        break;
+      case 'sheathe': {
+        // The keyboard arm's exact rule: the world owns the gate, the cue
+        // plays only when the state moved.
+        const wasStowed = world.player.weaponStowed;
+        world.toggleWeaponStow();
+        if (world.player.weaponStowed !== wasStowed) {
+          if (world.player.weaponStowed) audio.weaponSheathe();
+          else audio.weaponUnsheathe();
+        }
+        break;
+      }
       case 'chat':
         openChat();
         break;

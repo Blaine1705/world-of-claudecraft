@@ -6,6 +6,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { BIND_ACTIONS } from '../src/game/keybinds';
 import { padReelItemId } from '../src/game/pad_reel';
 import { ITEMS } from '../src/sim/data';
 import { FISHING_CAST_ID, GATHER_CAST_ID } from '../src/sim/types';
@@ -50,5 +51,26 @@ describe('padReelItemId', () => {
     expect(interactCase.indexOf('padReelItemId')).toBeLessThan(
       interactCase.indexOf('interactKey()'),
     );
+  });
+});
+
+// The offered-but-dropped guard: the controller panel offers EVERY edge
+// keybind action (options_window.ts gamepadActionOptions), so every one of
+// them must have a dispatch arm, or binding it silently does nothing (the
+// class that shipped Crafting, the dungeon finder, sheathe, and three pet
+// edges dead on the pad).
+describe('gamepad dispatch covers every action the controller panel offers', () => {
+  it('every offered edge action id has a case in dispatchGamepadAction', () => {
+    const mainTs = readFileSync(join(__dirname, '../src/main.ts'), 'utf8');
+    const start = mainTs.indexOf('function dispatchGamepadAction');
+    expect(start).toBeGreaterThan(-1);
+    const body = mainTs.slice(start, mainTs.indexOf('const gamepad = new GamepadManager', start));
+    for (const action of BIND_ACTIONS) {
+      if (action.kind !== 'edge') continue;
+      if (action.id === 'attackMove') continue; // panel-excluded (mode-gated)
+      if (action.id === 'jump' || action.id === 'autorun') continue; // Input-handled, never reach onAction (gamepad.ts GamepadCallbacks doc)
+      if (action.id.startsWith('slot')) continue; // the slotN prefix arm
+      expect(body.includes(`case '${action.id}'`), `pad dispatch drops '${action.id}'`).toBe(true);
+    }
   });
 });
