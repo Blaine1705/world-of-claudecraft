@@ -36,6 +36,7 @@ export class InstancedOccluderGhosts {
     }
     handle.mesh.matrix.copy(matrix);
     source.add(handle.mesh);
+    handle.mesh.updateMatrixWorld(true);
     return handle;
   }
 

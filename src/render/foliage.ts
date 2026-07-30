@@ -66,6 +66,7 @@ import {
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
 import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import { freezeStaticMatrices } from './static_matrix';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
 import { applySurfaceDetail, foliageWornFamilyFor } from './worn_stone';
@@ -2503,6 +2504,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       im.visible = chunk.lastSeen === generation;
       chunk.mesh = im;
       parent.add(im);
+      freezeStaticMatrices(im);
     }
     if (fn > 0) {
       fm.count = fn;
@@ -2513,6 +2515,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       fm.visible = chunk.lastSeen === generation;
       chunk.flowerMesh = fm;
       parent.add(fm);
+      freezeStaticMatrices(fm);
     }
     chunk.ready = true;
     builtChunks++;
@@ -2788,6 +2791,7 @@ export function buildFoliage(seed: number): FoliageView {
         },
       }
     : buildGrassRing(group, seed);
+  freezeStaticMatrices(group);
   return {
     group,
     setGrassQuality(level: number): void {

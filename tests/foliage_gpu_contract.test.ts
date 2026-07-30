@@ -42,6 +42,15 @@ describe('foliage GPU optimization production wiring', () => {
     );
   });
 
+  it('freezes static bucket and streamed chunk transforms after construction', () => {
+    expect(foliage).toContain("import { freezeStaticMatrices } from './static_matrix';");
+    expect(foliage).toMatch(/parent\.add\(im\);\s+freezeStaticMatrices\(im\);/);
+    expect(foliage).toMatch(/parent\.add\(fm\);\s+freezeStaticMatrices\(fm\);/);
+    expect(foliage).toMatch(
+      /: buildGrassRing\(group, seed\);\s+freezeStaticMatrices\(group\);\s+return \{/,
+    );
+  });
+
   it('attaches canopy and shared leaf-map fragment savings to live materials', () => {
     expect(canopy).toContain(
       'const patched = patchCanopyDetailShaderSource(shader.vertexShader, shader.fragmentShader, {',
