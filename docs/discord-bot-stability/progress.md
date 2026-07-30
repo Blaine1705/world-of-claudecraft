@@ -169,9 +169,11 @@ ISOLATED worktree at the phase tip with its own `npm ci`. Most of the 20 refutat
 were verify agents racing the fix commits and reading a tree where the finding was
 already closed; none hid a real defect.
 
-Mutation tally, all NEW mutants beyond Phase 1's own 31: 70 distinct mutants over 139
-runs (discovery plus re-verification), in an isolated worktree, with the un-mutated
-baseline re-run green at the end and the worktree left clean.
+Mutation tally, all NEW mutants beyond Phase 1's own 31: 162 mutant runs (discovery,
+re-verification after each fix, and the fix round's own pins), in an isolated worktree
+with its own `npm ci`, with the un-mutated baseline re-run green at the end and the
+worktree left clean. Every run proved the patch APPLIED (cmp against a backup) and that
+tests actually RAN, so a silently-unapplied patch could not be scored as a survivor.
 
   - Against the phase as committed: 58 planted, 9 killed, **49 SURVIVED**. That is the
     real story of this round. `bot/gateway.ts` was the worst, 16 of 18 protocol mutants
