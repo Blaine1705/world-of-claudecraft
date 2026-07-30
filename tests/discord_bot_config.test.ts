@@ -2,6 +2,7 @@
 // and the background-loop cadences. Both are pure value reads with no IO, so
 // they are testable in plain Node; the env arms mutate `process.env` and restore
 // it key by key so nothing leaks into another test file.
+import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { PRESENCE_DEBOUNCE_MS, RELAY_POLL_MS, ROLE_SYNC_INTERVAL_MS } from '../bot/cadence';
 import { loadConfig } from '../bot/config';
@@ -70,14 +71,21 @@ describe('loadConfig required env', () => {
   });
 
   it('treats an EMPTY required value as missing (the !v guard, not a key check)', () => {
-    setRequired();
-    process.env.DISCORD_BOT_SECRET = '';
     // The key IS present: only the falsy-value guard rejects this, which is what
     // stops a blank line in a .env from booting a bot that cannot authenticate.
-    expect('DISCORD_BOT_SECRET' in process.env).toBe(true);
-    expect(() => loadConfig()).toThrowError(
-      new Error('[bot] missing required env DISCORD_BOT_SECRET'),
-    );
+    // Every one of the four, not just the secret: `required` is shared today,
+    // but an inlined key check on any single one would be invisible otherwise.
+    for (const key of [
+      'DISCORD_BOT_TOKEN',
+      'DISCORD_CLIENT_ID',
+      'DISCORD_GUILD_ID',
+      'DISCORD_BOT_SECRET',
+    ] as const) {
+      setRequired();
+      process.env[key] = '';
+      expect(key in process.env).toBe(true);
+      expect(() => loadConfig()).toThrowError(new Error(`[bot] missing required env ${key}`));
+    }
   });
 
   it('passes the four required values through verbatim once all are set', () => {
@@ -184,6 +192,22 @@ describe('loadConfig channel fallback ladders', () => {
     expect(loadConfig().activityChannelId).toBe('');
   });
 
+  it('walks past an EMPTY rung, not just an absent one', () => {
+    // Every other ladder arm deletes the key, and `??` walks past a deleted key
+    // exactly like `||` does, so the two are indistinguishable there. An empty
+    // value is where they part, and empty is the realistic shape: a bare
+    // `DISCORD_RELAY_CHANNEL_ID=` line in a .env sets it to ''. Under `??` the
+    // ladder would stop on that empty string and post nowhere.
+    setRequired();
+    process.env.DISCORD_RELAY_CHANNEL_ID = '';
+    process.env.DISCORD_ACTIVITY_CHANNEL_ID = '';
+    process.env.DISCORD_TEST_CHANNEL_ID = 'test-1';
+
+    const cfg = loadConfig();
+    expect(cfg.relayChannelId).toBe('test-1');
+    expect(cfg.activityChannelId).toBe('test-1');
+  });
+
   it('points BOTH relay and activity at the test channel when only it is set', () => {
     // The single-channel deployment: one announce channel carries the in-game
     // "!" posts and the activity feed.
@@ -215,6 +239,36 @@ describe('loadConfig nickname sync opt-out', () => {
       process.env.DISCORD_SYNC_NICKNAMES = value;
       expect(loadConfig().syncNicknames).toBe(true);
     }
+  });
+});
+
+describe('loadConfig env-key inventory', () => {
+  it('reads no env key that BOT_ENV_KEYS does not save and restore', () => {
+    // The save/restore list above is what stops the developer's own shell (or
+    // another suite) from deciding an arm. It is only as good as its coverage:
+    // a key added to bot/config.ts and not here would silently read through to
+    // the ambient environment and could make a fallback test pass for the wrong
+    // reason. Comments are stripped first so a commented-out read cannot pad
+    // the set.
+    const source = readFileSync(new URL('../bot/config.ts', import.meta.url), 'utf8').replace(
+      /(^|[^:])\/\/.*$/gm,
+      '$1',
+    );
+    const direct = [...source.matchAll(/process\.env\.([A-Z0-9_]+)/g)].map((m) => m[1]);
+    const dynamic = source.match(/process\.env\[/g) ?? [];
+    const viaRequired = [...source.matchAll(/required\('([A-Z0-9_]+)'\)/g)].map((m) => m[1]);
+
+    // Account for EVERY process.env touch first, so a read written in some
+    // other shape cannot simply go unseen by the two patterns above and leave
+    // the set comparison passing for the wrong reason.
+    const total = source.match(/process\.env/g) ?? [];
+    expect(direct.length + dynamic.length).toBe(total.length);
+    // The one dynamic lookup is required()'s own, whose keys are the literals
+    // collected above.
+    expect(dynamic.length).toBe(1);
+    expect(viaRequired.length).toBe(4);
+
+    expect([...new Set([...direct, ...viaRequired])].sort()).toEqual([...BOT_ENV_KEYS].sort());
   });
 });
 

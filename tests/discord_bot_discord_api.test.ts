@@ -366,19 +366,33 @@ describe('DiscordApi production defaults', () => {
     // cannot detect.
     const api = new DiscordApi('tok');
 
-    const seen: string[] = [];
-    vi.stubGlobal('fetch', async (input: unknown) => {
-      seen.push(String(input));
-      return fakeResponse({ body: { url: 'wss://real.test' } });
+    const seen: { url: string; init: RequestInit | undefined }[] = [];
+    // The stub takes BOTH parameters. A one-parameter stub cannot tell
+    // `(...args) => fetch(...args)` from `(input) => fetch(input)`, and the
+    // latter type-checks fine (TypeScript allows an arity-reduced function
+    // where a wider one is expected), so every Discord call would go out with
+    // no method, no Authorization, no User-Agent, and no body while the suite
+    // stayed green.
+    vi.stubGlobal('fetch', async (input: unknown, init?: RequestInit) => {
+      seen.push({ url: String(input), init });
+      return fakeResponse({ status: 204 });
     });
 
     try {
-      expect(await api.gatewayUrl()).toBe('wss://real.test');
+      await api.setNickname('g1', 'u1', 'Aran (12)');
     } finally {
       vi.unstubAllGlobals();
     }
 
-    expect(seen).toEqual(['https://discord.com/api/v10/gateway/bot']);
+    expect(seen.length).toBe(1);
+    expect(seen[0].url).toBe('https://discord.com/api/v10/guilds/g1/members/u1');
+    expect(seen[0].init?.method).toBe('PATCH');
+    expect(seen[0].init?.headers).toEqual({
+      Authorization: 'Bot tok',
+      'Content-Type': 'application/json',
+      'User-Agent': 'WorldOfClaudeCraftBot (https://worldofclaudecraft.com, 1.0)',
+    });
+    expect(seen[0].init?.body).toBe('{"nick":"Aran (12)"}');
   });
 
   it('backs the default retry sleep with the real global setTimeout', async () => {

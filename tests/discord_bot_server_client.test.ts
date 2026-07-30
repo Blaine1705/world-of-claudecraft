@@ -194,6 +194,23 @@ describe('ServerClient per-endpoint routes', () => {
       data: {},
     },
     {
+      name: 'grant',
+      drive: (c) => c.grant('u1', 'daily', 5, 'k1'),
+      method: 'POST',
+      // The points-granting call: a path swap here silently stops every reward.
+      path: '/internal/discord/grant',
+      body: '{"discord_user_id":"u1","reason":"daily","points":5,"dedupeKey":"k1"}',
+      data: {},
+    },
+    {
+      name: 'markDailyRewardWinners',
+      drive: (c) => c.markDailyRewardWinners('2026-07-30'),
+      method: 'POST',
+      path: '/internal/discord/daily-rewards-winners/mark',
+      body: '{"day":"2026-07-30"}',
+      data: {},
+    },
+    {
       name: 'drainRelay',
       drive: (c) => c.drainRelay(),
       method: 'GET',
@@ -281,6 +298,23 @@ describe('ServerClient envelope handling', () => {
     expect(await client.drainRelay()).toEqual([]);
     expect(reads).toEqual([]);
     expect(errors).toEqual([['[bot] server GET /internal/discord/relay -> 500']]);
+  });
+
+  it('treats a 3xx as not-ok, not just a 5xx', async () => {
+    // 200 and 500 agree under every plausible rewrite of `!resp.ok`, including
+    // `resp.status >= 400`. A redirect is where they part: the game server
+    // answering 301 (a proxy misconfiguration, the realistic case) must not be
+    // read as success and parsed as an envelope.
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const reads: string[] = [];
+    const timers = fakeTimers();
+    const { impl } = recordingFetch(() =>
+      fakeResponse({ status: 301, body: { success: true, data: { items: [1] } }, reads }),
+    );
+    const client = new ServerClient('http://host', 'sekrit', impl, timers.seam);
+
+    expect(await client.drainRelay()).toEqual([]);
+    expect(reads).toEqual([]);
   });
 
   it('returns null when the fetch itself rejects, and still clears the deadline', async () => {
@@ -422,6 +456,40 @@ describe('ServerClient call deadline', () => {
     expect(timers.cleared).toEqual([1, 2]);
     expect(calls[0].init.signal).not.toBe(calls[1].init.signal);
   });
+
+  it('keeps each in-flight call on its OWN handle and signal when they overlap', async () => {
+    // The sequential test above cannot see a shared handle: call 2 arms after
+    // call 1 has already cleared. The bot's poll loops genuinely overlap (six
+    // of them, two on a 3 second tick), so a shared controller would let one
+    // call's deadline abort another's request.
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const timers = fakeTimers();
+    const settle: ((r: Response) => void)[] = [];
+    const signals: (AbortSignal | null | undefined)[] = [];
+    const impl: typeof fetch = (_input, init) => {
+      signals.push(init?.signal);
+      return new Promise<Response>((resolve, reject) => {
+        settle.push(resolve);
+        init?.signal?.addEventListener('abort', () => reject(new Error('aborted')));
+      });
+    };
+    const client = new ServerClient('http://host', 'sekrit', impl, timers.seam);
+
+    const first = client.roles('u1');
+    const second = client.roles('u2');
+    expect(timers.armed.length).toBe(2);
+    expect(signals[0]).not.toBe(signals[1]);
+
+    // Firing only the FIRST deadline must abort only the first request.
+    timers.armed[0].fn();
+    expect(signals[0]?.aborted).toBe(true);
+    expect(signals[1]?.aborted).toBe(false);
+
+    expect(await first).toBe(null);
+    settle[1](fakeResponse({ body: ROLES_ENVELOPE }));
+    expect(await second).toEqual({ linked: true, statusTier: 3, points: 12, lifetimePoints: 40 });
+    expect(timers.cleared.sort()).toEqual([1, 2]);
+  });
 });
 
 describe('ServerClient production defaults', () => {
@@ -434,13 +502,17 @@ describe('ServerClient production defaults', () => {
     // stub-then-construct ordering cannot detect it.
     const client = new ServerClient('http://host:8787', 'sekrit');
 
-    const seen: string[] = [];
+    const seen: { url: string; init: RequestInit | undefined }[] = [];
     const armed: { ms: number; handle: unknown }[] = [];
     const cleared: unknown[] = [];
     const realSetTimeout = globalThis.setTimeout;
     const realClearTimeout = globalThis.clearTimeout;
-    vi.stubGlobal('fetch', async (input: unknown) => {
-      seen.push(String(input));
+    // Both parameters, deliberately. A one-parameter stub cannot tell
+    // `(...args) => fetch(...args)` from `(input) => fetch(input)`, and the
+    // arity-reduced form type-checks, so every internal call would lose its
+    // secret header, its method, its body, and its abort signal unnoticed.
+    vi.stubGlobal('fetch', async (input: unknown, init?: RequestInit) => {
+      seen.push({ url: String(input), init });
       return fakeResponse({ body: { success: true, data: { items: [{ id: 7 }] }, error: null } });
     });
     // Delegates to the real timer so the deadline is a genuine handle the
@@ -461,7 +533,16 @@ describe('ServerClient production defaults', () => {
       vi.unstubAllGlobals();
     }
 
-    expect(seen).toEqual(['http://host:8787/internal/discord/relay']);
+    expect(seen.length).toBe(1);
+    expect(seen[0].url).toBe('http://host:8787/internal/discord/relay');
+    expect(seen[0].init?.method).toBe('GET');
+    // The shared secret is the whole authentication story for /internal/*: a
+    // forwarder that drops `init` would strip it and every call would 401.
+    expect(seen[0].init?.headers).toEqual({
+      'x-woc-discord-secret': 'sekrit',
+      'Content-Type': 'application/json',
+    });
+    expect(seen[0].init?.signal).toBeInstanceOf(AbortSignal);
     // Exactly one arm, at the real deadline: the defaults read the globals and
     // pass the production timeout, not an injected one.
     expect(armed.map((a) => a.ms)).toEqual([8000]);
