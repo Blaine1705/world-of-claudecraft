@@ -365,7 +365,7 @@ describe('Eastbrook polish capture contract', () => {
       // deltas fold together here; every Eastbrook line in renderer.ts is
       // byte-identical across that delta, so the accepted evidence still
       // depicts this tree. No recapture.
-      fingerprint: '412e5f8360cc63bdb356ad33c44978f8673b88f3ea2fe1cd48e21f78291117b6',
+      fingerprint: 'cc0f655f77038dcb15f67da3f1466d8fee8a588b15289d4af53bd181cc6ebb8c',
       components: {
         captureContract: {
           id: 'polish-v2',
