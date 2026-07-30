@@ -32,6 +32,7 @@ import { ITEMS, isDelvePos, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
 import { instanceInfoAt } from '../instances/dungeons';
+import { forceDismount } from '../mounts';
 import { FISH_REEL_WINDOW_ROD_BONUS_SEC, FISH_REEL_WINDOW_SEC } from '../professions/fishing';
 import { bestOwnedGatherToolTier } from '../professions/tools';
 import { scheduleProjectile } from '../projectile_travel';
@@ -711,10 +712,14 @@ export function castAbility(
   // bonusCharges: Double Charge, extra Blink/Frost Nova/Ice Block): a running
   // cooldown is only the RECHARGE timer; the cast is blocked only once every
   // stored use is spent.
+  // A cooldown-carrying transform shares the base button's clock (one slot,
+  // one clock; res.cooldownId from action_replacement); everything else keys
+  // its own id.
+  const cooldownKey = res.cooldownId ?? ability.id;
   if (
-    (p.cooldowns.has(ability.id) || sharedCooldown) &&
+    (p.cooldowns.has(cooldownKey) || sharedCooldown) &&
     !togglingOff &&
-    !hasAbilityCharge(p, ability.id, res.bonusCharges ?? 0, res.cooldown) &&
+    !hasAbilityCharge(p, cooldownKey, res.bonusCharges ?? 0, res.cooldown) &&
     // An armed Brain Freeze lets Flurry cast through its running cooldown
     // (combat/frost_mage.ts; the override below consumes the proc).
     !brainFreezeBypassesCooldown(p, ability.id)
@@ -789,7 +794,7 @@ export function castAbility(
     return;
   }
   // combo points are character-bound: any built points finish on the current target
-  if (ability.spendsCombo && p.comboPoints <= 0) {
+  if (ability.spendsCombo && !ability.comboOptional && p.comboPoints <= 0) {
     ctx.error(p.id, 'That ability requires combo points.');
     return;
   }
@@ -1079,6 +1084,12 @@ export function castAbility(
   if (ability.id !== 'ghost_wolf' && p.auras.some((a) => a.id === 'ghost_wolf')) {
     ctx.breakGhostWolf(p);
   }
+  // Auto-dismount when the player is mounted or mid-summon-channel and casts any ability.
+  if (p.mountKey !== '') forceDismount(ctx, p);
+  if (p.mountCastKey !== '') {
+    p.mountCastRemaining = 0;
+    p.mountCastKey = '';
+  }
   // An instant slipping through a RUNNING cast (usableWhileCasting /
   // Flickerstep) must not disturb that cast's aim: castTargetId/castAim belong
   // to the spell in progress (its finish path re-validates them), so they are
@@ -1170,7 +1181,7 @@ export function castAbility(
 
   if (ability.channel) {
     spendAbilityCost(ctx, p, meta, res);
-    armAbilityCooldown(p, ability.id, res.cooldown, false, res.bonusCharges ?? 0);
+    armAbilityCooldown(p, res.cooldownId ?? ability.id, res.cooldown, false, res.bonusCharges ?? 0);
     // Blizzard's Frozen Orb refund budget resets per cast (combat/frost_mage.ts).
     frostMageChannelStart(p, ability.id);
     // Aether Darts arms its one-time Arcane Charge consume for THIS channel
@@ -1775,7 +1786,7 @@ function applyAbility(
       return;
     }
     spendResource(p, billableCost());
-    armAbilityCooldown(p, ability.id, res.cooldown, false, res.bonusCharges ?? 0);
+    armAbilityCooldown(p, res.cooldownId ?? ability.id, res.cooldown, false, res.bonusCharges ?? 0);
     if (pet.dead) {
       ctx.revivePet(p.id);
     } else {
@@ -1900,7 +1911,13 @@ function applyAbility(
     (ability.targetType === 'any' && target && ctx.isFriendlyTo(p, target))
   ) {
     spendAbilityCost(ctx, p, meta, res);
-    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.bonusCharges ?? 0);
+    armAbilityCooldown(
+      p,
+      res.cooldownId ?? ability.id,
+      res.cooldown,
+      togglingOff,
+      res.bonusCharges ?? 0,
+    );
     ctx.runEffects(p, meta, target, res);
     completeStormcastReservation(ctx, p, stormcastReservation);
     // 'spellCast' means SPELLS: a physical friendly ability never rolls.
@@ -1921,7 +1938,13 @@ function applyAbility(
   if (target && firesProjectile) {
     const isSpell = ability.school !== 'physical';
     spendAbilityCost(ctx, p, meta, res);
-    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.bonusCharges ?? 0);
+    armAbilityCooldown(
+      p,
+      res.cooldownId ?? ability.id,
+      res.cooldown,
+      togglingOff,
+      res.bonusCharges ?? 0,
+    );
     ctx.emit({
       type: 'spellfx',
       sourceId: p.id,
@@ -1977,7 +2000,13 @@ function applyAbility(
   }
 
   spendAbilityCost(ctx, p, meta, res);
-  armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.bonusCharges ?? 0);
+  armAbilityCooldown(
+    p,
+    res.cooldownId ?? ability.id,
+    res.cooldown,
+    togglingOff,
+    res.bonusCharges ?? 0,
+  );
   // A shout announces itself: world-visible cue so the caster roars and the
   // shockwave ring reads for everyone nearby (renderer-only; no mechanic).
   if (ability.castFx && !togglingOff) {

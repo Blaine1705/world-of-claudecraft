@@ -17,6 +17,7 @@ export type { ProcDef, ProcResponse, ProcTrigger } from '../content/talents';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { convergenceOnCast } from './convergence';
+import { druidEngineOnCast } from './druid_engines';
 import { combustionRestokesCinderfall, PERSONAL_BARRIER_IDS } from './fire_mage';
 import { priestOnCastCompleted } from './priest/talents';
 import { rogueEngineOnCast } from './rogue_engines';
@@ -197,6 +198,7 @@ export function onCastCompleted(
   // Rogue spec engines (combat/rogue_engines.ts): Skulduggery banks Gloam
   // from Duskveil openers and the Red Ribbon rhythm. Same funnel, no rng.
   rogueEngineOnCast(ctx, player, abilityId, target);
+  druidEngineOnCast(ctx, player, abilityId, target);
   if (wasEmpowered) return;
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;

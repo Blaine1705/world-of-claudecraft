@@ -43,6 +43,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   extendDot: 'other',
   // Detonate-style: the consumed DoT's remaining damage lands immediately.
   consumeDot: 'damage',
+  druidMarrowbreakGuard: 'other',
+  druidOverbloom: 'other',
   aoeDamage: 'damage',
   chainDamage: 'damage',
   aoeHeal: 'other',

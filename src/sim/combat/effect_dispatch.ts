@@ -71,6 +71,13 @@ import {
   selectCascadeTargets,
 } from './chronomancy';
 import { extendOwnedDot } from './dot_mutation';
+import {
+  druidApexPayoffMult,
+  druidEngineOnHotPlanted,
+  druidEngineOnLandedStrike,
+  druidMarrowbreakUsesGuard,
+  resolveDruidOverbloom,
+} from './druid_engines';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
@@ -384,7 +391,9 @@ export function runEffects(
     }
   }
 
-  if (ability.requiresAuraKind) consumeAuraKind(ctx, p, ability.requiresAuraKind);
+  if (ability.requiresAuraKind && ability.consumesRequiredAura !== false) {
+    consumeAuraKind(ctx, p, ability.requiresAuraKind);
+  }
 
   let targetBuffIndex = 0;
   for (const eff of res.effects) {
@@ -423,6 +432,7 @@ export function runEffects(
         // inside the veil consumes the edge and strikes for double.
         weaponMult *= consumeVeiledEdge(ctx, p, ability.id);
         const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
+          abilityId: ability.id,
           cannotBeDodged: eff.cannotBeDodged,
           weaponMult,
           threatFlat: res.threatFlat,
@@ -475,6 +485,16 @@ export function runEffects(
       case 'directDamage': {
         if (!target) break;
         if (!ctx.isHostileTo(p, target)) break;
+        const marrowbreakGuard = res.effects.find(
+          (effect) => effect.type === 'druidMarrowbreakGuard',
+        );
+        if (
+          ability.id === 'marrowbreak' &&
+          marrowbreakGuard?.type === 'druidMarrowbreakGuard' &&
+          druidMarrowbreakUsesGuard(p, marrowbreakGuard.belowFrac)
+        ) {
+          break;
+        }
         const rooted = isRootedOrChilled(target);
         const abilityMod = mods.abilities[ability.id];
         const critChance =
@@ -533,9 +553,10 @@ export function runEffects(
         // the caster's charge aura (combat/chronomancy.ts).
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
         dmg *= thundercallDamageMultiplier(ctx, p, ability.id);
+        dmg *= druidApexPayoffMult(ctx, p, ability.id);
         const finalDamage = Math.round(dmg);
         lastDirectDamage = finalDamage;
-        ctx.dealDamage(
+        const resolvedDamage = ctx.dealDamage(
           p,
           target,
           finalDamage,
@@ -562,10 +583,18 @@ export function runEffects(
         }
         if (areaEcho) {
           areaEchoDealt = true;
-          echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
+          echoAreaDamage(ctx, p, target, resolvedDamage, ability.school, ability.name, threatOpts);
         }
         if (sweeping)
-          sweepStrikeDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
+          sweepStrikeDamage(
+            ctx,
+            p,
+            target,
+            resolvedDamage,
+            ability.school,
+            ability.name,
+            threatOpts,
+          );
         // Power Echo (mage choice row): the armed echo repeats the SAME
         // resolved amount at its fraction on the same target (already rolled,
         // post crit; no new rng draw), consumed BEFORE the repeat so a copy
@@ -624,15 +653,16 @@ export function runEffects(
         break;
       }
       case 'finisherDamage': {
-        if (!target || spentCombo <= 0) break;
+        if (!target || (spentCombo <= 0 && !ability.comboOptional)) break;
         let dmg =
           eff.base +
           eff.perCombo * spentCombo +
           ctx.rng.range(0, eff.variance) +
           ctx.effectiveAttackPower(p) / 14;
-        // Knockout Blow (rogue combat engine): cash out the Redline window,
+        // Lights Out (rogue combat engine): cash out the Redline window,
         // hitting harder per pip; consuming the window here ENDS the run.
         dmg *= knockoutRedlineMult(ctx, p, ability.id);
+        dmg *= druidApexPayoffMult(ctx, p, ability.id);
         const crit =
           ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance) ||
           sureCrit ||
@@ -655,6 +685,7 @@ export function runEffects(
           false,
           ability.id,
         );
+        druidEngineOnLandedStrike(ctx, p, ability.id);
         // Second Shadow (rogue capstone, docs/design/rogue-v029-class-design.md):
         // a full 5-combo finisher strikes again as a shadow echo at a fraction of
         // the resolved damage. No extra rng (never crits); the amount is already
@@ -939,6 +970,9 @@ export function runEffects(
       }
       case 'hot': {
         const hotTarget = target ?? p;
+        const plantsHot = !hotTarget.auras.some(
+          (aura) => aura.kind === 'hot' && aura.id === ability.id && aura.sourceId === p.id,
+        );
         // A HoT that RIDES a direct heal (Regrowth-style) does NOT also scale here:
         // the direct component already took the cast-time coefficient, so scaling the
         // rider too would double-dip. Only pure HoTs (Rejuvenation) take the rider.
@@ -957,6 +991,7 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        if (plantsHot) druidEngineOnHotPlanted(ctx, p, ability.id);
         break;
       }
       case 'absorb': {
@@ -1325,22 +1360,44 @@ export function runEffects(
             e.type === 'aoeRoot',
         );
         if (eff.directPct !== undefined && lastDirectDamage <= 0) break;
+        // Combo-point finishers (rupture/rip, spendsCombo: true) add a perCombo
+        // term to the base total, mirroring finisherDamage/finisherHaste/
+        // finisherStun below: spentCombo is already 0 for any ability that
+        // doesn't spend combo, so this is a no-op for every other dot.
         const dotTotal =
-          eff.directPct === undefined ? eff.total : Math.round(lastDirectDamage * eff.directPct);
-        const dotBase = Math.max(1, Math.round(dotTotal / (eff.duration / eff.interval)));
+          eff.directPct === undefined
+            ? eff.total + (eff.perCombo ?? 0) * spentCombo
+            : Math.round(lastDirectDamage * eff.directPct);
+        // Combo-scaled finisher bleed (classic Rip): fixed duration, the points
+        // spent buy bigger ticks; a 5-point spend equals the canonical total.
+        const comboTotal =
+          eff.perComboTotal !== undefined
+            ? (eff.baseTotal ?? 0) + eff.perComboTotal * spentCombo
+            : dotTotal;
+        const dotBase = Math.max(
+          1,
+          Math.round(
+            (comboTotal / (eff.duration / eff.interval)) * druidApexPayoffMult(ctx, p, ability.id),
+          ),
+        );
+        // Combo-scaled finisher bleed (classic Rupture): the tick value above
+        // stays fixed; the points spent only buy more ticks.
+        const dotDuration = eff.perComboDuration
+          ? (eff.baseDuration ?? 0) + eff.perComboDuration * spentCombo
+          : eff.duration;
         // Physical bleeds (Rend, Rupture, Garrote, Rip) scale off melee Attack
         // Power here just like a spell DoT scales off Spell Power; `hybrid` still
         // suppresses the rider on a DoT that trails its own direct nuke.
         const dotSp = !hybrid
-          ? dotTickBonus(abilityScalingPower(p, ability), ability, eff.duration, eff.interval)
+          ? dotTickBonus(abilityScalingPower(p, ability), ability, dotDuration, eff.interval)
           : 0;
         const dotId = eff.auraId ?? ability.id;
         ctx.applyAura(target, {
           id: dotId,
           name: ABILITIES[dotId]?.name ?? ability.name,
           kind: 'dot',
-          remaining: eff.duration,
-          duration: eff.duration,
+          remaining: dotDuration,
+          duration: dotDuration,
           value: dotBase + dotSp,
           tickInterval: eff.interval,
           tickTimer: eff.interval,
@@ -1348,6 +1405,7 @@ export function runEffects(
           school: eff.school ?? ability.school,
           leechPct: eff.leechPct,
         });
+        if (ability.id === 'rip') druidEngineOnLandedStrike(ctx, p, ability.id);
         ctx.enterCombat(p, target);
         break;
       }
@@ -1369,7 +1427,9 @@ export function runEffects(
           untilNextTick <= dot.remaining
             ? 1 + Math.max(0, Math.floor((dot.remaining - untilNextTick) / interval))
             : 0;
-        const remainingDamage = Math.round(dot.value * ticksLeft);
+        const remainingDamage = Math.round(
+          dot.value * ticksLeft * druidApexPayoffMult(ctx, p, ability.id),
+        );
         target.auras.splice(dotIndex, 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: dot.name, gained: false });
         ctx.emit({
@@ -1392,6 +1452,28 @@ export function runEffects(
             threatOpts,
           );
         }
+        break;
+      }
+      case 'druidMarrowbreakGuard': {
+        if (!druidMarrowbreakUsesGuard(p, eff.belowFrac)) break;
+        const mult = druidApexPayoffMult(ctx, p, ability.id);
+        ctx.applyAura(p, {
+          id: 'marrowbreak_guard',
+          name: ability.name,
+          kind: 'absorb',
+          remaining: 8,
+          duration: 8,
+          value: Math.round(p.maxHp * eff.absorbPctMaxHp * mult),
+          sourceId: p.id,
+          school: 'nature',
+        });
+        if (p.resourceType === 'rage') {
+          p.resource = Math.min(p.maxResource, p.resource + eff.rage);
+        }
+        break;
+      }
+      case 'druidOverbloom': {
+        resolveDruidOverbloom(ctx, p, target ?? p, eff.harvestPct);
         break;
       }
       case 'slow': {
@@ -1628,6 +1710,7 @@ export function runEffects(
           ctx.awardCombo(p, aoeTargets[0], ability.awardsCombo);
           comboAwarded = true;
         }
+        if (aoeTargets.length > 0) druidEngineOnLandedStrike(ctx, p, ability.id);
         break;
       }
       case 'chainDamage': {
@@ -1642,7 +1725,10 @@ export function runEffects(
           res.castTime,
           true,
         );
-        const baseAmount = ctx.rng.range(eff.min, eff.max) + chainSpBonus;
+        // Resolve the shared primary amount once before applying hop falloff.
+        // Fractional spell-power coefficients must not make later hops round
+        // from a hidden value that differs from the primary damage players saw.
+        const baseAmount = Math.round(ctx.rng.range(eff.min, eff.max) + chainSpBonus);
         const hitsPrimary = eff.hitsPrimary === true && target !== null;
         const hitList: Entity[] = hitsPrimary && target ? [target] : [];
         const excluded = new Set<number>([p.id]);
@@ -2825,10 +2911,12 @@ export function runEffects(
         }
         // Expose Armor (`full`) lands all stacks at once; warrior Sunder adds one.
         const existing = target.auras.find((a) => a.kind === 'sunder');
+        // Classic Expose Armor: the points spent set the stacks outright.
+        const comboStacks = eff.perCombo ? Math.min(eff.maxStacks, Math.max(1, spentCombo)) : null;
         if (existing) {
           existing.stacks = eff.full
             ? eff.maxStacks
-            : Math.min(eff.maxStacks, (existing.stacks ?? 1) + 1);
+            : (comboStacks ?? Math.min(eff.maxStacks, (existing.stacks ?? 1) + 1));
           existing.value = eff.armor;
           existing.remaining = existing.duration;
           ctx.emit({ type: 'aura', targetId: target.id, name: ability.name, gained: true });
@@ -2840,7 +2928,7 @@ export function runEffects(
             remaining: 30,
             duration: 30,
             value: eff.armor,
-            stacks: eff.full ? eff.maxStacks : 1,
+            stacks: eff.full ? eff.maxStacks : (comboStacks ?? 1),
             sourceId: p.id,
             school: 'physical',
           });

@@ -27,9 +27,10 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
-import { ITEMS, isArenaPos, MOBS } from '../data';
+import { CLASSES, ITEMS, isArenaPos, MOBS } from '../data';
 import { weaponHand } from '../equipment_rules';
 import { TWOHAND_DPS_MULT } from '../item_budget';
+import { forceDismount } from '../mounts';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -53,6 +54,7 @@ import {
 import { drawWeapon } from '../weapon_stow';
 import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
+import { druidEngineOnLandedStrike } from './druid_engines';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed, rangedAutoProfile } from './form_swing';
@@ -120,6 +122,8 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
     ctx.error(p.id, 'Invalid attack target.');
     return;
   }
+  // Auto-dismount when the player is mounted and starts auto-attack.
+  if (p.mountKey !== '') forceDismount(ctx, p);
   if (p.sitting) ctx.standUp(p);
   if (p.weaponStowed) drawWeapon(p);
   p.autoAttack = true;
@@ -181,6 +185,10 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   // casters (wand-style, no dead zone so they don't run into melee, #94).
   // Form-aware: a druid keeps the class wand only in caster or Moonwing Form;
   // bear/cat/travel resolve to undefined here and fall through to melee.
+  // A pre-armed auto-attack that fires while mounted (e.g. mounted player who
+  // somehow retained autoAttack=true) force-dismounts before the swing lands,
+  // mirroring the ghost_wolf break pattern below and the startAutoAttack guard.
+  if (p.mountKey !== '') forceDismount(ctx, p);
   const ranged = rangedAutoProfile(p, meta.cls);
   if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
     if (!ctx.hasLineOfSight(p, t)) return;
@@ -206,6 +214,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   if (p.swingTimer <= 0) {
     let bonus = 0;
     let abilityName: string | null = null;
+    let abilityId: string | undefined;
     let threatFlat = 0;
     let threatMult = 1;
     if (p.queuedOnSwing) {
@@ -224,6 +233,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
           if (queued.def.cooldown > 0) p.cooldowns.set(queued.def.id, queued.def.cooldown);
           bonus = eff.bonus;
           abilityName = queued.def.name;
+          abilityId = queued.def.id;
           threatFlat = queued.threatFlat;
           threatMult = queued.threatMult;
         }
@@ -234,6 +244,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     }
     const connected = meleeSwing(ctx, p, t, bonus, abilityName, {
       autoAttackHand: 'mainhand',
+      abilityId,
       threatFlat,
       threatMult,
       whiteDualWieldPenalty: dualWieldWhiteMissPenalty && abilityName === null,
@@ -419,6 +430,7 @@ export function meleeSwing(
     // weaponStrike path threads it here so per-ability crit talents reach the
     // shared hit table.
     critBonus?: number;
+    abilityId?: string;
     onDealt?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
   },
@@ -513,7 +525,7 @@ export function meleeSwing(
     dmg = Math.max(1, dmg - target.blockValue);
   }
   const dealtAmount = Math.max(1, Math.round(dmg));
-  ctx.dealDamage(
+  const resolvedAmount = ctx.dealDamage(
     attacker,
     target,
     dealtAmount,
@@ -527,7 +539,8 @@ export function meleeSwing(
       mult: (opts.threatMult ?? 1) * stoneboundThreatMultiplier(ctx, attacker),
     },
   );
-  opts.onDealt?.(dealtAmount);
+  opts.onDealt?.(resolvedAmount);
+  druidEngineOnLandedStrike(ctx, attacker, opts.abilityId);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
   // the weaponStrike ability path, which resolves through this shell). Gated on
   // setProcs inside applySetProcs, so proc-less players draw no rng.

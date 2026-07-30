@@ -1194,3 +1194,76 @@ or hero-tree name.
 | `venom_ritual` | (new) | Venom Ritual | engine-state | new-coinage |
 | `redline` | (new) | Redline | engine-state | new-coinage |
 | `gloam` | (new) | Gloam | engine-state | new-coinage |
+
+## Druid v0.29 row redesign coinages (2026-07-27, append-only)
+
+Fresh names for the druid v0.29 choice rows
+(docs/design/druid-v029-class-design.md). All are original coinages in the map
+voice; none shadow a Blizzard spell or talent name. The r17 options keep the
+existing Red Haze / Gladesong / Lifesap coinages (the granted cooldowns moved
+rows, no new names), and r11 Typhoon grants the pre-existing Typhoon ability.
+
+| id | old | new | kind | flag |
+|---|---|---|---|---|
+| `dru_r5_improved_wrath` | (new) | Wildshift | row-option | new-coinage |
+| `dru_r5_ferocity` | (new) | Loping Stride | row-option | new-coinage |
+| `dru_r5_natures_bounty` | (new) | Skylark | row-option | new-coinage |
+| `dru_r8_typhoon` | (new) | Oakhide Reflex | row-option | new-coinage |
+| `dru_r8_improved_roots` | (new) | Ironhide Reflex | row-option | new-coinage |
+| `dru_r8_brutal_bash` | (new) | Bear-Blood Mending | row-option | new-coinage |
+| `dru_r11_furor` | (new) | Gripping Ambush | row-option | new-coinage |
+| `dru_r11_improved_mark` | (new) | Concussive Economy | row-option | new-coinage |
+| `dru_r14_savage_fury` | (new) | Blooddrunk | row-option | new-coinage |
+| `dru_r14_moonfury` | (new) | Highmoon Tithe | row-option | new-coinage |
+| `dru_r14_empowered_touch` | (new) | Seedspread | row-option | new-coinage |
+| `dru_r20_improved_hurricane` | (new) | Nature's Echo | row-option | new-coinage |
+| `dru_r20_berserk` | (new) | Wild Apex | row-option | new-coinage |
+| `dru_r20_tranquility` | (new) | Quickening | row-option | new-coinage |
+
+## Druid v0.29 spec-engine coinages (2026-07-27, append-only)
+
+The spec-engine abilities, states, and the two strike renames
+(docs/design/druid-v029-class-design.md), all original coinages in the map
+voice; none shadow a Blizzard spell, talent, or hero-tree name. In-map note:
+druid Redharvest (one word) sits near the pre-existing warrior "Red Harvest"
+(two words); distinct abilities, both kept by decision.
+
+| id | old | new | kind | flag |
+|---|---|---|---|---|
+| `moonlash` | (new) | Moonlash | ability | new-coinage |
+| `sunlance` | (new) | Sunlance | ability | new-coinage |
+| `moonseed` | (new) | Moonseed | ability | new-coinage |
+| `redharvest` | (new) | Redharvest | ability | new-coinage |
+| `marrowbreak` | (new) | Marrowbreak | ability | new-coinage |
+| `overbloom` | (new) | Overbloom | ability | new-coinage |
+| `moontide` | (new) | Moontide | engine-state | new-coinage |
+| `sunwake` | (new) | Sunwake | engine-state | new-coinage |
+| `skyborne` | (new) | Skyborne | engine-state | new-coinage |
+| `old_blood` | (new) | Old Blood | engine-state | new-coinage |
+| `verdance` | (new) | Verdance | engine-state | new-coinage |
+| `claw` | Claw | Rendclaw | ability-rename | renamed |
+| `rip` | Rip | Bloodrift | ability-rename | renamed |
+
+## Druid v0.29 Moongrove v2 revision (2026-07-27, append-only)
+
+Owner playtest simplified the Moongrove engine to one bank and one alternating
+payoff button. One coinage is added and one is retired before ever shipping:
+Skyborne (the instant-cast window) was cut in the same session it was built,
+replaced by Moonsurge, an original coinage in the map voice; no Blizzard
+spell, talent, or hero-tree name collision.
+
+| id | old | new | kind | flag |
+|---|---|---|---|---|
+| `moonsurge` | (new) | Moonsurge | engine-state | new-coinage |
+| `skyborne` | Skyborne | (retired pre-ship) | engine-state | retired |
+
+## Druid v0.29 Moongrove v3 revision (2026-07-28, append-only)
+
+Owner playtest turned the alternating payoff into a player CHOICE: at full
+Moontide, Moonseed becomes the damage payoff and Skyfall becomes the economy
+payoff, and either press spends the bank. The payoff ABILITY names now reuse
+the session's own coinages (both already recorded above): def id `moonlash`
+displays as Moonsurge, def id `sunlance` displays as Sunwake. The Sunwake sky
+marker and the Moonsurge next-bolt empowerment are retired pre-ship; the
+names live on as the two payoff abilities. Moonlash and Sunlance are retired
+pre-ship as display names.

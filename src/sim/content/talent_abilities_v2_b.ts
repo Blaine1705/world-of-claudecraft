@@ -119,6 +119,7 @@ export const TALENT_ABILITIES_V2_B = {
   },
   innervate: {
     id: 'innervate',
+    tooltipOmitEffectLines: true,
     name: 'Lifesap',
     class: 'druid',
     learnLevel: 10,
@@ -150,6 +151,7 @@ export const TALENT_ABILITIES_V2_B = {
   },
   berserk: {
     id: 'berserk',
+    tooltipOmitEffectLines: true,
     name: 'Red Haze',
     class: 'druid',
     learnLevel: 10,

@@ -157,7 +157,7 @@ describe('spec masteries', () => {
       global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'feral')?.mastery.effect).toEqual({
-      global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 },
+      global: { meleeDmgPct: 0.5, dotDmgPct: 0.5, threatPct: 0.2 },
       // The v0.27 Dire Bruin retune rides the mastery now that the old
       // feral_choice_bear node is retired.
       stats: { armorPct: 0.15 },
@@ -192,7 +192,7 @@ describe('spec masteries', () => {
 
   it('applies petDmgPct at BOTH the melee and ranged pet damage sites, not only the helper', () => {
     // Drive the actual damage sites (a regression that drops `dmg *= petDamageMult` at
-    // either would still pass a helper-only assertion). Same seed + fixed rolls + an
+    // either would still pass a helper-only assertion). A fixed attack-site RNG + an
     // identical dummy (armor cancels in the ratio) isolate the multiplier: Packlord's
     // Packbond (petDmgPct 0.25) must deal exactly 1.25x what a no-pet-mastery spec's
     // identical pet deals.
@@ -200,6 +200,10 @@ describe('spec masteries', () => {
       const sim = new Sim({ seed: 11, playerClass: 'hunter', autoEquip: true });
       sim.setPlayerLevel(20);
       sim.setSpec(spec);
+      // World construction consumes the shared RNG, so pin subsequent combat rolls:
+      // adding unrelated world content must not move this multiplier test across an
+      // integer-rounding boundary.
+      (sim as unknown as { rng: { next: () => number } }).rng.next = () => 0.5;
       const pet = createMob(9101, MOBS.forest_wolf, 20, sim.player.pos);
       pet.ownerId = sim.player.id;
       pet.weapon = { ...pet.weapon, min: 100, max: 100 };
@@ -440,7 +444,7 @@ describe('spec masteries', () => {
       },
       druid: {
         balance: { global: 'spellDmgPct', value: 0.15 },
-        feral: { global: 'meleeDmgPct', value: 0.15 },
+        feral: { global: 'meleeDmgPct', value: 0.5 },
         restoration: { global: 'hotHealPct', value: 0.25 },
       },
     };

@@ -14,12 +14,13 @@ const TALENTS_V2_CONTENT_REVISION = 1;
 
 /**
  * Latest production character-JSON revision. 1: the v0.26 Talents V2 rollout.
- * 2: the v0.29 class redesigns (hunter, shaman, priest, and the rogue rows);
+ * 2: the first v0.29 class redesigns (hunter, shaman, priest, and rogue);
+ * 3: the v0.29 Druid redesign;
  * changed option ids get a free row repick, and the repair scrubs retired row
  * grants (for rogues: Contingency, Wraith Strike, Shadecloak) off saved bars.
  * Untouched classes pass through unchanged and only advance the marker.
  */
-export const CURRENT_CHARACTER_CONTENT_REVISION = 2;
+export const CURRENT_CHARACTER_CONTENT_REVISION = 3;
 
 function migrationLevel(value: number): number {
   if (!Number.isFinite(value)) return 1;
@@ -91,24 +92,27 @@ function migrateLoadouts(
   level: number,
   value: unknown,
   activeValue: unknown,
+  freeRepick: boolean,
 ): { loadouts: SavedLoadout[]; activeLoadout: number } {
   const repaired = repairTalentLoadouts(cls, level, value, activeValue);
   return {
     activeLoadout: repaired.activeLoadout,
-    loadouts: repaired.loadouts.map((loadout) => ({
-      name: loadout.name,
-      alloc: loadout.alloc,
-      bar: migrateLoadoutBar(cls, level, loadout.alloc, loadout.bar),
-    })),
+    loadouts: repaired.loadouts.map((loadout) => {
+      const alloc = freeRepick ? { spec: loadout.alloc.spec, rows: {} } : loadout.alloc;
+      return {
+        name: loadout.name,
+        alloc,
+        bar: migrateLoadoutBar(cls, level, alloc, loadout.bar),
+      };
+    }),
   };
 }
 
 /**
  * Pure one-way content migration. Revision 1 converted production point-tree
- * saves to canonical `{spec, rows}`. Revision 2 grants Hunters a free row repick
- * for the v0.29 redesign and removes retired abilities from saved loadout bars.
- * Other classes only advance the revision marker. Reapplying the current
- * revision is an identity operation.
+ * saves to canonical `{spec, rows}`. Revision 2 grants Hunters a free row repick.
+ * Revision 3 does the same for Druids and scrubs retired row grants from bars.
+ * Reapplying the current revision is an identity operation.
  */
 export function migrateCharacterTalentsV2(cls: PlayerClass, state: CharacterState): CharacterState {
   const revision = Number.isSafeInteger(state.contentRevision)
@@ -116,13 +120,21 @@ export function migrateCharacterTalentsV2(cls: PlayerClass, state: CharacterStat
     : 0;
   if (revision >= CURRENT_CHARACTER_CONTENT_REVISION) return state;
 
-  if (revision >= TALENTS_V2_CONTENT_REVISION && cls !== 'hunter') {
+  const freeRepick =
+    revision < TALENTS_V2_CONTENT_REVISION ||
+    (cls === 'hunter' && revision < 2) ||
+    (cls === 'druid' && revision < 3);
+  if (!freeRepick) {
     return { ...state, contentRevision: CURRENT_CHARACTER_CONTENT_REVISION };
   }
 
   const level = migrationLevel(state.level);
-  const talents = repairAllocation(cls, state.talents, level);
-  const migratedLoadouts = migrateLoadouts(cls, level, state.loadouts, state.activeLoadout);
+  const repairedTalents = repairAllocation(cls, state.talents, level);
+  const talents = {
+    spec: repairedTalents.spec,
+    rows: {},
+  };
+  const migratedLoadouts = migrateLoadouts(cls, level, state.loadouts, state.activeLoadout, true);
   return {
     ...state,
     contentRevision: CURRENT_CHARACTER_CONTENT_REVISION,

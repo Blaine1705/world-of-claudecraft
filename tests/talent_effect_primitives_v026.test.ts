@@ -335,12 +335,15 @@ describe('Talents V2 stasis and resource-sap primitives', () => {
   it('Lifesap ticks the current resource every two seconds and is stilled by hard control', () => {
     // A mana user now also passively regenerates Spirit mana in combat (the mp5
     // change), so isolate Lifesap by differencing a with-sap run against a without-sap
-    // run over the same in-combat window. `control` optionally stuns the caster.
+    // run over the same in-combat window. `control` optionally stuns the caster. The
+    // v0.29 druid tree moved the Lifesap unlock to the row 17 pick.
     const sapGain = (control: boolean): number => {
       const run = (withSap: boolean): number => {
         const sim = new Sim({ seed: 10, playerClass: 'druid', autoEquip: true });
         sim.setPlayerLevel(20);
-        expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
+        expect(
+          sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_survival_of_the_fittest' } }),
+        ).toBe(true);
         sim.player.inCombat = true;
         sim.player.fiveSecondRule = 0;
         if (withSap) sim.castAbility('innervate');

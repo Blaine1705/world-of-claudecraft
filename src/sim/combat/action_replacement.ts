@@ -11,10 +11,25 @@ export function resolveActionReplacement(base: ResolvedAbility, actor: Entity): 
   // A def may carry one rule per spec engine; the aura kinds are spec-gated,
   // so at most one can be active. The first matching rule wins.
   for (const rule of Array.isArray(rules) ? rules : [rules]) {
+    if (rule.actorAuraKind && !actor.auras.some((aura) => aura.kind === rule.actorAuraKind)) {
+      continue;
+    }
     const active = actor.auras.some(
       (aura) => aura.kind === rule.auraKind && (aura.stacks ?? 1) >= (rule.minStacks ?? 1),
     );
-    if (active) return replaceResolvedAbility(base, rule.abilityId);
+    if (active) {
+      const replaced = replaceResolvedAbility(base, rule.abilityId);
+      // One slot, one clock: an aura-state transform that carries its own
+      // cooldown checks and arms the BASE button's cooldown (Swiftmend and
+      // Overbloom share one 8 sec clock), while a cooldown-free payoff
+      // (Unleash Beast) casts through the base recharge and arms nothing.
+      // Only THIS rule path stamps the shared key: the hunter resolver also
+      // swaps defs via replaceResolvedAbility, and Pack Rally deliberately
+      // owns its own clock (the resolver reverts the button while
+      // cooldowns.has('pack_rally') runs).
+      if (replaced !== base && replaced.cooldown > 0) replaced.cooldownId = base.def.id;
+      return replaced;
+    }
   }
   return base;
 }

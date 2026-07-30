@@ -19,13 +19,15 @@ export type OwnedDpsSpec =
   | 'fieldcraft'
   | 'thundercall'
   | 'warspirit'
-  | 'vespers';
+  | 'vespers'
+  | 'moongrove'
+  | 'wildfang';
 
-export type OwnedHealerSpec = 'spiritmend' | 'doctrine' | 'benison';
+export type OwnedHealerSpec = 'spiritmend' | 'doctrine' | 'benison' | 'groveheart';
 
 export interface OwnedClassBalanceScenario {
   targets: 1 | 3;
-  seconds: 15 | 60 | 120;
+  seconds: 15 | 60 | 120 | 123;
   window: 'burst' | 'sustained' | 'raid';
   targetLevel?: 20 | 22 | 23 | 24;
   targetTemplateId?: 'training_dummy' | 'nythraxis_scourge_of_thornpeak';
@@ -78,7 +80,7 @@ export interface OwnedHealerBalanceResult {
   seed: number;
   spec: OwnedHealerSpec;
   allies: 1 | 3;
-  seconds: 60;
+  seconds: number;
   effectiveHealing: number;
   healingBySource: Record<string, number>;
   hps: number;
@@ -139,6 +141,7 @@ type ProbeSim = Sim & {
 interface Fixture {
   cls: PlayerClass;
   talentSpec: string;
+  talentRows?: Record<number, string>;
   distance: number;
   hunterPet: boolean;
 }
@@ -202,6 +205,8 @@ export const OWNED_DPS_SPECS: readonly OwnedDpsSpec[] = [
   'thundercall',
   'warspirit',
   'vespers',
+  'moongrove',
+  'wildfang',
 ] as const;
 
 const FIXTURES: Record<OwnedDpsSpec, Fixture> = {
@@ -211,6 +216,26 @@ const FIXTURES: Record<OwnedDpsSpec, Fixture> = {
   thundercall: { cls: 'shaman', talentSpec: 'elemental', distance: 18, hunterPet: false },
   warspirit: { cls: 'shaman', talentSpec: 'enhancement', distance: 3, hunterPet: false },
   vespers: { cls: 'priest', talentSpec: 'shadow', distance: 18, hunterPet: false },
+  moongrove: {
+    cls: 'druid',
+    talentSpec: 'balance',
+    talentRows: {
+      14: 'dru_r14_moonfury',
+      20: 'dru_r20_improved_hurricane',
+    },
+    distance: 18,
+    hunterPet: false,
+  },
+  wildfang: {
+    cls: 'druid',
+    talentSpec: 'feral',
+    talentRows: {
+      14: 'dru_r14_savage_fury',
+      20: 'dru_r20_improved_hurricane',
+    },
+    distance: 3,
+    hunterPet: false,
+  },
 };
 
 // Fixed level-20 PBE loadouts. These deliberately use exact item ids instead of
@@ -277,6 +302,35 @@ const VESPERS_PBE_LOADOUT: PbeLoadout = {
 
 const HEALER_SHAMAN_PBE_LOADOUT: PbeLoadout = THUNDERCALL_PBE_LOADOUT;
 const HEALER_PRIEST_PBE_LOADOUT: PbeLoadout = VESPERS_PBE_LOADOUT;
+// Groveheart heals from an intellect-leather set: the shared DRUID_PBE_LOADOUT
+// is the agility set the two damage lanes are anchored on, and it starves the
+// healer's mana pool at half the peer fixtures'.
+const DRUID_HEALER_PBE_LOADOUT: PbeLoadout = {
+  mainhand: 'scepter_of_the_deathless_court',
+  helmet: 'stormroot_cowl',
+  neck: 'zense_meridian',
+  shoulder: 'stormbark_mantle',
+  chest: 'vestments_of_the_waking_grove',
+  waist: 'lunarward_cinch',
+  legs: 'heroic_wildgrowth_leggings',
+  gloves: 'heroic_grovewardens_grips',
+  feet: 'dreamroot_boots',
+  ring1: 'nielas_coldlight_band',
+  ring2: 'architects_cornerstone',
+};
+const DRUID_PBE_LOADOUT: PbeLoadout = {
+  mainhand: 'scepter_of_the_deathless_court',
+  helmet: 'heroic_nighttalon_crown',
+  neck: 'medallion_of_endless_profit',
+  shoulder: 'heroic_nighttalon_shoulderguards',
+  chest: 'scourgehide_carapace',
+  waist: 'bonechill_cord',
+  legs: 'heroic_wyrmshadow_legguards',
+  gloves: 'heroic_wyrmshadow_talongrips',
+  feet: 'heroic_wyrmshadow_treads',
+  ring1: 'architects_cornerstone',
+  ring2: 'nielas_coldlight_band',
+};
 
 export const OWNED_CLASS_PBE_LOADOUTS: Readonly<Record<OwnedDpsSpec, PbeLoadout>> = {
   packlord: HUNTER_PBE_LOADOUT,
@@ -285,6 +339,8 @@ export const OWNED_CLASS_PBE_LOADOUTS: Readonly<Record<OwnedDpsSpec, PbeLoadout>
   thundercall: THUNDERCALL_PBE_LOADOUT,
   warspirit: WARSPIRIT_PBE_LOADOUT,
   vespers: VESPERS_PBE_LOADOUT,
+  moongrove: DRUID_PBE_LOADOUT,
+  wildfang: DRUID_PBE_LOADOUT,
 };
 
 // Fixed PBE builds keep balance evidence reproducible and make each profile use
@@ -324,6 +380,28 @@ export const OWNED_CLASS_PBE_TALENTS: Readonly<
       14: 'sha_r14_improved_flame_shock',
       17: 'sha_r17_earthbind',
       20: 'sha_r20_bloodlust',
+    },
+  },
+  // Druid v0.29 lanes (stacked #2218 + #2328 + druid): the engine-economy row
+  // and capstone the pinned druid numbers were measured with; the matrix
+  // overrides row 20 per capstone run. Groveheart's band profile runs bare.
+  moongrove: {
+    spec: 'balance',
+    rows: { 14: 'dru_r14_moonfury', 20: 'dru_r20_improved_hurricane' },
+  },
+  wildfang: {
+    spec: 'feral',
+    rows: { 14: 'dru_r14_savage_fury', 20: 'dru_r20_improved_hurricane' },
+  },
+  groveheart: {
+    spec: 'restoration',
+    rows: {
+      5: 'dru_r5_natures_bounty',
+      8: 'dru_r8_improved_roots',
+      11: 'dru_r11_innervate',
+      14: 'dru_r14_empowered_touch',
+      17: 'dru_r17_survival_of_the_fittest',
+      20: 'dru_r20_berserk',
     },
   },
   doctrine: {
@@ -579,6 +657,39 @@ function castVespers(state: RunState): void {
   tryCast(state, 'mind_flay');
 }
 
+function castMoongrove(state: RunState): void {
+  const missingTempest = state.targets.find((target) => {
+    const tempest = ownAura(target, 'moonfire', state.sim.playerId);
+    return !tempest || tempest.remaining <= 3;
+  });
+  if (missingTempest && tryCast(state, 'moonfire', missingTempest)) return;
+  const moontide = state.sim.player.auras.find((aura) => aura.id === 'moontide');
+  if ((moontide?.stacks ?? 0) >= 3) {
+    // The spend choice: Sunwake when mana runs thin, Moonsurge otherwise.
+    const lowMana = state.sim.player.resource < state.sim.player.maxResource * 0.4;
+    if (tryCast(state, lowMana ? 'starfire' : 'moonseed')) return;
+  }
+  if (!state.sim.player.cooldowns.has('moonseed') && tryCast(state, 'moonseed')) return;
+  tryCast(state, 'wrath');
+}
+
+function castWildfang(state: RunState): void {
+  const flense = ownAura(state.primary, 'rake', state.sim.playerId);
+  const bloodrift = ownAura(state.primary, 'rip', state.sim.playerId);
+  const oldBlood = state.sim.player.auras.find((aura) => aura.id === 'old_blood');
+  if ((oldBlood?.stacks ?? 0) >= 3 && state.sim.player.comboPoints >= 1) {
+    // The long bleed timers make one builder after Bloodrift affordable, so
+    // the detonation always carries at least a one-point bite.
+    if (tryCast(state, 'ferocious_bite')) return;
+  }
+  if (state.sim.player.comboPoints >= 5 && !bloodrift) {
+    if (tryCast(state, 'rip')) return;
+  }
+  if (!flense && tryCast(state, 'rake')) return;
+  if (state.sim.player.comboPoints >= 5 && tryCast(state, 'ferocious_bite')) return;
+  tryCast(state, 'claw');
+}
+
 function runRotation(state: RunState): void {
   const player = state.sim.player;
   if (player.dead || player.castingAbility || player.gcdRemaining > 0.001) return;
@@ -588,7 +699,9 @@ function runRotation(state: RunState): void {
   else if (state.spec === 'fieldcraft') castFieldcraft(state);
   else if (state.spec === 'thundercall') castThundercall(state);
   else if (state.spec === 'warspirit') castWarspirit(state);
-  else castVespers(state);
+  else if (state.spec === 'vespers') castVespers(state);
+  else if (state.spec === 'moongrove') castMoongrove(state);
+  else castWildfang(state);
 }
 
 function prepare(state: RunState): void {
@@ -600,6 +713,11 @@ function prepare(state: RunState): void {
     tryCast(state, 'galeheart_weapon');
   } else if (state.spec === 'vespers') {
     tryCast(state, 'shadowform');
+  } else if (state.spec === 'moongrove') {
+    tryCast(state, 'moonkin_form');
+  } else if (state.spec === 'wildfang') {
+    tryCast(state, 'cat_form');
+    state.sim.startAutoAttack();
   }
   state.sim.tick();
   state.sim.player.gcdRemaining = 0;
@@ -655,12 +773,16 @@ export function runOwnedClassDpsProbe(
   scenario: OwnedClassBalanceScenario,
   seed = 29_900,
   head = 'working-tree',
+  talentRows?: Record<number, string>,
 ): OwnedClassBalanceResult {
   const fixture = FIXTURES[spec];
   const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
   sim.setPlayerLevel(20);
   anchorProbeInOpenField(sim);
   const talents = pbeTalents(spec, fixture.talentSpec);
+  // Druid fixtures carry engine rows, and the druid matrix overrides the
+  // capstone per run; both fold over the upstream PBE talent profile.
+  talents.rows = { ...talents.rows, ...(fixture.talentRows ?? {}), ...(talentRows ?? {}) };
   if (!sim.applyTalents(talents)) {
     throw new Error(`failed to apply ${fixture.talentSpec}`);
   }
@@ -796,10 +918,13 @@ export function averageOwnedClassDpsProbe(
 }
 
 function healerFixture(spec: OwnedHealerSpec): {
-  cls: 'shaman' | 'priest';
+  cls: 'shaman' | 'priest' | 'druid';
   talentSpec: 'restoration' | 'discipline' | 'holy';
   loadout: PbeLoadout;
 } {
+  if (spec === 'groveheart') {
+    return { cls: 'druid', talentSpec: 'restoration', loadout: DRUID_HEALER_PBE_LOADOUT };
+  }
   if (spec === 'spiritmend') {
     return { cls: 'shaman', talentSpec: 'restoration', loadout: HEALER_SHAMAN_PBE_LOADOUT };
   }
@@ -846,6 +971,35 @@ function runHealerRotation(
   if (healer.dead || healer.castingAbility || healer.gcdRemaining > 0.001) return;
   const lowest = lowestHealth(allies);
   const injured = allies.filter((ally) => ally.hp / ally.maxHp < 0.82).length;
+  if (spec === 'groveheart') {
+    // The documented loop: harvest at full growth, keep Wildbloom on the whole
+    // party and Second Bloom on the spike target, and fill every remaining
+    // GCD with Wildmend while the garden ticks. A sow-only loop saturates its
+    // GCDs re-seeding and under-measures the spec (the pooled-payoff lesson).
+    if (
+      healer.resource < healer.maxResource * 0.4 &&
+      !healer.cooldowns.has('innervate') &&
+      healerCast(sim, healer, 'innervate', healer, castsByAbility)
+    ) {
+      return;
+    }
+    const verdance = healer.auras.find((aura) => aura.id === 'verdance');
+    if ((verdance?.stacks ?? 0) >= 5) {
+      if (healerCast(sim, healer, 'swiftmend', lowest, castsByAbility)) return;
+    }
+    if (lowest.hp / lowest.maxHp < 0.55) {
+      if (healerCast(sim, healer, 'healing_touch', lowest, castsByAbility)) return;
+    }
+    const unseeded = allies.find((ally) => !ownAura(ally, 'rejuvenation', healer.id));
+    if (unseeded && healerCast(sim, healer, 'rejuvenation', unseeded, castsByAbility)) return;
+    if (!ownAura(lowest, 'regrowth', healer.id)) {
+      if (healerCast(sim, healer, 'regrowth', lowest, castsByAbility)) return;
+    }
+    if (lowest.hp / lowest.maxHp < 0.8) {
+      healerCast(sim, healer, 'healing_touch', lowest, castsByAbility);
+    }
+    return;
+  }
   if (spec === 'spiritmend') {
     if (healerCast(sim, healer, 'primal_exaltation', healer, castsByAbility)) return;
     const prepared = allies.filter((ally) =>
@@ -901,12 +1055,15 @@ export function runOwnedHealerProbe(
   allyCount: 1 | 3,
   seed = 29_910,
   head = 'working-tree',
+  talentRows?: Record<number, string>,
+  seconds = 60,
 ): OwnedHealerBalanceResult {
   const fixture = healerFixture(spec);
   const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
   sim.setPlayerLevel(20);
   anchorProbeInOpenField(sim);
   const talents = pbeTalents(spec, fixture.talentSpec);
+  talents.rows = { ...talents.rows, ...(talentRows ?? {}) };
   if (!sim.applyTalents(talents)) {
     throw new Error(`failed to apply ${fixture.talentSpec}`);
   }
@@ -941,9 +1098,6 @@ export function runOwnedHealerProbe(
     const measured = { resolved: 0 };
     args[7] = measured;
     const effective = originalApplyHeal(...args);
-    effectiveHealing += effective;
-    const ability = args[3];
-    healingBySource[ability] = (healingBySource[ability] ?? 0) + effective;
     overhealing += Math.max(0, measured.resolved - effective);
     if (callerResolution) callerResolution.resolved = measured.resolved;
     return effective;
@@ -953,9 +1107,15 @@ export function runOwnedHealerProbe(
   let damage = 0;
   let emergencyRecoverySeconds: number | null = null;
   let recovered = false;
-  for (let tick = 0; tick < 60 * 20; tick++) {
+  for (let tick = 0; tick < seconds * 20; tick++) {
     runHealerRotation(spec, sim, healer, allies, enemy, castsByAbility);
     const events = sim.tick();
+    for (const event of events) {
+      if (event.type !== 'heal2' || event.sourceId !== healer.id) continue;
+      effectiveHealing += event.amount;
+      const ability = event.ability ?? 'Unknown';
+      healingBySource[ability] = (healingBySource[ability] ?? 0) + event.amount;
+    }
     damage += collectDamage(
       {
         sim,
@@ -1018,16 +1178,16 @@ export function runOwnedHealerProbe(
     seed,
     spec,
     allies: allyCount,
-    seconds: 60,
+    seconds,
     effectiveHealing,
     healingBySource,
-    hps: effectiveHealing / 60,
+    hps: effectiveHealing / seconds,
     overhealing,
     overhealPct:
       effectiveHealing + overhealing > 0 ? overhealing / (effectiveHealing + overhealing) : 0,
     absorbedDamage,
     damage,
-    dps: damage / 60,
+    dps: damage / seconds,
     preparedHealing,
     emergencyRecoverySeconds,
     castsByAbility,

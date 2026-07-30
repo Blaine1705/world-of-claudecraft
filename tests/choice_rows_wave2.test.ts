@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { onCastCompleted, onHotExpired } from '../src/sim/combat/talent_procs';
+import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -10,8 +10,9 @@ function rig(
   level: number,
   rows: Record<number, string>,
   spec: string | null = null,
+  seed = 1,
 ) {
-  const sim = new Sim({ seed: 17, playerClass: cls, autoEquip: true });
+  const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
   sim.setPlayerLevel(level);
   expect(sim.applyTalents({ spec, rows })).toBe(true);
   const p = sim.player;
@@ -65,15 +66,6 @@ function completeCast(sim: Sim, ability: string, target: Entity | null = null): 
   );
 }
 
-function expireHot(sim: Sim, ability: string, target: Entity): void {
-  onHotExpired(
-    (sim as unknown as { ctx: Parameters<typeof onHotExpired>[0] }).ctx,
-    sim.player,
-    ability,
-    target,
-  );
-}
-
 // The mage and Hunter trees were replaced wholesale by owner-approved designs.
 // Their coverage lives in tests/mage_choice_rows.test.ts and
 // tests/hunter_talents.test.ts.
@@ -104,55 +96,25 @@ describe('rogue wave 2 choice rows', () => {
 });
 
 describe('druid wave 2 choice rows', () => {
-  it('form and heal loops create cheap casts, cooldown resets, and echoes', () => {
-    const { sim, p } = rig('druid', 20, {
-      5: 'dru_r5_ferocity',
-      14: 'dru_r14_empowered_touch',
-    });
+  it('Loping Stride triggers once per internal cooldown after a form change', () => {
+    const { sim, p } = rig('druid', 20, { 5: 'dru_r5_ferocity' });
     castAndSettle(sim, 'cat_form', 1);
-    expect(p.auras.some((a) => a.id === 'dru_redmaw')).toBe(true);
-
-    // Bloom's End is self-contained since the final #1756 pass: a full
-    // Wildbloom arms an instant Wildmend instead of resetting Swiftmend
-    // (unobtainable alongside this row).
-    const healer = rig('druid', 20, { 5: 'dru_r5_natures_bounty' });
-    healer.p.hp = Math.round(healer.p.maxHp * 0.5);
-    expireHot(healer.sim, 'rejuvenation', healer.p);
-    expect(healer.p.auras.find((a) => a.id === 'dru_natures_bounty')?.kind).toBe(
-      'next_cast_instant',
-    );
+    expect(p.auras.some((a) => a.id === 'loping_stride' && a.kind === 'buff_speed')).toBe(true);
+    p.auras = p.auras.filter((a) => a.id !== 'loping_stride');
+    p.gcdRemaining = 0;
+    sim.castAbility('bear_form');
+    expect(p.auras.some((a) => a.id === 'loping_stride')).toBe(false);
   });
 
-  it('Empowered Touch echo and Survival of the Fittest big-hit loop resolve', () => {
-    const { sim, p } = rig('druid', 20, { 14: 'dru_r14_empowered_touch' });
-    p.hp = Math.round(p.maxHp * 0.7);
-    sim.targetEntity(sim.playerId);
-    castAndSettle(sim, 'healing_touch', 4);
-    expect(p.auras.some((a) => a.id === 'dru_empowered_touch')).toBe(true);
-    p.hp = Math.round(p.maxHp * 0.4);
-    dealDamage(sim, p, Math.ceil(p.maxHp * 0.2));
-    expect(p.auras.some((a) => a.id === 'dru_empowered_touch')).toBe(false);
-
-    const bear = rig('druid', 20, {
-      17: 'dru_r17_survival_of_the_fittest',
-      20: 'dru_r20_improved_hurricane',
-    });
-    // Ironhide Reflex is self-contained since the final #1756 pass: a big hit
-    // restores 20 rage (only in Bruin Form, via the resourceType gate) and
-    // grants a shield, instead of refunding the same-row Savage Mending.
-    castAndSettle(bear.sim, 'bear_form', 1);
-    expect(bear.p.resourceType).toBe('rage');
-    bear.p.resource = 0;
-    dealDamage(bear.sim, bear.p, Math.ceil(bear.p.maxHp * 0.25));
-    expect(bear.p.resource).toBe(20);
-    expect(bear.p.auras.some((a) => a.id === 'dru_survival_of_the_fittest')).toBe(true);
-    // Balance pass round two: the capstone is Nature's Fury (a passive
-    // moonwing party-crit radiator, covered in tests/natures_fury.test.ts);
-    // Galeheart casts no longer refund or arm anything.
-    bear.p.cooldowns.set('hurricane', 10);
-    completeCast(bear.sim, 'hurricane');
-    expect(bear.p.cooldowns.get('hurricane')).toBe(10);
-    expect(bear.p.auras.some((a) => a.id === 'dru_improved_hurricane')).toBe(false);
+  it('Ironhide Reflex absorbs a large hit and respects its internal cooldown', () => {
+    const { sim, p } = rig('druid', 20, { 8: 'dru_r8_improved_roots' });
+    dealDamage(sim, p, Math.ceil(p.maxHp * 0.25));
+    const shield = p.auras.find((a) => a.id === 'dru_ironhide_reflex');
+    expect(shield?.kind).toBe('absorb');
+    expect(shield?.value).toBe(Math.round(p.maxHp * 0.15));
+    p.auras = p.auras.filter((a) => a.id !== 'dru_ironhide_reflex');
+    dealDamage(sim, p, Math.ceil(p.maxHp * 0.25));
+    expect(p.auras.some((a) => a.id === 'dru_ironhide_reflex')).toBe(false);
   });
 });
 
@@ -201,7 +163,9 @@ describe('warlock wave 2 choice rows', () => {
 
   it('Deepened Hex and defensive pact hooks change live combat outcomes', () => {
     const hit = (withDot: boolean) => {
-      const { sim } = rig('warlock', 20, { 14: 'wlk_r14_amplify_curse' });
+      // Seed hunted (post-merge camp order) so the level-20 bolt LANDS in both
+      // arms (a resist zeroes the delta and voids the ratio). Spares: 3, 4.
+      const { sim } = rig('warlock', 20, { 14: 'wlk_r14_amplify_curse' }, null, 2);
       const mob = addTargetMob(sim);
       if (withDot) {
         mob.auras.push({

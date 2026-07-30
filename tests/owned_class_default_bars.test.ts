@@ -27,6 +27,7 @@ import {
 } from '../src/ui/hud/action_bar/mobile_action_page_view';
 import {
   ownedClassSpecDefaultAbilityIds,
+  ownedDruidFormDefaultAbilityIds,
   shouldSeedOwnedSpecDefault,
 } from '../src/ui/hud/action_bar/owned_class_spec_defaults';
 
@@ -182,6 +183,46 @@ const EXPECTED = {
     'lesser_heal',
     'power_word_fortitude',
   ],
+  'druid/balance': [
+    'moonkin_form',
+    'wrath',
+    'starfire',
+    'moonseed',
+    'moonfire',
+    'barkskin',
+    'entangling_roots',
+    'faerie_fire',
+    'healing_touch',
+    'rejuvenation',
+    'regrowth',
+    'travel_form',
+  ],
+  'druid/feral': [
+    'cat_form',
+    'bear_form',
+    'feral_charge',
+    'barkskin',
+    'primal_reflexes',
+    'travel_form',
+    'healing_touch',
+    'rejuvenation',
+    'mark_of_the_wild',
+    'thorns',
+    'faerie_fire',
+  ],
+  'druid/restoration': [
+    'rejuvenation',
+    'regrowth',
+    'healing_touch',
+    'swiftmend',
+    'barkskin',
+    'entangling_roots',
+    'moonfire',
+    'wrath',
+    'mark_of_the_wild',
+    'thorns',
+    'travel_form',
+  ],
 } as const;
 
 class MemoryStorage {
@@ -248,7 +289,7 @@ function seedOwnedSpecBar(
 }
 
 describe('owned class level 20 default action bars', () => {
-  it('pins the manual-first templates for all nine specs', () => {
+  it('pins the manual-first templates for every redesigned owned spec', () => {
     for (const { key, playerClass, spec, expected, known } of ownedSpecEntries()) {
       expect(ownedClassSpecDefaultAbilityIds(playerClass, spec, 20, known), key).toEqual(expected);
       expect(
@@ -270,6 +311,23 @@ describe('owned class level 20 default action bars', () => {
         new Set(['bloodhook', 'raptor_strike']),
       ),
     ).toEqual(['bloodhook', 'raptor_strike']);
+  });
+
+  it('keeps the Wildfang signature and defensives on both curated form pages', () => {
+    const known = new Set(
+      abilitiesKnownAt(
+        'druid',
+        20,
+        computeTalentModifiers('druid', { spec: 'feral', rows: {} }, 20),
+      ).map((ability) => ability.def.id),
+    );
+    for (const form of ['bear', 'cat'] as const) {
+      const ids = ownedDruidFormDefaultAbilityIds('druid', form, known);
+      expect(ids, form).toEqual(
+        expect.arrayContaining(['feral_charge', 'barkskin', 'primal_reflexes']),
+      );
+      expect(ids, form).toHaveLength(12);
+    }
   });
 
   it('replaces only a missing bar or the exact previously generated layout', () => {
