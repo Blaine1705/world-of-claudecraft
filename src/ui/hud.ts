@@ -142,7 +142,7 @@ import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from './bag_item_action_menu
 import { bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
-import { type BannerClass, BannerQueue } from './banner_queue';
+import { type BannerClass, type BannerEnqueueOutcome, BannerQueue } from './banner_queue';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter } from './cast_bar_painter';
@@ -913,10 +913,24 @@ interface BannerPayload {
   subtext?: string;
   durationMs: number;
   source: 'unstuck' | null;
+  /** The R38 class, kept on the payload so the advance chain can tell a
+   *  deferred AMBIENT (droppable when stale) from a celebration. */
+  bannerClass: BannerClass;
+  /** performance.now() at enqueue, for the ambient max-defer below. */
+  enqueuedAt: number;
 }
 
 /** The fade gap between a finished banner and the next queued one. */
 const BANNER_ADVANCE_GAP_MS = 250;
+
+/** How long a parked AMBIENT banner stays worth replaying. An ambient is
+ *  current-state, not history: behind ONE celebration (2600ms + gap) a zone
+ *  name or prompt is still fresh enough to show, but behind a celebration
+ *  CHAIN a "starting now" or countdown digit replayed many seconds late
+ *  misleads (the phase 14 QA finding), so the advance chain drops anything
+ *  parked longer than this. Celebrations never age out: "you leveled" stays
+ *  true however late it shows. */
+const AMBIENT_MAX_DEFER_MS = 4000;
 const ITEM_QUALITY_LABEL_KEYS: Record<ItemQuality, TranslationKey> = {
   poor: 'itemUi.quality.poor',
   common: 'itemUi.quality.common',
@@ -9879,35 +9893,17 @@ export class Hud {
           break;
         }
         case 'levelup': {
-          this.showBanner(
-            t('hud.core.levelBanner', { level: ev.level }),
-            true,
-            undefined,
-            'default',
-            undefined,
-            2600,
-            null,
-            // R38: a level-up is a celebration; it queues rather than being
-            // replaced (the deed collision this closes) and files ahead of
-            // queued deeds.
-            'levelup',
-          );
+          // R38: a level-up is a celebration; it queues rather than being
+          // replaced (the deed collision this closes) and files ahead of
+          // queued deeds.
+          this.showCelebrationBanner(t('hud.core.levelBanner', { level: ev.level }), 'levelup');
           this.log(t('hud.core.levelLog', { level: ev.level }), '#ffd100');
           audio.levelUp();
           if (isTalentRowUnlockLevel(ev.level)) {
             // Same 'levelup' class as the level banner above: before the R38
             // queue this call CLOBBERED it (only the last of the arm's
             // banners ever showed); queued, all of them play in order.
-            this.showBanner(
-              t('game.talents.rowUnlockToast'),
-              true,
-              undefined,
-              'default',
-              undefined,
-              2600,
-              null,
-              'levelup',
-            );
+            this.showCelebrationBanner(t('game.talents.rowUnlockToast'), 'levelup');
             // No local gain override: the manifest's resolved gain (keyTrimDb)
             // is the single source of truth, same fix efe124264 already
             // applied to every other quest_ready call site. This one was
@@ -9925,16 +9921,7 @@ export class Hud {
           }
           // First talent point (and spec) unlock — nudge the player to the panel.
           if (ev.level === FIRST_TALENT_LEVEL && talentsFor(this.sim.cfg.playerClass)) {
-            this.showBanner(
-              t('game.talents.unlockBanner'),
-              true,
-              undefined,
-              'default',
-              undefined,
-              2600,
-              null,
-              'levelup',
-            );
+            this.showCelebrationBanner(t('game.talents.unlockBanner'), 'levelup');
             this.log(t('game.talents.unlockHint'), '#ffd100');
           }
           break;
@@ -10973,10 +10960,16 @@ export class Hud {
             () => this.sim.duelDecline(),
           );
           break;
-        case 'duelCountdown':
-          this.showBanner(t('hud.system.duelCountdown', { seconds: ev.seconds }));
+        case 'duelCountdown': {
+          // The durable-record arm (the phase 14 QA): a countdown digit
+          // whose banner did NOT show immediately (a celebration held the
+          // slot, so it parked or aged out) lays a log line instead; an
+          // on-screen countdown needs none, and the tick cue fires always.
+          const text = t('hud.system.duelCountdown', { seconds: ev.seconds });
+          if (this.showBanner(text) !== 'show') this.log(text, '#fa6');
           audio.duelCountdownTick();
           break;
+        }
         case 'duelStart':
           audio.duelStart();
           break;
@@ -11022,14 +11015,15 @@ export class Hud {
           audio.duelChallenge();
           break;
         }
-        case 'arenaCountdown':
-          this.showBanner(
-            t('hud.system.arenaCountdown', {
-              seconds: formatNumber(ev.seconds, { maximumFractionDigits: 0 }),
-            }),
-          );
+        case 'arenaCountdown': {
+          // Same durable-record arm as duelCountdown above.
+          const text = t('hud.system.arenaCountdown', {
+            seconds: formatNumber(ev.seconds, { maximumFractionDigits: 0 }),
+          });
+          if (this.showBanner(text) !== 'show') this.log(text, '#fa6');
           audio.duelCountdownTick();
           break;
+        }
         case 'arenaStart':
           this.showBanner(t('hud.system.arenaStart'));
           audio.duelStart();
@@ -11699,8 +11693,12 @@ export class Hud {
           title: archetypeTitleText(plan.pairId),
         });
         // Deed hook: a per-archetype deed unlock will fire from this
-        // same attunement moment; today it is a pure celebration banner.
-        this.showBanner(text, plan.motion);
+        // same attunement moment; today it is a pure celebration banner,
+        // and it RIDES the celebration class (the phase 14 QA): classed
+        // ambient it could vanish in the latest-wins pending seat behind a
+        // live level-up. The attunedZone epic log line stays the durable
+        // record either way.
+        this.showCelebrationBanner(text, 'deed', 'default', plan.motion);
         this.combatAnnouncer.push(text, performance.now());
         if (plan.playSound) audio.achievement();
         // Offline identity is already mutated when this personal event drains,
@@ -11760,7 +11758,7 @@ export class Hud {
       // presentation only, never information.
       // R38: a deed is a celebration; it queues behind whatever is live
       // instead of replacing it (the first-level-up collision).
-      this.showBanner(bannerText, true, undefined, 'deed', undefined, 2600, null, 'deed');
+      this.showCelebrationBanner(bannerText, 'deed', 'deed');
       // The banner div carries no live semantics and the chat log is
       // deliberately aria-live off, so the polite #combat-live region is what
       // a screen reader hears (the throttled self-note precedent above).
@@ -12511,8 +12509,7 @@ export class Hud {
     this.bannerEl.style.opacity = '0';
     // The live slot just ended early: the queue decides what (if anything)
     // takes it, so a level-up waiting behind the unstuck line still shows.
-    const next = this.bannerQueue?.advance();
-    if (next) this.paintBanner(next);
+    this.advanceBannerSlot();
   }
 
   showBanner(
@@ -12525,9 +12522,11 @@ export class Hud {
     source: 'unstuck' | null = null,
     // R38: celebrations queue instead of last-write-wins; ambient (the
     // default: zone names, prompts, countdowns) keeps replace semantics.
-    // See src/ui/banner_queue.ts for the whole policy.
+    // See src/ui/banner_queue.ts for the whole policy. The outcome returns
+    // so a time-critical caller (the duel and arena countdowns) can lay a
+    // durable log line exactly when its banner did NOT show immediately.
     bannerClass: BannerClass = 'ambient',
-  ): void {
+  ): BannerEnqueueOutcome {
     const payload: BannerPayload = {
       text,
       motion,
@@ -12536,11 +12535,28 @@ export class Hud {
       subtext,
       durationMs,
       source,
+      bannerClass,
+      enqueuedAt: performance.now(),
     };
     this.bannerQueue ??= new BannerQueue();
-    if (this.bannerQueue.enqueue(bannerClass, payload) === 'show') {
-      this.paintBanner(payload);
-    }
+    const outcome = this.bannerQueue.enqueue(bannerClass, payload);
+    if (outcome === 'show') this.paintBanner(payload);
+    return outcome;
+  }
+
+  /** The celebration form of showBanner (R38): full motion, the standard
+   *  2600ms duration, queued under the given class. Exists so the four
+   *  celebration call sites stop threading five defaults positionally to
+   *  reach the class argument (and so changing the default duration cannot
+   *  strand them). `motion` stays a parameter for the reduced-motion
+   *  celebration plans (the attunement banner). */
+  showCelebrationBanner(
+    text: string,
+    bannerClass: 'levelup' | 'deed',
+    variant: BannerVariant = 'default',
+    motion = true,
+  ): void {
+    this.showBanner(text, motion, undefined, variant, undefined, 2600, null, bannerClass);
   }
 
   /** The paint half of the banner slot: renders one payload and arms the
@@ -12588,15 +12604,34 @@ export class Hud {
       this.bannerSource = null;
       // The fade gap before the next queued banner, so back-to-back
       // celebrations read as two banners rather than one changing its text.
-      this.bannerTimer = window.setTimeout(() => {
-        const next = this.bannerQueue?.advance();
-        if (next) this.paintBanner(next);
-      }, BANNER_ADVANCE_GAP_MS);
+      this.bannerTimer = window.setTimeout(() => this.advanceBannerSlot(), BANNER_ADVANCE_GAP_MS);
     }, durationMs);
   }
 
+  /** Advance the banner slot to the next queued payload, dropping any parked
+   *  AMBIENT older than AMBIENT_MAX_DEFER_MS (stale current-state; the doc
+   *  above the constant). Celebrations paint however late they surface. */
+  private advanceBannerSlot(): void {
+    for (;;) {
+      const next = this.bannerQueue?.advance();
+      if (!next) return;
+      if (
+        next.bannerClass === 'ambient' &&
+        performance.now() - next.enqueuedAt > AMBIENT_MAX_DEFER_MS
+      ) {
+        continue;
+      }
+      this.paintBanner(next);
+      return;
+    }
+  }
+
   private hideBannerImmediately(): void {
-    this.bannerQueue?.clear();
+    // hideLive, not clear (the phase 14 QA): the one caller is the
+    // mount-race countdown claiming the slot, an ambient takeover, not a
+    // hard reset. Queued celebrations survive to play after the race;
+    // only the live element and the stale pending-ambient seat go.
+    this.bannerQueue?.hideLive();
     clearTimeout(this.bannerTimer);
     this.bannerTimer = undefined;
     this.bannerSource = null;

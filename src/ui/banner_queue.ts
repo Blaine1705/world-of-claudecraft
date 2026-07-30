@@ -107,6 +107,17 @@ export class BannerQueue<T> {
     this.liveClass = null;
   }
 
+  /** The LIVE banner was hidden early by an ambient takeover (the mount-race
+   *  countdown claiming the slot): the pending ambient seat drops (it was
+   *  current-state that is no longer current) but every QUEUED celebration
+   *  survives to play after the takeover ends. clear() above stays the hard
+   *  reset; using it for a takeover silently discarded queued level-up and
+   *  deed banners (the phase 14 QA finding). */
+  hideLive(): void {
+    this.pendingAmbient = null;
+    this.liveClass = null;
+  }
+
   /** Purge queued entries failing `keep` (the unstuck-source purge). The
    *  LIVE banner is the caller's to clear; this touches only the waiters. */
   retainQueued(keep: (payload: T) => boolean): void {

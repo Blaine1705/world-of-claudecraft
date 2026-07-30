@@ -163,8 +163,35 @@ describe('hud wiring', () => {
     expect(body).toMatch(
       /if \(plan\.retroCount > 0\) \{\s*const retroText = t\('hudChrome\.deeds\.retroSummary'/,
     );
-    expect(body.match(/showBanner/g)?.length).toBe(1);
+    expect(body.match(/showCelebrationBanner/g)?.length).toBe(1);
     expect(body.match(/audio\.achievement/g)?.length).toBe(1);
+  });
+
+  it("the level-up arm's three banners all ride the 'levelup' class (source pin)", () => {
+    // Commit 81a0dc2037's claim, previously unpinned (the phase 14 QA): the
+    // level banner, the talent-row toast, and the first-point banner all
+    // queue under 'levelup', the class that files ahead of queued deeds.
+    // Comment-stripped so the arm's own prose cannot satisfy the pin.
+    const start = hud.indexOf("case 'levelup': {");
+    expect(start).toBeGreaterThan(-1);
+    const end = hud.indexOf("case 'virtualLevelUp'", start);
+    expect(end).toBeGreaterThan(start);
+    const body = stripLineComments(hud.slice(start, end));
+    expect(body.match(/showCelebrationBanner\([^;]*'levelup'\)/g)?.length).toBe(3);
+  });
+
+  it('the duel and arena countdown arms lay a log line exactly when their banner is deferred', () => {
+    // The durable-record arm (the phase 14 QA): a countdown banner parked
+    // or aged out behind a celebration leaves the log line; an on-screen
+    // one leaves none. Both arms carry the same shape.
+    for (const anchor of ["case 'duelCountdown': {", "case 'arenaCountdown': {"]) {
+      const start = hud.indexOf(anchor);
+      expect(start, anchor).toBeGreaterThan(-1);
+      const body = stripLineComments(hud.slice(start, hud.indexOf('break;', start)));
+      expect(body, anchor).toContain(
+        "if (this.showBanner(text) !== 'show') this.log(text, '#fa6');",
+      );
+    }
   });
 
   it("paints the earned moment in the deed variant, not the level-up's gold banner", () => {
@@ -178,12 +205,11 @@ describe('hud wiring', () => {
     // Strip line comments first: this method's prose names the 'deed' variant,
     // so an uncommented slice would let a reworded comment satisfy the pin.
     const body = stripLineComments(hud.slice(start, hud.indexOf('log(text: string', start)));
-    // The deed variant AND the R38 'deed' banner class both ride the call:
-    // the variant is the visual split from the level-up gold, the class is
-    // what queues it behind a live level-up instead of replacing it.
-    expect(body).toContain(
-      "this.showBanner(bannerText, true, undefined, 'deed', undefined, 2600, null, 'deed');",
-    );
+    // The deed variant AND the R38 'deed' banner class both ride the call
+    // (the celebration wrapper's second and third arguments): the class is
+    // what queues it behind a live level-up instead of replacing it, the
+    // variant is the visual split from the level-up gold.
+    expect(body).toContain("this.showCelebrationBanner(bannerText, 'deed', 'deed');");
     expect(body).toContain('this.combatAnnouncer.push(bannerText, performance.now());');
   });
 
@@ -303,6 +329,113 @@ describe('hud wiring', () => {
     } finally {
       vi.useRealTimers();
       vi.restoreAllMocks();
+    }
+  });
+
+  // Shared rig for the queue-lifecycle arms below: the same bare-prototype
+  // shape the collision drive uses.
+  function bannerRig() {
+    const h = Object.create(Hud.prototype) as unknown as {
+      bannerEl: HTMLElement;
+      bannerTimer: number | undefined;
+      bannerSource: 'unstuck' | null;
+      log: ReturnType<typeof vi.fn>;
+      combatAnnouncer: { push: ReturnType<typeof vi.fn> };
+      handleDeedUnlocks(events: { deedId: string; retro?: boolean }[]): void;
+      showBanner(
+        text: string,
+        motion?: boolean,
+        icon?: string,
+        variant?: string,
+        subtext?: string,
+        durationMs?: number,
+        source?: 'unstuck' | null,
+        bannerClass?: string,
+      ): string;
+      showCelebrationBanner(text: string, bannerClass: 'levelup' | 'deed'): void;
+      hideBannerImmediately(): void;
+      clearUnstuckBanner(): void;
+    };
+    h.bannerEl = document.createElement('div');
+    h.bannerTimer = undefined;
+    h.bannerSource = null;
+    h.log = vi.fn();
+    h.combatAnnouncer = { push: vi.fn() };
+    return h;
+  }
+
+  it('the mount-race takeover (hideBannerImmediately) keeps queued celebrations', () => {
+    // The phase 14 QA finding: the takeover used clear(), silently
+    // discarding queued level-up and deed banners. hideLive keeps them: the
+    // race countdown claims the slot NOW, and the celebrations play after.
+    vi.useFakeTimers();
+    const achievement = vi.spyOn(audio, 'achievement').mockImplementation(() => {});
+    try {
+      const h = bannerRig();
+      h.showCelebrationBanner('Level 2!', 'levelup');
+      h.handleDeedUnlocks([{ deedId: 'prog_first_steps' }]);
+      expect(h.bannerEl.textContent).toBe('Level 2!');
+      h.hideBannerImmediately();
+      expect(h.bannerEl.style.opacity).toBe('0');
+      // The takeover's own ambient shows immediately in the freed slot...
+      expect(h.showBanner('3')).toBe('show');
+      expect(h.bannerEl.textContent).toBe('3');
+      // ...and the queued deed still plays after it.
+      vi.advanceTimersByTime(2600 + 250);
+      expect(h.bannerEl.textContent).toContain(deedName('prog_first_steps'));
+      expect(achievement).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+    }
+  });
+
+  it('clearUnstuckBanner ends the unstuck line early and advances to a waiting celebration', () => {
+    // docs/design/banner-queue.md's contract for the unstuck purge, driven
+    // on the real methods (the pure retainQueued arm alone cannot see the
+    // Hud half): the live unstuck banner clears and the queued level-up
+    // takes the slot immediately.
+    vi.useFakeTimers();
+    try {
+      const h = bannerRig();
+      h.showBanner('Stuck? Hold still.', true, undefined, 'default', undefined, 2600, 'unstuck');
+      h.showCelebrationBanner('Level 3!', 'levelup');
+      expect(h.bannerEl.textContent).toBe('Stuck? Hold still.');
+      h.clearUnstuckBanner();
+      expect(h.bannerEl.textContent).toBe('Level 3!');
+      expect(h.bannerEl.style.opacity).toBe('1');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('a parked ambient older than the defer window is dropped, a fresh one replays', () => {
+    // The phase 14 QA finding: an ambient is current-state, so replaying it
+    // seconds late misleads. Behind ONE celebration (2850ms) it is still
+    // fresh and replays; behind a celebration CHAIN (5700ms) it ages out.
+    // performance must be faked alongside the timers or the stamp cannot
+    // age with advanceTimersByTime.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] });
+    try {
+      const fresh = bannerRig();
+      fresh.showCelebrationBanner('Level 2!', 'levelup');
+      fresh.showBanner('Mirefen Marsh');
+      vi.advanceTimersByTime(2600 + 250);
+      expect(fresh.bannerEl.textContent).toBe('Mirefen Marsh');
+
+      const stale = bannerRig();
+      stale.showCelebrationBanner('Level 2!', 'levelup');
+      stale.showCelebrationBanner('Level 3!', 'levelup');
+      stale.showBanner('Mirefen Marsh');
+      vi.advanceTimersByTime(2600 + 250);
+      expect(stale.bannerEl.textContent).toBe('Level 3!');
+      vi.advanceTimersByTime(2600 + 250);
+      // The parked zone line aged past AMBIENT_MAX_DEFER_MS while the chain
+      // played: dropped, the slot goes idle instead of replaying it.
+      expect(stale.bannerEl.textContent).not.toBe('Mirefen Marsh');
+      expect(stale.bannerEl.style.opacity).toBe('0');
+    } finally {
+      vi.useRealTimers();
     }
   });
 

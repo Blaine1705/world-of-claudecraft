@@ -64,6 +64,21 @@ describe('BannerQueue', () => {
     expect(q.depth).toBe(BANNER_QUEUE_LIMIT);
   });
 
+  it('hideLive keeps queued celebrations, drops the pending ambient, frees the slot', () => {
+    // The ambient-takeover arm (the phase 14 QA): distinct from clear(),
+    // which stays the hard reset. A takeover ends the LIVE banner and
+    // retires the stale pending-ambient seat, but every queued celebration
+    // survives to play afterwards.
+    const q = new BannerQueue<string>();
+    expect(q.enqueue('levelup', 'L1')).toBe('show');
+    expect(q.enqueue('deed', 'D1')).toBe('queued');
+    expect(q.enqueue('ambient', 'A1')).toBe('queued');
+    q.hideLive();
+    expect(q.isLive).toBe(false);
+    expect(q.advance()).toBe('D1');
+    expect(q.advance()).toBeNull();
+  });
+
   it('clear() wipes everything; retainQueued purges only the waiters', () => {
     const q = new BannerQueue<{ source: string | null }>();
     const unstuck = { source: 'unstuck' };
