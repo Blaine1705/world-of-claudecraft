@@ -102,7 +102,6 @@ export function bestWieldableGatherToolTierOrNone(
   const held = coerceProficiency(proficiency);
   let best = NO_TOOL_OWNED;
   for (const slot of inventory) {
-    if (!slot) continue;
     const tier = gatherToolTier(items[slot.itemId], professionId);
     if (tier === undefined) continue;
     if (professionId !== 'fishing' && held < wieldRequirementForTier(tier)) continue;
@@ -175,7 +174,6 @@ export function minWieldRequirementToWork(
 ): number | null {
   let min: number | null = null;
   for (const slot of inventory) {
-    if (!slot) continue;
     const tier = gatherToolTier(items[slot.itemId], professionId);
     if (tier === undefined || tier < targetTier) continue;
     const req = wieldRequirementForTier(tier);

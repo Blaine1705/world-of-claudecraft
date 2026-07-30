@@ -941,13 +941,53 @@ describe('gather node placement: every node sits on ground a player can work', (
     expect([...DELIBERATE_DANGERS].sort()).toEqual(DELIBERATE_DANGERS);
   });
 
+  it('every allowlisted danger stays at its RECORDED heat (the clearance floor)', () => {
+    // The exact-set pin above says WHICH pairings are hot; this says HOW hot,
+    // so an allowlisted node cannot silently drift deeper into its named
+    // mob's reach (the old arm's starting-zone floor generalized: a
+    // deliberate danger is a recorded number, not an unbounded license).
+    // Values are the measured clearances at allowlisting time, negative =
+    // yards of overlap between the harvest disc and the scaled reach; one
+    // yard of tolerance absorbs spawn-scatter-free re-measurement noise
+    // while any real relocation reds and forces a fresh decision here.
+    const EXPECTED_CLEARANCE: Record<string, number> = {
+      'herb_eastbrook_5:mogger': -0.98,
+      'ore_mirefen_4:sloomtooth_the_drowned': -5.0,
+      'ore_mirefen_t2b:sister_nhalia': -8.98,
+      'ore_thornpeak_1:ironvein_foreman': -13.05,
+      'ore_thornpeak_2:ironvein_foreman': -0.95,
+      'ore_thornpeak_t2:ironvein_foreman': -23.67,
+      'ore_thornpeak_t3b:thunzharr_waking_peak': -5.0,
+      'wood_eastbrook_4:old_greyjaw': -4.48,
+      'wood_thornpeak_1:brutok_skullsmasher': -9.75,
+      'wood_thornpeak_t2:brutok_skullsmasher': -20.0,
+      'wood_thornpeak_t3:sethrael_palecoil': -3.12,
+      'wood_thornpeak_t3b:marrowlord_varkas': -22.0,
+    };
+    expect(Object.keys(EXPECTED_CLEARANCE).sort()).toEqual(DELIBERATE_DANGERS);
+    const worst = new Map<string, number>();
+    for (const pairing of namedMobClearances()) {
+      const prev = worst.get(pairing.key);
+      if (prev === undefined || pairing.clearance < prev) worst.set(pairing.key, pairing.clearance);
+    }
+    for (const [key, expected] of Object.entries(EXPECTED_CLEARANCE)) {
+      const actual = worst.get(key);
+      expect(actual, `${key} was measured when allowlisted`).toBeDefined();
+      expect(
+        Math.abs((actual ?? 0) - expected),
+        `${key} drifted from its recorded clearance (${expected} to ${actual?.toFixed(2)})`,
+      ).toBeLessThanOrEqual(1);
+    }
+  });
+
   it('the margin arm mirrors the LIVE aggro formula (source pin on locomotion)', () => {
     // scaledAggro above re-implements production's level scaling because
-    // locomotion exports no helper; this pin is what keeps the mirror
-    // honest. Comment-stripped and whitespace-collapsed so neither prose nor
-    // a formatter wrap can satisfy or dodge it; both the slope and the floor
-    // are in the matched text, so retuning either in production reds this
-    // file until the mirror follows.
+    // locomotion exports no helper; this pin keeps the FORMULA mirror honest
+    // (slope, floor, clamp). What it deliberately does not cover: the arm
+    // feeds maxLevel where production reads the live mob.level, the
+    // conservative worst case a margin rule wants. Comment-stripped and
+    // whitespace-collapsed so neither prose nor a formatter wrap can satisfy
+    // or dodge it.
     const source = readFileSync(path.resolve(process.cwd(), 'src/sim/mob/locomotion.ts'), 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/(^|\s)\/\/.*$/gm, '$1')

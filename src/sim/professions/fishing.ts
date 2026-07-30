@@ -213,6 +213,12 @@ export const FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY = 100;
 // schedule above, NEVER a skill-up roll and never an rng draw. The first
 // schedule row the proficiency sits below wins; at or past the last row the
 // gain is 0.
+//
+// GRANT SITES DO NOT BELONG HERE (R19): this is the schedule HALF only,
+// with no water ceiling, kept exported for the derivation tests. Any code
+// granting proficiency must call fishingCatchGainAt below, or a grant site
+// silently reintroduces uncapped zone-1 fishing gain (the tools.ts
+// ownership-scan banner's sibling).
 export function fishingCatchGain(proficiency: number, isJunk: boolean): number {
   if (isJunk && proficiency >= FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY) return 0;
   for (const row of FISHING_GAIN_SCHEDULE) {

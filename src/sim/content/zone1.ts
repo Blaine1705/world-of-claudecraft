@@ -950,7 +950,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Stolen Supplies',
     giverNpcId: 'trader_wilkes',
     turnInNpcId: 'trader_wilkes',
-    text: 'Those bandits hit my last wagon and made off with four crates of goods — tools, salt, good Eastbrook linen. The crates are stacked around their camp in the southwest hills. Steal them back for me, would you?',
+    text: 'Those bandits hit my last wagon and made off with four crates of goods: tools, salt, good Eastbrook linen. The crates are stacked around their camp in the southwest hills. Steal them back for me, would you?',
     completionText: 'My crates! Barely a scratch on them. You are a wonder.',
     objectives: [
       { type: 'collect', itemId: 'supply_crate', count: 4, label: 'Stolen Supply Crate' },
@@ -1477,11 +1477,11 @@ export const ZONE1_QUEST_ORDER = [
 // Guarded by tests/eastbrook_camp_spacing.test.ts. Row ORDER is a determinism
 // contract (see the CAMPS merge in data.ts): edit values, never reorder.
 export const ZONE1_CAMPS: CampDef[] = [
-  // Compass note for every placement comment and quest text below: the
-  // player-facing map puts north at +Z and EAST at -X (west is +X); see
-  // src/ui/compass.ts and src/ui/continent_map_view.ts. Reading +X as east
-  // is what produced a run of mirrored quest directions, so verify any
-  // direction claim against that convention, not against raw signs.
+  // Compass check for every placement comment and quest text below: the
+  // canonical convention statement lives higher in this file (the pois
+  // block: +z north, +x WEST, east is -x), and reading +X as east is what
+  // produced a run of mirrored quest directions; verify any direction claim
+  // against that note, never against raw signs.
   // Wolves: north woods
   { mobId: 'forest_wolf', center: { x: -27, z: 71 }, radius: 28.5, count: 6 },
   { mobId: 'forest_wolf', center: { x: 24, z: 70 }, radius: 26, count: 5 },

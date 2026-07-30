@@ -30,7 +30,10 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   and quest consumption paths share. Upgrade needs the tool STRICTLY above the
   material AND a vein carrying that tier; substitution runs downward only.
 - `fishing.ts`: the fourth gathering row (bite delay, reel window,
-  `FISHING_TABLES_BY_BAND`); the TWO sessions' hidden per-cast state lives in
+  `FISHING_TABLES_BY_BAND`, and since R19 the gain model: the schedule half
+  `fishingCatchGain` composed with the water's teaching ceiling in
+  `fishingCatchGainAt`, the ONLY function a grant site may call); the TWO
+  sessions' hidden per-cast state lives in
   five transient Entity fields (`gatherCastNodeId` and `gatherCastToolRarity`
   for the gather cast; `fishBiteAtTick`, `fishReelDeadlineTick`,
   `fishCastZoneId` for fishing), never wired, never persisted, all cleared
@@ -97,7 +100,16 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   and report through the one text-free personal `toolEffectResult` event so
   no refusal is silent. Draw-free in every arm.
 - `fishing_zones.ts`: the per-zone rod-tier ladder (`rodTierRequiredForZone`,
-  water gated by the WATER's zone) the cast gate and the vendor rows read.
+  water gated by the WATER's zone) the cast gate and the vendor rows read;
+  since R19 the SAME column also caps how far each water teaches
+  (`fishingTeachingCeilingFor` in `fishing.ts` reads it at the gain site).
+- `wield_gate.ts`: the R22 land-tool USE requirements, a pure leaf like
+  `tools.ts` (items table as a parameter, no player-state import): the one
+  frozen threshold table (40/70/85/100), the wield-filtered bag scans the
+  harvest gate, grade resolution, corpse premium arm, and every client
+  mirror read, and the denial-naming helpers. The ownership scans in
+  `tools.ts` survive for the R47/R30 price family ONLY, with banners
+  saying so.
 - `mastery_reset.ts`: the one-time skill reset behind `masteryResetApplied`;
   `normalizeArchetypeState` must keep running BEFORE `applyMasteryReset`
   (the single load-time reader of pre-reset values).

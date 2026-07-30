@@ -51,9 +51,12 @@ const FISHING_ZONE_ROD_TIER_ROWS: Record<string, number> = {
   // DEFAULT_FISHING_ROD_TIER floor so the every-zone-covered pin in
   // tests/fishing_zones.test.ts keeps meaning "someone decided", not "nobody
   // looked". The phase 13 content pass KEPT them tier 1 deliberately (the
-  // R37 starter kit; under R19 their water therefore teaches to 100);
-  // re-tiering rides the zone-4 design pass with each zone's full kit
-  // (docs/design/professions-tuning-packet-review.md, R37).
+  // R37 starter kit), and under R19 that is a NAMED PROGRESSION INVERSION:
+  // their water teaches only to 100, so a level-17 expansion zone is a
+  // strictly worse fishing climb than the level-6 marsh until the zone-4
+  // design pass re-tiers each zone with its full kit
+  // (docs/design/professions-tuning-packet-review.md, R37; surfaced in the
+  // phase 13 record).
   veiled_hollow: 1,
   drakelands: 1,
   frostveil: 1,
