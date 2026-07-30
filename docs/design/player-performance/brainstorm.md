@@ -761,7 +761,7 @@ current 60 s unlink window.
 - Fairness rules: docs/design/graphics-settings-fairness.md; UI contracts: src/ui/CLAUDE.md;
   render contracts: src/render/CLAUDE.md; server hot paths: server/CLAUDE.md.
 - Bot detection private repo (contract for the Packet 6 anti-bot decision):
-  /Users/fernando/Documents/wocc-bot-protection (overlay at private/bot_detector/).
+  worktree wocc-bot-protection (overlay at private/bot_detector/).
 - External reports cross-examined 2026-07 (codex v1 July 8 profile, codex v2 v0.30 review,
   codex v3 design review of revision 1 of this document): scorecards folded into sections
   5 and 6; adopted-and-verified v3 corrections: crowd-multiplicative server scaling, net

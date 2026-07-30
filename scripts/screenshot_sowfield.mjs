@@ -13,7 +13,7 @@ import { BROWSER_PATH as EDGE } from './browser_path.mjs';
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const OUT =
   process.env.OUT_DIR ??
-  '/private/tmp/claude-501/-Users-maxpolaczuk-misc-world-of-claudecraft/dcd10462-1610-43f2-aed5-ed902f9c03d5/scratchpad/sowfield_shots';
+  '/tmp/sowfield_shots';
 fs.mkdirSync(OUT, { recursive: true });
 
 const browser = await puppeteer.launch({
