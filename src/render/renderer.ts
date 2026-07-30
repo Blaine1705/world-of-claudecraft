@@ -1633,6 +1633,7 @@ export class Renderer {
     canvas.addEventListener('webglcontextrestored', () => {
       this.contextRestoredCount++;
       this.captureGlIdentity();
+      this.vfx.onContextRestored();
     });
     initGfxTier(this.webgl); // software-GL autodetect needs the live context
     if (GFX.composer || GFX.gradePass) {
@@ -3638,6 +3639,7 @@ export class Renderer {
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.vfx.update(dt);
+    this.vfx.prepareDraw(this.camera);
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
@@ -8446,6 +8448,8 @@ export class Renderer {
       this.camera.position.y += shakeY;
       this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
     }
+    this.camera.updateMatrixWorld();
+    this.vfx.prepareDraw(this.camera);
     if (this.post) this.post.render();
     else this.webgl.render(this.scene, this.camera);
     if (shakeX !== 0 || shakeY !== 0) {
@@ -8541,6 +8545,8 @@ export class Renderer {
   // (lost context, tainted canvas) so the caller can degrade gracefully.
   async captureScreenshot(maxEdge = 1280, quality = 0.7): Promise<string | null> {
     try {
+      this.camera.updateMatrixWorld();
+      this.vfx.prepareDraw(this.camera);
       if (this.post) this.post.render();
       else this.webgl.render(this.scene, this.camera);
       const gl = this.webgl.domElement;
