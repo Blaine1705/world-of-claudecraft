@@ -17,7 +17,7 @@ import { DiscordApi } from './discord_api';
 import { Gateway } from './gateway';
 import {
   allTierRoleNames,
-  buildActivityMessage,
+  buildActivityMessages,
   buildDailyRewardWinnersMessage,
   buildLevelNick,
   buildLinkContent,
@@ -483,15 +483,13 @@ async function main(): Promise<void> {
   };
 
   // Drain + post the significant-activity feed (level-ups, rare drops, duels,
-  // arena, Vale Cup, masterworks, deeds).
+  // arena, Vale Cup, masterworks, deeds). buildActivityMessages drops any
+  // kind this build does not know (a newer server mid-deploy) rather than
+  // post an empty embed.
   const pollActivity = async (): Promise<void> => {
     if (!cfg.activityChannelId) return;
     const items = await server.drainActivity();
-    for (const item of items) {
-      // null = a kind this build does not know (a newer server mid-deploy):
-      // skip it rather than post an empty embed.
-      const payload = buildActivityMessage(item);
-      if (!payload) continue;
+    for (const payload of buildActivityMessages(items)) {
       await discord
         .createMessage(cfg.activityChannelId, payload)
         .catch((e) => console.error('[bot] activity post failed', e));

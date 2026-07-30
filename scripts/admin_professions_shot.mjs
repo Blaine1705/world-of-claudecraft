@@ -29,6 +29,12 @@ import { worldAuthMessage } from './lib/world_auth.mjs';
 const MODE = process.env.MODE === 'before' ? 'before' : 'after';
 const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5195';
 const SERVER_URL = process.env.SERVER_URL ?? 'http://127.0.0.1:8791';
+// This script registers accounts and grants a STAFF role against SERVER_URL;
+// a mistyped target must never do that to a real server.
+const serverHost = new URL(SERVER_URL).hostname;
+if (!['localhost', '127.0.0.1', '::1', '[::1]'].includes(serverHost)) {
+  throw new Error(`SERVER_URL must be local (got ${serverHost}); this tool creates staff accounts`);
+}
 const WS_BASE = SERVER_URL.replace(/^http/, 'ws');
 const OUT = process.env.SHOTS_DIR ?? 'docs/screenshots/r35-admin-professions-inspector';
 fs.mkdirSync(OUT, { recursive: true });

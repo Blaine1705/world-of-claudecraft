@@ -993,10 +993,19 @@ export async function forceCharacterRename(input: {
 /**
  * R35 GM restore audit row: resolve the character's owner and record the
  * audited action (the live grant itself happens in the game runtime, AFTER
- * this lands, so a grant can never exist without its audit row). `detail`
- * names what was restored (item id and count, or profession and effect) and
- * is folded into the stored reason so the one history row carries the whole
- * story. The reason is REQUIRED: a restore mints value onto a character.
+ * this lands, so a grant can never exist without its audit row; the runtime
+ * also forces a character save right after the mint so the row cannot long
+ * outlive the grant it records). The folded prefix carries the CHARACTER id
+ * beside what was requested, because account_moderation_actions has no
+ * character column and a multi-character account could not otherwise answer
+ * "which character got the free pick"; it says "requested" because a refusal
+ * AFTER the audit (the leave race, no_tool, already_slotted) is possible and
+ * the handler surfaces it to the operator as a 400. The prefix is applied
+ * after the reason's own cleanText cap, so a restore row can exceed
+ * ACTION_REASON_MAX by the bounded prefix length (allowlisted ids plus a
+ * 1..20 integer): the column is unbounded TEXT and the moderateAccount
+ * expiry suffix sets the same precedent, so 500 is a reason cap, not a row
+ * invariant. The reason is REQUIRED: a restore mints value onto a character.
  */
 export async function recordProfessionsRestore(input: {
   characterId: number;
@@ -1015,7 +1024,7 @@ export async function recordProfessionsRestore(input: {
   await recordModerationAction(pool, input.action, {
     accountId,
     adminAccountId: input.adminAccountId,
-    reason: `[${input.detail}] ${reason}`,
+    reason: `[requested ${input.detail} for character ${input.characterId}] ${reason}`,
   });
   return { accountId };
 }

@@ -16,6 +16,7 @@ const sheet: CharacterProfessionsSheet = {
   username: 'alice',
   live: false,
   updatedAt: '2026-06-01T00:00:00Z',
+  preMigration: false,
   archetype: { activeArchetype: 'alchemy', pairedMajor: 'engineering', hobbyCraft: 'cooking' },
   gathering: [
     { professionId: 'mining', proficiency: 42.5 },
@@ -41,8 +42,9 @@ const sheet: CharacterProfessionsSheet = {
   toolEffectIds: ['gatherers_cache', 'artisans_eye', 'quickening_charm'],
 };
 
+let activeSheet: CharacterProfessionsSheet = sheet;
 const apiGet = vi.fn(async (path: string) => {
-  if (path === '/admin/api/characters/7/professions') return sheet;
+  if (path === '/admin/api/characters/7/professions') return activeSheet;
   throw new Error(`unexpected path ${path}`);
 });
 const apiPost = vi.fn(async (_path: string, _body: unknown) => ({}));
@@ -64,6 +66,7 @@ vi.mock('../../src/admin/api', () => ({
 
 describe('CharacterProfessionsModal', () => {
   beforeEach(() => {
+    activeSheet = sheet;
     apiGet.mockClear();
     apiPost.mockClear();
   });
@@ -80,6 +83,28 @@ describe('CharacterProfessionsModal', () => {
     expect(screen.getByText('ore_eastbrook_1')).toBeInTheDocument();
     // The blob clock is surfaced (this sheet is not live).
     expect(screen.queryByText(t('profInspect.liveBadge'))).not.toBeInTheDocument();
+    // A migrated (post-flag) blob shows no rewrite warning.
+    expect(screen.queryByText(t('profInspect.preMigrationNote'))).not.toBeInTheDocument();
+  });
+
+  it('shows the live badge for a live snapshot (the positive arm)', async () => {
+    grantPermissions();
+    activeSheet = { ...sheet, live: true, updatedAt: null };
+    render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    expect(screen.getByText(t('profInspect.liveBadge'))).toBeInTheDocument();
+  });
+
+  it('warns on a pre-migration blob whose values the next login rewrites', async () => {
+    grantPermissions();
+    activeSheet = { ...sheet, preMigration: true };
+    render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    expect(screen.getByText(t('profInspect.preMigrationNote'))).toBeInTheDocument();
   });
 
   it('drives the restore-slot flow through the confirm prompt to the endpoint', async () => {

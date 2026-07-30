@@ -180,7 +180,9 @@ export function t(key: string, params?: Record<string, string | number>): string
 // Server-sent operator-error bodies (server/admin.ts) mapped to localized admin
 // strings. Unknown / transport / code-diagnostic errors fall through to English on
 // purpose (the localization design principle: only operator-facing UI is translated).
-const ADMIN_ERROR_KEYS: Record<string, string> = {
+// Exported for the tests/admin coupling guard: every server error prose a
+// handler emits must have a row here, or an operator sees raw English.
+export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'too many attempts, wait a minute and try again': 'error.tooManyAttempts',
   'too many failed attempts, wait a few minutes and try again': 'error.tooManyFailedAttempts',
   'invalid username or password': 'error.invalidCredentials',
@@ -223,6 +225,7 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   'unknown gathering profession id': 'error.unknownGatheringProfession',
   'unknown tool effect id': 'error.unknownToolEffect',
   'the character owns no tool for that profession': 'error.restoreNoTool',
+  'that profession already has a slotted effect': 'error.restoreAlreadySlotted',
   'that effect cannot be slotted on that profession': 'error.restoreBadPair',
   'character went offline before the restore landed': 'error.restoreWentOffline',
   'item restore failed': 'error.restoreItemFailed',

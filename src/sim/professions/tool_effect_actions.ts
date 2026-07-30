@@ -116,7 +116,8 @@ function applyMintedSlot(
 ): void {
   // Created lazily HERE, never in makeMeta: the absent-by-default field is
   // what keeps a player who has never slotted an effect byte-identical in
-  // the parity digest (every deny arm above returns before this line).
+  // the parity digest (every deny arm in BOTH callers returns before this
+  // function is reached).
   r.meta.toolEffectSlots ??= {};
   r.meta.toolEffectSlots[professionId] = slot;
   // A fresh mint retires a live gather cast's R47 start-capture and R40
@@ -150,7 +151,7 @@ function applyMintedSlot(
 }
 
 /**
- * GM restore of a lost tool-effect slot row (R35): mint `effectId` onto
+ * GM restore of a LOST tool-effect slot row (R35): mint `effectId` onto
  * `professionId` at full charges WITHOUT consuming a charm. This is exactly
  * the free acquisition the module header's incident bans from every
  * player-reachable path, so it is exported for the server ADMIN runtime
@@ -161,17 +162,25 @@ function applyMintedSlot(
  * OWNED, so a toolless character has no honest charge count; restore the
  * tool first), full charges sized by that tool's rarity, the same post-mint
  * capture hygiene, and the same success event so the player sees it land.
- * `craftedBy` stays unset (there is no consumed copy to take provenance
- * from), so a restored slot pays the generic recharge rate, the documented
- * unsigned arm. `confirmMode` mints 'always', the fresh-install default.
- * Draw-free, like everything in this module.
+ * Beyond the charm cost, the restore drops exactly one more real-mint gate,
+ * the no-gain refusal, and REPLACES it with a stricter one: a profession
+ * that already HAS a slot refuses (`already_slotted`), because an overwrite
+ * would silently destroy the live row's craftedBy provenance (the R48
+ * recharge-discount identity), the player's R40 confirmMode choice, and an
+ * R47-ratcheted ceiling; a restore is for a row that is GONE. `craftedBy`
+ * stays unset (there is no consumed copy to take provenance from), so a
+ * restored slot pays the generic recharge rate, the documented unsigned
+ * arm. `confirmMode` mints 'always', the fresh-install default. `pid` is
+ * REQUIRED (no primary-entity fallback: the one caller is the server, which
+ * always names the live session; an omitted pid could only ever mis-target
+ * the server sim's primary entity). Draw-free, like everything here.
  */
 export function restoreToolEffectSlotAction(
   ctx: SimContext,
   professionId: string,
   effectId: string,
-  pid?: number,
-): 'ok' | 'invalid_request' | 'no_tool' | 'offline' {
+  pid: number,
+): 'ok' | 'invalid_request' | 'no_tool' | 'already_slotted' | 'offline' {
   const r = ctx.resolve(pid);
   if (!r) return 'offline';
   if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) {
@@ -180,6 +189,7 @@ export function restoreToolEffectSlotAction(
   if (!Object.hasOwn(TOOL_EFFECTS, effectId)) return 'invalid_request';
   if (slotToolEffectRefused(professionId, effectId)) return 'invalid_request';
   const profession = professionId as GatheringProfessionId;
+  if (r.meta.toolEffectSlots?.[profession] !== undefined) return 'already_slotted';
   const best = bestOwnedGatherToolFor(r.meta.inventory, profession, ITEMS);
   if (best.ownedTier === NO_TOOL_OWNED) return 'no_tool';
   const slot = slotEffect(effectId as ToolEffectId, { toolRarity: best.rarity });

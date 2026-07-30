@@ -3258,3 +3258,81 @@ describe('R35 GM restores (restore-item / restore-slot)', () => {
     expect(recordProfessionsRestore).not.toHaveBeenCalled();
   });
 });
+
+describe('R35 GM restores: refusal prose arms', () => {
+  it('restore-slot maps already_slotted and invalid_request to their own prose', async () => {
+    authedAdminDb({ recordProfessionsRestore: vi.fn(async () => ({ accountId: 9 })) });
+    const rt = installAdminRuntime({
+      adminCharacterState: vi.fn(() => ({})),
+      adminRestoreToolEffectSlot: vi.fn(() => 'already_slotted'),
+    });
+    const slotted = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(slotted.status).toBe(400);
+    expect(slotted.body).toEqual({
+      success: false,
+      data: null,
+      error: 'that profession already has a slotted effect',
+    });
+    (rt.adminRestoreToolEffectSlot as ReturnType<typeof vi.fn>).mockReturnValue('invalid_request');
+    const badPair = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(badPair.status).toBe(400);
+    expect(badPair.body).toEqual({
+      success: false,
+      data: null,
+      error: 'that effect cannot be slotted on that profession',
+    });
+  });
+
+  it('both restores surface the post-audit leave race as their own prose', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    installAdminRuntime({
+      adminCharacterState: vi.fn(() => ({})), // online at the pre-check...
+      adminRestoreItem: vi.fn(() => 'offline'), // ...gone by the mint
+      adminRestoreToolEffectSlot: vi.fn(() => 'offline'),
+    });
+    const raceProse = 'character went offline before the restore landed';
+    const item = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 1, reason: 'lost' },
+    });
+    expect(item.status).toBe(400);
+    expect(item.body).toEqual({ success: false, data: null, error: raceProse });
+    const slot = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'lost' },
+    });
+    expect(slot.status).toBe(400);
+    expect(slot.body).toEqual({ success: false, data: null, error: raceProse });
+    // The race is the ONE place an audit row may outlive a failed grant, so
+    // the row must exist for the history to stay honest.
+    expect(recordProfessionsRestore).toHaveBeenCalledTimes(2);
+  });
+
+  it('restore-slot refuses an unknown effect id pre-audit', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    installAdminRuntime({
+      adminCharacterState: vi.fn(() => ({})),
+      adminRestoreToolEffectSlot: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'not_an_effect', reason: 'lost' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({ success: false, data: null, error: 'unknown tool effect id' });
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+  });
+});

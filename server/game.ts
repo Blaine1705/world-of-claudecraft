@@ -3946,7 +3946,8 @@ export class GameServer {
   // R35 GM restore: mint a lost item back onto a LIVE character through the
   // sim's normal grant hub (grants reaching addItem always land). The count
   // is re-clamped defensively even though the admin handler validates it
-  // (the dev_give 1..20 clamp).
+  // (the dev_give 1..20 clamp); a non-integer (NaN included) clamps to 1
+  // rather than flowing through Math.floor into the hub.
   adminRestoreItem(
     characterId: number,
     itemId: string,
@@ -3955,8 +3956,17 @@ export class GameServer {
     const session = this.sessionByCharacterId(characterId);
     if (!session) return 'offline';
     if (!Object.hasOwn(ITEMS, itemId)) return 'invalid_item';
-    const clamped = Math.max(1, Math.min(RESTORE_ITEM_MAX_COUNT, Math.floor(count)));
+    const clamped = Number.isInteger(count)
+      ? Math.max(1, Math.min(RESTORE_ITEM_MAX_COUNT, count))
+      : 1;
     this.sim.addItem(itemId, clamped, session.pid);
+    // Close the audit-durability window: the audit row is already committed,
+    // so the grant must not wait up to AUTOSAVE_SECONDS to become durable (a
+    // crash inside that window would leave a row for a grant that vanished).
+    // Fire-and-forget, the deed-unlock durability pattern.
+    void this.saveCharacter(session).catch((err) =>
+      console.error(`restore-item save failed for ${session.name}:`, err),
+    );
     return 'ok';
   }
 
@@ -3968,10 +3978,17 @@ export class GameServer {
     characterId: number,
     professionId: string,
     effectId: string,
-  ): 'ok' | 'offline' | 'invalid_request' | 'no_tool' {
+  ): 'ok' | 'offline' | 'invalid_request' | 'no_tool' | 'already_slotted' {
     const session = this.sessionByCharacterId(characterId);
     if (!session) return 'offline';
-    return restoreToolEffectSlotAction(this.sim.ctx, professionId, effectId, session.pid);
+    const result = restoreToolEffectSlotAction(this.sim.ctx, professionId, effectId, session.pid);
+    if (result === 'ok') {
+      // Same audit-durability reasoning as adminRestoreItem above.
+      void this.saveCharacter(session).catch((err) =>
+        console.error(`restore-slot save failed for ${session.name}:`, err),
+      );
+    }
+    return result;
   }
 
   // Force-disconnect the live session (if any) for a character the requesting
@@ -6804,25 +6821,37 @@ export class GameServer {
         );
       } else if (ev.type === 'masterwork' && ev.pid !== undefined) {
         // A masterwork proc: the professions moment the rareloot arm above
-        // cannot see (a craft fires no loot roll). One card per proc,
-        // mirroring the in-game zone-wide celebration; the ACCOUNT-scoped
-        // dedupe key (unlike rareloot's per-drop rollId) collapses a
-        // crafting-session burst inside the TTL to one card. Bots have no
-        // session, so this.clients.get filters them naturally.
+        // cannot see (a craft fires no loot roll). The ACCOUNT-scoped dedupe
+        // key (unlike rareloot's per-drop rollId) collapses a crafting
+        // session to at most one card per dedupe TTL, and the card rides the
+        // same deed_broadcasts opt-out as the deed fan-out below: masterwork
+        // procs REPEAT (3 to 15 percent of crafts), so unlike the once-ever
+        // levelup/rareloot arms, publishing them to a third-party channel
+        // needs the player-controllable gate. Fire-and-forget off the loop
+        // (the fanOutDeedUnlock shape); identity captured before the await.
+        // Bots have no session, so this.clients.get filters them naturally.
         const s = this.clients.get(ev.pid);
         if (!s) continue;
-        enqueueActivity(
-          {
-            kind: 'masterwork',
-            accountIds: [s.accountId],
-            names: [s.name],
-            realm: REALM,
-            profileUrl: this.profileUrlFor(s.name),
-            itemName: ITEMS[ev.itemId]?.name ?? ev.itemId,
-          },
-          `masterwork:${s.accountId}`,
-          now,
-        );
+        const { accountId, name } = s;
+        const profileUrl = this.profileUrlFor(name);
+        const itemName = ITEMS[ev.itemId]?.name ?? ev.itemId;
+        void getDeedBroadcasts(accountId)
+          .then((enabled) => {
+            if (!enabled) return;
+            enqueueActivity(
+              {
+                kind: 'masterwork',
+                accountIds: [accountId],
+                names: [name],
+                realm: REALM,
+                profileUrl,
+                itemName,
+              },
+              `masterwork:${accountId}`,
+              now,
+            );
+          })
+          .catch((err) => console.error('masterwork activity failed:', err));
       } else if (ev.type === 'duelEnd') {
         const w = this.sessionByName(ev.winnerName);
         const l = this.sessionByName(ev.loserName);

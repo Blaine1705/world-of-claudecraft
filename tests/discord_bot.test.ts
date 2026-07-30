@@ -3,6 +3,7 @@ import {
   type ActivityItem,
   allTierRoleNames,
   buildActivityMessage,
+  buildActivityMessages,
   buildDailyRewardWinnersMessage,
   buildLevelNick,
   buildLinkContent,
@@ -701,6 +702,10 @@ describe('significant-activity cards', () => {
     'deed',
   ] as const satisfies readonly ActivityKind[];
   type MissingServerKind = Exclude<ActivityKind, (typeof SERVER_KINDS)[number]>;
+  // Deliberately a TYPE-level pin: the initializer is literally null, so the
+  // runtime expect below is a tautology; the teeth are that this line fails
+  // `tsc --noEmit` (which the gate and the pre-push floor run) the moment the
+  // server union gains a kind the list lacks.
   const noMissingServerKinds: MissingServerKind extends never ? null : MissingServerKind = null;
 
   it('renders a non-null card for every kind the server can enqueue', () => {
@@ -715,6 +720,28 @@ describe('significant-activity cards', () => {
       });
       expect(msg, `kind ${kind} must render a card`).not.toBeNull();
     }
+  });
+
+  it('buildActivityMessages drops unknown kinds and keeps the rest in order', () => {
+    // The seam bot/main.ts posts through: a drained batch with a kind this
+    // build does not know must shed exactly that item, never post an empty
+    // embed, and never reorder the survivors.
+    const known = (kind: ActivityItem['kind']): ActivityItem => ({
+      kind,
+      realm: 'Claudemoon',
+      profileUrl: null,
+      level: 20,
+      participants: [linked('Aldric', '111')],
+    });
+    const payloads = buildActivityMessages([
+      known('levelup'),
+      { ...known('rareloot'), kind: 'parade' as never },
+      known('masterwork'),
+    ]);
+    expect(payloads).toHaveLength(2);
+    const titles = payloads.map((p) => (p.embeds as Array<{ title: string }>)[0].title);
+    expect(titles[0]).toContain('level 20');
+    expect(titles[1]).toBe('A masterwork piece');
   });
 });
 

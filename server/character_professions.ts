@@ -3,17 +3,30 @@
 // the admin dashboard's professions read. PURE, no SQL, no IO, the
 // character_sheet.ts pattern, so the shaping is unit-testable without a pool.
 //
-// Reads follow the blob's own back-compat rules: gathering proficiency
-// prefers `gatheringProficiency` and falls back to the legacy `professions`
-// key (the dual-write pair), every absent field loads to its documented
-// default, and node timers pass through as the persisted remaining-second
-// deltas (anchored at save time for a blob, at serialize time for a live
-// snapshot; the `live` flag tells the operator which clock they are reading).
+// Reads run through the LOADER'S OWN per-field normalizers
+// (normalizeGatheringProficiency / normalizeCraftSkills /
+// normalizeToolEffectSlots), so what the operator sees is what the next login
+// resolves field-by-field: the legacy `professions` dual-key fallback, the
+// clamps, the retired/refused slot drops, and the confirmMode coercion all
+// match by construction. The ONE-SHOT load migrations (mastery reset, the
+// proficiency display heal, the recipe grandfather union) are load-path code
+// this read cannot replay, so a stored blob written before them is MARKED
+// (`preMigration`) instead: the modal warns that those values will be
+// rewritten at the character's next login. Node timers pass through as the
+// persisted remaining-second deltas (anchored at save time for a blob, at
+// serialize time for a live snapshot; the `live` flag tells the operator
+// which clock they are reading), clamped to each live node's respawnSeconds
+// the way applyNodeReadiness clamps on load.
 
 import { CRAFT_RING, GATHERING_PROFESSION_IDS, TOOL_EFFECTS } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
-import { gatherNodeById } from '../src/sim/professions/gathering';
-import { tierForSkill } from '../src/sim/professions/wheel';
+import {
+  gatherNodeById,
+  NODE_HARVEST_TABLE,
+  normalizeGatheringProficiency,
+} from '../src/sim/professions/gathering';
+import { normalizeToolEffectSlots } from '../src/sim/professions/tools';
+import { normalizeCraftSkills, tierForSkill } from '../src/sim/professions/wheel';
 import type { CharacterState } from '../src/sim/sim';
 import type { AdminCharacterProfessionsRow } from './admin_db';
 
@@ -60,6 +73,13 @@ export interface CharacterProfessionsSheet {
   live: boolean;
   // The blob's save time; null for a live snapshot (it is "now").
   updatedAt: string | null;
+  // True when a STORED blob predates one of the one-shot load migrations
+  // (mastery reset, proficiency display heal, recipe grandfather union):
+  // the skills and recipe count shown will be REWRITTEN at the character's
+  // next login, so the operator must not judge a restore off them. Every
+  // curve-era save writes the three flags as literal true, so this is
+  // precise, and a live snapshot is never pre-migration.
+  preMigration: boolean;
   archetype: {
     activeArchetype: string | null;
     pairedMajor: string | null;
@@ -91,32 +111,40 @@ export function characterProfessionsSheet(
   input: CharacterProfessionsInput,
 ): CharacterProfessionsSheet {
   const { state } = input;
-  // Dual-key read, the loader's own rule: prefer the current key, fall back
-  // to the legacy pre-rename `professions`, default every profession to 0.
-  const gatheringMap = state.gatheringProficiency ?? state.professions ?? {};
+  // The loader's own per-field normalizers, so the sheet shows exactly what
+  // the next login resolves: the legacy `professions` dual-key fallback, the
+  // [0, maxSkill] clamps, and 0 defaults for every absent profession.
+  const gatheringMap = normalizeGatheringProficiency(
+    state.gatheringProficiency ?? state.professions,
+  );
   const gathering = GATHERING_PROFESSION_IDS.map((professionId) => ({
     professionId,
-    proficiency: gatheringMap[professionId] ?? 0,
+    proficiency: gatheringMap[professionId],
   }));
-  const craftSkills = state.craftSkills ?? {};
+  const craftSkills = normalizeCraftSkills(state.craftSkills ?? null);
   const crafting = CRAFT_RING.map((craft) => {
-    const skill = craftSkills[craft.id] ?? 0;
+    const skill = craftSkills[craft.id];
     return { craftId: craft.id, skill, tier: tierForSkill(skill) };
   });
-  const slots: ProfessionsSlotRow[] = Object.entries(state.toolEffectSlots ?? {}).flatMap(
-    ([professionId, slot]) =>
-      slot
-        ? [
-            {
-              professionId,
-              effectId: slot.effectId,
-              durability: slot.durability,
-              maxDurability: slot.maxDurability,
-              craftedBy: slot.craftedBy ?? null,
-              confirmMode: slot.confirmMode,
-            },
-          ]
-        : [],
+  // normalizeToolEffectSlots applies the load rules a raw read would miss:
+  // retired effects and refused pairs DROP (a row minted before the policy
+  // must not render as a live slot a GM then declines to restore), durability
+  // clamps, and the legacy confirmMode coercion (absent reads 'always').
+  const slots: ProfessionsSlotRow[] = Object.entries(
+    normalizeToolEffectSlots(state.toolEffectSlots) ?? {},
+  ).flatMap(([professionId, slot]) =>
+    slot
+      ? [
+          {
+            professionId,
+            effectId: slot.effectId,
+            durability: slot.durability,
+            maxDurability: slot.maxDurability,
+            craftedBy: slot.craftedBy ?? null,
+            confirmMode: slot.confirmMode,
+          },
+        ]
+      : [],
   );
   const nodeTimers = Object.entries(state.nodeHarvestCooldowns ?? {})
     .map(([nodeId, remainingSeconds]) => {
@@ -125,7 +153,11 @@ export function characterProfessionsSheet(
         nodeId,
         zoneId: node?.zoneId ?? null,
         nodeType: node?.type ?? null,
-        remainingSeconds,
+        // The load-side clamp (applyNodeReadiness): a stale or tampered row
+        // never displays a wait the game would not honor.
+        remainingSeconds: node
+          ? Math.min(remainingSeconds, NODE_HARVEST_TABLE[node.type].respawnSeconds)
+          : remainingSeconds,
       };
     })
     .sort((a, b) => b.remainingSeconds - a.remainingSeconds || a.nodeId.localeCompare(b.nodeId));
@@ -139,6 +171,11 @@ export function characterProfessionsSheet(
     username: input.username,
     live: input.live,
     updatedAt: input.updatedAt,
+    preMigration:
+      !input.live &&
+      (state.masteryResetApplied !== true ||
+        state.proficiencyDisplayHealApplied !== true ||
+        state.recipesGrandfathered !== true),
     archetype: {
       activeArchetype: archetype.activeArchetype ?? null,
       pairedMajor: archetype.pairedMajor ?? null,
@@ -168,7 +205,11 @@ export function characterProfessionsSheetFromRow(
     level: row.level,
     accountId: row.accountId,
     username: row.username,
-    state: liveState ?? (row.state as CharacterState),
+    // characters.state is NULLABLE (a created-but-never-entered character
+    // stores SQL NULL until its first save, and the admin list shows such
+    // rows), so an empty object stands in: every field then reads its
+    // documented default instead of throwing.
+    state: liveState ?? ((row.state ?? {}) as CharacterState),
     live: liveState !== null,
     updatedAt: liveState !== null ? null : row.updatedAt,
   });

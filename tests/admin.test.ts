@@ -31,6 +31,7 @@ vi.mock('../server/admin_db', async () => {
     listSharedIps: vi.fn(),
     accountDetail: vi.fn(),
     associationsForIp: vi.fn(),
+    characterProfessionsRow: vi.fn(),
     clientPerfSummary: vi.fn(),
     clientPerfRaw: vi.fn(),
   };
@@ -44,6 +45,7 @@ vi.mock('../server/auth', () => ({
 }));
 vi.mock('../server/moderation_db', () => ({
   forceCharacterRename: vi.fn(),
+  recordProfessionsRestore: vi.fn(),
   moderationQueue: vi.fn(),
   moderationReportsForAccount: vi.fn(),
   ignoreReport: vi.fn(),
@@ -94,6 +96,7 @@ import {
 import {
   accountDetail,
   associationsForIp,
+  characterProfessionsRow,
   clientPerfRaw,
   clientPerfSummary,
   escapeLike,
@@ -137,6 +140,7 @@ import {
   muteAccountChat,
   reactivateAccountAudited,
   recordPasswordReset,
+  recordProfessionsRestore,
   resetChatStrikesAudited,
 } from '../server/moderation_db';
 import { resetAuthFailures } from '../server/ratelimit';
@@ -230,6 +234,9 @@ const fakeGameState = {
   isIpBlocked: vi.fn(() => false),
   reloadBlockedIps: vi.fn(async () => {}),
   disconnectByIp: vi.fn(),
+  adminCharacterState: vi.fn((): Record<string, unknown> | null => ({})),
+  adminRestoreItem: vi.fn(() => 'ok' as const),
+  adminRestoreToolEffectSlot: vi.fn(() => 'ok' as const),
 };
 const fakeGame = fakeGameState as typeof fakeGameState & Parameters<typeof handleAdminApi>[2];
 
@@ -2300,5 +2307,86 @@ describe('staff role change live effects', () => {
 
     expect(res.statusCode).toBe(200);
     expect(fakeGame.disconnectAccount).not.toHaveBeenCalled();
+  });
+});
+
+describe('admin api R35 professions tooling (LEGACY dispatch arm)', () => {
+  beforeEach(() => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+  });
+
+  it('serves the professions inspector through the legacy arm', async () => {
+    vi.mocked(characterProfessionsRow).mockResolvedValue({
+      id: 42,
+      name: 'Merlin',
+      class: 'mage',
+      level: 12,
+      accountId: 9,
+      username: 'alice',
+      state: { gatheringProficiency: { mining: 5 } },
+      updatedAt: '2026-06-01T00:00:00Z',
+    });
+    vi.mocked(fakeGame.adminCharacterState).mockReturnValue(null);
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/characters/42/professions' }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data.name).toBe('Merlin');
+    expect(res.body.data.live).toBe(false);
+    expect(res.body.data.gathering).toContainEqual({ professionId: 'mining', proficiency: 5 });
+  });
+
+  it('restore-item audits FIRST then mints, mirroring the RouteDef arm', async () => {
+    vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
+    vi.mocked(fakeGame.adminCharacterState).mockReturnValue({});
+    vi.mocked(fakeGame.adminRestoreItem).mockReturnValue('ok');
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/characters/42/restore-item',
+        body: { itemId: 'copper_mining_pick', count: 2, reason: 'lost to a bug' },
+      }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(recordProfessionsRestore).toHaveBeenCalledWith({
+      characterId: 42,
+      adminAccountId: 7,
+      action: 'restore_item',
+      detail: 'copper_mining_pick x2',
+      reason: 'lost to a bug',
+    });
+    expect(fakeGame.adminRestoreItem).toHaveBeenCalledWith(42, 'copper_mining_pick', 2);
+    const auditOrder = vi.mocked(recordProfessionsRestore).mock.invocationCallOrder[0];
+    const mintOrder = vi.mocked(fakeGame.adminRestoreItem).mock.invocationCallOrder[0];
+    expect(auditOrder).toBeLessThan(mintOrder);
+  });
+
+  it('restore-slot refuses an offline character BEFORE any audit write', async () => {
+    vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
+    vi.mocked(fakeGame.adminCharacterState).mockReturnValue(null);
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/characters/42/restore-slot',
+        body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'lost' },
+      }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe('character is not online on this realm');
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+    expect(fakeGame.adminRestoreToolEffectSlot).not.toHaveBeenCalled();
   });
 });

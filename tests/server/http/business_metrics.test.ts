@@ -226,8 +226,10 @@ describe('registerBusinessMetrics', () => {
     expect(funnel).toHaveBeenCalledTimes(1);
 
     const text = await registry.metrics();
+    // [^"]* not [^"]+: an empty-valued forbidden label (realm="") must still
+    // count as present for the prohibition loop below.
     const labelValues = (label: string) =>
-      new Set([...text.matchAll(new RegExp(`${label}="([^"]+)"`, 'g'))].map((match) => match[1]));
+      new Set([...text.matchAll(new RegExp(`${label}="([^"]*)"`, 'g'))].map((match) => match[1]));
     expect(labelValues('period')).toEqual(new Set(['today', 'yesterday']));
     expect(labelValues('segment')).toEqual(new Set(['new', 'returning', 'all', 'level_20']));
     expect(labelValues('level')).toEqual(new Set(['2', '5']));

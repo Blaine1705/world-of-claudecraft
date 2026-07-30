@@ -774,6 +774,9 @@ export async function handleAdminApi(
           reason: body.reason,
         });
         const result = game.adminRestoreItem(id, itemId, count);
+        // Defensive twin of the pre-audit body check; reachable only if the
+        // runtime and validator ever disagree about ITEMS.
+        if (result === 'invalid_item') return fail(res, 400, 'unknown item id');
         if (result !== 'ok') {
           return fail(res, 400, 'character went offline before the restore landed');
         }
@@ -806,6 +809,11 @@ export async function handleAdminApi(
         const result = game.adminRestoreToolEffectSlot(id, professionId, effectId);
         if (result === 'no_tool') {
           return fail(res, 400, 'the character owns no tool for that profession');
+        }
+        // A restore is for a row that is GONE: an overwrite would destroy the
+        // live row's provenance, confirm mode, and ratcheted ceiling.
+        if (result === 'already_slotted') {
+          return fail(res, 400, 'that profession already has a slotted effect');
         }
         if (result === 'invalid_request') {
           return fail(res, 400, 'that effect cannot be slotted on that profession');
@@ -2226,6 +2234,9 @@ async function restoreItemHandler(ctx: Ctx): Promise<void> {
       reason: body.reason,
     });
     const result = rt.adminRestoreItem(id, itemId, count);
+    // Defensive twin of the pre-audit body check; reachable only if the
+    // runtime and validator ever disagree about ITEMS.
+    if (result === 'invalid_item') return fail(ctx.res, 400, 'unknown item id');
     if (result !== 'ok') {
       return fail(ctx.res, 400, 'character went offline before the restore landed');
     }
@@ -2261,6 +2272,11 @@ async function restoreSlotHandler(ctx: Ctx): Promise<void> {
     const result = rt.adminRestoreToolEffectSlot(id, professionId, effectId);
     if (result === 'no_tool') {
       return fail(ctx.res, 400, 'the character owns no tool for that profession');
+    }
+    // A restore is for a row that is GONE: an overwrite would destroy the
+    // live row's provenance, confirm mode, and ratcheted ceiling.
+    if (result === 'already_slotted') {
+      return fail(ctx.res, 400, 'that profession already has a slotted effect');
     }
     // Reachable past body validation: the pair-validity rule (which effects a
     // profession accepts) lives with the sim, not the body check.

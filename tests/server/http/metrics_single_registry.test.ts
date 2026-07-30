@@ -64,6 +64,8 @@ describe('single-registry production shape', () => {
   it('a registrar run twice against the shared registry throws instead of silently double-counting', () => {
     const httpMetrics = createHttpMetrics({ defaultMetrics: false });
     registerGameStateMetrics(httpMetrics.registry, stubSource());
-    expect(() => registerGameStateMetrics(httpMetrics.registry, stubSource())).toThrow();
+    expect(() => registerGameStateMetrics(httpMetrics.registry, stubSource())).toThrow(
+      /already been registered/,
+    );
   });
 });

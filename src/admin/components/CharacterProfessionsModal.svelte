@@ -114,15 +114,18 @@
       {t('profInspect.levelClass', { level: sheet.level, cls: classLabel(sheet.class) })}
       &middot;
       {#if sheet.live}
-        {t('profInspect.liveBadge')}
+        <span>{t('profInspect.liveBadge')}</span>
       {:else}
-        {t('profInspect.savedBadge', { when: fmtDate(sheet.updatedAt) })}
+        <span>{t('profInspect.savedBadge', { when: fmtDate(sheet.updatedAt) })}</span>
       {/if}
       &middot;
       {archetypeLine(sheet)}
       &middot;
       {t('profInspect.knownRecipes', { n: fmtNumber(sheet.knownRecipes) })}
     </p>
+    {#if sheet.preMigration}
+      <p class="text-dim">{t('profInspect.preMigrationNote')}</p>
+    {/if}
     <div class="detail-grid">
       <div>
         <h4>{t('profInspect.gatheringHeader')}</h4>

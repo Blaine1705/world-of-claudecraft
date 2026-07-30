@@ -237,6 +237,7 @@ export interface CharacterProfessionsSheet {
   username: string;
   live: boolean;
   updatedAt: string | null;
+  preMigration: boolean;
   archetype: {
     activeArchetype: string | null;
     pairedMajor: string | null;
