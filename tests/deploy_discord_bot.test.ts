@@ -1,17 +1,23 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-const dockerfile = readFileSync('Dockerfile', 'utf8');
-const dockerignore = readFileSync('.dockerignore', 'utf8');
-const compose = readFileSync('docker-compose.yml', 'utf8');
+// Resolved from THIS file, not process.cwd(): a vitest invocation from another
+// directory would otherwise fail at module scope with ENOENT.
+const read = (name: string) => readFileSync(new URL(`../${name}`, import.meta.url), 'utf8');
+const dockerfile = read('Dockerfile');
+const dockerignore = read('.dockerignore');
+const compose = read('docker-compose.yml');
 const composeEnv = (name: string) => `$${`{${name}:-}`}`;
-const packageJson = JSON.parse(
-  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
-) as { scripts: Record<string, string> };
-const buildBot = readFileSync(new URL('../scripts/build_bot.mjs', import.meta.url), 'utf8');
-const tsconfig = JSON.parse(readFileSync(new URL('../tsconfig.json', import.meta.url), 'utf8')) as {
-  include: string[];
-};
+const packageJson = JSON.parse(read('package.json')) as { scripts: Record<string, string> };
+const buildBot = read('scripts/build_bot.mjs');
+// tsconfig.json is JSONC by spec, so strip comments before parsing: a perfectly
+// legal `// note` added to it would otherwise crash this file at module scope
+// and take every test in it down with an error that names none of them.
+const tsconfig = JSON.parse(
+  read('tsconfig.json')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1'),
+) as { include: string[] };
 
 describe('Discord bot deploy container contract', () => {
   it('builds and ships the bundled Discord bot artifact', () => {

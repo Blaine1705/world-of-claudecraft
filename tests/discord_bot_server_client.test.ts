@@ -328,6 +328,30 @@ describe('ServerClient envelope handling', () => {
   });
 });
 
+describe('ServerClient drain fallbacks', () => {
+  it('answers with an empty list when the call fails, for every drain', async () => {
+    // Each drain ends in `?? []`. Without it a failed call hands the caller
+    // undefined and the poll loop throws on the next `.length`, killing the
+    // loop rather than skipping one cycle. drainRelay is covered above; these
+    // are the two that were not.
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const timers = fakeTimers();
+    const failing = () =>
+      new ServerClient(
+        'http://host',
+        'sekrit',
+        recordingFetch(() => fakeResponse({ status: 500 })).impl,
+        timers.seam,
+      );
+
+    expect(await failing().drainActivity()).toEqual([]);
+    expect(await failing().dailyRewardWinners()).toEqual([]);
+    // And a 200 whose envelope carries no list at all.
+    expect(await clientReturning({}).client.drainActivity()).toEqual([]);
+    expect(await clientReturning({}).client.dailyRewardWinners()).toEqual([]);
+  });
+});
+
 describe('ServerClient flairedIds null-versus-empty contract', () => {
   it('returns the ids, keeping only the strings', async () => {
     // The reconcile treats every id it gets back as "still flaired"; a stray

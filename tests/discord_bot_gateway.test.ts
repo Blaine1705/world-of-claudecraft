@@ -400,10 +400,12 @@ describe('Gateway resume', () => {
 });
 
 describe('Gateway close handling', () => {
-  it('does NOT reconnect after ANY fatal close code', () => {
-    // The whole set matters, not just 4014: 4004 is a bad/rotated token, and
-    // reconnecting on it hammers Discord with a doomed handshake forever.
-    for (const code of [4004, 4010, 4011, 4012, 4013, 4014]) {
+  // One test per code rather than one loop over all of them: a loop stops at the
+  // first failing row, so a regression affecting several codes would report as one.
+  // The whole set matters, not just 4014: 4004 is a bad or rotated token, and
+  // reconnecting on it hammers Discord with a doomed handshake forever.
+  for (const code of [4004, 4010, 4011, 4012, 4013, 4014]) {
+    it(`does NOT reconnect after fatal close ${code}`, () => {
       const { socket, timers, sockets } = rig();
       const errors: unknown[][] = [];
       vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
@@ -416,12 +418,11 @@ describe('Gateway close handling', () => {
       expect(sockets.length).toBe(1);
       // The log line is the only operator-visible signal that the bot stopped.
       expect(errors).toEqual([[`[bot] gateway closed with fatal code ${code}; not reconnecting`]]);
-      vi.restoreAllMocks();
-    }
-  });
+    });
+  }
 
-  it('DOES reconnect after a non-fatal close, and actually opens the new socket', () => {
-    for (const code of [1000, 1001, 1006, 4000, 4009]) {
+  for (const code of [1000, 1001, 1006, 4000, 4009]) {
+    it(`reconnects after non-fatal close ${code}, and actually opens the new socket`, () => {
       const { socket, timers, sockets, factoryUrls } = rig();
       vi.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -434,8 +435,23 @@ describe('Gateway close handling', () => {
       // pass here, which would leave the bot silently offline after a drop.
       expect(sockets.length).toBe(2);
       expect(factoryUrls[1]).toBe('wss://gateway.discord.gg/?v=10&encoding=json');
-      vi.restoreAllMocks();
-    }
+    });
+  }
+
+  it('tears the old socket down even when removeAllListeners throws', () => {
+    // reconnect() wraps the teardown in an empty catch. Without it a socket that
+    // rejects the teardown (a foreign implementation, or one already destroyed)
+    // would stop the reconnect entirely and leave the bot offline for good.
+    const { socket, timers, sockets } = rig();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    socket.removeAllListeners = () => {
+      throw new Error('already destroyed');
+    };
+
+    socket.emit('close', 1006);
+    timers.armed[0].fn();
+
+    expect(sockets.length).toBe(2); // the reconnect still happened
   });
 });
 
@@ -499,6 +515,25 @@ describe('Gateway send guard and dispatch', () => {
     // connect(), and the pump still survives, so the delivery assertions above
     // pass either way. Only the log line separates the two catches.
     expect(errors).toEqual([['[bot] dispatch handler error', expect.any(Error)]]);
+  });
+
+  it('logs a socket error without tearing the connection down', () => {
+    // The 'error' listener exists to keep an emitted socket error from becoming
+    // an unhandled 'error' event, which in Node terminates the process. Nothing
+    // else in the class references it, so only driving it proves it is wired.
+    const { socket } = rig();
+    const errors: unknown[][] = [];
+    vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      errors.push(args);
+    });
+
+    socket.emit('error', new Error('ECONNRESET'));
+
+    expect(errors[0][0]).toBe('[bot] gateway socket error');
+    // No reconnect, no terminate: 'error' is followed by 'close', which owns that.
+    expect(socket.terminated).toBe(0);
+    frame(socket, { op: 10, d: { heartbeat_interval: 30_000 } });
+    expect(lastSent(socket).op).toBe(2); // still usable
   });
 
   it('survives an unparseable frame', () => {

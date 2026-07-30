@@ -250,10 +250,11 @@ describe('loadConfig env-key inventory', () => {
     // the ambient environment and could make a fallback test pass for the wrong
     // reason. Line comments are stripped first so a commented-out read cannot
     // pad the set.
-    const source = readFileSync(new URL('../bot/config.ts', import.meta.url), 'utf8').replace(
-      /(^|[^:])\/\/.*$/gm,
-      '$1',
-    );
+    // bot/config.ts is mostly JSDoc, so block comments have to go first: a
+    // `/** process.env.FOO */` would otherwise be counted as a real read.
+    const source = readFileSync(new URL('../bot/config.ts', import.meta.url), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
     const direct = [...source.matchAll(/process\.env\.([A-Z0-9_]+)/g)].map((m) => m[1]);
     const dynamic = source.match(/process\.env\[/g) ?? [];
     const viaRequired = [...source.matchAll(/required\('([A-Z0-9_]+)'\)/g)].map((m) => m[1]);
