@@ -422,12 +422,12 @@ describe('renderVendorWindow: focus across the rebuild (the R22 advisory widenin
     }
   });
 
-  it('a row that comes back DISABLED is skipped, not focused (the last-stack buy)', () => {
+  it('a row that comes back DISABLED yields to its enabled grid neighbor (the last-stack buy)', () => {
     // The primary degradation the focus_restore family documents: buying the
     // last affordable stack drains copper, so the SAME row returns from the
-    // rebuild disabled (row.disabled = !affordable) and cannot take focus;
-    // the restore must skip it to the first enabled candidate rather than
-    // silently dropping to <body>.
+    // rebuild disabled (row.disabled = !affordable) and cannot take focus.
+    // The restore must stay INSIDE the row (the sibling item), never jump to
+    // Close, where a reflexive Enter would shut the vendor.
     const before: VendorView = {
       goods: [goodsRow('bread'), goodsRow('water')],
       buyback: [],
@@ -447,13 +447,13 @@ describe('renderVendorWindow: focus across the rebuild (the R22 advisory widenin
       const rebuilt = el.querySelector<HTMLButtonElement>('[data-focus-key="buy:water"]');
       expect(rebuilt?.disabled).toBe(true);
       expect(document.activeElement).not.toBe(rebuilt);
-      expect(document.activeElement).toBe(el.querySelector('[data-close]'));
+      expect(document.activeElement).toBe(el.querySelector('[data-focus-key="buy:bread"]'));
     } finally {
       el.remove();
     }
   });
 
-  it('a vanished row falls to the stable neighbors, skipping a disabled sell-junk', () => {
+  it('a vanished row lands on the same grid slot, not on Close', () => {
     const two: VendorView = {
       goods: [goodsRow('bread'), goodsRow('water')],
       buyback: [],
@@ -466,11 +466,89 @@ describe('renderVendorWindow: focus across the rebuild (the R22 advisory widenin
     try {
       renderVendorWindow(el, 'Vendor', two, deps());
       el.querySelector<HTMLButtonElement>('[data-focus-key="buy:water"]')?.focus();
-      // The focused row is gone from the rebuilt tree; sell-junk is disabled
-      // in the default deps, so the close button is the first enabled
-      // candidate and focus must land there rather than on <body>.
+      // The focused row is gone; the slot clamps to the surviving sibling,
+      // which is exactly where a browsing player expects to continue.
       renderVendorWindow(el, 'Vendor', one, deps());
-      expect(document.activeElement).toBe(el.querySelector('[data-close]'));
+      expect(document.activeElement).toBe(el.querySelector('[data-focus-key="buy:bread"]'));
+    } finally {
+      el.remove();
+    }
+  });
+
+  it('an emptied grid falls to an ENABLED sell-junk before Close (the ladder rung is real)', () => {
+    // The middle rung by identity: with the goods grid gone entirely, an
+    // enabled sell-junk takes focus ahead of Close. This is the arm that
+    // kills a deleted rung: the default deps disable sell-junk, so only an
+    // enabled-sell-junk drive can tell the rung from its absence.
+    const before: VendorView = {
+      goods: [goodsRow('bread')],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+    };
+    const after: VendorView = { ...before, goods: [] };
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    try {
+      renderVendorWindow(el, 'Vendor', before, deps({ sellJunk: { enabled: true, proceeds: 5 } }));
+      el.querySelector<HTMLButtonElement>('[data-focus-key="buy:bread"]')?.focus();
+      renderVendorWindow(el, 'Vendor', after, deps({ sellJunk: { enabled: true, proceeds: 5 } }));
+      expect(document.activeElement).toBe(el.querySelector('.vendor-sell-junk'));
+    } finally {
+      el.remove();
+    }
+  });
+
+  it('focus OUTSIDE the window is untouched by a rebuild (containment)', () => {
+    // The vendor repaints from onInventoryChanged and the online vendor
+    // event, neither of which is a vendor click, and it sits open beside
+    // #bags; a sell from bags must not have the vendor repaint steal focus.
+    const view: VendorView = {
+      goods: [goodsRow('bread')],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+    };
+    const el = document.createElement('div');
+    const outside = document.createElement('button');
+    document.body.appendChild(el);
+    document.body.appendChild(outside);
+    try {
+      renderVendorWindow(el, 'Vendor', view, deps());
+      outside.focus();
+      renderVendorWindow(el, 'Vendor', view, deps());
+      expect(document.activeElement).toBe(outside);
+    } finally {
+      el.remove();
+      outside.remove();
+    }
+  });
+
+  it('a buyback reclaim keeps focus at the same SLOT: the next item to reclaim', () => {
+    // The positional-key design, pinned instead of hand-checked: buyBackItem
+    // compacts the list, so after reclaiming slot 0 the old second item now
+    // holds buyback:0 and the exact-key match lands on it.
+    const sword = { itemId: 'sword', item: item('sword'), count: 1, price: 10, index: 0 };
+    const shield = { itemId: 'shield', item: item('shield'), count: 1, price: 12, index: 1 };
+    const before: VendorView = {
+      goods: [],
+      buyback: [sword, shield],
+      honorBalance: 0,
+      hasHonorGoods: false,
+    };
+    const after: VendorView = {
+      ...before,
+      buyback: [{ ...shield, index: 0 }],
+    };
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    try {
+      renderVendorWindow(el, 'Vendor', before, deps());
+      el.querySelector<HTMLButtonElement>('[data-focus-key="buyback:0"]')?.focus();
+      renderVendorWindow(el, 'Vendor', after, deps());
+      const landed = document.activeElement as HTMLElement | null;
+      expect(landed?.dataset.focusKey).toBe('buyback:0');
+      expect(landed?.textContent).toContain('shield');
     } finally {
       el.remove();
     }

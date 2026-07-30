@@ -139,6 +139,18 @@ describe('tool-tier lock dimension', () => {
     expect(viewerUsableToolTier(makeWorld({ inventory: T1_PICK }), 'mining')).toBe(1);
   });
 
+  it('the optional third argument: an explicit map wins, an omitted one reads through', () => {
+    // The per-build hoist seam (the minimap hands the map it already read):
+    // an explicit map must govern even when it disagrees with the world's
+    // own, and omitting it must keep the pre-widening behavior byte for
+    // byte. The pairing contract (same world, same synchronous pass) lives
+    // at the signature; this pins the mechanics either side of it.
+    const world = makeWorld({ inventory: PICK, proficiency: {} });
+    expect(viewerUsableToolTier(world, 'mining')).toBe(0); // read-through: counter short
+    expect(viewerUsableToolTier(world, 'mining', MINING_40)).toBe(2); // explicit map wins
+    expect(viewerUsableToolTier(world, 'mining', undefined)).toBe(0); // explicit undefined = default
+  });
+
   it('isNodeToolLockedFor: tier-2 locks toolless AND unwieldable viewers, unlocks with the earned pick', () => {
     expect(isNodeToolLockedFor(makeWorld({}), { type: 'ore', tier: 2 })).toBe(true);
     // Owned but unearned: still locked (R22), the map lock agreeing with the

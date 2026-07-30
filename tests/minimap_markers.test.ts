@@ -526,6 +526,28 @@ describe('gather-node markers: the locked dimension', () => {
     expect(gatherMarkers(makeGatherWorld('sim'))).toEqual(gatherMarkers(makeGatherWorld('client')));
   });
 
+  it('the proficiency map is read ONCE per build (the offline getter copies per access)', () => {
+    // The hoist this pins is the change's entire purpose: Sim's
+    // gatheringProficiency getter spread-copies the live map on every access,
+    // so a per-profession read is per-build garbage no reference probe can
+    // see. Model the copying getter and count: the multi-profession rim
+    // (ore + wood + herb professions in range) must cost exactly one read.
+    let reads = 0;
+    const world = makeGatherWorld('sim', {
+      inventory: [{ itemId: 'iron_mining_pick', count: 1 }],
+    }) as { gatheringProficiency?: Record<string, number> };
+    delete world.gatheringProficiency;
+    Object.defineProperty(world, 'gatheringProficiency', {
+      get() {
+        reads++;
+        return { mining: 40 };
+      },
+    });
+    const markers = gatherMarkers(world as unknown as IWorld);
+    expect(markers.length).toBeGreaterThan(0); // the rim really had nodes
+    expect(reads).toBe(1);
+  });
+
   it('both shapes agree on the R22 wield axis, each locked vector pinned literally', () => {
     // The toolless parity arm above cannot discriminate on the wield axis: an
     // empty bag with an empty counter map locks every node in both shapes, so

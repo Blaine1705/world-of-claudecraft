@@ -10,7 +10,7 @@
 import type { ItemInstancePayload } from '../../../sim/types';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
-import { captureFocusKey, restoreFirstEnabled } from '../../focus_restore';
+import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { GATHERING_PROFESSION_NAME_KEYS } from '../../gathering_profession_name';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
@@ -100,7 +100,18 @@ export function renderVendorWindow(
   // the focus-across-a-REBUILD contract; requirement-advisory rows are
   // focusable since the R22 turn, which widened the set exposed to the drop.
   deps.hideTooltip();
-  const focusKey = captureFocusKey(el);
+  const focused = focusedWithin(el);
+  const focusKey = focused?.dataset.focusKey ?? null;
+  // The grid slot beside the key: when the exact row is gone or comes back
+  // disabled (the last-stack buy), the same SLOT in the same grid is the next
+  // best landing (after a removal it holds the next item), and it keeps the
+  // player inside the row instead of jumping to Close, where a reflexive
+  // Enter would shut the vendor.
+  const focusedGrid = focused?.closest<HTMLElement>('.vendor-goods-grid');
+  const focusedGridName = focusedGrid?.dataset.grid ?? null;
+  const focusedSlot = focusedGrid
+    ? [...focusedGrid.querySelectorAll('button')].indexOf(focused as HTMLButtonElement)
+    : -1;
   const scrollTop = el.scrollTop;
   el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
 
@@ -117,6 +128,7 @@ export function renderVendorWindow(
   // full-width row per item (see .vendor-goods-grid in components.css).
   const goodsGrid = document.createElement('div');
   goodsGrid.className = 'vendor-goods-grid';
+  goodsGrid.dataset.grid = 'goods';
   for (const goods of view.goods) {
     const { itemId, item, quantity } = goods;
     const row = document.createElement('button');
@@ -202,6 +214,7 @@ export function renderVendorWindow(
   }
   const buybackGrid = document.createElement('div');
   buybackGrid.className = 'vendor-goods-grid';
+  buybackGrid.dataset.grid = 'buyback';
   for (const {
     itemId,
     item,
@@ -246,14 +259,31 @@ export function renderVendorWindow(
   if (focusKey) {
     // Matched by dataset equality rather than an attribute selector: the keys
     // are self-minted (buy:<itemId> and friends) but this needs no CSS.escape,
-    // which jsdom does not provide.
-    const exact = [...el.querySelectorAll<HTMLButtonElement>('[data-focus-key]')].find(
-      (b) => b.dataset.focusKey === focusKey,
-    );
+    // which jsdom does not provide. ONE identity end to end: every rung below
+    // resolves through data-focus-key, so a class rename cannot silently
+    // hollow a rung.
+    const keyed = [...el.querySelectorAll<HTMLButtonElement>('[data-focus-key]')];
+    const exact = keyed.find((b) => b.dataset.focusKey === focusKey);
+    // The same-grid slot ladder: the slot itself (after a removal it holds
+    // the NEXT item), then outward neighbors, before ever leaving the row.
+    const grid =
+      focusedGridName !== null
+        ? el.querySelector<HTMLElement>(`.vendor-goods-grid[data-grid="${focusedGridName}"]`)
+        : null;
+    const rows = grid ? [...grid.querySelectorAll('button')] : [];
+    const slot = focusedSlot >= 0 ? Math.min(focusedSlot, rows.length - 1) : -1;
+    const neighbors: (HTMLButtonElement | undefined)[] = [];
+    if (slot >= 0) {
+      for (let step = 0; step < rows.length; step++) {
+        if (rows[slot + step]) neighbors.push(rows[slot + step] as HTMLButtonElement);
+        if (step > 0 && rows[slot - step]) neighbors.push(rows[slot - step] as HTMLButtonElement);
+      }
+    }
     restoreFirstEnabled([
       exact,
-      el.querySelector<HTMLButtonElement>('.vendor-sell-junk'),
-      el.querySelector<HTMLButtonElement>('[data-close]'),
+      ...neighbors,
+      keyed.find((b) => b.dataset.focusKey === 'sell-junk'),
+      keyed.find((b) => b.dataset.focusKey === 'close'),
     ]);
   }
 }
