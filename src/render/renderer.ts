@@ -180,7 +180,11 @@ import { FrozenOrbFx } from './frozen_orb_fx';
 import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import { gardenMazeCameraLift } from './garden_maze_core';
-import { buildGatherNodes, type GatherNodesView } from './gather_nodes';
+import {
+  buildGatherNodes,
+  type GatherNodesView,
+  gatherNodeIdFromIntersection,
+} from './gather_nodes';
 import {
   GFX,
   type GfxBucketBands,
@@ -9250,8 +9254,8 @@ export class Renderer {
   }
 
   // Click/tap-to-harvest (#1866): raycasts the static gather-node meshes
-  // (`gatherNodeMeshes`, tagged with `userData.gatherNodeId` in
-  // src/render/gather_nodes.ts) and returns the hit node's content id, or null.
+  // (`gatherNodeMeshes`, with per-instance ids in src/render/gather_nodes.ts)
+  // and returns the hit node's content id, or null.
   // A separate method from `pick()` on purpose: nodes are static content keyed
   // by string id, not entities keyed by numeric id, so widening `pick()`'s
   // return contract would force every existing caller to re-discriminate.
@@ -9263,11 +9267,8 @@ export class Renderer {
     this.raycaster.setFromCamera(ndc, this.camera);
     const hits = this.raycaster.intersectObjects(this.gatherNodeMeshes, true);
     for (const hit of hits) {
-      let o: THREE.Object3D | null = hit.object;
-      while (o) {
-        if (typeof o.userData.gatherNodeId === 'string') return o.userData.gatherNodeId as string;
-        o = o.parent;
-      }
+      const nodeId = gatherNodeIdFromIntersection(hit);
+      if (nodeId !== null) return nodeId;
     }
     return null;
   }

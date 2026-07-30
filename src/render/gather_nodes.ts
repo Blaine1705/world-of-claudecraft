@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import type { GatherNodeType } from '../sim/data';
 import { GATHER_NODES } from '../sim/data';
+import type { GatherNodeDef, GatherNodeType } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
@@ -60,7 +60,20 @@ interface GatherNodeShadowEntry {
   casts: boolean;
 }
 
-function buildNodeMesh(type: GatherNodeType): THREE.Object3D {
+interface GatherNodeBatch {
+  type: GatherNodeType;
+  zoneId: string;
+  nodes: GatherNodeDef[];
+}
+
+interface GatherNodeMeshPart {
+  geometry: THREE.BufferGeometry;
+  material: THREE.Material | THREE.Material[];
+  matrix: THREE.Matrix4;
+  source: THREE.Mesh;
+}
+
+function buildNodeTemplate(type: GatherNodeType): THREE.Object3D {
   const loaded = loadedNodeGltf.get(type);
   if (loaded) {
     const inst = loaded.clone(true);
@@ -80,24 +93,121 @@ function buildNodeMesh(type: GatherNodeType): THREE.Object3D {
   return mesh;
 }
 
-export function buildGatherNodes(seed: number): GatherNodesView {
-  const group = new THREE.Group();
-  group.name = 'gatherNodes';
-  const shadowEntries: GatherNodeShadowEntry[] = [];
-  for (const node of GATHER_NODES) {
-    const obj = buildNodeMesh(node.type);
-    const y = terrainHeight(node.pos.x, node.pos.z, seed);
-    obj.position.set(node.pos.x, y + NODE_Y_OFFSET[node.type], node.pos.z);
-    obj.name = node.id;
-    // Click/tap-to-harvest target (#1866): the renderer raycasts clickable node
-    // meshes and reads this back to resolve which node was hit, the same
-    // userData convention entity views use for `entityId`.
-    obj.userData.gatherNodeId = node.id;
-    const sphere = new THREE.Box3().setFromObject(obj).getBoundingSphere(new THREE.Sphere());
-    const casters: THREE.Mesh[] = [];
-    obj.traverse((child) => {
-      if (child instanceof THREE.Mesh && child.castShadow) casters.push(child);
+function isOpaqueMaterial(material: THREE.Material): boolean {
+  const physical = material as THREE.Material & { transmission?: number };
+  return (
+    material.visible &&
+    !material.transparent &&
+    material.opacity === 1 &&
+    material.alphaTest === 0 &&
+    !material.alphaHash &&
+    !material.alphaToCoverage &&
+    material.depthTest &&
+    material.depthWrite &&
+    material.colorWrite &&
+    (physical.transmission ?? 0) === 0
+  );
+}
+
+function gatherNodeMeshParts(template: THREE.Object3D): GatherNodeMeshPart[] | null {
+  template.updateMatrixWorld(true);
+  const parts: GatherNodeMeshPart[] = [];
+  let supported = true;
+  template.traverse((child) => {
+    if (
+      child instanceof THREE.Line ||
+      child instanceof THREE.Points ||
+      child instanceof THREE.Sprite ||
+      child instanceof THREE.SkinnedMesh
+    ) {
+      supported = false;
+      return;
+    }
+    if (!(child instanceof THREE.Mesh) || !child.visible) return;
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    if (
+      materials.some((material) => !isOpaqueMaterial(material)) ||
+      Object.keys(child.geometry.morphAttributes).length > 0
+    ) {
+      supported = false;
+      return;
+    }
+    parts.push({
+      geometry: child.geometry,
+      material: child.material,
+      matrix: child.matrixWorld.clone(),
+      source: child,
     });
+  });
+  return supported && parts.length > 0 ? parts : null;
+}
+
+function gatherNodeBatches(nodes: readonly GatherNodeDef[]): GatherNodeBatch[] {
+  const byZoneAndType = new Map<string, GatherNodeBatch>();
+  for (const node of nodes) {
+    const key = `${node.zoneId}:${node.type}`;
+    let batch = byZoneAndType.get(key);
+    if (!batch) {
+      batch = { type: node.type, zoneId: node.zoneId, nodes: [] };
+      byZoneAndType.set(key, batch);
+    }
+    batch.nodes.push(node);
+  }
+  return [...byZoneAndType.values()];
+}
+
+function copyMeshRenderState(source: THREE.Mesh, target: THREE.InstancedMesh): void {
+  target.castShadow = source.castShadow;
+  target.receiveShadow = source.receiveShadow;
+  target.layers.mask = source.layers.mask;
+  target.renderOrder = source.renderOrder;
+  target.frustumCulled = source.frustumCulled;
+  target.customDepthMaterial = source.customDepthMaterial;
+  target.customDistanceMaterial = source.customDistanceMaterial;
+  target.onBeforeRender = source.onBeforeRender;
+  target.onAfterRender = source.onAfterRender;
+  target.onBeforeShadow = source.onBeforeShadow;
+  target.onAfterShadow = source.onAfterShadow;
+}
+
+function addInstancedBatch(
+  group: THREE.Group,
+  batch: GatherNodeBatch,
+  parts: GatherNodeMeshPart[],
+  seed: number,
+  shadowEntries: GatherNodeShadowEntry[],
+): void {
+  const placement = new THREE.Matrix4();
+  const instanceMatrix = new THREE.Matrix4();
+  const nodeIds = batch.nodes.map((node) => node.id);
+  // Instance transforms are baked into world space. Union every mesh part so
+  // one castShadow decision conservatively covers the full zone and type batch.
+  const batchBounds = new THREE.Box3();
+  const casters: THREE.Mesh[] = [];
+  for (const [partIndex, part] of parts.entries()) {
+    const mesh = new THREE.InstancedMesh(part.geometry, part.material, batch.nodes.length);
+    mesh.name = `gatherNodes:${batch.zoneId}:${batch.type}:${partIndex}`;
+    // Raycaster intersections carry the instance index, which resolves through
+    // this stable content-order table without widening the renderer's picker.
+    mesh.userData.gatherNodeIds = nodeIds;
+    mesh.userData.gatherNodeZoneId = batch.zoneId;
+    mesh.userData.gatherNodeType = batch.type;
+    copyMeshRenderState(part.source, mesh);
+    for (const [instanceId, node] of batch.nodes.entries()) {
+      const y = terrainHeight(node.pos.x, node.pos.z, seed);
+      placement.makeTranslation(node.pos.x, y + NODE_Y_OFFSET[node.type], node.pos.z);
+      instanceMatrix.multiplyMatrices(placement, part.matrix);
+      mesh.setMatrixAt(instanceId, instanceMatrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingBox();
+    mesh.computeBoundingSphere();
+    if (mesh.boundingBox) batchBounds.union(mesh.boundingBox);
+    if (mesh.castShadow) casters.push(mesh);
+    group.add(mesh);
+  }
+  if (casters.length > 0 && !batchBounds.isEmpty()) {
+    const sphere = batchBounds.getBoundingSphere(new THREE.Sphere());
     shadowEntries.push({
       bounds: {
         x: sphere.center.x,
@@ -108,7 +218,67 @@ export function buildGatherNodes(seed: number): GatherNodesView {
       casters,
       casts: true,
     });
-    group.add(obj);
+  }
+}
+
+function addIndividualNode(
+  group: THREE.Group,
+  template: THREE.Object3D,
+  node: GatherNodeDef,
+  seed: number,
+  shadowEntries: GatherNodeShadowEntry[],
+): void {
+  const obj = template.clone(true);
+  const y = terrainHeight(node.pos.x, node.pos.z, seed);
+  obj.position.set(node.pos.x, y + NODE_Y_OFFSET[node.type], node.pos.z);
+  obj.name = node.id;
+  obj.userData.gatherNodeId = node.id;
+  group.add(obj);
+  const casters: THREE.Mesh[] = [];
+  obj.traverse((child) => {
+    if (child instanceof THREE.Mesh && child.castShadow) casters.push(child);
+  });
+  if (casters.length > 0) {
+    const sphere = new THREE.Box3().setFromObject(obj).getBoundingSphere(new THREE.Sphere());
+    shadowEntries.push({
+      bounds: {
+        x: sphere.center.x,
+        y: sphere.center.y,
+        z: sphere.center.z,
+        radius: sphere.radius,
+      },
+      casters,
+      casts: true,
+    });
+  }
+}
+
+function buildGatherNodesFromTemplates(
+  seed: number,
+  templates: ReadonlyMap<GatherNodeType, THREE.Object3D>,
+  nodes: readonly GatherNodeDef[],
+): GatherNodesView {
+  const group = new THREE.Group();
+  group.name = 'gatherNodes';
+  const shadowEntries: GatherNodeShadowEntry[] = [];
+  const partsByType = new Map<GatherNodeType, GatherNodeMeshPart[] | null>();
+  for (const batch of gatherNodeBatches(nodes)) {
+    const template = templates.get(batch.type);
+    if (!template) throw new Error(`Missing gather node render template: ${batch.type}`);
+    if (!partsByType.has(batch.type)) {
+      partsByType.set(batch.type, gatherNodeMeshParts(template));
+    }
+    const parts = partsByType.get(batch.type);
+    if (parts) {
+      addInstancedBatch(group, batch, parts, seed, shadowEntries);
+      continue;
+    }
+    // Preserve the authored hierarchy and draw order if a future asset uses
+    // transparent, alpha-tested, skinned, morphed, line, point, or sprite
+    // rendering. Those cases are not safe to consolidate.
+    for (const node of batch.nodes) {
+      addIndividualNode(group, template, node, seed, shadowEntries);
+    }
   }
   const cameraForward = new THREE.Vector3();
   const cameraState = {
@@ -137,7 +307,34 @@ export function buildGatherNodes(seed: number): GatherNodesView {
   };
 }
 
+export function buildGatherNodes(seed: number): GatherNodesView {
+  const templates = new Map<GatherNodeType, THREE.Object3D>();
+  for (const node of GATHER_NODES) {
+    if (!templates.has(node.type)) templates.set(node.type, buildNodeTemplate(node.type));
+  }
+  return buildGatherNodesFromTemplates(seed, templates, GATHER_NODES);
+}
+
+export function gatherNodeIdFromIntersection(
+  hit: THREE.Intersection<THREE.Object3D>,
+): string | null {
+  const instanceIds = hit.object.userData.gatherNodeIds;
+  if (hit.instanceId !== undefined && Array.isArray(instanceIds)) {
+    const id = instanceIds[hit.instanceId];
+    if (typeof id === 'string') return id;
+  }
+  let object: THREE.Object3D | null = hit.object;
+  while (object) {
+    if (typeof object.userData.gatherNodeId === 'string') {
+      return object.userData.gatherNodeId as string;
+    }
+    object = object.parent;
+  }
+  return null;
+}
+
 /** Test-only window into the preload asset set (mirrors props.ts). */
 export const gatherNodePreloadInternalsForTest = {
   nodeAssetUrl: NODE_ASSET_URL,
+  buildFromTemplates: buildGatherNodesFromTemplates,
 };
