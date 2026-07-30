@@ -24,6 +24,12 @@ the exact prompt record.
 Generated filenames are the immutable imagegen-store originals. Accepted destination paths are
 relative to `docs/screenshots/eastbrook-vale-rebuild/`. Rejected bytes remain outside Git.
 
+Machine-local absolute paths inside the fenced blocks (for example under
+`/Users/fernando/Documents/wocc-banker-chest-glb/...`, including historical
+`docs/screenshots/banker-chest/` capture inputs) are provenance of the generation
+session only. They are not required to exist in this clone; do not rewrite them or
+the payload SHA-256 pins break.
+
 ## Output map
 
 | Record | Call ID | UTC timestamp | Payload SHA-256 | Outcome |

@@ -31,8 +31,8 @@ Key data points (measured or replicated during this investigation):
   the frame is main-thread CPU-bound on that machine (a browser CPU/allocation/GPU trace in
   Packet 0 confirms it formally; LOW parity alone is strong evidence, not proof).
 - Fleet reports: some players report MEDIUM outperforming LOW. Verified real; see 4.5.
-- 91-player Ultra capture (docs/screenshots/rig-merge-crowd-after.jpg, produced by
-  scripts/crowd_fps_bench.mjs with vsync disabled): frame p95 32 ms vs renderer p95 16.8 ms,
+- 91-player Ultra capture (produced by scripts/crowd_fps_bench.mjs with vsync disabled;
+  numbers below are from that capture, image not retained in-tree): frame p95 32 ms vs renderer p95 16.8 ms,
   entities 2.9 ms, nameplates 1.0 ms. Roughly 15 ms per frame of non-renderer main-thread
   work (HUD, snapshot apply, GC, style/layout); order-of-magnitude, since percentiles do not
   subtract. Note the same capture's "1 draw / 1 triangle" row is the draw-stats bug (4.6).

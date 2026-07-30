@@ -371,7 +371,8 @@ GAME_URL=http://127.0.0.1:5184 SHOT_PREFIX=after EXPECT_CHEST=1 \
 The helper captures desktop Ultra at 1600 by 900 and mobile Low at 844 by 390. It suppresses
 the GPU notice and unrelated hostile nameplates only in the capture page, reports the
 resolved banker, camera, chest state, and browser errors, and writes matched files under
-`docs/screenshots/banker-chest/`. Stop both dev servers after inspection.
+`docs/screenshots/banker-chest/` (created on demand by the capture script; treat as
+regenerable PR evidence, not permanent tree content). Stop both dev servers after inspection.
 
 Use desktop Ultra and mobile Low as the two ends of the presentation contract. Confirm:
 
