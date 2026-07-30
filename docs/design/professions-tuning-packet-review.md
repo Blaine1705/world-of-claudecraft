@@ -2529,6 +2529,177 @@ Build: Fable xhigh. QA: Fable xhigh, new session.
    (single-exporter registration, per-realm labels), building on the
    phase 10 wiring.
 
+**Phase 15 BUILT** (2026-07-30, Fable xhigh, serial build with fresh-eyes
+reviewers dispatched via the Agent tool). Entry tip de2f9bdd3d;
+release/v0.33.0 unmoved past the synced b0acba0ad, so no re-sync and no
+merge audit were owed. Seventeen commits 8fd7a0604..352d6c804; the final
+gate ran at the committed idle tip 352d6c804: PASS, all 11 steps, exit
+code 0 read explicitly.
+
+Item 1, the R35 minimal pair. GET /admin/api/characters/:id/professions
+(accounts.read) shapes the stored blob, or a fresh live serializeCharacter
+snapshot when the character is online here, through a pure normalizer
+(server/character_professions.ts) that runs the LOADER'S own per-field
+normalizers, so the operator reads what the next login resolves: the
+legacy `professions` dual-key fallback, the clamps, the retired/refused
+slot drops, the confirmMode coercion, the positive() node-timer filter and
+respawnSeconds clamp. Retired node ids stay VISIBLE with null enrichment,
+the one deliberate divergence (the operator should see the row existed). A
+NULL state blob (created but never entered; the admin list shows such
+rows) reads as defaults and is emptyBlob, never pre-migration; a stored
+blob predating the one-shot load migrations is MARKED preMigration and the
+modal warns that skills and recipes will be rewritten at next login. When
+the character is live, the query suppresses the state fetch entirely
+(state undefined, distinguishable from a genuinely NULL blob by contract).
+The two restores (POST .../restore-item and .../restore-slot,
+moderation.act) run validate, require-online (a cheap adminCharacterOnline
+predicate), audit, then mint, on BOTH dispatch arms: the audit row via
+recordProfessionsRestore (reason REQUIRED; the locally-capped folded
+prefix names the CHARACTER, since account_moderation_actions has no
+character column, and says "requested" because a post-audit refusal
+surfaces as a 400), then the sync live mint plus a forced saveCharacter so
+the committed audit row cannot long outlive the grant (the 200 still
+precedes save durability by one queued save; accepted and recorded, as is
+the narrow lease-release-window save fence the deed-unlock forced save
+already shares). Item restore mints through sim.addItem at the dev_give
+1..20 clamp (every non-integer clamps to 1); slot restore is
+restoreToolEffectSlotAction in src/sim/professions/tool_effect_actions.ts,
+a charm-free mint exported for the server admin runtime ALONE (the
+free-grant incident fence: no wire command, no IWorld member, no dev
+command; a source-scan guard walks src/server/headless/bot/scripts/
+electron and pins server/game.ts as the only importer). It shares the real
+mint's validation, tool-rarity charge sizing, post-mint capture hygiene,
+and success event through the extracted applyMintedSlot body (verified a
+byte-equivalent move), refuses no_tool (R30 sizes charges by an owned
+tool: restore the tool first), and refuses to OVERWRITE an intact slot
+(already_slotted, checked before no_tool and order-pinned: an overwrite
+would destroy craftedBy provenance, the R40 confirmMode choice, and an R47
+ratcheted ceiling); craftedBy stays unset, so a restored slot pays the
+generic recharge rate. The SPA: a Professions column on the Characters
+page opens CharacterProfessionsModal (sheet tables, live/saved and
+preMigration badges, GM restore controls behind moderation.act through the
+ModerationActionPrompt reason flow with pre-prompt validation, pure
+professions_restore builders, server-authored profession and effect
+vocabularies). All strings ride the admin catalog; the error reverse map
+is guarded by a SCAN of every inline-rendered fail() literal in
+server/admin.ts, which also surfaced and closed six PRE-EXISTING unmatched
+proses. Before/after screenshots:
+docs/screenshots/r35-admin-professions-inspector/ (before-characters.png,
+after-characters.png, after-professions-modal.png), captured by
+scripts/admin_professions_shot.mjs against a real server with BOTH restore
+endpoints exercised live (200 + 200); the tool refuses non-local servers
+and is registered in the world-auth script pin.
+
+Item 2, the Discord feed. Masterwork procs and feed-worthy deed unlocks
+(title deeds plus the first-koi deed col_glimmerfin) enqueue activity
+cards where the rareloot detector cannot see them (a craft, a catch, and a
+deed fire no loot roll). discordFeedDeed (server/deeds_records.ts) is the
+feed-worthiness gate, fail-CLOSED through isPubliclyListableDeedId: a
+Discord channel is exactly the third-party surface the hidden-deed
+contract covers. fanOutDeedUnlock replaces maybeBroadcastDeedUnlock: ONE
+deed_broadcasts opt-out read serves the guild marquee AND the feed card
+(read-count pinned), retro unlocks never fan out anywhere (query-ABSENCE
+pinned: the retro gate is the veteran-login storm guard), and dedupe is
+per account AND deed. The masterwork arm claims its account-scoped dedupe
+key SYNCHRONOUSLY (claimDedupeKey, the atomic test-and-set
+enqueueActivity itself now uses) BEFORE the opt-out read, so a proc burst
+costs one query and one card per TTL, and a REJECTED read releases the
+key (one db blip loses one card, never the account's whole window;
+pinned). The card rides the same deed_broadcasts opt-out (R58) because
+procs repeat, unlike the once-ever levelup/rareloot arms. Accepted and
+recorded: the masterwork card lands a microtask late in feed order, a db
+blip fail-closes the card (matching the deed arm), and the queue keeps
+its global FIFO 100-cap (kind-blind under a stalled bot). The vale_cup
+empty-embed bug is fixed test-first: the server had enqueued vale_cup
+cards since the Cup shipped while the bot's builder union lacked the
+kind, so every card posted an author-less empty embed Discord rejects.
+The bot now renders the nation (a typed Record<VcNationId, string> label
+map, compile-time exhaustive, raw-id fallback), bracket, and winner-first
+score; an unknown kind returns null, which buildActivityMessages (the
+testable seam bot/main.ts posts through) drops rather than posts. The
+drift class is closed twice more: a tsc-level SERVER_KINDS parity pin
+fails the build in both directions, and the koi deed id is pinned across
+the process boundary. The activity drain batches its discord_links
+lookups into one ANY(int[]) query per poll on both dispatch arms (the
+pre-existing N+1 the new kinds would have fed); the legacy drain arm
+remains covered only by route parity, a recorded pre-existing shape.
+
+Item 3, the metrics double-check. Every professions series is
+realm-agnostic BY DESIGN, so "per-realm labels" executed as verification
+(R57). The one real hazard: woc_rod_fee_copper is a static content gauge
+identical in every realm process, and its published usage recipe
+multiplied summed counters by a SUMMED gauge, overstating copper by the
+realm count; the gauge comment, help text, and DEPLOY.md now carry the
+max()-based form, and DEPLOY.md gains the missing multi-realm scrape
+guidance (per-realm targets, realm as a scrape-config target label). New
+pins: the production single-registry shape (exporter, game-state, and
+business registrars on ONE prom-client Registry, never exercised before:
+a duplicate name across families now fails a test instead of throwing at
+boot), a double-register throw pin with a message matcher, and the
+realm/realm_name/server_name prohibition extended to the business
+family's forbidden list with the empty-value regex escape closed.
+Correction recorded: account_moderation_actions is a deliberate
+forever-kept audit log, not a retention gap.
+
+New rulings, build-decided, veto-able (the R32/R45 pattern):
+- **R57. Realm identity is a SCRAPE-TIME label, never a series label.**
+  The item's "per-realm labels" reads against the shipped design
+  (docs/api-pipeline/state.md, the game_metrics forbidden-label pin, one
+  process per realm): professions series stay realm-agnostic and
+  identically shaped across realm processes; operators attach realm as a
+  Prometheus target label per DEPLOY.md. A realm series label would
+  redden tests/server/http/game_metrics.test.ts by design.
+- **R58. accounts.deed_broadcasts is the professions-feed consent flag.**
+  The guild/friend marquee opt-out now also gates the Discord feed's deed
+  AND masterwork cards: opting out of the in-game audience a fortiori
+  covers the third-party one, and a dedicated toggle would be a new
+  persisted wire surface for a preference the flag already expresses. The
+  settings-row wording is staled by the widening; its reword rides phase
+  17 (scheduled there).
+- **R59. The restores gate on moderation.act, surfaced for the
+  maintainer.** These are the first moderation.act routes that MINT
+  economic value (every sibling is punitive or metadata), so every
+  moderator can mint any item in ITEMS, 20 per audited action, onto any
+  online character. Kept on moderation.act because GM restores are the
+  moderation team's job and the audit trail (operator, character, item,
+  reason, forced save) is the control; the accounts.password precedent
+  (admin-only, so moderators cannot reset passwords) is the named
+  alternative if the maintainer wants minting held tighter.
+
+Review evidence. Six fresh-eyes reviewers (architecture,
+privacy-security, migration-safety, database-performance,
+cross-platform-sync, test-coverage-auditor), a fix-round architecture
+re-review with an extension sweep over the later commits, and the
+qa-checklist adversarial close. The database round BLOCKed on a
+read-amplification bug the first fix round itself introduced (the
+per-proc opt-out read the claim-before-read now prevents); the fix-round
+re-review confirmed the charm mint byte-unweakened, the parity digest
+untouched, and the online-predicate substitution equivalence; the
+qa-checklist's blocking find (the item-id placeholder, the only literal
+placeholder in the entire UI codebase) and its polish items are all
+applied. Roughly fifty findings applied across the rounds; the two
+caught-live regressions beyond them (the adminCharacterOnline
+null-vs-undefined sentinel; the capture tool missing from the world-auth
+pin) were each killed by a new test the same round they appeared.
+Mutation evidence: 51 distinct targeted mutants, 56 runs counting the
+post-fix re-proofs, ALL KILLED in an isolated worktree (git worktree add
+plus cp -c node_modules, removed after), spanning the sim restore's every
+refusal arm plus its draw-free and single-importer guards, the feed
+detector's dedupe, retro, opt-out, key-release, and query-count arms,
+both dispatch arms' audit-before-mint order, the permission rows, the
+sheet's null-state, dual-key, preMigration, and clamp arms, the db
+layer's SQL and reason folding, both tsc-level parity directions, and the
+SPA builders, badges, and wiring; the feed suite is shuffle-stable across
+two randomized orders.
+
+MAINTAINER FLAGS (veto-able, surfaced not re-litigated): R57, R58, R59
+above; the masterwork feed cadence (every proc, account-TTL deduped,
+opt-out gated) as the rareloot-altitude reading of this phase's
+"masterwork" moment; craftedBy provenance shown to operators behind
+accounts.read; and the GM item restore minting PLAIN copies only (no
+client-supplied instance payloads by design, so a signed or masterwork
+original is not exactly reproducible; recorded, not solved).
+
 ---
 
 ## Phase 16: performance at 1,000 concurrent
