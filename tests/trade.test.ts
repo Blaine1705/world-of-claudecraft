@@ -280,6 +280,54 @@ describe('trade module (direct, no Sim)', () => {
     expect(players.get(2).inventory[0].instance).toEqual(instance);
   });
 
+  it('ships a foreign or unsigned copy before the seller: own self-signed goes last', () => {
+    // The copy-choice fix (the phase 12 QA hand-off): removePreferFungible
+    // used to walk highest-index-first signer-blind, so trading "one charm"
+    // could ship the seller's discount-bearing self-signed copy while a
+    // foreign copy sat beside it. Ayla (pid 1) holds her own signed copy
+    // ABOVE a foreign-signed one: the foreign copy must cross.
+    const selfSigned = { signer: 'Ayla' };
+    const foreign = { signer: 'Cedric' };
+    const { ctx, players } = makeInstancedTradeCtx(
+      [
+        { itemId: 'wolf_fang', count: 1, instance: foreign },
+        { itemId: 'wolf_fang', count: 1, instance: selfSigned },
+      ],
+      [],
+    );
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    expect(players.get(1).inventory).toHaveLength(1);
+    expect(players.get(1).inventory[0].instance).toEqual(selfSigned);
+    expect(players.get(2).inventory).toHaveLength(1);
+    expect(players.get(2).inventory[0].instance).toEqual(foreign);
+  });
+
+  it('a self-signed copy still ships when it is all the seller holds', () => {
+    // Deprioritized, never spared: the second pass takes it, so an offer the
+    // clamp accepted can never fail the removal.
+    const selfSigned = { signer: 'Ayla' };
+    const { ctx, players } = makeInstancedTradeCtx(
+      [{ itemId: 'wolf_fang', count: 1, instance: selfSigned }],
+      [],
+    );
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    expect(players.get(1).inventory).toHaveLength(0);
+    expect(players.get(2).inventory).toHaveLength(1);
+    expect(players.get(2).inventory[0].instance).toEqual(selfSigned);
+  });
+
   it('rejects a trade that would push the receiver over bag capacity via an instanced grant', () => {
     // Reproduces the capacity-gate hole the fitsAfterSwap fix closes: the
     // receiver is already at full (16-slot) capacity, one of those slots is a

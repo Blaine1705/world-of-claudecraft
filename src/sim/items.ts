@@ -183,30 +183,45 @@ export function removePreferFungible(
   count: number,
   pid?: number,
   skip?: (instance: ItemInstancePayload) => boolean,
+  // The trade copy-choice fix (the phase 12 QA hand-off): copies this
+  // predicate matches are consumed LAST among the instanced copies (still
+  // honoring `skip` outright). The trade drop arm passes the seller's own
+  // signature, so shipping "one charm" no longer grabs the seller's
+  // discount-bearing self-signed copy while a foreign or unsigned copy sat
+  // beside it. Absent, the walk is byte-identical to before.
+  deprioritize?: (instance: ItemInstancePayload) => boolean,
 ): ItemInstancePayload[] {
   const fungibleAvailable = ctx.countFungibleItem(itemId, pid);
   const fungibleTake = Math.min(fungibleAvailable, count);
   if (fungibleTake > 0) ctx.removeFungibleItem(itemId, fungibleTake, pid);
   const remaining = count - fungibleTake;
   if (remaining <= 0) return [];
-  if (!skip) return ctx.removeItem(itemId, remaining, pid);
+  if (!skip && !deprioritize) return ctx.removeItem(itemId, remaining, pid);
   const r = ctx.resolve(pid);
   if (!r) return [];
   const { meta } = r;
   const consumed: ItemInstancePayload[] = [];
   let left = remaining;
-  for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
-    const s = meta.inventory[i];
-    if (s.itemId !== itemId || !s.instance || skip(s.instance)) continue;
-    const take = Math.min(s.count, left);
-    for (let unit = 0; unit < take; unit++) {
-      const finalUnitOfSlot = take >= s.count && unit === take - 1;
-      consumed.push(finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance));
+  // Two passes over the same highest-index-first order: the preferred class
+  // first, then (only if still short) the deprioritized class. With no
+  // deprioritize predicate the first pass is the whole old walk.
+  const walk = (takeDeprioritized: boolean): void => {
+    for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
+      const s = meta.inventory[i];
+      if (s.itemId !== itemId || !s.instance || skip?.(s.instance)) continue;
+      if ((deprioritize?.(s.instance) ?? false) !== takeDeprioritized) continue;
+      const take = Math.min(s.count, left);
+      for (let unit = 0; unit < take; unit++) {
+        const finalUnitOfSlot = take >= s.count && unit === take - 1;
+        consumed.push(finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance));
+      }
+      s.count -= take;
+      left -= take;
+      if (s.count <= 0) meta.inventory.splice(i, 1);
     }
-    s.count -= take;
-    left -= take;
-    if (s.count <= 0) meta.inventory.splice(i, 1);
-  }
+  };
+  walk(false);
+  if (deprioritize && left > 0) walk(true);
   // Same post-removal hook the inventory hub's removeItem fires. Optional-called
   // so a decoupled test ctx that models inventory but omits the hook (its own
   // removeItem does the same) is not forced to stub it; the live SimContext

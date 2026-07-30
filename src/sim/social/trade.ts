@@ -196,6 +196,17 @@ type PendingGrant = { itemId: string; plainCount: number; instances: ItemInstanc
 
 function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): PendingGrant[] {
   const grants: PendingGrant[] = [];
+  // The copy-choice fix (the phase 12 QA hand-off): when an instanced copy
+  // must ship, the seller's own SELF-SIGNED copies go last, so trading "one
+  // charm" prefers a foreign or unsigned copy over the copy that carries the
+  // seller's original-crafter recharge discount. A name is a stable identity
+  // here (the craft signing rule's own key); a resolve-less pid ships
+  // signer-blind exactly as before.
+  const sellerName = ctx.resolve(fromPid)?.meta.name;
+  const sellerSigned =
+    sellerName !== undefined
+      ? (instance: ItemInstancePayload): boolean => instance.signer === sellerName
+      : undefined;
   for (const s of items) {
     // A trade removal NEVER consumes a trade-locked copy. The offer
     // was already clamped to the unbound count (tradeSetOffer / offerCovered),
@@ -203,7 +214,14 @@ function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): Pendin
     // removePreferFungible's highest-index-first walk spares a bound copy even
     // if one sits above an unbound one. Every OTHER caller passes no predicate
     // and keeps its byte-identical behavior.
-    const instances = removePreferFungible(ctx, s.itemId, s.count, fromPid, isTradeLocked);
+    const instances = removePreferFungible(
+      ctx,
+      s.itemId,
+      s.count,
+      fromPid,
+      isTradeLocked,
+      sellerSigned,
+    );
     grants.push({ itemId: s.itemId, plainCount: s.count - instances.length, instances });
   }
   return grants;
