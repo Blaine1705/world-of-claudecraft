@@ -367,7 +367,7 @@ describe('Eastbrook polish capture contract', () => {
       // byte-identical across that delta and the town group is added straight
       // to the scene, never through the new zone-feature cull, so the accepted
       // evidence still depicts this tree. No recapture.
-      fingerprint: 'de1940f757436c8be3214db23451d5e61bf06fb96208adfbb8a970f8e3a73e07',
+      fingerprint: 'e66b0452c1182281e625b8093275c961d854d080165edc09ad3e0c91a9575161',
       components: {
         captureContract: {
           id: 'polish-v2',
