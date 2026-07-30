@@ -139,6 +139,7 @@ import { ArenaWindow } from './arena_window';
 import { auraDisplayNameFromSource } from './aura_display_name';
 import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
+import { AuraOverlayController } from './aura_overlay_controller';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
@@ -1596,6 +1597,13 @@ export class Hud {
     private keybinds: Keybinds,
     private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
+    this.auraOverlayController = new AuraOverlayController({
+      writers: this.writerFacet,
+      playerClass: this.sim.cfg.playerClass,
+      playerName: this.sim.player.name,
+      known: () => this.sim.known,
+      iconUrl: (abilityId) => iconDataUrl('ability', abilityId),
+    });
     this.localIgnoredNames = this.loadLocalIgnoredNames();
     this.meters = new Meters(sim, {
       attachTooltip: (element, html) => this.attachTooltip(element, html),
@@ -3536,6 +3544,10 @@ export class Hud {
     this.writerFacet,
     this.procOverlayEl,
   );
+  // Player-configurable Warrior proc overlays. The controller builds the native
+  // spell icon plus two side crescents once; its painter only toggles active
+  // state on the hot path. Options > Auras owns preview and placement mode.
+  private readonly auraOverlayController: AuraOverlayController;
   // One-shot login preview gate for the phoenix (see update()).
   private procOverlayPreviewed = false;
   // The per-frame FCT painter: the pooled-div ring that replaced the per-event
@@ -4263,6 +4275,21 @@ export class Hud {
     root: () => $('#options-menu'),
     world: () => this.sim,
     options: () => this.optionsHooks,
+    auraOverlays: () => ({
+      playerClass: () => this.sim.cfg.playerClass,
+      defs: () => this.auraOverlayController.defs(),
+      get: (id) => this.auraOverlayController.get(id),
+      patch: (id, patch) => this.auraOverlayController.patch(id, patch),
+      reset: (id) => this.auraOverlayController.reset(id),
+      nudge: (id, part, deltaX, deltaY) =>
+        this.auraOverlayController.nudge(id, part, deltaX, deltaY),
+      setAll: (enabled) => this.auraOverlayController.setAll(enabled),
+      beginPlacement: (id, part) => this.auraOverlayController.beginPlacement(id, part),
+      endPlacement: () => this.auraOverlayController.endPlacement(),
+      setPlacement: (on) => this.auraOverlayController.setPlacement(on),
+      onPositionChange: (listener) => this.auraOverlayController.onPositionChange(listener),
+      onPlacementChange: (listener) => this.auraOverlayController.onPlacementChange(listener),
+    }),
     bugReport: () => this.bugReportHooks,
     keybinds: () => this.keybinds,
     slotActionName: (slot) => {
@@ -4277,6 +4304,7 @@ export class Hud {
     setDropdownValue: (root, value) => this.setDropdownValue(root, value),
     focusFirstInteractive: (root, preferredSelector) =>
       this.focusManager.focusFirst(root, preferredSelector),
+    openFocusTrap: (root, returnFocusTo) => this.focusManager.open({ root, returnFocusTo }),
     closeOthers: () => this.closeOtherWindows('#options-menu'),
     hideTooltip: () => this.hideTooltip(),
     ...this.windowFocus('#options-menu'),
@@ -7821,6 +7849,7 @@ export class Hud {
     } else {
       this.procOverlayPainter.paint(procOverlayState(p.auras), combustionOverlayActive(p.auras));
     }
+    this.auraOverlayController.paint(p.auras);
 
     // action bar: the slot row, driven by the pure action_bar_view core + the thin
     // ActionBarPainter. Every per-slot icon / cooldown / dimming / count write

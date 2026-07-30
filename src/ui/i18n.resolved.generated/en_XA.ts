@@ -1280,6 +1280,37 @@ export const en_XA: EnTranslations = {
         "offline": "[Óƒƒļíñé]"
       }
     },
+    "auraOverlay": {
+      "title": "[Áúŕáš]",
+      "currentClass": "[Çúŕŕéñţ çļášš: {class}]",
+      "previewHint": "[Úšé Ŕéþóšíţíóñ ţó ɱóʋé áñ áúŕá ŵíţĥóúţ çóʋéŕíñĝ ţĥé ɱéñú.]",
+      "noProcs": "[Ñó šúþþóŕţéð þŕóç íš áʋáíļáƀļé ƒóŕ ţĥíš çĥáŕáçţéŕ.]",
+      "enabled": "[Šĥóŵ Áúŕá]",
+      "icon": "[Šþéļļ Íçóñ]",
+      "arcs": "[Šíðé Çŕéšçéñţš]",
+      "size": "[Šížé]",
+      "opacity": "[Óþáçíţý]",
+      "color": "[Çóļóŕ]",
+      "allOn": "[Áļļ Óñ]",
+      "allOff": "[Áļļ Óƒƒ]",
+      "reposition": "[Ŕéþóšíţíóñ]",
+      "positioning": "[Þóšíţíóñíñĝ: {aura}]",
+      "selectAura": "[Áúŕá]",
+      "done": "[Ðóñé]",
+      "moveLeft": "[Ɱóʋé Ļéƒţ]",
+      "moveUp": "[Ɱóʋé Úþ]",
+      "moveDown": "[Ɱóʋé Ðóŵñ]",
+      "moveRight": "[Ɱóʋé Ŕíĝĥţ]",
+      "reset": "[Ŕéšéţ Þóšíţíóñ]",
+      "procs": {
+        "revenge": "[Ŕéʋéñĝé!]",
+        "battleTrance": "[Ɓáţţļé Ţŕáñçé]",
+        "overpowerCharge": "[Ŕéðĥáñð Éɱþóŵéŕɱéñţ]",
+        "suddenDeath": "[Šúððéñ Ðéáţĥ]",
+        "victoryRush": "[Ʋíçţóŕý Ŕúšĥ]",
+        "enrage": "[Ɱáýĥéɱ: Éñŕáĝéð]"
+      }
+    },
     "playerCard": {
       "showWalletBadge": "[Šĥóŵ ŵáļļéţ ƀáðĝé]"
     },

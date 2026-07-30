@@ -548,6 +548,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the Heating Up / Hot Streak arm, the default for every other spec',
   },
   {
+    call: 'this.auraOverlayController.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the configured Warrior proc frames; writer-facet toggles elide unchanged states',
+  },
+  {
     call: 'this.renderPetBar',
     band: 'frame',
     gate: '',

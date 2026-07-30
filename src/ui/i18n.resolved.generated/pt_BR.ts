@@ -1280,6 +1280,37 @@ export const pt_BR: EnTranslations = {
         "offline": "Offline"
       }
     },
+    "auraOverlay": {
+      "title": "Auras",
+      "currentClass": "Current class: {class}",
+      "previewHint": "Use Reposition to move an aura without covering the menu.",
+      "noProcs": "No supported proc is available for this character.",
+      "enabled": "Show Aura",
+      "icon": "Spell Icon",
+      "arcs": "Side Crescents",
+      "size": "Size",
+      "opacity": "Opacity",
+      "color": "Color",
+      "allOn": "All On",
+      "allOff": "All Off",
+      "reposition": "Reposition",
+      "positioning": "Positioning: {aura}",
+      "selectAura": "Aura",
+      "done": "Done",
+      "moveLeft": "Move Left",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "moveRight": "Move Right",
+      "reset": "Reset Position",
+      "procs": {
+        "revenge": "Revenge!",
+        "battleTrance": "Battle Trance",
+        "overpowerCharge": "Redhand Empowerment",
+        "suddenDeath": "Sudden Death",
+        "victoryRush": "Victory Rush",
+        "enrage": "Mayhem: Enraged"
+      }
+    },
     "playerCard": {
       "showWalletBadge": "Mostrar selo da carteira"
     },
