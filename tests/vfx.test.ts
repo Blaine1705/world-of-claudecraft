@@ -23,7 +23,9 @@ interface VfxProbe {
   alphaAttr: Float32Array;
   spriteAttr: Float32Array;
   rotAttr: Float32Array;
+  activeSlots: Int32Array;
   activeCount: number;
+  head: number;
   drawBuffer: THREE.InterleavedBuffer;
   spriteRadiusSq: Float32Array;
   onContextRestored(): void;
@@ -101,11 +103,21 @@ describe('pooled VFX cloud', () => {
     probe.spawn(1, 0, -10, 0, 0, 0, 0xffffff, 1, 1, 0, 0, 0);
     probe.spawn(100, 0, -10, 0, 0, 0, 0xffffff, 1, 1, 0, 0, 0);
     vfx.update(0.1);
+    expect([...probe.activeSlots.subarray(0, probe.activeCount)]).toEqual([0, 2, 3]);
+    let lifeReads = 0;
+    probe.life = new Proxy(probe.life, {
+      get(target, property) {
+        if (typeof property === 'string' && /^\d+$/.test(property)) lifeReads++;
+        const value = Reflect.get(target, property, target);
+        return typeof value === 'function' ? value.bind(target) : value;
+      },
+    });
 
     const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
     camera.lookAt(0, 0, -10);
     camera.updateMatrixWorld();
     vfx.prepareDraw(camera);
+    expect(lifeReads).toBe(probe.activeCount);
     expect(geometry.drawRange.count).toBe(2);
     expect([position.getX(0), position.getX(1)]).toEqual([-1, 1]);
     expect(position.data.updateRanges).toEqual([{ start: 0, count: 22 }]);
@@ -241,6 +253,19 @@ describe('pooled VFX cloud', () => {
     expect(capacityPosition.getX(0)).toBe(4_096);
     expect(capacityPosition.getX(1)).toBe(1);
     expect(capacityPosition.getX(4_095)).toBe(4_095);
+
+    capacityProbe.life[0] = 0.05;
+    capacityVfx.update(0.1);
+    expect(capacityProbe.activeCount).toBe(4_095);
+    expect(capacityProbe.activeSlots[0]).toBe(1);
+
+    capacityProbe.head = 0;
+    capacityProbe.spawn(8_192, 0, -10, 0, 0, 0, 0xffffff, 1, 1, 0, 0, 0);
+    expect(capacityProbe.activeCount).toBe(4_096);
+    expect([...capacityProbe.activeSlots.subarray(0, 3)]).toEqual([0, 1, 2]);
+    capacityVfx.prepareDraw(camera);
+    expect(capacityPosition.getX(0)).toBe(8_192);
+    expect(capacityPosition.getX(1)).toBe(1);
   });
 
   it('keeps settled idle frames upload-free and rearms prewarm after context restore', () => {

@@ -485,12 +485,15 @@ export function buildJailScene(seed: number): JailSceneView {
     updateVisibility(camera: THREE.PerspectiveCamera, sun: THREE.DirectionalLight): void {
       const halfHeight = camera.far * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
       const colorRange = Math.hypot(camera.far, halfHeight, halfHeight * camera.aspect);
-      const shadowCamera = sun.shadow.camera;
-      const shadowRange = Math.hypot(
-        shadowCamera.far,
-        Math.max(Math.abs(shadowCamera.left), Math.abs(shadowCamera.right)),
-        Math.max(Math.abs(shadowCamera.top), Math.abs(shadowCamera.bottom)),
-      );
+      let shadowRange = 0;
+      if (sun.castShadow) {
+        const shadowCamera = sun.shadow.camera;
+        shadowRange = Math.hypot(
+          shadowCamera.far,
+          Math.max(Math.abs(shadowCamera.left), Math.abs(shadowCamera.right)),
+          Math.max(Math.abs(shadowCamera.top), Math.abs(shadowCamera.bottom)),
+        );
+      }
       group.visible = residentSceneMayReachRenderVolumes(
         bounds,
         camera.position,

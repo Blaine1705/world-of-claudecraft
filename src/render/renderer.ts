@@ -239,6 +239,7 @@ import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import {
   applyPointLightBudget,
+  flickerContributingFireLights,
   pointLightPadCount,
   type RankedPointLight,
   reconcileViewPointLights,
@@ -1424,6 +1425,7 @@ export class Renderer {
   // and the IBL intensity. Defaults to full day for the frames before the first
   // updateAmbience runs.
   private dnGrade: DayNightGrade = fullDayGrade();
+  private fixedLowDayBiome: BiomeId | null = null;
   private dnColorScratch = new THREE.Color();
   private dnMoonScratch = new THREE.Color();
   private flames: THREE.Mesh[];
@@ -3688,27 +3690,23 @@ export class Renderer {
       const pp = pv.group.position;
       this.updateKeyLight(pp);
     }
-    this.shadowLightDirection.subVectors(this.sun.position, this.sun.target.position).normalize();
     this.jailScene.updateVisibility(this.camera, this.sun);
-    this.gatherNodes.updateShadowVisibility(
-      this.camera,
-      this.shadowLightDirection,
-      this.sun.castShadow,
-    );
-    this.valeCupStadium.updateShadowVisibility(
-      this.camera,
-      this.shadowLightDirection,
-      this.sun.castShadow,
-    );
+    if (this.sun.castShadow) {
+      this.shadowLightDirection.subVectors(this.sun.position, this.sun.target.position).normalize();
+      this.gatherNodes.updateShadowVisibility(this.camera, this.shadowLightDirection, true);
+      this.valeCupStadium.updateShadowVisibility(this.camera, this.shadowLightDirection, true);
+    }
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     // The dome rides the camera, so it also serves Wildheart's open-air field.
     this.sky.visible = this.fogState === 'outdoor' || this.fogState === 'wildheartField';
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
-      this.skyView.setDayNight(this.dnGrade.sky);
-      this.skyView.setFog((this.scene.fog as THREE.Fog).color);
-      this.skyView.setStars(this.starAmt, this.time);
-      this.updateEnvBiome(dt);
+      if (!this.lowGfx) {
+        this.skyView.setDayNight(this.dnGrade.sky);
+        this.skyView.setFog((this.scene.fog as THREE.Fog).color);
+        this.skyView.setStars(this.starAmt, this.time);
+        this.updateEnvBiome(dt);
+      }
     }
     this.updateCelestialSprites();
     this.updateGodRays();
@@ -6441,48 +6439,44 @@ export class Renderer {
     } else {
       this.valeCupSky.mesh.visible = false;
     }
-    // recompute the world day/night grade from the shared UTC-anchored clock.
-    // This is render-only, so the Date.now() read never touches sim parity; the
-    // grade is per-realm, the player's biome deciding how far the global cycle
-    // pulls its authored look (signature realms swing less, see day_night_core).
     const biome = zoneBiomeAt(this.sim.player.pos.x, pz);
-    const phase = currentDayNightPhase();
-    const gday = globalDayness(phase);
-    // DAY ONLY: the released world renders under its authored daylight rig, not the
-    // cycle's (deliberately dimmed and cooled) day. A dev `/daynight <phase>`
-    // override still drives the real grade, so the cycle stays testable in place.
-    this.dnGrade =
-      DAY_ONLY && dayNightPhaseOverride() === null
-        ? NEUTRAL_DAY_GRADE
-        : dayNightGrade(effectiveDayness(gday, biome));
-    // the sun and moon track the world clock; each disc/key-light strength is
-    // scaled by the realm's day/night amplitude so signature-sky realms (the
-    // Nightbloom, the Veiled Hollow, ...) keep their look instead of gaining a
-    // hard noon sun. The moon keeps a higher floor since it suits most realms.
-    const amp = REALM_DAYNIGHT_AMPLITUDE[biome];
-    if (DAY_ONLY && dayNightPhaseOverride() === null) {
-      // DAY ONLY pins the GRADE above, but the sun DIRECTION used to keep
-      // riding the real 12-hour clock: at world-night the key light eased to
-      // the moon's azimuth at full daylight strength with both the golden and
-      // moonlight color ramps gated to zero — flat white light from an
-      // arbitrary angle, different depending on when the player logs in. Pin
-      // the whole celestial rig to the golden anchor instead, so the authored
-      // late-afternoon key (long shadows, standing warm) is a constant and
-      // the water glints / sky-dome sun stay aligned by construction.
-      this.sunDir.copy(SUN_DIR);
-      this.moonDir.set(0, -1, 0);
-      this.sunUp = aboveHorizon(SUN_DIR.y) * amp;
-      this.moonUp = 0;
-      this.starAmt = 0; // signature night skies (Nightbloom) live in their HDRIs
+    const phaseOverride = dayNightPhaseOverride();
+    if (this.lowGfx && DAY_ONLY && phaseOverride === null) {
+      if (this.fixedLowDayBiome !== biome) {
+        this.dnGrade = NEUTRAL_DAY_GRADE;
+        this.sunDir.copy(SUN_DIR);
+        this.moonDir.set(0, -1, 0);
+        this.sunUp = aboveHorizon(SUN_DIR.y) * REALM_DAYNIGHT_AMPLITUDE[biome];
+        this.moonUp = 0;
+        this.starAmt = 0;
+        this.fixedLowDayBiome = biome;
+      }
     } else {
-      const sd = sunDirection(phase);
-      const md = moonDirection(phase);
-      this.sunDir.set(sd[0], sd[1], sd[2]);
-      this.moonDir.set(md[0], md[1], md[2]);
-      this.sunUp = aboveHorizon(sd[1]) * amp;
-      this.moonUp = aboveHorizon(md[1]) * Math.max(amp, 0.6);
-      // stars follow the global cycle (not per-realm), fading in past dusk
-      this.starAmt = nightStarAmount(gday);
+      this.fixedLowDayBiome = null;
+      // This is render-only, so the clock read never touches sim parity. The
+      // dev override still drives the real grade even while DAY_ONLY ships.
+      const phase = currentDayNightPhase();
+      const gday = globalDayness(phase);
+      this.dnGrade =
+        DAY_ONLY && phaseOverride === null
+          ? NEUTRAL_DAY_GRADE
+          : dayNightGrade(effectiveDayness(gday, biome));
+      const amp = REALM_DAYNIGHT_AMPLITUDE[biome];
+      if (DAY_ONLY && phaseOverride === null) {
+        this.sunDir.copy(SUN_DIR);
+        this.moonDir.set(0, -1, 0);
+        this.sunUp = aboveHorizon(SUN_DIR.y) * amp;
+        this.moonUp = 0;
+        this.starAmt = 0;
+      } else {
+        const sd = sunDirection(phase);
+        const md = moonDirection(phase);
+        this.sunDir.set(sd[0], sd[1], sd[2]);
+        this.moonDir.set(md[0], md[1], md[2]);
+        this.sunUp = aboveHorizon(sd[1]) * amp;
+        this.moonUp = aboveHorizon(md[1]) * Math.max(amp, 0.6);
+        this.starAmt = nightStarAmount(gday);
+      }
     }
     if (isDelvePos(px) && !inPractice) {
       this.ensureDelveInteriorsNear(px, pz);
@@ -6877,6 +6871,7 @@ export class Renderer {
   // Aim the key light (sun by day, moon by night) at the player. On the low tier
   // day/night is off, so it keeps the fixed anchor for a stable, cheap look.
   private updateKeyLight(pp: THREE.Vector3): void {
+    if (this.lowGfx && !this.sun.castShadow) return;
     if (this.lowGfx) {
       this.sun.position.set(pp.x + SUN_ANCHOR.x, pp.y + SUN_ANCHOR.y, pp.z + SUN_ANCHOR.z);
     } else {
@@ -7163,6 +7158,7 @@ export class Renderer {
       this.lastBudgetPressure,
     );
     const shadowRangeSq = lodBands.shadowRangeSq;
+    const shadowsEnabled = this.sun.castShadow;
     let visibleRigCount = 0;
 
     for (const [id, v] of this.views) {
@@ -7259,8 +7255,10 @@ export class Renderer {
       if (isSelf) {
         v.group.visible = true;
         v.isFar = false;
-        v.visual?.setShadow(true);
-        v.visual?.setProxyShadow(false);
+        if (shadowsEnabled) {
+          v.visual?.setShadow(true);
+          v.visual?.setProxyShadow(false);
+        }
       }
       if (!isSelf) {
         // Per-frame visibility uses the same create/destroy hysteresis as view
@@ -7280,18 +7278,19 @@ export class Renderer {
           v.group.visible = false;
           continue;
         }
-        // mid-distance rigs keep rendering but leave the shadow pass
-        const wantShadow = d2 < shadowRangeSq;
-        const inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
         if (v.visual) {
           visibleRigCount++; // crowd-density signal for next frame's adaptive LOD
-          v.visual.setShadow(wantShadow);
-          v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose);
+        }
+        if (shadowsEnabled) {
+          // mid-distance rigs keep rendering but leave the shadow pass
+          const wantShadow = d2 < shadowRangeSq;
+          const inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
+          v.visual?.setShadow(wantShadow);
           // past the articulated gate the static-pose proxy carries the
           // shadow; an active form's own rig keeps casting instead. A mounted
           // rider also skips the proxy: its baked ground-level idle silhouette
           // would render under the raised body.
-          v.visual.setProxyShadow(
+          v.visual?.setProxyShadow(
             !wantShadow &&
               inProxyBand &&
               !polyed &&
@@ -7309,11 +7308,12 @@ export class Renderer {
           v.catVisual?.setShadow(wantFormShadow);
           v.travelVisual?.setShadow(wantFormShadow);
           v.mountVisual?.setShadow(wantFormShadow);
+          if (wantShadow !== v.shadowOn) {
+            v.shadowOn = wantShadow;
+            for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
+          }
         }
-        if (wantShadow !== v.shadowOn) {
-          v.shadowOn = wantShadow;
-          for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
-        }
+        if (v.visual) v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose);
       }
       // online, entities beyond nameplate range stream below snapshot rate;
       // each interpolates on its own clock so they move smoothly instead of
@@ -8307,12 +8307,7 @@ export class Renderer {
         this.vfx.campfireEmber(this.tmpV, dt);
       }
     }
-    for (let i = 0; i < this.fireLights.length; i++) {
-      const light = this.fireLights[i];
-      const base = (light.userData.baseIntensity as number | undefined) ?? 11;
-      light.intensity = base + Math.sin(this.time * 11 + i * 1.7) * 2.5 * (base / 11);
-    }
-    this.budgetFireLights(p.pos.x, p.pos.z);
+    this.budgetFireLights(p.pos.x, p.pos.z, true);
     worldStart = markWorldPhase('lights', worldStart);
 
     // water shimmer (low-tier texture scroll; shader water rides uTime)
@@ -8471,10 +8466,12 @@ export class Renderer {
     this.sky.visible = this.fogState === 'outdoor' || this.fogState === 'wildheartField';
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
-      this.skyView.setDayNight(this.dnGrade.sky);
-      this.skyView.setFog((this.scene.fog as THREE.Fog).color);
-      this.skyView.setStars(this.starAmt, this.time);
-      this.updateEnvBiome(dt);
+      if (!this.lowGfx) {
+        this.skyView.setDayNight(this.dnGrade.sky);
+        this.skyView.setFog((this.scene.fog as THREE.Fog).color);
+        this.skyView.setStars(this.starAmt, this.time);
+        this.updateEnvBiome(dt);
+      }
     }
     // precipitation only falls outdoors; indoors/underwater pass null to clear
     this.weather.update(
@@ -8520,18 +8517,12 @@ export class Renderer {
       this.camera.position.y += shakeY;
       this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
     }
-    this.shadowLightDirection.subVectors(this.sun.position, this.sun.target.position).normalize();
     this.jailScene.updateVisibility(this.camera, this.sun);
-    this.gatherNodes.updateShadowVisibility(
-      this.camera,
-      this.shadowLightDirection,
-      this.sun.castShadow,
-    );
-    this.valeCupStadium.updateShadowVisibility(
-      this.camera,
-      this.shadowLightDirection,
-      this.sun.castShadow,
-    );
+    if (this.sun.castShadow) {
+      this.shadowLightDirection.subVectors(this.sun.position, this.sun.target.position).normalize();
+      this.gatherNodes.updateShadowVisibility(this.camera, this.shadowLightDirection, true);
+      this.valeCupStadium.updateShadowVisibility(this.camera, this.shadowLightDirection, true);
+    }
     this.updateOpaqueDrawOrder(dt);
     this.camera.updateMatrixWorld();
     this.vfx.prepareDraw(this.camera);
@@ -8657,7 +8648,7 @@ export class Renderer {
   // Rank entries are pooled (extended only when interiors or view lights change).
   // Static world positions stay cached; moving weapon VFX refresh into their
   // existing vectors, so this hot loop allocates nothing.
-  private budgetFireLights(px: number, pz: number): void {
+  private budgetFireLights(px: number, pz: number, flicker = false): void {
     const ranked = this.lightRank;
     // Rank the union of static fire lights AND entity-view lights (e.g. quest-object
     // glows). Both must share one budget: if a view light were counted separately,
@@ -8669,13 +8660,15 @@ export class Renderer {
     const want = this.fireLights.length + this.viewLights.length;
     if (this.lightRankDirty || ranked.length !== want) {
       ranked.length = 0;
-      for (const light of this.fireLights) {
+      for (let fireIndex = 0; fireIndex < this.fireLights.length; fireIndex++) {
+        const light = this.fireLights[fireIndex];
         ranked.push({
           light,
           d2: 0,
           worldPos: light.getWorldPosition(new THREE.Vector3()),
           base: null,
           dynamic: false,
+          fireIndex,
         });
       }
       for (const light of this.viewLights) {
@@ -8704,6 +8697,15 @@ export class Renderer {
     const visibleCount = GFX.maxPointLights;
     const liveBudget = this.effectivePointLights || GFX.maxPointLights;
     applyPointLightBudget(ranked, px, pz, visibleCount, liveBudget, LIGHT_BUDGET_RANGE_SQ);
+    if (flicker) {
+      flickerContributingFireLights(
+        ranked,
+        this.time,
+        visibleCount,
+        liveBudget,
+        LIGHT_BUDGET_RANGE_SQ,
+      );
+    }
     // Fill unused slots of the visible count with pad lights so the total
     // visible point-light count stays pinned at visibleCount even when fewer
     // real lights than the budget exist (boot, sparse custom maps, interiors).
