@@ -2,7 +2,7 @@
 // secret-gated /internal/discord/* endpoints, and how the per-call abort
 // deadline is armed and cleared. Everything runs through the injected fetch and
 // timer seams, so there is no network IO and no real 8 second wait; the last
-// case constructs the client the way bot/main.ts does (two arguments) to prove
+// block constructs the client the way bot/main.ts does (two arguments) to prove
 // the production defaults are still the real globals.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -66,6 +66,14 @@ function fakeTimers(): {
   return { armed, cleared, seam };
 }
 
+/** A client whose every call succeeds with `data`, plus the recorded calls. */
+function clientReturning(data: unknown): { calls: FetchCall[]; client: ServerClient } {
+  const { calls, impl } = recordingFetch(() =>
+    fakeResponse({ body: { success: true, data, error: null } }),
+  );
+  return { calls, client: new ServerClient('http://host', 'sekrit', impl, fakeTimers().seam) };
+}
+
 const ROLES_ENVELOPE = {
   success: true,
   data: { linked: true, statusTier: 3, points: 12, lifetimePoints: 40 },
@@ -99,7 +107,11 @@ describe('ServerClient request envelope', () => {
     expect(roles).toEqual({ linked: true, statusTier: 3, points: 12, lifetimePoints: 40 });
   });
 
-  it('leaves the body key present but undefined when no body is passed', async () => {
+  it('sends no body on a GET', async () => {
+    // Note this does NOT pin the `body === undefined ? undefined :` ternary in
+    // call(): JSON.stringify(undefined) is itself undefined, so the guard is
+    // defensive rather than load-bearing and no assertion can distinguish it.
+    // What this DOES pin is that a GET reaches fetch with no body at all.
     const timers = fakeTimers();
     const { calls, impl } = recordingFetch(() =>
       fakeResponse({ body: { success: true, data: { items: [] }, error: null } }),
@@ -134,6 +146,110 @@ describe('ServerClient request envelope', () => {
       '{"discord_user_id":"u1","reason":"daily","points":5,"dedupeKey":"k1"}',
     );
   });
+});
+
+describe('ServerClient per-endpoint routes', () => {
+  // Each row is the ONE wire contract only that method can get wrong. A typo in
+  // any path 404s, call() returns null, and the drain methods answer with an
+  // empty array, so the feed stops with no error surface at all.
+  const ROWS: {
+    name: string;
+    drive: (c: ServerClient) => Promise<unknown>;
+    method: string;
+    path: string;
+    body: string | undefined;
+    data: unknown;
+  }[] = [
+    {
+      name: 'flex',
+      drive: (c) => c.flex('u 1'),
+      method: 'GET',
+      path: '/internal/discord/flex?discord_user_id=u%201',
+      body: undefined,
+      data: { linked: true },
+    },
+    {
+      name: 'roles',
+      drive: (c) => c.roles('u 1'),
+      method: 'GET',
+      path: '/internal/discord/roles?discord_user_id=u%201',
+      body: undefined,
+      data: {},
+    },
+    {
+      name: 'pushPresence',
+      drive: (c) =>
+        c.pushPresence({ onlineCount: 3, memberTotal: 9, voiceChannelName: null, voice: [] }),
+      method: 'POST',
+      path: '/internal/discord/presence',
+      body: '{"onlineCount":3,"memberTotal":9,"voiceChannelName":null,"voice":[]}',
+      data: {},
+    },
+    {
+      name: 'setMember',
+      drive: (c) => c.setMember('u1', true),
+      method: 'POST',
+      path: '/internal/discord/member',
+      body: '{"discord_user_id":"u1","guildMember":true}',
+      data: {},
+    },
+    {
+      name: 'drainRelay',
+      drive: (c) => c.drainRelay(),
+      method: 'GET',
+      path: '/internal/discord/relay',
+      body: undefined,
+      data: { items: [] },
+    },
+    {
+      name: 'drainActivity',
+      drive: (c) => c.drainActivity(),
+      method: 'GET',
+      path: '/internal/discord/activity',
+      body: undefined,
+      data: { items: [] },
+    },
+    {
+      name: 'dailyRewardWinners',
+      drive: (c) => c.dailyRewardWinners(),
+      method: 'GET',
+      // limit=2 decides how many days of winners can still be announced after a
+      // missed run; shrinking it silently drops a day.
+      path: '/internal/discord/daily-rewards-winners?limit=2',
+      body: undefined,
+      data: { days: [] },
+    },
+    {
+      name: 'pushMembersMeta',
+      drive: (c) =>
+        c.pushMembersMeta([{ discord_user_id: 'u1', name: 'A', joinedAtMs: 1, role: null }]),
+      method: 'POST',
+      path: '/internal/discord/members-meta',
+      body: '{"members":[{"discord_user_id":"u1","name":"A","joinedAtMs":1,"role":null}]}',
+      data: { updated: 1 },
+    },
+    {
+      name: 'flairedIds',
+      drive: (c) => c.flairedIds(),
+      method: 'GET',
+      path: '/internal/discord/flaired-ids',
+      body: undefined,
+      data: { ids: [] },
+    },
+  ];
+
+  for (const row of ROWS) {
+    it(`${row.name} sends ${row.method} ${row.path}`, async () => {
+      const { calls, client } = clientReturning(row.data);
+
+      await row.drive(client);
+
+      expect(calls.length).toBe(1);
+      expect(calls[0].init.method).toBe(row.method);
+      expect(calls[0].url).toBe(`http://host${row.path}`);
+      expect(calls[0].init.body).toBe(row.body);
+    });
+  }
 });
 
 describe('ServerClient envelope handling', () => {
@@ -175,6 +291,88 @@ describe('ServerClient envelope handling', () => {
 
     expect(await client.roles('u1')).toBe(null);
     expect(timers.cleared).toEqual([1]); // the finally runs on the throwing path too
+  });
+});
+
+describe('ServerClient flairedIds null-versus-empty contract', () => {
+  it('returns the ids, keeping only the strings', async () => {
+    // The reconcile treats every id it gets back as "still flaired"; a stray
+    // number would stringify into an id that matches nobody and silently drop
+    // that member's flair.
+    const { client } = clientReturning({ ids: ['a', 1, null, 'b', { id: 'c' }] });
+    expect(await client.flairedIds()).toEqual(['a', 'b']);
+  });
+
+  it('returns an EMPTY ARRAY for a real "nothing flagged" answer', async () => {
+    const { client } = clientReturning({ ids: [] });
+    expect(await client.flairedIds()).toEqual([]);
+  });
+
+  it('returns NULL when the server is unreachable or the payload is malformed', async () => {
+    // Null means "change nothing" per the method's own doc comment. Collapsing
+    // it to an empty array would tell the departed-member reconcile that every
+    // linked member lost their flair, and strip the lot.
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const timers = fakeTimers();
+
+    const unreachable = new ServerClient(
+      'http://host',
+      'sekrit',
+      recordingFetch(() => fakeResponse({ status: 503 })).impl,
+      timers.seam,
+    );
+    expect(await unreachable.flairedIds()).toBe(null);
+
+    for (const ids of [undefined, null, 'a,b', { 0: 'a' }, 7]) {
+      const { client } = clientReturning({ ids });
+      expect(await client.flairedIds()).toBe(null);
+    }
+  });
+});
+
+describe('ServerClient pushMembersMeta silent-drop warning', () => {
+  it('warns when a NON-EMPTY push processed zero rows', async () => {
+    // The server coerces an over-cap body to an empty member list and still
+    // answers 200 { updated: 0 }, so this is the one silent-drop signature.
+    const errors: unknown[][] = [];
+    vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      errors.push(args);
+    });
+    const { client } = clientReturning({ updated: 0 });
+
+    await client.pushMembersMeta([
+      { discord_user_id: 'u1', name: 'A', joinedAtMs: null, role: null },
+      { discord_user_id: 'u2', name: 'B', joinedAtMs: null, role: null },
+    ]);
+
+    expect(errors).toEqual([['[bot] members-meta push of 2 processed 0 rows']]);
+  });
+
+  it('stays quiet when rows were processed, when the push was empty, and on failure', async () => {
+    const errors: unknown[][] = [];
+    vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      errors.push(args);
+    });
+    const member = { discord_user_id: 'u1', name: 'A', joinedAtMs: null, role: null };
+
+    // Rows processed: nothing to report.
+    await clientReturning({ updated: 1 }).client.pushMembersMeta([member]);
+    // An empty push legitimately updates nothing, so the guard is on the
+    // REQUEST being non-empty, not on the response alone.
+    await clientReturning({ updated: 0 }).client.pushMembersMeta([]);
+
+    expect(errors).toEqual([]);
+
+    // A failed call returns null, which must not be read as a zero-row success.
+    const timers = fakeTimers();
+    const failed = new ServerClient(
+      'http://host',
+      'sekrit',
+      recordingFetch(() => fakeResponse({ status: 500 })).impl,
+      timers.seam,
+    );
+    await failed.pushMembersMeta([member]);
+    expect(errors).toEqual([['[bot] server POST /internal/discord/members-meta -> 500']]);
   });
 });
 
@@ -227,10 +425,20 @@ describe('ServerClient call deadline', () => {
 });
 
 describe('ServerClient production defaults', () => {
-  it('uses the real global fetch and the real 8000 ms deadline when constructed with two arguments', async () => {
+  it('reads the global fetch and timers at CALL time, and clears the handle it armed', async () => {
+    // Exactly the construction in bot/main.ts: no fetch, no timer seam. It
+    // happens BEFORE the stubs deliberately, because a capture-form default
+    // (`= fetch`, `= { setTimeout, clearTimeout }`) would bind the pre-stub
+    // globals and never see the swap. That is the regression bot/CLAUDE.md's
+    // forward-to-the-global invariant exists to prevent, and a
+    // stub-then-construct ordering cannot detect it.
+    const client = new ServerClient('http://host:8787', 'sekrit');
+
     const seen: string[] = [];
-    const armedMs: number[] = [];
+    const armed: { ms: number; handle: unknown }[] = [];
+    const cleared: unknown[] = [];
     const realSetTimeout = globalThis.setTimeout;
+    const realClearTimeout = globalThis.clearTimeout;
     vi.stubGlobal('fetch', async (input: unknown) => {
       seen.push(String(input));
       return fakeResponse({ body: { success: true, data: { items: [{ id: 7 }] }, error: null } });
@@ -238,13 +446,16 @@ describe('ServerClient production defaults', () => {
     // Delegates to the real timer so the deadline is a genuine handle the
     // client's finally can clear.
     vi.stubGlobal('setTimeout', (fn: () => void, ms?: number) => {
-      armedMs.push(ms ?? -1);
-      return realSetTimeout(fn, ms);
+      const handle = realSetTimeout(fn, ms);
+      armed.push({ ms: ms ?? -1, handle });
+      return handle;
+    });
+    vi.stubGlobal('clearTimeout', (handle: unknown) => {
+      cleared.push(handle);
+      realClearTimeout(handle as Parameters<typeof clearTimeout>[0]);
     });
 
     try {
-      // Exactly the construction in bot/main.ts: no fetch, no timer seam.
-      const client = new ServerClient('http://host:8787', 'sekrit');
       expect(await client.drainRelay()).toEqual([{ id: 7 }]);
     } finally {
       vi.unstubAllGlobals();
@@ -253,6 +464,10 @@ describe('ServerClient production defaults', () => {
     expect(seen).toEqual(['http://host:8787/internal/discord/relay']);
     // Exactly one arm, at the real deadline: the defaults read the globals and
     // pass the production timeout, not an injected one.
-    expect(armedMs).toEqual([8000]);
+    expect(armed.map((a) => a.ms)).toEqual([8000]);
+    // And the default clearTimeout really cancels THAT handle. Without this the
+    // member could be a no-op and every call would leak a live 8 second timer;
+    // the relay poller runs every 3 seconds, so the backlog is permanent.
+    expect(cleared).toEqual([armed[0].handle]);
   });
 });
