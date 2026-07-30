@@ -487,6 +487,10 @@ async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<Leaderboar
     prestigeRank: r.prestigeRank,
     // a deed id (never display text); the client localizes via deed_i18n
     title: r.activeTitle,
+    // The guild tag shown beside the name. Omitted (not null) for an unguilded
+    // character, the `realm` treatment below, so an unguilded row is byte-unchanged
+    // on the wire.
+    ...(r.guild ? { guild: r.guild } : {}),
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
   // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
