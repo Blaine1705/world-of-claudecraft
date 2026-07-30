@@ -155,7 +155,7 @@ if (MODE === 'after') {
   let clicked = false;
   for (const b of buttons) {
     const label = await b.evaluate((el) => el.textContent?.trim());
-    if (label === 'Professions') {
+    if (label === 'Inspect') {
       await b.click();
       clicked = true;
       break;
