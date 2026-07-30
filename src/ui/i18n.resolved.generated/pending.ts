@@ -10,69 +10,54 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ],
   "es_ES": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ],
   "fr_FR": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ],
   "fr_CA": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ],
   "en_CA": [],
   "it_IT": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ],
   "de_DE": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ],
   "nl_NL": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ],
   "pl_PL": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ],
   "id_ID": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ],
   "tr_TR": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ],
   "sv_SE": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ],
   "vi_VN": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ],
   "da_DK": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.errors.tradeAlreadyTrading"
   ]
 };
