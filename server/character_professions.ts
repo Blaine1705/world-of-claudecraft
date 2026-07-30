@@ -70,6 +70,9 @@ export interface CharacterProfessionsSheet {
   knownRecipes: number;
   slots: ProfessionsSlotRow[];
   nodeTimers: ProfessionsNodeTimerRow[];
+  // The live tool-effect vocabulary, server-authored so the restore-slot
+  // select renders data instead of a client-side mirror that could drift.
+  toolEffectIds: string[];
 }
 
 export interface CharacterProfessionsInput {
@@ -146,6 +149,7 @@ export function characterProfessionsSheet(
     knownRecipes: (state.knownRecipes ?? []).length,
     slots,
     nodeTimers,
+    toolEffectIds: Object.keys(TOOL_EFFECTS),
   };
 }
 

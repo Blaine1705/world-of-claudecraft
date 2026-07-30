@@ -216,6 +216,17 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   'password reset failed': 'error.resetPasswordFailed',
   'password must be at least 6 chars': 'error.passwordTooShort',
   'password must be at most 128 chars': 'error.passwordTooLong',
+  // R35 GM professions tooling (inspector + restores).
+  'character is not online on this realm': 'error.characterNotOnline',
+  'unknown item id': 'error.unknownItemId',
+  'count must be a whole number between 1 and 20': 'error.restoreCountRange',
+  'unknown gathering profession id': 'error.unknownGatheringProfession',
+  'unknown tool effect id': 'error.unknownToolEffect',
+  'the character owns no tool for that profession': 'error.restoreNoTool',
+  'that effect cannot be slotted on that profession': 'error.restoreBadPair',
+  'character went offline before the restore landed': 'error.restoreWentOffline',
+  'item restore failed': 'error.restoreItemFailed',
+  'slot restore failed': 'error.restoreSlotFailed',
 };
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];
