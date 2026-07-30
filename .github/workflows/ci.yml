@@ -27,7 +27,7 @@ permissions:
 #                 slowest quarter, not the whole suite.
 #
 #   pr-checks     the PR tier's serialized checks (i18n freshness + coverage
-#                 summary, malware gate, game/admin typecheck, env/server/client
+#                 summary, malware gate, game/admin typecheck, env/server/bot/client
 #                 builds), split into their own job so they run in parallel with
 #                 pr-gate and the PR critical path is max(tests, checks), not
 #                 their sum. Same triggers as pr-gate.

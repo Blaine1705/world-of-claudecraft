@@ -3,9 +3,18 @@ import { describe, expect, it } from 'vitest';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const gate = readFileSync(new URL('../scripts/gate.mjs', import.meta.url), 'utf8');
+// gate.mjs with its line comments removed. A raw-substring pin on a step is not
+// a pin at all: commenting the step out leaves the substring in the file, so the
+// assertion stays green while the local gate quietly stops running it. Anything
+// after `://` is left alone so a URL in a string cannot be truncated.
+const gateCode = gate.replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 function jobSource(name: string): string {
-  const match = workflow.match(new RegExp(`\\n  ${name}:[\\s\\S]*?(?=\\n  [a-z][a-z-]+:|$)`));
+  // The lookahead is the job boundary. It accepts digits and underscores too:
+  // a future job id like `pr-gate2` would otherwise not terminate the previous
+  // slice, letting one job's text bleed into another and quietly satisfying a
+  // by-name pin from the wrong job.
+  const match = workflow.match(new RegExp(`\\n  ${name}:[\\s\\S]*?(?=\\n  [a-z][a-z0-9_-]*:|$)`));
   if (!match) throw new Error(`missing CI job: ${name}`);
   return match[0];
 }
@@ -180,13 +189,59 @@ describe('CI workflow parity', () => {
     // scripts/gate.mjs is the local mirror of the CI step list (its own header
     // says to keep them in sync), and nothing else pins its build steps: a
     // deleted gate step is invisible to CI, which runs its own list.
-    for (const step of [
-      "['env build', 'npm', ['run', 'build:env']]",
-      "['server build', 'npm', ['run', 'build:server']]",
-      "['bot build', 'npm', ['run', 'build:bot']]",
-      "['client build', 'npm', ['run', 'build']]",
-    ]) {
-      expect(gate).toContain(step);
+    // Matched against the comment-stripped source and with tolerant whitespace,
+    // so neither commenting a step out nor a biome re-wrap can decide this.
+    for (const [label, script] of [
+      ['env build', 'build:env'],
+      ['server build', 'build:server'],
+      ['bot build', 'build:bot'],
+      ['client build', 'build'],
+    ] as const) {
+      expect(gateCode).toMatch(
+        new RegExp(
+          `\\[\\s*'${label}',\\s*'npm',\\s*\\[\\s*'run',\\s*'${script}'\\s*\\]\\s*,?\\s*\\]`,
+        ),
+      );
     }
+    // ...and in the CI order, so the cheap bundles still fail before the slow
+    // client build does.
+    expect(gateCode.indexOf("'server build'")).toBeLessThan(gateCode.indexOf("'bot build'"));
+    expect(gateCode.indexOf("'bot build'")).toBeLessThan(gateCode.indexOf("'client build'"));
+  });
+
+  it('keeps the bot build a real, ungated failure in both CI jobs', () => {
+    const prChecks = jobSource('pr-checks');
+    const releaseGate = jobSource('release-gate');
+    // Name-to-run adjacency, because `toContain('run: npm run build:bot')` is
+    // also satisfied by `run: npm run build:bot || true` (which can never fail)
+    // and by a copy-pasted `if: matrix.shard == 1` slipped between the two
+    // lines, which in this unsharded job is never true and would disable the
+    // build outright. Either would put a broken bundle back on the host.
+    expect(prChecks).toMatch(/- name: Build Discord bot\n {8}run: npm run build:bot\n/);
+    // A step that is allowed to fail is not a gate.
+    expect(workflow).not.toContain('continue-on-error');
+    // In release-gate the step must ALSO stay tied to its own name and its
+    // single-shard condition: the aggregate count of 9 is compensable, so
+    // un-gating this build while gating some other step keeps the count and
+    // quietly runs the bot build four times per release push.
+    expect(releaseGate).toMatch(
+      /- name: Build Discord bot\n {8}if: matrix\.shard == 1\n {8}run: npm run build:bot\n/,
+    );
+  });
+
+  it('never runs untrusted pull-request code with write access', () => {
+    // The jobs above run `npm ci`, the full suite, and four builds over the
+    // head ref of any fork PR. That is only safe while the workflow stays on
+    // `pull_request` with a read-only token: switching to
+    // `pull_request_target`, or granting a job write scope so some check
+    // "works on forks", would hand that untrusted code a privileged token and
+    // nothing else in the repo would go red.
+    expect(workflow).not.toContain('pull_request_target');
+    expect(workflow).toMatch(/\npermissions:\n {2}contents: read\n/);
+    // Unanchored on purpose: the read-only grant is workflow-level, and a JOB
+    // may re-declare `permissions:` at its own indent to widen it. Matching
+    // only at column 0 would miss exactly that escalation.
+    expect(workflow.match(/^\s*permissions:/gm)).toHaveLength(1);
+    expect(workflow).not.toContain('secrets.');
   });
 });
