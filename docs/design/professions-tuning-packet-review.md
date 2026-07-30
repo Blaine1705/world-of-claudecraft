@@ -2607,6 +2607,14 @@ exactly once.
      page nowhere surfaces the ceiling today, which the phase 13
      adversarial round flagged as the mechanic's one missing player
      surface, so this reword is where it gains one.
+   - THE PHASE 15 CONSENT REWORD: the deed-sharing settings row
+     (`broadcastsLabel`, "Share deed unlocks with guild and friends") is
+     staled by phase 15, which reuses `accounts.deed_broadcasts` to gate
+     the Discord activity feed's deed AND masterwork cards (R58): the row
+     must name the Discord feed as an audience, and its sibling comment
+     scope note follows. Flagged by the phase 15 security review (W1);
+     rides here per the reword-once protocol since the branch ships whole
+     and the interim mismatch reaches no player.
    - The packet's own reword calling the Glyphsteel Bar Bree-only
      (Gizzel stocks it at the toolworks).
    - `fish.startBody` "rather than bought" (the Marks route).
