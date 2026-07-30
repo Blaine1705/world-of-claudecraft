@@ -6912,6 +6912,7 @@ export const id_ID: EnTranslations = {
       "armor": "Zirah",
       "quest": "Barang Misi",
       "junk": "Rongsokan",
+      "fineMaterial": "Fine Material",
       "food": "Makanan",
       "drink": "Minuman",
       "tool": "Perkakas",

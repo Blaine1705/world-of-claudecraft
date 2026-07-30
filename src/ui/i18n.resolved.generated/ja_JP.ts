@@ -6912,6 +6912,7 @@ export const ja_JP: EnTranslations = {
       "armor": "防具",
       "quest": "クエストアイテム",
       "junk": "雑貨",
+      "fineMaterial": "上質な素材",
       "food": "食べ物",
       "drink": "飲み物",
       "tool": "道具",

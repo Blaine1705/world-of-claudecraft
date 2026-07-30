@@ -6912,6 +6912,7 @@ export const nl_NL: EnTranslations = {
       "armor": "Pantser",
       "quest": "Opdrachtvoorwerp",
       "junk": "Rommel",
+      "fineMaterial": "Fine Material",
       "food": "Voedsel",
       "drink": "Drank",
       "tool": "Gereedschap",

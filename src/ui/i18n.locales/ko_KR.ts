@@ -2301,6 +2301,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.armor': '방어구',
   'itemUi.kind.quest': '퀘스트 아이템',
   'itemUi.kind.junk': '잡동사니',
+  'itemUi.kind.fineMaterial': '상급 재료',
   'itemUi.kind.food': '음식',
   'itemUi.kind.drink': '음료',
   'itemUi.kind.tool': '도구',

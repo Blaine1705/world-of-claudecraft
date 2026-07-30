@@ -6912,6 +6912,7 @@ export const pl_PL: EnTranslations = {
       "armor": "Pancerz",
       "quest": "Przedmiot zadania",
       "junk": "Tandeta",
+      "fineMaterial": "Fine Material",
       "food": "Jedzenie",
       "drink": "Napój",
       "tool": "Narzędzie",

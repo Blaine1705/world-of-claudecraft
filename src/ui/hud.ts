@@ -142,6 +142,7 @@ import { bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
 import { type BannerClass, BannerQueue } from './banner_queue';
+import { baseMaterialFor } from '../sim/professions/material_grades';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter } from './cast_bar_painter';
@@ -4934,7 +4935,7 @@ export class Hud {
     let qualityKindHtml = esc(
       t('itemUi.tooltip.qualityKind', {
         quality: itemQualityLabel(item.quality),
-        kind: itemKindLabel(item.kind),
+        kind: itemKindLabel(item.kind, item.id),
       }),
     );
     if (item.heroicOf || item.heroic) {
@@ -15730,7 +15731,15 @@ function itemQualityLabel(quality: ItemDef['quality']): string {
   return t(ITEM_QUALITY_LABEL_KEYS[quality ?? 'common']);
 }
 
-function itemKindLabel(kind: ItemDef['kind']): string {
+function itemKindLabel(kind: ItemDef['kind'], itemId?: string): string {
+  // The fine-grade presentation split (the UX pass): a fine-grade material's
+  // KIND stays 'junk' internally (the downward substitution and the Sell
+  // Junk sweep both key off quality/kind), but its tooltip line must not
+  // read "Junk". baseMaterialFor answers non-undefined for exactly the fine
+  // ids (material_grades.ts, the FINE_GRADE pairing).
+  if (kind === 'junk' && itemId !== undefined && baseMaterialFor(itemId) !== undefined) {
+    return t('itemUi.kind.fineMaterial');
+  }
   return t(ITEM_KIND_LABEL_KEYS[kind]);
 }
 

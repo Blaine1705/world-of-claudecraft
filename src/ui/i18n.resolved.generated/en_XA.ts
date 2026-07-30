@@ -6912,6 +6912,7 @@ export const en_XA: EnTranslations = {
       "armor": "[Áŕɱóŕ]",
       "quest": "[Ɋúéšţ Íţéɱ]",
       "junk": "[Ĵúñķ]",
+      "fineMaterial": "[Ƒíñé Ɱáţéŕíáļ]",
       "food": "[Ƒóóð]",
       "drink": "[Ðŕíñķ]",
       "tool": "[Ţóóļ]",

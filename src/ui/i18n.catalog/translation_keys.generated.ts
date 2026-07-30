@@ -8103,6 +8103,7 @@ export type TranslationKeyFlat =
   | 'itemUi.kind.bag'
   | 'itemUi.kind.drink'
   | 'itemUi.kind.elixir'
+  | 'itemUi.kind.fineMaterial'
   | 'itemUi.kind.food'
   | 'itemUi.kind.junk'
   | 'itemUi.kind.mount'

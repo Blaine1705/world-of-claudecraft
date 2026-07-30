@@ -6912,6 +6912,7 @@ export const tr_TR: EnTranslations = {
       "armor": "Zırh",
       "quest": "Görev Eşyası",
       "junk": "Döküntü",
+      "fineMaterial": "Fine Material",
       "food": "Yiyecek",
       "drink": "İçecek",
       "tool": "Alet",

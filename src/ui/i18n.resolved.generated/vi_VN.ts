@@ -6912,6 +6912,7 @@ export const vi_VN: EnTranslations = {
       "armor": "Giáp",
       "quest": "Vật Phẩm Nhiệm Vụ",
       "junk": "Đồ Vụn",
+      "fineMaterial": "Fine Material",
       "food": "Thức Ăn",
       "drink": "Đồ Uống",
       "tool": "Dụng Cụ",

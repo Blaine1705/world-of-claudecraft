@@ -6912,6 +6912,7 @@ export const ru_RU: EnTranslations = {
       "armor": "Броня",
       "quest": "Задание",
       "junk": "Хлам",
+      "fineMaterial": "Отборный материал",
       "food": "Еда",
       "drink": "Напиток",
       "tool": "Инструмент",

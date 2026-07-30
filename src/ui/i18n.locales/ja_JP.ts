@@ -2317,6 +2317,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.armor': '防具',
   'itemUi.kind.quest': 'クエストアイテム',
   'itemUi.kind.junk': '雑貨',
+  'itemUi.kind.fineMaterial': '上質な素材',
   'itemUi.kind.food': '食べ物',
   'itemUi.kind.drink': '飲み物',
   'itemUi.kind.tool': '道具',

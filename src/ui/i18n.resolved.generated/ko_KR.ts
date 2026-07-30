@@ -6912,6 +6912,7 @@ export const ko_KR: EnTranslations = {
       "armor": "방어구",
       "quest": "퀘스트 아이템",
       "junk": "잡동사니",
+      "fineMaterial": "상급 재료",
       "food": "음식",
       "drink": "음료",
       "tool": "도구",

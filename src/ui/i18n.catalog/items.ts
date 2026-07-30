@@ -44,6 +44,10 @@ const itemStringsEn = {
       armor: 'Armor',
       quest: 'Quest Item',
       junk: 'Junk',
+      // The fine-grade presentation split (the UX pass): a fine material's
+      // KIND stays 'junk' internally (substitution and sell rules key off
+      // it) but its tooltip line reads this instead.
+      fineMaterial: 'Fine Material',
       food: 'Food',
       drink: 'Drink',
     },

@@ -6912,6 +6912,7 @@ export const zh_CN: EnTranslations = {
       "armor": "护甲",
       "quest": "任务物品",
       "junk": "杂物",
+      "fineMaterial": "优质材料",
       "food": "食物",
       "drink": "饮料",
       "tool": "工具",

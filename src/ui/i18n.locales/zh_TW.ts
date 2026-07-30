@@ -2220,6 +2220,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.armor': '護甲',
   'itemUi.kind.quest': '任務物品',
   'itemUi.kind.junk': '雜物',
+  'itemUi.kind.fineMaterial': '優質材料',
   'itemUi.kind.food': '食物',
   'itemUi.kind.drink': '飲料',
   'itemUi.kind.tool': '工具',

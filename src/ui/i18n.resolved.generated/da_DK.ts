@@ -6912,6 +6912,7 @@ export const da_DK: EnTranslations = {
       "armor": "Rustning",
       "quest": "Opgavegenstand",
       "junk": "Skrammel",
+      "fineMaterial": "Fine Material",
       "food": "Mad",
       "drink": "Drikke",
       "tool": "Værktøj",

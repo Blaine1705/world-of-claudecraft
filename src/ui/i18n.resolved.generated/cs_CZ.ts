@@ -6912,6 +6912,7 @@ export const cs_CZ: EnTranslations = {
       "armor": "Brnění",
       "quest": "Úkolový předmět",
       "junk": "Odpad",
+      "fineMaterial": "Fine Material",
       "food": "Jídlo",
       "drink": "Nápoj",
       "tool": "Nástroj",

@@ -6912,6 +6912,7 @@ export const sv_SE: EnTranslations = {
       "armor": "Rustning",
       "quest": "Uppdragsföremål",
       "junk": "Skräp",
+      "fineMaterial": "Fine Material",
       "food": "Mat",
       "drink": "Dryck",
       "tool": "Verktyg",

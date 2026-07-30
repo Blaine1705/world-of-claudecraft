@@ -2342,6 +2342,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.armor': 'Броня',
   'itemUi.kind.quest': 'Задание',
   'itemUi.kind.junk': 'Хлам',
+  'itemUi.kind.fineMaterial': 'Отборный материал',
   'itemUi.kind.food': 'Еда',
   'itemUi.kind.drink': 'Напиток',
   'itemUi.kind.tool': 'Инструмент',
