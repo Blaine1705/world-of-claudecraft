@@ -115,6 +115,120 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
   });
 });
 
+describe('renderVendorWindow: bulk purchase (#2374)', () => {
+  it('a row with no bulkQuantity renders only the ordinary buy tile', () => {
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'bread',
+        item: item('bread'),
+        price: { copper: 5, honor: 0 },
+        quantity: 1,
+        affordable: true,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view, deps());
+
+    expect(el.querySelectorAll('.vendor-item').length).toBe(1);
+    expect(el.querySelector('.vendor-item-bulk')).toBeNull();
+  });
+
+  it('a row with bulkQuantity of exactly 1 stays a single tile (no redundant Buy Stack)', () => {
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'thread',
+        item: item('thread'),
+        price: { copper: 12, honor: 0 },
+        quantity: 1,
+        affordable: false,
+        bulkQuantity: 1,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view, deps());
+
+    expect(el.querySelectorAll('.vendor-item').length).toBe(1);
+    expect(el.querySelector('.vendor-item-bulk')).toBeNull();
+  });
+
+  it('a row with bulkQuantity > 1 renders a second, always-visible Buy Stack tile', () => {
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'thread',
+        item: item('thread'),
+        price: { copper: 12, honor: 0 },
+        quantity: 1,
+        affordable: true,
+        bulkQuantity: 20,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    let bulkCalled: [string, boolean | undefined] | undefined;
+    renderVendorWindow(
+      el,
+      'Vendor',
+      view,
+      deps({ onBuy: (itemId, bulk) => (bulkCalled = [itemId, bulk]) }),
+    );
+
+    const rows = el.querySelectorAll('.vendor-item');
+    expect(rows.length).toBe(2);
+    const bulkRow = el.querySelector('.vendor-item-bulk') as HTMLButtonElement | null;
+    expect(bulkRow).not.toBeNull();
+    expect(bulkRow?.parentElement).toBe(el.querySelector('.vendor-goods-grid'));
+    expect(bulkRow?.getAttribute('aria-label')).toContain('20');
+
+    bulkRow?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(bulkCalled).toEqual(['thread', true]);
+  });
+
+  it('the Buy Stack tile is disabled whenever the row itself is unaffordable', () => {
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'thread',
+        item: item('thread'),
+        price: { copper: 12, honor: 0 },
+        quantity: 1,
+        affordable: false,
+        bulkQuantity: 3,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view, deps());
+
+    const bulkRow = el.querySelector('.vendor-item-bulk') as HTMLButtonElement | null;
+    expect(bulkRow?.disabled).toBe(true);
+  });
+
+  it('ctrl-click and cmd-click on the ordinary tile also request a bulk purchase', () => {
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'thread',
+        item: item('thread'),
+        price: { copper: 12, honor: 0 },
+        quantity: 1,
+        affordable: true,
+        bulkQuantity: 20,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    const calls: (boolean | undefined)[] = [];
+    renderVendorWindow(el, 'Vendor', view, deps({ onBuy: (_itemId, bulk) => calls.push(bulk) }));
+
+    const mainRow = el.querySelector('.vendor-item:not(.vendor-item-bulk)') as HTMLButtonElement;
+    mainRow.dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }));
+    mainRow.dispatchEvent(new MouseEvent('click', { bubbles: true, metaKey: true }));
+    mainRow.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(calls).toEqual([true, true, false]);
+  });
+});
+
 describe('renderHeroicVendorWindow: goods grid wrapping', () => {
   it('appends rows as children of .vendor-goods-grid', () => {
     const rows: HeroicShopRow[] = [

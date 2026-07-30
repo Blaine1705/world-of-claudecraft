@@ -4458,7 +4458,7 @@ export class GameServer {
         break;
       case 'buy':
         if (typeof msg.npc === 'number' && typeof msg.item === 'string')
-          sim.buyItem(msg.npc, msg.item, pid);
+          sim.buyItem(msg.npc, msg.item, pid, msg.bulk === true);
         break;
       case 'sell':
         if (typeof msg.item === 'string') {

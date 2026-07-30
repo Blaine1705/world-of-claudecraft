@@ -7030,6 +7030,8 @@ export const cs_CZ: EnTranslations = {
       "close": "Zavřít obchodníka",
       "hint": "Když je toto okno otevřené, klikni na předmět v batozích a prodáš ho.",
       "buyAria": "Koupit {item} za {price}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Zpětný odkup",
       "buybackEmpty": "Žádné předměty",
       "buybackAria": "Odkoupit zpět {item} za {price}",

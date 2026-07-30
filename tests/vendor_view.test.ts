@@ -10,6 +10,7 @@ function item(
     priceHonor?: number;
     sellValue?: number;
     kind?: ItemDef['kind'];
+    stackSize?: number;
   } = {},
 ): ItemDef {
   return {
@@ -21,6 +22,7 @@ function item(
     sellValue: opts.sellValue ?? 0,
     buyValue: opts.buyValue,
     priceHonor: opts.priceHonor,
+    stackSize: opts.stackSize,
   } as unknown as ItemDef;
 }
 
@@ -90,6 +92,49 @@ describe('buildVendorView goods', () => {
     ]);
     expect(view.hasHonorGoods).toBe(true);
     expect(view.honorBalance).toBe(RICH.honor);
+  });
+
+  it('bulkQuantity: a plain copper-priced stacking good offers the full stack when fully affordable', () => {
+    const items = table(item('thread', { buyValue: 12, stackSize: 20 }));
+    const view = buildVendorView(['thread'], [], items, { copper: 1_000_000, honor: 0 });
+    expect(view.goods[0].bulkQuantity).toBe(20);
+  });
+
+  it('bulkQuantity: floors to what the buyer can currently afford', () => {
+    const items = table(item('thread', { buyValue: 12, stackSize: 20 }));
+    const view = buildVendorView(['thread'], [], items, { copper: 100, honor: 0 }); // floor(100/12)=8
+    expect(view.goods[0].bulkQuantity).toBe(8);
+  });
+
+  it('bulkQuantity: floors to 1 rather than 0 when even one unit is unaffordable (row stays disabled instead)', () => {
+    const items = table(item('thread', { buyValue: 12, stackSize: 20 }));
+    const view = buildVendorView(['thread'], [], items, { copper: 0, honor: 0 });
+    expect(view.goods[0].bulkQuantity).toBe(1);
+    expect(view.goods[0].affordable).toBe(false);
+  });
+
+  it('bulkQuantity is absent for an item that does not stack', () => {
+    const items = table(item('sword', { buyValue: 50, kind: 'weapon' })); // UNSTACKED_KINDS: stackSize 1
+    const view = buildVendorView(['sword'], [], items, RICH);
+    expect(view.goods[0].bulkQuantity).toBeUndefined();
+  });
+
+  it('bulkQuantity is absent for a mount (never bulk-buy several copies of the same reins)', () => {
+    const items = table(item('reins', { buyValue: 100_000, kind: 'mount' }));
+    const view = buildVendorView(['reins'], [], items, RICH);
+    expect(view.goods[0].bulkQuantity).toBeUndefined();
+  });
+
+  it('bulkQuantity is absent for an Honor-priced good (Honor is never stack-multiplied)', () => {
+    const items = table(item('banner', { priceHonor: 250, stackSize: 20 }));
+    const view = buildVendorView(['banner'], [], items, RICH);
+    expect(view.goods[0].bulkQuantity).toBeUndefined();
+  });
+
+  it('bulkQuantity is absent for a dual-price (copper + Honor) good too', () => {
+    const items = table(item('rations', { buyValue: 4, priceHonor: 30, kind: 'food' }));
+    const view = buildVendorView(['rations'], [], items, RICH);
+    expect(view.goods[0].bulkQuantity).toBeUndefined();
   });
 
   it('requires both balances for a dual-price good', () => {
