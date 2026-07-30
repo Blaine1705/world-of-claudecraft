@@ -115,21 +115,31 @@ describe('bags window focus restore (the vendor ladder pattern)', () => {
     expect(activeKey()).toBe('bag:wolf_fang:1');
   });
 
-  it('consuming an earlier different-item stack leaves the focused identity intact', () => {
-    // The ordinal-key improvement pinned directly: under raw index keys the
-    // bread's removal shifted every later key one down and the exact rung
-    // landed focus one stack over; the ordinal only moves when an earlier
-    // SAME-item stack goes.
+  it('consuming an earlier different-item stack keeps focus on the SAME stack, not its key-heir', () => {
+    // The ordinal-key improvement pinned by ELEMENT identity, not by key
+    // string (a key-equality assertion passes under raw index keys too,
+    // because the neighbor stack inherits the stale key and answers to it).
+    // Under index keys the bread's removal shifted the focused stack's key
+    // onto its neighbor and the exact rung landed one stack over even
+    // though the focused stack survived; the ordinal key is stable, so the
+    // SAME element keeps focus.
     const inv: InvSlot[] = [
       { itemId: 'baked_bread', count: 1 },
       { itemId: 'wolf_fang', count: 1 },
       { itemId: 'wolf_fang', count: 3 },
     ];
     const { root, w } = harness(inv);
-    focusRow(root, 'bag:wolf_fang:1');
+    const fangRows = () => [
+      ...root.querySelectorAll<HTMLElement>('.bag-grid [data-focus-key^="bag:wolf_fang"]'),
+    ];
+    // Focus the FIRST wolf_fang by position: key-independent, so this arm
+    // decides between key schemes instead of assuming one.
+    fangRows()[0].focus();
+    expect(document.activeElement).toBe(fangRows()[0]);
     inv.splice(0, 1);
     w.render();
-    expect(activeKey()).toBe('bag:wolf_fang:1');
+    expect(document.activeElement).toBe(fangRows()[0]);
+    expect(activeKey()).toBe('bag:wolf_fang:0');
   });
 
   it('the sort select carries a focus key and survives its own rebuild', () => {
