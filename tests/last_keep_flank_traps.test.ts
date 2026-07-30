@@ -1,7 +1,9 @@
-// The Last Keep's flanks must never wedge a player. Two authored defects put
-// standable ground into cracks a body cannot turn around in, both beside the
-// keep (player reports: "VERY easy to fall in-between the cracks or get stuck
-// underground", one death with the corpse left in the gap):
+// The Last Keep must never wedge a player. Authored defects put standable
+// ground into cracks a body cannot turn around in (player reports: "VERY easy
+// to fall in-between the cracks or get stuck underground", one death with the
+// corpse left in the gap; later, "if the player walks into the foundation they
+// get stuck along the side of the foundation"). The first two were both beside
+// the keep:
 //   NORTH FLANK: the alley flight's mass stopped at z 1991.3 while the ward's
 //   retaining edge starts at 1991.4, leaving a sliver of BAILEY floor under the
 //   stair, up to 6.8yd below the tread beside it. Falling in put the player
@@ -24,8 +26,14 @@ import { groundHeight } from '../src/sim/world';
 // the live world seed: the reports are seed-pinned castle geometry
 const SEED = 20061;
 
-// the ward and both of its flanks, out to the curtain walls on either side
-const RECT = { x0: 394, x1: 440, z0: 1986, z1: 2024 };
+// The WHOLE castle: barbican forecourt, bailey, ward, and a skirt outside
+// every curtain. It started as the ward and its two flanks, but the defect is
+// not local to the keep: every mass here collides as a circle (or a straight
+// stair riser), so any two that come within a body diameter leave a tapering
+// alley, and the second sweep over the full grounds found fifteen more of them
+// out in the bailey, behind the market stalls and the east wall's climbing
+// shelves. Scanning the ward alone would have called that clean.
+const RECT = { x0: 348, x1: 452, z0: 1982, z1: 2080 };
 const TICK_STEP = 0.35; // one movement tick of run at RUN_SPEED 7
 const FINE = 0.1; // corridor-width sampling
 const WALL_RISE = 1.5; // ground this much higher within reach is a wall face
@@ -311,17 +319,26 @@ describe('the Last Keep flanks hold no wedge pockets', () => {
         'walks out west into the open alley',
       ).toBe(true);
     }
-    // driven north out of the open terrace into the keep/hall slot
+    // The keep and the barracks overlap across the middle of the neck, so the
+    // slot itself is solid; what is left are the two cusps where their arcs
+    // cross. Driven north out of the open terrace into the south cusp:
     {
       const { sim, p, meta } = makeWalker({ x: 411.6, z: 2009 });
       pushToward(sim, p, meta, { x: 411.6, z: 1998 }, 20 * 6);
       expect(p.pos.z, 'held south of the slot').toBeGreaterThan(2006.5);
     }
-    // and driven south into it from the ward's north yard
+    // ...and driven south off the ward's north shelf into the north cusp
     {
-      const { sim, p, meta } = makeWalker({ x: 411.6, z: 2002 });
-      pushToward(sim, p, meta, { x: 411.6, z: 2012 }, 20 * 6);
-      expect(p.pos.z, 'held north of the slot').toBeLessThan(2003.5);
+      const { sim, p, meta } = makeWalker({ x: 413, z: 1994.3 });
+      pushToward(sim, p, meta, { x: 413, z: 2004 }, 20 * 6);
+      expect(p.pos.z, 'held north of the slot').toBeLessThan(1995.6);
+    }
+    // ...and driven west along the alley flight's foot, where the flight's
+    // side and the keep's arc close on each other to nothing
+    {
+      const { sim, p, meta } = makeWalker({ x: 430.5, z: 1994.4 });
+      pushToward(sim, p, meta, { x: 424, z: 1994.4 }, 20 * 6);
+      expect(p.pos.x, 'held east of the flight slot').toBeGreaterThan(428.1);
     }
   });
 

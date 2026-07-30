@@ -83,17 +83,27 @@ describe('castle wall climbing chains', () => {
     }
   });
 
-  it('stands every outside shelf clear of its own curtain', () => {
-    // a shelf must sit OUTSIDE the wall strip, or it is buried in the lift
+  it('corbels every outside shelf onto its own curtain', () => {
+    // A shelf is a corbel: its inner face sits ON the wall's outer face, and
+    // its body protrudes outward far enough to stand on. Both halves matter.
+    // Standing one OFF the wall (the first cut did) leaves a strip of ground
+    // behind it walled by the curtain riser on one side and the shelf's
+    // collider on the other, too narrow for a body to turn around in. The
+    // curtain is TERRAIN, so it never pushes a body away by its radius the way
+    // a collider does: the shelf has to reach the stone itself, not stop a
+    // body's width short of it.
+    const REACH = 1.0; // usable shelf outside the wall face
+    const keepFace = CASTLE.wx1 + CASTLE.wallTh / 2;
     for (const l of CASTLE_WALL_LEDGES) {
-      expect(l.x - l.hw, `Last Keep shelf at (${l.x},${l.z}) overlaps the curtain`).toBeGreaterThan(
-        CASTLE.wx1 + CASTLE.wallTh / 2,
-      );
+      const at = `Last Keep shelf at (${l.x},${l.z})`;
+      expect(l.x - l.hw, `${at} stands off the curtain`).toBeLessThanOrEqual(keepFace);
+      expect(l.x + l.hw, `${at} is buried in the curtain`).toBeGreaterThan(keepFace + REACH);
     }
+    const dawnFace = DAWNHOLD.wz0 - DAWNHOLD.wallTh / 2;
     for (const l of DAWNHOLD_WALL_LEDGES) {
-      expect(l.z + l.hd, `Dawnhold shelf at (${l.x},${l.z}) overlaps the curtain`).toBeLessThan(
-        DAWNHOLD.wz0 - DAWNHOLD.wallTh / 2,
-      );
+      const at = `Dawnhold shelf at (${l.x},${l.z})`;
+      expect(l.z + l.hd, `${at} stands off the curtain`).toBeGreaterThanOrEqual(dawnFace);
+      expect(l.z - l.hd, `${at} is buried in the curtain`).toBeLessThan(dawnFace - REACH);
     }
   });
 });

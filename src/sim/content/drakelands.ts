@@ -1009,9 +1009,13 @@ export const DRAKELANDS_PROPS: ZonePropsDef = {
   stalls: [
     { x: 398, z: 1896, rot: 0.5, r: 1.6 },
     { x: 410, z: 1910, rot: -1.2, r: 1.6 },
-    // the keep's market row inside the main gate
-    { x: 391, z: 2033, rot: 0.7, r: 1.6 },
-    { x: 402, z: 2044.5, rot: -2.1, r: 1.6 },
+    // The keep's market row inside the main gate. A stall's collider is its
+    // rotated box PLUS its dressing, so it needs the same standable lane
+    // around it the bailey buildings get: pitched against the market hall's
+    // circle it left a tapering alley a body could walk into and not turn
+    // around in.
+    { x: 394, z: 2032, rot: 0.7, r: 1.6 },
+    { x: 403, z: 2045.5, rot: -2.4, r: 1.6 },
   ],
   // the Last Keep's bailey: every building comes from the castle plan (one
   // source of truth with the walls, walks, and colliders)

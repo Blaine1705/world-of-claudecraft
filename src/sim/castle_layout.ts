@@ -150,8 +150,19 @@ export const CASTLE_RAMPS: readonly CastleRamp[] = [
   // tucks 0.3 INTO the thicker wall strip so no low sliver opens between
   // flight and walk; the wall's own max() simply wins over that edge)
   { axis: 'z', b0: 361.2, b1: 364.0, a0: 2040, a1: 2058.6, h0: 6, h1: CASTLE.walkAbs },
-  // ...and its flat landing, bridging the flight top onto the SW bastion
-  { axis: 'z', b0: 361.2, b1: 364.0, a0: 2058.6, a1: 2069, h0: CASTLE.walkAbs, h1: CASTLE.walkAbs },
+  // ...and its flat landing, bridging the flight top onto the SW bastion. It
+  // runs INTO the south wall strip, not up to it: stopping short left a lane
+  // of bailey floor between the landing's end wall and the south curtain that
+  // narrowed to nothing in the corner.
+  {
+    axis: 'z',
+    b0: 361.2,
+    b1: 364.0,
+    a0: 2058.6,
+    a1: CASTLE.wz1 - CASTLE.wallTh / 2 + 0.3,
+    h0: CASTLE.walkAbs,
+    h1: CASTLE.walkAbs,
+  },
   // the alley flight: squeezed between the north wall and the ward's
   // retaining edge, climbing east to the NE walk. The band runs THROUGH the
   // ward's retaining blend (the overlap rule above): stopping at the rect line
@@ -191,6 +202,11 @@ export const WARD_STEPS = [{ x0: 414, x1: 428 }] as const;
  * band the engine can actually cross: 1.3 vault off the pad, then 2.0 and
  * 2.1 ledge climbs, then a 1.6 vault onto the walk. Pinned by
  * tests/castle_ledges.
+ *
+ * Each shelf's inner face sits FLUSH on the curtain's outer face (438.3).
+ * Standing them off the wall left a slot of bailey-level floor behind them,
+ * too narrow to turn around in, which is what a corbel is not: a corbel grows
+ * out of the wall it is cut into.
  */
 export interface CastleWallLedge {
   x: number;
@@ -201,9 +217,9 @@ export interface CastleWallLedge {
   top: number;
 }
 export const CASTLE_WALL_LEDGES: readonly CastleWallLedge[] = [
-  { x: 440.8, z: 2040, hw: 1.5, hd: 1.8, top: 7.3 },
-  { x: 439.9, z: 2036, hw: 1.4, hd: 1.8, top: 9.3 },
-  { x: 439.9, z: 2032, hw: 1.4, hd: 1.8, top: 11.4 },
+  { x: 439.8, z: 2040, hw: 1.5, hd: 1.8, top: 7.3 },
+  { x: 439.7, z: 2036, hw: 1.4, hd: 1.8, top: 9.3 },
+  { x: 439.7, z: 2032, hw: 1.4, hd: 1.8, top: 11.4 },
 ] as const;
 /** the step ramps run from the ward edge z1 down to bailey over this run */
 export const WARD_STEP_RUN = 4;
@@ -252,41 +268,78 @@ export const CASTLE_BUILDINGS: readonly CastleBuilding[] = [
   },
   // the great hall, moved down into the bailey to free the terrace
   { key: 'hexrTownhall', x: 390, z: 2016, rot: 0, scale: 7, r: 5.8, h: 15 },
-  // THE BAILEY, northwest military quarter: catapult tower, archery range,
-  // and the servants' house
-  { key: 'hexrTowerCatapult', x: 367, z: 1995, rot: Math.PI / 2, scale: 7, r: 4, h: 14 },
-  { key: 'hexrArcheryrange', x: 383, z: 1996, rot: 0, scale: 7, r: 5.5, h: 12.5 },
-  { key: 'hexrHomeB', x: 366.2, z: 2006, rot: Math.PI / 2, scale: 7, r: 4.5, h: 9 },
+  // THE BAILEY. Every mass here collides as a circle, and a circle that comes
+  // within a body diameter of the curtain, a stair mass, a bastion, or its
+  // neighbour leaves a tapering alley the player can walk into and wedge in
+  // (the arcs cross, or graze a straight riser, and the floor between is
+  // inside the rendered stonework). So the quarters are spaced to keep a real
+  // lane, at least 1.6yd of standable floor, around every building on every
+  // side: the bailey reads as a walled town with a circulation ring rather
+  // than sheds shoved against the wall. Pinned by
+  // tests/last_keep_flank_traps.test.ts.
+  //
+  // northwest military quarter: catapult tower, archery range, and the
+  // servants' house
+  { key: 'hexrTowerCatapult', x: 369, z: 1997, rot: Math.PI / 2, scale: 7, r: 4, h: 14 },
+  { key: 'hexrArcheryrange', x: 384, z: 1998.5, rot: 0, scale: 7, r: 5.5, h: 12.5 },
+  { key: 'hexrHomeB', x: 370, z: 2009, rot: Math.PI / 2, scale: 7, r: 4.5, h: 9 },
   // the forge and market quarter by the gate road
-  { key: 'hexrBlacksmith', x: 368, z: 2020, rot: Math.PI / 2, scale: 7, r: 5, h: 7 },
+  { key: 'hexrBlacksmith', x: 371, z: 2022.5, rot: Math.PI / 2, scale: 7, r: 5, h: 7 },
   { key: 'hexrMarket', x: 388, z: 2040, rot: -Math.PI / 2, scale: 6.5, r: 4.5, h: 6.5 },
   { key: 'hexrHomeA', x: 376, z: 2039, rot: Math.PI, scale: 6, r: 3.8, h: 6 },
-  // the south quarter: stables, the twin barracks, chapel, and the inn
-  { key: 'hexrStables', x: 370, z: 2052, rot: 0.35, scale: 7, r: 5.5, h: 4.5 },
-  { key: 'hexrBarracks', x: 386, z: 2062, rot: Math.PI, scale: 7.5, r: 6, h: 12.5 },
-  { key: 'hexrBarracks', x: 400, z: 2063, rot: 0, scale: 7.5, r: 6, h: 12.5 },
-  { key: 'hexrChurch', x: 413, z: 2060, rot: -Math.PI / 2, scale: 7.5, r: 5.5, h: 12.5 },
+  // the south quarter: stables, the twin barracks, chapel, and the inn. The
+  // stables stand clear of the west flight's mass, not beside it.
+  { key: 'hexrStables', x: 373, z: 2052, rot: 0.35, scale: 7, r: 5.5, h: 4.5 },
+  { key: 'hexrBarracks', x: 384, z: 2061, rot: Math.PI, scale: 7.5, r: 6, h: 12.5 },
+  { key: 'hexrBarracks', x: 401, z: 2059.8, rot: 0, scale: 7.5, r: 6, h: 12.5 },
+  { key: 'hexrChurch', x: 416, z: 2059, rot: -Math.PI / 2, scale: 7.5, r: 5.5, h: 12.5 },
   { key: 'hexrTavern', x: 421, z: 2043, rot: Math.PI, scale: 7.5, r: 5.5, h: 10.5 },
 ] as const;
 
-// The keep and the great hall stand 1.2yd apart on the ward terrace, closer
-// than a player body can use. Their collision circles are INSCRIBED in square
-// meshes, so that slot's floor sits inside both rendered buildings: a player
-// who squeezed in stood under the stonework (it reads as being underground)
-// with barely room to turn around. Two invisible blocker walls close the neck
-// at the point where the gap is still wide enough to stand in, so the slot can
-// never be entered from either end. The terrace east of the keep (2.4yd clear)
-// stays the way around to the ward's north yard.
+// THE KEEP'S FOUNDATION SEALS. Every mass on the ward terrace collides as a
+// CIRCLE inscribed in a SQUARE mesh, so the mesh corners always overhang
+// walkable ground: wherever two of those arcs (or an arc and a stair mass)
+// come within a body diameter, the floor between them is inside the rendered
+// stonework and a player who walks in wedges there, unable to turn around.
+// Player report: "you get stuck along the side of the foundation."
+//
+// Growing a radius only MOVES a circle-crossing cusp, it never removes one, so
+// each pinch is closed at its MOUTH instead: an invisible wall whose two ends
+// sit inside solid geometry, placed where the gap is still wide enough to
+// stand in. Every route the ward needs stays open: the terrace east of the
+// keep is the way around to the north yard, and the keep's door lane between
+// the arch jambs is untouched (every seal sits behind the keep's own mass,
+// never on the approach a player walks).
 //
 // Same idiom as JAIL_BLOCKERS: fence-width, camera-ghost, never jumpable, and
 // pure static data (no rng, no tick-order effect). Merged into the built-in
 // world's blockers in data.ts, so all three hosts collide identically.
+// Pinned by tests/last_keep_flank_traps.test.ts (the reachable-wedge scan).
 export const CASTLE_BLOCKERS: readonly BlockerDef[] = [
-  // the slot's north mouth: from inside the great hall's circle to inside the
-  // keep's, so neither end can be walked around
-  { x1: 410.2, z1: 2003.9, x2: 412.6, z2: 2003.9 },
-  // the slot's south mouth
-  { x1: 410.2, z1: 2006.1, x2: 412.6, z2: 2006.1 },
+  // THE KEEP/BARRACKS NECK. The two circles overlap across the middle, so the
+  // neck is already solid there (the old pair of blockers at z 2003.9/2006.1
+  // sat inside both masses and did nothing once the great hall moved down into
+  // the bailey). What is left is the two cusps where the arcs cross, at
+  // z 1995.8 and z 2007.2: southward and northward spikes off the open yard
+  // that taper to 0.4yd. Sealed just outside each cusp, barracks arc to keep
+  // arc.
+  { x1: 411.3, z1: 1995.4, x2: 414.2, z2: 1995.4 },
+  { x1: 411.3, z1: 2007.6, x2: 414.2, z2: 2007.6 },
+  // THE KEEP FACADE. The dungeon door's arch jambs stand 1.06yd (jamb half
+  // depth plus a body radius) north of the threshold, which lands them 0.3yd
+  // off the keep's collision arc: two slivers of standable floor pinched
+  // between the stonework and the jamb, one either side of the doorway. The
+  // whole strip north of the threshold is dead space, so one wall across the
+  // facade closes both. The door stays reachable from the south, where players
+  // arrive.
+  { x1: 418.9, z1: 2011.05, x2: 423.1, z2: 2011.05 },
+  // THE ALLEY FLIGHT'S SOUTH FACE. East of x 425.5 the flight has climbed more
+  // than a step above the terrace beside it, and the keep's arc runs back
+  // toward it, so the strip between the two closes from 2.2yd to nothing at
+  // x 425.8. Sealed at the east mouth, flight mass to keep arc; west of the
+  // seal the strip is only ever entered by walking round the keep's east
+  // terrace, which this closes.
+  { x1: 427.85, z1: 1993.2, x2: 427.85, z2: 1995.3 },
 ] as const;
 
 // Ember crystals of varying sizes around the grounds and approach (drawn by

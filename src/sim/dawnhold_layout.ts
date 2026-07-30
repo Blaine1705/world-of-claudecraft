@@ -159,9 +159,12 @@ export interface DawnholdWallLedge {
   top: number;
 }
 export const DAWNHOLD_WALL_LEDGES: readonly DawnholdWallLedge[] = [
-  { x: 255, z: 860.2, hw: 1.5, hd: 1.4, top: 4.5 },
-  { x: 259, z: 860.9, hw: 1.4, hd: 1.4, top: 6.5 },
-  { x: 263, z: 860.9, hw: 1.4, hd: 1.4, top: 8.5 },
+  // inner faces FLUSH on the curtain's outer face (862.5): standing a shelf
+  // off the wall leaves a strip of ground behind it too narrow to turn around
+  // in, and a corbel grows out of the wall it is cut into anyway
+  { x: 255, z: 861.1, hw: 1.5, hd: 1.4, top: 4.5 },
+  { x: 259, z: 861.1, hw: 1.4, hd: 1.4, top: 6.5 },
+  { x: 263, z: 861.1, hw: 1.4, hd: 1.4, top: 8.5 },
 ] as const;
 
 export interface DawnholdField {
