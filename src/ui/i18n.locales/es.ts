@@ -170,7 +170,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'La pesca abastece los ingredientes principales, zona a zona: trucha espejo y pez de río de las aguas del Valle de Eastbrook, lucio de pantano y anguila de ciénaga de Mirefen, trucha escarcha y carpa pizarra de las Alturas de Thornpeak. Cada peldaño de la escalera cocina el pescado de su nivel, así que un cocinero que pesca nunca se queda sin nada.\n\nEl lado del carnicero viene de cadáveres cosechados: carne de caza de jabalíes y sus parientes, y, en una tirada de cosecha rara o mejor, un Corte Selecto firmado, la pieza central del gran asado. Las hierbas sazonan los mejores platos, un tronco de ashwood ahuma la anguila y la Sal de Cocina cuesta 8 cobres la bolsa en el propio puesto de Marlow.',
   'guide.profPages.craftProse.cooking.ladderHeading': 'Del tasajo al gran asado',
   'guide.profPages.craftProse.cooking.ladderBody':
-    'El Tasajo Salado es la receta de campo: conocida desde el principio, una pata de araña, elaborable en cualquier lugar, la comida de viaje de todo aventurero recién llegado. La escalera del entrenador cocina en las cocinas de Eastbrook al oeste de la plaza: el peldaño gratuito en habilidad 0 (el pez, el Pincho de Caza del Cazador, la Lucio de Pantano con Hierbas), el peldaño intermedio en habilidad 25 por 25 de plata la receta (Anguila Ahumada de Ashwood, Guiso de Caza con Hoja Dorada, Chowder de Trucha Escarcha), y el peldaño raro en habilidad 50 por 1 de oro cada uno (Cena de Carpa Plateada, Plato de Fiesta del Pescador, Gran Asado de Marlow).\n\nLos platos en lote estiran los ingredientes: la anguila ahumada y el guiso de caza sirven dos porciones por fabricación, y el plato de fiesta sirve tres. Marlow enseña cada peldaño en cuanto tu nivel en Cocina lo alcanza.',
+    'El Tasajo Salado es la receta de campo: conocida desde el principio, una pata de araña, elaborable en cualquier lugar, la comida de viaje de todo aventurero recién llegado. La escalera del entrenador cocina en las cocinas de Eastbrook al este de la plaza: el peldaño gratuito en habilidad 0 (el pez, el Pincho de Caza del Cazador, la Lucio de Pantano con Hierbas), el peldaño intermedio en habilidad 25 por 25 de plata la receta (Anguila Ahumada de Ashwood, Guiso de Caza con Hoja Dorada, Chowder de Trucha Escarcha), y el peldaño raro en habilidad 50 por 1 de oro cada uno (Cena de Carpa Plateada, Plato de Fiesta del Pescador, Gran Asado de Marlow).\n\nLos platos en lote estiran los ingredientes: la anguila ahumada y el guiso de caza sirven dos porciones por fabricación, y el plato de fiesta sirve tres. Marlow enseña cada peldaño en cuanto tu nivel en Cocina lo alcanza.',
   'guide.profPages.craftProse.cooking.routeHeading':
     'Especialización, no obras maestras, y la ruta hasta 125',
   'guide.profPages.craftProse.cooking.routeBody':
@@ -3631,6 +3631,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.hint':
     'Haz clic en un objeto de tus bolsas para venderlo mientras esta ventana esté abierta.',
   'itemUi.vendor.buyAria': 'Comprar {item} por {price}',
+  'itemUi.vendor.buyAriaWithRequirement': 'Comprar {item} por {price}. {requirement}',
   'itemUi.vendor.buybackTitle': 'Recomprar',
   'itemUi.vendor.buybackEmpty': 'Sin objetos',
   'itemUi.vendor.buybackAria': 'Recomprar {item} por {price}',

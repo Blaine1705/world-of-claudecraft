@@ -172,7 +172,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'A pesca abastece os ingredientes principais, zona por zona: truta-espelho e peixe do rio das águas de Eastbrook Vale, pique do pântano e enguia do brejo do Pântano Mirefen, truta geladinha e carpa de ardósia dos Picos de Thornpeak. Cada degrau da escada cozinha o peixe do seu nível, então um cozinheiro que pesca nunca fica sem estoque.\n\nO lado do açougueiro vem de cadáveres colhidos: carne de caça de javalis e parentes, e, em uma colheita rara ou melhor, um Corte Principal assinado, a peça central do grande assado. Ervas temperam os melhores pratos, um toro de freixo defuma a enguia, e o Sal de Cozinha custa 8 cobre o pacote na própria banca de Marlow.',
   'guide.profPages.craftProse.cooking.ladderHeading': 'Da carne seca ao grande assado',
   'guide.profPages.craftProse.cooking.ladderBody':
-    'Carne Seca Salgada é a receita de campo: conhecida desde o início, uma perna de aranha, preparável em qualquer lugar, o alimento de trilha de todo aventureiro recente. A escada do treinador cozinha nas cozinhas de Eastbrook no lado oeste da praça: o degrau gratuito na habilidade 0 (o peixe, o Espeto de Caça do Caçador, o Pique do Pântano Temperado com Ervas), o degrau do meio na habilidade 25 por 25 prata por receita (Enguia Defumada de Freixo, Ensopado de Caça com Folha Dourada, Chowder Geladinha), e o degrau raro na habilidade 50 por 1 ouro cada (Jantar de Carpa Prateada, Prato de Festa do Pescador, Grande Assado de Marlow).\n\nOs pratos em lote esticam seus ingredientes: a enguia defumada e o ensopado servem dois por criação, e o prato de festa serve três. Marlow ensina cada degrau assim que seu nível em Culinária o alcança.',
+    'Carne Seca Salgada é a receita de campo: conhecida desde o início, uma perna de aranha, preparável em qualquer lugar, o alimento de trilha de todo aventureiro recente. A escada do treinador cozinha nas cozinhas de Eastbrook no lado leste da praça: o degrau gratuito na habilidade 0 (o peixe, o Espeto de Caça do Caçador, o Pique do Pântano Temperado com Ervas), o degrau do meio na habilidade 25 por 25 prata por receita (Enguia Defumada de Freixo, Ensopado de Caça com Folha Dourada, Chowder Geladinha), e o degrau raro na habilidade 50 por 1 ouro cada (Jantar de Carpa Prateada, Prato de Festa do Pescador, Grande Assado de Marlow).\n\nOs pratos em lote esticam seus ingredientes: a enguia defumada e o ensopado servem dois por criação, e o prato de festa serve três. Marlow ensina cada degrau assim que seu nível em Culinária o alcança.',
   'guide.profPages.craftProse.cooking.routeHeading':
     'Especialização, não obras-primas, e o caminho até o 125',
   'guide.profPages.craftProse.cooking.routeBody':
@@ -3720,6 +3720,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.hint':
     'Clique em um item nas suas bolsas para vendê-lo enquanto esta janela estiver aberta.',
   'itemUi.vendor.buyAria': 'Comprar {item} por {price}',
+  'itemUi.vendor.buyAriaWithRequirement': 'Comprar {item} por {price}. {requirement}',
   'itemUi.vendor.buybackTitle': 'Recompra',
   'itemUi.vendor.buybackEmpty': 'Sem itens',
   'itemUi.vendor.buybackAria': 'Recomprar {item} por {price}',

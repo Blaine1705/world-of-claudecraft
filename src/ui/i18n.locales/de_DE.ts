@@ -174,7 +174,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Angeln bestückt die Signatur-Zutaten, Zone für Zone: Spiegelforelle und Flussbarsch aus den Gewässern des Eastbrook-Tals, Sumpfhecht und Mooraal aus dem Sumpfnebel-Moor, Frostkiemen-Forelle und Schieferflossen-Karpfen aus den Dornkuppen-Höhen. Jede Sprosse der Leiter kocht den Fisch ihres Rangs, sodass einem Koch, der angelt, nie die Zutaten ausgehen.\n\nDie Fleischer-Seite kommt von geernteten Leichen: Wildfleisch von Ebern und ihren Verwandten, und bei einem seltenen oder besserem Erntewurf ein signiertes Erstklassiges Filet, der Mittelpunkt des großen Bratens. Kräuter würzen die besseren Gerichte, ein Aschenholzscheit räuchert den Aal, und Kochsalz kostet 8 Kupfer pro Beutel an Marlows eigenem Stand.',
   'guide.profPages.craftProse.cooking.ladderHeading': 'Von Dörrfleisch zum großen Braten',
   'guide.profPages.craftProse.cooking.ladderBody':
-    'Gesalzenes Dörrfleisch ist das Feldrezept: von Anfang an bekannt, ein Spinnenbein, überall herstellbar, die Wegzehrung jedes frischen Abenteurers. Die Lehrmeister-Leiter wird in den Eastbrook-Küchen auf der Westseite des Platzes gekocht: die kostenlose Sprosse bei Fertigkeit 0 (der Barsch, der Jägers Wildspieß, der Kräuter-Sumpfhecht), die mittlere Sprosse bei Fertigkeit 25 für 25 Silber pro Rezept (Eschenholz-Räucheraal, Goldblatt-Wildeintopf, Frostkiemensuppe) und die seltene Sprosse bei Fertigkeit 50 für 1 Gold das Stück (Abendmahl vom Silberkarpfen, Anglers Festmahlschale, Marlows Festtagsbraten).\n\nChargen-Gerichte strecken deine Zutaten: Der Räucheraal und der Wildeintopf servieren zwei pro Herstellung und die Festmahlschale drei. Marlow lehrt jede Sprosse, sobald dein Rang im Kochen sie erreicht.',
+    'Gesalzenes Dörrfleisch ist das Feldrezept: von Anfang an bekannt, ein Spinnenbein, überall herstellbar, die Wegzehrung jedes frischen Abenteurers. Die Lehrmeister-Leiter wird in den Eastbrook-Küchen auf der Ostseite des Platzes gekocht: die kostenlose Sprosse bei Fertigkeit 0 (der Barsch, der Jägers Wildspieß, der Kräuter-Sumpfhecht), die mittlere Sprosse bei Fertigkeit 25 für 25 Silber pro Rezept (Eschenholz-Räucheraal, Goldblatt-Wildeintopf, Frostkiemensuppe) und die seltene Sprosse bei Fertigkeit 50 für 1 Gold das Stück (Abendmahl vom Silberkarpfen, Anglers Festmahlschale, Marlows Festtagsbraten).\n\nChargen-Gerichte strecken deine Zutaten: Der Räucheraal und der Wildeintopf servieren zwei pro Herstellung und die Festmahlschale drei. Marlow lehrt jede Sprosse, sobald dein Rang im Kochen sie erreicht.',
   'guide.profPages.craftProse.cooking.routeHeading':
     'Spezialisierung, nicht Meisterwerke, und der Weg auf 125',
   'guide.profPages.craftProse.cooking.routeBody':
@@ -3770,6 +3770,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.hint':
     'Klickt auf einen Gegenstand in Euren Taschen, um ihn zu verkaufen, solange dieses Fenster geöffnet ist.',
   'itemUi.vendor.buyAria': '{item} für {price} kaufen',
+  'itemUi.vendor.buyAriaWithRequirement': '{item} für {price} kaufen. {requirement}',
   'itemUi.vendor.buybackTitle': 'Rückkauf',
   'itemUi.vendor.buybackEmpty': 'Keine Gegenstände',
   'itemUi.vendor.buybackAria': '{item} für {price} zurückkaufen',

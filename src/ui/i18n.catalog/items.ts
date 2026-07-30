@@ -331,7 +331,6 @@ export const itemStrings = {
         close: 'Cerrar vendedor',
         hint: 'Haz clic en un objeto de tus bolsas para venderlo mientras esta ventana esté abierta.',
         buyAria: 'Comprar {item} por {price}',
-        buyAriaWithRequirement: 'Comprar {item} por {price}. {requirement}',
       },
       market: {
         ...itemStringsEn.itemUi.market,
@@ -495,7 +494,6 @@ export const itemStrings = {
         close: 'Fermer le vendeur',
         hint: 'Cliquez sur un objet dans vos sacs pour le vendre tant que cette fenêtre est ouverte.',
         buyAria: 'Acheter {item} pour {price}',
-        buyAriaWithRequirement: 'Acheter {item} pour {price}. {requirement}',
       },
       market: {
         ...itemStringsEn.itemUi.market,
@@ -659,7 +657,6 @@ export const itemStrings = {
         close: 'Chiudi venditore',
         hint: 'Clicca su un oggetto nelle borse per venderlo mentre questa finestra è aperta.',
         buyAria: 'Compra {item} per {price}',
-        buyAriaWithRequirement: 'Compra {item} per {price}. {requirement}',
       },
       market: {
         ...itemStringsEn.itemUi.market,
@@ -821,7 +818,6 @@ export const itemStrings = {
         close: 'Händler schließen',
         hint: 'Klickt auf einen Gegenstand in Euren Taschen, um ihn zu verkaufen, solange dieses Fenster geöffnet ist.',
         buyAria: '{item} für {price} kaufen',
-        buyAriaWithRequirement: '{item} für {price} kaufen. {requirement}',
       },
       market: {
         ...itemStringsEn.itemUi.market,
@@ -982,7 +978,6 @@ export const itemStrings = {
         close: '关闭商人',
         hint: '此窗口打开时，点击背包中的物品即可出售。',
         buyAria: '以 {price} 购买 {item}',
-        buyAriaWithRequirement: '以 {price} 购买 {item}。{requirement}',
       },
       market: {
         ...itemStringsEn.itemUi.market,
@@ -1138,7 +1133,6 @@ export const itemStrings = {
         close: '關閉商人',
         hint: '此視窗開啟時，點擊背包中的物品即可出售。',
         buyAria: '以 {price} 購買 {item}',
-        buyAriaWithRequirement: '以 {price} 購買 {item}。{requirement}',
       },
       market: {
         ...itemStringsEn.itemUi.market,
@@ -1296,7 +1290,6 @@ export const itemStrings = {
         close: '상인 닫기',
         hint: '이 창이 열려 있을 때 가방의 아이템을 클릭하면 판매합니다.',
         buyAria: '{price}에 {item} 구매',
-        buyAriaWithRequirement: '{price}에 {item} 구매. {requirement}',
       },
       market: {
         ...itemStringsEn.itemUi.market,
@@ -1456,7 +1449,6 @@ export const itemStrings = {
         close: '商人を閉じる',
         hint: 'このウィンドウが開いている間、バッグ内のアイテムをクリックすると売却できます。',
         buyAria: '{item}を{price}で購入',
-        buyAriaWithRequirement: '{item}を{price}で購入。{requirement}',
       },
       market: {
         ...itemStringsEn.itemUi.market,
@@ -1616,7 +1608,6 @@ export const itemStrings = {
         close: 'Fechar vendedor',
         hint: 'Clique em um item nas suas bolsas para vendê-lo enquanto esta janela estiver aberta.',
         buyAria: 'Comprar {item} por {price}',
-        buyAriaWithRequirement: 'Comprar {item} por {price}. {requirement}',
       },
       market: {
         ...itemStringsEn.itemUi.market,
@@ -1776,7 +1767,6 @@ export const itemStrings = {
         close: 'Закрыть торговца',
         hint: 'Нажмите на предмет в сумках, чтобы продать его, пока это окно открыто.',
         buyAria: 'Купить {item} за {price}',
-        buyAriaWithRequirement: 'Купить {item} за {price}. {requirement}',
       },
       market: {
         ...itemStringsEn.itemUi.market,
@@ -1844,8 +1834,13 @@ export const itemStrings = {
   },
 };
 
-itemStrings.es_ES = itemStrings.es;
-itemStrings.fr_CA = itemStrings.fr_FR;
+// The casts keep these dialect aliases from forcing new keys into the inline
+// locale blocks above: those blocks are INERT legacy data (the resolver reads
+// only itemStrings.en; translations live in src/ui/i18n.locales/<lang>.ts),
+// and the uncast assignment is exactly what once pushed real fills into this
+// file where no locale ever served them.
+itemStrings.es_ES = itemStrings.es as typeof itemStringsEn;
+itemStrings.fr_CA = itemStrings.fr_FR as typeof itemStringsEn;
 
 const ITEM_ENTITY_IDS = [
   'worn_sword',

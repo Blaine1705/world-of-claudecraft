@@ -1573,7 +1573,7 @@ export const ZONE1_OBJECTS: GroundObjectDef[] = [
 // Roads from town toward each hub — used for terrain painting and the map.
 export const ZONE1_ROADS: { x: number; z: number }[][] = [
   [...EASTBROOK_LAYOUT.roads[0].points, { x: -8, z: 30 }, { x: -15, z: 55 }, { x: -2, z: 78 }], // north to wolves
-  [...EASTBROOK_LAYOUT.roads[1].points, { x: 30, z: 8 }, { x: 55, z: 12 }], // east to boars
+  [...EASTBROOK_LAYOUT.roads[1].points, { x: 30, z: 8 }, { x: 55, z: 12 }], // west to boars
   [...EASTBROOK_LAYOUT.roads[2].points, { x: 30, z: -30 }, { x: 50, z: -50 }, { x: 65, z: -65 }], // southwest to bandits
   [...EASTBROOK_LAYOUT.roads[3].points, { x: -35, z: 25 }, { x: -58, z: 48 }, { x: -66, z: 58 }], // northeast to lake
   [...EASTBROOK_LAYOUT.roads[4].points, { x: -30, z: -28 }, { x: -55, z: -45 }, { x: -70, z: -55 }], // southeast to mine

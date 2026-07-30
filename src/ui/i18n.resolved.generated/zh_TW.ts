@@ -4068,7 +4068,7 @@ export const zh_TW: EnTranslations = {
           "materialsHeading": "釣竿與獵刀供養的食櫃",
           "materialsBody": "釣魚按區域供應招牌食材：Eastbrook Vale的鏡鱒與河鱸，Mirefen Marsh的沼狗魚與泥鰻，Thornpeak Heights的霜鰓鱒與板鰭鯉，每一檔都烹本檔的魚。屠夫的一側來自屍體採集：野味肉，以及精良採集擲出的署名Prime Cut（大烤肉的核心）。藥草調味，梣木燻鰻，Cooking Salt在Marlow攤位8銅一袋。",
           "ladderHeading": "從肉乾到大烤肉",
-          "ladderBody": "Salted Jerky是野外配方：初始即會、一條蛛腿、隨處可做。訓練師梯子在廣場西側的Eastbrook廚房：免費檔技能0（河鱸、Hunter's Game Skewer、Herbed Marsh Pike），中檔技能25每個25銀（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder），精良檔技能50每個1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。批量菜省料：燻鰻與燉肉每次兩份，宴會拼盤三份。",
+          "ladderBody": "Salted Jerky是野外配方：初始即會、一條蛛腿、隨處可做。訓練師梯子在廣場東側的Eastbrook廚房：免費檔技能0（河鱸、Hunter's Game Skewer、Herbed Marsh Pike），中檔技能25每個25銀（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder），精良檔技能50每個1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。批量菜省料：燻鰻與燉肉每次兩份，宴會拼盤三份。",
           "routeHeading": "專精而非傑作，以及通往125之路",
           "routeBody": "烹飪是傑作故事裡誠實的例外：菜餚沒有屬性可提升，永不觸發，也不必追。這門手藝的精通在於75的專精：每樣食材省五分之一（批量菜上疊加極快），外加移動野外廚房，讓宴席在副本門口出鍋。邊釣邊做，兩門技能互相供養：免費檔到25，中檔到50，精良檔到75；此後精良菜衰減為半速與四分之一，到上限約再做150次。Marlow的訂單每30分鐘收八塊野味肉。技能50記下Seasoned Chef，125是Grandmaster Cooking頭銜。"
         },
@@ -6978,7 +6978,7 @@ export const zh_TW: EnTranslations = {
       "close": "關閉商人",
       "hint": "此視窗開啟時，點擊背包中的物品即可出售。",
       "buyAria": "以 {price} 購買 {item}",
-      "buyAriaWithRequirement": "Buy {item} for {price}. {requirement}",
+      "buyAriaWithRequirement": "以 {price} 購買 {item}。{requirement}",
       "buybackTitle": "買回",
       "buybackEmpty": "沒有物品",
       "buybackAria": "以 {price} 買回 {item}",

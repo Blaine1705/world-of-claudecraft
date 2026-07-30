@@ -4068,7 +4068,7 @@ export const ko_KR: EnTranslations = {
           "materialsHeading": "낚싯대와 칼이 채우는 찬장",
           "materialsBody": "간판 재료는 낚시가 지역별로 댄다. Eastbrook Vale의 거울 송어와 강 농어, Mirefen Marsh의 늪 창꼬치와 진흙 장어, Thornpeak Heights의 서리아가미 송어와 판지느러미 잉어. 사다리의 각 단은 제 단의 물고기를 요리하니 낚는 요리사는 재료가 마르지 않는다. 푸줏간 쪽은 사체 채집에서 온다. 멧돼지 따위의 사냥 고기, 그리고 희귀 이상 판정에서 나오는 서명된 Prime Cut, 대구이의 주인공이다. 약초가 좋은 접시에 향을 더하고, ashwood 통나무 하나가 장어를 훈제하며, Cooking Salt는 Marlow의 가판에서 한 봉지 8동이다.",
           "ladderHeading": "육포에서 대구이까지",
-          "ladderBody": "Salted Jerky가 야외 제조법이다. 처음부터 알고, 거미 다리 하나면 어디서든 만드는 신출내기의 행군식. 수련 사다리는 광장 서쪽 Eastbrook 주방에서 돈다. 무료 단은 기술 0(농어, Hunter's Game Skewer, Herbed Marsh Pike), 중간 단은 기술 25에 각 25은(Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder), 희귀 단은 기술 50에 각 1금(Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast). 묶음 요리는 재료를 늘린다. 훈제 장어와 스튜는 한 번에 두 접시, 연회 모둠은 세 접시다.",
+          "ladderBody": "Salted Jerky가 야외 제조법이다. 처음부터 알고, 거미 다리 하나면 어디서든 만드는 신출내기의 행군식. 수련 사다리는 광장 동쪽 Eastbrook 주방에서 돈다. 무료 단은 기술 0(농어, Hunter's Game Skewer, Herbed Marsh Pike), 중간 단은 기술 25에 각 25은(Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder), 희귀 단은 기술 50에 각 1금(Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast). 묶음 요리는 재료를 늘린다. 훈제 장어와 스튜는 한 번에 두 접시, 연회 모둠은 세 접시다.",
           "routeHeading": "걸작 아닌 특화, 그리고 125까지의 길",
           "routeBody": "요리는 걸작 이야기의 정직한 예외다. 접시에는 올릴 능력치가 없어 걸작이 절대 발동하지 않고, 좇을 이유도 없다. 이 기술의 정점은 75의 특화다. 모든 재료가 5분의 1씩 절약되고(묶음 요리에서 빠르게 불어난다), 이동식 야외 주방으로 던전 문 앞에서 연회를 차린다. 낚은 것을 요리하자. 두 기술이 서로를 먹인다. 육포와 무료 단으로 25, 중간 단으로 50, 희귀 단으로 75. 이후 더 높은 접시가 없어 희귀 요리가 절반과 4분의 1로 줄고, 상한까지 약 150회다. 갈이가 아니라 비축이라 생각하자. 길드는 모든 접시를 비운다. Marlow의 주문은 30분마다 사냥 고기 8점. 기술 50에 Seasoned Chef, 125에 Grandmaster Cooking 칭호다."
         },
@@ -6978,7 +6978,7 @@ export const ko_KR: EnTranslations = {
       "close": "상인 닫기",
       "hint": "이 창이 열려 있을 때 가방의 아이템을 클릭하면 판매합니다.",
       "buyAria": "{price}에 {item} 구매",
-      "buyAriaWithRequirement": "Buy {item} for {price}. {requirement}",
+      "buyAriaWithRequirement": "{price}에 {item} 구매. {requirement}",
       "buybackTitle": "되사기",
       "buybackEmpty": "물품 없음",
       "buybackAria": "{item}을(를) {price}에 되사기",

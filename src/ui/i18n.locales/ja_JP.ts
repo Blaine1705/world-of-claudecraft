@@ -2386,6 +2386,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.hint':
     'このウィンドウが開いている間、バッグ内のアイテムをクリックすると売却できます。',
   'itemUi.vendor.buyAria': '{item}を{price}で購入',
+  'itemUi.vendor.buyAriaWithRequirement': '{item}を{price}で購入。{requirement}',
   'itemUi.vendor.buybackTitle': '買い戻し',
   'itemUi.vendor.buybackEmpty': 'アイテムなし',
   'itemUi.vendor.buybackAria': '{item}を{price}で買い戻す',
@@ -10602,7 +10603,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '看板食材は釣りが地方ごとに供給します。Eastbrook Valeの鏡鱒と川鱸、Mirefen Marshの沼カワカマスと泥鰻、Thornpeak Heightsの霜鰓鱒と板鰭鯉。梯子の各段はその段の魚を調理するので、釣る料理人は品切れ知らずです。肉屋の側は亡骸採集から。猪などの獣肉、そしてレア以上の採集判定で署名入りのPrime Cut、大ローストの主役が出ます。薬草が上位の皿に香りを添え、ashwoodの丸太一本が鰻を燻し、Cooking SaltはMarlowの店で一袋8銅です。',
   'guide.profPages.craftProse.cooking.ladderHeading': '干し肉から大ローストへ',
   'guide.profPages.craftProse.cooking.ladderBody':
-    "Salted Jerkyが野外レシピです。最初から誰でも、蜘蛛の脚1本で、どこでも作れる駆け出しの携行食。訓練の梯子は広場西側のEastbrook厨房で、無料段はスキル0（川鱸、Hunter's Game Skewer、Herbed Marsh Pike）、中段はスキル25で各25銀（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder）、レア段はスキル50で各1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。まとめ料理は食材を伸ばします。燻製鰻と煮込みは1回で2皿、宴会盛りは3皿です。",
+    "Salted Jerkyが野外レシピです。最初から誰でも、蜘蛛の脚1本で、どこでも作れる駆け出しの携行食。訓練の梯子は広場東側のEastbrook厨房で、無料段はスキル0（川鱸、Hunter's Game Skewer、Herbed Marsh Pike）、中段はスキル25で各25銀（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder）、レア段はスキル50で各1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。まとめ料理は食材を伸ばします。燻製鰻と煮込みは1回で2皿、宴会盛りは3皿です。",
   'guide.profPages.craftProse.cooking.routeHeading': '傑作ではなく特化、そして125への道',
   'guide.profPages.craftProse.cooking.routeBody':
     '料理は傑作物語の正直な例外です。皿に伸ばす能力値がないので傑作は決して発動せず、追う必要もありません。この職の極みは75の特化です。全食材が2割引きになり（まとめ料理では加速度的に効きます）、移動式の野外厨房でダンジョンの扉の前で宴が炊けます。釣った物を料理し、二つの技能を互いに養いましょう。干し肉と無料段で25、中段で50、レア段で75。以降は上位の皿が未実装のため半減から四分の一へ薄れ、上限まではおよそ150回。作り置きと考えれば無駄がなく、ギルドは全皿を平らげます。Marlowの依頼は30分ごとに獣肉8個。スキル50でSeasoned Chef、125でGrandmaster Cooking称号です。',
