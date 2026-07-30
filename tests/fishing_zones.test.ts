@@ -49,11 +49,15 @@ import {
 } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
-const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'];
-// The v0.32.0 expansion zones: authored at tier 1 (matching their all-tier-1
-// hub-outskirt nodes) until phase 13 re-tiers them onto the ladder. Their
-// catch tables fall back to the Vale rows, so the weight arms below stay
-// scoped to ZONE_IDS, the three zones whose cells are authored.
+// DERIVED from the authored tables' own keys, never a hand list: the
+// shortfall-schedule sweep below must conscript a NEW zone's catch table the
+// moment one is authored (the new-zone checklist in
+// tests/professions_zone_rollout.test.ts pins only sum-100 and the
+// empty-hook row; THIS file is where the cells' authoring rule lives, and a
+// hand-kept list was exactly how a fourth zone's table would have dodged
+// it). The starter zones fall back to the Vale rows and so have no keys
+// here until their zone-4 re-tier authors real tables.
+const ZONE_IDS = Object.keys(FISHING_TABLES_BY_BAND[0]).sort();
 const EXPANSION_ZONE_IDS = [
   'veiled_hollow',
   'drakelands',
