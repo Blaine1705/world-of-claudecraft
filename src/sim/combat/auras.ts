@@ -38,8 +38,8 @@
 
 import { shouldFireConsumeTickSfx } from '../consume_sfx';
 import { pctValue, recalcPlayerStats } from '../entity';
-import { isPersistentEngineAura } from '../persistent_aura';
 import { manaRegenPer2s } from '../mana_regen';
+import { isPersistentEngineAura } from '../persistent_aura';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
