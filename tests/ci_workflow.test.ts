@@ -3,11 +3,13 @@ import { describe, expect, it } from 'vitest';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const gate = readFileSync(new URL('../scripts/gate.mjs', import.meta.url), 'utf8');
-// gate.mjs with its line comments removed. A raw-substring pin on a step is not
-// a pin at all: commenting the step out leaves the substring in the file, so the
-// assertion stays green while the local gate quietly stops running it. Anything
-// after `://` is left alone so a URL in a string cannot be truncated.
-const gateCode = gate.replace(/(^|[^:])\/\/.*$/gm, '$1');
+// gate.mjs with its comments removed, BOTH kinds. A raw-substring pin on a step
+// is not a pin at all: commenting the step out leaves the substring in the file,
+// so the assertion stays green while the local gate quietly stops running it.
+// Block comments are stripped first (a `/* ... */` wrapper defeats a line-comment
+// strip just as well), then line comments, leaving anything after `://` alone so
+// a URL inside a string cannot be truncated.
+const gateCode = gate.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 function jobSource(name: string): string {
   // The lookahead is the job boundary. It accepts digits and underscores too:

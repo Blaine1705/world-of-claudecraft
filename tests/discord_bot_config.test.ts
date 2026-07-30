@@ -248,8 +248,8 @@ describe('loadConfig env-key inventory', () => {
     // another suite) from deciding an arm. It is only as good as its coverage:
     // a key added to bot/config.ts and not here would silently read through to
     // the ambient environment and could make a fallback test pass for the wrong
-    // reason. Comments are stripped first so a commented-out read cannot pad
-    // the set.
+    // reason. Line comments are stripped first so a commented-out read cannot
+    // pad the set.
     const source = readFileSync(new URL('../bot/config.ts', import.meta.url), 'utf8').replace(
       /(^|[^:])\/\/.*$/gm,
       '$1',

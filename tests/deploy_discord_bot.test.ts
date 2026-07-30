@@ -53,9 +53,9 @@ describe('Discord bot build and typecheck surface', () => {
     // This is the headline deliverable of the stability packet's first phase,
     // and it is one word in one array. Removing it is completely silent:
     // build:bot is esbuild, which does not typecheck, and `npm run check:types`
-    // would simply check a smaller file set and stay green. The four bot suites
+    // would simply check a smaller file set and stay green. The bot test suites
     // drag most of bot/ in through their own imports, but bot/main.ts (the
-    // wiring, and the largest file) is imported by nothing and would drop out.
+    // wiring) is imported by nothing and would drop out.
     expect(tsconfig.include).toContain('bot');
   });
 });

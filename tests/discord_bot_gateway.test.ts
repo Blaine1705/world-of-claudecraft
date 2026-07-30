@@ -149,7 +149,6 @@ describe('Gateway production defaults', () => {
     // The query string is what selects protocol v10 and JSON (not ETF) encoding;
     // dropping either silently changes the wire format the parser expects.
     expect(constructed[0].url).toBe('wss://gateway.discord.gg/?v=10&encoding=json');
-    expect(constructed[0].socket).toBeInstanceOf(FakeSocket);
   });
 
   it('registers the message, close, and error listeners on the default socket', () => {
@@ -167,8 +166,15 @@ describe('Gateway production defaults', () => {
     // The socket factory has a default-path test above; the timers seam did not,
     // so replacing all three members with no-ops used to keep the suite green
     // while the production bot would never heartbeat and never reconnect.
-    vi.useFakeTimers();
+    //
+    // Constructed BEFORE the fake clock is installed, per R16: the default
+    // parameter is evaluated at construction, so a capture form
+    // (`= { setTimeout, setInterval, clearInterval }`) would bind the REAL
+    // timers here and never see the fake, and neither the heartbeat nor the
+    // reconnect below would fire. Installing the fake first passes for both
+    // forms and would guard nothing.
     const gateway = new Gateway('tok', 'wss://gateway.discord.gg', noopHandlers());
+    vi.useFakeTimers();
     gateway.connect(false);
     vi.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -228,7 +234,7 @@ describe('Gateway injected socket factory', () => {
 });
 
 describe('Gateway heartbeat', () => {
-  it('beats with the last seq it saw, and clears acked before each beat', () => {
+  it('beats with the last seq it saw', () => {
     const { socket, timers } = rig();
     frame(socket, { op: 10, d: { heartbeat_interval: 30_000 } });
     // A DISPATCH carrying s=7 is what advances the sequence the heartbeat sends;
@@ -328,7 +334,6 @@ describe('Gateway resume', () => {
       [false, 2], // d=false: the session is gone, start a fresh IDENTIFY
       [true, 6], // d=true: Discord says the session survives, RESUME it
     ] as const) {
-      constructed.length = 0;
       const { socket, timers, sockets } = rig();
       frame(socket, { op: 10, d: { heartbeat_interval: 30_000 } });
       frame(socket, {
@@ -465,7 +470,10 @@ describe('Gateway send guard and dispatch', () => {
       timers.seam,
     );
     gateway.connect(false);
-    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const errors: unknown[][] = [];
+    vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      errors.push(args);
+    });
 
     frame(socket, { op: 0, s: 1, t: 'GUILD_CREATE', d: { id: 'g1' } });
     frame(socket, { op: 0, s: 2, t: 'BOOM', d: {} });
@@ -475,6 +483,11 @@ describe('Gateway send guard and dispatch', () => {
 
     expect(seen.map(([t]) => t)).toEqual(['GUILD_CREATE', 'BOOM', 'GUILD_MEMBER_ADD']);
     expect(seen[0][1]).toEqual({ id: 'g1' });
+    // The MESSAGE label, not the parse one. Without the inner try/catch around
+    // onDispatch the throw still gets swallowed, by the outer handler in
+    // connect(), and the pump still survives, so the delivery assertions above
+    // pass either way. Only the log line separates the two catches.
+    expect(errors).toEqual([['[bot] dispatch handler error', expect.any(Error)]]);
   });
 
   it('survives an unparseable frame', () => {

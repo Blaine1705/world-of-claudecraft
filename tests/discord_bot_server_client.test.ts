@@ -488,7 +488,7 @@ describe('ServerClient call deadline', () => {
     expect(await first).toBe(null);
     settle[1](fakeResponse({ body: ROLES_ENVELOPE }));
     expect(await second).toEqual({ linked: true, statusTier: 3, points: 12, lifetimePoints: 40 });
-    expect(timers.cleared.sort()).toEqual([1, 2]);
+    expect([...timers.cleared].sort((a, b) => Number(a) - Number(b))).toEqual([1, 2]);
   });
 });
 

@@ -398,12 +398,17 @@ describe('DiscordApi production defaults', () => {
   it('backs the default retry sleep with the real global setTimeout', async () => {
     // Fake timers prove the default sleep is a genuine timer rather than an
     // accidental no-op: nothing resolves until the clock is advanced.
+    // Constructed BEFORE the fake clock, per R16: the default is evaluated at
+    // construction, so a form that captured setTimeout would bind the REAL one
+    // here and never resolve under the fake clock. Installing the fake first
+    // passes for both forms.
+    const api = new DiscordApi('tok');
     vi.useFakeTimers();
     let settled = false;
     vi.stubGlobal('fetch', async () => fakeResponse({ status: 429, body: { retry_after: 5 } }));
 
     try {
-      const pending = new DiscordApi('tok')
+      const pending = api
         .guildRoles('g1')
         .then(() => {
           settled = true;
@@ -415,9 +420,14 @@ describe('DiscordApi production defaults', () => {
       await vi.advanceTimersByTimeAsync(4999);
       expect(settled).toBe(false); // still inside the 5000 ms clamped wait
 
+      // Assert BEFORE awaiting `pending`. Awaiting first would wait out a REAL
+      // timer too, so a default that captured setTimeout at construction (and
+      // therefore scheduled on the real clock, ignoring the fake) would still
+      // settle eventually and pass. Advancing the FAKE clock has to be what
+      // resolves it.
       await vi.advanceTimersByTimeAsync(1);
-      await pending;
       expect(settled).toBe(true);
+      await pending;
     } finally {
       vi.useRealTimers();
       vi.unstubAllGlobals();

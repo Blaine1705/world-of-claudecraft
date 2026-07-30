@@ -58,7 +58,7 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
   after construction is still seen, and the global is never invoked with the
   instance as its `this`. Every shell also has a test that drives the DEFAULT
   path, not just the injected one; keep that pair when adding a shell, and write
-  it the only two ways that can actually fail:
+  it so that it can actually fail, which takes BOTH of these:
   **construct the shell BEFORE stubbing the global** (stub-then-construct passes
   for a capturing `= fetch`, so it does not guard this rule at all), and
   **assert every argument the default forwards**, not just the first (a
