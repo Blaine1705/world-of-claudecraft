@@ -1,9 +1,11 @@
 // @vitest-environment jsdom
 import './_setup';
-import { fireEvent, render, screen } from '@testing-library/svelte';
+import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import CharacterProfessionsModal from '../../src/admin/components/CharacterProfessionsModal.svelte';
-import { t } from '../../src/admin/i18n';
+import { fmtNumber } from '../../src/admin/format';
+import { DICT, t } from '../../src/admin/i18n';
+import { RESTORE_ITEM_MAX_COUNT } from '../../src/admin/professions_restore';
 import type { CharacterProfessionsSheet } from '../../src/admin/types';
 import { grantPermissions } from './_grant';
 
@@ -44,7 +46,8 @@ const sheet: CharacterProfessionsSheet = {
 
 let activeSheet: CharacterProfessionsSheet = sheet;
 const apiGet = vi.fn(async (path: string) => {
-  if (path === '/admin/api/characters/7/professions') return activeSheet;
+  // Any character id, so a modal re-pointed at another character is servable.
+  if (/^\/admin\/api\/characters\/\d+\/professions$/.test(path)) return activeSheet;
   throw new Error(`unexpected path ${path}`);
 });
 const apiPost = vi.fn(async (_path: string, _body: unknown) => ({}));
@@ -64,12 +67,37 @@ vi.mock('../../src/admin/api', () => ({
   clearSession: () => {},
 }));
 
+// window.alert is the modal's whole error surface (validation refusals and the
+// failed-POST path), so it is captured rather than left to jsdom's stub.
+const alerts = vi.fn<(message?: string) => void>();
+
 describe('CharacterProfessionsModal', () => {
   beforeEach(() => {
     activeSheet = sheet;
     apiGet.mockClear();
     apiPost.mockClear();
+    apiPost.mockImplementation(async () => ({}));
+    alerts.mockClear();
+    window.alert = alerts;
   });
+
+  // Fills the item-restore form and clicks Restore item.
+  async function openItemPrompt(itemId: string, count?: string): Promise<void> {
+    await fireEvent.input(screen.getByPlaceholderText(t('profInspect.itemIdPlaceholder')), {
+      target: { value: itemId },
+    });
+    if (count !== undefined) {
+      await fireEvent.input(screen.getByRole('spinbutton'), { target: { value: count } });
+    }
+    await fireEvent.click(screen.getByRole('button', { name: t('profInspect.restoreItemButton') }));
+  }
+
+  async function confirmPrompt(reason: string): Promise<void> {
+    await fireEvent.input(screen.getByPlaceholderText(t('detail.notePlaceholder')), {
+      target: { value: reason },
+    });
+    await fireEvent.click(screen.getByRole('button', { name: t('dialog.confirm') }));
+  }
 
   it('renders proficiencies, slots, and node timers from the sheet', async () => {
     grantPermissions();
@@ -157,5 +185,199 @@ describe('CharacterProfessionsModal', () => {
     expect(
       screen.queryByRole('button', { name: t('profInspect.restoreItemButton') }),
     ).not.toBeInTheDocument();
+  });
+
+  it('gives a read-only operator a visible close button that exits the modal', async () => {
+    // accounts.read without moderation.act renders no action buttons at all, so
+    // the header X is that operator's only way out besides Escape.
+    grantPermissions(['accounts.read']);
+    let closed = 0;
+    render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => (closed += 1) },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    const buttons = screen.getAllByRole('button', { name: t('profInspect.close') });
+    // The backdrop carries the same label; the header X is the one inside the
+    // dialog, and it is what the modal auto-focuses.
+    const close = buttons.find((el) => el.hasAttribute('data-modal-focus'));
+    expect(close, 'header close button with data-modal-focus').toBeDefined();
+    await fireEvent.click(close as HTMLElement);
+    expect(closed).toBe(1);
+  });
+
+  it('localizes the node-timer zone through the id-keyed label, not the raw id', async () => {
+    // The sheet sends a snake_case content id; the display-name-keyed zoneLabel
+    // fell straight through it, so this fails if that helper comes back.
+    grantPermissions();
+    render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    expect(screen.getByText(t('zone.eastbrook_vale'))).toBeInTheDocument();
+    expect(screen.queryByText('eastbrook_vale')).not.toBeInTheDocument();
+  });
+
+  it('renders the slot fire mode as operator copy, not the raw sim enum', async () => {
+    grantPermissions();
+    render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    expect(screen.getByText(t('profInspect.fireModeAlways'))).toBeInTheDocument();
+    expect(screen.queryByText('always')).not.toBeInTheDocument();
+  });
+
+  it('labels the empty profession and effect options instead of shipping blanks', async () => {
+    grantPermissions();
+    render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    const [profession, effect] = screen.getAllByRole('combobox') as HTMLSelectElement[];
+    expect(profession.options[0].value).toBe('');
+    expect(profession.options[0].textContent).toBe(t('profInspect.professionOptionNone'));
+    expect(effect.options[0].value).toBe('');
+    expect(effect.options[0].textContent).toBe(t('profInspect.effectOptionNone'));
+  });
+
+  it('joins a paired major through the catalog joiner, not a hardcoded separator', async () => {
+    grantPermissions();
+    const table = DICT.en as Record<string, string>;
+    const original = table['profInspect.archetypePair'];
+    // Re-point the catalog value for this render: a separator still hardcoded
+    // in the component would keep printing " + " and fail here.
+    table['profInspect.archetypePair'] = '{first} and {second}';
+    try {
+      const { container } = render(CharacterProfessionsModal, {
+        props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+      });
+      await screen.findByText('ore_eastbrook_1');
+      expect(container.textContent).toContain('Majors: alchemy and engineering; hobby: cooking');
+    } finally {
+      table['profInspect.archetypePair'] = original;
+    }
+  });
+
+  it('renders the single-major form for a legacy save with no paired major', async () => {
+    // The blob shape this inspector exists to read: no dangling separator.
+    grantPermissions();
+    activeSheet = {
+      ...sheet,
+      archetype: { activeArchetype: 'alchemy', pairedMajor: null, hobbyCraft: 'cooking' },
+    };
+    const { container } = render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    expect(container.textContent).toContain('Majors: alchemy; hobby: cooking');
+    expect(container.textContent).not.toContain('alchemy +');
+  });
+
+  it('renders the confirm summary from the catalog and clamps the count input', async () => {
+    grantPermissions();
+    const table = DICT.en as Record<string, string>;
+    const original = table['profInspect.restoreSummary'];
+    // Re-point the catalog value: a hardcoded "x" in either the builder or the
+    // component would keep printing the old shape and fail here.
+    table['profInspect.restoreSummary'] = '{count} of {id}';
+    try {
+      render(CharacterProfessionsModal, {
+        props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+      });
+      await screen.findByText('ore_eastbrook_1');
+      // The input clamp is the shared constant, so it cannot drift from the
+      // validator and the server.
+      expect(screen.getByRole('spinbutton')).toHaveAttribute('max', String(RESTORE_ITEM_MAX_COUNT));
+      await openItemPrompt('wolf_fang', '3');
+      expect(screen.getByText('3 of wolf_fang')).toBeInTheDocument();
+    } finally {
+      table['profInspect.restoreSummary'] = original;
+    }
+  });
+
+  it('refuses an out-of-range count BEFORE the confirm prompt opens', async () => {
+    // The prompt must never show a request the builder would then refuse, so
+    // this fails if the button stops going through openItemPrompt.
+    grantPermissions();
+    render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    await openItemPrompt('wolf_fang', '99');
+    expect(screen.queryByRole('button', { name: t('dialog.confirm') })).not.toBeInTheDocument();
+    expect(alerts).toHaveBeenCalledWith(
+      t('alert.restoreCountRange', { max: fmtNumber(RESTORE_ITEM_MAX_COUNT) }),
+    );
+    expect(apiPost).not.toHaveBeenCalled();
+  });
+
+  it('freezes the restore inputs while the confirm prompt is open', async () => {
+    // The summary in the prompt has to still describe the request that is sent.
+    grantPermissions();
+    render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    await openItemPrompt('wolf_fang');
+    expect(screen.getByPlaceholderText(t('profInspect.itemIdPlaceholder'))).toBeDisabled();
+    expect(screen.getByRole('spinbutton')).toBeDisabled();
+    for (const select of screen.getAllByRole('combobox')) expect(select).toBeDisabled();
+    // The frozen summary is the one the operator is confirming.
+    expect(screen.getByText('wolf_fang x1')).toBeInTheDocument();
+  });
+
+  it('surfaces the localized server error when the restore POST fails', async () => {
+    grantPermissions();
+    const serverProse = 'character is not online on this realm';
+    apiPost.mockRejectedValueOnce(new Error(serverProse));
+    render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    await openItemPrompt('wolf_fang');
+    await confirmPrompt('lost to a bug');
+    // The catalog value differs from the wire prose, so surfacing the raw
+    // server string instead of the localized one fails here.
+    expect(t('error.characterNotOnline')).not.toBe(serverProse);
+    await waitFor(() => expect(alerts).toHaveBeenCalledWith(t('error.characterNotOnline')));
+    // A failed restore keeps the operator's input so it can be retried.
+    expect(screen.getByPlaceholderText(t('profInspect.itemIdPlaceholder'))).toHaveValue(
+      'wolf_fang',
+    );
+  });
+
+  it('refetches and clears the form when it is re-pointed at another character', async () => {
+    // The sheet and a half-filled restore must never survive the swap: they
+    // would describe the previous character.
+    grantPermissions();
+    const { rerender } = render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    await fireEvent.input(screen.getByPlaceholderText(t('profInspect.itemIdPlaceholder')), {
+      target: { value: 'wolf_fang' },
+    });
+    await rerender({ characterId: 8, characterName: 'Alaric', onClose: () => {} });
+    await waitFor(() => expect(apiGet).toHaveBeenCalledWith('/admin/api/characters/8/professions'));
+    await screen.findByText('ore_eastbrook_1');
+    expect(screen.getByPlaceholderText(t('profInspect.itemIdPlaceholder'))).toHaveValue('');
+  });
+
+  it('refetches the sheet and clears the form after a confirmed restore', async () => {
+    grantPermissions();
+    render(CharacterProfessionsModal, {
+      props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
+    });
+    await screen.findByText('ore_eastbrook_1');
+    expect(apiGet).toHaveBeenCalledTimes(1);
+    await openItemPrompt('wolf_fang', '3');
+    await confirmPrompt('lost to a bug');
+    // The sheet is re-read, so the operator sees the restored state.
+    await waitFor(() => expect(apiGet).toHaveBeenCalledTimes(2));
+    // ... and the fields are empty, so a second click cannot silently re-mint
+    // the same restore.
+    expect(screen.queryByRole('button', { name: t('dialog.confirm') })).not.toBeInTheDocument();
+    expect(screen.getByPlaceholderText(t('profInspect.itemIdPlaceholder'))).toHaveValue('');
+    expect(screen.getByRole('spinbutton')).toHaveValue(1);
   });
 });

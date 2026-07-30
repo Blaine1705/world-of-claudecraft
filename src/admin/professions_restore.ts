@@ -6,12 +6,20 @@
 // fail-closed (content vocabularies live with the sim, not here), so these
 // checks exist only to catch operator slips before the audit row is written.
 
+import { fmtNumber } from './format';
 import { t } from './i18n';
 import type { Built } from './moderation_actions';
 
 /** Client mirror of the server's dev_give clamp (RESTORE_ITEM_MAX_COUNT in
  *  server/character_professions.ts); the server refuses past it regardless. */
 export const RESTORE_ITEM_MAX_COUNT = 20;
+
+/** The "<id> x<count>" confirm-row value. The multiplier is typography a
+ *  locale may render differently, and the count goes through the admin number
+ *  formatter, so both the builder row and the live modal row read it here. */
+export function restoreItemSummary(itemId: string, count: number): string {
+  return t('profInspect.restoreSummary', { id: itemId, count: fmtNumber(count) });
+}
 
 export function restoreItem(
   characterId: number,
@@ -33,7 +41,7 @@ export function restoreItem(
       title: t('dialog.confirmRestoreItem'),
       rows: [
         { label: t('dialog.character'), value: characterName },
-        { label: t('dialog.item'), value: `${id} x${count}` },
+        { label: t('dialog.item'), value: restoreItemSummary(id, count) },
         { label: t('dialog.reason'), value: note },
       ],
       endpoint: `/admin/api/moderation/characters/${characterId}/restore-item`,

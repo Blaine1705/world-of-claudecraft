@@ -236,6 +236,20 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'character went offline before the restore landed': 'error.restoreWentOffline',
   'item restore failed': 'error.restoreItemFailed',
   'slot restore failed': 'error.restoreSlotFailed',
+  // Named-constant, multi-line, and `err.message ?? literal` fallback prose the
+  // widened phase 15 scan guard surfaced (it now flattens the source, resolves
+  // single-identifier arguments through server/admin.ts's own constants, and
+  // reads the ternary fallback literal).
+  'ai must be a boolean': 'error.aiFlagRequired',
+  'streamer must be a boolean': 'error.streamerFlagRequired',
+  'a links object is required': 'error.streamerLinksRequired',
+  'failed to update account flair': 'error.accountFlairFailed',
+  'a valid daily rewards date is required': 'error.dailyRewardDayRequired',
+  'daily rewards moderation failed': 'error.dailyRewardsModerationFailed',
+  'daily rewards ip moderation failed': 'error.dailyRewardsIpModerationFailed',
+  'failed to add note': 'error.addNoteFailed',
+  'chat strikes reset failed': 'error.chatStrikesResetFailed',
+  'reactivation failed': 'error.reactivationFailed',
 };
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];
