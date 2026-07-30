@@ -104,6 +104,9 @@ export function slotToolEffectAction(
   // would silently strip a confirmed prompt use mid-cast (the phase 14 QA
   // finding). No live cast means the fields are already inert and the
   // clear is a no-op kept for the defensive arm (an unknown cast node id).
+  // A live FISHING cast also reads as the empty id (fishing never writes
+  // gatherCastNodeId or these captures today); if fishing ever adopts the
+  // capture fields, key this scope off the profession instead.
   // Draw-free field writes; '' / false are the inert values.
   const castNode = r.e.gatherCastNodeId !== '' ? gatherNodeById(r.e.gatherCastNodeId) : undefined;
   const castProfession = castNode ? NODE_HARVEST_TABLE[castNode.type].professionId : undefined;

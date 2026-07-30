@@ -138,13 +138,16 @@ export function gatherNodeClusters(
  * Memoized per (item id, link distance): every input is static content
  * (GATHER_NODES and the grade tables) and the map view re-asks per redraw
  * for every incomplete collect objective, so the filter-and-union work
- * runs once per distinct ask for the process lifetime.
+ * runs once per distinct ask for the process lifetime. The RETURN IS THE
+ * LIVE CACHE, shared across every Sim in the process (unlike the sibling
+ * gatherNodeClusters, which builds fresh): callers must never mutate it,
+ * which the readonly type enforces at compile time.
  */
-const yieldClusterMemo = new Map<string, { x: number; z: number }[][]>();
+const yieldClusterMemo = new Map<string, readonly (readonly { x: number; z: number }[])[]>();
 export function nodeYieldClusters(
   itemId: string,
   linkYd: number = NODE_CLUSTER_LINK_YD,
-): { x: number; z: number }[][] {
+): readonly (readonly { x: number; z: number }[])[] {
   const key = `${itemId}:${linkYd}`;
   const hit = yieldClusterMemo.get(key);
   if (hit) return hit;

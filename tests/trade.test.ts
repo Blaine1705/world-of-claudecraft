@@ -358,9 +358,10 @@ describe('trade module (direct, no Sim)', () => {
 
     expect(players.get(1).inventory).toHaveLength(0);
     const arrived = players.get(2).inventory.map((s: any) => s.instance);
-    expect(arrived).toHaveLength(2);
-    expect(arrived).toContainEqual(foreign);
-    expect(arrived).toContainEqual(selfSigned);
+    // ORDER pinned, not membership (the fix-round review): charms land in
+    // distinct receiver slots in grant order, so a swapped pass pair would
+    // ship the self-signed copy first and this line reds.
+    expect(arrived).toEqual([foreign, selfSigned]);
   });
 
   it('signed NON-charm equipment keeps the plain highest-index walk (no deprioritization)', () => {
@@ -470,9 +471,14 @@ describe('trade module (direct, no Sim)', () => {
     const end = src.indexOf('fitsAfterSwap(metaA', start);
     expect(end).toBeGreaterThan(start);
     const body = src.slice(start, end);
-    expect(body).toContain('sellerSignedCharmDeprioritize(giver.name, s.itemId)');
-    expect(body).toContain('modelPass(false)');
-    expect(body).toContain('modelPass(true)');
+    expect(body).toContain('sellerSignedCharmDeprioritize(');
+    expect(body).toContain('ctx.resolve(giver.entityId)?.meta.name');
+    // The preferred pass runs BEFORE the deprioritized one, and the second
+    // pass stays guarded on a real remainder (the fix-round review: two
+    // independent toContains passed with the passes swapped).
+    expect(body.indexOf('modelPass(false)')).toBeGreaterThan(-1);
+    expect(body.indexOf('modelPass(false)')).toBeLessThan(body.indexOf('modelPass(true)'));
+    expect(body).toContain('deprioritize && remaining > 0 && !modelPass(true)');
     expect(body).toContain('(deprioritize?.(g.instance) ?? false) !== takeDeprioritized');
   });
 

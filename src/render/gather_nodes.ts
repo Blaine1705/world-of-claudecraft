@@ -71,14 +71,25 @@ function buildNodeMesh(type: GatherNodeType): THREE.Object3D {
 export function buildGatherNodes(seed: number): GatherNodesView {
   const group = new THREE.Group();
   group.name = 'gatherNodes';
+  // Per-BUILD, not module-level: the GLBs can finish loading between one
+  // build and a later one (the fallback-primitive race), and a stale
+  // module cache would then anchor fresh GLB instances with the
+  // primitive's minY.
+  const typeMinY = new Map<GatherNodeType, number>();
   for (const node of GATHER_NODES) {
     const obj = buildNodeMesh(node.type);
     // The UNSCALED bounds, read before the tier scale lands: the base
     // anchor below needs the geometry-space minY (a GLB instance is a
-    // Group, so the box is the one shape both paths share). A degenerate
-    // box (no geometry yet) reads 0 and the anchor is a no-op.
-    const bounds = new THREE.Box3().setFromObject(obj);
-    const minY = Number.isFinite(bounds.min.y) ? bounds.min.y : 0;
+    // Group, so the box is the one shape both paths share). Cached per
+    // TYPE (the fix-round review): every node of a type clones the same
+    // source, so one traversal per type covers the whole table. A
+    // degenerate box (no geometry yet) reads 0 and the anchor is a no-op.
+    let minY = typeMinY.get(node.type);
+    if (minY === undefined) {
+      const bounds = new THREE.Box3().setFromObject(obj);
+      minY = Number.isFinite(bounds.min.y) ? bounds.min.y : 0;
+      typeMinY.set(node.type, minY);
+    }
     // Tier differentiation (the UX pass): size, never hue, identical on
     // every preset (gather_nodes_lookup.ts nodeTierScale).
     const tierScale = nodeTierScale(node.tier);

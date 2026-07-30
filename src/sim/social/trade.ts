@@ -320,10 +320,18 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
         addStacked(scratch, s.itemId, plainCount);
       }
       let remaining = s.count - plainCount;
-      // The same predicate the removal builds: the model's two passes must
-      // pick the same copies in the same order or the modeled payloads
-      // diverge from the shipped ones (the phase 14 QA's proven overflow).
-      const deprioritize = sellerSignedCharmDeprioritize(giver.name, s.itemId);
+      // The same predicate the removal builds, from the same RESOLVE (the
+      // fix-round review): removeOffer sources the name through
+      // ctx.resolve, which answers null when either half is missing, so
+      // the model must share that failure mode or a meta-present,
+      // entity-absent state builds a predicate the removal never applies.
+      // The model's two passes must pick the same copies in the same order
+      // or the modeled payloads diverge from the shipped ones (the phase
+      // 14 QA's proven overflow).
+      const deprioritize = sellerSignedCharmDeprioritize(
+        ctx.resolve(giver.entityId)?.meta.name,
+        s.itemId,
+      );
       const modelPass = (takeDeprioritized: boolean): boolean => {
         for (let i = giver.inventory.length - 1; i >= 0 && remaining > 0; i--) {
           const g = giver.inventory[i];

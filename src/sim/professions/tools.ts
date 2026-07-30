@@ -597,14 +597,22 @@ export function normalizeToolEffectSlots(
       // flow shipped it is an ordinary live mode: the mint accepts it and
       // the harvest command carries the per-use consent it asks for.
       // Coercing it to 'always' here would silently retire a player's
-      // deliberate choice. An ABSENT mode is a legacy row minted before the
-      // union existed, when every slot fired unconditionally: 'always' is
-      // its faithful reading. A GARBLED value (no live path writes one; a
-      // hand-edited or corrupted row) coerces to 'prompt', the fail-safe
-      // direction: a slot that asks first can never silently spend a
-      // charge, while 'always' would.
-      confirmMode:
-        row.confirmMode === 'always' || row.confirmMode === undefined ? 'always' : 'prompt',
+      // deliberate choice. An ABSENT or NULL mode is a legacy row minted
+      // before the union existed, when every slot fired unconditionally
+      // ('always' is its faithful reading; null is the one plausible
+      // never-set shape a JSON column writes). A GARBLED value (no live
+      // path writes one; a hand-edited or corrupted row) coerces to
+      // 'prompt', the fail-safe direction: a slot that asks first can
+      // never silently spend a charge, while 'always' would. The coercion
+      // is NOT read-only: the normalized row re-serializes on the next
+      // save (sim.ts serializeCharacter), so a garbled value becomes a
+      // stored 'prompt' permanently and can no longer be told apart from a
+      // deliberate choice, and changing a live slot's mode back costs
+      // another charm (the no_gain conjunct is what lets a mode-only
+      // re-slot land). Fail-safe stays the right direction: a burned
+      // charge is unrecoverable, a charm is a known price, and the mode
+      // chip makes the coerced state visible.
+      confirmMode: row.confirmMode === 'always' || row.confirmMode == null ? 'always' : 'prompt',
     };
   }
   return out;

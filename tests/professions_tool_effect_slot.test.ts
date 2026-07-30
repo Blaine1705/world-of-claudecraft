@@ -824,6 +824,9 @@ describe('the id tables and the load normalizer, directly', () => {
     expect(load('prompt')).toBe('prompt');
     expect(load('always')).toBe('always');
     expect(load(undefined)).toBe('always');
+    // null is the never-set shape a JSON column plausibly writes: it reads
+    // as legacy-absent, never as garbage (the fix-round review).
+    expect(load(null)).toBe('always');
     expect(load('sometimes')).toBe('prompt');
     expect(load(7)).toBe('prompt');
   });
