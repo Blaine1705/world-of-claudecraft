@@ -236,10 +236,10 @@ describe('camera follow', () => {
     // holds the pre-death heading. The rigid-follow term reads that as a turn,
     // but because lastInterpFacing re-syncs to interpFacing every call regardless
     // of whether camYaw caught up, only ONE frame's worth of the correction is
-    // ever applied before the term goes quiet again: the camera partially
-    // rotates, then sticks there. This is why a prevFacing-only fix does not
-    // reliably resolve it: the stale value lives on the camera side, not the sim.
-    it('without a resync, a stale camera lastInterpFacing sticks the camera ~140 degrees off after a respawn', () => {
+    // ever applied before the term goes quiet again: a spurious partial turn that
+    // sticks. This is why a prevFacing-only fix does not reliably resolve it: the
+    // stale value lives on the camera side, not the sim.
+    it('without a resync, a stale camera lastInterpFacing applies one spurious partial turn after a respawn', () => {
       const dt = 1 / 60;
       // Camera was settled in behind the player before death (camYaw in sync with
       // the pre-death facing).
@@ -260,8 +260,12 @@ describe('camera follow', () => {
         camYaw = next.camYaw;
         lastInterpFacing = next.lastInterpFacing;
       }
-      // Stuck well off both the old (2.5) and new (0) facing: about 140 degrees
-      // (2.44 rad) away from where the player is actually looking.
+      // The large gap from facing 0 (camYaw stays near 2.5) is expected: the
+      // rigid-follow term only settles the camera while the player is moving,
+      // and that persists after the fix too. What the fix removes is the ONE
+      // spurious capped step (~0.06 rad at MAX_AUTO_YAW_SPEED) the stale
+      // lastInterpFacing otherwise applies on this frame, dropping camYaw from
+      // 2.5 to about 2.44 before the term goes quiet again.
       expect(camYaw).toBeGreaterThan(2.2);
       expect(camYaw).toBeLessThan(2.5);
     });
