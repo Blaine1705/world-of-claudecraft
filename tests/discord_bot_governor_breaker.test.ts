@@ -14,6 +14,7 @@ import {
   GovernorBlockedError,
   type GovernorRequest,
   type GovernorResponse,
+  MAX_TRACKED_BUCKETS,
   RateGovernor,
   type RateGovernorOptions,
 } from '../bot/rate_governor';
@@ -612,5 +613,71 @@ describe('governor registry bounds', () => {
     const before = rig.clock.now();
     await call(rig, SWEEP, OK);
     expect(rig.clock.now() - before).toBeGreaterThanOrEqual(2000);
+  });
+});
+
+describe('bucket registry cap on every insert path', () => {
+  it('bounds limits when 429s carry NO rate headers at all', async () => {
+    // The cap used to be enforced only from absorbHeaders, which returns early
+    // when a response has neither x-ratelimit-remaining nor -reset-after. A JSON
+    // 429 with no rate headers therefore inserted straight into `limits` and
+    // skipped the bound entirely, and interaction callbacks mint a unique
+    // template per interaction id, so that path grew forever.
+    //
+    // evictBuckets also used to consider ONLY idle buckets and evict one per
+    // call, so a population of live ones (every 429 here sets a future resetAt)
+    // could not be evicted at all. Both halves are exercised here at once.
+    // A breaker limit far above the 700 counted 429s below: the breaker is not
+    // what is under test here, and the rig's usual limit of 3 would open it on
+    // the fourth iteration and refuse the rest before they ever reached a bucket.
+    const rig = makeRig({ breakerLimit: 100_000 });
+    const bare429: GovernorResponse = {
+      status: 429,
+      headers: {},
+      json: { retry_after: 30 },
+      jsonParsed: true,
+    };
+
+    for (let i = 0; i < 700; i++) {
+      const id = `2000000000000000${String(i).padStart(3, '0')}`;
+      // One attempt each: the retry is not what is under test, and letting it
+      // run would sleep out 30 virtual seconds per iteration.
+      await call(rig, { method: 'POST', path: `/interactions/${id}/tok/callback` }, bare429, OK);
+    }
+
+    const snap = rig.governor.snapshot();
+    expect(snap.trackedBuckets).toBeLessThanOrEqual(MAX_TRACKED_BUCKETS);
+    // Non-trivial: the loop really did drive hundreds of distinct buckets
+    // through the cap rather than collapsing onto a handful of keys.
+    expect(snap.rateLimited).toBe(700);
+  });
+
+  it('evicts a LIVE bucket when every tracked bucket still holds a future reset', async () => {
+    // The other half of the eviction fix, and the branch the 429 test above
+    // cannot reach: there, the retry wait advances the clock past each reset, so
+    // buckets keep becoming idle and an idle-only sweep still finds victims.
+    //
+    // Here every response is a success carrying a reset far in the future, so no
+    // bucket is EVER idle and no time passes to make one. An eviction pass that
+    // considered only idle entries would find no victim, return without deleting
+    // anything, and let the map grow past its documented bound forever.
+    const rig = makeRig({ breakerLimit: 100_000 });
+    const live: GovernorResponse = {
+      status: 200,
+      headers: { 'x-ratelimit-remaining': '5', 'x-ratelimit-reset-after': '100000' },
+      json: {},
+      jsonParsed: true,
+    };
+
+    for (let i = 0; i < 700; i++) {
+      const id = `3000000000000000${String(i).padStart(3, '0')}`;
+      await call(rig, { method: 'POST', path: `/interactions/${id}/tok/callback` }, live);
+    }
+
+    const snap = rig.governor.snapshot();
+    expect(snap.trackedBuckets).toBeLessThanOrEqual(MAX_TRACKED_BUCKETS);
+    // The window never elapsed, so this really was the all-live population.
+    expect(rig.clock.now()).toBeLessThan(100_000_000);
+    expect(rig.sent.length).toBe(700);
   });
 });

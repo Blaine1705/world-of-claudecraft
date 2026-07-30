@@ -655,6 +655,11 @@ export class RateGovernor {
     state.resetAt = Math.max(state.resetAt ?? 0, now + retryMs);
     state.lastUsedAt = now;
     this.limits.set(key, state);
+    // Enforced HERE too, not only from absorbHeaders. A 429 carrying no
+    // x-ratelimit-* headers makes absorbHeaders return early, so this insert was
+    // the one path into `limits` that skipped the cap entirely, and interaction
+    // callbacks mint a unique template per interaction id.
+    this.evictBuckets(now);
     return { retryMs, countsAsFailure };
   }
 
@@ -748,17 +753,36 @@ export class RateGovernor {
    * without this the map would grow for the process's whole life.
    */
   private evictBuckets(now: number): void {
-    if (this.limits.size <= MAX_TRACKED_BUCKETS) return;
-    let oldestKey: string | null = null;
-    let oldestAt = Number.POSITIVE_INFINITY;
-    for (const [key, state] of this.limits) {
-      const idle = state.resetAt === null || state.resetAt <= now;
-      if (idle && state.lastUsedAt < oldestAt) {
-        oldestAt = state.lastUsedAt;
-        oldestKey = key;
+    // Drains until the map is AT the cap, not one entry per call. Evicting a
+    // single entry cannot catch up with a burst, so the map would sit over its
+    // documented bound indefinitely.
+    while (this.limits.size > MAX_TRACKED_BUCKETS) {
+      let idleKey: string | null = null;
+      let idleAt = Number.POSITIVE_INFINITY;
+      let anyKey: string | null = null;
+      let anyAt = Number.POSITIVE_INFINITY;
+      for (const [key, state] of this.limits) {
+        if (state.lastUsedAt < anyAt) {
+          anyAt = state.lastUsedAt;
+          anyKey = key;
+        }
+        const idle = state.resetAt === null || state.resetAt <= now;
+        if (idle && state.lastUsedAt < idleAt) {
+          idleAt = state.lastUsedAt;
+          idleKey = key;
+        }
       }
+      // Prefer an idle bucket, whose state is worthless anyway. But fall back to
+      // the least recently used LIVE one rather than giving up: with every
+      // tracked bucket holding a future reset there was no idle candidate at
+      // all, so the loop evicted nothing and MAX_TRACKED_BUCKETS stopped being a
+      // bound. Dropping a live entry only costs one round trip of proactive
+      // gating, which the next response re-establishes; an unbounded map does
+      // not recover.
+      const victim = idleKey ?? anyKey;
+      if (victim === null) return;
+      this.limits.delete(victim);
     }
-    if (oldestKey !== null) this.limits.delete(oldestKey);
   }
 
   /** Count one response toward the invalid-request window and open if it is full. */
