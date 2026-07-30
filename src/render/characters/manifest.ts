@@ -802,17 +802,12 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0xd08b45,
     tintStrength: 0.35,
   },
-  // Druid Travel Form: the ghostly-stag apparition the ability conjures is the
-  // classic read, so the morphed body IS a stag (Quaternius animal rig, same
-  // GLB as mob_stag) - body and spell ceremony now agree instead of a
-  // chicken-cow body clashing with a deer apparition. Slight tint so the druid
-  // form reads apart from wild stags; Gallop carries the run-speed fantasy.
+  // Druid Travel Form: a daft chicken-cow hybrid (custom GLB). No tint: its
+  // authored cow-spots/comb/beak colours carry the look.
   form_travel: {
-    url: `${CREATURES}/stag.glb`,
-    height: 2.0,
-    clips: animal(['Attack_Headbutt', 'Attack']),
-    tint: 0xbfe39a,
-    tintStrength: 0.28,
+    url: `${CREATURES}/chicken_cow.glb`,
+    height: 2.3,
+    clips: CHICKEN_COW,
   },
 
   // -- rideable mounts (src/sim/content/mounts.ts catalog) -------------------
