@@ -1986,7 +1986,11 @@ export class Renderer {
     this.motes = buildMotes(this.sim.cfg.seed);
     this.scene.add(this.motes.group);
     // near-field solid-blade carpet; the card tufts own the mid/far field
-    this.bladeGrass = buildBladeGrass(this.sim.cfg.seed);
+    this.bladeGrass = buildBladeGrass(
+      this.sim.cfg.seed,
+      this.sim.player.pos.x,
+      this.sim.player.pos.z,
+    );
     this.scene.add(this.bladeGrass.group);
     // boulders on the steep-slope band; cliffs stop being bare wedges
     this.cliffScree = buildCliffScree(this.sim.cfg.seed);

@@ -2,6 +2,11 @@ import * as THREE from 'three';
 import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
 import { isInSowfieldShell } from '../sim/vale_cup_layout';
 import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
+import {
+  activateDenseSlot,
+  type DenseSlotState,
+  deactivateDenseSlot,
+} from './blade_grass_dense_core';
 import { GRASS_BIOME_DENSITY } from './foliage';
 import { insideGrassHubExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
@@ -122,7 +127,11 @@ function clusterGeometry(rng: () => number): THREE.BufferGeometry {
   return geo;
 }
 
-export function buildBladeGrass(seed: number): BladeGrassView {
+export function buildBladeGrass(
+  seed: number,
+  initialPx: number,
+  initialPz: number,
+): BladeGrassView {
   const group = new THREE.Group();
   group.name = 'bladeGrass';
   // The carpet is a close-camera read and one of the graphics-overhaul detail
@@ -185,15 +194,20 @@ export function buildBladeGrass(seed: number): BladeGrassView {
   im.receiveShadow = true;
   im.castShadow = false;
   im.frustumCulled = false; // pool is centred on the player
-  const zero = new THREE.Matrix4().makeScale(0, 0, 0);
-  for (let s = 0; s < POOL; s++) im.setMatrixAt(s, zero);
+  im.count = 0;
   im.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(POOL * 3), 3);
   im.instanceColor.setUsage(THREE.DynamicDrawUsage);
   group.add(im);
 
   // per-slot current cell (packed), Number.MIN_SAFE_INTEGER = never placed
   const slotCell = new Int32Array(POOL).fill(0x7fffffff);
+  const denseSlots: DenseSlotState = {
+    count: 0,
+    slotToDense: new Int32Array(POOL).fill(-1),
+    denseToSlot: new Int32Array(POOL).fill(-1),
+  };
   const m = new THREE.Matrix4();
+  const movedMatrix = new THREE.Matrix4();
   const q = new THREE.Quaternion();
   const qLean = new THREE.Quaternion();
   const up = new THREE.Vector3(0, 1, 0);
@@ -201,6 +215,14 @@ export function buildBladeGrass(seed: number): BladeGrassView {
   const v = new THREE.Vector3();
   const sv = new THREE.Vector3();
   const c = new THREE.Color();
+  const movedColor = new THREE.Color();
+  let dirtyLo = POOL;
+  let dirtyHi = -1;
+
+  const markDirty = (dense: number): void => {
+    if (dense < dirtyLo) dirtyLo = dense;
+    if (dense > dirtyHi) dirtyHi = dense;
+  };
 
   const hash = (i: number, j: number, k: number): number => {
     let h = (i * 374761393 + j * 668265263 + k * 2246822519) | 0;
@@ -249,17 +271,31 @@ export function buildBladeGrass(seed: number): BladeGrassView {
           // per-cluster height jitter on top of the blade-level length spread
           const hJit = 0.82 + hash(ci, cj, 6) * 0.36;
           m.compose(v.set(x, h - 0.02, z), q, sv.set(s, s * (0.85 + lush * 0.5) * hJit, s));
-          im.setMatrixAt(slot, m);
           groundGrassColorAt(x, z, seed, c);
           // slight lift over the raw ground tint: blades catch more sky
           // than the soil they stand on
           c.multiplyScalar(1.18);
-          im.setColorAt(slot, c);
+          const dense = activateDenseSlot(denseSlots, slot);
+          im.setMatrixAt(dense, m);
+          im.setColorAt(dense, c);
+          markDirty(dense);
           return;
         }
       }
     }
-    im.setMatrixAt(slot, zero);
+    const removedDense = denseSlots.slotToDense[slot];
+    if (removedDense < 0) return;
+    const movedSlot = deactivateDenseSlot(denseSlots, slot);
+    if (movedSlot >= 0) {
+      // The old last element remains readable at the new count index until
+      // this copy completes. Moving it into the gap keeps the submitted
+      // prefix dense without changing the matrix or colour bytes.
+      im.getMatrixAt(denseSlots.count, movedMatrix);
+      im.setMatrixAt(removedDense, movedMatrix);
+      im.getColorAt(denseSlots.count, movedColor);
+      im.setColorAt(removedDense, movedColor);
+      markDirty(removedDense);
+    }
   }
 
   // Scan bookkeeping: the toroidal scan only has work when the target block
@@ -269,9 +305,42 @@ export function buildBladeGrass(seed: number): BladeGrassView {
   // world column depends only on (gi, baseI), so a scan computes it GRID_W
   // times instead of GRID_W * GRID_W times.
   const colCi = new Int32Array(GRID_W);
-  let lastBaseI = 0x7fffffff;
-  let lastBaseJ = 0x7fffffff;
-  let pending = true;
+
+  const scanTargetBlock = (baseI: number, baseJ: number, initialBudget: number): boolean => {
+    for (let gi = 0; gi < GRID_W; gi++) {
+      // world cell owned by slot (gi, gj): the unique cell in the target
+      // block congruent to (gi, gj) mod GRID_W
+      colCi[gi] = baseI + ((((gi - baseI) % GRID_W) + GRID_W) % GRID_W);
+    }
+    let budget = initialBudget;
+    for (let gj = 0; gj < GRID_W && budget > 0; gj++) {
+      const cjj = baseJ + ((((gj - baseJ) % GRID_W) + GRID_W) % GRID_W);
+      const packedLo = cjj & 0xffff;
+      const rowBase = gj * GRID_W;
+      for (let gi = 0; gi < GRID_W && budget > 0; gi++) {
+        const packed = ((colCi[gi] & 0xffff) << 16) | packedLo;
+        const slot = rowBase + gi;
+        if (slotCell[slot] === packed) continue;
+        slotCell[slot] = packed;
+        placeSlot(slot, colCi[gi], cjj);
+        budget--;
+      }
+    }
+    return budget <= 0;
+  };
+
+  // Build the first dense prefix before the mesh reaches the renderer. Three.js
+  // uploads each full attribute on its first draw, so no needsUpdate edge or
+  // per-frame backfill is required for this placement.
+  const initialBaseI = Math.floor(initialPx / CELL) - (GRID_W >> 1);
+  const initialBaseJ = Math.floor(initialPz / CELL) - (GRID_W >> 1);
+  scanTargetBlock(initialBaseI, initialBaseJ, Number.POSITIVE_INFINITY);
+  im.count = denseSlots.count;
+  dirtyLo = POOL;
+  dirtyHi = -1;
+  let lastBaseI = initialBaseI;
+  let lastBaseJ = initialBaseJ;
+  let pending = false;
 
   return {
     group,
@@ -283,32 +352,13 @@ export function buildBladeGrass(seed: number): BladeGrassView {
       if (baseI === lastBaseI && baseJ === lastBaseJ && !pending) return;
       lastBaseI = baseI;
       lastBaseJ = baseJ;
-      for (let gi = 0; gi < GRID_W; gi++) {
-        // world cell owned by slot (gi, gj): the unique cell in the target
-        // block congruent to (gi, gj) mod GRID_W
-        colCi[gi] = baseI + ((((gi - baseI) % GRID_W) + GRID_W) % GRID_W);
-      }
-      let budget = PLACE_BUDGET;
       // dirty slot span: re-placed slots this frame, so the GPU upload can
       // cover just that range of the instance buffers instead of the pool
-      let dirtyLo = POOL;
-      let dirtyHi = -1;
-      for (let gj = 0; gj < GRID_W && budget > 0; gj++) {
-        const cjj = baseJ + ((((gj - baseJ) % GRID_W) + GRID_W) % GRID_W);
-        const packedLo = cjj & 0xffff;
-        const rowBase = gj * GRID_W;
-        for (let gi = 0; gi < GRID_W && budget > 0; gi++) {
-          const packed = ((colCi[gi] & 0xffff) << 16) | packedLo;
-          const slot = rowBase + gi;
-          if (slotCell[slot] === packed) continue;
-          slotCell[slot] = packed;
-          placeSlot(slot, colCi[gi], cjj);
-          if (slot < dirtyLo) dirtyLo = slot;
-          if (slot > dirtyHi) dirtyHi = slot;
-          budget--;
-        }
-      }
-      pending = budget <= 0;
+      dirtyLo = POOL;
+      dirtyHi = -1;
+      const previousCount = denseSlots.count;
+      pending = scanTargetBlock(baseI, baseJ, PLACE_BUDGET);
+      if (denseSlots.count !== previousCount) im.count = denseSlots.count;
       if (dirtyHi >= 0) {
         // partial upload: only the touched slot span goes to the GPU. Ranges
         // are queued, never cleared here: the renderer clears them after it

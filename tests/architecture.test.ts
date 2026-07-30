@@ -275,6 +275,7 @@ const UI_PURE_CORES = [
 // moment of the cycle.
 const RENDER_PURE_CORES = [
   'src/render/arena_water_band_core.ts',
+  'src/render/blade_grass_dense_core.ts',
   'src/render/camera_boom_core.ts',
   'src/render/camera_director_core.ts',
   'src/render/camera_feel_core.ts',
