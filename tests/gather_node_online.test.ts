@@ -70,3 +70,28 @@ describe('ClientWorld.nodeRespawnSeconds', () => {
     }
   });
 });
+
+// The R40 consent on the WIRE, sender side: confirmEffectUse true rides as
+// confirmUse: true; omitted or false sends the byte-identical pre-flow
+// frame (no key at all). The server half is pinned through the real router
+// in tests/gather_node_harvest.test.ts.
+describe('ClientWorld.harvestNode confirm flag (sender)', () => {
+  it('sends confirmUse only when explicitly true', () => {
+    const client = Object.create(ClientWorld.prototype) as ClientWorld;
+    const sent: Record<string, unknown>[] = [];
+    (
+      client as unknown as { cmdWithOutcome(msg: Record<string, unknown>): Promise<boolean> }
+    ).cmdWithOutcome = (msg) => {
+      sent.push(msg);
+      return Promise.resolve(true);
+    };
+    void client.harvestNode('node_a');
+    void client.harvestNode('node_a', false);
+    void client.harvestNode('node_a', true);
+    expect(sent).toHaveLength(3);
+    expect('confirmUse' in sent[0]).toBe(false);
+    expect('confirmUse' in sent[1]).toBe(false);
+    expect(sent[2].confirmUse).toBe(true);
+    expect(sent[2]).toMatchObject({ cmd: 'harvest_node', node: 'node_a' });
+  });
+});
