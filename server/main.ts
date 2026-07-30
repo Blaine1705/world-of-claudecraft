@@ -3039,7 +3039,15 @@ export async function startServer(): Promise<http.Server> {
     simEntities: () => game.sim.entities.size,
     simTickHz: () => game.simTickHz(),
     tickPhaseMillis: () => game.tickPhaseMillis(),
-    dbPool: () => ({ total: pool.totalCount, idle: pool.idleCount, waiting: pool.waitingCount }),
+    // Coerced at the untyped boundary: @types/pg hand-declares these getters,
+    // so a pg upgrade that drops one type-checks clean and would otherwise
+    // fail the ENTIRE scrape at collect time (one bad collector rejects
+    // registry.metrics(), taking every gauge with it).
+    dbPool: () => ({
+      total: Number(pool.totalCount) || 0,
+      idle: Number(pool.idleCount) || 0,
+      waiting: Number(pool.waitingCount) || 0,
+    }),
     lastTickAt: () => game.lastTickAt(),
     loopStartedAt: () => game.loopStartedAt(),
   };

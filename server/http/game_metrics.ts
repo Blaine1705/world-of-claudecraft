@@ -269,7 +269,7 @@ export function registerGameStateMetrics(
 
   new Gauge({
     name: WOC_DB_POOL_CLIENTS,
-    help: 'pg pool clients by state (total open, idle, callers waiting for a client). Sustained waiting > 0 means the pool is saturated.',
+    help: 'pg pool clients by state (total open, idle, callers waiting for a client). Sustained waiting > 0 means the pool is saturated. Saturation is PER POOL: read waiting per realm target (a cross-realm sum hides which realm is stuck); the shared-Postgres connection budget is sum(total) across targets.',
     labelNames: ['state'],
     registers: [registry],
     collect() {

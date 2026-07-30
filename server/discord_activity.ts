@@ -70,16 +70,22 @@ const recentKeys = new Map<string, number>();
 export function claimDedupeKey(key: string, now: number): boolean {
   const last = recentKeys.get(key);
   if (last !== undefined && now - last < DEDUPE_TTL_MS) return false;
+  // Delete-then-set so a re-claimed key moves to the END of insertion order:
+  // Map.set on an existing key keeps its ORIGINAL slot, which would make the
+  // eviction below drop the freshest window first and quietly lean on the
+  // never-grows-on-reclaim size invariant instead of on position.
+  recentKeys.delete(key);
   recentKeys.set(key, now);
   if (recentKeys.size > MAX_RECENT_KEYS) {
     for (const [k, t] of recentKeys) {
       if (now - t >= DEDUPE_TTL_MS) recentKeys.delete(k);
     }
     // Live-set overflow backstop: expiry freed nothing (more than the cap of
-    // keys all inside the TTL), so evict oldest-first down to the cap instead
-    // of re-running a fruitless full scan on every subsequent claim. An
-    // evicted key can let one duplicate card through; at this population
-    // that beats an O(size) sweep per claim.
+    // keys all inside the TTL), so evict oldest-first down to the cap. This
+    // bounds the live set's MEMORY and thereby the SIZE of the per-claim
+    // expiry sweep (which still runs whenever the population sits at the
+    // cap); an evicted key can let one duplicate card through, which at
+    // this population beats an unbounded map.
     if (recentKeys.size > MAX_RECENT_KEYS) {
       const over = recentKeys.size - MAX_RECENT_KEYS;
       let evicted = 0;
@@ -101,7 +107,10 @@ export function claimDedupeKey(key: string, now: number): boolean {
  * reject can land after the TTL) cannot delete a window a newer claimant
  * now owns. The re-stamp (not a delete) keeps a retry backoff: the next
  * claim succeeds RELEASE_RETRY_BACKOFF_MS after the failed one, never
- * immediately.
+ * immediately. The backoff is measured from the CLAIM, not the failure,
+ * which is safe ONLY because the key stays burned for the whole in-flight
+ * read: releasing before the read settles would zero the backoff for any
+ * failure slower than the backoff window.
  */
 export function releaseDedupeKey(key: string, claimedAt: number): void {
   if (recentKeys.get(key) !== claimedAt) return;
