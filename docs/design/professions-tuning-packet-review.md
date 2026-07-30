@@ -2582,7 +2582,7 @@ ModerationActionPrompt reason flow with pre-prompt validation, pure
 professions_restore builders, server-authored profession and effect
 vocabularies). All strings ride the admin catalog; the error reverse map
 is guarded by a SCAN of every inline-rendered fail() literal in
-server/admin.ts, which also surfaced and closed six PRE-EXISTING unmatched
+server/admin.ts, which also surfaced and closed five PRE-EXISTING unmatched
 proses. Before/after screenshots:
 docs/screenshots/r35-admin-professions-inspector/ (before-characters.png,
 after-characters.png, after-professions-modal.png), captured by

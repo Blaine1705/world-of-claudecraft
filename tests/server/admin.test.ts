@@ -3540,6 +3540,22 @@ describe('characterProfessionsSheet: the per-field normalizer arms (pure)', () =
     expect(sheet.knownRecipes).toBe(1);
   });
 
+  it('renders a corrupt non-iterable knownRecipes as 0 instead of a 500', () => {
+    // The loader THROWS on this blob (such a character cannot log in), which
+    // is exactly why the sheet must not: the inspector is the tool an
+    // operator opens to diagnose it. Guarded on iterability, not isArray,
+    // so a string still counts its characters the way the loader Set does.
+    expect(
+      characterProfessionsSheet(baseInput({ ...ALL_FLAGS, knownRecipes: 42 })).knownRecipes,
+    ).toBe(0);
+    expect(
+      characterProfessionsSheet(baseInput({ ...ALL_FLAGS, knownRecipes: {} })).knownRecipes,
+    ).toBe(0);
+    expect(
+      characterProfessionsSheet(baseInput({ ...ALL_FLAGS, knownRecipes: 'abc' })).knownRecipes,
+    ).toBe(3);
+  });
+
   it('repairs an invalid archetype the way the login does (trio nulls together)', () => {
     const sheet = characterProfessionsSheet(
       baseInput({

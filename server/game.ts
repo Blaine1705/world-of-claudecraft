@@ -3331,7 +3331,10 @@ export class GameServer {
 
   // Resolves false ONLY when the lease-fenced write matched no row (a
   // same-account takeover rotated the nonce): the blob did not persist and
-  // the session is being kicked. Callers that must know their write landed
+  // the session is being kicked. True means "did not fence out", not
+  // "landed": the no-state arm (pid already gone from the sim, unreachable
+  // from the restore paths which hold a live session) is a silent no-op
+  // that resolves true. Callers that must know their write was not fenced
   // (the audited GM restores) read it; every legacy void caller ignores it.
   async saveCharacter(
     session: ClientSession,

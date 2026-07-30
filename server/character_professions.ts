@@ -112,6 +112,13 @@ export interface CharacterProfessionsInput {
   emptyBlob?: boolean;
 }
 
+function isIterable(value: unknown): value is Iterable<unknown> {
+  return (
+    value != null &&
+    typeof (value as { [Symbol.iterator]?: unknown })[Symbol.iterator] === 'function'
+  );
+}
+
 export function characterProfessionsSheet(
   input: CharacterProfessionsInput,
 ): CharacterProfessionsSheet {
@@ -203,8 +210,12 @@ export function characterProfessionsSheet(
     crafting,
     // The loader builds a Set (src/sim/sim.ts), so duplicate ids in a
     // hand-edited blob collapse at login; count the deduplicated size the
-    // next login resolves, not the raw array length.
-    knownRecipes: new Set(state.knownRecipes ?? []).size,
+    // next login resolves, not the raw array length. Guarded on ITERABILITY,
+    // not Array.isArray (the loader Sets a string into its characters and
+    // the sheet must match that reading): a corrupt non-iterable value
+    // renders 0 instead of throwing the whole sheet into a 500, which is
+    // exactly the blob the operator opened the inspector to diagnose.
+    knownRecipes: isIterable(state.knownRecipes) ? new Set(state.knownRecipes).size : 0,
     slots,
     nodeTimers,
     toolEffectIds: Object.keys(TOOL_EFFECTS),

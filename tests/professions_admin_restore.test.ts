@@ -120,10 +120,10 @@ describe('restoreToolEffectSlotAction (GM restore, R35)', () => {
   // banner naming it THE ONE MINT AUTHORITY, so no path can mint what another
   // path refuses; the restore is the single arm that does not call it and
   // re-implements the gates the two mints share. This matrix feeds one fixture
-  // to BOTH and demands the same answer tuple-for-tuple, so a gate added to
-  // the resolver (an eighth refusal, a changed ownership scan) that the
-  // restore never learns about reddens HERE rather than shipping as a
-  // free-grant hole.
+  // to BOTH and demands the same answer tuple-for-tuple, so a divergence in
+  // any gate these fixtures reach (membership, effect existence, the refused
+  // pair, the ownership scan) reddens HERE rather than shipping as a
+  // free-grant hole; a future shared gate no fixture trips needs its own row.
   //
   // Each fixture isolates a SHARED gate on purpose: the charm the real mint
   // consumes is in bags whenever the effect has one (Springback has no item
@@ -259,14 +259,16 @@ describe('restoreToolEffectSlotAction (GM restore, R35)', () => {
   });
 
   it('refuses a non-finite pid instead of falling back to the PRIMARY entity', () => {
-    // `ctx.resolve(undefined)` resolves the sim's primary entity, so without
-    // the explicit guard an omitted pid (the type says required, the server is
-    // JavaScript at runtime) would aim a charm-free mint at whoever that is.
-    // The tool is in bags, so every other gate here passes: only the guard can
-    // produce the refusal.
+    // `ctx.resolve(undefined)` and `ctx.resolve(null)` resolve the sim's
+    // primary entity, so without the explicit guard an omitted pid (the type
+    // says required, the server is JavaScript at runtime) would aim a
+    // charm-free mint at whoever that is: undefined and null are the two
+    // mutation-killing values here (NaN/Infinity already missed the map
+    // lookup before the guard existed and ride along for coverage). The tool
+    // is in bags, so every other gate passes for the primary.
     const sim = makeSim();
     sim.addItem('copper_mining_pick', 1);
-    for (const pid of [undefined, Number.NaN, Number.POSITIVE_INFINITY]) {
+    for (const pid of [undefined, null, Number.NaN, Number.POSITIVE_INFINITY]) {
       expect(
         restoreToolEffectSlotAction(sim.ctx, 'mining', 'gatherers_cache', pid as unknown as number),
       ).toBe('offline');
@@ -332,8 +334,10 @@ describe('restoreToolEffectSlotAction (GM restore, R35)', () => {
     //
     // `tests` is excluded deliberately (this file names the identifier, and so
     // may any future test); the rest are dependencies, build output, vendored
-    // or generated trees, packaging assets, and non-code content, none of
-    // which can import the sim action in a way a player could reach.
+    // or generated trees, packaging assets, and non-code content, plus
+    // ip-refactor (a server-internal tooling tree that never rides a bundle).
+    // `private` IS walked: it is in the tsconfig include and hosts the
+    // bot-detector alias, so an import from there must trip the guard.
     const NON_SOURCE_ROOTS = new Set([
       'node_modules',
       'tests',
@@ -348,7 +352,6 @@ describe('restoreToolEffectSlotAction (GM restore, R35)', () => {
       'screenshots',
       'skies_in',
       'ip-refactor',
-      'private',
       'tmp',
     ]);
     const roots = fs
