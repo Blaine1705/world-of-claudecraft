@@ -13,6 +13,7 @@
 // never imports Hud and never hardcodes the window id).
 
 import { audio } from '../game/audio';
+import { GATHERING_PROFESSIONS, type GatheringProfessionId } from '../sim/content/professions';
 import type { IWorld } from '../world_api';
 import { archetypeTitleText, craftNameText } from './char_window';
 import { markDialogRoot } from './dialog_root';
@@ -223,11 +224,24 @@ export class ProfessionsWindow {
     const world = this.deps.world();
     return {
       identity: world.craftingIdentity,
-      gathering: world.professionsState.skills.map((row) => ({
-        professionId: row.professionId,
-        skill: row.skill,
-        maxSkill: row.maxSkill,
-      })),
+      gathering: world.professionsState.skills.map((row) => {
+        // The denominator comes from the GATHERING_PROFESSIONS content table,
+        // the character sheet's cure (gathering_view.ts
+        // buildGatheringProficiencyRows): the wire row's maxSkill is the same
+        // number on an honest server but it is per-row rather than total, so
+        // a missing or malformed row must never paint a nonsense "12 / 0".
+        // hasOwn because the id is wire-mirrored (the prototype-key doctrine);
+        // an unknown id keeps the wire value and falls out at the view's
+        // name-key guard.
+        const cap = Object.hasOwn(GATHERING_PROFESSIONS, row.professionId)
+          ? GATHERING_PROFESSIONS[row.professionId as GatheringProfessionId].maxSkill
+          : row.maxSkill;
+        return {
+          professionId: row.professionId,
+          skill: Number.isFinite(row.skill) ? Math.max(0, row.skill) : 0,
+          maxSkill: cap,
+        };
+      }),
       toolEffects: world.toolEffectSlots.map((row) => ({
         professionId: row.professionId,
         effectId: row.effectId,

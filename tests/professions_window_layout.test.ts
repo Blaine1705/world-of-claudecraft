@@ -12,6 +12,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import { requiredAmendsProgress } from '../src/sim/professions/archetype';
 import { ProfessionsWindow, type ProfessionsWindowDeps } from '../src/ui/professions_window';
 
@@ -303,6 +304,37 @@ describe('ProfessionsWindow: gathering rows', () => {
     const { el } = makeWindow(state);
     expect(el.querySelectorAll('.prof-gather-row')).toHaveLength(0);
     expect(el.querySelector('.prof-gathering')).toBeNull();
+  });
+
+  it('sources the denominator from the content cap, never the wire row', () => {
+    // The character sheet's "12 / 0" cure (gathering_view.ts
+    // buildGatheringProficiencyRows): the wire row's maxSkill is the same
+    // number on an honest server but it is not total, so a malformed row must
+    // not paint a nonsense denominator. Two professions with DIFFERENT
+    // content caps, so a hardcoded 100 cannot pass.
+    const state = baseState();
+    state.gathering = [
+      { professionId: 'mining', skill: 12, maxSkill: 0 },
+      { professionId: 'fishing', skill: 30, maxSkill: 0 },
+    ];
+    const { el } = makeWindow(state);
+    const values = [...el.querySelectorAll('.prof-gather-row .prof-skill-value')].map(
+      (node) => node.textContent ?? '',
+    );
+    expect(values).toHaveLength(2);
+    expect(values[0]).toContain('12');
+    expect(values[0]).toContain(String(GATHERING_PROFESSIONS.mining.maxSkill));
+    expect(values[0]).not.toMatch(/\/\s*0\b/);
+    expect(values[1]).toContain(String(GATHERING_PROFESSIONS.fishing.maxSkill));
+  });
+
+  it('a non-finite wire skill renders as 0, never NaN', () => {
+    const state = baseState();
+    state.gathering = [{ professionId: 'mining', skill: Number.NaN, maxSkill: 100 }];
+    const { el } = makeWindow(state);
+    const value = mustQuery(el, '.prof-gather-row .prof-skill-value').textContent ?? '';
+    expect(value).not.toContain('NaN');
+    expect(value).toMatch(/\b0\b/);
   });
 });
 
