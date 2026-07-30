@@ -7569,7 +7569,7 @@ export const en: EnTranslations = {
       },
       "devotion_ward": {
         "name": "Bastion Devotion",
-        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Only this aura and Requital Aura replace each other; Radiant, Dawn, and Grace Devotion coexist."
+        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Replaces your own Requital Aura. Another Paladin casting Bastion Devotion refreshes it instead of stacking; Radiant, Dawn, and Grace Devotion coexist."
       },
       "hammer_of_grace": {
         "name": "Hammer of Grace",
@@ -7729,7 +7729,7 @@ export const en: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Requital Aura",
-        "description": "Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take {buff} Holy damage, and affected allies deal {buff} additional Holy damage with auto-attacks."
+        "description": "Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take {buff} Holy damage, and affected allies deal {buff} additional Holy damage with auto-attacks. Replaces your own Bastion Devotion. Another Paladin casting Requital Aura refreshes it instead of stacking."
       },
       "tame_beast": {
         "name": "Wildbond",

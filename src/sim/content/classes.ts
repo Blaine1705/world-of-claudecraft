@@ -3337,7 +3337,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take $b Holy damage, and affected allies deal $b additional Holy damage with auto-attacks.',
+      'Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take $b Holy damage, and affected allies deal $b additional Holy damage with auto-attacks. Replaces your own Bastion Devotion. Another Paladin casting Requital Aura refreshes it instead of stacking.',
   },
 
   // ====================== HUNTER ======================
