@@ -169,12 +169,24 @@ ISOLATED worktree at the phase tip with its own `npm ci`. Most of the 20 refutat
 were verify agents racing the fix commits and reading a tree where the finding was
 already closed; none hid a real defect.
 
-Mutation tally, all NEW mutants beyond Phase 1's 31: 79 planted, 79 resolved, and the
-un-mutated baseline re-run green at the end with the worktree clean. 43 of the first 52
-SURVIVED, which is the real story of this QA round. `bot/gateway.ts` was the worst: 16
-of 18 protocol mutants lived, including the zombie-terminate branch, RESUME versus
-IDENTIFY, and seq tracking. After the fixes every one of those dies against a named
-test.
+Mutation tally, all NEW mutants beyond Phase 1's own 31: 70 distinct mutants over 139
+runs (discovery plus re-verification), in an isolated worktree, with the un-mutated
+baseline re-run green at the end and the worktree left clean.
+
+  - Against the phase as committed: 58 planted, 9 killed, **49 SURVIVED**. That is the
+    real story of this round. `bot/gateway.ts` was the worst, 16 of 18 protocol mutants
+    alive, including the zombie-terminate branch, RESUME versus IDENTIFY, and seq
+    tracking.
+  - After the fixes: 46 of those 49 die against a named test.
+  - The fix round's own new pins were then mutated in turn: 12 more mutants, all killed.
+
+Three survivors are deliberate and must not be "fixed":
+  - `M01`/`M02`, swapping which cadence constant a `bot/main.ts` loop uses. `main.ts`
+    calls `main()` at module scope so it cannot be imported, and R6 forbids a source-text
+    pin. Ruled-acceptable residual.
+  - `S05`, deleting the `body === undefined ? undefined :` ternary in `ServerClient.call`.
+    `JSON.stringify(undefined)` IS `undefined`, so the guard is a semantic no-op and no
+    assertion can distinguish it. The test comment was corrected instead of the test.
 
 Four traps are worth carrying forward, because each looked like a passing test:
 
