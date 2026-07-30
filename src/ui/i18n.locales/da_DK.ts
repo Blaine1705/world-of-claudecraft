@@ -7012,6 +7012,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Den quest er ikke fuldført.',
   'questUi.errors.notInLog': 'Den quest er ikke i din log.',
   'questUi.errors.tooFar': 'For langt væk.',
+  'questUi.errors.escortAway': 'Din eskorte er ikke på sin post lige nu og vender snart tilbage.',
   'questUi.errors.turnInMissing': 'Den quest-aflevering er ikke i nærheden.',
   'questUi.errors.unavailable': 'Den quest er ikke tilgængelig.',
   'questUi.log.abandon': 'Opgiv quest',
@@ -8569,7 +8570,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Natten føles allerede tyndere. Hvad end der vækker dem, er ikke færdigt, men du har købt Trapperne lidt ro.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Wren Bragt Hjem',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Min lærling Wren gik ud for at gå Guldsmeltets linje for to dage siden og kom aldrig tilbage. Jeg fandt hendes spor, hun sidder under vejmarkeringerne sydvest for Nordlys-Trapperne, for bange for ulvene til at bevæge sig. Jeg kan ikke forlade kæret, {playerName}. Følg hende til Veylas lejr på Trapperne. Hun vil være sikker under lysene.',
+    'Min lærling Wren gik ud for at gå Guldsmeltets linje for to dage siden og kom aldrig tilbage. Jeg fandt hendes spor, hun sidder under vejmarkeringerne nordøst for Nordlys-Trapperne, for bange for ulvene til at bevæge sig. Jeg kan ikke forlade kæret, {playerName}. Følg hende til Veylas lejr på Trapperne. Hun vil være sikker under lysene.',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Lærling Wren bragt sikkert til Nordlys-Trapperne',
   'entities.quests.q_fv_seeing_wren_home.completion':
@@ -8663,7 +8664,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Dæmningen holder, og Tam har stadig ånde nok til at spøge om treslaget. Godt. Vi er en ø under belejring, {playerName}, og hvert par hænder, der krydser den sandbanke, er et par, bruddene skal igennem, før de når mit folk. Velkommen til Mågehavn.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Kommer Hjem',
   'entities.quests.q_fs_bram_come_home.text':
-    'Min Bram tog båden ud den morgen, net-bruddet åbnede sig, og havet kastede ham tilbage et sted forbi Landgangspynten. Jeg hørte ham tre nætter siden, {playerName}, kalde over vandet, og jeg var for bange til at gå. Jeg er stadig for bange. Vær sød. Hans båd ligger vraget på nordkysten. Følg ham hjem til mig.',
+    'Min Bram tog båden ud den morgen, net-bruddet åbnede sig, og havet kastede ham tilbage et sted forbi Landgangspynten. Jeg hørte ham tre nætter siden, {playerName}, kalde over vandet, og jeg var for bange til at gå. Jeg er stadig for bange. Vær sød. Hans båd ligger vraget på sydkysten. Følg ham hjem til mig.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Fisker Bram bragt sikkert hjem til Mågehavn',
   'entities.quests.q_fs_bram_come_home.completion':

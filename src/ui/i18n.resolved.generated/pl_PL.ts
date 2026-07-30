@@ -6835,7 +6835,8 @@ export const pl_PL: EnTranslations = {
       "incomplete": "To zadanie nie jest ukończone.",
       "giverMissing": "Tego zleceniodawcy nie ma w pobliżu.",
       "turnInMissing": "Miejsca oddania tego zadania nie ma w pobliżu.",
-      "tooFar": "Za daleko."
+      "tooFar": "Za daleko.",
+      "escortAway": "Osoba, którą masz eskortować, nie jest teraz na miejscu. Wróci tam wkrótce."
     }
   },
   "itemUi": {
@@ -12838,7 +12839,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Odprowadzenie Wren do Domu",
-        "text": "Moja uczennica Wren wyszła dwa dni temu, by przejść linię Złotego Roztopu, i nigdy nie wróciła. Znalazłam jej ślady, schowała się pod znacznikami drogi na południowy zachód od Stopni Zorzy, zbyt przerażona wilkami, by się ruszyć. Nie mogę opuścić mokradła, {playerName}. Odprowadź ją do obozu Veyli na Stopniach. Będzie bezpieczna pod światłami.",
+        "text": "Moja uczennica Wren wyszła dwa dni temu, by przejść linię Złotego Roztopu, i nigdy nie wróciła. Znalazłam jej ślady, schowała się pod znacznikami drogi na północny wschód od Stopni Zorzy, zbyt przerażona wilkami, by się ruszyć. Nie mogę opuścić mokradła, {playerName}. Odprowadź ją do obozu Veyli na Stopniach. Będzie bezpieczna pod światłami.",
         "completion": "Dziewczyna jest w środku, owinięta w połowę moich koców i gadająca tak, że gwiazdy pospadałyby z nieba. Zrobiłeś dziś coś dobrego, {playerName}. Kraina niewiele takich rzeczy widuje.",
         "objectives": {
           "0": {
@@ -13522,7 +13523,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Wraca do Domu",
-        "text": "Mój Bram wypłynął łodzią rano, gdy otworzył się Wyłom Sieci, a morze wyrzuciło go gdzieś za Przystanią. Słyszałam go trzy noce temu, {playerName}, wołającego nad wodą, i byłam zbyt przerażona, by iść. Wciąż jestem zbyt przerażona. Proszę. Jego łódź leży rozbita na północnym brzegu. Odprowadź go do mnie do domu.",
+        "text": "Mój Bram wypłynął łodzią rano, gdy otworzył się Wyłom Sieci, a morze wyrzuciło go gdzieś za Przystanią. Słyszałam go trzy noce temu, {playerName}, wołającego nad wodą, i byłam zbyt przerażona, by iść. Wciąż jestem zbyt przerażona. Proszę. Jego łódź leży rozbita na południowym brzegu. Odprowadź go do mnie do domu.",
         "completion": "Bram! Przyprowadziłeś go do mnie całego, {playerName}. Oboje płakaliśmy i żadne z nas się tego nie wstydzi. Cokolwiek wyłomy zabiorą z tej wyspy następnym razem, nie dostaną mojej rodziny. Już nie.",
         "objectives": {
           "0": {

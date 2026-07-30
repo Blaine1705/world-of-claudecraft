@@ -2183,6 +2183,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': '该任务发布者不在附近。',
   'questUi.errors.turnInMissing': '该任务交付点不在附近。',
   'questUi.errors.tooFar': '距离太远。',
+  'questUi.errors.escortAway': '你要护送的人现在不在原处，稍后就会回来。',
   'itemUi.money.goldShort': '金',
   'itemUi.money.silverShort': '银',
   'itemUi.money.copperShort': '铜',
@@ -4441,7 +4442,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '布拉姆！你把他完完整整地带回来了，{playerName}。我们俩都哭了，谁也不觉得丢人。往后裂隙不管再从这座岛夺走什么，都别想夺走我的家人。再也不会了。',
   'entities.quests.q_fs_bram_come_home.objectives.0.label': '已护送渔民布拉姆平安回到鸥港',
   'entities.quests.q_fs_bram_come_home.text':
-    '晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在北岸。把他领回家，交到我手上。',
+    '晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在南岸。把他领回家，交到我手上。',
   'entities.quests.q_fs_bram_come_home.title': '布拉姆回家',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     '少了十个，雇工们已经在争谁第一个下田了。这撑不了多久，裂隙从不会安分太久，但吃得上饭的镇子，就是守得住的镇子。',
@@ -4526,7 +4527,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '姑娘已经在帐里了，裹着我一半的毯子，叽叽喳喳快把星星都聊下来了。你今天做了件善事，{playerName}。这样的事，霜幕之境可不多见。',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label': '已护送学徒雯恩平安抵达极光台阶',
   'entities.quests.q_fv_seeing_wren_home.text':
-    '我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶西南边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。',
+    '我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶东北边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。',
   'entities.quests.q_fv_seeing_wren_home.title': '送雯恩回家',
   'entities.quests.q_fv_silent_trapline.completion':
     '梅芙派你来的？哈。十一年了，那女人还当沼泽会吃了我。唔……今年她也许还真说对了。看看它把我的陷阱线糟蹋成什么样了。',

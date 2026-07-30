@@ -7164,6 +7164,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Die quest is niet voltooid.',
   'questUi.errors.notInLog': 'Die quest staat niet in je logboek.',
   'questUi.errors.tooFar': 'Te ver weg.',
+  'questUi.errors.escortAway':
+    'Degene die je moet begeleiden is er nu niet. Die komt binnenkort terug.',
   'questUi.errors.turnInMissing': 'Die questinlevering is niet in de buurt.',
   'questUi.errors.unavailable': 'Die quest is niet beschikbaar.',
   'questUi.log.abandon': 'Quest opgeven',
@@ -8670,7 +8672,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'De nacht voelt al ijler aan. Wat hen ook wekt, is nog niet klaar, maar je hebt de Trappen wat rust gekocht.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Wren Veilig Thuisbrengen',
   'entities.quests.q_fv_seeing_wren_home.text':
-    "Mijn leerling Wren ging twee dagen geleden de Goudsmelt-lijn lopen en is nooit teruggekomen. Ik vond haar sporen, ze schuilt onder de wegmarkeringen ten zuidwesten van de Aurora-Trappen, te bang voor de wolven om te bewegen. Ik kan het veen niet verlaten, {playerName}. Breng haar naar Veyla's kamp op de Trappen. Daar is ze veilig onder de lichten.",
+    "Mijn leerling Wren ging twee dagen geleden de Goudsmelt-lijn lopen en is nooit teruggekomen. Ik vond haar sporen, ze schuilt onder de wegmarkeringen ten noordoosten van de Aurora-Trappen, te bang voor de wolven om te bewegen. Ik kan het veen niet verlaten, {playerName}. Breng haar naar Veyla's kamp op de Trappen. Daar is ze veilig onder de lichten.",
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Leerling Wren veilig naar de Aurora-Trappen gebracht',
   'entities.quests.q_fv_seeing_wren_home.completion':
@@ -8764,7 +8766,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'De dam houdt stand, en Tam heeft nog genoeg adem om te grappen over de drieslag. Goed. Wij zijn een eiland onder belegering, {playerName}, en elk paar handen dat die zandbank oversteekt, is een paar dat de breuken moeten passeren voordat ze mijn mensen bereiken. Welkom in Meeuwenhaven.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Komt Thuis',
   'entities.quests.q_fs_bram_come_home.text':
-    'Mijn Bram nam de boot mee de ochtend dat de nettenbreuk opende, en de zee wierp hem ergens voorbij de Aanlegpunt terug. Ik hoorde hem drie nachten geleden, {playerName}, roepend over het water, en ik was te bang om te gaan. Ik ben nog steeds te bang. Alsjeblieft. Zijn boot ligt vergaan op de noordoever. Breng hem lopend naar mij terug.',
+    'Mijn Bram nam de boot mee de ochtend dat de nettenbreuk opende, en de zee wierp hem ergens voorbij de Aanlegpunt terug. Ik hoorde hem drie nachten geleden, {playerName}, roepend over het water, en ik was te bang om te gaan. Ik ben nog steeds te bang. Alsjeblieft. Zijn boot ligt vergaan op de zuidoever. Breng hem lopend naar mij terug.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Visser Bram veilig naar Meeuwenhaven gebracht',
   'entities.quests.q_fs_bram_come_home.completion':

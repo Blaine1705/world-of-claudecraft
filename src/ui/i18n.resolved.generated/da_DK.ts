@@ -6835,7 +6835,8 @@ export const da_DK: EnTranslations = {
       "incomplete": "Den quest er ikke fuldført.",
       "giverMissing": "Den quest-giver er ikke i nærheden.",
       "turnInMissing": "Den quest-aflevering er ikke i nærheden.",
-      "tooFar": "For langt væk."
+      "tooFar": "For langt væk.",
+      "escortAway": "Din eskorte er ikke på sin post lige nu og vender snart tilbage."
     }
   },
   "itemUi": {
@@ -12838,7 +12839,7 @@ export const da_DK: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Wren Bragt Hjem",
-        "text": "Min lærling Wren gik ud for at gå Guldsmeltets linje for to dage siden og kom aldrig tilbage. Jeg fandt hendes spor, hun sidder under vejmarkeringerne sydvest for Nordlys-Trapperne, for bange for ulvene til at bevæge sig. Jeg kan ikke forlade kæret, {playerName}. Følg hende til Veylas lejr på Trapperne. Hun vil være sikker under lysene.",
+        "text": "Min lærling Wren gik ud for at gå Guldsmeltets linje for to dage siden og kom aldrig tilbage. Jeg fandt hendes spor, hun sidder under vejmarkeringerne nordøst for Nordlys-Trapperne, for bange for ulvene til at bevæge sig. Jeg kan ikke forlade kæret, {playerName}. Følg hende til Veylas lejr på Trapperne. Hun vil være sikker under lysene.",
         "completion": "Pigen er indenfor, svøbt i halvdelen af mine tæpper og snakker stjernerne ned fra himlen. Du gjorde noget venligt i dag, {playerName}. Sløret ser ikke mange af den slags.",
         "objectives": {
           "0": {
@@ -13522,7 +13523,7 @@ export const da_DK: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Kommer Hjem",
-        "text": "Min Bram tog båden ud den morgen, net-bruddet åbnede sig, og havet kastede ham tilbage et sted forbi Landgangspynten. Jeg hørte ham tre nætter siden, {playerName}, kalde over vandet, og jeg var for bange til at gå. Jeg er stadig for bange. Vær sød. Hans båd ligger vraget på nordkysten. Følg ham hjem til mig.",
+        "text": "Min Bram tog båden ud den morgen, net-bruddet åbnede sig, og havet kastede ham tilbage et sted forbi Landgangspynten. Jeg hørte ham tre nætter siden, {playerName}, kalde over vandet, og jeg var for bange til at gå. Jeg er stadig for bange. Vær sød. Hans båd ligger vraget på sydkysten. Følg ham hjem til mig.",
         "completion": "Bram! Du bragte ham tilbage til mig hel, {playerName}. Vi græd begge, og ingen af os skammer sig. Hvad end bruddene tager fra denne ø næste gang, får de ikke min familie. Ikke mere.",
         "objectives": {
           "0": {

@@ -6835,7 +6835,8 @@ export const cs_CZ: EnTranslations = {
       "incomplete": "Tento úkol není dokončený.",
       "giverMissing": "Tento zadavatel úkolu není poblíž.",
       "turnInMissing": "Místo pro odevzdání tohoto úkolu není poblíž.",
-      "tooFar": "Příliš daleko."
+      "tooFar": "Příliš daleko.",
+      "escortAway": "Ten, koho máš doprovodit, teď není na svém místě. Za chvíli se tam vrátí."
     }
   },
   "itemUi": {
@@ -12838,7 +12839,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Doprovodit Wren domů",
-        "text": "Má učednice Wren šla před dvěma dny projít linii Zlatotání a nikdy se nevrátila. Našel jsem její stopy, schovává se pod cestními značkami jihozápadně od Schodů polární záře, příliš vyděšená z vlků na to, aby se hnula. Nemohu opustit bažinu, {playerName}. Doveď ji do tábora Veyly na schodech. Bude v bezpečí pod světly.",
+        "text": "Má učednice Wren šla před dvěma dny projít linii Zlatotání a nikdy se nevrátila. Našel jsem její stopy, schovává se pod cestními značkami severovýchodně od Schodů polární záře, příliš vyděšená z vlků na to, aby se hnula. Nemohu opustit bažinu, {playerName}. Doveď ji do tábora Veyly na schodech. Bude v bezpečí pod světly.",
         "completion": "Ta dívka je uvnitř, zabalená do poloviny mých přikrývek a povídá si s hvězdami na obloze. Udělal jsi dnes dobrou věc, {playerName}. Kraj takových moc nevídá.",
         "objectives": {
           "0": {
@@ -13522,7 +13523,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram se vrací domů",
-        "text": "Můj Bram vzal loď ráno, kdy se otevřel síťový průlom, a moře ho vyvrhlo někam za Přístavištní mys. Slyšela jsem ho před třemi nocemi, {playerName}, jak volá přes vodu, a byla jsem příliš vyděšená na to, abych šla. Stále jsem příliš vyděšená. Prosím. Jeho loď leží ztroskotaná na severním pobřeží. Doveď ho ke mně domů.",
+        "text": "Můj Bram vzal loď ráno, kdy se otevřel síťový průlom, a moře ho vyvrhlo někam za Přístavištní mys. Slyšela jsem ho před třemi nocemi, {playerName}, jak volá přes vodu, a byla jsem příliš vyděšená na to, abych šla. Stále jsem příliš vyděšená. Prosím. Jeho loď leží ztroskotaná na jižním pobřeží. Doveď ho ke mně domů.",
         "completion": "Brame! Přivedl jsi mi ho zpátky celého, {playerName}. Oba jsme plakali a ani jeden z nás se nestydí. Ať už si průlomy z tohoto ostrova vezmou příště cokoliv, mou rodinu nedostanou. Už ne.",
         "objectives": {
           "0": {

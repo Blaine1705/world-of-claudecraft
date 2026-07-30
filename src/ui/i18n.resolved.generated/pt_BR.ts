@@ -6835,7 +6835,8 @@ export const pt_BR: EnTranslations = {
       "incomplete": "Essa missão não está concluída.",
       "giverMissing": "Quem oferece essa missão não está por perto.",
       "turnInMissing": "A entrega dessa missão não está por perto.",
-      "tooFar": "Você está longe demais."
+      "tooFar": "Você está longe demais.",
+      "escortAway": "Sua escolta não está em seu posto agora. Ela voltará para lá em breve."
     }
   },
   "itemUi": {
@@ -12838,7 +12839,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Levando Wren para Casa",
-        "text": "Minha aprendiz Wren saiu para percorrer a linha do Goldmelt há dois dias e nunca voltou. Encontrei suas pegadas, ela está escondida sob os marcos da estrada a sudoeste da Escadaria da Aurora, com medo demais dos lobos para se mover. Não posso deixar o pântano, {playerName}. Leve-a até o acampamento de Veyla na Escadaria. Ela estará segura sob as luzes.",
+        "text": "Minha aprendiz Wren saiu para percorrer a linha do Goldmelt há dois dias e nunca voltou. Encontrei suas pegadas, ela está escondida sob os marcos da estrada a nordeste da Escadaria da Aurora, com medo demais dos lobos para se mover. Não posso deixar o pântano, {playerName}. Leve-a até o acampamento de Veyla na Escadaria. Ela estará segura sob as luzes.",
         "completion": "A garota está dentro, envolta em metade dos meus cobertores e conversando com as estrelas no céu. Você fez algo gentil hoje, {playerName}. Os Confins não veem muitos gestos assim.",
         "objectives": {
           "0": {
@@ -13522,7 +13523,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Volta para Casa",
-        "text": "Meu Bram levou o barco na manhã em que a brecha das redes se abriu, e o mar o jogou de volta em algum lugar além da ponta do Desembarque. Eu o ouvi três noites atrás, {playerName}, chamando sobre a água, e fiquei com medo demais para ir. Ainda estou com medo demais. Por favor. O barco dele jaz naufragado na costa norte. Traga-o de volta para casa comigo.",
+        "text": "Meu Bram levou o barco na manhã em que a brecha das redes se abriu, e o mar o jogou de volta em algum lugar além da ponta do Desembarque. Eu o ouvi três noites atrás, {playerName}, chamando sobre a água, e fiquei com medo demais para ir. Ainda estou com medo demais. Por favor. O barco dele jaz naufragado na costa sul. Traga-o de volta para casa comigo.",
         "completion": "Bram! Você o trouxe de volta para mim inteiro, {playerName}. Nós dois choramos e nenhum de nós tem vergonha disso. O que quer que as brechas levem desta ilha a seguir, não vão levar minha família. Nunca mais.",
         "objectives": {
           "0": {

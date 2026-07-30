@@ -6835,7 +6835,8 @@ export const vi_VN: EnTranslations = {
       "incomplete": "Nhiệm vụ đó chưa hoàn thành.",
       "giverMissing": "Người giao nhiệm vụ không ở gần đây.",
       "turnInMissing": "Nơi nộp nhiệm vụ không ở gần đây.",
-      "tooFar": "Quá xa."
+      "tooFar": "Quá xa.",
+      "escortAway": "Người bạn cần hộ tống hiện không có ở đó. Họ sẽ trở lại sớm."
     }
   },
   "itemUi": {
@@ -12838,7 +12839,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Đưa Wren Về Nhà",
-        "text": "Học việc Wren của ta đã ra đi dọc theo tuyến Goldmelt hai ngày trước và không bao giờ trở lại. Ta đã tìm thấy dấu chân cô bé, cô bé đang trốn dưới những cột mốc đường tây nam Bậc Thang Cực Quang, quá sợ đàn sói để di chuyển. Ta không thể rời khỏi đầm lầy này, {playerName}. Hãy dẫn cô bé đến trại của Veyla trên Bậc Thang. Cô bé sẽ an toàn dưới ánh sáng.",
+        "text": "Học việc Wren của ta đã ra đi dọc theo tuyến Goldmelt hai ngày trước và không bao giờ trở lại. Ta đã tìm thấy dấu chân cô bé, cô bé đang trốn dưới những cột mốc đường đông bắc Bậc Thang Cực Quang, quá sợ đàn sói để di chuyển. Ta không thể rời khỏi đầm lầy này, {playerName}. Hãy dẫn cô bé đến trại của Veyla trên Bậc Thang. Cô bé sẽ an toàn dưới ánh sáng.",
         "completion": "Cô bé đang ở trong nhà, cuộn mình trong nửa số chăn của ta và huyên thuyên về những vì sao trên trời. Bạn đã làm một việc tốt hôm nay, {playerName}. Vùng Đất này không thường thấy những việc như vậy.",
         "objectives": {
           "0": {
@@ -13522,7 +13523,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Trở Về Nhà",
-        "text": "Bram của tôi đã đưa thuyền ra khơi vào sáng hôm vết rạn ở khu lưới mở ra, và biển đã ném anh ấy trở lại đâu đó qua khỏi mũi Bến Tàu. Tôi nghe thấy anh ấy ba đêm trước, {playerName}, gọi vọng qua mặt nước, và tôi đã quá sợ hãi để đi. Tôi vẫn còn quá sợ hãi. Làm ơn. Thuyền của anh ấy đang đắm trên bờ bắc. Hãy dẫn anh ấy về nhà cho tôi.",
+        "text": "Bram của tôi đã đưa thuyền ra khơi vào sáng hôm vết rạn ở khu lưới mở ra, và biển đã ném anh ấy trở lại đâu đó qua khỏi mũi Bến Tàu. Tôi nghe thấy anh ấy ba đêm trước, {playerName}, gọi vọng qua mặt nước, và tôi đã quá sợ hãi để đi. Tôi vẫn còn quá sợ hãi. Làm ơn. Thuyền của anh ấy đang đắm trên bờ nam. Hãy dẫn anh ấy về nhà cho tôi.",
         "completion": "Bram! Bạn đã mang anh ấy về nguyên vẹn cho tôi, {playerName}. Cả hai chúng tôi đều đã khóc và không ai trong chúng tôi thấy xấu hổ. Dù những vết rạn có lấy đi thứ gì từ hòn đảo này tiếp theo, chúng sẽ không lấy được gia đình tôi. Không còn nữa đâu.",
         "objectives": {
           "0": {

@@ -4529,7 +4529,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Ngư Dân Bram được đưa về Gullhaven an toàn',
   'entities.quests.q_fs_bram_come_home.text':
-    'Bram của tôi đã đưa thuyền ra khơi vào sáng hôm vết rạn ở khu lưới mở ra, và biển đã ném anh ấy trở lại đâu đó qua khỏi mũi Bến Tàu. Tôi nghe thấy anh ấy ba đêm trước, {playerName}, gọi vọng qua mặt nước, và tôi đã quá sợ hãi để đi. Tôi vẫn còn quá sợ hãi. Làm ơn. Thuyền của anh ấy đang đắm trên bờ bắc. Hãy dẫn anh ấy về nhà cho tôi.',
+    'Bram của tôi đã đưa thuyền ra khơi vào sáng hôm vết rạn ở khu lưới mở ra, và biển đã ném anh ấy trở lại đâu đó qua khỏi mũi Bến Tàu. Tôi nghe thấy anh ấy ba đêm trước, {playerName}, gọi vọng qua mặt nước, và tôi đã quá sợ hãi để đi. Tôi vẫn còn quá sợ hãi. Làm ơn. Thuyền của anh ấy đang đắm trên bờ nam. Hãy dẫn anh ấy về nhà cho tôi.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Trở Về Nhà',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'Bớt đi mười kẻ, và những người làm ruộng đã bắt đầu tranh cãi xem ai sẽ ra ngoài trước. Việc này sẽ không kéo dài, những vết rạn chẳng bao giờ nghỉ ngơi lâu, nhưng một thị trấn có cái ăn là một thị trấn trụ vững.',
@@ -4617,7 +4617,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Học Việc Wren được đưa an toàn đến Bậc Thang Cực Quang',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Học việc Wren của ta đã ra đi dọc theo tuyến Goldmelt hai ngày trước và không bao giờ trở lại. Ta đã tìm thấy dấu chân cô bé, cô bé đang trốn dưới những cột mốc đường tây nam Bậc Thang Cực Quang, quá sợ đàn sói để di chuyển. Ta không thể rời khỏi đầm lầy này, {playerName}. Hãy dẫn cô bé đến trại của Veyla trên Bậc Thang. Cô bé sẽ an toàn dưới ánh sáng.',
+    'Học việc Wren của ta đã ra đi dọc theo tuyến Goldmelt hai ngày trước và không bao giờ trở lại. Ta đã tìm thấy dấu chân cô bé, cô bé đang trốn dưới những cột mốc đường đông bắc Bậc Thang Cực Quang, quá sợ đàn sói để di chuyển. Ta không thể rời khỏi đầm lầy này, {playerName}. Hãy dẫn cô bé đến trại của Veyla trên Bậc Thang. Cô bé sẽ an toàn dưới ánh sáng.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Đưa Wren Về Nhà',
   'entities.quests.q_fv_silent_trapline.completion':
     'Maeve cử bạn đến sao? Ha. Mười một năm rồi mà bà ấy vẫn nghĩ đầm lầy sẽ nuốt chửng ta. Chà... năm nay có lẽ bà ấy đúng. Nhìn xem nó đã làm gì với các tuyến bẫy của ta.',
@@ -7817,6 +7817,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Nhiệm vụ đó chưa hoàn thành.',
   'questUi.errors.notInLog': 'Nhiệm vụ đó không có trong nhật ký của bạn.',
   'questUi.errors.tooFar': 'Quá xa.',
+  'questUi.errors.escortAway': 'Người bạn cần hộ tống hiện không có ở đó. Họ sẽ trở lại sớm.',
   'questUi.errors.turnInMissing': 'Nơi nộp nhiệm vụ không ở gần đây.',
   'questUi.errors.unavailable': 'Nhiệm vụ đó không khả dụng.',
   'questUi.log.abandon': 'Từ Bỏ Nhiệm Vụ',

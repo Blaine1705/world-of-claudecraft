@@ -3546,6 +3546,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': 'El dador de esa misión no está cerca.',
   'questUi.errors.turnInMissing': 'La entrega de esa misión no está cerca.',
   'questUi.errors.tooFar': 'Está demasiado lejos.',
+  'questUi.errors.escortAway':
+    'Tu escolta no está en su puesto ahora mismo. Volverá allí en breve.',
   'itemUi.money.goldShort': 'o',
   'itemUi.money.silverShort': 'p',
   'itemUi.money.copperShort': 'c',
@@ -8528,7 +8530,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': 'Informa al Guardián Coalfast',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Vuelve a Casa',
   'entities.quests.q_fs_bram_come_home.text':
-    'Mi Bram sacó el bote la mañana en que se abrió la brecha de las redes, y el mar lo devolvió en algún lugar pasado el Embarcadero. Lo oí hace tres noches, {playerName}, llamando sobre el agua, y tuve demasiado miedo para ir. Todavía tengo demasiado miedo. Por favor. Su bote yace naufragado en la orilla norte. Tráelo caminando de vuelta a mí.',
+    'Mi Bram sacó el bote la mañana en que se abrió la brecha de las redes, y el mar lo devolvió en algún lugar pasado el Embarcadero. Lo oí hace tres noches, {playerName}, llamando sobre el agua, y tuve demasiado miedo para ir. Todavía tengo demasiado miedo. Por favor. Su bote yace naufragado en la orilla sur. Tráelo caminando de vuelta a mí.',
   'entities.quests.q_fs_bram_come_home.completion':
     '¡Bram! Me lo trajiste de vuelta entero, {playerName}. Los dos lloramos y ninguno se avergüenza de ello. Lo que sea que las brechas le quiten a esta isla la próxima vez, no se llevarán a mi familia. Ya no.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
@@ -8615,7 +8617,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_rime_unbound.objectives.0.label': 'Elemental de Escarcha abatido',
   'entities.quests.q_fv_seeing_wren_home.title': 'Llevando a Wren a Casa',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Mi aprendiz Wren salió a recorrer la línea del Goldmelt hace dos días y nunca volvió. Encontré sus huellas, está refugiada bajo los mojones al suroeste de los Escalones de la Aurora, demasiado asustada de los lobos para moverse. No puedo dejar la ciénaga, {playerName}. Llévala al campamento de Veyla en los Escalones. Estará a salvo bajo las luces.',
+    'Mi aprendiz Wren salió a recorrer la línea del Goldmelt hace dos días y nunca volvió. Encontré sus huellas, está refugiada bajo los mojones al noreste de los Escalones de la Aurora, demasiado asustada de los lobos para moverse. No puedo dejar la ciénaga, {playerName}. Llévala al campamento de Veyla en los Escalones. Estará a salvo bajo las luces.',
   'entities.quests.q_fv_seeing_wren_home.completion':
     'La chica está dentro, envuelta en la mitad de mis mantas y hablándole a las estrellas hasta bajarlas del cielo. Hiciste algo bondadoso hoy, {playerName}. El Reach no ve muchos gestos así.',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':

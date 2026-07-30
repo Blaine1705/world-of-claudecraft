@@ -6835,7 +6835,8 @@ export const tr_TR: EnTranslations = {
       "incomplete": "O görev tamamlanmadı.",
       "giverMissing": "O görev veren yakında değil.",
       "turnInMissing": "O görevin teslim yeri yakında değil.",
-      "tooFar": "Çok uzakta."
+      "tooFar": "Çok uzakta.",
+      "escortAway": "Eşlik edeceğin kişi şu anda yerinde değil. Kısa süre içinde dönecek."
     }
   },
   "itemUi": {
@@ -12838,7 +12839,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Wren'i Eve Ulaştırmak",
-        "text": "Çırağım Wren iki gün önce Altın Eriyiş hattını yürümeye çıktı ve bir daha geri dönmedi. İzlerini buldum, Kutup Işığı Basamakları'nın güneybatısındaki yol işaretlerinin altında saklanıyor, kurtlardan çok korktuğu için kımıldayamıyor. Bataklığı terk edemem, {playerName}. Onu Basamaklardaki Veyla'nın kampına götür. Işıkların altında güvende olacak.",
+        "text": "Çırağım Wren iki gün önce Altın Eriyiş hattını yürümeye çıktı ve bir daha geri dönmedi. İzlerini buldum, Kutup Işığı Basamakları'nın kuzeydoğusundaki yol işaretlerinin altında saklanıyor, kurtlardan çok korktuğu için kımıldayamıyor. Bataklığı terk edemem, {playerName}. Onu Basamaklardaki Veyla'nın kampına götür. Işıkların altında güvende olacak.",
         "completion": "Kız içeride, battaniyelerimin yarısına sarılı ve yıldızları gökten indirecek kadar konuşuyor. Bugün nazik bir şey yaptın, {playerName}. Diyar bunlardan pek fazla görmüyor.",
         "objectives": {
           "0": {
@@ -13522,7 +13523,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Eve Dönüyor",
-        "text": "Bram'ım, ağ gediği açıldığı sabah tekneyi çıkardı, ve deniz onu İskele noktasının ötesinde bir yere geri fırlattı. Onu üç gece önce duydum, {playerName}, suyun üzerinden sesleniyordu, ve gitmeye çok korktum. Hala çok korkuyorum. Lütfen. Teknesi kuzey kıyısında parçalanmış yatıyor. Onu bana eve getir.",
+        "text": "Bram'ım, ağ gediği açıldığı sabah tekneyi çıkardı, ve deniz onu İskele noktasının ötesinde bir yere geri fırlattı. Onu üç gece önce duydum, {playerName}, suyun üzerinden sesleniyordu, ve gitmeye çok korktum. Hala çok korkuyorum. Lütfen. Teknesi güney kıyısında parçalanmış yatıyor. Onu bana eve getir.",
         "completion": "Bram! Onu bana sağ salim getirdin, {playerName}. İkimiz de ağladık ve hiçbirimiz utanmıyoruz. Gedikler bu adadan bundan sonra ne alırsa alsın, ailemi alamazlar. Artık olmaz.",
         "objectives": {
           "0": {
