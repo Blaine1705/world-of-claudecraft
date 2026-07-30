@@ -4,7 +4,7 @@ import { GATHER_NODES } from '../sim/data';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { NODE_COLOR, NODE_Y_OFFSET } from './gather_nodes_lookup';
+import { NODE_COLOR, NODE_Y_OFFSET, nodeTierScale } from './gather_nodes_lookup';
 import { surfaceMat } from './gfx';
 
 // Visible markers for gatherable world nodes (ore/wood/herb). Content and
@@ -73,6 +73,9 @@ export function buildGatherNodes(seed: number): GatherNodesView {
   group.name = 'gatherNodes';
   for (const node of GATHER_NODES) {
     const obj = buildNodeMesh(node.type);
+    // Tier differentiation (the UX pass): size, never hue, identical on
+    // every preset (gather_nodes_lookup.ts nodeTierScale).
+    obj.scale.multiplyScalar(nodeTierScale(node.tier));
     const y = terrainHeight(node.pos.x, node.pos.z, seed);
     obj.position.set(node.pos.x, y + NODE_Y_OFFSET[node.type], node.pos.z);
     obj.name = node.id;
