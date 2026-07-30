@@ -98,7 +98,12 @@
   });
 </script>
 
-<ModalDialog labelledBy="prof-inspect-title" closeLabel={t('profInspect.close')} {onClose}>
+<ModalDialog
+  labelledBy="prof-inspect-title"
+  closeLabel={t('profInspect.close')}
+  width="1360px"
+  {onClose}
+>
   <h3 id="prof-inspect-title">{t('profInspect.title', { name: characterName })}</h3>
   {#if failed}
     <div class="empty">{t('profInspect.loadFailed')}</div>
