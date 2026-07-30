@@ -5618,15 +5618,21 @@ export function armorReduction(armor: number, attackerLevel: number): number {
 export const MOB_VS_PLAYER_MAX_ARMOR_DR = MOB_VS_PLAYER_MAX_MISS;
 
 // Effective armor-DR fraction for `attacker`'s hit on `target`, floored directionally
-// the same way swingMissChance floors mob miss: a hostile wild mob (or its cleave
-// splash) hitting a player or player-owned pet never gets more than
-// MOB_VS_PLAYER_MAX_ARMOR_DR mitigated away by armor, regardless of how armored the
-// target is. Player/pet -> mob keeps the full armorReduction scaling untouched.
+// the same way swingMissChance floors mob miss. Unlike meleeMissChance, armorReduction
+// itself carries NO level-difference term (only the attacker's level and the target's
+// armor), so unconditionally capping it here would also neuter armor against a
+// same-level or higher-level mob, including raid bosses: a live tanking stat, not an
+// anti-power-level deterrent, and level parity is not what issue #1050 was about.
+// The floor only applies in the exact inverted case the miss/resist floors correct: a
+// LOWER-level hostile mob (or its cleave splash) hitting a higher-level player or
+// player-owned pet. At or above the target's level, armor keeps its full, uncapped
+// scaling in both directions.
 export function mobArmorReduction(attacker: Entity, target: Entity, armor: number): number {
   const dr = armorReduction(armor, attacker.level);
   const mobAttacker = attacker.kind === 'mob' && attacker.hostile && attacker.ownerId === null;
   const playerSide = target.kind === 'player' || target.ownerId !== null;
-  if (mobAttacker && playerSide) return Math.min(dr, MOB_VS_PLAYER_MAX_ARMOR_DR);
+  const belowTarget = attacker.level < target.level;
+  if (mobAttacker && playerSide && belowTarget) return Math.min(dr, MOB_VS_PLAYER_MAX_ARMOR_DR);
   return dr;
 }
 

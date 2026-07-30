@@ -123,6 +123,28 @@ describe('enemy mob armor DR against a player never mitigates more than MOB_VS_P
     const armor = 50; // well under the 20% DR floor already
     expect(mobArmorReduction(mob, player, armor)).toBe(armorReduction(armor, mob.level));
   });
+
+  // Review finding (PR #2601): armorReduction carries no level-difference term at all
+  // (only the attacker's level and the raw armor value), unlike meleeMissChance, so an
+  // unconditional floor here would also cap a same-level or higher-level mob's mitigation,
+  // including raid bosses, redefining tanking mitigation globally instead of only fixing
+  // the inverted low-level-mob-vs-high-level-player case issue #1050 was about. The floor
+  // must apply ONLY when the mob is below the target's level.
+  it('a same-level hostile mob keeps the full, uncapped armor DR (level parity is not the bug)', () => {
+    const mob = ent({ kind: 'mob', level: 60, hostile: true, ownerId: null });
+    const player = ent({ kind: 'player', level: 60, ownerId: null });
+    const armor = 1_000_000; // pins the raw DR at its 75% cap
+    expect(mobArmorReduction(mob, player, armor)).toBe(armorReduction(armor, mob.level));
+    expect(mobArmorReduction(mob, player, armor)).toBeCloseTo(0.75);
+  });
+
+  it('a higher-level hostile mob (e.g. a raid boss) also keeps the full, uncapped armor DR', () => {
+    const boss = ent({ kind: 'mob', level: 63, hostile: true, ownerId: null });
+    const player = ent({ kind: 'player', level: 60, ownerId: null });
+    const armor = 1_000_000;
+    expect(mobArmorReduction(boss, player, armor)).toBe(armorReduction(armor, boss.level));
+    expect(mobArmorReduction(boss, player, armor)).toBeCloseTo(0.75);
+  });
 });
 
 describe('enemy mob-cast spells never resist more than MOB_VS_PLAYER_MAX_RESIST against a player (issue #1050)', () => {
