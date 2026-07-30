@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { NATIVE_APP } from '../client_origin';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
+import { applyGfxOverridesFromSearch } from './gfx_override_core';
 import { isSoftwareRendererName } from './software_renderer';
 
 // Quality tiers: every tier-dependent knob keys off this module instead of
@@ -1049,7 +1050,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       settings = { ...settings, shadowMap: 2560, terrainCastShadows: false };
     else if (shadowLevel === 3) settings = { ...settings, shadowMap: 8192 };
   }
-  return settings;
+  return applyGfxOverridesFromSearch(settings, hints?.search ?? '');
 }
 
 export function forcedTierFromSearch(search: string): GfxTier | null {
