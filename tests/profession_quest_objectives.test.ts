@@ -5,6 +5,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { GATHER_NODES, QUESTS } from '../src/sim/data';
 import { nodeMaterialFor } from '../src/sim/professions/gathering';
+import { TIER2_TOOL_WIELD_PROFICIENCY } from '../src/sim/professions/wield_gate';
 import { Sim } from '../src/sim/sim';
 import type { QuestDef, QuestObjective, QuestProgress } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -155,8 +156,12 @@ describe('gather quest objectives across material grades', () => {
       { type: 'gather', itemId: baseItemId, count: 1, label: 'Ore material gathered' },
     ]);
     // A tier-2 pick: eastbrook is all tier-1 veins at material tier 1, so this
-    // player can no longer produce the plain grade anywhere in the zone.
+    // player can no longer produce the plain grade anywhere in the zone. The
+    // wield counter has to be earned first (R22): a covering tool below its
+    // threshold is a denial, not a downgrade, so an unearned pick would stop
+    // this harvest before the grade axis this test is about ever resolves.
     sim.addItem('iron_mining_pick', 1, pid);
+    sim.meta(pid)!.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
     const ore = GATHER_NODES.find(
       (node) => node.zoneId === 'eastbrook_vale' && node.type === 'ore',
     )!;
