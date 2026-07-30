@@ -81,8 +81,10 @@ Implementation requirements:
 - Keep the solution maintainable and extensible: follow the module-first seams below, do not grow
   a monolith.
 - **If the change is visual, add before/after screenshots to the PR** (desktop and mobile where
-  relevant), committed under `docs/screenshots` and referenced from the PR body (the
-  `pr-screenshots` skill has the capture recipe).
+  relevant) and reference them from the PR body (the `pr-screenshots` skill has the capture
+  recipe). Prefer PR attachments or the CI screenshot bot over committing one-off shots under
+  `docs/screenshots/`; that tree is for load-bearing README/asset evidence only (see
+  `docs/CLAUDE.md`).
 
 Deliverable: a PR based off the latest release branch, following
 `.github/PULL_REQUEST_TEMPLATE.md`, that is **fully mergeable and passes CI**. Gate it locally

@@ -1,14 +1,16 @@
 ---
 name: pr-screenshots
-description: Capture before/after screenshots for a World of ClaudeCraft PR (desktop and mobile), commit them under docs/screenshots, and reference them from the PR body. Use when a change is visual (render, HUD, CSS, content models, windows), when the PR template's screenshot requirement applies, or when asked to screenshot the game for a review or comparison. Covers the change-aware capture tooling, the before/after protocol, and the known puppeteer/CDP traps.
+description: Capture before/after screenshots for a World of ClaudeCraft PR (desktop and mobile) and attach or link them from the PR body. Prefer ephemeral PR attachments over committing under docs/screenshots. Use when a change is visual (render, HUD, CSS, content models, windows), when the PR template's screenshot requirement applies, or when asked to screenshot the game for a review or comparison. Covers the change-aware capture tooling, the before/after protocol, and the known puppeteer/CDP traps.
 user-invocable: true
 ---
 
 # PR screenshots
 
 The repo rule (root `CLAUDE.md`): a visual change ships with before/after screenshots,
-desktop and mobile where relevant, committed under `docs/screenshots/` and referenced from
-the PR body. This skill is the capture recipe.
+desktop and mobile where relevant, referenced from the PR body. Prefer PR attachments
+or the CI screenshot bot; do **not** permanently commit one-off PR evidence under
+`docs/screenshots/` (that tree is load-bearing README/asset evidence only; see
+`docs/CLAUDE.md`). This skill is the capture recipe.
 
 ## 1. Use the change-aware tooling first
 
@@ -38,8 +40,10 @@ be a target entry (for example an online-only or multi-client scene).
 3. The Vite dev client picks up source changes live, but `npm run server` bundles at START:
    after any branch flip, restart the server before online captures or you will shoot a
    stale bundle.
-4. Move the keepers to `docs/screenshots/<slug>/before-*.png` / `after-*.png`, commit them,
-   and reference them from the PR body with repo-relative links.
+4. Keep capture output under a gitignored local dir (for example `pr-shots/` or `SHOTS_DIR`).
+   Attach the keepers to the PR body (or rely on the CI screenshot bot). Do not commit them
+   under `docs/screenshots/` unless they are permanent load-bearing assets (README hero,
+   asset-pipeline evidence, living design/PRD concept art).
 5. For screenshots in a REVIEW COMMENT on someone else's PR: GitHub `user-attachments`
    upload URLs only work from the web UI. Push the PNGs to a gist and embed the gist's raw
    URLs instead.
