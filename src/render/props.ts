@@ -33,6 +33,7 @@ import {
   isEastbrookRebuildStall,
   isEastbrookRebuildWell,
 } from './eastbrook_town';
+import { indexExactVertexTuples } from './exact_index_geometry';
 import { EMISSIVE_LIGHT, GFX, sharedUniforms, surfaceMat } from './gfx';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
@@ -2381,8 +2382,8 @@ function cullableVisible(
 // (material, castShadow, z-band). Flames (animated) and InstancedMeshes
 // survive untouched, as do the PointLights (not meshes). The merged meshes
 // replace the originals on the same group; emptied sub-groups are left in
-// place (they carry lights). Geometries are de-indexed before merging so
-// indexed glTF extracts and procedural shapes can share a bucket.
+// place (they carry lights). Non-indexed procedural shapes receive exact tuple
+// indices so they can share indexed glTF buckets without expanding either.
 function mergeStaticMeshes(group: THREE.Group, keep: Set<THREE.Object3D>): THREE.Mesh[] {
   group.updateMatrixWorld(true);
   interface Bucket {
@@ -2404,9 +2405,10 @@ function mergeStaticMeshes(group: THREE.Group, keep: Set<THREE.Object3D>): THREE
       bucket = { material, castShadow: mesh.castShadow, geoms: [] };
       buckets.set(key, bucket);
     }
-    // clone/de-index: extracted geometries are shared across placements, so
-    // the bake must never mutate them in place
-    const geo = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
+    // Extracted geometries are shared across placements, so the bake must
+    // never mutate them in place. Preserve source index reuse and normalize
+    // procedural streams with byte-exact full-tuple indices.
+    const geo = mesh.geometry.index ? mesh.geometry.clone() : indexExactVertexTuples(mesh.geometry);
     bucket.geoms.push(geo.applyMatrix4(mesh.matrixWorld));
     merged.push(mesh);
   });
@@ -2425,3 +2427,5 @@ function mergeStaticMeshes(group: THREE.Group, keep: Set<THREE.Object3D>): THREE
   }
   return out;
 }
+
+export const propStaticMergeInternalsForTest = { mergeStaticMeshes };
