@@ -638,6 +638,31 @@ must be re-derived if either number is ever tuned on its own.
 - New profession mechanic: its own module in `src/sim/professions/` behind
   `SimContext` (see `src/sim/professions/CLAUDE.md` for the seam map and
   landing checklist).
+- New ZONE with professions content: flip its ledger row to 'complete' in
+  `tests/professions_zone_rollout.test.ts` (the R37 guard) and the same
+  file's new-zone checklist conscripts the zone whole: six nodes per type on
+  legal ground with a real tier ladder, materials with fine twins, the tool
+  and rod rungs the zone opens, catch tables in every band, hub stocking per
+  the hub rule with the ladder top routed through content (R23, the delve
+  Marks prototype), R22 wield requirements reachable on the ladder below,
+  the gatherer chronicle and first-cast deeds, and wiki presence. Shipping
+  an incomplete zone reds the gate instead of relying on memory.
+- CAP SCALING when zone 4 arrives (design note, phase 13; implementation
+  rides the first new zone): the land cap and the fishing cap are today
+  authored constants (`GATHERING_PROFESSIONS` maxSkill 100 / 200) that
+  HAPPEN to equal what the shipped tier ladder teaches: land tier T ground
+  teaches to `GATHER_GAIN_TIER_STEP * (T + 2)` clamped at the cap, and
+  tier-T water teaches to the fishing schedule's row-T boundary. When a
+  tier-4 zone ships, raise the caps as a CONTENT CONSEQUENCE of that
+  derivation (land 125 = 25 * (4 + 2) minus nothing to clamp; fishing gains
+  a schedule row whose boundary becomes the new ceiling), never as a bare
+  constant edit: the character-sheet denominator reads maxSkill live and
+  follows; the R22 wield table gains its next rung under the knife-edge
+  rule (reachable on tier-4 ground, pinned like 40/70/85/100); the
+  empty-hook shortfall schedule gains a band column derived like the
+  shipped ones; and the load clamp (`normalizeGatheringProficiency`) makes
+  any cap RAISE rollback-destructive, so the raise ships with the zone,
+  never ahead of it (the phase 9 rollback note owns the mechanics).
 
 ## Open worklists
 

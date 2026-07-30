@@ -243,3 +243,259 @@ describe('the R37 professions zone-rollout guard', () => {
     expect(delveToolRows).toBeGreaterThan(0);
   });
 });
+
+// ---------------------------------------------------------------------------
+// The NEW-ZONE CHECKLIST (phase 13 of the packet review): the assert-complete
+// half of the R37 flip. Every arm below walks the ledger's 'complete' rows,
+// so flipping a starter zone to 'complete' conscripts it into the WHOLE
+// checklist at once: a future zone must arrive mechanically whole (six nodes
+// per type on a real tier ladder, materials with fine twins, the tool and
+// rod rungs it opens, catch tables in every band, hub stocking per the hub
+// rule with the ladder top routed through content per R23, wield
+// requirements reachable per R22's knife-edge rule, deeds, and wiki
+// presence) or red the gate. Everything is derived from the live tables;
+// the ledger stays the one hand-kept decision.
+// ---------------------------------------------------------------------------
+
+import { GUIDE_PROF_GATHERING } from '../src/guide/content.generated';
+import { DEEDS } from '../src/sim/content/deeds';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
+import {
+  gatherNodeGainMultiplier,
+  NODE_HARVEST_TABLE,
+  NODE_MATERIAL_TABLE,
+} from '../src/sim/professions/gathering';
+import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
+import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
+
+describe('the new-zone checklist: every complete zone arrives mechanically whole', () => {
+  const complete = [...rolledOutFrom(PROFESSIONS_ZONE_ROLLOUT)].sort();
+  const zoneOf = (zoneId: string) => {
+    const zone = ZONES.find((z) => z.id === zoneId);
+    if (!zone) throw new Error(`ledger zone ${zoneId} is not in ZONES`);
+    return zone;
+  };
+  const nodesIn = (zoneId: string) => GATHER_NODES.filter((n) => n.zoneId === zoneId);
+  const zoneTierOf = (zoneId: string) => Math.max(...nodesIn(zoneId).map((n) => n.tier));
+  const landTools = Object.entries(ITEMS).filter(
+    ([, def]) => def.use?.type === 'gatherTool' && def.use.professionId !== 'fishing',
+  );
+  const rods = Object.entries(ITEMS).filter(
+    ([, def]) => def.use?.type === 'gatherTool' && def.use.professionId === 'fishing',
+  );
+
+  it('the checklist sweeps a real, non-vacuous complete set', () => {
+    expect(complete.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('six nodes per type, an entry rung, and at least one node of the zone tier', () => {
+    for (const zoneId of complete) {
+      const zoneTier = zoneTierOf(zoneId);
+      for (const type of GATHER_NODE_TYPES) {
+        const ofType = nodesIn(zoneId).filter((n) => n.type === type);
+        expect(ofType.length, `${zoneId} ${type} circuit floor`).toBeGreaterThanOrEqual(6);
+        expect(
+          ofType.some((n) => n.tier === 1),
+          `${zoneId} ${type} needs a tier-1 entry node`,
+        ).toBe(true);
+      }
+      expect(
+        nodesIn(zoneId).some((n) => n.tier === zoneTier),
+        `${zoneId} tier assignment must be carried by a real node`,
+      ).toBe(true);
+    }
+  });
+
+  it('ground and water agree on the zone tier (one progression ladder)', () => {
+    for (const zoneId of complete) {
+      expect(FISHING_ZONE_ROD_TIERS[zoneId], `${zoneId} rod tier`).toBe(zoneTierOf(zoneId));
+    }
+  });
+
+  it('every node material resolves and carries its fine twin with a real def', () => {
+    for (const zoneId of complete) {
+      for (const type of GATHER_NODE_TYPES) {
+        const row = NODE_MATERIAL_TABLE[type][zoneId];
+        expect(row, `${zoneId} ${type} material row`).toBeDefined();
+        expect(ITEMS[row.itemId], `${zoneId} ${type} material def`).toBeDefined();
+        const grade = MATERIAL_GRADES[row.itemId];
+        expect(grade, `${zoneId} ${type} material needs a fine-grade row (D8)`).toBeDefined();
+        expect(ITEMS[grade.fineItemId], `${zoneId} ${type} fine def`).toBeDefined();
+      }
+    }
+  });
+
+  it('the tool and rod rungs a zone opens exist in the catalog', () => {
+    for (const zoneId of complete) {
+      const zoneTier = zoneTierOf(zoneId);
+      for (const professionId of new Set(
+        Object.values(NODE_HARVEST_TABLE).map((entry) => entry.professionId),
+      )) {
+        expect(
+          landTools.some(
+            ([, def]) =>
+              def.use?.type === 'gatherTool' &&
+              def.use.professionId === professionId &&
+              def.use.tier === zoneTier,
+          ),
+          `${zoneId} opens tier ${zoneTier}: ${professionId} needs a tool of that rung`,
+        ).toBe(true);
+      }
+      if (zoneTier >= 2) {
+        expect(
+          rods.some(([, def]) => def.use?.type === 'gatherTool' && def.use.tier === zoneTier),
+          `${zoneId} water takes a tier-${zoneTier} rod, which must exist`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('every band carries the zone catch table, summing to 100 with an empty-hook row', () => {
+    for (const zoneId of complete) {
+      FISHING_TABLES_BY_BAND.forEach((band, index) => {
+        const table = band[zoneId];
+        expect(table, `${zoneId} band ${index} table`).toBeDefined();
+        expect(
+          table.reduce((sum, entry) => sum + entry.weight, 0),
+          `${zoneId} band ${index} weights`,
+        ).toBe(100);
+        expect(
+          table.some((entry) => entry.itemId === null),
+          `${zoneId} band ${index} empty-hook row`,
+        ).toBe(true);
+      });
+    }
+  });
+
+  it('the hub stocks the rungs its own nodes use, and the water rod; ladder tops never (hub rule, R20, R23)', () => {
+    for (const zoneId of complete) {
+      const zone = zoneOf(zoneId);
+      const zoneTier = zoneTierOf(zoneId);
+      const hub = zone.hub;
+      expect(hub, `${zoneId} needs a hub`).toBeDefined();
+      const hubStock = new Set<string>();
+      for (const npc of Object.values(NPCS)) {
+        if (!npc.vendorItems?.length) continue;
+        const d = Math.hypot(npc.pos.x - hub.x, npc.pos.z - hub.z);
+        if (d > hub.radius * 2) continue;
+        for (const itemId of npc.vendorItems) hubStock.add(itemId);
+      }
+      // Land side, both directions: every vendor-priced land tier up to the
+      // zone tier is on the counter, and nothing above the zone tier is.
+      for (const [itemId, def] of landTools) {
+        if (def.use?.type !== 'gatherTool') continue;
+        const priced = def.buyValue !== undefined;
+        if (priced && def.use.tier <= zoneTier) {
+          expect(hubStock.has(itemId), `${zoneId} hub should stock ${itemId}`).toBe(true);
+        }
+        if (def.use.tier > zoneTier) {
+          expect(hubStock.has(itemId), `${zoneId} hub must not stock ${itemId}`).toBe(false);
+        }
+      }
+      // Rod side: a tiered-water hub stocks exactly the rod its water takes;
+      // the tier-1 zone hub is the R20 buy-ahead counter and may carry the
+      // whole vendor-priced ladder, never a crafted rung.
+      const rodsStocked = rods.filter(([itemId]) => hubStock.has(itemId));
+      if (zoneTier >= 2) {
+        expect(
+          rodsStocked.some(
+            ([, def]) => def.use?.type === 'gatherTool' && def.use.tier === zoneTier,
+          ),
+          `${zoneId} hub must stock the rod its water takes`,
+        ).toBe(true);
+        for (const [itemId, def] of rodsStocked) {
+          expect(
+            def.use?.type === 'gatherTool' && def.use.tier <= zoneTier,
+            `${zoneId} hub stocks ${itemId} above its own water`,
+          ).toBe(true);
+        }
+      } else {
+        for (const [itemId, def] of rodsStocked) {
+          expect(def.buyValue !== undefined, `${zoneId} hub sells unpriced rod ${itemId}`).toBe(
+            true,
+          );
+        }
+      }
+    }
+  });
+
+  it('the ladder top rungs route through content, never a counter (R23)', () => {
+    const professionTops = new Map<string, number>();
+    for (const [, def] of [...landTools, ...rods]) {
+      if (def.use?.type !== 'gatherTool') continue;
+      const top = professionTops.get(def.use.professionId) ?? 0;
+      if (def.use.tier > top) professionTops.set(def.use.professionId, def.use.tier);
+    }
+    expect(professionTops.size).toBeGreaterThanOrEqual(4);
+    const delveRows = Object.values(DELVE_SHOPS).flat();
+    for (const [itemId, def] of [...landTools, ...rods]) {
+      if (def.use?.type !== 'gatherTool') continue;
+      if (def.use.tier !== professionTops.get(def.use.professionId)) continue;
+      expect(def.buyValue, `${itemId} is a ladder top and must never price for copper`).toBe(
+        undefined,
+      );
+      const crafted = ALL_RECIPES.some((recipe) => recipe.resultItemId === itemId);
+      const marks = delveRows.some((row) => row.itemId === itemId && row.gate !== 'available');
+      expect(
+        crafted || marks,
+        `${itemId} names no content source (recipe or gated Marks row)`,
+      ).toBe(true);
+    }
+  });
+
+  it('every wield requirement a zone asks is reachable on the ladder below it (R22 knife-edge)', () => {
+    const cap = 100;
+    const teachingCeilingFor = (nodeTier: number): number => {
+      for (let proficiency = 0; proficiency <= cap; proficiency++) {
+        if (gatherNodeGainMultiplier(proficiency, nodeTier) === 0) return proficiency;
+      }
+      return cap;
+    };
+    const tiersPresent = new Set(complete.flatMap((zoneId) => nodesIn(zoneId).map((n) => n.tier)));
+    for (const tier of tiersPresent) {
+      if (tier < 2) continue;
+      const below = [...tiersPresent].filter((t) => t < tier);
+      expect(below.length, `tier ${tier} needs ground below it somewhere`).toBeGreaterThan(0);
+      const reachable = Math.max(...below.map(teachingCeilingFor));
+      expect(
+        wieldRequirementForTier(tier),
+        `tier ${tier} wield requirement must be reachable on the ladder below`,
+      ).toBeLessThanOrEqual(reachable);
+    }
+  });
+
+  it('every complete zone has its gatherer chronicle and first-cast deed', () => {
+    for (const zoneId of complete) {
+      const gatherMarks = GATHER_NODE_TYPES.map((type) => `gather:${zoneId}:${type}`);
+      expect(
+        Object.values(DEEDS).some((deed) => {
+          const trigger = deed.trigger;
+          return (
+            trigger.kind === 'visits' &&
+            gatherMarks.every((mark) => trigger.markIds.includes(mark))
+          );
+        }),
+        `${zoneId} needs a gatherer chronicle over all three node types (R21)`,
+      ).toBe(true);
+      expect(
+        Object.values(DEEDS).some(
+          (deed) => deed.trigger.kind === 'visit' && deed.trigger.markId === `fish:${zoneId}`,
+        ),
+        `${zoneId} needs its first-cast fishing deed`,
+      ).toBe(true);
+    }
+  });
+
+  it('the wiki renders every complete zone in each land gathering table', () => {
+    for (const zoneId of complete) {
+      const zoneName = zoneOf(zoneId).name;
+      for (const guide of GUIDE_PROF_GATHERING) {
+        if (!guide.nodes) continue;
+        expect(
+          guide.nodes.some((row) => row.zone === zoneName),
+          `${zoneName} missing from a wiki gathering table`,
+        ).toBe(true);
+      }
+    }
+  });
+});
