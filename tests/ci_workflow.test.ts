@@ -97,6 +97,7 @@ describe('CI workflow parity', () => {
       'run: npm run check:types',
       'run: npm run build:env',
       'run: npm run build:server',
+      'run: npm run build:bot',
       'run: npm run build\n',
     ]) {
       expect(prChecks).toContain(step);
@@ -143,13 +144,14 @@ describe('CI workflow parity', () => {
     // ...while release-gate keeps its serialized checks and builds on exactly
     // one shard each (they are not partitionable and must not run four times):
     // i18n:gen, the freshness diff, the coverage summary, the malware gate,
-    // typecheck, and the three builds. Every new non-test step added to
-    // release-gate needs the same single-shard condition, and this count.
-    expect(releaseGate.match(/if: matrix\.shard == 1/g)).toHaveLength(8);
+    // typecheck, and the four builds (env, server, bot, client). Every new
+    // non-test step added to release-gate needs the same single-shard
+    // condition, and this count.
+    expect(releaseGate.match(/if: matrix\.shard == 1/g)).toHaveLength(9);
     // The release TEST step itself must stay un-gated (run on every shard):
     // name-to-run adjacency proves no if: line sits between them, so a
     // compensating double-edit (gate the test step, un-gate a build; count
-    // still 8) cannot silently shrink the release tier to a quarter of the
+    // still 9) cannot silently shrink the release tier to a quarter of the
     // suite.
     expect(releaseGate).toMatch(
       /- name: Run tests \(release tier[^\n]*\n {8}run: npm test -- --shard=\$\{\{ matrix\.shard \}\}\/4/,
@@ -160,6 +162,31 @@ describe('CI workflow parity', () => {
     // run four times per release push; pr-gate stays exactly checkout,
     // setup-node, npm ci, and the sharded test run).
     expect(prGate.match(/\n {6}- name: /g)).toHaveLength(4);
-    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(12);
+    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(13);
+    // ...and by NAME, because the two counts above are compensable: deleting a
+    // build step and adding any other single-shard step keeps both totals and
+    // would silently stop shipping that bundle from the release tier.
+    for (const build of [
+      'run: npm run build:env',
+      'run: npm run build:server',
+      'run: npm run build:bot',
+      'run: npm run build\n',
+    ]) {
+      expect(releaseGate).toContain(build);
+    }
+  });
+
+  it('builds every bundle in the local gate too, including the Discord bot', () => {
+    // scripts/gate.mjs is the local mirror of the CI step list (its own header
+    // says to keep them in sync), and nothing else pins its build steps: a
+    // deleted gate step is invisible to CI, which runs its own list.
+    for (const step of [
+      "['env build', 'npm', ['run', 'build:env']]",
+      "['server build', 'npm', ['run', 'build:server']]",
+      "['bot build', 'npm', ['run', 'build:bot']]",
+      "['client build', 'npm', ['run', 'build']]",
+    ]) {
+      expect(gate).toContain(step);
+    }
   });
 });

@@ -70,6 +70,7 @@ const steps = [
   ['typecheck', 'npm', ['run', 'check:types']],
   ['env build', 'npm', ['run', 'build:env']],
   ['server build', 'npm', ['run', 'build:server']],
+  ['bot build', 'npm', ['run', 'build:bot']],
   ['client build', 'npm', ['run', 'build']],
 ];
 

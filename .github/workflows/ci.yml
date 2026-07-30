@@ -234,6 +234,12 @@ jobs:
       - name: Build server
         run: npm run build:server
 
+      # The Discord bot bundles from the same tree and ships in the same image
+      # (Dockerfile runs build:bot), so a broken bot bundle must fail here rather
+      # than on the production host during docker compose up --build.
+      - name: Build Discord bot
+        run: npm run build:bot
+
       - name: Build client
         run: npm run build
 
@@ -316,6 +322,12 @@ jobs:
       - name: Build server
         if: matrix.shard == 1
         run: npm run build:server
+
+      # Same reason as the PR-tier job: the bot bundles from this tree and ships
+      # in the same image, so a broken bot bundle fails here, not on the host.
+      - name: Build Discord bot
+        if: matrix.shard == 1
+        run: npm run build:bot
 
       - name: Build client
         if: matrix.shard == 1
