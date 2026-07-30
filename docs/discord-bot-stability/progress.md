@@ -87,6 +87,14 @@
 
 ### Phase 1 (2026-07-30)
 
+Release sync: NO-OP. `origin/release/v0.33.0` was still at `b0acba0adc`, the commit
+this branch was cut from, so there was nothing to merge (6 ahead, 0 behind). Every
+later phase repeats the check at its START, per the standing rules at the top of
+state.md.
+
+Environment: this worktree had no `node_modules`; `npm ci` was run in it to get the
+real TypeScript 7 native binary and a runnable gate.
+
 The tsconfig include surfaced ZERO latent type errors, so the "fix the errors the
 include surfaces" commit collapsed into the include itself. The include was proven
 live two ways rather than assumed: `tsc --noEmit --listFiles` lists all six bot files

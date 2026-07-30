@@ -83,6 +83,25 @@ Current phase: Phase 1 built (2026-07-30), QA session next.
 - Shared-worktree care: commit with EXPLICIT paths, never `git add -A`.
 - WS `maxPayload` 16 KiB is not widened; the game wire protocol is not touched.
 
+## Every phase starts here (standing rules, set by the user 2026-07-30)
+
+1. **Sync the release base FIRST.** `git fetch origin release/v0.33.0`, then
+   `git rev-list --left-right --count HEAD...origin/release/v0.33.0`. If behind, merge
+   the release branch into `feature/discord-bot-stability` BEFORE doing the phase's
+   work, so each phase eats one small conflict set instead of handing a huge one to a
+   later phase. Compare against the FRESHLY fetched tip, not a stale tracking ref.
+   After any non-empty merge, run the `release-merge-audit` skill and re-run the gate
+   (a gate that was green before a merge says nothing about the merged result). Record
+   the sync in progress.md, including "no-op, already current".
+2. **Install what the toolchain needs.** A fresh worktree has no `node_modules`, and
+   the main checkout's install is stale (TypeScript 5.9.3, no ffmpeg-static). Run
+   `npm ci` in THIS worktree; do not degrade the verification to avoid it. This does
+   NOT relax D7: no new packages.
+3. **Apply EVERY review finding**, blocking, should-fix, nice-to-have, and nit alike,
+   before the phase is called done. If a finding is genuinely not a defect, say so and
+   why; do not silently drop it. The fix round is itself unreviewed code, so
+   mutation-check the tests it adds too.
+
 ## Validation matrix
 
 - bot-only change: `npx tsc --noEmit` + `npx vitest run tests/discord_bot.test.ts` plus
