@@ -20,6 +20,7 @@
 
 import { CRAFT_RING, GATHERING_PROFESSION_IDS, TOOL_EFFECTS } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
+import { normalizeArchetypeState } from '../src/sim/professions/archetype';
 import {
   gatherNodeById,
   NODE_HARVEST_TABLE,
@@ -171,7 +172,13 @@ export function characterProfessionsSheet(
       };
     })
     .sort((a, b) => b.remainingSeconds - a.remainingSeconds || a.nodeId.localeCompare(b.nodeId));
-  const archetype = state.archetype ?? {};
+  // The loader's archetype normalizer, with the craftSkills computed above
+  // as its repair input (the same pre-mastery-reset map the loader passes at
+  // the equivalent point in its own order): an invalid activeArchetype nulls
+  // the trio, a non-adjacent pairedMajor is repaired to the default pair,
+  // and a null hobby resolves to defaultHobbyForPair, so the operator sees
+  // the trio the next login actually resolves rather than the raw blob.
+  const archetype = normalizeArchetypeState(state.archetype, craftSkills);
   return {
     characterId: input.characterId,
     name: input.name,
@@ -188,13 +195,16 @@ export function characterProfessionsSheet(
         state.proficiencyDisplayHealApplied !== true ||
         state.recipesGrandfathered !== true),
     archetype: {
-      activeArchetype: archetype.activeArchetype ?? null,
-      pairedMajor: archetype.pairedMajor ?? null,
-      hobbyCraft: archetype.hobbyCraft ?? null,
+      activeArchetype: archetype.activeArchetype,
+      pairedMajor: archetype.pairedMajor,
+      hobbyCraft: archetype.hobbyCraft,
     },
     gathering,
     crafting,
-    knownRecipes: (state.knownRecipes ?? []).length,
+    // The loader builds a Set (src/sim/sim.ts), so duplicate ids in a
+    // hand-edited blob collapse at login; count the deduplicated size the
+    // next login resolves, not the raw array length.
+    knownRecipes: new Set(state.knownRecipes ?? []).size,
     slots,
     nodeTimers,
     toolEffectIds: Object.keys(TOOL_EFFECTS),
@@ -225,10 +235,12 @@ export function characterProfessionsSheetFromRow(
     state: liveState ?? ((row.state ?? {}) as CharacterState),
     live: liveState !== null,
     updatedAt: liveState !== null ? null : row.updatedAt,
-    // The liveState conjunct is LOAD-BEARING: a live caller suppresses the
-    // blob fetch (row.state undefined), which must never read as
-    // never-entered; the row's undefined-vs-null contract documents the
-    // same coupling from the other end.
+    // The liveState conjunct is DEFENSIVE, not load-bearing: emptyBlob only
+    // feeds preMigration, which already short-circuits on live input, so the
+    // conjunct changes no output today. It documents the undefined-vs-null
+    // contract (a live caller suppresses the blob fetch, which must never
+    // read as never-entered) and keeps the derivation honest if emptyBlob
+    // ever gains a second reader.
     emptyBlob: liveState === null && row.state == null,
   });
 }

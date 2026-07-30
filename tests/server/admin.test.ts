@@ -42,6 +42,7 @@ import {
   routes,
   setAdminDbForTests,
 } from '../../server/admin';
+import { characterProfessionsSheet } from '../../server/character_professions';
 import { pool } from '../../server/db';
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
@@ -3020,10 +3021,13 @@ describe('R35 professions inspector (GET /admin/api/characters/:id/professions)'
     expect(sheet.gathering).toContainEqual({ professionId: 'fishing', proficiency: 0 });
     expect(sheet.crafting).toContainEqual({ craftId: 'alchemy', skill: 30, tier: 1 });
     expect(sheet.knownRecipes).toBe(2);
+    // The sheet runs the LOADER'S normalizeArchetypeState, so the stored
+    // null hobby renders as the default the next login resolves for the
+    // alchemy+engineering pair (enchanting; inscription has no content).
     expect(sheet.archetype).toEqual({
       activeArchetype: 'alchemy',
       pairedMajor: 'engineering',
-      hobbyCraft: null,
+      hobbyCraft: 'enchanting',
     });
     expect(sheet.slots).toEqual([
       {
@@ -3463,6 +3467,90 @@ describe('R35 professions inspector: fix-round edge pins', () => {
     const sheet = (r.body as { data: Record<string, any> }).data;
     expect(sheet.live).toBe(true);
     expect(sheet.preMigration).toBe(false);
+  });
+});
+
+describe('characterProfessionsSheet: the per-field normalizer arms (pure)', () => {
+  const baseInput = (state: Record<string, unknown>) => ({
+    characterId: 5,
+    name: 'Aldric',
+    class: 'warrior',
+    level: 12,
+    accountId: 9,
+    username: 'alice',
+    state: state as never,
+    live: false,
+    updatedAt: null as string | null,
+    emptyBlob: false,
+  });
+  const ALL_FLAGS = {
+    masteryResetApplied: true,
+    proficiencyDisplayHealApplied: true,
+    recipesGrandfathered: true,
+  };
+
+  it('preMigration fires when ANY single one-shot flag is missing (per-dimension)', () => {
+    // The check ORs three independent flags; each case drops exactly one so
+    // a deleted conjunct in the source fails its own case.
+    for (const missing of [
+      'masteryResetApplied',
+      'proficiencyDisplayHealApplied',
+      'recipesGrandfathered',
+    ] as const) {
+      const flags: Record<string, boolean> = { ...ALL_FLAGS };
+      delete flags[missing];
+      const sheet = characterProfessionsSheet(baseInput(flags));
+      expect(sheet.preMigration, `missing ${missing} must warn`).toBe(true);
+    }
+    expect(characterProfessionsSheet(baseInput(ALL_FLAGS)).preMigration).toBe(false);
+  });
+
+  it('clamps out-of-range proficiencies and craft skills the way the login does', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({
+        ...ALL_FLAGS,
+        gatheringProficiency: { mining: 999, logging: -5 },
+        craftSkills: { alchemy: 99999 },
+      }),
+    );
+    // mining maxSkill is 100 (content); a tampered 999 renders as the value
+    // the next login resolves, and a negative floors at 0.
+    expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 100 });
+    expect(sheet.gathering).toContainEqual({ professionId: 'logging', proficiency: 0 });
+    const alchemy = sheet.crafting.find((c) => c.craftId === 'alchemy');
+    expect(alchemy?.skill).toBeLessThanOrEqual(300);
+    expect(Number.isFinite(alchemy?.skill)).toBe(true);
+  });
+
+  it('drops a ZERO node timer (the > 0 boundary) and tie-breaks equal timers by node id', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({
+        ...ALL_FLAGS,
+        nodeHarvestCooldowns: { ore_eastbrook_1: 0, zz_retired: 30, aa_retired: 30 },
+      }),
+    );
+    // The literal 0 row is not "pending", it is the loader's drop boundary.
+    expect(sheet.nodeTimers.map((t) => t.nodeId)).toEqual(['aa_retired', 'zz_retired']);
+  });
+
+  it('counts knownRecipes through the loader Set (duplicates collapse)', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({ ...ALL_FLAGS, knownRecipes: ['recipe_a', 'recipe_a', 'recipe_a'] }),
+    );
+    expect(sheet.knownRecipes).toBe(1);
+  });
+
+  it('repairs an invalid archetype the way the login does (trio nulls together)', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({
+        ...ALL_FLAGS,
+        archetype: { activeArchetype: 'not_a_craft', pairedMajor: 'engineering', hobbyCraft: null },
+      }),
+    );
+    // normalizeArchetypeState refuses the invalid active craft, and without
+    // an active there is no pair and no hobby: the operator sees the reset
+    // the next login performs, not the raw stored trio.
+    expect(sheet.archetype).toEqual({ activeArchetype: null, pairedMajor: null, hobbyCraft: null });
   });
 });
 

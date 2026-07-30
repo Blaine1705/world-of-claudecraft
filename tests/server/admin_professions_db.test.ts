@@ -75,6 +75,23 @@ describe('recordProfessionsRestore', () => {
       null,
     ]);
   });
+
+  it('caps the folded detail at 128 characters (the bounded-prefix invariant)', async () => {
+    query.mockImplementationOnce(async () => ({ rows: [{ account_id: 9 }] }));
+    await recordProfessionsRestore({
+      characterId: 42,
+      adminAccountId: 7,
+      action: 'restore_item',
+      detail: 'x'.repeat(500),
+      reason: 'lost',
+    });
+    const [, params] = query.mock.calls[1];
+    const reason = params[3] as string;
+    // The prefix stays bounded no matter what a future caller passes: the
+    // detail inside it is cleanText-capped at 128, so the whole folded form
+    // cannot balloon the audit row.
+    expect(reason).toBe(`[requested ${'x'.repeat(128)} for character 42] lost`);
+  });
 });
 
 describe('characterProfessionsRow', () => {
@@ -121,5 +138,29 @@ describe('characterProfessionsRow', () => {
     query.mockImplementationOnce(async () => ({ rows: [] }));
     await characterProfessionsRow(42, false);
     expect(query.mock.calls[0][1]).toEqual([42, false]);
+  });
+
+  it('a FOUND row with the blob suppressed reads state UNDEFINED, never null', async () => {
+    // The undefined-vs-null contract: the CASE arm returns SQL NULL for a
+    // suppressed blob, and the mapper must translate that to undefined so a
+    // live caller's suppression stays distinguishable from a genuinely NULL
+    // stored blob (a created-but-never-entered character).
+    query.mockImplementationOnce(async () => ({
+      rows: [
+        {
+          id: 42,
+          name: 'Merlin',
+          class: 'mage',
+          level: 12,
+          account_id: 9,
+          username: 'alice',
+          state: null,
+          updated_at: '2026-06-01T00:00:00Z',
+        },
+      ],
+    }));
+    const row = await characterProfessionsRow(42, false);
+    expect(row).not.toBeNull();
+    expect('state' in (row as object) && (row as { state?: unknown }).state).toBeUndefined();
   });
 });
