@@ -46,6 +46,7 @@ interface BloomInternals {
   renderTargetsHorizontal: THREE.WebGLRenderTarget[];
   renderTargetsVertical: THREE.WebGLRenderTarget[];
   bloomTexture: THREE.Texture;
+  compositeMaterial: THREE.ShaderMaterial;
 }
 
 describe('live post pipeline', () => {
@@ -114,6 +115,12 @@ describe('live post pipeline', () => {
       [80, 45],
       [40, 23],
     ]);
+    expect(bloom.compositeMaterial.fragmentShader).not.toContain('bloomTintColors');
+    expect(
+      bloom.compositeMaterial.fragmentShader.match(
+        /lerpBloomFactor\(bloomFactors\[\d]\) \* texture2D/g,
+      ),
+    ).toHaveLength(5);
   });
 
   it('keeps medium MSAA on only the geometry target', async () => {

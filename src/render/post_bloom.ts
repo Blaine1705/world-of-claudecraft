@@ -56,6 +56,22 @@ export class PreparedBloomPass extends UnrealBloomPass {
     }
     this.compositeMaterial.depthTest = false;
     this.compositeMaterial.depthWrite = false;
+    // The live bloom is untinted: UnrealBloom initializes all five tints to
+    // vec3(1), and no caller changes them. Remove only those identity
+    // multiplications while retaining every factor, texture sample, addition,
+    // and outer strength multiplication in its original order.
+    let compositeShader = this.compositeMaterial.fragmentShader.replace(
+      'uniform vec3 bloomTintColors[NUM_MIPS];',
+      '',
+    );
+    for (let mip = 0; mip < this.nMips; mip++) {
+      compositeShader = compositeShader.replace(` * vec4(bloomTintColors[${mip}], 1.0)`, '');
+    }
+    if (compositeShader.includes('bloomTintColors')) {
+      throw new Error('Pinned UnrealBloom composite tint shader shape changed');
+    }
+    this.compositeMaterial.fragmentShader = compositeShader;
+    delete this.compositeMaterial.uniforms.bloomTintColors;
   }
 
   override render(
@@ -96,7 +112,6 @@ export class PreparedBloomPass extends UnrealBloomPass {
     this.fsQuad.material = this.compositeMaterial;
     this.compositeMaterial.uniforms.bloomStrength.value = this.strength;
     this.compositeMaterial.uniforms.bloomRadius.value = this.radius;
-    this.compositeMaterial.uniforms.bloomTintColors.value = this.bloomTintColors;
     renderer.setRenderTarget(this.renderTargetsHorizontal[0]);
     this.fsQuad.render(renderer);
 
