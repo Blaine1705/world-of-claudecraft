@@ -307,10 +307,17 @@ describe('touch drop reachability (the phase 14 QA blocker)', () => {
     // paired layout and the menu cluster ate bag-cell drops. Everything but
     // the ring goes pointer-events none for exactly the drag window.
     const css = readFileSync(join(__dirname, '../src/styles/hud.mobile.css'), 'utf8');
-    const idx = css.indexOf(
-      'body.mobile-touch.game-active.touch-item-dragging #mobile-controls > :not(#mobile-action-ring)',
-    );
-    expect(idx).toBeGreaterThan(-1);
+    // BOTH selector lines, pinned separately (the mutation check caught the
+    // single-indexOf form surviving a half-broken group): the direct
+    // children AND their descendants must be neutralized, or a nested
+    // pointer-active control keeps eating drops.
+    const child =
+      'body.mobile-touch.game-active.touch-item-dragging #mobile-controls > :not(#mobile-action-ring),';
+    const descendant =
+      'body.mobile-touch.game-active.touch-item-dragging #mobile-controls > :not(#mobile-action-ring) * {';
+    expect(css).toContain(child);
+    expect(css).toContain(descendant);
+    const idx = css.indexOf(descendant);
     const rule = css.slice(idx, css.indexOf('}', idx));
     expect(rule).toContain('pointer-events: none;');
   });
