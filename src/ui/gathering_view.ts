@@ -65,7 +65,10 @@ export function viewerUsableToolTier(
   // 10 Hz marker build) hands the map it already read: the offline world's
   // gatheringProficiency getter COPIES the live map per access, so
   // re-reading it per profession is per-build garbage the reference probe
-  // cannot see. Single-callers omit it and read through as before.
+  // cannot see. Single-callers omit it and read through as before. The
+  // pairing is on the caller: hand the map from THE SAME world as the bags,
+  // read within the same synchronous pass (nothing guards a cross-world or
+  // held-over map).
   proficiency: Readonly<Record<string, number>> | undefined = world.gatheringProficiency,
 ): number {
   const skill = proficiency?.[professionId];

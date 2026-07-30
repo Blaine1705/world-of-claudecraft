@@ -1028,13 +1028,15 @@ describe('the LIVE map cross-boundary cast site (no content override)', () => {
   it('at (172,936) a veiled_hollow caster fishes evergarden water across x=180', () => {
     // The one cross-boundary stand point the shipped map offers: the probe
     // ring walks due east across the x=180 column line into the east strait
-    // (a programmatic border water), stable across seeds (the dry ring at
-    // d4..d12 and the water at d16 hold on 467, 4242, 1, 99, and 12345).
-    // Both zones are tier 1 today, so only the pinned zoneId discriminates
-    // (catch table, deed, and gain all collapse to the same answer); the
-    // moment either side re-tiers in the zone-4 water pass this same stand
-    // point becomes a full gain discriminator for free, so keep the arm.
-    const sim = makeSim();
+    // (a programmatic border water). Run at the SHIPPED seed (the farshore
+    // lesson: pin the world players get), and verified stable on 467, 4242,
+    // 1, 99, and 12345 besides: the dry ring at d4..d12 and the water at d16
+    // hold on all six. Both zones are tier 1 today, so only the pinned
+    // zoneId discriminates (catch table, deed, and gain all collapse to the
+    // same answer); the moment either side re-tiers in the zone-4 water pass
+    // this same stand point becomes a full gain discriminator for free, so
+    // keep the arm.
+    const sim = makeSim(WORLD_SEED);
     const meta = sim.meta(sim.playerId) as PlayerMeta;
     sim.addItem('simple_fishing_pole', 1);
     teleportTo(sim, 172, 936);
@@ -1103,10 +1105,13 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
     // R55's authored numbers, pinned behaviorally: the census in
     // tests/water_flora_core.test.ts guards the depth INDIRECTLY (lilies
     // place only below WATER_LEVEL - 0.7), but a census red reads as a
-    // flora count to re-baseline; this probe names the regression. The
-    // fraction floor is deliberately half the measured 0.82 so terrain
-    // noise never flakes it while a collapse to a puddle (the pre-R55
-    // Hilltop state, or the 1 percent Glimmermere shape) reds it.
+    // flora count to re-baseline; this probe names the regression. Division
+    // of labor, mutation-proven: a SHRUNK basin is caught by the sample
+    // count floor below (effectively a radius gate), while the fraction
+    // floor catches a basin still full-size but no longer DEEP (the
+    // decorative pre-R55 Hilltop state, or the 1 percent Glimmermere shape:
+    // a dome-lifted bed zeroes the fraction). The 0.5 floor is deliberately
+    // half the measured 0.82 so terrain noise never flakes it.
     const farshore = ZONES.find((z) => z.id === 'farshore_isle');
     const mere = farshore?.lakes.find((l) => l.x === 350 && l.z === 118);
     expect(mere).toEqual({ x: 350, z: 118, radius: 10 });

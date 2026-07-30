@@ -850,7 +850,6 @@ describe('axe: bags discard prompt', () => {
 describe('axe: vendor window advisory rows', () => {
   it('advisory and plain rows are clean, and the advisory name folds the requirement', async () => {
     const root = host('vendor-window');
-    root.style.display = 'none';
     const pick = ITEMS.iron_mining_pick;
     const bread = Object.values(ITEMS).find((i) => i?.kind === 'food') ?? pick;
     const view = {
@@ -877,7 +876,10 @@ describe('axe: vendor window advisory rows', () => {
       honorBalance: 0,
       hasHonorGoods: false,
     };
-    renderVendorWindow(root, t('itemUi.vendor.goodsTitle'), view, {
+    // A literal vendor NAME: the painter interpolates it into the
+    // goodsTitle key itself, so passing a t() result here would nest the
+    // template and render a literal {name}.
+    renderVendorWindow(root, 'Quartermaster Bree', view, {
       itemIcon: () => '<img alt="">',
       moneyHtml: (copper: number) => `<span>${copper}c</span>`,
       itemTooltip: () => '<div></div>',

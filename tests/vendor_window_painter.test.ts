@@ -422,6 +422,37 @@ describe('renderVendorWindow: focus across the rebuild (the R22 advisory widenin
     }
   });
 
+  it('a row that comes back DISABLED is skipped, not focused (the last-stack buy)', () => {
+    // The primary degradation the focus_restore family documents: buying the
+    // last affordable stack drains copper, so the SAME row returns from the
+    // rebuild disabled (row.disabled = !affordable) and cannot take focus;
+    // the restore must skip it to the first enabled candidate rather than
+    // silently dropping to <body>.
+    const before: VendorView = {
+      goods: [goodsRow('bread'), goodsRow('water')],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+    };
+    const after: VendorView = {
+      ...before,
+      goods: [goodsRow('bread'), { ...goodsRow('water'), affordable: false }],
+    };
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    try {
+      renderVendorWindow(el, 'Vendor', before, deps());
+      el.querySelector<HTMLButtonElement>('[data-focus-key="buy:water"]')?.focus();
+      renderVendorWindow(el, 'Vendor', after, deps());
+      const rebuilt = el.querySelector<HTMLButtonElement>('[data-focus-key="buy:water"]');
+      expect(rebuilt?.disabled).toBe(true);
+      expect(document.activeElement).not.toBe(rebuilt);
+      expect(document.activeElement).toBe(el.querySelector('[data-close]'));
+    } finally {
+      el.remove();
+    }
+  });
+
   it('a vanished row falls to the stable neighbors, skipping a disabled sell-junk', () => {
     const two: VendorView = {
       goods: [goodsRow('bread'), goodsRow('water')],

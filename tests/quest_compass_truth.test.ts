@@ -381,8 +381,9 @@ describe('the guide twins of audited direction claims (the wiki cannot drift alo
     const dz = kitchens.position.z - from.z;
     expect(componentHolds('east', dx, dz), `kitchens at dx ${dx} dz ${dz} (east is -X)`).toBe(true);
     // NO dominance arm: "the east side of the square" claims a side, not a
-    // bearing, and the station stands a hair off the exact northeast diagonal
-    // (|dx| and |dz| within 4 mm of each other), so a dominance requirement
-    // would flake on placement noise while adding no truth to the side claim.
+    // bearing. The station stands a hair NORTH of the exact northeast
+    // diagonal (|dz| exceeds |dx| by 4 mm, deterministically: the position
+    // is localToWorld of fixed constants), so a dominance requirement would
+    // fail every run while adding no truth to the side claim.
   });
 });

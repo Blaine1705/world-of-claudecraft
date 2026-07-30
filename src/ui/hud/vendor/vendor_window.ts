@@ -218,6 +218,9 @@ export function renderVendorWindow(
     const itemName = itemDisplayName(item);
     row.setAttribute('aria-label', t('itemUi.vendor.buybackAria', { item: itemName, price }));
     row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) }))}` : ''}</span><span class="vi-price">${deps.moneyHtml(priceCopper)}</span>`;
+    // POSITIONAL by design, unlike the identity-keyed goods rows: after a
+    // buyback the list shifts and focus stays at the same SLOT (the next
+    // item to reclaim), which is the useful landing for repeated buybacks.
     row.dataset.focusKey = `buyback:${index}`;
     row.addEventListener('click', () => deps.onBuyBack(itemId, index, instance, craftedRecipeId));
     deps.attachTooltip(
