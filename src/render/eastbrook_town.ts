@@ -31,6 +31,7 @@ import {
   eastbrookRoofVisibilityPlanInto,
   newEastbrookRoofVisibilityPlan,
 } from './eastbrook_town_visibility_core';
+import { indexExactVertexTuples } from './exact_index_geometry';
 import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
@@ -193,11 +194,13 @@ function geometryFromMesh(
   if (!geometry.getAttribute('normal')) geometry.computeVertexNormals();
   const normalizedGeometry = geometry.index ? geometry.toNonIndexed() : geometry;
   const finalColor = normalizedGeometry.getAttribute('color');
-  return eastbrookSurfaceGeometry(normalizedGeometry, (index) =>
-    eastbrookTownSemanticForColor(
-      finalColor.getX(index),
-      finalColor.getY(index),
-      finalColor.getZ(index),
+  return indexExactVertexTuples(
+    eastbrookSurfaceGeometry(normalizedGeometry, (index) =>
+      eastbrookTownSemanticForColor(
+        finalColor.getX(index),
+        finalColor.getY(index),
+        finalColor.getZ(index),
+      ),
     ),
   );
 }
@@ -351,7 +354,7 @@ function coloredBox(
     colors[index * 3 + 2] = tint.b;
   }
   geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  return eastbrookSurfaceGeometry(geometry, 'darkStoneBlocks');
+  return indexExactVertexTuples(eastbrookSurfaceGeometry(geometry, 'darkStoneBlocks'));
 }
 
 function buildingTerrain(
