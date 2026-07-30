@@ -3388,7 +3388,13 @@ describe('R35 professions inspector: fix-round edge pins', () => {
         // fishing slot the loader drops plus a legacy confirm-mode row.
         state: {
           gatheringProficiency: { mining: 50 },
-          nodeHarvestCooldowns: { ore_eastbrook_1: 99999 },
+          // 99999 pins the clamp; the negative and NaN rows pin the
+          // loader's positive() filter (garbage never renders).
+          nodeHarvestCooldowns: {
+            ore_eastbrook_1: 99999,
+            ore_eastbrook_2: -5,
+            ore_eastbrook_3: Number.NaN,
+          },
           toolEffectSlots: {
             fishing: {
               effectId: 'gatherers_cache',

@@ -1007,7 +1007,11 @@ export async function listCharacters(
 // R35 GM professions inspector: one character's identity plus its raw state
 // blob (JSONB, already parsed by pg). The handler overlays a live
 // serializeCharacter snapshot when the character is online, then shapes both
-// through the pure characterProfessionsSheet normalizer.
+// through the pure characterProfessionsSheet normalizer. `state` is
+// UNDEFINED when the caller suppressed the fetch (includeState false, the
+// live path) and null/object when fetched: undefined-vs-null is what keeps
+// "not fetched" distinguishable from "never entered" (SQL NULL blob), the
+// distinction characterProfessionsSheetFromRow's emptyBlob derivation rides.
 export interface AdminCharacterProfessionsRow {
   id: number;
   name: string;
@@ -1044,7 +1048,9 @@ export async function characterProfessionsRow(
     level: r.level,
     accountId: r.account_id,
     username: r.username,
-    state: r.state,
+    // Honest suppression: the CASE arm returns SQL NULL when the fetch was
+    // skipped, which would be indistinguishable from a genuinely NULL blob.
+    state: includeState ? r.state : undefined,
     updatedAt: r.updated_at,
   };
 }

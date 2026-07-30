@@ -204,6 +204,32 @@ describe('detectActivity: professions arms (GameServer)', () => {
     expect(drainActivity()).toHaveLength(0);
   });
 
+  it('a FAILED opt-out read releases the claimed dedupe key (one blip, one loss)', async () => {
+    const session = joinServer(server, fakeWs(), 112, 'Blipped');
+    const ev = {
+      type: 'masterwork',
+      recipeId: 'recipe_eastbrook_arming_sword',
+      itemId: 'eastbrook_arming_sword',
+      crafter: session.pid,
+      pid: session.pid,
+    };
+    // First proc: the opt-out read rejects (db blip). The card is lost
+    // fail-closed, but the claimed TTL key must be RELEASED.
+    (db.pool.query as ReturnType<typeof vi.fn>).mockImplementationOnce(async () => {
+      throw new Error('db blip');
+    });
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    (server as any).detectActivity([ev]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(0);
+    // Second proc, still inside the TTL: without the release this account
+    // would stay dark for the whole window.
+    (server as any).detectActivity([ev]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(1);
+    errSpy.mockRestore();
+  });
+
   it('a masterworkZone bystander copy never enqueues a card', async () => {
     // A real overworld craft emits BOTH the personal event and one zone copy
     // per player in zone; only the personal one may post, or every bystander

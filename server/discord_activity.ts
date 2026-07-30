@@ -74,6 +74,16 @@ export function claimDedupeKey(key: string, now: number): boolean {
 }
 
 /**
+ * Release a claimed dedupe key: the claimant's gated work FAILED (a rejected
+ * opt-out read), so the TTL window must not stay burned; without this, one
+ * db blip would silently drop the failed proc AND every proc for that
+ * account for the rest of the TTL.
+ */
+export function releaseDedupeKey(key: string): void {
+  recentKeys.delete(key);
+}
+
+/**
  * Enqueue an activity for the bot to post. When dedupeKey is given and was seen
  * within the TTL, the item is dropped (so one moment yields one card). `now` is
  * injected so callers pass the server clock (and tests stay deterministic).

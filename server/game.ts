@@ -161,7 +161,7 @@ import {
   reconcileCharacterDeeds,
   recordDeedUnlocks,
 } from './deeds_records';
-import { claimDedupeKey, enqueueActivity } from './discord_activity';
+import { claimDedupeKey, enqueueActivity, releaseDedupeKey } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
@@ -6865,7 +6865,12 @@ export class GameServer {
               now,
             );
           })
-          .catch((err) => console.error('masterwork activity failed:', err));
+          .catch((err) => {
+            // The claim gated work that FAILED: release it, or one db blip
+            // silently drops this account's cards for the whole TTL.
+            releaseDedupeKey(`masterwork:${accountId}`);
+            console.error('masterwork activity failed:', err);
+          });
       } else if (ev.type === 'duelEnd') {
         const w = this.sessionByName(ev.winnerName);
         const l = this.sessionByName(ev.loserName);

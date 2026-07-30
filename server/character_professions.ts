@@ -225,6 +225,10 @@ export function characterProfessionsSheetFromRow(
     state: liveState ?? ((row.state ?? {}) as CharacterState),
     live: liveState !== null,
     updatedAt: liveState !== null ? null : row.updatedAt,
+    // The liveState conjunct is LOAD-BEARING: a live caller suppresses the
+    // blob fetch (row.state undefined), which must never read as
+    // never-entered; the row's undefined-vs-null contract documents the
+    // same coupling from the other end.
     emptyBlob: liveState === null && row.state == null,
   });
 }
