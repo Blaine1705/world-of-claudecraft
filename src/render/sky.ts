@@ -29,6 +29,8 @@ import { skyTexture } from './textures';
 // Low tier keeps the legacy 4x256 canvas-gradient dome.
 
 const DOME_RADIUS = 560;
+export const SKY_BACKGROUND_RENDER_ORDER = 1000;
+const SKY_FAR_DEPTH = 'gl_Position.z = gl_Position.w;';
 
 // The photographic HDRIs run hot next to the old procedural dome (sky bands
 // 0.5-2.5 radiance, sun texels ~60000): unscaled they shove most of the sky
@@ -470,6 +472,7 @@ const SKY_VERT = /* glsl */ `
   void main() {
     vDir = position; // dome is camera-centred; object space = view direction
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    ${SKY_FAR_DEPTH}
   }
 `;
 
@@ -667,6 +670,17 @@ function sunOffsetU(biome: SkyKey, sunDir: THREE.Vector3): number {
   return HDRI_SUN_U[biome] - sunU;
 }
 
+function deferBasicSkyFragments(material: THREE.MeshBasicMaterial): void {
+  material.onBeforeCompile = (shader) => {
+    const anchor = '#include <logdepthbuf_vertex>';
+    if (!shader.vertexShader.includes(anchor)) {
+      throw new Error('sky shader is missing the pinned log-depth vertex anchor');
+    }
+    shader.vertexShader = shader.vertexShader.replace(anchor, `${anchor}\n${SKY_FAR_DEPTH}`);
+  };
+  material.customProgramCacheKey = () => 'woc-sky-far-depth-v1';
+}
+
 export function buildSky(
   lowGfx: boolean,
   sunDir: THREE.Vector3,
@@ -686,7 +700,10 @@ export function buildSky(
         depthWrite: false,
       }),
     );
-    dome.renderOrder = -10;
+    deferBasicSkyFragments(dome.material);
+    // Draw after opaque geometry at far depth. Covered fragments fail depth
+    // before the texture sample while untouched background pixels stay exact.
+    dome.renderOrder = SKY_BACKGROUND_RENDER_ORDER;
     return {
       dome,
       setCameraPos: (x, z) => {
@@ -743,7 +760,7 @@ export function buildSky(
     depthWrite: false,
   });
   const dome = new THREE.Mesh(new THREE.SphereGeometry(DOME_RADIUS, 32, 20), material);
-  dome.renderOrder = -10;
+  dome.renderOrder = SKY_BACKGROUND_RENDER_ORDER;
 
   const current = createEnvironmentBlend(start);
   let boundFrom = start.from;

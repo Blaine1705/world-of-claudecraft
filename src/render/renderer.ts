@@ -2357,8 +2357,7 @@ export class Renderer {
     this.webgl.setPixelRatio(ratio);
     this.webgl.setSize(this.viewport.width, this.viewport.height, false);
     if (this.post) {
-      this.post.composer.setPixelRatio(ratio);
-      this.post.setSize(this.viewport.width, this.viewport.height);
+      this.post.setSize(this.viewport.width, this.viewport.height, ratio);
     }
     const devicePxHeight = this.webgl.domElement.clientHeight * this.webgl.getPixelRatio();
     this.vfx.setViewportScale(devicePxHeight, 60);

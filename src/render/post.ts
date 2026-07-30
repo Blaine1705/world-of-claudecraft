@@ -1,28 +1,39 @@
 import { N8AOPass } from 'n8ao';
 import * as THREE from 'three';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { GFX, sharedUniforms } from './gfx';
+import { PostEffectComposer } from './post_composer';
+import { OutputGradePass } from './post_output_grade';
+import { postPipelinePlan } from './post_plan_core';
 import { renderLayerDisabled } from './render_dev_flags';
 
-// Post chain: RenderPass -> N8AO (high: half-res Low, ultra: full-res Medium)
-// -> UnrealBloom -> OutputPass (ACES tonemap + sRGB, reads
-// renderer.toneMapping) -> GradePass (display space lift/gamma/gain,
-// saturation, vignette, faint animated grain) -> SMAA.
+// Post chain: N8AO (high: half-res Low, ultra+insane: full-res Medium)
+// -> UnrealBloom -> OutputGradePass (OutputPass ACES tonemap + sRGB followed
+// by the display-space lift/gamma/gain, saturation, vignette, and grain)
+// -> SMAA (high only). Medium uses RenderPass -> OutputGradePass.
 //
 // N8AO replaced three's GTAOPass: better denoise at lower sample counts, and
 // cheap enough (half-res) to run on the high tier where GTAO was ultra-only.
 // It sits mid-chain so its autosetGamma leaves the buffer linear for bloom.
 //
-// AA: when N8AO is active it renders the scene into its own non-MSAA beauty
-// target, so the composer target skips MSAA storage (pure waste otherwise)
-// and MSAA never sees the scene. SMAA at the tail of the chain is what
-// actually supplies edge AA on the composer tiers; the no-AO fallback path
-// keeps MSAA on the composer target and gets SMAA on top of it.
+// Actual AA graph on the pinned packages: N8AO renders into its own
+// single-sample beauty target, so ultra and insane have no MSAA resolve and
+// rely on their 2.5 DPR cap. High adds tail SMAA. The medium RenderPass path
+// keeps 4x MSAA only on its geometry target and resolves exactly once when
+// OutputGradePass samples it. Full-screen targets never inherit MSAA.
+//
+// OutputGradePass explicitly quantizes OutputPass color through binary16
+// before running the unchanged grade. That preserves the removed RGBA16F
+// store/sample boundary while saving one full-screen draw and target write.
+// With no tail SMAA, the composer also aliases its read/write buffer because
+// N8AO or RenderPass is the only producer and bloom composites in place.
+//
+// N8AO owns one beauty+depth scene draw. Full-res Medium reconstructs normals
+// from that shared depth texture; half-res Low downsamples the same depth once.
+// OpaqueCompositeN8AOPass prevents the package constructor from allocating its
+// transparency rerender targets before we disable that output-identical mode.
 
 // Bloom is a high-pass in linear HDR, so the threshold has to clear the
 // brightest lit diffuse or the whole sunlit world glows. Sunlit high-albedo
@@ -32,49 +43,20 @@ const BLOOM_STRENGTH = 0.4; // subtle: fires/lamps/windows glow, sky must not bl
 const BLOOM_RADIUS = 0.6;
 const BLOOM_THRESHOLD = 1.32;
 
-const GradeShader = {
-  name: 'GradeShader',
-  uniforms: {
-    tDiffuse: { value: null as THREE.Texture | null },
-    uTime: { value: 0 },
-  },
-  vertexShader: /* glsl */ `
-    varying vec2 vUv;
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `,
-  fragmentShader: /* glsl */ `
-    uniform sampler2D tDiffuse;
-    uniform float uTime;
-    varying vec2 vUv;
-    const vec3 LIFT = vec3(0.010, 0.008, 0.010);   // warm shadow floor without a red cast
-    const vec3 GAIN = vec3(1.10, 1.035, 0.90);     // clearly warm highlights and midtones
-    const vec3 GAMMA = vec3(0.975);
-    void main() {
-      vec3 c = texture2D(tDiffuse, vUv).rgb;
-      c = pow(max(vec3(0.0), c * GAIN + LIFT), GAMMA);
-      // Dimension comes from the tone curve, not from chroma: a gentle S around
-      // the midtones separates lit from shaded so the grade can stay near
-      // neutral saturation instead of pushing colour to fake depth.
-      c = mix(c, c * c * (3.0 - 2.0 * c), 0.23);
-      float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
-      c = mix(vec3(l), c, 1.07);                                  // saturation
-      vec2 d = vUv - 0.5;
-      c *= 1.0 - 0.20 * smoothstep(0.60, 0.95, dot(d, d) * 2.2);  // gentle vignette (0.32 crushed corners)
-      c += (fract(sin(dot(vUv * 731.7 + uTime, vec2(12.9898, 78.233))) * 43758.5) - 0.5) * 0.012; // grain
-      gl_FragColor = vec4(c, 1.0);
-    }
-  `,
-};
+class OpaqueCompositeN8AOPass extends N8AOPass {
+  override detectTransparency(): void {
+    // The shipped mode is transparencyAware=false. Overriding the virtual
+    // constructor hook avoids allocating two beauty targets plus a depth-copy
+    // pass that the next configuration write would immediately dispose.
+  }
+}
 
 export interface PostPipeline {
-  composer: EffectComposer;
+  composer: PostEffectComposer;
   bloom: UnrealBloomPass | null; // null on the grade-only path
   ao: N8AOPass | null;
-  grade: ShaderPass;
-  setSize(width: number, height: number): void;
+  grade: OutputGradePass;
+  setSize(width: number, height: number, pixelRatio?: number): void;
   render(): void;
 }
 
@@ -86,32 +68,38 @@ export function buildComposer(
   height: number,
   opts?: { gradeOnly?: boolean },
 ): PostPipeline {
-  // Grade-only mini chain for the medium tier: RenderPass -> OutputPass ->
-  // GradePass, one fullscreen pass over the direct path. No AO, no bloom, no
+  // Grade-only mini chain for the medium tier: RenderPass -> OutputGradePass,
+  // one fullscreen pass over the direct path. No AO, no bloom, no
   // SMAA — but the display-space grade (lift/gain/S-curve/vignette) is what
   // separates "cinematic" from "raw ACES wash", and medium was the only
   // daylight tier shipping without it.
   const gradeOnly = opts?.gradeOnly === true;
   const size = webgl.getDrawingBufferSize(new THREE.Vector2());
-  // HDR target; HalfFloat keeps >1 colors for bloom. MSAA only helps when a
-  // RenderPass draws the scene into this target — with N8AO that never
-  // happens, so skip the multisample storage + resolve cost there.
+  const plan = postPipelinePlan({
+    gradeOnly,
+    ao: GFX.ao,
+    aoFullRes: GFX.aoFullRes,
+    bloom: GFX.bloom,
+    smaa: GFX.smaa,
+    n8aoDisabled: renderLayerDisabled('n8ao'),
+    smaaDisabled: renderLayerDisabled('smaa'),
+    isWebGL2: webgl.capabilities.isWebGL2,
+    msaaSamples: GFX.msaaSamples,
+  });
+  // HalfFloat keeps >1 colors for bloom. N8AO owns beauty depth, so its
+  // composer target is color-only. RenderPass keeps depth only on the one
+  // target that rasterizes geometry.
   const target = new THREE.WebGLRenderTarget(size.x, size.y, {
-    samples: webgl.capabilities.isWebGL2 && !(GFX.ao && !gradeOnly) ? GFX.msaaSamples : 0,
+    depthBuffer: plan.scene.pass === 'render',
+    samples: plan.composerSamples,
     type: THREE.HalfFloatType,
   });
-  const composer = new EffectComposer(webgl, target);
+  const composer = new PostEffectComposer(webgl, target, width, height, plan.singleComposerBuffer);
 
   let ao: N8AOPass | null = null;
-  // ?n8ao=off is the dev-only perf-attribution kill switch (render_dev_flags):
-  // the chain falls back to the plain RenderPass branch below.
-  if (GFX.ao && !gradeOnly && !renderLayerDisabled('n8ao')) {
-    // N8AOPass REPLACES RenderPass: it renders the scene into its own
-    // HalfFloat beauty+depth target (a separate RenderPass would be a
-    // discarded full scene draw). Trade-off: the composer's MSAA target
-    // never sees the scene, so AA comes from the bloom/grade softening +
-    // pixel ratio. Measured acceptable; revisit if edges crawl.
-    ao = new N8AOPass(scene, camera, size.x, size.y);
+  if (plan.scene.pass === 'n8ao') {
+    // N8AOPass replaces RenderPass. A separate scene pass would be discarded.
+    ao = new OpaqueCompositeN8AOPass(scene, camera, size.x, size.y);
     // world-space radius tuned for 2.6u-tall characters: grounds props and
     // darkens building/rock crevices without dirtying open fields
     ao.configuration.aoRadius = 1.8;
@@ -123,16 +111,17 @@ export function buildComposer(
     // leaf albedo is back at authored levels (the black-clump look was the
     // AO multiplying an already-dark un-lifted atlas, not the AO alone).
     ao.configuration.intensity = 1.45;
-    // mid-chain: the buffer must stay linear for bloom/OutputPass (autoset
+    // mid-chain: the buffer must stay linear for bloom/OutputGradePass (autoset
     // guesses from renderToScreen, but be explicit — a gamma-lifted frame
     // here washes the whole image out)
     ao.configuration.gammaCorrection = false;
-    // no transparency-aware compositing: auto-detection re-enables it every
-    // frame (water/sprites are transparent), costing 2 extra scene renders +
-    // ~5 full-scene traversals per frame. AO multiplying over transparent
-    // surfaces showed no visible difference in A/B shots.
+    // No transparency-aware compositing. Water and sprites make the package's
+    // constructor auto-detect that mode before this configuration write; the
+    // subclass hook above prevents those transient targets. Enabling the mode
+    // costs 2 extra scene renders plus repeated full-scene traversals. AO over
+    // transparent surfaces showed no visible difference in A/B shots.
     ao.configuration.transparencyAware = false;
-    if (GFX.aoFullRes) {
+    if (plan.scene.aoQuality === 'Medium') {
       // ultra and insane (and the Advanced Effects dial's top level)
       ao.setQualityMode('Medium');
     } else {
@@ -148,43 +137,32 @@ export function buildComposer(
   }
 
   let bloom: UnrealBloomPass | null = null;
-  if (!gradeOnly && GFX.bloom) {
+  if (plan.composerPasses.includes('bloom')) {
     bloom = new UnrealBloomPass(size.clone(), BLOOM_STRENGTH, BLOOM_RADIUS, BLOOM_THRESHOLD);
     composer.addPass(bloom);
   }
-  composer.addPass(new OutputPass());
-
-  const grade = new ShaderPass(GradeShader);
-  grade.uniforms.uTime = sharedUniforms.uTime; // shared clock drives the grain
+  const grade = new OutputGradePass(sharedUniforms.uTime);
   composer.addPass(grade);
 
-  // Edge AA, last so it works on the final display-space image (SMAA's edge
-  // detector expects gamma-encoded color, which is what OutputPass produced).
-  // Construction size is provisional: composer.setSize below, and the
-  // setSize() member, resize every pass to the live drawing-buffer extent.
+  // Edge AA, last so it works on the final display-space image. SMAA's edge
+  // detector expects the gamma-encoded color OutputGradePass produces.
+  // Construction size is provisional; addPass and the setSize() member resize
+  // every pass to the live drawing-buffer extent.
   // GFX.smaa is high-tier only: ultra's 2.5 pixelRatioCap already suppresses
   // edge crawl and SMAA at that pixel count costs ~1.5ms; high runs a 1.75
   // cap where aliasing is visible and the pass is cheap.
   // ?smaa=off is the dev-only perf-attribution kill switch: SMAA is new on
   // this branch (the merge-base high tier shipped no AA pass), so its cost
   // needs to be attributable against the high-tier ladder budget.
-  if (GFX.composer && GFX.smaa && !renderLayerDisabled('smaa'))
-    composer.addPass(new SMAAPass(size.x, size.y));
-
-  // EffectComposer defaults its logical size to drawing-buffer pixels and
-  // then multiplies by pixelRatio again when sizing passes — N8AO/bloom would
-  // run at ~3x the intended pixel area until the first window resize. Reset
-  // to logical size x real ratio (identical to the resize-handler state).
-  composer.setPixelRatio(webgl.getPixelRatio());
-  composer.setSize(width, height);
+  if (plan.composerPasses.includes('smaa')) composer.addPass(new SMAAPass(size.x, size.y));
 
   return {
     composer,
     bloom,
     ao,
     grade,
-    setSize(width: number, height: number): void {
-      composer.setSize(width, height); // also resizes every pass (N8AO, bloom)
+    setSize(width: number, height: number, pixelRatio = webgl.getPixelRatio()): void {
+      composer.setSizeAndPixelRatio(width, height, pixelRatio);
     },
     render(): void {
       composer.render();

@@ -23,6 +23,7 @@ declare module 'n8ao' {
   export class N8AOPass extends Pass {
     constructor(scene: Scene, camera: Camera, width?: number, height?: number);
     configuration: N8AOConfiguration;
+    detectTransparency(): void;
     setQualityMode(mode: 'Performance' | 'Low' | 'Medium' | 'High' | 'Ultra'): void;
     setDisplayMode(mode: 'Combined' | 'AO' | 'No AO' | 'Split' | 'Split AO'): void;
     setSize(width: number, height: number): void;
