@@ -4846,6 +4846,101 @@ function professionsGatherFine(seed = 1): Scenario {
   };
 }
 
+// The slotted tool effect on the harvest path (D10 + R42). No scenario in this
+// suite has ever carried a `toolEffectSlots` row at all: the field is created
+// lazily by the mint, so every golden here records a world where the harvest
+// never consults the effect system. The slot command is draw-free and the
+// settle is draw-free, which is exactly why a green gate says nothing about
+// either: a slip that moved the applied bonus, the ratchet capture, or the
+// charge settle across the two draws would leave every OTHER golden
+// byte-identical. This scenario records the world with a live slot, so the
+// two-draw contract is pinned inside it too.
+//
+// A QUANTITY effect (Gatherer's Cache) is the one to record: the use-time
+// suppression rule (`usableToolEffectSlot`) withholds only QUALITY effects, so
+// this bonus fires at any vein and the R42 settle always sees a granted count
+// above the same-draw base. No seed hunting, and the charge spend is
+// unconditional rather than content-dependent.
+function professionsToolEffectSlot(seed = 1): Scenario {
+  // The sibling gather scenarios' worst-case window: a tier-3 pick two tiers
+  // over a tier-2 vein casts shorter than this, and surplus ticks are plain
+  // world ticks.
+  const castTicks = Math.ceil(gatherCastDurationSec(1, 1, 0) / DT) + 1;
+  // The same vein professions_gather_fine works. Named once, and stood on
+  // through standOnNode, so the position comes from content (see that helper
+  // for why an inlined coordinate is the thing that rotted).
+  const VEIN_ID = 'ore_mirefen_t2';
+  return {
+    name: 'professions_tool_effect_slot',
+    coverage: [
+      'class:warrior (gatherer carrying a slotted tool effect)',
+      'slotToolEffect mint: consumes the self-signed charm copy, records craftedBy',
+      'toolEffectSlots row minted lazily (absent in every other scenario)',
+      'the slot command is draw-free: zero draws across the whole mint',
+      'quantity effect fires at the vein: granted qty is the same-draw base plus one',
+      'R42 charge settle at the command boundary: one charge for one bonus-bearing harvest',
+      'the harvest keeps its exact two-draw contract with a live slot applied',
+      'own-timer denial on the same vein: zero draws, no cast, no charge',
+    ],
+    sampleEvery: 500,
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const pid = sim.playerId as number;
+      const p = sim.player as AnyEntity;
+
+      // No mob interference: mob damage cancels a gather cast mid-drive (the
+      // professionsGather despawn idiom).
+      for (const e of (sim.entities as Map<number, AnyEntity>).values()) {
+        if (e.kind !== 'mob') continue;
+        e.dead = true;
+        e.hp = 0;
+        e.aiState = 'dead';
+        e.respawnTimer = 9999;
+        e.corpseTimer = 9999;
+        e.inCombat = false;
+      }
+
+      // The tier-3 pick: the slot's owned-tool gate reads these same bags, and
+      // the pick's own rarity is what sizes the minted slot's charges. It must
+      // also WIELD (R22, mining 70), the fine scenario's setup idiom, or the
+      // tier-2 vein refuses the harvest below.
+      sim.addItem('mithril_mining_pick', 1, pid);
+      const meta = sim.meta(pid) as {
+        name: string;
+        gatheringProficiency: Record<string, number>;
+      };
+      meta.gatheringProficiency.mining = 70;
+
+      // ONE self-signed charm: the resolver's consume preference takes a copy
+      // the slotter signed themselves ahead of an unsigned or foreign one, so
+      // the minted slot records craftedBy (the original-crafter recharge
+      // identity) rather than leaving it unset. addItemInstance draws no rng.
+      sim.addItemInstance('gatherers_cache', { signer: meta.name }, pid);
+      // The mint: draw-free in every arm, so this checkpoint must still stand
+      // at zero draws with the slot row already present.
+      sim.slotToolEffect('mining', 'gatherers_cache', 'always', pid);
+      rec.snapshot('effect-slotted');
+
+      // The harvest the bonus rides: two draws at completion, the +1 quantity
+      // applied after both of them, and the charge settled against the GRANTED
+      // count at the command boundary.
+      standOnNode(sim, p, VEIN_ID);
+      sim.harvestNode(VEIN_ID, pid);
+      rec.tick(castTicks); // the cast completes inside this window
+      rec.snapshot('harvest-with-effect-applied');
+      rec.tick(2);
+
+      // The same vein again: the player's own node timer denies it ahead of
+      // every arm that draws or spends, so this adds zero draws and leaves the
+      // slot's remaining charges untouched.
+      sim.harvestNode(VEIN_ID, pid);
+      rec.snapshot('same-vein-denied-by-own-timer');
+      rec.tick(2);
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -4906,4 +5001,5 @@ export const SCENARIOS: Scenario[] = [
   professionsGather(),
   professionsGatherFine(),
   professionsFishingSession(),
+  professionsToolEffectSlot(),
 ];

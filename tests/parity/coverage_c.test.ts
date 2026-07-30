@@ -442,4 +442,76 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(fine!.rng.draws).toBe(2);
     expect(trace.draws).toBe(6);
   });
+
+  it('professions_tool_effect_slot: draw-free mint, the quantity bonus fires, and one charge settles', () => {
+    const { trace, rec } = record(
+      SCENARIOS.find((s) => s.name === 'professions_tool_effect_slot')!,
+    );
+    const ev = rec.allEvents as Ev[];
+    const pid = (rec.sim as any).playerId as number;
+    const meta = (rec.sim as any).players.get(pid);
+
+    // The mint landed, once, on the slot action, for this player's mining
+    // profession, and the charm it consumed is gone from the bags.
+    const slotted = ev.filter((e) => e.type === 'toolEffectResult' && e.action === 'slot');
+    expect(slotted).toHaveLength(1);
+    expect(slotted[0].ok).toBe(true);
+    expect(slotted[0].professionId).toBe('mining');
+    expect(slotted[0].effectId).toBe('gatherers_cache');
+    expect(slotted[0].pid).toBe(pid);
+    expect(meta.inventory.some((s: any) => s.itemId === 'gatherers_cache')).toBe(false);
+    // Draw-free in every arm: the whole mint stands at zero draws.
+    const minted = trace.frames.find((f) => f.label === 'effect-slotted');
+    expect(minted, 'missing the mint checkpoint frame').toBeTruthy();
+    expect(minted!.rng.draws).toBe(0);
+
+    // One granted harvest, and the +1 the cache adds is read off the one field
+    // it moves: gatherResult carries no effect flag, so compare the granted qty
+    // against the shipped yield table for the SAME rolled rarity (the
+    // same-draw base the R42 settle compares against).
+    const gathers = ev.filter((e) => e.type === 'gatherResult');
+    expect(gathers).toHaveLength(1);
+    expect(gathers[0].nodeId).toBe('ore_mirefen_t2');
+    expect(gathers[0].professionId).toBe('mining');
+    const qtyByRarity: Record<string, number> = {
+      common: 1,
+      uncommon: 2,
+      rare: 2,
+      epic: 3,
+      legendary: 4,
+    };
+    const base = qtyByRarity[gathers[0].rarity] * (gathers[0].rareEvent ? 5 : 1);
+    expect(gathers[0].qty).toBe(base + 1);
+
+    // The harvest keeps its exact two-draw contract with a live slot applied,
+    // and the own-timer denial after it draws nothing.
+    const harvested = trace.frames.find((f) => f.label === 'harvest-with-effect-applied');
+    expect(harvested, 'missing the harvest checkpoint frame').toBeTruthy();
+    expect(harvested!.rng.draws).toBe(2);
+    expect(
+      ev.some(
+        (e) => e.type === 'error' && e.text === 'This resource node has not respawned for you yet.',
+      ),
+    ).toBe(true);
+    expect(trace.draws).toBe(2);
+
+    // The R42 charge settle, pinned where the golden records it: the final
+    // checkpoint's sampled slot row. One bonus-bearing harvest spent exactly
+    // one charge, so durability sits strictly below the slot's own ceiling.
+    // The ceiling is an absolute pin, not a self-comparison: 20 base charges
+    // for the cache plus one rarity rung for the uncommon tier-3 pick, and the
+    // R47 use-time ratchet leaves it there because that pick was already the
+    // best tool owned at mint time.
+    const finalFrame = trace.frames.find((f) => f.label === 'final');
+    expect(finalFrame, 'missing the final checkpoint frame').toBeTruthy();
+    const slot = (finalFrame!.players?.[0] as any)?.toolEffectSlots?.mining;
+    expect(slot, 'the final checkpoint sampled no mining tool-effect slot').toBeTruthy();
+    expect(slot.effectId).toBe('gatherers_cache');
+    expect(slot.confirmMode).toBe('always');
+    // The self-signed charm's signer became the slot's original-crafter identity.
+    expect(slot.craftedBy).toBe(meta.name);
+    expect(slot.maxDurability).toBe(30);
+    expect(slot.durability).toBeLessThan(slot.maxDurability);
+    expect(slot.durability).toBe(29);
+  });
 });
