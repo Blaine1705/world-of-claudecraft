@@ -2343,7 +2343,10 @@ export const id_ID: EnTranslations = {
       "downgradeMark": "Tas penuh: temuan disimpan tanpa tanda pengumpulnya.",
       "downgradeFind": "Tas penuh: temuan murni terlewat.",
       "stateReady": "Siap",
-      "stateCooldown": "Muncul kembali"
+      "stateCooldown": "Muncul kembali",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Gelar",

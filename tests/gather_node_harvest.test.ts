@@ -1872,3 +1872,45 @@ describe('harvest breaks stealth and action-locked forms refuse it', () => {
     expect(p.auras.some((a) => a.kind === 'stealth')).toBe(true);
   });
 });
+
+// The countdown read of the per-player respawn timer (IWorldProfessions
+// nodeRespawnSeconds, the UX pass): the read half of the same
+// nodeHarvestReadyAt entry the harvest gate checks, so the two can never
+// disagree about readiness.
+describe('nodeRespawnSeconds (the tooltip countdown read)', () => {
+  it('null when ready, the live remaining after a harvest, and null again once elapsed', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Miner');
+    sim.addItem('copper_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, NODE_ID);
+    const node = mustNode(NODE_ID);
+    const respawn = NODE_HARVEST_TABLE[node.type].respawnSeconds;
+
+    expect(sim.nodeRespawnSecondsFor(NODE_ID, pid)).toBeNull();
+    expect(castAndComplete(sim, NODE_ID, pid)).toBe(true);
+
+    const remaining = sim.nodeRespawnSecondsFor(NODE_ID, pid);
+    if (remaining === null) throw new Error('expected a live countdown after the harvest');
+    expect(remaining).toBeGreaterThan(0);
+    expect(remaining).toBeLessThanOrEqual(respawn);
+    expect(sim.nodeHarvestableByMeFor(NODE_ID, pid)).toBe(false);
+
+    sim.tick();
+    const later = sim.nodeRespawnSecondsFor(NODE_ID, pid);
+    if (later === null) throw new Error('one tick cannot drain a node respawn timer');
+    expect(later).toBeLessThan(remaining);
+
+    // Elapse the timer the way the D6 freeze/restore tests do (writing the
+    // same field the gate reads) rather than ticking out minutes of world.
+    mustMeta(sim, pid).nodeHarvestReadyAt[NODE_ID] = sim.time;
+    expect(sim.nodeRespawnSecondsFor(NODE_ID, pid)).toBeNull();
+    expect(sim.nodeHarvestableByMeFor(NODE_ID, pid)).toBe(true);
+  });
+
+  it('null for an unknown node id and for an unknown pid', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Miner');
+    expect(sim.nodeRespawnSecondsFor('no_such_node', pid)).toBeNull();
+    expect(sim.nodeRespawnSecondsFor(NODE_ID, 999999)).toBeNull();
+  });
+});

@@ -87,12 +87,39 @@ export function gatherNodeTooltipHtml(model: GatherNodeTooltipModel): string {
     // unearned locks too, R22), mirroring the item-tooltip unmet idiom.
     html += `<div class="${model.locked ? 'tt-red' : 'tt-sub'}">${esc(line)}</div>`;
   }
-  const stateKey =
-    model.state === 'ready'
-      ? 'hudChrome.gathering.stateReady'
-      : 'hudChrome.gathering.stateCooldown';
-  html += `<div class="${model.state === 'ready' ? 'tt-green' : 'tt-sub'}">${esc(t(stateKey as TranslationKey))}</div>`;
+  // The grade-preview line (the UX pass): shown only when the grant's own
+  // resolution says the viewer's tool would mint this node's fine grade
+  // (gathering_view.ts fineUpgrade, absent while locked), so the line can
+  // never promise a grade the harvest refuses.
+  if (model.fineUpgrade === true) {
+    html += `<div class="tt-green">${esc(t('hudChrome.gathering.fineGradePreview'))}</div>`;
+  }
+  // The state line: a live countdown when the world put a number on the
+  // respawn timer, the untimed word for a null read (an unknown remaining is
+  // still honestly "Respawning").
+  if (model.state === 'ready') {
+    html += `<div class="tt-green">${esc(t('hudChrome.gathering.stateReady'))}</div>`;
+  } else if (model.respawnSeconds !== undefined) {
+    html += `<div class="tt-sub">${esc(
+      t('hudChrome.gathering.stateCooldownTimed', { time: respawnClock(model.respawnSeconds) }),
+    )}</div>`;
+  } else {
+    html += `<div class="tt-sub">${esc(t('hudChrome.gathering.stateCooldown'))}</div>`;
+  }
   return html;
+}
+
+/** m:ss through the shared clock token pattern (the finder/vale-cup idiom):
+ *  minutes unpadded via formatNumber, seconds pre-padded. Ceils so a live
+ *  timer never reads 0:00 while the node still refuses. */
+function respawnClock(totalSeconds: number): string {
+  const whole = Math.max(1, Math.ceil(totalSeconds));
+  const minutes = Math.floor(whole / 60);
+  const seconds = whole % 60;
+  return t('hudChrome.gathering.respawnClock', {
+    minutes: formatNumber(minutes, { maximumFractionDigits: 0, useGrouping: false }),
+    seconds: String(seconds).padStart(2, '0'),
+  });
 }
 
 const TOOL_TIER_UNMET_KEYS: Record<GatherNodeType, string> = {

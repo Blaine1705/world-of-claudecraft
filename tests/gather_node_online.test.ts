@@ -40,3 +40,33 @@ describe('ClientWorld.nodeHarvestableByMe', () => {
     expect(client.nodeHarvestableByMe('node_a')).toBe(true);
   });
 });
+
+// The countdown read of the same mirror (the UX pass's respawn tooltip
+// line): the map entry IS the remaining seconds, so the read is a lookup,
+// and it answers null exactly where nodeHarvestableByMe answers true.
+describe('ClientWorld.nodeRespawnSeconds', () => {
+  function bareClient(): ClientWorld {
+    return Object.create(ClientWorld.prototype);
+  }
+
+  it('answers null (no throw) before any snapshot has been applied', () => {
+    expect(bareClient().nodeRespawnSeconds('any_node')).toBeNull();
+  });
+
+  it('answers the mirrored remaining seconds while cooling, null otherwise', () => {
+    const client = bareClient();
+    (client as any).nodeCooldowns = new Map([['node_a', 12.5]]);
+    expect(client.nodeRespawnSeconds('node_a')).toBe(12.5);
+    expect(client.nodeRespawnSeconds('node_b')).toBeNull();
+    (client as any).nodeCooldowns = new Map();
+    expect(client.nodeRespawnSeconds('node_a')).toBeNull();
+  });
+
+  it('agrees with nodeHarvestableByMe: null exactly when the node reads ready', () => {
+    const client = bareClient();
+    (client as any).nodeCooldowns = new Map([['node_a', 3]]);
+    for (const nodeId of ['node_a', 'node_b']) {
+      expect(client.nodeRespawnSeconds(nodeId) === null).toBe(client.nodeHarvestableByMe(nodeId));
+    }
+  });
+});

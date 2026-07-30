@@ -363,6 +363,7 @@ import {
   gatherNodeById,
   harvestNode as harvestNodeImpl,
   isNodeHarvestableBy,
+  nodeRespawnRemainingSec,
   normalizeGatheringProficiency,
 } from './professions/gathering';
 import { updateGuildTrendLetters } from './professions/guild_letter';
@@ -7894,6 +7895,21 @@ export class Sim {
 
   nodeHarvestableByMe(nodeId: string): boolean {
     return this.nodeHarvestableByMeFor(nodeId, this.primaryId);
+  }
+
+  // The countdown read of the same per-player timer (IWorldProfessions
+  // nodeRespawnSeconds): remaining seconds until THIS player may harvest the
+  // node again, null when it is ready now or the id is unknown. Same explicit
+  // pid shape as nodeHarvestableByMeFor, same pure helper clock domain.
+  nodeRespawnSecondsFor(nodeId: string, pid: number): number | null {
+    const meta = this.players.get(pid);
+    if (!meta) return null;
+    if (!gatherNodeById(nodeId)) return null;
+    return nodeRespawnRemainingSec(meta, nodeId, this.time);
+  }
+
+  nodeRespawnSeconds(nodeId: string): number | null {
+    return this.nodeRespawnSecondsFor(nodeId, this.primaryId);
   }
 
   // IWorld read surface (IWorldProfessions, #1127): the full recipe list

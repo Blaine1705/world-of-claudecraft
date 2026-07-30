@@ -2343,7 +2343,10 @@ export const it_IT: EnTranslations = {
       "downgradeMark": "Borse piene: il ritrovamento e stato conservato senza il marchio del raccoglitore.",
       "downgradeFind": "Borse piene: un ritrovamento pregiato e scivolato via.",
       "stateReady": "Pronto",
-      "stateCooldown": "In rigenerazione"
+      "stateCooldown": "In rigenerazione",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Titolo",

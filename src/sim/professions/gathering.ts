@@ -31,6 +31,7 @@ import {
   type GatherNodeType,
   type GatherRareEventFlavor,
   INTERACT_RANGE,
+  type InvSlot,
   type ItemDef,
   isConsuming,
 } from '../types';
@@ -199,6 +200,19 @@ export function harvestYieldItemId(meta: PlayerMeta, node: GatherNodeDef): strin
   return harvestYieldItemIdFor(node, effectiveGradeToolTier(meta, professionId, node));
 }
 
+/** The subset of PlayerMeta the grade resolution reads, spelled out so the
+ *  client-side tooltip preview can supply it too: the sim hands the full
+ *  PlayerMeta (structurally assignable), the tooltip adapts the equivalent
+ *  IWorld reads (bags, proficiency map, tool-effect slot rows). Loose string
+ *  keying on the proficiency map is deliberate: the online mirror's map is
+ *  Record<string, number>, and an absent profession coerces fail-closed to 0
+ *  inside bestWieldableGatherToolTierOrNone either way. */
+export interface GradeReadMeta {
+  inventory: readonly InvSlot[];
+  gatheringProficiency: Readonly<Record<string, number>>;
+  toolEffectSlots?: Partial<Record<GatheringProfessionId, ToolEffectSlot>>;
+}
+
 /**
  * The slot the grant will actually RUN for a harvest of this node: a QUALITY
  * effect is suppressed outright (no charge spent, no bonus applied) where the
@@ -211,7 +225,7 @@ export function harvestYieldItemId(meta: PlayerMeta, node: GatherNodeDef): strin
  * exactly how a tooltip would come to advertise a bonus the grant refuses.
  */
 export function usableToolEffectSlot(
-  meta: PlayerMeta,
+  meta: GradeReadMeta,
   professionId: GatheringProfessionId,
   node: GatherNodeDef,
 ): ToolEffectSlot | undefined {
@@ -232,18 +246,18 @@ export function usableToolEffectSlot(
  * Runs the bonus through `applyEffectBonus`, the same function the grant path
  * uses, rather than re-deriving "+1 if a quality effect is slotted" here. That
  * is deliberate: a second copy of a bonus rule is exactly how a tooltip once
- * promised a second the sim's clamp never gave. One definition, two live
+ * promised a second the sim's clamp never gave. One definition, three live
  * readers (the capacity gates at both ends of the cast, through
- * harvestYieldItemId, and the grant); the grade-preview tooltip planned in
- * the review worklist's UX pass becomes the third when it ships, and it
- * must read THIS function too.
+ * harvestYieldItemId, the grant, and the grade-preview tooltip, which adapts
+ * the IWorld reads into `GradeReadMeta` in src/ui/gathering_view.ts so the
+ * preview and the grant literally share this function).
  *
  * Pure and draw-free, and it never spends a charge: spending belongs to the
  * grant alone (`resolveHarvest`), so asking what a harvest WOULD yield costs
  * the player nothing.
  */
 export function effectiveGradeToolTier(
-  meta: PlayerMeta,
+  meta: GradeReadMeta,
   professionId: GatheringProfessionId,
   node: GatherNodeDef,
 ): number {
@@ -342,6 +356,21 @@ function distToNode(pos: { x: number; z: number }, node: { x: number; z: number 
 export function isNodeHarvestableBy(meta: PlayerMeta, nodeId: string, now: number): boolean {
   const readyAt = meta.nodeHarvestReadyAt[nodeId];
   return readyAt === undefined || now >= readyAt;
+}
+
+/** Remaining seconds until THIS player may harvest `nodeId` again, or null
+ *  when it is harvestable now (never harvested counts as ready). The read
+ *  half of the same timer isNodeHarvestableBy gates on, same clock domain
+ *  (sim.time seconds), so the tooltip countdown and the harvest gate can
+ *  never disagree about readiness. */
+export function nodeRespawnRemainingSec(
+  meta: PlayerMeta,
+  nodeId: string,
+  now: number,
+): number | null {
+  const readyAt = meta.nodeHarvestReadyAt[nodeId];
+  if (readyAt === undefined || now >= readyAt) return null;
+  return readyAt - now;
 }
 
 // Node-tier-relative proficiency gain (Professions 2.0): every

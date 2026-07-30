@@ -2343,7 +2343,10 @@ export const nl_NL: EnTranslations = {
       "downgradeMark": "Tassen vol: de vondst werd opgeslagen zonder verzamelderstempel.",
       "downgradeFind": "Tassen vol: een ongeschonden vondst glipte weg.",
       "stateReady": "Gereed",
-      "stateCooldown": "Aan het hergroeien"
+      "stateCooldown": "Aan het hergroeien",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Titel",

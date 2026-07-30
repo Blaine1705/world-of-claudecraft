@@ -69,6 +69,30 @@ describe('gatherNodeTooltipHtml', () => {
     expect(html).not.toContain('tt-green');
   });
 
+  it('a cooldown with respawnSeconds renders the live countdown, m:ss, ceiled', () => {
+    const html = gatherNodeTooltipHtml(model({ state: 'cooldown', respawnSeconds: 226.4 }));
+    // 226.4 ceils to 227 = 3:47; the untimed word must NOT also render.
+    expect(html).toContain('Respawns in 3:47');
+    expect(html).not.toContain('>Respawning<');
+    // Sub-minute remainders keep the two-digit seconds token.
+    expect(gatherNodeTooltipHtml(model({ state: 'cooldown', respawnSeconds: 8 }))).toContain(
+      'Respawns in 0:08',
+    );
+    // A live timer never reads 0:00 while the node still refuses.
+    expect(gatherNodeTooltipHtml(model({ state: 'cooldown', respawnSeconds: 0.2 }))).toContain(
+      'Respawns in 0:01',
+    );
+  });
+
+  it('the fine-grade preview line renders green exactly when the model carries it true', () => {
+    const on = gatherNodeTooltipHtml(model({ locked: false, fineUpgrade: true }));
+    expect(on).toContain('<div class="tt-green">Your tool refines this yield to fine grade.</div>');
+    const off = gatherNodeTooltipHtml(model({ locked: false, fineUpgrade: false }));
+    expect(off).not.toContain('fine grade');
+    const absent = gatherNodeTooltipHtml(model({ locked: false }));
+    expect(absent).not.toContain('fine grade');
+  });
+
   it('each node family resolves its own name key', () => {
     expect(gatherNodeTooltipHtml(model({ type: 'wood', professionId: 'logging' }))).toContain(
       'Timber Stand',

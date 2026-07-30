@@ -8398,6 +8398,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.downgradeFind': '가방이 가득 찼습니다: 최상급 수확물을 놓쳐 버렸습니다.',
   'hudChrome.gathering.stateReady': '채집 가능',
   'hudChrome.gathering.stateCooldown': '재생성 중',
+  'hudChrome.gathering.stateCooldownTimed': '{time} 후 재생성',
+  'hudChrome.gathering.fineGradePreview': '현재 도구로 채집하면 상급 등급을 얻습니다.',
   'gatherEvent.pristineVein': '{finder}님이 순수한 광맥을 발견했습니다!',
   'gatherEvent.ancientHeartwood': '{finder}님이 고대 심목을 베어냈습니다!',
   'gatherEvent.moonlitBloom': '{finder}님이 달빛 꽃을 발견했습니다!',

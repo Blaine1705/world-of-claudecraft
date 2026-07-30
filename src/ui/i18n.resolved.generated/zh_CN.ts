@@ -2343,7 +2343,10 @@ export const zh_CN: EnTranslations = {
       "downgradeMark": "背包已满：这份收获未能留下采集者的印记。",
       "downgradeFind": "背包已满：一件完美的收获溜走了。",
       "stateReady": "可采集",
-      "stateCooldown": "恢复中"
+      "stateCooldown": "恢复中",
+      "stateCooldownTimed": "{time}后恢复",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "使用当前工具采集可获得优质品级。"
     },
     "archetypeTitle": {
       "label": "称号",

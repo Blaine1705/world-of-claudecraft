@@ -2343,7 +2343,10 @@ export const de_DE: EnTranslations = {
       "downgradeMark": "Taschen voll: der Fund wurde ohne Sammelzeichen gespeichert.",
       "downgradeFind": "Taschen voll: ein makelloser Fund ist entkommen.",
       "stateReady": "Bereit",
-      "stateCooldown": "Nachwachsen"
+      "stateCooldown": "Nachwachsen",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Titel",

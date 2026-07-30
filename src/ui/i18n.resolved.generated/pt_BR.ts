@@ -2343,7 +2343,10 @@ export const pt_BR: EnTranslations = {
       "downgradeMark": "Bolsas cheias: a descoberta foi armazenada sem a marca do coletor.",
       "downgradeFind": "Bolsas cheias: uma descoberta imaculada escapou.",
       "stateReady": "Disponível",
-      "stateCooldown": "Regenerando"
+      "stateCooldown": "Regenerando",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Título",

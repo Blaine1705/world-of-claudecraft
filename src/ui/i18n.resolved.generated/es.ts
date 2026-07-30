@@ -2343,7 +2343,10 @@ export const es: EnTranslations = {
       "downgradeMark": "Bolsas llenas: el hallazgo se guardó sin la marca del recolector.",
       "downgradeFind": "Bolsas llenas: se perdió un hallazgo prístino.",
       "stateReady": "Listo",
-      "stateCooldown": "Reapareciendo"
+      "stateCooldown": "Reapareciendo",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Título",

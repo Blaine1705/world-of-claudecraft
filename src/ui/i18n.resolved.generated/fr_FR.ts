@@ -2343,7 +2343,10 @@ export const fr_FR: EnTranslations = {
       "downgradeMark": "Sacs pleins : la trouvaille a été rangée sans la marque du collecteur.",
       "downgradeFind": "Sacs pleins : une trouvaille de qualité supérieure vous a échappé.",
       "stateReady": "Disponible",
-      "stateCooldown": "En repoussement"
+      "stateCooldown": "En repoussement",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Titre",

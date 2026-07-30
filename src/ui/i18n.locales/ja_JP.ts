@@ -8411,6 +8411,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.downgradeFind': 'バッグが満杯です：極上の獲物を逃してしまいました。',
   'hudChrome.gathering.stateReady': '採集可能',
   'hudChrome.gathering.stateCooldown': '再生中',
+  'hudChrome.gathering.stateCooldownTimed': '{time}後に再生',
+  'hudChrome.gathering.fineGradePreview': 'あなたの道具なら、ここの採取物は上質な等級になります。',
   'gatherEvent.pristineVein': '{finder}が純粋な鉱脈を掘り当てた！',
   'gatherEvent.ancientHeartwood': '{finder}が太古の心木を切り倒した！',
   'gatherEvent.moonlitBloom': '{finder}が月光の花を発見した！',

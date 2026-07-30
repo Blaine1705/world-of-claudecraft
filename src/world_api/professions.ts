@@ -217,6 +217,14 @@ export interface IWorldProfessions {
   /** Static station anchors for the active world, shared by map and renderer consumers. */
   readonly stationPlacements: readonly StationDef[];
   nodeHarvestableByMe(nodeId: string): boolean;
+  /** Remaining seconds until `nodeId` respawns FOR THE LOCAL VIEWER, or null
+   *  when it is harvestable now (or the id is unknown). The countdown read of
+   *  the same per-viewer timer nodeHarvestableByMe gates on: null exactly when
+   *  that read answers true, so the tooltip's state line and its countdown can
+   *  never disagree. Offline the Sim reads the live per-player timer
+   *  (professions/gathering.ts nodeRespawnRemainingSec); online it reads the
+   *  `ncd` mirror, whose entries are already remaining seconds. */
+  nodeRespawnSeconds(nodeId: string): number | null;
   harvestNode(nodeId: string): WorldInteractionOutcome;
   recipeList: readonly RecipeDef[];
   lastCraftResult: CraftResultView | null;

@@ -2343,7 +2343,10 @@ export const ru_RU: EnTranslations = {
       "downgradeMark": "Сумки полны: добыча сохранена без метки сборщика.",
       "downgradeFind": "Сумки полны: превосходная находка ускользнула.",
       "stateReady": "Готово",
-      "stateCooldown": "Восстанавливается"
+      "stateCooldown": "Восстанавливается",
+      "stateCooldownTimed": "Восстановится через {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Ваш инструмент даёт здесь отборный сорт добычи."
     },
     "archetypeTitle": {
       "label": "Титул",

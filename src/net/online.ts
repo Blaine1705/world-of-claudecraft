@@ -1522,6 +1522,14 @@ export class ClientWorld implements IWorld {
   nodeHarvestableByMe(nodeId: string): boolean {
     return !this.nodeCooldowns?.has(nodeId);
   }
+  // The countdown read of the same mirror (IWorldProfessions
+  // nodeRespawnSeconds): the entry IS the remaining seconds, refreshed per
+  // snapshot in stable timer mode (refreshStableSelfTimers ages the deadline
+  // set) and re-sent by the legacy wire, so this stays a plain lookup with no
+  // second timer domain. Null exactly when nodeHarvestableByMe is true.
+  nodeRespawnSeconds(nodeId: string): number | null {
+    return this.nodeCooldowns?.get(nodeId) ?? null;
+  }
   // Static content read (#1127, extended #1132): the full recipe list (common
   // tier plus combo recipes) ships with the client bundle like every other
   // content table, so this needs no wire round-trip. See src/world_api/professions.ts.

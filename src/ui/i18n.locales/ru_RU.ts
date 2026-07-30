@@ -8549,6 +8549,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.downgradeFind': 'Сумки полны: превосходная находка ускользнула.',
   'hudChrome.gathering.stateReady': 'Готово',
   'hudChrome.gathering.stateCooldown': 'Восстанавливается',
+  'hudChrome.gathering.stateCooldownTimed': 'Восстановится через {time}',
+  'hudChrome.gathering.fineGradePreview': 'Ваш инструмент даёт здесь отборный сорт добычи.',
   'gatherEvent.pristineVein': '{finder} находит нетронутую жилу!',
   'gatherEvent.ancientHeartwood': '{finder} добывает древнюю сердцевину!',
   'gatherEvent.moonlitBloom': '{finder} находит лунный цветок!',

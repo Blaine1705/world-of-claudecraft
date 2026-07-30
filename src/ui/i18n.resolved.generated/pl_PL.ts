@@ -2343,7 +2343,10 @@ export const pl_PL: EnTranslations = {
       "downgradeMark": "Torby pełne: znalezisko zostało schowane bez znaku zbieracza.",
       "downgradeFind": "Torby pełne: wyjątkowe znalezisko przeszło ci koło nosa.",
       "stateReady": "Gotowy",
-      "stateCooldown": "Odnawianie się"
+      "stateCooldown": "Odnawianie się",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Tytuł",

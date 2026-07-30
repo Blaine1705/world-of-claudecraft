@@ -2648,9 +2648,21 @@ export const hudChromeStrings = {
     // 'mark' (the yield arrived unsigned) and 'find' (the jackpot dropped).
     downgradeMark: "Bags full: the find was stored without its gatherer's mark.",
     downgradeFind: 'Bags full: a pristine find slipped away.',
-    // Tooltip third line: the per-viewer respawn state.
+    // Tooltip third line: the per-viewer respawn state. The timed variant
+    // renders when the world can put a number on the same timer
+    // (IWorldProfessions nodeRespawnSeconds); the plain one stays the
+    // fallback for a null read. {time} is the respawnClock template below.
     stateReady: 'Ready',
     stateCooldown: 'Respawning',
+    stateCooldownTimed: 'Respawns in {time}',
+    // m:ss, the finder-clock token pattern: {minutes} unpadded via
+    // formatNumber, {seconds} pre-padded to two digits.
+    respawnClock: '{minutes}:{seconds}',
+    // Tooltip grade-preview line (the UX pass): shown only when the viewer's
+    // current wieldable tool (plus a usable slotted quality effect) would
+    // mint this node's FINE grade, through the same effectiveGradeToolTier
+    // read the grant runs.
+    fineGradePreview: 'Your tool refines this yield to fine grade.',
   },
   // Archetype title chrome (#1130, pair-named under Professions 2.0):
   // `label` heads the character-sheet title line, `none` is shown before the

@@ -32,6 +32,19 @@ function makeWorld(opts: {
   harvestable?: (nodeId: string) => boolean;
   proficiency?: Record<string, number>;
   inventory?: InvSlot[];
+  /** The countdown read (IWorldProfessions nodeRespawnSeconds); defaults to
+   *  the null answer both worlds give for a ready node. */
+  respawnSeconds?: (nodeId: string) => number | null;
+  /** The viewer's slotted tool effect rows (IWorld toolEffectSlots), the
+   *  grade preview's slot input; defaults to the never-slotted empty list. */
+  toolEffectSlots?: {
+    professionId: string;
+    effectId: string;
+    charges: number;
+    maxCharges: number;
+    confirmMode: 'always' | 'prompt';
+    selfCrafted?: boolean;
+  }[];
 }): IWorld {
   const proficiency = opts.proficiency ?? {};
   return {
@@ -45,6 +58,8 @@ function makeWorld(opts: {
     // same opts so the fixture cannot disagree with itself.
     gatheringProficiency: proficiency,
     nodeHarvestableByMe: opts.harvestable ?? (() => true),
+    nodeRespawnSeconds: opts.respawnSeconds ?? (() => null),
+    toolEffectSlots: opts.toolEffectSlots ?? [],
     professionsState: {
       // The rows carry the RESOLVED per-profession content caps
       // (100 gathering, 200 fishing), matching what both worlds now emit.
@@ -257,6 +272,63 @@ describe('tool-tier lock dimension', () => {
     );
     // A stale pick after a content change resolves to null, never a throw.
     expect(buildGatherNodeTooltip(makeWorld({}), 'no_such_node_id')).toBeNull();
+  });
+
+  it('carries respawnSeconds exactly when cooling AND the world puts a number on it', () => {
+    const cooling = makeWorld({
+      harvestable: () => false,
+      respawnSeconds: (id) => (id === NODE.id ? 95.2 : null),
+    });
+    expect(buildGatherNodeTooltip(cooling, NODE.id)).toMatchObject({
+      state: 'cooldown',
+      respawnSeconds: 95.2,
+    });
+    // A null read keeps the untimed shape (the painter falls back to the
+    // plain "Respawning" word).
+    const nullRead = makeWorld({ harvestable: () => false });
+    expect('respawnSeconds' in (buildGatherNodeTooltip(nullRead, NODE.id) ?? {})).toBe(false);
+    // Ready never carries one, even against a world that would answer.
+    const ready = makeWorld({ respawnSeconds: () => 42 });
+    expect('respawnSeconds' in (buildGatherNodeTooltip(ready, NODE.id) ?? {})).toBe(false);
+  });
+
+  it('fineUpgrade reads the grant resolution: t1 pick false, outclassing pick true, locked absent', () => {
+    // NODE is the tier-1 copper vein: its fine grade needs a tool strictly
+    // above the material tier, so the tier-1 pick previews false...
+    expect(buildGatherNodeTooltip(makeWorld({ inventory: T1_PICK }), NODE.id)).toMatchObject({
+      locked: false,
+      fineUpgrade: false,
+    });
+    // ...and the WIELDABLE tier-2 pick previews true (R22/R49: the same
+    // wield-filtered scan the grant runs).
+    expect(
+      buildGatherNodeTooltip(makeWorld({ inventory: PICK, proficiency: MINING_40 }), NODE.id),
+    ).toMatchObject({ locked: false, fineUpgrade: true });
+    // Owned-but-unwieldable mints no fine grade, so it previews none either.
+    expect(buildGatherNodeTooltip(makeWorld({ inventory: PICK }), NODE.id)).toMatchObject({
+      locked: true,
+    });
+    // Locked: absent, the red requirement line owns that state.
+    expect('fineUpgrade' in (buildGatherNodeTooltip(makeWorld({}), NODE.id) ?? {})).toBe(false);
+  });
+
+  it('a usable quality effect lifts the preview, a spent one does not (adapter durability mapping)', () => {
+    const slotted = (charges: number, effectId = 'artisans_eye') =>
+      makeWorld({
+        inventory: T1_PICK,
+        toolEffectSlots: [
+          { professionId: 'mining', effectId, charges, maxCharges: 30, confirmMode: 'always' },
+        ],
+      });
+    expect(buildGatherNodeTooltip(slotted(3), NODE.id)).toMatchObject({ fineUpgrade: true });
+    // A spent slot (0 charges) previews the base grade: the adapter maps
+    // charges onto durability, and applyEffectBonus refuses at zero.
+    expect(buildGatherNodeTooltip(slotted(0), NODE.id)).toMatchObject({ fineUpgrade: false });
+    // An unknown (or prototype-key) effect id from a newer server drops the
+    // row instead of throwing mid-hover.
+    expect(buildGatherNodeTooltip(slotted(3, 'constructor'), NODE.id)).toMatchObject({
+      fineUpgrade: false,
+    });
   });
 
   it('gatherDeniedLineKey maps surface + professionId + requiredTier to the exact key, falling back safely', () => {

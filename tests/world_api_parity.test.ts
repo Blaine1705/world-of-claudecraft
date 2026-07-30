@@ -297,6 +297,7 @@ export const IWORLD_MEMBERS = [
   { name: 'stationPlacements', kind: 'data' },
   { name: 'craftingIdentity', kind: 'data' },
   { name: 'nodeHarvestableByMe', kind: 'method' }, // read-returning
+  { name: 'nodeRespawnSeconds', kind: 'method' }, // read-returning (countdown of the same timer)
   { name: 'harvestNode', kind: 'method' },
   { name: 'recipeList', kind: 'data' },
   { name: 'lastCraftResult', kind: 'data' },
@@ -499,11 +500,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // members on top of the branch's 272; making reins usable items then removed
     // two (selectedMount + selectMount) for 273; the v0.32.0 base merge adds
     // activeMasterLootRolls, leaving 274; the packet's slotted tool effects add
-    // toolEffectSlots (data) and slotToolEffect (method) for 276, and the
-    // acquisition craft's recharge command (rechargeToolEffect) makes 277.
-    expect(IWORLD_MEMBERS.length).toBe(277);
+    // toolEffectSlots (data) and slotToolEffect (method) for 276, the
+    // acquisition craft's recharge command (rechargeToolEffect) makes 277,
+    // and the UX pass's node respawn countdown read (nodeRespawnSeconds)
+    // makes 278.
+    expect(IWORLD_MEMBERS.length).toBe(278);
     expect(DATA_MEMBERS.length).toBe(73);
-    expect(METHOD_MEMBERS.length).toBe(204);
+    expect(METHOD_MEMBERS.length).toBe(205);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -687,6 +690,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'moveInventoryItem',
       'moveRaidMember',
       'nodeHarvestableByMe',
+      'nodeRespawnSeconds',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -998,6 +1002,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'moveInventoryItem',
       'moveRaidMember',
       'nodeHarvestableByMe',
+      'nodeRespawnSeconds',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -1511,6 +1516,7 @@ const FACET_PROFESSIONS = [
   'stationPlacements',
   'craftingIdentity',
   'nodeHarvestableByMe',
+  'nodeRespawnSeconds',
   'harvestNode',
   'recipeList',
   'lastCraftResult',
@@ -1619,8 +1625,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(277);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(277);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(278);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(278);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

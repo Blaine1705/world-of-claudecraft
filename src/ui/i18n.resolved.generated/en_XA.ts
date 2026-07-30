@@ -2343,7 +2343,10 @@ export const en_XA: EnTranslations = {
       "downgradeMark": "[Ɓáĝš ƒúļļ: ţĥé ƒíñð ŵáš šţóŕéð ŵíţĥóúţ íţš ĝáţĥéŕéŕ'š ɱáŕķ.]",
       "downgradeFind": "[Ɓáĝš ƒúļļ: á þŕíšţíñé ƒíñð šļíþþéð áŵáý.]",
       "stateReady": "[Ŕéáðý]",
-      "stateCooldown": "[Ŕéšþáŵñíñĝ]"
+      "stateCooldown": "[Ŕéšþáŵñíñĝ]",
+      "stateCooldownTimed": "[Ŕéšþáŵñš íñ {time}]",
+      "respawnClock": "[{minutes}:{seconds}]",
+      "fineGradePreview": "[Ýóúŕ ţóóļ ŕéƒíñéš ţĥíš ýíéļð ţó ƒíñé ĝŕáðé.]"
     },
     "archetypeTitle": {
       "label": "[Ţíţļé]",

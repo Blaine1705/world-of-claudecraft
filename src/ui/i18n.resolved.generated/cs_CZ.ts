@@ -2343,7 +2343,10 @@ export const cs_CZ: EnTranslations = {
       "downgradeMark": "Plné brašny: nález byl uložen bez značky sběrače.",
       "downgradeFind": "Plné brašny: vzácný nález ti proklouzl.",
       "stateReady": "Připraveno",
-      "stateCooldown": "Dobíjení"
+      "stateCooldown": "Dobíjení",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Titul",

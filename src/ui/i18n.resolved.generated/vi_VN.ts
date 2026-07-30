@@ -2343,7 +2343,10 @@ export const vi_VN: EnTranslations = {
       "downgradeMark": "Túi đầy: phát hiện được lưu mà không có dấu thợ thu thập.",
       "downgradeFind": "Túi đầy: một phát hiện tuyệt vời đã trôi qua.",
       "stateReady": "Sẵn Sàng",
-      "stateCooldown": "Đang Hồi Sinh"
+      "stateCooldown": "Đang Hồi Sinh",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Danh hiệu",

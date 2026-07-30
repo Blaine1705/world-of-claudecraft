@@ -20,10 +20,18 @@ import {
   GATHERING_PROFESSION_IDS,
   GATHERING_PROFESSIONS,
   type GatheringProfessionId,
+  TOOL_EFFECTS,
+  type ToolEffectId,
 } from '../sim/content/professions';
 import { GATHER_NODES, ITEMS } from '../sim/data';
-import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
-import { canGatherTier } from '../sim/professions/tools';
+import {
+  effectiveGradeToolTier,
+  type GradeReadMeta,
+  harvestYieldItemIdFor,
+  NODE_HARVEST_TABLE,
+  nodeMaterialFor,
+} from '../sim/professions/gathering';
+import { canGatherTier, type ToolEffectSlot } from '../sim/professions/tools';
 import {
   bestWieldableGatherToolTierOrNone,
   minWieldRequirementToWork,
@@ -143,6 +151,42 @@ export interface GatherNodeTooltipModel {
    *  line for that arm. */
   wieldSkill?: number;
   state: GatherNodeState;
+  /** Remaining seconds until this node respawns for the viewer
+   *  (IWorldProfessions nodeRespawnSeconds), present exactly when `state` is
+   *  'cooldown' and the world put a number on the same timer; the painter
+   *  keeps the untimed line for an absent value. */
+  respawnSeconds?: number;
+  /** The grade preview (the UX pass): true when the viewer's current
+   *  wieldable tool, plus a usable slotted quality effect, would mint this
+   *  node's FINE grade, resolved through the grant's own
+   *  effectiveGradeToolTier read (never a second copy of the rule). Absent
+   *  while the node is locked: the red requirement line owns that state. */
+  fineUpgrade?: boolean;
+}
+
+/** Adapts the IWorld reads into the GradeReadMeta shape the sim's grade
+ *  resolution takes, so the tooltip preview runs `effectiveGradeToolTier`
+ *  itself (its promised third reader). Unknown and prototype-key effect ids
+ *  are dropped: `applyEffectBonus` indexes TOOL_EFFECTS by the id and the
+ *  row is wire-mirrored; a dropped row previews no bonus, the same degraded
+ *  shape an unknown id renders everywhere else. */
+function gradeReadMetaFor(world: IWorld): GradeReadMeta {
+  const slots: NonNullable<GradeReadMeta['toolEffectSlots']> = {};
+  for (const row of world.toolEffectSlots) {
+    if (!Object.hasOwn(TOOL_EFFECTS, row.effectId)) continue;
+    if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(row.professionId)) continue;
+    slots[row.professionId as GatheringProfessionId] = {
+      effectId: row.effectId as ToolEffectId,
+      durability: row.charges,
+      maxDurability: row.maxCharges,
+      confirmMode: row.confirmMode,
+    } satisfies ToolEffectSlot;
+  }
+  return {
+    inventory: world.inventory,
+    gatheringProficiency: world.gatheringProficiency,
+    toolEffectSlots: slots,
+  };
 }
 
 export function buildGatherNodeTooltip(
@@ -156,13 +200,26 @@ export function buildGatherNodeTooltip(
   const wieldReq = locked
     ? minWieldRequirementToWork(world.inventory, professionId, node.tier, ITEMS)
     : null;
+  const state = classifyGatherNode(world, node.id);
+  const respawn = state === 'cooldown' ? world.nodeRespawnSeconds(node.id) : null;
+  // The grade preview: fine exactly when the grant's own resolution would
+  // mint an item id other than the node's base material. Suppressed while
+  // locked (nothing can be harvested, so nothing is previewed).
+  const fineUpgrade = locked
+    ? undefined
+    : harvestYieldItemIdFor(
+        node,
+        effectiveGradeToolTier(gradeReadMetaFor(world), professionId, node),
+      ) !== nodeMaterialFor(node.type, node.zoneId).itemId;
   return {
     type: node.type,
     professionId,
     tier: node.tier,
     locked,
     ...(wieldReq !== null && wieldReq > 0 ? { wieldSkill: wieldReq } : {}),
-    state: classifyGatherNode(world, node.id),
+    state,
+    ...(respawn !== null && respawn > 0 ? { respawnSeconds: respawn } : {}),
+    ...(fineUpgrade !== undefined ? { fineUpgrade } : {}),
   };
 }
 

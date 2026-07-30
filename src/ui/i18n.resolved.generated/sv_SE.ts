@@ -2343,7 +2343,10 @@ export const sv_SE: EnTranslations = {
       "downgradeMark": "Väskorna fulla: fyndet förvarades utan samlarmärke.",
       "downgradeFind": "Väskorna fulla: ett orört fynd gled undan.",
       "stateReady": "Redo",
-      "stateCooldown": "Återspawnning"
+      "stateCooldown": "Återspawnning",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Titel",

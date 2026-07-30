@@ -8019,6 +8019,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.downgradeFind': '背包已满：一件完美的收获溜走了。',
   'hudChrome.gathering.stateReady': '可采集',
   'hudChrome.gathering.stateCooldown': '恢复中',
+  'hudChrome.gathering.stateCooldownTimed': '{time}后恢复',
+  'hudChrome.gathering.fineGradePreview': '使用当前工具采集可获得优质品级。',
   'gatherEvent.pristineVein': '{finder}挖到了一条纯净的矿脉！',
   'gatherEvent.ancientHeartwood': '{finder}砍倒了一棵远古心木！',
   'gatherEvent.moonlitBloom': '{finder}发现了一朵月光之花！',

@@ -2343,7 +2343,10 @@ export const da_DK: EnTranslations = {
       "downgradeMark": "Tasker fyldte: fundet blev gemt uden indsamlerens mærke.",
       "downgradeFind": "Tasker fyldte: et pristint fund slap væk.",
       "stateReady": "Klar",
-      "stateCooldown": "Genskabes"
+      "stateCooldown": "Genskabes",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Titel",

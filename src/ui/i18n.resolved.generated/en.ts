@@ -2343,7 +2343,10 @@ export const en: EnTranslations = {
       "downgradeMark": "Bags full: the find was stored without its gatherer's mark.",
       "downgradeFind": "Bags full: a pristine find slipped away.",
       "stateReady": "Ready",
-      "stateCooldown": "Respawning"
+      "stateCooldown": "Respawning",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Title",

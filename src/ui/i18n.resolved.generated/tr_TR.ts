@@ -2343,7 +2343,10 @@ export const tr_TR: EnTranslations = {
       "downgradeMark": "Çantalar dolu: bulgu, toplayıcı işareti olmadan saklandı.",
       "downgradeFind": "Çantalar dolu: pırıl pırıl bir bulgu kayboldu gitti.",
       "stateReady": "Hazır",
-      "stateCooldown": "Yeniden Oluşuyor"
+      "stateCooldown": "Yeniden Oluşuyor",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Unvan",
