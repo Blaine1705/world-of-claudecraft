@@ -2390,6 +2390,127 @@ explicitly, on the committed idle tree at the code tip 5ed690b9c9 (the
 record commit after it is docs-only). Phase 14 is BUILT; its QA runs in
 a NEW session (ultracode), per the cadence.
 
+QA COMPLETE 2026-07-30 (Fable ultracode, new session, fresh eyes over
+16a36005a..5ed690b9c9 plus the docs close). Preamble: origin fetched,
+release/v0.33.0 unmoved past the synced b0acba0ad, tree clean at the
+entry tip, no re-sync needed. The round: six domain reviewers via the
+Agent tool (qa gate, architecture, cross-platform, frontend seam, test
+coverage, privacy/security) plus a 23-agent adversarial Workflow (eight
+blind lenses with paired refuters and a completeness critic), then a
+three-reviewer fix round over the applied changes as unreviewed code.
+Roughly ninety findings, ALL applied or recorded, across nineteen code,
+test, style, and screenshot commits; the record commit after the gate
+is docs-only.
+
+The round's three blockers. The trade capacity model: fitsAfterSwap
+still walked the old single-pass order while removeOffer shipped the
+two-pass signer order, runtime-proven by the architecture reviewer
+against both parents as a receiver pushed to seventeen of sixteen slots
+with no error; closed by scoping the deprioritize predicate to charm
+items (crafting signs every rare-or-better output, so the wide
+predicate silently rerouted commission and masterwork equipment
+trades) and by mirroring the two-pass into the model from one exported
+predicate builder, with the charm stack-of-one premise, the scope, and
+the structural mirror all pinned. The capacity pre-gates: neither end
+of an unconfirmed prompt cast had a pin that failed when the consent
+argument reverted (every table arm had roomy bags); closed with the
+room-for-base-only fixture at both gates. The touch drop arms: under
+the phone HUD the desktop rows are display none and the bags sheet
+covered the ring's layer, so the phase's own drag-to-slot flow could
+not be performed at all, and the touch Use button still ran the nearby
+scan over a live bobber; closed with a drag-scoped raise of the
+controls layer plus (the fix round's own blocker) a neutralization
+rule that keeps ONLY the ring pointer-active while dragging, the
+padReelItemId arm on the touch press, and a live probe
+(tmp/phase14_drag_probe.mjs) that asserts the armed drag, the ring
+hit-test, and the seat flip end to end, with the completed-drag
+captures committed.
+
+Load-bearing closures beyond the blockers, each pinned: the R40
+re-press self-decline (a second interact press re-asked, the confirm
+family's replacement contract answered the open ask as a decline, and
+the real answer landed on the busy gate; a pending-node latch swallows
+the repeat press), the cross-profession consent revocation (a mid-cast
+mint on an UNRELATED profession cleared the live cast's captured
+consent; the clear now keys on the casting profession), the
+cannot-matter ask (a prompt-mode quality charm on a tool already past
+the material's rung popped a dialog every harvest where neither answer
+did anything; gatherEffectPrompt now mirrors the grant's mattered
+predicate plus the locally knowable deny arms and the confirmed-grade
+capacity read, with its two honest online limits named in place), the
+mount-race banner takeover discarding queued celebrations (hideLive
+plus a self-armed advance), the stale parked-ambient replay (the
+ambient max-defer), the frozen respawn countdown (a shown-scoped 1 Hz
+interval in the renamed gather_node_tooltip_controller, contracted in
+the hud_perf_budget driver registry with write elision), the fairness
+guard's inert governor arm (two tokens matched nothing in the repo;
+now the real render_budget pair, with the tier ladder literal-pinned,
+proven applied on built meshes, and the base-anchored scale that
+stopped tier props sinking into the terrain), the minimap strike pin
+proven gameable by reconstruction (replaced with a segment-tracing
+rasterization drive over all three lock states), the bags focus keys
+(same-item ordinals instead of raw indexes, the sort select joining
+the ladder, element-identity pins), the Ask-each-use toggle
+contradicting the chip (seeded from the live slot at open), the
+last-charge singular (count-neutral confirm body in English, Russian,
+Japanese, and Korean), and the confirmed-harvest parity chapter (no
+scenario had ever driven a consented use, so a draw added inside the
+consent-gated branch would have passed every shard; the golden now
+pins both consent arms at the exact draw ledger).
+
+BUILT-record corrections (the completeness critic): the "ask sits
+AFTER every deny arm" claim held only for the three client verdicts
+(the locally knowable sim arms now also suppress, and the swimming arm
+stays server-side by intent); the "ring arm is the one mobile fingers
+reach" and the mobile-audit-clean claims were false until this round's
+reachability fixes; the "restore ladder is the vendor contract
+exactly" claim missed the sort select; and the pad guard's "minus the
+two Input-handled ids" undersold the exemption set (every slotN id
+plus the panel's own escape row, each now pinned where its exemption
+is handled). The two refuted adversarial findings were judged by hand
+and both refutations HELD: the unknown-id null is the facet doc's own
+enumerated case (the rationale clause was still sharpened), and the
+attunement moment's durable record is its zone-broadcast epic log line
+(the banner was reclassed to the celebration queue anyway, as the
+mechanical half was right).
+
+Mutation evidence: thirty-nine targeted mutants over the round's new
+pins, run in an ISOLATED worktree (git worktree add plus cp -c
+node_modules, removed after) with the prove-tests-ran guard:
+thirty-nine of thirty-nine KILLED. Two pins were strengthened mid
+-battery when their first forms survived (the bags identity arm, which
+a key-string assertion could not decide, and the neutralization rule's
+two selector lines). Live track: the real-browser suite 90 of 90 (axe,
+target size, focus indicator, keyboard nav), the perf tour on both
+viewports (structural pass, FCT cap-bounded at 24, hud skip 98 to 99
+percent), and the drag probe run twice, before and after the
+ring-scoping fix.
+
+Surfaced for the maintainer, changing nothing: the trade
+deprioritization's charm scope is a deliberate NARROWING (signed
+non-charm equipment reverts to the plain highest-index walk, pinned;
+confirm the ruling reading). The migration review's operator note,
+recorded verbatim in spirit: toolEffectSlots has never shipped
+(absent from release/v0.33.0), so rolling back past this packet drops
+the whole key on each character's first autosave, destroying every
+slot and the charms spent on them; a mid-packet rollback to a
+pre-phase-14 build additionally makes player-minted prompt slots fire
+and spend on every harvest with NO on-screen indication (the chip and
+toggle are phase 14); the load coercion re-serializes permanently, so
+a garbled stored mode becomes a deliberate-looking prompt and the way
+back costs a charm. Follow-ups recorded, not filed: the banner pair's
+banner_view/banner_painter extraction together with moving the
+ambient-staleness rule into the queue as advance(nowMs); the
+reagentLine suffix's single-key form; the padStart numeral-system
+idiom shared with four older clocks. Standing levers and R45 through
+R56 stay as recorded; no new ruling was needed.
+
+CLOSING GATE: PASS, all 11 steps, exit code read explicitly, on the
+committed idle tree at the code tip 2f7b7e8b26 (nineteen commits
+23797e7d6 through 2f7b7e8b26; this record commit is docs-only). Phase
+14 is QA COMPLETE; next is the phase 15 build (ops: GM tooling and the
+activity feed), new session per the cadence.
+
 ---
 
 ## Phase 15: ops (GM tooling and the activity feed)
