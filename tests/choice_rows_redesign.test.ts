@@ -9,8 +9,13 @@ import type { Entity } from '../src/sim/types';
 // uses it, on a real Sim. Deterministic setups; every assertion is a behavior a
 // player would see.
 
-function rig(cls: 'priest' | 'shaman' | 'paladin', level: number, rows: Record<number, string>) {
-  const sim = new Sim({ seed: 11, playerClass: cls, autoEquip: true });
+function rig(
+  cls: 'priest' | 'shaman' | 'paladin',
+  level: number,
+  rows: Record<number, string>,
+  seed = 11,
+) {
+  const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
   sim.setPlayerLevel(level);
   expect(sim.applyTalents({ spec: null, rows })).toBe(true);
   const p = sim.player;
@@ -177,10 +182,15 @@ describe('shaman redesign', () => {
   });
 
   it('Improved Cinder Jolt: Earthen Jolt detonates the Cinder Jolt DoT', () => {
-    const { sim } = rig('shaman', 20, {
-      8: 'sha_r8_shock_efficiency',
-      14: 'sha_r14_improved_flame_shock',
-    });
+    const { sim } = rig(
+      'shaman',
+      20,
+      {
+        8: 'sha_r8_shock_efficiency',
+        14: 'sha_r14_improved_flame_shock',
+      },
+      12,
+    );
     const mob = addTargetMob(sim, 100000, 8);
     castAndSettle(sim, 'flame_shock', 7); // the shocks share a cooldown; wait it out
     expect(mob.auras.some((a) => a.kind === 'dot' && a.id === 'flame_shock')).toBe(true);

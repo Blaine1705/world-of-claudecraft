@@ -306,17 +306,12 @@ function isolate(): void {
 type MainModule = typeof import('../../../server/main');
 
 // A Dispatch that BAKES IN the /api dispatch mode: it flips the flag (legacy vs
-// new) via the test-only setter, drives the real routeHttpRequest, then polls
-// res.writableEnded (routeHttpRequest is synchronous fire-and-forget).
+// new) via the test-only setter and drives the real routeHttpRequest. The shared
+// captureResponse helper waits on FakeRes's end signal.
 function makeModedDispatch(main: MainModule, mode: 'legacy' | 'new'): Dispatch {
-  return async (req, res) => {
+  return (req, res) => {
     main.setApiDispatchModeForTests(mode);
     main.routeHttpRequest(req, res);
-    let ticks = 0;
-    while (!(res as unknown as { writableEnded: boolean }).writableEnded) {
-      if (ticks++ > MAX_POLL_TICKS) throw new Error('response never ended');
-      await new Promise((r) => setImmediate(r));
-    }
   };
 }
 
@@ -528,6 +523,28 @@ describe('/api dispatch parity (legacy flag vs new flag)', () => {
     );
     expect(oldCap.status).toBe(404);
     expect(newCap.status).not.toBe(404);
+  });
+
+  it('the OTA update check 404s on the legacy ladder but is served on the new arm', async () => {
+    // POST /api/ota/updates is a registry-only RouteDef (the deeds/steam
+    // new-route rule). Under legacy dispatch the ladder has no such arm, so it
+    // falls through to 404; under new dispatch the router serves it. The env
+    // key is FORCED unset (a developer .env may set it) so the handler takes
+    // the fail-closed no-update 200 and the case never performs an outbound
+    // manifest fetch.
+    const { oldCap, newCap } = await captureWithEnv({ OTA_MANIFEST_URL: undefined }, () =>
+      makeReq({
+        method: 'POST',
+        url: '/api/ota/updates',
+        body: { platform: 'ios', version_name: 'builtin', version_build: '0.32.0' },
+      }),
+    );
+    expect(oldCap.status).toBe(404);
+    expect(newCap.status).toBe(200);
+    expect(JSON.parse(newCap.body as string)).toEqual({
+      message: 'No new version available',
+      error: 'no_new_version_available',
+    });
   });
 
   it('GET /api/perf-report is identical old-vs-new and is a 404 (re-pins the masked /api/perf-report)', async () => {

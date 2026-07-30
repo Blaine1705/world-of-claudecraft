@@ -47,6 +47,7 @@ import {
 } from './paladin_templars_verdict_clip';
 import { mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
+import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
 
@@ -349,6 +350,7 @@ function attachProp(
   stowed = false,
 ): THREE.Object3D {
   const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(att.url).scene));
+  primeSkinnedSortSpheres(payload);
   payload.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) o.userData.weaponMesh = true;
   });
@@ -490,7 +492,21 @@ for (const [key, list] of Object.entries(SKINS)) {
   if (VISUALS[key]?.lazyPreload) continue;
   for (const u of list) if (u) bootSkinUrls.add(u);
 }
-for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
+// The packaged iOS shell, plus iOS Safari after a confirmed entry kill, defers
+// the whole alternate-atlas sweep out of the boot gate: ~34 1024x1024 atlases
+// decode to well over 100 MB of RGBA inside the same WebContent process whose
+// jetsam ceiling the entry spike already presses against (the iPhone 13 report),
+// and almost all of them are OTHER players' cosmetics. skinTexture() fails soft
+// to the embedded default and every apply site heals through ensureSkinTexture()
+// (visual.ts constructor + setSkin, portrait.ts before its one-shot snapshot),
+// so a deferred atlas costs a brief fallback, never a crash or a stall. Both
+// profile hints derive from static boot signals (never the tier), so this
+// import-time read cannot drift from the live profile the way an import-time
+// TIER read would (the farmCrate P0).
+const eagerSkinAtlases = !(GFX.nativeIosMemoryProfile || GFX.tightMemory);
+if (eagerSkinAtlases) {
+  for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
+}
 
 /** Resolve once every boot-time character GLB + skin atlas is cached, retrying
  *  whatever is still missing instead of depending on the site-wide assetsReady()
@@ -511,7 +527,11 @@ for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUr
 export async function charactersReady(maxAttempts = 3): Promise<void> {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const missingGltf = preloadUrls.filter((u) => !gltfByUrl.has(assetUrl(u)));
-    const missingSkins = [...bootSkinUrls].filter((u) => !skinTexByUrl.has(u));
+    // Deferred atlases (native iOS) are not boot assets: gating the preview on
+    // them would re-create the exact entry-footprint spike the deferral removes.
+    const missingSkins = eagerSkinAtlases
+      ? [...bootSkinUrls].filter((u) => !skinTexByUrl.has(u))
+      : [];
     if (missingGltf.length === 0 && missingSkins.length === 0) return;
     if (attempt > 1) {
       await new Promise((resolve) => setTimeout(resolve, gltfRetryDelayMs(attempt)));
@@ -624,6 +644,28 @@ export function mechAssetsReady(): boolean {
   );
 }
 
+// Lazy fetch for rideable mount GLBs (the mech pattern, per visual key): a
+// mount loads on the first sight of a rider, so seven mount models never
+// weigh on every client's boot. Memoized per key; mounts have no skin or
+// emissive atlases, so the GLB is the whole job.
+const mountAssetPromises = new Map<string, Promise<void>>();
+export function preloadMountAssets(visualKey: string): Promise<void> {
+  const existing = mountAssetPromises.get(visualKey);
+  if (existing) return existing;
+  const def = VISUALS[visualKey];
+  if (!def) return Promise.resolve();
+  const job = loadGltf(def.url).then((g) => {
+    gltfByUrl.set(def.url, g);
+  });
+  mountAssetPromises.set(visualKey, job);
+  return job;
+}
+
+export function mountAssetsReady(visualKey: string): boolean {
+  const def = VISUALS[visualKey];
+  return !!def && gltfByUrl.has(assetUrl(def.url));
+}
+
 function resolvedGltf(url: string): GLTF {
   const resolvedUrl = assetUrl(url);
   const g = gltfByUrl.get(resolvedUrl);
@@ -646,6 +688,7 @@ function optimizedScene(url: string): THREE.Object3D {
   if (hit) return hit;
   const root = cloneSkinned(resolvedGltf(url).scene);
   mergeSkinnedParts(root);
+  primeSkinnedSortSpheres(root);
   optimizedSceneCache.set(url, root);
   return root;
 }

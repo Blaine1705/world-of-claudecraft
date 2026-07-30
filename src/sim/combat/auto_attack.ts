@@ -27,9 +27,10 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
-import { ITEMS, isArenaPos, MOBS } from '../data';
+import { CLASSES, ITEMS, isArenaPos, MOBS } from '../data';
 import { weaponHand } from '../equipment_rules';
 import { TWOHAND_DPS_MULT } from '../item_budget';
+import { forceDismount } from '../mounts';
 import { grantDevotionFromBlock } from '../paladin_devotion';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
@@ -117,6 +118,8 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
     ctx.error(p.id, 'Invalid attack target.');
     return;
   }
+  // Auto-dismount when the player is mounted and starts auto-attack.
+  if (p.mountKey !== '') forceDismount(ctx, p);
   if (p.sitting) ctx.standUp(p);
   if (p.weaponStowed) drawWeapon(p);
   p.autoAttack = true;
@@ -179,6 +182,10 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   // casters (wand-style, no dead zone so they don't run into melee, #94).
   // Form-aware: a druid keeps the class wand only in caster or Moonwing Form;
   // bear/cat/travel resolve to undefined here and fall through to melee.
+  // A pre-armed auto-attack that fires while mounted (e.g. mounted player who
+  // somehow retained autoAttack=true) force-dismounts before the swing lands,
+  // mirroring the ghost_wolf break pattern below and the startAutoAttack guard.
+  if (p.mountKey !== '') forceDismount(ctx, p);
   const ranged = rangedAutoProfile(p, meta.cls);
   if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
     if (!ctx.hasLineOfSight(p, t)) return;
@@ -527,7 +534,7 @@ export function meleeSwing(
   }
   const dealtAmount = Math.max(1, Math.round(dmg));
   const hpBefore = target.hp;
-  ctx.dealDamage(
+  const resolvedAmount = ctx.dealDamage(
     attacker,
     target,
     dealtAmount,
@@ -541,7 +548,7 @@ export function meleeSwing(
       mult: opts.threatMult ?? 1,
     },
   );
-  opts.onDealt?.(dealtAmount);
+  opts.onDealt?.(resolvedAmount);
   opts.onEffectiveDamage?.(Math.max(0, hpBefore - target.hp));
   if (opts.autoAttack) {
     applyRequitalAutoAttack(ctx, attacker, target);

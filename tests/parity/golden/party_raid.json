@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 415,
+      "nextId": 820,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 422,
-      "state": "2c45b977",
-      "events": "24043dbb",
+      "nextId": 827,
+      "state": "d50f237a",
+      "events": "6c3e58cf",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -69,7 +69,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -123,7 +123,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 416,
+          "entityId": 821,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -179,7 +179,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 417,
+          "entityId": 822,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -233,7 +233,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 418,
+          "entityId": 823,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -290,7 +290,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 419,
+          "entityId": 824,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -338,7 +338,6 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
-              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -346,11 +345,10 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 420,
+          "entityId": 825,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace",
-            "offhand": "eastbrook_buckler"
+            "mainhand": "training_mace"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -402,7 +400,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 421,
+          "entityId": 826,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -438,7 +436,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 415
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -451,7 +449,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 415,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -501,7 +499,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 416,
+          "id": 821,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -552,7 +550,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 417,
+          "id": 822,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -610,7 +608,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 69,
-          "id": 418,
+          "id": 823,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -661,7 +659,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 57,
-          "id": 419,
+          "id": 824,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -703,8 +701,6 @@
         {
           "aiState": "idle",
           "attackPower": 44,
-          "blockChance": 0.05,
-          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0585,
@@ -712,18 +708,16 @@
           "dodgeChance": 0.0585,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 105,
-          "id": 420,
+          "hp": 95,
+          "id": 825,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 105,
+          "maxHp": 95,
           "maxResource": 93,
           "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
-          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -741,10 +735,10 @@
           "spellPower": 7,
           "stats": {
             "agi": 17,
-            "armor": 133,
+            "armor": 99,
             "int": 13,
             "spi": 14,
-            "sta": 23,
+            "sta": 22,
             "str": 22
           },
           "templateId": "paladin",
@@ -765,7 +759,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 421
+              "sourceId": 826
             }
           ],
           "blockChance": 0.05,
@@ -778,7 +772,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 421,
+          "id": 826,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -822,9 +816,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 422,
-      "state": "2c45b977",
-      "events": "837ef659",
+      "nextId": 827,
+      "state": "d50f237a",
+      "events": "39d5a075",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -862,7 +856,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -916,7 +910,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 416,
+          "entityId": 821,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -972,7 +966,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 417,
+          "entityId": 822,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -1026,7 +1020,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 418,
+          "entityId": 823,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -1083,7 +1077,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 419,
+          "entityId": 824,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1131,7 +1125,6 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
-              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -1139,11 +1132,10 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 420,
+          "entityId": 825,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace",
-            "offhand": "eastbrook_buckler"
+            "mainhand": "training_mace"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -1195,7 +1187,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 421,
+          "entityId": 826,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1231,7 +1223,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 415
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -1244,7 +1236,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 415,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1294,7 +1286,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 416,
+          "id": 821,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1345,7 +1337,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 417,
+          "id": 822,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1403,7 +1395,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 69,
-          "id": 418,
+          "id": 823,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1454,7 +1446,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 57,
-          "id": 419,
+          "id": 824,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1496,8 +1488,6 @@
         {
           "aiState": "idle",
           "attackPower": 44,
-          "blockChance": 0.05,
-          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0585,
@@ -1505,18 +1495,16 @@
           "dodgeChance": 0.0585,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 105,
-          "id": 420,
+          "hp": 95,
+          "id": 825,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 105,
+          "maxHp": 95,
           "maxResource": 93,
           "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
-          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -1534,10 +1522,10 @@
           "spellPower": 7,
           "stats": {
             "agi": 17,
-            "armor": 133,
+            "armor": 99,
             "int": 13,
             "spi": 14,
-            "sta": 23,
+            "sta": 22,
             "str": 22
           },
           "templateId": "paladin",
@@ -1558,7 +1546,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 421
+              "sourceId": 826
             }
           ],
           "blockChance": 0.05,
@@ -1571,7 +1559,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 421,
+          "id": 826,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1615,9 +1603,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 422,
-      "state": "4f2fc613",
-      "events": "21752ac2",
+      "nextId": 827,
+      "state": "e03ce7c8",
+      "events": "73a60257",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1655,7 +1643,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1709,7 +1697,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 416,
+          "entityId": 821,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1765,7 +1753,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 417,
+          "entityId": 822,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -1819,7 +1807,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 418,
+          "entityId": 823,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -1876,7 +1864,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 419,
+          "entityId": 824,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1926,7 +1914,6 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
-              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -1934,11 +1921,10 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 420,
+          "entityId": 825,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace",
-            "offhand": "eastbrook_buckler"
+            "mainhand": "training_mace"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -1992,7 +1978,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 421,
+          "entityId": 826,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2028,7 +2014,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 415
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -2041,7 +2027,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 415,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2091,7 +2077,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 416,
+          "id": 821,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2142,7 +2128,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 417,
+          "id": 822,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2200,7 +2186,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 69,
-          "id": 418,
+          "id": 823,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2251,7 +2237,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 57,
-          "id": 419,
+          "id": 824,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2293,8 +2279,6 @@
         {
           "aiState": "idle",
           "attackPower": 44,
-          "blockChance": 0.05,
-          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0585,
@@ -2302,18 +2286,16 @@
           "dodgeChance": 0.0585,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 105,
-          "id": 420,
+          "hp": 95,
+          "id": 825,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 105,
+          "maxHp": 95,
           "maxResource": 93,
           "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
-          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -2331,10 +2313,10 @@
           "spellPower": 7,
           "stats": {
             "agi": 17,
-            "armor": 133,
+            "armor": 99,
             "int": 13,
             "spi": 14,
-            "sta": 23,
+            "sta": 22,
             "str": 22
           },
           "templateId": "paladin",
@@ -2355,7 +2337,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 421
+              "sourceId": 826
             }
           ],
           "blockChance": 0.05,
@@ -2368,7 +2350,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 421,
+          "id": 826,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2412,9 +2394,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 422,
-      "state": "4f2fc613",
-      "events": "77a7946b",
+      "nextId": 827,
+      "state": "e03ce7c8",
+      "events": "bb52c433",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2452,7 +2434,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2506,7 +2488,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 416,
+          "entityId": 821,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2562,7 +2544,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 417,
+          "entityId": 822,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -2616,7 +2598,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 418,
+          "entityId": 823,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -2673,7 +2655,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 419,
+          "entityId": 824,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2723,7 +2705,6 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
-              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -2731,11 +2712,10 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 420,
+          "entityId": 825,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace",
-            "offhand": "eastbrook_buckler"
+            "mainhand": "training_mace"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -2789,7 +2769,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 421,
+          "entityId": 826,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2825,7 +2805,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 415
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -2838,7 +2818,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 415,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2888,7 +2868,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 416,
+          "id": 821,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2939,7 +2919,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 417,
+          "id": 822,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2997,7 +2977,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 69,
-          "id": 418,
+          "id": 823,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -3048,7 +3028,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 57,
-          "id": 419,
+          "id": 824,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -3090,8 +3070,6 @@
         {
           "aiState": "idle",
           "attackPower": 44,
-          "blockChance": 0.05,
-          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0585,
@@ -3099,18 +3077,16 @@
           "dodgeChance": 0.0585,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 105,
-          "id": 420,
+          "hp": 95,
+          "id": 825,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 105,
+          "maxHp": 95,
           "maxResource": 93,
           "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
-          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -3128,10 +3104,10 @@
           "spellPower": 7,
           "stats": {
             "agi": 17,
-            "armor": 133,
+            "armor": 99,
             "int": 13,
             "spi": 14,
-            "sta": 23,
+            "sta": 22,
             "str": 22
           },
           "templateId": "paladin",
@@ -3152,7 +3128,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 421
+              "sourceId": 826
             }
           ],
           "blockChance": 0.05,
@@ -3165,7 +3141,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 421,
+          "id": 826,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -3209,9 +3185,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 422,
-      "state": "4f2fc613",
-      "events": "d43134f1",
+      "nextId": 827,
+      "state": "e03ce7c8",
+      "events": "f0a6da6f",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -3249,7 +3225,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -3303,7 +3279,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 416,
+          "entityId": 821,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3359,7 +3335,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 417,
+          "entityId": 822,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -3413,7 +3389,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 418,
+          "entityId": 823,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -3470,7 +3446,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 419,
+          "entityId": 824,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3520,7 +3496,6 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
-              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -3528,11 +3503,10 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 420,
+          "entityId": 825,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace",
-            "offhand": "eastbrook_buckler"
+            "mainhand": "training_mace"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -3586,7 +3560,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 421,
+          "entityId": 826,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -3622,7 +3596,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 415
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -3635,7 +3609,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 415,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -3685,7 +3659,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 416,
+          "id": 821,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -3736,7 +3710,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 417,
+          "id": 822,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -3794,7 +3768,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 69,
-          "id": 418,
+          "id": 823,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -3845,7 +3819,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 57,
-          "id": 419,
+          "id": 824,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -3887,8 +3861,6 @@
         {
           "aiState": "idle",
           "attackPower": 44,
-          "blockChance": 0.05,
-          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0585,
@@ -3896,18 +3868,16 @@
           "dodgeChance": 0.0585,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 105,
-          "id": 420,
+          "hp": 95,
+          "id": 825,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 105,
+          "maxHp": 95,
           "maxResource": 93,
           "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
-          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -3925,10 +3895,10 @@
           "spellPower": 7,
           "stats": {
             "agi": 17,
-            "armor": 133,
+            "armor": 99,
             "int": 13,
             "spi": 14,
-            "sta": 23,
+            "sta": 22,
             "str": 22
           },
           "templateId": "paladin",
@@ -3949,7 +3919,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 421
+              "sourceId": 826
             }
           ],
           "blockChance": 0.05,
@@ -3962,7 +3932,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 421,
+          "id": 826,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -4006,9 +3976,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 422,
-      "state": "4f2fc613",
-      "events": "d08918c5",
+      "nextId": 827,
+      "state": "e03ce7c8",
+      "events": "1760ad46",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -4046,7 +4016,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -4100,7 +4070,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 416,
+          "entityId": 821,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -4156,7 +4126,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 417,
+          "entityId": 822,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -4210,7 +4180,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 418,
+          "entityId": 823,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -4267,7 +4237,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 419,
+          "entityId": 824,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -4317,7 +4287,6 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
-              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -4325,11 +4294,10 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 420,
+          "entityId": 825,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace",
-            "offhand": "eastbrook_buckler"
+            "mainhand": "training_mace"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -4383,7 +4351,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 421,
+          "entityId": 826,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -4419,7 +4387,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 415
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -4432,7 +4400,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 415,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -4482,7 +4450,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 416,
+          "id": 821,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -4533,7 +4501,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 417,
+          "id": 822,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -4591,7 +4559,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 69,
-          "id": 418,
+          "id": 823,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -4642,7 +4610,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 57,
-          "id": 419,
+          "id": 824,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -4684,8 +4652,6 @@
         {
           "aiState": "idle",
           "attackPower": 44,
-          "blockChance": 0.05,
-          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0585,
@@ -4693,18 +4659,16 @@
           "dodgeChance": 0.0585,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 105,
-          "id": 420,
+          "hp": 95,
+          "id": 825,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 105,
+          "maxHp": 95,
           "maxResource": 93,
           "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
-          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -4722,10 +4686,10 @@
           "spellPower": 7,
           "stats": {
             "agi": 17,
-            "armor": 133,
+            "armor": 99,
             "int": 13,
             "spi": 14,
-            "sta": 23,
+            "sta": 22,
             "str": 22
           },
           "templateId": "paladin",
@@ -4746,7 +4710,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 421
+              "sourceId": 826
             }
           ],
           "blockChance": 0.05,
@@ -4759,7 +4723,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 421,
+          "id": 826,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -4803,8 +4767,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 422,
-      "state": "4f2fc613",
+      "nextId": 827,
+      "state": "e03ce7c8",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -4843,7 +4807,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -4897,7 +4861,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 416,
+          "entityId": 821,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -4953,7 +4917,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 417,
+          "entityId": 822,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -5007,7 +4971,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 418,
+          "entityId": 823,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -5064,7 +5028,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 419,
+          "entityId": 824,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -5114,7 +5078,6 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
-              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -5122,11 +5085,10 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 420,
+          "entityId": 825,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace",
-            "offhand": "eastbrook_buckler"
+            "mainhand": "training_mace"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -5180,7 +5142,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 421,
+          "entityId": 826,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -5216,7 +5178,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 415
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -5229,7 +5191,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 415,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -5279,7 +5241,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 416,
+          "id": 821,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -5330,7 +5292,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 417,
+          "id": 822,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -5388,7 +5350,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 69,
-          "id": 418,
+          "id": 823,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -5439,7 +5401,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 57,
-          "id": 419,
+          "id": 824,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -5481,8 +5443,6 @@
         {
           "aiState": "idle",
           "attackPower": 44,
-          "blockChance": 0.05,
-          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0585,
@@ -5490,18 +5450,16 @@
           "dodgeChance": 0.0585,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 105,
-          "id": 420,
+          "hp": 95,
+          "id": 825,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 105,
+          "maxHp": 95,
           "maxResource": 93,
           "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
-          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -5519,10 +5477,10 @@
           "spellPower": 7,
           "stats": {
             "agi": 17,
-            "armor": 133,
+            "armor": 99,
             "int": 13,
             "spi": 14,
-            "sta": 23,
+            "sta": 22,
             "str": 22
           },
           "templateId": "paladin",
@@ -5543,7 +5501,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 421
+              "sourceId": 826
             }
           ],
           "blockChance": 0.05,
@@ -5556,7 +5514,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 421,
+          "id": 826,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
