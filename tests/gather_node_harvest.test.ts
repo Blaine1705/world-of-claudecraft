@@ -1353,6 +1353,73 @@ describe('fine material grades on the live harvest path', () => {
     expect(slot.durability).toBe(chargesBefore);
   });
 
+  it('a mid-cast mint on a DIFFERENT profession leaves the live cast consent intact (R40)', () => {
+    // The phase 14 QA finding: slotToolEffectAction cleared the consent
+    // capture unconditionally, so slotting an herbalism charm during a
+    // confirmed mining cast silently revoked the mining consent and the
+    // confirmed use minted base grade. The clear is now scoped to the
+    // casting profession.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('iron_mining_pick', 1, pid);
+    sim.addItem('artisans_eye', 1, pid);
+    sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
+    const meta = mustMeta(sim, pid);
+    meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
+    const slot = meta.toolEffectSlots?.mining;
+    expect(slot).toBeDefined();
+    if (!slot) return;
+    slot.confirmMode = 'prompt';
+    const chargesBefore = slot.durability;
+    // The unrelated profession's kit, minted MID-CAST below.
+    sim.addItem('gathering_sickle', 1, pid);
+    sim.addItem('gatherers_cache', 1, pid);
+
+    teleportOntoNode(sim, pid, MIREFEN_T2);
+    expect(sim.harvestNode(MIREFEN_T2, true, pid)).toBe(true);
+    sim.slotToolEffect('herbalism', 'gatherers_cache', undefined, pid);
+    completeCastNow(sim, pid);
+    sim.tick();
+
+    // The confirmed mining use survived the herbalism mint: fine grade
+    // minted, mining charge spent.
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(1);
+    expect(slot.durability).toBe(chargesBefore - 1);
+  });
+
+  it('a mid-cast mint on the SAME profession still retires the consent (the R47 clear)', () => {
+    // The scoped clear keeps its original purpose: replacing the CASTING
+    // profession's slot mid-cast retires both captures, so the freshly
+    // minted prompt slot cannot inherit consent given for the old one.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('iron_mining_pick', 1, pid);
+    sim.addItem('artisans_eye', 2, pid);
+    // First slot stays 'always' so the mid-cast re-slot below is a REAL
+    // mode gain (the no_gain conjunct would refuse a same-mode remint and
+    // the clear under test would never run).
+    sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
+    const meta = mustMeta(sim, pid);
+    meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
+    expect(meta.toolEffectSlots?.mining?.confirmMode).toBe('always');
+
+    teleportOntoNode(sim, pid, MIREFEN_T2);
+    expect(sim.harvestNode(MIREFEN_T2, true, pid)).toBe(true);
+    // Replace the casting profession's own slot mid-cast, prompt-mode mint.
+    sim.slotToolEffect('mining', 'artisans_eye', 'prompt', pid);
+    const minted = meta.toolEffectSlots?.mining;
+    expect(minted?.confirmMode).toBe('prompt');
+    const mintedCharges = minted?.durability ?? 0;
+    completeCastNow(sim, pid);
+    sim.tick();
+
+    // Consent retired with the old slot: the new prompt slot did not fire,
+    // the harvest minted base grade, and the fresh charge is intact.
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
+    expect(sim.countItem('iron_ore', pid)).toBe(1);
+    expect(minted?.durability).toBe(mintedCharges);
+  });
+
   it('the consent defaults split by caller class: readers effect-assisted, commands fail-safe', () => {
     // The documented asymmetry, pinned so a future caller omitting the
     // argument gets exactly the intended answer: harvestYieldItemId (and

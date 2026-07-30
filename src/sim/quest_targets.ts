@@ -10,7 +10,7 @@
 
 import { CAMPS, ESCORTS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
 import { nodeMaterialFor } from './professions/gathering';
-import { fineMaterialFor } from './professions/material_grades';
+import { fineGradeReachable, fineMaterialFor } from './professions/material_grades';
 import {
   type GatherNodeType,
   type QuestObjective,
@@ -124,25 +124,40 @@ export function gatherNodeClusters(
 /**
  * The clusters of nodes whose HARVEST feeds a collect objective for `itemId`
  * (the UX pass): a node counts when its zone-and-type yield IS the item, or
- * when the item is that yield's fine grade (a fine objective is banked at
- * the same veins; only the tool decides the grade). Before this arm, a
- * collect objective for a node-yield material drew NO map guidance at all:
- * no mob drops it and no ground object carries it, so the classic blobs
+ * when the item is that yield's fine grade AND the vein can actually mint
+ * it (fineGradeReachable, the grant's own node-tier arm: a tier-1 vein of a
+ * gatherTier-2 material yields the plain grade forever, whatever the tool,
+ * so circling it for a fine objective would guide the player to nodes that
+ * can categorically never drop the item). Before this arm, a collect
+ * objective for a node-yield material drew NO map guidance at all: no mob
+ * drops it and no ground object carries it, so the classic blobs
  * (questObjectiveAreas below) skipped it entirely, while the four
  * 'gather'-typed objectives in content drew theirs. Same linkage and pin
  * story as gatherNodeClusters.
+ *
+ * Memoized per (item id, link distance): every input is static content
+ * (GATHER_NODES and the grade tables) and the map view re-asks per redraw
+ * for every incomplete collect objective, so the filter-and-union work
+ * runs once per distinct ask for the process lifetime.
  */
+const yieldClusterMemo = new Map<string, { x: number; z: number }[][]>();
 export function nodeYieldClusters(
   itemId: string,
   linkYd: number = NODE_CLUSTER_LINK_YD,
 ): { x: number; z: number }[][] {
-  return clusterNodes(
+  const key = `${itemId}:${linkYd}`;
+  const hit = yieldClusterMemo.get(key);
+  if (hit) return hit;
+  const clusters = clusterNodes(
     GATHER_NODES.filter((n) => {
       const base = nodeMaterialFor(n.type, n.zoneId).itemId;
-      return base === itemId || fineMaterialFor(base) === itemId;
+      if (base === itemId) return true;
+      return fineMaterialFor(base) === itemId && fineGradeReachable(base, n.tier);
     }),
     linkYd,
   );
+  yieldClusterMemo.set(key, clusters);
+  return clusters;
 }
 
 function clusterNodes(

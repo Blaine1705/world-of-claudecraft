@@ -217,6 +217,26 @@ describe('questObjectiveAreas', () => {
     }
   });
 
+  it('the fine-grade arm circles only veins that can actually mint the fine item', () => {
+    // The grant's node-tier arm (fineGradeReachable): iron_ore is a
+    // gatherTier-2 material, so mirefen's tier-1 ore nodes yield plain
+    // iron_ore forever, whatever the tool. A fine_iron_ore collect
+    // objective must not guide the player to them. Literal coordinates from
+    // src/sim/content/gather_nodes.ts pin the split: ore_mirefen_2 (tier 1,
+    // -30/360) excluded, ore_mirefen_t2b (tier 2, 45/491) included.
+    const points = nodeYieldClusters('fine_iron_ore').flat();
+    expect(points.length).toBeGreaterThan(0);
+    expect(points.some((p) => p.x === -30 && p.z === 360)).toBe(false);
+    expect(points.some((p) => p.x === 45 && p.z === 491)).toBe(true);
+    // The BASE arm keeps every vein: a plain iron_ore objective still
+    // circles the tier-1 nodes that yield it.
+    const basePoints = nodeYieldClusters('iron_ore').flat();
+    expect(basePoints.some((p) => p.x === -30 && p.z === 360)).toBe(true);
+    // And the memo returns the identical object per (item, distance) ask:
+    // static content, computed once.
+    expect(nodeYieldClusters('fine_iron_ore')).toBe(nodeYieldClusters('fine_iron_ore'));
+  });
+
   it('a gather objective still draws its node clusters (the hand-verify arm)', () => {
     // The pass-2 capture question resolved: the GATHER arm works (this
     // drive), so the captured quest with no circle was the collect class

@@ -26,6 +26,7 @@ import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from '../content
 import { ITEMS } from '../data';
 import type { SimContext } from '../sim_context';
 import { recordAction, withinActionThrottle } from './action_throttle';
+import { gatherNodeById, NODE_HARVEST_TABLE } from './gathering';
 import {
   resolveRechargeToolEffect,
   resolveSlotToolEffect,
@@ -93,13 +94,23 @@ export function slotToolEffectAction(
   // the parity digest (every deny arm above returns before this line).
   r.meta.toolEffectSlots ??= {};
   r.meta.toolEffectSlots[resolved.professionId] = resolved.slot;
-  // A fresh mint retires any live gather cast's R47 start-capture: the
-  // re-slot toll (this whole charm) is the sanctioned way DOWN off a price
-  // rung, so a stale capture from the OLD slot's cast must not re-latch the
-  // new slot's ceiling at completion. Draw-free field write, '' is the inert
-  // no-capture value.
-  r.e.gatherCastToolRarity = '';
-  r.e.gatherCastEffectConfirmed = false;
+  // A fresh mint retires a live gather cast's R47 start-capture and R40
+  // consent, but ONLY for the profession this mint touches: the re-slot
+  // toll (this whole charm) is the sanctioned way DOWN off a price rung, so
+  // a stale capture from the OLD slot's cast must not re-latch the new
+  // slot's ceiling at completion. A cast on a DIFFERENT profession is
+  // untouched by this mint (its slot, its consent, and its rarity capture
+  // all belong to the other profession), so revoking its captures here
+  // would silently strip a confirmed prompt use mid-cast (the phase 14 QA
+  // finding). No live cast means the fields are already inert and the
+  // clear is a no-op kept for the defensive arm (an unknown cast node id).
+  // Draw-free field writes; '' / false are the inert values.
+  const castNode = r.e.gatherCastNodeId !== '' ? gatherNodeById(r.e.gatherCastNodeId) : undefined;
+  const castProfession = castNode ? NODE_HARVEST_TABLE[castNode.type].professionId : undefined;
+  if (castProfession === undefined || castProfession === resolved.professionId) {
+    r.e.gatherCastToolRarity = '';
+    r.e.gatherCastEffectConfirmed = false;
+  }
   ctx.emit({
     type: 'toolEffectResult',
     action: 'slot',
