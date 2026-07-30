@@ -10830,11 +10830,17 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Ratunek: /unstuck rozpoczyna nieruchome odliczanie, które przeniesie cię do pobliskiego, osiągalnego bezpiecznego miejsca.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Ratunek: /unstuck rozpoczyna nieruchome odliczanie, a następnie wysyła twojego ducha na najbliższy cmentarz. Powrót przez Bladego Strażnika wymaga Opłaty Strażnika.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Ratunek: /unstuck rozpoczyna nieruchome odliczanie, a następnie przenosi cię na najbliższy cmentarz i wskrzesza, jeśli padłeś. Choroba Wyzwolenia pozostaje na tobie do 5 minut.',
   'hudChrome.unstuck.menuButton': 'Wyzwolenie',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Zostałeś przeniesiony na najbliższy cmentarz. Choroba Wyzwolenia ciąży na tobie.',
   'hudChrome.unstuck.noSafePosition':
     'Nie znaleziono w pobliżu żadnego osiągalnego bezpiecznego miejsca. Nie zostałeś przeniesiony.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Zostałeś przeniesiony na najbliższy cmentarz i wskrzeszony. Opłata Strażnika ciąży na tobie.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Zostałeś przeniesiony na najbliższy cmentarz i wskrzeszony. Choroba Wyzwolenia ciąży na tobie.',
   'hudChrome.unstuck.standStill': 'Stój nieruchomo na stałym gruncie, zanim użyjesz Wyzwolenia.',
   'hudChrome.unstuck.standStillAnywhere': 'Stój nieruchomo, zanim użyjesz Wyzwolenia.',
   'hudChrome.unstuck.started':

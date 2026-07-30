@@ -10839,11 +10839,17 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Pemulihan: /unstuck memulai hitung mundur diam di tempat untuk memindahkanmu ke titik aman terjangkau terdekat.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Pemulihan: /unstuck memulai hitung mundur diam di tempat, lalu mengirim rohmu ke kuburan terdekat. Kembali lewat Sang Penjaga Pucat membutuhkan Upeti Sang Penjaga.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Pemulihan: /unstuck memulai hitung mundur diam di tempat, lalu memindahkanmu ke kuburan terdekat dan menghidupkanmu kembali jika kamu telah tumbang. Penyakit Pelepasan tetap membebanimu hingga 5 menit.',
   'hudChrome.unstuck.menuButton': 'Lepaskan Diri',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Kamu telah dipindahkan ke kuburan terdekat. Penyakit Pelepasan membebanimu.',
   'hudChrome.unstuck.noSafePosition':
     'Tidak ditemukan titik aman terjangkau di dekatmu. Kamu tidak dipindahkan.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Kamu telah dikembalikan ke kuburan terdekat dan dihidupkan kembali. Upeti Sang Penjaga membebanimu.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Kamu telah dipindahkan ke kuburan terdekat dan dihidupkan kembali. Penyakit Pelepasan membebanimu.',
   'hudChrome.unstuck.standStill':
     'Berdirilah diam di tanah padat sebelum menggunakan Lepaskan Diri.',
   'hudChrome.unstuck.standStillAnywhere': 'Berdirilah diam sebelum menggunakan Lepaskan Diri.',

@@ -10887,11 +10887,17 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Herstel: /unstuck start een stilstaande aftelling die je verplaatst naar een nabije bereikbare veilige plek.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Herstel: /unstuck start een stilstaande aftelling en stuurt je geest daarna naar het dichtstbijzijnde kerkhof. Terugkeren via De Bleke Hoeder vereist de Tol van de Hoeder.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Herstel: /unstuck start een stilstaande aftelling en verplaatst je daarna naar het dichtstbijzijnde kerkhof, waarbij je herrijst als je was gevallen. De Loskomingsziekte blijft tot 5 minuten op je.',
   'hudChrome.unstuck.menuButton': 'Loskomen',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Je bent naar het dichtstbijzijnde kerkhof verplaatst. De Loskomingsziekte weegt op je.',
   'hudChrome.unstuck.noSafePosition':
     'Er is geen bereikbare veilige plek in de buurt gevonden. Je bent niet verplaatst.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Je bent teruggebracht naar het dichtstbijzijnde kerkhof en herrezen. De Tol van de Hoeder weegt op je.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Je bent naar het dichtstbijzijnde kerkhof verplaatst en herrezen. De Loskomingsziekte weegt op je.',
   'hudChrome.unstuck.standStill': 'Sta stil op vaste grond voordat je Loskomen gebruikt.',
   'hudChrome.unstuck.standStillAnywhere': 'Sta stil voordat je Loskomen gebruikt.',
   'hudChrome.unstuck.started':

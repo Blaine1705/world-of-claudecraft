@@ -10760,11 +10760,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên để đưa bạn đến một vị trí an toàn gần đó có thể tiếp cận được.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên, sau đó đưa linh hồn của bạn đến nghĩa trang gần nhất. Quay lại qua Người Giữ Nhợt Nhạt yêu cầu Phí Tổn Của Người Giữ.',
+  'hudChrome.unstuck.helpUnstuckSickness': 'Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên, sau đó đưa bạn đến nghĩa trang gần nhất và hồi sinh bạn nếu bạn đã ngã xuống. Hội Chứng Thoát Kẹt sẽ đè nặng lên bạn tối đa 5 phút.',
   'hudChrome.unstuck.menuButton': 'Thoát Kẹt',
+  'hudChrome.unstuck.movedToGraveyard': 'Bạn đã được đưa đến nghĩa trang gần nhất. Hội Chứng Thoát Kẹt đang đè nặng lên bạn.',
   'hudChrome.unstuck.noSafePosition':
     'Không tìm thấy vị trí an toàn nào có thể tiếp cận gần đó. Bạn đã không được di chuyển.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Bạn đã được đưa về nghĩa trang gần nhất và hồi sinh. Phí Tổn Của Người Giữ đang đè nặng lên bạn.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck': 'Bạn đã được đưa đến nghĩa trang gần nhất và hồi sinh. Hội Chứng Thoát Kẹt đang đè nặng lên bạn.',
   'hudChrome.unstuck.standStill': 'Đứng yên trên mặt đất vững chắc trước khi sử dụng Thoát Kẹt.',
   'hudChrome.unstuck.standStillAnywhere': 'Đứng yên trước khi sử dụng Thoát Kẹt.',
   'hudChrome.unstuck.started':

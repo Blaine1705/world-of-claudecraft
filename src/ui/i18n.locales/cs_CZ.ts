@@ -10704,11 +10704,17 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Záchrana: /unstuck spustí nehybné odpočítávání, které tě přemístí na nedaleké dostupné bezpečné místo.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Záchrana: /unstuck spustí nehybné odpočítávání a poté pošle tvého ducha na nejbližší hřbitov. Návrat přes Bledého strážce vyžaduje Strážcovo mýtné.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Záchrana: /unstuck spustí nehybné odpočítávání a poté tě přenese na nejbližší hřbitov, a pokud jsi padl, oživí tě. Nemoc z vyproštění na tobě zůstane až 5 minut.',
   'hudChrome.unstuck.menuButton': 'Vyproštění',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Byl jsi přenesen na nejbližší hřbitov. Nemoc z vyproštění na tobě leží.',
   'hudChrome.unstuck.noSafePosition':
     'V okolí nebylo nalezeno žádné dostupné bezpečné místo. Nebyl jsi přemístěn.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Byl jsi vrácen na nejbližší hřbitov a oživen. Strážcovo mýtné na tobě leží.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Byl jsi přenesen na nejbližší hřbitov a oživen. Nemoc z vyproštění na tobě leží.',
   'hudChrome.unstuck.standStill': 'Zůstaň stát na pevné zemi, než použiješ Vyproštění.',
   'hudChrome.unstuck.standStillAnywhere': 'Zůstaň stát, než použiješ Vyproštění.',
   'hudChrome.unstuck.started':

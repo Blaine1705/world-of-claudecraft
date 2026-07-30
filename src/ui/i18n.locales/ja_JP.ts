@@ -9174,11 +9174,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '日々使う便利なコマンドをいくつか覚えておくとよいでしょう。/w 名前 でウィスパーを送り、/r で最後に受け取ったウィスパーに返信します。/invite で誰かをパーティに誘い、/follow で仲間の後ろについて歩き、/roll でグループの全員に見えるサイコロを振り、/who でオンラインの相手を確認し、/afk で離席中を示します。全一覧はゲーム内で /help と打てば見られます。',
   'guide.social.slashHeading': '便利なスラッシュコマンド',
   // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.helpUnstuckSickness':
+    '復帰：/unstuck はその場でカウントダウンを開始し、完了すると最寄りの墓地へ移動します。倒れていた場合は蘇生します。スタック解除の後遺症が最大5分間残ります。',
   'hudChrome.unstuck.menuButton': 'スタック解除',
   'hudChrome.unstuck.help':
     '復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。',
   'hudChrome.unstuck.helpAtGraveyard':
     '復帰：/unstuck はその場でカウントダウンを開始し、完了すると魂を最寄りの墓地へ送ります。生き返るには霊魂の癒し手から番人の代償を受ける必要があります。',
+  'hudChrome.unstuck.movedToGraveyard':
+    '最寄りの墓地へ移動しました。スタック解除の後遺症があなたにのしかかっています。',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    '最寄りの墓地へ移動し、蘇生しました。スタック解除の後遺症があなたにのしかかっています。',
   'hudChrome.unstuck.started':
     '{seconds}秒後にスタックを解除します。移動、戦闘、被ダメージ、別の行動を始めるとキャンセルされます。',
   'hudChrome.unstuck.countdown': 'スタック解除：{seconds}',

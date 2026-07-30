@@ -10929,11 +10929,17 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Rettung: /unstuck startet einen Countdown im Stehen, der dich zu einer nahen, erreichbaren sicheren Stelle bewegt.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Rettung: /unstuck startet einen Countdown im Stehen und schickt deinen Geist dann zum nächsten Friedhof. Die Rückkehr über den Bleichen Hüter erfordert den Hüterzoll.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Rettung: /unstuck startet einen Countdown im Stehen und bringt dich dann zum nächsten Friedhof, wobei du wiederbelebt wirst, falls du gefallen warst. Die Befreiungskrankheit bleibt bis zu 5 Minuten auf dir.',
   'hudChrome.unstuck.menuButton': 'Befreien',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Du wurdest zum nächsten Friedhof gebracht. Die Befreiungskrankheit lastet auf dir.',
   'hudChrome.unstuck.noSafePosition':
     'In der Nähe wurde keine erreichbare sichere Stelle gefunden. Du wurdest nicht bewegt.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Du wurdest zum nächsten Friedhof zurückgebracht und wiederbelebt. Der Hüterzoll lastet auf dir.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Du wurdest zum nächsten Friedhof gebracht und wiederbelebt. Die Befreiungskrankheit lastet auf dir.',
   'hudChrome.unstuck.standStill': 'Steh still auf festem Boden, bevor du Befreien benutzt.',
   'hudChrome.unstuck.standStillAnywhere': 'Steh still, bevor du Befreien benutzt.',
   'hudChrome.unstuck.started':

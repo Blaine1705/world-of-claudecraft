@@ -10752,11 +10752,17 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Redning: /unstuck starter en stillestående nedtælling, der flytter dig til et nærliggende tilgængeligt sikkert sted.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Redning: /unstuck starter en stillestående nedtælling og sender derefter din ånd til den nærmeste kirkegård. At vende tilbage via Den Blege Vogter kræver Vogterens Klokke.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Redning: /unstuck starter en stillestående nedtælling og flytter dig derefter til den nærmeste kirkegård, hvor du genoplives, hvis du var faldet. Frigørelsessyge bliver på dig i op til 5 minutter.',
   'hudChrome.unstuck.menuButton': 'Frigørelse',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Du er blevet flyttet til den nærmeste kirkegård. Frigørelsessyge tynger dig.',
   'hudChrome.unstuck.noSafePosition':
     'Intet tilgængeligt sikkert sted blev fundet i nærheden. Du blev ikke flyttet.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Du er blevet returneret til den nærmeste kirkegård og genoplivet. Vogterens Klokke tynger dig.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Du er blevet flyttet til den nærmeste kirkegård og genoplivet. Frigørelsessyge tynger dig.',
   'hudChrome.unstuck.standStill': 'Stå stille på fast grund, før du bruger Frigørelse.',
   'hudChrome.unstuck.standStillAnywhere': 'Stå stille, før du bruger Frigørelse.',
   'hudChrome.unstuck.started':

@@ -3772,10 +3772,12 @@ export type UnstuckEvent =
   | {
       type: 'unstuck';
       phase: 'completed';
-      // 'nearest_graveyard': a living player died and rose as a ghost there.
+      // 'moved_to_graveyard': a living player was moved there and left alive.
       // 'revived_at_graveyard': an already dead or released player was pulled to
-      // the graveyard and resurrected under The Keeper's Toll instead.
-      reason: 'nearest_safe_position' | 'nearest_graveyard' | 'revived_at_graveyard';
+      // the graveyard and raised there.
+      // Both charge Unstuck Sickness. 'nearest_safe_position' is the retired
+      // short-range-teleport outcome, kept only so historical telemetry stays typed.
+      reason: 'nearest_safe_position' | 'moved_to_graveyard' | 'revived_at_graveyard';
       area: UnstuckArea;
       origin: UnstuckPosition;
       destination: UnstuckPosition;

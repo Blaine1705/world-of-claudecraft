@@ -10897,11 +10897,17 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Recuperação: /unstuck inicia uma contagem regressiva parado para movê-lo até um local seguro alcançável nas proximidades.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Recuperação: /unstuck inicia uma contagem regressiva parado, depois envia seu espírito ao cemitério mais próximo. Retornar pelo Guardião Pálido exige o Tributo do Guardião.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Recuperação: /unstuck inicia uma contagem regressiva parado, depois leva você ao cemitério mais próximo, reanimando você se havia caído. O Mal do Desbloqueio permanece por até 5 minutos.',
   'hudChrome.unstuck.menuButton': 'Desbloqueio',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Você foi levado ao cemitério mais próximo. O Mal do Desbloqueio pesa sobre você.',
   'hudChrome.unstuck.noSafePosition':
     'Nenhum local seguro alcançável foi encontrado nas proximidades. Você não foi movido.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Você foi levado de volta ao cemitério mais próximo e reanimado. O Tributo do Guardião pesa sobre você.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Você foi levado ao cemitério mais próximo e reanimado. O Mal do Desbloqueio pesa sobre você.',
   'hudChrome.unstuck.standStill': 'Fique parado em terreno firme antes de usar Desbloqueio.',
   'hudChrome.unstuck.standStillAnywhere': 'Fique parado antes de usar Desbloqueio.',
   'hudChrome.unstuck.started':

@@ -10949,11 +10949,17 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Recupero: /unstuck avvia un conto alla rovescia da fermo per spostarti in un punto sicuro raggiungibile nelle vicinanze.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Recupero: /unstuck avvia un conto alla rovescia da fermo, poi invia il tuo spirito al cimitero più vicino. Tornare tramite il Custode Pallido richiede il Mal di resurrezione.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Recupero: /unstuck avvia un conto alla rovescia da fermo, poi ti sposta al cimitero più vicino, rianimandoti se eri caduto. Ti lascia il Mal di sblocco per un massimo di 5 minuti.',
   'hudChrome.unstuck.menuButton': 'Sblocco',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Sei stato spostato al cimitero più vicino. Il Mal di sblocco grava su di te.',
   'hudChrome.unstuck.noSafePosition':
     'Non è stato trovato alcun punto sicuro raggiungibile nelle vicinanze. Non sei stato spostato.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Sei stato riportato al cimitero più vicino e rianimato. Il Mal di resurrezione grava su di te.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Sei stato spostato al cimitero più vicino e rianimato. Il Mal di sblocco grava su di te.',
   'hudChrome.unstuck.standStill': 'Resta fermo su terreno solido prima di usare Sblocco.',
   'hudChrome.unstuck.standStillAnywhere': 'Resta fermo prima di usare Sblocco.',
   'hudChrome.unstuck.started':

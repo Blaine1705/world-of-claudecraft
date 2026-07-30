@@ -10783,11 +10783,17 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Kurtarma: /unstuck, seni yakındaki ulaşılabilir güvenli bir noktaya taşıyacak hareketsiz bir geri sayım başlatır.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Kurtarma: /unstuck hareketsiz bir geri sayım başlatır, ardından ruhunu en yakın mezarlığa gönderir. Solgun Gözcü aracılığıyla dönmek Gözcünün Bedelini gerektirir.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Kurtarma: /unstuck hareketsiz bir geri sayım başlatır, ardından seni en yakın mezarlığa taşır ve düşmüşsen diriltir. En fazla 5 dakika boyunca üzerinde Kurtulma Hastalığı kalır.',
   'hudChrome.unstuck.menuButton': 'Kurtulma',
+  'hudChrome.unstuck.movedToGraveyard':
+    'En yakın mezarlığa taşındın. Kurtulma Hastalığı üzerinde ağırlık yapıyor.',
   'hudChrome.unstuck.noSafePosition':
     'Yakınlarda ulaşılabilir güvenli bir nokta bulunamadı. Taşınmadın.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'En yakın mezarlığa döndürüldün ve diriltildin. Gözcünün Bedeli üzerinde ağırlık yapıyor.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'En yakın mezarlığa taşındın ve diriltildin. Kurtulma Hastalığı üzerinde ağırlık yapıyor.',
   'hudChrome.unstuck.standStill': 'Kurtulmayı kullanmadan önce sağlam zeminde hareketsiz dur.',
   'hudChrome.unstuck.standStillAnywhere': 'Kurtulmayı kullanmadan önce hareketsiz dur.',
   'hudChrome.unstuck.started':

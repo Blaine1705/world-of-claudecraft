@@ -8758,10 +8758,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '有幾個日常指令值得記住：/w 名稱 可發送密語，/r 則回覆你最近收到的一則，/invite 邀請某人加入你的隊伍，/follow 跟隨在朋友身後，/roll 為隊伍擲骰讓大家看見，/who 顯示誰在線上，而 /afk 則標示你暫時離開。在遊戲中輸入 /help 可查看完整清單。',
   'guide.social.slashHeading': '實用的斜線指令',
   // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.helpUnstuckSickness':
+    '脫困：/unstuck 會啟動原地倒數，結束後將你移動到最近的墓地，若你已倒下則會復活你。你將帶著脫困虛弱，最多持續 5 分鐘。',
   'hudChrome.unstuck.menuButton': '脫困',
   'hudChrome.unstuck.help': '脫困：/unstuck 會啟動原地倒數，之後將你移動到附近可到達的安全位置。',
   'hudChrome.unstuck.helpAtGraveyard':
     '脫困：/unstuck 會啟動原地倒數，結束後將你的靈魂送往最近的墓地。你必須向靈魂醫者接受守護者的代價才能復活。',
+  'hudChrome.unstuck.movedToGraveyard': '你已被移動到最近的墓地。脫困虛弱正壓在你身上。',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    '你已被移動到最近的墓地並復活。脫困虛弱正壓在你身上。',
   'hudChrome.unstuck.started':
     '將在 {seconds} 秒後脫困。移動、戰鬥、受到傷害或開始其他動作都會取消。',
   'hudChrome.unstuck.countdown': '脫困：{seconds}',

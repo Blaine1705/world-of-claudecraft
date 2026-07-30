@@ -10770,11 +10770,17 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Räddning: /unstuck startar en stillastående nedräkning som flyttar dig till en närliggande nåbar säker plats.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Räddning: /unstuck startar en stillastående nedräkning och skickar sedan din ande till närmaste kyrkogård. Att återvända via Den bleka väktaren kräver Väktarens tribut.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Räddning: /unstuck startar en stillastående nedräkning och flyttar dig sedan till närmaste kyrkogård, och återupplivar dig om du hade fallit. Räddningssjuka stannar på dig i upp till 5 minuter.',
   'hudChrome.unstuck.menuButton': 'Fastna-hjälp',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Du har flyttats till närmaste kyrkogård. Räddningssjuka vilar tungt på dig.',
   'hudChrome.unstuck.noSafePosition':
     'Ingen nåbar säker plats hittades i närheten. Du flyttades inte.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Du har återförts till närmaste kyrkogård och återupplivats. Väktarens tribut vilar tungt på dig.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Du har flyttats till närmaste kyrkogård och återupplivats. Räddningssjuka vilar tungt på dig.',
   'hudChrome.unstuck.standStill': 'Stå still på fast mark innan du använder Fastna-hjälp.',
   'hudChrome.unstuck.standStillAnywhere': 'Stå still innan du använder Fastna-hjälp.',
   'hudChrome.unstuck.started':

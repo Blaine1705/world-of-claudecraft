@@ -406,12 +406,14 @@ import * as chatMod from './social/chat';
 import * as tradeMod from './social/trade';
 import {
   applyResurrectionSickness,
+  applyUnstuckSickness,
   RESURRECTION_SICKNESS_ID,
   releasePlayerSpirit,
   resurrectAtCorpse,
   resurrectAtSpiritHealer,
   revivePlayerAt,
   spawnOverworldSpiritHealers,
+  UNSTUCK_SICKNESS_ID,
 } from './spirit';
 import { repairTalentLoadouts } from './talent_loadouts';
 import {
@@ -1473,6 +1475,9 @@ export interface CharacterState {
   // The Keeper's Toll (Resurrection Sickness) remaining seconds (JSONB; optional/null when
   // none). Persisted so the penalty cannot be shed by logging out and back in.
   resSickness?: number | null;
+  // Unstuck Sickness remaining seconds, same contract as resSickness above (JSONB;
+  // optional/null when none, so pre-feature saves stay byte-equal and load clean).
+  unstuckSickness?: number | null;
   jail?: JailState;
   // Z-key sheathed-weapon toggle (JSONB; written only while sheathed, so pre-feature
   // saves and unsheathed characters stay byte-equal and load with the weapon drawn).
@@ -2840,6 +2845,12 @@ export class Sim {
       applyResurrectionSickness(this.ctx, player, savedState.resSickness);
       player.hp = Math.min(player.hp, player.maxHp);
     }
+    // Unstuck Sickness restores the same way. The two are mutually exclusive (see
+    // applySickness in spirit.ts), so a save carrying both resolves to this one.
+    if (savedState?.unstuckSickness && savedState.unstuckSickness > 0) {
+      applyUnstuckSickness(this.ctx, player, savedState.unstuckSickness);
+      player.hp = Math.min(player.hp, player.maxHp);
+    }
     // Resume a ghost: a player who logged out as a released spirit comes back as a
     // ghost at the graveyard (corpse still marked), not freely resurrected. dead stays
     // unset for a non-ghost logout (the pre-existing revive-on-relog behavior).
@@ -3318,6 +3329,8 @@ export class Sim {
       corpsePos: e.corpsePos ? { x: e.corpsePos.x, z: e.corpsePos.z } : null,
       // The Keeper's Toll persists across logout (it cannot be shed by relogging).
       resSickness: e.auras.find((a) => a.id === RESURRECTION_SICKNESS_ID)?.remaining ?? null,
+      // Unstuck Sickness persists across logout for the same reason.
+      unstuckSickness: e.auras.find((a) => a.id === UNSTUCK_SICKNESS_ID)?.remaining ?? null,
       equipment: { ...meta.equipment },
       equipmentInstance: Object.fromEntries(
         Object.entries(meta.equipmentInstance).map(([slot, inst]) => [

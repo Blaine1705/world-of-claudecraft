@@ -79,7 +79,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `mob/social_aggro.ts` + `mob/yells.ts` | flee-for-help rally pull; boss bark broadcast (`MobTemplate.yells`) |
 | `encounters/nythraxis.ts` | the whole Nythraxis raid encounter (per-tick driver, reset/wipe/init, dialogue scheduler, adds + boss mechanics, the Aldric transition + wardstones, the relic/grave-vision quest chain, the encounter CC-immunity predicates) |
 | `world_boss.ts` | hourly world bosses: spawn/scale/announce, contributor tracking, personal loot (`rollWorldBossLoot`), per-boss loot lockouts |
-| `spirit.ts` | death/release/resurrection: graveyards + spirit healers, the ghost run, `releasePlayerSpirit`/`resurrectAtCorpse`/`resurrectAtSpiritHealer` (sickness rules live in the `resurrection.ts` leaf) |
+| `spirit.ts` | death/release/resurrection: graveyards + spirit healers, the ghost run, `releasePlayerSpirit`/`resurrectAtCorpse`/`resurrectAtSpiritHealer`, plus the two `/unstuck` outcomes `moveToGraveyardForUnstuck`/`reviveAtGraveyardForUnstuck` (sickness rules live in the `resurrection.ts` leaf) |
 | `pet/pet_ai.ts` | `updatePet`, follow, ranged attack, target pick |
 | `pet/pet_commands.ts` | the pet command surface + `petOf`/`summonPet`/tame/despawn/`syncPetLevel`/`serializePet`/`restorePet` and the delve pet-park round-trip (`stowPetForDelve`/`restorePetFromDelveStash`) |
 | `items.ts` | equip/use/discard + vendor buy/sell/buyback command bodies (W2 move out of `sim.ts`) |
@@ -101,7 +101,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `social/vale_cup.ts` + `social/vale_cup_bots.ts` | Vale Cup boarball: brackets, the one match slot, the `vcup*` seam arms (pure ball math in the `vale_cup_ball.ts`/`vale_cup_layout.ts` leaves); its tick phase draws ZERO shared rng |
 | `social/yumi.ts` | Protect Yumi 3v3/5v5 maze mode (layout leaf `yumi_maze_layout.ts`) |
 | `social/ready_check.ts` | `/ready`: the `readyChecks` primitive + the `updateReadyChecks` phase |
-| `unstuck.ts` | `/unstuck` recovery countdown, same-area safe-point search, cancellation, and cooldown |
+| `unstuck.ts` | `/unstuck` recovery countdown, the graveyard move (alive) or graveyard revive (dead), cancellation, and cooldown. Charges Unstuck Sickness, never a death |
 | `social/card_duel.ts` | the Card Duel minigame (Card Master NPC): queue/match state, the `updateCardDuelQueue` (pairing) and `updateCardDuelDeadlines` (AFK forfeit/void) phases |
 | `instances/card_master.ts` | the Card Master NPC proximity gate (`cardMasterInRange`) `social/card_duel.ts` queues against |
 | `social/trade.ts` + `social/chat.ts` | player trade; the `chat()` router, emotes, whispers, channel membership (readout formatters in `social/chat_readouts.ts`). `Sim` keeps only a thin `chat()` delegate for the `IWorld` facade; new slash commands land in `social/chat.ts`, never on `Sim` |
@@ -132,7 +132,8 @@ recovery timer across competitive resets), `tab_target.ts`/`assist.ts`/
 `market_listing_ids.ts` (the World Market's id allocator: the reserved house band plus
 the load-time reissue that keeps one row per id),
 `vendor_stack.ts`, `loot_master.ts`, `aura_classify.ts` (buff-vs-debuff, shared with the
-HUD), `resurrection.ts` (sickness rules shared by every death site), and the combat
+HUD), `resurrection.ts` (both sicknesses, The Keeper's Toll and the shorter Unstuck one,
+shared by every death site), and the combat
 leaves `spell_resist.ts`/`ranged_shot.ts`/`aura_stacking.ts`/`aura_cancel.ts`/
 `exclusive_aura.ts`/`form_swing.ts`, `jail.ts` (moderation-jail cage layout, gate
 teleport, visitor spot; the jail SYSTEM logic stays on `Sim`), and

@@ -28,6 +28,22 @@ const error = (key: TranslationKey): UnstuckFeedback => ({
 
 const seconds = (value: number): string => formatNumber(value, { maximumFractionDigits: 0 });
 
+/**
+ * The two live outcomes both end at the graveyard under Unstuck Sickness and differ only in
+ * whether a revive happened, so they get their own keys. 'nearest_safe_position' is the
+ * retired short-range teleport, still reachable only by replaying historical telemetry.
+ */
+function completedKey(reason: Extract<Event, { phase: 'completed' }>['reason']): TranslationKey {
+  switch (reason) {
+    case 'moved_to_graveyard':
+      return 'hudChrome.unstuck.movedToGraveyard';
+    case 'revived_at_graveyard':
+      return 'hudChrome.unstuck.revivedAtGraveyardUnstuck';
+    case 'nearest_safe_position':
+      return 'hudChrome.unstuck.completed';
+  }
+}
+
 export function unstuckFeedback(event: Event): UnstuckFeedback {
   if (event.phase === 'started') {
     return {
@@ -52,10 +68,7 @@ export function unstuckFeedback(event: Event): UnstuckFeedback {
   }
   if (event.phase === 'completed') {
     return {
-      key:
-        event.reason === 'revived_at_graveyard'
-          ? 'hudChrome.unstuck.revivedAtGraveyard'
-          : 'hudChrome.unstuck.completedAtGraveyard',
+      key: completedKey(event.reason),
       kind: 'success',
       banner: true,
       log: true,

@@ -10577,11 +10577,17 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Recuperación: /unstuck inicia una cuenta regresiva estacionaria para llevarte a un punto seguro accesible cercano.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Recuperación: /unstuck inicia una cuenta regresiva estacionaria y luego envía tu espíritu al cementerio más cercano. Volver a través del Guardián Pálido requiere el Tañido del Guardián.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Recuperación: /unstuck inicia una cuenta regresiva estacionaria y luego te traslada al cementerio más cercano, reviviéndote si habías caído. Te deja con el Mal de desatasco durante un máximo de 5 minutos.',
   'hudChrome.unstuck.menuButton': 'Desatascar',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Has sido trasladado al cementerio más cercano. El Mal de desatasco pesa sobre ti.',
   'hudChrome.unstuck.noSafePosition':
     'No se encontró ningún punto seguro accesible cerca. No fuiste trasladado.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Has sido devuelto al cementerio más cercano y revivido. El Tañido del Guardián pesa sobre ti.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Has sido trasladado al cementerio más cercano y revivido. El Mal de desatasco pesa sobre ti.',
   'hudChrome.unstuck.standStill': 'Quédate quieto sobre suelo firme antes de usar Desatascar.',
   'hudChrome.unstuck.standStillAnywhere': 'Quédate quieto antes de usar Desatascar.',
   'hudChrome.unstuck.started':

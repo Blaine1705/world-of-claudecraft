@@ -10928,11 +10928,17 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Récupération : /unstuck démarre un compte à rebours immobile qui vous déplace vers un endroit sûr et accessible à proximité.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Récupération : /unstuck démarre un compte à rebours immobile, puis envoie votre esprit au cimetière le plus proche. Revenir par le Veilleur pâle exige le Glas du Veilleur.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Récupération : /unstuck démarre un compte à rebours immobile, puis vous déplace au cimetière le plus proche en vous ranimant si vous étiez tombé. Le Mal de déblocage vous accable pendant 5 minutes au maximum.',
   'hudChrome.unstuck.menuButton': 'Déblocage',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Vous avez été déplacé au cimetière le plus proche. Le Mal de déblocage pèse sur vous.',
   'hudChrome.unstuck.noSafePosition':
     "Aucun endroit sûr accessible n'a été trouvé à proximité. Vous n'avez pas été déplacé.",
   'hudChrome.unstuck.revivedAtGraveyard':
     'Vous avez été ramené au cimetière le plus proche et ranimé. Le Glas du Veilleur pèse sur vous.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Vous avez été déplacé au cimetière le plus proche et ranimé. Le Mal de déblocage pèse sur vous.',
   'hudChrome.unstuck.standStill':
     "Restez immobile sur un sol stable avant d'utiliser le Déblocage.",
   'hudChrome.unstuck.standStillAnywhere': "Restez immobile avant d'utiliser le Déblocage.",

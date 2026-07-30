@@ -8758,10 +8758,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '有几条日常命令值得记住：/w 名字 发送密语，/r 回复你最近收到的一条，/invite 邀请某人加入你的小队，/follow 跟随一位好友的脚步，/roll 为全队掷骰，/who 显示谁在线，/afk 将你标记为离开。在游戏中输入 /help 可查看完整列表。',
   'guide.social.slashHeading': '实用的斜杠命令',
   // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.helpUnstuckSickness':
+    '脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。你将带着脱困后遗症，最多持续 5 分钟。',
   'hudChrome.unstuck.menuButton': '脱困',
   'hudChrome.unstuck.help': '脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。',
   'hudChrome.unstuck.helpAtGraveyard':
     '脱困：/unstuck 会启动原地倒计时，结束后将你的灵魂送往最近的墓地。你必须向灵魂医者接受守护者的代价才能复活。',
+  'hudChrome.unstuck.movedToGraveyard': '你已被移动到最近的墓地。脱困后遗症正压在你身上。',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    '你已被移动到最近的墓地并复活。脱困后遗症正压在你身上。',
   'hudChrome.unstuck.started':
     '将在 {seconds} 秒后脱困。移动、战斗、受到伤害或开始其他动作都会取消。',
   'hudChrome.unstuck.countdown': '脱困：{seconds}',
