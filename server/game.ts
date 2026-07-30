@@ -53,10 +53,11 @@ import {
 } from '../src/sim/party_frame_info';
 import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
+import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import { populateCommunityRiftPortals } from '../src/sim/rift/portals';
-import type { PetState, PlayerMeta } from '../src/sim/sim';
+import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { RAID_MAX } from '../src/sim/social/party';
 import type { VcMatch } from '../src/sim/social/vale_cup';
@@ -115,6 +116,7 @@ import {
   buildDetectionCalibrationSnapshot,
   type DetectionCalibrationSnapshot,
 } from './calibration_snapshot';
+import { RESTORE_ITEM_MAX_COUNT } from './character_professions';
 import { ChatFilter } from './chat_filter';
 import {
   isChatFilterWrite,
@@ -3930,6 +3932,46 @@ export class GameServer {
       if (session.accountId !== accountId) continue;
       void this.kickSession(session, reason, 'moderation action');
     }
+  }
+
+  // R35 GM professions tooling: a fresh serializeCharacter of a LIVE
+  // character (the stored blob lags the 30s autosave), or null when the
+  // character is not online on this realm process (the liveLevelForCharacter
+  // idiom above).
+  adminCharacterState(characterId: number): CharacterState | null {
+    const session = this.sessionByCharacterId(characterId);
+    return session ? this.sim.serializeCharacter(session.pid) : null;
+  }
+
+  // R35 GM restore: mint a lost item back onto a LIVE character through the
+  // sim's normal grant hub (grants reaching addItem always land). The count
+  // is re-clamped defensively even though the admin handler validates it
+  // (the dev_give 1..20 clamp).
+  adminRestoreItem(
+    characterId: number,
+    itemId: string,
+    count: number,
+  ): 'ok' | 'offline' | 'invalid_item' {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session) return 'offline';
+    if (!Object.hasOwn(ITEMS, itemId)) return 'invalid_item';
+    const clamped = Math.max(1, Math.min(RESTORE_ITEM_MAX_COUNT, Math.floor(count)));
+    this.sim.addItem(itemId, clamped, session.pid);
+    return 'ok';
+  }
+
+  // R35 GM restore: re-mint a lost tool-effect slot row on a LIVE character.
+  // The sim action owns validation, tool-rarity charge sizing, and the
+  // success event the player sees; it is server-admin-only by design (the
+  // free-grant incident), so this runtime method is its ONLY caller.
+  adminRestoreToolEffectSlot(
+    characterId: number,
+    professionId: string,
+    effectId: string,
+  ): 'ok' | 'offline' | 'invalid_request' | 'no_tool' {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session) return 'offline';
+    return restoreToolEffectSlotAction(this.sim.ctx, professionId, effectId, session.pid);
   }
 
   // Force-disconnect the live session (if any) for a character the requesting

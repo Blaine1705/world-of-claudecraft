@@ -1004,6 +1004,45 @@ export async function listCharacters(
   };
 }
 
+// R35 GM professions inspector: one character's identity plus its raw state
+// blob (JSONB, already parsed by pg). The handler overlays a live
+// serializeCharacter snapshot when the character is online, then shapes both
+// through the pure characterProfessionsSheet normalizer.
+export interface AdminCharacterProfessionsRow {
+  id: number;
+  name: string;
+  class: string;
+  level: number;
+  accountId: number;
+  username: string;
+  state: unknown;
+  updatedAt: string;
+}
+
+export async function characterProfessionsRow(
+  characterId: number,
+): Promise<AdminCharacterProfessionsRow | null> {
+  const res = await pool.query(
+    `SELECT c.id, c.name, c.class, c.level, c.account_id, a.username, c.state, c.updated_at
+     FROM characters c
+     JOIN accounts a ON a.id = c.account_id
+     WHERE c.id = $1`,
+    [characterId],
+  );
+  const r = res.rows[0];
+  if (!r) return null;
+  return {
+    id: r.id,
+    name: r.name,
+    class: r.class,
+    level: r.level,
+    accountId: r.account_id,
+    username: r.username,
+    state: r.state,
+    updatedAt: r.updated_at,
+  };
+}
+
 export interface AccountDetail {
   id: number;
   username: string;

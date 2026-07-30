@@ -2,6 +2,7 @@ import type * as http from 'node:http';
 import {
   accountDetail,
   associationsForIp,
+  characterProfessionsRow,
   classDistribution,
   clientPerfRaw,
   clientPerfSummary,
@@ -38,6 +39,11 @@ import {
   verifyPassword,
 } from './auth';
 import { getBugReportScreenshot, listBugReports } from './bug_report_db';
+import {
+  characterProfessionsSheetFromRow,
+  restoreItemBodyError,
+  restoreSlotBodyError,
+} from './character_professions';
 import {
   addFilterWord,
   chatModeratedAccounts,
@@ -92,6 +98,7 @@ import {
   muteAccountChat,
   reactivateAccountAudited,
   recordPasswordReset,
+  recordProfessionsRestore,
   resetChatStrikesAudited,
   setAccountAiFlag,
   setAccountStreamerFlair,
@@ -743,6 +750,75 @@ export async function handleAdminApi(
       }
     }
 
+    // R35 GM restores (professions tooling): validate, require online HERE,
+    // audit row, then the sync live mint (the RouteDef twin's exact order).
+    const restoreItemMatch = /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-item$/.exec(
+      path,
+    );
+    if (req.method === 'POST' && restoreItemMatch) {
+      const id = Number(restoreItemMatch[1]);
+      const body = await readBody(req);
+      const bodyError = restoreItemBodyError(body);
+      if (bodyError) return fail(res, 400, bodyError);
+      const itemId = String(body.itemId);
+      const count = Number(body.count);
+      try {
+        if (game.adminCharacterState(id) === null) {
+          return fail(res, 400, 'character is not online on this realm');
+        }
+        await recordProfessionsRestore({
+          characterId: id,
+          adminAccountId: accountId,
+          action: 'restore_item',
+          detail: `${itemId} x${count}`,
+          reason: body.reason,
+        });
+        const result = game.adminRestoreItem(id, itemId, count);
+        if (result !== 'ok') {
+          return fail(res, 400, 'character went offline before the restore landed');
+        }
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'item restore failed');
+      }
+    }
+    const restoreSlotMatch = /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/.exec(
+      path,
+    );
+    if (req.method === 'POST' && restoreSlotMatch) {
+      const id = Number(restoreSlotMatch[1]);
+      const body = await readBody(req);
+      const bodyError = restoreSlotBodyError(body);
+      if (bodyError) return fail(res, 400, bodyError);
+      const professionId = String(body.professionId);
+      const effectId = String(body.effectId);
+      try {
+        if (game.adminCharacterState(id) === null) {
+          return fail(res, 400, 'character is not online on this realm');
+        }
+        await recordProfessionsRestore({
+          characterId: id,
+          adminAccountId: accountId,
+          action: 'restore_slot',
+          detail: `${professionId}/${effectId}`,
+          reason: body.reason,
+        });
+        const result = game.adminRestoreToolEffectSlot(id, professionId, effectId);
+        if (result === 'no_tool') {
+          return fail(res, 400, 'the character owns no tool for that profession');
+        }
+        if (result === 'invalid_request') {
+          return fail(res, 400, 'that effect cannot be slotted on that profession');
+        }
+        if (result !== 'ok') {
+          return fail(res, 400, 'character went offline before the restore landed');
+        }
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'slot restore failed');
+      }
+    }
+
     // Chat filter: lift mute / reset strikes for an account.
     const liftMuteMatch = /^\/admin\/api\/moderation\/accounts\/(\d+)\/lift-mute$/.exec(path);
     if (req.method === 'POST' && liftMuteMatch) {
@@ -1184,6 +1260,15 @@ export async function handleAdminApi(
       const dir = url.searchParams.get('dir') === 'asc' ? 'asc' : 'desc';
       return ok(res, await listCharacters(search, sort, dir, page, limit));
     }
+    // R35 professions inspector (the RouteDef twin's exact shape: live
+    // serializeCharacter snapshot when online, stored blob otherwise).
+    const characterProfessionsMatch = /^\/admin\/api\/characters\/(\d+)\/professions$/.exec(path);
+    if (characterProfessionsMatch) {
+      const id = Number(characterProfessionsMatch[1]);
+      const row = await characterProfessionsRow(id);
+      if (!row) return fail(res, 404, 'character not found');
+      return ok(res, characterProfessionsSheetFromRow(row, game.adminCharacterState(id)));
+    }
     if (path === '/admin/api/maps') {
       const { page, limit } = parsePageParams(url.searchParams);
       const { rows, total } = await adminMapsDb().listAdmin(limit, (page - 1) * limit);
@@ -1304,6 +1389,11 @@ export type AdminRuntime = Pick<
   | 'applyAntibotConfig'
   | 'startPerfCapture'
   | 'perfCaptureStatus'
+  // R35 GM professions tooling: a live character-state snapshot for the
+  // inspector, and the two audited restores (item mint, slot re-mint).
+  | 'adminCharacterState'
+  | 'adminRestoreItem'
+  | 'adminRestoreToolEffectSlot'
 >;
 
 let runtime: AdminRuntime | null = null;
@@ -1365,6 +1455,7 @@ function makeRealAdminDb() {
   return {
     accountDetail,
     associationsForIp,
+    characterProfessionsRow,
     classDistribution,
     clientPerfRaw,
     clientPerfSummary,
@@ -1415,6 +1506,7 @@ function makeRealAdminDb() {
     isAdminAccount,
     saveToken,
     reactivateAccountAudited,
+    recordProfessionsRestore,
     touchLogin,
     newToken,
     verifyPassword,
@@ -2096,6 +2188,94 @@ async function accountDetailHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { ...detail, online: rt.liveAccountIds().has(id) });
 }
 
+/** GET /admin/api/characters/:id/professions: the R35 professions inspector.
+ *  A live character reads a fresh serializeCharacter snapshot (the stored
+ *  blob lags the 30s autosave); an offline one reads the stored blob, whose
+ *  updatedAt tells the operator which clock the node timers anchor to. */
+async function characterProfessionsHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const row = await adminDb().characterProfessionsRow(id);
+  if (!row) return fail(ctx.res, 404, 'character not found');
+  ok(ctx.res, characterProfessionsSheetFromRow(row, rt.adminCharacterState(id)));
+}
+
+/** POST /admin/api/moderation/characters/:id/restore-item: the R35 GM item
+ *  restore. Order is deliberate: validate (no audit row for an impossible
+ *  grant), require the character online HERE, write the audit row, then the
+ *  sync live mint, so a grant can never exist unaudited; the rare
+ *  leave-between-audit-and-mint race surfaces as an explicit 400 and the
+ *  audit row honestly records the attempt. */
+async function restoreItemHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  const bodyError = restoreItemBodyError(body);
+  if (bodyError) return fail(ctx.res, 400, bodyError);
+  const itemId = String(body.itemId);
+  const count = Number(body.count);
+  try {
+    if (rt.adminCharacterState(id) === null) {
+      return fail(ctx.res, 400, 'character is not online on this realm');
+    }
+    await adminDb().recordProfessionsRestore({
+      characterId: id,
+      adminAccountId: ctxAccountId(ctx),
+      action: 'restore_item',
+      detail: `${itemId} x${count}`,
+      reason: body.reason,
+    });
+    const result = rt.adminRestoreItem(id, itemId, count);
+    if (result !== 'ok') {
+      return fail(ctx.res, 400, 'character went offline before the restore landed');
+    }
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'item restore failed');
+  }
+}
+
+/** POST /admin/api/moderation/characters/:id/restore-slot: the R35 GM
+ *  tool-effect slot re-mint, same ordering contract as restore-item; the
+ *  sim action refuses no_tool (charges are sized by the best owned tool,
+ *  so the tool must be restored first). */
+async function restoreSlotHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  const bodyError = restoreSlotBodyError(body);
+  if (bodyError) return fail(ctx.res, 400, bodyError);
+  const professionId = String(body.professionId);
+  const effectId = String(body.effectId);
+  try {
+    if (rt.adminCharacterState(id) === null) {
+      return fail(ctx.res, 400, 'character is not online on this realm');
+    }
+    await adminDb().recordProfessionsRestore({
+      characterId: id,
+      adminAccountId: ctxAccountId(ctx),
+      action: 'restore_slot',
+      detail: `${professionId}/${effectId}`,
+      reason: body.reason,
+    });
+    const result = rt.adminRestoreToolEffectSlot(id, professionId, effectId);
+    if (result === 'no_tool') {
+      return fail(ctx.res, 400, 'the character owns no tool for that profession');
+    }
+    // Reachable past body validation: the pair-validity rule (which effects a
+    // profession accepts) lives with the sim, not the body check.
+    if (result === 'invalid_request') {
+      return fail(ctx.res, 400, 'that effect cannot be slotted on that profession');
+    }
+    if (result !== 'ok') {
+      return fail(ctx.res, 400, 'character went offline before the restore landed');
+    }
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'slot restore failed');
+  }
+}
+
 /** GET /admin/api/accounts/:id/daily-rewards-events: bounded point-award ledger. */
 async function dailyRewardPointEventsHandler(ctx: Ctx): Promise<void> {
   const day = await dailyRewardEventDay(ctx.url.searchParams.get('day'));
@@ -2474,6 +2654,30 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: accountDetailHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/characters/:id/professions',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('character')],
+    meta: adminTargetMeta('character'),
+    handler: characterProfessionsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/restore-item',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('character')],
+    meta: adminTargetMeta('character'),
+    handler: restoreItemHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/restore-slot',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('character')],
+    meta: adminTargetMeta('character'),
+    handler: restoreSlotHandler,
   },
   {
     method: 'GET',

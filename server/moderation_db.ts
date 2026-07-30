@@ -46,6 +46,11 @@ export const MODERATION_ACTIONS = [
   // and when has to be recoverable.
   'set_ai',
   'set_streamer',
+  // R35 GM restores (professions tooling): not punitive, but they MINT value
+  // onto a character, so the reason is REQUIRED and the restored thing is
+  // folded into the stored reason text.
+  'restore_item',
+  'restore_slot',
 ] as const;
 export type ModerationActionKind = (typeof MODERATION_ACTIONS)[number];
 
@@ -983,4 +988,34 @@ export async function forceCharacterRename(input: {
   } finally {
     client.release();
   }
+}
+
+/**
+ * R35 GM restore audit row: resolve the character's owner and record the
+ * audited action (the live grant itself happens in the game runtime, AFTER
+ * this lands, so a grant can never exist without its audit row). `detail`
+ * names what was restored (item id and count, or profession and effect) and
+ * is folded into the stored reason so the one history row carries the whole
+ * story. The reason is REQUIRED: a restore mints value onto a character.
+ */
+export async function recordProfessionsRestore(input: {
+  characterId: number;
+  adminAccountId: number;
+  action: 'restore_item' | 'restore_slot';
+  detail: string;
+  reason: unknown;
+}): Promise<{ accountId: number }> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new Error('moderation reason is required');
+  const character = await pool.query('SELECT account_id FROM characters WHERE id = $1', [
+    input.characterId,
+  ]);
+  const accountId = character.rows[0]?.account_id;
+  if (!accountId) throw new Error('character not found');
+  await recordModerationAction(pool, input.action, {
+    accountId,
+    adminAccountId: input.adminAccountId,
+    reason: `[${input.detail}] ${reason}`,
+  });
+  return { accountId };
 }
