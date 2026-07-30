@@ -3596,7 +3596,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.unavailable': 'Non disponibile',
   'abilityUi.tooltip.requiresLevel': 'Richiede livello {level}',
   'abilityUi.tooltip.requiresForm': 'Richiede Forma di {form}',
-  'abilityUi.tooltip.requiresStealth': 'Richiede furtività',
   'abilityUi.tooltip.requiresCombo': 'Consuma punti combo',
   'abilityUi.tooltip.requiresTargetHealthBelow':
     'Richiede il bersaglio sotto il {percent}% di salute',
@@ -4024,13 +4023,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_barrier.description':
     'Ti protegge nel ghiaccio, assorbendo {damage} danni per 60 sec.',
   'entities.abilities.sinister_strike.name': 'Fendente Malvagio',
-  'entities.abilities.sinister_strike.description':
-    "Colpo istantaneo per danni dell'arma più {damage}. Conferisce 1 punto combo.",
   'entities.abilities.eviscerate.name': 'Sonno Eterno',
-  'entities.abilities.eviscerate.description': 'Mossa finale che infligge {damage}.',
   'entities.abilities.backstab.name': 'Affondo Codardo',
-  'entities.abilities.backstab.description':
-    "Pugnala il bersaglio per il 150% dei danni dell'arma più {damage}. Devi essere dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
   'entities.abilities.gouge.name': "Colpo all'Occhio",
   'entities.abilities.gouge.description':
     "Colpisce il bersaglio per {damage} danni e lo incapacita per 4 sec. Qualsiasi danno interrompe l'effetto. Conferisce 1 punto combo.",
@@ -4038,28 +4032,16 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.evasion.description':
     'Aumenta la tua probabilità di schivata del 50% per 15 s.',
   'entities.abilities.slice_and_dice.name': 'Ritmo Sanguinario',
-  'entities.abilities.slice_and_dice.description':
-    "Mossa finale che aumenta la velocità d'attacco in mischia del 30%. Dura più a lungo per ogni punto combo.",
   'entities.abilities.sprint.name': 'Calcagni Veloci',
   'entities.abilities.sprint.description': 'Aumenta la tua velocità di movimento del 70% per 15 s.',
   'entities.abilities.kidney_shot.name': 'Colpo Basso',
-  'entities.abilities.kidney_shot.description':
-    'Mossa finale che stordisce il bersaglio. Dura 1 s in più per punto combo.',
   'entities.abilities.ambush.name': "Colpo dell'Agguato",
-  'entities.abilities.ambush.description':
-    "Tende un agguato al bersaglio per il 250% dei danni dell'arma più {damage}. Devi essere furtivo e dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
   'entities.abilities.stealth.name': 'Velo Crepuscolare',
-  'entities.abilities.stealth.description':
-    'Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe Duskveil. Lanciala di nuovo per uscire.',
   'entities.abilities.adrenaline_rush.name': 'Sangue Impetuoso',
   'entities.abilities.adrenaline_rush.description':
     'Il sangue ti ribolle e ripristina istantaneamente 60 energia.',
   'entities.abilities.garrote.name': 'Filo alla Gola',
-  'entities.abilities.garrote.description':
-    'Garrota il nemico, infliggendo {damage} danni immediati e provocando sanguinamento per {overTime} in 18 sec. Devi essere furtivo. Conferisce 1 punto combo.',
   'entities.abilities.cheap_shot.name': 'Pugno allo Stomaco',
-  'entities.abilities.cheap_shot.description':
-    'Colpisce il bersaglio per {damage} danni, stordendolo per 4 sec. Devi essere furtivo. Conferisce 2 punti combo.',
   'entities.abilities.sap.name': 'Tramortimento',
   'entities.abilities.sap.description':
     "Incapacita il bersaglio per 8 sec. Devi essere furtivo e fuori dal combattimento. Qualsiasi danno interrompe l'effetto.",
@@ -4067,11 +4049,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.description':
     'Colpisce il bersaglio con un veleno plumbeo, infliggendo {damage} danni della Natura e rallentando la sua velocità di movimento del 50% per 12 sec.',
   'entities.abilities.expose_armor.name': "Breccia nell'Armatura",
-  'entities.abilities.expose_armor.description':
-    'Mossa finale che espone il bersaglio, riducendone la corazza di {damage} per 30 sec.',
   'entities.abilities.rupture.name': 'Dissanguamento',
-  'entities.abilities.rupture.description':
-    'Mossa finale che ferisce il bersaglio, provocando sanguinamento per {damage} in 16 sec.',
   'entities.abilities.vanish.name': 'Passo di Fumo',
   'entities.abilities.vanish.description':
     'Scompari dalla vista, entrando in Duskveil anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec.',
@@ -4248,18 +4226,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.description':
     'Travolge istantaneamente il bersaglio con ombra rovente per {damage} danni da Ombra.',
   'entities.abilities.wrath.name': 'Dardo Silvano',
-  'entities.abilities.wrath.description':
-    'Scaglia un dardo di energia naturale per {damage} danni da Natura.',
   'entities.abilities.healing_touch.name': 'Rammendo Selvaggio',
   'entities.abilities.healing_touch.description': 'Cura un bersaglio alleato di {damage}.',
   'entities.abilities.mark_of_the_wild.name': 'Custodia Selvaggia',
   'entities.abilities.mark_of_the_wild.description':
     "Pone il Wildward su un bersaglio alleato, aumentando l'armatura di {buff} per 30 min.",
   'entities.abilities.moonfire.name': 'Tempesta Lunare',
-  'entities.abilities.moonfire.description':
-    'Brucia il nemico con fuoco lunare per {damage} danni Arcani più danni nel tempo.',
   'entities.abilities.rejuvenation.name': 'Fioritura Selvaggia',
-  'entities.abilities.rejuvenation.description': 'Cura il bersaglio di {damage} in 12 s.',
   'entities.abilities.thorns.name': 'Guardia di Rovi',
   'entities.abilities.thorns.description':
     'Dal bersaglio spuntano spine: gli assalitori in mischia subiscono {buff} danni da Natura.',
@@ -4270,8 +4243,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bear_form.description':
     "Mutamenti in orso: armatura +130%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore.",
   'entities.abilities.maul.name': 'Frantumaossa',
-  'entities.abilities.maul.description':
-    'Attacco brutale che aumenta i danni in mischia di {damage} e causa molta minaccia. Si attiva al tuo prossimo colpo. Solo in Forma di Bruin.',
   'entities.abilities.growl.name': 'Intimidazione',
   'entities.abilities.growl.description':
     'Ringhia al bersaglio: la tua minaccia sale fino a eguagliare quella del suo nemico più odiato e lo costringe ad attaccarti per 3 s. Solo in Forma di Bruin.',
@@ -4279,23 +4250,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cat_form.description':
     "Mutamenti in lupo: la potenza d'attacco cresce con il livello, gli attacchi usano energia e punti combo, e generi il 29% di minaccia in meno. Lanciala di nuovo per tornare alla forma da incantatore.",
   'entities.abilities.claw.name': 'Artigliata',
-  'entities.abilities.claw.description':
-    "Artiglia il nemico per danni dell'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Lupo.",
   'entities.abilities.ferocious_bite.name': 'Morso Cruento',
-  'entities.abilities.ferocious_bite.description':
-    'Mossa finale che infligge {damage}. Solo Forma del Lupo.',
   'entities.abilities.swipe.name': 'Artigli Falcianti',
-  'entities.abilities.swipe.description':
-    'Falcia i nemici vicini per {damage} danni. Genera minaccia extra. Solo in Forma di Bruin.',
   'entities.abilities.regrowth.name': 'Seconda Fioritura',
-  'entities.abilities.regrowth.description':
-    'Cura un bersaglio alleato di {damage} e di una quantità aggiuntiva in 21 s.',
   'entities.abilities.barkskin.name': 'Scorza di Quercia',
   'entities.abilities.barkskin.description':
     "La tua pelle si indurisce come corteccia, aumentando l'armatura di 150 per 15 s.",
   'entities.abilities.starfire.name': 'Caduta Celeste',
-  'entities.abilities.starfire.description':
-    'Richiama un dardo di fuoco stellare, infliggendo {damage} danni Arcani.',
   'entities.abilities.travel_form.name': 'Forma di Fleet',
   'entities.abilities.travel_form.description':
     "Assumi all'istante una rapida Forma di Fleet, aumentando la velocità di movimento del 40%. Mentre sei trasformato non puoi usare altre abilità, ma puoi trasformarti dentro o fuori dal combattimento: ideale per fuggire.",
@@ -4306,8 +4267,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.description':
     'Stordisce il bersaglio per 2 sec. Solo in Forma di Bruin.',
   'entities.abilities.faerie_fire.name': 'Luce Stregata',
-  'entities.abilities.faerie_fire.description':
-    "Riduce l'armatura del bersaglio del {damage}% per 40 sec. Non si somma con Trancia Armatura.",
   'entities.abilities.hibernate.name': 'Sopore',
   'entities.abilities.hibernate.description':
     'Costringe il bersaglio in un sonno profondo per un massimo di 8 sec. Qualsiasi danno lo risveglia.',
@@ -4324,8 +4283,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.description':
     "Aumenta la potenza d'attacco di {buff} per {duration} sec. Solo Forma del Lupo.",
   'entities.abilities.rip.name': 'Squartare',
-  'entities.abilities.rip.description':
-    'Mossa finale che infligge {damage} danni da sanguinamento in 12 sec. Consuma i punti combo. Solo Forma del Lupo.',
   'entities.abilities.mortal_strike.name': 'Colpo Mutilante',
   'entities.abilities.mortal_strike.description':
     "Un colpo feroce che infligge danni dell'arma più {damage}. (firma Armi)",
@@ -4372,8 +4329,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description':
     'Entra in furtività mentre sei in Forma del Lupo, muovendoti il 50% più lentamente. Non utilizzabile in combattimento.',
   'entities.abilities.rake.name': 'Scarnificare',
-  'entities.abilities.rake.description':
-    "Un'apertura furtiva che dilania il nemico infliggendo danno dell'arma più {damage} e provoca danno da sanguinamento per 9 sec. Conferisce 1 punto combo. Solo in Forma del Lupo.",
   'entities.abilities.revive_pet.name': 'Rattoppare',
   'entities.abilities.revive_pet.description':
     'Rattoppa il tuo famiglio, ripristinando {overTime} salute in 12 sec con impulsi ogni 3 sec se è vivo. Se è morto, lo rianima con il 35% della salute.',
@@ -4402,14 +4357,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     'Aumenta la celerità magica del 30% e impedisce l’interruzione e il contraccolpo dei lanci per 10 s. (firma Gelo)',
   'entities.abilities.cold_blood.name': 'Sangue Freddo',
-  'entities.abilities.cold_blood.description':
-    'Concentra il tuo intento omicida, così il tuo prossimo attacco è un colpo critico. (firma Assassinio)',
   'entities.abilities.blade_flurry.name': 'Vortice di Lame',
-  'entities.abilities.blade_flurry.description':
-    'Scatena un turbine di lame, aumentando la velocità d’attacco del 20% per 12 s. (firma Combattimento)',
   'entities.abilities.hemorrhage.name': 'Emorragia',
-  'entities.abilities.hemorrhage.description':
-    'Colpisce il nemico per danni dell’arma più {damage} e causa danni da sanguinamento per 12 s. Conferisce 1 punto combo. (firma Scaltrezza)',
   'entities.abilities.power_infusion.name': 'Infusione di Potere',
   'entities.abilities.power_infusion.description':
     'Infone potere in un bersaglio alleato, aumentando la potenza magica di 28 per 15 s. (firma Disciplina)',
@@ -4435,8 +4384,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Carica un nemico e lo immobilizza per 1 s. Portata 8-25 m. (firma Aggressore Ferino)',
   'entities.abilities.swiftmend.name': 'Rapidità di Guarigione',
-  'entities.abilities.swiftmend.description':
-    'Consuma un effetto di cura periodica su un bersaglio alleato per curarlo di {damage}. (firma Guarigione)',
   'entities.abilities.crusader_strike.name': 'Assalto del Crociato',
   'entities.abilities.crusader_strike.description':
     'Colpisce il bersaglio infliggendo danni dell’arma più {damage} danni sacri. (talento da paladino)',
@@ -9864,8 +9811,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ripristina 180 salute in 10 sec. Utilizzabile solo in Forma d’Orso. (talento del Druido)',
   'entities.abilities.frost_trap.description':
     'Congela i nemici nell’area bersaglio per 3 sec., impedendo loro di muoversi e agire. (talento del Cacciatore)',
-  'entities.abilities.ghostly_strike.description':
-    'Colpisce il nemico infliggendo i danni dell’arma più {damage}, aumenta brevemente la schivata e assegna 1 punto combo. (talento del Ladro)',
   'entities.abilities.hammer_of_wrath.description':
     'Scaglia un martello sacro contro un nemico ferito, infliggendo {damage} danni sacri. Utilizzabile solo sotto il 20% di salute. (talento del Paladino)',
   'entities.abilities.healing_stream.description':

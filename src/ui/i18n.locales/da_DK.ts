@@ -2263,7 +2263,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.requiresForm': 'Kræver {form}-form',
   'abilityUi.tooltip.requiresLevel': 'Kræver niveau {level}',
   'abilityUi.tooltip.requiresOutOfCombat': 'Kræver at være uden for kamp',
-  'abilityUi.tooltip.requiresStealth': 'Kræver snigen',
   'abilityUi.tooltip.requiresTargetHealthBelow': 'Kræver mål under {percent}% liv',
   'abilityUi.tooltip.unavailable': 'Utilgængelig',
   'auth.appearance': 'Udseende',
@@ -2548,8 +2547,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Et omhyggeligt optrukket skud, der giver {damage} skade.',
   'entities.abilities.aimed_shot.name': 'Langt Optræk',
-  'entities.abilities.ambush.description':
-    'Læg baghold mod målet for 250% våbenskade plus {damage}. Skal være sneget og bag målet. Kræver en dolk. Giver 1 kombopoint.',
   'entities.abilities.ambush.name': 'Luskerens Slag',
   'entities.abilities.arcane_explosion.description':
     'Et udbrud af Arkan energi rammer alle nærliggende fjender for {damage} Arkan skade.',
@@ -2571,8 +2568,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.description':
     'Antag mårens skikkelse, og øg din undvigechance med 8% i 30 min.',
   'entities.abilities.aspect_of_the_monkey.name': 'Mårens Skikkelse',
-  'entities.abilities.backstab.description':
-    'Dolk målet i ryggen for 150% våbenskade plus {damage}. Skal være bag målet. Kræver en dolk. Giver 1 kombopoint.',
   'entities.abilities.backstab.name': 'Fejt Stød',
   'entities.abilities.barkskin.description':
     'Din hud hærder som bark, og øger rustning med 150 i 15 sek.',
@@ -2608,11 +2603,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.charge.description':
     'Storm mod en fjende, generér 9 raseri og bedøv den i 1 sek. 8-25 m rækkevidde.',
   'entities.abilities.charge.name': 'Fremstorm',
-  'entities.abilities.cheap_shot.description':
-    'Slå målet for {damage} skade, og bedøv det i 4 sek. Skal være sneget. Giver 2 kombopoint.',
   'entities.abilities.cheap_shot.name': 'Maveslag',
-  'entities.abilities.claw.description':
-    'Klo fjenden for våbenskade plus {damage}. Giver 1 kombopoint. Kun i Ulveform.',
   'entities.abilities.claw.name': 'Klo',
   'entities.abilities.cleave.description':
     'Et fejende slag, der rammer alle fjender foran dig for {damage} skade.',
@@ -2675,7 +2666,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.name': 'Gribende Rødder',
   'entities.abilities.evasion.description': 'Øger din chance for at undvige med 50% i 15 sek.',
   'entities.abilities.evasion.name': 'Spøgelsesfod',
-  'entities.abilities.eviscerate.description': 'Afslutningstræk der volder {damage}.',
   'entities.abilities.eviscerate.name': 'Gravsøvn',
   'entities.abilities.execute.description':
     'Forsøg på at gøre det af med en såret fjende, hvilket volder {damage} skade. Kan kun bruges på fjender under 20% helbred.',
@@ -2683,17 +2673,11 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.exorcism.description':
     'Forviser de onde med hellig vrede, hvilket volder {damage} hellig skade.',
   'entities.abilities.exorcism.name': 'Uddrivelsesrite',
-  'entities.abilities.expose_armor.description':
-    'Afslutningstræk der blotlægger målet og sænker dets rustning med {damage} i 30 sek.',
   'entities.abilities.expose_armor.name': 'Rustningsbrud',
-  'entities.abilities.faerie_fire.description':
-    'Sænker målets rustning med {damage}% i 40 sek. Stakker ikke med Rustningsskær.',
   'entities.abilities.faerie_fire.name': 'Hekselys',
   'entities.abilities.fear.description':
     'Slår rædsel i fjenden, så den kryber sammen i op til 8 sek. Enhver skade bryder effekten.',
   'entities.abilities.fear.name': 'Hjemsøg',
-  'entities.abilities.ferocious_bite.description':
-    'Afslutningstræk der volder {damage}. Kun i Ulveform.',
   'entities.abilities.ferocious_bite.name': 'Blodbid',
   'entities.abilities.fire_blast.description':
     'Sprænger fjenden for {damage} ildskade. Øjeblikkelig.',
@@ -2743,8 +2727,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbrand_weapon.description':
     'Gennemtrænger dit våben med bidende frost: hvert hug volder {damage} ekstra skade i 5 min.',
   'entities.abilities.frostbrand_weapon.name': 'Rimbundet Våben',
-  'entities.abilities.garrote.description':
-    'Garrotterer fjenden, hvilket volder {damage} skade nu og får den til at bløde for {overTime} over 18 sek. Du skal være sneget. Giver 1 kombopoint.',
   'entities.abilities.garrote.name': 'Strubetråd',
   'entities.abilities.ghost_wolf.description':
     'Forvandler dig til en Shadewolf og øger bevægelseshastigheden med 40% i 10 min.',
@@ -2790,8 +2772,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.judgement.description':
     'Udløser dit aktive Segl mod fjenden og forbruger det for at volde dets oplagrede Hellig skade.',
   'entities.abilities.judgement.name': 'Dom',
-  'entities.abilities.kidney_shot.description':
-    'Afslutningstræk der bedøver målet. Varer 1 sek længere pr. kombopoint.',
   'entities.abilities.kidney_shot.name': 'Lavt Slag',
   'entities.abilities.lay_on_hands.description':
     'En massiv bølge af helbredelse genopretter {damage}% af dit maksimale helbred. 10 min afkøling.',
@@ -2808,8 +2788,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     'Anbringer Wildward på et venligt mål og øger rustningen med {buff} i 30 min.',
   'entities.abilities.mark_of_the_wild.name': 'Vildværn',
-  'entities.abilities.maul.description':
-    'Et lemlæstende angreb, der øger nærkampsskaden med {damage} og skaber en stor mængde trussel. Aktiveres ved dit næste hug. Kun i Bruin-form.',
   'entities.abilities.maul.name': 'Knogleknus',
   'entities.abilities.mind_blast.description': 'Sprænger målets sind for {damage} skyggeskade.',
   'entities.abilities.mind_blast.name': 'Sindsbrud',
@@ -2819,8 +2797,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mongoose_bite.description':
     'Modangreb efter målet undviger for våbenskade plus {damage}. Kan ikke undviges.',
   'entities.abilities.mongoose_bite.name': 'Modbid',
-  'entities.abilities.moonfire.description':
-    'Brænder fjenden med måneild for {damage} arkan skade plus skade over tid.',
   'entities.abilities.moonfire.name': 'Månestorm',
   'entities.abilities.mortal_strike.description':
     'Et ondskabsfuldt slag, der volder våbenskade plus {damage}. (Arms-signatur)',
@@ -2846,8 +2822,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pyroblast.description':
     'Slynger en enorm flammende kampesten, der volder {damage} ildskade plus yderligere skade over tid.',
   'entities.abilities.pyroblast.name': 'Bållanse',
-  'entities.abilities.rake.description':
-    'En snigeåbner der kradser fjenden for våbenskade plus {damage} og volder blødningsskade over 9 sek. Giver 1 kombopoint. Kun i Ulveform.',
   'entities.abilities.rake.name': 'Flæns',
   'entities.abilities.rapid_fire.description':
     'Kanaliser seks hurtige skud over 2,4 sek. mens du bevæger dig. Hvert skud giver {damage} fysisk skade.',
@@ -2855,10 +2829,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.description':
     'Et stærkt nærkampsangreb, der øger skaden med {damage}. Aktiveres ved dit næste hug.',
   'entities.abilities.raptor_strike.name': 'Sprættende Slag',
-  'entities.abilities.regrowth.description':
-    'Helbreder et venligt mål for {damage} og en yderligere mængde over 21 sek.',
   'entities.abilities.regrowth.name': 'Anden Blomstring',
-  'entities.abilities.rejuvenation.description': 'Helbreder målet for {damage} over 12 sek.',
   'entities.abilities.rejuvenation.name': 'Vildblomst',
   'entities.abilities.renew.description': 'Helbreder målet for {damage} over 15 sek.',
   'entities.abilities.renew.name': 'Dvælende Nåde',
@@ -2871,14 +2842,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.righteous_fury.description':
     'Øger truslen genereret af din Hellige skade med 60 % i 30 min. Den tankende paladins hjørnesten.',
   'entities.abilities.righteous_fury.name': 'Brændende Ed',
-  'entities.abilities.rip.description':
-    'Afslutningsangreb der forårsager {damage} Blødningsskade over 12 sek. Forbruger kombopoint. Kun i Ulveform.',
   'entities.abilities.rip.name': 'Sønderriv',
   'entities.abilities.rockbiter_weapon.description':
     'Gennemstrømmer dit våben med stenets vrede: hvert hug tilføjer {damage} ekstra skade i 5 min.',
   'entities.abilities.rockbiter_weapon.name': 'Stenbundet Våben',
-  'entities.abilities.rupture.description':
-    'Afslutningsangreb der sårer målet og får det til at bløde for {damage} over 16 sek.',
   'entities.abilities.rupture.name': 'Forblødning',
   'entities.abilities.sap.description':
     'Sætter målet ud af spillet i 8 sek. Du skal være i snigen og uden for kamp. Enhver skade bryder effekten.',
@@ -2907,23 +2874,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_slam.description':
     'Slå målet med dit skjold for 50% våbenskade plus {damage} og enorm trussel. (Beskyttelses-kendetegn)',
   'entities.abilities.shield_slam.name': 'Skjoldknæk',
-  'entities.abilities.sinister_strike.description':
-    'Et øjeblikkeligt slag for våbenskade plus {damage}. Giver 1 kombopoint.',
   'entities.abilities.sinister_strike.name': 'Ondsindet Hug',
   'entities.abilities.slam.description': 'Drøner modstanderen for våbenskade plus {damage}.',
   'entities.abilities.slam.name': 'Brutalt Sving',
-  'entities.abilities.slice_and_dice.description':
-    'Afslutningsangreb der øger nærkampsangrebshastighed med 30 %. Varer længere per kombopoint.',
   'entities.abilities.slice_and_dice.name': 'Skånselsløst Tempo',
   'entities.abilities.smite.description': 'Slår fjenden for {damage} Hellig skade.',
   'entities.abilities.smite.name': 'Straffeslag',
   'entities.abilities.sprint.description': 'Øger din bevægelseshastighed med 70 % i 15 sek.',
   'entities.abilities.sprint.name': 'Hurtige Hæle',
-  'entities.abilities.starfire.description':
-    'Nedkalder et lyn af stjerneild og forårsager {damage} Arkan skade.',
   'entities.abilities.starfire.name': 'Himmelfald',
-  'entities.abilities.stealth.description':
-    'Skjuler dig i skyggerne: fjender lægger knap mærke til dig, men du bevæger dig 50 % langsommere. Angreb eller skade bryder Duskveil. Kast igen for at træde frem.',
   'entities.abilities.stealth.name': 'Skumringsslør',
   'entities.abilities.stormstrike.description':
     'Kanaliserer stormen gennem dit våben og rammer øjeblikkeligt for våbenskade plus {damage}.',
@@ -2950,8 +2909,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Tilkalder en Gloomshade under Heksemesterens kommando. Gloomshaden er en robust dæmon, der håner dine fjender og opsuger tæsk. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen.',
   'entities.abilities.summon_voidwalker.name': 'Tilkald Gloomshade',
   'entities.abilities.sunder_armor.name': 'Rustningsskær',
-  'entities.abilities.swipe.description':
-    'Sving mod nærliggende fjender for {damage} skade. Forårsager ekstra trussel. Kun i Bruin-form.',
   'entities.abilities.swipe.name': 'Fejende Kløer',
   'entities.abilities.tame_beast.description':
     'Begynder at tæmme et bæst, der skal være din ledsager. Det skal være på dit niveau eller lavere og ikke en elite. Dit kæledyr følger dig, angriber dine fjender og holder sin egen trussel. Du kan have ét kæledyr ad gangen.',
@@ -2980,7 +2937,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wing_clip.description':
     'Påfører et sår for {damage} skade, der sløver fjenden med 40% i 10 sek.',
   'entities.abilities.wing_clip.name': 'Lænkende Snit',
-  'entities.abilities.wrath.description': 'Slynger et lyn af naturenergi for {damage} Natur skade.',
   'entities.abilities.wrath.name': 'Vildlyn',
   'entities.abilities.holy_shock.name': 'Hellig chok',
   'entities.abilities.holy_shock.description':
@@ -3007,14 +2963,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     'Øger besværgelseshast med 30% og forhindrer afbrydelse og tilbageslag i 10 sek. (Frost-signatur)',
   'entities.abilities.cold_blood.name': 'Koldt blod',
-  'entities.abilities.cold_blood.description':
-    'Fokuserer din dræbervilje, så dit næste angreb bliver et kritisk træf. (Snigmordersignatur)',
   'entities.abilities.blade_flurry.name': 'Klingevirvel',
-  'entities.abilities.blade_flurry.description':
-    'Udløser en byge af klinger og øger angrebshastighed med 20% i 12 sek. (Kampsignatur)',
   'entities.abilities.hemorrhage.name': 'Blødning',
-  'entities.abilities.hemorrhage.description':
-    'Ramler fjenden for våbenskade plus {damage} og påfører blødningsskade over 12 sek. Giver 1 combopoint. (Underfundighedssignatur)',
   'entities.abilities.power_infusion.name': 'Kraftinfusion',
   'entities.abilities.power_infusion.description':
     'Indgyder et venligt mål med kraft og øger besværgelseskraft med 28 i 15 sek. (Disciplin signatur)',
@@ -3040,8 +2990,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Storm mod en fjende og rodfæst den i 1 sek. 8-25 m rækkevidde. (Vildskabssignatur)',
   'entities.abilities.swiftmend.name': 'Hurtig heling',
-  'entities.abilities.swiftmend.description':
-    'Forbruger en helbredelse over tid-effekt på et venligt mål for at helbrede det for {damage}. (Genoprettelsessignatur)',
   'entities.abilities.crusader_strike.name': 'Korsfarerslag',
   'entities.abilities.crusader_strike.description':
     'Slår målet for våbenskade plus {damage} hellig skade. (Paladin-talent)',
@@ -9443,8 +9391,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Genopretter 180 helbred over 10 sek. Kun i Bjørneform. (druidentalent)',
   'entities.abilities.frost_trap.description':
     'Fryser fjender i målområdet i 3 sek., så de hverken kan bevæge sig eller handle. (jægertalent)',
-  'entities.abilities.ghostly_strike.description':
-    'Rammer fjenden for våbenskade plus {damage}, øger kortvarigt undvigelse og giver 1 kombinationspoint. (slyngeltalent)',
   'entities.abilities.hammer_of_wrath.description':
     'Kaster en hellig hammer mod en såret fjende for {damage} Hellig skade. Kan kun bruges under 20 % helbred. (paladintalent)',
   'entities.abilities.healing_stream.description':

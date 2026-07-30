@@ -236,6 +236,7 @@ import {
   salvageResultToast,
 } from './enchanting_view';
 import {
+  type AbilitySpecNoteField,
   classDisplayName,
   dungeonDisplayName,
   itemDisplayName,
@@ -275,7 +276,7 @@ import {
   shouldFloatHealLanding,
   shouldShowHealLanding,
 } from './heal_landing_feedback_core';
-import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
+import { abilityRequirementKeys } from './hud/action_bar/ability_requirement_keys';
 import {
   handleShiftClearContextMenu,
   handleShiftClearKeydown,
@@ -517,7 +518,7 @@ import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view'
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
-import { localizeSimText } from './sim_i18n';
+import { localizeSimAuraName, localizeSimText } from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
@@ -5526,11 +5527,12 @@ export class Hud {
         t('abilityUi.tooltip.cooldownSeconds', { seconds: formatAbilityNumber(res.cooldown) }),
       );
     html += `<div class="tt-stat">${castLine.map(esc).join(' &nbsp; ')}</div>`;
-    html += `<div class="tt-desc">${esc(abilityDisplayDescription(res, damageText, scaling))}</div>`;
+    html += `<div class="tt-desc">${esc(abilityDisplayDescription(res, damageText, scaling, this.sim.talents.spec))}</div>`;
     // Resolved buff/aura effect line(s). Reads the RESOLVED effect value, so a buff's
     // tooltip reflects rank AND talents that strengthen it (Improved Devotion Aura /
     // Aspect of the Hawk / Fortitude via buffPct) - which the static description can't.
     for (const eff of res.effects) {
+      if (res.def.tooltipOmitEffectLines) break;
       if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
         // Pass the ability id so the effect line can resolve its damage school
         // (the {school} placeholder in the thorns/dot/absorb summaries).
@@ -5544,7 +5546,7 @@ export class Hud {
         });
       }
     }
-    const requirements = abilityRequirementLines(a);
+    const requirements = abilityRequirementLines(a, this.sim.talents.spec);
     if (requirements.length) {
       html += requirements.map((line) => `<div class="tt-sub">${esc(line)}</div>`).join('');
     }
@@ -15412,6 +15414,7 @@ function abilityDisplayDescription(
   res: ResolvedAbility,
   damageText: string,
   scaling?: AbilityScaling,
+  spec?: string | null,
 ): string {
   const buff = abilityBuffValue(res);
   const duration = abilityDurationValue(res);
@@ -15423,7 +15426,7 @@ function abilityDisplayDescription(
     0,
   );
   const rageText = rageGained > 0 ? formatAbilityNumber(rageGained) : '';
-  return tEntity({
+  const text = tEntity({
     kind: 'ability',
     id: res.def.id,
     field: 'description',
@@ -15445,6 +15448,16 @@ function abilityDisplayDescription(
       rage: rageText,
     },
   });
+  // Spec-aware teaching line: a shared button explains its interaction ONLY
+  // for the player's current spec, so a new player never reads another
+  // spec's rules on their own tooltip.
+  const note = spec ? res.def.specNotes?.[spec] : undefined;
+  if (!note) return text;
+  return `${text} ${tEntity({
+    kind: 'ability',
+    id: res.def.id,
+    field: `specNote_${spec}` as AbilitySpecNoteField,
+  })}`;
 }
 
 function itemDisplayNameFromSource(name: string): string {
@@ -15606,28 +15619,40 @@ function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
   return t('abilityUi.tooltip.instant');
 }
 
-export function abilityRequirementLines(def: AbilityDef): string[] {
-  const lines: string[] = [];
-  if (def.requiresForm)
-    lines.push(t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[def.requiresForm]) }));
-  if (def.requiresStealth) lines.push(t('abilityUi.tooltip.requiresStealth'));
-  if (def.spendsCombo) lines.push(t('abilityUi.tooltip.requiresCombo'));
-  if (def.requiresDodgeProc) lines.push(t('abilityUi.tooltip.requiresDodge'));
-  if (def.requiresOutOfCombat) lines.push(t('abilityUi.tooltip.requiresOutOfCombat'));
-  const targetHealthThreshold = def.executeThreshold ?? def.requiresTargetHpBelow;
-  if (targetHealthThreshold !== undefined) {
-    lines.push(
-      t('abilityUi.tooltip.requiresTargetHealthBelow', {
-        percent: formatAbilityNumber(targetHealthThreshold * 100),
-      }),
-    );
-  }
-  if (def.onNextSwing) lines.push(t('abilityUi.tooltip.onNextSwing'));
-  if (def.offGcd) lines.push(t('abilityUi.tooltip.offGlobalCooldown'));
-  if (def.targetType === 'friendly') lines.push(t('abilityUi.tooltip.friendlyTarget'));
-  else if (def.requiresTarget) lines.push(t('abilityUi.tooltip.enemyTarget'));
-  else if (isSelfOnlyAbility(def)) lines.push(t('abilityUi.tooltip.selfOnly'));
-  return lines;
+// Thin i18n mapper over the pure resolver (ability_requirement_keys.ts), which
+// owns the truth table incl. the Skulduggery-only stealth-bypass line.
+export function abilityRequirementLines(def: AbilityDef, spec?: string | null): string[] {
+  return abilityRequirementKeys(def, spec).map((req) => {
+    switch (req.key) {
+      case 'requiresForm':
+        return t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[req.form!]) });
+      case 'requiresStealth':
+        return t('abilityUi.tooltip.requiresStealth');
+      case 'requiresStealthSkulduggery':
+        return t('abilityUi.tooltip.requiresStealthSkulduggery');
+      case 'requiresCombo':
+        return t('abilityUi.tooltip.requiresCombo');
+      case 'requiresDodge':
+        return t('abilityUi.tooltip.requiresDodge');
+      case 'requiresOutOfCombat':
+        return t('abilityUi.tooltip.requiresOutOfCombat');
+      case 'requiresTargetHealthBelow':
+        return t('abilityUi.tooltip.requiresTargetHealthBelow', {
+          percent: formatAbilityNumber(req.percent!),
+        });
+      case 'onNextSwing':
+        return t('abilityUi.tooltip.onNextSwing');
+      case 'offGlobalCooldown':
+        return t('abilityUi.tooltip.offGlobalCooldown');
+      case 'friendlyTarget':
+        return t('abilityUi.tooltip.friendlyTarget');
+      case 'enemyTarget':
+        return t('abilityUi.tooltip.enemyTarget');
+      case 'selfOnly':
+      default:
+        return t('abilityUi.tooltip.selfOnly');
+    }
+  });
 }
 
 // Builds the `$d` damage string for an ability tooltip. When `scaling` (the live
@@ -15682,7 +15707,9 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
         return formatAbilityNumber(primary.bonus);
       case 'sunder':
         return formatAbilityNumber(
-          SUNDER_ARMOR_PCT_PER_STACK * (primary.full ? primary.maxStacks : 1) * 100,
+          SUNDER_ARMOR_PCT_PER_STACK *
+            (primary.full || primary.perCombo ? primary.maxStacks : 1) *
+            100,
         );
       case 'faerieFire':
         return formatAbilityNumber(FAERIE_FIRE_ARMOR_PCT * 100);

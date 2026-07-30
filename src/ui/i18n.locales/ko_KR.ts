@@ -304,19 +304,21 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.silence.description': '대상을 4초 동안 침묵시킵니다. (사제 특성)',
   'entities.abilities.venomrend.name': '맹독 찢기',
   'entities.abilities.venomrend.description':
-    '맹독 의식을 삼킵니다: 22 더하기 연계 점수당 26의 피해를 입히고, 자신의 출혈 효과의 남은 피해를 폭발시키며 25의 기력을 회복합니다. (나이프워크 엔진)',
+    '맹독 의식 6단계를 소모합니다: 100 더하기 연계 점수당 55의 피해를 입히고, 자신의 출혈 효과가 앞으로 입힐 남은 피해를 즉시 모두 입힌 뒤, 새로운 맹독 상처를 남깁니다(20초에 걸쳐 120의 피해). 기력 20을 회복합니다. (암살)',
   'entities.abilities.veilstrike.name': '장막 일격',
   'entities.abilities.veilstrike.description':
-    '어스름 저장고를 삼켜 6초 동안 그림자를 두릅니다: 은신 선제 기술을 훤한 곳에서도 쓸 수 있고 피해가 25% 증가합니다. (스컬더거리 엔진)',
-  'entities.abilities.body_blow.name': '보디 블로',
+    '6초 동안 그림자에 휩싸입니다: 황혼장막 전용 선제 기술을 은신 없이 어느 각도에서든 사용할 수 있고, 입히는 피해가 10% 증가하며, 그 안에서 처음 사용하는 잠복자의 일격이 두 배의 피해를 입힙니다. (잠행)',
+  'entities.abilities.body_blow.name': '헤이메이커',
   'entities.abilities.body_blow.description':
-    '무기 공격력의 130%에 10을 더한 묵직한 일격으로, 연계 점수를 2 얻고 레드라인을 한 단계 깊게 만듭니다. (전투 엔진)',
-  'entities.abilities.knockout_blow.name': '녹아웃 블로',
+    '무기 피해의 130%에 10을 더한 묵직한 일격입니다. 연계 점수 2점을 얻고 레드라인이 1단계 쌓입니다(최대 4단계). (전투)',
+  'entities.abilities.knockout_blow.name': '소등',
   'entities.abilities.knockout_blow.description':
-    '녹아웃으로 레드라인을 끝냅니다: 45 더하기 연계 점수당 35의 피해를 입히며, 레드라인 단계마다 25% 더 강해지고 25의 기력을 회복합니다. (전투 엔진)',
+    '녹아웃으로 레드라인을 끝냅니다: 45 더하기 연계 점수당 35의 피해를 입히고, 쌓은 레드라인 단계마다 25% 더 강해지며, 기력 25를 회복합니다. 레드라인이 끝나기 전에 사용하지 않으면 녹아웃 기회가 사라집니다. (전투)',
   'entities.abilities.venom_dart.name': '맹독 다트',
   'entities.abilities.venom_dart.description':
-    '독 묻은 다트를 튕겨 {damage}의 자연 피해를 입힙니다. 연계 점수를 1 얻습니다. 나이프워크: 맹독 찢기 상처를 6초 연장합니다(최대 20초).',
+    '독 묻은 다트를 튕겨 {damage}의 자연 피해를 입힙니다. 연계 점수 1점을 얻습니다.',
+  'entities.abilities.venom_dart.specNote_assassination':
+    '맹독 의식이 1단계 쌓이고 맹독 상처가 6초 연장됩니다(상처는 20초를 넘지 않습니다).',
   'entities.abilities.smoke_screen.name': '연막',
   'entities.abilities.smoke_screen.description':
     '연기 속으로 몸을 숨겨 8초 동안 회피율을 30%만큼 증가시킵니다.',
@@ -618,11 +620,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_hourglass.description':
     '선택한 위치에 시간의 모래시계를 놓습니다. 적의 발밑에서는 PvE에서 {hostilePveDuration}초, PvP에서 {hostilePvpDuration}초 동안 정지시키며 피해를 받으면 해제됩니다. 자신이나 파티 아군의 발밑에서는 {duration}초 동안 정지 상태가 되어 피해에 면역이고 행동할 수 없으며, 최대 생명력의 {healing}%를 회복합니다. 자신의 재사용 대기시간은 {selfCooldownRecovery}%, 아군의 재사용 대기시간은 {allyCooldownRecovery}% 더 빠르게 회복됩니다. 빈 지면에 놓으면 {groundDuration}초 동안 유지되며 처음 밟은 유효한 대상에게 적용됩니다. 이로운 효과는 직접 해제할 수 있습니다.',
   'hudChrome.auraEffect.venomRitual':
-    '맹독 의식: {stacks}/{max} 단계. 연계 점수 생성 기술이 단계를 쌓으며, {max} 단계가 되면 영면이 맹독 찢기로 바뀝니다',
+    '맹독 의식: {stacks}/{max} 단계. 비겁한 찌르기, 사악한 베기, 맹독 다트가 각각 1단계를 쌓으며, {max} 단계가 되면 영면이 맹독 찢기로 바뀝니다',
   'hudChrome.auraEffect.gloam':
-    '땅거미: {stacks}/{max} 단계. {max} 단계가 되면 황혼장막이 장막 일격으로 바뀝니다',
+    '땅거미: {stacks}/{max} 단계. 황혼장막 상태에서 사용한 선제 기술이 각각 1단계를 쌓습니다. {max} 단계가 되면 선제 기술을 은신 없이 쓸 수 있으며, 다음 선제 기술은 자원이 들지 않고 3단계를 모두 소모하며 그림자에 휩싸입니다',
   'hudChrome.auraEffect.redline':
-    '레드라인: 핍 {stacks}/{max}. 보디 블로가 핍을 쌓고, 녹아웃 블로는 핍마다 {pct}% 더 강해지며 적중 시 창을 끝냅니다. 시간이 다 되면 사라집니다',
+    '레드라인: {stacks}/{max} 단계. 헤이메이커가 각각 1단계를 쌓습니다. 소등은 단계마다 {pct}% 더 강해지며 레드라인을 끝냅니다. 시간이 먼저 다 되면 녹아웃 기회는 사라집니다',
   'hudChrome.auraEffect.veilstrikeWindow':
     '그림자에 휩싸임: 황혼장막 전용 선제 기술을 어느 각도에서든 사용할 수 있고, 주는 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.veiledEdge': '다음 잠복자의 일격이 두 배의 피해를 입힙니다',
@@ -2338,6 +2340,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.requiresLevel': '{level}레벨 필요',
   'abilityUi.tooltip.requiresForm': '{form} 변신 필요',
   'abilityUi.tooltip.requiresStealth': '은신 필요',
+  'abilityUi.tooltip.requiresStealthSkulduggery':
+    '은신 필요 (땅거미 3단계이거나 그림자에 휩싸인 동안에는 불필요)',
   'abilityUi.tooltip.requiresCombo': '연계 점수 소비',
   'abilityUi.tooltip.requiresTargetHealthBelow': '대상 생명력이 {percent}% 미만이어야 함',
   'abilityUi.tooltip.requiresDodge': '대상이 회피한 뒤에만 사용 가능',
@@ -2792,11 +2796,21 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sinister_strike.name': '사악한 베기',
   'entities.abilities.sinister_strike.description':
     '즉시 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다.',
+  'entities.abilities.sinister_strike.specNote_assassination':
+    '맹독 의식이 1단계 쌓입니다(최대 6단계).',
+  'entities.abilities.sinister_strike.specNote_combat':
+    '레드라인이 활성화된 동안 이 버튼이 헤이메이커로 변합니다: 무기 피해의 130%에 10을 더한 피해를 입히고, 연계 점수 2점을 얻으며, 레드라인이 1단계 쌓입니다(최대 4단계).',
   'entities.abilities.eviscerate.name': '영면',
   'entities.abilities.eviscerate.description': '결정타로 {damage}의 피해를 입힙니다.',
+  'entities.abilities.eviscerate.specNote_assassination':
+    '맹독 의식 6단계에서 이 버튼이 맹독 찢기로 변합니다: 자신의 출혈 효과가 앞으로 입힐 남은 피해를 즉시 모두 입히고, 새로운 맹독 상처를 남기며, 기력 20을 회복하는 일격입니다.',
+  'entities.abilities.eviscerate.specNote_combat':
+    '연계 점수 4점 이상으로 적중시키면 8초 동안 레드라인이 시작됩니다: 사악한 베기가 헤이메이커로, 이 버튼이 소등으로 변합니다(45 더하기 연계 점수당 35의 피해, 쌓은 레드라인 단계마다 25% 더 강해지며, 기력 25 회복). 레드라인이 끝나기 전에 사용하세요.',
   'entities.abilities.backstab.name': '비겁한 찌르기',
   'entities.abilities.backstab.description':
     '대상을 등 뒤에서 찔러 무기 피해의 150%에 {damage}를 더한 피해를 입힙니다. 대상 뒤에 있어야 합니다. 단검이 필요합니다. 연계 점수 1점을 얻습니다.',
+  'entities.abilities.backstab.specNote_assassination':
+    '공격마다 맹독 의식이 1단계 쌓이고(최대 6단계) 기력 15를 돌려받습니다. 맹독 의식 6단계에서 영면이 맹독 찢기로 변합니다(자신의 남은 출혈 피해를 한꺼번에 입힙니다).',
   'entities.abilities.gouge.name': '눈 찌르기',
   'entities.abilities.gouge.description':
     '대상을 가격해 {damage}의 피해를 입히고 4초 동안 행동 불가 상태로 만듭니다. 피해를 받으면 효과가 해제됩니다. 연계 점수 1점을 얻습니다.',
@@ -2804,26 +2818,34 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.evasion.description': '15초 동안 회피 확률이 50%만큼 증가합니다.',
   'entities.abilities.slice_and_dice.name': '살수의 박자',
   'entities.abilities.slice_and_dice.description':
-    '근접 공격 속도를 30%만큼 증가시키는 결정타입니다. 연계 점수당 지속시간이 길어집니다.',
+    '근접 공격 속도를 30%만큼 증가시키는 결정타입니다. 12초에 연계 점수당 4초가 더해집니다(연계 점수 5점: 32초).',
   'entities.abilities.sprint.name': '날쌘 발',
   'entities.abilities.sprint.description': '15초 동안 이동 속도가 70%만큼 증가합니다.',
   'entities.abilities.kidney_shot.name': '반칙 가격',
   'entities.abilities.kidney_shot.description':
-    '대상을 기절시키는 결정타입니다. 연계 점수당 1초 더 지속됩니다.',
+    '대상을 기절시키는 결정타입니다. 1초에 연계 점수당 1초가 더해집니다(연계 점수 5점: 6초).',
   'entities.abilities.ambush.name': '잠복자의 일격',
   'entities.abilities.ambush.description':
-    '은신 상태에서 대상 뒤를 기습해 무기 피해의 250%에 {damage}를 더한 피해를 입힙니다. 단검이 필요합니다. 연계 점수 1점을 얻습니다.',
+    '그림자 속에서 기습해 무기 피해의 250%에 {damage}를 더한 피해를 입힙니다. 은신 상태로 대상 뒤에 있어야 합니다. 단검이 필요합니다. 연계 점수 1점을 얻습니다.',
+  'entities.abilities.ambush.specNote_subtlety':
+    '황혼장막 상태에서 사용하면 땅거미가 1단계 쌓입니다(최대 3단계). 땅거미 3단계에서는 은신 없이 어느 각도에서든 사용할 수 있습니다: 이때는 자원이 들지 않고, 땅거미 3단계를 모두 소모하며, 6초 동안 그림자에 휩싸이고, 두 배의 피해를 입힙니다.',
   'entities.abilities.stealth.name': '황혼장막',
   'entities.abilities.stealth.description':
     '그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 50% 감소합니다. 공격하거나 피해를 받으면 황혼장막이 해제됩니다. 다시 시전하면 모습을 드러냅니다.',
+  'entities.abilities.stealth.specNote_subtlety':
+    '황혼장막 상태에서 사용하는 선제 기술마다 땅거미가 1단계 쌓입니다(최대 3단계).',
   'entities.abilities.adrenaline_rush.name': '들끓는 피',
   'entities.abilities.adrenaline_rush.description': '피가 끓어올라 즉시 기력 60을 회복합니다.',
   'entities.abilities.garrote.name': '철사 목조르기',
   'entities.abilities.garrote.description':
-    '적의 목을 졸라 즉시 {damage}의 피해를 입히고 18초에 걸쳐 {overTime}의 출혈 피해를 입힙니다. 은신 상태여야 합니다. 연계 점수 1점을 얻습니다.',
+    '적의 목에 철사를 감아 즉시 {damage}의 피해를 입히고 18초에 걸쳐 {overTime}의 출혈 피해를 입힙니다. 은신 상태여야 합니다. 연계 점수 1점을 얻습니다.',
+  'entities.abilities.garrote.specNote_subtlety':
+    '황혼장막 상태에서 사용하면 땅거미가 1단계 쌓입니다(최대 3단계). 땅거미 3단계에서는 은신 없이 사용할 수 있습니다: 이때는 자원이 들지 않고, 땅거미 3단계를 모두 소모하며, 6초 동안 그림자에 휩싸입니다.',
   'entities.abilities.cheap_shot.name': '명치 가격',
   'entities.abilities.cheap_shot.description':
     '대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 은신 상태여야 합니다. 연계 점수 2점을 얻습니다.',
+  'entities.abilities.cheap_shot.specNote_subtlety':
+    '황혼장막 상태에서 사용하면 땅거미가 1단계 쌓입니다(최대 3단계). 땅거미 3단계에서는 은신 없이 사용할 수 있습니다: 이때는 자원이 들지 않고, 땅거미 3단계를 모두 소모하며, 6초 동안 그림자에 휩싸입니다.',
   'entities.abilities.sap.name': '관자놀이 가격',
   'entities.abilities.sap.description':
     '대상을 8초 동안 무력화합니다. 은신 상태이며 전투 중이 아니어야 합니다. 피해를 받으면 효과가 해제됩니다.',
@@ -2832,10 +2854,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '둔중한 독으로 대상을 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다.',
   'entities.abilities.expose_armor.name': '방어구 돌파',
   'entities.abilities.expose_armor.description':
-    '대상의 약점을 드러내 30초 동안 방어도를 {damage}만큼 감소시키는 결정타입니다.',
+    '대상의 약점을 30초 동안 드러내는 결정타입니다: 소모한 연계 점수마다 방어도가 2% 감소합니다(연계 점수 5점: {damage}%).',
   'entities.abilities.rupture.name': '과다출혈',
   'entities.abilities.rupture.description':
-    '대상에게 상처를 입혀 16초에 걸쳐 {damage}의 출혈 피해를 입히는 결정타입니다.',
+    '대상에게 상처를 입히는 결정타입니다: 2초마다 출혈 피해를 입히며, 6초에 연계 점수당 2초가 더해집니다(연계 점수 5점: 16초, 총 {damage}의 피해).',
   'entities.abilities.vanish.name': '연막 걸음',
   'entities.abilities.vanish.description':
     '시야에서 사라져 전투 중에도 황혼장막 상태가 됩니다. 숨어 있는 동안 이동 속도가 50% 감소합니다. 최대 10초 동안 지속됩니다.',
@@ -2863,12 +2885,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '아군 대상에게 축복을 내려 5분 동안 전투력을 {buff}만큼 증가시킵니다.',
   'entities.abilities.divine_protection.name': '신념의 결계',
   'entities.abilities.divine_protection.description':
-    '신성한 보호막이 최대 생명력의 {damage}%에 해당하는 피해를 {duration}초 동안 흡수합니다.',
+    '보호의 결계가 10초 동안 {damage}의 피해를 흡수합니다.',
   'entities.abilities.hammer_of_justice.name': '분쇄의 망치',
   'entities.abilities.hammer_of_justice.description': '대상을 {duration}초 동안 기절시킵니다.',
   'entities.abilities.lay_on_hands.name': '마지막 의식',
   'entities.abilities.lay_on_hands.description':
-    '막대한 치유의 힘으로 최대 생명력의 {damage}%를 회복합니다. 재사용 대기시간 10분.',
+    '막대한 치유의 힘으로 생명력을 {damage}만큼 회복시킵니다. 재사용 대기시간 10분.',
   'entities.abilities.holy_taunt.name': '신성한 부추김',
   'entities.abilities.holy_taunt.description':
     '대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다.',
@@ -2880,13 +2902,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '신성한 분노로 악을 몰아내 {damage}의 신성 피해를 입힙니다.',
   'entities.abilities.consecration.name': '신성한 땅',
   'entities.abilities.consecration.description':
-    '땅을 9초 동안 신성화하여 매초 {damage}의 신성 피해를 입힙니다. 신앙의 수호자는 범위 안에서 받는 피해가 10% 감소합니다.',
+    '발밑의 땅을 신성화하여 10초 동안 2초마다 주위 적에게 {damage}의 신성 피해를 입힙니다.',
   'entities.abilities.righteous_fury.name': '불타는 맹세',
   'entities.abilities.righteous_fury.description':
     '30분 동안 자신의 신성 피해가 생성하는 위협 수준이 60%만큼 증가합니다. 방어 성기사의 핵심입니다.',
   'entities.abilities.retribution_aura.name': '응보의 오라',
   'entities.abilities.retribution_aura.description':
-    '죽거나 교체될 때까지 자신과 파티를 신성한 기운으로 감쌉니다. 효과를 받는 아군을 근접 공격한 적은 {buff}의 신성 피해를 입고, 효과를 받는 아군의 자동 공격은 {buff}의 신성 피해를 추가로 입힙니다.',
+    '30분 동안 신성한 기운으로 자신을 감싸 근접 공격으로 자신을 타격하는 모든 적에게 5의 신성 피해를 입힙니다.',
   'entities.abilities.tame_beast.name': '야생의 결속',
   'entities.abilities.tame_beast.description':
     '야수를 길들여 동료로 삼기 시작합니다. 야수는 자신의 레벨 이하이며 정예가 아니어야 합니다. 소환수는 주인을 따르고 적을 공격하며 자체 위협 수준을 유지합니다. 한 번에 하나의 소환수만 둘 수 있습니다.',
@@ -3032,7 +3054,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '즉시 대상에게 타오르는 어둠을 폭발시켜 {damage}의 암흑 피해를 입힙니다.',
   'entities.abilities.wrath.name': '야생 벼락',
   'entities.abilities.wrath.description':
-    '자연 에너지의 화살을 던져 {damage}의 자연 피해를 입힙니다. 달날개 형상에서 시전을 완료하면 달물결이 쌓입니다. 달물결 최대 단계에서 이를 소모합니다: 달씨앗이 달의 격동으로, 창공 낙하가 해돋움으로 변합니다.',
+    '자연 에너지의 화살을 던져 {damage}의 자연 피해를 입힙니다.',
+  'entities.abilities.wrath.specNote_balance':
+    '달날개 형상에서 시전을 완료할 때마다 달물결이 1단계 쌓입니다(최대 3단계). 달물결 3단계에서 달씨앗이 달의 격동으로, 창공 낙하가 해돋움으로 변합니다.',
   'entities.abilities.healing_touch.name': '야생 치유',
   'entities.abilities.healing_touch.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.mark_of_the_wild.name': '야생의 수호',
@@ -3040,10 +3064,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '아군 대상에게 야생의 수호를 걸어 30분 동안 방어도를 {buff}만큼 증가시킵니다.',
   'entities.abilities.moonfire.name': '달빛 폭풍',
   'entities.abilities.moonfire.description':
-    '달빛불로 적을 태워 {damage}의 비전 피해와 지속 피해를 입힙니다. 조화: 계속 타오르게 유지합니다. 달씨앗이 지속시간을 6초 연장합니다.',
+    '달빛불로 적을 태워 {damage}의 비전 피해와 지속 피해를 입힙니다.',
+  'entities.abilities.moonfire.specNote_balance':
+    '계속 타오르게 유지하세요: 달씨앗이 지속시간을 6초 연장합니다.',
   'entities.abilities.rejuvenation.name': '야생 개화',
   'entities.abilities.rejuvenation.description':
-    '12초에 걸쳐 대상의 생명력을 {damage}만큼 회복시킵니다. 회복: 새로 심는 개화가 푸른 생장을 쌓으며, 5단계에서 신속한 치유가 만개로 변합니다.',
+    '12초에 걸쳐 대상의 생명력을 {damage}만큼 회복시킵니다.',
+  'entities.abilities.rejuvenation.specNote_restoration':
+    '개화를 새로 심으면 푸른 생장이 1단계 쌓입니다(최대 5단계). 푸른 생장 5단계에서 신속한 치유가 만개로 변합니다.',
   'entities.abilities.thorns.name': '가시 수호',
   'entities.abilities.thorns.description':
     '대상에게 가시가 돋아 근접 공격자가 {buff}의 자연 피해를 받습니다.',
@@ -3054,7 +3082,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '곰으로 변신합니다. 방어도 +130%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
   'entities.abilities.maul.name': '뼈 분쇄',
   'entities.abilities.maul.description':
-    '근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 야성: 적중한 공격이 오랜 피를 쌓으며, 3단계에서 뼈 분쇄가 골수분쇄로 변합니다. 다음 무기 공격 시 발동됩니다. 큰곰 변신 전용.',
+    '근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 다음 무기 공격 시 발동됩니다. 큰곰 변신 전용.',
+  'entities.abilities.maul.specNote_feral':
+    '적중한 공격마다 오랜 피가 1단계 쌓입니다. 오랜 피 3단계에서 이 버튼이 골수분쇄로 변합니다: 78에서 96의 피해를 입히는 높은 위협 수준의 강타이며, 생명력이 절반 미만이면 대신 최대 생명력의 18%를 흡수하는 보호막을 얻고 분노 15를 돌려받습니다.',
   'entities.abilities.growl.name': '위협',
   'entities.abilities.growl.description':
     '대상에게 으르렁거립니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용.',
@@ -3063,16 +3093,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '늑대로 변신합니다. 민첩성이 레벨에 따라 증가하고 전투력이 8에 레벨당 2를 더한 만큼 증가합니다. 공격이 기력과 연계 점수를 사용하며 위협 수준 생성량이 29% 감소합니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
   'entities.abilities.claw.name': '가르는 발톱',
   'entities.abilities.claw.description':
-    '적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 야성: 적중한 공격이 오랜 피를 쌓습니다. 늑대 변신 전용.',
+    '적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 늑대 변신 전용.',
+  'entities.abilities.claw.specNote_feral': '적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계).',
   'entities.abilities.ferocious_bite.name': '유혈 물어뜯기',
   'entities.abilities.ferocious_bite.description':
-    '결정타로 {damage}의 피해를 입힙니다. 야성: 적중한 공격이 오랜 피를 쌓으며, 3단계에서 유혈 물어뜯기가 피의 수확으로 변합니다. 늑대 변신 전용.',
+    '결정타로 {damage}의 피해를 입힙니다. 늑대 변신 전용.',
+  'entities.abilities.ferocious_bite.specNote_feral':
+    '적중한 공격마다 오랜 피가 1단계 쌓입니다. 오랜 피 3단계에서 이 버튼이 피의 수확으로 변합니다: 91 더하기 연계 점수당 55의 피해를 입히는 물어뜯기로, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히고 기력 30을 회복합니다.',
   'entities.abilities.swipe.name': '휩쓰는 발톱',
   'entities.abilities.swipe.description':
-    '주위 적을 휘둘러 {damage}의 피해를 입힙니다. 추가 위협 수준을 생성합니다. 야성: 적중한 공격이 오랜 피를 쌓습니다. 큰곰 변신 전용.',
+    '주위 적에게 발톱을 휘둘러 {damage}의 피해를 입힙니다. 추가 위협 수준을 생성합니다. 큰곰 변신 전용.',
+  'entities.abilities.swipe.specNote_feral':
+    '적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계).',
   'entities.abilities.regrowth.name': '두 번째 개화',
   'entities.abilities.regrowth.description':
-    '아군 대상의 생명력을 {damage}만큼 회복시키고 21초에 걸쳐 추가로 회복시킵니다. 회복: 새로 심는 개화가 푸른 생장을 쌓습니다.',
+    '아군 대상의 생명력을 {damage}만큼 회복시키고 21초에 걸쳐 추가로 회복시킵니다.',
+  'entities.abilities.regrowth.specNote_restoration':
+    '개화를 새로 심으면 푸른 생장이 1단계 쌓입니다(최대 5단계).',
   'entities.abilities.barkskin.name': '참나무 가죽',
   'entities.abilities.barkskin.description':
     '피부가 나무껍질처럼 단단해져 15초 동안 방어도가 150만큼 증가합니다.',
@@ -3084,7 +3121,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '본능이 예리해져 6초 동안 회피율이 50% 증가합니다.',
   'entities.abilities.starfire.name': '창공 낙하',
   'entities.abilities.starfire.description':
-    '별의 불꽃을 불러 내려 {damage}의 비전 피해를 입힙니다. 달날개 형상에서 시전을 완료하면 달물결이 쌓입니다. 달물결 최대 단계에서 창공 낙하가 해돋움으로 변합니다.',
+    '별의 불꽃을 불러 내려 {damage}의 비전 피해를 입힙니다.',
+  'entities.abilities.starfire.specNote_balance':
+    '달날개 형상에서 시전을 완료할 때마다 달물결이 1단계 쌓입니다(최대 3단계). 달물결 3단계에서 이 버튼이 해돋움으로 변합니다: 160에서 190의 자연 피해와 9초에 걸친 75의 화상 피해를 입히는 즉시 공격으로, 마나 35를 회복하고 3단계를 모두 소모합니다.',
   'entities.abilities.travel_form.name': '쾌속 형태',
   'entities.abilities.travel_form.description':
     '즉시 날렵한 쾌속 형태로 변신하여 이동 속도가 40% 증가합니다. 변신 중에는 다른 능력을 사용할 수 없지만 전투 중에도 자유롭게 변신할 수 있어 도주에 이상적입니다.',
@@ -3094,7 +3133,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.description': '대상을 2초 동안 기절시킵니다. 큰곰 변신 전용.',
   'entities.abilities.faerie_fire.name': '마녀불빛',
   'entities.abilities.faerie_fire.description':
-    '대상의 방어도를 40초 동안 {damage}%만큼 감소시킵니다. 방어구 절단과 중첩되지 않습니다.',
+    '대상의 방어도를 40초 동안 {damage}%만큼 감소시킵니다.',
   'entities.abilities.hibernate.name': '깊은 잠',
   'entities.abilities.hibernate.description':
     '대상을 최대 8초 동안 깊은 잠에 빠뜨립니다. 피해를 입으면 깨어납니다.',
@@ -3112,7 +3151,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '전투력을 {duration}초 동안 {buff}만큼 증가시킵니다. 늑대 변신 전용.',
   'entities.abilities.rip.name': '피의 균열',
   'entities.abilities.rip.description':
-    '24초에 걸쳐 {damage}의 출혈 피해를 입히는 결정타입니다. 연계 점수를 소모합니다. 야성: 적중한 공격이 오랜 피를 쌓습니다. 늑대 변신 전용.',
+    '대상이 24초 동안 2초마다 출혈 피해를 입는 결정타입니다: 36 더하기 소모한 연계 점수당 24의 피해입니다(연계 점수 5점: 총 {damage}). 늑대 변신 전용.',
+  'entities.abilities.rip.specNote_feral': '적중하면 오랜 피가 1단계 쌓입니다(최대 3단계).',
   'entities.abilities.mortal_strike.name': '불구의 일격',
   'entities.abilities.mortal_strike.description':
     '잔혹한 일격으로 무기 피해에 {damage}의 피해를 더합니다. (무기 특화 대표 기술)',
@@ -3160,7 +3200,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '늑대 변신 상태에서 은신하고 이동 속도가 50% 감소합니다. 전투 중에는 사용할 수 없습니다.',
   'entities.abilities.rake.name': '저미기',
   'entities.abilities.rake.description':
-    '적을 저며 무기 피해에 더해 {damage}의 피해를 입히고 18초에 걸쳐 출혈 피해를 줍니다. 연계 점수 1을 부여합니다. 야성: 적중한 공격이 오랜 피를 쌓습니다. 늑대 변신 상태에서만 사용 가능.',
+    '적을 저며 무기 피해에 {damage}를 더한 피해를 입히고 18초에 걸쳐 출혈 피해를 입힙니다. 연계 점수 1점을 얻습니다. 늑대 변신 전용.',
+  'entities.abilities.rake.specNote_feral': '적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계).',
   'entities.abilities.revive_pet.name': '응급 처치',
   'entities.abilities.revive_pet.description':
     '소환수를 응급 처치합니다. 살아 있으면 12초에 걸쳐 3초마다 생명력을 회복해 총 {overTime}의 생명력을 회복합니다. 죽어 있으면 35%의 생명력으로 되살립니다.',
@@ -3169,7 +3210,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)',
   'entities.abilities.holy_shield.name': '신성한 방패',
   'entities.abilities.holy_shield.description':
-    '방패 막기가 30% 증가하고 최대 생명력의 {damage}%에 해당하는 보호막을 {duration}초 동안 얻습니다. 승천은 방어를 강화합니다.',
+    '10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)',
   'entities.abilities.bestial_wrath.name': '야수의 격노',
   'entities.abilities.bestial_wrath.description':
     '야수의 분노에 휩싸여 15초 동안 전투력이 55만큼 증가합니다. (야수 전문화 상징)',
@@ -3196,7 +3237,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '칼날의 폭풍을 일으켜 12초 동안 공격 속도를 20% 증가시킵니다. (전투 전문화 상징)',
   'entities.abilities.hemorrhage.name': '과다출혈',
   'entities.abilities.hemorrhage.description':
-    '적을 공격하여 무기 피해에 더해 {damage}의 피해를 주고 12초 동안 출혈 피해를 줍니다. 연계 점수 1점을 얻습니다. (잠행 전문화 상징)',
+    '적을 공격해 무기 피해에 {damage}를 더한 피해를 입히고, 12초에 걸쳐 출혈 피해를 입히며, 대상이 받는 출혈 피해를 40% 증가시킵니다. 연계 점수 1점을 얻습니다. 두 번 사용할 때마다 땅거미가 1단계 쌓입니다(최대 3단계). (잠행 전문화 상징)',
   'entities.abilities.power_infusion.name': '마력 주입',
   'entities.abilities.power_infusion.description':
     '아군 대상에게 힘을 주입하여 15초 동안 주문력을 28만큼 증가시킵니다. (수양 전문화 상징)',
@@ -3223,7 +3264,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 돌진하고 1초 동안 묶습니다. 8-25미터 거리. (야성 전문화 상징)',
   'entities.abilities.swiftmend.name': '신속한 치유',
   'entities.abilities.swiftmend.description':
-    '아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. 야생 개화와 두 번째 개화 시전을 완료하면 푸른 생장이 쌓이며, 푸른 생장 5단계에서 신속한 치유가 만개로 변합니다. (회복 전문화 상징)',
+    '아군 대상의 지속 치유 효과 하나를 소모하여 생명력을 {damage}만큼 회복시킵니다. 야생 개화와 두 번째 개화를 심으면 푸른 생장이 쌓이며, 푸른 생장 5단계에서 이 버튼이 만개로 변합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 60%를 즉시 회복합니다. (회복 전문화 상징)',
   'entities.abilities.crusader_strike.name': '성전사의 일격',
   'entities.abilities.crusader_strike.description':
     '대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)',
@@ -9498,7 +9539,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frost_trap.description':
     '대상 지역의 적을 3초 동안 얼려 이동하거나 행동하지 못하게 합니다. (사냥꾼 특성)',
   'entities.abilities.ghostly_strike.description':
-    '적에게 무기 피해에 {damage}를 더한 피해를 입히고, 잠시 회피를 증가시키며 연계 점수 1점을 얻습니다. (도적 특성)',
+    '적을 공격해 무기 피해에 {damage}를 더한 피해를 입히고 7초 동안 회피 확률을 15% 증가시킵니다. 연계 점수 1점을 얻습니다. (도적 특성)',
   'entities.abilities.hammer_of_wrath.description':
     '부상당한 적에게 신성한 망치를 던져 {damage}의 신성 피해를 입힙니다. 생명력이 20% 미만일 때만 사용할 수 있습니다. (성기사 특성)',
   'entities.abilities.healing_stream.description':
@@ -10923,37 +10964,34 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': '무기 해방',
   'entities.abilities.unleash_weapon.description':
     '활성화된 무기 마법을 해방합니다. 화염낙인은 54에서 64의 화염 피해를 입히고 주문력의 30%가 추가되며 천둥을 2 얻습니다. 질풍은 무기로 공격하고 전령의 박자를 진행하며 6초 동안 공격 속도를 20% 높입니다. 바위결속은 무기 피해의 75%를 입히고 대상이 자신을 공격하게 하며 4초 동안 받는 피해를 20% 줄입니다. 생명의 샘은 치유의 물결을 소모해 남은 치유량의 125%를 즉시 회복하고 8초 안에 받는 다음 피해를 실제 회복량의 50%만큼 줄입니다.',
-
-  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
-  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
   'entities.abilities.veilbound_mark.name': '장막의 표식',
   'hudChrome.auraEffect.dawnsWrath': '천벌: 체력 무관 · +1회 · 재사용 0 · 피해 +{pct}%',
   'hudChrome.auraEffect.moontide':
-    '달물결: {stacks}/{max}단계. 달날개 형상에서 야생 벼락, 창공 낙하, 달씨앗 시전이 단계를 쌓습니다. {max}단계에서 달씨앗이 달의 격동으로, 창공 낙하가 해돋움으로 변하며, 어느 쪽을 써도 소모됩니다',
+    '달물결: {stacks}/{max}단계. 달날개 형상에서 야생 벼락, 창공 낙하, 달씨앗 시전이 각각 1단계를 쌓습니다. {max}단계에서 달씨앗이 달의 격동으로, 창공 낙하가 해돋움으로 변하며, 어느 쪽을 써도 3단계를 모두 소모합니다',
   'hudChrome.auraEffect.oldBlood':
-    '오랜 피: {stacks}/{max}단계. 늑대와 곰의 적중 공격이 이 저장량을 공유하며, {max}단계에서 유혈 물어뜯기 또는 뼈 분쇄가 변합니다',
+    '오랜 피: {stacks}/{max}단계. 가르는 발톱, 저미기, 피의 균열, 유혈 물어뜯기, 휩쓰는 발톱, 뼈 분쇄의 적중한 공격이 각각 1단계를 쌓습니다. {max}단계에서 늑대 변신의 유혈 물어뜯기는 피의 수확으로, 큰곰 변신의 뼈 분쇄는 골수분쇄로 변합니다',
   'hudChrome.auraEffect.verdance':
-    '푸른 생장: {stacks}/{max}단계. 야생 개화와 두 번째 개화 시전 완료로 쌓이며, {max}단계에서 신속한 치유가 만개로 변합니다',
+    '푸른 생장: {stacks}/{max}단계. 새로 심는 야생 개화와 두 번째 개화가 각각 1단계를 쌓으며, {max}단계에서 신속한 치유가 만개로 변합니다',
   'entities.abilities.moonseed.name': '달씨앗',
   'entities.abilities.moonseed.description':
-    '달날개 형상 전용입니다. {damage}의 비전 피해를 주고 달물결을 1단계 올리며 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 6초입니다. 달물결 최대 단계에서 달씨앗이 달의 격동으로 변합니다.',
+    '달날개 형상 전용입니다. {damage}의 비전 피해를 입히고, 달물결을 1단계 올리며(최대 3단계), 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 6초입니다. 달물결 3단계에서 이 버튼이 달의 격동으로 변합니다: 240에서 285의 비전 피해를 입히는 즉시 공격으로, 3단계를 모두 소모합니다.',
   'guide.abilityHook.moonseed':
     '달날개 형상일 때 달물결을 1단계 진행시키고 달빛 폭풍 지속시간을 연장합니다.',
   'entities.abilities.moonlash.name': '달의 격동',
   'entities.abilities.moonlash.description':
-    '달물결 3단계를 소모해 강력한 비전 공격을 하는 피해 특화 선택지입니다. 해돋움과 같은 달물결을 소모하므로 하나만 선택할 수 있습니다.',
+    '달물결 3단계를 소모해 {damage}의 비전 피해를 입히는 강력한 일격을 가합니다: 피해 특화 선택지입니다. 해돋움도 같은 달물결 3단계를 소모하므로 하나만 선택하세요.',
   'entities.abilities.sunlance.name': '해돋움',
   'entities.abilities.sunlance.description':
-    '달물결 3단계를 소모해 자연 공격과 화상을 입히고 마나를 35 회복하는 마나 특화 선택지입니다. 달의 격동과 같은 달물결을 소모하므로 하나만 선택할 수 있습니다.',
+    '달물결 3단계를 소모해 {damage}의 자연 피해와 9초에 걸친 {overTime}의 화상 피해를 입히고 마나 35를 회복합니다: 마나 특화 선택지입니다. 달의 격동도 같은 달물결 3단계를 소모하므로 하나만 선택하세요.',
   'entities.abilities.redharvest.name': '피의 수확',
   'entities.abilities.redharvest.description':
-    '오랜 피 3단계를 소모해 대상에게 남은 자신의 저미기와 피의 균열 피해를 폭발시키고 기력 30을 회복합니다. 보유한 연계 점수는 물어뜯기를 강화하지만 필수는 아닙니다.',
+    '오랜 피 3단계를 소모합니다: {damage}의 피해를 입히고, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히며, 두 출혈 효과를 제거하고 기력 30을 회복합니다. 연계 점수가 없어도 사용할 수 있습니다.',
   'entities.abilities.marrowbreak.name': '골수분쇄',
   'entities.abilities.marrowbreak.description':
-    '오랜 피 3단계를 소모해 위협 수준이 높은 강타를 가합니다. 생명력이 절반 미만이면 대신 8초 동안 최대 생명력의 18%를 흡수하고 분노 15를 회복합니다.',
+    '오랜 피 3단계를 소모해 {damage}의 피해를 입히는 위협 수준이 높은 강타를 가합니다. 생명력이 절반 미만이면 대신 8초 동안 최대 생명력의 18%를 흡수하는 보호막을 얻고 분노 15를 돌려받습니다.',
   'entities.abilities.overbloom.name': '만개',
   'entities.abilities.overbloom.description':
-    '푸른 생장 5단계를 소모합니다. 모든 아군에게 남은 자신의 지속 치유량 중 60%를 즉시 회복시키고 해당 효과를 제거한 뒤 대상에게 새로운 야생 개화를 심습니다.',
+    '푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 60%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다.',
   'hudChrome.continentMap.title': '세계 지도',
   'hudChrome.continentMap.summary': '세계 지도. 지역을 선택하면 해당 지도가 열립니다.',
   'hudChrome.continentMap.toWorld': '세계 지도',

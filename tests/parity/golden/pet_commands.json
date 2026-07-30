@@ -23,7 +23,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 821,
-      "state": "8ceca962",
+      "state": "237f6a79",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -55,8 +55,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ]
           },
           "delveClears": {},
@@ -73,10 +72,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "mailWelcomed": true,
@@ -105,7 +100,7 @@
           "level": 1,
           "lootFfaTimer": "Infinity",
           "maxHp": 69,
-          "maxResource": 93,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -117,8 +112,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 50,
-          "resource": 93,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
@@ -146,7 +141,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 823,
-      "state": "6c02e23c",
+      "state": "7e78d549",
       "events": "6de887c3",
       "rng": {
         "draws": 0,
@@ -178,8 +173,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ]
           },
           "delveClears": {},
@@ -196,10 +190,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 44000,
@@ -229,7 +219,7 @@
           "level": 12,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
-          "maxResource": 358,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -241,8 +231,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
-          "resource": 358,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
@@ -311,7 +301,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 823,
-      "state": "f8aec481",
+      "state": "824d68e8",
       "events": "efcf1f34",
       "rng": {
         "draws": 0,
@@ -343,8 +333,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ]
           },
           "delveClears": {},
@@ -361,10 +350,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 44000,
@@ -394,7 +379,7 @@
           "level": 12,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
-          "maxResource": 358,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -406,8 +391,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
-          "resource": 358,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
@@ -490,7 +475,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 823,
-      "state": "3f30b778",
+      "state": "4e92194d",
       "events": "06bb543a",
       "rng": {
         "draws": 0,
@@ -501,7 +486,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 823,
-      "state": "17e72e6a",
+      "state": "f3819167",
       "events": "401e791a",
       "rng": {
         "draws": 0,
@@ -512,7 +497,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 824,
-      "state": "bf3cfdaf",
+      "state": "761610fa",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -544,8 +529,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ],
             "visited": [
               "poi:eastbrook_vale:eastbrook"
@@ -579,10 +563,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 44000,
@@ -613,7 +593,7 @@
           "level": 12,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
-          "maxResource": 358,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -625,8 +605,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
-          "resource": 358,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
@@ -771,7 +751,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 824,
-      "state": "ac823009",
+      "state": "ee87aae4",
       "events": "35d7df45",
       "rng": {
         "draws": 0,
@@ -803,8 +783,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ],
             "visited": [
               "poi:eastbrook_vale:eastbrook"
@@ -838,10 +817,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 44000,
@@ -872,7 +847,7 @@
           "level": 12,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
-          "maxResource": 358,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -884,8 +859,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
-          "resource": 358,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
@@ -969,7 +944,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 826,
-      "state": "c652d1e7",
+      "state": "60531a0e",
       "events": "726a698b",
       "rng": {
         "draws": 0,
@@ -1001,8 +976,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ],
             "visited": [
               "poi:eastbrook_vale:eastbrook"
@@ -1036,10 +1010,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 44000,
@@ -1070,7 +1040,7 @@
           "level": 12,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
-          "maxResource": 358,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1082,8 +1052,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
-          "resource": 358,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
@@ -1208,7 +1178,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 826,
-      "state": "cebef9ff",
+      "state": "181229f2",
       "events": "e4fc95d7",
       "rng": {
         "draws": 0,
@@ -1240,8 +1210,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ],
             "visited": [
               "poi:eastbrook_vale:eastbrook"
@@ -1275,10 +1244,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 44000,
@@ -1309,7 +1274,7 @@
           "level": 12,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
-          "maxResource": 358,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1321,8 +1286,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
-          "resource": 358,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
@@ -1447,7 +1412,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 826,
-      "state": "ac823009",
+      "state": "ee87aae4",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1479,8 +1444,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ],
             "visited": [
               "poi:eastbrook_vale:eastbrook"
@@ -1514,10 +1478,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 44000,
@@ -1548,7 +1508,7 @@
           "level": 12,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
-          "maxResource": 358,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1560,8 +1520,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
-          "resource": 358,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
@@ -1645,7 +1605,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 827,
-      "state": "ac823009",
+      "state": "ee87aae4",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1677,8 +1637,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ],
             "visited": [
               "poi:eastbrook_vale:eastbrook"
@@ -1712,10 +1671,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 44000,
@@ -1746,7 +1701,7 @@
           "level": 12,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
-          "maxResource": 358,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1758,8 +1713,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
-          "resource": 358,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
@@ -1843,7 +1798,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 829,
-      "state": "34d6cb33",
+      "state": "03cc5392",
       "events": "683f086b",
       "rng": {
         "draws": 0,
@@ -1875,8 +1830,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ],
             "visited": [
               "poi:eastbrook_vale:eastbrook"
@@ -1910,10 +1864,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 44000,
@@ -2000,7 +1950,7 @@
           "level": 12,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
-          "maxResource": 358,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2012,8 +1962,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
-          "resource": 358,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
@@ -2194,7 +2144,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 829,
-      "state": "926671ef",
+      "state": "e921b12c",
       "events": "e9524cc5",
       "rng": {
         "draws": 148,
@@ -2205,7 +2155,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 829,
-      "state": "3d959423",
+      "state": "ec341edc",
       "events": "fb77dd72",
       "rng": {
         "draws": 295,
@@ -2216,7 +2166,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 829,
-      "state": "3d959423",
+      "state": "ec341edc",
       "events": "741638a5",
       "rng": {
         "draws": 295,
@@ -2248,8 +2198,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ],
             "visited": [
               "poi:eastbrook_vale:eastbrook"
@@ -2283,10 +2232,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 44000,
@@ -2389,7 +2334,7 @@
           "level": 12,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
-          "maxResource": 358,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2401,8 +2346,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
-          "resource": 358,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
@@ -2521,7 +2466,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 870,
+          "resource": 876,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -2591,7 +2536,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 831,
-      "state": "09bee39a",
+      "state": "6d7124b1",
       "events": "cdd93bbf",
       "rng": {
         "draws": 295,
@@ -2623,8 +2568,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ],
             "visited": [
               "poi:eastbrook_vale:eastbrook"
@@ -2658,10 +2602,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 44000,
@@ -2764,7 +2704,7 @@
           "level": 12,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
-          "maxResource": 358,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2776,8 +2716,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
-          "resource": 358,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
@@ -2896,7 +2836,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 870,
+          "resource": 876,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -2966,7 +2906,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 833,
-      "state": "855b1794",
+      "state": "dabf8b0f",
       "events": "b3ef694a",
       "rng": {
         "draws": 295,
@@ -2998,8 +2938,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ],
             "visited": [
               "poi:eastbrook_vale:eastbrook"
@@ -3033,10 +2972,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 44000,
@@ -3139,7 +3074,7 @@
           "level": 12,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
-          "maxResource": 358,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -3151,8 +3086,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
-          "resource": 358,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
@@ -3271,7 +3206,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 870,
+          "resource": 876,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -3350,7 +3285,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 833,
-      "state": "855b1794",
+      "state": "dabf8b0f",
       "events": "741638a5",
       "rng": {
         "draws": 295,
@@ -3382,8 +3317,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ],
             "visited": [
               "poi:eastbrook_vale:eastbrook"
@@ -3417,10 +3351,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 44000,
@@ -3523,7 +3453,7 @@
           "level": 12,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
-          "maxResource": 358,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -3535,8 +3465,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
-          "resource": 358,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
@@ -3655,7 +3585,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 870,
+          "resource": 876,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,

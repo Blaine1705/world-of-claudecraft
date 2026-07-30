@@ -14,44 +14,13 @@ const TALENTS_V2_CONTENT_REVISION = 1;
 
 /**
  * Latest production character-JSON revision. 1: the v0.26 Talents V2 rollout.
- * 2: the v0.31 class-overhaul wave (hunter, shaman, priest, paladin, rogue);
+ * 2: the first v0.29 class redesigns (hunter, shaman, priest, and rogue);
+ * 3: the v0.29 Druid redesign;
  * changed option ids get a free row repick, and the repair scrubs retired row
  * grants (for rogues: Contingency, Wraith Strike, Shadecloak) off saved bars.
- * 3: the v0.29 Druid redesign; its rows kept their ids while changing meaning,
- * so the druid repick also wipes surviving row picks.
- * Untouched classes keep their build and bar layout and only advance the marker,
- * but every class is still scrubbed of ability ids it cannot use (see below).
+ * Untouched classes pass through unchanged and only advance the marker.
  */
 export const CURRENT_CHARACTER_CONTENT_REVISION = 3;
-
-/**
- * Which classes were redesigned at each revision, applied STEPWISE: a save that
- * skipped several revisions collects every repick it is owed on the way up, so a
- * pre-wave hunter save still gets its revision-2 repick when it migrates to 3.
- * `wipeRows` is for redesigns that kept row ids while changing what they mean
- * (the druid re-theme): a plain repair would keep the stale picks, so the repick
- * must clear them.
- *
- * WHEN YOU REDESIGN A CLASS: add a new revision entry (or join the newest entry
- * if your redesign ships in the same wave) and bump
- * `CURRENT_CHARACTER_CONTENT_REVISION` to match. The rev-2 wave originally used a
- * single overwritten set; paladin (#2428) and rogue (#2328) were silently missed
- * by an earlier `cls !== 'hunter'` guard, which left retired ids like `judgement`
- * on live bars. The scrub below now runs for every class, so a missed entry can
- * no longer strand dead ids, but the class still loses its free repick.
- */
-const REDESIGNED_BY_REVISION: ReadonlyArray<{
-  revision: number;
-  classes: ReadonlySet<PlayerClass>;
-  wipeRows: boolean;
-}> = [
-  {
-    revision: 2,
-    classes: new Set<PlayerClass>(['hunter', 'shaman', 'priest', 'paladin', 'rogue']),
-    wipeRows: false,
-  },
-  { revision: 3, classes: new Set<PlayerClass>(['druid']), wipeRows: true },
-];
 
 function migrationLevel(value: number): number {
   if (!Number.isFinite(value)) return 1;
@@ -77,22 +46,15 @@ function canSeedOnMainBar(cls: PlayerClass, abilityId: string): boolean {
 }
 
 /**
- * Keep valid positions, drop obsolete/duplicate/passive entries, then (only when
- * `seed` is set) fill empty slots with deterministic baseline/spec actives.
- * Computing seed candidates with an empty row map prevents unselected row grants
- * from leaking onto the bar.
- *
- * The drop half runs for EVERY class: a slot naming an ability the character cannot
- * use is dead whoever owns it, and nothing else removes it (talent_loadouts.repairBar
- * only checks the slot is a string). The seed half is what would disturb a bar a
- * player deliberately left gapped, so it stays gated to the redesigned classes.
+ * Keep valid positions, drop obsolete/duplicate/passive entries, then fill empty
+ * slots with deterministic baseline/spec actives. Computing seed candidates with
+ * an empty row map prevents unselected row grants from leaking onto the bar.
  */
 function migrateLoadoutBar(
   cls: PlayerClass,
   level: number,
   allocation: TalentAllocation,
   value: readonly (string | null)[],
-  seed: boolean,
 ): (string | null)[] {
   const fullMods = computeTalentModifiers(cls, allocation, level);
   const known = new Set(abilitiesKnownAt(cls, level, fullMods).map((entry) => entry.def.id));
@@ -110,8 +72,6 @@ function migrateLoadoutBar(
     seen.add(abilityId);
     return abilityId;
   });
-
-  if (!seed) return bar;
 
   const specOnly = computeTalentModifiers(cls, { spec: allocation.spec, rows: {} }, level);
   const seedIds = abilitiesKnownAt(cls, level, specOnly)
@@ -132,30 +92,27 @@ function migrateLoadouts(
   level: number,
   value: unknown,
   activeValue: unknown,
-  seed: boolean,
-  wipeRows: boolean,
+  freeRepick: boolean,
 ): { loadouts: SavedLoadout[]; activeLoadout: number } {
   const repaired = repairTalentLoadouts(cls, level, value, activeValue);
   return {
     activeLoadout: repaired.activeLoadout,
     loadouts: repaired.loadouts.map((loadout) => {
-      const alloc = wipeRows ? { spec: loadout.alloc.spec, rows: {} } : loadout.alloc;
+      const alloc = freeRepick ? { spec: loadout.alloc.spec, rows: {} } : loadout.alloc;
       return {
         name: loadout.name,
         alloc,
-        bar: migrateLoadoutBar(cls, level, alloc, loadout.bar, seed),
+        bar: migrateLoadoutBar(cls, level, alloc, loadout.bar),
       };
     }),
   };
 }
 
 /**
- * Pure one-way content migration. Revision 1 converted production point-tree saves
- * to canonical `{spec, rows}`. Revision 2 gives every class redesigned in the v0.31
- * wave a free row repick and refills its bar. A class nobody redesigned keeps its
- * build and bar layout and only advances the marker, but is still scrubbed of
- * ability ids it cannot use. Reapplying the current revision is an identity
- * operation.
+ * Pure one-way content migration. Revision 1 converted production point-tree
+ * saves to canonical `{spec, rows}`. Revision 2 grants Hunters a free row repick.
+ * Revision 3 does the same for Druids and scrubs retired row grants from bars.
+ * Reapplying the current revision is an identity operation.
  */
 export function migrateCharacterTalentsV2(cls: PlayerClass, state: CharacterState): CharacterState {
   const revision = Number.isSafeInteger(state.contentRevision)
@@ -163,28 +120,21 @@ export function migrateCharacterTalentsV2(cls: PlayerClass, state: CharacterStat
     : 0;
   if (revision >= CURRENT_CHARACTER_CONTENT_REVISION) return state;
 
-  // A pre-v1 save always needs the full conversion; at v1 and up only a class
-  // some skipped revision actually redesigned does (stepwise, see the table).
-  const owed = REDESIGNED_BY_REVISION.filter(
-    (step) => revision < step.revision && step.classes.has(cls),
-  );
-  const fullRepair = revision < TALENTS_V2_CONTENT_REVISION || owed.length > 0;
-  const wipeRows = fullRepair && owed.some((step) => step.wipeRows);
+  const freeRepick =
+    revision < TALENTS_V2_CONTENT_REVISION ||
+    (cls === 'hunter' && revision < 2) ||
+    (cls === 'druid' && revision < 3);
+  if (!freeRepick) {
+    return { ...state, contentRevision: CURRENT_CHARACTER_CONTENT_REVISION };
+  }
 
   const level = migrationLevel(state.level);
-  let talents = state.talents;
-  if (fullRepair) {
-    const repaired = repairAllocation(cls, state.talents, level);
-    talents = wipeRows ? { spec: repaired.spec, rows: {} } : repaired;
-  }
-  const migratedLoadouts = migrateLoadouts(
-    cls,
-    level,
-    state.loadouts,
-    state.activeLoadout,
-    fullRepair,
-    wipeRows,
-  );
+  const repairedTalents = repairAllocation(cls, state.talents, level);
+  const talents = {
+    spec: repairedTalents.spec,
+    rows: {},
+  };
+  const migratedLoadouts = migrateLoadouts(cls, level, state.loadouts, state.activeLoadout, true);
   return {
     ...state,
     contentRevision: CURRENT_CHARACTER_CONTENT_REVISION,

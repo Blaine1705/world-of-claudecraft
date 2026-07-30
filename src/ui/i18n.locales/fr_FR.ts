@@ -4050,7 +4050,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.unavailable': 'Indisponible',
   'abilityUi.tooltip.requiresLevel': 'Niveau {level} requis',
   'abilityUi.tooltip.requiresForm': 'Requiert la forme de {form}',
-  'abilityUi.tooltip.requiresStealth': 'Requiert le camouflage',
   'abilityUi.tooltip.requiresCombo': 'Consomme des points de combo',
   'abilityUi.tooltip.requiresTargetHealthBelow':
     'Requiert une cible sous {percent}% de points de vie',
@@ -4485,42 +4484,25 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_barrier.description':
     'Vous protège dans la glace et absorbe {damage} points de dégâts pendant 60 s.',
   'entities.abilities.sinister_strike.name': 'Taillade perfide',
-  'entities.abilities.sinister_strike.description':
-    "Frappe instantanée infligeant les dégâts de l'arme plus {damage}. Confère 1 point de combo.",
   'entities.abilities.eviscerate.name': 'Sommeil éternel',
-  'entities.abilities.eviscerate.description': 'Coup de grâce qui inflige {damage}.',
   'entities.abilities.backstab.name': 'Estoc lâche',
-  'entities.abilities.backstab.description':
-    "Poignarde la cible pour 150% des dégâts de l'arme plus {damage}. Vous devez être derrière la cible. Requiert une dague. Confère 1 point de combo.",
   'entities.abilities.gouge.name': "Coup à l'œil",
   'entities.abilities.gouge.description':
     "Frappe la cible pour {damage} points de dégâts et l'incapacite pendant 4 s. Tout dégât interrompt l'effet. Confère 1 point de combo.",
   'entities.abilities.evasion.name': 'Pied spectral',
   'entities.abilities.evasion.description': "Augmente vos chances d'esquiver de 50% pendant 15 s.",
   'entities.abilities.slice_and_dice.name': 'Tempo du coupe-gorge',
-  'entities.abilities.slice_and_dice.description':
-    "Coup de grâce qui augmente la vitesse d'attaque en mêlée de 30%. Dure plus longtemps par point de combo.",
   'entities.abilities.sprint.name': 'Talons ailés',
   'entities.abilities.sprint.description':
     'Augmente votre vitesse de déplacement de 70% pendant 15 s.',
   'entities.abilities.kidney_shot.name': 'Coup bas',
-  'entities.abilities.kidney_shot.description':
-    'Coup de grâce qui étourdit la cible. Dure 1 s de plus par point de combo.',
   'entities.abilities.ambush.name': 'Frappe du rôdeur',
-  'entities.abilities.ambush.description':
-    "Prend la cible en embuscade pour 250% des dégâts de l'arme plus {damage}. Vous devez être camouflé et derrière la cible. Requiert une dague. Confère 1 point de combo.",
   'entities.abilities.stealth.name': 'Voile du crépuscule',
-  'entities.abilities.stealth.description':
-    'Vous dissimule dans les ombres : les ennemis vous remarquent à peine, mais vous vous déplacez 50% plus lentement. Attaquer ou subir des dégâts interrompt Duskveil. Relancez pour sortir.',
   'entities.abilities.adrenaline_rush.name': 'Sang vif',
   'entities.abilities.adrenaline_rush.description':
     "Votre sang s'embrase et restaure instantanément 60 énergie.",
   'entities.abilities.garrote.name': 'Fil étrangleur',
-  'entities.abilities.garrote.description':
-    "Garrotte l'ennemi, lui infligeant {damage} points de dégâts immédiats et le faisant saigner de {overTime} pendant 18 s. Vous devez être camouflé. Confère 1 point de combo.",
   'entities.abilities.cheap_shot.name': 'Coup au ventre',
-  'entities.abilities.cheap_shot.description':
-    "Frappe la cible pour {damage} points de dégâts et l'étourdit pendant 4 s. Vous devez être camouflé. Confère 2 points de combo.",
   'entities.abilities.sap.name': 'Assommer',
   'entities.abilities.sap.description':
     "Neutralise la cible pendant 8 s. Vous devez être camouflé et hors combat. Le moindre dégât rompt l'effet.",
@@ -4528,11 +4510,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.description':
     'Frappe la cible avec un venin de plomb, infligeant {damage} dégâts de Nature et réduisant sa vitesse de déplacement de 50% pendant 12 s.',
   'entities.abilities.expose_armor.name': "Brèche d'armure",
-  'entities.abilities.expose_armor.description':
-    'Coup de grâce qui expose la cible, réduisant son armure de {damage} pendant 30 s.',
   'entities.abilities.rupture.name': 'Hémorragie',
-  'entities.abilities.rupture.description':
-    'Coup de grâce qui blesse la cible, la faisant saigner de {damage} pendant 16 s.',
   'entities.abilities.vanish.name': 'Pas de fumée',
   'entities.abilities.vanish.description':
     "Vous disparaissez et entrez en Duskveil, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
@@ -4708,18 +4686,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.description':
     "Frappe instantanément la cible d'une ombre brûlante pour {damage} points de dégâts d'Ombre.",
   'entities.abilities.wrath.name': 'Trait sauvage',
-  'entities.abilities.wrath.description':
-    "Lance un trait d'énergie naturelle qui inflige {damage} points de dégâts de Nature.",
   'entities.abilities.healing_touch.name': 'Soin sauvage',
   'entities.abilities.healing_touch.description': 'Rend {damage} points de vie à une cible alliée.',
   'entities.abilities.mark_of_the_wild.name': 'Garde sauvage',
   'entities.abilities.mark_of_the_wild.description':
     'Place le Wildward sur une cible alliée et augmente son armure de {buff} pendant 30 min.',
   'entities.abilities.moonfire.name': 'Tempête lunaire',
-  'entities.abilities.moonfire.description':
-    "Brûle l'ennemi par un feu lunaire pour {damage} points de dégâts des Arcanes plus des dégâts sur la durée.",
   'entities.abilities.rejuvenation.name': 'Floraison sauvage',
-  'entities.abilities.rejuvenation.description': 'Rend {damage} points de vie à la cible en 12 s.',
   'entities.abilities.thorns.name': 'Garde de ronces',
   'entities.abilities.thorns.description':
     'Des épines jaillissent de la cible: les assaillants en mêlée subissent {buff} points de dégâts de Nature.',
@@ -4730,8 +4703,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bear_form.description':
     "Vous change en ours: armure +130%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur.",
   'entities.abilities.maul.name': 'Brise-os',
-  'entities.abilities.maul.description':
-    "Attaque dévastatrice qui augmente les dégâts de mêlée de {damage} et génère beaucoup de menace. S'active lors de votre prochaine frappe. Forme de Bruin uniquement.",
   'entities.abilities.growl.name': 'Menacer',
   'entities.abilities.growl.description':
     'Gronde la cible : votre menace rejoint celle de son ennemi le plus haï et elle est forcée de vous attaquer pendant 3 s. Forme de Bruin uniquement.',
@@ -4739,23 +4710,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cat_form.description':
     "Vous change en loup: la puissance d'attaque augmente avec votre niveau, vos attaques utilisent énergie et points de combo, et vous générez 29% de menace en moins. Relancez pour reprendre votre forme de lanceur.",
   'entities.abilities.claw.name': 'Griffe',
-  'entities.abilities.claw.description':
-    "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de loup uniquement.",
   'entities.abilities.ferocious_bite.name': 'Morsure sanglante',
-  'entities.abilities.ferocious_bite.description':
-    'Coup de grâce qui inflige {damage}. Forme de loup uniquement.',
   'entities.abilities.swipe.name': 'Griffes balayantes',
-  'entities.abilities.swipe.description':
-    'Balaye les ennemis proches pour {damage} points de dégâts. Génère de la menace supplémentaire. Forme de Bruin uniquement.',
   'entities.abilities.regrowth.name': 'Seconde floraison',
-  'entities.abilities.regrowth.description':
-    'Rend {damage} points de vie à une cible alliée plus une quantité supplémentaire en 21 s.',
   'entities.abilities.barkskin.name': 'Peau de chêne',
   'entities.abilities.barkskin.description':
     "Votre peau durcit comme de l'écorce et augmente l'armure de 150 pendant 15 s.",
   'entities.abilities.starfire.name': 'Chute céleste',
-  'entities.abilities.starfire.description':
-    'Fait tomber un trait de feu stellaire qui inflige {damage} points de dégâts des Arcanes.',
   'entities.abilities.travel_form.name': 'Forme de Fleet',
   'entities.abilities.travel_form.description':
     "Adopte instantanément une forme de Fleet rapide, augmentant la vitesse de déplacement de 40%. Vous ne pouvez pas utiliser d'autres capacités sous cette forme, mais vous pouvez l'adopter ou la quitter en combat, idéale pour fuir.",
@@ -4766,8 +4727,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.description':
     'Étourdit la cible pendant 2 s. Forme de Bruin uniquement.',
   'entities.abilities.faerie_fire.name': 'Lumière de sorcière',
-  'entities.abilities.faerie_fire.description':
-    "Diminue l'armure de la cible de {damage}% pendant 40 s. Ne se cumule pas avec Cisaillement d'armure.",
   'entities.abilities.hibernate.name': 'Sommeil',
   'entities.abilities.hibernate.description':
     'Plonge la cible dans un sommeil profond pendant 8 s maximum. Tout dégât la réveille.',
@@ -4784,8 +4743,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.description':
     "Augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement.",
   'entities.abilities.rip.name': 'Lacération',
-  'entities.abilities.rip.description':
-    'Coup de grâce qui inflige {damage} points de dégâts de saignement sur 12 s. Consomme les points de combo. Forme de loup uniquement.',
   'entities.abilities.mortal_strike.name': 'Frappe mutilante',
   'entities.abilities.mortal_strike.description':
     "Frappe vicieuse infligeant les dégâts de l'arme plus {damage}. (signature Armes)",
@@ -4832,8 +4789,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description':
     'Passe en camouflage tant que vous êtes en forme de loup, avec une vitesse de déplacement réduite de 50%. Inutilisable en combat.',
   'entities.abilities.rake.name': 'Écorcher',
-  'entities.abilities.rake.description':
-    "Une attaque d'ouverture en camouflage qui lacère l'ennemi pour les dégâts de l'arme plus {damage} et inflige des dégâts de saignement sur 9 sec. Octroie 1 point de combo. Forme de loup uniquement.",
   'entities.abilities.revive_pet.name': 'Rafistoler',
   'entities.abilities.revive_pet.description':
     "Rafistole votre familier et lui rend {overTime} points de vie en 12 s, par pulsations toutes les 3 s, s'il est vivant. S'il est mort, le ranime avec 35 % de ses points de vie.",
@@ -4862,14 +4817,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     'Augmente la hâte des sorts de 30% et empêche l’interruption et le recul des incantations pendant 10 s. (signature Givre)',
   'entities.abilities.cold_blood.name': 'Sang froid',
-  'entities.abilities.cold_blood.description':
-    'Concentre votre intention meurtrière afin que votre prochaine attaque soit un coup critique. (signature Assassinat)',
   'entities.abilities.blade_flurry.name': 'Déluge de lames',
-  'entities.abilities.blade_flurry.description':
-    'Déchaîne un déluge de lames, augmentant la vitesse d’attaque de 20% pendant 12 s. (signature Combat)',
   'entities.abilities.hemorrhage.name': 'Hémorragie',
-  'entities.abilities.hemorrhage.description':
-    'Frappe l’ennemi pour les dégâts de l’arme plus {damage} et inflige des dégâts de saignement pendant 12 s. Confère 1 point de combo. (signature Finesse)',
   'entities.abilities.power_infusion.name': 'Infusion de puissance',
   'entities.abilities.power_infusion.description':
     'Insuffle de la puissance à une cible alliée, augmentant sa puissance des sorts de 28 pendant 15 s. (signature Discipline)',
@@ -4895,8 +4844,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Charge un ennemi et l’enracine pendant 1 s. Portée de 8-25 m. (signature Farouche)',
   'entities.abilities.swiftmend.name': 'Prompte guérison',
-  'entities.abilities.swiftmend.description':
-    'Consume un effet de soins sur la durée sur une cible alliée pour lui rendre {damage} points de vie. (signature Restauration)',
   'entities.abilities.crusader_strike.name': 'Frappe du croisé',
   'entities.abilities.crusader_strike.description':
     'Frappe la cible et inflige les dégâts de l’arme plus {damage} points de dégâts du Sacré. (talent de paladin)',
@@ -9983,8 +9930,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Rend 180 points de vie en 10 s. Forme d'ours uniquement. (talent de Druide)",
   'entities.abilities.frost_trap.description':
     "Gèle les ennemis dans la zone ciblée pendant 3 s, les empêchant de se déplacer et d'agir. (talent de Chasseur)",
-  'entities.abilities.ghostly_strike.description':
-    "Frappe l'ennemi et lui inflige les dégâts de l'arme plus {damage}, augmente brièvement l'esquive et octroie 1 point de combo. (talent de Voleur)",
   'entities.abilities.hammer_of_wrath.description':
     'Lance un marteau sacré sur un ennemi blessé et lui inflige {damage} points de dégâts du Sacré. Utilisable uniquement sous 20 % de points de vie. (talent de Paladin)',
   'entities.abilities.healing_stream.description':

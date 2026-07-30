@@ -2396,7 +2396,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.requiresForm': 'Membutuhkan Wujud {form}',
   'abilityUi.tooltip.requiresLevel': 'Membutuhkan level {level}',
   'abilityUi.tooltip.requiresOutOfCombat': 'Harus berada di luar pertarungan',
-  'abilityUi.tooltip.requiresStealth': 'Membutuhkan siluman',
   'abilityUi.tooltip.requiresTargetHealthBelow': 'Membutuhkan nyawa target di bawah {percent}%',
   'abilityUi.tooltip.unavailable': 'Tidak tersedia',
   'auth.appearance': 'Penampilan',
@@ -2690,8 +2689,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Tembakan yang ditarik dengan cermat yang menimbulkan {damage} kerusakan.',
   'entities.abilities.aimed_shot.name': 'Tarikan Panjang',
-  'entities.abilities.ambush.description':
-    'Sergap target untuk 250% kerusakan senjata plus {damage}. Harus dalam siluman dan di belakang target. Membutuhkan belati. Memberi 1 poin kombo.',
   'entities.abilities.ambush.name': 'Serangan Penyergap',
   'entities.abilities.arcane_explosion.description':
     'Ledakan energi Arkana menghantam semua musuh terdekat untuk {damage} kerusakan Arkana.',
@@ -2714,8 +2711,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.description':
     'Mengambil wujud musang, meningkatkan peluang menghindarmu sebesar 8% selama 30 menit.',
   'entities.abilities.aspect_of_the_monkey.name': 'Wujud Musang',
-  'entities.abilities.backstab.description':
-    'Tikam target dari belakang untuk 150% kerusakan senjata plus {damage}. Harus di belakang target. Membutuhkan belati. Memberi 1 poin kombo.',
   'entities.abilities.backstab.name': 'Tusukan Pengecut',
   'entities.abilities.barkskin.description':
     'Kulitmu mengeras bagai kulit kayu, meningkatkan zirah sebesar 150 selama 15 detik.',
@@ -2752,11 +2747,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.charge.description':
     'Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Jangkauan 8-25 yard.',
   'entities.abilities.charge.name': 'Serbuan',
-  'entities.abilities.cheap_shot.description':
-    'Menyerang target sebesar {damage} kerusakan, menyetrumnya selama 4 detik. Harus dalam siluman. Memberi 2 poin kombo.',
   'entities.abilities.cheap_shot.name': 'Pukulan Ulu Hati',
-  'entities.abilities.claw.description':
-    'Mencakar musuh untuk kerusakan senjata plus {damage}. Memberi 1 poin kombo. Hanya dalam Wujud Serigala.',
   'entities.abilities.claw.name': 'Cakar',
   'entities.abilities.cleave.description':
     'Sabetan menyapu yang menghantam semua musuh di hadapanmu untuk {damage} kerusakan.',
@@ -2823,7 +2814,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.evasion.description':
     'Meningkatkan peluang mengelakmu sebesar 50% selama 15 detik.',
   'entities.abilities.evasion.name': 'Langkah Hantu',
-  'entities.abilities.eviscerate.description': 'Gerakan penutup yang menyebabkan {damage}.',
   'entities.abilities.eviscerate.name': 'Tidur Abadi',
   'entities.abilities.execute.description':
     'Berupaya menghabisi musuh yang terluka, menimbulkan {damage} kerusakan. Hanya dapat digunakan pada musuh di bawah 20% kesehatan.',
@@ -2831,17 +2821,11 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.exorcism.description':
     'Mengusir yang jahat dengan murka Suci, menimbulkan {damage} kerusakan Suci.',
   'entities.abilities.exorcism.name': 'Ritus Pengusiran',
-  'entities.abilities.expose_armor.description':
-    'Gerakan penutup yang menyingkap target, mengurangi zirahnya sebesar {damage} selama 30 detik.',
   'entities.abilities.expose_armor.name': 'Tembus Zirah',
-  'entities.abilities.faerie_fire.description':
-    'Mengurangi zirah target sebesar {damage}% selama 40 detik. Tidak menumpuk dengan Robek Zirah.',
   'entities.abilities.faerie_fire.name': 'Cahaya Sihir',
   'entities.abilities.fear.description':
     'Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 8 detik. Kerusakan apa pun mematahkan efeknya.',
   'entities.abilities.fear.name': 'Cekaman',
-  'entities.abilities.ferocious_bite.description':
-    'Gerakan penutup yang menyebabkan {damage}. Hanya dalam Wujud Serigala.',
   'entities.abilities.ferocious_bite.name': 'Gigitan Berdarah',
   'entities.abilities.fire_blast.description':
     'Meledakkan musuh sebesar {damage} kerusakan Api. Seketika.',
@@ -2891,8 +2875,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbrand_weapon.description':
     'Mengisi senjatamu dengan embun beku yang menggigit: setiap ayunan memberi {damage} kerusakan tambahan selama 5 menit.',
   'entities.abilities.frostbrand_weapon.name': 'Senjata Rimebound',
-  'entities.abilities.garrote.description':
-    'Menjerat musuh, menimbulkan {damage} kerusakan sekarang dan membuatnya berdarah sebesar {overTime} selama 18 detik. Harus dalam siluman. Memberi 1 poin kombo.',
   'entities.abilities.garrote.name': 'Kawat Leher',
   'entities.abilities.ghost_wolf.description':
     'Mengubahmu menjadi Shadewolf, meningkatkan kecepatan gerak sebesar 40% selama 10 menit.',
@@ -2939,8 +2921,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.judgement.description':
     'Melepaskan Segel aktifmu kepada musuh, melahapnya untuk memberi kerusakan Suci yang tersimpan.',
   'entities.abilities.judgement.name': 'Vonis',
-  'entities.abilities.kidney_shot.description':
-    'Gerakan penutup yang membuat target terpana. Bertahan 1 detik lebih lama per poin kombo.',
   'entities.abilities.kidney_shot.name': 'Pukulan Curang',
   'entities.abilities.lay_on_hands.description':
     'Lonjakan penyembuhan masif memulihkan {damage}% dari kesehatan maksimummu. Jeda 10 menit.',
@@ -2958,8 +2938,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     'Menempatkan Wildward pada target sekutu, meningkatkan zirah sebesar {buff} selama 30 menit.',
   'entities.abilities.mark_of_the_wild.name': 'Naungan Liar',
-  'entities.abilities.maul.description':
-    'Serangan mencabik yang meningkatkan kerusakan jarak dekat sebesar {damage} dan menimbulkan ancaman tinggi. Aktif pada ayunan berikutnya. Hanya dalam Wujud Bruin.',
   'entities.abilities.maul.name': 'Remuk Tulang',
   'entities.abilities.mind_blast.description':
     'Meledakkan pikiran target sebesar {damage} kerusakan Bayangan.',
@@ -2970,8 +2948,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mongoose_bite.description':
     'Serangan balasan setelah target mengelak sebesar kerusakan senjata ditambah {damage}. Tidak dapat dielakkan.',
   'entities.abilities.mongoose_bite.name': 'Taring Balasan',
-  'entities.abilities.moonfire.description':
-    'Membakar musuh dengan api bulan sebesar {damage} kerusakan Arkana ditambah kerusakan seiring waktu.',
   'entities.abilities.moonfire.name': 'Badai Rembulan',
   'entities.abilities.mortal_strike.description':
     'Serangan ganas yang menimbulkan kerusakan senjata ditambah {damage}. (Ciri khas Arms)',
@@ -2997,8 +2973,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pyroblast.description':
     'Melontarkan bongkahan berkobar raksasa yang menimbulkan {damage} kerusakan Api ditambah kerusakan tambahan seiring waktu.',
   'entities.abilities.pyroblast.name': 'Tombak Api',
-  'entities.abilities.rake.description':
-    'Pembuka siluman yang menggaruk musuh sebesar kerusakan senjata ditambah {damage} dan menimbulkan kerusakan berdarah selama 9 detik. Memberi 1 poin kombo. Hanya dalam Wujud Serigala.',
   'entities.abilities.rake.name': 'Kupasan',
   'entities.abilities.rapid_fire.description':
     'Salurkan enam tembakan cepat selama 2,4 detik sambil bergerak. Setiap tembakan menimbulkan {damage} kerusakan fisik.',
@@ -3006,11 +2980,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.description':
     'Serangan jarak dekat kuat yang meningkatkan kerusakan sebesar {damage}. Aktif pada ayunan berikutnya.',
   'entities.abilities.raptor_strike.name': 'Serangan Cabik Perut',
-  'entities.abilities.regrowth.description':
-    'Menyembuhkan target sekutu sebesar {damage} dan jumlah tambahan selama 21 detik.',
   'entities.abilities.regrowth.name': 'Mekar Kedua',
-  'entities.abilities.rejuvenation.description':
-    'Menyembuhkan target sebesar {damage} selama 12 detik.',
   'entities.abilities.rejuvenation.name': 'Mekar Liar',
   'entities.abilities.renew.description': 'Menyembuhkan target sebesar {damage} selama 15 detik.',
   'entities.abilities.renew.name': 'Rahmat Berlanjut',
@@ -3023,14 +2993,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.righteous_fury.description':
     'Meningkatkan ancaman yang dihasilkan oleh kerusakan Suci-mu sebesar 60% selama 30 menit. Landasan utama paladin penahan serangan.',
   'entities.abilities.righteous_fury.name': 'Sumpah Membara',
-  'entities.abilities.rip.description':
-    'Gerakan penutup yang menyebabkan {damage} kerusakan Pendarahan selama 12 detik. Menghabiskan poin kombo. Hanya Wujud Serigala.',
   'entities.abilities.rip.name': 'Robekan',
   'entities.abilities.rockbiter_weapon.description':
     'Mengisi senjatamu dengan amukan batu: setiap ayunan memberikan {damage} kerusakan tambahan selama 5 menit.',
   'entities.abilities.rockbiter_weapon.name': 'Senjata Stonebound',
-  'entities.abilities.rupture.description':
-    'Gerakan penutup yang melukai target, membuatnya berdarah sebesar {damage} selama 16 detik.',
   'entities.abilities.rupture.name': 'Kehabisan Darah',
   'entities.abilities.sap.description':
     'Melumpuhkan target selama 8 detik. Harus dalam siluman dan di luar pertempuran. Kerusakan apa pun mematahkan efeknya.',
@@ -3059,25 +3025,17 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_slam.description':
     'Menghantam target dengan perisaimu sebesar 50% kerusakan senjata ditambah {damage} dan ancaman besar. (Ciri khas Perlindungan)',
   'entities.abilities.shield_slam.name': 'Pemecah Perisai',
-  'entities.abilities.sinister_strike.description':
-    'Serangan seketika sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin kombo.',
   'entities.abilities.sinister_strike.name': 'Tebasan Keji',
   'entities.abilities.slam.description':
     'Menghantam lawan sebesar kerusakan senjata ditambah {damage}.',
   'entities.abilities.slam.name': 'Ayunan Brutal',
-  'entities.abilities.slice_and_dice.description':
-    'Gerakan penutup yang meningkatkan kecepatan serangan jarak dekat sebesar 30%. Bertahan lebih lama per poin kombo.',
   'entities.abilities.slice_and_dice.name': 'Tempo Bengis',
   'entities.abilities.smite.description': 'Menghardik musuh sebesar {damage} kerusakan Suci.',
   'entities.abilities.smite.name': 'Hardikan',
   'entities.abilities.sprint.description':
     'Meningkatkan kecepatan gerakmu sebesar 70% selama 15 detik.',
   'entities.abilities.sprint.name': 'Tumit Gesit',
-  'entities.abilities.starfire.description':
-    'Memanggil turun panah api bintang, menyebabkan {damage} kerusakan Arkana.',
   'entities.abilities.starfire.name': 'Langit Runtuh',
-  'entities.abilities.stealth.description':
-    'Menyembunyikanmu dalam bayangan: musuh nyaris tak menyadarimu, tetapi kau bergerak 50% lebih lambat. Menyerang atau menerima kerusakan mematahkan Duskveil. Rapal lagi untuk keluar.',
   'entities.abilities.stealth.name': 'Selubung Senja',
   'entities.abilities.stormstrike.description':
     'Mengalirkan badai melalui senjatamu, seketika menyerang sebesar kerusakan senjata ditambah {damage}.',
@@ -3104,8 +3062,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memanggil Gloomshade di bawah perintah Penyihir Iblis. Gloomshade adalah iblis kokoh yang memprovokasi musuhmu dan menyerap hantaman. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu.',
   'entities.abilities.summon_voidwalker.name': 'Panggil Gloomshade',
   'entities.abilities.sunder_armor.name': 'Robek Zirah',
-  'entities.abilities.swipe.description':
-    'Menyabet musuh di sekitar sebesar {damage} kerusakan. Menyebabkan ancaman ekstra. Hanya dalam Wujud Bruin.',
   'entities.abilities.swipe.name': 'Cakar Menyapu',
   'entities.abilities.tame_beast.description':
     'Mulai menjinakkan seekor hewan untuk menjadi pendampingmu. Hewan itu harus selevel atau lebih rendah darimu dan bukan elit. Peliharaanmu mengikutimu, menyerang musuhmu, dan menahan ancamannya sendiri. Kau hanya boleh memiliki satu peliharaan pada satu waktu.',
@@ -3134,8 +3090,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wing_clip.description':
     'Menimbulkan luka sebesar {damage} kerusakan, memperlambat musuh sebesar 40% selama 10 detik.',
   'entities.abilities.wing_clip.name': 'Tebasan Pembelenggu',
-  'entities.abilities.wrath.description':
-    'Melontarkan panah energi alam sebesar {damage} kerusakan Alam.',
   'entities.abilities.wrath.name': 'Panah Liar',
   'entities.abilities.holy_shock.name': 'Kejutan Suci',
   'entities.abilities.holy_shock.description':
@@ -3162,14 +3116,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     'Meningkatkan haste mantra sebesar 30% dan mencegah interupsi serta pushback cast selama 10 dtk. (signature Frost)',
   'entities.abilities.cold_blood.name': 'Darah Dingin',
-  'entities.abilities.cold_blood.description':
-    'Memusatkan niat membunuhmu sehingga serangan berikutnya menjadi serangan kritis. (ciri khas Pembunuhan)',
   'entities.abilities.blade_flurry.name': 'Tebasan Bertubi',
-  'entities.abilities.blade_flurry.description':
-    'Melepaskan hujan bilah, meningkatkan kecepatan serangan sebesar 20% selama 12 dtk. (ciri khas Pertarungan)',
   'entities.abilities.hemorrhage.name': 'Pendarahan',
-  'entities.abilities.hemorrhage.description':
-    'Menyerang musuh dengan kerusakan senjata ditambah {damage} dan menyebabkan kerusakan berdarah selama 12 dtk. Memberi 1 poin kombo. (ciri khas Kelicikan)',
   'entities.abilities.power_infusion.name': 'Infusi Kekuatan',
   'entities.abilities.power_infusion.description':
     'Mengisi target kawan dengan kekuatan, meningkatkan kekuatan mantra sebesar 28 selama 15 dtk. (ciri khas Disiplin)',
@@ -3195,8 +3143,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Menerjang musuh dan mengakarkannya selama 1 dtk. Jarak 8-25 m. (ciri khas Keganasan)',
   'entities.abilities.swiftmend.name': 'Pemulihan Cepat',
-  'entities.abilities.swiftmend.description':
-    'Menghabiskan efek pemulihan berkala pada target kawan untuk memulihkannya sebesar {damage}. (ciri khas Pemulihan)',
   'entities.abilities.crusader_strike.name': 'Serangan Tentara Salib',
   'entities.abilities.crusader_strike.description':
     'Menyerang target dengan kerusakan senjata ditambah {damage} kerusakan Suci. (talenta Paladin)',
@@ -9549,8 +9495,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memulihkan 180 nyawa selama 10 detik. Hanya dalam Bentuk Beruang. (talenta Druid)',
   'entities.abilities.frost_trap.description':
     'Membekukan musuh di area target selama 3 detik sehingga mereka tidak dapat bergerak atau bertindak. (talenta Hunter)',
-  'entities.abilities.ghostly_strike.description':
-    'Menghantam musuh dengan kerusakan senjata ditambah {damage}, meningkatkan penghindaran sejenak, dan memberikan 1 poin kombo. (talenta Rogue)',
   'entities.abilities.hammer_of_wrath.description':
     'Melempar palu suci kepada musuh yang terluka dan menghasilkan {damage} kerusakan Suci. Hanya dapat digunakan di bawah 20% nyawa. (talenta Paladin)',
   'entities.abilities.healing_stream.description':

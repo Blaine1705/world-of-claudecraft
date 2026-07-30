@@ -2469,7 +2469,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.requiresForm': 'Yêu cầu Hình {form}',
   'abilityUi.tooltip.requiresLevel': 'Yêu cầu cấp {level}',
   'abilityUi.tooltip.requiresOutOfCombat': 'Yêu cầu đang ngoài trận chiến',
-  'abilityUi.tooltip.requiresStealth': 'Yêu cầu ẩn thân',
   'abilityUi.tooltip.requiresTargetHealthBelow': 'Yêu cầu mục tiêu dưới {percent}% máu',
   'abilityUi.tooltip.unavailable': 'Không khả dụng',
   'auth.appearance': 'Ngoại hình',
@@ -2760,8 +2759,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Một phát bắn được giương cung cẩn thận gây {damage} sát thương.',
   'entities.abilities.aimed_shot.name': 'Kéo Cung Dài',
-  'entities.abilities.ambush.description':
-    'Mai phục mục tiêu gây 250% sát thương vũ khí cộng thêm {damage}. Phải đang ẩn thân và ở phía sau mục tiêu. Yêu cầu một thanh dao găm. Thưởng 1 điểm liên hoàn.',
   'entities.abilities.ambush.name': 'Đòn Kẻ Rình Rập',
   'entities.abilities.arcane_explosion.description':
     'Một luồng năng lượng Bí Thuật bùng nổ giáng vào mọi kẻ địch lân cận gây {damage} sát thương Bí Thuật.',
@@ -2783,8 +2780,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.description':
     'Khoác lên lốt chồn, tăng tỷ lệ né đòn thêm 8% trong 30 phút.',
   'entities.abilities.aspect_of_the_monkey.name': 'Lốt Chồn',
-  'entities.abilities.backstab.description':
-    'Đâm lén mục tiêu gây 150% sát thương vũ khí cộng thêm {damage}. Phải ở phía sau mục tiêu. Yêu cầu một thanh dao găm. Thưởng 1 điểm liên hoàn.',
   'entities.abilities.backstab.name': 'Đòn Đâm Hèn Hạ',
   'entities.abilities.barkskin.description':
     'Da ngươi rắn lại như vỏ cây, tăng 150 giáp trong 15 giây.',
@@ -2821,11 +2816,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.charge.description':
     'Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước.',
   'entities.abilities.charge.name': 'Xông Tới',
-  'entities.abilities.cheap_shot.description':
-    'Đánh mục tiêu gây {damage} sát thương, làm choáng nó trong 4 giây. Phải đang ẩn thân. Thưởng 2 điểm liên hoàn.',
   'entities.abilities.cheap_shot.name': 'Thụi Bụng',
-  'entities.abilities.claw.description':
-    'Cào kẻ địch gây sát thương vũ khí cộng thêm {damage}. Thưởng 1 điểm liên hoàn. Chỉ khi ở Hình Sói.',
   'entities.abilities.claw.name': 'Vuốt Cào',
   'entities.abilities.cleave.description':
     'Một đòn chém quét trúng mọi kẻ địch phía trước ngươi gây {damage} sát thương.',
@@ -2889,7 +2880,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.name': 'Rễ Siết Chặt',
   'entities.abilities.evasion.description': 'Tăng tỷ lệ né đòn của bạn thêm 50% trong 15 giây.',
   'entities.abilities.evasion.name': 'Bước Chân Ma',
-  'entities.abilities.eviscerate.description': 'Đòn kết liễu gây {damage}.',
   'entities.abilities.eviscerate.name': 'Giấc Ngủ Vùi Đất',
   'entities.abilities.execute.description':
     'Cố gắng kết liễu kẻ thù đang trọng thương, gây {damage} sát thương. Chỉ dùng được trên kẻ địch còn dưới 20% máu.',
@@ -2897,17 +2887,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.exorcism.description':
     'Trục xuất kẻ xấu xa bằng cơn thịnh nộ Thần Thánh, gây {damage} sát thương Thần Thánh.',
   'entities.abilities.exorcism.name': 'Nghi Lễ Trục Xuất',
-  'entities.abilities.expose_armor.description':
-    'Đòn kết liễu phơi bày mục tiêu, giảm giáp của chúng đi {damage} trong 30 giây.',
   'entities.abilities.expose_armor.name': 'Xuyên Phá Giáp',
-  'entities.abilities.faerie_fire.description':
-    'Giảm giáp của mục tiêu đi {damage}% trong 40 giây. Không cộng dồn với Xẻ Giáp.',
   'entities.abilities.faerie_fire.name': 'Ánh Ma Trơi',
   'entities.abilities.fear.description':
     'Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 8 giây. Mọi sát thương sẽ phá vỡ hiệu ứng.',
   'entities.abilities.fear.name': 'Giày Vò',
-  'entities.abilities.ferocious_bite.description':
-    'Đòn kết liễu gây {damage}. Chỉ dùng được ở Hình Sói.',
   'entities.abilities.ferocious_bite.name': 'Cắn Xé Máu',
   'entities.abilities.fire_blast.description':
     'Nổ tung kẻ địch, gây {damage} sát thương Hỏa. Tức thời.',
@@ -2957,8 +2941,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbrand_weapon.description':
     'Phù phép vũ khí của bạn bằng băng giá buốt lạnh: mỗi đòn đánh gây thêm {damage} sát thương trong 5 phút.',
   'entities.abilities.frostbrand_weapon.name': 'Vũ Khí Khắc Băng',
-  'entities.abilities.garrote.description':
-    'Siết cổ kẻ địch, gây {damage} sát thương ngay lập tức và khiến nó chảy máu {overTime} trong 18 giây. Phải đang ẩn thân. Tặng 1 điểm liên hoàn.',
   'entities.abilities.garrote.name': 'Dây Siết Cổ',
   'entities.abilities.ghost_wolf.description':
     'Biến bạn thành Shadewolf, tăng tốc độ di chuyển 40% trong 10 phút.',
@@ -3004,8 +2986,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.judgement.description':
     'Giải phóng Ấn đang kích hoạt của bạn lên kẻ địch, tiêu hao nó để gây lượng sát thương Thánh tích trữ trong đó.',
   'entities.abilities.judgement.name': 'Phán Quyết',
-  'entities.abilities.kidney_shot.description':
-    'Đòn kết liễu làm choáng mục tiêu. Kéo dài thêm 1 giây cho mỗi điểm liên hoàn.',
   'entities.abilities.kidney_shot.name': 'Đòn Chơi Xấu',
   'entities.abilities.lay_on_hands.description':
     'Một luồng trị liệu khổng lồ hồi phục {damage}% máu tối đa của bạn. Hồi chiêu 10 phút.',
@@ -3023,8 +3003,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     'Đặt Wildward lên một đồng minh, tăng giáp thêm {buff} trong 30 phút.',
   'entities.abilities.mark_of_the_wild.name': 'Hộ Vệ Hoang Dã',
-  'entities.abilities.maul.description':
-    'Một đòn vồ tăng sát thương cận chiến thêm {damage} và gây ra lượng đe dọa lớn. Kích hoạt ở đòn đánh tiếp theo của bạn. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.maul.name': 'Nghiền Xương',
   'entities.abilities.mind_blast.description':
     'Nổ tung tâm trí của mục tiêu gây {damage} sát thương Bóng Tối.',
@@ -3035,8 +3013,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mongoose_bite.description':
     'Phản công sau khi mục tiêu né đòn, gây sát thương vũ khí cộng thêm {damage}. Không thể bị né.',
   'entities.abilities.mongoose_bite.name': 'Phản Nanh',
-  'entities.abilities.moonfire.description':
-    'Thiêu đốt kẻ địch bằng nguyệt hỏa gây {damage} sát thương Bí Thuật cùng sát thương theo thời gian.',
   'entities.abilities.moonfire.name': 'Bão Tố Nguyệt',
   'entities.abilities.mortal_strike.description':
     'Một đòn đánh hung hãn gây sát thương vũ khí cộng thêm {damage}. (Đặc trưng nhánh Vũ Khí)',
@@ -3062,8 +3038,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pyroblast.description':
     'Ném ra một tảng lửa khổng lồ gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian.',
   'entities.abilities.pyroblast.name': 'Thương Liệt Hỏa',
-  'entities.abilities.rake.description':
-    'Một đòn mở màn từ trạng thái ẩn thân cào xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây sát thương chảy máu trong 9 giây. Tặng 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói.',
   'entities.abilities.rake.name': 'Lóc Xé',
   'entities.abilities.rapid_fire.description':
     'Vừa di chuyển vừa bắn nhanh sáu phát trong 2,4 giây. Mỗi phát gây {damage} sát thương vật lý.',
@@ -3071,11 +3045,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.description':
     'Một đòn cận chiến mạnh tăng sát thương thêm {damage}. Kích hoạt ở đòn đánh tiếp theo của bạn.',
   'entities.abilities.raptor_strike.name': 'Đòn Moi Ruột',
-  'entities.abilities.regrowth.description':
-    'Trị liệu cho đồng minh {damage} máu cùng một lượng bổ sung trong 21 giây.',
   'entities.abilities.regrowth.name': 'Nở Hoa Lần Hai',
-  'entities.abilities.rejuvenation.description':
-    'Trị liệu cho mục tiêu {damage} máu trong 12 giây.',
   'entities.abilities.rejuvenation.name': 'Hoa Nở Hoang Dã',
   'entities.abilities.renew.description': 'Trị liệu cho mục tiêu {damage} trong 15 giây.',
   'entities.abilities.renew.name': 'Ân Điển Vương Vấn',
@@ -3088,14 +3058,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.righteous_fury.description':
     'Tăng 60% mối đe dọa tạo ra từ sát thương Thánh của bạn trong 30 phút. Nền tảng của thánh kỵ sĩ giữ aggro.',
   'entities.abilities.righteous_fury.name': 'Lời Thề Rực Cháy',
-  'entities.abilities.rip.description':
-    'Đòn kết liễu gây {damage} sát thương Chảy Máu trong 12 giây. Tiêu hao điểm liên hoàn. Chỉ dùng được ở Hình Sói.',
   'entities.abilities.rip.name': 'Xé Rách',
   'entities.abilities.rockbiter_weapon.description':
     'Phù phép vũ khí với cơn cuồng nộ của đá: mỗi cú vung gây thêm {damage} sát thương trong 5 phút.',
   'entities.abilities.rockbiter_weapon.name': 'Vũ Khí Khắc Đá',
-  'entities.abilities.rupture.description':
-    'Đòn kết liễu gây vết thương cho mục tiêu, khiến nó chảy máu nhận {damage} trong 16 giây.',
   'entities.abilities.rupture.name': 'Rỉ Máu Chí Tử',
   'entities.abilities.sap.description':
     'Vô hiệu hóa mục tiêu trong 8 giây. Phải đang Ẩn Thân và ngoài chiến đấu. Bất kỳ sát thương nào cũng phá vỡ hiệu ứng.',
@@ -3124,24 +3090,16 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_slam.description':
     'Giáng khiên vào mục tiêu gây 50% sát thương vũ khí cộng thêm {damage} và lượng đe dọa khổng lồ. (Đặc trưng Hộ Vệ)',
   'entities.abilities.shield_slam.name': 'Giáng Nứt Khiên',
-  'entities.abilities.sinister_strike.description':
-    'Một đòn đánh tức thì gây sát thương vũ khí cộng thêm {damage}. Tích 1 điểm liên hoàn.',
   'entities.abilities.sinister_strike.name': 'Nhát Chém Gian Tà',
   'entities.abilities.slam.description':
     'Giáng đòn vào đối thủ gây sát thương vũ khí cộng thêm {damage}.',
   'entities.abilities.slam.name': 'Cú Vung Thô Bạo',
-  'entities.abilities.slice_and_dice.description':
-    'Đòn kết liễu tăng 30% tốc độ đánh cận chiến. Kéo dài hơn theo mỗi điểm liên hoàn.',
   'entities.abilities.slice_and_dice.name': 'Nhịp Cắt Cổ',
   'entities.abilities.smite.description': 'Trừng phạt kẻ địch gây {damage} sát thương Thánh.',
   'entities.abilities.smite.name': 'Trừng Phạt',
   'entities.abilities.sprint.description': 'Tăng 70% tốc độ di chuyển của bạn trong 15 giây.',
   'entities.abilities.sprint.name': 'Gót Chân Nhanh',
-  'entities.abilities.starfire.description':
-    'Gọi xuống một tia lửa tinh tú, gây {damage} sát thương Bí Thuật.',
   'entities.abilities.starfire.name': 'Thiên Giáng',
-  'entities.abilities.stealth.description':
-    'Che giấu bạn trong bóng tối: kẻ địch khó nhận ra bạn, nhưng bạn di chuyển chậm hơn 50%. Tấn công hoặc nhận sát thương sẽ phá vỡ Duskveil. Niệm lại để bước ra.',
   'entities.abilities.stealth.name': 'Màn Chạng Vạng',
   'entities.abilities.stormstrike.description':
     'Dẫn dắt cơn bão qua vũ khí của bạn, tức thì đánh gây sát thương vũ khí cộng thêm {damage}.',
@@ -3168,8 +3126,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Triệu hồi một Gloomshade dưới quyền chỉ huy của Thuật Sĩ Hắc Ám. Gloomshade là con quỷ vững chãi khiêu khích kẻ địch của bạn và hứng chịu đòn tấn công. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc.',
   'entities.abilities.summon_voidwalker.name': 'Triệu Hồi Gloomshade',
   'entities.abilities.sunder_armor.name': 'Xẻ Giáp',
-  'entities.abilities.swipe.description':
-    'Quật quét các kẻ địch lân cận gây {damage} sát thương. Tạo thêm đe dọa. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.swipe.name': 'Vuốt Quét Ngang',
   'entities.abilities.tame_beast.description':
     'Bắt đầu thuần hóa một mãnh thú làm bạn đồng hành. Nó phải bằng hoặc thấp hơn cấp của bạn và không phải tinh nhuệ. Thú cưng đi theo bạn, tấn công kẻ địch và tự giữ đe dọa. Bạn chỉ có thể có một thú cưng cùng lúc.',
@@ -3198,8 +3154,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wing_clip.description':
     'Gây một vết thương với {damage} sát thương, làm chậm kẻ địch 40% trong 10 giây.',
   'entities.abilities.wing_clip.name': 'Nhát Chém Xiềng Xích',
-  'entities.abilities.wrath.description':
-    'Phóng một tia năng lượng tự nhiên gây {damage} sát thương Tự Nhiên.',
   'entities.abilities.wrath.name': 'Tia Hoang Dã',
   'entities.abilities.holy_shock.name': 'Sốc Thánh',
   'entities.abilities.holy_shock.description':
@@ -3226,14 +3180,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     'Tăng tốc độ phép 30% và ngăn gián đoạn cùng đẩy lùi thi triển trong 10 giây. (kỹ năng đặc trưng Frost)',
   'entities.abilities.cold_blood.name': 'Máu Lạnh',
-  'entities.abilities.cold_blood.description':
-    'Tập trung sát ý để đòn tấn công tiếp theo của bạn là một cú chí mạng. (dấu ấn Ám Sát)',
   'entities.abilities.blade_flurry.name': 'Loạn Đao',
-  'entities.abilities.blade_flurry.description':
-    'Tung ra một loạt lưỡi dao, tăng tốc độ tấn công thêm 20% trong 12 giây. (dấu ấn Chiến Đấu)',
   'entities.abilities.hemorrhage.name': 'Xuất Huyết',
-  'entities.abilities.hemorrhage.description':
-    'Đánh kẻ địch gây sát thương vũ khí cộng {damage} và gây sát thương chảy máu trong 12 giây. Nhận 1 điểm combo. (dấu ấn Tinh Tế)',
   'entities.abilities.power_infusion.name': 'Truyền Sức Mạnh',
   'entities.abilities.power_infusion.description':
     'Truyền sức mạnh cho một mục tiêu đồng minh, tăng sức mạnh phép thêm 28 trong 15 giây. (dấu ấn Kỷ Luật)',
@@ -3259,8 +3207,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Xung phong vào kẻ địch và trói chân chúng trong 1 giây. Tầm 8-25 m. (dấu ấn Hoang Dã)',
   'entities.abilities.swiftmend.name': 'Hồi Phục Nhanh',
-  'entities.abilities.swiftmend.description':
-    'Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage}. (dấu ấn Phục Hồi)',
   'entities.abilities.crusader_strike.name': 'Đòn Thập Tự',
   'entities.abilities.crusader_strike.description':
     'Đánh mục tiêu bằng sát thương vũ khí cộng {damage} sát thương Thánh. (tài năng Paladin)',
@@ -9494,8 +9440,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Hồi 180 máu trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)',
   'entities.abilities.frost_trap.description':
     'Đóng băng kẻ địch trong khu vực mục tiêu trong 3 giây, khiến chúng không thể di chuyển hoặc hành động. (thiên phú Thợ săn)',
-  'entities.abilities.ghostly_strike.description':
-    'Đánh kẻ địch gây sát thương vũ khí cộng {damage}, tăng né tránh trong thời gian ngắn và cho 1 điểm liên kích. (thiên phú Đạo tặc)',
   'entities.abilities.hammer_of_wrath.description':
     'Ném búa thần thánh vào kẻ địch bị thương, gây {damage} sát thương Thánh. Chỉ dùng được khi còn dưới 20% máu. (thiên phú Paladin)',
   'entities.abilities.healing_stream.description':

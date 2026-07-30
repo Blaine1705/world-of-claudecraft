@@ -6777,7 +6777,8 @@ export const cs_CZ: EnTranslations = {
       "unavailable": "Nedostupné",
       "requiresLevel": "Vyžaduje úroveň {level}",
       "requiresForm": "Vyžaduje podobu: {form}",
-      "requiresStealth": "Vyžaduje plížení",
+      "requiresStealth": "Requires stealth",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Spotřebuje combo body",
       "requiresTargetHealthBelow": "Vyžaduje cíl pod {percent}% zdraví",
       "requiresDodge": "Použitelné jen poté, co se cíl vyhne",
@@ -7455,15 +7456,20 @@ export const cs_CZ: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Zlý sek",
-        "description": "Okamžitý úder za poškození zbraně plus {damage}. Udělí 1 combo bod."
+        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
+        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
+        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
       },
       "eviscerate": {
         "name": "Do hrobu",
-        "description": "Dokončovací útok, který způsobí {damage}."
+        "description": "Finishing move that causes {damage}.",
+        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
+        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
       },
       "backstab": {
         "name": "Zbabělý výpad",
-        "description": "Bodne cíl do zad za 150 % poškození zbraně plus {damage}. Musíš být za cílem. Vyžaduje dýku. Udělí 1 combo bod."
+        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
+        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
       },
       "gouge": {
         "name": "Píchnutí do oka",
@@ -7475,7 +7481,7 @@ export const cs_CZ: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Vražedné tempo",
-        "description": "Dokončovací útok, který zvýší rychlost útoků na blízko o 30 %. Trvá déle za každý combo bod."
+        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
       },
       "sprint": {
         "name": "Rychlé paty",
@@ -7483,15 +7489,17 @@ export const cs_CZ: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Podpásovka",
-        "description": "Dokončovací útok, který omráčí cíl. Trvá o 1 s déle za každý combo bod."
+        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
       },
       "ambush": {
         "name": "Úder z číhání",
-        "description": "Přepadne cíl za 250 % poškození zbraně plus {damage}. Musíš být v plížení a za cílem. Vyžaduje dýku. Udělí 1 combo bod."
+        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
       },
       "stealth": {
         "name": "Závoj šera",
-        "description": "Skryje tě ve stínech: nepřátelé si tě sotva všimnou, ale pohybuješ se o 50 % pomaleji. Útok nebo obdržené poškození přeruší Závoj šera. Sesláním znovu vystoupíš."
+        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
+        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
         "name": "Zrychlená krev",
@@ -7499,11 +7507,13 @@ export const cs_CZ: EnTranslations = {
       },
       "garrote": {
         "name": "Struna na hrdlo",
-        "description": "Zaškrtí nepřítele, způsobí {damage} okamžitého poškození a krvácení za {overTime} během 18 s. Musíš být v plížení. Udělí 1 combo bod."
+        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "cheap_shot": {
         "name": "Rána do břicha",
-        "description": "Zasáhne cíl za {damage} poškození a omráčí ho na 4 s. Musíš být v plížení. Udělí 2 combo body."
+        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
         "name": "Omráčení",
@@ -7515,11 +7525,11 @@ export const cs_CZ: EnTranslations = {
       },
       "expose_armor": {
         "name": "Průraz zbroje",
-        "description": "Dokončovací útok, který odhalí cíl a sníží jeho zbroj o {damage} na 30 s."
+        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
       },
       "rupture": {
         "name": "Vykrvácení",
-        "description": "Dokončovací útok, který zraní cíl a způsobí krvácení za {damage} během 16 s."
+        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
       },
       "vanish": {
         "name": "Kouřový krok",
@@ -7911,7 +7921,8 @@ export const cs_CZ: EnTranslations = {
       },
       "wrath": {
         "name": "Šíp divočiny",
-        "description": "Vrhe šíp přírodní energie za {damage} přírodního poškození."
+        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
       },
       "healing_touch": {
         "name": "Divoké zhojení",
@@ -7923,7 +7934,8 @@ export const cs_CZ: EnTranslations = {
       },
       "moonfire": {
         "name": "Měsíční bouře",
-        "description": "Spálí nepřítele měsíčním ohněm za {damage} arkánního poškození plus poškození v čase."
+        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
+        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
       },
       "moonseed": {
         "name": "Měsíční semeno",
@@ -7931,7 +7943,8 @@ export const cs_CZ: EnTranslations = {
       },
       "rejuvenation": {
         "name": "Divoký květ",
-        "description": "Vyléčí cíl za {damage} během 12 s."
+        "description": "Heals the target for {damage} over 12 sec.",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
       },
       "thorns": {
         "name": "Ostružinová stráž",
@@ -7947,7 +7960,8 @@ export const cs_CZ: EnTranslations = {
       },
       "maul": {
         "name": "Drcení kostí",
-        "description": "Drtivý útok, který zvýší poškození na blízko o {damage} a způsobí velké množství hrozby. Aktivuje se při tvém dalším úderu. Pouze v medvědí podobě."
+        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
       },
       "growl": {
         "name": "Hrozba",
@@ -7959,19 +7973,23 @@ export const cs_CZ: EnTranslations = {
       },
       "claw": {
         "name": "Dráp",
-        "description": "Sekne nepřítele drápem za poškození zbraně plus {damage}. Udělí 1 combo bod. Pouze ve vlčí podobě."
+        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "Krvavý skus",
-        "description": "Dokončovací útok, který způsobí {damage}. Pouze ve vlčí podobě."
+        "description": "Finishing move that causes {damage}. Wolf Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 91 plus 55 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
       },
       "swipe": {
         "name": "Rozmáchlé drápy",
-        "description": "Sekne blízké nepřátele za {damage} poškození. Způsobí dodatečnou hrozbu. Pouze v medvědí podobě."
+        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "regrowth": {
         "name": "Druhý květ",
-        "description": "Vyléčí spojenecký cíl za {damage} a další množství během 21 s."
+        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
       },
       "barkskin": {
         "name": "Dubová kůže",
@@ -7987,7 +8005,8 @@ export const cs_CZ: EnTranslations = {
       },
       "starfire": {
         "name": "Pád nebes",
-        "description": "Přivolá šíp hvězdného ohně a způsobí {damage} arkánního poškození."
+        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 160 to 190 Nature damage plus a 75 burn over 9 sec, restoring 35 mana and spending all 3."
       },
       "travel_form": {
         "name": "Svižná podoba",
@@ -8027,7 +8046,8 @@ export const cs_CZ: EnTranslations = {
       },
       "rip": {
         "name": "Roztržení",
-        "description": "Dokončovací útok, který způsobí {damage} krvácivého poškození během 12 s. Spotřebuje combo body. Pouze ve vlčí podobě."
+        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
+        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
         "name": "Mrzačící úder",
@@ -8127,15 +8147,15 @@ export const cs_CZ: EnTranslations = {
       },
       "cold_blood": {
         "name": "Klid zabijáka",
-        "description": "Soustředí tvůj vražedný záměr, takže tvůj příští útok bude kritickým zásahem. (klíčová schopnost Vraždění)"
+        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
       },
       "blade_flurry": {
         "name": "Zrcadlové čepele",
-        "description": "Rozpoutá smršť čepelí a zvýší tvoji rychlost útoku o 20 % na 12 s. (klíčová schopnost Boje)"
+        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
       },
       "hemorrhage": {
         "name": "Rudá stuha",
-        "description": "Zasáhne nepřítele za poškození zbraně plus {damage}, způsobí mu krvácení na 12 s a zvýší utrpěné poškození krvácením o 40 %. Udělí 1 combo bod. (klíčová schopnost Lstivosti)"
+        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
       },
       "power_infusion": {
         "name": "Pomazání",
@@ -8427,7 +8447,7 @@ export const cs_CZ: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Přízračný úder",
-        "description": "Zasáhne nepřítele za poškození zbraně plus {damage}, krátce zvýší úhyb a udělí 1 kombinovaný bod. (lotrovský talent)"
+        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
         "name": "Zvonící kladivo",
@@ -8587,7 +8607,8 @@ export const cs_CZ: EnTranslations = {
       },
       "venom_dart": {
         "name": "Jedová šipka",
-        "description": "Vymrští otrávenou šipku za {damage} přírodního poškození. Uděluje 1 combo bod. Knifework: prodlužuje ránu vaší Jedové trhliny o 6 s, nejvýše na 20 s."
+        "description": "Vymrští otrávenou šipku za {damage} přírodního poškození. Uděluje 1 combo bod. Knifework: prodlužuje ránu vaší Jedové trhliny o 6 s, nejvýše na 20 s.",
+        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
       },
       "body_blow": {
         "name": "Úder na tělo",
@@ -8651,7 +8672,8 @@ export const cs_CZ: EnTranslations = {
       },
       "rake": {
         "name": "Stažení z kůže",
-        "description": "Zahajovací útok z plížení, který rozdrásá nepřítele za poškození zbraně plus {damage} a způsobí krvácení během 9 s. Udělí 1 combo bod. Pouze ve vlčí podobě."
+        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {
         "name": "Ošetření",

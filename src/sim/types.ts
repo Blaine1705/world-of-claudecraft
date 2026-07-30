@@ -2277,6 +2277,17 @@ export type AbilityEffect =
       directPct?: number;
       school?: Aura['school'];
       perCombo?: number; // rupture/rip: combo-point finisher scaling, added to total
+      /** Classic finisher bleed (Rupture): duration = baseDuration +
+       *  perComboDuration x combo points spent; the per-tick value stays
+       *  fixed (total/duration/interval define it), so more points = a
+       *  longer bleed and more total damage. */
+      baseDuration?: number;
+      perComboDuration?: number;
+      /** Classic finisher bleed (Rip): total = baseTotal + perComboTotal x
+       *  combo points spent at a FIXED duration, so points buy bigger ticks.
+       *  `total` stays the 5-point canonical for tooltips and balance pins. */
+      baseTotal?: number;
+      perComboTotal?: number;
     }
   | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
   | { type: 'consumeDot'; dot: string }
@@ -2517,7 +2528,14 @@ export type AbilityEffect =
   // flat threat. `full` lands all `maxStacks` at once (Expose Armor, a finisher that
   // applies the cap in one cast) instead of building one stack per hit (warrior Sunder).
   // `armor` is retained for the threat value; the reduction percent is a fixed constant.
-  | { type: 'sunder'; armor: number; maxStacks: number; full?: boolean }
+  | {
+      type: 'sunder';
+      armor: number;
+      maxStacks: number;
+      full?: boolean;
+      /** Classic Expose Armor: stacks applied = combo points spent. */
+      perCombo?: boolean;
+    }
   | { type: 'faerieFire'; duration: number } // fixed-percent armor reduction (AuraKind 'faerie_fire')
   | { type: 'absorbSpentResource'; mult: number; duration: number }
   | { type: 'aoeTaunt'; radius: number }
@@ -2714,6 +2732,15 @@ export interface AbilityDef {
   effects: AbilityEffect[];
   ranks?: AbilityRank[]; // later ranks (sorted by level)
   description: string; // tooltip text, $d = damage placeholder
+  /** The description already states this buff's numbers in prose; skip the
+   *  derived aura-effect line so the tooltip never says the same thing twice
+   *  (owner feedback: Ghostfoot showed its dodge buff two ways). */
+  tooltipOmitEffectLines?: boolean;
+  /** Per-spec tooltip sentences (internal spec id -> English), rendered ONLY
+   *  for the player's current spec so a shared button never carries another
+   *  spec's teaching text. Localized as
+   *  entities.abilities.<id>.specNote_<spec>. */
+  specNotes?: Readonly<Record<string, string>>;
 }
 
 // ---------------------------------------------------------------------------

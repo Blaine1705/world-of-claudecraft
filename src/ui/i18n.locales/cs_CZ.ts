@@ -1735,7 +1735,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.requiresForm': 'Vyžaduje podobu: {form}',
   'abilityUi.tooltip.requiresLevel': 'Vyžaduje úroveň {level}',
   'abilityUi.tooltip.requiresOutOfCombat': 'Vyžaduje stav mimo boj',
-  'abilityUi.tooltip.requiresStealth': 'Vyžaduje plížení',
   'abilityUi.tooltip.requiresTargetHealthBelow': 'Vyžaduje cíl pod {percent}% zdraví',
   'abilityUi.tooltip.unavailable': 'Nedostupné',
   'questUi.detail.itemReward': 'Odměna v podobě předmětu:',
@@ -4877,8 +4876,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Pečlivě natažený výstřel, který způsobí {damage} poškození.',
   'entities.abilities.aimed_shot.name': 'Dlouhý nátah',
-  'entities.abilities.ambush.description':
-    'Přepadne cíl za 250 % poškození zbraně plus {damage}. Musíš být v plížení a za cílem. Vyžaduje dýku. Udělí 1 combo bod.',
   'entities.abilities.ambush.name': 'Úder z číhání',
   'entities.abilities.arcane_explosion.description':
     'Výbuch arkánní energie zasáhne všechny blízké nepřátele za {damage} arkánního poškození.',
@@ -4900,8 +4897,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.description':
     'Přijmeš podobu kuny, která zvýší tvoji šanci na uhýbání o 8 % na 30 min.',
   'entities.abilities.aspect_of_the_monkey.name': 'Podoba kuny',
-  'entities.abilities.backstab.description':
-    'Bodne cíl do zad za 150 % poškození zbraně plus {damage}. Musíš být za cílem. Vyžaduje dýku. Udělí 1 combo bod.',
   'entities.abilities.backstab.name': 'Zbabělý výpad',
   'entities.abilities.barkskin.description':
     'Tvoje kůže ztvrdne jako kůra a zvýší zbroj o 150 na 15 s.',
@@ -4933,11 +4928,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Proměníš se ve vlka: síla útoku roste s tvojí úrovní, tvoje útoky používají energii a combo body a vytváříš o 29 % méně hrozby. Sesláním znovu se vrátíš do podoby sesilatele.',
   'entities.abilities.cat_form.name': 'Vlčí podoba',
   'entities.abilities.charge.name': 'Nápor',
-  'entities.abilities.cheap_shot.description':
-    'Zasáhne cíl za {damage} poškození a omráčí ho na 4 s. Musíš být v plížení. Udělí 2 combo body.',
   'entities.abilities.cheap_shot.name': 'Rána do břicha',
-  'entities.abilities.claw.description':
-    'Sekne nepřítele drápem za poškození zbraně plus {damage}. Udělí 1 combo bod. Pouze ve vlčí podobě.',
   'entities.abilities.claw.name': 'Dráp',
   'entities.abilities.cleave.description':
     'Rozmáchlý úder, který zasáhne všechny nepřátele před tebou za {damage} poškození.',
@@ -5003,7 +4994,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.name': 'Svazující kořeny',
   'entities.abilities.evasion.description': 'Zvýší tvoji šanci na uhýbání o 50 % na 15 s.',
   'entities.abilities.evasion.name': 'Přízračný krok',
-  'entities.abilities.eviscerate.description': 'Dokončovací útok, který způsobí {damage}.',
   'entities.abilities.eviscerate.name': 'Do hrobu',
   'entities.abilities.execute.description':
     'Pokusí se dorazit zraněného nepřítele a způsobí {damage} poškození. Použitelné jen na nepřátele pod 20 % zdraví.',
@@ -5011,15 +5001,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.exorcism.description':
     'Vyžene zkažené svatým hněvem a způsobí {damage} svatého poškození.',
   'entities.abilities.exorcism.name': 'Rituál vypuzení',
-  'entities.abilities.expose_armor.description':
-    'Dokončovací útok, který odhalí cíl a sníží jeho zbroj o {damage} na 30 s.',
   'entities.abilities.expose_armor.name': 'Průraz zbroje',
   'entities.abilities.faerie_fire.name': 'Čarodějné světlo',
   'entities.abilities.fear.description':
     'Vžene nepříteli hrůzu a nechá ho krčit se až 8 s. Jakékoli poškození efekt přeruší.',
   'entities.abilities.fear.name': 'Děs',
-  'entities.abilities.ferocious_bite.description':
-    'Dokončovací útok, který způsobí {damage}. Pouze ve vlčí podobě.',
   'entities.abilities.ferocious_bite.name': 'Krvavý skus',
   'entities.abilities.fire_blast.description':
     'Odstřelí nepřítele za {damage} ohnivého poškození. Okamžité.',
@@ -5056,8 +5042,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbrand_weapon.description':
     'Naplní tvoji zbraň štiplavým mrazem: každý úder způsobí {damage} dodatečného poškození po dobu 5 min.',
   'entities.abilities.frostbrand_weapon.name': 'Zbraň spoutaná jinovatkou',
-  'entities.abilities.garrote.description':
-    'Zaškrtí nepřítele, způsobí {damage} okamžitého poškození a krvácení za {overTime} během 18 s. Musíš být v plížení. Udělí 1 combo bod.',
   'entities.abilities.garrote.name': 'Struna na hrdlo',
   'entities.abilities.ghost_wolf.description':
     'Promění tě ve stínovlka a zvýší rychlost pohybu o 40 % na 10 min.',
@@ -5106,8 +5090,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.judgement.description':
     'Vypustí tvou aktivní pečeť na nepřítele, spotřebuje ji a způsobí uložené svaté poškození.',
   'entities.abilities.judgement.name': 'Verdikt',
-  'entities.abilities.kidney_shot.description':
-    'Dokončovací útok, který omráčí cíl. Trvá o 1 s déle za každý combo bod.',
   'entities.abilities.kidney_shot.name': 'Podpásovka',
   'entities.abilities.lay_on_hands.description':
     'Mohutná vlna léčení obnoví {damage}% tvého maximálního zdraví. Cooldown 10 min.',
@@ -5125,8 +5107,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     'Vloží Ochranu divočiny na spojenecký cíl a zvýší zbroj o {buff} na 30 min.',
   'entities.abilities.mark_of_the_wild.name': 'Ochrana divočiny',
-  'entities.abilities.maul.description':
-    'Drtivý útok, který zvýší poškození na blízko o {damage} a způsobí velké množství hrozby. Aktivuje se při tvém dalším úderu. Pouze v medvědí podobě.',
   'entities.abilities.maul.name': 'Drcení kostí',
   'entities.abilities.mind_blast.description': 'Rozdrtí mysl cíle za {damage} stínového poškození.',
   'entities.abilities.mind_blast.name': 'Zlomení mysli',
@@ -5136,8 +5116,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mongoose_bite.description':
     'Protiútok po uhnutí cíle za poškození zbraně plus {damage}. Nelze mu uhnout.',
   'entities.abilities.mongoose_bite.name': 'Protišpičák',
-  'entities.abilities.moonfire.description':
-    'Spálí nepřítele měsíčním ohněm za {damage} arkánního poškození plus poškození v čase.',
   'entities.abilities.moonfire.name': 'Měsíční bouře',
   'entities.abilities.mortal_strike.description':
     'Zákeřný úder, který způsobí poškození zbraně plus {damage}. (Hlavní schopnost Arms)',
@@ -5165,8 +5143,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rain_of_fire.description':
     'Přivolá ohnivý déšť do cílové oblasti na 4 s a spálí nepřátele za {damage} ohnivého poškození každou sekundu.',
   'entities.abilities.rain_of_fire.name': 'Ohnivý déšť',
-  'entities.abilities.rake.description':
-    'Zahajovací útok z plížení, který rozdrásá nepřítele za poškození zbraně plus {damage} a způsobí krvácení během 9 s. Udělí 1 combo bod. Pouze ve vlčí podobě.',
   'entities.abilities.rake.name': 'Stažení z kůže',
   'entities.abilities.rapid_fire.description':
     'Za pohybu vystřelíš během 2,4 s šest rychlých střel, z nichž každá způsobí {damage} bodů fyzického poškození.',
@@ -5174,10 +5150,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.description':
     'Silný útok na blízko, který zvýší poškození o {damage}. Aktivuje se při tvém dalším úderu.',
   'entities.abilities.raptor_strike.name': 'Párací úder',
-  'entities.abilities.regrowth.description':
-    'Vyléčí spojenecký cíl za {damage} a další množství během 21 s.',
   'entities.abilities.regrowth.name': 'Druhý květ',
-  'entities.abilities.rejuvenation.description': 'Vyléčí cíl za {damage} během 12 s.',
   'entities.abilities.rejuvenation.name': 'Divoký květ',
   'entities.abilities.renew.description': 'Vyléčí cíl za {damage} během 15 s.',
   'entities.abilities.renew.name': 'Přetrvávající milost',
@@ -5190,14 +5163,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.righteous_fury.description':
     'Zvýší hrozbu vytvořenou tvým svatým poškozením o 60 % na 30 min. Základ tankovacího paladina.',
   'entities.abilities.righteous_fury.name': 'Hořící přísaha',
-  'entities.abilities.rip.description':
-    'Dokončovací útok, který způsobí {damage} krvácivého poškození během 12 s. Spotřebuje combo body. Pouze ve vlčí podobě.',
   'entities.abilities.rip.name': 'Roztržení',
   'entities.abilities.rockbiter_weapon.description':
     'Naplní tvoji zbraň zuřivostí kamene: každý úder způsobí {damage} dodatečného poškození po dobu 5 min.',
   'entities.abilities.rockbiter_weapon.name': 'Zbraň spoutaná kamenem',
-  'entities.abilities.rupture.description':
-    'Dokončovací útok, který zraní cíl a způsobí krvácení za {damage} během 16 s.',
   'entities.abilities.rupture.name': 'Vykrvácení',
   'entities.abilities.sap.description':
     'Vyřadí cíl na 8 s. Musíš být v plížení a mimo boj. Jakékoli poškození efekt přeruší.',
@@ -5226,23 +5195,15 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_slam.description':
     'Udeří cíl štítem za 50 % poškození zbraně plus {damage} a masivní hrozbu. (Hlavní schopnost Protection)',
   'entities.abilities.shield_slam.name': 'Proražení štítem',
-  'entities.abilities.sinister_strike.description':
-    'Okamžitý úder za poškození zbraně plus {damage}. Udělí 1 combo bod.',
   'entities.abilities.sinister_strike.name': 'Zlý sek',
   'entities.abilities.slam.description': 'Praští protivníka za poškození zbraně plus {damage}.',
   'entities.abilities.slam.name': 'Hrubý švih',
-  'entities.abilities.slice_and_dice.description':
-    'Dokončovací útok, který zvýší rychlost útoků na blízko o 30 %. Trvá déle za každý combo bod.',
   'entities.abilities.slice_and_dice.name': 'Vražedné tempo',
   'entities.abilities.smite.description': 'Potrestá nepřítele za {damage} svatého poškození.',
   'entities.abilities.smite.name': 'Potrestání',
   'entities.abilities.sprint.description': 'Zvýší tvoji rychlost pohybu o 70 % na 15 s.',
   'entities.abilities.sprint.name': 'Rychlé paty',
-  'entities.abilities.starfire.description':
-    'Přivolá šíp hvězdného ohně a způsobí {damage} arkánního poškození.',
   'entities.abilities.starfire.name': 'Pád nebes',
-  'entities.abilities.stealth.description':
-    'Skryje tě ve stínech: nepřátelé si tě sotva všimnou, ale pohybuješ se o 50 % pomaleji. Útok nebo obdržené poškození přeruší Závoj šera. Sesláním znovu vystoupíš.',
   'entities.abilities.stealth.name': 'Závoj šera',
   'entities.abilities.stormstrike.description':
     'Svede bouři skrz tvoji zbraň a okamžitě udeří za poškození zbraně plus {damage}.',
@@ -5271,8 +5232,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunder_armor.description':
     'Rozpoltí zbroj cíle a sníží ji o {damage} za každou aplikaci. Stakuje se až 5 krát. Vytváří velké množství hrozby.',
   'entities.abilities.sunder_armor.name': 'Seřezání zbroje',
-  'entities.abilities.swipe.description':
-    'Sekne blízké nepřátele za {damage} poškození. Způsobí dodatečnou hrozbu. Pouze v medvědí podobě.',
   'entities.abilities.swipe.name': 'Rozmáchlé drápy',
   'entities.abilities.tame_beast.description':
     'Začne krotit bestii, aby se stala tvým společníkem. Musí být na tvojí úrovni nebo nižší a nesmí být elitní. Mazlíček tě následuje, útočí na tvoje nepřátele a drží si vlastní hrozbu. Můžeš mít vždy jen jednoho mazlíčka.',
@@ -5304,8 +5263,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wing_clip.description':
     'Způsobí zranění za {damage} poškození, které zpomalí nepřítele o 40 % na 10 s.',
   'entities.abilities.wing_clip.name': 'Spoutávající sek',
-  'entities.abilities.wrath.description':
-    'Vrhe šíp přírodní energie za {damage} přírodního poškození.',
   'entities.abilities.wrath.name': 'Šíp divočiny',
   'entities.items.acolytes_circlet.name': 'Kroužek akolyty',
   'entities.items.alien_armor_plate.name': 'Mimozemská zbrojní deska',
@@ -5725,8 +5682,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Během 10 s obnoví 180 bodů zdraví. Pouze v Medvědí podobě. (druidský talent)',
   'entities.abilities.frost_trap.description':
     'Na 3 s zmrazí nepřátele v cílové oblasti, takže se nemohou pohybovat ani jednat. (lovecký talent)',
-  'entities.abilities.ghostly_strike.description':
-    'Zasáhne nepřítele za poškození zbraně plus {damage}, krátce zvýší úhyb a udělí 1 kombinovaný bod. (lotrovský talent)',
   'entities.abilities.hammer_of_wrath.description':
     'Vrhne svaté kladivo na zraněného nepřítele za {damage} bodů Svatého poškození. Lze použít pouze pod 20 % zdraví. (paladinský talent)',
   'entities.abilities.healing_stream.description':
@@ -7969,14 +7924,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     'Zvýší rychlost sesílání o 30 % a na 10 s zabrání přerušení i zpomalení sesílání. (klíčová schopnost Mrazu)',
   'entities.abilities.cold_blood.name': 'Klid zabijáka',
-  'entities.abilities.cold_blood.description':
-    'Soustředí tvůj vražedný záměr, takže tvůj příští útok bude kritickým zásahem. (klíčová schopnost Vraždění)',
   'entities.abilities.blade_flurry.name': 'Zrcadlové čepele',
-  'entities.abilities.blade_flurry.description':
-    'Rozpoutá smršť čepelí a zvýší tvoji rychlost útoku o 20 % na 12 s. (klíčová schopnost Boje)',
   'entities.abilities.hemorrhage.name': 'Rudá stuha',
-  'entities.abilities.hemorrhage.description':
-    'Zasáhne nepřítele za poškození zbraně plus {damage}, způsobí mu krvácení na 12 s a zvýší utrpěné poškození krvácením o 40 %. Udělí 1 combo bod. (klíčová schopnost Lstivosti)',
   'entities.abilities.power_infusion.name': 'Pomazání',
   'entities.abilities.power_infusion.description':
     'Naplní spojenecký cíl mocí a zvýší jeho rychlost sesílání o 20 % na 15 s. (klíčová schopnost Kázně)',

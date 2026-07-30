@@ -3561,7 +3561,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.unavailable': 'Indisponível',
   'abilityUi.tooltip.requiresLevel': 'Requer nível {level}',
   'abilityUi.tooltip.requiresForm': 'Requer Forma de {form}',
-  'abilityUi.tooltip.requiresStealth': 'Requer furtividade',
   'abilityUi.tooltip.requiresCombo': 'Consome pontos de combo',
   'abilityUi.tooltip.requiresTargetHealthBelow': 'Requer alvo abaixo de {percent}% de saúde',
   'abilityUi.tooltip.requiresDodge': 'Só pode ser usado depois que o alvo esquiva',
@@ -3989,41 +3988,24 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_barrier.description':
     'Protege você em gelo, absorvendo {damage} de dano por 60 s.',
   'entities.abilities.sinister_strike.name': 'Talho Perverso',
-  'entities.abilities.sinister_strike.description':
-    'Golpe instantâneo com dano de arma mais {damage}. Concede 1 ponto de combo.',
   'entities.abilities.eviscerate.name': 'Sono Eterno',
-  'entities.abilities.eviscerate.description': 'Golpe final que causa {damage}.',
   'entities.abilities.backstab.name': 'Estocada Covarde',
-  'entities.abilities.backstab.description':
-    'Apunhala o alvo pelas costas, causando 150% do dano de arma mais {damage}. Você precisa estar atrás do alvo. Requer uma adaga. Concede 1 ponto de combo.',
   'entities.abilities.gouge.name': 'Golpe no Olho',
   'entities.abilities.gouge.description':
     'Atinge o alvo com {damage} de dano, incapacitando-o por 4 s. Qualquer dano quebra o efeito. Concede 1 ponto de combo.',
   'entities.abilities.evasion.name': 'Passo Espectral',
   'entities.abilities.evasion.description': 'Aumenta sua chance de esquiva em 50% por 15 s.',
   'entities.abilities.slice_and_dice.name': 'Ritmo Degolador',
-  'entities.abilities.slice_and_dice.description':
-    'Golpe final que aumenta a velocidade de ataque corpo a corpo em 30%. Dura mais por ponto de combo.',
   'entities.abilities.sprint.name': 'Pés Ligeiros',
   'entities.abilities.sprint.description': 'Aumenta sua velocidade de movimento em 70% por 15 s.',
   'entities.abilities.kidney_shot.name': 'Golpe Baixo',
-  'entities.abilities.kidney_shot.description':
-    'Golpe final que atordoa o alvo. Dura 1 s a mais por ponto de combo.',
   'entities.abilities.ambush.name': 'Golpe do Espreitador',
-  'entities.abilities.ambush.description':
-    'Embosca o alvo com 250% do dano de arma mais {damage}. Você precisa estar furtivo e atrás do alvo. Requer uma adaga. Concede 1 ponto de combo.',
   'entities.abilities.stealth.name': 'Véu Crepuscular',
-  'entities.abilities.stealth.description':
-    'Esconde você nas sombras: inimigos mal percebem você, mas você se move 50% mais devagar. Atacar ou sofrer dano quebra Duskveil. Lance de novo para sair.',
   'entities.abilities.adrenaline_rush.name': 'Sangue Acelerado',
   'entities.abilities.adrenaline_rush.description':
     'Seu sangue ferve, restaurando 60 de energia instantaneamente.',
   'entities.abilities.garrote.name': 'Fio na Garganta',
-  'entities.abilities.garrote.description':
-    'Garroteia o inimigo, causando {damage} de dano imediato e fazendo-o sangrar por {overTime} ao longo de 18 s. Requer modo furtivo. Concede 1 ponto de combo.',
   'entities.abilities.cheap_shot.name': 'Soco no Estômago',
-  'entities.abilities.cheap_shot.description':
-    'Atinge o alvo com {damage} de dano, atordoando-o por 4 s. Requer modo furtivo. Concede 2 pontos de combo.',
   'entities.abilities.sap.name': 'Nocaute',
   'entities.abilities.sap.description':
     'Incapacita o alvo por 8 s. Requer modo furtivo e estar fora de combate. Qualquer dano quebra o efeito.',
@@ -4031,11 +4013,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.description':
     'Atinge o alvo com um veneno plúmbeo, causando {damage} de dano de Natureza e reduzindo sua velocidade de movimento em 50% por 12 s.',
   'entities.abilities.expose_armor.name': 'Brecha na Armadura',
-  'entities.abilities.expose_armor.description':
-    'Golpe final que expõe o alvo, reduzindo sua armadura em {damage} por 30 s.',
   'entities.abilities.rupture.name': 'Hemorragia',
-  'entities.abilities.rupture.description':
-    'Golpe final que fere o alvo, fazendo-o sangrar por {damage} ao longo de 16 s.',
   'entities.abilities.vanish.name': 'Passo de Fumaça',
   'entities.abilities.vanish.description':
     'Some de vista, entrando em Duskveil mesmo em combate. Você se move 50% mais devagar enquanto escondido. Dura até 10 s.',
@@ -4211,18 +4189,13 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.description':
     'Atinge instantaneamente o alvo com sombra abrasadora, causando {damage} de dano de Sombra.',
   'entities.abilities.wrath.name': 'Raio Selvagem',
-  'entities.abilities.wrath.description':
-    'Arremessa um projétil de energia natural, causando {damage} de dano de Natureza.',
   'entities.abilities.healing_touch.name': 'Cura Selvagem',
   'entities.abilities.healing_touch.description': 'Cura um alvo aliado em {damage}.',
   'entities.abilities.mark_of_the_wild.name': 'Guarda Selvagem',
   'entities.abilities.mark_of_the_wild.description':
     'Coloca o Wildward em um alvo aliado, aumentando a armadura em {buff} por 30 min.',
   'entities.abilities.moonfire.name': 'Tempestade Lunar',
-  'entities.abilities.moonfire.description':
-    'Queima o inimigo com fogo lunar, causando {damage} de dano Arcano e dano ao longo do tempo.',
   'entities.abilities.rejuvenation.name': 'Florescer Selvagem',
-  'entities.abilities.rejuvenation.description': 'Cura o alvo em {damage} ao longo de 12 s.',
   'entities.abilities.thorns.name': 'Guarda de Espinhos',
   'entities.abilities.thorns.description':
     'Espinhos brotam do alvo: atacantes corpo a corpo sofrem {buff} de dano de Natureza.',
@@ -4232,8 +4205,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bear_form.description':
     'Assume a forma de urso: armadura +130%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador.',
   'entities.abilities.maul.name': 'Esmaga-Ossos',
-  'entities.abilities.maul.description':
-    'Ataque brutal que aumenta o dano corpo a corpo em {damage} e causa muita ameaça. Ativa no seu próximo golpe. Apenas Forma de Bruin.',
   'entities.abilities.growl.name': 'Ameaçar',
   'entities.abilities.growl.description':
     'Rosna para o alvo: sua ameaça sobe para igualar a do inimigo mais odiado por ele, que é forçado a atacar você por 3 s. Apenas Forma de Bruin.',
@@ -4241,23 +4212,13 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cat_form.description':
     'Assume a forma de lobo: o poder de ataque sobe com seu nível, seus ataques usam energia e pontos de combo, e você gera 29% menos ameaça. Lance de novo para voltar à forma de conjurador.',
   'entities.abilities.claw.name': 'Garra',
-  'entities.abilities.claw.description':
-    'Arranha o inimigo com dano de arma mais {damage}. Concede 1 ponto de combo. Apenas Forma de Lobo.',
   'entities.abilities.ferocious_bite.name': 'Mordida Sanguinária',
-  'entities.abilities.ferocious_bite.description':
-    'Golpe final que causa {damage}. Apenas Forma de Lobo.',
   'entities.abilities.swipe.name': 'Garras Varredoras',
-  'entities.abilities.swipe.description':
-    'Atinge inimigos próximos com {damage} de dano. Gera ameaça extra. Apenas Forma de Bruin.',
   'entities.abilities.regrowth.name': 'Segundo Florescer',
-  'entities.abilities.regrowth.description':
-    'Cura um alvo aliado em {damage} e em uma quantidade adicional ao longo de 21 s.',
   'entities.abilities.barkskin.name': 'Pele de Carvalho',
   'entities.abilities.barkskin.description':
     'Sua pele endurece como casca, aumentando a armadura em 150 por 15 s.',
   'entities.abilities.starfire.name': 'Queda Celeste',
-  'entities.abilities.starfire.description':
-    'Invoca um raio de fogo estelar, causando {damage} de dano Arcano.',
   'entities.abilities.travel_form.name': 'Forma de Fleet',
   'entities.abilities.travel_form.description':
     'Assume instantaneamente uma rápida forma de Fleet, aumentando a velocidade de movimento em 40%. Você não pode usar outras habilidades enquanto transformado, mas pode ativar ou cancelar a forma dentro ou fora de combate: ideal para fugir.',
@@ -4267,8 +4228,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': 'Concussão',
   'entities.abilities.bash.description': 'Atordoa o alvo por 2 s. Apenas Forma de Bruin.',
   'entities.abilities.faerie_fire.name': 'Luz Bruxa',
-  'entities.abilities.faerie_fire.description':
-    'Reduz a armadura do alvo em {damage}% por 40 s. Não acumula com Retalhar Armadura.',
   'entities.abilities.hibernate.name': 'Sono Profundo',
   'entities.abilities.hibernate.description':
     'Força o alvo a um sono profundo por até 8 s. Qualquer dano o desperta.',
@@ -4285,8 +4244,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.description':
     'Aumenta o poder de ataque em {buff} por {duration} s. Apenas Forma de Lobo.',
   'entities.abilities.rip.name': 'Rasgar',
-  'entities.abilities.rip.description':
-    'Golpe final que causa {damage} de dano de Sangramento ao longo de 12 s. Consome pontos de combo. Apenas Forma de Lobo.',
   'entities.abilities.mortal_strike.name': 'Golpe Mutilador',
   'entities.abilities.mortal_strike.description':
     'Um golpe cruel que causa dano da arma mais {damage}. (assinatura de Armas)',
@@ -4333,8 +4290,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description':
     'Entra em furtividade enquanto na Forma de Lobo, movendo-se 50% mais devagar. Não pode ser usado em combate.',
   'entities.abilities.rake.name': 'Esfolar',
-  'entities.abilities.rake.description':
-    'Um golpe de abertura furtivo que dilacera o inimigo causando dano de arma mais {damage} e provoca sangramento ao longo de 9 s. Concede 1 ponto de combo. Apenas Forma de Lobo.',
   'entities.abilities.revive_pet.name': 'Remendar',
   'entities.abilities.revive_pet.description':
     'Remenda seu mascote, restaurando {overTime} de vida ao longo de 12 s em pulsos a cada 3 s se ele estiver vivo. Se estiver morto, revive-o com 35% da vida.',
@@ -4363,14 +4318,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     'Aumenta a aceleração de feitiços em 30% e impede interrupção e recuo de conjuração por 10 s. (assinatura Gelo)',
   'entities.abilities.cold_blood.name': 'Sangue Frio',
-  'entities.abilities.cold_blood.description':
-    'Concentra sua intenção assassina para que seu próximo ataque seja um acerto crítico. (assinatura Assassinato)',
   'entities.abilities.blade_flurry.name': 'Torrente de Lâminas',
-  'entities.abilities.blade_flurry.description':
-    'Libera uma rajada de lâminas, aumentando a velocidade de ataque em 20% por 12 s. (assinatura Combate)',
   'entities.abilities.hemorrhage.name': 'Hemorragia',
-  'entities.abilities.hemorrhage.description':
-    'Atinge o inimigo com dano de arma mais {damage} e causa dano de sangramento por 12 s. Concede 1 ponto de combo. (assinatura Sutileza)',
   'entities.abilities.power_infusion.name': 'Infusão de Poder',
   'entities.abilities.power_infusion.description':
     'Infunde poder em um alvo aliado, aumentando o poder mágico em 28 por 15 s. (assinatura Disciplina)',
@@ -4396,8 +4345,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Investe contra um inimigo e o enraíza por 1 s. Alcance de 8-25 m. (assinatura Feral)',
   'entities.abilities.swiftmend.name': 'Recuperação Rápida',
-  'entities.abilities.swiftmend.description':
-    'Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. (assinatura Restauração)',
   'entities.abilities.crusader_strike.name': 'Golpe do Cruzado',
   'entities.abilities.crusader_strike.description':
     'Golpeia o alvo com dano da arma mais {damage} de dano Sagrado. (talento de paladino)',
@@ -9698,8 +9645,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Restaura 180 de vida ao longo de 10 s. Somente em Forma de Urso. (talento de Druida)',
   'entities.abilities.frost_trap.description':
     'Congela os inimigos na área-alvo por 3 s, impedindo que se movam ou ajam. (talento de Caçador)',
-  'entities.abilities.ghostly_strike.description':
-    'Atinge o inimigo, causando o dano da arma mais {damage}, aumenta brevemente a esquiva e concede 1 ponto de combo. (talento de Ladino)',
   'entities.abilities.hammer_of_wrath.description':
     'Arremessa um martelo sagrado contra um inimigo ferido, causando {damage} de dano Sagrado. Só pode ser usado abaixo de 20% de vida. (talento de Paladino)',
   'entities.abilities.healing_stream.description':

@@ -2416,7 +2416,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.requiresForm': 'Wymaga postaci: {form}',
   'abilityUi.tooltip.requiresLevel': 'Wymaga poziomu {level}',
   'abilityUi.tooltip.requiresOutOfCombat': 'Wymaga przebywania poza walką',
-  'abilityUi.tooltip.requiresStealth': 'Wymaga skradania się',
   'abilityUi.tooltip.requiresTargetHealthBelow': 'Wymaga celu poniżej {percent}% zdrowia',
   'abilityUi.tooltip.unavailable': 'Niedostępne',
   'auth.appearance': 'Wygląd',
@@ -2704,8 +2703,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Starannie naciągnięty strzał, który zadaje {damage} obrażeń.',
   'entities.abilities.aimed_shot.name': 'Długie naciągnięcie',
-  'entities.abilities.ambush.description':
-    'Atakuj cel z zasadzki, zadając 250% obrażeń broni plus {damage}. Wymaga skradania się i pozycji za celem. Wymaga sztyletu. Przyznaje 1 punkt kombinacji.',
   'entities.abilities.ambush.name': 'Cios czyhacza',
   'entities.abilities.arcane_explosion.description':
     'Wybuch arkanicznej energii uderza wszystkich pobliskich wrogów, zadając {damage} obrażeń arkanicznych.',
@@ -2727,8 +2724,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.description':
     'Przyjmij postać kuny, zwiększając szansę na unik o 8% na 30 min.',
   'entities.abilities.aspect_of_the_monkey.name': 'Postać kuny',
-  'entities.abilities.backstab.description':
-    'Pchnij cel w plecy, zadając 150% obrażeń broni plus {damage}. Musisz znajdować się za celem. Wymaga sztyletu. Przyznaje 1 punkt kombinacji.',
   'entities.abilities.backstab.name': 'Tchórzliwe pchnięcie',
   'entities.abilities.barkskin.description':
     'Twoja skóra twardnieje niczym kora, zwiększając pancerz o 150 na 15 sek.',
@@ -2764,11 +2759,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.charge.description':
     'Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Zasięg 8-25 jardów.',
   'entities.abilities.charge.name': 'Natarcie',
-  'entities.abilities.cheap_shot.description':
-    'Uderz cel, zadając {damage} obrażeń i ogłuszając go na 4 sek. Wymaga skradania się. Przyznaje 2 punkty kombinacji.',
   'entities.abilities.cheap_shot.name': 'Cios w brzuch',
-  'entities.abilities.claw.description':
-    'Rozdrap wroga, zadając obrażenia broni plus {damage}. Przyznaje 1 punkt kombinacji. Tylko w postaci wilka.',
   'entities.abilities.claw.name': 'Pazur',
   'entities.abilities.cleave.description':
     'Zamaszyste uderzenie, które trafia wszystkich wrogów przed tobą, zadając {damage} obrażeń.',
@@ -2832,7 +2823,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.name': 'Chwytające korzenie',
   'entities.abilities.evasion.description': 'Zwiększa twoją szansę na unik o 50% na 15 sek.',
   'entities.abilities.evasion.name': 'Upiorny krok',
-  'entities.abilities.eviscerate.description': 'Ruch kończący, który zadaje {damage}.',
   'entities.abilities.eviscerate.name': 'Wieczny sen',
   'entities.abilities.execute.description':
     'Próba dobicia rannego przeciwnika, zadająca {damage} obrażeń. Użyteczne tylko na wrogach poniżej 20% zdrowia.',
@@ -2840,17 +2830,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.exorcism.description':
     'Wygania niegodziwca świętym gniewem, zadając {damage} obrażeń od światłości.',
   'entities.abilities.exorcism.name': 'Rytuał wygnania',
-  'entities.abilities.expose_armor.description':
-    'Ruch kończący, który odsłania cel, zmniejszając jego pancerz o {damage} na 30 sek.',
   'entities.abilities.expose_armor.name': 'Wyłom w pancerzu',
-  'entities.abilities.faerie_fire.description':
-    'Zmniejsza pancerz celu o {damage}% na 40 sek. Nie kumuluje się z Rozdarciem pancerza.',
   'entities.abilities.faerie_fire.name': 'Wiedźmie światło',
   'entities.abilities.fear.description':
     'Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez nawet 8 sek. Każde obrażenie przerywa efekt.',
   'entities.abilities.fear.name': 'Trwoga',
-  'entities.abilities.ferocious_bite.description':
-    'Ruch kończący, który zadaje {damage}. Tylko w postaci wilka.',
   'entities.abilities.ferocious_bite.name': 'Krwawe ukąszenie',
   'entities.abilities.fire_blast.description':
     'Razi wroga, zadając {damage} obrażeń od ognia. Natychmiastowe.',
@@ -2900,8 +2884,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbrand_weapon.description':
     'Przepaja twój oręż kąsającym mrozem: każde uderzenie zadaje {damage} dodatkowych obrażeń przez 5 min.',
   'entities.abilities.frostbrand_weapon.name': 'Oręż szronowych okowów',
-  'entities.abilities.garrote.description':
-    'Dusi wroga garotą, zadając {damage} obrażeń natychmiast oraz powodując krwawienie za {overTime} w ciągu 18 sek. Wymaga skradania. Przyznaje 1 punkt kombinacji.',
   'entities.abilities.garrote.name': 'Drut na gardło',
   'entities.abilities.ghost_wolf.description':
     'Przemienia cię w Shadewolfa, zwiększając prędkość ruchu o 40% na 10 min.',
@@ -2947,8 +2929,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.judgement.description':
     'Uwalnia twoją aktywną pieczęć na wrogu, zużywając ją, by zadać zmagazynowane obrażenia od Świętości.',
   'entities.abilities.judgement.name': 'Wyrok',
-  'entities.abilities.kidney_shot.description':
-    'Ruch kończący, który ogłusza cel. Trwa o 1 sek dłużej za każdy punkt kombinacji.',
   'entities.abilities.kidney_shot.name': 'Cios poniżej pasa',
   'entities.abilities.lay_on_hands.description':
     'Potężny przypływ uzdrowienia przywraca {damage}% twojego maksymalnego zdrowia. 10 min czasu odnowienia.',
@@ -2966,8 +2946,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     'Nakłada Dziką osłonę na sprzymierzony cel, zwiększając pancerz o {buff} na 30 min.',
   'entities.abilities.mark_of_the_wild.name': 'Dzika osłona',
-  'entities.abilities.maul.description':
-    'Miażdżący atak, który zwiększa obrażenia w zwarciu o {damage} i powoduje wysokie zagrożenie. Aktywuje się przy następnym uderzeniu. Tylko w postaci Bruina.',
   'entities.abilities.maul.name': 'Kruszenie kości',
   'entities.abilities.mind_blast.description':
     'Razi umysł celu, zadając {damage} obrażeń od cienia.',
@@ -2978,8 +2956,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mongoose_bite.description':
     'Kontratak po uniku celu, zadający obrażenia broni plus {damage}. Nie można uniknąć.',
   'entities.abilities.mongoose_bite.name': 'Odwetowy kieł',
-  'entities.abilities.moonfire.description':
-    'Spala wroga księżycowym ogniem, zadając {damage} obrażeń arkanicznych oraz obrażenia w czasie.',
   'entities.abilities.moonfire.name': 'Księżycowa nawałnica',
   'entities.abilities.mortal_strike.description':
     'Bezlitosne uderzenie zadające obrażenia broni plus {damage}. (Sygnatura Oręża)',
@@ -3005,8 +2981,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pyroblast.description':
     'Ciska ogromnym ognistym głazem, który zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie.',
   'entities.abilities.pyroblast.name': 'Ognista lanca',
-  'entities.abilities.rake.description':
-    'Otwarcie ze skradania, które rozdziera wroga za obrażenia broni plus {damage} i powoduje krwawienie w ciągu 9 sek. Przyznaje 1 punkt kombinacji. Tylko w postaci wilka.',
   'entities.abilities.rake.name': 'Zdzieranie',
   'entities.abilities.rapid_fire.description':
     'Podczas ruchu wystrzel sześć szybkich strzałów w ciągu 2,4 sek. Każdy zadaje {damage} obrażeń fizycznych.',
@@ -3014,10 +2988,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.description':
     'Potężny atak w zwarciu, który zwiększa obrażenia o {damage}. Aktywuje się przy następnym uderzeniu.',
   'entities.abilities.raptor_strike.name': 'Patroszące uderzenie',
-  'entities.abilities.regrowth.description':
-    'Leczy sprzymierzony cel o {damage} oraz dodatkową ilość w ciągu 21 sek.',
   'entities.abilities.regrowth.name': 'Drugi rozkwit',
-  'entities.abilities.rejuvenation.description': 'Leczy cel o {damage} w ciągu 12 sek.',
   'entities.abilities.rejuvenation.name': 'Dziki rozkwit',
   'entities.abilities.renew.description': 'Leczy cel o {damage} w ciągu 15 sek.',
   'entities.abilities.renew.name': 'Trwająca łaska',
@@ -3030,14 +3001,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.righteous_fury.description':
     'Zwiększa zagrożenie generowane przez twoje obrażenia od Świętości o 60% na 30 min. Filar paladyna-obrońcy.',
   'entities.abilities.righteous_fury.name': 'Płonąca przysięga',
-  'entities.abilities.rip.description':
-    'Cios kończący zadający {damage} obrażeń od Krwawienia w ciągu 12 sek. Zużywa punkty kombinacji. Tylko w Postaci wilka.',
   'entities.abilities.rip.name': 'Rozszarpanie',
   'entities.abilities.rockbiter_weapon.description':
     'Nasyca twoją broń furią kamienia: każde uderzenie zadaje {damage} dodatkowych obrażeń przez 5 min.',
   'entities.abilities.rockbiter_weapon.name': 'Oręż kamiennych okowów',
-  'entities.abilities.rupture.description':
-    'Cios kończący, który rani cel, powodując krwawienie zadające {damage} w ciągu 16 sek.',
   'entities.abilities.rupture.name': 'Wykrwawienie',
   'entities.abilities.sap.description':
     'Obezwładnia cel na 8 sek. Wymaga skradania się i pozostawania poza walką. Jakiekolwiek obrażenia przerywają efekt.',
@@ -3066,24 +3033,16 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_slam.description':
     'Uderza cel tarczą, zadając 50% obrażeń broni plus {damage} i wzbudzając ogromne zagrożenie. (Znak rozpoznawczy Ochrony)',
   'entities.abilities.shield_slam.name': 'Trzask tarczy',
-  'entities.abilities.sinister_strike.description':
-    'Natychmiastowe uderzenie zadające obrażenia broni plus {damage}. Przyznaje 1 punkt kombinacji.',
   'entities.abilities.sinister_strike.name': 'Nikczemne cięcie',
   'entities.abilities.slam.description': 'Wali przeciwnika, zadając obrażenia broni plus {damage}.',
   'entities.abilities.slam.name': 'Brutalny zamach',
-  'entities.abilities.slice_and_dice.description':
-    'Cios kończący zwiększający szybkość ataków wręcz o 30%. Trwa dłużej za każdy punkt kombinacji.',
   'entities.abilities.slice_and_dice.name': 'Mordercze tempo',
   'entities.abilities.smite.description': 'Karze wroga, zadając {damage} obrażeń od Świętości.',
   'entities.abilities.smite.name': 'Karząca moc',
   'entities.abilities.sprint.description':
     'Zwiększa twoją szybkość poruszania się o 70% na 15 sek.',
   'entities.abilities.sprint.name': 'Rącze pięty',
-  'entities.abilities.starfire.description':
-    'Sprowadza pocisk gwiezdnego ognia, zadając {damage} obrażeń od Arkanów.',
   'entities.abilities.starfire.name': 'Spadające niebo',
-  'entities.abilities.stealth.description':
-    'Ukrywa cię w cieniu: wrogowie ledwie cię dostrzegają, ale poruszasz się o 50% wolniej. Atak lub otrzymanie obrażeń przerywa Duskveil. Rzuć ponownie, aby się ujawnić.',
   'entities.abilities.stealth.name': 'Zasłona zmierzchu',
   'entities.abilities.stormstrike.description':
     'Kieruje burzę przez twoją broń, natychmiast uderzając za obrażenia broni plus {damage}.',
@@ -3110,8 +3069,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     "Przywołuje Gloomshade'a pod komendę Czarnoksiężnika. Gloomshade to wytrzymały demon, który prowokuje twoich wrogów i pochłania razy. Przywołanie nowego demona odprawia obecnego. Możesz mieć jednego demona naraz.",
   'entities.abilities.summon_voidwalker.name': "Przywołanie Gloomshade'a",
   'entities.abilities.sunder_armor.name': 'Rozdarcie pancerza',
-  'entities.abilities.swipe.description':
-    'Zamach uderzający pobliskich wrogów za {damage} obrażeń. Wzbudza dodatkowe zagrożenie. Tylko w postaci Bruina.',
   'entities.abilities.swipe.name': 'Zamaszyste pazury',
   'entities.abilities.tame_beast.description':
     'Rozpoczyna oswajanie bestii, by stała się twoim towarzyszem. Musi być na twoim poziomie lub niższym i nie może być elitą. Twoje zwierzę podąża za tobą, atakuje twoich wrogów i utrzymuje własne zagrożenie. Możesz mieć jedno zwierzę naraz.',
@@ -3140,8 +3097,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wing_clip.description':
     'Zadaje ranę, zadając {damage} obrażeń i spowalniając wroga o 40% na 10 sek.',
   'entities.abilities.wing_clip.name': 'Pętające cięcie',
-  'entities.abilities.wrath.description':
-    'Ciska pocisk energii natury, zadając {damage} obrażeń od Natury.',
   'entities.abilities.wrath.name': 'Dziki pocisk',
   'entities.abilities.holy_shock.name': 'Święty wstrząs',
   'entities.abilities.holy_shock.description':
@@ -3168,14 +3123,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     'Zwiększa przyspieszenie zaklęć o 30% oraz zapobiega przerwaniu i opóźnieniu rzucania na 10 sek. (specjalizacja Mróz)',
   'entities.abilities.cold_blood.name': 'Zimna krew',
-  'entities.abilities.cold_blood.description':
-    'Skupia twoją morderczą intencję, aby następny atak był trafieniem krytycznym. (specjalizacja Zabójstwo)',
   'entities.abilities.blade_flurry.name': 'Nawałnica ostrzy',
-  'entities.abilities.blade_flurry.description':
-    'Uwalnia nawałnicę ostrzy, zwiększając szybkość ataku o 20% na 12 sek. (specjalizacja Walka)',
   'entities.abilities.hemorrhage.name': 'Krwotok',
-  'entities.abilities.hemorrhage.description':
-    'Uderza wroga za obrażenia broni plus {damage} i powoduje krwawienie przez 12 sek. Daje 1 punkt combo. (specjalizacja Subtelność)',
   'entities.abilities.power_infusion.name': 'Infuzja mocy',
   'entities.abilities.power_infusion.description':
     'Napełnia przyjazny cel mocą, zwiększając moc zaklęć o 28 na 15 sek. (specjalizacja Dyscyplina)',
@@ -3201,8 +3150,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Szarżujesz na wroga i unieruchamiasz go na 1 sek. Zasięg 8-25 m. (specjalizacja Dzikość)',
   'entities.abilities.swiftmend.name': 'Szybkie uzdrowienie',
-  'entities.abilities.swiftmend.description':
-    'Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. (specjalizacja Odnowa)',
   'entities.abilities.crusader_strike.name': 'Cios krzyżowca',
   'entities.abilities.crusader_strike.description':
     'Uderza cel za obrażenia broni plus {damage} obrażeń od Świętości. (talent paladyna)',
@@ -9647,8 +9594,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przywraca 180 zdrowia przez 10 sek. Tylko w Formie Niedźwiedzia. (talent Druida)',
   'entities.abilities.frost_trap.description':
     'Zamraża wrogów w wybranym obszarze na 3 sek., uniemożliwiając im ruch i działanie. (talent Łowcy)',
-  'entities.abilities.ghostly_strike.description':
-    'Uderza wroga, zadając obrażenia broni plus {damage}, krótko zwiększa unik i przyznaje 1 punkt kombinacji. (talent Łotrzyka)',
   'entities.abilities.hammer_of_wrath.description':
     'Ciska święty młot w rannego wroga, zadając {damage} obrażeń od Świętości. Można użyć tylko poniżej 20% zdrowia. (talent Paladyna)',
   'entities.abilities.healing_stream.description':

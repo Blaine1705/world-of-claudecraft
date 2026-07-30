@@ -3468,7 +3468,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.unavailable': 'No disponible',
   'abilityUi.tooltip.requiresLevel': 'Requiere nivel {level}',
   'abilityUi.tooltip.requiresForm': 'Requiere Forma de {form}',
-  'abilityUi.tooltip.requiresStealth': 'Requiere sigilo',
   'abilityUi.tooltip.requiresCombo': 'Consume puntos de combo',
   'abilityUi.tooltip.requiresTargetHealthBelow':
     'Requiere que el objetivo tenga menos de {percent}% de salud',
@@ -3901,13 +3900,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_barrier.description':
     'Te protege con hielo y absorbe {damage} de daño durante 60 s.',
   'entities.abilities.sinister_strike.name': 'Tajo Perverso',
-  'entities.abilities.sinister_strike.description':
-    'Golpe instantáneo que inflige daño de arma más {damage}. Otorga 1 punto de combo.',
   'entities.abilities.eviscerate.name': 'Descanso Eterno',
-  'entities.abilities.eviscerate.description': 'Remate que causa {damage}.',
   'entities.abilities.backstab.name': 'Estocada Cobarde',
-  'entities.abilities.backstab.description':
-    'Apuñala al objetivo por un 150% de daño de arma más {damage}. Debes estar detrás del objetivo. Requiere una daga. Otorga 1 punto de combo.',
   'entities.abilities.gouge.name': 'Golpe al Ojo',
   'entities.abilities.gouge.description':
     'Golpea al objetivo por {damage} de daño y lo incapacita durante 4 s. Cualquier daño rompe el efecto. Otorga 1 punto de combo.',
@@ -3915,29 +3909,17 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.evasion.description':
     'Aumenta tu probabilidad de esquivar un 50% durante 15 s.',
   'entities.abilities.slice_and_dice.name': 'Ritmo Degollador',
-  'entities.abilities.slice_and_dice.description':
-    'Remate que aumenta la velocidad de ataque cuerpo a cuerpo un 30%. Dura más por cada punto de combo.',
   'entities.abilities.sprint.name': 'Talones Veloces',
   'entities.abilities.sprint.description':
     'Aumenta tu velocidad de movimiento un 70% durante 15 s.',
   'entities.abilities.kidney_shot.name': 'Golpe Bajo',
-  'entities.abilities.kidney_shot.description':
-    'Remate que aturde al objetivo. Dura 1 s más por cada punto de combo.',
   'entities.abilities.ambush.name': 'Golpe del Acechador',
-  'entities.abilities.ambush.description':
-    'Embosca al objetivo por un 250% de daño de arma más {damage}. Debes estar en sigilo y detrás del objetivo. Requiere una daga. Otorga 1 punto de combo.',
   'entities.abilities.stealth.name': 'Velo Crepuscular',
-  'entities.abilities.stealth.description':
-    'Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 50% más lento. Atacar o recibir daño rompe Duskveil. Lánzalo de nuevo para salir.',
   'entities.abilities.adrenaline_rush.name': 'Sangre Acelerada',
   'entities.abilities.adrenaline_rush.description':
     'Tu sangre se enciende y restaura al instante 60 de energía.',
   'entities.abilities.garrote.name': 'Alambre al Cuello',
-  'entities.abilities.garrote.description':
-    'Estrangula al enemigo con un garrote, infligiendo {damage} de daño de inmediato y haciéndolo sangrar {overTime} durante 18 s. Debes estar en sigilo. Otorga 1 punto de combo.',
   'entities.abilities.cheap_shot.name': 'Golpe al Vientre',
-  'entities.abilities.cheap_shot.description':
-    'Golpea al objetivo por {damage} de daño y lo aturde durante 4 s. Debes estar en sigilo. Otorga 2 puntos de combo.',
   'entities.abilities.sap.name': 'Pasmar',
   'entities.abilities.sap.description':
     'Incapacita al objetivo durante 8 s. Debes estar en sigilo y fuera de combate. Cualquier daño rompe el efecto.',
@@ -3945,11 +3927,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.description':
     'Golpea al objetivo con un veneno plúmbeo, infligiendo {damage} de daño de Naturaleza y reduciendo su velocidad de movimiento un 50% durante 12 s.',
   'entities.abilities.expose_armor.name': 'Brecha en la Armadura',
-  'entities.abilities.expose_armor.description':
-    'Movimiento final que deja al descubierto al objetivo y reduce su armadura en {damage} durante 30 s.',
   'entities.abilities.rupture.name': 'Desangramiento',
-  'entities.abilities.rupture.description':
-    'Movimiento final que hiere al objetivo, haciéndolo sangrar {damage} durante 16 s.',
   'entities.abilities.vanish.name': 'Paso de Humo',
   'entities.abilities.vanish.description':
     'Desaparece de la vista, entrando en Duskveil incluso en combate. Te mueves un 50% más lento mientras estás oculto. Dura hasta 10 s.',
@@ -4125,18 +4103,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.description':
     'Explota al instante contra el objetivo con sombra abrasadora por {damage} de daño de las Sombras.',
   'entities.abilities.wrath.name': 'Descarga Silvestre',
-  'entities.abilities.wrath.description':
-    'Lanza una descarga de energía natural que inflige {damage} de daño de Naturaleza.',
   'entities.abilities.healing_touch.name': 'Cura Silvestre',
   'entities.abilities.healing_touch.description': 'Sana a un objetivo amistoso por {damage}.',
   'entities.abilities.mark_of_the_wild.name': 'Resguardo Silvestre',
   'entities.abilities.mark_of_the_wild.description':
     'Coloca la Wildward sobre un objetivo amistoso y aumenta su armadura en {buff} durante 30 min.',
   'entities.abilities.moonfire.name': 'Tempestad Lunar',
-  'entities.abilities.moonfire.description':
-    'Quema al enemigo con fuego lunar por {damage} de daño Arcano y daño en el tiempo.',
   'entities.abilities.rejuvenation.name': 'Floración Silvestre',
-  'entities.abilities.rejuvenation.description': 'Sana al objetivo por {damage} durante 12 s.',
   'entities.abilities.thorns.name': 'Guardia de Zarzas',
   'entities.abilities.thorns.description':
     'Brotan espinas del objetivo: los atacantes cuerpo a cuerpo reciben {buff} de daño de Naturaleza.',
@@ -4147,8 +4120,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bear_form.description':
     'Cambias a forma de oso: armadura +130%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo.',
   'entities.abilities.maul.name': 'Rompehuesos',
-  'entities.abilities.maul.description':
-    'Ataque brutal que aumenta el daño cuerpo a cuerpo en {damage} y causa mucha amenaza. Se activa en tu siguiente golpe. Solo en forma de Bruin.',
   'entities.abilities.growl.name': 'Amenazar',
   'entities.abilities.growl.description':
     'Gruñe al objetivo: tu amenaza sube hasta igualar la de su enemigo más odiado y queda obligado a atacarte durante 3 s. Solo en forma de Bruin.',
@@ -4156,23 +4127,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cat_form.description':
     'Cambias a forma de lobo: el poder de ataque aumenta con tu nivel, tus ataques usan energía y puntos de combo, y generas un 29% menos de amenaza. Lánzala de nuevo para volver a forma de taumaturgo.',
   'entities.abilities.claw.name': 'Zarpa',
-  'entities.abilities.claw.description':
-    'Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de lobo.',
   'entities.abilities.ferocious_bite.name': 'Mordisco Sangriento',
-  'entities.abilities.ferocious_bite.description':
-    'Remate que causa {damage}. Solo en Forma de lobo.',
   'entities.abilities.swipe.name': 'Zarpas Barredoras',
-  'entities.abilities.swipe.description':
-    'Golpea a los enemigos cercanos por {damage} de daño. Causa amenaza adicional. Solo en forma de Bruin.',
   'entities.abilities.regrowth.name': 'Segundo Florecer',
-  'entities.abilities.regrowth.description':
-    'Sana a un objetivo amistoso por {damage} y una cantidad adicional durante 21 s.',
   'entities.abilities.barkskin.name': 'Piel de Roble',
   'entities.abilities.barkskin.description':
     'Tu piel se endurece como corteza y aumenta la armadura en 150 durante 15 s.',
   'entities.abilities.starfire.name': 'Caída Celeste',
-  'entities.abilities.starfire.description':
-    'Invoca una descarga de fuego estelar que causa {damage} de daño Arcano.',
   'entities.abilities.travel_form.name': 'Forma Fleet',
   'entities.abilities.travel_form.description':
     'Adopta al instante una veloz forma Fleet, aumentando la velocidad de movimiento un 40%. No puedes usar otras habilidades mientras estás transformado, pero puedes transformarte dentro o fuera del combate, ideal para escapar.',
@@ -4182,8 +4143,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': 'Conmocionar',
   'entities.abilities.bash.description': 'Aturde al objetivo durante 2 s. Solo en forma de Bruin.',
   'entities.abilities.faerie_fire.name': 'Fuego Fatuo',
-  'entities.abilities.faerie_fire.description':
-    'Reduce la armadura del objetivo en un {damage}% durante 40 s. No se acumula con Cizalla de Armadura.',
   'entities.abilities.hibernate.name': 'Letargo',
   'entities.abilities.hibernate.description':
     'Sume al objetivo en un sueño profundo de hasta 8 s. Cualquier daño lo despertará.',
@@ -4200,8 +4159,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.description':
     'Aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma de lobo.',
   'entities.abilities.rip.name': 'Desgarrar',
-  'entities.abilities.rip.description':
-    'Remate que causa {damage} de daño de sangrado durante 12 s. Consume puntos de combo. Solo en Forma de lobo.',
   'entities.abilities.mortal_strike.name': 'Golpe Mutilador',
   'entities.abilities.mortal_strike.description':
     'Ataque brutal que inflige daño de arma más {damage}. (habilidad distintiva de Armas)',
@@ -4248,8 +4205,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description':
     'Entra en sigilo mientras estás en Forma de lobo y te mueves un 50% más lento. No puede usarse en combate.',
   'entities.abilities.rake.name': 'Desollar',
-  'entities.abilities.rake.description':
-    'Una apertura sigilosa que desgarra al enemigo causando el daño del arma más {damage} y provoca daño por sangrado durante 9 s. Otorga 1 punto de combo. Solo en Forma de lobo.',
   'entities.abilities.revive_pet.name': 'Remendar',
   'entities.abilities.revive_pet.description':
     'Remienda a tu mascota y restaura {overTime} de salud durante 12 s en pulsos cada 3 s mientras esté viva. Si está muerta, la revive con un 35% de salud.',
@@ -4278,14 +4233,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     'Aumenta la celeridad con hechizos un 30% e impide interrupciones y retroceso de lanzamiento durante 10 s. (habilidad distintiva de Escarcha)',
   'entities.abilities.cold_blood.name': 'Sangre fría',
-  'entities.abilities.cold_blood.description':
-    'Concentra tu intención asesina para que tu siguiente ataque sea un golpe crítico. (habilidad distintiva de Asesinato)',
   'entities.abilities.blade_flurry.name': 'Aluvión de acero',
-  'entities.abilities.blade_flurry.description':
-    'Desata una ráfaga de hojas, aumentando la velocidad de ataque un 20% durante 12 s. (habilidad distintiva de Combate)',
   'entities.abilities.hemorrhage.name': 'Hemorragia',
-  'entities.abilities.hemorrhage.description':
-    'Golpea al enemigo con daño de arma más {damage} y causa daño de sangrado durante 12 s. Otorga 1 punto de combo. (habilidad distintiva de Sutileza)',
   'entities.abilities.power_infusion.name': 'Infusión de poder',
   'entities.abilities.power_infusion.description':
     'Infunde poder a un objetivo amistoso, aumentando el poder con hechizos en 28 durante 15 s. (habilidad distintiva de Disciplina)',
@@ -4311,8 +4260,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Carga contra un enemigo y lo enraíza durante 1 s. Alcance de 8-25 m. (habilidad distintiva de Feral)',
   'entities.abilities.swiftmend.name': 'Alivio presto',
-  'entities.abilities.swiftmend.description':
-    'Consume un efecto de sanación en el tiempo sobre un objetivo amistoso para sanarlo por {damage}. (habilidad distintiva de Restauración)',
   'entities.abilities.crusader_strike.name': 'Golpe de cruzado',
   'entities.abilities.crusader_strike.description':
     'Golpea al objetivo con daño de arma más {damage} de daño Sagrado. (talento de paladín)',
@@ -9789,8 +9736,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Restaura 180 de salud durante 10 s. Solo en Forma de Oso. (talento de Druida)',
   'entities.abilities.frost_trap.description':
     'Congela a los enemigos del área objetivo durante 3 s e impide que se muevan o actúen. (talento de Cazador)',
-  'entities.abilities.ghostly_strike.description':
-    'Golpea al enemigo e inflige el daño del arma más {damage}, aumenta brevemente la esquiva y otorga 1 punto de combo. (talento de Pícaro)',
   'entities.abilities.hammer_of_wrath.description':
     'Lanza un martillo sagrado contra un enemigo herido e inflige {damage} de daño Sagrado. Solo se puede usar por debajo del 20% de salud. (talento de Paladín)',
   'entities.abilities.healing_stream.description':

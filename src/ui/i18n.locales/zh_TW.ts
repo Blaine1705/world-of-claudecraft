@@ -296,19 +296,21 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.silence.name': '沉默',
   'entities.abilities.venomrend.name': '蝕毒撕裂',
   'entities.abilities.venomrend.description':
-    '吞噬毒祭：造成22點傷害，每個連擊點額外造成26點，引爆你的流血效果的剩餘傷害，並恢復25點能量。（刀工引擎）',
+    '耗盡6層毒祭：造成100點傷害，每個連擊點額外造成55點，立即引爆你的流血效果的剩餘傷害，再施加一道新的蝕毒傷口（20秒內造成120點傷害）。恢復20點能量。（刺殺）',
   'entities.abilities.veilstrike.name': '罩影突襲',
   'entities.abilities.veilstrike.description':
-    '耗盡幽暝儲備，暗影纏身6秒：你的潛行先制技可在明處使用，且造成的傷害提高25%。（詭詐引擎）',
-  'entities.abilities.body_blow.name': '擊體重拳',
+    '持續6秒：你的暮紗先制技可在明處以任意角度使用，造成的傷害提高10%，且期間第一次潛伏者一擊造成雙倍傷害。（敏銳）',
+  'entities.abilities.body_blow.name': '重磅擺拳',
   'entities.abilities.body_blow.description':
-    '沉重的一擊，造成130%武器傷害外加10點，獲得2個連擊點，並使紅線加深一格。（戰鬥引擎）',
-  'entities.abilities.knockout_blow.name': '擊倒重拳',
+    '沉重的一擊，造成130%武器傷害外加10點。獲得2個連擊點，並使紅線加深一格（最多4格）。（戰鬥）',
+  'entities.abilities.knockout_blow.name': '眼前一黑',
   'entities.abilities.knockout_blow.description':
-    '以擊倒終結紅線：造成45點傷害，每個連擊點額外造成35點，紅線每格加深使傷害提高25%，並恢復25點能量。（戰鬥引擎）',
+    '以擊倒終結紅線：造成45點傷害，每個連擊點額外造成35點，紅線每格加深使傷害提高25%，並恢復25點能量。請在紅線結束前使用，否則擊倒便會作廢。（戰鬥）',
   'entities.abilities.venom_dart.name': '毒鏢',
   'entities.abilities.venom_dart.description':
-    '彈出一枚毒鏢，造成{damage}點自然傷害。獲得1個連擊點。刀工：使你的蝕毒撕裂傷口延長6秒，最多20秒。',
+    '彈出一枚毒鏢，造成{damage}點自然傷害。獲得1個連擊點。',
+  'entities.abilities.venom_dart.specNote_assassination':
+    '累積1層毒祭，並使你的蝕毒傷口延長6秒（傷口不會超過20秒）。',
   'entities.abilities.smoke_screen.name': '煙幕',
   'entities.abilities.smoke_screen.description': '遁入煙霧之中，使你的閃躲幾率提高30%，持續8秒。',
   'entities.abilities.flurry_of_knives.name': '刀刃亂舞',
@@ -604,10 +606,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_hourglass.description':
     '在選定位置放置一個時間沙漏。置於敵人腳下時，在 PvE 中使其懸停 {hostilePveDuration} 秒，在 PvP 中懸停 {hostilePvpDuration} 秒；受到任何傷害都會解除效果。置於自己或隊伍盟友腳下時，進入 {duration} 秒的停滯，免疫傷害且無法行動，恢復 {healing}% 最大生命值，並使自己的冷卻恢復速度提高 {selfCooldownRecovery}%，盟友提高 {allyCooldownRecovery}%。若位置為空，沙漏會等待 {groundDuration} 秒並影響第一個踩上去的有效單位。增益光環可手動移除。',
   'hudChrome.auraEffect.venomRitual':
-    '毒祭：第{stacks}/{max}層。連擊點生成技能累積層數，達到{max}層時，入土長眠變為蝕毒撕裂',
-  'hudChrome.auraEffect.gloam': '幽暝：第{stacks}/{max}層。達到{max}層時，暮紗變為罩影突襲',
+    '毒祭：第{stacks}/{max}層。怯懦突刺、邪惡揮斬與毒鏢各累積1層。達到{max}層時，入土長眠變為蝕毒撕裂',
+  'hudChrome.auraEffect.gloam':
+    '幽暝：第{stacks}/{max}層。自暮紗中使用先制技各累積1層。達到{max}層時，你的先制技可在明處使用，且下一次施展不消耗資源，耗盡全部3層並開啟暗影纏身',
   'hudChrome.auraEffect.redline':
-    '紅線：第{stacks}/{max}格。擊體重拳增加格數；擊倒重拳每格傷害提高{pct}%，命中後結束紅線。時限一到則作廢',
+    '紅線：第{stacks}/{max}格。每次重磅擺拳加深一格；眼前一黑每格傷害提高{pct}%，並結束紅線。時限一到則擊倒作廢',
   'hudChrome.auraEffect.veilstrikeWindow':
     '暗影纏身：你的暮紗先制技可在明處以任意角度使用，造成的傷害提高{pct}%',
   'hudChrome.auraEffect.veiledEdge': '你的下一次潛伏者一擊造成雙倍傷害',
@@ -2251,6 +2254,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.requiresLevel': '需要等級 {level}',
   'abilityUi.tooltip.requiresForm': '需要{form}形態',
   'abilityUi.tooltip.requiresStealth': '需要潛行',
+  'abilityUi.tooltip.requiresStealthSkulduggery': '需要潛行（幽暝達3層或暗影纏身期間除外）',
   'abilityUi.tooltip.requiresCombo': '消耗連擊點',
   'abilityUi.tooltip.requiresTargetHealthBelow': '需要目標生命值低於 {percent}%',
   'abilityUi.tooltip.requiresDodge': '只能在目標閃避後使用',
@@ -2693,11 +2697,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sinister_strike.name': '邪惡揮斬',
   'entities.abilities.sinister_strike.description':
     '立即攻擊，造成武器傷害加 {damage}。獎勵 1 個連擊點。',
+  'entities.abilities.sinister_strike.specNote_assassination': '累積 1 層毒祭（最多 6 層）。',
+  'entities.abilities.sinister_strike.specNote_combat':
+    '紅線期間，此按鈕變為重磅擺拳：造成 130% 武器傷害加 10，獎勵 2 個連擊點，並使紅線加深一格（最多 4 格）。',
   'entities.abilities.eviscerate.name': '入土長眠',
   'entities.abilities.eviscerate.description': '終結技，造成 {damage}。',
+  'entities.abilities.eviscerate.specNote_assassination':
+    '毒祭達 6 層時，此按鈕變為蝕毒撕裂：這一擊會立即引爆你的流血效果的全部剩餘傷害，種下一道新的蝕毒傷口，並恢復 20 點能量。',
+  'entities.abilities.eviscerate.specNote_combat':
+    '以 4 個或更多連擊點命中時，開啟紅線 8 秒：邪惡揮斬變為重磅擺拳，此按鈕變為眼前一黑（造成 45 點傷害，每個連擊點額外造成 35 點，紅線每格加深使傷害提高 25%，並恢復 25 點能量）。請在紅線結束前使用。',
   'entities.abilities.backstab.name': '怯懦突刺',
   'entities.abilities.backstab.description':
     '背刺目標，造成 150% 武器傷害加 {damage}。必須位於目標背後。需要匕首。獎勵 1 個連擊點。',
+  'entities.abilities.backstab.specNote_assassination':
+    '每次攻擊累積 1 層毒祭（最多 6 層）並恢復 15 點能量。毒祭達 6 層時，入土長眠變為蝕毒撕裂（一次引爆你所有流血效果的剩餘傷害）。',
   'entities.abilities.gouge.name': '戳眼一擊',
   'entities.abilities.gouge.description':
     '攻擊目標，造成 {damage} 點傷害，使其癱瘓 4 秒。任何傷害都會打破效果。獎勵 1 個連擊點。',
@@ -2705,26 +2718,34 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.evasion.description': '使你的閃躲機率提高 50%，持續 15 秒。',
   'entities.abilities.slice_and_dice.name': '割喉節奏',
   'entities.abilities.slice_and_dice.description':
-    '終結技，使近戰攻擊速度提高 30%。每個連擊點都會延長持續時間。',
+    '終結技，使近戰攻擊速度提高 30%，持續 12 秒，每個連擊點額外延長 4 秒（5 個連擊點：32 秒）。',
   'entities.abilities.sprint.name': '疾風之足',
   'entities.abilities.sprint.description': '使你的移動速度提高 70%，持續 15 秒。',
   'entities.abilities.kidney_shot.name': '陰狠一擊',
   'entities.abilities.kidney_shot.description':
-    '終結技，使目標昏迷。每個連擊點使持續時間延長 1 秒。',
+    '終結技，使目標昏迷 1 秒，每個連擊點額外延長 1 秒（5 個連擊點：6 秒）。',
   'entities.abilities.ambush.name': '潛伏者一擊',
   'entities.abilities.ambush.description':
     '伏擊目標，造成 250% 武器傷害加 {damage}。必須處於潛行並位於目標背後。需要匕首。獎勵 1 個連擊點。',
+  'entities.abilities.ambush.specNote_subtlety':
+    '自暮紗中使用時累積 1 層幽暝（最多 3 層）。幽暝達 3 層時，可在明處以任意角度使用：那一次施展不消耗資源，耗盡全部 3 層幽暝，開啟 6 秒的暗影纏身，並造成雙倍傷害。',
   'entities.abilities.stealth.name': '暮紗',
   'entities.abilities.stealth.description':
     '將你隱藏在陰影中：敵人幾乎無法察覺你，但你的移動速度降低 50%。攻擊或受到傷害會打破暮紗。再次施放可現身。',
+  'entities.abilities.stealth.specNote_subtlety':
+    '自暮紗中使用的每個先制技累積 1 層幽暝（最多 3 層）。',
   'entities.abilities.adrenaline_rush.name': '疾血',
   'entities.abilities.adrenaline_rush.description': '熱血沸騰，立即恢復 60 點能量。',
   'entities.abilities.garrote.name': '勒喉鋼絲',
   'entities.abilities.garrote.description':
     '勒住敵人的咽喉，立即造成 {damage} 點傷害，並使其在 18 秒內流血損失 {overTime}。必須處於潛行狀態。獎勵 1 個連擊點。',
+  'entities.abilities.garrote.specNote_subtlety':
+    '自暮紗中使用時累積 1 層幽暝（最多 3 層）。幽暝達 3 層時，可在明處使用：那一次施展不消耗資源，耗盡全部 3 層幽暝，並開啟 6 秒的暗影纏身。',
   'entities.abilities.cheap_shot.name': '掏腹重擊',
   'entities.abilities.cheap_shot.description':
     '攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。必須處於潛行狀態。獎勵 2 個連擊點。',
+  'entities.abilities.cheap_shot.specNote_subtlety':
+    '自暮紗中使用時累積 1 層幽暝（最多 3 層）。幽暝達 3 層時，可在明處使用：那一次施展不消耗資源，耗盡全部 3 層幽暝，並開啟 6 秒的暗影纏身。',
   'entities.abilities.sap.name': '悶棍',
   'entities.abilities.sap.description':
     '使目標無法行動，持續 8 秒。必須處於潛行狀態且脫離戰鬥。任何傷害都會破除此效果。',
@@ -2733,10 +2754,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '用沉鉛之毒攻擊目標，造成 {damage} 點自然傷害，並使其移動速度降低 50%，持續 12 秒。',
   'entities.abilities.expose_armor.name': '裂甲',
   'entities.abilities.expose_armor.description':
-    '終結技，使目標破綻盡露，使其護甲降低 {damage}，持續 30 秒。',
+    '終結技，使目標破綻盡露 30 秒：每消耗 1 個連擊點使其護甲降低 2%（5 個連擊點：{damage}%）。',
   'entities.abilities.rupture.name': '血竭',
   'entities.abilities.rupture.description':
-    '終結技，撕裂目標的傷口，使其在 16 秒內流血損失 {damage} 點生命。',
+    '終結技，撕裂目標的傷口：使其每 2 秒流血一次，持續 6 秒，每個連擊點額外延長 2 秒（5 個連擊點：16 秒，共 {damage} 點傷害）。',
   'entities.abilities.vanish.name': '煙遁步',
   'entities.abilities.vanish.description':
     '從視野中消失，即使在戰鬥中也能進入暮紗狀態。隱身時你的移動速度降低 50%。最多持續 10 秒。',
@@ -2764,12 +2785,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '為一個友方目標施加祝福，使攻擊強度提高 {buff}，持續 5 分鐘。',
   'entities.abilities.divine_protection.name': '信仰守護',
   'entities.abilities.divine_protection.description':
-    '一道神聖護盾吸收相當於你最大生命值 {damage}% 的傷害，持續 {duration} 秒。',
+    '一道神聖護盾吸收 {damage} 點傷害，持續 10 秒。',
   'entities.abilities.hammer_of_justice.name': '裂碎法槌',
   'entities.abilities.hammer_of_justice.description': '使目標昏迷 {duration} 秒。',
   'entities.abilities.lay_on_hands.name': '臨終聖禮',
   'entities.abilities.lay_on_hands.description':
-    '巨大的治療湧流恢復你最大生命值的 {damage}%。10 分鐘冷卻時間。',
+    '巨大的治療湧流：恢復 {damage} 點生命值。10 分鐘冷卻時間。',
   'entities.abilities.holy_taunt.name': '神聖挑釁',
   'entities.abilities.holy_taunt.description':
     '嘲諷目標：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。',
@@ -2780,13 +2801,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.exorcism.description': '以神聖怒火驅逐邪惡，造成 {damage} 點神聖傷害。',
   'entities.abilities.consecration.name': '聖化之地',
   'entities.abilities.consecration.description':
-    '奉獻地面 9 秒，每秒造成 {damage} 點神聖傷害。信仰守衛站在其中時受到的傷害降低 10%。',
+    '奉獻你腳下的土地，持續 10 秒，每 2 秒灼燒附近敵人造成 {damage} 點神聖傷害。',
   'entities.abilities.righteous_fury.name': '燃燒誓言',
   'entities.abilities.righteous_fury.description':
     '使你的神聖傷害產生的威脅值提高 60%，持續 30 分鐘。防護聖騎士的核心技能。',
   'entities.abilities.retribution_aura.name': '報償光環',
   'entities.abilities.retribution_aura.description':
-    '以神聖能量環繞你和你的隊伍，直到死亡或被替換。近戰攻擊受影響隊友的敵人受到 {buff} 點神聖傷害，受影響的隊友的普通攻擊額外造成 {buff} 點神聖傷害。',
+    '以神聖能量環繞自身，持續 30 分鐘，對任何近戰攻擊你的敵人造成 5 點神聖傷害。',
   'entities.abilities.tame_beast.name': '野性繫絆',
   'entities.abilities.tame_beast.description':
     '開始馴服一隻野獸作為你的夥伴。牠必須不高於你的等級，且不能是精英。你的寵物會跟隨你、攻擊敵人，並保持自己的威脅值。同一時間只能擁有一隻寵物。',
@@ -2918,8 +2939,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.name': '暮焰',
   'entities.abilities.shadowburn.description': '立即以灼燒暗影轟擊目標，造成 {damage} 點暗影傷害。',
   'entities.abilities.wrath.name': '狂野奔雷',
-  'entities.abilities.wrath.description':
-    '投擲一道自然能量箭，造成 {damage} 點自然傷害。月翼形態下，完成施法會累積月潮。月潮滿層時將其消耗：月種變為月湧、隕天術變為日醒。',
+  'entities.abilities.wrath.description': '投擲一道自然能量箭，造成 {damage} 點自然傷害。',
+  'entities.abilities.wrath.specNote_balance':
+    '月翼形態下，每次完成施法累積 1 層月潮（最多 3 層）。月潮達 3 層時，月種變為月湧、隕天術變為日醒。',
   'entities.abilities.healing_touch.name': '荒野癒合',
   'entities.abilities.healing_touch.description': '為一個友方目標恢復 {damage} 點生命值。',
   'entities.abilities.mark_of_the_wild.name': '野性守護',
@@ -2927,10 +2949,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '為一個友方目標施加野性守護，使護甲提高 {buff}，持續 30 分鐘。',
   'entities.abilities.moonfire.name': '月光風暴',
   'entities.abilities.moonfire.description':
-    '以月火灼燒敵人，造成 {damage} 點秘法傷害，並附加持續傷害。月林：讓它持續燃燒；月種可將其延長6秒。',
+    '以月火灼燒敵人，造成 {damage} 點秘法傷害，並附加持續傷害。',
+  'entities.abilities.moonfire.specNote_balance': '讓它持續燃燒：月種可將其延長 6 秒。',
   'entities.abilities.rejuvenation.name': '野性綻放',
-  'entities.abilities.rejuvenation.description':
-    '在 12 秒內為目標恢復 {damage} 點生命值。林心：種下全新的綻放才會累積繁茂；繁茂達到5層時，迅癒變為盛放。',
+  'entities.abilities.rejuvenation.description': '在 12 秒內為目標恢復 {damage} 點生命值。',
+  'entities.abilities.rejuvenation.specNote_restoration':
+    '種下全新的綻放累積 1 層繁茂（最多 5 層）。繁茂達 5 層時，迅癒變為盛放。',
   'entities.abilities.thorns.name': '荊棘守衛',
   'entities.abilities.thorns.description': '目標身上長出荊棘：近戰攻擊者受到 {buff} 點自然傷害。',
   'entities.abilities.entangling_roots.name': '攫纏根鬚',
@@ -2940,7 +2964,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '變形為熊：護甲 +130%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。',
   'entities.abilities.maul.name': '碎骨擊',
   'entities.abilities.maul.description':
-    '一次猛擊攻擊，使近戰傷害提高 {damage}，並產生大量威脅值。野牙：命中的攻擊會儲存古血；古血達到 3 層時，碎骨擊變為碎髓。在你的下一次揮擊時觸發。僅限巨熊形態。',
+    '一次猛擊攻擊，使近戰傷害提高 {damage}，並產生大量威脅值。在你的下一次揮擊時觸發。僅限巨熊形態。',
+  'entities.abilities.maul.specNote_feral':
+    '每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為碎髓：造成 78 至 96 點高威脅傷害；生命值低於一半時，改為吸收相當於最大生命值 18% 的傷害，並恢復 15 點怒氣。',
   'entities.abilities.growl.name': '威嚇',
   'entities.abilities.growl.description':
     '對目標低吼：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。僅限巨熊形態。',
@@ -2949,16 +2975,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '變形為狼：敏捷隨等級提高，攻擊強度提高8點並且每級再提高2點，攻擊使用能量和連擊點，產生的威脅值降低29%。再次施放可返回施法者形態。',
   'entities.abilities.claw.name': '裂爪',
   'entities.abilities.claw.description':
-    '用利爪攻擊敵人，造成武器傷害加 {damage}。獎勵 1 個連擊點。野牙：命中的攻擊會儲存古血。僅限狼形態。',
+    '用利爪攻擊敵人，造成武器傷害加 {damage}。獎勵 1 個連擊點。僅限狼形態。',
+  'entities.abilities.claw.specNote_feral': '每次命中的攻擊累積 1 層古血（最多 3 層）。',
   'entities.abilities.ferocious_bite.name': '血噬',
-  'entities.abilities.ferocious_bite.description':
-    '終結技，造成 {damage}。野牙：命中的攻擊會儲存古血；古血達到 3 層時，血噬變為血收。僅限狼形態。',
+  'entities.abilities.ferocious_bite.description': '終結技，造成 {damage}。僅限狼形態。',
+  'entities.abilities.ferocious_bite.specNote_feral':
+    '每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為血收：撕咬造成 91 點傷害，每個連擊點額外造成 55 點，並立即引爆你的剮擊與血裂的剩餘傷害，恢復 30 點能量。',
   'entities.abilities.swipe.name': '橫掃利爪',
   'entities.abilities.swipe.description':
-    '橫掃附近敵人，造成 {damage} 點傷害。造成額外威脅值。野牙：命中的攻擊會儲存古血。僅限巨熊形態。',
+    '橫掃附近敵人，造成 {damage} 點傷害。造成額外威脅值。僅限巨熊形態。',
+  'entities.abilities.swipe.specNote_feral': '每次命中的攻擊累積 1 層古血（最多 3 層）。',
   'entities.abilities.regrowth.name': '再度綻放',
   'entities.abilities.regrowth.description':
-    '為一個友方目標恢復 {damage} 點生命值，並在 21 秒內額外恢復一定生命值。林心：種下全新的綻放才會累積繁茂。',
+    '為一個友方目標恢復 {damage} 點生命值，並在 21 秒內額外恢復一定生命值。',
+  'entities.abilities.regrowth.specNote_restoration': '種下全新的綻放累積 1 層繁茂（最多 5 層）。',
   'entities.abilities.barkskin.name': '橡樹皮術',
   'entities.abilities.barkskin.description': '你的皮膚硬化如樹皮，使護甲提高 150，持續 15 秒。',
   'entities.abilities.sacred_bulwark.name': '神聖壁壘',
@@ -2968,8 +2998,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.primal_reflexes.description':
     '你的本能變得敏銳，使閃避機率提高 50%，持續 6 秒。',
   'entities.abilities.starfire.name': '隕天術',
-  'entities.abilities.starfire.description':
-    '召下一道星辰之火，造成 {damage} 點秘法傷害。月翼形態下，完成施法會累積月潮。月潮滿層時，隕天術變為日醒。',
+  'entities.abilities.starfire.description': '召下一道星辰之火，造成 {damage} 點秘法傷害。',
+  'entities.abilities.starfire.specNote_balance':
+    '月翼形態下，每次完成施法累積 1 層月潮（最多 3 層）。月潮達 3 層時，此按鈕變為日醒：立即造成 160 至 190 點自然傷害，外加 9 秒內共 75 點灼燒傷害，恢復 35 點法力並耗盡全部 3 層。',
   'entities.abilities.travel_form.name': '迅捷形態',
   'entities.abilities.travel_form.description':
     '立即化為敏捷迅速的形態，使移動速度提高 40%。變身期間無法使用其他技能，但可在戰鬥中或脫離戰鬥時變身，非常適合逃脫。',
@@ -2978,8 +3009,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': '震腦擊',
   'entities.abilities.bash.description': '昏迷目標 2 秒。僅限巨熊形態。',
   'entities.abilities.faerie_fire.name': '巫光',
-  'entities.abilities.faerie_fire.description':
-    '使目標的護甲降低 {damage}%，持續 40 秒。無法與削甲疊加。',
+  'entities.abilities.faerie_fire.description': '使目標的護甲降低 {damage}%，持續 40 秒。',
   'entities.abilities.hibernate.name': '沉眠',
   'entities.abilities.hibernate.description':
     '迫使目標陷入深度睡眠，最多持續 8 秒。任何傷害都會將其喚醒。',
@@ -2996,7 +3026,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '使攻擊強度提高 {buff}，持續 {duration} 秒。僅限狼形態。',
   'entities.abilities.rip.name': '血裂',
   'entities.abilities.rip.description':
-    '終結技，造成持續24秒共{damage}的流血傷害。消耗連擊點數。野牙：命中的一擊會儲存古血。僅限狼形態。',
+    '終結技，使目標每 2 秒流血一次，持續 24 秒：造成 36 點傷害，每消耗 1 個連擊點額外造成 24 點（5 個連擊點：共 {damage} 點）。僅限狼形態。',
+  'entities.abilities.rip.specNote_feral': '命中的一擊累積 1 層古血（最多 3 層）。',
   'entities.abilities.mortal_strike.name': '致殘打擊',
   'entities.abilities.mortal_strike.description':
     '凶狠打擊，造成武器傷害外加 {damage} 點傷害。（武器專精標誌技能）',
@@ -3043,7 +3074,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在狼形態下進入隱匿狀態，移動速度降低 50%。無法於戰鬥中使用。',
   'entities.abilities.rake.name': '剮擊',
   'entities.abilities.rake.description':
-    '以武器傷害外加 {damage} 剮開敵人，並造成持續 18 秒的流血傷害。給予 1 點連擊點數。野牙：命中的攻擊會儲存古血。僅限狼形態。',
+    '以武器傷害外加 {damage} 剮開敵人，並造成持續 18 秒的流血傷害。給予 1 點連擊點數。僅限狼形態。',
+  'entities.abilities.rake.specNote_feral': '每次命中的攻擊累積 1 層古血（最多 3 層）。',
   'entities.abilities.revive_pet.name': '修補',
   'entities.abilities.revive_pet.description':
     '修補你的寵物。若其存活，在 12 秒內每 3 秒恢復一次生命值，共恢復 {overTime} 點；若其死亡，則以 35% 生命值將其復活。',
@@ -3052,7 +3084,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）',
   'entities.abilities.holy_shield.name': '神聖之盾',
   'entities.abilities.holy_shield.description':
-    '格擋提高 30%，並獲得相當於最大生命值 {damage}% 的護盾，持續 {duration} 秒。昇華會強化防禦。',
+    '以神聖之力保護你10秒，護甲提高90，並對近戰攻擊者造成12點神聖傷害。（防護專精招牌）',
   'entities.abilities.bestial_wrath.name': '狂野怒火',
   'entities.abilities.bestial_wrath.description':
     '使你進入野獸怒火狀態，攻擊強度提高55點，持續15秒。（野獸控制專精招牌）',
@@ -3079,7 +3111,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '釋放劍刃亂舞，攻擊速度提高20%，持續12秒。（戰鬥專精招牌）',
   'entities.abilities.hemorrhage.name': '出血',
   'entities.abilities.hemorrhage.description':
-    '攻擊敵人，造成武器傷害加{damage}點傷害，並在12秒內造成流血傷害。獎勵1個連擊點。（敏銳專精招牌）',
+    '攻擊敵人，造成武器傷害加{damage}點傷害，在12秒內造成流血傷害，並使目標受到的流血傷害提高40%。獎勵1個連擊點。每使用2次累積1層幽暝（最多3層）。（敏銳專精招牌）',
   'entities.abilities.power_infusion.name': '能量灌注',
   'entities.abilities.power_infusion.description':
     '向一名友方目標灌注能量，使其法術強度提高28點，持續15秒。（戒律專精招牌）',
@@ -3106,7 +3138,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '衝向敵人並使其定身1秒。8-25碼距離。（野性專精招牌）',
   'entities.abilities.swiftmend.name': '迅癒',
   'entities.abilities.swiftmend.description':
-    '吞噬友方目標身上的持續治療效果，為其恢復{damage}點生命值。完成野性綻放與再度綻放的施法會累積繁茂；繁茂達到5層時，迅癒變為盛放。（恢復專精招牌）',
+    '吞噬友方目標身上的持續治療效果，為其恢復{damage}點生命值。種下野性綻放與再度綻放會累積繁茂；繁茂達到5層時，此按鈕變為盛放：立即為每位持有你持續治療效果的盟友恢復其剩餘治療量的60%。（恢復專精招牌）',
   'entities.abilities.crusader_strike.name': '十字軍聖擊',
   'entities.abilities.crusader_strike.description':
     '打擊目標，造成武器傷害外加 {damage} 點神聖傷害。（聖騎士天賦）',
@@ -9074,7 +9106,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frost_trap.description':
     '凍結目標區域內的敵人3秒，使其無法移動或行動。（獵人天賦）',
   'entities.abilities.ghostly_strike.description':
-    '攻擊敵人，造成武器傷害加{damage}點傷害，短暫提高閃躲並獲得1個連擊點。（潛行者天賦）',
+    '攻擊敵人，造成武器傷害加{damage}點傷害，並使你的閃躲機率提高15%，持續7秒。獎勵1個連擊點。（潛行者天賦）',
   'entities.abilities.hammer_of_wrath.description':
     '向受傷的敵人投擲神聖之錘，造成{damage}點神聖傷害。只能對生命值低於20%的目標使用。（聖騎士天賦）',
   'entities.abilities.healing_stream.description':
@@ -10437,32 +10469,29 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': '釋放武器',
   'entities.abilities.unleash_weapon.description':
     '釋放目前的武器灌注。焰烙造成54至64點火焰傷害，獲得30%法術強度加成，並獲得2層雷霆。風心用武器攻擊，推進戰魂節律，並使攻擊速度提高20%，持續6秒。縛石造成75%武器傷害，迫使目標攻擊你，並使你受到的傷害降低20%，持續4秒。活泉消耗目標身上的癒合水流，立即治療其剩餘治療量的125%，並使8秒內下一次受到的傷害降低，降低量等於實際恢復生命值的50%。',
-
-  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
-  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
   'hudChrome.auraEffect.dawnsWrath': '制裁之錘：無生命限制 · +1次 · 冷卻0 · 傷害+{pct}%',
   'hudChrome.auraEffect.moontide':
-    '月潮：第{stacks}/{max}層。月翼形態下，狂野奔雷、隕天術與月種的施法累積層數。達到{max}層時，月種變為月湧、隕天術變為日醒，使用任一個都會消耗月潮',
+    '月潮：第{stacks}/{max}層。月翼形態下，狂野奔雷、隕天術與月種的施法各累積1層。達到{max}層時，月種變為月湧、隕天術變為日醒，使用任一個都會耗盡全部3層',
   'hudChrome.auraEffect.oldBlood':
-    '古血：第{stacks}/{max}層。狼形態與巨熊形態的命中攻擊共享儲備；達到{max}層時，血噬或碎骨擊變形',
+    '古血：第{stacks}/{max}層。裂爪、剮擊、血裂、血噬、橫掃利爪與碎骨擊的命中各累積1層。達到{max}層時：狼形態下血噬變為血收，巨熊形態下碎骨擊變為碎髓',
   'hudChrome.auraEffect.verdance':
-    '繁茂：第{stacks}/{max}層。完成野性綻放與再度綻放會累積層數；達到{max}層時，迅癒變為盛放',
+    '繁茂：第{stacks}/{max}層。每種下一個全新的野性綻放或再度綻放累積1層。達到{max}層時，迅癒變為盛放',
   'entities.abilities.moonseed.name': '月種',
   'entities.abilities.moonseed.description':
-    '僅限月翼形態。造成{damage}點秘法傷害，使月潮推進一層，並將你的月光風暴延長6秒；每次施加最多延長6秒。月潮滿層時，月種變為月湧。',
+    '僅限月翼形態。造成{damage}點秘法傷害，累積1層月潮（最多3層），並將你的月光風暴延長6秒；每次施加最多延長6秒。月潮達3層時，此按鈕變為月湧：立即造成240至285點秘法傷害，並耗盡全部3層。',
   'guide.abilityHook.moonseed': '在月翼形態下，推進一層月潮並延長月光風暴。',
   'entities.abilities.moonlash.name': '月湧',
   'entities.abilities.moonlash.description':
-    '消耗3層月潮，造成強力秘法打擊：傷害之選。與日醒消耗同一份月潮，二者只能擇一。',
+    '消耗3層月潮，造成{damage}點秘法傷害的強力打擊：傷害之選。與日醒消耗同一份月潮，二者只能擇一。',
   'entities.abilities.sunlance.name': '日醒',
   'entities.abilities.sunlance.description':
-    '消耗3層月潮，造成自然打擊與灼燒，並恢復35點法力：法力之選。與月湧消耗同一份月潮，二者只能擇一。',
+    '消耗3層月潮，造成{damage}點自然傷害，外加9秒內共{overTime}點灼燒傷害，並恢復35點法力：法力之選。與月湧消耗同一份月潮，二者只能擇一。',
   'entities.abilities.redharvest.name': '血收',
   'entities.abilities.redharvest.description':
-    '消耗3層古血，引爆目標身上由你施加的剮擊與血裂剩餘傷害，並恢復30點能量。持有的連擊點數會強化撕咬，但並非必需。',
+    '消耗3層古血：造成{damage}點傷害，立即引爆你的剮擊與血裂的剩餘傷害，移除這兩個流血效果，並恢復30點能量。沒有連擊點也能使用。',
   'entities.abilities.marrowbreak.name': '碎髓',
   'entities.abilities.marrowbreak.description':
-    '消耗3層古血，造成高威脅的重擊。生命值低於一半時，改為吸收相當於最大生命值18%的傷害，持續8秒，並恢復15點怒氣。',
+    '消耗3層古血，造成{damage}點高威脅的重擊。生命值低於一半時，改為吸收相當於最大生命值18%的傷害，持續8秒，並恢復15點怒氣。',
   'entities.abilities.overbloom.name': '盛放',
   'entities.abilities.overbloom.description':
     '消耗5層繁茂。收割你在所有盟友身上的持續治療，以其剩餘治療量的60%立即治療，移除這些效果，並在目標身上種下一次新的野性綻放。',

@@ -6777,7 +6777,8 @@ export const de_DE: EnTranslations = {
       "unavailable": "Nicht verfügbar",
       "requiresLevel": "Benötigt Stufe {level}",
       "requiresForm": "Benötigt {form}form",
-      "requiresStealth": "Benötigt Verstohlenheit",
+      "requiresStealth": "Requires stealth",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Verbraucht Combopunkte",
       "requiresTargetHealthBelow": "Benötigt ein Ziel unter {percent}% Gesundheit",
       "requiresDodge": "Nur nutzbar, nachdem das Ziel ausgewichen ist",
@@ -7455,15 +7456,20 @@ export const de_DE: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Boshafter Hieb",
-        "description": "Sofortiger Hieb für Waffenschaden plus {damage}. Gewährt 1 Combopunkt."
+        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
+        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
+        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
       },
       "eviscerate": {
         "name": "Grabesschlaf",
-        "description": "Finishing-Move, der {damage} verursacht."
+        "description": "Finishing move that causes {damage}.",
+        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
+        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
       },
       "backstab": {
         "name": "Feiger Stoß",
-        "description": "Meuchelt das Ziel für 150% Waffenschaden plus {damage}. Ihr müsst hinter dem Ziel stehen. Erfordert einen Dolch. Gewährt 1 Combopunkt."
+        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
+        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
       },
       "gouge": {
         "name": "Augenstich",
@@ -7475,7 +7481,7 @@ export const de_DE: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Mörderisches Tempo",
-        "description": "Finishing-Move, der das Nahkampfangriffstempo um 30% erhöht. Hält pro Combopunkt länger an."
+        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
       },
       "sprint": {
         "name": "Flinke Fersen",
@@ -7483,15 +7489,17 @@ export const de_DE: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Tiefschlag",
-        "description": "Finishing-Move, der das Ziel betäubt. Hält pro Combopunkt 1 Sek. länger an."
+        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
       },
       "ambush": {
         "name": "Lauererstoß",
-        "description": "Überfällt das Ziel für 250% Waffenschaden plus {damage}. Ihr müsst verstohlen und hinter dem Ziel sein. Erfordert einen Dolch. Gewährt 1 Combopunkt."
+        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
       },
       "stealth": {
         "name": "Dämmerschleier",
-        "description": "Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 50% langsamer. Angreifen oder Schaden erleiden bricht Duskveil. Erneut wirken, um hervorzutreten."
+        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
+        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
         "name": "Beschleunigtes Blut",
@@ -7499,11 +7507,13 @@ export const de_DE: EnTranslations = {
       },
       "garrote": {
         "name": "Kehldraht",
-        "description": "Erwürgt den Gegner, verursacht sofort {damage} Schaden und lässt ihn über 18 Sek. für {overTime} bluten. Erfordert Verstohlenheit. Gewährt 1 Combopunkt."
+        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "cheap_shot": {
         "name": "Magenhieb",
-        "description": "Trifft das Ziel für {damage} Schaden und betäubt es 4 Sek. lang. Erfordert Verstohlenheit. Gewährt 2 Combopunkte."
+        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
         "name": "Kopfnuss",
@@ -7515,11 +7525,11 @@ export const de_DE: EnTranslations = {
       },
       "expose_armor": {
         "name": "Rüstungsbruch",
-        "description": "Finishing-Move, der das Ziel entblößt und seine Rüstung 30 Sek. lang um {damage} verringert."
+        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
       },
       "rupture": {
         "name": "Ausbluten",
-        "description": "Finishing-Move, der das Ziel verwundet und es 16 Sek. lang um {damage} bluten lässt."
+        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
       },
       "vanish": {
         "name": "Rauchschritt",
@@ -7911,7 +7921,8 @@ export const de_DE: EnTranslations = {
       },
       "wrath": {
         "name": "Wildblitz",
-        "description": "Schleudert einen Blitz Naturenergie für {damage} Naturschaden."
+        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
       },
       "healing_touch": {
         "name": "Wildheilung",
@@ -7923,7 +7934,8 @@ export const de_DE: EnTranslations = {
       },
       "moonfire": {
         "name": "Mondsturm",
-        "description": "Verbrennt den Gegner mit Mondfeuer für {damage} Arkanschaden plus Schaden über Zeit."
+        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
+        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
       },
       "moonseed": {
         "name": "Mondsaat",
@@ -7931,7 +7943,8 @@ export const de_DE: EnTranslations = {
       },
       "rejuvenation": {
         "name": "Wildblüte",
-        "description": "Heilt das Ziel über 12 Sek. um {damage}."
+        "description": "Heals the target for {damage} over 12 sec.",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
       },
       "thorns": {
         "name": "Dornenwacht",
@@ -7947,7 +7960,8 @@ export const de_DE: EnTranslations = {
       },
       "maul": {
         "name": "Knochenmalmer",
-        "description": "Ein zerfleischender Angriff, der den Nahkampfschaden um {damage} erhöht und viel Bedrohung verursacht. Wird bei eurem nächsten Schwung ausgelöst. Nur in Bruin Form."
+        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
       },
       "growl": {
         "name": "Bedrohen",
@@ -7959,19 +7973,23 @@ export const de_DE: EnTranslations = {
       },
       "claw": {
         "name": "Klaue",
-        "description": "Kratzt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Wolfsgestalt."
+        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "Blutbiss",
-        "description": "Finishing-Move, der {damage} verursacht. Nur in Wolfsgestalt."
+        "description": "Finishing move that causes {damage}. Wolf Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 91 plus 55 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
       },
       "swipe": {
         "name": "Fegende Klauen",
-        "description": "Fegt nahe Gegner für {damage} Schaden. Verursacht zusätzliche Bedrohung. Nur in Bruin Form."
+        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "regrowth": {
         "name": "Zweite Blüte",
-        "description": "Heilt ein freundliches Ziel um {damage} und zusätzlich über 21 Sek."
+        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
       },
       "barkskin": {
         "name": "Eichenhaut",
@@ -7987,7 +8005,8 @@ export const de_DE: EnTranslations = {
       },
       "starfire": {
         "name": "Himmelssturz",
-        "description": "Ruft einen Bolzen aus Sternenfeuer herab, der {damage} Arkanschaden verursacht."
+        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 160 to 190 Nature damage plus a 75 burn over 9 sec, restoring 35 mana and spending all 3."
       },
       "travel_form": {
         "name": "Fleet-Gestalt",
@@ -8003,7 +8022,7 @@ export const de_DE: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Hexenlicht",
-        "description": "Verringert die Rüstung des Ziels 40 Sek. lang um {damage}%. Nicht mit Rüstungsspalter kumulierbar."
+        "description": "Decreases the target's armor by {damage}% for 40 sec."
       },
       "hibernate": {
         "name": "Schlummer",
@@ -8027,7 +8046,8 @@ export const de_DE: EnTranslations = {
       },
       "rip": {
         "name": "Zerfetzen",
-        "description": "Finishing-Move, der über 12 Sek. {damage} Blutungsschaden verursacht. Verbraucht Combopunkte. Nur in Wolfsgestalt."
+        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
+        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
         "name": "Verstümmelnder Hieb",
@@ -8127,15 +8147,15 @@ export const de_DE: EnTranslations = {
       },
       "cold_blood": {
         "name": "Kaltblütigkeit",
-        "description": "Bündelt Eure Mordlust, sodass Euer nächster Angriff ein kritischer Treffer ist. (Meucheln-Signatur)"
+        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
       },
       "blade_flurry": {
         "name": "Klingenwirbel",
-        "description": "Entfesselt einen Klingenwirbel und erhöht das Angriffstempo 12 Sek. lang um 20%. (Kampf-Signatur)"
+        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
       },
       "hemorrhage": {
         "name": "Blutsturz",
-        "description": "Trifft den Gegner für Waffenschaden plus {damage} und verursacht 12 Sek. lang Blutungsschaden. Gewährt 1 Combopunkt. (Täuschungs-Signatur)"
+        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
       },
       "power_infusion": {
         "name": "Machtinfusion",
@@ -8171,7 +8191,7 @@ export const de_DE: EnTranslations = {
       },
       "swiftmend": {
         "name": "Rasche Heilung",
-        "description": "Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. (Wiederherstellungs-Signatur)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Mondwoge",
@@ -8427,7 +8447,7 @@ export const de_DE: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Geisterschlag",
-        "description": "Trifft den Gegner für Waffenschaden plus {damage}, erhöht kurzzeitig die Ausweichchance und gewährt 1 Combopunkt. (Schurkentalent)"
+        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
         "name": "Läutender Hammer",
@@ -8587,7 +8607,8 @@ export const de_DE: EnTranslations = {
       },
       "venom_dart": {
         "name": "Giftpfeil",
-        "description": "Schnippt einen vergifteten Pfeil für {damage} Naturschaden. Gewährt 1 Combopunkt. Knifework: verlängert eure Giftriss-Wunde um 6 Sek., bis zu 20 Sek."
+        "description": "Schnippt einen vergifteten Pfeil für {damage} Naturschaden. Gewährt 1 Combopunkt. Knifework: verlängert eure Giftriss-Wunde um 6 Sek., bis zu 20 Sek.",
+        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
       },
       "body_blow": {
         "name": "Körpertreffer",
@@ -8651,7 +8672,8 @@ export const de_DE: EnTranslations = {
       },
       "rake": {
         "name": "Schinden",
-        "description": "Ein Schleicheröffner, der den Gegner für Waffenschaden plus {damage} aufreißt und über 9 Sek. Blutungsschaden verursacht. Gewährt 1 Combopunkt. Nur in Wolfsgestalt."
+        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {
         "name": "Zusammenflicken",

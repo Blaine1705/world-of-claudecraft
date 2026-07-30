@@ -1738,15 +1738,15 @@ export const en_CA: EnTranslations = {
       "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
       "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
       "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
-      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
-      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
-      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "venomRitual": "Venom Ritual {stacks}/{max}. Craven Thrust, Wicked Slash, and Venom Dart each add 1. At {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam {stacks}/{max}. Openers used from Duskveil each add 1. At {max}, your openers work without stealth, and the next one is free, spends all 3, and starts the Shadow Veil",
+      "redline": "Redline {stacks}/{max}. Each Haymaker adds 1. Lights Out hits {pct}% harder for each one and ends Redline. If the timer runs out first, the knockout is lost",
       "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
       "veiledEdge": "Your next Lurker's Strike strikes for double",
       "duskEconomy": "Abilities cost {pct}% less energy",
-      "moontide": "Moontide: stage {stacks} of {max}. Wildbolt, Skyfall, and Moonseed casts build it in Moonwing Form; at {max}, Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and either spends it",
-      "oldBlood": "Old Blood: stage {stacks} of {max}. Landed Wolf and Bruin strikes share this bank; at {max}, Gorebite or Bonecrush transforms",
-      "verdance": "Verdance: stage {stacks} of {max}. Completed Wildbloom and Second Bloom casts build it; at {max}, Swiftmend becomes Overbloom",
+      "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
+      "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Swiftmend becomes Overbloom",
       "increase": {
         "ap": "Increases attack power by {value}",
         "sp": "Increases spell power by {value}",
@@ -6777,7 +6777,8 @@ export const en_CA: EnTranslations = {
       "unavailable": "Unavailable",
       "requiresLevel": "Requires level {level}",
       "requiresForm": "Requires {form} Form",
-      "requiresStealth": "Requires stealth (or a full Gloam bank, or the shadow veil)",
+      "requiresStealth": "Requires stealth",
+      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Consumes combo points",
       "requiresTargetHealthBelow": "Requires target below {percent}% health",
       "requiresDodge": "Only usable after the target dodges",
@@ -7455,15 +7456,20 @@ export const en_CA: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Wicked Slash",
-        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point. Knifework: builds the Venom Ritual like Craven Thrust. Thuggery: becomes Body Blow while the Redline window runs."
+        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
+        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
+        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
       },
       "eviscerate": {
         "name": "Dirt Nap",
-        "description": "Finishing move that causes {damage}. Knifework: becomes Venomrend at 6 Venom Ritual stages. Thuggery: landing this with 4 or more combo points opens the 8 sec Redline window, transforming your buttons."
+        "description": "Finishing move that causes {damage}.",
+        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
+        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
       },
       "backstab": {
         "name": "Craven Thrust",
-        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point. Knifework: each strike adds a Venom Ritual stage and refunds 15 energy; at 6 stages Dirt Nap becomes Venomrend."
+        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
+        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
       },
       "gouge": {
         "name": "Eye Jab",
@@ -7475,7 +7481,7 @@ export const en_CA: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Cutthroat Tempo",
-        "description": "Finishing move that increases melee attack speed by 30%. Lasts longer per combo point."
+        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
       },
       "sprint": {
         "name": "Swift Heels",
@@ -7483,15 +7489,17 @@ export const en_CA: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Low Blow",
-        "description": "Finishing move that stuns the target. Lasts 1 sec longer per combo point."
+        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
       },
       "ambush": {
         "name": "Lurker's Strike",
-        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point. Skulduggery: banks a Gloam stage when cast from Duskveil; with a full bank it is castable in the open from any angle FOR FREE, detonating the bank into a 6 sec shadow veil, and the first one of the veil strikes for double."
+        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
       },
       "stealth": {
         "name": "Duskveil",
-        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out. Skulduggery: openers cast from Duskveil bank Gloam stages."
+        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
+        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
         "name": "Quickened Blood",
@@ -7499,11 +7507,13 @@ export const en_CA: EnTranslations = {
       },
       "garrote": {
         "name": "Throat Wire",
-        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point. Skulduggery: banks a Gloam stage when cast from Duskveil; with a full bank it is castable in the open FOR FREE, detonating the bank into a 6 sec shadow veil."
+        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "cheap_shot": {
         "name": "Gut Punch",
-        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points. Skulduggery: banks a Gloam stage when cast from Duskveil; with a full bank it is castable in the open FOR FREE, detonating the bank into a 6 sec shadow veil."
+        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
         "name": "Sap",
@@ -7515,11 +7525,11 @@ export const en_CA: EnTranslations = {
       },
       "expose_armor": {
         "name": "Armor Breach",
-        "description": "Finishing move that exposes the target, reducing its armor by {damage}% for 30 sec."
+        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
       },
       "rupture": {
         "name": "Bleed Out",
-        "description": "Finishing move that wounds the target, causing it to bleed for {damage} over 16 sec."
+        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
       },
       "vanish": {
         "name": "Smokestep",
@@ -7911,7 +7921,8 @@ export const en_CA: EnTranslations = {
       },
       "wrath": {
         "name": "Wildbolt",
-        "description": "Hurls a bolt of nature energy for {damage} Nature damage. In Moonwing Form, completed casts build Moontide. At full Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
       },
       "healing_touch": {
         "name": "Wildmend",
@@ -7923,15 +7934,17 @@ export const en_CA: EnTranslations = {
       },
       "moonfire": {
         "name": "Lunar Tempest",
-        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time. Moongrove: keep it burning; Moonseed extends it by 6 sec."
+        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
+        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
       },
       "moonseed": {
         "name": "Moonseed",
-        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds one Moontide stage, and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At full Moontide, Moonseed becomes Moonsurge."
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 240 to 285 Arcane damage that spends all 3."
       },
       "rejuvenation": {
         "name": "Wildbloom",
-        "description": "Heals the target for {damage} over 12 sec. Groveheart: planting a NEW bloom adds Verdance; at 5, Swiftmend becomes Overbloom."
+        "description": "Heals the target for {damage} over 12 sec.",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
       },
       "thorns": {
         "name": "Briarguard",
@@ -7947,7 +7960,8 @@ export const en_CA: EnTranslations = {
       },
       "maul": {
         "name": "Bonecrush",
-        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Wildfang: landed hits bank Old Blood; at 3, Bonecrush becomes Marrowbreak. Activates on your next swing. Bruin Form only."
+        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
       },
       "growl": {
         "name": "Menace",
@@ -7959,19 +7973,23 @@ export const en_CA: EnTranslations = {
       },
       "claw": {
         "name": "Rendclaw",
-        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wildfang: landed hits bank Old Blood. Wolf Form only."
+        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "Gorebite",
-        "description": "Finishing move that causes {damage}. Wildfang: landed hits bank Old Blood; at 3, Gorebite becomes Redharvest. Wolf Form only."
+        "description": "Finishing move that causes {damage}. Wolf Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 91 plus 55 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
       },
       "swipe": {
         "name": "Sweeping Claws",
-        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Wildfang: landed hits bank Old Blood. Bruin Form only."
+        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "regrowth": {
         "name": "Second Bloom",
-        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec. Groveheart: planting a NEW bloom adds Verdance."
+        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
       },
       "barkskin": {
         "name": "Oakhide",
@@ -7987,7 +8005,8 @@ export const en_CA: EnTranslations = {
       },
       "starfire": {
         "name": "Skyfall",
-        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage. In Moonwing Form, completed casts build Moontide. At full Moontide, Skyfall becomes Sunwake."
+        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 160 to 190 Nature damage plus a 75 burn over 9 sec, restoring 35 mana and spending all 3."
       },
       "travel_form": {
         "name": "Fleet Form",
@@ -8003,7 +8022,7 @@ export const en_CA: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Witchlight",
-        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Armor Shear."
+        "description": "Decreases the target's armor by {damage}% for 40 sec."
       },
       "hibernate": {
         "name": "Slumber",
@@ -8027,7 +8046,8 @@ export const en_CA: EnTranslations = {
       },
       "rip": {
         "name": "Bloodrift",
-        "description": "Finishing move that causes {damage} Bleed damage over 24 sec. Consumes combo points. Wildfang: the landed hit banks Old Blood. Wolf Form only."
+        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
+        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
         "name": "Maiming Strike",
@@ -8127,15 +8147,15 @@ export const en_CA: EnTranslations = {
       },
       "cold_blood": {
         "name": "Killer's Calm",
-        "description": "Focuses your killing intent so your next attack is a critical strike. (Assassination signature)"
+        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
       },
       "blade_flurry": {
         "name": "Mirrored Blades",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)"
+        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
       },
       "hemorrhage": {
         "name": "Red Ribbon",
-        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Skulduggery: every 2nd cast banks a Gloam stage. (Subtlety signature)"
+        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
       },
       "power_infusion": {
         "name": "Anointing",
@@ -8171,27 +8191,27 @@ export const en_CA: EnTranslations = {
       },
       "swiftmend": {
         "name": "Swiftmend",
-        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Completed Wildbloom and Second Bloom casts build Verdance; at 5 Verdance, Swiftmend becomes Overbloom. (Groveheart signature)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Moonsurge",
-        "description": "Consumes 3 Moontide for a heavy Arcane strike: the damage choice. Spends the same bank as Sunwake, so pick one."
+        "description": "Spends your 3 Moontide for a heavy strike of {damage} Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one."
       },
       "sunlance": {
         "name": "Sunwake",
-        "description": "Consumes 3 Moontide for a Nature strike and burn and restores 35 mana: the economy choice. Spends the same bank as Moonsurge, so pick one."
+        "description": "Spends your 3 Moontide for a strike of {damage} Nature damage plus a {overTime} burn over 9 sec, and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one."
       },
       "redharvest": {
         "name": "Redharvest",
-        "description": "Consumes 3 Old Blood, detonates all remaining Flense and Bloodrift damage you own on the target, and restores 30 energy. Any combo points held strengthen the bite but are never required."
+        "description": "Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points."
       },
       "marrowbreak": {
         "name": "Marrowbreak",
-        "description": "Consumes 3 Old Blood for a heavy, high-threat strike. Below half health, instead absorbs 18% of maximum health for 8 sec and restores 15 rage."
+        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
       },
       "overbloom": {
         "name": "Overbloom",
-        "description": "Consumes 5 Verdance. Harvests every heal over time you own on all allies for 60% of its remaining healing, removes those effects, and plants a fresh Wildbloom on the target."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom."
       },
       "summon_imp": {
         "name": "Summon Emberkin",
@@ -8427,7 +8447,7 @@ export const en_CA: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Wraith Strike",
-        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
+        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
         "name": "Hammer of Wrath",
@@ -8587,23 +8607,24 @@ export const en_CA: EnTranslations = {
       },
       "venom_dart": {
         "name": "Venom Dart",
-        "description": "Flick a poisoned dart for {damage} Nature damage. Awards 1 combo point. Knifework: extends your Venomrend wound by 6 sec, up to 20 sec."
+        "description": "Flick a poisoned dart for {damage} Nature damage. Awards 1 combo point.",
+        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
       },
       "body_blow": {
-        "name": "Body Blow",
-        "description": "A heavy blow for 130% weapon damage plus 10 that awards 2 combo points and deepens the Redline by one pip. (Thuggery engine)"
+        "name": "Haymaker",
+        "description": "A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)"
       },
       "knockout_blow": {
-        "name": "Knockout Blow",
-        "description": "End the Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder per Redline pip, and recover 25 energy. (Thuggery engine)"
+        "name": "Lights Out",
+        "description": "Ends Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder for each Redline you built, and recover 25 energy. Use it before Redline runs out or the knockout is lost. (Thuggery)"
       },
       "veilstrike": {
         "name": "Shadow Veil",
-        "description": "The detonated Gloam bank: for 6 sec your Duskveil openers work in the open from any angle, you deal 10% more damage, and the first Lurker's Strike of the veil strikes for double. (Skulduggery engine)"
+        "description": "For 6 sec: your Duskveil openers work without stealth and from any angle, you deal 10% more damage, and your first Lurker's Strike inside it hits for double. (Skulduggery)"
       },
       "venomrend": {
         "name": "Venomrend",
-        "description": "Consume the Venom Ritual: strike for 100 plus 55 per combo point, reopen your venom wound (120 damage over 20 sec), and detonate the previous wound plus any other bleeds for their remaining damage. Restores 20 energy. (Knifework engine)"
+        "description": "Spends your 6 Venom Ritual: strike for 100 plus 55 per combo point, instantly deal all the damage your bleeds would still have dealt, then apply a fresh venom wound (120 damage over 20 sec). Restores 20 energy. (Knifework)"
       },
       "typhoon": {
         "name": "Typhoon",
@@ -8651,7 +8672,8 @@ export const en_CA: EnTranslations = {
       },
       "rake": {
         "name": "Flense",
-        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wildfang: landed hits bank Old Blood. Wolf Form only."
+        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {
         "name": "Patch Up",

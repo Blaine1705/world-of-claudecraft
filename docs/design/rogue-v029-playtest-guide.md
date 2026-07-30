@@ -19,8 +19,8 @@ permanent state that made Dirt Nap obsolete.
 Combo-chain pass, other specs (same session, owner verdict: passive echoes
 and refunds read as NOTHING on screen): Redline is now a button chain. The
 opening Dirt Nap transforms BOTH buttons for 8 sec: Wicked Slash becomes
-Body Blow (2 combo points, each landing adds a pip) and Dirt Nap becomes
-Knockout Blow, which hits 25% harder per pip and ends the window.
+Haymaker (2 combo points, each landing adds a pip) and Dirt Nap becomes
+Lights Out, which hits 25% harder per pip and ends the window.
 
 Detonation pass (owner review of this guide): the transformed stealth button
 is gone. A full Gloam bank simply unlocks the Duskveil openers in the open,
@@ -76,10 +76,10 @@ energy.
 Build: Killer's Pace / Ghostfoot Ward / Marked Prey / Ceaseless Cuts /
 Flurry of Knives / Second Shadow.
 
-Loop: Wicked Slash to 5 (every 3rd slash or Body Blow refunds 50 energy),
+Loop: Wicked Slash to 5 (every 3rd slash or Haymaker refunds 50 energy),
 Cutthroat Tempo, then POOL to 70 energy and Dirt Nap: the window opens and
-both buttons transform for 8 sec. Chain Body Blows (2 combo points each,
-each landing adds a Redline pip, max 4), then cash out with Knockout Blow:
+both buttons transform for 8 sec. Chain Haymakers (2 combo points each,
+each landing adds a Redline pip, max 4), then cash out with Lights Out:
 25% harder per pip, 25 energy back, and the window ends with it. The clock
 is the tension: a window that expires forfeits the Knockout, so cash out at
 4 pips or when the timer runs short, whichever comes first. Mirrored Blades
@@ -110,6 +110,6 @@ refreshes the 12% Grave Brand.
 - The button transforms (Dirt Nap to Venomrend, and the Redline pair) read
   at a glance; Skulduggery has none, its signal is the openers lighting up.
 - Each spec has a heartbeat, not a steady state: Knifework alternates dump
-  and DETONATE, Thuggery opens a window, chains Body Blows, and cashes out
+  and DETONATE, Thuggery opens a window, chains Haymakers, and cashes out
   one Knockout, Skulduggery banks toward one doubled strike from the
   shadows.

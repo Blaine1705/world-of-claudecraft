@@ -374,11 +374,11 @@ describe('percent armor debuffs (Sunder / Faerie Fire / corrode)', () => {
     expect(pet.maxHp).toBe(base);
   });
 
-  it('Expose Armor lands the full Sunder cap (5 stacks = 10%) in one cast', () => {
+  it('Expose Armor lands one Sunder stack per combo point (5 = the 10% cap)', () => {
     expect(ABILITIES.expose_armor.effects[0]).toMatchObject({
       type: 'sunder',
       maxStacks: 5,
-      full: true,
+      perCombo: true,
     });
     const sim = makeWorld();
     const mob = spawnMob(sim);
@@ -389,7 +389,7 @@ describe('percent armor debuffs (Sunder / Faerie Fire / corrode)', () => {
       remaining: 30,
       duration: 30,
       value: 170,
-      stacks: 5, // full cap applied at once
+      stacks: 5, // a five-point spend = the full cap
       sourceId: 1,
       school: 'physical',
     });

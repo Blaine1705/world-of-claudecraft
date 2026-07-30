@@ -2498,7 +2498,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.requiresForm': 'Vereist {form}-gedaante',
   'abilityUi.tooltip.requiresLevel': 'Vereist niveau {level}',
   'abilityUi.tooltip.requiresOutOfCombat': 'Vereist dat je buiten gevecht bent',
-  'abilityUi.tooltip.requiresStealth': 'Vereist sluiptocht',
   'abilityUi.tooltip.requiresTargetHealthBelow': 'Vereist doelwit onder {percent}% gezondheid',
   'abilityUi.tooltip.unavailable': 'Niet beschikbaar',
   'auth.appearance': 'Uiterlijk',
@@ -2787,8 +2786,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Een zorgvuldig getrokken schot dat {damage} schade toebrengt.',
   'entities.abilities.aimed_shot.name': 'Lange Trek',
-  'entities.abilities.ambush.description':
-    'Overval het doelwit voor 250% wapenschade plus {damage}. Je moet onzichtbaar zijn en achter het doelwit staan. Vereist een dolk. Levert 1 combopunt op.',
   'entities.abilities.ambush.name': 'Sluiperslag',
   'entities.abilities.arcane_explosion.description':
     'Een uitbarsting van Arcane energie raakt alle nabije vijanden voor {damage} Arcane schade.',
@@ -2811,8 +2808,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.description':
     'Neem de gedaante van de marter aan, waardoor je ontwijkkans met 8% toeneemt gedurende 30 min.',
   'entities.abilities.aspect_of_the_monkey.name': 'Gedaante van de Marter',
-  'entities.abilities.backstab.description':
-    'Steek het doelwit in de rug voor 150% wapenschade plus {damage}. Je moet achter het doelwit staan. Vereist een dolk. Levert 1 combopunt op.',
   'entities.abilities.backstab.name': 'Laffe Steek',
   'entities.abilities.barkskin.description':
     'Je huid verhardt als schors, waardoor je pantser met 150 toeneemt gedurende 15 sec.',
@@ -2849,11 +2844,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.charge.description':
     'Stormt op een vijand af, genereert 9 woede en verdooft hem gedurende 1 sec. Bereik 8-25 m.',
   'entities.abilities.charge.name': 'Bestorming',
-  'entities.abilities.cheap_shot.description':
-    'Sla het doelwit voor {damage} schade en verdoof het gedurende 4 sec. Je moet onzichtbaar zijn. Levert 2 combopunten op.',
   'entities.abilities.cheap_shot.name': 'Buikstoot',
-  'entities.abilities.claw.description':
-    'Klauw de vijand voor wapenschade plus {damage}. Levert 1 combopunt op. Alleen in Wolfsgedaante.',
   'entities.abilities.claw.name': 'Klauw',
   'entities.abilities.cleave.description':
     'Een vegende slag die alle vijanden voor je raakt voor {damage} schade.',
@@ -2919,7 +2910,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.name': 'Grijpende Wortels',
   'entities.abilities.evasion.description': 'Verhoogt je ontwijkkans met 50% gedurende 15 sec.',
   'entities.abilities.evasion.name': 'Spookvoet',
-  'entities.abilities.eviscerate.description': 'Afmaakzet die {damage} veroorzaakt.',
   'entities.abilities.eviscerate.name': 'Zandslaap',
   'entities.abilities.execute.description':
     'Poging om een gewonde vijand af te maken voor {damage} schade. Alleen bruikbaar op vijanden met minder dan 20% levenskracht.',
@@ -2927,17 +2917,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.exorcism.description':
     'Verbant de verdorvene met heilige toorn voor {damage} Heilige schade.',
   'entities.abilities.exorcism.name': 'Rite van Uitdrijving',
-  'entities.abilities.expose_armor.description':
-    'Afmaakzet die het doelwit blootlegt en zijn pantser met {damage} verlaagt gedurende 30 sec.',
   'entities.abilities.expose_armor.name': 'Pantserbres',
-  'entities.abilities.faerie_fire.description':
-    'Verlaagt het pantser van het doelwit met {damage}% gedurende 40 sec. Stapelt niet met Pantserscheur.',
   'entities.abilities.faerie_fire.name': 'Heksenlicht',
   'entities.abilities.fear.description':
     'Jaagt de vijand de stuipen op het lijf, waardoor het maximaal 8 sec ineenkrimpt. Elke schade verbreekt het effect.',
   'entities.abilities.fear.name': 'Teisteren',
-  'entities.abilities.ferocious_bite.description':
-    'Afmaakzet die {damage} veroorzaakt. Alleen in Wolfsgedaante.',
   'entities.abilities.ferocious_bite.name': 'Bloedbeet',
   'entities.abilities.fire_blast.description':
     'Treft de vijand voor {damage} Vuurschade. Ogenblikkelijk.',
@@ -2987,8 +2971,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbrand_weapon.description':
     'Doordringt je wapen met bijtende vorst: elke slag brengt {damage} extra schade toe gedurende 5 min.',
   'entities.abilities.frostbrand_weapon.name': 'Rijpgebonden Wapen',
-  'entities.abilities.garrote.description':
-    'Wurgt de vijand, brengt nu {damage} schade toe en laat het bloeden voor {overTime} gedurende 18 sec. Vereist sluiptocht. Levert 1 combopunt op.',
   'entities.abilities.garrote.name': 'Keeldraad',
   'entities.abilities.ghost_wolf.description':
     'Verandert je in een Shadewolf en verhoogt de bewegingssnelheid met 40% gedurende 10 min.',
@@ -3035,8 +3017,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.judgement.description':
     'Ontketent je actieve Zegel op de vijand en verbruikt het om de opgeslagen Heilige schade toe te brengen.',
   'entities.abilities.judgement.name': 'Vonnis',
-  'entities.abilities.kidney_shot.description':
-    'Afmaakzet die het doelwit verdooft. Duurt 1 sec langer per combopunt.',
   'entities.abilities.kidney_shot.name': 'Lage Stoot',
   'entities.abilities.lay_on_hands.description':
     'Een enorme golf van genezing herstelt {damage}% van je maximale gezondheid. 10 min hersteltijd.',
@@ -3054,8 +3034,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     'Plaatst de Wildward op een bevriend doelwit en verhoogt het pantser met {buff} gedurende 30 min.',
   'entities.abilities.mark_of_the_wild.name': 'Wildwering',
-  'entities.abilities.maul.description':
-    'Een verscheurende aanval die de slagschade met {damage} verhoogt en veel dreiging veroorzaakt. Activeert bij je volgende slag. Alleen in Bruingedaante.',
   'entities.abilities.maul.name': 'Botverbrijzelen',
   'entities.abilities.mind_blast.description':
     'Treft de geest van het doelwit voor {damage} Schaduwschade.',
@@ -3066,8 +3044,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mongoose_bite.description':
     'Tegenaanval nadat het doelwit ontwijkt voor wapenschade plus {damage}. Kan niet worden ontweken.',
   'entities.abilities.mongoose_bite.name': 'Tegenbeet',
-  'entities.abilities.moonfire.description':
-    'Verbrandt de vijand met maanvuur voor {damage} Arcane schade plus schade over tijd.',
   'entities.abilities.moonfire.name': 'Maanstorm',
   'entities.abilities.mortal_strike.description':
     'Een venijnige slag die wapenschade plus {damage} toebrengt. (Wapens-handtekening)',
@@ -3093,8 +3069,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pyroblast.description':
     'Werpt een immense vurige kei die {damage} Vuurschade toebrengt plus extra schade over tijd.',
   'entities.abilities.pyroblast.name': 'Pyrelans',
-  'entities.abilities.rake.description':
-    'Een sluipopener die de vijand harkt voor wapenschade plus {damage} en bloedingsschade veroorzaakt gedurende 9 sec. Levert 1 combopunt op. Alleen in Wolfsgedaante.',
   'entities.abilities.rake.name': 'Villen',
   'entities.abilities.rapid_fire.description':
     'Kanaliseer zes snelle schoten in 2,4 sec. terwijl je beweegt. Elk schot richt {damage} fysieke schade aan.',
@@ -3102,11 +3076,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.description':
     'Een sterke slagaanval die de schade met {damage} verhoogt. Activeert bij je volgende slag.',
   'entities.abilities.raptor_strike.name': 'Ontweiende Slag',
-  'entities.abilities.regrowth.description':
-    'Geneest een bevriend doelwit voor {damage} plus een extra hoeveelheid gedurende 21 sec.',
   'entities.abilities.regrowth.name': 'Tweede Bloei',
-  'entities.abilities.rejuvenation.description':
-    'Geneest het doelwit voor {damage} gedurende 12 sec.',
   'entities.abilities.rejuvenation.name': 'Wildbloei',
   'entities.abilities.renew.description': 'Geneest het doelwit voor {damage} gedurende 15 sec.',
   'entities.abilities.renew.name': 'Aanhoudende Genade',
@@ -3119,14 +3089,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.righteous_fury.description':
     'Verhoogt de dreiging die je Heilige schade opwekt met 60% gedurende 30 min. De hoeksteen van de tankende paladijn.',
   'entities.abilities.righteous_fury.name': 'Brandende Eed',
-  'entities.abilities.rip.description':
-    'Afmaakzet die {damage} Bloedschade toebrengt gedurende 12 sec. Verbruikt combopunten. Alleen in Wolfsgedaante.',
   'entities.abilities.rip.name': 'Verscheuren',
   'entities.abilities.rockbiter_weapon.description':
     'Doordrenkt je wapen met de woede van steen: elke zwaai brengt {damage} extra schade toe gedurende 5 min.',
   'entities.abilities.rockbiter_weapon.name': 'Steengebonden Wapen',
-  'entities.abilities.rupture.description':
-    'Afmaakzet die het doelwit verwondt, waardoor het {damage} bloedt gedurende 16 sec.',
   'entities.abilities.rupture.name': 'Doodbloeden',
   'entities.abilities.sap.description':
     'Schakelt het doelwit 8 sec lang uit. Je moet gesluipt zijn en buiten gevecht. Elke schade verbreekt het effect.',
@@ -3155,25 +3121,17 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_slam.description':
     'Sla het doelwit met je schild voor 50% wapenschade plus {damage} en enorme dreiging. (Protectie-kenmerk)',
   'entities.abilities.shield_slam.name': 'Schildbreuk',
-  'entities.abilities.sinister_strike.description':
-    'Een ogenblikkelijke slag voor wapenschade plus {damage}. Levert 1 combopunt op.',
   'entities.abilities.sinister_strike.name': 'Kwaadaardige Houw',
   'entities.abilities.slam.description':
     'Dreunt op de tegenstander in voor wapenschade plus {damage}.',
   'entities.abilities.slam.name': 'Botte Zwaai',
-  'entities.abilities.slice_and_dice.description':
-    'Afmaakzet die de melee-aanvalssnelheid met 30% verhoogt. Duurt langer per combopunt.',
   'entities.abilities.slice_and_dice.name': 'Moordend Tempo',
   'entities.abilities.smite.description': 'Kastijdt de vijand voor {damage} Heilige schade.',
   'entities.abilities.smite.name': 'Kastijden',
   'entities.abilities.sprint.description':
     'Verhoogt je bewegingssnelheid met 70% gedurende 15 sec.',
   'entities.abilities.sprint.name': 'Snelle Hielen',
-  'entities.abilities.starfire.description':
-    'Roept een bout van sterrenvuur naar beneden, die {damage} Arcane schade veroorzaakt.',
   'entities.abilities.starfire.name': 'Hemelval',
-  'entities.abilities.stealth.description':
-    'Verbergt je in de schaduwen: vijanden merken je nauwelijks op, maar je beweegt 50% trager. Aanvallen of schade oplopen verbreekt Duskveil. Bezweer opnieuw om eruit te stappen.',
   'entities.abilities.stealth.name': 'Schemersluier',
   'entities.abilities.stormstrike.description':
     'Kanaliseert de storm door je wapen en treft ogenblikkelijk voor wapenschade plus {damage}.',
@@ -3200,8 +3158,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Roept een Gloomshade op onder bevel van de Heksenmeester. De Gloomshade is een stevige demon die je vijanden provoceert en klappen opvangt. Het oproepen van een nieuwe demon stuurt je huidige weg. Je mag één demon tegelijk hebben.',
   'entities.abilities.summon_voidwalker.name': 'Gloomshade Oproepen',
   'entities.abilities.sunder_armor.name': 'Pantserscheur',
-  'entities.abilities.swipe.description':
-    'Haal uit naar nabije vijanden voor {damage} schade. Veroorzaakt extra dreiging. Alleen in Bruingedaante.',
   'entities.abilities.swipe.name': 'Vegende Klauwen',
   'entities.abilities.tame_beast.description':
     'Begint met het temmen van een beest tot je metgezel. Het moet je niveau of lager zijn en geen elite. Je huisdier volgt je, valt je vijanden aan en houdt zelf dreiging vast. Je mag één huisdier tegelijk hebben.',
@@ -3230,8 +3186,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wing_clip.description':
     'Brengt een wond toe voor {damage} schade die de vijand 40% vertraagt gedurende 10 sec.',
   'entities.abilities.wing_clip.name': 'Kluisterende Houw',
-  'entities.abilities.wrath.description':
-    'Slingert een bout van natuurenergie voor {damage} Natuurschade.',
   'entities.abilities.wrath.name': 'Wildbout',
   'entities.abilities.holy_shock.name': 'Heilige schok',
   'entities.abilities.holy_shock.description':
@@ -3258,14 +3212,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     'Verhoogt spreukhaast met 30% en voorkomt onderbreking en terugslag van spreuken gedurende 10 sec. (Frost-signatuur)',
   'entities.abilities.cold_blood.name': 'Koud bloed',
-  'entities.abilities.cold_blood.description':
-    'Bundelt je dodelijke intentie zodat je volgende aanval een kritieke treffer is. (Moord signatuur)',
   'entities.abilities.blade_flurry.name': 'Klingenvlaag',
-  'entities.abilities.blade_flurry.description':
-    'Ontketent een vlaag van klingen, waardoor aanvalssnelheid 12 sec met 20% toeneemt. (Gevecht signatuur)',
   'entities.abilities.hemorrhage.name': 'Bloeding',
-  'entities.abilities.hemorrhage.description':
-    'Raakt de vijand voor wapenschade plus {damage} en veroorzaakt bloedschade gedurende 12 sec. Geeft 1 combopunt. (Subtiliteit signatuur)',
   'entities.abilities.power_infusion.name': 'Krachtinfusie',
   'entities.abilities.power_infusion.description':
     'Doordrenkt een bevriend doelwit met kracht, waardoor spreukkracht 15 sec met 28 toeneemt. (Discipline signatuur)',
@@ -3291,8 +3239,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Storm op een vijand af en wortel hem 1 sec. Bereik 8-25 m. (Wildernis signatuur)',
   'entities.abilities.swiftmend.name': 'Snelle genezing',
-  'entities.abilities.swiftmend.description':
-    'Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het voor {damage} te genezen. (Herstel signatuur)',
   'entities.abilities.crusader_strike.name': 'Kruisvaardersslag',
   'entities.abilities.crusader_strike.description':
     'Treft het doel voor wapenschade plus {damage} Heilige schade. (paladijntalent)',
@@ -9517,8 +9463,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Herstelt 180 gezondheid gedurende 10 sec. Alleen in Berenvorm. (druïdetalent)',
   'entities.abilities.frost_trap.description':
     'Bevriest vijanden in het doelgebied 3 sec. en verhindert dat ze bewegen of handelen. (jagertalent)',
-  'entities.abilities.ghostly_strike.description':
-    'Treft de vijand voor wapenschade plus {damage}, verhoogt kort de ontwijking en kent 1 combinatiepunt toe. (schurkentalent)',
   'entities.abilities.hammer_of_wrath.description':
     'Slingert een heilige hamer naar een gewonde vijand en brengt {damage} Heilige schade toe. Alleen bruikbaar onder 20% gezondheid. (paladijntalent)',
   'entities.abilities.healing_stream.description':
