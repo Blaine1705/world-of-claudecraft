@@ -55,6 +55,7 @@ import { itemDisplayName } from './entity_i18n';
 import { isPaperdollDraggable } from './equip_drop_core';
 import { esc } from './esc';
 import { FOCUSABLE_SELECTOR } from './focus_manager';
+import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hud/action_bar/hotbar';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
@@ -367,11 +368,20 @@ export class BagsWindow {
   render(): void {
     const el = this.deps.root();
     const world = this.deps.world();
+    // The focused control's identity, carried across the rebuild (the vendor
+    // ladder pattern, the phase 13 QA hand-off): this window rebuilds whole
+    // on the same onInventoryChanged hook the vendor does, and used to drop
+    // keyboard focus to <body> every time a stack changed. Captured BEFORE
+    // teardown, with the focused grid SLOT for the outward-walk rung.
+    const focusKey = captureFocusKey(el);
+    const preRows = [...el.querySelectorAll<HTMLElement>('.bag-grid [data-focus-key]')];
+    const focusedNode = focusedWithin(el);
+    const focusedSlot = focusedNode instanceof HTMLElement ? preRows.indexOf(focusedNode) : -1;
     // .bag-grid (not #bags) is the scroll container; it is recreated on every
     // rebuild, so capture its scroll offset and reapply it to the fresh grid:
     // otherwise using an item (e.g. a potion) snaps the list back to the top.
     const prevScrollTop = el.querySelector('.bag-grid')?.scrollTop ?? 0;
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
+    el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
     el.appendChild(this.buildBagBar());
     // Skip the chip/search row entirely when the bag is empty: a full filter bar
     // above a grid of empty squares is just noise.
@@ -385,6 +395,28 @@ export class BagsWindow {
     moneyRow.className = 'money';
     el.appendChild(moneyRow);
     this.paintMoneyRow(moneyRow, world.copper);
+    // The restore ladder (the vendor contract): the exact control when it
+    // survived, else the same grid slot walking outward (after a consumed
+    // stack the slot holds the NEXT item, the useful landing), else Close.
+    // Every rung resolves by dataset equality (jsdom has no CSS.escape).
+    if (focusKey !== null) {
+      const keyed = [...el.querySelectorAll<HTMLElement>('[data-focus-key]')];
+      const exact = keyed.find((node) => node.dataset.focusKey === focusKey);
+      const rows = [...el.querySelectorAll<HTMLElement>('.bag-grid [data-focus-key]')];
+      const slot = focusedSlot >= 0 ? Math.min(focusedSlot, rows.length - 1) : -1;
+      const neighbors: (HTMLElement | undefined)[] = [];
+      if (slot >= 0) {
+        for (let step = 0; step < rows.length; step++) {
+          if (rows[slot + step]) neighbors.push(rows[slot + step]);
+          if (step > 0 && rows[slot - step]) neighbors.push(rows[slot - step]);
+        }
+      }
+      restoreFirstEnabled([
+        exact,
+        ...neighbors,
+        el.querySelector<HTMLElement>('[data-close]') ?? undefined,
+      ]);
+    }
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       // On touch the vendor / bank clusters hide their LEFT panel's own x-btn, so
       // this bags x-btn is the whole cluster's single close control: it closes the
@@ -425,6 +457,7 @@ export class BagsWindow {
     const backpack = document.createElement('button');
     backpack.type = 'button';
     backpack.className = 'bag-socket backpack';
+    backpack.dataset.focusKey = 'bagsocket:backpack';
     backpack.setAttribute('aria-disabled', 'true');
     backpack.innerHTML = `<img class="item-icon q-common" src="${iconDataUrl('item', 'backpack')}" alt="" draggable="false">`;
     backpack.setAttribute(
@@ -448,6 +481,7 @@ export class BagsWindow {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = `bag-socket q-${bagQualityKey(item)}`;
+        btn.dataset.focusKey = `bagsocket:${socket.socket}`;
         btn.innerHTML = this.deps.itemIcon(item);
         btn.setAttribute(
           'aria-label',
@@ -473,6 +507,7 @@ export class BagsWindow {
         const emptySocket = document.createElement('button');
         emptySocket.type = 'button';
         emptySocket.className = 'bag-socket empty';
+        emptySocket.dataset.focusKey = `bagsocket:${socket.socket}`;
         emptySocket.setAttribute('aria-disabled', 'true');
         emptySocket.setAttribute('aria-label', t('hudChrome.bags.socketEmpty'));
         this.deps.attachTooltip(
@@ -520,6 +555,7 @@ export class BagsWindow {
       const chip = document.createElement('button');
       chip.type = 'button';
       chip.className = `bag-chip${this.filter.category === category ? ' active' : ''}`;
+      chip.dataset.focusKey = `bagchip:${category}`;
       chip.textContent = t(BAG_CATEGORY_LABEL_KEYS[category]);
       chip.setAttribute('aria-pressed', this.filter.category === category ? 'true' : 'false');
       chip.addEventListener('click', () => {
@@ -539,6 +575,7 @@ export class BagsWindow {
     const search = document.createElement('input');
     search.type = 'search';
     search.className = 'bag-search';
+    search.dataset.focusKey = 'bag-search';
     search.placeholder = t('hudChrome.bags.searchPlaceholder');
     search.setAttribute('aria-label', t('hudChrome.bags.searchAria'));
     search.value = this.filter.search;
@@ -637,6 +674,10 @@ export class BagsWindow {
       // instanced copies share an itemId): that is what the move command sends as `from`.
       const index = bagStackIndex(world.inventory, s);
       if (cell !== null) row.dataset.bagIndex = String(cell);
+      // Focus identity for the rebuild ladder (the vendor pattern): itemId
+      // plus live inventory index, so the exact stack re-lands after a
+      // repaint and duplicates stay distinct.
+      row.dataset.focusKey = `bag:${s.itemId}:${index}`;
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
@@ -859,6 +900,7 @@ export class BagsWindow {
     const row = document.createElement('button');
     row.type = 'button';
     row.className = 'bag-item q-common';
+    row.dataset.focusKey = `bag:${s.itemId}:${cell ?? -1}`;
     row.style.setProperty('--bag-slot-quality', QUALITY_DEFAULT_COLOR);
     // The known cell's ladder gives trade, mail-attach, market-sell, and
     // vendor precedence over the deposit; those four all need a def, so on
