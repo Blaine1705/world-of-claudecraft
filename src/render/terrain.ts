@@ -660,11 +660,21 @@ function buildSplatMaterial(
         // Camera distance, UNCONDITIONAL: the snow-sparkle fade in the
         // roughness chunk reads it on every relief level (level 0 used to
         // leave it undeclared, which broke the whole terrain program).
-        float wocCamDist = length(cameraPosition - vWPos);
+        ${
+          terrainReliefLevel() >= 2
+            ? `vec3 pRay = cameraPosition - vWPos;
+        float wocCamDist = length(pRay);`
+            : 'float wocCamDist = length(cameraPosition - vWPos);'
+        }
         ${
           // upW feeds both the parallax fade and the cavity slope fade; emit
           // it once whenever any relief level is active.
-          terrainReliefLevel() >= 1 ? 'float upW = normalize(vWNorm).y;' : ''
+          terrainReliefLevel() >= 2
+            ? `vec3 wocReliefUnitN = normalize(vWNorm);
+        float upW = wocReliefUnitN.y;`
+            : terrainReliefLevel() >= 1
+              ? 'float upW = normalize(vWNorm).y;'
+              : ''
         }
         ${
           // The parallax walk is relief level 2+ (high and up): medium
@@ -672,13 +682,15 @@ function buildSplatMaterial(
           // PBR tiers (the round-10 medium regate), so it keeps flat-lit
           // ground.
           terrainReliefLevel() >= 2
-            ? `vec3 pRay = cameraPosition - vWPos;
-        float pDist = wocCamDist;
+            ? `float pDist = wocCamDist;
+        // Outside either smoothstep support the fade is exactly zero. Keep
+        // incidence and every dependent relief tap out of those fragments.
+        if (upW > 0.55 && pDist < 36.0) {
         // Grazing fade: at low N dot V the view-ray offset grows past what a
         // 1-2 tap parallax can refine and the texture smears into a liquid
         // blur, exactly where the depth cue is weakest anyway. Fade the whole
         // effect out as N dot V drops below ~0.38.
-        float pNdv = dot(normalize(vWNorm), pRay) / max(pDist, 1e-3);
+        float pNdv = dot(wocReliefUnitN, pRay) / max(pDist, 1e-3);
         // Distance fade tightened (was 16..44yd): past ~36yd mip selection
         // has blurred the 512px packed height field, and offsetting UVs by a
         // blurry height signal reads as smear, not relief.
@@ -706,6 +718,7 @@ function buildSplatMaterial(
           pOff = pDir * wocGroundHeightSmooth(tuv + pOff, pAmp) * pFade;
           pOff /= max(1.0, length(pOff) / WOC_PARALLAX_CLAMP);
           tuv += pOff;
+        }
         }`
             : ''
         }

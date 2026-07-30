@@ -12,6 +12,15 @@ let vertexShader = '';
 let fragmentShader = '';
 let finishChunkGeometry: typeof import('../src/render/terrain').terrainInternalsForTest.finishChunkGeometry;
 
+function braceDepthAt(source: string, offset: number): number {
+  let depth = 0;
+  for (let i = 0; i < offset; i++) {
+    if (source[i] === '{') depth++;
+    if (source[i] === '}') depth--;
+  }
+  return depth;
+}
+
 async function compileTerrainShader(preset: string): Promise<FakeShader> {
   vi.resetModules();
   vi.stubGlobal('location', { search: `?gfx=${preset}` });
@@ -131,6 +140,40 @@ describe('insane terrain fragment shader', () => {
       'diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro * groundShade;',
     );
     expect(fragmentShader).toContain('normal = normalize(normal + tbn * vec3(detN, 0.0));');
+  });
+
+  it('keeps relief guards away from the base albedo path', () => {
+    const mapDepth = braceDepthAt(fragmentShader, fragmentShader.indexOf('vec2 tuv ='));
+    const parallaxSampleDepth = braceDepthAt(fragmentShader, fragmentShader.indexOf('vec2 pOff ='));
+    const grassAlbedoDepth = braceDepthAt(
+      fragmentShader,
+      fragmentShader.indexOf('vec3 grassAlb ='),
+    );
+    const albedoBlendDepth = braceDepthAt(fragmentShader, fragmentShader.indexOf('vec3 alb ='));
+    const finalAccumulationDepth = braceDepthAt(
+      fragmentShader,
+      fragmentShader.indexOf('diffuseColor.rgb *= alb'),
+    );
+
+    expect(fragmentShader).not.toContain('bvec3 active');
+    expect(fragmentShader).not.toContain('pActive');
+    expect(fragmentShader).toContain('vec3 wocReliefUnitN = normalize(vWNorm);');
+    expect(fragmentShader.match(/normalize\(vWNorm\)/g)).toHaveLength(2);
+    expect(fragmentShader).toContain('float wocCamDist = length(pRay);');
+    expect(fragmentShader).toContain('if (upW > 0.55 && pDist < 36.0) {');
+    expect(fragmentShader).toContain(
+      'vec3 alb = grassAlb * vSplatR.x\n' +
+        '                 + dirtAlb * vSplatR.y\n' +
+        '                 + rockAlb * vSplatR.z\n' +
+        '                 + sandAlb * vSplatR.w;',
+    );
+    expect(fragmentShader).toContain(
+      'diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro * groundShade;',
+    );
+    expect(parallaxSampleDepth).toBeGreaterThan(mapDepth);
+    expect(grassAlbedoDepth).toBe(mapDepth);
+    expect(albedoBlendDepth).toBe(mapDepth);
+    expect(finalAccumulationDepth).toBe(mapDepth);
   });
 
   it('keeps the shared terrain material opaque and depth-writing', () => {
