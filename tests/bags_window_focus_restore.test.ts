@@ -91,9 +91,11 @@ describe('bags window focus restore (the vendor ladder pattern)', () => {
       { itemId: 'wolf_fang', count: 2 },
       { itemId: 'baked_bread', count: 1 },
     ]);
-    focusRow(root, 'bag:baked_bread:1');
+    // Ordinal keys (the phase 14 QA): the bread is the FIRST baked_bread,
+    // whatever its raw inventory index.
+    focusRow(root, 'bag:baked_bread:0');
     w.render();
-    expect(activeKey()).toBe('bag:baked_bread:1');
+    expect(activeKey()).toBe('bag:baked_bread:0');
   });
 
   it('a consumed stack lands the same slot (the next item), never <body>', () => {
@@ -103,13 +105,42 @@ describe('bags window focus restore (the vendor ladder pattern)', () => {
       { itemId: 'wolf_fang', count: 3 },
     ];
     const { root, w } = harness(inv);
-    focusRow(root, 'bag:baked_bread:1');
+    focusRow(root, 'bag:baked_bread:0');
     // The focused stack is consumed (the sim removed it); the rebuild must
-    // land the SAME slot, which now holds the next stack.
+    // land the SAME slot, which now holds the next stack (the second
+    // wolf_fang, ordinal 1).
     inv.splice(1, 1);
     w.render();
     expect(document.activeElement).not.toBe(document.body);
     expect(activeKey()).toBe('bag:wolf_fang:1');
+  });
+
+  it('consuming an earlier different-item stack leaves the focused identity intact', () => {
+    // The ordinal-key improvement pinned directly: under raw index keys the
+    // bread's removal shifted every later key one down and the exact rung
+    // landed focus one stack over; the ordinal only moves when an earlier
+    // SAME-item stack goes.
+    const inv: InvSlot[] = [
+      { itemId: 'baked_bread', count: 1 },
+      { itemId: 'wolf_fang', count: 1 },
+      { itemId: 'wolf_fang', count: 3 },
+    ];
+    const { root, w } = harness(inv);
+    focusRow(root, 'bag:wolf_fang:1');
+    inv.splice(0, 1);
+    w.render();
+    expect(activeKey()).toBe('bag:wolf_fang:1');
+  });
+
+  it('the sort select carries a focus key and survives its own rebuild', () => {
+    // The one filter-bar control the ladder missed (the phase 14 QA): its
+    // change handler rebuilds the window, and keyless it fell to <body>.
+    const { root, w } = harness([{ itemId: 'wolf_fang', count: 1 }]);
+    const sort = root.querySelector<HTMLElement>('[data-focus-key="bag-sort"]');
+    expect(sort).toBeTruthy();
+    sort?.focus();
+    w.render();
+    expect(activeKey()).toBe('bag-sort');
   });
 
   it('the last stack falls to Close, and non-grid controls restore exactly', () => {

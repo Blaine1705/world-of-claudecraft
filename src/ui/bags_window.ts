@@ -408,6 +408,12 @@ export class BagsWindow {
       if (slot >= 0) {
         for (let step = 0; step < rows.length; step++) {
           if (rows[slot + step]) neighbors.push(rows[slot + step]);
+          // The backward rung is NEAR-dead by construction: the clamp above
+          // guarantees rows[slot] resolves whenever any row survives, so
+          // walking backward only matters if forward rungs are all
+          // disabled. Kept deliberately: restoreFirstEnabled skips
+          // disabled controls, and a grid tail of aria-disabled rows is a
+          // real state (the unknown-cell ladder).
           if (step > 0 && rows[slot - step]) neighbors.push(rows[slot - step]);
         }
       }
@@ -588,6 +594,10 @@ export class BagsWindow {
 
     const sort = document.createElement('select');
     sort.className = 'bag-sort';
+    // The one filter-bar control the ladder missed (the phase 14 QA): its
+    // change handler rebuilds the window, and keyless it fell to <body>
+    // mid-interaction (a closed select fires change per arrow press).
+    sort.dataset.focusKey = 'bag-sort';
     sort.setAttribute('aria-label', t('hudChrome.bags.sortAria'));
     for (const option of BAG_SORTS) {
       const opt = document.createElement('option');
@@ -675,9 +685,16 @@ export class BagsWindow {
       const index = bagStackIndex(world.inventory, s);
       if (cell !== null) row.dataset.bagIndex = String(cell);
       // Focus identity for the rebuild ladder (the vendor pattern): itemId
-      // plus live inventory index, so the exact stack re-lands after a
-      // repaint and duplicates stay distinct.
-      row.dataset.focusKey = `bag:${s.itemId}:${index}`;
+      // plus the stack's ORDINAL among same-item stacks, not the raw
+      // inventory index (the phase 14 QA): consuming an earlier
+      // different-item stack shifts every later index, and an index-keyed
+      // exact rung then lands focus one stack over. The ordinal only moves
+      // when an earlier SAME-item stack goes, where the same-slot rung is
+      // the honest landing anyway. Distinct 'bagu:' prefix on the
+      // unknown-cell builder keeps the two families from colliding on a
+      // shared miss value.
+      const ordinal = world.inventory.filter((x) => x.itemId === s.itemId).indexOf(s);
+      row.dataset.focusKey = `bag:${s.itemId}:${ordinal}`;
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
@@ -900,7 +917,7 @@ export class BagsWindow {
     const row = document.createElement('button');
     row.type = 'button';
     row.className = 'bag-item q-common';
-    row.dataset.focusKey = `bag:${s.itemId}:${cell ?? -1}`;
+    row.dataset.focusKey = `bagu:${s.itemId}:${cell ?? -1}`;
     row.style.setProperty('--bag-slot-quality', QUALITY_DEFAULT_COLOR);
     // The known cell's ladder gives trade, mail-attach, market-sell, and
     // vendor precedence over the deposit; those four all need a def, so on

@@ -3982,8 +3982,13 @@ export class Hud {
     markEquipDropTargets: (itemId) => this.charWindow.markDropTargets(itemId),
     dropOnEquipSlot: (itemId, slot) => this.charWindow.dropOnEquipSlot(itemId, slot),
     dropOnActionSlot: (itemId, slot) => this.placeHotbarItemFromTouch(itemId, slot),
-    dropOnActionRingSlot: (itemId, ringIndex) =>
-      this.placeHotbarItemFromTouch(itemId, this.mobileSourceSlotForButton(ringIndex)),
+    dropOnActionRingSlot: (itemId, ringIndex) => {
+      // Bounded like mobileRingSlotFromPoint (the phase 14 QA): a stale
+      // data-mobile-index past the live ring must map to no seat, never to
+      // a computed bar slot past the end of the bar.
+      if (ringIndex >= this.mobileRingSlotBtns.length) return;
+      this.placeHotbarItemFromTouch(itemId, this.mobileSourceSlotForButton(ringIndex));
+    },
     openItemActionMenu: (def, itemId, slotIndex, x, y, runDefault) =>
       this.bagItemActionMenu.open(def, itemId, slotIndex, x, y, runDefault),
   });
