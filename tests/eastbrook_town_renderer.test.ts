@@ -267,18 +267,17 @@ describe('Eastbrook town renderer', () => {
     }));
     const microMaterial = micro.material as THREE.Material;
 
-    // A tiny dt fades partially: the occlusion transition animates.
+    // Occlusion snaps to the ghost target on its first positive-dt frame.
     view.update(45, 2, 45, bank.position.x, 2, bank.position.z, 200, 0.05);
     expect(
       bankMaterials.every(
         (material, i) =>
           material.transparent &&
           material.depthWrite &&
-          material.opacity < authored[i].opacity &&
-          material.opacity > authored[i].opacity * 0.2,
+          Math.abs(material.opacity - authored[i].opacity * 0.2) < 1e-9,
       ),
     ).toBe(true);
-    // A large dt settles the fade at exactly 20% of the authored opacity.
+    // Further occluded frames remain at exactly 20% of the authored opacity.
     view.update(45, 2, 45, bank.position.x, 2, bank.position.z, 200, 10);
     expect(
       bankMaterials.every(
