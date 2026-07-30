@@ -15,8 +15,11 @@ import {
   QUESTS,
   zoneAt,
 } from '../src/sim/data';
+import { nodeMaterialFor } from '../src/sim/professions/gathering';
+import { fineMaterialFor } from '../src/sim/professions/material_grades';
 import {
   gatherNodeClusters,
+  nodeYieldClusters,
   questObjectiveAreas,
   questObjectivesForMob,
 } from '../src/sim/quest_targets';
@@ -164,6 +167,67 @@ describe('questObjectiveAreas', () => {
         ).toBe(true);
       }
     }
+  });
+
+  it('a collect objective for a node-yield material draws the yield clusters (the UX pass)', () => {
+    // The blind arm the pass-2 accepted-quest capture exposed: the shipped
+    // work-order quests collect materials that come out of veins/stands/
+    // patches, which no mob drops and no ground object carries, so the map
+    // drew NOTHING for them. Derived over the live tables with non-vacuity:
+    // at least one shipped quest must be in this class.
+    const yields = new Set(GATHER_NODES.map((n) => nodeMaterialFor(n.type, n.zoneId).itemId));
+    let found: { quest: QuestDef; itemId: string; objIndex: number } | null = null;
+    for (const q of Object.values(QUESTS)) {
+      for (const [i, objective] of q.objectives.entries()) {
+        if (objective.type === 'collect' && objective.itemId && yields.has(objective.itemId)) {
+          found = { quest: q, itemId: objective.itemId, objIndex: i };
+          break;
+        }
+      }
+      if (found) break;
+    }
+    expect(found, 'no shipped collect-of-node-yield quest (the work orders)').toBeTruthy();
+    if (!found) return;
+    const clusters = nodeYieldClusters(found.itemId);
+    expect(clusters.length).toBeGreaterThan(0);
+    const areas = questObjectiveAreas(activeLog(found.quest));
+    // Every yield cluster earned a circle carrying this objective's ref.
+    for (const group of clusters) {
+      const cx = group.reduce((sum, node) => sum + node.x, 0) / group.length;
+      const cz = group.reduce((sum, node) => sum + node.z, 0) / group.length;
+      const area = areas.find((a) => a.center.x === cx && a.center.z === cz);
+      expect(area, `yield cluster at ${cx},${cz} should have an area`).toBeTruthy();
+      expect(
+        area?.objectives.some(
+          (o) => o.questId === found?.quest.id && o.objectiveIndex === found?.objIndex,
+        ),
+      ).toBe(true);
+    }
+    // And only matching nodes feed the clusters: a yield id never clusters
+    // a node whose zone-and-type yield is a different material.
+    for (const group of nodeYieldClusters(found.itemId)) {
+      for (const point of group) {
+        const node = GATHER_NODES.find((n) => n.pos.x === point.x && n.pos.z === point.z);
+        expect(node).toBeTruthy();
+        if (node) {
+          const base = nodeMaterialFor(node.type, node.zoneId).itemId;
+          expect(base === found.itemId || fineMaterialFor(base) === found.itemId).toBe(true);
+        }
+      }
+    }
+  });
+
+  it('a gather objective still draws its node clusters (the hand-verify arm)', () => {
+    // The pass-2 capture question resolved: the GATHER arm works (this
+    // drive), so the captured quest with no circle was the collect class
+    // above. Derived over live content: zone1 ships gather objectives.
+    const quest = Object.values(QUESTS).find((q) =>
+      q.objectives.some((o) => o.type === 'gather' && o.nodeType),
+    );
+    expect(quest, 'no shipped gather-typed objective').toBeTruthy();
+    if (!quest) return;
+    const areas = questObjectiveAreas(activeLog(quest));
+    expect(areas.length).toBeGreaterThan(0);
   });
 
   it('encloses a ground-object cluster in one finite circle', () => {

@@ -9,6 +9,8 @@
 // interest-radius limited: a camp far across the zone still resolves.
 
 import { CAMPS, ESCORTS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
+import { nodeMaterialFor } from './professions/gathering';
+import { fineMaterialFor } from './professions/material_grades';
 import {
   type GatherNodeType,
   type QuestObjective,
@@ -113,7 +115,40 @@ export function gatherNodeClusters(
   nodeType: GatherNodeType,
   linkYd: number = NODE_CLUSTER_LINK_YD,
 ): { x: number; z: number }[][] {
-  const nodes = GATHER_NODES.filter((n) => n.type === nodeType);
+  return clusterNodes(
+    GATHER_NODES.filter((n) => n.type === nodeType),
+    linkYd,
+  );
+}
+
+/**
+ * The clusters of nodes whose HARVEST feeds a collect objective for `itemId`
+ * (the UX pass): a node counts when its zone-and-type yield IS the item, or
+ * when the item is that yield's fine grade (a fine objective is banked at
+ * the same veins; only the tool decides the grade). Before this arm, a
+ * collect objective for a node-yield material drew NO map guidance at all:
+ * no mob drops it and no ground object carries it, so the classic blobs
+ * (questObjectiveAreas below) skipped it entirely, while the four
+ * 'gather'-typed objectives in content drew theirs. Same linkage and pin
+ * story as gatherNodeClusters.
+ */
+export function nodeYieldClusters(
+  itemId: string,
+  linkYd: number = NODE_CLUSTER_LINK_YD,
+): { x: number; z: number }[][] {
+  return clusterNodes(
+    GATHER_NODES.filter((n) => {
+      const base = nodeMaterialFor(n.type, n.zoneId).itemId;
+      return base === itemId || fineMaterialFor(base) === itemId;
+    }),
+    linkYd,
+  );
+}
+
+function clusterNodes(
+  nodes: readonly (typeof GATHER_NODES)[number][],
+  linkYd: number,
+): { x: number; z: number }[][] {
   const root = nodes.map((_, i) => i);
   const find = (i: number): number => {
     let r = i;
@@ -289,12 +324,18 @@ export function questObjectiveAreas(
   const pushNodeCluster = (ref: QuestObjectiveRef, nodeType: GatherNodeType): void => {
     for (const group of gatherNodeClusters(nodeType)) pushEnclosing(ref, group);
   };
+  // And per yield-matched cluster for a collect objective naming a
+  // node-yield material (the UX pass; nodeYieldClusters above).
+  const pushYieldClusters = (ref: QuestObjectiveRef, itemId: string): void => {
+    for (const group of nodeYieldClusters(itemId)) pushEnclosing(ref, group);
+  };
   for (const { questId, objectiveIndex, obj } of incompleteObjectives(questLog)) {
     const ref: QuestObjectiveRef = { questId, objectiveIndex };
     if (obj.type === 'kill' && obj.targetMobId) pushMobCamps(ref, obj.targetMobId);
     else if (obj.type === 'collect' && obj.itemId) {
       for (const mobId of mobsDroppingQuestItem(obj.itemId, questId)) pushMobCamps(ref, mobId);
       pushObjectCluster(ref, obj.itemId);
+      pushYieldClusters(ref, obj.itemId);
     } else if (obj.type === 'interact') {
       if (obj.targetObjectItemId) pushObjectCluster(ref, obj.targetObjectItemId);
       const npc = obj.targetNpcId ? NPCS[obj.targetNpcId] : undefined;
