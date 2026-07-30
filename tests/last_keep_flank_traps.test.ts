@@ -18,6 +18,7 @@
 import { describe, expect, it } from 'vitest';
 import { CASTLE, CASTLE_RAMPS, WARD_STEPS } from '../src/sim/castle_layout';
 import { isBlocked, resolveMovement } from '../src/sim/colliders';
+import { DUNGEONS } from '../src/sim/data';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { rideSteepnessAt } from '../src/sim/ride_height';
 import { Sim } from '../src/sim/sim';
@@ -278,10 +279,14 @@ function pushToward(
 }
 
 describe('the Last Keep flanks hold no wedge pockets', () => {
+  // A million fine samples over the whole castle, each one a groundHeight, a
+  // steepness and a collider query, takes about 15s alone and longer sharing
+  // cores with the rest of a run: past the 20s default, so it is spelled out
+  // rather than left to flake in a full sweep.
   it('leaves no reachable spot in a corridor narrower than a body', () => {
     const wedges = reachableWedges();
     expect(wedges.length, `wedge pockets: ${describeWedges(wedges)}`).toBe(0);
-  });
+  }, 120_000);
 
   it('carries the alley flight onto the ward edge with no bailey sliver under it', () => {
     // the flight's mass must overlap the ward's retaining edge: any dip back to
@@ -319,19 +324,25 @@ describe('the Last Keep flanks hold no wedge pockets', () => {
         'walks out west into the open alley',
       ).toBe(true);
     }
-    // The keep and the barracks overlap across the middle of the neck, so the
-    // slot itself is solid; what is left are the two cusps where their arcs
-    // cross. Driven north out of the open terrace into the south cusp:
+    // There is no keep/hall slot to be held out of any more. The great hall
+    // moved down into the bailey and the barracks wing that replaced it now
+    // stands clear of the keep, so the ground between them is a 2.3yd passage
+    // across the terrace. Assert it is genuinely walkable end to end, in both
+    // directions, since a slot that reads as a corridor but is not one is the
+    // defect this whole file exists to catch.
     {
-      const { sim, p, meta } = makeWalker({ x: 411.6, z: 2009 });
-      pushToward(sim, p, meta, { x: 411.6, z: 1998 }, 20 * 6);
-      expect(p.pos.z, 'held south of the slot').toBeGreaterThan(2006.5);
+      const { sim, p, meta } = makeWalker({ x: 412, z: 2010 });
+      expect(
+        pushToward(sim, p, meta, { x: 412, z: 1994 }, 20 * 10),
+        'walks north through the terrace passage',
+      ).toBe(true);
     }
-    // ...and driven south off the ward's north shelf into the north cusp
     {
-      const { sim, p, meta } = makeWalker({ x: 413, z: 1994.3 });
-      pushToward(sim, p, meta, { x: 413, z: 2004 }, 20 * 6);
-      expect(p.pos.z, 'held north of the slot').toBeLessThan(1995.6);
+      const { sim, p, meta } = makeWalker({ x: 412, z: 1994 });
+      expect(
+        pushToward(sim, p, meta, { x: 412, z: 2010 }, 20 * 10),
+        'walks south through the terrace passage',
+      ).toBe(true);
     }
     // ...and driven west along the alley flight's foot, where the flight's
     // side and the keep's arc close on each other to nothing
@@ -339,6 +350,59 @@ describe('the Last Keep flanks hold no wedge pockets', () => {
       const { sim, p, meta } = makeWalker({ x: 430.5, z: 1994.4 });
       pushToward(sim, p, meta, { x: 424, z: 1994.4 }, 20 * 6);
       expect(p.pos.x, 'held east of the flight slot').toBeGreaterThan(428.1);
+    }
+  });
+
+  it('lets a body pushed OUT of any castle mass walk away from where it lands', () => {
+    // The wedge scan above cannot see this failure, by construction. Where two
+    // masses both push a body and their standoffs overlap, the push vectors
+    // CANCEL: isBlocked reports that ground free (net displacement is zero) and
+    // the flood fill cannot walk in, so the scan files it as unreachable and
+    // skips it. A body put there by depenetration is held solid.
+    //
+    // That is not hypothetical. A blocker laid across the keep's facade to
+    // close the door-jamb slivers reached 0.85yd (its OBB pad plus a body
+    // radius), not the 0.5 a bare segment suggests, which put its standoff
+    // north of the keep circle's own. The keep's restore path (sim.ts, the
+    // branch that deliberately skips findSafePos) drops a logged-out character
+    // at doorPos.z - 4, INSIDE the circle; the circle pushed them south onto
+    // the blocker and they could not move in any direction. So: every spot a
+    // mass can depenetrate a body into must leave it somewhere it can leave.
+    const keepDoor = DUNGEONS.the_last_keep.doorPos;
+    const seeds: { at: { x: number; z: number }; what: string }[] = [
+      { at: { x: keepDoor.x, z: keepDoor.z - 4 }, what: 'the keep instance-restore point' },
+      { at: { x: 419.5, z: 2009 }, what: 'inside the keep, west of the door axis' },
+      { at: { x: 422.5, z: 2009 }, what: 'inside the keep, east of the door axis' },
+      { at: { x: 413, z: 1996.5 }, what: 'the terrace passage beside the keep' },
+      { at: { x: 403.5, z: 2001.5 }, what: 'the ward barracks wing core' },
+      { at: { x: 427, z: 1995 }, what: 'the keep arc beside the alley flight' },
+      { at: { x: 421, z: 2001.5 }, what: 'the keep core' },
+      { at: { x: 371, z: 2022.5 }, what: 'the blacksmith core' },
+      { at: { x: 384, z: 2061 }, what: 'the west barracks core' },
+    ];
+    for (const s of seeds) {
+      const { sim, p, meta } = makeWalker(s.at);
+      const from = { x: p.pos.x, z: p.pos.z };
+      let best = 0;
+      for (const [dx, dz] of [
+        [0, 12],
+        [0, -12],
+        [12, 0],
+        [-12, 0],
+      ] as const) {
+        pushToward(sim, p, meta, { x: from.x + dx, z: from.z + dz }, 20 * 4);
+        // past the dungeon threshold means it walked into the keep's door,
+        // which is leaving under its own power, not being stuck
+        if (Math.abs(p.pos.x) > 1000) {
+          best = Infinity;
+          break;
+        }
+        best = Math.max(best, Math.hypot(p.pos.x - from.x, p.pos.z - from.z));
+        p.pos.x = from.x;
+        p.pos.z = from.z;
+        p.prevPos = { ...p.pos };
+      }
+      expect(best, `held solid after being pushed out of ${s.what}`).toBeGreaterThan(1);
     }
   });
 

@@ -195,15 +195,35 @@ describe('the Last Keep castle grounds', () => {
     }
   });
 
-  it('the keep door sits flush on the keep axis; the leave-drop lands clear in front', () => {
+  it('the keep door stands proud of the facade on its axis; the leave-drop lands clear in front', () => {
     const def = DUNGEONS.the_last_keep;
     const keep = CASTLE_BUILDINGS.find((b) => b.key === 'hexrCastle');
     if (!keep) throw new Error('no keep');
-    // flush: the portal stands on the keep's door axis at the model face
-    // (half the native 2.26 depth at the authored scale)
+    // The portal stands on the keep's door axis, as a PORCH in front of the
+    // model face (half the native 2.26 depth at the authored scale) rather
+    // than flush on it. Flush is what the first cut did, and it put the arch's
+    // stone jambs within 0.3yd of the keep's collision circle: the floor
+    // pinched between them was too narrow for a body to turn around in, one
+    // sliver either side of the doorway. The apron cannot be fenced off
+    // instead, because the instance-restore path drops a player inside the
+    // keep's own circle and it depenetrates them south across this ground.
     expect(def.doorPos.x).toBe(keep.x);
     const face = keep.z + (2.26 * keep.scale) / 2;
-    expect(Math.abs(def.doorPos.z - face)).toBeLessThan(0.5);
+    const porch = def.doorPos.z - face;
+    expect(porch, 'the door sank back inside the facade').toBeGreaterThan(0);
+    expect(porch, 'the door drifted off its own keep').toBeLessThan(2);
+    // The load-bearing half: every jamb must clear the keep's collision circle
+    // by a full corridor. JAMB_X is the jamb's offset either side of the axis,
+    // and a jamb's north face plus a body radius is how close a body may come.
+    const JAMB_X = 1.5;
+    const JAMB_HD = 0.56;
+    const BODY = 0.5;
+    for (const sx of [-JAMB_X - 0.35, -JAMB_X + 0.35, JAMB_X - 0.35, JAMB_X + 0.35]) {
+      const x = def.doorPos.x + sx;
+      const arc = keep.z + Math.sqrt((keep.r + BODY) ** 2 - (x - keep.x) ** 2);
+      const jambFace = def.doorPos.z - JAMB_HD - BODY;
+      expect(jambFace - arc, `jamb sliver at x ${x.toFixed(2)}`).toBeGreaterThan(1.4);
+    }
     // both the door spot and the leave-drop are open terrace ground, and
     // the drop lands OUTSIDE the keep's decor collider
     const drop = def.leaveOffset ?? { x: 0, z: -4 };

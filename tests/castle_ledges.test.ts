@@ -92,17 +92,27 @@ describe('castle wall climbing chains', () => {
     // curtain is TERRAIN, so it never pushes a body away by its radius the way
     // a collider does: the shelf has to reach the stone itself, not stop a
     // body's width short of it.
+    // The inner face is bounded on BOTH sides: it must reach the stone, and it
+    // must not pass through it. A shelf that spans the whole wall strip would
+    // satisfy "reaches the stone" while becoming a standable bridge out over
+    // the bailey side, which no shelf may be.
     const REACH = 1.0; // usable shelf outside the wall face
     const keepFace = CASTLE.wx1 + CASTLE.wallTh / 2;
     for (const l of CASTLE_WALL_LEDGES) {
       const at = `Last Keep shelf at (${l.x},${l.z})`;
       expect(l.x - l.hw, `${at} stands off the curtain`).toBeLessThanOrEqual(keepFace);
+      expect(l.x - l.hw, `${at} reaches through the curtain`).toBeGreaterThan(
+        keepFace - CASTLE.wallTh,
+      );
       expect(l.x + l.hw, `${at} is buried in the curtain`).toBeGreaterThan(keepFace + REACH);
     }
     const dawnFace = DAWNHOLD.wz0 - DAWNHOLD.wallTh / 2;
     for (const l of DAWNHOLD_WALL_LEDGES) {
       const at = `Dawnhold shelf at (${l.x},${l.z})`;
       expect(l.z + l.hd, `${at} stands off the curtain`).toBeGreaterThanOrEqual(dawnFace);
+      expect(l.z + l.hd, `${at} reaches through the curtain`).toBeLessThan(
+        dawnFace + DAWNHOLD.wallTh,
+      );
       expect(l.z - l.hd, `${at} is buried in the curtain`).toBeLessThan(dawnFace - REACH);
     }
   });

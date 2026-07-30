@@ -241,9 +241,17 @@ export interface CastleBuilding {
   keepComplex?: boolean;
 }
 export const CASTLE_BUILDINGS: readonly CastleBuilding[] = [
-  // THE WARD: the keep composed with a barracks hall wing so its base
-  // reads as one larger palace mass (the pieces deliberately touch); the
-  // keep's own door faces +z, straight down the ward toward the portal
+  // THE WARD: the keep with a barracks hall wing set beside it, the pair
+  // composing the terrace; the keep's own door faces +z, straight down the
+  // ward toward the portal.
+  //
+  // The wing used to be pulled in tight enough that the two collision circles
+  // CROSSED. Two crossing circles always meet at a cusp, and a cusp is a
+  // notch that tapers to nothing: walk in and you cannot turn around. It
+  // cannot be fenced off either. Sealing a cusp means overlapping the circle's
+  // own standoff, and then the fence and the circle push a body opposite ways
+  // and cancel, which holds it solid. So the wing stands clear instead, and
+  // the 2.3yd between the two masses is a real passage across the terrace.
   {
     key: 'hexrCastle',
     x: 421,
@@ -257,12 +265,12 @@ export const CASTLE_BUILDINGS: readonly CastleBuilding[] = [
   },
   {
     key: 'hexrBarracks',
-    x: 409.5,
+    x: 403.5,
     z: 2001.5,
     rot: Math.PI / 2,
-    scale: 7.5,
-    r: 6,
-    h: 12.5,
+    scale: 6.5,
+    r: 5.2,
+    h: 11,
     ward: true,
     keepComplex: true,
   },
@@ -282,9 +290,9 @@ export const CASTLE_BUILDINGS: readonly CastleBuilding[] = [
   // servants' house
   { key: 'hexrTowerCatapult', x: 369, z: 1997, rot: Math.PI / 2, scale: 7, r: 4, h: 14 },
   { key: 'hexrArcheryrange', x: 384, z: 1998.5, rot: 0, scale: 7, r: 5.5, h: 12.5 },
-  { key: 'hexrHomeB', x: 370, z: 2009, rot: Math.PI / 2, scale: 7, r: 4.5, h: 9 },
+  { key: 'hexrHomeB', x: 370.5, z: 2008.5, rot: Math.PI / 2, scale: 7, r: 4.5, h: 9 },
   // the forge and market quarter by the gate road
-  { key: 'hexrBlacksmith', x: 371, z: 2022.5, rot: Math.PI / 2, scale: 7, r: 5, h: 7 },
+  { key: 'hexrBlacksmith', x: 371, z: 2021, rot: Math.PI / 2, scale: 7, r: 5, h: 7 },
   { key: 'hexrMarket', x: 388, z: 2040, rot: -Math.PI / 2, scale: 6.5, r: 4.5, h: 6.5 },
   { key: 'hexrHomeA', x: 376, z: 2039, rot: Math.PI, scale: 6, r: 3.8, h: 6 },
   // the south quarter: stables, the twin barracks, chapel, and the inn. The
@@ -308,38 +316,39 @@ export const CASTLE_BUILDINGS: readonly CastleBuilding[] = [
 // sit inside solid geometry, placed where the gap is still wide enough to
 // stand in. Every route the ward needs stays open: the terrace east of the
 // keep is the way around to the north yard, and the keep's door lane between
-// the arch jambs is untouched (every seal sits behind the keep's own mass,
-// never on the approach a player walks).
+// the arch jambs carries no seal at all (the keep's own door apron solves that
+// one, see dungeons.ts the_last_keep doorPos).
+//
+// A seal is only ever safe where nothing can PUT a player behind it. Never
+// place one across ground a mass depenetrates into, above all the keep facade:
+// the instance-return path drops a logged-out character at doorPos.z - 4,
+// inside the keep's circle, and the circle then pushes them south onto
+// whatever is there.
 //
 // Same idiom as JAIL_BLOCKERS: fence-width, camera-ghost, never jumpable, and
 // pure static data (no rng, no tick-order effect). Merged into the built-in
 // world's blockers in data.ts, so all three hosts collide identically.
 // Pinned by tests/last_keep_flank_traps.test.ts (the reachable-wedge scan).
 export const CASTLE_BLOCKERS: readonly BlockerDef[] = [
-  // THE KEEP/BARRACKS NECK. The two circles overlap across the middle, so the
-  // neck is already solid there (the old pair of blockers at z 2003.9/2006.1
-  // sat inside both masses and did nothing once the great hall moved down into
-  // the bailey). What is left is the two cusps where the arcs cross, at
-  // z 1995.8 and z 2007.2: southward and northward spikes off the open yard
-  // that taper to 0.4yd. Sealed just outside each cusp, barracks arc to keep
-  // arc.
-  { x1: 411.3, z1: 1995.4, x2: 414.2, z2: 1995.4 },
-  { x1: 411.3, z1: 2007.6, x2: 414.2, z2: 2007.6 },
-  // THE KEEP FACADE. The dungeon door's arch jambs stand 1.06yd (jamb half
-  // depth plus a body radius) north of the threshold, which lands them 0.3yd
-  // off the keep's collision arc: two slivers of standable floor pinched
-  // between the stonework and the jamb, one either side of the doorway. The
-  // whole strip north of the threshold is dead space, so one wall across the
-  // facade closes both. The door stays reachable from the south, where players
-  // arrive.
-  { x1: 418.9, z1: 2011.05, x2: 423.1, z2: 2011.05 },
+  // The old pair at z 2003.9/2006.1 is gone: once the great hall moved down
+  // into the bailey they sat inside both remaining masses and did nothing. The
+  // keep/barracks cusps they were re-aimed at are gone too, solved above by
+  // standing the wing clear rather than by fencing.
+  //
   // THE ALLEY FLIGHT'S SOUTH FACE. East of x 425.5 the flight has climbed more
   // than a step above the terrace beside it, and the keep's arc runs back
   // toward it, so the strip between the two closes from 2.2yd to nothing at
   // x 425.8. Sealed at the east mouth, flight mass to keep arc; west of the
   // seal the strip is only ever entered by walking round the keep's east
   // terrace, which this closes.
-  { x1: 427.85, z1: 1993.2, x2: 427.85, z2: 1995.3 },
+  //
+  // NOTE the x: a blocker is not the thin segment it reads as. It becomes an
+  // OBB padded by FENCE_HALF_DEPTH and FENCE_END_PAD, and a body stands off
+  // that by its own radius, so its real reach is 0.85yd, not 0.5. Sizing one
+  // as a bare segment is how the first cut of this pass put a blocker's
+  // standoff PAST the keep's own: the two push vectors then cancel and the
+  // player is held, which is the exact defect these seals exist to remove.
+  { x1: 427.6, z1: 1993.2, x2: 427.6, z2: 1995.3 },
 ] as const;
 
 // Ember crystals of varying sizes around the grounds and approach (drawn by
