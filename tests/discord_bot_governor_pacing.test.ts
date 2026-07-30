@@ -1,0 +1,434 @@
+// Header-driven pacing and bucket identity in the rate governor: the half of the
+// contract that is about WHEN a request goes out and which limit state answers for
+// it. Every case below drives the governor with the virtual clock from
+// tests/helpers/synthetic_clock.ts and asserts the ABSOLUTE virtual time at which
+// each send actually ran, because "it waited" is only meaningful against a number:
+// a test that asserted call counts alone would pass for a governor that dispatched
+// everything immediately.
+//
+// Vitest fake timers are deliberately not used here (see the synthetic clock's own
+// header): a captured clock does not move under them, and a fractional retry delay
+// is allowed to fire early, so both of the things these tests exist to pin would be
+// unobservable.
+import { describe, expect, it } from 'vitest';
+import {
+  GovernorBlockedError,
+  type GovernorResponse,
+  MAX_QUEUE_DEPTH,
+  RateGovernor,
+  redactPath,
+  routeTemplate,
+} from '../bot/rate_governor';
+import { type SyntheticClock, syntheticClock } from './helpers/synthetic_clock';
+
+/** A live interaction token: long, opaque, and a bearer credential for 15 minutes. */
+const INTERACTION_TOKEN = 'aW50ZXJhY3Rpb250b2tlbnZhbHVlMTIzNDU2Nzg5';
+
+/**
+ * A governor on a fully virtual clock. `maxRps` is explicit at every call site
+ * because each expected dispatch time below is spelled in terms of the spacing it
+ * implies, `Math.ceil(1000 / maxRps)` ms. The other three knobs are set to values
+ * that are deliberately NOT the exported DEFAULT_* constants, so nothing here can
+ * pass by accidentally agreeing with a fallback the governor supplies itself.
+ */
+function makeGovernor(maxRps: number): { governor: RateGovernor; clock: SyntheticClock } {
+  const clock = syntheticClock();
+  const governor = new RateGovernor({
+    clock,
+    maxRps,
+    banPauseMs: 123_000,
+    breakerLimit: 77,
+    forbiddenTtlMs: 456_000,
+  });
+  return { governor, clock };
+}
+
+/** A plain 200 carrying whatever rate headers the case is about. Keys are lowercase. */
+function reply(headers: Record<string, string> = {}): GovernorResponse {
+  return { status: 200, headers, json: {}, jsonParsed: true };
+}
+
+describe('RateGovernor header-driven bucket gating', () => {
+  it('gates the NEXT dispatch in a bucket until the reported reset has elapsed', async () => {
+    // Proactive gating (D2): a bucket whose last response reported Remaining 0
+    // stops BEFORE Discord has to answer 429 at all. 2.5 s of reset-after is
+    // 2500 ms exactly, so the second send lands at 2500 on the virtual clock, not
+    // at the 1 ms the global cap alone would have cost it.
+    const { governor, clock } = makeGovernor(1000);
+    const sentAt: number[] = [];
+    const path = '/guilds/99887766554433221/members/11223344556677889';
+    const headers = [
+      {
+        'x-ratelimit-bucket': 'bucket-alpha',
+        'x-ratelimit-remaining': '0',
+        'x-ratelimit-reset-after': '2.5',
+      },
+      {
+        'x-ratelimit-bucket': 'bucket-alpha',
+        'x-ratelimit-remaining': '4',
+        'x-ratelimit-reset-after': '2.5',
+      },
+    ];
+    const send = async (): Promise<GovernorResponse> => {
+      sentAt.push(clock.now());
+      return reply(headers[sentAt.length - 1]);
+    };
+
+    const calls = [
+      governor.run({ method: 'PATCH', path }, send),
+      governor.run({ method: 'PATCH', path }, send),
+    ];
+    await clock.runAll();
+    await Promise.all(calls);
+
+    // Both sides are literals, not a relation: asserting only that the second is
+    // later than the first would hold for any wait at all, including a 1 ms one.
+    expect(sentAt).toEqual([0, 2500]);
+  });
+
+  it('does NOT delay the next dispatch while the bucket still reports headroom', async () => {
+    // The complement of the gate above, and the reason it is safe to ship. A 90 s
+    // reset window with 3 requests still in it must cost nothing: if the
+    // `remaining > 0` arm of the gate were dropped, the second send would land at
+    // 90000 rather than at the global cap's own 1 ms.
+    const { governor, clock } = makeGovernor(1000);
+    const sentAt: number[] = [];
+    const path = '/guilds/99887766554433221/members/11223344556677889';
+    const send = async (): Promise<GovernorResponse> => {
+      sentAt.push(clock.now());
+      return reply({
+        'x-ratelimit-bucket': 'bucket-beta',
+        'x-ratelimit-remaining': '3',
+        'x-ratelimit-reset-after': '90',
+      });
+    };
+
+    const calls = [
+      governor.run({ method: 'PATCH', path }, send),
+      governor.run({ method: 'PATCH', path }, send),
+    ];
+    await clock.runAll();
+    await Promise.all(calls);
+
+    expect(sentAt).toEqual([0, 1]);
+  });
+
+  it('does not gate on Remaining 0 when no reset-after says when the window reopens', async () => {
+    // Without the null-reset guard the delay computes to NaN, which is neither
+    // positive nor non-positive: the governor would spin on a zero-length sleep
+    // forever and this request would never be sent. The gate needs a deadline to
+    // wait for, and absent one the only safe move is to dispatch.
+    const { governor, clock } = makeGovernor(1000);
+    const sentAt: number[] = [];
+    const path = '/channels/22334455667788990/messages';
+    const send = async (): Promise<GovernorResponse> => {
+      sentAt.push(clock.now());
+      return reply({ 'x-ratelimit-remaining': '0' });
+    };
+
+    const calls = [
+      governor.run({ method: 'POST', path }, send),
+      governor.run({ method: 'POST', path }, send),
+    ];
+    await clock.runAll();
+    await Promise.all(calls);
+
+    expect(sentAt).toEqual([0, 1]);
+  });
+});
+
+describe('RateGovernor per-bucket serialization', () => {
+  it('serializes two calls in one bucket: the second send starts after the first ENDS', async () => {
+    // Discord's per-bucket limit is only knowable from the previous response's
+    // headers, so overlapping two sends in one bucket spends the window blind.
+    // Start and end are both recorded because a call-count assertion, or even a
+    // start-time one, cannot tell a FIFO queue from two sends racing.
+    // The replies carry no rate headers on purpose: nothing here may be explained
+    // by proactive gating, only by the queue.
+    const { governor, clock } = makeGovernor(1000);
+    const order: string[] = [];
+    const send = (label: string) => async (): Promise<GovernorResponse> => {
+      order.push(`${label}:start@${clock.now()}`);
+      await clock.sleep(500);
+      order.push(`${label}:end@${clock.now()}`);
+      return reply();
+    };
+
+    // Two different members of one guild: the route template collapses the member
+    // id, so both are one provisional bucket key and therefore one queue.
+    const calls = [
+      governor.run(
+        { method: 'PATCH', path: '/guilds/99887766554433221/members/11223344556677889' },
+        send('a'),
+      ),
+      governor.run(
+        { method: 'PATCH', path: '/guilds/99887766554433221/members/44556677889900112' },
+        send('b'),
+      ),
+    ];
+    await clock.runAll();
+    await Promise.all(calls);
+
+    expect(order).toEqual(['a:start@0', 'a:end@500', 'b:start@500', 'b:end@1000']);
+  });
+
+  it('does NOT serialize two calls in different buckets', async () => {
+    // The other arm, and the one that keeps the serialization above from being a
+    // global lock: a slow member PATCH in one guild must not hold up another
+    // guild's. Interleaved start/end is the proof, and both starts are pinned to
+    // literals (1 ms apart, which is the global cap at maxRps 1000, not the queue).
+    const { governor, clock } = makeGovernor(1000);
+    const order: string[] = [];
+    const send = (label: string) => async (): Promise<GovernorResponse> => {
+      order.push(`${label}:start@${clock.now()}`);
+      await clock.sleep(500);
+      order.push(`${label}:end@${clock.now()}`);
+      return reply();
+    };
+
+    const calls = [
+      governor.run(
+        { method: 'PATCH', path: '/guilds/99887766554433221/members/11223344556677889' },
+        send('a'),
+      ),
+      governor.run(
+        { method: 'PATCH', path: '/guilds/55667788990011223/members/11223344556677889' },
+        send('b'),
+      ),
+    ];
+    await clock.runAll();
+    await Promise.all(calls);
+
+    expect(order).toEqual(['a:start@0', 'b:start@1', 'a:end@500', 'b:end@501']);
+  });
+});
+
+describe('RateGovernor global send-rate cap', () => {
+  it('spaces queued requests across DIFFERENT buckets by the configured cap', async () => {
+    // Per-bucket gating cannot bound the process: four buckets with headroom would
+    // all fire at once and the global 50/s ceiling is what Discord bans on. maxRps
+    // 4 is 250 ms of spacing (and is deliberately not DEFAULT_MAX_RPS, which the
+    // governor would otherwise be free to be using instead of the value passed in).
+    const { governor, clock } = makeGovernor(4);
+    const sentAt: number[] = [];
+    const send = async (): Promise<GovernorResponse> => {
+      sentAt.push(clock.now());
+      return reply();
+    };
+
+    const calls = [
+      governor.run({ method: 'POST', path: '/channels/11111111111111111/messages' }, send),
+      governor.run({ method: 'POST', path: '/channels/22222222222222222/messages' }, send),
+      governor.run({ method: 'POST', path: '/channels/33333333333333333/messages' }, send),
+      governor.run({ method: 'POST', path: '/channels/44444444444444444/messages' }, send),
+    ];
+    await clock.runAll();
+    await Promise.all(calls);
+
+    expect(sentAt).toEqual([0, 250, 500, 750]);
+  });
+
+  it('exempts interaction callbacks from the cap while everything else still pays it', async () => {
+    // Interaction callbacks are exempt from Discord's GLOBAL limit by documented
+    // contract and carry a hard 3 second deadline, so pacing them behind a
+    // saturated role sweep is how a slash command times out. Both arms run against
+    // ONE governor: the interaction sends must neither wait for a slot nor CONSUME
+    // one, which is why the three message posts still land on 0, 500, 1000.
+    const { governor, clock } = makeGovernor(2);
+    const dispatched: { label: string; at: number }[] = [];
+    const send = (label: string) => async (): Promise<GovernorResponse> => {
+      dispatched.push({ label, at: clock.now() });
+      return reply();
+    };
+
+    const calls = [
+      governor.run(
+        { method: 'POST', path: `/interactions/11111111111111111/${INTERACTION_TOKEN}/callback` },
+        send('i1'),
+      ),
+      governor.run({ method: 'POST', path: '/channels/22222222222222222/messages' }, send('m1')),
+      governor.run(
+        { method: 'POST', path: `/interactions/33333333333333333/${INTERACTION_TOKEN}/callback` },
+        send('i2'),
+      ),
+      governor.run({ method: 'POST', path: '/channels/44444444444444444/messages' }, send('m2')),
+      governor.run(
+        { method: 'POST', path: `/interactions/55555555555555555/${INTERACTION_TOKEN}/callback` },
+        send('i3'),
+      ),
+      governor.run({ method: 'POST', path: '/channels/66666666666666666/messages' }, send('m3')),
+    ];
+    await clock.runAll();
+    await Promise.all(calls);
+
+    const at = (prefix: string) =>
+      dispatched.filter((d) => d.label.startsWith(prefix)).map((d) => d.at);
+    expect(at('i')).toEqual([0, 0, 0]);
+    expect(at('m')).toEqual([0, 500, 1000]);
+  });
+});
+
+describe('RateGovernor bucket remap onto the X-RateLimit-Bucket hash', () => {
+  it('shares ONE limit state between two provisional routes that return the same hash', async () => {
+    // Discord's real buckets do not line up with method-plus-route: several routes
+    // share one. Keying rate state on the provisional template alone would give
+    // each of them its own copy of a limit they are jointly spending, so the pair
+    // would double count the bucket and blow through it. Sharing is proved by
+    // EXHAUSTING the bucket through the role PUT and watching the member PATCH,
+    // whose own last response said it had 5 requests left, get gated anyway.
+    const { governor, clock } = makeGovernor(1000);
+    const sent: { label: string; at: number }[] = [];
+    const patchPath = '/guilds/99887766554433221/members/11223344556677889';
+    const rolePath = '/guilds/99887766554433221/members/11223344556677889/roles/33445566778899001';
+    const SHARED = 'shared-hash-9';
+    const send = (label: string, headers: Record<string, string>) => async () => {
+      sent.push({ label, at: clock.now() });
+      return reply(headers);
+    };
+
+    const first = governor.run(
+      { method: 'PATCH', path: patchPath },
+      send('patch-1', {
+        'x-ratelimit-bucket': SHARED,
+        'x-ratelimit-remaining': '5',
+        'x-ratelimit-reset-after': '10',
+      }),
+    );
+    await clock.runAll();
+    await first;
+
+    // A DIFFERENT provisional route (different method AND different template) that
+    // answers with the SAME hash, and reports the bucket spent to zero.
+    const second = governor.run(
+      { method: 'PUT', path: rolePath },
+      send('roles-1', {
+        'x-ratelimit-bucket': SHARED,
+        'x-ratelimit-remaining': '0',
+        'x-ratelimit-reset-after': '4',
+      }),
+    );
+    await clock.runAll();
+    await second;
+
+    // One bucket tracked, not two: the count is what says the remap RETIRED the
+    // provisional keys rather than leaving a second stale copy beside the hash.
+    expect(governor.snapshot().trackedBuckets).toBe(1);
+
+    const third = governor.run(
+      { method: 'PATCH', path: patchPath },
+      send('patch-2', {
+        'x-ratelimit-bucket': SHARED,
+        'x-ratelimit-remaining': '4',
+        'x-ratelimit-reset-after': '10',
+      }),
+    );
+    await clock.runAll();
+    await third;
+
+    expect(sent.map((s) => s.label)).toEqual(['patch-1', 'roles-1', 'patch-2']);
+    // The PUT went out at 1 and reported a 4 s window, so the shared bucket
+    // reopens at 4001. Without the remap the PATCH would read its OWN state
+    // (5 remaining) and go out at 2 instead.
+    expect(sent.map((s) => s.at)).toEqual([0, 1, 4001]);
+  });
+});
+
+describe('routeTemplate and redactPath', () => {
+  it('replaces a per-user id but KEEPS the guild and channel major ids', () => {
+    // A template that interpolated the member id would mint one bucket per member
+    // and defeat bucketing entirely; one that replaced the guild id would merge
+    // buckets Discord genuinely keeps apart. Both halves are asserted, because
+    // either mistake alone still produces a plausible-looking string.
+    expect(routeTemplate('PATCH', '/guilds/99887766554433221/members/11223344556677889')).toBe(
+      'PATCH /guilds/99887766554433221/members/:id',
+    );
+    // Two members of ONE guild therefore collapse onto one key.
+    expect(routeTemplate('PATCH', '/guilds/99887766554433221/members/44556677889900112')).toBe(
+      'PATCH /guilds/99887766554433221/members/:id',
+    );
+    // Two guilds do not.
+    expect(routeTemplate('PATCH', '/guilds/55667788990011223/members/11223344556677889')).toBe(
+      'PATCH /guilds/55667788990011223/members/:id',
+    );
+    expect(routeTemplate('POST', '/channels/22334455667788990/messages')).toBe(
+      'POST /channels/22334455667788990/messages',
+    );
+  });
+
+  it('turns an interaction or webhook token into :token so no credential reaches a key', () => {
+    // The bucket key reaches counters, log fields, and the blocked-request error
+    // message, so a token surviving into it publishes a live bearer credential.
+    const interaction = routeTemplate(
+      'POST',
+      `/interactions/1234567890123456789/${INTERACTION_TOKEN}/callback`,
+    );
+    expect(interaction).toBe('POST /interactions/1234567890123456789/:token/callback');
+    expect(interaction).not.toContain(INTERACTION_TOKEN);
+
+    const webhook = routeTemplate(
+      'PATCH',
+      `/webhooks/1234567890123456789/${INTERACTION_TOKEN}/messages/@original`,
+    );
+    expect(webhook).toBe('PATCH /webhooks/1234567890123456789/:token/messages/@original');
+    expect(webhook).not.toContain(INTERACTION_TOKEN);
+  });
+
+  it('redacts ONLY the credential segment, leaving the ids a log line needs', () => {
+    // Redaction is token-only by design: losing the ids would cost the operator
+    // the one detail that makes a failure diagnosable, so the member id stays.
+    const path = `/interactions/1234567890123456789/${INTERACTION_TOKEN}/callback`;
+    expect(redactPath(path)).toBe('/interactions/1234567890123456789/:token/callback');
+    expect(redactPath(path)).not.toContain(INTERACTION_TOKEN);
+    expect(redactPath('/guilds/99887766554433221/members/11223344556677889')).toBe(
+      '/guilds/99887766554433221/members/11223344556677889',
+    );
+  });
+});
+
+describe('RateGovernor queue depth cap', () => {
+  it('refuses a request at MAX_QUEUE_DEPTH instead of growing the backlog', async () => {
+    // A poll loop that keeps enqueuing while a bucket is paused is how a bounded
+    // memory footprint turns into an unbounded one, and every queued request is
+    // stale by the time it drains anyway. The route is an interaction callback so
+    // the refusal message doubles as the proof that the token never reaches an
+    // operator-facing string.
+    const { governor, clock } = makeGovernor(1000);
+    let sends = 0;
+    const path = `/interactions/1234567890123456789/${INTERACTION_TOKEN}/callback`;
+    const send = async (): Promise<GovernorResponse> => {
+      sends++;
+      return reply();
+    };
+
+    const queued: Promise<GovernorResponse>[] = [];
+    for (let i = 0; i < MAX_QUEUE_DEPTH; i++) {
+      queued.push(governor.run({ method: 'POST', path }, send));
+    }
+    // No await inside the loop, so nothing has drained: the enqueue path runs to
+    // `waiting++` synchronously and the queue is genuinely at its cap here.
+    const refused = governor.run({ method: 'POST', path }, send);
+    // Read BEFORE awaiting: awaiting yields the microtask queue, the jobs start
+    // draining, and the depth this asserts would have moved.
+    expect(governor.snapshot().queueDepth).toBe(MAX_QUEUE_DEPTH);
+
+    const blocked = await refused.catch((e: unknown) => e);
+    expect(blocked).toBeInstanceOf(GovernorBlockedError);
+    expect((blocked as GovernorBlockedError).reason).toBe('queue-full');
+    // An Error argument is message EQUALITY; a bare string would be a substring
+    // match, which would leave the redacted route in the message unpinned.
+    expect(blocked).toEqual(
+      new GovernorBlockedError(
+        'queue-full',
+        '[bot] governor refused POST /interactions/1234567890123456789/:token/callback: bucket queue is full',
+      ),
+    );
+    expect((blocked as Error).message).not.toContain(INTERACTION_TOKEN);
+
+    await clock.runAll();
+    await Promise.all(queued);
+    // The refused request was never handed to send, and the ones that were queued
+    // all drained: the cap sheds load, it does not deadlock the queue.
+    expect(sends).toBe(MAX_QUEUE_DEPTH);
+    expect(governor.snapshot().queueDepth).toBe(0);
+  });
+});

@@ -24,6 +24,10 @@ const BOT_ENV_KEYS = [
   'DISCORD_ACTIVITY_CHANNEL_ID',
   'DISCORD_DAILY_REWARDS_CHANNEL_ID',
   'DISCORD_SYNC_NICKNAMES',
+  'DISCORD_MAX_RPS',
+  'DISCORD_BAN_PAUSE_MS',
+  'DISCORD_BREAKER_LIMIT',
+  'DISCORD_FORBIDDEN_TTL_MS',
 ] as const;
 
 /** Fill the four required keys with obvious non-secret placeholders. */

@@ -6,7 +6,14 @@
 // real global fetch and a real setTimeout-backed sleep, which is the arm a broken
 // default parameter would otherwise silently replace.
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { DiscordApi } from '../bot/discord_api';
+import { AUDIT_LOG_REASON, DiscordApi, sanitizeAuditReason } from '../bot/discord_api';
+import {
+  DEFAULT_BAN_PAUSE_MS,
+  DEFAULT_BREAKER_LIMIT,
+  DEFAULT_FORBIDDEN_TTL_MS,
+  RateGovernor,
+  type RateGovernorOptions,
+} from '../bot/rate_governor';
 
 const API = 'https://discord.com/api/v10';
 
@@ -25,12 +32,21 @@ function fakeResponse(
     reads?: string[];
     jsonThrows?: boolean;
     textThrows?: boolean;
+    headers?: Record<string, string>;
   } = {},
 ): Response {
   const status = opts.status ?? 200;
+  const headers = opts.headers ?? {};
   return {
     ok: status >= 200 && status < 300,
     status,
+    // Modeled on a real Headers: iteration hands back (value, key) in that
+    // order, which is the argument order the shell's collector relies on.
+    headers: {
+      forEach: (fn: (value: string, key: string) => void) => {
+        for (const [key, value] of Object.entries(headers)) fn(value, key);
+      },
+    },
     json: async () => {
       opts.reads?.push('json');
       if (opts.jsonThrows) throw new SyntaxError('Unexpected token < in JSON');
@@ -39,9 +55,40 @@ function fakeResponse(
     text: async () => {
       opts.reads?.push('text');
       if (opts.textThrows) throw new Error('body already consumed');
-      return opts.text ?? '';
+      // A 429 body is read as TEXT and parsed from that, so a fixture that only
+      // sets `body` still has to serialize into the text view the way a real
+      // Response would; otherwise every JSON 429 would look like a ban page.
+      if (opts.text !== undefined) return opts.text;
+      return opts.body === undefined ? '' : JSON.stringify(opts.body);
     },
   } as unknown as Response;
+}
+
+/** A governor wired to a synthetic clock, so no shell test ever waits for real. */
+function testGovernor(overrides: Partial<RateGovernorOptions> = {}): {
+  governor: RateGovernor;
+  slept: number[];
+  logs: { level: string; message: string; fields: Record<string, string | number> }[];
+} {
+  const slept: number[] = [];
+  const logs: { level: string; message: string; fields: Record<string, string | number> }[] = [];
+  let now = 0;
+  const governor = new RateGovernor({
+    clock: {
+      now: () => now,
+      sleep: async (ms) => {
+        slept.push(ms);
+        now += ms;
+      },
+    },
+    maxRps: 1000,
+    banPauseMs: DEFAULT_BAN_PAUSE_MS,
+    breakerLimit: DEFAULT_BREAKER_LIMIT,
+    forbiddenTtlMs: DEFAULT_FORBIDDEN_TTL_MS,
+    log: (level, message, fields) => logs.push({ level, message, fields }),
+    ...overrides,
+  });
+  return { governor, slept, logs };
 }
 
 function recordingFetch(responses: Response[]): { calls: FetchCall[]; impl: typeof fetch } {
@@ -256,21 +303,23 @@ describe('DiscordApi per-method call envelopes', () => {
   }
 });
 
-describe('DiscordApi 429 retry', () => {
-  it('waits the clamped retry_after ONCE and replays the same request', async () => {
-    const slept: number[] = [];
+describe('DiscordApi 429 handling through the governor', () => {
+  it('honors the FULL retry_after with no ceiling, the incident regression', async () => {
+    // THE pin for this phase. The client this replaced computed
+    // `Math.min(10_000, ...)`, so a 60 second Discord penalty became a 10 second
+    // wait and the bot came back four times too early, every time, which is what
+    // escalated the 2026-07-29 incident. 60000, not 10000.
+    const { governor, slept } = testGovernor();
     const { calls, impl } = recordingFetch([
-      fakeResponse({ status: 429, body: { retry_after: 2 } }),
+      fakeResponse({ status: 429, body: { retry_after: 60 } }),
       fakeResponse({ body: [{ id: 'r1', name: 'WoC Initiate' }] }),
     ]);
-    const api = new DiscordApi('tok', impl, async (ms) => {
-      slept.push(ms);
-    });
 
-    expect(await api.guildRoles('g1')).toEqual([{ id: 'r1', name: 'WoC Initiate' }]);
+    expect(await new DiscordApi('tok', impl, governor).guildRoles('g1')).toEqual([
+      { id: 'r1', name: 'WoC Initiate' },
+    ]);
 
-    // retry_after is SECONDS, so 2 becomes 2000 ms, inside the 500..10000 clamp.
-    expect(slept).toEqual([2000]);
+    expect(slept).toEqual([60_000]);
     expect(calls.length).toBe(2);
     // Both sides pinned to a literal, not just to each other: a relation-only
     // assertion holds even if BOTH requests go somewhere wrong.
@@ -279,81 +328,172 @@ describe('DiscordApi 429 retry', () => {
   });
 
   it('replays the BODY too, not just the method and path', async () => {
-    // Every other retry arm drives a bodyless GET, so dropping `body` from the
-    // recursive call was invisible. The likeliest 429 in this bot is a relay
-    // post, which would then be replayed as an empty message.
+    // The likeliest 429 in this bot is a relay post, which a replay that dropped
+    // the body would resend as an empty message.
+    const { governor } = testGovernor();
     const { calls, impl } = recordingFetch([
       fakeResponse({ status: 429, body: { retry_after: 1 } }),
       fakeResponse({ body: {} }),
     ]);
-    const api = new DiscordApi('tok', impl, async () => {});
 
-    await api.createMessage('ch1', { content: 'hello' });
+    await new DiscordApi('tok', impl, governor).createMessage('ch1', { content: 'hello' });
 
     expect(calls.length).toBe(2);
     expect(calls[1].init.body).toBe('{"content":"hello"}');
     expect(calls[1].url).toBe(`${API}/channels/ch1/messages`);
   });
 
-  it('clamps the wait to the 500 ms floor and the 10000 ms ceiling', async () => {
-    for (const [retryAfter, expected] of [
-      [0.01, 500],
-      [30, 10_000],
-    ] as const) {
-      const slept: number[] = [];
-      const { impl } = recordingFetch([
-        fakeResponse({ status: 429, body: { retry_after: retryAfter } }),
-        fakeResponse({ body: [] }),
-      ]);
-      await new DiscordApi('tok', impl, async (ms) => {
-        slept.push(ms);
-      }).guildRoles('g1');
-      expect(slept).toEqual([expected]);
-    }
-  });
-
-  it('defaults a missing retry_after to 1 second', async () => {
-    const slept: number[] = [];
+  it('logs the X-RateLimit-Scope on every 429 (D14)', async () => {
+    // O5 is answered from these lines after deploy: whether member-write 429s
+    // come back as `user` or `shared` decides the ban-counter exposure.
+    const { governor, logs } = testGovernor();
     const { impl } = recordingFetch([
-      fakeResponse({ status: 429, body: {} }),
+      fakeResponse({
+        status: 429,
+        body: { retry_after: 1 },
+        headers: { 'x-ratelimit-scope': 'user' },
+      }),
       fakeResponse({ body: [] }),
     ]);
-    await new DiscordApi('tok', impl, async (ms) => {
-      slept.push(ms);
-    }).guildRoles('g1');
-    expect(slept).toEqual([1000]);
+
+    await new DiscordApi('tok', impl, governor).guildRoles('g1');
+
+    const limited = logs.filter((l) => l.message === '[bot] discord rate limited');
+    expect(limited.length).toBe(1);
+    expect(limited[0].fields.scope).toBe('user');
+    expect(limited[0].fields.route).toBe('GET /guilds/g1/roles');
   });
 
-  it('falls back to the 1 second default when the 429 body is not JSON at all', async () => {
-    // An edge 429 comes from Cloudflare ahead of Discord's own limiter and
-    // carries HTML; without the parse guard the whole call throws instead of
-    // backing off.
-    const slept: number[] = [];
-    const { impl } = recordingFetch([
-      fakeResponse({ status: 429, jsonThrows: true }),
-      fakeResponse({ body: [] }),
-    ]);
-    await new DiscordApi('tok', impl, async (ms) => {
-      slept.push(ms);
-    }).guildRoles('g1');
-    expect(slept).toEqual([1000]);
-  });
-
-  it('retries at most once: a second 429 is thrown, not slept on again', async () => {
-    const slept: number[] = [];
+  it('treats a non-JSON 429 body as a ban: long pause, error log, NO short retry', async () => {
+    // The other half of the incident. Cloudflare answers with HTML once it
+    // starts refusing, and the old client parsed that to `{}`, defaulted
+    // retry_after to 1, and came back one second later into an active ban.
+    const { governor, slept, logs } = testGovernor();
     const { calls, impl } = recordingFetch([
+      fakeResponse({ status: 429, text: '<html>error 1015</html>' }),
+      fakeResponse({ body: [] }),
+    ]);
+
+    await expect(new DiscordApi('tok', impl, governor).guildRoles('g1')).rejects.toThrow(
+      '-> 429 <html>error 1015</html>',
+    );
+
+    // No retry at all, and above all not a 1000 ms one.
+    expect(calls.length).toBe(1);
+    expect(slept).toEqual([]);
+    const banned = logs.filter((l) => l.level === 'error');
+    expect(banned.length).toBe(1);
+    expect(banned[0].fields.pauseMs).toBe(DEFAULT_BAN_PAUSE_MS);
+  });
+
+  it('bounds the retries: a route that answers 429 forever gives up and throws', async () => {
+    const { governor, slept } = testGovernor();
+    const { calls, impl } = recordingFetch([
+      fakeResponse({ status: 429, body: { retry_after: 1 } }),
       fakeResponse({ status: 429, body: { retry_after: 1 } }),
       fakeResponse({ status: 429, body: { retry_after: 1 }, text: 'rate limited' }),
     ]);
-    const api = new DiscordApi('tok', impl, async (ms) => {
-      slept.push(ms);
-    });
 
-    // The retry flag is false on the replay, so the second 429 falls through to
-    // the non-ok throw instead of looping. This is the unbounded-retry guard.
-    await expect(api.guildRoles('g1')).rejects.toThrow('-> 429 rate limited');
-    expect(slept).toEqual([1000]);
-    expect(calls.length).toBe(2);
+    await expect(new DiscordApi('tok', impl, governor).guildRoles('g1')).rejects.toThrow(
+      '-> 429 rate limited',
+    );
+    // Three attempts, so two waits: the third gives up rather than looping.
+    expect(calls.length).toBe(3);
+    expect(slept).toEqual([1000, 1000]);
+  });
+});
+
+describe('DiscordApi governor wiring', () => {
+  it('pins the REST base to /api/v10 as a literal (D14)', async () => {
+    // Spelled out rather than built from the API constant, so a change to the
+    // constant cannot quietly move every call to another API version.
+    const { governor } = testGovernor();
+    const { calls, impl } = recordingFetch([fakeResponse({ body: {} })]);
+    await new DiscordApi('tok', impl, governor).createMessage('ch1', { content: 'hi' });
+    expect(calls[0].url).toBe('https://discord.com/api/v10/channels/ch1/messages');
+  });
+
+  it('sends X-Audit-Log-Reason on the member PATCH (D14)', async () => {
+    const { governor } = testGovernor();
+    const { calls, impl } = recordingFetch([fakeResponse({ status: 204 })]);
+
+    await new DiscordApi('tok', impl, governor).setNickname('g1', 'u1', 'Aran (12)');
+
+    const headers = calls[0].init.headers as Record<string, string>;
+    expect(headers['X-Audit-Log-Reason']).toBe(AUDIT_LOG_REASON);
+    // Discord's own bound on the header.
+    expect(AUDIT_LOG_REASON.length).toBeGreaterThanOrEqual(1);
+    expect(AUDIT_LOG_REASON.length).toBeLessThanOrEqual(512);
+    // Plain ASCII: a non-ASCII byte does not survive the header round trip.
+    expect(/^[\x20-\x7E]+$/.test(AUDIT_LOG_REASON)).toBe(true);
+  });
+
+  it('does NOT send an audit reason on calls that are not member PATCHes', async () => {
+    // The all-headers equality tests above would still pass if the reason were
+    // attached to every request, because they assert the header BAG; this is the
+    // arm that says the option is actually per call site.
+    const { governor } = testGovernor();
+    const { calls, impl } = recordingFetch([fakeResponse({ body: {} })]);
+    await new DiscordApi('tok', impl, governor).createMessage('ch1', { content: 'hi' });
+    expect('X-Audit-Log-Reason' in (calls[0].init.headers as Record<string, string>)).toBe(false);
+  });
+
+  it('clamps and ASCII-folds an audit reason', () => {
+    expect(sanitizeAuditReason('x'.repeat(600)).length).toBe(512);
+    // Each non-ASCII code point becomes one space, and the surrounding ASCII is
+    // left alone. Written as an ESCAPE rather than a literal accented character
+    // on purpose: as a literal the expected string depends on whether the file
+    // stores the accent precomposed (one code point, so one space, giving
+    // 'caf  sync') or decomposed (a plain 'e' plus a combining mark, so the 'e'
+    // survives, giving 'cafe  sync'). Those are different answers, so a literal
+    // fixture is a test that flips the day an editor normalizes the file.
+    expect(sanitizeAuditReason('caf\u00e9 sync')).toBe('caf  sync');
+    // An all-non-ASCII reason still has to yield a legal 1 to 512 character
+    // value, because Discord rejects an empty header outright.
+    expect(sanitizeAuditReason('\u00e9\u00e9')).toBe(AUDIT_LOG_REASON);
+  });
+
+  it('redacts the interaction token out of the thrown message (L1)', async () => {
+    // The token is a live bearer credential for about 15 minutes and the throw
+    // reaches a bare console.error in bot/main.ts, so it must never carry it.
+    const token = 'aW50ZXJhY3Rpb250b2tlbnZhbHVlMTIzNDU2Nzg5';
+    const { governor } = testGovernor();
+    const { impl } = recordingFetch([fakeResponse({ status: 404, text: 'Unknown interaction' })]);
+
+    const failure = await new DiscordApi('tok', impl, governor)
+      .respondInteraction('1234567890123456789', token, { content: 'hi' })
+      .catch((e: Error) => e);
+
+    expect((failure as Error).message).not.toContain(token);
+    expect((failure as Error).message).toBe(
+      '[bot] discord POST /interactions/1234567890123456789/:token/callback -> 404 Unknown interaction',
+    );
+  });
+
+  it('keeps the guild-route message shape unchanged, ids and all', async () => {
+    // Redaction is token-only: losing the ids would cost the operator the one
+    // detail that makes a failure diagnosable.
+    const { governor } = testGovernor();
+    const { impl } = recordingFetch([fakeResponse({ status: 403, text: 'Missing Permissions' })]);
+    await expect(new DiscordApi('tok', impl, governor).guildRoles('g1')).rejects.toThrow(
+      new Error('[bot] discord GET /guilds/g1/roles -> 403 Missing Permissions'),
+    );
+  });
+
+  it('caches a 403 member so the NEXT write for them is never sent (D4)', async () => {
+    const { governor } = testGovernor();
+    const { calls, impl } = recordingFetch([
+      fakeResponse({ status: 403, text: 'Missing Permissions' }),
+    ]);
+    const api = new DiscordApi('tok', impl, governor);
+
+    await expect(api.setNickname('g1', 'u1', 'Aran (12)')).rejects.toThrow('-> 403');
+    // The recording fetch has no second queued response, so a second dispatch
+    // would throw "ran out of queued responses" rather than the block message.
+    await expect(api.setNickname('g1', 'u1', 'Aran (13)')).rejects.toThrow(
+      'subject previously answered 401 or 403',
+    );
+    expect(calls.length).toBe(1);
   });
 });
 
@@ -391,21 +531,31 @@ describe('DiscordApi production defaults', () => {
       Authorization: 'Bot tok',
       'Content-Type': 'application/json',
       'User-Agent': 'WorldOfClaudeCraftBot (https://worldofclaudecraft.com, 1.0)',
+      'X-Audit-Log-Reason': AUDIT_LOG_REASON,
     });
     expect(seen[0].init?.body).toBe('{"nick":"Aran (12)"}');
   });
 
-  it('backs the default retry sleep with the real global setTimeout', async () => {
-    // Fake timers prove the default sleep is a genuine timer rather than an
-    // accidental no-op: nothing resolves until the clock is advanced.
-    // Constructed BEFORE the fake clock, per R16: the default is evaluated at
-    // construction, so a form that captured setTimeout would bind the REAL one
-    // here and never resolve under the fake clock. Installing the fake first
-    // passes for both forms.
+  it('backs the DEFAULT governor clock with the real global setTimeout', async () => {
+    // Fake timers prove the default clock is a genuine timer rather than an
+    // accidental no-op: nothing resolves until the clock is advanced. The wait
+    // is now the governor's, not a sleep parameter, but the seam it guards is
+    // the same one.
+    //
+    // Constructed BEFORE the fake clock, per R16: the default governor is built
+    // at construction, so a clock that CAPTURED setTimeout would bind the real
+    // one here and never resolve under the fake clock. Installing the fake first
+    // passes for both forms and therefore guards nothing.
     const api = new DiscordApi('tok');
     vi.useFakeTimers();
     let settled = false;
-    vi.stubGlobal('fetch', async () => fakeResponse({ status: 429, body: { retry_after: 5 } }));
+    let call = 0;
+    vi.stubGlobal('fetch', async () => {
+      call++;
+      return call === 1
+        ? fakeResponse({ status: 429, body: { retry_after: 5 } })
+        : fakeResponse({ body: [] });
+    });
 
     try {
       const pending = api
@@ -418,15 +568,16 @@ describe('DiscordApi production defaults', () => {
         });
 
       await vi.advanceTimersByTimeAsync(4999);
-      expect(settled).toBe(false); // still inside the 5000 ms clamped wait
+      expect(settled).toBe(false); // still inside the FULL 5000 ms retry_after
 
       // Assert BEFORE awaiting `pending`. Awaiting first would wait out a REAL
-      // timer too, so a default that captured setTimeout at construction (and
+      // timer too, so a clock that captured setTimeout at construction (and
       // therefore scheduled on the real clock, ignoring the fake) would still
       // settle eventually and pass. Advancing the FAKE clock has to be what
       // resolves it.
       await vi.advanceTimersByTimeAsync(1);
       expect(settled).toBe(true);
+      expect(call).toBe(2);
       await pending;
     } finally {
       vi.useRealTimers();
