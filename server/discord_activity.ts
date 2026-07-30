@@ -50,6 +50,12 @@ const MAX_QUEUE = 100; // backstop so a stalled/absent bot can never grow this u
 // several sim events (a loot roll per candidate, an arena end per ally) is posted
 // once. Keys expire after DEDUPE_TTL_MS.
 const DEDUPE_TTL_MS = 30_000;
+const MAX_RECENT_KEYS = 512;
+// After a rejected gated read the claimant re-opens the key only this far
+// into the future: a single blip costs one card (a retry lands 2s later),
+// while a sustained outage still costs at most one read per backoff window
+// instead of one per proc against the already-failing pool.
+const RELEASE_RETRY_BACKOFF_MS = 2_000;
 const recentKeys = new Map<string, number>();
 
 /**
@@ -65,9 +71,22 @@ export function claimDedupeKey(key: string, now: number): boolean {
   const last = recentKeys.get(key);
   if (last !== undefined && now - last < DEDUPE_TTL_MS) return false;
   recentKeys.set(key, now);
-  if (recentKeys.size > 512) {
+  if (recentKeys.size > MAX_RECENT_KEYS) {
     for (const [k, t] of recentKeys) {
       if (now - t >= DEDUPE_TTL_MS) recentKeys.delete(k);
+    }
+    // Live-set overflow backstop: expiry freed nothing (more than the cap of
+    // keys all inside the TTL), so evict oldest-first down to the cap instead
+    // of re-running a fruitless full scan on every subsequent claim. An
+    // evicted key can let one duplicate card through; at this population
+    // that beats an O(size) sweep per claim.
+    if (recentKeys.size > MAX_RECENT_KEYS) {
+      const over = recentKeys.size - MAX_RECENT_KEYS;
+      let evicted = 0;
+      for (const k of recentKeys.keys()) {
+        if (evicted++ >= over) break;
+        recentKeys.delete(k);
+      }
     }
   }
   return true;
@@ -77,10 +96,16 @@ export function claimDedupeKey(key: string, now: number): boolean {
  * Release a claimed dedupe key: the claimant's gated work FAILED (a rejected
  * opt-out read), so the TTL window must not stay burned; without this, one
  * db blip would silently drop the failed proc AND every proc for that
- * account for the rest of the TTL.
+ * account for the rest of the TTL. `claimedAt` is the caller's claim stamp:
+ * the release is a compare-and-set, so a LATE rejection (a driver-timeout
+ * reject can land after the TTL) cannot delete a window a newer claimant
+ * now owns. The re-stamp (not a delete) keeps a retry backoff: the next
+ * claim succeeds RELEASE_RETRY_BACKOFF_MS after the failed one, never
+ * immediately.
  */
-export function releaseDedupeKey(key: string): void {
-  recentKeys.delete(key);
+export function releaseDedupeKey(key: string, claimedAt: number): void {
+  if (recentKeys.get(key) !== claimedAt) return;
+  recentKeys.set(key, claimedAt - DEDUPE_TTL_MS + RELEASE_RETRY_BACKOFF_MS);
 }
 
 /**

@@ -112,6 +112,42 @@ describe('R35 GameServer runtime methods', () => {
     expect(server.adminRestoreItem(999999, 'copper_mining_pick', 1)).toBe('offline');
   });
 
+  it('a fenced-out forced save logs the restore-specific error, not just the generic warn', async () => {
+    // A same-account takeover can rotate the lease nonce so the audited
+    // grant's save matches no row: saveCharacter resolves false without
+    // throwing, and the restore path must say ITS grant did not persist
+    // (the operator already got a 200 and the audit row is committed).
+    const session = joinServer(server, fakeWs(), 204, 'Fenced');
+    vi.mocked(db.saveCharacterState).mockResolvedValueOnce(false);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(server.adminRestoreItem(204, 'copper_mining_pick', 1)).toBe('ok');
+    await flushAsync();
+    expect(
+      errSpy.mock.calls.some(
+        (c) => typeof c[0] === 'string' && c[0].includes('audited grant did not persist'),
+      ),
+    ).toBe(true);
+    errSpy.mockRestore();
+    warnSpy.mockRestore();
+    void session;
+  });
+
+  it('clamps a fraction, a negative, and zero to exactly ONE item each', () => {
+    // The NaN case above is the easy half of "every non-integer clamps to 1".
+    // A finite fraction is the half that would survive a Math.floor or a
+    // Math.round rewrite (2.7 must grant 1, never 2 or 3), and the two
+    // out-of-range integers pin the lower clamp arm the same way. Deltas, not
+    // totals, so each call is pinned on its own.
+    const session = joinServer(server, fakeWs(), 205, 'Fractional');
+    for (const count of [2.7, -5, 0]) {
+      const before = bagCount(server, session.pid, 'copper_mining_pick');
+      expect(server.adminRestoreItem(205, 'copper_mining_pick', count)).toBe('ok');
+      expect(bagCount(server, session.pid, 'copper_mining_pick') - before).toBe(1);
+    }
+    expect(bagCount(server, session.pid, 'copper_mining_pick')).toBe(3);
+  });
+
   it('adminRestoreToolEffectSlot mints once, saves, then refuses the overwrite', async () => {
     const session = joinServer(server, fakeWs(), 204, 'Slotted');
     server.sim.addItem('copper_mining_pick', 1, session.pid);

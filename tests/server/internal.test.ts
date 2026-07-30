@@ -636,6 +636,12 @@ describe('discord/activity', () => {
       },
       error: null,
     });
+    // The whole point of the batch: ONE links read per poll, over the
+    // flattened participant ids, with zero per-item singular lookups (a
+    // once-per-item discordForAccounts call would return the same body).
+    expect(discordForAccounts).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(discordForAccounts).mock.calls[0][1]).toEqual([1, 2]);
+    expect(discordForAccount).not.toHaveBeenCalled();
   });
 });
 

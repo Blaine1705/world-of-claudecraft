@@ -131,20 +131,30 @@ export async function discordForAccount(
   return res.rows[0] ?? null;
 }
 
+/** The activity drain reads exactly these three columns; the projection is
+ *  deliberately NARROWER than DiscordLinkRow so the per-poll batch never
+ *  hauls emails or guild metadata into the feed path. */
+export interface DiscordTagRow {
+  account_id: number;
+  discord_user_id: string;
+  discord_avatar: string | null;
+}
+
 /**
  * Batched form of discordForAccount for the activity drain: ONE query over
  * the distinct account ids of a drained batch instead of a sequential
  * per-participant lookup (most players are unlinked, so the N+1 mostly
- * fetched nulls). Missing ids are simply absent from the map.
+ * fetched nulls). Missing ids are simply absent from the map. Projects only
+ * the tag columns the drain renders (never discord_email).
  */
 export async function discordForAccounts(
   pool: Pool,
   accountIds: readonly number[],
-): Promise<Map<number, DiscordLinkRow>> {
-  const out = new Map<number, DiscordLinkRow>();
+): Promise<Map<number, DiscordTagRow>> {
+  const out = new Map<number, DiscordTagRow>();
   if (accountIds.length === 0) return out;
   const res = await pool.query(
-    `SELECT account_id, discord_user_id, discord_username, discord_avatar, discord_email, guild_member, linked_at
+    `SELECT account_id, discord_user_id, discord_avatar
        FROM discord_links WHERE account_id = ANY($1::int[])`,
     [[...new Set(accountIds)]],
   );

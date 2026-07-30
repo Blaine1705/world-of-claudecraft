@@ -1430,7 +1430,7 @@ export class GameServer {
   private saveTimer = 0;
   private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
-  private readonly characterSaveQueues = new Map<number, Promise<void>>();
+  private readonly characterSaveQueues = new Map<number, Promise<boolean>>();
   // Weapon-skin loadouts are whole-record replacements in their dedicated paid
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
   // commit on separate pool clients in reverse order and resurrect stale state.
@@ -3329,7 +3329,14 @@ export class GameServer {
     }
   }
 
-  async saveCharacter(session: ClientSession, opts: { withMarket?: boolean } = {}): Promise<void> {
+  // Resolves false ONLY when the lease-fenced write matched no row (a
+  // same-account takeover rotated the nonce): the blob did not persist and
+  // the session is being kicked. Callers that must know their write landed
+  // (the audited GM restores) read it; every legacy void caller ignores it.
+  async saveCharacter(
+    session: ClientSession,
+    opts: { withMarket?: boolean } = {},
+  ): Promise<boolean> {
     const previous = this.characterSaveQueues.get(session.characterId);
     const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
       const state = this.sim.serializeCharacter(session.pid);
@@ -3416,7 +3423,7 @@ export class GameServer {
           if (!session.left) {
             void this.kickSession(session, 'character taken over', 'character taken over');
           }
-          return;
+          return false;
         }
         session.lastSave = Date.now();
         // The blob is durable: publish every unlock it contains. A rejected
@@ -3435,10 +3442,11 @@ export class GameServer {
           session.pendingDeedRecords.splice(0, recordUpTo),
         );
       }
+      return true;
     });
     this.characterSaveQueues.set(session.characterId, run);
     try {
-      await run;
+      return await run;
     } finally {
       if (this.characterSaveQueues.get(session.characterId) === run) {
         this.characterSaveQueues.delete(session.characterId);
@@ -3971,10 +3979,19 @@ export class GameServer {
     // Close the audit-durability window: the audit row is already committed,
     // so the grant must not wait up to AUTOSAVE_SECONDS to become durable (a
     // crash inside that window would leave a row for a grant that vanished).
-    // Fire-and-forget, the deed-unlock durability pattern.
-    void this.saveCharacter(session).catch((err) =>
-      console.error(`restore-item save failed for ${session.name}:`, err),
-    );
+    // Fire-and-forget, the deed-unlock durability pattern. A fenced-out save
+    // (same-account takeover rotated the lease) resolves false without
+    // throwing: the audited grant died with the displaced session's memory,
+    // so say so loudly instead of letting the generic fence warn swallow it.
+    void this.saveCharacter(session)
+      .then((landed) => {
+        if (!landed) {
+          console.error(
+            `restore-item for ${session.name}: audited grant did not persist (save fenced by a same-account takeover); re-check via the inspector and re-issue if missing`,
+          );
+        }
+      })
+      .catch((err) => console.error(`restore-item save failed for ${session.name}:`, err));
     return 'ok';
   }
 
@@ -3991,10 +4008,17 @@ export class GameServer {
     if (!session) return 'offline';
     const result = restoreToolEffectSlotAction(this.sim.ctx, professionId, effectId, session.pid);
     if (result === 'ok') {
-      // Same audit-durability reasoning as adminRestoreItem above.
-      void this.saveCharacter(session).catch((err) =>
-        console.error(`restore-slot save failed for ${session.name}:`, err),
-      );
+      // Same audit-durability and fence-visibility reasoning as
+      // adminRestoreItem above.
+      void this.saveCharacter(session)
+        .then((landed) => {
+          if (!landed) {
+            console.error(
+              `restore-slot for ${session.name}: audited grant did not persist (save fenced by a same-account takeover); re-check via the inspector and re-issue if missing`,
+            );
+          }
+        })
+        .catch((err) => console.error(`restore-slot save failed for ${session.name}:`, err));
     }
     return result;
   }
@@ -6867,8 +6891,11 @@ export class GameServer {
           })
           .catch((err) => {
             // The claim gated work that FAILED: release it, or one db blip
-            // silently drops this account's cards for the whole TTL.
-            releaseDedupeKey(`masterwork:${accountId}`);
+            // silently drops this account's cards for the whole TTL. The
+            // claim stamp rides along so a LATE rejection cannot delete a
+            // window a newer claimant owns, and the release re-stamps with
+            // a short retry backoff rather than deleting outright (R60).
+            releaseDedupeKey(`masterwork:${accountId}`, now);
             console.error('masterwork activity failed:', err);
           });
       } else if (ev.type === 'duelEnd') {
