@@ -18,7 +18,7 @@ const insaneInput: PostPlanInput = {
 };
 
 describe('post pipeline plan', () => {
-  it('pins the insane chain to one composer target and nineteen fullscreen stages', () => {
+  it('pins the insane chain to one composer target and seventeen fullscreen stages', () => {
     const plan = postPipelinePlan(insaneInput);
 
     expect(plan.scene).toEqual({
@@ -29,13 +29,12 @@ describe('post pipeline plan', () => {
     expect(plan.composerPasses).toEqual(['n8ao', 'bloom', 'output-grade']);
     expect(plan.singleComposerBuffer).toBe(true);
     expect(plan.resolveCount).toBe(0);
-    expect(plan.renderTargets).toHaveLength(16);
-    expect(plan.fullscreenStages).toHaveLength(19);
+    expect(plan.renderTargets).toHaveLength(15);
+    expect(plan.fullscreenStages).toHaveLength(17);
     expect(plan.fullscreenStages.map((stage) => stage.id)).toEqual([
       'n8ao-evaluate',
       'n8ao-denoise-0',
       'n8ao-denoise-1',
-      'n8ao-accumulation-copy',
       'n8ao-composite',
       'bloom-high-pass',
       'bloom-blur-x-0',
@@ -49,7 +48,6 @@ describe('post pipeline plan', () => {
       'bloom-blur-x-4',
       'bloom-blur-y-4',
       'bloom-mip-composite',
-      'bloom-add',
       'output-grade',
     ]);
   });
@@ -73,13 +71,6 @@ describe('post pipeline plan', () => {
       },
       { id: 'n8ao-ao-a', scale: 1, format: 'rgba8', samples: 0, depth: 'none' },
       { id: 'n8ao-ao-b', scale: 1, format: 'rgba8', samples: 0, depth: 'none' },
-      {
-        id: 'n8ao-accumulation',
-        scale: 1,
-        format: 'rgba16f',
-        samples: 0,
-        depth: 'none',
-      },
       { id: 'bloom-bright', scale: 0.5, format: 'rgba16f', samples: 0, depth: 'none' },
       { id: 'bloom-h-0', scale: 0.5, format: 'rgba16f', samples: 0, depth: 'none' },
       { id: 'bloom-v-0', scale: 0.5, format: 'rgba16f', samples: 0, depth: 'none' },
@@ -94,6 +85,43 @@ describe('post pipeline plan', () => {
     ];
 
     expect(plan.renderTargets).toEqual(expected);
+  });
+
+  it('pins distinct bloom-bright ownership and every intentional multi-writer target', () => {
+    const plan = postPipelinePlan(insaneInput);
+    const stages = new Map(plan.fullscreenStages.map((stage) => [stage.id, stage]));
+
+    expect(stages.get('n8ao-composite')).toEqual({
+      id: 'n8ao-composite',
+      scale: 1,
+      reads: ['n8ao-beauty', 'n8ao-beauty-depth', 'n8ao-ao-a'],
+      writes: 'composer-a',
+    });
+    expect(stages.get('bloom-high-pass')).toEqual({
+      id: 'bloom-high-pass',
+      scale: 0.5,
+      reads: ['composer-a'],
+      writes: 'bloom-bright',
+    });
+    expect(stages.get('bloom-blur-x-0')?.reads).toEqual(['bloom-bright']);
+    expect(stages.get('output-grade')).toEqual({
+      id: 'output-grade',
+      scale: 1,
+      reads: ['composer-a', 'bloom-h-0'],
+      writes: 'canvas',
+    });
+
+    const writers = new Map<string, string[]>();
+    for (const stage of plan.fullscreenStages) {
+      expect(stage.reads).not.toContain(stage.writes);
+      const targetWriters = writers.get(stage.writes) ?? [];
+      targetWriters.push(stage.id);
+      writers.set(stage.writes, targetWriters);
+    }
+    expect([...writers].filter(([, targetWriters]) => targetWriters.length > 1)).toEqual([
+      ['n8ao-ao-a', ['n8ao-evaluate', 'n8ao-denoise-1']],
+      ['bloom-h-0', ['bloom-blur-x-0', 'bloom-mip-composite']],
+    ]);
   });
 
   it('keeps medium MSAA only on geometry and performs exactly one resolve', () => {
@@ -148,8 +176,8 @@ describe('post pipeline plan', () => {
       samples: 0,
       depth: 'none',
     });
-    expect(plan.renderTargets).toHaveLength(20);
-    expect(plan.fullscreenStages).toHaveLength(23);
+    expect(plan.renderTargets).toHaveLength(19);
+    expect(plan.fullscreenStages).toHaveLength(21);
     expect(plan.resolveCount).toBe(0);
   });
 
@@ -199,7 +227,6 @@ describe('post pipeline plan', () => {
       'n8ao-evaluate',
       'n8ao-denoise-0',
       'n8ao-denoise-1',
-      'n8ao-accumulation-copy',
       'n8ao-composite',
       'output-grade',
     ]);

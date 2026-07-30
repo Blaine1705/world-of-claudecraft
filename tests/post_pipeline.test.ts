@@ -34,6 +34,9 @@ interface N8AOInternals {
   writeTargetInternal: THREE.WebGLRenderTarget;
   readTargetInternal: THREE.WebGLRenderTarget;
   accumulationRenderTarget: THREE.WebGLRenderTarget;
+  effectCompositerQuad: {
+    material: THREE.ShaderMaterial;
+  };
   transparencyRenderTargetDWFalse?: THREE.WebGLRenderTarget | null;
   transparencyRenderTargetDWTrue?: THREE.WebGLRenderTarget | null;
 }
@@ -42,6 +45,7 @@ interface BloomInternals {
   renderTargetBright: THREE.WebGLRenderTarget;
   renderTargetsHorizontal: THREE.WebGLRenderTarget[];
   renderTargetsVertical: THREE.WebGLRenderTarget[];
+  bloomTexture: THREE.Texture;
 }
 
 describe('live post pipeline', () => {
@@ -60,8 +64,8 @@ describe('live post pipeline', () => {
     );
 
     expect(post.composer.passes.map((pass) => pass.constructor.name)).toEqual([
-      'OpaqueCompositeN8AOPass',
-      'UnrealBloomPass',
+      'StaticOpaqueN8AOPass',
+      'PreparedBloomPass',
       'OutputGradePass',
     ]);
     expect(post.composer.renderTarget1).toBe(post.composer.renderTarget2);
@@ -75,7 +79,10 @@ describe('live post pipeline', () => {
     expect(ao.beautyRenderTarget.depthTexture?.type).toBe(THREE.UnsignedIntType);
     expect(ao.writeTargetInternal.texture.type).toBe(THREE.UnsignedByteType);
     expect(ao.readTargetInternal.texture.type).toBe(THREE.UnsignedByteType);
-    expect(ao.accumulationRenderTarget.texture.type).toBe(THREE.HalfFloatType);
+    expect(ao.accumulationRenderTarget).toBe(ao.writeTargetInternal);
+    expect(ao.effectCompositerQuad.material.fragmentShader).toContain(
+      'quantizeAccumulatedAo(texelFetch(tDiffuse, pixel, 0))',
+    );
     expect(ao.transparencyRenderTargetDWFalse).toBeFalsy();
     expect(ao.transparencyRenderTargetDWTrue).toBeFalsy();
 
@@ -83,6 +90,23 @@ describe('live post pipeline', () => {
     expect(bloom.renderTargetBright.texture.type).toBe(THREE.HalfFloatType);
     expect(bloom.renderTargetsHorizontal).toHaveLength(5);
     expect(bloom.renderTargetsVertical).toHaveLength(5);
+    expect(bloom.renderTargetBright).not.toBe(bloom.renderTargetsVertical[0]);
+    expect(
+      new Set([
+        bloom.renderTargetBright,
+        ...bloom.renderTargetsHorizontal,
+        ...bloom.renderTargetsVertical,
+      ]).size,
+    ).toBe(11);
+    expect(bloom.bloomTexture).toBe(bloom.renderTargetsHorizontal[0].texture);
+    expect(post.grade.uniforms.tBloom.value).toBe(bloom.bloomTexture);
+    expect(
+      [
+        bloom.renderTargetBright,
+        ...bloom.renderTargetsHorizontal,
+        ...bloom.renderTargetsVertical,
+      ].every((target) => !target.depthBuffer),
+    ).toBe(true);
     expect(bloom.renderTargetsHorizontal.map((target) => [target.width, target.height])).toEqual([
       [640, 360],
       [320, 180],

@@ -10,6 +10,7 @@ import { groundHeight } from '../sim/world';
 import { registerPreload } from './assets/preload';
 import { buildDungeonPropMesh, ensureDungeonAssets, loadKitModules } from './dungeon';
 import { EMISSIVE_LIGHT, GFX } from './gfx';
+import { residentSceneMayReachRenderVolumes, type ScenerySphere } from './resident_scenery_core';
 import { freezeStaticMatrices } from './static_matrix';
 import { radialGlowTexture } from './textures';
 import { applySurfaceDetail } from './worn_stone';
@@ -440,7 +441,12 @@ function emit(group: THREE.Group, p: JailPlacements): void {
   }
 }
 
-export function buildJailScene(seed: number): THREE.Group {
+export interface JailSceneView {
+  group: THREE.Group;
+  updateVisibility(camera: THREE.PerspectiveCamera, sun: THREE.DirectionalLight): void;
+}
+
+export function buildJailScene(seed: number): JailSceneView {
   const group = new THREE.Group();
   group.name = 'jail_scene';
   group.position.set(
@@ -467,5 +473,32 @@ export function buildJailScene(seed: number): THREE.Group {
   group.traverse((o) => {
     if (o.userData.jailPortalSpin) o.matrixAutoUpdate = true;
   });
-  return group;
+  const sphere = new THREE.Box3().setFromObject(group).getBoundingSphere(new THREE.Sphere());
+  const bounds: ScenerySphere = {
+    x: sphere.center.x,
+    y: sphere.center.y,
+    z: sphere.center.z,
+    radius: sphere.radius,
+  };
+  return {
+    group,
+    updateVisibility(camera: THREE.PerspectiveCamera, sun: THREE.DirectionalLight): void {
+      const halfHeight = camera.far * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      const colorRange = Math.hypot(camera.far, halfHeight, halfHeight * camera.aspect);
+      const shadowCamera = sun.shadow.camera;
+      const shadowRange = Math.hypot(
+        shadowCamera.far,
+        Math.max(Math.abs(shadowCamera.left), Math.abs(shadowCamera.right)),
+        Math.max(Math.abs(shadowCamera.top), Math.abs(shadowCamera.bottom)),
+      );
+      group.visible = residentSceneMayReachRenderVolumes(
+        bounds,
+        camera.position,
+        colorRange,
+        sun.castShadow,
+        sun.position,
+        shadowRange,
+      );
+    },
+  };
 }

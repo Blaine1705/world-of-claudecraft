@@ -1,10 +1,12 @@
-import { N8AOPass } from 'n8ao';
+import type { N8AOPass } from 'n8ao';
 import * as THREE from 'three';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import type { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { GFX, sharedUniforms } from './gfx';
+import { PreparedBloomPass } from './post_bloom';
 import { PostEffectComposer } from './post_composer';
+import { StaticOpaqueN8AOPass } from './post_n8ao';
 import { OutputGradePass } from './post_output_grade';
 import { postPipelinePlan } from './post_plan_core';
 import { renderLayerDisabled } from './render_dev_flags';
@@ -24,16 +26,18 @@ import { renderLayerDisabled } from './render_dev_flags';
 // keeps 4x MSAA only on its geometry target and resolves exactly once when
 // OutputGradePass samples it. Full-screen targets never inherit MSAA.
 //
-// OutputGradePass explicitly quantizes OutputPass color through binary16
-// before running the unchanged grade. That preserves the removed RGBA16F
-// store/sample boundary while saving one full-screen draw and target write.
-// With no tail SMAA, the composer also aliases its read/write buffer because
-// N8AO or RenderPass is the only producer and bloom composites in place.
+// OutputGradePass explicitly quantizes both removed RGBA16F boundaries: bloom's
+// additive scene write before tone mapping, then OutputPass color before the
+// unchanged grade. PreparedBloomPass keeps a dedicated bright target and leaves
+// every bright/blur/composite sample intact while removing that full-resolution
+// add draw and its redundant clears. With no tail SMAA, the composer also aliases
+// its read/write buffer.
 //
 // N8AO owns one beauty+depth scene draw. Full-res Medium reconstructs normals
 // from that shared depth texture; half-res Low downsamples the same depth once.
-// OpaqueCompositeN8AOPass prevents the package constructor from allocating its
-// transparency rerender targets before we disable that output-identical mode.
+// StaticOpaqueN8AOPass prevents transparency rerender allocations and replaces
+// disabled accumulation's copy with the same binary16 conversion in composite.
+// It retains the beauty clear but suppresses clears before full-coverage writes.
 
 // Bloom is a high-pass in linear HDR, so the threshold has to clear the
 // brightest lit diffuse or the whole sunlit world glows. Sunlit high-albedo
@@ -42,14 +46,6 @@ import { renderLayerDisabled } from './render_dev_flags';
 const BLOOM_STRENGTH = 0.4; // subtle: fires/lamps/windows glow, sky must not blow out
 const BLOOM_RADIUS = 0.6;
 const BLOOM_THRESHOLD = 1.32;
-
-class OpaqueCompositeN8AOPass extends N8AOPass {
-  override detectTransparency(): void {
-    // The shipped mode is transparencyAware=false. Overriding the virtual
-    // constructor hook avoids allocating two beauty targets plus a depth-copy
-    // pass that the next configuration write would immediately dispose.
-  }
-}
 
 export interface PostPipeline {
   composer: PostEffectComposer;
@@ -70,7 +66,7 @@ export function buildComposer(
 ): PostPipeline {
   // Grade-only mini chain for the medium tier: RenderPass -> OutputGradePass,
   // one fullscreen pass over the direct path. No AO, no bloom, no
-  // SMAA — but the display-space grade (lift/gain/S-curve/vignette) is what
+  // SMAA, but the display-space grade (lift/gain/S-curve/vignette) is what
   // separates "cinematic" from "raw ACES wash", and medium was the only
   // daylight tier shipping without it.
   const gradeOnly = opts?.gradeOnly === true;
@@ -99,7 +95,7 @@ export function buildComposer(
   let ao: N8AOPass | null = null;
   if (plan.scene.pass === 'n8ao') {
     // N8AOPass replaces RenderPass. A separate scene pass would be discarded.
-    ao = new OpaqueCompositeN8AOPass(scene, camera, size.x, size.y);
+    ao = new StaticOpaqueN8AOPass(scene, camera, size.x, size.y);
     // world-space radius tuned for 2.6u-tall characters: grounds props and
     // darkens building/rock crevices without dirtying open fields
     ao.configuration.aoRadius = 1.8;
@@ -112,7 +108,7 @@ export function buildComposer(
     // AO multiplying an already-dark un-lifted atlas, not the AO alone).
     ao.configuration.intensity = 1.45;
     // mid-chain: the buffer must stay linear for bloom/OutputGradePass (autoset
-    // guesses from renderToScreen, but be explicit — a gamma-lifted frame
+    // guesses from renderToScreen, but be explicit: a gamma-lifted frame
     // here washes the whole image out)
     ao.configuration.gammaCorrection = false;
     // No transparency-aware compositing. Water and sprites make the package's
@@ -138,10 +134,13 @@ export function buildComposer(
 
   let bloom: UnrealBloomPass | null = null;
   if (plan.composerPasses.includes('bloom')) {
-    bloom = new UnrealBloomPass(size.clone(), BLOOM_STRENGTH, BLOOM_RADIUS, BLOOM_THRESHOLD);
+    bloom = new PreparedBloomPass(size.clone(), BLOOM_STRENGTH, BLOOM_RADIUS, BLOOM_THRESHOLD);
     composer.addPass(bloom);
   }
-  const grade = new OutputGradePass(sharedUniforms.uTime);
+  const grade = new OutputGradePass(
+    sharedUniforms.uTime,
+    bloom instanceof PreparedBloomPass ? bloom.bloomTexture : null,
+  );
   composer.addPass(grade);
 
   // Edge AA, last so it works on the final display-space image. SMAA's edge

@@ -112,7 +112,6 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
       target('n8ao-beauty', 1, 'rgba16f', 0, 'depth32ui-texture'),
       target('n8ao-ao-a', aoScale, 'rgba8'),
       target('n8ao-ao-b', aoScale, 'rgba8'),
-      target('n8ao-accumulation', aoScale, 'rgba16f'),
     );
     if (aoScale === 0.5) {
       renderTargets.push(target('n8ao-depth-downsample', 0.5, 'r32f+rgba16f'));
@@ -125,13 +124,7 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
       stage('n8ao-evaluate', aoScale, ['n8ao-beauty', aoDepth], 'n8ao-ao-a'),
       stage('n8ao-denoise-0', aoScale, ['n8ao-ao-a', aoDepth], 'n8ao-ao-b'),
       stage('n8ao-denoise-1', aoScale, ['n8ao-ao-b', aoDepth], 'n8ao-ao-a'),
-      stage('n8ao-accumulation-copy', aoScale, ['n8ao-ao-a'], 'n8ao-accumulation'),
-      stage(
-        'n8ao-composite',
-        1,
-        ['n8ao-beauty', 'n8ao-beauty-depth', 'n8ao-accumulation'],
-        sceneTarget,
-      ),
+      stage('n8ao-composite', 1, ['n8ao-beauty', 'n8ao-beauty-depth', 'n8ao-ao-a'], sceneTarget),
     );
   }
 
@@ -158,12 +151,13 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
         ['bloom-v-0', 'bloom-v-1', 'bloom-v-2', 'bloom-v-3', 'bloom-v-4'],
         'bloom-h-0',
       ),
-      stage('bloom-add', 1, ['bloom-h-0', sceneTarget], sceneTarget),
     );
   }
 
   composerPasses.push('output-grade');
-  fullscreenStages.push(stage('output-grade', 1, [sceneTarget], outputTarget));
+  fullscreenStages.push(
+    stage('output-grade', 1, useBloom ? [sceneTarget, 'bloom-h-0'] : [sceneTarget], outputTarget),
+  );
 
   if (useSmaa) {
     composerPasses.push('smaa');

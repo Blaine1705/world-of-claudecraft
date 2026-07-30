@@ -24,6 +24,7 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
   precision highp float;
 
   uniform sampler2D tDiffuse;
+  uniform sampler2D tBloom;
   uniform float uTime;
 
   #include <tonemapping_pars_fragment>
@@ -36,9 +37,8 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
   const vec3 GAIN = vec3(1.10, 1.035, 0.90);
   const vec3 GAMMA = vec3(0.975);
 
-  // OutputPass used to store display-space color in the composer's RGBA16F
-  // target before GradePass sampled it. Keep that exact precision boundary
-  // while fusing the two shader invocations.
+  // Keep the exact RGBA16F boundaries removed by the bloom-add fusion and by
+  // the earlier OutputPass plus GradePass fusion.
   vec3 quantizeHalf(vec3 value) {
     vec2 rg = unpackHalf2x16(packHalf2x16(value.rg));
     float b = unpackHalf2x16(packHalf2x16(vec2(value.b, 0.0))).x;
@@ -47,6 +47,11 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
 
   void main() {
     vec4 outputColor = texture(tDiffuse, vUv);
+
+    #ifdef BLOOM_PREPARED
+      vec4 bloom = texture(tBloom, vUv);
+      outputColor.rgb = quantizeHalf(outputColor.rgb + bloom.rgb * bloom.a);
+    #endif
 
     #ifdef LINEAR_TONE_MAPPING
       outputColor.rgb = LinearToneMapping(outputColor.rgb);
@@ -97,6 +102,7 @@ const OUTPUT_GRADE_VERTEX_SHADER = /* glsl */ `
 export class OutputGradePass extends Pass {
   readonly uniforms: {
     tDiffuse: { value: Texture | null };
+    tBloom: { value: Texture | null };
     toneMappingExposure: { value: number };
     uTime: TimeUniform;
   };
@@ -104,11 +110,14 @@ export class OutputGradePass extends Pass {
   readonly fsQuad: FullScreenQuad;
   private outputColorSpace: string | null = null;
   private toneMapping: ToneMapping | null = null;
+  private readonly hasPreparedBloom: boolean;
 
-  constructor(timeUniform: TimeUniform) {
+  constructor(timeUniform: TimeUniform, bloomTexture: Texture | null = null) {
     super();
+    this.hasPreparedBloom = bloomTexture !== null;
     this.uniforms = {
       tDiffuse: { value: null },
+      tBloom: { value: bloomTexture },
       toneMappingExposure: { value: 1 },
       uTime: timeUniform,
     };
@@ -118,6 +127,8 @@ export class OutputGradePass extends Pass {
       uniforms: this.uniforms,
       vertexShader: OUTPUT_GRADE_VERTEX_SHADER,
       fragmentShader: OUTPUT_GRADE_FRAGMENT_SHADER,
+      depthTest: false,
+      depthWrite: false,
     });
     this.fsQuad = new FullScreenQuad(this.material);
   }
@@ -136,7 +147,7 @@ export class OutputGradePass extends Pass {
     ) {
       this.outputColorSpace = renderer.outputColorSpace;
       this.toneMapping = renderer.toneMapping;
-      this.material.defines = {};
+      this.material.defines = this.hasPreparedBloom ? { BLOOM_PREPARED: '' } : {};
 
       if (ColorManagement.getTransfer(renderer.outputColorSpace) === SRGBTransfer) {
         this.material.defines.SRGB_TRANSFER = '';
@@ -165,7 +176,13 @@ export class OutputGradePass extends Pass {
         renderer.clear(renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil);
       }
     }
-    this.fsQuad.render(renderer);
+    const oldAutoClear = renderer.autoClear;
+    renderer.autoClear = false;
+    try {
+      this.fsQuad.render(renderer);
+    } finally {
+      renderer.autoClear = oldAutoClear;
+    }
   }
 
   override dispose(): void {

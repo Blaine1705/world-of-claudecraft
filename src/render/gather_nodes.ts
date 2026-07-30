@@ -6,6 +6,7 @@ import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { NODE_COLOR, NODE_Y_OFFSET } from './gather_nodes_lookup';
 import { surfaceMat } from './gfx';
+import { casterShadowMayReachCamera, type ScenerySphere } from './resident_scenery_core';
 
 // Visible markers for gatherable world nodes (ore/wood/herb). Content and
 // placements come from sim/content/gather_nodes.ts (merged into
@@ -46,6 +47,17 @@ if (typeof window !== 'undefined') {
 
 export interface GatherNodesView {
   group: THREE.Group;
+  updateShadowVisibility(
+    camera: THREE.PerspectiveCamera,
+    lightDirection: THREE.Vector3,
+    shadowsEnabled: boolean,
+  ): void;
+}
+
+interface GatherNodeShadowEntry {
+  readonly bounds: ScenerySphere;
+  readonly casters: THREE.Mesh[];
+  casts: boolean;
 }
 
 function buildNodeMesh(type: GatherNodeType): THREE.Object3D {
@@ -71,6 +83,7 @@ function buildNodeMesh(type: GatherNodeType): THREE.Object3D {
 export function buildGatherNodes(seed: number): GatherNodesView {
   const group = new THREE.Group();
   group.name = 'gatherNodes';
+  const shadowEntries: GatherNodeShadowEntry[] = [];
   for (const node of GATHER_NODES) {
     const obj = buildNodeMesh(node.type);
     const y = terrainHeight(node.pos.x, node.pos.z, seed);
@@ -80,9 +93,48 @@ export function buildGatherNodes(seed: number): GatherNodesView {
     // meshes and reads this back to resolve which node was hit, the same
     // userData convention entity views use for `entityId`.
     obj.userData.gatherNodeId = node.id;
+    const sphere = new THREE.Box3().setFromObject(obj).getBoundingSphere(new THREE.Sphere());
+    const casters: THREE.Mesh[] = [];
+    obj.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.castShadow) casters.push(child);
+    });
+    shadowEntries.push({
+      bounds: {
+        x: sphere.center.x,
+        y: sphere.center.y,
+        z: sphere.center.z,
+        radius: sphere.radius,
+      },
+      casters,
+      casts: true,
+    });
     group.add(obj);
   }
-  return { group };
+  const cameraForward = new THREE.Vector3();
+  const cameraState = {
+    position: new THREE.Vector3(),
+    forward: cameraForward,
+    near: 0,
+  };
+  return {
+    group,
+    updateShadowVisibility(
+      camera: THREE.PerspectiveCamera,
+      lightDirection: THREE.Vector3,
+      shadowsEnabled: boolean,
+    ): void {
+      if (!shadowsEnabled) return;
+      camera.getWorldDirection(cameraForward);
+      cameraState.position.copy(camera.position);
+      cameraState.near = camera.near;
+      for (const entry of shadowEntries) {
+        const casts = casterShadowMayReachCamera(entry.bounds, cameraState, lightDirection);
+        if (casts === entry.casts) continue;
+        entry.casts = casts;
+        for (const mesh of entry.casters) mesh.castShadow = casts;
+      }
+    },
+  };
 }
 
 /** Test-only window into the preload asset set (mirrors props.ts). */

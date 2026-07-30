@@ -180,7 +180,7 @@ import { FrozenOrbFx } from './frozen_orb_fx';
 import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import { gardenMazeCameraLift } from './garden_maze_core';
-import { buildGatherNodes } from './gather_nodes';
+import { buildGatherNodes, type GatherNodesView } from './gather_nodes';
 import {
   GFX,
   type GfxBucketBands,
@@ -201,7 +201,7 @@ import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
-import { buildJailScene } from './jail_scene';
+import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { LightPulses } from './light_pulses';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
@@ -1206,6 +1206,7 @@ export class Renderer {
   // id, so they get their own list and `pickGatherNode` instead of widening
   // `pick()`'s numeric-id contract.
   gatherNodeMeshes: THREE.Object3D[] = [];
+  private gatherNodes: GatherNodesView;
   camYaw = Math.PI;
   camPitch = 0.32;
   camDist = 12;
@@ -1383,6 +1384,7 @@ export class Renderer {
   // (0 down, 1 up); recomputed each frame in updateAmbience from the world clock
   private moonDir = new THREE.Vector3(0, -1, 0);
   private lightDir = new THREE.Vector3(); // blended sun/moon dir the key light uses
+  private shadowLightDirection = new THREE.Vector3();
   private sunUp = 1;
   private moonUp = 0;
   private starAmt = 0; // 0 day, 1 deep night: star-field strength for the sky dome
@@ -1393,6 +1395,7 @@ export class Renderer {
   // Map-editor placed GLB assets; null when the world has none and the editor
   // never asked for the view (the shipped game with the built-in world).
   private placedAssetsView: PlacedAssetsView | null = null;
+  private jailScene: JailSceneView;
   private foliage: FoliageView;
   private fish: FishView;
   private motes: MotesView;
@@ -2074,16 +2077,17 @@ export class Renderer {
       this.scene.add(this.placedAssetsView.group);
     }
 
-    const jailScene = buildJailScene(this.sim.cfg.seed);
-    setRenderCategory(jailScene, 'props');
-    this.scene.add(jailScene);
+    this.jailScene = buildJailScene(this.sim.cfg.seed);
+    setRenderCategory(this.jailScene.group, 'props');
+    this.scene.add(this.jailScene.group);
 
-    const gatherNodes = buildGatherNodes(this.sim.cfg.seed);
-    setRenderCategory(gatherNodes.group, 'props');
-    this.scene.add(gatherNodes.group);
-    // Baked into world space at build with no per-frame update(), same as props.
-    freezeStaticMatrices(gatherNodes.group);
-    this.gatherNodeMeshes = gatherNodes.group.children;
+    this.gatherNodes = buildGatherNodes(this.sim.cfg.seed);
+    setRenderCategory(this.gatherNodes.group, 'props');
+    this.scene.add(this.gatherNodes.group);
+    // Node transforms are baked into world space. The lightweight frame update
+    // below changes only provably unreachable directional-shadow eligibility.
+    freezeStaticMatrices(this.gatherNodes.group);
+    this.gatherNodeMeshes = this.gatherNodes.group.children;
 
     // Crafting-station scenery (Professions 2.0): static, except the kitchens
     // fire, whose flame + light join the campfire flicker/ember pass above.
@@ -3676,6 +3680,18 @@ export class Renderer {
       const pp = pv.group.position;
       this.updateKeyLight(pp);
     }
+    this.shadowLightDirection.subVectors(this.sun.position, this.sun.target.position).normalize();
+    this.jailScene.updateVisibility(this.camera, this.sun);
+    this.gatherNodes.updateShadowVisibility(
+      this.camera,
+      this.shadowLightDirection,
+      this.sun.castShadow,
+    );
+    this.valeCupStadium.updateShadowVisibility(
+      this.camera,
+      this.shadowLightDirection,
+      this.sun.castShadow,
+    );
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     // The dome rides the camera, so it also serves Wildheart's open-air field.
     this.sky.visible = this.fogState === 'outdoor' || this.fogState === 'wildheartField';
@@ -8496,6 +8512,18 @@ export class Renderer {
       this.camera.position.y += shakeY;
       this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
     }
+    this.shadowLightDirection.subVectors(this.sun.position, this.sun.target.position).normalize();
+    this.jailScene.updateVisibility(this.camera, this.sun);
+    this.gatherNodes.updateShadowVisibility(
+      this.camera,
+      this.shadowLightDirection,
+      this.sun.castShadow,
+    );
+    this.valeCupStadium.updateShadowVisibility(
+      this.camera,
+      this.shadowLightDirection,
+      this.sun.castShadow,
+    );
     this.updateOpaqueDrawOrder(dt);
     this.camera.updateMatrixWorld();
     this.vfx.prepareDraw(this.camera);

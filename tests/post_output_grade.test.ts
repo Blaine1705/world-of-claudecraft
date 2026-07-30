@@ -3,8 +3,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { OUTPUT_GRADE_FRAGMENT_SHADER, OutputGradePass } from '../src/render/post_output_grade';
 
 describe('fused output and grade shader', () => {
-  it('preserves the output half-float boundary before the exact grade operation order', () => {
+  it('preserves both removed half-float boundaries and the exact grade operation order', () => {
     const shader = OUTPUT_GRADE_FRAGMENT_SHADER;
+    const bloomSampleAt = shader.indexOf('vec4 bloom = texture(tBloom, vUv);');
+    const bloomBlendAt = shader.indexOf(
+      'outputColor.rgb = quantizeHalf(outputColor.rgb + bloom.rgb * bloom.a);',
+    );
     const toneMapAt = shader.indexOf('outputColor.rgb = ACESFilmicToneMapping(outputColor.rgb);');
     const srgbAt = shader.indexOf('outputColor = sRGBTransferOETF(outputColor);');
     const halfAt = shader.indexOf('vec3 c = quantizeHalf(outputColor.rgb);');
@@ -16,7 +20,9 @@ describe('fused output and grade shader', () => {
       'c += (fract(sin(dot(vUv * 731.7 + uTime, vec2(12.9898, 78.233))) * 43758.5) - 0.5) * 0.012;',
     );
 
-    expect(toneMapAt).toBeGreaterThan(-1);
+    expect(bloomSampleAt).toBeGreaterThan(-1);
+    expect(bloomBlendAt).toBeGreaterThan(bloomSampleAt);
+    expect(toneMapAt).toBeGreaterThan(bloomBlendAt);
     expect(srgbAt).toBeGreaterThan(toneMapAt);
     expect(halfAt).toBeGreaterThan(srgbAt);
     expect(liftAt).toBeGreaterThan(halfAt);
@@ -34,12 +40,14 @@ describe('fused output and grade shader', () => {
 
   it('propagates exposure and selects the same ACES and sRGB defines as OutputPass', () => {
     const time = { value: 17 };
-    const pass = new OutputGradePass(time);
+    const bloomTexture = new THREE.Texture();
+    const pass = new OutputGradePass(time, bloomTexture);
     const write = new THREE.WebGLRenderTarget(16, 8);
     const read = new THREE.WebGLRenderTarget(16, 8);
     const setRenderTarget = vi.fn();
     const clear = vi.fn();
     const renderer = {
+      autoClear: true,
       outputColorSpace: THREE.SRGBColorSpace,
       toneMapping: THREE.ACESFilmicToneMapping,
       toneMappingExposure: 0.73,
@@ -55,12 +63,17 @@ describe('fused output and grade shader', () => {
     pass.render(renderer, write, read);
 
     expect(pass.uniforms.tDiffuse.value).toBe(read.texture);
+    expect(pass.uniforms.tBloom.value).toBe(bloomTexture);
     expect(pass.uniforms.toneMappingExposure.value).toBe(0.73);
     expect(pass.uniforms.uTime).toBe(time);
     expect(pass.material.defines).toEqual({
+      BLOOM_PREPARED: '',
       SRGB_TRANSFER: '',
       ACES_FILMIC_TONE_MAPPING: '',
     });
+    expect(pass.material.depthTest).toBe(false);
+    expect(pass.material.depthWrite).toBe(false);
+    expect(renderer.autoClear).toBe(true);
     expect(setRenderTarget).toHaveBeenCalledWith(write);
     expect(clear).toHaveBeenCalledWith(true, true, false);
     expect(pass.fsQuad.render).toHaveBeenCalledWith(renderer);
