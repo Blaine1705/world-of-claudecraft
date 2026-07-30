@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { LivePlayerLocation } from '../types';
   import { locationDisplay } from '../location';
+  import { tooltipPlacement, type TooltipPlacement } from '../tooltip_placement';
 
   let {
     location = null,
@@ -16,20 +17,54 @@
 
   let display = $derived(locationDisplay({ location, x, z, zone }));
   let accessible = $derived(display.details.join('. '));
+
+  // The tooltip is FIXED, not absolute: the table lives in a horizontal scroll
+  // container, and a scroller clips both axes, so an absolutely positioned tooltip
+  // hanging under the last row would be cut off (and add a stray vertical scrollbar).
+  let cell: HTMLElement;
+  let placement = $state<TooltipPlacement | null>(null);
+
+  function open(): void {
+    const anchor = cell.getBoundingClientRect();
+    placement = tooltipPlacement(anchor, {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+  }
+
+  function close(): void {
+    placement = null;
+  }
 </script>
 
-<span class="location-cell" aria-label={accessible}>
+<span
+  class="location-cell"
+  role="note"
+  bind:this={cell}
+  aria-label={accessible}
+  onpointerenter={open}
+  onpointerleave={close}
+  onfocusin={open}
+  onfocusout={close}
+>
   <span class="location-coords">{display.secondary}</span>
-  <span class="location-tooltip">
-    {#each display.details as detail}
-      <span>{detail}</span>
-    {/each}
-  </span>
+  {#if placement}
+    <span
+      class="location-tooltip"
+      class:above={placement.side === 'above'}
+      style="right: {placement.right}px; {placement.side === 'above'
+        ? `bottom: ${placement.offset}px`
+        : `top: ${placement.offset}px`}"
+    >
+      {#each display.details as detail}
+        <span>{detail}</span>
+      {/each}
+    </span>
+  {/if}
 </span>
 
 <style>
   .location-cell {
-    position: relative;
     display: inline-flex;
     flex-direction: column;
     align-items: flex-end;
@@ -43,11 +78,9 @@
   }
 
   .location-tooltip {
-    position: absolute;
-    right: 0;
-    top: calc(100% + 7px);
+    position: fixed;
     z-index: 4;
-    display: none;
+    display: flex;
     flex-direction: column;
     gap: 3px;
     min-width: 210px;
@@ -75,9 +108,13 @@
     transform: rotate(45deg);
   }
 
-  .location-cell:hover .location-tooltip,
-  .location-tooltip:hover {
-    display: flex;
+  .location-tooltip.above::before {
+    top: auto;
+    bottom: -5px;
+    border-left: 0;
+    border-top: 0;
+    border-right: 1px solid var(--border-soft);
+    border-bottom: 1px solid var(--border-soft);
   }
 
   @media (max-width: 760px) {
