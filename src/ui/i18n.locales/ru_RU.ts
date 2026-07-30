@@ -10176,6 +10176,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeFull': '{effect} уже полностью заряжен.',
   'hudChrome.professions.toolEffectRechargeMaterials': 'Для перезарядки {effect} нужно {material} x{count}.',
   'hudChrome.professions.toolEffectSpent': 'Израсходовано, нужна подзарядка',
+  'hudChrome.professions.toolEffectDepleted': 'Эффект инструмента израсходован',
   'hudChrome.professions.toolEffectCharges': 'Осталось зарядов: {charges} из {max}',
   'entities.items.resonant_thread.name': 'Резонирующая нить',
   'entities.items.resonant_hide.name': 'Резонирующая шкура',

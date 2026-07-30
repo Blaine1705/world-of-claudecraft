@@ -2438,6 +2438,7 @@ export const pl_PL: EnTranslations = {
       "skillValue": "{skill} / {max}",
       "toolEffectCharges": "{charges} of {max} charges",
       "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectDepleted": "Tool effect spent",
       "toolEffectName": {
         "gatherersCache": "Gatherer's Cache",
         "artisansEye": "Artisan's Eye",

@@ -7517,6 +7517,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.professions.tierPipAria'
   | 'hudChrome.professions.title'
   | 'hudChrome.professions.toolEffectCharges'
+  | 'hudChrome.professions.toolEffectDepleted'
   | 'hudChrome.professions.toolEffectName.artisansEye'
   | 'hudChrome.professions.toolEffectName.gatherersCache'
   | 'hudChrome.professions.toolEffectName.quickeningCharm'

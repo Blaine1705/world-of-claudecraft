@@ -2782,6 +2782,10 @@ export const hudChromeStrings = {
     // Said in words rather than as "0 of 30": a bare zero reads like a broken
     // tool, and the tool is fine. Only the effect is spent, and it recharges.
     toolEffectSpent: 'Spent, needs recharging',
+    // The last-charge FCT self-note (the UX pass), fired off the
+    // gatherResult event's effectDepleted flag: the harvest that spent the
+    // final charge says so instead of letting the effect expire silently.
+    toolEffectDepleted: 'Tool effect spent',
     // The three slottable effects, by catalog id (src/sim/content/professions.ts
     // TOOL_EFFECTS). The sim is language-agnostic and emits the id; these are
     // where it becomes a name.

@@ -2438,6 +2438,7 @@ export const en_XA: EnTranslations = {
       "skillValue": "[{skill} / {max}]",
       "toolEffectCharges": "[{charges} óƒ {max} çĥáŕĝéš]",
       "toolEffectSpent": "[Šþéñţ, ñééðš ŕéçĥáŕĝíñĝ]",
+      "toolEffectDepleted": "[Ţóóļ éƒƒéçţ šþéñţ]",
       "toolEffectName": {
         "gatherersCache": "[Ĝáţĥéŕéŕ'š Çáçĥé]",
         "artisansEye": "[Áŕţíšáñ'š Éýé]",

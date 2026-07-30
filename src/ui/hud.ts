@@ -10205,6 +10205,15 @@ export class Hud {
           audio.gather(ev.nodeType);
           const gatherRareTier = gatherRareTierFor(ev.rarity, ev.rareEvent);
           if (gatherRareTier) audio.gatherRareTier(gatherRareTier);
+          // The last-charge signal (the UX pass): the harvest that spent the
+          // slotted effect's final charge announces it as an FCT self-note
+          // (which also feeds the polite live region). ONE surface on
+          // purpose: the professions window's charge row is the durable
+          // record, so a log line here would be the double-feedback trap the
+          // arms above already avoid.
+          if (ev.effectDepleted) {
+            this.showSelfNote(t('hudChrome.professions.toolEffectDepleted'));
+          }
           break;
         }
         case 'harvestResult': {

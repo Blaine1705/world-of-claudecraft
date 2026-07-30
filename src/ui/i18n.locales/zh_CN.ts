@@ -9540,6 +9540,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeFull': '{effect}已充满能量。',
   'hudChrome.professions.toolEffectRechargeMaterials': '为{effect}充能需要{material}x{count}。',
   'hudChrome.professions.toolEffectSpent': '已耗尽，需要充能',
+  'hudChrome.professions.toolEffectDepleted': '工具效果已耗尽',
   'hudChrome.professions.toolEffectCharges': '剩余 {charges} / {max} 次',
   'entities.items.resonant_thread.name': '共鸣丝线',
   'entities.items.resonant_hide.name': '共鸣兽皮',

@@ -1505,6 +1505,71 @@ describe('fine material grades on the live harvest path', () => {
     expect(slot.durability).toBe(0);
   });
 
+  it('the last-charge signal: gatherResult carries effectDepleted exactly on the emptying spend', () => {
+    // The UX pass: depleteEffect's return used to be discarded, so an effect
+    // expired silently. The flag must ride ONLY the harvest whose spend
+    // reached zero: absent (not false) on every other event, so the wire
+    // stays byte-identical for non-final harvests.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('gatherers_cache', 1, pid); // quantity: every uncapped grant matters
+    sim.slotToolEffect('mining', 'gatherers_cache', undefined, pid);
+    const slot = mustMeta(sim, pid).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+
+    // The completeCastNow idiom (the event-shape tests above): zero ticks
+    // between completion and drain, so the emitted event is still queued.
+    const harvestOnce = () => {
+      mustMeta(sim, pid).nodeHarvestReadyAt.ore_eastbrook_1 = sim.time;
+      sim.drainEvents();
+      expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(true);
+      completeCastNow(sim, pid);
+      const ev = sim.drainEvents().find((e) => e.type === 'gatherResult');
+      if (ev?.type !== 'gatherResult') throw new Error('missing gatherResult');
+      return ev;
+    };
+
+    // Two charges left: the spend that lands on 1 must NOT carry the flag.
+    slot.durability = 2;
+    teleportOntoNode(sim, pid, 'ore_eastbrook_1');
+    const notLast = harvestOnce();
+    expect(slot.durability).toBe(1);
+    expect('effectDepleted' in notLast).toBe(false);
+
+    // The final charge: the same command now announces the depletion.
+    const last = harvestOnce();
+    expect(slot.durability).toBe(0);
+    expect(last.effectDepleted).toBe(true);
+
+    // Spent slot: further harvests apply nothing and never re-announce.
+    const after = harvestOnce();
+    expect('effectDepleted' in after).toBe(false);
+  });
+
+  it('the last-charge signal never fires on a KEPT charge (R42: the bonus did not matter)', () => {
+    // A quality charm on a fine-unreachable starter node keeps its charge
+    // (the R9 use-time suppression), so even at one remaining charge the
+    // event must not claim a depletion that never happened.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('artisans_eye', 1, pid);
+    sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
+    const slot = mustMeta(sim, pid).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    slot.durability = 1;
+    // veiled_hollow's tier-1 node grants a rung-3 material: fine unreachable.
+    teleportOntoNode(sim, pid, 'ore_veiled_hollow_1');
+    sim.drainEvents();
+    expect(sim.harvestNode('ore_veiled_hollow_1', pid)).toBe(true);
+    completeCastNow(sim, pid);
+    const ev = sim.drainEvents().find((e) => e.type === 'gatherResult');
+    if (ev?.type !== 'gatherResult') throw new Error('missing gatherResult');
+    expect(slot.durability).toBe(1);
+    expect('effectDepleted' in ev).toBe(false);
+  });
+
   it('R47: handing the good pick away MID-CAST still latches: the cast-start capture', () => {
     // Trade has no casting gate (deliberately), so the completion-time bag
     // scan alone was dodgeable: start the cast with the epic pick carried,

@@ -4665,6 +4665,13 @@ export type SimEvent = { pid?: number } & (
       qty: number;
       // The rare event this harvest rolled (resolveHarvest draw #2), or null.
       rareEvent: GatherRareEventFlavor | null;
+      // The last-charge signal (the UX pass): present, and true, exactly when
+      // THIS harvest's R42 settle spent the slotted effect's final charge, so
+      // the client can say the effect expired instead of stopping silently.
+      // Additive and optional (the phase 11 stale-client doctrine): absent on
+      // every other harvest keeps the event byte-identical to the pre-field
+      // wire, and an old bundle's whole-event decode ignores it.
+      effectDepleted?: true;
     }
   // Gathering tool-gate denial (Professions 2.0, extended by #2343): the
   // player lacks a matching tool of at least `requiredTier` for a node

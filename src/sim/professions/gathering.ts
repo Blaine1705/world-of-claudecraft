@@ -900,6 +900,7 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   // re-prices itself on its first bonus-bearing harvest, handoff or not.
   // Raise-only and idempotent, so the pair is exactly max(start, completion).
   // One extra bag scan on the effect-bearing path only, draw-free.
+  let effectDepleted = false;
   if (result.effectApplied) {
     const usedSlot = usableToolEffectSlot(meta, professionId, node);
     if (usedSlot) {
@@ -910,7 +911,14 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
       if (startToolRarity !== '') ratchetCeilingForUse(usedSlot, startToolRarity);
     }
     const mattered = itemId !== result.baseItemId || grantedQty > (result.baseQty ?? qty);
-    if (mattered) depleteEffect(usedSlot);
+    // The last-charge signal (the UX pass): a spend that empties the slot is
+    // the one worth announcing, so the return depleteEffect always had is
+    // finally read instead of discarded. Rides the gatherResult emit below
+    // as an additive optional field.
+    if (mattered) {
+      const spent = depleteEffect(usedSlot);
+      effectDepleted = spent && usedSlot !== undefined && usedSlot.durability <= 0;
+    }
   }
   ctx.onNodeGatheredForQuests(node, itemId, meta);
   // Zone gather mark: one entry per zone and node type ever harvested.
@@ -939,6 +947,9 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     rarity,
     qty: grantedQty,
     rareEvent: rareEvent ?? null,
+    // Present only when THIS spend emptied the slot (absent otherwise, so
+    // every non-final harvest's event stays byte-identical to the old wire).
+    ...(effectDepleted ? { effectDepleted: true as const } : {}),
   });
 }
 

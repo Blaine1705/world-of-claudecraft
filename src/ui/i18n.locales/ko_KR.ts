@@ -9997,6 +9997,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeMaterials':
     '{effect} 재충전에는 {material} x{count}이(가) 필요합니다.',
   'hudChrome.professions.toolEffectSpent': '모두 소모됨, 재충전 필요',
+  'hudChrome.professions.toolEffectDepleted': '도구 효과를 모두 소모했습니다',
   'hudChrome.professions.toolEffectCharges': '{charges} / {max}회 남음',
   'entities.items.resonant_thread.name': '공명의 실',
   'entities.items.resonant_hide.name': '공명의 가죽',

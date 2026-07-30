@@ -10002,6 +10002,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRechargeMaterials':
     '{effect}の再充填には{material}x{count}が必要だ。',
   'hudChrome.professions.toolEffectSpent': '使い切りました。再充填が必要です',
+  'hudChrome.professions.toolEffectDepleted': '道具の効果を使い切りました',
   'hudChrome.professions.toolEffectCharges': '残り {charges} / {max} 回',
   'entities.items.resonant_thread.name': '共鳴の糸',
   'entities.items.resonant_hide.name': '共鳴の獣皮',
