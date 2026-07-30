@@ -29,6 +29,7 @@ function stubSource(): GameStateSource {
     simEntities: () => 0,
     simTickHz: () => 20,
     tickPhaseMillis: () => ({}),
+    dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     lastTickAt: () => 1_700_000_000_000,
     loopStartedAt: () => 1_700_000_000_000,
   };

@@ -3039,6 +3039,7 @@ export async function startServer(): Promise<http.Server> {
     simEntities: () => game.sim.entities.size,
     simTickHz: () => game.simTickHz(),
     tickPhaseMillis: () => game.tickPhaseMillis(),
+    dbPool: () => ({ total: pool.totalCount, idle: pool.idleCount, waiting: pool.waitingCount }),
     lastTickAt: () => game.lastTickAt(),
     loopStartedAt: () => game.loopStartedAt(),
   };

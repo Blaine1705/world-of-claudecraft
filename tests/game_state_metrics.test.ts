@@ -101,6 +101,7 @@ function sourceOver(server: GameServer): GameStateSource {
     simEntities: () => server.sim.entities.size,
     simTickHz: () => server.simTickHz(),
     tickPhaseMillis: () => server.tickPhaseMillis(),
+    dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     lastTickAt: () => server.lastTickAt(),
     loopStartedAt: () => server.loopStartedAt(),
   };

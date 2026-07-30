@@ -481,8 +481,11 @@ For off-box safety, sync the directory to S3 occasionally:
   (`sum(woc_fishing_catches_total)` is world-wide). The one exception:
   `woc_rod_fee_copper` is a static content gauge published IDENTICALLY by
   every realm process, so aggregate it with `max()` (or `avg()`), never
-  `sum()`: the copper the rod fees took across realms is
-  `sum(woc_rod_fee_payments_total) * max(woc_rod_fee_copper)` per recipe.
+  `sum()`. Both series carry a `recipe` label and the two rod fees DIFFER,
+  so the aggregation must keep that label or the product multiplies every
+  training by the single highest fee: the copper the rod fees took across
+  realms is
+  `sum(sum by (recipe) (woc_rod_fee_payments_total) * max by (recipe) (woc_rod_fee_copper))`.
 - **Game watchdog (wedge recovery)**: `deploy/game_watchdog.sh`, installed as
   `/usr/local/bin/eastbrook-watchdog` and fired every minute from
   `/etc/cron.d/eastbrook-watchdog`. Docker's `restart: unless-stopped` only acts when

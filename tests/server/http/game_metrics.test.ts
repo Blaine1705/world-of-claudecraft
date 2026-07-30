@@ -25,6 +25,7 @@ import {
   WOC_CHAT_MESSAGES_TOTAL,
   WOC_COPPER_CREDITED_TOTAL,
   WOC_COPPER_SPENT_TOTAL,
+  WOC_DB_POOL_CLIENTS,
   WOC_FISHING_CASTS_TOTAL,
   WOC_FISHING_CATCHES_TOTAL,
   WOC_FISHING_EMPTY_HOOKS_TOTAL,
@@ -55,6 +56,7 @@ function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
     simEntities: () => 42,
     simTickHz: () => 20,
     tickPhaseMillis: () => ({}),
+    dbPool: () => ({ total: 7, idle: 4, waiting: 1 }),
     lastTickAt: () => 1_700_000_000_000,
     loopStartedAt: () => 1_700_000_000_000,
     ...overrides,
@@ -112,6 +114,19 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(sampleValue(text, /^woc_ws_connections (\d+)$/m)).toBe('5');
     expect(sampleValue(text, /^woc_sim_entities (\d+)$/m)).toBe('42');
     expect(sampleValue(text, /^woc_sim_tick_hz (\d+)$/m)).toBe('20');
+  });
+
+  it('exports pg pool saturation by state from the source snapshot', async () => {
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    const text = await registry.metrics();
+    expect(WOC_DB_POOL_CLIENTS).toBe('woc_db_pool_clients');
+    expect(text).toContain(`# TYPE ${WOC_DB_POOL_CLIENTS} gauge`);
+    // The stub returns total 7, idle 4, waiting 1: each state must surface as
+    // its own labeled sample (waiting is the saturation alarm line).
+    expect(sampleValue(text, /^woc_db_pool_clients\{state="total"\} (\d+)$/m)).toBe('7');
+    expect(sampleValue(text, /^woc_db_pool_clients\{state="idle"\} (\d+)$/m)).toBe('4');
+    expect(sampleValue(text, /^woc_db_pool_clients\{state="waiting"\} (\d+)$/m)).toBe('1');
   });
 
   it('reflects a fresh source read on every scrape (no drift)', async () => {
@@ -594,6 +609,13 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
       expect(text).toContain(`# TYPE ${name} counter`);
     }
     expect(text).toContain(`# TYPE ${WOC_ROD_FEE_COPPER} gauge`);
+    // The published usage recipe must keep the recipe grouping: the two rod
+    // fees differ 4x, so an ungrouped sum() * max() multiplies every training
+    // by the single highest fee. The help line is the operator-facing copy of
+    // that recipe, so its by (recipe) form is pinned here.
+    const helpLine = text.split('\n').find((l) => l.startsWith(`# HELP ${WOC_ROD_FEE_COPPER}`));
+    expect(helpLine).toContain('max by (recipe)');
+    expect(helpLine).toContain('sum by (recipe)');
   });
 
   it('pre-registers the whole zone x band cross product of every fishing counter at zero', async () => {

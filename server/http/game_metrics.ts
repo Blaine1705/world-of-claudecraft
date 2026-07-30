@@ -73,6 +73,11 @@ export const WOC_SIM_ENTITIES = 'woc_sim_entities';
 /** Achieved sim ticks per wall-clock second (target is 20 Hz). */
 export const WOC_SIM_TICK_HZ = 'woc_sim_tick_hz';
 
+/** pg pool clients by state (total/idle/waiting): the saturation signal for
+ *  every db-backed path, and the counter-signal for any fire-and-forget read
+ *  family (a regression in its rate shows up here first in production). */
+export const WOC_DB_POOL_CLIENTS = 'woc_db_pool_clients';
+
 /** Per-phase authoritative-loop timing in SECONDS, labeled by phase and stat (p95/max). */
 export const WOC_SIM_TICK_PHASE_SECONDS = 'woc_sim_tick_phase_seconds';
 
@@ -125,8 +130,10 @@ export const WOC_ROD_FEE_PAYMENTS_TOTAL = 'woc_rod_fee_payments_total';
  *  dashboard hardcodes a gold amount. Content-derived and constant for the
  *  process's life, which is why it carries no collect(). Every realm process
  *  publishes the SAME value, so across realm targets the copper the rod fees
- *  took is sum(woc_rod_fee_payments_total) * max(woc_rod_fee_copper) per
- *  recipe; summing the gauge itself overstates by the realm count. */
+ *  took is sum(sum by (recipe) (woc_rod_fee_payments_total) * max by
+ *  (recipe) (woc_rod_fee_copper)): summing the gauge itself overstates by
+ *  the realm count, and dropping the by (recipe) grouping multiplies every
+ *  training by the single HIGHEST fee (the two rod fees differ 4x). */
 export const WOC_ROD_FEE_COPPER = 'woc_rod_fee_copper';
 
 /**
@@ -179,6 +186,8 @@ export interface GameStateSource {
   simTickHz(): number | null;
   /** Per-phase p95/max in MILLISECONDS, keyed by phase name; missing phases are skipped. */
   tickPhaseMillis(): Record<string, TickPhaseMillis>;
+  /** pg pool saturation snapshot (pg Pool totalCount/idleCount/waitingCount). */
+  dbPool(): { total: number; idle: number; waiting: number };
   /**
    * Wall clock (epoch millis) of the last COMPLETED tick pass, null during warmup.
    * This one is NOT a Prometheus gauge (loop rate is already covered by
@@ -255,6 +264,19 @@ export function registerGameStateMetrics(
       // The rate meter reports null for the first second of uptime; a scrape is a
       // steady-state read, so map that brief warmup window to 0 rather than omit.
       this.set(source.simTickHz() ?? 0);
+    },
+  });
+
+  new Gauge({
+    name: WOC_DB_POOL_CLIENTS,
+    help: 'pg pool clients by state (total open, idle, callers waiting for a client). Sustained waiting > 0 means the pool is saturated.',
+    labelNames: ['state'],
+    registers: [registry],
+    collect() {
+      const p = source.dbPool();
+      this.set({ state: 'total' }, p.total);
+      this.set({ state: 'idle' }, p.idle);
+      this.set({ state: 'waiting' }, p.waiting);
     },
   });
 
@@ -396,7 +418,7 @@ export function registerGameStateMetrics(
   });
   const rodFeeCopper = new Gauge({
     name: WOC_ROD_FEE_COPPER,
-    help: 'The static training fee in copper for each rod recipe (multiply the payments counter by max() of this gauge across realms, never its sum).',
+    help: 'The static training fee in copper for each rod recipe. Aggregate across realms with max() by (recipe), never sum(): total copper is sum(sum by (recipe) (payments) * max by (recipe) (this gauge)).',
     labelNames: ['recipe'],
     registers: [registry],
   });
