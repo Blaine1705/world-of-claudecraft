@@ -299,17 +299,21 @@ describe('pooled VFX cloud', () => {
       fileURLToPath(new URL('../src/render/renderer.ts', import.meta.url)),
       'utf8',
     );
-    expect(source).toContain(`this.camera.position.y += shakeY;
-      this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
+    // Every prepareDraw that feeds a render must pack against the FINAL camera
+    // pose, so each render site is immediately preceded by updateMatrixWorld.
+    // Pinned structurally: the previous version anchored on a neighbouring
+    // block of unrelated camera-shake code, which drifted and left this test
+    // failing for reasons that had nothing to do with the invariant.
+    const renderSites = [
+      ...source.matchAll(/this\.vfx\.prepareDraw\(this\.camera\);\n\s*if \(this\.post\)/g),
+    ];
+    expect(renderSites).toHaveLength(2);
+    for (const site of renderSites) {
+      expect(
+        source.slice(0, site.index).trimEnd().endsWith('this.camera.updateMatrixWorld();'),
+      ).toBe(true);
     }
-    this.camera.updateMatrixWorld();
-    this.vfx.prepareDraw(this.camera);
-    if (this.post) this.post.render();`);
     expect(source).toContain(`async captureScreenshot(maxEdge = 1280, quality = 0.7)`);
-    expect(source).toContain(`try {
-      this.camera.updateMatrixWorld();
-      this.vfx.prepareDraw(this.camera);
-      if (this.post) this.post.render();`);
     expect(source.match(/this\.vfx\.prepareDraw\(this\.camera\);/g)).toHaveLength(3);
     expect(source).toContain(`this.vfx.update(dt);
     this.vfx.prepareDraw(this.camera);
