@@ -114,6 +114,19 @@
   body.mobile-touch.game-active #ui {
     z-index: 80;
   }
+  /* The touch item-drag drop window (the phase 14 QA blocker): while a bag
+     stack is mid-drag the action ring must be REACHABLE over the full-screen
+     bags sheet (z-index 95 below), or every release hit-tests the sheet and
+     the drag-to-slot flow cannot be performed at all. The drag lifecycle
+     stamps body.touch-item-dragging (src/ui/touch_item_drag.ts); raising the
+     controls layer above the sheet for exactly that window floats the ring
+     over the bags corner as the visible drop target, and the release
+     restores normal stacking. Bag-cell drops keep working: between the
+     ring's buttons the controls layer is pointer-events none, so
+     hit-testing falls through to the sheet. */
+  body.mobile-touch.game-active.touch-item-dragging #mobile-controls {
+    z-index: 96;
+  }
   body.mobile-touch.game-active #ui,
   body.mobile-touch.game-active #nameplates,
   body.mobile-touch.game-active #mobile-controls {

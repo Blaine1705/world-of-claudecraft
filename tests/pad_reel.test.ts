@@ -35,6 +35,25 @@ describe('padReelItemId', () => {
     expect(padReelItemId(FISHING_CAST_ID, [])).toBeNull();
   });
 
+  it('the touch Use button reels too: onInteract tries the rod before the scan (source pin)', () => {
+    // The phase 14 QA found the touch path still had the exact failure the
+    // pad arm closed: onInteract dispatched interactKey() directly, so a
+    // mid-cast tap ran the nearby scan over a live bobber. Comment-stripped
+    // so the arm's own prose cannot satisfy the pin.
+    const mainTs = readFileSync(join(__dirname, '../src/main.ts'), 'utf8').replace(
+      /^\s*\/\/.*$/gm,
+      '',
+    );
+    const start = mainTs.indexOf('onInteract: () => {');
+    expect(start).toBeGreaterThan(-1);
+    const body = mainTs.slice(start, mainTs.indexOf('onChat:', start));
+    expect(body).toContain(
+      'const reelRod = padReelItemId(world.player.castingAbility, world.inventory);',
+    );
+    expect(body.indexOf('padReelItemId')).toBeLessThan(body.indexOf('interactKey()'));
+    expect(body).toContain('world.useItem(reelRod);');
+  });
+
   it('main.ts wires the reel ahead of the nearby-interaction scan (source pin)', () => {
     const mainTs = readFileSync(join(__dirname, '../src/main.ts'), 'utf8');
     // The braced form is unique to the pad dispatch (the keyboard Input

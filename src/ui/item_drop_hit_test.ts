@@ -22,7 +22,12 @@ export type DropTargetAt =
   // reeling through bags-row taps inside the 2.5 s window. Desktop rows
   // stamp data-hotbar-slot (1-based bar slot); the mobile ring stamps
   // data-mobile-index (a RING position whose underlying bar slot depends on
-  // the live page, so the HUD resolves it at drop time, not here).
+  // the live page, so the HUD resolves it at drop time, not here). The
+  // RING arm is the live one: the touch HUD hides all three desktop rows,
+  // and the ring is reachable mid-drag via the touch-item-dragging z-raise
+  // in hud.mobile.css (the phase 14 QA blocker). The row arm has no
+  // reachable layout today; it is the forward twin for a touch tier that
+  // shows the desktop rows, kept because the hit-test is the cheap half.
   | { kind: 'actionSlot'; slot: number }
   | { kind: 'actionRingSlot'; ringIndex: number }
   | { kind: 'world' }

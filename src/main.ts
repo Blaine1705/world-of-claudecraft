@@ -1691,7 +1691,19 @@ async function startGame(
   const mobileControls = new MobileControls(input, {
     onCycleTarget: () => world.tabTarget(),
     onJump: () => input.triggerTouchJump(),
-    onInteract: () => interactKey(),
+    onInteract: () => {
+      // The touch twin of the pad reel arm (pad_reel.ts, the dispatch's
+      // 'interact' case below): mid fishing cast the Use press answers the
+      // bite with the carried implement instead of running the nearby scan
+      // over a live bobber (the phase 14 QA found the touch path still had
+      // the exact failure the pad arm closed).
+      const reelRod = padReelItemId(world.player.castingAbility, world.inventory);
+      if (reelRod !== null) {
+        world.useItem(reelRod);
+        return;
+      }
+      interactKey();
+    },
     onChat: () => openChat(),
     onChatOpen: () => openChatRead(),
     onChatClose: () => closeChat(),

@@ -8,6 +8,8 @@
 // arm, so a lit socket is always one the sim will accept and a refused drop is one
 // it would have refused anyway.
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
@@ -199,5 +201,31 @@ describe('resolveDropTargetAt (touch release)', () => {
     const el = stubEl('<div id="chatlog"></div>');
     expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'none' });
     expect(resolveDropTargetAt(10, 10, () => null)).toEqual({ kind: 'none' });
+  });
+});
+
+describe('touch drop reachability (the phase 14 QA blocker)', () => {
+  // The hit-test arms above only matter if a release can REACH a target:
+  // the full-screen bags sheet sits at z-index 95 and the action ring's
+  // layer at 60, so without the drag-scoped raise every release hit-tests
+  // the sheet and the drag-to-slot flow cannot be performed at all.
+  const read = (rel: string): string =>
+    readFileSync(join(__dirname, rel), 'utf8').replace(/^\s*\/\/.*$/gm, '');
+
+  it('the drag lifecycle stamps and removes body.touch-item-dragging', () => {
+    const drag = read('../src/ui/touch_item_drag.ts');
+    expect(drag).toContain("document.body.classList.add('touch-item-dragging');");
+    expect(drag).toContain("document.body.classList.remove('touch-item-dragging');");
+  });
+
+  it('the drag window raises the controls layer above the bags sheet', () => {
+    const css = readFileSync(join(__dirname, '../src/styles/hud.mobile.css'), 'utf8');
+    // The sheet's own literal, so a re-tiering of either side re-derives
+    // this pair rather than passing silently.
+    expect(css).toContain('z-index: 95 !important;');
+    const idx = css.indexOf('body.mobile-touch.game-active.touch-item-dragging #mobile-controls');
+    expect(idx).toBeGreaterThan(-1);
+    const rule = css.slice(idx, css.indexOf('}', idx));
+    expect(rule).toContain('z-index: 96;');
   });
 });
