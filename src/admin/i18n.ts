@@ -226,6 +226,12 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'unknown tool effect id': 'error.unknownToolEffect',
   'the character owns no tool for that profession': 'error.restoreNoTool',
   'that profession already has a slotted effect': 'error.restoreAlreadySlotted',
+  // Pre-existing prose the phase 15 scan guard surfaced as unmatched.
+  'an overrides object is required': 'error.antibotOverridesRequired',
+  asset_not_found: 'error.assetNotFound',
+  map_not_found: 'error.mapNotFound',
+  'internal error': 'error.internal',
+  'unknown admin endpoint': 'error.unknownEndpoint',
   'that effect cannot be slotted on that profession': 'error.restoreBadPair',
   'character went offline before the restore landed': 'error.restoreWentOffline',
   'item restore failed': 'error.restoreItemFailed',

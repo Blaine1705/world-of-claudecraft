@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   restoreItemBodyError,
@@ -87,6 +90,28 @@ describe('server prose coupling (the count clamp and the error reverse map)', ()
     // Three copies of the clamp exist (server validator, client mirror, the
     // matcher key below); this pin makes a move in one drag the others.
     expect(RESTORE_ITEM_MAX_COUNT).toBe(SERVER_RESTORE_ITEM_MAX_COUNT);
+  });
+
+  it('reverse-maps EVERY fail() prose in server/admin.ts to a real catalog key', () => {
+    // The scan arm: a future handler error string cannot ship unmatched.
+    // Dynamic strings (err.message passthroughs, template literals) are not
+    // literals and are covered by the fixture-driven arm below.
+    const source = fs.readFileSync(
+      path.join(fileURLToPath(new URL('../..', import.meta.url)), 'server/admin.ts'),
+      'utf8',
+    );
+    // 401s are excluded: handleAuthFailure logs the operator out on a 401,
+    // so that prose never renders inline through localizeAdminError.
+    const literals = [...source.matchAll(/fail\((?:ctx\.)?res, (\d+), '([^']+)'\)/g)]
+      .filter((m) => m[1] !== '401')
+      .map((m) => m[2]);
+    expect(literals.length).toBeGreaterThan(10); // the scan itself must be alive
+    for (const prose of literals) {
+      expect(
+        ADMIN_ERROR_KEYS[prose.toLowerCase()],
+        `unmatched admin error prose in server/admin.ts: ${prose}`,
+      ).toBeTruthy();
+    }
   });
 
   it('reverse-maps every R35 server error prose to a real catalog key', () => {

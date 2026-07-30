@@ -68,7 +68,8 @@ export function isPubliclyListableDeedId(id: string): boolean {
   return def !== undefined && def.hidden !== true;
 }
 
-/** The first-koi deed (col_glimmerfin, "Catch a Sunglint Koi"): the one
+/** The first-koi deed (col_glimmerfin, "Glimmer of Hope", desc "Catch a
+ *  Sunglint Koi"; the NAME is what ships as the card's deedName): the one
  *  feed-worthy deed with no title reward; its Discord card reads as a catch. */
 export const FIRST_KOI_DEED_ID = 'col_glimmerfin';
 

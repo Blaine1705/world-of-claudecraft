@@ -583,8 +583,9 @@ export function vcNationLabel(id: string): string {
   return VC_NATION_LABELS[id as VcNationId] ?? id;
 }
 
-// The first-koi deed (col_glimmerfin, "Catch a Sunglint Koi"): the one
-// feed-visible deed whose card reads as a catch rather than a deed record.
+// The first-koi deed (col_glimmerfin, "Glimmer of Hope"; the deed NAME is
+// what arrives as deedName): the one feed-visible deed whose card reads as a
+// catch rather than a deed record.
 export const FIRST_KOI_DEED_ID = 'col_glimmerfin';
 
 // Per-quality embed accent for a rare drop (epic purple, legendary orange).

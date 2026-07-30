@@ -6,7 +6,7 @@
   import { fmtDate, fmtDecimal, fmtDuration, fmtNumber } from '../format';
   import { classLabel, localizeAdminError, t, zoneLabel } from '../i18n';
   import type { Built, PendingAction } from '../moderation_actions';
-  import { restoreItem, restoreSlot } from '../professions_restore';
+  import { RESTORE_ITEM_MAX_COUNT, restoreItem, restoreSlot } from '../professions_restore';
   import ModalDialog from './ModalDialog.svelte';
   import ModerationActionPrompt from './ModerationActionPrompt.svelte';
 
@@ -84,11 +84,32 @@
     }
   }
 
+  // Validate BEFORE the prompt opens, so the confirm dialog never shows an
+  // impossible request (an empty id, or "xnull" from a cleared number field)
+  // that the builder would refuse only after the operator confirms.
+  function openItemPrompt(): void {
+    if (!itemId.trim()) return window.alert(t('alert.itemIdRequired'));
+    if (!Number.isInteger(count) || count < 1 || count > RESTORE_ITEM_MAX_COUNT) {
+      return window.alert(t('alert.restoreCountRange'));
+    }
+    restoreKind = 'item';
+  }
+
+  function openSlotPrompt(): void {
+    if (!professionId || !effectId) return window.alert(t('alert.restoreSlotSelection'));
+    restoreKind = 'slot';
+  }
+
   function archetypeLine(sheetData: CharacterProfessionsSheet): string {
     const a = sheetData.archetype;
     if (!a.activeArchetype) return t('profInspect.archetypeNone');
+    // A legacy single-craft save can carry a null pairedMajor: no dangling
+    // separator for exactly the blobs this inspector exists to read.
+    const majors = a.pairedMajor
+      ? `${a.activeArchetype} + ${a.pairedMajor}`
+      : a.activeArchetype;
     return t('profInspect.archetypeLine', {
-      majors: `${a.activeArchetype} + ${a.pairedMajor ?? ''}`,
+      majors,
       hobby: a.hobbyCraft ?? t('common.emptyValue'),
     });
   }
@@ -226,13 +247,13 @@
           <div class="controls">
             <label>
               <span>{t('profInspect.itemIdLabel')}</span>
-              <input bind:value={itemId} placeholder="copper_mining_pick" />
+              <input bind:value={itemId} placeholder={t('profInspect.itemIdPlaceholder')} />
             </label>
             <label>
               <span>{t('profInspect.countLabel')}</span>
               <input type="number" min="1" max="20" bind:value={count} />
             </label>
-            <button class="btn-sm" onclick={() => (restoreKind = 'item')}>
+            <button class="btn-sm" onclick={openItemPrompt}>
               {t('profInspect.restoreItemButton')}
             </button>
           </div>
@@ -255,7 +276,7 @@
                 {/each}
               </select>
             </label>
-            <button class="btn-sm" onclick={() => (restoreKind = 'slot')}>
+            <button class="btn-sm" onclick={openSlotPrompt}>
               {t('profInspect.restoreSlotButton')}
             </button>
           </div>

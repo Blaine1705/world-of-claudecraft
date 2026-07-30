@@ -134,7 +134,7 @@ describe('CharacterProfessionsModal', () => {
       props: { characterId: 7, characterName: 'Merlin', onClose: () => {} },
     });
     await screen.findByText('ore_eastbrook_1');
-    const itemInput = screen.getByPlaceholderText('copper_mining_pick');
+    const itemInput = screen.getByPlaceholderText(t('profInspect.itemIdPlaceholder'));
     await fireEvent.input(itemInput, { target: { value: 'wolf_fang' } });
     await fireEvent.click(screen.getByRole('button', { name: t('profInspect.restoreItemButton') }));
     const reason = screen.getByPlaceholderText(t('detail.notePlaceholder'));
