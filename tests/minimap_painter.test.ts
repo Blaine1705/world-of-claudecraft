@@ -91,6 +91,21 @@ describe('minimap_painter: no magic values (canvas sub-rule)', () => {
 });
 
 describe('minimap_painter: cached background + ~10Hz cadence preserved', () => {
+  it('a locked node carries the non-hue strike on both respawn silhouettes', () => {
+    // DESIGN.md color independence: the lock state must never ride tint
+    // alone. The strike sits AFTER the ready/else fill split, gated on the
+    // lock alone, so both silhouettes carry it.
+    const nodeCase = sliceFrom(code, "case 'gather-node'", 'break;');
+    const strikeAt = nodeCase.indexOf('if (m.locked)');
+    expect(strikeAt).toBeGreaterThan(-1);
+    const strike = nodeCase.slice(strikeAt);
+    expect(strike).toContain('moveTo');
+    expect(strike).toContain('lineTo');
+    // Reachable from BOTH branches: the cooldown fill precedes it.
+    expect(nodeCase.indexOf('gatherCooldown')).toBeLessThan(strikeAt);
+    expect(nodeCase.indexOf('gatherReady')).toBeLessThan(strikeAt);
+  });
+
   it('blits the Hud-owned cached terrain background rather than rebuilding it', () => {
     // The painter receives the cached bg and only drawImages it (no terrain build).
     expect(code).toContain('ctx.drawImage(');

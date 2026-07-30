@@ -545,27 +545,43 @@ export class MinimapPainter {
           ctx.fill();
           ctx.stroke();
           break;
-        case 'gather-node':
+        case 'gather-node': {
           // Tool-tier lock (Professions 2.0) composes with the
           // respawn state: a locked node keeps the ready/cooldown silhouette
           // (radius + outline) but the locked tint replaces the state color,
           // so both dimensions stay readable at once. Actionable info on
           // every graphics tier (fairness invariant: never preset-gated).
+          const radius = m.ready ? GATHER_NODE_READY_RADIUS : GATHER_NODE_COOLDOWN_RADIUS;
           if (m.ready) {
             ctx.fillStyle = m.locked ? colors.gatherLocked : colors.gatherReady;
             ctx.strokeStyle = colors.outline;
             ctx.lineWidth = MARKER_OUTLINE_WIDTH;
             ctx.beginPath();
-            ctx.arc(m.mx, m.my, GATHER_NODE_READY_RADIUS, 0, FULL_CIRCLE);
+            ctx.arc(m.mx, m.my, radius, 0, FULL_CIRCLE);
             ctx.fill();
             ctx.stroke();
           } else {
             ctx.fillStyle = m.locked ? colors.gatherLocked : colors.gatherCooldown;
             ctx.beginPath();
-            ctx.arc(m.mx, m.my, GATHER_NODE_COOLDOWN_RADIUS, 0, FULL_CIRCLE);
+            ctx.arc(m.mx, m.my, radius, 0, FULL_CIRCLE);
             ctx.fill();
           }
+          // The non-hue lock cue (the UX pass, DESIGN.md color independence:
+          // every state pairs color with a second signal): a locked node
+          // carries a diagonal strike through its disc on BOTH respawn
+          // silhouettes, so the lock never rides tint alone. Outline-colored,
+          // so it reads on either fill at every marker size.
+          if (m.locked) {
+            const reach = radius + 1.5;
+            ctx.strokeStyle = colors.outline;
+            ctx.lineWidth = MARKER_OUTLINE_WIDTH;
+            ctx.beginPath();
+            ctx.moveTo(m.mx - reach, m.my + reach);
+            ctx.lineTo(m.mx + reach, m.my - reach);
+            ctx.stroke();
+          }
           break;
+        }
       }
     }
   }
