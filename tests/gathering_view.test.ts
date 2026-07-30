@@ -33,6 +33,11 @@ function makeWorld(opts: {
   harvestable?: (nodeId: string) => boolean;
   proficiency?: Record<string, number>;
   inventory?: InvSlot[];
+  /** The R40 deny-mirror states (gatherEffectPrompt); default all clear. */
+  dead?: boolean;
+  inCombat?: boolean;
+  castingAbility?: string | null;
+  auras?: { kind: string }[];
   /** The countdown read (IWorldProfessions nodeRespawnSeconds); defaults to
    *  the null answer both worlds give for a ready node. */
   respawnSeconds?: (nodeId: string) => number | null;
@@ -49,7 +54,20 @@ function makeWorld(opts: {
 }): IWorld {
   const proficiency = opts.proficiency ?? {};
   return {
-    player: { pos: opts.pos ?? { x: NODE.pos.x, z: NODE.pos.z } },
+    // The full deny-relevant Entity surface the R40 prompt mirror reads
+    // (dead, combat, busy, consuming, shapeshift): a partial stub here
+    // would read as "consuming" through isConsuming's null contract and
+    // silently suppress every ask.
+    player: {
+      pos: opts.pos ?? { x: NODE.pos.x, z: NODE.pos.z },
+      dead: opts.dead ?? false,
+      inCombat: opts.inCombat ?? false,
+      castingAbility: opts.castingAbility ?? null,
+      eating: null,
+      drinking: null,
+      auras: opts.auras ?? [],
+    },
+    bags: [null, null, null, null],
     // buildNearbyGatherNodes resolves the locked dimension from the
     // viewer's bags; an empty bag reads as no tool owned at all (#2343:
     // bare hands never gather, so every node locks without its tool).
@@ -349,6 +367,96 @@ describe('tool-tier lock dimension', () => {
     // No slot, and an unknown node id: never ask.
     expect(gatherEffectPrompt(makeWorld({ inventory: T1_PICK }), NODE.id)).toBeNull();
     expect(gatherEffectPrompt(slotted(), 'no_such_node')).toBeNull();
+  });
+
+  it('gatherEffectPrompt never asks about a use that cannot matter (tool past the rung)', () => {
+    // The grant's `mattered` predicate, mirrored (the phase 14 QA finding):
+    // a wieldable tier-2 pick already mints NODE's fine grade unassisted,
+    // so a prompt-mode quality charm changes nothing, spends nothing, and
+    // must not pop a dialog on every single harvest.
+    const world = makeWorld({
+      inventory: PICK,
+      proficiency: MINING_40,
+      toolEffectSlots: [
+        {
+          professionId: 'mining',
+          effectId: 'artisans_eye',
+          charges: 5,
+          maxCharges: 30,
+          confirmMode: 'prompt',
+        },
+      ],
+    });
+    expect(gatherEffectPrompt(world, NODE.id)).toBeNull();
+    // A quantity effect on the same over-tiered tool still matters (more
+    // units is more units), so it still asks.
+    const qty = makeWorld({
+      inventory: PICK,
+      proficiency: MINING_40,
+      toolEffectSlots: [
+        {
+          professionId: 'mining',
+          effectId: 'gatherers_cache',
+          charges: 5,
+          maxCharges: 20,
+          confirmMode: 'prompt',
+        },
+      ],
+    });
+    expect(gatherEffectPrompt(qty, NODE.id)).toEqual({
+      effectId: 'gatherers_cache',
+      charges: 5,
+    });
+  });
+
+  it('gatherEffectPrompt mirrors the locally knowable deny arms and the capacity gate', () => {
+    const slotted = (
+      over: Partial<{
+        dead: boolean;
+        inCombat: boolean;
+        castingAbility: string | null;
+        auras: { kind: string }[];
+        inventory: InvSlot[];
+      }> = {},
+    ) =>
+      makeWorld({
+        inventory: over.inventory ?? T1_PICK,
+        dead: over.dead,
+        inCombat: over.inCombat,
+        castingAbility: over.castingAbility,
+        auras: over.auras,
+        toolEffectSlots: [
+          {
+            professionId: 'mining',
+            effectId: 'artisans_eye',
+            charges: 5,
+            maxCharges: 30,
+            confirmMode: 'prompt',
+          },
+        ],
+      });
+    // The control: all states clear, the ask fires.
+    expect(gatherEffectPrompt(slotted(), NODE.id)).not.toBeNull();
+    // Each deny state, one at a time: a harvest the sim will refuse (dead,
+    // combat, busy, action-locked form) never pops the dialog first.
+    expect(gatherEffectPrompt(slotted({ dead: true }), NODE.id)).toBeNull();
+    expect(gatherEffectPrompt(slotted({ inCombat: true }), NODE.id)).toBeNull();
+    expect(gatherEffectPrompt(slotted({ castingAbility: 'fireball' }), NODE.id)).toBeNull();
+    expect(gatherEffectPrompt(slotted({ auras: [{ kind: 'form_bear' }] }), NODE.id)).toBeNull();
+    // A NON-locking aura does not suppress (the mirror keys on the sim's
+    // own action-locked set, not "any aura").
+    expect(
+      gatherEffectPrompt(slotted({ auras: [{ kind: 'regrowth_hot' }] }), NODE.id),
+    ).not.toBeNull();
+    // The capacity mirror: with no room for the CONFIRMED (fine) grade, a
+    // confirmed use would be refused at the cast-start pre-gate, so the
+    // dialog never asks; the plain harvest command still goes out.
+    const full = [
+      ...T1_PICK,
+      ...Array.from({ length: 15 }, (_, i) => ({ itemId: `filler_${i}`, count: 1 })),
+    ];
+    expect(full).toHaveLength(16);
+    expect(gatherEffectPrompt(slotted({ inventory: full }), NODE.id)).toBeNull();
   });
 
   it('a usable quality effect lifts the preview, a spent one does not (adapter durability mapping)', () => {

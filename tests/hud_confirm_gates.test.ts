@@ -272,4 +272,24 @@ describe('confirmDialog no-choice callback (the R40 family contract)', () => {
     hud.closeManagedWindow(second);
     expect(replaced).toHaveBeenCalledTimes(1);
   });
+
+  it('fires when the INPUT modal takes the shared slot (the fourth no-choice route)', () => {
+    // inputDialog shares the #confirm-dialog element, so a rename prompt
+    // (or any input modal) replacing an open R40 ask is a dismissal without
+    // a choice: the pending callback must answer before the modal takes it.
+    document.body.innerHTML = '';
+    const hud = realDialogHud();
+    const replaced = vi.fn();
+    hud.confirmDialog('T', 'B', 'OK', 'Cancel', vi.fn(), replaced);
+    (hud as unknown as { inputDialog: (opts: { title: string }) => void }).inputDialog({
+      title: 'Rename',
+    });
+    expect(replaced).toHaveBeenCalledTimes(1);
+    // The input modal itself carries no confirm callback: closing it fires
+    // nothing more.
+    const el = document.getElementById('confirm-dialog');
+    if (!el) throw new Error('input modal not painted');
+    hud.closeManagedWindow(el);
+    expect(replaced).toHaveBeenCalledTimes(1);
+  });
 });

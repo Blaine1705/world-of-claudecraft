@@ -1,5 +1,9 @@
-import { describe, expect, it } from 'vitest';
-import { decideGatherNodeAction, handleGatherNodeInteract } from '../src/game/gather_node_interact';
+import { afterEach, describe, expect, it } from 'vitest';
+import {
+  decideGatherNodeAction,
+  handleGatherNodeInteract,
+  resetGatherEffectConfirmLatch,
+} from '../src/game/gather_node_interact';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { nodeMaterialFor } from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
@@ -216,6 +220,10 @@ describe('handleGatherNodeInteract', () => {
   });
 
   describe('the R40 effect-confirm gate', () => {
+    // A case that abandons an open ask (never calls proceed) must not leak
+    // its latch into the next case; a live dismissal always answers.
+    afterEach(() => resetGatherEffectConfirmLatch());
+
     function confirmWorld() {
       const calls: { nodeId: string; confirm: boolean | undefined }[] = [];
       return {
@@ -262,6 +270,55 @@ describe('handleGatherNodeInteract', () => {
         expect(calls).toEqual([{ nodeId: 'node_a', confirm: answer }]);
         expect(errors).toEqual([]);
       }
+    });
+
+    it('a repeat press while the ask is open is swallowed: no re-ask, no self-decline', () => {
+      // The phase 14 QA finding: the confirm family's replacement contract
+      // answers the OPEN dialog's no-choice callback first, so a re-ask on
+      // a second interact press would self-decline the pending question,
+      // start the cast unconfirmed, and land the player's real answer on
+      // the busy gate. The latch swallows the repeat press instead.
+      const { world, calls } = confirmWorld();
+      const { hud, errors } = fakeHud();
+      let asks = 0;
+      const pending: { proceed?: (confirmed: boolean) => void } = {};
+      const gate = {
+        needed: () => ({ effectId: 'artisans_eye', charges: 3 }),
+        ask: (
+          _prompt: { effectId: string; charges: number },
+          proceed: (confirmed: boolean) => void,
+        ) => {
+          asks++;
+          pending.proceed = proceed;
+        },
+      };
+      const press = () =>
+        handleGatherNodeInteract(
+          world,
+          hud,
+          { x: 0, y: 0, z: 0 },
+          'node_a',
+          nodePos,
+          tooFarText,
+          notReadyText,
+          undefined,
+          gate,
+        );
+      expect(press()).toBe(true);
+      expect(asks).toBe(1);
+      // Repeat presses with the dialog open: swallowed whole, still a
+      // successful interaction (the dialog IS the live interaction).
+      expect(press()).toBe(true);
+      expect(press()).toBe(true);
+      expect(asks).toBe(1);
+      expect(calls).toEqual([]);
+      // The answer clears the latch: the harvest sends exactly once, and a
+      // NEW press may ask again.
+      pending.proceed?.(true);
+      expect(calls).toEqual([{ nodeId: 'node_a', confirm: true }]);
+      expect(press()).toBe(true);
+      expect(asks).toBe(2);
+      expect(errors).toEqual([]);
     });
 
     it('a null needed answer sends the plain pre-flow command, no dialog', () => {

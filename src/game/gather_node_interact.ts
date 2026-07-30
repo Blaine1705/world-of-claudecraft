@@ -116,13 +116,36 @@ export function handleGatherNodeInteract(
   // success for the autorun-stop contract (#1982). The server re-validates
   // everything regardless: a stale prompt still lands as a plain harvest.
   if (effectConfirm) {
+    // The re-press latch (the phase 14 QA finding): with an ask already on
+    // screen, a repeat interact press must NOT re-ask. The confirm family's
+    // replacement contract answers the OPEN dialog's no-choice callback
+    // before wiring a new one, so a re-ask would self-decline the pending
+    // question, start the cast unconfirmed, and land the player's real
+    // answer on the busy gate. The dialog IS the live interaction, so the
+    // press is swallowed as a success; the exactly-once answer contract
+    // (every dismissal path fires `proceed`) is what clears the latch.
+    if (pendingConfirmNodeId !== null) return true;
     const prompt = effectConfirm.needed(nodeId);
     if (prompt !== null) {
+      pendingConfirmNodeId = nodeId;
       effectConfirm.ask(prompt, (confirmed) => {
+        pendingConfirmNodeId = null;
         void world.harvestNode(nodeId, confirmed);
       });
       return true;
     }
   }
   return world.harvestNode(nodeId);
+}
+
+// The open ask's node id, or null. Module state rather than a parameter:
+// there is exactly one local player and one confirm-dialog slot, and every
+// dismissal path answers (the confirm family contract), so the latch always
+// clears with the dialog.
+let pendingConfirmNodeId: string | null = null;
+
+/** Test seam: clear the re-press latch between cases that abandon an ask
+ *  without answering it (a live dismissal always answers). */
+export function resetGatherEffectConfirmLatch(): void {
+  pendingConfirmNodeId = null;
 }

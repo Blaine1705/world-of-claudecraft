@@ -16,6 +16,8 @@
 // for a node is independent. This core never assumes otherwise: it always
 // re-resolves through the passed-in `world`, never caches across callers.
 
+import { bagCapacity, countFit } from '../sim/bags';
+import { isActionLockingFormAuraKind } from '../sim/combat/forms';
 import {
   GATHERING_PROFESSION_IDS,
   GATHERING_PROFESSIONS,
@@ -37,7 +39,7 @@ import {
   bestWieldableGatherToolTierOrNone,
   minWieldRequirementToWork,
 } from '../sim/professions/wield_gate';
-import type { GatherNodeDef } from '../sim/types';
+import { type GatherNodeDef, isConsuming } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { TranslationKey } from './i18n.catalog';
 
@@ -193,10 +195,21 @@ function gradeReadMetaFor(world: IWorld): GradeReadMeta {
 /** The R40 pre-harvest question, resolved for one node: non-null exactly when
  *  the viewer's slot for this node's profession is 'prompt'-mode AND a
  *  confirmed harvest would actually fire the effect (charges live, the R9
- *  suppression honored, through the sim's own applyToolEffectUse), so the
- *  dialog can never ask about a use that would not happen. Null means send
- *  the harvest plain: no slot, 'always' mode, spent, suppressed, or an
- *  unknown node id. */
+ *  suppression honored, through the sim's own applyToolEffectUse) AND the
+ *  fire would MATTER (the grant's `mattered` predicate, mirrored: a quality
+ *  effect on a tool already past the material's rung upgrades nothing and
+ *  spends nothing, so it never asks) AND no locally knowable deny arm would
+ *  refuse the harvest or the confirmed use. Null means send the harvest
+ *  plain: no slot, 'always' mode, spent, suppressed, pointless, denied, or
+ *  an unknown node id.
+ *
+ *  The deny mirror covers the sim arms the Entity mirror carries exactly
+ *  (dead, in combat, busy casting or consuming, action-locked shapeshift)
+ *  plus the confirmed-grade capacity read through the sim's own countFit;
+ *  the swimming arm stays server-side (isSwimming is a SimContext
+ *  position derivation, and a wrong local guess here would silently skip a
+ *  legal use, the harmful direction). A denied state falls through to the
+ *  plain harvest command and the server's own toast. */
 export function gatherEffectPrompt(
   world: IWorld,
   nodeId: string,
@@ -207,12 +220,29 @@ export function gatherEffectPrompt(
   const meta = gradeReadMetaFor(world);
   const slot = meta.toolEffectSlots?.[professionId];
   if (!slot || slot.confirmMode !== 'prompt') return null;
-  const wouldFire = applyToolEffectUse(
+  const p = world.player;
+  if (p.dead || p.inCombat || p.castingAbility || isConsuming(p)) return null;
+  if (p.auras.some((a) => isActionLockingFormAuraKind(a.kind))) return null;
+  const fired = applyToolEffectUse(
     usableToolEffectSlot(meta, professionId, node),
     { quantity: 0, gradeToolTier: 0 },
     true,
-  ).applied;
-  return wouldFire ? { effectId: slot.effectId, charges: slot.durability } : null;
+  );
+  if (!fired.applied) return null;
+  // The mattered mirror: a quantity effect always adds units; a quality
+  // effect matters only when the assisted and unassisted grade resolutions
+  // mint DIFFERENT ids (both through the grant's own readers, so the ask
+  // and the spend share one definition).
+  const assisted = effectiveGradeToolTier(meta, professionId, node, true);
+  const unassisted = effectiveGradeToolTier(meta, professionId, node, false);
+  const assistedYield = harvestYieldItemIdFor(node, assisted);
+  const qtyChanges = fired.outcome.quantity > 0;
+  if (!qtyChanges && assistedYield === harvestYieldItemIdFor(node, unassisted)) return null;
+  // The confirmed-grade capacity mirror of the cast-start pre-gate: a
+  // confirmed use the sim would refuse "Your bags are full." is a use that
+  // will not happen, so it is never asked about.
+  if (countFit(world.inventory, bagCapacity(world.bags), assistedYield, 1) < 1) return null;
+  return { effectId: slot.effectId, charges: slot.durability };
 }
 
 export function buildGatherNodeTooltip(

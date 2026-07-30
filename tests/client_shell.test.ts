@@ -2078,6 +2078,12 @@ describe('client HTML shell', () => {
       'stopAutorunForInteraction(interactionOutcome, input, mobileControls);',
     );
     expect(mainTs).toContain('stopAutorunForInteraction(\n          handleGatherNodeInteract(');
+    // The R40 gate rides the CLICK dispatch too (the phase 14 QA found only
+    // the interact-key site pinned): the world-click harvest passes the same
+    // confirm gate, trailing the tool gate.
+    expect(mainTs).toContain(
+      'gatherNodeToolGateFor(world, node),\n            gatherEffectConfirm,\n          ),',
+    );
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-utility-cluster');
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-autorun {');
     // The cast bar sits at the classic centre seat above the bottom-centre
