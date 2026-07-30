@@ -3,6 +3,10 @@ import { NATIVE_APP } from '../client_origin';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
 import { applyGfxOverridesFromSearch } from './gfx_override_core';
+import {
+  installPbrPointLightShaderPruning,
+  patchPbrRimGlowFragmentShader,
+} from './pbr_fragment_shader';
 import { isSoftwareRendererName } from './software_renderer';
 
 // Quality tiers: every tier-dependent knob keys off this module instead of
@@ -1393,6 +1397,10 @@ export function gfxSoftwareRendering(): boolean {
 export let GFX: GfxSettings = settingsFor(tierFromHints(runtimeHints(), false), runtimeHints());
 
 export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
+  // Install before any scene material compiles. The fixed point-light budget
+  // keeps program counts stable with zero-intensity slots; the shader guard
+  // makes those stable slots cheap without changing their permutation.
+  installPbrPointLightShaderPruning();
   const hints = { ...runtimeHints(), gpuRenderer: rendererName(webgl) };
   softwareGlDetected = isSoftwareGL(webgl);
   const tier = tierFromHints(hints, softwareGlDetected);
@@ -1467,22 +1475,25 @@ export interface SurfaceMatOpts {
 // Shared fresnel rim emissive for character rigs (high/ultra only; Lambert on
 // low has no per-fragment view vector worth paying for). uRimBoost lets the
 // renderer crank the rim inside dungeons.
+const rimGlowMaterials = new WeakSet<THREE.Material>();
+
 export function addRimGlow(mat: THREE.Material): void {
-  mat.onBeforeCompile = (sh) => {
+  if (!(mat as THREE.MeshStandardMaterial).isMeshStandardMaterial || rimGlowMaterials.has(mat)) {
+    return;
+  }
+  rimGlowMaterials.add(mat);
+  const previousCompile = mat.onBeforeCompile;
+  const previousCompileSource = previousCompile.toString();
+  const previousProgramKey = mat.customProgramCacheKey.bind(mat);
+  mat.onBeforeCompile = (sh, renderer) => {
+    previousCompile.call(mat, sh, renderer);
+    const patched = patchPbrRimGlowFragmentShader(sh.fragmentShader);
+    if (patched === sh.fragmentShader) return;
     sh.uniforms.uRimBoost = sharedUniforms.uRimBoost;
-    sh.fragmentShader = sh.fragmentShader
-      .replace(
-        '#include <common>',
-        `#include <common>
-      uniform float uRimBoost;`,
-      )
-      .replace(
-        '#include <emissivemap_fragment>',
-        `#include <emissivemap_fragment>
-      totalEmissiveRadiance += vec3(0.5, 0.6, 0.8) * 0.12 * uRimBoost *
-        pow(1.0 - saturate(dot(normal, normalize(vViewPosition))), 3.0);`,
-      );
+    sh.fragmentShader = patched;
   };
+  mat.customProgramCacheKey = () =>
+    `pbr-rim-reuse|${previousCompileSource}|${previousProgramKey()}`;
 }
 
 // Material factory: dedupes by (color|maps|flags) so hundreds of small box
