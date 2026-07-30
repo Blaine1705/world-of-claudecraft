@@ -219,7 +219,11 @@ describe('Eastbrook civic beacon shader animation', () => {
     const mask = micro.geometry.getAttribute(EASTBROOK_CIVIC_MASK_ATTRIBUTE);
     const bytes = mask.array as Uint8Array;
     const selectedCount = bytes.reduce((sum, value) => sum + (value === 255 ? 1 : 0), 0);
-    const civicTemplateVertexCount = 36;
+    // The merge preserves exact full-tuple indices instead of de-indexing, so
+    // the box fixture contributes its 24 UNIQUE vertices (4 per face, since the
+    // per-face normals differ) rather than the 36 it expands to when every
+    // triangle carries its own copy. Same rendered geometry, fewer vertices.
+    const civicTemplateVertexCount = 24;
 
     expect(mask.normalized).toBe(true);
     expect(mask.count).toBe(micro.geometry.getAttribute('position').count);
