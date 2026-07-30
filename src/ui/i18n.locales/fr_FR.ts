@@ -8797,6 +8797,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Ce lien de réinitialisation est invalide ou a expiré. Demandez-en un nouveau.',
   'apiError.deeds.invalid_input': 'Saisie invalide.',
+  'apiError.ota_updates.invalid_input': 'Saisie invalide.',
   'apiError.steam.account_taken': 'Ce compte Steam est déjà lié à un autre compte.',
   'apiError.steam.already_linked': 'Votre compte est déjà lié à un compte Steam.',
   'apiError.steam.banned': 'Ce compte Steam ne peut pas être lié.',

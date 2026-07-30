@@ -7961,6 +7961,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Den här återställningslänken är ogiltig eller har gått ut. Begär en ny.',
   'apiError.deeds.invalid_input': 'Ogiltig indata.',
+  'apiError.ota_updates.invalid_input': 'Ogiltig indata.',
   'apiError.steam.account_taken': 'Det Steam-kontot är redan länkat till ett annat konto.',
   'apiError.steam.already_linked': 'Ditt konto har redan ett länkat Steam-konto.',
   'apiError.steam.banned': 'Det Steam-kontot kan inte länkas.',

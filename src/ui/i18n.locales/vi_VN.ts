@@ -8746,6 +8746,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Liên kết đặt lại này không hợp lệ hoặc đã hết hạn. Hãy yêu cầu liên kết mới.',
   'apiError.deeds.invalid_input': 'Dữ liệu nhập không hợp lệ.',
+  'apiError.ota_updates.invalid_input': 'Dữ liệu nhập không hợp lệ.',
   'apiError.steam.account_taken': 'Tài khoản Steam đó đã được liên kết với một tài khoản khác.',
   'apiError.steam.already_linked': 'Tài khoản của bạn đã liên kết với một tài khoản Steam.',
   'apiError.steam.banned': 'Không thể liên kết tài khoản Steam đó.',

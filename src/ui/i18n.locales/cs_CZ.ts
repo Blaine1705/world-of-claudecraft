@@ -8755,6 +8755,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Tento odkaz pro obnovení je neplatný nebo vypršel. Požádejte o nový.',
   'apiError.deeds.invalid_input': 'Neplatný vstup.',
+  'apiError.ota_updates.invalid_input': 'Neplatný vstup.',
   'apiError.steam.account_taken': 'Tento účet Steam už je propojený s jiným účtem.',
   'apiError.steam.already_linked': 'Tvůj účet už má propojený účet Steam.',
   'apiError.steam.banned': 'Tento účet Steam nelze propojit.',

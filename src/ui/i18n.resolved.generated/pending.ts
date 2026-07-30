@@ -9,55 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "apiError.ota_updates.invalid_input"
-  ],
-  "es_ES": [
-    "apiError.ota_updates.invalid_input"
-  ],
-  "fr_FR": [
-    "apiError.ota_updates.invalid_input"
-  ],
-  "fr_CA": [
-    "apiError.ota_updates.invalid_input"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "apiError.ota_updates.invalid_input"
-  ],
-  "de_DE": [
-    "apiError.ota_updates.invalid_input"
-  ],
+  "it_IT": [],
+  "de_DE": [],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [
-    "apiError.ota_updates.invalid_input"
-  ],
+  "pt_BR": [],
   "ru_RU": [],
-  "cs_CZ": [
-    "apiError.ota_updates.invalid_input"
-  ],
-  "nl_NL": [
-    "apiError.ota_updates.invalid_input"
-  ],
-  "pl_PL": [
-    "apiError.ota_updates.invalid_input"
-  ],
-  "id_ID": [
-    "apiError.ota_updates.invalid_input"
-  ],
-  "tr_TR": [
-    "apiError.ota_updates.invalid_input"
-  ],
-  "sv_SE": [
-    "apiError.ota_updates.invalid_input"
-  ],
-  "vi_VN": [
-    "apiError.ota_updates.invalid_input"
-  ],
-  "da_DK": [
-    "apiError.ota_updates.invalid_input"
-  ]
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

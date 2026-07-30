@@ -8184,6 +8184,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Ten link do resetowania jest nieprawidłowy lub wygasł. Poproś o nowy.',
   'apiError.deeds.invalid_input': 'Nieprawidłowe dane.',
+  'apiError.ota_updates.invalid_input': 'Nieprawidłowe dane.',
   'apiError.steam.account_taken': 'To konto Steam jest już połączone z innym kontem.',
   'apiError.steam.already_linked': 'Twoje konto ma już połączone konto Steam.',
   'apiError.steam.banned': 'Tego konta Steam nie można połączyć.',

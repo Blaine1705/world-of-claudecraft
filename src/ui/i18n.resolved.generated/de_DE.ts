@@ -2930,7 +2930,7 @@ export const de_DE: EnTranslations = {
       "handoff_invalid": "Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut."
     },
     "ota_updates": {
-      "invalid_input": "Invalid input."
+      "invalid_input": "Ungültige Eingabe."
     }
   },
   "guide": {

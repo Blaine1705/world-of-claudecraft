@@ -8185,6 +8185,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Este link de redefinição é inválido ou expirou. Solicite um novo.',
   'apiError.deeds.invalid_input': 'Entrada inválida.',
+  'apiError.ota_updates.invalid_input': 'Entrada inválida.',
   'apiError.steam.account_taken': 'Essa conta Steam já está vinculada a outra conta.',
   'apiError.steam.already_linked': 'Sua conta já tem uma conta Steam vinculada.',
   'apiError.steam.banned': 'Essa conta Steam não pode ser vinculada.',

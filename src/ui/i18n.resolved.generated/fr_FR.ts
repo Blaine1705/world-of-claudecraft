@@ -2930,7 +2930,7 @@ export const fr_FR: EnTranslations = {
       "handoff_invalid": "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez."
     },
     "ota_updates": {
-      "invalid_input": "Invalid input."
+      "invalid_input": "Saisie invalide."
     }
   },
   "guide": {

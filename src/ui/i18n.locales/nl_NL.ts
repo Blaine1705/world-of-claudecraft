@@ -8126,6 +8126,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Deze herstellink is ongeldig of verlopen. Vraag een nieuwe aan.',
   'apiError.deeds.invalid_input': 'Ongeldige invoer.',
+  'apiError.ota_updates.invalid_input': 'Ongeldige invoer.',
   'apiError.steam.account_taken': 'Dat Steam-account is al aan een ander account gekoppeld.',
   'apiError.steam.already_linked': 'Je account heeft al een gekoppeld Steam-account.',
   'apiError.steam.banned': 'Dat Steam-account kan niet worden gekoppeld.',

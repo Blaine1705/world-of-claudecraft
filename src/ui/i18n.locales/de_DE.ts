@@ -7972,6 +7972,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Dieser Link zum Zurücksetzen ist ungültig oder abgelaufen. Fordere einen neuen an.',
   'apiError.deeds.invalid_input': 'Ungültige Eingabe.',
+  'apiError.ota_updates.invalid_input': 'Ungültige Eingabe.',
   'apiError.steam.account_taken':
     'Dieses Steam-Konto ist bereits mit einem anderen Konto verknüpft.',
   'apiError.steam.already_linked': 'Dein Konto ist bereits mit einem Steam-Konto verknüpft.',

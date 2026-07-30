@@ -2930,7 +2930,7 @@ export const da_DK: EnTranslations = {
       "handoff_invalid": "Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen."
     },
     "ota_updates": {
-      "invalid_input": "Invalid input."
+      "invalid_input": "Ugyldig indtastning."
     }
   },
   "guide": {

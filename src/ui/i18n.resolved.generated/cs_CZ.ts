@@ -2930,7 +2930,7 @@ export const cs_CZ: EnTranslations = {
       "handoff_invalid": "Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu."
     },
     "ota_updates": {
-      "invalid_input": "Invalid input."
+      "invalid_input": "Neplatný vstup."
     }
   },
   "guide": {

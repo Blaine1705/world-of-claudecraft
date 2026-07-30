@@ -2930,7 +2930,7 @@ export const es: EnTranslations = {
       "handoff_invalid": "La autorización de la cartera ha caducado o no se ha podido verificar. Inténtalo de nuevo."
     },
     "ota_updates": {
-      "invalid_input": "Invalid input."
+      "invalid_input": "Entrada no válida."
     }
   },
   "guide": {

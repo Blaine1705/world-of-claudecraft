@@ -2930,7 +2930,7 @@ export const vi_VN: EnTranslations = {
       "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại."
     },
     "ota_updates": {
-      "invalid_input": "Invalid input."
+      "invalid_input": "Dữ liệu nhập không hợp lệ."
     }
   },
   "guide": {

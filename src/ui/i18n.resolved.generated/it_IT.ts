@@ -2930,7 +2930,7 @@ export const it_IT: EnTranslations = {
       "handoff_invalid": "L'autorizzazione del portafoglio è scaduta o non ha potuto essere verificata. Riprova."
     },
     "ota_updates": {
-      "invalid_input": "Invalid input."
+      "invalid_input": "Dati non validi."
     }
   },
   "guide": {

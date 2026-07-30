@@ -8208,6 +8208,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Este enlace de restablecimiento no es válido o ha caducado. Solicita uno nuevo.',
   'apiError.deeds.invalid_input': 'Entrada no válida.',
+  'apiError.ota_updates.invalid_input': 'Entrada no válida.',
   'apiError.steam.account_taken': 'Esa cuenta de Steam ya está vinculada a otra cuenta.',
   'apiError.steam.already_linked': 'Tu cuenta ya tiene una cuenta de Steam vinculada.',
   'apiError.steam.banned': 'Esa cuenta de Steam no se puede vincular.',

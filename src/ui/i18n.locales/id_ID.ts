@@ -8799,6 +8799,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Tautan pengaturan ulang ini tidak valid atau sudah kedaluwarsa. Minta yang baru.',
   'apiError.deeds.invalid_input': 'Masukan tidak valid.',
+  'apiError.ota_updates.invalid_input': 'Masukan tidak valid.',
   'apiError.steam.account_taken': 'Akun Steam itu sudah tertaut ke akun lain.',
   'apiError.steam.already_linked': 'Akunmu sudah memiliki akun Steam yang tertaut.',
   'apiError.steam.banned': 'Akun Steam itu tidak dapat ditautkan.',

@@ -8027,6 +8027,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Dette nulstillingslink er ugyldigt eller udløbet. Anmod om et nyt.',
   'apiError.deeds.invalid_input': 'Ugyldig indtastning.',
+  'apiError.ota_updates.invalid_input': 'Ugyldig indtastning.',
   'apiError.steam.account_taken': 'Den Steam-konto er allerede knyttet til en anden konto.',
   'apiError.steam.already_linked': 'Din konto har allerede en tilknyttet Steam-konto.',
   'apiError.steam.banned': 'Den Steam-konto kan ikke tilknyttes.',

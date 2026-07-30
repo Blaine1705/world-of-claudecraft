@@ -2930,7 +2930,7 @@ export const pl_PL: EnTranslations = {
       "handoff_invalid": "Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie."
     },
     "ota_updates": {
-      "invalid_input": "Invalid input."
+      "invalid_input": "Nieprawidłowe dane."
     }
   },
   "guide": {

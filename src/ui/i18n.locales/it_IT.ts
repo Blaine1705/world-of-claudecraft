@@ -8344,6 +8344,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Questo link di reimpostazione non è valido o è scaduto. Richiedine uno nuovo.',
   'apiError.deeds.invalid_input': 'Dati non validi.',
+  'apiError.ota_updates.invalid_input': 'Dati non validi.',
   'apiError.steam.account_taken': "Quell'account Steam è già collegato a un altro account.",
   'apiError.steam.already_linked': 'Il tuo account ha già un account Steam collegato.',
   'apiError.steam.banned': "Quell'account Steam non può essere collegato.",

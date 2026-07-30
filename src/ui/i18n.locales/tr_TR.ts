@@ -8678,6 +8678,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Bu sıfırlama bağlantısı geçersiz veya süresi dolmuş. Yeni bir tane iste.',
   'apiError.deeds.invalid_input': 'Geçersiz girdi.',
+  'apiError.ota_updates.invalid_input': 'Geçersiz girdi.',
   'apiError.steam.account_taken': 'Bu Steam hesabı zaten başka bir hesaba bağlı.',
   'apiError.steam.already_linked': 'Hesabına zaten bağlı bir Steam hesabı var.',
   'apiError.steam.banned': 'Bu Steam hesabı bağlanamaz.',
