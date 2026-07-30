@@ -358,7 +358,8 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         // (the gather_rare_events.test.ts hunt idiom).
         purgeItem(hunt.itemId);
         delete meta.nodeHarvestReadyAt[hunt.nodeId];
-        if (!sim.harvestNode(hunt.nodeId, undefined, pid)) throw new Error(`${hunt.nodeId} cast denied`);
+        if (!sim.harvestNode(hunt.nodeId, undefined, pid))
+          throw new Error(`${hunt.nodeId} cast denied`);
         player.castingAbility = null;
         player.castRemaining = 0;
         sim.ctx.completeGatherCast(player, meta);

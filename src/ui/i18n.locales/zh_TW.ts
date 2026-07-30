@@ -9551,7 +9551,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectModeAsk': '每次使用前詢問',
   'hudChrome.professions.toolEffectModePrompt': '每次使用前會詢問',
   'hudChrome.professions.toolEffectConfirmTitle': '使用{effect}？',
-  'hudChrome.professions.toolEffectConfirmBody': '本次採集消耗 1 次充能（剩餘 {charges} 次）？拒絕後仍會採集，只是沒有加成。',
+  'hudChrome.professions.toolEffectConfirmBody':
+    '本次採集消耗 1 次充能（剩餘 {charges} 次）？拒絕後仍會採集，只是沒有加成。',
   'hudChrome.professions.toolEffectConfirmAccept': '消耗充能',
   'hudChrome.professions.toolEffectConfirmDecline': '直接採集',
   'hudChrome.professions.toolEffectCharges': '剩餘 {charges} / {max} 次',

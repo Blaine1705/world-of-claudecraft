@@ -10005,7 +10005,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectModeAsk': '사용할 때마다 확인',
   'hudChrome.professions.toolEffectModePrompt': '사용 시마다 확인함',
   'hudChrome.professions.toolEffectConfirmTitle': '{effect}을(를) 사용하시겠습니까?',
-  'hudChrome.professions.toolEffectConfirmBody': '이번 채집에 남은 {charges}회 중 1회를 소모하시겠습니까? 거절해도 채집은 진행되지만 보너스는 없습니다.',
+  'hudChrome.professions.toolEffectConfirmBody':
+    '이번 채집에 남은 {charges}회 중 1회를 소모하시겠습니까? 거절해도 채집은 진행되지만 보너스는 없습니다.',
   'hudChrome.professions.toolEffectConfirmAccept': '1회 사용',
   'hudChrome.professions.toolEffectConfirmDecline': '그냥 채집',
   'hudChrome.professions.toolEffectCharges': '{charges} / {max}회 남음',
