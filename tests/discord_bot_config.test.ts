@@ -1,0 +1,234 @@
+// Boot-time constants of the Discord bot: the env contract `loadConfig` reads
+// and the background-loop cadences. Both are pure value reads with no IO, so
+// they are testable in plain Node; the env arms mutate `process.env` and restore
+// it key by key so nothing leaks into another test file.
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { PRESENCE_DEBOUNCE_MS, RELAY_POLL_MS, ROLE_SYNC_INTERVAL_MS } from '../bot/cadence';
+import { loadConfig } from '../bot/config';
+
+// Every env key loadConfig reads. Each test starts from a clean slate of these,
+// so a value left by another test (or by the developer's own shell) can never
+// decide an arm.
+const BOT_ENV_KEYS = [
+  'DISCORD_BOT_TOKEN',
+  'DISCORD_CLIENT_ID',
+  'DISCORD_GUILD_ID',
+  'DISCORD_BOT_SECRET',
+  'GAME_SERVER_URL',
+  'PUBLIC_GAME_URL',
+  'DISCORD_VOICE_CHANNEL_ID',
+  'DISCORD_WELCOME_CHANNEL_ID',
+  'DISCORD_TEST_CHANNEL_ID',
+  'DISCORD_RELAY_CHANNEL_ID',
+  'DISCORD_ACTIVITY_CHANNEL_ID',
+  'DISCORD_DAILY_REWARDS_CHANNEL_ID',
+  'DISCORD_SYNC_NICKNAMES',
+] as const;
+
+/** Fill the four required keys with obvious non-secret placeholders. */
+function setRequired(): void {
+  process.env.DISCORD_BOT_TOKEN = 'token-placeholder';
+  process.env.DISCORD_CLIENT_ID = 'client-placeholder';
+  process.env.DISCORD_GUILD_ID = 'guild-placeholder';
+  process.env.DISCORD_BOT_SECRET = 'secret-placeholder';
+}
+
+let savedEnv: Record<string, string | undefined> = {};
+
+beforeEach(() => {
+  savedEnv = {};
+  for (const key of BOT_ENV_KEYS) {
+    savedEnv[key] = process.env[key];
+    delete process.env[key];
+  }
+});
+
+afterEach(() => {
+  for (const key of BOT_ENV_KEYS) {
+    const value = savedEnv[key];
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  }
+});
+
+describe('loadConfig required env', () => {
+  it('names the ONE missing key in the thrown message, for each of the four', () => {
+    // The four are evaluated in object-literal order, so each arm fills the
+    // other three and clears only its own key: an implementation that reported
+    // a fixed name (or the first key every time) fails here.
+    const cases = [
+      ['DISCORD_BOT_TOKEN', '[bot] missing required env DISCORD_BOT_TOKEN'],
+      ['DISCORD_CLIENT_ID', '[bot] missing required env DISCORD_CLIENT_ID'],
+      ['DISCORD_GUILD_ID', '[bot] missing required env DISCORD_GUILD_ID'],
+      ['DISCORD_BOT_SECRET', '[bot] missing required env DISCORD_BOT_SECRET'],
+    ] as const;
+    for (const [key, message] of cases) {
+      setRequired();
+      delete process.env[key];
+      expect(() => loadConfig()).toThrowError(new Error(message));
+    }
+  });
+
+  it('treats an EMPTY required value as missing (the !v guard, not a key check)', () => {
+    setRequired();
+    process.env.DISCORD_BOT_SECRET = '';
+    // The key IS present: only the falsy-value guard rejects this, which is what
+    // stops a blank line in a .env from booting a bot that cannot authenticate.
+    expect('DISCORD_BOT_SECRET' in process.env).toBe(true);
+    expect(() => loadConfig()).toThrowError(
+      new Error('[bot] missing required env DISCORD_BOT_SECRET'),
+    );
+  });
+
+  it('passes the four required values through verbatim once all are set', () => {
+    setRequired();
+    const cfg = loadConfig();
+    expect(cfg.token).toBe('token-placeholder');
+    expect(cfg.clientId).toBe('client-placeholder');
+    expect(cfg.guildId).toBe('guild-placeholder');
+    expect(cfg.botSecret).toBe('secret-placeholder');
+  });
+});
+
+describe('loadConfig defaults', () => {
+  it('defaults the game server URL and the public game URL', () => {
+    setRequired();
+    const cfg = loadConfig();
+    expect(cfg.gameServerUrl).toBe('http://127.0.0.1:8787');
+    expect(cfg.gameUrl).toBe('https://worldofclaudecraft.com');
+  });
+
+  it('lets an env value override each default', () => {
+    setRequired();
+    process.env.GAME_SERVER_URL = 'http://10.0.0.5:9000';
+    process.env.PUBLIC_GAME_URL = 'https://staging.example.test';
+    const cfg = loadConfig();
+    expect(cfg.gameServerUrl).toBe('http://10.0.0.5:9000');
+    expect(cfg.gameUrl).toBe('https://staging.example.test');
+  });
+
+  it('falls back to the default when the override is an EMPTY string', () => {
+    // `||`, not `??`: an empty GAME_SERVER_URL would otherwise make every
+    // /internal/discord call target a relative path against no host.
+    setRequired();
+    process.env.GAME_SERVER_URL = '';
+    process.env.PUBLIC_GAME_URL = '';
+    const cfg = loadConfig();
+    expect(cfg.gameServerUrl).toBe('http://127.0.0.1:8787');
+    expect(cfg.gameUrl).toBe('https://worldofclaudecraft.com');
+  });
+
+  it('defaults every optional channel id to the empty string', () => {
+    setRequired();
+    const cfg = loadConfig();
+    expect(cfg.voiceChannelId).toBe('');
+    expect(cfg.welcomeChannelId).toBe('');
+    expect(cfg.testChannelId).toBe('');
+    expect(cfg.relayChannelId).toBe('');
+    expect(cfg.activityChannelId).toBe('');
+    expect(cfg.dailyRewardsChannelId).toBe('');
+  });
+
+  it('reads each channel field from its OWN env key', () => {
+    // Every value is distinct, so a swapped key name (voice reading the welcome
+    // key, say) cannot pass. The all-defaults test above cannot catch that: both
+    // arms are the empty string there.
+    setRequired();
+    process.env.DISCORD_VOICE_CHANNEL_ID = 'voice-id';
+    process.env.DISCORD_WELCOME_CHANNEL_ID = 'welcome-id';
+    process.env.DISCORD_TEST_CHANNEL_ID = 'test-id';
+    process.env.DISCORD_RELAY_CHANNEL_ID = 'relay-id';
+    process.env.DISCORD_ACTIVITY_CHANNEL_ID = 'activity-id';
+    process.env.DISCORD_DAILY_REWARDS_CHANNEL_ID = 'daily-id';
+
+    const cfg = loadConfig();
+    expect(cfg.voiceChannelId).toBe('voice-id');
+    expect(cfg.welcomeChannelId).toBe('welcome-id');
+    expect(cfg.testChannelId).toBe('test-id');
+    expect(cfg.relayChannelId).toBe('relay-id');
+    expect(cfg.activityChannelId).toBe('activity-id');
+    expect(cfg.dailyRewardsChannelId).toBe('daily-id');
+  });
+});
+
+describe('loadConfig channel fallback ladders', () => {
+  it('prefers the relay channel over the test channel', () => {
+    setRequired();
+    process.env.DISCORD_RELAY_CHANNEL_ID = 'relay-1';
+    process.env.DISCORD_TEST_CHANNEL_ID = 'test-1';
+    expect(loadConfig().relayChannelId).toBe('relay-1');
+  });
+
+  it('falls the relay channel back to the test channel, then to empty', () => {
+    setRequired();
+    process.env.DISCORD_TEST_CHANNEL_ID = 'test-1';
+    expect(loadConfig().relayChannelId).toBe('test-1');
+    delete process.env.DISCORD_TEST_CHANNEL_ID;
+    expect(loadConfig().relayChannelId).toBe('');
+  });
+
+  it('walks the activity ladder: activity, then relay, then test, then empty', () => {
+    setRequired();
+    process.env.DISCORD_ACTIVITY_CHANNEL_ID = 'activity-1';
+    process.env.DISCORD_RELAY_CHANNEL_ID = 'relay-1';
+    process.env.DISCORD_TEST_CHANNEL_ID = 'test-1';
+    expect(loadConfig().activityChannelId).toBe('activity-1');
+
+    delete process.env.DISCORD_ACTIVITY_CHANNEL_ID;
+    expect(loadConfig().activityChannelId).toBe('relay-1');
+
+    delete process.env.DISCORD_RELAY_CHANNEL_ID;
+    expect(loadConfig().activityChannelId).toBe('test-1');
+
+    delete process.env.DISCORD_TEST_CHANNEL_ID;
+    expect(loadConfig().activityChannelId).toBe('');
+  });
+
+  it('points BOTH relay and activity at the test channel when only it is set', () => {
+    // The single-channel deployment: one announce channel carries the in-game
+    // "!" posts and the activity feed.
+    setRequired();
+    process.env.DISCORD_TEST_CHANNEL_ID = 'test-1';
+    const cfg = loadConfig();
+    expect(cfg.relayChannelId).toBe('test-1');
+    expect(cfg.activityChannelId).toBe('test-1');
+  });
+});
+
+describe('loadConfig nickname sync opt-out', () => {
+  it('is ON when unset', () => {
+    setRequired();
+    expect(loadConfig().syncNicknames).toBe(true);
+  });
+
+  it("is OFF for exactly '0'", () => {
+    setRequired();
+    process.env.DISCORD_SYNC_NICKNAMES = '0';
+    expect(loadConfig().syncNicknames).toBe(false);
+  });
+
+  it("stays ON for 'false', 'off', and '' (only '0' opts out)", () => {
+    // The arm a careless rewrite to a truthiness check (or to `=== '1'`)
+    // breaks: nothing but the literal '0' turns nickname sync off.
+    setRequired();
+    for (const value of ['false', 'off', 'no', '', '1', 'true']) {
+      process.env.DISCORD_SYNC_NICKNAMES = value;
+      expect(loadConfig().syncNicknames).toBe(true);
+    }
+  });
+});
+
+describe('bot loop cadences', () => {
+  it('pins each cadence against its literal', () => {
+    expect(ROLE_SYNC_INTERVAL_MS).toBe(300000);
+    expect(PRESENCE_DEBOUNCE_MS).toBe(4000);
+    expect(RELAY_POLL_MS).toBe(3000);
+  });
+
+  it('keeps the presence debounce and relay poll well under the role sync', () => {
+    // The ordering is the point: presence and relay are player-visible loops,
+    // role sync is the slow reconcile.
+    expect(PRESENCE_DEBOUNCE_MS).toBeLessThan(ROLE_SYNC_INTERVAL_MS);
+    expect(RELAY_POLL_MS).toBeLessThan(ROLE_SYNC_INTERVAL_MS);
+  });
+});
