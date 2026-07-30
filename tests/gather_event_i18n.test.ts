@@ -311,7 +311,13 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
   });
 
   it('the fishingEmptyHook case self-notes and plays exactly the reel cue (the timed press)', () => {
-    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    // Comment-stripped (the phase 14 QA): the arm's own prose names the
+    // self-note and the cue, so a commented-out body satisfied every raw
+    // includes/matchAll below.
+    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8').replace(
+      /^\s*\/\/.*$/gm,
+      '',
+    );
     const caseStart = source.indexOf("case 'fishingEmptyHook'");
     expect(caseStart).toBeGreaterThan(-1);
     const block = source.slice(caseStart, source.indexOf('break;', caseStart));
@@ -322,6 +328,26 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
     // The sim's own grey "No fish are biting." line stays the ONLY log line.
     expect(block.includes('this.log(')).toBe(false);
     expect(hasTranslation('hudChrome.gathering.emptyHookNote')).toBe(true);
+  });
+
+  it('the effectDepleted flag renders ONE gated FCT self-note (the last-charge signal)', () => {
+    // The phase 14 QA: the HUD arm had no test at all. Same idiom as the
+    // fishingEmptyHook pin above: comment-stripped, the note gated on the
+    // additive flag, the key real, and no log line doubling the announce
+    // (the professions window's charge row is the durable record).
+    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8').replace(
+      /^\s*\/\/.*$/gm,
+      '',
+    );
+    const caseStart = source.indexOf("case 'gatherResult': {");
+    expect(caseStart).toBeGreaterThan(-1);
+    const block = source.slice(caseStart, source.indexOf('break;', caseStart));
+    const gateAt = block.indexOf('if (ev.effectDepleted) {');
+    expect(gateAt).toBeGreaterThan(-1);
+    const gated = block.slice(gateAt, block.indexOf('}', gateAt));
+    expect(gated).toContain("this.showSelfNote(t('hudChrome.professions.toolEffectDepleted'));");
+    expect(gated).not.toContain('this.log(');
+    expect(hasTranslation('hudChrome.professions.toolEffectDepleted')).toBe(true);
   });
 
   it('every gathering profession id has a catalog label in the shared name table', () => {
