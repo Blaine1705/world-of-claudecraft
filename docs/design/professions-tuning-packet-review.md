@@ -2050,6 +2050,122 @@ gate-contract change owes a full-suite run well before the close,
 because per-file iteration and reviewer runs missed both stragglers
 for the whole round.
 
+QA COMPLETE 2026-07-30 (Fable, ultracode, new session). Judged
+44140364e^..32a349d7b plus the record commits, fresh eyes. Preamble:
+origin fetched; release/v0.33.0 had shipped and stood 14 commits past
+the v0.32.0 sync, so the branch re-synced first (merge cc75acdb3): four
+conflicts, three clean unions of the branch's unstuck_reports retention
+entry beside the release's three new swept tables and the generated
+pending.ts regenerated; the release-merge audit ran as an eight-agent
+workflow, six areas clean with the Bombardier hobby tiebreak, the
+reins-on-action-bar widening (still behind the sim-side mount
+interlock), and the retention signatures each verified against both
+parents, and its two comment-level residues fixed at 9735ffd69; full
+gate PASS post-merge before any QA work.
+
+The round: six fresh domain reviewers (qa-checklist, architecture,
+test-coverage, frontend-seam, cross-platform-sync, privacy-security)
+over the whole range plus a 24-agent adversarial workflow (seven blind
+lenses, two independent refuters per finding, completeness critic) and
+a scouting agent for the caster-zone question. Roughly thirty distinct
+findings after convergence; EVERY one applied, recorded with its
+reason, or refuted with the file open. One blocking: the zone-rollout
+EARNABLE arm was derived-both-sides on the gather half (expected marks
+built from the arm's own template; a producer rename bricked all three
+gatherer chronicles with every suite green; proven live, then pinned by
+a real harvest against the producer's write). Load-bearing shouldfixes:
+the ten buyAriaWithRequirement translations sat in the item catalog's
+INERT inline locale blocks so every locale shipped English on the
+screen-reader-only surface (root cause: the uncast dialect aliases
+type-forced keys into the dead blocks; fills moved to the overlays,
+aliases cast with the reason, pending dropped exactly 12); the cooking
+guide page sent players west to kitchens that stand east under the
+pinned convention (English plus all eighteen translated overlays
+word-swapped); ten comment sites still described the wield-gated axes
+as ownership-scanned (swept, with the fine-grade parameter renamed
+usableToolTier); the guide startBody and cooking twins gained the
+compass-guard arm the quest rows already had; Gull Mere gained its
+depth-fraction, dry-shore, and castability probes at the shipped seed
+plus the rod-tier-row sweep; the farshore geometry suite moved off a
+false client-seed premise onto WORLD_SEED; the fishing rod-tier ladder
+gained a schedule-completeness tripwire (corrected once: the first
+strictly-increasing shape passed a lone over-tiered zone, caught while
+planning its own mutant); the delivered wield deny is pinned over the
+live server with its literal counter; the merge's auth-token TTLs are
+pinned inside the earliest legal prune horizon (email-change sits
+exactly on the 24-hour boundary); and the accepted caster-zone residual
+CLOSED beyond the record's hope: a scouting sweep proved no live
+tier-differing site exists (nearest fishable rim 36 yards against the
+24-yard cast, brute-forced over every differing edge), the border-lake
+fixture now discriminates the GAIN itself (0.1 at proficiency 120 where
+the caster's zone would teach zero), and a live veiled_hollow to
+evergarden cast at (172,936) pins the probe-point zone on shipped
+content, with the forward note that any zone-4 re-tier makes it a full
+gain discriminator for free.
+
+The fix round was re-reviewed as unreviewed code (READY, six nits, all
+applied), and its frontend slice took a second bounded seam pass whose
+six shouldfixes reshaped the vendor focus ladder: restoration now walks
+the same grid slot outward before sell-junk and Close (a last-stack buy
+had parked a keyboard player on the close button), every rung resolves
+by focus key, and the previously unpinned promises each carry an arm
+(neighbor landing, enabled sell-junk rung, containment from outside the
+window, buyback positional slot, one-proficiency-read-per-build against
+a counting getter, explicit-map-wins plus read-through). Mutation
+evidence, run in an ISOLATED worktree and removed after: 12 of 12
+killed, zero hollow runs, including the corrected tripwire naming its
+zone and the M1 zoneId mutant killed by exactly the three
+completion-side arms while the cast-start arm stayed green as
+predicted.
+
+The live track ran for the first time in the packet: the browser axe
+suite green (90 tests, the vendor window newly axed with its combined
+advisory aria), the perf tour both viewports (structural gates pass,
+FCT pool bounded at 24 across waves; the numbers are the headless
+software-rendering norm and stand as the packet's first recorded
+baseline in tmp/), and a changed-surfaces probe showing the Gull Mere
+area renders at hub-comparable rates. The two stale pr_shot_targets
+premises are retired (vendor target now verifies the advisory contract
+including the folded aria; node-hover gained the covering-but-
+unwieldable variant that refuses a frame missing the wield line), and
+the locale-fill skill gained the overlay biome-format step whose
+absence cost the build's closing gate a round.
+
+NEW FLAG for the maintainer, beside the standing levers: Thornpeak's
+Glimmermere, the only tier-3 fishing water, is roughly one percent
+fishable at the shipped seed (a single small patch on the east rim; two
+independent refuters reproduced the probe, and casts facing the visible
+lake centre from most of the shore are refused), so the R19 endgame
+climb from 150 to 200 rests on nearly decorative water; the zone-4
+water pass owns the fix (widen or deepen the basin as Gull Mere did, or
+re-tier). Recorded, not changed here. Also flagged: the fishing town
+stocks no fishing implement on the isle (poles are mainland-only), a
+natural zone-4 item. Recorded residuals: the R22-as-written edge that a
+player whose ONLY tool is tier-3-plus at proficiency zero cannot
+harvest even tier-1 nodes until a tier-1 tool is acquired; the
+rollback-skew direction (a cached new bundle against a rolled-back
+server refuses harvests the server would allow); negative proficiency
+would lock everything but no path produces one; the vendor
+re-announcement note under looting parties; bags_window still lacking
+focus restore (handed to phase 14 with the rest of its focus family);
+sub-yard deepening creep inside the placement tolerance (cooling is
+caught by the exact-set arm); and the deed i18n rows plus the toolsNote
+clause added to the phase 17 fill list. Release-tier deed_i18n red on
+chr_peaks_gatherer rows was reproduced and is the recorded phase 17
+debt, correct at PR tier.
+
+CLOSING GATE: two rounds. Round one failed at the full suite on ONE
+straggler out of 23598 that no targeted run had covered all round:
+the delve-map compositional WCAG arm scraped vendor_window.ts for the
+adjacency literal "data-close aria-label=" and the focus-restore key
+now sits between the attributes; the pin moved to the same-tag shape
+its claim was always about (0ab4ec15f). The build round's closing-gate
+lesson repeated to the letter, including the second half: the round-one
+verdict was nearly misread because the gate ran piped through tail,
+which masks the exit code, the exact trap the repo doc warns about.
+Round two: PASS, all 11 steps, on the committed idle tree at the code
+tip 0ab4ec15f (the record commit after it is docs-only).
+
 ---
 
 ## Phase 14: UX polish (desktop, mobile, gamepad, accessibility)
