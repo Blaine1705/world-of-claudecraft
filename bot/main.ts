@@ -12,6 +12,7 @@
 // this file is the wiring. esbuild-bundled for Node via `npm run bot`.
 
 import { DISCORD_REWARD_GRANTS } from '../src/sim/discord_tier';
+import { PRESENCE_DEBOUNCE_MS, RELAY_POLL_MS, ROLE_SYNC_INTERVAL_MS } from './cadence';
 import { loadConfig } from './config';
 import { DiscordApi } from './discord_api';
 import { Gateway } from './gateway';
@@ -42,10 +43,6 @@ import {
   voiceMembersForChannel,
 } from './logic';
 import { ServerClient, type VoiceMemberPush } from './server_client';
-
-const ROLE_SYNC_INTERVAL_MS = 5 * 60_000;
-const PRESENCE_DEBOUNCE_MS = 4_000;
-const RELAY_POLL_MS = 3_000; // how often the bot pulls queued in-game "!" posts
 
 async function main(): Promise<void> {
   // Load .env (and optional .env.local) into process.env, matching server/db.ts.
