@@ -194,19 +194,35 @@ export function tradeSetOffer(
 // to its owner, or gets spared while a plain copy crosses in its place.
 type PendingGrant = { itemId: string; plainCount: number; instances: ItemInstancePayload[] };
 
+/** The trade copy-choice predicate (the phase 12 QA hand-off), built per
+ *  offer slot and shared VERBATIM by the real removal (removeOffer) and the
+ *  capacity model (fitsAfterSwap), so the copy the model prices is the copy
+ *  the transfer ships (#2139: a pre-check that disagrees with the real grant
+ *  re-opens the overflow class, in both directions). Scoped to charm items
+ *  (use.type 'toolEffect'): the deprioritization exists to spare the
+ *  seller's original-crafter RECHARGE discount, and widening it to every
+ *  signed instance would silently reroute commission and masterwork
+ *  equipment trades, where the seller's signature is the very thing the
+ *  buyer is trading for. The signer compare keys on the display name (the
+ *  craft signing rule's own key): after a sanctioned rename the seller's
+ *  older copies carry the old name and ship in the pre-fix order, the same
+ *  accepted limitation `craftedBy` carries. A resolve-less seller ships
+ *  signer-blind exactly as before. */
+export function sellerSignedCharmDeprioritize(
+  sellerName: string | undefined,
+  itemId: string,
+): ((instance: ItemInstancePayload) => boolean) | undefined {
+  if (sellerName === undefined) return undefined;
+  if (ITEMS[itemId]?.use?.type !== 'toolEffect') return undefined;
+  return (instance) => instance.signer === sellerName;
+}
+
 function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): PendingGrant[] {
   const grants: PendingGrant[] = [];
-  // The copy-choice fix (the phase 12 QA hand-off): when an instanced copy
-  // must ship, the seller's own SELF-SIGNED copies go last, so trading "one
-  // charm" prefers a foreign or unsigned copy over the copy that carries the
-  // seller's original-crafter recharge discount. A name is a stable identity
-  // here (the craft signing rule's own key); a resolve-less pid ships
-  // signer-blind exactly as before.
+  // The copy-choice fix: when an instanced CHARM copy must ship, the
+  // seller's own self-signed copies go last (sellerSignedCharmDeprioritize
+  // above owns the predicate and its scope).
   const sellerName = ctx.resolve(fromPid)?.meta.name;
-  const sellerSigned =
-    sellerName !== undefined
-      ? (instance: ItemInstancePayload): boolean => instance.signer === sellerName
-      : undefined;
   for (const s of items) {
     // A trade removal NEVER consumes a trade-locked copy. The offer
     // was already clamped to the unbound count (tradeSetOffer / offerCovered),
@@ -220,7 +236,7 @@ function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): Pendin
       s.count,
       fromPid,
       isTradeLocked,
-      sellerSigned,
+      sellerSignedCharmDeprioritize(sellerName, s.itemId),
     );
     grants.push({ itemId: s.itemId, plainCount: s.count - instances.length, instances });
   }
@@ -283,9 +299,11 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
   // giver's stock for that item is (partly) instanced copies, letting a
   // receiver end up over capacity. Mirror removePreferFungible's own split
   // here: the giver's fungible stock stacks on arrival; the instanced
-  // remainder transfers from the giver's instanced slots highest-index-first
-  // (removeItem's walk), so model those exact payloads merge-aware against
-  // the scratch bags, exactly like the real transfer.
+  // remainder transfers in removeOffer's EXACT walk order, highest-index
+  // -first with a charm offer's seller-signed copies consumed last (the
+  // sellerSignedCharmDeprioritize two-pass). One predicate definition feeds
+  // both the model and the removal, so the payloads modeled merge-aware
+  // against the scratch bags are the payloads the transfer actually ships.
   const fitsAfterSwap = (
     meta: PlayerMeta,
     giver: PlayerMeta,
@@ -302,26 +320,36 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
         addStacked(scratch, s.itemId, plainCount);
       }
       let remaining = s.count - plainCount;
-      for (let i = giver.inventory.length - 1; i >= 0 && remaining > 0; i--) {
-        const g = giver.inventory[i];
-        // Skip trade-locked copies here too: the real transfer
-        // (removeOffer) spares them, so the capacity model must walk the same
-        // unbound instanced slots or it would mis-estimate the receiver's slots.
-        if (g.itemId !== s.itemId || !g.instance || isTradeLocked(g.instance)) continue;
-        // Model the payload AS IT ARRIVES: grantOffer stamps boundTo onto an
-        // armed copy on this first trade, and a stamped payload merges
-        // differently than the giver's pre-stamp copy (#2139: a capacity
-        // pre-check that disagrees with the real grant re-opens the overflow
-        // class, in both directions).
-        const arrival =
-          g.instance.bindOnTrade === true && g.instance.boundTo === undefined
-            ? { ...g.instance, boundTo: meta.entityId }
-            : g.instance;
-        const take = Math.min(g.count, remaining);
-        remaining -= take;
-        if (countFit(scratch, capacity, s.itemId, take, arrival) < take) return false;
-        addStacked(scratch, s.itemId, take, arrival);
-      }
+      // The same predicate the removal builds: the model's two passes must
+      // pick the same copies in the same order or the modeled payloads
+      // diverge from the shipped ones (the phase 14 QA's proven overflow).
+      const deprioritize = sellerSignedCharmDeprioritize(giver.name, s.itemId);
+      const modelPass = (takeDeprioritized: boolean): boolean => {
+        for (let i = giver.inventory.length - 1; i >= 0 && remaining > 0; i--) {
+          const g = giver.inventory[i];
+          // Skip trade-locked copies here too: the real transfer
+          // (removeOffer) spares them, so the capacity model must walk the same
+          // unbound instanced slots or it would mis-estimate the receiver's slots.
+          if (g.itemId !== s.itemId || !g.instance || isTradeLocked(g.instance)) continue;
+          if ((deprioritize?.(g.instance) ?? false) !== takeDeprioritized) continue;
+          // Model the payload AS IT ARRIVES: grantOffer stamps boundTo onto an
+          // armed copy on this first trade, and a stamped payload merges
+          // differently than the giver's pre-stamp copy (#2139: a capacity
+          // pre-check that disagrees with the real grant re-opens the overflow
+          // class, in both directions).
+          const arrival =
+            g.instance.bindOnTrade === true && g.instance.boundTo === undefined
+              ? { ...g.instance, boundTo: meta.entityId }
+              : g.instance;
+          const take = Math.min(g.count, remaining);
+          remaining -= take;
+          if (countFit(scratch, capacity, s.itemId, take, arrival) < take) return false;
+          addStacked(scratch, s.itemId, take, arrival);
+        }
+        return true;
+      };
+      if (!modelPass(false)) return false;
+      if (deprioritize && remaining > 0 && !modelPass(true)) return false;
       // Stock the giver's inventory list does not surface (a stubbed store in
       // tests, or a desynced offer the final validation above already
       // covered): the conservative one-fresh-slot-per-unit model.

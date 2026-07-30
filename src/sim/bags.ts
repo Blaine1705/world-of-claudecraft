@@ -276,7 +276,10 @@ export function removeStacked(inventory: InvSlot[], itemId: string, count: numbe
  *  removeEnchantableItem's second pass), and only then an excluded instanced
  *  slot (highest index: with no preferred copy left, the live paths fall back
  *  to the plain removeItem walk, where only excluded slots remain). With no
- *  `excludeInstance` it models items.ts removePreferFungible (salvage); with
+ *  `excludeInstance` it models items.ts removePreferFungible in its
+ *  predicate-less form, the only form its callers here use (salvage); the
+ *  trade path's `deprioritize` two-pass has its own dedicated mirror,
+ *  trade.ts fitsAfterSwap. With
  *  professions/enchanting.ts isEnchantedInstance it models the
  *  countEnchantableItem >= 1 ? removeEnchantableItem : removeItem split
  *  (disenchant) and removeEnchantableItem alone (apply-enchant, whose
