@@ -32,6 +32,7 @@ import { ITEMS, isDelvePos, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
 import { instanceInfoAt } from '../instances/dungeons';
+import { forceDismount } from '../mounts';
 import {
   canActivateDivineAscension,
   hasDevotion,
@@ -1128,6 +1129,12 @@ export function castAbility(
   if (p.weaponStowed) drawWeapon(p);
   if (ability.id !== 'ghost_wolf' && p.auras.some((a) => a.id === 'ghost_wolf')) {
     ctx.breakGhostWolf(p);
+  }
+  // Auto-dismount when the player is mounted or mid-summon-channel and casts any ability.
+  if (p.mountKey !== '') forceDismount(ctx, p);
+  if (p.mountCastKey !== '') {
+    p.mountCastRemaining = 0;
+    p.mountCastKey = '';
   }
   // An instant slipping through a RUNNING cast (usableWhileCasting /
   // Flickerstep) must not disturb that cast's aim: castTargetId/castAim belong

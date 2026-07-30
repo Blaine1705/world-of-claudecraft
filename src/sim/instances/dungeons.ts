@@ -832,11 +832,15 @@ export function updateInstances(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.instances) {
     if (inst.partyKey === null) continue;
-    const origin = instanceOriginOf(inst);
     let occupied = false;
     for (const meta of ctx.players.values()) {
       const e = ctx.entities.get(meta.entityId);
-      if (e && instanceContains(origin, e.pos)) {
+      // instanceClaimContains, not the plain instanceContains box: the
+      // Nythraxis boss arena's authored room is wider than the generic
+      // footprint (see its carve-out above), so the narrower box let this
+      // reaper free a claim while raiders were still legitimately standing
+      // in the wide outer floor.
+      if (e && instanceClaimContains(inst, e.pos)) {
         occupied = true;
         break;
       }
@@ -854,16 +858,23 @@ export function instanceSlotAt(ctx: SimContext, pos: Vec3): number | null {
   return instanceInfoAt(ctx, pos)?.slot ?? null;
 }
 
+/** The live slot whose claim footprint contains `pos`, or null. Same envelope as
+ *  instanceInfoAt below, exposed for the callers that need the slot's own STATE
+ *  (its mobIds roster) and not just its identity: see
+ *  instances/boss_chain_pull.ts. */
+export function instanceAt(ctx: SimContext, pos: Vec3): InstanceSlot | null {
+  for (const inst of ctx.instances) {
+    if (instanceClaimContains(inst, pos)) return inst;
+  }
+  return null;
+}
+
 export function instanceInfoAt(
   ctx: SimContext,
   pos: Vec3,
 ): { slot: number; dungeonId: string } | null {
-  for (const inst of ctx.instances) {
-    if (instanceClaimContains(inst, pos)) {
-      return { slot: inst.slot, dungeonId: inst.dungeonId };
-    }
-  }
-  return null;
+  const inst = instanceAt(ctx, pos);
+  return inst ? { slot: inst.slot, dungeonId: inst.dungeonId } : null;
 }
 
 // Authoritative: is `pos` physically inside one of the two Nythraxis raid

@@ -685,7 +685,7 @@ export function runEffects(
         const finalDamage = Math.round(dmg);
         lastDirectDamage = finalDamage;
         const targetHpBefore = target.hp;
-        ctx.dealDamage(
+        const resolvedDamage = ctx.dealDamage(
           p,
           target,
           finalDamage,
@@ -759,10 +759,18 @@ export function runEffects(
         }
         if (areaEcho) {
           areaEchoDealt = true;
-          echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
+          echoAreaDamage(ctx, p, target, resolvedDamage, ability.school, ability.name, threatOpts);
         }
         if (sweeping)
-          sweepStrikeDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
+          sweepStrikeDamage(
+            ctx,
+            p,
+            target,
+            resolvedDamage,
+            ability.school,
+            ability.name,
+            threatOpts,
+          );
         // Power Echo (mage choice row): the armed echo repeats the SAME
         // resolved amount at its fraction on the same target (already rolled,
         // post crit; no new rng draw), consumed BEFORE the repeat so a copy
@@ -1632,8 +1640,14 @@ export function runEffects(
             e.type === 'aoeRoot',
         );
         if (eff.directPct !== undefined && lastDirectDamage <= 0) break;
+        // Combo-point finishers (rupture/rip, spendsCombo: true) add a perCombo
+        // term to the base total, mirroring finisherDamage/finisherHaste/
+        // finisherStun below: spentCombo is already 0 for any ability that
+        // doesn't spend combo, so this is a no-op for every other dot.
         const dotTotal =
-          eff.directPct === undefined ? eff.total : Math.round(lastDirectDamage * eff.directPct);
+          eff.directPct === undefined
+            ? eff.total + (eff.perCombo ?? 0) * spentCombo
+            : Math.round(lastDirectDamage * eff.directPct);
         const dotBase = Math.max(
           1,
           Math.round(
@@ -2078,7 +2092,12 @@ export function runEffects(
           res.castTime,
           true,
         );
-        const baseAmount = (ctx.rng.range(eff.min, eff.max) + chainSpBonus) * (eff.damageMult ?? 1);
+        // Resolve the shared primary amount once before applying hop falloff.
+        // Fractional spell-power coefficients must not make later hops round
+        // from a hidden value that differs from the primary damage players saw.
+        const baseAmount = Math.round(
+          (ctx.rng.range(eff.min, eff.max) + chainSpBonus) * (eff.damageMult ?? 1),
+        );
         if (ability.id === 'sunward_disc') {
           if (initialTarget) {
             scheduleSunwardBounceChain(ctx, {

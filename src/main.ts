@@ -2,6 +2,7 @@
 // index.html and play.html both bootstrap through this module, so this one import
 // styles both game entries; admin/guide use their own entries and inline CSS.
 import './styles/index.css';
+import { markEntryTightMode } from './device_memory_hint';
 import { startDiscordLogin } from './discord_login_start';
 import { syncAppViewport as syncAppViewportShared } from './game/app_viewport';
 import { audio } from './game/audio';
@@ -16,6 +17,7 @@ import { isCameraDrivenFacingActive } from './game/camera_driven_facing';
 import { cameraFollowShouldSettle, updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
 import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
+  clickMoveBrokenByTeleport,
   clickMoveShouldWalk,
   clickMoveStep,
   distance2d,
@@ -29,6 +31,7 @@ import { localPartyMemberIds } from './game/corpse_loot_availability';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
 import { initDesktopDownload } from './game/desktop_download';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
+import { installDevTeleports } from './game/dev_shortcuts';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import {
   clearEntryProbe,
@@ -41,10 +44,13 @@ import {
 import {
   checkpointActiveEntryDiagnostics,
   createEntryDiagnosticsController,
+  resumeActiveEntryDiagnostics,
   stopActiveEntryDiagnostics,
+  suspendActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
+import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/gather_tool_use';
 import { Input } from './game/input';
@@ -105,6 +111,7 @@ import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
+import { zoneWarmupMode } from './game/zone_transition';
 import {
   CHAR_SORT_MODES,
   type CharSortMode,
@@ -129,6 +136,7 @@ import {
   signInWithNativeApple,
 } from './net/native_apple_auth';
 import { createNativeAttestationProof } from './net/native_attestation';
+import { primeNativeDeviceMemoryHint } from './net/native_device_info';
 import {
   createNativeDiscordProof,
   installNativeDiscordUrlHandler,
@@ -136,6 +144,7 @@ import {
   openNativeDiscordOAuth,
   takeNativeDiscordVerifier,
 } from './net/native_discord';
+import { notifyOtaAppReady } from './net/native_ota';
 import {
   Api,
   ApiError,
@@ -164,22 +173,44 @@ import { assetsReady } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
 import { charactersReady, preloadMechAssets } from './render/characters/assets';
 import { skinCount } from './render/characters/manifest';
-import { onPortraitsReady, playerPortraitDataUrl } from './render/characters/portrait';
+import {
+  onPortraitsReady,
+  onPortraitUpdate,
+  playerPortraitDataUrl,
+} from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
+import { setDayNightPhaseOverride } from './render/day_night_clock';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
 import { Renderer } from './render/renderer';
-import type { SelfMotionFrame } from './render/self_motion';
-import { navigatorSaveData } from './render/sky';
+import {
+  hasAuthoritativeSelfPositionDiscontinuity,
+  type SelfMotionFrame,
+} from './render/self_motion';
+import { ensureSkyAssetsAt, navigatorSaveData } from './render/sky';
+import { ARRIVAL_NEIGHBOR_STREAM_RADIUS } from './render/zone_streaming';
 import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
 import { ABILITIES, CLASSES } from './sim/content/classes';
-import { GATHER_NODES, ITEMS, isDelvePos, setActiveWorldContent } from './sim/data';
+import { HEROIC_VENDOR_STOCK } from './sim/content/heroic_vendor';
+import { rowTreeFor } from './sim/content/talents';
+import {
+  GATHER_NODES,
+  ITEMS,
+  isDelvePos,
+  isRiftPos,
+  QUESTS,
+  questRewardItem,
+  setActiveWorldContent,
+  ZONES,
+} from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
+import { MARKET_HOUSE_STOCK } from './sim/market';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
 import {
+  ALL_CLASSES,
   DT,
   dist2d,
   MELEE_RANGE,
@@ -233,6 +264,7 @@ import {
   setDiscordUiEnabled,
 } from './ui/discord_status';
 import { renderDiscordWidget } from './ui/discord_widget';
+import { finderLootItemIds } from './ui/dungeon_finder_view';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
@@ -262,7 +294,7 @@ import {
   t,
   tPlural,
 } from './ui/i18n';
-import { defaultIconPrewarmEntries, prewarmIconCache } from './ui/icon_prewarm';
+import { defaultIconPrewarmPlan, type IconPrewarmEntry, prewarmIconCache } from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
 import {
   noteLoadingProgress,
@@ -283,8 +315,10 @@ import { buildPerfOverlayView, FrameMeter } from './ui/perf_overlay_model';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
 import { createSpectateBadge } from './ui/spectate_badge';
+import { refreshStartSkinPickerPortraits } from './ui/start_skin_picker_portraits';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
 import { shouldShowStorePromo } from './ui/store_promo_card';
+import { talentRowOptionIconRef } from './ui/talent_icons';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
 import {
   classifyAuthCode,
@@ -380,6 +414,12 @@ applyNativeDeviceLanguage({
   languages: navigator.languages,
   language: navigator.language,
 });
+
+// Cache the native shell's physical-memory measurement for the NEXT boot's
+// synchronous graphics-profile resolution (4 GB-class devices get the tight
+// residency profile; see src/device_memory_hint.ts). Fire-and-forget: this
+// boot's profile is already resolved, and a missing bridge no-ops.
+void primeNativeDeviceMemoryHint();
 
 const SITE_URL = 'https://worldofclaudecraft.com/';
 
@@ -596,6 +636,7 @@ setInterfaceMode(interfaceModeFromSetting(new Settings().get('interfaceMode')));
 syncAppViewport();
 syncBuildInfo();
 scheduleNativeUpdateCheck(__APP_VERSION__);
+void notifyOtaAppReady();
 preventMobileZoom();
 syncPhoneTouchClass();
 window.matchMedia(PHONE_TOUCH_QUERY).addEventListener?.('change', syncPhoneTouchClass);
@@ -815,12 +856,14 @@ let loadingTipTimer: number | null = null;
 
 function showLoadingScreen(statusText: string): void {
   const el = $('#loading-screen');
+  const wasVisible = el.classList.contains('visible');
   if (loadingHideTimer !== null) {
     window.clearTimeout(loadingHideTimer);
     loadingHideTimer = null;
   }
   el.classList.remove('fade');
   el.classList.add('visible');
+  if (!wasVisible) $('#ls-fill').style.width = '0%';
   setLoadingStatus(statusText);
   startLoadingTips();
   startSlowConnectionWatch();
@@ -830,10 +873,22 @@ function setLoadingStatus(text: string): void {
   $('#ls-status').textContent = text;
 }
 
-function setLoadingProgress(done: number, total: number): void {
-  $('#ls-fill').style.width = total > 0 ? `${Math.round((done / total) * 100)}%` : '0%';
+function setLoadingProgressRange(
+  done: number,
+  total: number,
+  rangeStart: number,
+  rangeEnd: number,
+): void {
+  const fraction = total > 0 ? Math.max(0, Math.min(1, done / total)) : 0;
+  const percent = rangeStart + (rangeEnd - rangeStart) * fraction;
+  $('#ls-fill').style.width = `${Math.round(percent)}%`;
   setLoadingStatus(t('loading.worldProgress', { done, total }));
   noteLoadingProgress();
+}
+
+function setLoadingPercent(percent: number, statusText: string): void {
+  $('#ls-fill').style.width = `${Math.max(0, Math.min(100, Math.round(percent)))}%`;
+  setLoadingStatus(statusText);
 }
 
 // Rotating "did you know" copy under the progress bar, purely cosmetic (no
@@ -960,39 +1015,15 @@ async function startGame(
   // Paint the loading screen before anything can block, assetsReady may resolve
   // immediately when assets are already cached, and the scene build is synchronous.
   await nextPaint();
-  // Lazy locale flip: fetch the active locale's chunk (plus the deed locale chunk the HUD's
-  // deed surfaces read) and make both resident before the HUD renders (mountGameUi ->
-  // translatePage fans out hundreds of t() calls). It sits behind the loading screen (already
-  // painted above), so a stored non-en visitor never sees an English flash. This is now a
-  // REAL per-locale network request, so guard it: startGame is void-invoked (see the call
-  // sites) with no .catch, and English is always resident, so a failed fetch must fall back
-  // to English and keep booting rather than reject unhandled.
-  try {
-    await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);
-  } catch {
-    // Soft fallback: English is statically resident; boot in English (the picker can retry).
-  }
-  try {
-    await assetsReady((done, total) => setLoadingProgress(done, total));
-  } catch (err) {
-    fatalOverlay(t('loading.assetsFailed', { error: technicalErrorMessage(err) }));
-    return;
-  }
-  // Assets are the only network-bound phase the slow-connection hint can
-  // speak to; everything after this is synchronous CPU-bound scene build, so
-  // stop watching here rather than leaving it armed through hideLoadingScreen.
-  stopSlowConnectionWatch();
-  const spectateBadge = createSpectateBadge();
-  setLoadingStatus(t('loading.enteringWorld'));
-  // Let the final status + full progress bar paint before the synchronous
-  // Renderer/Hud build freezes the main thread for a beat.
-  await nextPaint();
-  mountGameUi();
-
-  const canvas = $('#game-canvas') as unknown as HTMLCanvasElement;
-  const nameplates = $('#nameplates') as HTMLDivElement;
-
-  const keybinds = new Keybinds(keybindScope);
+  // Graphics preset resolution + the entry crash probe run BEFORE the locale and
+  // asset awaits below. Those awaits are where the WebContent process actually
+  // holds its peak footprint on phone-class WebKit (the import-time preloads all
+  // resolve inside assetsReady), and a probe armed only after them missed every
+  // kill in that window: the next boot found no evidence, stepped nothing down,
+  // and the player re-crashed identically (the iPhone 13 entry-crash report).
+  // Settings and both preset writers are pure localStorage/navigator reads, so
+  // hoisting them ahead of mountGameUi is safe; everything DOM-bound (canvas
+  // lookups, the context-lost listeners) stays below, after the template mounts.
   const settings = new Settings();
   // First-run graphics default: until a device default has been applied (the dedicated
   // graphicsDefaultApplied marker, NOT the graphicsPreset key, which save() def-fills the moment
@@ -1026,38 +1057,9 @@ async function startGame(
   if (safePreset !== settings.get('graphicsPreset')) {
     settings.set('graphicsPreset', safePreset);
   }
-  // UI theming: apply the persisted theme's CSS variables to :root, then keep a
-  // hook so the Options panel can switch preset / override colours live.
-  const themeStore = new ThemeStore();
-  function applyTheme(): void {
-    const vars = themeStore.cssVars();
-    for (const name of Object.keys(vars))
-      document.documentElement.style.setProperty(name, vars[name]);
-  }
-  applyTheme();
-  // Graphics-tier HUD effects: publish the resolved effect profile (data-fx-level +
-  // the --fx-* tokens) on settings / OS reduced-motion changes only, never per
-  // frame. Driven by the STATIC graphics preset (the gfx.ts `ui` band stays
-  // governable:false): the FPS governor cannot measure compositor blur cost (the
-  // two-controller hazard). The pure resolver decides; this applier is the thin DOM
-  // consumer, mirroring applyTheme above. Motion has a single source of truth: the
-  // OS prefers-reduced-motion channel (owned by the applier) OR the in-game
-  // reduceMotion setting, both feeding the resolver's reduceMotion input; the
-  // body.reduce-motion class below stays only as the CSS hook it already is.
-  const uiEffectsApplier = new UiEffectsApplier({
-    resolve: (osReducedMotion) =>
-      resolveUiEffectsProfile({
-        presetLabel: graphicsPresetLabel(settings.get('graphicsPreset')),
-        effectsQuality: settings.get('effectsQuality'),
-        reduceMotion: osReducedMotion || settings.get('reduceMotion'),
-      }),
-  });
-  uiEffectsApplier.applyNow();
   let renderer!: Renderer;
   let rendererReady = false;
   let hud!: Hud;
-  const autoLoot = new AutoLoot();
-  const perf = createPerfMonitor(null);
   const baseEntryDiagnostics = (): EntryDiagnostics => {
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
     return {
@@ -1092,6 +1094,7 @@ async function startGame(
       tier: stats.tier,
       constrainedMemory: GFX.constrainedMemory,
       nativeIosMemoryProfile: GFX.nativeIosMemoryProfile,
+      tightMemory: GFX.tightMemory,
       dynamicShadows: GFX.dynamicShadows,
       shadowMap: GFX.shadowMap,
       msaaSamples: GFX.msaaSamples,
@@ -1137,6 +1140,90 @@ async function startGame(
     baseSnapshot: baseEntryDiagnostics,
     renderSnapshot: renderEntryDiagnostics,
   });
+  // World-entry crash guard: persist a probe BEFORE the locale/asset awaits AND the
+  // synchronous scene build. If phone WebKit kills the WebContent process anywhere in
+  // that window (no event, no error, just a reload), the next boot finds the probe
+  // still armed and steps the graphics preset down one tier (see the recovery block
+  // in wireStartScreens). Cleared once the entry demonstrably survives, on the
+  // handled failure paths below, and whenever the page is hidden (a backgrounded
+  // eviction is NOT an entry crash).
+  entryDiagnostics.start(settings.get('graphicsPreset'));
+  // Dev-channel diagnostic (English on purpose): grep "[entry-guard]" in the WebView
+  // inspector / device console to isolate crash-at-entry causes on real hardware.
+  console.info(
+    `[entry-guard] world entry: preset=${settings.get('graphicsPreset')} ` +
+      `(${graphicsPresetLabel(settings.get('graphicsPreset'))}) native=${isNativeRuntime()}`,
+  );
+  // Name the await window in the probe: a kill during the locale/asset resolution
+  // now reads as checkpoint=assets-await instead of masquerading as a scene-build
+  // death (start() stamps scene-build-start; the real one is re-stamped below).
+  entryDiagnostics.checkpoint('assets-await', baseEntryDiagnostics());
+  // Lazy locale flip: fetch the active locale's chunk (plus the deed locale chunk the HUD's
+  // deed surfaces read) and make both resident before the HUD renders (mountGameUi ->
+  // translatePage fans out hundreds of t() calls). It sits behind the loading screen (already
+  // painted above), so a stored non-en visitor never sees an English flash. This is now a
+  // REAL per-locale network request, so guard it: startGame is void-invoked (see the call
+  // sites) with no .catch, and English is always resident, so a failed fetch must fall back
+  // to English and keep booting rather than reject unhandled.
+  try {
+    await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);
+  } catch {
+    // Soft fallback: English is statically resident; boot in English (the picker can retry).
+  }
+  try {
+    await assetsReady((done, total) => setLoadingProgressRange(done, total, 0, 35));
+  } catch (err) {
+    // A HANDLED failure is not a process kill, so the crash probe must not
+    // survive to cost the player a graphics tier next boot (same rule as the
+    // scene-build catch below).
+    entryDiagnostics.stop();
+    fatalOverlay(t('loading.assetsFailed', { error: technicalErrorMessage(err) }));
+    return;
+  }
+  // Assets are the only network-bound phase the slow-connection hint can
+  // speak to; everything after this is synchronous CPU-bound scene build, so
+  // stop watching here rather than leaving it armed through hideLoadingScreen.
+  stopSlowConnectionWatch();
+  const spectateBadge = createSpectateBadge();
+  setLoadingStatus(t('loading.enteringWorld'));
+  // Let the final status + full progress bar paint before the synchronous
+  // Renderer/Hud build freezes the main thread for a beat.
+  await nextPaint();
+  mountGameUi();
+
+  const canvas = $('#game-canvas') as unknown as HTMLCanvasElement;
+  const nameplates = $('#nameplates') as HTMLDivElement;
+
+  const keybinds = new Keybinds(keybindScope);
+  // UI theming: apply the persisted theme's CSS variables to :root, then keep a
+  // hook so the Options panel can switch preset / override colours live.
+  const themeStore = new ThemeStore();
+  function applyTheme(): void {
+    const vars = themeStore.cssVars();
+    for (const name of Object.keys(vars))
+      document.documentElement.style.setProperty(name, vars[name]);
+  }
+  applyTheme();
+  // Graphics-tier HUD effects: publish the resolved effect profile (data-fx-level +
+  // the --fx-* tokens) on settings / OS reduced-motion changes only, never per
+  // frame. Driven by the STATIC graphics preset (the gfx.ts `ui` band stays
+  // governable:false): the FPS governor cannot measure compositor blur cost (the
+  // two-controller hazard). The pure resolver decides; this applier is the thin DOM
+  // consumer, mirroring applyTheme above. Motion has a single source of truth: the
+  // OS prefers-reduced-motion channel (owned by the applier) OR the in-game
+  // reduceMotion setting, both feeding the resolver's reduceMotion input; the
+  // body.reduce-motion class below stays only as the CSS hook it already is.
+  const uiEffectsApplier = new UiEffectsApplier({
+    resolve: (osReducedMotion) =>
+      resolveUiEffectsProfile({
+        presetLabel: graphicsPresetLabel(settings.get('graphicsPreset')),
+        effectsQuality: settings.get('effectsQuality'),
+        reduceMotion: osReducedMotion || settings.get('reduceMotion'),
+      }),
+  });
+  uiEffectsApplier.applyNow();
+  const autoLoot = new AutoLoot();
+  const perf = createPerfMonitor(null);
   canvas.addEventListener('webglcontextlost', () => {
     entryDiagnostics.checkpoint('webgl-context-lost', {
       ...renderEntryDiagnostics(),
@@ -1148,20 +1235,13 @@ async function startGame(
     entryDiagnostics.checkpoint('webgl-context-restored');
     console.info('[entry-diag] WebGL context restored during or after world entry');
   });
-  // World-entry crash guard: persist a probe RIGHT BEFORE the synchronous scene build.
-  // If phone WebKit kills the WebContent process during the build (no event, no error,
-  // just a reload), the next boot finds the probe still armed and steps the graphics
-  // preset down one tier (see the recovery block in wireStartScreens). Cleared once the
-  // entry demonstrably survives, on the handled failure path below, and whenever the
-  // page is hidden (a backgrounded eviction is NOT an entry crash).
-  entryDiagnostics.start(settings.get('graphicsPreset'));
-  // Dev-channel diagnostic (English on purpose): grep "[entry-guard]" in the WebView
-  // inspector / device console to isolate crash-at-entry causes on real hardware.
-  console.info(
-    `[entry-guard] world entry: preset=${settings.get('graphicsPreset')} ` +
-      `(${graphicsPresetLabel(settings.get('graphicsPreset'))}) native=${isNativeRuntime()}`,
-  );
+  // The probe was armed before the locale/asset awaits above; mark that the await
+  // window ended and the synchronous scene build is what runs next.
+  entryDiagnostics.checkpoint('scene-build-start', baseEntryDiagnostics());
   try {
+    setLoadingPercent(37, t('loading.enteringWorld'));
+    await ensureSkyAssetsAt(world.player.pos.x, world.player.pos.z);
+    setLoadingPercent(40, t('loading.enteringWorld'));
     renderer = new Renderer(world, canvas, nameplates);
     rendererReady = true;
     renderer.setAudioSink(sfx);
@@ -1193,9 +1273,62 @@ async function startGame(
       constrainedMemory: GFX.constrainedMemory,
     });
     perf.setHud(hud);
+    // Every zone the renderer makes resident (boot, teleport warmup, or the
+    // background streaming lane) also prewarms its world-map background, so
+    // opening the map right after a crossing never pays the terrain render.
+    renderer.onZonePrepared = (zoneId) => hud.queueMapBgPrewarm(zoneId);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
     applyPerfOrnamentVars(); // Performance Overlay window's gilded corner/edge masks
     applyMinimapOrnamentVars(); // minimap disc's gilded ring
+    hud.prewarmStaticUiAssets();
+
+    // Start the worker-backed procedural icon warmup while the loading screen
+    // is still opaque. Player-specific windows get a small eager prefix; the
+    // rest of the catalog stays in the idle lane. This removes synchronous PNG
+    // encoding from the first bags/character/spellbook/vendor open without
+    // moving that work onto the main thread.
+    const iconPriorities: IconPrewarmEntry[] = [];
+    const prioritizeItem = (id: string | null | undefined): void => {
+      if (id) iconPriorities.push({ kind: 'item', id });
+    };
+    for (const id of Object.values(world.equipment)) prioritizeItem(id);
+    // Party frames render compact 20px crests, while profile/Inspect chips use
+    // 96px badges. Cache keys include size, so warm both exact consumer
+    // dimensions; otherwise the first inspected player synchronously encodes a
+    // procedural crest even though its 3D portrait is already cached.
+    for (const cls of ALL_CLASSES) {
+      iconPriorities.push({ kind: 'crest', id: `class_${cls}`, size: 20 });
+      iconPriorities.push({ kind: 'crest', id: `class_${cls}`, size: 96 });
+    }
+    for (const slot of world.inventory) prioritizeItem(slot.itemId);
+    for (const id of world.bags) prioritizeItem(id);
+    for (const ability of world.known) iconPriorities.push({ kind: 'ability', id: ability.def.id });
+    // Spellbook paints the whole class kit, including not-yet-learned rows.
+    for (const id of CLASSES[world.cfg.playerClass].abilities)
+      iconPriorities.push({ kind: 'ability', id });
+    // Talent row options also use procedural crest ids that are absent from
+    // ABILITIES, plus granted abilities not guaranteed to be in the base kit.
+    for (const row of rowTreeFor(world.cfg.playerClass) ?? []) {
+      for (const option of row.options) iconPriorities.push(talentRowOptionIconRef(option));
+    }
+    for (const recipe of world.recipeList) prioritizeItem(recipe.resultItemId);
+    for (const id of finderLootItemIds()) prioritizeItem(id);
+    // Gossip/quest-log reward rows and the heroic marks shop can be opened from
+    // navigation chrome before the all-items idle sweep reaches their ids.
+    for (const entity of world.entities.values()) {
+      for (const questId of entity.questIds) {
+        const quest = QUESTS[questId];
+        if (quest) prioritizeItem(questRewardItem(quest, world.cfg.playerClass));
+      }
+    }
+    for (const offer of HEROIC_VENDOR_STOCK) prioritizeItem(offer.itemId);
+    for (const listing of world.marketInfo?.listings ?? []) prioritizeItem(listing.itemId);
+    for (const slot of world.marketInfo?.collectionItems ?? []) prioritizeItem(slot.itemId);
+    for (const listing of MARKET_HOUSE_STOCK) prioritizeItem(listing.itemId);
+    for (const entity of world.entities.values())
+      for (const id of entity.vendorItems) prioritizeItem(id);
+    const iconPrewarm = defaultIconPrewarmPlan(iconPriorities);
+    prewarmIconCache(iconPrewarm.entries, { eagerCount: iconPrewarm.priorityCount });
     entryDiagnostics.checkpoint('hud-built');
   } catch (err) {
     // e.g. WebGL context creation failure: surface it instead of leaving the
@@ -1336,6 +1469,57 @@ async function startGame(
       autosizeChat();
     }
   });
+  // Dev-only chat command to scrub the world day/night cycle for testing:
+  //   /daynight night|dawn|day|dusk|<0..1>|auto   (also /dev daynight, /dev time)
+  // Render-only: it just overrides the shared clock phase (day_night_clock), so
+  // the sky lighting and the minimap dial both jump to the chosen time of day.
+  // Returns true when it handled the input (so it is not also sent to chat).
+  const DAY_NIGHT_PRESETS: Record<string, number> = {
+    midnight: 0,
+    night: 0,
+    dawn: 0.25,
+    sunrise: 0.25,
+    morning: 0.375,
+    day: 0.5,
+    noon: 0.5,
+    midday: 0.5,
+    afternoon: 0.625,
+    dusk: 0.75,
+    sunset: 0.75,
+    evening: 0.8,
+  };
+  const tryDayNightDevCommand = (raw: string): boolean => {
+    const m = raw.trim().match(/^\/(?:dev\s+time|dev\s+daynight|daynight)\b\s*(.*)$/i);
+    if (!m) return false;
+    // Dev builds only: a per-client phase override is brighter-night-for-me,
+    // exactly the actionable-visibility class the graphics-fairness rule bans.
+    // Harmless while DAY_ONLY pins day, but gate it before that ever flips.
+    if (!import.meta.env.DEV) return false;
+    const arg = m[1].trim().toLowerCase();
+    if (!arg) {
+      hud.log('[dev] usage: /daynight night|dawn|day|dusk|<0..1>|auto', '#ffcf6a');
+      return true;
+    }
+    if (['auto', 'off', 'real', 'resume', 'clear'].includes(arg)) {
+      setDayNightPhaseOverride(null);
+      hud.log('[dev] day/night resumed (real UTC clock)', '#8fd0ff');
+      hud.refreshDayNightDial();
+      return true;
+    }
+    let phase: number | null = arg in DAY_NIGHT_PRESETS ? DAY_NIGHT_PRESETS[arg] : null;
+    if (phase === null) {
+      const n = Number.parseFloat(arg);
+      if (Number.isFinite(n)) phase = ((n % 1) + 1) % 1;
+    }
+    if (phase === null) {
+      hud.log(`[dev] unknown time "${arg}" - try night|dawn|day|dusk|<0..1>|auto`, '#ffcf6a');
+      return true;
+    }
+    setDayNightPhaseOverride(phase);
+    hud.log(`[dev] time of day set to ${arg} (phase ${phase.toFixed(2)})`, '#8fd0ff');
+    hud.refreshDayNightDial();
+    return true;
+  };
   chatInput.addEventListener('keydown', (e) => {
     e.stopPropagation();
     // While the "!" command dropdown is open it owns Arrows/Enter/Tab/Escape.
@@ -1350,6 +1534,12 @@ async function startGame(
       // the active channel tab supplies the send prefix, so plain text goes to
       // that channel without the player retyping "/world" etc.
       const raw = chatInput.value;
+      // dev-only day/night scrub command, intercepted before the chat send path
+      if (import.meta.env.DEV && tryDayNightDevCommand(raw)) {
+        chatInput.value = '';
+        closeChat();
+        return;
+      }
       // "/share" links the selected quest into party chat; skip the normal send path.
       if (hud.devCommandsAvailable && isDevGuiCommand(raw)) {
         hud.toggleDevCommandWindow();
@@ -1457,6 +1647,11 @@ async function startGame(
           case 'valecup':
             hud.toggleValeCup();
             break;
+          case 'mount':
+            // Ride the pick immediately (every player always has one; the
+            // character sheet's picker is where the pick changes).
+            world.toggleMounted();
+            break;
           case 'leaderboard':
             hud.toggleLeaderboard();
             break;
@@ -1560,6 +1755,7 @@ async function startGame(
     onLeaderboard: () => hud.toggleLeaderboard(),
     onDailyRewards: () => hud.toggleDailyRewards(),
     onDeeds: () => hud.toggleDeeds(),
+    onMountToggle: () => world.toggleMounted(),
     onProfessions: () => hud.toggleProfessions(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
     onMusic: () => {
@@ -1695,6 +1891,9 @@ async function startGame(
       case 'valecup':
         hud.toggleValeCup();
         break;
+      case 'mount':
+        world.toggleMounted();
+        break;
       case 'leaderboard':
         hud.toggleLeaderboard();
         break;
@@ -1718,7 +1917,12 @@ async function startGame(
   const gamepad = new GamepadManager(input, gamepadBindings, {
     onAction: (id) => dispatchGamepadAction(id),
     onInputEdge: () => inputMeter.record(performance.now()),
-    isPointerMode: () => hud.isWindowOpen() || cameraPromptOpen(),
+    isPointerMode: () =>
+      shouldUseGamepadPointerMode(
+        hud.isWindowOpen(),
+        cameraPromptOpen(),
+        document.getElementById('race-start-btn')?.style.display === 'block',
+      ),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => hud.refreshControllerLabels(),
   });
@@ -2224,7 +2428,7 @@ async function startGame(
         api.reportPlayerByName(online.characterId, targetName, reason, details),
     });
     hud.attachBugReporting({
-      capture: () => renderer?.captureScreenshot() ?? null,
+      capture: () => renderer?.captureScreenshot() ?? Promise.resolve(null),
       collectMeta: () =>
         assembleBugReportMeta({
           build: `${__APP_VERSION__} (${__APP_BUILD_ID__})`,
@@ -2234,7 +2438,7 @@ async function startGame(
             h: window.innerHeight,
             dpr: window.devicePixelRatio,
           },
-          zone: zoneBiomeAt(world.player.pos.z),
+          zone: zoneBiomeAt(world.player.pos.x, world.player.pos.z),
           level: world.player.level,
           // Entity has no `cls`; the player's class is its templateId (see Entity).
           className: world.player.templateId,
@@ -2487,6 +2691,7 @@ async function startGame(
         (node) => gatherNodeToolGateFor(world, node),
         t('questUi.errors.tooFar'),
         t('hudChrome.gathering.notReady'),
+        t('questUi.errors.escortAway'),
         t('errors.nothingInteract'),
       ),
       input,
@@ -2841,10 +3046,114 @@ async function startGame(
   let acc = 0;
   let onlineInputEchoMs = 0;
   let playerWasDead = world.player.dead;
+  let raceMovementWasLocked = world.mountRaceView()?.phase === 'countdown';
   // Smoothed input-echo jitter (mean absolute deviation of RTT samples) for the
   // perf overlay's Jitter row.
   let onlineJitterMs = 0;
   let gameInputReady = false;
+  let zoneWarmup: Promise<void> | null = null;
+
+  let lastWarmCheckX = Number.NaN;
+  let lastWarmCheckZ = Number.NaN;
+  // Rift-band exit tracking. Leaving the instance band teleports back into an
+  // overworld zone that is usually still RESIDENT, so the ready-bail below
+  // would skip the loading screen entirely and drop the player inside the
+  // residency fog clamp while the surrounding zones stream back in: a tight
+  // teal fog wall easing open over seconds that reads as "standing in water".
+  // A rift exit therefore always takes the blocking path, and it streams a
+  // WIDER arrival neighbourhood than an ordinary teleport: the rift band sits
+  // outside the overworld entirely, so the whole ring around the exit point
+  // may have been evicted rather than just the border the player lands next
+  // to (ARRIVAL_NEIGHBOR_STREAM_RADIUS covers that ordinary case).
+  let lastWarmInRiftBand = false;
+  const RIFT_EXIT_STREAM_RADIUS = 240;
+  const maybeWarmCurrentZone = (): void => {
+    const player = world.player;
+    const displacement = Number.isFinite(lastWarmCheckX)
+      ? Math.hypot(player.pos.x - lastWarmCheckX, player.pos.z - lastWarmCheckZ)
+      : 0;
+    lastWarmCheckX = player.pos.x;
+    lastWarmCheckZ = player.pos.z;
+    const wasInRiftBand = lastWarmInRiftBand;
+    lastWarmInRiftBand = isRiftPos(player.pos.x);
+    const riftExit = wasInRiftBand && !lastWarmInRiftBand;
+    if (zoneWarmup) return;
+    if (!riftExit && renderer.isZoneReadyAt(player.pos.x, player.pos.z)) return;
+    const zoneX = player.pos.x;
+    const zoneZ = player.pos.z;
+    if (!riftExit && zoneWarmupMode(displacement) === 'background') {
+      // A walked crossing: the visible-zone streaming lane normally has the
+      // destination resident long before the boundary, so landing here means
+      // the build is still catching up (or a prepare failed). Finish it in the
+      // background: no loading screen, no input freeze. Sim collision is
+      // procedural math, so gameplay on not-yet-rendered ground stays correct;
+      // the chunks under the player stream in first (prepareZoneAt priority),
+      // and the fog residency clamp keeps the unbuilt remainder hidden.
+      zoneWarmup = renderer
+        .prepareZoneAt(zoneX, zoneZ)
+        .then(() => renderer.prewarmZoneAt(zoneX, zoneZ, { background: true }))
+        .catch((err) => {
+          console.warn('Background zone warmup failed', err);
+          // Back off before the frame loop may retry, so a persistent failure
+          // (e.g. an asset fetch while offline) does not re-kick every frame.
+          return new Promise<void>((resolve) => window.setTimeout(resolve, 5000));
+        })
+        .finally(() => {
+          zoneWarmup = null;
+        });
+      return;
+    }
+    // A teleport-sized jump (rift exit, dungeon door, hearthstone) can land
+    // anywhere: keep the classic blocking loading screen instead of dropping
+    // the player into a not-yet-built void. The destination rectangle is only
+    // half of it, so the arrival NEIGHBOURHOOD streams behind the same screen
+    // on every such jump, not just a rift exit: landing near a zone border
+    // with the neighbour unprepared leaves the residency clamp holding the
+    // view at MIN_OUTDOOR_FOG_FAR long after the screen lifts.
+    const resumeInput = gameInputReady;
+    gameInputReady = false;
+    showLoadingScreen(t('loading.world'));
+    zoneWarmup = nextPaint()
+      .then(() =>
+        renderer.prepareZoneAt(zoneX, zoneZ, (done, total) =>
+          setLoadingProgressRange(done, total, 0, 55),
+        ),
+      )
+      .then(() =>
+        renderer.prepareZonesAround(
+          zoneX,
+          zoneZ,
+          riftExit ? RIFT_EXIT_STREAM_RADIUS : ARRIVAL_NEIGHBOR_STREAM_RADIUS,
+          (done, total) => setLoadingProgressRange(done, total, 55, 94),
+        ),
+      )
+      // An arrival with no overworld neighbourhood at all (a dungeon or rift
+      // interior, 99k yards off the strip) reports no progress above, so fill
+      // the band explicitly rather than letting the bar sit at 55.
+      .then(() => setLoadingProgressRange(1, 1, 55, 94))
+      .then(async () => {
+        setLoadingPercent(96, t('loading.enteringWorld'));
+        try {
+          await renderer.prewarmZoneAt(zoneX, zoneZ);
+        } catch (err) {
+          console.warn('Zone shader prewarm failed', err);
+        }
+      })
+      .then(() => setLoadingPercent(100, t('loading.enteringWorld')))
+      .then(nextPaint)
+      .then(() => {
+        hideLoadingScreen();
+        gameInputReady = resumeInput;
+        last = performance.now();
+        acc = 0;
+      })
+      .catch((err) => {
+        fatalOverlay(t('loading.rendererFailed', { error: technicalErrorMessage(err) }));
+      })
+      .finally(() => {
+        zoneWarmup = null;
+      });
+  };
 
   // Camera follow state: keyboard turning advances facing in 20Hz sim steps,
   // so the camera tracks the player's render-interpolated facing per frame
@@ -2910,6 +3219,7 @@ async function startGame(
     );
   }
 
+  let lastResolveMovePos: { x: number; z: number } | null = null;
   function resolveMove(
     mouselook: boolean,
     playerPos: { x: number; z: number },
@@ -2919,6 +3229,13 @@ async function startGame(
     attackMoveTick();
     const mi = input.readMoveInput();
     let facing: number | null = mouselook ? input.camYaw : null;
+    // A teleport (door, portal, spirit release) invalidates any pending
+    // click-to-move: the destination is across the transition, and chasing it
+    // walks the player straight back into the trigger.
+    if (input.clickMoveTarget && clickMoveBrokenByTeleport(lastResolveMovePos, playerPos)) {
+      input.clearClickMove();
+    }
+    lastResolveMovePos = { x: playerPos.x, z: playerPos.z };
     if (input.clickMoveTarget) {
       const action = resolveClickMoveAction(mi, {
         mouselook,
@@ -3139,6 +3456,7 @@ async function startGame(
 
   function frame(now: number): void {
     requestAnimationFrame(frame);
+    maybeWarmCurrentZone();
     let frameDt = (now - last) / 1000;
     last = now;
     if (frameDt > 0.25) frameDt = 0.25;
@@ -3146,11 +3464,23 @@ async function startGame(
     syncPerfOverlay(frameDt, now);
     syncOverlayDiagnostics();
 
-    // freeze movement while the game menu is up so WASD doesn't walk the
-    // character behind it (other windows stay non-modal, as before); the
-    // first-spawn intro cinematic holds movement the same way until it lands
+    // Freeze movement while the game menu is up, during the first-spawn intro,
+    // the camera prompt, and through the race countdown. The sim independently
+    // enforces the same countdown lock, so online latency cannot move the
+    // authoritative rider.
+    const raceMovementLocked = world.mountRaceView()?.phase === 'countdown';
+    if (raceMovementLocked && !raceMovementWasLocked) {
+      input.clearClickMove();
+      input.setAutorun(false);
+      mobileControls.syncAutorun(false);
+    }
+    raceMovementWasLocked = raceMovementLocked;
     input.setSuspendMovement(
-      !gameInputReady || hud.isModalOpen() || cameraPromptOpen() || intro !== null,
+      !gameInputReady ||
+        hud.isModalOpen() ||
+        cameraPromptOpen() ||
+        intro !== null ||
+        raceMovementLocked,
     );
     const playerDead = world.player.dead;
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
@@ -3341,6 +3671,10 @@ async function startGame(
     }
     net.pendingFacingDelta = 0; // superseded by the interpolated follow below
     const drainedEvents = net.drainEvents();
+    const selfAuthoritativeDiscontinuity = hasAuthoritativeSelfPositionDiscontinuity(
+      drainedEvents,
+      net.playerId,
+    );
     perf.time('events', () =>
       perf.trace('hud.handleEvents', () => hud.handleEvents(drainedEvents), {
         mode: 'online',
@@ -3384,11 +3718,16 @@ async function startGame(
             net.spectating === null &&
             !movementFrozen() &&
             !playerImmobilized() &&
+            !isDelvePos(pe.pos.x) &&
+            // Rifts (like delves) are server-authoritative instanced content, and
+            // their raised sanctum tiers lift the player's Y server-side. The local
+            // kernel predicts a flat floor, so keep prediction off here and render
+            // the authoritative interpolated Y (no vertical jitter on the stairs).
+            !isRiftPos(pe.pos.x) &&
             // A ledge climb is a server-owned scripted move the client does
             // not re-simulate: predicting a fall through it would fight the
             // authoritative pull-up and show the correction as a stutter.
-            pe.climbing !== true &&
-            !isDelvePos(pe.pos.x),
+            pe.climbing !== true,
           moveInput: resolved.mi,
           displayFacing: netFacing ?? interpServerFacing,
           echoMs: onlineInputEchoMs,
@@ -3421,6 +3760,7 @@ async function startGame(
             net.spectating === null ? onlineRenderFacing : null,
             adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
             selfMotion,
+            selfAuthoritativeDiscontinuity,
           ),
         {
           mode: 'online',
@@ -3440,8 +3780,9 @@ async function startGame(
   }
   const controller = {
     move(moveInput: unknown, facing?: unknown) {
-      if (arguments.length > 1) input.setControllerMoveInput(moveInput, facing);
-      else input.setControllerMoveInput(moveInput);
+      // setControllerMoveInput ignores an undefined facing, so the 1- and
+      // 2-argument caller shapes collapse into one call.
+      input.setControllerMoveInput(moveInput, facing);
     },
     face(facing: unknown) {
       input.setControllerFacing(facing);
@@ -3569,6 +3910,28 @@ async function startGame(
     prewarmEntry: 'initial',
   });
   try {
+    await renderer.prepareZoneAt(world.player.pos.x, world.player.pos.z, (done, total) =>
+      setLoadingProgressRange(done, total, 40, 70),
+    );
+    // A character logged out near a zone border (Thornpeak's south edge sits
+    // 40 yd from the Mirefen rectangle) would otherwise enter the world inside
+    // the residency clamp: fog pinned at MIN_OUTDOOR_FOG_FAR until the
+    // idle-paced background lane finishes the neighbour, which is a wall of
+    // haze for the first minute of every session. Stream the same arrival
+    // neighbourhood a teleport gets, behind the loading screen that is already
+    // up. Costs nothing when the logout spot is mid-rectangle.
+    await renderer.prepareZonesAround(
+      world.player.pos.x,
+      world.player.pos.z,
+      ARRIVAL_NEIGHBOR_STREAM_RADIUS,
+      (done, total) => setLoadingProgressRange(done, total, 70, 88),
+    );
+  } catch (err) {
+    fatalOverlay(t('loading.rendererFailed', { error: technicalErrorMessage(err) }));
+    return;
+  }
+  setLoadingPercent(90, t('loading.enteringWorld'));
+  try {
     const prewarm = await renderer.prewarmInitialScene({
       onEntryStart: (id, category) =>
         entryDiagnostics.checkpoint('prewarm-start', {
@@ -3593,8 +3956,33 @@ async function startGame(
       ...renderEntryDiagnostics(),
       prewarmFailed: true,
     });
+    // Shader prewarm is an optimization; a failed program warmup can safely
+    // fall back to Three's normal first-use compilation once the zone itself
+    // has been materialized successfully.
     console.warn('Renderer prewarm failed', err);
   }
+  // Each preview prewarm mints a SECONDARY WebGL context beside the world
+  // renderer: real WebKit GPU-process residency held for a window the player
+  // may never open. The 4 GB-class tight profile skips both and keeps their
+  // documented lazy first-open path instead (the catch arms below already
+  // promise exactly that fallback).
+  if (!GFX.tightMemory) {
+    try {
+      await hud.prewarmCharacterPreview();
+    } catch (err) {
+      // The paperdoll preview is optional UI. If its secondary WebGL context
+      // cannot prewarm, opening the window can still take the normal lazy path.
+      console.warn('Character preview prewarm failed', err);
+    }
+    try {
+      await hud.prewarmArmoryPreview();
+    } catch (err) {
+      // The store is optional and online-only. A secondary-context failure must
+      // never prevent entering the world; opening it can retain the lazy path.
+      console.warn('Armory preview prewarm failed', err);
+    }
+  }
+  setLoadingPercent(100, t('loading.enteringWorld'));
   await nextPaint();
   last = performance.now();
   // A hidden tab pauses rAF while snapshots keep arriving; reset the pending
@@ -3627,10 +4015,6 @@ async function startGame(
         // One-time machine-local performance nudge (packet 0 rulings R14-R16):
         // the assembler polls the same PerfMonitor the reporter reads.
         initPerfNudge({ perf, desktopShell: DESKTOP_APP });
-        // Warm the procedural icon cache during idle time so the first
-        // bags/vendor/loot open never pays the compose burst synchronously
-        // (icon_prewarm.ts). Re-entry is a fast no-op: the cache is module-global.
-        prewarmIconCache(defaultIconPrewarmEntries());
         // First-run camera-mode prompt (issue #1727): show once per browser on a
         // mouse-driven interface, after any spawn cinematic has finished. Applies
         // the choice through the same applySetting path as the Key Bindings toggle.
@@ -3657,6 +4041,21 @@ async function startGame(
             hud.submitLockpickAction(action as import('./sim/lockpick').PickAction),
           flushLockpickEvents: () => hud.flushLockpickEvents(),
         };
+        // Console realm teleports (go.vale() ... go.fen()): offline dev only,
+        // never online (server-authoritative movement) and never production.
+        if (import.meta.env.DEV && offlineSim && !online) {
+          installDevTeleports(
+            ZONES.map((zn) => ({ id: zn.id, town: zn.hub.name, x: zn.hub.x, z: zn.hub.z })),
+            (x, z) => {
+              const me = offlineSim.entities.get(offlineSim.playerId);
+              if (!me) return;
+              me.pos.x = x;
+              me.pos.z = z;
+              me.prevPos = { ...me.pos };
+              me.hp = me.maxHp;
+            },
+          );
+        }
       }, LOADING_FADE_MS);
     }),
   );
@@ -3696,6 +4095,9 @@ async function startOffline(
     playerClass,
     playerName: name,
     devCommands: import.meta.env.DEV,
+    // The offline world runs the ranked rift portal scheduler like the live
+    // server (custom editor play-test maps keep it off: their zones differ).
+    riftPortals: world === undefined,
     valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
     world,
   });
@@ -3885,6 +4287,10 @@ function refreshOnlineSkins(cls: PlayerClass): void {
     characterPreview?.setSkin(i);
   });
 }
+
+onPortraitUpdate((visualKey, skin) => {
+  refreshStartSkinPickerPortraits(document, visualKey, skin, playerPortraitDataUrl);
+});
 
 function updatePreviewContainer(panelId: string): void {
   if (!characterPreview) return;
@@ -5438,7 +5844,16 @@ function renderClassDetails(
             eff.type === 'imbue',
         );
         if (secondaryEffect) {
-          if (secondaryEffect.type === 'dot' || secondaryEffect.type === 'hot') {
+          if (secondaryEffect.type === 'dot' && secondaryEffect.perCombo !== undefined) {
+            // A combo-point bleed finisher (rupture, rip): `total` alone is the
+            // damage at zero combo points, a state the caster can never reach.
+            // Render base plus per-combo-point, the same composition the
+            // finisherDamage arm above and abilityEffectText in the HUD use.
+            dmgText = t('abilityUi.tooltip.finisherDamage', {
+              base: formatClassDetailNumber(secondaryEffect.total),
+              perCombo: formatClassDetailNumber(secondaryEffect.perCombo),
+            });
+          } else if (secondaryEffect.type === 'dot' || secondaryEffect.type === 'hot') {
             dmgText = formatClassDetailNumber(secondaryEffect.total);
           } else if (secondaryEffect.type === 'absorb') {
             dmgText = formatClassDetailNumber(secondaryEffect.amount);
@@ -9062,6 +9477,13 @@ function wireStartScreens(): void {
         recoverySettings.set('graphicsPreset', entryRecovery.to);
       }
       recoverySettings.set('graphicsDefaultApplied', true);
+      // A confirmed WebContent kill during entry is direct evidence this device
+      // runs at its memory ceiling, and the preset ladder has no rung below Low.
+      // Stamp the tight-memory marker: from the NEXT module load the gfx profile
+      // and the render preload sweeps shed residency (DPR, pooled rigs, deferred
+      // cosmetic atlases/prewarms) independently of the preset. Time-limited in
+      // device_memory_hint.ts so a one-off kill cannot degrade a device forever.
+      markEntryTightMode(entryRecoveryAt);
       clearPlayMarker();
       console.warn(
         `[entry-guard] previous world entry crashed ${Math.round(entryRecovery.ageMs / 1000)}s ` +
@@ -9169,8 +9591,12 @@ function wireStartScreens(): void {
       // A page that leaves the foreground mid-entry was not killed by a foreground
       // memory spike: a later eviction while backgrounded (or a deliberate reload,
       // which also fires pagehide) must not read as an entry crash next boot.
-      stopActiveEntryDiagnostics();
-      clearEntryProbe();
+      suspendActiveEntryDiagnostics();
+    } else {
+      // A hidden page can resume the same entry attempt. Re-arm the probe with
+      // its last durable checkpoint before the awaits or scene build continue,
+      // so a later foreground WebContent kill still advances the recovery ladder.
+      resumeActiveEntryDiagnostics();
     }
   };
   document.addEventListener('visibilitychange', restampResumeMarker);
