@@ -2392,6 +2392,135 @@ describe('admin api R35 professions tooling (LEGACY dispatch arm)', () => {
     expect(recordProfessionsRestore).not.toHaveBeenCalled();
     expect(fakeGame.adminRestoreToolEffectSlot).not.toHaveBeenCalled();
   });
+
+  // API_DISPATCH=legacy is the one-flag production rollback, so the legacy
+  // arm needs the same behavioral coverage as the RouteDef twin: a drift
+  // here surfaces exactly during an incident.
+  it('restore-slot audits FIRST then mints, mirroring the RouteDef arm', async () => {
+    vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
+    vi.mocked(fakeGame.adminCharacterOnline).mockReturnValue(true);
+    vi.mocked(fakeGame.adminRestoreToolEffectSlot).mockReturnValue('ok');
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/characters/42/restore-slot',
+        body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+      }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(recordProfessionsRestore).toHaveBeenCalledWith({
+      characterId: 42,
+      adminAccountId: 7,
+      action: 'restore_slot',
+      detail: 'mining/gatherers_cache',
+      reason: 'row vanished',
+    });
+    expect(fakeGame.adminRestoreToolEffectSlot).toHaveBeenCalledWith(
+      42,
+      'mining',
+      'gatherers_cache',
+    );
+    const auditOrder = vi.mocked(recordProfessionsRestore).mock.invocationCallOrder[0];
+    const mintOrder = vi.mocked(fakeGame.adminRestoreToolEffectSlot).mock.invocationCallOrder[0];
+    expect(auditOrder).toBeLessThan(mintOrder);
+  });
+
+  it('maps every sim refusal to the SAME prose the RouteDef arm sends', async () => {
+    const cases = [
+      ['no_tool', 'the character owns no tool for that profession'],
+      ['already_slotted', 'that profession already has a slotted effect'],
+      ['invalid_request', 'that effect cannot be slotted on that profession'],
+    ] as const;
+    for (const [result, prose] of cases) {
+      vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
+      vi.mocked(fakeGame.adminCharacterOnline).mockReturnValue(true);
+      vi.mocked(fakeGame.adminRestoreToolEffectSlot).mockReturnValue(result);
+      const res = fakeRes();
+      await handleAdminApi(
+        fakeReq({
+          method: 'POST',
+          token: VALID_TOKEN,
+          url: '/admin/api/moderation/characters/42/restore-slot',
+          body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'lost' },
+        }),
+        res,
+        fakeGame,
+      );
+      expect(res.statusCode, result).toBe(400);
+      expect(res.body.error, result).toBe(prose);
+    }
+  });
+
+  it('refuses an invalid body with the validator prose BEFORE any audit write', async () => {
+    vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
+    vi.mocked(fakeGame.adminCharacterOnline).mockReturnValue(true);
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/characters/42/restore-item',
+        body: { itemId: 'copper_mining_pick', count: 25, reason: 'over the cap' },
+      }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe('count must be a whole number between 1 and 20');
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+  });
+
+  it('maps the post-audit offline race to its own prose (the row honestly says requested)', async () => {
+    vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
+    vi.mocked(fakeGame.adminCharacterOnline).mockReturnValue(true);
+    vi.mocked(fakeGame.adminRestoreToolEffectSlot).mockReturnValue('offline');
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/characters/42/restore-slot',
+        body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'lost' },
+      }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe('character went offline before the restore landed');
+    expect(recordProfessionsRestore).toHaveBeenCalled();
+  });
+
+  it('a live snapshot suppresses the blob fetch on the legacy arm too', async () => {
+    vi.mocked(characterProfessionsRow).mockResolvedValue({
+      id: 42,
+      name: 'Merlin',
+      class: 'mage',
+      level: 12,
+      accountId: 9,
+      username: 'alice',
+      updatedAt: '2026-06-01T00:00:00Z',
+    } as never);
+    vi.mocked(fakeGame.adminCharacterState).mockReturnValue({
+      gatheringProficiency: { mining: 43.5 },
+    } as never);
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/characters/42/professions' }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data.live).toBe(true);
+    expect(res.body.data.gathering).toContainEqual({ professionId: 'mining', proficiency: 43.5 });
+    // The measured point of the CASE arm: a live read must pass
+    // includeState=false so the widest TOAST column never detoasts.
+    expect(characterProfessionsRow).toHaveBeenCalledWith(42, false);
+  });
 });
 
 describe('admin api R35 restore-item invalid_item arm (LEGACY dispatch arm)', () => {
