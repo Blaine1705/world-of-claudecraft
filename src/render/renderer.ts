@@ -225,7 +225,12 @@ import {
 import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
 import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import { buildEastbrookNoticeboard } from './noticeboard';
-import { opaqueFrontToBackSort } from './opaque_draw_order_core';
+import {
+  type OpaqueSortPolicyInput,
+  opaqueFrontToBackSort,
+  opaqueMaterialFirstSort,
+  shouldUseFrontToBackOpaqueSort,
+} from './opaque_draw_order_core';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import {
@@ -1272,6 +1277,15 @@ export class Renderer {
   private drawStats: DrawStatsAccumulator | null = null;
   // Last completed frame's draw delta (what perfStats serves on composer tiers).
   private drawStatsFrame: DrawStatsCounters = { calls: 0, triangles: 0, points: 0, lines: 0 };
+  private opaqueFrontToBackActive: boolean | null = null;
+  private readonly opaqueSortPolicyInput: OpaqueSortPolicyInput = {
+    drawCalls: 0,
+    elapsedSeconds: 0,
+    focusX: 0,
+    focusZ: 0,
+    previousFocusX: Number.NaN,
+    previousFocusZ: Number.NaN,
+  };
   // Tone-mapping exposure at brightness 1.0. Applied in OutputPass, i.e.
   // AFTER bloom, so this trims the raised sun rig back to the old apparent
   // brightness without moving anything across BLOOM_THRESHOLD.
@@ -1640,12 +1654,6 @@ export class Renderer {
       this.vfx.onContextRestored();
     });
     initGfxTier(this.webgl); // software-GL autodetect needs the live context
-    // Three r165 sorts opaque draws by material before projected depth. PBR
-    // shading is fragment-heavy enough that front-to-back early-Z wins over
-    // that state batching; solid depth writers also precede alpha-tested cards
-    // so town geometry rejects foliage hidden behind it. Explicit group and
-    // render-order barriers remain the comparator's first keys.
-    if (GFX.standardMaterials) this.webgl.setOpaqueSort(opaqueFrontToBackSort);
     if (GFX.composer || GFX.gradePass) {
       // three r165's render() resets info per pass (after the shadow pass, see
       // draw_stats_core.ts header), so with the composer's multiple passes every
@@ -4195,8 +4203,26 @@ export class Renderer {
     this.webgl.info.reset();
   }
 
+  private updateOpaqueDrawOrder(elapsedSeconds: number): void {
+    if (!GFX.standardMaterials) return;
+    const focusX = this.cameraLookAt.x;
+    const focusZ = this.cameraLookAt.z;
+    const input = this.opaqueSortPolicyInput;
+    input.drawCalls = this.drawStats ? this.drawStatsFrame.calls : this.webgl.info.render.calls;
+    input.elapsedSeconds = elapsedSeconds;
+    input.focusX = focusX;
+    input.focusZ = focusZ;
+    const useFrontToBack = shouldUseFrontToBackOpaqueSort(input);
+    input.previousFocusX = focusX;
+    input.previousFocusZ = focusZ;
+    if (useFrontToBack === this.opaqueFrontToBackActive) return;
+    this.opaqueFrontToBackActive = useFrontToBack;
+    this.webgl.setOpaqueSort(useFrontToBack ? opaqueFrontToBackSort : opaqueMaterialFirstSort);
+  }
+
   private renderPrewarmPass(dt: number, opts?: { offscreen?: boolean }): void {
     this.prewarmWorldFrame(dt);
+    this.updateOpaqueDrawOrder(dt);
     // Offscreen only applies on a composer tier: there gameplay's scene pass
     // renders into the composer's buffer, so its programs are the
     // render-target variants and an offscreen pass warms the exact same ones
@@ -8470,6 +8496,7 @@ export class Renderer {
       this.camera.position.y += shakeY;
       this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
     }
+    this.updateOpaqueDrawOrder(dt);
     this.camera.updateMatrixWorld();
     this.vfx.prepareDraw(this.camera);
     if (this.post) this.post.render();
