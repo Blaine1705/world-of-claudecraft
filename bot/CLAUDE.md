@@ -22,8 +22,13 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
   `tests/discord_bot.test.ts`.
 - `gateway.ts`: ws Gateway (v10) IO shell (HELLO/heartbeat, IDENTIFY, RESUME).
   Tested in `tests/discord_bot_gateway.test.ts`.
-- `discord_api.ts`: thin Discord REST client (bot-token authed). Tested in
-  `tests/discord_bot_discord_api.test.ts`.
+- `rate_governor.ts`: **pure, IO-free** Discord rate-limit governor. Owns ALL REST
+  pacing: bucket-keyed serialized queues remapped onto the `X-RateLimit-Bucket` hash,
+  proactive gating at `Remaining == 0`, the global pause (full `retry_after`, no
+  ceiling), the Cloudflare ban pause on a non-JSON 429, the invalid-request breaker,
+  the 401/403 cache, and the Phase 8 counters. Time is injected; it reads no clock.
+- `discord_api.ts`: thin Discord REST client (bot-token authed), an IO shell over the
+  governor. Tested in `tests/discord_bot_discord_api.test.ts`.
 - `server_client.ts`: client for the game server's secret-gated `/internal/discord/*`
   endpoints (`x-woc-discord-secret`); grep `/internal/discord/` there for the live set.
   Tested in `tests/discord_bot_server_client.test.ts`.
@@ -65,6 +70,15 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
   one-parameter stub passes for `(input) => fetch(input)`, which type-checks
   because TypeScript accepts an arity-reduced function, and which would strip
   the auth header off every request in production).
+- **Every Discord REST call goes through the governor.** `discord_api.ts` never paces,
+  retries, or sleeps on its own; it normalizes one response and hands the decision to
+  `rate_governor.ts`. A new REST method is a `request()` call with the right options
+  (`subjectKey` for a member write so the 401/403 cache can see it, `essential: true`
+  only for traffic that must survive an open breaker, such as a slash-command reply and
+  its 3 second deadline), never a bare call to the injected sender.
+- **No credential ever reaches a bucket key, a log line, or a thrown message.** Three
+  interaction routes carry a live ~15 minute bearer token in the PATH. `routeTemplate`
+  emits `:token` and `redactPath` redacts the throw; ids are deliberately kept.
 - **Secrets are env only**; never commit them. `DISCORD_BOT_SECRET` must match the server's.
 - **Privileged intents:** `GUILD_MEMBERS` + `GUILD_PRESENCES` must be enabled for the
   application in the Discord developer portal, or IDENTIFY is rejected (close 4014).
@@ -106,9 +120,17 @@ Required: `DISCORD_BOT_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID`,
 (one-time startup announcement), `DISCORD_RELAY_CHANNEL_ID` (falls back to test),
 `DISCORD_ACTIVITY_CHANNEL_ID` (falls back to relay, then test),
 `DISCORD_DAILY_REWARDS_CHANNEL_ID`, `DISCORD_SYNC_NICKNAMES` (`0` disables, default
-on). `DISCORD_WELCOME_CHANNEL_ID` is read but currently unwired (no welcome message
-is posted). Boot loads `.env`/`.env.local` when present but runs fine from ambient
-env alone (`process.loadEnvFile`).
+on). Governor knobs (all optional, safe defaults): `DISCORD_MAX_RPS` (8),
+`DISCORD_BAN_PAUSE_MS` (600000), `DISCORD_BREAKER_LIMIT` (300),
+`DISCORD_FORBIDDEN_TTL_MS` (86400000); each falls back to its default for an empty or
+non-numeric value, never to 0. `DISCORD_WELCOME_CHANNEL_ID` is read but currently
+unwired (no welcome message is posted). Boot loads `.env`/`.env.local` when present but
+runs fine from ambient env alone (`process.loadEnvFile`).
+
+Adding an env key means adding it to `BOT_ENV_KEYS` in
+`tests/discord_bot_config.test.ts` too: that suite pins the complete key set and asserts
+exactly one dynamic `process.env[...]` lookup, so read a new key as a direct
+`process.env.NAME` and pass the VALUE to a parser.
 
 ## Limits / notes
 - Guild state is seeded from `GUILD_CREATE` and then kept live: `GUILD_MEMBER_ADD`

@@ -14,7 +14,7 @@
 import { DISCORD_REWARD_GRANTS } from '../src/sim/discord_tier';
 import { PRESENCE_DEBOUNCE_MS, RELAY_POLL_MS, ROLE_SYNC_INTERVAL_MS } from './cadence';
 import { loadConfig } from './config';
-import { DiscordApi } from './discord_api';
+import { consoleGovernorLog, DiscordApi, systemGovernorClock } from './discord_api';
 import { Gateway } from './gateway';
 import {
   allTierRoleNames,
@@ -42,6 +42,7 @@ import {
   topSpecialRoleKeyFor,
   voiceMembersForChannel,
 } from './logic';
+import { RateGovernor } from './rate_governor';
 import { ServerClient, type VoiceMemberPush } from './server_client';
 
 async function main(): Promise<void> {
@@ -58,7 +59,18 @@ async function main(): Promise<void> {
     /* no .env.local */
   }
   const cfg = loadConfig();
-  const discord = new DiscordApi(cfg.token);
+  // The governor is built here because this is where config meets IO: it needs
+  // the env knobs from loadConfig plus a real clock and a real log sink, and the
+  // module itself must stay pure. `undefined` keeps the production fetch default.
+  const governor = new RateGovernor({
+    clock: systemGovernorClock(),
+    maxRps: cfg.maxRps,
+    banPauseMs: cfg.banPauseMs,
+    breakerLimit: cfg.breakerLimit,
+    forbiddenTtlMs: cfg.forbiddenTtlMs,
+    log: consoleGovernorLog,
+  });
+  const discord = new DiscordApi(cfg.token, undefined, governor);
   const server = new ServerClient(cfg.gameServerUrl, cfg.botSecret);
 
   await discord.registerGuildCommands(cfg.clientId, cfg.guildId, [...SLASH_COMMANDS]);

@@ -1,53 +1,216 @@
 // Thin Discord REST client (bot-token authed). Just the calls the bot needs:
 // gateway URL, slash-command registration, interaction responses, guild roles +
-// member role edits, and posting messages. Naive about rate limits (low volume):
-// on a 429 it waits the returned retry_after once and retries.
+// member role edits, and posting messages.
+//
+// This file is an IO SHELL and nothing else. Every request is handed to the
+// rate governor (./rate_governor), which owns all pacing: bucket queues,
+// proactive gating, the global pause, the invalid-request breaker, and the
+// permanent-failure cache. What used to live here was a single retry that
+// clamped Discord's retry_after to 10 seconds and answered a Cloudflare ban page
+// with a 1 second retry, which is the escalation path the 2026-07-29 incident
+// rode all the way down. The governor replaces it; see
+// docs/discord-bot-stability/phase-02-rate-limit-governor.md.
+
+import {
+  DEFAULT_BAN_PAUSE_MS,
+  DEFAULT_BREAKER_LIMIT,
+  DEFAULT_FORBIDDEN_TTL_MS,
+  DEFAULT_MAX_RPS,
+  type GovernorClock,
+  type GovernorLog,
+  type GovernorResponse,
+  RateGovernor,
+  redactPath,
+} from './rate_governor';
 
 const API = 'https://discord.com/api/v10';
 
+/**
+ * Why the bot edited a member, written into Discord's audit log (D14). Plain
+ * ASCII and well inside Discord's 1 to 512 character bound.
+ */
+export const AUDIT_LOG_REASON = 'World of ClaudeCraft level sync';
+
+/**
+ * Discord rejects a reason header that is empty or over 512 characters, and any
+ * non-ASCII byte has to survive an HTTP header round trip. Clamp rather than
+ * throw: a rejected header would fail the whole member write.
+ */
+export function sanitizeAuditReason(reason: string): string {
+  const ascii = reason.replace(/[^\x20-\x7E]/g, ' ').trim();
+  const collapsed = ascii === '' ? AUDIT_LOG_REASON : ascii;
+  return collapsed.slice(0, 512);
+}
+
+/** The production clock. Lives here because the governor itself must stay pure. */
+export function systemGovernorClock(): GovernorClock {
+  return {
+    now: () => Date.now(),
+    sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+  };
+}
+
+/** The production log sink for the governor. */
+export const consoleGovernorLog: GovernorLog = (level, message, fields) => {
+  const detail = Object.entries(fields)
+    .map(([key, value]) => `${key}=${value}`)
+    .join(' ');
+  if (level === 'error') console.error(`${message} ${detail}`);
+  else console.warn(`${message} ${detail}`);
+};
+
+/** What the shell hands back to the governor, plus what only the shell needs. */
+interface RestResponse extends GovernorResponse {
+  ok: boolean;
+  /** Parsed success body, or null when there is none. */
+  data: unknown;
+  /** Error body text, read only for a non-ok status that is not a 429. */
+  errorText: string;
+}
+
+function collectHeaders(source: Headers | undefined): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (!source || typeof source.forEach !== 'function') return out;
+  source.forEach((value, key) => {
+    out[key.toLowerCase()] = value;
+  });
+  return out;
+}
+
 export class DiscordApi {
-  // `fetch` and the retry-after sleep are trailing constructor parameters with
-  // their production defaults so tests can drive the request path (including the
-  // 429 retry) with no real network IO and no real wait. Constructed with the
-  // token alone, as main.ts does, this is exactly the production client.
+  // `fetch` and the governor are trailing constructor parameters with their
+  // production defaults so tests can drive the request path with no real network
+  // IO and no real wait. Constructed with the token alone, as bot/main.ts does,
+  // this is exactly the production client.
   //
-  // Every default forwards to the global rather than capturing it, which keeps
-  // one convention across the three shells: the global is read at CALL time, so
-  // it is never invoked with the instance as its `this`, and a test that swaps a
-  // global after construction is still seen. See bot/CLAUDE.md.
+  // The fetch default FORWARDS to the global rather than capturing it, which
+  // keeps one convention across the three shells: the global is read at CALL
+  // time, so it is never invoked with the instance as its `this`, and a test
+  // that swaps a global after construction is still seen. See bot/CLAUDE.md
+  // (R15) and state.md R16.
   constructor(
     private token: string,
     private fetchImpl: typeof fetch = (...args) => fetch(...args),
-    private sleep: (ms: number) => Promise<void> = (ms) => new Promise((r) => setTimeout(r, ms)),
+    private governor: RateGovernor = new RateGovernor({
+      clock: systemGovernorClock(),
+      maxRps: DEFAULT_MAX_RPS,
+      banPauseMs: DEFAULT_BAN_PAUSE_MS,
+      breakerLimit: DEFAULT_BREAKER_LIMIT,
+      forbiddenTtlMs: DEFAULT_FORBIDDEN_TTL_MS,
+      log: consoleGovernorLog,
+    }),
   ) {}
+
+  /** Counters for Phase 8. */
+  counters(): ReturnType<RateGovernor['snapshot']> {
+    return this.governor.snapshot();
+  }
+
+  /** Clear the permanent-failure cache (the bot's own role position moved). */
+  invalidateForbidden(subjectKey?: string): void {
+    this.governor.invalidateForbidden(subjectKey);
+  }
 
   private async request(
     method: string,
     path: string,
     body?: unknown,
-    retry = true,
+    options: { subjectKey?: string; essential?: boolean; reason?: string } = {},
   ): Promise<unknown> {
-    const resp = await this.fetchImpl(`${API}${path}`, {
-      method,
-      headers: {
-        Authorization: `Bot ${this.token}`,
-        'Content-Type': 'application/json',
-        'User-Agent': 'WorldOfClaudeCraftBot (https://worldofclaudecraft.com, 1.0)',
+    const headers: Record<string, string> = {
+      Authorization: `Bot ${this.token}`,
+      'Content-Type': 'application/json',
+      'User-Agent': 'WorldOfClaudeCraftBot (https://worldofclaudecraft.com, 1.0)',
+    };
+    if (options.reason !== undefined) {
+      headers['X-Audit-Log-Reason'] = sanitizeAuditReason(options.reason);
+    }
+
+    const send = async (): Promise<RestResponse> => {
+      const resp = await this.fetchImpl(`${API}${path}`, {
+        method,
+        headers,
+        body: body === undefined ? undefined : JSON.stringify(body),
+      });
+      const collected = collectHeaders(resp.headers);
+      // A 204 has no body at all, so it short circuits before any read: falling
+      // through would lean entirely on a parse failure being caught.
+      if (resp.status === 204) {
+        return {
+          status: 204,
+          headers: collected,
+          jsonParsed: false,
+          ok: true,
+          data: null,
+          errorText: '',
+        };
+      }
+      if (resp.status === 429) {
+        // Read the body ONCE as text and parse from that. Whether it is JSON at
+        // all is the signal that separates a normal Discord 429 from a
+        // Cloudflare ban page, and a real Response body cannot be read twice.
+        const text = await resp.text().catch(() => '');
+        try {
+          return {
+            status: 429,
+            headers: collected,
+            json: JSON.parse(text),
+            jsonParsed: true,
+            ok: false,
+            data: null,
+            errorText: text,
+          };
+        } catch {
+          return {
+            status: 429,
+            headers: collected,
+            jsonParsed: false,
+            ok: false,
+            data: null,
+            errorText: text,
+          };
+        }
+      }
+      if (resp.ok) {
+        return {
+          status: resp.status,
+          headers: collected,
+          jsonParsed: true,
+          ok: true,
+          data: await resp.json().catch(() => null),
+          errorText: '',
+        };
+      }
+      return {
+        status: resp.status,
+        headers: collected,
+        jsonParsed: false,
+        ok: false,
+        data: null,
+        errorText: await resp.text().catch(() => ''),
+      };
+    };
+
+    const resp = await this.governor.run(
+      {
+        method,
+        path,
+        subjectKey: options.subjectKey,
+        essential: options.essential,
       },
-      body: body === undefined ? undefined : JSON.stringify(body),
-    });
-    if (resp.status === 429 && retry) {
-      const data = (await resp.json().catch(() => ({}))) as { retry_after?: number };
-      const waitMs = Math.min(10_000, Math.max(500, (data.retry_after ?? 1) * 1000));
-      await this.sleep(waitMs);
-      return this.request(method, path, body, false);
-    }
+      send,
+    );
+
     if (!resp.ok) {
-      const text = await resp.text().catch(() => '');
-      throw new Error(`[bot] discord ${method} ${path} -> ${resp.status} ${text.slice(0, 200)}`);
+      // `redactPath`, not `path`: three interaction routes carry a live bearer
+      // token in the path, and this message reaches a bare console.error in
+      // bot/main.ts. Ledger item L1; the redaction belongs in the THROW, because
+      // fixing only the one named catch would leave every other handler leaking.
+      throw new Error(
+        `[bot] discord ${method} ${redactPath(path)} -> ${resp.status} ${resp.errorText.slice(0, 200)}`,
+      );
     }
-    if (resp.status === 204) return null;
-    return resp.json().catch(() => null);
+    return resp.data;
   }
 
   async gatewayUrl(): Promise<string> {
@@ -64,15 +227,19 @@ export class DiscordApi {
   }
 
   // Acknowledge + reply to a slash command (type 4 = channel message with source).
+  // Essential: a slash-command reply has a hard 3 second deadline, so it keeps
+  // flowing even while the breaker has stopped the sweeps.
   async respondInteraction(
     interactionId: string,
     interactionToken: string,
     data: Record<string, unknown>,
   ): Promise<void> {
-    await this.request('POST', `/interactions/${interactionId}/${interactionToken}/callback`, {
-      type: 4,
-      data,
-    });
+    await this.request(
+      'POST',
+      `/interactions/${interactionId}/${interactionToken}/callback`,
+      { type: 4, data },
+      { essential: true },
+    );
   }
 
   // Defer a slash command (type 5 = "Bot is thinking..."), buying up to 15 minutes
@@ -83,10 +250,12 @@ export class DiscordApi {
     interactionToken: string,
     ephemeral: boolean,
   ): Promise<void> {
-    await this.request('POST', `/interactions/${interactionId}/${interactionToken}/callback`, {
-      type: 5,
-      data: ephemeral ? { flags: 64 } : {},
-    });
+    await this.request(
+      'POST',
+      `/interactions/${interactionId}/${interactionToken}/callback`,
+      { type: 5, data: ephemeral ? { flags: 64 } : {} },
+      { essential: true },
+    );
   }
 
   // Edit the deferred response with the real content (webhook on the app id).
@@ -95,7 +264,9 @@ export class DiscordApi {
     interactionToken: string,
     data: Record<string, unknown>,
   ): Promise<void> {
-    await this.request('PATCH', `/webhooks/${appId}/${interactionToken}/messages/@original`, data);
+    await this.request('PATCH', `/webhooks/${appId}/${interactionToken}/messages/@original`, data, {
+      essential: true,
+    });
   }
 
   async guildRoles(guildId: string): Promise<{ id: string; name: string }[]> {
@@ -121,17 +292,31 @@ export class DiscordApi {
   }
 
   async addMemberRole(guildId: string, userId: string, roleId: string): Promise<void> {
-    await this.request('PUT', `/guilds/${guildId}/members/${userId}/roles/${roleId}`);
+    await this.request('PUT', `/guilds/${guildId}/members/${userId}/roles/${roleId}`, undefined, {
+      subjectKey: `${guildId}:${userId}`,
+    });
   }
 
   async removeMemberRole(guildId: string, userId: string, roleId: string): Promise<void> {
-    await this.request('DELETE', `/guilds/${guildId}/members/${userId}/roles/${roleId}`);
+    await this.request(
+      'DELETE',
+      `/guilds/${guildId}/members/${userId}/roles/${roleId}`,
+      undefined,
+      {
+        subjectKey: `${guildId}:${userId}`,
+      },
+    );
   }
 
   // Set a member's server nickname (needs MANAGE_NICKNAMES; cannot rename the
   // guild owner). Used to attach the in-game level to their Discord name.
   async setNickname(guildId: string, userId: string, nick: string): Promise<void> {
-    await this.request('PATCH', `/guilds/${guildId}/members/${userId}`, { nick });
+    await this.request(
+      'PATCH',
+      `/guilds/${guildId}/members/${userId}`,
+      { nick },
+      { subjectKey: `${guildId}:${userId}`, reason: AUDIT_LOG_REASON },
+    );
   }
 
   async createMessage(channelId: string, payload: Record<string, unknown>): Promise<void> {
