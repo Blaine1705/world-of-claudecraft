@@ -420,6 +420,10 @@ describe('admin guild database access', () => {
     });
     // Self-exclusion is what makes this safe: the collision probe passes the guild id.
     expect(client.query.mock.calls[3][1]).toEqual(['test-realm', 'Historical Name', 4]);
+    // The rename fan-out list is read cap-bounded, not whole-roster: 100 members
+    // plus the single extra row that proves an overflow.
+    expect(client.query.mock.calls[5][0]).toMatch(/FROM guild_members[\s\S]*LIMIT \$2/);
+    expect(client.query.mock.calls[5][1]).toEqual([4, 101]);
     expect(client.query).toHaveBeenLastCalledWith('COMMIT');
   });
 

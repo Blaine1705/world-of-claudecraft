@@ -465,7 +465,10 @@ export class SocialService {
 
   // Called only after the admin DB transaction has committed. The bounded
   // member ids are already known to that transaction, so this path performs
-  // no DB reads and never fans out full social snapshots.
+  // no DB reads and never fans out full social snapshots. The cap below is
+  // re-applied here on purpose rather than trusted from the caller: the two
+  // bounds are independent, so dropping either one alone cannot turn this
+  // into an unbounded fan-out.
   guildRenamed(
     guildId: number,
     oldName: string,

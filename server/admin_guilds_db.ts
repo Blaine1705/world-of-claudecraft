@@ -314,6 +314,11 @@ export async function renameAdminGuild(
       throw error;
     }
 
+    // Read cap + 1: enough to detect an overflow, never an unbounded roster read.
+    // These rows become the fan-out list SocialService.guildRenamed walks, and it
+    // bounds the same cap again on its side, so neither module depends on the
+    // other still bounding. Refusing above the cap rather than truncating keeps a
+    // roster that somehow grew past it from being renamed with members unnotified.
     const members = await client.query(
       `SELECT character_id
          FROM guild_members
