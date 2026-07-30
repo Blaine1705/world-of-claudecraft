@@ -1,15 +1,23 @@
 // Tool-effect command bodies (the acquisition craft): the slot and recharge
 // actions behind the SimContext seam, with `Sim` keeping thin same-named
-// delegates for the IWorld facade and the server dispatch.
+// delegates for the IWorld facade and the server dispatch, plus a third
+// export, the R35 admin slot restore, which has no delegate at all.
 //
 // The free-grant incident is this module's design constraint: the slot
 // command was once its own acquisition path (no item, no copper, no
-// cooldown), so BOTH actions here resolve their whole decision through the
-// pure resolvers in tools.ts before any mutation, consume their price with no
-// partial arm (the charm copy, the arcane materials), and report through the
-// one text-free personal `toolEffectResult` event so no refusal is ever
-// silent on a player-reachable path. Every arm is draw-free: nothing in this
-// module can move the rng stream a harvest walks.
+// cooldown), so the TWO player-reachable actions here (slot and recharge)
+// resolve their whole decision through the pure resolvers in tools.ts before
+// any mutation, consume their price with no partial arm (the charm copy, the
+// arcane materials), and report through the one text-free personal
+// `toolEffectResult` event so no refusal is ever silent on a player-reachable
+// path. The third action, `restoreToolEffectSlotAction`, is the R35 GM
+// restore: charm-free, delegate-free (no `Sim` method, no IWorld member, no
+// wire command), reachable from the server ADMIN runtime alone, and the one
+// arm that does NOT call `resolveSlotToolEffect`. It carries its OWN copy of
+// the gate chain, which `tests/professions_admin_restore.test.ts` pins
+// tuple-for-tuple against the resolver so a gate added to the one mint
+// authority cannot silently skip the restore. Every arm is draw-free: nothing
+// in this module can move the rng stream a harvest walks.
 //
 // Throttling is deliberately ASYMMETRIC: the recharge draws the shared
 // craft-action window (it consumes fungible materials, the same pacing every
@@ -171,9 +179,11 @@ function applyMintedSlot(
  * stays unset (there is no consumed copy to take provenance from), so a
  * restored slot pays the generic recharge rate, the documented unsigned
  * arm. `confirmMode` mints 'always', the fresh-install default. `pid` is
- * REQUIRED (no primary-entity fallback: the one caller is the server, which
- * always names the live session; an omitted pid could only ever mis-target
- * the server sim's primary entity). Draw-free, like everything here.
+ * REQUIRED and enforced at runtime, not just by the type: a non-finite pid
+ * refuses as 'offline' rather than reaching `ctx.resolve`'s primary-entity
+ * fallback (the one caller is the server, which always names the live
+ * session, so an omitted pid could only ever mis-target the server sim's
+ * primary entity). Draw-free, like everything here.
  */
 export function restoreToolEffectSlotAction(
   ctx: SimContext,
@@ -181,6 +191,10 @@ export function restoreToolEffectSlotAction(
   effectId: string,
   pid: number,
 ): 'ok' | 'invalid_request' | 'no_tool' | 'already_slotted' | 'offline' {
+  // `pid` is required at the type level, but `ctx.resolve` falls back to the
+  // sim's PRIMARY entity when it is undefined: an omitted or malformed pid
+  // must never aim a charm-free mint at whoever that entity happens to be.
+  if (!Number.isFinite(pid)) return 'offline';
   const r = ctx.resolve(pid);
   if (!r) return 'offline';
   if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) {

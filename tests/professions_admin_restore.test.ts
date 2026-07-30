@@ -10,8 +10,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
-import { startingDurabilityFor } from '../src/sim/professions/tools';
+import { resolveSlotToolEffect, startingDurabilityFor } from '../src/sim/professions/tools';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 
 const makeSim = (seed = 11) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -52,8 +53,12 @@ describe('restoreToolEffectSlotAction (GM restore, R35)', () => {
       'ok',
     );
     const slot = metaOf(sim).toolEffectSlots?.mining;
-    expect(slot?.maxDurability).toBe(startingDurabilityFor('gatherers_cache', 'epic'));
-    expect(slot?.maxDurability).toBeGreaterThan(startingDurabilityFor('gatherers_cache', 'common'));
+    // The epic rung as a LITERAL (20 base charges plus one
+    // RARITY_DURABILITY_BONUS of 10 per rung above common, epic being the
+    // third), so this is a pin and not the production helper compared against
+    // itself; 20 is the common rung pinned above.
+    expect(slot?.maxDurability).toBe(50);
+    expect(slot?.maxDurability).toBeGreaterThan(20);
   });
 
   it('matches the real charm mint field-for-field except provenance', () => {
@@ -111,6 +116,111 @@ describe('restoreToolEffectSlotAction (GM restore, R35)', () => {
     expect(metaOf(sim).toolEffectSlots).toBeUndefined();
   });
 
+  // The one-mint-authority drift pin. `resolveSlotToolEffect` carries the
+  // banner naming it THE ONE MINT AUTHORITY, so no path can mint what another
+  // path refuses; the restore is the single arm that does not call it and
+  // re-implements the gates the two mints share. This matrix feeds one fixture
+  // to BOTH and demands the same answer tuple-for-tuple, so a gate added to
+  // the resolver (an eighth refusal, a changed ownership scan) that the
+  // restore never learns about reddens HERE rather than shipping as a
+  // free-grant hole.
+  //
+  // Each fixture isolates a SHARED gate on purpose: the charm the real mint
+  // consumes is in bags whenever the effect has one (Springback has no item
+  // by design), so the resolver's no_charm arm can never stand in for a shared
+  // refusal; confirmMode is 'always' and the live slot is undefined, so its
+  // confirm-mode and no_gain arms cannot fire; and every tuple gets a fresh
+  // sim, so the restore's own already_slotted arm cannot fire either.
+  it('agrees with the one mint authority (resolveSlotToolEffect) on every shared gate', () => {
+    const matrix: Array<{
+      what: string;
+      professionId: string;
+      effectId: string;
+      bags: string[];
+      expected: 'ok' | 'invalid_request' | 'no_tool';
+    }> = [
+      {
+        what: 'gate 1, not a gathering profession',
+        professionId: 'cooking',
+        effectId: 'gatherers_cache',
+        bags: ['copper_mining_pick', 'gatherers_cache'],
+        expected: 'invalid_request',
+      },
+      {
+        what: 'gate 2, effect absent from the catalog',
+        professionId: 'mining',
+        effectId: 'not_an_effect',
+        bags: ['copper_mining_pick', 'gatherers_cache'],
+        expected: 'invalid_request',
+      },
+      {
+        what: 'gate 3, the refused pair policy (respawnSpeed everywhere)',
+        professionId: 'mining',
+        effectId: 'quickening_charm',
+        bags: ['copper_mining_pick'],
+        expected: 'invalid_request',
+      },
+      {
+        what: 'gate 3, the refused pair policy (every effect on fishing)',
+        professionId: 'fishing',
+        effectId: 'gatherers_cache',
+        bags: ['ironreel_fishing_rod', 'gatherers_cache'],
+        expected: 'invalid_request',
+      },
+      {
+        what: 'gate 4, no tool owned for the profession',
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        bags: ['gatherers_cache'],
+        expected: 'no_tool',
+      },
+      {
+        what: 'every gate passed',
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        bags: ['copper_mining_pick', 'gatherers_cache'],
+        expected: 'ok',
+      },
+      {
+        what: 'every gate passed, a second effect',
+        professionId: 'mining',
+        effectId: 'artisans_eye',
+        bags: ['copper_mining_pick', 'artisans_eye'],
+        expected: 'ok',
+      },
+    ];
+    const actual: string[] = [];
+    const expected: string[] = [];
+    for (const row of matrix) {
+      const sim = makeSim();
+      for (const itemId of row.bags) sim.addItem(itemId, 1);
+      const meta = metaOf(sim);
+      // The real mint's decision, read off the SAME bags, before the restore
+      // mutates anything.
+      const resolved = resolveSlotToolEffect(
+        meta.inventory,
+        row.professionId,
+        row.effectId,
+        'always',
+        ITEMS,
+        meta.name,
+        undefined,
+      );
+      const mint = resolved.ok ? 'ok' : resolved.reason;
+      const restore = restoreToolEffectSlotAction(
+        sim.ctx,
+        row.professionId,
+        row.effectId,
+        sim.playerId,
+      );
+      actual.push(`${row.what}: mint=${mint} restore=${restore}`);
+      // Pinned to the literal on BOTH sides, not just to each other: deleting
+      // the same gate from both arms would still agree, and must still fail.
+      expected.push(`${row.what}: mint=${row.expected} restore=${row.expected}`);
+    }
+    expect(actual).toEqual(expected);
+  });
+
   it('refuses to OVERWRITE an intact slot (already_slotted preserves the live row)', () => {
     const sim = makeSim();
     sim.addItem('copper_mining_pick', 1);
@@ -144,6 +254,23 @@ describe('restoreToolEffectSlotAction (GM restore, R35)', () => {
     expect(restoreToolEffectSlotAction(sim.ctx, 'mining', 'gatherers_cache', 424242)).toBe(
       'offline',
     );
+    expect(metaOf(sim).toolEffectSlots).toBeUndefined();
+    expect(toolEffectEvents(sim)).toHaveLength(0);
+  });
+
+  it('refuses a non-finite pid instead of falling back to the PRIMARY entity', () => {
+    // `ctx.resolve(undefined)` resolves the sim's primary entity, so without
+    // the explicit guard an omitted pid (the type says required, the server is
+    // JavaScript at runtime) would aim a charm-free mint at whoever that is.
+    // The tool is in bags, so every other gate here passes: only the guard can
+    // produce the refusal.
+    const sim = makeSim();
+    sim.addItem('copper_mining_pick', 1);
+    for (const pid of [undefined, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(
+        restoreToolEffectSlotAction(sim.ctx, 'mining', 'gatherers_cache', pid as unknown as number),
+      ).toBe('offline');
+    }
     expect(metaOf(sim).toolEffectSlots).toBeUndefined();
     expect(toolEffectEvents(sim)).toHaveLength(0);
   });
@@ -185,7 +312,10 @@ describe('restoreToolEffectSlotAction (GM restore, R35)', () => {
         if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
         const full = path.join(dir, entry.name);
         if (entry.isDirectory()) walk(full);
-        else if (/\.(ts|mts|cts|tsx|js|mjs|cjs)$/.test(entry.name)) {
+        // `.svelte` included on purpose: the admin dashboard is Svelte, and a
+        // component reaching the sim action directly would be exactly the
+        // player-unreachable-only claim breaking.
+        else if (/\.(ts|mts|cts|tsx|js|mjs|cjs|svelte)$/.test(entry.name)) {
           const text = fs.readFileSync(full, 'utf8');
           if (
             text.includes('restoreToolEffectSlotAction') &&
@@ -196,9 +326,47 @@ describe('restoreToolEffectSlotAction (GM restore, R35)', () => {
         }
       }
     };
-    for (const top of ['src', 'server', 'headless', 'bot', 'scripts', 'electron']) {
-      walk(path.join(root, top));
+    // The roots are DERIVED from the repo, not listed: a hardcoded list is a
+    // guard that silently stops covering the next top-level source directory
+    // somebody adds. Everything not on the denylist below is walked.
+    //
+    // `tests` is excluded deliberately (this file names the identifier, and so
+    // may any future test); the rest are dependencies, build output, vendored
+    // or generated trees, packaging assets, and non-code content, none of
+    // which can import the sim action in a way a player could reach.
+    const NON_SOURCE_ROOTS = new Set([
+      'node_modules',
+      'tests',
+      'docs',
+      'public',
+      'mediawiki',
+      'deploy',
+      'android',
+      'ios',
+      'build',
+      'third_party',
+      'screenshots',
+      'skies_in',
+      'ip-refactor',
+      'private',
+      'tmp',
+    ]);
+    const roots = fs
+      .readdirSync(root, { withFileTypes: true })
+      .filter(
+        (entry) =>
+          entry.isDirectory() &&
+          !entry.name.startsWith('.') &&
+          !entry.name.startsWith('dist') && // dist, dist-env, dist-server: bundled output
+          !NON_SOURCE_ROOTS.has(entry.name),
+      )
+      .map((entry) => entry.name);
+    // The derivation may only WIDEN: a denylist typo that dropped one of the
+    // original six roots would quietly stop guarding a real source tree.
+    for (const required of ['src', 'server', 'headless', 'bot', 'scripts', 'electron']) {
+      expect(roots).toContain(required);
     }
+    for (const top of roots) walk(path.join(root, top));
     expect(importers).toEqual(['server/game.ts']);
   });
 });

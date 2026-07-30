@@ -95,17 +95,20 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   policy (`slotToolEffectRefused`) keeps Springback and fishing slots
   refused until their arms have real behavior.
 - `tool_effect_actions.ts`: the slot and recharge COMMAND BODIES behind the
-  seam (`Sim` keeps thin delegates). Everything stateful lives here and
-  every decision in the `tools.ts` leaf above: resolve first, then consume
-  the price (the charm copy by index, the arcane materials), write the slot,
-  and report through the one text-free personal `toolEffectResult` event so
-  no refusal is silent. Draw-free in every arm. The third export,
-  `restoreToolEffectSlotAction` (R35), is deliberately NOT a command body
-  and has NO `Sim` delegate: it is the server admin runtime's GM restore (a
-  charm-free mint the free-grant incident bans from every player-reachable
-  path), callable only from `server/game.ts`, refusing an intact live slot
-  (`already_slotted`) and pinned unreachable by
-  `tests/professions_admin_restore.test.ts`.
+  seam (`Sim` keeps thin delegates). Everything stateful lives here and, for
+  those TWO, every decision in the `tools.ts` leaf above: resolve first, then
+  consume the price (the charm copy by index, the arcane materials), write the
+  slot, and report through the one text-free personal `toolEffectResult` event
+  so no refusal is silent. Draw-free in every arm. A third export, the
+  admin-only `restoreToolEffectSlotAction` (R35), is deliberately NOT a
+  command body and has NO `Sim` delegate: it is the server admin runtime's GM
+  restore (a charm-free mint the free-grant incident bans from every
+  player-reachable path), callable only from `server/game.ts`, refusing an
+  intact live slot (`already_slotted`) and pinned unreachable by
+  `tests/professions_admin_restore.test.ts`. It is also the one arm that does
+  NOT route through `resolveSlotToolEffect`: it carries its own copy of the
+  shared gate chain, which the same test pins tuple-for-tuple against the
+  resolver so the two cannot drift.
 - `fishing_zones.ts`: the per-zone rod-tier ladder (`rodTierRequiredForZone`,
   water gated by the WATER's zone) the cast gate and the vendor rows read;
   since R19 the SAME column also caps how far each water teaches
