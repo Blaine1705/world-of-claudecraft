@@ -136,6 +136,9 @@ import {
   primarySlugForAccount,
   pruneChatLogsBatch,
   pruneClientPerfReportsBatch,
+  pruneEmailChangeRequestsBatch,
+  pruneEmailLogBatch,
+  prunePasswordResetRequestsBatch,
   reclaimDeactivatedName,
   referralCountForAccount,
   releaseAllCharacterLeases,
@@ -3126,6 +3129,19 @@ export async function startServer(): Promise<http.Server> {
         // retire; it rides the shared budget and batch size like every sibling.
         name: 'unstuck_reports',
         pruneBatch: (n) => pruneUnstuckReportsBatch(pool, config.unstuckReportRetentionDays, n),
+      },
+      {
+        name: 'password_reset_requests',
+        pruneBatch: (n) =>
+          prunePasswordResetRequestsBatch(config.passwordResetRequestRetentionDays, n),
+      },
+      {
+        name: 'email_change_requests',
+        pruneBatch: (n) => pruneEmailChangeRequestsBatch(config.emailChangeRequestRetentionDays, n),
+      },
+      {
+        name: 'email_log',
+        pruneBatch: (n) => pruneEmailLogBatch(config.emailLogRetentionDays, n),
       },
     ],
     // The fold precondition makes sample pruning lossless; skip the whole group

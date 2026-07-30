@@ -41,6 +41,9 @@ describe('retention sweep wiring in server/main.ts', () => {
       'pruneUnstuckReports(',
       'pruneUnstuckReportsBatch(',
       'foldOnlinePeak(',
+      'prunePasswordResetRequestsBatch(',
+      'pruneEmailChangeRequestsBatch(',
+      'pruneEmailLogBatch(',
     ]) {
       expect(preListen).not.toContain(call);
     }
@@ -78,6 +81,14 @@ describe('retention sweep wiring in server/main.ts', () => {
       'foldOnlinePeak(',
       'distinctOnlineSampleRealms(',
       'dailyRewardEventsCutoffDay(',
+      // password_reset_requests / email_change_requests / email_log used to be
+      // absent from this table list entirely: each completed reset or email
+      // change left a permanent row (the per-account supersede DELETE in db.ts
+      // only removes a duplicate PENDING row, never a consumed one), and every
+      // outbound email attempt logged forever. These three close that gap.
+      'prunePasswordResetRequestsBatch(',
+      'pruneEmailChangeRequestsBatch(',
+      'pruneEmailLogBatch(',
     ]) {
       expect(count(MAIN, call)).toBe(1);
     }
@@ -120,6 +131,13 @@ describe('retention sweep wiring in server/main.ts', () => {
       'pruneAccountIpAssociationsBatch(pool, config.accountIpAssociationRetentionDays, n)',
     );
     expect(MAIN).toContain('pruneUnstuckReportsBatch(pool, config.unstuckReportRetentionDays, n)');
+    expect(MAIN).toContain(
+      'prunePasswordResetRequestsBatch(config.passwordResetRequestRetentionDays, n)',
+    );
+    expect(MAIN).toContain(
+      'pruneEmailChangeRequestsBatch(config.emailChangeRequestRetentionDays, n)',
+    );
+    expect(MAIN).toContain('pruneEmailLogBatch(config.emailLogRetentionDays, n)');
   });
 
   it('sweeps the play-session fold before the association ager', () => {
