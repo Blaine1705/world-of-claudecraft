@@ -6,7 +6,20 @@
 const API = 'https://discord.com/api/v10';
 
 export class DiscordApi {
-  constructor(private token: string) {}
+  // `fetch` and the retry-after sleep are trailing constructor parameters with
+  // their production defaults so tests can drive the request path (including the
+  // 429 retry) with no real network IO and no real wait. Constructed with the
+  // token alone, as main.ts does, this is exactly the production client.
+  //
+  // Every default forwards to the global rather than capturing it, which keeps
+  // one convention across the three shells: the global is read at CALL time, so
+  // it is never invoked with the instance as its `this`, and a test that swaps a
+  // global after construction is still seen. See bot/CLAUDE.md.
+  constructor(
+    private token: string,
+    private fetchImpl: typeof fetch = (...args) => fetch(...args),
+    private sleep: (ms: number) => Promise<void> = (ms) => new Promise((r) => setTimeout(r, ms)),
+  ) {}
 
   private async request(
     method: string,
@@ -14,7 +27,7 @@ export class DiscordApi {
     body?: unknown,
     retry = true,
   ): Promise<unknown> {
-    const resp = await fetch(`${API}${path}`, {
+    const resp = await this.fetchImpl(`${API}${path}`, {
       method,
       headers: {
         Authorization: `Bot ${this.token}`,
@@ -26,7 +39,7 @@ export class DiscordApi {
     if (resp.status === 429 && retry) {
       const data = (await resp.json().catch(() => ({}))) as { retry_after?: number };
       const waitMs = Math.min(10_000, Math.max(500, (data.retry_after ?? 1) * 1000));
-      await new Promise((r) => setTimeout(r, waitMs));
+      await this.sleep(waitMs);
       return this.request(method, path, body, false);
     }
     if (!resp.ok) {

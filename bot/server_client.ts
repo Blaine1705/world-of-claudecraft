@@ -23,17 +23,42 @@ export interface VoiceMemberPush {
   selfMute: boolean;
 }
 
+/**
+ * How long one server call may run before its AbortController fires. Named
+ * rather than inline so the suite can pin the deadline against a literal.
+ */
+export const SERVER_CALL_TIMEOUT_MS = 8000;
+
+/** What a TimerSeam hands back. Opaque: only ever passed back to clearTimeout. */
+export type TimerHandle = ReturnType<typeof setTimeout> | number;
+
+/** The timer pair backing the per-call deadline. */
+export interface TimerSeam {
+  setTimeout: (fn: () => void, ms: number) => TimerHandle;
+  clearTimeout: (handle: TimerHandle) => void;
+}
+
 export class ServerClient {
+  // `fetch` and the deadline timer pair are trailing constructor parameters with
+  // their production defaults, so a test can drive the whole request/response
+  // envelope with no network IO and fire the abort deadline without a real 8
+  // second wait. Constructed with a base URL and a secret alone, as main.ts
+  // does, this is exactly the production client.
   constructor(
     private baseUrl: string,
     private secret: string,
+    private fetchImpl: typeof fetch = (...args) => fetch(...args),
+    private timers: TimerSeam = {
+      setTimeout: (fn, ms) => setTimeout(fn, ms),
+      clearTimeout: (handle) => clearTimeout(handle),
+    },
   ) {}
 
   private async call<T>(method: string, path: string, body?: unknown): Promise<T | null> {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8000);
+    const timer = this.timers.setTimeout(() => controller.abort(), SERVER_CALL_TIMEOUT_MS);
     try {
-      const resp = await fetch(`${this.baseUrl}${path}`, {
+      const resp = await this.fetchImpl(`${this.baseUrl}${path}`, {
         method,
         headers: {
           'x-woc-discord-secret': this.secret,
@@ -52,7 +77,7 @@ export class ServerClient {
       console.error(`[bot] server ${method} ${path} failed`, err);
       return null;
     } finally {
-      clearTimeout(timer);
+      this.timers.clearTimeout(timer);
     }
   }
 

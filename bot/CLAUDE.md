@@ -21,10 +21,15 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
 - `logic.ts`: **pure, IO-free** protocol/diff/message-builder logic. Unit-tested in
   `tests/discord_bot.test.ts`.
 - `gateway.ts`: ws Gateway (v10) IO shell (HELLO/heartbeat, IDENTIFY, RESUME).
-- `discord_api.ts`: thin Discord REST client (bot-token authed).
+  Tested in `tests/discord_bot_gateway.test.ts`.
+- `discord_api.ts`: thin Discord REST client (bot-token authed). Tested in
+  `tests/discord_bot_discord_api.test.ts`.
 - `server_client.ts`: client for the game server's secret-gated `/internal/discord/*`
   endpoints (`x-woc-discord-secret`); grep `/internal/discord/` there for the live set.
-- `config.ts`: env to `BotConfig` (throws on missing required).
+  Tested in `tests/discord_bot_server_client.test.ts`.
+- `config.ts`: env to `BotConfig` (throws on missing required). Tested in
+  `tests/discord_bot_config.test.ts`.
+- `cadence.ts`: the poll-loop interval constants, importable without booting `main.ts`.
 - `main.ts`: wiring only: guild state seeded from `GUILD_CREATE` (plus the op 8
   member backfill for large guilds), kept live by the `GUILD_MEMBER_*` events,
   event dispatch, the poll loops.
@@ -44,6 +49,15 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
 - **Pure/IO split** (like `wallet_link.ts` vs `wallet.ts`): protocol/diff/embed
   logic in `logic.ts` (tested), ws/fetch IO in the shells. Don't inline opcode or
   role-diff logic into `gateway.ts`/`main.ts`.
+- **One injection convention in the three shells.** Each shell takes its IO as
+  TRAILING constructor parameters with production defaults, so `main.ts` keeps
+  constructing with the leading arguments only and gets exactly production IO.
+  Every default FORWARDS to the global, `(...args) => fetch(...args)` and
+  `(cb, ms) => setTimeout(cb, ms)`, never `= fetch` or `= { setTimeout }`: the
+  forwarding form reads the global at CALL time, so a test that swaps a global
+  after construction is still seen, and the global is never invoked with the
+  instance as its `this`. Every shell also has a test that drives the DEFAULT
+  path, not just the injected one; keep that pair when adding a shell.
 - **Secrets are env only**; never commit them. `DISCORD_BOT_SECRET` must match the server's.
 - **Privileged intents:** `GUILD_MEMBERS` + `GUILD_PRESENCES` must be enabled for the
   application in the Discord developer portal, or IDENTIFY is rejected (close 4014).

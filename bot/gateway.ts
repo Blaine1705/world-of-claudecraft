@@ -15,8 +15,23 @@ export interface GatewayHandlers {
   onDispatch(type: string, data: Record<string, unknown>): void;
 }
 
+/** Opens the gateway socket. Injected so tests can hand the Gateway a fake
+ *  socket; production is the `ws` client this file already imports. The return
+ *  type is `ws`'s own WebSocket so the `on('message'|'close'|'error', ...)`
+ *  callbacks keep their contextual parameter types and `WebSocket.OPEN` stays
+ *  reachable. */
+export type GatewaySocketFactory = (url: string) => WebSocket;
+
+/** The timers the reconnect delays and the heartbeat run on. Injected so tests
+ *  can drive those paths on fake timers instead of real waits. */
+export interface GatewayTimers {
+  setTimeout: (cb: () => void, ms: number) => ReturnType<typeof setTimeout>;
+  setInterval: (cb: () => void, ms: number) => ReturnType<typeof setInterval>;
+  clearInterval: (id: ReturnType<typeof setInterval>) => void;
+}
+
 // Close codes we cannot resume from / must not auto-reconnect (bad token, bad
-// intents, etc.) — see Discord gateway close-code docs.
+// intents, etc.), see Discord gateway close-code docs.
 const FATAL_CLOSE_CODES = new Set([4004, 4010, 4011, 4012, 4013, 4014]);
 
 export class Gateway {
@@ -32,6 +47,17 @@ export class Gateway {
     private token: string,
     private gatewayUrl: string,
     private handlers: GatewayHandlers,
+    // Socket + timers trail `handlers` with their production defaults, so
+    // main.ts keeps constructing with the first three arguments and gets exactly
+    // today's IO; tests pass a fake socket and fake timers instead. Each default
+    // forwards to the global rather than capturing it, the same convention the
+    // other two shells use (see bot/CLAUDE.md).
+    private socketFactory: GatewaySocketFactory = (url) => new WebSocket(url),
+    private timers: GatewayTimers = {
+      setTimeout: (cb, ms) => setTimeout(cb, ms),
+      setInterval: (cb, ms) => setInterval(cb, ms),
+      clearInterval: (id) => clearInterval(id),
+    },
   ) {}
 
   /**
@@ -47,7 +73,7 @@ export class Gateway {
   connect(resume = false): void {
     this.resuming = resume && this.sessionId !== null;
     const base = this.resuming && this.resumeUrl ? this.resumeUrl : this.gatewayUrl;
-    const ws = new WebSocket(`${base}/?v=10&encoding=json`);
+    const ws = this.socketFactory(`${base}/?v=10&encoding=json`);
     this.ws = ws;
     ws.on('message', (raw) => {
       try {
@@ -81,7 +107,7 @@ export class Gateway {
       case GATEWAY_OP.INVALID_SESSION:
         // d=true means resumable; else re-identify after a short delay.
         this.resuming = payload.d === true;
-        setTimeout(() => this.reconnect(this.resuming), 1500);
+        this.timers.setTimeout(() => this.reconnect(this.resuming), 1500);
         break;
       case GATEWAY_OP.RECONNECT:
         this.reconnect(true);
@@ -108,7 +134,7 @@ export class Gateway {
   private startHeartbeat(intervalMs: number): void {
     this.stopHeartbeat();
     this.acked = true;
-    this.heartbeatTimer = setInterval(() => {
+    this.heartbeatTimer = this.timers.setInterval(() => {
       if (!this.acked) {
         // No ACK since the last beat: the connection is a zombie. Drop + resume.
         this.ws?.terminate();
@@ -124,7 +150,7 @@ export class Gateway {
   }
 
   private stopHeartbeat(): void {
-    if (this.heartbeatTimer) clearInterval(this.heartbeatTimer);
+    if (this.heartbeatTimer) this.timers.clearInterval(this.heartbeatTimer);
     this.heartbeatTimer = null;
   }
 
@@ -138,7 +164,7 @@ export class Gateway {
       console.error(`[bot] gateway closed with fatal code ${code}; not reconnecting`);
       return;
     }
-    setTimeout(() => this.reconnect(true), 2000);
+    this.timers.setTimeout(() => this.reconnect(true), 2000);
   }
 
   private reconnect(resume: boolean): void {
