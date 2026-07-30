@@ -384,6 +384,23 @@ veto-able by the maintainer, the R32/R45 pattern):
   its XP and cadence, the coin sink survives by construction, and the
   surrendered value is bounded per window. Both recorded in
   `docs/design/professions.md` beside the conventions they interpret.
+- **R55. Farshore Isle gains Gull Mere, real fishable water.** The
+  fishing-town-themed starter zone shipped with ZERO fishable water (the
+  Hilltop Spring's bed is re-raised above swim depth by the Crown dome's
+  +14 lift, and open ocean is never a water body), so its tier-1 rod row
+  was decorative: the merge-settlement checkpoint's probe sweep proved it
+  and handed the authoring here. The experiment swept the whole rect: the
+  entire inland approach from Gullhaven sits in the dome's shadow (the
+  first fishable basin appears about 100 yards from the dome centre, and
+  the hub is 102.6 from it), a radius-14 lake has NO fully-inland
+  footprint anywhere on the isle, and the north downs carry the only
+  clean basins. Gull Mere lands at (350, 118) radius 10: 82 percent of
+  the disc fishable at the world-wide canonical -7.60 bed, a complete
+  castable walkable shore ring, a 1.28-steepness walk from the hub, every
+  hazard gap measured and recorded at the lake's authoring comment, and
+  the water flora census re-minted (one new region, 3 lilies, 5 reeds).
+  The zone stays R37-starter otherwise: tier-1 rod row now real, catch
+  table still the Vale fallback until the zone-4 re-tier.
 - **R54. Fishing's identity has NO fine-grade axis, and rare-moment
   flavor stays zone-agnostic.** The richness audit's two decisions,
   written into the design record: fishing's specials are its
