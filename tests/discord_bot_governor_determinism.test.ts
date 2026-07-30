@@ -556,27 +556,25 @@ describe('governor arithmetic and remap migration', () => {
     const { governor, clock } = ceilRig();
     const at: number[] = [];
 
-    // Exhausted, no bucket header at all.
+    // Rate state, but NO bucket header, so it lands under the provisional key.
     await send(governor, clock, at, {
-      'x-ratelimit-remaining': '0',
+      'x-ratelimit-remaining': '5',
       'x-ratelimit-reset-after': '4',
     });
-    // The window is still shut, so this one waits, and the response that
-    // finally arrives names the hash.
-    await send(governor, clock, at, {
-      'x-ratelimit-bucket': 'abcdef',
-      'x-ratelimit-remaining': '0',
-      'x-ratelimit-reset-after': '3',
-    });
-    // Gated by the MIGRATED state, under the hash rather than the template.
-    await send(governor, clock, at, {
-      'x-ratelimit-bucket': 'abcdef',
-      'x-ratelimit-remaining': '9',
-    });
-
-    expect(at).toEqual([0, 4000, 7000]);
-    // Exactly one bucket, not one under the template plus one under the hash.
     expect(governor.snapshot().trackedBuckets).toBe(1);
+
+    // Now the hash arrives on a response carrying NO rate headers of its own.
+    // That is what makes the migration observable: there is nothing here to
+    // rebuild the state from, so a block that fails to MOVE the existing entry
+    // onto the hash simply loses it. An earlier version of this test let the
+    // second response carry fresh headers, which quietly reconstructed the
+    // state and left the migration untestable.
+    await send(governor, clock, at, { 'x-ratelimit-bucket': 'abcdef' });
+
+    // Still exactly one bucket: moved, not dropped, and not duplicated under
+    // both the template and the hash.
+    expect(governor.snapshot().trackedBuckets).toBe(1);
+    expect(governor.snapshot().trackedRoutes).toBe(1);
   });
 
   it('keeps a query string out of the bucket key but intact in a redacted path', async () => {

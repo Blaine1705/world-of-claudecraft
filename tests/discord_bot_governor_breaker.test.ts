@@ -459,18 +459,54 @@ describe('half-open probe ownership', () => {
     const rig = makeRig();
     await openThenQuiet(rig);
 
-    // The essential reply succeeds while the breaker is still OPEN. It must not
-    // move the breaker at all, however many of them land.
+    // While the breaker is HALF-OPEN and a probe is genuinely in flight, an
+    // essential success must still not close it. This is the arm that makes the
+    // `isProbe` half of the settle guard decisive: with the breaker merely OPEN,
+    // settleProbe early-returns anyway, so dropping `isProbe` is invisible.
+    // The probe is held open by a deferred the test resolves by hand, rather
+    // than by a timed wait: the shared `call` helper drains the whole clock, so
+    // anything clock-based would already have finished before the essential
+    // request below could overlap it.
+    let releaseProbe: (r: GovernorResponse) => void = () => {};
+    const probeHeld = new Promise<GovernorResponse>((resolve) => {
+      releaseProbe = resolve;
+    });
+    const probe = rig.governor.run(SWEEP, () => {
+      rig.sent.push('probe');
+      return probeHeld;
+    });
+    const probeSettled = probe.then(
+      () => 'resolved',
+      () => 'rejected',
+    );
+    // Let the probe be claimed and reach its send.
+    await rig.clock.runAll();
+    expect(rig.governor.snapshot().breakerState).toBe('half-open');
+
+    // The essential reply lands DURING the probe and succeeds. Under the mutant
+    // that settles on ANY success, this closes the breaker.
+    expect((await call(rig, REPLY, OK)).status).toBe(200);
+    expect(rig.governor.snapshot().breakerState).toBe('half-open');
+
+    // Now let the probe itself finish, badly, and the breaker re-opens.
+    releaseProbe(statusOnly(403));
+    await rig.clock.runAll();
+    await probeSettled;
+
+    // The probe was the only request entitled to decide, and it failed, so the
+    // breaker is open again on its own account.
+    const afterProbe = rig.governor.snapshot();
+    expect(afterProbe.breakerState).toBe('open');
+    expect(afterProbe.breakerOpens).toBe(2);
+
+    // More essential replies still succeed and still move nothing, and the
+    // freshly restarted quiet window means the sweep is genuinely refused.
     expect((await call(rig, REPLY, OK)).status).toBe(200);
     expect((await call(rig, REPLY, OK)).status).toBe(200);
     const snap = rig.governor.snapshot();
     expect(snap.breakerState).toBe('open');
-    expect(snap.breakerOpens).toBe(1);
-
-    // Note the sweep is deliberately NOT asserted refused here: a full quiet
-    // window HAS elapsed, so the next non-essential request is entitled to be
-    // the probe. The claim under test is only that essential success never
-    // closed the breaker on its behalf, and the state above is that claim.
+    expect(snap.breakerOpens).toBe(2);
+    expect((await refused(rig, SWEEP)).reason).toBe('breaker-open');
   });
 
   it('settles a probe that never gets an answer instead of latching half-open', async () => {
@@ -540,9 +576,14 @@ describe('governor registry bounds', () => {
     for (let i = 0; i < 600; i++) {
       // Keep touching the hot route so it stays the most recently used entry.
       if (i % 5 === 0) await call(rig, SWEEP, hashed('sweep-bucket'));
+      // Built by string concatenation, NOT by adding to a numeric literal:
+      // 1000000000000000000 is past Number.MAX_SAFE_INTEGER, so `literal + i`
+      // silently collapses hundreds of iterations onto the same few ids, the
+      // map never grows, and this test passes with the bound deleted.
+      const interactionId = `1000000000000000${String(i).padStart(3, '0')}`;
       await call(
         rig,
-        { method: 'POST', path: `/interactions/${1000000000000000000 + i}/tok/callback` },
+        { method: 'POST', path: `/interactions/${interactionId}/tok/callback` },
         hashed(`interaction-${i}`),
       );
     }
