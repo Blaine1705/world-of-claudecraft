@@ -180,15 +180,23 @@ export function effectiveFishingBand(meta: PlayerMeta): 0 | 1 | 2 {
   ) as 0 | 1 | 2;
 }
 
-// Per-catch proficiency gain schedule (Professions 2.0): fishing has
-// no per-node tier to score against, so its gain is proficiency-relative by
-// design. The effective fishing band is min(profBand, rodBand), so a
-// band-appropriate catch always reduces to a function of proficiency alone;
-// the breakpoints are the half-band boundaries (50 inside band 0, 150 inside
-// band 1), halving-then-tapering the gain each step. Proficiency 200 (band 2)
-// is a thousands-of-catches journey by design: the 0.02 trickle is the climb's
-// long tail, and at or past the last row the gain is 0 (the maxSkill cap clamp
-// is the real stop, not this schedule).
+// Per-catch proficiency gain schedule (Professions 2.0): the breakpoints are
+// the half-band boundaries (50 inside band 0, 150 inside band 1),
+// halving-then-tapering the gain each step. Proficiency 200 (band 2) is a
+// thousands-of-catches journey by design: the 0.02 trickle is the climb's
+// long tail, and at or past the last row the gain is 0 (the maxSkill cap
+// clamp is the real stop, not this schedule).
+//
+// The schedule is only HALF the model since R19: the water's ZONE TIER caps
+// how far a given water teaches (fishingTeachingCeilingFor below), the same
+// shape the land curve gets from node tiers. Before R19 fishing gain was
+// proficiency-relative alone, which made zone-1 water the mathematically
+// optimal grind spot all the way to the 200 cap; now the climb itself pulls
+// an angler to better water, while the catch tables keep paying whatever the
+// zone pays. R19 is the packet's one authorized extension of the D12
+// no-gain-changes scope, and the schedule VALUES are deliberately untouched:
+// the ceiling composes with them, so every gain a legal water grants is the
+// number this table always granted.
 export const FISHING_GAIN_SCHEDULE = [
   { belowProficiency: 50, gain: 1 },
   { belowProficiency: 100, gain: 0.5 },
@@ -211,6 +219,27 @@ export function fishingCatchGain(proficiency: number, isJunk: boolean): number {
     if (proficiency < row.belowProficiency) return row.gain;
   }
   return 0;
+}
+
+// The teaching ceiling one water can carry an angler to (R19): DERIVED from
+// the schedule's own row boundaries rather than a second constant set, so
+// the two halves of the model cannot drift. Tier-1 water teaches through the
+// schedule's first two rows and grays at 100; tier-2 through the third row
+// to 150; tier-3 and up to the last boundary, the cap itself. The zone tier
+// here is the same zone-progression column the rod gate reads
+// (fishing_zones.ts; the v0.32.0 starter zones are all explicit tier 1, so
+// their water teaches to 100 until a future content pass re-tiers them).
+export function fishingTeachingCeilingFor(zoneTier: number): number {
+  const row = Math.max(1, Math.min(zoneTier, FISHING_GAIN_SCHEDULE.length - 1));
+  return FISHING_GAIN_SCHEDULE[row].belowProficiency;
+}
+
+// The full R19 gain model: the schedule amount, zeroed at or past the
+// water's teaching ceiling. Pure and draw-free like both halves; a graying
+// water returns 0, which queueGatheringGrant drops.
+export function fishingCatchGainAt(proficiency: number, isJunk: boolean, zoneTier: number): number {
+  if (proficiency >= fishingTeachingCeilingFor(zoneTier)) return 0;
+  return fishingCatchGain(proficiency, isJunk);
 }
 
 /** The first facing-forward ring sample with fishable-depth water, or null.
@@ -545,16 +574,25 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // fishing proficiency and loot, never levels. Pinned by the zero-XP test in
   // tests/professions_fishing.test.ts.
   // Fishing proficiency: a landed catch accrues the fractional
-  // schedule amount (fishingCatchGain above, junk cut off past band 0) through
-  // the shared gathering-grant queue, draining on the tick path exactly like a
-  // world-node harvest. The gain is pure state computed AFTER the single table
-  // draw (zero rng draws, zero draw reordering), and a 0 gain queues nothing
-  // (queueGatheringGrant drops non-positive amounts). Deliberately queued only
-  // here, on the landed path: the no-bite null branch, the bags-full got-away
-  // branch, and the codfather quest branch (which returns above) never accrue.
+  // schedule amount (fishingCatchGainAt above: the schedule, junk cut off
+  // past band 0, zeroed at or past the WATER'S teaching ceiling per R19)
+  // through the shared gathering-grant queue, draining on the tick path
+  // exactly like a world-node harvest. The zone tier is the SAME `zoneId`
+  // local the catch table resolved above (the rod-gate-validated cast zone,
+  // with the position fallback for direct drives), so the table, the deed
+  // credit, the telemetry, and the gain all read one water. The gain is pure
+  // state computed AFTER the single table draw (zero rng draws, zero draw
+  // reordering), and a 0 gain queues nothing (queueGatheringGrant drops
+  // non-positive amounts). Deliberately queued only here, on the landed
+  // path: the no-bite null branch, the bags-full got-away branch, and the
+  // codfather quest branch (which returns above) never accrue.
   queueGatheringGrant(
     meta,
     'fishing',
-    fishingCatchGain(meta.gatheringProficiency.fishing ?? 0, ITEMS[caught]?.kind === 'junk'),
+    fishingCatchGainAt(
+      meta.gatheringProficiency.fishing ?? 0,
+      ITEMS[caught]?.kind === 'junk',
+      rodTierRequiredForZone(zoneId),
+    ),
   );
 }

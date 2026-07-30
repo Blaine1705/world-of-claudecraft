@@ -35,6 +35,7 @@ import { bagCapacity } from '../src/sim/bags';
 import { updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { FISHING_TABLES, FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
+import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import { DEEPFEN_SHALLOWS_LAKE, ITEMS, LAKE } from '../src/sim/data';
 import {
   completeFishing,
@@ -43,6 +44,8 @@ import {
   FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY,
   fishingBandFor,
   fishingCatchGain,
+  fishingCatchGainAt,
+  fishingTeachingCeilingFor,
   startFishing,
 } from '../src/sim/professions/fishing';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
@@ -671,10 +674,15 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
     expect(meta.pendingGatherGrants).toEqual([{ professionId: 'fishing', amount: 0.5 }]);
   });
 
-  it('live junk cutoff: at proficiency 150 a weed queues nothing while a fish queues 0.02', () => {
-    // No rod, so the band-1 proficiency silently caps to the band-0 table,
-    // which still carries the weed row: junk-ness comes from the caught
-    // item's def kind (ItemDef kind 'junk'), never from the band.
+  it('live R19 ceiling: at proficiency 150 tier-1 water teaches NOTHING, fish and weed alike', () => {
+    // Before R19 this drive pinned the junk cutoff (the fish queued 0.02
+    // while the weed queued nothing). Tier-1 water now grays entirely at 100,
+    // which SWALLOWS the junk cutoff here: both kinds queue nothing, and the
+    // junk-versus-fish discrimination above the ceiling only exists in
+    // higher-tier water, where the pure arms below pin it (a live tier-2
+    // drive would need a rod and a junk row in that band's table, which the
+    // shipped tables do not guarantee). The drive still lands both kinds so
+    // the zero is proven for each, not vacuously.
     const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     teleportToValeShore(sim);
@@ -684,24 +692,58 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
     for (let i = 0; i < 60 && !(sawJunk && sawFish); i++) {
       const before = meta.pendingGatherGrants.length;
       const { caught } = castOnce(sim, meta);
-      if (caught === null) {
-        expect(meta.pendingGatherGrants).toHaveLength(before);
-      } else if (caught === WEED) {
-        sawJunk = true;
-        expect(meta.pendingGatherGrants).toHaveLength(before); // cut off past band 0
-      } else {
-        sawFish = true;
-        expect(meta.pendingGatherGrants).toHaveLength(before + 1);
-        expect(meta.pendingGatherGrants[meta.pendingGatherGrants.length - 1]).toEqual({
-          professionId: 'fishing',
-          amount: 0.02,
-        });
-      }
+      if (caught === WEED) sawJunk = true;
+      else if (caught !== null) sawFish = true;
+      expect(meta.pendingGatherGrants).toHaveLength(before);
     }
-    // Decisive only if the drive really saw both kinds (seed 467's band-0
-    // walk lands both well inside 60 casts).
     expect(sawJunk).toBe(true);
     expect(sawFish).toBe(true);
+  });
+
+  it('the R19 teaching ceilings derive from the schedule rows: 100, 150, then the cap', () => {
+    // Walked off the composed gain, not restated: the first proficiency at
+    // which a legal-band fish teaches nothing in each water tier.
+    const grayPoint = (zoneTier: number): number => {
+      for (let p = 0; p <= 200; p++) {
+        if (fishingCatchGainAt(p, false, zoneTier) === 0) return p;
+      }
+      return Number.POSITIVE_INFINITY;
+    };
+    expect(grayPoint(1)).toBe(100);
+    expect(grayPoint(2)).toBe(150);
+    expect(grayPoint(3)).toBe(200);
+    // Each is a true boundary and equals its schedule row's edge, the
+    // derivation the ceiling is defined by.
+    for (const tier of [1, 2, 3]) {
+      expect(fishingCatchGainAt(grayPoint(tier) - 1, false, tier)).toBeGreaterThan(0);
+      expect(fishingTeachingCeilingFor(tier)).toBe(FISHING_GAIN_SCHEDULE[tier].belowProficiency);
+    }
+    // Tier-3 water teaches to the cap: the ceiling IS the cap, so only the
+    // maxSkill clamp stops the climb there.
+    expect(fishingTeachingCeilingFor(3)).toBe(GATHERING_PROFESSIONS.fishing.maxSkill);
+    // Out-of-ladder tiers clamp instead of throwing: below 1 reads tier 1,
+    // above 3 reads tier 3 (a future tier-4 zone teaches to the cap until
+    // the schedule itself grows a row).
+    expect(fishingTeachingCeilingFor(0)).toBe(100);
+    expect(fishingTeachingCeilingFor(4)).toBe(200);
+  });
+
+  it('below its water ceiling the composed gain IS the schedule amount (the D12 arm)', () => {
+    // R19 composes with the untouched schedule: no value changes, teaching
+    // just stops at the water's edge. Junk composition included: the cutoff
+    // still bites above 100 wherever the water itself still teaches.
+    expect(fishingCatchGainAt(0, false, 1)).toBe(1);
+    expect(fishingCatchGainAt(49, false, 1)).toBe(1);
+    expect(fishingCatchGainAt(50, false, 1)).toBe(0.5);
+    expect(fishingCatchGainAt(99, false, 1)).toBe(0.5);
+    expect(fishingCatchGainAt(100, false, 2)).toBe(0.1);
+    expect(fishingCatchGainAt(149, false, 2)).toBe(0.1);
+    expect(fishingCatchGainAt(150, false, 3)).toBe(0.02);
+    expect(fishingCatchGainAt(199, false, 3)).toBe(0.02);
+    // The junk cutoff survives inside higher water's teaching range.
+    expect(fishingCatchGainAt(120, true, 2)).toBe(0);
+    expect(fishingCatchGainAt(120, false, 2)).toBe(0.1);
+    expect(fishingCatchGainAt(99, true, 1)).toBe(0.5);
   });
 });
 

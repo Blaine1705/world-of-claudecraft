@@ -81,7 +81,7 @@ takeable back to back.
 | D9 | Fishing difficulty is skill-versus-zone, not reaction time. |
 | D10 | Wire the parked `TOOL_EFFECTS` system as the rare-tool hook. |
 | D11 | Fishing keeps granting zero character XP, documented as deliberate. |
-| D12 | No XP or proficiency gain constant changes anywhere in this packet. |
+| D12 | No XP or proficiency gain constant changes anywhere in this packet. One authorized exception, R19 (the review worklist's rulings ledger): the fishing teaching ceiling composes a zone-tier gray-out onto the untouched `FISHING_GAIN_SCHEDULE`, extending this scope for that one mechanic with the maintainer's sign-off. Every gain a legal water grants is still the schedule's own number. |
 
 ### D1: why `buyValue` stays
 
