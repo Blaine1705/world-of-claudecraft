@@ -435,6 +435,7 @@ export type { MarketSave } from './market';
 
 import { updateSwimFatigue } from './fatigue';
 import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
+import type { CombatExitMemory } from './instance_exit_memory';
 import {
   applyDungeonMobTuning,
   mobLevelForDungeonDifficulty,
@@ -985,6 +986,12 @@ export interface InstanceSlot {
   // when they actually entered this run: a door-camper or a member parked in
   // town takes the lockout without turning roster membership into mailed income.
   enteredBy: Set<number>;
+  // Recently-exited-mid-combat memory (issue #2653): a player who left this claim
+  // while a mob was actively fighting them has their dropped threat snapshotted
+  // here for a short window. Re-entering before it lapses resumes the fight
+  // instead of granting a free, unengaged reset (instances/dungeons.ts). Session
+  // state, cleared with the claim, same as clearedBy/enteredBy above.
+  combatExitMemory: CombatExitMemory;
 }
 
 export interface ResolvedAbility {
@@ -2060,6 +2067,7 @@ export class Sim {
             resetAvailableAt: 0,
             clearedBy: new Set(),
             enteredBy: new Set(),
+            combatExitMemory: new Map(),
           });
         }
         continue;
@@ -2090,6 +2098,7 @@ export class Sim {
           resetAvailableAt: 0,
           clearedBy: new Set(),
           enteredBy: new Set(),
+          combatExitMemory: new Map(),
         });
       }
     }
@@ -2208,6 +2217,7 @@ export class Sim {
         progressed: false,
         seqResetAt: -Infinity,
         bossDeathZones: [],
+        combatExitMemory: new Map(),
       });
     }
 

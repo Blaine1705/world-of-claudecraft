@@ -18,6 +18,12 @@
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '../data';
 import { createGroundObject, createMob } from '../entity';
+import {
+  type CombatExitThreatEntry,
+  recordCombatExit,
+  takeCombatExit,
+} from '../instance_exit_memory';
+import { retargetMob } from '../mob/targeting';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { arenaQueueLeave } from '../social/arena';
@@ -425,6 +431,10 @@ export function enterDungeon(
   const passingThroughNythraxisCrypt =
     dungeonId === 'nythraxis_crypt' && corpseRunClaim !== undefined;
   if (p.ghost && !passingThroughNythraxisCrypt) resurrectOnInstanceReentry(ctx, r.meta, p, p.pos);
+  // A living return within the memory window resumes whatever mid-combat exit
+  // this player left behind in this exact claim (issue #2653); a still-dead
+  // ghost passing through has nothing to resume (mobs never target the dead).
+  if (!p.dead) resumeRememberedCombat(ctx, inst, r.meta.entityId);
   ctx.emit({ type: 'log', text: dungeon.enterText, color: '#b9f', pid: r.meta.entityId });
   // Stepping through the moongate is a Chronicle task.
   if (dungeonId === 'drowned_temple') ctx.markVisited(r.meta, 'dungeon:drowned_temple');
@@ -540,11 +550,21 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
 // Drop one departing player (and every entity they own) from the hate tables of
 // all mobs in the instance, releasing any aggro locked onto them. With the table
 // entry gone, updateMobTarget re-targets the remaining party next tick, or the
-// mob evades home when nobody is left on the table.
+// mob evades home when nobody is left on the table. A player leaving while a mob
+// is genuinely fighting them also has that exact threat value snapshotted onto
+// the claim (issue #2653): re-entering the SAME live instance shortly after
+// resumes the fight (resumeRememberedCombat) instead of granting a free,
+// unengaged reset. An out-of-combat walk-out (mob never aggroed, or already
+// dead) drops nothing worth remembering, so no memory entry is made.
 function scrubInstanceThreat(ctx: SimContext, inst: InstanceSlot, pid: number): void {
+  const mobThreat: CombatExitThreatEntry[] = [];
   for (const id of inst.mobIds) {
     const mob = ctx.entities.get(id);
     if (!mob || mob.dead) continue;
+    const priorThreat = mob.threat.get(pid);
+    if (mob.inCombat && priorThreat !== undefined && priorThreat > 0) {
+      mobThreat.push([id, priorThreat]);
+    }
     dropThreat(mob, pid);
     for (const srcId of [...mob.threat.keys()]) {
       if (ctx.entities.get(srcId)?.ownerId === pid) dropThreat(mob, srcId);
@@ -553,6 +573,23 @@ function scrubInstanceThreat(ctx: SimContext, inst: InstanceSlot, pid: number): 
       const tgt = ctx.entities.get(mob.aggroTargetId);
       if (mob.aggroTargetId === pid || tgt?.ownerId === pid) mob.aggroTargetId = null;
     }
+  }
+  recordCombatExit(inst.combatExitMemory, pid, ctx.time, mobThreat);
+}
+
+// Reapply a still-live mid-combat exit snapshot (issue #2653): if `pid` left this
+// SAME claim while genuinely fighting within the memory window, restore the
+// exact threat scrubbed at the door and force any mob that lost its target back
+// into the fight, instead of letting it sit idle/evading until manually re-pulled.
+// A lapsed or absent memory entry is a no-op: the claim resets exactly as before.
+function resumeRememberedCombat(ctx: SimContext, inst: InstanceSlot, pid: number): void {
+  const rec = takeCombatExit(inst.combatExitMemory, pid, ctx.time);
+  if (!rec) return;
+  for (const [mobId, threat] of rec.mobThreat) {
+    const mob = ctx.entities.get(mobId);
+    if (!mob || mob.dead) continue;
+    mob.threat.set(pid, threat);
+    if (mob.aggroTargetId === null) retargetMob(ctx, mob);
   }
 }
 
@@ -579,6 +616,7 @@ function claimInstance(
   inst.claimedAt = ctx.time;
   inst.clearedBy = new Set();
   inst.enteredBy = new Set();
+  inst.combatExitMemory = new Map();
   const origin = instanceOriginOf(inst);
   for (const spawn of dungeon.spawns) {
     const template = MOBS[spawn.mobId];
@@ -659,6 +697,7 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
   inst.claimedAt = undefined;
   inst.clearedBy = new Set();
   inst.enteredBy = new Set();
+  inst.combatExitMemory = new Map();
 }
 
 // Explicit classic-style reset for the caller's standard dungeon claims. Durable
