@@ -11,11 +11,16 @@ import { ITEMS } from '../src/sim/data';
 import { requiredReagentCountFor } from '../src/sim/professions/crafting';
 import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/disenchant_reagents';
 import {
+  NO_TOOL_OWNED,
   normalizeToolEffectSlots,
   RECHARGE_CHARGES_PER_MATERIAL,
   rarityLadderIndex,
   startingDurabilityFor,
 } from '../src/sim/professions/tools';
+import {
+  bestWieldableGatherToolTierOrNone,
+  TIER4_TOOL_WIELD_PROFICIENCY,
+} from '../src/sim/professions/wield_gate';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 
@@ -307,6 +312,74 @@ describe('the recharge command: price, consume, refill', () => {
     expect(sim.countItem('arcane_shard')).toBe(45);
     expect(sim.countItem('arcane_dust')).toBe(50);
     expect(sim.countItem('arcane_essence')).toBe(50);
+  });
+
+  it('R47/R30 read the best tool OWNED: an unwieldable pick still sets the price rung', () => {
+    // The ruling boundary, stated: the wield gate (professions/wield_gate.ts)
+    // filters ACCESS, so a tier-4 pick under its 85 requirement works no node
+    // at all, while the R47/R30 price family reads the best tool OWNED. They
+    // price, they do not gate. A wieldability read here would answer no_tool
+    // and price nothing, which is why the rung below is the assertion.
+    const run = (miningProficiency: number) => {
+      const sim = makeSim();
+      sim.addItem('copper_mining_pick', 1);
+      sim.addItemInstance('gatherers_cache', { signer: 'Elsewhere' }, sim.playerId, 1);
+      sim.slotToolEffect('mining', 'gatherers_cache');
+      const slot = metaOf(sim).toolEffectSlots?.mining;
+      if (!slot) throw new Error('slot minted');
+      // Minted on the common pick (ceiling 20), which then leaves the bags:
+      // the tier-4 RARE pick is the only mining tool carried from here on.
+      expect(slot.maxDurability).toBe(startingDurabilityFor('gatherers_cache', 'common'));
+      sim.removeItem('copper_mining_pick', 1);
+      sim.addItem('thorium_mining_pick', 1);
+      metaOf(sim).gatheringProficiency.mining = miningProficiency;
+      slot.durability = 0;
+      sim.addItem('arcane_essence', 10);
+      sim.rechargeToolEffect('mining');
+      return { sim, slot, events: sim.tick() };
+    };
+    const { sim, slot, events } = run(0);
+    // POSITIVE CONTROL: the wield filter really refuses this pick at mining 0
+    // and really admits it at its requirement, so the recharge below is
+    // resolving off a tool the player genuinely cannot swing.
+    expect(
+      bestWieldableGatherToolTierOrNone(metaOf(sim).inventory, 'mining', 0, ITEMS),
+      'the fixture pick must be unwieldable at mining 0',
+    ).toBe(NO_TOOL_OWNED);
+    expect(
+      bestWieldableGatherToolTierOrNone(
+        metaOf(sim).inventory,
+        'mining',
+        TIER4_TOOL_WIELD_PROFICIENCY,
+        ITEMS,
+      ),
+    ).toBe(4);
+    // Priced and filled at the RARE rung the unwieldable pick carries: 40
+    // charges billed in arcane_essence, never the arcane_dust the slot's own
+    // common ceiling would have named on its own.
+    expect(lastToolEffectResult(events)).toMatchObject({
+      action: 'recharge',
+      ok: true,
+      materialItemId: 'arcane_essence',
+      count: 4,
+    });
+    expect(slot.durability).toBe(startingDurabilityFor('gatherers_cache', 'rare'));
+    expect(slot.durability).toBe(40);
+    expect(slot.maxDurability).toBe(40);
+    expect(sim.countItem('arcane_essence')).toBe(6);
+    // With the counter earned the answer is the same one, against the same
+    // literals rather than against the arm above: the ruling is that none of
+    // these numbers ever depended on the counter.
+    const earned = run(TIER4_TOOL_WIELD_PROFICIENCY);
+    expect(lastToolEffectResult(earned.events)).toMatchObject({
+      action: 'recharge',
+      ok: true,
+      materialItemId: 'arcane_essence',
+      count: 4,
+    });
+    expect(earned.slot.durability).toBe(40);
+    expect(earned.slot.maxDurability).toBe(40);
+    expect(earned.sim.countItem('arcane_essence')).toBe(6);
   });
 
   it('slotting and recharging draw no rng at all', () => {

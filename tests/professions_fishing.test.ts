@@ -83,6 +83,9 @@ interface FishingResultEvent {
   pid: number;
   itemId: string;
   quality: string;
+  /** The water the cast resolved against, which the tier-2 R19 drive below
+   *  reads to prove it fished Mirefen rather than the Vale fallback. */
+  zoneId: string;
 }
 
 function fishingResultsIn(events: readonly SimEvent[]): FishingResultEvent[] {
@@ -698,6 +701,54 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
     }
     expect(sawJunk).toBe(true);
     expect(sawFish).toBe(true);
+  });
+
+  it('live R19 in TIER-2 water: Mirefen still teaches 0.1 at proficiency 120', () => {
+    // The live evidence every drive above is blind to: they all fish tier-1
+    // Vale water, so replacing the rodTierRequiredForZone(zoneId) read at
+    // completeFishing's gain call with the literal 1 kept the whole suite
+    // green. 120 is past tier-1's ceiling of 100 and inside tier-2's 150, so
+    // that mutation zeroes the grant this arm requires. Driven in the Deepfen
+    // Shallows (Mirefen), through the shore probe that runs the REAL
+    // startFishing, so the zone rod gate is satisfied for real by the Ironreel
+    // the water demands.
+    const sim = makeSim(467);
+    const meta = sim.meta(sim.playerId)!;
+    sim.addItem('ironreel_fishing_rod', 1);
+    teleportToDeepfenShore(sim, meta);
+    meta.gatheringProficiency.fishing = 120;
+    // The Mirefen-EXCLUSIVE band-1 rows, off the live table: a silent fallback
+    // to the Vale rows (the zone key the table pick falls back to) must not be
+    // mistakable for a Mirefen catch, and the koi sits in both tables.
+    const bandRows = FISHING_TABLES_BY_BAND[1];
+    const valeIds = new Set(bandRows.eastbrook_vale.map((e) => e.itemId));
+    const mirefenOnly = bandRows.mirefen_marsh
+      .map((e) => e.itemId)
+      .filter((id): id is string => id !== null && !valeIds.has(id));
+    expect(mirefenOnly.length).toBeGreaterThan(0); // non-vacuity of the filter
+    let landedFish = 0;
+    for (let i = 0; i < 60 && landedFish === 0; i++) {
+      const before = meta.pendingGatherGrants.length;
+      const [result] = fishingResultsIn(castOnce(sim, meta).events);
+      if (!result) continue; // an empty hook queues nothing on any tier
+      if (ITEMS[result.itemId]?.kind === 'junk') {
+        // The junk cutoff composing with the ceiling INSIDE teaching water,
+        // which no live drive covered before: past 100 a boot teaches nothing
+        // even where the water itself still teaches.
+        expect(meta.pendingGatherGrants).toHaveLength(before);
+      } else if (mirefenOnly.includes(result.itemId)) {
+        landedFish++;
+        // The water the GAIN itself resolved against, straight off the event:
+        // the catch table, the deed credit, the telemetry and the gain all read
+        // one zoneId local, so pinning it here rules out a silent fallback to
+        // the Vale rows being mistaken for tier-2 teaching.
+        expect(result.zoneId).toBe('mirefen_marsh');
+        expect(meta.pendingGatherGrants.slice(before)).toEqual([
+          { professionId: 'fishing', amount: 0.1 },
+        ]);
+      }
+    }
+    expect(landedFish, 'the drive must land a Mirefen fish').toBe(1);
   });
 
   it('the R19 teaching ceilings derive from the schedule rows: 100, 150, then the cap', () => {
