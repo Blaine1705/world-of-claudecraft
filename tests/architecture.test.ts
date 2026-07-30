@@ -280,6 +280,7 @@ const RENDER_PURE_CORES = [
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
   'src/render/chunk_residency_core.ts',
+  'src/render/cliff_scree_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
