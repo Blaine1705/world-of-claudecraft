@@ -1853,6 +1853,182 @@ derived test; the cap-scaling design note) plus:
    applies BELOW the top rung), and the R37 guard flips per-zone from
    assert-absent to assert-complete.
 
+BUILT 2026-07-29/30 (Fable, ultracode). Preamble: origin fetched,
+release/v0.32.0 still the newest release branch and unmoved at a802b4be2
+(already merged), no re-sync, nothing for the release-merge audit; opening
+gate PASS, all 11 steps, at the entry tip 1ab42967d. Eighteen code,
+docs, and asset commits, 44140364e through b186b994f, plus this
+record's own commit. What each item settled:
+
+Pass-1 scope: R19 landed as the zone-tier teaching ceiling DERIVED from
+the gain schedule's own row boundaries (tier-1 water grays at 100, tier-2
+at 150, tier-3 at the cap; `fishingTeachingCeilingFor` and
+`fishingCatchGainAt` in fishing.ts, the D12 extension recorded at the
+packet doc's D12 row), draw-free behind the single table draw, reading
+the same cast-zone local the table, deeds, and telemetry read; no golden
+moved (tier-1 water at proficiency 0 still grants 1), and the schedule
+half keeps a grant-sites-do-not-belong-here banner. R21 landed as
+chr_peaks_gatherer (stand-alone: rule 9 freezes the shipped peaks chapter
+deedIds; catalog pins and the frozen digest re-baselined). The per-skill
+richness audit produced R54's two identity decisions (written into
+professions.md), the matrix in this record's inputs (deed coverage is
+per-zone symmetric after R21), and R55 (Gull Mere: the farshore probe
+swept the whole rect, the lagoon landed at (350,118) r10 with the flora
+census re-minted; the merge-settlement hand-off closed). The out-tooled
+work-order economics call and the thinness call settled as R53; the
+new-zone checklist landed as the assert-complete half of the R37 guard
+itself (eleven derived arms in tests/professions_zone_rollout.test.ts,
+same-file ledger, so a flip conscripts the whole kit), with the
+cap-scaling design note in professions.md's How to extend. Item 1 (R22)
+landed whole: the wield_gate.ts pure leaf (one frozen 40/70/85/100 table,
+R51), the wield-filtered scans behind the harvest gate, cast speed,
+fine-grade resolution (R49) and corpse premium arm (R50), the retired
+buy deny with advisory vendor rows, the wieldProficiency denial arm end
+to end (sim event, client keys with five non-Latin fills, tooltip line,
+node-hover and minimap and interact mirrors on ONE client scan), and the
+re-minted deny pins plus the knife-edge derivation. Item 2 landed as the
+compass-truth sweep: the four named fixes plus five more verified-wrong
+claims (q_supplies, q_mogger, q_old_cragmaw, the three grave anchors,
+the sealed crypt), the guide's startBody twin, overlay word-swaps in all
+eighteen locales with the two restructured texts fully retranslated in
+the five non-Latin locales (the always-on non-Latin completeness arm
+forbids English-fill there) and their Latin rows re-pended to the phase
+17 fill; the naive-axis placement comments were corrected and the
+canonical convention note now owns the file. JUDGED, recorded: q_zealots'
+"southern peaks" is atmospheric wind flavor, not navigation, and
+q_nythraxis_bound_guardian's directions were verified CORRECT and left
+alone. Item 3 landed as the placement-margin arm (level-scaled aggro,
+camps of rare-or-boss named mobs plus the world boss registry, the whole
+harvest disc, exact-set allowlist with per-entry recorded clearances at
+one-yard tolerance) and the two Grix veins moved to 34.0 and 31.3 yards
+inside the pinned dig ring; the wander-tail acceptance is stated at the
+arm (the bound is the standing worst case; the 2-to-9-yard idle ring is
+a transient tail whose pricing would condemn five of the six veins
+including the always-shipped trio). Items 4 to 6 landed as R52, the
+crafting-anchor and work-order records, the all-zones supply arm
+(un-blinding the mastery floor the phase 11 QA left), and the
+market-depth watch with its honest trigger.
+
+The review rounds (the phase header's mandate): four domain reviewers
+(architecture, test-coverage, frontend-seam, cross-platform-sync)
+dispatched fresh over the committed range, plus a 66-agent adversarial
+workflow (six lenses, paired refuters per finding, resumed twice across
+a session-limit window with the dead verifiers re-run to completion).
+Roughly sixty findings across the rounds, EVERY one applied, recorded,
+or refuted with the reason written down. Load-bearing fixes: the
+committed R22 slice had left the minimap consumer un-staged (the tip did
+not compile; repaired and recorded here, history unrewritten), the
+client viewer scan moved onto the guarded plain-proficiency map
+(restoring the documented fail-closed contract and un-redding 21
+minimap tests), the vendor advisory's accessible name gained the
+combined requirement key, the node-hover tooltip gained the wield arm
+the click toast already had, a vacuous buy-path arm was re-driven at the
+counter that stocks the tier-3 pick, the grant-and-cast-duration scans
+gained their live discriminating drive, the drowned_litany parity red
+was bisected in an isolated worktree to the vein-collider relocation
+(the one long scenario that keeps world mobs; golden re-recorded with
+the mechanism), the fine-grade parity scenario's stale stand point (dead
+since the v0.32.0 re-sync, headline arm recording a denial with no
+coverage block to notice) was fixed via a shared content-derived helper
+with its coverage block added, the slot-tool-effect scenario handed from
+phase 12 QA landed with a byte-identical-across-tree-states mint, and
+the catch-table shortfall sweep's zone list now derives from the tables'
+own keys (the round overturned this record-keeper's own wrong
+refutation there). PROCESS RECORDS: five intermediate commits
+(d68d02458..b5794ff0e) ship a red parity_e, re-minted at be129ac89, the
+red window recorded rather than rewritten; be129ac89's message says
+"one draw ahead" where the recorded delta is eleven draws; d68d02458's
+title overclaims the rule its own record scopes precisely.
+
+Three delegated coverage arms closed the round at 25639f236, each
+independently verified before commit: the recharge ownership arm proves
+the R47/R30 family prices off the best tool OWNED (an unwieldable rare
+pick sets the same 40-charge arcane_essence rung at proficiency 0 and
+at its wield requirement, with a positive control proving the wield
+filter genuinely refuses that pick, so "they price, they do not gate"
+now has teeth); the live Mirefen drive at proficiency 120 kills the
+literal-tier mutant at the gain call, pins the exact 0.1 grant, and
+permanently asserts the catch event's zoneId so a silent Vale fallback
+can never impersonate tier-2 teaching; and the compass-truth guard
+resolves every audited direction claim against live content under the
+east-is-minus-X convention, with the convention itself pinned as
+arithmetic through the continent map projection and the compass strip,
+control rows plus a both-signs arm guarding the table's own shape, and
+q_nythraxis_graves excluded with its reason written at the table.
+PROCESS RECORD: mid-round the Mirefen arm read as red to the concurrent
+architecture reviewer; the cause was the arm's own literal-tier mutant
+transiently live in the shared worktree during its author's kill check,
+not a regression, and the reviewer's opposite-consequence narrowing
+plus the author's isolated reproduction settled it without widening
+anything; the lesson (mutation checks run in an isolated worktree, or
+the window is announced) was applied to this phase's own mutation pass.
+
+The mutation pass ran in that isolated worktree over a 30-mutant
+worklist spanning every new pin family (the wield ladder and its
+knife edges, the harvest, grade, speed, and corpse wiring, the deny
+payload, the R19 ceiling and the literal-tier read, the rod-tier rows,
+the placement clearances, the checklist ledger, the deed, the lake, a
+compass reword, the vendor advisory, the recharge ownership scan, and
+the UI keys): thirty proven kills in total, every kill showing a
+genuinely failed named test, and zero hollow runs (no kill with zero
+tests executed). Every apparent survivor resolved with evidence rather
+than a shrug: the deny-payload mutant is pinned by the tool-gate suite
+(the worklist had predicted the wrong file), the first placement mutant
+was mis-specified in the worklist itself (its "toward the camp" move
+went AWAY from the camp, so surviving it proved nothing) and the
+corrected mutant, 23.5 yards against the 29-yard hot boundary, kills
+both the exact-set pin and the counter-example arm, the two catalog
+mutants are invisible to the predicted UI suites but are killed by two
+arms of the resolved-equivalence reproducibility suite (catalog text
+only reaches t() through the committed bundles, so the regeneration arm
+is the only check that can pin a catalog row; proven live on a fixed
+tip), and the single-faucet blind is below the supply floor's
+resolution while blinding all ten expansion faucets kills it (a
+collapse alarm, which is what its comment claims).
+The pass also caught a real defect: the fix-round's supplies-quest
+reword never regenerated the resolved i18n bundles, so the
+reproducibility arm was red on the tip itself; the regeneration landed
+as its own commit and the equivalence suite is green on the committed
+tree since.
+
+Screenshots landed at b186b994f (docs/screenshots/professions-wield-gate/
+and docs/screenshots/gull-mere/): the tool tooltip requirement line at
+tiers 2 and 3, the vendor advisory rows BEFORE and AFTER on desktop and
+mobile (the before pair shows the retired locked rendering, including
+its empty accessible name), the wield deny toast naming the counter,
+the node hover wield line, and Gull Mere on the downs. The node hover
+surface has no mobile frame BY DESIGN: touch pointers have no hover, so
+the tooltip module returns early for them and there is nothing to
+shoot. Every frame was DOM-asserted before capture, and the pass
+surfaced findings of its own: the repo's bare screenshots/ ignore
+pattern silently swallowed every NEW file under docs/screenshots (a
+plain git add no-ops; root-anchored now, which also un-traps the
+pr-screenshots recipe's commit step), the error toast's computed
+opacity is not a readiness signal (blank its textContent, poll for it
+to refill, then wait out the fade-in), and two shipped
+pr_shot_targets.mjs entries carry stale premises after this change
+(vendor-tool-gate still frames its subject as a LOCKED row and leans on
+the surviving .vendor-locked style hook; the node-hover target's
+toolless/tooled variants miss the new owned-but-unwieldable state).
+Both are cheap QA-session follow-ups, and the capture driver is kept at
+tmp/phase13_shots.mjs (gitignored) for that session.
+
+SURFACED for the maintainer, beside the standing levers: the slot MINT
+charge-size ownership reading (R49's entry), the corpse rod exemption at
+future tier-2+ families (R50's entry), and the R19 starter-zone
+progression inversion (a level-17 expansion zone teaches fishing to 100
+while the level-6 marsh teaches to 150; named at fishing_zones.ts,
+owned by the zone-4 re-tier per R37). Accepted residuals with reasons:
+the wander tail (above); the caster-zone-at-the-gain-site line
+regression is not discriminated by any live drive (caster and water
+coincide in all of them; the shared zoneId local plus the architecture
+review's read is the evidence, and a cross-boundary gain drive needs
+water within 24 yards of a zone line, none convenient), a QA-session
+candidate; the compound wield-and-tier denials carry no wieldProficiency
+(correct semantics, recorded by the sim-suite re-mint); the browser axe
+suite and the perf tour were not run by any reviewer here and belong to
+the QA session's live track.
+
 ---
 
 ## Phase 14: UX polish (desktop, mobile, gamepad, accessibility)
