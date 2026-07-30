@@ -68,6 +68,22 @@ interface RestResponse extends GovernorResponse {
   errorText: string;
 }
 
+// Permanent-failure cache keys, scoped PER PERMISSION rather than per member.
+// A member can be un-writable for one of these and perfectly writable for the
+// other, and the two failures come from different Discord permissions:
+// MANAGE_NICKNAMES versus MANAGE_ROLES. Sharing one key per member would let a
+// nickname 403, which Discord returns PERMANENTLY for the guild owner and for
+// anyone above the bot in the role hierarchy, suppress that member's tier-role
+// sync for the whole TTL. With MANAGE_NICKNAMES missing outright, every member
+// would 403 on the PATCH and all role sync in the guild would stop.
+function nickSubject(guildId: string, userId: string): string {
+  return `nick:${guildId}:${userId}`;
+}
+
+function rolesSubject(guildId: string, userId: string): string {
+  return `roles:${guildId}:${userId}`;
+}
+
 function collectHeaders(source: Headers | undefined): Record<string, string> {
   const out: Record<string, string> = {};
   if (!source || typeof source.forEach !== 'function') return out;
@@ -293,7 +309,7 @@ export class DiscordApi {
 
   async addMemberRole(guildId: string, userId: string, roleId: string): Promise<void> {
     await this.request('PUT', `/guilds/${guildId}/members/${userId}/roles/${roleId}`, undefined, {
-      subjectKey: `${guildId}:${userId}`,
+      subjectKey: rolesSubject(guildId, userId),
     });
   }
 
@@ -303,7 +319,7 @@ export class DiscordApi {
       `/guilds/${guildId}/members/${userId}/roles/${roleId}`,
       undefined,
       {
-        subjectKey: `${guildId}:${userId}`,
+        subjectKey: rolesSubject(guildId, userId),
       },
     );
   }
@@ -315,7 +331,7 @@ export class DiscordApi {
       'PATCH',
       `/guilds/${guildId}/members/${userId}`,
       { nick },
-      { subjectKey: `${guildId}:${userId}`, reason: AUDIT_LOG_REASON },
+      { subjectKey: nickSubject(guildId, userId), reason: AUDIT_LOG_REASON },
     );
   }
 

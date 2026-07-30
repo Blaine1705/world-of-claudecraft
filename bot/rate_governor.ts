@@ -150,6 +150,13 @@ export const BREAKER_WINDOW_MS = 10 * 60_000;
  */
 export const MAX_ATTEMPTS = 3;
 
+/**
+ * The wait used when a 429 carries no retry_after in its body and no Retry-After
+ * header. Matches the one second default of the client this replaced, so a
+ * malformed 429 can never become a zero-delay retry loop.
+ */
+export const MISSING_RETRY_AFTER_MS = 1000;
+
 /** Per-queue backlog cap. Beyond it a request is refused rather than queued. */
 export const MAX_QUEUE_DEPTH = 256;
 
@@ -263,7 +270,10 @@ export function redactPath(path: string): string {
  * pause, because a pause means Discord has told us to stop entirely.
  */
 function skipsGlobalRate(template: string): boolean {
-  return template.startsWith('POST /interactions/');
+  // The /callback SUFFIX is part of the test, not just the prefix: the exemption
+  // belongs to the interaction-response endpoint alone, and a future POST
+  // somewhere else under /interactions/ must not inherit it silently.
+  return template.startsWith('POST /interactions/') && template.endsWith('/callback');
 }
 
 function headerNumber(headers: Readonly<Record<string, string>>, name: string): number | null {
@@ -492,6 +502,13 @@ export class RateGovernor {
         await this.waitForPause();
         await this.waitForBucket(template);
         await this.waitForGlobalSlot(template);
+        // Re-check the pause LAST. The bucket gate and the rate slot can each
+        // block for a long time, and a global 429 or a ban pause raised by
+        // another queue during that wait was declared after this request last
+        // looked. Without this second check it would send straight into a pause
+        // the governor had already announced, which is the exact traffic a pause
+        // exists to stop.
+        await this.waitForPause();
 
         this.counters.requests++;
         const response = await send();
@@ -599,8 +616,16 @@ export class RateGovernor {
     const body = (response.json ?? {}) as { retry_after?: unknown; global?: unknown };
     const bodyRetry = typeof body.retry_after === 'number' ? body.retry_after : null;
     const headerRetry = headerNumber(response.headers, 'retry-after');
-    const retryAfterSeconds = bodyRetry ?? headerRetry ?? 0;
-    const retryMs = secondsToMs(Math.max(0, retryAfterSeconds));
+    // A 429 that names no wait at all is malformed. Falling back to 0 would
+    // retry with NO delay, and on an interaction route, which is exempt from the
+    // global rate cap, that means MAX_ATTEMPTS back-to-back sends into an active
+    // rate limit. The client this replaced defaulted a missing retry_after to
+    // one second; that floor is kept deliberately.
+    const retryAfterSeconds = bodyRetry ?? headerRetry;
+    const retryMs =
+      retryAfterSeconds === null
+        ? MISSING_RETRY_AFTER_MS
+        : secondsToMs(Math.max(0, retryAfterSeconds));
     const isGlobal = scope === 'global' || body.global === true;
 
     // A shared-scope 429 is another app's traffic against a shared resource, so

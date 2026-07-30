@@ -291,3 +291,77 @@ describe('bot loop cadences', () => {
     expect(RELAY_POLL_MS).toBeLessThan(ROLE_SYNC_INTERVAL_MS);
   });
 });
+
+describe('loadConfig governor knobs', () => {
+  // The four keys Phase 2 introduced. The BOT_ENV_KEYS inventory guard above
+  // proves only that config.ts READS them; nothing there proves a value reaches
+  // the right field, nor that the empty-string fallback exists at all.
+  const KNOBS = [
+    { env: 'DISCORD_MAX_RPS', field: 'maxRps', fallback: 8, override: '17' },
+    { env: 'DISCORD_BAN_PAUSE_MS', field: 'banPauseMs', fallback: 600000, override: '123456' },
+    { env: 'DISCORD_BREAKER_LIMIT', field: 'breakerLimit', fallback: 300, override: '42' },
+    {
+      env: 'DISCORD_FORBIDDEN_TTL_MS',
+      field: 'forbiddenTtlMs',
+      fallback: 86400000,
+      override: '999',
+    },
+  ] as const;
+
+  it('defaults all four to their documented values when unset', () => {
+    setRequired();
+    const cfg = loadConfig();
+    expect(cfg.maxRps).toBe(8);
+    expect(cfg.banPauseMs).toBe(600000);
+    expect(cfg.breakerLimit).toBe(300);
+    expect(cfg.forbiddenTtlMs).toBe(86400000);
+  });
+
+  it('reads each knob from its OWN key, with a distinct value per field', () => {
+    // Every override is different, so a transposed pair (ban pause reading the
+    // breaker key, say) cannot pass. The all-defaults test above cannot catch
+    // that: a swap there is invisible because both sides are the default.
+    setRequired();
+    for (const knob of KNOBS) process.env[knob.env] = knob.override;
+    const cfg = loadConfig() as unknown as Record<string, number>;
+    for (const knob of KNOBS) {
+      expect(cfg[knob.field]).toBe(Number(knob.override));
+    }
+  });
+
+  it('falls back to the default for an EMPTY value, never to 0', () => {
+    // The trap this exists for: Number('') is 0. A bare parse would turn a blank
+    // `DISCORD_MAX_RPS=` line in a .env into a hard 0, which stops the bot
+    // sending entirely, and a 0 breaker limit would trip on the first response.
+    setRequired();
+    for (const knob of KNOBS) process.env[knob.env] = '';
+    const cfg = loadConfig() as unknown as Record<string, number>;
+    for (const knob of KNOBS) {
+      expect(cfg[knob.field]).toBe(knob.fallback);
+      expect(cfg[knob.field]).not.toBe(0);
+    }
+  });
+
+  it('falls back for whitespace, non-numeric, zero and negative values alike', () => {
+    // Each of these would otherwise produce a dangerous state rather than a
+    // merely wrong one: 0 rps sends nothing, a 0 or negative threshold trips
+    // immediately, and NaN makes every comparison false.
+    for (const bad of ['   ', 'eight', '0', '-5', 'NaN', '1e', 'null']) {
+      setRequired();
+      for (const knob of KNOBS) process.env[knob.env] = bad;
+      const cfg = loadConfig() as unknown as Record<string, number>;
+      for (const knob of KNOBS) {
+        expect(cfg[knob.field]).toBe(knob.fallback);
+      }
+    }
+  });
+
+  it('accepts a legitimate override that happens to be small but positive', () => {
+    // The complement of the rejection arm: the guard rejects non-positive, not
+    // "anything unusual", so an operator throttling the bot hard in an incident
+    // still gets the value they asked for.
+    setRequired();
+    process.env.DISCORD_MAX_RPS = '1';
+    expect(loadConfig().maxRps).toBe(1);
+  });
+});

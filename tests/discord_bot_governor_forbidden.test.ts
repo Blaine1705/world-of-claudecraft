@@ -9,6 +9,7 @@
 // clock), and a fractional delay is allowed to fire EARLY under real timers, which
 // would make every boundary assertion below a coin flip.
 import { describe, expect, it } from 'vitest';
+import { DiscordApi } from '../bot/discord_api';
 import {
   DEFAULT_FORBIDDEN_TTL_MS,
   GovernorBlockedError,
@@ -387,14 +388,16 @@ describe('permanent-failure cache: what must NOT enter it', () => {
     for (const status of [400, 404, 429, 500, 502]) {
       const r = rig();
       const subjectKey = `g1:${status}`;
-      expect(
-        (
-          await r.governor.run(
-            { method: 'PATCH', path: MEMBER_ONE, subjectKey },
-            r.reply('first', status),
-          )
-        ).status,
-      ).toBe(status);
+      // The clock is driven, because a 429 waits out a retry: with no
+      // retry_after in the body the governor uses MISSING_RETRY_AFTER_MS rather
+      // than retrying instantly, so a bare await here would hang on a virtual
+      // sleep nothing advances.
+      const firstRun = r.governor.run(
+        { method: 'PATCH', path: MEMBER_ONE, subjectKey },
+        r.reply('first', status),
+      );
+      await r.clock.runAll();
+      expect((await firstRun).status).toBe(status);
 
       expect(r.governor.isForbidden(subjectKey)).toBe(false);
       expect(r.governor.snapshot().forbiddenEntries).toBe(0);
@@ -404,10 +407,12 @@ describe('permanent-failure cache: what must NOT enter it', () => {
       // MAX_ATTEMPTS times, so 'first' legitimately appears more than once and
       // an exact-array pin would fail for a reason that has nothing to do with
       // the cache.
-      await r.governor.run(
+      const secondRun = r.governor.run(
         { method: 'PATCH', path: MEMBER_ONE, subjectKey },
         r.reply('second', 200),
       );
+      await r.clock.runAll();
+      await secondRun;
       expect(r.sent.at(-1)).toBe('second');
       expect(r.sent.filter((label) => label === 'second').length).toBe(1);
     }
@@ -477,5 +482,96 @@ describe('permanent-failure cache: what must NOT enter it', () => {
     expect(r.governor.snapshot().forbiddenEntries).toBe(cap + 10);
     // And the map never exceeds the module's stated bound.
     expect(r.governor.snapshot().forbiddenEntries).toBeLessThanOrEqual(MAX_FORBIDDEN_ENTRIES);
+  });
+});
+
+describe('permanent-failure cache scoping across endpoints (B1 regression)', () => {
+  it('keeps a nickname 403 from suppressing that member ROLE writes', async () => {
+    // REGRESSION, and the worst defect this phase introduced. Both writes used
+    // one key per member, so a nickname PATCH that 403s poisoned the cache for
+    // the member outright and every later ROLE write for them was refused
+    // without being sent, for the whole 24 hour TTL.
+    //
+    // This is not a corner case. Discord 403s a nickname PATCH PERMANENTLY for
+    // the guild owner and for anyone above the bot in the role hierarchy, and
+    // bot/main.ts sweeps nicknames for every linked member. With
+    // MANAGE_NICKNAMES missing altogether, every member 403s and ALL tier-role
+    // sync in the guild stops for a day. Before the governor, a nickname failure
+    // could not touch role sync at all, so this was a change in the user-visible
+    // effect of the calls, which this phase's scope forbids.
+    //
+    // Driven through DiscordApi rather than the governor directly, because the
+    // defect lived in the KEYS the shell passes, not in the cache itself.
+    const calls: string[] = [];
+    const impl: typeof fetch = async (input, init) => {
+      const url = String(input);
+      calls.push(`${init?.method} ${url.replace('https://discord.com/api/v10', '')}`);
+      const nickPatch = init?.method === 'PATCH';
+      return {
+        ok: !nickPatch,
+        status: nickPatch ? 403 : 204,
+        headers: { forEach: () => {} },
+        json: async () => ({}),
+        text: async () => 'Missing Permissions',
+      } as unknown as Response;
+    };
+    const governor = new RateGovernor({
+      clock: syntheticClock(),
+      maxRps: 0,
+      banPauseMs: 60_000,
+      breakerLimit: 50,
+      forbiddenTtlMs: TTL_MS,
+    });
+    const api = new DiscordApi('tok', impl, governor);
+
+    // The nickname write 403s, exactly as it does for a guild owner.
+    await expect(api.setNickname('g1', 'u1', 'Aran (12)')).rejects.toThrow('-> 403');
+
+    // The SAME member's role writes must still go out.
+    await api.addMemberRole('g1', 'u1', 'r1');
+    await api.removeMemberRole('g1', 'u1', 'r2');
+
+    expect(calls).toEqual([
+      'PATCH /guilds/g1/members/u1',
+      'PUT /guilds/g1/members/u1/roles/r1',
+      'DELETE /guilds/g1/members/u1/roles/r2',
+    ]);
+
+    // The nickname failure IS still remembered, under its own scope, so the
+    // suppression that D4 asks for is intact where it belongs.
+    await expect(api.setNickname('g1', 'u1', 'Aran (13)')).rejects.toThrow(
+      'subject previously answered 401 or 403',
+    );
+    expect(calls.length).toBe(3);
+  });
+
+  it('keeps a role-write 403 from suppressing that member NICKNAME write', async () => {
+    // The mirror direction, so the split cannot be half-applied.
+    const calls: string[] = [];
+    const impl: typeof fetch = async (input, init) => {
+      const url = String(input);
+      calls.push(`${init?.method} ${url.replace('https://discord.com/api/v10', '')}`);
+      const roleWrite = init?.method === 'PUT';
+      return {
+        ok: !roleWrite,
+        status: roleWrite ? 403 : 204,
+        headers: { forEach: () => {} },
+        json: async () => ({}),
+        text: async () => 'Missing Permissions',
+      } as unknown as Response;
+    };
+    const governor = new RateGovernor({
+      clock: syntheticClock(),
+      maxRps: 0,
+      banPauseMs: 60_000,
+      breakerLimit: 50,
+      forbiddenTtlMs: TTL_MS,
+    });
+    const api = new DiscordApi('tok', impl, governor);
+
+    await expect(api.addMemberRole('g1', 'u1', 'r1')).rejects.toThrow('-> 403');
+    await api.setNickname('g1', 'u1', 'Aran (12)');
+
+    expect(calls).toEqual(['PUT /guilds/g1/members/u1/roles/r1', 'PATCH /guilds/g1/members/u1']);
   });
 });
