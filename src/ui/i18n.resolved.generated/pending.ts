@@ -9,62 +9,84 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hud.errors.tradeAlreadyTrading"
+  ],
+  "es_ES": [
+    "hud.errors.tradeAlreadyTrading"
+  ],
+  "fr_FR": [
+    "hud.errors.tradeAlreadyTrading"
+  ],
+  "fr_CA": [
+    "hud.errors.tradeAlreadyTrading"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hud.errors.tradeAlreadyTrading"
+  ],
+  "de_DE": [
+    "hud.errors.tradeAlreadyTrading"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hud.errors.tradeAlreadyTrading"
+  ],
   "ru_RU": [],
   "cs_CZ": [
+    "hud.errors.tradeAlreadyTrading",
     "hud.options.graphicsPresetInsane",
     "hud.options.surfaceDetail",
     "hud.options.surfaceDetailBasic",
     "hud.options.surfaceDetailFull"
   ],
   "nl_NL": [
+    "hud.errors.tradeAlreadyTrading",
     "hud.options.graphicsPresetInsane",
     "hud.options.surfaceDetail",
     "hud.options.surfaceDetailBasic",
     "hud.options.surfaceDetailFull"
   ],
   "pl_PL": [
+    "hud.errors.tradeAlreadyTrading",
     "hud.options.graphicsPresetInsane",
     "hud.options.surfaceDetail",
     "hud.options.surfaceDetailBasic",
     "hud.options.surfaceDetailFull"
   ],
   "id_ID": [
+    "hud.errors.tradeAlreadyTrading",
     "hud.options.graphicsPresetInsane",
     "hud.options.surfaceDetail",
     "hud.options.surfaceDetailBasic",
     "hud.options.surfaceDetailFull"
   ],
   "tr_TR": [
+    "hud.errors.tradeAlreadyTrading",
     "hud.options.graphicsPresetInsane",
     "hud.options.surfaceDetail",
     "hud.options.surfaceDetailBasic",
     "hud.options.surfaceDetailFull"
   ],
   "sv_SE": [
+    "hud.errors.tradeAlreadyTrading",
     "hud.options.graphicsPresetInsane",
     "hud.options.surfaceDetail",
     "hud.options.surfaceDetailBasic",
     "hud.options.surfaceDetailFull"
   ],
   "vi_VN": [
+    "hud.errors.tradeAlreadyTrading",
     "hud.options.graphicsPresetInsane",
     "hud.options.surfaceDetail",
     "hud.options.surfaceDetailBasic",
     "hud.options.surfaceDetailFull"
   ],
   "da_DK": [
+    "hud.errors.tradeAlreadyTrading",
     "hud.options.graphicsPresetInsane",
     "hud.options.surfaceDetail",
     "hud.options.surfaceDetailBasic",
