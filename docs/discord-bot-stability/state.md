@@ -208,6 +208,28 @@ because dropping the one word is otherwise silent),
   on purpose.
 - New shared test helper: `tests/helpers/synthetic_clock.ts`, a fully virtual clock.
   Phase 3's scheduler should drive it rather than vitest fake timers.
+- OPEN, from the Phase 2 privacy-security review (no blocking findings; L1 confirmed
+  closed per call site and no secret committed). Three tracked follow-ups it raised that
+  Phase 2 did NOT close, each with its reason:
+  - The four env knobs are validated as positive-finite but not RANGE clamped, so an
+    operator can defeat the very control they configure: `DISCORD_MAX_RPS=1000` turns
+    the global cap into an accelerator well past Discord's own 50 rps ceiling,
+    `DISCORD_BAN_PAUSE_MS=1` is a disabled ban pause, and a huge `DISCORD_BREAKER_LIMIT`
+    means the breaker never opens. Operator-controlled rather than attacker-controlled,
+    which is why it is not blocking. A clamp to documented ranges is the fix.
+  - The interaction-callback path has every ceiling off at once BY DESIGN: its own
+    bucket per interaction id (so MAX_QUEUE_DEPTH never binds), exempt from the global
+    rate cap per Discord's contract, and `essential` so the breaker never stops it. Not
+    a regression, since the replaced client had no pacing at all, but it is the one path
+    through the governor with no ceiling and a guild member can trigger it at will. A
+    per-process in-flight cap would close it without touching the documented exemption.
+  - `redactPath` preserves a query string verbatim while `routeTemplate` strips it. No
+    current Discord call site uses a query, so nothing leaks today, but a future call
+    with a token or signature in the query would reach the thrown message intact.
+- Ruled-acceptable residual, do not "fix" it in QA: the drain loop in `evictBuckets` is
+  observationally identical to a single `if` while entries are inserted one at a time,
+  so no assertion can distinguish them. It is kept as defense against a future batch
+  insert, exactly as R14 and the S05 precedent were kept.
 - DEFERRED to a later phase, recorded here rather than left implicit: D4's
   role-position arm ships as a HOOK with no caller. `RateGovernor.invalidateForbidden()`
   (exposed as `DiscordApi.invalidateForbidden()`) is never invoked, so today a cached
