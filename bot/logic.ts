@@ -565,8 +565,11 @@ export interface ActivityItem {
 // English banner-nation names for the Vale Cup card. Discord posts are English
 // by design (every builder in this file), so this mirrors the game catalog's
 // hudChrome.vcup.nation.* English values; typing the record over VcNationId
-// makes a future nation fail the build here until it is labeled.
-const VC_NATION_LABELS: Record<VcNationId, string> = {
+// makes a future nation fail the build here until it is labeled. Exported so
+// tests/discord_bot.test.ts can pin the values against that catalog (the test
+// imports both; this file must NOT import the ui catalog, the bot stays
+// standalone), so a catalog reword reddens this copy.
+export const VC_NATION_LABELS: Record<VcNationId, string> = {
   vale: 'Eastbrook Vale',
   mirefen: 'The Mirefen',
   thornpeak: 'Thornpeak',
@@ -630,7 +633,10 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
       break;
     case 'rareloot':
       author = ':gem: Rare Drop';
-      title = item.itemName ?? 'A rare item';
+      // Every title fallback below is `||`, never `??`: an EMPTY name from the
+      // server must degrade to the generic title, and `??` would keep the empty
+      // string, which Discord rejects (an embed title cannot be blank).
+      title = item.itemName || 'A rare item';
       description =
         `A **${item.quality ?? 'rare'}** drop` +
         (subject ? ` for ${mentionFor(subjectName, item.participants)}` : '') +
@@ -674,7 +680,7 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
     }
     case 'masterwork':
       author = ':hammer: Masterwork';
-      title = item.itemName ?? 'A masterwork piece';
+      title = item.itemName || 'A masterwork piece';
       description =
         `A **masterwork** ${item.itemName ?? 'piece'} from the hands of ` +
         `${mentionFor(subjectName, item.participants)} on ${item.realm}!`;
@@ -684,14 +690,14 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
       if (item.deedId === FIRST_KOI_DEED_ID) {
         // The first-koi moment reads as a catch, not a deed record.
         author = ':fish: Rare Catch';
-        title = item.deedName ?? 'A rare catch';
+        title = item.deedName || 'A rare catch';
         description =
           `${mentionFor(subjectName, item.participants)} landed their ` +
           `first ${item.itemName ?? 'rare catch'} on ${item.realm}!`;
         color = 0x3fa7d6;
       } else {
         author = ':scroll: Deed Complete';
-        title = item.deedName ?? 'A deed of renown';
+        title = item.deedName || 'A deed of renown';
         description =
           `${mentionFor(subjectName, item.participants)} completed ` +
           `"${item.deedName ?? 'a deed'}"` +

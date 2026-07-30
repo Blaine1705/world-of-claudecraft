@@ -38,6 +38,29 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
    secret-gated `RouteDef` in `server/internal.ts` (registered via `server/http/registry.ts`).
 3. Only the wiring (a dispatch case or a poll loop) lands in `main.ts`.
 
+### Activity-kind parity (server to bot)
+The activity wire crosses two processes as unchecked JSON, so a kind the server
+enqueues but `buildActivityMessage` has no case for renders an EMPTY embed that
+Discord rejects (the shipped vale_cup failure). A new `ActivityKind` in
+`server/discord_activity.ts` therefore needs BOTH, in the same change: a `case`
+in `buildActivityMessage` (`logic.ts`) and a row in `SERVER_KINDS` in
+`tests/discord_bot.test.ts`. That list is pinned to the server union in both
+directions at `tsc` time (a server kind the list lacks reddens the
+conditional-type line; a listed kind the bot cannot take reddens the
+`buildActivityMessage` call), and its runtime loop pins every kind to a
+non-blank embed author name, title, and description. Fallbacks for optional
+copy use `||`, never `??`: an empty string must degrade to the generic title.
+
+### Discord posts are English
+Every builder in `logic.ts` writes English literals, deliberately. The repo's
+"every player-visible string is a `t()` key" rule scopes to the GAME surfaces
+(client HUD, guide, admin), not to this bot: the official Discord server is one
+English-speaking channel with no per-viewer locale to resolve, and the bot has
+no i18n runtime by design (zero dependencies, standalone bundle). English
+copy the game also renders (Vale Cup nation names) is a copy pinned to the
+catalog in `tests/discord_bot.test.ts`, not an import, so `logic.ts` stays free
+of `src/ui/` imports.
+
 ## Invariants
 - **The game server is the authority for rewards.** The bot never computes points
   or status; it reads them and pushes grants the server validates (dedupe keys).

@@ -35,10 +35,12 @@ import {
   stripLevelSuffix,
   tierRoleName,
   topSpecialRoleKeyFor,
+  VC_NATION_LABELS,
   voiceMembersForChannel,
 } from '../bot/logic';
 import type { ActivityKind } from '../server/discord_activity';
 import { DEFAULT_JSON_BODY_MAX_BYTES } from '../server/http_util';
+import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 
 describe('gateway protocol helpers', () => {
   it('requests the privileged member + presence intents', () => {
@@ -623,6 +625,19 @@ describe('significant-activity cards', () => {
     expect(msg.embeds[0].title).toContain('newnation');
   });
 
+  // The bot's nation labels are a deliberate COPY of the game catalog's English
+  // values: bot/logic.ts must not import the ui catalog (the bot bundle stays
+  // standalone), so only this test, which imports BOTH, notices the two drifting
+  // apart. Reword hudChrome.vcup.nation.* and the bot copy reddens here.
+  it('pins the bot Vale Cup nation labels to the game catalog English values', () => {
+    const catalog: Record<string, string> = hudChromeStrings.vcup.nation;
+    expect(Object.keys(VC_NATION_LABELS).sort()).toEqual(Object.keys(catalog).sort());
+    expect(Object.keys(VC_NATION_LABELS)).toHaveLength(8);
+    for (const [id, label] of Object.entries(VC_NATION_LABELS)) {
+      expect(label, `nation ${id}`).toBe(catalog[id]);
+    }
+  });
+
   it('masterwork card names the crafted item and pings the crafter', () => {
     const msg = buildActivityMessage({
       kind: 'masterwork',
@@ -672,6 +687,24 @@ describe('significant-activity cards', () => {
     expect(msg.embeds[0].description).toContain('<@111>');
   });
 
+  // Same empty-embed class, one layer in: an item name the server sends as an
+  // EMPTY string (not absent) must fall back to the generic title. `??` keeps
+  // the empty string and Discord rejects a blank embed title, so every title
+  // fallback in buildActivityMessage is `||`.
+  it('degrades an empty item or deed name to the generic title', () => {
+    const titleOf = (item: ActivityItem): string =>
+      (buildActivityMessage(item) as { embeds: Array<{ title: string }> }).embeds[0].title;
+    const base = { realm: 'Claudemoon', profileUrl: null, participants: [linked('Aldric', '111')] };
+    expect(titleOf({ ...base, kind: 'rareloot', itemName: '' })).toBe('A rare item');
+    expect(titleOf({ ...base, kind: 'masterwork', itemName: '' })).toBe('A masterwork piece');
+    expect(titleOf({ ...base, kind: 'deed', deedId: 'col_glimmerfin', deedName: '' })).toBe(
+      'A rare catch',
+    );
+    expect(titleOf({ ...base, kind: 'deed', deedId: 'prog_masterwright', deedName: '' })).toBe(
+      'A deed of renown',
+    );
+  });
+
   // The empty-embed class guard: a kind this bot build does not know (a newer
   // server mid-deploy) must skip the post entirely, never render a blank card.
   it('returns null for an unknown activity kind', () => {
@@ -708,7 +741,7 @@ describe('significant-activity cards', () => {
   // server union gains a kind the list lacks.
   const noMissingServerKinds: MissingServerKind extends never ? null : MissingServerKind = null;
 
-  it('renders a non-null card for every kind the server can enqueue', () => {
+  it('renders a fully populated card for every kind the server can enqueue', () => {
     expect(noMissingServerKinds).toBeNull();
     for (const kind of SERVER_KINDS) {
       const msg = buildActivityMessage({
@@ -717,8 +750,28 @@ describe('significant-activity cards', () => {
         profileUrl: null,
         level: 20,
         participants: [linked('Aldric', '111')],
-      });
+      }) as { embeds: Array<Record<string, any>> } | null;
       expect(msg, `kind ${kind} must render a card`).not.toBeNull();
+      // Non-null is not enough: the production failure was a card that rendered
+      // with an EMPTY author ({}) and an undefined title/description, which
+      // Discord 400s. author.name is the field that 400s first, so every kind
+      // is pinned on all three universal embed fields being real, non-blank
+      // text (the item here carries only the fields the server always sends,
+      // so any kind leaning on an optional field must still fill them).
+      const embed = (msg as { embeds: Array<Record<string, any>> }).embeds[0];
+      expect(embed, `kind ${kind} must render one embed`).toBeDefined();
+      for (const [field, value] of [
+        ['author.name', embed.author?.name],
+        ['title', embed.title],
+        ['description', embed.description],
+      ] as const) {
+        expect(typeof value, `kind ${kind} ${field} must be a string`).toBe('string');
+        expect(
+          String(value).trim().length,
+          `kind ${kind} ${field} must not be blank`,
+        ).toBeGreaterThan(0);
+      }
+      expect(typeof embed.color, `kind ${kind} must set an accent color`).toBe('number');
     }
   });
 

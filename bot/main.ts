@@ -486,13 +486,28 @@ async function main(): Promise<void> {
   // arena, Vale Cup, masterworks, deeds). buildActivityMessages drops any
   // kind this build does not know (a newer server mid-deploy) rather than
   // post an empty embed.
+  let activityInFlight = false;
   const pollActivity = async (): Promise<void> => {
     if (!cfg.activityChannelId) return;
-    const items = await server.drainActivity();
-    for (const payload of buildActivityMessages(items)) {
-      await discord
-        .createMessage(cfg.activityChannelId, payload)
-        .catch((e) => console.error('[bot] activity post failed', e));
+    // A batch held up by a 429 must not interleave with the next tick's drain,
+    // or cards post out of chronological order. Skipping is free: the queue is
+    // server-side, so the next tick drains this tick's items too.
+    if (activityInFlight) return;
+    activityInFlight = true;
+    try {
+      const items = await server.drainActivity();
+      for (const payload of buildActivityMessages(items)) {
+        await discord
+          .createMessage(cfg.activityChannelId, payload)
+          // A failed post drops the card for good: the server already drained
+          // it, so unlike pollDailyRewardWinners (at-least-once, marked back
+          // only after a successful post) this feed is at-most-once BY DESIGN.
+          // A lost card is a lost moment, never lost state, and retrying would
+          // need the queue re-armed server-side for a purely cosmetic post.
+          .catch((e) => console.error('[bot] activity post failed', e));
+      }
+    } finally {
+      activityInFlight = false;
     }
   };
 
