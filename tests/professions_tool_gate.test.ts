@@ -520,14 +520,35 @@ describe('the counter sells ahead; the wield gate owns enforcement (R22)', () =>
     expect(errorTexts(sim.drainEvents())).toEqual([]);
   });
 
-  it('never emits the retired unlock refusal anywhere in the buy path', () => {
-    // The old deny's literal, asserted ABSENT on the exact drive that used to
-    // produce it, so a re-introduced counter gate cannot ride back in quietly.
+  it('never emits the retired unlock refusal: the tier-3 row SELLS at the counter that stocks it', () => {
+    // The old deny's literal, asserted absent on a drive that actually
+    // reaches the purchase: Hale does not stock the tier-3 pick, so the
+    // first draft of this arm bounced off 'That item is not sold here.'
+    // and passed with the deny fully restored (the vacuous-arm trap).
+    // Quartermaster Bree at the Highwatch counter is the row's real home.
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
-    const { pid, hale } = shopper(sim);
+    const anySim = sim as unknown as { entities: Map<number, Entity>; rebucket(e: Entity): void };
+    const pid = sim.addPlayer('warrior', 'Climber');
+    const bree = [...anySim.entities.values()].find(
+      (e) => (e as unknown as { templateId?: string }).templateId === 'quartermaster_bree',
+    ) as Entity;
+    expect(bree, 'the Highwatch quartermaster exists').toBeDefined();
+    const p = anySim.entities.get(pid) as Entity;
+    p.pos.x = bree.pos.x + 2;
+    p.pos.z = bree.pos.z;
+    anySim.rebucket(p);
+    const meta = sim.meta(pid)!;
+    meta.inventory.length = 0;
+    meta.copper = 1_000_000;
+    expect(meta.gatheringProficiency.mining).toBe(0);
+    const before = meta.copper;
     sim.drainEvents();
-    items.buyItem(ctxOf(sim), hale.id, 'mithril_mining_pick', pid);
-    expect(errorTexts(sim.drainEvents())).not.toContain('You have not unlocked that item yet.');
+
+    items.buyItem(ctxOf(sim), bree.id, 'mithril_mining_pick', pid);
+
+    expect(sim.countItem('mithril_mining_pick', pid)).toBe(1);
+    expect(meta.copper).toBe(before - (ITEMS.mithril_mining_pick.buyValue ?? 0));
+    expect(errorTexts(sim.drainEvents())).toEqual([]);
   });
 
   it('buyback still works at zero proficiency', () => {
@@ -667,6 +688,59 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
     expect(p.castingAbility).toBeTruthy();
   });
 
+  it('the GRANT and the cast duration read the wieldable tier too, driven live (R49)', () => {
+    // resolveHarvest keeps its OWN scan (the grant must agree with the
+    // pre-gates), and the cast duration is a third reader: this drive is the
+    // one place all three are distinguished from the OWNERSHIP scan. A
+    // wieldable tier-1 pick beside an unwieldable tier-4 pick at mining 0:
+    // the cast runs at the tier-1 duration (no speed from a tool you cannot
+    // swing), and the grant mints the PLAIN material (a tier-4 read would
+    // mint fine_copper_ore at a tier-1 vein). Reverting either read to the
+    // ownership scan fails one of the two assertions.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const { pid, p, meta } = miner(sim, 'ore_eastbrook_1');
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('thorium_mining_pick', 1, pid);
+    expect(meta.gatheringProficiency.mining).toBe(0);
+    for (const e of sim.entities.values()) {
+      if (e.kind !== 'mob') continue;
+      e.dead = true;
+      e.hp = 0;
+      e.aiState = 'dead';
+      e.respawnTimer = 9999;
+      e.corpseTimer = 9999;
+      e.inCombat = false;
+    }
+    expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(true);
+    // Tier-1 tool at a tier-1 node in band 0: the base 2.5s cast, no
+    // tool-tier reduction (a tier-4 read would shave 1.2s).
+    expect(p.castTotal).toBeCloseTo(2.5, 5);
+    for (let i = 0; i < 80 && p.castingAbility; i++) sim.tick();
+    expect(p.castingAbility).toBeFalsy();
+    sim.tick();
+    expect(sim.countItem('copper_ore', pid)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('fine_copper_ore', pid)).toBe(0);
+  });
+
+  it('the shipped land-tool tier set is exactly the wield table (completeness)', () => {
+    // A tier-6 tool would read wieldRequirementForTier 0 (fail-open by
+    // design) with nothing red; this arm makes shipping one a decision that
+    // touches the table.
+    const shippedTiers = [
+      ...new Set(
+        Object.values(ITEMS)
+          .filter((def) => def.use?.type === 'gatherTool' && def.use.professionId !== 'fishing')
+          .map((def) => (def.use as { tier: number }).tier),
+      ),
+    ].sort((a, b) => a - b);
+    expect(shippedTiers).toEqual([1, 2, 3, 4, 5]);
+    expect(
+      Object.keys(WIELD_REQUIREMENT_BY_TIER)
+        .map(Number)
+        .sort((a, b) => a - b),
+    ).toEqual(shippedTiers);
+  });
+
   it('the grade arm reads the WIELDABLE tier (R49): an unearned tier-4 pick mints no fine grade', () => {
     // The same resolver the capacity pre-gates and the grant share
     // (effectiveGradeToolTier through harvestYieldItemId), driven pure. At
@@ -693,9 +767,10 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
     const source = readFileSync(path.resolve(process.cwd(), 'src/sim/interaction.ts'), 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/(^|\s)\/\/.*$/gm, '$1')
-      .replace(/\s+/g, ' ');
+      .replace(/\s+/g, '')
+      .replace(/,\)/g, ')');
     expect(source).toContain(
-      'bestWieldableAnyGatherToolTier(meta.inventory, meta.gatheringProficiency, ITEMS)',
+      'bestWieldableAnyGatherToolTier(meta.inventory,meta.gatheringProficiency,ITEMS)',
     );
     expect(source).not.toContain('bestOwnedAnyGatherToolTier(');
     // And the denial names a wield requirement when one applies.

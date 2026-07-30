@@ -38,6 +38,20 @@ describe('gatherNodeTooltipHtml', () => {
     expect(html).not.toContain('tt-red');
   });
 
+  it('a wield shortfall outranks the tier line: the hover names the counter (R22)', () => {
+    // The player carries a covering pick and only Mining is short: the tier
+    // sentence would name a requirement they meet, so the wield line renders
+    // instead, red, with the smallest counter that unlocks something owned.
+    const html = gatherNodeTooltipHtml(model({ wieldSkill: 40 }));
+    expect(html).toContain(
+      '<div class="tt-red">You need Mining 40 to swing the pick already in your bags.</div>',
+    );
+    expect(html).not.toContain('Requires a tier 2 mining pick');
+    // The shortfall only speaks while the node is actually locked.
+    const unlocked = gatherNodeTooltipHtml(model({ locked: false, wieldSkill: 40 }));
+    expect(unlocked).toContain('<div class="tt-sub">Requires a tier 2 mining pick</div>');
+  });
+
   it('a tier-1 node renders the tierless base-tool requirement line (#2343: bare hands never gather)', () => {
     // Locked (no pick owned): the tierless line renders red.
     const locked = gatherNodeTooltipHtml(model({ tier: 1, locked: true }));
@@ -84,16 +98,8 @@ describe('gatherNodeToolGateFor', () => {
     inventory: { itemId: string; count: number }[],
     proficiency: Record<string, number> = {},
   ): IWorld {
-    return {
-      inventory,
-      professionsState: {
-        skills: Object.entries(proficiency).map(([professionId, skill]) => ({
-          professionId,
-          skill,
-          maxSkill: 100,
-        })),
-      },
-    } as unknown as IWorld;
+    // The plain counter map the wield-filtered scan reads (R22).
+    return { inventory, gatheringProficiency: proficiency } as unknown as IWorld;
   }
 
   it('resolves the viewer tier from bags and bakes the localized denial line per family', () => {
@@ -156,10 +162,17 @@ describe('hud gatherDenied case stays an error toast only (source pin)', () => {
   it('maps surface + professionId + requiredTier + wieldProficiency through the pure key mapper into showError', () => {
     expect(caseStart).toBeGreaterThan(-1);
     expect(block).toContain('this.showError(');
-    // Whitespace- and trailing-comma-normalized: the four-argument call is
-    // long enough for the formatter to wrap one-per-line with a dangling
-    // comma, and any such shape must still satisfy the pin.
-    expect(block.replace(/\s+/g, '').replace(/,\)/g, ')')).toContain(
+    // Comment-stripped THEN whitespace- and trailing-comma-normalized: the
+    // case's own comment names all four fields, so an unstripped scrape
+    // could be satisfied by prose with the argument removed; and the
+    // four-argument call is long enough for the formatter to wrap
+    // one-per-line with a dangling comma.
+    const strippedBlock = block
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|\s)\/\/.*$/gm, '$1')
+      .replace(/\s+/g, '')
+      .replace(/,\)/g, ')');
+    expect(strippedBlock).toContain(
       'gatherDeniedLineKey(ev.surface,ev.professionId,ev.requiredTier,ev.wieldProficiency)',
     );
     expect(block).toContain('formatNumber(ev.requiredTier');

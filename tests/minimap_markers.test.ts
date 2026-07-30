@@ -443,6 +443,10 @@ describe('gather-node markers: the locked dimension', () => {
     opts: {
       inventory?: { itemId: string; count: number }[];
       harvestable?: (id: string) => boolean;
+      /** The viewer's counters (R22): a tooled fixture must also carry the
+       *  proficiency its tools ask, or the wield-filtered scan reads them
+       *  as unusable exactly like the sim's harvest gate would. */
+      gatheringProficiency?: Record<string, number>;
     } = {},
   ): IWorld {
     const junk = shape === 'sim' ? { hp: 100, maxHp: 100, castingAbility: null } : {};
@@ -469,6 +473,7 @@ describe('gather-node markers: the locked dimension', () => {
       playerId: 1,
       stationPlacements: STATIONS,
       inventory: opts.inventory ?? [],
+      gatheringProficiency: opts.gatheringProficiency ?? {},
       nodeHarvestableByMe: opts.harvestable ?? (() => true),
       questState: () => 'unavailable',
     } as unknown as IWorld;
@@ -490,14 +495,25 @@ describe('gather-node markers: the locked dimension', () => {
     expect(centre).toMatchObject({ locked: true, ready: true });
   });
 
-  it('the tier-2 pick unlocks only the ore nodes; herb stays locked without a sickle', () => {
+  it('the WIELDED tier-2 pick unlocks only the ore nodes; herb stays locked without a sickle', () => {
     const tooled = gatherMarkers(
-      makeGatherWorld('sim', { inventory: [{ itemId: 'iron_mining_pick', count: 1 }] }),
+      makeGatherWorld('sim', {
+        inventory: [{ itemId: 'iron_mining_pick', count: 1 }],
+        // The pick must wield (R22): mining 40, its own requirement.
+        gatheringProficiency: { mining: 40 },
+      }),
     );
     // GATHER_NODES rim order: ore t1, ore t1, wood t1, herb t1, ore t2
     // (centre): the pick unlocks the ores alone; the wood stand and the herb
     // patch both stay locked without their own implements.
     expect(tooled.map((m) => m.locked)).toEqual([false, false, true, true, false]);
+    // The R22 arm: the SAME pick with the counter short is unusable, so
+    // every ore row stays locked on the map exactly as the sim's wield
+    // denial would refuse the harvest (owned is not earned).
+    const unearned = gatherMarkers(
+      makeGatherWorld('sim', { inventory: [{ itemId: 'iron_mining_pick', count: 1 }] }),
+    );
+    expect(unearned.map((m) => m.locked)).toEqual([true, true, true, true, true]);
     // Locked composes WITH the respawn dimension, never replaces it: a
     // cooling locked vein keeps ready=false (the silhouette the painter keeps
     // readable under the locked tint).

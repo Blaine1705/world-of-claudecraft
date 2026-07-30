@@ -157,8 +157,8 @@ export interface ApplyEnchantResultView {
 // One gathering profession's slotted tool effect, as the HUD reads it.
 //
 // PER PROFESSION, NOT PER TOOL. The live harvest path resolves a tool TIER and
-// never a tool (professions/tools.ts bestOwnedGatherToolTierOrNone returns a
-// number), so there is nothing on it holding the particular pick that satisfied
+// never a tool (professions/wield_gate.ts bestWieldableGatherToolTierOrNone
+// returns a number), so there is nothing on it holding the particular pick that satisfied
 // the gate; and a slot bought for a tier-4 pick would go inert the moment its
 // owner crafted the tier-5 one, which inverts the point of chasing a better
 // tool. The consequence the UI must honor: a player owning two picks shares ONE

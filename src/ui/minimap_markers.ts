@@ -36,7 +36,7 @@ import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
 import { isQuestTurnInNpc } from '../sim/types';
 import type { IWorld } from '../world_api';
-import { viewerOwnedToolTier } from './gathering_view';
+import { viewerUsableToolTier } from './gathering_view';
 
 // Markers beyond (S/2 - RIM_INSET) from the centre are culled (entities) or pinned to
 // that rim as an arrow (party). Byte-faithful to the inline `S/2 - 7`.
@@ -266,7 +266,7 @@ export function createMinimapMarkers(): MinimapMarkers {
         const professionId = NODE_HARVEST_TABLE[node.type].professionId;
         let best = bestToolTiers.get(professionId);
         if (best === undefined) {
-          best = viewerOwnedToolTier(world, professionId);
+          best = viewerUsableToolTier(world, professionId);
           bestToolTiers.set(professionId, best);
         }
         markers.push({

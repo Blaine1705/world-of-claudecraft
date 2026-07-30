@@ -6977,6 +6977,7 @@ export const id_ID: EnTranslations = {
       "close": "Tutup pedagang",
       "hint": "Klik barang di tasmu untuk menjualnya selama jendela ini terbuka.",
       "buyAria": "Beli {item} seharga {price}",
+      "buyAriaWithRequirement": "Buy {item} for {price}. {requirement}",
       "buybackTitle": "Beli Kembali",
       "buybackEmpty": "Tidak ada barang",
       "buybackAria": "Beli kembali {item} seharga {price}",

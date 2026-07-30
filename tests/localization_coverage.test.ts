@@ -408,6 +408,7 @@ describe('i18n Localization Key Coverage', () => {
     range: 30,
     rank: 2,
     realm: 'Eastbrook',
+    requirement: 'Requires Mining 40',
     resource: 'Mana',
     seconds: 7,
     shown: 120,

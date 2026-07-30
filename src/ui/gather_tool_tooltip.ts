@@ -133,11 +133,15 @@ export function gatherToolTooltipLines(item: ItemDef): string {
   // (professions/wield_gate.ts). Land tools only by construction: rods are
   // R22-exempt and their branch returned above, and tier 1 reads 0.
   const wieldReq = wieldRequirementForTier(use.tier);
-  if (wieldReq > 0) {
+  const professionNameKey = GATHERING_PROFESSION_NAME_KEYS[use.professionId];
+  // No printable profession name means no line, matching requirementText in
+  // the vendor painter: a fallback through the KIND keys would render
+  // "Requires Mining tool 40", a wrong sentence rather than a missing one.
+  if (wieldReq > 0 && professionNameKey !== undefined) {
     html += line(
       'tt-desc',
       t('hudChrome.crafting.skillReqLine', {
-        craft: t(GATHERING_PROFESSION_NAME_KEYS[use.professionId] ?? KIND_KEYS[use.professionId]),
+        craft: t(professionNameKey),
         skill: formatNumber(wieldReq, { maximumFractionDigits: 0 }),
       }),
     );

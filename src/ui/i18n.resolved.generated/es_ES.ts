@@ -6977,6 +6977,7 @@ export const es_ES: EnTranslations = {
       "close": "Cerrar vendedor",
       "hint": "Haz clic en un objeto de tus bolsas para venderlo mientras esta ventana esté abierta.",
       "buyAria": "Comprar {item} por {price}",
+      "buyAriaWithRequirement": "Buy {item} for {price}. {requirement}",
       "buybackTitle": "Recomprar",
       "buybackEmpty": "Sin objetos",
       "buybackAria": "Recomprar {item} por {price}",

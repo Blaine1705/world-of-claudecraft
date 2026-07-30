@@ -88,6 +88,11 @@ export const NO_TOOL_OWNED = 0;
 // The best (highest) matching-profession gatherTool tier anywhere in the
 // player's bags, or NO_TOOL_OWNED when none is carried. Pure bag scan, no
 // equip slot: owning the tool is carrying it.
+// ACCESS AND GRADE DECISIONS DO NOT BELONG HERE (R22): this is the raw
+// OWNERSHIP scan, kept for the price family (R47 ratchet, R30 recharge) and
+// for tests; any surface deciding what a player may WORK or MINT must use
+// the wield-filtered sibling in professions/wield_gate.ts, or a traded tool
+// silently skips its use requirement.
 export function bestOwnedGatherToolTierOrNone(
   inventory: readonly InvSlot[],
   professionId: GatheringProfessionId,
@@ -196,6 +201,9 @@ export function hasFishingImplement(
 // The best owned gatherTool tier across EVERY gathering profession, floored at
 // BARE_HANDS_TOOL_TIER. This is the corpse-harvest gate's input: a monster
 // material has no single owning profession, so any gathering tool counts.
+// OWNERSHIP scan, cross-profession: see the R22 note on
+// bestOwnedGatherToolTierOrNone above; the corpse premium arm reads the
+// wield-filtered sibling (wield_gate.ts bestWieldableAnyGatherToolTier).
 export function bestOwnedAnyGatherToolTier(
   inventory: readonly InvSlot[],
   items: Readonly<Record<string, ItemDef>>,

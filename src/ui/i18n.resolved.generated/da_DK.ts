@@ -6977,6 +6977,7 @@ export const da_DK: EnTranslations = {
       "close": "Luk købmand",
       "hint": "Klik på en genstand i dine tasker for at sælge den, mens dette vindue er åbent.",
       "buyAria": "Køb {item} for {price}",
+      "buyAriaWithRequirement": "Buy {item} for {price}. {requirement}",
       "buybackTitle": "Tilbagekøb",
       "buybackEmpty": "Ingen genstande",
       "buybackAria": "Køb {item} tilbage for {price}",

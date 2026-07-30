@@ -67,16 +67,23 @@ const REQUIRES_TOOL_KEYS: Partial<Record<GatheringProfessionId, string>> = {
 export function gatherNodeTooltipHtml(model: GatherNodeTooltipModel): string {
   const name = t(NODE_NAME_KEYS[model.type] as TranslationKey);
   let html = `<div class="tt-title">${esc(name)}</div>`;
+  // The R22 wield arm outranks the tier line: when the model carries a
+  // wield shortfall, the viewer already OWNS a covering tool and "Requires a
+  // tier N pick" would name a requirement they meet. The hover surface says
+  // the same thing the click toast and the sim's denial would.
   const reqKey =
-    model.tier > 1
-      ? TIER_REQUIRED_KEYS[model.professionId]
-      : REQUIRES_TOOL_KEYS[model.professionId];
+    model.locked && model.wieldSkill
+      ? WIELD_UNMET_KEYS[model.type]
+      : model.tier > 1
+        ? TIER_REQUIRED_KEYS[model.professionId]
+        : REQUIRES_TOOL_KEYS[model.professionId];
   if (reqKey) {
     const line = t(reqKey as TranslationKey, {
       tier: formatNumber(model.tier, { maximumFractionDigits: 0 }),
+      skill: formatNumber(model.wieldSkill ?? 0, { maximumFractionDigits: 0 }),
     });
-    // Red only while the viewer's owned-best tool falls short, mirroring the
-    // item-tooltip unmet-requirement idiom.
+    // Red only while the viewer's best USABLE tool falls short (owned but
+    // unearned locks too, R22), mirroring the item-tooltip unmet idiom.
     html += `<div class="${model.locked ? 'tt-red' : 'tt-sub'}">${esc(line)}</div>`;
   }
   const stateKey =
@@ -115,7 +122,8 @@ const WIELD_UNMET_KEYS: Record<GatherNodeType, string> = {
  *  copy surface, so main.ts wires it in one line). Structurally matches
  *  gather_node_interact.ts GatherNodeToolGate; the server stays authoritative
  *  either way (a stale read still answers gatherDenied). `viewerToolTier` is
- *  the unfloored owned tier (0 = no tool, #2343), so the shared canGatherTier
+ *  the unfloored USABLE tier (0 = nothing owned or nothing wieldable, #2343
+ *  plus R22), so the shared canGatherTier
  *  comparison locks every node, tier 1 included, for a toolless viewer. */
 export function gatherNodeToolGateFor(
   world: IWorld,

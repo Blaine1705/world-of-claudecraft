@@ -57,6 +57,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ],
   "es_ES": [
@@ -107,6 +108,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ],
   "fr_FR": [
@@ -157,6 +159,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ],
   "fr_CA": [
@@ -207,6 +210,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ],
   "en_CA": [],
@@ -258,6 +262,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ],
   "de_DE": [
@@ -308,12 +313,21 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "itemUi.vendor.buyAriaWithRequirement"
+  ],
+  "zh_TW": [
+    "itemUi.vendor.buyAriaWithRequirement"
+  ],
+  "ko_KR": [
+    "itemUi.vendor.buyAriaWithRequirement"
+  ],
+  "ja_JP": [
+    "itemUi.vendor.buyAriaWithRequirement"
+  ],
   "pt_BR": [
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
@@ -362,9 +376,12 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "itemUi.vendor.buyAriaWithRequirement"
+  ],
   "cs_CZ": [
     "entities.items.artisans_eye.name",
     "entities.items.fine_ashwood_log.name",
@@ -413,6 +430,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ],
   "nl_NL": [
@@ -463,6 +481,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ],
   "pl_PL": [
@@ -513,6 +532,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ],
   "id_ID": [
@@ -563,6 +583,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ],
   "tr_TR": [
@@ -613,6 +634,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ],
   "sv_SE": [
@@ -663,6 +685,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ],
   "vi_VN": [
@@ -713,6 +736,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ],
   "da_DK": [
@@ -763,6 +787,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaEnchanted",
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
+    "itemUi.vendor.buyAriaWithRequirement",
     "questUi.tracker.unknownQuest"
   ]
 };

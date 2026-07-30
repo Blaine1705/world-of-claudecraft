@@ -132,8 +132,12 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     expect(row.classList.contains('vendor-locked')).toBe(true);
     // ENABLED although the requirement is unmet: the sale is real (R22).
     expect(row.disabled).toBe(false);
-    // And the buy promise is true, so the accessible name states it.
+    // The accessible name states the buy promise AND the requirement: an
+    // aria-label replaces the button's content as its name, so without the
+    // combined key a screen reader would never hear what the sighted
+    // sub-line says.
     expect(row.getAttribute('aria-label')).toContain('Iron Mining Pick');
+    expect(row.getAttribute('aria-label')).toContain('Requires Mining 40');
     expect(row.querySelector('.vi-sub')?.textContent).toBe('Requires Mining 40');
     // The price still renders: the row shows what it will cost.
     expect(row.querySelector('.vi-price')?.textContent).toContain('120');
@@ -169,12 +173,14 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     expect(row.getAttribute('aria-label')).toContain('Iron Mining Pick');
   });
 
-  it('the requirement-unmet row TOOLTIP carries the requirement AND still invites the click', () => {
+  it('the requirement-unmet row TOOLTIP invites the click and appends NO second requirement line', () => {
     // The deps bag's attachTooltip is a no-op by default, so the tooltip
     // builder closure never runs and this branch was invisible. Capture the
-    // builder and invoke it: under the advisory model the tooltip must say
-    // what the tool will ask AND keep the click invitation, because the
-    // click genuinely buys (R22).
+    // builder and invoke it: the shared item tooltip (deps.itemTooltip, which
+    // resolves gatherToolTooltipLines) already carries the requirement
+    // sentence on every requirement-carrying tool, so the painter appending
+    // it again rendered the line twice on every gated row. The painter owes
+    // the click invitation only; the requirement rides the item tooltip.
     const built: string[] = [];
     const goods: VendorGoodsRow[] = [
       {
@@ -203,8 +209,10 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     // The goods row is the first tooltip attached (sell-junk and buyback rows
     // attach their own after it).
     expect(built.length).toBeGreaterThan(0);
-    expect(built[0]).toContain('Requires Mining 40');
     expect(built[0]).toContain('Click to buy');
+    // The painter itself adds no requirement line (the stubbed itemTooltip
+    // here proves the appended half is gone; the real one carries it once).
+    expect(built[0]).not.toContain('Requires Mining 40');
   });
 
   it('keeps click-to-buy on an unlocked row TOOLTIP', () => {

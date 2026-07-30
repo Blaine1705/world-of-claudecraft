@@ -8258,6 +8258,7 @@ export type TranslationKeyFlat =
   | 'itemUi.tooltip.useHealingPotion'
   | 'itemUi.tooltip.useManaPotion'
   | 'itemUi.vendor.buyAria'
+  | 'itemUi.vendor.buyAriaWithRequirement'
   | 'itemUi.vendor.buybackAria'
   | 'itemUi.vendor.buybackEmpty'
   | 'itemUi.vendor.buybackTitle'

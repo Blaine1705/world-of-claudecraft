@@ -24,7 +24,10 @@ import {
 import { GATHER_NODES, ITEMS } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
-import { bestWieldableGatherToolTierOrNone } from '../sim/professions/wield_gate';
+import {
+  bestWieldableGatherToolTierOrNone,
+  minWieldRequirementToWork,
+} from '../sim/professions/wield_gate';
 import type { GatherNodeDef } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { TranslationKey } from './i18n.catalog';
@@ -42,18 +45,21 @@ export function classifyGatherNode(world: IWorld, nodeId: string): GatherNodeSta
 /** The viewer's best USABLE gatherTool tier for one gathering profession:
  *  the same IWorld bags read the bags window renders
  *  (IWorldInventory#inventory), filtered by the R22 wield gate against the
- *  viewer's own proficiency (IWorldProfessions#professionsState, the same
- *  read the character sheet renders; absent or malformed counters read 0 and
- *  LOCK, the resolveVendorRowGate coercion contract, which
- *  bestWieldableGatherToolTierOrNone applies itself). 0 means nothing usable
- *  at all (#2343: bare hands never gather, so every node, tier 1 included,
+ *  viewer's own counter (the plain `gatheringProficiency` map both worlds
+ *  expose and the vendor advisory already reads: the Sim getter copies the
+ *  live map, ClientWorld mirrors the gprof wire field). Guarded end to end:
+ *  a partial IWorld stub or a malformed mirror reads undefined here, and
+ *  bestWieldableGatherToolTierOrNone coerces absent-or-malformed to 0,
+ *  which LOCKS (the documented fail-closed contract; a thrown read one
+ *  level above the coercion would defeat it). 0 means nothing usable at
+ *  all (#2343: bare hands never gather, so every node, tier 1 included,
  *  reads locked without a usable tool). This is the ONE client-side scan:
  *  the minimap lock, the node tooltip, and the interact pre-verdict all
  *  read it, so what the client shows can never disagree with what the
  *  sim's wield-filtered harvest gate refuses. Fishing passes through
  *  unfiltered inside the shared resolver (rods are R22-exempt). */
 export function viewerUsableToolTier(world: IWorld, professionId: GatheringProfessionId): number {
-  const skill = world.professionsState.skills.find((s) => s.professionId === professionId)?.skill;
+  const skill = world.gatheringProficiency?.[professionId];
   return bestWieldableGatherToolTierOrNone(world.inventory, professionId, skill, ITEMS);
 }
 
@@ -107,13 +113,23 @@ export function buildNearbyGatherNodes(world: IWorld, radiusYd: number): NearbyG
 
 /** Everything the gather-node hover tooltip renders, resolved for
  *  the local viewer: name by node family, the access-tier requirement, whether
- *  the viewer's owned-best tool meets it, and the respawn state. Null for an
+ *  the viewer's best USABLE tool meets it (owned-but-unearned locks, R22),
+ *  the wield shortfall when that is the lock, and the respawn state. Null for an
  *  unknown node id (a stale pick after a content change). */
 export interface GatherNodeTooltipModel {
   type: GatherNodeDef['type'];
   professionId: GatheringProfessionId;
   tier: number;
+  /** True when the viewer cannot work this node: no covering USABLE tool
+   *  (the wield-filtered scan; 0 owned and owned-but-unearned both lock). */
   locked: boolean;
+  /** The R22 wield arm, present exactly when the lock is a COUNTER
+   *  shortfall: a covering tool is already carried and this is the smallest
+   *  proficiency that would put something owned to work (the same
+   *  minWieldRequirementToWork the sim's denial names). Absent when the
+   *  lock is a plain tool/tier shortfall, so the painter keeps the tier
+   *  line for that arm. */
+  wieldSkill?: number;
   state: GatherNodeState;
 }
 
@@ -123,11 +139,17 @@ export function buildGatherNodeTooltip(
 ): GatherNodeTooltipModel | null {
   const node = GATHER_NODES.find((n) => n.id === nodeId);
   if (!node) return null;
+  const professionId = NODE_HARVEST_TABLE[node.type].professionId;
+  const locked = isNodeToolLockedFor(world, node);
+  const wieldReq = locked
+    ? minWieldRequirementToWork(world.inventory, professionId, node.tier, ITEMS)
+    : null;
   return {
     type: node.type,
-    professionId: NODE_HARVEST_TABLE[node.type].professionId,
+    professionId,
     tier: node.tier,
-    locked: isNodeToolLockedFor(world, node),
+    locked,
+    ...(wieldReq !== null && wieldReq > 0 ? { wieldSkill: wieldReq } : {}),
     state: classifyGatherNode(world, node.id),
   };
 }

@@ -6977,6 +6977,7 @@ export const sv_SE: EnTranslations = {
       "close": "Stäng köpman",
       "hint": "Klicka på ett föremål i dina väskor för att sälja det medan detta fönster är öppet.",
       "buyAria": "Köp {item} för {price}",
+      "buyAriaWithRequirement": "Buy {item} for {price}. {requirement}",
       "buybackTitle": "Återköp",
       "buybackEmpty": "Inga föremål",
       "buybackAria": "Köp tillbaka {item} för {price}",

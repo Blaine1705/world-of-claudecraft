@@ -19,6 +19,8 @@
 // world, so validating them at any other seed would be checking placements
 // against terrain that never ships.
 
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
 import {
@@ -911,6 +913,23 @@ describe('gather node placement: every node sits on ground a player can work', (
     // Sorted-input guard: an unsorted insertion would make the equality above
     // fail confusingly, so pin the list's own order too.
     expect([...DELIBERATE_DANGERS].sort()).toEqual(DELIBERATE_DANGERS);
+  });
+
+  it('the margin arm mirrors the LIVE aggro formula (source pin on locomotion)', () => {
+    // scaledAggro above re-implements production's level scaling because
+    // locomotion exports no helper; this pin is what keeps the mirror
+    // honest. Comment-stripped and whitespace-collapsed so neither prose nor
+    // a formatter wrap can satisfy or dodge it; both the slope and the floor
+    // are in the matched text, so retuning either in production reds this
+    // file until the mirror follows.
+    const source = readFileSync(path.resolve(process.cwd(), 'src/sim/mob/locomotion.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|\s)\/\/.*$/gm, '$1')
+      .replace(/\s+/g, '')
+      .replace(/,\)/g, ')');
+    expect(source).toContain(
+      'Math.max(4,Math.min(MAX_AGGRO_RADIUS,template.aggroRadius+(mob.level-e.level)*1.5))',
+    );
   });
 
   it('every allowlisted pair names a real node and a real named mob', () => {

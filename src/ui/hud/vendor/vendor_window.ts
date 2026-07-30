@@ -129,20 +129,33 @@ export function renderVendorWindow(
         ? ` ${t('itemUi.bags.stackCount', { count: formatNumber(quantity, { maximumFractionDigits: 0 }) })}`
         : '';
     const requirement = goods.requirementUnmet ? requirementText(goods) : '';
-    // Every row gets the buy aria-label now: with the purchase deny retired
-    // the "Buy {item} for {price}" promise is true of a requirement-unmet
-    // row too, and the requirement line is advisory detail the sighted and
-    // screen-reader flows both learn from the tooltip and sub-line.
+    // Every row gets a buy aria-label (the purchase deny is retired, so the
+    // promise is true of every row), and an aria-label REPLACES the button's
+    // content as its accessible name: a requirement-unmet row must fold the
+    // advisory into the name itself or screen-reader users never hear what
+    // the sighted sub-line says. One combined key, never two concatenated
+    // t() results.
     row.setAttribute(
       'aria-label',
-      t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
+      requirement
+        ? t('itemUi.vendor.buyAriaWithRequirement', {
+            item: `${itemName}${stack}`,
+            price,
+            requirement,
+          })
+        : t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
     );
     row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${esc(stack)}${requirement ? `<span class="vi-sub">${esc(requirement)}</span>` : ''}</span><span class="vi-price">${goodsPriceHtml(goods, deps)}</span>`;
     row.addEventListener('click', () => deps.onBuy(itemId));
-    deps.attachTooltip(row, () =>
-      goods.requirementUnmet
-        ? `${deps.itemTooltip(item)}${requirement ? `<div class="tt-sub">${esc(requirement)}</div>` : ''}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`
-        : `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`,
+    // No appended requirement line in the tooltip: the shared item tooltip
+    // (deps.itemTooltip -> gatherToolTooltipLines) already renders the same
+    // "Requires {craft} {skill}" sentence on every requirement-carrying
+    // tool, and the painter appending it again showed the line twice on
+    // every gated row. The at-a-glance signal stays the .vi-sub row line.
+    deps.attachTooltip(
+      row,
+      () =>
+        `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`,
     );
     goodsGrid.appendChild(row);
   }

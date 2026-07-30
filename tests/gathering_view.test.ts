@@ -40,6 +40,10 @@ function makeWorld(opts: {
     // viewer's bags; an empty bag reads as no tool owned at all (#2343:
     // bare hands never gather, so every node locks without its tool).
     inventory: opts.inventory ?? [],
+    // The plain counter map the wield-filtered scan reads (R22), beside the
+    // professionsState rows the display surfaces read: both derive from the
+    // same opts so the fixture cannot disagree with itself.
+    gatheringProficiency: proficiency,
     nodeHarvestableByMe: opts.harvestable ?? (() => true),
     professionsState: {
       // The rows carry the RESOLVED per-profession content caps
@@ -108,7 +112,8 @@ describe('buildNearbyGatherNodes', () => {
 // The tool-tier access dimension. `locked` is SEPARATE from the
 // ready/cooldown respawn state so the minimap can compose both; the lock
 // resolves through the sim's own canGatherTier comparator against the
-// viewer's owned-best bag scan (#2343: no floor, 0 means no tool owned, so
+// viewer's wield-filtered bag scan (#2343 plus R22: no floor, 0 means no
+// USABLE tool, owned-but-unearned included, so
 // even a tier-1 node locks for a toolless viewer).
 describe('tool-tier lock dimension', () => {
   // A literal NEW tier-2 vein; GATHER_NODES[0] stays the
@@ -196,10 +201,16 @@ describe('tool-tier lock dimension', () => {
         T2.id,
       ),
     ).toMatchObject({ locked: false });
-    // Owned-but-unearned stays locked in the tooltip model too (R22).
+    // Owned-but-unearned stays locked in the tooltip model too (R22), and
+    // the model carries the wield shortfall so the hover painter can name
+    // the counter instead of a tier the viewer already meets.
     expect(
       buildGatherNodeTooltip(makeWorld({ pos: T2.pos, inventory: PICK }), T2.id),
-    ).toMatchObject({ locked: true });
+    ).toMatchObject({ locked: true, wieldSkill: TIER2_TOOL_WIELD_PROFICIENCY });
+    // Absent, not zero, when the lock is a plain tool shortfall.
+    expect('wieldSkill' in (buildGatherNodeTooltip(makeWorld({ pos: T2.pos }), T2.id) ?? {})).toBe(
+      false,
+    );
     // A stale pick after a content change resolves to null, never a throw.
     expect(buildGatherNodeTooltip(makeWorld({}), 'no_such_node_id')).toBeNull();
   });
@@ -235,6 +246,9 @@ describe('tool-tier lock dimension', () => {
     );
     expect(gatherDeniedLineKey('node', 'herbalism', 2, 70)).toBe(
       'hudChrome.gathering.wieldUnmet.herbalism',
+    );
+    expect(gatherDeniedLineKey('node', 'logging', 1, 40)).toBe(
+      'hudChrome.gathering.wieldUnmet.logging',
     );
     // A zero or absent wield requirement never takes the wield line.
     expect(gatherDeniedLineKey('node', 'mining', 2, 0)).toBe(
