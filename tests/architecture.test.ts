@@ -883,6 +883,8 @@ const EXPECTED_BARE_NAMED = [
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/render/cast_bar.ts',
+  'src/render/foliage_lod.ts',
+  'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/bag_item_context_menu.ts',
