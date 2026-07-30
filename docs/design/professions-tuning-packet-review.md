@@ -1856,9 +1856,9 @@ derived test; the cap-scaling design note) plus:
 BUILT 2026-07-29/30 (Fable, ultracode). Preamble: origin fetched,
 release/v0.32.0 still the newest release branch and unmoved at a802b4be2
 (already merged), no re-sync, nothing for the release-merge audit; opening
-gate PASS, all 11 steps, at the entry tip 1ab42967d. Eighteen code,
-docs, and asset commits, 44140364e through b186b994f, plus this
-record's own commit. What each item settled:
+gate PASS, all 11 steps, at the entry tip 1ab42967d. Twenty-one code,
+docs, asset, and gate-fix commits, 44140364e through 8886bef8e, plus
+this record. What each item settled:
 
 Pass-1 scope: R19 landed as the zone-tier teaching ceiling DERIVED from
 the gain schedule's own row boundaries (tier-1 water grays at 100, tier-2
@@ -2028,6 +2028,27 @@ candidate; the compound wield-and-tier denials carry no wieldProficiency
 (correct semantics, recorded by the sim-suite re-mint); the browser axe
 suite and the perf tour were not run by any reviewer here and belong to
 the QA session's live track.
+
+CLOSING GATE: three rounds. Round one failed at changed-files biome on
+one format error, this round's own ja_JP wield fills running past the
+line width (wrapped by biome itself; CJK strings blow the width
+silently, so an overlay fill owes a format pass on the touched file in
+the same change), with a context find worth keeping: the changed-set
+base origin/main fast-forwarded twice mid-session under concurrent
+sessions' fetches, so the set a long session gates against moves under
+it. Round two failed at the full suite on two stragglers, out of
+23559 tests, that NO targeted run had covered all round: the deeds
+view's fresh-character denominator pins had not moved for the new
+chronicle (the catalog pins live in a different suite and were
+re-baselined; the view-side pins were not), and the D8 grade-credit
+rig hands its player a tier-2 pick at mining 0, which is now the
+covering-but-unwieldable DENIAL rather than a yield upgrade, so the
+rig earns the tier-2 wield counter first. Both fixed with the R22
+comment written at the rig. Round three: PASS, all 11 steps, at
+8886bef8e. The lesson stands in the record: a content-count or
+gate-contract change owes a full-suite run well before the close,
+because per-file iteration and reviewer runs missed both stragglers
+for the whole round.
 
 ---
 
