@@ -23,6 +23,7 @@ import {
   DUNGEONS,
   delveAt,
   dungeonAt,
+  ITEMS,
   isDelvePos,
   MOBS,
   ZONES,
@@ -152,6 +153,7 @@ import {
 import { getDeedBroadcasts } from './deeds_db';
 import {
   deedRecordsIdle,
+  discordFeedDeed,
   isHiddenDeedId,
   isMarqueeDeed,
   reconcileCharacterDeeds,
@@ -6650,10 +6652,11 @@ export class GameServer {
           const ids = deedUnlocks.get(s);
           if (ids) ids.push(ev.deedId);
           else deedUnlocks.set(s, [ev.deedId]);
-          // Marquee unlocks fan out to guildmates and followers; retro
-          // unlocks NEVER broadcast (a veteran's first login after rollout
-          // must not spam their guild).
-          if (ev.retro !== true) this.maybeBroadcastDeedUnlock(s, ev.deedId);
+          // Marquee unlocks fan out to guildmates and followers, and
+          // feed-worthy unlocks (titles, the first koi) to the Discord
+          // activity feed; retro unlocks NEVER fan out anywhere (a veteran's
+          // first login after rollout must not spam their guild or the feed).
+          if (ev.retro !== true) this.fanOutDeedUnlock(s, ev.deedId, now);
         }
       }
       // Economy telemetry: one granted node harvest, counted under the ZONE
@@ -6755,6 +6758,27 @@ export class GameServer {
             quality: ev.quality,
           },
           `rareloot:${ev.rollId}`,
+          now,
+        );
+      } else if (ev.type === 'masterwork' && ev.pid !== undefined) {
+        // A masterwork proc: the professions moment the rareloot arm above
+        // cannot see (a craft fires no loot roll). One card per proc,
+        // mirroring the in-game zone-wide celebration; the ACCOUNT-scoped
+        // dedupe key (unlike rareloot's per-drop rollId) collapses a
+        // crafting-session burst inside the TTL to one card. Bots have no
+        // session, so this.clients.get filters them naturally.
+        const s = this.clients.get(ev.pid);
+        if (!s) continue;
+        enqueueActivity(
+          {
+            kind: 'masterwork',
+            accountIds: [s.accountId],
+            names: [s.name],
+            realm: REALM,
+            profileUrl: this.profileUrlFor(s.name),
+            itemName: ITEMS[ev.itemId]?.name ?? ev.itemId,
+          },
+          `masterwork:${s.accountId}`,
           now,
         );
       } else if (ev.type === 'duelEnd') {
@@ -7299,27 +7323,51 @@ export class GameServer {
     this.send(session, { t: 'events', list: [{ type: 'log', text, color: '#ffd100' }] });
   }
 
-  // Fan a non-retro marquee deed unlock out to the earner's online guildmates
-  // and followers unless the account opted out (accounts.deed_broadcasts).
-  // Fire-and-forget off the loop (the daily-reward observer pattern): the
-  // opt-out read and the audience resolution are async DB work the tick never
-  // awaits, and a failure logs without touching gameplay. The earner's own
-  // toast is client-side from the sim event; no frame is sent to them here.
-  private maybeBroadcastDeedUnlock(session: ClientSession, deedId: string): void {
+  // Fan a non-retro deed unlock out to its two audiences, the earner's online
+  // guildmates and followers (marquee deeds) and the Discord activity feed
+  // (title deeds + the first koi, via discordFeedDeed's fail-closed gate),
+  // unless the account opted out (accounts.deed_broadcasts, ONE read serving
+  // both audiences; a Discord post is a wider audience than the guild marquee,
+  // so the opt-out covers it a fortiori). Fire-and-forget off the loop (the
+  // daily-reward observer pattern): the opt-out read and the audience
+  // resolution are async DB work the tick never awaits, and a failure logs
+  // without touching gameplay. The earner's own toast is client-side from the
+  // sim event; no frame is sent to them here. Session identity is captured
+  // BEFORE the await so a leave between tick and resolution changes nothing.
+  private fanOutDeedUnlock(session: ClientSession, deedId: string, now: number): void {
     const def = DEEDS[deedId];
-    if (!def || !isMarqueeDeed(def)) return;
+    if (!def) return;
     // Hidden deeds are invisible until earned, EXISTENCE included (the
     // deeds_records contract every third-party surface honors): a reward can
     // make one marquee, but the fan-out would hand its id and name to viewers
-    // who have not earned their own copy.
-    if (isHiddenDeedId(deedId)) return;
-    void getDeedBroadcasts(session.accountId)
+    // who have not earned their own copy. discordFeedDeed applies the same
+    // contract fail-closed for the feed card.
+    const marquee = isMarqueeDeed(def) && !isHiddenDeedId(deedId);
+    const feed = discordFeedDeed(deedId);
+    if (!marquee && !feed) return;
+    const { accountId, characterId, name } = session;
+    const profileUrl = this.profileUrlFor(name);
+    void getDeedBroadcasts(accountId)
       .then((enabled) => {
         if (!enabled) return;
-        return this.social.broadcastDeedUnlock(
-          { characterId: session.characterId, name: session.name },
-          deedId,
-        );
+        if (feed) {
+          enqueueActivity(
+            {
+              kind: 'deed',
+              accountIds: [accountId],
+              names: [name],
+              realm: REALM,
+              profileUrl,
+              deedId,
+              ...feed,
+            },
+            `deed:${accountId}:${deedId}`,
+            now,
+          );
+        }
+        if (marquee) {
+          return this.social.broadcastDeedUnlock({ characterId, name }, deedId);
+        }
       })
       .catch((err) => console.error('deed broadcast failed:', err));
   }

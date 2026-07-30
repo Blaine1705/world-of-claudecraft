@@ -482,13 +482,18 @@ async function main(): Promise<void> {
     }
   };
 
-  // Drain + post the significant-activity feed (level-ups, rare drops, duels, arena).
+  // Drain + post the significant-activity feed (level-ups, rare drops, duels,
+  // arena, Vale Cup, masterworks, deeds).
   const pollActivity = async (): Promise<void> => {
     if (!cfg.activityChannelId) return;
     const items = await server.drainActivity();
     for (const item of items) {
+      // null = a kind this build does not know (a newer server mid-deploy):
+      // skip it rather than post an empty embed.
+      const payload = buildActivityMessage(item);
+      if (!payload) continue;
       await discord
-        .createMessage(cfg.activityChannelId, buildActivityMessage(item))
+        .createMessage(cfg.activityChannelId, payload)
         .catch((e) => console.error('[bot] activity post failed', e));
     }
   };

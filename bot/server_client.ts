@@ -106,7 +106,8 @@ export class ServerClient {
     return data?.items ?? [];
   }
 
-  /** Drain the significant-activity feed (level-ups, rare drops, duels, arena). */
+  /** Drain the significant-activity feed (level-ups, rare drops, duels, arena,
+   *  Vale Cup, masterworks, deeds). */
   async drainActivity(): Promise<ActivityItem[]> {
     const data = await this.call<{ items: ActivityItem[] }>('GET', '/internal/discord/activity');
     return data?.items ?? [];

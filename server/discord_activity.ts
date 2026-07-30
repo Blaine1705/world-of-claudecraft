@@ -1,13 +1,21 @@
 // Significant-activity feed: the game loop detects notable moments (a character
-// reaching max level, a rare drop, a duel result, an arena win) and enqueues a
-// structured item here; the bot drains /internal/discord/activity and posts a
-// rich card to the activity channel, tagging the linked Discord user(s) involved.
+// reaching max level, a rare drop, a duel result, an arena win, a decided Vale
+// Cup match, a masterwork craft, a feed-worthy deed) and enqueues a structured
+// item here; the bot drains /internal/discord/activity and posts a rich card to
+// the activity channel, tagging the linked Discord user(s) involved.
 //
 // Pure + dependency-free (no Discord IO, no DB), so it is trivially testable. The
 // drain endpoint resolves accountIds to Discord identities; this layer is just the
 // in-memory hand-off, mirroring discord_relay.ts.
 
-export type ActivityKind = 'levelup' | 'rareloot' | 'duel' | 'arena' | 'vale_cup';
+export type ActivityKind =
+  | 'levelup'
+  | 'rareloot'
+  | 'duel'
+  | 'arena'
+  | 'vale_cup'
+  | 'masterwork'
+  | 'deed';
 
 export interface QueuedActivity {
   kind: ActivityKind;
@@ -21,7 +29,7 @@ export interface QueuedActivity {
   profileUrl: string | null;
   // Type-specific payload (only the relevant fields are set):
   level?: number; // levelup
-  itemName?: string; // rareloot
+  itemName?: string; // rareloot; masterwork; the first-koi deed's catch name
   quality?: string; // rareloot ('epic' | 'legendary')
   winnerName?: string; // duel
   loserName?: string; // duel
@@ -30,6 +38,9 @@ export interface QueuedActivity {
   scoreA?: number; // vale_cup
   scoreB?: number; // vale_cup
   winnerNation?: string; // vale_cup (VcNationId banner of the winning side)
+  deedId?: string; // deed
+  deedName?: string; // deed (English deed name; the bot posts English)
+  deedTitle?: string; // deed, when the deed rewards a title
 }
 
 const QUEUE: QueuedActivity[] = [];

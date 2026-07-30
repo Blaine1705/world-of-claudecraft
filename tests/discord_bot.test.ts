@@ -578,6 +578,109 @@ describe('significant-activity cards', () => {
     expect(msg.embeds[0].description).toContain('Ghost'); // plain, no mention
     expect(msg.allowed_mentions.users).toEqual(['111']);
   });
+
+  // The server has enqueued vale_cup cards since the Vale Cup shipped, but the
+  // bot's builder had no case for the kind, so every card posted as an embed
+  // with an undefined title/description/color (the empty-embed render).
+  it('vale-cup card names the winning nation, bracket, and score, tagging the side', () => {
+    const msg = buildActivityMessage({
+      kind: 'vale_cup',
+      realm: 'Claudemoon',
+      profileUrl: null,
+      bracket: 3,
+      scoreA: 2,
+      scoreB: 5,
+      winnerNation: 'copperdig',
+      participants: [linked('Aldric', '111'), linked('Mira', '222')],
+    }) as {
+      content: string;
+      allowed_mentions: { users: string[] };
+      embeds: Array<Record<string, any>>;
+    };
+    expect(msg.embeds[0].title).toContain('The Copper Dig');
+    expect(msg.embeds[0].title).toContain('3v3');
+    // Winning score reads first regardless of which team's column it sat in.
+    expect(msg.embeds[0].description).toContain('5 to 2');
+    expect(msg.embeds[0].description).toContain('<@111>');
+    expect(msg.embeds[0].description).toContain('<@222>');
+    expect(msg.allowed_mentions.users.sort()).toEqual(['111', '222']);
+    expect(typeof msg.embeds[0].color).toBe('number');
+  });
+
+  it('vale-cup card falls back to the raw nation id when the label map misses', () => {
+    const msg = buildActivityMessage({
+      kind: 'vale_cup',
+      realm: 'Claudemoon',
+      profileUrl: null,
+      bracket: 1,
+      scoreA: 3,
+      scoreB: 0,
+      winnerNation: 'newnation',
+      participants: [linked('Aldric', '111')],
+    }) as { embeds: Array<Record<string, any>> };
+    expect(msg.embeds[0].title).toContain('newnation');
+  });
+
+  it('masterwork card names the crafted item and pings the crafter', () => {
+    const msg = buildActivityMessage({
+      kind: 'masterwork',
+      realm: 'Claudemoon',
+      profileUrl: 'https://woc.test/c/Aldric',
+      itemName: 'Osmium Breastplate',
+      participants: [linked('Aldric', '111')],
+    }) as {
+      content: string;
+      allowed_mentions: { users: string[] };
+      embeds: Array<Record<string, any>>;
+    };
+    expect(msg.embeds[0].title).toBe('Osmium Breastplate');
+    expect(msg.embeds[0].description).toContain('masterwork');
+    expect(msg.embeds[0].description).toContain('<@111>');
+    expect(msg.allowed_mentions.users).toEqual(['111']);
+  });
+
+  it('deed-title card names the deed and the earned title', () => {
+    const msg = buildActivityMessage({
+      kind: 'deed',
+      realm: 'Claudemoon',
+      profileUrl: null,
+      deedId: 'prog_masterwright',
+      deedName: 'Masterwright',
+      deedTitle: 'Masterwright',
+      participants: [linked('Aldric', '111')],
+    }) as { embeds: Array<Record<string, any>> };
+    expect(msg.embeds[0].title).toBe('Masterwright');
+    expect(msg.embeds[0].description).toContain('"Masterwright"');
+    expect(msg.embeds[0].description).toContain('title');
+    expect(msg.embeds[0].description).toContain('<@111>');
+  });
+
+  it('first-koi card reads as a catch, not a generic deed', () => {
+    const msg = buildActivityMessage({
+      kind: 'deed',
+      realm: 'Claudemoon',
+      profileUrl: null,
+      deedId: 'col_glimmerfin',
+      deedName: 'Glimmer of Hope',
+      itemName: 'Sunglint Koi',
+      participants: [linked('Aldric', '111')],
+    }) as { embeds: Array<Record<string, any>> };
+    expect(msg.embeds[0].title).toBe('Glimmer of Hope');
+    expect(msg.embeds[0].description).toContain('first Sunglint Koi');
+    expect(msg.embeds[0].description).toContain('<@111>');
+  });
+
+  // The empty-embed class guard: a kind this bot build does not know (a newer
+  // server mid-deploy) must skip the post entirely, never render a blank card.
+  it('returns null for an unknown activity kind', () => {
+    const msg = buildActivityMessage({
+      kind: 'parade' as never,
+      realm: 'Claudemoon',
+      profileUrl: null,
+      participants: [linked('Aldric', '111')],
+    });
+    expect(msg).toBeNull();
+  });
 });
 
 describe('daily rewards winner cards', () => {
