@@ -1309,6 +1309,75 @@ describe('fine material grades on the live harvest path', () => {
     }
   });
 
+  it('an unconfirmed prompt cast reserves the BASE grade at both capacity gates (R40)', () => {
+    // The consent THREADING pin the four-arm table cannot see (its bags
+    // always have room): with a prompt-mode slot left unconfirmed, both the
+    // cast-start pre-gate and the completion re-gate must reserve room for
+    // the BASE grade the grant will actually mint. The fixture has room for
+    // plain ore and none for fine, so a pre-gate that lost the consent
+    // argument (falling back to the effect-assisted reader default) would
+    // deny this harvest "Your bags are full." at either end of the cast.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('iron_mining_pick', 1, pid);
+    sim.addItem('artisans_eye', 1, pid);
+    sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
+    const meta = mustMeta(sim, pid);
+    meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
+    const slot = meta.toolEffectSlots?.mining;
+    expect(slot).toBeDefined();
+    if (!slot) return;
+    slot.confirmMode = 'prompt'; // as a persisted row would load
+    const chargesBefore = slot.durability;
+    const capacity = bagCapacity(meta.bags);
+    const fillerStack = ITEMS.bone_fragments.stackSize ?? 20;
+    while (meta.inventory.length < capacity - 1) sim.addItem('bone_fragments', fillerStack, pid);
+    sim.addItem('iron_ore', 1, pid); // partial plain stack: room for base only
+    expect(meta.inventory.length).toBe(capacity);
+    expect(sim.ctx.canAddItem('iron_ore', 1, pid)).toBe(true);
+    expect(sim.ctx.canAddItem('fine_iron_ore', 1, pid)).toBe(false);
+
+    teleportOntoNode(sim, pid, MIREFEN_T2);
+    sim.drainEvents();
+    // The cast STARTS: the start pre-gate reserved the base grade.
+    expect(sim.harvestNode(MIREFEN_T2, undefined, pid)).toBe(true);
+    completeCastNow(sim, pid);
+    sim.tick();
+    // And COMPLETES: the completion re-gate reserved the same base grade,
+    // the grant minted it, and the unfired prompt effect kept its charge.
+    expect(sim.countItem('iron_ore', pid)).toBe(2);
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
+    expect(
+      sim.drainEvents().some((e) => e.type === 'error' && e.text === 'Your bags are full.'),
+    ).toBe(false);
+    expect(slot.durability).toBe(chargesBefore);
+  });
+
+  it('the consent defaults split by caller class: readers effect-assisted, commands fail-safe', () => {
+    // The documented asymmetry, pinned so a future caller omitting the
+    // argument gets exactly the intended answer: harvestYieldItemId (and
+    // effectiveGradeToolTier under it) default confirmed=true, the
+    // out-of-command reader view; the command path defaults false (the
+    // four-arm table's undefined-consent rows pin the grant half).
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('iron_mining_pick', 1, pid);
+    sim.addItem('artisans_eye', 1, pid);
+    sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
+    const meta = mustMeta(sim, pid);
+    meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
+    const slot = meta.toolEffectSlots?.mining;
+    expect(slot).toBeDefined();
+    if (!slot) return;
+    slot.confirmMode = 'prompt';
+    const node = gatherNodeById(MIREFEN_T2);
+    expect(node).toBeDefined();
+    if (!node) return;
+    // Reader default: the omitted argument previews the effect-assisted id.
+    expect(harvestYieldItemId(meta, node)).toBe('fine_iron_ore');
+    expect(harvestYieldItemId(meta, node, false)).toBe('iron_ore');
+  });
+
   it('the pre-gate reads the SLOTTED quality effect (allow arm: room for fine only)', () => {
     // The mirror case: every plain stack is FULL (no room for plain ore) but a
     // partial FINE stack can top up. A raw-tool pre-gate resolves the plain id

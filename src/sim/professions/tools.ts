@@ -597,8 +597,14 @@ export function normalizeToolEffectSlots(
       // flow shipped it is an ordinary live mode: the mint accepts it and
       // the harvest command carries the per-use consent it asks for.
       // Coercing it to 'always' here would silently retire a player's
-      // deliberate choice.
-      confirmMode: row.confirmMode === 'prompt' ? 'prompt' : 'always',
+      // deliberate choice. An ABSENT mode is a legacy row minted before the
+      // union existed, when every slot fired unconditionally: 'always' is
+      // its faithful reading. A GARBLED value (no live path writes one; a
+      // hand-edited or corrupted row) coerces to 'prompt', the fail-safe
+      // direction: a slot that asks first can never silently spend a
+      // charge, while 'always' would.
+      confirmMode:
+        row.confirmMode === 'always' || row.confirmMode === undefined ? 'always' : 'prompt',
     };
   }
   return out;

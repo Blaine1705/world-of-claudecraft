@@ -748,7 +748,12 @@ export function harvestNode(
   // The R40 consent capture, beside the rarity capture and under the same
   // slot-present condition, so a slot-less cast (every player until one is
   // slotted) keeps the field inert and every existing parity frame
-  // byte-identical. Read once at completion.
+  // byte-identical. Read once at completion. Load-bearing coupling: the
+  // cast-start pre-gate above threads the RAW flag while this capture ANDs
+  // in slot presence; they agree only because usableToolEffectSlot derives
+  // presence from the same toolEffectSlots map, so a confirmed-but-slotless
+  // read resolves the base grade either way. If the two expressions ever
+  // diverge, the pre-gate reserves room for an id the grant does not mint.
   p.gatherCastEffectConfirmed =
     confirmEffectUse && meta.toolEffectSlots?.[professionId] !== undefined;
   // Drop any GCD-held queued spell press: a session's end paths never call
@@ -816,6 +821,12 @@ export function useGatherToolItem(
     ctx.emit({ type: 'gatherToolNoNode', pid: meta.entityId, professionId });
     return false;
   }
+  // Deliberately consent-blind (R40): this is the raw item-use command's
+  // path (the RL env, bots, an old bundle), whose wire shape carries no
+  // confirm flag and whose callers have no dialog to answer, so the default
+  // false is the fail-safe arm: a 'prompt' slot never fires here and never
+  // spends. The three client dispatch sites resolve the node locally and
+  // send harvest_node with the consent instead.
   return harvestNode(ctx, best.id, pid);
 }
 
@@ -967,6 +978,10 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     // as an additive optional field.
     if (mattered) {
       const spent = depleteEffect(usedSlot);
+      // `spent` already implies usedSlot is defined (depleteEffect returns
+      // false for undefined); the extra term is TypeScript narrowing only.
+      // Do not "simplify" by dropping `spent`: the durability read alone
+      // would announce a depletion the settle never performed.
       effectDepleted = spent && usedSlot !== undefined && usedSlot.durability <= 0;
     }
   }

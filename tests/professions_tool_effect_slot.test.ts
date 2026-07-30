@@ -810,6 +810,24 @@ describe('the id tables and the load normalizer, directly', () => {
     expect(mixed && 'fishing' in mixed).toBe(false);
   });
 
+  it('confirmMode load coercion: kept modes, legacy absent reads always, garbage fails safe to prompt', () => {
+    // The four value-domain arms of the load coercion. ABSENT is a legacy
+    // row minted before the union existed, when every slot fired
+    // unconditionally: 'always' is its faithful reading. A GARBLED value has
+    // no live writer (the mint refuses out-of-union outright); it coerces to
+    // 'prompt', the direction that asks before spending a charge rather
+    // than the one that silently spends.
+    const load = (confirmMode: unknown) =>
+      normalizeToolEffectSlots({
+        mining: { effectId: 'gatherers_cache', durability: 5, maxDurability: 20, confirmMode },
+      } as never)?.mining?.confirmMode;
+    expect(load('prompt')).toBe('prompt');
+    expect(load('always')).toBe('always');
+    expect(load(undefined)).toBe('always');
+    expect(load('sometimes')).toBe('prompt');
+    expect(load(7)).toBe('prompt');
+  });
+
   it('normalizes the five safe-by-construction garbage shapes, pinned so the guards cannot rot', () => {
     // Each arm names the guard that catches it: Number.isFinite for
     // Infinity, Math.max(0, ...) for a negative durability, Math.floor for a
@@ -911,7 +929,7 @@ describe('the id tables and the load normalizer, directly', () => {
     expect(kept?.mining?.maxDurability).toBe(50);
   });
 
-  it('refuses a corrupt confirmMode and a non-string craftedBy', () => {
+  it('coerces a corrupt confirmMode to the asking mode and drops a non-string craftedBy', () => {
     const out = normalizeToolEffectSlots({
       mining: {
         effectId: 'gatherers_cache',
@@ -921,7 +939,10 @@ describe('the id tables and the load normalizer, directly', () => {
         craftedBy: 42,
       },
     } as never);
-    expect(out?.mining?.confirmMode).toBe('always');
+    // Fail-safe direction (the phase 14 QA): a garbled mode loads as
+    // 'prompt', the mode that asks before spending a charge; only a literal
+    // 'always' (or the legacy absent field) fires unconditionally.
+    expect(out?.mining?.confirmMode).toBe('prompt');
     // The docblock promises every row is checked; craftedBy was the one field
     // passing through unvalidated, and it re-serializes on the next save.
     expect(out?.mining?.craftedBy).toBeUndefined();
