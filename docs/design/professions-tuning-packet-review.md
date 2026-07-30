@@ -2177,6 +2177,8 @@ exactly once.
      so the interim falsehood reaches no player, and English rewords land
      exactly once here): `toolsNote`'s purchase-gating sentences ("the row
      names the requirement" survives; the merchant REFUSING does not), its
+     "anything you already own keeps working" clause (R22 falsifies it: an
+     owned tier-2 tool does not work until its wield counter is met), its
      silence on the wield ladder (40/70 and the crafted rungs at 85/100
      now pace USE), the gatherIntro trio's "all it takes is a tool in your
      bags" phrasing, and the tool table gaining the wield-requirement
@@ -2197,6 +2199,10 @@ exactly once.
    - `scheduleNote` joins the remove-and-refill set (the R19 reword
      stales it; pass 2 found the pass-1 refill scope missed it).
    - R32's veto-able soft danger hint in "Where to start".
+   - The `chr_peaks_gatherer` deed's rows in every deed i18n locale table
+     (the phase 13 QA round reproduced the release-tier `deed_i18n` red
+     naming `de_DE.chr_peaks_gatherer.name`: the deed shipped with zero
+     locale rows, a legal pending state at PR tier that this fill owes).
 2. Every reword follows the remove-and-refill protocol (stale overlays
    deleted so keys re-pend; non-Latin fills for M16-wordy values in the
    same change), because the gate cannot see reword staleness.

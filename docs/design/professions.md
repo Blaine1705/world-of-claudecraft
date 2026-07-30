@@ -118,9 +118,10 @@ the WATER caps how far they teach (`fishingTeachingCeilingFor`, derived
 from the schedule's own row boundaries: tier-1 water grays at 100, tier-2
 at 150, tier-3 at the cap); junk teaches nothing at or past
 `FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY` wherever the water still teaches.
-Hidden per-cast state is four transient Entity fields (`fishBiteAtTick`,
-`fishReelDeadlineTick`, `gatherCastNodeId`, `fishCastZoneId`), never
-wired, never persisted, cleared on every cast-end path.
+Hidden per-cast state is a set of transient Entity fields
+(`fishBiteAtTick`, `fishReelDeadlineTick`, `gatherCastNodeId`,
+`fishCastZoneId`, `gatherCastToolRarity`), never wired, never
+persisted, cleared on every cast-end path.
 
 FISHING'S STATED IDENTITY (the content pass's richness audit, veto-able
 in the review worklist's ledger): fishing deliberately has NO fine-grade
@@ -474,8 +475,8 @@ to 3 gathering hours plus the cast, throttle, and travel time, which is
 where the band's low end comes from. One access assumption the figures
 rest on, stated: the expansion's thorium faucets are TIER-1 nodes, so
 under R22 they need only the tier-1 pick at any proficiency; only the
-Thornpeak tier-3 circuit asks for the wielded tier-3 tool (mining 70). Gathering-100 and fishing-200
-currently pace FASTER than target: maintainer-accepted for this release;
+Thornpeak tier-3 circuit asks for the wielded tier-3 tool (mining 70).
+Gathering-100 and fishing-200 currently pace FASTER than target: maintainer-accepted for this release;
 correct post-launch via data-only levers (respawn seconds, node density,
 quantity per rarity, bite-delay band, junk share), never via smaller gain
 numbers. If mastery should get longer, the pre-approved lever is material
@@ -537,9 +538,9 @@ the old authoritative buy deny is retired.
 One knock-on worth naming, and it INVERTED when the gate moved: the tier-4
 engineering tool recipes consume the tier-3 land tools as reagents, and
 with the counter open that reagent is purchasable at any proficiency
-(consuming a tool in a craft never wields it). Not a completability regression (the tool deed is any
-station craft, and the same recipes already need node-only materials), but it is
-a new coupling between an engineering craft and a gathering counter.
+(consuming a tool in a craft never wields it). Not a completability
+regression (the tool deed is any station craft, and the same recipes
+already need node-only materials), but it is a new coupling between an engineering craft and a gathering counter.
 
 Respawn seconds and node density are ONE lever, not two. The per-zone harvest
 ceiling is nodes x 3600 / respawn, so moving either alone moves the ceiling:

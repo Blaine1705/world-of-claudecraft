@@ -304,7 +304,7 @@ both hosts.
   and the crafted rungs at 85/100), so a pre-gate owner keeps the tool and
   reaches the threshold to wield it, and the purchase gates are advisory
   display. The patch note carries both halves.
-  
+
 
 Gating on zone alone does not work and is not attempted: there is no level gate,
 no quest gate and no travel cost anywhere, the inter-zone ridge has a road pass,
