@@ -4881,6 +4881,9 @@ function professionsToolEffectSlot(seed = 1): Scenario {
       'R42 charge settle at the command boundary: one charge for one bonus-bearing harvest',
       'the harvest keeps its exact two-draw contract with a live slot applied',
       'own-timer denial on the same vein: zero draws, no cast, no charge',
+      "R40 prompt re-slot: the mode gain mints, the spent slot's charge resets",
+      'R40 unconfirmed prompt use: two draws, base quantity, charge kept (the fail-safe)',
+      'R40 confirmed prompt use: two draws, bonus applied, charge spent (the consented digest)',
     ],
     sampleEvery: 500,
     build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
@@ -4936,6 +4939,32 @@ function professionsToolEffectSlot(seed = 1): Scenario {
       // slot's remaining charges untouched.
       sim.harvestNode(VEIN_ID, undefined, pid);
       rec.snapshot('same-vein-denied-by-own-timer');
+      rec.tick(2);
+
+      // The R40 prompt chapter (the phase 14 QA: no scenario pinned the
+      // CONSENTED digest, so a draw added inside the consent-gated branch
+      // would have passed every shard). Re-slot the same effect in 'prompt'
+      // mode: the spent charge above makes it a real gain, and the second
+      // self-signed charm feeds the mint.
+      sim.addItemInstance('gatherers_cache', { signer: meta.name }, pid);
+      sim.slotToolEffect('mining', 'gatherers_cache', 'prompt', pid);
+      rec.snapshot('prompt-mode-reslotted');
+
+      // Unconfirmed prompt use on the tier-1 vein: the harvest proceeds on
+      // its exact two-draw contract while the effect skips whole (base
+      // quantity, charge kept), the stale-client fail-safe digest.
+      standOnNode(sim, p, 'ore_mirefen_1');
+      sim.harvestNode('ore_mirefen_1', undefined, pid);
+      rec.tick(castTicks);
+      rec.snapshot('prompt-unconfirmed-skips-whole');
+
+      // Confirmed on the second tier-2 vein: the consent-gated branch runs
+      // (bonus applied, charge spent) inside the same two-draw contract, so
+      // a draw added or reordered anywhere in that branch moves THIS digest.
+      standOnNode(sim, p, 'ore_mirefen_t2b');
+      sim.harvestNode('ore_mirefen_t2b', true, pid);
+      rec.tick(castTicks);
+      rec.snapshot('prompt-confirmed-fires-and-spends');
       rec.tick(2);
     },
   };
