@@ -2210,6 +2210,186 @@ sourcing; the mobile audit of every professions flow) plus:
 10. The removed prompt-mode HUD badge leftovers check (pass-1 item)
     rides along.
 
+BUILT 2026-07-30 (Fable xhigh, screenshot-driven, serial). Preamble:
+origin fetched; release/v0.33.0 stood one commit past the sync (the
+perf-overlay ornament scroll fix), merged clean, release-merge-audit run
+(two branch-owned overlaps, scripts/pr_shot_targets.mjs and
+src/styles/components.css, read against both parents with both sides
+intact; no routes, no injected helpers, no premise moved), full gate PASS
+post-merge before any phase work. Twenty-one code, test, style, and
+screenshot commits; the record commit follows the closing gate.
+
+The pass-1 scope, what each settled: the node tooltip gained the grade
+preview and the live respawn countdown together. The preview resolves
+through effectiveGradeToolTier ITSELF, its promised third reader: the
+grant's meta parameter narrowed to the new GradeReadMeta subset and the
+client adapts the IWorld reads (bags, proficiency map, tool-effect rows,
+unknown ids dropped) into the same function, so the tier a tooltip
+previews and the tier the grant runs share one definition. The countdown
+rides the new IWorldProfessions nodeRespawnSeconds member, implemented in
+both worlds (Sim reads the per-player timer through the new
+nodeRespawnRemainingSec helper beside the gate it mirrors; ClientWorld
+reads the ncd mirror, whose stable-timer entries are already aged
+remaining seconds), null exactly when nodeHarvestableByMe answers true,
+parity pin moved to 278, and the m:ss line ceils so a live timer never
+reads 0:00. The last-charge signal finally reads depleteEffect's return:
+gatherResult carries an additive optional effectDepleted flag on exactly
+the emptying spend (absent otherwise keeps every other harvest
+byte-identical), rendered as ONE FCT self-note; the charge row stays the
+durable record, and the kept-charge R42 arms pin that a suppressed or
+unfired use never announces.
+
+R40 shipped WHOLE. The resolver accepts the 'always' | 'prompt' union
+(out-of-union values still refuse outright), the facet re-widened both
+members (slotToolEffect's union and harvestNode's confirmEffectUse flag,
+the commission idiom: strict boolean-true on the wire, omitted otherwise,
+so an unconfirmed harvest's frame stays byte-identical), and the consent
+is captured at cast start on a new inert-false Entity transient
+(gatherCastEffectConfirmed, mirrored at every sibling clear site, seeded
+live in the wire-leak scan, never wired) then threaded through BOTH
+capacity pre-gates and the grant, so the id the pre-gate reserves and the
+id the grant mints share one consent value. An unconfirmed prompt use
+skips the effect whole: no bonus, no charge, the harvest proceeds, which
+is the stale-client fail-safe (an old bundle simply never fires its
+prompt slot). The dialog rides the one confirm-dialog family, which
+gained a no-choice callback firing exactly once on cancel, Esc, and
+replacement, so the flow always answers; the pure gatherEffectPrompt
+question (asks only when the effect WOULD fire, so R9-suppressed and
+spent slots never prompt) is shared by all three gather entry points, and
+the ask sits AFTER every deny arm. The professions window gained the
+Ask-each-use toggle (the mode rides the mint; the slottable affordance
+asks the resolver with the mode the button will SEND, so a
+mode-only re-slot renders its button exactly when the server would accept
+it) and the live-slot "Asks each use" chip. Both ruling-named comment
+retouches landed, Sim.harvestNode's pid moved to LAST (the slotToolEffect
+convention) with 117 call sites swept mechanically and tsc-verified, and
+the sender side of the flag got its own pin after the mutation plan found
+the gap. The professions window maxSkill now reads the
+GATHERING_PROFESSIONS content cap behind the prototype hasOwn guard with
+non-finite wire skills clamped, pinned on BOTH content caps so a
+hardcoded denominator cannot pass.
+
+Items 1 to 10: (1) R38 banners queue through banner_queue.ts, a
+registered pure core with its design note in docs/design/banner-queue.md:
+celebrations FIFO with level-up filing ahead of queued deeds (the level
+arm's talent banners ride the same class; they used to clobber the level
+banner itself), ambient keeps its immediate replace over a live ambient
+(race countdowns depend on it) and waits in one latest-wins seat behind a
+celebration, the queue is bounded with drop-incoming (the log and
+announcer are the durable records), the unstuck clear purges its queued
+entries and advances, hard hides flush whole, and the R38 collision is
+pinned end to end on the real method. (2) The touch item drag gained
+actionSlot and actionRingSlot arms in resolveDropTargetAt, validated the
+equip-arm way; the bags release routes both into the HUD's
+placeHotbarItemFromTouch, the desktop drop's exact item branch, with the
+ring position resolved through the live page at drop time (the ring arm
+is the one mobile fingers reach; the desktop rows are display:none under
+mobile-touch). (3) The pad's offered-but-dropped class was EIGHT wide:
+crafting, petStop, petTaunt, petAttack, petDefensive, petAggressive, the
+dungeon finder, and the sheathe toggle all had panel rows and no dispatch
+case; each is wired to its exact keyboard handler and a guard now diffs
+every offered edge action against the dispatch (minus the two
+Input-handled ids), so the class cannot reopen. The interact press also
+gained the reel arm (pad_reel.ts): mid fishing cast it re-uses the
+carried implement ahead of the nearby scan, ending cursor-mode bag
+clicks and the B-button conflict. (4) The colorblind audit against
+DESIGN.md's color-independence rule found ONE hue-only channel, the
+minimap lock tint; locked nodes now carry an outline-colored diagonal
+strike on both respawn silhouettes, source-pinned reachable from both
+fills. Compliant and recorded: the deed-versus-level banners split by
+LABEL and PLATE, the tooltip lock in words, the crafting shortfall and
+the new substitution suffix in words. (5) The fishingEmptyHook event,
+telemetry-only client-side until now, renders the reel cue (the timing
+confirmation) and an FCT self-note beside the sim's grey line; the
+absent catch line and loot ding stay what say empty. (6) Fine grades
+read "Fine Material" in the tooltip kind line through the
+baseMaterialFor pairing; the kind stays junk internally and base
+materials keep Junk, pinned side by side. (7) The crafting window states
+the substitution before the click: each reagent row resolves
+fineSubstituted through the sim's own planGradeRemoval and the window
+appends a spends-N-fine-grade suffix to the visible line and the aria
+fold; the refresh signature already keys per grade id. (8) Collect
+objectives for node-yield materials draw map guidance: nodeYieldClusters
+circles the nodes whose zone-and-type yield is the item or its fine
+grade, and THE PASS-2 CAPTURE MYSTERY IS RESOLVED: the gather arm always
+worked (the hand-verify pin drives it); the captured quest was the
+collect-of-node-yield class, the three shipped work-order quests, which
+drew nothing until this arm. (9) Node props scale one uniform step per
+tier (nodeTierScale in the pure lookup sibling: size, never hue, static
+on every preset), and the new professions fairness guard
+(tests/professions_graphics_fairness.test.ts) names the actionable set
+(bobber bite state, minimap markers, the tier ladder: profile- and
+governor-free, comment-stripped scans) and the cosmetic set (LOW_FOG's
+scenery shed, splash richness) with the reasons. (10) The prompt-badge
+leftovers check came back CLEAN: the removed badge left zero references
+anywhere, and the R40 chip is its shipped replacement.
+
+The handed-forward items, all settled: the recharge cost preview rides
+the ONE resolver call the view already made (now fed the viewer's REAL
+craft skills, so the specialization discount previews at the charged
+count), painted as a price line beside the button; the blind marginal
+top-up is thereby stated before the click (one full material for one
+charge at one short, pinned at 19 of 20), and R46's deny line stays the
+affordability surface with both formerly-contradicting comments
+retouched. The trade copy-choice is closed sim-side: removePreferFungible
+gained a deprioritize predicate (matched instanced copies consumed LAST,
+two passes over the same highest-index order; skip still spares
+outright) and the trade drop arm passes the seller's own signature, so
+shipping one charm prefers a foreign or unsigned copy over the seller's
+discount-bearing self-signed one, which still ships when it is all there
+is; every other caller is byte-identical. The bags window carries
+keyboard focus across its rebuild: every focusable surface has a
+data-focus-key identity, and the restore ladder is the vendor contract
+exactly (exact control, same grid slot walking outward, Close), pinned
+through the real window including the consumed-stack landing.
+
+New ruling, build-decided, veto-able (the R32/R45 pattern): R56, NO
+unslot or suspend affordance ships this packet. The capacity wall stays
+deliberate per 8a.1; its live escapes are clearing one bag slot and the
+now-real R40 prompt mode, whose unconfirmed use resolves the BASE grade
+at both capacity gates, so a prompt-mode slot can always gather past a
+fine-capacity wall by declining the charge. An unslot that destroys
+remaining charges is a support-ticket generator and a suspend toggle is
+a whole new persisted wire surface for a wall with two escapes; revisit
+on telemetry. The vendor re-announce note is RECORDED as accepted with
+its honest mechanism: the rebuild replaces the focused node, so
+restoring focus re-reads the row's aria under party looting; bounded to
+focus already inside the vendor, dropping focus instead would be the
+worse failure, and the live-region politeness 'silent' tier is the named
+future fix if telemetry shows pain. Surfaced beside the standing levers:
+proficiency bands above today's caps are deliberate V3 headroom (band 1
+is fishing-only, band 2 reachable by nobody; the stale 300-cap comment
+is corrected), and the confirm-dialog buttons gained the coarse-pointer
+floor the R40 dialog made routine.
+
+Mutation evidence: 12 targeted mutations over the phase's new pins
+(content-cap sourcing, the effectDepleted emit, the resolver widening,
+the consent capture, the sender flag, the queue priority, the lock
+strike, the yield-cluster match, the deprioritized pass, the bags
+neighbors rung, the preview count, the fineUpgrade compare), run in an
+ISOLATED worktree (git worktree add plus cp -c node_modules, removed
+after) with the prove-application guard: 12 of 12 KILLED, zero hollow
+runs. Screenshots: nineteen frames under
+docs/screenshots/professions-ux-phase14/ (the R40 dialog reached through
+the real interact key on both form factors; the staged slot row showing
+charges, chip, price line, and toggle; the tooltip's grade line and live
+countdown; the substitution suffix; the minimap strike; the Fine
+Material line; plus the curated change-aware set), captured by
+scripts/pr_screenshots.mjs plus the tmp/phase14_shots.mjs driver
+(gitignored, the phase 13 convention). The mobile audit rode the same
+captures: the reviewed flows are clean, with the dialog and toggle
+touch floors as its fixes. New surfaces are after-only on purpose: each
+line or control is additive, so the before state is its absence.
+
+CLOSING GATE: two rounds. Round one failed at changed-files biome on
+five format diffs: the four CJK confirm-body fills applied by script
+without a biome pass (the phase 13 locale-fill lesson repeated to the
+letter) plus one sweep-lengthened test line. Formatted, resolved bundles
+byte-identical, and round two ran PASS, all 11 steps, exit code read
+explicitly, on the committed idle tree at the code tip 5ed690b9c9 (the
+record commit after it is docs-only). Phase 14 is BUILT; its QA runs in
+a NEW session (ultracode), per the cadence.
+
 ---
 
 ## Phase 15: ops (GM tooling and the activity feed)
