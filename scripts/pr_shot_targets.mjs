@@ -955,15 +955,21 @@ export const TARGETS = [
   },
   {
     key: 'gather-node-hover-tooltip',
-    label: 'World hover: gather-node requirement line, tier 1 included (#2343)',
+    label: 'World hover: gather-node requirement and wield lines (#2343, R22)',
     when: ['ui/gather_node_tooltip', 'ui/gathering_view', 'professions/gathering'],
     // Teleport onto the starter ore vein and sweep the REAL mouse over it: the
     // hover tooltip only paints through the live pointermove raycast, so the
     // sweep proves the actual path. Toolless shows the red requires-a-pick
-    // line; tooled shows it neutral.
-    variants: [{ key: 'toolless' }, { key: 'tooled', tooled: true }],
+    // line; tooled shows it neutral; unwieldable is the R22 third state (a
+    // COVERING tier-2 pick owned at mining 0), where the tooltip carries the
+    // wield line naming the counter instead of the tool requirement.
+    variants: [
+      { key: 'toolless' },
+      { key: 'tooled', tooled: true },
+      { key: 'unwieldable', unwieldable: true },
+    ],
     async capture(page, variant) {
-      await page.evaluate((tooled) => {
+      await page.evaluate((mode) => {
         document.querySelector('#gpu-notice')?.remove();
         document.querySelector('.camera-prompt-confirm')?.click();
         const banner = document.querySelector('#banner');
@@ -983,9 +989,12 @@ export const TARGETS = [
             e.inCombat = false;
           }
           sim?.chat?.('/dev tp -70 -52');
-          if (tooled) sim?.addItem?.('copper_mining_pick', 1);
+          if (mode === 'tooled') sim?.addItem?.('copper_mining_pick', 1);
+          // A tier-2 pick at mining 0: covering but unwieldable, the state
+          // R22 added. The tooltip must show the wield line, not a downgrade.
+          if (mode === 'unwieldable') sim?.addItem?.('iron_mining_pick', 1);
         } catch {}
-      }, Boolean(variant?.tooled));
+      }, variant?.key ?? 'toolless');
       await wait(800); // let the teleport settle and the camera follow
       const vp = page.viewport() ?? { width: 1280, height: 720 };
       let shown = false;
@@ -1008,6 +1017,15 @@ export const TARGETS = [
       }
       // No honest hover, no shot: never fake the tooltip into the DOM.
       if (!shown) throw new Error('node hover tooltip never appeared through the live raycast');
+      if (variant?.unwieldable) {
+        // The frame must carry what it claims: the R22 wield line (the
+        // covering pick's counter, Mining 40), not the toolless line.
+        const carries = await page.evaluate(() => {
+          const text = document.getElementById('tooltip')?.textContent ?? '';
+          return text.includes('You need Mining 40 to swing the pick already in your bags.');
+        });
+        if (!carries) throw new Error('unwieldable hover frame lacks the wield line');
+      }
       await wait(200);
       return {};
     },
@@ -2740,7 +2758,7 @@ export const TARGETS = [
   },
   {
     key: 'vendor-tool-gate',
-    label: 'Vendor goods: a tool row locked by gathering proficiency',
+    label: 'Vendor goods: advisory wield-requirement lines on the tool ladder (R22)',
     when: [
       'sim/content/vendor_row_gates',
       'ui/hud/vendor/vendor_view',
@@ -2751,19 +2769,20 @@ export const TARGETS = [
     ],
     // Quartermaster Bree is the only counter carrying all three rungs of a
     // ladder at once (Highwatch has tier-1 through tier-3 ground), so one frame
-    // shows the whole rule: the tier-1 pick open, the tier-2 locked with
-    // "Requires Mining 40", the tier-3 locked with "Requires Mining 70". Mining
-    // is left at 0 rather than staged part-way, because a fresh counter is the
-    // state a player actually walks up to first and it is the only one that
-    // renders BOTH thresholds.
+    // shows the whole rule: the tier-1 pick plain, the tier-2 and tier-3 rows
+    // carrying their ADVISORY "Requires Mining 40" / "Requires Mining 70"
+    // sub-lines. The purchase deny is RETIRED (R22): every row sells, the
+    // gate lives at the harvest, and .vendor-locked survives purely as the
+    // style hook that tints the sub-line. Mining is left at 0 rather than
+    // staged part-way, because a fresh counter is the state a player actually
+    // walks up to first and it is the only one that renders BOTH thresholds.
     //
-    // Copper is set high so the rows are unmistakably closed by the gate rather
-    // than by the price: the two refusals share a greyed row and only the
-    // requirement line tells them apart, which is exactly what the shot is for.
+    // Copper is set high so an affordability disable cannot be mistaken for
+    // the advisory state: only the requirement sub-line marks the rows apart.
     //
     // The same recipe runs unchanged on the base tree, where Bree stocks the
-    // same three picks at the old prices and no row is gated, so the before and
-    // after frames differ only by this change.
+    // same three picks at the old prices and no row carries a requirement, so
+    // the before and after frames differ only by this change.
     variants: [
       { key: 'desktop', charClass: 'warrior', charName: 'Oreseeker' },
       { key: 'mobile', charClass: 'warrior', charName: 'Oreseeker', mobile: true },
@@ -2803,16 +2822,34 @@ export const TARGETS = [
       if (!open) throw new Error('vendor window did not open');
       await wait(200);
       // Verify the frame carries what the shot claims. On the BASE tree there
-      // is no gate at all, so a zero count is the correct before state and only
-      // the after side is checked; the marker is the class this change adds.
-      const locked = await page.evaluate(
-        () => document.querySelectorAll('#vendor-window .vendor-locked').length,
-      );
-      const gateShipped = await page.evaluate(
-        () => document.querySelectorAll('#vendor-window .vendor-item .vi-sub').length > 0,
-      );
-      if (gateShipped && locked < 2) {
-        throw new Error(`expected both gated rungs to render locked, saw ${locked}`);
+      // are no requirement rows at all, so a zero count is the correct before
+      // state and only the after side is checked. The advisory contract has
+      // three legs: the sub-line renders on both gated rungs, the rows still
+      // SELL (never disabled for the requirement), and the accessible name
+      // folds the advisory in (the combined buyAriaWithRequirement key).
+      const advisory = await page.evaluate(() => {
+        const rows = [...document.querySelectorAll('#vendor-window .vendor-item')];
+        const withSub = rows.filter((r) => r.querySelector('.vi-sub'));
+        return {
+          shipped: withSub.length > 0,
+          count: withSub.length,
+          anyDisabledForRequirement: withSub.some((r) => r.disabled),
+          ariaCarriesRequirement: withSub.every((r) => {
+            const sub = r.querySelector('.vi-sub')?.textContent ?? '';
+            return sub.length > 0 && (r.getAttribute('aria-label') ?? '').includes(sub);
+          }),
+        };
+      });
+      if (advisory.shipped) {
+        if (advisory.count < 2) {
+          throw new Error(`expected both gated rungs to carry the sub-line, saw ${advisory.count}`);
+        }
+        if (advisory.anyDisabledForRequirement) {
+          throw new Error('a requirement row is disabled: the advisory turn promises it sells');
+        }
+        if (!advisory.ariaCarriesRequirement) {
+          throw new Error('a requirement row aria-label lacks the folded advisory');
+        }
       }
       if (variant?.mobile) {
         // The short landscape viewport cannot show the whole goods grid, and the

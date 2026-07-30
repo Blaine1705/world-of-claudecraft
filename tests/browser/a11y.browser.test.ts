@@ -21,6 +21,7 @@ import { CharWindow } from '../../src/ui/char_window';
 import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
 import { resolveActionBarVisibility } from '../../src/ui/hud/action_bar/action_bar_visibility_core';
 import { QuestLogWindow } from '../../src/ui/hud/quest/questlog_window';
+import { renderVendorWindow } from '../../src/ui/hud/vendor/vendor_window';
 import { t } from '../../src/ui/i18n';
 import { LeaderboardWindow } from '../../src/ui/leaderboard_window';
 import { MarketWindow } from '../../src/ui/market_window';
@@ -837,5 +838,67 @@ describe('axe: bags discard prompt', () => {
     win.close();
     expect(root.style.display).toBe('none');
     expect(document.activeElement).toBe(opener);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Vendor (#vendor-window) - the R22 advisory turn: requirement rows sell, the
+// sub-line is the sighted advisory, and the combined aria-label is the
+// screen-reader one. Rendered through the real painter with the real styles.
+// ---------------------------------------------------------------------------
+
+describe('axe: vendor window advisory rows', () => {
+  it('advisory and plain rows are clean, and the advisory name folds the requirement', async () => {
+    const root = host('vendor-window');
+    root.style.display = 'none';
+    const pick = ITEMS.iron_mining_pick;
+    const bread = Object.values(ITEMS).find((i) => i?.kind === 'food') ?? pick;
+    const view = {
+      goods: [
+        {
+          itemId: bread.id,
+          item: bread,
+          price: { copper: 5, honor: 0 },
+          quantity: 1,
+          affordable: true,
+          requirementUnmet: false,
+        },
+        {
+          itemId: 'iron_mining_pick',
+          item: pick,
+          price: { copper: 120, honor: 0 },
+          quantity: 1,
+          affordable: true,
+          requirementUnmet: true,
+          requirement: { professionId: 'mining' as const, proficiency: 40 },
+        },
+      ],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+    };
+    renderVendorWindow(root, t('itemUi.vendor.goodsTitle'), view, {
+      itemIcon: () => '<img alt="">',
+      moneyHtml: (copper: number) => `<span>${copper}c</span>`,
+      itemTooltip: () => '<div></div>',
+      attachTooltip: () => {},
+      hideTooltip: () => {},
+      onBuy: () => {},
+      onBuyBack: () => {},
+      onSellJunk: () => {},
+      onClose: () => {},
+      sellJunk: { enabled: false, proceeds: 0 },
+    });
+    const rows = root.querySelectorAll<HTMLButtonElement>('.vendor-item');
+    expect(rows.length).toBe(2);
+    const advisory = [...rows].find((r) => r.querySelector('.vi-sub'));
+    expect(advisory).toBeTruthy();
+    // The advisory row SELLS and its accessible name carries what the sighted
+    // sub-line says (an aria-label replaces the content as the name).
+    expect(advisory?.disabled).toBe(false);
+    const sub = advisory?.querySelector('.vi-sub')?.textContent ?? '';
+    expect(sub.length).toBeGreaterThan(0);
+    expect(advisory?.getAttribute('aria-label') ?? '').toContain(sub);
+    await expectClean(root);
   });
 });
