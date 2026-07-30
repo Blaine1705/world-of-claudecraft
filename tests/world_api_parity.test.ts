@@ -317,7 +317,6 @@ export const IWORLD_MEMBERS = [
   // Maker's Bond unbind service (Professions 2.0).
   { name: 'unbindItem', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
-  { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
@@ -492,9 +491,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Rift + mounts surface. The v0.31.0 base merge added the release's three new
     // members on top of the branch's 272; making reins usable items then removed
     // two (selectedMount + selectMount) for 273; the v0.32.0 base merge adds
-    // activeMasterLootRolls, leaving 274.
-    expect(IWORLD_MEMBERS.length).toBe(274);
-    expect(DATA_MEMBERS.length).toBe(72);
+    // activeMasterLootRolls, then the renderer-only rift collision token leaves
+    // the public seam with 273.
+    expect(IWORLD_MEMBERS.length).toBe(273);
+    expect(DATA_MEMBERS.length).toBe(71);
     expect(METHOD_MEMBERS.length).toBe(202);
   });
   it('has no duplicate member names', () => {
@@ -719,7 +719,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'revivePet',
       'ridingTrained',
       'riftBossDeathZones',
-      'riftCollisionToken',
       'riftFloor',
       'salvageItem',
       'saveActionBarLayout',
@@ -845,7 +844,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'recipeList',
       'renown',
       'restedXp',
-      'riftCollisionToken',
       'riftFloor',
       'socialInfo',
       'stationPlacements',
@@ -1407,7 +1405,6 @@ const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
   'raidLockouts',
-  'riftCollisionToken',
   'riftFloor',
   'riftBossDeathZones',
   'dungeonDifficulty',
@@ -1602,8 +1599,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(274);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(274);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(273);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(273);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

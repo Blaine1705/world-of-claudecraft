@@ -999,10 +999,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
 
   const ground = (x: number, z: number) => terrainHeight(x, z, seed);
 
-  // Camera-ghost props (see colliders.ts `camGhost`) stay individual and
-  // un-merged so they can be faded while the camera ray passes through their
-  // footprint. Footprints mirror the colliders so what fades is exactly what
-  // the camera passes through.
+  // Hideable props stay individual and unmerged so they can be faded while
+  // the camera ray passes through their footprint. Footprints mirror the
+  // colliders so what fades is exactly what the camera passes through.
   const hideables: Hideable[] = [];
   const keepFromMerge = new Set<THREE.Object3D>();
   /**

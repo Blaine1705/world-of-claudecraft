@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -7,16 +7,42 @@ function source(relativePath: string): string {
 }
 
 describe('graphics-overhaul integration', () => {
-  it('keeps the non-ghost collider sweep in the chase-camera path', () => {
+  it('keeps object obstruction opacity-only and never changes chase-camera distance', () => {
     const renderer = source('src/render/renderer.ts');
+    const colliders = source('src/sim/colliders.ts');
+
+    const obsoleteParts: Array<[string[], string]> = [
+      [['camera', 'Occlusion'], ''],
+      [['Camera', 'OcclusionState'], ''],
+      [['stepCamera', 'Occlusion'], ''],
+      [['cam', 'Occlusion'], ''],
+      [['CAMERA', 'COLLIDER_PAD'], '_'],
+      [['CAMERA_SOFT', 'COLLIDER_PAD'], '_'],
+      [['CAMERA', 'MIN_DIST'], '_'],
+      [['CAMERA', 'PULL_IN_RATE'], '_'],
+      [['CAMERA', 'PULL_OUT_RATE'], '_'],
+      [['CAMERA_SOFT', 'PULL_WEIGHT'], '_'],
+      [['CAMERA_MAX', 'COMP_FOV'], '_'],
+    ];
+    const obsolete = obsoleteParts.map(([parts, separator]) => parts.join(separator));
+    for (const identifier of obsolete) {
+      expect(renderer, identifier).not.toContain(identifier);
+      expect(colliders, identifier).not.toContain(identifier);
+    }
+    const removedModule = ['camera', 'collision.ts'].join('_');
+    expect(existsSync(path.join(__dirname, '..', 'src/render', removedModule))).toBe(false);
     expect(renderer).toContain(
-      "import { cameraOcclusion, supportHeightAt } from '../sim/colliders';",
+      'const cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;',
     );
-    expect(renderer).toContain("from './camera_collision';");
-    expect(renderer).toContain('let hardT = cameraOcclusion(');
-    expect(renderer).toContain('let softT = cameraOcclusion(');
-    expect(renderer).toContain('stepCameraOcclusion(');
-    expect(renderer).toContain('const ct = this.camOcclusion.pullT;');
+    expect(renderer).toContain('this.camera.position.set(cx, Math.max(cy, groundY), cz);');
+    const chaseCamera = renderer.slice(
+      renderer.indexOf('const cx = px - Math.sin(pose.yaw)'),
+      renderer.indexOf('// Spatial-audio listener'),
+    );
+    expect(chaseCamera.match(/\bcx\s*=/g)).toHaveLength(1);
+    expect(chaseCamera.match(/\bcy\s*=/g)).toHaveLength(1);
+    expect(chaseCamera.match(/\bcz\s*=/g)).toHaveLength(1);
+    expect(renderer).toContain('Math.max(50, CAMERA_BASE_FOV + cameraFovOffset(this.camFeel))');
   });
 
   it('routes reduced motion through every occluder-fade consumer', () => {

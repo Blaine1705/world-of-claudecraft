@@ -790,8 +790,7 @@ export class DungeonInteriors {
     const p = new Placements();
     // Every standard-layout interior routes its outer walls through the
     // hideable-wall path (formerly arena-only), so any wall crossing the
-    // eye-to-camera segment fades to 20% opacity instead of blanking or
-    // pulling the camera in.
+    // eye-to-camera segment fades to 20% opacity instead of blanking the view.
     const arenaWalls = this.pendingArenaWalls(layout, ox, oz);
 
     // Authored room-graph floor (the set-piece citadel): its rooms/doors/decor

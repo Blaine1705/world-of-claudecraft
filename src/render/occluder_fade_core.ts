@@ -1,7 +1,7 @@
 // Pure per-frame fade policy for hideable objects that cross the eye-to-camera
 // segment. Subjects behind an occluder become readable immediately; restoration
-// eases back to opaque once the segment clears. Non-hideable solid geometry is
-// still handled by the chase-camera collision sweep.
+// eases back to opaque once the segment clears. Scene geometry never changes
+// the requested chase-camera distance.
 
 /** Opacity an occluding structure settles at while it blocks the view. */
 export const OCCLUDER_FADE_ALPHA = 0.2;

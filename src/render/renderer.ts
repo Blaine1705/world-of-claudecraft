@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { NumberSampleRing } from '../game/sample_ring';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
-import { cameraOcclusion, supportHeightAt } from '../sim/colliders';
+import { supportHeightAt } from '../sim/colliders';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -50,7 +50,6 @@ import { attachBankerChestToNpcView } from './banker_chest';
 import { type BirdsView, buildBirds } from './birds';
 import { type BladeGrassView, buildBladeGrass } from './blade_grass';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
-import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import {
   cancelCameraDirective,
   createCameraDirector,
@@ -471,16 +470,10 @@ for (const set of Object.values(ITEM_SETS)) {
 }
 const CLICK_MARKER_POOL = 4; // concurrent click-feedback markers before reuse
 const SPARKLE_BOOST = 1.5;
-// Third-person camera collision. Hideable camera-ghost scenery fades in the
-// render subsystems; this sweep remains for non-ghost solid walls and props.
-const CAMERA_COLLIDER_PAD = 0.35;
-const CAMERA_SOFT_COLLIDER_PAD = 1.65;
-const CAMERA_MIN_DIST = 1.2;
-const CAMERA_PULL_IN_RATE = 10;
-const CAMERA_PULL_OUT_RATE = 6;
-const CAMERA_SOFT_PULL_WEIGHT = 0.45;
+// Third-person camera obstruction is opacity-only. Anything registered as a
+// hideable crosses the eye-to-camera segment through the shared fade policy.
+// The requested chase-camera distance is never changed by scene geometry.
 const CAMERA_BASE_FOV = 60;
-const CAMERA_MAX_COMP_FOV = 98;
 // Decay rate of the one-time offset captured when the self-motion predictor
 // takes over from the lead-smoothing path (gone in ~0.3 s, no camera step).
 const SELF_MOTION_HANDOFF_RATE = 15;
@@ -1218,12 +1211,6 @@ export class Renderer {
   // chasing the player (updateCamera honors it and returns early). Editor-only;
   // always null in the shipped game.
   editorCam: { pos: THREE.Vector3; target: THREE.Vector3 } | null = null;
-  // Smoothed chase-cam occlusion (1 = no pull-in); see updateCamera.
-  private camOcclusion: CameraOcclusionState = {
-    pullT: 1,
-    lensT: 1,
-    fov: CAMERA_BASE_FOV,
-  };
   // AAA camera-feel layers (all display-only; see the three *_core modules):
   // spring-arm pivot lag, look-ahead + FOV kicks + landing thump, and the
   // directed moves (zone vista, death drift). Gated by reducedMotion().
@@ -8964,7 +8951,7 @@ export class Renderer {
 
   private updateCamera(selfPos: THREE.Vector3, dt: number): void {
     // Map-editor free camera: use the editor pose verbatim and skip the entire
-    // player-chase + occlusion path. Every camera-relative cull in sync() then
+    // player-chase path. Every camera-relative cull in sync() then
     // runs off this free camera with no other change.
     if (this.editorCam) {
       this.camera.position.copy(this.editorCam.pos);
@@ -9054,73 +9041,16 @@ export class Renderer {
     mirror.pitch = this.camPitch;
     mirror.dist = this.camDist;
 
-    // The camera orbits the lagged/led pivot, but the collision ray and pull-in
-    // anchor stay on the avatar's resolved eye. Camera-ghost scenery is skipped
-    // by the sweep and fades separately; non-ghost solids still constrain it.
+    // The camera orbits the lagged/led pivot at the player's requested
+    // distance. Scene geometry never changes that distance; registered
+    // obstructors fade through their subsystem's occluder-fade pass.
     const px = this.camBoom.x + this.camFeel.leadX;
     const py = this.camBoom.y;
     const pz = this.camBoom.z + this.camFeel.leadZ;
     const eyeY = py + 2.0;
-    const ax = selfPos.x;
-    const ay = selfPos.y + 2.0;
-    const az = selfPos.z;
-    let cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
-    let cy = eyeY + Math.sin(pose.pitch) * pose.dist;
-    let cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
-    if (isArenaPos(p.pos.x)) {
-      // Arena walls are registered fade targets, so they keep requested zoom.
-      this.camOcclusion.pullT = 1;
-      this.camOcclusion.lensT = 1;
-      this.camOcclusion.fov = CAMERA_BASE_FOV;
-    } else {
-      const delveMods = this.sim.delveRun?.modules;
-      const riftToken = this.sim.riftCollisionToken;
-      let hardT = cameraOcclusion(
-        seed,
-        ax,
-        ay,
-        az,
-        cx,
-        cy,
-        cz,
-        CAMERA_COLLIDER_PAD,
-        delveMods,
-        riftToken,
-      );
-      let softT = cameraOcclusion(
-        seed,
-        ax,
-        ay,
-        az,
-        cx,
-        cy,
-        cz,
-        CAMERA_SOFT_COLLIDER_PAD,
-        delveMods,
-        riftToken,
-      );
-      const segLen = Math.hypot(cx - ax, cy - ay, cz - az);
-      if (segLen > 1e-3) {
-        const minT = CAMERA_MIN_DIST / segLen;
-        hardT = Math.min(1, Math.max(hardT, minT));
-        softT = Math.min(1, Math.max(softT, minT));
-      }
-      stepCameraOcclusion(
-        this.camOcclusion,
-        hardT,
-        softT,
-        dt,
-        CAMERA_PULL_IN_RATE,
-        CAMERA_PULL_OUT_RATE,
-        CAMERA_SOFT_PULL_WEIGHT,
-        CAMERA_BASE_FOV,
-        CAMERA_MAX_COMP_FOV,
-      );
-    }
-    const ct = this.camOcclusion.pullT;
-    cx = ax + (cx - ax) * ct;
-    cy = ay + (cy - ay) * ct;
-    cz = az + (cz - az) * ct;
+    const cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
+    const cy = eyeY + Math.sin(pose.pitch) * pose.dist;
+    const cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
     let groundY = groundHeight(cx, cz, seed) + 0.6;
     // On a raised rift tier the flat ground clamp would let the camera sink
     // into the riser: add the same lift the sim stands entities on.
@@ -9134,12 +9064,8 @@ export class Renderer {
     // way the old terrain walls lifted it.
     groundY += gardenMazeCameraLift(cx, cz);
     this.camera.position.set(cx, Math.max(cy, groundY), cz);
-    // Collision-compensated FOV plus the feel kicks; the latter are zero under
-    // reduced motion.
-    const fovTarget = Math.min(
-      100,
-      Math.max(50, this.camOcclusion.fov + cameraFovOffset(this.camFeel)),
-    );
+    // Base FOV plus the feel kicks; the latter are zero under reduced motion.
+    const fovTarget = Math.min(100, Math.max(50, CAMERA_BASE_FOV + cameraFovOffset(this.camFeel)));
     if (Math.abs(this.camera.fov - fovTarget) > 0.01) {
       this.camera.fov = fovTarget;
       this.camera.updateProjectionMatrix();
