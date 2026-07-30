@@ -8,7 +8,8 @@ official Discord server and the game two ways:
   data (the `/flex` command was removed; `FlexData` survives because the role-sync
   poll reads it); in-game "!" community posts relayed as embeds with a respond
   deep-link button; a significant-activity feed (max level, rare drops, duels,
-  arena); daily-rewards top-10 winner posts; a member reward on guild join
+  arena, Vale Cup wins, masterwork crafts, title deeds + the first koi);
+  daily-rewards top-10 winner posts; a member reward on guild join
   (server-deduped; no welcome message is posted, intentionally quiet).
 - **Into the game:** presence (online count + the featured voice room) and member
   metadata (guild join date + top staff role) pushed to the server, which renders
