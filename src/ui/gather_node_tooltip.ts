@@ -40,6 +40,10 @@ import { getUiScale } from './ui_scale';
 // display rate. State (ready/cooldown) also refreshes at this cadence.
 const PICK_THROTTLE_MS = 120;
 
+/** The shown-cooldown tip's self-tick (the countdown clock): 1 Hz, the m:ss
+ *  line's own resolution, armed only while a cooldown tip is visible. */
+export const RESPAWN_TICK_MS = 1000;
+
 const NODE_NAME_KEYS: Record<GatherNodeType, string> = {
   ore: 'hudChrome.gathering.nodeName.ore',
   wood: 'hudChrome.gathering.nodeName.wood',
@@ -206,16 +210,48 @@ export function attachGatherNodeHoverTooltip(
   if (!tooltipEl) return;
   let lastPickAt = 0;
   let shown = false;
+  let refreshTimer: number | undefined;
+  let lastPaint: { nodeId: string; x: number; y: number } | null = null;
+
+  const clearRefresh = (): void => {
+    if (refreshTimer !== undefined) {
+      clearTimeout(refreshTimer);
+      refreshTimer = undefined;
+    }
+  };
+
+  // The countdown's clock (the phase 14 QA): the paint was pointer-gated,
+  // so a stationary hover froze the m:ss line and a node turning ready
+  // under the cursor kept reading "Respawns in ...". One 1 Hz timeout while
+  // a COOLDOWN tip is shown, disposed on hide: not a per-frame painter and
+  // not a cold window's repeating driver, just the tick the painted number
+  // already claims to be. A ready tip arms nothing (its text is static).
+  const armRefresh = (model: GatherNodeTooltipModel): void => {
+    clearRefresh();
+    if (model.state !== 'cooldown') return;
+    refreshTimer = window.setTimeout(() => {
+      refreshTimer = undefined;
+      if (!shown || lastPaint === null) return;
+      const next = buildGatherNodeTooltip(world, lastPaint.nodeId);
+      if (next === null) {
+        hide();
+        return;
+      }
+      paintAt(next, lastPaint.nodeId, lastPaint.x, lastPaint.y);
+    }, RESPAWN_TICK_MS);
+  };
 
   // Only ever hide the shared box when THIS module painted it (the
   // hideMapAreaTip idiom), so an unrelated owner's tooltip is never wiped.
   const hide = (): void => {
+    clearRefresh();
+    lastPaint = null;
     if (!shown) return;
     shown = false;
     hud.hideTooltip();
   };
 
-  const paintAt = (model: GatherNodeTooltipModel, x: number, y: number): void => {
+  const paintAt = (model: GatherNodeTooltipModel, nodeId: string, x: number, y: number): void => {
     // The paintTooltipAt idiom: drop the mob-tooltip size modifier, fill,
     // then clamp the author-space box against the viewport (x/y arrive in
     // visual space, so divide by the UI scale first).
@@ -228,6 +264,8 @@ export function attachGatherNodeHoverTooltip(
     tooltipEl.style.left = `${Math.max(8, Math.min(window.innerWidth / z - tw - 8, x / z + 14))}px`;
     tooltipEl.style.top = `${Math.max(8, y / z - th - 10)}px`;
     shown = true;
+    lastPaint = { nodeId, x, y };
+    armRefresh(model);
   };
 
   canvas.addEventListener('pointermove', (ev) => {
@@ -244,11 +282,11 @@ export function attachGatherNodeHoverTooltip(
     const nodeId =
       pickEntity(ev.clientX, ev.clientY) === null ? pickGatherNode(ev.clientX, ev.clientY) : null;
     const model = nodeId !== null ? buildGatherNodeTooltip(world, nodeId) : null;
-    if (model === null) {
+    if (model === null || nodeId === null) {
       hide();
       return;
     }
-    paintAt(model, ev.clientX, ev.clientY);
+    paintAt(model, nodeId, ev.clientX, ev.clientY);
   });
   // Leaving the canvas (including onto an overlaying HUD window) or starting
   // any press (a click harvests or moves) dismisses the tip.

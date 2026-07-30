@@ -2444,7 +2444,7 @@ export const ru_RU: EnTranslations = {
       "toolEffectModeAsk": "Спрашивать при каждом использовании",
       "toolEffectModePrompt": "Спрашивает при каждом использовании",
       "toolEffectConfirmTitle": "Использовать {effect}?",
-      "toolEffectConfirmBody": "Потратить один из {charges} зарядов на эту добычу? Если отказаться, добыча всё равно произойдёт, но без бонуса.",
+      "toolEffectConfirmBody": "Потратить заряд на эту добычу? Если отказаться, добыча всё равно произойдёт, но без бонуса. Осталось зарядов: {charges}.",
       "toolEffectConfirmAccept": "Потратить заряд",
       "toolEffectConfirmDecline": "Добыть без бонуса",
       "toolEffectName": {

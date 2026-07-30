@@ -219,11 +219,14 @@ export interface IWorldProfessions {
   nodeHarvestableByMe(nodeId: string): boolean;
   /** Remaining seconds until `nodeId` respawns FOR THE LOCAL VIEWER, or null
    *  when it is harvestable now (or the id is unknown). The countdown read of
-   *  the same per-viewer timer nodeHarvestableByMe gates on: null exactly when
-   *  that read answers true, so the tooltip's state line and its countdown can
-   *  never disagree. Offline the Sim reads the live per-player timer
-   *  (professions/gathering.ts nodeRespawnRemainingSec); online it reads the
-   *  `ncd` mirror, whose entries are already remaining seconds. */
+   *  the same per-viewer timer nodeHarvestableByMe gates on: for a KNOWN id,
+   *  null exactly when that read answers true, so the tooltip's state line
+   *  and its countdown can never disagree. The unknown-id arm is the one
+   *  place the pair diverges offline (harvestableByMe answers false there
+   *  while this read answers null), so readiness must never be inferred
+   *  from a null countdown alone. Offline the Sim reads the live per-player
+   *  timer (professions/gathering.ts nodeRespawnRemainingSec); online it
+   *  reads the `ncd` mirror, whose entries are already remaining seconds. */
   nodeRespawnSeconds(nodeId: string): number | null;
   // `confirmEffectUse` (R40): the per-use consent for a 'prompt'-mode tool
   // effect slot on this harvest. A boolean flag ONLY (the craftItem
@@ -368,6 +371,9 @@ export interface IWorldProfessions {
   // price paid, or the price required on an insufficient-materials refusal).
   // The professions window ALSO previews the price before the click (the UX
   // pass): the view runs this same resolver client-side over the mirrored
-  // bags, so the previewed count and the charged count share one authority.
+  // bags, so the previewed count and the charged count share one authority
+  // in CODE; under snapshot lag the mirrored state can trail for a moment,
+  // and the server still prices authoritatively (the toolEffectResult event
+  // carries the price actually paid).
   rechargeToolEffect(professionId: string): void;
 }

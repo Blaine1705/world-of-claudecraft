@@ -2803,8 +2803,12 @@ export const hudChromeStrings = {
     toolEffectModeAsk: 'Ask each use',
     toolEffectModePrompt: 'Asks each use',
     toolEffectConfirmTitle: 'Use {effect}?',
+    // Count-neutral on purpose (the phase 14 QA): "one of {charges}
+    // charges" read "one of 1 charges" on the last charge, the moment the
+    // prompt matters most. The label form carries the number without
+    // English pluralization; the CJK fills already phrased it this way.
     toolEffectConfirmBody:
-      'Spend one of {charges} charges on this harvest? Declining still gathers, without the bonus.',
+      'Spend a charge on this harvest? Declining still gathers, without the bonus. Charges left: {charges}.',
     toolEffectConfirmAccept: 'Use a Charge',
     toolEffectConfirmDecline: 'Gather Without',
     // The three slottable effects, by catalog id (src/sim/content/professions.ts

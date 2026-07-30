@@ -2444,7 +2444,7 @@ export const en_XA: EnTranslations = {
       "toolEffectModeAsk": "[Ášķ éáçĥ úšé]",
       "toolEffectModePrompt": "[Ášķš éáçĥ úšé]",
       "toolEffectConfirmTitle": "[Úšé {effect}?]",
-      "toolEffectConfirmBody": "[Šþéñð óñé óƒ {charges} çĥáŕĝéš óñ ţĥíš ĥáŕʋéšţ? Ðéçļíñíñĝ šţíļļ ĝáţĥéŕš, ŵíţĥóúţ ţĥé ƀóñúš.]",
+      "toolEffectConfirmBody": "[Šþéñð á çĥáŕĝé óñ ţĥíš ĥáŕʋéšţ? Ðéçļíñíñĝ šţíļļ ĝáţĥéŕš, ŵíţĥóúţ ţĥé ƀóñúš. Çĥáŕĝéš ļéƒţ: {charges}.]",
       "toolEffectConfirmAccept": "[Úšé á Çĥáŕĝé]",
       "toolEffectConfirmDecline": "[Ĝáţĥéŕ Ŵíţĥóúţ]",
       "toolEffectName": {

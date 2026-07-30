@@ -10184,7 +10184,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectModeAsk': 'Спрашивать при каждом использовании',
   'hudChrome.professions.toolEffectModePrompt': 'Спрашивает при каждом использовании',
   'hudChrome.professions.toolEffectConfirmTitle': 'Использовать {effect}?',
-  'hudChrome.professions.toolEffectConfirmBody': 'Потратить один из {charges} зарядов на эту добычу? Если отказаться, добыча всё равно произойдёт, но без бонуса.',
+  'hudChrome.professions.toolEffectConfirmBody': 'Потратить заряд на эту добычу? Если отказаться, добыча всё равно произойдёт, но без бонуса. Осталось зарядов: {charges}.',
   'hudChrome.professions.toolEffectConfirmAccept': 'Потратить заряд',
   'hudChrome.professions.toolEffectConfirmDecline': 'Добыть без бонуса',
   'hudChrome.professions.toolEffectCharges': 'Осталось зарядов: {charges} из {max}',

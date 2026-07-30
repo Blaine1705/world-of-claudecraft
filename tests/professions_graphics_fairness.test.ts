@@ -53,6 +53,10 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
   it('the minimap node markers (spotting + lock) read no profile and no governor', () => {
     expectProfileFree('src/ui/minimap_markers.ts');
     expectProfileFree('src/ui/minimap_painter.ts');
+    // The node tooltip carries two actionable lines of its own (the respawn
+    // countdown and the fine-grade preview), so it joins the scan (the
+    // phase 14 QA).
+    expectProfileFree('src/ui/gather_node_tooltip.ts');
   });
 
   it('the node prop tier ladder is static and profile-free', () => {

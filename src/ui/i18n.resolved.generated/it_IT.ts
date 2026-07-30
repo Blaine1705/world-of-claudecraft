@@ -2444,7 +2444,7 @@ export const it_IT: EnTranslations = {
       "toolEffectModeAsk": "Ask each use",
       "toolEffectModePrompt": "Asks each use",
       "toolEffectConfirmTitle": "Use {effect}?",
-      "toolEffectConfirmBody": "Spend one of {charges} charges on this harvest? Declining still gathers, without the bonus.",
+      "toolEffectConfirmBody": "Spend a charge on this harvest? Declining still gathers, without the bonus. Charges left: {charges}.",
       "toolEffectConfirmAccept": "Use a Charge",
       "toolEffectConfirmDecline": "Gather Without",
       "toolEffectName": {
