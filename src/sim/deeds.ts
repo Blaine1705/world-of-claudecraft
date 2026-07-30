@@ -213,7 +213,10 @@ const RARE_SLAIN_TEMPLATES = new Set([
 
 // Zone fishing catches that count as "a fish" for the chr_ first-cast deeds
 // (weeds and empty hooks do not count). Pinned to the authored tables.
-const ZONE_FISH: Record<string, readonly string[]> = {
+// Exported for the new-zone checklist (tests/professions_zone_rollout.test.ts):
+// a complete zone's first-cast deed is only earnable if a row here writes its
+// fish:<zone> mark, so the checklist sweeps this table too.
+export const ZONE_FISH: Record<string, readonly string[]> = {
   eastbrook_vale: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
   mirefen_marsh: ['raw_marsh_pike', 'raw_bog_eel', 'glimmerfin_koi'],
   thornpeak_heights: ['raw_frostgill_trout', 'raw_stonescale_carp', 'glimmerfin_koi'],

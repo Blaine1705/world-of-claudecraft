@@ -313,6 +313,88 @@ veto-able by the maintainer, the R32 pattern):
   a charm): the ladder is now the same control, then Close, with a
   sent-guard on each painted button.
 
+Build-decided rulings (phase 13; recorded per the new-rulings process,
+veto-able by the maintainer, the R32/R45 pattern):
+
+- **R49. The fine-grade tier reads the WIELD-FILTERED scan, in lockstep
+  with the access gate.** The grade resolution
+  (`effectiveGradeToolTier` through `harvestYieldItemId`), both capacity
+  pre-gates, the grant's own scan, and the cast speed all read the best
+  WIELDABLE tool, so a traded tier-4 pick a player cannot swing mints no
+  fine grade and buys no speed: the exact traded-tool bypass R22 exists to
+  close, applied to value as well as access. The PRICE family deliberately
+  stays ownership-based (R30's letter): the R47 use-time ratchet and the
+  recharge rung keep reading the best tool OWNED, since they price rather
+  than gate, and filtering them would let an unearned tool dodge its price
+  rung. SURFACED for the maintainer, found by the phase's adversarial
+  round: the slot MINT's starting charge count also reads ownership
+  (R30's slot-time letter), so an unearned epic pick in the bags fattens a
+  charm's mint from 20 to 50 charges, a VALUE effect on the ownership side
+  of the line; the alternative (wield-filtering the mint size) would
+  re-rule R30/R45 and is left as the maintainer's call, with the harvest
+  gate's comment stating the boundary precisely.
+- **R50. The corpse premium arm reads the wield-aware ANY-profession
+  scan.** Each land profession's contribution filters by its own counter,
+  a rod contributes unfiltered (the R22 exemption), bare hands still floor
+  the scan at tier 1, and the plain grant stays ungated. Zero behavior
+  change in shipped content (every wave-one family is tier 1); the seam is
+  pinned at source plus a raised-family-tier negative
+  (`tests/corpse_harvest_sim.test.ts`). SURFACED beside it, same
+  adversarial round: through the rod exemption a purchased or traded rod
+  covers ANY future tier-2+ monster-material family at zero proficiency
+  (rods reach tier 5), a pre-dodged seam the moment such a family ships;
+  whether the exemption should extend to the land-side corpse surface is
+  the call to make WITH that family, named here so it cannot ship by
+  omission.
+- **R51. The wield ladder is 40 / 70 / 85 / 100 for tiers 2 to 5, one
+  frozen table.** `WIELD_REQUIREMENT_BY_TIER`
+  (`src/sim/professions/wield_gate.ts`) is the single source; the vendor
+  advisory constants alias it. Knife-edge derivation pinned against the
+  live curve (`tests/professions_tool_gate.test.ts`): tiers 2/3 strictly
+  under the tier-1 teaching ceiling with margin, tier 4 at least five
+  under the cap (tier-2+ ground teaches to the cap at quarter gain), and
+  tier 5 AT the cap deliberately: the masterwork rung asks for the
+  mastered counter, reachable by construction. The `gatherDenied` event
+  gained the additive optional `wieldProficiency` field (present exactly
+  when a covering tool is carried and only the counter is short, valued at
+  the smallest requirement unlocking something carried); old bundles
+  render their tier-based copy, wording-misleading only, the phase 11
+  stale-client doctrine.
+- **R52. The craft-mastery prose target MOVES to the measured band; the
+  curve stays.** The authored 10-to-20 focused hours predated the v0.32.0
+  expansion (ten starter zones re-grant thorium and one re-grants iron
+  from tier-1 nodes: the all-zones supply arm prices the same bill at
+  about 2.8 conservative gather hours, floored at 2 as the
+  trivially-short alarm) and predated the #2387 Battlefield Experience
+  attribution fix; the all-levers climb measures nearer 1 to 3 gathering
+  hours plus cast, throttle, and travel. The record now states roughly
+  1.5 to 5 focused hours. Moving the CURVE instead was declined: the
+  pre-approved material-quantities lever (named in the record for the
+  maintainer) would need a 4x-to-9x sweep late in the packet, rippling
+  through the recipe economy and R46's mint inequality, and would fight
+  the expansion's own supply design; the durable supply-side answer is
+  the zone-4 pass re-tiering the starter faucets (R37's owner).
+- **R53. The work-order calls: later-zone thinness is deliberate, and the
+  out-tooled flat payout stands.** Orders are a per-station-master
+  convention (four masters in Eastbrook, one each in Fenbridge and
+  Highwatch), so the distribution follows the crafting-anchor record;
+  filling it would need non-master givers or later-zone stations, both
+  declined. The flat payout stays deliberate friction: substitution keeps
+  every order farmable for a fine-only player, the order's real pay is
+  its XP and cadence, the coin sink survives by construction, and the
+  surrendered value is bounded per window. Both recorded in
+  `docs/design/professions.md` beside the conventions they interpret.
+- **R54. Fishing's identity has NO fine-grade axis, and rare-moment
+  flavor stays zone-agnostic.** The richness audit's two decisions,
+  written into the design record: fishing's specials are its
+  zone-exclusive catch ladder, the koi, the Codfather, the Slatefin, and
+  the empty-hook rhythm, with the rod ladder, band tables, and the R19
+  ceiling as its pacing; a fine-fish axis would duplicate what the band
+  tables already express and was declined. Rare-event flavor and signing
+  stay type- and proficiency-keyed on the one shared cadence knob;
+  zone-flavored moments ride the zone-4 pass with a signature material
+  family.
+
 ---
 
 ## Phase 8: base repair and review closeout
@@ -1873,7 +1955,25 @@ exactly once.
      point, so a cross-boundary cast (up to 24 yards) contradicts the
      published wording (found by the phase 10 QA; the reword rides here
      per the reword-staleness rule, not mid-packet).
-   - Enchanting `identityBody` per the phase 12 decision.
+   - Enchanting `identityBody` per the phase 12 decision, AND its mirrored
+     compass claim (the toolworks sits in the SOUTHWEST corner of Eastbrook
+     Square, Gizzel at positive-x negative-z; the phase 13 compass sweep
+     verified it and left the fix to this key's already-scheduled reword).
+   - THE R22 SET (staled by phase 13's wield gate; the branch ships whole,
+     so the interim falsehood reaches no player, and English rewords land
+     exactly once here): `toolsNote`'s purchase-gating sentences ("the row
+     names the requirement" survives; the merchant REFUSING does not), its
+     silence on the wield ladder (40/70 and the crafted rungs at 85/100
+     now pace USE), the gatherIntro trio's "all it takes is a tool in your
+     bags" phrasing, and the tool table gaining the wield-requirement
+     column beside the delve CLEARS gates this list already carries.
+   - THE R19 SET (staled by the fishing teaching ceiling): `scheduleNote`
+     (already listed) must state that the WATER caps how far it teaches
+     (100/150/cap by zone tier); `fish.tablesNote` and `bandsBody` should
+     say the climb itself pulls an angler to better water; the fishing
+     page nowhere surfaces the ceiling today, which the phase 13
+     adversarial round flagged as the mechanic's one missing player
+     surface, so this reword is where it gains one.
    - The packet's own reword calling the Glyphsteel Bar Bree-only
      (Gizzel stocks it at the toolworks).
    - `fish.startBody` "rather than bought" (the Marks route).

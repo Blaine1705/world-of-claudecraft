@@ -260,6 +260,7 @@ describe('the R37 professions zone-rollout guard', () => {
 import { GUIDE_PROF_GATHERING } from '../src/guide/content.generated';
 import { DEEDS } from '../src/sim/content/deeds';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { ZONE_FISH } from '../src/sim/deeds';
 import {
   gatherNodeGainMultiplier,
   NODE_HARVEST_TABLE,
@@ -451,48 +452,92 @@ describe('the new-zone checklist: every complete zone arrives mechanically whole
       }
       return cap;
     };
-    const tiersPresent = new Set(complete.flatMap((zoneId) => nodesIn(zoneId).map((n) => n.tier)));
-    for (const tier of tiersPresent) {
-      if (tier < 2) continue;
-      const below = [...tiersPresent].filter((t) => t < tier);
-      expect(below.length, `tier ${tier} needs ground below it somewhere`).toBeGreaterThan(0);
-      const reachable = Math.max(...below.map(teachingCeilingFor));
-      expect(
-        wieldRequirementForTier(tier),
-        `tier ${tier} wield requirement must be reachable on the ladder below`,
-      ).toBeLessThanOrEqual(reachable);
+    // Per node TYPE (which maps one-to-one onto a land profession): pooling
+    // tiers across professions would let a zone whose only tier-2 ground is
+    // herb patches vouch for a tier-3 PICK requirement the mining counter
+    // cannot actually climb to.
+    for (const type of GATHER_NODE_TYPES) {
+      const tiersPresent = new Set(
+        complete.flatMap((zoneId) =>
+          nodesIn(zoneId)
+            .filter((n) => n.type === type)
+            .map((n) => n.tier),
+        ),
+      );
+      expect(tiersPresent.size, `${type} ships at least one tier`).toBeGreaterThan(0);
+      for (const tier of tiersPresent) {
+        if (tier < 2) continue;
+        const below = [...tiersPresent].filter((t) => t < tier);
+        expect(
+          below.length,
+          `${type} tier ${tier} needs ground below it somewhere`,
+        ).toBeGreaterThan(0);
+        const reachable = Math.max(...below.map(teachingCeilingFor));
+        expect(
+          wieldRequirementForTier(tier),
+          `${type} tier ${tier} wield requirement must be reachable on its own ladder below`,
+        ).toBeLessThanOrEqual(reachable);
+      }
     }
   });
 
-  it('every complete zone has its gatherer chronicle and first-cast deed', () => {
+  it('every complete zone has its gatherer chronicle and first-cast deed, EARNABLE', () => {
     for (const zoneId of complete) {
       const gatherMarks = GATHER_NODE_TYPES.map((type) => `gather:${zoneId}:${type}`);
+      // The chronicle must be VISIBLE (a hidden deed advertises nothing and
+      // satisfies no player-facing coverage claim) and ZONE-OWNED: every
+      // gather mark in its trigger belongs to this zone, so one shared
+      // multi-zone deed cannot satisfy two zones' checklist rows at once.
       expect(
         Object.values(DEEDS).some((deed) => {
           const trigger = deed.trigger;
           return (
+            !deed.hidden &&
             trigger.kind === 'visits' &&
-            gatherMarks.every((mark) => trigger.markIds.includes(mark))
+            gatherMarks.every((mark) => trigger.markIds.includes(mark)) &&
+            trigger.markIds
+              .filter((mark) => mark.startsWith('gather:'))
+              .every((mark) => gatherMarks.includes(mark))
           );
         }),
-        `${zoneId} needs a gatherer chronicle over all three node types (R21)`,
+        `${zoneId} needs a visible zone-owned gatherer chronicle over all three node types (R21)`,
       ).toBe(true);
       expect(
         Object.values(DEEDS).some(
-          (deed) => deed.trigger.kind === 'visit' && deed.trigger.markId === `fish:${zoneId}`,
+          (deed) =>
+            !deed.hidden &&
+            deed.trigger.kind === 'visit' &&
+            deed.trigger.markId === `fish:${zoneId}`,
         ),
         `${zoneId} needs its first-cast fishing deed`,
       ).toBe(true);
+      // EARNABLE, not just declared: the fish:<zone> mark only ever writes
+      // when the deed evaluator's own catch table lists real fish for the
+      // zone (src/sim/deeds.ts ZONE_FISH), so a first-cast deed without a
+      // row here would ship permanently uncompletable.
+      expect(
+        (ZONE_FISH[zoneId] ?? []).length,
+        `${zoneId} first-cast deed needs ZONE_FISH rows to ever fire`,
+      ).toBeGreaterThan(0);
+      for (const itemId of ZONE_FISH[zoneId] ?? []) {
+        expect(
+          ITEMS[itemId],
+          `${zoneId} ZONE_FISH row ${itemId} must be a real item`,
+        ).toBeDefined();
+      }
     }
   });
 
   it('the wiki renders every complete zone in each land gathering table', () => {
+    // Non-vacuity first: the generated guide really carries node tables for
+    // the three land professions, or the per-zone loop below never runs.
+    const withNodes = GUIDE_PROF_GATHERING.filter((guide) => guide.nodes?.length);
+    expect(withNodes.length).toBeGreaterThanOrEqual(3);
     for (const zoneId of complete) {
       const zoneName = zoneOf(zoneId).name;
-      for (const guide of GUIDE_PROF_GATHERING) {
-        if (!guide.nodes) continue;
+      for (const guide of withNodes) {
         expect(
-          guide.nodes.some((row) => row.zone === zoneName),
+          guide.nodes?.some((row) => row.zone === zoneName),
           `${zoneName} missing from a wiki gathering table`,
         ).toBe(true);
       }

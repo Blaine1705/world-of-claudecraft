@@ -200,9 +200,13 @@ const MASTERY_TUNED_ZONE_IDS = new Set(['eastbrook_vale', 'mirefen_marsh', 'thor
  *  starter zones alike. The un-blinded supply read the phase 13 content pass
  *  added: the tuned-circuit inversion above deliberately prices three zones,
  *  and this prices the world, so the floor below can SEE the expansion's
- *  extra faucets instead of assuming them away. Cross-zone travel is
- *  unmodeled (bias DOWN, stated), which keeps this a ceiling like its
- *  single-zone sibling. */
+ *  extra faucets instead of assuming them away. Two stated biases, one per
+ *  direction: cross-zone travel is unmodeled (bias DOWN on real supply,
+ *  which keeps this a ceiling like its single-zone sibling), and units per
+ *  cast are hard-assumed at the 1-unit common yield (bias UP on hours,
+ *  matching the tuned model's own common-only assumption; the rarity
+ *  ladder and rare events only shorten the real climb, which the floor's
+ *  purpose tolerates). */
 function allZonesHarvestsPerHour(itemId: string): number {
   let perHour = 0;
   for (const [type, byZone] of Object.entries(NODE_MATERIAL_TABLE)) {

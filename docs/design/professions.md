@@ -67,7 +67,13 @@ Gains are node-tier-relative (`gatherNodeGainMultiplier`,
 (`src/sim/professions/gather_events.ts`) are per-node-type flavors (pristine
 vein, ancient heartwood, moonlit bloom) on ONE shared cadence knob
 (`GATHER_RARE_EVENT_CHANCE`), five times yield, always signed, announced to
-the overworld zone via `emitToZonePlayers`. Corpse harvesting grants ALL
+the overworld zone via `emitToZonePlayers`. Rare-event flavor and material
+signing stay ZONE-AGNOSTIC by design (the content pass's richness audit
+considered zone-flavored rare moments and declined for now): the flavors
+are type identity, the signing is proficiency identity, and the shared
+cadence knob is what the post-launch watch tunes; zone-flavored moments
+become worth their content cost when a zone ships a signature material
+family of its own, the zone-4 design pass's call. Corpse harvesting grants ALL
 plain yields before any signed instance, specimens last, with rarity draws
 staying in the first loop in yield order (`harvestCorpse`,
 `src/sim/interaction.ts`; the draw order is pinned by the corpse suites' own
@@ -107,11 +113,28 @@ scripted client can react faster but can never learn the bite early or
 stretch the window: accepted by design, attention over reflexes. Catch
 tables are proficiency-banded (`FISHING_TABLES_BY_BAND`, bands gated by rod
 tier band+1; band 0 is byte-identical to the original shipped table). Gains
-are band-relative and fractional (`FISHING_GAIN_SCHEDULE`); junk teaches
-nothing at or past `FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY`. Hidden per-cast
-state is three transient Entity fields (`fishBiteAtTick`,
-`fishReelDeadlineTick`, `gatherCastNodeId`), never wired, never persisted,
-cleared on every cast-end path.
+are band-relative and fractional (`FISHING_GAIN_SCHEDULE`), and since R19
+the WATER caps how far they teach (`fishingTeachingCeilingFor`, derived
+from the schedule's own row boundaries: tier-1 water grays at 100, tier-2
+at 150, tier-3 at the cap); junk teaches nothing at or past
+`FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY` wherever the water still teaches.
+Hidden per-cast state is four transient Entity fields (`fishBiteAtTick`,
+`fishReelDeadlineTick`, `gatherCastNodeId`, `fishCastZoneId`), never
+wired, never persisted, cleared on every cast-end path.
+
+FISHING'S STATED IDENTITY (the content pass's richness audit, veto-able
+in the review worklist's ledger): fishing deliberately has NO fine-grade
+axis. Its specials are the zone-exclusive catch ladder itself (every
+zone's fish are strictly better eating and coin), the Glimmerfin Koi and
+the Codfather as its rare moments, the Slatefin as its zone-3 exclusive,
+and the empty-hook/got-away rhythm as its failure texture; its
+progression pacing is the rod ladder, the band tables, and the R19
+teaching ceiling. A fine-fish axis was considered in the audit and
+declined: it would duplicate what the band tables already express
+(better water, better fish) without a consumer, and the koi already
+fills the jackpot slot. Symmetry with the land trades is therefore
+CONTENT symmetry (per-zone deeds, per-zone tables, its own tool ladder),
+never mechanism-for-mechanism cloning.
 
 ### Tools and the mastery curve
 Every NODE harvest requires a matching-profession gathering tool covering
@@ -437,16 +460,21 @@ guards.
 | LEGACY_GOLD_POSITIVE_RECIPE_IDS | tests/recipe_economy.test.ts | empty set (every recipe passes the invariant) |
 
 Time-to-master targets the constants were tuned against: first tier-up in
-15 to 20 minutes, skill 50 in an evening, craft mastery in roughly 2 to 5
+15 to 20 minutes, skill 50 in an evening, craft mastery in roughly 1.5 to 5
 focused hours, gathering 100 in 8 to 12 hours, fishing 200 in 15 to 25
 hours. The craft-mastery band MOVED from the authored 10-to-20 by the
 content pass's veto-able ruling (the review worklist's ledger): the old
 figure predated the v0.32.0 expansion, whose starter zones re-grant the
 top-rung materials from ten more zones (the all-zones supply arm in
 `tests/professions_crafts_to_mastery.test.ts` prices the same bill at
-about 2.8 conservative gather hours), and predated the #2387 Battlefield
+about 2.8 gather hours under the deliberately conservative model, floored
+at 2 as its trivially-short alarm), and predated the #2387 Battlefield
 Experience attribution fix; the measured all-levers climb lands nearer 1
-to 3 gathering hours plus craft time. Gathering-100 and fishing-200
+to 3 gathering hours plus the cast, throttle, and travel time, which is
+where the band's low end comes from. One access assumption the figures
+rest on, stated: the expansion's thorium faucets are TIER-1 nodes, so
+under R22 they need only the tier-1 pick at any proficiency; only the
+Thornpeak tier-3 circuit asks for the wielded tier-3 tool (mining 70). Gathering-100 and fishing-200
 currently pace FASTER than target: maintainer-accepted for this release;
 correct post-launch via data-only levers (respawn seconds, node density,
 quantity per rarity, bite-delay band, junk share), never via smaller gain
@@ -499,14 +527,17 @@ knife-edge rule), the vendor purchase gates become advisory (counters sell
 ahead freely), and enforcement moves to the harvest gate, which also closes
 the traded-tool bypass. Rods are exempt: the water gate and the fishing
 teaching ceiling pace them. Pre-gate owners keep their tools and reach the
-threshold to wield them; nothing is confiscated. Built by the review
-worklist's phase 13; until that phase lands, the shipped behavior is still
-purchase-gate pacing, so describe the LIVE gate as pacing what a merchant
-will sell and the settled DESIGN as wield-time.
+threshold to wield them; nothing is confiscated. LIVE since the review
+worklist's phase 13: the wield gate is the shipped enforcement
+(`src/sim/professions/wield_gate.ts`, thresholds 40/70/85/100 pinned with
+the knife-edge derivation in `tests/professions_tool_gate.test.ts`), the
+counters sell ahead freely with the requirement as an advisory line, and
+the old authoritative buy deny is retired.
 
-One knock-on worth naming: the tier-4 engineering tool recipes consume the
-tier-3 land tools, so buying that reagent from a counter now needs 70 in the
-matching gathering trade. Not a completability regression (the tool deed is any
+One knock-on worth naming, and it INVERTED when the gate moved: the tier-4
+engineering tool recipes consume the tier-3 land tools as reagents, and
+with the counter open that reagent is purchasable at any proficiency
+(consuming a tool in a craft never wields it). Not a completability regression (the tool deed is any
 station craft, and the same recipes already need node-only materials), but it is
 a new coupling between an engineering craft and a gathering counter.
 

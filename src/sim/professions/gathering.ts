@@ -69,7 +69,8 @@ export type GatheringProficiency = Record<GatheringProfessionId, number>;
 // respawnSeconds is 240 and moved there together with the node count, which
 // doubled to six per type per zone across the TUNED strip zones
 // (content/gather_nodes.ts; the v0.32.0 expansion zones ship two starter
-// nodes per type instead, their ceilings un-tuned until phase 13). The pair
+// nodes per type instead, their ceilings deliberately starter-kit per R37
+// until the zone-4 design pass re-tiers them). The pair
 // is one change and has to stay one within that tuned set: the per-zone
 // ceiling is nodes * 3600 / respawn,
 // so 9 nodes at 120 seconds and 18 at 240 are the same 270 harvests an hour,
@@ -584,7 +585,14 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   // the denial means "no tool owned at all". Since R22 the tool must also
   // WIELD: the scan filters out land tools whose proficiency requirement the
   // player has not reached (professions/wield_gate.ts), so a traded or
-  // bought-ahead tool sits inert until earned. The gate is rng-free and sits
+  // bought-ahead tool sits inert until earned ON THE ACCESS, GRADE, AND
+  // SPEED AXES. Stated precisely because one axis deliberately stays
+  // ownership-based: the tool-effect mint and recharge size charges from the
+  // best tool OWNED (R30's letter; the R47 ratchet and rung floor own the
+  // price side), so an unearned tool still fattens a slot's charge count.
+  // That reading is SURFACED in the review worklist's ledger for the
+  // maintainer beside R45/R47 rather than silently re-ruled here.
+  // The gate is rng-free and sits
   // before both rng draws: a denial never touches the respawn timer, never
   // draws rng, and never consumes anything.
   const professionId = NODE_HARVEST_TABLE[node.type].professionId;

@@ -50,8 +50,10 @@ const FISHING_ZONE_ROD_TIER_ROWS: Record<string, number> = {
   // water asks no more than the ground does). Explicit rows rather than the
   // DEFAULT_FISHING_ROD_TIER floor so the every-zone-covered pin in
   // tests/fishing_zones.test.ts keeps meaning "someone decided", not "nobody
-  // looked"; re-tiering them onto the ladder is phase 13 work
-  // (docs/design/professions-tuning-packet-review.md).
+  // looked". The phase 13 content pass KEPT them tier 1 deliberately (the
+  // R37 starter kit; under R19 their water therefore teaches to 100);
+  // re-tiering rides the zone-4 design pass with each zone's full kit
+  // (docs/design/professions-tuning-packet-review.md, R37).
   veiled_hollow: 1,
   drakelands: 1,
   frostveil: 1,

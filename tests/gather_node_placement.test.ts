@@ -833,9 +833,23 @@ describe('gather node placement: every node sits on ground a player can work', (
   // clamp, which is what made the old tutorial vein spots a forced fight at
   // any level (R33's stated exception; those veins moved).
   //
-  // Scope: NAMED mobs only (rare: true camps plus the WORLD_BOSSES registry).
-  // Ordinary and generic-elite camps are deliberate gathering risk (a third
-  // of all nodes sit inside one on purpose: grey trash, not a named fight).
+  // The bound is the STANDING worst case: a mob rolled to its spawn ring's
+  // edge, detecting at the scaled radius, against the disc's near edge. The
+  // idle WANDER ring (2 to 9 yards off spawn, src/sim/mob/aggro_ranges.ts)
+  // adds a transient tail deliberately NOT priced in: the class this arm
+  // exists for is CONSTANT overlap (a cast started at the node is inside
+  // detection every time), while the wander tail needs the mob to have
+  // drifted toward that node in that moment, which is the ordinary-world
+  // risk texture every camp-adjacent node has always accepted. Pricing the
+  // tail would condemn five of the six Copper Dig veins including the trio
+  // that has shipped since the field existed (measured; the acceptance is
+  // recorded in the packet review's phase 13 record).
+  //
+  // Scope: NAMED mobs (camps whose mob is rare or boss flagged, plus the
+  // WORLD_BOSSES registry). Ordinary and generic-elite camps are deliberate
+  // gathering risk: a third of all nodes sit inside one on purpose, from
+  // grey trash fields up to the eight-elite ogre warcamp, and none of them
+  // is a single named fight the way this arm's subjects are.
   const scaledAggro = (base: number, mobLevel: number, playerLevel: number) =>
     Math.max(4, Math.min(MAX_AGGRO_RADIUS, base + (mobLevel - playerLevel) * 1.5));
 
@@ -848,7 +862,7 @@ describe('gather node placement: every node sits on ground a player can work', (
       const playerLevel = zoneAt(node.pos.x, node.pos.z).levelRange[0];
       for (const camp of CAMPS) {
         const mob = MOBS[camp.mobId];
-        if (!mob?.rare) continue;
+        if (!mob?.rare && !mob?.boss) continue;
         const reach = camp.radius + scaledAggro(mob.aggroRadius, mob.maxLevel, playerLevel);
         const d = Math.hypot(node.pos.x - camp.center.x, node.pos.z - camp.center.z);
         out.push({ key: `${node.id}:${camp.mobId}`, clearance: d - reach - REACH });
@@ -872,8 +886,11 @@ describe('gather node placement: every node sits on ground a player can work', (
   // kept as the same risk-beside-a-named-mob flavour, recorded in the packet
   // review doc as build-judged.
   const DELIBERATE_DANGERS = [
-    // Mogger's meadow: the herb patch beside the group boss is optional side
-    // content, never a quest target; level-first is the path (R32 family).
+    // Mogger's meadow: the herb patch sits beside the group-quest boss.
+    // Mogger himself IS a quest target (q_mogger, suggested for three), and
+    // that is the point: the patch shares the danger of a fight the zone
+    // already tells players to bring friends to; level-first is the path
+    // (R32 family), and no tutorial quest sends anyone to this patch.
     'herb_eastbrook_5:mogger',
     // The drowned bank: t2 ore beside the marsh's named lurker.
     'ore_mirefen_4:sloomtooth_the_drowned',
@@ -901,8 +918,17 @@ describe('gather node placement: every node sits on ground a player can work', (
   ];
 
   it('hot node-versus-named-mob pairings are exactly the pinned deliberate dangers', () => {
-    const rareCamps = CAMPS.filter((camp) => MOBS[camp.mobId]?.rare === true);
-    expect(rareCamps.length, 'no rare camps found, so this arm proves nothing').toBeGreaterThan(0);
+    const namedCamps = CAMPS.filter(
+      (camp) => MOBS[camp.mobId]?.rare === true || MOBS[camp.mobId]?.boss === true,
+    );
+    expect(namedCamps.length, 'no named camps found, so this arm proves nothing').toBeGreaterThan(
+      0,
+    );
+    // Both halves of the scope are populated: rare camps and boss-flagged
+    // camps (the quest bosses) each contribute, so neither filter arm can
+    // silently go dead.
+    expect(namedCamps.some((c) => MOBS[c.mobId]?.boss === true)).toBe(true);
+    expect(namedCamps.some((c) => MOBS[c.mobId]?.rare === true)).toBe(true);
     expect(WORLD_BOSSES.length, 'no world bosses, so the boss half proves nothing').toBeGreaterThan(
       0,
     );
@@ -935,7 +961,9 @@ describe('gather node placement: every node sits on ground a player can work', (
   it('every allowlisted pair names a real node and a real named mob', () => {
     const nodeIds = new Set(GATHER_NODES.map((n) => n.id));
     const namedIds = new Set([
-      ...CAMPS.filter((c) => MOBS[c.mobId]?.rare === true).map((c) => c.mobId),
+      ...CAMPS.filter((c) => MOBS[c.mobId]?.rare === true || MOBS[c.mobId]?.boss === true).map(
+        (c) => c.mobId,
+      ),
       ...WORLD_BOSSES.map((b) => b.templateId),
     ]);
     for (const entry of DELIBERATE_DANGERS) {

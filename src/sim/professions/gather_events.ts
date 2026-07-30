@@ -17,7 +17,7 @@ import type { MasterworkProc } from './masterwork';
 // the TUNED zones' (the R37 'complete' set): the v0.32.0 expansion's starter
 // zones carry 6 nodes each, so their ceiling is ~30 harvests per 20 minutes
 // and this knob lands them at roughly 1 event per zone per hour, an
-// UN-TUNED cadence their phase 13 design pass owns (a per-zone knob or a
+// UN-TUNED cadence the zone-4 design pass owns per R37 (a per-zone knob or a
 // starter-zone node count are both open there; do not split the constant
 // here without that pass).
 //

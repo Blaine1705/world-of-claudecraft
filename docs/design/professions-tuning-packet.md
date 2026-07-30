@@ -26,7 +26,10 @@ readout problem, and they compound:
 
 - The vendor sells bulk trade goods, so crafting mastery is a shopping trip.
   Full armorcrafting mastery is 150 crafts fed entirely by vendor purchases,
-  against a stated target of 10 to 20 focused hours.
+  against the target the record then stated as 10 to 20 focused hours
+  (historical diagnosis; the target MOVED to the measured 2-to-5 band in
+  the content pass, see the professions.md time-to-master block and the
+  review worklist's R52).
 - Gathering tools buy almost nothing you can feel, so there is no reason to
   chase one.
 - Fishing has no failure state that can fire, and its catch table is chosen by
@@ -296,11 +299,12 @@ both hosts.
 - Zone stocking follows the "hub sells the tiers its own nodes use" rule the
   later zones already follow. Only the first zone over-stocks today.
 - Owned tools are never confiscated when a gate arrives. Patch-note line.
-  AMENDED BY R22 (built by the review worklist's phase 13): tools stay in
-  the bags, but land tools GAIN use requirements (tier 2/3 wield at
-  gathering 40/70), so a pre-gate owner keeps the tool and must reach the
-  threshold to wield it, and the purchase gates become advisory. The patch
-  note carries both halves when that phase ships.
+  AMENDED BY R22 (LIVE since the review worklist's phase 13): tools stay in
+  the bags, but land tools carry use requirements (the wield ladder 40/70
+  and the crafted rungs at 85/100), so a pre-gate owner keeps the tool and
+  reaches the threshold to wield it, and the purchase gates are advisory
+  display. The patch note carries both halves.
+  
 
 Gating on zone alone does not work and is not attempted: there is no level gate,
 no quest gate and no travel cost anywhere, the inter-zone ridge has a road pass,
@@ -537,7 +541,7 @@ Its own phase because it is the only one that touches persistence and the wire.
 - **SETTLED (R22, superseding R7's use arm): purchase gates are ADVISORY and
   enforcement moves to the wield.** Land tools gain RuneScape-shaped use
   requirements (tier 2/3 at gathering 40/70; tiers 4/5 derived in-phase under
-  the knife-edge rule) built by the review worklist's phase 13; every counter,
+  the knife-edge rule), LIVE since the review worklist's phase 13; every counter,
   the delve rows included, sells ahead freely, and the harvest gate is what
   refuses an unearned tool, which also closes the traded-tool bypass. Rods
   stay exempt (the water gate plus the R19 teaching ceiling pace fishing),
