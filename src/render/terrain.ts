@@ -54,6 +54,7 @@ import {
   type TexelBounds,
   type WorldRect,
 } from './terrain_region_core';
+import { terrainSplatPresence, terrainSplatPresenceMask } from './terrain_splat_presence_core';
 import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textures';
 
 // Chunked terrain across the whole 360x1080 zone strip.
@@ -203,6 +204,12 @@ function finishChunkGeometry(state: ChunkGeometryArrays): THREE.BufferGeometry {
   geo.setAttribute('uv', new THREE.BufferAttribute(state.uvs, 2));
   if (state.splats) geo.setAttribute('aSplat', new THREE.BufferAttribute(state.splats, 4));
   if (state.extras) geo.setAttribute('aExtra', new THREE.BufferAttribute(state.extras, 4));
+  if (state.splats) {
+    const presence = terrainSplatPresence(state.splats, state.extras);
+    const packedPresence = new Uint8Array(state.positions.length / 3);
+    packedPresence.fill(terrainSplatPresenceMask(presence));
+    geo.setAttribute('aTerrainPresenceMask', new THREE.BufferAttribute(packedPresence, 1));
+  }
   geo.setIndex(new THREE.BufferAttribute(state.indices, 1));
   geo.computeBoundingBox();
   geo.computeBoundingSphere();
@@ -426,9 +433,18 @@ const GROUND_RELIEF_GLSL = /* glsl */ `
 const vec4 WOC_PARALLAX_AMP = vec4(0.129, 0.188, 0.229, 0.107);
 const float WOC_PARALLAX_CLAMP = 0.04;   // UV units, ~0.18 world (radial, see pOff)
 float wocGroundHeight(vec2 uv, vec4 sw) {
-  vec4 aoBase = texture2D(uGroundAO, uv);      // grass + sand share the base tiling
-  float aoDirt = texture2D(uGroundAO, uv * 0.55).g;
-  float aoRock = texture2D(uGroundAO, uv * 0.6).b;
+  // The presence varyings are constant for the entire chunk draw. Skipping a
+  // projection is therefore coherent, and only happens when every source
+  // vertex for that layer is exactly zero.
+  vec4 aoBase = vec4(0.812, 0.0, 0.0, 0.883);
+  float aoDirt = 0.897;
+  float aoRock = 0.623;
+  if ( vTerrainSplatPresence.x > 0.5 || vTerrainSplatPresence.w > 0.5 )
+    aoBase = texture2D(uGroundAO, uv);      // grass + sand share the base tiling
+  if ( vTerrainSplatPresence.y > 0.5 )
+    aoDirt = texture2D(uGroundAO, uv * 0.55).g;
+  if ( vTerrainSplatPresence.z > 0.5 )
+    aoRock = texture2D(uGroundAO, uv * 0.6).b;
   // means measured by scripts/assets/pack_ground_ao.mjs; B (rock) is the
   // Rock026/Rock060 displacement blend, centred like the AO channels so the
   // signal stays zero-mean and mips fade it out with distance
@@ -446,9 +462,15 @@ float wocGroundHeight(vec2 uv, vec4 sw) {
 // clod-scale lumps (~14px features) and discards the per-texel jitter.
 const float WOC_PARALLAX_LOD = 2.5;
 float wocGroundHeightSmooth(vec2 uv, vec4 sw) {
-  vec4 aoBase = textureLod(uGroundAO, uv, WOC_PARALLAX_LOD);
-  float aoDirt = textureLod(uGroundAO, uv * 0.55, WOC_PARALLAX_LOD).g;
-  float aoRock = textureLod(uGroundAO, uv * 0.6, WOC_PARALLAX_LOD).b;
+  vec4 aoBase = vec4(0.812, 0.0, 0.0, 0.883);
+  float aoDirt = 0.897;
+  float aoRock = 0.623;
+  if ( vTerrainSplatPresence.x > 0.5 || vTerrainSplatPresence.w > 0.5 )
+    aoBase = textureLod(uGroundAO, uv, WOC_PARALLAX_LOD);
+  if ( vTerrainSplatPresence.y > 0.5 )
+    aoDirt = textureLod(uGroundAO, uv * 0.55, WOC_PARALLAX_LOD).g;
+  if ( vTerrainSplatPresence.z > 0.5 )
+    aoRock = textureLod(uGroundAO, uv * 0.6, WOC_PARALLAX_LOD).b;
   return (aoBase.r - 0.812) * sw.x
        + (aoDirt - 0.897) * sw.y
        + (aoRock - 0.623) * sw.z
@@ -554,8 +576,11 @@ function buildSplatMaterial(
         `#include <common>
         attribute vec4 aSplat;
         attribute vec4 aExtra;
+        attribute float aTerrainPresenceMask;
         varying vec4 vSplat;
         varying vec4 vExtra;
+        flat varying vec4 vTerrainSplatPresence;
+        flat varying vec2 vTerrainExtraPresence;
         varying vec3 vWPos;
         varying vec3 vWNorm;`,
       )
@@ -564,6 +589,10 @@ function buildSplatMaterial(
         `#include <begin_vertex>
         vSplat = aSplat;
         vExtra = aExtra;
+        vTerrainSplatPresence = mod(
+          floor(vec4(aTerrainPresenceMask) / vec4(1.0, 2.0, 4.0, 8.0)), 2.0);
+        vTerrainExtraPresence = mod(
+          floor(vec2(aTerrainPresenceMask) / vec2(16.0, 32.0)), 2.0);
         vWPos = (modelMatrix * vec4(position, 1.0)).xyz;
         vWNorm = objectNormal; // terrain mesh is untransformed: object == world`,
       );
@@ -573,6 +602,8 @@ function buildSplatMaterial(
         `#include <common>
         varying vec4 vSplat;
         varying vec4 vExtra;
+        flat varying vec4 vTerrainSplatPresence;
+        flat varying vec2 vTerrainExtraPresence;
         varying vec3 vWPos;
         varying vec3 vWNorm;
         uniform sampler2D uGrass, uGrassN, uDirt, uDirtN, uRock, uRockN, uSand, uSandN, uMud, uSnow, uMacro, uGroundAO;
@@ -588,6 +619,12 @@ function buildSplatMaterial(
         '#include <map_fragment>',
         `
         vec2 tuv = vWPos.xz * 0.22;
+        bool wocHasGrass = vTerrainSplatPresence.x > 0.5;
+        bool wocHasDirt = vTerrainSplatPresence.y > 0.5;
+        bool wocHasRock = vTerrainSplatPresence.z > 0.5;
+        bool wocHasSand = vTerrainSplatPresence.w > 0.5;
+        bool wocHasMud = vTerrainExtraPresence.x > 0.5;
+        bool wocHasSnow = vTerrainExtraPresence.y > 0.5;
         // Fragment-side splat reshape: the vertex-interpolated dirt weight
         // crosses triangles linearly, so a path edge is a chain of straight
         // segments that reads as sawtooth triangles the moment shading
@@ -598,8 +635,9 @@ function buildSplatMaterial(
         vec4 vSplatR = vSplat;
         // bn is hoisted out of the reshape block: the path-wear bands below
         // reuse it so their margins wander with the same worn-edge noise.
-        float bn = texture2D(uGroundAO, tuv * 0.5).g - 0.897;
-        {
+        float bn = 0.0;
+        if ( wocHasDirt ) {
+          bn = texture2D(uGroundAO, tuv * 0.5).g - 0.897;
           float shaped = smoothstep(0.32, 0.68, vSplat.y + bn * 1.1);
           float rest = max(1.0 - vSplat.y, 1e-4);
           float restScale = (1.0 - shaped) / rest;
@@ -742,7 +780,9 @@ function buildSplatMaterial(
         // hill-scale macro noise, hoisted above the grass blend so the grass
         // octave balance, the rock wall blend, and the hue drift below all
         // share one tap
-        float macro2 = texture2D(uMacro, vWPos.xz * 0.0045 + 0.37).r;
+        float macro2 = 0.5;
+        if ( wocHasGrass || wocHasRock )
+          macro2 = texture2D(uMacro, vWPos.xz * 0.0045 + 0.37).r;
         // grass blends two scales so the 1K photo source never reads as tile.
         // The second octave samples with swapped/negated components (a 90
         // degree rotation), so the two scales can never phase-align into a
@@ -761,14 +801,17 @@ function buildSplatMaterial(
           // the no-relief tiers keep the plain two-octave anti-tiling mix.
           // ?talbedo=off is the dev perf-attribution kill switch.
           richTerrainSplat()
-            ? `// Per-octave scale jitter: a slow (~36yd) two-channel drift field
+            ? `vec2 grassJitter = vec2(0.0);
+        if ( wocHasGrass ) {
+          // Per-octave scale jitter: a slow (~36yd) two-channel drift field
         // nudges each octave's sample position a different amount and sign,
         // so the tilings slide against each other across the map and their
         // repeats never line up into one fixed cadence. The warp gradient is
         // tiny (well under a yard of drift over ~36yd) so nothing smears.
-        vec2 grassJitter = (vec2(
+          grassJitter = (vec2(
             texture2D(uMacro, vWPos.xz * 0.028 + 0.07).r,
             texture2D(uMacro, vWPos.xz * 0.028 + 0.63).r) - 0.5) * WOC_GRASS_SCALE_JITTER;
+        }
         // Combed growth direction: the finest grass detail samples through a
         // locally-rotating ANISOTROPIC transform (comb frame: compressed
         // WOC_COMB_COMPRESS along combDir, unit across), so its features
@@ -777,17 +820,22 @@ function buildSplatMaterial(
         // brushed turf: the dots elongate into grain that follows a local
         // growth direction. Built on the post-parallax tuv so the combed taps
         // shift with the same world-space offset as every other layer.
-        float combA = (texture2D(uMacro, vWPos.xz * WOC_COMB_FREQ + 0.19).r - 0.5) * WOC_COMB_SWING;
-        vec2 combDir = vec2(cos(combA), sin(combA));
+        vec2 combDir = vec2(1.0, 0.0);
+        if ( wocHasGrass || wocHasSand ) {
+          float combA = (texture2D(uMacro, vWPos.xz * WOC_COMB_FREQ + 0.19).r - 0.5) * WOC_COMB_SWING;
+          combDir = vec2(cos(combA), sin(combA));
+        }
         vec2 combPerp = vec2(-combDir.y, combDir.x);
         vec2 combT = vec2(dot(tuv, combDir) * WOC_COMB_COMPRESS, dot(tuv, combPerp));
         // fine octave combed; blend base 0.56 (was 0.50): with the fine
         // octave's job reduced to directional grain, the coarse and mid
         // octaves carry more of the tonal variation (patchy turf, not dots)
-        vec3 grassAlb = mix(
-          texture2D(uGrass, combT + grassJitter).rgb,
-          texture2D(uGrass, vec2(-tuv.y, tuv.x) * 0.31 - grassJitter * 0.6).rgb,
-          0.56 + (macro2 - 0.5) * 0.3);
+        vec3 grassAlb = vec3(0.0);
+        if ( wocHasGrass ) {
+          grassAlb = mix(
+            texture2D(uGrass, combT + grassJitter).rgb,
+            texture2D(uGrass, vec2(-tuv.y, tuv.x) * 0.31 - grassJitter * 0.6).rgb,
+            0.56 + (macro2 - 0.5) * 0.3);
         // Third, LOW-amplitude mid octave between the fine (1.0x) and coarse
         // (0.31x) tilings: 0.57x scale rotated 23 degrees (cos 0.9205 and
         // sin 0.3907 folded into the constants), with its own seed offset so
@@ -801,8 +849,9 @@ function buildSplatMaterial(
         // ~42yd hue rotation: meadows drift a few percent between warm
         // yellow-green and cool blue-green. Value-neutral endpoints, so it
         // adds randomness you feel across a field without a patch to point at.
-        float grassHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
-        grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT);`
+          float grassHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
+          grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT);
+        }`
             : `// No-relief tiers: the plain two-octave anti-tiling mix (the
         // 90-degree-rotated coarse octave still kills the shared repeat).
         // The comb-frame locals stay declared at IDENTITY for the detail
@@ -812,10 +861,13 @@ function buildSplatMaterial(
         vec2 grassJitter = vec2(0.0);
         vec2 combDir = vec2(1.0, 0.0);
         vec2 combPerp = vec2(0.0, 1.0);
-        vec3 grassAlb = mix(
-          texture2D(uGrass, tuv).rgb,
-          texture2D(uGrass, vec2(-tuv.y, tuv.x) * 0.31).rgb,
-          0.56 + (macro2 - 0.5) * 0.3);`
+        vec3 grassAlb = vec3(0.0);
+        if ( wocHasGrass ) {
+          grassAlb = mix(
+            texture2D(uGrass, tuv).rgb,
+            texture2D(uGrass, vec2(-tuv.y, tuv.x) * 0.31).rgb,
+            0.56 + (macro2 - 0.5) * 0.3);
+        }`
         }
         // Tussock height-shade (the worn_stone round-7 idiom): sd-normalized
         // R-channel height, clamped at 1.5 sd; recesses darken and saturate a
@@ -824,11 +876,13 @@ function buildSplatMaterial(
         // walk does nothing. Sampled through the comb frame so the shading is
         // directional streaks, never the isotropic dots this pass removes;
         // cavW gates it off banks with the rest of the planar relief.
-        float grassH = clamp(
-          (texture2D(uGroundAO, combT).r - WOC_GRASS_H_MEAN) * WOC_GRASS_H_INV_SD, -1.5, 1.5);
-        grassAlb *= 1.0 + grassH * WOC_GRASS_HEIGHT_SHADE * cavW;
-        grassAlb = mix(vec3(dot(grassAlb, vec3(0.299, 0.587, 0.114))), grassAlb,
-          1.0 + max(-grassH, 0.0) * WOC_GRASS_RECESS_SAT * cavW);
+        if ( wocHasGrass ) {
+          float grassH = clamp(
+            (texture2D(uGroundAO, combT).r - WOC_GRASS_H_MEAN) * WOC_GRASS_H_INV_SD, -1.5, 1.5);
+          grassAlb *= 1.0 + grassH * WOC_GRASS_HEIGHT_SHADE * cavW;
+          grassAlb = mix(vec3(dot(grassAlb, vec3(0.299, 0.587, 0.114))), grassAlb,
+            1.0 + max(-grassH, 0.0) * WOC_GRASS_RECESS_SAT * cavW);
+        }
         // rock: top-down projection smears into vertical streaks on cliffs,
         // so steep faces blend toward wall-planar (world XY/ZY) samples
         vec3 an = abs(normalize(vWNorm));
@@ -838,6 +892,11 @@ function buildSplatMaterial(
         // player stands right next to), so it takes its own wall blend with a
         // gentler onset than rock's cliff threshold
         float dirtWallW = smoothstep(0.1, 0.42, 1.0 - an.y);
+        vec3 dirtAlb = vec3(0.0);
+        float pathCore = 0.0;
+        float pathEdge = 0.0;
+        float gravelW = 0.0;
+        if ( wocHasDirt ) {
         ${
           richTerrainSplat()
             ? `// --- de-carpeted dirt: multi-scale soil instead of one speckle ---
@@ -879,10 +938,11 @@ function buildSplatMaterial(
         // neither traces the vertex mesh into sawteeth. Faded by the marsh
         // mud swap: wet mud does not wear like packed earth. The roughness
         // and detail-normal chunks below reuse pathCore/pathEdge.
-        float pathCore = smoothstep(0.55, 0.92, vSplat.y + bn * 0.6) * (1.0 - vExtra.x);
-        float pathEdge = vSplatR.y * (1.0 - pathCore) * (1.0 - vExtra.x);
+        pathCore = smoothstep(0.55, 0.92, vSplat.y + bn * 0.6) * (1.0 - vExtra.x);
+        pathEdge = vSplatR.y * (1.0 - pathCore) * (1.0 - vExtra.x);
         dirtFlat *= 1.0 + pathCore * 0.07 - pathEdge * 0.05;
-        dirtFlat = mix(dirtFlat, texture2D(uMud, tuv * 0.8).rgb, vExtra.x);
+        if ( wocHasMud )
+          dirtFlat = mix(dirtFlat, texture2D(uMud, tuv * 0.8).rgb, vExtra.x);
         ${
           richTerrainSplat()
             ? `// Trails read as packed grit, not smooth brown paint: fold a
@@ -891,16 +951,20 @@ function buildSplatMaterial(
         // swap so wet mud keeps its smooth sheen. 0.10 (was 0.16): with the
         // macro soil structure above, the old weight let single-scale
         // micro-grain dominate the read again, the exact carpet failure.
-        float gravelW = 0.07 * (1.0 - vExtra.x);
+        gravelW = 0.07 * (1.0 - vExtra.x);
         dirtFlat = mix(dirtFlat, texture2D(uRock, tuv * 1.8).rgb, gravelW);`
-            : 'float gravelW = 0.0;'
+            : ''
         }
         vec3 dirtWall = mix(
           texture2D(uDirt, vWPos.xy * 0.176).rgb,
           texture2D(uDirt, vWPos.zy * 0.176).rgb,
           axisW);
         // marsh swaps packed dirt for wet mud (roads, hub discs included)
-        vec3 dirtAlb = mix(dirtFlat, dirtWall, dirtWallW);
+        dirtAlb = mix(dirtFlat, dirtWall, dirtWallW);
+        }
+        vec3 rockAlb = vec3(0.0);
+        float wallCav = 0.0;
+        if ( wocHasRock ) {
         ${
           richTerrainSplat()
             ? `// Flat rock (scree, summits, outcrops) mottles between two scales the
@@ -941,7 +1005,7 @@ function buildSplatMaterial(
           mix(texture2D(uRock, vWPos.yz * 0.132).rgb,
               texture2D(uRock, vWPos.yz * 0.043).rgb, plateMix),
           axisW);
-        vec3 rockAlb = mix(rockFlat, rockWall, wallW);
+        rockAlb = mix(rockFlat, rockWall, wallW);
         // Macro stone drift: cooler grey patches against warmer tan ones,
         // +-6% value folded into the tint. XZ-keyed so it varies along a
         // wall's run rather than repeating down its height.
@@ -955,7 +1019,7 @@ function buildSplatMaterial(
         // albedo mix just broke up. Centred on the channel's measured mean
         // like wocGroundHeight, so mip averaging fades it out with distance
         // for free.
-        float wallCav = mix(
+        wallCav = mix(
           texture2D(uGroundAO, vWPos.xy * 0.043).b,
           texture2D(uGroundAO, vWPos.yz * 0.043).b,
           axisW) - 0.623;
@@ -970,15 +1034,19 @@ function buildSplatMaterial(
           texture2D(uRock, vWPos.xy * 0.132).rgb,
           texture2D(uRock, vWPos.yz * 0.132).rgb,
           axisW);
-        vec3 rockAlb = mix(rockFlat, rockWall, wallW);
-        float wallCav = 0.0;`
+        rockAlb = mix(rockFlat, rockWall, wallW);`
         }
+        }
+        vec3 sandAlb = vec3(0.0);
+        if ( wocHasSand )
+          sandAlb = texture2D(uSand, tuv).rgb;
         vec3 alb = grassAlb * vSplatR.x
                  + dirtAlb * vSplatR.y
                  + rockAlb * vSplatR.z
-                 + texture2D(uSand, tuv).rgb * vSplatR.w;
+                 + sandAlb * vSplatR.w;
         // snow cover on the peaks/rim, by baked per-vertex weight
-        alb = mix(alb, texture2D(uSnow, tuv * 0.7).rgb, vExtra.y);
+        if ( wocHasSnow )
+          alb = mix(alb, texture2D(uSnow, tuv * 0.7).rgb, vExtra.y);
         // Wet shoreline: within ~1.6u above the waterline (WATER_LEVEL is
         // inlined from src/sim/world.ts at material build), sand and dirt
         // darken and tighten as if soaked, so every shore carries a wet
@@ -1068,11 +1136,20 @@ function buildSplatMaterial(
         // space; the chain rule scales the along-comb slope by the
         // compression, which IS the combed look: smooth along the growth
         // direction, ridged across it.
-        vec3 gN = texture2D(uGrassN, combT + grassJitter).xyz * 2.0 - 1.0;
-        vec2 gNxy = gN.x * WOC_COMB_COMPRESS * combDir + gN.y * combPerp;
-        vec3 dN = texture2D(uDirtN, tuv * 0.55).xyz * 2.0 - 1.0;
-        vec3 rN = texture2D(uRockN, tuv * 0.6).xyz * 2.0 - 1.0;
-        vec3 sN = texture2D(uSandN, tuv).xyz * 2.0 - 1.0;
+        vec2 gNxy = vec2(0.0);
+        if ( wocHasGrass ) {
+          vec3 gN = texture2D(uGrassN, combT + grassJitter).xyz * 2.0 - 1.0;
+          gNxy = gN.x * WOC_COMB_COMPRESS * combDir + gN.y * combPerp;
+        }
+        vec3 dN = vec3(0.0);
+        if ( wocHasDirt )
+          dN = texture2D(uDirtN, tuv * 0.55).xyz * 2.0 - 1.0;
+        vec3 rN = vec3(0.0);
+        if ( wocHasRock )
+          rN = texture2D(uRockN, tuv * 0.6).xyz * 2.0 - 1.0;
+        vec3 sN = vec3(0.0);
+        if ( wocHasSand )
+          sN = texture2D(uSandN, tuv).xyz * 2.0 - 1.0;
         ${
           richTerrainSplat()
             ? `// A second octave at 4x the base tiling: without it the ground is one
@@ -1080,16 +1157,23 @@ function buildSplatMaterial(
         // than one per layer, since the octave only supplies grain and its
         // source map is indistinguishable once summed into a layer's normal:
         // the hard layers share the crisp tap, the soft layers the gentle one.
-        vec2 fineHard = texture2D(uRockN, tuv * 2.4).xy * 2.0 - 1.0;
+        vec2 fineHard = vec2(0.0);
+        if ( wocHasDirt || wocHasRock )
+          fineHard = texture2D(uRockN, tuv * 2.4).xy * 2.0 - 1.0;
         // The fine-soft grain is combed like the blade normal (the 3x tiling
         // was the single loudest dot-scale voice): elongated micro-grain for
         // grass, and on sand it reads as wind-swept ripple rather than dots.
-        vec2 fineSoftRaw = texture2D(uGrassN, combT * 3.0).xy * 2.0 - 1.0;
-        vec2 fineSoft = fineSoftRaw.x * WOC_COMB_COMPRESS * combDir + fineSoftRaw.y * combPerp;
+        vec2 fineSoft = vec2(0.0);
+        if ( wocHasGrass || wocHasSand ) {
+          vec2 fineSoftRaw = texture2D(uGrassN, combT * 3.0).xy * 2.0 - 1.0;
+          fineSoft = fineSoftRaw.x * WOC_COMB_COMPRESS * combDir + fineSoftRaw.y * combPerp;
+        }
         // gravel grain at the trail albedo's own tap scale, so the grit a
         // path shows is lit rather than painted (gravelW already fades it
         // with the marsh mud swap)
-        vec2 gvN = texture2D(uRockN, tuv * 1.8).xy * 2.0 - 1.0;`
+        vec2 gvN = vec2(0.0);
+        if ( wocHasDirt )
+          gvN = texture2D(uRockN, tuv * 1.8).xy * 2.0 - 1.0;`
             : `// Simple-splat tiers: base-scale detail normals only (the
         // merge-base budget); the fine octaves fold to zero and every term
         // below compiles out.
@@ -1137,6 +1221,14 @@ function buildSplatMaterial(
   };
   return mat;
 }
+
+export const terrainInternalsForTest = {
+  createSplatMaterial(): THREE.MeshStandardMaterial {
+    const normal = new THREE.DataTexture(new Uint8Array([128, 128, 255, 255]), 1, 1);
+    return buildSplatMaterial(normal, makeBrushUniforms());
+  },
+  finishChunkGeometry,
+};
 
 function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
   const detail = groundDetailTexture();
