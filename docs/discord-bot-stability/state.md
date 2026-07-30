@@ -208,6 +208,19 @@ because dropping the one word is otherwise silent),
   on purpose.
 - New shared test helper: `tests/helpers/synthetic_clock.ts`, a fully virtual clock.
   Phase 3's scheduler should drive it rather than vitest fake timers.
+- DEFERRED to a later phase, recorded here rather than left implicit: D4's
+  role-position arm ships as a HOOK with no caller. `RateGovernor.invalidateForbidden()`
+  (exposed as `DiscordApi.invalidateForbidden()`) is never invoked, so today a cached
+  401/403 clears only when `DISCORD_FORBIDDEN_TTL_MS` expires. Whichever phase owns the
+  bot's own role-position tracking must wire it, because until then an operator who
+  grants a missing permission sees no effect for up to 24 hours.
+- The permanent-failure cache is keyed PER PERMISSION, not per member
+  (`nick:<guild>:<user>` and `roles:<guild>:<user>`). One key per member is a real
+  defect, found by the Phase 2 QA gate: Discord 403s a nickname PATCH permanently for
+  the guild owner and for anyone above the bot in the role hierarchy, so a shared key
+  let a nickname failure suppress that member's tier-role sync for the whole TTL, and a
+  missing MANAGE_NICKNAMES stopped role sync guild-wide. Keep any future subject key
+  scoped to the permission that can fail.
 - New exported constant: `SERVER_CALL_TIMEOUT_MS` (8000) in `bot/server_client.ts`,
   named so the suite can pin the deadline against a literal.
 - Touched pins: `tests/ci_workflow.test.ts` structural counts (release-gate

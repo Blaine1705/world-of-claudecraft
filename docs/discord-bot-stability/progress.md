@@ -149,6 +149,73 @@ Worktree note for later phases: this checkout had no `node_modules`, and the mai
 checkout's install is stale (TypeScript 5.9.3, no ffmpeg-static). A local `npm ci` in
 the worktree is what gets the real TypeScript 7 native binary and a runnable gate.
 
+### Phase 2 (2026-07-30)
+
+Release sync: NO-OP. `origin/release/v0.33.0` on a fresh fetch was 0 behind / 20 ahead,
+so there was nothing to merge and no release-merge audit.
+
+`bot/rate_governor.ts` is pure with zero imports: a grep for fetch, ws, Date.now,
+setTimeout, setInterval and performance.now returns nothing, and every test drives it
+through `tests/helpers/synthetic_clock.ts`, a fully VIRTUAL clock rather than vitest
+fake timers. That choice is load bearing twice over: a clock captured at construction
+does not move under fake timers, so a suite built on them can pass for an
+implementation that quietly reads the wall clock, and a fractional delay is allowed to
+fire early, which would make every boundary assertion a coin flip.
+
+Design calls worth carrying forward. Queues are keyed by the PROVISIONAL route
+template while rate state is keyed by the RESOLVED bucket, which is what makes "the two
+keys must not double count" true without a mid-flight chain swap. Interaction callbacks
+get a per-interaction bucket and skip the global RPS cap, which is Discord's documented
+contract and without which a saturated sweep would blow the hard 3 second interaction
+deadline; they still respect every pause. Credentials never enter a bucket key or a log
+line (`:token`), which is also how ledger item L1 was closed, in the THROW.
+
+Three registries would otherwise have grown without bound, because a per-interaction
+bucket means a new entry per slash command: live rate state and the learned
+route-to-bucket map are LRU capped, and a drained queue is dropped. All three sizes are
+reported in the counter snapshot so the bounds are observable at all.
+
+The test matrix was fanned out over six agents, one per arm group with its own file,
+each followed by an independent skeptic. That earned its keep: the skeptics found three
+REAL module defects, not just test gaps. The half-open probe never settled on an
+ordinary JSON 429, so the breaker parked in half-open and every later request claimed a
+fresh probe; `settleProbe(true)` fired on ANY success rather than the probe's, so one
+essential slash-command reply closed the breaker on the sweeps' behalf; and a probe
+whose send threw or whose retries ran out never settled at all. A fourth, that opening
+the breaker did not restart the quiet window, surfaced when the regression test for the
+third was written.
+
+The `qa-checklist` gate then found the phase's worst defect, which every one of those
+agents had missed: `setNickname` and the two role writes shared ONE permanent-failure
+subject key per member. Discord 403s a nickname PATCH permanently for the guild owner
+and for anyone above the bot in the role hierarchy, so from the next sweep that member's
+role writes were refused unsent for 24 hours, and with MANAGE_NICKNAMES absent every
+member 403d and all tier-role sync stopped guild-wide. That is a change in the
+user-visible effect of the calls, which this phase's scope forbids. Keys are now scoped
+per permission. The same review found the pause was not re-checked after the bucket and
+rate-slot waits, that a 429 with no retry_after retried with zero delay, and that the
+four config knobs had no test at all behind their acceptance item.
+
+Mutation tally: 13 mutants, all killed, each run proving the patch applied and the tests
+actually ran. Three initially SURVIVED and every one was a defect in the test rather
+than the code: the probe-ownership arm only ran with the breaker open, where
+settleProbe early-returns; the registry-bound arm built interaction ids by adding to a
+numeric literal past Number.MAX_SAFE_INTEGER, so hundreds of iterations collapsed onto
+the same few ids and the map never grew; and the remap arm let its second response carry
+fresh headers, which rebuilt the state the migration was meant to move.
+
+Gate: the full suite has ONE failure, `tests/texture_upload.test.ts`, which reproduces
+identically on the pre-phase base commit `91e9ac4461` in a clean detached worktree and
+is a Three.js version-pin drift unrelated to this phase (no `src/` file is touched).
+The steps the gate abort skipped were run by hand: `tsc --noEmit`, `build:bot`,
+`build:server`, and `ci:changed` all green.
+
+NOT DONE, blocked on the environment: the four `.env.example` entries that ruling R8
+puts in this phase. Every `.env*` path is denied by the harness permission layer, for
+both Read and Bash, and the project's own permission config is empty, so there is no
+project rule to relax. The keys and defaults are recorded in state.md and
+`bot/CLAUDE.md`; the example block still needs adding once access is granted.
+
 ### Phase 1 QA (2026-07-30)
 
 Release sync: NO-OP again. `origin/release/v0.33.0` was still `b0acba0adc` on a fresh
