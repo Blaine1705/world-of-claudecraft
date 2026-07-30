@@ -30,6 +30,7 @@ import {
   FISH_REEL_WINDOW_RARITY_BONUS_SEC,
   FISH_REEL_WINDOW_ROD_BONUS_SEC,
   FISH_REEL_WINDOW_SEC,
+  FISHING_GAIN_SCHEDULE,
   fishingTeachingCeilingFor,
   fishReelWindowSecFor,
   startFishing,
@@ -1053,9 +1054,19 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
     // The wield ladder's completeness arm has this shape for land tools; the
     // fishing side had none, so a tier-4 rod row could ship while the
     // teaching derivation silently clamps its water to the tier-3 ceiling.
-    // Every shipped tier must earn its OWN ceiling: strictly higher than the
-    // tier below it, with the top tier reaching the cap the derivation ends
-    // at.
+    // The derivation distinguishes exactly the schedule's row indexes
+    // (fishingTeachingCeilingFor clamps zoneTier into [1, rows - 1]), so
+    // every shipped tier must sit inside that range: a single zone re-tiered
+    // past it clamps silently, which is precisely what this arm reds on.
+    // (A strictly-increasing walk over the SHIPPED tier set cannot catch
+    // that: a lone tier 4 still beats tier 2 after clamping.)
+    const maxDistinguished = FISHING_GAIN_SCHEDULE.length - 1;
+    for (const [zoneId, tier] of Object.entries(FISHING_ZONE_ROD_TIERS)) {
+      expect(
+        tier,
+        `${zoneId} ships rod tier ${tier}, past the ${maxDistinguished} the gain schedule derives`,
+      ).toBeLessThanOrEqual(maxDistinguished);
+    }
     const tiers = [...new Set(Object.values(FISHING_ZONE_ROD_TIERS))].sort((a, b) => a - b);
     for (let i = 1; i < tiers.length; i++) {
       expect(
@@ -1064,7 +1075,6 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
       ).toBeGreaterThan(fishingTeachingCeilingFor(tiers[i - 1]));
     }
     const top = tiers[tiers.length - 1];
-    expect(fishingTeachingCeilingFor(top)).toBe(fishingTeachingCeilingFor(top + 1));
     expect(fishingTeachingCeilingFor(top)).toBe(200);
   });
 
