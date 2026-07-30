@@ -966,7 +966,7 @@ export const sv_SE: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Skuggsprångspaddan",
       "name_stormfeather_griffin": "Himmelsvidd Stormfjäder",
       "name_thunderstrut_gobbler": "Åskstoltsern, Den stora kalkonen",
-      "name_tank": "Tank",
+      "name_tank": "Terrorspark Groundshaker",
       "desc_valorsteed": "En uthållig, säkerfotad stridshäst som ger ökad reshastighet.",
       "desc_grag_bear": "En uthållig, säkerfotad björn som ger ökad reshastighet.",
       "desc_stalkglider_snail": "En robust, långsamt brinnande snigel som ger ökad reshastighet.",
@@ -9739,7 +9739,7 @@ export const sv_SE: EnTranslations = {
         "name": "Sista fästets signetring"
       },
       "reins_tank": {
-        "name": "Ignition Key: Tank"
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

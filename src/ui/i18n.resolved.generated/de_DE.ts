@@ -966,7 +966,7 @@ export const de_DE: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage die Schattensprungkröte",
       "name_stormfeather_griffin": "Himmelsgreif Sturmfeder",
       "name_thunderstrut_gobbler": "Donnerstolz der Große Puter",
-      "name_tank": "Tank",
+      "name_tank": "Terrorspark Groundshaker",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
       "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
       "desc_stalkglider_snail": "Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.",
@@ -9739,7 +9739,7 @@ export const de_DE: EnTranslations = {
         "name": "Siegelring von Last Keep"
       },
       "reins_tank": {
-        "name": "Ignition Key: Tank"
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"

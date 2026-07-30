@@ -966,7 +966,7 @@ export const cs_CZ: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, stínoskákací ropucha",
       "name_stormfeather_griffin": "Nebeský Bouřepero",
       "name_thunderstrut_gobbler": "Hromokrok, Velký krocan",
-      "name_tank": "Tank",
+      "name_tank": "Terrorspark Groundshaker",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
       "desc_stalkglider_snail": "Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.",
@@ -9739,7 +9739,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Signet Poslední tvrze"
       },
       "reins_tank": {
-        "name": "Ignition Key: Tank"
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

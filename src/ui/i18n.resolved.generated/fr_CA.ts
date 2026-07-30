@@ -966,7 +966,7 @@ export const fr_CA: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, le Crapaud Saute-Ombre",
       "name_stormfeather_griffin": "Plume-d’Orage Toise-Ciel",
       "name_thunderstrut_gobbler": "Pavane-Tonnerre, le Grand Dindon",
-      "name_tank": "Tank",
+      "name_tank": "Terrorspark Groundshaker",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_stalkglider_snail": "Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.",
@@ -9739,7 +9739,7 @@ export const fr_CA: EnTranslations = {
         "name": "Chevalière de The Last Keep"
       },
       "reins_tank": {
-        "name": "Ignition Key: Tank"
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"

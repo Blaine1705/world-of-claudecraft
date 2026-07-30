@@ -394,7 +394,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // /dev give reins_tank while the feature remains under development.
   reins_tank: {
     id: 'reins_tank',
-    name: 'Ignition Key: Tank',
+    name: 'Ignition Key: Terrorspark Groundshaker',
     kind: 'mount',
     mount: 'tank',
     quality: 'epic',

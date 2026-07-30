@@ -2371,7 +2371,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   saltforged_grips: 'Saltforged Grips',
   mantle_of_the_unbroken_shore: 'Mantle of the Unbroken Shore',
   last_keep_signet: 'Signet of the Last Keep',
-  reins_tank: 'Ignition Key: Tank',
+  reins_tank: 'Ignition Key: Terrorspark Groundshaker',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

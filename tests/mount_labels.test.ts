@@ -14,7 +14,7 @@ describe('mount label maps', () => {
   it('resolves the tank name and description through a non-English locale', async () => {
     await ensureLocaleLoaded('zh_CN');
     setLanguage('zh_CN');
-    expect(mountDisplayName('tank')).toBe('坦克');
+    expect(mountDisplayName('tank')).toBe('惊雷撼地者');
     expect(t(MOUNT_DESC_KEYS.tank)).toContain('重型履带');
   });
 });

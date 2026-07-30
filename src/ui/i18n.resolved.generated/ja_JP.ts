@@ -966,7 +966,7 @@ export const ja_JP: EnTranslations = {
       "name_shadowjump_toad": "影跳びのカマカゲ",
       "name_stormfeather_griffin": "スカイリーチ・ストームフェザー",
       "name_thunderstrut_gobbler": "大七面鳥サンダーストラット",
-      "name_tank": "戦車",
+      "name_tank": "地揺らしのテラースパーク",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
@@ -9739,7 +9739,7 @@ export const ja_JP: EnTranslations = {
         "name": "最後の砦の印章"
       },
       "reins_tank": {
-        "name": "戦車の始動キー"
+        "name": "テラースパークの始動キー"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

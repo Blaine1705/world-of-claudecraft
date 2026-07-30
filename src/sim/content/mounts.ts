@@ -93,7 +93,7 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   },
   tank: {
     key: 'tank',
-    name: 'Tank',
+    name: 'Terrorspark Groundshaker',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },

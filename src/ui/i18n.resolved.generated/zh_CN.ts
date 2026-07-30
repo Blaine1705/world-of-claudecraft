@@ -966,7 +966,7 @@ export const zh_CN: EnTranslations = {
       "name_shadowjump_toad": "影跃蟾蜍卡玛影",
       "name_stormfeather_griffin": "凌天风暴之羽",
       "name_thunderstrut_gobbler": "雷霆阔步大火鸡",
-      "name_tank": "坦克",
+      "name_tank": "惊雷撼地者",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
       "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一只坚毅耐久的蜗牛，可提升旅行速度。",
@@ -9739,7 +9739,7 @@ export const zh_CN: EnTranslations = {
         "name": "最后的堡垒印戒"
       },
       "reins_tank": {
-        "name": "坦克点火钥匙"
+        "name": "惊雷撼地者点火钥匙"
       },
       "conjured_water4": {
         "name": "魔法泉水"

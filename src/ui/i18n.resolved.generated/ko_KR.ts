@@ -966,7 +966,7 @@ export const ko_KR: EnTranslations = {
       "name_shadowjump_toad": "그림자 도약 두꺼비 카마카게",
       "name_stormfeather_griffin": "하늘닿이 폭풍깃",
       "name_thunderstrut_gobbler": "천둥활보 대왕 칠면조",
-      "name_tank": "전차",
+      "name_tank": "대지를 뒤흔드는 테러스파크",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
       "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
@@ -9739,7 +9739,7 @@ export const ko_KR: EnTranslations = {
         "name": "마지막 요새의 인장"
       },
       "reins_tank": {
-        "name": "전차 시동 열쇠"
+        "name": "테러스파크 시동 열쇠"
       },
       "conjured_water4": {
         "name": "창조된 샘물"
