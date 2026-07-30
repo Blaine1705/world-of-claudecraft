@@ -199,11 +199,12 @@ export function hasFishingImplement(
 }
 
 // The best owned gatherTool tier across EVERY gathering profession, floored at
-// BARE_HANDS_TOOL_TIER. This is the corpse-harvest gate's input: a monster
-// material has no single owning profession, so any gathering tool counts.
-// OWNERSHIP scan, cross-profession: see the R22 note on
-// bestOwnedGatherToolTierOrNone above; the corpse premium arm reads the
-// wield-filtered sibling (wield_gate.ts bestWieldableAnyGatherToolTier).
+// BARE_HANDS_TOOL_TIER. It was the corpse-harvest gate's input until R22/R50
+// moved that arm onto the wield-filtered sibling (wield_gate.ts
+// bestWieldableAnyGatherToolTier); no production path reads it today. Kept
+// DELIBERATELY as the cross-profession OWNERSHIP reference: the corpse suite
+// uses it as its ownership oracle, and the tool-gate guard pins by name that
+// interaction.ts never regresses onto it.
 export function bestOwnedAnyGatherToolTier(
   inventory: readonly InvSlot[],
   items: Readonly<Record<string, ItemDef>>,
@@ -229,9 +230,10 @@ export function bestOwnedAnyGatherToolTier(
 // with availability:
 //
 // the live harvest path resolves a TOOL TIER, never a tool. Nothing on it ever
-// holds the particular pick that satisfied the gate, because
-// `bestOwnedGatherToolTierOrNone` returns a number, and its callers are the
-// node gate, the corpse gate and fishing's band cap. Keying a slot per item
+// holds the particular pick that satisfied the gate, because the tier scans
+// return a number: fishing's band cap still reads
+// `bestOwnedGatherToolTierOrNone`, and the node and corpse gates read the
+// wield-filtered siblings in wield_gate.ts (R22). Keying a slot per item
 // would mean widening all three to carry an item through, and a slot bought
 // for a tier-4 pick would go inert the moment its owner crafts the tier-5 one,
 // which inverts the point of giving players a reason to chase the better tool.

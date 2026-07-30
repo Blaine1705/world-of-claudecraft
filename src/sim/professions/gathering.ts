@@ -177,16 +177,16 @@ export function nodeMaterialFor(
 }
 
 /** The item id a harvest of `node` grants a player whose best matching tool is
- *  `ownedToolTier`: the zone row's material, upgraded to its fine grade when
+ *  `usableToolTier`: the zone row's material, upgraded to its fine grade when
  *  that tool outclasses the material at a full-grade vein (D8, the rule and
  *  its two arms live in professions/material_grades.ts). Signature kept
  *  separate from nodeMaterialFor, whose (type, zoneId) shape is depended on by
  *  the quest-objective and placement suites and carries no player. */
-export function harvestYieldItemIdFor(node: GatherNodeDef, ownedToolTier: number): string {
+export function harvestYieldItemIdFor(node: GatherNodeDef, usableToolTier: number): string {
   return harvestGradeItemId(
     nodeMaterialFor(node.type, node.zoneId).itemId,
     node.tier,
-    ownedToolTier,
+    usableToolTier,
   );
 }
 
@@ -225,9 +225,9 @@ export function usableToolEffectSlot(
 
 /**
  * The tool tier the FINE-GRADE comparison should read for this player at this
- * node: their best owned tool, plus whatever a USABLE slotted quality effect
- * adds (`usableToolEffectSlot` above owns usability, so a suppressed slot
- * previews no bonus either).
+ * node: their best WIELDABLE tool (R22/R49, wield_gate.ts), plus whatever a
+ * USABLE slotted quality effect adds (`usableToolEffectSlot` above owns
+ * usability, so a suppressed slot previews no bonus either).
  *
  * Runs the bonus through `applyEffectBonus`, the same function the grant path
  * uses, rather than re-deriving "+1 if a quality effect is slotted" here. That
@@ -491,9 +491,9 @@ export function resolveHarvest(
 
 // Gather cast timing (Professions 2.0): the harvest is a short
 // visible cast instead of an instant grant. Base duration, shortened per
-// owned tool tier ABOVE the node's tier (owning exactly the required tier
-// buys nothing: the gate already demands covering it) and modestly per
-// proficiency band, floored. Named tuning constants, recorded in state.md.
+// WIELDABLE tool tier ABOVE the node's tier (R22; holding exactly the
+// required tier buys nothing: the gate already demands covering it) and
+// modestly per proficiency band, floored. Named tuning constants, recorded in state.md.
 export const GATHER_CAST_BASE_SEC = 2.5;
 export const GATHER_CAST_FLOOR_SEC = 1.5;
 export const GATHER_CAST_TOOL_TIER_REDUCTION_SEC = 0.4;

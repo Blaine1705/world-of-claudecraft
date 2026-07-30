@@ -2554,7 +2554,8 @@ export const hudChromeStrings = {
       herb: 'Herb Patch',
     },
     // Tooltip requirement line for tier 2+ nodes; doubles as the locked-state
-    // line (red while the viewer's owned-best tool falls short).
+    // line (red while the viewer's usable tool falls short: the R22
+    // wield-filtered scan, so an owned but unwieldable tool reads short too).
     tierRequired: {
       mining: 'Requires a tier {tier} mining pick',
       logging: 'Requires a tier {tier} logging axe',
@@ -2606,8 +2607,8 @@ export const hudChromeStrings = {
     // tier-based sibling below.
     wieldUnmetCorpse: 'You need gathering skill {skill} to put your finest tool to work.',
     // gatherDenied error toast, surface 'corpse': profession-neutral (a corpse
-    // harvest is gated by the best owned tool across ALL gathering
-    // professions, so no single tool is named).
+    // harvest is gated by the best WIELDABLE tool across ALL gathering
+    // professions, R22/R50, so no single tool is named).
     toolTierUnmetCorpse: 'You need a tier {tier} gathering tool to recover the finest materials.',
     // Gathering-tool item tooltip lines (#2343): what the tool is, what it is
     // required for, how using it behaves, and its speed/fishing bonuses. All

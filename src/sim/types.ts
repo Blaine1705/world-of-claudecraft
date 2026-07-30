@@ -2515,8 +2515,9 @@ export interface GatherNodeDef {
   // time from the node's zone levelRange midpoint rather than looked up live.
   level: number;
   // Access tier (Professions 2.0), 1 = bare-hands: gated via
-  // canGatherTier against the player's best owned matching tool
-  // (professions/tools.ts bestOwnedGatherToolTier). Pure access gating, never
+  // canGatherTier against the player's best WIELDABLE matching tool (R22:
+  // professions/wield_gate.ts bestWieldableGatherToolTierOrNone; an owned but
+  // unwieldable tool no longer opens the node). Pure access gating, never
   // a speed mechanic; every pre-phase node is tier 1.
   tier: number;
 }

@@ -3,8 +3,9 @@
 // the node's name, its tool requirement (#2343: every node requires its
 // profession's tool, so tier-1 nodes show the tierless base-tool line and
 // tier 2+ the tiered one), and its per-viewer ready/cooldown state. Mobile
-// has no hover surface: touch players read the tier off the minimap lock
-// tint and the gatherDenied error toast instead.
+// has no hover surface: touch players read the minimap lock tint (which since
+// R22 means no USABLE tool: covering-but-unwieldable locks too) and the
+// gatherDenied error toast instead.
 //
 // Reuses the HUD's shared #tooltip container and the paintTooltipAt idiom
 // (hud.ts): same box, same +14/-10 cursor offsets, same author-space viewport

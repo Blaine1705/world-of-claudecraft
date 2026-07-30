@@ -106,7 +106,7 @@ export function gatherMaterialTier(baseItemId: string): number | undefined {
  * Whether one harvest upgrades to the fine grade. BOTH conditions, and each
  * one carries its own weight:
  *
- * - `ownedToolTier > gatherTier`: the tool must be strictly ABOVE the
+ * - `usableToolTier > gatherTier`: the tool must be strictly ABOVE the
  *   material, so the tool that merely unlocks a material never also improves
  *   it. Strict is what keeps the parity gather scenario (tier-1 tool, tier-1
  *   eastbrook nodes, gatherTier 1) on its shipped yields; `>=` would flip all
@@ -125,9 +125,9 @@ export function gatherMaterialTier(baseItemId: string): number | undefined {
 export function yieldsFineGrade(
   gatherTier: number,
   nodeTier: number,
-  ownedToolTier: number,
+  usableToolTier: number,
 ): boolean {
-  return ownedToolTier > gatherTier && nodeTier >= gatherTier;
+  return usableToolTier > gatherTier && nodeTier >= gatherTier;
 }
 
 /**
@@ -155,11 +155,11 @@ export function fineGradeReachable(baseItemId: string, nodeTier: number): boolea
 export function harvestGradeItemId(
   baseItemId: string,
   nodeTier: number,
-  ownedToolTier: number,
+  usableToolTier: number,
 ): string {
   const row = MATERIAL_GRADES[baseItemId];
   if (!row) return baseItemId;
-  return yieldsFineGrade(row.gatherTier, nodeTier, ownedToolTier) ? row.fineItemId : baseItemId;
+  return yieldsFineGrade(row.gatherTier, nodeTier, usableToolTier) ? row.fineItemId : baseItemId;
 }
 
 /**

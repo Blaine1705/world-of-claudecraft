@@ -135,8 +135,9 @@ export const HARVEST_COMPONENT_ITEMS: Readonly<Record<string, string>> = {
 
 // Monster material access tiers (Professions 2.0): which tool tier
 // the corpse-harvest premium (signed/specimen) arm requires per component
-// family, checked against the player's best owned gathering tool of ANY
-// profession (professions/tools.ts bestOwnedAnyGatherToolTier). EVERY
+// family, checked against the player's best WIELDABLE gathering tool of ANY
+// profession (R22/R50: professions/wield_gate.ts
+// bestWieldableAnyGatherToolTier). EVERY
 // HARVEST_COMPONENT_ITEMS key is listed explicitly, ALL at 1 in wave one
 // (the prime directive: all pre-existing content stays bare-hands
 // harvestable); future corpse families may ship higher.
