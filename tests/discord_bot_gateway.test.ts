@@ -191,6 +191,17 @@ describe('Gateway production defaults', () => {
     expect(constructed.length).toBe(1);
     await vi.advanceTimersByTimeAsync(1);
     expect(constructed.length).toBe(2);
+
+    // And the third member: the close ran stopHeartbeat, so the interval must
+    // be genuinely cleared on the real clock. A no-op default clearInterval
+    // would keep beating forever against every future socket.
+    // Counted as TERMINATIONS, not sends: the first beat left acked false, so a
+    // leaked interval takes the zombie branch and terminates instead of
+    // sending, which a send count cannot see.
+    const terminations = () => constructed.reduce((n, c) => n + c.socket.terminated, 0);
+    expect(terminations()).toBe(0);
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(terminations()).toBe(0);
   });
 });
 

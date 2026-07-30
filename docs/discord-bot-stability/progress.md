@@ -209,13 +209,27 @@ handshake was covered, and the "six bot files" count was stale within its own co
 L5 was closed here instead of deferred. L6 is new and open: `bot/` type-checks against
 lib DOM, so a Node-missing DOM global passes both `tsc` and `build:bot`.
 
+A second workflow then reviewed the FIX ROUND, which is unreviewed code, and it earned
+its keep: the round had broken the very rule it had just written into `bot/CLAUDE.md`.
+Two new default-path tests installed the fake clock BEFORE constructing, the ordering
+R16 exists to forbid, so a capture-form default would have passed them. The sleep test
+also awaited its pending promise before asserting, and awaiting waits out a REAL timer,
+so a captured `setTimeout` still settled and passed. Both are fixed and both mutants now
+die. R17 had the same shape of problem: it was minted and then applied to only one of
+six `scripts/gate.mjs` pins, so the rest still matched the raw source.
+
 Deferred, with reasons: L1 and L2 (the interaction token and the discord_user_id in log
 lines) stay routed to Phase 2, which rewrites `request()` anyway; the security review
 added that the redaction must live in the THROW in `discord_api.ts`, not in the one
 named catch, because 15 other bare `console.error(e)` handlers would re-open it. L6 is
-a toolchain restructure, routed to Phase 7. The cadence constants remain unpinned
-against `bot/main.ts`'s USE of them (a swap survives): `main.ts` calls `main()` at
-module scope so it cannot be imported, and R6 forbids a source-text pin, so this is a
-ruled-acceptable residual rather than a finding.
+a toolchain restructure, routed to Phase 7. L7 is a genuine gateway behavior defect (a
+non-resumable INVALID_SESSION never clears `sessionId`, so a close before the next READY
+RESUMEs a session Discord already declared dead); fixing it changes runtime behavior,
+which this phase forbids, so it is ledgered for Phase 3 or 7. L8 records that
+`bot/main.ts`'s two pure helpers are unreachable from any test.
+
+The cadence constants remain unpinned against `bot/main.ts`'s USE of them (a swap
+survives): `main.ts` calls `main()` at module scope so it cannot be imported, and R6
+forbids a source-text pin, so this is a ruled-acceptable residual rather than a finding.
 
 Gate: PASS, all 12 steps.

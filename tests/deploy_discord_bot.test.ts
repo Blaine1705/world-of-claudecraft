@@ -57,5 +57,10 @@ describe('Discord bot build and typecheck surface', () => {
     // drag most of bot/ in through their own imports, but bot/main.ts (the
     // wiring) is imported by nothing and would drop out.
     expect(tsconfig.include).toContain('bot');
+    // ...and that the gate's typecheck actually reads THAT tsconfig. A bare
+    // `tsc --noEmit` defaults to the root tsconfig.json; pointing it at another
+    // project file would leave the include above pinning a config nothing runs.
+    expect(packageJson.scripts['check:ts']).toBe('tsc --noEmit');
+    expect(packageJson.scripts['check:types']).toContain('check:ts');
   });
 });

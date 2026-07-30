@@ -12,11 +12,13 @@ const gate = readFileSync(new URL('../scripts/gate.mjs', import.meta.url), 'utf8
 const gateCode = gate.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 function jobSource(name: string): string {
-  // The lookahead is the job boundary. It accepts digits and underscores too:
-  // a future job id like `pr-gate2` would otherwise not terminate the previous
-  // slice, letting one job's text bleed into another and quietly satisfying a
-  // by-name pin from the wrong job.
-  const match = workflow.match(new RegExp(`\\n  ${name}:[\\s\\S]*?(?=\\n  [a-z][a-z0-9_-]*:|$)`));
+  // The lookahead is the job boundary. It accepts digits, underscores, and an
+  // uppercase initial: a future job id like `pr-gate2` or `Release` would
+  // otherwise not terminate the previous slice, letting one job's text bleed
+  // into another and quietly satisfying a by-name pin from the wrong job.
+  const match = workflow.match(
+    new RegExp(`\\n  ${name}:[\\s\\S]*?(?=\\n  [A-Za-z][A-Za-z0-9_-]*:|$)`),
+  );
   if (!match) throw new Error(`missing CI job: ${name}`);
   return match[0];
 }
@@ -25,7 +27,7 @@ describe('CI workflow parity', () => {
   it('runs the canonical game and admin typecheck in CI and the local gate', () => {
     expect(workflow.match(/run: npm run check:types/g)).toHaveLength(2);
     expect(workflow).not.toContain('run: npx tsc --noEmit');
-    expect(gate).toContain("['typecheck', 'npm', ['run', 'check:types']]");
+    expect(gateCode).toContain("['typecheck', 'npm', ['run', 'check:types']]");
   });
 
   it('provisions FFmpeg from the static npm packages instead of apt', () => {
@@ -36,14 +38,14 @@ describe('CI workflow parity', () => {
     // Either way no CI job apt-installs system FFmpeg; reintroducing the install
     // step would put its cost back on every job it touches.
     expect(workflow).not.toContain('apt-get');
-    expect(gate).toContain("from './sfx/ffmpeg_paths.mjs'");
+    expect(gateCode).toContain("from './sfx/ffmpeg_paths.mjs'");
   });
 
   it('runs the opt-in Chromium browser regressions in their own CI job', () => {
     const browserGate = jobSource('browser-gate');
     expect(browserGate).toContain('run: npx playwright install --with-deps chromium');
     expect(browserGate).toContain('run: npm run test:browser');
-    expect(gate).toContain("['browser regressions', 'npm', ['run', 'test:browser']]");
+    expect(gateCode).toContain("['browser regressions', 'npm', ['run', 'test:browser']]");
   });
 
   it('posts the i18n coverage summary and diffs the committed artifacts in both jobs', () => {
@@ -61,7 +63,7 @@ describe('CI workflow parity', () => {
       );
       expect(job).not.toContain('src/ui/i18n.status.summary.json');
     }
-    expect(gate).not.toContain('src/ui/i18n.status.summary.json');
+    expect(gateCode).not.toContain('src/ui/i18n.status.summary.json');
   });
 
   it('runs the release tier against a release-to-main pull request merge result', () => {
@@ -111,9 +113,20 @@ describe('CI workflow parity', () => {
       'run: npm run build:bot',
       'run: npm run build\n',
     ]) {
-      expect(prChecks).toContain(step);
+      // Anchored to the start of a step line, so a YAML-commented-out step
+      // (`#        run: npm run build:server`) cannot satisfy it: the substring
+      // survives the comment, the anchored form does not.
+      expect(prChecks).toMatch(new RegExp(`\\n {8}${step.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
       expect(prGate).not.toContain(step);
     }
+    // ...and a structural count, the same backstop release-gate has: an added
+    // or removed pr-checks step must consciously update this test rather than
+    // slipping in beside the by-name pins above.
+    expect(prChecks.match(/\n {6}- name: /g)).toHaveLength(12);
+    // pr-checks is unsharded, so NO step in it may carry a condition: an
+    // `if: matrix.shard == 1` copy-pasted here is never true and would disable
+    // that step outright.
+    expect(prChecks).not.toMatch(/\n {8}if: /);
   });
 
   it('shards the PR and release test steps four ways and keeps the checks single-shard', () => {
@@ -144,9 +157,9 @@ describe('CI workflow parity', () => {
     // turn the pre-merge gate into a partial run, deleting the step would
     // silently drop tests from the gate entirely, and dropping the worker
     // bound would reintroduce the documented core-contention flake mode.
-    expect(gate).not.toContain('--shard');
-    expect(gate).toContain("'vitest (full suite)'");
-    expect(gate).toContain('--maxWorkers=');
+    expect(gateCode).not.toContain('--shard');
+    expect(gateCode).toContain("'vitest (full suite)'");
+    expect(gateCode).toContain('--maxWorkers=');
     // pr-checks stays a single unsharded job: its serialized checks run once.
     expect(prChecks).not.toContain('strategy:');
     expect(prChecks).not.toContain('matrix:');
@@ -239,11 +252,15 @@ describe('CI workflow parity', () => {
     // "works on forks", would hand that untrusted code a privileged token and
     // nothing else in the repo would go red.
     expect(workflow).not.toContain('pull_request_target');
-    expect(workflow).toMatch(/\npermissions:\n {2}contents: read\n/);
+    // The WHOLE block, terminated by a blank line: matching only the first
+    // entry would let `packages: write` be appended underneath it.
+    expect(workflow).toMatch(/\npermissions:\n {2}contents: read\n\n/);
     // Unanchored on purpose: the read-only grant is workflow-level, and a JOB
     // may re-declare `permissions:` at its own indent to widen it. Matching
     // only at column 0 would miss exactly that escalation.
     expect(workflow.match(/^\s*permissions:/gm)).toHaveLength(1);
     expect(workflow).not.toContain('secrets.');
+    expect(workflow).not.toContain("secrets['");
+    expect(workflow).not.toContain('secrets["');
   });
 });

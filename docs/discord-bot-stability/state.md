@@ -1,6 +1,6 @@
 # State: Discord Bot Stability (cross-phase cheat sheet)
 
-Current phase: Phase 1 built (2026-07-30), QA session next.
+Current phase: Phase 1 built AND QA'd (2026-07-30). Next: Phase 2, the rate-limit governor.
 
 ## Locked decisions
 
@@ -170,14 +170,19 @@ because dropping the one word is otherwise silent),
   `tests/discord_bot_server_client.test.ts` (call envelope, secret header, deadline,
   production-default path), `tests/discord_bot_discord_api.test.ts` (auth headers, the
   v10 base, the 429 retry clamps and the retry-once bound, production-default path),
-  `tests/discord_bot_gateway.test.ts` (module-mocks `ws`; default socket factory,
-  injected factory, HELLO to IDENTIFY, fatal-versus-normal close).
-  `tests/discord_bot.test.ts` stays pure-logic only.
+  `tests/discord_bot_gateway.test.ts` (module-mocks `ws`; both defaults, the injected
+  factory, the whole opcode surface, the heartbeat tick with its zombie-terminate and ACK
+  arms, RESUME versus IDENTIFY, and every fatal close code).
+  `tests/discord_bot.test.ts` stays pure-logic only. The Phase 1 QA round widened all four
+  well past the arm lists above; treat the files, not this summary, as the inventory.
 - New exported constant: `SERVER_CALL_TIMEOUT_MS` (8000) in `bot/server_client.ts`,
   named so the suite can pin the deadline against a literal.
 - Touched pins: `tests/ci_workflow.test.ts` structural counts (release-gate
   single-shard conditions 8 to 9, release-gate steps 12 to 13) plus the pr-checks
-  build-step coverage loop.
+  build-step coverage loop. Phase 1 QA then rewrote that file's gate and CI pins per
+  R17 (comment-stripped source, line and adjacency anchors, a pr-checks step count, and
+  a workflow trust-posture test) and extended `tests/deploy_discord_bot.test.ts` with the
+  bot build and typecheck surface.
 
 ## Rulings settled during authoring (2026-07-30)
 
@@ -294,14 +299,17 @@ route each to a phase or file it.
   The concern was that nothing stops a future call site from passing a wrapping
   `fetchImpl` that observes the bot token or the shared secret. The original rationale
   said `tsc` "proves the arity of every construction site". **That is false and must not
-  be reasoned from:** the seams are OPTIONAL trailing parameters, so `tsc` accepts two,
-  three, or four arguments equally (the suite itself constructs with all of them). The
+  be reasoned from:** the seams are OPTIONAL trailing parameters, so `tsc` accepts the
+  leading arguments alone or any prefix of the seams as well (2 to 4 for `DiscordApi` and
+  `ServerClient`, 3 to 5 for `Gateway`), and the suite itself constructs with all of them.
+  Verified with a `tsc` probe under the repo's own compiler options, with a negative
+  control to prove the probe was not vacuous. The
   real reason no pin is needed is the one the security review gave: passing a wrapping
   `fetchImpl` requires editing `bot/main.ts`, which is code-execution the attacker
   already has, so this is not a privilege boundary. A text pin would also carry the
   documented source-scrape traps. No pin.
 - L4 CLOSED, genuinely, as of Phase 1 QA. Phase 1's own claim ("closed outright") was
-  overstated: the file covered the CONNECT handshake only, and 16 of 18 gateway protocol
+  overstated: the file covered the CONNECT handshake only, and 16 of the first 18 gateway
   mutants survived it. `tests/discord_bot_gateway.test.ts` now also pins seq tracking,
   the heartbeat tick including the zombie-terminate and ACK arms, stopHeartbeat on close,
   RESUME versus IDENTIFY with the session and resume-URL capture, all six fatal close
@@ -313,12 +321,29 @@ route each to a phase or file it.
   empty array, and null for an unreachable server or a malformed payload), and
   `pushMembersMeta()`'s zero-updated warning is pinned on both sides of its non-empty
   guard. Phase 5 inherits the pins instead of writing them.
+### Found during Phase 1 QA (2026-07-30), OPEN
+
 - L6 (nice-to-have, toolchain, OPEN): `bot/` type-checks against the shared tsconfig,
   whose `lib` is `["ES2022","DOM","DOM.Iterable"]` with `types: ["vite/client","node"]`.
   A Node-missing DOM global therefore passes BOTH `tsc` and `build:bot` (esbuild does not
   typecheck) and only fails at runtime in the container. A bot-specific tsconfig would
   close it; that is a toolchain restructure, not a QA-round edit. Natural home is Phase 7,
   which already owns the bot's deploy hardening.
+
+- L7 (should-fix, behavior, OPEN): a NON-resumable `INVALID_SESSION` (op 9 with `d:false`)
+  never clears `this.sessionId` in `bot/gateway.ts`; the field is only ever assigned in the
+  READY handler. So after Discord tells the bot its session is dead, a socket close that
+  arrives before the next READY takes `reconnect(true)` to
+  `this.resuming = resume && this.sessionId !== null`, which is still true, and the bot
+  RESUMEs a session it was just told is gone. Discord answers with another
+  INVALID_SESSION, so it self-corrects at the cost of a wasted round trip and a slower
+  recovery during exactly the reconnect storms this packet exists to tame. Fixing it is a
+  RUNTIME BEHAVIOR CHANGE, which Phase 1 forbids, so it is recorded rather than landed.
+  Natural home is Phase 3 (scheduler and reconnect coalescing) or Phase 7 (supervision).
+- L8 (nice-to-have, coverage, OPEN): the two pure helpers at the bottom of `bot/main.ts`
+  are unreachable from any test, because `main.ts` calls `main()` at module scope. If a
+  later phase needs them pinned, extract them into a sibling module first (the same move
+  R6 made for the cadences); do not add a source-text pin.
 
 ## Known gotchas for implementers
 
