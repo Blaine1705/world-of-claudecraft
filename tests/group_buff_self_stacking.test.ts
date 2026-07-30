@@ -106,4 +106,36 @@ describe('every group buff is exhaustion-gated or source-independent', () => {
     }
     expect(offenders, 'group buffs missing both self-stack guards').toEqual([]);
   });
+
+  // The aoeAlly sweep above never saw the OTHER shape a group buff can take:
+  // `buffTarget` with `party: true`, which is how every shout, blessing and
+  // Paladin aura reaches the party. Five Paladin auras stacked across casters
+  // for exactly that reason (two Paladins on Dawn Devotion granted +80 AP), so
+  // this arm holds the whole family, not just the ids that were fixed.
+  it('no party buffTarget aura can silently self-stack across casters', () => {
+    const offenders: string[] = [];
+    const seen: string[] = [];
+    for (const ability of Object.values(ABILITIES)) {
+      const effects = [
+        ...(ability.effects ?? []),
+        ...(ability.ranks ?? []).flatMap((r) => r.effects ?? []),
+      ];
+      for (const eff of effects) {
+        if (eff.type !== 'buffTarget' || !eff.party) continue;
+        seen.push(ability.id);
+        // A party buffTarget lands under the ability id (see aura_stacking.ts).
+        if (!SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS.has(ability.id)) {
+          offenders.push(`${ability.id} (buffTarget party)`);
+        }
+        break;
+      }
+    }
+    // Guard the guard: if the party-buff shape is ever renamed, this scan would
+    // pass by finding nothing at all. It must keep seeing the real family.
+    expect(seen).toContain('battle_shout');
+    expect(seen).toContain('dawn_devotion');
+    expect(seen).toContain('retribution_aura');
+    expect(seen.length).toBeGreaterThanOrEqual(9);
+    expect(offenders, 'party buffTarget auras missing the source-independent guard').toEqual([]);
+  });
 });
