@@ -212,13 +212,27 @@ describe('paladin redesign', () => {
     expect(before).toBeGreaterThan(0);
     sim.startAutoAttack();
     let swings = 0;
+    let elapsedTicks = 0;
     for (let i = 0; i < 20 * 10 && swings === 0; i++) {
       for (const ev of sim.tick()) {
-        if (ev.type === 'damage' && ev.sourceId === p.id && ev.school === 'physical') swings++;
+        // Only a LANDED swing counts: the row reads "landed melee attacks", so a
+        // missed opener (an rng-stream artifact of upstream content adds) must
+        // keep the loop waiting instead of ending it shave-less.
+        if (
+          ev.type === 'damage' &&
+          ev.sourceId === p.id &&
+          ev.school === 'physical' &&
+          ev.kind === 'hit'
+        )
+          swings++;
       }
+      elapsedTicks++;
     }
     expect(swings).toBeGreaterThan(0);
-    expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(before! - 0.5);
+    // The 0.5 sec shave must show OVER AND ABOVE the natural cooldown decay of
+    // the ticks the loop ran (0.05 sec per tick), so waiting out early misses
+    // cannot pass the test on decay alone.
+    expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(before! - elapsedTicks * 0.05 - 0.45);
   });
 
   it('Deathless Ardor: a killing blow leaves 1 health, once per 180 sec', () => {
