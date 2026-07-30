@@ -4921,6 +4921,12 @@ function priestCodex(seed = 2929): Scenario {
       ].entries()) {
         teleport(sim, entity, origin.x + index, origin.z);
         beef(entity);
+        // The coverage contract needs every scripted cast to LAND (a resisted
+        // Mindfracture binds no Effigy and silences the whole Vespers loop).
+        // Full hit keeps the resist roll drawn (draw order unchanged) while
+        // pinning its outcome, so upstream content adds cannot flake this
+        // scenario off its contract again.
+        entity.hitBonus = 1;
       }
       sim.partyInvite(doctrineAllyId, doctrineId);
       sim.partyAccept(doctrineAllyId);

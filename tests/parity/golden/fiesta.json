@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 824,
-      "state": "9d14aaa3",
+      "state": "1de28ed0",
       "events": "445fd575",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 824,
-      "state": "5de07072",
+      "state": "a74827a3",
       "events": "f68efa25",
       "rng": {
         "draws": 62,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 824,
-      "state": "85711f0c",
+      "state": "78e136ad",
       "events": "4313e4ad",
       "rng": {
         "draws": 237,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 824,
-      "state": "fcf6c5e3",
+      "state": "ee6f4f10",
       "events": "64ec10ed",
       "rng": {
         "draws": 468,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 824,
-      "state": "921e8c78",
+      "state": "cfd9e6fb",
       "events": "49c42e6f",
       "rng": {
         "draws": 747,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 824,
-      "state": "fec9ea17",
+      "state": "bb93d9b2",
       "events": "741638a5",
       "rng": {
         "draws": 1011,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 824,
-      "state": "373402f8",
+      "state": "d456067b",
       "events": "2681b6c8",
       "rng": {
         "draws": 1146,
@@ -304,12 +304,12 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {
-              "5": "rog_r5_relentless_strikes",
-              "8": "rog_r8_smoke_screen",
-              "11": "rog_r11_preparation",
-              "14": "rog_r14_seal_fate",
-              "17": "rog_r17_cloak_of_shadows",
-              "20": "rog_r20_shadowstep"
+              "5": "rog_r5_shadeslip",
+              "8": "rog_r8_borrowed_breath",
+              "11": "rog_r11_marked_prey",
+              "14": "rog_r14_dusk_economy",
+              "17": "rog_r17_flurry_of_knives",
+              "20": "rog_r20_second_shadow"
             },
             "spec": "assassination"
           },
@@ -338,8 +338,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet",
-              "spring_water"
+              "rusty_hatchet"
             ]
           },
           "delveClears": {},
@@ -362,10 +361,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
             }
           ],
           "mailWelcomed": true,
@@ -373,12 +368,12 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {
-              "5": "hun_r5_improved_serpent_sting",
-              "8": "hun_r8_startle_shot",
-              "11": "hun_r11_mend_pet",
-              "14": "hun_r14_multi_shot",
-              "17": "hun_r17_deterrence",
-              "20": "hun_r20_improved_volley"
+              "5": "hun_r5_tactical_retreat",
+              "8": "hun_r8_receding_shell",
+              "11": "hun_r11_double_hush",
+              "14": "hun_r14_efficient_rhythm",
+              "17": "hun_r17_apex_instinct",
+              "20": "hun_r20_overdraw"
             },
             "spec": "beast_mastery"
           },
@@ -569,7 +564,7 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "maxHp": 783,
-          "maxResource": 622,
+          "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -580,8 +575,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 188,
-          "resource": 622,
-          "resourceType": "mana",
+          "resource": 100,
+          "resourceType": "focus",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
