@@ -3869,6 +3869,10 @@ export class Sim {
         prestigeRank: meta.prestigeRank,
         // the selected Book of Deeds title (a deed id), like the server fill
         title: meta.activeTitle,
+        // The guild tag beside the name, read off the passive display field the
+        // host stamps (setPlayerGuild). Omitted rather than empty, like the server
+        // fill; offline that is always the case, since guilds are server-only.
+        ...(e.guild ? { guild: e.guild } : {}),
       }));
     return Promise.resolve(paginateLeaderboard(rows, page, pageSize));
   }

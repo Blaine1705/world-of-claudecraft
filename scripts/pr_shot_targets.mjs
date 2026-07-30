@@ -49,6 +49,80 @@ async function openMarketBrowse(page) {
   return pollForSize(page, '#market-window');
 }
 
+// The home page's global board is a REST read (`/api/leaderboard?scope=global...`),
+// and a screenshot host has no populated realm behind it, so answer that one request
+// with a representative cross-realm page before the document loads. Everything after
+// the fetch is the real code path: Api.leaderboard, the board module, the stylesheet.
+// Installed via evaluateOnNewDocument, in string form because this script runs under
+// tsx (whose keepNames rewrite breaks nested functions inside an evaluate callback).
+async function stubGlobalLeaderboardFetch(page) {
+  const leaders = [
+    {
+      rank: 1,
+      name: 'Zyzz',
+      cls: 'warrior',
+      level: 20,
+      lifetimeXp: 5200000,
+      prestigeRank: 2,
+      guild: 'Monarchs',
+      realm: 'Claudemoon',
+    },
+    {
+      rank: 2,
+      name: 'Aldwin',
+      cls: 'mage',
+      level: 20,
+      lifetimeXp: 4100000,
+      prestigeRank: 0,
+      guild: 'Monarchs',
+      realm: 'Claudemoon',
+    },
+    {
+      rank: 3,
+      name: 'Selene',
+      cls: 'priest',
+      level: 19,
+      lifetimeXp: 3650000,
+      prestigeRank: 0,
+      guild: 'Dawnward Company',
+      realm: 'Duskhold',
+    },
+    {
+      rank: 4,
+      name: 'Brightoak',
+      cls: 'druid',
+      level: 19,
+      lifetimeXp: 2900000,
+      prestigeRank: 0,
+      realm: 'Claudemoon',
+    },
+    {
+      rank: 5,
+      name: 'Morgatha',
+      cls: 'warlock',
+      level: 18,
+      lifetimeXp: 2450000,
+      prestigeRank: 0,
+      guild: 'Ashen Pact',
+      realm: 'Duskhold',
+    },
+  ].map((r) => ({ ...r, virtualLevel: 12, title: null }));
+  await page.evaluateOnNewDocument(`(() => {
+    const leaders = ${JSON.stringify(leaders)};
+    const real = window.fetch.bind(window);
+    window.fetch = (input, init) => {
+      const url = String(typeof input === 'string' ? input : (input && input.url) || '');
+      if (url.indexOf('/api/leaderboard') !== -1) {
+        return Promise.resolve(new Response(JSON.stringify({ leaders }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }));
+      }
+      return real(input, init);
+    };
+  })()`);
+}
+
 export const TARGETS = [
   {
     key: 'player-tooltip',
@@ -2269,6 +2343,84 @@ export const TARGETS = [
       }
       if (variant?.clipMinimap) return { clip: '#minimap' };
       return {};
+    },
+  },
+  {
+    key: 'player-board-guild',
+    label: 'High-score window: the player board with each name guild-tagged',
+    when: ['src/ui/leaderboard_view.ts', 'src/ui/leaderboard_window.ts'],
+    variants: [
+      { key: 'desktop', charClass: 'warrior', charName: 'Thorgar' },
+      { key: 'mobile', charClass: 'warrior', charName: 'Thorgar', mobile: true },
+    ],
+    // Guilds are a server-only social system, so the offline Sim's own board
+    // carries no guild names (Entity.guild stays '' offline). Stub the IWorld read
+    // with a representative ranked page the way the Renown target does: the real
+    // pure core plus painter then render the tag exactly as the live board would,
+    // including the unguilded row that must show no tag at all.
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      await wait(300);
+      await page.evaluate(() => {
+        const game = window.__game;
+        if (!game) return;
+        const row = (rank, name, cls, level, lifetimeXp, guild) => ({
+          rank,
+          name,
+          cls,
+          level,
+          virtualLevel: 12,
+          lifetimeXp,
+          prestigeRank: rank === 1 ? 2 : 0,
+          title: null,
+          ...(guild ? { guild } : {}),
+        });
+        const fakePage = {
+          leaders: [
+            row(1, 'Zyzz', 'warrior', 20, 5_200_000, 'Monarchs'),
+            row(2, 'Aldwin', 'mage', 20, 4_100_000, 'Monarchs'),
+            row(3, 'Selene', 'priest', 19, 3_650_000, 'Dawnward Company'),
+            row(4, 'Brightoak', 'druid', 19, 2_900_000),
+            row(5, 'Morgatha', 'warlock', 18, 2_450_000, 'Ashen Pact'),
+          ],
+          page: 0,
+          pageCount: 1,
+          total: 5,
+          pageSize: 50,
+        };
+        game.world.leaderboard = async () => fakePage;
+        game.hud.toggleLeaderboard();
+      });
+      const open = await pollForSize(page, '#leaderboard-window .lb-row-players', 10, 300);
+      if (!open) throw new Error('player board rows did not render');
+      return { clip: '#leaderboard-window' };
+    },
+  },
+  {
+    key: 'home-highscores-guild',
+    label: 'Home page High Scores board with each name guild-tagged',
+    when: ['src/ui/highscore_board.ts', 'styles/shell.css'],
+    // The pre-game marketing shell, so `landing` (no world entry): the board is a
+    // home-page view, and entering the world replaces the shell with the HUD.
+    variants: [
+      { key: 'desktop', landing: true, beforeLoad: stubGlobalLeaderboardFetch },
+      { key: 'mobile', landing: true, mobile: true, beforeLoad: stubGlobalLeaderboardFetch },
+    ],
+    async capture(page) {
+      // Open the real view through its nav button, then wait for the board the
+      // stubbed /api/leaderboard response feeds.
+      await page.evaluate(() => {
+        document.querySelector('#nav-btn-highscores')?.click();
+      });
+      // :not(.hs-head) on purpose: the header row is display:none on mobile-touch,
+      // so polling the first .hs-row would never report a size there.
+      const open = await pollForSize(page, '#hs-leaderboard .hs-row:not(.hs-head)', 20, 300);
+      if (!open) throw new Error('home-page high-score rows did not render');
+      return { clip: '#highscores-view .hs-panel' };
     },
   },
   {

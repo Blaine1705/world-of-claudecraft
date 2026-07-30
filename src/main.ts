@@ -261,6 +261,7 @@ import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { attachGatherNodeHoverTooltip, gatherNodeToolGateFor } from './ui/gather_node_tooltip';
 import { gatherToolNoNodeKey } from './ui/gathering_view';
+import { loadHighscoresInto } from './ui/highscore_board';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
 import { autosizeChatInput } from './ui/hud/chat/chat_input_autosize';
@@ -6185,62 +6186,11 @@ async function loadProjectStats(): Promise<void> {
 }
 
 // Home-page global (cross-realm) lifetime-XP leaderboard. Server computes the
-// virtual level + ranking; this only renders. Re-fetched each time the High
-// Scores view is opened (the server caches, so this is cheap).
-let highscoresLoading = false;
+// virtual level + ranking; the board markup (including the `<Guild>` tag beside
+// each name) lives in ./ui/highscore_board, extracted out of this firewall file
+// the way the news feed was; this call site only supplies the host + fetcher.
 async function loadHighscores(): Promise<void> {
-  const host = $('#hs-leaderboard');
-  if (!host || highscoresLoading) return;
-  highscoresLoading = true;
-  host.innerHTML = `<div class="hs-loading">${t('game.leaderboard.loading')}</div>`;
-  let rows: LeaderboardEntry[] = [];
-  try {
-    rows = await api.leaderboard('global', 100);
-  } catch {
-    host.innerHTML = `<div class="hs-error">${t('game.leaderboard.retry')}</div>`;
-    highscoresLoading = false;
-    return;
-  }
-  highscoresLoading = false;
-  if (rows.length === 0) {
-    host.innerHTML = `<div class="hs-empty">${t('game.leaderboard.empty')}</div>`;
-    return;
-  }
-  const esc = (s: string): string =>
-    s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
-  const rankLabel = t('game.leaderboard.rank');
-  const nameLabel = t('game.leaderboard.name');
-  const realmLabel = t('game.leaderboard.realmCol');
-  const levelLabel = t('game.leaderboard.level');
-  const virtualLevelLabel = t('game.leaderboard.vlevel');
-  const lifetimeXpLabel = t('game.leaderboard.lifetimeXp');
-  const head =
-    `<div class="hs-row hs-head">` +
-    `<span class="hs-rank">${rankLabel}</span>` +
-    `<span class="hs-name">${nameLabel}</span>` +
-    `<span class="hs-realm">${realmLabel}</span>` +
-    `<span class="hs-lvl">${levelLabel}</span>` +
-    `<span class="hs-vlvl">${virtualLevelLabel}</span>` +
-    `<span class="hs-xp">${lifetimeXpLabel}</span></div>`;
-  const body = rows
-    .map((r) => {
-      const cls = CLASSES[r.cls];
-      const star =
-        r.prestigeRank > 0
-          ? `<span class="hs-prestige" title="${t('game.prestige.rank')} ${r.prestigeRank}">★${r.prestigeRank}</span>`
-          : '';
-      return (
-        `<div class="hs-row${r.rank <= 3 ? ' hs-top' : ''}">` +
-        `<span class="hs-rank">${r.rank}</span>` +
-        `<span class="hs-name"${cls ? ` title="${esc(classDisplayName(r.cls))}"` : ''}>${star}${esc(r.name)}</span>` +
-        `<span class="hs-realm" data-label="${esc(realmLabel)}">${esc(r.realm ?? '')}</span>` +
-        `<span class="hs-lvl" data-label="${esc(levelLabel)}">${r.level}</span>` +
-        `<span class="hs-vlvl" data-label="${esc(virtualLevelLabel)}">${r.virtualLevel}</span>` +
-        `<span class="hs-xp" data-label="${esc(lifetimeXpLabel)}">${formatXp(r.lifetimeXp)}</span></div>`
-      );
-    })
-    .join('');
-  host.innerHTML = head + body;
+  await loadHighscoresInto($('#hs-leaderboard'), () => api.leaderboard('global', 100));
 }
 
 // News & Updates: published GitHub releases, proxied + cached by the server.

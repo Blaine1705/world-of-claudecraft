@@ -91,6 +91,10 @@ const newsFeedTs = readFileSync(new URL('../src/ui/news_feed.ts', import.meta.ur
   /\r\n/g,
   '\n',
 );
+const highscoreBoardTs = readFileSync(
+  new URL('../src/ui/highscore_board.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -1572,11 +1576,13 @@ describe('client HTML shell', () => {
   });
 
   it('renders the high scores leaderboard responsively on mobile', () => {
-    expect(mainTs).toContain(
+    // The board markup moved to src/ui/highscore_board.ts (extracted out of main.ts,
+    // the news_feed.ts precedent); the mobile data-label captions moved with it.
+    expect(highscoreBoardTs).toContain(
       // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
       '<span class="hs-realm" data-label="${esc(realmLabel)}">${esc(r.realm ?? \'\')}</span>',
     );
-    expect(mainTs).toContain(
+    expect(highscoreBoardTs).toContain(
       // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
       '<span class="hs-xp" data-label="${esc(lifetimeXpLabel)}">${formatXp(r.lifetimeXp)}</span>',
     );
