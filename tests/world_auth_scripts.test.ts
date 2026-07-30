@@ -12,6 +12,12 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SCRIPTS_ROOT = join(ROOT, 'scripts');
 const AUTHENTICATED_NODE_CLIENTS = [
   {
+    // The R35 admin capture tool: joins one throwaway character over the
+    // wire so the professions inspector reads a LIVE session.
+    path: 'scripts/admin_professions_shot.mjs',
+    authSend: 'ws.send(JSON.stringify(worldAuthMessage(reg.body.token, char.body.id)))',
+  },
+  {
     path: 'scripts/armory_skins_e2e.mjs',
     authSend: 'this.send(worldAuthMessage(token, characterId));',
   },
