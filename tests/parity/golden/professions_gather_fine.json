@@ -11,8 +11,8 @@
     "fine grant costs no extra rng draw (two per granted harvest, unchanged)",
     "gatherResult itemId carries the resolved grade"
   ],
-  "draws": 4,
-  "drawDigest": "313f85da",
+  "draws": 6,
+  "drawDigest": "de061ff8",
   "frames": [
     {
       "tick": 0,
@@ -150,11 +150,11 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 821,
-      "state": "c53be1ed",
-      "events": "778e7220",
+      "state": "a0ddbceb",
+      "events": "88f5686c",
       "rng": {
-        "draws": 0,
-        "digest": "811c9dc5"
+        "draws": 2,
+        "digest": "ad89c14b"
       },
       "label": "fine-grade-at-full-tier-vein",
       "players": [
@@ -173,7 +173,9 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
-          "counters": {},
+          "counters": {
+            "xpGained": 36
+          },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
@@ -183,11 +185,29 @@
               "baked_bread",
               "bronze_sickle",
               "eastbrook_buckler",
+              "fine_iron_ore",
               "mithril_mining_pick",
               "recruit_tunic",
               "worn_sword"
+            ],
+            "visited": [
+              "gather:mirefen_marsh:ore"
             ]
           },
+          "deedsEarned": [
+            [
+              "exp_first_herb",
+              ""
+            ],
+            [
+              "exp_first_ore",
+              ""
+            ],
+            [
+              "prog_first_harvest",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 816,
@@ -199,7 +219,7 @@
           "equipmentInstance": {},
           "gatheringProficiency": {
             "herbalism": 40,
-            "mining": 70
+            "mining": 70.5
           },
           "heroicDaily": {},
           "inventory": [
@@ -214,15 +234,24 @@
             {
               "count": 1,
               "itemId": "bronze_sickle"
+            },
+            {
+              "count": 2,
+              "itemId": "fine_iron_ore"
             }
           ],
+          "lifetimeXp": 36,
           "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
+          "nodeHarvestReadyAt": {
+            "ore_mirefen_t2": 242.1
+          },
           "recipesGrandfathered": true,
+          "renown": 15,
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "xp": 36
         }
       ],
       "entities": [
@@ -242,12 +271,13 @@
           ],
           "blockChance": 0.05,
           "blockValue": 6,
+          "castTotal": 2.1,
           "combatTimer": 101.55,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -4.084635,
+          "fallStartY": -2.136687,
           "fiveSecondRule": 101.55,
           "hp": 100,
           "id": 816,
@@ -262,9 +292,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 48,
-            "y": -4.084635,
-            "z": 352
+            "x": 36,
+            "y": -2.136687,
+            "z": 350
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -295,11 +325,11 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 821,
-      "state": "523bd504",
-      "events": "8acb97a8",
+      "state": "26f8a433",
+      "events": "4e19f7a8",
       "rng": {
-        "draws": 2,
-        "digest": "ad89c14b"
+        "draws": 4,
+        "digest": "313f85da"
       },
       "label": "plain-grade-at-lower-tier-vein",
       "players": [
@@ -319,7 +349,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "xpGained": 36
+            "xpGained": 72
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -330,6 +360,7 @@
               "baked_bread",
               "bronze_sickle",
               "eastbrook_buckler",
+              "fine_iron_ore",
               "iron_ore",
               "mithril_mining_pick",
               "recruit_tunic",
@@ -364,7 +395,7 @@
           "equipmentInstance": {},
           "gatheringProficiency": {
             "herbalism": 40,
-            "mining": 70.25
+            "mining": 70.75
           },
           "heroicDaily": {},
           "inventory": [
@@ -382,13 +413,18 @@
             },
             {
               "count": 2,
+              "itemId": "fine_iron_ore"
+            },
+            {
+              "count": 2,
               "itemId": "iron_ore"
             }
           ],
-          "lifetimeXp": 36,
+          "lifetimeXp": 72,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {
-            "ore_mirefen_1": 244.35
+            "ore_mirefen_1": 244.35,
+            "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
           "renown": 15,
@@ -396,7 +432,7 @@
             "rows": {}
           },
           "townFocus": {},
-          "xp": 36
+          "xp": 72
         }
       ],
       "entities": [
@@ -470,11 +506,11 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 821,
-      "state": "aa21d116",
-      "events": "5f7be6b0",
+      "state": "9d884550",
+      "events": "59f2c770",
       "rng": {
-        "draws": 4,
-        "digest": "313f85da"
+        "draws": 6,
+        "digest": "de061ff8"
       },
       "label": "wrong-profession-tool-does-not-upgrade",
       "players": [
@@ -494,7 +530,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "xpGained": 72
+            "xpGained": 108
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -505,6 +541,7 @@
               "baked_bread",
               "bronze_sickle",
               "eastbrook_buckler",
+              "fine_iron_ore",
               "goldleaf_herb",
               "iron_ore",
               "mithril_mining_pick",
@@ -541,7 +578,7 @@
           "equipmentInstance": {},
           "gatheringProficiency": {
             "herbalism": 41,
-            "mining": 70.25
+            "mining": 70.75
           },
           "heroicDaily": {},
           "inventory": [
@@ -559,18 +596,23 @@
             },
             {
               "count": 2,
+              "itemId": "fine_iron_ore"
+            },
+            {
+              "count": 2,
               "itemId": "iron_ore"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "goldleaf_herb"
             }
           ],
-          "lifetimeXp": 72,
+          "lifetimeXp": 108,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "herb_mirefen_t2": 247.8,
-            "ore_mirefen_1": 244.35
+            "ore_mirefen_1": 244.35,
+            "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
           "renown": 15,
@@ -578,7 +620,7 @@
             "rows": {}
           },
           "townFocus": {},
-          "xp": 72
+          "xp": 108
         }
       ],
       "entities": [
@@ -652,11 +694,11 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 821,
-      "state": "e9e7b7c5",
+      "state": "1db42d51",
       "events": "741638a5",
       "rng": {
-        "draws": 4,
-        "digest": "313f85da"
+        "draws": 6,
+        "digest": "de061ff8"
       },
       "label": "final",
       "players": [
@@ -676,7 +718,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "xpGained": 72
+            "xpGained": 108
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -687,6 +729,7 @@
               "baked_bread",
               "bronze_sickle",
               "eastbrook_buckler",
+              "fine_iron_ore",
               "goldleaf_herb",
               "iron_ore",
               "mithril_mining_pick",
@@ -723,7 +766,7 @@
           "equipmentInstance": {},
           "gatheringProficiency": {
             "herbalism": 41,
-            "mining": 70.25
+            "mining": 70.75
           },
           "heroicDaily": {},
           "inventory": [
@@ -741,18 +784,23 @@
             },
             {
               "count": 2,
+              "itemId": "fine_iron_ore"
+            },
+            {
+              "count": 2,
               "itemId": "iron_ore"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "goldleaf_herb"
             }
           ],
-          "lifetimeXp": 72,
+          "lifetimeXp": 108,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "herb_mirefen_t2": 247.8,
-            "ore_mirefen_1": 244.35
+            "ore_mirefen_1": 244.35,
+            "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
           "renown": 15,
@@ -760,7 +808,7 @@
             "rows": {}
           },
           "townFocus": {},
-          "xp": 72
+          "xp": 108
         }
       ],
       "entities": [

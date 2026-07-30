@@ -34,7 +34,7 @@ import {
 import { createMob } from '../../src/sim/entity';
 import { solveLockActions } from '../../src/sim/lockpick';
 import { startFishing } from '../../src/sim/professions/fishing';
-import { gatherCastDurationSec } from '../../src/sim/professions/gathering';
+import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
 import { Sim } from '../../src/sim/sim';
 import { addThreat } from '../../src/sim/threat';
 import {
@@ -78,6 +78,23 @@ function teleport(sim: AnySim, e: AnyEntity, x: number, z: number): void {
   e.onGround = true;
   e.fallStartY = e.pos.y;
   sim.rebucket(e);
+}
+
+// Stand an entity exactly on a gather node, addressed by ID, with the position
+// read from content instead of copied into a literal here.
+//
+// The literal is what rotted: professions_gather_fine shipped its stand point
+// as `teleport(sim, p, 48, 352)` and went quiet when the v0.32.0 merge moved
+// ore_mirefen_t2 to (36, 350). harvestNode gates on INTERACT_RANGE (5 yd), so a
+// 12.2 yd stale stand point turned that scenario's entire fine-grade arm into a
+// "Too far away." denial, which the golden faithfully recorded (0 draws where 2
+// belonged) and no assertion watched. Deriving the position still moves the
+// golden when content moves, since position is sampled, and that is the gate
+// doing its job; what it buys is that the HARVEST stays a harvest.
+function standOnNode(sim: AnySim, e: AnyEntity, nodeId: string): void {
+  const node = gatherNodeById(nodeId);
+  if (!node) throw new Error(`parity scenario: no gather node ${nodeId}`);
+  teleport(sim, e, node.pos.x, node.pos.z);
 }
 
 // Spawn a mob from a template key and register it (entities + spatial grid),
@@ -4802,15 +4819,17 @@ function professionsGatherFine(seed = 1): Scenario {
       meta.gatheringProficiency.mining = 70;
       meta.gatheringProficiency.herbalism = 40;
 
-      // Step 1: the full-grade vein upgrades.
-      teleport(sim, p, 48, 352); // ore_mirefen_t2, tier 2
+      // Step 1: the full-grade vein upgrades. The stand point is DERIVED from
+      // the node (standOnNode): this step's inlined literal is the one that
+      // went stale and cost the scenario its headline arm.
+      standOnNode(sim, p, 'ore_mirefen_t2'); // tier 2
       sim.harvestNode('ore_mirefen_t2', pid);
       rec.tick(castTicks);
       rec.snapshot('fine-grade-at-full-tier-vein');
       rec.tick(2);
 
       // Step 2: the SAME tool at the zone's tier-1 vein still yields plain.
-      teleport(sim, p, 40, 340); // ore_mirefen_1, tier 1
+      standOnNode(sim, p, 'ore_mirefen_1'); // tier 1
       sim.harvestNode('ore_mirefen_1', pid);
       rec.tick(castTicks);
       rec.snapshot('plain-grade-at-lower-tier-vein');
@@ -4818,7 +4837,7 @@ function professionsGatherFine(seed = 1): Scenario {
 
       // Step 3: the herb patch, worked by a sickle that is only AT its tier.
       // The tier-3 pick in the same bags must not leak across professions.
-      teleport(sim, p, 34, 406); // herb_mirefen_t2, tier 2
+      standOnNode(sim, p, 'herb_mirefen_t2'); // tier 2
       sim.harvestNode('herb_mirefen_t2', pid);
       rec.tick(castTicks);
       rec.snapshot('wrong-profession-tool-does-not-upgrade');

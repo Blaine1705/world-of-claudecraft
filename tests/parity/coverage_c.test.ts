@@ -405,4 +405,41 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(signedUnits).toBeGreaterThanOrEqual(rareGather!.qty);
     expect(signed.length).toBeLessThanOrEqual(Math.ceil(signedUnits / 20));
   });
+
+  // This block exists because its absence is what let the scenario rot. Its
+  // stand point for step 1 was an inlined coordinate; the v0.32.0 merge moved
+  // ore_mirefen_t2 and the harvest became a "Too far away." denial, faithfully
+  // recorded in the golden as 0 draws at the fine-grade frame and 4 total where
+  // three granted harvests are 6. The gate stayed green the whole time, because
+  // nothing here asserted the fine-grade arm actually fires.
+  it('professions_gather_fine: all three harvests grant, and only the full-grade vein upgrades', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'professions_gather_fine')!);
+    const ev = rec.allEvents as Ev[];
+
+    // Three granted harvests, in drive order, each carrying the grade its vein
+    // and tool resolve to: fine at the full-grade vein (tier-3 pick strictly
+    // above iron's rung 2), plain at the zone's tier-1 vein (the vein is below
+    // the rung, so no tool upgrades it), plain at the herb patch (the tier-2
+    // sickle only MATCHES goldleaf's rung, and the pick is the wrong
+    // profession).
+    const gathers = ev.filter((e) => e.type === 'gatherResult');
+    expect(gathers).toHaveLength(3);
+    expect(gathers.map((e) => [e.nodeId, e.itemId])).toEqual([
+      ['ore_mirefen_t2', 'fine_iron_ore'],
+      ['ore_mirefen_1', 'iron_ore'],
+      ['herb_mirefen_t2', 'goldleaf_herb'],
+    ]);
+
+    // No harvest was refused for standing in the wrong place: the exact
+    // regression this block guards, and the reason step 1's stand point is
+    // derived from the node instead of inlined.
+    expect(ev.some((e) => e.type === 'error' && e.text === 'Too far away.')).toBe(false);
+
+    // Two draws per granted harvest and no more: six total, with the
+    // fine-grade arm spending its own two (it spent ZERO while stale).
+    const fine = trace.frames.find((f) => f.label === 'fine-grade-at-full-tier-vein');
+    expect(fine, 'missing the fine-grade checkpoint frame').toBeTruthy();
+    expect(fine!.rng.draws).toBe(2);
+    expect(trace.draws).toBe(6);
+  });
 });
