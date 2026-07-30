@@ -22,15 +22,25 @@
 // membership is what drives the re-diff, and the dispatch comment in
 // server/game.ts records that acceptance).
 
-import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from '../content/professions';
+import {
+  GATHERING_PROFESSION_IDS,
+  type GatheringProfessionId,
+  TOOL_EFFECTS,
+  type ToolEffectId,
+} from '../content/professions';
 import { ITEMS } from '../data';
 import type { SimContext } from '../sim_context';
 import { recordAction, withinActionThrottle } from './action_throttle';
 import { gatherNodeById, NODE_HARVEST_TABLE } from './gathering';
 import {
+  bestOwnedGatherToolFor,
+  NO_TOOL_OWNED,
   resolveRechargeToolEffect,
   resolveSlotToolEffect,
+  slotEffect,
+  slotToolEffectRefused,
   type ToolEffectConfirmMode,
+  type ToolEffectSlot,
 } from './tools';
 
 /**
@@ -89,11 +99,26 @@ export function slotToolEffectAction(
   // shipped quest collects a charm today; the seam contract is what matters,
   // so the first one that does cannot be quietly stale.
   ctx.onInventoryChangedForQuests(r.meta);
+  applyMintedSlot(ctx, r, resolved.professionId, effectId, resolved.slot);
+}
+
+/**
+ * The shared post-mint body of a slot install (the real charm mint above and
+ * the R35 GM restore below): assign the slot, retire the touched profession's
+ * live-cast captures, and emit the success event.
+ */
+function applyMintedSlot(
+  ctx: SimContext,
+  r: NonNullable<ReturnType<SimContext['resolve']>>,
+  professionId: GatheringProfessionId,
+  effectId: string,
+  slot: ToolEffectSlot,
+): void {
   // Created lazily HERE, never in makeMeta: the absent-by-default field is
   // what keeps a player who has never slotted an effect byte-identical in
   // the parity digest (every deny arm above returns before this line).
   r.meta.toolEffectSlots ??= {};
-  r.meta.toolEffectSlots[resolved.professionId] = resolved.slot;
+  r.meta.toolEffectSlots[professionId] = slot;
   // A fresh mint retires a live gather cast's R47 start-capture and R40
   // consent, but ONLY for the profession this mint touches: the re-slot
   // toll (this whole charm) is the sanctioned way DOWN off a price rung, so
@@ -110,7 +135,7 @@ export function slotToolEffectAction(
   // Draw-free field writes; '' / false are the inert values.
   const castNode = r.e.gatherCastNodeId !== '' ? gatherNodeById(r.e.gatherCastNodeId) : undefined;
   const castProfession = castNode ? NODE_HARVEST_TABLE[castNode.type].professionId : undefined;
-  if (castProfession === undefined || castProfession === resolved.professionId) {
+  if (castProfession === undefined || castProfession === professionId) {
     r.e.gatherCastToolRarity = '';
     r.e.gatherCastEffectConfirmed = false;
   }
@@ -118,10 +143,48 @@ export function slotToolEffectAction(
     type: 'toolEffectResult',
     action: 'slot',
     ok: true,
-    professionId: resolved.professionId,
+    professionId,
     effectId,
     pid: r.meta.entityId,
   });
+}
+
+/**
+ * GM restore of a lost tool-effect slot row (R35): mint `effectId` onto
+ * `professionId` at full charges WITHOUT consuming a charm. This is exactly
+ * the free acquisition the module header's incident bans from every
+ * player-reachable path, so it is exported for the server ADMIN runtime
+ * alone: no wire command routes here, no IWorld member exposes it, and the
+ * admin surface audits every call with an operator identity and reason. The
+ * mint mirrors a real slot everywhere else: the same profession/effect/pair
+ * validation, the same no-tool refusal (R30 sizes charges by the best tool
+ * OWNED, so a toolless character has no honest charge count; restore the
+ * tool first), full charges sized by that tool's rarity, the same post-mint
+ * capture hygiene, and the same success event so the player sees it land.
+ * `craftedBy` stays unset (there is no consumed copy to take provenance
+ * from), so a restored slot pays the generic recharge rate, the documented
+ * unsigned arm. `confirmMode` mints 'always', the fresh-install default.
+ * Draw-free, like everything in this module.
+ */
+export function restoreToolEffectSlotAction(
+  ctx: SimContext,
+  professionId: string,
+  effectId: string,
+  pid?: number,
+): 'ok' | 'invalid_request' | 'no_tool' | 'offline' {
+  const r = ctx.resolve(pid);
+  if (!r) return 'offline';
+  if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) {
+    return 'invalid_request';
+  }
+  if (!Object.hasOwn(TOOL_EFFECTS, effectId)) return 'invalid_request';
+  if (slotToolEffectRefused(professionId, effectId)) return 'invalid_request';
+  const profession = professionId as GatheringProfessionId;
+  const best = bestOwnedGatherToolFor(r.meta.inventory, profession, ITEMS);
+  if (best.ownedTier === NO_TOOL_OWNED) return 'no_tool';
+  const slot = slotEffect(effectId as ToolEffectId, { toolRarity: best.rarity });
+  applyMintedSlot(ctx, r, profession, effectId, slot);
+  return 'ok';
 }
 
 /**
