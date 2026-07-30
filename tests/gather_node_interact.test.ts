@@ -214,6 +214,112 @@ describe('handleGatherNodeInteract', () => {
     expect(calls).toEqual(['node_a']);
     expect(errors).toEqual([]);
   });
+
+  describe('the R40 effect-confirm gate', () => {
+    function confirmWorld() {
+      const calls: { nodeId: string; confirm: boolean | undefined }[] = [];
+      return {
+        world: {
+          nodeHarvestableByMe: () => true,
+          harvestNode: (nodeId: string, confirmEffectUse?: boolean) => {
+            calls.push({ nodeId, confirm: confirmEffectUse });
+            return true;
+          },
+        },
+        calls,
+      };
+    }
+
+    it('defers to the dialog and sends with the answer; either answer harvests', () => {
+      for (const answer of [true, false]) {
+        const { world, calls } = confirmWorld();
+        const { hud, errors } = fakeHud();
+        let asked: { effectId: string; charges: number } | null = null;
+        const gate = {
+          needed: () => ({ effectId: 'artisans_eye', charges: 3 }),
+          ask: (
+            prompt: { effectId: string; charges: number },
+            proceed: (confirmed: boolean) => void,
+          ) => {
+            asked = prompt;
+            proceed(answer);
+          },
+        };
+        expect(
+          handleGatherNodeInteract(
+            world,
+            hud,
+            { x: 0, y: 0, z: 0 },
+            'node_a',
+            nodePos,
+            tooFarText,
+            notReadyText,
+            undefined,
+            gate,
+          ),
+        ).toBe(true);
+        expect(asked).toEqual({ effectId: 'artisans_eye', charges: 3 });
+        expect(calls).toEqual([{ nodeId: 'node_a', confirm: answer }]);
+        expect(errors).toEqual([]);
+      }
+    });
+
+    it('a null needed answer sends the plain pre-flow command, no dialog', () => {
+      const { world, calls } = confirmWorld();
+      const { hud } = fakeHud();
+      let asks = 0;
+      const gate = {
+        needed: () => null,
+        ask: () => {
+          asks++;
+        },
+      };
+      handleGatherNodeInteract(
+        world,
+        hud,
+        { x: 0, y: 0, z: 0 },
+        'node_a',
+        nodePos,
+        tooFarText,
+        notReadyText,
+        undefined,
+        gate,
+      );
+      expect(asks).toBe(0);
+      expect(calls).toEqual([{ nodeId: 'node_a', confirm: undefined }]);
+    });
+
+    it('a denied verdict never opens the dialog (the ask sits after every deny arm)', () => {
+      const { world, calls } = confirmWorld();
+      const { hud, errors } = fakeHud();
+      let consulted = 0;
+      const gate = {
+        needed: () => {
+          consulted++;
+          return { effectId: 'artisans_eye', charges: 3 };
+        },
+        ask: () => {
+          throw new Error('a denied harvest must not ask');
+        },
+      };
+      expect(
+        handleGatherNodeInteract(
+          world,
+          hud,
+          { x: 0, y: 0, z: 0 },
+          'node_a',
+          { x: 99, z: 99 },
+          tooFarText,
+          notReadyText,
+          undefined,
+          gate,
+        ),
+      ).toBe(false);
+      expect(consulted).toBe(0);
+      expect(calls).toEqual([]);
+      expect(errors).toEqual([tooFarText]);
+    });
+  });
 });
 
 // The sim command behind the interact helper starts a gather CAST
@@ -235,7 +341,7 @@ describe('the real harvestNode behind the helper (cast start)', () => {
     p.pos.z = node.pos.z;
     p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
     p.prevPos = { ...p.pos };
-    expect(sim.harvestNode(node.id, pid)).toBe(true);
+    expect(sim.harvestNode(node.id, undefined, pid)).toBe(true);
     expect(p.castingAbility).toBe(GATHER_CAST_ID);
     // Band 0, tier-1 node: a tier-1 pick at a tier-1 node still casts the
     // 2.5s base (only a tool tier ABOVE the node shortens it).

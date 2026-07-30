@@ -1068,7 +1068,7 @@ describe('the pitch police and live profession sessions', () => {
     }
     sim.addItem('gathering_sickle', 1, a);
     teleport(sim, a, 23, -99); // herb_eastbrook_4, inside the pitch
-    expect(sim.harvestNode('herb_eastbrook_4', a)).toBe(true);
+    expect(sim.harvestNode('herb_eastbrook_4', undefined, a)).toBe(true);
     const e = sim.entities.get(a);
     if (!e) throw new Error('missing fighter');
     expect(e.castingAbility).not.toBeNull();
@@ -1104,7 +1104,7 @@ describe('the pitch police and live profession sessions', () => {
     const c = sim.addPlayer('warrior', 'Herbalist');
     sim.addItem('gathering_sickle', 1, c);
     teleport(sim, c, 23, -99);
-    expect(sim.harvestNode('herb_eastbrook_4', c)).toBe(true);
+    expect(sim.harvestNode('herb_eastbrook_4', undefined, c)).toBe(true);
     const e = sim.entities.get(c);
     if (!e) throw new Error('missing herbalist');
     expect(e.castingAbility).not.toBeNull();

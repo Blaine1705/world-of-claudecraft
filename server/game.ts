@@ -4560,10 +4560,13 @@ export class GameServer {
           );
         break;
       case 'harvest_node':
+        // `confirmUse` (R40): strict boolean-true, the `commission` idiom; a
+        // missing or malformed flag reads unconfirmed, the fail-safe arm (a
+        // 'prompt' slot skips its effect and keeps the charge).
         this.sendCommandOutcome(
           session,
           msg,
-          typeof msg.node === 'string' && sim.harvestNode(msg.node, pid),
+          typeof msg.node === 'string' && sim.harvestNode(msg.node, msg.confirmUse === true, pid),
         );
         break;
       case 'craft_item':

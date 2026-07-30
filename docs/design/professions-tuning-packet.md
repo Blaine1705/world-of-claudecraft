@@ -574,13 +574,17 @@ Its own phase because it is the only one that touches persistence and the wire.
   pins BOTH directions so the gate cannot rot into a no-op. Remove it in the
   same change that ships the craft.
 
-- **`prompt` mode is refused until a confirmation flow exists.** `resolveHarvest`
-  passes `confirmed: true` unconditionally, so a `prompt` slot would fire and
-  spend a charge on every harvest while telling its owner it asks first.
-  Accepting the mode is what would make that comment in `gathering.ts` false,
-  so `resolveSlotToolEffect` refuses it and the HUD badge that advertised it
-  was removed. The machinery in `resolveToolEffectUse` stays, ready for the
-  flow.
+- **`prompt` mode is REAL as of the phase 14 confirm flow (R40).** The
+  historical refusal (the resolver denied `prompt` while `resolveHarvest`
+  passed `confirmed: true` unconditionally, and the HUD badge that
+  advertised the mode was removed with it) is retired whole:
+  `resolveSlotToolEffect` accepts the union, the harvest command carries the
+  per-use consent (`confirmUse`, strict boolean-true, omitted on every
+  unconfirmed harvest so the wire stays byte-identical), the cast-start
+  capture threads it through both capacity pre-gates and the grant, and
+  `applyToolEffectUse` gates the fire. The fail-safe arm is the doctrine: a
+  stale bundle that never sends the flag gathers normally, spends nothing,
+  and simply never fires its prompt slot.
 
 - **`craftedBy` is left unset at slot time** (as of phase 7; phase 12's craft
   now writes it from the consumed charm's signer, a character name, which is

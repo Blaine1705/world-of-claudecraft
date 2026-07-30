@@ -50,7 +50,7 @@ function despawnMobs(sim: Sim): void {
 function startGatherSession(sim: Sim, pid: number): Entity {
   sim.addItem('copper_mining_pick', 1, pid);
   teleportTo(sim, pid, NODE.pos.x, NODE.pos.z);
-  expect(sim.harvestNode(NODE.id, pid)).toBe(true);
+  expect(sim.harvestNode(NODE.id, undefined, pid)).toBe(true);
   const p = sim.entities.get(pid);
   if (!p) throw new Error('missing entity');
   expect(p.castingAbility).toBe(GATHER_CAST_ID);

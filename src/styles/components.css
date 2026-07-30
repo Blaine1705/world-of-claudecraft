@@ -7215,8 +7215,32 @@
     padding: 2px 10px;
     font-size: 11px;
   }
+  /* The R40 prompt-mode chip on a live slot line: words, not hue, per the
+     color-independence rule (the chip IS the second signal). */
+  .prof-effect-mode {
+    font-size: 10px;
+    color: var(--color-text-light);
+    border: 1px solid currentcolor;
+    border-radius: 3px;
+    padding: 0 4px;
+    opacity: 0.85;
+  }
+  /* The "Ask each use" toggle beside the slot buttons: a real labeled
+     checkbox, baseline-aligned with the compact buttons. */
+  .prof-effect-mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--color-text-light);
+    cursor: pointer;
+  }
   @media (pointer: coarse) {
     .prof-effect-btn {
+      min-height: 40px;
+    }
+    /* The checkbox target grows with the buttons on coarse pointers. */
+    .prof-effect-mode-toggle {
       min-height: 40px;
     }
   }

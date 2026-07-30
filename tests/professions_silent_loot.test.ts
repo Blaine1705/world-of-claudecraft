@@ -108,7 +108,7 @@ describe('professions grants suppress BOTH generic hub feedbacks', () => {
     // the actual grant lands later via completeGatherCast once the cast
     // timer runs out. GATHER_CAST_BASE_SEC (2.5s) is the longest possible
     // cast, so 3 seconds of ticks always clears it.
-    expect(sim.harvestNode(NODE_ID, pid)).toBe(true);
+    expect(sim.harvestNode(NODE_ID, undefined, pid)).toBe(true);
     const events: SimEvent[] = [];
     for (let i = 0; i < 20 * 3; i++) events.push(...sim.tick());
     const loot = lootEvents(events);

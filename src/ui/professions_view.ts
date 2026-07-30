@@ -282,6 +282,12 @@ export interface ProfessionsViewInput {
    *  resolveSlotToolEffect as the slotter, so the consume-copy preference
    *  and the R48 provenance arm evaluate exactly as the server will. */
   viewerName: string;
+  /** Profession ids whose "Ask each use" toggle is ON (painter-local UI
+   *  state, R40): the slot affordance asks the resolver with the mode the
+   *  button will actually SEND, so a same-effect re-slot that only changes
+   *  the confirm mode renders its button exactly when the server would
+   *  accept it (the no_gain mode conjunct). Omitted reads as none. */
+  slotModePrompt?: readonly string[];
 }
 
 export interface ProfessionsCraftRow {
@@ -309,6 +315,9 @@ export interface GatheringToolEffectModel {
    *  button never second-guesses the resolver, so it cannot offer an action
    *  the server refuses. */
   rechargeable: boolean;
+  /** The slot's live confirm mode (R40): 'prompt' rows chip "Asks each use"
+   *  so the per-use dialog never surprises. */
+  confirmMode: 'always' | 'prompt';
 }
 
 export interface ProfessionsGatheringRow {
@@ -461,6 +470,7 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
             charges: slot.charges,
             maxCharges: slot.maxCharges,
             spent: slot.charges <= 0,
+            confirmMode: slot.confirmMode,
             // The recharge affordance asks the sim's own resolver over the
             // mirrored bags: a slot-shaped view row carries everything the
             // ok/deny half of the resolution reads (the recharger identity
@@ -504,7 +514,10 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
             input.inventory,
             row.professionId,
             effectId,
-            'always',
+            // The mode the button will actually send (R40): with the row's
+            // "Ask each use" toggle on, a same-effect re-slot that only
+            // changes the mode is a gain and must render its button.
+            input.slotModePrompt?.includes(row.professionId) ? 'prompt' : 'always',
             ITEMS,
             input.viewerName,
             liveSlotFor(slot, input.viewerName),
@@ -596,6 +609,11 @@ export function professionsRefreshSig(
     // The slotter identity itself: a rename moves every name-derived
     // affordance in one repaint.
     input.viewerName,
+    // The R40 "Ask each use" toggles: the slottable set asks the resolver
+    // with the mode the button will send, so flipping a toggle can change
+    // which buttons exist and must repaint. Sorted: set order is not a
+    // repaint dimension.
+    [...(input.slotModePrompt ?? [])].sort(),
     [...local],
   ]);
 }

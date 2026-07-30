@@ -1581,6 +1581,13 @@ export class Hud {
   private readonly playerCard: PlayerCardController;
   // Shared by the confirm + input modals (one #confirm-dialog id; they never coexist).
   private confirmTrap: FocusTrapHandle | null = null;
+  // The pending no-choice callback of the OPEN confirm dialog (R40 family):
+  // fired exactly once on ANY dismissal that is not the OK button (cancel
+  // click, Esc through closeManagedWindow, replacement by a newer modal), so
+  // a flow that must always answer (the per-use effect confirm sends the
+  // harvest either way) can never hang on a dismissed dialog. Null for every
+  // dialog that passed no onCancel; cleared BEFORE onOk runs.
+  private confirmOnCancel: (() => void) | null = null;
   // The first-tier tutorial modal's focus trap (#profession-tutorial).
   private professionTutorialTrap: FocusTrapHandle | null = null;
   private meters: Meters;
@@ -2869,6 +2876,9 @@ export class Hud {
         this.confirmTrap?.release();
         this.confirmTrap = null;
         el.remove();
+        // Esc/closeAll is a dismissal without a choice: the pending
+        // no-choice callback (the R40 family) must still answer.
+        this.fireConfirmCancel();
         break;
       case 'profession-tutorial':
         // Route through closeProfessionTutorial so the focus trap is released
@@ -13764,10 +13774,15 @@ export class Hud {
     okText: string,
     cancelText: string,
     onOk: () => void,
+    onCancel?: () => void,
   ): void {
     this.confirmTrap?.release(false);
     this.confirmTrap = null;
+    // A replaced dialog was dismissed without a choice: its pending
+    // no-choice callback (if any) fires before the new one takes the slot.
+    this.fireConfirmCancel();
     document.getElementById('confirm-dialog')?.remove();
+    this.confirmOnCancel = onCancel ?? null;
     const el = document.createElement('div');
     el.id = 'confirm-dialog';
     el.className = 'window panel';
@@ -13806,12 +13821,62 @@ export class Hud {
       b.addEventListener('click', () => {
         audio.click();
         close();
+        this.fireConfirmCancel();
       });
     });
     el.querySelector('[data-ok]')?.addEventListener('click', () => {
+      // A made choice: the no-choice callback must NOT fire on the removal.
+      this.confirmOnCancel = null;
       close();
       onOk();
     });
+  }
+
+  /** Fire-and-clear the open confirm dialog's no-choice callback (see the
+   *  field doc). Safe to call when none is pending. */
+  private fireConfirmCancel(): void {
+    const pending = this.confirmOnCancel;
+    this.confirmOnCancel = null;
+    pending?.();
+  }
+
+  // The R40 per-use effect confirm (gather_node_interact.ts
+  // GatherEffectConfirmGate.ask): rides the one confirm-dialog family, so
+  // the focus trap, dialog key activation, aria naming, gamepad A/B, and
+  // mobile tap treatment are all inherited. OK confirms the spend; the
+  // cancel button, the X, and Esc all decline, and DECLINING STILL GATHERS
+  // (the ruling's letter: prompt mode gates the charge, never the gather),
+  // which is why the body copy says so and why `proceed` runs on every
+  // dismissal path via the onCancel hook.
+  confirmToolEffectUse(
+    prompt: { effectId: string; charges: number },
+    proceed: (confirmed: boolean) => void,
+  ): void {
+    const nameKey = Object.hasOwn(TOOL_EFFECT_NAME_KEYS, prompt.effectId)
+      ? TOOL_EFFECT_NAME_KEYS[prompt.effectId]
+      : undefined;
+    // An unknown effect id (a newer server's catalog) cannot compose the
+    // ask: degrade to an unconfirmed harvest rather than a broken dialog.
+    if (nameKey === undefined) {
+      proceed(false);
+      return;
+    }
+    let answered = false;
+    const answer = (confirmed: boolean) => {
+      if (answered) return;
+      answered = true;
+      proceed(confirmed);
+    };
+    this.confirmDialog(
+      t('hudChrome.professions.toolEffectConfirmTitle', { effect: t(nameKey) }),
+      t('hudChrome.professions.toolEffectConfirmBody', {
+        charges: formatNumber(prompt.charges, { maximumFractionDigits: 0 }),
+      }),
+      t('hudChrome.professions.toolEffectConfirmAccept'),
+      t('hudChrome.professions.toolEffectConfirmDecline'),
+      () => answer(true),
+      () => answer(false),
+    );
   }
 
   // In-app text-input modal (reuses the confirm-dialog chrome) — replaces native
@@ -13832,6 +13897,9 @@ export class Hud {
   }): void {
     this.confirmTrap?.release(false);
     this.confirmTrap = null;
+    // Shares the #confirm-dialog slot: a replaced confirm's pending
+    // no-choice callback (R40 family) fires before the input modal takes it.
+    this.fireConfirmCancel();
     document.getElementById('confirm-dialog')?.remove();
     const el = document.createElement('div');
     el.id = 'confirm-dialog';

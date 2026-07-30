@@ -2439,6 +2439,12 @@ export const en_XA: EnTranslations = {
       "toolEffectCharges": "[{charges} óƒ {max} çĥáŕĝéš]",
       "toolEffectSpent": "[Šþéñţ, ñééðš ŕéçĥáŕĝíñĝ]",
       "toolEffectDepleted": "[Ţóóļ éƒƒéçţ šþéñţ]",
+      "toolEffectModeAsk": "[Ášķ éáçĥ úšé]",
+      "toolEffectModePrompt": "[Ášķš éáçĥ úšé]",
+      "toolEffectConfirmTitle": "[Úšé {effect}?]",
+      "toolEffectConfirmBody": "[Šþéñð óñé óƒ {charges} çĥáŕĝéš óñ ţĥíš ĥáŕʋéšţ? Ðéçļíñíñĝ šţíļļ ĝáţĥéŕš, ŵíţĥóúţ ţĥé ƀóñúš.]",
+      "toolEffectConfirmAccept": "[Úšé á Çĥáŕĝé]",
+      "toolEffectConfirmDecline": "[Ĝáţĥéŕ Ŵíţĥóúţ]",
       "toolEffectName": {
         "gatherersCache": "[Ĝáţĥéŕéŕ'š Çáçĥé]",
         "artisansEye": "[Áŕţíšáñ'š Éýé]",

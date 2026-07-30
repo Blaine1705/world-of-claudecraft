@@ -123,23 +123,23 @@ describe('gather quest objectives', () => {
     sim.addItem('handaxe', 1, pid);
 
     // Too far away, so the server denies without quest credit.
-    sim.harvestNode(ore.id, pid);
+    sim.harvestNode(ore.id, undefined, pid);
     expect(qp.counts).toEqual([0, 0]);
 
     // A successful nonmatching gather still does not count.
     teleportOntoNode(sim, pid, wood.id);
-    sim.harvestNode(wood.id, pid);
+    sim.harvestNode(wood.id, undefined, pid);
     completeCastNow(sim, pid);
     expect(qp.counts).toEqual([0, 0]);
 
     teleportOntoNode(sim, pid, ore.id);
-    sim.harvestNode(ore.id, pid);
+    sim.harvestNode(ore.id, undefined, pid);
     completeCastNow(sim, pid);
     expect(qp.counts).toEqual([1, 1]);
     expect(qp.state).toBe('ready');
 
     // The same node is now cooling down. Its denied replay cannot over-credit.
-    sim.harvestNode(ore.id, pid);
+    sim.harvestNode(ore.id, undefined, pid);
     expect(qp.counts).toEqual([1, 1]);
   });
 });
@@ -167,7 +167,7 @@ describe('gather quest objectives across material grades', () => {
     )!;
     teleportOntoNode(sim, pid, ore.id);
 
-    expect(sim.harvestNode(ore.id, pid)).toBe(true);
+    expect(sim.harvestNode(ore.id, undefined, pid)).toBe(true);
     completeCastNow(sim, pid);
 
     // The premise: the grant really was the fine grade, not the base id.
@@ -189,7 +189,7 @@ describe('gather quest objectives across material grades', () => {
     )!;
     teleportOntoNode(sim, pid, wood.id);
 
-    expect(sim.harvestNode(wood.id, pid)).toBe(true);
+    expect(sim.harvestNode(wood.id, undefined, pid)).toBe(true);
     completeCastNow(sim, pid);
 
     expect(sim.countItem('ironbark_log', pid)).toBeGreaterThanOrEqual(1);

@@ -581,3 +581,93 @@ describe('professions window: two-column craft list CSS', () => {
     expect(rule).toContain('grid-template-columns: minmax(0, 1fr);');
   });
 });
+
+// ---------------------------------------------------------------------------
+// The R40 prompt-mode surfaces: the "Ask each use" toggle (painter-local,
+// configures the NEXT mint), the mode riding the sent command, and the live
+// slot's "Asks each use" chip. Window-level on purpose: the mode-in-the-wire
+// claim rides buildInput/wire, not the view core alone.
+// ---------------------------------------------------------------------------
+
+describe('ProfessionsWindow: R40 prompt-mode surfaces', () => {
+  function charmState(): WorldState {
+    const state = baseState();
+    state.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'artisans_eye', count: 1 },
+    ];
+    return state;
+  }
+
+  function windowWith(state: WorldState, sent: unknown[][]) {
+    return makeWindow(state, {
+      world: () =>
+        ({
+          craftingIdentity: state.identity,
+          professionsState: { skills: state.gathering },
+          toolEffectSlots: state.toolEffects ?? [],
+          inventory: state.inventory ?? [],
+          player: { name: 'Testchar' },
+          slotToolEffect: (...args: unknown[]) => {
+            sent.push(args);
+          },
+        }) as never,
+    });
+  }
+
+  it('renders the toggle beside the slot buttons; unchecked sends the plain two-arg command', () => {
+    const sent: unknown[][] = [];
+    const { el } = windowWith(charmState(), sent);
+    const box = el.querySelector<HTMLInputElement>('[data-slot-mode="mining"]');
+    expect(box).not.toBeNull();
+    expect(box?.checked).toBe(false);
+    el.querySelector<HTMLElement>('[data-slot-effect]')?.click();
+    // No third argument at all: the unchecked send stays byte-identical.
+    expect(sent).toEqual([['mining', 'artisans_eye']]);
+  });
+
+  it('a checked toggle survives the rebuild it triggers and mints prompt mode', () => {
+    const sent: unknown[][] = [];
+    const { el } = windowWith(charmState(), sent);
+    const box = el.querySelector<HTMLInputElement>('[data-slot-mode="mining"]');
+    if (!box) throw new Error('missing mode toggle');
+    box.checked = true;
+    box.dispatchEvent(new Event('change', { bubbles: true }));
+    // The change handler repaints (the slottable set can move with the
+    // mode); the fresh checkbox must still be checked or the choice silently
+    // resets under the player.
+    const fresh = el.querySelector<HTMLInputElement>('[data-slot-mode="mining"]');
+    expect(fresh).not.toBeNull();
+    expect(fresh?.checked).toBe(true);
+    el.querySelector<HTMLElement>('[data-slot-effect]')?.click();
+    expect(sent).toEqual([['mining', 'artisans_eye', 'prompt']]);
+  });
+
+  it('a live prompt slot chips "Asks each use"; an always slot chips nothing', () => {
+    const state = baseState();
+    state.toolEffects = [
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        charges: 12,
+        maxCharges: 30,
+        confirmMode: 'prompt',
+      },
+    ];
+    const { el } = makeWindow(state);
+    expect(el.querySelector('.prof-effect-mode')?.textContent).toBe('Asks each use');
+
+    const always = baseState();
+    always.toolEffects = [
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        charges: 12,
+        maxCharges: 30,
+        confirmMode: 'always',
+      },
+    ];
+    const { el: alwaysEl } = makeWindow(always);
+    expect(alwaysEl.querySelector('.prof-effect-mode')).toBeNull();
+  });
+});

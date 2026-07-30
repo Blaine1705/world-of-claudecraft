@@ -2439,6 +2439,12 @@ export const zh_TW: EnTranslations = {
       "toolEffectCharges": "剩餘 {charges} / {max} 次",
       "toolEffectSpent": "已耗盡，需要充能",
       "toolEffectDepleted": "工具效果已耗盡",
+      "toolEffectModeAsk": "每次使用前詢問",
+      "toolEffectModePrompt": "每次使用前會詢問",
+      "toolEffectConfirmTitle": "使用{effect}？",
+      "toolEffectConfirmBody": "本次採集消耗 1 次充能（剩餘 {charges} 次）？拒絕後仍會採集，只是沒有加成。",
+      "toolEffectConfirmAccept": "消耗充能",
+      "toolEffectConfirmDecline": "直接採集",
       "toolEffectName": {
         "gatherersCache": "採集者儲囊",
         "artisansEye": "匠人之眼",

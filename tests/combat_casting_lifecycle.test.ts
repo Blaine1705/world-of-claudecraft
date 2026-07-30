@@ -573,7 +573,7 @@ describe('casting_lifecycle: session starts clear the queued slot', () => {
     p.pos.z = node.pos.z;
     p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
     p.prevPos = { ...p.pos };
-    expect(sim.harvestNode(node.id, p.id)).toBe(true);
+    expect(sim.harvestNode(node.id, undefined, p.id)).toBe(true);
     expect(p.castingAbility).toBe(GATHER_CAST_ID);
     expect(p.queuedCastAbility).toBeNull();
     expect(p.queuedCastAim).toBeNull();

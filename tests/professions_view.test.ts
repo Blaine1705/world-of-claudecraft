@@ -139,6 +139,9 @@ describe('buildProfessionsView: model construction', () => {
         // affordance stays off (the resolver-derived arms below cover the
         // positive cases).
         rechargeable: false,
+        // The R40 mode projection: the live slot's own confirm mode, so the
+        // "Asks each use" chip renders from the row.
+        confirmMode: 'always',
       });
       // The OTHER row must stay null, so the join is a join and not a broadcast.
       expect(byId.get('logging')?.effect).toBeNull();

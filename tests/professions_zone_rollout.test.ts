@@ -614,7 +614,7 @@ describe('the new-zone checklist: every complete zone arrives mechanically whole
     // Negative control: the mark is absent before the harvest, so the read
     // below cannot pass off a pre-seeded set as a producer write.
     expect(meta.deedStats.visited.has(MARK), 'the mark must not pre-exist').toBe(false);
-    expect(sim.harvestNode(node.id, pid), 'the gather cast must be granted').toBe(true);
+    expect(sim.harvestNode(node.id, undefined, pid), 'the gather cast must be granted').toBe(true);
     for (let i = 0; i < 80 && p.castingAbility; i++) sim.tick();
     expect(p.castingAbility, 'the gather cast must finish inside the drive').toBeNull();
     // The grant really landed: the mark writes only on the granted path, so

@@ -7877,8 +7877,12 @@ export class Sim {
   // Gather-node harvest (#1121): a thin delegate onto
   // src/sim/professions/gathering.ts, resolved on the deterministic tick the
   // command arrives on, same as buyItem/useItem above.
-  harvestNode(nodeId: string, pid?: number): boolean {
-    return harvestNodeImpl(this.ctx, nodeId, pid);
+  // `confirmEffectUse` (R40) sits before pid to match the IWorld facet's
+  // (nodeId, confirmEffectUse?) shape positionally; pid stays last, the
+  // slotToolEffect convention. Callers naming a pid pass undefined through
+  // the consent slot.
+  harvestNode(nodeId: string, confirmEffectUse?: boolean, pid?: number): boolean {
+    return harvestNodeImpl(this.ctx, nodeId, pid, confirmEffectUse === true);
   }
 
   // IWorld read surface (IWorldProfessions): whether the given node is

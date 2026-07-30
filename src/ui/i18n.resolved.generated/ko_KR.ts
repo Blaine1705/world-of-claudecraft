@@ -2439,6 +2439,12 @@ export const ko_KR: EnTranslations = {
       "toolEffectCharges": "{charges} / {max}회 남음",
       "toolEffectSpent": "모두 소모됨, 재충전 필요",
       "toolEffectDepleted": "도구 효과를 모두 소모했습니다",
+      "toolEffectModeAsk": "사용할 때마다 확인",
+      "toolEffectModePrompt": "사용 시마다 확인함",
+      "toolEffectConfirmTitle": "{effect}을(를) 사용하시겠습니까?",
+      "toolEffectConfirmBody": "이번 채집에 남은 {charges}회 중 1회를 소모하시겠습니까? 거절해도 채집은 진행되지만 보너스는 없습니다.",
+      "toolEffectConfirmAccept": "1회 사용",
+      "toolEffectConfirmDecline": "그냥 채집",
       "toolEffectName": {
         "gatherersCache": "채집가의 주머니",
         "artisansEye": "장인의 눈",

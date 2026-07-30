@@ -268,7 +268,7 @@ describe('a slotted tool effect changes the yield and never the draw stream', ()
     p.pos.z = t2.pos.z;
     p.prevPos = { ...p.pos };
     sim.drainEvents();
-    expect(sim.harvestNode(t2.id, pid)).toBe(false);
+    expect(sim.harvestNode(t2.id, undefined, pid)).toBe(false);
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
       { type: 'gatherDenied', pid, surface: 'node', professionId: 'mining', requiredTier: 2 },
     ]);

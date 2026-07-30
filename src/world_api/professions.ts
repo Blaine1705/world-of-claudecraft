@@ -225,7 +225,13 @@ export interface IWorldProfessions {
    *  (professions/gathering.ts nodeRespawnRemainingSec); online it reads the
    *  `ncd` mirror, whose entries are already remaining seconds. */
   nodeRespawnSeconds(nodeId: string): number | null;
-  harvestNode(nodeId: string): WorldInteractionOutcome;
+  // `confirmEffectUse` (R40): the per-use consent for a 'prompt'-mode tool
+  // effect slot on this harvest. A boolean flag ONLY (the craftItem
+  // `commission` precedent): omitted or false sends a wire message
+  // byte-identical to the pre-flow form and the effect simply does not fire
+  // (no bonus, no charge; the harvest itself proceeds). The sim re-validates
+  // everything server-side; an 'always' slot ignores the flag entirely.
+  harvestNode(nodeId: string, confirmEffectUse?: boolean): WorldInteractionOutcome;
   recipeList: readonly RecipeDef[];
   lastCraftResult: CraftResultView | null;
   lastMasterwork: MasterworkView | null;
@@ -344,12 +350,14 @@ export interface IWorldProfessions {
   // text-free toolEffectResult event reports it).
   //
   // `confirmMode` defaults to 'always' (#1136's behaviour) when omitted, so the
-  // wire message for a caller that never touches it stays minimal. The type
-  // deliberately admits ONLY 'always': every host silently refuses 'prompt'
-  // today (resolveSlotToolEffect, no confirmation flow exists), so the seam
-  // must not advertise a mode no world honors. The acquisition craft's
-  // confirm flow re-widens this to 'always' | 'prompt' when it ships.
-  slotToolEffect(professionId: string, effectId: string, confirmMode?: 'always'): void;
+  // wire message for a caller that never touches it stays minimal. The union
+  // re-widened to 'always' | 'prompt' with the R40 confirm flow: a 'prompt'
+  // slot spends a charge only on an explicit per-use confirmation, carried by
+  // `harvestNode`'s confirmEffectUse flag and honored end to end
+  // (resolveSlotToolEffect accepts the mode, completeGatherCast threads the
+  // consent, applyToolEffectUse gates the fire), so the seam now advertises
+  // exactly what both worlds honor.
+  slotToolEffect(professionId: string, effectId: string, confirmMode?: 'always' | 'prompt'): void;
   // Recharge the viewer's slotted effect on `professionId`, for the arcane
   // material of the recharge-time best tool's rarity rung at a count scaled
   // to the charges restored (R39), refilling to the maximum re-derived from

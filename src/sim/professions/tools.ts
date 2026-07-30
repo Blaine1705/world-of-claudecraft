@@ -346,13 +346,13 @@ export type ResolvedSlotToolEffect =
  *   - an effect id absent from the live catalog
  *   - a pair the slot POLICY refuses (`slotToolEffectRefused` below: the
  *     Springback Charm everywhere, every effect on fishing)
- *   - any confirm mode other than 'always'. A malformed value is refused
- *     OUTRIGHT rather than falling back, and 'prompt' is refused too, for now:
- *     `resolveHarvest` passes `confirmed: true` unconditionally because no
- *     confirmation flow exists, so a 'prompt' slot would fire and spend a
- *     charge on every harvest while telling its owner it asks first. Accepting
- *     it here is what would make that comment in gathering.ts false. The
- *     'prompt' machinery in `applyToolEffectUse` stays, ready for the flow.
+ *   - any confirm mode outside the union. A malformed value is refused
+ *     OUTRIGHT rather than falling back; 'prompt' is accepted since the R40
+ *     confirm flow shipped: the harvest command carries the per-use consent
+ *     (confirmEffectUse), completeGatherCast threads it into the grade
+ *     resolution and the grant, and `applyToolEffectUse` gates the fire, so
+ *     a 'prompt' slot genuinely asks first and an unconfirmed use costs
+ *     nothing.
  *   - no REAL tool carried for that profession. Reads
  *     `bestOwnedGatherToolTierOrNone`, which returns NO_TOOL_OWNED rather than
  *     the bare-hands floor, so carrying nothing is not carrying a tier-1 tool.
@@ -394,7 +394,9 @@ export function resolveSlotToolEffect(
   if (slotToolEffectRefused(professionId, effectId)) {
     return { ok: false, reason: 'invalid_request' };
   }
-  if (confirmMode !== 'always') return { ok: false, reason: 'invalid_request' };
+  if (confirmMode !== 'always' && confirmMode !== 'prompt') {
+    return { ok: false, reason: 'invalid_request' };
+  }
   const profession = professionId as GatheringProfessionId;
   const best = bestOwnedGatherToolFor(inventory, profession, items);
   if (best.ownedTier === NO_TOOL_OWNED) return { ok: false, reason: 'no_tool' };

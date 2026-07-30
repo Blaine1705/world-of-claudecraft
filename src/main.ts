@@ -261,7 +261,7 @@ import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { attachGatherNodeHoverTooltip, gatherNodeToolGateFor } from './ui/gather_node_tooltip';
-import { gatherToolNoNodeKey } from './ui/gathering_view';
+import { gatherEffectPrompt, gatherToolNoNodeKey } from './ui/gathering_view';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
 import { autosizeChatInput } from './ui/hud/chat/chat_input_autosize';
@@ -2642,6 +2642,15 @@ async function startGame(
       }
     }
   }
+  // The R40 per-use effect confirm gate, shared by every gather entry point
+  // (world click, interact key, gathering-tool use): the pure question from
+  // the view core, the ask through the HUD's confirm-dialog family. The
+  // harvest proceeds on either answer; only the charge follows it.
+  const gatherEffectConfirm = {
+    needed: (nodeId: string) => gatherEffectPrompt(world, nodeId),
+    ask: (prompt: { effectId: string; charges: number }, proceed: (confirmed: boolean) => void) =>
+      hud.confirmToolEffectUse(prompt, proceed),
+  };
   function interactKey(): void {
     stopAutorunForInteraction(
       tryNearbyInteraction(
@@ -2652,6 +2661,8 @@ async function startGame(
         t('questUi.errors.tooFar'),
         t('hudChrome.gathering.notReady'),
         t('errors.nothingInteract'),
+        undefined,
+        gatherEffectConfirm,
       ),
       input,
       mobileControls,
@@ -2762,6 +2773,7 @@ async function startGame(
             t('questUi.errors.tooFar'),
             t('hudChrome.gathering.notReady'),
             gatherNodeToolGateFor(world, node),
+            gatherEffectConfirm,
           ),
           input,
           mobileControls,
@@ -3362,6 +3374,7 @@ async function startGame(
         t('questUi.errors.tooFar'),
         t('hudChrome.gathering.notReady'),
         gatherNodeToolGateFor(world, node),
+        gatherEffectConfirm,
       ),
       input,
       mobileControls,

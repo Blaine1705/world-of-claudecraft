@@ -4705,9 +4705,9 @@ function professionsGather(seed = 1): Scenario {
       // attempt denied by the player's own cooldown, which must add ZERO
       // draws to the digest.
       teleport(sim, p, -70, -53); // ore_eastbrook_1
-      sim.harvestNode('ore_eastbrook_1', pid);
+      sim.harvestNode('ore_eastbrook_1', undefined, pid);
       rec.tick(castTicks); // the cast completes inside this window
-      sim.harvestNode('ore_eastbrook_1', pid); // denied: own timer, no draw
+      sim.harvestNode('ore_eastbrook_1', undefined, pid); // denied: own timer, no draw
       rec.snapshot('harvest-ore-common-and-denial');
       rec.tick(2);
 
@@ -4716,7 +4716,7 @@ function professionsGather(seed = 1): Scenario {
       // signed-or-fungible grant shape land in the state sample.
       meta.gatheringProficiency.logging = 100;
       teleport(sim, p, -62, 8); // wood_eastbrook_1
-      sim.harvestNode('wood_eastbrook_1', pid);
+      sim.harvestNode('wood_eastbrook_1', undefined, pid);
       rec.tick(castTicks);
       rec.snapshot('harvest-wood-max-proficiency');
       rec.tick(2);
@@ -4753,7 +4753,7 @@ function professionsGather(seed = 1): Scenario {
           ...meta.inventory.filter((s: any) => s.instance?.signer !== undefined).slice(-8),
         ];
         delete meta.nodeHarvestReadyAt.herb_eastbrook_1;
-        sim.harvestNode('herb_eastbrook_1', pid);
+        sim.harvestNode('herb_eastbrook_1', undefined, pid);
         rec.tick(castTicks);
       }
       rec.snapshot('rare-event-window');
@@ -4823,14 +4823,14 @@ function professionsGatherFine(seed = 1): Scenario {
       // the node (standOnNode): this step's inlined literal is the one that
       // went stale and cost the scenario its headline arm.
       standOnNode(sim, p, 'ore_mirefen_t2'); // tier 2
-      sim.harvestNode('ore_mirefen_t2', pid);
+      sim.harvestNode('ore_mirefen_t2', undefined, pid);
       rec.tick(castTicks);
       rec.snapshot('fine-grade-at-full-tier-vein');
       rec.tick(2);
 
       // Step 2: the SAME tool at the zone's tier-1 vein still yields plain.
       standOnNode(sim, p, 'ore_mirefen_1'); // tier 1
-      sim.harvestNode('ore_mirefen_1', pid);
+      sim.harvestNode('ore_mirefen_1', undefined, pid);
       rec.tick(castTicks);
       rec.snapshot('plain-grade-at-lower-tier-vein');
       rec.tick(2);
@@ -4838,7 +4838,7 @@ function professionsGatherFine(seed = 1): Scenario {
       // Step 3: the herb patch, worked by a sickle that is only AT its tier.
       // The tier-3 pick in the same bags must not leak across professions.
       standOnNode(sim, p, 'herb_mirefen_t2'); // tier 2
-      sim.harvestNode('herb_mirefen_t2', pid);
+      sim.harvestNode('herb_mirefen_t2', undefined, pid);
       rec.tick(castTicks);
       rec.snapshot('wrong-profession-tool-does-not-upgrade');
       rec.tick(2);
@@ -4926,7 +4926,7 @@ function professionsToolEffectSlot(seed = 1): Scenario {
       // applied after both of them, and the charge settled against the GRANTED
       // count at the command boundary.
       standOnNode(sim, p, VEIN_ID);
-      sim.harvestNode(VEIN_ID, pid);
+      sim.harvestNode(VEIN_ID, undefined, pid);
       rec.tick(castTicks); // the cast completes inside this window
       rec.snapshot('harvest-with-effect-applied');
       rec.tick(2);
@@ -4934,7 +4934,7 @@ function professionsToolEffectSlot(seed = 1): Scenario {
       // The same vein again: the player's own node timer denies it ahead of
       // every arm that draws or spends, so this adds zero draws and leaves the
       // slot's remaining charges untouched.
-      sim.harvestNode(VEIN_ID, pid);
+      sim.harvestNode(VEIN_ID, undefined, pid);
       rec.snapshot('same-vein-denied-by-own-timer');
       rec.tick(2);
     },

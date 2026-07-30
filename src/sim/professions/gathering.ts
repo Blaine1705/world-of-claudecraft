@@ -194,10 +194,21 @@ export function harvestYieldItemIdFor(node: GatherNodeDef, usableToolTier: numbe
 /** The same resolution from a player's bags. One pure bag scan, no rng, so
  *  every caller can ask BEFORE drawing: the capacity pre-gates at both ends of
  *  the cast and the grant itself all resolve the id this way, and they must
- *  agree or a pre-gate would clear room for an item the grant does not mint. */
-export function harvestYieldItemId(meta: PlayerMeta, node: GatherNodeDef): string {
+ *  agree or a pre-gate would clear room for an item the grant does not mint.
+ *  `effectUseConfirmed` is the R40 consent the pre-gates thread through so an
+ *  unconfirmed 'prompt' cast reserves room for the BASE grade the grant will
+ *  actually mint; readers outside a live command (the tooltip preview) keep
+ *  the default and see the effect-assisted answer. */
+export function harvestYieldItemId(
+  meta: PlayerMeta,
+  node: GatherNodeDef,
+  effectUseConfirmed = true,
+): string {
   const professionId = NODE_HARVEST_TABLE[node.type].professionId;
-  return harvestYieldItemIdFor(node, effectiveGradeToolTier(meta, professionId, node));
+  return harvestYieldItemIdFor(
+    node,
+    effectiveGradeToolTier(meta, professionId, node, effectUseConfirmed),
+  );
 }
 
 /** The subset of PlayerMeta the grade resolution reads, spelled out so the
@@ -260,6 +271,11 @@ export function effectiveGradeToolTier(
   meta: GradeReadMeta,
   professionId: GatheringProfessionId,
   node: GatherNodeDef,
+  // The R40 consent: a 'prompt' slot contributes its bonus only when the use
+  // is confirmed. Defaults true so out-of-command readers (the tooltip
+  // preview, an 'always' world) see the effect-assisted answer; the capacity
+  // pre-gates thread the live cast's captured value.
+  effectUseConfirmed = true,
 ): number {
   // WIELDABLE, not owned (R49, the R22 grade arm): the fine-grade comparison
   // reads the same wield-filtered scan the access gate reads, so a traded
@@ -273,10 +289,14 @@ export function effectiveGradeToolTier(
     meta.gatheringProficiency[professionId],
     ITEMS,
   );
-  return applyEffectBonus(usableToolEffectSlot(meta, professionId, node), {
-    quantity: 0,
-    gradeToolTier: wieldable,
-  }).gradeToolTier;
+  // Through applyToolEffectUse rather than applyEffectBonus directly, so the
+  // prompt-consent gate has ONE owner: the tier a pre-gate reserves for and
+  // the tier the grant runs share the same confirmed/unconfirmed answer.
+  return applyToolEffectUse(
+    usableToolEffectSlot(meta, professionId, node),
+    { quantity: 0, gradeToolTier: wieldable },
+    effectUseConfirmed,
+  ).outcome.gradeToolTier;
 }
 
 export function gatherNodeById(nodeId: string): GatherNodeDef | undefined {
@@ -436,6 +456,12 @@ export function resolveHarvest(
   node: GatherNodeDef,
   now: number,
   rng: Rng,
+  // The R40 per-use consent for a 'prompt'-mode slot, threaded from the
+  // command boundary (completeGatherCast reads the cast-start capture).
+  // Defaults false, the fail-safe arm: an unconfirmed prompt use skips the
+  // effect entirely (no bonus, no charge) while the harvest proceeds; an
+  // 'always' slot ignores it (applyToolEffectUse owns the gate).
+  effectUseConfirmed = false,
 ): HarvestResolution {
   if (!isNodeHarvestableBy(meta, node.id, now)) return { granted: false };
   const entry = NODE_HARVEST_TABLE[node.type];
@@ -462,8 +488,9 @@ export function resolveHarvest(
   // above. A quantity effect raises the units; a quality effect raises only
   // the tier the GRADE comparison reads, never the tier the access gate reads,
   // so an effect can improve what a vein yields and can never open one.
-  // `confirmed` is true because no confirmation flow exists yet: every shipped
-  // slot is 'always' mode, for which the flag is ignored outright.
+  // `confirmed` is the R40 per-use consent threaded from the command
+  // boundary; an 'always' slot ignores it outright, a 'prompt' slot fires
+  // only when it is true.
   // Use-time zero-benefit gate (the R9 refusal): `usableToolEffectSlot` owns
   // the suppression rule, shared with the preview reader
   // (`effectiveGradeToolTier`), so the tier a tooltip previews and the tier
@@ -491,7 +518,7 @@ export function resolveHarvest(
   const effect = applyToolEffectUse(
     usableToolEffectSlot(meta, entry.professionId, node),
     { quantity: baseQty, gradeToolTier: wieldableTier },
-    true,
+    effectUseConfirmed,
   );
   const itemId = harvestYieldItemIdFor(node, effect.outcome.gradeToolTier);
   const qty = effect.outcome.quantity;
@@ -560,7 +587,18 @@ export function gatherCastDurationSec(
 // never consumes that player's respawn timer, and never starts a cast.
 // Returns true when the cast STARTS: starting the cast is the successful
 // interaction for the autorun-stop contract (#1982).
-export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): boolean {
+//
+// `confirmEffectUse` is the R40 per-use consent for a 'prompt'-mode tool
+// effect slot: true means the player explicitly confirmed spending a charge
+// on THIS harvest. Defaults false (fail-safe: an old bundle that never sends
+// the flag skips the effect and keeps the charge); an 'always' slot ignores
+// it entirely, so every pre-prompt caller is byte-identical.
+export function harvestNode(
+  ctx: SimContext,
+  nodeId: string,
+  pid?: number,
+  confirmEffectUse = false,
+): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
   const { meta, e: p } = r;
@@ -661,7 +699,7 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   // grant would refuse (room for plain, none for fine) and refused the mirror
   // case. That re-walks the bags once more per cast START (a command, never
   // per tick), the price of one resolver instead of two.
-  const yieldItemId = harvestYieldItemId(meta, node);
+  const yieldItemId = harvestYieldItemId(meta, node, confirmEffectUse);
   if (!ctx.canAddItem(yieldItemId, 1, meta.entityId)) {
     bagsFullError(ctx, meta.entityId);
     return false;
@@ -707,6 +745,12 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   p.gatherCastToolRarity = meta.toolEffectSlots?.[professionId]
     ? (bestOwnedGatherToolFor(meta.inventory, professionId, ITEMS).rarity ?? '')
     : '';
+  // The R40 consent capture, beside the rarity capture and under the same
+  // slot-present condition, so a slot-less cast (every player until one is
+  // slotted) keeps the field inert and every existing parity frame
+  // byte-identical. Read once at completion.
+  p.gatherCastEffectConfirmed =
+    confirmEffectUse && meta.toolEffectSlots?.[professionId] !== undefined;
   // Drop any GCD-held queued spell press: a session's end paths never call
   // fireQueuedCast, so a slot that survived into the session would fire
   // unprompted one tick after it ends (updateCasting's retry arm).
@@ -791,6 +835,12 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   // the node id, so the field is inert again whatever arm returns below.
   const startToolRarity = p.gatherCastToolRarity;
   p.gatherCastToolRarity = '';
+  // The R40 consent capture, read-and-reset the same way: the whole
+  // completion (both capacity reads and the grant) resolves under ONE
+  // consent value, so the room this gate checks is room for the id the
+  // grant actually mints, confirmed or not.
+  const effectUseConfirmed = p.gatherCastEffectConfirmed;
+  p.gatherCastEffectConfirmed = false;
   const node = gatherNodeById(nodeId);
   // Defensive: the id was validated at cast start and content is static.
   if (!node) return;
@@ -805,11 +855,11 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   // Same grade resolution resolveHarvest is about to make, one line later and
   // with no inventory mutation in between, so the room this gate checks is
   // room for the id the grant actually mints.
-  if (!ctx.canAddItem(harvestYieldItemId(meta, node), 1, meta.entityId)) {
+  if (!ctx.canAddItem(harvestYieldItemId(meta, node, effectUseConfirmed), 1, meta.entityId)) {
     bagsFullError(ctx, meta.entityId);
     return;
   }
-  const result = resolveHarvest(meta, node, ctx.time, ctx.rng);
+  const result = resolveHarvest(meta, node, ctx.time, ctx.rng, effectUseConfirmed);
   if (!result.granted) {
     // Unreachable in practice (the readiness check above already gates this),
     // but kept as a defensive fallback so a future resolveHarvest change

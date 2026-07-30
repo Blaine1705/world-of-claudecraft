@@ -2439,6 +2439,12 @@ export const ja_JP: EnTranslations = {
       "toolEffectCharges": "残り {charges} / {max} 回",
       "toolEffectSpent": "使い切りました。再充填が必要です",
       "toolEffectDepleted": "道具の効果を使い切りました",
+      "toolEffectModeAsk": "毎回確認する",
+      "toolEffectModePrompt": "毎回確認します",
+      "toolEffectConfirmTitle": "{effect}を使いますか？",
+      "toolEffectConfirmBody": "この採集で残り{charges}回のうち1回分を消費しますか？断っても採集は行われますが、ボーナスは付きません。",
+      "toolEffectConfirmAccept": "1回分を使う",
+      "toolEffectConfirmDecline": "そのまま採集",
       "toolEffectName": {
         "gatherersCache": "採集者の貯蔵袋",
         "artisansEye": "職人の眼",

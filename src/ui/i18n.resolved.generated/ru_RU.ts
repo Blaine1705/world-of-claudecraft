@@ -2439,6 +2439,12 @@ export const ru_RU: EnTranslations = {
       "toolEffectCharges": "Осталось зарядов: {charges} из {max}",
       "toolEffectSpent": "Израсходовано, нужна подзарядка",
       "toolEffectDepleted": "Эффект инструмента израсходован",
+      "toolEffectModeAsk": "Спрашивать при каждом использовании",
+      "toolEffectModePrompt": "Спрашивает при каждом использовании",
+      "toolEffectConfirmTitle": "Использовать {effect}?",
+      "toolEffectConfirmBody": "Потратить один из {charges} зарядов на эту добычу? Если отказаться, добыча всё равно произойдёт, но без бонуса.",
+      "toolEffectConfirmAccept": "Потратить заряд",
+      "toolEffectConfirmDecline": "Добыть без бонуса",
       "toolEffectName": {
         "gatherersCache": "Сумка собирателя",
         "artisansEye": "Глаз ремесленника",

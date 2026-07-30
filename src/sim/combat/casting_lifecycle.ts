@@ -510,6 +510,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   // deadline, or pinned zone into a later cast.
   p.gatherCastNodeId = '';
   p.gatherCastToolRarity = '';
+  p.gatherCastEffectConfirmed = false;
   p.fishBiteAtTick = 0;
   p.fishReelDeadlineTick = 0;
   p.fishCastZoneId = '';

@@ -2786,6 +2786,18 @@ export const hudChromeStrings = {
     // gatherResult event's effectDepleted flag: the harvest that spent the
     // final charge says so instead of letting the effect expire silently.
     toolEffectDepleted: 'Tool effect spent',
+    // The R40 prompt-mode surfaces. The toggle configures the NEXT slot
+    // action's mint; the chip marks a LIVE 'prompt' slot; the dialog is the
+    // per-use ask (accept spends the charge, decline still gathers, and the
+    // body says so, because a dialog whose cancel still acts must never
+    // surprise).
+    toolEffectModeAsk: 'Ask each use',
+    toolEffectModePrompt: 'Asks each use',
+    toolEffectConfirmTitle: 'Use {effect}?',
+    toolEffectConfirmBody:
+      'Spend one of {charges} charges on this harvest? Declining still gathers, without the bonus.',
+    toolEffectConfirmAccept: 'Use a Charge',
+    toolEffectConfirmDecline: 'Gather Without',
     // The three slottable effects, by catalog id (src/sim/content/professions.ts
     // TOOL_EFFECTS). The sim is language-agnostic and emits the id; these are
     // where it becomes a name.

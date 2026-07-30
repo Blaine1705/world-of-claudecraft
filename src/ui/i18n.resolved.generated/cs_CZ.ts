@@ -2439,6 +2439,12 @@ export const cs_CZ: EnTranslations = {
       "toolEffectCharges": "{charges} of {max} charges",
       "toolEffectSpent": "Spent, needs recharging",
       "toolEffectDepleted": "Tool effect spent",
+      "toolEffectModeAsk": "Ask each use",
+      "toolEffectModePrompt": "Asks each use",
+      "toolEffectConfirmTitle": "Use {effect}?",
+      "toolEffectConfirmBody": "Spend one of {charges} charges on this harvest? Declining still gathers, without the bonus.",
+      "toolEffectConfirmAccept": "Use a Charge",
+      "toolEffectConfirmDecline": "Gather Without",
       "toolEffectName": {
         "gatherersCache": "Gatherer's Cache",
         "artisansEye": "Artisan's Eye",

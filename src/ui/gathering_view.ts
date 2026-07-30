@@ -30,8 +30,9 @@ import {
   harvestYieldItemIdFor,
   NODE_HARVEST_TABLE,
   nodeMaterialFor,
+  usableToolEffectSlot,
 } from '../sim/professions/gathering';
-import { canGatherTier, type ToolEffectSlot } from '../sim/professions/tools';
+import { applyToolEffectUse, canGatherTier, type ToolEffectSlot } from '../sim/professions/tools';
 import {
   bestWieldableGatherToolTierOrNone,
   minWieldRequirementToWork,
@@ -187,6 +188,31 @@ function gradeReadMetaFor(world: IWorld): GradeReadMeta {
     gatheringProficiency: world.gatheringProficiency,
     toolEffectSlots: slots,
   };
+}
+
+/** The R40 pre-harvest question, resolved for one node: non-null exactly when
+ *  the viewer's slot for this node's profession is 'prompt'-mode AND a
+ *  confirmed harvest would actually fire the effect (charges live, the R9
+ *  suppression honored, through the sim's own applyToolEffectUse), so the
+ *  dialog can never ask about a use that would not happen. Null means send
+ *  the harvest plain: no slot, 'always' mode, spent, suppressed, or an
+ *  unknown node id. */
+export function gatherEffectPrompt(
+  world: IWorld,
+  nodeId: string,
+): { effectId: string; charges: number } | null {
+  const node = GATHER_NODES.find((n) => n.id === nodeId);
+  if (!node) return null;
+  const professionId = NODE_HARVEST_TABLE[node.type].professionId;
+  const meta = gradeReadMetaFor(world);
+  const slot = meta.toolEffectSlots?.[professionId];
+  if (!slot || slot.confirmMode !== 'prompt') return null;
+  const wouldFire = applyToolEffectUse(
+    usableToolEffectSlot(meta, professionId, node),
+    { quantity: 0, gradeToolTier: 0 },
+    true,
+  ).applied;
+  return wouldFire ? { effectId: slot.effectId, charges: slot.durability } : null;
 }
 
 export function buildGatherNodeTooltip(

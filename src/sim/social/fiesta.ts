@@ -306,6 +306,7 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   // parity samplers rely on inert values outside a live cast).
   e.gatherCastNodeId = '';
   e.gatherCastToolRarity = '';
+  e.gatherCastEffectConfirmed = false;
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
   e.fishCastZoneId = '';

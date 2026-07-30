@@ -323,7 +323,7 @@ describe('sim-level node access gating (Professions 2.0)', () => {
 
   function castAndComplete(sim: Sim, nodeId: string, pid: number): boolean {
     despawnMobs(sim);
-    if (!sim.harvestNode(nodeId, pid)) return false;
+    if (!sim.harvestNode(nodeId, undefined, pid)) return false;
     const p = sim.entities.get(pid);
     if (!p) throw new Error('missing entity');
     for (let i = 0; i < 80 && p.castingAbility; i++) sim.tick();
@@ -336,7 +336,7 @@ describe('sim-level node access gating (Professions 2.0)', () => {
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     try {
-      expect(sim.harvestNode(nodeId, pid)).toBe(false);
+      expect(sim.harvestNode(nodeId, undefined, pid)).toBe(false);
     } finally {
       sim.rng.setObserver(null);
     }
@@ -353,7 +353,7 @@ describe('sim-level node access gating (Professions 2.0)', () => {
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     try {
-      expect(sim.harvestNode(T2_ORE, pid)).toBe(false);
+      expect(sim.harvestNode(T2_ORE, undefined, pid)).toBe(false);
     } finally {
       sim.rng.setObserver(null);
     }
@@ -382,7 +382,7 @@ describe('sim-level node access gating (Professions 2.0)', () => {
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     try {
-      expect(sim.harvestNode(T1_ORE, pid)).toBe(false);
+      expect(sim.harvestNode(T1_ORE, undefined, pid)).toBe(false);
     } finally {
       sim.rng.setObserver(null);
     }

@@ -34,8 +34,9 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   `fishingCatchGain` composed with the water's teaching ceiling in
   `fishingCatchGainAt`, the ONLY function a grant site may call); the TWO
   sessions' hidden per-cast state lives in
-  five transient Entity fields (`gatherCastNodeId` and `gatherCastToolRarity`
-  for the gather cast; `fishBiteAtTick`, `fishReelDeadlineTick`,
+  transient Entity fields (`gatherCastNodeId`, `gatherCastToolRarity`, and
+  the R40 consent `gatherCastEffectConfirmed` for the gather cast;
+  `fishBiteAtTick`, `fishReelDeadlineTick`,
   `fishCastZoneId` for fishing), never wired, never persisted, all cleared
   together on every cast exit path.
 - `session_teardown.ts`: the ONE displacement cancel for a live gather or

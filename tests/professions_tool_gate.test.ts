@@ -636,7 +636,7 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
       draws++;
     });
 
-    expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(false);
+    expect(sim.harvestNode('ore_eastbrook_1', undefined, pid)).toBe(false);
 
     const denied = denials(sim.drainEvents());
     expect(denied).toHaveLength(1);
@@ -655,11 +655,11 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
     const { pid, p, meta } = miner(sim, 'ore_eastbrook_1');
     sim.addItem('iron_mining_pick', 1, pid);
     meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY - 1;
-    expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(false);
+    expect(sim.harvestNode('ore_eastbrook_1', undefined, pid)).toBe(false);
     expect(denials(sim.drainEvents())).toHaveLength(1);
 
     meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
-    expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(true);
+    expect(sim.harvestNode('ore_eastbrook_1', undefined, pid)).toBe(true);
     expect(p.castingAbility).toBeTruthy();
     expect(denials(sim.drainEvents())).toHaveLength(0);
   });
@@ -668,7 +668,7 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const { pid } = miner(sim, 'ore_eastbrook_1');
 
-    expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(false);
+    expect(sim.harvestNode('ore_eastbrook_1', undefined, pid)).toBe(false);
 
     const denied = denials(sim.drainEvents());
     expect(denied).toHaveLength(1);
@@ -684,7 +684,7 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
     sim.addItem('copper_mining_pick', 1, pid);
     expect(meta.gatheringProficiency.mining).toBe(0);
 
-    expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(true);
+    expect(sim.harvestNode('ore_eastbrook_1', undefined, pid)).toBe(true);
     expect(p.castingAbility).toBeTruthy();
   });
 
@@ -711,7 +711,7 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
       e.corpseTimer = 9999;
       e.inCombat = false;
     }
-    expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(true);
+    expect(sim.harvestNode('ore_eastbrook_1', undefined, pid)).toBe(true);
     // Tier-1 tool at a tier-1 node in band 0: the base 2.5s cast, no
     // tool-tier reduction (a tier-4 read would shave 1.2s).
     expect(p.castTotal).toBeCloseTo(2.5, 5);

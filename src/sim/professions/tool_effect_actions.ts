@@ -99,6 +99,7 @@ export function slotToolEffectAction(
   // new slot's ceiling at completion. Draw-free field write, '' is the inert
   // no-capture value.
   r.e.gatherCastToolRarity = '';
+  r.e.gatherCastEffectConfirmed = false;
   ctx.emit({
     type: 'toolEffectResult',
     action: 'slot',

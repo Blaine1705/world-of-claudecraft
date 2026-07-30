@@ -1206,6 +1206,7 @@ function blankEntity(id: number): Entity {
     castAim: null,
     gatherCastNodeId: '',
     gatherCastToolRarity: '',
+    gatherCastEffectConfirmed: false,
     fishBiteAtTick: 0,
     fishReelDeadlineTick: 0,
     fishCastZoneId: '',
@@ -3538,7 +3539,15 @@ export class ClientWorld implements IWorld {
   buyItem(npcId: number, itemId: string): void {
     this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
   }
-  harvestNode(nodeId: string): Promise<boolean> {
+  // `confirmEffectUse` (R40): the per-use consent for a 'prompt'-mode tool
+  // effect slot, sent ONLY when true (the craftItem `commission` precedent)
+  // so every unconfirmed harvest's wire message stays byte-identical to the
+  // pre-flow form. The server reads it strict-boolean and defaults
+  // unconfirmed, the fail-safe arm for a stale bundle that never sends it.
+  harvestNode(nodeId: string, confirmEffectUse?: boolean): Promise<boolean> {
+    if (confirmEffectUse === true) {
+      return this.cmdWithOutcome({ cmd: 'harvest_node', node: nodeId, confirmUse: true });
+    }
     return this.cmdWithOutcome({ cmd: 'harvest_node', node: nodeId });
   }
   // `commission` (Professions 2.0): the boolean Maker's Bond
@@ -3567,9 +3576,10 @@ export class ClientWorld implements IWorld {
   // acquisition craft: the slot consumes it server-side); the resulting slot
   // mirrors back via the tslot delta and the outcome via the pid-scoped
   // toolEffectResult event, so nothing is written here optimistically.
-  // The mode union matches the narrowed IWorld facet ('always' only): the
-  // server refuses 'prompt' silently today, so the seam does not offer it.
-  slotToolEffect(professionId: string, effectId: string, confirmMode?: 'always'): void {
+  // The mode union matches the re-widened IWorld facet (R40): 'prompt' is a
+  // real mode now that the confirm flow ships, and the resolver validates
+  // the union server-side either way.
+  slotToolEffect(professionId: string, effectId: string, confirmMode?: 'always' | 'prompt'): void {
     // The craftItem `commission` precedent: an omitted optional sends a wire
     // message byte-identical to the pre-feature form rather than an explicit
     // default the server would have applied anyway.

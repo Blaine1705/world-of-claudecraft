@@ -2063,9 +2063,12 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
     // Open-gate flip: the trailing (online === null) override is gone,
     // so the helpers default harvestStateReliable = true (trusting the hcb
-    // corpse-claim mirror online); the call now closes right after the
-    // nothing-to-interact string.
-    expect(mainTs).toContain("t('errors.nothingInteract'),\n      ),");
+    // corpse-claim mirror online). The R40 confirm gate now trails the
+    // nothing-to-interact string, with harvestStateReliable still an
+    // explicit `undefined` (the default), never a live override.
+    expect(mainTs).toContain(
+      "t('errors.nothingInteract'),\n        undefined,\n        gatherEffectConfirm,\n      ),",
+    );
     expect(mainTs).not.toContain('online === null');
     expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');
     expect(mainTs).toContain(

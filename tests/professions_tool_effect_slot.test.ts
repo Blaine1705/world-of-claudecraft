@@ -180,20 +180,20 @@ describe('slotting mints charges from the best owned tool rarity', () => {
     expect(sim.toolEffectSlots[0].effectId).toBe('artisans_eye');
   });
 
-  it('defaults to always, and refuses every other mode including prompt', () => {
+  it('defaults to always, accepts prompt (R40), and refuses modes outside the union', () => {
     const sim = simHolding('copper_mining_pick');
     sim.slotToolEffect('mining', 'gatherers_cache');
     expect(sim.toolEffectSlots[0].confirmMode).toBe('always');
-    // 'prompt' is refused FOR NOW, and that is a correctness fix rather than an
-    // omission: resolveHarvest passes `confirmed: true` unconditionally because
-    // no confirmation flow exists, so a prompt slot would fire and spend a
-    // charge on every harvest while claiming it asks first.
+    // R40: 'prompt' is a real mode now that the confirm flow ships. A
+    // re-slot that changes only the mode is a GAIN (the no_gain mode
+    // conjunct), so it lands, consuming another charm.
     sim.slotToolEffect('mining', 'gatherers_cache', 'prompt');
-    expect(sim.toolEffectSlots[0].confirmMode).toBe('always');
-    // A mode outside the union is refused the same way.
+    expect(sim.toolEffectSlots[0].confirmMode).toBe('prompt');
+    // A mode outside the union is refused outright, never normalized: the
+    // slot keeps the mode it had.
     sim.slotToolEffect('mining', 'gatherers_cache', 'sometimes' as never);
-    expect(sim.toolEffectSlots[0].confirmMode).toBe('always');
-    // And the refusals really refused: still exactly one slot, still full.
+    expect(sim.toolEffectSlots[0].confirmMode).toBe('prompt');
+    // Still exactly one slot: a mode change re-mints, never duplicates.
     expect(sim.toolEffectSlots).toHaveLength(1);
   });
 });
@@ -205,12 +205,15 @@ describe('the mint consumes a crafted charm (the acquisition craft price)', () =
     sim.slotToolEffect('mining', 'gatherers_cache');
     expect(sim.countItem('gatherers_cache')).toBe(4);
     // Refusals consume nothing, whatever the deny arm: unknown profession,
-    // policy-refused pair, no-tool profession, bad mode.
+    // policy-refused pair, no-tool profession, out-of-union mode.
     sim.slotToolEffect('not_a_profession', 'gatherers_cache');
     sim.slotToolEffect('fishing', 'gatherers_cache');
     sim.slotToolEffect('logging', 'gatherers_cache'); // pick is not an axe
-    sim.slotToolEffect('mining', 'gatherers_cache', 'prompt');
+    sim.slotToolEffect('mining', 'gatherers_cache', 'sometimes' as never);
     expect(sim.countItem('gatherers_cache')).toBe(4);
+    // R40: a mode change is a gain, so it re-mints and pays another charm.
+    sim.slotToolEffect('mining', 'gatherers_cache', 'prompt');
+    expect(sim.countItem('gatherers_cache')).toBe(3);
     expect(sim.countItem('artisans_eye')).toBe(5);
   });
 

@@ -66,7 +66,7 @@ describe('starting a profession cast dismounts, like every other cast', () => {
   it('a mounted rider dismounts the moment a gather cast starts, and the harvest completes', () => {
     const sim = makeSim(7);
     const { pid, p } = mountedRider(sim);
-    expect(sim.harvestNode(NODE!.id, pid)).toBe(true);
+    expect(sim.harvestNode(NODE!.id, undefined, pid)).toBe(true);
     expect(p.mountKey).toBe('');
     expect(p.castingAbility).toBe(GATHER_CAST_ID);
     for (let i = 0; i < 200 && p.castingAbility; i++) sim.tick();
@@ -103,7 +103,7 @@ describe('starting a profession cast dismounts, like every other cast', () => {
     // Drop the pick: the tool gate refuses before the cast (and therefore
     // before the dismount arm) is reached.
     meta.inventory = meta.inventory.filter((s) => s.itemId !== 'copper_mining_pick');
-    expect(sim.harvestNode(NODE!.id, pid)).toBe(false);
+    expect(sim.harvestNode(NODE!.id, undefined, pid)).toBe(false);
     expect(p.mountKey).toBe('valorsteed');
     expect(p.castingAbility).toBeNull();
   });
@@ -121,7 +121,7 @@ describe('starting a profession cast dismounts, like every other cast', () => {
     expect(summonMountItem(sim.ctx, pid, 'valorsteed')).toBe(true);
     const p = sim.entities.get(pid) as Entity;
     expect(p.mountCastKey).toBe('valorsteed');
-    expect(sim.harvestNode(NODE!.id, pid)).toBe(true);
+    expect(sim.harvestNode(NODE!.id, undefined, pid)).toBe(true);
     expect(p.mountCastKey).toBe('');
     expect(p.mountCastRemaining).toBe(0);
     expect(p.castingAbility).toBe(GATHER_CAST_ID);
@@ -151,7 +151,7 @@ describe('the other direction is the busy guard, not a dismount', () => {
     };
     sim.addItem('copper_mining_pick', 1, pid);
     teleportTo(sim, pid, NODE!.pos.x + 1.2, NODE!.pos.z + 1.2);
-    expect(sim.harvestNode(NODE!.id, pid)).toBe(true);
+    expect(sim.harvestNode(NODE!.id, undefined, pid)).toBe(true);
     const p = sim.entities.get(pid) as Entity;
     sim.drainEvents();
     expect(sim.toggleMountFor(pid)).toBe(false);
@@ -174,7 +174,7 @@ describe('the other direction is the busy guard, not a dismount', () => {
     sim.setPlayerLevel(20, pid);
     sim.addItem('copper_mining_pick', 1, pid);
     teleportTo(sim, pid, NODE!.pos.x + 1.2, NODE!.pos.z + 1.2);
-    expect(sim.harvestNode(NODE!.id, pid)).toBe(true);
+    expect(sim.harvestNode(NODE!.id, undefined, pid)).toBe(true);
     // Set AFTER the item adds: the entry only needs to exist for the
     // needsRidingLessonRace gate, and a hand-built entry must not ride the
     // quest-credit inventory walk.
@@ -200,7 +200,7 @@ describe('the other direction is the busy guard, not a dismount', () => {
     sim.addItem('reins_valorsteed', 1, pid);
     sim.addItem('copper_mining_pick', 1, pid);
     teleportTo(sim, pid, NODE!.pos.x + 1.2, NODE!.pos.z + 1.2);
-    expect(sim.harvestNode(NODE!.id, pid)).toBe(true);
+    expect(sim.harvestNode(NODE!.id, undefined, pid)).toBe(true);
     const p = sim.entities.get(pid) as Entity;
     sim.drainEvents();
     // The REAL wire path: a reins click routes through useItem, whose busy

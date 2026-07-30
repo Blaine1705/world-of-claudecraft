@@ -54,11 +54,23 @@ export function decideGatherNodeAction(
 
 export interface GatherNodeInteractWorld {
   nodeHarvestableByMe(nodeId: string): boolean;
-  harvestNode(nodeId: string): InteractionOutcome;
+  harvestNode(nodeId: string, confirmEffectUse?: boolean): InteractionOutcome;
 }
 
 export interface GatherNodeInteractHud {
   showError(text: string): void;
+}
+
+/** The R40 per-use confirm gate, injected by the callers that own a dialog
+ *  surface (all three live entry points do). `needed` is the pure question
+ *  (gathering_view.ts gatherEffectPrompt: a 'prompt'-mode slot whose effect
+ *  would actually fire on this node); `ask` presents the dialog and calls
+ *  `proceed` exactly once with the player's answer. The harvest proceeds on
+ *  EITHER answer (only the charge follows it), which is the ruling's letter:
+ *  prompt mode gates the spend, never the gather. */
+export interface GatherEffectConfirmGate {
+  needed(nodeId: string): { effectId: string; charges: number } | null;
+  ask(prompt: { effectId: string; charges: number }, proceed: (confirmed: boolean) => void): void;
 }
 
 /** Thin dispatch: resolves the verdict, then either calls `harvestNode` and
@@ -74,6 +86,7 @@ export function handleGatherNodeInteract(
   tooFarText: string,
   notReadyText: string,
   toolGate?: GatherNodeToolGate,
+  effectConfirm?: GatherEffectConfirmGate,
 ): InteractionOutcome {
   const verdict = decideGatherNodeAction(
     playerPos,
@@ -95,6 +108,21 @@ export function handleGatherNodeInteract(
   if (verdict === 'not_ready') {
     hud.showError(notReadyText);
     return false;
+  }
+  // The R40 ask, AFTER every deny arm: a harvest that would be refused never
+  // pops a dialog. When the gate says a 'prompt'-mode effect would fire, the
+  // dialog carries the interaction forward and the command sends with the
+  // player's answer; either answer harvests, so the interaction is already a
+  // success for the autorun-stop contract (#1982). The server re-validates
+  // everything regardless: a stale prompt still lands as a plain harvest.
+  if (effectConfirm) {
+    const prompt = effectConfirm.needed(nodeId);
+    if (prompt !== null) {
+      effectConfirm.ask(prompt, (confirmed) => {
+        void world.harvestNode(nodeId, confirmed);
+      });
+      return true;
+    }
   }
   return world.harvestNode(nodeId);
 }

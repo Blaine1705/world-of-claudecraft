@@ -96,7 +96,7 @@ describe('q_prof_intro: mining, and only mining, satisfies the gather objective'
     teleportOntoNode(sim, pid, ORE_NODE_ID);
 
     expect(sim.countItem('chunk_of_ore', pid)).toBe(0);
-    sim.harvestNode(ORE_NODE_ID, pid);
+    sim.harvestNode(ORE_NODE_ID, undefined, pid);
     completeCastNow(sim, pid);
     expect(sim.countItem(nodeMaterialFor('ore', 'eastbrook_vale').itemId, pid)).toBe(1);
     expect(sim.countItem('chunk_of_ore', pid)).toBe(0);
@@ -110,7 +110,7 @@ describe('q_prof_intro: mining, and only mining, satisfies the gather objective'
     sim.addItem('copper_mining_pick', 1, pid);
     teleportOntoNode(sim, pid, ORE_NODE_ID);
     // Never accepted q_prof_intro.
-    sim.harvestNode(ORE_NODE_ID, pid);
+    sim.harvestNode(ORE_NODE_ID, undefined, pid);
     completeCastNow(sim, pid);
     sim.tick();
     expect(sim.countItem('chunk_of_ore', pid)).toBe(0);
@@ -150,7 +150,7 @@ describe('q_prof_intro: mining, and only mining, satisfies the gather objective'
     expect(new Set(oreNodes.map((n) => n.zoneId)).size, 'the run must cross a zone band').toBe(2);
     oreNodes.forEach((node, index) => {
       teleportOntoNode(sim, pid, node.id);
-      sim.harvestNode(node.id, pid);
+      sim.harvestNode(node.id, undefined, pid);
       completeCastNow(sim, pid);
       expect(sim.meta(pid)!.questLog.get('q_prof_intro')?.counts).toEqual([index + 1]);
     });

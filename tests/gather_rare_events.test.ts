@@ -290,7 +290,7 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
       meta.inventory.length = 0;
       meta.inventory.push({ itemId: TOOL_BY_TYPE[node.type], count: 1 });
       delete meta.nodeHarvestReadyAt[nodeId];
-      expect(sim.harvestNode(nodeId, pid)).toBe(true);
+      expect(sim.harvestNode(nodeId, undefined, pid)).toBe(true);
       completeCastNow(sim, pid);
       const events = sim.drainEvents();
       const rare = events.find((e) => e.type === 'gatherRareEvent');
@@ -410,7 +410,7 @@ describe('rarity-floor signing through Sim.harvestNode', () => {
       meta.inventory.length = 0;
       meta.inventory.push({ itemId: TOOL_BY_TYPE.ore, count: 1 }); // the #2343 tool gate
       delete meta.nodeHarvestReadyAt[nodeId];
-      expect(sim.harvestNode(nodeId, pid)).toBe(true);
+      expect(sim.harvestNode(nodeId, undefined, pid)).toBe(true);
       completeCastNow(sim, pid);
       const gather = sim.drainEvents().find((e) => e.type === 'gatherResult');
       if (gather?.type !== 'gatherResult') throw new Error('expected gatherResult');
@@ -487,7 +487,7 @@ describe('grant truncation at the command boundary (full bags)', () => {
       for (let f = 0; f < capacity - 2; f++)
         meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
       delete meta.nodeHarvestReadyAt[nodeId];
-      expect(sim.harvestNode(nodeId, pid)).toBe(true);
+      expect(sim.harvestNode(nodeId, undefined, pid)).toBe(true);
       completeCastNow(sim, pid);
       const events = sim.drainEvents();
       const gather = events.find((e) => e.type === 'gatherResult');
@@ -531,7 +531,7 @@ describe('grant truncation at the command boundary (full bags)', () => {
         meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
       meta.inventory.push({ itemId: 'copper_ore', count: 15 });
       delete meta.nodeHarvestReadyAt[nodeId];
-      if (!sim.harvestNode(nodeId, pid)) continue;
+      if (!sim.harvestNode(nodeId, undefined, pid)) continue;
       completeCastNow(sim, pid);
       const events = sim.drainEvents();
       const gather = events.find((e) => e.type === 'gatherResult');
@@ -581,7 +581,7 @@ describe('grant truncation at the command boundary (full bags)', () => {
       meta.inventory.push({ itemId: 'copper_ore', count: 15 });
       meta.inventory.push({ itemId: 'copper_ore', count: 5, instance: { signer: 'Packrat' } });
       delete meta.nodeHarvestReadyAt[nodeId];
-      if (!sim.harvestNode(nodeId, pid)) continue;
+      if (!sim.harvestNode(nodeId, undefined, pid)) continue;
       completeCastNow(sim, pid);
       const events = sim.drainEvents();
       const gather = events.find((e) => e.type === 'gatherResult');
@@ -620,7 +620,7 @@ describe('grant truncation at the command boundary (full bags)', () => {
         meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
       meta.inventory.push({ itemId: 'copper_ore', count: 19 });
       delete meta.nodeHarvestReadyAt[nodeId];
-      if (!sim.harvestNode(nodeId, pid)) continue;
+      if (!sim.harvestNode(nodeId, undefined, pid)) continue;
       completeCastNow(sim, pid);
       const events = sim.drainEvents();
       const gather = events.find((e) => e.type === 'gatherResult');

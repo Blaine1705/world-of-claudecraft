@@ -18,6 +18,7 @@ import {
   classifyGatherNode,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
+  gatherEffectPrompt,
   gatherRareTierFor,
   gatherToolNoNodeKey,
   isNodeToolLockedFor,
@@ -310,6 +311,44 @@ describe('tool-tier lock dimension', () => {
     });
     // Locked: absent, the red requirement line owns that state.
     expect('fineUpgrade' in (buildGatherNodeTooltip(makeWorld({}), NODE.id) ?? {})).toBe(false);
+  });
+
+  it('gatherEffectPrompt asks exactly when a prompt-mode effect would fire', () => {
+    const slotted = (
+      over: Partial<{ effectId: string; charges: number; confirmMode: 'always' | 'prompt' }> = {},
+    ) =>
+      makeWorld({
+        inventory: T1_PICK,
+        toolEffectSlots: [
+          {
+            professionId: 'mining',
+            effectId: 'artisans_eye',
+            charges: 5,
+            maxCharges: 30,
+            confirmMode: 'prompt',
+            ...over,
+          },
+        ],
+      });
+    // The live prompt slot on a fine-reachable node: ask, naming the effect
+    // and the marginal fact (the charges left).
+    expect(gatherEffectPrompt(slotted(), NODE.id)).toEqual({
+      effectId: 'artisans_eye',
+      charges: 5,
+    });
+    // 'always' mode never asks; a spent prompt slot has nothing to spend.
+    expect(gatherEffectPrompt(slotted({ confirmMode: 'always' }), NODE.id)).toBeNull();
+    expect(gatherEffectPrompt(slotted({ charges: 0 }), NODE.id)).toBeNull();
+    // The R9 suppression: a quality charm on a fine-unreachable starter node
+    // would not fire, so the dialog must not ask about it...
+    expect(gatherEffectPrompt(slotted(), 'ore_veiled_hollow_1')).toBeNull();
+    // ...while a quantity effect fires anywhere and still asks there.
+    expect(
+      gatherEffectPrompt(slotted({ effectId: 'gatherers_cache' }), 'ore_veiled_hollow_1'),
+    ).toEqual({ effectId: 'gatherers_cache', charges: 5 });
+    // No slot, and an unknown node id: never ask.
+    expect(gatherEffectPrompt(makeWorld({ inventory: T1_PICK }), NODE.id)).toBeNull();
+    expect(gatherEffectPrompt(slotted(), 'no_such_node')).toBeNull();
   });
 
   it('a usable quality effect lifts the preview, a spent one does not (adapter durability mapping)', () => {

@@ -3229,8 +3229,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // aimed at, captured (server-clamped to range) when the cast begins and read by
   // its area effects when it resolves. null for normal entity/self casts.
   castAim: Vec3 | null;
-  // Hidden per-cast state (Professions 2.0). All four are
-  // transient: initialized inert ('' / 0) at entity creation, non-inert ONLY
+  // Hidden per-cast state (Professions 2.0). Every field here is
+  // transient: initialized inert ('' / 0 / false) at entity creation,
+  // non-inert ONLY
   // between a real cast start and its end, and cleared on EVERY end path
   // (completion, reel, miss, cancelCast). Parity contract: while inert they
   // canonicalize away (omitDefaults), so existing goldens stay byte-identical;
@@ -3250,6 +3251,17 @@ export interface Entity extends ClientMirroredEntityFields {
    * at-rest parity sample.
    */
   gatherCastToolRarity: Exclude<ItemDef['quality'], undefined> | '';
+  /**
+   * The R40 per-use consent, captured at gather-cast start from the
+   * harvest command's confirmEffectUse flag, and only when the profession
+   * actually carries a tool-effect slot (false otherwise, and between
+   * casts, so every slot-less frame stays byte-identical). Read once by
+   * completeGatherCast and threaded into the grade resolution and the
+   * grant: a 'prompt' slot fires and spends only when this was true, an
+   * 'always' slot ignores it. Cleared wherever `gatherCastNodeId` clears;
+   * inert (false) at rest.
+   */
+  gatherCastEffectConfirmed: boolean;
   /** Hidden seeded sim tick the fishing bite fires on (0 = no pending bite). */
   fishBiteAtTick: number;
   /** Sim-tick deadline for the fishing reel re-press (0 = window not armed). */

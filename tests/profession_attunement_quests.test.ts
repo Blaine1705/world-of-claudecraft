@@ -289,7 +289,7 @@ describe('live profession attunement quests', () => {
         player.pos.z = node.pos.z;
         player.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
         player.prevPos = { ...player.pos };
-        sim.harvestNode(node.id, pid); // rarity roll: draws rng
+        sim.harvestNode(node.id, undefined, pid); // rarity roll: draws rng
         sim.tick();
       }
 

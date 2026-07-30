@@ -92,6 +92,12 @@ export class ProfessionsWindow {
   private opened = false;
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
+  // The R40 "Ask each use" choice per gathering profession: UI-local state
+  // for the NEXT slot action (the mode is part of the mint, so it rides the
+  // slotToolEffect command), held here so the full innerHTML rebuild cannot
+  // reset a checked box. Session-scoped on purpose: the durable record of a
+  // LIVE slot's mode is the row's own chip, mirrored from the tslot wire.
+  private readonly slotModePrompt = new Set<string>();
 
   constructor(private readonly deps: ProfessionsWindowDeps) {}
 
@@ -252,6 +258,9 @@ export class ProfessionsWindow {
       })),
       inventory: world.inventory,
       viewerName: world.player.name,
+      // The R40 "Ask each use" toggles (painter-local, survives rebuilds in
+      // this field the way the section scroller does). Sorted for the sig.
+      slotModePrompt: [...this.slotModePrompt].sort(),
     };
   }
 
@@ -556,10 +565,17 @@ export class ProfessionsWindow {
               t('hudChrome.professions.toolEffectRechargeButton'),
             )}</button>`
           : '';
+        // The R40 mode chip: a 'prompt' slot says it asks, in words beside
+        // the charges, so the per-use dialog never reads as a malfunction.
+        // Not hue-gated: the chip IS the second signal.
+        const modeChip =
+          effect.confirmMode === 'prompt'
+            ? `<span class="prof-effect-mode">${esc(t('hudChrome.professions.toolEffectModePrompt'))}</span>`
+            : '';
         html +=
           `<div class="prof-effect${effect.spent ? ' prof-effect-spent' : ''}">` +
           `<span class="prof-effect-name">${esc(t(nameKey))}</span>` +
-          `<span class="prof-effect-charges">${esc(charges)}</span>${recharge}</div>`;
+          `<span class="prof-effect-charges">${esc(charges)}</span>${modeChip}${recharge}</div>`;
       }
     }
     const slotButtons = row.slottable
@@ -574,7 +590,16 @@ export class ProfessionsWindow {
       })
       .join('');
     if (slotButtons !== '') {
-      html += `<div class="prof-effect-actions">${slotButtons}</div>`;
+      // The R40 mode toggle rides the actions row: it configures the NEXT
+      // slot action (the mode is part of the mint), so it renders exactly
+      // when a slot button does. A real labeled checkbox: keyboard-operable,
+      // announced by its own text, and focus-keyed so the rebuild the toggle
+      // triggers restores focus onto it (the exact-control rung).
+      const checked = this.slotModePrompt.has(row.professionId) ? ' checked' : '';
+      const toggle =
+        `<label class="prof-effect-mode-toggle"><input type="checkbox" data-slot-mode="${esc(row.professionId)}" data-focus-key="slotmode:${esc(row.professionId)}"${checked}> ` +
+        `${esc(t('hudChrome.professions.toolEffectModeAsk'))}</label>`;
+      html += `<div class="prof-effect-actions">${slotButtons}${toggle}</div>`;
     }
     return html;
   }
@@ -620,8 +645,28 @@ export class ProfessionsWindow {
         const effectId = button.getAttribute('data-slot-effect');
         if (professionId === null || effectId === null) return;
         this.armSentGuard(button);
-        this.deps.world().slotToolEffect(professionId, effectId);
+        // The R40 mode rides the mint: 'prompt' when the row's toggle is on,
+        // OMITTED otherwise so the plain send stays byte-identical.
+        if (this.slotModePrompt.has(professionId)) {
+          this.deps.world().slotToolEffect(professionId, effectId, 'prompt');
+        } else {
+          this.deps.world().slotToolEffect(professionId, effectId);
+        }
         audio.click();
+      });
+    }
+    // The R40 mode toggles: flip the painter-local choice and repaint (the
+    // slottable set asks the resolver with the sent mode, so the button set
+    // can change with the toggle). render() re-latches the signature and the
+    // focus ladder restores onto the checkbox's own focus key.
+    for (const box of el.querySelectorAll<HTMLInputElement>('[data-slot-mode]')) {
+      box.addEventListener('change', () => {
+        const professionId = box.getAttribute('data-slot-mode');
+        if (professionId === null) return;
+        if (box.checked) this.slotModePrompt.add(professionId);
+        else this.slotModePrompt.delete(professionId);
+        audio.click();
+        this.render();
       });
     }
     for (const button of el.querySelectorAll<HTMLElement>('[data-recharge-profession]')) {
