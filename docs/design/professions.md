@@ -301,6 +301,23 @@ by `tests/professions_station_placement.test.ts`). Field recipes
 (`FIELD_RECIPES`, the common set in `src/sim/content/recipes.ts`) craft
 anywhere; every ladder recipe is trainer-taught AND station-bound. The
 mobile-crafting-station specialization perk bypasses the station gate.
+
+THE CRAFTING-ANCHOR RECORD (the review worklist's content pass, item 5):
+engineering's all-Eastbrook placement, the one toolworks station with
+Tinker Gizzel as its only trainer, is the DELIBERATE hub design, not a
+gap. The craft's outward pull rides its reagent side (the tier-3-plus
+tool recipes consume later-zone counters' exclusives and the prior tools
+themselves), while leatherworking and alchemy carry the station-side
+zone anchors (Fenbridge, Highwatch). Giving a later zone a toolworks
+stake was considered in the pass-1 audit and declined: it would dilute
+the toolmaker's-monopoly identity the guide sells without adding a pull
+the reagents do not already provide. Two riders, stated so the record is
+honest about its edges: the mobile-crafting-station perk above means a
+specialized crafter can work ANY ladder recipe in the field, so the
+station anchors are a pull for the unspecialized climb, not a wall; and
+the work-order distribution below follows the station distribution
+(one order per master), which is where the later-zone thinness comes
+from and why it is recorded as deliberate rather than filled.
 Training is skill-tier gated on learning, never on use:
 `tierForSkill(craft skill) >= tierForSkill(recipe.skillReq)`
 (`resolveTrain`, `src/sim/professions/training.ts`), fees from
@@ -320,7 +337,22 @@ active every other one reports unavailable in both hosts. One cadence-capped
 repeatable work-order quest per master (coin = floor(0.5 * summed vendor
 sellValue of the requested materials), `WORK_ORDER_PAYOUT_FRACTION`,
 cadence `WORK_ORDER_CADENCE_TICKS`; vendoring is always more gold by
-construction). One-shot-per-tier congratulation mail from the attuned
+construction). Two settled work-order calls from the review worklist's
+content pass, both veto-able rulings in its ledger: the LATER-ZONE
+THINNESS (four orders in Eastbrook, one each in Fenbridge and Highwatch)
+is deliberate, because orders are a per-master convention and the zones
+have one station master each; filling it would need either non-master
+order givers (a convention break) or later-zone stations (declined in
+the crafting-anchor record above). And the OUT-TOOLED payout stands as
+deliberate friction: a player whose tool mints only the fine grade hands
+over the more valuable material for the same flat coin (turn-in
+substitution is base-first, downward-only, `planGradeRemoval`), which is
+accepted because the order's real pay is its XP and cadence rhythm, the
+flat coin is what keeps the counter a commission rather than a second
+vendor, the sink property survives either way, and the surrendered value
+is bounded by the fine grade's vendor delta per window. The fine grade's
+worth is realized on the market and the crafting bench, not at the
+order counter. One-shot-per-tier congratulation mail from the attuned
 archetype's master (`src/sim/professions/tier_mail.ts`), trend nudges on
 `NUDGE_CADENCE_TICKS` (`src/sim/professions/prof_nudges.ts`, in-memory
 cadence, resets on restart by design), and the one-shot Guild trend letter
@@ -405,18 +437,28 @@ guards.
 | LEGACY_GOLD_POSITIVE_RECIPE_IDS | tests/recipe_economy.test.ts | empty set (every recipe passes the invariant) |
 
 Time-to-master targets the constants were tuned against: first tier-up in
-15 to 20 minutes, skill 50 in an evening, craft mastery in 10 to 20 focused
-hours, gathering 100 in 8 to 12 hours, fishing 200 in 15 to 25 hours.
-Gathering-100 and fishing-200 currently pace FASTER than target:
-maintainer-accepted for this release; correct post-launch via data-only
-levers (respawn seconds, node density, quantity per rarity, bite-delay band,
-junk share), never via smaller gain numbers. If mastery should get longer,
-the lever is material quantities per craft.
+15 to 20 minutes, skill 50 in an evening, craft mastery in roughly 2 to 5
+focused hours, gathering 100 in 8 to 12 hours, fishing 200 in 15 to 25
+hours. The craft-mastery band MOVED from the authored 10-to-20 by the
+content pass's veto-able ruling (the review worklist's ledger): the old
+figure predated the v0.32.0 expansion, whose starter zones re-grant the
+top-rung materials from ten more zones (the all-zones supply arm in
+`tests/professions_crafts_to_mastery.test.ts` prices the same bill at
+about 2.8 conservative gather hours), and predated the #2387 Battlefield
+Experience attribution fix; the measured all-levers climb lands nearer 1
+to 3 gathering hours plus craft time. Gathering-100 and fishing-200
+currently pace FASTER than target: maintainer-accepted for this release;
+correct post-launch via data-only levers (respawn seconds, node density,
+quantity per rarity, bite-delay band, junk share), never via smaller gain
+numbers. If mastery should get longer, the pre-approved lever is material
+quantities per craft, and the durable supply-side answer is the zone-4
+design pass re-tiering the starter-zone faucets (R37's owner).
 
-The two tool-gate thresholds and the land-tool prices are the pacing lever on
-the tool ladder, and both halves are needed: the gate says when you may buy the
-next rung, the price says what it costs once you may. Neither is a gain number,
-so neither touches the locked ruling above. Both thresholds must stay strictly
+The wield thresholds and the land-tool prices are the pacing lever on the
+tool ladder, and both halves are needed: the wield gate (R22) says when a
+rung you own starts working, the price says what the counter asks for it,
+and every counter sells ahead freely. Neither is a gain number, so neither
+touches the locked ruling above. The tier-2/3 thresholds must stay strictly
 below the proficiency at which a tier-1 node stops teaching, which is
 `GATHER_GAIN_TIER_STEP` times 3: the first zone is entirely tier-1 ground and
 the gather quests grant only the tier-1 tool, so a threshold at or above that
@@ -658,6 +700,24 @@ must be re-derived if either number is ever tuned on its own.
 - Gathering-100 / fishing-200 pacing (data-only levers above).
 - Rare-event cadence stays ONE shared knob until zone-expansion data argues
   for a per-family split.
+- Fine-grade market depth floats free of supply pressure, by construction:
+  node timers are strictly per player (`PlayerMeta.nodeHarvestReadyAt`; the
+  shared-depletion rejection is recorded at the packet design record's D6),
+  so no player's harvesting tightens anyone else's supply, and every
+  fine-grade ask on the market is priced against effectively unlimited
+  personal faucets rather than scarcity. That is the accepted trade of the
+  per-player model, not a defect; the consequence to watch is fine-grade
+  listings drifting toward vendor floor rather than holding a premium. The
+  honest trigger today is indirect: sustained tier-2/3 traffic in
+  `woc_gather_harvests_total{band,tier}` (the same gate the D6 revisit
+  already names) with anecdotal price-floor reports, because no market
+  telemetry exists yet: no listing-book gauge, no sale-price series, and
+  the harvest counter cannot tell a fine mint from a plain yield. A
+  data-driven revisit therefore needs one of those built first; the
+  smallest is a bounded grade label (fine|plain) on the harvest counter,
+  which requires threading the resolved item id into the counter call
+  (`server/game.ts`) under the fixed-cardinality contract
+  (`server/http/game_signals.ts`).
 
 ### Deferred follow-ups (recorded, not scheduled)
 - Wave 2 on #1866/#1298: the commission ORDER workflow, market/mail

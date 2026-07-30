@@ -102,12 +102,21 @@
 // the gathered half of every reagent list reaches 21.7 hours, trimming it to a
 // third reaches 1.7, and halving node density reaches 13.9.
 //
-// READ THE 6.94 HONESTLY: it bounds the MODEL, not the player, and the UP
-// biases dominate (measured in the QA round: the unmodeled rare-event
-// multiplier alone brings it to ~6.66, the real proficiency climb to ~3.6,
-// and the self-signed reduction to ~2.8). A real focused climb therefore
-// lands nearer 3 to 5 hours against the design record's 10-to-20 prose
-// target: the shipped content is FASTER than the target, not slower, and a
+// READ THE 6.94 HONESTLY: it bounds the TUNED-CIRCUIT MODEL, not the
+// player, and the UP biases dominate (measured in the QA round: the
+// unmodeled rare-event multiplier alone brings it to ~6.66, the real
+// proficiency climb to ~3.6, and the self-signed reduction to ~2.8; the
+// post-#2387 Battlefield Experience credit lowers the craft count further
+// and is deliberately unmodeled, another UP bias). The content pass then
+// re-derived supply over EVERY granting zone (the all-zones arm below): the
+// v0.32.0 starter zones grant thorium from ten zones and iron from one, so
+// the same conservative bill lands at ~2.8 gather hours before any of the
+// yield biases, and a real focused all-levers climb sits nearer 1 to 3
+// hours against the design record's former 10-to-20 prose target. The
+// target MOVED to the measured band by the content pass's veto-able ruling
+// (the review worklist's ledger; the pre-approved material-quantities
+// lever stays named for the maintainer): the shipped content is FASTER
+// than the old prose promised, and a
 // tuner reaching for a lever should start from that reading.
 
 import { describe, expect, it } from 'vitest';
@@ -185,6 +194,29 @@ interface GatheredSource {
  *  hours, so the floors below stay the conservative reading. Inside the
  *  tuned set the ambiguity refusal keeps its old teeth. */
 const MASTERY_TUNED_ZONE_IDS = new Set(['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights']);
+
+/** The ALL-ZONES harvest ceiling for one gathered material: the sum of every
+ *  granting zone's own per-hour ceiling (nodes x 3600 / respawn), tuned and
+ *  starter zones alike. The un-blinded supply read the phase 13 content pass
+ *  added: the tuned-circuit inversion above deliberately prices three zones,
+ *  and this prices the world, so the floor below can SEE the expansion's
+ *  extra faucets instead of assuming them away. Cross-zone travel is
+ *  unmodeled (bias DOWN, stated), which keeps this a ceiling like its
+ *  single-zone sibling. */
+function allZonesHarvestsPerHour(itemId: string): number {
+  let perHour = 0;
+  for (const [type, byZone] of Object.entries(NODE_MATERIAL_TABLE)) {
+    for (const [zoneId, row] of Object.entries(byZone)) {
+      if (row.itemId !== itemId) continue;
+      const nodes = GATHER_NODES.filter(
+        (node) => node.zoneId === zoneId && node.type === type,
+      ).length;
+      if (nodes === 0) continue;
+      perHour += (nodes * 3600) / NODE_HARVEST_TABLE[type as GatherNodeType].respawnSeconds;
+    }
+  }
+  return perHour;
+}
 function gatheredSources(): Map<string, GatheredSource> {
   const sources = new Map<string, GatheredSource>();
   for (const [type, byZone] of Object.entries(NODE_MATERIAL_TABLE)) {
@@ -524,15 +556,35 @@ describe('armorcrafting mastery derives from the live tables (R13)', () => {
         .map(([id, n]) => `${id} x${n}`)
         .join(', ')}`,
     ).toBeGreaterThanOrEqual(MIN_GATHER_HOURS);
-    // KNOWINGLY BLIND on the low side since the v0.32.0 merge: the model
-    // prices supply from the tuned zones only (MASTERY_TUNED_ZONE_IDS
-    // above), while ten expansion zones now grant thorium_ore and one
-    // grants iron_ore from starter nodes, so REAL gather hours sit well
-    // under the modeled figure and this floor cannot see the grind turning
-    // trivially short. The MAX arm stays honest (real supply only lowers
-    // hours). Re-deriving the model over every granting zone is the phase
-    // 13 economy integration's call, recorded in the phase 11 QA record.
     expect(RUN.gatherHours).toBeLessThanOrEqual(MAX_GATHER_HOURS);
+  });
+
+  it('the ALL-ZONES supply floor sees the expansion faucets (the un-blinded arm)', () => {
+    // This arm replaced the KNOWINGLY BLIND note the phase 11 QA left: the
+    // tuned-circuit floor above cannot see the grind turning trivially
+    // short, because ten starter zones re-grant thorium_ore and one
+    // re-grants iron_ore. Price the SAME bill against the whole world's
+    // ceilings and hold a floor there instead. Measured 2.82 hours at the
+    // time of writing; the floor at 2 is the trivially-short alarm with
+    // headroom for a starter-node nudge, and the upper relation is derived,
+    // not a literal: world supply can only lower hours, never raise them.
+    const billed = [...RUN.bill.entries()].filter(([id]) => allZonesHarvestsPerHour(id) > 0);
+    const allZonesGatherHours = billed.reduce(
+      (hours, [id, units]) => hours + units / allZonesHarvestsPerHour(id),
+      0,
+    );
+    expect(allZonesGatherHours).toBeGreaterThanOrEqual(2);
+    expect(allZonesGatherHours).toBeLessThanOrEqual(RUN.gatherHours);
+    // Non-vacuity, both ways: the arm really sees supply the tuned circuit
+    // does not (thorium alone is granted well beyond Thornpeak), and the
+    // billed set matches the tuned model's gathered set exactly.
+    expect(allZonesHarvestsPerHour('thorium_ore')).toBeGreaterThan(
+      allZonesHarvestsPerHour('copper_ore'),
+    );
+    expect(allZonesHarvestsPerHour('thorium_ore')).toBeGreaterThanOrEqual(
+      (6 * 3600) / NODE_HARVEST_TABLE.ore.respawnSeconds + 1,
+    );
+    expect(billed.map(([id]) => id).sort()).toEqual([...RUN.gatherHoursByMaterial.keys()].sort());
   });
 
   it('the window bites: inflating or trimming the reagent bill leaves it', () => {
