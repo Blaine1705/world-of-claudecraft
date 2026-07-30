@@ -1803,8 +1803,8 @@ export class Hud {
       itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
       attachTooltip: (element, html) => this.attachTooltip(element, html),
       openChronicles: () => this.openDeeds('chronicle'),
-      openVendor: (npcId) => this.openVendor(npcId),
-      openHeroicVendor: (npcId) => this.openHeroicVendor(npcId),
+      openVendor: (npcId, opener) => this.openVendor(npcId, opener),
+      openHeroicVendor: (npcId, opener) => this.openHeroicVendor(npcId, opener),
       openTrain: (npcId) => this.openTrain(npcId),
       openUnbind: (npcId) => this.openUnbind(npcId),
       openMarket: () => this.openMarket(),
@@ -12702,7 +12702,14 @@ export class Hud {
   // Vendor
   // -------------------------------------------------------------------------
 
-  openVendor(npcId: number): void {
+  // opener: the element to return focus to on close. Reachable from the quest
+  // dialog's "Browse Goods" route, which hides #quest-dialog (display:none)
+  // BEFORE calling this, so document.activeElement would already be
+  // disconnected from layout by the time activeFocusable() ran here; the
+  // caller must capture it beforehand and hand it in. Omitted (not merely
+  // null) falls back to activeFocusable() for any other opener whose element
+  // is still visible/connected at call time.
+  openVendor(npcId: number, opener?: HTMLElement | null): void {
     this.closeOtherWindows(['#vendor-window', '#bags']);
     // The bags companion is exclusive (see openBank): close the bank cluster
     // through the painter so onBankClosed clears body.bank-open before the
@@ -12712,7 +12719,7 @@ export class Hud {
     // Non-trapping focus capture/return (WCAG 2.4.3), matching the bank
     // companion: NOT windowFocus, which would install a Tab trap and break
     // the vendor + bags cluster.
-    this.vendorOpenerFocus = this.focusManager.activeFocusable();
+    this.vendorOpenerFocus = opener !== undefined ? opener : this.focusManager.activeFocusable();
     this.openVendorNpcId = npcId;
     document.body.classList.add('vendor-open');
     this.renderVendor();
@@ -12764,7 +12771,9 @@ export class Hud {
     );
   }
 
-  openHeroicVendor(npcId: number): void {
+  // opener: see openVendor's comment; same handoff need for the Heroic
+  // Quartermaster route out of the quest dialog.
+  openHeroicVendor(npcId: number, opener?: HTMLElement | null): void {
     this.closeOtherWindows('#vendor-window');
     // The bags companion is exclusive (see openBank): close the bank cluster
     // through the painter so onBankClosed clears body.bank-open before the
@@ -12774,7 +12783,7 @@ export class Hud {
     // Non-trapping focus capture/return (WCAG 2.4.3), matching the bank
     // companion: NOT windowFocus, which would install a Tab trap and break
     // the vendor + bags cluster.
-    this.vendorOpenerFocus = this.focusManager.activeFocusable();
+    this.vendorOpenerFocus = opener !== undefined ? opener : this.focusManager.activeFocusable();
     this.openHeroicVendorNpcId = npcId;
     this.renderHeroicVendor();
   }

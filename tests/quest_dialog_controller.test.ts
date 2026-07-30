@@ -352,8 +352,10 @@ describe('QuestDialogController', () => {
     vendorNpc.vendorItems = ['minor_healing_potion'];
     const vendor = harness(vendorNpc);
     vendor.controller.open(vendorNpc.id);
-    vendor.element.querySelector<HTMLButtonElement>('[data-vendor]')?.click();
-    expect(vendor.openVendor).toHaveBeenCalledWith(vendorNpc.id);
+    const vendorButton = vendor.element.querySelector<HTMLButtonElement>('[data-vendor]');
+    vendorButton?.focus();
+    vendorButton?.click();
+    expect(vendor.openVendor).toHaveBeenCalledWith(vendorNpc.id, vendorButton);
     expect(vendor.release).toHaveBeenCalledWith(false);
 
     const marketId = Object.values(NPCS).find((definition) => definition.market)?.id;
@@ -367,8 +369,10 @@ describe('QuestDialogController', () => {
 
     const heroic = harness(npc(42, heroicId));
     heroic.controller.open(42);
-    heroic.element.querySelector<HTMLButtonElement>('[data-heroic-shop]')?.click();
-    expect(heroic.openHeroicVendor).toHaveBeenCalledWith(42);
+    const heroicButton = heroic.element.querySelector<HTMLButtonElement>('[data-heroic-shop]');
+    heroicButton?.focus();
+    heroicButton?.click();
+    expect(heroic.openHeroicVendor).toHaveBeenCalledWith(42, heroicButton);
 
     const boardNpcId = DELVES.collapsed_reliquary.boardNpcId;
     const board = harness(npc(43, boardNpcId));
@@ -385,6 +389,35 @@ describe('QuestDialogController', () => {
     cardMaster.controller.open(45);
     cardMaster.element.querySelector<HTMLButtonElement>('[data-card-duel]')?.click();
     expect(cardMaster.openCardDuel).toHaveBeenCalledTimes(1);
+  });
+
+  it('captures the opener BEFORE hiding the dialog, so a successor window can restore focus (WCAG 2.4.3)', () => {
+    // Regression for the review finding on PR #2619: bindRoute used to call
+    // close(false) (which sets #quest-dialog to display:none) BEFORE calling
+    // open(), so a capture taken inside openVendor via
+    // FocusManager.activeFocusable() would always see a disconnected,
+    // display:none ancestor and resolve to null. The real fix is that
+    // QuestDialogController itself reads document.activeElement while the
+    // dialog (and the clicked button) is still visible, and hands that
+    // element to openVendor/openHeroicVendor directly, so the successor
+    // window's own focusManager.restore() has something to return to.
+    const vendorNpc = npc(50, ordinaryNpcId());
+    vendorNpc.vendorItems = ['minor_healing_potion'];
+    const test = harness(vendorNpc);
+    test.controller.open(vendorNpc.id);
+    const vendorButton = test.element.querySelector<HTMLButtonElement>('[data-vendor]');
+    expect(vendorButton).not.toBeNull();
+    vendorButton?.focus();
+    expect(test.document.activeElement).toBe(vendorButton);
+
+    vendorButton?.click();
+
+    // The dialog is hidden by the time openVendor is invoked...
+    expect(test.element.style.display).toBe('none');
+    // ...but openVendor still received the live button reference, captured
+    // before the hide, not null.
+    expect(test.openVendor).toHaveBeenCalledWith(vendorNpc.id, vendorButton);
+    expect(test.openVendor.mock.calls[0][1]).not.toBeNull();
   });
 
   it('a station master offers the Train option and routes it to openTrain', () => {

@@ -202,29 +202,41 @@ describe('vendor window family: hud.ts focus-management wiring (WCAG 2.4.3)', ()
   // section pins for bank: the non-trapping capture/return pair, matching
   // bankWindow (NOT windowFocus, which would install a Tab trap and break the
   // vendor + bags cluster, which is documented as a companion, not modal).
-  const openVendorBody = hud.slice(
-    hud.indexOf('openVendor(npcId: number): void {'),
-    hud.indexOf('private renderVendor(): void {'),
+  // Anchors resolve with indexOf, which returns -1 (not undefined) on a miss;
+  // a slice built from two -1s or one -1 plus a real offset can still
+  // silently contain the expected substring (e.g. slice(-1, 40) === the
+  // WHOLE tail of the file), so a renamed anchor must be caught explicitly
+  // rather than trusted to make the body assertions fail for the right
+  // reason.
+  const anchor = (needle: string): number => {
+    const at = hud.indexOf(needle);
+    expect(at, `anchor not found in hud.ts: ${JSON.stringify(needle)}`).toBeGreaterThanOrEqual(0);
+    return at;
+  };
+  const openVendorStart = anchor('openVendor(npcId: number, opener?: HTMLElement | null): void {');
+  const openVendorEnd = anchor('private renderVendor(): void {');
+  const openHeroicVendorStart = anchor(
+    'openHeroicVendor(npcId: number, opener?: HTMLElement | null): void {',
   );
-  const openHeroicVendorBody = hud.slice(
-    hud.indexOf('openHeroicVendor(npcId: number): void {'),
-    hud.indexOf('private renderHeroicVendor(): void {'),
-  );
-  const closeHeroicVendorBody = hud.slice(
-    hud.indexOf('closeHeroicVendor(): void {'),
-    hud.indexOf('closeVendor(): void {'),
-  );
-  const closeVendorBody = hud.slice(
-    hud.indexOf('closeVendor(): void {'),
-    hud.indexOf('get vendorOpen(): boolean {'),
-  );
+  const openHeroicVendorEnd = anchor('private renderHeroicVendor(): void {');
+  const closeHeroicVendorStart = anchor('closeHeroicVendor(): void {');
+  const closeVendorStart = anchor('closeVendor(): void {');
+  const vendorOpenGetterStart = anchor('get vendorOpen(): boolean {');
+  expect(openVendorEnd).toBeGreaterThan(openVendorStart);
+  expect(openHeroicVendorEnd).toBeGreaterThan(openHeroicVendorStart);
+  expect(closeVendorStart).toBeGreaterThan(closeHeroicVendorStart);
+  expect(vendorOpenGetterStart).toBeGreaterThan(closeVendorStart);
+  const openVendorBody = hud.slice(openVendorStart, openVendorEnd);
+  const openHeroicVendorBody = hud.slice(openHeroicVendorStart, openHeroicVendorEnd);
+  const closeHeroicVendorBody = hud.slice(closeHeroicVendorStart, closeVendorStart);
+  const closeVendorBody = hud.slice(closeVendorStart, vendorOpenGetterStart);
 
-  it('captures the opener on openVendor and openHeroicVendor via the shared FocusManager', () => {
+  it('captures the opener on openVendor and openHeroicVendor via the shared FocusManager, with an explicit opener overriding the fallback', () => {
     expect(openVendorBody).toContain(
-      'this.vendorOpenerFocus = this.focusManager.activeFocusable();',
+      'this.vendorOpenerFocus = opener !== undefined ? opener : this.focusManager.activeFocusable();',
     );
     expect(openHeroicVendorBody).toContain(
-      'this.vendorOpenerFocus = this.focusManager.activeFocusable();',
+      'this.vendorOpenerFocus = opener !== undefined ? opener : this.focusManager.activeFocusable();',
     );
   });
 

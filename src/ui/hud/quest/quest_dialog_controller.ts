@@ -53,8 +53,12 @@ export interface QuestDialogControllerDeps {
   itemTooltip(item: ItemDef): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   openChronicles(): void;
-  openVendor(npcId: number): void;
-  openHeroicVendor(npcId: number): void;
+  // opener: the pre-close active element, handed in because bindRoute hides
+  // #quest-dialog (display:none) before calling this; an activeFocusable()
+  // read taken afterward would find nothing focusable and the WCAG 2.4.3
+  // return-to-opener chain would silently drop to <body>.
+  openVendor(npcId: number, opener?: HTMLElement | null): void;
+  openHeroicVendor(npcId: number, opener?: HTMLElement | null): void;
   openTrain(npcId: number): void;
   openUnbind(npcId: number): void;
   openMarket(): void;
@@ -393,8 +397,8 @@ export class QuestDialogController {
         item.disabled = true;
       });
     });
-    this.bindRoute('[data-vendor]', () => this.deps.openVendor(npc.id));
-    this.bindRoute('[data-heroic-shop]', () => this.deps.openHeroicVendor(npc.id));
+    this.bindRoute('[data-vendor]', (opener) => this.deps.openVendor(npc.id, opener));
+    this.bindRoute('[data-heroic-shop]', (opener) => this.deps.openHeroicVendor(npc.id, opener));
     this.bindRoute('[data-train]', () => this.deps.openTrain(npc.id));
     this.bindRoute('[data-unbind]', () => this.deps.openUnbind(npc.id));
     this.bindRoute('[data-market]', this.deps.openMarket);
@@ -602,10 +606,18 @@ export class QuestDialogController {
     );
   }
 
-  private bindRoute(selector: string, open: () => void): void {
+  private bindRoute(selector: string, open: (opener: HTMLElement | null) => void): void {
     this.deps.element.querySelector(selector)?.addEventListener('click', () => {
+      // Capture the still-connected, still-visible active element BEFORE
+      // close(false) hides #quest-dialog: once hidden, its subtree fails
+      // FocusManager.canFocus (getClientRects().length === 0), so a capture
+      // taken after the hide would always resolve to null. See openVendor's
+      // deps comment for why the successor window needs this handed in.
+      const active = this.deps.document.activeElement;
+      const opener =
+        active instanceof HTMLElement && active !== this.deps.document.body ? active : null;
       this.close(false);
-      open();
+      open(opener);
     });
   }
 
