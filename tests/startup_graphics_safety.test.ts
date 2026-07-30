@@ -35,7 +35,19 @@ describe('safeStartupGraphicsPreset', () => {
 describe('constrained renderer integration', () => {
   it('uses the resolved dynamic-shadow policy for both the WebGL map and sun pass', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const prewarmMethod = source.indexOf(
+      'private async compileSkinnedShadowPrograms(root: THREE.Object3D)',
+    );
+    const prewarmGuard = source.indexOf(
+      'if (!GFX.dynamicShadows || !this.asyncCompileSupported) return;',
+      prewarmMethod,
+    );
+    const prewarmTraversal = source.indexOf('root.traverse((obj) => {', prewarmMethod);
+
     expect(source).toContain('this.webgl.shadowMap.enabled = GFX.dynamicShadows;');
     expect(source).toContain('sun.castShadow = GFX.dynamicShadows;');
+    expect(prewarmMethod).toBeGreaterThanOrEqual(0);
+    expect(prewarmGuard).toBeGreaterThan(prewarmMethod);
+    expect(prewarmGuard).toBeLessThan(prewarmTraversal);
   });
 });

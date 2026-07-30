@@ -4090,7 +4090,7 @@ export class Renderer {
    * before the synchronous shadow warm pass asks getUniforms for them.
    */
   private async compileSkinnedShadowPrograms(root: THREE.Object3D): Promise<void> {
-    if (!this.asyncCompileSupported) return;
+    if (!GFX.dynamicShadows || !this.asyncCompileSupported) return;
     const swaps: { mesh: THREE.SkinnedMesh; material: THREE.Material | THREE.Material[] }[] = [];
     root.traverse((obj) => {
       const mesh = obj as THREE.SkinnedMesh;

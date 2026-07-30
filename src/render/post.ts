@@ -87,6 +87,7 @@ export function buildComposer(
   // target that rasterizes geometry.
   const target = new THREE.WebGLRenderTarget(size.x, size.y, {
     depthBuffer: plan.scene.pass === 'render',
+    resolveDepthBuffer: !gradeOnly,
     samples: plan.composerSamples,
     type: THREE.HalfFloatType,
   });
