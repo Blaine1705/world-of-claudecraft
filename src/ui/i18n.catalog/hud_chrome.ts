@@ -2648,14 +2648,14 @@ export const hudChromeStrings = {
     // 'mark' (the yield arrived unsigned) and 'find' (the jackpot dropped).
     downgradeMark: "Bags full: the find was stored without its gatherer's mark.",
     downgradeFind: 'Bags full: a pristine find slipped away.',
-    // Tooltip third line: the per-viewer respawn state. The timed variant
-    // renders when the world can put a number on the same timer
-    // (IWorldProfessions nodeRespawnSeconds); the plain one stays the
-    // fallback for a null read. {time} is the respawnClock template below.
     // The empty-hook FCT self-note (the UX pass), fired off the
     // fishingEmptyHook event beside the sim's grey log line: the reel was
     // timed right, the hook just came up bare.
     emptyHookNote: 'Nothing on the hook',
+    // Tooltip third line: the per-viewer respawn state. The timed variant
+    // renders when the world can put a number on the same timer
+    // (IWorldProfessions nodeRespawnSeconds); the plain one stays the
+    // fallback for a null read. {time} is the respawnClock template below.
     stateReady: 'Ready',
     stateCooldown: 'Respawning',
     stateCooldownTimed: 'Respawns in {time}',
@@ -2790,16 +2790,16 @@ export const hudChromeStrings = {
     // gatherResult event's effectDepleted flag: the harvest that spent the
     // final charge says so instead of letting the effect expire silently.
     toolEffectDepleted: 'Tool effect spent',
-    // The R40 prompt-mode surfaces. The toggle configures the NEXT slot
-    // action's mint; the chip marks a LIVE 'prompt' slot; the dialog is the
-    // per-use ask (accept spends the charge, decline still gathers, and the
-    // body says so, because a dialog whose cancel still acts must never
-    // surprise).
     // The recharge cost preview beside the button (the UX pass): the priced
     // material and count the resolver would charge right now. Ceil-priced,
     // so the marginal top-up (one charge short) honestly reads one full
     // material.
     toolEffectRechargePrice: 'Recharge: {count} x {material}',
+    // The R40 prompt-mode surfaces. The toggle configures the NEXT slot
+    // action's mint; the chip marks a LIVE 'prompt' slot; the dialog is the
+    // per-use ask (accept spends the charge, decline still gathers, and the
+    // body says so, because a dialog whose cancel still acts must never
+    // surprise).
     toolEffectModeAsk: 'Ask each use',
     toolEffectModePrompt: 'Asks each use',
     toolEffectConfirmTitle: 'Use {effect}?',

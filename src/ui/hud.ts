@@ -68,7 +68,6 @@ import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
 import { FOCUS_POINT_BUDGET, isInTownZone } from '../sim/professions/focus';
-import { baseMaterialFor } from '../sim/professions/material_grades';
 import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/stations';
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { type QuestObjectiveRef, questObjectivesForMob } from '../sim/quest_targets';
@@ -398,6 +397,7 @@ import {
   itemNumber,
   itemStatName,
 } from './item_instance_tooltip';
+import { itemKindLabel, itemQualityLabel } from './item_kind_label';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { knownItemDef, ownEntry } from './known_item';
@@ -894,7 +894,6 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
   defensive: 'hud.pet.defensiveDesc',
   aggressive: 'hud.pet.aggressiveDesc',
 };
-type ItemQuality = NonNullable<ItemDef['quality']>;
 /** The visual language the shared #banner slot paints in. 'default' is the
  *  bare gold celebration text every milestone has always used (level up, zone
  *  crossing, craft masterwork, duel result). 'deed' is the Book of Deeds
@@ -931,28 +930,6 @@ const BANNER_ADVANCE_GAP_MS = 250;
  *  parked longer than this. Celebrations never age out: "you leveled" stays
  *  true however late it shows. */
 const AMBIENT_MAX_DEFER_MS = 4000;
-const ITEM_QUALITY_LABEL_KEYS: Record<ItemQuality, TranslationKey> = {
-  poor: 'itemUi.quality.poor',
-  common: 'itemUi.quality.common',
-  uncommon: 'itemUi.quality.uncommon',
-  rare: 'itemUi.quality.rare',
-  epic: 'itemUi.quality.epic',
-  legendary: 'itemUi.quality.legendary',
-};
-const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
-  weapon: 'itemUi.kind.weapon',
-  armor: 'itemUi.kind.armor',
-  held_offhand: 'itemUi.kind.armor',
-  quest: 'itemUi.kind.quest',
-  junk: 'itemUi.kind.junk',
-  food: 'itemUi.kind.food',
-  drink: 'itemUi.kind.drink',
-  tool: 'itemUi.kind.tool',
-  potion: 'itemUi.kind.potion',
-  elixir: 'itemUi.kind.elixir',
-  bag: 'itemUi.kind.bag',
-  mount: 'itemUi.kind.mount',
-};
 // Classic class colors (CLASSES[cls].color is a 0xRRGGBB number) as a CSS
 // string, used to color-code party members on the minimap and in the frames.
 const classCss = (cls: string): string =>
@@ -15800,22 +15777,6 @@ function resourceDisplayName(resourceType: ResourceType | null): string {
 // itemSlotName moved to ./item_slot_labels as itemSlotLabel (imported above under
 // its old name here), so the pure view cores can read the same shared-label facts
 // the HUD does (#2466).
-
-function itemQualityLabel(quality: ItemDef['quality']): string {
-  return t(ITEM_QUALITY_LABEL_KEYS[quality ?? 'common']);
-}
-
-function itemKindLabel(kind: ItemDef['kind'], itemId?: string): string {
-  // The fine-grade presentation split (the UX pass): a fine-grade material's
-  // KIND stays 'junk' internally (the downward substitution and the Sell
-  // Junk sweep both key off quality/kind), but its tooltip line must not
-  // read "Junk". baseMaterialFor answers non-undefined for exactly the fine
-  // ids (material_grades.ts, the FINE_GRADE pairing).
-  if (kind === 'junk' && itemId !== undefined && baseMaterialFor(itemId) !== undefined) {
-    return t('itemUi.kind.fineMaterial');
-  }
-  return t(ITEM_KIND_LABEL_KEYS[kind]);
-}
 
 function parseSimMoney(text: string): number | null {
   let copper = 0;

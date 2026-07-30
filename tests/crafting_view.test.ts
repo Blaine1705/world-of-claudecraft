@@ -873,6 +873,15 @@ describe('buildCraftingView spans material grades', () => {
     const short: InvSlot[] = [{ itemId: 'fine_copper_ore', count: 3 }];
     const shortView = buildCraftingView([gradeRecipe], short, GRADE_ITEMS);
     expect(shortView.recipes[0].reagents[0].fineSubstituted).toBe(0);
+    // Fully substituted (the phase 14 QA's missing arm): zero base held and
+    // the fine stock covers the WHOLE bill, so the suffix states the entire
+    // requirement.
+    const allFine: InvSlot[] = [{ itemId: 'fine_copper_ore', count: 4 }];
+    const allFineView = buildCraftingView([gradeRecipe], allFine, GRADE_ITEMS);
+    expect(allFineView.recipes[0].reagents[0]).toMatchObject({
+      satisfied: true,
+      fineSubstituted: 4,
+    });
   });
 
   it('the base never counts toward a FINE reagent (the gate stays one-directional)', () => {
