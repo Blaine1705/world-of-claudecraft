@@ -15,7 +15,7 @@ close the packet.
 Model: Opus 4.8 or newer, xhigh effort. Harness: Claude Code. ULTRACODE: yes, run the
 adversarial-verify Workflow (every finding independently confirmed by a skeptic agent before
 it counts) plus mutation spot checks on the Phase 9 cache keying, TTL, and bust wiring.
-Worktree: /Users/fernando/Documents/wocc-discord-bot.
+Worktree: /home/fernandoramirez/Documents/world-of-claudecraft.
 
 STEP 0 - PRE-FLIGHT: git status clean (Phase 9 committed). Memory scan including the test-pin
 trap index (READ IT before judging or writing any pin), cached-read-bust-inflight-joiner,

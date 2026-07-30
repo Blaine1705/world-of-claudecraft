@@ -15,7 +15,7 @@ storms impossible, and the diffs that make a steady-state sweep write nothing at
 ```
 This is Phase 3 of the Discord Bot Stability packet: Loop scheduler + diff-before-write.
 Model: Opus 4.8 or newer, xhigh effort. Harness: Claude Code.
-Worktree: /Users/fernando/Documents/wocc-discord-bot (branch feature/discord-bot-stability).
+Worktree: /home/fernandoramirez/Documents/world-of-claudecraft (branch feature/discord-bot-stability).
 No Workflow needed: two independent module slices plus one serial wiring stage. Use a 2-agent
 fan-out in STEP 2 stage 1 and keep the bot/main.ts migration in the main loop.
 

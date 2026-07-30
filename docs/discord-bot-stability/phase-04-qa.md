@@ -14,7 +14,7 @@ Model: Opus 4.8 or newer, xhigh effort. Harness: Claude Code. ULTRACODE: yes, ru
 adversarial-verify Workflow (every finding independently confirmed by a skeptic agent before it
 counts) plus mutation spot checks on the flex-batch handler logic, the members-meta bulk
 upsert, and the relay/activity queue modules (decision D19: every phase's QA runs ultracode).
-Worktree: /Users/fernando/Documents/wocc-discord-bot.
+Worktree: /home/fernandoramirez/Documents/world-of-claudecraft.
 
 STEP 0 - PRE-FLIGHT: `git status` clean and Phase 4 committed (if the tree is dirty, ASK; this
 checkout may be shared). Memory scan including the test-pin trap index: READ IT before judging

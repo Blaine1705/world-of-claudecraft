@@ -17,7 +17,7 @@ cadence values.
 ```
 This is Phase 1 of the Discord Bot Stability packet: Bot verification foundation.
 Model: Opus 4.8 or newer, xhigh effort. Harness: Claude Code.
-Worktree: /Users/fernando/Documents/wocc-discord-bot (branch feature/discord-bot-stability).
+Worktree: /home/fernandoramirez/Documents/world-of-claudecraft (branch feature/discord-bot-stability).
 No Workflow needed: this phase is small and mostly serial, and a 2-agent fan-out in STEP 2 is
 the right size.
 

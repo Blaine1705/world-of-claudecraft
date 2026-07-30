@@ -16,7 +16,7 @@ Model: Opus 4.8 or newer, xhigh effort. Harness: Claude Code. ULTRACODE: yes, ru
 adversarial-verify Workflow (every finding independently confirmed by a skeptic agent
 before it counts) plus mutation spot checks on the Phase 7 fatal-close handling and the
 heartbeat module.
-Worktree: /Users/fernando/Documents/wocc-discord-bot.
+Worktree: /home/fernandoramirez/Documents/world-of-claudecraft.
 
 STEP 0 - PRE-FLIGHT: git status clean (Phase 7 committed). Memory scan including the
 test-pin trap index (READ IT before judging or writing any pin: the source-scrape and

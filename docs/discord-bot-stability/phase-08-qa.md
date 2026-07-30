@@ -15,7 +15,7 @@ adversarial-verify Workflow (every finding independently confirmed by a skeptic 
 before it counts) plus mutation spot checks on the Phase 8 clamp, render, and staleness
 logic (the bot-side counter collector, the server-side snapshot module, and the metrics
 register function).
-Worktree: /Users/fernando/Documents/wocc-discord-bot.
+Worktree: /home/fernandoramirez/Documents/world-of-claudecraft.
 
 STEP 0 - PRE-FLIGHT: git status clean (Phase 8 committed). Memory scan including the
 test-pin trap index (READ IT before judging or writing any pin), plus

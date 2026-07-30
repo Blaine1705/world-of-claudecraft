@@ -7,7 +7,7 @@ current population (design envelope: 1,000 concurrent players, 5,000 guild membe
 Stability and architecture only: no new player-facing features in this packet.
 
 Branch: `feature/discord-bot-stability` off `release/v0.33.0`.
-Worktree: `/Users/fernando/Documents/wocc-discord-bot`.
+Worktree: `/home/fernandoramirez/Documents/world-of-claudecraft`.
 
 ## Reading order
 

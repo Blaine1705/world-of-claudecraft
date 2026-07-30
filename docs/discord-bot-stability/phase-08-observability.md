@@ -15,7 +15,7 @@ Starter prompt for the session:
 ```
 This is Phase 8 of the Discord Bot Stability packet: Observability.
 Model: Opus 4.8 or newer, xhigh effort. Harness: Claude Code.
-Worktree: /Users/fernando/Documents/wocc-discord-bot (branch feature/discord-bot-stability).
+Worktree: /home/fernandoramirez/Documents/world-of-claudecraft (branch feature/discord-bot-stability).
 No ultracode Workflow for this phase: it is one bot slice, one server slice, and a doc
 note, so a parallel Agent fan-out is the lightest orchestration that fits. Its QA session
 runs ultracode.

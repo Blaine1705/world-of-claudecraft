@@ -6,7 +6,7 @@
 |---|---|---|---|
 | Phase 1: Bot verification foundation | built | 2026-07-30 | 2026-07-30 |
 | Phase 1 QA | done | 2026-07-30 | 2026-07-30 |
-| Phase 2: Discord rate-limit governor | not started | | |
+| Phase 2: Discord rate-limit governor | built | 2026-07-30 | 2026-07-30 |
 | Phase 2 QA | not started | | |
 | Phase 3: Loop scheduler + diff-before-write | not started | | |
 | Phase 3 QA | not started | | |
@@ -34,10 +34,10 @@
 - [x] Baseline tests: config arms, server_client envelope/secret/timeout, cadence pins via the module
 
 ### Phase 2
-- [ ] `bot/rate_governor.ts` pure module (buckets, proactive gating, global pause, breaker, forbidden cache, counters)
-- [ ] `DiscordApi.request()` rewired; `/api/v10` pinned; audit-log reason on member PATCH; scope logging
-- [ ] New env keys in `bot/config.ts` with defaults
-- [ ] Governor test suite (all 429 arms, HTML 429, breaker, pacing determinism)
+- [x] `bot/rate_governor.ts` pure module (buckets, proactive gating, global pause, breaker, forbidden cache, counters)
+- [x] `DiscordApi.request()` rewired; `/api/v10` pinned; audit-log reason on member PATCH; scope logging
+- [x] New env keys in `bot/config.ts` with defaults
+- [x] Governor test suite (all 429 arms, HTML 429, breaker, pacing determinism)
 
 ### Phase 3
 - [ ] `bot/scheduler.ts` (overlap guards, jitter, adaptive backoff, coalescing, env cadences)

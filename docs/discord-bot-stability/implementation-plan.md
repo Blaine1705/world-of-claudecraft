@@ -8,7 +8,7 @@ ultracode (D19).
 ## Canonical workflow (every phase)
 
 1. **Step 0, pre-flight**: `git status` clean in the worktree
-   (`/Users/fernando/Documents/wocc-discord-bot`); memory scan of `MEMORY.md` for the
+   (`/home/fernandoramirez/Documents/world-of-claudecraft`); memory scan of `MEMORY.md` for the
    phase domain.
 2. **Step 1, load context**: spawn an Explore agent over `state.md`, `progress.md`, the
    phase file, and the phase's listed source files. The main loop reads conclusions,
@@ -203,7 +203,7 @@ Phase files embed these verbatim with the braces filled. Implementation template
 ```
 This is Phase N of the Discord Bot Stability packet: {title}.
 Model: Opus 4.8 or newer, xhigh effort. Harness: Claude Code.
-Worktree: /Users/fernando/Documents/wocc-discord-bot (branch feature/discord-bot-stability).
+Worktree: /home/fernandoramirez/Documents/world-of-claudecraft (branch feature/discord-bot-stability).
 {ULTRACODE line if the phase warrants a Workflow}
 
 Goal: {one sentence}
@@ -246,7 +246,7 @@ This is Phase N QA of the Discord Bot Stability packet: verify {title}.
 Model: Opus 4.8 or newer, xhigh effort. Harness: Claude Code. ULTRACODE: yes, run the
 adversarial-verify Workflow (every finding independently confirmed by a skeptic agent
 before it counts) plus mutation spot checks on {the phase's new pure modules}.
-Worktree: /Users/fernando/Documents/wocc-discord-bot.
+Worktree: /home/fernandoramirez/Documents/world-of-claudecraft.
 
 STEP 0 - PRE-FLIGHT: git status clean (Phase N committed); memory scan including the
 test-pin trap index (READ IT before judging or writing any pin).

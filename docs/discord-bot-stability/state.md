@@ -1,6 +1,7 @@
 # State: Discord Bot Stability (cross-phase cheat sheet)
 
-Current phase: Phase 1 built AND QA'd (2026-07-30). Next: Phase 2, the rate-limit governor.
+Current phase: Phase 2 built (2026-07-30), QA pending. Next: Phase 2 QA, then Phase 3,
+the loop scheduler and diff-before-write.
 
 ## Locked decisions
 
@@ -161,11 +162,28 @@ because dropping the one word is otherwise silent),
   and to both CI jobs that build the server (`pr-checks`, and `release-gate` under
   `if: matrix.shard == 1`); injected IO seams on all three shells; cadence constants
   extracted per R6.
-- New env keys: none (Phase 2 adds the first ones).
+- Phase 2: `bot/rate_governor.ts`, the pure governor every Discord REST call is now
+  dispatched through; `bot/discord_api.ts` reduced to an IO shell over it (the 10 second
+  retry clamp and the 1 second non-JSON-429 retry are both gone); ledger item L1 closed
+  in the same rewrite.
+- New env keys (Phase 2, the first four; DEPLOY.md documentation is still Phase 7 per
+  D13, and the commented `.env.example` block is R8):
+  `DISCORD_MAX_RPS` (8), `DISCORD_BAN_PAUSE_MS` (600000),
+  `DISCORD_BREAKER_LIMIT` (300), `DISCORD_FORBIDDEN_TTL_MS` (86400000).
+  The defaults are exported from `bot/rate_governor.ts` as `DEFAULT_MAX_RPS`,
+  `DEFAULT_BAN_PAUSE_MS`, `DEFAULT_BREAKER_LIMIT`, and `DEFAULT_FORBIDDEN_TTL_MS`, and
+  `bot/config.ts` imports them, so the config fallback and the governor's own
+  construction default cannot drift apart.
+- Counter names Phase 8 consumes (D16), the snapshot from `RateGovernor.snapshot()`:
+  `requests`, `rateLimited`, `rateLimitedByScope` (`user`/`global`/`shared`/`unknown`),
+  `globalPauses`, `banPauses`, `breakerState`, `breakerOpens`, `queueDepth`,
+  `trackedBuckets`, `forbiddenEntries`, `forbiddenBlocks`, `breakerBlocks`.
+  `DiscordApi.counters()` is the accessor the wiring will read.
 - New endpoints: (pending; planned `POST /internal/discord/flex-batch`,
   `GET /internal/discord/outbox`)
-- New modules: `bot/cadence.ts` (the three poll-loop constants, values only).
-  Still planned: governor, scheduler, change feed.
+- New modules: `bot/cadence.ts` (the three poll-loop constants, values only),
+  `bot/rate_governor.ts` (Phase 2, pure and clock-injected). Still planned: scheduler,
+  change feed.
 - New tests: `tests/discord_bot_config.test.ts` (config arms + the cadence pins),
   `tests/discord_bot_server_client.test.ts` (call envelope, secret header, deadline,
   production-default path), `tests/discord_bot_discord_api.test.ts` (auth headers, the
@@ -175,6 +193,21 @@ because dropping the one word is otherwise silent),
   arms, RESUME versus IDENTIFY, and every fatal close code).
   `tests/discord_bot.test.ts` stays pure-logic only. The Phase 1 QA round widened all four
   well past the arm lists above; treat the files, not this summary, as the inventory.
+  Phase 2 adds the governor suite, split by concern rather than one large file:
+  `tests/discord_bot_governor_pacing.test.ts` (header gating, bucket serialization,
+  the rate cap, the bucket remap, route templates),
+  `tests/discord_bot_governor_scopes.test.ts` (the three 429 scopes, the FULL
+  retry_after, the non-JSON ban pause),
+  `tests/discord_bot_governor_breaker.test.ts` (both edges, window ageing, the half-open
+  probe), `tests/discord_bot_governor_forbidden.test.ts` (the 401/403 cache and its
+  invalidation hook), `tests/discord_bot_governor_counters.test.ts` (the D16 snapshot),
+  and `tests/discord_bot_governor_determinism.test.ts` (recorded-schedule equality plus
+  the pure helpers). `tests/discord_bot_discord_api.test.ts` gained the shell-side pins
+  (the v10 literal, the audit-log reason, scope logging, token redaction, the forbidden
+  short circuit) and LOST the three clamp arms, which pinned behavior this phase deletes
+  on purpose.
+- New shared test helper: `tests/helpers/synthetic_clock.ts`, a fully virtual clock.
+  Phase 3's scheduler should drive it rather than vitest fake timers.
 - New exported constant: `SERVER_CALL_TIMEOUT_MS` (8000) in `bot/server_client.ts`,
   named so the suite can pin the deadline against a literal.
 - Touched pins: `tests/ci_workflow.test.ts` structural counts (release-gate
@@ -282,6 +315,14 @@ Phase 1 forbids any runtime behavior change, and each of these changes behavior 
 adds a guard, so they were recorded rather than landed. The Phase 1 QA session should
 route each to a phase or file it.
 
+- L1 CLOSED by Phase 2. The throw now formats `redactPath(path)` (exported from
+  `bot/rate_governor.ts`), which replaces only the CREDENTIAL segment on the
+  `/interactions/<id>/<token>/...` and `/webhooks/<id>/<token>/...` shapes and leaves
+  every id intact, so the operator keeps the diagnosable detail. The redaction is in the
+  THROW, as the Phase 1 security review required, not in the one named catch, so the 15
+  other bare `console.error(e)` handlers cannot re-open it. Token segments are kept out
+  of bucket keys and log lines too (`routeTemplate` emits `:token`). Original report,
+  kept for the record:
 - L1 (should-fix, security): `bot/discord_api.ts` throws
   `[bot] discord ${method} ${path} -> ...` with `path` interpolated verbatim, and three
   interaction call sites (`respondInteraction`, `deferInteraction`,
@@ -359,5 +400,17 @@ route each to a phase or file it.
   scheduler must coalesce, or a reconnect storm multiplies sweeps.
 - The game server's keep-alive window is 5s (`server/http/server_timeouts.ts`); a 3s
   poller reuses its connection, the 5-minute loops never do.
-- Fake timers vs captured clocks: see memory entries cachedread-captured-clock-vs-fake-
-  timers and settimeout-fractional-delay-fires-early before testing scheduler timing.
+- Fake timers vs captured clocks: a clock captured at construction does not move under
+  fake timers, and a fractional delay fires EARLY. Phase 2 sidesteps both by testing
+  against a fully VIRTUAL clock, `tests/helpers/synthetic_clock.ts`, rather than vitest
+  fake timers; reuse it for the Phase 3 scheduler. The two memory entries this line used
+  to name (cachedread-captured-clock-vs-fake-timers,
+  settimeout-fractional-delay-fires-early) do not exist in the memory store, and neither
+  does env-empty-numeric-default-shift, which phase-02 cites; the rules themselves are
+  real and are now written down here and at the seams that depend on them.
+- Numeric env parsing: `Number('')` is 0, so an unguarded parse turns a blank line in a
+  .env into a hard 0. `positiveNumberFromEnv` in `bot/config.ts` falls back to the
+  default for empty, non-numeric, and non-positive alike. It takes the VALUE rather than
+  the key on purpose: a second dynamic `process.env[...]` lookup would slip past the
+  env-key inventory guard in `tests/discord_bot_config.test.ts`, which asserts exactly
+  one dynamic lookup and pins the whole key set.

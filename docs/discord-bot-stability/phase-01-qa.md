@@ -16,7 +16,7 @@ counts) plus mutation spot checks on the code paths the new baseline tests claim
 bot/config.ts (required, default, and fallback arms) and bot/server_client.ts (the call
 envelope). Judge every refutation yourself rather than taking it on faith, and require the
 skeptic to have the file open before a refutation counts.
-Worktree: /Users/fernando/Documents/wocc-discord-bot.
+Worktree: /home/fernandoramirez/Documents/world-of-claudecraft.
 
 STEP 0 - PRE-FLIGHT: run `git status` and confirm it is clean with Phase 1 committed; another
 session may share this checkout, so ASK before touching anything you did not create. Memory scan

@@ -14,7 +14,7 @@ handful.
 ```
 This is Phase 6 of the Discord Bot Stability packet: Bot consumes the new surface.
 Model: Opus 4.8 or newer, xhigh effort. Harness: Claude Code.
-Worktree: /Users/fernando/Documents/wocc-discord-bot (branch feature/discord-bot-stability).
+Worktree: /home/fernandoramirez/Documents/world-of-claudecraft (branch feature/discord-bot-stability).
 ULTRACODE: not required. Use parallel Agent fan-out (STEP 2), not a Workflow.
 
 Goal: rewire the bot onto flex-batch plus the outbox, sweep only linked members through the

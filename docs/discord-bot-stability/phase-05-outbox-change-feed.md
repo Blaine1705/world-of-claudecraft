@@ -15,7 +15,7 @@ is therefore a first-class deliverable, not a side effect.
 ```
 This is Phase 5 of the Discord Bot Stability packet: Outbox + linked-member change feed.
 Model: Opus 4.8 or newer, xhigh effort. Harness: Claude Code.
-Worktree: /Users/fernando/Documents/wocc-discord-bot (branch feature/discord-bot-stability).
+Worktree: /home/fernandoramirez/Documents/world-of-claudecraft (branch feature/discord-bot-stability).
 ULTRACODE: not required, but the feed-site enumeration in STEP 1 must be EXHAUSTIVE; give the
 Explore agent "very thorough" breadth and treat its output as a deliverable, not a hint.
 

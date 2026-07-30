@@ -15,7 +15,7 @@ adversarial-verify Workflow (every finding independently confirmed by a skeptic 
 counts) plus mutation spot checks on bot/rate_governor.ts. Judge every refutation yourself rather
 than taking it on faith, and require the skeptic to have the file open before a refutation
 counts.
-Worktree: /Users/fernando/Documents/wocc-discord-bot.
+Worktree: /home/fernandoramirez/Documents/world-of-claudecraft.
 
 STEP 0 - PRE-FLIGHT: run `git status` and confirm it is clean with Phase 2 committed; another
 session may share this checkout, so ASK before touching anything you did not create. Memory scan

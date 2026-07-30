@@ -13,7 +13,7 @@ code changes here; the existing per-endpoint routes stay exactly where they are 
 ```
 This is Phase 4 of the Discord Bot Stability packet: Server set-based endpoints.
 Model: Opus 4.8 or newer, xhigh effort. Harness: Claude Code.
-Worktree: /Users/fernando/Documents/wocc-discord-bot (branch feature/discord-bot-stability).
+Worktree: /home/fernandoramirez/Documents/world-of-claudecraft (branch feature/discord-bot-stability).
 ULTRACODE: not required for this phase. Use parallel Agent fan-out (STEP 2), not a Workflow.
 
 Goal: make the game server answer the bot's needs with set-based work: one batched flex endpoint
