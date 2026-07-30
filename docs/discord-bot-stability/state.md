@@ -1,6 +1,6 @@
 # State: Discord Bot Stability (cross-phase cheat sheet)
 
-Current phase: Phase 1 not started.
+Current phase: Phase 1 built (2026-07-30), QA session next.
 
 ## Locked decisions
 
@@ -101,11 +101,12 @@ Current phase: Phase 1 not started.
 
 ## Key file paths
 
-Bot: `bot/main.ts` (wiring, intervals at :518-537, sync at :203-251, dispatch at
-:254-390), `bot/logic.ts` (pure), `bot/discord_api.ts` (REST shell, request() :11-38),
-`bot/server_client.ts` (game API shell, call() :32-57), `bot/gateway.ts` (ws shell,
-fatal closes :135-142), `bot/config.ts`. Build: `scripts/build_bot.mjs` ->
-`dist-bot/bot.cjs`; `package.json:80`.
+Bot: `bot/main.ts` (wiring, the six intervals, sync, dispatch), `bot/cadence.ts` (the
+three poll-loop constants, moved out of `main.ts` by Phase 1 per R6), `bot/logic.ts`
+(pure), `bot/discord_api.ts` (REST shell, one `request()` funnel), `bot/server_client.ts`
+(game API shell, one `call()` funnel), `bot/gateway.ts` (ws shell, fatal closes),
+`bot/config.ts`. Build: `scripts/build_bot.mjs` -> `dist-bot/bot.cjs`; `package.json`
+`build:bot`, in the gate and both CI build jobs since Phase 1.
 
 Server: `server/internal.ts` (RouteDef table :329-549, FROZEN legacy twins :75-241),
 `server/discord.ts` (flex :950, status payload :798, presence cache :185),
@@ -129,17 +130,34 @@ vi.mock module fakes + `runRoute`; `tests/discord_db.test.ts` `makePool` fake, w
 `tests/discord_relay.test.ts` covers `src/sim/discord_relay.ts`, NOT the server module
 of the same name.
 
-Config: `tsconfig.json` (`include` lacks `bot` until Phase 1), `scripts/gate.mjs`
-(steps :56-74).
+Config: `tsconfig.json` (`include` carries `bot` as of Phase 1, so all six bot files
+are type-checked and every construction site's arity is compiler-enforced),
+`scripts/gate.mjs` (the `steps` list, which now carries the `bot build` step).
 
 ## Created by this packet (update per phase)
 
-- Phase 1: (pending)
-- New env keys: (pending)
+- Phase 1: `bot` added to the tsconfig `include` (it surfaced ZERO latent type errors,
+  so no behavior-preserving fixes were needed); `build:bot` added to the gate step list
+  and to both CI jobs that build the server (`pr-checks`, and `release-gate` under
+  `if: matrix.shard == 1`); injected IO seams on all three shells; cadence constants
+  extracted per R6.
+- New env keys: none (Phase 2 adds the first ones).
 - New endpoints: (pending; planned `POST /internal/discord/flex-batch`,
   `GET /internal/discord/outbox`)
-- New modules: (pending; planned governor, scheduler, change feed)
-- New tests: (pending)
+- New modules: `bot/cadence.ts` (the three poll-loop constants, values only).
+  Still planned: governor, scheduler, change feed.
+- New tests: `tests/discord_bot_config.test.ts` (config arms + the cadence pins),
+  `tests/discord_bot_server_client.test.ts` (call envelope, secret header, deadline,
+  production-default path), `tests/discord_bot_discord_api.test.ts` (auth headers, the
+  v10 base, the 429 retry clamps and the retry-once bound, production-default path),
+  `tests/discord_bot_gateway.test.ts` (module-mocks `ws`; default socket factory,
+  injected factory, HELLO to IDENTIFY, fatal-versus-normal close).
+  `tests/discord_bot.test.ts` stays pure-logic only.
+- New exported constant: `SERVER_CALL_TIMEOUT_MS` (8000) in `bot/server_client.ts`,
+  named so the suite can pin the deadline against a literal.
+- Touched pins: `tests/ci_workflow.test.ts` structural counts (release-gate
+  single-shard conditions 8 to 9, release-gate steps 12 to 13) plus the pr-checks
+  build-step coverage loop.
 
 ## Rulings settled during authoring (2026-07-30)
 
@@ -175,8 +193,12 @@ Config: `tsconfig.json` (`include` lacks `bot` until Phase 1), `scripts/gate.mjs
   documentation still lands in DEPLOY.md in Phase 7 (D13 unchanged).
 - R9: The pre-existing em dash in the `bot/gateway.ts` FATAL_CLOSE_CODES comment is
   fixed as a one-character copy fix inside Phase 1 (the phase touches that file for the
-  socket seam and the Stop hook would otherwise block the diff). Scoped to that one
-  comment; QA must not flag it as scope creep. Phase 7 need not act on it.
+  socket seam anyway, and the repo copy rule bans em dashes outright). Scoped to that
+  one comment; QA must not flag it as scope creep. Phase 7 need not act on it.
+  Correction (Phase 1, verified): the original rationale said the Stop hook would have
+  blocked the diff. It would not have. `.claude/hooks/qa-stop.sh` scans ADDED lines
+  only, so an untouched pre-existing comment never trips it. The fix stands on the copy
+  rule alone. Do not reason from the old premise.
 - R10 (D17 reading, confirmed): Phase 9 caches only the database-backed part of the
   `/api/discord` payload; `discordPresenceCache()` is composed fresh per request so
   presence is never frozen behind the payload TTL. Both routes (RouteDef
@@ -195,11 +217,60 @@ Config: `tsconfig.json` (`include` lacks `bot` until Phase 1), `scripts/gate.mjs
   Docker's backoff is the desired behavior over today's silent zombie. No retry
   limiter, no supervisor. The Counter-versus-Gauge shape for pushed bot counters is
   DELIBERATELY delegated to the Phase 8 runner (pick, justify, record here).
+- R14 (settled in Phase 1): naming the previously inline `8000` as the exported
+  `SERVER_CALL_TIMEOUT_MS` is sanctioned, even though acceptance item 6 enumerates only
+  "type annotations, defaulted constructor parameters, comments, the cadence move, and
+  the gateway comment fix". It is value-identical, and a named export is what lets the
+  suite pin the deadline against a literal instead of re-reading the source (the
+  constant-self-comparison trap). Do not re-litigate it in QA.
+- R15 (settled in Phase 1): the three IO shells share ONE injection convention. Every
+  default FORWARDS to the global (`(...args) => fetch(...args)`, `(cb, ms) =>
+  setTimeout(cb, ms)`) rather than capturing it (`= fetch`, `= { setTimeout }`). Two
+  reasons: the global is then read at CALL time, so a test that swaps a global after
+  construction is still seen (this matters for the fake-timer work in Phases 2 and 3);
+  and the global is never invoked with the instance as its `this`, which is harmless on
+  Node today but is a real trap on any other host. New shells follow this. Recorded in
+  `bot/CLAUDE.md`.
 
 ## OPEN items
 
 See brainstorm.md O1 to O7. O4 (Developer Portal intent toggles) needs the user.
 O5 (member-write 429 scope) resolves from logs after first prod deploy.
+
+### Ledgered during Phase 1 (found, deliberately NOT fixed there)
+
+Phase 1 forbids any runtime behavior change, and each of these changes behavior or
+adds a guard, so they were recorded rather than landed. The Phase 1 QA session should
+route each to a phase or file it.
+
+- L1 (should-fix, security): `bot/discord_api.ts` throws
+  `[bot] discord ${method} ${path} -> ...` with `path` interpolated verbatim, and three
+  interaction call sites (`respondInteraction`, `deferInteraction`,
+  `editOriginalResponse`) carry the INTERACTION TOKEN inside `path`. The throw is caught
+  by the `console.error('[bot] interaction error', e)` handler in `bot/main.ts`, so a
+  400/401/404 (or a twice-429) on a slash-command reply writes a live ~15 minute bearer
+  credential into the container log. PRE-EXISTING, not a regression of Phase 1. Fix
+  shape: redact the token segment, or log a safe label beside the real path. Natural
+  home is Phase 2, which already rewrites `request()` for the governor.
+- L2 (nice-to-have, privacy): `bot/server_client.ts` non-ok log line prints `path`,
+  which for `flex()` and `roles()` carries `?discord_user_id=<id>`. Low sensitivity
+  (a Discord id is pseudonymous and guild-visible) but it is user-identifying data in
+  an operator log. Pre-existing.
+- L3 RESOLVED, do not add the pin. The concern was that nothing stops a future call site
+  from passing a wrapping `fetchImpl` that observes the bot token or the shared secret.
+  Ruling: `tsc` now proves the arity of every construction site (that is what adding
+  `bot` to the include bought), which is a stronger guard than a source-text scan and
+  costs nothing, and a text pin would carry the documented source-scrape traps. No pin.
+- L4 CLOSED by Phase 1. `tests/discord_bot_gateway.test.ts` module-mocks `ws` and covers
+  both directions: the DEFAULT factory constructs the real `ws` client at
+  `/?v=10&encoding=json`, and an injected factory is used instead of it. It also
+  exercises HELLO to IDENTIFY, the heartbeat interval, and the fatal-versus-normal close
+  branch. Phases 3 and 7 extend it rather than starting from nothing.
+- L5 (coverage gap, Phase 5 territory): two `bot/server_client.ts` contracts are still
+  unpinned. `flairedIds()` distinguishes null (meaning "change nothing", per its own doc
+  comment) from an empty array, and its `typeof x === 'string'` filter is untested;
+  `pushMembersMeta()` has an untested zero-updated silent-drop warning branch. Both were
+  outside Phase 1's assigned arm list. Phase 5 touches both, so pin them there.
 
 ## Known gotchas for implementers
 

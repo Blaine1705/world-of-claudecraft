@@ -4,7 +4,7 @@
 
 | Phase | Status | Started | Completed |
 |---|---|---|---|
-| Phase 1: Bot verification foundation | not started | | |
+| Phase 1: Bot verification foundation | built | 2026-07-30 | 2026-07-30 |
 | Phase 1 QA | not started | | |
 | Phase 2: Discord rate-limit governor | not started | | |
 | Phase 2 QA | not started | | |
@@ -26,11 +26,12 @@
 ## Deliverable checklists
 
 ### Phase 1
-- [ ] `bot` in tsconfig include, latent type errors fixed behavior-preserving
-- [ ] `build:bot` in `scripts/gate.mjs`
-- [ ] Injectable fetch/socket/clock seams in `discord_api.ts`, `server_client.ts`, `gateway.ts`
-- [ ] Cadence constants extracted into `bot/cadence.ts` as a pure move (R6)
-- [ ] Baseline tests: config arms, server_client envelope/secret/timeout, cadence pins via the module
+- [x] `bot` in tsconfig include, latent type errors fixed behavior-preserving
+      (the include surfaced none; all six bot files are in the checked set)
+- [x] `build:bot` in `scripts/gate.mjs` (and in both CI jobs that build the server, R7)
+- [x] Injectable fetch/socket/clock seams in `discord_api.ts`, `server_client.ts`, `gateway.ts`
+- [x] Cadence constants extracted into `bot/cadence.ts` as a pure move (R6)
+- [x] Baseline tests: config arms, server_client envelope/secret/timeout, cadence pins via the module
 
 ### Phase 2
 - [ ] `bot/rate_governor.ts` pure module (buckets, proactive gating, global pause, breaker, forbidden cache, counters)
@@ -84,4 +85,58 @@
 
 ## Per-phase notes
 
-(fill in after each session)
+### Phase 1 (2026-07-30)
+
+The tsconfig include surfaced ZERO latent type errors, so the "fix the errors the
+include surfaces" commit collapsed into the include itself. The include was proven
+live two ways rather than assumed: `tsc --noEmit --listFiles` lists all six bot files
+including `bot/main.ts`, and a deliberate type error added to `bot/main.ts` failed the
+check before being reverted.
+
+The bot build had fallout the plan did not name: `tests/ci_workflow.test.ts` pins the
+release-gate structure by count, so adding a step moved the single-shard condition
+count from 8 to 9 and the release-gate step count from 12 to 13. Both new pins were
+mutation-checked (dropping either new CI step turns the suite red).
+
+Seam shapes chosen, all trailing parameters with production defaults so every
+existing call site in `bot/main.ts` is untouched: `DiscordApi(token, fetchImpl, sleep)`,
+`ServerClient(baseUrl, secret, fetchImpl, timers)`, and
+`Gateway(token, gatewayUrl, handlers, socketFactory, timers)`. The Gateway socket
+factory returns `ws`'s own `WebSocket` type deliberately, because widening it to a
+structural interface would strip the contextual parameter types off the
+`on('message'|'close'|'error', ...)` callbacks and put `WebSocket.OPEN` out of reach.
+
+Verification: 98 tests green across the seven bot-related suites, and two independent
+mutation rounds killed 31/31.
+
+The review round changed the shape of the phase in three ways worth carrying forward.
+The `qa-checklist` pass found the acceptance criterion "a test asserts the DEFAULT
+path" was met for `ServerClient` only, while `DiscordApi` and `Gateway` had no test
+importing them at all. That is not cosmetic: this phase INTRODUCED the failure mode
+(`request()` used to call the global `fetch` directly and now calls `this.fetchImpl`),
+so a broken default parameter would have shipped silently. Both are now covered, the
+Gateway one by module-mocking `ws`, which also closed the L4 ledger item outright
+rather than deferring it to Phase 3.
+
+Second, the three shells had drifted into two different injection conventions
+(capture-the-global versus forward-to-the-global). They are now uniformly
+forward-to-the-global, which is both fake-timer friendly for Phases 2 and 3 and avoids
+calling a global with the instance as its `this`. Recorded as R15 and in `bot/CLAUDE.md`.
+
+Third, the CI guard was compensable: `build:bot` in `release-gate` was pinned only by
+two counts, so deleting it and adding any other single-shard step kept the suite green.
+It is now also pinned by name, along with the other three builds and the four gate
+steps. The decoy-swap mutation confirms the hole is closed.
+
+The killed mutants: both cadence constants, the `'0'` nickname arm, the `||` default
+fallback, the `!v` required guard, the activity ladder rung, two channel key swaps, the
+secret header name, the 8000 ms deadline, the success-flag check, the `finally`
+clearTimeout, the Content-Type header, the non-ok short circuit, the injected-fetch
+routing, the `Bot` versus `Bearer` prefix, the v10 base, all three retry-clamp bounds,
+the retry-once bound, the User-Agent, both Gateway default-socket arms, the v10/json
+query string, the 4014 fatal-close code, the reconnect delay, the deleted gate step,
+and the count-preserving CI decoy swap.
+
+Worktree note for later phases: this checkout had no `node_modules`, and the main
+checkout's install is stale (TypeScript 5.9.3, no ffmpeg-static). A local `npm ci` in
+the worktree is what gets the real TypeScript 7 native binary and a runnable gate.
