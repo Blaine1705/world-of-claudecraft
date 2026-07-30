@@ -105,6 +105,10 @@ export interface CharacterProfessionsInput {
   state: CharacterState;
   live: boolean;
   updatedAt: string | null;
+  // True when there was no stored blob at all (a created-but-never-entered
+  // character): the one-shot migrations never apply to the CONSTRUCTION path
+  // a first login takes, so the preMigration warning must not fire.
+  emptyBlob?: boolean;
 }
 
 export function characterProfessionsSheet(
@@ -147,14 +151,20 @@ export function characterProfessionsSheet(
       : [],
   );
   const nodeTimers = Object.entries(state.nodeHarvestCooldowns ?? {})
+    // The loader's positive() rule: a non-positive or non-finite remaining is
+    // garbage the login drops, and Math.min(NaN, cap) would render NaN.
+    .filter(([, remainingSeconds]) => Number.isFinite(remainingSeconds) && remainingSeconds > 0)
     .map(([nodeId, remainingSeconds]) => {
       const node = gatherNodeById(nodeId);
       return {
         nodeId,
         zoneId: node?.zoneId ?? null,
         nodeType: node?.type ?? null,
-        // The load-side clamp (applyNodeReadiness): a stale or tampered row
-        // never displays a wait the game would not honor.
+        // Two of the loader's three rules apply here (the positive filter
+        // above and this respawnSeconds clamp); the third, dropping RETIRED
+        // node ids, is deliberately NOT applied: the operator should see the
+        // row existed (null zone/type marks it), even though the next login
+        // discards it.
         remainingSeconds: node
           ? Math.min(remainingSeconds, NODE_HARVEST_TABLE[node.type].respawnSeconds)
           : remainingSeconds,
@@ -173,6 +183,7 @@ export function characterProfessionsSheet(
     updatedAt: input.updatedAt,
     preMigration:
       !input.live &&
+      input.emptyBlob !== true &&
       (state.masteryResetApplied !== true ||
         state.proficiencyDisplayHealApplied !== true ||
         state.recipesGrandfathered !== true),
@@ -208,10 +219,13 @@ export function characterProfessionsSheetFromRow(
     // characters.state is NULLABLE (a created-but-never-entered character
     // stores SQL NULL until its first save, and the admin list shows such
     // rows), so an empty object stands in: every field then reads its
-    // documented default instead of throwing.
+    // documented default instead of throwing. Such a row is emptyBlob, not
+    // pre-migration: first login takes the construction path, which the
+    // one-shot migrations never touch.
     state: liveState ?? ((row.state ?? {}) as CharacterState),
     live: liveState !== null,
     updatedAt: liveState !== null ? null : row.updatedAt,
+    emptyBlob: liveState === null && row.state == null,
   });
 }
 

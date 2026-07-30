@@ -1016,6 +1016,10 @@ export async function recordProfessionsRestore(input: {
 }): Promise<{ accountId: number }> {
   const reason = cleanText(input.reason, ACTION_REASON_MAX);
   if (!reason) throw new Error('moderation reason is required');
+  // Locally enforce the bounded-prefix claim above instead of trusting every
+  // future caller's validation: today's two callers pass allowlisted ids, and
+  // this cap keeps that an invariant rather than a convention.
+  const detail = cleanText(input.detail, 128);
   const character = await pool.query('SELECT account_id FROM characters WHERE id = $1', [
     input.characterId,
   ]);
@@ -1024,7 +1028,7 @@ export async function recordProfessionsRestore(input: {
   await recordModerationAction(pool, input.action, {
     accountId,
     adminAccountId: input.adminAccountId,
-    reason: `[requested ${input.detail} for character ${input.characterId}] ${reason}`,
+    reason: `[requested ${detail} for character ${input.characterId}] ${reason}`,
   });
   return { accountId };
 }

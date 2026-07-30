@@ -3953,8 +3953,9 @@ export class GameServer {
   // R35 GM restore: mint a lost item back onto a LIVE character through the
   // sim's normal grant hub (grants reaching addItem always land). The count
   // is re-clamped defensively even though the admin handler validates it
-  // (the dev_give 1..20 clamp); a non-integer (NaN included) clamps to 1
-  // rather than flowing through Math.floor into the hub.
+  // (the dev_give 1..20 clamp); EVERY non-integer (NaN and finite fractions
+  // alike) clamps to 1, deliberately stricter than a Math.floor would be,
+  // because a non-integer here means the validator was bypassed.
   adminRestoreItem(
     characterId: number,
     itemId: string,

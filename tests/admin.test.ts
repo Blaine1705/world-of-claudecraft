@@ -236,8 +236,10 @@ const fakeGameState = {
   disconnectByIp: vi.fn(),
   adminCharacterState: vi.fn((): Record<string, unknown> | null => ({})),
   adminCharacterOnline: vi.fn(() => true),
-  adminRestoreItem: vi.fn(() => 'ok' as const),
-  adminRestoreToolEffectSlot: vi.fn(() => 'ok' as const),
+  adminRestoreItem: vi.fn((): 'ok' | 'offline' | 'invalid_item' => 'ok'),
+  adminRestoreToolEffectSlot: vi.fn(
+    (): 'ok' | 'offline' | 'invalid_request' | 'no_tool' | 'already_slotted' => 'ok',
+  ),
 };
 const fakeGame = fakeGameState as typeof fakeGameState & Parameters<typeof handleAdminApi>[2];
 
@@ -2389,5 +2391,28 @@ describe('admin api R35 professions tooling (LEGACY dispatch arm)', () => {
     expect(res.body.error).toBe('character is not online on this realm');
     expect(recordProfessionsRestore).not.toHaveBeenCalled();
     expect(fakeGame.adminRestoreToolEffectSlot).not.toHaveBeenCalled();
+  });
+});
+
+describe('admin api R35 restore-item invalid_item arm (LEGACY dispatch arm)', () => {
+  it('maps a runtime invalid_item to its own prose, never the offline race', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
+    vi.mocked(fakeGame.adminCharacterOnline).mockReturnValue(true);
+    vi.mocked(fakeGame.adminRestoreItem).mockReturnValue('invalid_item');
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/characters/42/restore-item',
+        body: { itemId: 'copper_mining_pick', count: 1, reason: 'lost' },
+      }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe('unknown item id');
   });
 });

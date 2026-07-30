@@ -124,6 +124,21 @@ describe('restoreToolEffectSlotAction (GM restore, R35)', () => {
     expect(metaOf(sim).toolEffectSlots?.mining).toEqual(before);
   });
 
+  it('already_slotted outranks no_tool: the ORDER of the refusals is deliberate', () => {
+    // A character with a live slot but NO tool must hear "already slotted",
+    // not "no tool": the live row is the reason a restore is wrong, and the
+    // two arms produce different operator-facing prose. Swapping the checks
+    // is the refactor this pin exists to catch.
+    const sim = makeSim();
+    sim.addItem('copper_mining_pick', 1);
+    sim.addItemInstance('gatherers_cache', { signer: metaOf(sim).name }, sim.playerId, 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    sim.removeItem('copper_mining_pick', 1, sim.playerId);
+    expect(restoreToolEffectSlotAction(sim.ctx, 'mining', 'gatherers_cache', sim.playerId)).toBe(
+      'already_slotted',
+    );
+  });
+
   it('refuses offline (unresolvable) pids without touching anything', () => {
     const sim = makeSim();
     expect(restoreToolEffectSlotAction(sim.ctx, 'mining', 'gatherers_cache', 424242)).toBe(
@@ -170,7 +185,7 @@ describe('restoreToolEffectSlotAction (GM restore, R35)', () => {
         if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
         const full = path.join(dir, entry.name);
         if (entry.isDirectory()) walk(full);
-        else if (/\.(ts|mts|cts|tsx)$/.test(entry.name)) {
+        else if (/\.(ts|mts|cts|tsx|js|mjs|cjs)$/.test(entry.name)) {
           const text = fs.readFileSync(full, 'utf8');
           if (
             text.includes('restoreToolEffectSlotAction') &&
@@ -181,7 +196,9 @@ describe('restoreToolEffectSlotAction (GM restore, R35)', () => {
         }
       }
     };
-    for (const top of ['src', 'server', 'headless', 'bot']) walk(path.join(root, top));
+    for (const top of ['src', 'server', 'headless', 'bot', 'scripts', 'electron']) {
+      walk(path.join(root, top));
+    }
     expect(importers).toEqual(['server/game.ts']);
   });
 });

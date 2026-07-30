@@ -3370,6 +3370,9 @@ describe('R35 professions inspector: fix-round edge pins', () => {
     expect(sheet.slots).toEqual([]);
     expect(sheet.nodeTimers).toEqual([]);
     expect(sheet.knownRecipes).toBe(0);
+    // Never-entered is emptyBlob, NOT pre-migration: first login takes the
+    // construction path the one-shot migrations never touch.
+    expect(sheet.preMigration).toBe(false);
   });
 
   it('marks a pre-migration blob and clamps a tampered node timer', async () => {
@@ -3454,5 +3457,22 @@ describe('R35 professions inspector: fix-round edge pins', () => {
     const sheet = (r.body as { data: Record<string, any> }).data;
     expect(sheet.live).toBe(true);
     expect(sheet.preMigration).toBe(false);
+  });
+});
+
+describe('R35 restore-item: the defensive invalid_item arm', () => {
+  it('maps a runtime invalid_item to its own prose, never the offline race', async () => {
+    authedAdminDb({ recordProfessionsRestore: vi.fn(async () => ({ accountId: 9 })) });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'invalid_item'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 1, reason: 'lost' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({ success: false, data: null, error: 'unknown item id' });
   });
 });
