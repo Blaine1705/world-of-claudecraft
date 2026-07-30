@@ -97,8 +97,12 @@ export class ProfessionsWindow {
   // The R40 "Ask each use" choice per gathering profession: UI-local state
   // for the NEXT slot action (the mode is part of the mint, so it rides the
   // slotToolEffect command), held here so the full innerHTML rebuild cannot
-  // reset a checked box. Session-scoped on purpose: the durable record of a
-  // LIVE slot's mode is the row's own chip, mirrored from the tslot wire.
+  // reset a checked box. Seeded from the LIVE slots' modes at each fresh
+  // open (the phase 14 QA: the toggle otherwise contradicted the chip one
+  // line above it); the player's unsent choice then persists across
+  // rebuilds for as long as the window stays open. The durable record of a
+  // LIVE slot's mode stays the row's own chip, mirrored from the tslot
+  // wire.
   private readonly slotModePrompt = new Set<string>();
 
   constructor(private readonly deps: ProfessionsWindowDeps) {}
@@ -117,6 +121,16 @@ export class ProfessionsWindow {
     this.deps.closeOthers();
     this.openerFocus = this.deps.captureFocus();
     this.opened = true;
+    // Seed the toggles from the LIVE slots (the phase 14 QA): the capture
+    // truth-test showed a prompt-mode slot chipping "Asks each use" beside
+    // an unchecked "Ask each use" toggle, two near-identical labels
+    // contradicting each other. A fresh open reflects each slot's real
+    // mode; the player's unsent choice then persists across rebuilds for
+    // as long as the window stays open.
+    this.slotModePrompt.clear();
+    for (const row of this.deps.world().toolEffectSlots) {
+      if (row.confirmMode === 'prompt') this.slotModePrompt.add(row.professionId);
+    }
     this.lastSig = '';
     this.render();
     this.deps.root().style.display = 'flex';

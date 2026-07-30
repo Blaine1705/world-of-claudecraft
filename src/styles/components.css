@@ -7211,6 +7211,16 @@
   .prof-effect-charges {
     font-variant-numeric: tabular-nums;
   }
+  /* The recharge cost preview beside the button (the UX pass): reads as a
+     price, so it takes the same gold the effect name carries, dimmed a
+     step under it, with tabular figures for the count (the charges rule
+     above). Previously an orphan class inheriting the row default (the
+     phase 14 QA). */
+  .prof-effect-price {
+    color: var(--gold-dim);
+    opacity: 0.85;
+    font-variant-numeric: tabular-nums;
+  }
   /* The slot/recharge affordances the acquisition craft opened: compact
      .btn variants on the effect line and in their own wrapping action row.
      Padding narrows on fine pointers; coarse pointers get the explicit

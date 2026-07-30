@@ -531,10 +531,10 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
     const deep = slotted({ charges: 3, maxCharges: 20 });
     deep.inventory = [{ itemId: 'copper_mining_pick', count: 1 }];
     const { el } = makeWindow(deep);
+    // Exact-line pins (the phase 14 QA: digit substrings let a 10x count
+    // mutation ship green, '20 x' still contains '2').
     const price = el.querySelector('.prof-effect-price')?.textContent ?? '';
-    expect(price).toContain('Recharge:');
-    expect(price).toContain('2');
-    expect(price).toContain('Chime Dust');
+    expect(price).toBe('Recharge: 2 x Chime Dust');
     // ...and the blind marginal top-up: 19 of 20 restores one charge and
     // STILL prices one full material (the ceil floor), stated before the
     // click instead of discovered after it.
@@ -542,13 +542,79 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
     marginal.inventory = [{ itemId: 'copper_mining_pick', count: 1 }];
     const { el: marginalEl } = makeWindow(marginal);
     const marginalPrice = marginalEl.querySelector('.prof-effect-price')?.textContent ?? '';
-    expect(marginalPrice).toContain('1');
-    expect(marginalPrice).toContain('Chime Dust');
+    expect(marginalPrice).toBe('Recharge: 1 x Chime Dust');
     // No preview without a button: the full slot renders neither.
     const full = slotted({ charges: 20, maxCharges: 20 });
     full.inventory = [{ itemId: 'copper_mining_pick', count: 1 }];
     const { el: fullEl } = makeWindow(full);
     expect(fullEl.querySelector('.prof-effect-price')).toBeNull();
+  });
+
+  it('a fresh open seeds each toggle from the live slot mode (the phase 14 QA)', () => {
+    // The capture truth-test showed a prompt-mode slot chipping "Asks each
+    // use" beside an UNCHECKED "Ask each use" toggle. A fresh open now
+    // reflects each live slot's real mode.
+    const prompt = slotted({ confirmMode: 'prompt' });
+    prompt.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'artisans_eye', count: 1 },
+    ];
+    const { el } = makeWindow(prompt);
+    const box = el.querySelector<HTMLInputElement>('[data-slot-mode="mining"]');
+    expect(box).toBeTruthy();
+    expect(box?.checked).toBe(true);
+    // The control arm: an 'always' slot opens unchecked.
+    const always = slotted();
+    always.inventory = prompt.inventory;
+    const { el: alwaysEl } = makeWindow(always);
+    expect(alwaysEl.querySelector<HTMLInputElement>('[data-slot-mode="mining"]')?.checked).toBe(
+      false,
+    );
+  });
+
+  it('flipping Ask-each-use changes which slot buttons exist (the resolver sees the sent mode)', () => {
+    // The no_gain mode conjunct, driven through the REAL toggle (the phase
+    // 14 QA found no arm where the threading changed an outcome): a full
+    // 'always' cache slot refuses a same-mode remint, so its button is
+    // absent; with the toggle on, the same remint is a mode gain and the
+    // button appears. The second charm keeps the actions row (and the
+    // toggle itself) painted in both states.
+    const state = slotted({ charges: 20, maxCharges: 20 });
+    state.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'artisans_eye', count: 1 },
+      { itemId: 'gatherers_cache', count: 1 },
+    ];
+    const { el } = makeWindow(state);
+    expect(el.querySelector('[data-slot-effect="artisans_eye"]')).not.toBeNull();
+    expect(el.querySelector('[data-slot-effect="gatherers_cache"]')).toBeNull();
+    const box = el.querySelector<HTMLInputElement>('[data-slot-mode="mining"]');
+    expect(box).toBeTruthy();
+    if (!box) return;
+    box.checked = true;
+    box.dispatchEvent(new Event('change'));
+    expect(el.querySelector('[data-slot-effect="gatherers_cache"]')).not.toBeNull();
+  });
+
+  it('the preview prices with the viewer craft skills: specialization shrinks the count', () => {
+    // The phase 14 QA: every recharge fixture lacked selfCrafted, so the
+    // old {} skills argument previewed identically. An EPIC pick refills a
+    // spent slot to 50 charges (restored 50, 5 undiscounted materials): the
+    // original-crafter discount alone prices ceil(2.5) = 3, and enchanting
+    // specialization (skill 75, the cache charm's craft) drops it to
+    // ceil(1.875) = 2, so the previewed count moves with
+    // input.identity.craftSkills exactly and a revert to the old {} reads 3.
+    const noSpec = slotted({ charges: 0, maxCharges: 20, selfCrafted: true });
+    noSpec.inventory = [{ itemId: 'arcanite_mining_pick', count: 1 }];
+    const { el: noSpecEl } = makeWindow(noSpec);
+    const noSpecPrice = noSpecEl.querySelector('.prof-effect-price')?.textContent ?? '';
+    expect(noSpecPrice).toMatch(/^Recharge: 3 x /);
+    const spec = slotted({ charges: 0, maxCharges: 20, selfCrafted: true });
+    spec.inventory = [{ itemId: 'arcanite_mining_pick', count: 1 }];
+    spec.identity.craftSkills.enchanting = 75;
+    const { el: specEl } = makeWindow(spec);
+    const specPrice = specEl.querySelector('.prof-effect-price')?.textContent ?? '';
+    expect(specPrice).toMatch(/^Recharge: 2 x /);
   });
 
   it('a rechargeable slot paints the recharge button; a full or tool-less one does not', () => {
