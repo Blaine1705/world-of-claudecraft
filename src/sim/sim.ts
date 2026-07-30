@@ -7318,6 +7318,9 @@ export class Sim {
       // ever swinging. Kited from here, the chase-case leash check walks it back to
       // this eruption point, not the boss's distant home.
       add.tappedById = boss.tappedById;
+      // Slain adds unravel with their corpse (mob/locomotion.ts) rather than
+      // respawning at the eruption point, which is wherever the fight dragged.
+      add.summonedAdd = true;
       this.addEntity(add);
       boss.summonedIds.push(add.id);
       inst?.mobIds.push(add.id);

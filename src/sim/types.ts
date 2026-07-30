@@ -3344,6 +3344,11 @@ export interface Entity extends ClientMirroredEntityFields {
   warcryTimer: number; // warcry ally-haste pulse countdown
   firedSummons: number; // summonAdds thresholds already triggered
   summonedIds: number[]; // live adds this boss summoned; despawned on reset
+  // Server-local (never on the wire; blankEntity keeps host shapes identical):
+  // true for a mob spawnBossAdds erupted beside its summoner. A slain add
+  // unravels with its corpse instead of respawning at its eruption point,
+  // which is wherever the fight dragged (see mob/locomotion.ts).
+  summonedAdd: boolean;
   enraged: boolean; // enrage mechanic active
   // Heroic-instance mechanic scaling (instances/difficulty.ts applyDungeonMobTuning).
   // Mechanic numbers (aoePulse/bigCast/stomp damage; mendAlly/wardAllies/stoneskin

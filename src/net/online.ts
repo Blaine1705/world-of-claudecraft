@@ -1250,6 +1250,7 @@ function blankEntity(id: number): Entity {
     detonateTimer: Infinity,
     firedSummons: 0,
     summonedIds: [],
+    summonedAdd: false,
     enraged: false,
     healedThisPull: false,
     threat: new Map(),
