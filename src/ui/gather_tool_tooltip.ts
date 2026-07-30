@@ -24,8 +24,10 @@ import {
 } from '../sim/professions/fishing';
 import { PROFICIENCY_BAND_THRESHOLDS } from '../sim/professions/proficiency_bands';
 import { isGatherToolUse } from '../sim/professions/tools';
+import { wieldRequirementForTier } from '../sim/professions/wield_gate';
 import type { ItemDef } from '../sim/types';
 import { esc } from './esc';
+import { GATHERING_PROFESSION_NAME_KEYS } from './gathering_profession_name';
 import { formatNumber, type TranslationKey, t } from './i18n';
 
 const KIND_KEYS: Record<GatheringProfessionId, TranslationKey> = {
@@ -125,6 +127,21 @@ export function gatherToolTooltipLines(item: ItemDef): string {
   const useKey = USE_KEYS[use.professionId];
   if (unlocksKey) html += line('tt-desc', t(unlocksKey, { tier }));
   if (useKey) html += line('tt-desc', t(useKey));
+  // The R22 wield requirement, on the item that carries it: the same
+  // "Requires {craft} {skill}" line the vendor's advisory sub-line renders,
+  // with the number read from the one wield table the harvest gate enforces
+  // (professions/wield_gate.ts). Land tools only by construction: rods are
+  // R22-exempt and their branch returned above, and tier 1 reads 0.
+  const wieldReq = wieldRequirementForTier(use.tier);
+  if (wieldReq > 0) {
+    html += line(
+      'tt-desc',
+      t('hudChrome.crafting.skillReqLine', {
+        craft: t(GATHERING_PROFESSION_NAME_KEYS[use.professionId] ?? KIND_KEYS[use.professionId]),
+        skill: formatNumber(wieldReq, { maximumFractionDigits: 0 }),
+      }),
+    );
+  }
   if (use.tier > 1) {
     html += line('tt-desc', t('hudChrome.gathering.toolTooltip.speed', { tier }));
   }

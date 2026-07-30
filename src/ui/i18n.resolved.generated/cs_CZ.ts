@@ -2309,6 +2309,12 @@ export const cs_CZ: EnTranslations = {
         "logging": "V dosahu není žádná skupina stromů.",
         "herbalism": "V dosahu není žádný porost bylin."
       },
+      "wieldUnmet": {
+        "mining": "You need Mining {skill} to swing the pick already in your bags.",
+        "logging": "You need Logging {skill} to swing the axe already in your bags.",
+        "herbalism": "You need Herbalism {skill} to work the sickle already in your bags."
+      },
+      "wieldUnmetCorpse": "You need gathering skill {skill} to put your finest tool to work.",
       "toolTierUnmetCorpse": "K získání nejjemnějších materiálů potřebuješ sběračský nástroj úrovně {tier}.",
       "toolTooltip": {
         "kind": {

@@ -2309,6 +2309,12 @@ export const pt_BR: EnTranslations = {
         "logging": "Não há nenhum arvoredo ao alcance.",
         "herbalism": "Não há nenhum canteiro de ervas ao alcance."
       },
+      "wieldUnmet": {
+        "mining": "You need Mining {skill} to swing the pick already in your bags.",
+        "logging": "You need Logging {skill} to swing the axe already in your bags.",
+        "herbalism": "You need Herbalism {skill} to work the sickle already in your bags."
+      },
+      "wieldUnmetCorpse": "You need gathering skill {skill} to put your finest tool to work.",
       "toolTierUnmetCorpse": "Você precisa de uma ferramenta de coleta de nível {tier} para recuperar os melhores materiais.",
       "toolTooltip": {
         "kind": {

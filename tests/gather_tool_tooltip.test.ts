@@ -31,6 +31,30 @@ describe('gatherToolTooltipLines: picks, axes, sickles', () => {
     expect(html).toContain('<div class="tt-desc">Gathers faster at nodes below tier 2.</div>');
   });
 
+  it('land tools above tier 1 carry the wield requirement line; rods and the entry tools never do (R22)', () => {
+    // The same "Requires {craft} {skill}" line the vendor's advisory sub-line
+    // renders, read from the one wield table the harvest gate enforces.
+    expect(gatherToolTooltipLines(ITEMS.iron_mining_pick)).toContain(
+      '<div class="tt-desc">Requires Mining 40</div>',
+    );
+    expect(gatherToolTooltipLines(ITEMS.mithril_mining_pick)).toContain(
+      '<div class="tt-desc">Requires Mining 70</div>',
+    );
+    expect(gatherToolTooltipLines(ITEMS.thorium_mining_pick)).toContain(
+      '<div class="tt-desc">Requires Mining 85</div>',
+    );
+    expect(gatherToolTooltipLines(ITEMS.arcanite_mining_pick)).toContain(
+      '<div class="tt-desc">Requires Mining 100</div>',
+    );
+    expect(gatherToolTooltipLines(ITEMS.ironbark_axe)).toContain(
+      '<div class="tt-desc">Requires Logging 70</div>',
+    );
+    // Tier 1 asks nothing; rods are exempt at every tier.
+    expect(gatherToolTooltipLines(ITEMS.copper_mining_pick)).not.toContain('Requires Mining');
+    expect(gatherToolTooltipLines(ITEMS.tidewrought_fishing_rod)).not.toContain('Requires');
+    expect(gatherToolTooltipLines(ITEMS.simple_fishing_pole)).not.toContain('Requires');
+  });
+
   it('axes and sickles speak their own trade', () => {
     const axe = gatherToolTooltipLines(ITEMS.handaxe);
     expect(axe).toContain('<div class="tt-sub">Logging tool (tier 1)</div>');

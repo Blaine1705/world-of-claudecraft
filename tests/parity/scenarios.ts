@@ -4793,6 +4793,14 @@ function professionsGatherFine(seed = 1): Scenario {
       // outclasses the herb too, but it is not the herb's tool.
       sim.addItem('mithril_mining_pick', 1, pid);
       sim.addItem('bronze_sickle', 1, pid);
+      // Both tools must WIELD (R22): the tier-3 pick asks mining 70, the
+      // tier-2 sickle herbalism 40. Direct meta writes, the suite's setup
+      // idiom; the values ride every frame's state digest from here on.
+      const meta = (sim as AnySim).meta(pid) as {
+        gatheringProficiency: Record<string, number>;
+      };
+      meta.gatheringProficiency.mining = 70;
+      meta.gatheringProficiency.herbalism = 40;
 
       // Step 1: the full-grade vein upgrades.
       teleport(sim, p, 48, 352); // ore_mirefen_t2, tier 2

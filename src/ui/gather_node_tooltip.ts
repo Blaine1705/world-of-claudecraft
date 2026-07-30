@@ -19,14 +19,17 @@
 // ui_effects_profile or the governor.
 
 import type { GatheringProfessionId } from '../sim/content/professions';
+import { ITEMS } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
+import { canGatherTier } from '../sim/professions/tools';
+import { minWieldRequirementToWork } from '../sim/professions/wield_gate';
 import type { GatherNodeDef, GatherNodeType } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { esc } from './esc';
 import {
   buildGatherNodeTooltip,
   type GatherNodeTooltipModel,
-  viewerOwnedToolTier,
+  viewerUsableToolTier,
 } from './gathering_view';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { getUiScale } from './ui_scale';
@@ -98,6 +101,15 @@ const TOOL_REQUIRED_KEYS: Record<GatherNodeType, string> = {
   herb: 'hudChrome.gathering.toolRequired.herbalism',
 };
 
+// The R22 wield arm's lines: a covering tool is in the bags and only the
+// counter is short, so the actionable number is {skill}, not a tier. The
+// same key family the sim's wieldProficiency-carrying gatherDenied renders.
+const WIELD_UNMET_KEYS: Record<GatherNodeType, string> = {
+  ore: 'hudChrome.gathering.wieldUnmet.mining',
+  wood: 'hudChrome.gathering.wieldUnmet.logging',
+  herb: 'hudChrome.gathering.wieldUnmet.herbalism',
+};
+
 /** The client-side tool pre-gate for one node, with the localized denial
  *  line already resolved for exactly this node (this module is the gathering
  *  copy surface, so main.ts wires it in one line). Structurally matches
@@ -109,12 +121,28 @@ export function gatherNodeToolGateFor(
   world: IWorld,
   node: Pick<GatherNodeDef, 'type' | 'tier'>,
 ): { nodeTier: number; viewerToolTier: number; unmetText: string } {
-  const unmetKey = node.tier > 1 ? TOOL_TIER_UNMET_KEYS[node.type] : TOOL_REQUIRED_KEYS[node.type];
+  const professionId = NODE_HARVEST_TABLE[node.type].professionId;
+  const viewerToolTier = viewerUsableToolTier(world, professionId);
+  // The wield split, mirroring the sim's denial choice exactly: when a
+  // covering tool is already carried and only its counter is short
+  // (minWieldRequirementToWork non-null), the line names the counter; the
+  // tier and no-tool lines keep their arms otherwise. Client and sim share
+  // the resolvers, so the toast the pre-verdict composes is the toast the
+  // server's own denial would render.
+  const wieldReq = minWieldRequirementToWork(world.inventory, professionId, node.tier, ITEMS);
+  const wieldLocked =
+    !canGatherTier(viewerToolTier, node.tier) && wieldReq !== null && wieldReq > 0;
+  const unmetKey = wieldLocked
+    ? WIELD_UNMET_KEYS[node.type]
+    : node.tier > 1
+      ? TOOL_TIER_UNMET_KEYS[node.type]
+      : TOOL_REQUIRED_KEYS[node.type];
   return {
     nodeTier: node.tier,
-    viewerToolTier: viewerOwnedToolTier(world, NODE_HARVEST_TABLE[node.type].professionId),
+    viewerToolTier,
     unmetText: t(unmetKey as TranslationKey, {
       tier: formatNumber(node.tier, { maximumFractionDigits: 0 }),
+      skill: formatNumber(wieldReq ?? 0, { maximumFractionDigits: 0 }),
     }),
   };
 }

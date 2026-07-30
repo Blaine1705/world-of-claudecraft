@@ -2309,6 +2309,12 @@ export const en_CA: EnTranslations = {
         "logging": "There is no timber stand within reach.",
         "herbalism": "There is no herb patch within reach."
       },
+      "wieldUnmet": {
+        "mining": "You need Mining {skill} to swing the pick already in your bags.",
+        "logging": "You need Logging {skill} to swing the axe already in your bags.",
+        "herbalism": "You need Herbalism {skill} to work the sickle already in your bags."
+      },
+      "wieldUnmetCorpse": "You need gathering skill {skill} to put your finest tool to work.",
       "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
       "toolTooltip": {
         "kind": {

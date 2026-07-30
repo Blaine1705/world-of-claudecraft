@@ -2309,6 +2309,12 @@ export const ko_KR: EnTranslations = {
         "logging": "손이 닿는 곳에 벌목 나무가 없습니다.",
         "herbalism": "손이 닿는 곳에 약초 군락이 없습니다."
       },
+      "wieldUnmet": {
+        "mining": "가방에 있는 곡괭이를 휘두르려면 채광 {skill}이(가) 필요합니다.",
+        "logging": "가방에 있는 도끼를 휘두르려면 벌목 {skill}이(가) 필요합니다.",
+        "herbalism": "가방에 있는 낫을 다루려면 약초학 {skill}이(가) 필요합니다."
+      },
+      "wieldUnmetCorpse": "최상급 도구를 제대로 다루려면 채집 기술 {skill}이(가) 필요합니다.",
       "toolTierUnmetCorpse": "최상급 재료를 회수하려면 {tier}티어 채집 도구가 필요합니다.",
       "toolTooltip": {
         "kind": {

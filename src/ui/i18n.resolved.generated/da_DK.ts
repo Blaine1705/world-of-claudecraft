@@ -2309,6 +2309,12 @@ export const da_DK: EnTranslations = {
         "logging": "Der er ingen tømmerlund inden for rækkevidde.",
         "herbalism": "Der er ingen urteplette inden for rækkevidde."
       },
+      "wieldUnmet": {
+        "mining": "You need Mining {skill} to swing the pick already in your bags.",
+        "logging": "You need Logging {skill} to swing the axe already in your bags.",
+        "herbalism": "You need Herbalism {skill} to work the sickle already in your bags."
+      },
+      "wieldUnmetCorpse": "You need gathering skill {skill} to put your finest tool to work.",
       "toolTierUnmetCorpse": "Du har brug for et niveau {tier} indsamlingsværktøj for at genvinde de fineste materialer.",
       "toolTooltip": {
         "kind": {

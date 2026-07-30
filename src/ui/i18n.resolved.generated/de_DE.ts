@@ -2309,6 +2309,12 @@ export const de_DE: EnTranslations = {
         "logging": "In Reichweite ist keine Baumgruppe.",
         "herbalism": "In Reichweite ist keine Kräuterpflanze."
       },
+      "wieldUnmet": {
+        "mining": "You need Mining {skill} to swing the pick already in your bags.",
+        "logging": "You need Logging {skill} to swing the axe already in your bags.",
+        "herbalism": "You need Herbalism {skill} to work the sickle already in your bags."
+      },
+      "wieldUnmetCorpse": "You need gathering skill {skill} to put your finest tool to work.",
       "toolTierUnmetCorpse": "Du brauchst ein Sammelwerkzeug der Stufe {tier}, um die feinsten Materialien zu gewinnen.",
       "toolTooltip": {
         "kind": {

@@ -1,13 +1,18 @@
-// Proficiency gates on the gathering-tool vendor rows: the side table and its
-// one resolver (src/sim/content/vendor_row_gates.ts), the authoritative refusal
-// in the buy path, and the advisory locked row in the vendor view core.
+// The land-tool wield gate (R22) and its advisory surfaces: the wield table
+// and resolvers (src/sim/professions/wield_gate.ts), the harvest-boundary
+// refusal that owns enforcement, the OPEN counter (the old authoritative buy
+// deny is retired; a sale is never refused for proficiency), and the advisory
+// requirement rows in the vendor view core (content/vendor_row_gates.ts,
+// whose numbers alias the wield table).
 //
-// The suite's centrepiece is the DERIVED-CEILING arm: it recomputes, from the
-// live gain constants rather than a copied number, the proficiency at which a
-// tier-1 node stops teaching, and asserts every threshold sits strictly under
-// it. The first zone is all tier-1 ground and the gather quests grant only the
-// tier-1 tool, so a threshold at or above that ceiling is unreachable by the
-// only means a new player has: the ladder would dead-end with no test failing.
+// The suite's centrepiece is the DERIVED-CEILING family: it recomputes, from
+// the live gain constants rather than copied numbers, the proficiency at
+// which each node tier stops teaching, and asserts the knife-edge rule for
+// every wield threshold: each requirement is reachable on ground the
+// previous tier's tool can already work. The first zone is all tier-1 ground
+// and the gather quests grant only the tier-1 tool, so a tier-2/3 threshold
+// at or above the tier-1 ceiling would dead-end the ladder with no test
+// failing; tier-4/5 lean on tier-2+ ground, which teaches to the cap.
 
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -21,7 +26,24 @@ import {
 } from '../src/sim/content/vendor_row_gates';
 import { GATHER_NODES, ITEMS, NPCS, zoneAt } from '../src/sim/data';
 import * as items from '../src/sim/items';
-import { GATHER_GAIN_TIER_STEP, gatherNodeGainMultiplier } from '../src/sim/professions/gathering';
+import {
+  GATHER_GAIN_TIER_STEP,
+  gatherNodeGainMultiplier,
+  harvestYieldItemId,
+} from '../src/sim/professions/gathering';
+import {
+  bestWieldableAnyGatherToolTier,
+  bestWieldableGatherToolTierOrNone,
+  canWieldGatherToolTier,
+  minWieldRequirementToWork,
+  minWieldRequirementToWorkAny,
+  TIER2_TOOL_WIELD_PROFICIENCY,
+  TIER3_TOOL_WIELD_PROFICIENCY,
+  TIER4_TOOL_WIELD_PROFICIENCY,
+  TIER5_TOOL_WIELD_PROFICIENCY,
+  WIELD_REQUIREMENT_BY_TIER,
+  wieldRequirementForTier,
+} from '../src/sim/professions/wield_gate';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { type Entity, INTERACT_RANGE, type SimEvent } from '../src/sim/types';
@@ -150,17 +172,133 @@ describe('vendor row gate resolver', () => {
 });
 
 describe('the threshold values themselves', () => {
-  it('are 40 and 70, pinned as literals', () => {
+  it('are 40, 70, 85 and 100, pinned as literals', () => {
     // Everything else in this file compares the constants to THEMSELVES, which
     // proves the wiring and proves nothing about the numbers: a mutation to
-    // 45 / 65 keeps the whole suite green while staying under the ceiling and
-    // inside the margin. These two numbers are published player copy (the wiki
-    // tools note interpolates them, and the vendor row renders them), so a
-    // rebalance has to touch this claim rather than drift past it. Same
-    // reasoning and same shape as the tier-1 price pin in
+    // 45 / 65 keeps most of the suite green while staying under the ceiling
+    // and inside the margin. These numbers are published player copy (the
+    // wiki tools note interpolates them, tooltips and vendor rows render
+    // them), so a rebalance has to touch this claim rather than drift past
+    // it. Same reasoning and shape as the tier-1 price pin in
     // tests/professions_tools.test.ts.
-    expect(TIER2_TOOL_GATE_PROFICIENCY).toBe(40);
-    expect(TIER3_TOOL_GATE_PROFICIENCY).toBe(70);
+    expect(TIER2_TOOL_WIELD_PROFICIENCY).toBe(40);
+    expect(TIER3_TOOL_WIELD_PROFICIENCY).toBe(70);
+    expect(TIER4_TOOL_WIELD_PROFICIENCY).toBe(85);
+    expect(TIER5_TOOL_WIELD_PROFICIENCY).toBe(100);
+    // The whole ladder, as the one frozen table every surface reads.
+    expect(WIELD_REQUIREMENT_BY_TIER).toEqual({ 1: 0, 2: 40, 3: 70, 4: 85, 5: 100 });
+    expect(Object.isFrozen(WIELD_REQUIREMENT_BY_TIER)).toBe(true);
+    // The vendor's advisory constants ALIAS the wield table rather than
+    // keeping numbers of their own; a fork here is the two-surfaces drift the
+    // advisory model exists to prevent.
+    expect(TIER2_TOOL_GATE_PROFICIENCY).toBe(TIER2_TOOL_WIELD_PROFICIENCY);
+    expect(TIER3_TOOL_GATE_PROFICIENCY).toBe(TIER3_TOOL_WIELD_PROFICIENCY);
+  });
+});
+
+describe('the wield resolvers (professions/wield_gate.ts)', () => {
+  const inv = (...ids: string[]) => ids.map((itemId) => ({ itemId, count: 1 }));
+
+  it('wieldRequirementForTier reads the table, 0 for tier 1 and anything unshipped', () => {
+    expect(wieldRequirementForTier(1)).toBe(0);
+    expect(wieldRequirementForTier(2)).toBe(TIER2_TOOL_WIELD_PROFICIENCY);
+    expect(wieldRequirementForTier(5)).toBe(TIER5_TOOL_WIELD_PROFICIENCY);
+    // Fail OPEN toward pre-R22 behavior for a tier outside the ladder: an
+    // unknown tier must not brick a tool.
+    expect(wieldRequirementForTier(6)).toBe(0);
+    expect(wieldRequirementForTier(0)).toBe(0);
+  });
+
+  it('canWieldGatherToolTier boundaries: below refuses, at and above wield', () => {
+    expect(canWieldGatherToolTier(2, TIER2_TOOL_WIELD_PROFICIENCY - 1)).toBe(false);
+    expect(canWieldGatherToolTier(2, TIER2_TOOL_WIELD_PROFICIENCY)).toBe(true);
+    expect(canWieldGatherToolTier(5, TIER5_TOOL_WIELD_PROFICIENCY)).toBe(true);
+    expect(canWieldGatherToolTier(1, 0)).toBe(true);
+  });
+
+  it('coerces malformed proficiency to 0, which LOCKS (the resolveVendorRowGate contract)', () => {
+    // NaN < threshold is false under a bare comparison, which would WIELD an
+    // unearned tool off a malformed wire value; the online mirror assigns
+    // gprof with no shape check, so this is the direction that must not fail
+    // open. NaN / Infinity / '99' discriminate; undefined rides the same arm.
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, '99', undefined, null, {}]) {
+      expect(canWieldGatherToolTier(2, bad), String(bad)).toBe(false);
+    }
+  });
+
+  it('the wield-aware scan filters an unwieldable land tool and floors at NO_TOOL', () => {
+    // A tier-2 pick at mining 0: owned, not wieldable, so the scan reports
+    // nothing usable at all.
+    expect(bestWieldableGatherToolTierOrNone(inv('iron_mining_pick'), 'mining', 0, ITEMS)).toBe(0);
+    // At the threshold it wields.
+    expect(
+      bestWieldableGatherToolTierOrNone(
+        inv('iron_mining_pick'),
+        'mining',
+        TIER2_TOOL_WIELD_PROFICIENCY,
+        ITEMS,
+      ),
+    ).toBe(2);
+    // A wieldable lower tool beside an unwieldable higher one: the usable one
+    // wins, the unearned one is inert rather than poisonous.
+    expect(
+      bestWieldableGatherToolTierOrNone(
+        inv('copper_mining_pick', 'mithril_mining_pick'),
+        'mining',
+        0,
+        ITEMS,
+      ),
+    ).toBe(1);
+  });
+
+  it('rods are exempt structurally: the fishing scan never filters', () => {
+    // A tier-3 rod at fishing proficiency 0 contributes its full tier; the
+    // exemption is inside the shared resolver, not a caller convention, so a
+    // land-side caller cannot accidentally gate a rod.
+    expect(
+      bestWieldableGatherToolTierOrNone(inv('silverstream_fishing_rod'), 'fishing', 0, ITEMS),
+    ).toBe(3);
+  });
+
+  it('the any-profession corpse scan filters land tools per counter, rods unfiltered', () => {
+    // R50: an unwieldable tier-3 pick contributes nothing, bare hands floor
+    // the scan at 1.
+    expect(bestWieldableAnyGatherToolTier(inv('mithril_mining_pick'), {}, ITEMS)).toBe(1);
+    // The same pick at mining 70 contributes its tier.
+    expect(
+      bestWieldableAnyGatherToolTier(
+        inv('mithril_mining_pick'),
+        { mining: TIER3_TOOL_WIELD_PROFICIENCY },
+        ITEMS,
+      ),
+    ).toBe(3);
+    // A rod contributes unfiltered at zero proficiency (the R22 exemption).
+    expect(bestWieldableAnyGatherToolTier(inv('silverstream_fishing_rod'), {}, ITEMS)).toBe(3);
+  });
+
+  it('minWieldRequirementToWork names the smallest threshold that unlocks something CARRIED', () => {
+    // Owns tier-2 and tier-3 picks, target tier 2: the tier-2 pick's 40 is
+    // the honest number, not the tier-3 pick's 70.
+    expect(
+      minWieldRequirementToWork(inv('iron_mining_pick', 'mithril_mining_pick'), 'mining', 2, ITEMS),
+    ).toBe(TIER2_TOOL_WIELD_PROFICIENCY);
+    // Owns ONLY the tier-3 pick, target tier 2: 70 is what unlocks it.
+    expect(minWieldRequirementToWork(inv('mithril_mining_pick'), 'mining', 2, ITEMS)).toBe(
+      TIER3_TOOL_WIELD_PROFICIENCY,
+    );
+    // Nothing covering the target: null, the plain no-tool arm's signal.
+    expect(minWieldRequirementToWork(inv('copper_mining_pick'), 'mining', 2, ITEMS)).toBe(null);
+    expect(minWieldRequirementToWork(inv(), 'mining', 1, ITEMS)).toBe(null);
+  });
+
+  it('minWieldRequirementToWorkAny skips fishing: a covering rod never names a requirement', () => {
+    // The any-scan would have PASSED with a covering rod (it wields freely),
+    // so the corpse denial asking for a requirement can only be about land
+    // tools; a rod in the bags must not smuggle a rod "requirement" into it.
+    expect(minWieldRequirementToWorkAny(inv('silverstream_fishing_rod'), 3, ITEMS)).toBe(null);
+    expect(minWieldRequirementToWorkAny(inv('mithril_mining_pick'), 3, ITEMS)).toBe(
+      TIER3_TOOL_WIELD_PROFICIENCY,
+    );
   });
 });
 
@@ -204,6 +342,51 @@ describe('gate thresholds against the live gain curve', () => {
     // it, so shrinking it to zero is a deliberate edit rather than a drift.
     expect(ceiling - TIER3_TOOL_GATE_PROFICIENCY).toBeGreaterThanOrEqual(5);
     expect(TIER2_TOOL_GATE_PROFICIENCY).toBeLessThan(TIER3_TOOL_GATE_PROFICIENCY);
+  });
+
+  // The teaching ceiling of one NODE tier: the lowest proficiency at which
+  // its gain multiplier grays out, or the cap when it teaches all the way
+  // there (tier-2 ground does: quarter gain from 75 to 100).
+  function teachingCeilingFor(nodeTier: number): number {
+    const cap = GATHERING_PROFESSIONS.mining.maxSkill;
+    for (let proficiency = 0; proficiency <= cap; proficiency++) {
+      if (gatherNodeGainMultiplier(proficiency, nodeTier) === 0) return proficiency;
+    }
+    return cap;
+  }
+
+  it('the knife-edge rule holds for the WHOLE wield ladder (R22): every requirement is reachable on the previous tier ground', () => {
+    // A tier-t tool's requirement must be reachable by a player whose best
+    // wieldable tool is tier t-1: the ground such a player can work is every
+    // node tier up to min(t-1, the highest shipped node tier), and the best
+    // of that ground's teaching ceilings bounds what they can climb to. A
+    // requirement past that ceiling dead-ends the ladder.
+    const maxNodeTier = Math.max(...GATHER_NODES.map((n) => n.tier));
+    expect(maxNodeTier).toBe(3); // the premise the t4/t5 derivation leans on
+    for (const tier of [2, 3, 4, 5]) {
+      const req = wieldRequirementForTier(tier);
+      expect(req, `tier ${tier} carries a requirement`).toBeGreaterThan(0);
+      const ground = Math.min(tier - 1, maxNodeTier);
+      const reachable = teachingCeilingFor(ground);
+      expect(
+        req,
+        `tier ${tier} requirement ${req} must be reachable on tier-${ground} ground (ceiling ${reachable})`,
+      ).toBeLessThanOrEqual(reachable);
+      // Climbability at the boundary: the point just below the requirement
+      // still teaches on that ground, so the last step exists.
+      expect(gatherNodeGainMultiplier(req - 1, ground)).toBeGreaterThan(0);
+    }
+    // Margin everywhere the requirement is not AT the cap: tier 5 is the
+    // deliberate exception (the masterwork rung asks for the mastered
+    // counter itself, and tier-2+ ground teaches to the cap, so the last
+    // point is reachable by construction).
+    const cap = GATHERING_PROFESSIONS.mining.maxSkill;
+    expect(TIER4_TOOL_WIELD_PROFICIENCY).toBeLessThanOrEqual(cap - 5);
+    expect(TIER5_TOOL_WIELD_PROFICIENCY).toBe(cap);
+    // The ladder is strictly increasing.
+    expect(TIER2_TOOL_WIELD_PROFICIENCY).toBeLessThan(TIER3_TOOL_WIELD_PROFICIENCY);
+    expect(TIER3_TOOL_WIELD_PROFICIENCY).toBeLessThan(TIER4_TOOL_WIELD_PROFICIENCY);
+    expect(TIER4_TOOL_WIELD_PROFICIENCY).toBeLessThan(TIER5_TOOL_WIELD_PROFICIENCY);
   });
 
   it('the first zone is all tier-1 ground, which is WHY the ceiling bounds the thresholds', () => {
@@ -319,24 +502,14 @@ describe('gate table completeness', () => {
   });
 });
 
-describe('the buy path enforces the gate authoritatively', () => {
-  it('refuses a gated tool below the threshold, spending nothing and granting nothing', () => {
+describe('the counter sells ahead; the wield gate owns enforcement (R22)', () => {
+  it('SELLS a requirement-carrying tool below its threshold, charging normally', () => {
+    // The re-minted purchase-deny pin: the same drive that used to assert a
+    // refusal now asserts the open counter. The refusal moved to the harvest
+    // boundary, driven in the wield-gate describe below.
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const { pid, hale, meta } = shopper(sim);
-    meta.copper = 1_000_000;
-    sim.drainEvents();
-
-    items.buyItem(ctxOf(sim), hale.id, 'iron_mining_pick', pid);
-
-    expect(sim.countItem('iron_mining_pick', pid)).toBe(0);
-    expect(meta.copper).toBe(1_000_000);
-    expect(errorTexts(sim.drainEvents())).toContain('You have not unlocked that item yet.');
-  });
-
-  it('allows the same purchase once the proficiency is there', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
-    const { pid, hale, meta } = shopper(sim);
-    meta.gatheringProficiency.mining = TIER2_TOOL_GATE_PROFICIENCY;
+    expect(meta.gatheringProficiency.mining).toBe(0);
     const before = meta.copper;
     sim.drainEvents();
 
@@ -347,34 +520,24 @@ describe('the buy path enforces the gate authoritatively', () => {
     expect(errorTexts(sim.drainEvents())).toEqual([]);
   });
 
-  it('refuses the gated tool BEFORE the balance, so the reason given is the real one', () => {
-    // Ordering matters: a broke, unskilled player must be told what opens the
-    // row, not sent away to find copper that would not have helped.
+  it('never emits the retired unlock refusal anywhere in the buy path', () => {
+    // The old deny's literal, asserted ABSENT on the exact drive that used to
+    // produce it, so a re-introduced counter gate cannot ride back in quietly.
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
-    const { pid, hale, meta } = shopper(sim);
-    meta.copper = 0;
+    const { pid, hale } = shopper(sim);
     sim.drainEvents();
-
-    items.buyItem(ctxOf(sim), hale.id, 'iron_mining_pick', pid);
-
-    const errs = errorTexts(sim.drainEvents());
-    expect(errs).toContain('You have not unlocked that item yet.');
-    expect(errs).not.toContain('Not enough money.');
+    items.buyItem(ctxOf(sim), hale.id, 'mithril_mining_pick', pid);
+    expect(errorTexts(sim.drainEvents())).not.toContain('You have not unlocked that item yet.');
   });
 
-  it('leaves BUYBACK ungated, the documented ruling', () => {
-    // The scope comment and docs/design/professions.md both state buyback is
-    // deliberately not gated, because returning a player their own sold item is
-    // not a new acquisition. Nothing pinned it, so gating buyBackItem later, or
-    // hoisting the check into a helper both paths call, would flip a recorded
-    // ruling with nothing red.
+  it('buyback still works at zero proficiency', () => {
+    // Buyback was deliberately ungated even under the purchase-gate model;
+    // with the counter open the property is now uniform, and this drive keeps
+    // the mastery-reset shape (own, sell, lose the counter, buy back) honest.
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const { pid, hale, meta } = shopper(sim);
-    meta.gatheringProficiency.mining = TIER2_TOOL_GATE_PROFICIENCY;
     items.buyItem(ctxOf(sim), hale.id, 'iron_mining_pick', pid);
     expect(sim.countItem('iron_mining_pick', pid)).toBe(1);
-
-    // Sell it back, then lose the proficiency (the mastery-reset shape).
     items.sellItem(ctxOf(sim), 'iron_mining_pick', 1, pid);
     expect(sim.countItem('iron_mining_pick', pid)).toBe(0);
     meta.gatheringProficiency.mining = 0;
@@ -386,7 +549,7 @@ describe('the buy path enforces the gate authoritatively', () => {
     expect(errorTexts(sim.drainEvents())).toEqual([]);
   });
 
-  it('leaves the ungated tier-1 tool buyable by a player with no proficiency at all', () => {
+  it('leaves the entry tier-1 tool buyable by a player with no proficiency at all', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const { pid, hale, meta } = shopper(sim);
     expect(meta.gatheringProficiency.mining).toBe(0);
@@ -398,70 +561,191 @@ describe('the buy path enforces the gate authoritatively', () => {
     expect(errorTexts(sim.drainEvents())).toEqual([]);
   });
 
-  it('never confiscates an owned tool, and owning one opens no gated row', () => {
+  it('never confiscates: an unearned tool sits in the bags untouched', () => {
+    // The R22 owners-are-never-stripped arm: nothing in the buy path or the
+    // wield gate reads-and-removes inventory, so a tier-3 pick held at zero
+    // mining stays owned; it is merely inert at the harvest gate until the
+    // counter reaches its threshold (driven below).
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const { pid, hale, meta } = shopper(sim);
-    // A grandfathered tier-3 pick in the bags of a player with zero mining:
-    // the case a live realm gets the moment the gate ships. Bought at this
-    // counter, `iron_mining_pick` is the tier-2 rung Hale actually stocks.
     sim.addItem('mithril_mining_pick', 1, pid);
     sim.drainEvents();
 
     items.buyItem(ctxOf(sim), hale.id, 'iron_mining_pick', pid);
 
-    // Refused: proficiency is the gate, and owning a BETTER tool is not
-    // proficiency. Nothing reads or removes inventory either way, so the
-    // grandfathered pick is still there and still works at every tier it did.
-    expect(errorTexts(sim.drainEvents())).toContain('You have not unlocked that item yet.');
     expect(sim.countItem('mithril_mining_pick', pid)).toBe(1);
-    expect(sim.countItem('iron_mining_pick', pid)).toBe(0);
+    expect(sim.countItem('iron_mining_pick', pid)).toBe(1);
     expect(meta.gatheringProficiency.mining).toBe(0);
   });
 });
 
-describe('the vendor view core renders a gated row locked, never dropped', () => {
+describe('the harvest boundary enforces the wield gate (the re-minted deny pins)', () => {
+  // A miner standing beside a Copper Dig vein. Placed 1.2yd off the node
+  // centre (ore nodes are solid bodies; standing ON one reads blocked) and
+  // rebucketed so the spatial grid agrees with the teleport. No ticks run in
+  // the deny arms, so no mob can aggro and no cast can be interrupted.
+  function miner(sim: Sim, nodeId: string) {
+    const node = GATHER_NODES.find((n) => n.id === nodeId);
+    if (!node) throw new Error(`missing node ${nodeId}`);
+    const anySim = sim as unknown as { rebucket(e: Entity): void };
+    const pid = sim.addPlayer('warrior', 'Digger');
+    const p = sim.entities.get(pid) as Entity;
+    p.pos.x = node.pos.x + 1.2;
+    p.pos.z = node.pos.z;
+    anySim.rebucket(p);
+    const meta = sim.meta(pid)!;
+    meta.inventory.length = 0;
+    sim.drainEvents();
+    return { pid, p, meta, node };
+  }
+
+  function denials(events: SimEvent[]) {
+    return events.filter(
+      (e): e is Extract<SimEvent, { type: 'gatherDenied' }> => e.type === 'gatherDenied',
+    );
+  }
+
+  it('refuses a covering tool below its wield threshold, naming the counter, drawing nothing', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const { pid, p, meta } = miner(sim, 'ore_eastbrook_1');
+    sim.addItem('iron_mining_pick', 1, pid);
+    expect(meta.gatheringProficiency.mining).toBe(0);
+    let draws = 0;
+    (sim as unknown as { rng: { setObserver(fn: () => void): void } }).rng.setObserver(() => {
+      draws++;
+    });
+
+    expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(false);
+
+    const denied = denials(sim.drainEvents());
+    expect(denied).toHaveLength(1);
+    expect(denied[0].surface).toBe('node');
+    expect(denied[0].professionId).toBe('mining');
+    expect(denied[0].requiredTier).toBe(1);
+    // The wield arm: a covering tool IS owned, so the denial names the
+    // smallest counter that would put something carried to work.
+    expect(denied[0].wieldProficiency).toBe(TIER2_TOOL_WIELD_PROFICIENCY);
+    expect(p.castingAbility).toBeFalsy();
+    expect(draws).toBe(0);
+  });
+
+  it('the boundary: denied at 39, casts at 40 with the same bags', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const { pid, p, meta } = miner(sim, 'ore_eastbrook_1');
+    sim.addItem('iron_mining_pick', 1, pid);
+    meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY - 1;
+    expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(false);
+    expect(denials(sim.drainEvents())).toHaveLength(1);
+
+    meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
+    expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(true);
+    expect(p.castingAbility).toBeTruthy();
+    expect(denials(sim.drainEvents())).toHaveLength(0);
+  });
+
+  it('the no-tool arm keeps its shape: empty bags deny WITHOUT a wield requirement', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const { pid } = miner(sim, 'ore_eastbrook_1');
+
+    expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(false);
+
+    const denied = denials(sim.drainEvents());
+    expect(denied).toHaveLength(1);
+    expect(denied[0].requiredTier).toBe(1);
+    // Absent, not zero: the wield field only rides when a covering tool is
+    // actually carried, so the client's no-tool copy keeps its arm.
+    expect('wieldProficiency' in denied[0]).toBe(false);
+  });
+
+  it('the entry tool works at zero proficiency: tier 1 carries no wield requirement', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const { pid, p, meta } = miner(sim, 'ore_eastbrook_1');
+    sim.addItem('copper_mining_pick', 1, pid);
+    expect(meta.gatheringProficiency.mining).toBe(0);
+
+    expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(true);
+    expect(p.castingAbility).toBeTruthy();
+  });
+
+  it('the grade arm reads the WIELDABLE tier (R49): an unearned tier-4 pick mints no fine grade', () => {
+    // The same resolver the capacity pre-gates and the grant share
+    // (effectiveGradeToolTier through harvestYieldItemId), driven pure. At
+    // mining 70 the tier-4 pick is owned but not wieldable, so a full-grade
+    // tier-3 vein yields the base material; at 85 the same bags mint fine.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const { pid, meta } = miner(sim, 'ore_eastbrook_1');
+    sim.addItem('thorium_mining_pick', 1, pid);
+    const t3 = GATHER_NODES.find((n) => n.id === 'ore_thornpeak_t3');
+    if (!t3) throw new Error('missing ore_thornpeak_t3');
+    meta.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY;
+    expect(harvestYieldItemId(meta, t3)).toBe('thorium_ore');
+    meta.gatheringProficiency.mining = TIER4_TOOL_WIELD_PROFICIENCY;
+    expect(harvestYieldItemId(meta, t3)).toBe('fine_thorium_ore');
+  });
+
+  it('the corpse premium arm resolves through the wield-aware any-scan (R50, source pin)', () => {
+    // Behaviorally unreachable in shipped content (every wave-one component
+    // family is tier 1 and bare hands floor the scan there), so the seam is
+    // pinned at the source: the corpse harvester must read the wield-aware
+    // any-profession scan with the player's counters, not the ownership
+    // scan. Whitespace-normalized so a formatter wrap cannot dodge it;
+    // comments stripped so prose cannot satisfy it.
+    const source = readFileSync(path.resolve(process.cwd(), 'src/sim/interaction.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|\s)\/\/.*$/gm, '$1')
+      .replace(/\s+/g, ' ');
+    expect(source).toContain(
+      'bestWieldableAnyGatherToolTier(meta.inventory, meta.gatheringProficiency, ITEMS)',
+    );
+    expect(source).not.toContain('bestOwnedAnyGatherToolTier(');
+    // And the denial names a wield requirement when one applies.
+    expect(source).toContain('minWieldRequirementToWorkAny(');
+  });
+});
+
+describe('the vendor view core renders the advisory requirement, never drops a row', () => {
   const stock = ['copper_mining_pick', 'iron_mining_pick'];
   const balances = { copper: 1_000_000, honor: 0 } as const;
 
-  it('keeps the locked row in the goods list and carries its requirement', () => {
+  it('keeps the requirement-unmet row in the goods list and carries its requirement', () => {
     const view = buildVendorView(stock, [], ITEMS, { ...balances, gatheringProficiency: {} });
     expect(view.goods.map((g) => g.itemId)).toEqual(stock);
     const [entry, gated] = view.goods;
-    expect(entry.locked).toBe(false);
+    expect(entry.requirementUnmet).toBe(false);
     expect(entry.requirement).toBeUndefined();
-    expect(gated.locked).toBe(true);
+    expect(gated.requirementUnmet).toBe(true);
     expect(gated.requirement).toEqual({
       professionId: 'mining',
       proficiency: TIER2_TOOL_GATE_PROFICIENCY,
     });
-    // Affordability is a separate axis and stays true: the row is not refused
-    // for money, and the painter must not conflate the two reasons.
+    // Affordability is a separate axis and stays true: the requirement is
+    // advisory (R22), and the painter must not conflate the two.
     expect(gated.affordable).toBe(true);
   });
 
-  it('unlocks the row at the threshold the shared resolver uses', () => {
+  it('clears the flag at the threshold the shared resolver uses', () => {
     const view = buildVendorView(stock, [], ITEMS, {
       ...balances,
       gatheringProficiency: { mining: TIER2_TOOL_GATE_PROFICIENCY },
     });
-    expect(view.goods.find((g) => g.itemId === 'iron_mining_pick')?.locked).toBe(false);
+    expect(view.goods.find((g) => g.itemId === 'iron_mining_pick')?.requirementUnmet).toBe(false);
   });
 
-  it('an EMPTY proficiency map locks every gated row rather than opening it', () => {
+  it('an EMPTY proficiency map marks every requirement row unmet rather than met', () => {
     // The map is a required field, so it can no longer be forgotten silently;
     // what remains reachable is a caller satisfying the type with an empty
-    // object. That must lock (the under-promising direction), never open.
+    // object. That must read unmet (the under-promising direction): a wrong
+    // advisory line understates what the buyer can already do, never
+    // overstates it.
     const view = buildVendorView(stock, [], ITEMS, { ...balances, gatheringProficiency: {} });
-    expect(view.goods.find((g) => g.itemId === 'iron_mining_pick')?.locked).toBe(true);
-    expect(view.goods.find((g) => g.itemId === 'copper_mining_pick')?.locked).toBe(false);
+    expect(view.goods.find((g) => g.itemId === 'iron_mining_pick')?.requirementUnmet).toBe(true);
+    expect(view.goods.find((g) => g.itemId === 'copper_mining_pick')?.requirementUnmet).toBe(false);
   });
 
   it('agrees with the SHARED RESOLVER on every stocked tool across a proficiency sweep', () => {
-    // Named for what it actually drives. The view and the sim cannot disagree
-    // because they call one resolver, and this sweeps that agreement across
-    // the whole stocked ladder; the buy path's own enforcement is driven
-    // directly in the buy-path describe above, which is where deleting the
-    // guard from items.ts turns red.
+    // The view and the wield table cannot disagree because the advisory
+    // constants alias the wield constants and both surfaces call one
+    // resolver; this sweeps that agreement across the whole stocked ladder.
     const toolStock = Object.keys(ITEMS).filter((id) => {
       const use = ITEMS[id].use;
       return use?.type === 'gatherTool' && ITEMS[id].buyValue !== undefined;
@@ -474,7 +758,7 @@ describe('the vendor view core renders a gated row locked, never dropped', () =>
         gatheringProficiency: map,
       });
       for (const row of view.goods) {
-        expect(row.locked, `${row.itemId} at ${proficiency}`).toBe(
+        expect(row.requirementUnmet, `${row.itemId} at ${proficiency}`).toBe(
           resolveVendorRowGate(row.itemId, map).locked,
         );
       }

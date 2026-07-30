@@ -8370,6 +8370,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTierUnmet.fishing': 'この水域で釣るにはティア{tier}の釣り竿が必要です。',
   'hudChrome.gathering.toolTierUnmetCorpse':
     '最高の素材を回収するにはティア{tier}の採集道具が必要です。',
+  'hudChrome.gathering.wieldUnmet.mining': 'バッグにある採掘ピッケルを振るうには採掘{skill}が必要です。',
+  'hudChrome.gathering.wieldUnmet.logging': 'バッグにある伐採斧を振るうには伐採{skill}が必要です。',
+  'hudChrome.gathering.wieldUnmet.herbalism': 'バッグにある薬草鎌を扱うには薬草学{skill}が必要です。',
+  'hudChrome.gathering.wieldUnmetCorpse': '最高の道具を使いこなすには採集スキル{skill}が必要です。',
   'hudChrome.gathering.requiresTool.mining': '採掘ピッケルが必要',
   'hudChrome.gathering.requiresTool.logging': '伐採斧が必要',
   'hudChrome.gathering.requiresTool.herbalism': '薬草鎌が必要',

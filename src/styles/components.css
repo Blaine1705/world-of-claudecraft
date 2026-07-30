@@ -5151,13 +5151,14 @@
     opacity: 0.45;
     cursor: default;
   }
-  /* A row locked by an unmet proficiency gate (vendor_row_gates.ts) already
-     greys through :disabled above, which is also what an unaffordable row
-     does; the .vi-sub requirement line is what tells the two apart, so it
-     takes the same error tint an unsatisfied cost takes just below, rather
-     than the dim sub-line grey it would otherwise inherit. Information, never
-     decoration: the line states the requirement in text, and the tint only
-     says the requirement is the unmet one. */
+  /* A row whose tool carries a wield requirement the viewer has not met yet
+     (vendor_row_gates.ts, the R22 advisory surface). The row itself stays
+     enabled and sells; only the .vi-sub requirement line marks the state, so
+     it takes the same error tint an unsatisfied cost takes just below rather
+     than the dim sub-line grey it would otherwise inherit. Information,
+     never decoration: the line states the requirement in text, and the tint
+     only says the requirement is the unmet one. The class name predates the
+     advisory turn; it is a style hook, not a claim the row refuses. */
   .vendor-item.vendor-locked .vi-sub {
     color: var(--color-text-error);
   }

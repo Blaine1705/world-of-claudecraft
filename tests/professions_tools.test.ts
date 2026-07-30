@@ -31,6 +31,7 @@ import {
   slotEffect,
   startingDurabilityFor,
 } from '../src/sim/professions/tools';
+import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -291,6 +292,19 @@ describe('sim-level node access gating (Professions 2.0)', () => {
     return { sim, pid };
   }
 
+  // Since R22 a tier-2+ land tool also has to WIELD: it sits inert until its
+  // own profession counter reaches the requirement. Every rig below that
+  // expects a granted tool to WORK raises that counter to the tool's own
+  // requirement, derived from the def rather than a bare number, so a fixture
+  // swapped to another tier stays honest. Rods are exempt from the gate.
+  function makeWieldable(sim: Sim, pid: number, toolId: string) {
+    const use = ITEMS[toolId]?.use;
+    if (use?.type !== 'gatherTool' || use.professionId === 'fishing') return;
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('missing meta');
+    meta.gatheringProficiency[use.professionId] = wieldRequirementForTier(use.tier);
+  }
+
   // harvestNode starts a gather cast. The unlock arms tick the
   // REAL loop through to the grant (mobs despawned first: mob damage cancels
   // a gather cast), and every deny arm pins that the denial is rng-free AND
@@ -401,6 +415,7 @@ describe('sim-level node access gating (Professions 2.0)', () => {
   it('the same player with the tier-2 pick in bags harvests the vein (grant lands, timer set)', () => {
     const { sim, pid } = simAtNode(T2_ORE);
     sim.addItem('iron_mining_pick', 1, pid);
+    makeWieldable(sim, pid, 'iron_mining_pick'); // the tool must wield (R22)
     sim.drainEvents();
     expect(castAndComplete(sim, T2_ORE, pid)).toBe(true);
     expect(sim.countItem('iron_ore', pid)).toBeGreaterThanOrEqual(1);
@@ -411,6 +426,9 @@ describe('sim-level node access gating (Professions 2.0)', () => {
   it('a wrong-profession tool does not unlock a node: the tier-2 axe leaves the ore vein denied', () => {
     const { sim, pid } = simAtNode(T2_ORE);
     sim.addItem('felling_axe', 1, pid); // logging tier 2
+    // The axe must wield (R22) here too: an inert axe would leave the ore vein
+    // denied for the wrong reason, and the case is about the PROFESSION.
+    makeWieldable(sim, pid, 'felling_axe');
     sim.drainEvents();
     expectDeniedDrawFreeNoCast(sim, T2_ORE, pid);
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
@@ -420,6 +438,7 @@ describe('sim-level node access gating (Professions 2.0)', () => {
     // through the cast to the grant).
     const wood = simAtNode(T2_WOOD);
     wood.sim.addItem('felling_axe', 1, wood.pid);
+    makeWieldable(wood.sim, wood.pid, 'felling_axe'); // the tool must wield (R22)
     expect(castAndComplete(wood.sim, T2_WOOD, wood.pid)).toBe(true);
     expect(wood.sim.countItem('elderwood_log', wood.pid)).toBeGreaterThanOrEqual(1);
   });
@@ -429,6 +448,9 @@ describe('sim-level node access gating (Professions 2.0)', () => {
     for (const id of ['copper_mining_pick', 'iron_mining_pick', 'mithril_mining_pick']) {
       sim.addItem(id, 1, pid);
     }
+    // The best of the three (the tier-3 pick) must wield (R22) for it to be the
+    // one that opens the tier-3 vein below.
+    makeWieldable(sim, pid, 'mithril_mining_pick');
     const meta = sim.players.get(pid);
     if (!meta) throw new Error('missing meta');
     expect(bestOwnedGatherToolTier(meta.inventory, 'mining', ITEMS)).toBe(3);
@@ -465,6 +487,7 @@ describe('sim-level node access gating (Professions 2.0)', () => {
     ]);
     const tooled = simAtNode(T2_HERB);
     tooled.sim.addItem('bronze_sickle', 1, tooled.pid); // herbalism tier 2
+    makeWieldable(tooled.sim, tooled.pid, 'bronze_sickle'); // the tool must wield (R22)
     tooled.sim.drainEvents();
     expect(castAndComplete(tooled.sim, T2_HERB, tooled.pid)).toBe(true);
     expect(tooled.sim.countItem('goldleaf_herb', tooled.pid)).toBeGreaterThanOrEqual(1);

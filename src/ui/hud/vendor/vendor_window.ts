@@ -53,8 +53,9 @@ function goodsPriceText(price: VendorPrice): string {
   return money || honor;
 }
 
-/** The requirement line under a locked row's name: the localized gathering
- *  profession plus the proficiency that opens it, e.g. "Requires Mining 40".
+/** The advisory requirement line under a row's name (R22): the localized
+ *  gathering profession plus the wield proficiency the tool will ask of its
+ *  owner, e.g. "Requires Mining 40". The row sells either way.
  *
  *  Reuses hudChrome.crafting.skillReqLine rather than minting a second sentence
  *  saying the same thing: its rendered English is exactly this line, it is
@@ -114,41 +115,33 @@ export function renderVendorWindow(
     const { itemId, item, quantity } = goods;
     const row = document.createElement('button');
     row.type = 'button';
-    // A gate the viewer has not met disables the row exactly like an
-    // unaffordable one, and adds the .vendor-locked class the stylesheet greys
-    // it by. The row STAYS in the grid: the ladder above you is the thing worth
-    // seeing (train_window.ts's locked recipes, same reasoning).
-    row.className = goods.locked ? 'vendor-item vendor-locked' : 'vendor-item';
-    row.disabled = !goods.affordable || goods.locked;
+    // An unmet wield requirement is ADVISORY (R22): the row sells like any
+    // other, and .vendor-locked survives purely as the style hook that tints
+    // the requirement sub-line so the number reads as "not yet met" rather
+    // than decoration. Never disabled for it: the sale is real, the gate is
+    // at the harvest.
+    row.className = goods.requirementUnmet ? 'vendor-item vendor-locked' : 'vendor-item';
+    row.disabled = !goods.affordable;
     const price = goodsPriceText(goods.price);
     const itemName = itemDisplayName(item);
     const stack =
       quantity > 1
         ? ` ${t('itemUi.bags.stackCount', { count: formatNumber(quantity, { maximumFractionDigits: 0 }) })}`
         : '';
-    const requirement = goods.locked ? requirementText(goods) : '';
-    // A locked row deliberately sets NO aria-label, the trainer's locked-row
-    // behaviour (train_window.ts): an aria-label REPLACES the button's content
-    // as its accessible name, so the "Buy {item} for {price}" wording would
-    // both promise a purchase the row refuses and hide the requirement line
-    // that says why. Leaving it off lets the name, the requirement and the
-    // price inside the button compose the accessible name themselves.
-    // Keyed on `locked`, never on whether the requirement TEXT came back
-    // non-empty: those differ for a locked row whose profession has no
-    // display-name key, and that case would otherwise get the "Buy {item} for
-    // {price}" name on a button the sim refuses, which is the exact failure
-    // this branch exists to prevent.
-    if (!goods.locked) {
-      row.setAttribute(
-        'aria-label',
-        t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
-      );
-    }
+    const requirement = goods.requirementUnmet ? requirementText(goods) : '';
+    // Every row gets the buy aria-label now: with the purchase deny retired
+    // the "Buy {item} for {price}" promise is true of a requirement-unmet
+    // row too, and the requirement line is advisory detail the sighted and
+    // screen-reader flows both learn from the tooltip and sub-line.
+    row.setAttribute(
+      'aria-label',
+      t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
+    );
     row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${esc(stack)}${requirement ? `<span class="vi-sub">${esc(requirement)}</span>` : ''}</span><span class="vi-price">${goodsPriceHtml(goods, deps)}</span>`;
     row.addEventListener('click', () => deps.onBuy(itemId));
     deps.attachTooltip(row, () =>
-      goods.locked
-        ? `${deps.itemTooltip(item)}${requirement ? `<div class="tt-sub">${esc(requirement)}</div>` : ''}`
+      goods.requirementUnmet
+        ? `${deps.itemTooltip(item)}${requirement ? `<div class="tt-sub">${esc(requirement)}</div>` : ''}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`
         : `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`,
     );
     goodsGrid.appendChild(row);

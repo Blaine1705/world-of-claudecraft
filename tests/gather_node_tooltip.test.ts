@@ -80,19 +80,50 @@ describe('gatherNodeTooltipHtml', () => {
 });
 
 describe('gatherNodeToolGateFor', () => {
-  function worldWith(inventory: { itemId: string; count: number }[]): IWorld {
-    return { inventory } as unknown as IWorld;
+  function worldWith(
+    inventory: { itemId: string; count: number }[],
+    proficiency: Record<string, number> = {},
+  ): IWorld {
+    return {
+      inventory,
+      professionsState: {
+        skills: Object.entries(proficiency).map(([professionId, skill]) => ({
+          professionId,
+          skill,
+          maxSkill: 100,
+        })),
+      },
+    } as unknown as IWorld;
   }
 
   it('resolves the viewer tier from bags and bakes the localized denial line per family', () => {
-    const gate = gatherNodeToolGateFor(worldWith([{ itemId: 'iron_mining_pick', count: 1 }]), {
-      type: 'ore',
-      tier: 3,
-    });
+    // The pick is WIELDED here (mining 40, R22), so the shortfall is purely
+    // the tier: the tiered line renders. The wield shortfall has its own arm
+    // below.
+    const gate = gatherNodeToolGateFor(
+      worldWith([{ itemId: 'iron_mining_pick', count: 1 }], { mining: 40 }),
+      {
+        type: 'ore',
+        tier: 3,
+      },
+    );
     expect(gate).toEqual({
       nodeTier: 3,
       viewerToolTier: 2,
       unmetText: 'You need a tier 3 mining pick to harvest this vein.',
+    });
+    // The R22 wield arm: the same pick with the counter short composes the
+    // wield line naming the smallest requirement that unlocks something
+    // already carried, exactly the line the sim's own denial would render.
+    expect(
+      gatherNodeToolGateFor(worldWith([{ itemId: 'iron_mining_pick', count: 1 }]), {
+        type: 'ore',
+        tier: 2,
+      }),
+    ).toEqual({
+      nodeTier: 2,
+      viewerToolTier: 0,
+      unmetText: 'You need Mining 40 to swing the pick already in your bags.',
     });
     // Empty bags read as no tool owned (0, #2343: no bare-hands floor), and
     // the wood/herb families word their own tiered lines.
@@ -122,11 +153,17 @@ describe('hud gatherDenied case stays an error toast only (source pin)', () => {
   const caseStart = source.indexOf("case 'gatherDenied'");
   const block = source.slice(caseStart, source.indexOf('break;', caseStart));
 
-  it('maps surface + professionId + requiredTier through the pure key mapper into showError', () => {
+  it('maps surface + professionId + requiredTier + wieldProficiency through the pure key mapper into showError', () => {
     expect(caseStart).toBeGreaterThan(-1);
     expect(block).toContain('this.showError(');
-    expect(block).toContain('gatherDeniedLineKey(ev.surface, ev.professionId, ev.requiredTier)');
+    // Whitespace- and trailing-comma-normalized: the four-argument call is
+    // long enough for the formatter to wrap one-per-line with a dangling
+    // comma, and any such shape must still satisfy the pin.
+    expect(block.replace(/\s+/g, '').replace(/,\)/g, ')')).toContain(
+      'gatherDeniedLineKey(ev.surface,ev.professionId,ev.requiredTier,ev.wieldProficiency)',
+    );
     expect(block).toContain('formatNumber(ev.requiredTier');
+    expect(block).toContain('formatNumber(ev.wieldProficiency ?? 0');
   });
 
   it('adds no log line and no audio cue (toast only, the double-feedback trap)', () => {

@@ -8353,6 +8353,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 수역에서 낚시하려면 {tier}티어 낚싯대가 필요합니다.',
   'hudChrome.gathering.toolTierUnmetCorpse':
     '최상급 재료를 회수하려면 {tier}티어 채집 도구가 필요합니다.',
+  'hudChrome.gathering.wieldUnmet.mining':
+    '가방에 있는 곡괭이를 휘두르려면 채광 {skill}이(가) 필요합니다.',
+  'hudChrome.gathering.wieldUnmet.logging':
+    '가방에 있는 도끼를 휘두르려면 벌목 {skill}이(가) 필요합니다.',
+  'hudChrome.gathering.wieldUnmet.herbalism':
+    '가방에 있는 낫을 다루려면 약초학 {skill}이(가) 필요합니다.',
+  'hudChrome.gathering.wieldUnmetCorpse':
+    '최상급 도구를 제대로 다루려면 채집 기술 {skill}이(가) 필요합니다.',
   'hudChrome.gathering.requiresTool.mining': '채광 곡괭이 필요',
   'hudChrome.gathering.requiresTool.logging': '벌목 도끼 필요',
   'hudChrome.gathering.requiresTool.herbalism': '약초 낫 필요',

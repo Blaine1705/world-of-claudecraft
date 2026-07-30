@@ -2309,6 +2309,12 @@ export const zh_CN: EnTranslations = {
         "logging": "附近没有林木可供砍伐。",
         "herbalism": "附近没有草药丛可供采集。"
       },
+      "wieldUnmet": {
+        "mining": "你需要采矿{skill}才能挥动背包里已有的采矿镐。",
+        "logging": "你需要伐木{skill}才能挥动背包里已有的伐木斧。",
+        "herbalism": "你需要草药学{skill}才能使用背包里已有的草药镰。"
+      },
+      "wieldUnmetCorpse": "你需要采集技能{skill}才能让最上等的工具派上用场。",
       "toolTierUnmetCorpse": "你需要{tier}阶采集工具才能取得最上等的材料。",
       "toolTooltip": {
         "kind": {

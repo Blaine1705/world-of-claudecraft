@@ -37,6 +37,11 @@ import {
   NODE_HARVEST_TABLE,
   nodeMaterialFor,
 } from '../src/sim/professions/gathering';
+import {
+  TIER2_TOOL_WIELD_PROFICIENCY,
+  TIER3_TOOL_WIELD_PROFICIENCY,
+  wieldRequirementForTier,
+} from '../src/sim/professions/wield_gate';
 import { Sim } from '../src/sim/sim';
 import { type Entity, INTERACT_RANGE, xpForLevel } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
@@ -659,6 +664,8 @@ describe('node tool gate ordering', () => {
     const pid = sim.addPlayer('warrior', 'OrderA');
     teleportOntoNode(sim, pid, T2);
     sim.addItem('iron_mining_pick', 1, pid);
+    // The tier-2 pick must wield (R22) for the first harvest to start at all.
+    mustMeta(sim, pid).gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
     expect(sim.harvestNode(T2, pid)).toBe(true);
     // Complete the cast: the respawn timer is consumed at completion
     // (inside resolveHarvest), never at the cast start.
@@ -731,6 +738,9 @@ describe('gated-path determinism (same seed, same drive)', () => {
       sim.drainEvents();
       sim.harvestNode('ore_mirefen_t2', pid); // denied: bare hands at a tier-2 vein
       sim.addItem('iron_mining_pick', 1, pid);
+      // The tier-2 pick must wield (R22). Set AFTER the bare-hands attempt
+      // above so that denial stays the plain no-tool-owned arm.
+      meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
       sim.harvestNode('ore_mirefen_t2', pid); // granted: the cast starts
       completeCastNow(sim, pid); // the two draws and the grant land here
       // A wolf corpse harvest beside the vein (the tier-1 corpse path).
@@ -902,6 +912,10 @@ describe('node tool gating over the live server', () => {
     // ClientWorld, exactly as for a tier-1 node.
     despawnMobs(server.sim);
     server.sim.addItem('iron_mining_pick', 1, sa.pid);
+    // The tier-2 pick must wield (R22). Set after the bare-hands denial above
+    // so that event keeps its no-tool-owned shape, and it stays inside band 0
+    // (the 100 boundary), which is what holds the pinned 2.5 s duration.
+    mustMeta(server.sim, sa.pid).gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
     expect(server.sim.harvestNode('ore_mirefen_t2', sa.pid)).toBe(true);
     (server as any).routeEvents(server.sim.drainEvents());
     expect(deliveredEvents(fcA)).toContainEqual(
@@ -934,6 +948,13 @@ describe('fine material grades on the live harvest path', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem(toolId, 1, pid);
+    // The tool must wield (R22): derive its own requirement from the def rather
+    // than a bare number, so a fixture swapped to another tier stays honest.
+    // Rods are exempt from the gate, so they are skipped here too.
+    const use = ITEMS[toolId]?.use;
+    if (use?.type === 'gatherTool' && use.professionId !== 'fishing') {
+      mustMeta(sim, pid).gatheringProficiency[use.professionId] = wieldRequirementForTier(use.tier);
+    }
     teleportOntoNode(sim, pid, nodeId);
     expect(castAndComplete(sim, nodeId, pid)).toBe(true);
     return { sim, pid };
@@ -978,6 +999,12 @@ describe('fine material grades on the live harvest path', () => {
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem('bronze_sickle', 1, pid); // herbalism tier 2
     sim.addItem('mithril_mining_pick', 1, pid); // mining tier 3, wrong profession
+    // BOTH tools must wield (R22), the pick included: an inert pick would fail
+    // to leak its tier for the wrong reason and the case would stop
+    // discriminating profession from tier.
+    const meta = mustMeta(sim, pid);
+    meta.gatheringProficiency.herbalism = TIER2_TOOL_WIELD_PROFICIENCY;
+    meta.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY;
     teleportOntoNode(sim, pid, 'herb_mirefen_t2');
     expect(castAndComplete(sim, 'herb_mirefen_t2', pid)).toBe(true);
 
@@ -994,6 +1021,8 @@ describe('fine material grades on the live harvest path', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem('silverleaf_sickle', 1, pid); // herbalism tier 3
+    // The tier-3 sickle must wield (R22).
+    mustMeta(sim, pid).gatheringProficiency.herbalism = TIER3_TOOL_WIELD_PROFICIENCY;
     teleportOntoNode(sim, pid, 'herb_mirefen_t2');
     expect(castAndComplete(sim, 'herb_mirefen_t2', pid)).toBe(true);
 
@@ -1007,6 +1036,8 @@ describe('fine material grades on the live harvest path', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem('mithril_mining_pick', 1, pid);
+    // The tier-3 pick must wield (R22).
+    mustMeta(sim, pid).gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY;
     teleportOntoNode(sim, pid, MIREFEN_T2);
     let draws = 0;
     (sim as any).rng.setObserver(() => {
@@ -1027,6 +1058,9 @@ describe('fine material grades on the live harvest path', () => {
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem('mithril_mining_pick', 1, pid);
     const meta = mustMeta(sim, pid);
+    // The tier-3 pick must wield (R22), or the tool gate would deny ahead of
+    // the capacity pre-gate this case is about and the arm would pass blind.
+    meta.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY;
     const capacity = bagCapacity(meta.bags);
     const fillerStack = ITEMS.bone_fragments.stackSize ?? 20;
     while (meta.inventory.length < capacity - 1) sim.addItem('bone_fragments', fillerStack, pid);
@@ -1041,8 +1075,15 @@ describe('fine material grades on the live harvest path', () => {
     (sim as any).rng.setObserver(() => {
       draws++;
     });
-    // Denied at the pre-gate, before the cast even starts, and rng-free.
+    // Denied at the pre-gate, before the cast even starts, and rng-free, and
+    // denied FOR THE RIGHT REASON: pin the bags-full text (the deny-arm case
+    // below does the same) so a wield-gate or tier refusal cannot stand in for
+    // the capacity pre-gate this case exists to prove.
+    sim.drainEvents();
     expect(sim.harvestNode(MIREFEN_T2, pid)).toBe(false);
+    expect(
+      sim.drainEvents().some((e) => e.type === 'error' && e.text === 'Your bags are full.'),
+    ).toBe(true);
     expect(draws).toBe(0);
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
     // The denial did not spend the player's timer either.
@@ -1057,6 +1098,8 @@ describe('fine material grades on the live harvest path', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem('mithril_mining_pick', 1, pid);
+    // The tier-3 pick must wield (R22).
+    mustMeta(sim, pid).gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY;
     teleportOntoNode(sim, pid, MIREFEN_T2);
 
     // Room for everything at cast start, so the cast really does begin.
@@ -1095,6 +1138,9 @@ describe('fine material grades on the live harvest path', () => {
     sim.addItem('artisans_eye', 1, pid); // the charm the slot consumes
     sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
     const meta = mustMeta(sim, pid);
+    // The tier-2 pick must wield (R22), or the tool gate denies ahead of the
+    // bags-full pre-gate this case pins.
+    meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
     expect(meta.toolEffectSlots?.mining?.effectId).toBe('artisans_eye');
     const capacity = bagCapacity(meta.bags);
     const fillerStack = ITEMS.bone_fragments.stackSize ?? 20;
@@ -1139,6 +1185,8 @@ describe('fine material grades on the live harvest path', () => {
       sim.addItem('artisans_eye', 1, pid); // the charm the slot consumes
       sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
       const meta = mustMeta(sim, pid);
+      // The tier-2 pick must wield (R22).
+      meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
       const slot = meta.toolEffectSlots?.mining;
       expect(slot).toBeDefined();
       if (slot) slot.confirmMode = confirmMode; // as a persisted row would load
@@ -1163,6 +1211,8 @@ describe('fine material grades on the live harvest path', () => {
     sim.addItem('artisans_eye', 1, pid); // the charm the slot consumes
     sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
     const meta = mustMeta(sim, pid);
+    // The tier-2 pick must wield (R22).
+    meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
     const capacity = bagCapacity(meta.bags);
     const oreStack = ITEMS.iron_ore.stackSize ?? 20;
     while (meta.inventory.length < capacity - 1) sim.addItem('iron_ore', oreStack, pid);
@@ -1190,6 +1240,8 @@ describe('fine material grades on the live harvest path', () => {
     sim.addItem('artisans_eye', 1, pid); // the charm the slot consumes
     sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
     const meta = mustMeta(sim, pid);
+    // The tier-2 pick must wield (R22).
+    meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
     const chargesBefore = meta.toolEffectSlots?.mining?.durability ?? 0;
     expect(chargesBefore).toBeGreaterThan(0);
     teleportOntoNode(sim, pid, MIREFEN_T2);
@@ -1277,6 +1329,9 @@ describe('fine material grades on the live harvest path', () => {
     sim.addItem('artisans_eye', 1, pid); // the charm the slot consumes
     sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
     const meta = mustMeta(sim, pid);
+    // The tier-3 pick must wield (R22): it is the raw tool whose own tier
+    // already earns the fine grade, which is the whole premise here.
+    meta.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY;
     const chargesBefore = meta.toolEffectSlots?.mining?.durability ?? 0;
     expect(chargesBefore).toBeGreaterThan(0);
     teleportOntoNode(sim, pid, MIREFEN_T2);
@@ -1531,6 +1586,9 @@ describe('fine material grades on the live harvest path', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem('iron_mining_pick', 1, pid);
+    // The tier-2 pick must wield (R22), so the live control below really is
+    // the dead gate lifting and not a tool the player could never swing.
+    mustMeta(sim, pid).gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
     teleportOntoNode(sim, pid, MIREFEN_T2);
     const p = mustEntity(sim, pid);
     p.dead = true;
@@ -1565,6 +1623,9 @@ describe('harvest denies in combat and while swimming (the startFishing pair)', 
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem('iron_mining_pick', 1, pid);
+    // The tier-2 pick must wield (R22), so the live control below really is
+    // combat lifting and not a tool the player could never swing.
+    mustMeta(sim, pid).gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
     teleportOntoNode(sim, pid, MIREFEN_T2);
     const p = mustEntity(sim, pid);
     p.inCombat = true;

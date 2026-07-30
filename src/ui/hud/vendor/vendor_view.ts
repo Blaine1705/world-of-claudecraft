@@ -24,10 +24,13 @@ export interface VendorGoodsRow {
   quantity: number;
   /** Advisory UI state only; the authoritative buy path rechecks both balances. */
   affordable: boolean;
-  /** True when a proficiency gate on this row is unmet (content/vendor_row_gates.ts).
-   *  Advisory only, exactly like `affordable`: buyItem re-runs the same resolver.
-   *  A locked row still renders, greyed with its requirement, never dropped. */
-  locked: boolean;
+  /** True when the row's tool carries a wield requirement the viewer has not
+   *  met yet (content/vendor_row_gates.ts, the R22 advisory surface). PURELY
+   *  advisory: the row still sells, and the buy path runs no proficiency
+   *  check at all; enforcement lives at the harvest gate
+   *  (professions/wield_gate.ts). The painter renders the requirement line
+   *  so a buyer knows what the tool will ask of them before it swings. */
+  requirementUnmet: boolean;
   /** The row's gate when it carries one, met or not, so the painter can name
    *  the requirement. Ids and numbers only; this core stays i18n-free. */
   requirement?: VendorRowGate;
@@ -108,8 +111,11 @@ export function buildVendorView(
       honor: Math.max(0, Math.floor(item.priceHonor ?? 0)),
     };
     if (price.copper <= 0 && price.honor <= 0) continue;
-    // The SAME resolver items.ts buyItem runs, never a mirror of its rule, so
-    // the lock the player sees cannot drift from what the purchase allows.
+    // The same resolver every advisory surface shares
+    // (content/vendor_row_gates.ts), whose numbers alias the wield table the
+    // harvest gate enforces, so the line a counter shows can never disagree
+    // with the requirement the tool will actually ask. The buy path itself
+    // runs no proficiency check any more (R22: counters sell ahead freely).
     const gate = resolveVendorRowGate(itemId, balances.gatheringProficiency);
     goods.push({
       itemId,
@@ -117,7 +123,7 @@ export function buildVendorView(
       price,
       quantity,
       affordable: balances.copper >= price.copper && balances.honor >= price.honor,
-      locked: gate.locked,
+      requirementUnmet: gate.locked,
       ...(gate.requirement ? { requirement: gate.requirement } : {}),
     });
   }

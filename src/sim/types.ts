@@ -4684,6 +4684,16 @@ export type SimEvent = { pid?: number } & (
       surface: 'node' | 'corpse' | 'fishing';
       requiredTier: number;
       professionId?: GatheringProfessionId;
+      // The R22 wield arm, additive on the wire: present exactly when a tool
+      // COVERING requiredTier is already in the player's bags and only its
+      // proficiency requirement is short. Carries the smallest proficiency at
+      // which something they already carry would work the target (see
+      // professions/wield_gate.ts minWieldRequirementToWork); the client
+      // renders the wield line instead of the tier line when present. A
+      // bundle predating this field ignores it and shows its tier-based
+      // copy: misleading only in wording, never a throw (the stale-client
+      // doctrine of phase 11).
+      wieldProficiency?: number;
     }
   // Gathering-tool item use found nothing to work on (#2343): the player used
   // a pick/axe/sickle from the bags with no matching resource node within

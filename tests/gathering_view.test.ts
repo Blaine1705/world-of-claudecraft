@@ -9,6 +9,7 @@
 import { describe, expect, it } from 'vitest';
 import { GATHERING_PROFESSIONS, type GatheringProfessionId } from '../src/sim/content/professions';
 import { GATHER_NODES } from '../src/sim/data';
+import { TIER2_TOOL_WIELD_PROFICIENCY } from '../src/sim/professions/wield_gate';
 import type { InvSlot } from '../src/sim/types';
 import {
   buildGatheringProficiencyRows,
@@ -20,7 +21,7 @@ import {
   gatherRareTierFor,
   gatherToolNoNodeKey,
   isNodeToolLockedFor,
-  viewerOwnedToolTier,
+  viewerUsableToolTier,
 } from '../src/ui/gathering_view';
 import type { IWorld } from '../src/world_api';
 
@@ -116,21 +117,38 @@ describe('tool-tier lock dimension', () => {
   if (!T2) throw new Error('missing ore_mirefen_t2');
   const PICK: InvSlot[] = [{ itemId: 'iron_mining_pick', count: 1 }];
   const T1_PICK: InvSlot[] = [{ itemId: 'copper_mining_pick', count: 1 }];
+  // The tier-2 pick's wield requirement (R22): the client scan filters
+  // unwieldable land tools exactly as the sim's harvest gate does, so every
+  // "tooled" fixture carries the counter its pick demands.
+  const MINING_40 = { mining: TIER2_TOOL_WIELD_PROFICIENCY };
 
-  it('viewerOwnedToolTier reads the IWorld bags: empty is 0 (no tool), the pick lifts mining only', () => {
-    expect(viewerOwnedToolTier(makeWorld({}), 'mining')).toBe(0);
-    const world = makeWorld({ inventory: PICK });
-    expect(viewerOwnedToolTier(world, 'mining')).toBe(2);
-    expect(viewerOwnedToolTier(world, 'logging')).toBe(0);
+  it('viewerUsableToolTier reads bags AND counters: empty is 0, the pick lifts mining only once wieldable', () => {
+    expect(viewerUsableToolTier(makeWorld({}), 'mining')).toBe(0);
+    const world = makeWorld({ inventory: PICK, proficiency: MINING_40 });
+    expect(viewerUsableToolTier(world, 'mining')).toBe(2);
+    expect(viewerUsableToolTier(world, 'logging')).toBe(0);
+    // The R22 arm: the same pick with the counter short is unusable, so the
+    // scan reports nothing rather than the owned tier.
+    expect(viewerUsableToolTier(makeWorld({ inventory: PICK }), 'mining')).toBe(0);
+    // The tier-1 entry tool never carries a requirement.
+    expect(viewerUsableToolTier(makeWorld({ inventory: T1_PICK }), 'mining')).toBe(1);
   });
 
-  it('isNodeToolLockedFor: a tier-2 node locks a toolless viewer, unlocks with the pick; tier 1 locks toolless too (#2343)', () => {
+  it('isNodeToolLockedFor: tier-2 locks toolless AND unwieldable viewers, unlocks with the earned pick', () => {
     expect(isNodeToolLockedFor(makeWorld({}), { type: 'ore', tier: 2 })).toBe(true);
+    // Owned but unearned: still locked (R22), the map lock agreeing with the
+    // sim's wield denial.
     expect(isNodeToolLockedFor(makeWorld({ inventory: PICK }), { type: 'ore', tier: 2 })).toBe(
-      false,
+      true,
     );
+    expect(
+      isNodeToolLockedFor(makeWorld({ inventory: PICK, proficiency: MINING_40 }), {
+        type: 'ore',
+        tier: 2,
+      }),
+    ).toBe(false);
     // Bare hands never gather: even a tier-1 vein is locked without a pick,
-    // and the tier-1 copper pick unlocks it.
+    // and the tier-1 copper pick unlocks it at zero proficiency.
     expect(isNodeToolLockedFor(makeWorld({}), { type: 'ore', tier: 1 })).toBe(true);
     expect(isNodeToolLockedFor(makeWorld({ inventory: T1_PICK }), { type: 'ore', tier: 1 })).toBe(
       false,
@@ -141,8 +159,14 @@ describe('tool-tier lock dimension', () => {
     const bare = buildNearbyGatherNodes(makeWorld({ pos: T2.pos }), 5);
     const bareT2 = bare.find((n) => n.id === T2.id);
     expect(bareT2).toMatchObject({ tier: 2, locked: true, state: 'ready' });
-    const tooled = buildNearbyGatherNodes(makeWorld({ pos: T2.pos, inventory: PICK }), 5);
+    const tooled = buildNearbyGatherNodes(
+      makeWorld({ pos: T2.pos, inventory: PICK, proficiency: MINING_40 }),
+      5,
+    );
     expect(tooled.find((n) => n.id === T2.id)).toMatchObject({ tier: 2, locked: false });
+    // The R22 arm: owned-but-unearned reads locked on the map too.
+    const unearned = buildNearbyGatherNodes(makeWorld({ pos: T2.pos, inventory: PICK }), 5);
+    expect(unearned.find((n) => n.id === T2.id)).toMatchObject({ tier: 2, locked: true });
     // The tier-1 arm (#2343): locked toolless, unlocked with the tier-1 pick.
     const t1 = buildNearbyGatherNodes(makeWorld({}), 5).find((n) => n.id === NODE.id);
     expect(t1).toMatchObject({ tier: 1, locked: true });
@@ -167,8 +191,15 @@ describe('tool-tier lock dimension', () => {
       state: 'ready',
     });
     expect(
-      buildGatherNodeTooltip(makeWorld({ pos: T2.pos, inventory: PICK }), T2.id),
+      buildGatherNodeTooltip(
+        makeWorld({ pos: T2.pos, inventory: PICK, proficiency: MINING_40 }),
+        T2.id,
+      ),
     ).toMatchObject({ locked: false });
+    // Owned-but-unearned stays locked in the tooltip model too (R22).
+    expect(
+      buildGatherNodeTooltip(makeWorld({ pos: T2.pos, inventory: PICK }), T2.id),
+    ).toMatchObject({ locked: true });
     // A stale pick after a content change resolves to null, never a throw.
     expect(buildGatherNodeTooltip(makeWorld({}), 'no_such_node_id')).toBeNull();
   });
@@ -196,6 +227,26 @@ describe('tool-tier lock dimension', () => {
     );
     // A missing requiredTier stays on the tiered line (never claims "no tool").
     expect(gatherDeniedLineKey('node', 'mining')).toBe('hudChrome.gathering.toolTierUnmet.mining');
+    // The R22 wield arm outranks BOTH tier arms when the event carries a
+    // requirement: the player owns a covering tool, so the counter is the
+    // actionable fact, at tier 1 and above alike.
+    expect(gatherDeniedLineKey('node', 'mining', 1, 40)).toBe(
+      'hudChrome.gathering.wieldUnmet.mining',
+    );
+    expect(gatherDeniedLineKey('node', 'herbalism', 2, 70)).toBe(
+      'hudChrome.gathering.wieldUnmet.herbalism',
+    );
+    // A zero or absent wield requirement never takes the wield line.
+    expect(gatherDeniedLineKey('node', 'mining', 2, 0)).toBe(
+      'hudChrome.gathering.toolTierUnmet.mining',
+    );
+    // The corpse flavor: profession-neutral, like its tier-based sibling.
+    expect(gatherDeniedLineKey('corpse', undefined, 2, 70)).toBe(
+      'hudChrome.gathering.wieldUnmetCorpse',
+    );
+    expect(gatherDeniedLineKey('corpse', undefined, 2)).toBe(
+      'hudChrome.gathering.toolTierUnmetCorpse',
+    );
     // The startFishing implement gate (#2343): surface 'fishing' at tier 1
     // means no tackle at all, so no tier is named.
     expect(gatherDeniedLineKey('fishing', 'fishing', 1)).toBe(

@@ -23,7 +23,8 @@ import {
 } from '../sim/content/professions';
 import { GATHER_NODES, ITEMS } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
-import { bestOwnedGatherToolTierOrNone, canGatherTier } from '../sim/professions/tools';
+import { canGatherTier } from '../sim/professions/tools';
+import { bestWieldableGatherToolTierOrNone } from '../sim/professions/wield_gate';
 import type { GatherNodeDef } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { TranslationKey } from './i18n.catalog';
@@ -38,13 +39,22 @@ export function classifyGatherNode(world: IWorld, nodeId: string): GatherNodeSta
   return world.nodeHarvestableByMe(nodeId) ? 'ready' : 'cooldown';
 }
 
-/** The viewer's best owned gatherTool tier for one gathering profession
- *  (Professions 2.0), resolved from the same IWorld bags read the
- *  bags window renders (IWorldInventory#inventory). 0 means no matching tool
- *  owned at all (#2343: bare hands never gather, so there is no floor here
- *  and every node, tier 1 included, reads locked without its tool). */
-export function viewerOwnedToolTier(world: IWorld, professionId: GatheringProfessionId): number {
-  return bestOwnedGatherToolTierOrNone(world.inventory, professionId, ITEMS);
+/** The viewer's best USABLE gatherTool tier for one gathering profession:
+ *  the same IWorld bags read the bags window renders
+ *  (IWorldInventory#inventory), filtered by the R22 wield gate against the
+ *  viewer's own proficiency (IWorldProfessions#professionsState, the same
+ *  read the character sheet renders; absent or malformed counters read 0 and
+ *  LOCK, the resolveVendorRowGate coercion contract, which
+ *  bestWieldableGatherToolTierOrNone applies itself). 0 means nothing usable
+ *  at all (#2343: bare hands never gather, so every node, tier 1 included,
+ *  reads locked without a usable tool). This is the ONE client-side scan:
+ *  the minimap lock, the node tooltip, and the interact pre-verdict all
+ *  read it, so what the client shows can never disagree with what the
+ *  sim's wield-filtered harvest gate refuses. Fishing passes through
+ *  unfiltered inside the shared resolver (rods are R22-exempt). */
+export function viewerUsableToolTier(world: IWorld, professionId: GatheringProfessionId): number {
+  const skill = world.professionsState.skills.find((s) => s.professionId === professionId)?.skill;
+  return bestWieldableGatherToolTierOrNone(world.inventory, professionId, skill, ITEMS);
 }
 
 /** Whether a node of this tier is tool-locked for the viewer: a SEPARATE
@@ -55,7 +65,7 @@ export function isNodeToolLockedFor(
   node: Pick<GatherNodeDef, 'type' | 'tier'>,
 ): boolean {
   return !canGatherTier(
-    viewerOwnedToolTier(world, NODE_HARVEST_TABLE[node.type].professionId),
+    viewerUsableToolTier(world, NODE_HARVEST_TABLE[node.type].professionId),
     node.tier,
   );
 }
@@ -136,6 +146,7 @@ export function gatherDeniedLineKey(
   surface: 'node' | 'corpse' | 'fishing',
   professionId?: GatheringProfessionId,
   requiredTier?: number,
+  wieldProficiency?: number,
 ): TranslationKey {
   if (surface === 'fishing') {
     return requiredTier !== undefined && requiredTier > 1
@@ -144,10 +155,19 @@ export function gatherDeniedLineKey(
   }
   if (surface === 'node') {
     if (professionId === 'mining' || professionId === 'logging' || professionId === 'herbalism') {
+      // The R22 wield arm outranks the tier arms: when the event carries a
+      // wield requirement, the player already OWNS a covering tool and the
+      // actionable fact is the counter, not the tier.
+      if (wieldProficiency !== undefined && wieldProficiency > 0) {
+        return `hudChrome.gathering.wieldUnmet.${professionId}`;
+      }
       return requiredTier !== undefined && requiredTier <= 1
         ? `hudChrome.gathering.toolRequired.${professionId}`
         : `hudChrome.gathering.toolTierUnmet.${professionId}`;
     }
+  }
+  if (wieldProficiency !== undefined && wieldProficiency > 0) {
+    return 'hudChrome.gathering.wieldUnmetCorpse';
   }
   return 'hudChrome.gathering.toolTierUnmetCorpse';
 }

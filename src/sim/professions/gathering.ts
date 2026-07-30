@@ -46,7 +46,6 @@ import {
   applyEffectBonus,
   applyToolEffectUse,
   bestOwnedGatherToolFor,
-  bestOwnedGatherToolTierOrNone,
   canGatherTier,
   depleteEffect,
   NO_TOOL_OWNED,
@@ -55,6 +54,7 @@ import {
 } from './tools';
 import type { PlayerProfessionSkill } from './types';
 import { tierProgressMultiplier } from './wheel';
+import { bestWieldableGatherToolTierOrNone, minWieldRequirementToWork } from './wield_gate';
 
 export type GatheringProficiency = Record<GatheringProfessionId, number>;
 
@@ -246,10 +246,21 @@ export function effectiveGradeToolTier(
   professionId: GatheringProfessionId,
   node: GatherNodeDef,
 ): number {
-  const owned = bestOwnedGatherToolTierOrNone(meta.inventory, professionId, ITEMS);
+  // WIELDABLE, not owned (R49, the R22 grade arm): the fine-grade comparison
+  // reads the same wield-filtered scan the access gate reads, so a traded
+  // tier-4 tool a player cannot swing mints no fine grade either. The access
+  // gate and this resolution moving together is the invariant; the ratchet
+  // and recharge surfaces deliberately stay ownership-based (R47/R30, the
+  // price family).
+  const wieldable = bestWieldableGatherToolTierOrNone(
+    meta.inventory,
+    professionId,
+    meta.gatheringProficiency[professionId],
+    ITEMS,
+  );
   return applyEffectBonus(usableToolEffectSlot(meta, professionId, node), {
     quantity: 0,
-    gradeToolTier: owned,
+    gradeToolTier: wieldable,
   }).gradeToolTier;
 }
 
@@ -436,11 +447,20 @@ export function resolveHarvest(
   // against the granted outcome, because only it can see capacity
   // truncation; the base fields returned below are its same-draw
   // counterfactual.
-  const ownedTier = bestOwnedGatherToolTierOrNone(meta.inventory, entry.professionId, ITEMS);
+  // WIELDABLE, not owned (R49): the grant's grade comparison must agree with
+  // the capacity pre-gates at both cast ends, which resolve through
+  // effectiveGradeToolTier's wield-filtered scan; an unwieldable tool minting
+  // a fine grade here would clear room for one item and grant another.
+  const wieldableTier = bestWieldableGatherToolTierOrNone(
+    meta.inventory,
+    entry.professionId,
+    meta.gatheringProficiency[entry.professionId],
+    ITEMS,
+  );
   const baseQty = material.qtyByRarity[rarity] * (rareEvent ? GATHER_RARE_EVENT_YIELD_MULT : 1);
   const effect = applyToolEffectUse(
     usableToolEffectSlot(meta, entry.professionId, node),
-    { quantity: baseQty, gradeToolTier: ownedTier },
+    { quantity: baseQty, gradeToolTier: wieldableTier },
     true,
   );
   const itemId = harvestYieldItemIdFor(node, effect.outcome.gradeToolTier);
@@ -463,7 +483,7 @@ export function resolveHarvest(
     signed,
     rareEvent,
     effectApplied: effect.applied,
-    baseItemId: effect.applied ? harvestYieldItemIdFor(node, ownedTier) : itemId,
+    baseItemId: effect.applied ? harvestYieldItemIdFor(node, wieldableTier) : itemId,
     baseQty,
   };
 }
@@ -561,20 +581,36 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   // mechanic. EVERY node harvest requires a matching-profession gatherTool of
   // at least the node's tier anywhere in bags (no equip slot); bare hands
   // never harvest, so a tier-1 node needs a tier-1 tool and requiredTier 1 on
-  // the denial means "no tool owned at all". The gate is rng-free and sits
+  // the denial means "no tool owned at all". Since R22 the tool must also
+  // WIELD: the scan filters out land tools whose proficiency requirement the
+  // player has not reached (professions/wield_gate.ts), so a traded or
+  // bought-ahead tool sits inert until earned. The gate is rng-free and sits
   // before both rng draws: a denial never touches the respawn timer, never
   // draws rng, and never consumes anything.
   const professionId = NODE_HARVEST_TABLE[node.type].professionId;
   // One bag scan serves both the tool gate and the cast-duration formula
   // below (pure lookup, no rng, so hoisting it cannot shift the draw order).
-  const ownedToolTier = bestOwnedGatherToolTierOrNone(meta.inventory, professionId, ITEMS);
-  if (ownedToolTier === NO_TOOL_OWNED || !canGatherTier(ownedToolTier, node.tier)) {
+  const wieldableToolTier = bestWieldableGatherToolTierOrNone(
+    meta.inventory,
+    professionId,
+    meta.gatheringProficiency[professionId],
+    ITEMS,
+  );
+  if (wieldableToolTier === NO_TOOL_OWNED || !canGatherTier(wieldableToolTier, node.tier)) {
+    // Two shapes of the same refusal, split for the player's sake: when a
+    // covering tool IS in the bags and only the wield requirement is short,
+    // the denial names the smallest proficiency at which something they
+    // already carry would work this node (`wieldProficiency`); otherwise it
+    // is the plain no-tool/tier arm. Both are text-free events the client
+    // matcher renders.
+    const wieldReq = minWieldRequirementToWork(meta.inventory, professionId, node.tier, ITEMS);
     ctx.emit({
       type: 'gatherDenied',
       pid: meta.entityId,
       surface: 'node',
       professionId,
       requiredTier: node.tier,
+      ...(wieldReq !== null && wieldReq > 0 ? { wieldProficiency: wieldReq } : {}),
     });
     return false;
   }
@@ -612,7 +648,7 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   }
   const duration = gatherCastDurationSec(
     node.tier,
-    ownedToolTier,
+    wieldableToolTier,
     proficiencyBandFor(meta.gatheringProficiency[professionId]),
   );
   p.castingAbility = GATHER_CAST_ID;

@@ -2592,6 +2592,19 @@ export const hudChromeStrings = {
       logging: 'There is no timber stand within reach.',
       herbalism: 'There is no herb patch within reach.',
     },
+    // gatherDenied error toast, the R22 wield arm: a covering tool IS in the
+    // bags and only its proficiency requirement is short, so the line names
+    // the counter instead of a tier. {skill} is the smallest proficiency at
+    // which something already carried would work the target
+    // (professions/wield_gate.ts minWieldRequirementToWork).
+    wieldUnmet: {
+      mining: 'You need Mining {skill} to swing the pick already in your bags.',
+      logging: 'You need Logging {skill} to swing the axe already in your bags.',
+      herbalism: 'You need Herbalism {skill} to work the sickle already in your bags.',
+    },
+    // The corpse flavor of the wield arm: profession-neutral like its
+    // tier-based sibling below.
+    wieldUnmetCorpse: 'You need gathering skill {skill} to put your finest tool to work.',
     // gatherDenied error toast, surface 'corpse': profession-neutral (a corpse
     // harvest is gated by the best owned tool across ALL gathering
     // professions, so no single tool is named).

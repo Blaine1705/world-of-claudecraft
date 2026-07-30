@@ -17,7 +17,6 @@
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
 import { addStacked, bagCapacity, bagsFullError, countFit, equipBag as equipBagCmd } from './bags';
-import { resolveVendorRowGate } from './content/vendor_row_gates';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import {
@@ -706,23 +705,13 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
       return;
     }
   }
-  // Vendor row gates (content/vendor_row_gates.ts): the authoritative half of
-  // the same resolver the vendor window renders its locked rows from, so the
-  // lock the player sees is the lock the purchase enforces. Checked BEFORE the
-  // balance below, matching the delve shop's order (delves/runs.ts
-  // delveBuyShopItem): a player who cannot use the tool yet should learn that
-  // rather than be told to come back with more copper.
-  //
-  // The denial reuses the delve gate's own line, which the client already
-  // localizes in every locale (sim_i18n.ts -> sim.delve.shopItemLocked). It is
-  // the accurate sentence for this refusal and stays generic; the specific
-  // threshold is on the row itself, which is where a player reads it before
-  // ever clicking. Reaching this at all means a stale view or a hand-built
-  // command, because the window renders a gated row disabled.
-  if (resolveVendorRowGate(itemId, meta.gatheringProficiency).locked) {
-    ctx.error(meta.entityId, 'You have not unlocked that item yet.');
-    return;
-  }
+  // No vendor-row proficiency deny here any more (R22): the counter sells
+  // ahead freely the way Wilkes always sold the rod ladder, the row's
+  // requirement line became advisory display (content/vendor_row_gates.ts),
+  // and enforcement moved to the WIELD gate at the moment of use
+  // (professions/wield_gate.ts, read by the harvest gate), which closes the
+  // market/trade/mail routes the counter deny never could. Owners are never
+  // stripped; a tool bought early wields at its threshold.
   // Food and drink are handed over in a stack (vendorStackSize); the player pays
   // the per-unit buyValue for every unit, so the per-unit price stays classic and
   // vendor buy price stays above the per-unit sell value (no buy-low/sell-high loop).

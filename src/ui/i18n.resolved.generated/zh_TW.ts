@@ -2309,6 +2309,12 @@ export const zh_TW: EnTranslations = {
         "logging": "附近沒有林木可供砍伐。",
         "herbalism": "附近沒有草藥叢可供採集。"
       },
+      "wieldUnmet": {
+        "mining": "你需要採礦{skill}才能揮動背包裡已有的採礦鎬。",
+        "logging": "你需要伐木{skill}才能揮動背包裡已有的伐木斧。",
+        "herbalism": "你需要藥草學{skill}才能使用背包裡已有的草藥鐮。"
+      },
+      "wieldUnmetCorpse": "你需要採集技能{skill}才能讓最上等的工具派上用場。",
       "toolTierUnmetCorpse": "你需要{tier}階採集工具才能取得最上等的材料。",
       "toolTooltip": {
         "kind": {

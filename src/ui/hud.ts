@@ -10247,11 +10247,22 @@ export class Hud {
           // No loot line, no cue, no other state (the grant-hub double-log
           // trap); the sim event is text-free, so the pure core resolves the
           // key off surface + professionId + requiredTier (tier 1 = no tool
-          // owned at all, #2343) and requiredTier interpolates.
+          // owned at all, #2343) plus the R22 wield arm (wieldProficiency
+          // present = a covering tool is owned, only the counter is short),
+          // and the numbers interpolate.
           this.showError(
-            t(gatherDeniedLineKey(ev.surface, ev.professionId, ev.requiredTier), {
-              tier: formatNumber(ev.requiredTier, { maximumFractionDigits: 0 }),
-            }),
+            t(
+              gatherDeniedLineKey(
+                ev.surface,
+                ev.professionId,
+                ev.requiredTier,
+                ev.wieldProficiency,
+              ),
+              {
+                tier: formatNumber(ev.requiredTier, { maximumFractionDigits: 0 }),
+                skill: formatNumber(ev.wieldProficiency ?? 0, { maximumFractionDigits: 0 }),
+              },
+            ),
           );
           break;
         }

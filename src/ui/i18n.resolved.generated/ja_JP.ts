@@ -2309,6 +2309,12 @@ export const ja_JP: EnTranslations = {
         "logging": "手の届く範囲に立木がありません。",
         "herbalism": "手の届く範囲に薬草の群生地がありません。"
       },
+      "wieldUnmet": {
+        "mining": "バッグにある採掘ピッケルを振るうには採掘{skill}が必要です。",
+        "logging": "バッグにある伐採斧を振るうには伐採{skill}が必要です。",
+        "herbalism": "バッグにある薬草鎌を扱うには薬草学{skill}が必要です。"
+      },
+      "wieldUnmetCorpse": "最高の道具を使いこなすには採集スキル{skill}が必要です。",
       "toolTierUnmetCorpse": "最高の素材を回収するにはティア{tier}の採集道具が必要です。",
       "toolTooltip": {
         "kind": {

@@ -69,7 +69,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         price: { copper: 5, honor: 0 },
         quantity: 1,
         affordable: true,
-        locked: false,
+        requirementUnmet: false,
       },
       {
         itemId: 'water',
@@ -77,7 +77,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         price: { copper: 2, honor: 0 },
         quantity: 1,
         affordable: true,
-        locked: false,
+        requirementUnmet: false,
       },
     ];
     const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
@@ -106,11 +106,11 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     expect(rows[0].parentElement).toBe(grids[0]);
   });
 
-  it('paints a proficiency-locked row disabled, with its requirement, and no aria-label', () => {
-    // The three things a locked row owes, driven through the real painter:
-    // it stays in the grid (never dropped), it says WHY it is closed, and it
-    // leaves the accessible name to its own content so the requirement is not
-    // replaced by a "Buy X for Y" label promising a purchase it refuses.
+  it('paints a requirement-unmet row ENABLED with its advisory line and the buy aria-label (R22)', () => {
+    // The advisory contract, driven through the real painter: the row stays
+    // in the grid, it SELLS (never disabled for proficiency; the wield gate
+    // at the harvest owns enforcement), it says what the tool will ask of
+    // its buyer, and the accessible name keeps the honest buy promise.
     const goods: VendorGoodsRow[] = [
       {
         itemId: 'iron_mining_pick',
@@ -118,7 +118,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         price: { copper: 120, honor: 0 },
         quantity: 1,
         affordable: true,
-        locked: true,
+        requirementUnmet: true,
         requirement: { professionId: 'mining', proficiency: 40 },
       },
     ];
@@ -128,23 +128,23 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
 
     const row = el.querySelector('.vendor-item') as HTMLButtonElement;
     expect(row).not.toBeNull();
+    // The class survives purely as the sub-line tint hook.
     expect(row.classList.contains('vendor-locked')).toBe(true);
-    // Disabled even though it IS affordable: the two refusal reasons are
-    // separate axes and the gate closes the row on its own.
-    expect(row.disabled).toBe(true);
-    expect(row.hasAttribute('aria-label')).toBe(false);
+    // ENABLED although the requirement is unmet: the sale is real (R22).
+    expect(row.disabled).toBe(false);
+    // And the buy promise is true, so the accessible name states it.
+    expect(row.getAttribute('aria-label')).toContain('Iron Mining Pick');
     expect(row.querySelector('.vi-sub')?.textContent).toBe('Requires Mining 40');
-    // The price still renders: a locked row shows what it will cost.
+    // The price still renders: the row shows what it will cost.
     expect(row.querySelector('.vi-price')?.textContent).toContain('120');
   });
 
-  it('suppresses the buy aria-label on a locked row even when no requirement text renders', () => {
-    // The aria-label branch keys on `locked`, not on whether the requirement
-    // TEXT came back non-empty, and this is the ONLY input that tells the two
-    // apart: a locked row whose profession has no display-name key renders no
-    // sub-line, so the text-keyed form would fall through and label the row
-    // "Buy X for Y" on a button the sim refuses. Reverting the discriminator
-    // leaves every other arm in this file green, which is why this case exists.
+  it('a requirement-unmet row with no printable requirement still sells with the buy aria-label', () => {
+    // The no-display-name corner: a profession missing from the shared name
+    // table renders no sub-line. Under the advisory model that must not
+    // change anything else about the row: it stays enabled and keeps its
+    // honest buy label (the old model suppressed the label here, which is
+    // exactly the behavior the retirement of the purchase deny removed).
     const goods: VendorGoodsRow[] = [
       {
         itemId: 'iron_mining_pick',
@@ -152,7 +152,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         price: { copper: 120, honor: 0 },
         quantity: 1,
         affordable: true,
-        locked: true,
+        requirementUnmet: true,
         // An id with no entry in the shared name table.
         requirement: { professionId: 'not_a_profession' as never, proficiency: 40 },
       },
@@ -163,17 +163,18 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
 
     const row = el.querySelector('.vendor-item') as HTMLButtonElement;
     expect(row.classList.contains('vendor-locked')).toBe(true);
-    expect(row.disabled).toBe(true);
-    // No requirement line is printable, and no misleading buy label either.
+    expect(row.disabled).toBe(false);
+    // No requirement line is printable; the buy label stands regardless.
     expect(row.querySelector('.vi-sub')).toBeNull();
-    expect(row.getAttribute('aria-label')).toBeNull();
+    expect(row.getAttribute('aria-label')).toContain('Iron Mining Pick');
   });
 
-  it('swaps the locked row TOOLTIP from click-to-buy to the requirement', () => {
+  it('the requirement-unmet row TOOLTIP carries the requirement AND still invites the click', () => {
     // The deps bag's attachTooltip is a no-op by default, so the tooltip
     // builder closure never runs and this branch was invisible. Capture the
-    // builder and invoke it: a row that refuses the click must not still
-    // invite it, which is a user-visible contradiction rather than a nicety.
+    // builder and invoke it: under the advisory model the tooltip must say
+    // what the tool will ask AND keep the click invitation, because the
+    // click genuinely buys (R22).
     const built: string[] = [];
     const goods: VendorGoodsRow[] = [
       {
@@ -182,7 +183,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         price: { copper: 120, honor: 0 },
         quantity: 1,
         affordable: true,
-        locked: true,
+        requirementUnmet: true,
         requirement: { professionId: 'mining', proficiency: 40 },
       },
     ];
@@ -203,7 +204,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     // attach their own after it).
     expect(built.length).toBeGreaterThan(0);
     expect(built[0]).toContain('Requires Mining 40');
-    expect(built[0]).not.toContain('Click to buy');
+    expect(built[0]).toContain('Click to buy');
   });
 
   it('keeps click-to-buy on an unlocked row TOOLTIP', () => {
@@ -217,7 +218,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         price: { copper: 20, honor: 0 },
         quantity: 1,
         affordable: true,
-        locked: false,
+        requirementUnmet: false,
       },
     ];
     const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
@@ -247,7 +248,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         price: { copper: 20, honor: 0 },
         quantity: 1,
         affordable: true,
-        locked: false,
+        requirementUnmet: false,
       },
     ];
     const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
@@ -271,7 +272,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         price: { copper: 20, honor: 0 },
         quantity: 1,
         affordable: false,
-        locked: false,
+        requirementUnmet: false,
       },
     ];
     const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };

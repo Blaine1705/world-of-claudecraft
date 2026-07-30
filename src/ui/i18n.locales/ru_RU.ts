@@ -8505,6 +8505,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чтобы рыбачить в этих водах, нужна удочка {tier} уровня.',
   'hudChrome.gathering.toolTierUnmetCorpse':
     'Чтобы добыть лучшие материалы, нужен инструмент сбора {tier} уровня.',
+  'hudChrome.gathering.wieldUnmet.mining':
+    'Чтобы махать шахтерской киркой, которая уже лежит в ваших сумках, нужен навык горного дела {skill}.',
+  'hudChrome.gathering.wieldUnmet.logging':
+    'Чтобы махать лесорубным топором, который уже лежит в ваших сумках, нужен навык лесозаготовки {skill}.',
+  'hudChrome.gathering.wieldUnmet.herbalism':
+    'Чтобы работать серпом травника, который уже лежит в ваших сумках, нужен навык травничества {skill}.',
+  'hudChrome.gathering.wieldUnmetCorpse':
+    'Чтобы пустить в ход свой лучший инструмент, нужен навык сбора {skill}.',
   'hudChrome.gathering.requiresTool.mining': 'Требуется шахтерская кирка',
   'hudChrome.gathering.requiresTool.logging': 'Требуется лесорубный топор',
   'hudChrome.gathering.requiresTool.herbalism': 'Требуется серп травника',

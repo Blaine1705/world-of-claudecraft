@@ -4,82 +4,49 @@
 //
 // A side table keyed by item id, plus one pure resolver, in the shape of the
 // Delve Marks shop gate (content/delves/shop.ts): the table says which stocked
-// rows carry a requirement, the resolver answers "is this row open for this
-// player" and hands back the requirement itself so a surface can SAY why a
-// closed row is closed. The sim's authoritative buy path (items.ts buyItem)
-// and the vendor window's pure view core (ui/hud/vendor/vendor_view.ts) both
-// call the resolver, so the lock a player sees can never disagree with what the
-// purchase allows, offline, on the server, and headless alike.
+// rows carry a requirement, the resolver answers "does this row's requirement
+// hold for this player" and hands back the requirement itself so a surface can
+// SAY it. The vendor window's pure view core (ui/hud/vendor/vendor_view.ts)
+// reads it to render the advisory line; the values come from the wield table
+// (professions/wield_gate.ts), so the line a counter shows can never disagree
+// with the number the harvest gate enforces.
 //
-// A gated row still RENDERS, greyed with its requirement, exactly like the
-// trainer's locked recipes and the delve shop's locked offers. Dropping it from
-// the list instead would leave a player who cannot yet buy a tier-2 pick with
-// no way to learn that one exists or what opens it.
+// ADVISORY, not enforcement (R22, docs/design/professions-tuning-packet-review.md):
+// every counter sells ahead freely, the way Wilkes always sold the whole rod
+// ladder (R20), and so do the market, trade, mail, and buyback. What is gated
+// is the WIELD: the harvest gate refuses to put an unearned tool to work
+// (professions/wield_gate.ts, read by gathering.ts harvestNode and the grade
+// resolution), which closes every transfer route at the moment of use instead
+// of at the counter. Owners are never stripped: a tool bought or received
+// early sits in the bags and wields the moment its owner reaches the
+// threshold. A row with an unmet requirement therefore still SELLS; it just
+// says what the tool will ask of its owner, exactly like the requirement
+// line on the tool's own tooltip.
 //
-// Why the tool ladder is gated at all: a tool's tier is the only thing that
-// decides which node tiers it can work (professions/tools.ts canGatherTier),
-// nothing else gated the purchase, and every price here is inside a first-zone
-// quest income. So a level-1 character with no proficiency at all could walk to
-// a counter and buy the top land tool, which skips the whole tool ladder the
-// gathering trades are paced around.
-//
-// SCOPE, stated precisely because it is narrower than it may read: this is a
-// PURCHASE gate on the NPC counter, not a USE-time gate. What a tool can work
-// is decided solely by `canGatherTier` (professions/tools.ts), which never
-// reads proficiency, so EVERY non-counter route reaches full tier at any
-// proficiency. No count is given here on purpose: the routes below are the
-// ones worth naming, not a closed set, and an enumeration that claims to be
-// complete is exactly the thing that rots when a future feature adds another
-// way to put an item in a player's hands.
-//
-//  - A tool already in a player's bags. Nothing here reads or removes
-//    inventory, so a tool owned before this shipped keeps working exactly as
-//    it did.
-//  - Buyback (items.ts buyBackItem), which is not gated on purpose: returning
-//    a player their own sold item is not a new acquisition. Reaching it at 0
-//    proficiency needs the tool to have been owned and sold first, which the
-//    one-time mastery reset allows (it zeroes the counter at load while the
-//    buyback list persists) and so does any of the routes below.
-//  - The World Market. These six carry neither `noVendorSell` nor
-//    `noMarketList` (of the gathering tools only the three tier-1 ones carry
-//    those flags, and only to close a quest re-grant mint), so a player may buy
-//    one from another player at any proficiency, which the tier-4 tool recipes
-//    give real demand for since they consume the tier-3 tools as reagents.
-//  - Direct trade and mail attachments, which are the same player-to-player
-//    transfer through different doors: none of the six carries `soulbound` or
-//    `bindOnTrade` either.
-//
-// The ruling is SETTLED (R22, docs/design/professions-tuning-packet-review.md):
-// tool tier WILL gate at wield time (tier 2/3 at gathering 40/70), these
-// purchase gates become advisory, and enforcement moves to the harvest gate,
-// which closes every transfer route above at the moment of use instead of at
-// the counter. Owners are never stripped: a pre-gate tool stays in the bags
-// and wields once its owner reaches the threshold. That lands with the
-// review worklist's content pass; UNTIL IT DOES, the shipped behavior is
-// exactly what this file implements, so describe the live gate as pacing
-// what a merchant will sell you, never as pacing tool access.
+// The buy path (items.ts buyItem) deliberately does NOT read this table any
+// more: the authoritative purchase deny this file used to drive was retired
+// when the wield gate landed, and tests/professions_tool_gate.test.ts pins
+// the open counter and the wield-time refusal as a pair.
 //
 // DOM-free, rng-free and host-agnostic (src/sim purity, tests/architecture.test.ts).
 
+import {
+  TIER2_TOOL_WIELD_PROFICIENCY,
+  TIER3_TOOL_WIELD_PROFICIENCY,
+} from '../professions/wield_gate';
 import type { GatheringProfessionId } from './professions';
 
-// The two thresholds, against a land-gathering cap of 100 (GATHERING_PROFESSIONS
-// maxSkill). Both sit strictly below the proficiency at which a TIER-1 node
-// stops teaching, which is the load-bearing property: the first zone is all
-// tier-1 ground, so a threshold at or above that ceiling would be unreachable
-// by a player who owns only the tier-1 tool the gather quests hand out, and the
-// ladder would dead-end. tests/professions_tool_gate.test.ts derives that
-// ceiling from the live gain constants and asserts the gap, so a future tuning
-// pass that moves the curve fails loudly instead of quietly bricking the climb.
-//
-// 70 rather than 75 for the same reason with margin: 75 is exactly the ceiling,
-// a knife edge where one constant change flips reachable to unreachable.
+// The displayed thresholds ARE the wield thresholds: one table
+// (professions/wield_gate.ts) owns the numbers, and these aliases keep the
+// advisory surface reading the same values the harvest gate enforces. The
+// reachability of every threshold against the live gain curve is derived and
+// pinned in tests/professions_tool_gate.test.ts.
 
-/** Gathering proficiency that opens a tier-2 land tool's vendor row. */
-export const TIER2_TOOL_GATE_PROFICIENCY = 40;
+/** Advisory display value: the tier-2 land tool's wield requirement (R22). */
+export const TIER2_TOOL_GATE_PROFICIENCY = TIER2_TOOL_WIELD_PROFICIENCY;
 
-/** Gathering proficiency that opens a tier-3 land tool's vendor row. */
-export const TIER3_TOOL_GATE_PROFICIENCY = 70;
+/** Advisory display value: the tier-3 land tool's wield requirement (R22). */
+export const TIER3_TOOL_GATE_PROFICIENCY = TIER3_TOOL_WIELD_PROFICIENCY;
 
 /** One row's requirement: proficiency in a named gathering profession. */
 export interface VendorRowGate {
@@ -96,20 +63,18 @@ export interface VendorRowGate {
 //   harvest at all, so gating it would gate gathering itself.
 // - Tier 4 and 5 are crafted, carry no buyValue and sit in no vendorItems row
 //   (content/items.ts), so there is no vendor row to gate.
-// - The tiered fishing RODS are deliberately absent. Their profession has no
-//   world nodes at all (gathering.ts NODE_TYPE_BY_PROFESSION omits fishing),
-//   which is what both the threshold derivation and the zone-stocking rule are
-//   expressed in terms of, and fishing counts to 200 rather than 100 so the
-//   numbers here would not mean the same thing on that ladder. Rod access
-//   belongs with the rest of the fishing work. The absence is asserted, not
-//   assumed: tests/professions_tool_gate.test.ts pins that no fishing
-//   implement carries a gate and that every other priced land tool above tier 1
-//   does, so a new tool cannot ship ungated by omission.
+// - The tiered fishing RODS are deliberately absent: rods are R22-exempt
+//   (the zone water gate plus the fishing teaching ceiling are that
+//   profession's pacing, and its counter runs to 200 rather than 100, so the
+//   numbers here would not mean the same thing on that ladder). The absence
+//   is asserted, not assumed: tests/professions_tool_gate.test.ts pins that
+//   no fishing implement carries a gate and that every priced land tool
+//   above tier 1 does, so a new tool cannot ship unadvertised by omission.
 // Frozen like its packet siblings (FISHING_ZONE_ROD_TIERS): the Readonly type
-// stops a TS caller, not a JS one, and both worlds resolve gates through this
-// one object, so a runtime mutation would desync buy denials silently. The
-// rows are frozen too: a gate is two numbers, and half-mutable is worse than
-// either.
+// stops a TS caller, not a JS one, and both worlds resolve the advisory line
+// through this one object, so a runtime mutation would desync the line a
+// counter shows from the number the harvest gate enforces. The rows are
+// frozen too: a gate is two numbers, and half-mutable is worse than either.
 export const VENDOR_ROW_GATES: Readonly<Record<string, VendorRowGate>> = Object.freeze({
   iron_mining_pick: Object.freeze({
     professionId: 'mining',

@@ -2309,6 +2309,12 @@ export const id_ID: EnTranslations = {
         "logging": "Tidak ada tegakan pohon dalam jangkauan.",
         "herbalism": "Tidak ada petak herba dalam jangkauan."
       },
+      "wieldUnmet": {
+        "mining": "You need Mining {skill} to swing the pick already in your bags.",
+        "logging": "You need Logging {skill} to swing the axe already in your bags.",
+        "herbalism": "You need Herbalism {skill} to work the sickle already in your bags."
+      },
+      "wieldUnmetCorpse": "You need gathering skill {skill} to put your finest tool to work.",
       "toolTierUnmetCorpse": "Kamu membutuhkan alat pengumpul tingkat {tier} untuk mendapatkan bahan terbaik.",
       "toolTooltip": {
         "kind": {
