@@ -1,7 +1,8 @@
 // The DiscordApi request envelope and its injected IO seams. Every method funnels
-// through the one private `request()`, so driving `gatewayUrl()` and a couple of
-// the writes covers the whole class. The last block constructs the client the way
-// bot/main.ts does (token only) to prove the production defaults are still the
+// through the one private `request()`, so driving a representative call covers the
+// shared envelope, and a table drives the per-method method/path/body triples that
+// only that method can get wrong. The production-defaults block constructs the
+// client the way bot/main.ts does (token only) to prove the defaults are still the
 // real global fetch and a real setTimeout-backed sleep, which is the arm a broken
 // default parameter would otherwise silently replace.
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -14,14 +15,32 @@ interface FetchCall {
   init: RequestInit;
 }
 
-/** A response carrying only the fields `request()` touches. */
-function fakeResponse(opts: { status?: number; body?: unknown; text?: string } = {}): Response {
+/** A response carrying only the fields `request()` touches. `reads` records every
+ *  body read, so a test can prove a body was never parsed. */
+function fakeResponse(
+  opts: {
+    status?: number;
+    body?: unknown;
+    text?: string;
+    reads?: string[];
+    jsonThrows?: boolean;
+    textThrows?: boolean;
+  } = {},
+): Response {
   const status = opts.status ?? 200;
   return {
     ok: status >= 200 && status < 300,
     status,
-    json: async () => opts.body,
-    text: async () => opts.text ?? '',
+    json: async () => {
+      opts.reads?.push('json');
+      if (opts.jsonThrows) throw new SyntaxError('Unexpected token < in JSON');
+      return opts.body;
+    },
+    text: async () => {
+      opts.reads?.push('text');
+      if (opts.textThrows) throw new Error('body already consumed');
+      return opts.text ?? '';
+    },
   } as unknown as Response;
 }
 
@@ -68,25 +87,173 @@ describe('DiscordApi request envelope', () => {
     expect(await new DiscordApi('tok', impl).gatewayUrl()).toBe('wss://gateway.discord.gg');
   });
 
-  it('JSON-encodes a write body and returns null on 204', async () => {
-    const { calls, impl } = recordingFetch([fakeResponse({ status: 204 })]);
-    const api = new DiscordApi('tok', impl);
-
-    await api.setNickname('g1', 'u1', 'Aran (12)');
-
-    expect(calls[0].init.method).toBe('PATCH');
-    expect(calls[0].url).toBe(`${API}/guilds/g1/members/u1`);
-    expect(calls[0].init.body).toBe('{"nick":"Aran (12)"}');
+  it('falls back to the public gateway URL for an EMPTY url, not just a missing one', async () => {
+    // `||`, not `??`: Discord answering with an empty string would otherwise
+    // hand the Gateway '' and every connect would target the bare query string.
+    const { impl } = recordingFetch([fakeResponse({ body: { url: '' } })]);
+    expect(await new DiscordApi('tok', impl).gatewayUrl()).toBe('wss://gateway.discord.gg');
   });
 
-  it('throws with the status and the truncated response text on a non-ok status', async () => {
+  it('returns null on a 204 WITHOUT reading the body', async () => {
+    // The empty-body short circuit, pinned by the absent read rather than by the
+    // return value alone: a 204 has no body, so falling through to resp.json()
+    // relies entirely on its .catch to paper over the parse failure.
+    const reads: string[] = [];
+    const { impl } = recordingFetch([fakeResponse({ status: 204, reads })]);
+
+    expect(await new DiscordApi('tok', impl).createGuildRole('g1', 'WoC Initiate')).toBe(null);
+    expect(reads).toEqual([]);
+  });
+
+  it('returns null rather than throwing when a 200 body is not JSON', async () => {
+    // Cloudflare and Discord both answer with HTML on some errors; the parse
+    // guard is what stops that from throwing an unexpected shape at the caller.
+    const { impl } = recordingFetch([fakeResponse({ jsonThrows: true })]);
+    expect(await new DiscordApi('tok', impl).createGuildRole('g1', 'WoC Initiate')).toBe(null);
+  });
+
+  it('throws with the status and the response text TRUNCATED to 200 characters', async () => {
     const { impl } = recordingFetch([fakeResponse({ status: 403, text: 'x'.repeat(300) })]);
     const api = new DiscordApi('tok', impl);
 
+    // An Error argument is message EQUALITY in vitest; a bare string would be a
+    // substring match, which a 300-character slice would also satisfy, leaving
+    // the truncation this test is named for completely unpinned.
     await expect(api.guildRoles('g1')).rejects.toThrow(
-      `[bot] discord GET /guilds/g1/roles -> 403 ${'x'.repeat(200)}`,
+      new Error(`[bot] discord GET /guilds/g1/roles -> 403 ${'x'.repeat(200)}`),
     );
   });
+
+  it('still throws with the status when the error body cannot be read', async () => {
+    const { impl } = recordingFetch([fakeResponse({ status: 500, textThrows: true })]);
+    await expect(new DiscordApi('tok', impl).guildRoles('g1')).rejects.toThrow(
+      new Error('[bot] discord GET /guilds/g1/roles -> 500 '),
+    );
+  });
+
+  it('normalizes a non-array roles payload to an empty array', async () => {
+    // Discord answers this route with an error OBJECT on a permissions change;
+    // without the guard the caller's role diff iterates a non-array and throws.
+    const { impl } = recordingFetch([fakeResponse({ body: { message: 'Missing Access' } })]);
+    expect(await new DiscordApi('tok', impl).guildRoles('g1')).toEqual([]);
+  });
+});
+
+describe('DiscordApi per-method call envelopes', () => {
+  // Every row is a method whose ONLY wire contract is its verb, path, and body.
+  // A copy-paste slip between the add/remove role pair, or a lost EPHEMERAL
+  // flag, is invisible to the shared-envelope tests above.
+  const ROWS: {
+    name: string;
+    drive: (api: DiscordApi) => Promise<unknown>;
+    method: string;
+    path: string;
+    body: string | undefined;
+    response?: Response;
+  }[] = [
+    {
+      name: 'registerGuildCommands',
+      drive: (api) => api.registerGuildCommands('c1', 'g1', [{ name: 'whoami' }]),
+      method: 'PUT',
+      path: '/applications/c1/guilds/g1/commands',
+      body: '[{"name":"whoami"}]',
+    },
+    {
+      name: 'respondInteraction',
+      drive: (api) => api.respondInteraction('i1', 'tkn', { content: 'hi' }),
+      method: 'POST',
+      path: '/interactions/i1/tkn/callback',
+      // type 4 is CHANNEL_MESSAGE_WITH_SOURCE: the immediate visible reply.
+      body: '{"type":4,"data":{"content":"hi"}}',
+    },
+    {
+      name: 'deferInteraction (ephemeral)',
+      drive: (api) => api.deferInteraction('i1', 'tkn', true),
+      method: 'POST',
+      path: '/interactions/i1/tkn/callback',
+      // 64 is the EPHEMERAL flag; losing it posts a private reply publicly.
+      body: '{"type":5,"data":{"flags":64}}',
+    },
+    {
+      name: 'deferInteraction (public)',
+      drive: (api) => api.deferInteraction('i1', 'tkn', false),
+      method: 'POST',
+      path: '/interactions/i1/tkn/callback',
+      body: '{"type":5,"data":{}}',
+    },
+    {
+      name: 'editOriginalResponse',
+      drive: (api) => api.editOriginalResponse('app1', 'tkn', { content: 'done' }),
+      method: 'PATCH',
+      path: '/webhooks/app1/tkn/messages/@original',
+      body: '{"content":"done"}',
+    },
+    {
+      name: 'guildRoles',
+      drive: (api) => api.guildRoles('g1'),
+      method: 'GET',
+      path: '/guilds/g1/roles',
+      body: undefined,
+      response: fakeResponse({ body: [] }),
+    },
+    {
+      name: 'createGuildRole (default color)',
+      drive: (api) => api.createGuildRole('g1', 'WoC Initiate'),
+      method: 'POST',
+      path: '/guilds/g1/roles',
+      // color 0 means "no color"; hoist/mentionable false keep the tier roles
+      // out of the member sidebar and out of @-mention range.
+      body: '{"name":"WoC Initiate","color":0,"mentionable":false,"hoist":false}',
+    },
+    {
+      name: 'createGuildRole (explicit color)',
+      drive: (api) => api.createGuildRole('g1', 'WoC Champion', 0xff8800),
+      method: 'POST',
+      path: '/guilds/g1/roles',
+      body: '{"name":"WoC Champion","color":16746496,"mentionable":false,"hoist":false}',
+    },
+    {
+      name: 'addMemberRole',
+      drive: (api) => api.addMemberRole('g1', 'u1', 'r1'),
+      method: 'PUT',
+      path: '/guilds/g1/members/u1/roles/r1',
+      body: undefined,
+    },
+    {
+      name: 'removeMemberRole',
+      drive: (api) => api.removeMemberRole('g1', 'u1', 'r1'),
+      method: 'DELETE',
+      path: '/guilds/g1/members/u1/roles/r1',
+      body: undefined,
+    },
+    {
+      name: 'setNickname',
+      drive: (api) => api.setNickname('g1', 'u1', 'Aran (12)'),
+      method: 'PATCH',
+      path: '/guilds/g1/members/u1',
+      body: '{"nick":"Aran (12)"}',
+    },
+    {
+      name: 'createMessage',
+      drive: (api) => api.createMessage('ch1', { content: 'hello' }),
+      method: 'POST',
+      path: '/channels/ch1/messages',
+      body: '{"content":"hello"}',
+    },
+  ];
+
+  for (const row of ROWS) {
+    it(`${row.name} sends ${row.method} ${row.path}`, async () => {
+      const { calls, impl } = recordingFetch([row.response ?? fakeResponse({ body: {} })]);
+
+      await row.drive(new DiscordApi('tok', impl));
+
+      expect(calls.length).toBe(1);
+      expect(calls[0].init.method).toBe(row.method);
+      expect(calls[0].url).toBe(`${API}${row.path}`);
+      expect(calls[0].init.body).toBe(row.body);
+    });
+  }
 });
 
 describe('DiscordApi 429 retry', () => {
@@ -105,8 +272,27 @@ describe('DiscordApi 429 retry', () => {
     // retry_after is SECONDS, so 2 becomes 2000 ms, inside the 500..10000 clamp.
     expect(slept).toEqual([2000]);
     expect(calls.length).toBe(2);
-    expect(calls[0].url).toBe(calls[1].url);
-    expect(calls[0].init.method).toBe(calls[1].init.method);
+    // Both sides pinned to a literal, not just to each other: a relation-only
+    // assertion holds even if BOTH requests go somewhere wrong.
+    expect(calls[1].url).toBe(`${API}/guilds/g1/roles`);
+    expect(calls[1].init.method).toBe('GET');
+  });
+
+  it('replays the BODY too, not just the method and path', async () => {
+    // Every other retry arm drives a bodyless GET, so dropping `body` from the
+    // recursive call was invisible. The likeliest 429 in this bot is a relay
+    // post, which would then be replayed as an empty message.
+    const { calls, impl } = recordingFetch([
+      fakeResponse({ status: 429, body: { retry_after: 1 } }),
+      fakeResponse({ body: {} }),
+    ]);
+    const api = new DiscordApi('tok', impl, async () => {});
+
+    await api.createMessage('ch1', { content: 'hello' });
+
+    expect(calls.length).toBe(2);
+    expect(calls[1].init.body).toBe('{"content":"hello"}');
+    expect(calls[1].url).toBe(`${API}/channels/ch1/messages`);
   });
 
   it('clamps the wait to the 500 ms floor and the 10000 ms ceiling', async () => {
@@ -138,6 +324,21 @@ describe('DiscordApi 429 retry', () => {
     expect(slept).toEqual([1000]);
   });
 
+  it('falls back to the 1 second default when the 429 body is not JSON at all', async () => {
+    // An edge 429 comes from Cloudflare ahead of Discord's own limiter and
+    // carries HTML; without the parse guard the whole call throws instead of
+    // backing off.
+    const slept: number[] = [];
+    const { impl } = recordingFetch([
+      fakeResponse({ status: 429, jsonThrows: true }),
+      fakeResponse({ body: [] }),
+    ]);
+    await new DiscordApi('tok', impl, async (ms) => {
+      slept.push(ms);
+    }).guildRoles('g1');
+    expect(slept).toEqual([1000]);
+  });
+
   it('retries at most once: a second 429 is thrown, not slept on again', async () => {
     const slept: number[] = [];
     const { calls, impl } = recordingFetch([
@@ -157,7 +358,14 @@ describe('DiscordApi 429 retry', () => {
 });
 
 describe('DiscordApi production defaults', () => {
-  it('uses the real global fetch when constructed with the token alone', async () => {
+  it('reads the global fetch at CALL time, not at construction', async () => {
+    // Construction happens BEFORE the stub deliberately. A capture-form default
+    // (`= fetch`) would bind the pre-stub global here and never see the swap,
+    // which is exactly the regression bot/CLAUDE.md's forward-to-the-global
+    // invariant exists to prevent, and which a stub-then-construct ordering
+    // cannot detect.
+    const api = new DiscordApi('tok');
+
     const seen: string[] = [];
     vi.stubGlobal('fetch', async (input: unknown) => {
       seen.push(String(input));
@@ -165,8 +373,6 @@ describe('DiscordApi production defaults', () => {
     });
 
     try {
-      // Exactly the construction in bot/main.ts: no fetch, no sleep.
-      const api = new DiscordApi('tok');
       expect(await api.gatewayUrl()).toBe('wss://real.test');
     } finally {
       vi.unstubAllGlobals();
