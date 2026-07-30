@@ -117,6 +117,31 @@ describe('warlock demon pets', () => {
     expect(pet!.petAutoTaunt).toBe(true);
   });
 
+  it('gloomshade does not auto-taunt by default for a grouped owner', () => {
+    // Auto-taunting off a 10s cycle with no target/tank check would rip every
+    // non-boss add off the real party/raid tank. Keep the free default scoped
+    // to solo play; a grouped warlock keeps the manual /pettaunt opt-in.
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: WARLOCK_TEST_WORLD,
+    });
+    const lockPid = sim.addPlayer('warlock', 'Lock');
+    const otherPid = sim.addPlayer('warrior', 'Tank');
+    sim.partyInvite(otherPid, lockPid);
+    sim.partyAccept(otherPid);
+    const lock = sim.entities.get(lockPid)!;
+    sim.setPlayerLevel(12, lockPid);
+    lock.resource = lock.maxResource;
+    sim.castAbility('summon_voidwalker', lockPid);
+    for (let i = 0; i < 20 * 12 && sim.entities.get(lockPid)!.castingAbility; i++) sim.tick();
+    const pet = sim.petOf(lockPid);
+    expect(pet).not.toBeNull();
+    expect(pet!.templateId).toBe('gloomshade');
+    expect(pet!.petAutoTaunt).toBe(false);
+  });
+
   it('emberkin, the ranged damage demon, does not auto-taunt by default', () => {
     // Non-tank demons keep the prior default: no free auto-taunt for a demon
     // that was never described as a threat-holder.

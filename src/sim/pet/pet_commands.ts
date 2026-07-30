@@ -360,8 +360,14 @@ export function createDemonPet(
   pet.petMode = 'defensive';
   pet.petTauntTimer = 0;
   // A melee_tank demon (Gloomshade) is built to hold threat, so it comes up with
-  // auto-taunt already on; every other demon keeps the old opt-in default.
-  pet.petAutoTaunt = template.petRole === 'melee_tank';
+  // auto-taunt already on for a solo owner; every other demon keeps the old opt-in
+  // default. petCanForceTaunt is the shared taunt-eligibility gate (pet_taunt_gate.ts)
+  // so a future tank demon that can't taunt doesn't default on. In a party/raid,
+  // default off: an unattended 10s Growl cycle would rip non-boss adds off the real
+  // tank (classic keeps autocast Torment off by default for the same reason), so
+  // grouped owners keep the manual /pettaunt opt-in instead.
+  pet.petAutoTaunt =
+    template.petRole === 'melee_tank' && petCanForceTaunt(mobId) && !ctx.partyOf(owner.id);
   pet.petAutoWaterJet = false;
   pet.petManualTauntPending = false;
   pet.hostile = false;

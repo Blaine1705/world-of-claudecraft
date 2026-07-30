@@ -2059,6 +2059,9 @@ describe('warlock demon summons', () => {
     // The toggle still works: turning auto-taunt off disables future forced Growls.
     sim.setPetAutoTaunt(false);
     expect(voidwalker.petAutoTaunt).toBe(false);
+    wolf.forcedTargetId = null;
+    for (let i = 0; i < 20 * (10 + 2); i++) sim.tick();
+    expect(wolf.forcedTargetId).not.toBe(voidwalker.id);
   });
 
   it('recasting the same demon dismisses it and summons a fresh one', () => {
