@@ -712,6 +712,39 @@ export function buildDailyRewardWinnersMessage(
 // predicates are pure and cache-free (the caller owns the caches) so the
 // decision is unit-tested without a network, a clock, or a Discord token.
 
+/** The caller-owned dedupe state behind `claimDailyActive`. */
+export interface DailyActiveState {
+  /** `${userId}:${day}` for everyone already granted today. */
+  seen: Set<string>;
+  /** The UTC day those keys belong to, empty before the first grant. */
+  day: string;
+}
+
+/**
+ * Whether this is a member's FIRST engagement of the given day, claiming it if so.
+ *
+ * The set is emptied when the day rolls over rather than accumulating an entry per
+ * member per day for the life of the process: a year on a 500 member guild is
+ * roughly 180k dead strings, and GUILD_MEMBER_REMOVE prunes the other caches but
+ * deliberately not this one, so departed members' keys persisted too. Clearing is
+ * safe precisely because a key carries its day, so nothing still live is ever
+ * dropped.
+ *
+ * Bot-side dedupe only. The server's grant dedupe key is what makes the reward
+ * exactly-once, so even a clock stepping backwards over UTC midnight cannot
+ * double-grant; this only decides whether the request is worth sending.
+ */
+export function claimDailyActive(state: DailyActiveState, day: string, userId: string): boolean {
+  if (day !== state.day) {
+    state.day = day;
+    state.seen.clear();
+  }
+  const key = `${userId}:${day}`;
+  if (state.seen.has(key)) return false;
+  state.seen.add(key);
+  return true;
+}
+
 /** One members-meta push record: the shape `clearedMemberMeta` returns and the
  * roster sweep builds. Named so the diff predicates below can share it. */
 export interface MemberMetaRecord {

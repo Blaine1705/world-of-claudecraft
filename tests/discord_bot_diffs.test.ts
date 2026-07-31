@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   changedMemberMeta,
+  claimDailyActive,
   clearedMemberMeta,
+  type DailyActiveState,
   isSelfNickEcho,
   type MemberMetaRecord,
   memberMetaChanged,
@@ -186,11 +188,37 @@ describe('isSelfNickEcho (drop the update our own PATCH caused)', () => {
     );
   });
 
-  it('compares set membership both ways, so a duplicate id alone is not a change', () => {
+  it('treats a duplicate id on EITHER side as no change, because the Sets dedupe it', () => {
+    // Retitled: this used to claim a both-directions membership scan, and the
+    // reverse loop it named was deleted as unreachable (equal Set sizes plus
+    // containment in one direction already proves equality). Building the Sets is
+    // what neutralizes a duplicate, so both sides are exercised here.
     const duplicated = [roles[0], roles[1], roles[1]];
     expect(isSelfNickEcho({ nick: 'Aldric 20', roleIds: duplicated }, 'Aldric 20', roles)).toBe(
       true,
     );
+    // And the mirror: the duplicate on the CACHED side instead.
+    expect(isSelfNickEcho({ nick: 'Aldric 20', roleIds: roles }, 'Aldric 20', duplicated)).toBe(
+      true,
+    );
+  });
+
+  it('claims a member once per day and empties the bucket on the rollover', () => {
+    // The bot-side half of the daily-engagement dedupe. The clear is what keeps the
+    // set from accumulating an entry per member per day for the life of the
+    // process, and it is safe because every key carries its own day.
+    const state: DailyActiveState = { seen: new Set<string>(), day: '' };
+    expect(claimDailyActive(state, '2026-07-31', 'u1')).toBe(true);
+    expect(claimDailyActive(state, '2026-07-31', 'u1')).toBe(false);
+    // A second member the same day is independent, and both keys are held.
+    expect(claimDailyActive(state, '2026-07-31', 'u2')).toBe(true);
+    expect(state.seen.size).toBe(2);
+
+    // The rollover: the same member grants again, and the bucket did not grow.
+    expect(claimDailyActive(state, '2026-08-01', 'u1')).toBe(true);
+    expect(state.seen.size).toBe(1);
+    expect(state.day).toBe('2026-08-01');
+    expect(claimDailyActive(state, '2026-08-01', 'u1')).toBe(false);
   });
 
   it('is an echo for an empty role set on both sides, with the written nick', () => {

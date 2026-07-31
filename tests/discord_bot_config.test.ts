@@ -428,9 +428,12 @@ describe('loadConfig cadence knobs (D13)', () => {
         new RegExp(`process\\.env\\.${knob.env}[\\s\\S]{0,40}?${knob.constant}`),
       );
     }
-    // And no bare copy of any default survives beside the import.
-    for (const value of ['300000', '300_000', '4000', '4_000', '3000', '3_000']) {
-      expect(source).not.toContain(value);
+    // And no bare copy of any default survives beside the import. Word-bounded on
+    // BOTH sides, never a substring scan: `not.toContain('3000')` also fires on
+    // 30000, 13000 and 130000, so the day a governor knob gains a plausible
+    // default this file would go red for a number that is not a copy of anything.
+    for (const value of ['300_?000', '4_?000', '3_?000']) {
+      expect(source).not.toMatch(new RegExp(`(?<![0-9_])${value}(?![0-9_])`));
     }
   });
 

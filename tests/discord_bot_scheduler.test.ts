@@ -907,15 +907,69 @@ describe('scheduler kick from IDLE, and the task lifecycle', () => {
     task.stop();
   });
 
-  it('survives a restart whose old run settles AFTER the new chain fires', async () => {
-    // The deadlock, and the reason stop() has to release the run state. Found by
-    // the Phase 3 QA audit and reproduced against the real module before the fix:
-    // the run held past the new chain's first timer, so execute() met an overlap
-    // guard still claimed by the retired run, returned WITHOUT arming anything,
-    // and the retired run's own settle then returned early on its stale
-    // generation. Neither owner armed the chain and the task was dead for the
-    // life of the process, with no counter and no log. Before the fix the runs
-    // below stopped at [1000] no matter how far the clock advanced.
+  it('never runs a restarted chain BESIDE the run the stop abandoned', async () => {
+    // Both halves of the restart contract at once, and the reason this case exists.
+    //
+    // stop() can retire a run's generation but it cannot cancel the promise, so an
+    // abandoned run keeps executing. The first shape of this fix released the
+    // overlap claim in stop(), which traded the deadlock below for genuine
+    // overlap: the restarted chain's first run entered while the abandoned one was
+    // still inside options.run(). So the claim is NOT released. start() arms
+    // nothing while a run is in flight, and the abandoned run's settle hands the
+    // chain over on its way out.
+    //
+    // The deadlock this replaced, reproduced against the real module before the
+    // fix: the retired run returned early on its stale generation while the newly
+    // armed timer was refused by the overlap guard, so neither owner armed
+    // anything and the task was dead for the life of the process, with no counter
+    // and no log. `runAt` stopped at [1000] no matter how far the clock advanced.
+    const clock = syntheticClock();
+    const runAt: number[] = [];
+    const gate = deferred();
+    let live = 0;
+    let peak = 0;
+    const scheduler = new LoopScheduler(clockTimers(clock), () => 0.5);
+    const task = scheduler.add({
+      name: 'sweep',
+      cadence: { activeMs: 1000 },
+      run: async () => {
+        live += 1;
+        peak = Math.max(peak, live);
+        runAt.push(clock.now());
+        if (runAt.length === 1) await gate.promise;
+        live -= 1;
+        return true;
+      },
+    });
+
+    task.start();
+    await clock.advanceTo(1000);
+    expect(runAt).toEqual([1000]);
+
+    task.stop();
+    task.start();
+
+    // NOT overlap: the abandoned run still holds the task, so the restart waits
+    // however long it takes rather than starting a second body beside it.
+    await clock.advanceTo(9000);
+    expect(runAt).toEqual([1000]);
+    expect(peak).toBe(1);
+
+    // NOT a deadlock either: the abandoned run's settle hands the chain over, and
+    // the restarted task resumes at its own cadence from that moment.
+    gate.resolve();
+    await clock.advanceTo(10_000);
+    expect(runAt).toEqual([1000, 10_000]);
+    await clock.advanceTo(11_000);
+    expect(runAt).toEqual([1000, 10_000, 11_000]);
+    expect(peak).toBe(1);
+    task.stop();
+  });
+
+  it('hands a kick that arrived during the abandoned run to the restarted chain', async () => {
+    // The handover carries the pending kick rather than dropping it. A kick that
+    // lands after the restart is aimed at the LIVE task, and losing it would lose
+    // exactly one GUILD_CREATE re-sync on the reconnect path this exists for.
     const clock = syntheticClock();
     const runAt: number[] = [];
     const gate = deferred();
@@ -932,65 +986,20 @@ describe('scheduler kick from IDLE, and the task lifecycle', () => {
 
     task.start();
     await clock.advanceTo(1000);
+    task.stop();
+    task.start();
+    task.kick(); // coalesced: the abandoned run still holds the task
+    await clock.advanceTo(5000);
     expect(runAt).toEqual([1000]);
 
-    task.stop();
-    task.start(); // the new chain arms for 2000, while the old run is still held
-
-    await clock.advanceTo(2000);
-    expect(runAt).toEqual([1000, 2000]);
-    // The retired run settles only now, long after the restarted chain took over,
-    // and it must not disturb it: the chain carries on at its own cadence.
+    // The settle honors it AT ONCE rather than waiting out a fresh interval,
+    // which is what a kick means everywhere else in this module.
     gate.resolve();
-    await clock.advanceTo(3000);
-    expect(runAt).toEqual([1000, 2000, 3000]);
-    await clock.advanceTo(4000);
-    expect(runAt).toEqual([1000, 2000, 3000, 4000]);
-    task.stop();
-  });
-
-  it('does not let a retired run re-open the overlap guard on a live one', async () => {
-    // The other half of the same fix, and the reason the state write moved BELOW
-    // the generation check. A retired run that still published its settle would
-    // clear `running` for the run the restarted task has in flight, so the very
-    // next kick would start a SECOND concurrent run: the one thing this whole
-    // module exists to make impossible.
-    const clock = syntheticClock();
-    const runAt: number[] = [];
-    const first = deferred();
-    const second = deferred();
-    const scheduler = new LoopScheduler(clockTimers(clock), () => 0.5);
-    const task = scheduler.add({
-      name: 'sweep',
-      cadence: { activeMs: 1000 },
-      run: async () => {
-        runAt.push(clock.now());
-        if (runAt.length === 1) await first.promise;
-        if (runAt.length === 2) await second.promise;
-        return true;
-      },
-    });
-
-    task.start();
-    await clock.advanceTo(1000);
-    task.stop();
-    task.start();
-    await clock.advanceTo(2000);
-    expect(runAt).toEqual([1000, 2000]); // the live run, now held by `second`
-
-    // The retired run settles while the live one is still in flight.
-    first.resolve();
-    await clock.advanceTo(2000);
-
-    // A kick now must be COALESCED, not run: the live run still holds the task.
-    task.kick();
-    await clock.advanceTo(2000);
-    expect(runAt).toEqual([1000, 2000]);
-
-    // And once the live run settles, the coalesced kick is the follow-up.
-    second.resolve();
-    await clock.advanceTo(2000);
-    expect(runAt).toEqual([1000, 2000, 2000]);
+    await clock.advanceTo(5000);
+    expect(runAt).toEqual([1000, 5000]);
+    // And the ordinary chain resumes from that run's own settle.
+    await clock.advanceTo(6000);
+    expect(runAt).toEqual([1000, 5000, 6000]);
     task.stop();
   });
 

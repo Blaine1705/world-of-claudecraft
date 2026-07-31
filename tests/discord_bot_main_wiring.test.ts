@@ -51,7 +51,9 @@ const TASKS = [
   { name: 'relay', field: 'relayPollMs', run: 'pollRelay' },
   { name: 'activity', field: 'relayPollMs', run: 'pollActivity' },
   { name: 'daily-rewards-winners', field: 'relayPollMs', run: 'pollDailyRewardWinners' },
-  { name: 'special-roles-and-meta', field: 'roleSyncIntervalMs', run: 'refreshSpecialRoles' },
+  // The paired task calls the tested helper, which is what receives the refresh
+  // and the push; the case below pins which two it is handed.
+  { name: 'special-roles-and-meta', field: 'roleSyncIntervalMs', run: 'refreshThenPushMeta' },
 ] as const;
 
 /**
@@ -94,9 +96,14 @@ describe('bot/main.ts loop wiring', () => {
       // The name, its cadence AND its sweep must appear in ONE registration, so a
       // task reading another task's interval, or running another task's sweep,
       // cannot pass by having the strings somewhere in the file.
+      // The spans REFUSE to cross into another registration: without the negative
+      // lookahead, a body swap between two same-cadence tasks is caught by only
+      // one of the two patterns, because the other one simply runs on into its
+      // neighbour and finds the sweep there.
+      const within = '((?!scheduler\\.add\\()[\\s\\S])';
       const pattern = new RegExp(
-        `name: '${task.name}'[\\s\\S]{0,240}?cadence: \\{ activeMs: cfg\\.${task.field}` +
-          `[\\s\\S]{0,900}?${task.run}\\(`,
+        `name: '${task.name}'${within}{0,240}?cadence: \\{ activeMs: cfg\\.${task.field}` +
+          `${within}{0,900}?${task.run}\\(`,
       );
       expect(source).toMatch(pattern);
     }
@@ -115,11 +122,19 @@ describe('bot/main.ts loop wiring', () => {
         .length;
       expect({ call: kick.call, found }).toEqual({ call: kick.call, found: kick.times });
     }
+    // A kick added for a NEW task passes every per-name count above, so the TOTAL
+    // is pinned too, the way the registration count is.
+    expect((source.match(/\.kick\(\)/g) ?? []).length).toBe(KICKS.reduce((n, k) => n + k.times, 0));
     // And they sit on the events that matter, not merely somewhere in the file.
     expect(source).toMatch(
       /case 'GUILD_CREATE'[\s\S]{0,4000}?roleSyncTask\.kick\(\)[\s\S]{0,80}?memberMetaTask\.kick\(\)/,
     );
-    expect(source).toMatch(/chunk_index[\s\S]{0,600}?memberMetaTask\.kick\(\)/);
+    // The backfill kick must sit INSIDE the final-chunk guard, not merely near
+    // chunk_index: without the guard it fires once per chunk, which on a large
+    // guild is a sweep per chunk during exactly the reconnect this coalesces.
+    expect(source).toMatch(
+      /idx >= count - 1[\s\S]{0,200}?memberMetaTask\.kick\(\)[\s\S]{0,160}?reconcileDepartedMembers\(/,
+    );
   });
 
   it('publishes a successful rename immediately, and re-syncs the diff cache', () => {
@@ -135,18 +150,47 @@ describe('bot/main.ts loop wiring', () => {
     // permanent divergence that dueForFullResync's header enumerates.
     const source = mainSource();
     expect(source).toMatch(/outcome === 'written'[\s\S]{0,80}?pushMemberMeta\(/);
-    expect(source).toMatch(/dueForFullResync\([\s\S]{0,200}?lastPushedMeta\.clear\(\)/);
+    // The WHOLE assignment, not just the two tokens near each other. An earlier
+    // version pinned `dueForFullResync(...) ... lastPushedMeta.clear()`, which
+    // matched with the predicate negated and with the restamp deleted; dropping
+    // the restamp turns every later sweep into a full re-push, which is precisely
+    // the load D5 removed.
+    expect(source).toMatch(
+      /lastFullMetaResyncMs = fullResyncIfDue\(lastFullMetaResyncMs, Date\.now\(\), lastPushedMeta\)/,
+    );
   });
 
-  it('does not let a failed special-roles refresh swallow the meta push', () => {
-    // The event paths (GUILD_CREATE, the member backfill) called pushAllMemberMeta
-    // DIRECTLY before this phase, with no Discord REST call in front of it.
-    // Routing them through the paired task gave them the guild-roles GET as a
-    // precondition, and a reconnect storm is exactly when that GET fails. The
-    // catch keeps the ordering when the refresh works and publishes the previous
-    // index when it does not.
-    expect(mainSource()).toMatch(
-      /try \{\s*await refreshSpecialRoles\(\);\s*\} catch[\s\S]{0,400}?await pushAllMemberMeta\(\)/,
+  it('delegates the refresh-then-push pair to the tested helper', () => {
+    // Deliberately NOT a pin on a try/catch here. A catch that RETHROWS is
+    // textually identical to one that swallows, so the source pin that used to
+    // stand here passed for the exact regression it was written to catch. The
+    // behavior lives in refreshThenPushMeta, where a test drives a throwing
+    // refresh and asserts the push still ran; all this has to say is that main.ts
+    // routes through it and in the right order.
+    const source = mainSource();
+    expect(source).toMatch(
+      /refreshThenPushMeta\(\{\s*refresh: refreshSpecialRoles,\s*push: pushAllMemberMeta,/,
+    );
+    // And no hand-rolled copy of the pair survives beside it.
+    expect(source).not.toMatch(/try \{\s*await refreshSpecialRoles\(\)/);
+  });
+
+  it('routes the two remaining unreachable decisions through their tested helpers', () => {
+    // Both are new behavior inside main(), which no test can enter. Each is a call
+    // to a helper that IS tested, so the pin only has to say the call site exists
+    // and passes the right state.
+    const source = mainSource();
+    // The departed-member clear reads its result through the one predicate that
+    // has the tests, rather than re-spelling `=== null || === undefined` inline.
+    expect(source).toMatch(
+      /pushMembersMeta\(\[clearedMemberMeta\(userId\)\]\)[\s\S]{0,200}?pushRejected\(result\)/,
+    );
+    // The daily-engagement dedupe, whose day-rollover clear is what keeps the set
+    // from growing for the life of the process.
+    expect(source).toMatch(/claimDailyActive\(dailyActive, day, userId\)/);
+    // The echo record is consumed, so one PATCH suppresses only its own one echo.
+    expect(source).toMatch(
+      /decision\.forgetWrittenNick[\s\S]{0,60}?lastWrittenNick\.delete\(userId\)/,
     );
   });
 

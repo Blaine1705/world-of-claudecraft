@@ -97,7 +97,7 @@ export interface MetaPushIo {
  * so a dropped push healed itself within one interval; now a batch wrongly marked
  * clean stays suppressed until the record changes again or the bot restarts.
  */
-function pushRejected(result: unknown): boolean {
+export function pushRejected(result: unknown): boolean {
   return result === null || result === undefined;
 }
 
@@ -192,6 +192,55 @@ export function dueForFullResync(
   const elapsed = nowMs - lastFullAtMs;
   if (elapsed < 0) return true;
   return elapsed >= every;
+}
+
+/**
+ * Drop the whole diff cache when the interval is up, and answer the timestamp to
+ * carry forward.
+ *
+ * The DECISION is dueForFullResync; this is the transition it exists to drive,
+ * here rather than in main.ts because main.ts runs `main()` at module scope and
+ * nothing in it can be reached from a test. Forgetting the restamp there would
+ * make every later sweep a full re-push, which is exactly the load D5 removed,
+ * and no assertion could have said so.
+ */
+export function fullResyncIfDue(
+  lastFullAtMs: number,
+  nowMs: number,
+  lastPushed: Map<string, MemberMetaRecord>,
+  everyMs: number = FULL_RESYNC_INTERVAL_MS,
+): number {
+  if (!dueForFullResync(lastFullAtMs, nowMs, everyMs)) return lastFullAtMs;
+  lastPushed.clear();
+  return nowMs;
+}
+
+/**
+ * The refresh-then-push pair the roster sweep runs, with the ordering that makes
+ * it correct and the catch that keeps it from being all-or-nothing.
+ *
+ * ORDERED, because the push reads the special-role index the refresh rebuilds, so
+ * a push that ran first would publish the previous sweep's flair. But a failed
+ * refresh must NOT take the push with it: before this phase the GUILD_CREATE and
+ * member-backfill paths called the push directly, with no Discord REST call in
+ * front of it, and folding them into one task gave them the guild-roles GET as a
+ * precondition they never had. A reconnect storm is exactly when that GET fails.
+ *
+ * Extracted for the same reason as everything else here: the arm that matters is
+ * "the refresh threw and the push still ran", and inside main.ts nothing can say
+ * so. A source pin cannot either, since a catch that rethrows looks identical.
+ */
+export async function refreshThenPushMeta(io: {
+  refresh: () => Promise<unknown>;
+  push: () => Promise<unknown>;
+  onRefreshError: (error: unknown) => void;
+}): Promise<void> {
+  try {
+    await io.refresh();
+  } catch (error) {
+    io.onRefreshError(error);
+  }
+  await io.push();
 }
 
 /**

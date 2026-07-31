@@ -23,10 +23,12 @@ import {
   dueForFullResync,
   FULL_RESYNC_INTERVAL_MS,
   forgetMember,
+  fullResyncIfDue,
   type NicknameCaches,
   nickOf,
   pushChangedMemberMeta,
   pushOneMemberMeta,
+  refreshThenPushMeta,
   writeMemberNickname,
 } from '../bot/member_writes';
 
@@ -601,13 +603,101 @@ describe('the diff cache cannot believe itself forever', () => {
     expect(dueForFullResync(10 * HOUR, 9 * HOUR)).toBe(true);
   });
 
-  it('falls back to the default rather than to 0 for an unusable interval', () => {
+  it('honors a custom interval, and falls back to the default for an unusable one', () => {
+    // The happy path FIRST: every other case here relies on the default, so
+    // ignoring the third argument entirely would survive them all.
+    expect(dueForFullResync(0, 4999, 5000)).toBe(false);
+    expect(dueForFullResync(0, 5000, 5000)).toBe(true);
+
     // A zero or negative interval would make EVERY sweep a full re-push, which is
     // precisely the load this phase removed.
     for (const bad of [0, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
       expect(dueForFullResync(0, HOUR - 1, bad)).toBe(false);
       expect(dueForFullResync(0, HOUR, bad)).toBe(true);
     }
+  });
+
+  it('clears the cache and RESTAMPS only when the interval is up', async () => {
+    // The transition, not just the decision. Forgetting the restamp makes every
+    // later sweep a full re-push, which is exactly the load D5 removed, and it is
+    // invisible from the predicate alone.
+    const last = new Map<string, MemberMetaRecord>();
+    last.set(USER, record(USER));
+
+    // Not yet due: nothing cleared, and the timestamp is carried through unmoved.
+    expect(fullResyncIfDue(1000, 1000 + HOUR - 1, last)).toBe(1000);
+    expect(last.size).toBe(1);
+
+    // Due: the cache is emptied AND the clock is restamped to now, so the next
+    // sweep starts a fresh interval instead of re-syncing forever.
+    expect(fullResyncIfDue(1000, 1000 + HOUR, last)).toBe(1000 + HOUR);
+    expect(last.size).toBe(0);
+
+    // Proving the restamp: one interval on from the value just returned is still
+    // not due, which is only true if the returned value moved.
+    last.set(USER, record(USER));
+    expect(fullResyncIfDue(1000 + HOUR, 1000 + HOUR + 1, last)).toBe(1000 + HOUR);
+    expect(last.size).toBe(1);
+    // And the custom interval reaches this layer too.
+    expect(fullResyncIfDue(0, 5000, last, 5000)).toBe(5000);
+    expect(last.size).toBe(0);
+  });
+});
+
+describe('the refresh-then-push pair', () => {
+  it('pushes IN ORDER after a successful refresh', async () => {
+    const order: string[] = [];
+    const errors: unknown[] = [];
+    await refreshThenPushMeta({
+      refresh: async () => {
+        order.push('refresh');
+      },
+      push: async () => {
+        order.push('push');
+      },
+      onRefreshError: (e) => errors.push(e),
+    });
+    // Ordered, because the push reads the index the refresh rebuilds.
+    expect(order).toEqual(['refresh', 'push']);
+    expect(errors).toEqual([]);
+  });
+
+  it('still pushes when the refresh THROWS, and reports the failure', async () => {
+    // The arm that matters, and the one no source pin can make: a catch that
+    // rethrows is textually identical to one that swallows. Before this phase the
+    // GUILD_CREATE and backfill paths pushed with no refresh in front of them at
+    // all, so a failed guild-roles GET must not take the push with it.
+    const order: string[] = [];
+    const errors: unknown[] = [];
+    const boom = new Error('breaker open');
+    await refreshThenPushMeta({
+      refresh: async () => {
+        order.push('refresh');
+        throw boom;
+      },
+      push: async () => {
+        order.push('push');
+      },
+      onRefreshError: (e) => errors.push(e),
+    });
+    expect(order).toEqual(['refresh', 'push']);
+    expect(errors).toEqual([boom]);
+  });
+
+  it('lets a failing PUSH propagate, so the task error arm sees it', async () => {
+    // Only the refresh is swallowed. A push that throws is unexpected (the client
+    // answers null rather than throwing) and must reach the task's error sink.
+    await expect(
+      refreshThenPushMeta({
+        refresh: async () => {},
+        push: async () => {
+          throw new Error('socket hang up');
+        },
+        onRefreshError: () => {
+          throw new Error('must not be called');
+        },
+      }),
+    ).rejects.toThrow(new Error('socket hang up'));
   });
 
   it('makes the sweep after a resync push a member the server silently dropped', async () => {

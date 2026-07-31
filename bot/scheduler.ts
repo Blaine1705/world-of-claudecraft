@@ -106,8 +106,13 @@ export const DEFAULT_IDLE_DECAY = 2;
 export const DEFAULT_JITTER_RATIO = 0.1;
 
 /**
- * The floor any resolved interval is held to. It exists because the failure it
- * prevents is the worst one this module can have: an interval of 0 arms a
+ * What an UNUSABLE interval resolves to. Deliberately not a clamp on a small one:
+ * a valid value passes through untouched however small it is, because silently
+ * rewriting a D13 operator override would be its own defect (locked ruling; the
+ * pass-through is pinned in tests/discord_bot_scheduler.test.ts).
+ *
+ * It exists because the failure it prevents is the worst one this module can
+ * have: an interval of 0 arms a
  * zero-delay timeout, whose callback arms another, which is a hot spin that
  * starves the macrotask queue and wedges the process rather than failing. Nothing
  * in production can reach it (bot/config.ts already rejects a non-positive env
@@ -324,6 +329,12 @@ class LoopTask implements ScheduledTask {
   start(): void {
     if (this.active) return;
     this.active = true;
+    // A run ABANDONED by an earlier stop() is still executing and still holds the
+    // claim, because stop() can bump a generation but cannot cancel a promise.
+    // Arming now would put the restarted chain's first run beside it, which is the
+    // one thing this module exists to prevent. So the restart arms nothing and the
+    // abandoned run's settle hands the chain over instead.
+    if (this.state.running) return;
     if (this.options.mode !== 'debounce') this.schedule();
   }
 
@@ -352,13 +363,6 @@ class LoopTask implements ScheduledTask {
     this.active = false;
     this.generation++;
     this.clearArmed();
-    // A run still in flight is ABANDONED here, so its claim on the task has to go
-    // with it. Leaving `running` set is not merely untidy: a later start() arms a
-    // chain whose first link is then refused by the overlap guard, and a refused
-    // claim arms nothing, so the task is silently dead for the life of the
-    // process. Its result is discarded either way, because the generation this
-    // line bumps already retired it.
-    this.state = { ...this.state, running: false, kickPending: false };
   }
 
   /**
@@ -423,12 +427,25 @@ class LoopTask implements ScheduledTask {
       }
     }
     const ended = endRun(this.state, this.options.cadence, didWork);
-    // A retired run publishes NOTHING. Its generation was bumped by a stop(), so
-    // the state it would write describes a task that no longer exists: clearing
-    // `running` would open the overlap guard on whatever run the RESTARTED task
-    // has in flight, and its decayed interval would re-phase a cadence the restart
-    // had already chosen. The write has to sit after the guard, not before it.
-    if (generation !== this.generation || !this.active) return;
+    if (generation !== this.generation) {
+      // This run was RETIRED by a stop(). It publishes no cadence, because the
+      // interval it decayed belongs to a lifecycle that ended, but it must release
+      // the claim it is still holding, and if the task was restarted meanwhile it
+      // owes that restart the chain: start() deliberately armed nothing so that
+      // this handover is the only thing that begins the new one, which is what
+      // keeps a restart from running BESIDE the run it abandoned.
+      const pending = this.state.kickPending;
+      this.state = { ...this.state, running: false, kickPending: false };
+      if (!this.active) return;
+      if (this.options.mode === 'debounce') {
+        if (pending) this.armDebounce();
+        return;
+      }
+      if (pending) void this.execute();
+      else this.schedule();
+      return;
+    }
+    if (!this.active) return;
     this.state = ended.state;
     if (this.options.mode === 'debounce') {
       // A kick that arrived mid-run waits out a FRESH window rather than running
@@ -439,6 +456,12 @@ class LoopTask implements ScheduledTask {
       return;
     }
     if (ended.followUpNow) {
+      // Straight into the run, unpaced and unjittered, which is the SAME contract
+      // the idle arm of kick() has: an event trigger has never waited, and this
+      // branch is only the deferred half of a kick that arrived mid-run. Jitter
+      // would buy nothing either, since it exists to decorrelate chain arms and
+      // an event-triggered run has no phase to decorrelate. Coalescing is what
+      // bounds the cost: however many kicks arrive, this fires once.
       void this.execute();
       return;
     }

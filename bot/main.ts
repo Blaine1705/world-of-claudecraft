@@ -23,9 +23,11 @@ import {
   buildLinkContent,
   buildRelayMessage,
   buildWhoamiContent,
+  claimDailyActive,
   clearDepartedFlair,
   clearedMemberMeta,
   computeRoleSync,
+  type DailyActiveState,
   GUILD_LARGE_THRESHOLD,
   indexSpecialRoleIds,
   isSlashCommand,
@@ -43,11 +45,13 @@ import {
 import {
   decideMemberUpdate,
   displayNameOf,
-  dueForFullResync,
   forgetMember,
+  fullResyncIfDue,
   nickOf,
   pushChangedMemberMeta,
   pushOneMemberMeta,
+  pushRejected,
+  refreshThenPushMeta,
   writeMemberNickname,
 } from './member_writes';
 import { LoopScheduler } from './scheduler';
@@ -435,7 +439,7 @@ async function main(): Promise<void> {
           void server
             .pushMembersMeta([clearedMemberMeta(userId)])
             .then((result) => {
-              if (result === null || result === undefined) {
+              if (pushRejected(result)) {
                 console.error('[bot] clear member meta refused for', userId);
               }
             })
@@ -572,23 +576,13 @@ async function main(): Promise<void> {
   // Daily Discord-engagement reward: the first time a linked member posts a message
   // or joins voice each day, grant the daily-active points. Deduped here (per user
   // per day) AND server-side (the grant dedupe key), so it is exactly-once.
-  const dailyActiveSeen = new Set<string>(); // `${userId}:${YYYY-MM-DD}`
-  // The day those keys belong to. Only today's matter, so the set is emptied when
-  // the day rolls over rather than accumulating one entry per member per day for
-  // the life of the process (a year on a 500-member guild is ~180k dead strings,
-  // and GUILD_MEMBER_REMOVE prunes five other caches but deliberately not this
-  // one, so departed members' keys persisted too).
-  let dailyActiveDay = '';
+  // Bot-side dedupe, emptied on the day rollover by claimDailyActive so it does
+  // not accumulate an entry per member per day for the life of the process.
+  const dailyActive: DailyActiveState = { seen: new Set<string>(), day: '' };
   const grantDailyActive = (userId: string): void => {
     if (!userId) return;
     const day = new Date().toISOString().slice(0, 10);
-    if (day !== dailyActiveDay) {
-      dailyActiveDay = day;
-      dailyActiveSeen.clear();
-    }
-    const key = `${userId}:${day}`;
-    if (dailyActiveSeen.has(key)) return;
-    dailyActiveSeen.add(key);
+    if (!claimDailyActive(dailyActive, day, userId)) return;
     const g = DISCORD_REWARD_GRANTS.dailyActive;
     void server
       .grant(userId, g.reason, g.points, `${g.reason}:${userId}:${day}`)
@@ -692,23 +686,19 @@ async function main(): Promise<void> {
     // ordering when the refresh works and publishes the previous index when it
     // does not, which is strictly more than the event paths ever had.
     run: async () => {
-      try {
-        await refreshSpecialRoles();
-      } catch (e) {
-        console.error(
-          '[bot] special roles refresh failed; pushing meta with the previous index',
-          e,
-        );
-      }
       // Bound how long the diff cache may keep believing the server still holds
       // what the bot last pushed. dueForFullResync's header lists the ways that
       // belief goes stale with nothing to correct it.
-      const now = Date.now();
-      if (dueForFullResync(lastFullMetaResyncMs, now)) {
-        lastFullMetaResyncMs = now;
-        lastPushedMeta.clear();
-      }
-      await pushAllMemberMeta();
+      lastFullMetaResyncMs = fullResyncIfDue(lastFullMetaResyncMs, Date.now(), lastPushedMeta);
+      await refreshThenPushMeta({
+        refresh: refreshSpecialRoles,
+        push: pushAllMemberMeta,
+        onRefreshError: (e) =>
+          console.error(
+            '[bot] special roles refresh failed; pushing meta with the previous index',
+            e,
+          ),
+      });
     },
   });
 
