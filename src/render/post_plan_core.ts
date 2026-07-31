@@ -65,7 +65,7 @@ const stage = (
 export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
   const useAo = input.ao && !input.gradeOnly && !input.n8aoDisabled;
   const useBloom = input.bloom && !input.gradeOnly;
-  const useSmaa = input.smaa && !input.gradeOnly && !input.smaaDisabled;
+  const useSmaa = input.smaa && !input.smaaDisabled;
   const singleComposerBuffer = !useSmaa;
   // Preserve the shipped dev-override behavior: configured AO owns scene rasterization
   // storage even when ?n8ao=off temporarily selects the RenderPass attribution branch.

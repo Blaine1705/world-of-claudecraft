@@ -7,8 +7,8 @@ const gfxSettings = vi.hoisted(() => ({
   aoFullRes: true,
   bloom: true,
   composer: true,
-  msaaSamples: 4,
-  smaa: false,
+  msaaSamples: 0,
+  smaa: true,
 }));
 
 vi.mock('../src/render/gfx', () => ({
@@ -54,14 +54,16 @@ describe('live post pipeline', () => {
   beforeEach(() => {
     disabledLayers.clear();
     gfxSettings.aoFullRes = true;
-    gfxSettings.smaa = false;
+    gfxSettings.smaa = true;
+    gfxSettings.msaaSamples = 0;
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  it('constructs the insane chain with one composer buffer and the pinned pass order', async () => {
+  it('constructs the insane chain with tail SMAA and the pinned pass order', async () => {
+    vi.stubGlobal('Image', class {});
     const { buildComposer } = await import('../src/render/post');
     const post = buildComposer(
       rendererStub(),
@@ -75,8 +77,9 @@ describe('live post pipeline', () => {
       'StaticOpaqueN8AOPass',
       'PreparedBloomPass',
       'OutputGradePass',
+      'SMAAPass',
     ]);
-    expect(post.composer.renderTarget1).toBe(post.composer.renderTarget2);
+    expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
     expect(post.composer.renderTarget1.samples).toBe(0);
     expect(post.composer.renderTarget1.depthBuffer).toBe(false);
     expect(post.composer.renderTarget1.resolveDepthBuffer).toBe(true);
@@ -132,7 +135,10 @@ describe('live post pipeline', () => {
     ).toHaveLength(5);
   });
 
-  it('keeps medium MSAA on only the geometry target', async () => {
+  it('gives medium tail SMAA without multisampling the geometry target', async () => {
+    gfxSettings.smaa = true;
+    gfxSettings.msaaSamples = 0;
+    vi.stubGlobal('Image', class {});
     const { buildComposer } = await import('../src/render/post');
     const post = buildComposer(
       rendererStub(),
@@ -146,10 +152,13 @@ describe('live post pipeline', () => {
     expect(post.composer.passes.map((pass) => pass.constructor.name)).toEqual([
       'RenderPass',
       'OutputGradePass',
+      'SMAAPass',
     ]);
-    expect(post.composer.renderTarget1).toBe(post.composer.renderTarget2);
-    expect(post.composer.renderTarget1.samples).toBe(4);
+    expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
+    expect(post.composer.renderTarget1.samples).toBe(0);
+    expect(post.composer.renderTarget2.samples).toBe(0);
     expect(post.composer.renderTarget1.depthBuffer).toBe(true);
+    expect(post.composer.renderTarget2.depthBuffer).toBe(true);
     expect(post.composer.renderTarget1.resolveDepthBuffer).toBe(false);
   });
 
@@ -175,5 +184,24 @@ describe('live post pipeline', () => {
     expect(ao.configuration.halfRes).toBe(true);
     expect(ao.beautyRenderTarget.depthTexture).toBeTruthy();
     expect(ao.beautyRenderTarget.resolveDepthBuffer).toBe(true);
+  });
+
+  it('removes tail SMAA through the attribution kill switch', async () => {
+    disabledLayers.add('smaa');
+    const { buildComposer } = await import('../src/render/post');
+    const post = buildComposer(
+      rendererStub(),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+    );
+
+    expect(post.composer.passes.map((pass) => pass.constructor.name)).toEqual([
+      'StaticOpaqueN8AOPass',
+      'PreparedBloomPass',
+      'OutputGradePass',
+    ]);
+    expect(post.composer.renderTarget1).toBe(post.composer.renderTarget2);
   });
 });

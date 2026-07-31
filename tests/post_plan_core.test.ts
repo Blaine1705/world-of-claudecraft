@@ -10,15 +10,15 @@ const insaneInput: PostPlanInput = {
   ao: true,
   aoFullRes: true,
   bloom: true,
-  smaa: false,
+  smaa: true,
   n8aoDisabled: false,
   smaaDisabled: false,
   isWebGL2: true,
-  msaaSamples: 4,
+  msaaSamples: 0,
 };
 
 describe('post pipeline plan', () => {
-  it('pins the insane chain to one composer target and seventeen fullscreen stages', () => {
+  it('pins the insane chain to eighteen targets and twenty fullscreen stages', () => {
     const plan = postPipelinePlan(insaneInput);
 
     expect(plan.scene).toEqual({
@@ -26,11 +26,11 @@ describe('post pipeline plan', () => {
       aoQuality: 'Medium',
       aoScale: 1,
     });
-    expect(plan.composerPasses).toEqual(['n8ao', 'bloom', 'output-grade']);
-    expect(plan.singleComposerBuffer).toBe(true);
+    expect(plan.composerPasses).toEqual(['n8ao', 'bloom', 'output-grade', 'smaa']);
+    expect(plan.singleComposerBuffer).toBe(false);
     expect(plan.resolveCount).toBe(0);
-    expect(plan.renderTargets).toHaveLength(15);
-    expect(plan.fullscreenStages).toHaveLength(17);
+    expect(plan.renderTargets).toHaveLength(18);
+    expect(plan.fullscreenStages).toHaveLength(20);
     expect(plan.fullscreenStages.map((stage) => stage.id)).toEqual([
       'n8ao-evaluate',
       'n8ao-denoise-0',
@@ -49,6 +49,9 @@ describe('post pipeline plan', () => {
       'bloom-blur-y-4',
       'bloom-mip-composite',
       'output-grade',
+      'smaa-edges',
+      'smaa-weights',
+      'smaa-blend',
     ]);
   });
 
@@ -57,6 +60,13 @@ describe('post pipeline plan', () => {
     const expected: PostRenderTargetPlan[] = [
       {
         id: 'composer-a',
+        scale: 1,
+        format: 'rgba16f',
+        samples: 0,
+        depth: 'none',
+      },
+      {
+        id: 'composer-b',
         scale: 1,
         format: 'rgba16f',
         samples: 0,
@@ -82,6 +92,8 @@ describe('post pipeline plan', () => {
       { id: 'bloom-v-3', scale: 0.0625, format: 'rgba16f', samples: 0, depth: 'none' },
       { id: 'bloom-h-4', scale: 0.03125, format: 'rgba16f', samples: 0, depth: 'none' },
       { id: 'bloom-v-4', scale: 0.03125, format: 'rgba16f', samples: 0, depth: 'none' },
+      { id: 'smaa-edges', scale: 1, format: 'rgba16f', samples: 0, depth: 'none' },
+      { id: 'smaa-weights', scale: 1, format: 'rgba16f', samples: 0, depth: 'none' },
     ];
 
     expect(plan.renderTargets).toEqual(expected);
@@ -108,7 +120,7 @@ describe('post pipeline plan', () => {
       id: 'output-grade',
       scale: 1,
       reads: ['composer-a', 'bloom-h-0'],
-      writes: 'canvas',
+      writes: 'composer-b',
     });
 
     const writers = new Map<string, string[]>();
@@ -124,13 +136,15 @@ describe('post pipeline plan', () => {
     ]);
   });
 
-  it('keeps medium MSAA only on geometry and performs exactly one resolve', () => {
+  it('gives medium tail SMAA without allocating multisample storage', () => {
     const plan = postPipelinePlan({
       ...insaneInput,
       gradeOnly: true,
       ao: false,
       aoFullRes: false,
       bloom: false,
+      smaa: true,
+      msaaSamples: 0,
     });
 
     expect(plan.scene).toEqual({
@@ -138,18 +152,32 @@ describe('post pipeline plan', () => {
       aoQuality: null,
       aoScale: null,
     });
-    expect(plan.composerPasses).toEqual(['render', 'output-grade']);
+    expect(plan.composerPasses).toEqual(['render', 'output-grade', 'smaa']);
     expect(plan.renderTargets).toEqual([
       {
         id: 'composer-a',
         scale: 1,
         format: 'rgba16f',
-        samples: 4,
+        samples: 0,
         depth: 'depth-renderbuffer',
       },
+      {
+        id: 'composer-b',
+        scale: 1,
+        format: 'rgba16f',
+        samples: 0,
+        depth: 'depth-renderbuffer',
+      },
+      { id: 'smaa-edges', scale: 1, format: 'rgba16f', samples: 0, depth: 'none' },
+      { id: 'smaa-weights', scale: 1, format: 'rgba16f', samples: 0, depth: 'none' },
     ]);
-    expect(plan.fullscreenStages.map((stage) => stage.id)).toEqual(['output-grade']);
-    expect(plan.resolveCount).toBe(1);
+    expect(plan.fullscreenStages.map((stage) => stage.id)).toEqual([
+      'output-grade',
+      'smaa-edges',
+      'smaa-weights',
+      'smaa-blend',
+    ]);
+    expect(plan.resolveCount).toBe(0);
   });
 
   it('keeps high AO half resolution and the two buffers required by tail SMAA', () => {
@@ -185,6 +213,7 @@ describe('post pipeline plan', () => {
     const plan = postPipelinePlan({
       ...insaneInput,
       n8aoDisabled: true,
+      smaa: false,
     });
 
     expect(plan.scene).toEqual({
@@ -219,6 +248,7 @@ describe('post pipeline plan', () => {
       ...insaneInput,
       aoFullRes: false,
       bloom: false,
+      smaa: false,
     });
 
     expect(plan.composerPasses).toEqual(['n8ao', 'output-grade']);
@@ -239,6 +269,7 @@ describe('post pipeline plan', () => {
       aoFullRes: false,
       bloom: false,
       smaa: true,
+      msaaSamples: 4,
     });
 
     expect(plan.scene.pass).toBe('render');

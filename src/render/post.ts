@@ -14,17 +14,18 @@ import { renderLayerDisabled } from './render_dev_flags';
 // Post chain: N8AO (high: half-res Low, ultra+insane: full-res Medium)
 // -> UnrealBloom -> OutputGradePass (OutputPass ACES tonemap + sRGB followed
 // by the display-space lift/gamma/gain, saturation, vignette, and grain)
-// -> SMAA (high only). Medium uses RenderPass -> OutputGradePass.
+// -> SMAA (medium and above). Medium uses RenderPass -> OutputGradePass
+// -> SMAA.
 //
 // N8AO replaced three's GTAOPass: better denoise at lower sample counts, and
 // cheap enough (half-res) to run on the high tier where GTAO was ultra-only.
 // It sits mid-chain so its autosetGamma leaves the buffer linear for bloom.
 //
 // Actual AA graph on the pinned packages: N8AO renders into its own
-// single-sample beauty target, so ultra and insane have no MSAA resolve and
-// rely on their 2.5 DPR cap. High adds tail SMAA. The medium RenderPass path
-// keeps 4x MSAA only on its geometry target and resolves exactly once when
-// OutputGradePass samples it. Full-screen targets never inherit MSAA.
+// single-sample beauty target, so MSAA cannot protect the composer tiers.
+// High, ultra, and insane use tail SMAA at a 1.75 DPR cap. Medium also uses
+// tail SMAA through its existing grade path instead of a multisampled geometry
+// target. Full-screen targets never inherit MSAA.
 //
 // OutputGradePass explicitly quantizes both removed RGBA16F boundaries: bloom's
 // additive scene write before tone mapping, then OutputPass color before the
@@ -65,8 +66,8 @@ export function buildComposer(
   opts?: { gradeOnly?: boolean },
 ): PostPipeline {
   // Grade-only mini chain for the medium tier: RenderPass -> OutputGradePass,
-  // one fullscreen pass over the direct path. No AO, no bloom, no
-  // SMAA, but the display-space grade (lift/gain/S-curve/vignette) is what
+  // one fullscreen grade pass over the direct path, followed by SMAA. No AO
+  // or bloom, but the display-space grade (lift/gain/S-curve/vignette) is what
   // separates "cinematic" from "raw ACES wash", and medium was the only
   // daylight tier shipping without it.
   const gradeOnly = opts?.gradeOnly === true;
@@ -148,12 +149,12 @@ export function buildComposer(
   // detector expects the gamma-encoded color OutputGradePass produces.
   // Construction size is provisional; addPass and the setSize() member resize
   // every pass to the live drawing-buffer extent.
-  // GFX.smaa is high-tier only: ultra's 2.5 pixelRatioCap already suppresses
-  // edge crawl and SMAA at that pixel count costs ~1.5ms; high runs a 1.75
-  // cap where aliasing is visible and the pass is cheap.
-  // ?smaa=off is the dev-only perf-attribution kill switch: SMAA is new on
-  // this branch (the merge-base high tier shipped no AA pass), so its cost
-  // needs to be attributable against the high-tier ladder budget.
+  // The AA policy uses SMAA from medium upward. Ultra and insane now run the
+  // same 1.75 cap as high: when both caps bind, 1.75 squared is 49 percent of
+  // the fragments at the old 2.5 cap, which leaves room for this fixed-cost
+  // edge pass.
+  // ?smaa=off is the dev-only perf-attribution kill switch. It keeps the
+  // post-AA cost attributable while comparing the revised tier policy.
   if (plan.composerPasses.includes('smaa')) composer.addPass(new SMAAPass(size.x, size.y));
 
   return {
