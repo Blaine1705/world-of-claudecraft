@@ -10,6 +10,7 @@
 import { describe, expect, it } from 'vitest';
 import { TOOL_EFFECT_IDS, TOOL_EFFECTS } from '../src/sim/content/professions';
 import {
+  MAX_CRAFTED_BY_LENGTH,
   normalizeToolEffectSlots,
   RARITY_DURABILITY_BONUS,
   slotToolEffectRefused,
@@ -808,6 +809,34 @@ describe('the id tables and the load normalizer, directly', () => {
     } as never);
     expect(mixed?.mining?.effectId).toBe('gatherers_cache');
     expect(mixed && 'fishing' in mixed).toBe(false);
+  });
+
+  it('craftedBy length clamp: legal names keep provenance, an oversized string drops ALONE', () => {
+    // Phase 16 blob-growth bound: character names cap at 16 chars
+    // (server/auth.ts), so a longer stored craftedBy is a hand-edited or
+    // corrupted row. The clamp DROPS rather than truncates (a truncated
+    // prefix could equal a DIFFERENT player's real name and misattribute the
+    // original-crafter recharge discount) and the slot itself survives.
+    const load = (craftedBy: unknown) =>
+      normalizeToolEffectSlots({
+        mining: {
+          effectId: 'gatherers_cache',
+          durability: 5,
+          maxDurability: 20,
+          confirmMode: 'always',
+          craftedBy,
+        },
+      } as never)?.mining;
+    expect(load('Loggerholm')?.craftedBy).toBe('Loggerholm');
+    // Exactly at the ceiling: the longest legal name survives byte-faithfully.
+    expect(load('A'.repeat(MAX_CRAFTED_BY_LENGTH))?.craftedBy).toBe(
+      'A'.repeat(MAX_CRAFTED_BY_LENGTH),
+    );
+    // One over: the string drops, the slot stays live with its charges.
+    const over = load('A'.repeat(MAX_CRAFTED_BY_LENGTH + 1));
+    expect(over?.craftedBy).toBeUndefined();
+    expect(over?.durability).toBe(5);
+    expect(MAX_CRAFTED_BY_LENGTH).toBe(16);
   });
 
   it('confirmMode load coercion: kept modes, legacy absent reads always, garbage fails safe to prompt', () => {

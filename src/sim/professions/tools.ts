@@ -255,6 +255,12 @@ export type ToolEffectConfirmMode = 'always' | 'prompt';
 // readonly and every consumer only iterates the rows.
 export const EMPTY_TOOL_EFFECT_SLOT_VIEWS: readonly never[] = Object.freeze([]);
 
+// The longest crafter name a legal mint can stamp: character names come
+// through server/auth.ts's `/^[A-Za-z][A-Za-z' -]{1,15}$/`, so 16 characters.
+// normalizeToolEffectSlots drops a longer stored craftedBy as corrupt
+// (phase 16: the one professions blob field with no length ceiling at all).
+export const MAX_CRAFTED_BY_LENGTH = 16;
+
 export interface ToolEffectSlot {
   effectId: ToolEffectId;
   /** Remaining charges. Reaches 0 when the effect is fully depleted. */
@@ -598,7 +604,18 @@ export function normalizeToolEffectSlots(
       effectId: row.effectId,
       durability: Math.min(maxDurability, Math.max(0, Math.floor(row.durability) || 0)),
       maxDurability,
-      craftedBy: typeof row.craftedBy === 'string' ? row.craftedBy : undefined,
+      // An oversized crafter name cannot come from a legal mint (the auth
+      // shape caps names at MAX_CRAFTED_BY_LENGTH), so it is a hand-edited
+      // or corrupted row: DROP it rather than truncate, because a truncated
+      // prefix could equal a DIFFERENT player's real name and misattribute
+      // the original-crafter recharge discount, while an absent crafter
+      // merely forgoes it. Also the blob-growth bound (phase 16): three
+      // slots each carrying an unbounded string was the one professions
+      // field with no length ceiling.
+      craftedBy:
+        typeof row.craftedBy === 'string' && row.craftedBy.length <= MAX_CRAFTED_BY_LENGTH
+          ? row.craftedBy
+          : undefined,
       // A persisted 'prompt' row is PRESERVED, and since the R40 confirm
       // flow shipped it is an ordinary live mode: the mint accepts it and
       // the harvest command carries the per-use consent it asks for.
