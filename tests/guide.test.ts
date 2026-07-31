@@ -1388,7 +1388,10 @@ describe('Guide professions gathering accuracy', () => {
       }
       // R22 wield column: land tools above tier 1 publish the frozen wield
       // requirement; tier 1 and every fishing rod publish none (rods are the
-      // structural exemption, wield_gate.ts).
+      // structural exemption, wield_gate.ts). This is a MIRROR (generator and
+      // expectation both read the same constants); the absolute literal pins
+      // live in tests/professions_tool_gate.test.ts (85/100) and
+      // tests/delve_shop.test.ts (24/56 and every gate).
       if (use.professionId !== 'fishing' && use.tier >= 2) {
         expect(rows[0].wieldProficiency, `${itemId} wield requirement`).toBe(
           WIELD_REQUIREMENT_BY_TIER[use.tier],
@@ -1400,9 +1403,14 @@ describe('Guide professions gathering accuracy', () => {
       // counter enforces it, and the tier-4 rows all sit on clears:3, which
       // is what keeps the English "three delve clears" in
       // guide.profPages.toolCraftedOrMarks honest.
-      const shopRow = Object.values(DELVE_SHOPS)
+      const shopRows = Object.values(DELVE_SHOPS)
         .flat()
-        .find((e) => e.itemId === itemId);
+        .filter((e) => e.itemId === itemId);
+      // First-match-wins on both sides (the generator's marksRowFor scans the
+      // same way), so a tool stocked twice at different gates would agree
+      // invisibly: require uniqueness before trusting the mirror.
+      expect(shopRows.length, `${itemId} must appear on at most one delve counter`).toBeLessThan(2);
+      const shopRow = shopRows[0];
       if (shopRow) {
         expect(rows[0].priceMarks, `${itemId} Marks price`).toBe(shopRow.marks);
         if (shopRow.gate === 'heroicClear') {
@@ -1477,6 +1485,7 @@ describe('Guide professions gathering accuracy', () => {
     // all 19 languages at once; a fill that dropped the tokens would republish
     // frozen numbers, and nothing else would notice, because the value would
     // still be present and translated.
+    setLanguage('en');
     const en = t('guide.profPages.toolsNote', {
       tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
       tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
@@ -1485,15 +1494,22 @@ describe('Guide professions gathering accuracy', () => {
     expect(en).toContain(String(TIER3_TOOL_GATE_PROFICIENCY));
     expect(en, 'no token left unspliced').not.toMatch(/\{[A-Za-z0-9_]+\}/);
     // The crafted rungs' thresholds ride the prose as ENGLISH LITERALS (the
-    // long-translated key keeps its token set), so pin them to the frozen
-    // wield table: a retune fails here instead of rotting in the prose.
-    for (const literal of [TIER4_TOOL_WIELD_PROFICIENCY, TIER5_TOOL_WIELD_PROFICIENCY]) {
-      expect(en, `crafted-rung threshold ${literal} in the prose`).toMatch(
-        new RegExp(`(^|[^0-9])${literal}([^0-9]|$)`),
-      );
-    }
-    // The Marks-route cells name their gates; the "three" literal's honesty
-    // against the delve counter is pinned in the ladder mirror above.
+    // long-translated key keeps its token set, R64), so pin the exact
+    // crafted-rung clause to the frozen wield table: a retune fails here
+    // instead of rotting in the prose, and the clause scope keeps an
+    // unrelated 100 elsewhere in the note from ever satisfying this.
+    expect(en).toContain(
+      `${TIER4_TOOL_WIELD_PROFICIENCY} and ${TIER5_TOOL_WIELD_PROFICIENCY} for the two crafted rungs`,
+    );
+    // The Marks-route cells name their gates as English words, so tie the
+    // wording to the live gate IN THE SAME BREATH: if the delve counter's
+    // tier-4 rung ever leaves clears:3, this line reds together with the
+    // wording below, not in a different test a fixer can satisfy alone.
+    expect(
+      Object.values(DELVE_SHOPS)
+        .flat()
+        .find((e) => e.itemId === 'thorium_mining_pick')?.gate,
+    ).toBe('clears:3');
     expect(t('guide.profPages.toolCraftedOrMarks', { craft: 'X', marks: '24' })).toContain(
       'three delve clears',
     );
@@ -1788,6 +1804,26 @@ describe('Guide professions pages and routes', () => {
       expect((html.match(/<h1>/g) ?? []).length, `page "${id}" h1 count`).toBe(1);
       expect(html).not.toContain('guide-notfound');
     }
+    // The tool table's Use at column renders end to end: the header cell, the
+    // wield numbers, the ungated fallback, and BOTH Marks-gate source cells
+    // (the data-level mirror above cannot see a header/cell desync or a
+    // swapped gate string; this can).
+    const mining = professionsPage.render(ctx(['mining']));
+    expect(mining).toContain(`<th scope="col">${t('guide.profPages.colWield')}</th>`);
+    expect(mining).toContain(`<td>${t('guide.profPages.wieldNone')}</td>`);
+    expect(mining).toContain('three delve clears');
+    expect(mining).toContain('Heroic clear');
+    // Two guide-prof-tables render on the page (nodes first, tools second);
+    // anchor on the Use at header so the parity check reads the TOOLS table.
+    const toolsTable = mining
+      .split('<table')
+      .find((seg) => seg.includes(`<th scope="col">${t('guide.profPages.colWield')}</th>`));
+    expect(toolsTable, 'tools table present').toBeDefined();
+    const thCount = (toolsTable?.match(/<thead><tr>([\s\S]*?)<\/tr>/)?.[1].match(/<th /g) ?? [])
+      .length;
+    const tdCount = (toolsTable?.match(/<tbody><tr>([\s\S]*?)<\/tr>/)?.[1].match(/<td/g) ?? [])
+      .length;
+    expect([thCount, tdCount], 'header and body column counts agree').toEqual([6, 6]);
     // The craft page really renders its recipe rows.
     const weapon = professionsPage.render(ctx(['weaponcrafting']));
     expect(weapon).toContain('Osmium Warblade');

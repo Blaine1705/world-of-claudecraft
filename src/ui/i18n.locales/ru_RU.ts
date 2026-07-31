@@ -9210,7 +9210,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ваша учётная запись: место {rank}, лучшие {percent} процентов, Известность {renown}',
   'hudChrome.deeds.lbSelfRank': 'Ваша учётная запись: место {rank}, лучшие {percent} процентов',
   'hudChrome.deeds.lbEmpty': 'В рейтинге пока нет летописцев.',
-  'hudChrome.deeds.broadcastsLabel': 'Делиться деяниями с гильдией и друзьями',
+  'hudChrome.deeds.broadcastsLabel': 'Делиться деяниями и шедеврами с согильдейцами, подписчиками и лентой Discord',
   'guide.deedsPage.catHeading': '{label} ({count})',
   'guide.deedsPage.colName': 'Деяние',
   'guide.deedsPage.featTag': 'Подвиг',

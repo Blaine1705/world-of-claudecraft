@@ -8655,7 +8655,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.lbSelfAccount': '你的账号：第 {rank} 名，位居前 {percent}%，名望 {renown}',
   'hudChrome.deeds.lbSelfRank': '你的账号：第 {rank} 名，位居前 {percent}%',
   'hudChrome.deeds.lbEmpty': '暂无上榜的编年史家。',
-  'hudChrome.deeds.broadcastsLabel': '与公会和好友分享功绩达成',
+  'hudChrome.deeds.broadcastsLabel': '与公会成员、关注者和 Discord 动态分享功绩达成与杰作',
   'guide.deedsPage.catHeading': '{label}（{count}）',
   'guide.deedsPage.colName': '功绩',
   'guide.deedsPage.featTag': '壮举',

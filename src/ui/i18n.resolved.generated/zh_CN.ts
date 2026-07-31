@@ -2861,7 +2861,7 @@ export const zh_CN: EnTranslations = {
       "lbSelfAccount": "你的账号：第 {rank} 名，位居前 {percent}%，名望 {renown}",
       "lbSelfRank": "你的账号：第 {rank} 名，位居前 {percent}%",
       "lbEmpty": "暂无上榜的编年史家。",
-      "broadcastsLabel": "与公会和好友分享功绩达成",
+      "broadcastsLabel": "与公会成员、关注者和 Discord 动态分享功绩达成与杰作",
       "titledName": "{name}【{title}】"
     },
     "continentMap": {
@@ -4178,7 +4178,7 @@ export const zh_CN: EnTranslations = {
       "priceNone": "无出售",
       "toolTierReq": "{tier}阶工具",
       "colWield": "Use at",
-      "wieldNone": "None",
+      "wieldNone": "Any",
       "yieldsHeading": "一次采集的收获",
       "yieldsBody": "每次采集都会掷出品质，而熟练度决定一切：新手永远采到普通品，熟练度越高，权重越向高品质移动，绝不倒退。到100上限时普通品完全消失：60%优秀、30%精良、8%史诗、2%传说。品质也意味着数量：普通1个，优秀与精良2个，史诗3个，传说4个。精良及以上的收获都会以你的名字署名（Gathered by），封顶时十次采集有四次带着你的名字。",
       "bandsHeading": "熟练度区间",

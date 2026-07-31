@@ -2861,7 +2861,7 @@ export const ko_KR: EnTranslations = {
       "lbSelfAccount": "내 계정: {rank}위, 상위 {percent}%, 명성 {renown}",
       "lbSelfRank": "내 계정: {rank}위, 상위 {percent}%",
       "lbEmpty": "아직 순위에 오른 연대기 작가가 없습니다.",
-      "broadcastsLabel": "업적 달성을 길드와 친구에게 공유",
+      "broadcastsLabel": "업적 달성과 걸작을 길드원, 팔로워, Discord 피드에 공유",
       "titledName": "{name} [{title}]"
     },
     "continentMap": {
@@ -4178,7 +4178,7 @@ export const ko_KR: EnTranslations = {
       "priceNone": "판매 없음",
       "toolTierReq": "{tier}티어 도구",
       "colWield": "Use at",
-      "wieldNone": "None",
+      "wieldNone": "Any",
       "yieldsHeading": "채집의 수확물",
       "yieldsBody": "채집마다 품질을 굴리는데, 그 확률은 숙련도가 전부다. 갓 시작한 채집가는 언제나 일반 등급을 얻지만, 숙련이 오를수록 무게가 높은 등급으로 옮겨 가며 절대 후퇴하지 않는다. 상한 100에서는 일반이 완전히 사라져 60% 고급, 30% 희귀, 8% 영웅, 2% 전설이 된다. 품질은 곧 수량이다. 일반 1개, 고급과 희귀 2개, 영웅 3개, 전설 4개. 희귀 이상은 서명이 새겨져(Gathered by) 도착하며, 상한에서는 열 번 중 네 번에 이름이 남는다.",
       "bandsHeading": "숙련도 구간",

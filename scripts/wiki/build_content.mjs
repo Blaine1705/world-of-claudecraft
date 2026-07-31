@@ -1049,7 +1049,10 @@ export interface GuideProfTool {
   craftedBy?: string;
   /** Delve Marks price, for a tool a delve counter stocks. Absent otherwise. */
   priceMarks?: number;
-  /** Total delve clears the Marks row unlocks after (shop.ts 'clears:N'). */
+  /** Total delve clears the Marks row unlocks after (shop.ts 'clears:N').
+   *  Consumed today by the tests/guide.test.ts gate pin only: the source
+   *  cell keeps the count as an English literal until the deferred locale
+   *  re-fill adds a {clears} token (R64, the packet review doc). */
   marksClears?: number;
   /** True when the Marks row unlocks after a Heroic clear. */
   marksHeroicClear?: boolean;

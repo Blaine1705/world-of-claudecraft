@@ -4178,7 +4178,7 @@ export const cs_CZ: EnTranslations = {
       "priceNone": "Not sold for coin",
       "toolTierReq": "Nástroj {tier}. úrovně",
       "colWield": "Use at",
-      "wieldNone": "None",
+      "wieldNone": "Any",
       "yieldsHeading": "Co sklizeň přinese",
       "yieldsBody": "Každá sklizeň hodí kvalitu toho, co uděluje, a tvoje dovednost je celým příběhem toho hodu. Nováček sběrač vždy vytáhne běžný materiál; každý bod dovednosti přesouvá váhu rovnoměrně z běžného do vyšších stupňů a nikdy zpátky, až na limitu 100 běžný stupeň zcela zmizí: 60 procent neobvyklého, 30 procent vzácného, 8 procent epického a 2 procenta legendárního, pokaždé.\n\nKvalita také znamená množství: běžný hod přinese 1 jednotku, neobvyklý a vzácný 2, epický 3 a legendární 4. Jakýkoli vzácný, epický nebo legendární výtah přichází jako podepsaná instance s razítkem Sebral ty: na limitu to jsou čtyři sklizně z deseti nesoucí tvé jméno a pravidla původu na stránce Řemeslnická ekonomika vysvětlují, proč řemeslníci platí navíc právě za tyto zásoby.",
       "bandsHeading": "Dovednostní pásma",
@@ -4212,7 +4212,7 @@ export const cs_CZ: EnTranslations = {
         "pctFmt": "{pct}%",
         "emptyHook": "Nic nezabírá",
         "koiHeading": "Slunolesklý koi",
-        "koiBody": "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds answer to your catch band and to nothing else, the same in every zone: 1 percent of landed catches at band 0, 3 at band 1, and 6 at band 2, so the koi comes to the angler who earned the deep tables. Landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know."
+        "koiBody": "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds answer to your catch band and to nothing else, the same in every zone: a 1 percent row of the catch table at band 0, 3 at band 1, and 6 at band 2, drawn on every reeled-in cast, so the koi comes to the angler who earned the deep tables. Landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know."
       },
       "econ": {
         "title": "Řemeslná ekonomika",

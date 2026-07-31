@@ -2861,7 +2861,7 @@ export const zh_TW: EnTranslations = {
       "lbSelfAccount": "你的帳號：第 {rank} 名，位居前 {percent}%，名望 {renown}",
       "lbSelfRank": "你的帳號：第 {rank} 名，位居前 {percent}%",
       "lbEmpty": "尚無上榜的編年史家。",
-      "broadcastsLabel": "與公會和好友分享功績達成",
+      "broadcastsLabel": "與公會成員、關注者和 Discord 動態分享功績達成與傑作",
       "titledName": "{name}【{title}】"
     },
     "continentMap": {
@@ -4178,7 +4178,7 @@ export const zh_TW: EnTranslations = {
       "priceNone": "無販售",
       "toolTierReq": "{tier}階工具",
       "colWield": "Use at",
-      "wieldNone": "None",
+      "wieldNone": "Any",
       "yieldsHeading": "一次採集的收穫",
       "yieldsBody": "每次採集都會擲出品質，而熟練度決定一切：新手永遠採到普通品，熟練度越高，權重越向高品質移動，絕不倒退。到100上限時普通品完全消失：60%優秀、30%精良、8%史詩、2%傳說。品質也意味著數量：普通1個，優秀與精良2個，史詩3個，傳說4個。精良及以上的收穫都會以你的名字署名（Gathered by），封頂時十次採集有四次帶著你的名字。",
       "bandsHeading": "熟練度區間",

@@ -361,7 +361,10 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     maxZ: cz + spanZ / 2,
   };
 
-  // +X is map-left (east = -X); +Z is map-down.
+  // +X is map-left (east = -X); +Z is map-up (north = +Z): my shrinks as z
+  // grows. This projection is the compass authority for player-facing
+  // direction words (R61, docs/design/professions-tuning-packet-review.md);
+  // the layout files' legacy +x=east names are raw coordinates, not compass.
   const toMap = (x: number, z: number): { mx: number; my: number } => ({
     mx: ((region.maxX - x) / spanX) * S,
     my: ((region.maxZ - z) / spanZ) * S,

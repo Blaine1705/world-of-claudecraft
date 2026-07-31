@@ -4178,7 +4178,7 @@ export const fr_FR: EnTranslations = {
       "priceNone": "Not sold for coin",
       "toolTierReq": "Outil de palier {tier}",
       "colWield": "Use at",
-      "wieldNone": "None",
+      "wieldNone": "Any",
       "yieldsHeading": "Ce que rapporte une récolte",
       "yieldsBody": "Chaque récolte tire une qualité pour ce qu'elle rapporte, et votre maîtrise est le seul facteur de ce tirage. Un récolteur tout nouveau tire toujours des matériaux communs ; chaque point de compétence déplace régulièrement le poids du commun vers les grades supérieurs et jamais en arrière, jusqu'à ce qu'au plafond de 100 le grade commun disparaisse entièrement : 60 pourcent peu commun, 30 pourcent rare, 8 pourcent épique et 2 pourcent légendaire, à chaque fois.\n\nLa qualité signifie aussi la quantité : un tirage commun rapporte 1 unité, les tirages peu communs et rares en rapportent 2, épique 3, et légendaire 4. Tout tirage rare, épique ou légendaire arrive comme une instance signée estampillée Collecté par vous : au plafond, quatre récoltes sur dix portent votre nom, et les règles de provenance sur la page de l'Économie d'artisanat expliquent pourquoi les artisans paient en supplément exactement pour ces piles.",
       "bandsHeading": "Tranches de compétence",
@@ -4212,7 +4212,7 @@ export const fr_FR: EnTranslations = {
         "pctFmt": "{pct}%",
         "emptyHook": "Rien à l'hameçon",
         "koiHeading": "Le Koi solaire",
-        "koiBody": "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds answer to your catch band and to nothing else, the same in every zone: 1 percent of landed catches at band 0, 3 at band 1, and 6 at band 2, so the koi comes to the angler who earned the deep tables. Landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know."
+        "koiBody": "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds answer to your catch band and to nothing else, the same in every zone: a 1 percent row of the catch table at band 0, 3 at band 1, and 6 at band 2, drawn on every reeled-in cast, so the koi comes to the angler who earned the deep tables. Landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know."
       },
       "econ": {
         "title": "Économie de l'artisanat",

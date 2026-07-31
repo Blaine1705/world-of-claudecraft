@@ -2861,7 +2861,7 @@ export const ja_JP: EnTranslations = {
       "lbSelfAccount": "あなたのアカウント：{rank} 位（上位 {percent}%）、名声 {renown}",
       "lbSelfRank": "あなたのアカウント：{rank} 位（上位 {percent}%）",
       "lbEmpty": "ランク入りした年代記作家はまだいません。",
-      "broadcastsLabel": "功績の達成をギルドとフレンドに共有する",
+      "broadcastsLabel": "功績の達成と傑作をギルドメンバー、フォロワー、Discordフィードに共有する",
       "titledName": "{name}【{title}】"
     },
     "continentMap": {
@@ -4178,7 +4178,7 @@ export const ja_JP: EnTranslations = {
       "priceNone": "非売品",
       "toolTierReq": "ティア{tier}の道具",
       "colWield": "Use at",
-      "wieldNone": "None",
+      "wieldNone": "Any",
       "yieldsHeading": "採集の実り",
       "yieldsBody": "採集のたびに品質が抽選され、その確率は熟練度がすべてです。始めたばかりの採集者は常にコモン品ですが、熟練が上がるほど高い等級へ重みが移り、決して後退しません。上限100ではコモンが完全に消え、60%が良質、30%がレア、8%がエピック、2%が伝説になります。品質は量でもあります。コモンは1個、良質とレアは2個、エピックは3個、伝説は4個。レア以上の収穫はあなたの署名入り（Gathered by）で届き、上限では十回に四回、名前が刻まれます。",
       "bandsHeading": "熟練度バンド",

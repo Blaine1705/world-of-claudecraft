@@ -9049,7 +9049,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.lbSelfAccount': '내 계정: {rank}위, 상위 {percent}%, 명성 {renown}',
   'hudChrome.deeds.lbSelfRank': '내 계정: {rank}위, 상위 {percent}%',
   'hudChrome.deeds.lbEmpty': '아직 순위에 오른 연대기 작가가 없습니다.',
-  'hudChrome.deeds.broadcastsLabel': '업적 달성을 길드와 친구에게 공유',
+  'hudChrome.deeds.broadcastsLabel': '업적 달성과 걸작을 길드원, 팔로워, Discord 피드에 공유',
   'guide.deedsPage.catHeading': '{label} ({count})',
   'guide.deedsPage.colName': '업적',
   'guide.deedsPage.featTag': '위업',

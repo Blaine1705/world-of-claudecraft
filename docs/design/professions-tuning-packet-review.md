@@ -3232,6 +3232,141 @@ exactly once.
 4. The release-tier locale fill (`I18N_RELEASE_TIER=1` green) is this
    phase's closing act, via the i18n-locale-fill skill.
 
+**Phase 17 BUILT** (2026-07-31, Fable xhigh ultracode, new session). Entry
+found the worktree on the right branch at e753614ff2, but release/v0.33.0
+had MOVED to 893fdafb94 (four PRs: the tank mount #2638, the admin
+online-players page #2635, the shot-script prune #2685, the screenshot
+purge #2676). Synced as merge f4434f9977 (one real conflict, the catalog
+items.ts appended-ids tail, union-resolved; generated slices regenerated
+per convention), release-merge audited CLEAN by five verifiers with
+executable proof, and the release-side en delta measured at ZERO rewords
+plus three mount keys, so the six release-refilled prose keys and
+harvestBodyChoice were byte-verified unchanged and stay off the reword
+list. One inherited red: the release tip fails its own
+tests/terrorspark_groundshaker_asset.test.ts because the maintainer's
+KTX2 conversion (0578ede3c0) updated the GLB and media manifest but not
+the test pins; re-pinned to the shipped basisu export in dda84f425d (sha,
+1152 KiB budget, KHR_texture_basisu, image/ktx2 list) and the release
+branch wants the same fix. Post-merge full gate PASS all 11, exit 0.
+
+MAINTAINER INSTRUCTION, mid-phase and binding: do NOT translate into
+every language; add English only; translation happens after the packet is
+done. Item 4 (the release-tier fill and its I18N_RELEASE_TIER=1 close) is
+therefore DESCOPED from this phase, the chr_peaks_gatherer deed locale
+rows defer with it, and the phase closes on the PR-tier gate instead. The
+remove-and-refill protocol was adapted to the smallest gate-viable shape:
+reworded keys re-pend in the 13 Latin overlays (650 rows deleted), while
+the 5 non-Latin overlays KEEP their now-stale fills (deleting them reds
+the always-on M16 wordy-English guard, and the completeness gate's
+token-preservation arm additionally forbids any reword that changes a
+kept key's token set, so the crafted-rung wield thresholds and the
+delve-clears count ride the two long-translated tool keys as ENGLISH
+LITERALS pinned in tests/guide.test.ts against the frozen wield table and
+DELVE_SHOPS). The ONE new wordy key (toolCraftedOrMarksHeroic) got its
+five mandatory M16 fills, built from each overlay's shipped Delve
+Marks/Heroic terminology; those five short strings are the only
+translation this phase performed.
+
+Item 1 ran as a 10-verifier fan-out (one per professions surface:
+overview, land gathering, fishing, forge/soft/trial crafts, enchanting,
+economy plus shared sections, FAQ, the R58 consent row) checking 238
+claims against the sim: 161 verified TRUE, 77 FALSE or PARTIAL. Every
+known-falsified item on this section's list was confirmed and fixed, and
+the fresh eyes found new falsehoods beyond it, the headline ones being:
+koiBody's odds were wrong AGAIN (the sim's koi row is 1/3/6 percent by
+band, identical in every zone, no Thornpeak bonus; the flat-3/4 wording
+also contradicted tablesNote's correct six-times-likelier claim on the
+same page); disenchanting a crafted, signed, or masterworked piece
+teaches NOTHING (only world-found gear grants skill), which the leveling
+prose now states; Chime Shards have three sinks (Greater enchants, five
+per charm recipe, the epic recharge rung), where the prose said one; the
+enchanting release-refill's "identically enchanted copies stack" is
+impossible (gear never stacks) and was dropped; the two live charm
+recipes are trainer-taught by Gizzel at the toolworks (enchanting 25,
+tier-1 fee, toolworks-bound), retiring "no trainer, no station" from
+four keys; the trainer-fee table's higher rungs are live (rod lessons at
+75/125 for 4/16 gold); dormant crafts still climb on common recipes to
+75; the amends escalation counts prior RETURNS only; the tier-4/5 tools
+are also sold for Delve Marks behind the Litany's clears gates (24 after
+three clears, 56 after a Heroic clear), which the engineering identity,
+intro, ladder, and both fish keys now say; and the eleven v0.32.0
+expansion zones (starter nodes everywhere, no tool counters, Vale
+fallback fishing tables, no first-fish deeds) reached the gatherIntro
+trio, toolsNote, and both fishing summary keys. The tool table gained
+the R22 "Use at" column and the clears-gated Marks source cells
+(generator fields wieldProficiency/marksClears/marksHeroicClear mirrored
+in tests/guide.test.ts), and the R32 soft danger hint (veto-able) and
+R58 consent-row widening (the label now names guildmates, followers, and
+the Discord feed's deed and masterwork cards; four stale sibling
+comments widened) landed. All in commit 0f860a3cb3.
+
+Findings REJECTED with reason, for the QA round: two verifiers derived
+compass words from the layout file's raw +x=east naming, but the
+player-facing convention is the rendered map's (east = -X, north = +Z;
+anchored on the canonical Copper Dig southeast at (-84,-64) and the map
+projection math in map_window_view.ts, whose own inline "+Z is map-down"
+comment contradicts its math and should not be trusted): so the
+kitchens-east-side prose is CORRECT as shipped (kitchens at x:-11) and
+the toolworks is confirmed SOUTHWEST exactly as this section's
+parenthetical and the phase 13 sweep said. Accepted-not-applied:
+harvestBodyChoice's two verifier nits (the component-family example list
+and the owned-vs-wieldable premium arm, which has no live effect while
+every shipped family needs only tier 1) stay unapplied per this
+section's own release-refill ruling; ringWaveNote's future-caps claim is
+forward-looking design intent, unverifiable by construction.
+
+New rulings, build-decided, veto-able (the R32/R45 pattern):
+
+- **R61. The rendered map is the compass authority.** A player-facing
+  compass word resolves through the world map projection (east = -X,
+  north = +Z), never the layout file's raw-coordinate legacy names.
+- **R62. harvestBodyChoice stays as the release refilled it.** The two
+  fresh nits are recorded here for the post-packet fill instead.
+- **R63. A release-refilled key is re-reworded ONLY for a factually
+  false sentence,** minimally: enchanting marketBody lost its impossible
+  stacking sentence, provenanceBody and masterworkBody lost the wrong
+  "single-copy" signing qualifier and gained the specimen-arm and
+  wieldable-tool provisos. Their fresh release fills are re-staled by
+  this, ledgered below.
+- **R64. Literal-with-pin over token-set change.** Where a reword would
+  have changed a long-translated key's placeholder set, the new numbers
+  ride as English literals pinned to their sim constants in
+  tests/guide.test.ts (toolsNote's 85/100, toolCraftedOrMarks's
+  "three"), so the token-preservation gate keeps the stale non-Latin
+  fills viable until the deferred translation pass.
+
+THE REWORD LEDGER (load-bearing for the post-packet fill; the pending
+registry CANNOT see these, because a present overlay row re-records the
+new enHash as its srcHash and reads "translated"): all 52 reworded keys
+carry now-stale translations in ALL FIVE non-Latin overlays (260 rows to
+re-translate beyond the pending registry). The 52: guide.professions.
+{whatBody, archetypesBody, archetypeSwitchBody, startBody};
+hudChrome.deeds.broadcastsLabel; guide.profPages.{rhythmBody, gainBody,
+toolsNote, toolCraftedOrMarks, priceNone, bandsBody, specimenBody,
+trainingBody, howBody, masterworkBody}; gatherIntro.{mining, logging,
+herbalism, fishing}; gatherDeeds.fishing; fish.{startBody, biteBody,
+scheduleNote, tablesNote, koiBody}; craftIntro.{engineering,
+enchanting}; craftProse.weaponcrafting.{materialsBody, routeBody};
+craftProse.armorcrafting.{identityBody, materialsBody, ladderBody};
+craftProse.leatherworking.{materialsBody, ladderBody, routeBody};
+craftProse.cooking.{identityBody, materialsBody};
+craftProse.alchemy.{identityBody, ladderBody, routeBody};
+craftProse.engineering.{identityBody, materialsBody, ladderBody};
+craftProse.enchanting.{identityBody, levelingBody, marketBody};
+ench.enchantsNote; econ.{trainingNote, provenanceBody}; faq.{a6, a7,
+a8}. The Latin side of the same 52 keys is ordinary pending.
+
+Item 3, the re-sized fill at this build's tip: 210 pending keys /
+3,613 pending rows (main 119/1,793; admin 91/1,820; sim and server 0),
+PLUS the 260 ledgered non-Latin stale rows above, PLUS the
+chr_peaks_gatherer deed locale rows (deed_i18n scope, still zero rows).
+The pre-phase figure of 144/2,563 is superseded.
+
+Review round: four fresh reviewers (a prose truth-refuter over the new
+English and the five fills, qa-checklist, frontend-seam-reviewer,
+test-coverage-auditor) ran over dda84f425d + 0f860a3cb3; their findings
+and the closing gate state are recorded at the end of this block.
+
 ---
 
 ## Phase 18: final gate

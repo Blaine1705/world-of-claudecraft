@@ -31,28 +31,30 @@ export function gatheringById(id: string): GuideProfGathering | undefined {
   return GUIDE_PROF_GATHERING.find((g) => g.id === id);
 }
 
+// The Source cell's one decision, flattened: crafted tools name their craft
+// and, when a delve counter also stocks them, the Marks price behind its
+// clears gate (the eight top tools; naming only the craft made the table
+// contradict the prose above it); bought tools name their counter.
+function toolSource(tool: GuideProfTool): string {
+  if (tool.craftedBy) {
+    const craft = t(`hudChrome.craftName.${tool.craftedBy}` as TranslationKey);
+    if (tool.priceMarks == null) return t('guide.profPages.toolCrafted', { craft });
+    const marks = formatNumber(tool.priceMarks);
+    return tool.marksHeroicClear
+      ? t('guide.profPages.toolCraftedOrMarksHeroic', { craft, marks })
+      : t('guide.profPages.toolCraftedOrMarks', { craft, marks });
+  }
+  if (tool.vendors.length > 0) {
+    return t('guide.profPages.toolVendor', {
+      name: tool.vendors[0].name,
+      hub: tool.vendors[0].hub,
+    });
+  }
+  return t('guide.profPages.toolUnavailable');
+}
+
 function toolRow(tool: GuideProfTool): string {
-  // Both routes when a tool has both: the eight top tools are crafted at the
-  // toolworks OR bought with Delve Marks behind the delve counter's clears
-  // gate, and naming only the craft made the table contradict the prose
-  // above it.
-  const source = tool.craftedBy
-    ? tool.priceMarks != null
-      ? tool.marksHeroicClear
-        ? t('guide.profPages.toolCraftedOrMarksHeroic', {
-            craft: t(`hudChrome.craftName.${tool.craftedBy}` as TranslationKey),
-            marks: formatNumber(tool.priceMarks),
-          })
-        : t('guide.profPages.toolCraftedOrMarks', {
-            craft: t(`hudChrome.craftName.${tool.craftedBy}` as TranslationKey),
-            marks: formatNumber(tool.priceMarks),
-          })
-      : t('guide.profPages.toolCrafted', {
-          craft: t(`hudChrome.craftName.${tool.craftedBy}` as TranslationKey),
-        })
-    : tool.vendors.length > 0
-      ? t('guide.profPages.toolVendor', { name: tool.vendors[0].name, hub: tool.vendors[0].hub })
-      : t('guide.profPages.toolUnavailable');
+  const source = toolSource(tool);
   // R22: the wield requirement the harvest gate enforces, or None for tier 1
   // and every rod (rods are the structural exemption).
   const wield =

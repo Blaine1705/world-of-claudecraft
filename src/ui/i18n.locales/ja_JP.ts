@@ -9058,7 +9058,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'あなたのアカウント：{rank} 位（上位 {percent}%）、名声 {renown}',
   'hudChrome.deeds.lbSelfRank': 'あなたのアカウント：{rank} 位（上位 {percent}%）',
   'hudChrome.deeds.lbEmpty': 'ランク入りした年代記作家はまだいません。',
-  'hudChrome.deeds.broadcastsLabel': '功績の達成をギルドとフレンドに共有する',
+  'hudChrome.deeds.broadcastsLabel':
+    '功績の達成と傑作をギルドメンバー、フォロワー、Discordフィードに共有する',
   'guide.deedsPage.catHeading': '{label}（{count}）',
   'guide.deedsPage.colName': '功績',
   'guide.deedsPage.featTag': '偉業',
