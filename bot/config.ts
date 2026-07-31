@@ -1,6 +1,7 @@
 // Bot configuration from env. All secrets are server-side env only (never
 // committed). Missing-required values throw at boot with a clear message.
 
+import { PRESENCE_DEBOUNCE_MS, RELAY_POLL_MS, ROLE_SYNC_INTERVAL_MS } from './cadence';
 import {
   DEFAULT_BAN_PAUSE_MS,
   DEFAULT_BREAKER_LIMIT,
@@ -43,6 +44,12 @@ export interface BotConfig {
   breakerLimit: number;
   /** How long a member's 401 or 403 is remembered before it is retried. */
   forbiddenTtlMs: number;
+  /** How often the role sync, tier-role and special-role refresh sweeps run. */
+  roleSyncIntervalMs: number;
+  /** How long a burst of voice/presence events is collapsed before one push. */
+  presenceDebounceMs: number;
+  /** How often the relay, activity and daily-rewards drains poll the server. */
+  relayPollMs: number;
 }
 
 function required(name: string): string {
@@ -99,5 +106,19 @@ export function loadConfig(): BotConfig {
       process.env.DISCORD_FORBIDDEN_TTL_MS,
       DEFAULT_FORBIDDEN_TTL_MS,
     ),
+    // D13: the loop cadences are the operator's incident lever, so they are
+    // env-overridable with today's hard-coded values as the defaults. The
+    // defaults stay in bot/cadence.ts, beside nothing else, so the value the
+    // suite pins and the value the bot falls back to cannot drift apart (the
+    // same reason the governor's DEFAULT_* constants live in rate_governor.ts).
+    roleSyncIntervalMs: positiveNumberFromEnv(
+      process.env.DISCORD_ROLE_SYNC_INTERVAL_MS,
+      ROLE_SYNC_INTERVAL_MS,
+    ),
+    presenceDebounceMs: positiveNumberFromEnv(
+      process.env.DISCORD_PRESENCE_DEBOUNCE_MS,
+      PRESENCE_DEBOUNCE_MS,
+    ),
+    relayPollMs: positiveNumberFromEnv(process.env.DISCORD_RELAY_POLL_MS, RELAY_POLL_MS),
   };
 }

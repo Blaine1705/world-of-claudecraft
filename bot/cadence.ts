@@ -5,8 +5,10 @@
 // env, real Discord REST, a real WebSocket). Keeping them here lets the suite
 // pin the cadences directly.
 //
-// Values only: no env parsing, no derived timers. main.ts is the only RUNTIME
-// consumer; the suite imports them directly to pin them.
+// Values only: no env parsing, no derived timers. As of Phase 3 the runtime
+// consumer is bot/config.ts, which layers the D13 env overrides on top of these
+// as its fallbacks (main.ts reads the resolved BotConfig fields, never these
+// constants); the suite still imports them directly to pin them.
 
 export const ROLE_SYNC_INTERVAL_MS = 5 * 60_000;
 export const PRESENCE_DEBOUNCE_MS = 4_000;

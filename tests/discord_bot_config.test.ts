@@ -28,6 +28,9 @@ const BOT_ENV_KEYS = [
   'DISCORD_BAN_PAUSE_MS',
   'DISCORD_BREAKER_LIMIT',
   'DISCORD_FORBIDDEN_TTL_MS',
+  'DISCORD_ROLE_SYNC_INTERVAL_MS',
+  'DISCORD_PRESENCE_DEBOUNCE_MS',
+  'DISCORD_RELAY_POLL_MS',
 ] as const;
 
 /** Fill the four required keys with obvious non-secret placeholders. */
@@ -363,5 +366,76 @@ describe('loadConfig governor knobs', () => {
     setRequired();
     process.env.DISCORD_MAX_RPS = '1';
     expect(loadConfig().maxRps).toBe(1);
+  });
+});
+
+describe('loadConfig cadence knobs (D13)', () => {
+  // The three keys Phase 3 introduced, so an operator can slow every sweep down
+  // during an incident without a redeploy. Same shape as the governor knobs
+  // above, and tested to the same depth: reading a key is not the same as
+  // landing its value in the right field.
+  const CADENCE_KNOBS = [
+    {
+      env: 'DISCORD_ROLE_SYNC_INTERVAL_MS',
+      field: 'roleSyncIntervalMs',
+      fallback: 300000,
+      override: '450000',
+    },
+    {
+      env: 'DISCORD_PRESENCE_DEBOUNCE_MS',
+      field: 'presenceDebounceMs',
+      fallback: 4000,
+      override: '7500',
+    },
+    { env: 'DISCORD_RELAY_POLL_MS', field: 'relayPollMs', fallback: 3000, override: '11000' },
+  ] as const;
+
+  it('defaults each cadence to the value it had hard-coded, pinned against a LITERAL', () => {
+    // Against literals, never against the imported constant: driving the
+    // assertion from the same constant the implementation reads is a
+    // self-comparison that stays green when the value changes.
+    setRequired();
+    const cfg = loadConfig();
+    expect(cfg.roleSyncIntervalMs).toBe(300000);
+    expect(cfg.presenceDebounceMs).toBe(4000);
+    expect(cfg.relayPollMs).toBe(3000);
+  });
+
+  it('keeps the config defaults equal to the bot/cadence.ts constants', () => {
+    // The other half of the pin above: the literals are what Phase 3 promised
+    // not to change, and this is what proves config.ts actually falls back to
+    // the shared module rather than to a second copy of the numbers.
+    setRequired();
+    const cfg = loadConfig();
+    expect(cfg.roleSyncIntervalMs).toBe(ROLE_SYNC_INTERVAL_MS);
+    expect(cfg.presenceDebounceMs).toBe(PRESENCE_DEBOUNCE_MS);
+    expect(cfg.relayPollMs).toBe(RELAY_POLL_MS);
+  });
+
+  it('reads each cadence from its OWN key, with a distinct value per field', () => {
+    // Every override differs from every other AND from every default, so both a
+    // transposed pair and a field that silently kept its fallback fail here.
+    setRequired();
+    for (const knob of CADENCE_KNOBS) process.env[knob.env] = knob.override;
+    const cfg = loadConfig() as unknown as Record<string, number>;
+    for (const knob of CADENCE_KNOBS) {
+      expect(cfg[knob.field]).toBe(Number(knob.override));
+      expect(cfg[knob.field]).not.toBe(knob.fallback);
+    }
+  });
+
+  it('falls back to the default for empty, non-numeric, zero and negative alike', () => {
+    // A cadence of 0 is the dangerous one: it would turn a chained-timeout loop
+    // into an unbounded spin, which is the exact storm this phase exists to
+    // stop, so a blank line in a .env must never produce it.
+    for (const bad of ['', '   ', 'five', '0', '-1', 'NaN']) {
+      setRequired();
+      for (const knob of CADENCE_KNOBS) process.env[knob.env] = bad;
+      const cfg = loadConfig() as unknown as Record<string, number>;
+      for (const knob of CADENCE_KNOBS) {
+        expect(cfg[knob.field]).toBe(knob.fallback);
+        expect(cfg[knob.field]).not.toBe(0);
+      }
+    }
   });
 });
