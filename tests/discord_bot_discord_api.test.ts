@@ -595,8 +595,21 @@ describe('governorFromConfig', () => {
     // banPauseMs: a non-JSON 429 pauses for exactly the configured interval, and
     // the log line reports it.
     const logs: { level: string; message: string; fields: Record<string, string | number> }[] = [];
+    // The clock must ADVANCE on sleep. A frozen `now` with a no-op sleep is an
+    // infinite loop waiting to happen: waitForBucket re-reads the clock every
+    // pass, so a gate that never expires spins on a promise that resolves
+    // immediately, starving the macrotask queue so vitest's own test timeout can
+    // never fire. Found by the mutation pass, in this test rather than in the
+    // module: dropping the non-JSON-429 ban arm sends this response down the
+    // ordinary retry path, and only then does the frozen clock matter.
+    let observedNow = 0;
     const observed = new RateGovernor({
-      clock: { now: () => 0, sleep: async () => {} },
+      clock: {
+        now: () => observedNow,
+        sleep: async (ms) => {
+          observedNow += ms;
+        },
+      },
       ...config,
       log: (level, message, fields) => logs.push({ level, message, fields }),
     });
