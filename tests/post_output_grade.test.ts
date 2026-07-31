@@ -5,7 +5,8 @@ import { OUTPUT_GRADE_FRAGMENT_SHADER, OutputGradePass } from '../src/render/pos
 describe('fused output and grade shader', () => {
   it('preserves both removed half-float boundaries and the exact grade operation order', () => {
     const shader = OUTPUT_GRADE_FRAGMENT_SHADER;
-    const bloomSampleAt = shader.indexOf('vec4 bloom = texture(tBloom, vUv);');
+    const diffuseSampleAt = shader.indexOf('vec4 outputColor = texture(tDiffuse, inputUv);');
+    const bloomSampleAt = shader.indexOf('vec4 bloom = texture(tBloom, inputUv);');
     const bloomBlendAt = shader.indexOf(
       'outputColor.rgb = quantizeHalf(outputColor.rgb + bloom.rgb * bloom.a);',
     );
@@ -20,7 +21,8 @@ describe('fused output and grade shader', () => {
       'c += (fract(sin(dot(vUv * 731.7 + uTime, vec2(12.9898, 78.233))) * 43758.5) - 0.5) * 0.012;',
     );
 
-    expect(bloomSampleAt).toBeGreaterThan(-1);
+    expect(diffuseSampleAt).toBeGreaterThan(-1);
+    expect(bloomSampleAt).toBeGreaterThan(diffuseSampleAt);
     expect(bloomBlendAt).toBeGreaterThan(bloomSampleAt);
     expect(toneMapAt).toBeGreaterThan(bloomBlendAt);
     expect(srgbAt).toBeGreaterThan(toneMapAt);
@@ -36,6 +38,7 @@ describe('fused output and grade shader', () => {
     expect(shader).toContain('unpackHalf2x16(packHalf2x16(value.rg))');
     expect(shader).toContain('unpackHalf2x16(packHalf2x16(vec2(value.b, 0.0))).x');
     expect(shader).toContain('pc_fragColor = vec4(c, 1.0);');
+    expect(shader).toContain('vec2 inputUv = min(vUv * uInputUvRect.xy, uInputUvRect.zw);');
   });
 
   it('propagates exposure and selects the same ACES and sRGB defines as OutputPass', () => {
@@ -66,6 +69,7 @@ describe('fused output and grade shader', () => {
     expect(pass.uniforms.tBloom.value).toBe(bloomTexture);
     expect(pass.uniforms.toneMappingExposure.value).toBe(0.73);
     expect(pass.uniforms.uTime).toBe(time);
+    expect(pass.uniforms.uInputUvRect.value.toArray()).toEqual([1, 1, 1, 1]);
     expect(pass.material.defines).toEqual({
       BLOOM_PREPARED: '',
       SRGB_TRANSFER: '',
@@ -81,5 +85,8 @@ describe('fused output and grade shader', () => {
     pass.renderToScreen = true;
     pass.render(renderer, write, read);
     expect(setRenderTarget).toHaveBeenLastCalledWith(null);
+
+    pass.setInputUvRect(0.75, 0.8, 0.7, 0.74);
+    expect(pass.uniforms.uInputUvRect.value.toArray()).toEqual([0.75, 0.8, 0.7, 0.74]);
   });
 });

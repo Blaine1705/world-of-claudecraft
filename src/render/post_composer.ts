@@ -42,12 +42,26 @@ export class PostEffectComposer extends EffectComposer {
     state._width = width;
     state._height = height;
     state._pixelRatio = pixelRatio;
-    const effectiveWidth = width * pixelRatio;
-    const effectiveHeight = height * pixelRatio;
+    const effectiveWidth = Math.max(1, Math.floor(width * pixelRatio));
+    const effectiveHeight = Math.max(1, Math.floor(height * pixelRatio));
 
     this.renderTarget1.setSize(effectiveWidth, effectiveHeight);
     if (!this.singleBuffer) this.renderTarget2.setSize(effectiveWidth, effectiveHeight);
     for (const pass of this.passes) pass.setSize(effectiveWidth, effectiveHeight);
+  }
+
+  setRenderRegion(width: number, height: number): void {
+    const targets =
+      this.renderTarget1 === this.renderTarget2
+        ? [this.renderTarget1]
+        : [this.renderTarget1, this.renderTarget2];
+    for (const target of targets) {
+      const renderWidth = Math.min(target.width, Math.max(1, Math.floor(width)));
+      const renderHeight = Math.min(target.height, Math.max(1, Math.floor(height)));
+      target.viewport.set(0, 0, renderWidth, renderHeight);
+      target.scissor.set(0, 0, renderWidth, renderHeight);
+      target.scissorTest = renderWidth < target.width || renderHeight < target.height;
+    }
   }
 
   override setSize(width: number, height: number): void {

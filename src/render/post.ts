@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import type { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import type { DynamicResolutionRect } from './dynamic_resolution_core';
 import { GFX, sharedUniforms } from './gfx';
 import { PreparedBloomPass } from './post_bloom';
 import { PostEffectComposer } from './post_composer';
@@ -52,7 +53,9 @@ export interface PostPipeline {
   bloom: UnrealBloomPass | null; // null on the grade-only path
   ao: N8AOPass | null;
   grade: OutputGradePass;
+  supportsDynamicResolution: boolean;
   setSize(width: number, height: number, pixelRatio?: number): void;
+  setRenderRegion(region: DynamicResolutionRect): void;
   render(): void;
 }
 
@@ -161,8 +164,18 @@ export function buildComposer(
     bloom,
     ao,
     grade,
+    supportsDynamicResolution: gradeOnly,
     setSize(width: number, height: number, pixelRatio = webgl.getPixelRatio()): void {
       composer.setSizeAndPixelRatio(width, height, pixelRatio);
+      if (gradeOnly) {
+        composer.setRenderRegion(composer.renderTarget1.width, composer.renderTarget1.height);
+        grade.setInputUvRect(1, 1, 1, 1);
+      }
+    },
+    setRenderRegion(region: DynamicResolutionRect): void {
+      if (!gradeOnly) return;
+      composer.setRenderRegion(region.renderWidth, region.renderHeight);
+      grade.setInputUvRect(region.uvScaleX, region.uvScaleY, region.uvMaxX, region.uvMaxY);
     },
     render(): void {
       composer.render();
