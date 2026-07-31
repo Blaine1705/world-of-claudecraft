@@ -143,6 +143,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     elite: true,
     loot: [
       { copper: 200, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'emberwing_scale', chance: 0.7, questId: 'q_dk_scales_of_the_maw' },
     ],
     scale: 1.4,
@@ -165,6 +166,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 80, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.4 },
+      { copper: 90, chance: 1 },
       { itemId: 'ashbone_war_brand', chance: 0.6, questId: 'q_dk_marrow_and_ash' },
     ],
     scale: 1,
@@ -210,6 +212,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
       { copper: 90, chance: 1 },
       { itemId: 'chipped_tusk', chance: 0.4 },
     ],
+    loot: [{ copper: 90, chance: 1 }],
     scale: 1.15,
     color: 0xb07040,
   },
@@ -233,6 +236,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 20,
     elite: true,
     loot: [{ copper: 450, chance: 1 }],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.9,
     color: 0xf0b040,
   },

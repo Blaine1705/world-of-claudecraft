@@ -123,6 +123,7 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.1,
     color: 0xeef4f8,
+    componentTags: ['hide', 'fang', 'meat'],
   },
   ice_wisp: {
     id: 'ice_wisp',
@@ -140,6 +141,7 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 0, // drifting cold light, harmless unless harmed
     loot: [
       { copper: 80, chance: 1 },
+      { copper: 90, chance: 1 },
       { itemId: 'aurora_mote', chance: 0.65, questId: 'q_fv_aurora_motes' },
     ],
     scale: 0.7,
@@ -178,6 +180,7 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8,
     aggroRadius: 10,
     loot: [{ copper: 80, chance: 1 }],
+    loot: [{ copper: 90, chance: 1 }],
     scale: 0.9,
     color: 0xcfe0ea,
   },
@@ -201,6 +204,7 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 105, chance: 1 }],
     scale: 1.3,
     color: 0x9db4c8,
+    componentTags: ['hide', 'fang', 'meat'],
   },
   // Trapper Brosk's lost apprentice (q_fv_seeing_wren_home). Escort-run
   // escortee: non-hostile, never wanders (moveSpeed 0; src/sim/escort.ts
@@ -240,6 +244,7 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 16,
     elite: true,
     loot: [{ copper: 420, chance: 1 }],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.5,
     color: 0xf2f6fa,
   },

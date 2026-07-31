@@ -156,6 +156,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 0, // clipped leaves grazing the lawn; it minds its own shape
     loot: [
       { copper: 105, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'evergarden_bloom_clipping', chance: 0.65, questId: 'q_eg_bloom_clippings' },
     ],
     scale: 1.15,
@@ -176,6 +177,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8.5,
     aggroRadius: 11, // some of the shapes were pruned into hunger
     loot: [{ copper: 105, chance: 1 }],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.15,
     color: 0x4a8a4e,
   },
@@ -197,6 +199,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
       { copper: 115, chance: 1 },
       { itemId: 'linen_scrap', chance: 0.3 },
     ],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.0,
     color: 0xb8c4d0, // burnished plate
   },
@@ -216,6 +219,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 10, // the unseen groundskeepers, and they hate trespass
     loot: [
       { copper: 105, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'hedgewick_shears', chance: 0.6, questId: 'q_eg_stolen_shears' },
     ],
     scale: 0.95,
@@ -240,6 +244,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
       { copper: 450, chance: 1 },
       { itemId: 'tangled_weed', chance: 1 },
     ],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.45,
     color: 0x2e6a34,
   },
