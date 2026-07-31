@@ -193,8 +193,8 @@
       "tick": 120,
       "time": 6,
       "nextId": 834,
-      "state": "b9a37bd7",
-      "events": "03d007be",
+      "state": "f5ab005d",
+      "events": "0239e514",
       "rng": {
         "draws": 682,
         "digest": "91ea2bd6"
@@ -204,7 +204,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 834,
-      "state": "819802a0",
+      "state": "859f80ae",
       "events": "5d3372df",
       "rng": {
         "draws": 888,
@@ -215,7 +215,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 834,
-      "state": "4f319170",
+      "state": "28fbb6b2",
       "events": "4733734f",
       "rng": {
         "draws": 1140,
@@ -226,7 +226,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 834,
-      "state": "69fd1258",
+      "state": "2f111fd2",
       "events": "4f3d2e33",
       "rng": {
         "draws": 1406,
@@ -237,8 +237,8 @@
       "tick": 200,
       "time": 10,
       "nextId": 834,
-      "state": "7d7e42ae",
-      "events": "c62d38a4",
+      "state": "22bf432f",
+      "events": "b8801a10",
       "rng": {
         "draws": 1672,
         "digest": "d81d57ba"
@@ -248,7 +248,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 834,
-      "state": "59d3f0d5",
+      "state": "a0b0b6fa",
       "events": "c2141616",
       "rng": {
         "draws": 1844,
@@ -259,7 +259,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 834,
-      "state": "2b8cbbb9",
+      "state": "5ca1b154",
       "events": "741638a5",
       "rng": {
         "draws": 1844,
@@ -413,7 +413,7 @@
           "facing": 1.892547,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 345,
+          "hp": 339,
           "id": 832,
           "inCombat": true,
           "kind": "mob",
@@ -518,8 +518,8 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 834,
-      "state": "1c8a39f5",
-      "events": "5a232fc9",
+      "state": "d1a01197",
+      "events": "37ec2c62",
       "rng": {
         "draws": 1889,
         "digest": "a2f00d54"
@@ -673,7 +673,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 335,
+          "hp": 328,
           "id": 832,
           "inCombat": true,
           "kind": "mob",

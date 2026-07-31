@@ -149,8 +149,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 833,
-      "state": "cc882570",
-      "events": "99abee10",
+      "state": "e554a9ba",
+      "events": "12742299",
       "rng": {
         "draws": 7,
         "digest": "d9dea8ae"
@@ -160,7 +160,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 833,
-      "state": "53f8cd98",
+      "state": "77455b98",
       "events": "741638a5",
       "rng": {
         "draws": 7,
@@ -171,7 +171,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 833,
-      "state": "89eefc34",
+      "state": "03c463bc",
       "events": "ae8514d0",
       "rng": {
         "draws": 166,
@@ -182,7 +182,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 833,
-      "state": "0d1dba3a",
+      "state": "8f32e5ee",
       "events": "120f766c",
       "rng": {
         "draws": 253,
@@ -207,7 +207,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 7072,
-            "damageTaken": 4,
+            "damageTaken": 5,
             "kills": 1
           },
           "craftSkills": {},
@@ -294,7 +294,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 438,
+          "hp": 437,
           "id": 827,
           "inCombat": true,
           "kind": "player",
@@ -409,7 +409,7 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 833,
-      "state": "54d5a2ae",
+      "state": "e6ce3c56",
       "events": "7bf80ff7",
       "rng": {
         "draws": 300,
@@ -434,7 +434,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 7072,
-            "damageTaken": 4,
+            "damageTaken": 5,
             "kills": 1
           },
           "craftSkills": {},
@@ -526,7 +526,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.8,
-          "hp": 438,
+          "hp": 437,
           "id": 827,
           "inCombat": true,
           "kind": "player",

@@ -5609,6 +5609,49 @@ export function armorReduction(armor: number, attackerLevel: number): number {
   return Math.min(0.75, a / (a + 85 * attackerLevel + 400));
 }
 
+// Enemy mobs' damage against a player is never mitigated away by armor DR by more
+// than this fraction, mirroring MOB_VS_PLAYER_MAX_MISS's floor on melee miss chance
+// (same value, same directional guard). Without this, a heavily armored higher-level
+// player or player-owned pet could reduce a lower-level hostile mob's already-floored
+// hit chance further into near-zero damage per swing, making defensive-pet AFK farming
+// risk-free (see issue #1050).
+export const MOB_VS_PLAYER_MAX_ARMOR_DR = MOB_VS_PLAYER_MAX_MISS;
+
+// Below this many levels under the target, the armor-DR cap is fully saturated at
+// MOB_VS_PLAYER_MAX_ARMOR_DR; between 0 and this span it ramps linearly rather than
+// stepping off a single-level cliff. Mirrors the span ABOVE_LEVEL_MISS_PCT ramps its
+// own above-level penalty over (3 levels), so a mob one level below the target only
+// loses a third of the way toward the cap instead of jumping straight to it.
+const ARMOR_DR_RAMP_LEVELS = 3;
+
+// Effective armor-DR fraction for `attacker`'s hit on `target`, floored directionally
+// the same way swingMissChance floors mob miss. Unlike meleeMissChance, armorReduction
+// itself carries NO level-difference term (only the attacker's level and the target's
+// armor), so unconditionally capping it here would also neuter armor against a
+// same-level or higher-level mob, including raid bosses: a live tanking stat, not an
+// anti-power-level deterrent, and level parity is not what issue #1050 was about.
+// The cap only applies in the exact inverted case the miss/resist floors correct: a
+// LOWER-level hostile mob (or its cleave splash) hitting a higher-level player or
+// player-owned pet. At or above the target's level, armor keeps its full, uncapped
+// scaling in both directions. The cap itself ramps with the level gap (linearly, from
+// the natural uncapped DR at a 1-level gap down to MOB_VS_PLAYER_MAX_ARMOR_DR at
+// ARMOR_DR_RAMP_LEVELS and beyond) rather than snapping straight to the floor at a
+// single level below, so a heavily armored player doesn't take a discontinuous jump in
+// damage taken crossing one level boundary (a mob 3+ levels down keeps the full cap,
+// matching the far-below-level farming case issue #1050 describes).
+export function mobArmorReduction(attacker: Entity, target: Entity, armor: number): number {
+  const dr = armorReduction(armor, attacker.level);
+  const mobAttacker = attacker.kind === 'mob' && attacker.hostile && attacker.ownerId === null;
+  const playerSide = target.kind === 'player' || target.ownerId !== null;
+  const diff = target.level - attacker.level;
+  if (mobAttacker && playerSide && diff > 0) {
+    const t = Math.min(1, diff / ARMOR_DR_RAMP_LEVELS);
+    const rampedCap = dr - (dr - MOB_VS_PLAYER_MAX_ARMOR_DR) * t;
+    return Math.min(dr, rampedCap);
+  }
+  return dr;
+}
+
 // ---------------------------------------------------------------------------
 // Spell Power: caster damage scaling (classic-style cast-time / DoT-duration
 // coefficient model). Casters convert Intellect into Spell Power; Spell Power
