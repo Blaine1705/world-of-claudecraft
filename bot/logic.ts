@@ -248,12 +248,7 @@ export function chunk<T>(items: readonly T[], size: number): T[][] {
  * setMember(id, false) so a member who leaves loses their in-game verified /
  * staff flair promptly instead of keeping it until some later relink.
  */
-export function clearedMemberMeta(discordUserId: string): {
-  discord_user_id: string;
-  name: string | null;
-  joinedAtMs: number | null;
-  role: string | null;
-} {
+export function clearedMemberMeta(discordUserId: string): MemberMetaRecord {
   return { discord_user_id: discordUserId, name: null, joinedAtMs: null, role: null };
 }
 
@@ -704,4 +699,110 @@ export function buildDailyRewardWinnersMessage(
     ],
     allowed_mentions: { parse: [] },
   };
+}
+
+// ── Diff before write (the self-inflicted-load guards) ───────────────────────
+// Every write the bot makes to Discord comes back as an event: a nickname PATCH
+// makes Discord emit GUILD_MEMBER_UPDATE, whose handler pushes that member's
+// meta straight back into the game. Re-writing state that already matches
+// therefore costs a Discord PATCH, a gateway event, AND a game-server POST, per
+// member, every 5 minute sweep, for nothing. So the rule here is universal:
+// nothing is written unless it actually differs, and an update carrying only
+// the value we just wrote is recognized as our own echo and dropped. All three
+// predicates are pure and cache-free (the caller owns the caches) so the
+// decision is unit-tested without a network, a clock, or a Discord token.
+
+/** One members-meta push record: the shape `clearedMemberMeta` returns and the
+ * roster sweep builds. Named so the diff predicates below can share it. */
+export interface MemberMetaRecord {
+  discord_user_id: string;
+  name: string | null;
+  joinedAtMs: number | null;
+  role: string | null;
+}
+
+/**
+ * Whether a member's nickname PATCH must actually be sent. `cachedNick` is what
+ * we last OBSERVED for this member: `undefined` means we have never seen one, so
+ * we cannot prove the write is redundant and must send it; `null` means the
+ * member has no nickname at all, which a computed nick always differs from.
+ * Otherwise it is exact string equality, deliberately with no trimming or
+ * normalization: Discord stores the nick verbatim, so treating " Aldric" as
+ * equal to "Aldric" would make every sweep re-PATCH the same member forever,
+ * which is exactly the load this guard exists to stop. An empty computed nick is
+ * compared verbatim too, never read as "no opinion".
+ */
+export function nicknameNeedsWrite(
+  computedNick: string,
+  cachedNick: string | null | undefined,
+): boolean {
+  if (cachedNick === undefined || cachedNick === null) return true;
+  return computedNick !== cachedNick;
+}
+
+/**
+ * Whether this member's meta must be pushed to the game. `last` is the record we
+ * last pushed SUCCESSFULLY; `undefined` means we never did, so push. Otherwise
+ * all four fields are compared with strict equality and any difference pushes:
+ * a partial compare would strand whichever field it skipped (a rename, a rejoin,
+ * or a staff-role change) until some unrelated field happened to move. null and
+ * undefined are never conflated, and a cleared record (all-null, from
+ * `clearedMemberMeta`) is a real change against a populated one, so a departing
+ * member's flair still gets cleared.
+ */
+export function memberMetaChanged(
+  next: MemberMetaRecord,
+  last: MemberMetaRecord | undefined,
+): boolean {
+  if (last === undefined) return true;
+  return (
+    next.discord_user_id !== last.discord_user_id ||
+    next.name !== last.name ||
+    next.joinedAtMs !== last.joinedAtMs ||
+    next.role !== last.role
+  );
+}
+
+/**
+ * The subset of a sweep's records that actually need pushing, in INPUT ORDER
+ * (the caller batches them, and a reordered batch would make the pushes hard to
+ * read against the roster). Pure: `lastPushed` is read only, so the caller
+ * updates it after a push SUCCEEDS and a failed push is retried next sweep
+ * instead of being silently marked clean.
+ */
+export function changedMemberMeta(
+  records: readonly MemberMetaRecord[],
+  lastPushed: ReadonlyMap<string, MemberMetaRecord>,
+): MemberMetaRecord[] {
+  return records.filter((record) =>
+    memberMetaChanged(record, lastPushed.get(record.discord_user_id)),
+  );
+}
+
+/**
+ * Whether an incoming GUILD_MEMBER_UPDATE is nothing but the echo of the
+ * nickname the bot itself just wrote, in which case re-pushing that member's
+ * meta is pure self-inflicted load. It is an echo only when we actually wrote a
+ * nick for them (`lastWrittenNick` present), the incoming nick is exactly that
+ * value, AND the role set is unchanged. Roles are compared as SETS, not as
+ * ordered arrays: Discord does not promise role order, so an order-sensitive
+ * compare would read a genuine no-op update as a change every single time.
+ * Membership is checked in BOTH directions rather than by length alone, so a
+ * duplicate id on one side cannot make two equal sets look different. Anything
+ * else (a role grant, or a moderator renaming the member to something we did not
+ * write) is a third-party update and returns false so it still pushes.
+ */
+export function isSelfNickEcho(
+  incoming: { nick: string | null | undefined; roleIds: readonly string[] },
+  lastWrittenNick: string | undefined,
+  cachedRoleIds: readonly string[],
+): boolean {
+  if (lastWrittenNick === undefined) return false;
+  if (incoming.nick !== lastWrittenNick) return false;
+  const incomingSet = new Set(incoming.roleIds);
+  const cachedSet = new Set(cachedRoleIds);
+  if (incomingSet.size !== cachedSet.size) return false;
+  for (const id of incomingSet) if (!cachedSet.has(id)) return false;
+  for (const id of cachedSet) if (!incomingSet.has(id)) return false;
+  return true;
 }
