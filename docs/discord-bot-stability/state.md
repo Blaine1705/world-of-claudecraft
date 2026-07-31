@@ -239,10 +239,23 @@ because dropping the one word is otherwise silent),
     query" is true of `bot/discord_api.ts` today but is a fact about the CALLERS, not a
     property of `redactPath`, so it stops being true the moment a phase adds a query
     parameter. Whichever phase adds one owns redacting it.
-- Ruled-acceptable residual, do not "fix" it in QA: the drain loop in `evictBuckets` is
-  observationally identical to a single `if` while entries are inserted one at a time,
-  so no assertion can distinguish them. It is kept as defense against a future batch
-  insert, exactly as R14 and the S05 precedent were kept.
+- Ruled-acceptable residuals, do NOT "fix" either and do not score either as a surviving
+  mutant. Neither can be distinguished by any assertion, so a test for them is impossible
+  rather than merely missing:
+  - The drain loop in `evictBuckets` is observationally identical to a single `if` while
+    entries are inserted one at a time. Kept as defense against a future batch insert,
+    exactly as R14 and the S05 precedent were kept.
+  - The loop inside `waitForPause` became observationally identical to a single sleep once
+    the dispatch gates were made a LOOP (Phase 2 QA): a pause extended while a request is
+    already asleep is now re-read by the OUTER loop's `isGated` check, whichever shape the
+    inner one takes. It is kept because `waitForPause` has to be correct on its own terms,
+    not only in the one composition that currently calls it. Same footing as the
+    `evictBuckets` drain.
+- `waitForBucket` and the pre-send `isGated` check BOTH read `bucketBlockedUntil` and must
+  keep doing so. When the condition was written out twice, a change to one alone made the
+  dispatch loop spin hot, and a hot spin in an async loop starves the macrotask queue: the
+  process HANGS rather than failing, which is the worst shape a guard failure can take.
+  This was found by mutation, not by a test, so keep the single predicate.
 - DEFERRED to a later phase, recorded here rather than left implicit: D4's
   role-position arm ships as a HOOK with no caller. `RateGovernor.invalidateForbidden()`
   (exposed as `DiscordApi.invalidateForbidden()`) is never invoked, so today a cached
@@ -278,8 +291,22 @@ because dropping the one word is otherwise silent),
   - A bucket-hash CHANGE no longer deletes the old key's state. Other templates may still
     resolve to it, and the delete destroyed their gating over a rotation that had nothing
     to do with them. Only the first provisional-to-hash migration copies state now.
-  - The bucket gate is re-checked beside the pause after the rate slot. The pause re-check
-    was already there and reasoned; the bucket had the identical argument and no re-check.
+  - **The dispatch gates are a LOOP, not an ordered sequence.** The pause, the bucket gate,
+    and the rate slot each re-read until none is in force, with a synchronous `isGated`
+    check immediately before the send. Ordering alone provably cannot work here: each gate
+    can block for minutes, another queue can raise a different one meanwhile, and whichever
+    gate is checked LAST is the one whose predecessor goes stale. The QA round first shipped
+    the ordered form (pause, bucket, slot, pause, bucket) and its own fresh-eyes review
+    caught that this had merely moved the hole: a ban pause declared while a request slept
+    in the final bucket gate was never re-read. The loop also RE-RESERVES the rate slot on
+    every pass, because a slot taken and then sat on for a whole bucket window paces nothing
+    by the time the send happens, and every request coming off that window would fire
+    together with no spacing at all.
+  - A `retry_after` of Infinity is rejected. `JSON.parse` turns `1e999` into `Infinity` and
+    its `typeof` IS `'number'`, so it passed the old guard, set `pausedUntil` to Infinity,
+    and a sleep of Infinity is clamped by the platform to about a millisecond: the pause
+    loop then spun at a thousand iterations a second and the bot never sent again.
+    `headerNumber` already had the finiteness guard; the body path now matches it.
   - `MAX_TRACKED_ROUTES` is now its own constant (same value as `MAX_TRACKED_BUCKETS`).
     One constant bounded two populations with different lifetimes.
 - New exports from Phase 2 QA: `majorParameterOf` and `MAX_TRACKED_ROUTES`
@@ -569,6 +596,12 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   Any map keyed by the bare hash silently merges them. Pair it with the major parameter
   (`majorParameterOf` in `bot/rate_governor.ts`). This shipped as a real defect in Phase 2
   and was caught only by the QA round.
+- **Interaction callbacks now get one rate-state entry per interaction id**, because
+  `interactions` is in `MAJOR_PARENTS` and the rate key pairs the hash with the major
+  parameter. That is deliberate and consistent (the route template, and therefore the
+  queue, was already per interaction), and it is the correct reading: an interaction token
+  is single use, so one callback's `Remaining 0` must not gate every other user's reply.
+  The cost is one LRU insert per slash command, which `MAX_TRACKED_BUCKETS` bounds.
 - **A bound test that never reaches the bound is vacuous.** Phase 2's permanent-failure
   cache test stored 42 entries against a cap of 4096 and asserted `42 <= 4096`, which
   holds for every implementation including one with the eviction deleted. Its comment

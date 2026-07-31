@@ -272,7 +272,19 @@ was turned back into a plain FIFO, because a hot route that loses its mapping si
 rate state under its own template and gates identically. Reading that state through a
 SIBLING template is what makes the re-insertion line load bearing.
 
-Validation: `npx tsc --noEmit` clean, 306 tests green across the eleven bot suites (was
+The fresh-eyes pass over the fix round earned its keep, which is the whole reason the
+standing rule asks for one: the fix round had introduced a REGRESSION of its own. Adding a
+bucket re-check after the pause re-check made the bucket the last gate, and that gate is a
+long sleep in precisely the case it was added for, so a ban pause declared while a request
+slept there was never re-read and the request sent into it. Ordering cannot fix that at
+all: whichever gate goes last, its predecessor is the one that goes stale. The gates are
+now a LOOP that re-reads until none is in force, re-reserving the rate slot on each pass
+so a slot sat on for a whole bucket window no longer paces nothing. The same pass found
+that a `retry_after` of Infinity (JSON.parse turns `1e999` into one, and its `typeof` IS
+`number`) set `pausedUntil` to Infinity, which the platform clamps to about a millisecond,
+so the pause loop spun forever and the bot never sent again.
+
+Validation: `npx tsc --noEmit` clean, 308 tests green across the eleven bot suites (was
 283 at the phase tip), `npm run build:bot` green, `npm run ci:changed` exit 0 with
 error-level diagnostics clean on every touched file. `.env.example` could not be
 re-verified by the QA session: every `.env*` path stays denied at the harness level, so
@@ -293,7 +305,14 @@ survivor.
     second pause re-check silently compensated for, so it needed TWO extensions rather
     than one to become decisive. That is the standing rule about the fix round being
     unreviewed code earning its keep.
-  - Final: 44 planted, 44 KILLED, 0 survived, 0 errors, every run at 306 tests.
+  - After the fresh-eyes review round (the gate loop, the finiteness guard, the shared
+    bucket predicate) and 3 more mutants aimed at those: 47 planted, 46 KILLED, 0 errors,
+    0 hangs, every run at 308 tests.
+  - The single remaining survivor is a DECLARED RESIDUAL, not a gap: the loop inside
+    `waitForPause` became observationally identical to a single sleep once the gates
+    themselves became a loop, because the outer `isGated` re-check now absorbs an extension
+    whichever shape the inner one takes. No assertion can distinguish them, so it is kept
+    on the same footing as the `evictBuckets` drain loop and recorded in state.md.
 
 Two mutants were themselves defective and are worth recording. One HUNG the suite instead
 of failing it, and the cause was a pin I had just written: a frozen `now` with a no-op
