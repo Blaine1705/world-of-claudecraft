@@ -832,6 +832,12 @@ export interface DuelState {
   b: number;
   state: 'countdown' | 'active';
   timer: number; // countdown remaining / elapsed
+  // Tick number endDuel() set this on, or undefined while the duel is live.
+  // The entry is kept in `ctx.duels` (instead of being deleted synchronously)
+  // until updateDuels() purges it at tick-tail, so a reciprocal lethal hit
+  // resolving later in the SAME tick still finds it and gets clamped too:
+  // duels never produce a real death, even on a simultaneous double-kill.
+  endedTick?: number;
 }
 
 // GroundAoE type moved to entity_roster.ts (the ground-AoE drain's home); imported above.
@@ -1836,6 +1842,10 @@ export class Sim {
   // the sim runs at 20 Hz wall speed, so the interval is real hours.
   private worldBossNextAt: number[] = WORLD_BOSSES.map((b) => b.intervalSeconds);
   private worldBossEntityIds: (number | null)[] = WORLD_BOSSES.map(() => null);
+  // One-shot gate for takeActionBarLayoutRestore (IWorldActionBar): mirrors
+  // ClientWorld's null-out pattern so the offline arm honors the same
+  // consumed-once contract instead of returning the 'noop' value forever.
+  private actionBarLayoutRestoreServed = false;
 
   // Per-world key for the rift collision registry in colliders.ts. Allocated per
   // Sim INSTANCE (not per seed): two same-seed Sims in one process must never
@@ -2856,6 +2866,12 @@ export class Sim {
       player.corpsePos = savedState.corpsePos
         ? this.groundPos(savedState.corpsePos.x, savedState.corpsePos.z)
         : null;
+      // Instance ids are boot-local (recreated on every claim), so recompute
+      // from the restored position via the same helper the death path uses
+      // (spirit.ts releasePlayerSpirit) rather than persisting the raw id: a
+      // relog within a still-live claim recovers the corpse's instance
+      // binding, while a stale or reset claim correctly resolves to null.
+      player.corpseInstanceId = player.corpsePos ? this.instanceClaimIdAt(player.corpsePos) : null;
       player.hp = player.maxHp;
     } else if (savedState?.dead && !isArenaPos(savedState.pos.x) && !isDelvePos(savedState.pos.x)) {
       // Auto-release-on-logout: a character saved dead but UNRELEASED resumes as
@@ -3642,6 +3658,8 @@ export class Sim {
   }
 
   takeActionBarLayoutRestore(): ActionBarLayoutRestore | undefined {
+    if (this.actionBarLayoutRestoreServed) return undefined;
+    this.actionBarLayoutRestoreServed = true;
     return { source: 'noop' };
   }
 
@@ -8333,6 +8351,7 @@ export class Sim {
       const duel = this.duels.get(attackerPlayer.id);
       if (
         duel &&
+        duel.endedTick === undefined &&
         duel.state === 'active' &&
         ((duel.a === attackerPlayer.id && duel.b === target.id) ||
           (duel.b === attackerPlayer.id && duel.a === target.id))
@@ -10206,6 +10225,19 @@ export class Sim {
     const inst = riftInstanceAtPos(this.ctx, p.pos);
     if (!inst || inst.partyKey === null) return [];
     return inst.bossDeathZones;
+  }
+
+  // Milliseconds remaining before the current rift's backing world event stops
+  // admitting new parties (null outside a rift, or for a dev-spawned rift with no
+  // backing RiftEvent). Sim-clock arithmetic only (event.expiresAt and this.time are
+  // both sim-clock seconds), recomputed fresh on every call so a repeated read ticks
+  // down like raidLockouts() does, with no caching to go stale between ticks.
+  riftEventMsRemaining(): number | null {
+    const view = this.riftFloor;
+    if (!view || view.eventId === null) return null;
+    const event = this.riftEvents.find((candidate) => candidate.eventId === view.eventId);
+    if (!event) return null;
+    return Math.max(0, Math.round((event.expiresAt - this.time) * 1000));
   }
 
   get delveRun(): DelveRunInfo | null {

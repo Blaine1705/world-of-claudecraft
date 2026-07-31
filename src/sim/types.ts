@@ -4599,6 +4599,13 @@ export type SimEvent = { pid?: number } & (
       name: string;
       themeName: string;
       tier: RiftTier | null;
+      // Epoch-ms deadline (via ctx.lockoutNowMs, the same conversion
+      // rift/persistence.ts uses for save/load) after which the rift's backing
+      // world event stops admitting new parties. Null for a dev-spawned rift
+      // (no backing RiftEvent) or once the party has left. The client mirrors
+      // this verbatim and derives a locally-ticking "closes in" countdown from
+      // it, so it never needs a snapshot round trip once a second.
+      expiresAtMs: number | null;
     }
   | {
       type: 'riftRaceResult';
