@@ -536,6 +536,7 @@ describe('login with Epic does not exist', () => {
   // The source files the rule covers, exactly. A new epic module joins this
   // list and the Layout section of server/epic/CLAUDE.md in the same change.
   const EPIC_SOURCE_FILES = [
+    'achievement_map.ts',
     'config.ts',
     'epic_db.ts',
     'index.ts',

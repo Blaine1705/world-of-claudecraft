@@ -7,11 +7,20 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import {
+  buildClientCredentialsTokenRequest,
   buildExchangeCodeTokenRequest,
+  buildExternalAccountMappingUrl,
+  buildUnlockAchievementsRequest,
+  CLIENT_CREDENTIALS_GRANT,
+  EPIC_CONNECT_TOKEN_URL,
+  EPIC_GS_HOST,
+  EPIC_IDENTITY_PROVIDER,
   EPIC_TOKEN_URL,
   EXCHANGE_CODE_GRANT,
+  parseClientCredentialsTokenResponse,
+  parseExternalAccountMappingResponse,
 } from '../../server/epic/ticket';
-import { verifyLinkProof } from '../../server/epic/web_api';
+import { pushAchievementUnlocks, verifyLinkProof } from '../../server/epic/web_api';
 
 const OPTS = {
   clientId: 'CID',
@@ -149,5 +158,136 @@ describe('request builders (client-secret embedding)', () => {
     expect(body.get('deployment_id')).toBe('D');
     expect(body.get('client_id')).toBe('K');
     expect(body.get('client_secret')).toBe('S');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Achievement unlock push (O2 server-trusted path). No live Epic calls.
+// ---------------------------------------------------------------------------
+
+const UNLOCK_OPTS = {
+  clientId: 'CID',
+  clientSecret: 'CSEC',
+  deploymentId: 'DEP',
+  epicAccountId: 'a1b2c3d4e5f60718',
+  achNames: ['ACH_FIRST_STEPS', 'ACH_LEVEL_CAP'] as const,
+};
+
+const CLIENT_TOKEN_BODY = {
+  access_token: 'eg1~client-token',
+  token_type: 'bearer',
+  expires_in: 3600,
+};
+
+const PUID = '0002a1b2c3d4e5f60718192021222324';
+const MAPPING_BODY = {
+  ids: { [UNLOCK_OPTS.epicAccountId]: PUID },
+};
+
+describe('O2 unlock request builders (host/path/field pins)', () => {
+  it('buildClientCredentialsTokenRequest uses Connect token host and Basic auth', () => {
+    const { url, body, headers } = buildClientCredentialsTokenRequest({
+      clientId: 'K',
+      clientSecret: 'S',
+    });
+    expect(url).toBe(EPIC_CONNECT_TOKEN_URL);
+    expect(url).toBe('https://api.epicgames.dev/auth/v1/oauth/token');
+    expect(body.get('grant_type')).toBe(CLIENT_CREDENTIALS_GRANT);
+    expect(headers['Content-Type']).toBe('application/x-www-form-urlencoded');
+    expect(headers.Authorization).toBe(`Basic ${Buffer.from('K:S', 'utf8').toString('base64')}`);
+  });
+
+  it('buildExternalAccountMappingUrl pins user accounts path and epicgames provider', () => {
+    const url = buildExternalAccountMappingUrl({ epicAccountId: 'acct1' });
+    expect(url).toBe(
+      `${EPIC_GS_HOST}/user/v1/accounts?accountId=acct1&identityProviderId=${EPIC_IDENTITY_PROVIDER}`,
+    );
+  });
+
+  it('buildUnlockAchievementsRequest pins Stats Achievements unlock path and body field', () => {
+    const { url, body, headers } = buildUnlockAchievementsRequest({
+      deploymentId: 'DEP',
+      productUserId: PUID,
+      accessToken: 'tok',
+      achievementIds: ['ACH_A', 'ACH_B'],
+    });
+    expect(url).toBe(`https://api.epicgames.dev/stats/v1/DEP/players/${PUID}/achievements/unlock`);
+    expect(JSON.parse(body)).toEqual({ achievementIds: ['ACH_A', 'ACH_B'] });
+    expect(headers.Authorization).toBe('Bearer tok');
+    expect(headers['Content-Type']).toBe('application/json');
+  });
+
+  it('parseClientCredentialsTokenResponse and mapping parse are defensive', () => {
+    expect(parseClientCredentialsTokenResponse({ access_token: 't' })).toBe('t');
+    expect(parseClientCredentialsTokenResponse({})).toBeNull();
+    expect(parseExternalAccountMappingResponse(MAPPING_BODY, UNLOCK_OPTS.epicAccountId)).toBe(PUID);
+    expect(parseExternalAccountMappingResponse({ ids: {} }, UNLOCK_OPTS.epicAccountId)).toBeNull();
+  });
+});
+
+describe('pushAchievementUnlocks (mocked fetchImpl)', () => {
+  it('walks token -> map -> unlock and returns true on 2xx unlock', async () => {
+    const fetchImpl = vi.fn(async (url: string) => {
+      if (String(url).includes('/auth/v1/oauth/token')) return jsonResponse(CLIENT_TOKEN_BODY);
+      if (String(url).includes('/user/v1/accounts')) return jsonResponse(MAPPING_BODY);
+      // Undici rejects Response bodies on 204; a bare 200 stands in for success.
+      if (String(url).includes('/achievements/unlock')) return new Response(null, { status: 200 });
+      throw new Error(`unexpected url ${url}`);
+    });
+    expect(
+      await pushAchievementUnlocks(
+        { ...UNLOCK_OPTS, achNames: [...UNLOCK_OPTS.achNames] },
+        fetchImpl as never,
+      ),
+    ).toBe(true);
+    expect(fetchImpl).toHaveBeenCalledTimes(3);
+    const unlockCall = fetchImpl.mock.calls[2] as unknown as [string, RequestInit];
+    expect(unlockCall[0]).toContain('/stats/v1/DEP/players/');
+    expect(unlockCall[0]).toContain('/achievements/unlock');
+    expect(unlockCall[1].method).toBe('POST');
+    expect(JSON.parse(String(unlockCall[1].body))).toEqual({
+      achievementIds: ['ACH_FIRST_STEPS', 'ACH_LEVEL_CAP'],
+    });
+  });
+
+  it('returns false when client token fetch fails (network)', async () => {
+    const fetchImpl = vi.fn(async () => {
+      throw new TypeError('fetch failed');
+    });
+    expect(
+      await pushAchievementUnlocks({ ...UNLOCK_OPTS, achNames: ['ACH_X'] }, fetchImpl as never),
+    ).toBe(false);
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns false when product user mapping is empty', async () => {
+    const fetchImpl = vi.fn(async (url: string) => {
+      if (String(url).includes('/auth/v1/oauth/token')) return jsonResponse(CLIENT_TOKEN_BODY);
+      if (String(url).includes('/user/v1/accounts')) return jsonResponse({ ids: {} });
+      throw new Error(`unexpected url ${url}`);
+    });
+    expect(
+      await pushAchievementUnlocks({ ...UNLOCK_OPTS, achNames: ['ACH_X'] }, fetchImpl as never),
+    ).toBe(false);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
+  it('returns false when unlock POST is non-2xx', async () => {
+    const fetchImpl = vi.fn(async (url: string) => {
+      if (String(url).includes('/auth/v1/oauth/token')) return jsonResponse(CLIENT_TOKEN_BODY);
+      if (String(url).includes('/user/v1/accounts')) return jsonResponse(MAPPING_BODY);
+      return jsonResponse({ error: 'server_error' }, 503);
+    });
+    expect(
+      await pushAchievementUnlocks({ ...UNLOCK_OPTS, achNames: ['ACH_X'] }, fetchImpl as never),
+    ).toBe(false);
+  });
+
+  it('empty achNames is a no-op success without fetch', async () => {
+    const fetchImpl = vi.fn(async () => jsonResponse({}));
+    expect(await pushAchievementUnlocks({ ...UNLOCK_OPTS, achNames: [] }, fetchImpl as never)).toBe(
+      true,
+    );
+    expect(fetchImpl).not.toHaveBeenCalled();
   });
 });
