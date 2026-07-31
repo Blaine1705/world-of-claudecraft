@@ -18,11 +18,14 @@ bots with all 1,000 alive at window close, and passed the rig's own gate
 (`evaluateProfessionsLoadRun`: unconditional join and liveness enforcement,
 per-observer sample floors, timer-wire arm purity, and window-scoped
 hollow-run evidence, whose floors scale with the window instead of accepting
-one lone harvest or fishing outcome as proof the run was not hollow). The
-gate also holds each observer's WORST inter-snapshot gap under a continuity
+one lone harvest or fishing outcome as proof the run was not hollow: one
+piece of role evidence per minute of window, `max(1, floor(durationMs /
+60000))`, which is 3 across the 180 s window used here). The gate also holds
+each observer's WORST inter-snapshot gap under a 10,000 ms continuity
 ceiling, so a mid-window stall fails the run rather than averaging away into
-a healthy mean; the ceiling is deliberately generous, and these four
-captures' worst gaps ran 707 to 795 ms. Every artifact stamps
+a healthy mean. These four captures clear both arms with margin: 15 to 20
+pieces of role evidence per observer against the floor of 3, and worst gaps
+of 707 to 795 ms against the ceiling. Every artifact stamps
 `gitHead f881426ba1`, the commit whose rig produced it, so the whole set
 shares one provenance. The fix-round commits that landed AFTER the capture
 touch no measured loop phase: most change the rig itself (transactional
@@ -42,13 +45,21 @@ recaptures after it read lower still.
 Artifacts, one per scenario beside this file:
 `professions-load-mixed-stable.json`, `professions-load-gather-legacy.json`,
 `professions-load-gather-stable.json`, `professions-load-fish-stable.json`.
-The rig now also stamps the gate's own inputs into each artifact: a
-per-observer evidence row (`gaps`, `sawStableTw`, `ncdSeen`,
-`fishingOutcomes`, worst gap), the pool metrics scraped from `/metrics`
-(waiting, total, idle), `gitDirty`, and `REPORT_MS`. The four artifacts
-committed here predate those fields, so their gate inputs live outside the
-files, in the run's console verdict and log; a recapture's artifact carries
-more than these do.
+The rig now also stamps the gate's own inputs into each artifact, under
+`observerEvidence`: one row per observer carrying `label`, `role`, `gaps`,
+`gapMaxMs` (the worst inter-snapshot gap the continuity arm reads),
+`sawStableTw`, `ncdFrames` (a COUNT of the snapshots whose ncd map arrived
+non-empty, not a boolean), and `fishingOutcomes`, so a reader can re-judge a
+committed capture instead of trusting the verdict line beside it. Alongside
+it the artifact carries `gitDirty`, `reportMs`, and the db-pool gauges
+`poolAtWindowOpen` and `poolAtWindowClose` (waiting, total, idle) scraped
+from `/metrics`. That endpoint is bearer-gated by the SERVER's
+`METRICS_TOKEN` (404 when the server has none, 401 on a wrong credential),
+so a run without the token stamps both pool fields null: disclosure, never a
+gate input, and such a run is still a valid capture. The four artifacts
+committed here predate every one of these fields, so their gate inputs live
+outside the files, in the run's console verdict and log; a recapture's
+artifact carries more than these do.
 
 ## Capture machine
 
@@ -78,13 +89,16 @@ docker run -d --name wocc-prof-load-pg -p 127.0.0.1:5434:5432 \
 # 256 soft default hits EMFILE partway up the ramp.
 ulimit -n 10240
 
+# METRICS_TOKEN is optional and must MATCH on both lines below: it is what
+# lets the rig scrape the db-pool gauges off the bearer-gated /metrics.
 ALLOW_DEV_COMMANDS=1 PERF_TICK_LOG=1 PORT=8799 DB_POOL_MAX_CLIENTS=80 \
+  METRICS_TOKEN=<metrics-token> \
   DATABASE_URL=postgres://eastbrook:<throwaway>@127.0.0.1:5434/eastbrook \
   npm run server
 
 DATABASE_URL=postgres://eastbrook:<throwaway>@127.0.0.1:5434/eastbrook \
   SERVER_URL=http://127.0.0.1:8799 BOTS=1000 MODE=mixed STABLE=1 \
-  DURATION_MS=180000 \
+  DURATION_MS=180000 METRICS_TOKEN=<metrics-token> \
   JSON_OUT=docs/design/player-performance/professions-load-mixed-stable.json \
   node scripts/load_professions.mjs
 ```
@@ -94,9 +108,10 @@ The four scenarios vary only `MODE` (`mixed` | `gather` | `fish`) and `STABLE`
 `scripts/*.mjs` client rides by default). The rig's own defaults carried the
 rest and are stamped into each artifact: `WARMUP_MS` 45000,
 `CONNECT_CONCURRENCY` 20, `OBSERVERS` 32, `TOUR_SEC` 6, `NODES_PER_BOT` 40,
-`STEP_MS` 250, `BOT_LEVEL` 60 (stamped as `botLevel`), and `REPORT_MS` 10000,
-the mid-window `/api/perf` scrape cadence: a 180 s window at one scrape per
-10 s is the 18 entries in every artifact's `serverPerfMid`. `REALM_NAME`
+`STEP_MS` 250, `BOT_LEVEL` 60 (stamped as `botLevel`), and `REPORT_MS` 10000
+(stamped as `reportMs`), the mid-window `/api/perf` scrape cadence: a 180 s
+window at one scrape per 10 s is the 18 entries in every artifact's
+`serverPerfMid`. `REALM_NAME`
 defaults to `Claudemoon` and must match the realm the server runs, so a
 locally renamed realm has to be passed to the rig as well.
 
@@ -130,8 +145,8 @@ Capture protocol, learned the hard way:
   callback drags past the server's 10 s auth deadline, and the handshakes
   still in flight starve. A mid-handshake socket death used to orphan a
   permanent lease-holding zombie session that made a character unjoinable;
-  that server
-  defect was found and FIXED in this phase (the ws_auth readyState re-check),
+  that server defect was found and FIXED in this phase (the ws_auth
+  readyState re-check),
   and post-fix the tail failures are clean rejections the ladder converges.
 - **Verify the fresh bind, by hand, before every scenario.** A dying server
   closes its listener before it finishes draining, so a quick restart can

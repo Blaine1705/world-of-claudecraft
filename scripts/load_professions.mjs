@@ -16,9 +16,11 @@
 // The verdict (scripts/lib/bench_gate.mjs, evaluateProfessionsLoadRun, pinned
 // by tests/bench_gate.test.ts) is a GATE: partial joins fail, a run whose
 // observers rode the wrong timer-wire arm fails (STABLE=1 must see the tw
-// echo, STABLE=0 must not), and a hollow run (no non-empty ncd for a gather
-// observer, zero fishing outcomes for a fish observer) fails. Evidence lands
-// in JSON_OUT before the exit code is decided.
+// echo, STABLE=0 must not), an observer that went quiet past the continuity
+// ceiling fails, and a hollow run fails (each role must show its own evidence
+// at least once per minute of window: non-empty ncd frames for a gather
+// observer, fishing outcomes for a fish one). Evidence lands in JSON_OUT
+// before the exit code is decided, the gate's own inputs included.
 //
 // Setup (full recipe: docs/design/player-performance/professions-load-baseline.md):
 //   ulimit -n 10240                      # BOTH shells: 1,000 sockets each side
@@ -31,7 +33,9 @@
 //      MODE (gather|fish|mixed), STABLE (1 = request the stable timer wire),
 //      DURATION_MS, WARMUP_MS, CONNECT_CONCURRENCY, STEP_MS, TOUR_SEC,
 //      NODES_PER_BOT, OBSERVERS, BOT_LEVEL, REPORT_MS, RUN_ID, JSON_OUT,
-//      CLEANUP=1.
+//      CLEANUP=1, METRICS_TOKEN (optional: the server's own METRICS_TOKEN,
+//      which lets the rig scrape the db-pool gauges off /metrics; without it
+//      the pool readouts stamp null and nothing else changes).
 //
 // Seeding is direct-to-Postgres like scripts/load_players.mjs (no bcrypt
 // register storm ahead of the measurement window); each bot rides its own
@@ -89,6 +93,7 @@ const BOT_LEVEL = boundedEnvInt(process.env.BOT_LEVEL, 60, 1, 60);
 const WARMUP_MS = boundedEnvInt(process.env.WARMUP_MS, 45000, 2000, 300000);
 const REPORT_MS = boundedEnvInt(process.env.REPORT_MS, 10000, 1000, 60000);
 const REALM = process.env.REALM_NAME ?? 'Claudemoon';
+const METRICS_TOKEN = process.env.METRICS_TOKEN ?? '';
 const JSON_OUT = process.env.JSON_OUT ?? '';
 const CLEANUP = process.env.CLEANUP === '1';
 const RUN_ID = (process.env.RUN_ID ?? '').replace(/[^a-z]/gi, '').slice(0, 8) || randomLetters(5);
@@ -232,10 +237,49 @@ async function seedBots(pool) {
   }
 }
 
+// Account ids deleted per statement. A single 1,000-id DELETE walks every
+// ON DELETE SET NULL referrer of every account inside ONE statement (several
+// of those referring columns carry no index), holds its locks for the whole
+// walk, and blocks behind any character save still in flight from the fleet
+// that just logged out. Chunking keeps each lock window short enough for
+// those saves to interleave instead of queueing behind the cleanup.
+const CLEANUP_CHUNK = 100;
+
 async function cleanupBots(pool, records) {
   const accountIds = records.map((r) => r.accountId);
-  if (accountIds.length === 0) return;
-  await pool.query('DELETE FROM accounts WHERE id = ANY($1::int[])', [accountIds]);
+  for (let i = 0; i < accountIds.length; i += CLEANUP_CHUNK) {
+    const chunk = accountIds.slice(i, i + CLEANUP_CHUNK);
+    await pool.query('DELETE FROM accounts WHERE id = ANY($1::int[])', [chunk]);
+  }
+}
+
+// The db-pool saturation gauges, scraped off the Prometheus exposition at
+// window open and close so an artifact says whether the pool was starved
+// while the numbers beside it were measured. /metrics is bearer-gated by the
+// SERVER's METRICS_TOKEN (server/http/health.ts handleMetricsGate: 404 when
+// the server has none, 401 on a wrong credential), which the capture recipe
+// does not require, so every failure arm stamps null. This is DISCLOSURE, not
+// a gate input: a run without the token is still a valid capture.
+async function scrapePoolClients() {
+  if (!METRICS_TOKEN) return null;
+  try {
+    const res = await fetch(`${BASE}/metrics`, {
+      headers: { Authorization: `Bearer ${METRICS_TOKEN}` },
+    });
+    if (!res.ok) return null;
+    const text = await res.text();
+    const out = { waiting: null, total: null, idle: null };
+    for (const state of Object.keys(out)) {
+      // prom-client renders one line per label set: woc_db_pool_clients{state="idle"} 7
+      const m = text.match(
+        new RegExp(`^woc_db_pool_clients\\{state="${state}"\\}\\s+(\\S+)$`, 'm'),
+      );
+      if (m) out[state] = Number(m[1]);
+    }
+    return out;
+  } catch {
+    return null;
+  }
 }
 
 class Bot {
@@ -260,7 +304,7 @@ class Bot {
     this.tslotCount = 0;
     this.tslotBytes = 0;
     this.sawStableTw = false;
-    this.ncdSeen = false;
+    this.ncdFrames = 0;
     this.fishingOutcomes = 0;
     // fish driver state
     this.fishState = 'idle';
@@ -280,7 +324,13 @@ class Bot {
   async join() {
     const authExtra = STABLE ? { timerWire: 2 } : {};
     await new Promise((resolve, reject) => {
-      this.ws = new WebSocket(`${WS_BASE}/ws`, { headers: { 'X-Forwarded-For': this.ip } });
+      // The socket is held in a LOCAL as well, and every handler that outlives
+      // the handshake is guarded on it: a retry pass replaces this.ws, and a
+      // late close or error from the abandoned socket must not mark the new
+      // session dead. Unreachable while the retry only ever runs on bots whose
+      // join failed, but the guard costs one comparison and removes the class.
+      const ws = new WebSocket(`${WS_BASE}/ws`, { headers: { 'X-Forwarded-For': this.ip } });
+      this.ws = ws;
       // A rejected join must CLOSE the socket: a hello landing after this
       // timeout would otherwise put an uncounted bot in the world and skew
       // both the join gate and the measurement (seen live: 831 alive of 627
@@ -288,7 +338,7 @@ class Bot {
       const abort = (err) => {
         clearTimeout(to);
         try {
-          this.ws.terminate();
+          ws.terminate();
         } catch {
           /* already gone */
         }
@@ -299,8 +349,8 @@ class Bot {
       // orphan a zombie session that holds the character lease for minutes
       // (the tail-of-ramp failure shape), so the rig never gives up early.
       const to = setTimeout(() => abort(new Error('join timeout')), 30000);
-      this.ws.on('open', () => {
-        this.ws.send(
+      ws.on('open', () => {
+        ws.send(
           JSON.stringify({ ...worldAuthMessage(this.token, this.characterId), ...authExtra }),
         );
       });
@@ -315,17 +365,21 @@ class Bot {
           this.pid = msg.id ?? msg.pid;
           this.alive = true;
           clearTimeout(to);
-          this.ws.off('message', onJoinMessage);
-          this.ws.on('message', (d) => this.onFrame(d));
+          ws.off('message', onJoinMessage);
+          ws.on('message', (d) => this.onFrame(d));
           this.seedSession();
           resolve();
         } else if (msg.t === 'error') {
           abort(new Error(msg.error ?? 'auth error'));
         }
       };
-      this.ws.on('message', onJoinMessage);
-      this.ws.on('error', (e) => abort(e));
-      this.ws.on('close', () => {
+      ws.on('message', onJoinMessage);
+      ws.on('error', (e) => {
+        if (this.ws !== ws) return;
+        abort(e);
+      });
+      ws.on('close', () => {
+        if (this.ws !== ws) return;
         this.alive = false;
       });
     });
@@ -418,7 +472,7 @@ class Bot {
       if (self && self.ncd !== undefined) {
         this.ncdCount += 1;
         this.ncdBytes += JSON.stringify(self.ncd).length;
-        if (Object.keys(self.ncd).length > 0) this.ncdSeen = true;
+        if (Object.keys(self.ncd).length > 0) this.ncdFrames += 1;
       }
       if (self && self.tslot !== undefined) {
         this.tslotCount += 1;
@@ -456,12 +510,45 @@ class Bot {
     this.tslotCount = 0;
     this.tslotBytes = 0;
     this.fishingOutcomes = 0;
-    // WINDOW-scoped evidence: ncdSeen resets with the counters (the review
+    // WINDOW-scoped evidence: ncdFrames resets with the counters (the review
     // round: a fleet that harvested only during warmup and then stalled for
     // the whole window must fail the hollow-run gate, exactly like the fish
     // arm's outcome count). sawStableTw alone survives: the wire arm is fixed
     // at join and cannot change inside the window.
-    this.ncdSeen = false;
+    this.ncdFrames = 0;
+  }
+}
+
+// The fleet's logout wave has to LAND before the pool closes and (under
+// CLEANUP) the accounts go: at 1,000 sockets the server takes longer than any
+// fixed sleep to run every close and save, and deleting accounts out from
+// under an in-flight character save is how a teardown poisons the database
+// for the next scenario. So the rig polls the server's own liveness count
+// instead of sleeping. Capped, because any unrelated local session counts
+// toward players_online and must never hang the rig.
+const DRAIN_CAP_MS = 30000;
+const DRAIN_POLL_MS = 250;
+
+async function waitForFleetDrain() {
+  const deadline = Date.now() + DRAIN_CAP_MS;
+  // One settle first: the close frames need a moment to reach the server
+  // before its own count means anything.
+  await sleep(DRAIN_POLL_MS);
+  for (;;) {
+    const st = await fetch(`${BASE}/api/status`)
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null);
+    // A server that cannot answer has no fleet left to drain (already down,
+    // or never up on a mid-seed abort), and neither does one reporting zero:
+    // waiting out the cap on the error path would only slow teardown down.
+    if (!st || !(st.players_online > 0)) return;
+    if (Date.now() >= deadline) {
+      console.log(
+        `[prof-load] ${st.players_online} still online after ${DRAIN_CAP_MS}ms; proceeding with teardown`,
+      );
+      return;
+    }
+    await sleep(DRAIN_POLL_MS);
   }
 }
 
@@ -472,19 +559,24 @@ let teardown = null;
 async function main() {
   const startIso = new Date().toISOString();
   let gitHead = 'unknown';
+  let gitDirty = false;
   try {
     gitHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT }).toString().trim();
+    gitDirty =
+      execFileSync('git', ['status', '--porcelain'], { cwd: ROOT }).toString().trim() !== '';
   } catch {
     /* not a git checkout */
   }
+  // Echoed through sanitizeBaseUrl on both arms: a basic-auth SERVER_URL must
+  // not reach the console any more than it may reach the committed artifact.
   console.log(
-    `[prof-load] target=${BASE} bots=${BOTS} mode=${MODE} stable=${STABLE ? 1 : 0} duration=${DURATION_MS}ms run=${RUN_ID}`,
+    `[prof-load] target=${sanitizeBaseUrl(BASE)} bots=${BOTS} mode=${MODE} stable=${STABLE ? 1 : 0} duration=${DURATION_MS}ms run=${RUN_ID}`,
   );
   const st = await fetch(`${BASE}/api/status`)
     .then((r) => r.json())
     .catch(() => null);
   if (!st?.ok) {
-    console.error('server not reachable / not ok at', BASE);
+    console.error('server not reachable / not ok at', sanitizeBaseUrl(BASE));
     process.exit(1);
   }
 
@@ -514,17 +606,23 @@ async function main() {
   // ramp).
   let records = [];
   let bots = [];
-  let stopping = false;
-  async function stop() {
-    if (stopping) return;
-    stopping = true;
+  // Idempotent AND awaitable. SIGINT, the fatal-error path, and the normal end
+  // of main can all reach stop(); a second caller must await the SAME teardown
+  // rather than return immediately (an early return let process.exit race the
+  // account delete that the first call was still running).
+  let stopPromise = null;
+  async function runStop() {
     for (const b of bots) b.close();
-    await sleep(300);
+    await waitForFleetDrain();
     if (CLEANUP) {
       console.log('[prof-load] cleanup enabled, deleting seeded accounts');
       await cleanupBots(pool, records);
     }
     await pool.end();
+  }
+  function stop() {
+    stopPromise ??= runStop();
+    return stopPromise;
   }
   teardown = stop;
   process.once('SIGINT', () => {
@@ -665,6 +763,35 @@ async function main() {
   // % 4 silently dropped most bots' inputs at any non-default STEP_MS).
   const inputModulus = Math.max(1, Math.round(1000 / STEP_MS));
   let serverPerfAtWindowOpen = null;
+  let poolAtWindowOpen = null;
+  // The periodic mid-window scrape is FIRE-AND-FORGET. Awaiting it inside the
+  // driver loop charged its round trip to that step's loop-lag sample (18 of
+  // the first capture's 720 samples), and on a saturated box one round trip is
+  // the size of a whole loop callback, so the rig's own instrument overstated
+  // itself. Overlap-guarded: a scrape slower than REPORT_MS skips the next
+  // turn instead of queueing round trips against the server it measures. The
+  // console line reads the LATEST landed sample, so it can be one report
+  // behind; the artifact's serverPerfMid rows carry their own atMs.
+  let perfScrapeInFlight = false;
+  let lastPerfSample = null;
+  function scrapeServerPerf() {
+    if (perfScrapeInFlight) return;
+    perfScrapeInFlight = true;
+    // Stamped at REQUEST time, and the window membership with it: a scrape
+    // fired during warmup must never land in perfMid with a window-relative
+    // offset it was not taken at.
+    const atMs = Math.round(performance.now() - start);
+    const inWindow = measuring;
+    fetch(`${BASE}/api/perf`)
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null)
+      .then((perf) => {
+        perfScrapeInFlight = false;
+        if (!perf) return;
+        lastPerfSample = perf;
+        if (inWindow) perfMid.push({ atMs, online: perf.online, tickHz: perf.tickHz });
+      });
+  }
   let driving = false;
   let measuring = false;
   let settleAt = Number.POSITIVE_INFINITY;
@@ -735,6 +862,7 @@ async function main() {
         serverPerfAtWindowOpen = await fetch(`${BASE}/api/perf`)
           .then((r) => (r.ok ? r.json() : null))
           .catch(() => null);
+        poolAtWindowOpen = await scrapePoolClients();
         for (const b of bots) b.resetMeasurement();
         measuring = true;
         start = performance.now();
@@ -748,17 +876,9 @@ async function main() {
       lastReport = performance.now();
       const alive = bots.filter((b) => b.alive).length;
       const mb = bots.reduce((a, b) => a + b.bytes, 0) / 1e6;
-      const perf = await fetch(`${BASE}/api/perf`)
-        .then((r) => (r.ok ? r.json() : null))
-        .catch(() => null);
-      if (perf && measuring)
-        perfMid.push({
-          atMs: Math.round(performance.now() - start),
-          online: perf.online,
-          tickHz: perf.tickHz,
-        });
+      scrapeServerPerf();
       console.log(
-        `[prof-load] ${measuring ? 't=' + Math.round((performance.now() - start) / 1000) + 's' : 'warmup'} alive=${alive} joined=${joined} rx=${mb.toFixed(1)}MB tickHz=${perf?.tickHz ?? '?'}`,
+        `[prof-load] ${measuring ? 't=' + Math.round((performance.now() - start) / 1000) + 's' : 'warmup'} alive=${alive} joined=${joined} rx=${mb.toFixed(1)}MB tickHz=${lastPerfSample?.tickHz ?? '?'}`,
       );
     }
   }
@@ -779,18 +899,29 @@ async function main() {
   // observer's short gap count must fail the sample floor with its label
   // rather than silently vanishing from the evidence.
   const observers = bots.filter((b) => b.isObserver);
-  const observerRows = observers.map((o) => ({
-    label: `obs-${o.index}`,
-    role: o.role,
-    gaps: gapStats(o.snapTimes).gaps,
-    sawStableTw: o.sawStableTw,
-    ncdSeen: o.ncdSeen,
-    fishingOutcomes: o.fishingOutcomes,
-  }));
+  const observerRows = observers.map((o) => {
+    const gaps = gapStats(o.snapTimes);
+    return {
+      label: `obs-${o.index}`,
+      role: o.role,
+      gaps: gaps.gaps,
+      // The WORST gap, which the gate's continuity arm reads: a mid-window
+      // stall the p95 averages away has to be visible to the verdict AND to
+      // whoever reads the artifact later.
+      gapMaxMs: gaps.max,
+      sawStableTw: o.sawStableTw,
+      ncdFrames: o.ncdFrames,
+      fishingOutcomes: o.fishingOutcomes,
+    };
+  });
+  const poolAtWindowClose = await scrapePoolClients();
   const report = {
     base: sanitizeBaseUrl(BASE),
     runId: RUN_ID,
     gitHead,
+    // A capture taken on a dirty tree is not reproducible from gitHead alone,
+    // and the artifact is the only place that fact survives the run.
+    gitDirty,
     startIso,
     bots: joined,
     aliveAtEnd,
@@ -803,6 +934,9 @@ async function main() {
     tourSec: TOUR_SEC,
     nodesPerBot: NODES_PER_BOT,
     stepMs: STEP_MS,
+    // The scrape cadence in force, so serverPerfMid's row count is readable
+    // against the window instead of against the default nobody may have run.
+    reportMs: REPORT_MS,
     fishSpots: spots.length,
     fishSpotRotations: bots.reduce((a, b) => a + b.spotRotations, 0),
     observersRequested: OBSERVERS,
@@ -816,10 +950,17 @@ async function main() {
         : 0,
     },
     roles: aggregateObservers(observers, { gapStats, sampleStats }),
+    // The gate's OWN inputs, stamped verbatim: a reader can re-judge a
+    // committed artifact instead of trusting the verdict line beside it.
+    observerEvidence: observerRows,
     rig: { loopLagMs: sampleStats(loopLag) },
     serverPerfAtWindowOpen,
     serverPerfMid: perfMid,
     serverPerf: perf,
+    // null when the server ran without METRICS_TOKEN (the endpoint is
+    // feature-off) or the rig was started without it: disclosure, not a gate.
+    poolAtWindowOpen,
+    poolAtWindowClose,
   };
   const verdict = evaluateProfessionsLoadRun({
     joined,
@@ -855,16 +996,31 @@ async function main() {
     );
   }
   console.log(`rig loop lag p95=${report.rig.loopLagMs.p95}ms max=${report.rig.loopLagMs.max}ms`);
+  if (poolAtWindowClose) {
+    console.log(
+      `db pool at close: waiting=${poolAtWindowClose.waiting} total=${poolAtWindowClose.total} idle=${poolAtWindowClose.idle}`,
+    );
+  }
   for (const f of verdict.failures) console.error(`GATE FAIL: ${f}`);
   console.log(`verdict: ${verdict.ok ? 'PASS' : 'FAIL'}`);
   if (JSON_OUT) {
     // Guarded: a bad path must cost the artifact, never the teardown or the
-    // verdict's exit code.
+    // verdict's exit code. Written to a sibling temp file and RENAMED into
+    // place (rename is atomic within a filesystem), so a write that dies
+    // midway leaves the previous artifact intact rather than truncating a
+    // capture nobody can re-run cheaply.
+    const tmpOut = `${JSON_OUT}.tmp`;
     try {
-      fs.writeFileSync(JSON_OUT, `${JSON.stringify(report, null, 2)}\n`);
+      fs.writeFileSync(tmpOut, `${JSON.stringify(report, null, 2)}\n`);
+      fs.renameSync(tmpOut, JSON_OUT);
       console.log(`wrote ${JSON_OUT}`);
     } catch (err) {
       console.error(`[prof-load] failed to write ${JSON_OUT}:`, err);
+      try {
+        fs.rmSync(tmpOut, { force: true });
+      } catch {
+        /* nothing to clean up */
+      }
     }
   }
 

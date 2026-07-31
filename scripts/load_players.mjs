@@ -10,10 +10,15 @@
 // `ALLOW_DEV_COMMANDS=1` is required for dev_level and dev_teleport.
 // `MAX_WS_PER_IP_HARD` must be higher than BOT_COUNT plus any browser sessions
 // opened from the same machine.
+//
+// SERVER_URL / GAME_URL and DATABASE_URL must all be loopback: the script
+// mints accounts, cheats, and deletes rows, so it refuses any remote target
+// (scripts/lib/loopback_guard.mjs).
 
 import { randomBytes } from 'node:crypto';
 import pg from 'pg';
 import WebSocket from 'ws';
+import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from './lib/loopback_guard.mjs';
 import { worldAuthMessage } from './lib/world_auth.mjs';
 
 try {
@@ -523,11 +528,19 @@ function report(bots, startedAt) {
 }
 
 async function main() {
+  // Safety FIRST: this script mints accounts straight into Postgres, drives
+  // /dev cheats, and can delete accounts on the way out, so every target has
+  // to be local before anything is touched. The shared control lives in
+  // scripts/lib/loopback_guard.mjs (the DATABASE arm validates the host
+  // node-postgres actually resolves, ?host= override and hostaddr included,
+  // and never echoes the credential-bearing value).
+  assertLoopbackUrl(SERVER_URL, 'SERVER_URL (or GAME_URL)');
   if (!DATABASE_URL) {
     throw new Error(
       'DATABASE_URL is required so the script can create disposable load-test accounts.',
     );
   }
+  assertLoopbackDatabaseUrl(DATABASE_URL);
   if (BOT_COUNT > 20) {
     console.log(
       `[load-players] start the server with MAX_WS_PER_IP_HARD=${BOT_COUNT + 5} or higher for ${BOT_COUNT} local clients`,

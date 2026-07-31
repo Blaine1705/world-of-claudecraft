@@ -117,6 +117,7 @@ import {
   parseHeartbeat,
   parseSimline,
 } from './lib/mob_stall_parse.mjs';
+import { sanitizeBaseUrl } from './lib/prof_load_util.mjs';
 import { worldAuthMessage } from './lib/world_auth.mjs';
 
 try {
@@ -325,13 +326,6 @@ function isAliveMob(entity) {
   // dwells attacking them.
   return entity?.k === 'mob' && !entity.dead && (entity.hp ?? 1) > 0;
 }
-
-// --- Loopback safety: refuse any non-local target before doing anything else.
-// The checks live in scripts/lib/loopback_guard.mjs (shared with
-// admin_professions_shot.mjs and load_professions.mjs, pinned by
-// tests/loopback_guard.test.ts); the DATABASE arm validates the host
-// node-postgres will ACTUALLY use (?host= override aware) and never echoes
-// the credential-bearing value. ---
 
 // --- Server-line handling (parsers live in ./lib/mob_stall_parse.mjs). ---
 
@@ -914,9 +908,16 @@ function printSummary(staging, bots) {
 // --- Orchestration. ---
 
 async function main() {
-  // Safety FIRST: refuse a non-loopback target before touching the DB or a server.
-  const url = assertLoopbackUrl(SERVER_URL, 'SERVER_URL');
-  console.log(`[mob-stall] target ${url.href} is loopback: ok`);
+  // Safety FIRST: refuse a non-loopback target before touching the DB or a
+  // server. The checks live in scripts/lib/loopback_guard.mjs (shared with
+  // admin_professions_shot.mjs, load_professions.mjs, and load_players.mjs,
+  // pinned by tests/loopback_guard.test.ts); the DATABASE arm validates the
+  // host node-postgres will ACTUALLY use (?host= override and hostaddr aware)
+  // and never echoes the credential-bearing value. The echoed target goes
+  // through sanitizeBaseUrl for the same reason: a basic-auth SERVER_URL must
+  // not land in the console log or the results file beside it.
+  assertLoopbackUrl(SERVER_URL, 'SERVER_URL');
+  console.log(`[mob-stall] target ${sanitizeBaseUrl(SERVER_URL)} is loopback: ok`);
 
   if (!DATABASE_URL) {
     throw new Error('DATABASE_URL is required so the harness can create disposable accounts.');
@@ -954,7 +955,7 @@ async function main() {
     clients: BOT_COUNT,
     botLevel: BOT_LEVEL,
     measureMs: MEASURE_MS,
-    serverUrl: SERVER_URL,
+    serverUrl: sanitizeBaseUrl(SERVER_URL),
     realm: REALM,
     runId: RUN_ID,
     mode: EXTERNAL_SERVER ? 'external' : 'child',
@@ -1014,7 +1015,9 @@ async function main() {
 
   try {
     if (EXTERNAL_SERVER) {
-      console.log(`[mob-stall] EXTERNAL_SERVER: attaching to ${SERVER_URL}, tailing ${SERVER_LOG}`);
+      console.log(
+        `[mob-stall] EXTERNAL_SERVER: attaching to ${sanitizeBaseUrl(SERVER_URL)}, tailing ${SERVER_LOG}`,
+      );
       // SERVER_LOG is a required input: an unreadable path would otherwise degrade
       // to zero heartbeats and a misleading staging failure.
       try {
@@ -1044,7 +1047,7 @@ async function main() {
       } catch {}
       if (occupied) {
         throw new Error(
-          `something is already listening on ${SERVER_URL}. Stop it first, or use ` +
+          `something is already listening on ${sanitizeBaseUrl(SERVER_URL)}. Stop it first, or use ` +
             'EXTERNAL_SERVER=1 with SERVER_LOG to attach to it on purpose.',
         );
       }

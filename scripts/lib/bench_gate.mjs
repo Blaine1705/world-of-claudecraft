@@ -171,16 +171,39 @@ export function profMinGapsFor(durationMs) {
   return Math.max(50, Math.floor(durationMs / 1000));
 }
 
+// The hollow-run floor, WINDOW-PROPORTIONAL. A single harvest or a single
+// landed cast is not evidence that a three-minute window did professions
+// work: the fleet could have produced it in the first second and idled the
+// rest, which is the same hollow artifact the boolean floor was written to
+// catch, only harder to see. One piece of role evidence per minute of window
+// (never below 1, so a sub-minute exploratory run still has to show
+// something). The committed 1,000-connection captures ran 15 to 20 per
+// observer over 180 s against a floor of 3, so honest runs clear it with
+// about 5x of margin.
+export function profMinRoleEventsFor(durationMs) {
+  return Math.max(1, Math.floor(durationMs / 60000));
+}
+
+// The per-observer continuity ceiling in milliseconds: no single
+// inter-snapshot gap may exceed it. Distribution summaries average a stall
+// away (a 10 s freeze inside a 180 s window barely moves a p95 taken over
+// hundreds of gaps), so the WORST gap is gated on its own. Deliberately
+// generous against the saturation this rig measures: the committed captures'
+// worst gaps ran 707 to 795 ms, more than 12x under the ceiling, so it fires
+// on a genuine mid-window stall and never on honest cadence shed.
+export const PROF_MAX_OBSERVER_GAP_MS = 10000;
+
 // Judges a professions load-rig run (scripts/load_professions.mjs, the R36
 // 1,000-concurrent baseline). Join enforcement is unconditional like the
 // sibling gates. The parsing OBSERVERS are the run's evidence: each must have
-// captured at least the shed-aware sample floor above, every observer must sit
+// captured at least the shed-aware sample floor above, no observer may have
+// gone quiet for longer than the continuity ceiling, every observer must sit
 // on the ARM the run claims (a stable run whose observer never saw the tw
 // echo, or a legacy run whose observer did, measured the wrong wire arm and
-// fails), and each role must show its professions evidence (a gather observer
-// whose own node-cooldown map never went non-empty, or a fish observer with
-// zero fishing outcome events, means the fleet idled and the artifact is
-// hollow).
+// fails), and each role must show a WINDOW-PROPORTIONAL amount of its
+// professions evidence (non-empty node-cooldown frames for a gather observer,
+// fishing outcome events for a fish one): too little of either means the
+// fleet idled and the artifact is hollow.
 export function evaluateProfessionsLoadRun({
   joined,
   expected,
@@ -192,8 +215,11 @@ export function evaluateProfessionsLoadRun({
 }) {
   const failures = [];
   if (!(Number.isFinite(joined) && joined === expected)) {
+    // "professions" is load-bearing: without it this string is byte-identical
+    // to evaluateJitterRun's join failure, and a message-only assertion could
+    // not tell which gate produced a verdict.
     failures.push(
-      `joined ${joined} of ${expected} bots; partial joins always fail (lower BOTS for exploratory runs)`,
+      `joined ${joined} of ${expected} professions bots; partial joins always fail (lower BOTS for exploratory runs)`,
     );
   }
   // Liveness is gated like the join: a fleet that bled sockets mid-window
@@ -206,6 +232,7 @@ export function evaluateProfessionsLoadRun({
     );
   }
   const minGaps = profMinGapsFor(durationMs);
+  const minRoleEvents = profMinRoleEventsFor(durationMs);
   const rows = observers ?? [];
   if (rows.length === 0) {
     failures.push('no parsing observers were staged; a run with no observer evidence fails');
@@ -224,6 +251,11 @@ export function evaluateProfessionsLoadRun({
         `observer ${o.label} captured ${o.gaps} snapshot gaps, below the ${minGaps} floor for ${durationMs}ms; too few samples to gate`,
       );
     }
+    if (!(Number.isFinite(o.gapMaxMs) && o.gapMaxMs <= PROF_MAX_OBSERVER_GAP_MS)) {
+      failures.push(
+        `observer ${o.label} went ${o.gapMaxMs}ms without a snapshot, past the ${PROF_MAX_OBSERVER_GAP_MS}ms continuity ceiling; the window carried a stall the averages hide`,
+      );
+    }
     if (stable && !o.sawStableTw) {
       failures.push(
         `observer ${o.label} never saw the stable timer-wire echo (tw); a STABLE=1 run that rode the legacy arm measured the wrong protocol`,
@@ -234,16 +266,19 @@ export function evaluateProfessionsLoadRun({
         `observer ${o.label} saw the stable timer-wire echo (tw) on a legacy run; the arm under measurement is not the one claimed`,
       );
     }
-    if (o.role === 'gather' && !o.ncdSeen) {
+    if (o.role === 'gather' && !(Number.isFinite(o.ncdFrames) && o.ncdFrames >= minRoleEvents)) {
       failures.push(
-        `gather observer ${o.label} never received a non-empty node-cooldown map (ncd); no harvest completed, the run is hollow`,
+        `gather observer ${o.label} received ${o.ncdFrames} snapshots carrying a non-empty node-cooldown map (ncd), under the ${minRoleEvents} floor for ${durationMs}ms; too few harvests landed, the run is hollow`,
       );
     }
-    if (o.role === 'fish' && !(Number.isFinite(o.fishingOutcomes) && o.fishingOutcomes >= 1)) {
+    if (
+      o.role === 'fish' &&
+      !(Number.isFinite(o.fishingOutcomes) && o.fishingOutcomes >= minRoleEvents)
+    ) {
       failures.push(
-        `fish observer ${o.label} saw ${o.fishingOutcomes} fishing outcome events; no cast resolved, the run is hollow`,
+        `fish observer ${o.label} saw ${o.fishingOutcomes} fishing outcome events, under the ${minRoleEvents} floor for ${durationMs}ms; too few casts resolved, the run is hollow`,
       );
     }
   }
-  return { ok: failures.length === 0, failures, minGaps };
+  return { ok: failures.length === 0, failures, minGaps, minRoleEvents };
 }

@@ -53,10 +53,14 @@ const AUTHENTICATED_NODE_CLIENTS = [
   {
     // The phase 16 professions load rig; the spread carries the optional
     // stable timer-wire capability (STABLE=1) next to the shared auth shape.
-    // The literal is the biome-wrapped form, whitespace-normalized.
+    // Pinned to the payload CORE rather than the whole call: this line sits
+    // right at the wrap width, so the send() prefix moved on and off its own
+    // line with every nearby edit and reddened the pin for no behavioral
+    // reason. The core still proves what the row is for, that this script
+    // passes ITS OWN token and character id (never another bot's) through the
+    // shared helper, with the capability spread beside them.
     path: 'scripts/load_professions.mjs',
-    authSend:
-      'this.ws.send( JSON.stringify({ ...worldAuthMessage(this.token, this.characterId), ...authExtra }), );',
+    authSend: '...worldAuthMessage(this.token, this.characterId), ...authExtra',
   },
   {
     path: 'scripts/mob_stall_repro.mjs',

@@ -8,9 +8,11 @@ import {
   FULLSCREEN_DRAW_FLOOR,
   gapStats,
   minGapsFor,
+  PROF_MAX_OBSERVER_GAP_MS,
   parseCeilingEnv,
   pct,
   profMinGapsFor,
+  profMinRoleEventsFor,
   sampleStats,
 } from '../scripts/lib/bench_gate.mjs';
 
@@ -308,6 +310,10 @@ describe('gapStats percentile convention', () => {
 
   it('clamps the top rank to the last element and maps an empty set to zero', () => {
     expect(pct([7], 99)).toBe(7);
+    // p100 computes index 3 on a 3-element series: without the
+    // Math.min(length - 1, ...) clamp this reads undefined and every p99-ish
+    // ceiling comparison downstream goes vacuous.
+    expect(pct([1, 2, 3], 100)).toBe(3);
     expect(pct([], 50)).toBe(0);
   });
 
@@ -411,30 +417,6 @@ describe('sampleStats distribution summary', () => {
     expect(s.p50).toBe(1);
     expect(s.max).toBe(2);
   });
-
-  it('treats null and undefined observers exactly like an empty staging', () => {
-    for (const observers of [null, undefined]) {
-      const v = evaluateProfessionsLoadRun({ ...PROF_RUN, observers });
-      expect(v.ok).toBe(false);
-      expect(v.failures.some((f) => f.includes('no parsing observers'))).toBe(true);
-    }
-  });
-
-  it('refuses a non-finite joined count as a join failure, and ONLY that arm fires', () => {
-    const v = evaluateProfessionsLoadRun({
-      ...PROF_RUN,
-      joined: Number.NaN,
-      observers: [
-        profObserver(),
-        profObserver({ label: 'obs-9', role: 'fish', ncdSeen: false, fishingOutcomes: 2 }),
-      ],
-    });
-    expect(v.ok).toBe(false);
-    // The liveness arm also renders "of 1000", so the length pin plus the
-    // joined-specific prefix is what proves WHICH arm fired.
-    expect(v.failures).toHaveLength(1);
-    expect(v.failures[0]).toContain('joined NaN of 1000');
-  });
 });
 
 // A healthy observer row; each case overrides the one field under test.
@@ -445,8 +427,9 @@ function profObserver(
     label: 'obs-3',
     role: 'gather',
     gaps: 500,
+    gapMaxMs: 900,
     sawStableTw: true,
-    ncdSeen: true,
+    ncdFrames: 12,
     fishingOutcomes: 0,
     ...over,
   };
@@ -461,17 +444,44 @@ const PROF_RUN = {
   durationMs: 30000,
 };
 
+// The committed 1,000-connection window, whose floors every recapture has to
+// keep clearing: 180 s, worst gaps around 700 to 800 ms, 15 to 20 pieces of
+// role evidence per observer.
+const PROF_RUN_180S = { ...PROF_RUN, durationMs: 180000 };
+
 describe('evaluateProfessionsLoadRun join and observer floors', () => {
   const fishObs = profObserver({
     label: 'obs-9',
     role: 'fish',
-    ncdSeen: false,
+    ncdFrames: 0,
     fishingOutcomes: 4,
   });
 
   it('passes a fully-joined mixed run with healthy observers on the claimed arm', () => {
     const v = evaluateProfessionsLoadRun({ ...PROF_RUN, observers: [profObserver(), fishObs] });
-    expect(v).toEqual({ ok: true, failures: [], minGaps: 50 });
+    expect(v).toEqual({ ok: true, failures: [], minGaps: 50, minRoleEvents: 1 });
+  });
+
+  it('passes the committed 180 s capture shape with its real evidence counts', () => {
+    // The compatibility check the fix round owes the four checked-in
+    // artifacts: 283 snapshots an observer (282 gaps), worst gaps 707 to 795
+    // ms, 15 to 20 ncd frames / fishing outcomes each, against the 180 s
+    // floors (180 gaps, 3 role events, 10 s continuity ceiling).
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN_180S,
+      observers: [
+        profObserver({ gaps: 282, gapMaxMs: 708.7, ncdFrames: 15 }),
+        profObserver({
+          label: 'obs-9',
+          role: 'fish',
+          gaps: 282,
+          gapMaxMs: 795,
+          ncdFrames: 0,
+          fishingOutcomes: 20,
+        }),
+      ],
+    });
+    expect(v).toEqual({ ok: true, failures: [], minGaps: 180, minRoleEvents: 3 });
   });
 
   it('pins the shed-aware floor: one gap per second of window with a 50-gap minimum', () => {
@@ -481,6 +491,8 @@ describe('evaluateProfessionsLoadRun join and observer floors', () => {
     expect(profMinGapsFor(180000)).toBe(180);
     expect(profMinGapsFor(30000)).toBe(50);
     expect(profMinGapsFor(51000)).toBe(51);
+    // 51500 ms is 51.5 gaps: FLOOR keeps 51, a round() drift reads 52.
+    expect(profMinGapsFor(51500)).toBe(51);
     expect(profMinGapsFor(180000)).not.toBe(minGapsFor(180000));
   });
 
@@ -493,6 +505,41 @@ describe('evaluateProfessionsLoadRun join and observer floors', () => {
     expect(v.ok).toBe(false);
     expect(v.failures).toHaveLength(1);
     expect(v.failures[0]).toContain('joined 999 of 1000');
+    // The word that tells this gate's join failure apart from the jitter
+    // gate's otherwise byte-identical one.
+    expect(v.failures[0]).toContain('professions bots');
+  });
+
+  it('enforces the join exactly, an overshoot fails too', () => {
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      joined: 1001,
+      observers: [profObserver(), fishObs],
+    });
+    expect(v.ok).toBe(false);
+    expect(v.failures).toHaveLength(1);
+    expect(v.failures[0]).toContain('joined 1001 of 1000');
+  });
+
+  it('treats null and undefined observers exactly like an empty staging', () => {
+    for (const observers of [null, undefined]) {
+      const v = evaluateProfessionsLoadRun({ ...PROF_RUN, observers });
+      expect(v.ok).toBe(false);
+      expect(v.failures.some((f) => f.includes('no parsing observers'))).toBe(true);
+    }
+  });
+
+  it('refuses a non-finite joined count as a join failure, and ONLY that arm fires', () => {
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      joined: Number.NaN,
+      observers: [profObserver(), fishObs],
+    });
+    expect(v.ok).toBe(false);
+    // The liveness arm also renders "of 1000", so the length pin plus the
+    // joined-specific prefix is what proves WHICH arm fired.
+    expect(v.failures).toHaveLength(1);
+    expect(v.failures[0]).toContain('joined NaN of 1000');
   });
 
   it('fails a run with no observers at all as missing evidence', () => {
@@ -534,6 +581,63 @@ describe('evaluateProfessionsLoadRun join and observer floors', () => {
       observers: [profObserver({ gaps: 50 }), fishObs],
     });
     expect(v.ok).toBe(true);
+  });
+
+  it('refuses a non-finite gap count as missing evidence, not as a passing count', () => {
+    // Infinity satisfies `>= minGaps` while carrying no evidence at all, so
+    // the finite guard is what stands between a dead counter and a pass.
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      observers: [profObserver({ gaps: Number.POSITIVE_INFINITY }), fishObs],
+    });
+    expect(v.ok).toBe(false);
+    expect(v.failures).toHaveLength(1);
+    expect(v.failures[0]).toContain('too few samples to gate');
+  });
+});
+
+describe('evaluateProfessionsLoadRun continuity ceiling', () => {
+  const fishObs = profObserver({
+    label: 'obs-9',
+    role: 'fish',
+    ncdFrames: 0,
+    fishingOutcomes: 4,
+  });
+
+  it('pins the ceiling constant and passes an observer sitting exactly on it', () => {
+    expect(PROF_MAX_OBSERVER_GAP_MS).toBe(10000);
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      observers: [profObserver({ gapMaxMs: 10000 }), fishObs],
+    });
+    expect(v.ok).toBe(true);
+  });
+
+  it('fails one millisecond past the ceiling, naming the observer and both values', () => {
+    // A mid-window stall is exactly what the distribution summaries average
+    // away: this observer's gap COUNT and its p95 are healthy, and only the
+    // worst gap says the run froze.
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      observers: [profObserver({ gapMaxMs: 10001 }), fishObs],
+    });
+    expect(v.ok).toBe(false);
+    expect(v.failures).toHaveLength(1);
+    expect(v.failures[0]).toContain('obs-3');
+    expect(v.failures[0]).toContain('10001');
+    expect(v.failures[0]).toContain('10000');
+  });
+
+  it('refuses a missing or non-finite worst gap as missing evidence', () => {
+    for (const gapMaxMs of [Number.NaN, Number.POSITIVE_INFINITY, undefined]) {
+      const v = evaluateProfessionsLoadRun({
+        ...PROF_RUN,
+        observers: [profObserver({ gapMaxMs } as Partial<ProfessionsObserverEvidence>), fishObs],
+      });
+      expect(v.ok, String(gapMaxMs)).toBe(false);
+      expect(v.failures).toHaveLength(1);
+      expect(v.failures[0]).toContain('continuity ceiling');
+    }
   });
 });
 
@@ -577,7 +681,7 @@ describe('evaluateProfessionsLoadRun hollow-run evidence', () => {
     const v = evaluateProfessionsLoadRun({
       ...PROF_RUN,
       mode: 'gather',
-      observers: [profObserver({ ncdSeen: false })],
+      observers: [profObserver({ ncdFrames: 0 })],
     });
     expect(v.ok).toBe(false);
     expect(v.failures).toHaveLength(1);
@@ -595,13 +699,83 @@ describe('evaluateProfessionsLoadRun hollow-run evidence', () => {
     expect(v.failures[0]).toContain('fishing outcome events');
   });
 
-  it('passes a fish observer at exactly one fishing outcome', () => {
+  it('pins the WINDOW-PROPORTIONAL floor: one piece of role evidence a minute', () => {
+    expect(profMinRoleEventsFor(180000)).toBe(3);
+    expect(profMinRoleEventsFor(60000)).toBe(1);
+    // 150000 ms is 2.5 minutes: FLOOR keeps 2, a round() drift reads 3.
+    expect(profMinRoleEventsFor(150000)).toBe(2);
+    // Never below one, however short the exploratory window.
+    expect(profMinRoleEventsFor(59999)).toBe(1);
+    expect(profMinRoleEventsFor(5000)).toBe(1);
+  });
+
+  it('fails a 180 s window one event under the floor, each role, and passes AT it', () => {
+    // The whole point of replacing the boolean: two harvests across three
+    // minutes used to pass as "not hollow". The window carries the floor now.
+    const gatherShort = evaluateProfessionsLoadRun({
+      ...PROF_RUN_180S,
+      mode: 'gather',
+      observers: [profObserver({ gaps: 282, ncdFrames: 2 })],
+    });
+    expect(gatherShort.ok).toBe(false);
+    expect(gatherShort.failures).toHaveLength(1);
+    expect(gatherShort.failures[0]).toContain('received 2 snapshots');
+    expect(gatherShort.failures[0]).toContain('under the 3 floor');
+    const fishShort = evaluateProfessionsLoadRun({
+      ...PROF_RUN_180S,
+      mode: 'fish',
+      observers: [profObserver({ label: 'obs-9', role: 'fish', gaps: 282, fishingOutcomes: 2 })],
+    });
+    expect(fishShort.ok).toBe(false);
+    expect(fishShort.failures).toHaveLength(1);
+    expect(fishShort.failures[0]).toContain('saw 2 fishing outcome events');
+    expect(fishShort.failures[0]).toContain('under the 3 floor');
+    const atFloor = evaluateProfessionsLoadRun({
+      ...PROF_RUN_180S,
+      observers: [
+        profObserver({ gaps: 282, ncdFrames: 3 }),
+        profObserver({ label: 'obs-9', role: 'fish', gaps: 282, ncdFrames: 0, fishingOutcomes: 3 }),
+      ],
+    });
+    expect(atFloor.ok).toBe(true);
+  });
+
+  it('passes a short run at exactly one piece of evidence per role', () => {
     const v = evaluateProfessionsLoadRun({
       ...PROF_RUN,
-      mode: 'fish',
-      observers: [profObserver({ label: 'obs-9', role: 'fish', fishingOutcomes: 1 })],
+      observers: [
+        profObserver({ ncdFrames: 1 }),
+        profObserver({ label: 'obs-9', role: 'fish', ncdFrames: 0, fishingOutcomes: 1 }),
+      ],
     });
+    expect(v.minRoleEvents).toBe(1);
     expect(v.ok).toBe(true);
+  });
+
+  it('refuses a non-finite evidence count on either role arm', () => {
+    // Infinity clears every `>= floor` comparison while proving nothing.
+    const gather = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      mode: 'gather',
+      observers: [profObserver({ ncdFrames: Number.POSITIVE_INFINITY })],
+    });
+    expect(gather.ok).toBe(false);
+    expect(gather.failures).toHaveLength(1);
+    expect(gather.failures[0]).toContain('node-cooldown map');
+    const fish = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      mode: 'fish',
+      observers: [
+        profObserver({
+          label: 'obs-9',
+          role: 'fish',
+          fishingOutcomes: Number.POSITIVE_INFINITY,
+        }),
+      ],
+    });
+    expect(fish.ok).toBe(false);
+    expect(fish.failures).toHaveLength(1);
+    expect(fish.failures[0]).toContain('fishing outcome events');
   });
 
   it('does not demand ncd evidence of a fish observer nor outcomes of a gather observer', () => {
@@ -610,23 +784,62 @@ describe('evaluateProfessionsLoadRun hollow-run evidence', () => {
       ...PROF_RUN,
       observers: [
         profObserver({ fishingOutcomes: 0 }),
-        profObserver({ label: 'obs-9', role: 'fish', ncdSeen: false, fishingOutcomes: 2 }),
+        profObserver({ label: 'obs-9', role: 'fish', ncdFrames: 0, fishingOutcomes: 2 }),
       ],
     });
     expect(v.ok).toBe(true);
+  });
+});
+
+describe('evaluateProfessionsLoadRun role staging requirements', () => {
+  const fishOnlyRow = profObserver({
+    label: 'obs-9',
+    role: 'fish',
+    ncdFrames: 0,
+    fishingOutcomes: 2,
   });
 
   it('fails a mixed run that staged only one of the two roles, each direction', () => {
     const gatherOnly = evaluateProfessionsLoadRun({ ...PROF_RUN, observers: [profObserver()] });
     expect(gatherOnly.ok).toBe(false);
     expect(gatherOnly.failures.some((f) => f.includes('no fish observer'))).toBe(true);
-    const fishOnly = evaluateProfessionsLoadRun({
-      ...PROF_RUN,
-      observers: [
-        profObserver({ label: 'obs-9', role: 'fish', ncdSeen: false, fishingOutcomes: 2 }),
-      ],
-    });
+    const fishOnly = evaluateProfessionsLoadRun({ ...PROF_RUN, observers: [fishOnlyRow] });
     expect(fishOnly.ok).toBe(false);
     expect(fishOnly.failures.some((f) => f.includes('no gather observer'))).toBe(true);
+  });
+
+  it('demands the matching role on a SINGLE-mode run too, each direction', () => {
+    // The mixed-only pins above survive a mutant that reads
+    // `mode === 'mixed'` for both wants: these two do not. A gather run
+    // observed only by a fish bot measured nothing it claims to.
+    const gatherRun = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      mode: 'gather',
+      observers: [fishOnlyRow],
+    });
+    expect(gatherRun.ok).toBe(false);
+    expect(gatherRun.failures.some((f) => f.includes('no gather observer'))).toBe(true);
+    const fishRun = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      mode: 'fish',
+      observers: [profObserver()],
+    });
+    expect(fishRun.ok).toBe(false);
+    expect(fishRun.failures.some((f) => f.includes('no fish observer'))).toBe(true);
+  });
+
+  it('does not demand the OTHER role on a single-mode run', () => {
+    const gatherRun = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      mode: 'gather',
+      observers: [profObserver()],
+    });
+    expect(gatherRun.ok).toBe(true);
+    const fishRun = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      mode: 'fish',
+      observers: [fishOnlyRow],
+    });
+    expect(fishRun.ok).toBe(true);
   });
 });

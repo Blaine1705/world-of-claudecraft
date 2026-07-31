@@ -61,6 +61,20 @@ describe('lettersOf and ipFor', () => {
     }
     expect(seen.size).toBe(1201);
   });
+
+  it('ipFor is collision-free across the whole documented 1..65535 range', () => {
+    // The docstring promises the full 16-bit range, not just a fleet-sized
+    // slice, and the two octets are exactly 16 bits of the index: a sweep is
+    // the only thing that proves the claim, and it costs milliseconds.
+    const seen = new Set<string>();
+    for (let i = 1; i <= 65535; i++) seen.add(ipFor(i));
+    expect(seen.size).toBe(65535);
+    // Literal edges and one carry point. Distinctness alone survives an octet
+    // SWAP (it is still a bijection); these three do not.
+    expect(ipFor(1)).toBe('10.77.0.1');
+    expect(ipFor(256)).toBe('10.77.1.0');
+    expect(ipFor(65535)).toBe('10.77.255.255');
+  });
 });
 
 describe('sanitizeBaseUrl', () => {
@@ -124,6 +138,30 @@ describe('findFishingSpots', () => {
     const drySim = { ...sim, firstFishableSampleAhead: () => null };
     expect(findFishingSpots(drySim, 4)).toEqual([]);
   });
+
+  it('dedupes by cell so a fishable ANCHOR does not fill the list with one coordinate', () => {
+    // A 20-yard dry disc makes the anchor cell itself fishable (the 24-yard
+    // ray tip clears the disc), which is what makes the seen-cell dedupe
+    // bite: radius 0 probes all 8 angles at the SAME (x, z), so without the
+    // dedupe every one of them qualifies and the rig stands its whole fish
+    // fleet on one spawn-pileup coordinate (the surviving mutant returned 6
+    // spots at a single point).
+    const anchorFishable = {
+      ...sim,
+      groundHeight: (x: number, z: number, _seed: number) =>
+        Math.hypot(x, z) < 20 || Math.hypot(x - 500, z - 500) < 20 ? 10 : -10,
+      firstFishableSampleAhead: (x: number, z: number, facing: number, _seed: number) => {
+        const sx = x + Math.sin(facing) * 24;
+        const sz = z + Math.cos(facing) * 24;
+        const dry = Math.hypot(sx, sz) < 20 || Math.hypot(sx - 500, sz - 500) < 20;
+        return dry ? null : { x: sx, z: sz, water: 0 };
+      },
+    };
+    const spots = findFishingSpots(anchorFishable, 6);
+    expect(spots.length).toBe(6);
+    const coordinates = new Set(spots.map((s) => `${s.x},${s.z}`));
+    expect(coordinates.size).toBe(spots.length);
+  });
 });
 
 describe('aggregateObservers', () => {
@@ -154,6 +192,57 @@ describe('aggregateObservers', () => {
     expect(g.ncd.presenceRatio).toBe(0.5); // 2 of 4 snapshots carried ncd
     expect(g.ncd.bytesPerSnapshot).toBe(20); // 80 bytes over 4 snapshots
     expect(g.ncd.bytesWhenPresent).toBe(40);
+  });
+
+  it('attributes the tslot budget on its OWN counters, never the ncd ones', () => {
+    // Every tslot number is distinct from every ncd number on this fixture,
+    // so a copy-pasted ncd block, a swapped denominator, or a deleted tslot
+    // block each lands on a value asserted here (the whole block previously
+    // had ZERO assertions and three mutants survived it).
+    const out = aggregateObservers(
+      [observer({ snapCount: 4, ncdCount: 1, ncdBytes: 40, tslotCount: 3, tslotBytes: 60 })],
+      { gapStats, sampleStats },
+    );
+    const g = out.gather;
+    if (!g) throw new Error('gather aggregate missing');
+    expect(g.tslot.presenceRatio).toBe(0.75); // 3 of the 4 snapshots carried tslot
+    expect(g.tslot.bytesPerSnapshot).toBe(15); // 60 bytes spread over 4 snapshots
+    expect(g.tslot.bytesWhenPresent).toBe(20); // 60 bytes over the 3 that had it
+    expect(g.ncd.presenceRatio).toBe(0.25);
+    expect(g.ncd.bytesPerSnapshot).toBe(10);
+    expect(g.ncd.bytesWhenPresent).toBe(40);
+  });
+
+  it('reduces a dead observer to zeros, never NaN', () => {
+    // The rig hands the aggregator EVERY staged observer, alive or not, so a
+    // socket that died before the window opened arrives with empty arrays and
+    // a zero snapshot count. Each ratio divides by that count.
+    const out = aggregateObservers(
+      [
+        observer({
+          snapSizes: [],
+          snapTimes: [],
+          snapCount: 0,
+          ncdCount: 0,
+          ncdBytes: 0,
+          tslotCount: 0,
+          tslotBytes: 0,
+        }),
+      ],
+      { gapStats, sampleStats },
+    );
+    const g = out.gather;
+    if (!g) throw new Error('gather aggregate missing');
+    expect(g.observers).toBe(1);
+    expect(g.snapshots).toBe(0);
+    expect(g.snapBytes).toEqual({ count: 0, mean: 0, p50: 0, p95: 0, p99: 0, max: 0 });
+    expect(g.gapP95Median).toBe(0);
+    expect(g.gapMaxWorst).toBe(0);
+    for (const budget of [g.ncd, g.tslot]) {
+      expect(budget.presenceRatio).toBe(0);
+      expect(budget.bytesPerSnapshot).toBe(0);
+      expect(budget.bytesWhenPresent).toBe(0);
+    }
   });
 
   it('the gap median mirrors the pct floor convention on an even observer count', () => {
