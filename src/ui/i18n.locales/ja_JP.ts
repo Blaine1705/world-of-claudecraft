@@ -10663,7 +10663,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.wornTagIndexed': '装備中 ({slot}{index})',
   'hudChrome.auraOverlay.title': 'オーラ',
   'hudChrome.auraOverlay.currentClass': '現在のクラス: {class}',
-  'hudChrome.auraOverlay.previewHint': '「位置を設定」でオーラを動かし、メニューを隠さないようにします。',
+  'hudChrome.auraOverlay.previewHint':
+    '「位置を設定」でオーラを動かし、メニューを隠さないようにします。',
   'hudChrome.auraOverlay.noProcs': 'このキャラクターに対応する発動効果がありません。',
   'hudChrome.auraOverlay.enabled': 'オーラを表示',
   'hudChrome.auraOverlay.icon': 'スペルアイコン',
