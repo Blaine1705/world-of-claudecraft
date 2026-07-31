@@ -97,7 +97,11 @@ Capture protocol, learned the hard way:
   the new server's log contains no EADDRINUSE, something LISTENS on the port
   (`lsof -nP -iTCP:8799 -sTCP:LISTEN`), and `/api/status` reports
   `"players_online":0`. Abort the scenario if any check fails; the recipe
-  has no committed wrapper that does this for you.
+  has no committed wrapper that does this for you. After a release merge, do
+  one throwaway boot first: ensureSchema's boot-time CREATE INDEX
+  CONCURRENTLY migrations (v0.33.0 added play_sessions_ended_account) build
+  on a grown throwaway database while the boot holds the advisory lock, and
+  the three checks read that first boot as a wedged server.
 - **The rig measures itself.** `rig.loopLagMs` in each artifact is the
   driver-loop lag; at 1,000 sockets on the shared box its p95 ran 313 to
   508 ms across the four captures, so treat client-side GAP numbers as
@@ -127,6 +131,11 @@ Capture protocol, learned the hard way:
   (chat logs, reports, moderation trails) keep their rows. Fine for a
   disposable container; never point the rig anywhere else (the loopback
   guards refuse it).
+- **The entity counts are capture-time-relative.** The four tables' 1,824 to
+  1,832 entities predate the v0.33.0 rift scheduler (one portal per eligible
+  zone hourly, eleven eligible zones): a recapture at the merged tip reads
+  about ten entities higher from rift portal ground objects, from the rift
+  cadence and not from anything the professions path does.
 
 ## Results
 

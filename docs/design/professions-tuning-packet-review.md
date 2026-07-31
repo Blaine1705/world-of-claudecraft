@@ -2984,8 +2984,11 @@ cprof/prof/gprof per-tick rebuild-and-stringify above the heavy gate
 candidates recorded with the PartyFrameProjectionCache precedent,
 deferred because bcastSelf measured flat at 1,000); zoneAt's O(zones)
 linear scan and emitToZonePlayers' O(players x zones) per rare proc
-(benign at 1/90); the hover raycast over all world node meshes (about
-8 Hz, bounded today); nodeHarvestReadyAt's session-monotonic growth
+(benign at 1/90; the v0.33.0 merge adds zoneContaining, a second
+O(zones) scan once per mob death); the hover raycast over the node
+group (instanced batches per type and z-band since the v0.33.0
+draw-call diet; about 8 Hz, bounded today); nodeHarvestReadyAt's
+session-monotonic growth
 toward 120 keys (a runtime prune was rejected as delicate against the
 save doctrine); the ClientWorld toolEffectSlots mirror staying a fresh
 mutable array where the Sim returns the shared frozen instance (inert,
@@ -2995,6 +2998,54 @@ disclosed rather than gated and the tslot non-empty arm CI-only by
 design; and this file's own R37 prose ("no zone beyond the built-in
 three") remaining stale against the v0.32.0 starter kits, which
 `tests/professions_zone_rollout.test.ts` already records.
+
+**v0.33.0 sync-merge premise corrections** (2026-07-31, the
+release-merge audit over merge 49fcacb701; release/v0.33.0 was REBASED,
+so the true merge base is 2ef4d9b891, not the previously synced
+b0acba0ad). The zone-scaling verified negative HOLDS at the merged tip
+(the release's respawn-tier work is mob-only and per-death; the four
+GATHER_NODES walks are unchanged). Corrections the merge forced:
+
+- R45 is FALSIFIED by the release's instanced exchange pipes (#2507):
+  a signed charm now lists on the World Market and mails like any
+  instanced item, because market and mail refuse only quest kind,
+  noMarketList or soulbound, and locked copies, and the two charm defs
+  carry none of those flags. Restoring the hand-to-hand-only intent
+  needs an explicit noMarketList or soulbound flag on the charm defs:
+  MAINTAINER decision, flagged not changed (R45+ veto rule). The phase
+  12 handoff wording ("signed copies never list on the market and never
+  mail") must NOT be published by the phase 17 wiki sweep; the
+  items.ts charm comment was corrected in the merge-audit commit.
+- R37's prose scope is sharpened once more: the derived guard's true
+  scope is "no zone beyond the built-in three carries professions
+  stations, catch tables, or above-tier-1 nodes" (the release added
+  corpse-harvest componentTags on mobs across eight later zones; the
+  guard is unaffected and green).
+- R31's stated facts hold, but one acceptance ground weakened: Thornpeak
+  sits in the endgame respawn tier now, so trash respawn went 25 s to
+  180 s while the 240 s node timer still exceeds it; the faucet's rate
+  bound survives, the undefended-camp window is 7.2x longer. Maintainer
+  awareness, not a doc error.
+- Phase 17 sizing: the release already reworded and refilled six
+  professions and economy prose keys to the new instance-payload Market
+  rules (econ.marketBody, econ.provenanceBody, faq.a1, masterworkBody,
+  craftProse.enchanting.marketBody, guide.economy.mailHow), so they are
+  off this phase's reword list like harvestBodyChoice; the fill is
+  measured at the merged tip as 144 pending keys / 2,563 pending rows
+  (main 63/943, admin 81/1,620; the branch-owned professions slice is
+  27 main keys plus one admin key, 425 rows). chr_peaks_gatherer still
+  owes its locale rows.
+- Phase 18: the phase 11 wire-delta sweep wants a re-measure at the
+  merged base (surface rows 201, COMMAND_NAMES 187, IWORLD_MEMBERS 280,
+  and the registry file gained the OTA route module); the deploy
+  runbook gains the release's self-hosted OTA lane, so the "iOS binary
+  ships before deploy" premise is optional rather than load-bearing
+  (R34's decision unaffected).
+- The load-baseline doc gained the post-merge throwaway-boot note (the
+  boot-time CREATE INDEX CONCURRENTLY migration) and the entity-count
+  provenance note (the rift scheduler stands about ten more ground
+  objects at the merged tip); its measured server-path numbers are
+  untouched by the merge.
 
 ---
 
