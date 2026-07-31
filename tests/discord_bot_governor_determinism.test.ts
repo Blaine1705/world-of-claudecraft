@@ -16,6 +16,7 @@
 // from a float retry_after can expire a hair before its window).
 import { describe, expect, it } from 'vitest';
 import {
+  BREAKER_WINDOW_MS,
   DEFAULT_BAN_PAUSE_MS,
   DEFAULT_BREAKER_LIMIT,
   DEFAULT_FORBIDDEN_TTL_MS,
@@ -401,6 +402,13 @@ describe('governor registry bounds', () => {
     expect(MAX_TRACKED_ROUTES).toBe(512);
     expect(MAX_FORBIDDEN_ENTRIES).toBe(4096);
     expect(MAX_QUEUE_DEPTH).toBe(256);
+    // The breaker window belongs here for the same reason and was the one
+    // load-bearing constant with no literal anywhere: all twenty of its uses
+    // advance the clock BY it and assert AGAINST it, which is a pure
+    // self-comparison. At 60000 the whole suite stays green while the breaker's
+    // denominator stops matching Discord's 10000-invalid-per-10-minutes ban
+    // counter and the half-open quiet window shrinks tenfold.
+    expect(BREAKER_WINDOW_MS).toBe(600_000);
   });
 });
 

@@ -524,21 +524,29 @@ describe('DiscordApi essential traffic survives an open breaker', () => {
   // reply would then be refused with 'breaker-open' for the whole quiet window
   // and the user would see "the application did not respond". The breaker exists
   // to stop SWEEPS, never a reply on a 3 second deadline.
+  // Snowflake ids and a token-shaped token, because these three routes are the
+  // ones that carry a live bearer credential. Short stand-ins ('i1', 'tok1') are
+  // not variable segments, so routeTemplate keeps them verbatim and the fixture
+  // stops having the shape of the path it stands in for, which is how a :token
+  // redaction regression would go unnoticed here.
+  const IID = '111111111111111111';
+  const APPID = '222222222222222222';
+  const TOKEN = 'aW50ZXJhY3Rpb250b2tlbnZhbHVlMTIzNDU2Nzg5';
   const ESSENTIAL: { name: string; call: (api: DiscordApi) => Promise<void>; path: string }[] = [
     {
       name: 'respondInteraction',
-      call: (api) => api.respondInteraction('i1', 'tok1', { content: 'hi' }),
-      path: '/interactions/i1/tok1/callback',
+      call: (api) => api.respondInteraction(IID, TOKEN, { content: 'hi' }),
+      path: `/interactions/${IID}/${TOKEN}/callback`,
     },
     {
       name: 'deferInteraction',
-      call: (api) => api.deferInteraction('i2', 'tok2', true),
-      path: '/interactions/i2/tok2/callback',
+      call: (api) => api.deferInteraction(IID, TOKEN, true),
+      path: `/interactions/${IID}/${TOKEN}/callback`,
     },
     {
       name: 'editOriginalResponse',
-      call: (api) => api.editOriginalResponse('app1', 'tok3', { content: 'done' }),
-      path: '/webhooks/app1/tok3/messages/@original',
+      call: (api) => api.editOriginalResponse(APPID, TOKEN, { content: 'done' }),
+      path: `/webhooks/${APPID}/${TOKEN}/messages/@original`,
     },
   ];
 
@@ -725,7 +733,10 @@ describe('governorFromConfig', () => {
     ]);
 
     // The real global was asked for the slot spacing the config implies.
-    expect(delays).toEqual([500]);
+    // `toContain` rather than an exact array: the stub is global for this window,
+    // so an unrelated runtime timer would make an equality pin flake without
+    // saying anything about the default clock.
+    expect(delays).toContain(500);
     vi.unstubAllGlobals();
   });
 });

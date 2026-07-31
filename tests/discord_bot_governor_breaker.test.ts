@@ -630,7 +630,12 @@ describe('governor registry bounds', () => {
     const snap = rig.governor.snapshot();
     // Bounded rather than 600-and-climbing.
     expect(snap.trackedRoutes).toBe(MAX_TRACKED_ROUTES);
-    expect(snap.trackedBuckets).toBeLessThanOrEqual(MAX_TRACKED_BUCKETS);
+    // trackedBuckets is EXACTLY zero here, and asserting `<= MAX_TRACKED_BUCKETS`
+    // instead was vacuous: every response above carries a bucket hash and no
+    // x-ratelimit-remaining or -reset-after, so absorbHeaders returns early and
+    // `limits` is never written at all. Zero states that positively, and the
+    // bucket bound itself is pinned decisively by the two cap tests below.
+    expect(snap.trackedBuckets).toBe(0);
     // Every queue drained, so none are retained.
     expect(snap.activeQueues).toBe(0);
     expect(snap.queueDepth).toBe(0);
@@ -650,7 +655,9 @@ describe('governor registry bounds', () => {
     });
     const before = rig.clock.now();
     await call(rig, SWEEP, OK);
-    expect(rig.clock.now() - before).toBeGreaterThanOrEqual(2000);
+    // Exact, not a lower bound: `>= 2000` also passes for a governor that waited
+    // ten minutes, and every other timing assertion in these suites is exact.
+    expect(rig.clock.now() - before).toBe(2000);
   });
 
   it('keeps the HOT route resolved onto its HASH, not merely gated by its own template', async () => {

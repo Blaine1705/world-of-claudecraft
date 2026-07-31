@@ -315,6 +315,68 @@ describe('RateGovernor interaction-callback exemption boundary', () => {
   });
 });
 
+describe('RateGovernor interaction callbacks still pay every OTHER ceiling', () => {
+  // The exemption's own comment promises this in as many words: "Everything else
+  // still applies: their own bucket gating, and every pause, because a pause
+  // means Discord has told us to stop entirely." Only the rate-cap half was
+  // exercised, so deleting the pause and bucket gates FOR THIS TEMPLATE stayed
+  // green, on the one path with no other ceiling left.
+  it('honors a process-wide pause even though it skips the rate cap', async () => {
+    const { governor, clock } = makeGovernor(1000);
+    const sent: { label: string; at: number }[] = [];
+    const send = (label: string, response: GovernorResponse) => async () => {
+      sent.push({ label, at: clock.now() });
+      return response;
+    };
+
+    // An unrelated route takes a global 429 and pauses everything for 30 s.
+    const pauser = [res429({ 'x-ratelimit-scope': 'global' }, 30), reply()];
+    const paused = governor.run({ method: 'GET', path: '/guilds/1/roles' }, async () => {
+      sent.push({ label: 'pauser', at: clock.now() });
+      return pauser.shift() as GovernorResponse;
+    });
+    await clock.advanceBy(0);
+    expect(sent.map((s) => s.at)).toEqual([0]);
+
+    const callback = governor.run(
+      { method: 'POST', path: `/interactions/11111111111111111/${INTERACTION_TOKEN}/callback` },
+      send('callback', reply()),
+    );
+    await clock.runAll();
+    await Promise.all([paused, callback]);
+
+    // 30000, not 0. Exempt from the rate cap is not exempt from a pause.
+    expect(sent.find((s) => s.label === 'callback')?.at).toBe(30_000);
+  });
+
+  it('honors its OWN bucket gate even though it skips the rate cap', async () => {
+    // Interaction ids are major parameters, so each callback is its own bucket
+    // and normally cannot gate another. Driving the SAME interaction id twice is
+    // what makes the gate observable at all on this route.
+    const { governor, clock } = makeGovernor(1000);
+    const path = `/interactions/22222222222222222/${INTERACTION_TOKEN}/callback`;
+    const sentAt: number[] = [];
+    const headers = [
+      { 'x-ratelimit-bucket': 'cb', 'x-ratelimit-remaining': '0', 'x-ratelimit-reset-after': '5' },
+      { 'x-ratelimit-bucket': 'cb', 'x-ratelimit-remaining': '3', 'x-ratelimit-reset-after': '5' },
+    ];
+    const send = async (): Promise<GovernorResponse> => {
+      sentAt.push(clock.now());
+      return reply(headers[sentAt.length - 1]);
+    };
+
+    const calls = [
+      governor.run({ method: 'POST', path }, send),
+      governor.run({ method: 'POST', path }, send),
+    ];
+    await clock.runAll();
+    await Promise.all(calls);
+
+    // 5000, not the 0 the rate-cap exemption alone would allow.
+    expect(sentAt).toEqual([0, 5000]);
+  });
+});
+
 describe('RateGovernor bucket identity across major parameters', () => {
   it('does NOT merge two major parameters that report the SAME bucket hash', async () => {
     // REGRESSION, and the worst defect the Phase 2 QA round found. Discord

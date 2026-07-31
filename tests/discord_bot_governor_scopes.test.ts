@@ -286,7 +286,22 @@ describe('rate governor 429 that names no usable wait', () => {
     await clock.runAll();
     await pending;
 
-    expect(slept).toEqual([MISSING_RETRY_AFTER_MS]);
+    // The LITERAL, so this case stands on its own rather than leaning on the
+    // constant's own pin in a different `it` eighty lines up.
+    expect(slept).toEqual([1000]);
+  });
+
+  it('floors a NEGATIVE retry_after the same way', async () => {
+    // Discord should never send one, but a negative slipping through as a
+    // "wait" would be a zero-delay retry by another name.
+    const { governor, clock, slept } = governorFixture();
+    const { send } = queuedSend(clock, [res({ status: 429, json: { retry_after: -5 } }), res({})]);
+
+    const pending = governor.run({ method: 'GET', path: '/guilds/1/roles' }, send);
+    await clock.runAll();
+    await pending;
+
+    expect(slept).toEqual([1000]);
   });
 
   it('still honors a genuine SUB-second retry_after rather than rounding it up to the floor', async () => {
@@ -329,9 +344,11 @@ describe('rate governor 429 that names no usable wait', () => {
     await clock.runAll();
     await pending;
 
-    // A finite wait, and the retry actually happens.
-    expect(sentAt).toEqual([0, MISSING_RETRY_AFTER_MS]);
-    expect(slept.every((ms) => Number.isFinite(ms))).toBe(true);
+    // A finite wait, and the retry actually happens. Literals on both sides: an
+    // `every(isFinite)` check is vacuously true for an empty sleep list, so it
+    // would pass for a governor that never waited at all.
+    expect(slept).toEqual([1000]);
+    expect(sentAt).toEqual([0, 1000]);
   });
 
   it('does NOT let a short retry_after shorten a longer window the headers reported', async () => {
