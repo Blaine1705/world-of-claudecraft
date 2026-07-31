@@ -213,6 +213,7 @@ import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import { buildEastbrookNoticeboard } from './noticeboard';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
+import { type PlayerAuraRingInput, PlayerAuraRings } from './player_aura_rings';
 import {
   applyPointLightBudget,
   pointLightPadCount,
@@ -1132,6 +1133,7 @@ export class Renderer {
   private selRingX = Number.NaN;
   private selRingZ = Number.NaN;
   private selRingScale = Number.NaN;
+  private playerAuraRings: PlayerAuraRings;
   // Dev-only Tab-target cone overlay (enabled via ?targetcone=1 in main.ts).
   // Null until enabled; once built it is re-draped over the terrain in front of
   // the local player every frame. See target_cone_debug.ts.
@@ -2156,6 +2158,10 @@ export class Renderer {
     this.selectionRing.visible = false;
     this.scene.add(this.selectionRing);
 
+    this.playerAuraRings = new PlayerAuraRings(GFX.effectsTier, GFX.composer);
+    setRenderCategory(this.playerAuraRings.group, 'ui3d');
+    this.scene.add(this.playerAuraRings.group);
+
     // click-feedback marker pool: a small fixed set of ring+X groups reused
     // round-robin, so rapid clicking never allocates. Geometry is shared; each
     // slot owns its own materials so the ring and X fade independently and
@@ -2389,6 +2395,10 @@ export class Renderer {
   /** Tone-mapping exposure multiplier (1.0 = the default look). */
   setBrightness(mult: number): void {
     this.webgl.toneMappingExposure = this.baseExposure * mult;
+  }
+
+  setPlayerAuraRings(rings: readonly PlayerAuraRingInput[]): void {
+    this.playerAuraRings.setRings(rings);
   }
 
   zoneIdAt(x: number, z: number): string | null {
@@ -8136,6 +8146,26 @@ export class Renderer {
       }
     } else {
       this.selectionRing.visible = false;
+    }
+    const playerView = this.views.get(p.id);
+    if (playerView && !p.dead && this.playerAuraRings.hasVisibleRings()) {
+      const px = playerView.group.position.x;
+      const pz = playerView.group.position.z;
+      const seed = this.sim.cfg.seed;
+      const supportY = supportHeightAt(seed, px, pz, 0.5, playerView.group.position.y + 0.01);
+      const baseY = Math.max(groundHeight(px, pz, seed), supportY);
+      this.playerAuraRings.update(
+        true,
+        px,
+        pz,
+        baseY,
+        seed,
+        supportY,
+        this.time,
+        this.reducedMotion(),
+      );
+    } else {
+      this.playerAuraRings.update(false, 0, 0, 0, this.sim.cfg.seed, 0, this.time);
     }
     this.updateClickMarkers(dt);
     this.updateAoeRings(dt);
