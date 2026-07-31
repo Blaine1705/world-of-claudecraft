@@ -340,11 +340,14 @@ export const fr_CA: EnTranslations = {
       "menuButton": "Déblocage",
       "help": "Récupération : /unstuck démarre un compte à rebours immobile qui vous déplace vers un endroit sûr et accessible à proximité.",
       "helpAtGraveyard": "Récupération : /unstuck démarre un compte à rebours immobile, puis envoie votre esprit au cimetière le plus proche. Revenir par le Veilleur pâle exige le Glas du Veilleur.",
+      "helpUnstuckSickness": "Récupération : /unstuck démarre un compte à rebours immobile, puis vous déplace au cimetière le plus proche en vous ranimant si vous étiez tombé. Le Mal de déblocage vous accable pendant 5 minutes au maximum.",
       "started": "Déblocage dans {seconds} secondes. Bouger, combattre, subir des dégâts ou commencer une autre action l'annule.",
       "countdown": "Déblocage: {seconds}",
       "completed": "Déplacé vers l'endroit sûr accessible le plus proche.",
       "completedAtGraveyard": "Votre esprit est retourné au cimetière le plus proche. Parlez au Veilleur pâle pour accepter le Glas du Veilleur.",
       "revivedAtGraveyard": "Vous avez été ramené au cimetière le plus proche et ranimé. Le Glas du Veilleur pèse sur vous.",
+      "movedToGraveyard": "Vous avez été déplacé au cimetière le plus proche. Le Mal de déblocage pèse sur vous.",
+      "revivedAtGraveyardUnstuck": "Vous avez été déplacé au cimetière le plus proche et ranimé. Le Mal de déblocage pèse sur vous.",
       "cancelledMoved": "Déblocage annulé : vous avez bougé.",
       "cancelledDamaged": "Déblocage annulé : vous avez subi des dégâts.",
       "cancelledCombat": "Déblocage annulé : vous êtes entré en combat.",
@@ -885,6 +888,13 @@ export const fr_CA: EnTranslations = {
       "heroicName": "{name} héroïque",
       "heroicLocked": "Vous êtes verrouillé sur {name} héroïque."
     },
+    "riftTracker": {
+      "title": "Faille",
+      "floor": "Étage {current} sur {total}",
+      "closesIn": "Se ferme dans {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -912,6 +922,23 @@ export const fr_CA: EnTranslations = {
       "dock": "Ramener ce compteur dans la fenêtre des compteurs",
       "separate": "Séparer {meter}",
       "regroup": "Regrouper {meter}"
+    },
+    "targetAuras": {
+      "title": "Auras de la cible",
+      "keybindLabel": "Améliorations et affaiblissements de la cible",
+      "all": "Tous",
+      "debuffs": "Affaiblissements",
+      "buffs": "Améliorations",
+      "unlock": "Déplacer la fenêtre des auras de la cible",
+      "lock": "Verrouiller la fenêtre des auras de la cible",
+      "configureRows": "Configurer les auras de la cible",
+      "fewerRows": "Préférer moins de rangées d’auras",
+      "moreRows": "Préférer plus de rangées d’auras",
+      "visibleRows": "Rangées d’auras préférées : {count}",
+      "showSources": "Afficher les sources des auras",
+      "hideSources": "Masquer les sources des auras",
+      "ownAura": "Votre aura",
+      "opacity": "Opacité des auras : {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Le familier est à pleine santé",
@@ -956,13 +983,15 @@ export const fr_CA: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, le Crapaud Saute-Ombre",
       "name_stormfeather_griffin": "Plume-d’Orage Toise-Ciel",
       "name_thunderstrut_gobbler": "Pavane-Tonnerre, le Grand Dindon",
+      "name_terrorspark_groundshaker": "Terrétincelle, l’Ébranleur de sol",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_stalkglider_snail": "Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.",
       "desc_aether_hover_cycle": "Une puissante moto magitech conçue pour des déplacements de combat rapides en vol rasant.",
       "desc_shadowjump_toad": "Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.",
       "desc_stormfeather_griffin": "Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.",
-      "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage."
+      "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.",
+      "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides."
     },
     "mountTraining": {
       "mountPrompt": "Appuyez sur {key} pour monter le Valorsteed d'entraînement.",
@@ -1268,6 +1297,51 @@ export const fr_CA: EnTranslations = {
       "badges": {
         "backgrounded": "En arrière-plan",
         "offline": "Hors ligne"
+      }
+    },
+    "auraOverlay": {
+      "title": "Auras",
+      "currentClass": "Classe actuelle : {class}",
+      "previewHint": "Utilisez Configurer les positions pour déplacer une aura sans masquer le menu.",
+      "noProcs": "Aucun proc pris en charge n’est disponible pour ce personnage.",
+      "enabled": "Afficher l’aura",
+      "icon": "Icône du sort",
+      "arcs": "Croissants latéraux",
+      "groundRing": "Anneau au sol",
+      "groundRingSpellOrder": "Anneau au sol : ordre des sorts",
+      "crescentsSpellOrder": "Croissants latéraux : ordre des sorts",
+      "size": "Taille",
+      "iconSize": "Taille de l’icône",
+      "crescentBlockSize": "Taille des blocs du croissant",
+      "groundRingBlockSize": "Taille des blocs de l’anneau au sol",
+      "opacity": "Opacité",
+      "color": "Couleur",
+      "allOn": "Tout activer",
+      "allOff": "Tout désactiver",
+      "reposition": "Configurer les positions",
+      "positioning": "Positionnement : {aura}",
+      "selectAura": "Aura",
+      "done": "Terminé",
+      "moveLeft": "Déplacer vers la gauche",
+      "moveUp": "Déplacer vers le haut",
+      "moveDown": "Déplacer vers le bas",
+      "moveRight": "Déplacer vers la droite",
+      "moveEarlier": "Déplacer le sort vers l’intérieur",
+      "moveLater": "Déplacer le sort vers l’extérieur",
+      "screenPosition": "Position à l’écran",
+      "spellOrder": "Ordre des sorts",
+      "reset": "Réinitialiser la position",
+      "spellPosition": "Ordre des sorts {position} / {count}",
+      "procs": {
+        "revenge": "Vengeance !",
+        "battleTrance": "Transe de combat",
+        "overpowerCharge": "Renforcement de Main rouge",
+        "suddenDeath": "Mort subite",
+        "victoryRush": "Ruée victorieuse",
+        "enrage": "Carnage : enragé",
+        "heatingUp": "Montée en chaleur",
+        "arcaneCharge": "Charges des Arcanes",
+        "aetherRush": "Ruée d’Aether"
       }
     },
     "playerCard": {
@@ -2073,6 +2147,14 @@ export const fr_CA: EnTranslations = {
       "benefits": "Liez votre compte Steam depuis l'application de bureau pour que les hauts faits que vous obtenez se reflètent dans vos succès Steam.",
       "noTicket": "Steam n'a pas fourni de ticket de liaison. Lancez Steam, puis réessayez."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Lier Epic",
+      "unlink": "Délier Epic",
+      "linked": "Lié au compte Epic {id}",
+      "benefits": "Liez votre compte Epic depuis l’application de bureau Epic pour refléter les hauts faits que vous obtenez dans les succès Epic.",
+      "noProof": "Epic n’a pas fourni de preuve de liaison. Lancez le jeu depuis l’Epic Games Store, puis réessayez."
+    },
     "mailbox": {
       "title": "Boîte aux lettres",
       "subtitle": "La Poste aux Corbeaux",
@@ -2117,6 +2199,7 @@ export const fr_CA: EnTranslations = {
         "noRecipient": "Personne de ce nom ne possède de boîte aux lettres ici.",
         "tooManyParcels": "Une lettre transporte au plus {count} colis.",
         "noMailQuestItems": "Vous ne pouvez pas envoyer d'objets de quête par courrier.",
+        "noMailBound": "Cet objet est lié et ne peut pas être envoyé par la poste.",
         "notEnoughItems": "Vous n'en avez pas autant à envoyer.",
         "cantAffordPostage": "Vous n'avez pas de quoi payer l'affranchissement.",
         "recipientBoxFull": "Sa boîte aux lettres est pleine.",
@@ -2923,8 +3006,19 @@ export const fr_CA: EnTranslations = {
       "account_taken": "Ce compte Steam est déjà lié à un autre compte.",
       "upstream": "Steam n'a pas répondu. Réessayez dans un instant."
     },
+    "epic": {
+      "disabled": "La liaison Epic n’est pas disponible pour le moment.",
+      "invalid_token": "Epic n’a pas pu vérifier cette demande de liaison. Réessayez depuis l’application de bureau.",
+      "banned": "Ce compte Epic ne peut pas être lié.",
+      "already_linked": "Votre compte est déjà lié à un compte Epic.",
+      "account_taken": "Ce compte Epic est déjà lié à un autre compte.",
+      "upstream": "Epic n’a pas répondu. Réessayez dans un instant."
+    },
     "wallet": {
       "handoff_invalid": "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez."
+    },
+    "ota_updates": {
+      "invalid_input": "Saisie invalide."
     }
   },
   "guide": {
@@ -3524,14 +3618,6 @@ export const fr_CA: EnTranslations = {
       "reptile": {
         "name": "Reptiles",
         "desc": "Des chasseurs à sang froid dotés d'un sifflement et d'un claquement qui leur sont propres, distincts des créatures à sang chaud."
-      },
-      "murloc": {
-        "name": "Coasse-Palmes",
-        "desc": "Peuple-poisson coassant des rives et des bassins de marée, prompt à submerger quiconque s'aventure trop près."
-      },
-      "kobold": {
-        "name": "Chenapans",
-        "desc": "Charognards agiles et lutins des clairières et des haies, plus nuisance que menace, jusqu'à ce qu'ils se regroupent en nombre."
       },
       "demon": {
         "name": "Démons",
@@ -6184,11 +6270,15 @@ export const fr_CA: EnTranslations = {
       "graphicsPresetMedium": "Moyenne",
       "graphicsPresetHigh": "Haute",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Extrême",
       "graphicsPresetAdvanced": "Avancée",
       "terrainDetail": "Détail du terrain",
       "foliageDensity": "Densité de feuillage",
       "effectsQuality": "Effets et éclairage",
       "shadowQuality": "Qualité des ombres",
+      "surfaceDetail": "Détail des surfaces",
+      "surfaceDetailBasic": "Basique",
+      "surfaceDetailFull": "Complet",
       "terrainLow": "Bas",
       "terrainHigh": "Élevé",
       "touchOpacity": "Opacité des commandes tactiles",
@@ -6367,6 +6457,7 @@ export const fr_CA: EnTranslations = {
       "floatingDodge": "Esquive",
       "floatingParry": "Parade",
       "floatingResist": "Résisté",
+      "floatingEvade": "Évasion",
       "floatingHealFull": "Plein",
       "floatingHealAbsorbed": "Absorbé",
       "cannotMove": "Immobilisé !",
@@ -6379,6 +6470,7 @@ export const fr_CA: EnTranslations = {
       "dodged": "{target} esquive votre {ability}.",
       "parried": "Votre {ability} est parée par {target}.",
       "resisted": "{target} résiste à votre {ability}.",
+      "evaded": "Votre {ability} est évitée par {target}.",
       "healSelf": "Votre {ability} vous rend {amount} points de vie.",
       "healSelfCrit": "Votre {ability} vous rend un soin critique de {amount}.",
       "healOther": "Votre {ability} soigne {target} pour {amount}.",
@@ -6475,11 +6567,12 @@ export const fr_CA: EnTranslations = {
       "arenaQueueTrading": "Terminez votre échange avant de rejoindre la file.",
       "arenaQueueInstance": "Vous ne pouvez pas rejoindre la file depuis une instance.",
       "tradeInProgress": "Un échange est déjà en cours.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Ce joueur est déjà en train de faire un échange.",
       "tradeTooFar": "La cible est trop éloignée pour échanger.",
       "tradeExpired": "La demande d'échange a expiré.",
       "tradeFailed": "Échange échoué : objets ou argent indisponibles.",
-      "tradeBound": "Cet objet est lié et ne peut pas être échangé."
+      "tradeBound": "Cet objet est lié et ne peut pas être échangé.",
+      "marketListBound": "Cet objet est lié et ne peut pas être inscrit au marché."
     },
     "logs": {
       "standUp": "Vous vous levez.",
@@ -6835,7 +6928,8 @@ export const fr_CA: EnTranslations = {
       "incomplete": "Cette quête n'est pas terminée.",
       "giverMissing": "Le donneur de cette quête n'est pas à proximité.",
       "turnInMissing": "Le rendu de cette quête n'est pas à proximité.",
-      "tooFar": "Vous êtes trop loin."
+      "tooFar": "Vous êtes trop loin.",
+      "escortAway": "Votre escorte n'est pas à son poste pour le moment. Elle y reviendra sous peu."
     }
   },
   "itemUi": {
@@ -7225,7 +7319,7 @@ export const fr_CA: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Invisibilité accrue",
-        "description": "Disparais pendant 20 s : enlève 2 effets de dégâts périodiques et réduit de 90% les dégâts que tu subis tant que tu es invisible et pour un court moment après. (Talent de mage)"
+        "description": "Vous disparaissez pendant 20 s et dissipez 2 effets de dégâts sur la durée. À la fin de l’invisibilité, vous subissez 90% de dégâts en moins pendant 2 s. (Talent de mage)"
       },
       "hot_streak": {
         "name": "Suite flamboyante",
@@ -9564,6 +9658,18 @@ export const fr_CA: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Couteau-croc de Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Épieu de bêtes du Seigneur des crocs"
+      },
+      "bloodmane_warleggings": {
+        "name": "Jambières de guerre Crin-de-sang"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Culottes de traque Griffe-de-liane"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sarong rituel Os-solaire"
+      },
       "thick_winter_pelt": {
         "name": "Épaisse fourrure d'hiver"
       },
@@ -9731,6 +9837,9 @@ export const fr_CA: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Chevalière de The Last Keep"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Clé de contact : Terrétincelle, l’Ébranleur de sol"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"
@@ -10307,6 +10416,24 @@ export const fr_CA: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Bandes de mains du Choeur du Wyrm"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunique du traqueur du Bassin"
+      },
+      "verdant_heart_vestment": {
+        "name": "Vêtement du Cœur-verdoyant"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Haubert rituel Os-solaire"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Grand-croc du Bassin"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Couronne de l'oracle Os-solaire"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Garde-jambes de guerre Crin-de-sang"
       },
       "deathless_greatblade": {
         "name": "Grande lame immortelle"
@@ -12840,7 +12967,7 @@ export const fr_CA: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Ramener Wren à bon port",
-        "text": "Mon apprentie Wren est partie parcourir la ligne du Goldmelt il y a deux jours et n'est jamais revenue. J'ai trouvé ses traces, elle s'est terrée sous les bornes routières au sud-ouest des Marches de l'Aurore, trop effrayée par les loups pour bouger. Je ne peux quitter la tourbière, {playerName}. Ramenez-la au camp de Veyla sur les Marches. Elle sera en sécurité sous les lumières.",
+        "text": "Mon apprentie Wren est partie parcourir la ligne du Goldmelt il y a deux jours et n'est jamais revenue. J'ai trouvé ses traces, elle s'est terrée sous les bornes routières au nord-est des Marches de l'Aurore, trop effrayée par les loups pour bouger. Je ne peux quitter la tourbière, {playerName}. Ramenez-la au camp de Veyla sur les Marches. Elle sera en sécurité sous les lumières.",
         "completion": "La fille est à l'intérieur, enroulée dans la moitié de mes couvertures, à discourir sur les étoiles. Vous avez fait une bonne chose aujourd'hui, {playerName}. Le Reach n'en voit pas beaucoup.",
         "objectives": {
           "0": {
@@ -13524,7 +13651,7 @@ export const fr_CA: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Que Bram revienne",
-        "text": "Mon Bram a pris le bateau le matin où la brèche-des-filets s'est ouverte, et la mer l'a rejeté quelque part au-delà de la pointe du Débarcadère. Je l'ai entendu il y a trois nuits, {playerName}, appeler par-dessus l'eau, et j'étais trop effrayée pour y aller. Je le suis encore. Je vous en prie. Son bateau gît naufragé sur la rive nord. Ramenez-le-moi.",
+        "text": "Mon Bram a pris le bateau le matin où la brèche-des-filets s'est ouverte, et la mer l'a rejeté quelque part au-delà de la pointe du Débarcadère. Je l'ai entendu il y a trois nuits, {playerName}, appeler par-dessus l'eau, et j'étais trop effrayée pour y aller. Je le suis encore. Je vous en prie. Son bateau gît naufragé sur la rive sud. Ramenez-le-moi.",
         "completion": "Bram ! Vous me l'avez ramené entier, {playerName}. Nous avons tous les deux pleuré, et aucun de nous n'en a honte. Quoi que les brèches prennent ensuite à cette île, elles n'auront pas ma famille. Plus jamais.",
         "objectives": {
           "0": {

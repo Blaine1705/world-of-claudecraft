@@ -10,54 +10,84 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "es_ES": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "fr_FR": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "fr_CA": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "en_CA": [],
   "it_IT": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "de_DE": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "zh_TW": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "ko_KR": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "ja_JP": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
   "pt_BR": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
   "cs_CZ": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "nl_NL": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "pl_PL": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "id_ID": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "tr_TR": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "sv_SE": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "vi_VN": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "da_DK": [
-    "hud.errors.tradeAlreadyTrading"
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ]
 };
