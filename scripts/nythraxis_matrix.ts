@@ -402,6 +402,8 @@ const specs = {
       choices: {},
     },
     prepull: [{ ability: 'demon_skin', target: 'self' }],
+    // Ruination's real loop. The old list still spent globals on abilities the
+    // specialization can no longer learn and never touched Ruin at all.
     rotation: [
       { ability: 'summon_infernal', target: 'boss', aim: 'target' },
       'ruinous_brand',
@@ -876,6 +878,15 @@ function shouldTryAbility(caster: Entity, target: Entity, ability: string): bool
     (caster.resource > caster.maxResource * 0.3 || caster.hp <= caster.maxHp * 0.35)
   ) {
     return false;
+  }
+  // Sentence consumes the entire Condemnation pool and its damage escalates
+  // hard at the 20, 50, 80 and 100 thresholds (55, 160, 300 and 440 at level
+  // 20), so firing it the moment it becomes legal is the worst line available
+  // and would measure the harness rather than the specialization. Bank to the
+  // 80 threshold, which is what a player reading the meter does.
+  if (ability === 'sentence') {
+    const doom = caster.auras.find((aura) => aura.kind === 'affliction_doom')?.stacks ?? 0;
+    if (doom < 80) return false;
   }
   if (DOT_ABILITIES.has(ability) && auraActive(target, ability, caster.id)) return false;
   if (SELF_BUFF_ABILITIES.has(ability) && auraActive(caster, ability)) return false;
