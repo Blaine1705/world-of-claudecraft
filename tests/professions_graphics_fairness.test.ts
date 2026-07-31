@@ -22,6 +22,7 @@
 
 import { readFileSync } from 'node:fs';
 import type * as THREE from 'three';
+import { Matrix4, Quaternion, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 import { buildGatherNodes } from '../src/render/gather_nodes';
 import { NODE_TIER_SCALE_STEP, nodeTierScale } from '../src/render/gather_nodes_lookup';
@@ -85,28 +86,54 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     // The phase 14 QA: nodeTierScale was unit-pinned but deleting the
     // multiplyScalar in buildGatherNodes reddened nothing. Drive the real
     // build and compare two ore nodes of different tiers: the scale lands
-    // on the mesh at the literal ladder values, and the base-anchor
-    // compensation keeps each prop's bottom at the same height above its
-    // terrain sample (a center-anchored upscale sank tier-3 props).
+    // in the instance matrix at the literal ladder values, and the
+    // base-anchor compensation keeps each prop's bottom at the same height
+    // above its terrain sample (a center-anchored upscale sank tier-3
+    // props). The nodes are InstancedMesh batches after the v0.33.0
+    // draw-call diet: resolve each node to (batch, instance index) through
+    // the same userData.gatherNodeIds list the raycast resolver uses.
     const seed = 20260730;
     const { group } = buildGatherNodes(seed);
     const t1 = GATHER_NODES.find((n) => n.type === 'ore' && n.tier === 1);
     const t2 = GATHER_NODES.find((n) => n.type === 'ore' && n.tier === 2);
     expect(t1 && t2).toBeTruthy();
     if (!t1 || !t2) return;
-    const mesh1 = group.getObjectByName(t1.id) as THREE.Mesh;
-    const mesh2 = group.getObjectByName(t2.id) as THREE.Mesh;
-    expect(mesh1.scale.x).toBeCloseTo(1, 10);
-    expect(mesh2.scale.x).toBeCloseTo(1.18, 10);
-    const baseAboveTerrain = (
-      mesh: THREE.Mesh,
-      node: { pos: { x: number; z: number } },
-    ): number => {
-      mesh.geometry.computeBoundingBox();
-      const minY = mesh.geometry.boundingBox?.min.y ?? 0;
-      return mesh.position.y + mesh.scale.y * minY - terrainHeight(node.pos.x, node.pos.z, seed);
+    const instanceOf = (
+      id: string,
+    ): { position: THREE.Vector3; scale: THREE.Vector3; minY: number } => {
+      for (const child of group.children) {
+        const ids = child.userData.gatherNodeIds;
+        if (!Array.isArray(ids)) continue;
+        const index = ids.indexOf(id);
+        if (index === -1) continue;
+        const mesh = child as THREE.InstancedMesh;
+        const matrix = new Matrix4();
+        mesh.getMatrixAt(index, matrix);
+        const position = new Vector3();
+        const rotation = new Quaternion();
+        const scale = new Vector3();
+        matrix.decompose(position, rotation, scale);
+        mesh.geometry.computeBoundingBox();
+        return { position, scale, minY: mesh.geometry.boundingBox?.min.y ?? 0 };
+      }
+      throw new Error(`node ${id} not found in any instanced batch`);
     };
-    expect(baseAboveTerrain(mesh2, t2)).toBeCloseTo(baseAboveTerrain(mesh1, t1), 6);
+    const i1 = instanceOf(t1.id);
+    const i2 = instanceOf(t2.id);
+    // Instance matrices live in a Float32Array, so the read-back scale and
+    // position carry float32 rounding: 6 decimal places is the float32
+    // precision floor, still 5 orders of magnitude below the 0.18 step.
+    expect(i1.scale.x).toBeCloseTo(1, 6);
+    expect(i2.scale.x).toBeCloseTo(1.18, 6);
+    const baseAboveTerrain = (
+      inst: { position: THREE.Vector3; scale: THREE.Vector3; minY: number },
+      node: { pos: { x: number; z: number } },
+    ): number =>
+      inst.position.y + inst.scale.y * inst.minY - terrainHeight(node.pos.x, node.pos.z, seed);
+    // 3 decimal places: the float32 position error at world-coordinate
+    // magnitudes reaches ~1e-5, while the center-anchored-sink bug this
+    // guards produced a ~0.13 world-unit offset.
+    expect(baseAboveTerrain(i2, t2)).toBeCloseTo(baseAboveTerrain(i1, t1), 3);
   });
 
   it('the cosmetic side is the one that varies: LOW_FOG exists and the bobber does not read it', () => {

@@ -402,6 +402,7 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   p.prevPos = { ...pos };
   ctx.rebucket(p);
   p.facing = 0;
+  p.prevFacing = 0;
   p.targetId = null;
   p.autoAttack = false;
   run.emptyFor = 0;
@@ -648,6 +649,7 @@ export function ejectToDelveDoor(
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.facing = 0;
+  p.prevFacing = 0;
   // The Keeper's Toll survives a delve eject too (see resurrection.ts); all else clears.
   p.auras = aurasSurvivingDeath(p.auras);
   p.ccDr.clear();
@@ -1012,6 +1014,7 @@ export function advanceDelveModule(ctx: SimContext, run: DelveRun): void {
     p.prevPos = { ...pos };
     ctx.rebucket(p);
     p.facing = 0;
+    p.prevFacing = 0;
     ctx.emit({
       type: 'log',
       text: `You pass through the tombstone into ${modName}.`,

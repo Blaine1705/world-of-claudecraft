@@ -25,20 +25,30 @@ describe('node meshes: one resident object per authored node, identified by id',
   it('the render group holds exactly the GATHER_NODES id set, whatever the table grows to', () => {
     // The renderer builds the whole world's node meshes ONCE at construction
     // and never per frame; the linear term the projection names is this
-    // resident set. Pinned as an ID SET, not a count, so a duplicated or
-    // dropped node fails even at an unchanged length.
+    // resident set. The nodes are InstancedMesh batches after the v0.33.0
+    // draw-call diet (one batch per type x z-band, ids in
+    // userData.gatherNodeIds); in the Node host each type resolves to its
+    // single fallback part, so flattening the batch id lists yields each
+    // authored node exactly once. Pinned as an ID SET, not a count, so a
+    // duplicated or dropped node fails even at an unchanged length.
     const { group } = buildGatherNodes(WORLD_SEED);
-    const meshIds = group.children.map((child) => child.userData.gatherNodeId as string).sort();
+    const meshIds = group.children
+      .flatMap((child) => (child.userData.gatherNodeIds as string[]) ?? [])
+      .sort();
     const nodeIds = GATHER_NODES.map((n) => n.id).sort();
     expect(meshIds).toEqual(nodeIds);
+    // Every batch sizes its instance count to its id list (the raycast
+    // resolver indexes one by the other).
+    for (const child of group.children) {
+      const im = child as unknown as { count: number };
+      expect(im.count).toBe((child.userData.gatherNodeIds as string[]).length);
+    }
     // The per-zone contribution is linear by construction: every zone's
     // authored nodes appear, none minted from anywhere else.
     for (const zone of ZONES) {
       const zoneNodes = GATHER_NODES.filter((n) => n.zoneId === zone.id);
-      const zoneMeshes = group.children.filter((child) =>
-        zoneNodes.some((n) => n.id === child.userData.gatherNodeId),
-      );
-      expect(zoneMeshes).toHaveLength(zoneNodes.length);
+      const zoneMeshIds = meshIds.filter((id) => zoneNodes.some((n) => n.id === id));
+      expect(zoneMeshIds).toHaveLength(zoneNodes.length);
     }
   });
 });

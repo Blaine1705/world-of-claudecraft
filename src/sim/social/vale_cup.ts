@@ -83,6 +83,7 @@ import {
   isArenaQueued,
   snapshotArenaReturnPools,
 } from './arena';
+import { duelFor } from './duel';
 
 // ---------------------------------------------------------------------------
 // Tuning constants (fiesta style: all at the top).
@@ -447,7 +448,7 @@ export function vcupQueueJoin(
     ctx.error(id, 'You cannot queue for the arena while dead.');
     return;
   }
-  if (ctx.duels.has(id)) {
+  if (duelFor(ctx, id) !== null) {
     ctx.error(id, 'You cannot queue while dueling.');
     return;
   }
@@ -507,7 +508,7 @@ export function vcupQueueJoin(
       ctx.error(id, `${mMeta.name} is already in the arena queue.`);
       return;
     }
-    if (ctx.duels.has(mPid)) {
+    if (duelFor(ctx, mPid) !== null) {
       ctx.error(id, `${mMeta.name} cannot queue while dueling.`);
       return;
     }

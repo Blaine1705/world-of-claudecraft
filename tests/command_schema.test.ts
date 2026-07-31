@@ -31,12 +31,14 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // place_mobile_station, train_recipe, the three enchanting actions
 // (disenchant_item, apply_enchant, salvage_item), unbind_item (the
 // Maker's Bond unbind service), the Rift + mounts surface (rift and
-// forge commands, learn_riding, mount selection), plus slot_tool_effect
+// forge commands, learn_riding), plus slot_tool_effect
 // (attach a catalog effect to one gathering profession's tool, keyed per
 // profession rather than per tool item because the live harvest path
-// resolves a tier and never a tool).
-const EXPECTED_SEND_COUNT = 175; // recharge_tool_effect joined (the acquisition craft)
-const EXPECTED_DISPATCH_COUNT = 186; // recharge_tool_effect joined (the acquisition craft)
+// resolves a tier and never a tool), and market_list_instance
+// (the instance-payload market pipe). mount_select left the wire
+// (reins are items); recharge_tool_effect joined (the acquisition craft).
+const EXPECTED_SEND_COUNT = 175;
+const EXPECTED_DISPATCH_COUNT = 186;
 const EXPECTED_DISPATCH_ONLY_COUNT = 11;
 
 // The chat sub-channel routing switch (server/game.ts `switch

@@ -258,6 +258,7 @@ export const IWORLD_MEMBERS = [
   // --- market commands ---
   { name: 'marketSearch', kind: 'method' },
   { name: 'marketList', kind: 'method' },
+  { name: 'marketListInstance', kind: 'method' },
   { name: 'marketBuy', kind: 'method' },
   { name: 'marketCancel', kind: 'method' },
   { name: 'marketCollect', kind: 'method' },
@@ -327,6 +328,7 @@ export const IWORLD_MEMBERS = [
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
+  { name: 'riftEventMsRemaining', kind: 'method' }, // ms until the rift event stops admitting parties
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
   { name: 'setDungeonDifficulty', kind: 'method' },
   { name: 'buyHeroicVendorItem', kind: 'method' },
@@ -503,10 +505,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // toolEffectSlots (data) and slotToolEffect (method) for 276, the
     // acquisition craft's recharge command (rechargeToolEffect) makes 277,
     // and the UX pass's node respawn countdown read (nodeRespawnSeconds)
-    // makes 278.
-    expect(IWORLD_MEMBERS.length).toBe(278);
+    // makes 278; the v0.33.0 sync merge brings the rift floor timer HUD's
+    // riftEventMsRemaining and the instance-payload pipes'
+    // marketListInstance (both methods) for 280.
+    expect(IWORLD_MEMBERS.length).toBe(280);
     expect(DATA_MEMBERS.length).toBe(73);
-    expect(METHOD_MEMBERS.length).toBe(205);
+    expect(METHOD_MEMBERS.length).toBe(207);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -680,6 +684,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketCollectPending',
       'marketInfo',
       'marketList',
+      'marketListInstance',
       'marketSearch',
       'mountLessonActive',
       'mountRaceCancel',
@@ -733,6 +738,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'ridingTrained',
       'riftBossDeathZones',
       'riftCollisionToken',
+      'riftEventMsRemaining',
       'riftFloor',
       'salvageItem',
       'saveActionBarLayout',
@@ -993,6 +999,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketCancel',
       'marketCollect',
       'marketList',
+      'marketListInstance',
       'marketSearch',
       'mountLessonActive',
       'mountRaceCancel',
@@ -1033,6 +1040,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'revivePet',
       'ridingTrained',
       'riftBossDeathZones',
+      'riftEventMsRemaining',
       'salvageItem',
       'saveActionBarLayout',
       'saveLoadout',
@@ -1398,6 +1406,7 @@ const FACET_MARKET = [
   'marketCollectPending',
   'marketSearch',
   'marketList',
+  'marketListInstance',
   'marketBuy',
   'marketCancel',
   'marketCollect',
@@ -1429,6 +1438,7 @@ const FACET_DUNGEONS = [
   'riftCollisionToken',
   'riftFloor',
   'riftBossDeathZones',
+  'riftEventMsRemaining',
   'dungeonDifficulty',
   'setDungeonDifficulty',
   'buyHeroicVendorItem',
@@ -1625,8 +1635,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(278);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(278);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(280);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(280);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
