@@ -113,7 +113,6 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8.5,
     aggroRadius: 12, // it knows only the way it came and the thing in front of it
     loot: [
-      { copper: 15, chance: 1 },
       { copper: 20, chance: 1 },
       { itemId: 'farshore_salt_moss', chance: 0.6, questId: 'q_fs_moss_and_mending' },
     ],
@@ -135,7 +134,6 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 9,
     aggroRadius: 11, // the small ones come in numbers, and they come fast
     loot: [
-      { copper: 18, chance: 1 },
       { copper: 20, chance: 1 },
       { itemId: 'breakscarred_steel', chance: 0.6, questId: 'q_fs_steel_for_the_redoubt' },
     ],
@@ -176,7 +174,6 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 15, // the biggest thing the cliffs' break ever let through
     elite: true,
-    loot: [{ copper: 150, chance: 1 }],
     loot: [{ copper: 35, chance: 1 }],
     scale: 1.45,
     color: 0x8a2f6a,

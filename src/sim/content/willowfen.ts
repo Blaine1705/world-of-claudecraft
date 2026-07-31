@@ -166,7 +166,6 @@ export const WILLOWFEN_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7.5,
     aggroRadius: 14,
     elite: true,
-    loot: [{ copper: 450, chance: 1 }],
     loot: [{ copper: 100, chance: 1 }],
     scale: 1.65,
     color: 0x5a9858,

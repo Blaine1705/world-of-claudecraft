@@ -113,10 +113,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 9,
     aggroRadius: 0, // grazes the gold meadows, fights only if pressed
-    loot: [
-      { copper: 95, chance: 1 },
-      { itemId: 'gilded_sap_clot', chance: 0.6, questId: 'q_af_amber_from_the_herd' },
-    ],
+    loot: [{ itemId: 'gilded_sap_clot', chance: 0.6, questId: 'q_af_amber_from_the_herd' }],
     scale: 1.15,
     color: 0xd8a848,
     componentTags: ['hide', 'meat'],
@@ -156,10 +153,6 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 0, // ancient and calm, until an axe is raised
     elite: true,
     loot: [
-      { copper: 200, chance: 1 },
-      { itemId: 'tangled_weed', chance: 0.4 },
-    ],
-    loot: [{ copper: 100, chance: 1 }],
       { copper: 100, chance: 1 },
       { itemId: 'tangled_weed', chance: 0.4 },
     ],
@@ -199,10 +192,6 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8,
     aggroRadius: 13,
     loot: [
-      { copper: 105, chance: 1 },
-      { itemId: 'mudfin_scale', chance: 0.4 },
-    ],
-    loot: [{ copper: 100, chance: 1 }],
       { copper: 100, chance: 1 },
       { itemId: 'mudfin_scale', chance: 0.4 },
     ],
@@ -229,10 +218,6 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 16,
     elite: true,
     loot: [
-      { copper: 450, chance: 1 },
-      { itemId: 'mudfin_scale', chance: 1 },
-    ],
-    loot: [{ copper: 100, chance: 1 }],
       { copper: 100, chance: 1 },
       { itemId: 'mudfin_scale', chance: 1 },
     ],

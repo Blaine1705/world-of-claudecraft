@@ -166,7 +166,6 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7.5,
     aggroRadius: 0, // drifting ambient light, harmless unless harmed
     loot: [
-      { copper: 70, chance: 1 },
       { copper: 75, chance: 1 },
       { itemId: 'wisp_mote', chance: 0.6, questId: 'q_wisp_lights' },
     ],
@@ -276,7 +275,6 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 7.5,
     aggroRadius: 0, // the little folk of the village never strike first
-    loot: [{ copper: 70, chance: 1 }],
     loot: [{ copper: 80, chance: 1 }],
     scale: 1.0,
     color: 0xd8c4f0,
@@ -295,7 +293,6 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 7,
     aggroRadius: 0, // the mushroom folk tend their rings in peace
-    loot: [{ copper: 65, chance: 1 }],
     loot: [{ copper: 75, chance: 1 }],
     scale: 0.8,
     color: 0xd8b98a,
