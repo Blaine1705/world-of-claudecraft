@@ -526,6 +526,13 @@ per reconnect, and it makes the push more correct (the previous code published w
 index happened to be resolved). Everything else is cadence-only: which function runs and what
 it does are unchanged.
 
+A second, smaller deviation, on the error path: the roster push now STOPS at the first
+batch the server refuses instead of attempting the rest. Previously `call()` returned null
+and the loop carried on, spending a request per remaining batch against a server that had
+already refused one, which is the shape this packet exists to stop. Nothing goes stale for
+it: the refused members keep their old cache entries, so the next sweep retries exactly
+them. Pinned by "stops after a mid-run refusal, keeping the batches already accepted".
+
 Ledger: L7 CLOSED (a non-resumable INVALID_SESSION now clears the session id, resume URL and
 seq, so a close arriving before the next READY re-IDENTIFIEs instead of RESUMEing a session
 Discord had just killed). L12 CLOSED (`this.queues` is LRU bounded by `MAX_TRACKED_QUEUES`,
