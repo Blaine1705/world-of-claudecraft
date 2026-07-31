@@ -3047,6 +3047,105 @@ GATHER_NODES walks are unchanged). Corrections the merge forced:
   objects at the merged tip); its measured server-path numbers are
   untouched by the merge.
 
+**Phase 16 QA COMPLETE** (2026-07-31, Fable xhigh ultracode, new session, no
+authorship stake). Judged a33e30720e..15436d3f41 at tip c6e9ba1a20; the QA
+found the shared worktree switched to another branch by a later session
+(clean, reflog-verified, restored) and release/v0.33.0 unmoved, so no re-sync
+was owed. Verdict up front: the BUILT record's claims all verified, the
+committed baseline set stands unrecommitted, and the round closed thirty-odd
+defects none of which invalidates a measured number.
+
+Evidence: seven read-only reviewers via the Agent tool (architecture,
+database-performance, test-coverage, privacy-security, cross-platform-sync,
+migration-safety, and a general-purpose rig/baselines auditor whose child ran
+a 41-mutant audit of the rig libs), a 27-agent blind-lens workflow (six
+lenses disjoint from the reviewer domains, paired adversarial refuters on the
+top ten deduped findings, completeness critic; about 1.8M subagent tokens),
+and an independent number-by-number artifact reconciliation by the lead:
+every value in all four Results tables, all three derived ratios, and the
+mean-below-p50 ring-blend tell verified against the committed JSONs.
+
+The live track re-ran three of the four scenarios at the merged tip
+(pre-fix rig and bundle, gitHead-stamped c6e9ba1a20): mixed-stable,
+gather-legacy, and gather-stable all PASSED at exactly 1,000 of 1,000 and
+reproduced the committed numbers within same-box noise, entity counts ten to
+twelve higher from rift portals exactly as disclosed, rig loop lag LOWER
+exactly as the recapture note predicts. The re-measured arm contrast:
+12.3x ncd steady-state cut (committed 12.9x), 2.55x median gather snapshot
+(2.5x), 1.90x fleet receive rate (1.9x). A fourth diagnostic run evidenced
+the pool knob's motivating claim with the gauge the DB reviewer demanded: on
+the production-default 10-client pool the same ramp pinned the pool from
+about 487 online, oscillated 6 to 2,480 WAITING checkouts in autosave-wave
+rhythm, and ground to only 864 joined in twenty minutes, against the
+80-client captures' clean seven-minute ramps. Recorded here, not committed
+as an artifact.
+
+Findings, all applied per the standing rule (six commits: 81d4905380 sim,
+7298751e2e server, 489b9fe269 docs, 96a7ef42ac test polish, f53c503eee rig,
+186fa3bf25 the fix-round review's own findings). The headline defects: a
+knownRecipes value stored as a JSON string crashed Sim.addPlayer and locked
+the character out permanently (found independently by three reviewers; the
+sanitizer is now total on unknown with a 512-entry cap); the signer clamp
+missed the bank and vendor-buyback containers and every non-signer payload
+string (one shared sanitizer now bounds all four containers, drops
+clone-mangled numeric-keyed junk, rebuilds rift payloads before bounding on
+both arms, and logs one aggregated dev-channel line per character load); a
+late first frame after the auth-deadline reject still ran the full handshake
+and minted a five-minute linkdead ghost holding a realm slot and the lease
+(readyState guard, pre-auth close listener, discard-mode handshake buffer);
+the mid-handshake death save no longer enqueues a whole-realm market write at
+the exact moment the pool is exhausted (withMarket: false on that one call
+site, behavior-pinned end to end); DB_POOL_MAX_CLIENTS was unreachable on
+the shipped compose file, blessed 98..100 against a 97 budget, and fell back
+silently (compose passthrough, 1..97, loud reject, boot readout, realm
+multiplication warning); the rig's tslot attribution had zero assertions and
+the gate's hollow-run floors were one-sample floors a degraded fleet could
+pass to inflate the headline ratio (window-proportional floors, a 10 s
+continuity ceiling with a terminal-aware worst gap, per-observer evidence
+plus pool gauges, gitDirty, and reportMs stamped into every future artifact,
+teardown that drains the save wave before deleting). The loopback guard
+gained hostaddr refusal, suffix-lookalike pins, a fail-closed-catch pin that
+had a surviving fail-OPEN mutant, adoption by load_players.mjs, and a
+discovery arm classifying every script that touches Postgres.
+
+The fix round was itself reviewed by two fresh reviewers (code and tests),
+whose forty-plus findings were all applied in 186fa3bf25, including a
+biome-format gate breaker, an unreachable sanitizer arm the call sites'
+clone masked, a bags/equipment ordering divergence on over-keyed rift
+payloads, a gate compatibility test rebuilt to derive from the committed
+artifacts instead of hand-typed counts, and five baseline-doc drifts (the
+disclosure list, the 90 yd player interest radius, the reconstructed 20
+percent residual, version attributions replaced with stable symbols). One
+implementer died on a session usage limit with all its work complete on disk
+and unreported; the work was verified line by line before committing.
+
+Mutation ledger, every mutant with parsed fail counts in an isolated
+worktree restored pristine: 24 sim/server mutants (all killed), the rig
+slice's 22 self-run mutants (all killed; three re-verified independently by
+the fix-round code reviewer), 6 round-two mutants over the new arms (all
+killed), plus the 41-mutant audit of the pre-existing rig-lib pins that
+seeded the round. No survivor stands.
+
+Recorded, not fixed (beyond the BUILT record's standing list): six
+pre-existing operator scripts import pg without the loopback guard
+(armory_skins_e2e, armory_visual_e2e, bank_audit, chat_log_persistence,
+create_gm, grant_admin; now pinned as a classified exempt list, adoption is
+the follow-up) and name_reclaim_shot's DB arm; the ws_auth test fakes'
+fidelity limits (close() does not move readyState; reject paths exercise the
+replay branch) are documented in the fixture; the comment-strip source pins
+remain gameable by block comments by doctrine (a block-comment strip eats
+string content); the /metrics scrape requires METRICS_TOKEN and stamps null
+without it; the sheet-vs-loader knownRecipes divergence on a corrupt string
+is documented rather than reconciled; and jail is the one blob key written
+outside the serializer, classified explicitly in the complement pin. R45+
+rulings were not touched; the one save-policy-adjacent change (the
+withMarket scope on the mid-handshake arm) is flagged here for maintainer
+visibility with its reachability argument in the code.
+
+Final gate: PASS, all steps green, exit code 0 read explicitly, on the
+committed idle tree at 186fa3bf25 (this docs close on top). NEXT: phase 17,
+the wiki truth pass and the release locale fill (ultracode, new session).
+
 ---
 
 ## Phase 17: the wiki truth pass and the release locale fill
