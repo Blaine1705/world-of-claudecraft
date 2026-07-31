@@ -12819,6 +12819,13 @@ export class Hud {
   }
 
   closeVendor(): void {
+    // Guard, matching closeHeroicVendor: closeManagedWindow('vendor-window') calls both
+    // close methods unconditionally since either tenant can hold the shared container, so
+    // this must be a no-op when the copper vendor isn't the one open. Otherwise this still
+    // ran when only the heroic tenant was open, clearing the shared vendorOpenerFocus (and
+    // firing hideTooltip/mobile-bags teardown) before closeHeroicVendor got a chance to
+    // restore it, dropping the WCAG 2.4.3 focus return on the Esc/generic close path.
+    if (this.openVendorNpcId === null) return;
     const closeMobileBags =
       document.body.classList.contains('mobile-touch') && $('#bags').style.display !== 'none';
     $('#vendor-window').style.display = 'none';

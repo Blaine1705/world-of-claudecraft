@@ -248,4 +248,16 @@ describe('vendor window family: hud.ts focus-management wiring (WCAG 2.4.3)', ()
   it('never installs a Tab trap for #vendor-window (non-modal bags companion)', () => {
     expect(hud).not.toMatch(/this\.windowFocus\('#vendor-window'\)/);
   });
+
+  it('closeVendor is a no-op when the copper vendor tenant is not open (Esc/generic close on the heroic tenant)', () => {
+    // closeManagedWindow('vendor-window') calls closeVendor() then closeHeroicVendor()
+    // unconditionally, since either tenant can hold the shared #vendor-window container.
+    // Without this guard, closeVendor still ran while only the heroic tenant was open,
+    // clearing the shared vendorOpenerFocus (and firing hideTooltip/mobile-bags teardown)
+    // before closeHeroicVendor got a chance to restore it, so the generic close path
+    // (Escape, walking out of range via the topmost-window dispatcher) dropped the
+    // WCAG 2.4.3 focus return even though the explicit close button worked.
+    expect(closeVendorBody.trimStart().startsWith('// Guard')).toBe(true);
+    expect(closeVendorBody).toContain('if (this.openVendorNpcId === null) return;');
+  });
 });
