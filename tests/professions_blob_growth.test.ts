@@ -208,6 +208,11 @@ function ceilingSim(): Sim {
   // (only slot-keyed payloads are measured), so the declaration-order pick
   // is cosmetic; it exists to keep the equipment map non-empty.
   const instanceItemId = Object.keys(ITEMS)[0];
+  // The fixture and the settle assertion both read ALL_EQUIP_SLOTS, so the
+  // list length itself needs a literal pin: a slot silently dropped from the
+  // live list would shrink the fixture and the measured ceiling in lockstep.
+  if (ALL_EQUIP_SLOTS.length !== 12)
+    throw new Error('live equip slot list changed; re-mint the ceiling');
   for (const slot of ALL_EQUIP_SLOTS) {
     meta.equipment[slot] = instanceItemId;
     meta.equipmentInstance[slot] = {

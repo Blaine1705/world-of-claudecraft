@@ -2890,9 +2890,11 @@ export const hudChromeStrings = {
       'Spend a charge on this harvest? Declining still gathers, without the bonus. Charges left: {charges}.',
     toolEffectConfirmAccept: 'Use a Charge',
     toolEffectConfirmDecline: 'Gather Without',
-    // The three slottable effects, by catalog id (src/sim/content/professions.ts
-    // TOOL_EFFECTS). The sim is language-agnostic and emits the id; these are
-    // where it becomes a name.
+    // The TOOL_EFFECTS catalog by id (src/sim/content/professions.ts). Only two
+    // are slottable today: slotToolEffectRefused refuses every respawnSpeed-kind
+    // effect (quickening_charm) on every profession, so its name is unreachable
+    // until a recipe mints it and the slot policy admits it. The sim is
+    // language-agnostic and emits the id; these are where it becomes a name.
     toolEffectName: {
       gatherersCache: "Gatherer's Cache",
       artisansEye: "Artisan's Eye",

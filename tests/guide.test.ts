@@ -1511,10 +1511,10 @@ describe('Guide professions gathering accuracy', () => {
         .find((e) => e.itemId === 'thorium_mining_pick')?.gate,
     ).toBe('clears:3');
     expect(t('guide.profPages.toolCraftedOrMarks', { craft: 'X', marks: '24' })).toContain(
-      'three delve clears',
+      'three Drowned Litany clears',
     );
     expect(t('guide.profPages.toolCraftedOrMarksHeroic', { craft: 'X', marks: '56' })).toContain(
-      'Heroic clear',
+      'Heroic Drowned Litany clear',
     );
 
     // Every shipped locale, read off the resolved bundles: both tokens present
@@ -1820,10 +1820,19 @@ describe('Guide professions pages and routes', () => {
         new RegExp(`<tr>(?:(?!</tr>)[\\s\\S])*${name}(?:(?!</tr>)[\\s\\S])*</tr>`),
       )?.[0] ?? '';
     expect(rowFor('Osmium Mining Pick'), 'tier-4 row names its clears gate').toContain(
-      'three delve clears',
+      'three Drowned Litany clears',
     );
     expect(rowFor('Glyphsteel Mining Pick'), 'tier-5 row names its Heroic gate').toContain(
-      'Heroic clear',
+      'Heroic Drowned Litany clear',
+    );
+    // The rendered wield NUMBER, not just the artifact field: the data mirror
+    // pins the corpus, so a page that renders the wrong value in the cell
+    // would otherwise ship silently (the QA mutation pass proved it).
+    expect(rowFor('Osmium Mining Pick'), 'tier-4 row renders its wield number').toContain(
+      `<td>${TIER4_TOOL_WIELD_PROFICIENCY}</td>`,
+    );
+    expect(rowFor('Glyphsteel Mining Pick'), 'tier-5 row renders its wield number').toContain(
+      `<td>${TIER5_TOOL_WIELD_PROFICIENCY}</td>`,
     );
     // Two guide-prof-tables render on the page (nodes first, tools second);
     // anchor on the Use at header so the parity check reads the TOOLS table.
@@ -1833,9 +1842,23 @@ describe('Guide professions pages and routes', () => {
     expect(toolsTable, 'tools table present').toBeDefined();
     const thCount = (toolsTable?.match(/<thead><tr>([\s\S]*?)<\/tr>/)?.[1].match(/<th[\s>]/g) ?? [])
       .length;
-    const tdCount = (toolsTable?.match(/<tbody><tr>([\s\S]*?)<\/tr>/)?.[1].match(/<td/g) ?? [])
-      .length;
-    expect([thCount, tdCount], 'header and body column counts agree').toEqual([6, 6]);
+    expect(thCount, 'header column count').toBe(6);
+    // EVERY body row, not just the first: a conditional cell in a later row
+    // would slip past a first-row-only parity check.
+    const bodyRows =
+      toolsTable?.match(/<tbody>([\s\S]*?)<\/tbody>/)?.[1].match(/<tr>[\s\S]*?<\/tr>/g) ?? [];
+    expect(bodyRows.length, 'tools table has body rows').toBeGreaterThan(0);
+    for (const row of bodyRows) {
+      expect((row.match(/<td/g) ?? []).length, 'body row column count agrees with header').toBe(6);
+    }
+    // The mobile min-width floor is a two-sided contract: the markup carries
+    // the scoped class and the guide stylesheet declares a min-width for it.
+    // src/guide/styles.css sits outside every src/styles CSS guard, so this
+    // is its one pin (the fix round scoped the floor away from the shared
+    // .guide-prof-table after it crushed narrow tables).
+    expect(toolsTable, 'tools table carries its scoped width class').toContain('guide-tools-table');
+    const guideCss = readFileSync(resolve(process.cwd(), 'src/guide/styles.css'), 'utf8');
+    expect(guideCss).toMatch(/\.guide-tools-table\s*\{[^}]*min-width:/);
     // The craft page really renders its recipe rows.
     const weapon = professionsPage.render(ctx(['weaponcrafting']));
     expect(weapon).toContain('Osmium Warblade');
