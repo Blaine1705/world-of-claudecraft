@@ -106,6 +106,20 @@ describe('findFishingSpots', () => {
     }
   });
 
+  it('never stands a bot in the water even when demand outruns the dry shoreline', () => {
+    // The dry discs supply at most two rings of candidates per node; asking
+    // for MORE than that forces the spiral into open water, where every cell
+    // is trivially fishable, so this arm is what actually kills a dropped
+    // swimming check (the first mutation round found the cap-6 arm filled
+    // entirely from dry cells and never exercised a wet candidate).
+    const spots = findFishingSpots(sim, 40);
+    expect(spots.length).toBeGreaterThan(0);
+    expect(spots.length).toBeLessThan(40); // the dry shoreline genuinely ran out
+    for (const s of spots) {
+      expect(sim.groundHeight(s.x, s.z, 1)).toBeGreaterThanOrEqual(0);
+    }
+  });
+
   it('returns an empty list when no water exists, instead of spinning', () => {
     const drySim = { ...sim, firstFishableSampleAhead: () => null };
     expect(findFishingSpots(drySim, 4)).toEqual([]);
