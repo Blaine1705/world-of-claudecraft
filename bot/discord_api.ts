@@ -146,13 +146,13 @@ export class DiscordApi {
   constructor(
     private token: string,
     private fetchImpl: typeof fetch = (...args) => fetch(...args),
-    private governor: RateGovernor = new RateGovernor({
-      clock: systemGovernorClock(),
+    // Through the factory, not a second hand-rolled option map: two construction
+    // sites for the same thing means only one of them is pinned and they drift.
+    private governor: RateGovernor = governorFromConfig({
       maxRps: DEFAULT_MAX_RPS,
       banPauseMs: DEFAULT_BAN_PAUSE_MS,
       breakerLimit: DEFAULT_BREAKER_LIMIT,
       forbiddenTtlMs: DEFAULT_FORBIDDEN_TTL_MS,
-      log: consoleGovernorLog,
     }),
   ) {}
 

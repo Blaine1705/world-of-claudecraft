@@ -579,9 +579,6 @@ describe('governorFromConfig', () => {
     // two knobs, or replacing all four with the DEFAULT_* constants, shipped in
     // silence. The mapping lives here so it can be observed.
     //
-    // Every value is distinct, and none is that knob's own default, so a
-    // transposition cannot land on the value it displaced and a dropped option
-    // cannot be masked by the fallback.
     // Four values that are pairwise distinct AND none of them that knob's own
     // default, so a transposition cannot land on the value it displaced and a
     // dropped option cannot be masked by the fallback. maxRps 2 is 500 ms of
@@ -700,6 +697,36 @@ describe('governorFromConfig', () => {
     // not the governor's: a bare sink would print the object instead.
     expect(String(errors[0][0])).toContain('pauseMs=1');
     spy.mockRestore();
+
+    // And the CLOCK half, which the log assertions above cannot reach: a
+    // non-JSON 429 never sleeps, so a default clock replaced by a no-op would
+    // pass everything so far. Two sends into different buckets at 2 rps make the
+    // second wait out a real 500 ms slot, which the production clock serves from
+    // the global setTimeout. Stubbed AFTER construction on purpose: a
+    // capture-form default would pass a stub-then-construct test either way.
+    const paced = governorFromConfig({
+      maxRps: 2,
+      banPauseMs: 1,
+      breakerLimit: 99,
+      forbiddenTtlMs: 1,
+    });
+    const delays: number[] = [];
+    const realSetTimeout = globalThis.setTimeout;
+    vi.stubGlobal('setTimeout', (cb: () => void, ms?: number) => {
+      delays.push(ms ?? 0);
+      // Fire immediately, so the test does not actually wait half a second.
+      return realSetTimeout(cb, 0);
+    });
+
+    const ok = async () => ({ status: 204, headers: {}, jsonParsed: false }) as const;
+    await Promise.all([
+      paced.run({ method: 'POST', path: '/channels/1/messages' }, ok),
+      paced.run({ method: 'POST', path: '/channels/2/messages' }, ok),
+    ]);
+
+    // The real global was asked for the slot spacing the config implies.
+    expect(delays).toEqual([500]);
+    vi.unstubAllGlobals();
   });
 });
 

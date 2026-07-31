@@ -148,8 +148,9 @@ export const BREAKER_WINDOW_MS = 10 * 60_000;
 export const MAX_ATTEMPTS = 3;
 
 /**
- * The wait used when a 429 carries no retry_after in its body and no Retry-After
- * header. Matches the one second default of the client this replaced, so a
+ * The floor for a 429 that names no USABLE wait: no retry_after in the body and
+ * no Retry-After header, or a value that is present but zero, negative, or not
+ * finite. Matches the one second default of the client this replaced, so a
  * malformed 429 can never become a zero-delay retry loop.
  */
 export const MISSING_RETRY_AFTER_MS = 1000;
@@ -529,19 +530,29 @@ export class RateGovernor {
     try {
       let lastResponse: R | null = null;
       for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-        await this.waitForPause();
-        await this.waitForBucket(template);
-        await this.waitForGlobalSlot(template);
-        // Re-check BOTH gates last. The bucket gate and the rate slot can each
-        // block for a long time, and a global 429, a ban pause, or another
-        // template sharing this bucket exhausting it during that wait was
-        // declared after this request last looked. Without the second check it
-        // would send straight into a pause the governor had already announced,
-        // or into a bucket that reported Remaining 0 while it queued, which is
-        // the exact traffic both gates exist to stop. Both are no-ops when
-        // nothing is in force, so the re-check costs one map read.
-        await this.waitForPause();
-        await this.waitForBucket(template);
+        // A LOOP, not a fixed sequence. Each gate can block for a long time (a
+        // ban pause is ten minutes, a bucket window is whatever Reset-After
+        // says), and while one blocks another queue can raise either of the
+        // others, so any single pass through them can send on a stale answer.
+        // Ordering alone cannot fix that: whichever gate is checked last, the
+        // one before it is the one that goes stale. Only re-reading until
+        // nothing is in force makes "nothing was blocking when we sent" true
+        // rather than "nothing was blocking when we started waiting".
+        //
+        // The slot is re-reserved on every pass on purpose. A slot taken and
+        // then sat on for the length of a bucket window is not pacing anything
+        // by the time the send happens, and every request coming off that same
+        // window would fire together with no spacing at all.
+        //
+        // It terminates because each pass waits out whatever it found, and the
+        // check that follows is synchronous: nothing can be raised between the
+        // last read and the send.
+        for (;;) {
+          await this.waitForPause();
+          await this.waitForBucket(template);
+          await this.waitForGlobalSlot(template);
+          if (!this.isGated(template)) break;
+        }
 
         this.counters.requests++;
         const response = await send();
@@ -656,7 +667,15 @@ export class RateGovernor {
     }
 
     const body = (response.json ?? {}) as { retry_after?: unknown; global?: unknown };
-    const bodyRetry = typeof body.retry_after === 'number' ? body.retry_after : null;
+    // Number.isFinite, not just typeof: JSON.parse turns 1e999 into Infinity,
+    // whose typeof IS 'number'. That would set pausedUntil to Infinity, and a
+    // sleep of Infinity is clamped to about 1 ms by the platform, so the pause
+    // loop would spin at a thousand iterations a second and the bot would never
+    // send again. headerNumber already guards its side the same way.
+    const bodyRetry =
+      typeof body.retry_after === 'number' && Number.isFinite(body.retry_after)
+        ? body.retry_after
+        : null;
     const headerRetry = headerNumber(response.headers, 'retry-after');
     // A 429 that names no wait at all is malformed. Falling back to 0 would
     // retry with NO delay, and on an interaction route, which is exempt from the
@@ -720,6 +739,22 @@ export class RateGovernor {
       if (delay <= 0) return;
       await this.clock.sleep(delay);
     }
+  }
+
+  /**
+   * True when something would stop this request RIGHT NOW: the process-wide
+   * pause, or its bucket reporting Remaining 0 with a window that has not
+   * reopened. Read synchronously, immediately before the send, so it is the
+   * dispatch loop's proof that no gate went stale while another one blocked.
+   * The conditions mirror waitForPause and waitForBucket exactly, the
+   * null-resetAt arm included: a bucket with no deadline to wait for is not
+   * gated, because there would be nothing to wait FOR.
+   */
+  private isGated(template: string): boolean {
+    if (this.pausedUntil - this.clock.now() > 0) return true;
+    const state = this.limits.get(this.bucketKeyFor(template));
+    if (state === undefined || state.remaining === null || state.remaining > 0) return false;
+    return state.resetAt !== null && state.resetAt - this.clock.now() > 0;
   }
 
   /** Proactive gating: never dispatch from a bucket that reported Remaining 0. */

@@ -48,6 +48,11 @@ function reply(headers: Record<string, string> = {}): GovernorResponse {
   return { status: 200, headers, json: {}, jsonParsed: true };
 }
 
+/** A well-formed Discord 429 whose retry_after is spelled in SECONDS. */
+function res429(headers: Record<string, string>, retryAfterSeconds: number): GovernorResponse {
+  return { status: 429, headers, json: { retry_after: retryAfterSeconds }, jsonParsed: true };
+}
+
 describe('RateGovernor header-driven bucket gating', () => {
   it('gates the NEXT dispatch in a bucket until the reported reset has elapsed', async () => {
     // Proactive gating (D2): a bucket whose last response reported Remaining 0
@@ -417,6 +422,66 @@ describe('RateGovernor bucket identity across major parameters', () => {
     // the window out rather than spend it: without the re-check it went at 3000.
     expect(at('exhaust')).toBe(2000);
     expect(at('victim')).toBe(102_000);
+  });
+
+  it('honors a pause declared while a request sleeps in the bucket gate', async () => {
+    // The other half of the gate loop, and a regression this QA round introduced
+    // before catching it: adding a bucket re-check AFTER the pause re-check made
+    // the BUCKET the last gate, so a pause raised during a long bucket wait was
+    // never re-read and the request sent into it. Whichever gate is checked last,
+    // the one before it goes stale; only looping until nothing is in force works.
+    const { governor, clock } = makeGovernor(1);
+    const HASH = 'shared-by-two-templates';
+    const ROLES = '/guilds/1/roles';
+    const MEMBER = '/guilds/1/members/2';
+    const record: { label: string; at: number }[] = [];
+    const send = (label: string, response: GovernorResponse) => async () => {
+      record.push({ label, at: clock.now() });
+      return response;
+    };
+    const rate = (remaining: string): GovernorResponse =>
+      reply({
+        'x-ratelimit-bucket': HASH,
+        'x-ratelimit-remaining': remaining,
+        'x-ratelimit-reset-after': '100',
+      });
+
+    const seedA = governor.run({ method: 'GET', path: ROLES }, send('seed-roles', rate('5')));
+    await clock.runAll();
+    await seedA;
+    const seedB = governor.run({ method: 'PATCH', path: MEMBER }, send('seed-member', rate('5')));
+    await clock.runAll();
+    await seedB;
+
+    // The roles route shuts the shared bucket while the member write is asleep on
+    // its rate slot, so the member write parks in the bucket gate until 102000.
+    const exhaust = governor.run({ method: 'GET', path: ROLES }, send('exhaust', rate('0')));
+    const victim = governor.run({ method: 'PATCH', path: MEMBER }, send('victim', rate('5')));
+    // A THIRD queue, in a different guild so it shares nothing, takes a global
+    // 429 while the member write is parked. Its pause outlasts the bucket window.
+    // Answers 429 ONCE and then succeeds. A send that returned the same 429 on
+    // every attempt would extend the pause again on each retry, so the number
+    // this test pins would be an artifact of MAX_ATTEMPTS rather than of the gate.
+    const pauserQueue = [res429({ 'x-ratelimit-scope': 'global' }, 200), reply()];
+    const pauser = governor.run({ method: 'GET', path: '/guilds/7/roles' }, async () => {
+      record.push({ label: 'pauser', at: clock.now() });
+      return pauserQueue.shift() as GovernorResponse;
+    });
+
+    await clock.runAll();
+    await Promise.all([exhaust, victim, pauser]);
+
+    const at = (label: string) => record.find((r) => r.label === label)?.at;
+    expect(at('exhaust')).toBe(2000);
+    // The pause landed at 4000 and runs to 204000, well past the bucket's 102000.
+    // Without the loop the victim woke at 102000 and sent straight into it.
+    expect(at('pauser')).toBe(4000);
+    // 205000 rather than 204000, and the extra second is the second half of the
+    // same fix: the loop RE-RESERVES a rate slot on the pass that actually
+    // dispatches. The slot this request took at 3000 had been sat on for two
+    // hundred virtual seconds by then and was pacing nothing, so it takes a fresh
+    // one behind the retry that also came off the pause at 204000.
+    expect(at('victim')).toBe(205_000);
   });
 
   it('does NOT wipe shared bucket state when one template rotates onto a new hash', async () => {
