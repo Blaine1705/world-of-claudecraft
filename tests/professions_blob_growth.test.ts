@@ -34,7 +34,7 @@ import {
 } from '../src/sim/professions/archetype';
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
 import { MAX_CRAFTED_BY_LENGTH } from '../src/sim/professions/tools';
-import { MAX_KNOWN_RECIPE_ID_LENGTH } from '../src/sim/professions/training';
+import { MAX_KNOWN_RECIPE_ID_LENGTH, MAX_KNOWN_RECIPE_IDS } from '../src/sim/professions/training';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 import { EQUIP_SLOTS } from '../src/sim/types';
 
@@ -61,6 +61,87 @@ const PROFESSIONS_BLOB_FIELDS = [
   'questedHobbies',
   'profTierTutorialSent',
   'guildLetterSent',
+] as const;
+
+// Every CharacterState key this serializer writes that is NOT professions
+// state. Pinned as a literal so the complement test below can assert that
+// the two lists TOGETHER cover the whole blob: a new field must be
+// classified into one of them, or it stays invisible to this bound. Ordered
+// as serializeCharacter writes them (src/sim/sim.ts), conditional keys
+// included, since a key absent from the fixture is harmless here while a
+// missing one is not.
+const NON_PROFESSIONS_BLOB_FIELDS = [
+  'contentRevision',
+  'level',
+  'xp',
+  'lifetimeXp',
+  'honor',
+  'lifetimeHonor',
+  'honorArenaDaily',
+  'prestigeRank',
+  'unlockedMilestones',
+  'restedXp',
+  'totalPlayedSeconds',
+  'copper',
+  'hp',
+  'resource',
+  'pos',
+  'facing',
+  'dead',
+  'ghost',
+  'corpsePos',
+  'resSickness',
+  'unstuckSickness',
+  'equipment',
+  'inventory',
+  'bags',
+  'bank',
+  'vendorBuyback',
+  'questLog',
+  'questsDone',
+  'arenaRating',
+  'arenaWins',
+  'arenaLosses',
+  'arena1v1Rating',
+  'arena1v1Wins',
+  'arena1v1Losses',
+  'arena2v2Rating',
+  'arena2v2Wins',
+  'arena2v2Losses',
+  'weaponStowed',
+  'vcupWins',
+  'vcupLosses',
+  'vcupDraws',
+  'vcupGuildWins',
+  'vcupGuildLosses',
+  'vcupBetWins',
+  'vcupBetLosses',
+  'vcupBetNet',
+  'talents',
+  'loadouts',
+  'activeLoadout',
+  'raidLockouts',
+  'pet',
+  'cooldowns',
+  'skin',
+  'skinCatalog',
+  'pendingSkinRank',
+  'pendingSkinCatalog',
+  'pendingSkinItemId',
+  'mountTrainingFeePaid',
+  'ridingTrained',
+  'pbeBoostKit',
+  'delveMarks',
+  'delveClears',
+  'companionUpgrades',
+  'delveLoreUnlocked',
+  'delveDaily',
+  'heroicDaily',
+  'mailWelcomed',
+  'deeds',
+  'deedStats',
+  'activeTitle',
+  'renown',
 ] as const;
 
 // The settled ceiling measured 8,469 bytes when this bound was re-minted
@@ -225,9 +306,15 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(s2.knownRecipes ?? []).toHaveLength(new Set(ALL_RECIPES.map((r) => r.id)).size);
     expect(Object.keys(s2.toolEffectSlots ?? {})).toHaveLength(3);
     expect(Object.keys(s2.questedHobbies ?? {})).toHaveLength(ARCHETYPE_PAIR_TARGETS.length);
-    expect((s2.archetype?.attunedPairs ?? []).length).toBeLessThanOrEqual(
-      ARCHETYPE_PAIR_TARGETS.length,
-    );
+    // EXACT, not an upper bound: the fixture attunes every authored pair, so
+    // a cap pin that tolerated fewer would pass on a normalizer that
+    // silently dropped history (the load really does filter this list
+    // against the current ring, professions/archetype.ts).
+    expect(s2.archetype?.attunedPairs ?? []).toHaveLength(ARCHETYPE_PAIR_TARGETS.length);
+    // The tier-mail record is pruned to the ACTIVE pair's two majors on
+    // load, which is what keeps it a 2-entry field rather than one that
+    // grows a row per craft the character ever touched.
+    expect(Object.keys(s2.tierMailSent ?? {})).toHaveLength(2);
     expect(Object.keys(s2.townFocus ?? {})).toHaveLength(
       Object.keys(HARVEST_COMPONENT_ITEMS).length,
     );
@@ -246,42 +333,169 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(bytes).toBeLessThanOrEqual(PROFESSIONS_BYTE_CEILING);
   });
 
-  it('oversized junk drops on load, alone: bogus recipe ids and a corrupt signer', () => {
+  it('the two field lists together cover the whole blob, so a new field must be classified', () => {
+    // THE COMPLEMENT PIN. The scrape above only cross-checks the two
+    // professions lists against EACH OTHER, so a professions field added to
+    // neither is invisible to both: the sweep would not exercise it and this
+    // bound would not measure it. Subtracting the pinned non-professions
+    // allowlist from the real settled key set closes that hole in the one
+    // direction it can be closed: a new key must be added to one list or the
+    // other, and choosing which is the classification decision.
+    const sim = ceilingSim();
+    const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
+    const settled = makeSim(37);
+    const pid = settled.addPlayer('warrior', 'Complement', { state: s1 });
+    const state = settled.serializeCharacter(pid) as CharacterState;
+    const nonProfessions = new Set<string>(NON_PROFESSIONS_BLOB_FIELDS);
+    const professionsKeys = Object.keys(state).filter((key) => !nonProfessions.has(key));
+    expect(professionsKeys.sort()).toEqual([...PROFESSIONS_BLOB_FIELDS].sort());
+  });
+
+  it('oversized junk drops on load, alone, in every container that carries an instance', () => {
     // The write side is deliberately load-bounded (the node_persist doctrine:
     // both anti-tamper arms live on the LOAD side), so the junk serializes
     // once and the next load is where the bound bites.
+    //
+    // DOCTRINE NOTE on what these clamps do NOT reach: an instance parked in
+    // market or mail escrow lives in world_state, not in characters.state,
+    // and re-enters a character only at runtime through grantCopies. So the
+    // character blob is bounded with a one-save lag (the copy is bounded the
+    // next time that character loads) while world_state itself stays
+    // unbounded by this rule. Recorded, not fixed here: escrow rows are
+    // server-minted from live payloads rather than parsed from a stored
+    // blob.
     const sim = ceilingSim();
     const meta = sim.players.get(sim.playerId) as PlayerMeta;
-    meta.knownRecipes.add('x'.repeat(500));
+    const overLengthId = 'x'.repeat(MAX_KNOWN_RECIPE_ID_LENGTH + 1);
+    const atLengthId = 'y'.repeat(MAX_KNOWN_RECIPE_ID_LENGTH);
+    meta.knownRecipes.add(overLengthId);
+    meta.knownRecipes.add(atLengthId);
+    // A NON-STRING id: no legal writer produces one, and the filter's
+    // typeof arm was untested until the review round asked for it.
+    meta.knownRecipes.add(42 as unknown as string);
     const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
     expect(s1.knownRecipes?.some((id) => id.length > MAX_KNOWN_RECIPE_ID_LENGTH)).toBe(true);
+    const overSigner = 'S'.repeat(MAX_CRAFTED_BY_LENGTH + 1);
+    const legalSigner = 'A'.repeat(MAX_CRAFTED_BY_LENGTH);
     const corruptSlot = EQUIP_SLOTS[0];
     const keptSlot = EQUIP_SLOTS[1];
+    const numericSlot = EQUIP_SLOTS[2];
     const corrupt = s1.equipmentInstance?.[corruptSlot];
     if (!corrupt) throw new Error('ceiling fixture lost its first equip instance');
-    corrupt.signer = 'S'.repeat(MAX_CRAFTED_BY_LENGTH + 1);
+    corrupt.signer = overSigner;
+    const numeric = s1.equipmentInstance?.[numericSlot];
+    if (!numeric) throw new Error('ceiling fixture lost its third equip instance');
+    numeric.signer = 42 as unknown as string;
     // BAG stacks carry most signed instances in real play (the mint sites
     // put crafted copies into inventory, not equipment), so the clamp must
     // bite there too; the review round found an equipment-only first cut.
     if (!s1.inventory?.[0]) throw new Error('ceiling fixture has no inventory row');
-    s1.inventory[0].instance = {
-      enchant: 'enchant_weapon_might',
-      signer: 'S'.repeat(MAX_CRAFTED_BY_LENGTH + 1),
+    s1.inventory[0].instance = { enchant: 'enchant_weapon_might', signer: overSigner };
+    // The SURVIVOR half of the bag arm: a legal maximum-length signer on
+    // another bag row must come back byte-faithfully, or a clamp that simply
+    // deleted every bag signer would pass the drop pins above.
+    s1.inventory.push({
+      itemId: 'roasted_boar',
+      count: 1,
+      instance: { enchant: 'enchant_weapon_might', signer: legalSigner },
+    });
+    const bagSurvivorIndex = s1.inventory.length - 1;
+    // The two containers the first cut never reached at all.
+    s1.bank = {
+      inventory: [
+        {
+          itemId: 'roasted_boar',
+          count: 1,
+          instance: { enchant: 'enchant_weapon_might', signer: overSigner },
+        },
+        {
+          itemId: 'roasted_boar',
+          count: 1,
+          instance: { enchant: 'enchant_weapon_might', signer: legalSigner },
+        },
+      ],
+      purchasedSlots: 0,
+      bonusSlots: 0,
     };
+    s1.vendorBuyback = [
+      {
+        itemId: 'roasted_boar',
+        count: 1,
+        instance: { enchant: 'enchant_weapon_might', signer: overSigner },
+      },
+    ];
     const second = makeSim(34);
     const pid2 = second.addPlayer('warrior', 'Junk', { state: s1 });
     const s2 = second.serializeCharacter(pid2) as CharacterState;
-    // The bogus id dropped, every legal id (retired shapes included) survived.
+    // Both bogus ids dropped; every legal id (retired shapes included)
+    // survived, INCLUDING one exactly at the length ceiling.
     expect(s2.knownRecipes?.every((id) => id.length <= MAX_KNOWN_RECIPE_ID_LENGTH)).toBe(true);
-    expect(s2.knownRecipes).toHaveLength((s1.knownRecipes?.length ?? 0) - 1);
-    // The corrupt signer dropped ALONE, with the KEY genuinely removed (an
-    // explicit-undefined key would survive 'in' checks): its slot's instance
-    // survives, and a legal maximum-length signer on another slot is
-    // untouched. Same on the bag stack.
+    expect(s2.knownRecipes?.every((id) => typeof id === 'string')).toBe(true);
+    expect(s2.knownRecipes).toContain(atLengthId);
+    expect(s2.knownRecipes).not.toContain(overLengthId);
+    expect(s2.knownRecipes).toHaveLength((s1.knownRecipes?.length ?? 0) - 2);
+    // The boundary pair, pinned against the constant and then the constant
+    // against its literal: a 500-character junk id left the whole 65..499
+    // band unpinned, which the review round called out.
+    expect(atLengthId).toHaveLength(64);
+    expect(MAX_KNOWN_RECIPE_ID_LENGTH).toBe(64);
+    // Every corrupt signer dropped ALONE, with the KEY genuinely removed (an
+    // explicit-undefined key would survive 'in' checks): each slot's
+    // instance survives, and a legal maximum-length signer is untouched
+    // wherever it sits.
     expect('signer' in (s2.equipmentInstance?.[corruptSlot] ?? {})).toBe(false);
     expect(s2.equipmentInstance?.[corruptSlot]?.enchant).toBe('enchant_weapon_might');
-    expect(s2.equipmentInstance?.[keptSlot]?.signer).toBe('A'.repeat(MAX_CRAFTED_BY_LENGTH));
+    expect('signer' in (s2.equipmentInstance?.[numericSlot] ?? {})).toBe(false);
+    expect(s2.equipmentInstance?.[numericSlot]?.enchant).toBe('enchant_weapon_might');
+    expect(s2.equipmentInstance?.[keptSlot]?.signer).toBe(legalSigner);
     expect('signer' in (s2.inventory?.[0]?.instance ?? {})).toBe(false);
     expect(s2.inventory?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
+    expect(s2.inventory?.[bagSurvivorIndex]?.instance?.signer).toBe(legalSigner);
+    expect('signer' in (s2.bank?.inventory?.[0]?.instance ?? {})).toBe(false);
+    expect(s2.bank?.inventory?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
+    expect(s2.bank?.inventory?.[1]?.instance?.signer).toBe(legalSigner);
+    expect('signer' in (s2.vendorBuyback?.[0]?.instance ?? {})).toBe(false);
+    expect(s2.vendorBuyback?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
+  });
+
+  it('a knownRecipes value stored as a STRING loads the character instead of throwing', () => {
+    // THE CRASH REGRESSION. sanitizeKnownRecipeIds used to take an array and
+    // call .filter on it, so a stored string threw `filter is not a
+    // function` inside Sim.addPlayer: that character could never log in
+    // again, on any host, and no amount of retrying fixed it. The filter is
+    // total now, so the corrupt VALUE drops and the login proceeds.
+    const sim = ceilingSim();
+    const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
+    s1.knownRecipes = 'recipe_tough_jerky' as unknown as string[];
+    const second = makeSim(35);
+    const pid2 = second.addPlayer('warrior', 'StringRecipes', { state: s1 });
+    const meta2 = second.players.get(pid2) as PlayerMeta;
+    expect(meta2.knownRecipes.size).toBe(0);
+    // The rest of the character really loaded: the value dropped, not the
+    // login (a fixture that only asserted "did not throw" would pass on a
+    // load that silently bailed out early).
+    expect(meta2.copper).toBe(s1.copper);
+    expect(Object.keys(meta2.craftSkills)).toHaveLength(CRAFT_RING.length);
+    expect(second.serializeCharacter(pid2)?.knownRecipes).toEqual([]);
+  });
+
+  it('caps a corrupt knownRecipes row at its entry ceiling, keeping the first ids in order', () => {
+    // The COUNT half of the shape bound: 10,000 well-shaped ids are each
+    // individually legal, so only an entry cap keeps them off every autosave.
+    const sim = ceilingSim();
+    const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
+    const bulkIds: string[] = [];
+    for (let i = 0; i <= MAX_KNOWN_RECIPE_IDS; i++) bulkIds.push(`recipe_bulk_${i}`);
+    s1.knownRecipes = bulkIds;
+    const second = makeSim(36);
+    const pid2 = second.addPlayer('warrior', 'BulkRecipes', { state: s1 });
+    const s2 = second.serializeCharacter(pid2) as CharacterState;
+    expect(s2.knownRecipes).toHaveLength(MAX_KNOWN_RECIPE_IDS);
+    // Order preserved, cut from the TAIL: the ids a real catalog would have
+    // written first are the ones that survive.
+    expect(s2.knownRecipes?.[0]).toBe('recipe_bulk_0');
+    expect(s2.knownRecipes?.[511]).toBe('recipe_bulk_511');
+    expect(s2.knownRecipes).not.toContain('recipe_bulk_512');
+    expect(MAX_KNOWN_RECIPE_IDS).toBe(512);
   });
 });

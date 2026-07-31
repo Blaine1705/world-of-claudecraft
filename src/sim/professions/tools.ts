@@ -261,6 +261,31 @@ export const EMPTY_TOOL_EFFECT_SLOT_VIEWS: readonly never[] = Object.freeze([]);
 // (phase 16: the one professions blob field with no length ceiling at all).
 export const MAX_CRAFTED_BY_LENGTH = 16;
 
+/**
+ * True only for a string a legal mint could have stamped as a crafter name:
+ * at most MAX_CRAFTED_BY_LENGTH characters AND printable ASCII throughout.
+ *
+ * The char-code half is what makes this a BYTE bound rather than a
+ * code-unit one: the auth name alphabet is ASCII, so a multi-byte string has
+ * no legal mint at all, and 16 code units of astral characters weigh several
+ * times a name's once JSON escapes them, which is exactly how a corrupt row
+ * evades a length-only test and rides every autosave. Deliberately looser
+ * than the auth regex itself: the persisted value has to outlive a future
+ * widening of the legal alphabet, so this bounds the SHAPE and never the
+ * spelling.
+ *
+ * Two readers, so the rule cannot drift apart: normalizeToolEffectSlots
+ * below, and the payload `signer` arm in src/sim/item_instance_load.ts.
+ */
+export function isLegalCrafterName(value: unknown): value is string {
+  if (typeof value !== 'string' || value.length > MAX_CRAFTED_BY_LENGTH) return false;
+  for (let i = 0; i < value.length; i++) {
+    const code = value.charCodeAt(i);
+    if (code < 32 || code > 126) return false;
+  }
+  return true;
+}
+
 export interface ToolEffectSlot {
   effectId: ToolEffectId;
   /** Remaining charges. Reaches 0 when the effect is fully depleted. */
@@ -604,18 +629,19 @@ export function normalizeToolEffectSlots(
       effectId: row.effectId,
       durability: Math.min(maxDurability, Math.max(0, Math.floor(row.durability) || 0)),
       maxDurability,
-      // An oversized crafter name cannot come from a legal mint (the auth
-      // shape caps names at MAX_CRAFTED_BY_LENGTH), so it is a hand-edited
-      // or corrupted row: DROP it rather than truncate, because a truncated
-      // prefix could equal a DIFFERENT player's real name and misattribute
-      // the original-crafter recharge discount, while an absent crafter
-      // merely forgoes it. Part of the phase 16 blob-growth bound, beside
-      // the equipmentInstance signer clamp and the knownRecipes id-shape
-      // filter on the sim load path.
-      craftedBy:
-        typeof row.craftedBy === 'string' && row.craftedBy.length <= MAX_CRAFTED_BY_LENGTH
-          ? row.craftedBy
-          : undefined,
+      // A crafter name outside the legal name shape cannot come from a legal
+      // mint (isLegalCrafterName above: the auth length cap AND the ASCII
+      // alphabet), so it is a hand-edited or corrupted row: DROP it rather
+      // than truncate, because a truncated prefix could equal a DIFFERENT
+      // player's real name and misattribute the original-crafter recharge
+      // discount, while an absent crafter merely forgoes it. Part of the
+      // phase 16 blob-growth bound, beside the item-payload signer bound
+      // (item_instance_load.ts) and the knownRecipes id-shape filter on the
+      // sim load path. The key is OMITTED rather than set to an explicit
+      // undefined, matching how the payload arms delete it: an
+      // explicit-undefined key survives `in` and Object.keys while every
+      // consumer only tests `!== undefined`.
+      ...(isLegalCrafterName(row.craftedBy) ? { craftedBy: row.craftedBy } : {}),
       // A persisted 'prompt' row is PRESERVED, and since the R40 confirm
       // flow shipped it is an ordinary live mode: the mint accepts it and
       // the harvest command carries the per-use consent it asks for.

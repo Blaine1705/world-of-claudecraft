@@ -19,6 +19,7 @@ import type { BankInfo } from '../world_api';
 import { addStacked, bagCapacity, bagsFullError, countFit, instancedCountCap } from './bags';
 import { ITEMS } from './data';
 import * as deedsMod from './deeds';
+import { sanitizeItemInstancePayloadOnLoad, warnDroppedInstanceKeys } from './item_instance_load';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
 
@@ -292,8 +293,12 @@ export function bankInfoFor(ctx: SimContext, pid: number): BankInfo | null {
  *  items are NEVER destroyed (an unknown-but-string itemId stays as dormant
  *  recoverable data, the mail precedent). Over-capacity inventories are tolerated
  *  (never truncated). purchasedSlots is clamped into range and floored to a whole
- *  expansion so the price indexing stays coherent. */
-export function sanitizeBankState(raw: unknown): BankState {
+ *  expansion so the price indexing stays coherent. Every row's instance payload
+ *  takes the shared load bound (item_instance_load.ts): junk KEYS drop, the row
+ *  itself never does. `owner` names the character in that bound's dev-channel
+ *  log only, and is optional because the unit tests call this with a raw blob
+ *  and no character at all. */
+export function sanitizeBankState(raw: unknown, owner?: string): BankState {
   if (!raw || typeof raw !== 'object') {
     return { inventory: [], purchasedSlots: 0, bonusSlots: 0 };
   }
@@ -327,7 +332,22 @@ export function sanitizeBankState(raw: unknown): BankState {
         ? { itemId: e.itemId, count, instance: e.instance as InvSlot['instance'] }
         : { itemId: e.itemId, count };
       if (craftedRecipeId !== undefined) slot.craftedRecipeId = craftedRecipeId;
-      inventory.push(cloneInvSlot(slot));
+      const cleaned = cloneInvSlot(slot);
+      // The same load-side payload bound the carried bags and the equipment
+      // map take (item_instance_load.ts), applied to the clone above rather
+      // than to the stored row, which this function never owns.
+      // Banked copies were missed by the first cut and are exactly where a
+      // signed instance sits longest, so an unbounded name here would ride
+      // every autosave of an account that has not logged in for months. The
+      // count clamp above stands: it is computed from the payload AS STORED,
+      // so dropping a junk key can never widen a tampered stack.
+      if (cleaned.instance) {
+        const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(cleaned.instance);
+        warnDroppedInstanceKeys(owner ?? 'bank', dropped);
+        if (payload) cleaned.instance = payload;
+        else delete cleaned.instance;
+      }
+      inventory.push(cleaned);
     }
   }
   const maxPurchased = BANK_EXPANSION_PRICES.length * BANK_EXPANSION_SLOTS;

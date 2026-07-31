@@ -88,9 +88,21 @@ const populatedSim = (): Sim => {
   // The populated POLICY round trip (stat recalc, absent-field default) lives
   // in tests/professions_enchanting.test.ts; here it is one column of the
   // sweep so the field list's completeness claim stays true.
+  //
+  // Deliberately LEGAL on every arm of the load-side payload bound
+  // (src/sim/item_instance_load.ts): a signer inside the name shape, string
+  // values inside the string ceiling at the top level (enchant,
+  // craftedRecipeId) AND one level down (rolled.quality), plus the two
+  // non-string shapes it must never touch (rolled.stats, charges). That is
+  // what makes this column a byte-faithfulness pin for the bound rather than
+  // only for the serializer: the arms' own drop behavior is unit-tested in
+  // tests/item_instance_load.test.ts, and this is the identity half.
   meta.equipmentInstance.mainhand = {
+    signer: 'Loggerholm',
+    charges: { gatherers_cache: 3 },
+    rolled: { quality: 'rare', stats: { str: 2 } },
     enchant: 'enchant_weapon_might',
-    rolled: { stats: { str: 2 } },
+    craftedRecipeId: 'recipe_eastbrook_arming_sword',
   };
   meta.townFocus = { hide: 3, fang: 2 };
   meta.archetype = {
@@ -144,6 +156,14 @@ describe('the professions blob round-trip sweep', () => {
     // identically), so the literal is what carries the no-rounding claim.
     expect(s1.craftSkills).toMatchObject({ weaponcrafting: 55.5, cooking: 10 });
     expect(s1.equipmentInstance?.mainhand?.rolled?.stats?.str).toBe(2);
+    // The payload crosses the load bound BYTE-faithfully, key order included:
+    // toEqual alone would forgive a re-ordered rebuild, and the save is JSON.
+    expect(JSON.stringify(s1.equipmentInstance?.mainhand)).toBe(
+      '{"signer":"Loggerholm","charges":{"gatherers_cache":3},' +
+        '"rolled":{"quality":"rare","stats":{"str":2}},' +
+        '"enchant":"enchant_weapon_might",' +
+        '"craftedRecipeId":"recipe_eastbrook_arming_sword"}',
+    );
     expect(s1.nodeHarvestCooldowns).toEqual({ [NODE.id]: 30 });
     expect(s1.tierMailSent).toEqual({ weaponcrafting: 2, armorcrafting: 1 });
     expect(s1.questCadence).toEqual({ q_prof_work_order_smith: 600 });
@@ -160,6 +180,12 @@ describe('the professions blob round-trip sweep', () => {
     for (const field of PROFESSIONS_BLOB_FIELDS) {
       expect(s2[field], `${field} drifted across one save/load cycle`).toEqual(s1[field]);
     }
+    // The sweep above is toEqual, which is key-order blind. The instance
+    // payload crossed the load-side bound (src/sim/item_instance_load.ts),
+    // whose whole contract is that it deletes in place rather than
+    // rebuilding, so pin the BYTES for that field: a rebuild that happened to
+    // preserve every value would pass the loop and fail here.
+    expect(JSON.stringify(s2.equipmentInstance)).toBe(JSON.stringify(s1.equipmentInstance));
 
     // Layer 2, the whole-blob fixed point: a second load changes NOTHING
     // anywhere in the blob, professions or not. One-time load transforms

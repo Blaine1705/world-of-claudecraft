@@ -1038,6 +1038,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // the same change so any future emit added here lands under the drift
     // guard from day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/item_instance_merge.ts'), 'utf8'),
+    // Phase 16: the load-side item-instance payload bound. Its only string is
+    // a dev-channel console.warn (never matched), but every new sim module
+    // joins the scan list in the same change so any future emit added here
+    // lands under the drift guard from day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/item_instance_load.ts'), 'utf8'),
     // Professions 2.0: the force-rename instance-signer sweep. It
     // emits no player text itself (pure signer bookkeeping the rename handler
     // consumes), but every new sim module joins the scan list in the same

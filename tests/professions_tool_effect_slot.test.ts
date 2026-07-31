@@ -811,12 +811,13 @@ describe('the id tables and the load normalizer, directly', () => {
     expect(mixed && 'fishing' in mixed).toBe(false);
   });
 
-  it('craftedBy length clamp: legal names keep provenance, an oversized string drops ALONE', () => {
-    // Phase 16 blob-growth bound: character names cap at 16 chars
-    // (server/auth.ts), so a longer stored craftedBy is a hand-edited or
-    // corrupted row. The clamp DROPS rather than truncates (a truncated
-    // prefix could equal a DIFFERENT player's real name and misattribute the
-    // original-crafter recharge discount) and the slot itself survives.
+  it('craftedBy shape clamp: legal names keep provenance, junk drops ALONE', () => {
+    // Phase 16 blob-growth bound: character names cap at 16 ASCII chars
+    // (server/auth.ts), so a longer or non-ASCII stored craftedBy is a
+    // hand-edited or corrupted row. The clamp DROPS rather than truncates (a
+    // truncated prefix could equal a DIFFERENT player's real name and
+    // misattribute the original-crafter recharge discount) and the slot
+    // itself survives.
     const load = (craftedBy: unknown) =>
       normalizeToolEffectSlots({
         mining: {
@@ -836,7 +837,22 @@ describe('the id tables and the load normalizer, directly', () => {
     const over = load('A'.repeat(MAX_CRAFTED_BY_LENGTH + 1));
     expect(over?.craftedBy).toBeUndefined();
     expect(over?.durability).toBe(5);
+    // The KEY is omitted, not set to an explicit undefined: an
+    // explicit-undefined key survives `in` and Object.keys, which is the
+    // same distinction the equipment and bag arms make by deleting.
+    expect(over && 'craftedBy' in over).toBe(false);
     expect(MAX_CRAFTED_BY_LENGTH).toBe(16);
+    // Inside the length ceiling but outside the ASCII name alphabet, which
+    // a length-only test lets straight through: 16 code units of multi-byte
+    // text weigh several times a real name once JSON escapes them, and no
+    // account can hold one. Spelled with a char code because this repo's
+    // source is ASCII.
+    const accented = 'A'.repeat(15) + String.fromCharCode(0xe9);
+    expect(accented).toHaveLength(MAX_CRAFTED_BY_LENGTH);
+    expect(load(accented)?.craftedBy).toBeUndefined();
+    expect(load('Log\nherholm')?.craftedBy).toBeUndefined();
+    // The slot itself still survives the drop, exactly like the length arm.
+    expect(load(accented)?.durability).toBe(5);
   });
 
   it('confirmMode load coercion: kept modes, legacy absent reads always, garbage fails safe to prompt', () => {

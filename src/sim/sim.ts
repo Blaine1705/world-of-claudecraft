@@ -226,6 +226,7 @@ import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } fr
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
 import * as interaction from './interaction';
+import { sanitizeItemInstancePayloadOnLoad, warnDroppedInstanceKeys } from './item_instance_load';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
@@ -391,7 +392,6 @@ import {
 import { rechargeToolEffectAction, slotToolEffectAction } from './professions/tool_effect_actions';
 import {
   EMPTY_TOOL_EFFECT_SLOT_VIEWS,
-  MAX_CRAFTED_BY_LENGTH,
   normalizeToolEffectSlots,
   structuredCloneToolEffectSlots,
   type ToolEffectConfirmMode,
@@ -2705,20 +2705,25 @@ export class Sim {
         if (!itemId) continue;
         // A rift payload is validated against the worn item (anti-tamper); any
         // other instance (an enchant) deep-clones through the shared rules.
-        const clean = instance.rift
+        const owned = instance.rift
           ? sanitizeRiftGearInstance(itemId, instance, player.id)
           : cloneItemInstancePayload(instance);
-        // The signer is a character name; no legal mint exceeds the name
-        // shape's 16 characters (the craftedBy rule in professions/tools.ts),
-        // so an oversized stored value is corrupt and DROPS on load rather
-        // than truncating into a possible collision with a real player's
-        // name (phase 16 blob growth bound). Deleted, not set undefined: an
-        // explicit-undefined key survives 'in' checks and Object.keys.
-        if (clean?.signer !== undefined) {
-          if (typeof clean.signer !== 'string' || clean.signer.length > MAX_CRAFTED_BY_LENGTH) {
-            delete clean.signer;
-          }
-        }
+        // Both branches hand back a payload THIS load owns (a fresh clone, or
+        // a fresh rebuild), which is what lets the shared load bound delete
+        // keys in place (item_instance_load.ts). It bounds every string on
+        // the payload, not just the signer: the phase 16 first cut clamped
+        // the signer alone and left the rest of the shape unbounded.
+        //
+        // On the RIFT branch the signer arm is DEAD, and saying so is the
+        // point: sanitizeRiftGearInstance REBUILDS the payload from bounded
+        // progression inputs and never copies a signer across, so nothing
+        // survives there for the name rule to bite on. Ordered AFTER the rift
+        // rebuild here, and BEFORE it on the bags arm below; the asymmetry is
+        // harmless precisely because the rebuild drops every key this bound
+        // could touch, but it is deliberate rather than accidental and must
+        // stay that way if either arm gains a rule the rebuild preserves.
+        const { payload: clean, dropped } = sanitizeItemInstancePayloadOnLoad(owned);
+        warnDroppedInstanceKeys(meta.name, dropped);
         if (clean) meta.equipmentInstance[slot as EquipSlot] = clean;
       }
       // The shared tamper ceiling (bags.ts instancedCountCap, same rule as the
@@ -2732,17 +2737,17 @@ export class Sim {
         return slot;
       });
       for (const slot of meta.inventory) {
-        // The signer clamp covers BAGS too (the review round: the mint sites
+        // The payload bound covers BAGS too (the review round: the mint sites
         // put signed instances into bags in the common case, so an
         // equipment-only clamp missed the container that carries most of
-        // them). Same rule as the equip arm below: an oversized crafter name
-        // has no legal writer and DROPS, alone.
-        if (
-          slot.instance?.signer !== undefined &&
-          (typeof slot.instance.signer !== 'string' ||
-            slot.instance.signer.length > MAX_CRAFTED_BY_LENGTH)
-        ) {
-          delete slot.instance.signer;
+        // them). Same shared rule as the equip arm above, on the clone
+        // cloneInvSlot just made, and applied BEFORE the rift rebuild here
+        // (the equip arm applies it after; see the asymmetry note there).
+        if (slot.instance) {
+          const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(slot.instance);
+          warnDroppedInstanceKeys(meta.name, dropped);
+          if (payload) slot.instance = payload;
+          else delete slot.instance;
         }
         if (!slot.instance?.rift) continue;
         const clean = sanitizeRiftGearInstance(slot.itemId, slot.instance, player.id);
@@ -2775,12 +2780,23 @@ export class Sim {
       // charge-bearing copies through the grant's fresh-slot clone.
       meta.vendorBuyback = (s.vendorBuyback ?? []).map((raw) => {
         const slot = cloneInvSlot(raw);
+        // Buyback rows carry real signed instances (anything sold to a vendor
+        // lands here for five minutes), so they take the same payload bound
+        // as bags and equipment; the first cut reached neither this list nor
+        // the bank. Before the charges clamp below, which reads the payload
+        // this leaves behind.
+        if (slot.instance) {
+          const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(slot.instance);
+          warnDroppedInstanceKeys(meta.name, dropped);
+          if (payload) slot.instance = payload;
+          else delete slot.instance;
+        }
         if (slot.instance && !isMergeableInstancePayload(slot.instance)) slot.count = 1;
         return slot;
       });
       // Bank sanitizes on load (never destroys items; a pre-bank save has no `bank`
       // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
-      meta.bank = sanitizeBankState(s.bank);
+      meta.bank = sanitizeBankState(s.bank, meta.name);
       for (const q of s.questLog) {
         // Prune unknown quest ids at load (normalize on load, never crash): a save
         // mid a since-deleted quest (e.g. the retirement of
@@ -2817,9 +2833,18 @@ export class Sim {
       }
       meta.craftSkills = normalizeCraftSkills(s.craftSkills);
       // Shape-bounded, never catalog-filtered: retired ids must survive (the
-      // grandfather contract), oversized or non-string junk must not (the
-      // phase 16 blob growth bound).
-      if (s.knownRecipes) meta.knownRecipes = new Set(sanitizeKnownRecipeIds(s.knownRecipes));
+      // grandfather contract), oversized, non-string or over-count junk must
+      // not (the phase 16 blob growth bound). The filter is TOTAL, so a
+      // stored value that is not an array at all loads as no known recipes
+      // rather than throwing this character's load and locking the account
+      // out for good.
+      if (s.knownRecipes) {
+        const knownRecipeIds = sanitizeKnownRecipeIds(s.knownRecipes);
+        if (!Array.isArray(s.knownRecipes) || s.knownRecipes.length !== knownRecipeIds.length) {
+          console.warn(`[load] dropped knownRecipes junk for ${meta.name}`);
+        }
+        meta.knownRecipes = new Set(knownRecipeIds);
+      }
       // Grandfather normalize (one shared load path for offline saves
       // AND server-persisted state): an older save (flag absent/false)
       // gets the pre-training recipe ids unioned in exactly once, then the

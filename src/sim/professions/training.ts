@@ -222,11 +222,39 @@ export function grandfatherKnownRecipes(
 // have no legal writer at all.
 export const MAX_KNOWN_RECIPE_ID_LENGTH = 64;
 
-/** Load-side shape filter for a persisted knownRecipes array: strings within
- *  the id-length bound survive byte-faithfully (INCLUDING retired ids, the
- *  grandfather contract), everything else drops. Pure. */
-export function sanitizeKnownRecipeIds(ids: readonly unknown[]): string[] {
-  return ids.filter(
-    (id): id is string => typeof id === 'string' && id.length <= MAX_KNOWN_RECIPE_ID_LENGTH,
-  );
+/**
+ * The COUNT half of the same bound. The catalog ships well under a hundred
+ * recipes, and the grandfather contract only ever adds PRE_TRAINING_RECIPE_IDS
+ * on top, so a stored array anywhere near this size is corruption; without a
+ * cap, one row of ten thousand well-shaped ids rides every autosave forever.
+ * The bound is on the PERSISTED array, not on the live Set: the grandfather
+ * union runs after this filter and may legitimately push a capped set a few
+ * entries past it, which the next save then re-caps.
+ */
+export const MAX_KNOWN_RECIPE_IDS = 512;
+
+/**
+ * Load-side shape filter for a persisted knownRecipes value: strings within
+ * the id-length bound survive byte-faithfully and IN ORDER (retired ids
+ * included, the grandfather contract), everything else drops, and at most
+ * MAX_KNOWN_RECIPE_IDS survive.
+ *
+ * TOTAL on `unknown`, which is the contract and not a convenience: this runs
+ * inside Sim.addPlayer, so a stored value that is not an array (a JSON string
+ * is the shape a hand-edit or a bad admin write produces) used to throw
+ * `filter is not a function` there and lock that character out of the game
+ * permanently, on every host, with no way back in. A corrupt value loads as
+ * NO known recipes instead. A character not yet grandfathered still gets the
+ * pre-training set unioned in on that same load; one already past the cut
+ * loses what the corrupt row held, which was unreadable either way. Pure.
+ */
+export function sanitizeKnownRecipeIds(ids: unknown): string[] {
+  if (!Array.isArray(ids)) return [];
+  const out: string[] = [];
+  for (const id of ids) {
+    if (typeof id !== 'string' || id.length > MAX_KNOWN_RECIPE_ID_LENGTH) continue;
+    out.push(id);
+    if (out.length === MAX_KNOWN_RECIPE_IDS) break;
+  }
+  return out;
 }

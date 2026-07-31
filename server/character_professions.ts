@@ -210,11 +210,19 @@ export function characterProfessionsSheet(
     crafting,
     // The loader builds a Set (src/sim/sim.ts), so duplicate ids in a
     // hand-edited blob collapse at login; count the deduplicated size the
-    // next login resolves, not the raw array length. Guarded on ITERABILITY,
-    // not Array.isArray (the loader Sets a string into its characters and
-    // the sheet must match that reading): a corrupt non-iterable value
-    // renders 0 instead of throwing the whole sheet into a 500, which is
-    // exactly the blob the operator opened the inspector to diagnose.
+    // next login resolves, not the raw array length. Guarded on ITERABILITY
+    // rather than Array.isArray so a corrupt non-iterable value renders 0
+    // instead of throwing the whole sheet into a 500, which is exactly the
+    // blob the operator opened the inspector to diagnose.
+    //
+    // The two readings agree on every ARRAY, which is every legal blob, and
+    // deliberately diverge on a non-array iterable (a stored STRING is the
+    // only shape that reaches here): sanitizeKnownRecipeIds drops such a
+    // value whole, so the next login resolves ZERO while this row still
+    // counts the string's distinct characters. That is the intended
+    // inspector reading, because the sheet describes the blob as STORED,
+    // and a nonzero count beside an account that logs in with no recipes is
+    // the signal an operator is looking for.
     knownRecipes: isIterable(state.knownRecipes) ? new Set(state.knownRecipes).size : 0,
     slots,
     nodeTimers,
