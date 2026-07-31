@@ -296,6 +296,7 @@ import {
   abilityStartsAutoAttack,
   deferAutoAttackUntilCastEnd,
   hasAutoAttackTarget,
+  isPvpHostileTarget,
 } from './hud/action_bar/attack_on_ability';
 import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './hud/action_bar/consumable_bar_view';
 import {
@@ -5906,13 +5907,18 @@ export class Hud {
           // AOEs (Arcane Explosion, Frost Nova, Thunder Clap, ...) cast with no hostile
           // target, where startAutoAttack does NOT no-op but errors "Invalid attack
           // target." (sim/combat/auto_attack.ts). The explicit Attack button keeps that
-          // error feedback; this convenience path must not trip it.
+          // error feedback; this convenience path must not trip it. hasAutoAttackTarget
+          // also recognizes a live duel/arena opponent (#2451): a player target never
+          // carries the mob-only `hostile` flag, so it errored on every PvP cast.
           const tid = this.sim.player.targetId;
           const target = tid !== null ? (this.sim.entities.get(tid) ?? null) : null;
           if (
             this.optionsHooks?.settings.get('startAttackOnAbilityUse') &&
             abilityStartsAutoAttack(resolved.effects) &&
-            hasAutoAttackTarget(target)
+            hasAutoAttackTarget(
+              target,
+              isPvpHostileTarget(tid, this.sim.duelInfo, this.sim.arenaInfo),
+            )
           ) {
             // A TIMED cast must not engage yet: startAutoAttack aggros the target
             // immediately, so engaging at cast start pulled the mob before any
@@ -11379,7 +11385,8 @@ export class Hud {
             if (ev.success) {
               const castTid = sim.player.targetId;
               const castTarget = castTid !== null ? (sim.entities.get(castTid) ?? null) : null;
-              if (hasAutoAttackTarget(castTarget)) this.sim.startAutoAttack();
+              const castPvpHostile = isPvpHostileTarget(castTid, sim.duelInfo, sim.arenaInfo);
+              if (hasAutoAttackTarget(castTarget, castPvpHostile)) this.sim.startAutoAttack();
             }
           }
           break;
