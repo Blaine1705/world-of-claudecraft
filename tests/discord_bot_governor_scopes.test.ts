@@ -249,6 +249,32 @@ describe('rate governor 429 that names no usable wait', () => {
     expect(sentAt).toEqual([0, 50]);
   });
 
+  it('rejects a NON-FINITE retry_after instead of pausing until the heat death', async () => {
+    // `JSON.parse('{"retry_after":1e999}')` yields Infinity, whose typeof IS
+    // 'number', so it passed a bare typeof guard. That set the wait, the bucket
+    // reset, and on a global scope `pausedUntil` to Infinity; a sleep of Infinity
+    // is clamped by the platform to about a millisecond, so the pause loop spun
+    // at a thousand iterations a second and the bot never sent again. The floor
+    // applies, exactly as it does to a missing value.
+    const { governor, clock, slept } = governorFixture();
+    const body = JSON.parse('{"retry_after":1e999}') as { retry_after: number };
+    expect(body.retry_after).toBe(Number.POSITIVE_INFINITY);
+    expect(typeof body.retry_after).toBe('number');
+
+    const { send, sentAt } = queuedSend(clock, [
+      res({ status: 429, headers: { 'x-ratelimit-scope': 'global' }, json: body }),
+      res({}),
+    ]);
+
+    const pending = governor.run({ method: 'GET', path: '/guilds/1/roles' }, send);
+    await clock.runAll();
+    await pending;
+
+    // A finite wait, and the retry actually happens.
+    expect(sentAt).toEqual([0, MISSING_RETRY_AFTER_MS]);
+    expect(slept.every((ms) => Number.isFinite(ms))).toBe(true);
+  });
+
   it('does NOT let a short retry_after shorten a longer window the headers reported', async () => {
     // absorb429 takes the MAX of the window already known and the one this retry
     // implies. Dropping the max lets a 1 second retry_after overwrite a 60 second

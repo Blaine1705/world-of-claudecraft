@@ -742,38 +742,50 @@ export class RateGovernor {
   }
 
   /**
+   * The absolute time this template's bucket is shut until, or null when it is
+   * free to dispatch. THE one place the bucket condition is expressed: both the
+   * waiter and the pre-send check below read it, so they cannot drift apart.
+   *
+   * That matters more than it looks. When the two were written out separately,
+   * an edit to one alone made the dispatch loop spin hot (the waiter returning
+   * immediately while the check still said gated), and a hot spin in an async
+   * loop starves the macrotask queue, so the process HANGS rather than failing.
+   *
+   * Clearing the exhausted marker here is deliberate, not a side effect smuggled
+   * into a predicate: the window really has reopened, and the next response's
+   * headers are what re-establish it. It is idempotent.
+   */
+  private bucketBlockedUntil(template: string): number | null {
+    const state = this.limits.get(this.bucketKeyFor(template));
+    if (state === undefined || state.remaining === null || state.remaining > 0) return null;
+    // No deadline to wait FOR. Dispatching is the only safe move: waiting on a
+    // null reset would compute NaN and spin on a zero-length sleep forever.
+    if (state.resetAt === null) return null;
+    if (state.resetAt - this.clock.now() <= 0) {
+      state.remaining = null;
+      state.resetAt = null;
+      return null;
+    }
+    return state.resetAt;
+  }
+
+  /**
    * True when something would stop this request RIGHT NOW: the process-wide
-   * pause, or its bucket reporting Remaining 0 with a window that has not
-   * reopened. Read synchronously, immediately before the send, so it is the
-   * dispatch loop's proof that no gate went stale while another one blocked.
-   * The conditions mirror waitForPause and waitForBucket exactly, the
-   * null-resetAt arm included: a bucket with no deadline to wait for is not
-   * gated, because there would be nothing to wait FOR.
+   * pause, or its bucket still shut. Read synchronously, immediately before the
+   * send, so it is the dispatch loop's proof that no gate went stale while
+   * another one blocked.
    */
   private isGated(template: string): boolean {
     if (this.pausedUntil - this.clock.now() > 0) return true;
-    const state = this.limits.get(this.bucketKeyFor(template));
-    if (state === undefined || state.remaining === null || state.remaining > 0) return false;
-    return state.resetAt !== null && state.resetAt - this.clock.now() > 0;
+    return this.bucketBlockedUntil(template) !== null;
   }
 
   /** Proactive gating: never dispatch from a bucket that reported Remaining 0. */
   private async waitForBucket(template: string): Promise<void> {
     for (;;) {
-      const key = this.bucketKeyFor(template);
-      const state = this.limits.get(key);
-      if (state === undefined || state.remaining === null || state.remaining > 0) return;
-      const resetAt = state.resetAt;
-      if (resetAt === null) return;
-      const delay = resetAt - this.clock.now();
-      if (delay <= 0) {
-        // The window has reopened. Clear the exhausted marker so the next
-        // response's headers are what re-establish it.
-        state.remaining = null;
-        state.resetAt = null;
-        return;
-      }
-      await this.clock.sleep(delay);
+      const until = this.bucketBlockedUntil(template);
+      if (until === null) return;
+      await this.clock.sleep(until - this.clock.now());
     }
   }
 
