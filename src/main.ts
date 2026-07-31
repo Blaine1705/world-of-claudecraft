@@ -13,7 +13,12 @@ import {
   readBrowserEnv,
 } from './game/browser_env';
 import { isCameraDrivenFacingActive } from './game/camera_driven_facing';
-import { cameraFollowShouldSettle, updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
+import {
+  cameraFollowShouldSettle,
+  isRespawnFacingResyncEdge,
+  updateFollowCameraYaw,
+  wrapAngle,
+} from './game/camera_follow';
 import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveBrokenByTeleport,
@@ -3122,6 +3127,11 @@ async function startGame(
   // eases back to zero so the camera settles in behind the character.
   let lastInterpFacing: number | null = null;
   let wasClickMoving = false;
+  // Tracks the player's dead/ghost state across frames so a respawn/release-spirit
+  // edge (see isRespawnFacingResyncEdge) can resync lastInterpFacing below, the same
+  // way the click-to-move release edge does just underneath it.
+  let prevPlayerDead = world.player.dead;
+  let prevPlayerGhost = world.player.ghost;
   // Tracks camera-driven facing (classic right-mouse mouselook, or Mouse Camera
   // mode while a movement key is held) across frames so its falling edge can
   // commit the final camera yaw to the player facing (see mouselook_release.ts
@@ -3148,6 +3158,17 @@ async function startGame(
     // handoff stays smooth even in pure-follow (non-camera-driven) mode.
     if (wasClickMoving && !clickMoving) lastInterpFacing = interpFacing;
     wasClickMoving = clickMoving;
+    // A respawn/release-spirit forces the player's facing to 0 (see spirit.ts and
+    // entity_roster.ts); resync here too, or the rigid follow term below reads the
+    // gap against the stale pre-death lastInterpFacing as a turn and sticks the
+    // camera off-yaw (see isRespawnFacingResyncEdge for why).
+    const playerDead = world.player.dead;
+    const playerGhost = world.player.ghost;
+    if (isRespawnFacingResyncEdge(prevPlayerDead, prevPlayerGhost, playerDead, playerGhost)) {
+      lastInterpFacing = interpFacing;
+    }
+    prevPlayerDead = playerDead;
+    prevPlayerGhost = playerGhost;
     const next = updateFollowCameraYaw({
       camYaw: input.camYaw,
       interpFacing,
