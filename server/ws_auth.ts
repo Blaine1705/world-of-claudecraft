@@ -61,7 +61,21 @@ const WS_AUTH_ERROR = {
 } as const;
 
 // The first auth frame must arrive within this window or the socket is closed.
-const AUTH_TIMEOUT_MS = 10_000;
+// Env-tunable (WS_AUTH_TIMEOUT_MS) because the R36 1,000-connection load
+// captures need a longer window: with hundreds already online every loop
+// callback is slow and a handshake's sequential awaits can starve past 10 s,
+// where the deadline rejection can even race a completing join and orphan a
+// lease-holding session. The default is the production policy and does not
+// move; parsing is strict and fail-safe like DB_POOL_MAX_CLIENTS (blank,
+// non-numeric, non-integer, or out-of-range values stay on the default, so an
+// empty env can never mint a zero-ms deadline).
+export function parseWsAuthTimeoutMs(raw: string | undefined): number {
+  const trimmed = (raw ?? '').trim();
+  if (trimmed === '') return 10_000;
+  const n = Number(trimmed);
+  return Number.isInteger(n) && n >= 1_000 && n <= 120_000 ? n : 10_000;
+}
+const AUTH_TIMEOUT_MS = parseWsAuthTimeoutMs(process.env.WS_AUTH_TIMEOUT_MS);
 
 // Only this upgrade path is accepted; any other path is destroyed at the socket.
 const WS_UPGRADE_PATH = '/ws';

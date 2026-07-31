@@ -297,6 +297,26 @@ describe('byte caps + page sizes hold their literal values', () => {
     expect(DEFAULT_JSON_BODY_MAX_BYTES).toBe(65_536); // 64 KiB
   });
 
+  it('WS_AUTH_TIMEOUT_MS env parsing is strict and fail-safe, never a zero-ms deadline', async () => {
+    const { parseWsAuthTimeoutMs } = await import('../../server/ws_auth');
+    // unset / blank / whitespace stay on the production default
+    expect(parseWsAuthTimeoutMs(undefined)).toBe(10_000);
+    expect(parseWsAuthTimeoutMs('')).toBe(10_000);
+    expect(parseWsAuthTimeoutMs('   ')).toBe(10_000);
+    // out-of-range and malformed values stay on the default per dimension
+    expect(parseWsAuthTimeoutMs('0')).toBe(10_000);
+    expect(parseWsAuthTimeoutMs('999')).toBe(10_000);
+    expect(parseWsAuthTimeoutMs('120001')).toBe(10_000);
+    expect(parseWsAuthTimeoutMs('abc')).toBe(10_000);
+    expect(parseWsAuthTimeoutMs('30s')).toBe(10_000); // strict: a typo must not half-parse
+    expect(parseWsAuthTimeoutMs('1500.5')).toBe(10_000);
+    // valid values parse, at both range edges
+    expect(parseWsAuthTimeoutMs('30000')).toBe(30_000);
+    expect(parseWsAuthTimeoutMs(' 30000 ')).toBe(30_000);
+    expect(parseWsAuthTimeoutMs('1000')).toBe(1_000);
+    expect(parseWsAuthTimeoutMs('120000')).toBe(120_000);
+  });
+
   it('DB_POOL_MAX_CLIENTS env parsing is strict and fail-safe, never a zero-client pool', async () => {
     const { parseDbPoolMaxClients } = await import('../../server/db');
     // unset / blank / whitespace stay on the default (Number('') === 0 must
