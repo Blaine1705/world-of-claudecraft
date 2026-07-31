@@ -3482,6 +3482,162 @@ suite is green. Corrections the merge forced:
   MOVEMENT_LOCK_AURA_KINDS includes it; cosmetic, maintainer follow-up
   candidate to import the shared set.
 
+**Phase 17 QA COMPLETE** (2026-07-31, Fable xhigh ultracode, new session,
+no authorship stake). Judged e753614ff2..db4f5ff1eb plus the docs close
+2123aea7b8. Preamble first: entry verified on the right branch at
+2123aea7b8, release/v0.33.0 had MOVED to 2ae71a7fbf, so the sync merge
+051699610c and its seven-verifier audit (the corrections block above)
+plus a full gate PASS all 11 exit 0 at 01b71ea237 landed BEFORE any
+judging. Verdict up front: every deterministic claim in the BUILT record
+reconciles exactly, the reworded prose was RE-derived claim by claim and
+was right far more often than the pass it replaced, but fresh eyes still
+found 30 wrong or half-true statements including two blockers, all
+applied; the fix round then minted one new falsehood of its own, caught
+by the blind lenses, which is the whole argument for reviewing fix
+rounds.
+
+Deterministic reconciliation (before any fan-out, every number by
+script): the 51-key ledger resolves to exactly 255 kept non-Latin rows
+with zero violations, the Latin deletions count exactly 650 (50 x 13),
+the re-sized fill is exactly 210 keys / 3,613 rows (main 119/1,793,
+admin 91/1,820), the R45 wording appears nowhere in published English,
+harvestBodyChoice is byte-stable across the whole range including the
+new merge (R62), the six release-refilled keys changed ONLY by the three
+R63 minimal edits, and the prior merge's release-side en delta was
+exactly the three mount keys. One record nit: R63's ruling text names a
+wieldable-tool proviso the refuter round later removed; shipped
+provenanceBody carries only the specimen arm.
+
+Evidence: four repo reviewers via the Agent tool (test-coverage, whose
+18 read-only in-memory mutants killed 15 and turned both survivors into
+new pins; frontend-seam, 0 blocking; privacy-security, R58 disclosure
+verified exactly true end to end, two consumers, no third; qa-checklist,
+READY with zero should-fix), a 15-agent truth workflow (nine page
+refuters re-deriving 363 claims from the sim plus six blind lenses:
+numbers, proper nouns, compass under R61, cross-page, absolutes, R64
+pins; the six lenses died once on a session usage limit and were
+re-run from the cached workflow), a 5-locale native quality pass over
+the ten fill strings (8 good, 2 acceptable, 0 needs-fix), an
+isolated-worktree mutation pass, and a fix-round review that re-derived
+all eleven changed sentences.
+
+Findings, all applied per the standing rule (four commits: 6a1cd5bcca
+the refuter and reviewer round, c8305ca6ba the lens residue,
+bd1f5e81eb the trade-route scope, ffa46bd304 the fix-round review's own
+findings). The two blockers: alchemy identityBody promised the pair
+combination brew to both pairs when COMBO_RECIPES holds exactly three
+combos (two Smith, one Bombardier), so an Apothecary oath sworn for the
+promised brew bought nothing but the amends quest; and provenanceBody
+named three battlefield teach-back triggers (potion, killing blow,
+armor at a kill) when battlefieldExperienceTrickle has exactly one call
+site, the potion arm. The rest, briefly: the masterwork gear-stacking
+clause dropped under R63 (gear never stacks); the glyphsteel coin floor
+is the pick's alone (the tier-5 axe, sickle, and rod consume no bars);
+the tier-3 capstone gain math is majors-only and now says so in both
+the armorcrafting ladder and leatherworking route (zero gain below the
+ceiling); dormant charm crafting teaches nothing (hard-zero above the
+common ceiling), and epic/legendary disenchants never out-pay rare
+under any attainable identity; Engineering cannot be raised or even
+tried pre-oath (every recipe sits at tier 3+), which whatBody and
+archetypesBody now state instead of contradicting the engineering page;
+osmium also comes off the younger zones' starter veins, with the
+Farshore Isle iron exception the fix round itself initially missed; no
+armorcrafting recipe consumes linen scraps; three leatherworking
+recipes skip the trainer, not two; the tier-1 land tools' noMarketList
+closes the Market AND mail routes, so toolsNote scopes its trade-route
+claim to the three 20-copper land starters (the tier-1 rod lists
+freely); the masterwork signed-reagent bonus keys on HOLDING, not
+consuming (provenanceBody, faq.a4, worth 2 percentage points not 2
+percent); the shared throttle has FIVE consumers including tool-effect
+recharges and is a FIXED window, not rolling (howBody,
+econ.throttleBody, and the sim module doc all corrected); the koi row
+answers to the catch band, not skill alone; the rod trim clamps at the
+three-second floor; a capped gatherer rolls best odds, not guaranteed
+max quality; a signed windfall lands in a matching signed stack too;
+plus the Eastbrook Druid's Hide masterwork boundary, the Gravewyrm
+Gauntlets as the second Smith combo, the rare-tier gloss (skill 74 or
+less), the land-recipes-known-to-all wording, and the 'an glyphsteel'
+typo. Two keys newly reworded by the review round (faq.a4,
+econ.throttleBody) followed remove-and-refill: 26 Latin rows re-pend,
+their non-Latin rows join the stale ledger, which now counts 53 keys /
+265 rows beyond the pending registry.
+
+New rulings, QA-decided, veto-able (the R32/R45 pattern):
+
+- **R65. The widened consent label stays one label.** It wraps to
+  several lines against the desktop 120px name column; the label+note
+  restructure (.set-note disclosure) is DEFERRED to the post-packet
+  fill, because a split today would land the disclosure in an
+  English-only note for the sixteen unfilled locales and regress the
+  R58 fix. Desktop screenshot rides the phase 18 capture pass.
+- **R66. The two Marks-route tool cells name the Drowned Litany.** The
+  gate counts only that delve's clears (delveShopGateUnlocked filters
+  by delve id), so the generic "three delve clears" invited three
+  wasted clears of the wrong delve. The wordy Heroic key's five
+  non-Latin fills were re-minted per M16 with each locale's shipped
+  delve name (verified verbatim, correct genitive in ru), and the four
+  gate-wording pins derive the name from the shipped delve record so a
+  sim rename reds the prose.
+
+Mutation ledger (isolated worktree prof-packet-mut17 at c8305ca6ba,
+one mutant at a time, parsed fail counts, porcelain-verified pristine
+between and after): M1 wield 85->90, M2 generator gate-arm swap, M3
+page key swap, M4/M4b wield cell hard-coded (the split isolating the
+NEW per-row number pin, which the pre-QA mutant survived), M5 shop gate
+clears:3->2, M6 consent clause deleted, M8 offhand dropped from
+ALL_EQUIP_SLOTS (killed by the NEW length guard, previously a
+survivor), M9 min-width deleted, M10 class dropped, M11 derived bite
+figure, M12 crafted-rung literal: all KILLED with the named assertion.
+M7 (facet member deleted) SURVIVES vitest by design: the parity
+runtime probes check prototypes, and the type-level facet guard is
+tsc's, which the gate runs (two exact errors); recorded as a layer
+boundary, not a gap. Plus the test-coverage reviewer's own 18
+in-memory mutants (15 killed, 2 survivors converted to the new pins,
+1 harness artifact). Evidence note: the in-place guide generator masks
+pins on a re-run after a sim mutation, so every count above is from a
+pristine tree with content.generated.ts reverted between mutants.
+
+Recorded, not fixed, with reasons: the five non-Latin overlays still
+publish the pre-reword falsehoods for the ledgered keys (the maintainer
+ruling defers all translation; framing for the fill: these are
+ACTIVELY FALSE statements in five shipped languages, prioritize on
+that basis, the worst being toolsNote's retired purchase gate and, in
+ja/zh, a delve name for the Litany that matches nothing shipped); the
+five heroic-key fills use the guide-arm Delve Marks family terms,
+which in ja/zh_CN/zh_TW diverge from the delve UI's own currency
+label (the BUILT record's "shipped terminology" claim holds for the
+Heroic/difficulty words, not the currency; unify at the fill, where
+the tier-4 sibling cell's gate wording also lands, terms ready in
+each locale's delveUi.shop rows); ru "sogildeitsami" and zh_TW
+"guanzhuzhe" ride to the fill as recorded polish; masterworkBody's
+"{signed}% goes in" phrasing under-describes the holding case but is
+not false, so R63's bar keeps it; the koiBody Codfather once-ever
+reel, the pristine-specimen lost-outright arm, and the "field common"
+recipe-class vocabulary are accepted wording; craftIntro.engineering's
+"every serious gatherer" is marketing altitude; priceNone's latent
+guard gap (a hypothetical coinless crafted tool at tier <= 3 would
+render no Marks route unguarded) is a test note, no such item exists;
+the biteBody/startBody derived rod figures now carry derived pins; the
+minimap Yumi-maze bitmap renders +Z opposite the marker projection
+(PLAUSIBLE latent z-mirror, pre-existing, outside this phase's diff,
+wants an in-game look before filing); world.ts:1407 still calls
+Mirror Lake's shore the "western downs" in a legacy comment; the
+/api/deeds/broadcasts pair predates the packet without a rate limiter
+(bearer-gated); the Steam mirror and Renown board expose deed data by
+design outside the flag; mediawiki/seed/pages.xml's fishing stub is
+materially behind the system (tracking-issue candidate, not filed per
+the packet rule); and the deferred-fill worklist now carries: the
+{clears}/{tier4Prof}/{tier5Prof} token adds, the per-locale 85/100
+literal pin, a locale-side clears-wording guard for toolCraftedOrMarks,
+and the ledger arithmetic at 53 keys / 265 rows plus broadcastsLabel's
+and toolCraftedOrMarksHeroic's ten freshly minted rows.
+
+Final gate: PASS, all 11 steps green, exit code 0 read explicitly, on
+the committed idle tree at ffa46bd304 (this docs close on top). Phase
+17 QA is COMPLETE. NEXT: phase 18, the final gate (whole-branch
+review, release-malware-audit, screenshots, release-tier decision with
+the maintainer; ultracode, new session).
+
 ---
 
 ## Phase 18: final gate
