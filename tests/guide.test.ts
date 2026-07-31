@@ -1811,15 +1811,27 @@ describe('Guide professions pages and routes', () => {
     const mining = professionsPage.render(ctx(['mining']));
     expect(mining).toContain(`<th scope="col">${t('guide.profPages.colWield')}</th>`);
     expect(mining).toContain(`<td>${t('guide.profPages.wieldNone')}</td>`);
-    expect(mining).toContain('three delve clears');
-    expect(mining).toContain('Heroic clear');
+    // Tie each gate WORDING to its own tool's row, not just to the page: a
+    // swapped heroic/clears key pair in toolSource keeps both strings on the
+    // page (mining has one tool at each gate) and only a per-row assertion
+    // reds on the inversion.
+    const rowFor = (name: string): string =>
+      mining.match(
+        new RegExp(`<tr>(?:(?!</tr>)[\\s\\S])*${name}(?:(?!</tr>)[\\s\\S])*</tr>`),
+      )?.[0] ?? '';
+    expect(rowFor('Osmium Mining Pick'), 'tier-4 row names its clears gate').toContain(
+      'three delve clears',
+    );
+    expect(rowFor('Glyphsteel Mining Pick'), 'tier-5 row names its Heroic gate').toContain(
+      'Heroic clear',
+    );
     // Two guide-prof-tables render on the page (nodes first, tools second);
     // anchor on the Use at header so the parity check reads the TOOLS table.
     const toolsTable = mining
       .split('<table')
       .find((seg) => seg.includes(`<th scope="col">${t('guide.profPages.colWield')}</th>`));
     expect(toolsTable, 'tools table present').toBeDefined();
-    const thCount = (toolsTable?.match(/<thead><tr>([\s\S]*?)<\/tr>/)?.[1].match(/<th /g) ?? [])
+    const thCount = (toolsTable?.match(/<thead><tr>([\s\S]*?)<\/tr>/)?.[1].match(/<th[\s>]/g) ?? [])
       .length;
     const tdCount = (toolsTable?.match(/<tbody><tr>([\s\S]*?)<\/tr>/)?.[1].match(/<td/g) ?? [])
       .length;

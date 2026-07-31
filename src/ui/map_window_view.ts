@@ -272,7 +272,7 @@ export interface OverworldMapModel {
   /** Drag cursor when zoomed past the full-zone view. */
   cursor: 'grab' | 'default';
   /** The visible world rect. The painter composites the current zone's cached
-   *  background into it (+X is map-left, +Z map-down) over an ocean fill. */
+   *  background into it (+X is map-left, +Z map-up; R61) over an ocean fill. */
   region: { minX: number; maxX: number; minZ: number; maxZ: number };
   /** The committed zone id (the painter localizes the on-canvas title + summary). */
   zoneId: string;

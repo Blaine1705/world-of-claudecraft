@@ -7808,7 +7808,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "vendors": [],
         "craftedBy": "engineering",
         "priceMarks": 24,
-        "marksClears": 4,
+        "marksClears": 3,
         "wieldProficiency": 85
       },
       {

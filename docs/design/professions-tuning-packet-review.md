@@ -3337,11 +3337,14 @@ New rulings, build-decided, veto-able (the R32/R45 pattern):
 
 THE REWORD LEDGER (load-bearing for the post-packet fill; the pending
 registry CANNOT see these, because a present overlay row re-records the
-new enHash as its srcHash and reads "translated"): all 52 reworded keys
-carry now-stale translations in ALL FIVE non-Latin overlays (260 rows to
-re-translate beyond the pending registry). The 52: guide.professions.
+new enHash as its srcHash and reads "translated"): 51 reworded keys
+carry now-stale translations in ALL FIVE non-Latin overlays (255 rows to
+re-translate beyond the pending registry;
+hudChrome.deeds.broadcastsLabel is OFF this stale list because the
+review round freshly filled its five rows as a consent-disclosure fix).
+The 51 plus that one: guide.professions.
 {whatBody, archetypesBody, archetypeSwitchBody, startBody};
-hudChrome.deeds.broadcastsLabel; guide.profPages.{rhythmBody, gainBody,
+hudChrome.deeds.broadcastsLabel (FILLED); guide.profPages.{rhythmBody, gainBody,
 toolsNote, toolCraftedOrMarks, priceNone, bandsBody, specimenBody,
 trainingBody, howBody, masterworkBody}; gatherIntro.{mining, logging,
 herbalism, fishing}; gatherDeeds.fishing; fish.{startBody, biteBody,
@@ -3362,10 +3365,71 @@ PLUS the 260 ledgered non-Latin stale rows above, PLUS the
 chr_peaks_gatherer deed locale rows (deed_i18n scope, still zero rows).
 The pre-phase figure of 144/2,563 is superseded.
 
-Review round: four fresh reviewers (a prose truth-refuter over the new
-English and the five fills, qa-checklist, frontend-seam-reviewer,
-test-coverage-auditor) ran over dda84f425d + 0f860a3cb3; their findings
-and the closing gate state are recorded at the end of this block.
+Review round, all findings applied per the standing rule. Four fresh
+reviewers ran over dda84f425d + 0f860a3cb3, then the fix round itself
+was reviewed and the prose refuter's late report applied, five commits
+total (0f860a3cb3 the truth pass, 46967051fb the review fixes,
+72981d1bf0 the refuter fixes, then the fix-round reviewer's closures in
+the docs-close commit):
+
+- The QA gate found the one blocking defect the sweep itself had minted:
+  koiBody restated the corrected odds against the wrong denominator (the
+  1/3/6 weights are catch-table rows including the empty hook, drawn per
+  reeled-in cast, not a share of landed catches). Fixed. Its verifies
+  all settled TRUE from source: glyphsteel (arcanite_bar) at exactly
+  Gizzel and Bree for 160 copper, osmium (thorium_ore) on zero vendor
+  rows anywhere, the Silverstream reel window 4.25 s (the 0.25 rarity
+  rung), the Deeprock camp at levels 4 to 6, the masterwork Discord card
+  reading deed_broadcasts (server/game.ts), and no tool row showing "Not
+  sold for coin" without a Marks route.
+- The frontend seam review: the widened consent label's five non-Latin
+  rows still described the old audience, and deleting them would red
+  M16, so the five rows were FILLED as a targeted consent-disclosure
+  fix (the one translation beyond the heroic key this phase performed);
+  a .guide-prof-table with no min-width would crush rather than scroll
+  on phones (fixed, scoped to a new .guide-tools-table class after the
+  fix-round review found the shared class also dresses narrow tables);
+  wieldNone reworded from None (which under a "Use at" header reads as
+  unusable) to Any; the marksClears landing-pad comment; the source-cell
+  ternary flattened into toolSource().
+- The test-coverage audit: the "three delve clears" wording is now
+  pinned in the same test breath as the live clears:3 gate; render-level
+  assertions cover the new column including header/body parity anchored
+  on the tools table and, after the fix-round reviewer KILLED a
+  surviving mutant by inverting the heroic/clears keys, per-ROW gate
+  wording (the tier-4 row must say clears, the tier-5 row Heroic); the
+  crafted-rung pin is scoped to its exact clause; setLanguage('en') is
+  explicit; the tank budget was re-based with honest headroom (1280 KiB
+  ceiling, 1024 KiB floor); a unique-shop-row guard protects the
+  first-match-wins mirror. Its per-locale 85/100 literal pin proposal is
+  DEFERRED to the fill (it would red the five deliberately kept stale
+  rows now); at fill time, either tokenize {tier4Prof}/{tier5Prof} and
+  {clears} or extend the per-locale loop.
+- The prose truth-refuter (all 51 keys re-derived from source):
+  the alchemy identity claim that attunement opens gain speed was FALSE
+  (every Alchemy recipe sits inside the rare tier undeclared crafts
+  work under, so the ladder gains identically before any oath; a pair
+  buys the combination brew and the signed-work teach-back), the
+  masterwork coda inverted the skill-above-recipe bonus (a rung procs
+  better after you outgrow it, never while orange), provenanceBody's
+  wieldable-tool qualifier described a gate no shipped family can fail,
+  and the consent label over-promised (masterwork cards go ONLY to
+  Discord, so the label and its five fills now keep the two audiences
+  distinct). Everything else verified TRUE with citations, including
+  all five heroic-key fills' terminology.
+- The fix-round review also swept the R61 comment correction across the
+  whole map subsystem (map_window_view, map_window_painter,
+  minimap_painter all said "+Z is map-down" against their own math).
+
+Flags for the maintainer and the phase 17 QA: R61 through R64 are
+veto-able; release/v0.33.0 wants dda84f425d cherry-picked (its tip
+fails its own tank asset test); the eventual PR body must reproduce
+this ledger; the ja/zh guide-arm Delve Marks coin diverges from the
+delve UI's own term (pre-existing; unify at the fill); and the
+follow-up token adds ({clears}, {tier4Prof}/{tier5Prof}) land with the
+post-packet fill.
+
+Final gate: recorded below after the closing run.
 
 ---
 

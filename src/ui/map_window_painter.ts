@@ -237,7 +237,8 @@ export class MapWindowPainter {
     this.labels.beginRedraw();
 
     // Open ocean under everything, then composite only the current zone's cached
-    // terrain at its world position (+X is map-left, +Z map-down).
+    // terrain at its world position (+X is map-left, +Z map-up; R61: maxZ
+    // lands at the bitmap top, see the destY math below).
     // Smoothing stays ON for the scaled terrain blit, which is exactly why every
     // label blit below rounds its destination.
     const r = model.region;

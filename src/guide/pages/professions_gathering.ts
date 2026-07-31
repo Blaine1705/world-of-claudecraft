@@ -88,7 +88,7 @@ function toolsSection(g: GuideProfGathering): string {
         tier2Prof: formatNumber(TIER2_TOOL_GATE_PROFICIENCY),
         tier3Prof: formatNumber(TIER3_TOOL_GATE_PROFICIENCY),
       })}
-      <div class="guide-table-scroll"><table class="guide-keytable guide-prof-table">
+      <div class="guide-table-scroll"><table class="guide-keytable guide-prof-table guide-tools-table">
         <thead><tr>
           <th scope="col">${esc(t('guide.profPages.colTool'))}</th>
           <th scope="col">${esc(t('guide.profPages.colTier'))}</th>

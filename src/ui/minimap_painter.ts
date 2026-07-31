@@ -287,7 +287,8 @@ export class MinimapPainter {
     ctx.drawImage(bg, sx, sy, sw, sw, 0, 0, S, S);
 
     // Sharp overlay: the current zone's own high-res background, placed by its
-    // world rect so the player sits at centre. +X is map-left, +Z is map-down.
+    // world rect so the player sits at centre. +X is map-left, +Z is map-up
+    // (R61: maxZ lands at the bitmap top).
     if (zoneBg) {
       const r = zoneBg.region;
       const half = S / 2;
