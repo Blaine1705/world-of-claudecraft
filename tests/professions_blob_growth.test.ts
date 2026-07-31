@@ -26,7 +26,7 @@ import {
   GATHERING_PROFESSIONS,
   HARVEST_COMPONENT_ITEMS,
 } from '../src/sim/content/professions';
-import { ALL_RECIPES } from '../src/sim/data';
+import { ALL_RECIPES, ITEMS, QUESTS } from '../src/sim/data';
 import {
   ARCHETYPE_PAIR_TARGETS,
   craftsForPairTarget,
@@ -34,7 +34,9 @@ import {
 } from '../src/sim/professions/archetype';
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
 import { MAX_CRAFTED_BY_LENGTH } from '../src/sim/professions/tools';
+import { MAX_KNOWN_RECIPE_ID_LENGTH } from '../src/sim/professions/training';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
+import { EQUIP_SLOTS } from '../src/sim/types';
 
 const makeSim = (seed = 31) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
 
@@ -61,12 +63,14 @@ const PROFESSIONS_BLOB_FIELDS = [
   'guildLetterSent',
 ] as const;
 
-// The settled ceiling measured 7,033 bytes when this bound was minted
-// (2026-07-30, this content: 120 nodes, 79 recipes, 10 ring crafts, 4
-// gathering professions). The pinned ceiling leaves about 1,150 bytes of
-// headroom, roughly two more complete zones of node growth, before it needs
-// re-minting.
-const PROFESSIONS_BYTE_CEILING = 8192;
+// The settled ceiling measured 8,469 bytes when this bound was re-minted
+// (2026-07-30, after the review round grew the fixture honest: every equip
+// slot instanced and signed, every cadence window live; this content: 120
+// nodes, 79 recipes, 10 ring crafts, 4 gathering professions, 12 equip
+// slots, 9 cadence quests). The pinned ceiling leaves about 1,250 bytes of
+// headroom, roughly two and a half complete zones of node growth, before it
+// needs re-minting.
+const PROFESSIONS_BYTE_CEILING = 9728;
 
 function ceilingSim(): Sim {
   const sim = makeSim();
@@ -106,10 +110,26 @@ function ceilingSim(): Sim {
       confirmMode: 'prompt',
     },
   };
-  meta.equipmentInstance.mainhand = {
-    enchant: 'enchant_weapon_might',
-    rolled: { stats: { str: 2 } },
-  };
+  // EVERY equip slot carries a crafted, signed, enchanted, stat-rolled
+  // instance: the professions-endgame worst case the phase 16 review found
+  // missing from the first mint (one light slot understated the ceiling by
+  // over 2 KB). Slot-appropriateness is irrelevant to the serializer; the
+  // LOAD arm only requires the slot to be equipped for the instance to
+  // survive the settle.
+  const instanceItemId = Object.keys(ITEMS)[0];
+  for (const slot of EQUIP_SLOTS) {
+    meta.equipment[slot] = instanceItemId;
+    meta.equipmentInstance[slot] = {
+      enchant: 'enchant_weapon_might',
+      rolled: { stats: { str: 2, agi: 2, sta: 2 } },
+      signer: longName,
+    };
+  }
+  // Every repeatable cadence window live (the first mint never set the field,
+  // and the `field in state` measurement filter silently forgave it).
+  const cadenceQuests = Object.values(QUESTS).filter((q) => q.repeatCadenceTicks);
+  if (cadenceQuests.length < 7) throw new Error('cadence quest set shrank; re-check the fixture');
+  for (const q of cadenceQuests) meta.questCadence.set(q.id, 600);
   // Full focus budget spread across every component family.
   const components = Object.keys(HARVEST_COMPONENT_ITEMS);
   meta.townFocus = Object.fromEntries(
@@ -159,7 +179,7 @@ describe('the professions blob growth bound (phase 16)', () => {
     const anchor = source.indexOf('const PROFESSIONS_BLOB_FIELDS = [');
     expect(anchor).toBeGreaterThan(-1);
     const block = source.slice(anchor, source.indexOf('] as const', anchor));
-    const scraped = [...block.matchAll(/'([a-zA-Z]+)'/g)].map((m) => m[1]).sort();
+    const scraped = [...block.matchAll(/'([a-zA-Z][a-zA-Z0-9_]*)'/g)].map((m) => m[1]).sort();
     expect(scraped).toEqual([...PROFESSIONS_BLOB_FIELDS].sort());
   });
 
@@ -178,6 +198,13 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(s3).toEqual(s2);
     expect(Object.keys(s3).sort()).toEqual(Object.keys(s2).sort());
 
+    // The fixture really reached every field: an unpopulated field would be
+    // silently skipped by the measurement's `field in state` filter (the
+    // phase 16 review found questCadence lost exactly this way).
+    for (const field of PROFESSIONS_BLOB_FIELDS) {
+      expect(s2[field], `${field} missing from the settled ceiling`).toBeDefined();
+    }
+
     // Entry caps: the two content-scaled fields sit exactly at content size,
     // the per-player fields at their structural caps. These are what keep
     // the blob linear in CONTENT rather than unbounded per player.
@@ -195,10 +222,41 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(Object.keys(s2.gatheringProficiency ?? {})).toHaveLength(
       Object.keys(GATHERING_PROFESSIONS).length,
     );
+    expect(Object.keys(s2.questCadence ?? {})).toHaveLength(
+      Object.values(QUESTS).filter((q) => q.repeatCadenceTicks).length,
+    );
+    expect(Object.keys(s2.equipmentInstance ?? {})).toHaveLength(EQUIP_SLOTS.length);
 
     // The byte bound itself, on the settled state.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(4096); // the fixture is genuinely a ceiling, not a near-empty blob
+    expect(bytes).toBeGreaterThan(8192); // the fixture is genuinely a ceiling, not a near-empty blob
     expect(bytes).toBeLessThanOrEqual(PROFESSIONS_BYTE_CEILING);
+  });
+
+  it('oversized junk drops on load, alone: bogus recipe ids and a corrupt signer', () => {
+    // The write side is deliberately load-bounded (the node_persist doctrine:
+    // both anti-tamper arms live on the LOAD side), so the junk serializes
+    // once and the next load is where the bound bites.
+    const sim = ceilingSim();
+    const meta = sim.players.get(sim.playerId) as PlayerMeta;
+    meta.knownRecipes.add('x'.repeat(500));
+    const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
+    expect(s1.knownRecipes?.some((id) => id.length > MAX_KNOWN_RECIPE_ID_LENGTH)).toBe(true);
+    const corruptSlot = EQUIP_SLOTS[0];
+    const keptSlot = EQUIP_SLOTS[1];
+    const corrupt = s1.equipmentInstance?.[corruptSlot];
+    if (!corrupt) throw new Error('ceiling fixture lost its first equip instance');
+    corrupt.signer = 'S'.repeat(MAX_CRAFTED_BY_LENGTH + 1);
+    const second = makeSim(34);
+    const pid2 = second.addPlayer('warrior', 'Junk', { state: s1 });
+    const s2 = second.serializeCharacter(pid2) as CharacterState;
+    // The bogus id dropped, every legal id (retired shapes included) survived.
+    expect(s2.knownRecipes?.every((id) => id.length <= MAX_KNOWN_RECIPE_ID_LENGTH)).toBe(true);
+    expect(s2.knownRecipes).toHaveLength((s1.knownRecipes?.length ?? 0) - 1);
+    // The corrupt signer dropped ALONE: its slot's instance survives, and a
+    // legal maximum-length signer on another slot is untouched.
+    expect(s2.equipmentInstance?.[corruptSlot]?.signer).toBeUndefined();
+    expect(s2.equipmentInstance?.[corruptSlot]?.enchant).toBe('enchant_weapon_might');
+    expect(s2.equipmentInstance?.[keptSlot]?.signer).toBe('A'.repeat(MAX_CRAFTED_BY_LENGTH));
   });
 });

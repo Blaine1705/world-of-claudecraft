@@ -34,6 +34,7 @@ vi.mock('../server/db', () => ({
 
 import { type ClientSession, GameServer } from '../server/game';
 import { GATHER_NODES } from '../src/sim/data';
+import { EMPTY_TOOL_EFFECT_SLOT_VIEWS } from '../src/sim/professions/tools';
 import { probeAllocationStability } from './util/alloc_probe';
 
 interface RawClient {
@@ -135,14 +136,50 @@ describe('tslot bytes per player per tick under the delta rules', () => {
     expect(lastRawSnap(fc.sent)).not.toContain('"tslot"');
   });
 
-  it('the empty projection is allocation-stable: one shared frozen instance', () => {
+  it('the empty projection is allocation-stable: one shared frozen instance, both empty arms', () => {
     const server = new GameServer();
     const fc = rawWs();
     const session = joinServer(server, fc, 1, 'Nonslotter');
-    // Reference identity across repeated snapshot-path reads; a fresh [] per
-    // call (the pre-phase-16 behavior) fails the probe.
-    probeAllocationStability(() => server.sim.toolEffectSlotsFor(session.pid));
+    // Reference identity across repeated snapshot-path reads, ASSERTED (the
+    // review round found the probe's verdict discarded): a fresh array per
+    // call, even a fresh FROZEN one, is exactly the allocation this fast
+    // path removes and fails both pins below.
+    const probe = probeAllocationStability(() => server.sim.toolEffectSlotsFor(session.pid));
+    expect(probe.stable, probe.detail).toBe(true);
+    expect(server.sim.toolEffectSlotsFor(session.pid)).toBe(EMPTY_TOOL_EFFECT_SLOT_VIEWS);
     expect(Object.isFrozen(server.sim.toolEffectSlotsFor(session.pid))).toBe(true);
+    // The second empty arm (a slots object present with zero surviving rows)
+    // rides the same shared instance.
+    mustMeta(server, session.pid).toolEffectSlots = {};
+    expect(server.sim.toolEffectSlotsFor(session.pid)).toBe(EMPTY_TOOL_EFFECT_SLOT_VIEWS);
+  });
+
+  it('clearing the last slot ships "tslot":[] exactly once, then elides again', () => {
+    const server = new GameServer();
+    const fc = rawWs();
+    const session = joinServer(server, fc, 1, 'Slotter');
+    const meta = mustMeta(server, session.pid);
+    meta.toolEffectSlots = {
+      mining: {
+        effectId: 'gatherers_cache',
+        durability: 5,
+        maxDurability: 20,
+        confirmMode: 'always',
+      },
+    };
+    broadcast(server);
+    expect(lastRawSnap(fc.sent)).toContain('"tslot":[{');
+    // The non-empty to empty transition rides the empty fast path and must be
+    // byte-identical to the old chain's JSON.stringify([]).
+    meta.toolEffectSlots = undefined;
+    fc.sent.length = 0;
+    server.sim.tick();
+    broadcast(server);
+    expect(lastRawSnap(fc.sent)).toContain('"tslot":[]');
+    fc.sent.length = 0;
+    server.sim.tick();
+    broadcast(server);
+    expect(lastRawSnap(fc.sent)).not.toContain('"tslot"');
   });
 });
 
@@ -170,16 +207,24 @@ describe('ncd bytes per player per tick under the delta rules (stable arm)', () 
     const fc = rawWs();
     const session = joinServer(server, fc, 1, 'Stable', STABLE_META);
     const meta = mustMeta(server, session.pid);
+    // Absolute deadlines GROW with realm uptime (the review round: measuring
+    // at sim.time near zero understates the stable arm and is numerically
+    // indistinguishable from legacy remaining-seconds). Thirty days of
+    // uptime with a fractional clock is the honest worst case.
+    (server.sim as unknown as { time: number }).time = 2_592_000.33;
     for (const node of GATHER_NODES) meta.nodeHarvestReadyAt[node.id] = server.sim.time + 240;
     broadcast(server);
     const raw = lastRawSnap(fc.sent);
+    // The arm under measurement really is the stable wire.
+    expect(raw).toContain('"tw":2');
     const m = raw.match(/"ncd":(\{[^}]*\})/);
     expect(m).not.toBeNull();
     const payload = m?.[1] ?? '';
     expect(Object.keys(JSON.parse(payload))).toHaveLength(GATHER_NODES.length);
     // The wire twin of tests/professions_node_persist.test.ts's 4096-byte
-    // persistence ceiling: the same 120-entry record, absolute-deadline form.
-    // Growth history there: 2048 -> 4096 when live nodes went 54 -> 120.
+    // persistence ceiling: the same 120-entry record, absolute-deadline form
+    // at day-scale deadline widths. Growth history there: 2048 -> 4096 when
+    // live nodes went 54 -> 120.
     expect(payload.length).toBeLessThanOrEqual(4096);
   });
 });

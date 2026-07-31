@@ -402,6 +402,36 @@ describe('sampleStats distribution summary', () => {
   it('maps an empty series to zeros instead of NaN', () => {
     expect(sampleStats([])).toEqual({ count: 0, mean: 0, p50: 0, p95: 0, p99: 0, max: 0 });
   });
+
+  it('pins the one-decimal rounding the committed baselines depend on', () => {
+    // 4/3 needs the toFixed(1) pass; dropping it leaves 1.3333... and the
+    // checked-in artifacts' fractional values stop being reproducible.
+    const s = sampleStats([1, 1, 2]);
+    expect(s.mean).toBe(1.3);
+    expect(s.p50).toBe(1);
+    expect(s.max).toBe(2);
+  });
+
+  it('treats null and undefined observers exactly like an empty staging', () => {
+    for (const observers of [null, undefined]) {
+      const v = evaluateProfessionsLoadRun({ ...PROF_RUN, observers });
+      expect(v.ok).toBe(false);
+      expect(v.failures.some((f) => f.includes('no parsing observers'))).toBe(true);
+    }
+  });
+
+  it('refuses a non-finite joined count as a join failure', () => {
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      joined: Number.NaN,
+      observers: [
+        profObserver(),
+        profObserver({ label: 'obs-9', role: 'fish', ncdSeen: false, fishingOutcomes: 2 }),
+      ],
+    });
+    expect(v.ok).toBe(false);
+    expect(v.failures.some((f) => f.includes('of 1000'))).toBe(true);
+  });
 });
 
 // A healthy observer row; each case overrides the one field under test.
