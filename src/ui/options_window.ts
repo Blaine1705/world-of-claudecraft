@@ -200,8 +200,8 @@ export interface OptionsWindowDeps {
   world(): IWorld;
   /** The options seam main.ts wires after Input exists (null until attached). */
   options(): OptionsHooks | null;
-  /** Player-specific proc overlay editor, owned by Hud. */
-  auraOverlays(): AuraOverlayHooks;
+  /** Player-specific proc overlay editor, owned by Hud (null until wired). */
+  auraOverlays?: () => AuraOverlayHooks;
   /** The bug-report seam (online only; its presence gates the Report a Bug row). */
   bugReport(): BugReportHooks | null;
   /** The keybind store (read labels, rebind, reset). */
@@ -372,7 +372,7 @@ export class OptionsWindow {
     this.capturingKey = null;
     this.deps.options()?.perfOverlay.setPlacement(false);
     this.auraSettings?.closePlacement();
-    this.deps.auraOverlays().setPlacement(false);
+    this.deps.auraOverlays?.().setPlacement(false);
     this.deps.hideTooltip();
     music.resumeFromMenu();
     const target = this.returnFocus;
@@ -421,7 +421,7 @@ export class OptionsWindow {
     if (this.view !== 'auras') el.classList.remove('aura-wide');
     // The overlay is draggable only while the Performance sub-view is open.
     this.deps.options()?.perfOverlay.setPlacement(this.view === 'performance');
-    this.deps.auraOverlays().setPlacement(this.view === 'auras');
+    this.deps.auraOverlays?.().setPlacement(this.view === 'auras');
     switch (this.view) {
       case 'keybinds':
         this.renderKeybinds();
@@ -1225,10 +1225,12 @@ export class OptionsWindow {
   }
 
   private renderAuras(): void {
+    const hooks = this.deps.auraOverlays?.();
+    if (!hooks) return;
     this.deps.root().classList.add('aura-wide');
     const body = this.settingsViewShell(t('hudChrome.auraOverlay.title'));
     this.auraSettings ??= new AuraOverlaySettingsPanel({
-      auras: this.deps.auraOverlays(),
+      auras: hooks,
       click: () => audio.click(),
       openFocusTrap: this.deps.openFocusTrap,
     });
