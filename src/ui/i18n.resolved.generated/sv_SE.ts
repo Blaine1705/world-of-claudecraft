@@ -889,9 +889,9 @@ export const sv_SE: EnTranslations = {
       "heroicLocked": "Du är låst till Heroisk {name}."
     },
     "riftTracker": {
-      "title": "Rift",
-      "floor": "Floor {current} of {total}",
-      "closesIn": "Closes in {time}",
+      "title": "Reva",
+      "floor": "Våning {current} av {total}",
+      "closesIn": "Stänger om {time}",
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
@@ -6486,7 +6486,7 @@ export const sv_SE: EnTranslations = {
       "arenaQueueTrading": "Avsluta din handel innan du köar.",
       "arenaQueueInstance": "Du kan inte köa inifrån en instans.",
       "tradeInProgress": "En handel pågår redan.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Den spelaren handlar redan.",
       "tradeTooFar": "Målet är för långt bort för att handla.",
       "tradeExpired": "Handelsförfrågan har gått ut.",
       "tradeFailed": "Handeln misslyckades: föremål eller pengar är inte längre tillgängliga.",

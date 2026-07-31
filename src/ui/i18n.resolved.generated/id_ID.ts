@@ -890,8 +890,8 @@ export const id_ID: EnTranslations = {
     },
     "riftTracker": {
       "title": "Rift",
-      "floor": "Floor {current} of {total}",
-      "closesIn": "Closes in {time}",
+      "floor": "Lantai {current} dari {total}",
+      "closesIn": "Tutup dalam {time}",
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
@@ -6486,7 +6486,7 @@ export const id_ID: EnTranslations = {
       "arenaQueueTrading": "Selesaikan dulu perdaganganmu sebelum antre.",
       "arenaQueueInstance": "Kamu tidak bisa antre dari dalam instance.",
       "tradeInProgress": "Perdagangan sudah berlangsung.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Pemain itu sedang berdagang.",
       "tradeTooFar": "Sasaran terlalu jauh untuk berdagang.",
       "tradeExpired": "Permintaan perdagangan telah kedaluwarsa.",
       "tradeFailed": "Perdagangan gagal: barang atau uang sudah tidak tersedia.",

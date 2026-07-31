@@ -889,7 +889,7 @@ export const ja_JP: EnTranslations = {
       "heroicLocked": "ヒロイックの{name}にロックされています。"
     },
     "riftTracker": {
-      "title": "Rift",
+      "title": "リフト",
       "floor": "フロア {current}/{total}",
       "closesIn": "リフトは{time}後に閉じます",
       "clockMs": "{minutes}:{seconds}",

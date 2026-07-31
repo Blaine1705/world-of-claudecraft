@@ -889,9 +889,9 @@ export const fr_CA: EnTranslations = {
       "heroicLocked": "Vous êtes verrouillé sur {name} héroïque."
     },
     "riftTracker": {
-      "title": "Rift",
-      "floor": "Floor {current} of {total}",
-      "closesIn": "Closes in {time}",
+      "title": "Faille",
+      "floor": "Étage {current} sur {total}",
+      "closesIn": "Se ferme dans {time}",
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
@@ -6486,7 +6486,7 @@ export const fr_CA: EnTranslations = {
       "arenaQueueTrading": "Terminez votre échange avant de rejoindre la file.",
       "arenaQueueInstance": "Vous ne pouvez pas rejoindre la file depuis une instance.",
       "tradeInProgress": "Un échange est déjà en cours.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Ce joueur est déjà en train d’échanger.",
       "tradeTooFar": "La cible est trop éloignée pour échanger.",
       "tradeExpired": "La demande d'échange a expiré.",
       "tradeFailed": "Échange échoué : objets ou argent indisponibles.",

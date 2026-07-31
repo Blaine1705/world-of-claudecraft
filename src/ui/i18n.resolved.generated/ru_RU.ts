@@ -889,7 +889,7 @@ export const ru_RU: EnTranslations = {
       "heroicLocked": "Вы закреплены за героическим подземельем: {name}."
     },
     "riftTracker": {
-      "title": "Rift",
+      "title": "Разлом",
       "floor": "Этаж {current} из {total}",
       "closesIn": "Разлом закроется через {time}",
       "clockMs": "{minutes}:{seconds}",

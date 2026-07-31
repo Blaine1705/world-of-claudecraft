@@ -889,7 +889,7 @@ export const zh_CN: EnTranslations = {
       "heroicLocked": "你已被锁定至英雄难度的{name}。"
     },
     "riftTracker": {
-      "title": "Rift",
+      "title": "裂隙",
       "floor": "第 {current} 层，共 {total} 层",
       "closesIn": "裂隙将在 {time} 后关闭",
       "clockMs": "{minutes}:{seconds}",

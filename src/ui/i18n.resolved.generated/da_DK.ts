@@ -890,8 +890,8 @@ export const da_DK: EnTranslations = {
     },
     "riftTracker": {
       "title": "Rift",
-      "floor": "Floor {current} of {total}",
-      "closesIn": "Closes in {time}",
+      "floor": "Etage {current} af {total}",
+      "closesIn": "Lukker om {time}",
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
@@ -6486,7 +6486,7 @@ export const da_DK: EnTranslations = {
       "arenaQueueTrading": "Afslut din handel, før du stiller dig i kø.",
       "arenaQueueInstance": "Du kan ikke stille dig i kø inde fra en instans.",
       "tradeInProgress": "En handel er allerede i gang.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Den spiller handler allerede.",
       "tradeTooFar": "Målet er for langt væk til at handle.",
       "tradeExpired": "Handelsanmodningen er udløbet.",
       "tradeFailed": "Handel mislykkedes: genstande eller penge er ikke længere tilgængelige.",

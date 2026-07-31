@@ -889,9 +889,9 @@ export const cs_CZ: EnTranslations = {
       "heroicLocked": "Jsi uzamčen(a) k hrdinské verzi {name}."
     },
     "riftTracker": {
-      "title": "Rift",
-      "floor": "Floor {current} of {total}",
-      "closesIn": "Closes in {time}",
+      "title": "Trhlina",
+      "floor": "Patro {current} z {total}",
+      "closesIn": "Zavře se za {time}",
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
@@ -6486,7 +6486,7 @@ export const cs_CZ: EnTranslations = {
       "arenaQueueTrading": "Před zařazením do fronty dokonči obchod.",
       "arenaQueueInstance": "Z instance se nemůžeš zařadit do fronty.",
       "tradeInProgress": "Obchod už probíhá.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Tento hráč už obchoduje.",
       "tradeTooFar": "Cíl je příliš daleko pro obchod.",
       "tradeExpired": "Žádost o obchod vypršela.",
       "tradeFailed": "Obchod selhal: předměty nebo peníze už nejsou dostupné.",

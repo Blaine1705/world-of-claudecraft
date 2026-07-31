@@ -889,9 +889,9 @@ export const pl_PL: EnTranslations = {
       "heroicLocked": "Jesteś przypisany do heroicznego {name}."
     },
     "riftTracker": {
-      "title": "Rift",
-      "floor": "Floor {current} of {total}",
-      "closesIn": "Closes in {time}",
+      "title": "Szczelina",
+      "floor": "Piętro {current} z {total}",
+      "closesIn": "Zamyka się za {time}",
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
@@ -6486,7 +6486,7 @@ export const pl_PL: EnTranslations = {
       "arenaQueueTrading": "Zakończ wymianę przed dołączeniem do kolejki.",
       "arenaQueueInstance": "Nie możesz dołączyć do kolejki będąc wewnątrz instancji.",
       "tradeInProgress": "Wymiana już trwa.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Ten gracz już prowadzi wymianę.",
       "tradeTooFar": "Cel jest zbyt daleko, by handlować.",
       "tradeExpired": "Prośba o wymianę wygasła.",
       "tradeFailed": "Wymiana nieudana: przedmioty lub pieniądze są już niedostępne.",
