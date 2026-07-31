@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { tintedMaterial } from '../src/render/characters/assets';
@@ -63,6 +65,54 @@ describe('mount visual specs cover the sim catalog', () => {
     } finally {
       mutableGfx.standardMaterials = original;
     }
+  });
+});
+
+// The Lambert conversion above changes what Low renders for EVERY GLB that ships
+// authored COLOR_0, not just the mount that surfaced the bug. Pin that set so the
+// blast radius stays written down: a mount re-exported with or without a baked
+// vertex-color pass moves in or out of the fix, and the Highwatch stable horse
+// rides along because it reuses the Valorsteed GLB.
+describe('the Low vertex-color path covers every mount GLB that ships COLOR_0', () => {
+  const REPO_ROOT = path.join(__dirname, '..');
+
+  /** The attribute names declared across a GLB's mesh primitives. */
+  function glbAttributes(url: string): Set<string> {
+    const bytes = readFileSync(path.join(REPO_ROOT, 'public', url));
+    const json = JSON.parse(bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString('utf8')) as {
+      meshes?: { primitives?: { attributes: Record<string, number> }[] }[];
+    };
+    const attributes = new Set<string>();
+    for (const mesh of json.meshes ?? []) {
+      for (const primitive of mesh.primitives ?? []) {
+        for (const name of Object.keys(primitive.attributes)) attributes.add(name);
+      }
+    }
+    return attributes;
+  }
+
+  const mountUrls = [
+    ...new Set(
+      Object.values(VISUALS)
+        .map((def) => def.url)
+        .filter((url) => url.startsWith('models/mounts/')),
+    ),
+  ].sort();
+
+  it('carries authored COLOR_0 on exactly the Terrorspark Groundshaker and the Valorsteed', () => {
+    expect(mountUrls.length).toBeGreaterThanOrEqual(8);
+    const withVertexColors = mountUrls.filter((url) => glbAttributes(url).has('COLOR_0'));
+    expect(withVertexColors).toEqual([
+      'models/mounts/terrorspark_groundshaker.glb',
+      'models/mounts/valorsteed.glb',
+    ]);
+    // Not vacuous: every mount GLB is really parsed, and POSITION proves it.
+    for (const url of mountUrls) expect(glbAttributes(url).has('POSITION'), url).toBe(true);
+  });
+
+  it('puts the ambient stable horse on the Valorsteed GLB, so Low moves it too', () => {
+    expect(VISUALS.mob_stable_horse.url).toBe('models/mounts/valorsteed.glb');
+    expect(VISUALS.mount_valorsteed.url).toBe('models/mounts/valorsteed.glb');
   });
 });
 
