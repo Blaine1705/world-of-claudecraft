@@ -5,7 +5,7 @@
 | Phase | Status | Started | Completed |
 |---|---|---|---|
 | Phase 1: Desktop channel plumbing | complete | 2026-07-31 | 2026-07-31 |
-| Phase 2: Epic packaging channel | not started | | |
+| Phase 2: Epic packaging channel | complete | 2026-07-31 | 2026-07-31 |
 | Phase 3: Server dark surface | not started | | |
 | Phase 4: Desktop Epic shell | not started | | |
 | Phase 5: Server link verification | not started | | |
@@ -24,11 +24,11 @@
 - [x] Tests extended and green
 
 ### Phase 2
-- [ ] `electron:build:epic` / `electron:pack:epic` scripts
-- [ ] `release-epic/` output, publish null, dir targets Win+Mac only
-- [ ] Stamp fields for epic ids; refuse pack without required ids
-- [ ] Website/steam builds unchanged without Epic env
-- [ ] Builder config tests pin epic channel
+- [x] `electron:build:epic` / `electron:pack:epic` scripts
+- [x] `release-epic/` output, publish null, dir targets Win+Mac only
+- [x] Stamp fields for epic ids; refuse pack without required ids
+- [x] Website/steam builds unchanged without Epic env
+- [x] Builder config tests pin epic channel
 
 ### Phase 3
 - [ ] `server/epic/` skeleton with live `EPIC_ENABLED` gate

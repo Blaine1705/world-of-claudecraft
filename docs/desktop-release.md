@@ -1,34 +1,41 @@
-# Desktop release runbook (Electron: website download + Steam)
+# Desktop release runbook (Electron: website download + Steam + Epic)
 
 How to build, sign, publish, and verify the World of ClaudeCraft desktop app.
 The longer companion explainer (what shipped, per-platform update/signing
 mechanics, step-by-step release walkthroughs) is `docs/desktop-ship-notes.md`.
-One codebase produces two distribution channels:
+One codebase produces three distribution channels:
 
 | Channel | Command | Output | Updates |
 |---|---|---|---|
 | website | `npm run electron:build` | `release/` installers + update feed files | in-app via electron-updater |
 | steam | `npm run electron:build:steam` | `release-steam/` loose per-OS layouts | SteamPipe depots only (in-app updater OFF) |
+| epic | `npm run electron:build:epic` | `release-epic/` loose Win+Mac layouts | Epic BPT only (in-app updater OFF) |
 
 Sign-in is email and Discord only, identical to the web flow: email/password logs in
 inside the app, and "Continue with Discord" opens the player's default browser on the
 `/desktop-login` page, which hands a one-time code back to the app over the
-`worldofclaudecraft://desktop-login` deep link. There is no Steam sign-in on any
-channel; on the Steam channel the shell's one Steam surface is the account-link
-ticket behind the Book of Deeds achievement mirror (`electron/steam.cjs`).
+`worldofclaudecraft://desktop-login` deep link. There is no Steam or Epic sign-in on
+any channel; on the Steam channel the shell's one Steam surface is the account-link
+ticket behind the Book of Deeds achievement mirror (`electron/steam.cjs`). Epic
+account-link and achievement mirror surfaces land with the Epic Games Store
+integration packet (`docs/epic-games-integration/`); full BPT upload and store
+submission detail expands in Phase 8 of that packet.
 
 The build stamps `wocDesktop` into the packaged `package.json` (electron-builder
 `extraMetadata`, wired in `scripts/electron-build.mjs` +
 `scripts/electron-builder-config.mjs`): the `distribution` channel, the `apiOrigin`
 the Vite bundle was baked with, the main-process-only `loginOrigin`, the optional
-`crashSubmitUrl`, and (steam channel only) the `steamAppId` fed by the
-`WOC_STEAM_APP_ID` build env. The shell resolves the stamp at runtime in
-`electron/desktop_config.cjs`, and a PACKAGED build ignores the `WOC_*` and
-`VITE_DESKTOP_*` runtime env vars entirely (the stamp is final), so a local env var
-cannot steer an installed app to another API, login page, updater state, or crash
-endpoint. The updater runs only for a PACKAGED WEBSITE build; there is deliberately
-no way to force it on in a Steam build. To try either channel unpacked, set
-`WOC_DISTRIBUTION=website|steam` on `npm run electron:dev`.
+`crashSubmitUrl`, (steam channel only) the `steamAppId` fed by the
+`WOC_STEAM_APP_ID` build env, and (epic channel only) the `epicProductId` /
+`epicDeploymentId` / `epicClientId` fed by `WOC_EPIC_PRODUCT_ID` /
+`WOC_EPIC_DEPLOYMENT_ID` / `WOC_EPIC_CLIENT_ID`. Website builds need no Steam or
+Epic env. The shell resolves the stamp at runtime in `electron/desktop_config.cjs`,
+and a PACKAGED build ignores the `WOC_*` and `VITE_DESKTOP_*` runtime env vars
+entirely (the stamp is final), so a local env var cannot steer an installed app to
+another API, login page, updater state, or crash endpoint. The updater runs only
+for a PACKAGED WEBSITE build; there is deliberately no way to force it on in a
+Steam or Epic build. To try a channel unpacked, set
+`WOC_DISTRIBUTION=website|steam|epic` on `npm run electron:dev`.
 
 Update tracks (prod/dev split): the publish channel is derived from the baked
 `apiOrigin` by one rule shared between build and runtime
@@ -53,14 +60,16 @@ channel like everything else did, so they will auto-update onto production
 builds; give dev testers a fresh post-split dev build rather than expecting
 their old installs to stay on dev.
 
-`npm run electron:pack` / `electron:pack:steam` are the fast local variants
-(`--dir`, host arch only, no installers). Release builds use the full arch matrix in
-`package.json` `build`: macOS universal (dmg + zip), Windows x64 + arm64 (nsis + zip),
-Linux x64 + arm64 (AppImage + deb). To smoke-test a packaged build against a local
-server: `VITE_DESKTOP_API_ORIGIN=http://localhost:8787 npm run electron:pack` (a
-BUILD-time value: baked into the bundle and stamped into the app; such a build
-lands on the `dev` update channel automatically and cannot produce production
-feed files).
+`npm run electron:pack` / `electron:pack:steam` / `electron:pack:epic` are the fast
+local variants (`--dir`, host arch only, no installers). Epic packs still require
+the three `WOC_EPIC_*` build ids and emit Win+Mac dir layouts only (no linux).
+Release builds use the full arch matrix in `package.json` `build`: macOS universal
+(dmg + zip), Windows x64 + arm64 (nsis + zip), Linux x64 + arm64 (AppImage + deb)
+for website; steam and epic override to loose `dir` targets (epic: no linux). To
+smoke-test a packaged build against a local server:
+`VITE_DESKTOP_API_ORIGIN=http://localhost:8787 npm run electron:pack` (a BUILD-time
+value: baked into the bundle and stamped into the app; such a build lands on the
+`dev` update channel automatically and cannot produce production feed files).
 
 Build each OS on its own runner (mac artifacts on macOS, Windows artifacts on Windows,
 Linux artifacts on Linux). Cross-building is not part of this runbook.

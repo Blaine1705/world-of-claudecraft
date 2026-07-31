@@ -1,6 +1,6 @@
 # State: Epic Games Store integration (cross-phase cheat sheet)
 
-Current phase: Phase 1 complete. Next: Phase 2 (Epic packaging channel).
+Current phase: Phase 2 complete. Next: Phase 3 (Server dark surface).
 
 Read this first in every session. Locked decisions below override memory and
 ad-hoc invention. Research background: `research-brief.md`.
@@ -62,12 +62,15 @@ ad-hoc invention. Research background: `research-brief.md`.
   the short forms above for parity with `STEAM_*`. Document finals in DEPLOY.md
   when Phase 8 lands.
 - **D16 Env keys (desktop build / dev).**
-  - Build stamp for epic channel: product/deployment/client ids needed to init EOS
-    in a packaged epic build (refuse to package epic without them, like
-    `WOC_STEAM_APP_ID` for steam)
+  - Build stamp for epic channel (required non-empty; refuse otherwise, like
+    `WOC_STEAM_APP_ID` for steam):
+    - `WOC_EPIC_PRODUCT_ID` -> `wocDesktop.epicProductId`
+    - `WOC_EPIC_DEPLOYMENT_ID` -> `wocDesktop.epicDeploymentId`
+    - `WOC_EPIC_CLIENT_ID` -> `wocDesktop.epicClientId`
   - Unpackaged only: `WOC_DISTRIBUTION=epic`, `WOC_EPIC_DEV=1`, optional id
     overrides
-  Website builds never require any Epic env.
+  Website and steam builds never require any Epic env. Server secrets (client
+  secret) never land in the client stamp.
 - **D17 Routes (registry-only, no legacy ladder twin).**
   - `POST /api/epic/link` (body proof)
   - `DELETE /api/epic/link`
@@ -156,16 +159,26 @@ Client:
 
 (Update as phases land.)
 
-- Modules: none yet (Phase 1 extended existing `electron/desktop_config.cjs` only)
-- Tests: epic pins in `tests/electron_desktop_config.test.ts` and allow-list
-  acceptance in `tests/electron_builder_config.test.ts`
-- Env keys: none yet (planned in D15/D16). Unpackaged `WOC_DISTRIBUTION=epic`
-  works for dev; packaged stamp wins (same hatch rule as steam)
-- Builder note: `scripts/electron-builder-config.mjs` and
-  `scripts/electron-build.mjs` accept `epic` on the distribution allow-list so
-  pure config construction does not throw. Full packaging (publish null,
-  `release-epic/`, Win+Mac dir targets, EOS id stamps) is Phase 2.
-- Docs: this directory
+- Modules: none yet (Phase 1 extended existing `electron/desktop_config.cjs`
+  only; Phase 2 extended builder scripts, no new runtime module)
+- Tests: epic pins in `tests/electron_desktop_config.test.ts` and full epic
+  packaging pins in `tests/electron_builder_config.test.ts`
+- Env keys (build-time, epic channel only; D16):
+  - `WOC_EPIC_PRODUCT_ID` -> stamp `wocDesktop.epicProductId`
+  - `WOC_EPIC_DEPLOYMENT_ID` -> stamp `wocDesktop.epicDeploymentId`
+  - `WOC_EPIC_CLIENT_ID` -> stamp `wocDesktop.epicClientId`
+  Server secrets (client secret) are never stamped. Unpackaged
+  `WOC_DISTRIBUTION=epic` works for dev; packaged stamp wins (same hatch rule
+  as steam). Website and steam builds require none of these.
+- Builder (Phase 2):
+  - Scripts: `electron:build:epic`, `electron:pack:epic`
+  - `publish: null`, `directories.output = 'release-epic'`
+  - mac dir universal + win dir x64; **no linux** (D6; linux block deleted)
+  - Refuses epic pack/build without all three non-empty ids (whitespace-only
+    refused too)
+  - `files` / `asarUnpack` kept as arrays for Phase 4 EOS native re-include;
+    no real SDK vendored yet
+- Docs: this directory; short epic row in `docs/desktop-release.md` channel table
 
 ## Open items (do not invent answers mid-phase)
 

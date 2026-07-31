@@ -19,8 +19,11 @@ import { buildElectronVendor } from './electron-vendor.mjs';
 //  - steam: the SteamPipe channel; publish nulled, 'dir' targets per OS, output
 //    in release-steam/, and the runtime stamp turns the in-app updater OFF
 //    (Steam depots are the only update path there; see docs/desktop-release.md).
-//  - epic: Epic Games Store channel stamp; packaging details (release-epic/,
-//    dir targets, EOS id stamps) land with the dedicated epic packaging phase.
+//  - epic: Epic Games Store channel; publish nulled, 'dir' targets for mac +
+//    win only (no linux), output in release-epic/, and the runtime stamp turns
+//    the in-app updater OFF (Epic BPT owns patches; see docs/desktop-release.md
+//    and docs/epic-games-integration/). Requires WOC_EPIC_PRODUCT_ID,
+//    WOC_EPIC_DEPLOYMENT_ID, and WOC_EPIC_CLIENT_ID (server secrets stay out).
 const mode = process.argv[2] ?? 'build';
 if (!['pack', 'build'].includes(mode)) {
   console.error(`unknown electron build mode: ${mode}`);
@@ -143,6 +146,13 @@ const config = desktopBuilderConfig({
   steamworksInstalled: () =>
     existsSync(path.join(root, 'node_modules/steamworks.js/package.json')) &&
     existsSync(path.join(root, 'node_modules/steamworks.js/dist')),
+  // EOS product / deployment / client ids for an Epic package (stamped into
+  // wocDesktop for electron/epic.cjs). desktopBuilderConfig refuses an epic
+  // channel build without all three non-empty; website and steam builds ignore
+  // them. Server-only secrets (client secret) must never ride this stamp.
+  epicProductId: process.env.WOC_EPIC_PRODUCT_ID || '',
+  epicDeploymentId: process.env.WOC_EPIC_DEPLOYMENT_ID || '',
+  epicClientId: process.env.WOC_EPIC_CLIENT_ID || '',
 });
 const configDir = mkdtempSync(path.join(tmpdir(), 'woc-eb-'));
 const configPath = path.join(configDir, 'electron-builder.json');
