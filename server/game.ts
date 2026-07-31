@@ -51,7 +51,6 @@ import {
   partyFrameRole,
 } from '../src/sim/party_frame_info';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
-import { populateCommunityRiftPortals } from '../src/sim/rift/portals';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { RAID_MAX } from '../src/sim/social/party';
@@ -64,14 +63,14 @@ import {
 } from '../src/sim/talent_allocation_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
-  ALL_EQUIP_SLOTS,
   type Aura,
   DT,
   dist2d,
   type Entity,
-  type EquipSlot,
   emptyMoveInput,
+  type ItemInstancePayload,
   isDungeonDifficulty,
+  isEquipSlot,
   MAX_LEVEL,
   type MobFamily,
   RUN_SPEED,
@@ -332,8 +331,6 @@ export const MOB_UPDATE_BUCKETS = [
   'elemental',
   'dragonkin',
   'demon',
-  'kobold',
-  'murloc',
   'reptile',
   'other',
 ] as const satisfies readonly (MobFamily | 'other')[];
@@ -589,6 +586,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'change_weapon_skin',
   'prestige',
   'market_list',
+  'market_list_instance',
   'market_buy',
   'market_cancel',
   'market_collect',
@@ -898,7 +896,8 @@ interface WireAura {
   // into -0 -> 0 and flip a stat-sap's isAuraDebuff classification. Omitted only when exactly 0,
   // which decodes back to 0, so value-less auras and an old server are unchanged.
   value?: number;
-  // imbue judgement min/max bonus-damage range (aura_effect imbueRange); only imbue sets these.
+  // Optional secondary aura values: imbue judgement's min/max damage range and
+  // Greater Invisibility's reduction/aftereffect duration.
   value2?: number;
   value3?: number;
   // dot/hot tick cadence in seconds, so the tooltip's "every N sec" is right online.
@@ -1049,8 +1048,9 @@ function wireAura(a: Aura): WireAura {
   // an old server are unchanged. A hover tooltip magnitude is non-actionable cosmetic text,
   // so sending it cannot let a graphics preset hide anything (graphics-settings fairness).
   if (a.value !== 0) w.value = a.value;
-  // imbue judgement min/max range; dot/hot tick cadence; non-physical school. Each rides
-  // only when it carries meaning, so ordinary auras stay lean and decode to their defaults.
+  // Optional secondary aura values (imbue range or Greater Invisibility aftereffect);
+  // dot/hot cadence; non-physical school. Each rides only when it carries meaning, so
+  // ordinary auras stay lean and decode to their defaults.
   if (a.value2 !== undefined) w.value2 = a.value2;
   if (a.value3 !== undefined) w.value3 = a.value3;
   if (a.tickInterval !== undefined) w.tickInterval = a.tickInterval;
@@ -1336,10 +1336,6 @@ export interface PerfCaptureStatus {
   last: PerfCaptureResult | null;
 }
 
-export interface GameServerOptions {
-  readonly communityTestRifts?: boolean;
-}
-
 export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
@@ -1513,10 +1509,8 @@ export class GameServer {
   private readonly ipSessionCounts = new Map<string, number>();
   private readonly riftUpgrader: RiftUpgradeCoordinator;
   private readonly riftAssets: RiftAssetCoordinator;
-  private readonly communityTestRifts: boolean;
 
-  constructor(options: GameServerOptions = {}) {
-    this.communityTestRifts = options.communityTestRifts ?? false;
+  constructor() {
     this.sim = new Sim({
       seed: WORLD_SEED,
       playerClass: 'warrior',
@@ -1527,7 +1521,6 @@ export class GameServer {
       worldBossAtBoot: true,
       // Ranked rift portals spawn on the live realm (dev/test worlds opt in).
       riftPortals: true,
-      communityRifts: this.communityTestRifts,
       lockoutNowMs: () => Date.now(),
       // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
       // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
@@ -3085,6 +3078,11 @@ export class GameServer {
     session.chatStrikes = meta.chatStrikes ?? session.chatStrikes;
     session.isAdmin = meta.isAdmin ?? false;
     session.adminPermissions = new Set(meta.adminPermissions ?? []);
+    // Re-validate the freshly-read layout (untrusted at rest), same as a fresh
+    // join. Without this, a mid-session save that already landed durably would
+    // be clobbered by the stale join-time snapshot once lastSent resets below
+    // forces a resend.
+    session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
     session.lastSent = {};
@@ -3476,22 +3474,9 @@ export class GameServer {
 
   async loadRifts(): Promise<void> {
     try {
-      loadRiftWorldState(this.sim.ctx, await loadRiftState(), Date.now(), {
-        strict: this.communityTestRifts,
-      });
+      loadRiftWorldState(this.sim.ctx, await loadRiftState(), Date.now());
     } catch (err) {
       console.error('failed to load shared Rift state:', err);
-      if (this.communityTestRifts) throw err;
-      return;
-    }
-    if (!this.communityTestRifts) return;
-
-    populateCommunityRiftPortals(this.sim.ctx);
-    try {
-      await this.persistRifts();
-    } catch (err) {
-      console.error('failed to save shared Rift state:', err);
-      throw err;
     }
   }
 
@@ -4401,10 +4386,7 @@ export class GameServer {
           // sim's own resolver rather than trusting the client. The sim then
           // re-validates the slot against the item itself.
           const aimed =
-            typeof msg.slot === 'string' &&
-            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
-              ? (msg.slot as EquipSlot)
-              : undefined;
+            typeof msg.slot === 'string' && isEquipSlot(msg.slot) ? msg.slot : undefined;
           if (aimed) sim.equipItemToSlot(msg.item, aimed, pid);
           else sim.equipItem(msg.item, pid);
         }
@@ -4417,13 +4399,8 @@ export class GameServer {
         }
         break;
       case 'unequip_item':
-        // ALL_EQUIP_SLOTS, not the frozen EQUIP_SLOTS: the latter omits the
-        // additive 'offhand' slot, so any offhand unequip was silently dropped here.
-        if (
-          typeof msg.slot === 'string' &&
-          (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
-        ) {
-          sim.unequipItem(msg.slot as EquipSlot, pid);
+        if (typeof msg.slot === 'string' && isEquipSlot(msg.slot)) {
+          sim.unequipItem(msg.slot, pid);
         }
         break;
       case 'use':
@@ -4494,11 +4471,7 @@ export class GameServer {
           // to undefined, which is the bagged arm. The sim then re-validates that
           // the named slot is actually wearing this item id and, without the
           // confirm flag below, that the worn copy is not already enchanted.
-          const worn =
-            typeof msg.slot === 'string' &&
-            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
-              ? (msg.slot as EquipSlot)
-              : undefined;
+          const worn = typeof msg.slot === 'string' && isEquipSlot(msg.slot) ? msg.slot : undefined;
           // `confirm` (#2415): the explicit consent to replace an existing
           // enchant. A strict boolean-true check (the dispatch type-guard
           // rule, the craft_item `commission` precedent); anything else reads
@@ -5227,6 +5200,21 @@ export class GameServer {
           sim.marketList(msg.item, msg.count, msg.price, pid);
         }
         break;
+      case 'market_list_instance':
+        // The instance object is only an equality needle: the sim re-resolves
+        // it against the sender's own bags and escrows the actual held copy's
+        // payload, so no wire-supplied field ever enters the book directly.
+        if (
+          typeof msg.item === 'string' &&
+          typeof msg.price === 'number' &&
+          Number.isFinite(msg.price) &&
+          typeof msg.instance === 'object' &&
+          msg.instance !== null &&
+          !Array.isArray(msg.instance)
+        ) {
+          sim.marketListInstance(msg.item, msg.price, msg.instance as ItemInstancePayload, pid);
+        }
+        break;
       case 'market_buy':
         if (typeof msg.id === 'number') sim.marketBuy(msg.id, pid);
         break;
@@ -5247,10 +5235,10 @@ export class GameServer {
           msg.items.length > 3 // MAIL_MAX_ATTACHMENTS; the Sim re-validates
         )
           break;
-        const items: { itemId: string; count: number }[] = [];
+        const items: { itemId: string; count: number; instance?: ItemInstancePayload }[] = [];
         let itemsOk = true;
         for (const raw of msg.items as unknown[]) {
-          const slot = raw as { itemId?: unknown; count?: unknown } | null;
+          const slot = raw as { itemId?: unknown; count?: unknown; instance?: unknown } | null;
           if (
             !slot ||
             typeof slot.itemId !== 'string' ||
@@ -5260,7 +5248,20 @@ export class GameServer {
             itemsOk = false;
             break;
           }
-          items.push({ itemId: slot.itemId, count: Math.floor(slot.count) });
+          // The instance is only an equality needle (the market_list_instance
+          // rule): the sim re-resolves it against the sender's own bags and
+          // escrows the actual held copy's payload.
+          const instance =
+            slot.instance !== null &&
+            typeof slot.instance === 'object' &&
+            !Array.isArray(slot.instance)
+              ? (slot.instance as ItemInstancePayload)
+              : undefined;
+          items.push({
+            itemId: slot.itemId,
+            count: Math.floor(slot.count),
+            ...(instance ? { instance } : {}),
+          });
         }
         if (!itemsOk) break;
         // Player-written subject/body flow through the same gates as chat

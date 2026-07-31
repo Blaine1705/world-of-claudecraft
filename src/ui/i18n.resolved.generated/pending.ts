@@ -10,54 +10,99 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "es_ES": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "fr_FR": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "fr_CA": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "en_CA": [],
   "it_IT": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "de_DE": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "nl_NL": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "pl_PL": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "id_ID": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "tr_TR": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "sv_SE": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "vi_VN": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "da_DK": [
-    "hud.errors.tradeAlreadyTrading"
+    "entities.abilities.greater_invisibility.description",
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ]
 };
