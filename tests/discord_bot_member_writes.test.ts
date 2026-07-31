@@ -20,12 +20,16 @@ import {
 import {
   decideMemberUpdate,
   displayNameOf,
+  forgetMember,
   type NicknameCaches,
   nickOf,
   pushChangedMemberMeta,
   pushOneMemberMeta,
   writeMemberNickname,
 } from '../bot/member_writes';
+
+/** The two shapes a push result may take that mean "the server did not take it". */
+const pushRejectedShapes = [null, undefined];
 
 /** Ids as STRINGS: `1000000000000000000 + i` is past Number.MAX_SAFE_INTEGER, so a
  * loop built that way collapses onto a few values and a population never grows. */
@@ -156,7 +160,9 @@ describe('members-meta diff before push', () => {
   it('pushes NOTHING when no member changed', async () => {
     const last = new Map<string, MemberMetaRecord>();
     const records = [record(memberId(1)), record(memberId(2))];
-    for (const r of records) last.set(r.discord_user_id, r);
+    // Clones, not the same object references: seeding with the identical objects
+    // would let an identity compare (next !== last) pass this file.
+    for (const r of records) last.set(r.discord_user_id, { ...r });
     const pushes: MemberMetaRecord[][] = [];
     const pushed = await pushChangedMemberMeta(records, last, {
       pushMembersMeta: async (batch) => {
@@ -171,7 +177,9 @@ describe('members-meta diff before push', () => {
   it('pushes only the members that changed, in input order', async () => {
     const last = new Map<string, MemberMetaRecord>();
     const records = [record(memberId(1)), record(memberId(2)), record(memberId(3))];
-    for (const r of records) last.set(r.discord_user_id, r);
+    // Clones, not the same object references: seeding with the identical objects
+    // would let an identity compare (next !== last) pass this file.
+    for (const r of records) last.set(r.discord_user_id, { ...r });
     const changed = [records[0], { ...records[1], role: 'admin' }, records[2]];
     const pushes: MemberMetaRecord[][] = [];
     const pushed = await pushChangedMemberMeta(changed, last, {
@@ -373,5 +381,146 @@ describe('member name resolution', () => {
     expect(nickOf({})).toBeNull();
     expect(nickOf({ nick: null })).toBeNull();
     expect(nickOf({ nick: 42 })).toBeNull();
+  });
+});
+
+describe('a push the server did not take is never marked clean', () => {
+  it('treats undefined, not just null, as a refusal', () => {
+    // `call()` returns null for a transport or envelope failure, but it also
+    // returns `env.data` verbatim on a success envelope, so a body carrying no
+    // data arrives as undefined. A `!== null` check would mark that batch clean.
+    expect(pushRejectedShapes).toEqual([null, undefined]);
+  });
+
+  it.each([
+    ['null', null],
+    ['undefined', undefined],
+  ])('does not remember a batch when the push answered %s', async (_label, answer) => {
+    const last = new Map<string, MemberMetaRecord>();
+    const records = [record(memberId(1)), record(memberId(2))];
+    const pushed = await pushChangedMemberMeta(records, last, {
+      pushMembersMeta: async () => answer,
+    });
+    expect(pushed).toEqual([]);
+    expect(last.size).toBe(0);
+  });
+
+  it.each([
+    ['null', null],
+    ['undefined', undefined],
+  ])('does not remember a single push that answered %s', async (_label, answer) => {
+    const last = new Map<string, MemberMetaRecord>();
+    expect(
+      await pushOneMemberMeta(record(USER), last, { pushMembersMeta: async () => answer }),
+    ).toBe(false);
+    expect(last.size).toBe(0);
+  });
+
+  it('lets a REJECTING push propagate rather than swallowing it', async () => {
+    // Distinct from a refusal: the game client answers null, it does not throw, so
+    // a throw here means something unexpected and the scheduler's error arm should
+    // see it rather than this silently reporting an empty push.
+    const last = new Map<string, MemberMetaRecord>();
+    await expect(
+      pushChangedMemberMeta([record(USER)], last, {
+        pushMembersMeta: async () => {
+          throw new Error('socket hang up');
+        },
+      }),
+    ).rejects.toThrow(new Error('socket hang up'));
+    expect(last.size).toBe(0);
+  });
+
+  it('honors a custom batch size', async () => {
+    // The default is pinned against a literal elsewhere; this proves the parameter
+    // is actually used rather than shadowed by the default.
+    expect(MEMBERS_META_BATCH).toBe(200);
+    const records = Array.from({ length: 7 }, (_, i) => record(memberId(i)));
+    const sizes: number[] = [];
+    await pushChangedMemberMeta(
+      records,
+      new Map<string, MemberMetaRecord>(),
+      {
+        pushMembersMeta: async (batch) => {
+          sizes.push(batch.length);
+          return { updated: batch.length };
+        },
+      },
+      3,
+    );
+    expect(sizes).toEqual([3, 3, 1]);
+  });
+});
+
+describe('forgetting a departed member', () => {
+  it('drops every diff cache, so a rejoin re-pushes instead of being suppressed', async () => {
+    // The rejoin trap. Leave the last-pushed record behind and a member who leaves
+    // and comes back is diffed against their PRE-DEPARTURE state, so the push that
+    // would restore their flair is suppressed and the game shows them cleared
+    // indefinitely. This is the round trip, not just the deletes.
+    const c = caches({ nick: 'Aldric 20', name: 'Aldric 20', written: 'Aldric 20' });
+    const last = new Map<string, MemberMetaRecord>();
+    const io = { pushMembersMeta: async (): Promise<unknown> => ({ updated: 1 }) };
+    await pushOneMemberMeta(record(USER), last, io);
+    expect(last.has(USER)).toBe(true);
+
+    forgetMember(c, last, USER);
+    expect(c.memberNicks.has(USER)).toBe(false);
+    expect(c.lastWrittenNick.has(USER)).toBe(false);
+    expect(last.has(USER)).toBe(false);
+
+    // The rejoin: the SAME record must push again, which it only can because the
+    // cache entry went with them.
+    expect(await pushOneMemberMeta(record(USER), last, io)).toBe(true);
+    // And their nickname is written again rather than skipped as unchanged.
+    let sent = 0;
+    expect(
+      await writeMemberNickname(USER, 'Aldric 20', c, {
+        setNickname: async () => {
+          sent += 1;
+          return {};
+        },
+      }),
+    ).toBe('written');
+    expect(sent).toBe(1);
+  });
+
+  it('leaves other members alone', () => {
+    const c = caches({ nick: 'Aldric 20' });
+    const other = memberId(2);
+    c.memberNicks.set(other, 'Bryn 12');
+    const last = new Map<string, MemberMetaRecord>([[other, record(other)]]);
+    forgetMember(c, last, USER);
+    expect(c.memberNicks.get(other)).toBe('Bryn 12');
+    expect(last.has(other)).toBe(true);
+  });
+});
+
+describe('nickname write, remaining arms', () => {
+  it('does not require an onError sink', async () => {
+    const c = caches({ nick: 'Aldric 20' });
+    await expect(
+      writeMemberNickname(USER, 'Aldric 21', c, {
+        setNickname: async () => {
+          throw new Error('403');
+        },
+      }),
+    ).resolves.toBe('failed');
+    expect(c.memberNicks.get(USER)).toBe('Aldric 20');
+  });
+});
+
+describe('member update decision, remaining arms', () => {
+  it('pushes when the payload carries no roles AND the nick is not ours', () => {
+    // The null-roles path exists only as an echo case; this is its other arm.
+    const user = { id: USER, username: 'aldric' };
+    const decision = decideMemberUpdate(
+      { nick: 'Renamed By A Mod', user },
+      user,
+      { roles: ['r1'], lastWrittenNick: 'Aldric 21' },
+      { roles: reconcileMemberRolesFromUpdate, displayName: displayNameOf },
+    );
+    expect(decision.roles).toBeNull();
+    expect(decision.push).toBe(true);
   });
 });

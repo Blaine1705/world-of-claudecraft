@@ -451,6 +451,33 @@ describe('ServerClient pushMembersMeta silent-drop warning', () => {
     expect(errors).toEqual([['[bot] members-meta push of 2 processed 0 rows']]);
   });
 
+  it('REPORTS the silent drop as a failure, not just as a log line', async () => {
+    // Load bearing since the caller started diffing. The caller marks a batch as
+    // successfully pushed from this return value, so answering the truthy
+    // `{ updated: 0 }` here would let it record a batch the server demonstrably
+    // dropped, and the diff would then suppress the retry for the life of the
+    // process instead of for one sweep. Before diffing existed the roster was
+    // re-pushed wholesale every sweep, so the drop healed itself and only a
+    // warning was needed.
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { client } = clientReturning({ updated: 0 });
+    const result = await client.pushMembersMeta([
+      { discord_user_id: 'u1', name: 'A', joinedAtMs: null, role: null },
+    ]);
+    expect(result).toBeNull();
+  });
+
+  it('still returns the payload when rows WERE processed', async () => {
+    // The complement: a real success must not be reported as a failure, or every
+    // push would be retried forever and the diff would never settle.
+    const { client } = clientReturning({ updated: 2 });
+    const result = await client.pushMembersMeta([
+      { discord_user_id: 'u1', name: 'A', joinedAtMs: null, role: null },
+      { discord_user_id: 'u2', name: 'B', joinedAtMs: null, role: null },
+    ]);
+    expect(result).toEqual({ updated: 2 });
+  });
+
   it('stays quiet when rows were processed, when the push was empty, and on failure', async () => {
     const errors: unknown[][] = [];
     vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {

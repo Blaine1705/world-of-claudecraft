@@ -20,6 +20,7 @@ import {
   initialRunState,
   jitteredDelayMs,
   LoopScheduler,
+  MAX_JITTER_RATIO,
   MIN_INTERVAL_MS,
   nextIntervalMs,
   requestKick,
@@ -150,9 +151,26 @@ describe('scheduler jitter band', () => {
     expect(jitteredDelayMs(1000, 0, 1)).toBe(1000);
   });
 
-  it('never returns a negative or non-finite delay', () => {
-    // A ratio above 1 would put the bottom of the band below zero.
-    expect(jitteredDelayMs(1000, 5, 0)).toBe(0);
+  it('never returns a negative, zero or non-finite delay for a usable base', () => {
+    // The band's LOWER EDGE is the hazard: at a ratio of 1 it is exactly zero, and
+    // a zero delay arms a timeout whose callback arms another, which is a hot spin
+    // that wedges the process rather than failing. MIN_INTERVAL_MS does not cover
+    // this, because it floors the BASE and the jitter is applied after it.
+    expect(MAX_JITTER_RATIO).toBe(0.5);
+    expect(jitteredDelayMs(1000, 1, 0)).toBe(500); // clamped to MAX_JITTER_RATIO
+    expect(jitteredDelayMs(1000, 5, 0)).toBe(500);
+    // A ratio at the ceiling still never bottoms out at zero, for any draw.
+    for (const draw of [0, 0.25, 0.5, 0.75, 1]) {
+      expect(jitteredDelayMs(1000, MAX_JITTER_RATIO, draw)).toBeGreaterThanOrEqual(500);
+    }
+    // A negative or non-finite ratio means no jitter at all, never a negative band.
+    expect(jitteredDelayMs(1000, -0.3, 0)).toBe(1000);
+    expect(jitteredDelayMs(1000, Number.NaN, 0)).toBe(1000);
+    // Infinity is NOT finite, so it takes the same no-jitter branch as NaN rather
+    // than the MAX_JITTER_RATIO clamp: only a finite over-large ratio is clamped.
+    expect(jitteredDelayMs(1000, Number.POSITIVE_INFINITY, 0)).toBe(1000);
+    // An unusable BASE has no sensible delay to produce, so it yields 0 and the
+    // caller's own floor is what keeps that off a timer.
     expect(jitteredDelayMs(-5, 0.1, 0)).toBe(0);
     expect(jitteredDelayMs(Number.POSITIVE_INFINITY, 0.1, 0)).toBe(0);
     expect(jitteredDelayMs(Number.NaN, 0.1, 0)).toBe(0);
@@ -620,23 +638,39 @@ describe('scheduler debounce mode (the presence push)', () => {
     expect(runAt).toEqual([4000]);
   });
 
-  it('sends a kick that lands mid-run through a fresh window, exactly once', async () => {
-    // The debounce this replaces cleared its guard BEFORE starting the push, so
-    // an event arriving during the push armed a new full window. Three kicks
-    // against one in-flight run are still one follow-up, one window later.
+  it('opens the follow-up window at run SETTLE, not at event time, exactly once', async () => {
+    // A DELIBERATE deviation from the presenceTimer this replaces, and the arm is
+    // built so the two are distinguishable rather than accidentally equal. The old
+    // guard cleared itself BEFORE starting the push, so an event during the push
+    // armed its window from EVENT time; here the window opens when the run
+    // SETTLES. That guarantees a full quiet window BETWEEN pushes instead of
+    // allowing two to land a moment apart, which is the anti-storm direction.
+    //
+    // The run is held open across a clock advance so the two differ: the kick
+    // lands at 5000 and the run settles at 6000, so event-time would fire at 9000
+    // and settle-time fires at 10000. Resolving the gate before advancing (as an
+    // earlier version of this test did) collapses both onto the same number and
+    // the assertion becomes true for either implementation.
     const { clock, runAt, task, gate } = debounceRig();
     task.kick();
     await clock.advanceTo(4000);
-    expect(runAt).toEqual([4000]);
+    expect(runAt).toEqual([4000]); // run 1 is now in flight, holding the gate
 
+    await clock.advanceTo(5000);
     task.kick();
     task.kick();
     task.kick();
+    await clock.advanceTo(6000);
     gate.resolve();
-    await clock.advanceTo(7999);
-    expect(runAt).toEqual([4000]);
-    await clock.advanceTo(8000);
-    expect(runAt).toEqual([4000, 8000]);
+    await clock.advanceTo(6000); // flush the settle WITHOUT moving time
+
+    await clock.advanceTo(9000);
+    expect(runAt).toEqual([4000]); // event-time semantics would have fired here
+    await clock.advanceTo(10_000);
+    expect(runAt).toEqual([4000, 10_000]);
+    // Three kicks, one follow-up: still exactly one, not one per kick.
+    await clock.advanceTo(100_000);
+    expect(runAt).toEqual([4000, 10_000]);
   });
 
   it('cancels an armed window on stop, and ignores kicks afterwards', async () => {
@@ -650,5 +684,192 @@ describe('scheduler debounce mode (the presence push)', () => {
     task.kick();
     await clock.advanceTo(200_000);
     expect(runAt).toEqual([]);
+  });
+});
+
+describe('scheduler kick from IDLE, and the task lifecycle', () => {
+  /** A plain repeating task on the virtual clock, jitter pinned to the centre. */
+  function rig(cadence: TaskCadence = { activeMs: 1000 }): {
+    clock: SyntheticClock;
+    runAt: number[];
+    task: ScheduledTask;
+    scheduler: LoopScheduler;
+  } {
+    const clock = syntheticClock();
+    const runAt: number[] = [];
+    const scheduler = new LoopScheduler(clockTimers(clock), () => 0.5);
+    const task = scheduler.add({
+      name: 'sweep',
+      cadence,
+      run: async () => {
+        runAt.push(clock.now());
+        return true;
+      },
+    });
+    return { clock, runAt, task, scheduler };
+  }
+
+  it('runs a kick IMMEDIATELY when idle, and drops the delay it made stale', async () => {
+    // The GUILD_CREATE path main.ts actually uses, and the one branch of kick()
+    // the mid-run cases never reach. Three separate claims, each falsifiable:
+    // the 500 proves the kick ran at once rather than waiting; the ABSENCE of a
+    // 1000 proves the already-armed delay was cleared instead of firing a second
+    // run a moment later; and the 1500 proves the chain re-armed from the kick.
+    const { clock, runAt, task } = rig();
+    task.start();
+    await clock.advanceTo(500);
+    expect(runAt).toEqual([]);
+
+    task.kick();
+    await clock.advanceTo(500);
+    expect(runAt).toEqual([500]);
+
+    await clock.advanceTo(1000);
+    expect(runAt).toEqual([500]); // the stale delay did NOT fire
+    await clock.advanceTo(1500);
+    expect(runAt).toEqual([500, 1500]);
+    task.stop();
+  });
+
+  it('ignores a second start(), so a loop cannot be armed twice', async () => {
+    // A double start would arm two independent chains on one task, doubling every
+    // sweep forever, and the overlap guard would not catch it: the two chains
+    // interleave rather than overlap.
+    const { clock, runAt, task } = rig();
+    task.start();
+    task.start();
+    task.start();
+    await clock.advanceTo(3000);
+    expect(runAt).toEqual([1000, 2000, 3000]);
+    task.stop();
+  });
+
+  it('can be restarted after a stop, with no ghost chain from before', async () => {
+    const { clock, runAt, task } = rig();
+    task.start();
+    await clock.advanceTo(1000);
+    expect(runAt).toEqual([1000]);
+    task.stop();
+    await clock.advanceTo(10_000);
+    expect(runAt).toEqual([1000]);
+
+    task.start();
+    await clock.advanceTo(11_000);
+    // Exactly one more: the pre-stop chain did not resume alongside the new one.
+    expect(runAt).toEqual([1000, 11_000]);
+    task.stop();
+  });
+
+  it('resumes the ordinary chain after a coalesced follow-up run', async () => {
+    // The follow-up path returns early rather than calling schedule(), so the
+    // chain has to be re-armed by the follow-up's OWN settle. Nothing pinned that.
+    const clock = syntheticClock();
+    const runAt: number[] = [];
+    const gate = deferred();
+    const scheduler = new LoopScheduler(clockTimers(clock), () => 0.5);
+    const task = scheduler.add({
+      name: 'sweep',
+      cadence: { activeMs: 1000 },
+      run: async () => {
+        runAt.push(clock.now());
+        if (runAt.length === 1) await gate.promise;
+        return true;
+      },
+    });
+    task.start();
+    await clock.advanceTo(1000);
+    task.kick();
+    gate.resolve();
+    await clock.advanceTo(1000);
+    expect(runAt).toEqual([1000, 1000]); // the collapsed follow-up
+    await clock.advanceTo(2000);
+    expect(runAt).toEqual([1000, 1000, 2000]); // and the chain carries on
+    task.stop();
+  });
+
+  it('routes a throwing run to the default sink and keeps the chain alive', async () => {
+    // The default onError path, which the explicit-sink tests never take.
+    const clock = syntheticClock();
+    const runAt: number[] = [];
+    const logged: unknown[][] = [];
+    const original = console.error;
+    console.error = (...args: unknown[]): void => {
+      logged.push(args);
+    };
+    try {
+      const scheduler = new LoopScheduler(clockTimers(clock), () => 0.5);
+      const task = scheduler.add({
+        name: 'sweep',
+        cadence: { activeMs: 1000 },
+        run: async () => {
+          runAt.push(clock.now());
+          throw new Error('discord said no');
+        },
+      });
+      task.start();
+      await clock.advanceTo(2000);
+      task.stop();
+    } finally {
+      console.error = original;
+    }
+    expect(runAt).toEqual([1000, 2000]);
+    expect(logged).toHaveLength(2);
+    expect(logged[0][0]).toBe('[bot] scheduled task sweep failed');
+  });
+
+  it('survives an onError sink that throws, which is the claim at that catch', async () => {
+    // Stated in the source and otherwise unbacked: a broken error sink must not be
+    // the thing that stops the loop, or one bad log line silently ends syncing.
+    const clock = syntheticClock();
+    const runAt: number[] = [];
+    const scheduler = new LoopScheduler(clockTimers(clock), () => 0.5);
+    const task = scheduler.add({
+      name: 'sweep',
+      cadence: { activeMs: 1000 },
+      run: async () => {
+        runAt.push(clock.now());
+        throw new Error('discord said no');
+      },
+      onError: () => {
+        throw new Error('the sink is broken too');
+      },
+    });
+    task.start();
+    await clock.advanceTo(3000);
+    expect(runAt).toEqual([1000, 2000, 3000]);
+    task.stop();
+  });
+});
+
+describe('scheduler cadence resolution edge cases', () => {
+  it('clamps a stale or out-of-band current interval back into the band', () => {
+    // The doc comment claims a hand-built or stale value cannot escape the band;
+    // every other case feeds a value already inside it, so both clamps were
+    // unfalsifiable. Below the floor, above the ceiling, and unusable.
+    expect(nextIntervalMs(100, OUTBOX, false)).toBe(6000);
+    expect(nextIntervalMs(90_000, OUTBOX, false)).toBe(15_000);
+    expect(nextIntervalMs(Number.NaN, OUTBOX, false)).toBe(6000);
+    expect(nextIntervalMs(0, OUTBOX, false)).toBe(6000);
+    expect(nextIntervalMs(-1000, OUTBOX, false)).toBe(6000);
+  });
+
+  it('falls back to the active interval for an unusable idle interval', () => {
+    for (const bad of [0, -1, Number.NaN, Number.POSITIVE_INFINITY, undefined]) {
+      expect(resolveCadence({ activeMs: 3000, idleMs: bad as unknown as number }).idleMs).toBe(
+        3000,
+      );
+    }
+  });
+
+  it('falls back to the default decay for an unusable one, and accepts exactly 1', () => {
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, 0, -2, 0.99, undefined]) {
+      expect(resolveCadence({ activeMs: 3000, decay: bad as unknown as number }).decay).toBe(
+        DEFAULT_IDLE_DECAY,
+      );
+    }
+    // Exactly 1 is legal and means an idle interval that never grows, which is a
+    // real choice (back off by never backing off) rather than a bad value.
+    expect(resolveCadence({ activeMs: 3000, idleMs: 15_000, decay: 1 }).decay).toBe(1);
+    expect(nextIntervalMs(3000, { activeMs: 3000, idleMs: 15_000, decay: 1 }, false)).toBe(3000);
   });
 });

@@ -442,6 +442,32 @@ describe('Gateway resume', () => {
     expect(lastSent(sockets[2])).toEqual({ op: 1, d: null });
   });
 
+  it('re-identifies on op 7 after a non-resumable INVALID_SESSION too (L7)', () => {
+    // The mirror of the close-path arm above. The L7 comment names BOTH reconnect
+    // paths that call reconnect(true), and op 7 is the other one: Discord asks the
+    // client to reconnect, and without the session cleared it would RESUME the
+    // session it had just invalidated.
+    const { socket, timers, factoryUrls, sockets } = rig();
+    frame(socket, { op: 10, d: { heartbeat_interval: 30_000 } });
+    frame(socket, {
+      op: 0,
+      s: 5,
+      t: 'READY',
+      d: { session_id: 'sess-1', resume_gateway_url: 'wss://resume.discord.gg' },
+    });
+
+    frame(socket, { op: 9, d: false });
+    timers.armed[0].fn();
+    frame(sockets[1], { op: 10, d: { heartbeat_interval: 30_000 } });
+    expect(lastSent(sockets[1]).op).toBe(2);
+
+    // op 7 reconnects immediately, with no timer of its own.
+    frame(sockets[1], { op: 7 });
+    expect(factoryUrls[2]).toBe('wss://gateway.discord.gg/?v=10&encoding=json');
+    frame(sockets[2], { op: 10, d: { heartbeat_interval: 30_000 } });
+    expect(lastSent(sockets[2]).op).toBe(2); // IDENTIFY, not RESUME
+  });
+
   it('keeps the session on a RESUMABLE INVALID_SESSION, so a later close still resumes', () => {
     // The negative control for the L7 fix: clearing on d=false must not turn
     // into clearing on every op 9, which would throw away a session Discord

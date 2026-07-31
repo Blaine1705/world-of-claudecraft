@@ -54,6 +54,14 @@ function res429(headers: Record<string, string>, retryAfterSeconds: number): Gov
   return { status: 429, headers, json: { retry_after: retryAfterSeconds }, jsonParsed: true };
 }
 
+/** An interaction-callback path for a distinct id, built by CONCATENATION. */
+function interactionPath(index: number): string {
+  // Never `1000000000000000000 + index`: that is past Number.MAX_SAFE_INTEGER, so
+  // a loop collapses onto a handful of values and the population these tests exist
+  // to grow never actually grows.
+  return `/interactions/17${String(index).padStart(17, '0')}/${INTERACTION_TOKEN}/callback`;
+}
+
 describe('RateGovernor header-driven bucket gating', () => {
   it('gates the NEXT dispatch in a bucket until the reported reset has elapsed', async () => {
     // Proactive gating (D2): a bucket whose last response reported Remaining 0
@@ -785,14 +793,6 @@ describe('RateGovernor queue depth cap', () => {
 });
 
 describe('RateGovernor pacing and memory across a pause (L11, L12)', () => {
-  /** An interaction-callback path for a distinct id, built by CONCATENATION. */
-  function interactionPath(index: number): string {
-    // Never `1000000000000000000 + index`: that is past Number.MAX_SAFE_INTEGER,
-    // so a loop collapses onto a handful of values and the population this test
-    // exists to grow never actually grows.
-    return `/interactions/17${String(index).padStart(17, '0')}/${INTERACTION_TOKEN}/callback`;
-  }
-
   /** A 429 whose body is not JSON at all: the Cloudflare-ban shape. */
   function banned(): GovernorResponse {
     return { status: 429, headers: {}, json: null, jsonParsed: false };
@@ -922,6 +922,95 @@ describe('RateGovernor pacing and memory across a pause (L11, L12)', () => {
     await clock.runAll();
     await Promise.all(all);
     expect(started).toContain('hot-2');
+    expect(governor.snapshot().activeQueues).toBe(0);
+  });
+});
+
+describe('RateGovernor re-reservation after a BUCKET wait (L11, second arm)', () => {
+  it('re-reserves the rate slot after a bucket window too, not only after a pause', async () => {
+    // The source comment justifies per-pass re-reservation with "a slot taken and
+    // then sat on for the length of a bucket WINDOW". The pause arm above covers
+    // only the other half, so a mutant that re-reserved after a pause and not
+    // after a bucket gate would survive it. maxRps 1 makes the spacing 1000 ms.
+    const { governor, clock } = makeGovernor(1);
+    const sentAt: number[] = [];
+    // All four share one route TEMPLATE, so they also share one bucket, which is
+    // what makes the exhausted window gate every one of them.
+    const path = '/guilds/11223344556677889/members/99887766554433221';
+    let replies = 0;
+    const send = async (): Promise<GovernorResponse> => {
+      sentAt.push(clock.now());
+      replies += 1;
+      // The FIRST response shuts the bucket for 30 s; the rest report headroom.
+      return reply(
+        replies === 1
+          ? {
+              'x-ratelimit-bucket': 'bucket-window',
+              'x-ratelimit-remaining': '0',
+              'x-ratelimit-reset-after': '30',
+            }
+          : {
+              'x-ratelimit-bucket': 'bucket-window',
+              'x-ratelimit-remaining': '9',
+              'x-ratelimit-reset-after': '30',
+            },
+      );
+    };
+    const all = [0, 1, 2, 3].map(() => governor.run({ method: 'PATCH', path }, send));
+
+    await clock.runAll();
+    await Promise.all(all);
+
+    // One send at 0 (which shuts the bucket), then the window reopens at 30000 and
+    // the rest come off it SPACED by the rate cap rather than all at 30000. They
+    // serialize on one FIFO too, so this also proves the queue did not collapse.
+    expect(sentAt).toEqual([0, 30_000, 31_000, 32_000]);
+    expect(sentAt[2] - sentAt[1]).toBe(1000);
+    expect(sentAt[3] - sentAt[2]).toBe(1000);
+  });
+});
+
+describe('RateGovernor drained-queue identity guard (load bearing under L12)', () => {
+  it('does not delete a RE-MINTED chain when the evicted one drains', async () => {
+    // The `this.queues.get(template) === queue` check in the job's finally became
+    // load bearing the moment queues could be EVICTED: cold0's chain is evicted
+    // and a later request mints a fresh one under the same template, so when the
+    // ORIGINAL request settles its `waiting === 0` is true for the OLD object.
+    // Without the identity guard it would delete the LIVE chain from the map, and
+    // a third request would then run unserialized beside the second.
+    const { governor, clock } = makeGovernor(0);
+    const started: string[] = [];
+    let release = (): void => {};
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const send = (label: string) => async (): Promise<GovernorResponse> => {
+      started.push(label);
+      await held;
+      return reply();
+    };
+
+    const cold0 = interactionPath(0);
+    const all: Promise<unknown>[] = [];
+    all.push(governor.run({ method: 'POST', path: cold0 }, send('cold0-first')));
+    for (let i = 1; i < MAX_TRACKED_QUEUES + 5; i++) {
+      all.push(governor.run({ method: 'POST', path: interactionPath(i) }, send(`filler-${i}`)));
+    }
+    // cold0 was inserted first and never touched again, so it is the evicted one.
+    all.push(governor.run({ method: 'POST', path: cold0 }, send('cold0-second')));
+    await clock.advanceTo(clock.now());
+    expect(started).toContain('cold0-second'); // a fresh chain, not queued behind
+
+    // A THIRD request on the same template must serialize behind cold0-second,
+    // which it only can if cold0-second's chain is still the one the map holds.
+    all.push(governor.run({ method: 'POST', path: cold0 }, send('cold0-third')));
+    await clock.advanceTo(clock.now());
+    expect(started).not.toContain('cold0-third');
+
+    release();
+    await clock.runAll();
+    await Promise.all(all);
+    expect(started).toContain('cold0-third');
     expect(governor.snapshot().activeQueues).toBe(0);
   });
 });
