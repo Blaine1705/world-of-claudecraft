@@ -7229,7 +7229,7 @@ export const ko_KR: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "상급 투명화",
-        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
+        "description": "20초 동안 사라지며 지속 피해 효과를 2개 제거합니다. 투명화가 끝나면 2초 동안 받는 피해가 90% 감소합니다. (마법사 특성)"
       },
       "hot_streak": {
         "name": "몰아치는 열기",

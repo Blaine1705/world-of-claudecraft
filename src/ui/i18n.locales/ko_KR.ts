@@ -9380,6 +9380,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     '깜빡임 걸음, 서리장막 및 상급 투명화의 재사용 대기시간을 즉시 초기화합니다. (마법사 특성)',
   'entities.abilities.greater_invisibility.name': '상급 투명화',
+  'entities.abilities.greater_invisibility.description':
+    '20초 동안 사라지며 지속 피해 효과를 2개 제거합니다. 투명화가 끝나면 2초 동안 받는 피해가 90% 감소합니다. (마법사 특성)',
   'entities.abilities.hot_streak.name': '몰아치는 열기',
   'entities.abilities.hot_streak.description':
     '지속 효과: 화염 주문(화염구, 화염 작렬, 불태우기, 불덩이 작렬 또는 불기둥)으로 연속 두 번 치명타를 적중시키면 다음 불덩이 작렬 또는 불기둥이 즉시 시전되고 마나를 소모하지 않습니다. 소모 주문은 무료 시전을 포함해 다음 연속 발동 조건에 포함됩니다. 불기둥은 적중한 적의 수와 관계없이 한 번만 계산되며 최초 충격만 조건에 포함됩니다. (화염)',

@@ -7229,7 +7229,7 @@ export const ja_JP: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "グレーターインビジビリティ",
-        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
+        "description": "20 秒間姿を消し、継続ダメージ効果を 2 つ取り除く。透明化が終了すると、2 秒間、受けるダメージが 90% 減少する。（メイジのタレント）"
       },
       "hot_streak": {
         "name": "ホットストリーク",

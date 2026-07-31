@@ -9394,6 +9394,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'フリッカーステップ、フロストヴェール、グレーターインビジビリティのクールダウンを完了させます。（メイジタレント）',
   'entities.abilities.greater_invisibility.name': 'グレーターインビジビリティ',
+  'entities.abilities.greater_invisibility.description':
+    '20 秒間姿を消し、継続ダメージ効果を 2 つ取り除く。透明化が終了すると、2 秒間、受けるダメージが 90% 減少する。（メイジのタレント）',
   'entities.abilities.hot_streak.name': 'ホットストリーク',
   'entities.abilities.hot_streak.description':
     'パッシブ：火系呪文（ファイアボール、ファイアブラスト、スコーチ、パイロブラスト、フレイムストライク）で2回連続してクリティカルを出すと、次のパイロブラストまたはフレイムストライクが即時発動となり、コストがなくなります。消費呪文は無料発動も含めて次の連続判定に加算されます。フレイムストライクは命中した敵の数にかかわらず1回のみ加算され、最初の着弾だけが判定されます。（火）',

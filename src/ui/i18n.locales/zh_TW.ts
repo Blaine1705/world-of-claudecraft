@@ -8962,6 +8962,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     '立即結束閃爍步、霜幕與強效隱形術的冷卻時間。（法師天賦）',
   'entities.abilities.greater_invisibility.name': '強效隱形術',
+  'entities.abilities.greater_invisibility.description':
+    '消失 20 秒並移除 2 個持續傷害效果。隱形結束時，受到的傷害降低 90%，持續 2 秒。（法師天賦）',
   'entities.abilities.hot_streak.name': '熾熱連擊',
   'entities.abilities.hot_streak.description':
     '被動：你的火焰法術（火球術、火焰衝擊、灼燒、炎爆術或烈焰風暴）連續造成兩次致命一擊後，下一次炎爆術或烈焰風暴變為瞬發且不消耗法力。消耗技能會計入下一次連擊，包括免費施法；烈焰風暴無論命中多少敵人都只計一次，且只有首次衝擊會被計入。（火焰）',

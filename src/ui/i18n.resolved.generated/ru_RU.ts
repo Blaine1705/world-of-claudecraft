@@ -7229,7 +7229,7 @@ export const ru_RU: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Великая невидимость",
-        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
+        "description": "Исчезаете на 20 сек. и снимаете 2 эффекта периодического урона. Когда невидимость заканчивается, получаемый урон снижается на 90% на 2 сек. (Талант мага)"
       },
       "hot_streak": {
         "name": "Полоса везения",

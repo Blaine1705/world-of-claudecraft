@@ -28,24 +28,14 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "entities.abilities.greater_invisibility.description"
   ],
-  "zh_CN": [
-    "entities.abilities.greater_invisibility.description"
-  ],
-  "zh_TW": [
-    "entities.abilities.greater_invisibility.description"
-  ],
-  "ko_KR": [
-    "entities.abilities.greater_invisibility.description"
-  ],
-  "ja_JP": [
-    "entities.abilities.greater_invisibility.description"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "entities.abilities.greater_invisibility.description"
   ],
-  "ru_RU": [
-    "entities.abilities.greater_invisibility.description"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "entities.abilities.greater_invisibility.description"
   ],
