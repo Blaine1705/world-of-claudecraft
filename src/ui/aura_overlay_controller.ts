@@ -1,25 +1,44 @@
+import type { TalentAllocation } from '../sim/content/talents';
 import type { ResolvedAbility } from '../sim/sim';
 import type { Aura, PlayerClass } from '../sim/types';
 import {
   type AuraOverlayConfig,
   AuraOverlayConfigStore,
+  type AuraOverlayLayoutConfig,
+  type AuraOverlayLayoutPatch,
   type AuraOverlayPatch,
+  auraOverlayVisualSlot,
 } from './aura_overlay_config';
-import { AuraOverlayPainter, type AuraOverlayPaintTarget } from './aura_overlay_painter';
 import {
-  availableWarriorProcDefs,
-  type WarriorProcDef,
-  type WarriorProcId,
+  type AuraOverlayPaintAura,
+  AuraOverlayPainter,
+  type AuraOverlayPaintTarget,
+} from './aura_overlay_painter';
+import {
+  type AuraOverlayProcDef,
+  type AuraOverlayProcId,
+  auraOverlayProcIsActive,
+  availableAuraProcDefs,
 } from './aura_overlay_view';
 import type { PainterHostWriters } from './painter_host';
 
 const clampPosition = (value: number): number =>
   Math.round(Math.min(1, Math.max(0, value)) * 10_000) / 10_000;
 const POSITION_NUDGE = 0.01;
+const COUNTERFANG_WINDOW_DURATION = 5;
+const NO_SUPPLEMENTAL_AURAS: readonly AuraOverlayPaintAura[] = [];
 const snapPosition = (value: number): number =>
   clampPosition(Math.round(value / POSITION_NUDGE) * POSITION_NUDGE);
 
-export type AuraOverlayPart = 'icon' | 'arcs';
+export type AuraOverlayPart = 'icon' | 'arcs' | 'ground';
+
+export interface AuraGroundRingState {
+  id: AuraOverlayProcId;
+  visible: boolean;
+  color: string;
+  opacity: number;
+  scale: number;
+}
 
 export interface AuraOverlayControllerDeps {
   doc?: Document;
@@ -27,24 +46,36 @@ export interface AuraOverlayControllerDeps {
   playerClass: PlayerClass;
   playerName: string;
   known(): readonly ResolvedAbility[];
+  talents?(): TalentAllocation;
   iconUrl(abilityId: string): string;
+  paintGroundRings?(rings: readonly AuraGroundRingState[]): void;
 }
 
 export class AuraOverlayController {
   private readonly root: HTMLElement;
   private readonly store: AuraOverlayConfigStore;
   private readonly targets: AuraOverlayPaintTarget[] = [];
-  private readonly targetById = new Map<WarriorProcId, AuraOverlayPaintTarget>();
+  private readonly targetById = new Map<AuraOverlayProcId, AuraOverlayPaintTarget>();
   private readonly painter: AuraOverlayPainter;
   private knownIds: string[] = [];
-  private currentDefs: readonly WarriorProcDef[] = [];
+  private talentAllocation: TalentAllocation | undefined;
+  private currentDefs: readonly AuraOverlayProcDef[] = [];
+  private orderedGroundDefs: readonly AuraOverlayProcDef[] = [];
   private readonly positionListeners = new Set<
-    (id: WarriorProcId, config: AuraOverlayConfig) => void
+    (id: AuraOverlayProcId, config: AuraOverlayConfig) => void
   >();
   private readonly placementListeners = new Set<
-    (id: WarriorProcId, part: AuraOverlayPart) => void
+    (id: AuraOverlayProcId, part: AuraOverlayPart) => void
   >();
-  private placement: { id: WarriorProcId; part: AuraOverlayPart } | null = null;
+  private placement: { id: AuraOverlayProcId; part: AuraOverlayPart } | null = null;
+  private previewGroundRings = false;
+  private readonly counterfangAura: AuraOverlayPaintAura = {
+    id: 'counterfang_window',
+    kind: 'counterfang_window',
+    remaining: 0,
+    duration: COUNTERFANG_WINDOW_DURATION,
+  };
+  private readonly counterfangAuras: readonly AuraOverlayPaintAura[] = [this.counterfangAura];
 
   constructor(private readonly deps: AuraOverlayControllerDeps) {
     const doc = deps.doc ?? document;
@@ -52,6 +83,7 @@ export class AuraOverlayController {
     this.root = doc.createElement('div');
     this.root.id = 'aura-overlays';
     this.root.setAttribute('aria-hidden', 'true');
+    this.root.addEventListener('pointerdown', (event) => this.selectCrescent(event));
     this.painter = new AuraOverlayPainter(deps.writers, this.targets);
     this.syncLoadout();
     doc.body.appendChild(this.root);
@@ -59,6 +91,7 @@ export class AuraOverlayController {
 
   private syncLoadout(): void {
     const known = this.deps.known();
+    const talents = this.deps.talents?.();
     let changed = known.length !== this.knownIds.length;
     if (!changed) {
       for (let i = 0; i < known.length; i++) {
@@ -68,9 +101,12 @@ export class AuraOverlayController {
         }
       }
     }
+    if (!changed && talents !== this.talentAllocation) changed = true;
     if (!changed) return;
     this.knownIds = known.map((ability) => ability.def.id);
-    this.currentDefs = availableWarriorProcDefs(this.deps.playerClass, known);
+    this.talentAllocation = talents;
+    this.currentDefs = availableAuraProcDefs(this.deps.playerClass, known, talents);
+    this.refreshGroundOrder();
     const activeIds = new Set(this.currentDefs.map((def) => def.id));
     for (const target of this.targets) {
       target.el.classList.toggle('loadout-hidden', !activeIds.has(target.def.id));
@@ -78,17 +114,16 @@ export class AuraOverlayController {
     for (const def of this.currentDefs) {
       let target = this.targetById.get(def.id);
       if (!target) {
-        const el = this.buildFrame(this.root.ownerDocument, def);
-        target = { def, el };
+        target = this.buildFrame(this.root.ownerDocument, def);
         this.targetById.set(def.id, target);
         this.targets.push(target);
-        this.root.appendChild(el);
+        this.root.appendChild(target.el);
       }
       target.el.classList.remove('loadout-hidden');
     }
   }
 
-  private buildFrame(doc: Document, def: WarriorProcDef): HTMLElement {
+  private buildFrame(doc: Document, def: AuraOverlayProcDef): AuraOverlayPaintTarget {
     const el = doc.createElement('div');
     el.className = `aura-overlay-frame aura-overlay-${def.theme}`;
     el.dataset.proc = def.id;
@@ -102,22 +137,54 @@ export class AuraOverlayController {
     icon.src = this.deps.iconUrl(def.iconAbilityId);
     icon.alt = '';
     icon.draggable = false;
+    const timer = doc.createElement('span');
+    timer.className = 'aura-overlay-timer';
+    timer.setAttribute('aria-hidden', 'true');
     const right = doc.createElement('span');
     right.className = 'aura-overlay-arc aura-overlay-arc-right';
     arcs.appendChild(right);
     const moveHandle = this.buildMoveHandle(doc, def.id);
-    el.append(arcs, icon, moveHandle);
-    arcs.addEventListener('pointerdown', (event) => this.startDrag(event, def.id, 'arcs', arcs));
+    el.append(arcs, icon, timer, moveHandle);
     icon.addEventListener('pointerdown', (event) => this.startDrag(event, def.id, 'icon', icon));
     moveHandle.addEventListener('pointerdown', (event) => {
-      if (this.placement?.id !== def.id) return;
+      if (this.placement?.id !== def.id || this.placement.part !== 'icon') return;
       this.startDrag(event, def.id, this.placement.part, moveHandle);
     });
     this.apply(def.id, el, this.store.get(def.id));
-    return el;
+    return { def, el, timer };
   }
 
-  private buildMoveHandle(doc: Document, id: WarriorProcId): HTMLElement {
+  private selectCrescent(event: PointerEvent): void {
+    if (!this.placement || event.defaultPrevented || event.button !== 0) return;
+    const target = event.target;
+    if (
+      target instanceof Element &&
+      target.closest('.aura-overlay-icon, .aura-overlay-move-handle')
+    ) {
+      return;
+    }
+    const bounds = this.rootBounds();
+    if (bounds.width <= 0 || bounds.height <= 0) return;
+    let closest: { id: AuraOverlayProcId; distance: number } | null = null;
+    for (const def of this.currentDefs) {
+      const cfg = this.store.get(def.id);
+      const scale = cfg.arcsScale * this.store.getLayout().crescentBlockScale;
+      const centerX = bounds.left + 0.5 * bounds.width;
+      const centerY = bounds.top + 0.56 * bounds.height;
+      const localX = (event.clientX - centerX) / scale;
+      const localY = (event.clientY - centerY) / scale;
+      const horizontalDistance = Math.abs(Math.abs(localX) - 130);
+      const verticalOverflow = Math.max(0, Math.abs(localY) - 100);
+      const distance = Math.hypot(horizontalDistance, verticalOverflow) * scale;
+      if (distance <= Math.max(24, 24 * scale) && (!closest || distance < closest.distance)) {
+        closest = { id: def.id, distance };
+      }
+    }
+    if (!closest) return;
+    this.beginPlacement(closest.id, 'arcs');
+  }
+
+  private buildMoveHandle(doc: Document, id: AuraOverlayProcId): HTMLElement {
     const handle = doc.createElement('span');
     handle.className = 'aura-overlay-move-handle';
     handle.setAttribute('aria-hidden', 'true');
@@ -127,11 +194,11 @@ export class AuraOverlayController {
 
   private startDrag(
     event: PointerEvent,
-    id: WarriorProcId,
+    id: AuraOverlayProcId,
     part: AuraOverlayPart,
     el: HTMLElement,
   ): void {
-    if (!this.placement || event.button !== 0) return;
+    if (!this.placement || part !== 'icon' || event.button !== 0) return;
     if (this.placement.id !== id || this.placement.part !== part) {
       this.placement = { id, part };
       this.refreshPlacement();
@@ -140,13 +207,11 @@ export class AuraOverlayController {
     event.preventDefault();
     el.setPointerCapture(event.pointerId);
     el.classList.add('dragging');
-    const bounds = this.root.getBoundingClientRect();
+    const bounds = this.rootBounds();
     const move = (next: PointerEvent): void => {
       const posX = snapPosition((next.clientX - bounds.left) / bounds.width);
       const posY = snapPosition((next.clientY - bounds.top) / bounds.height);
-      const patch =
-        part === 'icon' ? { iconPosX: posX, iconPosY: posY } : { arcsPosX: posX, arcsPosY: posY };
-      const cfg = this.store.patch(id, patch);
+      const cfg = this.store.patch(id, { iconPosX: posX, iconPosY: posY });
       const frame = this.targetById.get(id)?.el;
       if (frame) this.apply(id, frame, cfg);
       this.emitPosition(id, cfg);
@@ -162,39 +227,51 @@ export class AuraOverlayController {
     el.addEventListener('pointercancel', end);
   }
 
-  private apply(id: WarriorProcId, el: HTMLElement, cfg: AuraOverlayConfig): void {
+  private rootBounds(): DOMRect {
+    return this.root.getBoundingClientRect();
+  }
+
+  private apply(id: AuraOverlayProcId, el: HTMLElement, cfg: AuraOverlayConfig): void {
+    const arcsScale = cfg.arcsScale * this.store.getLayout().crescentBlockScale;
     el.classList.toggle('disabled', !cfg.enabled);
     el.classList.toggle('hide-icon', !cfg.showIcon);
     el.classList.toggle('hide-arcs', !cfg.showArcs);
     el.style.setProperty('--aura-icon-x', `${Math.round(cfg.iconPosX * 10_000) / 100}%`);
     el.style.setProperty('--aura-icon-y', `${Math.round(cfg.iconPosY * 10_000) / 100}%`);
-    el.style.setProperty('--aura-arcs-x', `${Math.round(cfg.arcsPosX * 10_000) / 100}%`);
-    el.style.setProperty('--aura-arcs-y', `${Math.round(cfg.arcsPosY * 10_000) / 100}%`);
+    el.style.setProperty('--aura-arcs-x', '50%');
+    el.style.setProperty('--aura-arcs-y', '56%');
     el.style.setProperty('--aura-opacity', String(cfg.opacity));
     el.style.setProperty('--aura-icon-scale', String(cfg.scale));
-    el.style.setProperty('--aura-arcs-scale', String(cfg.arcsScale));
+    el.style.setProperty('--aura-arcs-scale', String(arcsScale));
     el.style.setProperty('--aura-color', cfg.color);
-    el.style.setProperty('--aura-half-width', `${150 * cfg.arcsScale + 12}px`);
-    el.style.setProperty('--aura-half-height', `${110 * cfg.arcsScale + 12}px`);
+    el.style.setProperty('--aura-half-width', `${150 * arcsScale + 12}px`);
+    el.style.setProperty('--aura-half-height', `${110 * arcsScale + 12}px`);
     el.style.setProperty('--aura-icon-half', `${31 * cfg.scale + 4}px`);
     el.dataset.proc = id;
   }
 
-  get(id: WarriorProcId): AuraOverlayConfig {
+  get(id: AuraOverlayProcId): AuraOverlayConfig {
     return this.store.get(id);
   }
 
-  patch(id: WarriorProcId, patch: AuraOverlayPatch): void {
+  getLayout(): AuraOverlayLayoutConfig {
+    return this.store.getLayout();
+  }
+
+  patchLayout(patch: AuraOverlayLayoutPatch): void {
+    this.store.patchLayout(patch);
+    for (const target of this.targets) {
+      this.apply(target.def.id, target.el, this.store.get(target.def.id));
+    }
+  }
+
+  patch(id: AuraOverlayProcId, patch: AuraOverlayPatch): void {
     const target = this.targets.find((item) => item.def.id === id);
     if (target) {
       const cfg = this.store.patch(id, patch);
       this.apply(id, target.el, cfg);
-      if (
-        patch.iconPosX !== undefined ||
-        patch.iconPosY !== undefined ||
-        patch.arcsPosX !== undefined ||
-        patch.arcsPosY !== undefined
-      ) {
+      if (patch.groundOrder !== undefined) this.refreshGroundOrder();
+      if (patch.iconPosX !== undefined || patch.iconPosY !== undefined) {
         this.emitPosition(id, cfg);
       }
     }
@@ -210,40 +287,80 @@ export class AuraOverlayController {
     }
   }
 
-  reset(id: WarriorProcId): void {
+  reset(id: AuraOverlayProcId): void {
     const target = this.targets.find((item) => item.def.id === id);
     if (target) {
-      const cfg = this.store.resetPosition(id);
+      this.store.resetPosition(id);
+      this.normalizeGroundOrder();
+      const cfg = this.store.get(id);
       this.apply(id, target.el, cfg);
+      this.refreshGroundOrder();
       this.emitPosition(id, cfg);
     }
   }
 
-  nudge(id: WarriorProcId, part: AuraOverlayPart, deltaX: number, deltaY: number): void {
+  nudge(id: AuraOverlayProcId, part: AuraOverlayPart, deltaX: number, deltaY: number): void {
+    if (part === 'ground' || part === 'arcs') {
+      const direction = Math.sign(deltaX);
+      if (direction === 0) return;
+      const ordered = this.currentDefs
+        .map((def, index) => ({ def, index, order: this.store.get(def.id).groundOrder }))
+        .sort((a, b) => a.order - b.order || a.index - b.index);
+      const index = ordered.findIndex((entry) => entry.def.id === id);
+      const neighborIndex = Math.min(ordered.length - 1, Math.max(0, index + direction));
+      if (index < 0 || neighborIndex === index) return;
+      const neighbor = ordered[neighborIndex];
+      this.normalizeGroundOrder(ordered);
+      const currentSlot = auraOverlayVisualSlot(this.store.get(id));
+      const neighborSlot = auraOverlayVisualSlot(this.store.get(neighbor.def.id));
+      const currentConfig = this.store.patch(id, neighborSlot);
+      const neighborConfig = this.store.patch(neighbor.def.id, currentSlot);
+      const currentTarget = this.targetById.get(id);
+      const neighborTarget = this.targetById.get(neighbor.def.id);
+      if (currentTarget) this.apply(id, currentTarget.el, currentConfig);
+      if (neighborTarget) this.apply(neighbor.def.id, neighborTarget.el, neighborConfig);
+      this.refreshGroundOrder();
+      for (const target of this.targets) {
+        this.apply(target.def.id, target.el, this.store.get(target.def.id));
+      }
+      this.emitPosition(id, currentConfig);
+      this.emitPosition(neighbor.def.id, neighborConfig);
+      return;
+    }
     const target = this.targetById.get(id);
     if (!target) return;
     const cfg = this.store.get(id);
-    const next = this.store.patch(
-      id,
-      part === 'icon'
-        ? {
-            iconPosX: snapPosition(cfg.iconPosX + deltaX * POSITION_NUDGE),
-            iconPosY: snapPosition(cfg.iconPosY + deltaY * POSITION_NUDGE),
-          }
-        : {
-            arcsPosX: snapPosition(cfg.arcsPosX + deltaX * POSITION_NUDGE),
-            arcsPosY: snapPosition(cfg.arcsPosY + deltaY * POSITION_NUDGE),
-          },
-    );
+    const next = this.store.patch(id, {
+      iconPosX: snapPosition(cfg.iconPosX + deltaX * POSITION_NUDGE),
+      iconPosY: snapPosition(cfg.iconPosY + deltaY * POSITION_NUDGE),
+    });
     this.apply(id, target.el, next);
     this.emitPosition(id, next);
   }
 
   setPlacement(on: boolean): void {
+    this.previewGroundRings = on;
     if (!on) this.endPlacement();
   }
 
-  beginPlacement(id: WarriorProcId, part: AuraOverlayPart): void {
+  private refreshGroundOrder(): void {
+    this.orderedGroundDefs = this.currentDefs
+      .map((def, index) => ({ def, index, order: this.store.get(def.id).groundOrder }))
+      .sort((a, b) => a.order - b.order || a.index - b.index)
+      .map(({ def }) => def);
+  }
+
+  private normalizeGroundOrder(
+    ordered = this.currentDefs
+      .map((def, index) => ({ def, index, order: this.store.get(def.id).groundOrder }))
+      .sort((a, b) => a.order - b.order || a.index - b.index),
+  ): void {
+    for (let order = 0; order < ordered.length; order++) {
+      this.store.patch(ordered[order].def.id, { groundOrder: order });
+    }
+  }
+
+  beginPlacement(id: AuraOverlayProcId, part: AuraOverlayPart): void {
     this.syncLoadout();
     if (!this.targetById.has(id)) return;
     this.placement = { id, part };
@@ -265,34 +382,56 @@ export class AuraOverlayController {
       target.el.classList.toggle('placement-target', selected);
       target.el.classList.toggle('placement-icon', selected && this.placement?.part === 'icon');
       target.el.classList.toggle('placement-arcs', selected && this.placement?.part === 'arcs');
+      target.el.classList.toggle('placement-ground', selected && this.placement?.part === 'ground');
     }
   }
 
-  paint(auras: readonly Aura[]): void {
+  paint(auras: readonly Aura[], counterfangRemaining = 0): void {
     this.syncLoadout();
-    this.painter.paint(auras);
+    const counterfangActive = this.deps.playerClass === 'hunter' && counterfangRemaining > 0;
+    const supplementalAuras = counterfangActive ? this.counterfangAuras : NO_SUPPLEMENTAL_AURAS;
+    if (counterfangActive) {
+      this.counterfangAura.remaining = Math.min(COUNTERFANG_WINDOW_DURATION, counterfangRemaining);
+    }
+    this.painter.paint(auras, supplementalAuras);
+    this.deps.paintGroundRings?.(
+      this.orderedGroundDefs.map((def) => {
+        const config = this.store.get(def.id);
+        const active =
+          auraOverlayProcIsActive(def, auras) || auraOverlayProcIsActive(def, supplementalAuras);
+        return {
+          id: def.id,
+          visible: config.enabled && config.showGroundRing && (this.previewGroundRings || active),
+          color: config.color,
+          opacity: config.opacity,
+          scale: this.store.getLayout().groundRingBlockScale,
+        };
+      }),
+    );
   }
 
-  defs(): readonly WarriorProcDef[] {
+  defs(): readonly AuraOverlayProcDef[] {
     this.syncLoadout();
     return this.currentDefs;
   }
 
-  onPositionChange(listener: (id: WarriorProcId, config: AuraOverlayConfig) => void): () => void {
+  onPositionChange(
+    listener: (id: AuraOverlayProcId, config: AuraOverlayConfig) => void,
+  ): () => void {
     this.positionListeners.add(listener);
     return () => this.positionListeners.delete(listener);
   }
 
-  onPlacementChange(listener: (id: WarriorProcId, part: AuraOverlayPart) => void): () => void {
+  onPlacementChange(listener: (id: AuraOverlayProcId, part: AuraOverlayPart) => void): () => void {
     this.placementListeners.add(listener);
     return () => this.placementListeners.delete(listener);
   }
 
-  private emitPosition(id: WarriorProcId, cfg: AuraOverlayConfig): void {
+  private emitPosition(id: AuraOverlayProcId, cfg: AuraOverlayConfig): void {
     for (const listener of this.positionListeners) listener(id, cfg);
   }
 
-  private emitPlacement(id: WarriorProcId, part: AuraOverlayPart): void {
+  private emitPlacement(id: AuraOverlayProcId, part: AuraOverlayPart): void {
     for (const listener of this.placementListeners) listener(id, part);
   }
 }

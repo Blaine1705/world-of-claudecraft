@@ -28,14 +28,17 @@ describe('aura overlay config', () => {
     expect(defaultAuraOverlayConfig('revenge_free')).toMatchObject({
       enabled: false,
       showIcon: true,
-      showArcs: true,
-      iconPosX: 0.42,
-      iconPosY: 0.72,
+      showArcs: false,
+      showGroundRing: true,
+      iconPosX: 0.44,
+      iconPosY: 0.7,
       arcsPosX: 0.5,
       arcsPosY: 0.56,
       opacity: 0.7,
-      scale: 1,
+      scale: 0.8,
       arcsScale: 0.8,
+      groundScale: 1,
+      groundOrder: 0,
       color: '#ffe14d',
     });
     const ids = [
@@ -52,22 +55,74 @@ describe('aura overlay config', () => {
     expect(defaults.map((config) => config.arcsScale)).toEqual([
       0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5,
     ]);
-    expect(defaults.every((config) => config.iconPosY === 0.72)).toBe(true);
-    expect(defaultAuraOverlayConfig('raised_guard').iconPosX).toBe(0.5);
-    expect(defaultAuraOverlayConfig('iron_resolve').iconPosX).toBe(0.58);
+    expect(defaults.map((config) => config.iconPosX)).toEqual([
+      0.44, 0.44, 0.5, 0.56, 0.5, 0.56, 0.47, 0.53,
+    ]);
+    expect(defaults.every((config) => config.iconPosY === 0.7)).toBe(true);
+    expect(defaults.every((config) => config.scale === 0.8)).toBe(true);
     expect(defaults.every((config) => config.arcsPosX === 0.5 && config.arcsPosY === 0.56)).toBe(
       true,
     );
   });
 
+  it('provides staggered class-themed defaults for Mage procs', () => {
+    expect(defaultAuraOverlayConfig('heating_up')).toMatchObject({
+      enabled: false,
+      iconPosX: 0.47,
+      iconPosY: 0.7,
+      scale: 0.8,
+      arcsScale: 0.9,
+      color: '#ff4b2b',
+    });
+    expect(defaultAuraOverlayConfig('hot_streak')).toMatchObject({
+      iconPosX: 0.53,
+      arcsScale: 1.1,
+      color: '#ffd43b',
+    });
+    expect(defaultAuraOverlayConfig('fingers_of_frost').color).toBe('#59d8ff');
+    expect(defaultAuraOverlayConfig('brain_freeze').color).toBe('#4d8dff');
+    expect(defaultAuraOverlayConfig('arcane_charge').color).toBe('#8b5cf6');
+    expect(defaultAuraOverlayConfig('aether_rush').color).toBe('#d946ef');
+    expect(defaultAuraOverlayConfig('perfect_moment').color).toBe('#6d28d9');
+  });
+
+  it('provides stable class palettes and row slots for generated talent procs', () => {
+    expect(defaultAuraOverlayConfig('hun_deathless_will')).toMatchObject({
+      iconPosX: 0.44,
+      iconPosY: 0.7,
+      scale: 0.8,
+      arcsScale: 1,
+      color: '#f5b942',
+    });
+    expect(defaultAuraOverlayConfig('sha_storm_recall')).toMatchObject({
+      iconPosX: 0.62,
+      iconPosY: 0.7,
+      arcsScale: 1.3,
+      color: '#38bdf8',
+    });
+    expect(defaultAuraOverlayConfig('dru_survival_of_the_fittest')).toMatchObject({
+      iconPosX: 0.56,
+      iconPosY: 0.7,
+      arcsScale: 1.2,
+      color: '#84cc16',
+    });
+    expect(defaultAuraOverlayConfig('rog_master_assassin').color).toBe('#a855f7');
+    expect(defaultAuraOverlayConfig('pri_inner_fire').color).toBe('#f8fafc');
+    expect(defaultAuraOverlayConfig('wlk_curse_mastery').color).toBe('#a855f7');
+    expect(defaultAuraOverlayConfig('pal_divine_wisdom').color).toBe('#fde047');
+  });
+
   it('clamps malformed values and rejects invalid colors', () => {
     expect(
       sanitizeAuraOverlayConfig('revenge_free', {
-        posX: 9,
-        posY: -2,
+        iconPosX: 9,
+        iconPosY: -2,
+        arcsPosX: 9,
+        arcsPosY: -2,
         opacity: 0,
         scale: 99,
         arcsScale: 0,
+        groundScale: 99,
         enabled: 'yes',
         color: 'red',
       }),
@@ -79,6 +134,7 @@ describe('aura overlay config', () => {
       opacity: 0.25,
       scale: 1.6,
       arcsScale: 0.65,
+      groundScale: 1.6,
       enabled: false,
       color: '#ffe14d',
     });
@@ -92,6 +148,9 @@ describe('aura overlay config', () => {
       opacity: 0.5,
       scale: 0.8,
       arcsScale: 1.4,
+      showGroundRing: false,
+      groundScale: 1.3,
+      groundOrder: 3,
       color: '#123abc',
     });
     raido.patch('victory_rush', { iconPosX: 0.75 });
@@ -101,10 +160,29 @@ describe('aura overlay config', () => {
       arcsPosX: 0.35,
       scale: 0.8,
       arcsScale: 1.4,
+      showGroundRing: false,
+      groundScale: 1.3,
+      groundOrder: 3,
       color: '#123abc',
     });
     expect(new AuraOverlayConfigStore('warrior:Raido').get('victory_rush').iconPosX).toBe(0.75);
-    expect(new AuraOverlayConfigStore('warrior:Other').get('revenge_free').iconPosX).toBe(0.42);
+    expect(new AuraOverlayConfigStore('warrior:Other').get('revenge_free').iconPosX).toBe(0.44);
+  });
+
+  it('persists shared crescent and ground-ring block scales', () => {
+    const store = new AuraOverlayConfigStore('warrior:Raido');
+
+    store.patchLayout({ crescentBlockScale: 1.25 });
+    expect(store.getLayout()).toEqual({
+      crescentBlockScale: 1.25,
+      groundRingBlockScale: 1,
+    });
+    store.patchLayout({ groundRingBlockScale: 1.4 });
+
+    expect(new AuraOverlayConfigStore('warrior:Raido').getLayout()).toEqual({
+      crescentBlockScale: 1.25,
+      groundRingBlockScale: 1.4,
+    });
   });
 
   it('recovers from corrupt stored JSON', () => {
@@ -126,8 +204,8 @@ describe('aura overlay config', () => {
       enabled: false,
     });
     expect(store.resetPosition('revenge_free')).toMatchObject({
-      iconPosX: 0.42,
-      iconPosY: 0.72,
+      iconPosX: 0.44,
+      iconPosY: 0.7,
       arcsPosX: 0.5,
       arcsPosY: 0.56,
       opacity: 0.4,
@@ -135,59 +213,44 @@ describe('aura overlay config', () => {
     });
   });
 
-  it('migrates a legacy shared position to both independently movable parts', () => {
+  it('discards pre-release configurations from an older layout version', () => {
     localStorage.setItem(
       'woc_aura_overlays:warrior:Raido',
-      JSON.stringify({ revenge_free: { posX: 0.2, posY: 0.7 } }),
+      JSON.stringify({
+        __layoutVersion: 6,
+        revenge_free: {
+          ...defaultAuraOverlayConfig('revenge_free'),
+          iconPosX: 0.2,
+          arcsScale: 1.55,
+          groundOrder: 4,
+        },
+      }),
     );
-    expect(new AuraOverlayConfigStore('warrior:Raido').get('revenge_free')).toMatchObject({
-      iconPosX: 0.2,
-      iconPosY: 0.7,
-      arcsPosX: 0.2,
-      arcsPosY: 0.7,
+
+    const store = new AuraOverlayConfigStore('warrior:Raido');
+
+    expect(store.get('revenge_free')).toEqual(defaultAuraOverlayConfig('revenge_free'));
+    expect(JSON.parse(localStorage.getItem('woc_aura_overlays:warrior:Raido') ?? '{}')).toEqual({
+      __layoutVersion: 8,
     });
   });
 
-  it('moves legacy default icons below the player without changing custom positions', () => {
+  it('discards pre-release configurations without a layout version', () => {
     localStorage.setItem(
       'woc_aura_overlays:warrior:Raido',
       JSON.stringify({
-        revenge_free: { iconPosX: 0.64 },
-        raised_guard: { iconPosX: 0.61 },
-      }),
-    );
-    const store = new AuraOverlayConfigStore('warrior:Raido');
-    expect(store.get('revenge_free').iconPosX).toBe(0.42);
-    expect(store.get('revenge_free').iconPosY).toBe(0.72);
-    expect(store.get('raised_guard').iconPosX).toBe(0.61);
-    store.patch('revenge_free', { iconPosX: 0.64 });
-    expect(new AuraOverlayConfigStore('warrior:Raido').get('revenge_free').iconPosX).toBe(0.64);
-  });
-
-  it('migrates the previous default column but preserves an explicitly moved icon', () => {
-    localStorage.setItem(
-      'woc_aura_overlays:warrior:Raido',
-      JSON.stringify({
-        __layoutVersion: 2,
-        revenge_free: { iconPosX: 0.54, iconPosY: 0.32 },
-        raised_guard: { iconPosX: 0.61, iconPosY: 0.7 },
+        revenge_free: {
+          ...defaultAuraOverlayConfig('revenge_free'),
+          iconPosX: 0.2,
+        },
       }),
     );
 
     const store = new AuraOverlayConfigStore('warrior:Raido');
 
-    expect(store.get('revenge_free')).toMatchObject({ iconPosX: 0.42, iconPosY: 0.72 });
-    expect(store.get('raised_guard')).toMatchObject({ iconPosX: 0.61, iconPosY: 0.7 });
-  });
-
-  it('migrates the legacy shared size to icon and crescent sizes', () => {
-    localStorage.setItem(
-      'woc_aura_overlays:warrior:Raido',
-      JSON.stringify({ revenge_free: { scale: 1.35 } }),
-    );
-    expect(new AuraOverlayConfigStore('warrior:Raido').get('revenge_free')).toMatchObject({
-      scale: 1.35,
-      arcsScale: 1.35,
+    expect(store.get('revenge_free')).toEqual(defaultAuraOverlayConfig('revenge_free'));
+    expect(JSON.parse(localStorage.getItem('woc_aura_overlays:warrior:Raido') ?? '{}')).toEqual({
+      __layoutVersion: 8,
     });
   });
 });

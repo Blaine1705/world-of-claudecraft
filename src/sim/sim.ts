@@ -1819,6 +1819,10 @@ export class Sim {
     }
     return hourglasses;
   }
+  reactiveAbilityWindowRemaining(abilityId: string): number {
+    if (abilityId !== 'mongoose_bite') return 0;
+    return Math.max(0, this.player.overpowerUntil - this.time);
+  }
   // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
   // serialized; drifted and pulsed by tickFrozenOrbs in the tick prologue.
   private frozenOrbs: FrozenOrbState[] = [];

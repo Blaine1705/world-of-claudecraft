@@ -112,6 +112,7 @@ export const IWORLD_MEMBERS = [
   { name: 'questsDone', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
+  { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
   { name: 'castAbility', kind: 'method' },
   { name: 'castAbilityAt', kind: 'method' },
   { name: 'castAbilityBySlot', kind: 'method' },
@@ -496,10 +497,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // two (selectedMount + selectMount) for 273; the v0.32.0 base merge adds
     // activeMasterLootRolls, leaving 274; the rift floor timer HUD adds
     // riftEventMsRemaining and the instance-payload pipes add
-    // marketListInstance, leaving 276.
-    expect(IWORLD_MEMBERS.length).toBe(276);
+    // marketListInstance, leaving 276. Reactive aura timing adds
+    // reactiveAbilityWindowRemaining, leaving 277.
+    expect(IWORLD_MEMBERS.length).toBe(277);
     expect(DATA_MEMBERS.length).toBe(72);
-    expect(METHOD_MEMBERS.length).toBe(204);
+    expect(METHOD_MEMBERS.length).toBe(205);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -708,6 +710,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questState',
       'questsDone',
       'raidLockouts',
+      'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
       'realm',
       'recipeList',
@@ -1010,6 +1013,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'prestige',
       'questState',
       'raidLockouts',
+      'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
       'releaseEmpoweredAbility',
       'releaseSpirit',
@@ -1146,6 +1150,7 @@ const FACET_COMBAT = [
   'known',
   'activeFrostRings',
   'activeTemporalHourglasses',
+  'reactiveAbilityWindowRemaining',
   'castAbility',
   'castAbilityAt',
   'castAbilityBySlot',
@@ -1612,8 +1617,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(276);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(276);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(277);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(277);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

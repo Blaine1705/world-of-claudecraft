@@ -308,6 +308,7 @@ const RENDER_PURE_CORES = [
   'src/render/foliage_lod.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
+  'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
   'src/render/zone_feature_visibility_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',

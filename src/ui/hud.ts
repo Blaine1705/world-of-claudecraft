@@ -1602,7 +1602,9 @@ export class Hud {
       playerClass: this.sim.cfg.playerClass,
       playerName: this.sim.player.name,
       known: () => this.sim.known,
+      talents: () => this.sim.talents,
       iconUrl: (abilityId) => iconDataUrl('ability', abilityId),
+      paintGroundRings: (rings) => this.renderer.setPlayerAuraRings(rings),
     });
     this.localIgnoredNames = this.loadLocalIgnoredNames();
     this.meters = new Meters(sim, {
@@ -3544,7 +3546,7 @@ export class Hud {
     this.writerFacet,
     this.procOverlayEl,
   );
-  // Player-configurable Warrior proc overlays. The controller builds the native
+  // Player-configurable class proc overlays. The controller builds the native
   // spell icon plus two side crescents once; its painter only toggles active
   // state on the hot path. Options > Auras owns preview and placement mode.
   private readonly auraOverlayController: AuraOverlayController;
@@ -4280,6 +4282,8 @@ export class Hud {
       defs: () => this.auraOverlayController.defs(),
       get: (id) => this.auraOverlayController.get(id),
       patch: (id, patch) => this.auraOverlayController.patch(id, patch),
+      getLayout: () => this.auraOverlayController.getLayout(),
+      patchLayout: (patch) => this.auraOverlayController.patchLayout(patch),
       reset: (id) => this.auraOverlayController.reset(id),
       nudge: (id, part, deltaX, deltaY) =>
         this.auraOverlayController.nudge(id, part, deltaX, deltaY),
@@ -7849,7 +7853,10 @@ export class Hud {
     } else {
       this.procOverlayPainter.paint(procOverlayState(p.auras), combustionOverlayActive(p.auras));
     }
-    this.auraOverlayController.paint(p.auras);
+    this.auraOverlayController.paint(
+      p.auras,
+      this.sim.reactiveAbilityWindowRemaining('mongoose_bite'),
+    );
 
     // action bar: the slot row, driven by the pure action_bar_view core + the thin
     // ActionBarPainter. Every per-slot icon / cooldown / dimming / count write

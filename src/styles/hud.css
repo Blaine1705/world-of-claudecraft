@@ -5872,6 +5872,7 @@
   }
   #aura-overlays.placement {
     z-index: 34;
+    pointer-events: auto;
   }
   .aura-overlay-frame {
     --aura-color: var(--color-aura-rpg-gold);
@@ -5888,16 +5889,8 @@
   }
   .aura-overlay-arcs-shell {
     position: absolute;
-    left: clamp(
-      calc(var(--aura-half-width) + env(safe-area-inset-left, 0px)),
-      var(--aura-arcs-x),
-      calc(var(--app-vw, 100vw) - var(--aura-half-width) - env(safe-area-inset-right, 0px))
-    );
-    top: clamp(
-      calc(var(--aura-half-height) + env(safe-area-inset-top, 0px)),
-      var(--aura-arcs-y),
-      calc(var(--app-vh, 100vh) - var(--aura-half-height) - env(safe-area-inset-bottom, 0px))
-    );
+    left: var(--aura-arcs-x);
+    top: var(--aura-arcs-y);
     width: 300px;
     height: 220px;
     translate: -50% -50%;
@@ -5917,11 +5910,11 @@
     opacity: var(--aura-opacity);
   }
   #aura-overlays.placement .aura-overlay-frame.placement-preview .aura-overlay-icon,
+  #aura-overlays.placement .aura-overlay-frame.placement-preview .aura-overlay-timer,
   #aura-overlays.placement .aura-overlay-frame.placement-preview .aura-overlay-arcs-shell {
     display: block;
   }
-  #aura-overlays.placement .aura-overlay-frame.placement-preview .aura-overlay-icon,
-  #aura-overlays.placement .aura-overlay-frame.placement-preview .aura-overlay-arc {
+  #aura-overlays.placement .aura-overlay-frame.placement-preview .aura-overlay-icon {
     pointer-events: auto;
     cursor: pointer;
     touch-action: none;
@@ -5931,10 +5924,17 @@
     .aura-overlay-frame.placement-target.placement-arcs
     .aura-overlay-arcs-shell {
     pointer-events: auto;
-    cursor: grab;
     outline: 1px dashed var(--gold);
     outline-offset: 4px;
     touch-action: none;
+  }
+  #aura-overlays.placement .aura-overlay-frame.placement-target.placement-icon .aura-overlay-icon {
+    cursor: grab;
+  }
+  #aura-overlays.placement
+    .aura-overlay-frame.placement-target.placement-arcs
+    .aura-overlay-arcs-shell {
+    cursor: pointer;
   }
   #aura-overlays.placement
     :is(.aura-overlay-arcs-shell, .aura-overlay-icon, .aura-overlay-move-handle).dragging {
@@ -5946,6 +5946,7 @@
     top: 18px;
     width: 72px;
     height: 184px;
+    pointer-events: none;
     filter: drop-shadow(0 0 var(--aura-glow-core) currentColor)
       drop-shadow(0 0 var(--aura-glow-halo) currentColor);
   }
@@ -5982,6 +5983,41 @@
       0 0 var(--aura-glow-halo) currentColor;
     opacity: 0.88;
   }
+  .aura-overlay-timer {
+    position: absolute;
+    z-index: 1;
+    left: clamp(
+      calc(var(--aura-icon-half) + env(safe-area-inset-left, 0px)),
+      var(--aura-icon-x),
+      calc(var(--app-vw, 100vw) - var(--aura-icon-half) - env(safe-area-inset-right, 0px))
+    );
+    top: clamp(
+      calc(var(--aura-icon-half) + env(safe-area-inset-top, 0px)),
+      var(--aura-icon-y),
+      calc(var(--app-vh, 100vh) - var(--aura-icon-half) - env(safe-area-inset-bottom, 0px))
+    );
+    display: grid;
+    width: 58px;
+    height: 58px;
+    place-items: center;
+    translate: -50% -50%;
+    scale: var(--aura-icon-scale);
+    border-radius: 7px;
+    background: conic-gradient(
+      from 0deg,
+      transparent var(--aura-remaining-ratio, 0%),
+      rgb(0 0 0 / 62%) 0
+    );
+    color: white;
+    font-size: 20px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    text-shadow:
+      0 1px 2px black,
+      0 0 4px black;
+    pointer-events: none;
+  }
   .aura-overlay-move-handle {
     position: absolute;
     z-index: 2;
@@ -6009,7 +6045,7 @@
       url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%202l4%204h-3v5h5V8l4%204-4%204v-3h-5v5h3l-4%204-4-4h3v-5H6v3l-4-4%204-4v3h5V6H8l4-4z'/%3E%3C/svg%3E")
       center / contain no-repeat;
   }
-  #aura-overlays.placement .placement-target .aura-overlay-move-handle {
+  #aura-overlays.placement .placement-target.placement-icon .aura-overlay-move-handle {
     display: block;
   }
   #aura-overlays.placement .placement-target.placement-icon .aura-overlay-move-handle {
@@ -6026,7 +6062,7 @@
     width: 40px;
     height: 40px;
   }
-  .aura-overlay-frame.hide-icon .aura-overlay-icon,
+  .aura-overlay-frame.hide-icon :is(.aura-overlay-icon, .aura-overlay-timer),
   .aura-overlay-frame.hide-arcs .aura-overlay-arcs-shell {
     display: none;
   }
@@ -6040,6 +6076,36 @@
     --aura-color: var(--color-aura-rpg-violet);
   }
   .aura-overlay-victory {
+    --aura-color: var(--color-aura-rpg-gold);
+  }
+  .aura-overlay-fire {
+    --aura-color: #ff8a33;
+  }
+  .aura-overlay-frost {
+    --aura-color: #54d9ff;
+  }
+  .aura-overlay-arcane {
+    --aura-color: #bd63ff;
+  }
+  .aura-overlay-paladin {
+    --aura-color: var(--color-aura-rpg-gold);
+  }
+  .aura-overlay-hunter {
+    --aura-color: var(--color-aura-rpg-gold);
+  }
+  .aura-overlay-rogue {
+    --aura-color: var(--color-aura-rpg-violet);
+  }
+  .aura-overlay-priest {
+    --aura-color: var(--color-aura-rpg-electric);
+  }
+  .aura-overlay-shaman {
+    --aura-color: var(--color-aura-rpg-electric);
+  }
+  .aura-overlay-warlock {
+    --aura-color: var(--color-aura-rpg-violet);
+  }
+  .aura-overlay-druid {
     --aura-color: var(--color-aura-rpg-gold);
   }
   body.reduce-motion .aura-overlay-frame {

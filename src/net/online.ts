@@ -1640,6 +1640,7 @@ export class ClientWorld implements IWorld {
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
+  private counterfangWindowRemaining = 0;
   // inventory deltas arrive in snapshots, separate from the event frames the
   // HUD redraws on — the frame loop polls this so open panels re-render
   private invChanged = false;
@@ -2734,6 +2735,10 @@ export class ClientWorld implements IWorld {
     const s = snap.self;
     const e = s ? applyWire(s) : null;
     if (s && e) {
+      this.counterfangWindowRemaining =
+        typeof s.opRem === 'number' && Number.isFinite(s.opRem)
+          ? Math.min(5, Math.max(0, s.opRem))
+          : 0;
       if (typeof this.spectating === 'string' && e.kind === 'player' && e.templateId in CLASSES) {
         this.cfg.playerClass = e.templateId as PlayerClass;
       }
@@ -3291,6 +3296,9 @@ export class ClientWorld implements IWorld {
   }
 
   // --- IWorldCombat: ability casts, auto-attack, spirit release ---
+  reactiveAbilityWindowRemaining(abilityId: string): number {
+    return abilityId === 'mongoose_bite' ? this.counterfangWindowRemaining : 0;
+  }
   castAbility(abilityId: string): void {
     if (this.deadTargetCast(this.known.find((k) => k.def.id === abilityId)?.def)) {
       this.eventQueue.push({ type: 'error', text: 'You have no target.', reason: 'target_dead' });

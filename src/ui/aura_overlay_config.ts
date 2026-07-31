@@ -1,9 +1,11 @@
-import type { WarriorProcId } from './aura_overlay_view';
+import type { AuraOverlayProcId, MageProcId, WarriorProcId } from './aura_overlay_view';
+import { auraOverlayDefaultMeta } from './aura_overlay_view';
 
 export interface AuraOverlayConfig {
   enabled: boolean;
   showIcon: boolean;
   showArcs: boolean;
+  showGroundRing: boolean;
   iconPosX: number;
   iconPosY: number;
   arcsPosX: number;
@@ -11,58 +13,152 @@ export interface AuraOverlayConfig {
   opacity: number;
   scale: number;
   arcsScale: number;
+  groundScale: number;
+  groundOrder: number;
   color: string;
 }
 
 export type AuraOverlayPatch = Partial<AuraOverlayConfig>;
 
+export interface AuraOverlayLayoutConfig {
+  crescentBlockScale: number;
+  groundRingBlockScale: number;
+}
+
+export type AuraOverlayLayoutPatch = Partial<AuraOverlayLayoutConfig>;
+
+export type AuraOverlayVisualSlot = Pick<AuraOverlayConfig, 'arcsScale' | 'groundOrder'>;
+
+export function auraOverlayVisualSlot(config: AuraOverlayConfig): AuraOverlayVisualSlot {
+  return {
+    arcsScale: config.arcsScale,
+    groundOrder: config.groundOrder,
+  };
+}
+
 const STORE_PREFIX = 'woc_aura_overlays:';
-const LEGACY_DEFAULT_ICON_X = 0.64;
-const PREVIOUS_DEFAULT_ICON_X = 0.54;
-const DEFAULT_ICON_Y = 0.72;
-const LAYOUT_VERSION = 3;
+const DEFAULT_ICON_Y = 0.7;
+const DEFAULT_ICON_SCALE = 0.8;
+const LAYOUT_VERSION = 8;
+const DEFAULT_OVERLAY_LAYOUT: AuraOverlayLayoutConfig = {
+  crescentBlockScale: 1,
+  groundRingBlockScale: 1,
+};
 
 interface AuraOverlayDefaultLayout {
-  iconX: number;
   arcsScale: number;
   color: string;
 }
 
-const PREVIOUS_DEFAULT_ICON_Y: Record<WarriorProcId, number> = {
-  revenge_free: 0.32,
-  battle_trance: 0.375,
-  raised_guard: 0.43,
-  iron_resolve: 0.485,
-  overpower_charge: 0.54,
-  sudden_death: 0.595,
-  victory_rush: 0.65,
-  enrage: 0.705,
-};
-
 const DEFAULT_LAYOUT: Record<WarriorProcId, AuraOverlayDefaultLayout> = {
-  revenge_free: { iconX: 0.42, arcsScale: 0.8, color: '#ffe14d' },
-  battle_trance: { iconX: 0.42, arcsScale: 0.9, color: '#3dc7ff' },
-  raised_guard: { iconX: 0.5, arcsScale: 1, color: '#bd63ff' },
-  iron_resolve: { iconX: 0.58, arcsScale: 1.1, color: '#ffe14d' },
-  overpower_charge: { iconX: 0.5, arcsScale: 1.2, color: '#3dc7ff' },
-  sudden_death: { iconX: 0.58, arcsScale: 1.3, color: '#bd63ff' },
-  victory_rush: { iconX: 0.66, arcsScale: 1.4, color: '#ffe14d' },
-  enrage: { iconX: 0.5, arcsScale: 1.5, color: '#3dc7ff' },
+  revenge_free: { arcsScale: 0.8, color: '#ffe14d' },
+  battle_trance: { arcsScale: 0.9, color: '#3dc7ff' },
+  raised_guard: { arcsScale: 1, color: '#bd63ff' },
+  iron_resolve: { arcsScale: 1.1, color: '#ffe14d' },
+  overpower_charge: { arcsScale: 1.2, color: '#3dc7ff' },
+  sudden_death: { arcsScale: 1.3, color: '#bd63ff' },
+  victory_rush: { arcsScale: 1.4, color: '#ffe14d' },
+  enrage: { arcsScale: 1.5, color: '#3dc7ff' },
 };
 
-export function defaultAuraOverlayConfig(id: WarriorProcId): AuraOverlayConfig {
-  const layout = DEFAULT_LAYOUT[id];
+const MAGE_DEFAULT_LAYOUT: Record<MageProcId, AuraOverlayDefaultLayout> = {
+  heating_up: { arcsScale: 0.9, color: '#ff4b2b' },
+  hot_streak: { arcsScale: 1.1, color: '#ffd43b' },
+  fingers_of_frost: { arcsScale: 0.9, color: '#59d8ff' },
+  brain_freeze: { arcsScale: 1.1, color: '#4d8dff' },
+  arcane_charge: { arcsScale: 0.8, color: '#8b5cf6' },
+  aether_rush: { arcsScale: 1, color: '#d946ef' },
+  perfect_moment: { arcsScale: 1.2, color: '#6d28d9' },
+};
+
+const ALL_DEFAULT_LAYOUT: Readonly<Record<string, AuraOverlayDefaultLayout>> = {
+  ...DEFAULT_LAYOUT,
+  ...MAGE_DEFAULT_LAYOUT,
+};
+
+const WARRIOR_ICON_X: Readonly<Record<WarriorProcId, number>> = {
+  revenge_free: 0.44,
+  battle_trance: 0.44,
+  raised_guard: 0.5,
+  iron_resolve: 0.56,
+  overpower_charge: 0.5,
+  sudden_death: 0.56,
+  victory_rush: 0.47,
+  enrage: 0.53,
+};
+const MAGE_ICON_X: Readonly<Record<MageProcId, number>> = {
+  heating_up: 0.47,
+  hot_streak: 0.53,
+  fingers_of_frost: 0.47,
+  brain_freeze: 0.53,
+  arcane_charge: 0.44,
+  aether_rush: 0.5,
+  perfect_moment: 0.56,
+};
+const WARRIOR_GROUND_ORDER = Object.fromEntries(
+  (Object.keys(WARRIOR_ICON_X) as WarriorProcId[]).map((id, index) => [id, index]),
+) as Readonly<Record<WarriorProcId, number>>;
+const MAGE_GROUND_ORDER = Object.fromEntries(
+  (Object.keys(MAGE_ICON_X) as MageProcId[]).map((id, index) => [id, index]),
+) as Readonly<Record<MageProcId, number>>;
+const GENERIC_ICON_X = [0.32, 0.38, 0.44, 0.5, 0.56, 0.62, 0.68] as const;
+const GENERIC_PALETTES: Readonly<Record<string, readonly string[]>> = {
+  paladin: ['#facc15', '#fff7cc', '#fde047', '#f59e0b', '#f8fafc', '#eab308', '#fff7cc'],
+  hunter: ['#65a30d', '#22c55e', '#f5b942', '#84cc16', '#d97706', '#16a34a', '#facc15'],
+  rogue: ['#facc15', '#ef4444', '#7c3aed', '#f97316', '#dc2626', '#a855f7', '#facc15'],
+  priest: ['#fde68a', '#facc15', '#c4b5fd', '#a78bfa', '#f8fafc', '#e9d5ff', '#ffffff'],
+  shaman: ['#22d3ee', '#a3e635', '#60a5fa', '#f97316', '#14b8a6', '#38bdf8', '#0ea5e9'],
+  warlock: ['#84cc16', '#7c3aed', '#f97316', '#22c55e', '#c026d3', '#a855f7', '#65a30d'],
+  druid: ['#22c55e', '#f59e0b', '#60a5fa', '#16a34a', '#84cc16', '#a78bfa', '#eab308'],
+};
+
+function genericDefaultLayout(id: AuraOverlayProcId): AuraOverlayDefaultLayout {
+  const meta = auraOverlayDefaultMeta(id);
+  if (!meta) return { arcsScale: 1, color: '#ffe14d' };
+  const slot = Math.min(GENERIC_ICON_X.length - 1, Math.max(0, meta.slot));
+  return {
+    arcsScale: Math.round(Math.min(1.4, 0.8 + slot * 0.1) * 10) / 10,
+    color: GENERIC_PALETTES[meta.playerClass]?.[slot] ?? '#ffe14d',
+  };
+}
+
+function defaultLayout(id: AuraOverlayProcId): AuraOverlayDefaultLayout {
+  return ALL_DEFAULT_LAYOUT[id] ?? genericDefaultLayout(id);
+}
+
+function defaultIconX(id: AuraOverlayProcId): number {
+  const warriorX = WARRIOR_ICON_X[id as WarriorProcId];
+  if (warriorX !== undefined) return warriorX;
+  const mageX = MAGE_ICON_X[id as MageProcId];
+  if (mageX !== undefined) return mageX;
+  const slot = auraOverlayDefaultMeta(id)?.slot ?? 3;
+  return GENERIC_ICON_X[Math.min(GENERIC_ICON_X.length - 1, Math.max(0, slot))];
+}
+
+function defaultGroundOrder(id: AuraOverlayProcId): number {
+  const warriorOrder = WARRIOR_GROUND_ORDER[id as WarriorProcId];
+  if (warriorOrder !== undefined) return warriorOrder;
+  const mageOrder = MAGE_GROUND_ORDER[id as MageProcId];
+  if (mageOrder !== undefined) return mageOrder;
+  return auraOverlayDefaultMeta(id)?.slot ?? 0;
+}
+
+export function defaultAuraOverlayConfig(id: AuraOverlayProcId): AuraOverlayConfig {
+  const layout = defaultLayout(id);
   return {
     enabled: false,
     showIcon: true,
-    showArcs: true,
-    iconPosX: layout.iconX,
+    showArcs: false,
+    showGroundRing: true,
+    iconPosX: defaultIconX(id),
     iconPosY: DEFAULT_ICON_Y,
     arcsPosX: 0.5,
     arcsPosY: 0.56,
     opacity: 0.7,
-    scale: 1,
+    scale: DEFAULT_ICON_SCALE,
     arcsScale: layout.arcsScale,
+    groundScale: 1,
+    groundOrder: defaultGroundOrder(id),
     color: layout.color,
   };
 }
@@ -80,37 +176,31 @@ function colorOr(raw: unknown, fallback: string): string {
   return typeof raw === 'string' && /^#[0-9a-f]{6}$/i.test(raw) ? raw.toLowerCase() : fallback;
 }
 
-export function sanitizeAuraOverlayConfig(id: WarriorProcId, raw: unknown): AuraOverlayConfig {
+export function sanitizeAuraOverlayConfig(id: AuraOverlayProcId, raw: unknown): AuraOverlayConfig {
   const fallback = defaultAuraOverlayConfig(id);
   const value = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
-  const legacyPosX = numberIn(value.posX, 0, 1, fallback.iconPosX);
-  const legacyPosY = numberIn(value.posY, 0, 1, fallback.iconPosY);
-  const legacyScale = numberIn(value.scale, 0.65, 1.6, fallback.scale);
-  const hasLegacyPosX = value.posX !== undefined;
-  const hasLegacyPosY = value.posY !== undefined;
-  const hasLegacyScale = value.scale !== undefined;
   return {
     enabled: boolOr(value.enabled, fallback.enabled),
     showIcon: boolOr(value.showIcon, fallback.showIcon),
     showArcs: boolOr(value.showArcs, fallback.showArcs),
-    iconPosX: numberIn(value.iconPosX, 0, 1, hasLegacyPosX ? legacyPosX : fallback.iconPosX),
-    iconPosY: numberIn(value.iconPosY, 0, 1, hasLegacyPosY ? legacyPosY : fallback.iconPosY),
-    arcsPosX: numberIn(value.arcsPosX, 0, 1, hasLegacyPosX ? legacyPosX : fallback.arcsPosX),
-    arcsPosY: numberIn(value.arcsPosY, 0, 1, hasLegacyPosY ? legacyPosY : fallback.arcsPosY),
+    showGroundRing: boolOr(value.showGroundRing, fallback.showGroundRing),
+    iconPosX: numberIn(value.iconPosX, 0, 1, fallback.iconPosX),
+    iconPosY: numberIn(value.iconPosY, 0, 1, fallback.iconPosY),
+    arcsPosX: numberIn(value.arcsPosX, 0, 1, fallback.arcsPosX),
+    arcsPosY: numberIn(value.arcsPosY, 0, 1, fallback.arcsPosY),
     opacity: numberIn(value.opacity, 0.25, 1, fallback.opacity),
-    scale: legacyScale,
-    arcsScale: numberIn(
-      value.arcsScale,
-      0.65,
-      1.6,
-      hasLegacyScale ? legacyScale : fallback.arcsScale,
-    ),
+    scale: numberIn(value.scale, 0.65, 1.6, fallback.scale),
+    arcsScale: numberIn(value.arcsScale, 0.65, 1.6, fallback.arcsScale),
+    groundScale: numberIn(value.groundScale, 0.65, 1.6, fallback.groundScale),
+    groundOrder: Math.round(numberIn(value.groundOrder, 0, 100, fallback.groundOrder)),
     color: colorOr(value.color, fallback.color),
   };
 }
 
-type StoredConfigs = Partial<Record<WarriorProcId, AuraOverlayConfig>> & {
+type StoredConfigs = {
+  [id: string]: AuraOverlayConfig | AuraOverlayLayoutConfig | number | undefined;
   __layoutVersion?: number;
+  __layout?: AuraOverlayLayoutConfig;
 };
 
 export class AuraOverlayConfigStore {
@@ -123,36 +213,24 @@ export class AuraOverlayConfigStore {
   }
 
   private load(): StoredConfigs {
+    const fresh = (): StoredConfigs => {
+      const next: StoredConfigs = { __layoutVersion: LAYOUT_VERSION };
+      try {
+        localStorage.setItem(this.key, JSON.stringify(next));
+      } catch {
+        // Storage can be unavailable in privacy modes. Session state still works.
+      }
+      return next;
+    };
     let raw: unknown = null;
     try {
       raw = JSON.parse(localStorage.getItem(this.key) ?? 'null');
     } catch {
-      return { __layoutVersion: LAYOUT_VERSION };
+      return fresh();
     }
-    if (!raw || typeof raw !== 'object') return { __layoutVersion: LAYOUT_VERSION };
+    if (!raw || typeof raw !== 'object') return fresh();
     const configs = raw as StoredConfigs;
-    if (configs.__layoutVersion !== LAYOUT_VERSION) {
-      for (const [rawId, config] of Object.entries(configs)) {
-        const id = rawId as WarriorProcId;
-        const layout = DEFAULT_LAYOUT[id];
-        if (!layout || typeof config !== 'object' || !config) continue;
-        const previousDefault =
-          config.iconPosX === PREVIOUS_DEFAULT_ICON_X &&
-          (config.iconPosY === undefined || config.iconPosY === PREVIOUS_DEFAULT_ICON_Y[id]);
-        if (config.iconPosX === LEGACY_DEFAULT_ICON_X || previousDefault) {
-          config.iconPosX = layout.iconX;
-          if (config.iconPosY === undefined || config.iconPosY === PREVIOUS_DEFAULT_ICON_Y[id]) {
-            config.iconPosY = DEFAULT_ICON_Y;
-          }
-        }
-      }
-      configs.__layoutVersion = LAYOUT_VERSION;
-      try {
-        localStorage.setItem(this.key, JSON.stringify(configs));
-      } catch {
-        // Storage can be unavailable in privacy modes. Session state still works.
-      }
-    }
+    if (configs.__layoutVersion !== LAYOUT_VERSION) return fresh();
     return configs;
   }
 
@@ -164,31 +242,66 @@ export class AuraOverlayConfigStore {
     }
   }
 
-  get(id: WarriorProcId): AuraOverlayConfig {
+  get(id: AuraOverlayProcId): AuraOverlayConfig {
     return sanitizeAuraOverlayConfig(id, this.configs[id]);
   }
 
-  patch(id: WarriorProcId, patch: AuraOverlayPatch): AuraOverlayConfig {
+  getLayout(): AuraOverlayLayoutConfig {
+    const raw = this.configs.__layout;
+    return {
+      crescentBlockScale: numberIn(
+        raw?.crescentBlockScale,
+        0.65,
+        1.6,
+        DEFAULT_OVERLAY_LAYOUT.crescentBlockScale,
+      ),
+      groundRingBlockScale: numberIn(
+        raw?.groundRingBlockScale,
+        0.65,
+        1.6,
+        DEFAULT_OVERLAY_LAYOUT.groundRingBlockScale,
+      ),
+    };
+  }
+
+  patchLayout(patch: AuraOverlayLayoutPatch): AuraOverlayLayoutConfig {
+    const current = this.getLayout();
+    const next = {
+      crescentBlockScale: numberIn(patch.crescentBlockScale, 0.65, 1.6, current.crescentBlockScale),
+      groundRingBlockScale: numberIn(
+        patch.groundRingBlockScale,
+        0.65,
+        1.6,
+        current.groundRingBlockScale,
+      ),
+    };
+    this.configs = { ...this.configs, __layout: next };
+    this.save();
+    return { ...next };
+  }
+
+  patch(id: AuraOverlayProcId, patch: AuraOverlayPatch): AuraOverlayConfig {
     const next = sanitizeAuraOverlayConfig(id, { ...this.get(id), ...patch });
     this.configs = { ...this.configs, [id]: next };
     this.save();
     return { ...next };
   }
 
-  reset(id: WarriorProcId): AuraOverlayConfig {
+  reset(id: AuraOverlayProcId): AuraOverlayConfig {
     const next = defaultAuraOverlayConfig(id);
     this.configs = { ...this.configs, [id]: next };
     this.save();
     return { ...next };
   }
 
-  resetPosition(id: WarriorProcId): AuraOverlayConfig {
+  resetPosition(id: AuraOverlayProcId): AuraOverlayConfig {
     const defaults = defaultAuraOverlayConfig(id);
     return this.patch(id, {
       iconPosX: defaults.iconPosX,
       iconPosY: defaults.iconPosY,
       arcsPosX: defaults.arcsPosX,
       arcsPosY: defaults.arcsPosY,
+      groundOrder: defaults.groundOrder,
     });
   }
 }
