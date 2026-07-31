@@ -2333,6 +2333,7 @@ const ITEM_ENTITY_IDS = [
   'last_keep_signet',
   'gatherers_cache',
   'artisans_eye',
+  'reins_terrorspark_groundshaker',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2426,6 +2427,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   last_keep_signet: 'Signet of the Last Keep',
   gatherers_cache: "Gatherer's Cache",
   artisans_eye: "Artisan's Eye",
+  reins_terrorspark_groundshaker: 'Ignition Key: Terrorspark Groundshaker',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

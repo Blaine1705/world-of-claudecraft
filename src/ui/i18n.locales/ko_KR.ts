@@ -9093,6 +9093,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '그림자 도약 두꺼비 카마카게',
   'hudChrome.mounts.name_stormfeather_griffin': '하늘닿이 폭풍깃',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',
+  'hudChrome.mounts.name_terrorspark_groundshaker': '대지를 뒤흔드는 테러스파크',
   'hudChrome.mounts.desc_valorsteed': '여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.',
   'hudChrome.mounts.desc_grag_bear': '여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.',
   'hudChrome.mounts.desc_stalkglider_snail': '여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.',
@@ -9104,6 +9105,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     '깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.',
+  'hudChrome.mounts.desc_terrorspark_groundshaker':
+    '묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.',
   'hudChrome.mounts.emptyTitle': '보유한 탈것 없음',
   'hudChrome.mounts.emptyStableHint':
     '20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.',
@@ -9886,6 +9889,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '마지막 요새',
   'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
+  'entities.items.reins_terrorspark_groundshaker.name': '테러스파크 시동 열쇠',
   'entities.dungeons.the_last_keep.leaveText':
     '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',
   'entities.items.wildheart_tuskblade.name': '야생심장 엄니대검',

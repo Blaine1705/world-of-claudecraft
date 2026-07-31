@@ -8695,6 +8695,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '影跃蟾蜍卡玛影',
   'hudChrome.mounts.name_stormfeather_griffin': '凌天风暴之羽',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
+  'hudChrome.mounts.name_terrorspark_groundshaker': '惊雷撼地者',
   'hudChrome.mounts.desc_valorsteed': '一匹坚韧稳健的骏马，可提升旅行速度。',
   'hudChrome.mounts.desc_grag_bear': '一头坚韧稳健的巨熊，可提升旅行速度。',
   'hudChrome.mounts.desc_stalkglider_snail': '一只坚毅耐久的蜗牛，可提升旅行速度。',
@@ -8706,6 +8707,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     '一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。',
+  'hudChrome.mounts.desc_terrorspark_groundshaker':
+    '一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。',
   'hudChrome.mounts.emptyTitle': '尚未收集坐骑',
   'hudChrome.mounts.emptyStableHint': '升到20级，前往高望以西的马厩，向马厩总管玛拉学习骑术。',
   'hudChrome.mounts.emptyDropHint': '较稀有的坐骑由英雄地下城首领掉落或完成裂隙获得。',
@@ -9431,6 +9434,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最后的堡垒',
   'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
   'entities.items.last_keep_signet.name': '最后的堡垒印戒',
+  'entities.items.reins_terrorspark_groundshaker.name': '惊雷撼地者点火钥匙',
   'entities.dungeons.the_last_keep.leaveText': '你带上堡门，重新走进龙裔荒原的寒风中。',
   'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
   'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',

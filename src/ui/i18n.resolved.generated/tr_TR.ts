@@ -966,13 +966,15 @@ export const tr_TR: EnTranslations = {
       "name_shadowjump_toad": "Gölge Sıçrayan Kurbağa Kama-Kage",
       "name_stormfeather_griffin": "Gökyüzü Erişimli Fırtınatüy",
       "name_thunderstrut_gobbler": "Gürlemeadım, Büyük Hindi",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
       "desc_grag_bear": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.",
       "desc_stalkglider_snail": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve yavaş yanan bir salyangoz.",
       "desc_aether_hover_cycle": "Savaşta hızlı, alçaktan süzülerek hareket etmek için tasarlanmış güçlü bir büyü-teknoloji motosikleti.",
       "desc_shadowjump_toad": "Her arazi türünü aşan, şimşek hızındaki gölgeli sıçramalarla eğitilmiş, dev ve sağlam adımlı bir kurbağa.",
       "desc_stormfeather_griffin": "Rün nallı pençeleriyle yerde süzülen, kanatları katlı, asil bir fırtına grifonu.",
-      "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi."
+      "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Eğitim Yiğit Küheylanına binmek için {key} tuşuna bas.",
@@ -9825,6 +9827,9 @@ export const tr_TR: EnTranslations = {
       },
       "artisans_eye": {
         "name": "Artisan's Eye"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

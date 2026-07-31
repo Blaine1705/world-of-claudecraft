@@ -966,13 +966,15 @@ export const es: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, el Sapo Saltasombras",
       "name_stormfeather_griffin": "Plumatormenta Alcanzacielos",
       "name_thunderstrut_gobbler": "Pavoneatruenos, el Gran Pavo",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "desc_valorsteed": "Un corcel resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_grag_bear": "Un oso resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_stalkglider_snail": "Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.",
       "desc_aether_hover_cycle": "Una potente moto magitecnológica diseñada para desplazamientos de combate veloces a baja altura.",
       "desc_shadowjump_toad": "Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.",
       "desc_stormfeather_griffin": "Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.",
-      "desc_thunderstrut_gobbler": "Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta."
+      "desc_thunderstrut_gobbler": "Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Pulsa {key} para montar el Corcel del Valor de entrenamiento.",
@@ -9825,6 +9827,9 @@ export const es: EnTranslations = {
       },
       "artisans_eye": {
         "name": "Artisan's Eye"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"

@@ -90,10 +90,10 @@
     }
   ],
   "commands": {
-    "normal": "python3 /Users/fernando/.codex/skills/img2threejs/forge/stage2_spec/validate_sculpt_spec.py <spec> --json",
-    "strictQuality": "python3 /Users/fernando/.codex/skills/img2threejs/forge/stage2_spec/validate_sculpt_spec.py <spec> --strict-quality --json",
-    "pipelineStatus": "python3 /Users/fernando/.codex/skills/img2threejs/forge/stage3_build/orchestrate_passes.py status <spec>",
-    "intakeCorrectness": "python3 /Users/fernando/.codex/skills/img2threejs/forge/stage1_intake/check_intake_correctness.py <spec> --json"
+    "normal": "python3 <codex-skills>/img2threejs/forge/stage2_spec/validate_sculpt_spec.py <spec> --json",
+    "strictQuality": "python3 <codex-skills>/img2threejs/forge/stage2_spec/validate_sculpt_spec.py <spec> --strict-quality --json",
+    "pipelineStatus": "python3 <codex-skills>/img2threejs/forge/stage3_build/orchestrate_passes.py status <spec>",
+    "intakeCorrectness": "python3 <codex-skills>/img2threejs/forge/stage1_intake/check_intake_correctness.py <spec> --json"
   },
   "intakeCorrectness": {
     "mailbox": {
