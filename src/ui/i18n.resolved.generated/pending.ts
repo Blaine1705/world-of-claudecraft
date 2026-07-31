@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -50,9 +51,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "es_ES": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -93,9 +97,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "fr_FR": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -136,9 +143,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "fr_CA": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -179,10 +189,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -223,9 +236,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "de_DE": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -266,13 +282,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -313,10 +332,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -357,9 +379,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "nl_NL": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -400,9 +425,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "pl_PL": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -443,9 +471,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "id_ID": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -486,9 +517,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "tr_TR": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -529,9 +563,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "sv_SE": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -572,9 +609,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "vi_VN": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -615,9 +655,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "da_DK": [
+    "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
     "hudChrome.auraOverlay.arcs",
@@ -658,6 +701,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraOverlay.size",
     "hudChrome.auraOverlay.spellOrder",
     "hudChrome.auraOverlay.spellPosition",
-    "hudChrome.auraOverlay.title"
+    "hudChrome.auraOverlay.title",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
   ]
 };

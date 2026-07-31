@@ -966,13 +966,15 @@ export const ja_JP: EnTranslations = {
       "name_shadowjump_toad": "影跳びのカマカゲ",
       "name_stormfeather_griffin": "スカイリーチ・ストームフェザー",
       "name_thunderstrut_gobbler": "大七面鳥サンダーストラット",
+      "name_terrorspark_groundshaker": "地揺らしのテラースパーク",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
       "desc_aether_hover_cycle": "低空ホバーで戦場を駆け抜けるために設計された強力な魔導バイク。",
       "desc_shadowjump_toad": "どんな地形も影の跳躍で瞬時に越える、巨大で足取り確かなガマ。",
       "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。",
-      "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。"
+      "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。",
+      "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。"
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
@@ -9780,6 +9782,9 @@ export const ja_JP: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "最後の砦の印章"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "テラースパークの始動キー"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

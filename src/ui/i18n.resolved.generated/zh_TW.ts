@@ -966,13 +966,15 @@ export const zh_TW: EnTranslations = {
       "name_shadowjump_toad": "影躍蟾蜍卡瑪影",
       "name_stormfeather_griffin": "凌天風暴之羽",
       "name_thunderstrut_gobbler": "雷霆闊步大火雞",
+      "name_terrorspark_groundshaker": "驚雷撼地者",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
       "desc_aether_hover_cycle": "一輛強大的魔導機車，專為快速貼地懸浮的戰鬥穿行而設計。",
       "desc_shadowjump_toad": "一隻體型龐大、步伐穩健的巨蟾，受訓於閃電般的暗影跳躍，可跨越任何地形。",
       "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。",
-      "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。"
+      "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。",
+      "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
@@ -9780,6 +9782,9 @@ export const zh_TW: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "最後的堡壘印戒"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "驚雷撼地者點火鑰匙"
       },
       "conjured_water4": {
         "name": "魔法泉水"
