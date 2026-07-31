@@ -644,6 +644,11 @@ export class MarketWindow {
           this.browsePage = Math.max(0, this.browsePage + (dir === 'next' ? 1 : -1));
           this.pushQuery(); // the server returns the requested page of listings
           this.lastSig = '';
+          // The page change is about to tear down and rebuild every `.mkt-row` node the
+          // same way refreshIfChanged()'s signature-driven refresh does; hide any tooltip
+          // still claimed by the pre-change rows before renderContent() below discards them
+          // (issue 2456, the pager's own row-teardown path).
+          this.deps.hideTooltip();
           audio.click();
           this.renderContent();
           // #market-body scrolls on desktop; on mobile the sheet base makes
