@@ -37,8 +37,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // resolves a tier and never a tool), and market_list_instance
 // (the instance-payload market pipe). mount_select left the wire
 // (reins are items); recharge_tool_effect joined (the acquisition craft).
-const EXPECTED_SEND_COUNT = 175;
-const EXPECTED_DISPATCH_COUNT = 186;
+const EXPECTED_SEND_COUNT = 176;
+const EXPECTED_DISPATCH_COUNT = 187;
 const EXPECTED_DISPATCH_ONLY_COUNT = 11;
 
 // The chat sub-channel routing switch (server/game.ts `switch

@@ -2474,21 +2474,38 @@ export const TARGETS = [
         (opts) => {
           const game = window.__game;
           const meshes = game?.renderer?.gatherNodeMeshes ?? [];
-          const byId = (id) => meshes.find((m) => m.userData?.gatherNodeId === id);
+          // The nodes are InstancedMesh batches (the v0.33.0 draw-call diet):
+          // resolve (batch, instance index) through userData.gatherNodeIds and
+          // read the stand position out of the instance matrix's translation
+          // column (a batch's own .position is the origin).
+          const byId = (id) => {
+            for (const m of meshes) {
+              const ids = m.userData?.gatherNodeIds;
+              const i = Array.isArray(ids) ? ids.indexOf(id) : -1;
+              if (i !== -1) {
+                const e = m.instanceMatrix.array;
+                return { id, x: e[i * 16 + 12], y: e[i * 16 + 13], z: e[i * 16 + 14] };
+              }
+            }
+            return null;
+          };
           // ore_mirefen_t2 exists only on the reworked tree; ore_mirefen_1 is the
           // base-tree vein 12 yd away, the honest before-side stand-in.
-          const mesh = byId('ore_mirefen_t2') ?? byId('ore_mirefen_1') ?? meshes[0];
+          const node =
+            byId('ore_mirefen_t2') ??
+            byId('ore_mirefen_1') ??
+            byId(meshes[0]?.userData?.gatherNodeIds?.[0]);
           const p = game?.world?.player;
-          if (!mesh || !p) return;
+          if (!node || !p) return;
           if (opts.pickup) game.world.addItem(opts.pickup, 1);
           // The minimap variant stands off the vein so the lock-tinted marker
           // is not hidden under the player arrow at the map centre.
           const off = opts.standOff ? 14 : 2.5;
-          p.pos.x = mesh.position.x + off;
-          p.pos.y = mesh.position.y;
-          p.pos.z = mesh.position.z + off;
-          p.facing = Math.atan2(mesh.position.x - p.pos.x, mesh.position.z - p.pos.z);
-          window.__p12ShotNodeId = mesh.userData?.gatherNodeId ?? null;
+          p.pos.x = node.x + off;
+          p.pos.y = node.y;
+          p.pos.z = node.z + off;
+          p.facing = Math.atan2(node.x - p.pos.x, node.z - p.pos.z);
+          window.__p12ShotNodeId = node.id ?? null;
         },
         { pickup: variant?.pickup ?? null, standOff: Boolean(variant?.standOff) },
       );
@@ -2515,14 +2532,23 @@ export const TARGETS = [
           // listener lives on #game-canvas specifically (main.ts wiring).
           await page.evaluate(() => {
             const game = window.__game;
-            const mesh = (game?.renderer?.gatherNodeMeshes ?? []).find(
-              (m) => m.userData?.gatherNodeId === window.__p12ShotNodeId,
-            );
+            const meshes = game?.renderer?.gatherNodeMeshes ?? [];
+            let nodePos = null;
+            for (const m of meshes) {
+              const ids = m.userData?.gatherNodeIds;
+              const i = Array.isArray(ids) ? ids.indexOf(window.__p12ShotNodeId) : -1;
+              if (i !== -1) {
+                const e = m.instanceMatrix.array;
+                nodePos = { x: e[i * 16 + 12], y: e[i * 16 + 13], z: e[i * 16 + 14] };
+                break;
+              }
+            }
             const canvas = document.querySelector('#game-canvas');
             const cam = game?.renderer?.camera;
-            if (!mesh || !canvas || !cam) return;
-            const v = mesh.position.clone();
-            v.y += 0.4;
+            if (!nodePos || !canvas || !cam) return;
+            // Borrow a live Vector3 (the camera's clone) so the projection
+            // runs without importing THREE into the page context.
+            const v = cam.position.clone().set(nodePos.x, nodePos.y + 0.4, nodePos.z);
             v.project(cam);
             const rect = canvas.getBoundingClientRect();
             canvas.dispatchEvent(
@@ -3712,15 +3738,27 @@ export const TARGETS = [
       await page.evaluate(() => {
         const game = window.__game;
         const meshes = game?.renderer?.gatherNodeMeshes ?? [];
-        const mesh =
-          meshes.find((m) => m.userData?.gatherNodeId === 'ore_eastbrook_1') ?? meshes[0];
+        // Instanced batches (the v0.33.0 draw-call diet): resolve the vein to
+        // (batch, index) and read the instance matrix translation.
+        const byId = (id) => {
+          for (const m of meshes) {
+            const ids = m.userData?.gatherNodeIds;
+            const i = Array.isArray(ids) ? ids.indexOf(id) : -1;
+            if (i !== -1) {
+              const e = m.instanceMatrix.array;
+              return { id, x: e[i * 16 + 12], y: e[i * 16 + 13], z: e[i * 16 + 14] };
+            }
+          }
+          return null;
+        };
+        const node = byId('ore_eastbrook_1') ?? byId(meshes[0]?.userData?.gatherNodeIds?.[0]);
         const p = game?.world?.player;
-        if (!mesh || !p) return;
-        p.pos.x = mesh.position.x + 2.5;
-        p.pos.y = mesh.position.y;
-        p.pos.z = mesh.position.z + 2.5;
-        p.facing = Math.atan2(mesh.position.x - p.pos.x, mesh.position.z - p.pos.z);
-        window.__p12bShotNodeId = mesh.userData?.gatherNodeId ?? null;
+        if (!node || !p) return;
+        p.pos.x = node.x + 2.5;
+        p.pos.y = node.y;
+        p.pos.z = node.z + 2.5;
+        p.facing = Math.atan2(node.x - p.pos.x, node.z - p.pos.z);
+        window.__p12bShotNodeId = node.id ?? null;
       });
       await wait(1200);
       await page.evaluate(() => {

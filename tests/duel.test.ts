@@ -260,7 +260,10 @@ describe('duel end and live profession sessions', () => {
     sim.dealDamage(winner, loser, loser.hp + 500, false, 'physical', null, 'hit');
 
     expect(loser.hp).toBe(1);
-    expect((sim as any).duels.get(a)?.state ?? 'gone').not.toBe('active');
+    // The release/v0.33.0 duel-end contract defers the map delete to the
+    // tick-tail purge (endedTick), so consumers see the end through
+    // duelFor's null, never a deleted entry.
+    expect(sim.duelFor(a)).toBeNull();
     expect(loser.castingAbility).toBeNull();
     expect(loser.fishBiteAtTick).toBe(0);
     expect(loser.fishCastZoneId).toBe('');
@@ -288,8 +291,43 @@ describe('duel end and live profession sessions', () => {
     sim.dealDamage(winner, loser, loser.hp + 500, false, 'physical', null, 'hit');
 
     expect(loser.hp).toBe(1);
-    expect((sim as any).duels.get(a)?.state ?? 'gone').not.toBe('active');
+    // The release/v0.33.0 duel-end contract defers the map delete to the
+    // tick-tail purge (endedTick), so consumers see the end through
+    // duelFor's null, never a deleted entry.
+    expect(sim.duelFor(a)).toBeNull();
     expect(loser.castingAbility).toBe('frostbolt');
+  });
+
+  it('a same-tick reciprocal lethal exchange clamps and cancels BOTH duelists', () => {
+    // The v0.33.0 sync composed two independent changes on the clamp arm: the
+    // release widened its gate to admit a duel that ended EARLIER THIS TICK
+    // (endedTick === tickCount, the reciprocal-lethal fix) and the branch
+    // added the landed-hit session cancel inside the arm. Neither parent
+    // exercised the combination: the second blow of a reciprocal exchange
+    // must still clamp to 1 hp AND cancel the survivor's non-spell cast.
+    const { sim, a, b } = startedDuel();
+    const first = sim.entities.get(a);
+    const second = sim.entities.get(b);
+    if (!first || !second) throw new Error('missing duelist');
+    first.castingAbility = 'fishing';
+    first.castTotal = 15;
+    first.castRemaining = 15;
+    second.castingAbility = 'fishing';
+    second.castTotal = 15;
+    second.castRemaining = 15;
+
+    // Blow one ends the duel (endedTick stamps the current tick).
+    sim.dealDamage(first, second, second.hp + 500, false, 'physical', null, 'hit');
+    expect(second.hp).toBe(1);
+    expect(second.castingAbility).toBeNull();
+    expect(sim.duelFor(a)).toBeNull();
+
+    // Blow two, same tick, from the other duelist: the ended-this-tick duel
+    // still clamps (nobody dies to a duel), and the branch's cancel runs on
+    // this newly-admitted path too.
+    sim.dealDamage(second, first, first.hp + 500, false, 'physical', null, 'hit');
+    expect(first.hp).toBe(1);
+    expect(first.castingAbility).toBeNull();
   });
 
   it('a duelist SELF-sourced clamped tick does not end their own session', () => {

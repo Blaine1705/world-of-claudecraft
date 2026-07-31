@@ -1919,8 +1919,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // mints every rare-or-better output as a signed instance carrying
   // `{ signer: crafterName }`, and the slot copies that signer into the slot's
   // `craftedBy`, which is what the original-crafter recharge discount reads. A
-  // signed instance is also non-fungible, so charms move by player trade only
-  // (never the World Market, never mail). No Springback (quickening_charm)
+  // signed instance kept charms hand-to-hand under the pre-v0.33.0 exchange
+  // rules; since the v0.33.0 instanced exchange pipes (#2507) a signed copy
+  // lists on the World Market and mails like any instanced item, so restoring
+  // R45's hand-to-hand-only intent would need an explicit noMarketList or
+  // soulbound flag here (maintainer decision, flagged by the v0.33.0 merge
+  // audit). No Springback (quickening_charm)
   // item exists ON PURPOSE: the R9 slot policy refuses that effect everywhere,
   // and no path may mint what another path refuses (the craftable set is
   // derived from these defs against the policy in

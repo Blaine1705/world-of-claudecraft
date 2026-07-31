@@ -14,7 +14,9 @@ import { handleDevChat } from '../src/sim/dev_commands';
 import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { updatePortalTriggers } from '../src/sim/portals';
 import { startFishing } from '../src/sim/professions/fishing';
+import { moveToGraveyardForUnstuck } from '../src/sim/spirit';
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
+import { RIFT_EVENT_INSTANCE_CAP } from '../src/sim/rift/runs';
 import { Sim } from '../src/sim/sim';
 import { type Entity, FISHING_CAST_ID, GATHER_CAST_ID } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -342,5 +344,50 @@ describe('a /follow tow across a zone line cancels the session', () => {
     expect(follower.pos.z).toBeLessThan(180);
     expect(follower.castingAbility).toBe(FISHING_CAST_ID);
     expect(follower.fishCastZoneId).toBe('eastbrook_vale');
+  });
+});
+
+describe('the unstuck graveyard move is a displacement', () => {
+  it('cancels a session on the living-player unstuck teleport (doctrine: every teleport)', () => {
+    // The unstuck countdown gates reject a casting player, so a REAL session
+    // cannot reach moveToGraveyardForUnstuck today; the assigned-session
+    // fixture exists for exactly this shape, and the pin holds the v0.33.0
+    // path to the every-teleport doctrine so a future session state that
+    // stops riding castingAbility cannot slip through it.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const p = assignFishingSession(sim, pid);
+    sim.drainEvents();
+    moveToGraveyardForUnstuck(sim.ctx, pid);
+    expectSessionEnded(sim, p);
+  });
+});
+
+describe('a denied rift entry is not a displacement', () => {
+  it('a pool-full rift denial leaves a live gather session untouched', () => {
+    // The v0.33.0 sync composed the release's event-instance cap early
+    // return (src/sim/rift/runs.ts, enterRift) ahead of the branch's
+    // cancelProfessionSessionOnDisplacement call: a denied entrant was
+    // never displaced, so the cancel must NOT run. Fill the per-event cap,
+    // then have a live gatherer knock on the full pool.
+    const sim = new Sim({ seed: 4242, playerClass: 'warrior', autoEquip: true, riftPortals: true });
+    const pid = sim.playerId;
+    const fillers = Array.from({ length: RIFT_EVENT_INSTANCE_CAP }, (_, index) =>
+      sim.addPlayer('warrior', `Rifter${index}`),
+    );
+    for (const filler of fillers) sim.enterRift(424242, 20, filler);
+    const p = startGatherSession(sim, pid);
+    sim.drainEvents();
+    sim.enterRift(424242, 20, pid);
+    // The exact pool-denial line, so a different early return (a level gate,
+    // a distance gate) cannot green this test vacuously.
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'error',
+        pid,
+        text: 'All rifts are unstable right now. Try again soon.',
+      }),
+    );
+    expect(p.castingAbility).toBe(GATHER_CAST_ID);
   });
 });

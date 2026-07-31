@@ -173,6 +173,12 @@ export function moveToGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r || r.e.dead || r.e.ghost) return;
   const { meta, e: p } = r;
+  // The unstuck gates reject a casting player, so no live gather or fishing
+  // session can reach this today; the shared displacement teardown still
+  // runs because EVERY living-player teleport routes through it (the
+  // professions doctrine), keeping this path safe if a session state ever
+  // stops riding castingAbility.
+  cancelProfessionSessionOnDisplacement(ctx, p);
   // Resolve the graveyard before the move takes the player out of its instance band.
   const gy = ghostGraveyard(ctx, p);
   p.pos = ctx.groundPos(gy.x, gy.z);
