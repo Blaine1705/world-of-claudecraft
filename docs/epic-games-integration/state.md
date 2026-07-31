@@ -1,0 +1,179 @@
+# State: Epic Games Store integration (cross-phase cheat sheet)
+
+Current phase: Phase 1 complete. Next: Phase 2 (Epic packaging channel).
+
+Read this first in every session. Locked decisions below override memory and
+ad-hoc invention. Research background: `research-brief.md`.
+
+## Locked decisions
+
+- **D1 Steam-shaped channel.** Epic is a third `wocDesktop.distribution` value
+  (`website` | `steam` | `epic`). Same Electron codebase. No second game client.
+- **D2 No login with Epic.** Identity stays email + Discord only. An `epic_links`
+  row is a cosmetic mirror pointer for achievements (and optional future ownership
+  checks), never an identity or session source. Source-scan tests must pin this
+  the way `tests/server/steam_routes.test.ts` pins Steam.
+- **D3 Merge-safe dark default.** `EPIC_ENABLED` is off unless exactly `1`. With
+  the flag off: every `/api/epic/*` route answers `epic.disabled`, the mirror is
+  inert, `/api/status` advertises `epic: { enabled: false }`, and no client
+  renders Epic link UI. Missing product id, deployment id, or client credentials
+  never break server boot, website builds, steam builds, or the default test/CI
+  gate. This is the Steam `STEAM_ENABLED` pattern.
+- **D4 Updater off on epic.** `updaterAllowed` is true only for packaged
+  `website`. Epic builds force publish null and never self-update (Epic BPT owns
+  patches), same hard rule as Steam.
+- **D5 Wallet closed on epic.** `walletConnectionSupported` stays website-only
+  until a later product decision. Epic follows Steam here.
+- **D6 Platforms for EGS v1.** Windows + macOS only. Linux stays website + Steam.
+  Do not add a Linux epic depot, target, or store claim in this packet.
+- **D7 Packaging shape.** Epic channel builds use electron-builder `dir` targets
+  into `release-epic/` (mac universal `.app`, win x64 unpacked). Never upload
+  NSIS/DMG/AppImage as the Epic store binary. Website installers stay website-only.
+- **D8 Native EOS isolation.** EOS C SDK (or its thin adapter) ships only on the
+  epic channel package (`files` + `asarUnpack`), never on website or steam
+  artifacts. Unpackaged dev uses `WOC_EPIC_DEV=1` (and optional id env overrides)
+  the way `WOC_STEAM_DEV=1` works. Packaged builds ignore runtime env for channel.
+- **D9 Thin shell surface.** `electron/epic.cjs` is the ONLY desktop Epic surface:
+  capability probe + mint link proof + settle/cancel cleanup. Injectable loader
+  for tests. Never throws across IPC (null on every failure path).
+- **D10 Server module layout.** `server/epic/` mirrors `server/steam/`:
+  `config.ts`, `ticket.ts` (pure), `web_api.ts` (fetch shell), `epic_db.ts`,
+  `routes.ts`, `mirror.ts`, `achievement_map.ts`, `index.ts` (routes only for
+  registry). Everything else imports concrete modules, not the barrel.
+- **D11 Token trust chain.** Server verifies the posted proof upstream and
+  extracts the Epic account id. Client-supplied Epic ids are never trusted.
+  VAC-style ban refusal mirrors Steam when the upstream reports a blocked account.
+- **D12 Reclaim by proof.** If a fresh verified proof shows an Epic account currently
+  linked to another WoCC account, displace the old row (Steam
+  `displaceSteamLink` pattern). True owner of the Epic login wins in steady state.
+- **D13 Achievement mirror is observer-only.** Sim decides deed unlocks. Server
+  records them. Epic mirror copies outward fire-and-forget. Never grant, deny, or
+  reorder a deed. World loop never awaits mirror IO.
+- **D14 Achievement IDs permanent.** Mapped EOS/EGS achievement names may be
+  added, never renamed or reused once shipped (Steam ACH rule).
+- **D15 Env keys (server runtime).**
+  - `EPIC_ENABLED` (exactly `1` to light the surface)
+  - `EPIC_PRODUCT_ID`
+  - `EPIC_SANDBOX_ID` (if required by the chosen verify path)
+  - `EPIC_DEPLOYMENT_ID`
+  - `EPIC_CLIENT_ID`
+  - `EPIC_CLIENT_SECRET` (server only, never logged)
+  Names may gain a `WOC_` prefix only if an existing collision forces it; prefer
+  the short forms above for parity with `STEAM_*`. Document finals in DEPLOY.md
+  when Phase 8 lands.
+- **D16 Env keys (desktop build / dev).**
+  - Build stamp for epic channel: product/deployment/client ids needed to init EOS
+    in a packaged epic build (refuse to package epic without them, like
+    `WOC_STEAM_APP_ID` for steam)
+  - Unpackaged only: `WOC_DISTRIBUTION=epic`, `WOC_EPIC_DEV=1`, optional id
+    overrides
+  Website builds never require any Epic env.
+- **D17 Routes (registry-only, no legacy ladder twin).**
+  - `POST /api/epic/link` (body proof)
+  - `DELETE /api/epic/link`
+  - `GET /api/epic/status`
+  Feature gate FIRST (before auth). Link mutations use an `ip+account` rate
+  policy twin of `STEAM_LINK_POLICY`.
+- **D18 Status advert.** `/api/status` gains `epic: { enabled: boolean }` beside
+  `steam`. RouteDef status path reads live `epicEnabled()`. Legacy arm hardcodes
+  `enabled: false` if that is the Steam pattern still in force (keep parity with
+  how steam is advertised on each arm).
+- **D19 DDL.** Additive `epic_links` table in `server/db.ts` SCHEMA
+  (`account_id` PK, `epic_account_id` TEXT UNIQUE, timestamps as Steam). Applied
+  every boot under existing advisory lock. Empty table when feature is dark is fine.
+- **D20 EOS adapter strategy.** Prefer a thin main-process adapter with injectable
+  `requireEos` (or equivalent). Do not add a heavy framework. A third-party npm
+  EOS package is allowed only if it is maintained, license-clean, and still
+  channel-isolated; default plan is FFI/N-API over the official C SDK. If the SDK
+  cannot be vendored yet, the shell still lands with fakes and degrades to null
+  without the native lib (merge-safe).
+- **D21 Dual mirror fan-out.** Deed recording and login reconcile call Steam and
+  Epic observers independently. Either may be dark. One outage must not block the
+  other. Prefer two direct imports (not a shared mega-bus) unless a third store
+  appears.
+- **D22 i18n.** Every new player-visible string is a catalog `t()` key (English
+  only from contributors). No `?? 'English'` fallbacks. S3 guard
+  (`tests/localization_fixes.test.ts`) must stay green.
+- **D23 Copy rules.** No em dashes, en dashes, or emojis in code, comments, docs,
+  commits, or player-facing copy.
+- **D24 Zero new runtime deps on the website/steam paths.** Epic-only optional
+  packaging deps are fine. Do not force EOS into default `npm ci` consumers that
+  never build epic if it can be avoided (optionalDependency or build-time fetch).
+- **D25 BPT is ops, not gameplay.** BuildPatchTool upload scripts and portal
+  checklists land with packaging/docs phases. They are not required for server
+  merge safety.
+- **D26 Portal work is parallel.** Epic org, product creation, IARC, store page,
+  and credentials proceed in parallel with coding. Phases must not block on them
+  except final store submission smoke.
+
+## Non-negotiable constraints
+
+- `src/sim/` stays free of Epic, Steam, Electron, DOM, and network SDK imports.
+  Achievements remain deeds in sim; mirrors are server-side observers only.
+- Server authority: client never decides link validity or achievement unlocks.
+- Secrets never committed; never logged (URLs that embed secrets, response bodies).
+- Module-first: no growing `electron/main.cjs` or `src/main.ts` with Epic logic
+  banks. Thin wiring only.
+- New REST endpoints are RouteDefs in the registry, never inline in `server/main.ts`.
+- Parameterized SQL only.
+- Conventional Commits with scope and body; explicit paths when committing.
+
+## Validation matrix (pick rows that match the diff)
+
+| When the diff touches | Run |
+|---|---|
+| `electron/desktop_config.cjs` or builder scripts | `npx vitest run tests/electron_desktop_config.test.ts tests/electron_builder_config.test.ts` |
+| `electron/epic.cjs` / preload / main IPC | `npx vitest run tests/electron_epic.test.ts tests/electron_ipc_channels.test.ts` (names as created) |
+| `server/epic/**` | `npx vitest run tests/server/epic_*.test.ts` plus any shared http spine tests touched |
+| DDL / `epic_links` | migration-safety review + `tests/server/epic_db.test.ts` |
+| UI / i18n | `npx vitest run tests/epic_link.test.ts tests/localization_fixes.test.ts` |
+| Any of the above near done | `npx tsc --noEmit`, `npm run ci:changed`, scoped biome write on touched files |
+| Phase complete / packet close | matching rows + `npm run gate` |
+
+## Key file paths (existing anchors)
+
+Desktop:
+
+- `electron/desktop_config.cjs`, `electron/steam.cjs`, `electron/main.cjs`, `electron/preload.cjs`
+- `scripts/electron-build.mjs`, `scripts/electron-builder-config.mjs`
+- `docs/desktop-release.md`
+
+Server Steam twin (copy shape, do not edit unless dual-wiring requires it):
+
+- `server/steam/` entire directory
+- `server/deeds_records.ts` (observer hook)
+- `server/game.ts` (`reconcileOnLogin`)
+- `server/leaderboard.ts` (status advert)
+- `server/db.ts` (`steam_links` DDL exemplar)
+- `server/http/registry.ts`, `server/http/error_codes.ts`
+
+Client:
+
+- `src/ui/steam_link.ts`, `src/runtime.ts` (`DesktopBridge`)
+- `tests/steam_link.test.ts`, `tests/electron_steam.test.ts`
+
+## Created by this packet
+
+(Update as phases land.)
+
+- Modules: none yet (Phase 1 extended existing `electron/desktop_config.cjs` only)
+- Tests: epic pins in `tests/electron_desktop_config.test.ts` and allow-list
+  acceptance in `tests/electron_builder_config.test.ts`
+- Env keys: none yet (planned in D15/D16). Unpackaged `WOC_DISTRIBUTION=epic`
+  works for dev; packaged stamp wins (same hatch rule as steam)
+- Builder note: `scripts/electron-builder-config.mjs` and
+  `scripts/electron-build.mjs` accept `epic` on the distribution allow-list so
+  pure config construction does not throw. Full packaging (publish null,
+  `release-epic/`, Win+Mac dir targets, EOS id stamps) is Phase 2.
+- Docs: this directory
+
+## Open items (do not invent answers mid-phase)
+
+- O1 Exact EOS verify Web API endpoints and claim field names for the link proof
+  (confirm against current Epic docs when implementing Phase 4/5; pin literals in tests).
+- O2 Whether achievement unlocks use EOS SDK server client, Web API, or both
+  (Phase 6 chooses based on current official docs; prefer the server-trusted path).
+- O3 Vendor vs download path for EOS C SDK binaries in CI (Phase 2/4).
+- O4 Final portal artifact naming for Mac (universal vs per-arch) once the product exists.
+- O5 Whether a public status page or support URL must appear in the EGS store listing
+  (ops, not code).

@@ -12,20 +12,22 @@ import {
 } from './electron-builder-config.mjs';
 import { buildElectronVendor } from './electron-vendor.mjs';
 
-// Usage: node scripts/electron-build.mjs [pack|build] [website|steam]
+// Usage: node scripts/electron-build.mjs [pack|build] [website|steam|epic]
 //  - pack: --dir only (fast local verification); build: full installers.
 //  - website (default): the direct-download channel; keeps the publish feed, so
 //    the packaged app self-updates via electron-updater.
 //  - steam: the SteamPipe channel; publish nulled, 'dir' targets per OS, output
 //    in release-steam/, and the runtime stamp turns the in-app updater OFF
 //    (Steam depots are the only update path there; see docs/desktop-release.md).
+//  - epic: Epic Games Store channel stamp; packaging details (release-epic/,
+//    dir targets, EOS id stamps) land with the dedicated epic packaging phase.
 const mode = process.argv[2] ?? 'build';
 if (!['pack', 'build'].includes(mode)) {
   console.error(`unknown electron build mode: ${mode}`);
   process.exit(1);
 }
 const distribution = process.argv[3] ?? 'website';
-if (!['website', 'steam'].includes(distribution)) {
+if (!['website', 'steam', 'epic'].includes(distribution)) {
   console.error(`unknown desktop distribution: ${distribution}`);
   process.exit(1);
 }

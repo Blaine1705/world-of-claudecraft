@@ -20,6 +20,10 @@
 //    has nothing to read even if it were reached), and every OS targets 'dir'
 //    because SteamPipe depots upload the loose installed layout (mac: the
 //    signed .app; win: win-unpacked; linux: linux-unpacked), never installers.
+//  - epic: recognized as a first-class channel stamp (distribution: 'epic');
+//    full packaging (publish null, release-epic/, Win+Mac dir targets, EOS id
+//    stamps) lands in the Epic packaging phase. Until then, basic config
+//    construction succeeds so pure tests can pin the stamp without Epic env.
 //  - windows signing: two routes, each injected only when the caller resolved
 //    a complete credential set from the environment, so unsigned local builds
 //    never trip the signing step. Azure Trusted Signing (WIN_SIGN_*) injects
@@ -99,7 +103,7 @@ export function desktopBuilderConfig({
   steamAppId = '',
   steamworksInstalled = null,
 }) {
-  if (distribution !== 'website' && distribution !== 'steam') {
+  if (distribution !== 'website' && distribution !== 'steam' && distribution !== 'epic') {
     throw new Error(`unknown desktop distribution: ${distribution}`);
   }
   const config = structuredClone(base);
