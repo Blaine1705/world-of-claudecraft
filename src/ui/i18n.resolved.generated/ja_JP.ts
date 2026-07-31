@@ -2861,7 +2861,7 @@ export const ja_JP: EnTranslations = {
       "lbSelfAccount": "あなたのアカウント：{rank} 位（上位 {percent}%）、名声 {renown}",
       "lbSelfRank": "あなたのアカウント：{rank} 位（上位 {percent}%）",
       "lbEmpty": "ランク入りした年代記作家はまだいません。",
-      "broadcastsLabel": "功績の達成と傑作をギルドメンバー、フォロワー、Discordフィードに共有する",
+      "broadcastsLabel": "功績の達成をギルドメンバーとフォロワーに、功績と傑作のカードをDiscordフィードに共有する",
       "titledName": "{name}【{title}】"
     },
     "continentMap": {

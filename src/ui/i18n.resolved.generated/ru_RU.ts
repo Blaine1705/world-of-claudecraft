@@ -2861,7 +2861,7 @@ export const ru_RU: EnTranslations = {
       "lbSelfAccount": "Ваша учётная запись: место {rank}, лучшие {percent} процентов, Известность {renown}",
       "lbSelfRank": "Ваша учётная запись: место {rank}, лучшие {percent} процентов",
       "lbEmpty": "В рейтинге пока нет летописцев.",
-      "broadcastsLabel": "Делиться деяниями и шедеврами с согильдейцами, подписчиками и лентой Discord",
+      "broadcastsLabel": "Делиться деяниями с согильдейцами и подписчиками, а карточками деяний и шедевров с лентой Discord",
       "titledName": "{name} [{title}]"
     },
     "continentMap": {

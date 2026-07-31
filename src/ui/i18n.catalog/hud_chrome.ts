@@ -3477,9 +3477,10 @@ export const hudChromeStrings = {
     // The options-window account row (accounts.deed_broadcasts): whether a
     // marquee unlock is shared with guildmates and followers, AND whether the
     // Discord activity feed posts the account's deed and masterwork cards
-    // (R58: one consent flag gates all three surfaces).
+    // (R58: one consent flag gates all three surfaces; masterwork cards go
+    // ONLY to Discord, so the label keeps the two audiences distinct).
     broadcastsLabel:
-      'Share deed unlocks and masterworks with guildmates, followers, and the Discord feed',
+      'Share deed unlocks with guildmates and followers, and deed and masterwork cards with the Discord feed',
     // The name-plus-title display pattern every titled surface composes
     // through (chat sender, target frame): the bracket decoration and its
     // placement around the name live HERE so a locale owns both. Non-wordy
