@@ -47,6 +47,17 @@
     }),
   );
 
+  // The roster count is what the header is about, but with a search on it would sit
+  // above a shorter table, so a filtered view says both numbers.
+  let count = $derived(
+    view.total === players.length
+      ? t('onlinePlayers.count', { count: fmtNumber(players.length) })
+      : t('onlinePlayers.countFiltered', {
+          shown: fmtNumber(view.total),
+          total: fmtNumber(players.length),
+        }),
+  );
+
   async function refresh(): Promise<void> {
     const currentRequest = ++requestId;
     try {
@@ -101,7 +112,7 @@
       }}
       aria-label={t('onlinePlayers.searchLabel')}
     />
-    <span class="text-dim">{t('onlinePlayers.count', { count: fmtNumber(players.length) })}</span>
+    <span class="text-dim">{count}</span>
     <span class="text-dim">{t('onlinePlayers.sortHint')}</span>
     <AutoRefreshToggle
       checked={autoRefresh}

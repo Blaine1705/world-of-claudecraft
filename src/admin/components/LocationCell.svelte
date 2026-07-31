@@ -35,24 +35,45 @@
   function close(): void {
     placement = null;
   }
+
+  function onKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') close();
+  }
+
+  // Placed once, against the viewport: a scroll that does not also fire pointerleave
+  // (the page scrolling under a stationary pointer, or the table's own scroller) would
+  // leave the tooltip floating away from its anchor, so scrolling dismisses it instead.
+  // Capture phase, because a scroll inside a nested scroller never bubbles to window.
+  $effect(() => {
+    if (!placement) return;
+    window.addEventListener('scroll', close, true);
+    window.addEventListener('resize', close);
+    return () => {
+      window.removeEventListener('scroll', close, true);
+      window.removeEventListener('resize', close);
+    };
+  });
 </script>
 
 <span
   class="location-cell"
-  role="note"
+  role="button"
+  tabindex="0"
   bind:this={cell}
   aria-label={accessible}
   onpointerenter={open}
   onpointerleave={close}
   onfocusin={open}
   onfocusout={close}
+  onkeydown={onKeydown}
 >
   <span class="location-coords">{display.secondary}</span>
   {#if placement}
     <span
       class="location-tooltip"
       class:above={placement.side === 'above'}
-      style="right: {placement.right}px; {placement.side === 'above'
+      style="right: {placement.right}px; --arrow-right: {placement.arrowRight}px; {placement.side ===
+      'above'
         ? `bottom: ${placement.offset}px`
         : `top: ${placement.offset}px`}"
     >
@@ -70,6 +91,11 @@
     align-items: flex-end;
     min-width: 78px;
     cursor: help;
+  }
+
+  .location-cell:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
   }
 
   .location-coords {
@@ -99,7 +125,7 @@
     content: "";
     position: absolute;
     top: -5px;
-    right: 14px;
+    right: var(--arrow-right, 14px);
     width: 8px;
     height: 8px;
     background: var(--surface-sunken);

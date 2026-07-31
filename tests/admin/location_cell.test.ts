@@ -3,7 +3,8 @@ import './_setup';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fireEvent, render, screen } from '@testing-library/svelte';
-import { describe, expect, it } from 'vitest';
+import { tick } from 'svelte';
+import { describe, expect, it, vi } from 'vitest';
 import LocationCell from '../../src/admin/components/LocationCell.svelte';
 import { t } from '../../src/admin/i18n';
 
@@ -47,20 +48,98 @@ describe('LocationCell', () => {
     // from the source below.
     expect(tooltip.getAttribute('style')).toMatch(/right: \d+px/);
     expect(tooltip.getAttribute('style')).toMatch(/(top|bottom): \d+px/);
+    // The arrow rides on the same computation, so it keeps pointing at the cell when
+    // an edge guard moves the tooltip off its right-aligned position.
+    expect(tooltip.getAttribute('style')).toMatch(/--arrow-right: \d+px/);
 
     await fireEvent.pointerLeave(cell);
     expect(container.querySelector('.location-tooltip')).toBeNull();
   });
 
-  it('opens and closes on keyboard focus too', async () => {
+  it('takes focus from the keyboard, and opens and closes the details on it', async () => {
     const { container } = render(LocationCell, { location: null, x: 5, z: 6, zone: 'greenhollow' });
-    const cell = container.querySelector('.location-cell');
+    const cell = container.querySelector<HTMLElement>('.location-cell');
     if (!cell) throw new Error('location cell not found');
 
-    await fireEvent.focusIn(cell);
+    // The cell renders only text, so without a tabindex of its own nothing here can
+    // ever take focus and focusin never fires from real keyboard navigation. Driving
+    // the tooltip through a REAL focus() is what makes the rest of this case mean
+    // anything: a dispatched focusin would pass against a cell no one can tab to.
+    expect(cell.tabIndex).toBe(0);
+    cell.focus();
+    expect(document.activeElement).toBe(cell);
+    await tick();
     expect(container.querySelector('.location-tooltip')).not.toBeNull();
-    await fireEvent.focusOut(cell);
+
+    cell.blur();
+    await tick();
     expect(container.querySelector('.location-tooltip')).toBeNull();
+  });
+
+  it('dismisses the details on Escape, which is the only way out for a focused cell', async () => {
+    const { container } = render(LocationCell, {
+      location: dungeon,
+      x: 1,
+      z: 2,
+      zone: 'shadowfen',
+    });
+    const cell = container.querySelector<HTMLElement>('.location-cell');
+    if (!cell) throw new Error('location cell not found');
+
+    cell.focus();
+    await tick();
+    expect(container.querySelector('.location-tooltip')).not.toBeNull();
+
+    await fireEvent.keyDown(cell, { key: 'Escape' });
+    expect(container.querySelector('.location-tooltip')).toBeNull();
+    // Escape dismisses the tooltip without stealing focus off the cell.
+    expect(document.activeElement).toBe(cell);
+  });
+
+  it('dismisses the details on scroll and resize, so a fixed tooltip cannot drift', async () => {
+    const { container } = render(LocationCell, {
+      location: dungeon,
+      x: 1,
+      z: 2,
+      zone: 'shadowfen',
+    });
+    const cell = container.querySelector<HTMLElement>('.location-cell');
+    if (!cell) throw new Error('location cell not found');
+
+    await fireEvent.pointerEnter(cell);
+    expect(container.querySelector('.location-tooltip')).not.toBeNull();
+    // Dispatched on the cell, and a scroll event does not bubble: only a CAPTURE
+    // listener on window sees it, which is what covers the table's own scroller.
+    cell.dispatchEvent(new Event('scroll'));
+    await tick();
+    expect(container.querySelector('.location-tooltip')).toBeNull();
+
+    await fireEvent.pointerEnter(cell);
+    expect(container.querySelector('.location-tooltip')).not.toBeNull();
+    window.dispatchEvent(new Event('resize'));
+    await tick();
+    expect(container.querySelector('.location-tooltip')).toBeNull();
+  });
+
+  it('stops listening for scroll once the details are closed', async () => {
+    const removed = new Set<string>();
+    const spy = vi.spyOn(window, 'removeEventListener');
+    const { container, unmount } = render(LocationCell, {
+      location: dungeon,
+      x: 1,
+      z: 2,
+      zone: 'shadowfen',
+    });
+    const cell = container.querySelector<HTMLElement>('.location-cell');
+    if (!cell) throw new Error('location cell not found');
+
+    await fireEvent.pointerEnter(cell);
+    await fireEvent.pointerLeave(cell);
+    await tick();
+    for (const call of spy.mock.calls) removed.add(String(call[0]));
+    expect(removed).toEqual(new Set(['scroll', 'resize']));
+    unmount();
+    spy.mockRestore();
   });
 
   it('positions the tooltip fixed, out of any scroll container it renders inside', () => {

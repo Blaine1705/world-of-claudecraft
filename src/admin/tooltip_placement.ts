@@ -9,6 +9,12 @@ export interface TooltipPlacement {
   right: number;
   /** `top` (below) or `bottom` (above) offset, in px from that viewport edge. */
   offset: number;
+  /**
+   * The arrow's `right` offset, in px from the tooltip's own right edge. It tracks
+   * whatever the edge guards did to `right`, so the arrow keeps pointing at the anchor
+   * instead of at a fixed spot the clamped tooltip no longer sits under.
+   */
+  arrowRight: number;
 }
 
 export interface TooltipViewport {
@@ -30,6 +36,10 @@ const MARGIN = 8;
 const MIN_WIDTH = 210;
 /** Room a full details list needs; below this the tooltip flips above the anchor. */
 const ESTIMATED_HEIGHT = 150;
+/** Where the arrow sits when nothing is clamped: inset from the tooltip's right edge. */
+const ARROW_INSET = 14;
+/** The arrow's rendered size, and the inset that keeps a shifted one inside the box. */
+const ARROW_SIZE = 8;
 
 export function tooltipPlacement(
   anchor: TooltipAnchor,
@@ -41,9 +51,16 @@ export function tooltipPlacement(
   const widest = Math.max(MARGIN, viewport.width - MIN_WIDTH - MARGIN);
   const right = Math.min(Math.max(rightAligned, MARGIN), widest);
 
+  // Whatever those guards took off `right`, the arrow gives back, so it still points
+  // at the anchor; the clamp keeps it inside a tooltip at its min-width.
+  const arrowRight = Math.min(
+    Math.max(ARROW_INSET + rightAligned - right, ARROW_SIZE),
+    MIN_WIDTH - ARROW_SIZE - ARROW_SIZE,
+  );
+
   const roomBelow = viewport.height - anchor.bottom;
   if (roomBelow >= ESTIMATED_HEIGHT + GAP) {
-    return { side: 'below', right, offset: anchor.bottom + GAP };
+    return { side: 'below', right, arrowRight, offset: anchor.bottom + GAP };
   }
-  return { side: 'above', right, offset: viewport.height - anchor.top + GAP };
+  return { side: 'above', right, arrowRight, offset: viewport.height - anchor.top + GAP };
 }

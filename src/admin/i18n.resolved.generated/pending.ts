@@ -13,6 +13,7 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -24,6 +25,7 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -35,6 +37,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -46,6 +49,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -58,6 +62,7 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -69,6 +74,7 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -80,6 +86,7 @@ export const pending: Record<string, readonly string[]> = {
   "zh_CN": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -91,6 +98,7 @@ export const pending: Record<string, readonly string[]> = {
   "zh_TW": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -102,6 +110,7 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -113,6 +122,7 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -124,6 +134,7 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -135,6 +146,7 @@ export const pending: Record<string, readonly string[]> = {
   "ru_RU": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -146,6 +158,7 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -157,6 +170,7 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -168,6 +182,7 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -179,6 +194,7 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -190,6 +206,7 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -201,6 +218,7 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -212,6 +230,7 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",
@@ -223,6 +242,7 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "onlinePlayers.autoRefresh",
     "onlinePlayers.count",
+    "onlinePlayers.countFiltered",
     "onlinePlayers.filteredEmpty",
     "onlinePlayers.loadFailed",
     "onlinePlayers.loading",

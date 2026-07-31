@@ -110,9 +110,18 @@ describe('Online players page', () => {
     await fireEvent.input(search, { target: { value: 'Belegorn' } });
     expect(screen.queryByText('Aragorn')).not.toBeInTheDocument();
     expect(screen.getByText('Belegorn')).toBeInTheDocument();
+    // A filtered header naming only the roster size would read "2 online" above one
+    // row, so it names both numbers instead.
+    expect(screen.queryByText(t('onlinePlayers.count', { count: '2' }))).not.toBeInTheDocument();
+    expect(
+      screen.getByText(t('onlinePlayers.countFiltered', { shown: '1', total: '2' })),
+    ).toBeInTheDocument();
 
     await fireEvent.input(search, { target: { value: 'nobody-here' } });
     expect(screen.getByText(t('onlinePlayers.filteredEmpty'))).toBeInTheDocument();
+    expect(
+      screen.getByText(t('onlinePlayers.countFiltered', { shown: '0', total: '2' })),
+    ).toBeInTheDocument();
     // Filtering is local: no extra request goes out for a keystroke.
     expect(mocks.apiGet).toHaveBeenCalledTimes(1);
   });

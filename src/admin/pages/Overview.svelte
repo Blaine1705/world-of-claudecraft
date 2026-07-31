@@ -22,7 +22,7 @@
   import StatCard from '../components/StatCard.svelte';
   import BarChart from '../components/BarChart.svelte';
   import LineChart from '../components/LineChart.svelte';
-  
+
   // Operational overview: live server stats (5s) plus activity charts (60s). The
   // account, character and online-roster browsers live on their dedicated Players
   // pages.
