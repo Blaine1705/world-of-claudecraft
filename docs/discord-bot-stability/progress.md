@@ -297,9 +297,15 @@ the env, server, bot and client builds. The full suite is 23065 passed with exac
 failures, both proven environmental in that same clean copy: `tests/malware_scan.test.ts`
 (the same foreign worktree, and it PASSES in the clean copy) and `tests/texture_upload.test.ts`
 (the known Three.js version-pin drift, which fails in the clean copy too and on the
-pre-phase base). No `src/` file is touched by this packet. `.env.example` could not be
-re-verified by the QA session: every `.env*` path stays denied at the harness level, so
-R8 is carried on the Phase 2 record and the four keys were not re-read here.
+pre-phase base). No `src/` file is touched by this packet.
+
+R8 is VERIFIED, not merely carried forward. Every `.env*` path stays denied to the agent at
+the harness level, so the check ran as a user-issued shell command instead, and all four keys
+are present as commented entries on consecutive lines carrying the defaults the module
+exports: `#DISCORD_MAX_RPS=8`, `#DISCORD_BAN_PAUSE_MS=600000`, `#DISCORD_BREAKER_LIMIT=300`,
+`#DISCORD_FORBIDDEN_TTL_MS=86400000`. Each matches its `DEFAULT_*` constant in
+`bot/rate_governor.ts`, which is the pairing worth checking: a documented default that had
+drifted from the code would be worse than no documentation at all.
 
 Mutation tally: 44 mutants across three rounds, in an ISOLATED worktree detached at the
 phase tip, all NEW beyond the 15 Phase 2 planted itself. Every run proved the patch
