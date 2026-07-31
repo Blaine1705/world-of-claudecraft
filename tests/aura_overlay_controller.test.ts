@@ -2,7 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import type { ResolvedAbility } from '../src/sim/sim';
-import { defaultAuraOverlayConfig } from '../src/ui/aura_overlay_config';
+import { AuraOverlayConfigStore, defaultAuraOverlayConfig } from '../src/ui/aura_overlay_config';
 import { AuraOverlayController } from '../src/ui/aura_overlay_controller';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 
@@ -670,6 +670,35 @@ describe('AuraOverlayController setup preview', () => {
       id: 'raised_guard',
       visible: false,
     });
+  });
+
+  it('does not republish unchanged ground-ring state on every frame', () => {
+    const paintGroundRings = vi.fn();
+    const getConfig = vi.spyOn(AuraOverlayConfigStore.prototype, 'get');
+    const controller = new AuraOverlayController({
+      doc: document,
+      writers,
+      playerClass: 'warrior',
+      playerName: 'Raido',
+      known: () => known('revenge'),
+      iconUrl: (id) => `/icons/${id}.png`,
+      paintGroundRings,
+    });
+    getConfig.mockClear();
+
+    controller.paint([]);
+    expect(paintGroundRings).toHaveBeenCalledTimes(1);
+    expect(getConfig).not.toHaveBeenCalled();
+    controller.paint([]);
+    expect(paintGroundRings).toHaveBeenCalledTimes(1);
+    expect(getConfig).not.toHaveBeenCalled();
+
+    controller.setAll(true);
+    controller.patch('revenge_free', { showGroundRing: true });
+    controller.paint([{ id: 'revenge_free', kind: 'revenge_free' } as never]);
+    expect(paintGroundRings).toHaveBeenCalledTimes(2);
+    controller.paint([{ id: 'revenge_free', kind: 'revenge_free' } as never]);
+    expect(paintGroundRings).toHaveBeenCalledTimes(2);
   });
 
   it('moves spells between visual ring and crescent slots when reordered', () => {

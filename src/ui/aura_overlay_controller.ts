@@ -54,6 +54,8 @@ export interface AuraOverlayControllerDeps {
 export class AuraOverlayController {
   private readonly root: HTMLElement;
   private readonly store: AuraOverlayConfigStore;
+  private readonly configById = new Map<AuraOverlayProcId, AuraOverlayConfig>();
+  private layout: AuraOverlayLayoutConfig;
   private readonly targets: AuraOverlayPaintTarget[] = [];
   private readonly targetById = new Map<AuraOverlayProcId, AuraOverlayPaintTarget>();
   private readonly painter: AuraOverlayPainter;
@@ -61,6 +63,8 @@ export class AuraOverlayController {
   private talentAllocation: TalentAllocation | undefined;
   private currentDefs: readonly AuraOverlayProcDef[] = [];
   private orderedGroundDefs: readonly AuraOverlayProcDef[] = [];
+  private readonly groundRingStates: AuraGroundRingState[] = [];
+  private groundRingsInitialized = false;
   private readonly positionListeners = new Set<
     (id: AuraOverlayProcId, config: AuraOverlayConfig) => void
   >();
@@ -80,6 +84,7 @@ export class AuraOverlayController {
   constructor(private readonly deps: AuraOverlayControllerDeps) {
     const doc = deps.doc ?? document;
     this.store = new AuraOverlayConfigStore(`${deps.playerClass}:${deps.playerName}`);
+    this.layout = this.store.getLayout();
     this.root = doc.createElement('div');
     this.root.id = 'aura-overlays';
     this.root.setAttribute('aria-hidden', 'true');
@@ -87,6 +92,21 @@ export class AuraOverlayController {
     this.painter = new AuraOverlayPainter(deps.writers, this.targets);
     this.syncLoadout();
     doc.body.appendChild(this.root);
+  }
+
+  private config(id: AuraOverlayProcId): AuraOverlayConfig {
+    let config = this.configById.get(id);
+    if (!config) {
+      config = this.store.get(id);
+      this.configById.set(id, config);
+    }
+    return config;
+  }
+
+  private patchConfig(id: AuraOverlayProcId, patch: AuraOverlayPatch): AuraOverlayConfig {
+    const config = this.store.patch(id, patch);
+    this.configById.set(id, config);
+    return config;
   }
 
   private syncLoadout(): void {
@@ -150,7 +170,7 @@ export class AuraOverlayController {
       if (this.placement?.id !== def.id || this.placement.part !== 'icon') return;
       this.startDrag(event, def.id, this.placement.part, moveHandle);
     });
-    this.apply(def.id, el, this.store.get(def.id));
+    this.apply(def.id, el, this.config(def.id));
     return { def, el, timer };
   }
 
@@ -167,8 +187,8 @@ export class AuraOverlayController {
     if (bounds.width <= 0 || bounds.height <= 0) return;
     let closest: { id: AuraOverlayProcId; distance: number } | null = null;
     for (const def of this.currentDefs) {
-      const cfg = this.store.get(def.id);
-      const scale = cfg.arcsScale * this.store.getLayout().crescentBlockScale;
+      const cfg = this.config(def.id);
+      const scale = cfg.arcsScale * this.layout.crescentBlockScale;
       const centerX = bounds.left + 0.5 * bounds.width;
       const centerY = bounds.top + 0.56 * bounds.height;
       const localX = (event.clientX - centerX) / scale;
@@ -211,7 +231,7 @@ export class AuraOverlayController {
     const move = (next: PointerEvent): void => {
       const posX = snapPosition((next.clientX - bounds.left) / bounds.width);
       const posY = snapPosition((next.clientY - bounds.top) / bounds.height);
-      const cfg = this.store.patch(id, { iconPosX: posX, iconPosY: posY });
+      const cfg = this.patchConfig(id, { iconPosX: posX, iconPosY: posY });
       const frame = this.targetById.get(id)?.el;
       if (frame) this.apply(id, frame, cfg);
       this.emitPosition(id, cfg);
@@ -232,7 +252,7 @@ export class AuraOverlayController {
   }
 
   private apply(id: AuraOverlayProcId, el: HTMLElement, cfg: AuraOverlayConfig): void {
-    const arcsScale = cfg.arcsScale * this.store.getLayout().crescentBlockScale;
+    const arcsScale = cfg.arcsScale * this.layout.crescentBlockScale;
     el.classList.toggle('disabled', !cfg.enabled);
     el.classList.toggle('hide-icon', !cfg.showIcon);
     el.classList.toggle('hide-arcs', !cfg.showArcs);
@@ -251,24 +271,24 @@ export class AuraOverlayController {
   }
 
   get(id: AuraOverlayProcId): AuraOverlayConfig {
-    return this.store.get(id);
+    return { ...this.config(id) };
   }
 
   getLayout(): AuraOverlayLayoutConfig {
-    return this.store.getLayout();
+    return { ...this.layout };
   }
 
   patchLayout(patch: AuraOverlayLayoutPatch): void {
-    this.store.patchLayout(patch);
+    this.layout = this.store.patchLayout(patch);
     for (const target of this.targets) {
-      this.apply(target.def.id, target.el, this.store.get(target.def.id));
+      this.apply(target.def.id, target.el, this.config(target.def.id));
     }
   }
 
   patch(id: AuraOverlayProcId, patch: AuraOverlayPatch): void {
     const target = this.targets.find((item) => item.def.id === id);
     if (target) {
-      const cfg = this.store.patch(id, patch);
+      const cfg = this.patchConfig(id, patch);
       this.apply(id, target.el, cfg);
       if (patch.groundOrder !== undefined) this.refreshGroundOrder();
       if (patch.iconPosX !== undefined || patch.iconPosY !== undefined) {
@@ -282,7 +302,7 @@ export class AuraOverlayController {
     for (const def of this.currentDefs) {
       const target = this.targetById.get(def.id);
       if (!target) continue;
-      const cfg = this.store.patch(def.id, { enabled });
+      const cfg = this.patchConfig(def.id, { enabled });
       this.apply(def.id, target.el, cfg);
     }
   }
@@ -290,9 +310,9 @@ export class AuraOverlayController {
   reset(id: AuraOverlayProcId): void {
     const target = this.targets.find((item) => item.def.id === id);
     if (target) {
-      this.store.resetPosition(id);
+      this.configById.set(id, this.store.resetPosition(id));
       this.normalizeGroundOrder();
-      const cfg = this.store.get(id);
+      const cfg = this.config(id);
       this.apply(id, target.el, cfg);
       this.refreshGroundOrder();
       this.emitPosition(id, cfg);
@@ -304,24 +324,24 @@ export class AuraOverlayController {
       const direction = Math.sign(deltaX);
       if (direction === 0) return;
       const ordered = this.currentDefs
-        .map((def, index) => ({ def, index, order: this.store.get(def.id).groundOrder }))
+        .map((def, index) => ({ def, index, order: this.config(def.id).groundOrder }))
         .sort((a, b) => a.order - b.order || a.index - b.index);
       const index = ordered.findIndex((entry) => entry.def.id === id);
       const neighborIndex = Math.min(ordered.length - 1, Math.max(0, index + direction));
       if (index < 0 || neighborIndex === index) return;
       const neighbor = ordered[neighborIndex];
       this.normalizeGroundOrder(ordered);
-      const currentSlot = auraOverlayVisualSlot(this.store.get(id));
-      const neighborSlot = auraOverlayVisualSlot(this.store.get(neighbor.def.id));
-      const currentConfig = this.store.patch(id, neighborSlot);
-      const neighborConfig = this.store.patch(neighbor.def.id, currentSlot);
+      const currentSlot = auraOverlayVisualSlot(this.config(id));
+      const neighborSlot = auraOverlayVisualSlot(this.config(neighbor.def.id));
+      const currentConfig = this.patchConfig(id, neighborSlot);
+      const neighborConfig = this.patchConfig(neighbor.def.id, currentSlot);
       const currentTarget = this.targetById.get(id);
       const neighborTarget = this.targetById.get(neighbor.def.id);
       if (currentTarget) this.apply(id, currentTarget.el, currentConfig);
       if (neighborTarget) this.apply(neighbor.def.id, neighborTarget.el, neighborConfig);
       this.refreshGroundOrder();
       for (const target of this.targets) {
-        this.apply(target.def.id, target.el, this.store.get(target.def.id));
+        this.apply(target.def.id, target.el, this.config(target.def.id));
       }
       this.emitPosition(id, currentConfig);
       this.emitPosition(neighbor.def.id, neighborConfig);
@@ -329,8 +349,8 @@ export class AuraOverlayController {
     }
     const target = this.targetById.get(id);
     if (!target) return;
-    const cfg = this.store.get(id);
-    const next = this.store.patch(id, {
+    const cfg = this.config(id);
+    const next = this.patchConfig(id, {
       iconPosX: snapPosition(cfg.iconPosX + deltaX * POSITION_NUDGE),
       iconPosY: snapPosition(cfg.iconPosY + deltaY * POSITION_NUDGE),
     });
@@ -345,18 +365,18 @@ export class AuraOverlayController {
 
   private refreshGroundOrder(): void {
     this.orderedGroundDefs = this.currentDefs
-      .map((def, index) => ({ def, index, order: this.store.get(def.id).groundOrder }))
+      .map((def, index) => ({ def, index, order: this.config(def.id).groundOrder }))
       .sort((a, b) => a.order - b.order || a.index - b.index)
       .map(({ def }) => def);
   }
 
   private normalizeGroundOrder(
     ordered = this.currentDefs
-      .map((def, index) => ({ def, index, order: this.store.get(def.id).groundOrder }))
+      .map((def, index) => ({ def, index, order: this.config(def.id).groundOrder }))
       .sort((a, b) => a.order - b.order || a.index - b.index),
   ): void {
     for (let order = 0; order < ordered.length; order++) {
-      this.store.patch(ordered[order].def.id, { groundOrder: order });
+      this.patchConfig(ordered[order].def.id, { groundOrder: order });
     }
   }
 
@@ -394,20 +414,40 @@ export class AuraOverlayController {
       this.counterfangAura.remaining = Math.min(COUNTERFANG_WINDOW_DURATION, counterfangRemaining);
     }
     this.painter.paint(auras, supplementalAuras);
-    this.deps.paintGroundRings?.(
-      this.orderedGroundDefs.map((def) => {
-        const config = this.store.get(def.id);
-        const active =
-          auraOverlayProcIsActive(def, auras) || auraOverlayProcIsActive(def, supplementalAuras);
-        return {
+    if (!this.deps.paintGroundRings) return;
+    const scale = this.layout.groundRingBlockScale;
+    let changed = this.groundRingStates.length !== this.orderedGroundDefs.length;
+    this.groundRingStates.length = this.orderedGroundDefs.length;
+    for (let i = 0; i < this.orderedGroundDefs.length; i++) {
+      const def = this.orderedGroundDefs[i];
+      const config = this.config(def.id);
+      const active =
+        auraOverlayProcIsActive(def, auras) || auraOverlayProcIsActive(def, supplementalAuras);
+      const visible =
+        config.enabled && config.showGroundRing && (this.previewGroundRings || active);
+      const previous = this.groundRingStates[i];
+      if (
+        !previous ||
+        previous.id !== def.id ||
+        previous.visible !== visible ||
+        previous.color !== config.color ||
+        previous.opacity !== config.opacity ||
+        previous.scale !== scale
+      ) {
+        this.groundRingStates[i] = {
           id: def.id,
-          visible: config.enabled && config.showGroundRing && (this.previewGroundRings || active),
+          visible,
           color: config.color,
           opacity: config.opacity,
-          scale: this.store.getLayout().groundRingBlockScale,
+          scale,
         };
-      }),
-    );
+        changed = true;
+      }
+    }
+    if (!this.groundRingsInitialized || changed) {
+      this.groundRingsInitialized = true;
+      this.deps.paintGroundRings(this.groundRingStates);
+    }
   }
 
   defs(): readonly AuraOverlayProcDef[] {

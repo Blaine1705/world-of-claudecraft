@@ -36,6 +36,18 @@ describe('aura overlay placement styles', () => {
     expect(hudCss).toMatch(/\.aura-overlay-arc\s*\{[^}]*pointer-events:\s*none/s);
   });
 
+  it('scales aura blur with the static graphics shadow token', () => {
+    expect(hudCss).toMatch(
+      /drop-shadow\(\s*0 0 calc\(var\(--aura-glow-core\) \* var\(--fx-shadow,\s*1\)\) currentColor\s*\)/,
+    );
+    expect(hudCss).toMatch(
+      /drop-shadow\(\s*0 0 calc\(var\(--aura-glow-halo\) \* var\(--fx-shadow,\s*1\)\) currentColor\s*\)/,
+    );
+    expect(hudCss).toMatch(
+      /0 0 calc\(var\(--aura-glow-halo\) \* var\(--fx-shadow,\s*1\)\) currentColor/,
+    );
+  });
+
   it('places a non-interactive duration sweep and countdown over the spell icon', () => {
     expect(hudCss).toMatch(/\.aura-overlay-timer\s*\{[^}]*conic-gradient/s);
     expect(hudCss).toMatch(/\.aura-overlay-timer\s*\{[^}]*pointer-events:\s*none/s);

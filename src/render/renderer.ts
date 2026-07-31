@@ -2158,7 +2158,7 @@ export class Renderer {
     this.selectionRing.visible = false;
     this.scene.add(this.selectionRing);
 
-    this.playerAuraRings = new PlayerAuraRings(GFX.tier, GFX.composer);
+    this.playerAuraRings = new PlayerAuraRings(GFX.effectsTier, GFX.composer);
     setRenderCategory(this.playerAuraRings.group, 'ui3d');
     this.scene.add(this.playerAuraRings.group);
 
@@ -8148,14 +8148,14 @@ export class Renderer {
       this.selectionRing.visible = false;
     }
     const playerView = this.views.get(p.id);
-    if (playerView) {
+    if (playerView && !p.dead && this.playerAuraRings.hasVisibleRings()) {
       const px = playerView.group.position.x;
       const pz = playerView.group.position.z;
       const seed = this.sim.cfg.seed;
       const supportY = supportHeightAt(seed, px, pz, 0.5, playerView.group.position.y + 0.01);
       const baseY = Math.max(groundHeight(px, pz, seed), supportY);
       this.playerAuraRings.update(
-        !p.dead,
+        true,
         px,
         pz,
         baseY,

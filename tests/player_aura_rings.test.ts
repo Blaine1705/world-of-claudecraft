@@ -12,7 +12,49 @@ const input = (id: string) => ({
   scale: 1,
 });
 
+const instancePosition = (mesh: THREE.InstancedMesh, index = 0): THREE.Vector3 => {
+  const matrix = new THREE.Matrix4();
+  mesh.getMatrixAt(index, matrix);
+  return new THREE.Vector3().setFromMatrixPosition(matrix);
+};
+
 describe('PlayerAuraRings procedural ornaments', () => {
+  it('batches each ring ornament set into one instanced draw', () => {
+    const rings = new PlayerAuraRings('high', true);
+    rings.setRings([input('raised_guard'), input('iron_resolve')]);
+
+    const ornaments = rings.group.children.filter(
+      (child): child is THREE.InstancedMesh => child instanceof THREE.InstancedMesh,
+    );
+    expect(ornaments).toHaveLength(2);
+    expect(ornaments[0].count).toBe(playerAuraOrnamentSpec('raised_guard').count);
+    expect(ornaments[1].count).toBe(playerAuraOrnamentSpec('iron_resolve').count);
+    expect(rings.group.children).toHaveLength(6);
+  });
+
+  it('applies the real Ultra profile and its full ornament density', () => {
+    const rings = new PlayerAuraRings('ultra', true);
+    rings.setRings([input('sudden_death')]);
+    const ring = rings.group.children.find(
+      (child): child is THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial> =>
+        child instanceof THREE.Mesh && child.geometry instanceof THREE.RingGeometry,
+    );
+    const ornaments = rings.group.children.find(
+      (child): child is THREE.InstancedMesh => child instanceof THREE.InstancedMesh,
+    );
+
+    expect(ring?.geometry.parameters.thetaSegments).toBe(64);
+    expect(ornaments?.count).toBe(10);
+  });
+
+  it('reports whether any ground ring exists so hidden frames can skip terrain work', () => {
+    const rings = new PlayerAuraRings('high', true);
+    expect(rings.hasVisibleRings()).toBe(false);
+    rings.setRings([input('raised_guard')]);
+    expect(rings.hasVisibleRings()).toBe(true);
+    rings.setRings([{ ...input('raised_guard'), visible: false }]);
+    expect(rings.hasVisibleRings()).toBe(false);
+  });
   it('builds the spell-specific number and kind of ornaments on every visible ring', () => {
     const rings = new PlayerAuraRings('high', true);
     rings.setRings([input('raised_guard'), input('iron_resolve')]);
@@ -24,8 +66,10 @@ describe('PlayerAuraRings procedural ornaments', () => {
       child.name.startsWith('player_aura_ornament_iron_resolve_'),
     );
 
-    expect(raised).toHaveLength(playerAuraOrnamentSpec('raised_guard').count);
-    expect(resolve).toHaveLength(playerAuraOrnamentSpec('iron_resolve').count);
+    expect(raised).toHaveLength(1);
+    expect(resolve).toHaveLength(1);
+    expect((raised[0] as THREE.InstancedMesh).count).toBe(6);
+    expect((resolve[0] as THREE.InstancedMesh).count).toBe(8);
     expect(raised.every((child) => child.name.endsWith('_shield'))).toBe(true);
     expect(resolve.every((child) => child.name.endsWith('_diamond'))).toBe(true);
   });
@@ -39,11 +83,12 @@ describe('PlayerAuraRings procedural ornaments', () => {
     expect(ornament).toBeDefined();
 
     rings.update(true, 0, -40, 0, 1234, Number.NEGATIVE_INFINITY, 0);
-    const first = ornament?.position.clone();
+    const first = instancePosition(ornament as THREE.InstancedMesh);
     rings.update(true, 0, -40, 0, 1234, Number.NEGATIVE_INFINITY, 1);
 
-    expect(ornament?.position.x).not.toBeCloseTo(first?.x ?? 0);
-    expect(ornament?.position.y).toBeGreaterThan(Number.NEGATIVE_INFINITY);
+    const second = instancePosition(ornament as THREE.InstancedMesh);
+    expect(second.x).not.toBeCloseTo(first.x);
+    expect(second.y).toBeGreaterThan(Number.NEGATIVE_INFINITY);
   });
 
   it('reduces low-tier ornament density without disabling orbit animation', () => {
@@ -52,13 +97,14 @@ describe('PlayerAuraRings procedural ornaments', () => {
     const ornaments = rings.group.children.filter((child) =>
       child.name.startsWith('player_aura_ornament_sudden_death_'),
     );
-    expect(ornaments).toHaveLength(5);
+    expect(ornaments).toHaveLength(1);
+    expect((ornaments[0] as THREE.InstancedMesh).count).toBe(5);
 
     rings.update(true, 0, -40, 0, 1234, Number.NEGATIVE_INFINITY, 0);
-    const first = ornaments[0].position.clone();
+    const first = instancePosition(ornaments[0] as THREE.InstancedMesh);
     rings.update(true, 0, -40, 0, 1234, Number.NEGATIVE_INFINITY, 1);
 
-    expect(ornaments[0].position.x).not.toBeCloseTo(first.x);
+    expect(instancePosition(ornaments[0] as THREE.InstancedMesh).x).not.toBeCloseTo(first.x);
   });
 
   it('applies progressively richer low, medium, and high ring presentation', () => {
@@ -70,24 +116,40 @@ describe('PlayerAuraRings procedural ornaments', () => {
         (child): child is THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial> =>
           child instanceof THREE.Mesh && child.geometry instanceof THREE.RingGeometry,
       );
+      const ornaments = rings.group.children.find(
+        (child): child is THREE.InstancedMesh => child instanceof THREE.InstancedMesh,
+      );
+      if (!ornaments) throw new Error('expected one batched ornament mesh');
       return {
         ringSegments: meshes[0].geometry.parameters.thetaSegments,
         glowOpacity: meshes[0].material.opacity,
+        glowBlue: meshes[0].material.color.b,
         coreRed: meshes[1].material.color.r,
+        ornamentBlue: (ornaments.material as THREE.MeshBasicMaterial).color.b,
+        ornamentCount: ornaments.count,
       };
     };
 
     const low = build('low', false);
     const medium = build('medium', false);
     const high = build('high', true);
+    const highWithoutBloom = build('high', false);
 
     expect(low.ringSegments).toBe(32);
     expect(medium.ringSegments).toBe(48);
     expect(high.ringSegments).toBe(64);
+    expect(low.ornamentCount).toBe(5);
+    expect(medium.ornamentCount).toBe(8);
+    expect(high.ornamentCount).toBe(10);
     expect(low.glowOpacity).toBeLessThan(medium.glowOpacity);
     expect(medium.glowOpacity).toBeLessThan(high.glowOpacity);
     expect(low.coreRed).toBeCloseTo(medium.coreRed);
     expect(high.coreRed).toBeGreaterThan(medium.coreRed);
+    expect(high.glowBlue).toBeGreaterThan(medium.glowBlue);
+    expect(high.ornamentBlue).toBeGreaterThan(medium.ornamentBlue);
+    expect(high.coreRed).toBeGreaterThan(highWithoutBloom.coreRed);
+    expect(high.glowBlue).toBeGreaterThan(highWithoutBloom.glowBlue);
+    expect(high.ornamentBlue).toBeGreaterThan(highWithoutBloom.ornamentBlue);
   });
 
   it('stops cosmetic orbit and pulse motion and hides the group when requested', () => {
@@ -105,11 +167,14 @@ describe('PlayerAuraRings procedural ornaments', () => {
       );
 
     rings.update(true, 0, -40, 0, 1234, Number.NEGATIVE_INFINITY, 0, true);
-    const first = ornament?.position.clone();
+    expect(rings.group.visible).toBe(true);
+    const instanceVersion = (ornament as THREE.InstancedMesh).instanceMatrix.version;
+    const first = instancePosition(ornament as THREE.InstancedMesh);
     const firstOpacities = materials.map((material) => material.opacity);
     rings.update(true, 0, -40, 0, 1234, Number.NEGATIVE_INFINITY, 10, true);
 
-    expect(ornament?.position).toEqual(first);
+    expect(instancePosition(ornament as THREE.InstancedMesh)).toEqual(first);
+    expect((ornament as THREE.InstancedMesh).instanceMatrix.version).toBe(instanceVersion);
     expect(materials.map((material) => material.opacity)).toEqual(firstOpacities);
 
     rings.update(true, 0, -40, 0, 1234, Number.NEGATIVE_INFINITY, 10, false);
@@ -122,7 +187,20 @@ describe('PlayerAuraRings procedural ornaments', () => {
   it('wires production graphics quality, bloom, and reduced motion into the ring renderer', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
 
-    expect(renderer).toContain('new PlayerAuraRings(GFX.tier, GFX.composer)');
+    expect(renderer).toContain('new PlayerAuraRings(GFX.effectsTier, GFX.composer)');
+    const activeGuard = renderer.indexOf('this.playerAuraRings.hasVisibleRings()');
+    const supportSample = renderer.indexOf('supportHeightAt(seed, px', activeGuard);
+    const auraSync = renderer.slice(
+      renderer.lastIndexOf('const playerView = this.views.get(p.id)', activeGuard),
+      renderer.indexOf('this.updateClickMarkers(dt)', activeGuard),
+    );
+    expect(activeGuard).toBeGreaterThan(-1);
+    expect(supportSample).toBeGreaterThan(activeGuard);
+    expect(renderer.match(/supportHeightAt\(seed, px/g)).toHaveLength(1);
+    expect(auraSync.match(/groundHeight\(px, pz, seed\)/g)).toHaveLength(1);
+    expect(auraSync).toMatch(
+      /if \(playerView && !p\.dead && this\.playerAuraRings\.hasVisibleRings\(\)\) \{[\s\S]*?supportHeightAt\(seed, px[\s\S]*?groundHeight\(px, pz, seed\)[\s\S]*?this\.playerAuraRings\.update\([\s\S]*?\n\s*\} else \{\n\s*this\.playerAuraRings\.update\(false/,
+    );
     expect(renderer).toMatch(
       /this\.playerAuraRings\.update\([\s\S]*?this\.reducedMotion\(\),[\s\S]*?\);/,
     );

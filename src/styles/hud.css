@@ -5947,8 +5947,8 @@
     width: 72px;
     height: 184px;
     pointer-events: none;
-    filter: drop-shadow(0 0 var(--aura-glow-core) currentColor)
-      drop-shadow(0 0 var(--aura-glow-halo) currentColor);
+    filter: drop-shadow(0 0 calc(var(--aura-glow-core) * var(--fx-shadow, 1)) currentColor)
+      drop-shadow(0 0 calc(var(--aura-glow-halo) * var(--fx-shadow, 1)) currentColor);
   }
   .aura-overlay-arc-left {
     left: 20px;
@@ -5979,8 +5979,8 @@
     border: 2px solid currentColor;
     border-radius: 9px;
     box-shadow:
-      0 0 var(--aura-glow-core) currentColor,
-      0 0 var(--aura-glow-halo) currentColor;
+      0 0 calc(var(--aura-glow-core) * var(--fx-shadow, 1)) currentColor,
+      0 0 calc(var(--aura-glow-halo) * var(--fx-shadow, 1)) currentColor;
     opacity: 0.88;
   }
   .aura-overlay-timer {

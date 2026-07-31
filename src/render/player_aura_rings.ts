@@ -27,16 +27,16 @@ interface DrapedMesh {
 interface RingView {
   core: DrapedMesh;
   glow: DrapedMesh;
-  ornaments: {
-    mesh: THREE.Mesh<THREE.ShapeGeometry, THREE.MeshBasicMaterial>;
-    baseAngle: number;
-    radius: number;
-  }[];
+  ornaments: THREE.InstancedMesh<THREE.ShapeGeometry, THREE.MeshBasicMaterial>;
+  ornamentCount: number;
+  ornamentRadius: number;
+  ornamentSize: number;
   ornamentMaterial: THREE.MeshBasicMaterial;
   angularSpeed: number;
   opacity: number;
   phase: number;
   quality: PlayerAuraRingQualityProfile;
+  reducedMotionSettled: boolean;
 }
 
 const ornamentGeometries = new Map<PlayerAuraOrnamentKind, THREE.ShapeGeometry>();
@@ -147,6 +147,7 @@ export class PlayerAuraRings {
   private baseY = Number.NaN;
   private seed = 0;
   private supportY = Number.NEGATIVE_INFINITY;
+  private readonly ornamentTransform = new THREE.Object3D();
   private readonly sampleGround = (x: number, z: number): number =>
     Math.max(groundHeight(x, z, this.seed), this.supportY);
 
@@ -199,35 +200,40 @@ export class PlayerAuraRings {
         input.opacity * 0.2,
         quality.radialSegments,
       );
-      const ornaments: RingView['ornaments'] = [];
       const ornamentColor = color.clone().multiplyScalar(quality.ornamentColorGain);
       const decorMaterial = ornamentMaterial(ornamentColor, input.opacity * 0.82);
       const decorGeometry = ornamentGeometry(ornamentSpec.kind);
       const ornamentRadius = (band.innerRadius + band.outerRadius) / 2;
-      for (let ornamentIndex = 0; ornamentIndex < quality.ornamentCount; ornamentIndex++) {
-        const mesh = new THREE.Mesh(decorGeometry, decorMaterial);
-        mesh.name = `player_aura_ornament_${input.id}_${ornamentSpec.kind}`;
-        mesh.userData.auraProcId = input.id;
-        mesh.frustumCulled = false;
-        mesh.scale.setScalar(ornamentSpec.size);
-        const baseAngle = (ornamentIndex / quality.ornamentCount) * Math.PI * 2;
-        ornaments.push({ mesh, baseAngle, radius: ornamentRadius });
-        this.group.add(mesh);
-      }
-      this.group.add(glow.mesh, core.mesh);
+      const ornaments = new THREE.InstancedMesh(
+        decorGeometry,
+        decorMaterial,
+        quality.ornamentCount,
+      );
+      ornaments.name = `player_aura_ornament_${input.id}_${ornamentSpec.kind}`;
+      ornaments.userData.auraProcId = input.id;
+      ornaments.frustumCulled = false;
+      this.group.add(ornaments, glow.mesh, core.mesh);
       this.views.push({
         core,
         glow,
         ornaments,
+        ornamentCount: quality.ornamentCount,
+        ornamentRadius,
+        ornamentSize: ornamentSpec.size,
         ornamentMaterial: decorMaterial,
         angularSpeed: ornamentSpec.angularSpeed,
         opacity: input.opacity,
         phase: i * 1.7,
         quality,
+        reducedMotionSettled: false,
       });
     }
     this.anchorX = Number.NaN;
     this.group.visible = this.views.length > 0;
+  }
+
+  hasVisibleRings(): boolean {
+    return this.views.length > 0;
   }
 
   update(
@@ -258,6 +264,7 @@ export class PlayerAuraRings {
     }
     for (let i = 0; i < this.views.length; i++) {
       const view = this.views[i];
+      if (reducedMotion && !moved && view.reducedMotionSettled) continue;
       if (moved) {
         for (const [meshView, lift] of [
           [view.glow, 0.045 + i * 0.003],
@@ -289,17 +296,23 @@ export class PlayerAuraRings {
       view.ornamentMaterial.opacity =
         view.opacity *
         (view.quality.ornamentBaseOpacity + view.quality.ornamentPulseOpacity * pulse);
-      for (const ornament of view.ornaments) {
-        const angle = ornament.baseAngle + (reducedMotion ? 0 : time * view.angularSpeed);
-        const localX = Math.cos(angle) * ornament.radius;
-        const localZ = Math.sin(angle) * ornament.radius;
-        ornament.mesh.position.set(
+      for (let ornamentIndex = 0; ornamentIndex < view.ornamentCount; ornamentIndex++) {
+        const baseAngle = (ornamentIndex / view.ornamentCount) * Math.PI * 2;
+        const angle = baseAngle + (reducedMotion ? 0 : time * view.angularSpeed);
+        const localX = Math.cos(angle) * view.ornamentRadius;
+        const localZ = Math.sin(angle) * view.ornamentRadius;
+        this.ornamentTransform.position.set(
           localX,
           this.sampleGround(x + localX, z + localZ) + 0.065 + i * 0.003 - baseY,
           localZ,
         );
-        ornament.mesh.rotation.y = -Math.PI / 2 - angle;
+        this.ornamentTransform.rotation.set(0, -Math.PI / 2 - angle, 0);
+        this.ornamentTransform.scale.setScalar(view.ornamentSize);
+        this.ornamentTransform.updateMatrix();
+        view.ornaments.setMatrixAt(ornamentIndex, this.ornamentTransform.matrix);
       }
+      view.ornaments.instanceMatrix.needsUpdate = true;
+      view.reducedMotionSettled = reducedMotion;
     }
   }
 }
