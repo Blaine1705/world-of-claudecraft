@@ -14,10 +14,10 @@ import { handleDevChat } from '../src/sim/dev_commands';
 import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { updatePortalTriggers } from '../src/sim/portals';
 import { startFishing } from '../src/sim/professions/fishing';
-import { moveToGraveyardForUnstuck } from '../src/sim/spirit';
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
 import { RIFT_EVENT_INSTANCE_CAP } from '../src/sim/rift/runs';
 import { Sim } from '../src/sim/sim';
+import { moveToGraveyardForUnstuck } from '../src/sim/spirit';
 import { type Entity, FISHING_CAST_ID, GATHER_CAST_ID } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
