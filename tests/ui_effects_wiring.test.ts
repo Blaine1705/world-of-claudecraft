@@ -102,7 +102,9 @@ describe('hud.css - target aura expiry sheds motion at low without hiding the cu
     expect(hudCss).toMatch(
       /@media \(prefers-reduced-motion: no-preference\) \{\s*\.ta-row\.expiring \.ta-icon \{\s*animation: aura-expire-blink/,
     );
-    const rule = hudCss.match(/:root\[data-fx-level="low"\] \.ta-row\.expiring \.ta-icon \{[^}]*\}/);
+    const rule = hudCss.match(
+      /:root\[data-fx-level="low"\] \.ta-row\.expiring \.ta-icon \{[^}]*\}/,
+    );
     expect(rule).not.toBeNull();
     expect(rule?.[0]).toContain('animation: none;');
     expect(rule?.[0]).toContain('filter: brightness(1.4);');

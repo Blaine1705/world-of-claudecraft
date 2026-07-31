@@ -729,7 +729,7 @@ export function mechAssetsReady(): boolean {
 }
 
 // Lazy fetch for rideable mount GLBs (the mech pattern, per visual key): a
-// mount loads on the first sight of a rider, so seven mount models never
+// mount loads on the first sight of a rider, so eight mount models never
 // weigh on every client's boot. Memoized per key; mounts have no skin or
 // emissive atlases, so the GLB is the whole job.
 const mountAssetPromises = new Map<string, Promise<void>>();
@@ -1067,6 +1067,7 @@ export function tintedMaterial(
       mat = new THREE.MeshLambertMaterial({
         map: s.map ?? null,
         color: s.color ? s.color.clone() : new THREE.Color(0xffffff),
+        vertexColors: s.vertexColors,
         transparent: s.transparent,
         opacity: s.opacity,
         side: s.side,

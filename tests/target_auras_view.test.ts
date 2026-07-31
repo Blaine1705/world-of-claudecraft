@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { AurasState } from '../src/ui/auras_view';
-import {
-  createTargetAurasWindowView,
-  targetAuraSourceName,
-} from '../src/ui/target_auras_view';
+import { createTargetAurasWindowView, targetAuraSourceName } from '../src/ui/target_auras_view';
 import { assertAllocationStable } from './util/alloc_probe';
 
 function state(): AurasState {

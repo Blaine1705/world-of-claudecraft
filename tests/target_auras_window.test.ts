@@ -343,7 +343,11 @@ describe('TargetAurasWindow', () => {
   it('converts visual viewport coordinates through the active UI scale', () => {
     const originalInnerWidth = window.innerWidth;
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: 500 });
-    const { root } = setup(undefined, () => false, () => 0.8);
+    const { root } = setup(
+      undefined,
+      () => false,
+      () => 0.8,
+    );
     const config = root.querySelector<HTMLButtonElement>('.ta-rows-config-btn');
     const control = root.querySelector<HTMLElement>('.ta-visible-rows-control');
     root.getBoundingClientRect = () => layoutRect(20, 176);
@@ -368,8 +372,7 @@ describe('TargetAurasWindow', () => {
     root.getBoundingClientRect = () =>
       layoutRect(root.style.width === '140px' ? 150 : 80, root.style.width === '140px' ? 140 : 220);
     if (config) {
-      config.getBoundingClientRect = () =>
-        layoutRect(root.style.width === '140px' ? 260 : 200, 24);
+      config.getBoundingClientRect = () => layoutRect(root.style.width === '140px' ? 260 : 200, 24);
     }
     if (control) control.getBoundingClientRect = () => layoutRect(0, 150);
 

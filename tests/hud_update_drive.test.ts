@@ -575,6 +575,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the Heating Up / Hot Streak arm, the default for every other spec',
   },
   {
+    call: 'this.auraOverlayController.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the configured Warrior proc frames; writer-facet toggles elide unchanged states',
+  },
+  {
     call: 'this.renderPetBar',
     band: 'frame',
     gate: '',
@@ -1290,7 +1297,8 @@ function guardProblems(
 const UI_DIR = fileURLToPath(new URL('../src/ui/', import.meta.url));
 const readUi = (module: string): string => readFileSync(`${UI_DIR}${module}`, 'utf8');
 const HUD_PATH = `${UI_DIR}hud.ts`;
-const scan = readMethodCallSites(HUD_PATH, readFileSync(HUD_PATH, 'utf8'), 'Hud', 'update');
+const HUD_SOURCE = readFileSync(HUD_PATH, 'utf8');
+const scan = readMethodCallSites(HUD_PATH, HUD_SOURCE, 'Hud', 'update');
 const observedKeys = scan.sites.map((s) => {
   const { band, gate } = splitBand(s.conditions);
   return keyOf(s.call, band, gate);
@@ -1308,6 +1316,12 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     const source = readFileSync(HUD_PATH, 'utf8');
     expect(source).toMatch(
       /if \(this\.targetAurasWindow\.toggle\(\)\) \{[\s\S]{0,400}?this\.lastTargetDebuffsPaintAt = Number\.NEGATIVE_INFINITY;/,
+    );
+  });
+
+  it('feeds the server-authoritative Hunter reactive window into the aura overlay', () => {
+    expect(HUD_SOURCE).toMatch(
+      /this\.auraOverlayController\.paint\(\s*p\.auras,\s*this\.sim\.reactiveAbilityWindowRemaining\('mongoose_bite'\),?\s*\)/,
     );
   });
 
@@ -1378,7 +1392,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 41, chrome: 70, none: 15 });
+    ).toEqual({ window: 41, chrome: 71, none: 15 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
