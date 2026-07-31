@@ -64,6 +64,10 @@ const FORGE_AMBIENCE_GAIN = 0.625;
 // 6) heading into town, and still 8 units narrower than the shared 46
 // default.
 export const FORGE_MAX_DISTANCE = 38;
+// Rift roller/portal loops (src/render/rift_ambience.ts): a moving hazard or
+// an open portal should read as a clear nearby presence, not a wallpaper bed
+// like campfire/forge, but must still sit under foreground one-shots.
+const RIFT_AMBIENCE_GAIN = 0.4;
 const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   grass: 'foot_grass',
   dirt: 'foot_dirt',
@@ -135,7 +139,7 @@ interface PendingLoop {
 // same pattern, no changes needed to the override mechanism itself.
 interface AmbientPointSource {
   readonly id: string;
-  readonly kind: 'campfire' | 'forge';
+  readonly kind: 'campfire' | 'forge' | 'rift_portal' | 'rift_roller' | 'rift_ice_glide';
   readonly x: number;
   readonly y: number;
   readonly z: number;
@@ -892,8 +896,30 @@ class Sfx {
       }
       return;
     }
-    const key = source.kind === 'campfire' ? 'amb_campfire' : 'amb_forge';
-    const gain = source.kind === 'forge' ? FORGE_AMBIENCE_GAIN : POINT_AMBIENCE_GAIN;
+    let key: string;
+    let gain: number;
+    switch (source.kind) {
+      case 'campfire':
+        key = 'amb_campfire';
+        gain = POINT_AMBIENCE_GAIN;
+        break;
+      case 'forge':
+        key = 'amb_forge';
+        gain = FORGE_AMBIENCE_GAIN;
+        break;
+      case 'rift_portal':
+        key = 'rift_portal_drone';
+        gain = RIFT_AMBIENCE_GAIN;
+        break;
+      case 'rift_roller':
+        key = 'rift_boulder_roll';
+        gain = RIFT_AMBIENCE_GAIN;
+        break;
+      case 'rift_ice_glide':
+        key = 'rift_ice_glide';
+        gain = RIFT_AMBIENCE_GAIN;
+        break;
+    }
     this.loop(source.id, key, gain, source.x, source.y, source.z, maxDistance);
   }
 
@@ -961,7 +987,26 @@ class Sfx {
     this.ambient('amb_rain', precip === 'rain' ? 0.11 : 0); // sharp clip, kept very low
     this.ambient('amb_snow', precip === 'snow' ? 0.13 : 0);
     this.ambient('amb_water', nearWater ? 0.18 : 0);
-    for (let i = 0; i < points.length; i++) this.pointAmbient(points[i]);
+    const activeIds = new Set<string>();
+    for (let i = 0; i < points.length; i++) {
+      activeIds.add(points[i].id);
+      this.pointAmbient(points[i]);
+    }
+    // Unlike the static campfire/forge set (the same fixed sources every frame,
+    // culled only by distance), a rift portal/roller/gliding-player source can
+    // disappear entirely between frames (instance ends, portal expires, the
+    // glide stops) without ever crossing the tooFar threshold: sweep any such
+    // loop no longer present.
+    const isDynamicRiftId = (id: string): boolean =>
+      id.startsWith('rift_portal:') ||
+      id.startsWith('rift_roller:') ||
+      id.startsWith('rift_ice_glide:');
+    for (const id of this.loops.keys()) {
+      if (isDynamicRiftId(id) && !activeIds.has(id)) this.unloop(id, 0.7);
+    }
+    for (const id of this.pendingLoops.keys()) {
+      if (isDynamicRiftId(id) && !activeIds.has(id)) this.pendingLoops.delete(id);
+    }
   }
 
   // --- Vale Cup one-shots (HUD-armed on vcupGoal/vcupEnd events) -----------

@@ -951,6 +951,21 @@ export const SFX = [
   // break-any-item-for-generic-materials action (src/sim/professions/
   // salvage.ts), separate from disenchant's rare+ arcane-materials path.
   { key: 'ui_craft_salvage', custom: true },
+
+  // --- Rift mechanics (custom recordings, src/sim/rift/) --------------------
+  // World-anchored one-shots and point-source loops for the procedural Rift
+  // dungeon's headline floor mechanics (src/sim/rift/runs.ts, portals.ts),
+  // played via the spellfxAt world event's optional sfxKey override.
+  { key: 'rift_portal_spawn', custom: true }, // a natural rift portal opening in the world
+  { key: 'rift_portal_enter', custom: true }, // stepping through into the instance
+  { key: 'rift_portal_drone', custom: true, loop: true }, // point-source loop near an open, unentered portal
+  { key: 'rift_gate_grind', custom: true }, // the rift gate mechanic's portcullis grinding open
+  { key: 'rift_boulder_impact', custom: true }, // the rolling-lane hazard bowling over a player
+  { key: 'rift_boulder_roll', custom: true, loop: true }, // point-source loop near an active rolling-lane hazard
+  { key: 'rift_ice_start', custom: true }, // launching onto the ice-slide zone
+  { key: 'rift_ice_glide', custom: true, loop: true }, // point-source loop for a player currently gliding
+  { key: 'rift_ice_stop', custom: true }, // skidding to a halt off the ice
+  { key: 'rift_lava_tick', custom: true }, // the 1 Hz lava/blackwater hazard burn tick
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

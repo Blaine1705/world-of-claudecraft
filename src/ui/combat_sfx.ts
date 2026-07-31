@@ -242,7 +242,14 @@ export function materialImpactCue(target: Entity): SfxId {
   return 'impact_flesh';
 }
 
+// These two rift hazards (src/sim/rift/runs.ts) already play their own custom
+// one-shot via the spellfxAt sfxKey override (riftFx) at the same moment this
+// damage event fires; returning null here stops the generic school/material
+// impact cue from ALSO firing and doubling up on every tick/wallop.
+const RIFT_HAZARD_ABILITIES = new Set(['Molten Rift', 'Rolling Boulder']);
+
 export function impactCueForDamage(event: DamageEvent, target: Entity): SfxId | null {
+  if (event.ability && RIFT_HAZARD_ABILITIES.has(event.ability)) return null;
   // Keyed off the stable abilityId, not the display-label `ability` field:
   // a display rename (Scald/Pyrelance/Aether Surge/Dirt Nap/Wicked Slash/
   // Craven Thrust/Lurker's Strike/Throat Wire all differ from their id)

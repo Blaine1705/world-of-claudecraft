@@ -4963,6 +4963,12 @@ export type SimEvent = { pid?: number } & (
       // blasts): the caster, so the renderer can fly the ability's authored
       // projectile volley from their hands to the aimed point.
       sourceId?: number;
+      // A fixed SFX manifest key that replaces the generic nova/burst+school
+      // sound the client would otherwise pick. Used by rift mechanics that
+      // have their own custom recording (src/sim/rift/fx.ts riftFx) instead
+      // of the generic per-school impact; unset for every other spellfxAt
+      // caller, which keeps the existing generic sound unchanged.
+      sfxKey?: string;
     }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide

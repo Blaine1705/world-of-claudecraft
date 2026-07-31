@@ -544,6 +544,28 @@ describe('combat SFX policy', () => {
     ).toBeNull();
   });
 
+  it('suppresses the generic impact cue for the two rift hazards with their own custom recording', () => {
+    // src/sim/rift/runs.ts fires its own spellfxAt(sfxKey: 'rift_lava_tick'|
+    // 'rift_boulder_impact') on the same damage event; without this the generic
+    // school/material impact would double up alongside the custom one.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'fire', ability: 'Molten Rift' }),
+        target('player', 'player'),
+      ),
+    ).toBeNull();
+    expect(
+      impactCueForDamage(
+        damage({ school: 'physical', ability: 'Rolling Boulder' }),
+        target('player', 'player'),
+      ),
+    ).toBeNull();
+    // A real fire spell (not the rift hazard) is unaffected.
+    expect(
+      impactCueForDamage(damage({ school: 'fire', ability: 'fireball' }), target('mob', 'boar')),
+    ).toBe('impact_fire');
+  });
+
   it('preserves v0.25 mob families and loaded subfamily overrides', () => {
     expect(mobVoiceFamily('mudfin_murloc')).toBe('mudfin');
     expect(mobVoiceCue('mudfin_murloc', 'aggro')).toBe('mob_mudfin_aggro');

@@ -373,6 +373,7 @@ import {
   type RendererFramePhaseMs,
   type RendererWorldPhaseMs,
 } from './renderer_frame_telemetry_core';
+import { riftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
 import {
@@ -11467,7 +11468,8 @@ export class Renderer {
       // Sowfield crowd bed: murmurs near the ground, swells while a match is
       // live (cupInfo is the IWorld mirror, so this works online too).
       const crowd = crowdAmbienceAt(px, pz, inDungeon, !!this.sim.cupInfo?.live);
-      sink.ambience(biome, inDungeon, precip, nearWater, crowd, this.ambientPointSources);
+      const points = this.ambientPointSources.concat(riftAmbientSources(this.sim.entities));
+      sink.ambience(biome, inDungeon, precip, nearWater, crowd, points);
     }
   }
 
