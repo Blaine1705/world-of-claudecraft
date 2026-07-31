@@ -372,6 +372,92 @@ describe('RateGovernor bucket identity across major parameters', () => {
     expect(sent.map((s) => s.at)).toEqual([0, 1, 10_000]);
   });
 
+  it('re-checks the bucket gate AFTER the rate slot, not only before it', async () => {
+    // The gate symmetry. A request checks the bucket, then sleeps out its global
+    // rate slot, and another template sharing that bucket can exhaust it during
+    // exactly that sleep. The pause has always been re-read afterwards for this
+    // reason; the bucket had the identical argument and no re-read, so it sent
+    // into a window it had already been told was shut.
+    const { governor, clock } = makeGovernor(1);
+    const HASH = 'shared-by-two-templates';
+    const ROLES = '/guilds/1/roles';
+    const MEMBER = '/guilds/1/members/2';
+    const headers = (remaining: string) => ({
+      'x-ratelimit-bucket': HASH,
+      'x-ratelimit-remaining': remaining,
+      'x-ratelimit-reset-after': '100',
+    });
+    const record: { label: string; at: number }[] = [];
+    const send = (label: string, remaining: string) => async () => {
+      record.push({ label, at: clock.now() });
+      return reply(headers(remaining));
+    };
+
+    // Both templates learn the same bucket (same guild, so the same major
+    // parameter), with headroom to spare.
+    const seedA = governor.run({ method: 'GET', path: ROLES }, send('seed-roles', '5'));
+    await clock.runAll();
+    await seedA;
+    const seedB = governor.run({ method: 'PATCH', path: MEMBER }, send('seed-member', '5'));
+    await clock.runAll();
+    await seedB;
+    expect(governor.snapshot().trackedBuckets).toBe(1);
+
+    // Now two requests in flight at once, in DIFFERENT queues so they do not
+    // serialize. At 1 rps their slots are a second apart, and the first one
+    // reports the bucket spent while the second is still asleep on its slot.
+    const exhaust = governor.run({ method: 'GET', path: ROLES }, send('exhaust', '0'));
+    const victim = governor.run({ method: 'PATCH', path: MEMBER }, send('victim', '5'));
+    await clock.runAll();
+    await Promise.all([exhaust, victim]);
+
+    const at = (label: string) => record.find((r) => r.label === label)?.at;
+    // The exhausting call takes the earlier slot and shuts the bucket for 100 s
+    // from there. The victim's slot came up one second later, and it must wait
+    // the window out rather than spend it: without the re-check it went at 3000.
+    expect(at('exhaust')).toBe(2000);
+    expect(at('victim')).toBe(102_000);
+  });
+
+  it('does NOT wipe shared bucket state when one template rotates onto a new hash', async () => {
+    // Discord can re-bucket a route. The migration path exists for the FIRST
+    // sighting, when state built up under the provisional key has to be carried
+    // onto the real one, and it used to run on every change: a rotation deleted
+    // the old key outright, and since sharing one key is the entire point of the
+    // remap, that destroyed the gating state of every OTHER template still
+    // resolved to it, over a rotation that had nothing to do with them.
+    const { governor, clock } = makeGovernor(1000);
+    const ROLES = '/guilds/1/roles';
+    const MEMBER = '/guilds/1/members/2';
+    const send = (hash: string) => async () =>
+      reply({
+        'x-ratelimit-bucket': hash,
+        'x-ratelimit-remaining': '5',
+        'x-ratelimit-reset-after': '100',
+      });
+
+    const first = governor.run({ method: 'GET', path: ROLES }, send('hash-one'));
+    await clock.runAll();
+    await first;
+    const second = governor.run({ method: 'PATCH', path: MEMBER }, send('hash-one'));
+    await clock.runAll();
+    await second;
+    // One shared bucket, two templates resolved onto it.
+    expect(governor.snapshot().trackedBuckets).toBe(1);
+    expect(governor.snapshot().trackedRoutes).toBe(2);
+
+    // The roles route rotates onto a different hash. The member route has NOT
+    // moved, so the entry it still resolves to must survive.
+    const rotated = governor.run({ method: 'GET', path: ROLES }, send('hash-two'));
+    await clock.runAll();
+    await rotated;
+
+    // TWO buckets: the rotated one and the one the member route still answers
+    // under. Deleting the old key leaves this at 1.
+    expect(governor.snapshot().trackedBuckets).toBe(2);
+    expect(governor.snapshot().trackedRoutes).toBe(2);
+  });
+
   it('KEEPS merging two templates that share a hash AND a major parameter', async () => {
     // The complement, so the split above cannot be implemented as "never merge".
     // Two routes in ONE guild that report one hash really are one bucket, and

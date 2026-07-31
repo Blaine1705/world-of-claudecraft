@@ -16,9 +16,11 @@ import {
   DEFAULT_BAN_PAUSE_MS,
   DEFAULT_BREAKER_LIMIT,
   DEFAULT_FORBIDDEN_TTL_MS,
+  DEFAULT_MAX_RPS,
   RateGovernor,
   type RateGovernorOptions,
 } from '../bot/rate_governor';
+import { syntheticClock } from './helpers/synthetic_clock';
 
 const API = 'https://discord.com/api/v10';
 
@@ -580,66 +582,124 @@ describe('governorFromConfig', () => {
     // Every value is distinct, and none is that knob's own default, so a
     // transposition cannot land on the value it displaced and a dropped option
     // cannot be masked by the fallback.
+    // Four values that are pairwise distinct AND none of them that knob's own
+    // default, so a transposition cannot land on the value it displaced and a
+    // dropped option cannot be masked by the fallback. maxRps 2 is 500 ms of
+    // spacing, which is distinguishable from every other number here.
     const config = {
-      maxRps: 1,
+      maxRps: 2,
       banPauseMs: 4321,
-      breakerLimit: 2,
+      breakerLimit: 3,
       forbiddenTtlMs: 8765,
     };
+    expect(new Set(Object.values(config)).size).toBe(4);
+    expect(config.maxRps).not.toBe(DEFAULT_MAX_RPS);
     expect(config.banPauseMs).not.toBe(DEFAULT_BAN_PAUSE_MS);
     expect(config.breakerLimit).not.toBe(DEFAULT_BREAKER_LIMIT);
     expect(config.forbiddenTtlMs).not.toBe(DEFAULT_FORBIDDEN_TTL_MS);
 
-    const governor = governorFromConfig(config);
-
-    // banPauseMs: a non-JSON 429 pauses for exactly the configured interval, and
-    // the log line reports it.
+    // All four knobs are observed on the governor the FACTORY built, through its
+    // injected clock and log. Observing them on a separately constructed governor
+    // would be a self-comparison: it would pin the option names, not the mapping.
+    const clock = syntheticClock();
     const logs: { level: string; message: string; fields: Record<string, string | number> }[] = [];
-    // The clock must ADVANCE on sleep. A frozen `now` with a no-op sleep is an
-    // infinite loop waiting to happen: waitForBucket re-reads the clock every
-    // pass, so a gate that never expires spins on a promise that resolves
-    // immediately, starving the macrotask queue so vitest's own test timeout can
-    // never fire. Found by the mutation pass, in this test rather than in the
-    // module: dropping the non-JSON-429 ban arm sends this response down the
-    // ordinary retry path, and only then does the frozen clock matter.
-    let observedNow = 0;
-    const observed = new RateGovernor({
-      clock: {
-        now: () => observedNow,
-        sleep: async (ms) => {
-          observedNow += ms;
-        },
-      },
-      ...config,
-      log: (level, message, fields) => logs.push({ level, message, fields }),
-    });
-    await observed.run({ method: 'GET', path: '/guilds/1/roles' }, async () => ({
+    const governor = governorFromConfig(config, clock, (level, message, fields) =>
+      logs.push({ level, message, fields }),
+    );
+
+    // maxRps: two sends into DIFFERENT buckets are spaced ceil(1000 / 2) ms apart.
+    const sentAt: number[] = [];
+    const paced = [
+      governor.run({ method: 'POST', path: '/channels/1/messages' }, async () => {
+        sentAt.push(clock.now());
+        return { status: 204, headers: {}, jsonParsed: false } as const;
+      }),
+      governor.run({ method: 'POST', path: '/channels/2/messages' }, async () => {
+        sentAt.push(clock.now());
+        return { status: 204, headers: {}, jsonParsed: false } as const;
+      }),
+    ];
+    await clock.runAll();
+    await Promise.all(paced);
+    expect(sentAt).toEqual([0, 500]);
+
+    // banPauseMs: a non-JSON 429 pauses for exactly the configured interval.
+    const banned = governor.run({ method: 'GET', path: '/guilds/1/roles' }, async () => ({
       status: 429,
       headers: {},
       jsonParsed: false,
     }));
-    expect(logs[0].fields.pauseMs).toBe(config.banPauseMs);
+    await clock.runAll();
+    await banned;
+    const banLog = logs.find((l) => l.fields.pauseMs !== undefined);
+    expect(banLog?.fields.pauseMs).toBe(config.banPauseMs);
 
-    // breakerLimit: the governor built by the factory opens on the 2nd counted
-    // failure, which is the configured limit and not DEFAULT_BREAKER_LIMIT.
-    const { impl } = recordingFetch([
-      fakeResponse({ status: 403, text: 'no' }),
-      fakeResponse({ status: 403, text: 'no' }),
-    ]);
-    const api = new DiscordApi('tok', impl, governor);
-    await expect(api.createMessage('c1', { content: 'a' })).rejects.toThrow('-> 403');
+    // breakerLimit: the ban above counted once, so two more counted failures
+    // reach the configured limit of three and open it.
     expect(governor.snapshot().breakerState).toBe('closed');
-    await expect(api.createMessage('c2', { content: 'b' })).rejects.toThrow('-> 403');
+    // The cache time is captured from inside the send, because the TTL is
+    // measured from THERE and the clock keeps moving afterwards: advancing by the
+    // TTL from a later "now" would expire the entry early and pin nothing.
+    let cachedAt = -1;
+    const cached = governor.run(
+      { method: 'PATCH', path: '/guilds/1/members/1', subjectKey: 'nick:g1:u0' },
+      async () => {
+        cachedAt = clock.now();
+        return { status: 403, headers: {}, jsonParsed: false };
+      },
+    );
+    await clock.runAll();
+    await cached;
+    expect(governor.snapshot().breakerState).toBe('closed');
+
+    const opener = governor.run(
+      { method: 'PATCH', path: '/guilds/1/members/2', subjectKey: 'nick:g1:u1' },
+      async () => ({ status: 403, headers: {}, jsonParsed: false }),
+    );
+    await clock.runAll();
+    await opener;
+    // Three counted failures (the ban 429 plus these two) reach the configured
+    // limit of three. A transposed breakerLimit would trip at a different count.
     expect(governor.snapshot().breakerState).toBe('open');
 
-    // forbiddenTtlMs reached the governor as its own value: the 403 above was on
-    // a subject-less route, so the cache is empty and the TTL is observed through
-    // a fresh factory governor driven by a member write.
-    const ttlGovernor = governorFromConfig(config);
-    const member = recordingFetch([fakeResponse({ status: 403, text: 'no' })]);
-    const ttlApi = new DiscordApi('tok', member.impl, ttlGovernor);
-    await expect(ttlApi.setNickname('g1', 'u1', 'Aran (12)')).rejects.toThrow('-> 403');
-    expect(ttlGovernor.isForbidden('nick:g1:u1')).toBe(true);
+    // forbiddenTtlMs: the subject cached above expires exactly at the configured
+    // TTL measured from its own cache time, and not a millisecond before.
+    expect(cachedAt).toBeGreaterThanOrEqual(0);
+    expect(governor.isForbidden('nick:g1:u0')).toBe(true);
+    await clock.advanceTo(cachedAt + config.forbiddenTtlMs - 1);
+    expect(governor.isForbidden('nick:g1:u0')).toBe(true);
+    await clock.advanceTo(cachedAt + config.forbiddenTtlMs);
+    expect(governor.isForbidden('nick:g1:u0')).toBe(false);
+  });
+
+  it('defaults to the production clock and log when the seams are omitted', async () => {
+    // The seams exist for the pin above, so the no-argument form has to stay the
+    // real production client. Constructed BEFORE the global is stubbed, because a
+    // capture-form default would pass a stub-then-construct test either way.
+    const governor = governorFromConfig({
+      maxRps: 1000,
+      banPauseMs: 1,
+      breakerLimit: 99,
+      forbiddenTtlMs: 1,
+    });
+    const errors: unknown[][] = [];
+    const spy = vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      errors.push(args);
+    });
+
+    // A non-JSON 429 is the governor's one error-level log line.
+    await governor.run({ method: 'GET', path: '/guilds/1/roles' }, async () => ({
+      status: 429,
+      headers: {},
+      jsonParsed: false,
+    }));
+
+    expect(errors.length).toBe(1);
+    expect(String(errors[0][0])).toContain('[bot] discord returned a non-JSON 429');
+    // The default log formats the fields, which is consoleGovernorLog's job and
+    // not the governor's: a bare sink would print the object instead.
+    expect(String(errors[0][0])).toContain('pauseMs=1');
+    spy.mockRestore();
   });
 });
 

@@ -75,14 +75,22 @@ export interface GovernorConfig {
  * export the mapping is pinnable. The clock and the log sink are the shell's
  * production ones, which is what keeps the governor module itself pure.
  */
-export function governorFromConfig(config: GovernorConfig): RateGovernor {
+export function governorFromConfig(
+  config: GovernorConfig,
+  // Trailing seams with production defaults, the one convention the three shells
+  // share (bot/CLAUDE.md R15). Without them the mapping below is unobservable:
+  // the production clock is the real one, so pinning that `banPauseMs` reached
+  // the governor would mean a test that actually waits out a ban pause.
+  clock: GovernorClock = systemGovernorClock(),
+  log: GovernorLog = consoleGovernorLog,
+): RateGovernor {
   return new RateGovernor({
-    clock: systemGovernorClock(),
+    clock,
     maxRps: config.maxRps,
     banPauseMs: config.banPauseMs,
     breakerLimit: config.breakerLimit,
     forbiddenTtlMs: config.forbiddenTtlMs,
-    log: consoleGovernorLog,
+    log,
   });
 }
 

@@ -674,22 +674,38 @@ describe('governor registry bounds', () => {
     await call(rig, SWEEP, hashed());
     await call(rig, SIBLING, hashed());
 
-    // Flood the route map well past its bound, re-touching the sweep so it stays
-    // the most recently used entry. Ids are built by concatenation, never by
-    // adding to a literal past Number.MAX_SAFE_INTEGER.
-    for (let i = 0; i < MAX_TRACKED_ROUTES + 100; i++) {
-      if (i % 5 === 0) await call(rig, SWEEP, hashed());
-      const interactionId = `4000000000000000${String(i).padStart(3, '0')}`;
-      await call(
-        rig,
-        { method: 'POST', path: `/interactions/${interactionId}/tok/callback` },
-        {
-          status: 200,
-          headers: { 'x-ratelimit-bucket': `cold-${i}` },
-          json: {},
-          jsonParsed: true,
-        },
-      );
+    // Fill the route map to EXACTLY its bound, then touch the two hot routes, then
+    // overflow by a few and never touch them again. That ordering is what
+    // separates least-recently-USED from first-IN: under LRU the touch moves them
+    // to the tail and the overflow evicts cold entries, while under a plain FIFO
+    // they keep their original front positions and the overflow takes them. A
+    // flood that kept touching the hot route throughout cannot tell the two
+    // apart, because a FIFO re-appends an entry it has just evicted.
+    //
+    // Ids are built by concatenation, never by adding to a literal past
+    // Number.MAX_SAFE_INTEGER, which would collapse the loop onto a few values.
+    const cold = (i: number): GovernorRequest => ({
+      method: 'POST',
+      path: `/interactions/4000000000000000${String(i).padStart(3, '0')}/tok/callback`,
+    });
+    const coldReply = (i: number): GovernorResponse => ({
+      status: 200,
+      headers: { 'x-ratelimit-bucket': `cold-${i}` },
+      json: {},
+      jsonParsed: true,
+    });
+
+    for (let i = 0; i < MAX_TRACKED_ROUTES - 2; i++) await call(rig, cold(i), coldReply(i));
+    expect(rig.governor.snapshot().trackedRoutes).toBe(MAX_TRACKED_ROUTES);
+
+    await call(rig, SWEEP, hashed());
+    await call(rig, SIBLING, hashed());
+    expect(rig.governor.snapshot().trackedRoutes).toBe(MAX_TRACKED_ROUTES);
+
+    const OVERFLOW = 10;
+    for (let i = 0; i < OVERFLOW; i++) {
+      const n = MAX_TRACKED_ROUTES + i;
+      await call(rig, cold(n), coldReply(n));
     }
     expect(rig.governor.snapshot().trackedRoutes).toBe(MAX_TRACKED_ROUTES);
 

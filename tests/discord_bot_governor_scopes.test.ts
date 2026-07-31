@@ -275,54 +275,71 @@ describe('rate governor 429 that names no usable wait', () => {
 });
 
 describe('rate governor pause re-checks', () => {
-  it('honors a pause EXTENDED while a request is already asleep on it', async () => {
+  it('honors a pause extended TWICE while one request is already asleep on it', async () => {
     // waitForPause is a loop rather than one sleep, because a request already
-    // waiting cannot see a deadline moved out from under it otherwise. The only
-    // way to extend a pause is a request that got past the gate BEFORE the pause
-    // was declared, so one is held open by hand here and answered mid-pause.
+    // waiting cannot otherwise see a deadline moved out from under it. Two
+    // extensions are what make that decisive: `attempt` calls waitForPause TWICE
+    // per pass, so a single-sleep implementation still absorbs ONE extension in
+    // its second call and a one-extension test cannot tell the two apart.
+    //
+    // A pause can only be extended by a request that got past the gate BEFORE it
+    // was declared, so two are held open by hand and answered at different points
+    // of the wait.
     const { governor, clock } = governorFixture({ maxRps: 0 });
 
-    let release: ((r: GovernorResponse) => void) | null = null;
-    let inflightCalls = 0;
-    const inflight = governor.run(
-      { method: 'POST', path: '/channels/2/messages' },
-      async (): Promise<GovernorResponse> => {
-        if (inflightCalls++ === 0) {
+    const hold = (path: string) => {
+      let release: ((r: GovernorResponse) => void) | null = null;
+      let calls = 0;
+      const run = governor.run({ method: 'POST', path }, async (): Promise<GovernorResponse> => {
+        if (calls++ === 0) {
           return new Promise<GovernorResponse>((resolve) => {
             release = resolve;
           });
         }
         return res({});
-      },
-    );
+      });
+      return {
+        run,
+        answer: (r: GovernorResponse) => (release as unknown as (x: GovernorResponse) => void)(r),
+      };
+    };
+    const globalLimit = (retryAfter: number): GovernorResponse =>
+      res({
+        status: 429,
+        headers: { 'x-ratelimit-scope': 'global' },
+        json: { retry_after: retryAfter },
+      });
+
+    const first = hold('/channels/2/messages');
+    const second = hold('/channels/4/messages');
     await clock.advanceBy(0);
 
     // A global 429 declares a 10 second pause.
-    const firstPause = queuedSend(clock, [
-      res({ status: 429, headers: { 'x-ratelimit-scope': 'global' }, json: { retry_after: 10 } }),
-      res({}),
-    ]);
-    const paused = governor.run({ method: 'GET', path: '/guilds/1/roles' }, firstPause.send);
+    const opener = queuedSend(clock, [globalLimit(10), res({})]);
+    const paused = governor.run({ method: 'GET', path: '/guilds/1/roles' }, opener.send);
     await clock.advanceBy(0);
-    expect(firstPause.sentAt).toEqual([0]);
+    expect(opener.sentAt).toEqual([0]);
 
-    // This one goes to sleep on that 10 second deadline.
+    // This is the request under test: it goes to sleep on that 10 second deadline.
     const later = queuedSend(clock, [res({})]);
     const waiting = governor.run({ method: 'POST', path: '/channels/3/messages' }, later.send);
 
-    // Halfway through it, the held request answers with a much longer global 429,
-    // moving the deadline from 10000 out to 105000.
+    // Extension one, at 5000: the deadline moves from 10000 out to 105000.
     await clock.advanceBy(5000);
-    (release as unknown as (r: GovernorResponse) => void)(
-      res({ status: 429, headers: { 'x-ratelimit-scope': 'global' }, json: { retry_after: 100 } }),
-    );
+    first.answer(globalLimit(100));
+
+    // Extension two, at 50000, by which point the request under test is asleep on
+    // the 105000 deadline: it moves again, to 150000.
+    await clock.advanceBy(45_000);
+    expect(clock.now()).toBe(50_000);
+    second.answer(globalLimit(100));
 
     await clock.runAll();
-    await Promise.all([inflight, paused, waiting]);
+    await Promise.all([first.run, second.run, paused, waiting]);
 
-    // A single sleep would have released it at 10000, straight into a pause that
-    // by then had 95 more seconds to run.
-    expect(later.sentAt).toEqual([105_000]);
+    // 150000, the final deadline. A single sleep would have woken at 105000 with
+    // no re-read and sent straight into a pause with 45 more seconds to run.
+    expect(later.sentAt).toEqual([150_000]);
   });
 
   it('re-checks the pause AFTER the bucket gate, not only before it', async () => {
