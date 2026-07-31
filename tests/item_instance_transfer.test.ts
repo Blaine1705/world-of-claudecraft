@@ -56,8 +56,9 @@ describe('publicInstanceView: the display trim', () => {
   it('never aliases the live rolled maps into the projection', () => {
     const live: ItemInstancePayload = { rolled: { stats: { str: 2 } } };
     const pub = publicInstanceView(live);
-    pub.rolled!.stats!.str = 99;
-    expect(live.rolled!.stats!.str).toBe(2);
+    if (!pub.rolled?.stats) throw new Error('missing projected rolled stats');
+    pub.rolled.stats.str = 99;
+    expect(live.rolled?.stats?.str).toBe(2);
   });
 
   it('matches the eqi wire allowlist in server/game.ts: widen both or neither', () => {
@@ -185,8 +186,9 @@ describe('canGrantCopies / grantCopies: the shared exchange-pipe pair', () => {
     const granted = calls[1].instance;
     expect(granted).toEqual(source);
     expect(granted).not.toBe(source);
-    granted!.rolled!.stats!.agi = 99;
-    expect(source.rolled!.stats!.agi).toBe(2);
+    if (!granted?.rolled?.stats) throw new Error('missing granted rolled stats');
+    granted.rolled.stats.agi = 99;
+    expect(source.rolled?.stats?.agi).toBe(2);
   });
 });
 

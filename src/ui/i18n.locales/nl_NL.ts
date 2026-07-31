@@ -10898,4 +10898,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.started':
     'Loskomen over {seconds} seconden. Bewegen, vechten, schade oplopen, of een andere actie beginnen annuleert dit.',
   'hudChrome.unstuck.unavailable': 'Loskomen is niet beschikbaar in je huidige toestand.',
+  'hud.errors.marketListBound': 'Dat voorwerp is gebonden en kan niet worden aangeboden.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Dat voorwerp is gebonden en kan niet per post worden verstuurd.',
 };

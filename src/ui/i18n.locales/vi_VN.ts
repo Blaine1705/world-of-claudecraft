@@ -10825,4 +10825,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'sim.rift.socketsShut': 'Các hốc khóa kèn kẹt đóng lại. Con đường lay động.',
   'sim.rift.stepBack': 'Bạn bước lùi qua Rạn Nứt.',
   'sim.rift.wayDownOpens': 'Lối đi xuống xé toạc mở ra.',
+  'hud.errors.marketListBound': 'Vật phẩm đó đã ràng buộc và không thể đăng bán.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Vật phẩm đó đã ràng buộc và không thể gửi qua thư.',
 };

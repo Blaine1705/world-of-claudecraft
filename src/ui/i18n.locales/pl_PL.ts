@@ -10841,4 +10841,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.started':
     'Wyzwolenie za {seconds} sekund. Poruszenie się, walka, otrzymanie obrażeń lub rozpoczęcie innej czynności anuluje je.',
   'hudChrome.unstuck.unavailable': 'Wyzwolenie jest niedostępne w twoim obecnym stanie.',
+  'hud.errors.marketListBound': 'Ten przedmiot jest przypisany i nie można go wystawić.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Ten przedmiot jest przypisany i nie można go wysłać pocztą.',
 };

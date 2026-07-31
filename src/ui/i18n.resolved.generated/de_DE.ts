@@ -2117,7 +2117,7 @@ export const de_DE: EnTranslations = {
         "noRecipient": "Niemand mit diesem Namen unterhält hier einen Briefkasten.",
         "tooManyParcels": "Ein Brief trägt höchstens {count} Pakete.",
         "noMailQuestItems": "Questgegenstände können nicht verschickt werden.",
-        "noMailBound": "That item is bound and cannot be mailed.",
+        "noMailBound": "Dieser Gegenstand ist gebunden und kann nicht per Post verschickt werden.",
         "notEnoughItems": "So viele davon hast du nicht zum Versenden.",
         "cantAffordPostage": "Du kannst dir das Porto nicht leisten.",
         "recipientBoxFull": "Der Briefkasten des Empfängers ist voll.",
@@ -6479,7 +6479,7 @@ export const de_DE: EnTranslations = {
       "tradeExpired": "Die Handelsanfrage ist abgelaufen.",
       "tradeFailed": "Handel fehlgeschlagen: Gegenstände oder Geld sind nicht mehr verfügbar.",
       "tradeBound": "Dieser Gegenstand ist gebunden und kann nicht gehandelt werden.",
-      "marketListBound": "That item is bound and cannot be listed."
+      "marketListBound": "Dieser Gegenstand ist gebunden und kann nicht angeboten werden."
     },
     "logs": {
       "standUp": "Ihr steht auf.",

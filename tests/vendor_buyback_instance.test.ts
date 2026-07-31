@@ -51,7 +51,9 @@ function inv(sim: Sim, pid: number) {
 }
 
 function buybackOf(sim: Sim, pid: number) {
-  return sim.ctx.resolve(pid)!.meta.vendorBuyback;
+  const resolved = sim.ctx.resolve(pid);
+  if (!resolved) throw new Error(`missing player ${pid}`);
+  return resolved.meta.vendorBuyback;
 }
 
 function slotsOf(sim: Sim, pid: number, itemId: string) {
@@ -204,7 +206,9 @@ describe('buyback preserves instance payloads', () => {
 
   it('instanced buyback capacity-models the payload: plain-stack room is not instanced room', () => {
     const { sim, pid } = vendorSetup();
-    const meta = sim.ctx.resolve(pid)!.meta;
+    const resolved = sim.ctx.resolve(pid);
+    if (!resolved) throw new Error(`missing player ${pid}`);
+    const meta = resolved.meta;
     meta.inventory.length = 0; // drop starter rations: this test pins exact slot usage
     sim.addItemInstance(HIDE, { ...SIGNED }, pid);
     sim.sellItem(HIDE, 1, pid);
@@ -285,7 +289,7 @@ describe('buyback preserves instance payloads', () => {
     state.vendorBuyback[0].count = 99; // hand-edited save
     const sim2 = makeWorld();
     const pid2 = sim2.addPlayer('warrior', 'Seller', { state });
-    const rows = sim2.ctx.resolve(pid2)!.meta.vendorBuyback;
+    const rows = buybackOf(sim2, pid2);
     expect(rows[0].count).toBe(1);
     // A byte-equal MERGEABLE row keeps its over-stack count: legitimate
     // multi-unit sales merge past the stack cap by design.
@@ -293,7 +297,7 @@ describe('buyback preserves instance payloads', () => {
     state2.vendorBuyback = [{ itemId: HIDE, count: 40, instance: { signer: 'Seller' } }];
     const sim3 = makeWorld();
     const pid3 = sim3.addPlayer('warrior', 'Seller', { state: state2 });
-    expect(sim3.ctx.resolve(pid3)!.meta.vendorBuyback[0].count).toBe(40);
+    expect(buybackOf(sim3, pid3)[0].count).toBe(40);
   });
 
   it('buyback rows with payloads round-trip the character save byte-equal', () => {
@@ -304,13 +308,13 @@ describe('buyback preserves instance payloads', () => {
     const reloaded = JSON.parse(JSON.stringify(state));
     const sim2 = makeWorld();
     const pid2 = sim2.addPlayer('warrior', 'Seller', { state: reloaded });
-    const rows = sim2.ctx.resolve(pid2)!.meta.vendorBuyback;
+    const rows = buybackOf(sim2, pid2);
     expect(rows.find((s) => s.itemId === BOOTS)?.instance).toEqual(ENCHANTED);
     standAt(sim2, pid2, vendorEntity(sim2));
     sim2.players.get(pid2)!.copper = 100000;
     sim2.buyBackItem(BOOTS, undefined, undefined, pid2);
     expect(
-      sim2.ctx.resolve(pid2)!.meta.inventory.find((s) => s.itemId === BOOTS)?.instance,
+      sim2.ctx.resolve(pid2)?.meta.inventory.find((s) => s.itemId === BOOTS)?.instance,
     ).toEqual(ENCHANTED);
   });
 });

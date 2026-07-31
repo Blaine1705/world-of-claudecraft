@@ -10763,4 +10763,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.started':
     'Frigørelse om {seconds} sekunder. At bevæge dig, kæmpe, tage skade eller begynde en anden handling annullerer den.',
   'hudChrome.unstuck.unavailable': 'Frigørelse er ikke tilgængelig i din nuværende tilstand.',
+  'hud.errors.marketListBound': 'Den genstand er bundet og kan ikke sættes til salg.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Den genstand er bundet og kan ikke sendes med post.',
 };

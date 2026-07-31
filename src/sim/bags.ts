@@ -27,7 +27,6 @@
 
 import { ITEMS } from './data';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
-import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
   cloneItemInstancePayload,
@@ -372,7 +371,7 @@ export function equipBag(ctx: SimContext, itemId: string, socket?: number, pid?:
   }
   let target = socket;
   if (target === undefined) {
-    const empty = meta.bags.findIndex((b) => b === null);
+    const empty = meta.bags.indexOf(null);
     target = empty >= 0 ? empty : -1;
   }
   if (target === -1) {

@@ -10991,4 +10991,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'sim.rift.socketsShut': 'Die Fassungen schließen sich knirschend. Der Weg regt sich.',
   'sim.rift.stepBack': 'Du trittst zurück durch den Riss.',
   'sim.rift.wayDownOpens': 'Der Weg hinab reißt auf.',
+  'hud.errors.marketListBound': 'Dieser Gegenstand ist gebunden und kann nicht angeboten werden.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Dieser Gegenstand ist gebunden und kann nicht per Post verschickt werden.',
 };

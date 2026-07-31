@@ -296,4 +296,7 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
     'Vos chances de parer entièrement une attaque de mêlée de front, sans subir de dégâts. Un coup porté dans le dos ne peut pas être paré.',
   'hudChrome.interfaceTabs.chat': 'Clavardage',
   'hudChrome.options.mouseoverCast': 'Lancement au survol sur les cadres de groupe',
+  'hud.errors.marketListBound': 'Cet objet est lié et ne peut pas être mis en vente.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Cet objet est lié et ne peut pas être envoyé par la poste.',
 };

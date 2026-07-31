@@ -10781,4 +10781,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.started':
     'Fastna-hjälp om {seconds} sekunder. Att röra sig, strida, ta skada eller påbörja en annan handling avbryter den.',
   'hudChrome.unstuck.unavailable': 'Fastna-hjälp är inte tillgänglig i ditt nuvarande tillstånd.',
+  'hud.errors.marketListBound':
+    'Det föremålet är bundet och kan inte läggas ut till försäljning.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Det föremålet är bundet och kan inte skickas med post.',
 };

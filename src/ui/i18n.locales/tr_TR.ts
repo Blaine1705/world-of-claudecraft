@@ -10794,4 +10794,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.started':
     'Kurtulma {seconds} saniye içinde. Hareket etmek, savaşmak, hasar almak veya başka bir eylem başlatmak bunu iptal eder.',
   'hudChrome.unstuck.unavailable': 'Kurtulma mevcut durumunda kullanılamaz.',
+  'hud.errors.marketListBound': 'Bu eşya bağlı ve satışa konulamaz.',
+  'hudChrome.mailbox.result.noMailBound': 'Bu eşya bağlı ve postayla gönderilemez.',
 };

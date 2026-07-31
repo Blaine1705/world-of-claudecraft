@@ -11043,4 +11043,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marque du fabricant',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': "Bonus d'ouvrage de maître",
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Lien de commande',
+  'hud.errors.marketListBound': 'Cet objet est lié et ne peut pas être mis en vente.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Cet objet est lié et ne peut pas être envoyé par courrier.',
 };

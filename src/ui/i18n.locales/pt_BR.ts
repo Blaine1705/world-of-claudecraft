@@ -10908,4 +10908,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.started':
     'Desbloqueio em {seconds} segundos. Mover-se, lutar, sofrer dano ou iniciar outra ação o cancela.',
   'hudChrome.unstuck.unavailable': 'Desbloqueio não está disponível no seu estado atual.',
+  'hud.errors.marketListBound': 'Esse item está vinculado e não pode ser anunciado.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Esse item está vinculado e não pode ser enviado pelo correio.',
 };

@@ -10902,4 +10902,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'sim.rift.socketsShut': 'Soket-soket berderit menutup. Jalan pun bergerak.',
   'sim.rift.stepBack': 'Kamu melangkah mundur melalui rift.',
   'sim.rift.wayDownOpens': 'Jalan turun terkoyak terbuka.',
+  'hud.errors.marketListBound': 'Item itu terikat dan tidak dapat didaftarkan.',
+  'hudChrome.mailbox.result.noMailBound': 'Item itu terikat dan tidak dapat dikirim lewat pos.',
 };

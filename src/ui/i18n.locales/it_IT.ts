@@ -10960,4 +10960,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.started':
     "Sblocco tra {seconds} secondi. Muoverti, combattere, subire danni o avviare un'altra azione lo annulla.",
   'hudChrome.unstuck.unavailable': 'Sblocco non è disponibile nel tuo stato attuale.',
+  'hud.errors.marketListBound': "Quell'oggetto è vincolato e non può essere messo in vendita.",
+  'hudChrome.mailbox.result.noMailBound':
+    "Quell'oggetto è vincolato e non può essere spedito per posta.",
 };
