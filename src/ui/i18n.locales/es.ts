@@ -10970,6 +10970,5 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonificación de obra maestra',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vínculo de encargo',
   'hud.errors.marketListBound': 'Ese objeto está ligado y no se puede poner en venta.',
-  'hudChrome.mailbox.result.noMailBound':
-    'Ese objeto está ligado y no se puede enviar por correo.',
+  'hudChrome.mailbox.result.noMailBound': 'Ese objeto está ligado y no se puede enviar por correo.',
 };

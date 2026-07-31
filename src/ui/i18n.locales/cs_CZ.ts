@@ -10716,6 +10716,5 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Vyproštění za {seconds} sekund. Pohyb, boj, utrpění zranění nebo zahájení jiné akce ho zruší.',
   'hudChrome.unstuck.unavailable': 'Vyproštění není ve tvém současném stavu dostupné.',
   'hud.errors.marketListBound': 'Tento předmět je vázaný a nelze ho vystavit k prodeji.',
-  'hudChrome.mailbox.result.noMailBound':
-    'Tento předmět je vázaný a nelze ho odeslat poštou.',
+  'hudChrome.mailbox.result.noMailBound': 'Tento předmět je vázaný a nelze ho odeslat poštou.',
 };
