@@ -3666,6 +3666,16 @@ export interface ZonePropsDef {
     r?: number;
     h?: number;
     scale?: number;
+    /** Rectangular collider half-extents in the model's LOCAL axes, already
+     * scaled. Supply BOTH to collide as the model's real box instead of a
+     * circle: these models are rectangles, and a circle that contains one
+     * bulges past its flat walls (an invisible wall a stride out) while a
+     * circle inside one cuts its corners off. `rot` orients the box, so these
+     * never need swapping for a rotated building. `r` is unchanged and still
+     * the CLEARANCE radius that scatter, roads and parterre keep-outs read, so
+     * it must stay set even when a box is given. */
+    hw?: number;
+    hd?: number;
     /** ride the water surface instead of the seabed (moored ships/boats);
      * sunk this many yd below the waterline (the hull's draft) */
     float?: number;

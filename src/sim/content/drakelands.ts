@@ -7,7 +7,7 @@
 // lobes, the desert gradient, volcano cones).
 
 import { BULWARK_BUILDINGS } from '../bulwark_layout';
-import { CASTLE_BUILDINGS } from '../castle_layout';
+import { castleBuildingProps } from '../castle_layout';
 import type {
   CampDef,
   GroundObjectDef,
@@ -1019,7 +1019,7 @@ export const DRAKELANDS_PROPS: ZonePropsDef = {
   ],
   // the Last Keep's bailey: every building comes from the castle plan (one
   // source of truth with the walls, walks, and colliders)
-  decorProps: [...CASTLE_BUILDINGS, ...BULWARK_BUILDINGS],
+  decorProps: [...castleBuildingProps(), ...BULWARK_BUILDINGS],
   crates: [
     [406, 1892],
     [396, 1912],

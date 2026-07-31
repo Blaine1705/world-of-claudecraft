@@ -14,6 +14,7 @@
 // bailey sits at padH and the inner ward, the keep's raised terrace,
 // 2.6 above it behind a retaining edge with two stair cuts. Pure leaf:
 // deterministic, no rng, no SimContext.
+import { hexBuildingBox } from './hex_building_dims';
 import type { BlockerDef } from './types';
 
 export const CASTLE = {
@@ -251,6 +252,44 @@ export interface CastleBuilding {
   ward?: boolean;
   /** part of the composed keep mass: allowed to touch its complex mates */
   keepComplex?: boolean;
+  /** Collide as the model's measured BOX rather than as `r`. Opt-in per
+   * building because it is not always an improvement: the keep's circle is
+   * already inside its mesh, and boxing it would close the alley flight's lane
+   * to under a body's width. `r` stays authored either way, as the clearance
+   * radius scatter and roads read. */
+  boxed?: boolean;
+}
+
+/**
+ * The bailey and ward buildings as `decorProps`, with a measured box on every
+ * entry flagged `boxed`. Derived, never hand-typed: the half-extents come from
+ * the shipped model via hex_building_dims, so a re-scaled building cannot drift
+ * away from its own collision.
+ */
+export function castleBuildingProps(): {
+  key: string;
+  x: number;
+  z: number;
+  rot: number;
+  scale: number;
+  r: number;
+  h: number;
+  hw?: number;
+  hd?: number;
+}[] {
+  return CASTLE_BUILDINGS.map((b) => {
+    const box = b.boxed ? hexBuildingBox(b.key, b.scale) : null;
+    return {
+      key: b.key,
+      x: b.x,
+      z: b.z,
+      rot: b.rot,
+      scale: b.scale,
+      r: b.r,
+      h: b.h,
+      ...(box ?? {}),
+    };
+  });
 }
 export const CASTLE_BUILDINGS: readonly CastleBuilding[] = [
   // THE WARD: the keep with a barracks hall wing set beside it, the pair
@@ -285,9 +324,10 @@ export const CASTLE_BUILDINGS: readonly CastleBuilding[] = [
     h: 11,
     ward: true,
     keepComplex: true,
+    boxed: true,
   },
   // the great hall, moved down into the bailey to free the terrace
-  { key: 'hexrTownhall', x: 390, z: 2016, rot: 0, scale: 7, r: 5.8, h: 15 },
+  { key: 'hexrTownhall', x: 390, z: 2016, rot: 0, scale: 7, r: 5.8, h: 15, boxed: true },
   // THE BAILEY. Every mass here collides as a circle, and a circle that comes
   // within a body diameter of the curtain, a stair mass, a bastion, or its
   // neighbour leaves a tapering alley the player can walk into and wedge in
@@ -300,20 +340,45 @@ export const CASTLE_BUILDINGS: readonly CastleBuilding[] = [
   //
   // northwest military quarter: catapult tower, archery range, and the
   // servants' house
-  { key: 'hexrTowerCatapult', x: 369, z: 1997, rot: Math.PI / 2, scale: 7, r: 4, h: 14 },
-  { key: 'hexrArcheryrange', x: 384, z: 1998.5, rot: 0, scale: 7, r: 5.5, h: 12.5 },
-  { key: 'hexrHomeB', x: 370.5, z: 2008.5, rot: Math.PI / 2, scale: 7, r: 4.5, h: 9 },
+  {
+    key: 'hexrTowerCatapult',
+    x: 369,
+    z: 1997,
+    rot: Math.PI / 2,
+    scale: 7,
+    r: 4,
+    h: 14,
+    boxed: true,
+  },
+  { key: 'hexrArcheryrange', x: 384, z: 1998.5, rot: 0, scale: 7, r: 5.5, h: 12.5, boxed: true },
+  { key: 'hexrHomeB', x: 370.5, z: 2008.5, rot: Math.PI / 2, scale: 7, r: 4.5, h: 9, boxed: true },
   // the forge and market quarter by the gate road
-  { key: 'hexrBlacksmith', x: 371, z: 2021, rot: Math.PI / 2, scale: 7, r: 5, h: 7 },
+  { key: 'hexrBlacksmith', x: 371, z: 2021, rot: Math.PI / 2, scale: 7, r: 5, h: 7, boxed: true },
+  // The market and the stables are the two entries whose real box is BIGGER
+  // than the circle they were given, not smaller, so boxing them would take
+  // bailey away rather than give it back. Both are open compounds (a stall run
+  // and a fenced paddock, barely a fifth solid at chest height), so their true
+  // rectangle is a poor description of them either way: the honest fix is a
+  // collider that follows the fence and leaves the yard open, which one box
+  // cannot express. Circles until then, and their corners stay approximate.
   { key: 'hexrMarket', x: 388, z: 2040, rot: -Math.PI / 2, scale: 6.5, r: 4.5, h: 6.5 },
-  { key: 'hexrHomeA', x: 376, z: 2039, rot: Math.PI, scale: 6, r: 3.8, h: 6 },
+  { key: 'hexrHomeA', x: 376, z: 2039, rot: Math.PI, scale: 6, r: 3.8, h: 6, boxed: true },
   // the south quarter: stables, the twin barracks, chapel, and the inn. The
   // stables stand clear of the west flight's mass, not beside it.
   { key: 'hexrStables', x: 373, z: 2052, rot: 0.35, scale: 7, r: 5.5, h: 4.5 },
-  { key: 'hexrBarracks', x: 384, z: 2061, rot: Math.PI, scale: 7.5, r: 6, h: 12.5 },
-  { key: 'hexrBarracks', x: 401, z: 2059.8, rot: 0, scale: 7.5, r: 6, h: 12.5 },
-  { key: 'hexrChurch', x: 416, z: 2059, rot: -Math.PI / 2, scale: 7.5, r: 5.5, h: 12.5 },
-  { key: 'hexrTavern', x: 421, z: 2043, rot: Math.PI, scale: 7.5, r: 5.5, h: 10.5 },
+  { key: 'hexrBarracks', x: 386.5, z: 2061, rot: Math.PI, scale: 7.5, r: 6, h: 12.5, boxed: true },
+  { key: 'hexrBarracks', x: 401, z: 2059.8, rot: 0, scale: 7.5, r: 6, h: 12.5, boxed: true },
+  {
+    key: 'hexrChurch',
+    x: 416,
+    z: 2059,
+    rot: -Math.PI / 2,
+    scale: 7.5,
+    r: 5.5,
+    h: 12.5,
+    boxed: true,
+  },
+  { key: 'hexrTavern', x: 421, z: 2043, rot: Math.PI, scale: 7.5, r: 5.5, h: 10.5, boxed: true },
 ] as const;
 
 // THE KEEP'S FOUNDATION SEALS. Every mass on the ward terrace collides as a

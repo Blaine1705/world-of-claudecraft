@@ -729,9 +729,26 @@ function staticWorldColliders(seed: number): Collider[] {
     }
   }
 
-  // hand-placed GLB decor: circle collider matched to the model footprint;
-  // r 0/absent entries are walk-through dressing and add no collider
+  // Hand-placed GLB decor. r 0/absent entries are walk-through dressing and add
+  // no collider. An entry carrying hw AND hd collides as the model's real BOX,
+  // oriented by its own rot; everything else keeps the circle it always had.
+  // The box exists because these models are rectangles: a circle drawn round one
+  // stands off its flat walls (that is the invisible wall players walk into) and
+  // a circle drawn inside one cuts its corners off instead.
   for (const d of PROPS.decorProps ?? []) {
+    const cameraTopY = topY(seed, d.x, d.z, d.h ?? 4);
+    if (d.hw !== undefined && d.hd !== undefined) {
+      out.push({
+        type: 'obb',
+        x: d.x,
+        z: d.z,
+        hw: d.hw,
+        hd: d.hd,
+        rot: d.rot ?? 0,
+        cameraTopY,
+      });
+      continue;
+    }
     if (!d.r) continue;
     out.push({
       type: 'circle',
