@@ -185,7 +185,7 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
     expect(bulkCalled).toEqual(['thread', true]);
   });
 
-  it('the Buy Stack tile is disabled whenever the row itself is unaffordable', () => {
+  it('the Buy Stack tile is disabled whenever the bulk purchase itself is unaffordable', () => {
     const goods: VendorGoodsRow[] = [
       {
         itemId: 'thread',
@@ -194,6 +194,7 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
         quantity: 1,
         affordable: false,
         bulkQuantity: 3,
+        bulkAffordable: false,
       },
     ];
     const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
@@ -202,6 +203,28 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
 
     const bulkRow = el.querySelector('.vendor-item-bulk') as HTMLButtonElement | null;
     expect(bulkRow?.disabled).toBe(true);
+  });
+
+  it('the Buy Stack tile stays enabled when the ordinary row is unaffordable but the bulk purchase is (food/drink stack-of-5 case)', () => {
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'loaf',
+        item: item('loaf'),
+        price: { copper: 50, honor: 0 },
+        quantity: 5,
+        affordable: false,
+        bulkQuantity: 3,
+        bulkAffordable: true,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view, deps());
+
+    const row = el.querySelector('.vendor-item:not(.vendor-item-bulk)') as HTMLButtonElement | null;
+    const bulkRow = el.querySelector('.vendor-item-bulk') as HTMLButtonElement | null;
+    expect(row?.disabled).toBe(true);
+    expect(bulkRow?.disabled).toBe(false);
   });
 
   it('ctrl-click and cmd-click on the ordinary tile also request a bulk purchase', () => {

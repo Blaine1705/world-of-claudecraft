@@ -31,6 +31,12 @@ export interface VendorGoodsRow {
    *  carrying an Honor price (Honor is a per-purchase cost, never
    *  stack-multiplied; see VendorPrice.honor). */
   bulkQuantity?: number;
+  /** Advisory UI state for the bulk row only, checked against the bulk total
+   *  rather than the ordinary row's price (see `affordable`): a bulk quantity
+   *  is floor-affordable by construction, so a food/drink row whose ordinary
+   *  5-unit price the player cannot afford can still offer a smaller,
+   *  affordable bulk purchase. Undefined whenever `bulkQuantity` is. */
+  bulkAffordable?: boolean;
 }
 
 export interface VendorPrice {
@@ -108,7 +114,10 @@ export function buildVendorView(
       price,
       quantity,
       affordable: balances.copper >= price.copper && balances.honor >= price.honor,
-      ...(bulkQuantity !== undefined && { bulkQuantity }),
+      ...(bulkQuantity !== undefined && {
+        bulkQuantity,
+        bulkAffordable: balances.copper >= unitCopper * bulkQuantity,
+      }),
     });
   }
   const buyback: VendorBuybackRow[] = [];

@@ -125,7 +125,7 @@ export function renderVendorWindow(
       const bulkRow = document.createElement('button');
       bulkRow.type = 'button';
       bulkRow.className = 'vendor-item vendor-item-bulk';
-      bulkRow.disabled = !goods.affordable;
+      bulkRow.disabled = !goods.bulkAffordable;
       const bulkCount = formatNumber(goods.bulkQuantity, { maximumFractionDigits: 0 });
       const bulkCopper = Math.max(0, item.buyValue ?? 0) * goods.bulkQuantity;
       const bulkPrice = formatLocalizedMoney(bulkCopper);

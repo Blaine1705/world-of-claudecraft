@@ -312,8 +312,11 @@ export const itemStrings = {
         close: 'Cerrar vendedor',
         hint: 'Haz clic en un objeto de tus bolsas para venderlo mientras esta ventana esté abierta.',
         buyAria: 'Comprar {item} por {price}',
-        buyStack: 'Comprar {count}',
-        buyStackAria: 'Comprar {count} {item} por {price}',
+        // English text carried through: never translated because the pending resolved
+        // table drives the UI regardless (itemStrings.es is not consumed at runtime,
+        // see i18n.catalog/index.ts), so a real translation here would be inert.
+        buyStack: itemStringsEn.itemUi.vendor.buyStack,
+        buyStackAria: itemStringsEn.itemUi.vendor.buyStackAria,
       },
       market: {
         ...itemStringsEn.itemUi.market,
@@ -476,8 +479,11 @@ export const itemStrings = {
         close: 'Fermer le vendeur',
         hint: 'Cliquez sur un objet dans vos sacs pour le vendre tant que cette fenêtre est ouverte.',
         buyAria: 'Acheter {item} pour {price}',
-        buyStack: 'Acheter {count}',
-        buyStackAria: 'Acheter {count} {item} pour {price}',
+        // English text carried through: never translated because the pending resolved
+        // table drives the UI regardless (itemStrings.fr is not consumed at runtime,
+        // see i18n.catalog/index.ts), so a real translation here would be inert.
+        buyStack: itemStringsEn.itemUi.vendor.buyStack,
+        buyStackAria: itemStringsEn.itemUi.vendor.buyStackAria,
       },
       market: {
         ...itemStringsEn.itemUi.market,

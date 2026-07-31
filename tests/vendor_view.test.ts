@@ -113,6 +113,25 @@ describe('buildVendorView goods', () => {
     expect(view.goods[0].affordable).toBe(false);
   });
 
+  it('bulkAffordable is checked against the bulk total, not the ordinary row price (food/drink stack-of-5 case)', () => {
+    // buyValue 10, ordinary row price is 10*5=50 (unaffordable at 30 copper), but
+    // the bulk row only asks for floor(30/10)=3 units at 30 copper, which the
+    // buyer CAN afford: the ordinary and bulk affordability must be independent.
+    const items = table(item('loaf', { buyValue: 10, kind: 'food' }));
+    const view = buildVendorView(['loaf'], [], items, { copper: 30, honor: 0 });
+    expect(view.goods[0].price).toEqual({ copper: 50, honor: 0 });
+    expect(view.goods[0].affordable).toBe(false);
+    expect(view.goods[0].bulkQuantity).toBe(3);
+    expect(view.goods[0].bulkAffordable).toBe(true);
+  });
+
+  it('bulkAffordable is false when even the floor-affordable bulk quantity is unaffordable', () => {
+    const items = table(item('thread', { buyValue: 12, stackSize: 20 }));
+    const view = buildVendorView(['thread'], [], items, { copper: 0, honor: 0 });
+    expect(view.goods[0].bulkQuantity).toBe(1);
+    expect(view.goods[0].bulkAffordable).toBe(false);
+  });
+
   it('bulkQuantity is absent for an item that does not stack', () => {
     const items = table(item('sword', { buyValue: 50, kind: 'weapon' })); // UNSTACKED_KINDS: stackSize 1
     const view = buildVendorView(['sword'], [], items, RICH);
