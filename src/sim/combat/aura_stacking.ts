@@ -17,6 +17,17 @@ export const SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS: ReadonlySet<string> = new S
   'battle_shout',
   'blessing_of_might',
   'devotion_aura',
+  // The overhauled Paladin aura kit. Every one is a persistent party buff, so a
+  // second Paladin running the SAME aura refreshes it instead of granting the
+  // effect twice: no double 5% damage reduction, no double thorns, no two copies
+  // of one Devotion. Distinct auras still coexist (Bastion plus Requital, or one
+  // Paladin's Dawn next to another's Grace), which is what the tooltips mean by
+  // Devotions from different Paladins working together.
+  'devotion_ward',
+  'retribution_aura',
+  'radiant_devotion',
+  'dawn_devotion',
+  'grace_devotion',
   // Emboldening Roar (Fury aoeAllySureCrit): two Fury warriors must not stack
   // two separate 3-charge guaranteed-crit auras on a shared ally.
   'emboldening_roar_crit',
