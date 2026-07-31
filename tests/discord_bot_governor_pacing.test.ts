@@ -973,41 +973,56 @@ describe('RateGovernor re-reservation after a BUCKET wait (L11, second arm)', ()
 describe('RateGovernor drained-queue identity guard (load bearing under L12)', () => {
   it('does not delete a RE-MINTED chain when the evicted one drains', async () => {
     // The `this.queues.get(template) === queue` check in the job's finally became
-    // load bearing the moment queues could be EVICTED: cold0's chain is evicted
-    // and a later request mints a fresh one under the same template, so when the
-    // ORIGINAL request settles its `waiting === 0` is true for the OLD object.
-    // Without the identity guard it would delete the LIVE chain from the map, and
-    // a third request would then run unserialized beside the second.
+    // load bearing the moment queues could be EVICTED. cold0's chain is evicted by
+    // the fillers, a later request mints a FRESH chain under the same template, and
+    // when the ORIGINAL request finally settles its `waiting === 0` is true for the
+    // OLD object. Without the identity check it deletes the LIVE chain from the map.
+    //
+    // Two gates, not one, and that is the whole design of this case: the first
+    // request has to settle while the second is STILL in flight, because the
+    // deletion is only observable through a request that arrives after the settle.
+    // A single shared gate releases everything at once and the mutant survives.
     const { governor, clock } = makeGovernor(0);
     const started: string[] = [];
-    let release = (): void => {};
-    const held = new Promise<void>((resolve) => {
-      release = resolve;
+    let releaseFirst = (): void => {};
+    let releaseRest = (): void => {};
+    const first = new Promise<void>((r) => {
+      releaseFirst = r;
     });
-    const send = (label: string) => async (): Promise<GovernorResponse> => {
+    const rest = new Promise<void>((r) => {
+      releaseRest = r;
+    });
+    const send = (label: string, gate: Promise<void>) => async (): Promise<GovernorResponse> => {
       started.push(label);
-      await held;
+      await gate;
       return reply();
     };
 
     const cold0 = interactionPath(0);
     const all: Promise<unknown>[] = [];
-    all.push(governor.run({ method: 'POST', path: cold0 }, send('cold0-first')));
+    all.push(governor.run({ method: 'POST', path: cold0 }, send('cold0-first', first)));
     for (let i = 1; i < MAX_TRACKED_QUEUES + 5; i++) {
-      all.push(governor.run({ method: 'POST', path: interactionPath(i) }, send(`filler-${i}`)));
+      all.push(
+        governor.run({ method: 'POST', path: interactionPath(i) }, send(`filler-${i}`, rest)),
+      );
     }
-    // cold0 was inserted first and never touched again, so it is the evicted one.
-    all.push(governor.run({ method: 'POST', path: cold0 }, send('cold0-second')));
+    // cold0 went in first and was never touched again, so it is the evicted one.
+    all.push(governor.run({ method: 'POST', path: cold0 }, send('cold0-second', rest)));
     await clock.advanceTo(clock.now());
     expect(started).toContain('cold0-second'); // a fresh chain, not queued behind
 
-    // A THIRD request on the same template must serialize behind cold0-second,
-    // which it only can if cold0-second's chain is still the one the map holds.
-    all.push(governor.run({ method: 'POST', path: cold0 }, send('cold0-third')));
+    // Let ONLY the original settle. Its finally now runs while cold0-second is
+    // still in flight, which is the moment the identity guard exists for.
+    releaseFirst();
+    await clock.advanceTo(clock.now());
+
+    // A later request on the same template must still serialize behind
+    // cold0-second, which it only can if the map still holds cold0-second's chain.
+    all.push(governor.run({ method: 'POST', path: cold0 }, send('cold0-third', rest)));
     await clock.advanceTo(clock.now());
     expect(started).not.toContain('cold0-third');
 
-    release();
+    releaseRest();
     await clock.runAll();
     await Promise.all(all);
     expect(started).toContain('cold0-third');

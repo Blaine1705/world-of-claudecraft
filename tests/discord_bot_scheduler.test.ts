@@ -711,10 +711,16 @@ describe('scheduler kick from IDLE, and the task lifecycle', () => {
 
   it('runs a kick IMMEDIATELY when idle, and drops the delay it made stale', async () => {
     // The GUILD_CREATE path main.ts actually uses, and the one branch of kick()
-    // the mid-run cases never reach. Three separate claims, each falsifiable:
-    // the 500 proves the kick ran at once rather than waiting; the ABSENCE of a
-    // 1000 proves the already-armed delay was cleared instead of firing a second
-    // run a moment later; and the 1500 proves the chain re-armed from the kick.
+    // the mid-run cases never reach. The 500 proves the kick ran at once rather
+    // than waiting, the absence of a 1000 proves no second run came from the
+    // delay the kick made stale, and the 1500 proves the chain re-armed from the
+    // kick rather than keeping its old phase.
+    //
+    // Honest limit, found by mutation: this does NOT prove the `clearArmed()`
+    // inside kick() specifically. Deleting it survives, because schedule() clears
+    // the handle again before re-arming and the overlap guard absorbs a stale
+    // timer that fires during a slow run. That line is defense in depth, not a
+    // load-bearing one, and no assertion can distinguish it.
     const { clock, runAt, task } = rig();
     task.start();
     await clock.advanceTo(500);
@@ -732,9 +738,11 @@ describe('scheduler kick from IDLE, and the task lifecycle', () => {
   });
 
   it('ignores a second start(), so a loop cannot be armed twice', async () => {
-    // A double start would arm two independent chains on one task, doubling every
-    // sweep forever, and the overlap guard would not catch it: the two chains
-    // interleave rather than overlap.
+    // Idempotence at the API level. Honest limit, found by mutation: deleting the
+    // `if (this.active) return` guard survives this, because schedule() clears the
+    // previously armed handle before arming the next, so a second start replaces
+    // the chain rather than adding one. The guard is defense in depth; what this
+    // test does pin is the OBSERVABLE contract, that N starts give one cadence.
     const { clock, runAt, task } = rig();
     task.start();
     task.start();
