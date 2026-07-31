@@ -656,7 +656,9 @@ describe('gather node placement: every node sits on ground a player can work', (
   it('count floor: every zone keeps every gathering profession worth visiting', () => {
     // A relocation must never be allowed to drain a zone of a type (moving a node
     // across a band boundary would), and the count itself is the density the
-    // world is tuned around: every zone carries six nodes of every type against
+    // world is tuned around: every TUNED zone (this loop's scope; the eleven
+    // expansion zones ship the thinner two-per-type starter kit, see the
+    // header note) carries six nodes of every type against
     // the 240-second respawn in NODE_HARVEST_TABLE, which is the pair that holds
     // the per-zone harvest ceiling flat while roughly doubling the circuit. NOT,
     // deliberately not, "which makes the circuit longer than the wait": measured
@@ -696,7 +698,8 @@ describe('gather node placement: every node sits on ground a player can work', (
         leanestTier1 = Math.min(leanestTier1, ofType.filter((n) => n.tier === 1).length);
       }
     }
-    // Every zone now carries exactly six of each type, so the total floor is
+    // Every TUNED zone carries exactly six of each type (the starter zones sit
+    // outside this loop at two), so the total floor is
     // exact rather than merely tight: it was three when Eastbrook shipped three
     // ore, three wood and three herb, and it moved with the content.
     expect(leanestTotal).toBe(6);

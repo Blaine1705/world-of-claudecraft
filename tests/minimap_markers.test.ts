@@ -10,7 +10,7 @@
 // canvas no-magic-values guard is in tests/minimap_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
-import { DELVE_X_MIN, QUESTS, STATIONS, YUMI_MAZE_X } from '../src/sim/data';
+import { DELVE_X_MIN, GATHER_NODES, QUESTS, STATIONS, YUMI_MAZE_X } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { createMinimapMarkers, type MinimapMarker, minimapMode } from '../src/ui/minimap_markers';
 import type { IWorld } from '../src/world_api';
@@ -585,5 +585,70 @@ describe('gather-node markers: the locked dimension', () => {
     // The pair genuinely discriminates: the counter, and nothing else, moved
     // the vector, so this parity assertion is not two copies of one constant.
     expect(earnedSim.map((m) => m.locked)).not.toEqual(unearnedSim.map((m) => m.locked));
+  });
+});
+
+describe('gather-node markers scale with the rim, not the node table (phase 16)', () => {
+  // The zone-scaling half of the client projection: the SCANNED set is the
+  // whole authored table (an accepted O(nodes) walk at the minimap's 10 Hz
+  // redraw), but the DRAWN set must stay bounded by the rim cull however many
+  // zones ship nodes. Both arms below fail if the cull is dropped or its
+  // comparison flips; neither moves when a new zone adds nodes.
+  function nodeWorldAt(x: number, z: number): IWorld {
+    const player = {
+      id: 1,
+      kind: 'player',
+      name: 'Me',
+      pos: { x, z },
+      facing: 0,
+      dead: false,
+      lootable: false,
+      aggroTargetId: null,
+      questIds: [],
+      templateId: '',
+    };
+    return {
+      player,
+      entities: new Map([[1, player]]),
+      partyInfo: null,
+      socialInfo: null,
+      delveRun: null,
+      cfg: { seed: 42, playerClass: 'warrior' },
+      playerId: 1,
+      stationPlacements: [],
+      inventory: [],
+      gatheringProficiency: {},
+      nodeHarvestableByMe: () => true,
+      questState: () => 'unavailable',
+    } as unknown as IWorld;
+  }
+  function nodeMarkersAt(x: number, z: number) {
+    return buildMarkers(nodeWorldAt(x, z)).filter((m) => m.kind === 'gather-node');
+  }
+  const RIM_PX = S / 2 - 7; // byte-faithful to the core's half - RIM_INSET
+
+  it('draws exactly the in-rim subset, probed standing on one node of every zone', () => {
+    const zones = [...new Set(GATHER_NODES.map((n) => n.zoneId))];
+    // Every shipped zone carries nodes since the v0.32.0 starter kits, so the
+    // probe genuinely tours the whole world.
+    expect(zones.length).toBeGreaterThanOrEqual(14);
+    for (const zoneId of zones) {
+      const anchor = GATHER_NODES.find((n) => n.zoneId === zoneId);
+      if (!anchor) throw new Error(`no node in ${zoneId}`);
+      const expected = GATHER_NODES.filter((n) => {
+        const dx = (n.pos.x - anchor.pos.x) * PPY;
+        const dz = (n.pos.z - anchor.pos.z) * PPY;
+        return dx * dx + dz * dz <= RIM_PX * RIM_PX;
+      }).length;
+      expect(nodeMarkersAt(anchor.pos.x, anchor.pos.z), `zone ${zoneId}`).toHaveLength(expected);
+      // Standing on a node always draws at least that node, and the rim
+      // genuinely culls (far zones never ride along).
+      expect(expected).toBeGreaterThanOrEqual(1);
+      expect(expected).toBeLessThan(GATHER_NODES.length);
+    }
+  });
+
+  it('a viewer far from every node draws zero node markers regardless of the table size', () => {
+    expect(nodeMarkersAt(99000, 99000)).toHaveLength(0);
   });
 });
