@@ -295,7 +295,11 @@ class Bot {
         }
         reject(err);
       };
-      const to = setTimeout(() => abort(new Error('join timeout')), 15000);
+      // Well past the server's own 10 s auth deadline: the server must always
+      // decide first. A client-side abort of an in-flight handshake can
+      // orphan a zombie session that holds the character lease for minutes
+      // (the tail-of-ramp failure shape), so the rig never gives up early.
+      const to = setTimeout(() => abort(new Error('join timeout')), 30000);
       this.ws.on('open', () => {
         this.ws.send(
           JSON.stringify({ ...worldAuthMessage(this.token, this.characterId), ...authExtra }),
@@ -571,9 +575,20 @@ async function main() {
   let joinsDone = false;
   const failures = [];
   const failedBots = [];
+  // The ramp TAPERS: most workers retire once 70 percent of the fleet is in,
+  // so the tail joins at concurrency 5. With hundreds already online every
+  // callback is slow and twenty concurrent handshakes starve each other past
+  // the server's 10 s auth deadline; the server's deadline rejection can race
+  // a completing join and orphan a lease-holding zombie session (minutes to
+  // reap), which is what made the last few joins of a 1,000-bot ramp
+  // unrecoverable. Fewer concurrent handshakes at the tail keeps every one
+  // comfortably inside the deadline instead.
+  const TAIL_CONCURRENCY = 5;
+  const taperAt = Math.floor(bots.length * 0.7);
   const joinPromise = Promise.all(
-    Array.from({ length: CONNECT_CONCURRENCY }, async () => {
+    Array.from({ length: CONNECT_CONCURRENCY }, async (_, worker) => {
       while (cursor < bots.length) {
+        if (worker >= TAIL_CONCURRENCY && joined >= taperAt) break;
         const bot = bots[cursor];
         cursor += 1;
         try {
@@ -592,12 +607,16 @@ async function main() {
       // auth deadline or catch an autosave wave holding the pool; a later
       // attempt normally lands (a real client retries too). The gate judges
       // the FINAL count, and a fleet with a broken join path (more than 10
-      // percent failed) is never retried into a false pass.
-      for (let pass = 1; pass <= 5 && failedBots.length > 0; pass++) {
+      // percent failed) is never retried into a false pass. The delays
+      // ESCALATE because a client-side abort can orphan the server-side
+      // character lease: every quick retry then refuses until the lease
+      // expires (the ~90 s lockout), so the late passes must wait it out.
+      const retryDelaysMs = [5000, 15000, 30000, 60000, 90000];
+      for (let pass = 1; pass <= retryDelaysMs.length && failedBots.length > 0; pass++) {
         if (failedBots.length > Math.max(50, BOTS / 10)) break;
         const retrying = failedBots.splice(0);
         console.log(`[prof-load] retry pass ${pass}: ${retrying.length} bots`);
-        await sleep(5000);
+        await sleep(retryDelaysMs[pass - 1]);
         let rcursor = 0;
         await Promise.all(
           Array.from({ length: 5 }, async () => {
@@ -614,6 +633,11 @@ async function main() {
             }
           }),
         );
+        if (failedBots.length > 0) {
+          console.log(
+            `[prof-load] retry pass ${pass} left ${failedBots.length} (last: ${failures.at(-1)})`,
+          );
+        }
       }
     })
     .then(() => {
