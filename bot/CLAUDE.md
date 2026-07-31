@@ -32,7 +32,10 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
   counters. Only the rate state is remapped; the queues are never re-keyed, which is what
   makes the remap safe mid-flight. Time is injected; it reads no clock.
 - `discord_api.ts`: thin Discord REST client (bot-token authed), an IO shell over the
-  governor. Tested in `tests/discord_bot_discord_api.test.ts`.
+  governor. Also owns the governor's production IO (`systemGovernorClock`,
+  `consoleGovernorLog`) and `governorFromConfig`, the ONE construction site for a
+  production governor: `main.ts` calls it, and `DiscordApi`'s own default routes through
+  it. Tested in `tests/discord_bot_discord_api.test.ts`.
 - `server_client.ts`: client for the game server's secret-gated `/internal/discord/*`
   endpoints (`x-woc-discord-secret`); grep `/internal/discord/` there for the live set.
   Tested in `tests/discord_bot_server_client.test.ts`.
@@ -59,7 +62,8 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
   logic in `logic.ts` (tested), ws/fetch IO in the shells. Don't inline opcode or
   role-diff logic into `gateway.ts`/`main.ts`.
 - **One injection convention in the three shells.** Each shell takes its IO as
-  TRAILING constructor parameters with production defaults, so `main.ts` keeps
+  TRAILING parameters with production defaults, on a constructor or on a factory
+  (`governorFromConfig`), so `main.ts` keeps
   constructing with the leading arguments only and gets exactly production IO.
   Every default FORWARDS to the global, `(...args) => fetch(...args)` and
   `(cb, ms) => setTimeout(cb, ms)`, never `= fetch` or `= { setTimeout }`: the

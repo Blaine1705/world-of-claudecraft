@@ -78,7 +78,9 @@ export interface GovernorConfig {
 export function governorFromConfig(
   config: GovernorConfig,
   // Trailing seams with production defaults, the one convention the three shells
-  // share (bot/CLAUDE.md R15). Without them the mapping below is unobservable:
+  // share (bot/CLAUDE.md, "One injection convention in the three shells"; the
+  // packet records it as R15 in docs/discord-bot-stability/state.md). Without
+  // them the mapping below is unobservable:
   // the production clock is the real one, so pinning that `banPauseMs` reached
   // the governor would mean a test that actually waits out a ban pause.
   clock: GovernorClock = systemGovernorClock(),

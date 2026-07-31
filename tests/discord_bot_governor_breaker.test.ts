@@ -37,6 +37,11 @@ const SPACING_MS = 20;
 /** A distinctive fractional retry_after: 0 is absorb429's own fallback. */
 const RETRY_AFTER_S = 0.25;
 
+/** Token-shaped, so a fixture on a credential-bearing route is one: a 3 character
+ *  stand-in is not a variable segment, so routeTemplate keeps it verbatim and the
+ *  path stops resembling the live callback shape it is standing in for. */
+const INTERACTION_TOKEN = 'aW50ZXJhY3Rpb250b2tlbnZhbHVlMTIzNDU2Nzg5';
+
 const SWEEP: GovernorRequest = { method: 'PATCH', path: '/guilds/1/members/2' };
 /** The template SWEEP resolves to, and therefore the one a refusal names. */
 const SWEEP_TEMPLATE = 'PATCH /guilds/1/members/:id';
@@ -617,7 +622,7 @@ describe('governor registry bounds', () => {
       const interactionId = `1000000000000000${String(i).padStart(3, '0')}`;
       await call(
         rig,
-        { method: 'POST', path: `/interactions/${interactionId}/tok/callback` },
+        { method: 'POST', path: `/interactions/${interactionId}/${INTERACTION_TOKEN}/callback` },
         hashed(`interaction-${i}`),
       );
     }
@@ -686,7 +691,7 @@ describe('governor registry bounds', () => {
     // Number.MAX_SAFE_INTEGER, which would collapse the loop onto a few values.
     const cold = (i: number): GovernorRequest => ({
       method: 'POST',
-      path: `/interactions/4000000000000000${String(i).padStart(3, '0')}/tok/callback`,
+      path: `/interactions/4000000000000000${String(i).padStart(3, '0')}/${INTERACTION_TOKEN}/callback`,
     });
     const coldReply = (i: number): GovernorResponse => ({
       status: 200,
@@ -799,7 +804,12 @@ describe('bucket registry cap on every insert path', () => {
       const id = `2000000000000000${String(i).padStart(3, '0')}`;
       // One attempt each: the retry is not what is under test, and letting it
       // run would sleep out 30 virtual seconds per iteration.
-      await call(rig, { method: 'POST', path: `/interactions/${id}/tok/callback` }, bare429, OK);
+      await call(
+        rig,
+        { method: 'POST', path: `/interactions/${id}/${INTERACTION_TOKEN}/callback` },
+        bare429,
+        OK,
+      );
     }
 
     const snap = rig.governor.snapshot();
@@ -831,7 +841,11 @@ describe('bucket registry cap on every insert path', () => {
 
     for (let i = 0; i < 700; i++) {
       const id = `3000000000000000${String(i).padStart(3, '0')}`;
-      await call(rig, { method: 'POST', path: `/interactions/${id}/tok/callback` }, live);
+      await call(
+        rig,
+        { method: 'POST', path: `/interactions/${id}/${INTERACTION_TOKEN}/callback` },
+        live,
+      );
     }
 
     const snap = rig.governor.snapshot();

@@ -22,6 +22,11 @@ import {
   DEFAULT_MAX_RPS,
   type GovernorCounters,
   type GovernorResponse,
+  MAX_FORBIDDEN_ENTRIES,
+  MAX_QUEUE_DEPTH,
+  MAX_TRACKED_BUCKETS,
+  MAX_TRACKED_ROUTES,
+  majorParameterOf,
   RateGovernor,
   redactPath,
   routeTemplate,
@@ -323,6 +328,79 @@ describe('routeTemplate', () => {
       `/interactions/${INTERACTION}/${INTERACTION_TOKEN}/callback`,
     );
     expect(callback).not.toContain(INTERACTION_TOKEN);
+  });
+});
+
+describe('majorParameterOf', () => {
+  // Discord's X-RateLimit-Bucket is documented as non-inclusive of the top-level
+  // resource, so the hash names a route SHAPE and the major parameter is what
+  // turns it into one real bucket. Driven directly rather than only through the
+  // governor, because the edge cases below are unreachable from the eight routes
+  // this bot calls and would otherwise be undocumented.
+  const ROWS: { name: string; template: string; major: string }[] = [
+    { name: 'guild roles', template: `GET /guilds/${GUILD}/roles`, major: GUILD },
+    {
+      name: 'member PATCH, past a collapsed member id',
+      template: `PATCH /guilds/${GUILD}/members/:id`,
+      major: GUILD,
+    },
+    {
+      name: 'member role add, past TWO collapsed ids',
+      template: `PUT /guilds/${GUILD}/members/:id/roles/:id`,
+      major: GUILD,
+    },
+    { name: 'channel messages', template: `POST /channels/${CHANNEL}/messages`, major: CHANNEL },
+    {
+      name: 'interaction callback, past the redacted token',
+      template: `POST /interactions/${INTERACTION}/:token/callback`,
+      major: INTERACTION,
+    },
+    {
+      name: 'webhook edit takes the APPLICATION id, not the token',
+      template: `PATCH /webhooks/${APP}/:token/messages/@original`,
+      major: APP,
+    },
+    // No major parent at all: the key degrades to the hash alone, which is right,
+    // because a route with no top-level resource has exactly one real bucket.
+    { name: 'gateway', template: 'GET /gateway/bot', major: '' },
+    {
+      name: 'command registration (an application id is NOT a major parameter)',
+      template: `PUT /applications/${APP}/guilds/${GUILD}/commands`,
+      major: GUILD,
+    },
+    // A LITERAL sitting where an id would. Returning 'templates' as this route's
+    // major parameter would be nonsense, so the id-shape test is what rejects it.
+    { name: 'a literal after a major parent', template: 'GET /guilds/templates/abc', major: '' },
+  ];
+
+  for (const row of ROWS) {
+    it(`reads the major parameter for ${row.name}`, () => {
+      expect(majorParameterOf(row.template)).toBe(row.major);
+    });
+  }
+
+  it('never returns a placeholder the template minted', () => {
+    // :id and :token are what routeTemplate substituted for a NON-major segment,
+    // so either one surviving into a bucket key would merge every member of a
+    // guild onto one key, or put a credential in it.
+    for (const row of ROWS) {
+      expect(majorParameterOf(row.template)).not.toBe(':id');
+      expect(majorParameterOf(row.template)).not.toBe(':token');
+    }
+  });
+});
+
+describe('governor registry bounds', () => {
+  it('pins every bound against a LITERAL, not against itself', () => {
+    // The bound tests drive their loops from these same constants and assert the
+    // result against them, so lowering one leaves the whole suite green while
+    // shipping a real defect: MAX_TRACKED_ROUTES at 4 would thrash the LRU on the
+    // hot member-PATCH route every sweep. The scopes suite pins the four DEFAULT_*
+    // knobs the same way and for the same reason.
+    expect(MAX_TRACKED_BUCKETS).toBe(512);
+    expect(MAX_TRACKED_ROUTES).toBe(512);
+    expect(MAX_FORBIDDEN_ENTRIES).toBe(4096);
+    expect(MAX_QUEUE_DEPTH).toBe(256);
   });
 });
 

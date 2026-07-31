@@ -230,6 +230,42 @@ describe('rate governor 429 that names no usable wait', () => {
     expect(sentAt).toEqual([0, 1000]);
   });
 
+  it('lets a usable retry-after HEADER win over a body value of zero', async () => {
+    // The precedence half of the floor, and a hole the first pass left open. A
+    // body value that names no wait must not merely be floored, it must stop
+    // counting as an answer at all: treating a present-but-zero body as the
+    // authoritative value suppresses a header that DOES name a wait, so a 429
+    // carrying `retry_after: 0` beside `retry-after: 30` waited one second and
+    // retried into a live thirty second penalty.
+    const { governor, clock, slept } = governorFixture();
+    const { send, sentAt } = queuedSend(clock, [
+      res({ status: 429, headers: { 'retry-after': '30' }, json: { retry_after: 0 } }),
+      res({}),
+    ]);
+
+    const pending = governor.run({ method: 'GET', path: '/guilds/1/roles' }, send);
+    await clock.runAll();
+    await pending;
+
+    expect(slept).toEqual([30_000]);
+    expect(slept).not.toContain(MISSING_RETRY_AFTER_MS);
+    expect(sentAt).toEqual([0, 30_000]);
+  });
+
+  it('still floors a zero body value when no header names a wait either', async () => {
+    // The complement, so the rule above cannot be implemented as "ignore the body
+    // whenever it is zero and then give up": with nothing usable anywhere, the
+    // one second floor is still what applies.
+    const { governor, clock, slept } = governorFixture();
+    const { send } = queuedSend(clock, [res({ status: 429, json: { retry_after: 0 } }), res({})]);
+
+    const pending = governor.run({ method: 'GET', path: '/guilds/1/roles' }, send);
+    await clock.runAll();
+    await pending;
+
+    expect(slept).toEqual([MISSING_RETRY_AFTER_MS]);
+  });
+
   it('still honors a genuine SUB-second retry_after rather than rounding it up to the floor', async () => {
     // The complement, so the floor cannot be implemented as "always wait at least
     // a second": Discord's sub-second penalties are real and waiting 20x longer

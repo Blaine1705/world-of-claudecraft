@@ -302,7 +302,11 @@ export function majorParameterOf(template: string): string {
     // The placeholders are what the template replaced a NON-major id with, so
     // neither can ever be the major parameter.
     if (segment === '' || segment === ':id' || segment === ':token') continue;
-    if (MAJOR_PARENTS.has(parts[i - 1])) return segment;
+    // isVariableSegment as well as the parent check: a LITERAL path component
+    // can sit where an id would (`/guilds/templates/{code}`), and returning
+    // "templates" as this route's major parameter would be nonsense. A real
+    // major id is always a snowflake, which routeTemplate keeps verbatim.
+    if (MAJOR_PARENTS.has(parts[i - 1]) && isVariableSegment(segment)) return segment;
   }
   return '';
 }
@@ -672,9 +676,16 @@ export class RateGovernor {
     // sleep of Infinity is clamped to about 1 ms by the platform, so the pause
     // loop would spin at a thousand iterations a second and the bot would never
     // send again. headerNumber already guards its side the same way.
+    // USABLE, not merely present. A body value that is zero, negative, or not
+    // finite names no wait at all, so it must not win the coalesce below and
+    // suppress a Retry-After header that does name one: a 429 carrying
+    // `retry_after: 0` beside `retry-after: 30` would otherwise wait one second
+    // and retry into a live thirty second penalty. (Number.isFinite because
+    // JSON.parse turns 1e999 into Infinity, whose typeof IS 'number'.)
+    const rawBodyRetry = typeof body.retry_after === 'number' ? body.retry_after : null;
     const bodyRetry =
-      typeof body.retry_after === 'number' && Number.isFinite(body.retry_after)
-        ? body.retry_after
+      rawBodyRetry !== null && Number.isFinite(rawBodyRetry) && rawBodyRetry > 0
+        ? rawBodyRetry
         : null;
     const headerRetry = headerNumber(response.headers, 'retry-after');
     // A 429 that names no wait at all is malformed. Falling back to 0 would
