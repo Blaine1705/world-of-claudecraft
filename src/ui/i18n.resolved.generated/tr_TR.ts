@@ -7231,7 +7231,7 @@ export const tr_TR: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Üstün Görünmezlik",
-        "description": "20 sn. boyunca kaybolursun: 2 zamanla hasar etkisini kaldırır ve görünmezken ve hemen sonrasında %90 daha az hasar alırsın. (büyücü yeteneği)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Sıcak Seri",

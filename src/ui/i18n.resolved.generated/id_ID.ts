@@ -7231,7 +7231,7 @@ export const id_ID: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Ketaklihatan Agung",
-        "description": "Menghilang selama 20 dtk.: menghapus 2 efek kerusakan berkala dan kamu menerima 90% lebih sedikit kerusakan saat tak terlihat dan sesaat setelahnya. (talenta mage)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Rentetan Membara",

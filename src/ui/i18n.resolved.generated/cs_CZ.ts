@@ -7231,7 +7231,7 @@ export const cs_CZ: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Dokonalá neviditelnost",
-        "description": "Na 20 s zmizíš: odstraní 2 efekty průběžného poškození a během neviditelnosti i krátce po ní utrpíš o 90 % méně poškození. (mágovský talent)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Žhavá série",

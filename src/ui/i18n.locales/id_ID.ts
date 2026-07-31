@@ -9575,8 +9575,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Mengakhiri waktu pemulihan Langkah Kedip, Selubung Beku, dan Ketaklihatan Agung. (talenta mage)',
   'entities.abilities.greater_invisibility.name': 'Ketaklihatan Agung',
-  'entities.abilities.greater_invisibility.description':
-    'Menghilang selama 20 dtk.: menghapus 2 efek kerusakan berkala dan kamu menerima 90% lebih sedikit kerusakan saat tak terlihat dan sesaat setelahnya. (talenta mage)',
   'entities.abilities.hot_streak.name': 'Rentetan Membara',
   'entities.abilities.hot_streak.description':
     'Pasif: dua serangan kritis berturut-turut dengan mantra Api milikmu (Cinderbolt, Cinderfall, Lepuh, Pyrelance, atau Hantaman Api) membuat Pyrelance atau Hantaman Api berikutnya seketika dan gratis. Mantra penghabis dihitung untuk rentetan BERIKUTNYA, termasuk penggunaan gratis; Hantaman Api dihitung sekali berapa pun musuh yang terkena, dan hanya benturan awal yang dapat dihitung. (Api)',

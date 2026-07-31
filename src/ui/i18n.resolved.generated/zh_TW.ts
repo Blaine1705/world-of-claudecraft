@@ -7231,7 +7231,7 @@ export const zh_TW: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "強效隱形術",
-        "description": "消失 20 秒：移除 2 個持續傷害效果，並使你在隱形期間及結束後短時間內受到的傷害降低 90%。（法師天賦）"
+        "description": "消失 20 秒並移除 2 個持續傷害效果。隱形結束時，受到的傷害降低 90%，持續 2 秒。（法師天賦）"
       },
       "hot_streak": {
         "name": "熾熱連擊",

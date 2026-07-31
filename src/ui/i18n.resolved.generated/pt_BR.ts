@@ -7231,7 +7231,7 @@ export const pt_BR: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Invisibilidade Maior",
-        "description": "Desaparece por 20 s: remove 2 efeitos de dano periódico e reduz o dano recebido em 90% enquanto você está invisível e por pouco tempo depois. (Talento de mago)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Embalo Ardente",

@@ -9523,8 +9523,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Hoàn tất thời gian hồi của Bước Chớp, Màn Sương Giá và Tàng Hình Cao Cấp. (tài năng pháp sư)',
   'entities.abilities.greater_invisibility.name': 'Tàng Hình Cao Cấp',
-  'entities.abilities.greater_invisibility.description':
-    'Biến mất trong 20 giây: xóa 2 hiệu ứng sát thương theo thời gian và bạn nhận ít hơn 90% sát thương khi đang tàng hình và trong chốc lát sau đó. (tài năng pháp sư)',
   'entities.abilities.hot_streak.name': 'Chuỗi Nóng',
   'entities.abilities.hot_streak.description':
     'Nội tại: hai đòn chí mạng liên tiếp bằng phép Lửa của bạn (Tia Tàn Lửa, Mưa Tàn Lửa, Bỏng Rát, Thương Liệt Hỏa hoặc Cú Đánh Lửa) khiến Thương Liệt Hỏa hoặc Cú Đánh Lửa tiếp theo được thi triển tức thì và miễn phí. Phép tiêu hao được tính cho chuỗi TIẾP THEO, kể cả lần thi triển miễn phí; một Cú Đánh Lửa chỉ được tính một lần dù trúng bao nhiêu kẻ địch, và chỉ cú va chạm đầu tiên được tính. (Lửa)',

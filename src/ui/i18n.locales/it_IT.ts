@@ -3950,8 +3950,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Termina il tempo di recupero di Passo fulmineo, Velo di Gelo e Invisibilità superiore. (Talento del mago)',
   'entities.abilities.greater_invisibility.name': 'Invisibilità superiore',
-  'entities.abilities.greater_invisibility.description':
-    'Svanisci per 20 s: rimuove 2 effetti di danno periodico e riduce i danni subiti del 90% mentre sei invisibile e per breve tempo dopo. (Talento del mago)',
   'entities.abilities.hot_streak.name': 'Vampata',
   'entities.abilities.hot_streak.description':
     "Passivo: due colpi critici consecutivi con le tue magie di Fuoco (Palla di Fuoco, Esplosione di Fuoco, Bruciatura, Pirosfera o Colonna di Fuoco) rendono la tua prossima Pirosfera o Colonna di Fuoco istantanea e gratuita. Le magie che consumano l'effetto contano per la serie SUCCESSIVA, inclusi i lanci gratuiti; Colonna di Fuoco conta una sola volta, indipendentemente dal numero di nemici colpiti, e può contare solo l'impatto iniziale. (Fuoco)",
