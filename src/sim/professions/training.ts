@@ -212,3 +212,21 @@ export function grandfatherKnownRecipes(
   }
   return true;
 }
+
+// The known-recipes load bound (phase 16). The grandfathered model DEPENDS on
+// ids the current catalog no longer names surviving a load (a retired recipe
+// keeps working forever), so a catalog allowlist here would be wrong; the
+// bound is SHAPE only. No shipped recipe id approaches this length (the
+// longest today is under 40 characters), so anything longer is a hand-edited
+// or corrupted row riding every future save at full length, and non-strings
+// have no legal writer at all.
+export const MAX_KNOWN_RECIPE_ID_LENGTH = 64;
+
+/** Load-side shape filter for a persisted knownRecipes array: strings within
+ *  the id-length bound survive byte-faithfully (INCLUDING retired ids, the
+ *  grandfather contract), everything else drops. Pure. */
+export function sanitizeKnownRecipeIds(ids: readonly unknown[]): string[] {
+  return ids.filter(
+    (id): id is string => typeof id === 'string' && id.length <= MAX_KNOWN_RECIPE_ID_LENGTH,
+  );
+}

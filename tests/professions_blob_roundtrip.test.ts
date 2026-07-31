@@ -76,9 +76,11 @@ const populatedSim = (): Sim => {
   meta.craftSkills.weaponcrafting = 55.5;
   meta.craftSkills.cooking = 10;
   // One real pre-training id plus one retired/synthetic id: knownRecipes is
-  // DOCUMENTED filter-free on load (the grandfathered model), so both must
-  // survive byte-faithfully; if load-time validation is ever added, this arm
-  // is the one that should go red and force the contract update.
+  // SHAPE-bounded but never catalog-filtered on load (the grandfathered
+  // model, with the phase 16 id-length bound in
+  // professions/training.ts sanitizeKnownRecipeIds), so both must survive
+  // byte-faithfully; if catalog filtering is ever added, this arm is the one
+  // that should go red and force the contract update.
   meta.knownRecipes.add(PRE_TRAINING_RECIPE_IDS[0]);
   meta.knownRecipes.add('retired_recipe_id');
   // An enchanted-copy payload: the craft-side persisted state

@@ -296,17 +296,18 @@ describe('one-shot: the flag serializes literal true and never re-fires', () => 
 });
 
 describe('the mail-phase notice letter', () => {
-  it('arrives exactly once, on the first 1 Hz mail sweep after the reset load', () => {
+  it('arrives exactly once, on the first tick after the reset load (counter-gated)', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Notice', { state: resetSave() });
     expect(sim.mailUnreadFor(pid)).toBe(0);
-    // The sweep carries the same tickCount % 20 cadence gate as its three
-    // mail-phase siblings (phase 16): one tick is NOT enough, which is the
-    // decisive arm for the gate itself.
+    // The phase 16 fast path: the load flip arms the live counter, the very
+    // NEXT tick drains it (a wider window would let a save-and-leave lose the
+    // one-shot forever, the phase 16 review finding), and the drained counter
+    // returns to zero so the 20 Hz sweep is a single integer read afterwards.
+    expect(sim.masteryResetNoticeCounter.pending).toBe(1);
     sim.tick();
-    expect(sim.mailUnreadFor(pid)).toBe(0);
-    for (let i = 0; i < 19; i++) sim.tick();
     expect(sim.mailUnreadFor(pid)).toBe(1);
+    expect(sim.masteryResetNoticeCounter.pending).toBe(0);
     for (let i = 0; i < 40; i++) sim.tick();
     expect(sim.mailUnreadFor(pid)).toBe(1);
     moveToMailbox(sim, pid);
@@ -351,7 +352,7 @@ describe('re-crossing the 75/100 thresholds after the reset', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Recross', { state: s });
     const meta = metaOf(sim, pid);
-    for (let i = 0; i < 20; i++) sim.tick(); // the 1 Hz sweep drains the one reset notice letter
+    sim.tick(); // drains the one reset notice letter
     const renownBefore = meta.renown;
     const unreadBefore = sim.mailUnreadFor(pid);
     // Climb back over both thresholds the character had already crossed.

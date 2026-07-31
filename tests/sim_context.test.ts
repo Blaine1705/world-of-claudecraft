@@ -270,6 +270,7 @@ function makeFakeHost() {
       return entities;
     },
     players: new Map(),
+    masteryResetNoticeCounter: { pending: 0 },
     stationPlacements: [],
     primaryId: -1,
     tradeInvites: new Map(),

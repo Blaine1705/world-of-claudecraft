@@ -61,21 +61,14 @@ const WS_AUTH_ERROR = {
 } as const;
 
 // The first auth frame must arrive within this window or the socket is closed.
-// Env-tunable (WS_AUTH_TIMEOUT_MS) because the R36 1,000-connection load
-// captures need a longer window: with hundreds already online every loop
-// callback is slow and a handshake's sequential awaits can starve past 10 s,
-// where the deadline rejection can even race a completing join and orphan a
-// lease-holding session. The default is the production policy and does not
-// move; parsing is strict and fail-safe like DB_POOL_MAX_CLIENTS (blank,
-// non-numeric, non-integer, or out-of-range values stay on the default, so an
-// empty env can never mint a zero-ms deadline).
-export function parseWsAuthTimeoutMs(raw: string | undefined): number {
-  const trimmed = (raw ?? '').trim();
-  if (trimmed === '') return 10_000;
-  const n = Number(trimmed);
-  return Number.isInteger(n) && n >= 1_000 && n <= 120_000 ? n : 10_000;
-}
-const AUTH_TIMEOUT_MS = parseWsAuthTimeoutMs(process.env.WS_AUTH_TIMEOUT_MS);
+// Scope, established by the phase 16 load review: the timer is cleared the
+// moment the FIRST frame arrives (the ws.once('message') handler below runs
+// clearTimeout synchronously before authenticateWebSocket), so this bounds
+// upgrade-to-first-frame ONLY, never the handshake's database work. A slow
+// handshake surfaces instead as the caught rejection in that same handler,
+// which relabels it with the authTimedOut wire literal; do not read that
+// client-facing string as this deadline firing.
+const AUTH_TIMEOUT_MS = 10_000;
 
 // Only this upgrade path is accepted; any other path is destroyed at the socket.
 const WS_UPGRADE_PATH = '/ws';
@@ -467,6 +460,22 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       ws.on('pong', () => {
         if (session.ws === ws) session.awaitingPong = false;
       });
+      // The socket can die DURING the handshake's awaits, before the close
+      // handler above exists; that close event is gone forever, and the
+      // session it just created would otherwise be a PERMANENT zombie: not
+      // linkdead (so the grace sweep skips it), readyState not OPEN (so
+      // pingLiveSessions skips it and sendRaw silently drops every frame),
+      // holding a realm slot and a character lease its heartbeat renews
+      // forever while planJoin refuses every re-login as 'character already
+      // in world' (the phase 16 load rig hit exactly this). Re-checking
+      // AFTER the handlers are attached closes the race: a death before this
+      // line lands here, a death after it lands in the close handler, and
+      // socketClosed is idempotent per socket so both never double-fire.
+      if (ws.readyState !== ws.OPEN && game.socketClosed(session, ws)) {
+        console.log(
+          `~ ${character.name} socket died mid-handshake, entering linkdead, ${game.clients.size} online`,
+        );
+      }
     } finally {
       // The join is decided (a session now lives in sessionsByCharacterId, or the
       // handshake was rejected), so a later handshake sees hasSessionForCharacter

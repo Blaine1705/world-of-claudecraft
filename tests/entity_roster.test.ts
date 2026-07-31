@@ -112,6 +112,7 @@ function makeCtx() {
     get players() {
       return players;
     },
+    masteryResetNoticeCounter: { pending: 0 },
     stationPlacements: [],
     get cfg() {
       return cfg;

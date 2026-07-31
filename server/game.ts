@@ -6292,7 +6292,10 @@ export class GameServer {
       // for..in probe replaces the unconditional entries/filter/map/
       // fromEntries chain (about 2N+4 allocations per player per tick against
       // a readyAt map that only ever grows within a session). Byte-identical
-      // to maybe('ncd', {}) on the wire.
+      // to maybe('ncd', {}) on the wire. Precondition making for..in exactly
+      // equivalent to the Object.entries filter below: nodeHarvestReadyAt is
+      // always a plain {} built by applyNodeReadiness / the gathering write
+      // site (own enumerable keys only, no prototype chain).
       let anyCooling = false;
       for (const k in meta.nodeHarvestReadyAt) {
         if (meta.nodeHarvestReadyAt[k] > this.sim.time) {

@@ -392,12 +392,18 @@ import {
 import { rechargeToolEffectAction, slotToolEffectAction } from './professions/tool_effect_actions';
 import {
   EMPTY_TOOL_EFFECT_SLOT_VIEWS,
+  MAX_CRAFTED_BY_LENGTH,
   normalizeToolEffectSlots,
   structuredCloneToolEffectSlots,
   type ToolEffectConfirmMode,
   type ToolEffectSlot,
 } from './professions/tools';
-import { grandfatherKnownRecipes, resolveTrain, type TrainResult } from './professions/training';
+import {
+  grandfatherKnownRecipes,
+  resolveTrain,
+  sanitizeKnownRecipeIds,
+  type TrainResult,
+} from './professions/training';
 import type { ProfessionRecipeRecord as RecipeDef } from './professions/types';
 import {
   craftSkillsFor,
@@ -1742,6 +1748,10 @@ export class Sim {
   // reach it through the seam.
   private targeting!: Targeting;
   players = new Map<number, PlayerMeta>(); // keyed by entity id
+  // Live ctx view (SimContext.masteryResetNoticeCounter): how many players
+  // carry a pending mastery-reset notice, so the 20 Hz mail-phase sweep can
+  // skip its player walk entirely on the ~always tick where nobody does.
+  readonly masteryResetNoticeCounter = { pending: 0 };
   // spatial indexes for radius queries; re-bucketed at the end of each tick
   // and kept roster-exact on spawn/despawn/teleport
   readonly grid = new SpatialGrid();
@@ -2685,6 +2695,16 @@ export class Sim {
         const clean = instance.rift
           ? sanitizeRiftGearInstance(itemId, instance, player.id)
           : cloneItemInstancePayload(instance);
+        // The signer is a character name; no legal mint exceeds the name
+        // shape's 16 characters (the craftedBy rule in professions/tools.ts),
+        // so an oversized stored value is corrupt and DROPS on load rather
+        // than truncating into a possible collision with a real player's
+        // name (phase 16 blob growth bound).
+        if (clean?.signer !== undefined) {
+          if (typeof clean.signer !== 'string' || clean.signer.length > MAX_CRAFTED_BY_LENGTH) {
+            clean.signer = undefined;
+          }
+        }
         if (clean) meta.equipmentInstance[slot as EquipSlot] = clean;
       }
       // The shared tamper ceiling (bags.ts instancedCountCap, same rule as the
@@ -2759,7 +2779,10 @@ export class Sim {
         }
       }
       meta.craftSkills = normalizeCraftSkills(s.craftSkills);
-      if (s.knownRecipes) meta.knownRecipes = new Set(s.knownRecipes);
+      // Shape-bounded, never catalog-filtered: retired ids must survive (the
+      // grandfather contract), oversized or non-string junk must not (the
+      // phase 16 blob growth bound).
+      if (s.knownRecipes) meta.knownRecipes = new Set(sanitizeKnownRecipeIds(s.knownRecipes));
       // Grandfather normalize (one shared load path for offline saves
       // AND server-persisted state): an older save (flag absent/false)
       // gets the pre-training recipe ids unioned in exactly once, then the
@@ -2784,6 +2807,7 @@ export class Sim {
       if (s.masteryResetApplied !== true) {
         applyMasteryReset(meta.craftSkills, meta.gatheringProficiency);
         meta.pendingMasteryResetNotice = true;
+        this.masteryResetNoticeCounter.pending += 1;
       }
       // The one-time proficiency display heal (issue 2339), after the
       // mastery-reset branch so it sees the values this character actually
@@ -4261,6 +4285,9 @@ export class Sim {
       },
       get primaryId() {
         return sim.primaryId;
+      },
+      get masteryResetNoticeCounter() {
+        return sim.masteryResetNoticeCounter;
       },
       get tradeInvites() {
         return sim.tradeInvites;

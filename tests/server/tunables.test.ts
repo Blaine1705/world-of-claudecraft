@@ -9,6 +9,14 @@ import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
+
+// The env-tunable pool size is read at server/db.ts module init (which also
+// loads .env from cwd), so a shell that legitimately exports the knob (the
+// load-capture recipe tells operators to) would otherwise turn the literal
+// default pin below into a confusing red. Cleared before any dynamic import
+// of server/db can run; vitest gives this file a fresh module registry.
+delete process.env.DB_POOL_MAX_CLIENTS;
+
 import { DESKTOP_LOGIN_TTL_MS } from '../../server/desktop_login';
 import {
   ASSET_UPLOAD_POLICY,
@@ -297,26 +305,6 @@ describe('byte caps + page sizes hold their literal values', () => {
     expect(DEFAULT_JSON_BODY_MAX_BYTES).toBe(65_536); // 64 KiB
   });
 
-  it('WS_AUTH_TIMEOUT_MS env parsing is strict and fail-safe, never a zero-ms deadline', async () => {
-    const { parseWsAuthTimeoutMs } = await import('../../server/ws_auth');
-    // unset / blank / whitespace stay on the production default
-    expect(parseWsAuthTimeoutMs(undefined)).toBe(10_000);
-    expect(parseWsAuthTimeoutMs('')).toBe(10_000);
-    expect(parseWsAuthTimeoutMs('   ')).toBe(10_000);
-    // out-of-range and malformed values stay on the default per dimension
-    expect(parseWsAuthTimeoutMs('0')).toBe(10_000);
-    expect(parseWsAuthTimeoutMs('999')).toBe(10_000);
-    expect(parseWsAuthTimeoutMs('120001')).toBe(10_000);
-    expect(parseWsAuthTimeoutMs('abc')).toBe(10_000);
-    expect(parseWsAuthTimeoutMs('30s')).toBe(10_000); // strict: a typo must not half-parse
-    expect(parseWsAuthTimeoutMs('1500.5')).toBe(10_000);
-    // valid values parse, at both range edges
-    expect(parseWsAuthTimeoutMs('30000')).toBe(30_000);
-    expect(parseWsAuthTimeoutMs(' 30000 ')).toBe(30_000);
-    expect(parseWsAuthTimeoutMs('1000')).toBe(1_000);
-    expect(parseWsAuthTimeoutMs('120000')).toBe(120_000);
-  });
-
   it('DB_POOL_MAX_CLIENTS env parsing is strict and fail-safe, never a zero-client pool', async () => {
     const { parseDbPoolMaxClients } = await import('../../server/db');
     // unset / blank / whitespace stay on the default (Number('') === 0 must
@@ -324,18 +312,41 @@ describe('byte caps + page sizes hold their literal values', () => {
     expect(parseDbPoolMaxClients(undefined)).toBe(10);
     expect(parseDbPoolMaxClients('')).toBe(10);
     expect(parseDbPoolMaxClients('   ')).toBe(10);
-    // out-of-range and malformed values stay on the default per dimension
+    // out-of-range and malformed values stay on the default per dimension;
+    // the ceiling is the stock postgres:16 connection budget (100)
     expect(parseDbPoolMaxClients('0')).toBe(10);
     expect(parseDbPoolMaxClients('-5')).toBe(10);
-    expect(parseDbPoolMaxClients('201')).toBe(10);
+    expect(parseDbPoolMaxClients('101')).toBe(10);
     expect(parseDbPoolMaxClients('abc')).toBe(10);
     expect(parseDbPoolMaxClients('30x')).toBe(10); // strict: a typo must not half-parse to 30
     expect(parseDbPoolMaxClients('2.5')).toBe(10); // whole clients only
+    // decimal digits only: JS numeric spellings must not surprise an operator
+    expect(parseDbPoolMaxClients('0x50')).toBe(10);
+    expect(parseDbPoolMaxClients('8e1')).toBe(10);
+    expect(parseDbPoolMaxClients('Infinity')).toBe(10);
     // valid values parse, at both range edges
     expect(parseDbPoolMaxClients('40')).toBe(40);
     expect(parseDbPoolMaxClients(' 40 ')).toBe(40);
     expect(parseDbPoolMaxClients('1')).toBe(1);
-    expect(parseDbPoolMaxClients('200')).toBe(200);
+    expect(parseDbPoolMaxClients('100')).toBe(100);
+  });
+
+  it('the pool size constant is genuinely FED by the env (the tunability claim itself)', () => {
+    // A revert to `= 10` leaves every parser test green; this scrape is what
+    // fails it (the max: DB_POOL_MAX_CLIENTS wiring pin lives below).
+    expect(read('server/db.ts')).toContain(
+      'parseDbPoolMaxClients(process.env.DB_POOL_MAX_CLIENTS)',
+    );
+  });
+
+  it('the craftedBy/signer clamp equals the auth name ceiling across the server/sim seam', async () => {
+    // src/sim cannot import server/, so the 16 lives twice; this cross-tie is
+    // what turns a future name-cap raise into a loud failure instead of a
+    // silent provenance drop (phase 16 review).
+    const { MAX_NAME_LEN } = await import('../../server/reclaim_name');
+    const { MAX_CRAFTED_BY_LENGTH } = await import('../../src/sim/professions/tools');
+    expect(MAX_CRAFTED_BY_LENGTH).toBe(MAX_NAME_LEN);
+    expect(MAX_CRAFTED_BY_LENGTH).toBe(16);
   });
 
   it('daily-rewards paginated decode defaults', async () => {

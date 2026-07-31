@@ -78,15 +78,22 @@ export const DATABASE_URL =
 // Env-tunable (DB_POOL_MAX_CLIENTS) because the R36 1,000-concurrent load
 // captures exhaust the default long before the loop does: at about 500 online
 // the 30 s autosave waves hold every client while login handshakes wait out
-// DB_POOL_CONNECT_TIMEOUT_MS and then breach the 10 s auth deadline. Parsing
-// is strict and fail-safe: a set-but-blank, non-numeric, non-integer, or
-// out-of-range value stays on the default (an empty string must never become
-// a zero-client pool, and a typo like "30x" must not half-parse).
+// DB_POOL_CONNECT_TIMEOUT_MS. Parsing is strict and fail-safe: a set-but-blank,
+// non-decimal-digit, or out-of-range value stays on the default (an empty
+// string must never become a zero-client pool, a typo like "30x" must not
+// half-parse, and hex/exponent spellings are rejected rather than surprising).
+// The ceiling honors the CONNECTION BUDGET of the shipped deployment: stock
+// postgres:16 serves max_connections 100 (3 superuser-reserved), every realm
+// process builds its own pool on one DATABASE_URL, and pools have no
+// cross-process coordination, so realms x DB_POOL_MAX_CLIENTS + tooling must
+// stay at or under about 97 or logins fail with "too many clients" exactly at
+// peak. One process may take the whole budget; more than that needs a bigger
+// max_connections first.
 export function parseDbPoolMaxClients(raw: string | undefined): number {
   const trimmed = (raw ?? '').trim();
-  if (trimmed === '') return 10;
+  if (!/^\d+$/.test(trimmed)) return 10;
   const n = Number(trimmed);
-  return Number.isInteger(n) && n >= 1 && n <= 200 ? n : 10;
+  return n >= 1 && n <= 100 ? n : 10;
 }
 export const DB_POOL_MAX_CLIENTS = parseDbPoolMaxClients(process.env.DB_POOL_MAX_CLIENTS);
 

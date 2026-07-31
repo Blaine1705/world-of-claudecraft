@@ -609,9 +609,9 @@ export function normalizeToolEffectSlots(
       // or corrupted row: DROP it rather than truncate, because a truncated
       // prefix could equal a DIFFERENT player's real name and misattribute
       // the original-crafter recharge discount, while an absent crafter
-      // merely forgoes it. Also the blob-growth bound (phase 16): three
-      // slots each carrying an unbounded string was the one professions
-      // field with no length ceiling.
+      // merely forgoes it. Part of the phase 16 blob-growth bound, beside
+      // the equipmentInstance signer clamp and the knownRecipes id-shape
+      // filter on the sim load path.
       craftedBy:
         typeof row.craftedBy === 'string' && row.craftedBy.length <= MAX_CRAFTED_BY_LENGTH
           ? row.craftedBy

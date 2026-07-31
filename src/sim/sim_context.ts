@@ -87,6 +87,15 @@ export interface SimContextPrimitives {
   // first join and on the primary's departure, so it is a LIVE getter, not a snapshot.
   // Stays a Sim field; the moved raid-marker `markerFor` (T1) reads it through the seam.
   readonly primaryId: number;
+  // The mastery-reset notice fast path (phase 16): a LIVE counter of players
+  // whose load-time reset flagged a pending authored notice. The load branch
+  // (Sim.addPlayer) increments; the mail-phase sweep
+  // (professions/mastery_reset.ts) early-returns at zero (one integer read per
+  // tick instead of an O(players) walk), drains on the very next tick
+  // otherwise, and re-zeroes after its walk so a pending player who left
+  // before the sweep cannot leave the fast path armed forever. The backing
+  // object stays on Sim, mutated in place.
+  readonly masteryResetNoticeCounter: { pending: number };
   // Social-invite maps owned by the trade (G2) and duel (A2) slices. The party
   // machine (A1) reads them for hasPendingSocialInvite's cross-system pending check
   // and lazily expires entries in place, so these are LIVE views: the backing fields
@@ -983,6 +992,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get players() {
       return host.players;
+    },
+    get masteryResetNoticeCounter() {
+      return host.masteryResetNoticeCounter;
     },
     get stationPlacements() {
       return host.stationPlacements;

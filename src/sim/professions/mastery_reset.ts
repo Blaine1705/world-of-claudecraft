@@ -37,16 +37,23 @@ export function applyMasteryReset(
  *  so its position in the tick tail cannot fork the deterministic draw
  *  order. */
 export function updateMasteryResetNotices(ctx: SimContext): void {
-  // The 1 Hz cadence gate all three mail-phase siblings carry
-  // (guild_letter.ts, tier_mail.ts, prof_nudges.ts). Without it this was a
-  // full player-map walk at 20 Hz reading a boolean that is false for every
-  // character after its one-time load-time flip; at 1,000 online that is
-  // 20,000 map visits a second for nothing. A notice lands at most one
-  // second later, exactly like the sibling mail sweeps.
-  if (ctx.tickCount % 20 !== 0) return;
+  // The phase 16 fast path. This sweep consumes a TRANSIENT one-shot whose
+  // persisted gate (masteryResetApplied) serializes true from the very first
+  // save, so unlike its three mail-phase siblings (which re-derive from
+  // persisted state and self-heal) any widened drain window here can LOSE the
+  // notice forever: a save-and-leave inside the window ships the reset with
+  // no letter. The sibling tickCount cadence gate is therefore WRONG for this
+  // sweep; the cost gate is the live pending counter instead (one integer
+  // read per tick), and a pending notice still drains on the very next tick
+  // exactly as it always did. The counter is re-zeroed after the walk so a
+  // pending player who left before the sweep cannot leave the fast path
+  // armed forever (the walk is the truth; the counter only gates it).
+  const counter = ctx.masteryResetNoticeCounter;
+  if (counter.pending === 0) return;
   for (const meta of ctx.players.values()) {
     if (!meta.pendingMasteryResetNotice) continue;
     meta.pendingMasteryResetNotice = false;
     ctx.mailAuthoredLetter(meta, MASTERY_RESET_LETTER);
   }
+  counter.pending = 0;
 }

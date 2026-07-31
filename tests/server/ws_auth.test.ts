@@ -19,6 +19,10 @@ import { ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
 class FakeWs extends EventEmitter {
   send = vi.fn();
   close = vi.fn();
+  // Mirrors the real ws instance constants the mid-handshake death re-check
+  // reads; OPEN by default so every existing case is unaffected.
+  readyState = 1;
+  OPEN = 1;
 }
 
 const asWs = (w: FakeWs): WebSocket => w as unknown as WebSocket;
@@ -1119,5 +1123,46 @@ describe('createWsAuth: attachUpgrade', () => {
 
     expect(socket.destroy).toHaveBeenCalledTimes(1);
     expect(wss.handleUpgrade).not.toHaveBeenCalled();
+  });
+});
+
+describe('mid-handshake socket death cannot mint a permanent zombie session', () => {
+  // The phase 16 finding: a socket that dies during the handshake's awaits
+  // emits its close event BEFORE the post-join close handler exists, so the
+  // event is lost; the freshly-created session is then invisible to every
+  // reaper (not linkdead for the grace sweep, readyState not OPEN for the
+  // keepalive sweep, sendRaw drops its frames silently) while its lease
+  // heartbeat renews forever and planJoin refuses the character's every
+  // re-login. The re-check after the handlers are attached is the fix, and
+  // these arms are its decisive pins.
+  it('a socket already closed when the join lands is handed to socketClosed', async () => {
+    const s = setup();
+    const { authenticateWebSocket } = createWsAuth(s.deps);
+    // The socket dies while the handshake awaits are in flight: model the
+    // final state (the close event itself fired before any handler existed).
+    s.ws.readyState = 3; // CLOSED
+    await authenticateWebSocket(asWs(s.ws), authRaw(), s.req);
+    expect(s.game.join).toHaveBeenCalledTimes(1);
+    expect(s.game.socketClosed).toHaveBeenCalledTimes(1);
+    expect(s.game.socketClosed).toHaveBeenCalledWith(s.session, s.ws);
+  });
+
+  it('a live socket is never pushed into linkdead by the re-check', async () => {
+    const s = setup();
+    const { authenticateWebSocket } = createWsAuth(s.deps);
+    await authenticateWebSocket(asWs(s.ws), authRaw(), s.req);
+    expect(s.game.join).toHaveBeenCalledTimes(1);
+    expect(s.game.socketClosed).not.toHaveBeenCalled();
+  });
+
+  it('a close AFTER the handlers attach rides the normal close handler, not the re-check', async () => {
+    const s = setup();
+    const { authenticateWebSocket } = createWsAuth(s.deps);
+    await authenticateWebSocket(asWs(s.ws), authRaw(), s.req);
+    expect(s.game.socketClosed).not.toHaveBeenCalled();
+    s.ws.readyState = 3;
+    s.ws.emit('close');
+    expect(s.game.socketClosed).toHaveBeenCalledTimes(1);
+    expect(s.game.socketClosed).toHaveBeenCalledWith(s.session, s.ws);
   });
 });
