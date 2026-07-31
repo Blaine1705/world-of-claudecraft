@@ -105,7 +105,12 @@ describe('tslot bytes per player per tick under the delta rules', () => {
     // The dirtyEveryDeltaField seed shape (a REAL slot written straight onto
     // meta: the wire shape under test is the delta, not the mint).
     meta.toolEffectSlots = {
-      mining: { effectId: 'gatherers_cache', durability: 12, maxDurability: 20, confirmMode: 'always' },
+      mining: {
+        effectId: 'gatherers_cache',
+        durability: 12,
+        maxDurability: 20,
+        confirmMode: 'always',
+      },
     };
     broadcast(server);
     const first = lastRawSnap(fc.sent);
@@ -117,7 +122,9 @@ describe('tslot bytes per player per tick under the delta rules', () => {
     broadcast(server);
     expect(lastRawSnap(fc.sent)).not.toContain('"tslot"');
     // A spent charge is a real change: exactly one re-ship, then quiet again.
-    meta.toolEffectSlots.mining!.durability = 11;
+    const miningSlot = meta.toolEffectSlots.mining;
+    if (!miningSlot) throw new Error('fixture slot missing');
+    miningSlot.durability = 11;
     fc.sent.length = 0;
     server.sim.tick();
     broadcast(server);
