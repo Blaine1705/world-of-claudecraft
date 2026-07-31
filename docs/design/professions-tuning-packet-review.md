@@ -3521,10 +3521,11 @@ the ten fill strings (8 good, 2 acceptable, 0 needs-fix), an
 isolated-worktree mutation pass, and a fix-round review that re-derived
 all eleven changed sentences.
 
-Findings, all applied per the standing rule (four commits: 6a1cd5bcca
+Findings, all applied per the standing rule (five commits: 6a1cd5bcca
 the refuter and reviewer round, c8305ca6ba the lens residue,
 bd1f5e81eb the trade-route scope, ffa46bd304 the fix-round review's own
-findings). The two blockers: alchemy identityBody promised the pair
+findings, 3333c3e6ef the reviewer's late consolidated report, recovered
+from its transcript after a delivery race). The two blockers: alchemy identityBody promised the pair
 combination brew to both pairs when COMBO_RECIPES holds exactly three
 combos (two Smith, one Bombardier), so an Apothecary oath sworn for the
 promised brew bought nothing but the amends quest; and provenanceBody
@@ -3550,14 +3551,25 @@ freely); the masterwork signed-reagent bonus keys on HOLDING, not
 consuming (provenanceBody, faq.a4, worth 2 percentage points not 2
 percent); the shared throttle has FIVE consumers including tool-effect
 recharges and is a FIXED window, not rolling (howBody,
-econ.throttleBody, and the sim module doc all corrected); the koi row
+econ.throttleBody, and the sim module doc all corrected); bone
+fragments never drop from everyday kills (19 of 20 loot rows are
+undead, the last a troll boss; salvaged common gear is the other
+source), a blocker the fix round had edited around in both smithing
+materials keys; the zone the fix round called Farshore Isle ships as
+The Farshore (the id-vs-display-name trap biting the QA's own
+sentences); the enchanting disenchant clause's "rare ceiling every
+identity carries" mechanism was false (majors carry none; the true
+reason is that no enchanting identity exists today); the koi row
 answers to the catch band, not skill alone; the rod trim clamps at the
 three-second floor; a capped gatherer rolls best odds, not guaranteed
 max quality; a signed windfall lands in a matching signed stack too;
 plus the Eastbrook Druid's Hide masterwork boundary, the Gravewyrm
 Gauntlets as the second Smith combo, the rare-tier gloss (skill 74 or
-less), the land-recipes-known-to-all wording, and the 'an glyphsteel'
-typo. Two keys newly reworded by the review round (faq.a4,
+less), the land-recipes-known-to-all wording, the 'an glyphsteel'
+typo, the never-sold-back trade-route precision, the Flux jar counts,
+and two pin hardenings (the tools-table row count pins the corpus
+rung count, and the wield pins anchor to the Use at column so a
+column swap reds). Two keys newly reworded by the review round (faq.a4,
 econ.throttleBody) followed remove-and-refill: 26 Latin rows re-pend,
 their non-Latin rows join the stale ledger, which now counts 53 keys /
 265 rows beyond the pending registry.
@@ -3632,9 +3644,10 @@ literal pin, a locale-side clears-wording guard for toolCraftedOrMarks,
 and the ledger arithmetic at 53 keys / 265 rows plus broadcastsLabel's
 and toolCraftedOrMarksHeroic's ten freshly minted rows.
 
-Final gate: PASS, all 11 steps green, exit code 0 read explicitly, on
-the committed idle tree at ffa46bd304 (this docs close on top). Phase
-17 QA is COMPLETE. NEXT: phase 18, the final gate (whole-branch
+Final gate: PASS twice, all 11 steps green, exit code 0 read
+explicitly each time: once at ffa46bd304, and again at 3333c3e6ef
+after the late consolidated report's fixes landed, on the committed
+idle tree (this docs close on top). Phase 17 QA is COMPLETE. NEXT: phase 18, the final gate (whole-branch
 review, release-malware-audit, screenshots, release-tier decision with
 the maintainer; ultracode, new session).
 
