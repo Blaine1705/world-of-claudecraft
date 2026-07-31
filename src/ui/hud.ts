@@ -12945,6 +12945,14 @@ export class Hud {
     return this.marketWindow.isOpen;
   }
 
+  // Reconnect resync (issue #2416): re-push the market window's own browse query
+  // if it drifted from what the server echoes back after a fresh-join reconnect.
+  // Wired from the client's onReconnected hook (main.ts); a no-op when the window
+  // is closed or the echoed query still matches (see MarketWindow.onReconnected).
+  marketResyncAfterReconnect(): void {
+    this.marketWindow.onReconnected();
+  }
+
   openMailbox(): void {
     this.mailboxWindow.open();
   }
