@@ -14,7 +14,7 @@
 // raw hex sits in this painter.
 
 import { audio } from '../game/audio';
-import type { ItemSlot } from '../sim/types';
+import type { ItemInstancePayload, ItemSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
@@ -94,6 +94,7 @@ export class MarketWindow {
   private rarityFilter: MarketRarityFilter = 'all';
   private browsePage = 0;
   private sellItemId: string | null = null;
+  private sellInstance: ItemInstancePayload | null = null;
   private searchQuery = '';
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
@@ -121,6 +122,7 @@ export class MarketWindow {
     this.rarityFilter = 'all';
     this.browsePage = 0;
     this.sellItemId = null;
+    this.sellInstance = null;
     this.searchQuery = '';
     this.pushQuery();
     this.lastSig = '';
@@ -140,6 +142,7 @@ export class MarketWindow {
     if (!this.opened) return;
     this.opened = false;
     this.sellItemId = null;
+    this.sellInstance = null;
     this.deps.root().style.display = 'none';
     this.deps.hideTooltip();
     document.body.classList.remove('market-open');
@@ -148,9 +151,12 @@ export class MarketWindow {
     this.openerFocus = null;
   }
 
-  /** Stage a bag item onto the Sell tab (called by the bags window on click). */
-  stageSell(itemId: string): void {
+  /** Stage a bag item onto the Sell tab (called by the bags window on click).
+   *  `instance` is the clicked slot's payload (issue 1165): an instanced copy stages
+   *  as ITSELF and lists single-copy through marketListInstance. */
+  stageSell(itemId: string, instance?: ItemInstancePayload): void {
     this.sellItemId = itemId;
+    this.sellInstance = instance ?? null;
     this.render();
   }
 
@@ -449,7 +455,12 @@ export class MarketWindow {
         rarity: this.rarityFilter,
       },
       sellItemId: this.sellItemId,
-      sellHave: this.sellItemId ? this.bagCount(this.sellItemId) : 0,
+      sellHave: this.sellItemId
+        ? this.sellInstance
+          ? 1
+          : this.fungibleBagCount(this.sellItemId)
+        : 0,
+      sellInstance: this.sellInstance,
     });
     if (view.kind === 'no-data') {
       body.innerHTML = `<div class="mkt-empty">${esc(t('itemUi.market.noMerchant'))}</div>`;
@@ -565,7 +576,7 @@ export class MarketWindow {
         audio.click();
       });
       row.appendChild(btn);
-      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item));
+      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, l.instance));
       list.appendChild(row);
     }
     if (page.pageCount > 1) {
@@ -621,6 +632,7 @@ export class MarketWindow {
     }
     if (view.state === 'cannot-market') {
       this.sellItemId = null;
+      this.sellInstance = null;
       const pick = document.createElement('div');
       pick.className = 'mkt-sell-pick empty';
       pick.textContent = t('itemUi.tooltip.cannotMarket');
@@ -632,6 +644,9 @@ export class MarketWindow {
     const pick = document.createElement('div');
     pick.className = 'mkt-sell-pick';
     pick.innerHTML = `${this.deps.itemIcon(item)}<span class="ps-name" style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
+    // The staged copy's tooltip carries its payload, so a player holding plain
+    // AND special copies can see WHICH one is staged (the mail chip precedent).
+    this.deps.attachTooltip(pick, () => this.deps.itemTooltip(item, view.form.instance));
     body.appendChild(pick);
 
     const form = document.createElement('div');
@@ -681,8 +696,11 @@ export class MarketWindow {
         this.deps.showError(t('itemUi.market.minPriceError'));
         return;
       }
-      this.deps.world().marketList(view.form.itemId, qty, each * qty);
+      const staged = view.form.instance;
+      if (staged) this.deps.world().marketListInstance(view.form.itemId, each, staged);
+      else this.deps.world().marketList(view.form.itemId, qty, each * qty);
       this.sellItemId = null;
+      this.sellInstance = null;
       audio.coin();
       this.render(); // the next snapshot echoes the new bags + listings
     });
@@ -701,7 +719,7 @@ export class MarketWindow {
       row.innerHTML = `<span>${esc(t('itemUi.market.saleProceeds'))}</span><span class="mkt-price">${this.deps.moneyHtml(view.proceeds)}</span>`;
       body.appendChild(row);
     }
-    for (const { item, count } of view.rows) {
+    for (const { item, count, instance } of view.rows) {
       const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
       const row = document.createElement('div');
       row.className = 'mkt-collect';
@@ -710,7 +728,7 @@ export class MarketWindow {
           ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
           : '';
       row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span></span>`;
-      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item));
+      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance));
       body.appendChild(row);
     }
     const btn = document.createElement('button');
@@ -723,10 +741,14 @@ export class MarketWindow {
     body.appendChild(btn);
   }
 
-  private bagCount(itemId: string): number {
+  // Fungible stock only: the plain listing form's quantity cap must match what
+  // marketList can actually escrow (an instanced copy is never swept into a
+  // bulk listing), or a qty above the fungible stock just bounces off the
+  // sim's denial. An instanced staging is single-copy and never reads this.
+  private fungibleBagCount(itemId: string): number {
     return this.deps
       .world()
-      .inventory.filter((s) => s.itemId === itemId)
+      .inventory.filter((s) => s.itemId === itemId && !s.instance)
       .reduce((n, s) => n + s.count, 0);
   }
 
