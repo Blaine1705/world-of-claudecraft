@@ -9,7 +9,7 @@
 | Phase 3: Server dark surface | complete | 2026-07-31 | 2026-07-31 |
 | Phase 4: Desktop Epic shell | complete | 2026-07-31 | 2026-07-31 |
 | Phase 5: Server link verification | complete | 2026-07-31 | 2026-07-31 |
-| Phase 6: Achievement mirror | not started | | |
+| Phase 6: Achievement mirror | complete | 2026-07-31 | 2026-07-31 |
 | Phase 7: Client UI + i18n | not started | | |
 | Phase 8: Ops docs + BPT runbook | not started | | |
 | Packet close QA (`qa-checklist.md`) | not started | | |
@@ -53,10 +53,10 @@
 - [x] Decisive route tests
 
 ### Phase 6
-- [ ] Achievement map + mirror worker
-- [ ] Wired from deeds_records + login reconcile (independent of Steam)
-- [ ] Dark when disabled; fire-and-forget
-- [ ] Mirror tests
+- [x] Achievement map + mirror worker
+- [x] Wired from deeds_records + login reconcile (independent of Steam)
+- [x] Dark when disabled; fire-and-forget
+- [x] Mirror tests
 
 ### Phase 7
 - [ ] `src/ui/epic_link.ts` + markup hooks

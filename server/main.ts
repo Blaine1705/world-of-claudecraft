@@ -181,6 +181,7 @@ import {
 } from './discord';
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
+import { stopEpicMirror } from './epic/mirror';
 import { GameServer } from './game';
 import {
   handleGitHubCallback,
@@ -3162,14 +3163,16 @@ export async function startServer(): Promise<http.Server> {
     // delays and drops queued telemetry before the shared pool closes.
     const unstuckReportsDrained = await stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS);
     if (!unstuckReportsDrained) console.warn('unstuck report drain deadline reached');
-    // Stop and drain the Steam mirror's in-memory push FIFO too (right after the
-    // deeds records it observes): an unlock still queued here would be lost on
-    // pool.end(), and the next reconcile (on link or on login) is its only
-    // replay. stopSteamMirror flips the shutdown flag and races the drain tail
-    // against a 5s deadline, so a stuck upstream cannot hang the shutdown;
-    // failures are swallowed inside the worker, so this never throws. A no-op
-    // when the mirror is dark.
+    // Stop and drain each storefront mirror's in-memory push FIFO too (right
+    // after the deeds records they observe): an unlock still queued here would
+    // be lost on pool.end(), and the next reconcile (on link or on login) is
+    // its only replay. Each stop*Mirror flips its shutdown flag and races the
+    // drain tail against a 5s deadline, so a stuck upstream cannot hang the
+    // shutdown; failures are swallowed inside the worker, so this never
+    // throws. A no-op when that mirror is dark. Steam and Epic drain
+    // independently (D21).
     await stopSteamMirror(5000);
+    await stopEpicMirror(5000);
     // Drop every character load lease this process holds so a clean restart can
     // reload its characters immediately instead of waiting out the lease TTL.
     // Runs before pool.end(); a failure here must not abort the shutdown, so log

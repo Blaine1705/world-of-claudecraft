@@ -160,3 +160,132 @@ export function classifyTokenErrorStatus(
   if (status === 400 || status === 401) return 'invalid';
   return 'upstream';
 }
+
+// ---------------------------------------------------------------------------
+// Achievement unlock builders (O2: server-trusted Web API path).
+//
+// Chosen path (never client-reported unlocks; never a native EOS SDK process
+// in Node):
+//   1. Client access token via Connect Web API client_credentials:
+//        POST https://api.epicgames.dev/auth/v1/oauth/token
+//   2. Epic account id -> Product User Id via Connect external accounts:
+//        GET  https://api.epicgames.dev/user/v1/accounts
+//            ?accountId=<epic_account_id>&identityProviderId=epicgames
+//   3. Unlock batch via Stats Achievements service (EOS SDK
+//      StatsAchievementsService base https://api.epicgames.dev/stats):
+//        POST https://api.epicgames.dev/stats/v1/{deploymentId}/players/
+//             {productUserId}/achievements/unlock
+//        body: { achievementIds: string[] }
+//
+// Field names pinned: access_token, product_user_id (token response when
+// present), ids map on external-accounts, achievementIds on unlock body.
+// Secrets ride only in Authorization headers / form bodies: never logged.
+// ---------------------------------------------------------------------------
+
+/** Connect Web API host (EOS Game Services). Shared by token, mapping, unlock. */
+export const EPIC_GS_HOST = 'https://api.epicgames.dev';
+
+/** Connect client_credentials token path (EOS Connect Web APIs). */
+export const EPIC_CONNECT_TOKEN_PATH = '/auth/v1/oauth/token';
+export const EPIC_CONNECT_TOKEN_URL = `${EPIC_GS_HOST}${EPIC_CONNECT_TOKEN_PATH}`;
+
+/** grant_type for a trusted server / GameServer-policy client. */
+export const CLIENT_CREDENTIALS_GRANT = 'client_credentials';
+
+/** External-accounts mapping path (Epic account id -> product user id). */
+export const EPIC_USER_ACCOUNTS_PATH = '/user/v1/accounts';
+
+/** identityProviderId value for Epic Account Services ids we store in
+ *  epic_links.epic_account_id. */
+export const EPIC_IDENTITY_PROVIDER = 'epicgames';
+
+/** Stats Achievements service base (UnlockAchievements operation). */
+export const EPIC_STATS_BASE_PATH = '/stats/v1';
+
+/**
+ * Client-credentials token request. The Authorization header CONTAINS the
+ * client secret (Basic base64(clientId:clientSecret)); fetched, never logged.
+ * Official Connect Web API: POST https://api.epicgames.dev/auth/v1/oauth/token
+ * with grant_type=client_credentials.
+ */
+export function buildClientCredentialsTokenRequest(opts: {
+  clientId: string;
+  clientSecret: string;
+}): { url: string; body: URLSearchParams; headers: Record<string, string> } {
+  const basic = Buffer.from(`${opts.clientId}:${opts.clientSecret}`, 'utf8').toString('base64');
+  const body = new URLSearchParams();
+  body.set('grant_type', CLIENT_CREDENTIALS_GRANT);
+  return {
+    url: EPIC_CONNECT_TOKEN_URL,
+    body,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: `Basic ${basic}`,
+    },
+  };
+}
+
+/** Parse a 2xx client_credentials token body. Returns the access_token string
+ *  or null when the shape is unusable (treated as upstream by the shell). */
+export function parseClientCredentialsTokenResponse(body: unknown): string | null {
+  if (body === null || typeof body !== 'object') return null;
+  const token = (body as { access_token?: unknown }).access_token;
+  if (typeof token !== 'string' || token.length === 0) return null;
+  return token;
+}
+
+/**
+ * External-account mapping URL: resolve one Epic account id to a product user
+ * id. Official Connect Web API query params: accountId, identityProviderId.
+ */
+export function buildExternalAccountMappingUrl(opts: {
+  epicAccountId: string;
+  identityProviderId?: string;
+}): string {
+  const url = new URL(`${EPIC_GS_HOST}${EPIC_USER_ACCOUNTS_PATH}`);
+  url.searchParams.set('accountId', opts.epicAccountId);
+  url.searchParams.set('identityProviderId', opts.identityProviderId ?? EPIC_IDENTITY_PROVIDER);
+  return url.toString();
+}
+
+/** Parse a 2xx external-accounts mapping body for one requested Epic account
+ *  id. Returns the product user id string, or null when unmapped / malformed. */
+export function parseExternalAccountMappingResponse(
+  body: unknown,
+  epicAccountId: string,
+): string | null {
+  if (body === null || typeof body !== 'object') return null;
+  const ids = (body as { ids?: unknown }).ids;
+  if (ids === null || typeof ids !== 'object') return null;
+  const puid = (ids as Record<string, unknown>)[epicAccountId];
+  if (typeof puid !== 'string' || puid.length === 0) return null;
+  return puid;
+}
+
+/**
+ * Unlock-achievements request. POST JSON to the Stats Achievements service.
+ * Bearer token is a short-lived client access token (not a player token). The
+ * Authorization header is secret-bearing: never logged.
+ *
+ * Path shape (O2 pin):
+ *   POST /stats/v1/{deploymentId}/players/{productUserId}/achievements/unlock
+ * Body field: achievementIds (string array of portal achievement ids).
+ */
+export function buildUnlockAchievementsRequest(opts: {
+  deploymentId: string;
+  productUserId: string;
+  accessToken: string;
+  achievementIds: readonly string[];
+}): { url: string; body: string; headers: Record<string, string> } {
+  const dep = encodeURIComponent(opts.deploymentId);
+  const puid = encodeURIComponent(opts.productUserId);
+  const url = `${EPIC_GS_HOST}${EPIC_STATS_BASE_PATH}/${dep}/players/${puid}/achievements/unlock`;
+  return {
+    url,
+    body: JSON.stringify({ achievementIds: [...opts.achievementIds] }),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${opts.accessToken}`,
+    },
+  };
+}

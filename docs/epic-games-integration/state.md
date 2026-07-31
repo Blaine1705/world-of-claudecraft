@@ -1,6 +1,6 @@
 # State: Epic Games Store integration (cross-phase cheat sheet)
 
-Current phase: Phase 5 complete. Next: Phase 6 (Achievement mirror).
+Current phase: Phase 6 complete. Next: Phase 7 (Client UI + i18n).
 
 Read this first in every session. Locked decisions below override memory and
 ad-hoc invention. Research background: `research-brief.md`.
@@ -170,6 +170,11 @@ Client:
   - Phase 5: `server/epic/ticket.ts` (pure), `server/epic/web_api.ts`
     (fetch shell); full link arms + reclaim-by-proof in `routes.ts`;
     `mirror.reconcileLink` stub for Phase 6
+  - Phase 6: `server/epic/achievement_map.ts` (75-deed launch set, same ACH
+    vocabulary as Steam); full `mirror.ts` worker (FIFO, dedupe, retries,
+    reconcile-on-link/login, link cache, injectable deps, `stopEpicMirror`);
+    `web_api.pushAchievementUnlocks` (O2 server-trusted path); dual fan-out
+    from `deeds_records.ts` + `game.ts` login + `main.ts` shutdown
 - Tests:
   - epic pins in `tests/electron_desktop_config.test.ts` and full epic
     packaging pins in `tests/electron_builder_config.test.ts`
@@ -181,6 +186,10 @@ Client:
   - Phase 5: `tests/server/epic_ticket.test.ts`,
     `tests/server/epic_web_api.test.ts` (mocked fetchImpl, no live Epic),
     extended `tests/server/epic_routes.test.ts` (every link arm + reclaim)
+  - Phase 6: `tests/server/epic_mirror.test.ts`,
+    `tests/epic_achievement_map.test.ts`, unlock pins in
+    `tests/server/epic_web_api.test.ts`; dual fan-out pins in
+    `tests/deed_records.test.ts` and `tests/deeds_reconcile.test.ts`
 - Desktop Epic shell (Phase 4):
   - Facade: `epicIntegrationEnabled`, `resolveEpicIds`,
     `parseLauncherExchangeCode`, `createEpicShell` returning
@@ -252,8 +261,21 @@ Client:
       `epic.banned`
   - Literals pinned in `tests/server/epic_ticket.test.ts` and
     `tests/server/epic_web_api.test.ts`. No live Epic calls in CI.
-- O2 Whether achievement unlocks use EOS SDK server client, Web API, or both
-  (Phase 6 chooses based on current official docs; prefer the server-trusted path).
+- O2 Achievement unlock path: **CLOSED (Phase 6)**. Server-trusted Web API only
+  (never client-reported unlocks; never a native EOS SDK process in Node).
+  - Auth: `POST https://api.epicgames.dev/auth/v1/oauth/token` with
+    `grant_type=client_credentials` (Basic `clientId:clientSecret`). Field:
+    `access_token`.
+  - Map linked Epic account id to product user id:
+    `GET https://api.epicgames.dev/user/v1/accounts?accountId=<epic_account_id>&identityProviderId=epicgames`
+    Response field: `ids` map (`epic_account_id` -> product user id).
+  - Unlock batch (Stats Achievements service base `https://api.epicgames.dev/stats`):
+    `POST https://api.epicgames.dev/stats/v1/{deploymentId}/players/{productUserId}/achievements/unlock`
+    Body field: `achievementIds` (string array of permanent portal ids from
+    `server/epic/achievement_map.ts`).
+  - Literals pinned in `tests/server/epic_web_api.test.ts`. No live Epic calls
+    in CI. Unmapped product users / upstream faults return false; mirror drops
+    after capped retries; reconcile heals.
 - O3 Vendor vs download path for EOS C SDK binaries in CI (Phase 2/4).
 - O4 Final portal artifact naming for Mac (universal vs per-arch) once the product exists.
 - O5 Whether a public status page or support URL must appear in the EGS store listing
