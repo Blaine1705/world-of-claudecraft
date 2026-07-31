@@ -5174,6 +5174,10 @@ export class Hud {
   private wocMarketHooks: WocMarketHooks | null = null;
   private readonly wocMarketWindow = new WocMarketWindow({
     root: () => $('#woc-market-window'),
+    attachTooltip: (element, html) => this.attachTooltip(element, html),
+    // compare ON, the same as the character window: a listing's worth is
+    // relative to what the viewer is already wearing.
+    itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
     world: () => this.sim,
     hooks: () => this.wocMarketHooks,
     closeOthers: () => this.closeOtherWindows('#woc-market-window'),

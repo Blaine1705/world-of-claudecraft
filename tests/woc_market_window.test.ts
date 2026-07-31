@@ -327,3 +327,86 @@ describe('woc_market_window: both game entries carry its root element', () => {
     }
   });
 });
+
+describe('woc_market_window: the item inspector on hover', () => {
+  it('reuses the SHARED item tooltip rather than building a second one', () => {
+    // The whole point of the feature is that a listing reads identically to worn
+    // gear. A bespoke tooltip here would drift from the character window's the
+    // first time the stat copy changed.
+    expect(painter).toContain('attachTooltip(element: HTMLElement, html: () => string): void');
+    expect(painter).toContain('itemTooltip(item: ItemDef, instance?: ItemInstancePayload): string');
+    expect(painter).toContain(
+      'this.deps.attachTooltip(el, () => this.deps.itemTooltip(def, target.instance))',
+    );
+    // And it does NOT reimplement stat formatting: no stat-line construction here.
+    expect(painter).not.toMatch(/itemStatName|instanceBonusStatLines|instanceBadgeLines/);
+  });
+
+  it('passes the INSTANCE payload through, so rolled stats are what you see', () => {
+    // A listing's value lives in its instance (rolled stats, masterwork, enchant).
+    // Showing the base def would misprice every crafted or enchanted item.
+    const cell = between('private itemCellHtml(', 'private attachItemTooltips(');
+    expect(cell).toContain('instance?: ItemInstancePayload');
+    expect(cell).toContain('this.tooltipTargets.set(key, { itemId, instance });');
+  });
+
+  it('tags every one of the four item surfaces with a namespaced, stable key', () => {
+    // Namespaced so the same item on two tabs cannot collide, and carrying the
+    // row's own id so the hover target survives a poll rebuild.
+    for (const key of [
+      '`browse:${r.id}`',
+      '`detail:${d.row.id}`',
+      '`sell:${r.index}`',
+      '`activity:${l.id}`',
+    ]) {
+      expect(painter, `missing tooltip key ${key}`).toContain(key);
+    }
+    // Every itemCellHtml call passes a key: a 3-arg call would register nothing
+    // and silently render an un-hoverable cell.
+    const calls = painter.match(/this\.itemCellHtml\([^)]*\)/g) ?? [];
+    expect(calls.length).toBeGreaterThanOrEqual(4);
+    for (const call of calls) {
+      expect(call, `itemCellHtml without a key: ${call}`).toMatch(
+        /,\s*`(browse|detail|sell|activity):/,
+      );
+    }
+  });
+
+  it('clears the target registry every render, so a key cannot outlive its row', () => {
+    // The registry describes the CURRENT DOM. A stale entry would attach a
+    // tooltip for a listing that had already been replaced.
+    const html = between('private html(model: WocMarketViewModel): string {', 'if (model.kind ===');
+    expect(html).toContain('this.tooltipTargets.clear()');
+  });
+
+  it('hides the shared tooltip BEFORE wiping the subtree it is anchored to', () => {
+    // A removed node fires no mouseleave, so a rebuild during hover would leave
+    // the tooltip box pointing at nothing.
+    const render = between('render(): void {', 'private usd(');
+    const hide = render.indexOf('this.deps.hideTooltip()');
+    const wipe = render.indexOf('root.innerHTML = this.html(model)');
+    expect(hide).toBeGreaterThanOrEqual(0);
+    expect(wipe).toBeGreaterThan(hide);
+  });
+
+  it('re-attaches after every rebuild, since the nodes are new each time', () => {
+    const render = between('render(): void {', 'private usd(');
+    const wipe = render.indexOf('root.innerHTML = this.html(model)');
+    const attach = render.indexOf('this.attachItemTooltips(root)');
+    expect(attach).toBeGreaterThan(wipe);
+  });
+
+  it('skips an item id this client has no def for instead of an empty box', () => {
+    const attach = between('private attachItemTooltips(', 'private html(');
+    expect(attach).toContain('const def = ITEMS[target.itemId]');
+    expect(attach).toContain('if (!def) continue');
+  });
+
+  it('still performs no forced-reflow read: the shared binder owns positioning', () => {
+    // The reason this can be a cold window AND have hover tooltips: every layout
+    // measurement lives in Hud.attachTooltip, not here.
+    for (const token of ['getBoundingClientRect', 'offsetWidth', 'offsetHeight', 'clientWidth']) {
+      expect(painter.includes(token), `forced-reflow read: ${token}`).toBe(false);
+    }
+  });
+});

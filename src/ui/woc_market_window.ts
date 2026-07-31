@@ -22,6 +22,7 @@ import type {
   WocSaleView,
 } from '../net/woc_market_sdk';
 import { ITEMS } from '../sim/data';
+import type { ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { userFacingApiError } from './api_error_i18n';
 import { markDialogRoot } from './dialog_root';
@@ -63,6 +64,14 @@ export interface WocMarketWindowDeps {
   hooks(): WocMarketHooks | null;
   closeOthers(): void;
   hideTooltip(): void;
+  /** The shared hover/focus tooltip binder (Hud.attachTooltip). It owns the
+   *  positioning and the only forced-reflow reads involved, which is what keeps
+   *  this cold window's no-layout-read contract intact. */
+  attachTooltip(element: HTMLElement, html: () => string): void;
+  /** The SAME item tooltip the character window shows (Hud.itemTooltip with
+   *  compare on), so a listing reads identically to worn gear: stats, the
+   *  instance badges, the enchant, and the compare-to-equipped deltas. */
+  itemTooltip(item: ItemDef, instance?: ItemInstancePayload): string;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
 }
@@ -117,6 +126,11 @@ export class WocMarketWindow {
   private busy = false;
   private busyLabel: TranslationKey | null = null;
   private notice: { text: string; error: boolean } | null = null;
+  // Item hover targets for the CURRENT DOM, rebuilt with it. An instance payload
+  // is an object and cannot ride in a data attribute, so the markup carries a
+  // stable key and this maps it back to the row it came from. Cleared at the top
+  // of every html() pass so a key can never resolve against a destroyed row.
+  private tooltipTargets = new Map<string, { itemId: string; instance?: ItemInstancePayload }>();
 
   constructor(private readonly deps: WocMarketWindowDeps) {}
 
@@ -270,8 +284,13 @@ export class WocMarketWindow {
     this.lastSig = wocMarketViewSig(model);
     const focusKey = captureFocusKey(root);
     const draft = captureFormDraft(root);
+    // The shared tooltip box is anchored to an element this rebuild is about to
+    // destroy. Without this it would hang there pointing at nothing, because a
+    // removed node fires no mouseleave.
+    this.deps.hideTooltip();
     root.innerHTML = this.html(model);
     this.wire(root, model);
+    this.attachItemTooltips(root);
     restoreFormDraft(root, draft);
     if (focusKey) {
       // captureFocusKey returns the ATTRIBUTE VALUE, so it must be wrapped in
@@ -325,18 +344,55 @@ export class WocMarketWindow {
     return def ? itemDisplayName(def) : itemId;
   }
 
-  private itemCellHtml(itemId: string, quality: string): string {
+  /**
+   * One item cell: icon plus quality-coloured name, hoverable for the full stat
+   * tooltip.
+   *
+   * `key` must be unique within a render and stable across renders (the tab plus
+   * the row's own id), so the hover target survives a poll rebuild. The tag goes
+   * on BOTH the icon and the name rather than on a new wrapper element, because a
+   * wrapper would become the single flex child of .wm-row-open and collapse the
+   * icon/name layout.
+   */
+  private itemCellHtml(
+    itemId: string,
+    quality: string,
+    key: string,
+    instance?: ItemInstancePayload,
+  ): string {
     const icon = iconDataUrl('item', itemId, 28);
     // Build-time color from the shared QUALITY_COLOR map (the vendor/bags
     // convention); the default token keeps unknown qualities theme-correct.
     const color = QUALITY_COLOR[quality] ?? 'var(--color-quality-default)';
+    this.tooltipTargets.set(key, { itemId, instance });
+    const tag = ` data-tt-key="${esc(key)}"`;
     return (
-      `<img class="wm-icon" src="${icon}" alt="" />` +
-      `<span class="wm-name" style="color: ${color}">${esc(this.itemName(itemId))}</span>`
+      `<img class="wm-icon"${tag} src="${icon}" alt="" />` +
+      `<span class="wm-name"${tag} style="color: ${color}">${esc(this.itemName(itemId))}</span>`
     );
   }
 
+  /**
+   * Bind the shared item tooltip to every tagged cell in the freshly built DOM.
+   *
+   * Runs after each rebuild because the elements are new every time; the previous
+   * listeners died with the nodes they were attached to.
+   */
+  private attachItemTooltips(root: HTMLElement): void {
+    for (const el of root.querySelectorAll<HTMLElement>('[data-tt-key]')) {
+      const target = this.tooltipTargets.get(el.dataset.ttKey ?? '');
+      if (!target) continue;
+      const def = ITEMS[target.itemId];
+      // An id this client has no def for (a server ahead of this build) simply
+      // gets no tooltip rather than an empty box.
+      if (!def) continue;
+      this.deps.attachTooltip(el, () => this.deps.itemTooltip(def, target.instance));
+    }
+  }
+
   private html(model: WocMarketViewModel): string {
+    // Same lifetime as the DOM it describes (see the field's comment).
+    this.tooltipTargets.clear();
     // The shared window-chrome family (.panel-title + .x-btn + the close glyph,
     // the social/bank/report markup), not a bespoke header: the invented
     // .window-header / .window-close classes matched no rule in any sheet, so
@@ -442,7 +498,7 @@ export class WocMarketWindow {
           // readers reach the purchase flow, not just the mouse.
           `<td><button type="button" class="wm-row-open" data-listing="${r.id}" ` +
           `data-focus-key="wm-row-${r.id}" aria-label="${esc(t('hudChrome.wocMarket.bidAria', { item: this.itemName(r.itemId) }))}">` +
-          `${this.itemCellHtml(r.itemId, r.quality)}</button>${mine}${locked}</td>` +
+          `${this.itemCellHtml(r.itemId, r.quality, `browse:${r.id}`, r.instance)}</button>${mine}${locked}</td>` +
           `<td>${esc(r.sellerName)}</td>` +
           `<td>${r.currentCents === null ? esc(t('hudChrome.wocMarket.detailNoBids')) : esc(this.usd(r.currentCents))}${badge}</td>` +
           `<td>${r.buyNowCents === null ? '' : esc(this.usd(r.buyNowCents))}</td>` +
@@ -519,7 +575,7 @@ export class WocMarketWindow {
         : '';
     return (
       `<div class="wm-detail"><h3>${esc(t('hudChrome.wocMarket.detailTitle'))}</h3>` +
-      `<div class="wm-detail-item">${this.itemCellHtml(d.row.itemId, d.row.quality)}</div>` +
+      `<div class="wm-detail-item">${this.itemCellHtml(d.row.itemId, d.row.quality, `detail:${d.row.id}`, d.row.instance)}</div>` +
       `<p>${esc(t('hudChrome.wocMarket.detailSeller', { name: d.row.sellerName }))}</p>` +
       `<p>${esc(t('hudChrome.wocMarket.detailEndsAt', { utc: endUtc, local: endLocal }))}</p>` +
       `<p>${
@@ -588,7 +644,7 @@ export class WocMarketWindow {
           `<button type="button" class="wm-sell-item ${this.sellIndex === r.index ? 'wm-sell-selected' : ''}" ` +
           `data-action="sell-select" data-index="${r.index}" ` +
           `aria-label="${esc(t('hudChrome.wocMarket.sellSelectAria', { item: this.itemName(r.itemId) }))}" ` +
-          `data-focus-key="wm-sell-${r.index}">${this.itemCellHtml(r.itemId, r.quality)}</button>`,
+          `data-focus-key="wm-sell-${r.index}">${this.itemCellHtml(r.itemId, r.quality, `sell:${r.index}`, r.instance)}</button>`,
       )
       .join('');
     const selected = model.sell.rows.find((r) => r.index === this.sellIndex) ?? null;
@@ -693,7 +749,7 @@ export class WocMarketWindow {
     const listings = a.listings
       .map(
         (l) =>
-          `<li>${this.itemCellHtml(l.itemId, l.quality)} ` +
+          `<li>${this.itemCellHtml(l.itemId, l.quality, `activity:${l.id}`, l.instance)} ` +
           `<span>${l.currentCents === null ? esc(this.usd(l.startCents)) : esc(this.usd(l.currentCents))}</span> ` +
           `<span>${esc(listingStatus(l.status, l.resolution))}</span></li>`,
       )
