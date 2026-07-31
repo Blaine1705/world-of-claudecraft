@@ -385,16 +385,11 @@ Use desktop Ultra and mobile Low as the two ends of the presentation contract. C
 - Shadows stop at the normal entity shadow distance.
 - Browser page errors are absent. Separate expected offline API failures from render errors.
 
-The accepted banker chest evidence is:
-
-| Target | Before | After |
-|---|---|---|
-| Desktop Ultra | ![Desktop before](screenshots/banker-chest/before-desktop-ultra.png) | ![Desktop after](screenshots/banker-chest/after-desktop-ultra.png) |
-| Mobile Low | ![Mobile before](screenshots/banker-chest/before-mobile-low.png) | ![Mobile after](screenshots/banker-chest/after-mobile-low.png) |
-
-The mobile view loses some fine rune definition, which is acceptable because the chest's
-silhouette, lock, banding, and role remain clear and no gameplay information depends on
-the fine detail.
+The accepted banker chest evidence is regenerable, not kept in-tree after merge. Re-run the
+capture commands above (desktop Ultra and mobile Low) when you need before/after shots for
+review. The mobile view loses some fine rune definition, which is acceptable because the
+chest's silhouette, lock, banding, and role remain clear and no gameplay information depends
+on the fine detail.
 
 ## 8. Run the contribution gates
 
