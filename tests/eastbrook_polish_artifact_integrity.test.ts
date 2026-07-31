@@ -1410,14 +1410,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // The 0.32.2 version sync (with main's KTX2 change merged in) bumped
-    // package-lock.json, a fingerprinted input to all five Eastbrook seals, so
-    // every source fingerprint moved, the composite polish provenance followed,
-    // and this seal follows the composite. Every measured value (frame timings,
-    // draw stats, triangle and scenario numbers) is byte-identical, and no
-    // capture was retaken.
+    // The release/v0.33.0 resync of the draw-call diet branch moved the
+    // runtimeRender.renderer.sha256 leaf (census hooks and the diet's batching
+    // seams merged over the streaming and cull deltas), so the composite
+    // polish provenance followed, and this seal follows the composite. Every
+    // measured value (frame timings, draw stats, triangle and scenario
+    // numbers) is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      'c63bef32f965c0b8e106bfa20c452512e45b382fd32245449dae40cdc3bdd2f1',
+      'efc71e4dc8dca63654d4e712474a5caa82b6aee34909b6d45b358a0b1d7c347c',
     );
   });
 
