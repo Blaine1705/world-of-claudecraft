@@ -2700,6 +2700,137 @@ accounts.read; and the GM item restore minting PLAIN copies only (no
 client-supplied instance payloads by design, so a signed or masterwork
 original is not exactly reproducible; recorded, not solved).
 
+**Phase 15 QA COMPLETE** (2026-07-30, Fable xhigh, new session). Judged
+de2f9bdd3d..0aec2cdb80 with fresh eyes over every surface. Preamble:
+release/v0.33.0 unmoved past the synced b0acba0ad, so no re-sync and no
+merge audit were owed. Evidence: eight reviewers via the Agent tool
+(architecture, privacy-security, migration-safety, database-performance,
+cross-platform-sync, test-coverage-auditor, plus general-purpose admin
+SPA and bot reviewers), a 23-agent workflow (eight blind lenses with
+paired adversarial refuters per finding and a completeness critic; every
+refuter vote upheld its finding, no hand-judging owed), a live track,
+a four-reviewer fix-round review over the applied fixes, and thirty
+targeted mutants in an isolated worktree (git worktree add plus cp -c
+node_modules, removed after): twenty-nine killed, one confirmed
+EQUIVALENT (a scan-regex mutant that matches the same calls on flattened
+source; the floor's real teeth were proven separately by killing the
+named-constant-resolution arm), on top of the seven mutants the fix
+agents killed in place. Roughly sixty findings applied across thirteen QA
+commits acfe98484..2f976d75b.
+
+The four blockers: the inspector modal had no scrollable body
+(ModalDialog clips at overflow:hidden, so a tall sheet left the restore
+Confirm unreachable on a laptop viewport; it now has the sibling-standard
+padded scrolling body, a visible close control, and the container-type
+that revives the responsive fallback); the first-koi feed test never
+asserted the guild marquee stayed SILENT for a renown-0 feed-worthy deed
+(an unconditional marquee would have shipped green); the legacy dispatch
+arm, the one-flag production rollback, had no behavioral coverage of the
+restore-slot success or refusal ladder (it now mirrors the RouteDef
+twin's tests, including the includeState=false detoast suppression the
+database round had measured); and discordForAccounts, the N+1 fix
+itself, had zero direct tests (its SQL shape, Set dedupe, empty-drain
+short-circuit, and keying are now pinned, its projection narrowed to the
+three tag columns so discord_email stays out of the feed path, and the
+drain pins ONE links read per poll).
+
+Landed beyond the blockers: the inspector's archetype trio and
+knownRecipes count now run through the loader's own normalizers (the
+operator sees the repaired pair and resolved hobby the next login
+produces; a corrupt non-iterable recipes blob renders 0 instead of
+500ing the sheet the operator opened to diagnose it); the masterwork
+arm's rejected opt-out read RE-STAMPS its dedupe key with a 2s retry
+backoff behind an ownership compare instead of deleting it (R60); a
+fenced-out forced save after an audited restore logs a restore-specific
+error (saveCharacter now reports the fence); a woc_db_pool_clients
+gauge (total/idle/waiting, coerced at the pg boundary) gives the pool
+the saturation signal every fire-and-forget read family lacked; the
+published rod-fee recipe gained its missing by (recipe) grouping in
+DEPLOY.md and the gauge help (the two rod fees differ 4x, so the
+ungrouped product multiplied every training by the highest fee); the
+sim restore refuses a non-finite pid and a drift-pin matrix feeds the
+same tuples to resolveSlotToolEffect and the restore so the shared gate
+chains cannot silently diverge; the bot poster gained an in-flight
+guard, || title fallbacks, membership in the tsc program (bot/main.ts
+and its siblings were type-checked by nothing), non-blank
+author/title/description pins per kind, and a value pin of the nation
+labels against the game catalog; the admin fail() prose scan flattens
+multi-line calls, resolves named constants and ternary fallbacks (ten
+pre-existing unmatched proses joined the reverse map), scans the body
+validators, and holds a floor just under the real count; the SPA sheet
+mirror is pinned to the server type bidirectionally at tsc level; the
+capture tool loopback-guards all three targets including the
+DATABASE_URL arm that actually mints superadmin (resolved through
+pg-connection-string so a ?host= override cannot slip past); and the
+three R35 routes joined the adminIdParamDecode deviation registry.
+
+Live track, driven twice (API_DISPATCH default AND legacy, byte-identical
+prose on every probe): inspector live/stored/never-entered(null-blob)/404
+arms, both restores 200, and every refusal live (already_slotted, the
+refused fishing pair, no_tool via a toolless logging restore, the count
+validator, missing reason, unknown item, offline on a never-entered
+character). The feed detector was exercised END TO END live: a real
+masterwork proc from a ~150-craft session (recipe_eastbrook_warded_
+leggings) flowed claim, consent read, enqueue, and the LEGACY drain arm
+over HTTP with the secret, enriched through the batched links read,
+closing the arm route-parity had covered only structurally. The R35
+captures were re-shot against the final copy. Two live-track discoveries
+recorded: /dev level cannot reach the Veteran lifetime-XP threshold
+(xpToReachLevel(cap) sits below 250k, so no cheap live title-deed
+trigger exists), and the masterwork proc effect-gates on PRIMARY-stat
+outputs (masterworkBonusStats returns null for armor-only or
+weapon-only commons such as the chain vest and the arming sword, so
+those recipes never proc; the feed tests inject the event and are
+unaffected). MAINTAINER note: most starter commons therefore cannot
+masterwork; flagged as a content observation, not changed.
+
+**R60. A rejected consent read re-opens its dedupe key after a short
+backoff, never immediately, and only for its own claim.** The BUILT
+record's "a REJECTED read releases the key" is amended: an unconditional
+delete removed the throttle exactly when the pool was failing (one read
+per proc against a 10-client pool already timing out) and could delete a
+window a NEWER claimant legitimately owned (a driver-timeout rejection
+lands after the TTL). The release is now a compare-and-set re-stamp:
+one blip still costs one card, a retry lands 2s later, and a stale
+claimant's late rejection is a no-op. Pinned at the pure layer and
+through the GameServer arm.
+
+R59 flag, sharpened (not re-litigated): the security round named the
+restore-item SCOPE as the adjacent question R59's text acknowledges but
+does not decide: the whole ITEMS catalog is mintable where a
+professions-scoped allowlist (gather tools plus profession materials)
+would serve every incident the tool was built for and bound what a
+compromised moderator session can mint. Surfaced as the named tighter
+alternative beside accounts.password; behavior unchanged. Also flagged:
+a restored item feeds the discovery ledger, so an operator restoring
+something never owned can publish a discovery-deed card the player did
+not earn (inert for the intended restore-what-was-lost use; operator
+note, not code).
+
+Accepted and recorded this round: the un-coalesced forced saves (N
+rapid restores are N blob writes; GM-paced), the restore landing on a
+mid-gather-cast window (the player strictly gains), saveCharacter's true
+meaning not-fenced rather than landed (the no-state arm is an
+unreachable no-op for the restore paths), addStacked never refusing on
+bag capacity (a 20-item restore can push past the ceiling into the
+documented tolerated overflow), no rate limiter on the authed restore
+routes (surface-consistent; the audit row is the volume control), the
+updatedAt string-typed TIMESTAMPTZ matching the sibling convention, the
+derived scan roots walking untracked directories (env-dependent
+brittleness in a dirty checkout, hermetic in CI), and the eviction
+backstop bounding sweep size rather than recurrence. Follow-ups recorded
+NOT filed: the RELAY drain still runs the N+1 the activity drain shed
+(now marginally harder to batch since the narrowed projection dropped
+discord_username), pollRelay and pollDailyRewardWinners share the
+unguarded-overlap shape pollActivity just closed, the QueuedActivity
+FIELD axis (unlike the kind axis) has no cross-process pin, and the
+bot's description-level ?? fallbacks share the empty-string blind spot
+the title sites shed (cosmetic only).
+
+Final gate: PASS, all 11 steps green, exit code 0 read explicitly, run
+on the committed idle tree at the QA code tip 2f976d75b (this record is
+the docs-only close on top). The branch stays LOCAL, not pushed.
+
 ---
 
 ## Phase 16: performance at 1,000 concurrent
