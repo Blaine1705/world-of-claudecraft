@@ -1563,6 +1563,22 @@ describe('Guide professions gathering accuracy', () => {
     expect(f.reelWindowSec).toBe(2.5);
     expect(f.reelRodBonusSec).toBe(0.75);
     expect(f.sessionCapSec).toBe(15);
+    // The biteBody prose quotes DERIVED figures (worst wait and reel window
+    // per rod tier) as English literals; derive them here from the published
+    // constants so a rhythm retune reds the prose too, not just the numbers
+    // above (the QA lens found the derivations otherwise unpinned).
+    setLanguage('en');
+    const bite = t('guide.profPages.fish.biteBody', {
+      min: '3',
+      max: '8',
+      reel: '2.5',
+      cap: '15',
+      rod: '1.5',
+      reelRod: '0.75',
+    });
+    expect(bite).toContain(`down to ${f.biteMaxSec - f.rodBiteReductionSec} seconds`);
+    expect(bite).toContain(`${f.reelWindowSec + f.reelRodBonusSec} second window`);
+    expect(bite).toContain(`the Silverstream to ${f.biteMaxSec - 2 * f.rodBiteReductionSec} with`);
     expect(f.schedule).toEqual(
       FISHING_GAIN_SCHEDULE.map((row) => ({ below: row.belowProficiency, gain: row.gain })),
     );
