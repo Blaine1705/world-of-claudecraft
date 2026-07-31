@@ -1510,11 +1510,16 @@ describe('Guide professions gathering accuracy', () => {
         .flat()
         .find((e) => e.itemId === 'thorium_mining_pick')?.gate,
     ).toBe('clears:3');
+    // The delve name in the wording derives from the shipped delve, so a sim
+    // rename reds this pin against the prose literal instead of rotting six
+    // English strings plus five locale fills with a green suite (R66).
+    const litany = GUIDE_DELVES.find((d) => d.id === 'drowned_litany')?.name.replace(/^The /, '');
+    expect(litany, 'the Litany ships under its known name').toBe('Drowned Litany');
     expect(t('guide.profPages.toolCraftedOrMarks', { craft: 'X', marks: '24' })).toContain(
-      'three Drowned Litany clears',
+      `three ${litany} clears`,
     );
     expect(t('guide.profPages.toolCraftedOrMarksHeroic', { craft: 'X', marks: '56' })).toContain(
-      'Heroic Drowned Litany clear',
+      `Heroic ${litany} clear`,
     );
 
     // Every shipped locale, read off the resolved bundles: both tokens present
@@ -1835,11 +1840,17 @@ describe('Guide professions pages and routes', () => {
       mining.match(
         new RegExp(`<tr>(?:(?!</tr>)[\\s\\S])*${name}(?:(?!</tr>)[\\s\\S])*</tr>`),
       )?.[0] ?? '';
+    // Delve name derived as in the wording pin above: a sim rename must red
+    // these rows rather than leave stale prose green.
+    const litanyRow = GUIDE_DELVES.find((d) => d.id === 'drowned_litany')?.name.replace(
+      /^The /,
+      '',
+    );
     expect(rowFor('Osmium Mining Pick'), 'tier-4 row names its clears gate').toContain(
-      'three Drowned Litany clears',
+      `three ${litanyRow} clears`,
     );
     expect(rowFor('Glyphsteel Mining Pick'), 'tier-5 row names its Heroic gate').toContain(
-      'Heroic Drowned Litany clear',
+      `Heroic ${litanyRow} clear`,
     );
     // The rendered wield NUMBER, not just the artifact field: the data mirror
     // pins the corpus, so a page that renders the wrong value in the cell

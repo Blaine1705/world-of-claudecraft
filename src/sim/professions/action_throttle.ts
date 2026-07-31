@@ -23,12 +23,15 @@ import type { PlayerMeta } from '../sim';
 // rename rippling into the content constants.
 export { CRAFT_THROTTLE_MAX_PER_WINDOW, CRAFT_THROTTLE_WINDOW_SECONDS };
 
-/** Whether `meta`'s rolling shared-action window still has room for one more
- *  paced profession action, advancing/resetting the window against `now`
- *  (sim time, deterministic) as a side effect exactly like a real rolling
- *  window would. A maxed specialist is capped at
+/** Whether `meta`'s shared-action window still has room for one more paced
+ *  profession action, advancing/resetting the window against `now` (sim
+ *  time, deterministic) as a side effect. The window is FIXED (tumbling),
+ *  anchored on the first check after expiry, not rolling: up to
+ *  2x`CRAFT_THROTTLE_MAX_PER_WINDOW` actions can land inside one arbitrary
+ *  span that straddles a reset, and the player-facing prose says "in each
+ *  window" deliberately. A maxed specialist is capped at
  *  `CRAFT_THROTTLE_MAX_PER_WINDOW` successful actions per
- *  `CRAFT_THROTTLE_WINDOW_SECONDS`, regardless of skill or material supply. */
+ *  `CRAFT_THROTTLE_WINDOW_SECONDS` window, regardless of skill or supply. */
 export function withinActionThrottle(meta: PlayerMeta, now: number): boolean {
   if (now - meta.craftThrottle.windowStart >= CRAFT_THROTTLE_WINDOW_SECONDS) {
     meta.craftThrottle.windowStart = now;
