@@ -3429,7 +3429,17 @@ delve UI's own term (pre-existing; unify at the fill); and the
 follow-up token adds ({clears}, {tier4Prof}/{tier5Prof}) land with the
 post-packet fill.
 
-Final gate: recorded below after the closing run.
+Final gate: the first full run at 57c2330bcb failed exactly one file,
+tests/deed_broadcast_row.test.ts, whose two literal pins held the
+pre-R58 consent label (the intended change; only the full suite runs
+that file, which is why every targeted subset missed it); both pins
+moved to the new English in db4f5ff1eb, and the re-run is PASS, all 11
+steps green, exit code 0 read explicitly, on the committed idle tree at
+db4f5ff1eb (this docs close on top). PR tier by design: the maintainer
+deferred all translation past the packet, so the I18N_RELEASE_TIER=1
+close moves to the deferred fill. Phase 17 is BUILT. NEXT: phase 17 QA
+(ultracode, new session, fresh eyes over e753614ff2..db4f5ff1eb plus
+this close), then phase 18.
 
 ---
 
