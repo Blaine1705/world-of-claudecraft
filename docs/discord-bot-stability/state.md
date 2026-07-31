@@ -166,8 +166,8 @@ because dropping the one word is otherwise silent),
   dispatched through; `bot/discord_api.ts` reduced to an IO shell over it (the 10 second
   retry clamp and the 1 second non-JSON-429 retry are both gone); ledger item L1 closed
   in the same rewrite.
-- New env keys (Phase 2, the first four; R8 satisfied, they are in the commented
-  `.env.example` Discord block. DEPLOY.md documentation is still Phase 7 per D13):
+- New env keys (Phase 2, the first four; R8 satisfied and re-verified in Phase 2 QA against
+  the file itself, each commented default matching its exported `DEFAULT_*` constant. DEPLOY.md documentation is still Phase 7 per D13):
   `DISCORD_MAX_RPS` (8), `DISCORD_BAN_PAUSE_MS` (600000),
   `DISCORD_BREAKER_LIMIT` (300), `DISCORD_FORBIDDEN_TTL_MS` (86400000).
   The defaults are exported from `bot/rate_governor.ts` as `DEFAULT_MAX_RPS`,
