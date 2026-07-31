@@ -108,7 +108,7 @@ export interface GfxSettings {
    * lift/gain/vignette to medium, which otherwise renders raw ACES and reads
    * washed-bright next to the graded tiers. Implied by `composer`; only
    * meaningful when `composer` is false. NOTE: emissive intensities across
-   * the codebase key off `composer` (it means "bloom exists") — this flag
+   * the codebase key off `composer` (it means "bloom exists"), while this flag
    * deliberately does not change them.
    */
   readonly gradePass: boolean;

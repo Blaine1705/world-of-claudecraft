@@ -180,11 +180,7 @@ import { FrozenOrbFx } from './frozen_orb_fx';
 import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import { gardenMazeCameraLift } from './garden_maze_core';
-import {
-  buildGatherNodes,
-  type GatherNodesView,
-  gatherNodeIdFromIntersection,
-} from './gather_nodes';
+import { buildGatherNodes, type GatherNodesView, resolveGatherNodePick } from './gather_nodes';
 import {
   GFX,
   type GfxBucketBands,
@@ -281,6 +277,14 @@ import {
 } from './renderer_frame_telemetry_core';
 import { buildRiftRankBadge } from './rift_rank';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
+import {
+  captureSceneCensus,
+  createHitchTracker,
+  type HitchSummary,
+  type SceneCensusChild,
+  type SceneCensusHost,
+  type SceneCensusReport,
+} from './scene_census_core';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
@@ -1121,6 +1125,9 @@ function measureFeatureFootprint(root: THREE.Object3D): FeatureFootprint | null 
   return { centerX: center.x, centerZ: center.z, halfX: size.x / 2, halfZ: size.z / 2 };
 }
 
+// Diagnostics-only label (the census buckets and the renderTrace walker read
+// it); NEVER a behavior or visibility gate, so tagging an actionable object
+// (team rings, corpse beacon) can never become a graphics-fairness break.
 function setRenderCategory(obj: THREE.Object3D, category: RenderDiagnosticsCategory): void {
   obj.userData.renderCategory = category;
 }
@@ -1337,6 +1344,22 @@ export class Renderer {
     previousFocusX: Number.NaN,
     previousFocusZ: Number.NaN,
   };
+  // Hitch correlation (scene_census_core): fed per frame only while the ?perf
+  // overlay has it enabled, so the fleet pays nothing for it. The sample is a
+  // reused scratch object so the per-frame path stays allocation-free.
+  private readonly hitchTracker = createHitchTracker();
+  private hitchLogEnabled = false;
+  private readonly hitchFrameScratch = {
+    atMs: 0,
+    frameMs: 0,
+    submitMs: 0,
+    programs: 0,
+    textures: 0,
+    createdViews: 0,
+  };
+  // The census burst inflates the following frame's dt; skip that one sample
+  // so the tracker never charges the census to the scene.
+  private hitchSkipNextFrame = false;
   // Tone-mapping exposure at brightness 1.0. Applied in OutputPass, i.e.
   // AFTER bloom, so this trims the raised sun rig back to the old apparent
   // brightness without moving anything across BLOOM_THRESHOLD.
@@ -1761,7 +1784,7 @@ export class Renderer {
     }
     this.webgl.shadowMap.enabled = GFX.dynamicShadows;
     // PCF (not PCFSoft): in three 0.165 shadow.radius is only honoured by the
-    // plain PCF kernel — PCFSoft ignores it and uses a fixed texel-sized
+    // plain PCF kernel. PCFSoft ignores it and uses a fixed texel-sized
     // kernel, so the old softening was silently a no-op and every shadow edge
     // rendered near-hard regardless of tuning. The live radius is deliberately
     // crisp without dropping all the way to a razor edge.
@@ -2047,6 +2070,7 @@ export class Renderer {
     setRenderCategory(this.fish.group, 'fish');
     this.scene.add(this.fish.group);
     this.motes = buildMotes(this.sim.cfg.seed);
+    setRenderCategory(this.motes.group, 'ambient');
     this.scene.add(this.motes.group);
     // near-field solid-blade carpet; the card tufts own the mid/far field
     this.bladeGrass = buildBladeGrass(
@@ -2059,8 +2083,10 @@ export class Renderer {
     this.cliffScree = buildCliffScree(this.sim.cfg.seed);
     this.scene.add(this.cliffScree.group);
     this.birds = buildBirds(this.sim.cfg.seed);
+    setRenderCategory(this.birds.group, 'ambient');
     this.scene.add(this.birds.group);
     this.impactSite = buildImpactSite(this.sim.cfg.seed);
+    setRenderCategory(this.impactSite.group, 'props');
     this.scene.add(this.impactSite.group);
     this.scene.add(this.impactSite.light);
     const props = buildProps(this.sim.cfg.seed, (delveId) =>
@@ -2100,12 +2126,14 @@ export class Renderer {
     // the fireLights budget (never the cull-toggled group) and its flames join the
     // campfire flicker + ember pass.
     this.valeCupStadium = buildValeCupStadium(this.sim.cfg.seed);
+    setRenderCategory(this.valeCupStadium.group, 'props');
     this.scene.add(this.valeCupStadium.group);
     // The private practice-pitch copy (shown at a far instance origin when the
     // local player is practicing; positioned/toggled by valeCupStadium.update).
+    setRenderCategory(this.valeCupStadium.practiceGroup, 'props');
     this.scene.add(this.valeCupStadium.practiceGroup);
     // The practice skybox (camera-centred; shown only while practicing, driven
-    // in updateAmbience). Category 'sky' so the FX governor treats it like the dome.
+    // in updateAmbience). Category 'sky' groups it with the dome in diagnostics.
     setRenderCategory(this.valeCupSky.mesh, 'sky');
     this.scene.add(this.valeCupSky.mesh);
     for (const light of this.valeCupStadium.lights) {
@@ -2126,6 +2154,7 @@ export class Renderer {
     }
     // Team glow rings under live match fighters (ally/enemy/self readability).
     this.valeCupTeamRings = buildValeCupTeamRings();
+    setRenderCategory(this.valeCupTeamRings.group, 'ui3d');
     this.scene.add(this.valeCupTeamRings.group);
     this.propsView = props;
 
@@ -3262,6 +3291,88 @@ export class Renderer {
     };
   }
 
+  /** Overlay-gated hitch correlation: enabled by the ?perf monitor only. */
+  setHitchLogEnabled(enabled: boolean): void {
+    if (this.hitchLogEnabled && !enabled) this.hitchTracker.reset();
+    this.hitchLogEnabled = enabled;
+  }
+
+  hitchStats(): HitchSummary | null {
+    return this.hitchLogEnabled ? this.hitchTracker.summary() : null;
+  }
+
+  /**
+   * One-shot MEASURED scene census (scene_census_core): per-category draw
+   * calls and triangles via bucket-visibility diffs through the real pipeline
+   * (composer and shadow passes included), plus the shadow pass share via a
+   * frozen-shadow render. On demand only (the ?perf overlay census button and
+   * the capture harness); the burst is excluded from the live draw-stats
+   * delta via discardOutOfBandDraws.
+   */
+  captureSceneCensus(): SceneCensusReport {
+    const info = this.webgl.info;
+    const children: SceneCensusChild[] = [];
+    for (const child of this.scene.children) {
+      // Lights stay untouched: hiding one changes the lighting state hash and
+      // recompiles programs mid-census, which would poison the diffs.
+      if ((child as { isLight?: boolean }).isLight) continue;
+      children.push({
+        category:
+          typeof child.userData.renderCategory === 'string'
+            ? (child.userData.renderCategory as string)
+            : 'unknown',
+        get visible() {
+          return child.visible;
+        },
+        setVisible(visible: boolean) {
+          child.visible = visible;
+        },
+      });
+    }
+    const host: SceneCensusHost = {
+      children: () => children,
+      render: () => {
+        if (this.post) this.post.render();
+        else this.webgl.render(this.scene, this.camera);
+      },
+      counters: () => ({
+        calls: info.render.calls,
+        triangles: info.render.triangles,
+        points: info.render.points,
+        lines: info.render.lines,
+      }),
+      resetCounters: () => info.reset(),
+      countersAutoReset: () => info.autoReset,
+      setCountersAutoReset: (autoReset: boolean) => {
+        info.autoReset = autoReset;
+      },
+      programCount: () => info.programs?.length ?? 0,
+      textureCount: () => info.memory.textures,
+      geometryCount: () => info.memory.geometries,
+      shadowsEnabled: () => this.webgl.shadowMap.enabled,
+      shadowAutoUpdate: () => this.webgl.shadowMap.autoUpdate,
+      setShadowAutoUpdate: (autoUpdate: boolean) => {
+        this.webgl.shadowMap.autoUpdate = autoUpdate;
+      },
+      discardOutOfBand: () => this.discardOutOfBandDraws(),
+    };
+    const p = this.sim.player;
+    try {
+      return captureSceneCensus(host, {
+        atMs: performance.now(),
+        tier: GFX.tier,
+        playerPosition: { x: roundMs(p.pos.x), y: roundMs(p.pos.y), z: roundMs(p.pos.z) },
+        cameraPosition: {
+          x: roundMs(this.camera.position.x),
+          y: roundMs(this.camera.position.y),
+          z: roundMs(this.camera.position.z),
+        },
+      });
+    } finally {
+      this.hitchSkipNextFrame = true;
+    }
+  }
+
   private recordRendererPhase(phase: RendererPhase, ms: number): void {
     if (!Number.isFinite(ms) || ms < 0) return;
     this.phaseSamples[phase].push(Math.min(250, ms));
@@ -4353,13 +4464,14 @@ export class Renderer {
     return Math.max(0, this.webgl.info.memory.textures - before);
   }
 
-  // Composer tiers only: drop an out-of-band render (prewarm pass, screenshot)
-  // from the draw-stats accumulator and zero the WebGL counters so the next
-  // sync() delta covers in-band work only. No-op on every other profile, where
-  // three's per-render auto-reset already isolates passes.
+  // Drop an out-of-band render burst (prewarm pass, screenshot, scene census)
+  // from the perf counters. The zeroing runs on EVERY profile so a synchronous
+  // perfStats() read right after the burst never serves a stale out-of-band
+  // pass (on auto-reset profiles the next live render would also clear it, but
+  // the census harness reads in the same task). The accumulator hand-off is
+  // composer-tiers-only, where the counters run monotonically.
   private discardOutOfBandDraws(): void {
-    if (!this.drawStats) return;
-    this.drawStats.noteOutOfBand(this.webgl.info.render);
+    if (this.drawStats) this.drawStats.noteOutOfBand(this.webgl.info.render);
     this.webgl.info.reset();
   }
 
@@ -5485,6 +5597,7 @@ export class Renderer {
     if (v.group.visible) {
       if (!this.valeCupBallTrail) {
         this.valeCupBallTrail = new ValeCupBallTrail();
+        setRenderCategory(this.valeCupBallTrail.group, 'vfx');
         this.scene.add(this.valeCupBallTrail.group);
       }
       this.valeCupBallTrail.emit(x, y + BALL_RADIUS * e.scale, z, speed, dt);
@@ -5492,6 +5605,7 @@ export class Renderer {
     if (speed > 6 && heightAbove < 0.5 && v.group.visible) {
       if (!this.valeCupBallDust) {
         this.valeCupBallDust = new ValeCupBallDust();
+        setRenderCategory(this.valeCupBallDust.group, 'vfx');
         this.scene.add(this.valeCupBallDust.group);
       }
       this.valeCupBallDust.kick(x, gy, z, dx, dz, dt);
@@ -5504,6 +5618,7 @@ export class Renderer {
     if (prevSpeed < 4 && speed > 13 && heightAbove < 0.7 && v.group.visible) {
       if (!this.valeCupBallDust) {
         this.valeCupBallDust = new ValeCupBallDust();
+        setRenderCategory(this.valeCupBallDust.group, 'vfx');
         this.scene.add(this.valeCupBallDust.group);
       }
       this.valeCupBallDust.burst(x, gy, z);
@@ -5564,6 +5679,7 @@ export class Renderer {
         blending: THREE.AdditiveBlending,
       });
       this.fiestaRing = new THREE.Mesh(geo, mat);
+      setRenderCategory(this.fiestaRing, 'vfx');
       this.scene.add(this.fiestaRing);
     }
     const m = this.fiestaRing;
@@ -5593,6 +5709,7 @@ export class Renderer {
           blending: THREE.AdditiveBlending,
         });
         m = new THREE.Mesh(geo, mat);
+        setRenderCategory(m, 'vfx');
         this.fiestaPowerupMeshes.set(p.id, m);
         this.scene.add(m);
       }
@@ -6406,7 +6523,7 @@ export class Renderer {
     // as white cutouts against the HDRI sky instead of far-off silhouettes).
     // 700 (not the 850 cap) on the open blue-sky realms: at 850 the last
     // visible hills sat almost fully outside the haze and the horizon read
-    // cutout-crisp — the same saturation at 400 yd as at 40. 700 puts real
+    // cutout-crisp, with the same saturation at 400 yd as at 40. 700 puts real
     // aerial perspective on the far third while costing nothing near (and
     // fog-far drives culling, so the trim is a small draw-count win too).
     vale: { color: 0x7095bd, near: 55, far: 700 },
@@ -6428,7 +6545,7 @@ export class Renderer {
     amber: { color: 0xdec18e, near: 130, far: 430 },
     // the Willowfen: clear airy morning, the lightest fog in the world
     // (deepened from 0xcfe2dc: the near-white haze tonemapped to a white
-    // cutout band on the horizon instead of reading as distance — same
+    // cutout band on the horizon instead of reading as distance, with the same
     // lesson as the blue-sky biomes above)
     fen: { color: 0xb7d0c6, near: 140, far: 510 },
     // the Nightbloom: a lavender dream-haze over the violet downs, deepened
@@ -6477,7 +6594,7 @@ export class Renderer {
     amber: { hemiSky: 0xffe2b0, hemiGround: 0x5a4a30, sun: 0xffc86a },
     fen: { hemiSky: 0xdceeff, hemiGround: 0x51704e, sun: 0xfff0d2 },
     // the Nightbloom: dreamlight. A cool rose sun over lavender sky bounce
-    // and deep violet ground — luminous, but at a twilight level: at full
+    // and deep violet ground: luminous, but at a twilight level. At full
     // day strength its canopies and downs rendered in ordinary daylight
     // green under the starfield sky
     night: {
@@ -6488,7 +6605,7 @@ export class Renderer {
       hemiScale: 0.95,
       envScale: 0.7,
     },
-    // the Wraithwood: sickly grey light strangled by the canopy — dim as
+    // the Wraithwood: sickly grey light strangled by the canopy, dim as
     // well as grey now that the rig has an intensity knob
     haunt: { hemiSky: 0x4d564c, hemiGround: 0x0e120e, sun: 0x6e7a66, sunScale: 0.8, envScale: 0.8 },
     // the Palmreach: hard tropical daylight over deep green bounce
@@ -6651,6 +6768,7 @@ export class Renderer {
             fireLights: this.fireLights,
             lowGfx: this.lowGfx,
           });
+          setRenderCategory(view.group, 'dungeon');
           this.scene.add(view.group);
           this.yumiMazeViews.set(i, view);
         }
@@ -6962,7 +7080,7 @@ export class Renderer {
       const lowness = 1 - hi * hi * (3 - 2 * hi);
       // 0.42 base: with the key pinned at 31° the warm never ramps through
       // the old near-horizon band, so the standing gold has to come from the
-      // base term — this is the golden-hour read at the permanent day angle
+      // base term. This is the golden-hour read at the permanent day angle
       const warmAmt = aboveHorizon(sunElev) * (0.52 + lowness * 0.4);
       this.dnColorScratch.setHex(light.sun);
       this.dnColorScratch.lerp(this.dnMoonScratch.setHex(WARM_SUN_COLOR), warmAmt);
@@ -8446,6 +8564,7 @@ export class Renderer {
           });
           this.corpseBeacon = new THREE.Mesh(geo, mat);
           this.corpseBeacon.renderOrder = 2;
+          setRenderCategory(this.corpseBeacon, 'ui3d');
           this.scene.add(this.corpseBeacon);
         }
         this.corpseBeacon.visible = true;
@@ -8739,6 +8858,18 @@ export class Renderer {
     frameStats.candidateViews = this.viewCandidates.length;
     frameStats.activeViews = this.views.size;
     frameStats.visibleViews = visibleViews;
+    if (this.hitchLogEnabled && this.hitchSkipNextFrame) {
+      this.hitchSkipNextFrame = false;
+    } else if (this.hitchLogEnabled) {
+      const sample = this.hitchFrameScratch;
+      sample.atMs = afterSubmit;
+      sample.frameMs = Math.min(250, Math.max(0, dt * 1000));
+      sample.submitMs = framePhaseMs.submit;
+      sample.programs = this.webgl.info.programs?.length ?? 0;
+      sample.textures = this.webgl.info.memory.textures;
+      sample.createdViews = createdViews;
+      this.hitchTracker.frame(sample);
+    }
     this.runtimeEntryElapsedMs += Math.min(250, Math.max(0, dt * 1000));
   }
 
@@ -9379,14 +9510,7 @@ export class Renderer {
     const hits = this.raycastHits;
     hits.length = 0;
     this.raycaster.intersectObjects(this.gatherNodeMeshes, true, hits);
-    let result: string | null = null;
-    for (const hit of hits) {
-      const nodeId = gatherNodeIdFromIntersection(hit);
-      if (nodeId !== null) {
-        result = nodeId;
-        break;
-      }
-    }
+    const result = resolveGatherNodePick(hits);
     hits.length = 0;
     return result;
   }

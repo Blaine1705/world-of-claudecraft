@@ -16,7 +16,10 @@
 // Media-engagement autoplay (a context that opens already 'running') never
 // reaches the queue: a non-suspended context returns immediately.
 
-type ResumableContext = Pick<AudioContext, 'state'> & { resume?: () => Promise<void> };
+type ResumableContext = {
+  state: AudioContextState | 'interrupted';
+  resume?: () => Promise<void>;
+};
 
 const GESTURE_EVENTS = ['pointerdown', 'keydown', 'touchend'] as const;
 
@@ -43,7 +46,7 @@ export function createAudioUnlockLatch(
   const onGesture = (): void => {
     if (unlocked) return;
     unlocked = true;
-    for (const event of GESTURE_EVENTS) target?.removeEventListener(event, onGesture);
+    for (const event of GESTURE_EVENTS) target?.removeEventListener(event, onGesture, true);
     for (const ctx of pending) resume(ctx);
     pending.clear();
   };
@@ -56,8 +59,9 @@ export function createAudioUnlockLatch(
 
   return {
     resumeWhenAllowed(ctx: ResumableContext): void {
-      // Already running (or closed): nothing to resume, and no warning to earn.
-      if (ctx.state !== 'suspended') return;
+      // Already running or permanently closed: nothing to resume. WebKit's
+      // interrupted state remains resumable after calls, Siri, or backgrounding.
+      if (ctx.state === 'running' || ctx.state === 'closed') return;
       if (!unlocked) {
         pending.add(ctx);
         return;

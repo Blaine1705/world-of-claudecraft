@@ -16,7 +16,7 @@ import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 
 // Near-field blade carpet: a single InstancedMesh of low-poly SOLID grass
 // clusters riding a toroidal grid around the player. The card-tuft system in
-// foliage.ts owns the mid/far field — its crossed alpha cards read fine at
+// foliage.ts owns the mid/far field. Its crossed alpha cards read fine at
 // range but resolve into "scattered 3D models" up close, which is exactly
 // where this carpet takes over: thousands of small individually-swaying
 // blades, dense on the lush soil patches and absent between them, tinted by
@@ -26,7 +26,7 @@ import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 //
 // The grid is toroidal: slot (i, j) always owns the world cell congruent to
 // (i, j) mod GRID_W nearest the player, so walking re-places only the ring of
-// slots whose target cell changed — no allocation, no map churn. Placement is
+// slots whose target cell changed, with no allocation or map churn. Placement is
 // budgeted per frame; a sprint briefly thins the leading edge and backfills
 // within a second.
 

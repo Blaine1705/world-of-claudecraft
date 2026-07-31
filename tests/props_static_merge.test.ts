@@ -52,7 +52,7 @@ describe('static prop merging', () => {
     sharedPlacement.castShadow = true;
 
     const nonIndexedMesh = new THREE.Mesh(indexedQuad().toNonIndexed(), material);
-    nonIndexedMesh.position.set(-3, 2, 5);
+    nonIndexedMesh.position.set(3, 2, 5);
     nonIndexedMesh.scale.set(1.5, 0.75, 2);
     nonIndexedMesh.castShadow = true;
     group.add(indexedMesh, sharedPlacement, nonIndexedMesh);
@@ -127,5 +127,46 @@ describe('static prop merging', () => {
       { material: wood, castShadow: false, receiveShadow: true },
       { material: stone, castShadow: true, receiveShadow: true },
     ]);
+  });
+
+  it('de-interleaves indexed source attributes without mutating the shared geometry', () => {
+    const group = new THREE.Group();
+    const material = new THREE.MeshStandardMaterial();
+    const geometry = new THREE.BufferGeometry();
+    const source = new Float32Array([
+      0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1,
+    ]);
+    const interleaved = new THREE.InterleavedBuffer(source, 6);
+    geometry.setAttribute('position', new THREE.InterleavedBufferAttribute(interleaved, 3, 0));
+    geometry.setAttribute('normal', new THREE.InterleavedBufferAttribute(interleaved, 3, 3));
+    geometry.setIndex([0, 1, 2, 0, 2, 3]);
+    const sourceBefore = Array.from(source);
+    const sourceIndexBefore = Array.from(geometry.getIndex()?.array ?? []);
+    const mesh = new THREE.Mesh(geometry, material);
+    const plainMesh = new THREE.Mesh(geometry.toNonIndexed(), material);
+    plainMesh.position.x = 2;
+    group.add(mesh, plainMesh);
+
+    const merged = propStaticMergeInternalsForTest.mergeStaticMeshes(group, new Set());
+
+    expect(merged).toHaveLength(1);
+    expect(merged[0].geometry.getAttribute('position')).not.toBeInstanceOf(
+      THREE.InterleavedBufferAttribute,
+    );
+    expect(merged[0].geometry.getAttribute('normal')).not.toBeInstanceOf(
+      THREE.InterleavedBufferAttribute,
+    );
+    expect(Array.from(merged[0].geometry.getAttribute('position').array)).toEqual([
+      0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 2, 0, 0, 3, 0, 0, 3, 1, 0, 2, 1, 0,
+    ]);
+    expect(Array.from(merged[0].geometry.getAttribute('normal').array)).toEqual([
+      0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+    ]);
+    expect(Array.from(merged[0].geometry.getIndex()?.array ?? [])).toEqual([
+      0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7,
+    ]);
+    expect(Array.from(source)).toEqual(sourceBefore);
+    expect(Array.from(geometry.getIndex()?.array ?? [])).toEqual(sourceIndexBefore);
+    expect(geometry.getAttribute('position')).toBeInstanceOf(THREE.InterleavedBufferAttribute);
   });
 });

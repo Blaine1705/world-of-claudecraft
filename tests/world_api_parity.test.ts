@@ -258,6 +258,7 @@ export const IWORLD_MEMBERS = [
   // --- market commands ---
   { name: 'marketSearch', kind: 'method' },
   { name: 'marketList', kind: 'method' },
+  { name: 'marketListInstance', kind: 'method' },
   { name: 'marketBuy', kind: 'method' },
   { name: 'marketCancel', kind: 'method' },
   { name: 'marketCollect', kind: 'method' },
@@ -492,10 +493,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // members on top of the branch's 272; making reins usable items then removed
     // two (selectedMount + selectMount) for 273; the v0.32.0 base merge adds
     // activeMasterLootRolls, then the renderer-only rift collision token leaves
-    // the public seam with 273.
-    expect(IWORLD_MEMBERS.length).toBe(273);
+    // the public seam with 273; the instance-payload pipes then add
+    // marketListInstance, leaving 274.
+    expect(IWORLD_MEMBERS.length).toBe(274);
     expect(DATA_MEMBERS.length).toBe(71);
-    expect(METHOD_MEMBERS.length).toBe(202);
+    expect(METHOD_MEMBERS.length).toBe(203);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -669,6 +671,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketCollectPending',
       'marketInfo',
       'marketList',
+      'marketListInstance',
       'marketSearch',
       'mountLessonActive',
       'mountRaceCancel',
@@ -975,6 +978,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketCancel',
       'marketCollect',
       'marketList',
+      'marketListInstance',
       'marketSearch',
       'mountLessonActive',
       'mountRaceCancel',
@@ -1377,6 +1381,7 @@ const FACET_MARKET = [
   'marketCollectPending',
   'marketSearch',
   'marketList',
+  'marketListInstance',
   'marketBuy',
   'marketCancel',
   'marketCollect',
@@ -1599,8 +1604,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(273);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(273);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(274);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(274);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

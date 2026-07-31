@@ -5,25 +5,43 @@ type Listener = () => void;
 
 function fakeTarget() {
   const listeners = new Map<string, Set<Listener>>();
+  const capture = (options?: boolean | AddEventListenerOptions | EventListenerOptions): boolean =>
+    typeof options === 'boolean' ? options : Boolean(options?.capture);
+  const key = (
+    type: string,
+    options?: boolean | AddEventListenerOptions | EventListenerOptions,
+  ): string => `${type}:${capture(options)}`;
   return {
-    addEventListener(type: string, fn: EventListenerOrEventListenerObject): void {
-      const set = listeners.get(type) ?? new Set<Listener>();
+    addEventListener(
+      type: string,
+      fn: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions,
+    ): void {
+      const listenerKey = key(type, options);
+      const set = listeners.get(listenerKey) ?? new Set<Listener>();
       set.add(fn as Listener);
-      listeners.set(type, set);
+      listeners.set(listenerKey, set);
     },
-    removeEventListener(type: string, fn: EventListenerOrEventListenerObject): void {
-      listeners.get(type)?.delete(fn as Listener);
+    removeEventListener(
+      type: string,
+      fn: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions,
+    ): void {
+      listeners.get(key(type, options))?.delete(fn as Listener);
     },
     fire(type: string): void {
-      for (const fn of listeners.get(type) ?? []) fn();
+      for (const fn of listeners.get(key(type, false)) ?? []) fn();
+      for (const fn of listeners.get(key(type, true)) ?? []) fn();
     },
     count(type: string): number {
-      return listeners.get(type)?.size ?? 0;
+      return (
+        (listeners.get(key(type, false))?.size ?? 0) + (listeners.get(key(type, true))?.size ?? 0)
+      );
     },
   };
 }
 
-function fakeContext(state: AudioContextState) {
+function fakeContext(state: AudioContextState | 'interrupted') {
   let calls = 0;
   return {
     state,
@@ -76,6 +94,24 @@ describe('audio unlock latch', () => {
     const ctx = fakeContext('running');
     latch.resumeWhenAllowed(ctx);
     expect(ctx.calls).toBe(0);
+  });
+
+  it('never resumes a context that is already closed', () => {
+    const target = fakeTarget();
+    const latch = createAudioUnlockLatch(target);
+    target.fire('pointerdown');
+    const ctx = fakeContext('closed');
+    latch.resumeWhenAllowed(ctx);
+    expect(ctx.calls).toBe(0);
+  });
+
+  it('resumes an interrupted WebKit context once unlocked', () => {
+    const target = fakeTarget();
+    const latch = createAudioUnlockLatch(target);
+    target.fire('pointerdown');
+    const ctx = fakeContext('interrupted');
+    latch.resumeWhenAllowed(ctx);
+    expect(ctx.calls).toBe(1);
   });
 
   it('drops its gesture listeners after unlocking', () => {

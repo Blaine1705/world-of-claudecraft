@@ -1,7 +1,7 @@
 // Live FPS A/B monitor. Connects to the two browsers fps_live_launch.mjs
 // booted, waits until BOTH are in-world (the user logs in manually), then
-// runs the same tour in both simultaneously — teleport to each waypoint,
-// sample idle, orbit the camera, run the player forward — collecting rAF
+// runs the same tour in both simultaneously: teleport to each waypoint,
+// sample idle, orbit the camera, run the player forward, collecting rAF
 // frame deltas in-page and per-browser process CPU (total + GPU helper) via
 // ps sampling. Simultaneous measurement means both builds share identical
 // ambient machine load at every moment, so the comparison is apples-to-apples
@@ -76,7 +76,7 @@ function psSnapshot() {
 
 // ---- in-page tour driver ----
 // Teleport through the game's OWN dev command path (sim.chat routes it to the
-// server when online, to the local sim offline) — raw pos writes get snapped
+// server when online, to the local sim offline). Raw pos writes get snapped
 // back by the server on PBE. Camera state is client-side input, safe to write.
 async function teleport(page, wp, label) {
   await page.evaluate((p) => {

@@ -21,11 +21,15 @@ describe('foliage GPU optimization production wiring', () => {
   it('packs cap flags and keeps cap and no-cap shader programs distinct', () => {
     expect(foliage).toContain('new Uint8Array(g.getAttribute');
     expect(foliage).toContain("g.setAttribute('aCap', new THREE.Uint8BufferAttribute(arr, 1));");
-    expect(foliage).toMatch(
-      /mat\.customProgramCacheKey = \(\) => `grass-card\|cap:\$\{hasCap \? 'yes' : 'no'\}\|\$\{baseProgramKey\}`;/,
+    expect(foliage).toContain(
+      'mat.customProgramCacheKey = () => `grass-card|cap:${capProgramKey}|${baseProgramKey}`;',
     );
-    expect(foliage).toContain('applyGrassShader(mat, uniforms, capNearCollapse);');
-    expect(foliage).toContain('applyGrassShader(fmMat, uniforms, false);');
+    expect(foliage).toContain(
+      'const capCollapseBand = grassCapCollapseBand(GFX.bladeCarpetRadius);',
+    );
+    expect(foliage).toContain('const capCollapse = grassCapCollapseShaderPatch(capBand);');
+    expect(foliage).toContain('applyGrassShader(mat, uniforms, capCollapseBand);');
+    expect(foliage).toContain('applyGrassShader(fmMat, uniforms, null);');
     expect(foliage).not.toContain("flowerGeo.setAttribute('aCap'");
   });
 

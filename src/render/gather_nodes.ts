@@ -63,6 +63,7 @@ interface GatherNodeShadowEntry {
 interface GatherNodeBatch {
   type: GatherNodeType;
   zoneId: string;
+  band: number;
   nodes: GatherNodeDef[];
 }
 
@@ -143,17 +144,18 @@ function gatherNodeMeshParts(template: THREE.Object3D): GatherNodeMeshPart[] | n
 }
 
 function gatherNodeBatches(nodes: readonly GatherNodeDef[]): GatherNodeBatch[] {
-  const byZoneAndType = new Map<string, GatherNodeBatch>();
+  const byZoneTypeAndBand = new Map<string, GatherNodeBatch>();
   for (const node of nodes) {
-    const key = `${node.zoneId}:${node.type}`;
-    let batch = byZoneAndType.get(key);
+    const band = Math.floor(node.pos.z / 180);
+    const key = `${node.zoneId}:${node.type}:${band}`;
+    let batch = byZoneTypeAndBand.get(key);
     if (!batch) {
-      batch = { type: node.type, zoneId: node.zoneId, nodes: [] };
-      byZoneAndType.set(key, batch);
+      batch = { type: node.type, zoneId: node.zoneId, band, nodes: [] };
+      byZoneTypeAndBand.set(key, batch);
     }
     batch.nodes.push(node);
   }
-  return [...byZoneAndType.values()];
+  return [...byZoneTypeAndBand.values()];
 }
 
 function copyMeshRenderState(source: THREE.Mesh, target: THREE.InstancedMesh): void {
@@ -181,17 +183,18 @@ function addInstancedBatch(
   const instanceMatrix = new THREE.Matrix4();
   const nodeIds = batch.nodes.map((node) => node.id);
   // Instance transforms are baked into world space. Union every mesh part so
-  // one castShadow decision conservatively covers the full zone and type batch.
+  // one castShadow decision conservatively covers the regional batch.
   const batchBounds = new THREE.Box3();
   const casters: THREE.Mesh[] = [];
   for (const [partIndex, part] of parts.entries()) {
     const mesh = new THREE.InstancedMesh(part.geometry, part.material, batch.nodes.length);
-    mesh.name = `gatherNodes:${batch.zoneId}:${batch.type}:${partIndex}`;
+    mesh.name = `gatherNodes:${batch.zoneId}:${batch.type}:${batch.band}:${partIndex}`;
     // Raycaster intersections carry the instance index, which resolves through
     // this stable content-order table without widening the renderer's picker.
     mesh.userData.gatherNodeIds = nodeIds;
     mesh.userData.gatherNodeZoneId = batch.zoneId;
     mesh.userData.gatherNodeType = batch.type;
+    mesh.userData.gatherNodeBand = batch.band;
     copyMeshRenderState(part.source, mesh);
     for (const [instanceId, node] of batch.nodes.entries()) {
       const y = terrainHeight(node.pos.x, node.pos.z, seed);
@@ -329,6 +332,36 @@ export function gatherNodeIdFromIntersection(
       return object.userData.gatherNodeId as string;
     }
     object = object.parent;
+  }
+  return null;
+}
+
+// Structural raycast-hit shape shared with THREE.Intersection, so the
+// resolver is Node-testable without a renderer.
+export interface GatherNodePickHit {
+  object: { userData: Record<string, unknown>; parent?: unknown } | null;
+  instanceId?: number;
+}
+
+/**
+ * Resolve a raycast hit list to a gather-node content id. Instanced batches
+ * resolve through instanceId against their stable id list, while authored
+ * hierarchy fallbacks walk parents for the legacy per-object id.
+ */
+export function resolveGatherNodePick(hits: readonly GatherNodePickHit[]): string | null {
+  for (const hit of hits) {
+    const ids = hit.object?.userData.gatherNodeIds;
+    if (Array.isArray(ids) && typeof hit.instanceId === 'number') {
+      const id = ids[hit.instanceId];
+      if (typeof id === 'string') return id;
+    }
+    let object = hit.object ?? null;
+    while (object) {
+      if (typeof object.userData.gatherNodeId === 'string') {
+        return object.userData.gatherNodeId as string;
+      }
+      object = (object.parent ?? null) as GatherNodePickHit['object'];
+    }
   }
   return null;
 }

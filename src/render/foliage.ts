@@ -55,7 +55,6 @@ import {
   patchGrassFragmentShader,
   reuseDiffuseMapSampleForEmissive,
 } from './foliage_shader_core';
-import { suppressShadowOnlyMainDraw } from './foliage_shadow_core';
 import {
   gardenLushGrassAt,
   gardenMeadowTintAt,
@@ -64,6 +63,11 @@ import {
   parterreFlowerTintAt,
 } from './garden_parterre_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
+import {
+  type GrassCapCollapseBand,
+  grassCapCollapseBand,
+  grassCapCollapseShaderPatch,
+} from './grass_cap_collapse_core';
 import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import {
@@ -72,6 +76,7 @@ import {
   projectedPixelSize,
   reorderInstanceDataByStableRank,
 } from './perceptual_lod_core';
+import { attachShadowPassOnlyGate } from './shadow_pass_gate_core';
 import { freezeStaticMatrices } from './static_matrix';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
@@ -534,9 +539,13 @@ function triangleCountFor(geometry?: THREE.BufferGeometry): number {
 }
 
 function bucketMeshCost(mesh: THREE.InstancedMesh): Pick<BucketMesh, 'draws' | 'triangles'> {
+  // Shadow-gated clones read count 0 outside the shadow draw; the gate
+  // stashes the real count so the budget telemetry keeps their true cost.
+  const count =
+    (mesh as unknown as { shadowPassFullCount?: number }).shadowPassFullCount ?? mesh.count;
   return {
     draws: drawCountFor(mesh.material, mesh.geometry),
-    triangles: triangleCountFor(mesh.geometry) * Math.max(0, mesh.count),
+    triangles: triangleCountFor(mesh.geometry) * Math.max(0, count),
   };
 }
 
@@ -614,7 +623,7 @@ function addWind(mat: THREE.Material, strength: number, upNormalBlend = 0): void
         `#include <beginnormal_vertex>
         // Bend leaf normals toward the direction from the canopy pivot
         // through the vertex, biased upward. The canopy then shades as a lit
-        // volume — sun side bright, shade side dimming through the sky term —
+        // volume: sun side bright, shade side dimming through the sky term,
         // where a straight-up bend gave every card the same N·L and flattened
         // the whole tree to one value. Model-local position: tree base at the
         // origin, so no instance transform is needed for the pivot.
@@ -819,7 +828,7 @@ function extractParts(url: string): ModelPart[] {
   // Accumulate the canopy pivot (mean leaf-bbox centre) on the shared
   // material for the sphere-normal bend in addWind. Materials are shared per
   // (role, name) across a species' GLB variants, so the pivot is a running
-  // average over every variant that uses the sheet — close enough for a
+  // average over every variant that uses the sheet, close enough for a
   // shading direction.
   for (const part of parts) {
     if (!part.isLeaf) continue;
@@ -1228,7 +1237,15 @@ function placeSpecies(
           const shadow = cloneInstancedTo(im, part.geometry, makeShadowOnlyMaterial(part.material));
           shadow.castShadow = true;
           shadow.receiveShadow = false;
-          suppressShadowOnlyMainDraw(shadow);
+          // ORDER MATTERS: compute the instance-aware bounds while the count
+          // is still full; the gate below zeroes the count, and a lazily
+          // computed sphere at count 0 would cache empty and cull the
+          // clone's shadow forever.
+          shadow.computeBoundingSphere();
+          shadow.computeBoundingBox();
+          // Shadow-pass only: without the gate every clone also costs a
+          // colorWrite-off draw in the color pass (one per casting bucket).
+          attachShadowPassOnlyGate(shadow);
           parent.add(shadow);
           // The shadow pass does NOT follow the fog-EXTENDED detail distance: a
           // tree's shadow past the old radius contributes nothing the eye can
@@ -1315,7 +1332,7 @@ function buildTrees(
   };
   // Mild oak leaf lift. The old 6.5x here was calibrated on a whole-atlas
   // average (~0.012) that was both diluted ~3.4x by fully-transparent texels
-  // and attributed to the wrong atlas — measured over the texels alphaTest
+  // and attributed to the wrong atlas, measured over the texels alphaTest
   // keeps, oak is (0.099, 0.197, 0.000) linear, already 2-3x BRIGHTER than
   // pine. At 6.5x the visible green albedo passed 1.0 (brighter than white)
   // and canopies read as neon lime with no shading left. 1.35x keeps oaks a
@@ -1717,13 +1734,13 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
   // Mild dressing lift. Like the oak lift above, the old 6.5x here came from
   // a transparent-texel-diluted atlas average; over visible texels the bush
   // canopy is (0.000, 0.139, 0.025) linear and fern (0.221, 0.260, 0.067).
-  // The old loop was also unfiltered, so the 'Flowers' material — already at
-  // (0.79, 0.58, 0.56) — reached 5.2/3.2/2.2 and flowering bushes were the
+  // The old loop was also unfiltered, so the 'Flowers' material, already at
+  // (0.79, 0.58, 0.56), reached 5.2/3.2/2.2 and flowering bushes were the
   // most blown-out surface in the world. Leaves get a gentle lift; Flowers
   // get none (their authored albedo is correct).
   const albedoLift: Partial<Record<DressKind, [number, number, number]>> = {
     // 1.6/1.5 read as neon against the calmer round-8 ground: the bush sheet
-    // is pure green (red 0), so brightness is the only lever here — the
+    // is pure green (red 0), so brightness is the only lever here. The
     // saturation itself is tamed by canopy_detail's desat luma mix.
     bush: [1.35, 1.22, 1.08],
     bushFlowers: [1.35, 1.22, 1.08],
@@ -1930,7 +1947,7 @@ function trimStaticInstanceAttributes(mesh: THREE.InstancedMesh, count: number):
 function applyGrassShader(
   mat: THREE.Material,
   uniforms: { uPlayerPos: { value: THREE.Vector2 }; uFadeFar: { value: number } },
-  hasCap: boolean,
+  capBand: GrassCapCollapseBand | null,
 ): void {
   // On tiers where the solid blade carpet runs (the exact buildBladeGrass
   // condition in blade_grass.ts), the carpet owns the near-field ground
@@ -1939,6 +1956,7 @@ function applyGrassShader(
   // to the tuft root near the player and grow them back where the carpet
   // fades out (its fade band runs 27.2 to 34). Tiers without the carpet
   // keep the cap everywhere: there it is still the only top-down read.
+  const hasCap = capBand !== null;
   const baseProgramKey = mat.customProgramCacheKey();
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = sharedUniforms.uTime;
@@ -1949,11 +1967,7 @@ function applyGrassShader(
         attribute float aCap;
         uniform vec2 uPlayerPos;`
       : '';
-    const capCollapse = hasCap
-      ? `
-        float capKeep = smoothstep(22.0, 30.0, distance(tuftBase, uPlayerPos));
-        transformed *= mix(1.0, capKeep, aCap);`
-      : '';
+    const capCollapse = grassCapCollapseShaderPatch(capBand);
     const wind = GFX.windSway
       ? `
         float windPhase = tuftBase.x * 0.31 + tuftBase.y * 0.27;
@@ -1986,7 +2000,8 @@ function applyGrassShader(
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
     sh.fragmentShader = patchGrassFragmentShader(sh.fragmentShader);
   };
-  mat.customProgramCacheKey = () => `grass-card|cap:${hasCap ? 'yes' : 'no'}|${baseProgramKey}`;
+  const capProgramKey = capBand ? `${capBand.start.toFixed(3)}-${capBand.end.toFixed(3)}` : 'none';
+  mat.customProgramCacheKey = () => `grass-card|cap:${capProgramKey}|${baseProgramKey}`;
 }
 
 function loopbackHostname(hostname: string): boolean {
@@ -2107,7 +2122,8 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   // high tier reads as a lush meadow: wider tufts with more blades; low keeps
   // the legacy sprite size
   const lush = !GFX.leanFoliage;
-  const capNearCollapse = GFX.standardMaterials && !GFX.leanFoliage;
+  const capCollapseBand = grassCapCollapseBand(GFX.bladeCarpetRadius);
+  const capNearCollapse = capCollapseBand !== null;
   const lowPlusGrassScale = GFX.lowPlus ? 1.08 : 1;
   const quad = new THREE.PlaneGeometry(
     lush ? 1.45 : 1.1 * lowPlusGrassScale,
@@ -2161,7 +2177,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
           alphaTest: 0.35,
         }),
   );
-  applyGrassShader(mat, uniforms, capNearCollapse);
+  applyGrassShader(mat, uniforms, capCollapseBand);
 
   // ground-cover flowers: a sparse companion set in the same chunks, sharing
   // the sway/fade shader so they move and thin exactly like the grass.
@@ -2252,7 +2268,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
           ? new THREE.MeshStandardMaterial({ map: tex, alphaTest: 0.3, roughness: 0.85 })
           : new THREE.MeshLambertMaterial({ map: tex, alphaTest: 0.35 }),
       );
-      applyGrassShader(fmMat, uniforms, false);
+      applyGrassShader(fmMat, uniforms, null);
       flowerMatCache.set(key, fmMat);
     }
     return fmMat;
@@ -2431,7 +2447,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         if (!fenTuft) {
           // r is the density hash, so it only ever reaches the density cap:
           // the lush scale tops out near 0.95 rather than sprouting monsters.
-          // Patch cores grow tall, patch edges stay short — with the sparse
+          // Patch cores grow tall and patch edges stay short. With the sparse
           // areas' accepted hashes skewing small, stragglers between patches
           // come out smallest of all.
           const s = ((lush ? 0.55 : 0.45) + r * (lush ? 0.8 : 1)) * (0.72 + lushness * 0.55);

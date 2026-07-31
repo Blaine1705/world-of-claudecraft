@@ -14,7 +14,7 @@
     "mode": "composite-sha256",
     "algorithm": "sha256",
     "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-    "fingerprint": "d21dd47ff9ae4a3d16ca42323a542ea459d4ae7a7f5036bd68190a476d97a006",
+    "fingerprint": "0737a35027b2347f81d47571ad088ce0c9b6acccdb5b14b45cc31b0517632681",
     "components": {
       "townAsset": {
         "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -31,7 +31,7 @@
       "runtimeRender": {
         "town": {
           "path": "src/render/eastbrook_town.ts",
-          "sha256": "816a8d2e4f3f6d913b4aaa626a7adda0b08177b0dae30fca5921054c0c8f654a"
+          "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
         },
         "mailbox": {
           "path": "src/render/mailbox.ts",
@@ -43,7 +43,7 @@
         },
         "renderer": {
           "path": "src/render/renderer.ts",
-          "sha256": "cba50710413d61b25d1cbaed42bba48c52a17252f000812541205ef10bf1513d"
+          "sha256": "93420eb49d3f3b05d7a8a9b6874d4174af99ee32e9867bfdf8484afaaa9f7dd0"
         },
         "viewPriorityPolicy": {
           "path": "src/render/prewarm_policy.ts",

@@ -400,12 +400,12 @@ vec3 wocBrushRing(vec2 p) {
 // rings, feet placement and water shorelines all sample the analytic height
 // field in src/sim, and moving the visual mesh off it breaks them.
 //
-// The previous proxy used splat albedo luminance centred on 0.45 — but the
+// The previous proxy used splat albedo luminance centred on 0.45, but the
 // albedo samplers are sRGB, so the shader receives LINEAR values whose real
 // means are 0.06-0.18. The 0.28-0.39 DC bias ate the whole parallax clamp:
 // at the default chase-camera pitch, dirt and rock produced a constant UV
 // slide with zero relief modulation. The AO channels below are centred on
-// their measured means instead, so the signal is zero-mean by construction —
+// their measured means instead, so the signal is zero-mean by construction.
 // and mip averaging returns it to zero with distance, fading both parallax
 // and cavity out for free.
 // One clod-scale step toward the sun in ground-UV space, inlined into the
@@ -478,7 +478,7 @@ float wocGroundHeightSmooth(vec2 uv, vec4 sw) {
 }
 // Coarse soil-clump octave, one repeat per ~28 yards. The fine cavity above
 // lives at the texture's native tiling, where mip averaging pulls it to zero
-// within chase-camera distance — this octave's features are ~6x larger, so
+// within chase-camera distance. This octave's features are ~6x larger, so
 // they keep shading the mid-field where the player actually looks. Uses the
 // dirt channel for every layer: grass's own AO is the weakest of the pack
 // (measured sd 0.078 vs dirt 0.117), and BSL-style ground reads come from
@@ -506,7 +506,7 @@ const float WOC_GRASS_SCALE_JITTER = 0.6;
 // WOC_GRASS_MID_OCTAVE: blend weight of the third grass octave (0.57x scale,
 // rotated 23 degrees, own seed offset). 0.22 (was 0.14): the de-spot pass
 // moved tonal contrast off the fine octave onto the mid/coarse pair, so the
-// mid voice earns real weight now — still the smallest of the three, it must
+// mid voice earns real weight now. Still the smallest of the three, it must
 // never form patches of its own.
 const float WOC_GRASS_MID_OCTAVE = 0.22;
 // WOC_GRASS_HUE_DRIFT_FREQ and the endpoints: ~42yd meadow hue rotation
@@ -742,7 +742,7 @@ function buildSplatMaterial(
         vec4 swShade = vSplatR * vec4(0.35, 0.8, 1.0, 1.0);
         float cavH = wocGroundHeight(tuv, swShade);
         // tighter slope fade than before: the AO/relief signal lives in the
-        // planar-XZ projection, which stretches on banks — full-strength
+        // planar-XZ projection, which stretches on banks. Full-strength
         // cavity there amplified the stretch into vertical streaking
         float cavW = (1.0 - vExtra.y) * smoothstep(0.62, 0.88, upW);
         // fine pores + coarse soil clumps: the macro octave carries the read
@@ -763,7 +763,7 @@ function buildSplatMaterial(
         // hollows instead of lying on it as paint. Broken up by the fine AO
         // signal so the lip reads as crumbled soil edge, not a drawn contour
         // (a clean contour also traces the coarse vertex splat into visible
-        // triangle steps — the earlier derivative-based normal tilt made the
+        // triangle steps. The earlier derivative-based normal tilt made the
         // same triangulation read as hard facets and is gone for that reason).
         float rim = vSplatR.y * (1.0 - vSplatR.y) * 4.0 * clamp(0.55 + cavH * 4.0, 0.2, 1.2);
         // floor 0.52 (was 0.38): with the macro knee above, the clamp is a
@@ -775,7 +775,7 @@ function buildSplatMaterial(
           terrainReliefLevel() >= 3 && !renderLayerDisabled('tmicroshadow')
             ? `// micro sun-shadow: terrain never casts real shadows at any
         // scale, so march the height proxy two steps toward the sun and shade
-        // texels whose sunward neighbourhood sits higher — clod-scale
+        // texels whose sunward neighbourhood sits higher, creating clod-scale
         // self-shadowing that gives the relief a lit and a shade side.
         {
           vec2 sunStep = vec2(${SUN_UV_STEP.x}, ${SUN_UV_STEP.y});
@@ -1469,7 +1469,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     mesh.receiveShadow = true;
     // Terrain casts too: without this no hill can shade its own lee side or
     // the valley under it, and open country reads shadow-flat however the
-    // rig is tuned — form shadows are the difference between painted dunes
+    // rig is tuned. Form shadows are the difference between painted dunes
     // and lit ones. Chunks outside the 105u shadow frustum are culled from
     // the depth pass, so the cost is a dozen static meshes re-drawn there.
     // GFX.terrainCastShadows follows dynamicShadows on the tier ladder; the

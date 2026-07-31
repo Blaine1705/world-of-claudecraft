@@ -20,7 +20,7 @@ const EDGE = 16; // keep-out margin from the world rectangle
 const HUB_EXCLUSION_RADIUS = 15; // same radius the grass hub exclusion uses
 
 // Kit rock dimensions at scale 1, baked from the shipped GLBs
-// (models/foliage/rock_1..3) via gltf-transform getBounds — constants so the
+// (models/foliage/rock_1..3) via gltf-transform getBounds, kept constant so the
 // renderer never parses a model just to recover bounds. The painter derives
 // its origin sink from these same rows.
 export const SCREE_ROCK_DIMS = [

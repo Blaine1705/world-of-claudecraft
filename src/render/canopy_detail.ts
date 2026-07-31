@@ -79,7 +79,7 @@ export interface CanopyDetailSpec {
   creviceShade: number;
   /**
    * Luma mix pulling the leaf albedo toward neutral (0 = off). The kit's
-   * bush sheet is (0, 0.139, 0.025) linear — pure green with NO red — so
+   * bush sheet is (0, 0.139, 0.025) linear, pure green with NO red, so
    * the foliage.ts albedo-lift multiplier can brighten it but can never
    * desaturate it; only a mix toward luminance can.
    */

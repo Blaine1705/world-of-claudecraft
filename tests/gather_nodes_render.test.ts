@@ -11,16 +11,18 @@ import type { GatherNodeDef, GatherNodeType } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 describe('gather node rendering', () => {
-  it('batches repeated opaque nodes by zone and type', () => {
+  it('batches repeated opaque nodes by zone, type, and regional z-band', () => {
     const { group } = buildGatherNodes(1);
-    const expectedBatches = new Set(GATHER_NODES.map((node) => `${node.zoneId}:${node.type}`));
+    const expectedBatches = new Set(
+      GATHER_NODES.map((node) => `${node.zoneId}:${node.type}:${Math.floor(node.pos.z / 180)}`),
+    );
     const meshes = group.children.filter(
       (child): child is THREE.InstancedMesh => child instanceof THREE.InstancedMesh,
     );
 
     expect(GATHER_NODES).toHaveLength(99);
-    expect(expectedBatches.size).toBe(42);
-    expect(meshes).toHaveLength(42);
+    expect(expectedBatches.size).toBe(53);
+    expect(meshes).toHaveLength(53);
     expect(meshes.reduce((sum, mesh) => sum + mesh.count, 0)).toBe(GATHER_NODES.length);
     expect(new Set(meshes.map((mesh) => mesh.geometry)).size).toBe(3);
     expect(new Set(meshes.map((mesh) => mesh.material)).size).toBe(3);
@@ -35,6 +37,7 @@ describe('gather node rendering', () => {
         const node = GATHER_NODES.find((candidate) => candidate.id === nodeId);
         expect(node?.zoneId).toBe(mesh.userData.gatherNodeZoneId);
         expect(node?.type).toBe(mesh.userData.gatherNodeType);
+        expect(Math.floor((node?.pos.z ?? 0) / 180)).toBe(mesh.userData.gatherNodeBand);
       }
       const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       expect(materials.every((material) => !material.transparent && material.alphaTest === 0)).toBe(
@@ -153,7 +156,7 @@ describe('gather node rendering', () => {
         id: 'ore_behind_camera',
         zoneId: 'wide_test_zone',
         type: 'ore',
-        pos: { x: 0, z: -20 },
+        pos: { x: 0, z: 20 },
         level: 1,
         tier: 1,
       },
@@ -161,7 +164,7 @@ describe('gather node rendering', () => {
         id: 'ore_in_front_of_camera',
         zoneId: 'wide_test_zone',
         type: 'ore',
-        pos: { x: 0, z: 20 },
+        pos: { x: 0, z: 160 },
         level: 1,
         tier: 1,
       },
@@ -172,12 +175,13 @@ describe('gather node rendering', () => {
     const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 2_000);
     const lightDirection = new THREE.Vector3(0, 0, 1);
 
-    camera.lookAt(0, 0, 1);
+    camera.position.z = 90;
+    camera.lookAt(0, 0, 91);
     camera.updateMatrixWorld(true);
     view.updateShadowVisibility(camera, lightDirection, true);
     expect(mesh.castShadow).toBe(true);
 
-    camera.lookAt(0, 0, -1);
+    camera.lookAt(0, 0, 89);
     camera.updateMatrixWorld(true);
     lightDirection.set(0, 0, -1);
     view.updateShadowVisibility(camera, lightDirection, true);
@@ -190,8 +194,8 @@ describe('gather node rendering', () => {
     view.updateShadowVisibility(camera, lightDirection, true);
     expect(mesh.castShadow).toBe(false);
 
-    camera.position.z = 0;
-    camera.lookAt(0, 0, 1);
+    camera.position.z = 90;
+    camera.lookAt(0, 0, 91);
     camera.updateMatrixWorld(true);
     view.updateShadowVisibility(camera, lightDirection, true);
     expect(mesh.castShadow).toBe(true);

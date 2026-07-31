@@ -758,6 +758,7 @@ export class DungeonInteriors {
         fireLights: this.fireLights,
       });
       group.position.set(ox, 0, oz);
+      group.userData.renderCategory = 'dungeon';
       this.scene.add(group);
       return group;
     }
@@ -847,6 +848,7 @@ export class DungeonInteriors {
         floor: opts?.style?.floorTint ?? (variant === 'lastkeep' ? KEEP_FLOOR_TINT : undefined),
       });
       group.position.set(ox, 0, oz);
+      group.userData.renderCategory = 'dungeon';
       this.scene.add(group);
       return group;
     }
@@ -897,6 +899,7 @@ export class DungeonInteriors {
       for (const wall of arenaWalls.all) this.emitArenaHideable(group, wall, variant);
     }
     group.position.set(ox, 0, oz);
+    group.userData.renderCategory = 'dungeon';
     this.scene.add(group);
     return group;
   }

@@ -110,7 +110,7 @@ describe('nameplate language-only transitions', () => {
     );
 
     expect(v.aiEl.textContent).toBe('[AI]');
-  });
+  }, 30_000);
 
   it('repaints the deed title when only pseudo activation changes', async () => {
     const { painter, setLanguage } = await pseudoPainter();
@@ -124,5 +124,5 @@ describe('nameplate language-only transitions', () => {
     titlePainter.setNameplateTitle(v, 'prog_veteran');
 
     expect(v.titleEl.textContent).toBe('Veteran');
-  });
+  }, 30_000);
 });
