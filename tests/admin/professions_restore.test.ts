@@ -24,34 +24,60 @@ import {
 // as one (the tests/world_auth_scripts.test.ts technique); newlines are never
 // significant inside these calls.
 function readServerSource(rel: string): string {
-  return fs
-    .readFileSync(path.join(fileURLToPath(new URL('../..', import.meta.url)), rel), 'utf8')
-    .replace(/\s+/g, ' ');
+  return (
+    fs
+      .readFileSync(path.join(fileURLToPath(new URL('../..', import.meta.url)), rel), 'utf8')
+      // FULL-LINE comments are stripped BEFORE flattening (the
+      // source-text-pin rule): a commented-out fail() must not inflate the
+      // floor or demand a catalog key, and flattening would otherwise run a
+      // line comment into the next statement. Deliberately full-line only:
+      // trailing and block comments stay, because strings in this file
+      // contain '//' and '/*' sequences (URLs, glob-shaped routes) that a
+      // regex-level strip would corrupt.
+      .replace(/^\s*\/\/[^\n]*$/gm, ' ')
+      .replace(/\s+/g, ' ')
+  );
 }
 
 // Every fail() prose a handler can put in front of an operator, resolved
 // through the three shapes the source actually uses: an inline literal, a
 // module-level named constant, and the `err instanceof Error ? err.message :
 // <fallback>` ternary (the fallback is what renders when the thrown value is
-// not an Error). A bare literal-only scan misses the last two entirely.
+// not an Error). A bare literal-only scan misses the last two entirely. The
+// argument is parsed QUOTE-AWARE from the position after the status code: a
+// lazy match to the first ')' would silently drop any prose containing a
+// parenthesis, exactly the escape hatch this scan exists to close.
 function failProses(rel: string): string[] {
   const flat = readServerSource(rel);
   const named = new Map<string, string>();
   for (const m of flat.matchAll(/const ([A-Z][A-Z0-9_]*) = '([^']*)'/g)) named.set(m[1], m[2]);
   const out: string[] = [];
-  for (const m of flat.matchAll(/fail\(\s*(?:ctx\.)?res,\s*(\d+),\s*(.+?),?\s*\)/g)) {
+  const QUOTED = /^'((?:[^'\\]|\\.)*)'/;
+  const IDENT = /^([A-Z][A-Z0-9_]*)\s*,?\s*\)/;
+  // The ternary fallback (`cond ? dynamic : 'literal'` or `: CONSTANT`); the
+  // condition and consequent cannot span a statement boundary.
+  const TERNARY = /^[^;{}]*?\?[^:;{}]*?:\s*(?:'((?:[^'\\]|\\.)*)'|([A-Z][A-Z0-9_]*))\s*,?\s*\)/;
+  for (const m of flat.matchAll(/fail\(\s*(?:ctx\.)?res,\s*(\d+),\s*/g)) {
     // 401s are excluded: handleAuthFailure logs the operator out on a 401,
     // so that prose never renders inline through localizeAdminError.
     if (m[1] === '401') continue;
-    const arg = m[2].trim();
-    const literal = /^'([^']*)'$/.exec(arg) ?? /\?[^?]*:\s*'([^']*)'$/.exec(arg);
-    if (literal) {
-      out.push(literal[1]);
+    const rest = flat.slice((m.index ?? 0) + m[0].length);
+    const quoted = QUOTED.exec(rest);
+    if (quoted) {
+      out.push(quoted[1]);
       continue;
     }
-    const ident = /^([A-Z][A-Z0-9_]*)$/.exec(arg) ?? /\?[^?]*:\s*([A-Z][A-Z0-9_]*)$/.exec(arg);
-    const resolved = ident ? named.get(ident[1]) : undefined;
-    if (resolved !== undefined) out.push(resolved);
+    const ident = IDENT.exec(rest);
+    if (ident) {
+      const resolved = named.get(ident[1]);
+      if (resolved !== undefined) out.push(resolved);
+      continue;
+    }
+    const ternary = TERNARY.exec(rest);
+    if (ternary) {
+      const resolved = ternary[1] ?? named.get(ternary[2] ?? '');
+      if (resolved !== undefined) out.push(resolved);
+    }
   }
   return out;
 }
@@ -157,7 +183,9 @@ describe('server prose coupling (the count clamp and the error reverse map)', ()
     // fixture-driven arm below.
     const literals = failProses('server/admin.ts');
     // Liveness floor, set just under the real post-widening count: a scan that
-    // silently stops resolving the named-constant / multi-line / ternary shapes
+    // silently stops resolving the named-constant or ternary shapes (measured
+    // drops of 14 and 30; the flattening arm is defensive against a future
+    // formatter wrap, since no multi-line fail() exists in the file today)
     // (its whole point) collapses well below this and fails here, not silently.
     expect(literals.length).toBeGreaterThan(109);
     for (const prose of literals) {
@@ -171,13 +199,16 @@ describe('server prose coupling (the count clamp and the error reverse map)', ()
   it('reverse-maps every body-error prose in server/character_professions.ts too', () => {
     // The restore validators render through the SAME reverse map, so their
     // literal refusals are in scope for the scan, not just the admin handlers.
-    const proses = [
-      ...new Set(
-        [...readServerSource('server/character_professions.ts').matchAll(/return '([^']+)'/g)].map(
-          (m) => m[1],
-        ),
-      ),
-    ];
+    // Scoped to the *BodyError validator functions (not the whole module), so
+    // a future non-error `return 'x'` elsewhere cannot demand a bogus key.
+    const source = readServerSource('server/character_professions.ts');
+    // The $ alternative matters: the last validator has no following export.
+    const validators = [
+      ...source.matchAll(/export function restore\w*BodyError[\s\S]*?(?=export |$)/g),
+    ]
+      .map((m) => m[0])
+      .join(' ');
+    const proses = [...new Set([...validators.matchAll(/return '([^']+)'/g)].map((m) => m[1]))];
     expect(proses.length).toBeGreaterThan(2); // the scan itself must be alive
     for (const prose of proses) {
       expect(

@@ -638,14 +638,14 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
       // string, which Discord rejects (an embed title cannot be blank).
       title = item.itemName || 'A rare item';
       description =
-        `A **${item.quality ?? 'rare'}** drop` +
+        `A **${item.quality || 'rare'}** drop` +
         (subject ? ` for ${mentionFor(subjectName, item.participants)}` : '') +
         ` on ${item.realm}!`;
       color = qualityColor(item.quality);
       break;
     case 'duel':
       author = ':crossed_swords: Duel';
-      title = `${item.winnerName ?? subjectName} wins!`;
+      title = `${item.winnerName || subjectName} wins!`;
       description =
         `${mentionFor(item.winnerName ?? '', item.participants)} defeated ` +
         `${mentionFor(item.loserName ?? '', item.participants)} in a duel on ${item.realm}.`;
@@ -682,7 +682,7 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
       author = ':hammer: Masterwork';
       title = item.itemName || 'A masterwork piece';
       description =
-        `A **masterwork** ${item.itemName ?? 'piece'} from the hands of ` +
+        `A **masterwork** ${item.itemName || 'piece'} from the hands of ` +
         `${mentionFor(subjectName, item.participants)} on ${item.realm}!`;
       color = 0xd9a334;
       break;
@@ -693,14 +693,14 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
         title = item.deedName || 'A rare catch';
         description =
           `${mentionFor(subjectName, item.participants)} landed their ` +
-          `first ${item.itemName ?? 'rare catch'} on ${item.realm}!`;
+          `first ${item.itemName || 'rare catch'} on ${item.realm}!`;
         color = 0x3fa7d6;
       } else {
         author = ':scroll: Deed Complete';
         title = item.deedName || 'A deed of renown';
         description =
           `${mentionFor(subjectName, item.participants)} completed ` +
-          `"${item.deedName ?? 'a deed'}"` +
+          `"${item.deedName || 'a deed'}"` +
           (item.deedTitle !== undefined ? ` and earned the title "${item.deedTitle}"` : '') +
           ` on ${item.realm}.`;
         color = 0xf0b743;
