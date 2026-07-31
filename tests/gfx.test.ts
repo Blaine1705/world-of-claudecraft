@@ -213,20 +213,24 @@ describe('graphics tier resolution', () => {
     expect(medium.shadowMap).toBeGreaterThan(low.shadowMap);
     expect(medium.shadowMap).toBeLessThan(high.shadowMap);
     expect(medium.pixelRatioCap).toBeLessThan(high.pixelRatioCap);
+    expect(medium.msaaSamples).toBe(0);
+    expect(medium.smaa).toBe(true);
 
     expect(high.standardMaterials).toBe(true);
     expect(high.dynamicShadows).toBe(true);
     expect(high.composer).toBe(true);
     expect(high.ao).toBe(true);
-    expect(high.msaaSamples).toBe(4);
+    expect(high.msaaSamples).toBe(0);
+    expect(high.smaa).toBe(true);
     expect(high.shadowMap).toBe(4096);
 
     expect(ultra.standardMaterials).toBe(true);
     expect(ultra.composer).toBe(true);
     expect(ultra.ao).toBe(true);
-    expect(ultra.msaaSamples).toBe(4);
+    expect(ultra.msaaSamples).toBe(0);
+    expect(ultra.smaa).toBe(true);
     expect(ultra.shadowMap).toBe(high.shadowMap);
-    expect(ultra.pixelRatioCap).toBeGreaterThan(high.pixelRatioCap);
+    expect(ultra.pixelRatioCap).toBe(high.pixelRatioCap);
     expect(GFX_BUCKET_BANDS.ultra.grass.baseline).toBeGreaterThan(
       GFX_BUCKET_BANDS.high.grass.baseline,
     );
@@ -245,7 +249,8 @@ describe('graphics tier resolution', () => {
     expect(insane.composer).toBe(true);
     expect(insane.ao).toBe(true);
     expect(insane.gradePass).toBe(true);
-    expect(insane.msaaSamples).toBe(4);
+    expect(insane.msaaSamples).toBe(0);
+    expect(insane.smaa).toBe(true);
     expect(insane.shadowMap).toBe(ultra.shadowMap);
     expect(insane.pixelRatioCap).toBe(ultra.pixelRatioCap);
     expect(insane.grassRadius).toBe(ultra.grassRadius);
@@ -350,6 +355,8 @@ describe('graphics tier resolution', () => {
     expect(effectsLow.composer).toBe(false);
     expect(effectsLow.gradePass).toBe(true);
     expect(effectsLow.ao).toBe(false);
+    expect(effectsLow.msaaSamples).toBe(0);
+    expect(effectsLow.smaa).toBe(true);
     const effectsMedium = adv({ effectsQuality: 0.5 });
     expect(effectsMedium.ao).toBe(true);
     expect(effectsMedium.bloom).toBe(false);

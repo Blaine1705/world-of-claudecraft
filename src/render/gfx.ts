@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { NATIVE_APP } from '../client_origin';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
+import { gfxAaPolicy } from './gfx_aa_policy_core';
 import { applyGfxOverridesFromSearch } from './gfx_override_core';
 import {
   installPbrPointLightShaderPruning,
@@ -116,7 +117,7 @@ export interface GfxSettings {
   readonly ao: boolean;
   /** MSAA samples on the composer's HalfFloat target (WebGL2) */
   readonly msaaSamples: number;
-  /** devicePixelRatio is capped here — 2.5 everywhere is a silent perf killer */
+  /** devicePixelRatio is capped here because unbounded supersampling is a fill-rate cost */
   readonly pixelRatioCap: number;
   /** Directional sun shadow pass. Disabled where its duplicate scene draw is unsafe. */
   readonly dynamicShadows: boolean;
@@ -147,7 +148,7 @@ export interface GfxSettings {
   readonly terrainRelief: number;
   /** N8AO at full resolution + Medium quality (vs half-res Low) */
   readonly aoFullRes: boolean;
-  /** SMAA tail pass on the composer (high only: ultra's DPR suppresses crawl) */
+  /** SMAA tail pass on the grade/composer output */
   readonly smaa: boolean;
   /** UnrealBloom pass on the composer */
   readonly bloom: boolean;
@@ -882,6 +883,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       coarsePointer: hints?.coarsePointer ?? false,
       narrowViewport: hints?.narrowViewport ?? false,
     });
+  const aaPolicy = gfxAaPolicy(tier, { constrainedMemory, nativeIosMemoryProfile });
   let settings: GfxSettings = {
     graphicsConfigVersion: GFX_CONFIG_VERSION,
     tier,
@@ -894,18 +896,8 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // N8AO runs on the composer tiers: half-res + Low quality on high keeps
     // it ~1ms-class on real GPUs; ultra and insane get full-res Medium
     ao: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
-    // medium included: its grade-only composer target needs the MSAA storage
-    // the direct-to-canvas path used to get from the context itself
-    msaaSamples: gfxTierAtLeast(tier, 'medium') && !constrainedMemory ? 4 : 0,
-    pixelRatioCap: nativeIosMemoryProfile
-      ? 1.25
-      : constrainedMemory
-        ? 1.48
-        : tier === 'low' || tier === 'medium'
-          ? 1.48
-          : tier === 'high'
-            ? 1.75
-            : 2.5,
+    msaaSamples: aaPolicy.msaaSamples,
+    pixelRatioCap: aaPolicy.pixelRatioCap,
     // Shadows are cosmetic and duplicate the visible scene draw. Both constrained browsers and
     // the stricter native-iOS residency profile remove that duplicate pass.
     dynamicShadows: tier !== 'low' && !constrainedMemory,
@@ -942,7 +934,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
           ? 2
           : 0,
     aoFullRes: gfxTierAtLeast(tier, 'ultra'),
-    smaa: tier === 'high',
+    smaa: aaPolicy.postAa === 'smaa',
     bloom: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     terrainCastShadows: tier !== 'low' && !constrainedMemory,
     lowPlus: tier === 'low' || nativeIosMemoryProfile,
@@ -1050,8 +1042,8 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       settings = { ...settings, surfaceDetailTaps: 3, surfaceDetailClampK: 0.85 };
     else settings = { ...settings, surfaceDetailTaps: 4, surfaceDetailClampK: 1 };
     // Effects & Lighting: Low is the grade-only mini composer (the medium
-    // tier's post profile); Medium adds N8AO; High the full high-tier stack
-    // (AO + bloom + SMAA). The level-0 test keeps the shared
+    // tier's post profile, including SMAA); Medium adds N8AO; High the full
+    // high-tier stack (AO + bloom + SMAA). The level-0 test keeps the shared
     // EFFECTS_QUALITY_LOW_CUTOFF constant so the HUD effect tier and the 3D
     // renderer still downgrade at the same threshold.
     const effectsValue = hints.effectsQuality ?? 1;
@@ -1063,7 +1055,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         ao: false,
         aoFullRes: false,
         bloom: false,
-        smaa: false,
+        smaa: !nativeIosMemoryProfile,
         maxPointLights: Math.min(settings.maxPointLights, 3),
       };
     else if (effectsValue < 0.75)
