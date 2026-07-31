@@ -481,12 +481,15 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
     ['renderGraphics', 'buildGraphicsControls'],
     ['renderAudio', 'buildAudioControls'],
     ['renderController', 'buildControllerControls'],
-  ])('%s builds its own controls and passes that same list into settingsViewFooter', (method, builder) => {
-    const start = painter.indexOf(`private ${method}(): void {`);
-    expect(start).toBeGreaterThan(-1);
-    const rest = painter.slice(start);
-    const body = rest.slice(0, rest.indexOf('\n  }\n'));
-    expect(body).toContain(builder);
-    expect(body).toContain('this.settingsViewFooter(controls)');
-  });
+  ])(
+    '%s builds its own controls and passes that same list into settingsViewFooter',
+    (method, builder) => {
+      const start = painter.indexOf(`private ${method}(): void {`);
+      expect(start).toBeGreaterThan(-1);
+      const rest = painter.slice(start);
+      const body = rest.slice(0, rest.indexOf('\n  }\n'));
+      expect(body).toContain(builder);
+      expect(body).toContain('this.settingsViewFooter(controls)');
+    },
+  );
 });
