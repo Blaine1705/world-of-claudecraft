@@ -5223,8 +5223,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    // Usable only inside the on-kill window aura handleDeath opens; the cast
-    // consumes it (runEffects), so one kill funds one strike.
+    // Usable only inside the on-kill window aura handleDeath opens; successful
+    // cast completion consumes it, so one kill funds one strike.
     requiresAuraKind: 'victory_rush',
     effects: [
       { type: 'weaponStrike', bonus: 10 },

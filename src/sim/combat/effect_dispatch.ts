@@ -316,7 +316,11 @@ export function runEffects(
     }
   }
 
-  if (ability.requiresAuraKind) consumeAuraKind(ctx, p, ability.requiresAuraKind);
+  // Non-channel prerequisites are consumed atomically at cast completion before
+  // projectile scheduling. Channels bypass applyAbility, so preserve their
+  // existing first-tick consumption here.
+  if (ability.requiresAuraKind && ability.channel)
+    consumeAuraKind(ctx, p, ability.requiresAuraKind);
 
   for (const eff of res.effects) {
     switch (eff.type) {

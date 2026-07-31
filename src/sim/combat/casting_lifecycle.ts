@@ -78,6 +78,7 @@ import {
 } from './chronomancy';
 import { extendOwnedDot } from './dot_mutation';
 import {
+  consumeAuraKind,
   consumeFreeCostFor,
   consumeNextAttackCrit,
   consumeNextCastCheap,
@@ -707,9 +708,10 @@ export function castAbility(
     return;
   }
   // Kill-window abilities (Victory Rush): usable only while the enabling aura
-  // is worn; runEffects consumes it on a successful cast. Reuses the existing
-  // not-ready error literal so no new client matcher is needed. requiresAuraStacks
-  // (Glacial Spike's full 5-stack Icicles) additionally gates on the stack count.
+  // is worn; a successful cast consumes it after completion-time validation.
+  // Reuses the existing not-ready error literal so no new client matcher is needed.
+  // requiresAuraStacks (Glacial Spike's full 5-stack Icicles) additionally gates
+  // on the stack count.
   if (
     ability.requiresAuraKind &&
     !p.auras.some(
@@ -1695,6 +1697,11 @@ function applyAbility(
         : Math.min(p.resource, ability.spendResourceCap);
     res = { ...res, cost: spend };
   }
+  // Consume cast-enabling state after every completion-time validation succeeds,
+  // but before a projectile launch can hand control back to the spell queue.
+  // Otherwise Glacial Spike can queue a second cast while the first projectile
+  // still carries the only Icicles stack toward its deferred impact.
+  if (ability.requiresAuraKind) consumeAuraKind(ctx, p, ability.requiresAuraKind);
 
   // helpful spells never miss
   if (

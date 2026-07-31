@@ -10,7 +10,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity, SimEvent } from '../src/sim/types';
+import { type Aura, CAST_QUEUE_WINDOW_SEC, type Entity, type SimEvent } from '../src/sim/types';
 
 // Glacial Spike (owner design 2026-07-14, combat/frost_mage.ts + content): the
 // frost spender. Rimelance impacts and Frozen Orb pulses bank Icicles (up to 5);
@@ -19,6 +19,7 @@ import type { Aura, Entity, SimEvent } from '../src/sim/types';
 
 type TestSim = Sim & {
   nextId: number;
+  entities: Map<number, Entity>;
   players: Map<number, PlayerMeta>;
   addEntity(entity: Entity): void;
 };
@@ -168,5 +169,68 @@ describe('Glacial Spike gating + payoff', () => {
     // It froze the target (a root aura), so isRooted counts it as frozen and the
     // follow-up spells Shatter.
     expect(target.auras.some((a) => a.kind === 'root')).toBe(true);
+  });
+
+  it('rejects a second Glacial Spike queued before the first projectile lands', () => {
+    const { sim, p } = makeSim();
+    spawnTarget(sim, p);
+    pushAura(p, { id: 'icicles', name: 'Icicles', kind: 'icicles', stacks: ICICLE_MAX });
+    p.gcdRemaining = 0;
+    p.resource = p.maxResource;
+    sim.drainEvents();
+    const resourceAfterOneCast =
+      p.resource - (sim.resolvedAbility('glacial_spike', p.id)?.cost ?? Number.NaN);
+
+    sim.castAbility('glacial_spike');
+    const events: SimEvent[] = [...sim.drainEvents()];
+    while (p.castRemaining > CAST_QUEUE_WINDOW_SEC / 2) events.push(...sim.tick());
+
+    sim.castAbility('glacial_spike');
+    events.push(...sim.drainEvents());
+    expect(p.queuedCastAbility).toBe('glacial_spike');
+    while (!events.some((event) => event.type === 'castStop' && event.success)) {
+      events.push(...sim.tick());
+    }
+
+    expect(p.queuedCastAbility).toBeNull();
+    expect(frostIcicleCharges(p.auras)).toBe(0);
+    expect(p.resource).toBe(resourceAfterOneCast);
+    expect(damageEvents(events, 'Glacial Spike')).toHaveLength(0);
+
+    for (let i = 0; i < 160; i++) events.push(...sim.tick());
+
+    expect(
+      events.filter((event) => event.type === 'castStart' && event.ability === 'glacial_spike'),
+    ).toHaveLength(1);
+    expect(damageEvents(events, 'Glacial Spike')).toHaveLength(1);
+    expect(
+      events.filter(
+        (event) =>
+          event.type === 'aura' &&
+          event.targetId === p.id &&
+          event.auraKind === 'icicles' &&
+          !event.gained,
+      ),
+    ).toHaveLength(1);
+    expect(frostIcicleCharges(p.auras)).toBe(0);
+  });
+
+  it('preserves Icicles and mana when the target disappears before cast completion', () => {
+    const { sim, p } = makeSim();
+    const target = spawnTarget(sim, p);
+    pushAura(p, { id: 'icicles', name: 'Icicles', kind: 'icicles', stacks: ICICLE_MAX });
+    p.gcdRemaining = 0;
+    p.resource = p.maxResource;
+    const resourceBefore = p.resource;
+    sim.drainEvents();
+
+    sim.castAbility('glacial_spike');
+    sim.entities.delete(target.id);
+    const events: SimEvent[] = [...sim.drainEvents()];
+    for (let i = 0; i < 160; i++) events.push(...sim.tick());
+
+    expect(damageEvents(events, 'Glacial Spike')).toHaveLength(0);
+    expect(frostIcicleCharges(p.auras)).toBe(ICICLE_MAX);
+    expect(p.resource).toBe(resourceBefore);
   });
 });
