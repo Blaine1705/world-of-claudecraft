@@ -145,6 +145,51 @@ describe('enemy mob armor DR against a player never mitigates more than MOB_VS_P
     expect(mobArmorReduction(boss, player, armor)).toBe(armorReduction(armor, boss.level));
     expect(mobArmorReduction(boss, player, armor)).toBeCloseTo(0.75);
   });
+
+  // Review finding (PR #2601, round 2): a hard `min(dr, 0.2)` right at the
+  // attacker.level < target.level boundary is a discontinuous cliff (a mob one
+  // level below the target snaps straight from full uncapped DR to 20%, and the
+  // jump gets bigger the more armor a player stacks). mobArmorReduction ramps the
+  // cap linearly over ARMOR_DR_RAMP_LEVELS (3) levels instead, so a mob only one
+  // level below the target keeps most of its natural mitigation, and the cap only
+  // fully saturates at MOB_VS_PLAYER_MAX_ARMOR_DR once the mob is 3+ levels down
+  // (the far-below-level farm-loop case issue #1050 is actually about).
+  it('a mob exactly one level below the target only partially ramps toward the DR cap, not a cliff', () => {
+    const mob = ent({ kind: 'mob', level: 59, hostile: true, ownerId: null });
+    const player = ent({ kind: 'player', level: 60, ownerId: null });
+    const armor = 1_000_000;
+    const natural = armorReduction(armor, mob.level);
+    const capped = mobArmorReduction(mob, player, armor);
+    // Strictly between the uncapped natural DR and the fully-saturated floor: a
+    // one-level gap must not already be the hard floor, and must not be a no-op.
+    expect(capped).toBeLessThan(natural);
+    expect(capped).toBeGreaterThan(MOB_VS_PLAYER_MAX_ARMOR_DR);
+    // Exact linear-ramp value at diff=1 over a 3-level span: 2/3 of the way from
+    // natural toward the floor.
+    const expected = natural - (natural - MOB_VS_PLAYER_MAX_ARMOR_DR) * (1 / 3);
+    expect(capped).toBeCloseTo(expected, 10);
+  });
+
+  it('a mob three or more levels below the target is fully saturated at the DR cap', () => {
+    const player = ent({ kind: 'player', level: 60, ownerId: null });
+    const armor = 1_000_000;
+    const threeBelow = ent({ kind: 'mob', level: 57, hostile: true, ownerId: null });
+    const wayBelow = ent({ kind: 'mob', level: 1, hostile: true, ownerId: null });
+    expect(mobArmorReduction(threeBelow, player, armor)).toBeCloseTo(
+      MOB_VS_PLAYER_MAX_ARMOR_DR,
+      10,
+    );
+    expect(mobArmorReduction(wayBelow, player, armor)).toBeCloseTo(MOB_VS_PLAYER_MAX_ARMOR_DR, 10);
+  });
+
+  it('low armor already under the cap ramps toward it from above, never below the natural DR', () => {
+    // armor well under the 20% cap already, one level below the target: the ramp
+    // math must clamp back to the natural (lower) DR, not overshoot past it.
+    const mob = ent({ kind: 'mob', level: 59, hostile: true, ownerId: null });
+    const player = ent({ kind: 'player', level: 60, ownerId: null });
+    const armor = 50;
+    expect(mobArmorReduction(mob, player, armor)).toBe(armorReduction(armor, mob.level));
+  });
 });
 
 describe('enemy mob-cast spells never resist more than MOB_VS_PLAYER_MAX_RESIST against a player (issue #1050)', () => {

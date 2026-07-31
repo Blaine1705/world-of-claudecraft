@@ -49,6 +49,13 @@ export const MOB_VS_PLAYER_MAX_RESIST = MOB_VS_PLAYER_MAX_MISS;
 // still hits at least (1 - MOB_VS_PLAYER_MAX_RESIST) of the time; player/pet ->
 // mob keeps the full above-level resist scaling untouched. Draws exactly one rng
 // value, same as isSpellResisted, so the global draw order is unchanged.
+//
+// Unlike mobArmorReduction, this cap is NOT further gated on caster.level <
+// target.level: spellHitChance already returns >= 96% whenever the caster is at or
+// above the target's level (diff <= 0), which always clears the 80% floor on its
+// own, so the Math.max below is a no-op there and an explicit level check would be
+// redundant. If spellHitChance's at-or-above-level branch is ever tuned below 80%,
+// re-check this comment: the cap would start binding above-level too.
 export function isMobSpellResisted(
   rng: { chance(p: number): boolean },
   caster: Entity,
