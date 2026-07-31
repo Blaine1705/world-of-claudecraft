@@ -9,7 +9,7 @@
 | Phase 2: Discord rate-limit governor | built | 2026-07-30 | 2026-07-30 |
 | Phase 2 QA | done | 2026-07-30 | 2026-07-30 |
 | Phase 3: Loop scheduler + diff-before-write | built | 2026-07-31 | 2026-07-31 |
-| Phase 3 QA | not started | | |
+| Phase 3 QA | done | 2026-07-31 | 2026-07-31 |
 | Phase 4: Server set-based endpoints | not started | | |
 | Phase 4 QA | not started | | |
 | Phase 5: Outbox + linked-member change feed | not started | | |
@@ -592,3 +592,113 @@ from one shared gate and so never reached the moment the guard exists for.
 
 Validation: `npx tsc --noEmit` clean, 444 bot tests green across 16 files, `npm run build:bot`
 bundles, `npm run ci:changed` exits 0 with zero warnings in the touched files.
+
+### Phase 3 QA (2026-07-31)
+
+Release base FIRST (standing rule 1): `origin/release/v0.33.0` had moved 12 commits past the
+Phase 3 merge, so it was merged before any QA work (`104994c21`, 82 files, zero conflicts) and
+audited with the `release-merge-audit` skill. Clean: the incoming delta is the warrior
+ground-auras UI work plus one `server/game.ts` snapshot field (`opRem`), and it intersects the
+21 files Phase 3 authored in exactly ZERO places. The `vi.mock('../server/db')` merge trap does
+not apply either, because the branch adds no `server/` file at all.
+
+**Verdict: PASS-WITH-FOLLOWUPS.** Phase 3's mechanism is sound and the migration preserved
+behavior: all six old `setInterval` loops plus the `presenceTimer` map one-to-one onto the seven
+tasks, every cadence reads its own D13 config field, and a traced reconnect storm really does
+collapse N GUILD_CREATEs into one follow-up per task. What this round found instead were two
+things a reviewer who already knew the design would not have questioned: a diff cache that can
+disagree with the server forever, and a scheduler lifecycle that deadlocks.
+
+**The findings.** Six parallel audit agents raised 68, each one handed to an independent skeptic
+told to refute it by default; 30 survived. A fresh-eyes review of the FIX round then raised 29
+more, of which 21 survived, including one against the first shape of the scheduler fix. Every
+survivor was judged here against the code rather than taken on the skeptic's word, and every one
+is applied. Two skeptic verdicts were themselves corrected: the rename-back echo case was called
+permanent and is really bounded by one sweep (the update handler moves `memberNames` whether or
+not it pushes), and the roster-push starvation case was correctly refuted (the members-meta
+endpoint coerces every field and always answers 200, so a content-tied deterministic refusal is
+not reachable).
+
+**The one that matters most: the diff cache could never be wrong-and-recover.** `lastPushedMeta`
+records what the bot BELIEVES the server holds, and the server can lose those values with nothing
+to tell the bot. `setDiscordMemberMeta` is an UPDATE against the link row and
+`server/internal.ts` counts `updated++` per iterated record rather than per affected row, so a
+push for a guild member who has not linked yet applies to zero rows and is still reported as
+accepted. That member is marked clean on the first sweep and never pushed again, so when they
+DO link, their join date and staff flair never reach the game until the bot restarts. Unlinking
+and relinking (a fresh row with both meta columns null), a restore, and a moderation delete all
+arrive at the same place. Before D5 every sweep re-pushed the whole roster, so all of them healed
+within one interval and nobody had to enumerate them. The fix keeps the load reduction and puts a
+ceiling on the divergence: `fullResyncIfDue` drops the whole cache once an hour, so eleven sweeps
+in twelve still send nothing. Time since the last full push, not a count of sweeps, because the
+task is also kicked by GUILD_CREATE and the member backfill and a reconnect storm would otherwise
+race the counter and re-push hardest exactly when it should not. The server-side halves (report
+`rowCount`, or tell the bot when a link row is created) are Phase 4 and Phase 5 work and are
+ledgered, not done here: this phase touches no `server/` file.
+
+**The scheduler deadlock.** Two independent agents found it and a live probe against the real
+module confirmed it: `stop()` while a run was in flight left the run's claim behind, so a later
+`start()` armed a chain whose first link the overlap guard refused, and a refused claim arms
+nothing. The retired run then returned early on its stale generation. Neither owner armed the
+chain and the task was dead for the life of the process. The FIRST fix released the claim in
+`stop()`, and the fresh-eyes review caught that this cures the deadlock by trading it for real
+overlap: `stop()` can retire a generation but cannot cancel a promise, so the restarted chain ran
+beside the abandoned body. The shipped fix keeps the claim, makes `start()` arm nothing while a
+run is in flight, and has the abandoned run's settle hand the chain over on its way out, carrying
+any kick that arrived meanwhile. Neither deadlock nor overlap. Production never calls `stopAll()`
+today, so this was latent rather than live, but the module is the seam Phases 6 and 7 build on.
+
+**The three recorded deviations, ruled.**
+1. *GUILD_CREATE and the op 8 backfill now also run `refreshSpecialRoles`.* The defense did NOT
+   hold and this is now fixed. The old 5 minute timer did chain refresh-then-push, but the old
+   GUILD_CREATE and final-chunk paths called `pushAllMemberMeta` DIRECTLY, with no Discord REST
+   call in front of them. Folding them into the paired task gave them the guild-roles GET as a
+   precondition they never had, and a reconnect storm is exactly when that GET throws (the
+   breaker opens, `request` throws on any non-ok). So the members-meta push that would have
+   landed before now did not. `refreshThenPushMeta` keeps the ordering when the refresh works and
+   publishes the previous index when it does not, which is strictly more than the event paths
+   ever had. It cannot starve a member.
+2. *The debounce follow-up window opens at run SETTLE where the old timer armed from EVENT time.*
+   Defense HOLDS. Worst-case latency for a presence event is one run duration plus
+   `presenceDebounceMs`, every open window always fires (`armDebounce` is called unconditionally
+   from the follow-up branch), and the already-armed early return folds a kick into an open
+   window rather than deferring it. No starvation.
+3. *The roster push stops at the first refused batch.* Defense HOLDS, and it is now actually
+   pinned. Permanent starvation would need a refusal tied to the CONTENT of the head batch, and
+   the members-meta endpoint cannot produce one: it coerces every field (bad id skipped, unknown
+   role to null, bad timestamp to null, name sliced) and always answers 200. The case that
+   claimed to pin the stop rule refused the LAST of two batches, so it had no third batch to skip
+   and the claim was constant-true; it now runs three and refuses the second.
+4. *The hung run (aim point d), ruled DEFER to Phase 7.* A run that never settles leaves the task
+   claimed with nothing armed: no counter, no log, dead for the life of the process. A watchdog
+   in the scheduler cannot fix it, because recovery needs the run CANCELLED and the scheduler
+   holds a promise it has no way to abort; a watchdog that only logs would advertise coverage it
+   does not have. The real fix is a deadline on the fetch underneath, which is Phase 7's
+   supervision work and has `server_client.ts`'s `SERVER_CALL_TIMEOUT_MS` to copy. Recorded in
+   `bot/CLAUDE.md` as a rule for anyone adding a task: every `run` handed to `scheduler.add` must
+   be one that always settles.
+5. *`MIN_INTERVAL_MS` and `MAX_JITTER_RATIO` (aim point e), ruled CORRECT as they stand.* The
+   operator story is the D13 knobs, and the locked ruling is that the floor is a FALLBACK for an
+   unusable value and never a clamp on a small one, because silently rewriting an operator's
+   override would be its own defect. Only the constant's opening sentence claimed otherwise, and
+   it now says what the code does. `MAX_JITTER_RATIO` is unreachable from production (no task
+   sets `jitterRatio`) and is kept because the pure helpers are exported and callable alone.
+
+**Mutation: 57 planted this session, 55 killed, 2 diagnosed unobservable.** Four rounds over the
+ground the build session's 32 did not reach, mutating in place with a per-run timeout that scores
+a hang as a kill and a recorded summary line plus a nonzero failure count per mutant. Eleven
+survivors were real gaps and are closed: the debounce window never distinguished its active
+interval from its idle or its decayed one; the generation counter's restart case; both
+`forgetMember` call sites in `main.ts`; the roster-push stop rule; `pushRejected` read as a
+truthiness check; and, in the fix round, the resync restamp, the refresh catch, the kick guard
+and the registration-to-sweep binding. The two survivors that remain are unobservable by
+construction and are recorded rather than tested: the generation checks inside the two timer
+callbacks (both `stop()` and `schedule()` clear the armed handle before a generation can change
+under a live one) and the `state.running` guard in `start()` (`beginRun` refuses the timer
+anyway, so deleting it wastes one arm and changes no behavior). Two more were equivalent mutants:
+`didWork` as a truthiness check agrees with `=== true` for every value the `Promise<boolean |
+void>` signature admits, and `forgetMember` deleting `memberNames` is a no-op at both call sites.
+
+**Validation.** `npx tsc --noEmit` clean, 330 bot tests green across 10 files, `npm run
+build:bot` bundles, `npm run ci:changed` exits 0. Full `npm run gate` at close, with the one
+known malware-step failure caused by a sibling session's worktree parked under `.worktrees/`.

@@ -923,6 +923,15 @@ describe('scheduler kick from IDLE, and the task lifecycle', () => {
     // armed timer was refused by the overlap guard, so neither owner armed
     // anything and the task was dead for the life of the process, with no counter
     // and no log. `runAt` stopped at [1000] no matter how far the clock advanced.
+    //
+    // Honest limit, found by mutation: this does NOT prove the `if
+    // (this.state.running) return` in start() specifically, and no assertion can.
+    // Deleting it arms one timer that beginRun then refuses, and the handover
+    // arms the chain either way, so the two are indistinguishable in behavior.
+    // It is defense in depth like the `clearArmed()` inside kick() and the
+    // double-start guard; what IS load bearing, and what this case does pin, is
+    // that stop() leaves the claim in place (the peak assertions) and that the
+    // retired run hands the chain back (the runs after the gate opens).
     const clock = syntheticClock();
     const runAt: number[] = [];
     const gate = deferred();

@@ -1,7 +1,8 @@
 # State: Discord Bot Stability (cross-phase cheat sheet)
 
-Current phase: Phase 3 BUILT (2026-07-31); its QA session is next. Phase 2 built and
-QA'd (2026-07-30).
+Current phase: Phase 3 BUILT and QA'd (2026-07-31); Phase 4 is next. Phases 1 and 2 built
+and QA'd (2026-07-30). The release base was re-synced during Phase 3 QA
+(`origin/release/v0.33.0` at `2ae71a7fb`, merged as `104994c21`, zero conflicts, audited).
 
 ## Locked decisions
 
@@ -63,8 +64,13 @@ QA'd (2026-07-30).
   members (10x today). Query-count and payload assertions pin against fixtures at this
   scale where practical.
 - D19 QA rigor: EVERY phase's QA session runs ultracode (adversarial-verify workflow)
-  plus mutation spot checks on that phase's new pure modules. Consult the memory
-  test-pin trap index before writing or mutation-checking any pin.
+  plus mutation spot checks on that phase's new pure modules. The trap list to hold while
+  writing or mutation-checking a pin is "Known gotchas for implementers" at the bottom of
+  this file; there is no memory "test-pin trap index" and there never was (verified
+  2026-07-31). Two additions Phase 3 QA proved out: an adversarial skeptic must have the
+  file OPEN and quote the code before a refutation counts, and the FIX round needs its own
+  fresh-eyes review, because the first shape of Phase 3 QA's scheduler fix cured a deadlock
+  by introducing overlap and only that second review caught it.
 - D20 Interim prod: left as is by explicit user decision (2026-07-30). No hotfix
   branch, no container stop. Do not re-raise.
 
@@ -179,10 +185,16 @@ because dropping the one word is otherwise silent),
   `DISCORD_RELAY_POLL_MS` (3000). Unlike the governor knobs the defaults are NOT new
   constants: they are the existing `bot/cadence.ts` values, which `bot/config.ts` imports,
   so the value the suite pins and the value the bot falls back to cannot drift apart. Each
-  falls back for empty, non-numeric and non-positive alike, never to 0. These are NOT in
-  `.env.example` yet: every `.env*` path is blocked at the harness level in this
-  environment, so R8's equivalent for these three keys is owed and is called out in the
-  Phase 3 handoff.
+  falls back for empty, non-numeric and non-positive alike, never to 0. **These are STILL
+  NOT in `.env.example`, re-verified during Phase 3 QA on 2026-07-31** (`git grep -l
+  DISCORD_ROLE_SYNC_INTERVAL_MS HEAD` returns no `.env.example`, where the Phase 2 governor
+  knobs do), and every `.env*` path remains blocked at the harness level for both Read and
+  Bash, so no session in this environment can add them. R8's equivalent for these three keys
+  is OWED and needs the maintainer. The values are the real defaults, not placeholders: an
+  operator who uncomments a wrong number gets the storm this packet exists to prevent. Add,
+  commented, beside the existing governor block:
+  `#DISCORD_ROLE_SYNC_INTERVAL_MS=300000`, `#DISCORD_PRESENCE_DEBOUNCE_MS=4000`,
+  `#DISCORD_RELAY_POLL_MS=3000`.
 - New env keys (Phase 2, the first four; R8 satisfied and re-verified in Phase 2 QA against
   the file itself, each commented default matching its exported `DEFAULT_*` constant. DEPLOY.md documentation is still Phase 7 per D13):
   `DISCORD_MAX_RPS` (8), `DISCORD_BAN_PAUSE_MS` (600000),
@@ -644,6 +656,58 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   caching non-retryable 4xx per subject the way 401/403 already are, or a per-member failure
   counter; both are governor surface, which Phase 2 owns and a QA round should not rewrite.
 
+### Found during Phase 3 QA (2026-07-31), routed rather than fixed
+
+- L14 (correctness, server side of the diff, OPEN, natural home Phase 4 with the set-based
+  endpoints): `/internal/discord/members-meta` reports every record it ITERATED as updated
+  (`server/internal.ts`, `updated++` per record), not every row it actually wrote.
+  `setDiscordMemberMeta` is a bare `UPDATE discord_links ... WHERE discord_user_id = $1`, so a
+  push for a guild member with no link row matches zero rows and is still answered as accepted.
+  The bot then caches it as pushed. Phase 3 QA bounded the damage bot-side with the hourly
+  `fullResyncIfDue`, which is the right ceiling but not the right signal: the endpoint should
+  report `rowCount` and the bot should cache only what the server confirms. Both the legacy
+  ladder and the RouteDef arm carry the same body byte for byte, so a change lands on BOTH.
+- L15 (correctness, the other side of the same gap, OPEN, natural home Phase 5 with the change
+  feed): nothing tells the bot when a link row is CREATED or reset. A member who links after
+  their first sweep, or who unlinks and relinks (a fresh row with `discord_joined_at` and
+  `discord_role` both null), is a server-side state change the bot cannot observe, so the diff
+  has nothing to react to. The hourly resync is the interim answer; the linked-member change
+  feed is the real one, and it removes the need for a periodic full push entirely.
+- L16 (correctness, roster seeding, OPEN, natural home Phase 6 with the D6 sweep-iteration
+  work): `seedGuild` and the op 8 chunk handler only UPSERT, they never prune. A member who
+  leaves while the gateway is disconnected fires no `GUILD_MEMBER_REMOVE`, and on reconnect they
+  stay in `memberRoles` forever. `staleFlairedIds` diffs the server's flagged ids against
+  `memberRoles.keys()`, so that member is never classified as stale and their flair is never
+  cleared, which defeats the whole point of the flaired-ids reconcile. Every per-member cache
+  also grows monotonically. The fix is to collect the ids present across a COMPLETE seed and
+  drop every cached id outside that set, which is real new state on the seed path and belongs
+  with the sweep-iteration change rather than in a QA round.
+- L17 (robustness, OPEN, natural home Phase 7 with L10): a run handed to `scheduler.add` that
+  never settles stops that loop for the life of the process, with no counter and no log. Ruled
+  DEFER rather than watchdogged: recovery needs the run CANCELLED, and the scheduler holds a
+  promise it cannot abort, so a watchdog that only logs would advertise coverage it does not
+  have. The real fix is a deadline on the fetch underneath (`server_client.ts` already has
+  `SERVER_CALL_TIMEOUT_MS` to copy). Until then the rule is in `bot/CLAUDE.md`: every `run` must
+  be one that always settles.
+
+### Judged during Phase 3 QA and ruled NOT defects (do not re-litigate)
+
+- **The roster push stopping at the first refused batch cannot starve anyone.** Permanent
+  starvation needs a refusal tied to the CONTENT of the head batch, and the members-meta
+  endpoint cannot produce one: it coerces every field (bad id skipped, unknown role key to null,
+  bad timestamp to null, name sliced) and always answers 200 `{updated: n}`.
+- **`MIN_INTERVAL_MS` is a fallback, not a clamp, and that is correct.** Already a locked
+  ruling; the constant's own opening sentence was the only thing claiming otherwise and now
+  matches the code. A valid-but-small D13 override passes through untouched on purpose.
+- **A kick resetting the periodic phase is not a fourth deviation.** The spec authorizes exactly
+  this ("the next run is scheduled only after the previous run settles, for event-triggered
+  kicks as well"), the kick runs the identical `run()`, and no fixed wall-clock grid survives
+  jitter or idle backoff anyway.
+- **A coalesced follow-up firing unpaced and unjittered is the contract, not a gap.** The idle
+  arm of `kick()` has always run at once and is test-pinned as doing so; the follow-up is only
+  the deferred half of the same kick, and jitter decorrelates chain arms, which an event
+  trigger does not have.
+
 ## Known gotchas for implementers
 
 - RESOLVED by Phase 1: all seven bot files are type-checked. The include surfaced ZERO
@@ -721,3 +785,57 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   the key on purpose: a second dynamic `process.env[...]` lookup would slip past the
   env-key inventory guard in `tests/discord_bot_config.test.ts`, which asserts exactly
   one dynamic lookup and pins the whole key set.
+- **A diff cache is a one-sided belief, so it needs an expiry.** Diffing before a write is the
+  right shape and it removes a property nobody notices they were relying on: that a wholesale
+  re-push heals every divergence within one interval. The cache records what the bot believes
+  the REMOTE side holds, and the remote side can lose those values with nothing to tell the bot
+  (a write that matched no row and was still reported as accepted, a row deleted out of band, a
+  restore). Whenever a phase adds a diff, ask what bounds how long a wrong belief can last, and
+  if the answer is "nothing", add the bound in the same change. Phase 3 QA's
+  `FULL_RESYNC_INTERVAL_MS` is the reference: an hour against a 5 minute sweep keeps eleven
+  twelfths of the load reduction while capping the divergence at one hour. Prefer TIME since
+  the last full push over a count of sweeps, because an event-kicked task lets a reconnect
+  storm race a counter and re-push hardest exactly when it should not.
+- **A stop() that cannot cancel must not release the claim it holds.** `LoopScheduler.stop()`
+  retires a run's generation but has no way to abort the promise, so the abandoned body keeps
+  executing. Both obvious readings are wrong: keeping the claim AND arming on `start()` deadlocks
+  (the armed timer is refused by the overlap guard, and a refused claim arms nothing), while
+  releasing the claim lets the restarted chain run BESIDE the body it abandoned. The shape that
+  works is to keep the claim, have `start()` arm nothing while a run is in flight, and have the
+  abandoned run's settle hand the chain over on its way out, carrying any kick that arrived
+  meanwhile. Both failure modes were found by review, not by the build session, and the second
+  one only by reviewing the fix.
+- **A "stops there" test that refuses the LAST batch pins nothing.** With two batches and the
+  refusal on the second there is no third batch to skip, so `return` and `continue` are
+  indistinguishable and the assertion is constant-true. Same family as the vacuous-bound trap:
+  an early-exit claim needs work REMAINING after the exit point, so use three batches and refuse
+  the second.
+- **A regex source pin over a coordinator is weaker than it reads, in three specific ways.**
+  `main.ts` runs `main()` at module scope so a source pin is the only tool, and Phase 3 QA
+  shipped three that its own review then broke. (1) A `[\s\S]{0,N}` span between two tokens runs
+  straight into the NEXT declaration, so a per-registration pattern needs
+  `((?!scheduler\.add\()[\s\S])` to stay inside one; without it, swapping two same-cadence task
+  bodies is caught by one of the two patterns and not the other. (2) Proximity is not
+  containment: `chunk_index ... memberMetaTask.kick()` matched with the `idx >= count - 1` guard
+  replaced by `if (true)`. (3) A `try { ... } catch` pin cannot tell a catch that SWALLOWS from
+  one that rethrows, which is the entire behavior it was written to guard. When the claim is
+  behavioral, extract the pair into a tested helper and let the pin say only that main.ts routes
+  through it.
+- **Per-name counts do not bound a set; pin the total too.** `KICKS` asserting one
+  `roleSyncTask.kick()` and two `memberMetaTask.kick()` catches a deletion or a duplication of a
+  known kick, and says nothing about a kick added for a NEW task. The registration count already
+  did this right (`expect(matches).toBe(TASKS.length)`); any table of named call sites needs the
+  same total beside it.
+- **`not.toContain('3000')` is a substring scan and will red on 30000 or 130000.** Phase 3 QA's
+  first cut of the config seam pin forbade the bare cadence literals that way, which would have
+  gone red the day an unrelated knob gained a plausible default. Word-bound both sides:
+  `new RegExp('(?<![0-9_])' + value + '(?![0-9_])')`.
+- **A surviving mutant in this packet has been dead code, an unobservable rig, and a real gap in
+  roughly equal measure, so diagnose before writing a test.** Phase 3 QA planted 57 and left 2
+  standing, both unobservable by construction (the generation checks inside the two timer
+  callbacks, which `clearArmed()` makes unreachable, and the `state.running` guard in `start()`,
+  which `beginRun` already enforces). Two more were equivalent mutants rather than survivors:
+  `didWork` as a truthiness check agrees with `=== true` for every value a
+  `Promise<boolean | void>` can hold, and `forgetMember` deleting `memberNames` is a no-op at
+  both of its call sites. Record the diagnosis where the next reader will look, the way this
+  file's suites already record their honest limits, rather than inventing a rig to kill it.
