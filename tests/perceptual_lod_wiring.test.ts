@@ -30,7 +30,11 @@ describe('perceptual scenery LOD production wiring', () => {
 
   it('routes the live projection only through the scenery flame helper', () => {
     expect(renderer).toContain('this.camera.projectionMatrix.elements[5]');
-    expect(renderer).toContain('this.webgl.domElement.height');
+    expect(
+      renderer.match(
+        /projectionScalePixels\(\n\s+this\.camera\.projectionMatrix\.elements\[5\],\n\s+this\.renderPixelHeight,/g,
+      ),
+    ).toHaveLength(2);
     expect(renderer).toContain('const state = updateSceneryFlame(');
     expect(renderer).toContain('if (state.emitsEmber) this.vfx.campfireEmber');
     expect(renderer).not.toContain('animCadenceFrames(projectionPixels');

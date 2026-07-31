@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { dynamicResolutionRect } from '../src/render/dynamic_resolution_core';
 
 const disabledLayers = new Set<string>();
 const gfxSettings = vi.hoisted(() => ({
@@ -7,8 +8,8 @@ const gfxSettings = vi.hoisted(() => ({
   aoFullRes: true,
   bloom: true,
   composer: true,
-  msaaSamples: 4,
-  smaa: false,
+  msaaSamples: 0,
+  smaa: true,
 }));
 
 vi.mock('../src/render/gfx', () => ({
@@ -53,15 +54,19 @@ interface BloomInternals {
 describe('live post pipeline', () => {
   beforeEach(() => {
     disabledLayers.clear();
+    gfxSettings.ao = true;
     gfxSettings.aoFullRes = true;
-    gfxSettings.smaa = false;
+    gfxSettings.bloom = true;
+    gfxSettings.smaa = true;
+    gfxSettings.msaaSamples = 0;
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  it('constructs the insane chain with one composer buffer and the pinned pass order', async () => {
+  it('constructs the insane chain with tail SMAA and the pinned pass order', async () => {
+    vi.stubGlobal('Image', class {});
     const { buildComposer } = await import('../src/render/post');
     const post = buildComposer(
       rendererStub(),
@@ -75,11 +80,13 @@ describe('live post pipeline', () => {
       'StaticOpaqueN8AOPass',
       'PreparedBloomPass',
       'OutputGradePass',
+      'SMAAPass',
     ]);
-    expect(post.composer.renderTarget1).toBe(post.composer.renderTarget2);
+    expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
     expect(post.composer.renderTarget1.samples).toBe(0);
     expect(post.composer.renderTarget1.depthBuffer).toBe(false);
     expect(post.composer.renderTarget1.resolveDepthBuffer).toBe(true);
+    expect(post.supportsDynamicResolution).toBe(false);
 
     const ao = post.ao as unknown as N8AOInternals;
     expect(ao.beautyRenderTarget.width).toBe(1280);
@@ -132,7 +139,10 @@ describe('live post pipeline', () => {
     ).toHaveLength(5);
   });
 
-  it('keeps medium MSAA on only the geometry target', async () => {
+  it('gives medium tail SMAA without multisampling the geometry target', async () => {
+    gfxSettings.smaa = true;
+    gfxSettings.msaaSamples = 0;
+    vi.stubGlobal('Image', class {});
     const { buildComposer } = await import('../src/render/post');
     const post = buildComposer(
       rendererStub(),
@@ -146,11 +156,34 @@ describe('live post pipeline', () => {
     expect(post.composer.passes.map((pass) => pass.constructor.name)).toEqual([
       'RenderPass',
       'OutputGradePass',
+      'SMAAPass',
     ]);
-    expect(post.composer.renderTarget1).toBe(post.composer.renderTarget2);
-    expect(post.composer.renderTarget1.samples).toBe(4);
+    expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
+    expect(post.composer.renderTarget1.samples).toBe(0);
+    expect(post.composer.renderTarget2.samples).toBe(0);
     expect(post.composer.renderTarget1.depthBuffer).toBe(true);
+    expect(post.composer.renderTarget2.depthBuffer).toBe(true);
     expect(post.composer.renderTarget1.resolveDepthBuffer).toBe(false);
+    expect(post.supportsDynamicResolution).toBe(true);
+
+    const rect = dynamicResolutionRect({
+      logicalWidth: 1280,
+      logicalHeight: 720,
+      pixelRatio: 1,
+      renderScale: 0.75,
+      maxRenderScale: 1,
+      minRenderScale: 0.68,
+    });
+    post.setRenderRegion(rect);
+    expect(post.composer.renderTarget1.viewport.toArray()).toEqual([0, 0, 960, 540]);
+    expect(post.composer.renderTarget1.scissor.toArray()).toEqual([0, 0, 960, 540]);
+    expect(post.composer.renderTarget1.scissorTest).toBe(true);
+    expect(post.grade.uniforms.uInputUvRect.value.toArray()).toEqual([
+      rect.uvScaleX,
+      rect.uvScaleY,
+      rect.uvMaxX,
+      rect.uvMaxY,
+    ]);
   });
 
   it('keeps high half-resolution AO depth available to every AO stage', async () => {
@@ -175,5 +208,50 @@ describe('live post pipeline', () => {
     expect(ao.configuration.halfRes).toBe(true);
     expect(ao.beautyRenderTarget.depthTexture).toBeTruthy();
     expect(ao.beautyRenderTarget.resolveDepthBuffer).toBe(true);
+    expect(post.supportsDynamicResolution).toBe(false);
+  });
+
+  it('keeps every neighboring-sample effect chain out of dynamic resolution', async () => {
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    const cases = [
+      { name: 'AO only', ao: true, bloom: false, smaa: false },
+      { name: 'bloom only', ao: false, bloom: true, smaa: false },
+      { name: 'SMAA only', ao: false, bloom: false, smaa: true },
+    ];
+
+    for (const settings of cases) {
+      gfxSettings.ao = settings.ao;
+      gfxSettings.bloom = settings.bloom;
+      gfxSettings.smaa = settings.smaa;
+      const post = buildComposer(
+        rendererStub(),
+        new THREE.Scene(),
+        new THREE.PerspectiveCamera(),
+        1280,
+        720,
+      );
+
+      expect(post.supportsDynamicResolution, settings.name).toBe(false);
+    }
+  });
+
+  it('removes tail SMAA through the attribution kill switch', async () => {
+    disabledLayers.add('smaa');
+    const { buildComposer } = await import('../src/render/post');
+    const post = buildComposer(
+      rendererStub(),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+    );
+
+    expect(post.composer.passes.map((pass) => pass.constructor.name)).toEqual([
+      'StaticOpaqueN8AOPass',
+      'PreparedBloomPass',
+      'OutputGradePass',
+    ]);
+    expect(post.composer.renderTarget1).toBe(post.composer.renderTarget2);
   });
 });

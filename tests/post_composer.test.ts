@@ -62,6 +62,29 @@ describe('post effect composer', () => {
     expect(setSize).toHaveBeenCalledWith(1280, 720);
   });
 
+  it('floors fixed targets and applies a whole-pixel scene region without reallocating', () => {
+    const target = new THREE.WebGLRenderTarget(320, 180, {
+      depthBuffer: false,
+      samples: 0,
+      type: THREE.HalfFloatType,
+    });
+    const composer = new PostEffectComposer(rendererStub(), target, 320, 180, true);
+    const resizeTarget = vi.spyOn(target, 'setSize');
+
+    composer.setSizeAndPixelRatio(641, 361, 1.5);
+    expect(resizeTarget).toHaveBeenLastCalledWith(961, 541);
+
+    resizeTarget.mockClear();
+    composer.setRenderRegion(640, 360);
+    expect(target.viewport.toArray()).toEqual([0, 0, 640, 360]);
+    expect(target.scissor.toArray()).toEqual([0, 0, 640, 360]);
+    expect(target.scissorTest).toBe(true);
+    expect(resizeTarget).not.toHaveBeenCalled();
+
+    composer.setRenderRegion(961, 541);
+    expect(target.scissorTest).toBe(false);
+  });
+
   it('keeps independent ping-pong targets when a tail pass needs them', () => {
     const target = new THREE.WebGLRenderTarget(640, 360, {
       depthBuffer: false,

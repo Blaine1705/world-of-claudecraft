@@ -362,7 +362,7 @@ describe('Eastbrook polish capture contract', () => {
       // Repinned after merging release/v0.33.0 into the graphics overhaul.
       // The composite was recomputed from the resolved renderer inputs; the
       // accepted Eastbrook evidence and its baseline revision are unchanged.
-      fingerprint: '0737a35027b2347f81d47571ad088ce0c9b6acccdb5b14b45cc31b0517632681',
+      fingerprint: '583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83',
       components: {
         captureContract: {
           id: 'polish-v2',

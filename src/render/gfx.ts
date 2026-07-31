@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { NATIVE_APP } from '../client_origin';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
+import { gfxAaPolicy } from './gfx_aa_policy_core';
 import { applyGfxOverridesFromSearch } from './gfx_override_core';
 import {
   installPbrPointLightShaderPruning,
@@ -116,7 +117,7 @@ export interface GfxSettings {
   readonly ao: boolean;
   /** MSAA samples on the composer's HalfFloat target (WebGL2) */
   readonly msaaSamples: number;
-  /** devicePixelRatio is capped here — 2.5 everywhere is a silent perf killer */
+  /** devicePixelRatio is capped here because unbounded supersampling is a fill-rate cost */
   readonly pixelRatioCap: number;
   /** Directional sun shadow pass. Disabled where its duplicate scene draw is unsafe. */
   readonly dynamicShadows: boolean;
@@ -147,7 +148,7 @@ export interface GfxSettings {
   readonly terrainRelief: number;
   /** N8AO at full resolution + Medium quality (vs half-res Low) */
   readonly aoFullRes: boolean;
-  /** SMAA tail pass on the composer (high only: ultra's DPR suppresses crawl) */
+  /** SMAA tail pass on the grade/composer output */
   readonly smaa: boolean;
   /** UnrealBloom pass on the composer */
   readonly bloom: boolean;
@@ -267,13 +268,15 @@ export const GFX_BUDGETS: Record<GfxTier, GfxRuntimeBudget> = {
     recoverStableSeconds: 3,
     cooldownSeconds: 0.85,
   },
+  // Ultra is both a player-selected premium preset and the strong-desktop default.
+  // Keep its governor armed, but wait for sustained 30ms pressure before shedding.
   ultra: {
     targetFps: 60,
     minRenderScaleDesktop: 0.78,
     minRenderScaleMobile: 0.68,
     maxRenderScale: 1,
-    dropFrameMs: 24,
-    urgentFrameMs: 34,
+    dropFrameMs: 30,
+    urgentFrameMs: 44,
     recoverFrameMs: 15,
     dropStep: 0.08,
     urgentDropStep: 0.12,
@@ -281,10 +284,8 @@ export const GFX_BUDGETS: Record<GfxTier, GfxRuntimeBudget> = {
     recoverStableSeconds: 3,
     cooldownSeconds: 0.85,
   },
-  // Insane keeps the runtime governor (shouldUseAutoGovernor) but on a LOOSER
-  // budget than every other tier: the player explicitly bought the everything-on
-  // preset, so the governor only steps in on genuine disasters (sustained 30ms+
-  // frames) rather than fighting the choice at the first 40fps dip.
+  // Insane shares ultra's loose frame thresholds and takes smaller quality steps.
+  // Its draw caps stay slightly higher because the preset deliberately draws more.
   insane: {
     targetFps: 60,
     minRenderScaleDesktop: 0.78,
@@ -836,19 +837,15 @@ export function graphicsPresetLabel(
   }
 }
 
-export function shouldUseAutoGovernor(tier: GfxTier, search: string): boolean {
+export function shouldUseAutoGovernor(_tier: GfxTier, search: string): boolean {
   const params = new URLSearchParams(search);
   const override = params.get('governor') ?? params.get('autoGovernor');
   if (override === '1' || override === 'true' || override === 'on') return true;
   if (override === '0' || override === 'false' || override === 'off') return false;
-  // The runtime governor adapts every non-ultra tier; ultra opts out (the player explicitly maxed
-  // it, or a recognized strong desktop auto-resolved there). Keying off the RESOLVED tier, not the
-  // raw preset, keeps the governor ON for a first-run inconclusive device (the medium fallback) so
-  // it can step quality down, instead of being silently opted out by an unset-preset -> ultra label.
-  // INSANE deliberately keeps the governor: it is the everything-on showcase and can bury any GPU,
-  // so the governor stays armed on the deliberately loose GFX_BUDGETS.insane thresholds (it only
-  // reacts to sustained 30ms+ frames, never fighting the player's explicit choice on a dip).
-  return tier !== 'ultra';
+  // Every resolved tier keeps the runtime governor armed. Ultra and insane use deliberately loose
+  // GFX_BUDGETS thresholds, so they react only to sustained 30ms pressure or an urgent 44ms frame
+  // instead of fighting a premium preset on a transient dip.
+  return true;
 }
 
 export function configureMaskedDoubleSidedVegetationMaterial<T extends THREE.Material>(mat: T): T {
@@ -882,6 +879,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       coarsePointer: hints?.coarsePointer ?? false,
       narrowViewport: hints?.narrowViewport ?? false,
     });
+  const aaPolicy = gfxAaPolicy(tier, { constrainedMemory, nativeIosMemoryProfile });
   let settings: GfxSettings = {
     graphicsConfigVersion: GFX_CONFIG_VERSION,
     tier,
@@ -894,18 +892,8 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // N8AO runs on the composer tiers: half-res + Low quality on high keeps
     // it ~1ms-class on real GPUs; ultra and insane get full-res Medium
     ao: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
-    // medium included: its grade-only composer target needs the MSAA storage
-    // the direct-to-canvas path used to get from the context itself
-    msaaSamples: gfxTierAtLeast(tier, 'medium') && !constrainedMemory ? 4 : 0,
-    pixelRatioCap: nativeIosMemoryProfile
-      ? 1.25
-      : constrainedMemory
-        ? 1.48
-        : tier === 'low' || tier === 'medium'
-          ? 1.48
-          : tier === 'high'
-            ? 1.75
-            : 2.5,
+    msaaSamples: aaPolicy.msaaSamples,
+    pixelRatioCap: aaPolicy.pixelRatioCap,
     // Shadows are cosmetic and duplicate the visible scene draw. Both constrained browsers and
     // the stricter native-iOS residency profile remove that duplicate pass.
     dynamicShadows: tier !== 'low' && !constrainedMemory,
@@ -942,7 +930,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
           ? 2
           : 0,
     aoFullRes: gfxTierAtLeast(tier, 'ultra'),
-    smaa: tier === 'high',
+    smaa: aaPolicy.postAa === 'smaa',
     bloom: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     terrainCastShadows: tier !== 'low' && !constrainedMemory,
     lowPlus: tier === 'low' || nativeIosMemoryProfile,
@@ -1050,8 +1038,8 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       settings = { ...settings, surfaceDetailTaps: 3, surfaceDetailClampK: 0.85 };
     else settings = { ...settings, surfaceDetailTaps: 4, surfaceDetailClampK: 1 };
     // Effects & Lighting: Low is the grade-only mini composer (the medium
-    // tier's post profile); Medium adds N8AO; High the full high-tier stack
-    // (AO + bloom + SMAA). The level-0 test keeps the shared
+    // tier's post profile, including SMAA); Medium adds N8AO; High the full
+    // high-tier stack (AO + bloom + SMAA). The level-0 test keeps the shared
     // EFFECTS_QUALITY_LOW_CUTOFF constant so the HUD effect tier and the 3D
     // renderer still downgrade at the same threshold.
     const effectsValue = hints.effectsQuality ?? 1;
@@ -1063,7 +1051,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         ao: false,
         aoFullRes: false,
         bloom: false,
-        smaa: false,
+        smaa: !nativeIosMemoryProfile,
         maxPointLights: Math.min(settings.maxPointLights, 3),
       };
     else if (effectsValue < 0.75)

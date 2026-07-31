@@ -109,7 +109,7 @@ describe('graphics tier resolution', () => {
     expect(forcedTierFromSearch('?gfx=insane')).toBe('insane');
   });
 
-  it('labels presets and runs the budget governor on every tier except ultra', () => {
+  it('labels presets and runs the budget governor on every tier by default', () => {
     expect(graphicsPresetLabel(undefined)).toBe('ultra');
     expect(graphicsPresetLabel(0)).toBe('low');
     expect(graphicsPresetLabel(1)).toBe('low');
@@ -118,20 +118,18 @@ describe('graphics tier resolution', () => {
     expect(graphicsPresetLabel(4)).toBe('ultra');
     expect(graphicsPresetLabel(5)).toBe('advanced');
     expect(graphicsPresetLabel(6)).toBe('insane');
-    // The governor follows the RESOLVED tier: ON for low/medium/high, OFF only at ultra. A
-    // first-run inconclusive device (the medium fallback) now keeps the governor ON to adapt; the
-    // old unset-preset -> ultra label used to opt it out (no runtime adaptation on weak devices).
+    // The governor follows the RESOLVED tier and stays armed on every tier. Ultra and insane use
+    // loose budgets so a transient dip cannot fight the selected preset.
     expect(shouldUseAutoGovernor('low', '')).toBe(true);
     expect(shouldUseAutoGovernor('medium', '')).toBe(true);
     expect(shouldUseAutoGovernor('high', '')).toBe(true);
-    expect(shouldUseAutoGovernor('ultra', '')).toBe(false);
-    // INSANE keeps the governor armed (on the loose insane budget): the everything-on
-    // preset can bury any GPU, so a genuine sustained disaster still recovers.
+    expect(shouldUseAutoGovernor('ultra', '')).toBe(true);
     expect(shouldUseAutoGovernor('insane', '')).toBe(true);
-    // The URL governor override beats the tier (force on even at ultra, off below it).
+    // The URL governor override beats the tier.
     expect(shouldUseAutoGovernor('ultra', '?gfx=ultra&governor=1')).toBe(true);
     expect(shouldUseAutoGovernor('low', '?governor=0')).toBe(false);
-    expect(shouldUseAutoGovernor('ultra', '?gfx=ultra')).toBe(false);
+    expect(shouldUseAutoGovernor('ultra', '?gfx=ultra')).toBe(true);
+    expect(shouldUseAutoGovernor('ultra', '?gfx=ultra&governor=0')).toBe(false);
   });
 
   it('keeps every quality tier bounded by explicit runtime budgets', () => {
@@ -144,11 +142,14 @@ describe('graphics tier resolution', () => {
       expect(budget.recoverFrameMs).toBeLessThan(budget.dropFrameMs);
       expect(tier).toMatch(/^(low|medium|high|ultra|insane)$/);
     }
-    // Insane keeps the governor armed but on a LOOSER trip point than ultra:
-    // it must never fight the player's explicit everything-on choice on a dip,
-    // only step in on sustained disasters.
-    expect(GFX_BUDGETS.insane.dropFrameMs).toBeGreaterThan(GFX_BUDGETS.ultra.dropFrameMs);
-    expect(GFX_BUDGETS.insane.urgentFrameMs).toBeGreaterThan(GFX_BUDGETS.ultra.urgentFrameMs);
+    // Premium tiers use literal-pinned disaster thresholds. High reacts at 22/32ms, while
+    // ultra and insane wait for sustained 30ms pressure or a 44ms urgent frame.
+    expect(GFX_BUDGETS.high.dropFrameMs).toBe(22);
+    expect(GFX_BUDGETS.high.urgentFrameMs).toBe(32);
+    expect(GFX_BUDGETS.ultra.dropFrameMs).toBe(30);
+    expect(GFX_BUDGETS.ultra.urgentFrameMs).toBe(44);
+    expect(GFX_BUDGETS.insane.dropFrameMs).toBe(30);
+    expect(GFX_BUDGETS.insane.urgentFrameMs).toBe(44);
   });
 
   it('defines tunable bucket bands for every quality tier', () => {
@@ -213,20 +214,24 @@ describe('graphics tier resolution', () => {
     expect(medium.shadowMap).toBeGreaterThan(low.shadowMap);
     expect(medium.shadowMap).toBeLessThan(high.shadowMap);
     expect(medium.pixelRatioCap).toBeLessThan(high.pixelRatioCap);
+    expect(medium.msaaSamples).toBe(0);
+    expect(medium.smaa).toBe(true);
 
     expect(high.standardMaterials).toBe(true);
     expect(high.dynamicShadows).toBe(true);
     expect(high.composer).toBe(true);
     expect(high.ao).toBe(true);
-    expect(high.msaaSamples).toBe(4);
+    expect(high.msaaSamples).toBe(0);
+    expect(high.smaa).toBe(true);
     expect(high.shadowMap).toBe(4096);
 
     expect(ultra.standardMaterials).toBe(true);
     expect(ultra.composer).toBe(true);
     expect(ultra.ao).toBe(true);
-    expect(ultra.msaaSamples).toBe(4);
+    expect(ultra.msaaSamples).toBe(0);
+    expect(ultra.smaa).toBe(true);
     expect(ultra.shadowMap).toBe(high.shadowMap);
-    expect(ultra.pixelRatioCap).toBeGreaterThan(high.pixelRatioCap);
+    expect(ultra.pixelRatioCap).toBe(high.pixelRatioCap);
     expect(GFX_BUCKET_BANDS.ultra.grass.baseline).toBeGreaterThan(
       GFX_BUCKET_BANDS.high.grass.baseline,
     );
@@ -245,7 +250,8 @@ describe('graphics tier resolution', () => {
     expect(insane.composer).toBe(true);
     expect(insane.ao).toBe(true);
     expect(insane.gradePass).toBe(true);
-    expect(insane.msaaSamples).toBe(4);
+    expect(insane.msaaSamples).toBe(0);
+    expect(insane.smaa).toBe(true);
     expect(insane.shadowMap).toBe(ultra.shadowMap);
     expect(insane.pixelRatioCap).toBe(ultra.pixelRatioCap);
     expect(insane.grassRadius).toBe(ultra.grassRadius);
@@ -350,6 +356,8 @@ describe('graphics tier resolution', () => {
     expect(effectsLow.composer).toBe(false);
     expect(effectsLow.gradePass).toBe(true);
     expect(effectsLow.ao).toBe(false);
+    expect(effectsLow.msaaSamples).toBe(0);
+    expect(effectsLow.smaa).toBe(true);
     const effectsMedium = adv({ effectsQuality: 0.5 });
     expect(effectsMedium.ao).toBe(true);
     expect(effectsMedium.bloom).toBe(false);
