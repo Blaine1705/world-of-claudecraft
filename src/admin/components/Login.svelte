@@ -35,7 +35,7 @@
         id="login-2fa-code"
         inputmode="numeric"
         autocomplete="one-time-code"
-        maxlength="14"
+        maxlength="19"
         placeholder={t('auth.twoFactorPlaceholder')}
         bind:value={code}
       />

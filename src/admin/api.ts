@@ -83,7 +83,8 @@ export async function apiLogin(
   });
   const data = await parseEnvelope<LoginResponse>(res);
   if (data.twoFactorRequired && !data.token) return { twoFactorRequired: true };
-  localStorage.setItem(TOKEN_KEY, data.token ?? '');
+  if (!data.token) throw new Error('login response missing token');
+  localStorage.setItem(TOKEN_KEY, data.token);
   localStorage.setItem(NAME_KEY, data.username ?? '');
   // Tolerate a pre-permissions server during a deploy window: missing arrays
   // degrade to zero permissions (the no-access screen) instead of a crash.

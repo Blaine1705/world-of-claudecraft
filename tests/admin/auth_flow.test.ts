@@ -150,12 +150,19 @@ describe('admin auth flow', () => {
     await fireEvent.input(screen.getByLabelText(t('auth.password')), { target: { value: 'pw' } });
     await fireEvent.submit(loginForm());
 
+    // Real-shaped recovery code (generateRecoveryCodes, server/totp.ts): 16 hex
+    // chars grouped in fours with dashes, 19 characters total. A field that
+    // truncates this (regression: maxlength was 14) makes recovery-code login,
+    // the account's own lockout escape hatch, impossible.
+    const recoveryCode = '4f8a-3b1c-9d2e-71ab';
     const codeInput = await screen.findByLabelText(t('auth.twoFactorLabel'));
-    await fireEvent.input(codeInput, { target: { value: 'abcd-1234-efgh' } });
+    expect(codeInput).not.toHaveAttribute('maxlength', '14');
+    await fireEvent.input(codeInput, { target: { value: recoveryCode } });
+    expect((codeInput as HTMLInputElement).value).toBe(recoveryCode);
     await fireEvent.submit(loginForm());
 
     expect(await screen.findByText(t('auth.signOut'))).toBeInTheDocument();
-    expect(h.apiLogin).toHaveBeenNthCalledWith(2, 'alice', 'pw', '', 'abcd-1234-efgh');
+    expect(h.apiLogin).toHaveBeenNthCalledWith(2, 'alice', 'pw', '', recoveryCode);
   });
 
   it('keeps the code field visible and shows an error when the 2FA code is wrong', async () => {
