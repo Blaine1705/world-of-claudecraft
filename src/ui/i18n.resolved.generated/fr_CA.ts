@@ -7276,7 +7276,7 @@ export const fr_CA: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Invisibilité accrue",
-        "description": "Disparais pendant 20 s : enlève 2 effets de dégâts périodiques et réduit de 90% les dégâts que tu subis tant que tu es invisible et pour un court moment après. (Talent de mage)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Suite flamboyante",

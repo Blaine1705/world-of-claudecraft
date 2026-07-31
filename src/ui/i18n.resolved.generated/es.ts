@@ -7276,7 +7276,7 @@ export const es: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Invisibilidad superior",
-        "description": "Desaparece durante 20 s: elimina 2 efectos de daño en el tiempo y recibes un 90% menos de daño mientras eres invisible y poco después. (Talento de mago)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Buena racha",

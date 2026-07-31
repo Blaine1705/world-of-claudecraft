@@ -7276,7 +7276,7 @@ export const fr_FR: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Invisibilité supérieure",
-        "description": "Vous disparaissez pendant 20 s : dissipe 2 effets de dégâts sur la durée et réduit les dégâts subis de 90% tant que vous êtes invisible et peu après. (Talent de mage)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Bonne série",

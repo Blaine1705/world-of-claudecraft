@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
@@ -56,6 +57,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "es_ES": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
@@ -102,6 +104,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "fr_FR": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
@@ -148,6 +151,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "fr_CA": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
@@ -195,6 +199,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
@@ -241,6 +246,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "de_DE": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
@@ -291,6 +297,7 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
@@ -338,6 +345,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
@@ -384,6 +392,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "nl_NL": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
@@ -430,6 +439,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "pl_PL": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
@@ -476,6 +486,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "id_ID": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
@@ -522,6 +533,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "tr_TR": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
@@ -568,6 +580,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "sv_SE": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
@@ -614,6 +627,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "vi_VN": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",
@@ -660,6 +674,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "da_DK": [
+    "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
     "hudChrome.auraOverlay.allOn",

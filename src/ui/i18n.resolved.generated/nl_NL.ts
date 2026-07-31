@@ -7276,7 +7276,7 @@ export const nl_NL: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Grotere onzichtbaarheid",
-        "description": "Verdwijn gedurende 20 sec.: verwijdert 2 effecten met schade over tijd en je loopt 90% minder schade op terwijl je onzichtbaar bent en kort daarna. (magiërstalent)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Hete reeks",

@@ -9543,8 +9543,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Voltooit de afkoeltijd van Flitsstap, Vorstsluier en Grotere onzichtbaarheid. (magiërstalent)',
   'entities.abilities.greater_invisibility.name': 'Grotere onzichtbaarheid',
-  'entities.abilities.greater_invisibility.description':
-    'Verdwijn gedurende 20 sec.: verwijdert 2 effecten met schade over tijd en je loopt 90% minder schade op terwijl je onzichtbaar bent en kort daarna. (magiërstalent)',
   'entities.abilities.hot_streak.name': 'Hete reeks',
   'entities.abilities.hot_streak.description':
     'Passief: twee kritieke treffers achter elkaar met je Vuurspreuken (Sintelbout, Sintelval, Blakeren, Pyrelans of Vlammenslag) maken je volgende Pyrelans of Vlammenslag onmiddellijk en gratis. De verbruikers tellen mee voor de VOLGENDE reeks, inclusief gratis spreuken; Vlammenslag telt één keer, hoeveel vijanden hij ook raakt, en alleen de eerste inslag telt ooit mee. (Vuur)',
