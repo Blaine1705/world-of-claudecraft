@@ -20,9 +20,21 @@ export const CASTLE = {
   // the graded grounds (terrain levels to the local pad target; the skirt
   // blends out to the waste; the west reach carries the barbican forecourt)
   pad: { x0: 334, x1: 452, z0: 1980, z1: 2085, h: 6 },
-  // the inner ward: the keep's raised terrace (z0 sits back far enough
-  // that the alley flight lane clears the thicker near wall)
-  ward: { x0: 398, x1: 433.4, z0: 1992.6, z1: 2018, h: 8.6 },
+  // The inner ward: the keep's raised terrace (z0 sits back far enough that the
+  // alley flight lane clears the thicker near wall).
+  //
+  // The .6 on x0 and z1 is load-bearing, not decoration. terrainSteepnessAt
+  // memoizes on 1-yard cells sampled at the CENTRE, so a retaining face whose
+  // foot sits near a whole number stamps the cliff's steepness onto up to half a
+  // cell of dead level floor either side of it. On the flat below that reads as
+  // steep with no downhill (a freeze, now also handled in player_motion); on the
+  // terrace above it reads as steep WITH a downhill and shoves a standing player
+  // off the drop. Both vanish once the face lands mid-cell. The safe window for
+  // a foot at coordinate a is frac(a) in [0.35, 0.85): z0 1992.6 and the east
+  // blend foot 432.7 were already inside it, x0 398 and z1 2018 were not. x0
+  // goes WEST to 397.6 rather than east to 398.4 because hexrBarracks (x 403.5,
+  // r 5.2) reaches to 398.3 and would then overhang the terrace edge.
+  ward: { x0: 397.6, x1: 433.4, z0: 1992.6, z1: 2018.6, h: 8.6 },
   // the curtain wall square: wall centerlines
   wx0: 360,
   wx1: 436.8,

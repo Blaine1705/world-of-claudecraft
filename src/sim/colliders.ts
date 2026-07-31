@@ -105,12 +105,20 @@ import type { WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
 import { WILDHEART_FIELD_COLLIDER_SPECS, WILDHEART_FIELD_WALLS } from './wildheart_field';
 import {
-  crossesGardenHedge,
   crossesSealedBorder,
   type Decoration,
   farshorePalmSpots,
+  gardenMazeCellPieces,
+  generateDecorations,
   generateDecorationsInBounds,
   groundHeight,
+  MAZE_CELL,
+  MAZE_COLS,
+  MAZE_ROWS,
+  MAZE_WALL_DEPTH,
+  MAZE_WALL_HEIGHT,
+  MAZE_X0,
+  MAZE_Z1,
   reachPalmSpots,
   roadDistance,
   terrainHeight,
@@ -732,6 +740,48 @@ function staticWorldColliders(seed: number): Collider[] {
       r: d.r,
       cameraTopY: topY(seed, d.x, d.z, d.h ?? 4),
     });
+  }
+
+  // THE GREAT MAZE's hedges. One box per drawn piece, straight off the same
+  // grid the renderer lays the hedge GLBs from, so the blocked ground IS the
+  // modeled hedge footprint.
+  //
+  // These are new, and their absence was a silent regression rather than a
+  // deletion. The hedge used to be enforced by crossesGardenHedge, a bespoke
+  // segment test living inside resolveMovement. When the parkour physics engine
+  // landed, the OPEN WORLD moved onto moveCharacter (player_motion.ts) and
+  // resolveMovement became the instanced-interior path, so the test simply
+  // stopped being reached for players on foot. Nothing errored: mobs, pets and
+  // Charge still route through resolveMove and still collided, so the maze went
+  // on looking enforced while players walked through the hedges. Two unrelated
+  // branches, the modeled hedge and the physics engine, auto-merged with no
+  // conflict and neither author saw the other's half.
+  //
+  // Real colliders instead of a second bespoke test: the solver, pathfinding and
+  // every mover get it from one place, and the next kernel rewrite inherits it.
+  // Length is the CELL, not the drawn piece: the 0.75yd overlap at each end is
+  // cosmetic leaf interlock, and where a run continues the neighbour's own box
+  // covers the joint. Deliberately NOT merged into colinear runs: colliderBounds
+  // and pruneCandidates both take an OBB's extent as hypot(hw, hd) on both axes,
+  // so one 153yd run registers as a 153yd blob across cells nowhere near it.
+  for (let r = 0; r < MAZE_ROWS; r++) {
+    for (let c = 0; c < MAZE_COLS; c++) {
+      const piece = gardenMazeCellPieces(c, r);
+      if (!piece) continue;
+      const x = MAZE_X0 + (c + 0.5) * MAZE_CELL;
+      const z = MAZE_Z1 - (r + 0.5) * MAZE_CELL;
+      const camTop = topY(seed, x, z, MAZE_WALL_HEIGHT);
+      const half = MAZE_CELL / 2;
+      const depth = MAZE_WALL_DEPTH / 2;
+      // full height on purpose: a 6.1yd hedge is nobody's platform, so no
+      // moveTopY and nothing to stand on or mantle
+      if (piece.h) {
+        out.push({ type: 'obb', x, z, hw: half, hd: depth, rot: 0, cameraTopY: camTop });
+      }
+      if (piece.v) {
+        out.push({ type: 'obb', x, z, hw: depth, hd: half, rot: 0, cameraTopY: camTop });
+      }
+    }
   }
 
   // Ravenpost mailboxes: authored civic furniture, spawned by the Sim at this
@@ -2276,21 +2326,19 @@ export function resolveMovement(
     z = fromZ;
   for (let i = 1; i <= steps; i++) {
     const t = i / steps;
-    let nextX = fromX + dx * t;
+    const nextX = fromX + dx * t;
     // A sealed zone border is a hard wall regardless of terrain slope (the
     // climb gate projects rise along the movement direction, so a shallow
     // diagonal would otherwise sneak over the crest). Clamp z at the crest
     // and keep the x component, so pushing into the wall slides along it.
-    let nextZ = crossesSealedBorder(x, z, fromZ + dz * t) ? z : fromZ + dz * t;
-    // The Great Maze's hedges are hard walls for the same reason, tested as
-    // a segment crossing (an endpoint-only test teleports a stalled mover
-    // across once its target passes the wall). The faces are axis-aligned,
-    // so slide by dropping whichever axis component pushes into the hedge.
-    if (crossesGardenHedge(x, z, nextX, nextZ)) {
-      if (!crossesGardenHedge(x, z, x, nextZ)) nextX = x;
-      else if (!crossesGardenHedge(x, z, nextX, z)) nextZ = z;
-      else break; // cornered against the hedge
-    }
+    const nextZ = crossesSealedBorder(x, z, fromZ + dz * t) ? z : fromZ + dz * t;
+    // The Great Maze's hedges used to be tested here as a segment crossing.
+    // They are real collider boxes now (staticWorldColliders), which the slide
+    // below handles like any other wall, and keeping the segment test as well
+    // would be actively harmful: a body that ends up INSIDE a hedge is pushed
+    // out by resolvePosition, and a segment test from where it was to where it
+    // was pushed crosses hedge by definition, so the escape would be cancelled
+    // and the body held there.
     if (!ignoreFences && crossesFence(x, z, nextX, nextZ, r)) break;
     const resolved = resolvePosition(
       seed,
@@ -2305,7 +2353,6 @@ export function resolveMovement(
     // ...and a static-collider slide (a tree hugging the crest) must not
     // shove the resolved position across it either
     if (crossesSealedBorder(x, z, resolved.z)) break;
-    if (crossesGardenHedge(x, z, resolved.x, resolved.z)) break;
     // Rift interiors: a resolution is a SLIDE, never a teleport. When a wide
     // obstacle abuts a thin wall (a chamber-waist stub reaching the side wall),
     // chained pushOuts can walk the centre across the wall centreline and eject
