@@ -1,6 +1,7 @@
-// The Epic link surface (server/epic/routes.ts): the env gate, the dark-default
-// arms, the rate-limit policy, the epic_links DDL pins, and the forbidden-login
-// rule (linking never mints credentials; login with Epic does not exist).
+// The Epic link surface (server/epic/routes.ts): the env gate, the proof
+// flow arms, both 409 conflicts, reclaim-by-proof, the rate-limit policy,
+// the epic_links DDL pins, and the forbidden-login rule (linking never mints
+// credentials; login with Epic does not exist).
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_epic_units';
 
 import * as fs from 'node:fs';
@@ -9,9 +10,9 @@ import * as path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { tsFilesUnder } from '../helpers/ts_files_under';
 
-// Isolate the route layer: SQL boundary and the mirror are mocked (the mirror
-// is inert stubs in Phase 3; the routes only owe it the cache-invalidation
-// call on unlink).
+// Isolate the route layer: SQL boundary, upstream verification, and the
+// mirror are each mocked (the mirror has its own suite later; the routes only
+// owe it the reconcile-on-link and cache-invalidation calls).
 vi.mock('../../server/epic/epic_db', () => ({
   epicLinkForAccount: vi.fn(async () => null),
   accountForEpicId: vi.fn(async () => null),
@@ -19,10 +20,14 @@ vi.mock('../../server/epic/epic_db', () => ({
   displaceEpicLink: vi.fn(async () => ({ result: 'ok', displacedAccountId: null })),
   deleteEpicLink: vi.fn(async () => {}),
 }));
+vi.mock('../../server/epic/web_api', () => ({
+  verifyLinkProof: vi.fn(async () => ({ kind: 'ok', epicAccountId: 'epicAccount00000001' })),
+}));
 vi.mock('../../server/epic/mirror', () => ({
   onDeedRecorded: vi.fn(),
   onLinkChanged: vi.fn(),
   reconcileOnLogin: vi.fn(),
+  reconcileLink: vi.fn(),
 }));
 // Partial db mock: keep SCHEMA (and everything else) real, stub only the two
 // reads requireAccount resolves at call time, so the full-chain tests below can
@@ -43,9 +48,22 @@ vi.mock('../../server/db', async (importOriginal) => {
 
 import type * as http from 'node:http';
 import { SCHEMA } from '../../server/db';
-import { deleteEpicLink, epicLinkForAccount, insertEpicLink } from '../../server/epic/epic_db';
-import { onLinkChanged } from '../../server/epic/mirror';
-import { isProofShape, MAX_PROOF_CHARS, routes } from '../../server/epic/routes';
+import {
+  accountForEpicId,
+  deleteEpicLink,
+  displaceEpicLink,
+  epicLinkForAccount,
+  insertEpicLink,
+} from '../../server/epic/epic_db';
+import { onLinkChanged, reconcileLink } from '../../server/epic/mirror';
+import { isProofShape, MAX_PROOF_CHARS, MIN_PROOF_CHARS, routes } from '../../server/epic/routes';
+import {
+  classifyTokenErrorStatus,
+  EPIC_TOKEN_URL,
+  EXCHANGE_CODE_GRANT,
+  parseExchangeCodeTokenResponse,
+} from '../../server/epic/ticket';
+import { verifyLinkProof } from '../../server/epic/web_api';
 import { HttpError } from '../../server/http/errors';
 import { EPIC_LINK_POLICY, rateLimit } from '../../server/http/middleware/rate_limit';
 import type { Ctx, RouteDef } from '../../server/http/types';
@@ -53,12 +71,17 @@ import { EPIC_LINK_MAX_PER_MINUTE, resetEpicLinkRateLimits } from '../../server/
 import { type FakeRes, fakeCtx } from './helpers';
 
 const linkForAccountMock = vi.mocked(epicLinkForAccount);
+const accountForEpicIdMock = vi.mocked(accountForEpicId);
 const insertMock = vi.mocked(insertEpicLink);
+const displaceMock = vi.mocked(displaceEpicLink);
 const deleteMock = vi.mocked(deleteEpicLink);
+const verifyMock = vi.mocked(verifyLinkProof);
+const reconcileMock = vi.mocked(reconcileLink);
 const onLinkChangedMock = vi.mocked(onLinkChanged);
 
 const ACCOUNT = { accountId: 7, scope: 'full' as const };
-const GOOD_PROOF = 'epic-link-proof-placeholder';
+const EPIC_ACCOUNT_ID = 'epicAccount00000001';
+const GOOD_PROOF = 'launcher-exchange-code-01';
 
 /** Read a handler's response off the fakeCtx's FakeRes. */
 function captured(res: http.ServerResponse): { status: number; body: unknown } {
@@ -118,7 +141,10 @@ afterEach(() => {
   resetEpicLinkRateLimits();
   vi.clearAllMocks();
   linkForAccountMock.mockResolvedValue(null);
+  accountForEpicIdMock.mockResolvedValue(null);
   insertMock.mockResolvedValue('ok');
+  displaceMock.mockResolvedValue({ result: 'ok', displacedAccountId: null });
+  verifyMock.mockResolvedValue({ kind: 'ok', epicAccountId: EPIC_ACCOUNT_ID });
 });
 
 // ---------------------------------------------------------------------------
@@ -177,7 +203,6 @@ describe('the EPIC_ENABLED gate', () => {
 
 // ---------------------------------------------------------------------------
 // POST /api/epic/link handler arms (middleware bypassed; ctx.account preset).
-// Phase 3: shape, provisioning, already-linked, and the verify stub (upstream).
 // ---------------------------------------------------------------------------
 
 describe('POST /api/epic/link', () => {
@@ -187,51 +212,161 @@ describe('POST /api/epic/link', () => {
     return fakeCtx({ method: 'POST', url: '/api/epic/link', account: ACCOUNT, body });
   }
 
+  it('links: verifies the proof, stores the verified epic account id, fires reconcile, returns it', async () => {
+    enableEpic();
+    const ctx = linkCtx({ proof: GOOD_PROOF });
+    await handler()(ctx);
+    expect(captured(ctx.res)).toEqual({
+      status: 200,
+      body: { linked: true, epicAccountId: EPIC_ACCOUNT_ID },
+    });
+    expect(verifyMock).toHaveBeenCalledWith({
+      clientId: 'client-test',
+      clientSecret: 'raw-test-secret-value',
+      deploymentId: 'dep-test',
+      proof: GOOD_PROOF,
+    });
+    expect(insertMock).toHaveBeenCalledWith(ACCOUNT.accountId, EPIC_ACCOUNT_ID);
+    expect(reconcileMock).toHaveBeenCalledWith(ACCOUNT.accountId, EPIC_ACCOUNT_ID);
+  });
+
+  it('links with a max-size proof through the REAL chain: clamp and body cap both admit it', async () => {
+    enableEpic();
+    // Max-size proof must stay inside the OAuth-safe charset (A-Za-z0-9._~+/=-).
+    const maxProof = 'b'.repeat(MAX_PROOF_CHARS);
+    const ctx = fakeCtx({
+      method: 'POST',
+      url: '/api/epic/link',
+      headers: { authorization: `Bearer ${'a'.repeat(64)}` },
+      body: { proof: maxProof },
+    });
+    await runRoute(routeFor('POST', '/api/epic/link'), ctx);
+    expect(captured(ctx.res)).toEqual({
+      status: 200,
+      body: { linked: true, epicAccountId: EPIC_ACCOUNT_ID },
+    });
+    expect(verifyMock).toHaveBeenCalledWith(expect.objectContaining({ proof: maxProof }));
+  });
+
   it.each([
     ['missing', undefined],
     ['not a string', 42],
     ['empty string', ''],
+    ['too short', 'a'.repeat(MIN_PROOF_CHARS - 1)],
     ['too long', 'a'.repeat(MAX_PROOF_CHARS + 1)],
-  ])('rejects a %s proof 400 epic.invalid_token without a db write', async (_name, proof) => {
+    ['whitespace / illegal charset', 'bad proof!!'],
+  ])('rejects a %s proof 400 epic.invalid_token without an upstream call', async (_name, proof) => {
     enableEpic();
     await expect(handler()(linkCtx({ proof }))).rejects.toMatchObject({
       status: 400,
       code: 'epic.invalid_token',
     });
+    expect(verifyMock).not.toHaveBeenCalled();
     expect(insertMock).not.toHaveBeenCalled();
   });
 
-  it('answers 503 epic.upstream when enabled but unprovisioned, before any write', async () => {
+  it('answers 503 epic.upstream when enabled but unprovisioned, before any upstream call', async () => {
     process.env.EPIC_ENABLED = '1';
     await expect(handler()(linkCtx({ proof: GOOD_PROOF }))).rejects.toMatchObject({
       status: 503,
       code: 'epic.upstream',
     });
-    expect(insertMock).not.toHaveBeenCalled();
+    expect(verifyMock).not.toHaveBeenCalled();
   });
 
-  it('409 epic.already_linked for a linked account BEFORE burning verify work', async () => {
+  it('409 epic.already_linked for a linked account BEFORE burning an upstream verification', async () => {
     enableEpic();
     linkForAccountMock.mockResolvedValue({
       accountId: ACCOUNT.accountId,
-      epicAccountId: 'epic-account-1',
+      epicAccountId: EPIC_ACCOUNT_ID,
       createdAt: '2026-01-01T00:00:00.000Z',
     });
     await expect(handler()(linkCtx({ proof: GOOD_PROOF }))).rejects.toMatchObject({
       status: 409,
       code: 'epic.already_linked',
     });
-    expect(insertMock).not.toHaveBeenCalled();
+    expect(verifyMock).not.toHaveBeenCalled();
   });
 
-  it('Phase 3 verify stub: provisioned surface still answers epic.upstream (no unproven write)', async () => {
+  it.each([
+    ['invalid', { kind: 'invalid' as const }, 400, 'epic.invalid_token'],
+    ['malformed', { kind: 'malformed' as const }, 400, 'epic.invalid_token'],
+    ['banned', { kind: 'banned' as const }, 403, 'epic.banned'],
+    ['upstream', { kind: 'upstream' as const }, 503, 'epic.upstream'],
+  ])('maps a %s verification outcome to its stable code', async (_name, outcome, status, code) => {
     enableEpic();
+    verifyMock.mockResolvedValue(outcome);
     await expect(handler()(linkCtx({ proof: GOOD_PROOF }))).rejects.toMatchObject({
-      status: 503,
-      code: 'epic.upstream',
+      status,
+      code,
     });
     expect(insertMock).not.toHaveBeenCalled();
+    expect(reconcileMock).not.toHaveBeenCalled();
   });
+
+  it('reclaim-by-proof: a fresh valid proof for a squatted epic id displaces the old owner and links the caller', async () => {
+    enableEpic();
+    const OLD_OWNER = 99;
+    accountForEpicIdMock.mockResolvedValue(OLD_OWNER);
+    displaceMock.mockResolvedValue({ result: 'ok', displacedAccountId: OLD_OWNER });
+    const ctx = linkCtx({ proof: GOOD_PROOF });
+    await handler()(ctx);
+    expect(captured(ctx.res)).toEqual({
+      status: 200,
+      body: { linked: true, epicAccountId: EPIC_ACCOUNT_ID },
+    });
+    expect(displaceMock).toHaveBeenCalledWith(ACCOUNT.accountId, EPIC_ACCOUNT_ID);
+    expect(insertMock).not.toHaveBeenCalled();
+    expect(onLinkChangedMock).toHaveBeenCalledWith(OLD_OWNER, null);
+    expect(reconcileMock).toHaveBeenCalledWith(ACCOUNT.accountId, EPIC_ACCOUNT_ID);
+  });
+
+  it('same-account already-linked is still a 409 pre-check, never a reclaim (displace untouched)', async () => {
+    enableEpic();
+    linkForAccountMock.mockResolvedValue({
+      accountId: ACCOUNT.accountId,
+      epicAccountId: EPIC_ACCOUNT_ID,
+      createdAt: '2026-01-01T00:00:00.000Z',
+    });
+    await expect(handler()(linkCtx({ proof: GOOD_PROOF }))).rejects.toMatchObject({
+      status: 409,
+      code: 'epic.already_linked',
+    });
+    expect(verifyMock).not.toHaveBeenCalled();
+    expect(insertMock).not.toHaveBeenCalled();
+    expect(displaceMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['account_linked' as const, 'epic.already_linked'],
+    ['epic_taken' as const, 'epic.account_taken'],
+  ])('maps the insert race arm %s to its 409 (TOCTOU behind the pre-checks)', async (arm, code) => {
+    enableEpic();
+    insertMock.mockResolvedValue(arm);
+    await expect(handler()(linkCtx({ proof: GOOD_PROOF }))).rejects.toMatchObject({
+      status: 409,
+      code,
+    });
+    expect(reconcileMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['account_linked' as const, 'epic.already_linked'],
+    ['epic_taken' as const, 'epic.account_taken'],
+  ])(
+    'maps a displace race arm %s to its 409 (23505 re-classified behind the reclaim)',
+    async (arm, code) => {
+      enableEpic();
+      accountForEpicIdMock.mockResolvedValue(99);
+      displaceMock.mockResolvedValue({ result: arm, displacedAccountId: null });
+      await expect(handler()(linkCtx({ proof: GOOD_PROOF }))).rejects.toMatchObject({
+        status: 409,
+        code,
+      });
+      expect(reconcileMock).not.toHaveBeenCalled();
+      expect(onLinkChangedMock).not.toHaveBeenCalled();
+    },
+  );
 });
 
 // ---------------------------------------------------------------------------
@@ -258,14 +393,14 @@ describe('GET /api/epic/status', () => {
     enableEpic();
     linkForAccountMock.mockResolvedValue({
       accountId: ACCOUNT.accountId,
-      epicAccountId: 'epic-account-1',
+      epicAccountId: EPIC_ACCOUNT_ID,
       createdAt: '2026-01-01T00:00:00.000Z',
     });
     const ctx = fakeCtx({ method: 'GET', url: '/api/epic/status', account: ACCOUNT });
     await routeFor('GET', '/api/epic/status').handler(ctx);
     expect(captured(ctx.res)).toEqual({
       status: 200,
-      body: { enabled: true, linked: true, epicAccountId: 'epic-account-1' },
+      body: { enabled: true, linked: true, epicAccountId: EPIC_ACCOUNT_ID },
     });
   });
 
@@ -312,12 +447,8 @@ describe('EPIC_LINK_POLICY', () => {
         headers: bearer,
         body: { proof: GOOD_PROOF },
       });
-      // Phase 3: every allowed attempt ends as epic.upstream (verify stub),
-      // which still counts against the rate limit before the handler runs.
-      await expect(runRoute(route, ctx)).rejects.toMatchObject({
-        status: 503,
-        code: 'epic.upstream',
-      });
+      await runRoute(route, ctx);
+      expect(captured(ctx.res).status).toBe(200);
     }
     const capped = fakeCtx({
       method: 'POST',
@@ -329,21 +460,69 @@ describe('EPIC_LINK_POLICY', () => {
       status: 429,
       code: 'rate_limit.exceeded',
     });
+    // The capped request never reached the handler.
+    expect(insertMock).toHaveBeenCalledTimes(EPIC_LINK_MAX_PER_MINUTE);
   });
 });
 
 // ---------------------------------------------------------------------------
-// Pure proof helper.
+// Pure proof / token helpers (source of truth in ticket.ts; re-exported shape).
 // ---------------------------------------------------------------------------
 
 describe('proof helpers (pure)', () => {
-  it('isProofShape accepts a non-empty string inside the clamp and rejects everything else', () => {
+  it('isProofShape accepts a non-empty OAuth-safe string inside the clamp and rejects everything else', () => {
     expect(isProofShape(GOOD_PROOF)).toBe(true);
     expect(isProofShape('a'.repeat(MAX_PROOF_CHARS))).toBe(true);
+    expect(isProofShape('a'.repeat(MIN_PROOF_CHARS))).toBe(true);
     expect(isProofShape('')).toBe(false);
     expect(isProofShape(null)).toBe(false);
     expect(isProofShape(42)).toBe(false);
+    expect(isProofShape('a'.repeat(MIN_PROOF_CHARS - 1))).toBe(false);
     expect(isProofShape('a'.repeat(MAX_PROOF_CHARS + 1))).toBe(false);
+    expect(isProofShape('has space')).toBe(false);
+  });
+
+  it('pins the official token URL and grant type literals', () => {
+    expect(EPIC_TOKEN_URL).toBe('https://api.epicgames.dev/epic/oauth/v2/token');
+    expect(EXCHANGE_CODE_GRANT).toBe('exchange_code');
+  });
+
+  it('parses the OK arm and extracts account_id as epicAccountId', () => {
+    expect(
+      parseExchangeCodeTokenResponse({
+        access_token: 'eg1~unused',
+        token_type: 'bearer',
+        expires_in: 7200,
+        account_id: EPIC_ACCOUNT_ID,
+        client_id: 'client-test',
+      }),
+    ).toEqual({ kind: 'ok', epicAccountId: EPIC_ACCOUNT_ID });
+  });
+
+  it.each([
+    ['null', null],
+    ['a string', 'nope'],
+    ['an empty object', {}],
+    ['missing account_id', { access_token: 'x' }],
+    ['empty account_id', { account_id: '' }],
+    ['short account_id', { account_id: 'short' }],
+    ['illegal account_id charset', { account_id: 'bad id!!' }],
+  ])('reads %s as malformed, never a throw', (_name, body) => {
+    expect(parseExchangeCodeTokenResponse(body)).toEqual({ kind: 'malformed' });
+  });
+
+  it.each([
+    [400, { error: 'invalid_grant' }, 'invalid'],
+    [400, { error: 'invalid_request' }, 'invalid'],
+    [401, { error: 'invalid_token' }, 'invalid'],
+    [403, { error: 'access_denied' }, 'banned'],
+    [403, { error: 'account_restricted' }, 'banned'],
+    [401, { error: 'invalid_client' }, 'upstream'],
+    [503, { error: 'server_error' }, 'upstream'],
+    [400, null, 'invalid'],
+    [403, {}, 'banned'],
+  ] as const)('classifyTokenErrorStatus(%s, %j) -> %s', (status, body, expected) => {
+    expect(classifyTokenErrorStatus(status, body)).toBe(expected);
   });
 });
 
@@ -356,7 +535,15 @@ describe('login with Epic does not exist', () => {
 
   // The source files the rule covers, exactly. A new epic module joins this
   // list and the Layout section of server/epic/CLAUDE.md in the same change.
-  const EPIC_SOURCE_FILES = ['config.ts', 'epic_db.ts', 'index.ts', 'mirror.ts', 'routes.ts'];
+  const EPIC_SOURCE_FILES = [
+    'config.ts',
+    'epic_db.ts',
+    'index.ts',
+    'mirror.ts',
+    'routes.ts',
+    'ticket.ts',
+    'web_api.ts',
+  ];
 
   // The credential-minting surface the epic domain may never reach for.
   // Same widened list as tests/server/steam_routes.test.ts.
@@ -382,6 +569,10 @@ describe('login with Epic does not exist', () => {
       tsFilesUnder(EPIC_DIR).map((f) => f.file),
       'server/epic source files: a new module joins this list and stays clear of FORBIDDEN',
     ).toEqual(EPIC_SOURCE_FILES);
+    // Live URL literal must survive the comment strip (Steam twin pin).
+    expect(codeOnly(fs.readFileSync(path.join(EPIC_DIR, 'ticket.ts'), 'utf8'))).toContain(
+      "'https://api.epicgames.dev'",
+    );
     // The strip must still remove the prose that states the rule, or the scan
     // reports the documentation as a violation of itself.
     const routesSource = fs.readFileSync(path.join(EPIC_DIR, 'routes.ts'), 'utf8');
@@ -435,6 +626,20 @@ describe('login with Epic does not exist', () => {
     );
     expect(own.split(`readdir${'Sync('}`).length - 1).toBe(0);
     expect(own).toContain(`helpers/ts_files${'_under'}`);
+  });
+
+  it('a successful link response carries no token-shaped field', async () => {
+    enableEpic();
+    const ctx = fakeCtx({
+      method: 'POST',
+      url: '/api/epic/link',
+      account: ACCOUNT,
+      body: { proof: GOOD_PROOF },
+    });
+    await routeFor('POST', '/api/epic/link').handler(ctx);
+    const { body } = captured(ctx.res);
+    expect(Object.keys(body as object).sort()).toEqual(['epicAccountId', 'linked']);
+    expect(ctx.res.getHeader('set-cookie')).toBeUndefined();
   });
 
   it('the disabled surface makes the dark default safe: no env, no route runs a handler', async () => {
