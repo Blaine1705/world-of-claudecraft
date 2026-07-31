@@ -322,6 +322,15 @@ describe('desktopBuilderConfig', () => {
       /unknown desktop distribution/,
     );
   });
+
+  // Phase 1 allow-list only: epic is a first-class stamp so pure config tests
+  // can construct without Epic credentials. Full packaging (publish null,
+  // release-epic/, id stamps) is the packaging phase.
+  it('accepts epic as a distribution stamp without requiring Epic env', () => {
+    const config = desktopBuilderConfig({ base, distribution: 'epic' });
+    expect(config.extraMetadata.wocDesktop.distribution).toBe('epic');
+    expect(config.extraMetadata.wocDesktop).not.toHaveProperty('steamAppId');
+  });
 });
 
 describe('isChannelFeedFile', () => {
