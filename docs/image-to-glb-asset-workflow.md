@@ -371,7 +371,8 @@ GAME_URL=http://127.0.0.1:5184 SHOT_PREFIX=after EXPECT_CHEST=1 \
 The helper captures desktop Ultra at 1600 by 900 and mobile Low at 844 by 390. It suppresses
 the GPU notice and unrelated hostile nameplates only in the capture page, reports the
 resolved banker, camera, chest state, and browser errors, and writes matched files under
-`docs/screenshots/banker-chest/`. Stop both dev servers after inspection.
+`docs/screenshots/banker-chest/` (created on demand by the capture script; treat as
+regenerable PR evidence, not permanent tree content). Stop both dev servers after inspection.
 
 Use desktop Ultra and mobile Low as the two ends of the presentation contract. Confirm:
 
@@ -384,16 +385,11 @@ Use desktop Ultra and mobile Low as the two ends of the presentation contract. C
 - Shadows stop at the normal entity shadow distance.
 - Browser page errors are absent. Separate expected offline API failures from render errors.
 
-The accepted banker chest evidence is:
-
-| Target | Before | After |
-|---|---|---|
-| Desktop Ultra | ![Desktop before](screenshots/banker-chest/before-desktop-ultra.png) | ![Desktop after](screenshots/banker-chest/after-desktop-ultra.png) |
-| Mobile Low | ![Mobile before](screenshots/banker-chest/before-mobile-low.png) | ![Mobile after](screenshots/banker-chest/after-mobile-low.png) |
-
-The mobile view loses some fine rune definition, which is acceptable because the chest's
-silhouette, lock, banding, and role remain clear and no gameplay information depends on
-the fine detail.
+The accepted banker chest evidence is regenerable, not kept in-tree after merge. Re-run the
+capture commands above (desktop Ultra and mobile Low) when you need before/after shots for
+review. The mobile view loses some fine rune definition, which is acceptable because the
+chest's silhouette, lock, banding, and role remain clear and no gameplay information depends
+on the fine detail.
 
 ## 8. Run the contribution gates
 
