@@ -27,13 +27,20 @@ STEP 0 - PRE-FLIGHT.
   - `git status` must be clean with Phase 2 and its QA committed. Another session shares this
     checkout, so ASK before touching anything you did not create. Phase 2 QA found a foreign
     worktree registered under `.worktrees/` by a sibling session; leave any such directory alone.
-  - SYNC THE RELEASE BASE FIRST (standing rule 1 in state.md). At the end of Phase 2 QA this
-    branch was 1 BEHIND: `94142c58ff perf(render): draw-call diet for props, shadows, and world
-    batches (#2460)`, 59 files, all src/render plus tests. Run `git fetch origin
-    release/v0.33.0`, then `git rev-list --left-right --count HEAD...origin/release/v0.33.0`
-    against the FRESHLY fetched tip, merge if behind, then run the `release-merge-audit` skill
-    and re-run the gate (a gate that was green before a merge says nothing about the merged
-    result). Record the sync in progress.md either way, "no-op" included.
+  - SYNC THE RELEASE BASE FIRST (standing rule 1 in state.md), and budget real time for it. This
+    is NOT the usual no-op: `origin/release/v0.33.0` moved by more than a hundred commits during
+    the Phase 2 QA session alone, spanning src/sim, src/render, src/ui, content, i18n and the
+    admin dashboard (mounts, rift, economy/instance payloads, KTX2 asset conversions, a v0.32.x
+    main merge). MEASURE it yourself rather than trusting this line, which rots: `git fetch
+    origin release/v0.33.0`, then `git rev-list --left-right --count HEAD...origin/release/v0.33.0`
+    against the FRESHLY fetched tip.
+    Merge BEFORE any Phase 3 work, so this phase eats the conflict set instead of handing a
+    larger one to Phase 4. Then run the `release-merge-audit` skill (it exists for exactly this)
+    and re-run the gate: a gate that was green before a merge says nothing about the merged
+    result, and this merge touches the suites the packet does not otherwise go near. Expect the
+    known `tests/texture_upload.test.ts` failure to change shape or clear, since the merge brings
+    render and asset work with it; re-verify it against the post-merge base rather than assuming
+    it is still the same environmental red. Record the sync in progress.md either way.
   - Run `npm ci` in this worktree if node_modules is stale. `node -v` should be v26.5.0.
 
 MEMORY SCAN. Read these, which EXIST: frozen-clock-rig-hangs-vitest (THE one for this phase: an
