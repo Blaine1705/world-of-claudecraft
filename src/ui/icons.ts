@@ -3104,6 +3104,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
     ['sigil_rune', { p: 'flame', ...BR }],
     ['crack', 'glow'],
   ),
+  cinderhide: r('fire', 'ember', ['shield', { p: 'flame', ...BR }], ['crack', 'glow']),
   destruction_ruin: r('fire', 'ember', ['gem', { p: 'flame', ...BR }], ['crack', 'glow']),
   desolation: r('fire', 'ember', ['sunburst', { p: 'bolt', ...BR }], ['crack']),
   duskfire_claim: r('shadow', 'ember', ['skull', { p: 'flame', ...BR }], ['glow']),

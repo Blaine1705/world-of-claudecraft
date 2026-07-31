@@ -1734,3 +1734,153 @@ describe('Necromancy Warlock', () => {
 function isTemporaryUndead(entity: Entity): boolean {
   return entity.templateId !== 'graveguard';
 }
+
+// Necromancy sustain and bounded minion upkeep: the deliberate Ossuary Mark
+// detonation pays health back (a natural expiry does not), and Reaping Command
+// buys each temporary servant one, and only one, extra slice of life.
+describe('Necromancy sustain and upkeep', () => {
+  function bankOssuaryDamage(sim: Sim, target: Entity, amount: number): void {
+    sim.dealDamage(
+      sim.player,
+      target,
+      amount,
+      false,
+      'shadow',
+      'Bank Mark',
+      'hit',
+      true,
+      undefined,
+      true,
+      false,
+      true,
+      'bank_mark',
+      false,
+      undefined,
+      true,
+    );
+  }
+
+  function markedNecromancer(bank: number): { sim: Sim; target: Entity; stored: number } {
+    const sim = makeNecromancer();
+    const target = addTarget(sim);
+    sim.player.hitBonus = 1;
+    finishCast(sim, 'ossuary_mark');
+    bankOssuaryDamage(sim, target, bank);
+    const mark = target.auras.find((aura) => aura.kind === 'necromancy_ossuary_mark');
+    if (!mark) throw new Error('Expected an Ossuary Mark');
+    return { sim, target, stored: Math.round(mark.damageAccrued ?? 0) };
+  }
+
+  function ossuaryHeals(sim: Sim, events: SimEvent[]): Extract<SimEvent, { type: 'heal2' }>[] {
+    return events.filter(
+      (event): event is Extract<SimEvent, { type: 'heal2' }> =>
+        event.type === 'heal2' &&
+        event.targetId === sim.playerId &&
+        event.ability === 'Ossuary Mark',
+    );
+  }
+
+  function castReapingCommand(sim: Sim): void {
+    sim.player.resource = sim.player.maxResource;
+    sim.player.cooldowns.delete('reaping_command');
+    sim.player.gcdRemaining = 0;
+    addSoulFragments(sim.ctx, sim.player, 2);
+    sim.castAbility('reaping_command');
+  }
+
+  it('heals the Necromancer for exactly a quarter of the bank on a deliberate detonation', () => {
+    const { sim, target, stored } = markedNecromancer(1000);
+    expect(stored).toBe(200);
+    sim.player.hp = sim.player.maxHp - 100;
+    const hpBefore = sim.player.hp;
+    const targetHpBefore = target.hp;
+    drain(sim);
+
+    sim.castAbility('ossuary_mark');
+    const heals = ossuaryHeals(sim, drain(sim));
+
+    expect(target.hp).toBe(targetHpBefore - stored);
+    expect(heals).toHaveLength(1);
+    expect(heals[0]?.amount).toBe(50);
+    expect(heals[0]?.crit).toBe(false);
+    expect(heals[0]?.sourceId).toBe(sim.playerId);
+    expect(sim.player.hp).toBe(hpBefore + 50);
+  });
+
+  it('pays no health back when an Ossuary Mark expires on its own', () => {
+    const { sim, target, stored } = markedNecromancer(1000);
+    expect(stored).toBe(200);
+    sim.player.hp = sim.player.maxHp - 100;
+    const targetHpBefore = target.hp;
+    drain(sim);
+
+    const events: SimEvent[] = [];
+    for (
+      let tick = 0;
+      tick < 20 * 15 && target.auras.some((aura) => aura.kind === 'necromancy_ossuary_mark');
+      tick++
+    ) {
+      events.push(...sim.tick());
+    }
+
+    expect(target.auras.some((aura) => aura.kind === 'necromancy_ossuary_mark')).toBe(false);
+    expect(target.hp).toBe(targetHpBefore - stored);
+    expect(ossuaryHeals(sim, events)).toHaveLength(0);
+  });
+
+  it('never overheals the Necromancer past maximum health on detonation', () => {
+    const { sim, stored } = markedNecromancer(1000);
+    expect(stored).toBe(200);
+    sim.player.hp = sim.player.maxHp - 3;
+    drain(sim);
+
+    sim.castAbility('ossuary_mark');
+    const heals = ossuaryHeals(sim, drain(sim));
+
+    expect(heals).toHaveLength(1);
+    expect(heals[0]?.amount).toBe(3);
+    expect(sim.player.hp).toBe(sim.player.maxHp);
+  });
+
+  it('extends every living temporary servant once with Reaping Command and never twice', () => {
+    const sim = makeNecromancer();
+    const primary = addTarget(sim);
+    finishCast(sim, 'raise_graveguard');
+    for (let fragment = 0; fragment < 5; fragment++) finishCast(sim, 'soul_harvest');
+    finishCast(sim, 'raise_skeletal_warrior');
+    finishCast(sim, 'raise_bone_mage');
+    sim.targetEntity(primary.id);
+
+    const graveguard = ownedUndead(sim).find((undead) => undead.templateId === 'graveguard');
+    const temporary = ownedUndead(sim)
+      .filter(isTemporaryUndead)
+      .sort((a, b) => a.id - b.id);
+    if (!graveguard) throw new Error('Expected a Graveguard');
+    expect(temporary).toHaveLength(2);
+    expect(graveguard.despawnTimer).toBeUndefined();
+
+    const before = temporary.map((undead) => undead.despawnTimer ?? 0);
+    for (const remaining of before) {
+      expect(remaining).toBeGreaterThan(0);
+      expect(remaining).toBeLessThanOrEqual(30);
+    }
+
+    castReapingCommand(sim);
+    const afterFirst = temporary.map((undead) => undead.despawnTimer ?? 0);
+    afterFirst.forEach((remaining, index) => {
+      expect(remaining).toBeCloseTo(before[index] + 8, 10);
+      expect(remaining).toBeLessThanOrEqual(38);
+    });
+    for (const undead of temporary) {
+      expect(undead.auras.some((aura) => aura.id === 'reaping_command_upkeep')).toBe(true);
+    }
+    expect(graveguard.despawnTimer).toBeUndefined();
+
+    castReapingCommand(sim);
+    const afterSecond = temporary.map((undead) => undead.despawnTimer ?? 0);
+    afterSecond.forEach((remaining, index) => {
+      expect(remaining).toBe(afterFirst[index]);
+    });
+    expect(graveguard.despawnTimer).toBeUndefined();
+  });
+});

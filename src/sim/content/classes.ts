@@ -442,6 +442,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'cruel_pact',
       'shadowburn',
       'ruinous_brand',
+      'cinderhide',
       'vicarious_suffering',
       'summon_infernal',
       'rain_of_fire',
@@ -4876,8 +4877,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Litany of Guilt',
     class: 'warlock',
     specs: ['affliction'],
-    learnLevel: 10,
-    cost: 50,
+    // Hexcraft had no area damage at all before level 11, which is half of the
+    // game. Rank 1 lands at 8 as a deliberately weak two-target wave; ranks 2
+    // and 3 keep the values Litany already had at 11 and 20, so nothing that
+    // existed before is nerfed.
+    learnLevel: 8,
+    cost: 35,
     castTime: 0,
     cooldown: 20,
     range: 30,
@@ -4887,15 +4892,29 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       {
         type: 'afflictionLitany',
-        duration: 8,
+        duration: 6,
         radius: 8,
-        maxTargets: 4,
-        damage: 9,
+        maxTargets: 2,
+        damage: 5,
       },
     ],
     ranks: [
       {
         rank: 2,
+        level: 11,
+        cost: 50,
+        effects: [
+          {
+            type: 'afflictionLitany',
+            duration: 8,
+            radius: 8,
+            maxTargets: 4,
+            damage: 9,
+          },
+        ],
+      },
+      {
+        rank: 3,
         level: 20,
         cost: 65,
         effects: [
@@ -4910,7 +4929,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Curses your primary Evil Eye for 8 sec. Condemnation gains release a wave that damages up to 4 other enemies within 8 yd, at most once per second.',
+      'Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yd, at most once per second. Rank 2 extends it to 8 sec and 4 enemies.',
   },
   umbral_anchor: {
     id: 'umbral_anchor',
@@ -5011,6 +5030,34 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'ruinousBrand', duration: 15, charges: 3 }],
     description:
       'Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target.',
+  },
+  // Ruination's personal defensive. It is the siege caster's only active
+  // mitigation: Fiendhide is passive armor and Sanguine Covenant costs a
+  // talent point. Placed at level 8 so every specialization gains its
+  // defensive button at the same level (Necromancy takes Bone Armor there).
+  cinderhide: {
+    id: 'cinderhide',
+    name: 'Cinderhide',
+    class: 'warlock',
+    learnLevel: 8,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'fire',
+    requiresTarget: false,
+    specs: ['destruction'],
+    effects: [
+      {
+        type: 'selfBuff',
+        kind: 'buff_dr',
+        value: 0.25,
+        duration: 10,
+        auraId: 'cinderhide',
+        auraName: 'Cinderhide',
+      },
+    ],
+    description: 'Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%.',
   },
   summon_imp: {
     id: 'summon_imp',

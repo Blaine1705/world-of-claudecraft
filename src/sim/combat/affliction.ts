@@ -7,6 +7,7 @@ import { grantShadowCredit } from './warlock_talents';
 export const AFFLICTION_DOOM_MAX = 100;
 export const AFFLICTION_DOOM_DURATION = 20;
 export const AFFLICTION_DOOM_WARNING = 5;
+export const AFFLICTION_EYE_DEATH_GAIN = 10;
 export const FATE_THREAD_MAX = 3;
 export const FATE_THREAD_DURATION = 12;
 export const FATE_THREAD_SENTENCE_DAMAGE_PER_STACK = 0.06;
@@ -865,12 +866,39 @@ export function tickAfflictionAura(ctx: SimContext, target: Entity, aura: Aura, 
   }
 }
 
+/**
+ * A marked enemy that dies pays out one last time. Below the level cap the only
+ * reliable generation is Needle of Fate, so normal mobs die long before the pool
+ * reaches a worthwhile Sentence threshold and it then expires on the walk to the
+ * next pull. Feeding the kill back into `gainDoom` keeps the ramp alive across a
+ * questing pull chain, and refreshes the expiry exactly like every other
+ * generation event. Secondary (Coven) Eyes pay the same halved rate as every
+ * other generation path, via `eyeGeneration`.
+ */
+function afflictionEyeDeath(ctx: SimContext, target: Entity, actualDamage: number): void {
+  // `target.dead` is still false here and the auras are still attached: the
+  // lethal blow lands in dealDamage well before handleDeath flips the flag and
+  // sheds them, so this is the last frame the Eye is observable. The same two
+  // guards make a follow-up hit on the corpse (already dead, or zero landed
+  // damage) a no-op, so a single death pays out once.
+  if (actualDamage <= 0 || target.dead || target.hp > 0) return;
+  for (const eye of target.auras) {
+    if (eye.kind !== 'affliction_eye' && eye.kind !== 'affliction_eye_secondary') continue;
+    const warlock = ctx.entities.get(eye.sourceId);
+    if (!warlock || warlock.id === target.id) continue;
+    gainDoom(ctx, warlock, eyeGeneration(eye, AFFLICTION_EYE_DEATH_GAIN));
+  }
+}
+
 export function onAfflictionDamage(
   ctx: SimContext,
   source: Entity | null,
   target: Entity,
   actualDamage: number,
 ): void {
+  // Runs ahead of the source guard below so a kill by an ally, or by a
+  // source-less tick, still feeds the caster who owns the Eye.
+  afflictionEyeDeath(ctx, target, actualDamage);
   if (!source || source.id === target.id || actualDamage <= 0) return;
   const sourceCanTrigger = source.auras.some((aura) =>
     AFFLICTION_SOURCE_DAMAGE_KINDS.has(aura.kind),

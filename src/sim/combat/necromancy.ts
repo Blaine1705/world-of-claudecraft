@@ -19,6 +19,24 @@ export const LICH_SOUL_LANCE_PIERCE_TARGETS = 2;
 export const LICH_SOUL_LANCE_PIERCE_MULT = 0.5;
 export const OSSUARY_MARK_ABILITY_ID = 'ossuary_mark';
 export const SOUL_LANCE_ABILITY_ID = 'soul_lance';
+// Necromancy is the only Warlock spec with no repeatable self-heal (Sacrifice
+// Undead, at level 17, eats a servant) while Hard Bargain sells health for mana
+// from level 6. A DELIBERATE detonation (the Ossuary Mark recast) returns a
+// quarter of the banked damage as health. A mark that merely EXPIRES pays
+// nothing: the sustain is the reward for actively popping the mark, so the
+// expiry path in combat/auras.ts keeps calling detonateOssuaryMark without the
+// deliberate flag.
+export const OSSUARY_DETONATE_HEAL_PCT = 0.25;
+// Bounded minion upkeep: Reaping Command buys each LIVING temporary servant one
+// extra slice of life, exactly once in that servant's lifetime, so a 30 sec
+// summon can never live past 38 sec however often the command is pressed. The
+// permanent Graveguard carries no despawn timer and is untouched.
+export const REAPING_UPKEEP_BONUS = 8;
+const REAPING_UPKEEP_AURA_ID = 'reaping_command_upkeep';
+// The "already extended" latch rides the servant itself as a long-lived marker
+// aura (the funeral_harvest_lockout / soul_fragments idiom in this file), so it
+// dies with the servant and needs no new Entity field.
+const REAPING_UPKEEP_LATCH_DURATION = 3600;
 const DEATH_ECHO_ID_PREFIX = 'necromancy_death_echo_';
 const FUNERAL_HARVEST_MARK_DURATION = 5;
 const FUNERAL_HARVEST_LOCKOUT = 3;
@@ -496,12 +514,35 @@ function applyReapingRider(
   }
 }
 
+// Convert, do not refresh: every living temporary servant that has never been
+// extended gains REAPING_UPKEEP_BONUS seconds of remaining life and is latched
+// so a second Reaping Command cannot extend it again. Draws no rng and never
+// touches the Graveguard (permanent undead have no despawnTimer).
+function extendTemporaryUndeadUpkeep(ctx: SimContext, owner: Entity): void {
+  for (const undead of ownedNecromancyUndead(ctx, owner.id)) {
+    if (!isTemporaryNecromancyUndead(undead) || undead.despawnTimer === undefined) continue;
+    if (undead.auras.some((aura) => aura.id === REAPING_UPKEEP_AURA_ID)) continue;
+    undead.despawnTimer += REAPING_UPKEEP_BONUS;
+    ctx.applyAura(undead, {
+      id: REAPING_UPKEEP_AURA_ID,
+      name: 'Unholy Upkeep',
+      kind: 'internal_cd',
+      remaining: REAPING_UPKEEP_LATCH_DURATION,
+      duration: REAPING_UPKEEP_LATCH_DURATION,
+      value: 0,
+      sourceId: owner.id,
+      school: 'shadow',
+    });
+  }
+}
+
 export function reapWithUndead(
   ctx: SimContext,
   owner: Entity,
   target: Entity,
   abilityName: string,
 ): void {
+  extendTemporaryUndeadUpkeep(ctx, owner);
   const intents = ownedNecromancyUndead(ctx, owner.id)
     .sort((a, b) => a.id - b.id)
     .flatMap((undead) => {
@@ -701,10 +742,26 @@ function grantOssuaryDeathFragment(ctx: SimContext, owner: Entity): void {
   if (soulFragmentCount(owner) < SOUL_FRAGMENT_CAP) addSoulFragments(ctx, owner, 1);
 }
 
+// Pay the deliberate-detonation sustain. Clamped to the owner's MISSING health
+// so it can never overheal, and cast with canCrit = false: the return is a flat
+// quarter of the bank and draws no rng, so the shared stream keeps its order.
+// applyHeal emits the normal heal2 the client already renders for self-heals.
+function healOssuaryDetonation(ctx: SimContext, owner: Entity, storedDamage: number): void {
+  const missing = owner.maxHp - owner.hp;
+  if (storedDamage <= 0 || missing <= 0) return;
+  const amount = Math.min(missing, Math.round(storedDamage * OSSUARY_DETONATE_HEAL_PCT));
+  if (amount <= 0) return;
+  ctx.applyHeal(owner, owner, amount, 'Ossuary Mark', OSSUARY_MARK_ABILITY_ID, false);
+}
+
+// `deliberate` is the player-driven recast path (applyOrDetonateOssuaryMark).
+// It defaults to false so the natural-expiry caller in combat/auras.ts keeps its
+// old behavior: an expiring mark still bursts, but pays no health back.
 export function detonateOssuaryMark(
   ctx: SimContext,
   target: Entity,
   aura: Entity['auras'][number],
+  deliberate = false,
 ): void {
   const owner = necromancyOwner(ctx, aura.sourceId, OSSUARY_MARK_ABILITY_ID);
   removeOssuaryMark(ctx, target, aura);
@@ -739,6 +796,7 @@ export function detonateOssuaryMark(
       true,
     );
   }
+  if (deliberate) healOssuaryDetonation(ctx, owner, storedDamage);
   if (!target.dead) {
     if (storedDamage > 0) createDeathEcho(ctx, owner, target.pos);
     return;
@@ -758,7 +816,7 @@ export function applyOrDetonateOssuaryMark(
 ): void {
   const active = activeOssuaryMark(ctx, owner.id);
   if (active) {
-    detonateOssuaryMark(ctx, active.target, active.aura);
+    detonateOssuaryMark(ctx, active.target, active.aura, true);
     return;
   }
   ctx.applyAura(target, {

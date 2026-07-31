@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   AFFLICTION_DOOM_DURATION,
   AFFLICTION_DOOM_MAX,
+  AFFLICTION_EYE_DEATH_GAIN,
   consumeDoom,
   doomValue,
   FATE_THREAD_DURATION,
@@ -85,6 +86,25 @@ function fateThreads(target: Entity, sourceId: number): number {
   );
 }
 
+function doomRemaining(player: Entity): number {
+  return player.auras.find((aura) => aura.kind === 'affliction_doom')?.remaining ?? 0;
+}
+
+// Kills through the real damage path so the death runs the whole dealDamage ->
+// handleDeath teardown, not a hand-set hp/dead pair.
+function kill(sim: Sim, target: Entity): void {
+  ctx(sim).dealDamage(
+    sim.player,
+    target,
+    target.maxHp * 5,
+    false,
+    'shadow',
+    'Sentence',
+    'hit',
+    true,
+  );
+}
+
 function sentenceBursts(events: readonly SimEvent[]): SimEvent[] {
   return events.filter((event) => event.type === 'spellfx' && event.fx === 'sentenceBurst');
 }
@@ -106,9 +126,10 @@ describe('Affliction Warlock', () => {
     expect(at(6)).not.toContain('drain_life');
     expect(at(7)).toContain('drain_life');
     expect(at(7)).toContain('searing_pain');
+    expect(at(7)).not.toContain('litany_of_guilt');
+    expect(at(8)).toContain('litany_of_guilt');
     expect(at(9)).toContain('cruel_pact');
-    expect(at(9)).not.toContain('litany_of_guilt');
-    expect(at(10)).toContain('litany_of_guilt');
+    expect(at(11)).toContain('litany_of_guilt');
     expect(at(12)).toContain('hex_of_violence');
     expect(at(13)).toContain('life_tap');
     expect(at(13)).toContain('possess_evil_eye');
@@ -153,10 +174,21 @@ describe('Affliction Warlock', () => {
     finishCast(sim, 'evil_eye', primary);
     finishCast(sim, 'litany_of_guilt', primary);
     const litany = sim.player.auras.find((aura) => aura.kind === 'affliction_litany');
+    // Rank 1 is the early level 8 cleave; ranks 2 and 3 keep the values Litany
+    // carried at 11 and 20 before the early rank existed.
     expect(ABILITIES.litany_of_guilt.effects).toEqual(
-      expect.arrayContaining([expect.objectContaining({ type: 'afflictionLitany', damage: 9 })]),
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'afflictionLitany', damage: 5, maxTargets: 2 }),
+      ]),
     );
+    expect(ABILITIES.litany_of_guilt.ranks?.[0]?.level).toBe(11);
     expect(ABILITIES.litany_of_guilt.ranks?.[0]?.effects).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'afflictionLitany', damage: 9, maxTargets: 4 }),
+      ]),
+    );
+    expect(ABILITIES.litany_of_guilt.ranks?.[1]?.level).toBe(20);
+    expect(ABILITIES.litany_of_guilt.ranks?.[1]?.effects).toEqual(
       expect.arrayContaining([expect.objectContaining({ type: 'afflictionLitany', damage: 14 })]),
     );
     expect(litany?.duration).toBe(8);
@@ -870,7 +902,7 @@ describe('Affliction Warlock', () => {
     ).toBe(true);
   });
 
-  it('keeps all 9 Condemnation when the third Consume tick is lethal', () => {
+  it('keeps all 9 Condemnation when the third Consume tick is lethal, plus the Eye death gain', () => {
     const sim = makeAffliction();
     const target = addTarget(sim);
     finishCast(sim, 'evil_eye', target);
@@ -888,7 +920,9 @@ describe('Affliction Warlock', () => {
     finishCast(sim, 'drain_life', target);
 
     expect(target.dead).toBe(true);
-    expect(doomValue(sim.player)).toBe(9);
+    // Three drain ticks (9) plus the primary Eye death payout: the lethal tick
+    // both generates and kills, and the kill pays once.
+    expect(doomValue(sim.player)).toBe(9 + AFFLICTION_EYE_DEATH_GAIN);
   });
 
   it('keeps consecutive long-range Consume completion bonuses isolated', () => {
@@ -1470,6 +1504,71 @@ describe('Affliction Warlock', () => {
     finishCast(sim, 'hex_of_violence', secondary);
     ctx(sim).dealDamage(secondary, victim, 10, false, 'physical', 'Claw', 'hit');
     expect(doomValue(sim.player)).toBe(10);
+  });
+
+  it('feeds Condemnation and refreshes the expiry when a primary Eye target dies', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 8);
+    finishCast(sim, 'evil_eye', target);
+    consumeDoom(ctx(sim), sim.player);
+    gainDoom(ctx(sim), sim.player, 10);
+    for (let i = 0; i < 40; i++) sim.tick();
+    const decayed = doomRemaining(sim.player);
+    expect(decayed).toBeLessThan(AFFLICTION_DOOM_DURATION);
+    expect(doomValue(sim.player)).toBe(10);
+
+    kill(sim, target);
+
+    expect(target.dead).toBe(true);
+    expect(doomValue(sim.player)).toBe(10 + AFFLICTION_EYE_DEATH_GAIN);
+    expect(doomRemaining(sim.player)).toBe(AFFLICTION_DOOM_DURATION);
+  });
+
+  it('halves the Eye death Condemnation on a secondary Coven Eye', () => {
+    const sim = makeAffliction();
+    const primary = addTarget(sim, 8);
+    const secondary = addTarget(sim, 10);
+    finishCast(sim, 'evil_eye', primary);
+    finishCast(sim, 'coven', primary);
+    expect(eye(secondary, sim.playerId, true)).toBe(true);
+    consumeDoom(ctx(sim), sim.player);
+
+    kill(sim, secondary);
+
+    expect(secondary.dead).toBe(true);
+    expect(primary.dead).toBe(false);
+    expect(doomValue(sim.player)).toBe(AFFLICTION_EYE_DEATH_GAIN / 2);
+    expect(doomRemaining(sim.player)).toBe(AFFLICTION_DOOM_DURATION);
+  });
+
+  it('grants no Condemnation when an enemy without one of the caster Eyes dies', () => {
+    const sim = makeAffliction();
+    const marked = addTarget(sim, 8);
+    const unmarked = addTarget(sim, 12);
+    finishCast(sim, 'evil_eye', marked);
+    consumeDoom(ctx(sim), sim.player);
+    gainDoom(ctx(sim), sim.player, 10);
+    for (let i = 0; i < 40; i++) sim.tick();
+    const decayed = doomRemaining(sim.player);
+
+    kill(sim, unmarked);
+
+    expect(unmarked.dead).toBe(true);
+    expect(doomValue(sim.player)).toBe(10);
+    expect(doomRemaining(sim.player)).toBe(decayed);
+  });
+
+  it('caps the Eye death Condemnation at the Condemnation maximum', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 8);
+    finishCast(sim, 'evil_eye', target);
+    consumeDoom(ctx(sim), sim.player);
+    gainDoom(ctx(sim), sim.player, AFFLICTION_DOOM_MAX - 5);
+
+    kill(sim, target);
+
+    expect(target.dead).toBe(true);
+    expect(doomValue(sim.player)).toBe(AFFLICTION_DOOM_MAX);
   });
 
   it('does not echo Sentence into a secondary Eye that is no longer hostile', () => {

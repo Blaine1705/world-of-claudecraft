@@ -1193,7 +1193,12 @@ const classAbilityNamesEn = {
       [
         'litany_of_guilt',
         'Litany of Guilt',
-        'Curses your primary Evil Eye for 8 sec. Condemnation gains release a wave that damages up to 4 other enemies within 8 yards, at most once per second.',
+        'Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies.',
+      ],
+      [
+        'cinderhide',
+        'Cinderhide',
+        'Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%.',
       ],
       [
         'umbral_anchor',
