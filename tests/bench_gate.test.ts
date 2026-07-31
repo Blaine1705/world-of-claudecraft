@@ -1,14 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import type { CrowdSample } from '../scripts/lib/bench_gate.mjs';
+import type { CrowdSample, ProfessionsObserverEvidence } from '../scripts/lib/bench_gate.mjs';
 import {
   COMPOSER_TIERS,
   evaluateCrowdRun,
   evaluateJitterRun,
+  evaluateProfessionsLoadRun,
   FULLSCREEN_DRAW_FLOOR,
   gapStats,
   minGapsFor,
   parseCeilingEnv,
   pct,
+  profMinGapsFor,
+  sampleStats,
 } from '../scripts/lib/bench_gate.mjs';
 
 // A healthy fully-joined crowd sample; each case overrides the one field under test.
@@ -371,5 +374,210 @@ describe('parseCeilingEnv', () => {
   it('throws on a non-numeric value naming the variable instead of running ungated', () => {
     expect(() => parseCeilingEnv('CROWD_MIN_FPS', '30fps')).toThrow(/CROWD_MIN_FPS/);
     expect(() => parseCeilingEnv('JITTER_MAX_P95', 'abc')).toThrow(/finite/);
+  });
+});
+
+describe('sampleStats distribution summary', () => {
+  it('sorts unordered input and applies the floor nearest-rank convention', () => {
+    // 5 elements at p50: floor(0.5 * 5) = index 2 -> 3 on the sorted series even
+    // though the input arrives shuffled; a ceil convention reads 4.
+    const s = sampleStats([5, 1, 4, 2, 3]);
+    expect(s.count).toBe(5);
+    expect(s.mean).toBe(3);
+    expect(s.p50).toBe(3);
+    expect(s.max).toBe(5);
+  });
+
+  it('keeps p95, p99 and max distinct on a fixture where a label swap dies', () => {
+    const values = [];
+    for (let v = 1; v <= 100; v++) values.push(v);
+    const s = sampleStats(values);
+    // 100 elements: p95 -> floor(95) -> index 95 -> 96; p99 -> index 99 -> 100.
+    expect(s.p95).toBe(96);
+    expect(s.p99).toBe(100);
+    expect(s.max).toBe(100);
+    expect(s.mean).toBe(50.5);
+  });
+
+  it('maps an empty series to zeros instead of NaN', () => {
+    expect(sampleStats([])).toEqual({ count: 0, mean: 0, p50: 0, p95: 0, p99: 0, max: 0 });
+  });
+});
+
+// A healthy observer row; each case overrides the one field under test.
+function profObserver(
+  over: Partial<ProfessionsObserverEvidence> = {},
+): ProfessionsObserverEvidence {
+  return {
+    label: 'obs-3',
+    role: 'gather',
+    gaps: 500,
+    sawStableTw: true,
+    ncdSeen: true,
+    fishingOutcomes: 0,
+    ...over,
+  };
+}
+
+const PROF_RUN = {
+  joined: 1000,
+  expected: 1000,
+  mode: 'mixed' as const,
+  stable: true,
+  durationMs: 30000,
+};
+
+describe('evaluateProfessionsLoadRun join and observer floors', () => {
+  const fishObs = profObserver({
+    label: 'obs-9',
+    role: 'fish',
+    ncdSeen: false,
+    fishingOutcomes: 4,
+  });
+
+  it('passes a fully-joined mixed run with healthy observers on the claimed arm', () => {
+    const v = evaluateProfessionsLoadRun({ ...PROF_RUN, observers: [profObserver(), fishObs] });
+    expect(v).toEqual({ ok: true, failures: [], minGaps: 50 });
+  });
+
+  it('pins the shed-aware floor: one gap per second of window with a 50-gap minimum', () => {
+    // The professions rig measures saturation; the loop legitimately sheds to
+    // about 2 broadcasts a second at 1,000 connections, so the jitter gate's
+    // 20 Hz-derived floor (minGapsFor) must NOT be the professions floor.
+    expect(profMinGapsFor(180000)).toBe(180);
+    expect(profMinGapsFor(30000)).toBe(50);
+    expect(profMinGapsFor(51000)).toBe(51);
+    expect(profMinGapsFor(180000)).not.toBe(minGapsFor(180000));
+  });
+
+  it('fails a partial join naming the joined and expected counts', () => {
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      joined: 999,
+      observers: [profObserver(), fishObs],
+    });
+    expect(v.ok).toBe(false);
+    expect(v.failures).toHaveLength(1);
+    expect(v.failures[0]).toContain('joined 999 of 1000');
+  });
+
+  it('fails a run with no observers at all as missing evidence', () => {
+    const v = evaluateProfessionsLoadRun({ ...PROF_RUN, observers: [] });
+    expect(v.ok).toBe(false);
+    expect(v.failures.some((f) => f.includes('no parsing observers'))).toBe(true);
+  });
+
+  it('refuses an observer one below the sample floor naming both counts', () => {
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      observers: [profObserver({ gaps: 49 }), fishObs],
+    });
+    expect(v.minGaps).toBe(50);
+    expect(v.ok).toBe(false);
+    expect(v.failures).toHaveLength(1);
+    expect(v.failures[0]).toContain('49');
+    expect(v.failures[0]).toContain('50');
+  });
+
+  it('gates normally at exactly the sample floor', () => {
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      observers: [profObserver({ gaps: 50 }), fishObs],
+    });
+    expect(v.ok).toBe(true);
+  });
+});
+
+describe('evaluateProfessionsLoadRun arm purity', () => {
+  it('fails a STABLE run whose observer never saw the tw echo', () => {
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      mode: 'gather',
+      observers: [profObserver({ sawStableTw: false })],
+    });
+    expect(v.ok).toBe(false);
+    expect(v.failures).toHaveLength(1);
+    expect(v.failures[0]).toContain('never saw the stable timer-wire echo');
+  });
+
+  it('fails a LEGACY run whose observer saw the tw echo', () => {
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      mode: 'gather',
+      stable: false,
+      observers: [profObserver({ sawStableTw: true })],
+    });
+    expect(v.ok).toBe(false);
+    expect(v.failures).toHaveLength(1);
+    expect(v.failures[0]).toContain('on a legacy run');
+  });
+
+  it('passes a LEGACY run whose observer stayed on the legacy arm', () => {
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      mode: 'gather',
+      stable: false,
+      observers: [profObserver({ sawStableTw: false })],
+    });
+    expect(v.ok).toBe(true);
+  });
+});
+
+describe('evaluateProfessionsLoadRun hollow-run evidence', () => {
+  it('fails a gather observer that never received a non-empty ncd map', () => {
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      mode: 'gather',
+      observers: [profObserver({ ncdSeen: false })],
+    });
+    expect(v.ok).toBe(false);
+    expect(v.failures).toHaveLength(1);
+    expect(v.failures[0]).toContain('non-empty node-cooldown map');
+  });
+
+  it('fails a fish observer with zero fishing outcome events', () => {
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      mode: 'fish',
+      observers: [profObserver({ label: 'obs-9', role: 'fish', fishingOutcomes: 0 })],
+    });
+    expect(v.ok).toBe(false);
+    expect(v.failures).toHaveLength(1);
+    expect(v.failures[0]).toContain('fishing outcome events');
+  });
+
+  it('passes a fish observer at exactly one fishing outcome', () => {
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      mode: 'fish',
+      observers: [profObserver({ label: 'obs-9', role: 'fish', fishingOutcomes: 1 })],
+    });
+    expect(v.ok).toBe(true);
+  });
+
+  it('does not demand ncd evidence of a fish observer nor outcomes of a gather observer', () => {
+    // Per-dimension negative: the role decides which evidence arm applies.
+    const v = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      observers: [
+        profObserver({ fishingOutcomes: 0 }),
+        profObserver({ label: 'obs-9', role: 'fish', ncdSeen: false, fishingOutcomes: 2 }),
+      ],
+    });
+    expect(v.ok).toBe(true);
+  });
+
+  it('fails a mixed run that staged only one of the two roles, each direction', () => {
+    const gatherOnly = evaluateProfessionsLoadRun({ ...PROF_RUN, observers: [profObserver()] });
+    expect(gatherOnly.ok).toBe(false);
+    expect(gatherOnly.failures.some((f) => f.includes('no fish observer'))).toBe(true);
+    const fishOnly = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      observers: [
+        profObserver({ label: 'obs-9', role: 'fish', ncdSeen: false, fishingOutcomes: 2 }),
+      ],
+    });
+    expect(fishOnly.ok).toBe(false);
+    expect(fishOnly.failures.some((f) => f.includes('no gather observer'))).toBe(true);
   });
 });

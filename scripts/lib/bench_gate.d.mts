@@ -52,3 +52,32 @@ export declare function evaluateJitterRun(run: {
 }): JitterVerdict;
 export declare function pct(sorted: ReadonlyArray<number>, p: number): number;
 export declare function gapStats(snapTimes: ReadonlyArray<number>): GapStats;
+
+export interface SampleStats {
+  count: number;
+  mean: number;
+  p50: number;
+  p95: number;
+  p99: number;
+  max: number;
+}
+
+export interface ProfessionsObserverEvidence {
+  label: string;
+  role: 'gather' | 'fish';
+  gaps: number;
+  sawStableTw: boolean;
+  ncdSeen: boolean;
+  fishingOutcomes: number;
+}
+
+export declare function sampleStats(values: ReadonlyArray<number>): SampleStats;
+export declare function profMinGapsFor(durationMs: number): number;
+export declare function evaluateProfessionsLoadRun(run: {
+  joined: number;
+  expected: number;
+  mode: 'gather' | 'fish' | 'mixed';
+  stable: boolean;
+  durationMs: number;
+  observers: ReadonlyArray<ProfessionsObserverEvidence> | null | undefined;
+}): JitterVerdict;

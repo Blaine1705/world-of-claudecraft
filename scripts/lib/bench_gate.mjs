@@ -139,3 +139,99 @@ export function gapStats(snapTimes) {
     over500: over(500),
   };
 }
+
+// Distribution summary for a set of measured samples (snapshot sizes in bytes,
+// per-frame costs, ...). Same FLOOR nearest-rank pct convention as gapStats, so
+// a baseline captured with one is comparable with the other. Values are
+// reported to one decimal like gapStats; byte inputs are integers so the
+// decimals collapse for them.
+export function sampleStats(values) {
+  const sorted = [...values].sort((a, b) => a - b);
+  const sum = sorted.reduce((a, c) => a + c, 0);
+  return {
+    count: sorted.length,
+    mean: sorted.length ? +(sum / sorted.length).toFixed(1) : 0,
+    p50: +pct(sorted, 50).toFixed(1),
+    p95: +pct(sorted, 95).toFixed(1),
+    p99: +pct(sorted, 99).toFixed(1),
+    max: +(sorted.at(-1) ?? 0).toFixed(1),
+  };
+}
+
+// The professions rig's observer sample floor. This rig MEASURES saturation:
+// past the loop budget the server keeps sim ticks near 20 Hz via catch-up but
+// broadcasts once per loop callback, so the per-client snapshot cadence
+// legitimately sheds toward ~2/s at 1,000 connections (observed live). The
+// jitter gate's 20 Hz-derived floor would fail every honestly-saturated run,
+// so the floor here is one gap per second of window (min 50): below ONE
+// snapshot a second the rig or server is broken, not merely loaded.
+export function profMinGapsFor(durationMs) {
+  return Math.max(50, Math.floor(durationMs / 1000));
+}
+
+// Judges a professions load-rig run (scripts/load_professions.mjs, the R36
+// 1,000-concurrent baseline). Join enforcement is unconditional like the
+// sibling gates. The parsing OBSERVERS are the run's evidence: each must have
+// captured at least the shed-aware sample floor above, every observer must sit
+// on the ARM the run claims (a stable run whose observer never saw the tw
+// echo, or a legacy run whose observer did, measured the wrong wire arm and
+// fails), and each role must show its professions evidence (a gather observer
+// whose own node-cooldown map never went non-empty, or a fish observer with
+// zero fishing outcome events, means the fleet idled and the artifact is
+// hollow).
+export function evaluateProfessionsLoadRun({
+  joined,
+  expected,
+  mode,
+  stable,
+  durationMs,
+  observers,
+}) {
+  const failures = [];
+  if (!(Number.isFinite(joined) && joined === expected)) {
+    failures.push(
+      `joined ${joined} of ${expected} bots; partial joins always fail (lower BOTS for exploratory runs)`,
+    );
+  }
+  const minGaps = profMinGapsFor(durationMs);
+  const rows = observers ?? [];
+  if (rows.length === 0) {
+    failures.push('no parsing observers were staged; a run with no observer evidence fails');
+  }
+  const wantGather = mode === 'gather' || mode === 'mixed';
+  const wantFish = mode === 'fish' || mode === 'mixed';
+  if (wantGather && !rows.some((o) => o.role === 'gather')) {
+    failures.push(`mode=${mode} staged no gather observer; the gathering arm has no evidence`);
+  }
+  if (wantFish && !rows.some((o) => o.role === 'fish')) {
+    failures.push(`mode=${mode} staged no fish observer; the fishing arm has no evidence`);
+  }
+  for (const o of rows) {
+    if (!(Number.isFinite(o.gaps) && o.gaps >= minGaps)) {
+      failures.push(
+        `observer ${o.label} captured ${o.gaps} snapshot gaps, below the ${minGaps} floor for ${durationMs}ms; too few samples to gate`,
+      );
+    }
+    if (stable && !o.sawStableTw) {
+      failures.push(
+        `observer ${o.label} never saw the stable timer-wire echo (tw); a STABLE=1 run that rode the legacy arm measured the wrong protocol`,
+      );
+    }
+    if (!stable && o.sawStableTw) {
+      failures.push(
+        `observer ${o.label} saw the stable timer-wire echo (tw) on a legacy run; the arm under measurement is not the one claimed`,
+      );
+    }
+    if (o.role === 'gather' && !o.ncdSeen) {
+      failures.push(
+        `gather observer ${o.label} never received a non-empty node-cooldown map (ncd); no harvest completed, the run is hollow`,
+      );
+    }
+    if (o.role === 'fish' && !(Number.isFinite(o.fishingOutcomes) && o.fishingOutcomes >= 1)) {
+      failures.push(
+        `fish observer ${o.label} saw ${o.fishingOutcomes} fishing outcome events; no cast resolved, the run is hollow`,
+      );
+    }
+  }
+  return { ok: failures.length === 0, failures, minGaps };
+}
