@@ -182,7 +182,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 833,
-      "state": "9852e7e9",
+      "state": "0d1dba3a",
       "events": "120f766c",
       "rng": {
         "draws": 253,
@@ -384,7 +384,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "respawnTimer": 25,
+          "respawnTimer": 60,
           "spawnPos": {
             "x": 4,
             "y": 1.5,
@@ -409,7 +409,7 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 833,
-      "state": "bf3e2ae6",
+      "state": "54d5a2ae",
       "events": "7bf80ff7",
       "rng": {
         "draws": 300,
@@ -616,7 +616,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "respawnTimer": 24.8,
+          "respawnTimer": 59.8,
           "spawnPos": {
             "x": 4,
             "y": 1.5,
