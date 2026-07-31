@@ -1,6 +1,6 @@
 # State: Epic Games Store integration (cross-phase cheat sheet)
 
-Current phase: Phase 3 complete. Next: Phase 4 (Desktop Epic shell).
+Current phase: Phase 4 complete. Next: Phase 5 (Server link verification).
 
 Read this first in every session. Locked decisions below override memory and
 ad-hoc invention. Research background: `research-brief.md`.
@@ -164,12 +164,32 @@ Client:
   - Phase 2: extended builder scripts, no new runtime module
   - Phase 3 `server/epic/`: `config.ts`, `routes.ts`, `epic_db.ts`,
     `mirror.ts` (inert stubs), `index.ts` (routes only), `CLAUDE.md`
+  - Phase 4: `electron/epic.cjs` (+ `epic.d.cts`); thin wire in
+    `electron/main.cjs`, `electron/preload.cjs`, `src/runtime.ts`
+    `DesktopBridge`
 - Tests:
   - epic pins in `tests/electron_desktop_config.test.ts` and full epic
     packaging pins in `tests/electron_builder_config.test.ts`
   - Phase 3: `tests/server/epic_routes.test.ts` (dark default, source-scan
     no-login, rate policy, DDL pins), `tests/server/epic_db.test.ts`
     (displace transaction)
+  - Phase 4: `tests/electron_epic.test.ts` (fakes, no real EOS SDK);
+    IPC allowlist + bridge pins in `tests/electron_ipc_channels.test.ts`
+- Desktop Epic shell (Phase 4):
+  - Facade: `epicIntegrationEnabled`, `resolveEpicIds`,
+    `parseLauncherExchangeCode`, `createEpicShell` returning
+    `{ enabled, productId, deploymentId, clientId, getLinkProof,
+    cancelLinkProof }`
+  - Injectable `requireEos` (optional; omitted means no native load) and
+    `readArgv` for tests. Missing adapter: argv exchange-code fallback,
+    then null. Never throws across IPC.
+  - IPC channels: `desktop-epic-capability`, `desktop-epic-link-proof`,
+    `desktop-epic-link-settled`
+  - DesktopBridge methods: `epicLinkSupported`, `epicLinkProof`,
+    `epicLinkSettled`
+  - Capability true on epic stamp or unpackaged `WOC_EPIC_DEV=1`; false
+    on packaged website/steam. Website/steam never call `requireEos`.
+  - No EOS native vendored yet; no new runtime deps on website/steam (D24)
 - Env keys (build-time, epic channel only; D16):
   - `WOC_EPIC_PRODUCT_ID` -> stamp `wocDesktop.epicProductId`
   - `WOC_EPIC_DEPLOYMENT_ID` -> stamp `wocDesktop.epicDeploymentId`
@@ -206,8 +226,19 @@ Client:
 
 ## Open items (do not invent answers mid-phase)
 
-- O1 Exact EOS verify Web API endpoints and claim field names for the link proof
-  (confirm against current Epic docs when implementing Phase 4/5; pin literals in tests).
+- O1 Link proof shape (Phase 4 partial resolve; Phase 5 pins server verify):
+  - Desktop mints a non-empty **string** proof for `POST /api/epic/link { proof }`.
+  - Preferred mint (Epic Auth Web APIs, launcher-launched client): the Epic
+    Games Launcher **exchange code** from argv
+    (`-AUTH_TYPE=exchangecode` + `-AUTH_PASSWORD=<code>`). Pure helper:
+    `parseLauncherExchangeCode` in `electron/epic.cjs`.
+  - Optional injectable EOS adapter may return a string or `{ proof, cancel }`
+    (e.g. future ID token path). Server must not trust client-supplied Epic
+    account ids (D11).
+  - Phase 5 still owns exact upstream endpoints / claim field names for
+    verifying exchange_code (or id token) with `EPIC_CLIENT_ID` +
+    `EPIC_CLIENT_SECRET` and extracting `epic_account_id`. Pin those literals
+    in server tests when real verify lands.
 - O2 Whether achievement unlocks use EOS SDK server client, Web API, or both
   (Phase 6 chooses based on current official docs; prefer the server-trusted path).
 - O3 Vendor vs download path for EOS C SDK binaries in CI (Phase 2/4).

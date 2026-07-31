@@ -7,7 +7,7 @@
 | Phase 1: Desktop channel plumbing | complete | 2026-07-31 | 2026-07-31 |
 | Phase 2: Epic packaging channel | complete | 2026-07-31 | 2026-07-31 |
 | Phase 3: Server dark surface | complete | 2026-07-31 | 2026-07-31 |
-| Phase 4: Desktop Epic shell | not started | | |
+| Phase 4: Desktop Epic shell | complete | 2026-07-31 | 2026-07-31 |
 | Phase 5: Server link verification | not started | | |
 | Phase 6: Achievement mirror | not started | | |
 | Phase 7: Client UI + i18n | not started | | |
@@ -40,11 +40,11 @@
 - [x] Default tests green with no Epic env
 
 ### Phase 4
-- [ ] `electron/epic.cjs` facade (injectable, never throws)
-- [ ] IPC + preload + DesktopBridge types
-- [ ] Capability false on website/steam; true on epic (or WOC_EPIC_DEV)
-- [ ] Missing native EOS degrades to null
-- [ ] Unit tests with fakes (no real SDK required)
+- [x] `electron/epic.cjs` facade (injectable, never throws)
+- [x] IPC + preload + DesktopBridge types
+- [x] Capability false on website/steam; true on epic (or WOC_EPIC_DEV)
+- [x] Missing native EOS degrades to null
+- [x] Unit tests with fakes (no real SDK required)
 
 ### Phase 5
 - [ ] Pure token helpers + web_api shell
