@@ -888,6 +888,13 @@ export const id_ID: EnTranslations = {
       "heroicName": "{name} Heroik",
       "heroicLocked": "Anda terkunci pada {name} Heroik."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Floor {current} of {total}",
+      "closesIn": "Closes in {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "U",
       "NE": "TL",

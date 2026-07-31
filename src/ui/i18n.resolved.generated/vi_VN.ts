@@ -888,6 +888,13 @@ export const vi_VN: EnTranslations = {
       "heroicName": "{name} Anh Hùng",
       "heroicLocked": "Bạn đang bị khóa với {name} Anh Hùng."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Floor {current} of {total}",
+      "closesIn": "Closes in {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "B",
       "NE": "ĐB",

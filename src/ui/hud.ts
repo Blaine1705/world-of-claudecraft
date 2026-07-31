@@ -365,6 +365,7 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
+import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
 import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
 import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
 import { TrainLearnTracker } from './hud/vendor/train_learn_core';
@@ -1428,6 +1429,7 @@ export class Hud {
   private selectedCraftTab: string | null = null;
   private readonly delveBoard: DelveBoardController;
   private readonly delveTracker: DelveTrackerController;
+  private readonly riftTracker: RiftFloorTrackerController;
   private readonly lockpickController: LockpickController;
   private readonly riteController: RiteController;
   private readonly questTracker: QuestTrackerController;
@@ -1633,6 +1635,10 @@ export class Hud {
       mobName: mobDisplayName,
       attachTooltip: (element, html) => this.attachTooltip(element, html),
       closeRitePanel: (restoreFocus) => this.closeRitePanel(restoreFocus),
+    });
+    this.riftTracker = new RiftFloorTrackerController({
+      element: $('#rift-tracker'),
+      world: () => this.sim,
     });
     this.delveBoard = new DelveBoardController({
       element: $('#delve-board'),
@@ -5320,6 +5326,9 @@ export class Hud {
     // a plain update() early-returns here and re-emits nothing. relocalize()
     // clears it for exactly one rebuild (#2529).
     this.delveTracker.relocalize();
+    // Same reason as delveTracker above: the rift floor tracker's signature is
+    // floor/timer numbers, none of which move with the locale.
+    this.riftTracker.relocalize();
     // The keyed-pool party rows reuse their DOM, so a rebuild never re-runs t() on
     // their badge tooltips / leave label; re-localize them in place on a switch.
     this.partyFramesPainter.relocalize();
@@ -7994,6 +8003,7 @@ export class Hud {
 
       this.updateQuestTracker();
       this.updateDelveTracker();
+      this.updateRiftTracker();
       // Party frames run on the ~4Hz mediumHud band (the enclosing block) for EVERY tier.
       // The tier knobs deliberately do NOT tier them down on low: party-member HP is a healer's
       // only actionable signal (no self-dispel), so a graphics preset must not slow it
@@ -8432,6 +8442,10 @@ export class Hud {
 
   private updateDelveTracker(): void {
     this.delveTracker.update();
+  }
+
+  private updateRiftTracker(): void {
+    this.riftTracker.update();
   }
 
   // -------------------------------------------------------------------------

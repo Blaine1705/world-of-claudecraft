@@ -888,6 +888,13 @@ export const cs_CZ: EnTranslations = {
       "heroicName": "{name} (hrdinská)",
       "heroicLocked": "Jsi uzamčen(a) k hrdinské verzi {name}."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Floor {current} of {total}",
+      "closesIn": "Closes in {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "S",
       "NE": "SV",

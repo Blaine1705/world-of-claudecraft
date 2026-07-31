@@ -888,6 +888,13 @@ export const sv_SE: EnTranslations = {
       "heroicName": "Heroisk {name}",
       "heroicLocked": "Du är låst till Heroisk {name}."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Floor {current} of {total}",
+      "closesIn": "Closes in {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NÖ",

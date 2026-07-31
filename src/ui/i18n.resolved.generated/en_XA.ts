@@ -888,6 +888,13 @@ export const en_XA: EnTranslations = {
       "heroicName": "[Ĥéŕóíç {name}]",
       "heroicLocked": "[Ýóú áŕé ļóçķéð ţó Ĥéŕóíç {name}.]"
     },
+    "riftTracker": {
+      "title": "[Ŕíƒţ]",
+      "floor": "[Ƒļóóŕ {current} óƒ {total}]",
+      "closesIn": "[Çļóšéš íñ {time}]",
+      "clockMs": "[{minutes}:{seconds}]",
+      "clockHms": "[{hours}:{minutes}:{seconds}]"
+    },
     "compass": {
       "N": "[Ñ]",
       "NE": "[ÑÉ]",

@@ -10227,6 +10227,19 @@ export class Sim {
     return inst.bossDeathZones;
   }
 
+  // Milliseconds remaining before the current rift's backing world event stops
+  // admitting new parties (null outside a rift, or for a dev-spawned rift with no
+  // backing RiftEvent). Sim-clock arithmetic only (event.expiresAt and this.time are
+  // both sim-clock seconds), recomputed fresh on every call so a repeated read ticks
+  // down like raidLockouts() does, with no caching to go stale between ticks.
+  riftEventMsRemaining(): number | null {
+    const view = this.riftFloor;
+    if (!view || view.eventId === null) return null;
+    const event = this.riftEvents.find((candidate) => candidate.eventId === view.eventId);
+    if (!event) return null;
+    return Math.max(0, Math.round((event.expiresAt - this.time) * 1000));
+  }
+
   get delveRun(): DelveRunInfo | null {
     return this.delveRunWire(this.primaryId) as DelveRunInfo | null;
   }

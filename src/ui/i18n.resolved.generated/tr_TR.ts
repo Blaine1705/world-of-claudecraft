@@ -888,6 +888,13 @@ export const tr_TR: EnTranslations = {
       "heroicName": "Kahramanca {name}",
       "heroicLocked": "Kahramanca {name} akınına kilitlisin."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Floor {current} of {total}",
+      "closesIn": "Closes in {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "K",
       "NE": "KD",

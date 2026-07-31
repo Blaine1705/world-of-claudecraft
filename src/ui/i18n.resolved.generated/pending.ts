@@ -10,54 +10,149 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ],
   "es_ES": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ],
   "fr_FR": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ],
   "fr_CA": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ],
   "en_CA": [],
   "it_IT": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ],
   "de_DE": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.title"
+  ],
+  "zh_TW": [
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.title"
+  ],
+  "ko_KR": [
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.title"
+  ],
+  "ja_JP": [
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.title"
+  ],
   "pt_BR": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.title"
+  ],
   "cs_CZ": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ],
   "nl_NL": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ],
   "pl_PL": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ],
   "id_ID": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ],
   "tr_TR": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ],
   "sv_SE": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ],
   "vi_VN": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ],
   "da_DK": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.riftTracker.clockHms",
+    "hudChrome.riftTracker.clockMs",
+    "hudChrome.riftTracker.closesIn",
+    "hudChrome.riftTracker.floor",
+    "hudChrome.riftTracker.title"
   ]
 };

@@ -888,6 +888,13 @@ export const zh_TW: EnTranslations = {
       "heroicName": "英雄難度:{name}",
       "heroicLocked": "你已被鎖定至英雄難度的{name}。"
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "第 {current} 層，共 {total} 層",
+      "closesIn": "裂隙將在 {time} 後關閉",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "北",
       "NE": "東北",

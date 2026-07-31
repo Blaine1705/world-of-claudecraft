@@ -888,6 +888,13 @@ export const ko_KR: EnTranslations = {
       "heroicName": "영웅: {name}",
       "heroicLocked": "영웅 난이도 {name}에 귀속되었습니다."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "{total}층 중 {current}층",
+      "closesIn": "균열이 {time} 후 닫힙니다",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "북",
       "NE": "북동",

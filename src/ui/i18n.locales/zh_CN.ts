@@ -4196,6 +4196,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': '英雄徽记',
   'hudChrome.raidLockout.heroicName': '英雄难度：{name}',
   'hudChrome.raidLockout.heroicLocked': '你已被锁定至英雄难度的{name}。',
+  'hudChrome.riftTracker.floor': '第 {current} 层，共 {total} 层',
+  'hudChrome.riftTracker.closesIn': '裂隙将在 {time} 后关闭',
   'entities.items.morthens_cryptforged_hauberk.name': '莫尔森的墓铸锁甲',
   'entities.items.shadowpulse_handwraps.name': '暗影脉冲裹手',
   'entities.items.bonechill_striders.name': '骨寒行者之靴',

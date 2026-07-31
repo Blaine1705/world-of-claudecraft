@@ -888,6 +888,13 @@ export const ru_RU: EnTranslations = {
       "heroicName": "Героический режим: {name}",
       "heroicLocked": "Вы закреплены за героическим подземельем: {name}."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Этаж {current} из {total}",
+      "closesIn": "Разлом закроется через {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "С",
       "NE": "СВ",

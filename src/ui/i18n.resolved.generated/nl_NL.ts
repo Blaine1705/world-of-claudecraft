@@ -888,6 +888,13 @@ export const nl_NL: EnTranslations = {
       "heroicName": "Heroïsch {name}",
       "heroicLocked": "Je bent vergrendeld voor Heroïsch {name}."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Floor {current} of {total}",
+      "closesIn": "Closes in {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NO",

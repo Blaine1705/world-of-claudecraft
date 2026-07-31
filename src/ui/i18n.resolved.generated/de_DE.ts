@@ -888,6 +888,13 @@ export const de_DE: EnTranslations = {
       "heroicName": "Heroisch {name}",
       "heroicLocked": "Du bist für Heroisch {name} gesperrt."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Floor {current} of {total}",
+      "closesIn": "Closes in {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NO",

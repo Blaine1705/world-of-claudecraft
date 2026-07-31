@@ -4369,6 +4369,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': '英雄の証',
   'hudChrome.raidLockout.heroicName': 'ヒロイック:{name}',
   'hudChrome.raidLockout.heroicLocked': 'ヒロイックの{name}にロックされています。',
+  'hudChrome.riftTracker.floor': 'フロア {current}/{total}',
+  'hudChrome.riftTracker.closesIn': 'リフトは{time}後に閉じます',
   'entities.items.morthens_cryptforged_hauberk.name': 'モルセンの墓鋳ホーバーク',
   'entities.items.shadowpulse_handwraps.name': 'シャドウパルスの手巻き',
   'entities.items.bonechill_striders.name': 'ボーンチルのストライダー',

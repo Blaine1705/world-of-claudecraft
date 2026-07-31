@@ -888,6 +888,13 @@ export const pt_BR: EnTranslations = {
       "heroicName": "{name} Heroico",
       "heroicLocked": "Você está vinculado a {name} Heroico."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Floor {current} of {total}",
+      "closesIn": "Closes in {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NE",

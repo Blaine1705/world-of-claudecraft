@@ -4354,6 +4354,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': '영웅의 징표',
   'hudChrome.raidLockout.heroicName': '영웅: {name}',
   'hudChrome.raidLockout.heroicLocked': '영웅 난이도 {name}에 귀속되었습니다.',
+  'hudChrome.riftTracker.floor': '{total}층 중 {current}층',
+  'hudChrome.riftTracker.closesIn': '균열이 {time} 후 닫힙니다',
   'entities.items.morthens_cryptforged_hauberk.name': '모르텐의 묘지주조 사슬갑옷',
   'entities.items.shadowpulse_handwraps.name': '어둠파동 손싸개',
   'entities.items.bonechill_striders.name': '뼈서리 장화',

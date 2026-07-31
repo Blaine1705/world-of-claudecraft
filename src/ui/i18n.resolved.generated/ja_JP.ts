@@ -888,6 +888,13 @@ export const ja_JP: EnTranslations = {
       "heroicName": "ヒロイック:{name}",
       "heroicLocked": "ヒロイックの{name}にロックされています。"
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "フロア {current}/{total}",
+      "closesIn": "リフトは{time}後に閉じます",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "北",
       "NE": "北東",

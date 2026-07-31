@@ -4396,6 +4396,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': 'Героический знак',
   'hudChrome.raidLockout.heroicName': 'Героический режим: {name}',
   'hudChrome.raidLockout.heroicLocked': 'Вы закреплены за героическим подземельем: {name}.',
+  'hudChrome.riftTracker.floor': 'Этаж {current} из {total}',
+  'hudChrome.riftTracker.closesIn': 'Разлом закроется через {time}',
   'entities.items.morthens_cryptforged_hauberk.name': 'Кольчуга Мортена из гробничной стали',
   'entities.items.shadowpulse_handwraps.name': 'Обмотки теневого пульса',
   'entities.items.bonechill_striders.name': 'Сапоги костяного холода',
