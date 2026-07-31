@@ -268,13 +268,15 @@ export const GFX_BUDGETS: Record<GfxTier, GfxRuntimeBudget> = {
     recoverStableSeconds: 3,
     cooldownSeconds: 0.85,
   },
+  // Ultra is both a player-selected premium preset and the strong-desktop default.
+  // Keep its governor armed, but wait for sustained 30ms pressure before shedding.
   ultra: {
     targetFps: 60,
     minRenderScaleDesktop: 0.78,
     minRenderScaleMobile: 0.68,
     maxRenderScale: 1,
-    dropFrameMs: 24,
-    urgentFrameMs: 34,
+    dropFrameMs: 30,
+    urgentFrameMs: 44,
     recoverFrameMs: 15,
     dropStep: 0.08,
     urgentDropStep: 0.12,
@@ -282,10 +284,8 @@ export const GFX_BUDGETS: Record<GfxTier, GfxRuntimeBudget> = {
     recoverStableSeconds: 3,
     cooldownSeconds: 0.85,
   },
-  // Insane keeps the runtime governor (shouldUseAutoGovernor) but on a LOOSER
-  // budget than every other tier: the player explicitly bought the everything-on
-  // preset, so the governor only steps in on genuine disasters (sustained 30ms+
-  // frames) rather than fighting the choice at the first 40fps dip.
+  // Insane shares ultra's loose frame thresholds and takes smaller quality steps.
+  // Its draw caps stay slightly higher because the preset deliberately draws more.
   insane: {
     targetFps: 60,
     minRenderScaleDesktop: 0.78,
@@ -837,19 +837,15 @@ export function graphicsPresetLabel(
   }
 }
 
-export function shouldUseAutoGovernor(tier: GfxTier, search: string): boolean {
+export function shouldUseAutoGovernor(_tier: GfxTier, search: string): boolean {
   const params = new URLSearchParams(search);
   const override = params.get('governor') ?? params.get('autoGovernor');
   if (override === '1' || override === 'true' || override === 'on') return true;
   if (override === '0' || override === 'false' || override === 'off') return false;
-  // The runtime governor adapts every non-ultra tier; ultra opts out (the player explicitly maxed
-  // it, or a recognized strong desktop auto-resolved there). Keying off the RESOLVED tier, not the
-  // raw preset, keeps the governor ON for a first-run inconclusive device (the medium fallback) so
-  // it can step quality down, instead of being silently opted out by an unset-preset -> ultra label.
-  // INSANE deliberately keeps the governor: it is the everything-on showcase and can bury any GPU,
-  // so the governor stays armed on the deliberately loose GFX_BUDGETS.insane thresholds (it only
-  // reacts to sustained 30ms+ frames, never fighting the player's explicit choice on a dip).
-  return tier !== 'ultra';
+  // Every resolved tier keeps the runtime governor armed. Ultra and insane use deliberately loose
+  // GFX_BUDGETS thresholds, so they react only to sustained 30ms pressure or an urgent 44ms frame
+  // instead of fighting a premium preset on a transient dip.
+  return true;
 }
 
 export function configureMaskedDoubleSidedVegetationMaterial<T extends THREE.Material>(mat: T): T {

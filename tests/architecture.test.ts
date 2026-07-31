@@ -301,6 +301,7 @@ const RENDER_PURE_CORES = [
   'src/render/eastbrook_town_visibility_core.ts',
   'src/render/occluder_fade_core.ts',
   'src/render/point_light_shader_core.ts',
+  'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',

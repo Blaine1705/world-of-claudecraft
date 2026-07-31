@@ -147,7 +147,7 @@ describe('gfx override application', () => {
       low: '352fdd74fc282f00c72da0d5e0d6b0184cf072e38371c0167cd6d5f6888a7e3c',
       medium: '3768346ca6a0290feb400c0284c28f211540dcb7b273a34b596991d35dd8e333',
       high: 'e8bed7606574c26585a32ac6a50f3e065022c40ba190415c0a5bac0a7b4768bb',
-      ultra: '75550b4ddb948e54ccb8be687017c77fdf9ee4918d1d4e308442f8fa7e2e826a',
+      ultra: 'cc7d9ff411c256c93da39c06b6a47ed6569ecec134c4b90a64abc0077512fa21',
       insane: '6f2bc36c5e1a78e01113b9fc344692119b54afdbd297874ba046f3e56c5e84a2',
       advanced: 'e0215c43f28a9e42347d51a4f1ec2ac2814f6849e6d57c51de30b13cb98a1e5a',
     });

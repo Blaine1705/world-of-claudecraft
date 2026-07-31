@@ -11,6 +11,7 @@ import {
   SRGBTransfer,
   type Texture,
   type ToneMapping,
+  Vector4,
   type WebGLRenderer,
   type WebGLRenderTarget,
 } from 'three';
@@ -26,6 +27,7 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
   uniform sampler2D tDiffuse;
   uniform sampler2D tBloom;
   uniform float uTime;
+  uniform vec4 uInputUvRect;
 
   #include <tonemapping_pars_fragment>
   #include <colorspace_pars_fragment>
@@ -46,10 +48,11 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
   }
 
   void main() {
-    vec4 outputColor = texture(tDiffuse, vUv);
+    vec2 inputUv = min(vUv * uInputUvRect.xy, uInputUvRect.zw);
+    vec4 outputColor = texture(tDiffuse, inputUv);
 
     #ifdef BLOOM_PREPARED
-      vec4 bloom = texture(tBloom, vUv);
+      vec4 bloom = texture(tBloom, inputUv);
       outputColor.rgb = quantizeHalf(outputColor.rgb + bloom.rgb * bloom.a);
     #endif
 
@@ -105,6 +108,7 @@ export class OutputGradePass extends Pass {
     tBloom: { value: Texture | null };
     toneMappingExposure: { value: number };
     uTime: TimeUniform;
+    uInputUvRect: { value: Vector4 };
   };
   readonly material: RawShaderMaterial;
   readonly fsQuad: FullScreenQuad;
@@ -120,6 +124,7 @@ export class OutputGradePass extends Pass {
       tBloom: { value: bloomTexture },
       toneMappingExposure: { value: 1 },
       uTime: timeUniform,
+      uInputUvRect: { value: new Vector4(1, 1, 1, 1) },
     };
     this.material = new RawShaderMaterial({
       name: 'OutputGradeShader',
@@ -131,6 +136,10 @@ export class OutputGradePass extends Pass {
       depthWrite: false,
     });
     this.fsQuad = new FullScreenQuad(this.material);
+  }
+
+  setInputUvRect(scaleX: number, scaleY: number, maxX: number, maxY: number): void {
+    this.uniforms.uInputUvRect.value.set(scaleX, scaleY, maxX, maxY);
   }
 
   override render(

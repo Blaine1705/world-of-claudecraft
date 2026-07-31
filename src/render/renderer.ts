@@ -144,6 +144,12 @@ import {
   governorDrawSignal,
 } from './draw_stats_core';
 import { DungeonInteriors, dungeonDaisHasRaisedPlatform, ensureDungeonAssets } from './dungeon';
+import {
+  dynamicResolutionAllocationScale,
+  dynamicResolutionGovernorRange,
+  dynamicResolutionRect,
+  MIN_DYNAMIC_RENDER_SCALE,
+} from './dynamic_resolution_core';
 import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { objectDisplayName } from './entity_labels';
@@ -1290,6 +1296,7 @@ export class Renderer {
   // settings-menu graphics knobs (applied live)
   private renderScale = 1; // user-requested resolution ceiling on top of the device pixel ratio
   private effectiveRenderScale = 1; // runtime value after adaptive backoff
+  private renderPixelHeight = 1;
   private frameMsEma = 16.7;
   private adaptiveGrace = 2.0;
   // biome-ignore lint/correctness/noUnusedPrivateClassMembers: write-only render-budget restore state (pre-existing); read path not yet wired.
@@ -1748,6 +1755,7 @@ export class Renderer {
     this.viewport = this.measureViewport();
     this.webgl.setPixelRatio(Math.min(window.devicePixelRatio, GFX.pixelRatioCap));
     this.webgl.setSize(this.viewport.width, this.viewport.height, false);
+    this.renderPixelHeight = this.webgl.domElement.height;
     // Three's default checkShaderErrors=true queries getShader/ProgramInfoLog
     // after every link: a SYNCHRONOUS GPU-process roundtrip that blocks until
     // the driver finishes compiling. Measured on a zone-streaming walk it was
@@ -2443,17 +2451,41 @@ export class Renderer {
     this.applyResolution();
   }
 
-  // Push the current device pixel ratio (× renderScale, still capped by the
-  // tier) to the renderer, composer, and vfx. Shared by resize and the
-  // render-scale setting so a window resize never drops the chosen scale.
+  // Allocate at the manual resolution ceiling. Automatic changes on the supported
+  // grade-only path update only the live region below, never target storage.
   private applyResolution(): void {
-    const ratio = Math.min(window.devicePixelRatio, GFX.pixelRatioCap) * this.effectiveRenderScale;
+    const basePixelRatio = Math.min(window.devicePixelRatio, GFX.pixelRatioCap);
+    const allocationScale = dynamicResolutionAllocationScale(
+      this.post?.supportsDynamicResolution === true,
+      this.renderScale,
+      this.effectiveRenderScale,
+    );
+    const ratio = basePixelRatio * allocationScale;
     this.webgl.setPixelRatio(ratio);
     this.webgl.setSize(this.viewport.width, this.viewport.height, false);
     if (this.post) {
       this.post.setSize(this.viewport.width, this.viewport.height, ratio);
     }
-    const devicePxHeight = this.webgl.domElement.clientHeight * this.webgl.getPixelRatio();
+    this.applyRenderRegion();
+  }
+
+  private applyRenderRegion(): void {
+    const post = this.post;
+    let devicePxHeight = this.webgl.domElement.clientHeight * this.webgl.getPixelRatio();
+    this.renderPixelHeight = this.webgl.domElement.height;
+    if (post?.supportsDynamicResolution) {
+      const rect = dynamicResolutionRect({
+        logicalWidth: this.viewport.width,
+        logicalHeight: this.viewport.height,
+        pixelRatio: Math.min(window.devicePixelRatio, GFX.pixelRatioCap),
+        renderScale: this.effectiveRenderScale,
+        maxRenderScale: this.renderBudgetMaxScale(),
+        minRenderScale: Math.max(MIN_DYNAMIC_RENDER_SCALE, this.renderBudgetMinScale()),
+      });
+      post.setRenderRegion(rect);
+      this.renderPixelHeight = rect.renderHeight;
+      devicePxHeight *= rect.renderHeight / rect.targetHeight;
+    }
     this.vfx.setViewportScale(devicePxHeight, 60);
     // Weapon-skin VFX point sprites size against the device-pixel height too:
     // future rigs read the module value, live rigs re-scale in place.
@@ -3137,7 +3169,12 @@ export class Renderer {
     this.foliage.setModelQuality(state.levels.foliage);
     this.vfx.setQuality(state.levels.vfx);
     this.effectivePointLights = Math.max(1, Math.round(GFX.maxPointLights * state.levels.lighting));
-    if (Math.abs(previousScale - this.effectiveRenderScale) >= 0.001) this.applyResolution();
+    if (
+      Math.abs(previousScale - this.effectiveRenderScale) >= 0.001 &&
+      this.post?.supportsDynamicResolution
+    ) {
+      this.applyRenderRegion();
+    }
   }
 
   private graphicsBucketLevels(state = this.renderBudgetGovernor.state()): GfxBucketLevels {
@@ -3524,12 +3561,17 @@ export class Renderer {
     if (!Number.isFinite(dt) || dt <= 0) return;
     const frameMs = Math.min(250, dt * 1000);
     const info = this.webgl.info;
-    // Do not let the live governor resize the drawing buffers during play.
-    // Three/WebGL can turn setSize/setPixelRatio into a large synchronous
-    // allocation on weak GPUs/software GL, which is worse than the pressure
-    // signal it is trying to fix. Manual render-scale changes still apply via
-    // setRenderScale(); the automatic governor keeps to grass/VFX budgets here.
-    const lockedRenderScale = this.effectiveRenderScale;
+    // Grade-only chains can vary a fixed target's viewport and upscale through
+    // OutputGradePass. Direct-to-canvas profiles have no upscale pass. N8AO,
+    // bloom, and SMAA sample neighboring full-target texels, so their chains stay
+    // locked until every internal target and depth read can honor the live rect.
+    const dynamicResolution = this.post?.supportsDynamicResolution === true;
+    const resolutionRange = dynamicResolutionGovernorRange(
+      dynamicResolution,
+      this.effectiveRenderScale,
+      this.renderBudgetMinScale(),
+      this.renderBudgetMaxScale(),
+    );
     // Composer tiers route through governorDrawSignal, which pins the frozen
     // legacy constant (1 call/1 triangle, the pre-accumulator post-frame read)
     // so the governor's draw arm stays exactly as dead as before (packet 0 R1).
@@ -3553,8 +3595,8 @@ export class Renderer {
     sample.grassVisibleChunks = this.lastFrameStats.foliage.grassVisibleChunks;
     sample.activeViews = this.lastFrameStats.activeViews;
     sample.createdViews = this.lastFrameStats.createdViews;
-    sample.minRenderScale = lockedRenderScale;
-    sample.maxRenderScale = lockedRenderScale;
+    sample.minRenderScale = resolutionRange.minRenderScale;
+    sample.maxRenderScale = resolutionRange.maxRenderScale;
     const state = this.renderBudgetGovernor.update(sample, this.renderBudgetState);
     this.frameMsEma = state.frameMsEma;
     this.adaptiveCooldown = state.cooldownSeconds;
@@ -3758,7 +3800,7 @@ export class Renderer {
     const fogNear = (this.scene.fog as THREE.Fog).near;
     const projectionPixels = projectionScalePixels(
       this.camera.projectionMatrix.elements[5],
-      this.webgl.domElement.height,
+      this.renderPixelHeight,
     );
     this.lastWaterSimulationPasses = this.waterView.update(
       this.time,
@@ -8458,7 +8500,7 @@ export class Renderer {
     let worldStart = performance.now();
     const projectionPixels = projectionScalePixels(
       this.camera.projectionMatrix.elements[5],
-      this.webgl.domElement.height,
+      this.renderPixelHeight,
     );
     this.tmpV2.subVectors(this.cameraLookAt, this.camera.position).normalize();
 
