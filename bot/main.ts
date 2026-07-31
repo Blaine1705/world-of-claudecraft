@@ -12,7 +12,6 @@
 // this file is the wiring. esbuild-bundled for Node via `npm run bot`.
 
 import { DISCORD_REWARD_GRANTS } from '../src/sim/discord_tier';
-import { PRESENCE_DEBOUNCE_MS, RELAY_POLL_MS, ROLE_SYNC_INTERVAL_MS } from './cadence';
 import { loadConfig } from './config';
 import { DiscordApi, governorFromConfig } from './discord_api';
 import { Gateway } from './gateway';
@@ -24,14 +23,13 @@ import {
   buildLinkContent,
   buildRelayMessage,
   buildWhoamiContent,
-  chunk,
   clearDepartedFlair,
   clearedMemberMeta,
   computeRoleSync,
   GUILD_LARGE_THRESHOLD,
   indexSpecialRoleIds,
   isSlashCommand,
-  MEMBERS_META_BATCH,
+  type MemberMetaRecord,
   memberRolesFromPayload,
   type RawVoiceState,
   reconcileMemberRolesFromUpdate,
@@ -42,6 +40,15 @@ import {
   topSpecialRoleKeyFor,
   voiceMembersForChannel,
 } from './logic';
+import {
+  decideMemberUpdate,
+  displayNameOf,
+  nickOf,
+  pushChangedMemberMeta,
+  pushOneMemberMeta,
+  writeMemberNickname,
+} from './member_writes';
+import { LoopScheduler } from './scheduler';
 import { ServerClient, type VoiceMemberPush } from './server_client';
 
 async function main(): Promise<void> {
@@ -64,6 +71,9 @@ async function main(): Promise<void> {
   const governor = governorFromConfig(cfg);
   const discord = new DiscordApi(cfg.token, undefined, governor);
   const server = new ServerClient(cfg.gameServerUrl, cfg.botSecret);
+  // Every background loop and the presence debounce run on this one scheduler; the
+  // tasks themselves are registered further down, next to the work they drive.
+  const scheduler = new LoopScheduler();
 
   await discord.registerGuildCommands(cfg.clientId, cfg.guildId, [...SLASH_COMMANDS]);
 
@@ -123,6 +133,23 @@ async function main(): Promise<void> {
   const memberRoles = new Map<string, string[]>();
   const memberJoined = new Map<string, number>(); // userId -> guild join epoch ms
   const onlineUsers = new Set<string>();
+  // The member's RAW `nick` field, null when they have none. Deliberately not
+  // memberNames: displayNameOf collapses nick, global_name and username into one
+  // string, so it cannot tell "the nick is exactly X" from "there is no nick and
+  // the global name happens to be X". The nickname PATCH's precondition is about
+  // the nick field specifically, so the diff needs the field itself (D5).
+  const memberNicks = new Map<string, string | null>();
+  // The nick this bot last successfully PATCHed, per member. Only used to
+  // recognize our own GUILD_MEMBER_UPDATE echo coming back.
+  const lastWrittenNick = new Map<string, string>();
+  // The members-meta record we last successfully PUSHED, per member. Written only
+  // after the server accepted it, so a failed push retries on the next sweep.
+  const lastPushedMeta = new Map<string, MemberMetaRecord>();
+  // The three caches a nickname write reads and, on success only, updates.
+  const nickCaches = { memberNicks, memberNames, lastWrittenNick };
+  const metaIo = {
+    pushMembersMeta: (records: MemberMetaRecord[]) => server.pushMembersMeta(records),
+  };
   let voiceChannelName: string | null = null; // resolved from GUILD_CREATE channels
   let memberTotal = 0; // total guild members (from GUILD_CREATE member_count)
   let announced = false; // guards the one-time startup announcement post
@@ -136,19 +163,19 @@ async function main(): Promise<void> {
     const id = String(u.id ?? '');
     if (!id) return '';
     memberNames.set(id, displayNameOf(m, u));
+    memberNicks.set(id, nickOf(m));
     memberRoles.set(id, memberRolesFromPayload(m));
     const joined = typeof m.joined_at === 'string' ? Date.parse(m.joined_at) : NaN;
     if (Number.isFinite(joined)) memberJoined.set(id, joined);
     return id;
   };
 
-  let presenceTimer: ReturnType<typeof setTimeout> | null = null;
+  // The presence push is debounced on the scheduler (a `debounce` task runs one
+  // full window after the first kick and folds every kick in that window into it),
+  // so this is now just the kick. The task itself is registered below, beside the
+  // poll loops, because that is where every cadence in this file lives.
   const schedulePresencePush = (): void => {
-    if (presenceTimer) return;
-    presenceTimer = setTimeout(() => {
-      presenceTimer = null;
-      void pushPresence();
-    }, PRESENCE_DEBOUNCE_MS);
+    presenceTask.kick();
   };
   const pushPresence = async (): Promise<void> => {
     const voice: VoiceMemberPush[] = cfg.voiceChannelId
@@ -161,6 +188,17 @@ async function main(): Promise<void> {
       voice,
     });
   };
+  // A `debounce` task, which is the presenceTimer guard this replaces expressed on
+  // the scheduler: the first kick opens one window, every kick inside it folds in,
+  // and the push runs once at the end. The scheduler adds what the raw timer had
+  // no notion of, an overlap guard, so a burst arriving during a slow push can no
+  // longer start a second one beside it.
+  const presenceTask = scheduler.add({
+    name: 'presence-push',
+    mode: 'debounce',
+    cadence: { activeMs: cfg.presenceDebounceMs },
+    run: () => pushPresence(),
+  });
 
   // ── slash command handling ───────────────────────────────────────────────────
   const handleInteraction = async (d: Record<string, unknown>): Promise<void> => {
@@ -242,9 +280,15 @@ async function main(): Promise<void> {
     if (cfg.syncNicknames && flex.character) {
       const base = flex.username ?? memberNames.get(userId) ?? 'Member';
       const nick = buildLevelNick(base, flex.character.level, flex.character.class);
-      await discord
-        .setNickname(cfg.guildId, userId, nick)
-        .catch((e) => console.error('[bot] setNickname failed', e));
+      // D5: only PATCH when the computed nick actually differs from the nick we
+      // last observed. This is the incident's biggest single source of load: the
+      // write was unconditional, so every linked online member was PATCHed every
+      // sweep forever, and each PATCH made Discord emit a GUILD_MEMBER_UPDATE that
+      // the handler below turned into a members-meta POST back into the game.
+      await writeMemberNickname(userId, nick, nickCaches, {
+        setNickname: (id, value) => discord.setNickname(cfg.guildId, id, value),
+        onError: (e) => console.error('[bot] setNickname failed', e),
+      });
     }
   };
   const syncAllOnlineRoles = async (): Promise<void> => {
@@ -268,11 +312,17 @@ async function main(): Promise<void> {
           else void reconcileDepartedMembers().catch((e) => console.error(e));
           schedulePresencePush();
           // Sync tier roles for everyone online right away, so a freshly linked
-          // member's role matches their points without waiting for the poll.
-          void syncAllOnlineRoles().catch((e) => console.error(e));
-          // Push member join dates + staff roles so the game shows member-since +
+          // member's role matches their points without waiting for the poll, and
+          // push member join dates + staff roles so the game shows member-since +
           // role color/tag for linked players.
-          void pushAllMemberMeta().catch((e) => console.error(e));
+          //
+          // Both are KICKS rather than bare calls now, which is the GUILD_CREATE
+          // trap: Discord re-sends GUILD_CREATE on every re-IDENTIFY, so a
+          // reconnect storm delivers a burst of them, and a burst of fire-and-
+          // forget sweeps is how a blip became a sustained storm. Kicks against an
+          // in-flight sweep collapse into exactly one follow-up.
+          roleSyncTask.kick();
+          memberMetaTask.kick();
           // One-time "bot online" announcement so the integration is visibly live.
           if (cfg.testChannelId && !announced) {
             announced = true;
@@ -325,10 +375,21 @@ async function main(): Promise<void> {
           const u = (d.user ?? {}) as Record<string, unknown>;
           const userId = String(u.id ?? '');
           if (!userId) return;
-          const roles = reconcileMemberRolesFromUpdate(d);
-          if (roles) memberRoles.set(userId, roles);
+          // Judged BEFORE the caches move, which is why the decision is computed
+          // in one place rather than inline: the question is whether this update
+          // tells us anything we did not already write ourselves (D5), and that
+          // is only answerable against the OLD cached roles.
+          const decision = decideMemberUpdate(
+            d,
+            u,
+            { roles: memberRoles.get(userId) ?? [], lastWrittenNick: lastWrittenNick.get(userId) },
+            { roles: reconcileMemberRolesFromUpdate, displayName: displayNameOf },
+          );
+          if (decision.roles) memberRoles.set(userId, decision.roles);
           // The update may also carry a changed nick/global_name.
-          memberNames.set(userId, displayNameOf(d, u));
+          memberNames.set(userId, decision.displayName);
+          memberNicks.set(userId, decision.nick);
+          if (!decision.push) break;
           void pushMemberMeta(userId).catch((e) => console.error(e));
           break;
         }
@@ -342,6 +403,8 @@ async function main(): Promise<void> {
           const userId = String(u.id ?? '');
           if (!userId) return;
           void server.setMember(userId, false);
+          // A cleared record IS a change, so this push is unconditional: the diff
+          // above must never suppress it.
           void server
             .pushMembersMeta([clearedMemberMeta(userId)])
             .catch((e) => console.error('[bot] clear member meta failed', e));
@@ -350,6 +413,11 @@ async function main(): Promise<void> {
           memberJoined.delete(userId);
           voiceStates.delete(userId);
           onlineUsers.delete(userId);
+          // Drop the diff caches too, or a member who leaves and rejoins would be
+          // compared against their pre-departure record and never re-pushed.
+          memberNicks.delete(userId);
+          lastWrittenNick.delete(userId);
+          lastPushedMeta.delete(userId);
           break;
         }
         case 'GUILD_MEMBERS_CHUNK': {
@@ -368,7 +436,9 @@ async function main(): Promise<void> {
           const idx = typeof d.chunk_index === 'number' ? d.chunk_index : 0;
           const count = typeof d.chunk_count === 'number' ? d.chunk_count : 1;
           if (idx >= count - 1) {
-            void pushAllMemberMeta().catch((e) => console.error(e));
+            // Same coalescing reason as GUILD_CREATE: a reconnect re-runs the whole
+            // op 8 backfill, so the final chunk arrives once per reconnect.
+            memberMetaTask.kick();
             void reconcileDepartedMembers().catch((e) => console.error(e));
           }
           break;
@@ -425,16 +495,21 @@ async function main(): Promise<void> {
   // (a large-guild backfill streams well past a single cap; capping the total
   // would leave every member past the cutoff without meta).
   const pushAllMemberMeta = async (): Promise<void> => {
-    for (const batch of chunk([...memberRoles.keys()], MEMBERS_META_BATCH)) {
-      await server.pushMembersMeta(batch.map(memberMetaRecord));
-    }
+    // D5: only members whose record actually moved since the last SUCCESSFUL push.
+    // In steady state that is nobody, so a sweep sends no request at all; the
+    // byte-batching still applies to whatever is left.
+    await pushChangedMemberMeta(
+      [...memberRoles.keys()].map(memberMetaRecord),
+      lastPushedMeta,
+      metaIo,
+    );
   };
 
   // Push a single member's meta (used when a live role change re-resolves their
   // flair), so a role grant/removal reflects in game without waiting for the poll.
   const pushMemberMeta = async (id: string): Promise<void> => {
     if (!id || !memberRoles.has(id)) return;
-    await server.pushMembersMeta([memberMetaRecord(id)]);
+    await pushOneMemberMeta(memberMetaRecord(id), lastPushedMeta, metaIo);
   };
 
   // Members who left while the bot was OFFLINE never fire GUILD_MEMBER_REMOVE,
@@ -450,7 +525,14 @@ async function main(): Promise<void> {
     if (!flagged) return;
     const stale = staleFlairedIds(flagged, new Set(memberRoles.keys()));
     await clearDepartedFlair(stale, (id) => memberRoles.has(id), {
-      pushMembersMeta: (records) => server.pushMembersMeta(records),
+      // Same rejoin reasoning as GUILD_MEMBER_REMOVE: once a member's stored flair
+      // is cleared, their last-pushed record no longer describes server state, so
+      // it must not be left behind to suppress a later push.
+      pushMembersMeta: async (records) => {
+        const pushed = await server.pushMembersMeta(records);
+        for (const record of records) lastPushedMeta.delete(record.discord_user_id);
+        return pushed;
+      },
       setMember: (id, guildMember) => server.setMember(id, guildMember),
     });
   };
@@ -516,38 +598,61 @@ async function main(): Promise<void> {
     }
   };
 
+  // ── background loops ─────────────────────────────────────────────────────────
+  // Every cadence in this file lives here, on one scheduler. These were six bare
+  // repeating timers, which fire on a fixed rhythm whether or not the previous run
+  // has finished: once a sweep ran long the next started anyway, the two contended
+  // for the same Discord buckets, and a slow minute became a storm that outlived
+  // restarts. The scheduler chains each delay after the previous run SETTLES, so
+  // overlap is impossible by construction, and jitters them so six loops armed in
+  // one boot do not stay phase-locked on the same tick.
+  //
+  // Which function runs, and what it does, is unchanged. Only the mechanism is
+  // new: the intervals are the same values (now D13 env-overridable, defaulting to
+  // exactly today's numbers), and the special-roles refresh still runs immediately
+  // before the roster push rather than beside it.
+  const roleSyncTask = scheduler.add({
+    name: 'role-sync',
+    cadence: { activeMs: cfg.roleSyncIntervalMs },
+    run: () => syncAllOnlineRoles(),
+  });
+  scheduler.add({
+    name: 'tier-roles',
+    cadence: { activeMs: cfg.roleSyncIntervalMs },
+    run: () => refreshTierRoles(),
+  });
+  scheduler.add({ name: 'relay', cadence: { activeMs: cfg.relayPollMs }, run: () => pollRelay() });
+  scheduler.add({
+    name: 'activity',
+    cadence: { activeMs: cfg.relayPollMs },
+    run: () => pollActivity(),
+  });
+  scheduler.add({
+    name: 'daily-rewards-winners',
+    cadence: { activeMs: cfg.relayPollMs },
+    run: () => pollDailyRewardWinners(),
+  });
+  const memberMetaTask = scheduler.add({
+    name: 'special-roles-and-meta',
+    cadence: { activeMs: cfg.roleSyncIntervalMs },
+    // The pairing is the point, and it is ordered: the roster push reads the
+    // special-role index the refresh rebuilds, so a push that ran first would
+    // publish the PREVIOUS sweep's role flair. An awaited pair also means a failed
+    // refresh skips the push entirely, exactly as the chained form it replaces did.
+    run: async () => {
+      await refreshSpecialRoles();
+      await pushAllMemberMeta();
+    },
+  });
+
   gateway.connect(false);
-  setInterval(
-    () => void syncAllOnlineRoles().catch((e) => console.error(e)),
-    ROLE_SYNC_INTERVAL_MS,
-  ).unref();
-  setInterval(
-    () => void refreshTierRoles().catch((e) => console.error(e)),
-    ROLE_SYNC_INTERVAL_MS,
-  ).unref();
-  setInterval(() => void pollRelay().catch((e) => console.error(e)), RELAY_POLL_MS).unref();
-  setInterval(() => void pollActivity().catch((e) => console.error(e)), RELAY_POLL_MS).unref();
-  setInterval(
-    () => void pollDailyRewardWinners().catch((e) => console.error(e)),
-    RELAY_POLL_MS,
-  ).unref();
-  setInterval(() => {
-    void refreshSpecialRoles()
-      .then(() => pushAllMemberMeta())
-      .catch((e) => console.error(e));
-  }, ROLE_SYNC_INTERVAL_MS).unref();
+  scheduler.startAll();
   console.log('[bot] World of ClaudeCraft Discord bot started');
 }
 
 // ── small helpers ──────────────────────────────────────────────────────────────
 function asArray(v: unknown): Record<string, unknown>[] {
   return Array.isArray(v) ? (v as Record<string, unknown>[]) : [];
-}
-function displayNameOf(member: Record<string, unknown>, user: Record<string, unknown>): string {
-  const nick = typeof member.nick === 'string' ? member.nick : '';
-  const global = typeof user.global_name === 'string' ? user.global_name : '';
-  const username = typeof user.username === 'string' ? user.username : '';
-  return nick || global || username || 'Member';
 }
 
 main().catch((err) => {
