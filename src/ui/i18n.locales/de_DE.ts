@@ -3874,8 +3874,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Beendet die Abklingzeit von Flimmerschritt, Frostschleier und Großer Unsichtbarkeit. (Magiertalent)',
   'entities.abilities.greater_invisibility.name': 'Große Unsichtbarkeit',
-  'entities.abilities.greater_invisibility.description':
-    'Ihr verschwindet 20 Sek. lang: Entfernt 2 Effekte mit regelmäßigem Schaden und verringert Euren erlittenen Schaden während der Unsichtbarkeit und kurz danach um 90%. (Magiertalent)',
   'entities.abilities.hot_streak.name': 'Heiße Serie',
   'entities.abilities.hot_streak.description':
     'Passiv: Zwei aufeinanderfolgende kritische Treffer mit Euren Feuerzaubern (Feuerball, Feuerschlag, Versengen, Pyroschlag oder Flammenstoß) machen Euren nächsten Pyroschlag oder Flammenstoß zu einem kostenlosen Spontanzauber. Die verbrauchenden Zauber zählen für die NÄCHSTE Serie, auch kostenlose Einsätze; Flammenstoß zählt unabhängig von der Zahl getroffener Gegner nur einmal, und nur der erste Einschlag kann zählen. (Feuer)',

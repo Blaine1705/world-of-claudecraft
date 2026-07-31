@@ -34,6 +34,16 @@ describe('options_window: no magic values', () => {
   });
 });
 
+describe('options_window: aura menu routing', () => {
+  it('routes the top-level Auras view to its settings panel and placement preview', () => {
+    expect(painter).toContain("case 'auras':");
+    expect(painter).toContain('this.renderAuras();');
+    // Optional chain: unstuck tests (and any pre-wire path) close without hooks.
+    expect(painter).toContain("this.deps.auraOverlays?.().setPlacement(this.view === 'auras')");
+    expect(painter).toContain('this.auraSettings.render(body);');
+  });
+});
+
 describe('options_window: tier boundary', () => {
   it('reads the graphics preset as a plain setting value, never the governor/cutoff', () => {
     expect(painter).not.toContain('ui_effects_profile');

@@ -13,14 +13,10 @@ import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/mounts/terrorspark_groundshaker.glb');
-// The textured surface layer (UVs, per-vertex baked shading, six embedded maps)
-// roughly doubled the asset over the blockout, and the KTX2 conversion the
-// texture-compression gate requires (tests/glb_texture_compression.test.ts)
-// doubled it again on disk: basisu supercompression trades file size for a
-// GPU-ready upload. The shipped tank sits at 1134 KiB; the bound keeps real
-// headroom because the sha pin above it already fails any re-export, so this
-// budget's one job is catching unbounded growth, not byte drift.
-const SHIPPING_BUDGET = 1280 * 1024;
+// Textured surface + KTX2 embeds put this above the lighter WebP-era mounts
+// (valorsteed 562 KiB, gobbler 555 KiB, toad 499 KiB). Budget tracks the
+// shipped KTX2 GLB so the pin stays honest about size as well as content.
+const SHIPPING_BUDGET = 1200 * 1024;
 const EXPECTED_SOURCE_FINGERPRINT =
   '52a28d2009046c90ce062ec47371b22aa01feab1484fe7bca2a3c6d02715bc9d';
 const EXPECTED_ASSET_SHA256 = 'a9ff2ca566419d2a2f002cab968840db437d2f2d2b6d7fab72fdbebe7808e7f9';
@@ -75,7 +71,7 @@ describe('tank mount asset pipeline', () => {
     const mutated = Buffer.from(bytes);
     mutated[Math.floor(mutated.length / 2)] ^= 1;
     expect(createHash('sha256').update(mutated).digest('hex')).not.toBe(EXPECTED_ASSET_SHA256);
-    expect(bytes.length).toBeGreaterThan(1024 * 1024);
+    expect(bytes.length).toBeGreaterThan(512 * 1024);
     expect(bytes.length).toBeLessThanOrEqual(SHIPPING_BUDGET);
     expect(MEDIA_ASSETS['models/mounts/terrorspark_groundshaker.glb']).toBe(
       `/media/models/mounts/terrorspark_groundshaker.${sha256.slice(0, 12)}.glb`,

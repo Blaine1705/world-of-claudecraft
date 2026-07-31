@@ -1282,6 +1282,51 @@ export const zh_TW: EnTranslations = {
         "offline": "離線"
       }
     },
+    "auraOverlay": {
+      "title": "光環",
+      "currentClass": "目前職業：{class}",
+      "previewHint": "使用「設定位置」移動光環，避免擋住選單。",
+      "noProcs": "此角色沒有可用的支援觸發效果。",
+      "enabled": "顯示光環",
+      "icon": "法術圖示",
+      "arcs": "側邊弧形",
+      "groundRing": "地面圓環",
+      "groundRingSpellOrder": "地面圓環：法術順序",
+      "crescentsSpellOrder": "側邊弧形：法術順序",
+      "size": "大小",
+      "iconSize": "圖示大小",
+      "crescentBlockSize": "弧形區塊大小",
+      "groundRingBlockSize": "地面圓環區塊大小",
+      "opacity": "不透明度",
+      "color": "顏色",
+      "allOn": "全部開啟",
+      "allOff": "全部關閉",
+      "reposition": "設定位置",
+      "positioning": "定位：{aura}",
+      "selectAura": "光環",
+      "done": "完成",
+      "moveLeft": "向左移動",
+      "moveUp": "向上移動",
+      "moveDown": "向下移動",
+      "moveRight": "向右移動",
+      "moveEarlier": "將法術向內移動",
+      "moveLater": "將法術向外移動",
+      "screenPosition": "螢幕位置",
+      "spellOrder": "法術順序",
+      "reset": "重設位置",
+      "spellPosition": "法術順序 {position} / {count}",
+      "procs": {
+        "revenge": "復仇！",
+        "battleTrance": "戰鬥冥想",
+        "overpowerCharge": "赤手充能",
+        "suddenDeath": "猝死",
+        "victoryRush": "乘勝追擊",
+        "enrage": "狂亂：激怒",
+        "heatingUp": "熱身",
+        "arcaneCharge": "秘法充能",
+        "aetherRush": "以太奔湧"
+      }
+    },
     "playerCard": {
       "showWalletBadge": "顯示錢包徽章"
     },
@@ -7285,7 +7330,7 @@ export const zh_TW: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "強效隱形術",
-        "description": "消失 20 秒：移除 2 個持續傷害效果，並使你在隱形期間及結束後短時間內受到的傷害降低 90%。（法師天賦）"
+        "description": "消失 20 秒並移除 2 個持續傷害效果。隱形結束時，受到的傷害降低 90%，持續 2 秒。（法師天賦）"
       },
       "hot_streak": {
         "name": "熾熱連擊",

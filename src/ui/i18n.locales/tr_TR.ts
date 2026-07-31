@@ -9353,8 +9353,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Titrek Adım, Ayaz Örtüsü ve Üstün Görünmezlik yeteneklerinin bekleme süresini bitirir. (büyücü yeteneği)',
   'entities.abilities.greater_invisibility.name': 'Üstün Görünmezlik',
-  'entities.abilities.greater_invisibility.description':
-    '20 sn. boyunca kaybolursun: 2 zamanla hasar etkisini kaldırır ve görünmezken ve hemen sonrasında %90 daha az hasar alırsın. (büyücü yeteneği)',
   'entities.abilities.hot_streak.name': 'Sıcak Seri',
   'entities.abilities.hot_streak.description':
     'Pasif: Ateş büyülerinle (Köz Oku, Köz Yağmuru, Haşlama, Alev Mızrağı veya Alev Vuruşu) art arda yaptığın iki kritik vuruş, sonraki Alev Mızrağı veya Alev Vuruşu büyünü anında ve bedelsiz hale getirir. Harcayıcılar, bedelsiz kullanımlar dâhil SONRAKİ seriye sayılır; Alev Vuruşu kaç düşmana vurursa vursun bir kez sayılır ve yalnızca ilk çarpma hesaba katılır. (Ateş)',

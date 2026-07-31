@@ -112,6 +112,7 @@ export const IWORLD_MEMBERS = [
   { name: 'questsDone', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
+  { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
   { name: 'castAbility', kind: 'method' },
   { name: 'castAbilityAt', kind: 'method' },
   { name: 'castAbilityBySlot', kind: 'method' },
@@ -505,12 +506,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // toolEffectSlots (data) and slotToolEffect (method) for 276, the
     // acquisition craft's recharge command (rechargeToolEffect) makes 277,
     // and the UX pass's node respawn countdown read (nodeRespawnSeconds)
-    // makes 278; the v0.33.0 sync merge brings the rift floor timer HUD's
-    // riftEventMsRemaining and the instance-payload pipes'
-    // marketListInstance (both methods) for 280.
-    expect(IWORLD_MEMBERS.length).toBe(280);
+    // makes 278; the v0.33.0 sync merges bring the rift floor timer HUD's
+    // riftEventMsRemaining, the instance-payload pipes' marketListInstance,
+    // and reactive aura timing's reactiveAbilityWindowRemaining (all
+    // methods) for 281.
+    expect(IWORLD_MEMBERS.length).toBe(281);
     expect(DATA_MEMBERS.length).toBe(73);
-    expect(METHOD_MEMBERS.length).toBe(207);
+    expect(METHOD_MEMBERS.length).toBe(208);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -720,6 +722,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questState',
       'questsDone',
       'raidLockouts',
+      'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
       'realm',
       'rechargeToolEffect',
@@ -1027,6 +1030,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'prestige',
       'questState',
       'raidLockouts',
+      'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
       'rechargeToolEffect',
       'releaseEmpoweredAbility',
@@ -1165,6 +1169,7 @@ const FACET_COMBAT = [
   'known',
   'activeFrostRings',
   'activeTemporalHourglasses',
+  'reactiveAbilityWindowRemaining',
   'castAbility',
   'castAbilityAt',
   'castAbilityBySlot',
@@ -1635,8 +1640,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(280);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(280);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(281);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(281);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -3729,8 +3729,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Finaliza el tiempo de reutilización de Paso centelleante, Velo de Escarcha e Invisibilidad superior. (Talento de mago)',
   'entities.abilities.greater_invisibility.name': 'Invisibilidad superior',
-  'entities.abilities.greater_invisibility.description':
-    'Desaparece durante 20 s: elimina 2 efectos de daño en el tiempo y recibes un 90% menos de daño mientras eres invisible y poco después. (Talento de mago)',
   'entities.abilities.hot_streak.name': 'Buena racha',
   'entities.abilities.hot_streak.description':
     'Pasivo: dos golpes críticos seguidos con tus hechizos de Fuego (Bola de Fuego, Explosión de Fuego, Agostar, Piroexplosión o Fogonazo) hacen que tu próxima Piroexplosión o Fogonazo sea instantánea y gratuita. Los hechizos que consumen el efecto cuentan para la SIGUIENTE racha, incluidos los lanzamientos gratuitos; Fogonazo cuenta una sola vez sin importar a cuántos enemigos golpee, y solo el impacto inicial puede contar. (Fuego)',

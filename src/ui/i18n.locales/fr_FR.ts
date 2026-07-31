@@ -4311,8 +4311,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Met fin au temps de recharge de Pas scintillant, Voile de givre et Invisibilité supérieure. (Talent de mage)',
   'entities.abilities.greater_invisibility.name': 'Invisibilité supérieure',
-  'entities.abilities.greater_invisibility.description':
-    'Vous disparaissez pendant 20 s : dissipe 2 effets de dégâts sur la durée et réduit les dégâts subis de 90% tant que vous êtes invisible et peu après. (Talent de mage)',
   'entities.abilities.hot_streak.name': 'Bonne série',
   'entities.abilities.hot_streak.description':
     "Passif : deux coups critiques consécutifs avec vos sorts de Feu (Boule de feu, Trait de feu, Brûlure, Explosion pyrotechnique ou Choc de flammes) rendent votre prochaine Explosion pyrotechnique ou votre prochain Choc de flammes instantané et gratuit. Les sorts qui consomment cet effet comptent pour la série SUIVANTE, y compris les incantations gratuites ; Choc de flammes ne compte qu'une fois, quel que soit le nombre d'ennemis touchés, et seul l'impact initial peut compter. (Feu)",

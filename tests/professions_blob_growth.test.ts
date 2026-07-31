@@ -36,7 +36,7 @@ import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
 import { MAX_CRAFTED_BY_LENGTH } from '../src/sim/professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH, MAX_KNOWN_RECIPE_IDS } from '../src/sim/professions/training';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
-import { EQUIP_SLOTS, type InvSlot } from '../src/sim/types';
+import { ALL_EQUIP_SLOTS, type InvSlot } from '../src/sim/types';
 
 const makeSim = (seed = 31) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
 
@@ -153,10 +153,12 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // The settled ceiling measured 8,469 bytes when this bound was re-minted
 // (2026-07-30, after the review round grew the fixture honest: every equip
 // slot instanced and signed, every cadence window live; this content: 120
-// nodes, 79 recipes, 10 ring crafts, 4 gathering professions, 12 equip
-// slots, 7 cadence quests). The pinned ceiling leaves about 1,250 bytes of
-// headroom, roughly two and a half complete zones of node growth, before it
-// needs re-minting.
+// nodes, 79 recipes, 10 ring crafts, 4 gathering professions, 7 cadence
+// quests). That measurement iterated the launch-era eleven-slot list; the
+// v0.33.0 offhand fix retired it, the fixture now instances all twelve
+// live slots (ALL_EQUIP_SLOTS), and the settled ceiling re-measured 8,587
+// bytes. The pinned ceiling leaves about 1,140 bytes of headroom, roughly
+// two complete zones of node growth, before it needs re-minting.
 const PROFESSIONS_BYTE_CEILING = 9728;
 
 function ceilingSim(): Sim {
@@ -206,7 +208,7 @@ function ceilingSim(): Sim {
   // (only slot-keyed payloads are measured), so the declaration-order pick
   // is cosmetic; it exists to keep the equipment map non-empty.
   const instanceItemId = Object.keys(ITEMS)[0];
-  for (const slot of EQUIP_SLOTS) {
+  for (const slot of ALL_EQUIP_SLOTS) {
     meta.equipment[slot] = instanceItemId;
     meta.equipmentInstance[slot] = {
       enchant: 'enchant_weapon_might',
@@ -331,7 +333,7 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(Object.keys(s2.questCadence ?? {})).toHaveLength(
       Object.values(QUESTS).filter((q) => q.repeatCadenceTicks).length,
     );
-    expect(Object.keys(s2.equipmentInstance ?? {})).toHaveLength(EQUIP_SLOTS.length);
+    expect(Object.keys(s2.equipmentInstance ?? {})).toHaveLength(ALL_EQUIP_SLOTS.length);
 
     // The byte bound itself, on the settled state.
     const bytes = professionsBytes(s2);
@@ -407,9 +409,9 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(s1.knownRecipes?.some((id) => id.length > MAX_KNOWN_RECIPE_ID_LENGTH)).toBe(true);
     const overSigner = 'S'.repeat(MAX_CRAFTED_BY_LENGTH + 1);
     const legalSigner = 'A'.repeat(MAX_CRAFTED_BY_LENGTH);
-    const corruptSlot = EQUIP_SLOTS[0];
-    const keptSlot = EQUIP_SLOTS[1];
-    const numericSlot = EQUIP_SLOTS[2];
+    const corruptSlot = ALL_EQUIP_SLOTS[0];
+    const keptSlot = ALL_EQUIP_SLOTS[1];
+    const numericSlot = ALL_EQUIP_SLOTS[2];
     const corrupt = s1.equipmentInstance?.[corruptSlot];
     if (!corrupt) throw new Error('ceiling fixture lost its first equip instance');
     corrupt.signer = overSigner;

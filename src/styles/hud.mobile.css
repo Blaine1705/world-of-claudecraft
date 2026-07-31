@@ -64,6 +64,10 @@
   body.mobile-touch #proc-overlay {
     scale: 0.2;
   }
+  body.mobile-touch .aura-overlay-arc {
+    top: 14px;
+    height: 156px;
+  }
   /* The HUD overlay must let one-finger panning reach scrollable windows (Bag,
      Market, etc.) on iOS: Safari intersects touch-action down the ancestor
      chain, so `none` here would block child scroll containers and a child's
