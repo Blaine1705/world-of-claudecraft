@@ -80,4 +80,20 @@ describe('rift SFX wiring: dynamic point ambience (src/render/rift_ambience.ts)'
     sim.player.riftSliding = false;
     expect(riftAmbientSources(sim.entities).some((s) => s.kind === 'rift_ice_glide')).toBe(false);
   });
+
+  it('picks up a DIFFERENT player gliding, not just self, matching the wire-synced riftSliding flag any party member can carry', () => {
+    const sim = makeSim();
+    const otherPid = sim.addPlayer('rogue', 'Glidebuddy');
+    const other = sim.entities.get(otherPid)!;
+    other.riftSliding = true;
+    other.pos = { x: 12, y: 0, z: 34 };
+    const sources = riftAmbientSources(sim.entities);
+    const match = sources.find((s) => s.id === `rift_ice_glide:${otherPid}`);
+    expect(match).toBeTruthy();
+    expect(match?.kind).toBe('rift_ice_glide');
+    expect(match?.x).toBe(12);
+    expect(match?.z).toBe(34);
+    // Self is not sliding, so only the other player's source shows up.
+    expect(sources.filter((s) => s.kind === 'rift_ice_glide')).toHaveLength(1);
+  });
 });
