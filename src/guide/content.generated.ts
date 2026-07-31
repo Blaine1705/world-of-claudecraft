@@ -163,6 +163,13 @@ export interface GuideProfTool {
   craftedBy?: string;
   /** Delve Marks price, for a tool a delve counter stocks. Absent otherwise. */
   priceMarks?: number;
+  /** Total delve clears the Marks row unlocks after (shop.ts 'clears:N'). */
+  marksClears?: number;
+  /** True when the Marks row unlocks after a Heroic clear. */
+  marksHeroicClear?: boolean;
+  /** R22 wield requirement (proficiency in the tool's own trade) for land
+   *  tools above tier 1. Absent for tier 1 and for every fishing rod. */
+  wieldProficiency?: number;
 }
 
 export interface GuideProfNodeRow {
@@ -7774,7 +7781,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 40
       },
       {
         "name": "Skysilver Mining Pick",
@@ -7786,7 +7794,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 70
       },
       {
         "name": "Osmium Mining Pick",
@@ -7795,7 +7804,9 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "priceCopper": null,
         "vendors": [],
         "craftedBy": "engineering",
-        "priceMarks": 24
+        "priceMarks": 24,
+        "marksClears": 3,
+        "wieldProficiency": 85
       },
       {
         "name": "Glyphsteel Mining Pick",
@@ -7804,7 +7815,9 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "priceCopper": null,
         "vendors": [],
         "craftedBy": "engineering",
-        "priceMarks": 56
+        "priceMarks": 56,
+        "marksHeroicClear": true,
+        "wieldProficiency": 100
       }
     ],
     "nodes": [
@@ -7978,7 +7991,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 40
       },
       {
         "name": "Ironbark Axe",
@@ -7990,7 +8004,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 70
       },
       {
         "name": "Ashwood Axe",
@@ -7999,7 +8014,9 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "priceCopper": null,
         "vendors": [],
         "craftedBy": "engineering",
-        "priceMarks": 24
+        "priceMarks": 24,
+        "marksClears": 3,
+        "wieldProficiency": 85
       },
       {
         "name": "Highpine Axe",
@@ -8008,7 +8025,9 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "priceCopper": null,
         "vendors": [],
         "craftedBy": "engineering",
-        "priceMarks": 56
+        "priceMarks": 56,
+        "marksHeroicClear": true,
+        "wieldProficiency": 100
       }
     ],
     "nodes": [
@@ -8182,7 +8201,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 40
       },
       {
         "name": "Sheenleaf Sickle",
@@ -8194,7 +8214,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 70
       },
       {
         "name": "Goldleaf Sickle",
@@ -8203,7 +8224,9 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "priceCopper": null,
         "vendors": [],
         "craftedBy": "engineering",
-        "priceMarks": 24
+        "priceMarks": 24,
+        "marksClears": 3,
+        "wieldProficiency": 85
       },
       {
         "name": "Sunpetal Sickle",
@@ -8212,7 +8235,9 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "priceCopper": null,
         "vendors": [],
         "craftedBy": "engineering",
-        "priceMarks": 56
+        "priceMarks": 56,
+        "marksHeroicClear": true,
+        "wieldProficiency": 100
       }
     ],
     "nodes": [
@@ -8411,7 +8436,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "priceCopper": null,
         "vendors": [],
         "craftedBy": "engineering",
-        "priceMarks": 24
+        "priceMarks": 24,
+        "marksClears": 3
       },
       {
         "name": "Tidewrought Fishing Rod",
@@ -8420,7 +8446,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "priceCopper": null,
         "vendors": [],
         "craftedBy": "engineering",
-        "priceMarks": 56
+        "priceMarks": 56,
+        "marksHeroicClear": true
       }
     ],
     "fishing": {

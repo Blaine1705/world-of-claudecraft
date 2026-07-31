@@ -10444,6 +10444,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolsHeading': '道具',
   'guide.profPages.toolCrafted': '製作品（{craft}）',
   'guide.profPages.toolCraftedOrMarks': '{craft}で製作、または探索の印 {marks} で購入',
+  'guide.profPages.toolCraftedOrMarksHeroic':
+    '{craft}で製作、またはヒロイック攻略後に探索の印 {marks} で購入',
   'guide.profPages.toolVendor': '{name}（{hub}）',
   'guide.profPages.toolUnavailable': '非売品',
   'guide.profPages.priceNone': '非売品',

@@ -43,6 +43,7 @@ import {
 } from '../src/guide/routes';
 import { buildIndex, rank } from '../src/guide/search';
 import { DEEDS } from '../src/sim/content/deeds';
+import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
@@ -100,6 +101,11 @@ import {
   tierForSkill,
   tierProgressMultiplier,
 } from '../src/sim/professions/wheel';
+import {
+  TIER4_TOOL_WIELD_PROFICIENCY,
+  TIER5_TOOL_WIELD_PROFICIENCY,
+  WIELD_REQUIREMENT_BY_TIER,
+} from '../src/sim/professions/wield_gate';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
@@ -1380,6 +1386,38 @@ describe('Guide professions gathering accuracy', () => {
           ALL_RECIPES.find((r) => r.resultItemId === itemId)?.professionId,
         );
       }
+      // R22 wield column: land tools above tier 1 publish the frozen wield
+      // requirement; tier 1 and every fishing rod publish none (rods are the
+      // structural exemption, wield_gate.ts).
+      if (use.professionId !== 'fishing' && use.tier >= 2) {
+        expect(rows[0].wieldProficiency, `${itemId} wield requirement`).toBe(
+          WIELD_REQUIREMENT_BY_TIER[use.tier],
+        );
+      } else {
+        expect(rows[0].wieldProficiency, `${itemId} must publish no wield`).toBeUndefined();
+      }
+      // The Marks route publishes its clears gate exactly as the delve
+      // counter enforces it, and the tier-4 rows all sit on clears:3, which
+      // is what keeps the English "three delve clears" in
+      // guide.profPages.toolCraftedOrMarks honest.
+      const shopRow = Object.values(DELVE_SHOPS)
+        .flat()
+        .find((e) => e.itemId === itemId);
+      if (shopRow) {
+        expect(rows[0].priceMarks, `${itemId} Marks price`).toBe(shopRow.marks);
+        if (shopRow.gate === 'heroicClear') {
+          expect(rows[0].marksHeroicClear, `${itemId} heroic gate`).toBe(true);
+          expect(rows[0].marksClears).toBeUndefined();
+        } else {
+          expect(shopRow.gate, `${itemId} gate must be the pinned clears rung`).toBe('clears:3');
+          expect(rows[0].marksClears, `${itemId} clears gate`).toBe(3);
+          expect(rows[0].marksHeroicClear).toBeUndefined();
+        }
+      } else {
+        expect(rows[0].priceMarks).toBeUndefined();
+        expect(rows[0].marksClears).toBeUndefined();
+        expect(rows[0].marksHeroicClear).toBeUndefined();
+      }
     }
     // The rod ladder: simple pole tier 1, Ironreel t2 at 60c, Silverstream t3
     // at 150c, all bought; Stormreel t4 and Tidewrought t5 crafted, so they
@@ -1446,6 +1484,22 @@ describe('Guide professions gathering accuracy', () => {
     expect(en).toContain(String(TIER2_TOOL_GATE_PROFICIENCY));
     expect(en).toContain(String(TIER3_TOOL_GATE_PROFICIENCY));
     expect(en, 'no token left unspliced').not.toMatch(/\{[A-Za-z0-9_]+\}/);
+    // The crafted rungs' thresholds ride the prose as ENGLISH LITERALS (the
+    // long-translated key keeps its token set), so pin them to the frozen
+    // wield table: a retune fails here instead of rotting in the prose.
+    for (const literal of [TIER4_TOOL_WIELD_PROFICIENCY, TIER5_TOOL_WIELD_PROFICIENCY]) {
+      expect(en, `crafted-rung threshold ${literal} in the prose`).toMatch(
+        new RegExp(`(^|[^0-9])${literal}([^0-9]|$)`),
+      );
+    }
+    // The Marks-route cells name their gates; the "three" literal's honesty
+    // against the delve counter is pinned in the ladder mirror above.
+    expect(t('guide.profPages.toolCraftedOrMarks', { craft: 'X', marks: '24' })).toContain(
+      'three delve clears',
+    );
+    expect(t('guide.profPages.toolCraftedOrMarksHeroic', { craft: 'X', marks: '56' })).toContain(
+      'Heroic clear',
+    );
 
     // Every shipped locale, read off the resolved bundles: both tokens present
     // AND neither threshold spelled out as a literal. The second half is what a

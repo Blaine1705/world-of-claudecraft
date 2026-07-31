@@ -9973,6 +9973,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolsHeading': '工具',
   'guide.profPages.toolCrafted': '製作獲得（{craft}）',
   'guide.profPages.toolCraftedOrMarks': '由{craft}製作，或用 {marks} 祕境印記購買',
+  'guide.profPages.toolCraftedOrMarksHeroic':
+    '由{craft}製作，或在英雄難度通關後用 {marks} 祕境印記購買',
   'guide.profPages.toolVendor': '{name}（{hub}）',
   'guide.profPages.toolUnavailable': '無販售',
   'guide.profPages.priceNone': '無販售',

@@ -43,6 +43,7 @@ const entrySource = `
   export {
     TIER_SKILL_STEP, tierForSkill, REDUCED_TIER_MULTIPLIER, MINIMAL_TIER_MULTIPLIER,
   } from './src/sim/professions/wheel.ts';
+  export { WIELD_REQUIREMENT_BY_TIER } from './src/sim/professions/wield_gate.ts';
   export { TRAINING_FEE_BY_TIER, trainingFeeFor } from './src/sim/professions/training.ts';
   export {
     NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE, GATHER_CAST_BASE_SEC, GATHER_CAST_FLOOR_SEC,
@@ -128,6 +129,7 @@ const {
   FISHING_TABLES_BY_BAND,
   FISHING_RARE_ID,
   TIER_SKILL_STEP,
+  WIELD_REQUIREMENT_BY_TIER,
   tierForSkill,
   REDUCED_TIER_MULTIPLIER,
   MINIMAL_TIER_MULTIPLIER,
@@ -613,17 +615,30 @@ const craftedByCraft = (itemId) => {
 // Source column reads "Crafted (Engineering)" for the eight top tools while the
 // prose directly above the table promises a Marks route, which is the table
 // contradicting its own page.
-const marksPriceFor = (itemId) => {
+const marksRowFor = (itemId) => {
   for (const entries of Object.values(DELVE_SHOPS)) {
     const row = entries.find((e) => e.itemId === itemId);
-    if (row) return row.marks;
+    if (row) return row;
   }
   return null;
 };
-const toolRow = (itemId, tier) => {
+const marksPriceFor = (itemId) => marksRowFor(itemId)?.marks ?? null;
+// The delve counter's unlock gate for a Marks-priced tool row, flattened for
+// the table cell: how many total clears, or a Heroic clear (shop.ts
+// DelveShopGate). An 'available' row emits neither.
+const marksGateFor = (itemId) => {
+  const gate = marksRowFor(itemId)?.gate;
+  if (gate === 'heroicClear') return { marksHeroicClear: true };
+  const clears = typeof gate === 'string' ? /^clears:(\d+)$/.exec(gate) : null;
+  return clears ? { marksClears: Number(clears[1]) } : {};
+};
+const toolRow = (itemId, tier, professionId) => {
   const def = ITEMS[itemId];
   const vendors = toolVendors(itemId);
   const craftedBy = craftedByCraft(itemId);
+  // R22: land tools above tier 1 carry a wield requirement; rods are the
+  // structural exemption and every rod row omits the field.
+  const wieldReq = professionId === 'fishing' ? 0 : (WIELD_REQUIREMENT_BY_TIER[tier] ?? 0);
   return {
     name: def.name,
     tier,
@@ -632,6 +647,8 @@ const toolRow = (itemId, tier) => {
     vendors,
     ...(craftedBy ? { craftedBy } : {}),
     ...(marksPriceFor(itemId) !== null ? { priceMarks: marksPriceFor(itemId) } : {}),
+    ...marksGateFor(itemId),
+    ...(wieldReq > 0 ? { wieldProficiency: wieldReq } : {}),
   };
 };
 const toolLadderFor = (professionId) => {
@@ -639,10 +656,10 @@ const toolLadderFor = (professionId) => {
   // The simple pole is the fishing ladder's tier-1 rung (use type 'fishing'
   // resolves to effective tier 1 and satisfies the #2343 implement gate,
   // professions/tools.ts).
-  if (professionId === 'fishing') rows.push(toolRow('simple_fishing_pole', 1));
+  if (professionId === 'fishing') rows.push(toolRow('simple_fishing_pole', 1, professionId));
   for (const [id, def] of Object.entries(ITEMS)) {
     if (def.use?.type === 'gatherTool' && def.use.professionId === professionId) {
-      rows.push(toolRow(id, def.use.tier));
+      rows.push(toolRow(id, def.use.tier, professionId));
     }
   }
   return rows.sort((a, b) => a.tier - b.tier);
@@ -1032,6 +1049,13 @@ export interface GuideProfTool {
   craftedBy?: string;
   /** Delve Marks price, for a tool a delve counter stocks. Absent otherwise. */
   priceMarks?: number;
+  /** Total delve clears the Marks row unlocks after (shop.ts 'clears:N'). */
+  marksClears?: number;
+  /** True when the Marks row unlocks after a Heroic clear. */
+  marksHeroicClear?: boolean;
+  /** R22 wield requirement (proficiency in the tool's own trade) for land
+   *  tools above tier 1. Absent for tier 1 and for every fishing rod. */
+  wieldProficiency?: number;
 }
 
 export interface GuideProfNodeRow {

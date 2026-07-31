@@ -671,9 +671,10 @@ export class Api {
   }
 
   // The account's deed-broadcast setting (accounts.deed_broadcasts): whether a
-  // marquee unlock fans out to guildmates and followers. Read/write pair for
-  // the options toggle; both need the signed-in bearer. A malformed read body
-  // conservatively reads as enabled (the column default).
+  // marquee unlock fans out to guildmates and followers, and whether the
+  // Discord activity feed posts the account's deed and masterwork cards (R58).
+  // Read/write pair for the options toggle; both need the signed-in bearer. A
+  // malformed read body conservatively reads as enabled (the column default).
   async deedBroadcasts(): Promise<boolean> {
     const data = await this.get('/api/deeds/broadcasts');
     return data.enabled !== false;

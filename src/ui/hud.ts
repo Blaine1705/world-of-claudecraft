@@ -613,9 +613,11 @@ export interface OptionsHooks {
   // feature is off or no wallet is connected/linked.
   refreshWocBalance(): void;
   // Account deed-broadcast opt-out seam (accounts.deed_broadcasts): whether a
-  // marquee deed unlock fans out to guildmates and followers. main.ts wires the
-  // REST read/write pair ONLINE ONLY; the options row renders only when the
-  // seam is present (offline characters have no account, so no row).
+  // marquee deed unlock fans out to guildmates and followers, and whether the
+  // Discord activity feed posts the account's deed and masterwork cards (R58).
+  // main.ts wires the REST read/write pair ONLINE ONLY; the options row
+  // renders only when the seam is present (offline characters have no
+  // account, so no row).
   deedBroadcasts?: {
     get(): Promise<boolean>;
     set(enabled: boolean): Promise<boolean>;

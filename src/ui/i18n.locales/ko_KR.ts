@@ -10442,6 +10442,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolsHeading': '도구',
   'guide.profPages.toolCrafted': '제작({craft})',
   'guide.profPages.toolCraftedOrMarks': '{craft}(으)로 제작하거나 탐굴 증표 {marks}개로 구매',
+  'guide.profPages.toolCraftedOrMarksHeroic':
+    '{craft}(으)로 제작하거나 영웅 난이도 공략 후 탐굴 증표 {marks}개로 구매',
   'guide.profPages.toolVendor': '{name}({hub})',
   'guide.profPages.toolUnavailable': '판매 없음',
   'guide.profPages.priceNone': '판매 없음',

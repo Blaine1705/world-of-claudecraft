@@ -10623,6 +10623,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolsHeading': 'Инструменты',
   'guide.profPages.toolCrafted': 'Создается ({craft})',
   'guide.profPages.toolCraftedOrMarks': 'Изготовление ({craft}) или {marks} меток вылазок',
+  'guide.profPages.toolCraftedOrMarksHeroic': 'Изготовление ({craft}) или {marks} меток вылазок после героического прохождения',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Не продается',
   'guide.profPages.priceNone': 'Не продается',

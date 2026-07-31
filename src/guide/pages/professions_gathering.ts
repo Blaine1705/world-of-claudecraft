@@ -33,24 +33,37 @@ export function gatheringById(id: string): GuideProfGathering | undefined {
 
 function toolRow(tool: GuideProfTool): string {
   // Both routes when a tool has both: the eight top tools are crafted at the
-  // toolworks OR bought with Delve Marks, and naming only the craft made the
-  // table contradict the prose above it.
+  // toolworks OR bought with Delve Marks behind the delve counter's clears
+  // gate, and naming only the craft made the table contradict the prose
+  // above it.
   const source = tool.craftedBy
     ? tool.priceMarks != null
-      ? t('guide.profPages.toolCraftedOrMarks', {
-          craft: t(`hudChrome.craftName.${tool.craftedBy}` as TranslationKey),
-          marks: formatNumber(tool.priceMarks),
-        })
+      ? tool.marksHeroicClear
+        ? t('guide.profPages.toolCraftedOrMarksHeroic', {
+            craft: t(`hudChrome.craftName.${tool.craftedBy}` as TranslationKey),
+            marks: formatNumber(tool.priceMarks),
+          })
+        : t('guide.profPages.toolCraftedOrMarks', {
+            craft: t(`hudChrome.craftName.${tool.craftedBy}` as TranslationKey),
+            marks: formatNumber(tool.priceMarks),
+          })
       : t('guide.profPages.toolCrafted', {
           craft: t(`hudChrome.craftName.${tool.craftedBy}` as TranslationKey),
         })
     : tool.vendors.length > 0
       ? t('guide.profPages.toolVendor', { name: tool.vendors[0].name, hub: tool.vendors[0].hub })
       : t('guide.profPages.toolUnavailable');
+  // R22: the wield requirement the harvest gate enforces, or None for tier 1
+  // and every rod (rods are the structural exemption).
+  const wield =
+    tool.wieldProficiency != null
+      ? formatNumber(tool.wieldProficiency)
+      : t('guide.profPages.wieldNone');
   return `<tr>
       <td class="q-${esc(tool.quality)}">${esc(tool.name)}</td>
       <td>${esc(formatNumber(tool.tier))}</td>
       <td>${esc(qualityLabel(tool.quality))}</td>
+      <td>${esc(wield)}</td>
       <td>${esc(tool.priceCopper != null ? formatMoney(tool.priceCopper) : t('guide.profPages.priceNone'))}</td>
       <td>${esc(source)}</td>
     </tr>`;
@@ -66,7 +79,10 @@ function toolsSection(g: GuideProfGathering): string {
         // stale number behind in each of them. Named ...Prof because the
         // adjacent trainingBody key already uses {tier1}/{tier2} for training
         // COSTS in copper, and a fill pass reading both should never have to
-        // guess which unit a token carries.
+        // guess which unit a token carries. The crafted rungs' 85/100 stay
+        // ENGLISH LITERALS in the prose (the long-translated key keeps its
+        // token set); tests/guide.test.ts pins them against the frozen wield
+        // table so a retune fails there instead of rotting here.
         tier2Prof: formatNumber(TIER2_TOOL_GATE_PROFICIENCY),
         tier3Prof: formatNumber(TIER3_TOOL_GATE_PROFICIENCY),
       })}
@@ -75,6 +91,7 @@ function toolsSection(g: GuideProfGathering): string {
           <th scope="col">${esc(t('guide.profPages.colTool'))}</th>
           <th scope="col">${esc(t('guide.profPages.colTier'))}</th>
           <th scope="col">${esc(t('guide.profPages.colQuality'))}</th>
+          <th scope="col">${esc(t('guide.profPages.colWield'))}</th>
           <th scope="col">${esc(t('guide.profPages.colPrice'))}</th>
           <th scope="col">${esc(t('guide.profPages.colSource'))}</th>
         </tr></thead>

@@ -9971,6 +9971,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolsHeading': '工具',
   'guide.profPages.toolCrafted': '制作获得（{craft}）',
   'guide.profPages.toolCraftedOrMarks': '由{craft}制作，或用 {marks} 秘境印记购买',
+  'guide.profPages.toolCraftedOrMarksHeroic':
+    '由{craft}制作，或在英雄难度通关后用 {marks} 秘境印记购买',
   'guide.profPages.toolVendor': '{name}（{hub}）',
   'guide.profPages.toolUnavailable': '无出售',
   'guide.profPages.priceNone': '无出售',
