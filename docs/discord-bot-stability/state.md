@@ -1,7 +1,7 @@
 # State: Discord Bot Stability (cross-phase cheat sheet)
 
-Current phase: Phase 2 built (2026-07-30), QA pending. Next: Phase 2 QA, then Phase 3,
-the loop scheduler and diff-before-write.
+Current phase: Phase 2 built and QA'd (2026-07-30). Next: Phase 3, the loop scheduler
+and diff-before-write.
 
 ## Locked decisions
 
@@ -150,8 +150,8 @@ vi.mock module fakes + `runRoute`; `tests/discord_db.test.ts` `makePool` fake, w
 `tests/discord_relay.test.ts` covers `src/sim/discord_relay.ts`, NOT the server module
 of the same name.
 
-Config: `tsconfig.json` (`include` carries `bot` as of Phase 1, so all SEVEN bot files
-are type-checked, `bot/main.ts` among them; pinned by `tests/deploy_discord_bot.test.ts`
+Config: `tsconfig.json` (`include` carries `bot` as of Phase 1, so all EIGHT bot files
+are type-checked (Phase 2 added `rate_governor.ts`), `bot/main.ts` among them; pinned by `tests/deploy_discord_bot.test.ts`
 because dropping the one word is otherwise silent),
 `scripts/gate.mjs` (the `steps` list, which now carries the `bot build` step).
 
@@ -174,11 +174,18 @@ because dropping the one word is otherwise silent),
   `DEFAULT_BAN_PAUSE_MS`, `DEFAULT_BREAKER_LIMIT`, and `DEFAULT_FORBIDDEN_TTL_MS`, and
   `bot/config.ts` imports them, so the config fallback and the governor's own
   construction default cannot drift apart.
-- Counter names Phase 8 consumes (D16), the snapshot from `RateGovernor.snapshot()`:
+- Counter names Phase 8 consumes (D16), the snapshot from `RateGovernor.snapshot()`.
+  FOURTEEN fields, not twelve: the list below was short by `trackedRoutes` and
+  `activeQueues` until the Phase 2 QA round, and Phase 8 ships exactly this list, so
+  read it from the `GovernorCounters` interface rather than from any prose summary.
   `requests`, `rateLimited`, `rateLimitedByScope` (`user`/`global`/`shared`/`unknown`),
   `globalPauses`, `banPauses`, `breakerState`, `breakerOpens`, `queueDepth`,
-  `trackedBuckets`, `forbiddenEntries`, `forbiddenBlocks`, `breakerBlocks`.
-  `DiscordApi.counters()` is the accessor the wiring will read.
+  `trackedBuckets`, `trackedRoutes`, `activeQueues`, `forbiddenEntries`,
+  `forbiddenBlocks`, `breakerBlocks`.
+  `DiscordApi.counters()` is the accessor the wiring will read. The three registry
+  sizes (`trackedBuckets`, `trackedRoutes`, `activeQueues`) exist so the LRU bounds are
+  observable at all; the first two are capped by `MAX_TRACKED_BUCKETS` and
+  `MAX_TRACKED_ROUTES` (separate constants, same value, different populations).
 - New endpoints: (pending; planned `POST /internal/discord/flex-batch`,
   `GET /internal/discord/outbox`)
 - New modules: `bot/cadence.ts` (the three poll-loop constants, values only),
@@ -223,9 +230,15 @@ because dropping the one word is otherwise silent),
     a regression, since the replaced client had no pacing at all, but it is the one path
     through the governor with no ceiling and a guild member can trigger it at will. A
     per-process in-flight cap would close it without touching the documented exemption.
-  - `redactPath` preserves a query string verbatim while `routeTemplate` strips it. No
-    current Discord call site uses a query, so nothing leaks today, but a future call
-    with a token or signature in the query would reach the thrown message intact.
+  - `redactPath` preserves a query string verbatim while `routeTemplate` strips it. The
+    asymmetry is DELIBERATE and pinned on both sides
+    (`tests/discord_bot_governor_determinism.test.ts`, the query-string cases), so do not
+    "fix" it by making them agree. What is genuinely open is the risk it carries: a future
+    Discord call with a token or signature in the query would reach the thrown message
+    intact. Phase 2 QA sharpened the recorded reason, because "no current call site uses a
+    query" is true of `bot/discord_api.ts` today but is a fact about the CALLERS, not a
+    property of `redactPath`, so it stops being true the moment a phase adds a query
+    parameter. Whichever phase adds one owns redacting it.
 - Ruled-acceptable residual, do not "fix" it in QA: the drain loop in `evictBuckets` is
   observationally identical to a single `if` while entries are inserted one at a time,
   so no assertion can distinguish them. It is kept as defense against a future batch
@@ -243,6 +256,38 @@ because dropping the one word is otherwise silent),
   let a nickname failure suppress that member's tier-role sync for the whole TTL, and a
   missing MANAGE_NICKNAMES stopped role sync guild-wide. Keep any future subject key
   scoped to the permission that can fail.
+- Phase 2 QA (2026-07-30) changed the module in one load-bearing way, plus four smaller
+  ones. Read this before reasoning about bucket identity:
+  - **Rate state is keyed by the bucket hash PAIRED WITH the major parameter**
+    (`` `${hash}|${majorParameterOf(template)}` ``), never by the bare hash. Discord
+    documents `X-RateLimit-Bucket` as non-inclusive of the top-level resource, so the
+    hash names a route SHAPE: two channels, or two guilds, hit on one route answer with
+    the SAME hash while holding genuinely separate limits. The bare-hash key merged them
+    into one `LimitState`, and since the bot posts to up to four distinct channel ids
+    through one `createMessage` route this was live traffic, not a corner case. The
+    failure ran both ways: one channel reporting headroom erased another's exhausted
+    window and the next post dispatched at `Remaining == 0` (the exact thing D2 exists to
+    prevent), and one channel's spent window gated every other channel. `majorParameterOf`
+    is exported and pinned. Two templates that share a hash AND a major parameter still
+    merge, which is the case the remap was written for.
+  - The `MISSING_RETRY_AFTER_MS` floor now covers a wait that is PRESENT but zero.
+    `retry_after: 0` is not nullish, so it slipped past the absent-value fallback and
+    produced a 0 ms wait; on the interaction path, which is exempt from the global rate
+    cap, that is `MAX_ATTEMPTS` back-to-back sends with nothing pacing them. A genuine
+    sub-second `retry_after` is still honored exactly.
+  - A bucket-hash CHANGE no longer deletes the old key's state. Other templates may still
+    resolve to it, and the delete destroyed their gating over a rotation that had nothing
+    to do with them. Only the first provisional-to-hash migration copies state now.
+  - The bucket gate is re-checked beside the pause after the rate slot. The pause re-check
+    was already there and reasoned; the bucket had the identical argument and no re-check.
+  - `MAX_TRACKED_ROUTES` is now its own constant (same value as `MAX_TRACKED_BUCKETS`).
+    One constant bounded two populations with different lifetimes.
+- New exports from Phase 2 QA: `majorParameterOf` and `MAX_TRACKED_ROUTES`
+  (`bot/rate_governor.ts`), and `governorFromConfig` plus the `GovernorConfig` shape
+  (`bot/discord_api.ts`). `governorFromConfig` exists because `bot/main.ts` calls `main()`
+  at module scope, so its construction site is unreachable from any test and a transposed
+  pair of knobs shipped in silence; the mapping is now pinned. `GovernorSend` was deleted
+  (a fully dead export).
 - New exported constant: `SERVER_CALL_TIMEOUT_MS` (8000) in `bot/server_client.ts`,
   named so the suite can pin the deadline against a literal.
 - Touched pins: `tests/ci_workflow.test.ts` structural counts (release-gate
@@ -344,6 +389,17 @@ because dropping the one word is otherwise silent),
 See brainstorm.md O1 to O7. O4 (Developer Portal intent toggles) needs the user.
 O5 (member-write 429 scope) resolves from logs after first prod deploy.
 
+Phase 2 QA sharpened two of them rather than closing either:
+- O2 (no hard-coded per-route rate numbers) is CONFIRMED for the governor: every numeric
+  limit in `bot/rate_governor.ts` comes from a response header or a constructor option,
+  audited line by line. It stays open only in the sense that the claim has to be
+  re-checked whenever a phase adds a route.
+- O5 (whether member-write 429s come back at `user` or `shared` scope) is unchanged and
+  still resolves from production logs, but the question is now narrower than "log the
+  scope": every 429 already logs `route`, `scope`, `retryAfterMs`, and `global`, and the
+  scope arm is pinned for all five header shapes including a missing and an unrecognized
+  one. Reading those log lines after the first deploy is the whole remaining task.
+
 ### Ledgered during Phase 1 (found, deliberately NOT fixed there)
 
 Phase 1 forbids any runtime behavior change, and each of these changes behavior or
@@ -397,6 +453,70 @@ route each to a phase or file it.
   empty array, and null for an unreachable server or a malformed payload), and
   `pushMembersMeta()`'s zero-updated warning is pinned on both sides of its non-empty
   guard. Phase 5 inherits the pins instead of writing them.
+### Found during Phase 2 QA (2026-07-30), routed rather than fixed
+
+Each of these is real and confirmed by an independent skeptic, and each was left for a
+later phase because its fix belongs to that phase's scope, not because it was dismissed.
+
+- L9 (should-fix, at-least-once, OPEN, natural home Phase 5 or 6): a `GovernorBlockedError`
+  permanently LOSES already-drained relay and activity items. `createMessage` is not
+  `essential`, so while the breaker is open every relay and activity post is refused
+  unsent, and `bot/main.ts` has already drained those items server-side with only a
+  `console.error` handler behind it: each refusal is a player-visible message deleted
+  rather than delayed. The pre-Phase-2 client lost them on a failed post too, so the loss
+  PATH is not new; what Phase 2 added is a systematic loss WINDOW of at least one breaker
+  quiet window. Phases 5 and 6 own the drain protocol (the outbox change feed), so the
+  fix belongs there: mark-after-successful-post, the way the daily-rewards winners
+  already work.
+- L10 (nice-to-have, supervision, OPEN, natural home Phase 7): `bot/discord_api.ts`
+  passes no `AbortSignal` or timeout to `fetch`, unlike `bot/server_client.ts` with its
+  `SERVER_CALL_TIMEOUT_MS`. A Discord call that stalls therefore holds its bucket's FIFO
+  and, if it was the half-open probe, the probe latch, for as long as the runtime's own
+  fetch timeouts allow. It is a stall rather than a permanent latch (the platform's fetch
+  imposes its own header and body deadlines, so it unwinds eventually), which is why this
+  is not blocking, but the bound is the runtime's rather than ours and it is invisible in
+  the counters. Phase 7 owns supervision and deploy hardening; adding a deadline there
+  means adding one injected timer seam to the shell, which is a seam change rather than a
+  QA-round edit.
+- L11 (nice-to-have, pacing, OPEN, natural home Phase 3): requests that reserved a global
+  rate slot BEFORE a pause was declared do not re-reserve one when the pause lifts, so
+  they all fire at the same instant. It is bounded by how many requests were between the
+  first pause check and the send when the pause landed, and the correct fix is a gate
+  loop that re-reserves after any blocking wait, which burns slots and belongs with the
+  Phase 3 scheduler rather than in a QA round.
+- L12 (nice-to-have, memory, OPEN, natural home Phase 3): `this.queues` is the one
+  governor map with no size cap. A request parked in `waitForPause` never reaches the
+  job's `finally` that drops a drained queue, and interaction callbacks mint a unique
+  template per interaction id, so during a long ban pause the map, its pending sleeps,
+  and `queueDepth` all grow with however many slash commands arrive. `activeQueues`
+  makes it observable. The existing record framed the uncapped interaction path as a WIRE
+  concern; this is the MEMORY dimension of the same thing.
+
+### Judged during Phase 2 QA and ruled NOT defects (do not re-litigate)
+
+Recorded with the reasoning so a later round does not spend agents rediscovering them.
+
+- A probe whose three attempts are all SHARED-scope 429s does reopen the breaker, via the
+  blanket `settle(false)` in the `finally`. That is deliberate: D3's shared-scope
+  exclusion is about the ban COUNTER, and the `finally` covers "the probe never got an
+  answer", which exhausted attempts is. The conservative reading is correct.
+- A queue-full refusal leaves the breaker in `half-open` with no probe in flight. It
+  self-heals: the next non-essential request claims the probe, which is exactly what the
+  aborted one would have been, and only one probe is ever in flight. The quiet window was
+  already satisfied when the state moved to half-open.
+- An empty or unreadable 429 body is classified as a Cloudflare ban and pauses for
+  `banPauseMs`. The two errors are not symmetric: a false ban pause costs 10 idle minutes,
+  a false short retry into a real ban is the 2026-07-29 incident. The conservative
+  direction is the right one.
+- `addMemberRole` and `removeMemberRole` share one `roles:` subject key, so a 403 on one
+  role suppresses the member's other role writes. Both realistic causes of that 403
+  (MANAGE_ROLES missing, or the bot's role below the target's) are guild-wide rather than
+  per-role, so a per-role key would multiply retries of a call that cannot succeed.
+- `essential` does not exempt a request from the process-wide pause. A pause means
+  Discord has told us to stop entirely; the exemption is breaker survival only.
+- `maxRps <= 0` disabling global spacing is the module's intentional escape hatch, used
+  by the test rigs and documented at their call sites.
+
 ### Found during Phase 1 QA (2026-07-30), OPEN
 
 - L6 (nice-to-have, toolchain, OPEN): `bot/` type-checks against the shared tsconfig,
@@ -443,6 +563,18 @@ route each to a phase or file it.
   settimeout-fractional-delay-fires-early) do not exist in the memory store, and neither
   does env-empty-numeric-default-shift, which phase-02 cites; the rules themselves are
   real and are now written down here and at the seams that depend on them.
+- **Discord's `X-RateLimit-Bucket` is NOT a bucket identity on its own.** It is
+  documented as non-inclusive of the top-level (major) resource, so two channels or two
+  guilds hit on the same route answer with the SAME hash while holding separate limits.
+  Any map keyed by the bare hash silently merges them. Pair it with the major parameter
+  (`majorParameterOf` in `bot/rate_governor.ts`). This shipped as a real defect in Phase 2
+  and was caught only by the QA round.
+- **A bound test that never reaches the bound is vacuous.** Phase 2's permanent-failure
+  cache test stored 42 entries against a cap of 4096 and asserted `42 <= 4096`, which
+  holds for every implementation including one with the eviction deleted. Its comment
+  claimed the size was "injected", but the cap is a module constant with no seam. Either
+  reach the real cap or give the module a seam; never assert `toBeLessThanOrEqual` against
+  a cap the test cannot approach, and prefer `toBe(CAP)` so over-eviction fails too.
 - Numeric env parsing: `Number('')` is 0, so an unguarded parse turns a blank line in a
   .env into a hard 0. `positiveNumberFromEnv` in `bot/config.ts` falls back to the
   default for empty, non-numeric, and non-positive alike. It takes the VALUE rather than

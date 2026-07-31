@@ -7,7 +7,7 @@
 | Phase 1: Bot verification foundation | built | 2026-07-30 | 2026-07-30 |
 | Phase 1 QA | done | 2026-07-30 | 2026-07-30 |
 | Phase 2: Discord rate-limit governor | built | 2026-07-30 | 2026-07-30 |
-| Phase 2 QA | not started | | |
+| Phase 2 QA | done | 2026-07-30 | 2026-07-30 |
 | Phase 3: Loop scheduler + diff-before-write | not started | | |
 | Phase 3 QA | not started | | |
 | Phase 4: Server set-based endpoints | not started | | |
@@ -219,6 +219,113 @@ for the single file (written to the gitignored `.claude/settings.local.json`) di
 lift it in-session, so the edit was applied through a user-run shell command instead,
 anchored on the `#DISCORD_SYNC_NICKNAMES=1` line so a missing anchor would abort rather
 than write to the wrong place.
+
+### Phase 2 QA (2026-07-30)
+
+Release sync: NO-OP. `origin/release/v0.33.0` on a fresh fetch was 0 behind / 32 ahead,
+so there was nothing to merge and no release-merge audit.
+
+Verdict PASS-WITH-FOLLOWUPS. The governor was in far better shape than Phase 1's diff
+had been: 26 of the round's first 34 mutants died against a named test on the code as
+committed, purity held, the copy rules held, and the diff touched no `src/`, no
+`server/`, and no `package.json`. But the round found ONE defect that the phase's own
+adversarial pass, its `qa-checklist` gate, and its `privacy-security-review` had all
+missed, and it is the failure D2 exists to prevent.
+
+**Rate state was keyed by the bare `X-RateLimit-Bucket` hash.** Discord documents that
+header as non-inclusive of the top-level (major) resource, so the hash names a route
+SHAPE rather than one live bucket: two channels, or two guilds, hit on the same route
+answer with the SAME hash while holding genuinely separate limits. The bot posts to up to
+four distinct channel ids through one `createMessage` route, so this was live traffic. It
+failed both ways. One channel reporting headroom overwrote another's exhausted window and
+the next post went out at `Remaining == 0`; and one channel's spent window gated every
+other channel. `trackedBuckets` under-reported to match. Worse, the wrong contract was
+FROZEN by a passing test that asserted two templates with different major parameters and
+one hash counted as a single bucket.
+
+That finding is also the round's method paying for itself. It was raised by the
+Discord-contract audit agent, independently confirmed by a skeptic that had the file open
+and built its own repro, and then re-verified by hand in a throwaway probe against the
+real module before a line was changed: a control run gated correctly at `[0, 10000]`,
+and one response from a second channel sharing the hash collapsed it to `[0, 1, 2]`. The
+fix pairs the hash with the major parameter, which is the composition every Discord
+client makes for the same reason, and it keeps merging two templates that share a hash
+AND a major parameter, which is the case the remap was written for.
+
+Four smaller code fixes rode along, each confirmed the same way: the
+`MISSING_RETRY_AFTER_MS` floor did not cover a `retry_after` that was present but zero
+(not nullish, so it slipped the fallback and produced a zero-delay retry on the one path
+with no rate cap); a bucket-hash CHANGE deleted state that other templates still resolved
+to; the bucket gate was not re-checked after the rate slot although the pause deliberately
+was; and one constant bounded two registries with different lifetimes.
+
+The test story is the other half. Five of the eight first-round survivors were exactly
+the behaviors the phase shipped BEYOND its original spec, which is where the phase notes
+said the risk had moved and where the tests had not followed: the missing-retry_after
+floor, the post-bucket-gate pause re-check, the `/callback` suffix half of the rate
+exemption, the `MAX_FORBIDDEN_ENTRIES` bound, and the "loop, not a single sleep" in
+`waitForPause`. Two existing pins were not merely thin but VACUOUS: the cache-bound test
+stored 42 entries against a cap of 4096 and asserted `42 <= 4096`, which no
+implementation can fail (its comment claimed the size was "injected", but the cap is a
+module constant with no seam), and the route-map LRU test passed unchanged when the LRU
+was turned back into a plain FIFO, because a hot route that loses its mapping simply keys
+rate state under its own template and gates identically. Reading that state through a
+SIBLING template is what makes the re-insertion line load bearing.
+
+Validation: `npx tsc --noEmit` clean, 306 tests green across the eleven bot suites (was
+283 at the phase tip), `npm run build:bot` green, `npm run ci:changed` exit 0 with
+error-level diagnostics clean on every touched file. `.env.example` could not be
+re-verified by the QA session: every `.env*` path stays denied at the harness level, so
+R8 is carried on the Phase 2 record and the four keys were not re-read here.
+
+Mutation tally: 44 mutants across three rounds, in an ISOLATED worktree detached at the
+phase tip, all NEW beyond the 15 Phase 2 planted itself. Every run proved the patch
+APPLIED (cmp against a backup), proved the suite actually RAN (306 tests, never zero),
+and proved the file RESTORED, so a silently-unapplied patch could not be scored as a
+survivor.
+
+  - Against the phase as committed: 34 planted, 26 killed, 8 SURVIVED. Five of the eight
+    were the beyond-spec behaviors named above.
+  - After the first fix round, with 10 new mutants added against the fix round's own
+    code: 44 planted, 39 killed, 5 SURVIVED. Four of the five were pins for code the fix
+    round had just written (the bucket re-check, the hash-rotation guard, the route-map
+    LRU, the config knob mapping) and the fifth was the pause loop, whose new test the
+    second pause re-check silently compensated for, so it needed TWO extensions rather
+    than one to become decisive. That is the standing rule about the fix round being
+    unreviewed code earning its keep.
+  - Final: 44 planted, 44 KILLED, 0 survived, 0 errors, every run at 306 tests.
+
+Two mutants were themselves defective and are worth recording. One HUNG the suite instead
+of failing it, and the cause was a pin I had just written: a frozen `now` with a no-op
+sleep makes `waitForBucket` spin on an immediately-resolved promise, starving the
+macrotask queue so vitest's own timeout never fires. The harness now scores a hang as a
+kill and bounds each run, rather than dying on a 900 second subprocess timeout with the
+mutant left applied. The other "survived" only because it flipped a guard's CONDITION and
+left the fixed BODY in place, so it never recreated the defect it named; rebuilt with the
+genuine pre-fix shape, it dies. That is the same trap Phase 2 hit with its subject-key
+mutant, and it is why a survivor is a claim to be checked rather than a result.
+
+Method: a 6-agent audit fan-out over the diff with one independent skeptic per finding
+(57 agents, 0 deaths, 0 empty results, 27 confirmed / 24 refuted), every refutation
+judged by hand rather than taken on faith. Two of those judgements went AGAINST the
+agents: `queue-full-latches-half-open` was reported confirmed by one skeptic and refuted
+by another, and the refutation is right (the state self-heals, since the next request
+claims the probe the aborted one would have been); and the shared-scope probe-exhaustion
+finding is the `finally`'s documented conservatism, not a contradiction of D3. Both are
+now written down so a later round does not rediscover them.
+
+Not fixed here, and routed instead, each with its reason recorded in state.md as L9 to
+L12: relay and activity items are permanently LOST when the breaker refuses their post
+(Phase 5 or 6 owns the drain protocol); `bot/discord_api.ts` sets no fetch deadline
+(Phase 7 owns supervision, and it is a stall rather than a permanent latch); requests
+holding a pre-pause rate slot all fire at once when the pause lifts (Phase 3 owns the
+scheduler); and `this.queues` is the one uncapped map, which matters for MEMORY during a
+long ban pause rather than for the wire (Phase 3).
+
+O2 is confirmed for the governor (every numeric limit comes from a header or an option,
+audited line by line) and O5 is narrowed rather than closed: the scope arm is pinned for
+all five header shapes, so the only remaining task is reading the log lines after the
+first deploy.
 
 ### Phase 1 QA (2026-07-30)
 

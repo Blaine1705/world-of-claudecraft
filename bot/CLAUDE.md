@@ -23,10 +23,14 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
 - `gateway.ts`: ws Gateway (v10) IO shell (HELLO/heartbeat, IDENTIFY, RESUME).
   Tested in `tests/discord_bot_gateway.test.ts`.
 - `rate_governor.ts`: **pure, IO-free** Discord rate-limit governor. Owns ALL REST
-  pacing: bucket-keyed serialized queues remapped onto the `X-RateLimit-Bucket` hash,
-  proactive gating at `Remaining == 0`, the global pause (full `retry_after`, no
-  ceiling), the Cloudflare ban pause on a non-JSON 429, the invalid-request breaker,
-  the 401/403 cache, and the Phase 8 counters. Time is injected; it reads no clock.
+  pacing: serialized FIFO queues keyed by the PROVISIONAL route template, rate state
+  keyed by the `X-RateLimit-Bucket` hash PAIRED WITH the major parameter (the hash alone
+  names a route shape, not one bucket: Discord documents it as non-inclusive of the
+  top-level resource, so two channels share a hash and not a limit), proactive gating at
+  `Remaining == 0`, the global pause (full `retry_after`, no ceiling), the Cloudflare ban
+  pause on a non-JSON 429, the invalid-request breaker, the 401/403 cache, and the Phase 8
+  counters. Only the rate state is remapped; the queues are never re-keyed, which is what
+  makes the remap safe mid-flight. Time is injected; it reads no clock.
 - `discord_api.ts`: thin Discord REST client (bot-token authed), an IO shell over the
   governor. Tested in `tests/discord_bot_discord_api.test.ts`.
 - `server_client.ts`: client for the game server's secret-gated `/internal/discord/*`
