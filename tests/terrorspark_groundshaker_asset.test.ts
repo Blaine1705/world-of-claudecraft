@@ -13,13 +13,13 @@ import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/mounts/terrorspark_groundshaker.glb');
-// The textured surface layer (UVs, per-vertex baked shading, six embedded maps)
-// roughly doubled the asset, which puts it alongside the other authored mounts
-// rather than above them: valorsteed 562 KiB, gobbler 555 KiB, toad 499 KiB.
-const SHIPPING_BUDGET = 576 * 1024;
+// Textured surface + KTX2 embeds put this above the lighter WebP-era mounts
+// (valorsteed 562 KiB, gobbler 555 KiB, toad 499 KiB). Budget tracks the
+// shipped KTX2 GLB so the pin stays honest about size as well as content.
+const SHIPPING_BUDGET = 1200 * 1024;
 const EXPECTED_SOURCE_FINGERPRINT =
   '52a28d2009046c90ce062ec47371b22aa01feab1484fe7bca2a3c6d02715bc9d';
-const EXPECTED_ASSET_SHA256 = '86a7af8348b23817334b97ec394ead5d881ddfba4314a253c6d68c7e9bd8524b';
+const EXPECTED_ASSET_SHA256 = 'a9ff2ca566419d2a2f002cab968840db437d2f2d2b6d7fab72fdbebe7808e7f9';
 /** Midtone the ORM map's roughness and metalness channels encode; the material
  *  factors divide the authored target by it. */
 const ORM_CENTER = 230 / 255;
@@ -91,8 +91,8 @@ describe('tank mount asset pipeline', () => {
         .sort(),
     ).toEqual([
       'EXT_meshopt_compression',
-      'EXT_texture_webp',
       'KHR_mesh_quantization',
+      'KHR_texture_basisu',
       'KHR_texture_transform',
     ]);
     expect(root.getExtras()).toEqual({ sourceFingerprint });
@@ -106,12 +106,12 @@ describe('tank mount asset pipeline', () => {
         )
         .sort(),
     ).toEqual([
-      'tank_fabric_albedo 512x512 image/webp',
-      'tank_fabric_normal 256x256 image/webp',
-      'tank_fabric_orm 256x256 image/webp',
-      'tank_metal_albedo 1024x1024 image/webp',
-      'tank_metal_normal 512x512 image/webp',
-      'tank_metal_orm 512x512 image/webp',
+      'tank_fabric_albedo 512x512 image/ktx2',
+      'tank_fabric_normal 256x256 image/ktx2',
+      'tank_fabric_orm 256x256 image/ktx2',
+      'tank_metal_albedo 1024x1024 image/ktx2',
+      'tank_metal_normal 512x512 image/ktx2',
+      'tank_metal_orm 512x512 image/ktx2',
     ]);
     expect(root.listSkins()).toHaveLength(0);
     expect(root.listCameras()).toHaveLength(0);

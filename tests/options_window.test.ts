@@ -38,7 +38,8 @@ describe('options_window: aura menu routing', () => {
   it('routes the top-level Auras view to its settings panel and placement preview', () => {
     expect(painter).toContain("case 'auras':");
     expect(painter).toContain('this.renderAuras();');
-    expect(painter).toContain("this.deps.auraOverlays().setPlacement(this.view === 'auras')");
+    // Optional chain: unstuck tests (and any pre-wire path) close without hooks.
+    expect(painter).toContain("this.deps.auraOverlays?.().setPlacement(this.view === 'auras')");
     expect(painter).toContain('this.auraSettings.render(body);');
   });
 });
@@ -480,15 +481,12 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
     ['renderGraphics', 'buildGraphicsControls'],
     ['renderAudio', 'buildAudioControls'],
     ['renderController', 'buildControllerControls'],
-  ])(
-    '%s builds its own controls and passes that same list into settingsViewFooter',
-    (method, builder) => {
-      const start = painter.indexOf(`private ${method}(): void {`);
-      expect(start).toBeGreaterThan(-1);
-      const rest = painter.slice(start);
-      const body = rest.slice(0, rest.indexOf('\n  }\n'));
-      expect(body).toContain(builder);
-      expect(body).toContain('this.settingsViewFooter(controls)');
-    },
-  );
+  ])('%s builds its own controls and passes that same list into settingsViewFooter', (method, builder) => {
+    const start = painter.indexOf(`private ${method}(): void {`);
+    expect(start).toBeGreaterThan(-1);
+    const rest = painter.slice(start);
+    const body = rest.slice(0, rest.indexOf('\n  }\n'));
+    expect(body).toContain(builder);
+    expect(body).toContain('this.settingsViewFooter(controls)');
+  });
 });
