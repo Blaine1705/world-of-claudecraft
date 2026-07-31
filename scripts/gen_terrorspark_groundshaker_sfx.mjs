@@ -1,6 +1,6 @@
 // Generate the tank mount movement cue from deterministic FFmpeg sources.
 //
-//   node scripts/gen_tank_mount_sfx.mjs
+//   node scripts/gen_terrorspark_groundshaker_sfx.mjs
 //
 // The seeded noise beds and oscillator are original procedural audio. FFmpeg
 // is invoked with argument arrays and no shell.
@@ -13,8 +13,8 @@ import { conformSfxAudio } from './sfx/conform_audio.mjs';
 import { FFMPEG_PATH } from './sfx/ffmpeg_paths.mjs';
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
-const OUTPUT = join(REPO_ROOT, 'public/audio/sfx/mount_run_tank.mp3');
-const SOURCE = join(dirname(OUTPUT), '.mount_run_tank.source.wav');
+const OUTPUT = join(REPO_ROOT, 'public/audio/sfx/mount_run_terrorspark_groundshaker.mp3');
+const SOURCE = join(dirname(OUTPUT), '.mount_run_terrorspark_groundshaker.source.wav');
 const DURATION = 0.6;
 
 function runFfmpeg(args) {

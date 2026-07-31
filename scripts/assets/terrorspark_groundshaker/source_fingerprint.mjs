@@ -7,15 +7,15 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const TANK_REPO_ROOT = path.resolve(HERE, '..', '..', '..');
 
 export const TANK_SOURCE_FILES = Object.freeze([
-  'docs/design/tank-mount/reference-metadata.json',
-  'docs/design/tank-mount/object-sculpt-spec.json',
-  'scripts/assets/tank_mount/model.js',
-  'scripts/assets/tank_mount/surface_shading.mjs',
-  'scripts/assets/tank_mount/surface_maps.mjs',
-  'scripts/assets/tank_mount/export_entry.js',
-  'scripts/assets/tank_mount/export_tank_mount.mjs',
-  'scripts/assets/tank_mount/source_fingerprint.mjs',
-  'scripts/assets/specs/tank_mount.json',
+  'docs/design/terrorspark-groundshaker/reference-metadata.json',
+  'docs/design/terrorspark-groundshaker/object-sculpt-spec.json',
+  'scripts/assets/terrorspark_groundshaker/model.js',
+  'scripts/assets/terrorspark_groundshaker/surface_shading.mjs',
+  'scripts/assets/terrorspark_groundshaker/surface_maps.mjs',
+  'scripts/assets/terrorspark_groundshaker/export_entry.js',
+  'scripts/assets/terrorspark_groundshaker/export_terrorspark_groundshaker.mjs',
+  'scripts/assets/terrorspark_groundshaker/source_fingerprint.mjs',
+  'scripts/assets/specs/terrorspark_groundshaker.json',
   'scripts/assets/build_assets.mjs',
   'package-lock.json',
 ]);

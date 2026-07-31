@@ -9,8 +9,8 @@
 // hide behind.
 //
 // Usage:
-//   node scripts/assets/tank_mount/lookdev_tank_mount.mjs
-//   node scripts/assets/tank_mount/lookdev_tank_mount.mjs --glb tmp/x.glb --out tmp/look
+//   node scripts/assets/terrorspark_groundshaker/lookdev_terrorspark_groundshaker.mjs
+//   node scripts/assets/terrorspark_groundshaker/lookdev_terrorspark_groundshaker.mjs --glb tmp/x.glb --out tmp/look
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -27,10 +27,13 @@ function optionValue(name, fallback) {
   return index >= 0 ? process.argv[index + 1] : fallback;
 }
 
-const glbPath = path.resolve(ROOT, optionValue('--glb', 'public/models/mounts/tank.glb'));
+const glbPath = path.resolve(
+  ROOT,
+  optionValue('--glb', 'public/models/mounts/terrorspark_groundshaker.glb'),
+);
 const outDir = path.resolve(
   ROOT,
-  optionValue('--out', 'docs/screenshots/tank-mount/authoring/material'),
+  optionValue('--out', 'docs/screenshots/terrorspark-groundshaker/authoring/material'),
 );
 const size = Number(optionValue('--size', '1024'));
 

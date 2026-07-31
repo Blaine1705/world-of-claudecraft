@@ -1,9 +1,9 @@
 // Deterministic procedural Tank mount export, optimization, validation, and preview.
 //
 // Usage:
-//   node scripts/assets/tank_mount/export_tank_mount.mjs --stage blockout --raw-only
-//   node scripts/assets/tank_mount/export_tank_mount.mjs --stage final
-//   node scripts/assets/tank_mount/export_tank_mount.mjs --stage final --no-preview
+//   node scripts/assets/terrorspark_groundshaker/export_terrorspark_groundshaker.mjs --stage blockout --raw-only
+//   node scripts/assets/terrorspark_groundshaker/export_terrorspark_groundshaker.mjs --stage final
+//   node scripts/assets/terrorspark_groundshaker/export_terrorspark_groundshaker.mjs --stage final --no-preview
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
@@ -29,10 +29,10 @@ import { ORM_CENTER } from './surface_shading.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..', '..');
 const ENTRY = path.join(HERE, 'export_entry.js');
-const SPEC = path.join(ROOT, 'scripts/assets/specs/tank_mount.json');
+const SPEC = path.join(ROOT, 'scripts/assets/specs/terrorspark_groundshaker.json');
 const BUILD_ASSETS = path.join(ROOT, 'scripts/assets/build_assets.mjs');
-const SHIPPING_OUT = path.join(ROOT, 'public/models/mounts/tank.glb');
-const PREVIEW_ROOT = path.join(ROOT, 'docs/screenshots/tank-mount/authoring');
+const SHIPPING_OUT = path.join(ROOT, 'public/models/mounts/terrorspark_groundshaker.glb');
+const PREVIEW_ROOT = path.join(ROOT, 'docs/screenshots/terrorspark-groundshaker/authoring');
 
 function optionValue(name, fallback) {
   const index = process.argv.indexOf(name);
@@ -43,7 +43,10 @@ const stage = optionValue('--stage', 'final');
 if (!TANK_STAGES.includes(stage)) throw new Error(`unknown tank stage: ${stage}`);
 const rawOnly = process.argv.includes('--raw-only');
 const noPreview = process.argv.includes('--no-preview');
-const rawOut = path.join(ROOT, `tmp/asset_src/tank_mount/tank-${stage}.glb`);
+const rawOut = path.join(
+  ROOT,
+  `tmp/asset_src/terrorspark_groundshaker/terrorspark_groundshaker-${stage}.glb`,
+);
 const sourceFingerprint = tankSourceFingerprint(ROOT);
 
 /** Two families (metal, fabric) times albedo, normal, and packed ORM. */

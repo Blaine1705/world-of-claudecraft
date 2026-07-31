@@ -46,7 +46,7 @@ export const TANK_SOCKET_DEFINITIONS = Object.freeze([
 
 // `roughness`/`metalness` are the AUTHORED TARGETS. The exporter divides them by
 // the ORM map's midtone when it attaches the maps, so the shipped factor times
-// the sampled channel lands back on the target (see export_tank_mount.mjs).
+// the sampled channel lands back on the target (see export_terrorspark_groundshaker.mjs).
 // `surface` picks which of the two procedural map families a material samples,
 // and `uvScale` its world-space repeats per yard.
 export const TANK_MATERIAL_CONTRACT = Object.freeze([

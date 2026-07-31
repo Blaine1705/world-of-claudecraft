@@ -183,7 +183,7 @@ describe('buildManifest', () => {
       'player_eat_food',
       'player_drink_water',
       'player_drink_potion',
-      'mount_run_tank',
+      'mount_run_terrorspark_groundshaker',
     ]) {
       expect(keys.has(key), key).toBe(true);
     }

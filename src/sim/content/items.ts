@@ -391,12 +391,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // Developer-only mount. It is intentionally absent from vendors, quests,
   // creature loot, heroic loot, and Rift reward pools. Use /dev mounts or
-  // /dev give reins_tank while the feature remains under development.
-  reins_tank: {
-    id: 'reins_tank',
+  // /dev give reins_terrorspark_groundshaker while the feature remains under development.
+  reins_terrorspark_groundshaker: {
+    id: 'reins_terrorspark_groundshaker',
     name: 'Ignition Key: Terrorspark Groundshaker',
     kind: 'mount',
-    mount: 'tank',
+    mount: 'terrorspark_groundshaker',
     quality: 'epic',
     soulbound: true,
     noDiscard: true,

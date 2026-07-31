@@ -120,7 +120,7 @@ export const SFX = [
     custom: true,
   },
   {
-    key: 'mount_run_tank',
+    key: 'mount_run_terrorspark_groundshaker',
     custom: true,
   },
   {

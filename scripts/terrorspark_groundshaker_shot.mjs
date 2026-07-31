@@ -4,8 +4,8 @@
 // The script enters an offline developer world, acquires the tank through
 // /dev mounts, summons it through its inventory item, and captures two
 // in-game views. Environment overrides can capture Low/mobile/HUD evidence:
-// TANK_GRAPHICS_PRESET=1 TANK_SHOW_UI=1 TANK_TOUCH=1 TANK_WIDTH=960 TANK_HEIGHT=540
-// TANK_CAPTURE_SUFFIX=-low-mobile node scripts/tank_mount_shot.mjs
+// GROUNDSHAKER_GRAPHICS_PRESET=1 GROUNDSHAKER_SHOW_UI=1 GROUNDSHAKER_TOUCH=1 GROUNDSHAKER_WIDTH=960 GROUNDSHAKER_HEIGHT=540
+// GROUNDSHAKER_CAPTURE_SUFFIX=-low-mobile node scripts/terrorspark_groundshaker_shot.mjs
 
 import { mkdirSync } from 'node:fs';
 import puppeteer from 'puppeteer-core';
@@ -13,13 +13,13 @@ import { BROWSER_PATH } from './browser_path.mjs';
 import { enterOfflineGame } from './enter_offline_game.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://127.0.0.1:5173';
-const OUT = 'docs/screenshots/tank-mount/in-game';
-const GRAPHICS_PRESET = Number(process.env.TANK_GRAPHICS_PRESET ?? 4);
-const SHOW_UI = process.env.TANK_SHOW_UI === '1';
-const WIDTH = Number(process.env.TANK_WIDTH ?? 1600);
-const HEIGHT = Number(process.env.TANK_HEIGHT ?? 1000);
-const TOUCH = process.env.TANK_TOUCH === '1';
-const CAPTURE_SUFFIX = process.env.TANK_CAPTURE_SUFFIX ?? '';
+const OUT = 'docs/screenshots/terrorspark-groundshaker/in-game';
+const GRAPHICS_PRESET = Number(process.env.GROUNDSHAKER_GRAPHICS_PRESET ?? 4);
+const SHOW_UI = process.env.GROUNDSHAKER_SHOW_UI === '1';
+const WIDTH = Number(process.env.GROUNDSHAKER_WIDTH ?? 1600);
+const HEIGHT = Number(process.env.GROUNDSHAKER_HEIGHT ?? 1000);
+const TOUCH = process.env.GROUNDSHAKER_TOUCH === '1';
+const CAPTURE_SUFFIX = process.env.GROUNDSHAKER_CAPTURE_SUFFIX ?? '';
 const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 mkdirSync(OUT, { recursive: true });
@@ -72,7 +72,7 @@ const booted = await enterOfflineGame(page, {
   gameBootTimeoutMs: 60_000,
 });
 if (!booted) {
-  await page.screenshot({ path: `${OUT}/tank-boot-failure.png` });
+  await page.screenshot({ path: `${OUT}/groundshaker-boot-failure.png` });
   console.error([...errors, ...consoleErrors].join('\n'));
   await browser.close();
   throw new Error('offline game did not boot');
@@ -82,22 +82,27 @@ const summon = await page.evaluate(() => {
   const game = window.__game;
   const sim = game.sim;
   sim.chat('/dev mounts');
-  const added = sim.countItem('reins_tank', sim.playerId);
-  const used = sim.useItem('reins_tank', sim.playerId);
+  const added = sim.countItem('reins_terrorspark_groundshaker', sim.playerId);
+  const used = sim.useItem('reins_terrorspark_groundshaker', sim.playerId);
   return { added, used };
 });
 if (summon.added !== 1) {
   throw new Error(`tank summon setup failed: ${JSON.stringify(summon)}`);
 }
 
-await page.waitForFunction(() => window.__game?.sim?.player?.mountKey === 'tank', {
-  timeout: 10_000,
-});
+await page.waitForFunction(
+  () => window.__game?.sim?.player?.mountKey === 'terrorspark_groundshaker',
+  {
+    timeout: 10_000,
+  },
+);
 await page.waitForFunction(
   () => {
     const game = window.__game;
     const view = game?.renderer?.views?.get(game.sim.playerId);
-    return view?.mountVisualKey === 'mount_tank' && view?.mountVisual?.root?.visible;
+    return (
+      view?.mountVisualKey === 'mount_terrorspark_groundshaker' && view?.mountVisual?.root?.visible
+    );
   },
   { timeout: 20_000 },
 );
@@ -157,7 +162,7 @@ await page.evaluate(() => {
     ?.click();
 });
 await sleep(300);
-await page.screenshot({ path: `${OUT}/tank-mounted-hero${CAPTURE_SUFFIX}.png` });
+await page.screenshot({ path: `${OUT}/groundshaker-mounted-hero${CAPTURE_SUFFIX}.png` });
 
 await page.evaluate(() => {
   const game = window.__game;
@@ -169,7 +174,7 @@ await page.evaluate(() => {
     ?.click();
 });
 await sleep(700);
-await page.screenshot({ path: `${OUT}/tank-mounted-side${CAPTURE_SUFFIX}.png` });
+await page.screenshot({ path: `${OUT}/groundshaker-mounted-side${CAPTURE_SUFFIX}.png` });
 
 console.log(JSON.stringify({ rig, errors, consoleErrors }, null, 2));
 if (errors.length > 0) process.exitCode = 1;

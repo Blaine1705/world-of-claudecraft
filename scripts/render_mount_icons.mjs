@@ -73,8 +73,8 @@ const JOBS = [
   {
     // Show the cannon, prow, and near track together so the silhouette reads
     // as a vehicle even at bag-icon size.
-    file: 'tank.glb',
-    id: 'reins_tank',
+    file: 'terrorspark_groundshaker.glb',
+    id: 'reins_terrorspark_groundshaker',
     cfg: { headFwd: 0.1, headUp: 0, fill: 1.18, yaw: 0.68, pitch: 0.24 },
   },
 ];

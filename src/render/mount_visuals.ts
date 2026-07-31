@@ -77,7 +77,7 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // Compact tracked vehicle with an authored rider socket behind the turret.
   // Its rigid-body clips animate the suspension and track wheels without a
   // procedural bob, keeping the pilot locked to the saddle.
-  tank: spec('mount_tank', 2.38, true, undefined, -0.3),
+  terrorspark_groundshaker: spec('mount_terrorspark_groundshaker', 2.38, true, undefined, -0.3),
 };
 
 /** Spec for an entity's active mountKey, or null when dismounted/unknown. */

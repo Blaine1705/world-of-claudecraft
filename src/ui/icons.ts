@@ -4318,7 +4318,7 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_shadowjump_toad',
   'reins_stormfeather_griffin',
   'reins_thunderstrut_gobbler',
-  'reins_tank',
+  'reins_terrorspark_groundshaker',
 ]);
 
 // The grouped literals above preserve the curated catalog's provenance history. Derive the

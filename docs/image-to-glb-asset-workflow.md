@@ -466,12 +466,12 @@ future asset genuinely needs a patterned finish, add a cell to the shared atlas 
 sibling shared atlas) with the same derivation-and-pin treatment; per-asset embedded
 textures remain the last resort and need a fresh performance case.
 
-**The one asset that made that case: the tank mount.** It is a rideable hero mount the
+**The one asset that made that case: the Terrorspark Groundshaker mount.** It is a rideable hero mount the
 player looks at from the chase camera for the whole session, so a shared grayscale grain
 cell could not carry it: it needs an independent roughness and normal response per material
 family, which vertex colors cannot express at all. It embeds six procedurally generated maps
 (metal and fabric, each albedo + tangent normal + packed occlusion/roughness/metalness) built
-by `scripts/assets/tank_mount/surface_maps.mjs`, plus a baked macro band in `COLOR_0`
+by `scripts/assets/terrorspark_groundshaker/surface_maps.mjs`, plus a baked macro band in `COLOR_0`
 (`surface_shading.mjs`: cavity occlusion against the neighbouring parts, ground contact and
 grime, settled dust, thinned paint on up-facing bevels and seam darkening on the rest). Read
 the shape of that solution before copying it:
@@ -494,7 +494,7 @@ the shape of that solution before copying it:
 
 Cost: 275 KiB to 572 KiB, which sits alongside the other authored mounts (valorsteed 562 KiB,
 gobbler 555 KiB) rather than above them, and mounts load lazily per visual key. A prop or a
-building still has no case for this; do not read the tank as a general licence.
+building still has no case for this; do not read the Terrorspark Groundshaker as a general licence.
 
 ### Budgets that held up
 

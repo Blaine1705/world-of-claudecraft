@@ -19,7 +19,7 @@ export type MountKey =
   | 'shadowjump_toad'
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
-  | 'tank';
+  | 'terrorspark_groundshaker';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -78,7 +78,8 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     moveSpeedPct: 0.75,
   },
   // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears.
-  // The tank is developer-only for now and has no player-facing acquisition.
+  // The Terrorspark Groundshaker is developer-only for now and has no
+  // player-facing acquisition.
   aether_hover_cycle: {
     key: 'aether_hover_cycle',
     name: 'Aether-Jouster Hover-Cycle',
@@ -91,8 +92,8 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
-  tank: {
-    key: 'tank',
+  terrorspark_groundshaker: {
+    key: 'terrorspark_groundshaker',
     name: 'Terrorspark Groundshaker',
     rarity: 'epic',
     moveSpeedPct: 0.8,

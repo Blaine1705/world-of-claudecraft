@@ -98,10 +98,10 @@ describe('procedural bob math', () => {
   });
 
   it('the tank is gait-rigged with a stable rear saddle and no procedural effect', () => {
-    const spec = MOUNT_VISUAL_SPECS.tank;
-    const def = VISUALS.mount_tank;
+    const spec = MOUNT_VISUAL_SPECS.terrorspark_groundshaker;
+    const def = VISUALS.mount_terrorspark_groundshaker;
     expect(spec).toMatchObject({
-      visualKey: 'mount_tank',
+      visualKey: 'mount_terrorspark_groundshaker',
       seat: 2.38,
       seatFwd: -0.3,
       rigged: true,
@@ -109,7 +109,7 @@ describe('procedural bob math', () => {
       fx: null,
     });
     expect(def).toMatchObject({
-      url: 'models/mounts/tank.glb',
+      url: 'models/mounts/terrorspark_groundshaker.glb',
       height: 2.8,
       walkRef: 3,
       runRef: 4.4,
@@ -128,6 +128,6 @@ describe('procedural bob math', () => {
     expect(MOUNT_VISUAL_SPECS.aether_hover_cycle.fx).toBe('exhaust');
     expect(MOUNT_VISUAL_SPECS.valorsteed.fx).toBeNull();
     expect(MOUNT_VISUAL_SPECS.stormfeather_griffin.fx).toBeNull();
-    expect(MOUNT_VISUAL_SPECS.tank.fx).toBeNull();
+    expect(MOUNT_VISUAL_SPECS.terrorspark_groundshaker.fx).toBeNull();
   });
 });

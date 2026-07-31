@@ -95,7 +95,7 @@ describe('mount catalog', () => {
   it('has exactly eight mounts with the horse first and the developer tank last', () => {
     expect(MOUNT_KEYS).toHaveLength(8);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
-    expect(MOUNT_KEYS.at(-1)).toBe('tank');
+    expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
   });
 
@@ -111,7 +111,7 @@ describe('mount catalog', () => {
     expect(spec('stalkglider_snail')).toEqual(['rare', 0.75]);
     expect(spec('aether_hover_cycle')).toEqual(['epic', 0.8]);
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
-    expect(spec('tank')).toEqual(['epic', 0.8]);
+    expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
     // The level field is GONE, not merely unused: it never fired (reins carry no
     // requiredLevel and every source is level-20 content) and leaving it would
     // invite a second gate to grow back beside ridingTrained.
@@ -195,7 +195,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
 
     for (const key of MOUNT_KEYS) {
       if (key === 'valorsteed') continue; // the purchase, not a drop
-      if (key === 'tank') continue; // developer-only, pinned separately below
+      if (key === 'terrorspark_groundshaker') continue; // developer-only, pinned separately below
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
       // No mount is ever on a NORMAL mob table, at any rarity.
@@ -240,11 +240,11 @@ describe('mount reins items (the collection: owning the item is owning the mount
   });
 
   it('keeps the tank developer-only and absent from every normal acquisition table', () => {
-    const itemId = 'reins_tank';
+    const itemId = 'reins_terrorspark_groundshaker';
     const item = ITEMS[itemId] as MountItemDef;
     expect(item).toMatchObject({
       kind: 'mount',
-      mount: 'tank',
+      mount: 'terrorspark_groundshaker',
       quality: 'epic',
       soulbound: true,
       noDiscard: true,

@@ -9,8 +9,8 @@ import {
   NORMAL_SCALE,
   TANK_MAP_SPECS,
   type TankSurfaceMaps,
-} from '../scripts/assets/tank_mount/surface_maps.mjs';
-import { ORM_CENTER } from '../scripts/assets/tank_mount/surface_shading.mjs';
+} from '../scripts/assets/terrorspark_groundshaker/surface_maps.mjs';
+import { ORM_CENTER } from '../scripts/assets/terrorspark_groundshaker/surface_shading.mjs';
 
 /** Spread of a large typed array. Math.min/max with a spread argument list
  *  blows the call stack at these resolutions. */

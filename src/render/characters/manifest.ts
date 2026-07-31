@@ -849,8 +849,8 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   // Compact fantasy tank. One wheel revolution per locomotion clip matches
   // its authored tread cadence at the reference ground speeds below.
-  mount_tank: {
-    url: `${MOUNTS_DIR}/tank.glb`,
+  mount_terrorspark_groundshaker: {
+    url: `${MOUNTS_DIR}/terrorspark_groundshaker.glb`,
     height: 2.8,
     clips: MOUNT_RIGGED,
     walkRef: 3,

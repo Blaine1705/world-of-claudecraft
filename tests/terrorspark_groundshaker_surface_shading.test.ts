@@ -9,7 +9,7 @@ import {
   SURFACE_TUNING,
   shadeSurfaceInto,
   UV_SCALE,
-} from '../scripts/assets/tank_mount/surface_shading.mjs';
+} from '../scripts/assets/terrorspark_groundshaker/surface_shading.mjs';
 
 /** One up-facing unit quad (two triangles) at height y, offset by `at` in x/z. */
 function upFacingQuad(y: number, atX = 0, atZ = 0, span = 1): [Float32Array, Float32Array] {
