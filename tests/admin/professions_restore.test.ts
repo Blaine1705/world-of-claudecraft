@@ -184,8 +184,8 @@ describe('server prose coupling (the count clamp and the error reverse map)', ()
     const literals = failProses('server/admin.ts');
     // Liveness floor, set just under the real post-widening count: a scan that
     // silently stops resolving the named-constant or ternary shapes (measured
-    // drops of 14 and 30; the flattening arm is defensive against a future
-    // formatter wrap, since no multi-line fail() exists in the file today)
+    // drops of 14 and 30; the flattening arm contributes 2 proses today via a
+    // constant DECLARATION wrapped across lines, below the floor's resolution)
     // (its whole point) collapses well below this and fails here, not silently.
     expect(literals.length).toBeGreaterThan(109);
     for (const prose of literals) {
