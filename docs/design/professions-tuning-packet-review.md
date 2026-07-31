@@ -2857,6 +2857,145 @@ Pass-1 phase 13 scope, honestly re-scoped:
 4. Character-blob growth measurement (node timers plus slots plus
    proficiency) lands here with a bound asserted.
 
+**Phase 16 BUILT** (2026-07-31, Fable xhigh, new session). Preamble:
+release/v0.33.0 unmoved past the synced b0acba0ad (no re-sync, no merge
+audit). Entry a33e30720e; nineteen commits to the code tip 86176bed9a,
+this record the docs-only close on top.
+
+Item 1, the rig, from scratch as scoped: `scripts/load_professions.mjs`
+(`npm run perf:professions`) drives synthetic gathering tours over the
+real `GATHER_NODES` table and fishing with bite-reactive reeling at up
+to 1,200 connections, with sampled parsing observers recording snapshot
+sizes and per-snapshot ncd/tslot payload bytes on either timer-wire arm,
+and a pinned gate (`evaluateProfessionsLoadRun`: unconditional join AND
+liveness enforcement, shed-aware sample floors, timer-wire arm purity in
+both directions, window-scoped hollow-run evidence per role). The pure
+halves live in `scripts/lib/prof_load_util.mjs` and the shared
+`scripts/lib/loopback_guard.mjs` (the thrice-copied local-only control,
+collapsed on the rule of three), both d.mts-typed and Vitest-pinned.
+Four gated captures at exactly 1,000 of 1,000 joined and alive are
+committed beside `docs/design/player-performance/
+professions-load-baseline.md` (hardware named per R36: Apple M4 Max, 16
+cores, 128 GB, macOS 26.5.2, Node v26.5.0), all four stamping one
+gitHead: mixed-stable, gather-legacy, gather-stable, fish-stable. The
+capture-protocol section records the traps the shakedowns hit (the pool
+default as the login wall, the spawn-point pileup, the EADDRINUSE zombie
+restart, the orphaned-lease ramp tail, the rolling perf ring's
+pre-window blend).
+
+Item 2, the budget split. CI pins:
+`tests/professions_wire_budget.test.ts` (tslot ships `[]` once then zero
+bytes per quiet tick, re-ships only on a charge change, plus its
+cleared-slot transition; stable ncd ships absolute deadlines once then
+zero bytes while cooling; legacy ncd re-ships the whole map every tick
+and returns to `{}` then silence on elapse; the 120-node worst case
+under the 4096-byte node_persist twin at thirty days of fractional
+uptime with the tw echo asserted; allocation stability of both empty
+arms pinned by reference identity to the shared frozen instance) and
+`tests/professions_blob_growth.test.ts` (the settled worst-case
+professions blob, 8,469 bytes measured against a 9,728 ceiling, every
+field present AND non-empty, every entry cap, and the junk-drop arms).
+Mac baselines, never CI-asserted: at 1,000 active professions bots the
+loop callback runs about 0.64 s steady state (1.53 to 1.57 snapshots per
+client per second, sim ticks held 15.4 to 15.8 Hz by catch-up), and the
+legacy per-tick ncd arm is measured live as scoped: 479.5 B in every
+frame against the stable arm's 37.2 B in 7.6 percent of frames, a 12.9x
+steady-state cut (2.5x on the median gather snapshot, 1.9x on fleet
+receive rate). The pass-1 "allocation-free when unchanged" claim was
+true of the stable arm only; the phase made it true of the legacy empty
+arm too and pinned both, via two byte-identical wire fast paths (the
+tslot empty arm compares the constant `[]`, the legacy ncd arm probes
+the readyAt map alloc-free and ships the constant `{}`) plus the shared
+frozen empty tool-effect projection.
+
+Item 3, the zone-scaling projection. Server side is a VERIFIED
+NEGATIVE: no per-tick work scales with node or zone count (no per-zone
+node registry exists; node respawn is a lazy per-player comparison; the
+only GATHER_NODES walks are module-init, the command path, and the
+seed-cached collider build). The real per-tick term is O(players): the
+professions self-delta block sits above the heavy gate and measured
+about 16 ms of each 1,000-session callback (bcastSelf), flat across all
+four scenarios, so professions wire is not the 1,000-concurrent
+bottleneck on either arm. The one genuine defect found there is fixed:
+`updateMasteryResetNotices` was an ungated 20 Hz O(players) walk, and
+the sibling cadence gate would have LOST the one-shot notice (its
+persisted gate saves true from the first save while the flag is
+transient), so it now runs behind a live pending counter on the
+SimContext seam, one integer read per tick, draining on the very next
+tick as before. Client side: `tests/professions_zone_scaling.test.ts`
+pins the render group to the GATHER_NODES id set (the resident linear
+term), every node's collider arm through the real spatial grid (solid
+ore and wood at authored radii, soft herb), and the per-zone table
+derivations in both directions; the minimap rim-cull parity arms landed
+in `tests/minimap_markers.test.ts`; the professions painter budgets were
+already enforced (every professions surface COLD, the gathering bar on
+the hot shared cast bar). Two false test comments claiming every zone
+carries six nodes per type were corrected to the tuned-zone scope.
+
+Item 4, the blob bound, with three load-side clamps beside it (the
+node_persist doctrine, drop-only, each dropping ALONE): `craftedBy` and
+`equipmentInstance`/inventory `signer` at the enforced 16-character name
+shape (cross-tied to `validCharNameShape` behaviorally, at and one past
+the clamp), and `knownRecipes` ids at a 64-character shape bound that
+keeps the grandfather contract (retired ids still load; catalog
+filtering would redden the roundtrip arm built to catch it).
+
+Server changes beyond the wire paths: `DB_POOL_MAX_CLIENTS` became
+env-tunable (decimal-digit-only, ceiling at the stock postgres:16
+connection budget of 100, the budget rule documented in db.ts and
+.env.example, the env wiring scrape-pinned) because the 10-client
+default is the real 1,000-login wall (autosave waves hold the pool
+while handshakes wait out the connect timeout); and a mid-handshake
+socket death no longer mints a PERMANENT lease-holding zombie session
+(the close event fired before the handler existed; the ping sweep skips
+non-open sockets; the grace sweep needs linkdead): the attach site
+re-checks readyState and routes the death through socketClosed, pinned
+three ways. A WS_AUTH_TIMEOUT_MS knob added mid-phase was REVERTED by
+the review round with the mechanism corrected in place: the deadline
+clears on the FIRST frame, before any handshake database work, and the
+client-facing authTimedOut literal is a relabel of any escaping
+handshake rejection.
+
+Evidence: five Explore mappers up front, five build reviewers via the
+Agent tool (architecture, database-performance, test-coverage,
+privacy-security, general-purpose rig/doc), TWO fix-round reviewers
+over the applied fixes, and qa-checklist as the adversarial close
+(READY, zero blocking; its six accuracy findings applied). Twenty-six
+targeted mutants in an isolated worktree (git worktree add plus cp -c
+node_modules, removed after), every one KILLED with parsed fail counts,
+including two survivors-turned-kills that forced pin strengthening (a
+discarded allocation-probe verdict; a spot-discovery fixture whose cap
+filled from benign candidates before the guarded arm ran). Final gate:
+PASS, all 11 steps green, exit code 0 read explicitly, on the committed
+idle tree at 86176bed9a (the first gate run caught the one ws_auth
+consumer fixture the targeted sweeps missed, fixed as its own commit).
+
+Recorded follow-ups, NOT filed (pre-existing unless noted): the login
+handshake's four separate single-row accounts reads inside eight
+sequential pool checkouts (a one-SELECT collapse would cut login pool
+demand roughly a third); autosave's missing dirty tracking and its
+four-round-trip per-character transaction (a serialized-blob hash skip
+and a single-statement autosave arm are the sketched relief); the
+uncounted pre-auth socket population (bounded only by the 10 s
+first-frame deadline); the client-facing authTimedOut relabel hiding
+pool exhaustion from clients (wire-change territory); the
+cprof/prof/gprof per-tick rebuild-and-stringify above the heavy gate
+(cprof sorts the recipe list twice per tick per player; memoization
+candidates recorded with the PartyFrameProjectionCache precedent,
+deferred because bcastSelf measured flat at 1,000); zoneAt's O(zones)
+linear scan and emitToZonePlayers' O(players x zones) per rare proc
+(benign at 1/90); the hover raycast over all world node meshes (about
+8 Hz, bounded today); nodeHarvestReadyAt's session-monotonic growth
+toward 120 keys (a runtime prune was rejected as delicate against the
+save doctrine); the ClientWorld toolEffectSlots mirror staying a fresh
+mutable array where the Sim returns the shared frozen instance (inert,
+no consumer mutates); the pure-allocation reverts of the wire fast
+paths being equivalent-by-design for behavior pins; the rig's loop lag
+disclosed rather than gated and the tslot non-empty arm CI-only by
+design; and this file's own R37 prose ("no zone beyond the built-in
+three") remaining stale against the v0.32.0 starter kits, which
+`tests/professions_zone_rollout.test.ts` already records.
+
 ---
 
 ## Phase 17: the wiki truth pass and the release locale fill
