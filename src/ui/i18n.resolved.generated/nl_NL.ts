@@ -340,11 +340,14 @@ export const nl_NL: EnTranslations = {
       "menuButton": "Loskomen",
       "help": "Herstel: /unstuck start een stilstaande aftelling die je verplaatst naar een nabije bereikbare veilige plek.",
       "helpAtGraveyard": "Herstel: /unstuck start een stilstaande aftelling en stuurt je geest daarna naar het dichtstbijzijnde kerkhof. Terugkeren via De Bleke Hoeder vereist de Tol van de Hoeder.",
+      "helpUnstuckSickness": "Herstel: /unstuck start een stilstaande aftelling en verplaatst je daarna naar het dichtstbijzijnde kerkhof, waarbij je herrijst als je was gevallen. De Loskomingsziekte blijft tot 5 minuten op je.",
       "started": "Loskomen over {seconds} seconden. Bewegen, vechten, schade oplopen, of een andere actie beginnen annuleert dit.",
       "countdown": "Loskomen: {seconds}",
       "completed": "Verplaatst naar de dichtstbijzijnde bereikbare veilige plek.",
       "completedAtGraveyard": "Je geest is teruggekeerd naar het dichtstbijzijnde kerkhof. Spreek met De Bleke Hoeder om de Tol van de Hoeder te accepteren.",
       "revivedAtGraveyard": "Je bent teruggebracht naar het dichtstbijzijnde kerkhof en herrezen. De Tol van de Hoeder weegt op je.",
+      "movedToGraveyard": "Je bent naar het dichtstbijzijnde kerkhof verplaatst. De Loskomingsziekte weegt op je.",
+      "revivedAtGraveyardUnstuck": "Je bent naar het dichtstbijzijnde kerkhof verplaatst en herrezen. De Loskomingsziekte weegt op je.",
       "cancelledMoved": "Loskomen geannuleerd omdat je bewoog.",
       "cancelledDamaged": "Loskomen geannuleerd omdat je schade opliep.",
       "cancelledCombat": "Loskomen geannuleerd omdat je in gevecht raakte.",
@@ -2926,6 +2929,9 @@ export const nl_NL: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw."
+    },
+    "ota_updates": {
+      "invalid_input": "Ongeldige invoer."
     }
   },
   "guide": {
@@ -6827,7 +6833,8 @@ export const nl_NL: EnTranslations = {
       "incomplete": "Die quest is niet voltooid.",
       "giverMissing": "Die questgever is niet in de buurt.",
       "turnInMissing": "Die questinlevering is niet in de buurt.",
-      "tooFar": "Te ver weg."
+      "tooFar": "Te ver weg.",
+      "escortAway": "Degene die je moet begeleiden is er nu niet. Die komt binnenkort terug."
     }
   },
   "itemUi": {
@@ -12830,7 +12837,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Wren Veilig Thuisbrengen",
-        "text": "Mijn leerling Wren ging twee dagen geleden de Goudsmelt-lijn lopen en is nooit teruggekomen. Ik vond haar sporen, ze schuilt onder de wegmarkeringen ten zuidwesten van de Aurora-Trappen, te bang voor de wolven om te bewegen. Ik kan het veen niet verlaten, {playerName}. Breng haar naar Veyla's kamp op de Trappen. Daar is ze veilig onder de lichten.",
+        "text": "Mijn leerling Wren ging twee dagen geleden de Goudsmelt-lijn lopen en is nooit teruggekomen. Ik vond haar sporen, ze schuilt onder de wegmarkeringen ten noordoosten van de Aurora-Trappen, te bang voor de wolven om te bewegen. Ik kan het veen niet verlaten, {playerName}. Breng haar naar Veyla's kamp op de Trappen. Daar is ze veilig onder de lichten.",
         "completion": "Het meisje is binnen, gewikkeld in de helft van mijn dekens en kletsend de sterren van de hemel. Je hebt vandaag iets goeds gedaan, {playerName}. Dat ziet de Sluier niet vaak.",
         "objectives": {
           "0": {
@@ -13514,7 +13521,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Komt Thuis",
-        "text": "Mijn Bram nam de boot mee de ochtend dat de nettenbreuk opende, en de zee wierp hem ergens voorbij de Aanlegpunt terug. Ik hoorde hem drie nachten geleden, {playerName}, roepend over het water, en ik was te bang om te gaan. Ik ben nog steeds te bang. Alsjeblieft. Zijn boot ligt vergaan op de noordoever. Breng hem lopend naar mij terug.",
+        "text": "Mijn Bram nam de boot mee de ochtend dat de nettenbreuk opende, en de zee wierp hem ergens voorbij de Aanlegpunt terug. Ik hoorde hem drie nachten geleden, {playerName}, roepend over het water, en ik was te bang om te gaan. Ik ben nog steeds te bang. Alsjeblieft. Zijn boot ligt vergaan op de zuidoever. Breng hem lopend naar mij terug.",
         "completion": "Bram! Je hebt hem heel bij me teruggebracht, {playerName}. We hebben allebei gehuild en geen van ons schaamt zich ervoor. Wat de breuken ook hierna van dit eiland nemen, mijn familie krijgen ze niet. Niet meer.",
         "objectives": {
           "0": {

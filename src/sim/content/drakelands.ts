@@ -167,6 +167,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
       { copper: 80, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.4 },
       { copper: 90, chance: 1 },
+      { itemId: 'bone_fragments', chance: 0.4 },
       { itemId: 'ashbone_war_brand', chance: 0.6, questId: 'q_dk_marrow_and_ash' },
     ],
     scale: 1,
