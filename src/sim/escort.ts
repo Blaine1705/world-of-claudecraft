@@ -234,7 +234,10 @@ function endRun(
 ): void {
   if (npc) emitMobYell(ctx, npc, outcome === 'success' ? def.successText : def.failText);
   // Surviving ambush mobs leave with the run (a failed wave never lingers to
-  // camp the respawned escortee).
+  // camp the respawned escortee). A SLAIN one is deliberately left alone: it
+  // carries summonedAdd, so mob/locomotion.ts unravels its corpse once the loot
+  // window lapses. Dropping it here instead would yank a corpse a player may be
+  // mid-loot on, which is the whole reason that arm waits for corpseTimer.
   for (const id of state.run?.ambushIds ?? []) {
     const mob = ctx.entities.get(id);
     if (mob && !mob.dead) ctx.dropEntity(id);
