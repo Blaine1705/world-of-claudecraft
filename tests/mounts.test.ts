@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 
 // Mock the db layer so importing server/game (for wireEntity) needs no Postgres,
@@ -171,6 +173,18 @@ describe('mount reins items (the collection: owning the item is owning the mount
       // The item's name color matches the card's rarity tier.
       expect(item.quality).toBe(MOUNTS[key].rarity);
     }
+  });
+
+  // scripts/mounts_shot.mjs grants the reins by a hardcoded list, and a mount
+  // added to the catalog without a matching row leaves the capture tool showing
+  // a stale collection while every gate stays green. Pin the list against the
+  // catalog so the desync is a red test instead of a silently short screenshot.
+  it('the mounts capture script grants exactly the catalog reins', () => {
+    const source = readFileSync(path.join(__dirname, '..', 'scripts/mounts_shot.mjs'), 'utf8');
+    const block = source.match(/for \(const id of \[([^\]]*)\]\)/);
+    expect(block, 'the reins grant loop moved or changed shape').not.toBeNull();
+    const granted = [...(block as RegExpMatchArray)[1].matchAll(/'([^']+)'/g)].map((m) => m[1]);
+    expect(granted.sort()).toEqual(MOUNT_KEYS.map((key) => mountItemId(key)).sort());
   });
 
   it('only the horse reins is purchasable, for 10 gold', () => {
