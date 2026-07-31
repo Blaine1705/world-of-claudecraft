@@ -888,6 +888,13 @@ export const id_ID: EnTranslations = {
       "heroicName": "{name} Heroik",
       "heroicLocked": "Anda terkunci pada {name} Heroik."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Lantai {current} dari {total}",
+      "closesIn": "Tutup dalam {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "U",
       "NE": "TL",
@@ -2120,7 +2127,7 @@ export const id_ID: EnTranslations = {
         "noRecipient": "Tidak ada orang dengan nama itu yang memiliki kotak surat di sini.",
         "tooManyParcels": "Satu surat memuat paling banyak {count} bingkisan.",
         "noMailQuestItems": "Kamu tidak bisa mengirim barang misi lewat surat.",
-        "noMailBound": "That item is bound and cannot be mailed.",
+        "noMailBound": "Barang itu terikat dan tidak dapat dikirim lewat surat.",
         "notEnoughItems": "Kamu tidak punya sebanyak itu untuk dikirim.",
         "cantAffordPostage": "Kamu tidak mampu membayar perangkonya.",
         "recipientBoxFull": "Kotak surat mereka penuh.",
@@ -6472,12 +6479,12 @@ export const id_ID: EnTranslations = {
       "arenaQueueTrading": "Selesaikan dulu perdaganganmu sebelum antre.",
       "arenaQueueInstance": "Kamu tidak bisa antre dari dalam instance.",
       "tradeInProgress": "Perdagangan sudah berlangsung.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Pemain itu sedang berdagang.",
       "tradeTooFar": "Sasaran terlalu jauh untuk berdagang.",
       "tradeExpired": "Permintaan perdagangan telah kedaluwarsa.",
       "tradeFailed": "Perdagangan gagal: barang atau uang sudah tidak tersedia.",
       "tradeBound": "Barang itu terikat dan tidak dapat diperdagangkan.",
-      "marketListBound": "That item is bound and cannot be listed."
+      "marketListBound": "Barang itu terikat dan tidak dapat dijual di pasar."
     },
     "logs": {
       "standUp": "Kamu berdiri.",

@@ -1980,6 +1980,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Esa carta ya no está en tu buzón.',
   'hudChrome.mailbox.result.needRecipient': 'Indica un destinatario para tu carta.',
   'hudChrome.mailbox.result.noMailQuestItems': 'No puedes enviar objetos de misión por correo.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Ese objeto está vinculado y no puede enviarse por correo.',
   'hudChrome.mailbox.result.noRecipient': 'Nadie con ese nombre tiene buzón aquí.',
   'hudChrome.mailbox.result.notEnoughItems': 'No tienes tantos para enviar.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Su buzón está lleno.',
@@ -3265,6 +3267,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hud.errors.tradeTooFar': 'El objetivo está demasiado lejos para comerciar.',
   'hud.errors.tradeExpired': 'La solicitud de comercio ha expirado.',
   'hud.errors.tradeBound': 'Ese objeto está vinculado y no puede comerciarse.',
+  'hud.errors.marketListBound': 'Ese objeto está vinculado y no puede ponerse a la venta.',
   'hud.errors.tradeFailed': 'Comercio fallido: los objetos o el dinero ya no están disponibles.',
   'hud.logs.standUp': 'Te pones de pie.',
   'hud.logs.partyInviteSent': 'Has invitado a {name} a tu grupo.',

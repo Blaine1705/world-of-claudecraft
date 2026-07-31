@@ -888,6 +888,13 @@ export const sv_SE: EnTranslations = {
       "heroicName": "Heroisk {name}",
       "heroicLocked": "Du är låst till Heroisk {name}."
     },
+    "riftTracker": {
+      "title": "Reva",
+      "floor": "Våning {current} av {total}",
+      "closesIn": "Stänger om {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NÖ",
@@ -2120,7 +2127,7 @@ export const sv_SE: EnTranslations = {
         "noRecipient": "Ingen med det namnet har en brevlåda här.",
         "tooManyParcels": "Ett brev rymmer högst {count} paket.",
         "noMailQuestItems": "Du kan inte skicka uppdragsföremål med post.",
-        "noMailBound": "That item is bound and cannot be mailed.",
+        "noMailBound": "Det föremålet är bundet och kan inte skickas med post.",
         "notEnoughItems": "Du har inte så många att skicka.",
         "cantAffordPostage": "Du har inte råd med portot.",
         "recipientBoxFull": "Mottagarens brevlåda är full.",
@@ -6472,12 +6479,12 @@ export const sv_SE: EnTranslations = {
       "arenaQueueTrading": "Avsluta din handel innan du köar.",
       "arenaQueueInstance": "Du kan inte köa inifrån en instans.",
       "tradeInProgress": "En handel pågår redan.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Den spelaren handlar redan.",
       "tradeTooFar": "Målet är för långt bort för att handla.",
       "tradeExpired": "Handelsförfrågan har gått ut.",
       "tradeFailed": "Handeln misslyckades: föremål eller pengar är inte längre tillgängliga.",
       "tradeBound": "Det föremålet är bundet och kan inte handlas.",
-      "marketListBound": "That item is bound and cannot be listed."
+      "marketListBound": "Det föremålet är bundet och kan inte säljas."
     },
     "logs": {
       "standUp": "Du reser dig upp.",

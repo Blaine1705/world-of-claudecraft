@@ -888,6 +888,13 @@ export const nl_NL: EnTranslations = {
       "heroicName": "Heroïsch {name}",
       "heroicLocked": "Je bent vergrendeld voor Heroïsch {name}."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Verdieping {current} van {total}",
+      "closesIn": "Sluit over {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NO",
@@ -2120,7 +2127,7 @@ export const nl_NL: EnTranslations = {
         "noRecipient": "Niemand met die naam heeft hier een brievenbus.",
         "tooManyParcels": "Een brief draagt hoogstens {count} pakketten.",
         "noMailQuestItems": "Je kunt geen opdrachtvoorwerpen versturen.",
-        "noMailBound": "That item is bound and cannot be mailed.",
+        "noMailBound": "Dat voorwerp is gebonden en kan niet worden verstuurd.",
         "notEnoughItems": "Zoveel heb je er niet om te versturen.",
         "cantAffordPostage": "Je kunt de porto niet betalen.",
         "recipientBoxFull": "Hun brievenbus is vol.",
@@ -6472,12 +6479,12 @@ export const nl_NL: EnTranslations = {
       "arenaQueueTrading": "Rond je ruil af voordat je in de wachtrij gaat.",
       "arenaQueueInstance": "Je kunt niet in de wachtrij gaan vanuit een instantie.",
       "tradeInProgress": "Er is al een ruil aan de gang.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Die speler is al aan het ruilen.",
       "tradeTooFar": "Het doelwit is te ver weg om mee te ruilen.",
       "tradeExpired": "Het ruilverzoek is verlopen.",
       "tradeFailed": "Ruil mislukt: voorwerpen of geld niet langer beschikbaar.",
       "tradeBound": "Dat voorwerp is gebonden en kan niet worden verhandeld.",
-      "marketListBound": "That item is bound and cannot be listed."
+      "marketListBound": "Dat voorwerp is gebonden en kan niet te koop worden aangeboden."
     },
     "logs": {
       "standUp": "Je staat op.",

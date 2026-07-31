@@ -2158,6 +2158,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Tego listu nie ma już w twojej skrzynce.',
   'hudChrome.mailbox.result.needRecipient': 'Wskaż odbiorcę listu.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Nie możesz wysyłać pocztą przedmiotów zadań.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Ten przedmiot jest przywiązany i nie można go wysłać pocztą.',
   'hudChrome.mailbox.result.noRecipient': 'Nikt o tym imieniu nie ma tu skrzynki pocztowej.',
   'hudChrome.mailbox.result.notEnoughItems': 'Nie masz aż tylu do wysłania.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Skrzynka odbiorcy jest pełna.',
@@ -5914,6 +5916,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetMustDodge': 'Twój cel musi najpierw zrobić unik.',
   'hud.errors.targetTooFar': 'Cel jest zbyt daleko.',
   'hud.errors.tradeBound': 'Ten przedmiot jest przywiązany i nie można go wymienić.',
+  'hud.errors.marketListBound':
+    'Ten przedmiot jest przywiązany i nie można go wystawić na sprzedaż.',
   'hud.errors.tooClose': 'Zbyt blisko!',
   'hud.errors.tradeExpired': 'Prośba o wymianę wygasła.',
   'hud.errors.tradeFailed': 'Wymiana nieudana: przedmioty lub pieniądze są już niedostępne.',

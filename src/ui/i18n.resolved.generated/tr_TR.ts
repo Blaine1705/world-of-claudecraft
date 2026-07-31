@@ -888,6 +888,13 @@ export const tr_TR: EnTranslations = {
       "heroicName": "Kahramanca {name}",
       "heroicLocked": "Kahramanca {name} akınına kilitlisin."
     },
+    "riftTracker": {
+      "title": "Yarık",
+      "floor": "Kat {current}/{total}",
+      "closesIn": "{time} içinde kapanır",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "K",
       "NE": "KD",
@@ -2120,7 +2127,7 @@ export const tr_TR: EnTranslations = {
         "noRecipient": "Burada bu isimde posta kutusu olan kimse yok.",
         "tooManyParcels": "Bir mektup en fazla {count} paket taşır.",
         "noMailQuestItems": "Görev eşyalarını postayla gönderemezsin.",
-        "noMailBound": "That item is bound and cannot be mailed.",
+        "noMailBound": "O eşya bağlı ve postayla gönderilemez.",
         "notEnoughItems": "Gönderecek o kadar tane yok.",
         "cantAffordPostage": "Posta ücretini karşılayamazsın.",
         "recipientBoxFull": "Alıcının posta kutusu dolu.",
@@ -6472,12 +6479,12 @@ export const tr_TR: EnTranslations = {
       "arenaQueueTrading": "Sıraya girmeden önce takasını bitir.",
       "arenaQueueInstance": "Bir zindanın içinden sıraya giremezsin.",
       "tradeInProgress": "Zaten devam eden bir takas var.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Bu oyuncu zaten takas yapıyor.",
       "tradeTooFar": "Hedef takas için çok uzakta.",
       "tradeExpired": "Takas isteğinin süresi doldu.",
       "tradeFailed": "Takas başarısız: eşyalar ya da para artık mevcut değil.",
       "tradeBound": "O eşya bağlı ve takas edilemez.",
-      "marketListBound": "That item is bound and cannot be listed."
+      "marketListBound": "O eşya bağlı ve satışa çıkarılamaz."
     },
     "logs": {
       "standUp": "Ayağa kalkıyorsun.",

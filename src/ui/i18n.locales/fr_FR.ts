@@ -2524,6 +2524,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.noMailQuestItems':
     "Vous ne pouvez pas envoyer d'objets de quête par courrier.",
   'hudChrome.mailbox.result.noRecipient': 'Personne de ce nom ne possède de boîte aux lettres ici.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Cet objet est lié et ne peut pas être envoyé par courrier.',
   'hudChrome.mailbox.result.notEnoughItems': "Vous n'en avez pas autant à envoyer.",
   'hudChrome.mailbox.result.recipientBoxFull': 'Sa boîte aux lettres est pleine.',
   'hudChrome.mailbox.result.sent':
@@ -3789,6 +3791,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.notEnoughHealth': 'Pas assez de points de vie.',
   'hud.errors.targetMustDodge': "Votre cible doit d'abord esquiver.",
   'hud.errors.tradeBound': 'Cet objet est lié et ne peut pas être échangé.',
+  'hud.errors.marketListBound': 'Cet objet est lié et ne peut pas être mis en vente.',
   'hud.errors.requiresCombo': 'Cette technique requiert des points de combo.',
   'hud.errors.requiresForm': 'Vous devez être en forme de {form}.',
   'hud.errors.bear': 'Bruin',

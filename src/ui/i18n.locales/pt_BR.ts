@@ -2079,6 +2079,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Essa carta não está mais na sua caixa.',
   'hudChrome.mailbox.result.needRecipient': 'Indique um destinatário para a sua carta.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Você não pode enviar itens de missão pelo correio.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Esse item está vinculado e não pode ser enviado pelo correio.',
   'hudChrome.mailbox.result.noRecipient': 'Ninguém com esse nome possui caixa de correio aqui.',
   'hudChrome.mailbox.result.notEnoughItems': 'Você não tem tantos assim para enviar.',
   'hudChrome.mailbox.result.recipientBoxFull': 'A caixa de correio do destinatário está cheia.',
@@ -3349,6 +3351,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.invitationExpired': 'O convite expirou.',
   'hud.errors.targetTooFar': 'O alvo está longe demais.',
   'hud.errors.tradeBound': 'Esse item está vinculado e não pode ser negociado.',
+  'hud.errors.marketListBound': 'Esse item está vinculado e não pode ser colocado à venda.',
   'hud.errors.duelInProgress': 'Já há um duelo em andamento.',
   'hud.errors.challengeExpired': 'O desafio expirou.',
   'hud.errors.arenaAlreadyInMatch': 'Você já está em uma luta de arena.',

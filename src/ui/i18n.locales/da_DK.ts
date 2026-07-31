@@ -2004,6 +2004,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Det brev er ikke længere i din postkasse.',
   'hudChrome.mailbox.result.needRecipient': 'Angiv en modtager til dit brev.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Du kan ikke sende opgavegenstande med posten.',
+  'hudChrome.mailbox.result.noMailBound': 'Den genstand er bundet og kan ikke sendes med posten.',
   'hudChrome.mailbox.result.noRecipient': 'Ingen med det navn har en postkasse her.',
   'hudChrome.mailbox.result.notEnoughItems': 'Du har ikke så mange at sende.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Modtagerens postkasse er fuld.',
@@ -5738,6 +5739,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetTooFar': 'Målet er for langt væk.',
   'hud.errors.tooClose': 'For tæt på!',
   'hud.errors.tradeBound': 'Den genstand er bundet og kan ikke handles.',
+  'hud.errors.marketListBound': 'Den genstand er bundet og kan ikke sættes til salg.',
   'hud.errors.tradeExpired': 'Handelsanmodningen er udløbet.',
   'hud.errors.tradeFailed':
     'Handel mislykkedes: genstande eller penge er ikke længere tilgængelige.',

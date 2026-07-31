@@ -888,6 +888,13 @@ export const cs_CZ: EnTranslations = {
       "heroicName": "{name} (hrdinská)",
       "heroicLocked": "Jsi uzamčen(a) k hrdinské verzi {name}."
     },
+    "riftTracker": {
+      "title": "Trhlina",
+      "floor": "Patro {current} z {total}",
+      "closesIn": "Zavře se za {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "S",
       "NE": "SV",
@@ -2120,7 +2127,7 @@ export const cs_CZ: EnTranslations = {
         "noRecipient": "Nikdo s tímto jménem zde poštovní schránku nemá.",
         "tooManyParcels": "Dopis unese nejvýše {count} balíků.",
         "noMailQuestItems": "Úkolové předměty nelze posílat poštou.",
-        "noMailBound": "That item is bound and cannot be mailed.",
+        "noMailBound": "Tento předmět je vázaný a nelze ho poslat poštou.",
         "notEnoughItems": "Nemáš tolik kusů k odeslání.",
         "cantAffordPostage": "Nemůžeš si dovolit poštovné.",
         "recipientBoxFull": "Jejich poštovní schránka je plná.",
@@ -6472,12 +6479,12 @@ export const cs_CZ: EnTranslations = {
       "arenaQueueTrading": "Před zařazením do fronty dokonči obchod.",
       "arenaQueueInstance": "Z instance se nemůžeš zařadit do fronty.",
       "tradeInProgress": "Obchod už probíhá.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Tento hráč už obchoduje.",
       "tradeTooFar": "Cíl je příliš daleko pro obchod.",
       "tradeExpired": "Žádost o obchod vypršela.",
       "tradeFailed": "Obchod selhal: předměty nebo peníze už nejsou dostupné.",
       "tradeBound": "Tento předmět je vázaný a nelze ho vyměnit.",
-      "marketListBound": "That item is bound and cannot be listed."
+      "marketListBound": "Tento předmět je vázaný a nelze ho nabídnout k prodeji."
     },
     "logs": {
       "standUp": "Vstáváš.",

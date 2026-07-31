@@ -2129,6 +2129,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Surat itu sudah tidak ada di kotakmu.',
   'hudChrome.mailbox.result.needRecipient': 'Sebutkan penerima untuk suratmu.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Kamu tidak bisa mengirim barang misi lewat surat.',
+  'hudChrome.mailbox.result.noMailBound': 'Barang itu terikat dan tidak dapat dikirim lewat surat.',
   'hudChrome.mailbox.result.noRecipient':
     'Tidak ada orang dengan nama itu yang memiliki kotak surat di sini.',
   'hudChrome.mailbox.result.notEnoughItems': 'Kamu tidak punya sebanyak itu untuk dikirim.',
@@ -6584,6 +6585,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetTooFar': 'Sasaran terlalu jauh.',
   'hud.errors.tooClose': 'Terlalu dekat!',
   'hud.errors.tradeBound': 'Barang itu terikat dan tidak dapat diperdagangkan.',
+  'hud.errors.marketListBound': 'Barang itu terikat dan tidak dapat dijual di pasar.',
   'hud.errors.tradeExpired': 'Permintaan perdagangan telah kedaluwarsa.',
   'hud.errors.tradeFailed': 'Perdagangan gagal: barang atau uang sudah tidak tersedia.',
   'hud.errors.tradeInProgress': 'Perdagangan sudah berlangsung.',

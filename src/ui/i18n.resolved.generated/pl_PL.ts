@@ -888,6 +888,13 @@ export const pl_PL: EnTranslations = {
       "heroicName": "Heroiczny {name}",
       "heroicLocked": "Jesteś przypisany do heroicznego {name}."
     },
+    "riftTracker": {
+      "title": "Szczelina",
+      "floor": "Piętro {current} z {total}",
+      "closesIn": "Zamyka się za {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "Pn",
       "NE": "PnW",
@@ -2120,7 +2127,7 @@ export const pl_PL: EnTranslations = {
         "noRecipient": "Nikt o tym imieniu nie ma tu skrzynki pocztowej.",
         "tooManyParcels": "List mieści najwyżej {count} paczek.",
         "noMailQuestItems": "Nie możesz wysyłać pocztą przedmiotów zadań.",
-        "noMailBound": "That item is bound and cannot be mailed.",
+        "noMailBound": "Ten przedmiot jest przywiązany i nie można go wysłać pocztą.",
         "notEnoughItems": "Nie masz aż tylu do wysłania.",
         "cantAffordPostage": "Nie stać cię na opłatę pocztową.",
         "recipientBoxFull": "Skrzynka odbiorcy jest pełna.",
@@ -6472,12 +6479,12 @@ export const pl_PL: EnTranslations = {
       "arenaQueueTrading": "Zakończ wymianę przed dołączeniem do kolejki.",
       "arenaQueueInstance": "Nie możesz dołączyć do kolejki będąc wewnątrz instancji.",
       "tradeInProgress": "Wymiana już trwa.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Ten gracz już prowadzi wymianę.",
       "tradeTooFar": "Cel jest zbyt daleko, by handlować.",
       "tradeExpired": "Prośba o wymianę wygasła.",
       "tradeFailed": "Wymiana nieudana: przedmioty lub pieniądze są już niedostępne.",
       "tradeBound": "Ten przedmiot jest przywiązany i nie można go wymienić.",
-      "marketListBound": "That item is bound and cannot be listed."
+      "marketListBound": "Ten przedmiot jest przywiązany i nie można go wystawić na sprzedaż."
     },
     "logs": {
       "standUp": "Wstajesz.",

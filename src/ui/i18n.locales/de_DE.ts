@@ -2136,6 +2136,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Dieser Brief ist nicht mehr in deinem Kasten.',
   'hudChrome.mailbox.result.needRecipient': 'Gib einen Empfänger für deinen Brief an.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Questgegenstände können nicht verschickt werden.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Dieser Gegenstand ist gebunden und kann nicht verschickt werden.',
   'hudChrome.mailbox.result.noRecipient':
     'Niemand mit diesem Namen unterhält hier einen Briefkasten.',
   'hudChrome.mailbox.result.notEnoughItems': 'So viele davon hast du nicht zum Versenden.',
@@ -3423,6 +3425,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.tradeInProgress': 'Es läuft bereits ein Handel.',
   'hud.errors.tradeAlreadyTrading': 'Dieser Spieler handelt bereits.',
   'hud.errors.tradeBound': 'Dieser Gegenstand ist gebunden und kann nicht gehandelt werden.',
+  'hud.errors.marketListBound':
+    'Dieser Gegenstand ist gebunden und kann nicht zum Verkauf angeboten werden.',
   'hud.errors.tradeTooFar': 'Das Ziel ist zu weit entfernt zum Handeln.',
   'hud.errors.tradeExpired': 'Die Handelsanfrage ist abgelaufen.',
   'hud.errors.tradeFailed':
