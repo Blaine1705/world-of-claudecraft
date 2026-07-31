@@ -18,8 +18,8 @@ const ASSET_PATH = path.join(REPO_ROOT, 'public/models/mounts/terrorspark_ground
 // rather than above them: valorsteed 562 KiB, gobbler 555 KiB, toad 499 KiB.
 const SHIPPING_BUDGET = 576 * 1024;
 const EXPECTED_SOURCE_FINGERPRINT =
-  '56e99d2bb8805d3c8a99f5df841d405e7b07b1e59d3dd168ccbb3995894d483a';
-const EXPECTED_ASSET_SHA256 = '7f1e17cf30fa9a022302b51467413c380dfe631504f51f128ba6d5b92c0dea27';
+  '52a28d2009046c90ce062ec47371b22aa01feab1484fe7bca2a3c6d02715bc9d';
+const EXPECTED_ASSET_SHA256 = '86a7af8348b23817334b97ec394ead5d881ddfba4314a253c6d68c7e9bd8524b';
 /** Midtone the ORM map's roughness and metalness channels encode; the material
  *  factors divide the authored target by it. */
 const ORM_CENTER = 230 / 255;
