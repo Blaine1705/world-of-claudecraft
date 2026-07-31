@@ -2892,8 +2892,9 @@ export const hudChromeStrings = {
     toolEffectConfirmDecline: 'Gather Without',
     // The TOOL_EFFECTS catalog by id (src/sim/content/professions.ts). Only two
     // are slottable today: slotToolEffectRefused refuses every respawnSpeed-kind
-    // effect (quickening_charm) on every profession, so its name is unreachable
-    // until a recipe mints it and the slot policy admits it. The sim is
+    // effect (quickening_charm) on every profession, so no shipped UI path
+    // offers the third; its name is still reachable through the refusal line,
+    // which echoes a hand-sent effectId, so the key stays localized. The sim is
     // language-agnostic and emits the id; these are where it becomes a name.
     toolEffectName: {
       gatherersCache: "Gatherer's Cache",

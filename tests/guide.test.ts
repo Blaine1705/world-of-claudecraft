@@ -1852,13 +1852,17 @@ describe('Guide professions pages and routes', () => {
     expect(rowFor('Glyphsteel Mining Pick'), 'tier-5 row names its Heroic gate').toContain(
       `Heroic ${litanyRow} clear`,
     );
-    // The rendered wield NUMBER, not just the artifact field: the data mirror
-    // pins the corpus, so a page that renders the wrong value in the cell
-    // would otherwise ship silently (the QA mutation pass proved it).
-    expect(rowFor('Osmium Mining Pick'), 'tier-4 row renders its wield number').toContain(
+    // The rendered wield NUMBER in its own COLUMN, not just the artifact
+    // field: the data mirror pins the corpus, so a page that renders the
+    // wrong value in the cell would otherwise ship silently (the QA mutation
+    // pass proved it), and a bare toContain would survive a column swap. The
+    // Use at column is the fourth cell (Tool, Tier, Quality, Use at, ...).
+    const wieldCell = (name: string): string =>
+      rowFor(name).match(/<td[^>]*>[\s\S]*?<\/td>/g)?.[3] ?? '';
+    expect(wieldCell('Osmium Mining Pick'), 'tier-4 wield column holds its number').toBe(
       `<td>${TIER4_TOOL_WIELD_PROFICIENCY}</td>`,
     );
-    expect(rowFor('Glyphsteel Mining Pick'), 'tier-5 row renders its wield number').toContain(
+    expect(wieldCell('Glyphsteel Mining Pick'), 'tier-5 wield column holds its number').toBe(
       `<td>${TIER5_TOOL_WIELD_PROFICIENCY}</td>`,
     );
     // Two guide-prof-tables render on the page (nodes first, tools second);
@@ -1874,7 +1878,11 @@ describe('Guide professions pages and routes', () => {
     // would slip past a first-row-only parity check.
     const bodyRows =
       toolsTable?.match(/<tbody>([\s\S]*?)<\/tbody>/)?.[1].match(/<tr>[\s\S]*?<\/tr>/g) ?? [];
-    expect(bodyRows.length, 'tools table has body rows').toBeGreaterThan(0);
+    // Exact row count from the corpus, not a floor: a table collapsing to one
+    // row must red, and the corpus mirror above pins the corpus to ITEMS.
+    expect(bodyRows.length, 'tools table renders every ladder rung').toBe(
+      GUIDE_PROF_GATHERING.find((g) => g.id === 'mining')?.tools.length,
+    );
     for (const row of bodyRows) {
       expect((row.match(/<td/g) ?? []).length, 'body row column count agrees with header').toBe(6);
     }
