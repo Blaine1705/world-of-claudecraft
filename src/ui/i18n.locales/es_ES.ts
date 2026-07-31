@@ -357,6 +357,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hud.combat.parried': '{target} rechaza tu {ability}.',
   'hudChrome.options.mouseoverCast': 'Lanzar al pasar el ratón sobre los marcos de grupo',
   'hudChrome.options.showTargetOfTarget': 'Mostrar objetivo del objetivo',
-  'hud.errors.marketListBound': 'Ese objeto está ligado y no se puede poner en venta.',
-  'hudChrome.mailbox.result.noMailBound': 'Ese objeto está ligado y no se puede enviar por correo.',
+  'hud.errors.marketListBound': 'Este objeto está vinculado y no puede ponerse a la venta.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Este objeto está vinculado y no puede enviarse por correo.',
 };

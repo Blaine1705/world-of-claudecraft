@@ -6479,7 +6479,7 @@ export const fr_CA: EnTranslations = {
       "tradeExpired": "La demande d'échange a expiré.",
       "tradeFailed": "Échange échoué : objets ou argent indisponibles.",
       "tradeBound": "Cet objet est lié et ne peut pas être échangé.",
-      "marketListBound": "Cet objet est lié et ne peut pas être mis en vente."
+      "marketListBound": "Cet objet est lié et ne peut pas être inscrit au marché."
     },
     "logs": {
       "standUp": "Vous vous levez.",
