@@ -352,6 +352,13 @@ class LoopTask implements ScheduledTask {
     this.active = false;
     this.generation++;
     this.clearArmed();
+    // A run still in flight is ABANDONED here, so its claim on the task has to go
+    // with it. Leaving `running` set is not merely untidy: a later start() arms a
+    // chain whose first link is then refused by the overlap guard, and a refused
+    // claim arms nothing, so the task is silently dead for the life of the
+    // process. Its result is discarded either way, because the generation this
+    // line bumps already retired it.
+    this.state = { ...this.state, running: false, kickPending: false };
   }
 
   /**
@@ -416,8 +423,13 @@ class LoopTask implements ScheduledTask {
       }
     }
     const ended = endRun(this.state, this.options.cadence, didWork);
-    this.state = ended.state;
+    // A retired run publishes NOTHING. Its generation was bumped by a stop(), so
+    // the state it would write describes a task that no longer exists: clearing
+    // `running` would open the overlap guard on whatever run the RESTARTED task
+    // has in flight, and its decayed interval would re-phase a cadence the restart
+    // had already chosen. The write has to sit after the guard, not before it.
     if (generation !== this.generation || !this.active) return;
+    this.state = ended.state;
     if (this.options.mode === 'debounce') {
       // A kick that arrived mid-run waits out a FRESH window rather than running
       // straight away, which is what the debounce this replaces did: it cleared
