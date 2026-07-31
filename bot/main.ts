@@ -43,6 +43,7 @@ import {
 import {
   decideMemberUpdate,
   displayNameOf,
+  forgetMember,
   nickOf,
   pushChangedMemberMeta,
   pushOneMemberMeta,
@@ -285,10 +286,19 @@ async function main(): Promise<void> {
       // write was unconditional, so every linked online member was PATCHed every
       // sweep forever, and each PATCH made Discord emit a GUILD_MEMBER_UPDATE that
       // the handler below turned into a members-meta POST back into the game.
-      await writeMemberNickname(userId, nick, nickCaches, {
+      const outcome = await writeMemberNickname(userId, nick, nickCaches, {
         setNickname: (id, value) => discord.setNickname(cfg.guildId, id, value),
         onError: (e) => console.error('[bot] setNickname failed', e),
       });
+      // A successful rename has to reach the game NOW, not on the next sweep.
+      // The name in a members-meta record is player-visible: the server stores it
+      // and emits it as the in-world Discord nameplate. Before the echo was
+      // suppressed, Discord's own GUILD_MEMBER_UPDATE was what carried it, within
+      // seconds; suppressing that without replacing it would leave the nameplate
+      // showing the old level for up to a whole role-sync interval.
+      // It cannot re-open the echo loop: this push is diff-guarded, so it happens
+      // exactly once, and the echo that follows finds the record already pushed.
+      if (outcome === 'written') await pushMemberMeta(userId);
     }
   };
   const syncAllOnlineRoles = async (): Promise<void> => {
@@ -415,9 +425,7 @@ async function main(): Promise<void> {
           onlineUsers.delete(userId);
           // Drop the diff caches too, or a member who leaves and rejoins would be
           // compared against their pre-departure record and never re-pushed.
-          memberNicks.delete(userId);
-          lastWrittenNick.delete(userId);
-          lastPushedMeta.delete(userId);
+          forgetMember(nickCaches, lastPushedMeta, userId);
           break;
         }
         case 'GUILD_MEMBERS_CHUNK': {
@@ -530,7 +538,9 @@ async function main(): Promise<void> {
       // it must not be left behind to suppress a later push.
       pushMembersMeta: async (records) => {
         const pushed = await server.pushMembersMeta(records);
-        for (const record of records) lastPushedMeta.delete(record.discord_user_id);
+        for (const record of records) {
+          forgetMember(nickCaches, lastPushedMeta, record.discord_user_id);
+        }
         return pushed;
       },
       setMember: (id, guildMember) => server.setMember(id, guildMember),
@@ -645,8 +655,14 @@ async function main(): Promise<void> {
     },
   });
 
-  gateway.connect(false);
+  // Tasks go live BEFORE the socket does. A kick on a task that has not started
+  // is dropped by design (it would be a one-off run with no chain behind it), and
+  // the gateway's first GUILD_CREATE arrives through a dispatch handler that kicks
+  // two of them. Nothing can dispatch synchronously inside connect(), so the other
+  // order happens to work today, but only by accident, and the accident is exactly
+  // the reconnect-storm path this phase cares about.
   scheduler.startAll();
+  gateway.connect(false);
   console.log('[bot] World of ClaudeCraft Discord bot started');
 }
 

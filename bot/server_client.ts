@@ -165,8 +165,16 @@ export class ServerClient {
     // answers 200 { updated: 0 }, so a zero on a non-empty push is the one
     // silent-drop signature worth surfacing (the batch sizing in logic.ts is
     // built to make this unreachable).
+    //
+    // It is reported as a FAILURE (null), not just logged. Callers now diff
+    // against the last successfully pushed record, so "the request did not
+    // throw" is no longer a good enough success signal: returning the truthy
+    // `{ updated: 0 }` here would let a caller mark a batch clean that the
+    // server demonstrably dropped, and the diff would then suppress the retry
+    // for the life of the process rather than for one sweep.
     if (data && members.length > 0 && data.updated === 0) {
       console.error(`[bot] members-meta push of ${members.length} processed 0 rows`);
+      return null;
     }
     return data;
   }

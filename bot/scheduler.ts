@@ -116,6 +116,17 @@ export const DEFAULT_JITTER_RATIO = 0.1;
  */
 export const MIN_INTERVAL_MS = 1000;
 
+/**
+ * The widest jitter allowed. At a ratio of 1 the bottom of the band is ZERO, so a
+ * low draw would arm a zero-delay timeout whose callback arms another: the same
+ * hot spin MIN_INTERVAL_MS exists to prevent, reached through a different door
+ * (the floor applies to the BASE interval, and jitter is applied after it). Half
+ * is a generous ceiling for something whose job is only to stop loops from
+ * landing on the same tick; beyond it the jitter is not decorrelating a cadence,
+ * it is replacing it.
+ */
+export const MAX_JITTER_RATIO = 0.5;
+
 /** One task's whole decision state. Plain data: no timer, no promise, no clock. */
 export interface RunState {
   running: boolean;
@@ -193,8 +204,13 @@ export function nextIntervalMs(currentMs: number, cadence: TaskCadence, didWork:
  */
 export function jitteredDelayMs(baseMs: number, jitterRatio: number, random01: number): number {
   const base = Number.isFinite(baseMs) && baseMs > 0 ? baseMs : 0;
-  // A ratio above 1 would put the bottom of the band below zero.
-  const ratio = Number.isFinite(jitterRatio) ? Math.min(1, Math.max(0, jitterRatio)) : 0;
+  // Clamped to MAX_JITTER_RATIO, not to 1: at a ratio of 1 the bottom of the band
+  // is exactly ZERO, so a low draw arms a zero-delay timeout that re-arms itself.
+  // The MIN_INTERVAL_MS floor does not cover this, because it applies to the base
+  // interval and the jitter is applied after it.
+  const ratio = Number.isFinite(jitterRatio)
+    ? Math.min(MAX_JITTER_RATIO, Math.max(0, jitterRatio))
+    : 0;
   // A non-finite draw falls back to the CENTER, so a broken random source degrades
   // to an unjittered loop rather than to a zero delay.
   const unit = Number.isFinite(random01) ? Math.min(1, Math.max(0, random01)) : 0.5;

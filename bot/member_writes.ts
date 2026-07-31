@@ -87,6 +87,21 @@ export interface MetaPushIo {
 }
 
 /**
+ * Whether a push result means the server did NOT take the records.
+ *
+ * Both nullish shapes count, and the distinction matters: `call()` returns null
+ * for a transport or envelope failure, but it also returns `env.data` verbatim on
+ * a success envelope, so a body with no data reads as `undefined`. A `!== null`
+ * check alone would treat that as accepted and mark the batch clean. Diffing made
+ * this sharper than it used to be: before, every sweep re-pushed the whole roster,
+ * so a dropped push healed itself within one interval; now a batch wrongly marked
+ * clean stays suppressed until the record changes again or the bot restarts.
+ */
+function pushRejected(result: unknown): boolean {
+  return result === null || result === undefined;
+}
+
+/**
  * Push exactly the members whose meta changed since the last SUCCESSFUL push,
  * still batched under the byte cap the roster push has always used. In steady
  * state nothing has changed, so this sends no request at all. Returns the records
@@ -104,7 +119,7 @@ export async function pushChangedMemberMeta(
 ): Promise<MemberMetaRecord[]> {
   const pushed: MemberMetaRecord[] = [];
   for (const batch of chunk(changedMemberMeta(records, lastPushed), batchSize)) {
-    if ((await io.pushMembersMeta(batch)) === null) return pushed;
+    if (pushRejected(await io.pushMembersMeta(batch))) return pushed;
     for (const record of batch) {
       lastPushed.set(record.discord_user_id, record);
       pushed.push(record);
@@ -124,9 +139,30 @@ export async function pushOneMemberMeta(
   io: MetaPushIo,
 ): Promise<boolean> {
   if (!memberMetaChanged(record, lastPushed.get(record.discord_user_id))) return false;
-  if ((await io.pushMembersMeta([record])) === null) return false;
+  if (pushRejected(await io.pushMembersMeta([record]))) return false;
   lastPushed.set(record.discord_user_id, record);
   return true;
+}
+
+/**
+ * Forget everything the diffs remember about a member, for use when they leave
+ * the guild or their stored flair is cleared.
+ *
+ * This is small enough to inline at its two call sites and is a named function
+ * anyway, because getting it wrong is invisible: leave a member's last-pushed
+ * record behind and a REJOIN is diffed against their pre-departure state, so the
+ * push that would restore their flair is suppressed and the game keeps showing
+ * them as cleared indefinitely. A test can state that; a line inside main.ts,
+ * which runs main() at module scope, cannot be reached to state anything.
+ */
+export function forgetMember(
+  caches: NicknameCaches,
+  lastPushed: Map<string, MemberMetaRecord>,
+  userId: string,
+): void {
+  caches.memberNicks.delete(userId);
+  caches.lastWrittenNick.delete(userId);
+  lastPushed.delete(userId);
 }
 
 /** What a GUILD_MEMBER_UPDATE should do to the caches, and whether it pushes. */
