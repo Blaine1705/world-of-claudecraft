@@ -563,7 +563,7 @@ function scrubInstanceThreat(ctx: SimContext, inst: InstanceSlot, pid: number): 
     if (!mob || mob.dead) continue;
     const priorThreat = mob.threat.get(pid);
     if (mob.inCombat && priorThreat !== undefined && priorThreat > 0) {
-      mobThreat.push([id, priorThreat]);
+      mobThreat.push([id, priorThreat, mob.evadeEpoch]);
     }
     dropThreat(mob, pid);
     for (const srcId of [...mob.threat.keys()]) {
@@ -585,9 +585,13 @@ function scrubInstanceThreat(ctx: SimContext, inst: InstanceSlot, pid: number): 
 function resumeRememberedCombat(ctx: SimContext, inst: InstanceSlot, pid: number): void {
   const rec = takeCombatExit(inst.combatExitMemory, pid, ctx.time);
   if (!rec) return;
-  for (const [mobId, threat] of rec.mobThreat) {
+  for (const [mobId, threat, evadeEpoch] of rec.mobThreat) {
     const mob = ctx.entities.get(mobId);
     if (!mob || mob.dead) continue;
+    // The mob fully evade-reset since this snapshot was taken: it is a
+    // different pull now (possibly someone else's fresh one), so the old
+    // threat value must not be grafted onto it (issue #2653 follow-up).
+    if (mob.evadeEpoch !== evadeEpoch) continue;
     mob.threat.set(pid, threat);
     if (mob.aggroTargetId === null) retargetMob(ctx, mob);
   }

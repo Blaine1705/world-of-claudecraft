@@ -18,6 +18,7 @@ import {
 } from '../src/sim/data';
 import { spawnNythraxisAdds } from '../src/sim/encounters/nythraxis';
 import { COMBAT_EXIT_MEMORY_SECONDS } from '../src/sim/instance_exit_memory';
+import { resetEvadingMob } from '../src/sim/mob/locomotion';
 import {
   awardHeroicMarks,
   enterDungeon,
@@ -366,6 +367,50 @@ describe('dungeons: door-trigger entry/exit', () => {
       expect(mob.threat.get(b)).toBe(threatB);
       expect(mob.aggroTargetId).toBe(a); // still the higher-threat attacker
       expect(mob.inCombat).toBe(true);
+    });
+
+    it('does not resume a snapshot onto a mob that has fully evade-reset and been freshly re-pulled since', () => {
+      const sim = makeSim();
+      const a = sim.addPlayer('warrior', 'Wanderer');
+      const b = sim.addPlayer('warrior', 'Tank');
+      const ea = sim.entities.get(a) as AnyEntity;
+      const eb = sim.entities.get(b) as AnyEntity;
+      enterDungeon(sim.ctx, 'hollow_crypt', a);
+      const inst = claimedHollow(sim);
+
+      const mob = mobInInstance(sim, inst, 'crypt_shambler');
+      teleport(sim, ea, mob.pos.x + 3, mob.pos.z);
+      ea.maxHp = ea.hp = 1_000_000;
+      sim.dealDamage(ea, mob, 100, false, 'physical', 'Strike', 'hit', true);
+      expect(mob.threat.get(a)).toBeGreaterThan(0);
+
+      leaveDungeon(sim.ctx, a);
+      expect(inst.combatExitMemory.size).toBe(1);
+
+      // The pack fully evades home (aggro table + HP reset) before A returns:
+      // this is a genuinely DIFFERENT pull now.
+      resetEvadingMob(sim.ctx, mob);
+      expect(mob.inCombat).toBe(false);
+
+      // The tank re-pulls the same mob fresh, at a much lower threat than A's
+      // stale snapshot.
+      enterDungeon(sim.ctx, 'hollow_crypt', b);
+      teleport(sim, eb, mob.pos.x + 3, mob.pos.z);
+      eb.maxHp = eb.hp = 1_000_000;
+      sim.dealDamage(eb, mob, 25, false, 'physical', 'Strike', 'hit', true);
+      const freshThreat = mob.threat.get(b);
+      expect(freshThreat).toBeGreaterThan(0);
+      expect(mob.aggroTargetId).toBe(b);
+
+      // A walks back in inside the original memory window: the stale, much
+      // higher snapshot must NOT be grafted onto this new pull and rip the
+      // tank's aggro.
+      sim.time += 5;
+      enterDungeon(sim.ctx, 'hollow_crypt', a);
+
+      expect(mob.threat.has(a)).toBe(false);
+      expect(mob.threat.get(b)).toBe(freshThreat);
+      expect(mob.aggroTargetId).toBe(b);
     });
   });
 });

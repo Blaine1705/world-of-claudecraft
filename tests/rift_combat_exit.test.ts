@@ -10,6 +10,8 @@
 import { describe, expect, it } from 'vitest';
 import { isRiftPos } from '../src/sim/data';
 import { COMBAT_EXIT_MEMORY_SECONDS } from '../src/sim/instance_exit_memory';
+import { resetEvadingMob } from '../src/sim/mob/locomotion';
+import { descendRift } from '../src/sim/rift/runs';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
@@ -59,7 +61,7 @@ describe('rift combat-exit memory (issue #2653, no free combat reset)', () => {
 
     sim.leaveRift(pid);
     expect(isRiftPos(p.pos.x)).toBe(false);
-    expect(inst.combatExitMemory.get(pid)?.mobThreat).toEqual([[mob.id, priorThreat]]);
+    expect(inst.combatExitMemory.get(pid)?.mobThreat).toEqual([[mob.id, priorThreat, 0]]);
 
     // The run's mob gives up on the departed player and settles before anyone
     // returns: a genuinely fresh, unengaged pack is what a walk-in would meet
@@ -201,5 +203,72 @@ describe('rift combat-exit memory (issue #2653, no free combat reset)', () => {
     expect(inst.combatExitMemory.has(pid), 'the blocked attempt never consumed the memory').toBe(
       true,
     );
+  });
+
+  it('does not resume a snapshot onto a mob that has fully evade-reset and been freshly re-pulled since', () => {
+    const sim = makeSim();
+    const a = sim.addPlayer('warrior', 'Wanderer');
+    const b = sim.addPlayer('warrior', 'Tank');
+    sim.enterRift(SEED, 20, a);
+    const inst = sim.riftInstances.find((i: any) => i.partyKey !== null)!;
+    const mob = sim.entities.get(inst.mobIds[0]) as AnyEntity;
+    const ea = sim.entities.get(a) as AnyEntity;
+    teleport(sim, ea, mob.pos.x + 2, mob.pos.z);
+    ea.maxHp = ea.hp = 1_000_000;
+    sim.dealDamage(ea, mob, 100, false, 'physical', 'Strike', 'hit', true);
+    expect(mob.threat.get(a)).toBeGreaterThan(0);
+
+    sim.leaveRift(a);
+    expect(inst.combatExitMemory.size).toBe(1);
+
+    // The pack fully evades home (a real evade-home reset, not the hand-rolled
+    // simulateNaturalReset above) before A returns: this is a genuinely
+    // DIFFERENT pull now.
+    resetEvadingMob(sim.ctx, mob);
+    expect(mob.inCombat).toBe(false);
+
+    // The tank joins and re-pulls the same mob fresh, at a much lower threat
+    // than A's stale snapshot.
+    sim.enterRift(SEED, 20, b);
+    const eb = sim.entities.get(b) as AnyEntity;
+    teleport(sim, eb, mob.pos.x + 2, mob.pos.z);
+    eb.maxHp = eb.hp = 1_000_000;
+    sim.dealDamage(eb, mob, 25, false, 'physical', 'Strike', 'hit', true);
+    const freshThreat = mob.threat.get(b);
+    expect(freshThreat).toBeGreaterThan(0);
+    expect(mob.aggroTargetId).toBe(b);
+
+    // A walks back in inside the original memory window: the stale, much
+    // higher snapshot must NOT be grafted onto this new pull and rip the
+    // tank's aggro.
+    sim.time += 5;
+    sim.enterRift(SEED, 20, a);
+
+    expect(mob.threat.has(a)).toBe(false);
+    expect(mob.threat.get(b)).toBe(freshThreat);
+    expect(mob.aggroTargetId).toBe(b);
+  });
+
+  it('descending a floor clears any dangling combat-exit memory from the cleared floor', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Descender');
+    sim.enterRift(SEED, 20, pid);
+    const inst = sim.riftInstances.find((i: any) => i.partyKey !== null)!;
+
+    // A dangling record left behind by some other party member (e.g. one who
+    // exited mid-combat and never returned before the floor was cleared and
+    // descended) must not survive the floor teardown, or a lucky reissued id
+    // on the next floor could resolve a lookup against it.
+    inst.combatExitMemory.set(999, {
+      expiresAt: sim.time + COMBAT_EXIT_MEMORY_SECONDS,
+      mobThreat: [[inst.mobIds[0], 500, 0]],
+    });
+    expect(inst.combatExitMemory.size).toBe(1);
+
+    inst.descentOpen = true;
+    inst.floorIndex = 0;
+    descendRift(sim.ctx, pid);
+
+    expect(inst.combatExitMemory.size).toBe(0);
   });
 });

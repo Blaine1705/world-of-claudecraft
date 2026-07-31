@@ -1017,6 +1017,11 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.leashAnchor = null;
   mob.evadeStall = 0;
   mob.chaseStall = 0;
+  // A full evade-home reset ends this pull for good (issue #2653 follow-up):
+  // bump the epoch so a mid-combat exit snapshot stamped against the OLD pull
+  // (instance_exit_memory.ts) is recognized as stale and never reapplied onto
+  // whoever re-pulls this mob fresh inside the same memory window.
+  mob.evadeEpoch++;
   mob.fleeTimer = 0;
   mob.fleeReturnTimer = 0;
   mob.hasFled = false;

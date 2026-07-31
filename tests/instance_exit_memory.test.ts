@@ -20,24 +20,24 @@ describe('instance_exit_memory: recordCombatExit', () => {
 
   it('remembers non-empty threat, expiring COMBAT_EXIT_MEMORY_SECONDS from now', () => {
     const memory: CombatExitMemory = new Map();
-    recordCombatExit(memory, 1, 100, [[7, 42]]);
+    recordCombatExit(memory, 1, 100, [[7, 42, 0]]);
     const rec = memory.get(1);
     expect(rec).toBeDefined();
-    expect(rec?.mobThreat).toEqual([[7, 42]]);
+    expect(rec?.mobThreat).toEqual([[7, 42, 0]]);
     expect(rec?.expiresAt).toBe(100 + COMBAT_EXIT_MEMORY_SECONDS);
   });
 
   it('overwrites an earlier record for the same pid with a fresh one', () => {
     const memory: CombatExitMemory = new Map();
-    recordCombatExit(memory, 1, 0, [[7, 10]]);
+    recordCombatExit(memory, 1, 0, [[7, 10, 0]]);
     recordCombatExit(memory, 1, 5, [
-      [7, 20],
-      [8, 30],
+      [7, 20, 0],
+      [8, 30, 0],
     ]);
     const rec = memory.get(1);
     expect(rec?.mobThreat).toEqual([
-      [7, 20],
-      [8, 30],
+      [7, 20, 0],
+      [8, 30, 0],
     ]);
     expect(rec?.expiresAt).toBe(5 + COMBAT_EXIT_MEMORY_SECONDS);
   });
@@ -52,18 +52,18 @@ describe('instance_exit_memory: takeCombatExit', () => {
 
   it('returns the record while still inside the window, consuming it', () => {
     const memory: CombatExitMemory = new Map();
-    recordCombatExit(memory, 1, 0, [[7, 42]]);
+    recordCombatExit(memory, 1, 0, [[7, 42, 0]]);
 
     const rec = takeCombatExit(memory, 1, COMBAT_EXIT_MEMORY_SECONDS - 1);
 
-    expect(rec?.mobThreat).toEqual([[7, 42]]);
+    expect(rec?.mobThreat).toEqual([[7, 42, 0]]);
     // Consumed: a second read (even still inside the original window) finds nothing.
     expect(takeCombatExit(memory, 1, COMBAT_EXIT_MEMORY_SECONDS - 1)).toBeNull();
   });
 
   it('returns null once the window has lapsed, and still removes the stale entry', () => {
     const memory: CombatExitMemory = new Map();
-    recordCombatExit(memory, 1, 0, [[7, 42]]);
+    recordCombatExit(memory, 1, 0, [[7, 42, 0]]);
 
     expect(takeCombatExit(memory, 1, COMBAT_EXIT_MEMORY_SECONDS + 1)).toBeNull();
     expect(memory.size).toBe(0);
@@ -71,17 +71,17 @@ describe('instance_exit_memory: takeCombatExit', () => {
 
   it('is exactly at the boundary: expiresAt itself no longer counts as inside the window', () => {
     const memory: CombatExitMemory = new Map();
-    recordCombatExit(memory, 1, 0, [[7, 42]]);
+    recordCombatExit(memory, 1, 0, [[7, 42, 0]]);
 
     expect(takeCombatExit(memory, 1, COMBAT_EXIT_MEMORY_SECONDS)).toBeNull();
   });
 
   it('keeps independent pids from clobbering each other', () => {
     const memory: CombatExitMemory = new Map();
-    recordCombatExit(memory, 1, 0, [[7, 10]]);
-    recordCombatExit(memory, 2, 0, [[7, 20]]);
+    recordCombatExit(memory, 1, 0, [[7, 10, 0]]);
+    recordCombatExit(memory, 2, 0, [[7, 20, 0]]);
 
-    expect(takeCombatExit(memory, 1, 1)?.mobThreat).toEqual([[7, 10]]);
-    expect(takeCombatExit(memory, 2, 1)?.mobThreat).toEqual([[7, 20]]);
+    expect(takeCombatExit(memory, 1, 1)?.mobThreat).toEqual([[7, 10, 0]]);
+    expect(takeCombatExit(memory, 2, 1)?.mobThreat).toEqual([[7, 20, 0]]);
   });
 });

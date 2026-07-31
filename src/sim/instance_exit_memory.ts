@@ -29,8 +29,12 @@
 export const COMBAT_EXIT_MEMORY_SECONDS = 30;
 
 /** One mob's threat value for the departing player, captured the instant they
- * left (before the scrub cleared it from the live hate table). */
-export type CombatExitThreatEntry = readonly [mobId: number, threat: number];
+ * left (before the scrub cleared it from the live hate table), plus the mob's
+ * `evadeEpoch` at that instant. A live mob whose epoch has since moved on has
+ * fully evaded home and been re-engaged as a DIFFERENT pull; the owning module
+ * must skip restoring a snapshot that no longer belongs to it (otherwise the
+ * remembered threat could rip a teammate's fresh, unrelated pull). */
+export type CombatExitThreatEntry = readonly [mobId: number, threat: number, evadeEpoch: number];
 
 export interface CombatExitRecord {
   expiresAt: number;

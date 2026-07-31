@@ -459,6 +459,13 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.orbId = null;
   inst.orbActive = false;
   inst.bossDeathZones = [];
+  // A floor's mobs are torn down here (descendRift, or a full teardown below):
+  // any remembered mid-combat exit still holding their ids can never resolve
+  // again once IDs are freed, but the map is inert only because `nextId` is
+  // monotonic. Clear it explicitly so a new floor's freshly spawned mobs can
+  // never accidentally collide with a stale entry (belt-and-suspenders with
+  // the evadeEpoch guard in resumeRememberedCombat above).
+  inst.combatExitMemory = new Map();
 }
 
 function freeRiftInstance(ctx: SimContext, inst: RiftInstance): void {
@@ -1379,7 +1386,7 @@ function snapshotCombatExit(ctx: SimContext, inst: RiftInstance, pid: number): v
     const mob = ctx.entities.get(id);
     if (!mob || mob.dead || !mob.inCombat) continue;
     const threat = mob.threat.get(pid);
-    if (threat !== undefined && threat > 0) mobThreat.push([id, threat]);
+    if (threat !== undefined && threat > 0) mobThreat.push([id, threat, mob.evadeEpoch]);
   }
   recordCombatExit(inst.combatExitMemory, pid, ctx.time, mobThreat);
 }
@@ -1392,9 +1399,13 @@ function snapshotCombatExit(ctx: SimContext, inst: RiftInstance, pid: number): v
 function resumeRememberedCombat(ctx: SimContext, inst: RiftInstance, pid: number): void {
   const rec = takeCombatExit(inst.combatExitMemory, pid, ctx.time);
   if (!rec) return;
-  for (const [mobId, threat] of rec.mobThreat) {
+  for (const [mobId, threat, evadeEpoch] of rec.mobThreat) {
     const mob = ctx.entities.get(mobId);
     if (!mob || mob.dead) continue;
+    // The mob fully evade-reset since this snapshot was taken: it is a
+    // different pull now (possibly someone else's fresh one), so the old
+    // threat value must not be grafted onto it (issue #2653 follow-up).
+    if (mob.evadeEpoch !== evadeEpoch) continue;
     mob.threat.set(pid, threat);
     if (mob.aggroTargetId === null) retargetMob(ctx, mob);
   }
