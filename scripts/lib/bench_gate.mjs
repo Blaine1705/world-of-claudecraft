@@ -159,12 +159,14 @@ export function sampleStats(values) {
 }
 
 // The professions rig's observer sample floor. This rig MEASURES saturation:
-// past the loop budget the server keeps sim ticks near 20 Hz via catch-up but
+// past the loop budget the server holds sim ticks up through catch-up (the
+// 1,000-bot captures ran 15.4 to 15.8 Hz against the 20 Hz nominal) but
 // broadcasts once per loop callback, so the per-client snapshot cadence
-// legitimately sheds toward ~2/s at 1,000 connections (observed live). The
-// jitter gate's 20 Hz-derived floor would fail every honestly-saturated run,
-// so the floor here is one gap per second of window (min 50): below ONE
-// snapshot a second the rig or server is broken, not merely loaded.
+// legitimately sheds toward 1.5 to 2 a second at 1,000 connections (observed
+// live). The jitter gate's 20 Hz-derived floor would fail every
+// honestly-saturated run, so the floor here is one gap per second of window
+// (min 50): below ONE snapshot a second the rig or server is broken, not
+// merely loaded.
 export function profMinGapsFor(durationMs) {
   return Math.max(50, Math.floor(durationMs / 1000));
 }

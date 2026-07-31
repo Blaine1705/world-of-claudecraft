@@ -17,8 +17,13 @@ Captured 2026-07-31 (UTC). All four scenarios joined exactly 1,000 of 1,000
 bots with all 1,000 alive at window close, and passed the rig's own gate
 (`evaluateProfessionsLoadRun`: unconditional join and liveness enforcement,
 per-observer sample floors, timer-wire arm purity, and window-scoped
-hollow-run evidence). Every artifact stamps `gitHead f881426ba1`, the branch
-tip that also carries the rig, so the whole set shares one provenance.
+hollow-run evidence). Every artifact stamps `gitHead f881426ba1`, the commit
+whose rig produced it, so the whole set shares one provenance. The fix-round
+commits that landed AFTER the capture touch no measured server path; they
+change the rig itself (transactional seeding, a helper rename, and moving
+the window-open perf fetch off the measured clock), so a recapture with the
+current rig reproduces the server and wire numbers but reports slightly
+lower `rig.loopLagMs` figures than these artifacts carry.
 Artifacts, one per scenario beside this file:
 `professions-load-mixed-stable.json`, `professions-load-gather-legacy.json`,
 `professions-load-gather-stable.json`, `professions-load-fish-stable.json`.
@@ -141,7 +146,7 @@ cost per snapshot under the delta rules (the field key and separator, about
 | Snapshot bytes, gather observers p50 / p95 / p99 / max | 4,688 / 25,056 / 61,290 / 101,043 |
 | Snapshot bytes, fish observers p50 / p95 / p99 / max | 10,453 / 24,234 / 29,919 / 36,033 |
 | ncd presence ratio / bytes per snapshot (gather) | 0.074 / 34.7 B |
-| tslot presence ratio (both roles) | 0 (fully elided in steady state) |
+| tslot presence ratio (both roles) | 0 (fully elided in steady state; the bots never slot an effect, so the tslot budget's non-empty arm is CI-only by design, owned by tests/professions_wire_budget.test.ts) |
 | Fleet receive rate per bot | 21,594 B/s at 3.2 frames/s |
 | Server loop total p50 / p95 / max | 525.4 / 646.3 / 704.6 ms |
 | Server broadcast p50 / p95 / max | 63.4 / 87.5 / 111.6 ms (bcastSelf 15.3 / 24.0 / 30.2) |

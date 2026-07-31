@@ -8,8 +8,10 @@
 // bots are parsing OBSERVERS that record snapshot sizes, snapshot gaps, and
 // the per-snapshot ncd/tslot payload bytes on the arm under measurement;
 // every other bot only counts frames and bytes so one rig process can hold
-// 1,000 sockets without distorting the server it measures. The rig reports
-// its own driver-loop lag so a saturated rig cannot silently pollute a run.
+// 1,000 sockets without distorting the server it measures. The rig also
+// reports its own driver-loop lag in the artifact (rig.loopLagMs), so a
+// saturated rig is VISIBLE in the evidence rather than silent; the lag is
+// disclosed, not gated, and client-side gap numbers are same-box-relative.
 //
 // The verdict (scripts/lib/bench_gate.mjs, evaluateProfessionsLoadRun, pinned
 // by tests/bench_gate.test.ts) is a GATE: partial joins fail, a run whose

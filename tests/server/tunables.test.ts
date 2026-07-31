@@ -18,7 +18,12 @@ import { describe, expect, it, vi } from 'vitest';
 // Load-bearing and narrow: ESM hoists the static imports above this line, so
 // the delete only protects the pin because server/db is reached EXCLUSIVELY
 // through the dynamic import inside its test; a future static import that
-// transitively pulls in server/db would silently defeat it.
+// transitively pulls in server/db would silently defeat it. Narrower still:
+// this covers the SHELL-export case only. server/env's loadEnvFile runs at
+// that dynamic import and will re-set a just-deleted var from a local .env,
+// so a developer keeping the knob in .env still sees this file red; the
+// capture recipe passes the knob on the command line for exactly that
+// reason.
 delete process.env.DB_POOL_MAX_CLIENTS;
 
 import { DESKTOP_LOGIN_TTL_MS } from '../../server/desktop_login';

@@ -7,10 +7,11 @@
 // docs/design/player-performance/professions-load-baseline.md and are never
 // asserted here.
 //
-// Byte pins read the RAW frame string (the tests/snapshots.test.ts:4297
-// raw-capturing socket idiom): a substring pin on the unparsed payload is
-// byte-exact, so a change that reshapes or re-orders the serialized field
-// fails even when the parsed value still matches.
+// Byte pins read the RAW frame string (the raw-capturing socket idiom from
+// tests/snapshots.test.ts's "ships byte-for-byte what plain maybe() shipped"
+// suite): a substring pin on the unparsed payload is byte-exact, so a change
+// that reshapes or re-orders the serialized field fails even when the parsed
+// value still matches.
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../server/db', () => ({
