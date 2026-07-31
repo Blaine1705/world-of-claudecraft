@@ -1,7 +1,7 @@
 # State: Discord Bot Stability (cross-phase cheat sheet)
 
-Current phase: Phase 2 built and QA'd (2026-07-30). Next: Phase 3, the loop scheduler
-and diff-before-write.
+Current phase: Phase 3 BUILT (2026-07-31); its QA session is next. Phase 2 built and
+QA'd (2026-07-30).
 
 ## Locked decisions
 
@@ -166,6 +166,23 @@ because dropping the one word is otherwise silent),
   dispatched through; `bot/discord_api.ts` reduced to an IO shell over it (the 10 second
   retry clamp and the 1 second non-JSON-429 retry are both gone); ledger item L1 closed
   in the same rewrite.
+- Phase 3: `bot/scheduler.ts`, the pure loop scheduler every background loop and the
+  presence debounce now run on (chained timeouts, overlap guard, coalescing kicks, jitter,
+  adaptive active-to-idle backoff; pure decision core plus a thin timer-owning driver);
+  `bot/member_writes.ts`, the diff-before-write paths and their cache bookkeeping behind
+  injected IO; three new pure predicates in `bot/logic.ts` (`nicknameNeedsWrite`,
+  `memberMetaChanged` with `changedMemberMeta`, `isSelfNickEcho`) plus the now-named
+  `MemberMetaRecord`. `bot/main.ts` holds no `setInterval` at all. Ledger items L7 and L12
+  closed here, L11 found already closed and pinned.
+- New env keys (Phase 3, the D13 cadences; DEPLOY.md documentation is still Phase 7):
+  `DISCORD_ROLE_SYNC_INTERVAL_MS` (300000), `DISCORD_PRESENCE_DEBOUNCE_MS` (4000),
+  `DISCORD_RELAY_POLL_MS` (3000). Unlike the governor knobs the defaults are NOT new
+  constants: they are the existing `bot/cadence.ts` values, which `bot/config.ts` imports,
+  so the value the suite pins and the value the bot falls back to cannot drift apart. Each
+  falls back for empty, non-numeric and non-positive alike, never to 0. These are NOT in
+  `.env.example` yet: every `.env*` path is blocked at the harness level in this
+  environment, so R8's equivalent for these three keys is owed and is called out in the
+  Phase 3 handoff.
 - New env keys (Phase 2, the first four; R8 satisfied and re-verified in Phase 2 QA against
   the file itself, each commented default matching its exported `DEFAULT_*` constant. DEPLOY.md documentation is still Phase 7 per D13):
   `DISCORD_MAX_RPS` (8), `DISCORD_BAN_PAUSE_MS` (600000),
@@ -188,9 +205,10 @@ because dropping the one word is otherwise silent),
   `MAX_TRACKED_ROUTES` (separate constants, same value, different populations).
 - New endpoints: (pending; planned `POST /internal/discord/flex-batch`,
   `GET /internal/discord/outbox`)
-- New modules: `bot/cadence.ts` (the three poll-loop constants, values only),
-  `bot/rate_governor.ts` (Phase 2, pure and clock-injected). Still planned: scheduler,
-  change feed.
+- New modules: `bot/cadence.ts` (the three poll-loop DEFAULTS, values only; `config.ts`
+  layers the env overrides over them as of Phase 3), `bot/rate_governor.ts` (Phase 2, pure
+  and clock-injected), `bot/scheduler.ts` and `bot/member_writes.ts` (Phase 3). Still
+  planned: the change feed.
 - New tests: `tests/discord_bot_config.test.ts` (config arms + the cadence pins),
   `tests/discord_bot_server_client.test.ts` (call envelope, secret header, deadline,
   production-default path), `tests/discord_bot_discord_api.test.ts` (auth headers, the
@@ -213,8 +231,16 @@ because dropping the one word is otherwise silent),
   (the v10 literal, the audit-log reason, scope logging, token redaction, the forbidden
   short circuit) and LOST the three clamp arms, which pinned behavior this phase deletes
   on purpose.
+  Phase 3 adds `tests/discord_bot_scheduler.test.ts` (the pure cadence math, the jitter
+  band, the run-state machine, and the driver arms: overlap, coalescing, chaining, the
+  adaptive walk to the idle ceiling and the snap back, the error arm, stop, and the whole
+  debounce mode, all at EXACT virtual times), `tests/discord_bot_diffs.test.ts` (the three
+  pure predicates, one negative case per meta field), and
+  `tests/discord_bot_member_writes.test.ts` (the composed write paths: the zero-write steady
+  state, the failure arm asserting the CACHE rather than a call count, the batching, and the
+  echo arms). `tests/discord_bot_governor_pacing.test.ts` gained the L11 and L12 arms.
 - New shared test helper: `tests/helpers/synthetic_clock.ts`, a fully virtual clock.
-  Phase 3's scheduler should drive it rather than vitest fake timers.
+  Phase 3's scheduler drives it rather than vitest fake timers, as ruled.
 - OPEN, from the Phase 2 privacy-security review (no blocking findings; L1 confirmed
   closed per call site and no secret committed). Three tracked follow-ups it raised that
   Phase 2 did NOT close, each with its reason:
@@ -505,13 +531,31 @@ later phase because its fix belongs to that phase's scope, not because it was di
   the counters. Phase 7 owns supervision and deploy hardening; adding a deadline there
   means adding one injected timer seam to the shell, which is a seam change rather than a
   QA-round edit.
-- L11 (nice-to-have, pacing, OPEN, natural home Phase 3): requests that reserved a global
+- L11 CLOSED by Phase 3, but NOT by a change: the dispatch loop Phase 2 QA shipped already
+  re-reserves the rate slot on every pass, which is exactly the fix this entry asked for, so
+  the entry was stale from the moment that loop landed. It was VERIFIED rather than assumed:
+  `tests/discord_bot_governor_pacing.test.ts` drives three requests holding pre-pause slots
+  and asserts they come off the ban pause one full spacing apart (123000, 124000, 125000),
+  and hoisting the reservation out of the gate loop reproduces the reported defect exactly,
+  all three firing at 123000. Original report, kept for the record:
+- L11 (was: nice-to-have, pacing, natural home Phase 3): requests that reserved a global
   rate slot BEFORE a pause was declared do not re-reserve one when the pause lifts, so
   they all fire at the same instant. It is bounded by how many requests were between the
   first pause check and the send when the pause landed, and the correct fix is a gate
   loop that re-reserves after any blocking wait, which burns slots and belongs with the
   Phase 3 scheduler rather than in a QA round.
-- L12 (nice-to-have, memory, OPEN, natural home Phase 3): `this.queues` is the one
+- L12 CLOSED by Phase 3. `this.queues` is now LRU bounded by `MAX_TRACKED_QUEUES` (512, a
+  THIRD separate constant for the same reason `MAX_TRACKED_ROUTES` is one: a third
+  population with a third lifetime), and `queueFor` re-inserts on every sighting so the
+  chain evicted is always the coldest. Evicting a chain that still has a request parked on
+  it is safe: the parked request holds its own reference, and the job's `finally` only
+  deletes a chain the map still holds. The only cost is that a LATER request on an evicted
+  template mints a fresh chain, and LRU makes that theoretical, since the cold end is
+  exactly the single-use per-interaction templates. Two tests: the bound REACHED
+  (`activeQueues` is `toBe(512)` with 552 parked, and back to 0 once they drain) and the
+  eviction ORDER (a touched hot chain survives and still serializes, an untouched cold one
+  does not). Original report, kept for the record:
+- L12 (was: nice-to-have, memory, natural home Phase 3): `this.queues` is the one
   governor map with no size cap. A request parked in `waitForPause` never reaches the
   job's `finally` that drops a drained queue, and interaction callbacks mint a unique
   template per interaction id, so during a long ban pause the map, its pending sleeps,
@@ -553,7 +597,15 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   close it; that is a toolchain restructure, not a QA-round edit. Natural home is Phase 7,
   which already owns the bot's deploy hardening.
 
-- L7 (should-fix, behavior, OPEN): a NON-resumable `INVALID_SESSION` (op 9 with `d:false`)
+- L7 CLOSED by Phase 3, which is where it was judged to belong: reconnect behavior is this
+  phase's subject matter, and Phase 1's no-behavior-change rule (the only reason it was
+  ledgered) no longer applies. A non-resumable INVALID_SESSION now clears `sessionId`,
+  `resumeUrl` and `seq` together, so the two reconnect paths that call `reconnect(true)` (a
+  socket close, and op 7) re-IDENTIFY instead of RESUMEing a dead session. Each of the three
+  fields is independently pinned in `tests/discord_bot_gateway.test.ts`, with a negative
+  control proving a RESUMABLE op 9 still keeps the session. Original report, kept for the
+  record:
+- L7 (was: should-fix, behavior): a NON-resumable `INVALID_SESSION` (op 9 with `d:false`)
   never clears `this.sessionId` in `bot/gateway.ts`; the field is only ever assigned in the
   READY handler. So after Discord tells the bot its session is dead, a socket close that
   arrives before the next READY takes `reconnect(true)` to
@@ -563,7 +615,12 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   recovery during exactly the reconnect storms this packet exists to tame. Fixing it is a
   RUNTIME BEHAVIOR CHANGE, which Phase 1 forbids, so it is recorded rather than landed.
   Natural home is Phase 3 (scheduler and reconnect coalescing) or Phase 7 (supervision).
-- L8 (nice-to-have, coverage, OPEN): the two pure helpers at the bottom of `bot/main.ts`
+- L8 ACTED ON by Phase 3 rather than closed outright. `displayNameOf` and `nickOf` moved
+  into `bot/member_writes.ts` and are tested there, following this entry's own instruction
+  (extract, never add a source-text pin). The underlying condition stands: `main.ts` still
+  calls `main()` at module scope, so anything left in it is still unreachable, which is why
+  the diff logic went into a sibling module too. Original report:
+- L8 (was: nice-to-have, coverage): the two pure helpers at the bottom of `bot/main.ts`
   are unreachable from any test, because `main.ts` calls `main()` at module scope. If a
   later phase needs them pinned, extract them into a sibling module first (the same move
   R6 made for the cadences); do not add a source-text pin.
@@ -618,6 +675,27 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   claimed the size was "injected", but the cap is a module constant with no seam. Either
   reach the real cap or give the module a seam; never assert `toBeLessThanOrEqual` against
   a cap the test cannot approach, and prefer `toBe(CAP)` so over-eviction fails too.
+- **`bot/server_client.ts` answers `null` for a failed call, it does NOT throw.** Every
+  `/internal/discord/*` method funnels through `call()`, which logs and returns null on a
+  non-ok status, a non-success envelope, or a thrown fetch. So for any write whose success
+  gates a cache update, the RETURN VALUE is the only signal there is: a cache updated merely
+  because nothing threw marks refused work as done and strands it until some unrelated field
+  moves. Phase 3 hit this on the members-meta push. The Discord side is the opposite,
+  `discord_api.ts` throws, so the two need different shapes and neither pattern transfers.
+- **An interval of 0 does not run fast, it WEDGES the process.** A chained-timeout loop with
+  a zero delay arms a timer whose callback arms another, which starves the macrotask queue,
+  so the failure looks like a hang rather than a red test (the same shape as the Phase 2 hot
+  spin). `bot/scheduler.ts` guards it twice: `resolveCadence` floors an unusable value at
+  `MIN_INTERVAL_MS` rather than 0, and `LoopScheduler.add` throws outright on a non-positive
+  `activeMs` so a wiring bug is loud at boot. A VALID value is passed through untouched
+  however small, because the floor is a fallback and not a clamp: silently rewriting a D13
+  operator override would be its own defect.
+- **The nickname diff needs the RAW nick, not `memberNames`.** `displayNameOf` returns
+  `nick || global_name || username`, so it cannot distinguish "the nick is exactly X" from
+  "there is no nick and the global name is X", and the PATCH precondition is about the nick
+  field specifically. Phase 3 caches `member.nick` separately for this. The same asymmetry is
+  why a successful PATCH updates BOTH caches: after the write the member's nick IS the
+  computed value, which is what makes the echo Discord sends back genuinely redundant.
 - Numeric env parsing: `Number('')` is 0, so an unguarded parse turns a blank line in a
   .env into a hard 0. `positiveNumberFromEnv` in `bot/config.ts` falls back to the
   default for empty, non-numeric, and non-positive alike. It takes the VALUE rather than

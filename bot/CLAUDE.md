@@ -41,10 +41,19 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
   Tested in `tests/discord_bot_server_client.test.ts`.
 - `config.ts`: env to `BotConfig` (throws on missing required). Tested in
   `tests/discord_bot_config.test.ts`.
-- `cadence.ts`: the poll-loop interval constants, importable without booting `main.ts`.
+- `cadence.ts`: the poll-loop interval DEFAULTS, importable without booting `main.ts`.
+  `config.ts` layers the D13 env overrides over them; `main.ts` reads the resolved
+  `BotConfig` fields, never these constants.
+- `scheduler.ts`: **pure, IO-free** loop scheduler. Chained timeouts (never `setInterval`),
+  overlap guard, coalescing kicks, jitter, and the adaptive active-to-idle backoff. Pure
+  decision core plus a thin driver that owns the one timer; time and the random source are
+  injected. Tested in `tests/discord_bot_scheduler.test.ts` against the virtual clock.
+- `member_writes.ts`: the diff-before-write paths (nickname, members-meta, the
+  member-update echo decision) with their cache bookkeeping, behind injected IO. Tested in
+  `tests/discord_bot_member_writes.test.ts`.
 - `main.ts`: wiring only: guild state seeded from `GUILD_CREATE` (plus the op 8
   member backfill for large guilds), kept live by the `GUILD_MEMBER_*` events,
-  event dispatch, the poll loops.
+  event dispatch, and the scheduler task registrations.
 
 ## New bot feature recipe (module-first)
 1. Pure message-builder/diff/shaping logic in `logic.ts`, with a test in
@@ -91,20 +100,53 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
 - **Privileged intents:** `GUILD_MEMBERS` + `GUILD_PRESENCES` must be enabled for the
   application in the Discord developer portal, or IDENTIFY is rejected (close 4014).
 
-## Poll loops (all wired in main.ts)
-- Role sync + members-meta push: every `ROLE_SYNC_INTERVAL_MS` (5 min), plus once on
-  `GUILD_CREATE`. Tier-role refresh + special-roles refresh: once at startup (before the
-  gateway connects) and every 5 min, NOT on `GUILD_CREATE`. The same sync also
-  sets the level-on-name nickname (`buildLevelNick`; the base name fallback can be
-  the member's own already-suffixed live nick, so `buildLevelNick` strips any
-  existing suffix first to stay idempotent across re-syncs;
-  `DISCORD_SYNC_NICKNAMES=0` disables).
-- Presence push: debounced `PRESENCE_DEBOUNCE_MS` (4 s) after voice/presence events.
-- Relay, activity feed, daily-rewards winners: drained every `RELAY_POLL_MS` (3 s).
-  Daily-rewards days are marked back on the server only after a successful post,
+## Poll loops (all on `scheduler.ts`, wired in main.ts)
+**There are no bare `setInterval` loops in `main.ts`, and a new loop must not add one**
+(`grep setInterval bot/main.ts` returns nothing; the gateway heartbeat in `gateway.ts` is a
+different concern and stays). A repeating timer fires whether or not the previous run
+finished, so once a sweep ran long the sweeps stacked and a slow minute became a storm that
+survived restarts. Every loop is a `scheduler.add({...})` task instead: the next delay is
+armed only after the previous run SETTLES, delays are jittered so loops armed in one boot do
+not stay phase-locked, and repeated event kicks coalesce into exactly one follow-up run.
+- Role sync (`role-sync`) and special-roles refresh + members-meta push
+  (`special-roles-and-meta`): every `cfg.roleSyncIntervalMs` (5 min), plus a coalescing
+  `kick()` on `GUILD_CREATE`; the meta task is also kicked when the op 8 member backfill
+  finishes. The refresh and the push are ONE task because the push reads the index the
+  refresh rebuilds, so their ordering is load bearing. Tier-role refresh (`tier-roles`) runs
+  once at startup (before the gateway connects) and on the same 5 min cadence.
+  The role sync also sets the level-on-name nickname (`buildLevelNick`; the base name
+  fallback can be the member's own already-suffixed live nick, so `buildLevelNick` strips any
+  existing suffix first to stay idempotent across re-syncs; `DISCORD_SYNC_NICKNAMES=0`
+  disables).
+- Presence push (`presence-push`): a `debounce` task, so voice/presence events open one
+  `cfg.presenceDebounceMs` (4 s) window and every event inside it folds into one push.
+- Relay, activity feed, daily-rewards winners: drained every `cfg.relayPollMs` (3 s), one
+  task each. Daily-rewards days are marked back on the server only after a successful post,
   so a failed post retries (at-least-once).
 - Daily engagement grant: first message or voice-join per member per day, deduped
   bot-side AND server-side (grant dedupe key), so it is exactly-once.
+- The adaptive active-to-idle backoff exists in the scheduler but no task uses it yet: every
+  task above sets `activeMs` only, so its cadence is constant. The consolidated outbox poll
+  (D1: 3 s active decaying to 15 s idle) is the first consumer, in Phase 6.
+
+## Diff before write (D5): nothing is written unless it changed
+`member_writes.ts` owns all three decisions, over the pure predicates in `logic.ts`, because
+`main.ts` calls `main()` at module scope and so is unreachable from any test.
+- **Nickname PATCH** only when the computed nick differs from the member's cached RAW nick.
+  The raw nick is cached separately from `memberNames`: `displayNameOf` collapses nick,
+  `global_name` and username into one string, so it cannot tell "the nick is X" from "there
+  is no nick and the global name is X".
+- **members-meta** pushed only for members whose record changed since the last SUCCESSFUL
+  push, still byte-batched. A cleared record IS a change, so both clearing paths push, and
+  they drop the member's cache entries so a rejoin re-pushes.
+- **Self-echo suppression**: Discord answers every nickname PATCH with a
+  `GUILD_MEMBER_UPDATE`, and answering that with a members-meta POST is the bot generating
+  load against itself. An update carrying only the nick we just wrote, with an unchanged role
+  SET (order is not promised), is dropped; anything else still pushes.
+- **Caches move only after the write succeeded**, the `computeRoleSync` pattern. A cache
+  written optimistically claims a failed write landed, and the retry never happens. Note
+  `server_client.ts` answers `null` for a failed push rather than throwing, so the RETURN
+  VALUE is the only success signal there is.
 
 ## Roles
 - **Status tiers** (`WoC Initiate` up to `WoC Mythic`; ladder in
@@ -130,8 +172,11 @@ Required: `DISCORD_BOT_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID`,
 `DISCORD_DAILY_REWARDS_CHANNEL_ID`, `DISCORD_SYNC_NICKNAMES` (`0` disables, default
 on). Governor knobs (all optional, safe defaults): `DISCORD_MAX_RPS` (8),
 `DISCORD_BAN_PAUSE_MS` (600000), `DISCORD_BREAKER_LIMIT` (300),
-`DISCORD_FORBIDDEN_TTL_MS` (86400000); each falls back to its default for an empty or
-non-numeric value, never to 0. `DISCORD_WELCOME_CHANNEL_ID` is read but currently
+`DISCORD_FORBIDDEN_TTL_MS` (86400000). Loop cadences (D13, all optional):
+`DISCORD_ROLE_SYNC_INTERVAL_MS` (300000), `DISCORD_PRESENCE_DEBOUNCE_MS` (4000),
+`DISCORD_RELAY_POLL_MS` (3000); the defaults are `bot/cadence.ts`, so the value the suite
+pins and the value the bot falls back to cannot drift apart. Each of these knobs falls back
+to its default for an empty or non-numeric value, never to 0. `DISCORD_WELCOME_CHANNEL_ID` is read but currently
 unwired (no welcome message is posted). Boot loads `.env`/`.env.local` when present but
 runs fine from ambient env alone (`process.loadEnvFile`).
 

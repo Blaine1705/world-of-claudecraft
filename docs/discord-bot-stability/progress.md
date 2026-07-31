@@ -8,7 +8,7 @@
 | Phase 1 QA | done | 2026-07-30 | 2026-07-30 |
 | Phase 2: Discord rate-limit governor | built | 2026-07-30 | 2026-07-30 |
 | Phase 2 QA | done | 2026-07-30 | 2026-07-30 |
-| Phase 3: Loop scheduler + diff-before-write | not started | | |
+| Phase 3: Loop scheduler + diff-before-write | built | 2026-07-31 | 2026-07-31 |
 | Phase 3 QA | not started | | |
 | Phase 4: Server set-based endpoints | not started | | |
 | Phase 4 QA | not started | | |
@@ -40,11 +40,12 @@
 - [x] Governor test suite (all 429 arms, HTML 429, breaker, pacing determinism)
 
 ### Phase 3
-- [ ] `bot/scheduler.ts` (overlap guards, jitter, adaptive backoff, coalescing, env cadences)
-- [ ] All six loops + presence debounce migrated; bare setIntervals deleted
-- [ ] Nickname diff-before-PATCH with success-only cache update
-- [ ] members-meta diff + self-echo suppression
-- [ ] Fake-timer scheduler tests; diff-arm tests
+- [x] `bot/scheduler.ts` (overlap guards, jitter, adaptive backoff, coalescing, env cadences)
+- [x] All six loops + presence debounce migrated; bare setIntervals deleted
+- [x] Nickname diff-before-PATCH with success-only cache update
+- [x] members-meta diff + self-echo suppression
+- [x] Scheduler tests on the VIRTUAL clock (not fake timers, per the Phase 2 ruling);
+      diff-arm tests
 
 ### Phase 4
 - [ ] `POST /internal/discord/flex-batch` RouteDef + spine rows + R1-rig tests + query-count pin
@@ -473,3 +474,72 @@ survives): `main.ts` calls `main()` at module scope so it cannot be imported, an
 forbids a source-text pin, so this is a ruled-acceptable residual rather than a finding.
 
 Gate: PASS, all 12 steps.
+
+### Phase 3 (2026-07-31)
+
+Release sync: REAL, not the usual no-op. `origin/release/v0.33.0` on a fresh fetch was 110
+ahead / 49 behind, so the branch merged it before any Phase 3 work: 3149 files, zero
+conflicts, merge `c5e004d8d`. The `release-merge-audit` skill found exactly one file both
+sides had changed, `.env.example`, and the merge kept both halves (the release's OTA block
+and removed COMMUNITY_TEST_RIFTS, plus Phase 2's four governor keys). The release touched no
+`bot/` file, none of `src/sim/discord_roles.ts` or `discord_tier.ts`, and none of the
+`server/` modules serving `/internal/discord`, so no legacy-arm mirroring, no injected-helper
+re-binding, and no invalidated planning premise. `npm ci` was re-run because package-lock
+moved.
+
+Post-merge baseline, measured BEFORE any Phase 3 change: 1833 files / 23801 tests pass, one
+failure, and it is the sibling-worktree malware scan. **`tests/texture_upload.test.ts` now
+PASSES**, so the packet's second known gate failure is gone: the merge carried the Three.js
+work that fixed it. Only the worktree malware red remains, and it aborts the gate before tsc
+and the builds, which were run by hand and are green.
+
+Both root causes are closed. The six bare `setInterval` loops and the `presenceTimer`
+debounce now run on `bot/scheduler.ts`, which chains each delay after the previous run
+SETTLES, so a sweep that outlasts its period can no longer stack a second one beside itself.
+`grep setInterval bot/main.ts` returns nothing. The nickname PATCH and every members-meta
+push are conditional on an actual change, so a steady-state sweep writes nothing at all,
+which also removes the self-inflicted echo load (a PATCH produced a `GUILD_MEMBER_UPDATE`
+that the handler turned straight back into a members-meta POST).
+
+Design calls worth carrying forward. The scheduler is split like the governor: the decision
+half (overlap, coalescing, backoff, jitter) is pure and imports nothing, so it is provable
+with zero IO, and only a thin driver owns a timer. A `debounce` MODE expresses the presence
+guard on the same machinery rather than as a second mechanism. The live nick is cached
+SEPARATELY from `memberNames`, because `displayNameOf` collapses nick, `global_name` and
+username into one string and therefore cannot answer the question the PATCH precondition
+asks. And the diff logic went into a new `bot/member_writes.ts` rather than into `main.ts`,
+because `main()` runs at module scope so nothing in that file is reachable from a test: that
+is ledger item L8's instruction, and it is what makes the phase's acceptance items testable
+at all.
+
+Two traps found here. `server_client.ts` answers `null` for a failed push instead of
+throwing, so the return value is the ONLY success signal; a cache updated on absence-of-throw
+would have marked refused batches clean and stranded those members. And an unusable
+`activeMs` resolving to 0 would arm a zero-delay timeout that re-arms itself, which starves
+the macrotask queue and WEDGES the process rather than failing, so the resolver floors to
+`MIN_INTERVAL_MS` and `add()` throws outright on a non-positive cadence.
+
+One deliberate behavior deviation, recorded rather than hidden: because the
+refresh-then-push pairing has to keep its ordering it lives in ONE task, so the
+`GUILD_CREATE` kick now also refreshes the special roles. That is one extra guild-roles GET
+per reconnect, and it makes the push more correct (the previous code published whatever role
+index happened to be resolved). Everything else is cadence-only: which function runs and what
+it does are unchanged.
+
+Ledger: L7 CLOSED (a non-resumable INVALID_SESSION now clears the session id, resume URL and
+seq, so a close arriving before the next READY re-IDENTIFIEs instead of RESUMEing a session
+Discord had just killed). L12 CLOSED (`this.queues` is LRU bounded by `MAX_TRACKED_QUEUES`,
+so a long ban pause can no longer grow it with one entry per slash command). L11 was found to
+be ALREADY closed by the dispatch loop Phase 2 QA shipped, which re-reserves the rate slot on
+every pass; it was verified rather than assumed, and the test that pins it reproduces the
+reported defect when the reservation is hoisted out of the loop.
+
+Mutation round: 15 planted mutants over `scheduler.ts` and `member_writes.ts`, 13 killed on
+the first pass. Both survivors were genuine holes, not equivalent mutants. Reading the work
+signal backwards survived because every driver test used a cadence whose idle interval equals
+its active one, so nothing observed the backoff through the driver at all; and the debounce
+burst test stopped at the first deadline, so a kick that armed a SECOND timer rather than
+folding into the open window still passed. Both are now covered and the re-run is 15/15.
+
+Validation: `npx tsc --noEmit` clean, 413 bot tests green across 15 files, `npm run build:bot`
+bundles, `npm run ci:changed` exits 0 with zero warnings in the touched files.
