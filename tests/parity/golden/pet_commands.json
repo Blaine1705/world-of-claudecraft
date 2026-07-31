@@ -2591,7 +2591,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 842,
-      "state": "b18285a0",
+      "state": "16b08cec",
       "events": "a6232866",
       "rng": {
         "draws": 295,
@@ -2938,6 +2938,7 @@
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 838,
+          "petAutoTaunt": true,
           "petMode": "defensive",
           "pos": {
             "x": 34,
