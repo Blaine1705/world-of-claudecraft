@@ -7229,7 +7229,7 @@ export const es_ES: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Invisibilidad mejorada",
-        "description": "Te esfumas durante 20 s: suprime 2 efectos de daño periódico y reduce el daño recibido un 90% mientras sigues invisible y durante un breve periodo posterior. (Talento de mago)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Racha ardiente",

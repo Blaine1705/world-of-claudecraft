@@ -84,7 +84,10 @@ import {
 } from './frost_mage';
 import { spawnFrozenOrb } from './frozen_orb';
 import { glacialFrontContains } from './glacial_front';
-import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
+import {
+  applyGreaterInvisibilityAftereffect,
+  GREATER_INVISIBILITY_DR_AURA_ID,
+} from './greater_invisibility';
 import { livingGroupRaidInRadius } from './group_targeting';
 import { applyGroupHaste } from './haste_burst';
 import { armHeroicLeap, relocateSwept } from './heroic_leap';
@@ -1980,7 +1983,7 @@ export function runEffects(
         // aftereffect so whichever normal path ends the vanish applies it once.
         // A reset-assisted recast may have just ended the previous vanish, so
         // clear that aftereffect before entering invisibility again.
-        const existingDr = p.auras.findIndex((a) => a.id === `${ability.id}_dr`);
+        const existingDr = p.auras.findIndex((a) => a.id === GREATER_INVISIBILITY_DR_AURA_ID);
         if (existingDr >= 0) {
           const gone = p.auras[existingDr];
           p.auras.splice(existingDr, 1);

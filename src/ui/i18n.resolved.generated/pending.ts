@@ -9,25 +9,65 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "es_ES": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "fr_FR": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "fr_CA": [
+    "entities.abilities.greater_invisibility.description"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "de_DE": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "zh_CN": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "zh_TW": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "ko_KR": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "ja_JP": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "pt_BR": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "ru_RU": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "cs_CZ": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "nl_NL": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "pl_PL": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "id_ID": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "tr_TR": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "sv_SE": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "vi_VN": [
+    "entities.abilities.greater_invisibility.description"
+  ],
+  "da_DK": [
+    "entities.abilities.greater_invisibility.description"
+  ]
 };

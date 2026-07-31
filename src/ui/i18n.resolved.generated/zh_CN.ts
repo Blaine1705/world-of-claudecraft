@@ -7229,7 +7229,7 @@ export const zh_CN: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "强效隐形术",
-        "description": "消失 20 秒：移除 2 个持续伤害效果，并使你在隐形期间及结束后短时间内受到的伤害降低 90%。（法师天赋）"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "炽热连击",

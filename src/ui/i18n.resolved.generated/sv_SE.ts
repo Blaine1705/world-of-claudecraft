@@ -7229,7 +7229,7 @@ export const sv_SE: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Förbättrad osynlighet",
-        "description": "Försvinn i 20 sek.: tar bort 2 skadeeffekter över tid och du tar 90% mindre skada medan du är osynlig och en kort stund efteråt. (magikertalang)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Het svit",

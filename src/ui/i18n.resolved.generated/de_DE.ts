@@ -7229,7 +7229,7 @@ export const de_DE: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Große Unsichtbarkeit",
-        "description": "Ihr verschwindet 20 Sek. lang: Entfernt 2 Effekte mit regelmäßigem Schaden und verringert Euren erlittenen Schaden während der Unsichtbarkeit und kurz danach um 90%. (Magiertalent)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Heiße Serie",

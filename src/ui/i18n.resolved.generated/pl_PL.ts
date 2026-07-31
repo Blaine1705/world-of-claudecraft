@@ -7229,7 +7229,7 @@ export const pl_PL: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Większa niewidzialność",
-        "description": "Znikasz na 20 sek.: usuwa 2 efekty obrażeń rozłożonych w czasie, a podczas niewidzialności i krótko po niej otrzymujesz o 90% mniej obrażeń. (talent maga)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Gorąca seria",

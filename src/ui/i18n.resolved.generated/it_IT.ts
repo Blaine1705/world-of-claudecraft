@@ -7229,7 +7229,7 @@ export const it_IT: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Invisibilità superiore",
-        "description": "Svanisci per 20 s: rimuove 2 effetti di danno periodico e riduce i danni subiti del 90% mentre sei invisibile e per breve tempo dopo. (Talento del mago)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Vampata",

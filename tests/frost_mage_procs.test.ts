@@ -5,6 +5,7 @@ import {
   FINGERS_OF_FROST_DURATION,
   FINGERS_OF_FROST_MAX_STACKS,
   frostProcGlowActive,
+  ICE_LANCE_FROZEN_MULT,
   resolveFrozenCast,
   SHATTER_CRIT_BONUS,
   WINTERS_CHILL_CHARGES,
@@ -320,6 +321,83 @@ describe('Ice Lance frozen resolution', () => {
 
     expect(iceLanceFrozen).toEqual({ treatAsFrozen: false, damageMult: 1 });
     expect(shatterFrozen).toEqual({ treatAsFrozen: false, damageMult: 1 });
+  });
+
+  // The other half of the same rule, and the regression that matters: "frozen"
+  // is the mage's own hard CC whatever KIND it lands as, not `root` alone.
+  // Deadfrost is a `stun`, Temporal Hourglass a `stasis`, Polymorph its own
+  // kind. Narrowing the check to `root` while fixing the source silently cost
+  // Deadfrost its 3x Ice Lance and its Shatter, with no test to catch it.
+  it.each(['stun', 'stasis', 'root', 'incapacitate', 'polymorph'] as const)(
+    'treats a mage %s as frozen for Ice Lance and Shatter',
+    (kind) => {
+      const { sim, p } = makeSim();
+      const mob = spawnTarget(sim, p);
+      pushAura(mob, { id: `test_mage_${kind}`, name: `Test ${kind}`, kind, sourceId: p.id });
+      const meta = sim.players.get(p.id)!;
+
+      expect(resolveFrozenCast(sim.ctx, p, meta, ABILITIES.ice_lance, mob)).toEqual({
+        treatAsFrozen: true,
+        damageMult: ICE_LANCE_FROZEN_MULT,
+      });
+      expect(resolveFrozenCast(sim.ctx, p, meta, ABILITIES.frostbolt, mob)).toEqual({
+        treatAsFrozen: true,
+        damageMult: 1,
+      });
+      // Still free: a hold of the mage's own spends no proc state.
+      expect(p.auras.some((a) => a.kind === 'fingers_of_frost')).toBe(false);
+    },
+  );
+
+  // The same kinds from ANOTHER class stay inert, so the source predicate is
+  // pinned per kind rather than only on the druid-root case above.
+  it.each(['stun', 'stasis', 'root', 'incapacitate', 'polymorph'] as const)(
+    'does not treat a druid %s as frozen',
+    (kind) => {
+      const { sim, p } = makeSim();
+      const mob = spawnTarget(sim, p);
+      const druidId = sim.addPlayer('druid', 'Holder');
+      pushAura(mob, { id: `test_druid_${kind}`, name: `Test ${kind}`, kind, sourceId: druidId });
+      const meta = sim.players.get(p.id)!;
+
+      expect(resolveFrozenCast(sim.ctx, p, meta, ABILITIES.ice_lance, mob)).toEqual({
+        treatAsFrozen: false,
+        damageMult: 1,
+      });
+      expect(resolveFrozenCast(sim.ctx, p, meta, ABILITIES.frostbolt, mob)).toEqual({
+        treatAsFrozen: false,
+        damageMult: 1,
+      });
+    },
+  );
+
+  // Deadfrost is THE canonical Shatter enabler, and the ability the narrowed
+  // check cost its 3x. It cannot be cast end to end here: `deep_freeze` is
+  // defined in classes.ts but nothing in src/sim grants it yet, so no level or
+  // talent path can learn it. Pin the link the loop above relies on instead: if
+  // Deadfrost ever stops landing a `stun`, this fails and says so, rather than
+  // leaving the loop testing a kind Deadfrost no longer uses.
+  it('Deadfrost lands the stun kind the frozen check treats as a mage freeze', () => {
+    expect(ABILITIES.deep_freeze.class).toBe('mage');
+    expect(ABILITIES.deep_freeze.effects).toContainEqual(expect.objectContaining({ type: 'stun' }));
+
+    const { sim, p } = makeSim();
+    const mob = spawnTarget(sim, p);
+    const stun = ABILITIES.deep_freeze.effects.find((e) => e.type === 'stun');
+    if (!stun || stun.type !== 'stun') throw new Error('Deadfrost lost its stun effect');
+    pushAura(mob, {
+      id: 'deep_freeze_stun',
+      name: ABILITIES.deep_freeze.name,
+      kind: 'stun',
+      sourceId: p.id,
+      remaining: stun.duration,
+      duration: stun.duration,
+      school: 'frost',
+    });
+
+    expect(resolveFrozenCast(sim.ctx, p, sim.players.get(p.id)!, ABILITIES.ice_lance, mob)).toEqual(
+      { treatAsFrozen: true, damageMult: ICE_LANCE_FROZEN_MULT },
+    );
   });
 
   it('lets Fingers of Frost freeze a root-immune target', () => {
