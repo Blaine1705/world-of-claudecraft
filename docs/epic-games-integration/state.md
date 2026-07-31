@@ -1,6 +1,6 @@
 # State: Epic Games Store integration (cross-phase cheat sheet)
 
-Current phase: Phase 4 complete. Next: Phase 5 (Server link verification).
+Current phase: Phase 5 complete. Next: Phase 6 (Achievement mirror).
 
 Read this first in every session. Locked decisions below override memory and
 ad-hoc invention. Research background: `research-brief.md`.
@@ -167,6 +167,9 @@ Client:
   - Phase 4: `electron/epic.cjs` (+ `epic.d.cts`); thin wire in
     `electron/main.cjs`, `electron/preload.cjs`, `src/runtime.ts`
     `DesktopBridge`
+  - Phase 5: `server/epic/ticket.ts` (pure), `server/epic/web_api.ts`
+    (fetch shell); full link arms + reclaim-by-proof in `routes.ts`;
+    `mirror.reconcileLink` stub for Phase 6
 - Tests:
   - epic pins in `tests/electron_desktop_config.test.ts` and full epic
     packaging pins in `tests/electron_builder_config.test.ts`
@@ -175,6 +178,9 @@ Client:
     (displace transaction)
   - Phase 4: `tests/electron_epic.test.ts` (fakes, no real EOS SDK);
     IPC allowlist + bridge pins in `tests/electron_ipc_channels.test.ts`
+  - Phase 5: `tests/server/epic_ticket.test.ts`,
+    `tests/server/epic_web_api.test.ts` (mocked fetchImpl, no live Epic),
+    extended `tests/server/epic_routes.test.ts` (every link arm + reclaim)
 - Desktop Epic shell (Phase 4):
   - Facade: `epicIntegrationEnabled`, `resolveEpicIds`,
     `parseLauncherExchangeCode`, `createEpicShell` returning
@@ -226,19 +232,26 @@ Client:
 
 ## Open items (do not invent answers mid-phase)
 
-- O1 Link proof shape (Phase 4 partial resolve; Phase 5 pins server verify):
-  - Desktop mints a non-empty **string** proof for `POST /api/epic/link { proof }`.
-  - Preferred mint (Epic Auth Web APIs, launcher-launched client): the Epic
-    Games Launcher **exchange code** from argv
-    (`-AUTH_TYPE=exchangecode` + `-AUTH_PASSWORD=<code>`). Pure helper:
-    `parseLauncherExchangeCode` in `electron/epic.cjs`.
-  - Optional injectable EOS adapter may return a string or `{ proof, cancel }`
-    (e.g. future ID token path). Server must not trust client-supplied Epic
-    account ids (D11).
-  - Phase 5 still owns exact upstream endpoints / claim field names for
-    verifying exchange_code (or id token) with `EPIC_CLIENT_ID` +
-    `EPIC_CLIENT_SECRET` and extracting `epic_account_id`. Pin those literals
-    in server tests when real verify lands.
+- O1 Link proof shape: **CLOSED (Phase 5)**.
+  - Body field: `POST /api/epic/link { proof: string }` (never a client-supplied
+    Epic account id; D11).
+  - Preferred mint (desktop Phase 4): launcher **exchange code** from argv
+    (`-AUTH_TYPE=exchangecode` + `-AUTH_PASSWORD=<code>` via
+    `parseLauncherExchangeCode` in `electron/epic.cjs`). Optional EOS adapter
+    may still return a string or `{ proof, cancel }`; server verifies the
+    string as `exchange_code` today.
+  - Shape clamp (pure, `server/epic/ticket.ts`): length 8 to 16384, charset
+    `A-Za-z0-9._~+/=-` (OAuth-safe, no whitespace).
+  - Upstream verify (official Epic Auth Web APIs):
+    - `POST https://api.epicgames.dev/epic/oauth/v2/token`
+    - form: `grant_type=exchange_code`, `exchange_code=<proof>`,
+      `deployment_id`, `client_id`, `client_secret`
+    - Success claim: JSON `account_id` (string) -> `epic_links.epic_account_id`
+    - 5 s timeout; network / 5xx / malformed / invalid_client -> `epic.upstream`;
+      invalid_grant-class -> `epic.invalid_token`; access_denied-class ->
+      `epic.banned`
+  - Literals pinned in `tests/server/epic_ticket.test.ts` and
+    `tests/server/epic_web_api.test.ts`. No live Epic calls in CI.
 - O2 Whether achievement unlocks use EOS SDK server client, Web API, or both
   (Phase 6 chooses based on current official docs; prefer the server-trusted path).
 - O3 Vendor vs download path for EOS C SDK binaries in CI (Phase 2/4).

@@ -24,3 +24,17 @@ export function reconcileOnLogin(_accountId: number): void {
 export function onLinkChanged(_accountId: number, _epicAccountId: string | null): void {
   // Phase 6.
 }
+
+/**
+ * Reconcile-on-link: Phase 6 will push everything the account already earned
+ * (intersected with the achievement map) to the freshly linked Epic account.
+ * Today: cache flip only (onLinkChanged), fire-and-forget, never throws.
+ * The link response never waits on any Epic IO.
+ */
+export function reconcileLink(accountId: number, epicAccountId: string): void {
+  try {
+    onLinkChanged(accountId, epicAccountId);
+  } catch {
+    // Never fault the link response on mirror work.
+  }
+}

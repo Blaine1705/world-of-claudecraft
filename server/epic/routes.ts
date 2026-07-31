@@ -9,12 +9,12 @@
 // mirror, never an identity or session source. Login stays email + Discord
 // only, everywhere, always.
 //
-// POST /api/epic/link { proof }: the client (desktop shell only in v1) obtains
-// a short-lived link proof and posts it; Phase 5 will have the SERVER verify
-// it upstream and extract the Epic account id from the verified response. The
-// client is never trusted to name its own Epic id. Until Phase 5 lands real
-// verification, a provisioned server still answers epic.upstream on link (the
-// dark-safe stub).
+// POST /api/epic/link { proof }: the client (desktop shell only in v1)
+// obtains a short-lived proof (preferred: launcher exchange code) and posts
+// it; the SERVER verifies it upstream with the confidential client credentials
+// and extracts the Epic account id from the verified response. The client is
+// never trusted to name its own Epic id. Blocked accounts are refused. On
+// success the reconcile job (Phase 6 fill) is fire-and-forget.
 
 import { ctxAccountId } from '../http/context';
 import { HttpError } from '../http/errors';
@@ -23,19 +23,27 @@ import { EPIC_LINK_POLICY, rateLimit } from '../http/middleware/rate_limit';
 import { requireAccount } from '../http/middleware/require_account';
 import type { Ctx, Middleware, RouteDef } from '../http/types';
 import { json } from '../http_util';
-import { epicEnabled, epicProvisioned } from './config';
-import { deleteEpicLink, epicLinkForAccount } from './epic_db';
-import { onLinkChanged } from './mirror';
+import {
+  epicClientId,
+  epicClientSecret,
+  epicDeploymentId,
+  epicEnabled,
+  epicProvisioned,
+} from './config';
+import {
+  accountForEpicId,
+  deleteEpicLink,
+  displaceEpicLink,
+  epicLinkForAccount,
+  insertEpicLink,
+} from './epic_db';
+import { onLinkChanged, reconcileLink } from './mirror';
+import { isProofShape } from './ticket';
+import { verifyLinkProof } from './web_api';
 
-/** Loose proof shape clamp until Phase 5 pins the real EOS proof form. A
- *  non-empty string under this cap is admitted; everything else is
- *  epic.invalid_token before any upstream work. */
-export const MAX_PROOF_CHARS = 16_384;
-
-/** True when the body field is a non-empty string inside the size clamp. */
-export function isProofShape(value: unknown): value is string {
-  return typeof value === 'string' && value.length > 0 && value.length <= MAX_PROOF_CHARS;
-}
+// Re-export shape helpers so existing importers of routes stay stable; the
+// pure source of truth lives in ticket.ts.
+export { isProofShape, MAX_PROOF_CHARS, MIN_PROOF_CHARS } from './ticket';
 
 /** The feature gate, FIRST on every route (before auth): with the flag off
  *  the whole surface answers the stable epic.disabled 503, bearer or not. */
@@ -44,9 +52,7 @@ const epicDisabledGuard: Middleware = async (_ctx, next) => {
   await next();
 };
 
-/** POST /api/epic/link { proof }: verify and store the caller's link.
- *  Phase 3: shape + provisioning + already-linked pre-checks only; real
- *  upstream verification and insert/displace land in Phase 5. */
+/** POST /api/epic/link { proof }: verify and store the caller's link. */
 async function linkHandler(ctx: Ctx): Promise<void> {
   const accountId = ctxAccountId(ctx);
   const proof = (ctx.body as Record<string, unknown> | null | undefined)?.proof;
@@ -57,16 +63,59 @@ async function linkHandler(ctx: Ctx): Promise<void> {
   // retry, never a 500.
   if (!epicProvisioned()) throw new HttpError(503, 'epic.upstream');
 
+  const clientId = epicClientId();
+  const clientSecret = epicClientSecret();
+  const deploymentId = epicDeploymentId();
+  // epicProvisioned already checked non-null; narrow for the type system.
+  if (clientId === null || clientSecret === null || deploymentId === null) {
+    throw new HttpError(503, 'epic.upstream');
+  }
+
   // Cheap conflict first: an already-linked account never burns an upstream
-  // verification call (Phase 5 will keep this order).
+  // verification call.
   if ((await epicLinkForAccount(accountId)) !== null) {
     throw new HttpError(409, 'epic.already_linked');
   }
 
-  // Phase 5 replaces this stub with real EOS verification, reclaim-by-proof
-  // displace, insert, and reconcile. Until then a provisioned surface still
-  // refuses to link so a half-lit deploy never writes an unproven row.
-  throw new HttpError(503, 'epic.upstream');
+  const outcome = await verifyLinkProof({
+    clientId,
+    clientSecret,
+    deploymentId,
+    proof,
+  });
+  if (outcome.kind === 'upstream') throw new HttpError(503, 'epic.upstream');
+  if (outcome.kind === 'invalid' || outcome.kind === 'malformed') {
+    throw new HttpError(400, 'epic.invalid_token');
+  }
+  if (outcome.kind === 'banned') throw new HttpError(403, 'epic.banned');
+  const epicAccountId = outcome.epicAccountId;
+
+  const owner = await accountForEpicId(epicAccountId);
+  if (owner !== null && owner !== accountId) {
+    // Reclaim-by-proof, NOT a 409: this Epic id is currently linked to a
+    // DIFFERENT WoCC account, but the caller just proved CURRENT control of
+    // the Epic account with a fresh verified proof, strictly stronger evidence
+    // than the stale (possibly stolen) proof the squatter linked with. Displace
+    // the old row and hand the link to the true owner, so the account that
+    // controls the Epic login always wins in steady state.
+    const displaced = await displaceEpicLink(accountId, epicAccountId);
+    if (displaced.result === 'account_linked') throw new HttpError(409, 'epic.already_linked');
+    if (displaced.result === 'epic_taken') throw new HttpError(409, 'epic.account_taken');
+    // Flip the displaced account's cached mirror view in-request so its
+    // in-flight pushes revalidate against a now-empty link and drop, exactly as
+    // unlink does. A peer realm process still heals via its own push-time read.
+    if (displaced.displacedAccountId !== null) onLinkChanged(displaced.displacedAccountId, null);
+  } else {
+    // The Epic id is free. Plain insert; it re-classifies a 23505 in case a
+    // concurrent request beat the pre-checks, both arms the same 409s the
+    // pre-checks answer.
+    const inserted = await insertEpicLink(accountId, epicAccountId);
+    if (inserted === 'account_linked') throw new HttpError(409, 'epic.already_linked');
+    if (inserted === 'epic_taken') throw new HttpError(409, 'epic.account_taken');
+  }
+
+  reconcileLink(accountId, epicAccountId);
+  json(ctx.res, 200, { linked: true, epicAccountId });
 }
 
 /** DELETE /api/epic/link: drop the caller's link. Idempotent. */
