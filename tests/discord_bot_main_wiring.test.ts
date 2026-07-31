@@ -106,6 +106,35 @@ describe('bot/main.ts loop wiring', () => {
     expect(startAll).toBeLessThan(connect);
   });
 
+  it('forgets a member on BOTH paths that clear their stored flair', () => {
+    // Found by mutation, round four: deleting either call site survived the whole
+    // suite. forgetMember itself is well covered, and what nothing could say was
+    // that main.ts still calls it, because main.ts runs main() at module scope
+    // and no test can reach inside.
+    //
+    // A source-text pin is the fallback the loop wiring above already uses for
+    // exactly that reason. It is weaker than a behavioral assertion and it is
+    // the strongest thing available here: leaving a departed member's last-pushed
+    // record behind means a REJOIN is diffed against their pre-departure state,
+    // so the push that would restore their flair is suppressed and the game shows
+    // them as cleared until the bot restarts. That is invisible in production.
+    const source = mainSource();
+    expect(source.length).toBeGreaterThan(5000);
+
+    // GUILD_MEMBER_REMOVE: the member left the guild.
+    expect(source).toMatch(
+      /case 'GUILD_MEMBER_REMOVE'[\s\S]{0,1200}?forgetMember\(nickCaches, lastPushedMeta, userId\)/,
+    );
+    // The flaired-ids reconcile: the member left while the bot was offline, so
+    // their stored flair is cleared by the roster sweep instead.
+    expect(source).toMatch(
+      /reconcileDepartedMembers[\s\S]{0,1200}?forgetMember\(nickCaches, lastPushedMeta, record\.discord_user_id\)/,
+    );
+    // Exactly two, so a third clearing path added without forgetting the member
+    // (or one of these two quietly dropped) fails here rather than in production.
+    expect((source.match(/forgetMember\(/g) ?? []).length).toBe(2);
+  });
+
   it('keeps the presence push on the debounce mode, not a poll loop', () => {
     // The distinction is behavioral: a repeating task would push presence every
     // 4 seconds forever, where a debounce pushes only after an actual event.

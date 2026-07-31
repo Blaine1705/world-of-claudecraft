@@ -198,9 +198,14 @@ describe('members-meta diff before push', () => {
     expect(again).toEqual([]);
   });
 
-  it('never marks a batch clean when the server refuses it, and stops there', async () => {
+  it('never marks a batch clean when the server refuses it', async () => {
     // `call` answers null rather than throwing, so the return value is the only
     // success signal. Marking on a null would strand the whole batch.
+    //
+    // Only the marking, deliberately: these two records are ONE batch, so nothing
+    // here can say whether a later batch would have been attempted. The stop rule
+    // is pinned by the three-batch case below, which is the only place it is
+    // falsifiable.
     const last = new Map<string, MemberMetaRecord>();
     const records = [record(memberId(1)), record(memberId(2))];
     const pushed = await pushChangedMemberMeta(records, last, {
@@ -237,21 +242,35 @@ describe('members-meta diff before push', () => {
   });
 
   it('stops after a mid-run refusal, keeping the batches already accepted', async () => {
-    const total = MEMBERS_META_BATCH + 5;
+    // THREE batches with the refusal on the SECOND, which is what makes the word
+    // "stops" mean anything: an earlier version of this case refused the LAST of
+    // two batches, so there was no third batch to skip and the stop rule was
+    // constant-true. Found by mutation, round four: replacing the `return` with a
+    // `continue` (press on past a refusal) survived that version untouched.
+    //
+    // This is recorded deviation 3 of the phase, the roster push abandoning the
+    // rest of the sweep rather than attempting it, and it is the assertion that
+    // states it.
+    const total = MEMBERS_META_BATCH * 2 + 5;
     const records = Array.from({ length: total }, (_, i) => record(memberId(i)));
     const last = new Map<string, MemberMetaRecord>();
-    let calls = 0;
+    const sizes: number[] = [];
     const pushed = await pushChangedMemberMeta(records, last, {
       pushMembersMeta: async (batch) => {
-        calls += 1;
-        return calls === 1 ? { updated: batch.length } : null;
+        sizes.push(batch.length);
+        return sizes.length === 1 ? { updated: batch.length } : null;
       },
     });
-    expect(calls).toBe(2);
+    // Two attempts, never three: the third batch is not tried at all, because
+    // spending more requests on a server that already refused one is the thing
+    // the stop rule exists to prevent.
+    expect(sizes).toEqual([MEMBERS_META_BATCH, MEMBERS_META_BATCH]);
     expect(pushed).toHaveLength(MEMBERS_META_BATCH);
-    // Exactly the accepted batch is remembered; the refused five are not.
+    // Exactly the accepted batch is remembered; the refused one and the untried
+    // one are both left dirty, so the next sweep retries all of them.
     expect(last.size).toBe(MEMBERS_META_BATCH);
     expect(last.has(memberId(MEMBERS_META_BATCH))).toBe(false);
+    expect(last.has(memberId(MEMBERS_META_BATCH * 2))).toBe(false);
   });
 
   it('pushes one member only when their record moved', async () => {
