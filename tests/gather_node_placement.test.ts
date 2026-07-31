@@ -653,7 +653,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     expect(TUNED_ZONES.map((zn) => zn.id)).toEqual([...TUNED_ZONE_IDS]);
   });
 
-  it('count floor: every zone keeps every gathering profession worth visiting', () => {
+  it('count floor: every TUNED zone keeps every gathering profession worth visiting', () => {
     // A relocation must never be allowed to drain a zone of a type (moving a node
     // across a band boundary would), and the count itself is the density the
     // world is tuned around: every TUNED zone (this loop's scope; the eleven

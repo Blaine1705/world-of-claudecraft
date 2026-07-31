@@ -635,16 +635,26 @@ describe('gather-node markers scale with the rim, not the node table (phase 16)'
     for (const zoneId of zones) {
       const anchor = GATHER_NODES.find((n) => n.zoneId === zoneId);
       if (!anchor) throw new Error(`no node in ${zoneId}`);
-      const expected = GATHER_NODES.filter((n) => {
+      const inRim = GATHER_NODES.filter((n) => {
         const dx = (n.pos.x - anchor.pos.x) * PPY;
         const dz = (n.pos.z - anchor.pos.z) * PPY;
         return dx * dx + dz * dz <= RIM_PX * RIM_PX;
-      }).length;
-      expect(nodeMarkersAt(anchor.pos.x, anchor.pos.z), `zone ${zoneId}`).toHaveLength(expected);
+      });
+      const drawn = nodeMarkersAt(anchor.pos.x, anchor.pos.z);
+      expect(drawn, `zone ${zoneId}`).toHaveLength(inRim.length);
+      // Position identity, not just cardinality: a cull that kept the WRONG
+      // nodes at the right count must fail, so pin the projected coordinate
+      // set (markers carry no node id; mx/my is half - delta * PPY).
+      const expectCoords = inRim
+        .map((n) => `${S / 2 - (n.pos.x - anchor.pos.x) * PPY},${S / 2 - (n.pos.z - anchor.pos.z) * PPY}`)
+        .sort();
+      expect(drawn.map((m) => `${m.mx},${m.my}`).sort(), `zone ${zoneId} coords`).toEqual(
+        expectCoords,
+      );
       // Standing on a node always draws at least that node, and the rim
       // genuinely culls (far zones never ride along).
-      expect(expected).toBeGreaterThanOrEqual(1);
-      expect(expected).toBeLessThan(GATHER_NODES.length);
+      expect(inRim.length).toBeGreaterThanOrEqual(1);
+      expect(inRim.length).toBeLessThan(GATHER_NODES.length);
     }
   });
 
