@@ -378,16 +378,24 @@ describe('loadConfig cadence knobs (D13)', () => {
     {
       env: 'DISCORD_ROLE_SYNC_INTERVAL_MS',
       field: 'roleSyncIntervalMs',
+      constant: 'ROLE_SYNC_INTERVAL_MS',
       fallback: 300000,
       override: '450000',
     },
     {
       env: 'DISCORD_PRESENCE_DEBOUNCE_MS',
       field: 'presenceDebounceMs',
+      constant: 'PRESENCE_DEBOUNCE_MS',
       fallback: 4000,
       override: '7500',
     },
-    { env: 'DISCORD_RELAY_POLL_MS', field: 'relayPollMs', fallback: 3000, override: '11000' },
+    {
+      env: 'DISCORD_RELAY_POLL_MS',
+      field: 'relayPollMs',
+      constant: 'RELAY_POLL_MS',
+      fallback: 3000,
+      override: '11000',
+    },
   ] as const;
 
   it('defaults each cadence to the value it had hard-coded, pinned against a LITERAL', () => {
@@ -401,15 +409,29 @@ describe('loadConfig cadence knobs (D13)', () => {
     expect(cfg.relayPollMs).toBe(3000);
   });
 
-  it('keeps the config defaults equal to the bot/cadence.ts constants', () => {
-    // The other half of the pin above: the literals are what Phase 3 promised
-    // not to change, and this is what proves config.ts actually falls back to
-    // the shared module rather than to a second copy of the numbers.
-    setRequired();
-    const cfg = loadConfig();
-    expect(cfg.roleSyncIntervalMs).toBe(ROLE_SYNC_INTERVAL_MS);
-    expect(cfg.presenceDebounceMs).toBe(PRESENCE_DEBOUNCE_MS);
-    expect(cfg.relayPollMs).toBe(RELAY_POLL_MS);
+  it('falls back to the SHARED cadence module, not to a second copy of the numbers', () => {
+    // Asserting `cfg.roleSyncIntervalMs === ROLE_SYNC_INTERVAL_MS` is what used to
+    // stand here, under a comment claiming it proved exactly this. It cannot: the
+    // cases above already pin the constant to 300000 and the config to 300000, so
+    // the comparison holds in every state where they pass, and inlining the
+    // literal into bot/config.ts with the ./cadence import deleted survives it.
+    //
+    // Only the source can say where the value came from, so that is what this
+    // reads. The literals stay pinned above; this pins the SEAM.
+    const source = readFileSync(new URL('../bot/config.ts', import.meta.url), 'utf8');
+    expect(source).toMatch(
+      /import \{[^}]*PRESENCE_DEBOUNCE_MS[^}]*RELAY_POLL_MS[^}]*ROLE_SYNC_INTERVAL_MS[^}]*\} from '\.\/cadence'/,
+    );
+    for (const knob of CADENCE_KNOBS) {
+      // Each env key resolved against its own imported constant, never a literal.
+      expect(source).toMatch(
+        new RegExp(`process\\.env\\.${knob.env}[\\s\\S]{0,40}?${knob.constant}`),
+      );
+    }
+    // And no bare copy of any default survives beside the import.
+    for (const value of ['300000', '300_000', '4000', '4_000', '3000', '3_000']) {
+      expect(source).not.toContain(value);
+    }
   });
 
   it('reads each cadence from its OWN key, with a distinct value per field', () => {

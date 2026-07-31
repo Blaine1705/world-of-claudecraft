@@ -43,6 +43,7 @@ import {
 import {
   decideMemberUpdate,
   displayNameOf,
+  dueForFullResync,
   forgetMember,
   nickOf,
   pushChangedMemberMeta,
@@ -146,6 +147,10 @@ async function main(): Promise<void> {
   // The members-meta record we last successfully PUSHED, per member. Written only
   // after the server accepted it, so a failed push retries on the next sweep.
   const lastPushedMeta = new Map<string, MemberMetaRecord>();
+  // When that cache was last thrown away wholesale. It has to be, periodically:
+  // the cache records what the bot believes the server holds, and the server can
+  // lose those values with nothing to tell the bot (see dueForFullResync).
+  let lastFullMetaResyncMs = Date.now();
   // The three caches a nickname write reads and, on success only, updates.
   const nickCaches = { memberNicks, memberNames, lastWrittenNick };
   const metaIo = {
@@ -399,6 +404,10 @@ async function main(): Promise<void> {
           // The update may also carry a changed nick/global_name.
           memberNames.set(userId, decision.displayName);
           memberNicks.set(userId, decision.nick);
+          // One PATCH produces one echo, so the record of what we wrote is spent
+          // once it has suppressed that echo. Holding it would let a later
+          // third-party rename BACK to the same value be dropped as ours.
+          if (decision.forgetWrittenNick) lastWrittenNick.delete(userId);
           if (!decision.push) break;
           void pushMemberMeta(userId).catch((e) => console.error(e));
           break;
@@ -415,8 +424,21 @@ async function main(): Promise<void> {
           void server.setMember(userId, false);
           // A cleared record IS a change, so this push is unconditional: the diff
           // above must never suppress it.
+          //
+          // The RESULT is the only failure signal there is. server_client answers
+          // null for a non-ok response or a transport error rather than throwing,
+          // so a bare .catch here could only ever fire for something that does not
+          // happen, and a failed clear would leave a departed member's staff tag
+          // showing in world with nothing said about it. The flaired-ids reconcile
+          // repairs it on the next complete roster seed; the log is what makes the
+          // gap between the two visible.
           void server
             .pushMembersMeta([clearedMemberMeta(userId)])
+            .then((result) => {
+              if (result === null || result === undefined) {
+                console.error('[bot] clear member meta refused for', userId);
+              }
+            })
             .catch((e) => console.error('[bot] clear member meta failed', e));
           memberRoles.delete(userId);
           memberNames.delete(userId);
@@ -551,9 +573,19 @@ async function main(): Promise<void> {
   // or joins voice each day, grant the daily-active points. Deduped here (per user
   // per day) AND server-side (the grant dedupe key), so it is exactly-once.
   const dailyActiveSeen = new Set<string>(); // `${userId}:${YYYY-MM-DD}`
+  // The day those keys belong to. Only today's matter, so the set is emptied when
+  // the day rolls over rather than accumulating one entry per member per day for
+  // the life of the process (a year on a 500-member guild is ~180k dead strings,
+  // and GUILD_MEMBER_REMOVE prunes five other caches but deliberately not this
+  // one, so departed members' keys persisted too).
+  let dailyActiveDay = '';
   const grantDailyActive = (userId: string): void => {
     if (!userId) return;
     const day = new Date().toISOString().slice(0, 10);
+    if (day !== dailyActiveDay) {
+      dailyActiveDay = day;
+      dailyActiveSeen.clear();
+    }
     const key = `${userId}:${day}`;
     if (dailyActiveSeen.has(key)) return;
     dailyActiveSeen.add(key);
@@ -614,8 +646,8 @@ async function main(): Promise<void> {
   // has finished: once a sweep ran long the next started anyway, the two contended
   // for the same Discord buckets, and a slow minute became a storm that outlived
   // restarts. The scheduler chains each delay after the previous run SETTLES, so
-  // overlap is impossible by construction, and jitters them so six loops armed in
-  // one boot do not stay phase-locked on the same tick.
+  // overlap is impossible by construction, and jitters them so loops armed in one
+  // boot do not stay phase-locked on the same tick.
   //
   // Which function runs, and what it does, is unchanged. Only the mechanism is
   // new: the intervals are the same values (now D13 env-overridable, defaulting to
@@ -647,10 +679,35 @@ async function main(): Promise<void> {
     cadence: { activeMs: cfg.roleSyncIntervalMs },
     // The pairing is the point, and it is ordered: the roster push reads the
     // special-role index the refresh rebuilds, so a push that ran first would
-    // publish the PREVIOUS sweep's role flair. An awaited pair also means a failed
-    // refresh skips the push entirely, exactly as the chained form it replaces did.
+    // publish the PREVIOUS sweep's role flair.
+    //
+    // A FAILED refresh must not take the push with it, though. The old 5 minute
+    // timer chained the two and did drop the push on a failed refresh, but the
+    // GUILD_CREATE and member-backfill paths called pushAllMemberMeta DIRECTLY,
+    // with no refresh in front of it at all. Routing those kicks through this one
+    // task gave them a Discord REST call as a precondition they never had, and
+    // the reconnect storm this packet exists for is exactly when that call fails:
+    // the breaker opens, the guild-roles GET throws, and the members-meta push
+    // that would still have landed before never happens. Catching keeps the
+    // ordering when the refresh works and publishes the previous index when it
+    // does not, which is strictly more than the event paths ever had.
     run: async () => {
-      await refreshSpecialRoles();
+      try {
+        await refreshSpecialRoles();
+      } catch (e) {
+        console.error(
+          '[bot] special roles refresh failed; pushing meta with the previous index',
+          e,
+        );
+      }
+      // Bound how long the diff cache may keep believing the server still holds
+      // what the bot last pushed. dueForFullResync's header lists the ways that
+      // belief goes stale with nothing to correct it.
+      const now = Date.now();
+      if (dueForFullResync(lastFullMetaResyncMs, now)) {
+        lastFullMetaResyncMs = now;
+        lastPushedMeta.clear();
+      }
       await pushAllMemberMeta();
     },
   });

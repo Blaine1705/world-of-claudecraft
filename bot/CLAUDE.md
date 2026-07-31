@@ -19,7 +19,9 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
 
 ## Files (one line each; each file's header comment is the reference)
 - `logic.ts`: **pure, IO-free** protocol/diff/message-builder logic. Unit-tested in
-  `tests/discord_bot.test.ts`.
+  `tests/discord_bot.test.ts`, except the diff-before-write predicates
+  (`nicknameNeedsWrite`, `memberMetaChanged`/`changedMemberMeta`, `isSelfNickEcho`), which
+  are pinned in `tests/discord_bot_diffs.test.ts` beside the write paths they serve.
 - `gateway.ts`: ws Gateway (v10) IO shell (HELLO/heartbeat, IDENTIFY, RESUME).
   Tested in `tests/discord_bot_gateway.test.ts`.
 - `rate_governor.ts`: **pure, IO-free** Discord rate-limit governor. Owns ALL REST
@@ -44,10 +46,13 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
 - `cadence.ts`: the poll-loop interval DEFAULTS, importable without booting `main.ts`.
   `config.ts` layers the D13 env overrides over them; `main.ts` reads the resolved
   `BotConfig` fields, never these constants.
-- `scheduler.ts`: **pure, IO-free** loop scheduler. Chained timeouts (never `setInterval`),
-  overlap guard, coalescing kicks, jitter, and the adaptive active-to-idle backoff. Pure
-  decision core plus a thin driver that owns the one timer; time and the random source are
-  injected. Tested in `tests/discord_bot_scheduler.test.ts` against the virtual clock.
+- `scheduler.ts`: the loop scheduler. A **pure, IO-free** decision core (overlap guard,
+  coalescing kicks, jitter, the adaptive active-to-idle backoff) plus a thin driver that
+  owns the one timer. Chained timeouts, never `setInterval`. NOT IO-free as a whole, unlike
+  `logic.ts` and `rate_governor.ts`: `LoopScheduler` calls `setTimeout`/`clearTimeout` and
+  defaults its random source to `Math.random`, both as injected trailing parameters with
+  forwarding production defaults. Tested in `tests/discord_bot_scheduler.test.ts` against
+  the virtual clock.
 - `member_writes.ts`: the diff-before-write paths (nickname, members-meta, the
   member-update echo decision) with their cache bookkeeping, behind injected IO. Tested in
   `tests/discord_bot_member_writes.test.ts`.
@@ -56,9 +61,11 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
   event dispatch, and the scheduler task registrations.
 
 ## New bot feature recipe (module-first)
-1. Pure message-builder/diff/shaping logic in `logic.ts`, with a test in
-   `tests/discord_bot.test.ts`. Bug fixes are test-first: a failing test that
-   reproduces the bug, then the smallest change that turns it green.
+1. Pure message-builder/diff/shaping logic in `logic.ts`, with a test in the suite that
+   owns that family: message builders and protocol shaping in `tests/discord_bot.test.ts`,
+   diff-before-write predicates in `tests/discord_bot_diffs.test.ts`. Bug fixes are
+   test-first: a failing test that reproduces the bug, then the smallest change that turns
+   it green.
 2. If it talks to the game: a method in `server_client.ts` plus the matching
    secret-gated `RouteDef` in `server/internal.ts` (registered via `server/http/registry.ts`).
 3. Only the wiring (a dispatch case or a poll loop) lands in `main.ts`.
@@ -102,7 +109,10 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
 
 ## Poll loops (all on `scheduler.ts`, wired in main.ts)
 **There are no bare `setInterval` loops in `main.ts`, and a new loop must not add one**
-(`grep setInterval bot/main.ts` returns nothing; the gateway heartbeat in `gateway.ts` is a
+(pinned by `tests/discord_bot_main_wiring.test.ts`, which also bans a bare `setTimeout`,
+requires EXACTLY the registrations listed below with each reading its own `cfg` cadence field
+AND running its own sweep, pins every event `kick()` call site with an exact count, and
+asserts `startAll()` precedes `gateway.connect()`; the gateway heartbeat in `gateway.ts` is a
 different concern and stays). A repeating timer fires whether or not the previous run
 finished, so once a sweep ran long the sweeps stacked and a slow minute became a storm that
 survived restarts. Every loop is a `scheduler.add({...})` task instead: the next delay is
@@ -128,6 +138,14 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
 - The adaptive active-to-idle backoff exists in the scheduler but no task uses it yet: every
   task above sets `activeMs` only, so its cadence is constant. The consolidated outbox poll
   (D1: 3 s active decaying to 15 s idle) is the first consumer, in Phase 6.
+- **A run that never settles stops its loop for the life of the process** (ledger L10, open
+  until Phase 7). The next delay is armed only after the previous run settles, which is the
+  whole overlap guarantee, so a `run` that never resolves leaves the task claimed with
+  nothing armed, no counter and no log. A watchdog in the scheduler cannot fix it: recovery
+  needs the run CANCELLED, and the scheduler holds a promise it has no way to abort. The
+  real fix is a deadline on the fetch underneath (Phase 7 owns it, and `server_client.ts`
+  already has `SERVER_CALL_TIMEOUT_MS` to copy). Until then, every `run` handed to
+  `scheduler.add` must be one that always settles.
 
 ## Diff before write (D5): nothing is written unless it changed
 `member_writes.ts` owns all three decisions, over the pure predicates in `logic.ts`, because
@@ -146,7 +164,20 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
 - **Caches move only after the write succeeded**, the `computeRoleSync` pattern. A cache
   written optimistically claims a failed write landed, and the retry never happens. Note
   `server_client.ts` answers `null` for a failed push rather than throwing, so the RETURN
-  VALUE is the only success signal there is.
+  VALUE is the only success signal there is (and `undefined` counts too: a success envelope
+  with no data comes back as `env.data` verbatim).
+- **The diff cache is dropped wholesale every `FULL_RESYNC_INTERVAL_MS` (1 h).** It records
+  what the bot BELIEVES the server holds, and the server can lose those values with nothing
+  to tell the bot: a member in the guild who has not linked yet is written by an UPDATE that
+  matches no row and is still counted as accepted, an unlink-relink inserts a fresh row with
+  both meta columns null, and a restore or a moderation delete edits the table out of band.
+  Before D5 every sweep re-pushed everything, so all of those healed within one interval
+  without anyone enumerating them; the periodic resync is what keeps that property while
+  still sending nothing for eleven sweeps out of twelve. **Do not "optimize" it away.**
+- **Echo suppression is consumed, not remembered.** One PATCH produces one
+  `GUILD_MEMBER_UPDATE`, so `decideMemberUpdate` reports `forgetWrittenNick` and the caller
+  drops the entry. Holding it lets a moderator's rename BACK to a value the bot once wrote
+  be misread as our own echo.
 
 ## Roles
 - **Status tiers** (`WoC Initiate` up to `WoC Mythic`; ladder in

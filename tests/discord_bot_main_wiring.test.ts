@@ -35,15 +35,37 @@ function mainSource(): string {
     .replace(/(^|[^:])\/\/.*$/gm, '$1');
 }
 
-/** Every scheduler task main.ts registers, and the config field it must read. */
+/**
+ * Every scheduler task main.ts registers, the config field it must read, and the
+ * sweep it must actually run.
+ *
+ * The `run` column is not decoration. Without it the per-task pattern stops at
+ * the cadence, so swapping the BODIES of two registrations that share an interval
+ * (relay and activity both read relayPollMs) leaves every assertion in this file
+ * green while the relay channel quietly receives the activity feed.
+ */
 const TASKS = [
-  { name: 'presence-push', field: 'presenceDebounceMs' },
-  { name: 'role-sync', field: 'roleSyncIntervalMs' },
-  { name: 'tier-roles', field: 'roleSyncIntervalMs' },
-  { name: 'relay', field: 'relayPollMs' },
-  { name: 'activity', field: 'relayPollMs' },
-  { name: 'daily-rewards-winners', field: 'relayPollMs' },
-  { name: 'special-roles-and-meta', field: 'roleSyncIntervalMs' },
+  { name: 'presence-push', field: 'presenceDebounceMs', run: 'pushPresence' },
+  { name: 'role-sync', field: 'roleSyncIntervalMs', run: 'syncAllOnlineRoles' },
+  { name: 'tier-roles', field: 'roleSyncIntervalMs', run: 'refreshTierRoles' },
+  { name: 'relay', field: 'relayPollMs', run: 'pollRelay' },
+  { name: 'activity', field: 'relayPollMs', run: 'pollActivity' },
+  { name: 'daily-rewards-winners', field: 'relayPollMs', run: 'pollDailyRewardWinners' },
+  { name: 'special-roles-and-meta', field: 'roleSyncIntervalMs', run: 'refreshSpecialRoles' },
+] as const;
+
+/**
+ * Every event-driven kick, and exactly how many times it appears.
+ *
+ * These are the coalescing rule's ONLY production triggers: the whole reason the
+ * scheduler collapses a reconnect burst into one follow-up is that GUILD_CREATE
+ * arrives once per re-IDENTIFY. Reverting any of them to the fire-and-forget
+ * sweep call it replaced restores the storm and moves no other assertion.
+ */
+const KICKS = [
+  { call: 'presenceTask.kick()', times: 1 },
+  { call: 'roleSyncTask.kick()', times: 1 },
+  { call: 'memberMetaTask.kick()', times: 2 },
 ] as const;
 
 describe('bot/main.ts loop wiring', () => {
@@ -69,14 +91,63 @@ describe('bot/main.ts loop wiring', () => {
     expect(TASKS.length).toBe(7);
 
     for (const task of TASKS) {
-      // The name and its cadence must appear in ONE registration, so a task
-      // reading another task's interval cannot pass by having both strings
-      // somewhere in the file.
+      // The name, its cadence AND its sweep must appear in ONE registration, so a
+      // task reading another task's interval, or running another task's sweep,
+      // cannot pass by having the strings somewhere in the file.
       const pattern = new RegExp(
-        `name: '${task.name}'[\\s\\S]{0,200}?cadence: \\{ activeMs: cfg\\.${task.field}`,
+        `name: '${task.name}'[\\s\\S]{0,240}?cadence: \\{ activeMs: cfg\\.${task.field}` +
+          `[\\s\\S]{0,900}?${task.run}\\(`,
       );
       expect(source).toMatch(pattern);
     }
+  });
+
+  it('kicks every task the events are supposed to kick, exactly as often', () => {
+    // Found by the Phase 3 QA audit: nothing anywhere pinned the kicks. Deleting
+    // the two GUILD_CREATE kicks, or the one on the final member-backfill chunk,
+    // left the entire suite green while the reconnect path stopped re-syncing
+    // altogether. main() runs at module scope, so a source pin is the only thing
+    // available, and it is the same idiom the registrations above use.
+    const source = mainSource();
+    expect(source.length).toBeGreaterThan(5000);
+    for (const kick of KICKS) {
+      const found = (source.match(new RegExp(kick.call.replace(/[.()]/g, '\\$&'), 'g')) ?? [])
+        .length;
+      expect({ call: kick.call, found }).toEqual({ call: kick.call, found: kick.times });
+    }
+    // And they sit on the events that matter, not merely somewhere in the file.
+    expect(source).toMatch(
+      /case 'GUILD_CREATE'[\s\S]{0,4000}?roleSyncTask\.kick\(\)[\s\S]{0,80}?memberMetaTask\.kick\(\)/,
+    );
+    expect(source).toMatch(/chunk_index[\s\S]{0,600}?memberMetaTask\.kick\(\)/);
+  });
+
+  it('publishes a successful rename immediately, and re-syncs the diff cache', () => {
+    // Two behaviors with no reachable test, both load bearing.
+    //
+    // The rename push compensates for echo suppression: without it the in-world
+    // nameplate keeps the old level for up to a whole role-sync interval, because
+    // the GUILD_MEMBER_UPDATE that used to carry it within seconds is now dropped
+    // as the bot's own echo.
+    //
+    // The resync bounds how long the members-meta diff cache may keep believing
+    // the server still holds what the bot last pushed. Deleting it re-opens the
+    // permanent divergence that dueForFullResync's header enumerates.
+    const source = mainSource();
+    expect(source).toMatch(/outcome === 'written'[\s\S]{0,80}?pushMemberMeta\(/);
+    expect(source).toMatch(/dueForFullResync\([\s\S]{0,200}?lastPushedMeta\.clear\(\)/);
+  });
+
+  it('does not let a failed special-roles refresh swallow the meta push', () => {
+    // The event paths (GUILD_CREATE, the member backfill) called pushAllMemberMeta
+    // DIRECTLY before this phase, with no Discord REST call in front of it.
+    // Routing them through the paired task gave them the guild-roles GET as a
+    // precondition, and a reconnect storm is exactly when that GET fails. The
+    // catch keeps the ordering when the refresh works and publishes the previous
+    // index when it does not.
+    expect(mainSource()).toMatch(
+      /try \{\s*await refreshSpecialRoles\(\);\s*\} catch[\s\S]{0,400}?await pushAllMemberMeta\(\)/,
+    );
   });
 
   it('reads every cadence from cfg, never from the bot/cadence.ts constants', () => {

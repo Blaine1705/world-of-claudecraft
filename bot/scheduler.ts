@@ -99,7 +99,7 @@ export const DEFAULT_IDLE_DECAY = 2;
 
 /**
  * Default jitter band, plus or minus 10 percent of the interval. Without it every
- * loop armed during one boot stays phase-locked forever, so all six fire on the
+ * loop armed during one boot stays phase-locked forever, so they all fire on the
  * same tick and hand the rate governor a burst it then has to pace out. A tenth
  * is enough to decorrelate them without making any single cadence surprising.
  */

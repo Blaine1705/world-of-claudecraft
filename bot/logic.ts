@@ -787,10 +787,12 @@ export function changedMemberMeta(
  * value, AND the role set is unchanged. Roles are compared as SETS, not as
  * ordered arrays: Discord does not promise role order, so an order-sensitive
  * compare would read a genuine no-op update as a change every single time.
- * Membership is checked in BOTH directions rather than by length alone, so a
- * duplicate id on one side cannot make two equal sets look different. Anything
- * else (a role grant, or a moderator renaming the member to something we did not
- * write) is a third-party update and returns false so it still pushes.
+ * Building the Sets is also what makes a duplicate id on one side harmless, so
+ * equal size plus containment in ONE direction already proves the sets equal: a
+ * second scan back the other way is unreachable, and used to sit here reading as
+ * though it were load bearing. Anything else (a role grant, or a moderator
+ * renaming the member to something we did not write) is a third-party update and
+ * returns false so it still pushes.
  */
 export function isSelfNickEcho(
   incoming: { nick: string | null | undefined; roleIds: readonly string[] },
@@ -803,6 +805,5 @@ export function isSelfNickEcho(
   const cachedSet = new Set(cachedRoleIds);
   if (incomingSet.size !== cachedSet.size) return false;
   for (const id of incomingSet) if (!cachedSet.has(id)) return false;
-  for (const id of cachedSet) if (!incomingSet.has(id)) return false;
   return true;
 }

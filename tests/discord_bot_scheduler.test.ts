@@ -551,6 +551,46 @@ describe('scheduler driver', () => {
     expect(cleared).toEqual([handle]);
     expect(unrefs).toBe(1);
   });
+
+  it('forwards to a real random source when none is injected', () => {
+    // The case above pins jitterRatio to 0, which makes the delay 1000 for EVERY
+    // possible draw, so it says nothing at all about the default random source:
+    // replacing `() => Math.random()` with `() => Number.NaN` survived it. Here
+    // the ratio is the real default, so the draw has to land in the band, and a
+    // non-finite draw would fall back to the centre and never vary.
+    const armed: number[] = [];
+    const realSetTimeout = globalThis.setTimeout;
+    const realClearTimeout = globalThis.clearTimeout;
+    globalThis.setTimeout = ((_cb: () => void, ms: number) => {
+      armed.push(ms);
+      return 0;
+    }) as unknown as typeof globalThis.setTimeout;
+    globalThis.clearTimeout = (() => {}) as unknown as typeof globalThis.clearTimeout;
+    try {
+      // Many tasks, because one draw could land anywhere in the band by chance;
+      // what no broken source can fake is a SPREAD of distinct values.
+      const scheduler = new LoopScheduler();
+      for (let i = 0; i < 40; i++) {
+        scheduler
+          .add({ name: `t${i}`, cadence: { activeMs: 1000 }, run: async () => true })
+          .start();
+      }
+    } finally {
+      globalThis.setTimeout = realSetTimeout;
+      globalThis.clearTimeout = realClearTimeout;
+    }
+
+    expect(armed).toHaveLength(40);
+    // Every delay inside the exact default band, and none of them the bare base.
+    for (const ms of armed) {
+      expect(Number.isFinite(ms)).toBe(true);
+      expect(ms).toBeGreaterThanOrEqual(1000 * (1 - DEFAULT_JITTER_RATIO));
+      expect(ms).toBeLessThanOrEqual(1000 * (1 + DEFAULT_JITTER_RATIO));
+    }
+    // And the whole point of jitter: the loops do NOT all land on the same tick.
+    // A constant or non-finite draw collapses this to one value.
+    expect(new Set(armed).size).toBeGreaterThan(1);
+  });
 });
 
 describe('scheduler purity', () => {

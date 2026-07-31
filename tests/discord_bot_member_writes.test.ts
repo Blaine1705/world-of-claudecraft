@@ -20,6 +20,8 @@ import {
 import {
   decideMemberUpdate,
   displayNameOf,
+  dueForFullResync,
+  FULL_RESYNC_INTERVAL_MS,
   forgetMember,
   type NicknameCaches,
   nickOf,
@@ -189,7 +191,9 @@ describe('members-meta diff before push', () => {
       },
     });
     expect(pushes).toEqual([[{ ...records[1], role: 'admin' }]]);
-    expect(pushed).toHaveLength(1);
+    // WHICH record came back, not merely how many: a length check cannot tell the
+    // accepted records apart from the batch's first element repeated.
+    expect(pushed).toEqual([{ ...records[1], role: 'admin' }]);
     // And the cache now carries the NEW record, so a repeat sweep is silent.
     expect(last.get(memberId(2))?.role).toBe('admin');
     const again = await pushChangedMemberMeta(changed, last, {
@@ -319,6 +323,80 @@ describe('self-echo suppression on GUILD_MEMBER_UPDATE', () => {
     expect(decision.nick).toBe('Aldric 21');
     expect(decision.displayName).toBe('Aldric 21');
     expect(decision.roles).toEqual(['r1', 'r2']);
+    // And the echo record is spent, so only the ONE echo a PATCH produces can be
+    // suppressed by it.
+    expect(decision.forgetWrittenNick).toBe(true);
+  });
+
+  it('does not drop a third-party rename BACK to a value the bot once wrote', () => {
+    // Without consuming the echo record, this is the sequence that loses a real
+    // change: the bot writes N; a moderator renames to M, which pushes; the
+    // moderator reverts to N, which looks exactly like our echo and is dropped.
+    // The caller applies forgetWrittenNick on the first echo, so by the time the
+    // revert arrives there is no lastWrittenNick left to match against.
+    const afterEcho = decideMemberUpdate(
+      { nick: 'Aldric 21', roles: ['r1'], user },
+      user,
+      { roles: ['r1'], lastWrittenNick: 'Aldric 21' },
+      parse,
+    );
+    expect(afterEcho.push).toBe(false);
+    expect(afterEcho.forgetWrittenNick).toBe(true);
+
+    // The caller having dropped the entry, the moderator's revert to the same
+    // string is judged on its own merits and pushes.
+    const revert = decideMemberUpdate(
+      { nick: 'Aldric 21', roles: ['r1'], user },
+      user,
+      { roles: ['r1'], lastWrittenNick: undefined },
+      parse,
+    );
+    expect(revert.push).toBe(true);
+    expect(revert.forgetWrittenNick).toBe(false);
+  });
+
+  it('resolves the display name from the USER when the payload carries no nick', () => {
+    // The only other displayName assertion sits on a payload whose nick is set,
+    // and displayNameOf short-circuits on the nick before it ever reads its second
+    // argument. So passing the WRONG second argument (the payload instead of the
+    // user) survived every case in this file. These two reach past the nick.
+    const noNick = { nick: null, roles: ['r1'], user };
+    expect(
+      decideMemberUpdate(noNick, user, { roles: ['r1'], lastWrittenNick: undefined }, parse)
+        .displayName,
+    ).toBe('Aldric');
+    const bare = { id: USER, username: 'aldric' };
+    expect(
+      decideMemberUpdate(
+        { nick: null, roles: ['r1'], user: bare },
+        bare,
+        { roles: ['r1'], lastWrittenNick: undefined },
+        parse,
+      ).displayName,
+    ).toBe('aldric');
+  });
+
+  it('reports a role-only update, with no nick key at all, as having no nick', () => {
+    // Discord documents `nick` as OPTIONAL on GUILD_MEMBER_UPDATE, so a role-only
+    // update carries no nick key. nickOf is pinned for that shape directly, but
+    // nothing drove it THROUGH the decision, which is where the caller reads it
+    // and overwrites the raw-nick cache.
+    //
+    // The contract this states is the current one, deliberately: an absent key
+    // reads as "no nickname", so the next sweep sees a null cached nick and does
+    // PATCH again. That costs one write per role-only update on a member the bot
+    // renames, which is the accepted price of not inventing a third state; the
+    // alternative is tracked as a Phase 7 item rather than changed here.
+    const decision = decideMemberUpdate(
+      { roles: ['r1', 'r2'], user },
+      user,
+      { roles: ['r1'], lastWrittenNick: 'Aldric 21' },
+      parse,
+    );
+    expect(decision.nick).toBeNull();
+    expect(decision.roles).toEqual(['r1', 'r2']);
+    // And it is NOT read as our echo, because the nick does not match what we wrote.
+    expect(decision.push).toBe(true);
   });
 
   it('ignores role ORDER, which Discord does not promise', () => {
@@ -404,35 +482,55 @@ describe('member name resolution', () => {
 });
 
 describe('a push the server did not take is never marked clean', () => {
-  it('treats undefined, not just null, as a refusal', () => {
-    // `call()` returns null for a transport or envelope failure, but it also
-    // returns `env.data` verbatim on a success envelope, so a body carrying no
-    // data arrives as undefined. A `!== null` check would mark that batch clean.
-    expect(pushRejectedShapes).toEqual([null, undefined]);
-  });
+  // `call()` returns null for a transport or envelope failure, but it also
+  // returns `env.data` verbatim on a success envelope, so a body carrying no data
+  // arrives as undefined. A `!== null` check would mark that batch clean.
+  //
+  // What used to stand here was `expect(pushRejectedShapes).toEqual([null,
+  // undefined])`, a test-local const asserted against its own literal: it never
+  // touched the module and passed for every possible implementation. The it.each
+  // rows below are the real pin, so the tautology is gone and the array now DRIVES
+  // them rather than being asserted about.
+  it.each(pushRejectedShapes.map((v) => [String(v), v] as const))(
+    'does not remember a batch when the push answered %s',
+    async (_label, answer) => {
+      const last = new Map<string, MemberMetaRecord>();
+      const records = [record(memberId(1)), record(memberId(2))];
+      const pushed = await pushChangedMemberMeta(records, last, {
+        pushMembersMeta: async () => answer,
+      });
+      expect(pushed).toEqual([]);
+      expect(last.size).toBe(0);
+    },
+  );
+
+  it.each(pushRejectedShapes.map((v) => [String(v), v] as const))(
+    'does not remember a single push that answered %s',
+    async (_label, answer) => {
+      const last = new Map<string, MemberMetaRecord>();
+      expect(
+        await pushOneMemberMeta(record(USER), last, { pushMembersMeta: async () => answer }),
+      ).toBe(false);
+      expect(last.size).toBe(0);
+    },
+  );
 
   it.each([
-    ['null', null],
-    ['undefined', undefined],
-  ])('does not remember a batch when the push answered %s', async (_label, answer) => {
+    ['zero', 0],
+    ['false', false],
+    ['an empty string', ''],
+  ])('DOES remember a batch when the push answered %s', async (_label, answer) => {
+    // The other arm, and the one nothing covered: every success stub in this file
+    // answers a truthy object and every failure stub answers null or undefined, so
+    // rewriting the nullish check as a plain `!result` truthiness check survived
+    // the whole suite. These three shapes are the ones the two differ on.
     const last = new Map<string, MemberMetaRecord>();
     const records = [record(memberId(1)), record(memberId(2))];
     const pushed = await pushChangedMemberMeta(records, last, {
       pushMembersMeta: async () => answer,
     });
-    expect(pushed).toEqual([]);
-    expect(last.size).toBe(0);
-  });
-
-  it.each([
-    ['null', null],
-    ['undefined', undefined],
-  ])('does not remember a single push that answered %s', async (_label, answer) => {
-    const last = new Map<string, MemberMetaRecord>();
-    expect(
-      await pushOneMemberMeta(record(USER), last, { pushMembersMeta: async () => answer }),
-    ).toBe(false);
-    expect(last.size).toBe(0);
+    expect(pushed).toHaveLength(2);
+    expect(last.size).toBe(2);
   });
 
   it('lets a REJECTING push propagate rather than swallowing it', async () => {
@@ -468,6 +566,87 @@ describe('a push the server did not take is never marked clean', () => {
       3,
     );
     expect(sizes).toEqual([3, 3, 1]);
+  });
+});
+
+describe('the diff cache cannot believe itself forever', () => {
+  const HOUR = 60 * 60_000;
+
+  it('pins the resync interval against a literal', () => {
+    // Against a LITERAL, never against itself: an hour is the ceiling on how long
+    // a bot-versus-server divergence can last, so it is a reviewed number.
+    expect(FULL_RESYNC_INTERVAL_MS).toBe(3_600_000);
+  });
+
+  it('holds the cache for the whole interval and drops it exactly at the end', () => {
+    expect(dueForFullResync(0, 0)).toBe(false);
+    expect(dueForFullResync(0, HOUR - 1)).toBe(false);
+    // At the boundary, not one millisecond past it.
+    expect(dueForFullResync(0, HOUR)).toBe(true);
+    expect(dueForFullResync(0, HOUR + 1)).toBe(true);
+    // And it measures ELAPSED time, not absolute time, so a long-lived process
+    // keeps re-syncing rather than doing it once and never again.
+    expect(dueForFullResync(50 * HOUR, 50 * HOUR + HOUR - 1)).toBe(false);
+    expect(dueForFullResync(50 * HOUR, 50 * HOUR + HOUR)).toBe(true);
+  });
+
+  it('re-syncs rather than postponing when the clock is unusable', () => {
+    // Every one of these would otherwise read as "loads of time left". Not
+    // knowing how much time passed is a reason to re-push, never a reason to
+    // keep trusting a cache.
+    expect(dueForFullResync(Number.NaN, 1000)).toBe(true);
+    expect(dueForFullResync(1000, Number.NaN)).toBe(true);
+    expect(dueForFullResync(Number.POSITIVE_INFINITY, 1000)).toBe(true);
+    // A clock stepped BACKWARDS by an NTP correction.
+    expect(dueForFullResync(10 * HOUR, 9 * HOUR)).toBe(true);
+  });
+
+  it('falls back to the default rather than to 0 for an unusable interval', () => {
+    // A zero or negative interval would make EVERY sweep a full re-push, which is
+    // precisely the load this phase removed.
+    for (const bad of [0, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(dueForFullResync(0, HOUR - 1, bad)).toBe(false);
+      expect(dueForFullResync(0, HOUR, bad)).toBe(true);
+    }
+  });
+
+  it('makes the sweep after a resync push a member the server silently dropped', async () => {
+    // The end-to-end reason the interval exists. The server writes stored meta
+    // with an UPDATE against the link row and counts the push accepted even when
+    // it matched no row, so a member who has not linked yet is marked clean on
+    // the first sweep and never re-pushed. Their flair appears only when the diff
+    // cache is dropped.
+    const applied = new Map<string, MemberMetaRecord>();
+    const linked = new Set<string>();
+    const io = {
+      pushMembersMeta: async (records: MemberMetaRecord[]) => {
+        // The real endpoint's shape: it reports every record as updated whether
+        // or not the row existed.
+        for (const r of records)
+          if (linked.has(r.discord_user_id)) applied.set(r.discord_user_id, r);
+        return { updated: records.length };
+      },
+    };
+    const last = new Map<string, MemberMetaRecord>();
+    const staff = record(USER, { role: 'mods' });
+
+    // Sweep one: the member is in the guild but has not linked, so the server
+    // stores nothing, yet the bot is told the push landed.
+    await pushChangedMemberMeta([staff], last, io);
+    expect(applied.has(USER)).toBe(false);
+    expect(last.has(USER)).toBe(true);
+
+    // They link. Nothing about their DISCORD record changed, so every diffed
+    // sweep from here on sends nothing and their staff tag never appears.
+    linked.add(USER);
+    await pushChangedMemberMeta([staff], last, io);
+    expect(applied.has(USER)).toBe(false);
+
+    // The forced resync is what breaks the deadlock.
+    expect(dueForFullResync(0, FULL_RESYNC_INTERVAL_MS)).toBe(true);
+    last.clear();
+    await pushChangedMemberMeta([staff], last, io);
+    expect(applied.get(USER)).toEqual(staff);
   });
 });
 

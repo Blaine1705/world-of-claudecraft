@@ -145,6 +145,56 @@ export async function pushOneMemberMeta(
 }
 
 /**
+ * How long the roster push may keep trusting its diff cache before one sweep is
+ * forced to re-push everything.
+ *
+ * An hour against the 5 minute sweep means eleven diffed sweeps and one full
+ * one, so the steady state still sends nothing for eleven twelfths of the time
+ * and the load this phase removed stays removed. It is the ceiling on how long a
+ * divergence can last, so it is chosen to be short enough that an operator does
+ * not notice and long enough that it is not the load.
+ */
+export const FULL_RESYNC_INTERVAL_MS = 60 * 60_000;
+
+/**
+ * Whether this sweep must re-push the WHOLE roster rather than only what changed.
+ *
+ * The diff cache is one-sided: it records what the bot BELIEVES the server holds,
+ * and nothing tells it when that belief goes stale. The server can lose the
+ * values behind the bot's back and the bot will never re-assert them, because
+ * the record it is diffing against has not moved. Three ways in, all real:
+ *  - a member who is in the guild but has not linked a game account. The stored
+ *    meta is written by an UPDATE against the link row, so the push applies to
+ *    zero rows, yet the endpoint counts it as accepted. When they link LATER,
+ *    the fresh row carries no join date and no staff flair, and the sweep has
+ *    already marked them clean.
+ *  - unlinking and relinking, which drops the row and inserts a new one with
+ *    both meta columns null.
+ *  - anything that edits the table out of band: a restore from backup, a
+ *    moderation delete.
+ * Before this phase every sweep re-pushed the whole roster, so all three healed
+ * within one interval and nobody had to enumerate them. Diffing removed that
+ * property, and this bounds how long its absence can last, which is why it is a
+ * TIME since the last full push rather than a count of sweeps: the task is also
+ * kicked by GUILD_CREATE and the member backfill, so a reconnect storm would
+ * otherwise race the counter and re-push hardest exactly when it should not.
+ */
+export function dueForFullResync(
+  lastFullAtMs: number,
+  nowMs: number,
+  everyMs: number = FULL_RESYNC_INTERVAL_MS,
+): boolean {
+  if (!Number.isFinite(lastFullAtMs) || !Number.isFinite(nowMs)) return true;
+  const every = Number.isFinite(everyMs) && everyMs > 0 ? everyMs : FULL_RESYNC_INTERVAL_MS;
+  // A clock that went BACKWARDS (an NTP correction) reads as a huge negative
+  // elapsed, which would postpone the resync rather than trigger it. Re-syncing
+  // is the safe answer to not knowing how much time passed.
+  const elapsed = nowMs - lastFullAtMs;
+  if (elapsed < 0) return true;
+  return elapsed >= every;
+}
+
+/**
  * Forget everything the diffs remember about a member, for use when they leave
  * the guild or their stored flair is cleared.
  *
@@ -174,6 +224,20 @@ export interface MemberUpdateDecision {
   displayName: string;
   /** False when this update is only our own nickname write coming back. */
   push: boolean;
+  /**
+   * True when an echo was recognized, meaning the caller must DROP this member's
+   * lastWrittenNick entry.
+   *
+   * One PATCH produces exactly one echo, so the record of it has served its
+   * purpose the moment it suppresses that echo. Keeping it lets a later
+   * third-party rename BACK to the same value be misread as ours: a moderator
+   * renames the member away (a real change, pushed), then back to the value we
+   * once wrote, and that second update is dropped even though it is theirs. The
+   * roster sweep repairs the record within one interval, because the caller moves
+   * the display name whether or not it pushes, so this is stale flair rather than
+   * lost flair. Consuming the entry removes the window entirely.
+   */
+  forgetWrittenNick: boolean;
 }
 
 /**
@@ -203,7 +267,13 @@ export function decideMemberUpdate(
     cached.lastWrittenNick,
     cached.roles,
   );
-  return { roles, nick, displayName: parse.displayName(payload, user), push: !echo };
+  return {
+    roles,
+    nick,
+    displayName: parse.displayName(payload, user),
+    push: !echo,
+    forgetWrittenNick: echo,
+  };
 }
 
 /** The member's RAW server nickname, or null when they have none set. */
