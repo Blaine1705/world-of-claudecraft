@@ -107,6 +107,21 @@ export class Gateway {
       case GATEWAY_OP.INVALID_SESSION:
         // d=true means resumable; else re-identify after a short delay.
         this.resuming = payload.d === true;
+        if (!this.resuming) {
+          // L7: a NON-resumable INVALID_SESSION means Discord has destroyed the
+          // session, so every artifact of it has to go. Clearing `resuming`
+          // alone is not enough, because it only steers THIS reconnect: the
+          // other two reconnect paths (a socket close, and op 7) both call
+          // `reconnect(true)`, and `connect()` re-derives resuming from
+          // `this.sessionId !== null`. Leaving the dead id behind therefore made
+          // any close arriving before the next READY RESUME a session Discord
+          // had just killed, which it answers with another INVALID_SESSION: a
+          // wasted round trip in exactly the reconnect storms this packet exists
+          // to tame. The resume URL and seq belong to the same dead session.
+          this.sessionId = null;
+          this.resumeUrl = null;
+          this.seq = null;
+        }
         this.timers.setTimeout(() => this.reconnect(this.resuming), 1500);
         break;
       case GATEWAY_OP.RECONNECT:

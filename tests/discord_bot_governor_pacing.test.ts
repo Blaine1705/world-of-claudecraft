@@ -15,6 +15,7 @@ import {
   GovernorBlockedError,
   type GovernorResponse,
   MAX_QUEUE_DEPTH,
+  MAX_TRACKED_QUEUES,
   RateGovernor,
   redactPath,
   routeTemplate,
@@ -780,5 +781,147 @@ describe('RateGovernor queue depth cap', () => {
     // all drained: the cap sheds load, it does not deadlock the queue.
     expect(sends).toBe(MAX_QUEUE_DEPTH);
     expect(governor.snapshot().queueDepth).toBe(0);
+  });
+});
+
+describe('RateGovernor pacing and memory across a pause (L11, L12)', () => {
+  /** An interaction-callback path for a distinct id, built by CONCATENATION. */
+  function interactionPath(index: number): string {
+    // Never `1000000000000000000 + index`: that is past Number.MAX_SAFE_INTEGER,
+    // so a loop collapses onto a handful of values and the population this test
+    // exists to grow never actually grows.
+    return `/interactions/17${String(index).padStart(17, '0')}/${INTERACTION_TOKEN}/callback`;
+  }
+
+  /** A 429 whose body is not JSON at all: the Cloudflare-ban shape. */
+  function banned(): GovernorResponse {
+    return { status: 429, headers: {}, json: null, jsonParsed: false };
+  }
+
+  it('re-reserves a rate slot after a pause, so pre-pause holders do not fire together (L11)', async () => {
+    // L11 as ledgered: requests that reserved a global slot BEFORE a pause was
+    // declared must not all fire at the same instant when it lifts. maxRps 1
+    // makes the spacing exactly 1000 ms, so "spaced" is a number here rather
+    // than an ordering: without the re-reservation all three land on 123000.
+    const { governor, clock } = makeGovernor(1);
+    const sentAt: number[] = [];
+
+    // The poisoner takes slot 0 and answers with a non-JSON 429, which pauses
+    // the whole process for banPauseMs (123000 in this rig). The three others
+    // reserve slots 1000, 2000 and 3000 synchronously, BEFORE that response
+    // lands, which is the precondition the ledger entry describes.
+    const poisoned = governor
+      .run({ method: 'POST', path: '/channels/500600700800900100/messages' }, async () => banned())
+      .catch(() => undefined);
+    const held = ['a', 'b', 'c'].map((label) =>
+      governor.run(
+        { method: 'PATCH', path: `/guilds/900800700600500400/members/${label}` },
+        async () => {
+          sentAt.push(clock.now());
+          return reply();
+        },
+      ),
+    );
+
+    await clock.runAll();
+    await poisoned;
+    await Promise.all(held);
+
+    // Exact virtual times, not an ordering: 123000 is when the ban pause lifts,
+    // and each later send is one full spacing behind the one before it.
+    expect(sentAt).toEqual([123000, 124000, 125000]);
+    // Spelled out separately so a change to the spacing cannot quietly keep the
+    // list above self-consistent: 1000 ms is `Math.ceil(1000 / maxRps)` at maxRps 1.
+    expect(sentAt[1] - sentAt[0]).toBe(1000);
+    expect(sentAt[2] - sentAt[1]).toBe(1000);
+    expect(new Set(sentAt).size).toBe(3);
+  });
+
+  it('bounds the live queue map at MAX_TRACKED_QUEUES while a pause holds requests (L12)', async () => {
+    // L12: a request parked in waitForPause has not reached the job's finally
+    // that drops a drained queue, and interaction callbacks mint a unique
+    // template per interaction id, so during a long ban pause this map grew
+    // without bound. maxRps 0 is the documented escape hatch that disables
+    // global spacing, so nothing here depends on the rate cap.
+    expect(MAX_TRACKED_QUEUES).toBe(512);
+    const { governor, clock } = makeGovernor(0);
+
+    void governor
+      .run({ method: 'POST', path: '/channels/500600700800900100/messages' }, async () => banned())
+      .catch(() => undefined);
+    await clock.advanceTo(clock.now()); // flush microtasks WITHOUT lifting the pause
+    expect(governor.snapshot().queueDepth).toBe(0); // the poisoner is done
+
+    // Well past the cap, so the bound is REACHED rather than merely respected.
+    const overflow = MAX_TRACKED_QUEUES + 40;
+    const parked = Array.from({ length: overflow }, (_, i) =>
+      governor.run({ method: 'POST', path: interactionPath(i) }, async () => reply()),
+    );
+
+    // Read before advancing: every one of these is parked in waitForPause, so
+    // this is the exact state the ledger entry describes.
+    const snapshot = governor.snapshot();
+    expect(snapshot.activeQueues).toBe(MAX_TRACKED_QUEUES);
+    expect(snapshot.queueDepth).toBe(overflow);
+
+    await clock.runAll();
+    await Promise.all(parked);
+    // Every request still completed: the cap sheds MAP entries, never requests.
+    // And the drain path still empties the map, so the cap is not masking a
+    // leak by holding the size at exactly its bound forever.
+    expect(governor.snapshot().activeQueues).toBe(0);
+    expect(governor.snapshot().queueDepth).toBe(0);
+  });
+
+  it('evicts the COLDEST chain and keeps a touched one, so serialization survives (L12)', async () => {
+    // The bound alone would be satisfied by evicting the hot route a sweep
+    // hammers, which would silently drop the governor's core guarantee for it.
+    // Two requests on ONE chain are strictly FIFO, so "did the chain survive"
+    // is observable: a retained chain makes the second request wait for the
+    // first, an evicted one mints a fresh chain that starts immediately.
+    const { governor, clock } = makeGovernor(0);
+    const started: string[] = [];
+    let release = (): void => {};
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const send = (label: string) => async (): Promise<GovernorResponse> => {
+      started.push(label);
+      await held;
+      return reply();
+    };
+
+    const hot = '/guilds/111222333444555666/members/777888999000111222';
+    const cold0 = interactionPath(0);
+    const all: Promise<unknown>[] = [];
+    // 1. the hot chain goes in FIRST, so it is the oldest entry.
+    all.push(governor.run({ method: 'PATCH', path: hot }, send('hot-1')));
+    // 2. fill to exactly the cap with cold single-use templates.
+    for (let i = 0; i < MAX_TRACKED_QUEUES - 1; i++) {
+      all.push(governor.run({ method: 'POST', path: interactionPath(i) }, send(`cold-${i}`)));
+    }
+    expect(governor.snapshot().activeQueues).toBe(MAX_TRACKED_QUEUES);
+    // 3. touch the hot chain, which under LRU moves it to the newest end.
+    all.push(governor.run({ method: 'PATCH', path: hot }, send('hot-2')));
+    // 4. one more cold template pushes past the cap and evicts the coldest,
+    //    which after the touch is cold0, NOT the hot chain.
+    all.push(governor.run({ method: 'POST', path: interactionPath(9000) }, send('cold-overflow')));
+    all.push(governor.run({ method: 'POST', path: cold0 }, send('cold0-again')));
+
+    await clock.advanceTo(clock.now());
+
+    // hot-2 is behind hot-1 on a chain that survived, so it has not been sent.
+    expect(started).toContain('hot-1');
+    expect(started).not.toContain('hot-2');
+    // cold0's chain WAS evicted, so its second request got a fresh chain and did
+    // not queue behind the first: it started even though cold-0 is still in flight.
+    expect(started).toContain('cold-0');
+    expect(started).toContain('cold0-again');
+
+    release();
+    await clock.runAll();
+    await Promise.all(all);
+    expect(started).toContain('hot-2');
+    expect(governor.snapshot().activeQueues).toBe(0);
   });
 });

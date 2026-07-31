@@ -170,6 +170,26 @@ export const MAX_TRACKED_BUCKETS = 512;
  */
 export const MAX_TRACKED_ROUTES = 512;
 
+/**
+ * Live FIFO chains kept before LRU eviction (L12). A third separate constant for
+ * the same reason MAX_TRACKED_ROUTES is one: it bounds a THIRD population with a
+ * third lifetime. A drained queue drops itself in the job's `finally`, so under
+ * normal traffic this map holds only the handful of route templates actually in
+ * flight. The case it exists for is a long pause: a request parked in
+ * `waitForPause` has not reached that `finally` yet, and interaction callbacks
+ * mint a unique template per interaction id, so during a ten minute ban pause
+ * the map (and its pending sleeps, and `queueDepth`) grew with however many
+ * slash commands arrived, unbounded. Evicting a chain is safe because the parked
+ * request holds its own reference to it and the `finally` only deletes a chain
+ * the map still holds; the sole cost is that a LATER request on an evicted
+ * template mints a fresh chain, losing serialization for that template. LRU is
+ * what makes that cost theoretical rather than real: `queueFor` re-inserts on
+ * every sighting, so a hot route (the member PATCH a sweep hammers) is never the
+ * victim, and the entries at the cold end are exactly the single-use
+ * per-interaction templates that will never be seen again.
+ */
+export const MAX_TRACKED_QUEUES = 512;
+
 /** Subjects remembered by the permanent-failure cache before LRU eviction. */
 export const MAX_FORBIDDEN_ENTRIES = 4096;
 
@@ -841,11 +861,31 @@ export class RateGovernor {
     return this.resolved.get(template) ?? template;
   }
 
+  /**
+   * The FIFO chain for a template, minting one on first sight and keeping the
+   * map bounded (L12). Re-inserting on every sighting makes the eviction order
+   * least-recently-used, so the chain thrown out is always the coldest, which on
+   * this map means a spent per-interaction template rather than a live route.
+   * See MAX_TRACKED_QUEUES for why evicting a chain with a request still parked
+   * on it is safe.
+   */
   private queueFor(template: string): QueueState {
     const existing = this.queues.get(template);
-    if (existing !== undefined) return existing;
+    if (existing !== undefined) {
+      this.queues.delete(template);
+      this.queues.set(template, existing);
+      return existing;
+    }
     const created: QueueState = { tail: Promise.resolve(), waiting: 0 };
     this.queues.set(template, created);
+    // Drains to the cap rather than evicting one per call, so a burst cannot
+    // leave the map sitting over its documented bound indefinitely (the same
+    // reason evictBuckets loops).
+    while (this.queues.size > MAX_TRACKED_QUEUES) {
+      const oldest = this.queues.keys().next();
+      if (oldest.done || oldest.value === template) break;
+      this.queues.delete(oldest.value);
+    }
     return created;
   }
 

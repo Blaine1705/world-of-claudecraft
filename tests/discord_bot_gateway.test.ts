@@ -402,6 +402,70 @@ describe('Gateway resume', () => {
     }
   });
 
+  it('drops the dead session on a non-resumable INVALID_SESSION, so a later close re-identifies (L7)', () => {
+    // The ledgered L7 defect. op 9 with d=false steered its OWN reconnect
+    // correctly, but left `sessionId` and `resumeUrl` set, and the other two
+    // reconnect paths (a socket close, op 7) both call `reconnect(true)`, where
+    // connect() re-derives resuming from `this.sessionId !== null`. So a close
+    // arriving before the next READY RESUMEd a session Discord had just killed.
+    const { socket, timers, factoryUrls, sockets } = rig();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    frame(socket, { op: 10, d: { heartbeat_interval: 30_000 } });
+    frame(socket, {
+      op: 0,
+      s: 5,
+      t: 'READY',
+      d: { session_id: 'sess-1', resume_gateway_url: 'wss://resume.discord.gg' },
+    });
+
+    frame(socket, { op: 9, d: false });
+    timers.armed[0].fn(); // the op 9 reconnect, which already re-identified
+    frame(sockets[1], { op: 10, d: { heartbeat_interval: 30_000 } });
+    expect(lastSent(sockets[1]).op).toBe(2);
+
+    // The arm that was broken: a close on the FRESH socket, before any READY has
+    // handed out a new session.
+    sockets[1].emit('close', 1006);
+    const closeTimer = timers.armed[timers.armed.length - 1];
+    expect(closeTimer.ms).toBe(2000);
+    closeTimer.fn();
+
+    // The dead session's resume endpoint must not be reused either.
+    expect(factoryUrls[2]).toBe('wss://gateway.discord.gg/?v=10&encoding=json');
+    frame(sockets[2], { op: 10, d: { heartbeat_interval: 30_000 } });
+    expect(lastSent(sockets[2]).op).toBe(2); // IDENTIFY, not RESUME (op 6)
+
+    // seq belongs to the dead session too: a fresh IDENTIFY heartbeats from
+    // null, not from the last sequence of a session that no longer exists.
+    const beat = timers.intervals[timers.intervals.length - 1];
+    beat.fn();
+    expect(lastSent(sockets[2])).toEqual({ op: 1, d: null });
+  });
+
+  it('keeps the session on a RESUMABLE INVALID_SESSION, so a later close still resumes', () => {
+    // The negative control for the L7 fix: clearing on d=false must not turn
+    // into clearing on every op 9, which would throw away a session Discord
+    // explicitly said survives and force a full re-IDENTIFY every time.
+    const { socket, timers, factoryUrls, sockets } = rig();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    frame(socket, { op: 10, d: { heartbeat_interval: 30_000 } });
+    frame(socket, {
+      op: 0,
+      s: 5,
+      t: 'READY',
+      d: { session_id: 'sess-1', resume_gateway_url: 'wss://resume.discord.gg' },
+    });
+
+    frame(socket, { op: 9, d: true });
+    timers.armed[0].fn();
+    expect(factoryUrls[1]).toBe('wss://resume.discord.gg/?v=10&encoding=json');
+    frame(sockets[1], { op: 10, d: { heartbeat_interval: 30_000 } });
+    expect(lastSent(sockets[1])).toEqual({
+      op: 6,
+      d: { token: 'tok', session_id: 'sess-1', seq: 5 },
+    });
+  });
+
   it('does not aim at the resume URL when READY gave one but no session id', () => {
     // A malformed READY is the only state where connect()'s own
     // `this.sessionId !== null` check does work its two consumers do not already
