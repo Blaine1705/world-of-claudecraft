@@ -3155,7 +3155,22 @@ export class GameServer {
   // sim and stays online for friends, analytics, and the play session row.
   // Returns true when grace began (false: the session was already torn down,
   // already linkdead, or the event came from a stale pre-resume socket).
-  socketClosed(session: ClientSession, ws: WebSocket): boolean {
+  //
+  // withMarket (default true) chooses whether the safety flush below also
+  // writes the realm-global World Market and mail escrow. The one caller that
+  // passes false is the mid-handshake death re-check in server/ws_auth.ts: that
+  // session processed zero input (game.join returns synchronously and the
+  // re-check runs before any message handling), so it cannot have touched the
+  // realm-global market or mail escrow, and those halves would write nothing
+  // new. It matters because that death happens exactly when the pool is
+  // exhausted: one whole-realm market+mail transaction per dead handshake, all
+  // serialized on the process-global market queue, feeds back into the resource
+  // that caused the death. Every ordinary dropped socket keeps the default.
+  socketClosed(
+    session: ClientSession,
+    ws: WebSocket,
+    opts: { withMarket?: boolean } = {},
+  ): boolean {
     // A late close/error from a socket that a resume already replaced must
     // not tear down the live session riding the new socket.
     if (session.ws !== ws) return false;
@@ -3171,7 +3186,7 @@ export class GameServer {
     const meta = this.sim.meta(session.pid);
     if (meta) Object.assign(meta.moveInput, emptyMoveInput());
     // Safety flush so a process crash during the grace window loses nothing.
-    void this.saveCharacter(session, { withMarket: true }).catch((err) =>
+    void this.saveCharacter(session, { withMarket: opts.withMarket ?? true }).catch((err) =>
       console.error(`linkdead save failed for ${session.name}:`, err),
     );
     return true;
