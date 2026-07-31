@@ -158,6 +158,62 @@ export interface DawnholdWallLedge {
   /** absolute shelf height */
   top: number;
 }
+// The wall-walk's OUTER parapet, the twin of the Last Keep's (see
+// castle_layout castleParapetSegments for why the curtain gives a body no
+// standoff at a down edge, and why this is the outer lip only). Gaps at both
+// gates, and across the north climbing shelves: fitsOn vetoes a ledge grab
+// landing inside anything with a movement top, standable or not, so a parapet
+// over their approach would kill the outside climb.
+export const DAWNHOLD_PARAPET_INSET = 1.2;
+export const DAWNHOLD_PARAPET_HALF = 0.2;
+export const DAWNHOLD_PARAPET_RISE = 1.56;
+
+export interface DawnholdParapet {
+  axis: 'x' | 'z';
+  line: number;
+  a0: number;
+  a1: number;
+  top: number;
+}
+
+export function dawnholdParapetSegments(): DawnholdParapet[] {
+  const hw = DAWNHOLD.towerHw;
+  const top = DAWNHOLD.walkAbs + DAWNHOLD_PARAPET_RISE;
+  const ledgeGap = { a0: 251, a1: 267 }; // DAWNHOLD_WALL_LEDGES climb x 255..263
+  const out: DawnholdParapet[] = [];
+  const add = (
+    axis: 'x' | 'z',
+    line: number,
+    outward: -1 | 1,
+    a0: number,
+    a1: number,
+    gaps: { a0: number; a1: number }[],
+  ): void => {
+    let spans: [number, number][] = [[a0, a1]];
+    for (const g of gaps) {
+      const next: [number, number][] = [];
+      for (const [s0, s1] of spans) {
+        if (g.a1 <= s0 || g.a0 >= s1) {
+          next.push([s0, s1]);
+          continue;
+        }
+        if (g.a0 > s0) next.push([s0, g.a0]);
+        if (g.a1 < s1) next.push([g.a1, s1]);
+      }
+      spans = next;
+    }
+    for (const [s0, s1] of spans) {
+      if (s1 - s0 <= 1) continue;
+      out.push({ axis, line: line + outward * DAWNHOLD_PARAPET_INSET, a0: s0, a1: s1, top });
+    }
+  };
+  add('z', DAWNHOLD.wx0, -1, DAWNHOLD.wz0 + hw, DAWNHOLD.wz1 - hw, []);
+  add('z', DAWNHOLD.wx1, 1, DAWNHOLD.wz0 + hw, DAWNHOLD.wz1 - hw, [DAWNHOLD_GATES.main]);
+  add('x', DAWNHOLD.wz0, -1, DAWNHOLD.wx0 + hw, DAWNHOLD.wx1 - hw, [ledgeGap]);
+  add('x', DAWNHOLD.wz1, 1, DAWNHOLD.wx0 + hw, DAWNHOLD.wx1 - hw, [DAWNHOLD_GATES.postern]);
+  return out;
+}
+
 export const DAWNHOLD_WALL_LEDGES: readonly DawnholdWallLedge[] = [
   // inner faces FLUSH on the curtain's outer face (862.5): standing a shelf
   // off the wall leaves a strip of ground behind it too narrow to turn around

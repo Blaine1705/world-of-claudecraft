@@ -13,7 +13,7 @@ import {
   buildingTerrainEnvelope,
   isEastbrookGrandArmoury,
 } from './building_layout';
-import { CASTLE_WALL_LEDGES } from './castle_layout';
+import { CASTLE_WALL_LEDGES, castleParapetSegments, PARAPET_HALF } from './castle_layout';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
 import {
   arenaOriginAt,
@@ -43,7 +43,7 @@ import {
   STRIP_MIN_X,
   yumiMazeOriginAt,
 } from './data';
-import { DAWNHOLD_WALL_LEDGES } from './dawnhold_layout';
+import { DAWNHOLD_WALL_LEDGES, dawnholdParapetSegments } from './dawnhold_layout';
 import {
   ROCK_COLLIDER_MIN_SCALE,
   ROCK_RADIUS_PER_SCALE,
@@ -521,6 +521,30 @@ function staticWorldColliders(seed: number): Collider[] {
       moveTopY: l.top,
       standable: true,
       cameraTopY: l.top,
+    });
+  }
+  // ...and the crenellated parapet along each wall-walk's OUTER edge, from the
+  // same plan the renderer lays its battlement modules from. The curtain is
+  // terrain, and terrain gives a body no standoff at a DOWN edge, so the walk
+  // was a 3.0yd strip with nothing at either lip and four ticks of drift put a
+  // player over the side.
+  //
+  // moveTopY WITHOUT standable, the campfire's semantic further down this file:
+  // a body whose feet are below the stone is blocked by it, and nobody may ever
+  // the shelves right beside it, so the chase camera does not yank in on a
+  // knee-high rail.
+  for (const seg of [...castleParapetSegments(), ...dawnholdParapetSegments()]) {
+    const alongHalf = (seg.a1 - seg.a0) / 2;
+    const mid = (seg.a0 + seg.a1) / 2;
+    out.push({
+      type: 'obb',
+      x: seg.axis === 'z' ? seg.line : mid,
+      z: seg.axis === 'z' ? mid : seg.line,
+      hw: seg.axis === 'z' ? PARAPET_HALF : alongHalf,
+      hd: seg.axis === 'z' ? alongHalf : PARAPET_HALF,
+      rot: 0,
+      moveTopY: seg.top,
+      cameraTopY: seg.top,
     });
   }
   // ...and the Drakelands' giant ember lilies: the huge and giant tiers

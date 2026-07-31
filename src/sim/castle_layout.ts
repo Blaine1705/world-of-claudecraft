@@ -237,6 +237,96 @@ export const CASTLE_WALL_LEDGES: readonly CastleWallLedge[] = [
 /** the step ramps run from the ward edge z1 down to bailey over this run */
 export const WARD_STEP_RUN = 4;
 
+// THE WALL-WALK'S OUTER PARAPET.
+//
+// The curtain is terrain, and terrain gives a body no standoff at a DOWN edge:
+// terrainWallStandoff only pushes away from RISING ground. So the walk was a
+// 3.0yd strip with nothing at either lip, and a player drifting four ticks off
+// the centreline simply left it, seven yards down into the bailey. The drawn
+// stone says otherwise: castle_features already lays a crenellated battlement
+// along the outer edge and a rail along the inner one. This is that battlement
+// made solid, so the wall you see is the wall you are held by.
+//
+// OUTER edge only, which is what was asked for and also the right call: the
+// inner lip overlooks the bailey a player often wants to drop into on purpose,
+// and railing both would turn the circuit into a corridor.
+/** centre of the parapet band, measured out from the wall centreline */
+export const PARAPET_INSET = 1.2;
+/** half-thickness of the band (the drawn merlon is 0.4 deep) */
+export const PARAPET_HALF = 0.2;
+/** the parapet's top over the walk it stands on */
+export const PARAPET_RISE = 1.56;
+
+export interface CastleParapet {
+  axis: 'x' | 'z';
+  /** the across coordinate: the band's CENTRE, already offset outward */
+  line: number;
+  a0: number;
+  a1: number;
+  /** ABSOLUTE top of the stone */
+  top: number;
+}
+
+/** Subtract a set of gaps from one run, yielding the spans that remain. */
+function splitRun(a0: number, a1: number, gaps: { a0: number; a1: number }[]): [number, number][] {
+  let spans: [number, number][] = [[a0, a1]];
+  for (const g of gaps) {
+    const next: [number, number][] = [];
+    for (const [s0, s1] of spans) {
+      if (g.a1 <= s0 || g.a0 >= s1) {
+        next.push([s0, s1]);
+        continue;
+      }
+      if (g.a0 > s0) next.push([s0, g.a0]);
+      if (g.a1 < s1) next.push([g.a1, s1]);
+    }
+    spans = next;
+  }
+  return spans.filter(([s0, s1]) => s1 - s0 > 1);
+}
+
+/**
+ * The parapet spans, with a gap wherever one would break something that works.
+ *
+ * Three kinds of gap, and the third is the subtle one:
+ *  - every GATE mouth, so the walk still opens over the way in;
+ *  - the watch flight, which climbs the south wall itself and rises clear above
+ *    parapet height, so a band there would be buried in the ramp;
+ *  - the CLIMBING SHELVES on the east curtain. fitsOn (physics/ledge.ts) vetoes
+ *    a ledge grab whose landing lands inside anything carrying a movement top,
+ *    whether or not it is standable, so a parapet over the shelves' approach
+ *    would silently kill the whole outside climb. The gap covers the run, not
+ *    just the one shelf that tops out.
+ */
+export function castleParapetSegments(): CastleParapet[] {
+  const hw = CASTLE.towerHw;
+  const top = CASTLE.walkAbs + PARAPET_RISE;
+  const G = CASTLE_GATES;
+  const ledgeGap = { a0: 2026, a1: 2044 }; // CASTLE_WALL_LEDGES climb z 2032..2040
+  const out: CastleParapet[] = [];
+  const add = (
+    axis: 'x' | 'z',
+    line: number,
+    outward: -1 | 1,
+    a0: number,
+    a1: number,
+    gaps: { a0: number; a1: number }[],
+  ): void => {
+    for (const [s0, s1] of splitRun(a0, a1, gaps)) {
+      out.push({ axis, line: line + outward * PARAPET_INSET, a0: s0, a1: s1, top });
+    }
+  };
+  // west curtain, outward is -x; the main gate parts it
+  add('z', CASTLE.wx0, -1, CASTLE.wz0 + hw, CASTLE.wz1 - hw, [G.main]);
+  // east curtain, outward is +x; the breach and the climbing shelves part it
+  add('z', CASTLE.wx1, 1, CASTLE.wz0 + hw, CASTLE.wz1 - hw, [ledgeGap, G.breach]);
+  // north curtain, outward is -z; the postern parts it
+  add('x', CASTLE.wz0, -1, CASTLE.wx0 + hw, CASTLE.wx1 - hw, [G.postern]);
+  // south curtain, outward is +z, solid, but stop at the watch flight's foot
+  add('x', CASTLE.wz1, 1, CASTLE.wx0 + hw, 424, []);
+  return out;
+}
+
 // The bailey and ward buildings. The ward pair (keep, great hall) stand on
 // the raised terrace; everything else on the bailey floor. Placement honors
 // the gate corridors, the stair masses, the ward edge, and each other.
