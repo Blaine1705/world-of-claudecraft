@@ -61,6 +61,7 @@ import {
   lettersOf,
   mulberry32,
   sanitizeBaseUrl,
+  terminalAwareGapMax,
 } from './lib/prof_load_util.mjs';
 import { worldAuthMessage } from './lib/world_auth.mjs';
 
@@ -247,9 +248,23 @@ const CLEANUP_CHUNK = 100;
 
 async function cleanupBots(pool, records) {
   const accountIds = records.map((r) => r.accountId);
+  let deleted = 0;
   for (let i = 0; i < accountIds.length; i += CLEANUP_CHUNK) {
     const chunk = accountIds.slice(i, i + CLEANUP_CHUNK);
-    await pool.query('DELETE FROM accounts WHERE id = ANY($1::int[])', [chunk]);
+    try {
+      const res = await pool.query('DELETE FROM accounts WHERE id = ANY($1::int[])', [chunk]);
+      deleted += res.rowCount ?? 0;
+    } catch (err) {
+      // A mid-loop throw leaves PART of the fleet seeded, and the operator
+      // reusing the container for the next scenario has to know which part:
+      // a bare driver error names neither the chunk nor how far cleanup got.
+      throw new Error(
+        `cleanup failed on chunk ${Math.floor(i / CLEANUP_CHUNK) + 1} of ` +
+          `${Math.ceil(accountIds.length / CLEANUP_CHUNK)} (account ids ${chunk[0]} to ` +
+          `${chunk.at(-1)}); ${deleted} of ${accountIds.length} accounts were deleted before it`,
+        { cause: err },
+      );
+    }
   }
 }
 
@@ -260,13 +275,28 @@ async function cleanupBots(pool, records) {
 // the server has none, 401 on a wrong credential), which the capture recipe
 // does not require, so every failure arm stamps null. This is DISCLOSURE, not
 // a gate input: a run without the token is still a valid capture.
+let metricsStatusLogged = false;
+
 async function scrapePoolClients() {
   if (!METRICS_TOKEN) return null;
   try {
     const res = await fetch(`${BASE}/metrics`, {
       headers: { Authorization: `Bearer ${METRICS_TOKEN}` },
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      // A wrong token (401) and a server that has none (404) are otherwise
+      // indistinguishable from passing no token at all: every arm just stamps
+      // null, so an operator who set METRICS_TOKEN gets silence instead of the
+      // gauges. Said ONCE, because the drain below polls this in a loop.
+      if (!metricsStatusLogged) {
+        metricsStatusLogged = true;
+        console.log(
+          `[prof-load] /metrics answered HTTP ${res.status}; pool gauges stamp null ` +
+            '(401 = the token does not match the server, 404 = the server has none)',
+        );
+      }
+      return null;
+    }
     const text = await res.text();
     const out = { waiting: null, total: null, idle: null };
     for (const state of Object.keys(out)) {
@@ -355,6 +385,10 @@ class Bot {
         );
       });
       const onJoinMessage = (data) => {
+        // Same guard as close/error below, for the same reason: a retry pass
+        // replaces this.ws, and a hello arriving late on the ABANDONED socket
+        // must not overwrite the new session's pid or re-seed it.
+        if (this.ws !== ws) return;
         let msg;
         try {
           msg = JSON.parse(String(data));
@@ -366,7 +400,12 @@ class Bot {
           this.alive = true;
           clearTimeout(to);
           ws.off('message', onJoinMessage);
-          ws.on('message', (d) => this.onFrame(d));
+          // Guarded too: frames from an abandoned socket would otherwise be
+          // counted as this bot's measured traffic.
+          ws.on('message', (d) => {
+            if (this.ws !== ws) return;
+            this.onFrame(d);
+          });
           this.seedSession();
           resolve();
         } else if (msg.t === 'error') {
@@ -528,28 +567,93 @@ class Bot {
 // toward players_online and must never hang the rig.
 const DRAIN_CAP_MS = 30000;
 const DRAIN_POLL_MS = 250;
+// A single failed /api/status is TRANSIENT, not proof the server is gone: the
+// box is saturated and answering the fleet's own logout wave, which is exactly
+// when one request gets dropped. Returning on the first null would turn the
+// whole drain into a no-op at the only moment it matters. Only a server that
+// never answered ONCE (already down, or never up on a mid-seed abort) has no
+// fleet left to drain, and waiting out the cap for it just slows teardown.
+const DRAIN_MAX_CONSECUTIVE_FAILURES = 5;
+// Fixed grace for the save wave when the pool cannot be watched directly.
+const SAVE_GRACE_MS = 3000;
+
+// players_online counts the server's live `clients` map, and the leave path
+// deletes from it BEFORE awaiting the character save, so the count reaches
+// zero with saves still in flight. Under CLEANUP that gap is where a DELETE
+// lands under an in-flight save. With METRICS_TOKEN the rig can watch the real
+// thing (the db pool going fully idle); without it a fixed grace is the only
+// honest option. Shares the caller's deadline, so the cap stays 30 s overall.
+async function waitForSaveDrain(deadline) {
+  if (!METRICS_TOKEN) {
+    await sleep(Math.min(SAVE_GRACE_MS, Math.max(0, deadline - Date.now())));
+    return;
+  }
+  let idleSamples = 0;
+  while (Date.now() < deadline) {
+    const pool = await scrapePoolClients();
+    // idle === total means nothing is checked out, so no save is running.
+    // TWO consecutive samples, because one can land in the gap between two
+    // saves; the null-field arms are excluded so a missing gauge line cannot
+    // read as null === null and pass.
+    if (pool && Number.isFinite(pool.idle) && Number.isFinite(pool.total)) {
+      idleSamples = pool.idle === pool.total ? idleSamples + 1 : 0;
+      if (idleSamples >= 2) return;
+    } else {
+      // No usable gauges (no token on the server, wrong token, changed
+      // exposition): fall back to the fixed grace rather than spinning to the
+      // cap on every teardown.
+      await sleep(Math.min(SAVE_GRACE_MS, Math.max(0, deadline - Date.now())));
+      return;
+    }
+    await sleep(DRAIN_POLL_MS);
+  }
+}
 
 async function waitForFleetDrain() {
   const deadline = Date.now() + DRAIN_CAP_MS;
   // One settle first: the close frames need a moment to reach the server
   // before its own count means anything.
   await sleep(DRAIN_POLL_MS);
+  let answers = 0;
+  let consecutiveFailures = 0;
   for (;;) {
     const st = await fetch(`${BASE}/api/status`)
       .then((r) => (r.ok ? r.json() : null))
       .catch(() => null);
-    // A server that cannot answer has no fleet left to drain (already down,
-    // or never up on a mid-seed abort), and neither does one reporting zero:
-    // waiting out the cap on the error path would only slow teardown down.
-    if (!st || !(st.players_online > 0)) return;
+    if (st) {
+      answers += 1;
+      consecutiveFailures = 0;
+      if (!(st.players_online > 0)) break;
+    } else {
+      consecutiveFailures += 1;
+      if (answers === 0 && consecutiveFailures >= DRAIN_MAX_CONSECUTIVE_FAILURES) return;
+    }
     if (Date.now() >= deadline) {
       console.log(
-        `[prof-load] ${st.players_online} still online after ${DRAIN_CAP_MS}ms; proceeding with teardown`,
+        st
+          ? `[prof-load] ${st.players_online} still online after ${DRAIN_CAP_MS}ms; proceeding with teardown`
+          : `[prof-load] /api/status unanswered at the ${DRAIN_CAP_MS}ms drain cap; proceeding with teardown`,
       );
       return;
     }
     await sleep(DRAIN_POLL_MS);
   }
+  await waitForSaveDrain(deadline);
+}
+
+// The documented recipe writes JSON_OUT into the artifact directory beside the
+// baseline doc, so scenario 1 dirties the tree by the rig's OWN doing and
+// scenarios 2 to 4 inherit that dirt: an unfiltered `git status --porcelain`
+// stamps gitDirty true on every honest run of the recipe, which is a flag that
+// cries wolf rather than evidence. Only paths OUTSIDE the artifact directory
+// bear on whether a capture is reproducible from gitHead.
+const ARTIFACT_DIR = 'docs/design/player-performance/';
+
+function isArtifactPath(porcelainLine) {
+  // `XY <path>`, or `XY <old> -> <new>` for a rename; git quotes a path with
+  // unusual bytes, and the quote is not part of the path.
+  const path = porcelainLine.slice(3).split(' -> ').at(-1).replace(/^"|"$/g, '');
+  return path.startsWith(ARTIFACT_DIR);
 }
 
 // Set inside main once the fleet exists, so the fatal-error path can still
@@ -562,8 +666,11 @@ async function main() {
   let gitDirty = false;
   try {
     gitHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT }).toString().trim();
-    gitDirty =
-      execFileSync('git', ['status', '--porcelain'], { cwd: ROOT }).toString().trim() !== '';
+    gitDirty = execFileSync('git', ['status', '--porcelain'], { cwd: ROOT })
+      .toString()
+      .split('\n')
+      .filter((line) => line.trim() !== '')
+      .some((line) => !isArtifactPath(line));
   } catch {
     /* not a git checkout */
   }
@@ -782,20 +889,35 @@ async function main() {
     // offset it was not taken at.
     const atMs = Math.round(performance.now() - start);
     const inWindow = measuring;
-    fetch(`${BASE}/api/perf`)
+    // Deadlined, and the flag cleared in a finally: a scrape that never
+    // answers would otherwise strand the overlap guard set and silence every
+    // later scrape for the rest of the run, leaving serverPerfMid short with
+    // nothing in the artifact saying why.
+    fetch(`${BASE}/api/perf`, { signal: AbortSignal.timeout(8000) })
       .then((r) => (r.ok ? r.json() : null))
       .catch(() => null)
       .then((perf) => {
-        perfScrapeInFlight = false;
         if (!perf) return;
         lastPerfSample = perf;
-        if (inWindow) perfMid.push({ atMs, online: perf.online, tickHz: perf.tickHz });
+        // The window is re-checked at RESOLUTION as well as at request time: a
+        // slow scrape fired inside the window can land after it closed, and
+        // its reading then describes a server the window never measured.
+        if (inWindow && measuring) {
+          perfMid.push({ atMs, online: perf.online, tickHz: perf.tickHz });
+        }
+      })
+      .finally(() => {
+        perfScrapeInFlight = false;
       });
   }
   let driving = false;
   let measuring = false;
   let settleAt = Number.POSITIVE_INFINITY;
   let start = performance.now();
+  // Window-relative close mark, stamped at the BREAK below: the close scrapes
+  // and the joinPromise await that follow take real time, and charging that to
+  // every observer's terminal gap would fabricate a stall in the evidence.
+  let windowCloseAtMs = 0;
   let lastReport = performance.now();
   let step = 0;
   let expectedAt = performance.now() + STEP_MS;
@@ -870,6 +992,7 @@ async function main() {
         console.log('[prof-load] measurement window open');
       }
     } else if (performance.now() - start >= DURATION_MS) {
+      windowCloseAtMs = performance.now() - start;
       break;
     }
     if (performance.now() - lastReport >= REPORT_MS) {
@@ -901,14 +1024,20 @@ async function main() {
   const observers = bots.filter((b) => b.isObserver);
   const observerRows = observers.map((o) => {
     const gaps = gapStats(o.snapTimes);
+    // Window-relative, and undefined when the observer received nothing at
+    // all, which is what makes the terminal gap span the whole window.
+    const lastSnapAtMs = o.snapCount > 0 ? o.snapTimes.at(-1) - start : undefined;
     return {
       label: `obs-${o.index}`,
       role: o.role,
       gaps: gaps.gaps,
       // The WORST gap, which the gate's continuity arm reads: a mid-window
       // stall the p95 averages away has to be visible to the verdict AND to
-      // whoever reads the artifact later.
-      gapMaxMs: gaps.max,
+      // whoever reads the artifact later. The TERMINAL gap counts too:
+      // gapStats only sees spans BETWEEN snapshots, so an observer that went
+      // silent for the last minute of the window otherwise reports the tidy
+      // gaps it had before dying and rides the ceiling to a false pass.
+      gapMaxMs: terminalAwareGapMax(gaps.max, lastSnapAtMs, windowCloseAtMs),
       sawStableTw: o.sawStableTw,
       ncdFrames: o.ncdFrames,
       fishingOutcomes: o.fishingOutcomes,

@@ -20,6 +20,15 @@ import { ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
 // A fake socket: real EventEmitter wiring (on/once/off/emit) so the handshake
 // buffer and the post-join ws.on('message'|'close'|'error') handlers work, plus
 // spy send/close so we can assert the exact frames and their ordering.
+//
+// KNOWN FIDELITY LIMITS (fix-round audit; deliberate, comment so nobody
+// "fixes" a test into them unaware): close() is a bare spy and does NOT move
+// readyState, where real ws sets CLOSING synchronously, so an arm that wants
+// a dead socket must set readyState by hand; consequently every reject-path
+// case here leaves the socket OPEN and takes the flush's 'replay' branch,
+// where production takes 'discard' (harmless while reject paths attach no
+// message handler, but a regression that attached one there would not be
+// seen by these cases).
 class FakeWs extends EventEmitter {
   send = vi.fn();
   close = vi.fn();
@@ -1323,8 +1332,18 @@ describe('mid-handshake socket death cannot mint a permanent zombie session', ()
     // The arm above pins what ws_auth PASSES; without this, game.ts could
     // ignore the option and the fix would be a no-op with every test green.
     const gameSrc = gameSourceCode();
-    expect(gameSrc).toContain('opts: { withMarket?: boolean } = {}');
-    expect(gameSrc).toContain(
+    // Sliced to the socketClosed body: saveCharacter declares the same
+    // options shape, so a whole-file toContain would stay green if
+    // socketClosed lost its parameter (the fix-round audit caught the
+    // ambiguity).
+    const socketClosedStart = gameSrc.indexOf('\n  socketClosed(');
+    expect(socketClosedStart).toBeGreaterThan(-1);
+    const socketClosedBody = gameSrc.slice(
+      socketClosedStart,
+      gameSrc.indexOf('\n  }', socketClosedStart),
+    );
+    expect(socketClosedBody).toContain('opts: { withMarket?: boolean } = {}');
+    expect(socketClosedBody).toContain(
       'this.saveCharacter(session, { withMarket: opts.withMarket ?? true })',
     );
     // The unconditional linkdead flush this replaced must not come back (the

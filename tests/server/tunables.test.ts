@@ -663,9 +663,11 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     );
     const branchStart = dbCode.indexOf("if (rawDbPoolMaxClients !== ''");
     expect(branchStart).toBeGreaterThan(-1);
-    // The guard fires only for a SET value that did not survive parsing: a
-    // legitimately configured 10 (and " 10 ") must stay quiet, which is what
-    // the numeric comparison against the effective value buys.
+    // The guard fires only for a SET value that did not survive parsing; the
+    // numeric comparison is what keeps a legitimately configured 10 (and
+    // " 10 ") quiet. Pinned STRUCTURALLY (the condition text), not
+    // behaviorally: the file-level delete of the env var means a behavior
+    // arm would need a resetModules dance the source pin does not.
     expect(dbCode).toContain(
       "if (rawDbPoolMaxClients !== '' && Number(rawDbPoolMaxClients) !== DB_POOL_MAX_CLIENTS) {",
     );
@@ -966,11 +968,15 @@ describe('the DB pool knob reaches the shipped container', () => {
     const compose = read('docker-compose.yml');
     // Scoped to the game service block: discord-bot runs the SAME image, so a
     // whole-file match would still pass with the line on the wrong service.
+    // Bounded at the NEXT top-level service key rather than at discord-bot by
+    // name, so inserting a service between the two cannot silently widen the
+    // slice (fix-round audit).
     const gameStart = compose.indexOf('\n  game:');
-    const discordStart = compose.indexOf('\n  discord-bot:');
     expect(gameStart).toBeGreaterThanOrEqual(0);
-    expect(discordStart).toBeGreaterThan(gameStart);
-    const gameService = compose.slice(gameStart, discordStart);
+    const rest = compose.slice(gameStart + '\n  game:'.length);
+    const next = rest.match(/\n {2}[a-z][a-z-]*:/);
+    expect(next).toBeTruthy();
+    const gameService = rest.slice(0, next?.index);
     // biome-ignore lint/suspicious/noTemplateCurlyInString: pins compose's own substitution syntax
     expect(gameService).toContain('DB_POOL_MAX_CLIENTS: ${DB_POOL_MAX_CLIENTS:-}');
     // Documented for operators, commented out so the built-in default applies.

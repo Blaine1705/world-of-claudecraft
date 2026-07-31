@@ -191,4 +191,34 @@ describe('loopback guard call sites', () => {
       .sort();
     expect(importers).toEqual([...GUARDED_SCRIPTS].sort());
   });
+
+  it('classifies every script that talks to Postgres (the discovery arm)', () => {
+    // The exhaustive arm above pins which scripts IMPORT the guard, not which
+    // scripts NEED it: a new script minting rows straight into Postgres and
+    // never importing the guard is invisible to both (the fix-round audit).
+    // Discovery keys on what a script DOES (the pg import), so a new database
+    // touchpoint must either adopt the guard or be classified here on
+    // purpose. The exempt list is operator/admin tooling that predates the
+    // guard: adopting it there is a recorded follow-up, and removing an entry
+    // from this list without adopting the guard reddens the run.
+    const PG_EXEMPT_OPERATOR_TOOLS = [
+      'scripts/armory_skins_e2e.mjs',
+      'scripts/armory_visual_e2e.mjs',
+      'scripts/bank_audit.mjs',
+      'scripts/chat_log_persistence.mjs',
+      'scripts/create_gm.mjs',
+      'scripts/grant_admin.mjs',
+    ] as const;
+    const pgImporters = scriptSources(join(ROOT, 'scripts'))
+      .filter((relPath) => {
+        const code = codeWithoutLineComments(relPath);
+        return code.includes("from 'pg'") || code.includes("require('pg')");
+      })
+      .sort();
+    const guardedPgUsers = pgImporters.filter((p) =>
+      (GUARDED_SCRIPTS as readonly string[]).includes(p),
+    );
+    const classified = [...guardedPgUsers, ...PG_EXEMPT_OPERATOR_TOOLS].sort();
+    expect(pgImporters).toEqual(classified);
+  });
 });

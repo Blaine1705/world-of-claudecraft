@@ -48,16 +48,36 @@ export function ipFor(n) {
 }
 
 /** The URL a committed artifact may carry: credentials stripped (a
- *  basic-auth SERVER_URL must never land in a checked-in report). */
+ *  basic-auth SERVER_URL must never land in a checked-in report). The query
+ *  and hash go with them: a token parked in either is the same secret the
+ *  userinfo strip exists to catch, and a base URL has no use for them. */
 export function sanitizeBaseUrl(urlStr) {
   try {
     const u = new URL(urlStr);
     u.username = '';
     u.password = '';
+    u.search = '';
+    u.hash = '';
     return u.toString().replace(/\/+$/, '');
   } catch {
     return 'invalid-url';
   }
+}
+
+/** The worst observer gap INCLUDING the terminal one: the span from the last
+ *  snapshot to window close. `gapStats` only ever sees gaps BETWEEN two
+ *  snapshots, so an observer that went silent for the last minute of the
+ *  window reports the healthy gaps it had before dying and sails past the
+ *  continuity ceiling. All three arguments are WINDOW-RELATIVE milliseconds,
+ *  which is what makes the zero-snapshot case fall out: no snapshot means no
+ *  last-snapshot mark, the terminal gap runs from window open, and the whole
+ *  window IS the gap. Non-finite inputs read as 0 rather than poisoning the
+ *  verdict with NaN. */
+export function terminalAwareGapMax(gapMax, lastSnapAtMs, windowCloseAtMs) {
+  const worst = Number.isFinite(gapMax) ? gapMax : 0;
+  const lastAt = Number.isFinite(lastSnapAtMs) ? lastSnapAtMs : 0;
+  const closeAt = Number.isFinite(windowCloseAtMs) ? windowCloseAtMs : 0;
+  return Math.max(worst, Math.max(0, closeAt - lastAt));
 }
 
 /** Dry-footed standing spots with fishable water ahead: spiral out from the

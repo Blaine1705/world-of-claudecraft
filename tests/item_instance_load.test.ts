@@ -201,6 +201,39 @@ describe('sanitizeItemInstancePayloadOnLoad: whole-payload drops', () => {
       expect(out.dropped).toEqual(['payload']);
     }
   });
+
+  it('drops a clone-mangled array or string wearing an object costume', () => {
+    // Every call site deep-clones the stored value first, and `{ ...src }`
+    // turns an array or a string into an object of decimal-numeric keys, so
+    // the plain-object arm above never sees the original shape (the
+    // fix-round review measured [1,2,3] surviving as {"0":1,"1":2,"2":3}).
+    for (const mangled of [{ 0: 1, 1: 2, 2: 3 }, { 0: 'a' }, { 0: 'a', 1: 'b', 10: 'c' }]) {
+      const out = sanitizeItemInstancePayloadOnLoad(mangled);
+      expect(out.payload, `input ${JSON.stringify(mangled)}`).toBeUndefined();
+      expect(out.dropped).toEqual(['payload']);
+    }
+    // A single numeric key beside a legal one is NOT the mangled shape: only
+    // an ALL-numeric key set drops, so a future payload never loses a legal
+    // field to this arm.
+    const mixed = sanitizeItemInstancePayloadOnLoad({ 0: 'a', boundTo: 7 });
+    expect(mixed.payload).toEqual({ 0: 'a', boundTo: 7 });
+    expect(mixed.dropped).toEqual([]);
+  });
+
+  it('never descends into rift: its strings are the progression rebuild business', () => {
+    // rift.sourceEventId is legitimately up to 128 characters and is
+    // validated by sanitizeRiftGearInstance, so the generic 64-char rule
+    // must NOT reach inside rift (adding 'rift' to the scanned sub-objects
+    // would delete legal data; this pin holds that doctrine).
+    const longEventId = 'e'.repeat(120);
+    const out = sanitizeItemInstancePayloadOnLoad({
+      rift: { tier: 'C', upgradeLevel: 1, sourceEventId: longEventId, gems: [] },
+      boundTo: 3,
+    });
+    expect(out.dropped).toEqual([]);
+    const rift = out.payload?.rift as { sourceEventId?: string } | undefined;
+    expect(rift?.sourceEventId).toBe(longEventId);
+  });
 });
 
 describe('warnDroppedInstanceKeys', () => {

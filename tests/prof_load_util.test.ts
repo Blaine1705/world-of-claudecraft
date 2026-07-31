@@ -11,6 +11,7 @@ import {
   mulberry32,
   type ObserverSample,
   sanitizeBaseUrl,
+  terminalAwareGapMax,
 } from '../scripts/lib/prof_load_util.mjs';
 
 describe('boundedEnvInt', () => {
@@ -83,6 +84,51 @@ describe('sanitizeBaseUrl', () => {
     expect(sanitizeBaseUrl('http://127.0.0.1:8799')).toBe('http://127.0.0.1:8799');
     expect(sanitizeBaseUrl('not a url')).toBe('invalid-url');
     expect(sanitizeBaseUrl('http://u:p@h/x')).not.toContain('secret');
+  });
+
+  it('strips the query and the hash, where a token hides just as well', () => {
+    // Userinfo is not the only place a secret rides a base URL, and both of
+    // these reach the console line AND the committed artifact.
+    expect(sanitizeBaseUrl('http://127.0.0.1:8799/?token=secret')).toBe('http://127.0.0.1:8799');
+    expect(sanitizeBaseUrl('http://127.0.0.1:8799/#secret')).toBe('http://127.0.0.1:8799');
+    expect(sanitizeBaseUrl('http://u:p@127.0.0.1:8799/base?token=secret#secret')).toBe(
+      'http://127.0.0.1:8799/base',
+    );
+  });
+});
+
+describe('terminalAwareGapMax', () => {
+  it('leaves a healthy observer alone: the largest INTER-snapshot gap wins', () => {
+    // Last snapshot 200 ms before close, worst measured gap 700 ms: the
+    // terminal gap is the smaller of the two and must not lower the answer.
+    expect(terminalAwareGapMax(700, 179800, 180000)).toBe(700);
+  });
+
+  it('reports the TERMINAL silence an inter-snapshot gap set cannot see', () => {
+    // The blindness this helper exists for: an observer whose socket went
+    // quiet 60 s before window close still has a tidy 700 ms worst gap
+    // between the snapshots it did receive, and rides the continuity ceiling
+    // to a false PASS on that number alone.
+    expect(terminalAwareGapMax(700, 120000, 180000)).toBe(60000);
+  });
+
+  it('counts the WHOLE window when the observer never got a snapshot', () => {
+    // No snapshot means no last-snapshot mark, so the terminal gap runs from
+    // window open: the deadest observer in the fleet must produce the largest
+    // gap, not a zero that reads as perfect continuity.
+    expect(terminalAwareGapMax(0, undefined, 180000)).toBe(180000);
+  });
+
+  it('is a no-op when the last snapshot abuts window close', () => {
+    expect(terminalAwareGapMax(700, 180000, 180000)).toBe(700);
+  });
+
+  it('never returns a negative gap or NaN on junk inputs', () => {
+    // A snapshot stamped past the close (the report-time clock read is taken
+    // after the break) must not subtract from the worst gap.
+    expect(terminalAwareGapMax(700, 180500, 180000)).toBe(700);
+    expect(terminalAwareGapMax(Number.NaN, Number.NaN, Number.NaN)).toBe(0);
+    expect(terminalAwareGapMax(700, Number.NaN, 180000)).toBe(180000);
   });
 });
 

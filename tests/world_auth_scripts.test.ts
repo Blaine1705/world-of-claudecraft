@@ -61,6 +61,14 @@ const AUTHENTICATED_NODE_CLIENTS = [
     // shared helper, with the capability spread beside them.
     path: 'scripts/load_professions.mjs',
     authSend: '...worldAuthMessage(this.token, this.characterId), ...authExtra',
+    // The payload core above cannot prove the frame is ever SENT (the
+    // fix-round audit: a built-but-never-sent payload stayed green once the
+    // send prefix left the pin). This tight form is matched against the
+    // fully despaced source, so neither the biome wrap nor the trailing
+    // comma can redden it, and it ends inside the call on purpose: the
+    // closing token after authExtra varies with the wrap.
+    tightSend:
+      'ws.send(JSON.stringify({...worldAuthMessage(this.token,this.characterId),...authExtra})',
   },
   {
     path: 'scripts/mob_stall_repro.mjs',
@@ -164,7 +172,9 @@ describe('standalone world WebSocket auth', () => {
 
   it.each(AUTHENTICATED_NODE_CLIENTS)(
     '$path sends its exact token and character through the shared helper',
-    ({ path, authSend }) => {
+    (row) => {
+      const { path, authSend } = row;
+      const tightSend = 'tightSend' in row ? row.tightSend : undefined;
       const source = readFileSync(join(ROOT, path), 'utf8');
       const helperPath = path.startsWith('scripts/profiler/')
         ? '../lib/world_auth.mjs'
@@ -173,6 +183,9 @@ describe('standalone world WebSocket auth', () => {
 
       expect(source).toContain(`import { worldAuthMessage } from '${helperPath}';`);
       expect(normalizedSource).toContain(authSend);
+      // Rows sitting at the wrap width carry a second, fully-despaced pin
+      // that survives any re-wrap while still proving the SEND itself.
+      if (tightSend) expect(source.replace(/\s+/g, '')).toContain(tightSend);
       expect(source).not.toMatch(LEGACY_AUTH_LITERAL);
     },
   );

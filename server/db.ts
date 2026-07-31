@@ -139,12 +139,15 @@ console.log(
 // production deployment sets the same list on every process), so its entry
 // count is how many independent pools this one DATABASE_URL will see. Unset
 // means a single realm, whose pool is already bounded by the parser ceiling and
-// so can never trip this on its own.
+// so can never trip this on its own. PREMISE: every realm shares one database
+// (true of the shipped single-box deployment); directory entries hosted on
+// their own databases have their own budgets, so the warning below names the
+// assumption instead of pretending to know each realm's DATABASE_URL.
 const realmDirectoryEntries = (process.env.REALMS ?? '').split(',');
 const configuredRealmCount = realmDirectoryEntries.filter((e) => e.trim() !== '').length;
 if (configuredRealmCount * DB_POOL_MAX_CLIENTS > DB_POOL_MAX_CLIENTS_CEILING) {
   console.warn(
-    `db pool: ${configuredRealmCount} realms x ${DB_POOL_MAX_CLIENTS} clients = ${configuredRealmCount * DB_POOL_MAX_CLIENTS} connections, past the ${DB_POOL_MAX_CLIENTS_CEILING} usable on stock postgres:16 (max_connections 100, 3 superuser-reserved) and before ensureSchema's one boot client per realm. Logins will fail with "too many clients" at peak: lower DB_POOL_MAX_CLIENTS or raise max_connections.`,
+    `db pool: ${configuredRealmCount} realms x ${DB_POOL_MAX_CLIENTS} clients = ${configuredRealmCount * DB_POOL_MAX_CLIENTS} connections, past the ${DB_POOL_MAX_CLIENTS_CEILING} usable on stock postgres:16 (max_connections 100, 3 superuser-reserved) and before ensureSchema's one boot client per realm. If every realm shares this DATABASE_URL, logins will fail with "too many clients" at peak: lower DB_POOL_MAX_CLIENTS or raise max_connections.`,
   );
 }
 

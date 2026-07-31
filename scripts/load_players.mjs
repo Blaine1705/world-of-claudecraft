@@ -19,6 +19,7 @@ import { randomBytes } from 'node:crypto';
 import pg from 'pg';
 import WebSocket from 'ws';
 import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from './lib/loopback_guard.mjs';
+import { sanitizeBaseUrl } from './lib/prof_load_util.mjs';
 import { worldAuthMessage } from './lib/world_auth.mjs';
 
 try {
@@ -550,7 +551,10 @@ async function main() {
     '[load-players] server must have ALLOW_DEV_COMMANDS=1 for dev_level and dev_teleport',
   );
   console.log(
-    `[load-players] run=${RUN_ID} count=${BOT_COUNT} level=${BOT_LEVEL} durationMs=${DURATION_MS} realm=${REALM} url=${SERVER_URL}`,
+    // Echoed through sanitizeBaseUrl like the professions rig does: a
+    // basic-auth (or ?token=) SERVER_URL must not reach the console, and this
+    // line is the one place the raw value was still printed.
+    `[load-players] run=${RUN_ID} count=${BOT_COUNT} level=${BOT_LEVEL} durationMs=${DURATION_MS} realm=${REALM} url=${sanitizeBaseUrl(SERVER_URL)}`,
   );
 
   const pool = new Pool({ connectionString: DATABASE_URL, max: 5 });

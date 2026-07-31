@@ -646,7 +646,10 @@ describe('gather-node markers scale with the rim, not the node table (phase 16)'
       // nodes at the right count must fail, so pin the projected coordinate
       // set (markers carry no node id; mx/my is half - delta * PPY).
       const expectCoords = inRim
-        .map((n) => `${S / 2 - (n.pos.x - anchor.pos.x) * PPY},${S / 2 - (n.pos.z - anchor.pos.z) * PPY}`)
+        .map(
+          (n) =>
+            `${S / 2 - (n.pos.x - anchor.pos.x) * PPY},${S / 2 - (n.pos.z - anchor.pos.z) * PPY}`,
+        )
         .sort();
       expect(drawn.map((m) => `${m.mx},${m.my}`).sort(), `zone ${zoneId} coords`).toEqual(
         expectCoords,

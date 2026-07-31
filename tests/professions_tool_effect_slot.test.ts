@@ -849,10 +849,14 @@ describe('the id tables and the load normalizer, directly', () => {
     // source is ASCII.
     const accented = 'A'.repeat(15) + String.fromCharCode(0xe9);
     expect(accented).toHaveLength(MAX_CRAFTED_BY_LENGTH);
-    expect(load(accented)?.craftedBy).toBeUndefined();
-    expect(load('Log\nherholm')?.craftedBy).toBeUndefined();
+    // The KEY is omitted, not set to explicit undefined, same as the length
+    // arm above: an explicit-undefined key survives 'in' and Object.keys.
+    const accentedRow = load(accented);
+    expect(accentedRow && 'craftedBy' in accentedRow).toBe(false);
+    const controlRow = load('Log\nherholm');
+    expect(controlRow && 'craftedBy' in controlRow).toBe(false);
     // The slot itself still survives the drop, exactly like the length arm.
-    expect(load(accented)?.durability).toBe(5);
+    expect(accentedRow?.durability).toBe(5);
   });
 
   it('confirmMode load coercion: kept modes, legacy absent reads always, garbage fails safe to prompt', () => {

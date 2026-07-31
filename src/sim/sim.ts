@@ -2697,6 +2697,12 @@ export class Sim {
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
       meta.equipmentInstance = {};
+      // ONE aggregated dev-channel line per character load, not one per row: a
+      // systematically corrupt blob (a bad migration) would otherwise log once
+      // per affected stack, and over-capacity inventories are tolerated rather
+      // than truncated, so that count is unbounded. Every container below
+      // pushes its drops here; the single warn sits after the bank load.
+      const droppedInstanceJunk: string[] = [];
       for (const [slot, instance] of Object.entries(
         s.equipmentInstance ?? s.equipmentInstances ?? {},
       )) {
@@ -2708,6 +2714,12 @@ export class Sim {
         const owned = instance.rift
           ? sanitizeRiftGearInstance(itemId, instance, player.id)
           : cloneItemInstancePayload(instance);
+        // A rift rebuild that REFUSES (item/payload mismatch, the anti-tamper
+        // arm) drops silently exactly as it did before the payload bound
+        // existed: routing the null through the bound would log "dropped
+        // item-instance junk: payload" for what is really a rift mismatch, a
+        // different cause with a different owner.
+        if (!owned) continue;
         // Both branches hand back a payload THIS load owns (a fresh clone, or
         // a fresh rebuild), which is what lets the shared load bound delete
         // keys in place (item_instance_load.ts). It bounds every string on
@@ -2717,13 +2729,13 @@ export class Sim {
         // On the RIFT branch the signer arm is DEAD, and saying so is the
         // point: sanitizeRiftGearInstance REBUILDS the payload from bounded
         // progression inputs and never copies a signer across, so nothing
-        // survives there for the name rule to bite on. Ordered AFTER the rift
-        // rebuild here, and BEFORE it on the bags arm below; the asymmetry is
-        // harmless precisely because the rebuild drops every key this bound
-        // could touch, but it is deliberate rather than accidental and must
-        // stay that way if either arm gains a rule the rebuild preserves.
+        // survives there for the name rule to bite on. Rift rebuild FIRST,
+        // then the bound, on BOTH this arm and the bags arm below: the
+        // rebuild reduces a corrupt rift payload to its bounded keys, so an
+        // over-keyed row that still carries a valid rift survives as the
+        // rebuilt payload instead of being destroyed by the key-count arm.
         const { payload: clean, dropped } = sanitizeItemInstancePayloadOnLoad(owned);
-        warnDroppedInstanceKeys(meta.name, dropped);
+        for (const d of dropped) droppedInstanceJunk.push(`equip.${slot}.${d}`);
         if (clean) meta.equipmentInstance[slot as EquipSlot] = clean;
       }
       // The shared tamper ceiling (bags.ts instancedCountCap, same rule as the
@@ -2737,22 +2749,32 @@ export class Sim {
         return slot;
       });
       for (const slot of meta.inventory) {
+        // Rift rebuild FIRST, matching the equip arm above: the rebuild
+        // reduces a corrupt rift payload to its bounded keys, so an over-keyed
+        // row that still carries a VALID rift survives as the rebuilt payload
+        // instead of being destroyed by the key-count arm before the rebuild
+        // could salvage it (the fix-round review caught the two arms
+        // disagreeing on exactly that blob). A refusal drops silently, same
+        // as the equip arm's anti-tamper rule.
+        if (slot.instance?.rift) {
+          const rebuilt = sanitizeRiftGearInstance(slot.itemId, slot.instance, player.id);
+          if (rebuilt) slot.instance = rebuilt;
+          else {
+            delete slot.instance;
+            continue;
+          }
+        }
         // The payload bound covers BAGS too (the review round: the mint sites
         // put signed instances into bags in the common case, so an
         // equipment-only clamp missed the container that carries most of
         // them). Same shared rule as the equip arm above, on the clone
-        // cloneInvSlot just made, and applied BEFORE the rift rebuild here
-        // (the equip arm applies it after; see the asymmetry note there).
+        // cloneInvSlot just made (or the fresh rift rebuild).
         if (slot.instance) {
           const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(slot.instance);
-          warnDroppedInstanceKeys(meta.name, dropped);
+          for (const d of dropped) droppedInstanceJunk.push(`bag.${slot.itemId}.${d}`);
           if (payload) slot.instance = payload;
           else delete slot.instance;
         }
-        if (!slot.instance?.rift) continue;
-        const clean = sanitizeRiftGearInstance(slot.itemId, slot.instance, player.id);
-        if (clean) slot.instance = clean;
-        else delete slot.instance;
       }
       if (s.bags === undefined) {
         // PRE-BAG save: the character earned this space under the infinite
@@ -2787,7 +2809,7 @@ export class Sim {
         // this leaves behind.
         if (slot.instance) {
           const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(slot.instance);
-          warnDroppedInstanceKeys(meta.name, dropped);
+          for (const d of dropped) droppedInstanceJunk.push(`buyback.${slot.itemId}.${d}`);
           if (payload) slot.instance = payload;
           else delete slot.instance;
         }
@@ -2796,7 +2818,8 @@ export class Sim {
       });
       // Bank sanitizes on load (never destroys items; a pre-bank save has no `bank`
       // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
-      meta.bank = sanitizeBankState(s.bank, meta.name);
+      meta.bank = sanitizeBankState(s.bank, meta.name, droppedInstanceJunk);
+      warnDroppedInstanceKeys(meta.name, droppedInstanceJunk);
       for (const q of s.questLog) {
         // Prune unknown quest ids at load (normalize on load, never crash): a save
         // mid a since-deleted quest (e.g. the retirement of

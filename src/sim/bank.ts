@@ -297,13 +297,17 @@ export function bankInfoFor(ctx: SimContext, pid: number): BankInfo | null {
  *  takes the shared load bound (item_instance_load.ts): junk KEYS drop, the row
  *  itself never does. `owner` names the character in that bound's dev-channel
  *  log only, and is optional because the unit tests call this with a raw blob
- *  and no character at all. */
-export function sanitizeBankState(raw: unknown, owner?: string): BankState {
+ *  and no character at all. When the caller passes `droppedSink` (Sim.addPlayer
+ *  does, to aggregate every container into ONE line per character load), drops
+ *  are pushed there instead of logged here; a sink-less call still logs one
+ *  aggregate line per CALL, never one per row. */
+export function sanitizeBankState(raw: unknown, owner?: string, droppedSink?: string[]): BankState {
   if (!raw || typeof raw !== 'object') {
     return { inventory: [], purchasedSlots: 0, bonusSlots: 0 };
   }
   const r = raw as { inventory?: unknown; purchasedSlots?: unknown; bonusSlots?: unknown };
   const inventory: InvSlot[] = [];
+  const localDrops: string[] = droppedSink ?? [];
   if (Array.isArray(r.inventory)) {
     for (const entry of r.inventory) {
       if (!entry || typeof entry !== 'object') continue;
@@ -343,13 +347,15 @@ export function sanitizeBankState(raw: unknown, owner?: string): BankState {
       // so dropping a junk key can never widen a tampered stack.
       if (cleaned.instance) {
         const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(cleaned.instance);
-        warnDroppedInstanceKeys(owner ?? 'bank', dropped);
+        for (const d of dropped) localDrops.push(`bank.${cleaned.itemId}.${d}`);
         if (payload) cleaned.instance = payload;
         else delete cleaned.instance;
       }
       inventory.push(cleaned);
     }
   }
+  // Sink-less callers (the unit tests) still get the aggregate diagnostic.
+  if (!droppedSink) warnDroppedInstanceKeys(owner ?? 'bank', localDrops);
   const maxPurchased = BANK_EXPANSION_PRICES.length * BANK_EXPANSION_SLOTS;
   let purchasedSlots = Math.max(
     0,

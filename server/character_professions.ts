@@ -216,13 +216,14 @@ export function characterProfessionsSheet(
     // blob the operator opened the inspector to diagnose.
     //
     // The two readings agree on every ARRAY, which is every legal blob, and
-    // deliberately diverge on a non-array iterable (a stored STRING is the
-    // only shape that reaches here): sanitizeKnownRecipeIds drops such a
-    // value whole, so the next login resolves ZERO while this row still
-    // counts the string's distinct characters. That is the intended
-    // inspector reading, because the sheet describes the blob as STORED,
-    // and a nonzero count beside an account that logs in with no recipes is
-    // the signal an operator is looking for.
+    // diverge on a non-array iterable (a stored STRING is the only shape
+    // that reaches here): sanitizeKnownRecipeIds drops such a value whole,
+    // so the next login resolves ZERO while this row counts the string's
+    // DISTINCT CHARACTERS, a garbage number that reads like a plausible
+    // recipe count. Known divergence, kept because the sheet describes the
+    // blob as stored; an operator diagnosing a recipe-less login against a
+    // nonzero row here should suspect a corrupt non-array value, not trust
+    // the number.
     knownRecipes: isIterable(state.knownRecipes) ? new Set(state.knownRecipes).size : 0,
     slots,
     nodeTimers,

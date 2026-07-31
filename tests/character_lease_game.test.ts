@@ -159,6 +159,35 @@ describe('character load lease, GameServer wiring', () => {
     expect(marketCall?.[5]).toBe('nonce-c');
   });
 
+  it('socketClosed with withMarket: false takes the plain save; the default keeps the market', async () => {
+    // The RECEIVING half of the mid-handshake re-check's market skip: the
+    // ws_auth suite pins what the caller passes and a source pin holds the
+    // parameter text, but only this proves game.ts actually routes the
+    // option through the real saveCharacter to the right db function
+    // (the fix-round audit: game.ts ignoring the option kept every test
+    // green).
+    const server = new GameServer();
+    const s = join(server, 103, 11, 'Dropper', 'nonce-d');
+    expect('error' in s).toBe(false);
+    vi.mocked(saveCharacterState).mockClear();
+    vi.mocked(saveCharacterAndMarketState).mockClear();
+    expect((server as any).socketClosed(s, s.ws, { withMarket: false })).toBe(true);
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(saveCharacterAndMarketState).not.toHaveBeenCalled();
+    expect(saveCharacterState).toHaveBeenCalledTimes(1);
+
+    // The default arm, on its own session (the first is linkdead now): an
+    // ordinary drop keeps the realm-global market halves.
+    const s2 = join(server, 104, 12, 'Dropperb', 'nonce-e');
+    expect('error' in s2).toBe(false);
+    vi.mocked(saveCharacterState).mockClear();
+    vi.mocked(saveCharacterAndMarketState).mockClear();
+    expect((server as any).socketClosed(s2, s2.ws)).toBe(true);
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(saveCharacterAndMarketState).toHaveBeenCalledTimes(1);
+    expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+
   it('a fenced-out save (false) warns, freezes lastSave, keeps deed records queued, and kicks the displaced session', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {

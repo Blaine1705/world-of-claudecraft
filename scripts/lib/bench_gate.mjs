@@ -177,9 +177,12 @@ export function profMinGapsFor(durationMs) {
 // rest, which is the same hollow artifact the boolean floor was written to
 // catch, only harder to see. One piece of role evidence per minute of window
 // (never below 1, so a sub-minute exploratory run still has to show
-// something). The committed 1,000-connection captures ran 15 to 20 per
-// observer over 180 s against a floor of 3, so honest runs clear it with
-// about 5x of margin.
+// something). The committed 1,000-connection captures predate the per-observer
+// evidence rows, but their roles.*.ncd presence counts put the GATHER arm at
+// roughly 21 (stable wire) to 275 (legacy wire) ncd-carrying snapshots per
+// observer over 180 s against a floor of 3, so honest runs clear it with 7x to
+// 92x of margin. The fish arm's outcome count is not recorded in that
+// committed set at all.
 export function profMinRoleEventsFor(durationMs) {
   return Math.max(1, Math.floor(durationMs / 60000));
 }

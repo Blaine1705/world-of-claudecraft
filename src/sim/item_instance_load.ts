@@ -67,13 +67,16 @@ export interface SanitizedItemInstancePayload {
 }
 
 /**
- * The ONE dev-channel line every call site emits when this bound removed
- * something, so the four sites cannot spell it differently. English by rule
- * (a developer log, never player text: see the i18n split in CLAUDE.md), and
- * a no-op when nothing dropped, so the call is safe to place unconditionally.
- * These bounds are otherwise entirely silent, which is what the phase 16
- * review objected to: a corrupt blob has to leave a trace an operator can
- * find, and this fires only for blobs no legal writer could have produced.
+ * The ONE dev-channel line per CHARACTER LOAD (never per row: a
+ * systematically corrupt blob would otherwise log once per affected stack,
+ * unbounded, since over-capacity inventories are tolerated). The call sites
+ * aggregate every container's drops into one sink and emit here once, so the
+ * spelling cannot drift apart. English by rule (a developer log, never
+ * player text: see the i18n split in CLAUDE.md), and a no-op when nothing
+ * dropped, so the call is safe to place unconditionally. These bounds are
+ * otherwise entirely silent, which is what the phase 16 review objected to:
+ * a corrupt blob has to leave a trace an operator can find, and this fires
+ * only for blobs no legal writer could have produced.
  */
 export function warnDroppedInstanceKeys(owner: string, dropped: readonly string[]): void {
   if (dropped.length === 0) return;
@@ -109,6 +112,16 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
   const record = payload as Record<string, unknown>;
   const keys = Object.keys(record);
   if (keys.length > MAX_INSTANCE_PAYLOAD_KEYS) {
+    return { payload: undefined, dropped: ['payload'] };
+  }
+  // A clone-mangled container: every call site deep-clones the STORED value
+  // first, and a `{ ...src }` spread turns an array or a string into an
+  // object of decimal-numeric keys before the plain-object arm above can see
+  // the original shape (the fix-round review measured `[1,2,3]` surviving as
+  // `{"0":1,"1":2,"2":3}`). No legal payload key is numeric, so an
+  // all-numeric-keyed payload is array or string junk wearing an object
+  // costume: drop it whole.
+  if (keys.length > 0 && keys.every((k) => /^\d+$/.test(k))) {
     return { payload: undefined, dropped: ['payload'] };
   }
   const dropped: string[] = [];

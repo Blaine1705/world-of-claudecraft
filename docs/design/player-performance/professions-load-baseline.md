@@ -23,25 +23,37 @@ piece of role evidence per minute of window, `max(1, floor(durationMs /
 60000))`, which is 3 across the 180 s window used here). The gate also holds
 each observer's WORST inter-snapshot gap under a 10,000 ms continuity
 ceiling, so a mid-window stall fails the run rather than averaging away into
-a healthy mean. These four captures clear both arms with margin: 15 to 20
-pieces of role evidence per observer against the floor of 3, and worst gaps
-of 707 to 795 ms against the ceiling. Every artifact stamps
+a healthy mean. These four captures clear both arms with margin: worst gaps
+of 707 to 795 ms against the ceiling, and roughly 21 (stable wire) to 275
+(legacy wire) ncd-carrying snapshots per gather observer against the floor of
+3. That second pair is RECONSTRUCTED from each artifact's `roles.*.ncd`
+counts, since the committed four predate the per-observer evidence rows; the
+fish arm's outcome counts survive only in each run's console verdict. Every
+artifact stamps
 `gitHead f881426ba1`, the commit whose rig produced it, so the whole set
-shares one provenance. The fix-round commits that landed AFTER the capture
-touch no measured loop phase: most change the rig itself (transactional
+shares one provenance. Two rounds of commits have landed on top of that tip
+since. The fix round: most of it changed the rig itself (transactional
 seeding, a helper rename, and moving the window-open perf fetch off the
-measured clock), and one (cdaf8478a7) also changed a sim LOAD path (the
-`addPlayer` signer and `craftedBy` clamp refinements), which runs once per
-character as the fleet joins and so lands in the ramp, not in any phase the
-tables below report. A recapture with the current rig therefore reproduces
-the server and wire numbers but reports slightly lower `rig.loopLagMs`
-figures than these artifacts carry. One more reason that figure reads high
-here: the periodic mid-window `/api/perf` scrape was awaited INSIDE the
-measured driver loop, so 18 of the window's 720 loop-lag samples each carry
-a scrape round trip and `rig.loopLagMs` modestly overstates pure loop lag on
-a saturated box (the server and wire numbers are unaffected). The QA round
-has since moved that periodic scrape off the measured clock too, so
-recaptures after it read lower still.
+measured clock), and one commit (cdaf8478a7) also changed a sim LOAD path
+(the `addPlayer` signer and `craftedBy` clamp refinements). The QA round then
+added five more, of which three matter to a reader of these tables:
+`81d4905380` is a SECOND sim load-path change (the item-instance payload
+bound), `7298751e2e` changes server teardown and boot behavior (the
+mid-handshake save scope and the pool-knob boot lines), and `f53c503eee`
+rewrote much of the rig itself. None of them touches a measured loop phase:
+both sim load-path changes run once per character as the fleet joins and so
+land in the ramp, the teardown and boot changes run outside the window
+entirely, and everything else is rig code. A recapture with the current rig
+therefore reproduces the server and wire numbers, but reports slightly lower
+`rig.loopLagMs` figures than these artifacts carry. One more reason that
+figure reads high here: the periodic mid-window `/api/perf` scrape was
+awaited INSIDE the measured driver loop, so 18 of the window's 720 loop-lag
+samples each carry a scrape round trip and `rig.loopLagMs` modestly
+overstates pure loop lag on a saturated box (the server and wire numbers are
+unaffected). The QA round has since moved that periodic scrape off the
+measured clock too, so recaptures after it read lower still. The QA round's
+own three re-captures ran at `c6e9ba1a20`, BEFORE the QA fix commits named
+here.
 Artifacts, one per scenario beside this file:
 `professions-load-mixed-stable.json`, `professions-load-gather-legacy.json`,
 `professions-load-gather-stable.json`, `professions-load-fish-stable.json`.
@@ -50,10 +62,13 @@ The rig now also stamps the gate's own inputs into each artifact, under
 `gapMaxMs` (the worst inter-snapshot gap the continuity arm reads),
 `sawStableTw`, `ncdFrames` (a COUNT of the snapshots whose ncd map arrived
 non-empty, not a boolean), and `fishingOutcomes`, so a reader can re-judge a
-committed capture instead of trusting the verdict line beside it. Alongside
-it the artifact carries `gitDirty`, `reportMs`, and the db-pool gauges
-`poolAtWindowOpen` and `poolAtWindowClose` (waiting, total, idle) scraped
-from `/metrics`. That endpoint is bearer-gated by the SERVER's
+committed capture instead of trusting the verdict line beside it, plus
+`verdict` itself (the `ok` flag and the failure strings). Alongside those the
+artifact carries `gitDirty`, `reportMs`, `observersRequested` and
+`observerCount` (the `OBSERVERS` knob against the observers actually staged),
+`fishSpotRotations` (fleet-wide self-healing spot rotations, the tell for a
+fish run fighting its shore spots), and the db-pool gauges `poolAtWindowOpen`
+and `poolAtWindowClose` (waiting, total, idle) scraped from `/metrics`. That endpoint is bearer-gated by the SERVER's
 `METRICS_TOKEN` (404 when the server has none, 401 on a wrong credential),
 so a run without the token stamps both pool fields null: disclosure, never a
 gate input, and such a run is still a valid capture. The four artifacts
@@ -106,17 +121,26 @@ DATABASE_URL=postgres://eastbrook:<throwaway>@127.0.0.1:5434/eastbrook \
 The four scenarios vary only `MODE` (`mixed` | `gather` | `fish`) and `STABLE`
 (`1` requests the stable timer wire; `0` rides the legacy per-tick arm every
 `scripts/*.mjs` client rides by default). The rig's own defaults carried the
-rest and are stamped into each artifact: `WARMUP_MS` 45000,
-`CONNECT_CONCURRENCY` 20, `OBSERVERS` 32, `TOUR_SEC` 6, `NODES_PER_BOT` 40,
-`STEP_MS` 250, `BOT_LEVEL` 60 (stamped as `botLevel`), and `REPORT_MS` 10000
-(stamped as `reportMs`), the mid-window `/api/perf` scrape cadence: a 180 s
-window at one scrape per 10 s is the 18 entries in every artifact's
-`serverPerfMid`. `REALM_NAME`
+rest: `WARMUP_MS` 45000, `CONNECT_CONCURRENCY` 20, `OBSERVERS` 32, `TOUR_SEC`
+6, `NODES_PER_BOT` 40, `STEP_MS` 250, `BOT_LEVEL` 60, and `REPORT_MS` 10000,
+the mid-window `/api/perf` scrape cadence: a 180 s window at one scrape per
+10 s is the 18 entries in every artifact's `serverPerfMid`. Most of those
+knobs are stamped into each artifact (`warmupMs`, `connectConcurrency`,
+`tourSec`, `nodesPerBot`, `stepMs`, `botLevel`); `reportMs` and
+`observersRequested` are stamped by the CURRENT rig only, and the four
+artifacts committed here predate both fields. `REALM_NAME`
 defaults to `Claudemoon` and must match the realm the server runs, so a
 locally renamed realm has to be passed to the rig as well.
 
 Capture protocol, learned the hard way:
 
+- **Both env vars on the server line are load-bearing, not decoration.**
+  `ALLOW_DEV_COMMANDS=1` is what the entire workload rides (`dev_level`,
+  `dev_give`, `dev_teleport`, and the `/dev gather` proficiency grants), and
+  without `PERF_TICK_LOG=1` the server's detailed-timing switch stays off, so
+  the `bcastSelf`, `bcastGrid` and sim-lap rows of every table below read 0.0
+  while the rig's gate, which never looks at server perf at all, still stamps
+  PASS on the run.
 - **`DB_POOL_MAX_CLIENTS=80` is load-bearing, not tuning.** On the 10-client
   default the ramp collapses long before 1,000: the 30 s autosave waves
   (every session, whole blob, no dirty tracking) hold the pool while login
@@ -157,9 +181,9 @@ Capture protocol, learned the hard way:
   `"players_online":0`. Abort the scenario if any check fails; the recipe
   has no committed wrapper that does this for you. After a release merge, do
   one throwaway boot first: ensureSchema's boot-time CREATE INDEX
-  CONCURRENTLY migrations (v0.33.0 added play_sessions_ended_account) build
-  on a grown throwaway database while the boot holds the advisory lock, and
-  the three checks read that first boot as a wedged server.
+  CONCURRENTLY migrations (`play_sessions_ended_account` is one) build on a
+  grown throwaway database while the boot holds the advisory lock, and the
+  three checks read that first boot as a wedged server.
 - **The rig measures itself.** `rig.loopLagMs` in each artifact is the
   driver-loop lag; at 1,000 sockets on the shared box its p95 ran 313 to
   508 ms across the four captures, so treat client-side GAP numbers as
@@ -188,7 +212,9 @@ Capture protocol, learned the hard way:
   even with cleanup, tables referencing accounts with ON DELETE SET NULL
   (chat logs, reports, moderation trails) keep their rows. Those same
   referrers make teardown cost grow with the database it reuses: the delete
-  is one bulk `DELETE FROM accounts`, but Postgres still enforces every
+  runs as chunked `DELETE FROM accounts WHERE id = ANY(...)` statements, 100
+  account ids each so the lock window stays short enough for a character save
+  still in flight to interleave, but Postgres still enforces every
   SET NULL reference row by row, and the columns with no index behind them
   (`chat_logs.account_id` is the volume one: the table indexes `created_at`
   and `(character_id, created_at)` only) cost a scan per deleted account.
@@ -197,10 +223,11 @@ Capture protocol, learned the hard way:
   progressively slower. Fine for a disposable container; never point the rig
   anywhere else (the loopback guards refuse it).
 - **The entity counts are capture-time-relative.** The four tables' 1,824 to
-  1,832 entities predate the v0.33.0 rift scheduler (one portal per eligible
-  zone hourly, eleven eligible zones): a recapture at the merged tip reads
-  about ten entities higher from rift portal ground objects, from the rift
-  cadence and not from anything the professions path does.
+  1,832 entities predate the rift scheduler (one portal per eligible zone
+  hourly, across the zones `eligibleRiftZones()` in `src/sim/rift/portals.ts`
+  returns): a recapture at the merged tip reads about ten entities higher from
+  rift portal ground objects, from the rift cadence and not from anything the
+  professions path does.
 
 ## Results
 
@@ -237,9 +264,9 @@ captured.
 The per-role byte rows are the SAMPLED quantity: 32 observers on a stride of
 31 bots, which under-samples the heaviest interest sets and so understates
 fleet-wide snapshot cost. `Fleet receive rate per bot` is the ground truth
-(summed over all 1,000 bots) and already carries that tail; a forensics pass
-put the residual between the two at about 25 percent here, against 5 to 10
-percent in the single-role runs.
+(summed over all 1,000 bots) and already carries that tail; reconstructing the
+sampled rate from each artifact's `roles` block puts the residual between the
+two at about 20 percent here, against 4 to 9 percent in the single-role runs.
 
 ### 2. gather-legacy (1,000 gatherers, the pre-stable per-tick ncd arm)
 
@@ -292,8 +319,9 @@ the legacy arm pays back.
 
 The fish scenario's larger snapshots are CO-LOCATION, not professions wire:
 1,000 anglers over 64 spots is about 16 anglers per SPOT, and an interest set
-holds more than one spot's worth, since the roughly 120 yd interest radius
-reaches past the spot a client stands on. `bcastGrid` (the entity stream)
+holds more than one spot's worth, since the 90 yd player interest radius
+(`INTEREST_RADIUS` in `server/game.ts`; the wider 120 yd one is the NPC
+radius) reaches past the spot a client stands on. `bcastGrid` (the entity stream)
 carries the growth while `bcastSelf` stays flat across all four scenarios
 (15.4 to 17.4 ms mean). That matches the packet's standing finding that
 professions self-deltas are cheap and crowding is the broadcast cost.

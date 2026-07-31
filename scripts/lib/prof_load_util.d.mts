@@ -10,6 +10,11 @@ export declare function mulberry32(seed: number): () => number;
 export declare function lettersOf(n: number): string;
 export declare function ipFor(n: number): string;
 export declare function sanitizeBaseUrl(urlStr: string): string;
+export declare function terminalAwareGapMax(
+  gapMax: number,
+  lastSnapAtMs: number | undefined,
+  windowCloseAtMs: number,
+): number;
 
 export interface FishingSpot {
   x: number;

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { CrowdSample, ProfessionsObserverEvidence } from '../scripts/lib/bench_gate.mjs';
 import {
@@ -462,26 +463,49 @@ describe('evaluateProfessionsLoadRun join and observer floors', () => {
     expect(v).toEqual({ ok: true, failures: [], minGaps: 50, minRoleEvents: 1 });
   });
 
-  it('passes the committed 180 s capture shape with its real evidence counts', () => {
-    // The compatibility check the fix round owes the four checked-in
-    // artifacts: 283 snapshots an observer (282 gaps), worst gaps 707 to 795
-    // ms, 15 to 20 ncd frames / fishing outcomes each, against the 180 s
-    // floors (180 gaps, 3 role events, 10 s continuity ceiling).
-    const v = evaluateProfessionsLoadRun({
-      ...PROF_RUN_180S,
-      observers: [
-        profObserver({ gaps: 282, gapMaxMs: 708.7, ncdFrames: 15 }),
-        profObserver({
-          label: 'obs-9',
-          role: 'fish',
-          gaps: 282,
-          gapMaxMs: 795,
-          ncdFrames: 0,
-          fishingOutcomes: 20,
-        }),
-      ],
-    });
-    expect(v).toEqual({ ok: true, failures: [], minGaps: 180, minRoleEvents: 3 });
+  it('the four COMMITTED captures clear the strengthened floors, read from their artifacts', () => {
+    // The compatibility check the fix round owes the checked-in evidence,
+    // derived from the artifacts rather than hand-typed (the fix-round audit
+    // caught the first draft using invented counts that could not fail):
+    // per artifact and role, the worst observer gap must clear the
+    // continuity ceiling, the per-observer gap count must clear the sample
+    // floor, and the observer-mean ncd evidence must clear the role floor.
+    // fishingOutcomes is recorded in NO committed artifact (the doc
+    // discloses this), so the fish role floor is judged only where ncd
+    // presence stands in: the gather arms of all three gather-bearing
+    // artifacts.
+    const dir = new URL('../docs/design/player-performance/', import.meta.url);
+    const names = [
+      'professions-load-mixed-stable.json',
+      'professions-load-gather-legacy.json',
+      'professions-load-gather-stable.json',
+      'professions-load-fish-stable.json',
+    ];
+    for (const name of names) {
+      const art = JSON.parse(readFileSync(new URL(name, dir), 'utf8')) as {
+        durationMs: number;
+        roles: Record<
+          string,
+          {
+            observers: number;
+            snapshots: number;
+            gapMaxWorst: number;
+            ncd: { presenceRatio: number };
+          }
+        >;
+      };
+      expect(art.durationMs).toBe(180000);
+      for (const [role, r] of Object.entries(art.roles)) {
+        const label = `${name} ${role}`;
+        expect(r.gapMaxWorst, label).toBeLessThanOrEqual(PROF_MAX_OBSERVER_GAP_MS);
+        const gapsPerObserver = Math.floor(r.snapshots / r.observers) - 1;
+        expect(gapsPerObserver, label).toBeGreaterThanOrEqual(profMinGapsFor(art.durationMs));
+        if (role === 'gather') {
+          const meanNcdFrames = Math.round((r.snapshots / r.observers) * r.ncd.presenceRatio);
+          expect(meanNcdFrames, label).toBeGreaterThanOrEqual(profMinRoleEventsFor(art.durationMs));
+        }
+      }
+    }
   });
 
   it('pins the shed-aware floor: one gap per second of window with a 50-gap minimum', () => {

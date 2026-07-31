@@ -36,7 +36,7 @@ import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
 import { MAX_CRAFTED_BY_LENGTH } from '../src/sim/professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH, MAX_KNOWN_RECIPE_IDS } from '../src/sim/professions/training';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
-import { EQUIP_SLOTS } from '../src/sim/types';
+import { EQUIP_SLOTS, type InvSlot } from '../src/sim/types';
 
 const makeSim = (seed = 31) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
 
@@ -71,6 +71,12 @@ const PROFESSIONS_BLOB_FIELDS = [
 // included, since a key absent from the fixture is harmless here while a
 // missing one is not.
 const NON_PROFESSIONS_BLOB_FIELDS = [
+  // Written by the SERVER, not by serializeCharacter: server/game.ts stamps
+  // state.jail onto the serialized blob before persisting, so no sim fixture
+  // can arm it and the source scrape below cannot see it either. Classified
+  // here explicitly so the complement pin stays honest about the one key
+  // that enters the blob outside the serializer.
+  'jail',
   'contentRevision',
   'level',
   'xp',
@@ -349,6 +355,30 @@ describe('the professions blob growth bound (phase 16)', () => {
     const nonProfessions = new Set<string>(NON_PROFESSIONS_BLOB_FIELDS);
     const professionsKeys = Object.keys(state).filter((key) => !nonProfessions.has(key));
     expect(professionsKeys.sort()).toEqual([...PROFESSIONS_BLOB_FIELDS].sort());
+    // FIXTURE-INDEPENDENCE ARM (the fix-round audit): the settled fixture
+    // cannot arm every CONDITIONAL key, so also scrape the keys the
+    // serializer actually WRITES out of its source (conditional spreads
+    // included) and require each to be classified in one of the two lists.
+    // The one key written OUTSIDE serializeCharacter is the server's jail
+    // stamp (server/game.ts assigns state.jail after serialization), which
+    // the allowlist carries explicitly for that reason.
+    const simSrc = readFileSync(new URL('../src/sim/sim.ts', import.meta.url), 'utf8');
+    const serializeStart = simSrc.indexOf('serializeCharacter(');
+    expect(serializeStart).toBeGreaterThan(-1);
+    const body = simSrc.slice(serializeStart, simSrc.indexOf('\n  }', serializeStart));
+    const written = new Set<string>();
+    for (const m of body.matchAll(
+      /^\s{6}(?:\.\.\.\((?:[^)]*&&\s*)?\{\s*)?([A-Za-z][A-Za-z0-9]*):/gm,
+    )) {
+      written.add(m[1]);
+    }
+    expect(written.size).toBeGreaterThan(20); // the scrape genuinely parsed the literal
+    for (const key of written) {
+      expect(
+        nonProfessions.has(key) || (PROFESSIONS_BLOB_FIELDS as readonly string[]).includes(key),
+        `serialized key "${key}" is classified in neither field list`,
+      ).toBe(true);
+    }
   });
 
   it('oversized junk drops on load, alone, in every container that carries an instance', () => {
@@ -456,6 +486,40 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(s2.bank?.inventory?.[1]?.instance?.signer).toBe(legalSigner);
     expect('signer' in (s2.vendorBuyback?.[0]?.instance ?? {})).toBe(false);
     expect(s2.vendorBuyback?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
+  });
+
+  it('a bagged over-keyed payload with a VALID rift survives as the rebuilt payload', () => {
+    // THE ORDER PIN (fix-round review): the bags arm used to run the payload
+    // bound BEFORE the rift rebuild, so an over-keyed row that still carried
+    // a valid rift was destroyed by the key-count arm while the SAME row on
+    // an equipped slot survived (the rebuild reduces it to its bounded keys
+    // first). Both arms now rebuild first; this red-goes-green only under
+    // that order.
+    const sim = ceilingSim();
+    const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
+    const junkKeys = Object.fromEntries(
+      Array.from({ length: 30 }, (_, i) => [`junk${i}`, i] as const),
+    );
+    s1.inventory = [
+      ...(s1.inventory ?? []),
+      {
+        itemId: 'riftbound_band_of_might',
+        count: 1,
+        instance: {
+          ...junkKeys,
+          rift: { tier: 'C', upgradeLevel: 1, sourceEventId: 'evt_order_pin', gems: [] },
+        } as unknown as InvSlot['instance'],
+      },
+    ];
+    const second = makeSim(41);
+    const pid2 = second.addPlayer('warrior', 'RiftOrder', { state: s1 });
+    const s2 = second.serializeCharacter(pid2) as CharacterState;
+    const row = s2.inventory?.find((slot) => slot.itemId === 'riftbound_band_of_might');
+    expect(row?.instance?.rift).toBeTruthy();
+    const rebuiltRift = row?.instance?.rift as { sourceEventId?: string } | undefined;
+    expect(rebuiltRift?.sourceEventId).toBe('evt_order_pin');
+    // The rebuild, not the junk, is what survived.
+    expect('junk0' in (row?.instance ?? {})).toBe(false);
   });
 
   it('a knownRecipes value stored as a STRING loads the character instead of throwing', () => {
