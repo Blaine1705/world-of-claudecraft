@@ -17,16 +17,38 @@ Captured 2026-07-31 (UTC). All four scenarios joined exactly 1,000 of 1,000
 bots with all 1,000 alive at window close, and passed the rig's own gate
 (`evaluateProfessionsLoadRun`: unconditional join and liveness enforcement,
 per-observer sample floors, timer-wire arm purity, and window-scoped
-hollow-run evidence). Every artifact stamps `gitHead f881426ba1`, the commit
-whose rig produced it, so the whole set shares one provenance. The fix-round
-commits that landed AFTER the capture touch no measured server path; they
-change the rig itself (transactional seeding, a helper rename, and moving
-the window-open perf fetch off the measured clock), so a recapture with the
-current rig reproduces the server and wire numbers but reports slightly
-lower `rig.loopLagMs` figures than these artifacts carry.
+hollow-run evidence, whose floors scale with the window instead of accepting
+one lone harvest or fishing outcome as proof the run was not hollow). The
+gate also holds each observer's WORST inter-snapshot gap under a continuity
+ceiling, so a mid-window stall fails the run rather than averaging away into
+a healthy mean; the ceiling is deliberately generous, and these four
+captures' worst gaps ran 707 to 795 ms. Every artifact stamps
+`gitHead f881426ba1`, the commit whose rig produced it, so the whole set
+shares one provenance. The fix-round commits that landed AFTER the capture
+touch no measured loop phase: most change the rig itself (transactional
+seeding, a helper rename, and moving the window-open perf fetch off the
+measured clock), and one (cdaf8478a7) also changed a sim LOAD path (the
+`addPlayer` signer and `craftedBy` clamp refinements), which runs once per
+character as the fleet joins and so lands in the ramp, not in any phase the
+tables below report. A recapture with the current rig therefore reproduces
+the server and wire numbers but reports slightly lower `rig.loopLagMs`
+figures than these artifacts carry. One more reason that figure reads high
+here: the periodic mid-window `/api/perf` scrape was awaited INSIDE the
+measured driver loop, so 18 of the window's 720 loop-lag samples each carry
+a scrape round trip and `rig.loopLagMs` modestly overstates pure loop lag on
+a saturated box (the server and wire numbers are unaffected). The QA round
+has since moved that periodic scrape off the measured clock too, so
+recaptures after it read lower still.
 Artifacts, one per scenario beside this file:
 `professions-load-mixed-stable.json`, `professions-load-gather-legacy.json`,
 `professions-load-gather-stable.json`, `professions-load-fish-stable.json`.
+The rig now also stamps the gate's own inputs into each artifact: a
+per-observer evidence row (`gaps`, `sawStableTw`, `ncdSeen`,
+`fishingOutcomes`, worst gap), the pool metrics scraped from `/metrics`
+(waiting, total, idle), `gitDirty`, and `REPORT_MS`. The four artifacts
+committed here predate those fields, so their gate inputs live outside the
+files, in the run's console verdict and log; a recapture's artifact carries
+more than these do.
 
 ## Capture machine
 
@@ -52,6 +74,10 @@ docker run -d --name wocc-prof-load-pg -p 127.0.0.1:5434:5432 \
   -e POSTGRES_USER=eastbrook -e POSTGRES_PASSWORD=<throwaway> \
   -e POSTGRES_DB=eastbrook postgres:16-alpine
 
+# In BOTH shells (server and rig): each side holds 1,000 sockets, and macOS's
+# 256 soft default hits EMFILE partway up the ramp.
+ulimit -n 10240
+
 ALLOW_DEV_COMMANDS=1 PERF_TICK_LOG=1 PORT=8799 DB_POOL_MAX_CLIENTS=80 \
   DATABASE_URL=postgres://eastbrook:<throwaway>@127.0.0.1:5434/eastbrook \
   npm run server
@@ -68,7 +94,11 @@ The four scenarios vary only `MODE` (`mixed` | `gather` | `fish`) and `STABLE`
 `scripts/*.mjs` client rides by default). The rig's own defaults carried the
 rest and are stamped into each artifact: `WARMUP_MS` 45000,
 `CONNECT_CONCURRENCY` 20, `OBSERVERS` 32, `TOUR_SEC` 6, `NODES_PER_BOT` 40,
-`STEP_MS` 250.
+`STEP_MS` 250, `BOT_LEVEL` 60 (stamped as `botLevel`), and `REPORT_MS` 10000,
+the mid-window `/api/perf` scrape cadence: a 180 s window at one scrape per
+10 s is the 18 entries in every artifact's `serverPerfMid`. `REALM_NAME`
+defaults to `Claudemoon` and must match the realm the server runs, so a
+locally renamed realm has to be passed to the rig as well.
 
 Capture protocol, learned the hard way:
 
@@ -77,17 +107,30 @@ Capture protocol, learned the hard way:
   (every session, whole blob, no dirty tracking) hold the pool while login
   handshakes wait out the pool connect timeout, surfacing to the client as
   the relabeled 'authentication timed out'. The production default is
-  unchanged; the knob parses strictly (decimal digits only, ceiling at the
-  stock postgres:16 connection budget of 100).
+  unchanged; the knob parses strictly (decimal digits only, 1 to 97, the
+  share of stock postgres:16's 100-connection budget left after the
+  superuser reservation). An out-of-range or malformed value is NOT clamped
+  down to the ceiling: it falls back to the 10-client default and says so
+  with a loud `console.error`. That fallback is why the knob deserves a
+  second look before every capture; while the error line was missing, a
+  capture launched with 120 ran silently on 10 clients and reproduced the
+  exact collapse this bullet warns about.
 - **The WS auth deadline is NOT a lever here.** The 10 s timer clears when
   the FIRST frame arrives, before any handshake database work, so raising it
   cannot help the ramp (a knob added mid-phase on that wrong theory was
   reverted by the review round). What converges the ramp instead: the join
   pool TAPERS to five concurrent workers past 70 percent joined, the client
   never aborts a handshake the server is still deciding (30 s client timeout
-  against the 10 s server deadline), and the retry passes escalate 5 s to
-  90 s. A mid-handshake socket death used to orphan a permanent
-  lease-holding zombie session that made a character unjoinable; that server
+  against the 10 s server deadline), the retry passes escalate 5 s to 90 s,
+  and every bot teleport-disperses at ITS OWN hello (`seedSession` fires the
+  `dev_teleport` the moment that bot's join lands, so the fleet spreads while
+  it is still joining). The dispersal is the one the code names as the fix
+  for the first observed 1,000-bot failure: 1,000 fresh characters otherwise
+  pile onto a single spawn point, interest goes quadratic there, the loop
+  callback drags past the server's 10 s auth deadline, and the handshakes
+  still in flight starve. A mid-handshake socket death used to orphan a
+  permanent lease-holding zombie session that made a character unjoinable;
+  that server
   defect was found and FIXED in this phase (the ws_auth readyState re-check),
   and post-fix the tail failures are clean rejections the ladder converges.
 - **Verify the fresh bind, by hand, before every scenario.** A dying server
@@ -128,9 +171,16 @@ Capture protocol, learned the hard way:
   to the rig invocation to delete the seeded accounts at teardown (the
   recipe above omits it, so each scenario leaves its fleet's rows behind);
   even with cleanup, tables referencing accounts with ON DELETE SET NULL
-  (chat logs, reports, moderation trails) keep their rows. Fine for a
-  disposable container; never point the rig anywhere else (the loopback
-  guards refuse it).
+  (chat logs, reports, moderation trails) keep their rows. Those same
+  referrers make teardown cost grow with the database it reuses: the delete
+  is one bulk `DELETE FROM accounts`, but Postgres still enforces every
+  SET NULL reference row by row, and the columns with no index behind them
+  (`chat_logs.account_id` is the volume one: the table indexes `created_at`
+  and `(character_id, created_at)` only) cost a scan per deleted account.
+  Measured at 1.7 s for the fleet against a database holding only about 50k
+  chat rows, so a container reused across all four scenarios tears down
+  progressively slower. Fine for a disposable container; never point the rig
+  anywhere else (the loopback guards refuse it).
 - **The entity counts are capture-time-relative.** The four tables' 1,824 to
   1,832 entities predate the v0.33.0 rift scheduler (one portal per eligible
   zone hourly, eleven eligible zones): a recapture at the merged tip reads
@@ -143,8 +193,15 @@ Server phase times are per LOOP CALLBACK (one broadcast plus however many
 catch-up sim ticks ran), from the ring described above at capture close.
 Snapshot sizes are bytes per received `snap` frame across the parsing
 observers; `ncd/tslot per-snap` is that field's average VALUE-payload byte
-cost per snapshot under the delta rules (the field key and separator, about
-7 bytes when present, are excluded by the measurement's re-stringify).
+cost per snapshot under the delta rules (the field key and separator, 7 bytes
+for `ncd` and 9 for `tslot` when present, are excluded by the measurement's
+re-stringify). The `Sim tick rate under catch-up` row in each table is a
+SINGLE tail sample: `TickRateMeter` averages a 3 s window and the tables read
+it from the scrape taken at window close. The 18 mid-window samples each
+artifact carries in `serverPerfMid` run 15.38 to 16.03 Hz across the four
+scenarios, with per-scenario means of 15.39 to 15.72 Hz, and it is those
+means the projection's 'near 15.5 Hz' tracks; the table values stand as
+captured.
 
 ### 1. mixed-stable (the flagship: 500 gather + 500 fish, stable timer wire)
 
@@ -161,6 +218,13 @@ cost per snapshot under the delta rules (the field key and separator, about
 | Server broadcast p50 / p95 / max | 63.4 / 87.5 / 111.6 ms (bcastSelf 15.3 / 24.0 / 30.2) |
 | Sim tick rate under catch-up | 15.8 Hz at 1,832 entities |
 | Rig loop lag p95 | 475.3 ms |
+
+The per-role byte rows are the SAMPLED quantity: 32 observers on a stride of
+31 bots, which under-samples the heaviest interest sets and so understates
+fleet-wide snapshot cost. `Fleet receive rate per bot` is the ground truth
+(summed over all 1,000 bots) and already carries that tail; a forensics pass
+put the residual between the two at about 25 percent here, against 5 to 10
+percent in the single-role runs.
 
 ### 2. gather-legacy (1,000 gatherers, the pre-stable per-tick ncd arm)
 
@@ -212,11 +276,12 @@ the legacy arm pays back.
 | Rig loop lag p95 | 507.6 ms |
 
 The fish scenario's larger snapshots are CO-LOCATION, not professions wire:
-1,000 anglers over 64 spots is about 16 players per interest set, and
-`bcastGrid` (the entity stream) carries the growth while `bcastSelf` stays
-flat across all four scenarios (15.4 to 17.4 ms mean). That matches the
-packet's standing finding that professions self-deltas are cheap and
-crowding is the broadcast cost.
+1,000 anglers over 64 spots is about 16 anglers per SPOT, and an interest set
+holds more than one spot's worth, since the roughly 120 yd interest radius
+reaches past the spot a client stands on. `bcastGrid` (the entity stream)
+carries the growth while `bcastSelf` stays flat across all four scenarios
+(15.4 to 17.4 ms mean). That matches the packet's standing finding that
+professions self-deltas are cheap and crowding is the broadcast cost.
 
 ## What the projection takes from this
 
