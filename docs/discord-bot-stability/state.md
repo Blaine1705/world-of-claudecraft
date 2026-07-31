@@ -590,6 +590,16 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   settimeout-fractional-delay-fires-early) do not exist in the memory store, and neither
   does env-empty-numeric-default-shift, which phase-02 cites; the rules themselves are
   real and are now written down here and at the seams that depend on them.
+- **A sibling session's git worktree parked INSIDE the repo root fails the gate, and the
+  failure looks like yours.** `scripts/malware_scan.mjs` and `tests/malware_scan.test.ts`
+  walk the whole working tree, so a checkout under `.worktrees/<branch>/` contributes every
+  `child_process` import and `new Function` in it as a high-severity `rce-obfuscation`
+  finding. Phase 2 QA hit this: `npm run gate` aborted at the malware step with 194 high
+  findings, 100 percent of them inside `.worktrees/fix-play-map-level-toggle`, a worktree
+  another session registered mid-session. Diagnose it by running the scanner in a clean
+  detached worktree of HEAD (it passed there, 4445 files, 0 high) rather than by triaging
+  the findings, and do NOT delete another session's worktree. Worktrees under
+  `.claude/worktrees/` are equally exposed, so remove your own before gating.
 - **Discord's `X-RateLimit-Bucket` is NOT a bucket identity on its own.** It is
   documented as non-inclusive of the top-level (major) resource, so two channels or two
   guilds hit on the same route answer with the SAME hash while holding separate limits.

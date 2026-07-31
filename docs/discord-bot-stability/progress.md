@@ -286,7 +286,18 @@ so the pause loop spun forever and the bot never sent again.
 
 Validation: `npx tsc --noEmit` clean, 308 tests green across the eleven bot suites (was
 283 at the phase tip), `npm run build:bot` green, `npm run ci:changed` exit 0 with
-error-level diagnostics clean on every touched file. `.env.example` could not be
+error-level diagnostics clean on every touched file.
+
+The gate aborted at the MALWARE SCAN, and it is environmental rather than a regression:
+all 194 high findings sit inside `.worktrees/fix-play-map-level-toggle`, a worktree another
+session registered in this checkout mid-run, and the scanner walks the whole working tree.
+A clean detached worktree of HEAD scans PASS (4445 files, 0 high). The remaining seven gate
+steps were then run by hand and all pass: biome on changed files, sfx check, typecheck, and
+the env, server, bot and client builds. The full suite is 23065 passed with exactly two
+failures, both proven environmental in that same clean copy: `tests/malware_scan.test.ts`
+(the same foreign worktree, and it PASSES in the clean copy) and `tests/texture_upload.test.ts`
+(the known Three.js version-pin drift, which fails in the clean copy too and on the
+pre-phase base). No `src/` file is touched by this packet. `.env.example` could not be
 re-verified by the QA session: every `.env*` path stays denied at the harness level, so
 R8 is carried on the Phase 2 record and the four keys were not re-read here.
 
