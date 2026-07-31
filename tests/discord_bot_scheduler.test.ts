@@ -429,9 +429,15 @@ describe('scheduler driver', () => {
     expect(inFlightAt).toEqual([11_000]);
 
     // The kick lands FIRST, while the task is still live, so a follow-up really is
-    // pending when stop() arrives. Stopping with nothing pending would be settled by
-    // schedule()'s own inactive guard, and the case would pass with the in-flight
-    // generation check deleted.
+    // pending when stop() arrives: this reaches the followUpNow branch of the
+    // settle, which stopping with nothing pending would not.
+    //
+    // Honest limit, corrected in the third mutation round: this case does NOT pin
+    // the in-flight GENERATION check, and an earlier comment here claimed it did.
+    // Deleting either half of that check survives, because the task stays stopped
+    // and `!this.active` settles the run on its own. The generation is only
+    // load bearing once a restart makes `active` true again while a stale run is
+    // still in flight, which is a separate case in the lifecycle block below.
     busy.kick();
     busy.stop();
     // And a kick after stop is ignored outright.
@@ -673,6 +679,45 @@ describe('scheduler debounce mode (the presence push)', () => {
     expect(runAt).toEqual([4000, 10_000]);
   });
 
+  it('opens its window at the ACTIVE interval, never the idle or the decayed one', async () => {
+    // Found by mutation, third round: swapping armDebounce's `activeMs` for
+    // `idleMs` survived the whole suite, because every debounce case above sets
+    // activeMs ALONE, and resolveCadence then makes idleMs equal to it. So the
+    // two values were never distinguishable and the window read whichever it
+    // liked. This case sets them apart.
+    //
+    // The second half pins the other door into the same bug: a debounce window is
+    // the DEBOUNCE, so it must come from the cadence, never from the task's own
+    // decayed interval. Nothing else says so, and the two are equal until an empty
+    // run has stretched one of them.
+    const clock = syntheticClock();
+    const runAt: number[] = [];
+    const scheduler = new LoopScheduler(clockTimers(clock), () => 0);
+    const task = scheduler.add({
+      name: 'presence-push',
+      mode: 'debounce',
+      cadence: { activeMs: 4000, idleMs: 30_000 },
+      run: async () => {
+        runAt.push(clock.now());
+      },
+    });
+
+    task.start();
+    task.kick();
+    await clock.advanceTo(4000);
+    expect(runAt).toEqual([4000]); // 4000, not the idle 30_000
+
+    // That run reported no work, so the task's own interval decayed. The next
+    // window must ignore it and stay one active interval wide.
+    expect(task.intervalMs()).toBe(8000);
+    task.kick();
+    await clock.advanceTo(7999);
+    expect(runAt).toEqual([4000]);
+    await clock.advanceTo(8000);
+    expect(runAt).toEqual([4000, 8000]); // 4000 + 4000, not 4000 + 8000
+    task.stop();
+  });
+
   it('cancels an armed window on stop, and ignores kicks afterwards', async () => {
     const { clock, runAt, task, gate } = debounceRig();
     gate.resolve();
@@ -765,6 +810,56 @@ describe('scheduler kick from IDLE, and the task lifecycle', () => {
     await clock.advanceTo(11_000);
     // Exactly one more: the pre-stop chain did not resume alongside the new one.
     expect(runAt).toEqual([1000, 11_000]);
+    task.stop();
+  });
+
+  it('leaves only the NEW chain armed when a restart lands mid-run', async () => {
+    // The one case the generation counter actually decides, and the one the
+    // restart case above does not reach: stop() arrives while a run is still in
+    // flight, start() arms a fresh chain, and only THEN does the old run settle.
+    // Its settle must not re-arm, or the delay start() just armed is silently
+    // replaced by one computed from the stale run's state.
+    //
+    // Found by mutation, third round: deleting the `generation++` in stop(), or
+    // the generation half of the in-flight check in execute(), survived the whole
+    // suite. The existing mid-run stop case cannot see either, because there the
+    // task stays stopped and `!this.active` settles it on its own; only a restart
+    // makes `active` true again while a stale run is still holding a generation.
+    //
+    // The decaying cadence is what makes the two outcomes tell apart. The chain
+    // start() armed carries the PRE-settle interval (1000), so the next run is at
+    // 2000; a settle that wrongly re-armed would cancel it and arm the DECAYED
+    // interval instead (2000 from t=1000), putting the run at 3000.
+    const clock = syntheticClock();
+    const runAt: number[] = [];
+    const gate = deferred();
+    const scheduler = new LoopScheduler(clockTimers(clock), () => 0.5);
+    const task = scheduler.add({
+      name: 'sweep',
+      cadence: { activeMs: 1000, idleMs: 8000 },
+      run: async () => {
+        runAt.push(clock.now());
+        if (runAt.length === 1) await gate.promise;
+        return false; // no work, so an errant settle decays before it re-arms
+      },
+    });
+
+    task.start();
+    await clock.advanceTo(1000);
+    expect(runAt).toEqual([1000]);
+
+    task.stop();
+    task.start();
+    gate.resolve();
+
+    await clock.advanceTo(2000);
+    expect(runAt).toEqual([1000, 2000]);
+    // The stale settle did decay the shared interval, and the run at 2000 carried
+    // it forward from there: 2000 doubles to 4000, so the next run is at 6000.
+    await clock.advanceTo(5999);
+    expect(runAt).toEqual([1000, 2000]);
+    await clock.advanceTo(6000);
+    expect(runAt).toEqual([1000, 2000, 6000]);
     task.stop();
   });
 
