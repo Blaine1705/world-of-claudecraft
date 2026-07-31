@@ -2154,6 +2154,7 @@
     z-index: 25;
   }
   body.mobile-touch #target-auras-window {
+    display: none !important;
     position: fixed;
     right: auto;
     bottom: auto;

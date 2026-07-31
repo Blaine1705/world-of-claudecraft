@@ -452,21 +452,21 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.targetDebuffsPainter.paint',
     band: 'frame',
-    gate: "target && target.kind !== 'object' && nonSelfRepaintDue(targetChanged, this.lastTargetDebuffsPaintAt, now, auraRefreshIntervalMs(fxTier))",
+    gate: "target && target.kind !== 'object'",
     surface: 'chrome',
-    why: 'the target debuff strip, tier-coarsened, swap-bypassed',
+    why: 'the complete target aura strip, full-rate and tier-neutral because every aura is actionable',
   },
   {
     call: 'this.targetAurasView.tick',
     band: 'frame',
-    gate: "target && target.kind !== 'object' && nonSelfRepaintDue(targetChanged, this.lastTargetDebuffsPaintAt, now, auraRefreshIntervalMs(fxTier)) && this.targetAurasWindow.isVisible",
+    gate: "target && target.kind !== 'object'",
     surface: 'none',
-    why: 'derives the full target-aura model only while its window is visible, on the tier-coarsened cadence',
+    why: 'derives the complete own-first model shared by the classic strip and optional detail window',
   },
   {
     call: 'this.targetAurasWindow.paint',
     band: 'frame',
-    gate: "target && target.kind !== 'object' && nonSelfRepaintDue(targetChanged, this.lastTargetDebuffsPaintAt, now, auraRefreshIntervalMs(fxTier)) && this.targetAurasWindow.isVisible",
+    gate: "target && target.kind !== 'object' && this.targetAurasWindow.isVisible",
     surface: 'window',
     guard: { kind: 'callsite' },
     why: 'updates the pooled detailed target-aura panel, with a target swap bypassing the cadence',
@@ -1305,17 +1305,30 @@ const observedKeys = scan.sites.map((s) => {
 });
 
 describe('Hud.update() drives exactly the registered set, on the registered bands', () => {
-  it('keeps the compact target strip own-only while the detailed window receives all auras', () => {
+  it('keeps the classic target strip complete and reuses that model for the detail window', () => {
     const source = readFileSync(HUD_PATH, 'utf8');
     expect(source).toMatch(
-      /this\.targetDebuffsPainter\.paint\(this\.targetSummaryAurasView\.tick\(target\)\);\s*if \(this\.targetAurasWindow\.isVisible\) \{\s*const targetAuraState = this\.targetAurasView\.tick\(target\);\s*this\.targetAurasWindow\.paint\([^,]+, targetAuraState,/,
+      /targetAurasView = createAurasView\('all', this\.aurasViewDeps, \{\s*ownFirst: true,\s*effectHtmlCacheVersion: getLanguage,\s*\}\);/,
     );
+    expect(source).toMatch(
+      /const targetAuraState = this\.targetAurasView\.tick\(target\);\s*this\.targetDebuffsPainter\.paint\(targetAuraState\);\s*if \(this\.targetAurasWindow\.isVisible\) \{\s*this\.targetAurasWindow\.paint\([^,]+, targetAuraState,/,
+    );
+    expect(source).not.toContain('targetSummaryAurasView');
   });
 
-  it('invalidates the low-tier aura cadence when the detail window is enabled', () => {
+  it('keeps target aura visibility and refresh tier-neutral', () => {
     const source = readFileSync(HUD_PATH, 'utf8');
+    const painterStart = source.indexOf('private readonly targetDebuffsPainter');
+    const painterEnd = source.indexOf('private readonly minimapPainter', painterStart);
+    const painterDefinition = source.slice(painterStart, painterEnd);
+
+    expect(painterStart).toBeGreaterThanOrEqual(0);
+    expect(painterDefinition).toMatch(
+      /private readonly targetDebuffsPainter = new AurasPainter\(\s*this\.writerFacet,\s*this\.targetDebuffsEl,\s*this\.aurasPainterDeps,\s*document,\s*\);/,
+    );
+    expect(source).not.toContain('lastTargetDebuffsPaintAt');
     expect(source).toMatch(
-      /if \(this\.targetAurasWindow\.toggle\(\)\) \{[\s\S]{0,400}?this\.lastTargetDebuffsPaintAt = Number\.NEGATIVE_INFINITY;/,
+      /toggleTargetAuras\(\): void \{\s*this\.targetAurasWindow\.toggle\(\);\s*\}/,
     );
   });
 

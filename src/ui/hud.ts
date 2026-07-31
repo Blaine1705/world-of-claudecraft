@@ -8,7 +8,6 @@ import type { GameSettings, Settings } from '../game/settings';
 import { sfx } from '../game/sfx';
 import type { UiEffectsTier } from '../game/ui_effects_profile';
 import {
-  auraRefreshIntervalMs,
   cadenceDue,
   coerceFxTier,
   minimapRedrawIntervalMs,
@@ -1550,7 +1549,6 @@ export class Hud {
   // party frames are deliberately not stamped (party-member HP is a healer's actionable
   // signal, so it stays on the mediumHud band for every tier: see ui_tier_knobs).
   private lastMinimapDrawAt = 0;
-  private lastTargetDebuffsPaintAt = 0;
   private lastTargetFramePaintAt = 0;
   private lastTargetFrameId: number | null = null;
   // Target-of-target frame throttle + identity tracking, the non-self cadence twins
@@ -3833,10 +3831,7 @@ export class Hud {
   // graphics tier keeps it (gameplay-neutral-graphics invariant).
   private readonly targetAurasView = createAurasView('all', this.aurasViewDeps, {
     ownFirst: true,
-  });
-  private readonly targetSummaryAurasView = createAurasView('all', this.aurasViewDeps, {
-    ownFirst: true,
-    ownOnly: true,
+    effectHtmlCacheVersion: getLanguage,
   });
   // The buff-bar painter alone gets attachCancel: right-clicking one of the local player's
   // own helpful buffs cancels it (classic convention). The debuff / target painters reuse
@@ -3874,7 +3869,6 @@ export class Hud {
     this.targetDebuffsEl,
     this.aurasPainterDeps,
     document,
-    () => this.fxTier(),
   );
   // Overworld minimap canvas painter (the delve branch stays with delvePainter). Owns
   // the marker core; redraws from the fastHud (~10Hz) band. classCss colors the party
@@ -7751,26 +7745,16 @@ export class Hud {
       // elided toggleClass writer so the per-frame hot path stays write-elided. Normal
       // mode is unaffected (the rule lives only inside @media (forced-colors: active)).
       this.toggleClass(this.targetNameEl, 'hostile', target.hostile);
-      // Tier the target-debuff refresh (tick) granularity like the buff
-      // bar. A target SWAP (targetChanged) forces an immediate repaint so the strip never
-      // shows the previous target's debuffs while throttled on low; otherwise the full
-      // tiers repaint every frame and low coarsens to ~4Hz.
-      if (
-        nonSelfRepaintDue(
-          targetChanged,
-          this.lastTargetDebuffsPaintAt,
-          now,
-          auraRefreshIntervalMs(fxTier),
-        )
-      ) {
-        this.lastTargetDebuffsPaintAt = now;
-        this.targetDebuffsPainter.paint(this.targetSummaryAurasView.tick(target));
-        if (this.targetAurasWindow.isVisible) {
-          const targetAuraState = this.targetAurasView.tick(target);
-          this.targetAurasWindow.paint(entityDisplayName(target), targetAuraState, (sourceId) =>
-            targetAuraSourceName(sourceId, (id) => sim.entities.get(id), entityDisplayName),
-          );
-        }
+      // Every target aura is actionable: hostile buffs can be purged, allied buffs
+      // can be maintained, and foreign debuffs coordinate a group. Keep this strip
+      // complete and full-rate on every graphics tier; the painter and window both
+      // elide unchanged DOM writes.
+      const targetAuraState = this.targetAurasView.tick(target);
+      this.targetDebuffsPainter.paint(targetAuraState);
+      if (this.targetAurasWindow.isVisible) {
+        this.targetAurasWindow.paint(entityDisplayName(target), targetAuraState, (sourceId) =>
+          targetAuraSourceName(sourceId, (id) => sim.entities.get(id), entityDisplayName),
+        );
       }
       // target/boss cast bar (e.g. Nythraxis' Deathless Rage), shown under the name +
       // HP so the raid sees exactly when to channel the wardstones. The target
@@ -9046,12 +9030,7 @@ export class Hud {
   }
 
   toggleTargetAuras(): void {
-    if (this.targetAurasWindow.toggle()) {
-      // The low preset may have painted the compact strip only moments ago. Force
-      // the newly enabled detail panel to populate on the very next HUD update
-      // instead of leaving it empty for the remainder of the coarsened interval.
-      this.lastTargetDebuffsPaintAt = Number.NEGATIVE_INFINITY;
-    }
+    this.targetAurasWindow.toggle();
   }
 
   // -------------------------------------------------------------------------

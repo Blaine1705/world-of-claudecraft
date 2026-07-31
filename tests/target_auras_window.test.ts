@@ -188,6 +188,57 @@ describe('TargetAurasWindow', () => {
     expect(root.style.getPropertyValue('--ta-row-opacity')).toBe('1');
   });
 
+  it('gates a persisted desktop enablement on touch and restores it on desktop', () => {
+    window.localStorage.setItem('woc_target_auras_visible', '1');
+    let mobile = true;
+
+    const { panel, root } = setup(undefined, () => mobile);
+
+    expect(panel.isVisible).toBe(false);
+    expect(root.style.display).toBe('none');
+    expect(window.localStorage.getItem('woc_target_auras_visible')).toBe('1');
+    expect(MOBILE_CSS).toMatch(
+      /body\.mobile-touch #target-auras-window \{\s*display: none !important;/,
+    );
+
+    mobile = false;
+    expect(panel.isVisible).toBe(true);
+    panel.paint('Training Dummy', auraState(), () => 'Caster');
+    expect(root.style.display).toBe('flex');
+  });
+
+  it('does not allow the target aura window to be enabled on mobile-touch', () => {
+    const { panel, root } = setup(undefined, () => true);
+
+    expect(panel.toggle()).toBe(false);
+    expect(panel.isVisible).toBe(false);
+    expect(root.style.display).toBe('none');
+    expect(window.localStorage.getItem('woc_target_auras_visible')).toBeNull();
+  });
+
+  it('stops logical and visual updates across a live desktop-to-touch transition', () => {
+    let mobile = false;
+    const { panel, root } = setup(undefined, () => mobile);
+    panel.toggle();
+    panel.paint('Training Dummy', auraState(), () => 'Caster');
+    expect(panel.isVisible).toBe(true);
+    expect(root.style.display).toBe('flex');
+
+    mobile = true;
+    expect(panel.isVisible).toBe(false);
+    panel.paint('Training Dummy', auraState(), () => 'Caster');
+    expect(root.style.display).toBe('none');
+    expect(window.localStorage.getItem('woc_target_auras_visible')).toBe('1');
+    expect(panel.toggle()).toBe(false);
+    expect(panel.isVisible).toBe(false);
+    expect(window.localStorage.getItem('woc_target_auras_visible')).toBe('1');
+
+    mobile = false;
+    expect(panel.isVisible).toBe(true);
+    panel.paint('Training Dummy', auraState(), () => 'Caster');
+    expect(root.style.display).toBe('flex');
+  });
+
   it('keeps row opacity above zero and persists slider changes without repainting rows', () => {
     const { root } = setup();
     const slider = root.querySelector<HTMLInputElement>('.ta-opacity-slider');

@@ -128,6 +128,9 @@ export class TargetAurasWindow {
     this.buffRowsEl = root.querySelector('.ta-buff-rows') as HTMLElement;
     this.filterButtons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-aura-filter]'));
     this.filter = this.loadFilter();
+    // This panel is a desktop affordance until a touch launcher and interaction
+    // model ship. Retain the desktop preference in memory while the dynamic
+    // isVisible gate keeps it inactive throughout a mobile-touch session.
     this.visible = this.loadVisible();
     this.visibleRows = this.loadVisibleRows();
     this.showSources = this.loadShowSources();
@@ -269,7 +272,7 @@ export class TargetAurasWindow {
     state: AurasState,
     sourceName: (sourceId: number | undefined) => string,
   ): void {
-    if (!this.visible) {
+    if (!this.isVisible) {
       this.deps.writers.setDisplay(this.deps.root, 'none');
       return;
     }
@@ -328,6 +331,14 @@ export class TargetAurasWindow {
   }
 
   toggle(): boolean {
+    if (this.deps.isMobileLayout()) {
+      this.rowsConfigOpen = false;
+      this.unlocked = false;
+      this.refreshMoveButton();
+      this.refreshVisibleRowsControl();
+      this.refreshVisibility();
+      return false;
+    }
     this.visible = !this.visible;
     if (this.visible) {
       // Never reveal rows retained from a target seen before the panel was
@@ -346,7 +357,7 @@ export class TargetAurasWindow {
   }
 
   get isVisible(): boolean {
-    return this.visible;
+    return this.visible && !this.deps.isMobileLayout();
   }
 
   relocalize(): void {
@@ -563,7 +574,7 @@ export class TargetAurasWindow {
   }
 
   private refreshVisibility(): void {
-    this.deps.writers.setDisplay(this.deps.root, this.visible ? 'flex' : 'none');
+    this.deps.writers.setDisplay(this.deps.root, this.isVisible ? 'flex' : 'none');
   }
 
   private applyFilterWidth(): void {
