@@ -1,6 +1,6 @@
 # State: Epic Games Store integration (cross-phase cheat sheet)
 
-Current phase: Phase 2 complete. Next: Phase 3 (Server dark surface).
+Current phase: Phase 3 complete. Next: Phase 4 (Desktop Epic shell).
 
 Read this first in every session. Locked decisions below override memory and
 ad-hoc invention. Research background: `research-brief.md`.
@@ -159,10 +159,17 @@ Client:
 
 (Update as phases land.)
 
-- Modules: none yet (Phase 1 extended existing `electron/desktop_config.cjs`
-  only; Phase 2 extended builder scripts, no new runtime module)
-- Tests: epic pins in `tests/electron_desktop_config.test.ts` and full epic
-  packaging pins in `tests/electron_builder_config.test.ts`
+- Modules:
+  - Phase 1: extended existing `electron/desktop_config.cjs` only
+  - Phase 2: extended builder scripts, no new runtime module
+  - Phase 3 `server/epic/`: `config.ts`, `routes.ts`, `epic_db.ts`,
+    `mirror.ts` (inert stubs), `index.ts` (routes only), `CLAUDE.md`
+- Tests:
+  - epic pins in `tests/electron_desktop_config.test.ts` and full epic
+    packaging pins in `tests/electron_builder_config.test.ts`
+  - Phase 3: `tests/server/epic_routes.test.ts` (dark default, source-scan
+    no-login, rate policy, DDL pins), `tests/server/epic_db.test.ts`
+    (displace transaction)
 - Env keys (build-time, epic channel only; D16):
   - `WOC_EPIC_PRODUCT_ID` -> stamp `wocDesktop.epicProductId`
   - `WOC_EPIC_DEPLOYMENT_ID` -> stamp `wocDesktop.epicDeploymentId`
@@ -170,6 +177,23 @@ Client:
   Server secrets (client secret) are never stamped. Unpackaged
   `WOC_DISTRIBUTION=epic` works for dev; packaged stamp wins (same hatch rule
   as steam). Website and steam builds require none of these.
+- Env keys (server runtime; D15 finals):
+  - `EPIC_ENABLED` (exactly `1` to light; default off)
+  - `EPIC_PRODUCT_ID`
+  - `EPIC_SANDBOX_ID` (optional)
+  - `EPIC_DEPLOYMENT_ID`
+  - `EPIC_CLIENT_ID`
+  - `EPIC_CLIENT_SECRET` (server only, never logged)
+- Routes (D17, registry-only):
+  - `POST /api/epic/link` (body `proof`; gate first; `EPIC_LINK_POLICY`)
+  - `DELETE /api/epic/link`
+  - `GET /api/epic/status`
+- Error codes: `epic.disabled`, `epic.invalid_token`, `epic.banned`,
+  `epic.already_linked`, `epic.account_taken`, `epic.upstream`
+- DDL: additive `epic_links` (`account_id` PK, `epic_account_id` UNIQUE,
+  `created_at`); never identity
+- Status advert: `epic: { enabled: epicEnabled() }` on RouteDef path; legacy
+  arm hardcodes `enabled: false` (Steam parity)
 - Builder (Phase 2):
   - Scripts: `electron:build:epic`, `electron:pack:epic`
   - `publish: null`, `directories.output = 'release-epic'`

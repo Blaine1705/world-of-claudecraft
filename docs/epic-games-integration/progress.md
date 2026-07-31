@@ -6,7 +6,7 @@
 |---|---|---|---|
 | Phase 1: Desktop channel plumbing | complete | 2026-07-31 | 2026-07-31 |
 | Phase 2: Epic packaging channel | complete | 2026-07-31 | 2026-07-31 |
-| Phase 3: Server dark surface | not started | | |
+| Phase 3: Server dark surface | complete | 2026-07-31 | 2026-07-31 |
 | Phase 4: Desktop Epic shell | not started | | |
 | Phase 5: Server link verification | not started | | |
 | Phase 6: Achievement mirror | not started | | |
@@ -31,13 +31,13 @@
 - [x] Builder config tests pin epic channel
 
 ### Phase 3
-- [ ] `server/epic/` skeleton with live `EPIC_ENABLED` gate
-- [ ] Routes registered; dark answers `epic.disabled`
-- [ ] `epic_links` DDL additive
-- [ ] Status advert `epic.enabled`
-- [ ] Error codes + rate policy stubs/twins
-- [ ] Source-scan: no login mint
-- [ ] Default tests green with no Epic env
+- [x] `server/epic/` skeleton with live `EPIC_ENABLED` gate
+- [x] Routes registered; dark answers `epic.disabled`
+- [x] `epic_links` DDL additive
+- [x] Status advert `epic.enabled`
+- [x] Error codes + rate policy stubs/twins
+- [x] Source-scan: no login mint
+- [x] Default tests green with no Epic env
 
 ### Phase 4
 - [ ] `electron/epic.cjs` facade (injectable, never throws)

@@ -10,6 +10,12 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -57,6 +63,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "es_ES": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -104,6 +116,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "fr_FR": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -151,6 +169,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "fr_CA": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -199,6 +223,12 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -246,6 +276,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "de_DE": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -292,11 +328,45 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_terrorspark_groundshaker",
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream"
+  ],
+  "zh_TW": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream"
+  ],
+  "ko_KR": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream"
+  ],
+  "ja_JP": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream"
+  ],
   "pt_BR": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -343,8 +413,21 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_terrorspark_groundshaker",
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream"
+  ],
   "cs_CZ": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -392,6 +475,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "nl_NL": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -439,6 +528,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "pl_PL": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -486,6 +581,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "id_ID": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -533,6 +634,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "tr_TR": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -580,6 +687,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "sv_SE": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -627,6 +740,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "vi_VN": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -674,6 +793,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_terrorspark_groundshaker"
   ],
   "da_DK": [
+    "apiError.epic.account_taken",
+    "apiError.epic.already_linked",
+    "apiError.epic.banned",
+    "apiError.epic.disabled",
+    "apiError.epic.invalid_token",
+    "apiError.epic.upstream",
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
