@@ -6287,14 +6287,31 @@ export class GameServer {
         ).json,
       );
     } else {
-      maybe(
-        'ncd',
-        Object.fromEntries(
-          Object.entries(meta.nodeHarvestReadyAt)
-            .filter(([, until]) => until > this.sim.time)
-            .map(([k, until]) => [k, round2(until - this.sim.time)]),
-        ),
-      );
+      // Fast path first: while NOTHING is cooling (a fresh session, or every
+      // timer elapsed), the projected map is always {}, and the alloc-free
+      // for..in probe replaces the unconditional entries/filter/map/
+      // fromEntries chain (about 2N+4 allocations per player per tick against
+      // a readyAt map that only ever grows within a session). Byte-identical
+      // to maybe('ncd', {}) on the wire.
+      let anyCooling = false;
+      for (const k in meta.nodeHarvestReadyAt) {
+        if (meta.nodeHarvestReadyAt[k] > this.sim.time) {
+          anyCooling = true;
+          break;
+        }
+      }
+      if (!anyCooling) {
+        maybeSerialized('ncd', '{}');
+      } else {
+        maybe(
+          'ncd',
+          Object.fromEntries(
+            Object.entries(meta.nodeHarvestReadyAt)
+              .filter(([, until]) => until > this.sim.time)
+              .map(([k, until]) => [k, round2(until - this.sim.time)]),
+          ),
+        );
+      }
     }
     // Charge-limited ability live counts (abilityCharges, the one recharge
     // model: Twinstrike, Double Charge, Frost's second Ice Block): {abilityId:
@@ -6496,8 +6513,12 @@ export class GameServer {
     // session (which carries `"tslot":[]`, as every registered key does while
     // lastSent is empty) the key delta-elides away for almost everyone. The
     // charge counter moves only on a harvest that actually spends one, so this
-    // is a cheap diff rather than a per-tick churn.
-    maybe('tslot', this.sim.toolEffectSlotsFor(anchorSession.pid));
+    // is a cheap diff rather than a per-tick churn. The empty arm compares the
+    // constant '[]' directly (byte-identical to maybe(...)): stringifying the
+    // shared frozen empty projection per player per tick bought nothing.
+    const tslotRows = this.sim.toolEffectSlotsFor(anchorSession.pid);
+    if (tslotRows.length === 0) maybeSerialized('tslot', '[]');
+    else maybe('tslot', tslotRows);
     // Riding skill: persisted, so the client knows whether to show the riding
     // trainer UI without waiting on a mount/select command to fail. Wire key
     // `mntRtd`; delta-guarded, only changes once (false to true, never back).

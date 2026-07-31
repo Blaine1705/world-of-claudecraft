@@ -249,6 +249,12 @@ export function bestOwnedAnyGatherToolTier(
 // spent) while the underlying harvest/craft action still proceeds.
 export type ToolEffectConfirmMode = 'always' | 'prompt';
 
+// Shared frozen empty projection result for Sim.toolEffectSlotsFor: it runs
+// per tick per session on the snapshot path and almost every player has no
+// slotted effect, so the empty arm must never allocate. The facet type is
+// readonly and every consumer only iterates the rows.
+export const EMPTY_TOOL_EFFECT_SLOT_VIEWS: readonly never[] = Object.freeze([]);
+
 export interface ToolEffectSlot {
   effectId: ToolEffectId;
   /** Remaining charges. Reaches 0 when the effect is fully depleted. */

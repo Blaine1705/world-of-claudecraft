@@ -391,6 +391,7 @@ import {
 } from './professions/tier_mail';
 import { rechargeToolEffectAction, slotToolEffectAction } from './professions/tool_effect_actions';
 import {
+  EMPTY_TOOL_EFFECT_SLOT_VIEWS,
   normalizeToolEffectSlots,
   structuredCloneToolEffectSlots,
   type ToolEffectConfirmMode,
@@ -10583,10 +10584,14 @@ export class Sim {
   // way: an empty object still serializes into the parity state digest, so
   // initialising the map would move every golden for a feature no scenario
   // uses. Sorted by professionId so the JSON form is a stable delta signature.
-  toolEffectSlotsFor(pid: number): ToolEffectSlotView[] {
+  toolEffectSlotsFor(pid: number): readonly ToolEffectSlotView[] {
     const meta = this.players.get(pid);
     const slots = meta?.toolEffectSlots;
-    if (!meta || !slots) return [];
+    // The empty arms return the shared frozen instance: this runs per tick
+    // per session on the snapshot path, and a fresh [] here was two
+    // allocations per player per tick (the array plus its serialized "[]")
+    // for the overwhelming majority who never slot an effect.
+    if (!meta || !slots) return EMPTY_TOOL_EFFECT_SLOT_VIEWS;
     const rows: ToolEffectSlotView[] = [];
     for (const professionId of GATHERING_PROFESSION_IDS) {
       const slot = slots[professionId];
@@ -10602,6 +10607,7 @@ export class Sim {
         selfCrafted: slot.craftedBy !== undefined && slot.craftedBy === meta.name,
       });
     }
+    if (rows.length === 0) return EMPTY_TOOL_EFFECT_SLOT_VIEWS;
     // GATHERING_PROFESSION_IDS is already a stable content order, but the sort
     // is what the signature contract actually promises, so state it. A plain
     // codepoint compare, never localeCompare: this runs per tick per session on
