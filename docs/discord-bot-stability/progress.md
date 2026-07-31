@@ -319,6 +319,9 @@ survivor.
   - After the fresh-eyes review round (the gate loop, the finiteness guard, the shared
     bucket predicate) and 3 more mutants aimed at those: 47 planted, 46 KILLED, 0 errors,
     0 hangs, every run at 308 tests.
+  - After the `qa-checklist` gate over the QA round's OWN diff, which returned READY with
+    three should-fix items, and 4 more mutants aimed at those: 51 planted, 50 KILLED,
+    0 errors, 0 hangs, every run at 322 tests.
   - The single remaining survivor is a DECLARED RESIDUAL, not a gap: the loop inside
     `waitForPause` became observationally identical to a single sleep once the gates
     themselves became a loop, because the outer `isGated` re-check now absorbs an extension
@@ -343,6 +346,27 @@ by another, and the refutation is right (the state self-heals, since the next re
 claims the probe the aborted one would have been); and the shared-scope probe-exhaustion
 finding is the `finally`'s documented conservatism, not a contradiction of D3. Both are
 now written down so a later round does not rediscover them.
+
+The `qa-checklist` gate then ran over the QA round's own diff, since the Review Dispatch
+Matrix names it for a completed phase and the fix round had only had a general-purpose
+review. Verdict READY, zero blocking, and it found three real should-fix items, all
+applied. The sharpest was a hole in the very fix the round had just written: a body
+`retry_after` of zero was declared UNUSABLE for the wait but still won PRECEDENCE over the
+header, so a 429 carrying `retry_after: 0` beside `retry-after: 30` waited one second and
+retried into a live thirty second penalty. A non-positive or non-finite body value is now
+nulled before the coalesce. The other two were coverage: `majorParameterOf` shipped as a
+public export with no direct test (it now has one per live route, plus the no-major and
+literal-after-major cases, and it now requires an id-shaped segment so a literal like
+`/guilds/templates/{code}` cannot be read as a major parameter), and the four registry
+bounds were asserted against the very constants they bound, so lowering
+`MAX_TRACKED_ROUTES` to 4 kept the suite green. They are pinned against literals now, the
+way the scopes suite already pinned the four DEFAULT_* knobs.
+
+Fixing that precedence hole then OPENED a new coverage gap and the mutation set caught it
+immediately: with a non-positive body value nulled before the coalesce, a zero retry-after
+HEADER became the only remaining path into the floor guard, and nothing exercised it. That
+is the round's clearest argument for re-running the whole mutation set after every fix
+rather than only mutating what the fix touched.
 
 Not fixed here, and routed instead, each with its reason recorded in state.md as L9 to
 L12: relay and activity items are permanently LOST when the breaker refuses their post
