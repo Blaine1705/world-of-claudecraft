@@ -27,12 +27,16 @@
 //
 // Env: SERVER_URL, DATABASE_URL (required, loopback only), REALM_NAME, BOTS,
 //      MODE (gather|fish|mixed), STABLE (1 = request the stable timer wire),
-//      DURATION_MS, CONNECT_CONCURRENCY, STEP_MS, TOUR_SEC, NODES_PER_BOT,
-//      OBSERVERS, BOT_LEVEL, REPORT_MS, RUN_ID, JSON_OUT, CLEANUP=1.
+//      DURATION_MS, WARMUP_MS, CONNECT_CONCURRENCY, STEP_MS, TOUR_SEC,
+//      NODES_PER_BOT, OBSERVERS, BOT_LEVEL, REPORT_MS, RUN_ID, JSON_OUT,
+//      CLEANUP=1.
 //
 // Seeding is direct-to-Postgres like scripts/load_players.mjs (no bcrypt
 // register storm ahead of the measurement window); each bot rides its own
-// X-Forwarded-For so loopback per-IP caps never throttle the fleet.
+// X-Forwarded-For so loopback per-IP caps never throttle the fleet. The pure
+// halves live in scripts/lib/ per the module-first rule: prof_load_util.mjs
+// (spot discovery, observer aggregation, knob parsing) and loopback_guard.mjs
+// (the shared local-only control), both Vitest-pinned.
 
 import { execFileSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
@@ -40,20 +44,23 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import * as esbuild from 'esbuild';
 import pg from 'pg';
-import { parse as parsePgTarget } from 'pg-connection-string';
 import WebSocket from 'ws';
 import { evaluateProfessionsLoadRun, gapStats, sampleStats } from './lib/bench_gate.mjs';
+import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from './lib/loopback_guard.mjs';
+import {
+  aggregateObservers,
+  boundedInt,
+  findFishingSpots,
+  ipFor,
+  lettersOf,
+  mulberry32,
+  sanitizeBaseUrl,
+} from './lib/prof_load_util.mjs';
 import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const BASE = (process.env.SERVER_URL ?? 'http://localhost:8787').replace(/\/+$/, '');
 const WS_BASE = BASE.replace(/^http/, 'ws');
-
-function boundedInt(raw, fallback, min, max) {
-  const n = Number.parseInt(String(raw ?? ''), 10);
-  if (!Number.isFinite(n)) return fallback;
-  return Math.min(max, Math.max(min, n));
-}
 
 const L = 'abcdefghijklmnopqrstuvwxyz';
 function randomLetters(n) {
@@ -85,53 +92,13 @@ const CLEANUP = process.env.CLEANUP === '1';
 const RUN_ID = (process.env.RUN_ID ?? '').replace(/[^a-z]/gi, '').slice(0, 8) || randomLetters(5);
 
 // This rig seeds token-only accounts straight into the database and drives
-// /dev cheats; every target must be loopback (the admin_professions_shot.mjs
-// policy), including the host node-postgres will ACTUALLY use (?host= override
-// aware via pg-connection-string).
-function assertLoopbackUrl(urlStr, label) {
-  const host = new URL(urlStr).hostname.replace(/^\[/, '').replace(/\]$/, '');
-  if (!['localhost', '127.0.0.1', '::1'].includes(host)) {
-    throw new Error(`${label} must be local (got ${host}); this rig seeds token-only accounts`);
-  }
-}
+// /dev cheats; every target must be loopback (the shared control in
+// scripts/lib/loopback_guard.mjs, ?host= override aware on the DATABASE arm).
 assertLoopbackUrl(BASE, 'SERVER_URL');
 if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required (direct bot seeding)');
-{
-  let dbHost;
-  try {
-    dbHost = String(parsePgTarget(process.env.DATABASE_URL).host ?? '').toLowerCase();
-  } catch {
-    throw new Error('invalid DATABASE_URL (not a parseable connection string)');
-  }
-  const bare = dbHost.replace(/^\[/, '').replace(/\]$/, '');
-  if (!['localhost', '127.0.0.1', '::1'].includes(bare)) {
-    throw new Error(`refusing non-loopback DATABASE_URL host "${dbHost || '(none)'}"`);
-  }
-}
+assertLoopbackDatabaseUrl(process.env.DATABASE_URL);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-function lettersOf(n) {
-  let s = '';
-  let x = n + 1;
-  while (x > 0) {
-    s = L[x % 26] + s;
-    x = Math.floor(x / 26);
-  }
-  return s;
-}
-// Deterministic per-bot rng so tour routes are stable across runs of one
-// scenario (comparable baselines); this is a rig, not sim code.
-function mulberry32(seed) {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-const ipFor = (n) => `9.${(n >> 8) & 255}.${n & 255}.7`;
 
 // Tier-3 tools cover every shipped node tier (asserted against the live
 // content below) and the tier-3 rod covers every zone's water. The tier-1
@@ -175,65 +142,79 @@ async function loadSimData() {
   return import(dataUrl);
 }
 
-// Dry-footed standing spots with fishable water ahead: spiral out from the
-// gather-node anchors (guaranteed near play space) probing the sim's own
-// water walk. The discovered facing is reused verbatim by the bot.
-function findFishingSpots(sim, want) {
-  const spots = [];
-  const seen = new Set();
-  for (let radius = 0; radius <= 96 && spots.length < want; radius += 12) {
-    for (const node of sim.GATHER_NODES) {
-      if (spots.length >= want) break;
-      for (let a = 0; a < 8; a++) {
-        const ang = (a / 8) * Math.PI * 2;
-        const x = node.pos.x + Math.sin(ang) * radius;
-        const z = node.pos.z + Math.cos(ang) * radius;
-        const cell = `${Math.round(x / 8)},${Math.round(z / 8)}`;
-        if (seen.has(cell)) continue;
-        seen.add(cell);
-        if (sim.groundHeight(x, z, sim.WORLD_SEED) < sim.waterLevelAt(x, z)) continue; // swimming
-        for (let f = 0; f < 12; f++) {
-          const facing = (f / 12) * Math.PI * 2;
-          const sample = sim.firstFishableSampleAhead(x, z, facing, sim.WORLD_SEED);
-          if (sample) {
-            spots.push({ x, z, facing, zoneId: sim.zoneAt(sample.x, sample.z).id });
-            break;
-          }
-        }
-      }
-    }
-  }
-  return spots;
-}
+const LOADTEST_PASSWORD_HASH = 'loadtest:token-only';
 
+// Batched seeding: three multi-row statements for the whole fleet instead of
+// three round trips per bot (the review round measured the serial version at
+// effective concurrency one). Collision honesty over convenience: the
+// accounts upsert only ever overwrites a row THIS harness family minted (the
+// password_hash predicate), and a colliding REAL account or character name
+// aborts the run loudly instead of clobbering or half-seeding.
 async function seedBots(pool) {
-  const records = [];
+  const usernames = [];
+  const names = [];
+  const tokens = [];
   for (let i = 0; i < BOTS; i += 1) {
-    const username = `prof_${RUN_ID.toLowerCase()}_${String(i).padStart(4, '0')}`;
-    const name = `P${RUN_ID}${lettersOf(i)}`.slice(0, 16);
-    const token = randomBytes(32).toString('hex');
-    const account = await pool.query(
-      `INSERT INTO accounts (username, password_hash)
-       VALUES ($1, $2)
-       ON CONFLICT (username) DO UPDATE SET password_hash = EXCLUDED.password_hash
-       RETURNING id`,
-      [username, 'loadtest:token-only'],
-    );
-    const accountId = account.rows[0].id;
-    await pool.query(
-      `INSERT INTO auth_tokens (token, account_id, expires_at)
-       VALUES ($1, $2, now() + interval '12 hours')`,
-      [token, accountId],
-    );
-    const character = await pool.query(
-      `INSERT INTO characters (account_id, name, class, realm, state)
-       VALUES ($1, $2, $3, $4, NULL)
-       RETURNING id`,
-      [accountId, name, 'warrior', REALM],
-    );
-    records.push({ token, characterId: character.rows[0].id, accountId });
+    usernames.push(`prof_${RUN_ID.toLowerCase()}_${String(i).padStart(4, '0')}`);
+    names.push(`P${RUN_ID}${lettersOf(i)}`.slice(0, 16));
+    tokens.push(randomBytes(32).toString('hex'));
   }
-  return records;
+  const accounts = await pool.query(
+    `INSERT INTO accounts (username, password_hash)
+     SELECT u, $2 FROM unnest($1::text[]) AS u
+     ON CONFLICT (username) DO UPDATE SET password_hash = EXCLUDED.password_hash
+       WHERE accounts.password_hash = EXCLUDED.password_hash
+     RETURNING id, username`,
+    [usernames, LOADTEST_PASSWORD_HASH],
+  );
+  if (accounts.rows.length !== BOTS) {
+    const returned = new Set(accounts.rows.map((r) => r.username));
+    const collided = usernames.filter((u) => !returned.has(u));
+    throw new Error(
+      `account seeding collided with ${collided.length} existing non-loadtest account(s), ` +
+        `e.g. "${collided[0]}"; refusing to overwrite. Use a fresh RUN_ID.`,
+    );
+  }
+  const idByUsername = new Map(accounts.rows.map((r) => [r.username, r.id]));
+  const accountIds = usernames.map((u) => idByUsername.get(u));
+  await pool.query(
+    `INSERT INTO auth_tokens (token, account_id, expires_at)
+     SELECT t, a, now() + interval '12 hours'
+     FROM unnest($1::text[], $2::int[]) AS rows(t, a)`,
+    [tokens, accountIds],
+  );
+  // Character-name uniqueness is APP-enforced (the rename path's
+  // (realm, lower(name)) rule; the live table carries no unique name index,
+  // so ON CONFLICT cannot arbitrate here): pre-check and abort loudly rather
+  // than silently minting duplicates of a real player's name.
+  const nameClash = await pool.query(
+    `SELECT name FROM characters WHERE realm = $2 AND lower(name) = ANY($1::text[]) LIMIT 3`,
+    [names.map((n) => n.toLowerCase()), REALM],
+  );
+  if (nameClash.rows.length > 0) {
+    throw new Error(
+      `character seeding would duplicate existing name(s) e.g. "${nameClash.rows[0].name}"; ` +
+        'refusing. Use a fresh RUN_ID.',
+    );
+  }
+  const characters = await pool.query(
+    `INSERT INTO characters (account_id, name, class, realm, state)
+     SELECT a, n, 'warrior', $3, NULL
+     FROM unnest($1::int[], $2::text[]) AS pairs(a, n)
+     RETURNING id, account_id`,
+    [accountIds, names, REALM],
+  );
+  if (characters.rows.length !== BOTS) {
+    throw new Error(
+      `character seeding wrote ${characters.rows.length} of ${BOTS} rows; aborting the run`,
+    );
+  }
+  const charByAccount = new Map(characters.rows.map((r) => [r.account_id, r.id]));
+  return accountIds.map((accountId, i) => ({
+    token: tokens[i],
+    characterId: charByAccount.get(accountId),
+    accountId,
+  }));
 }
 
 async function cleanupBots(pool, records) {
@@ -275,7 +256,10 @@ class Bot {
     this.routeIndex = 0;
     this.nextTourAt = 0;
     this.pressAt = 0;
+    this.pendingTool = null;
+    // fish spot state
     this.spot = null;
+    this.spotRotations = 0;
   }
 
   async join() {
@@ -399,7 +383,6 @@ class Bot {
         data.includes('"fishingEmptyHook"')
       ) {
         this.fishingOutcomes += 1;
-        this.deadCasts = 0;
         this.fishState = 'idle';
         this.nextCastAt = Date.now() + 800;
       }
@@ -458,45 +441,18 @@ class Bot {
     this.tslotCount = 0;
     this.tslotBytes = 0;
     this.fishingOutcomes = 0;
-    // sawStableTw and ncdSeen deliberately survive the reset: the arm and the
-    // first-harvest evidence were established during warmup and stay true.
+    // WINDOW-scoped evidence: ncdSeen resets with the counters (the review
+    // round: a fleet that harvested only during warmup and then stalled for
+    // the whole window must fail the hollow-run gate, exactly like the fish
+    // arm's outcome count). sawStableTw alone survives: the wire arm is fixed
+    // at join and cannot change inside the window.
+    this.ncdSeen = false;
   }
 }
 
-function aggregateObservers(observers) {
-  const byRole = {};
-  for (const role of ['gather', 'fish']) {
-    const rows = observers.filter((o) => o.role === role);
-    if (rows.length === 0) continue;
-    const allSizes = rows.flatMap((o) => o.snapSizes);
-    const allGapArrays = rows.map((o) => gapStats(o.snapTimes));
-    const totalSnaps = rows.reduce((a, o) => a + o.snapCount, 0);
-    const ncdCount = rows.reduce((a, o) => a + o.ncdCount, 0);
-    const ncdBytes = rows.reduce((a, o) => a + o.ncdBytes, 0);
-    const tslotCount = rows.reduce((a, o) => a + o.tslotCount, 0);
-    const tslotBytes = rows.reduce((a, o) => a + o.tslotBytes, 0);
-    byRole[role] = {
-      observers: rows.length,
-      snapshots: totalSnaps,
-      snapBytes: sampleStats(allSizes),
-      gapP95Median: +[...allGapArrays.map((g) => g.p95)]
-        .sort((a, b) => a - b)
-        [Math.floor(allGapArrays.length / 2)].toFixed(1),
-      gapMaxWorst: Math.max(...allGapArrays.map((g) => g.max)),
-      ncd: {
-        presenceRatio: totalSnaps ? +(ncdCount / totalSnaps).toFixed(4) : 0,
-        bytesPerSnapshot: totalSnaps ? +(ncdBytes / totalSnaps).toFixed(1) : 0,
-        bytesWhenPresent: ncdCount ? +(ncdBytes / ncdCount).toFixed(1) : 0,
-      },
-      tslot: {
-        presenceRatio: totalSnaps ? +(tslotCount / totalSnaps).toFixed(4) : 0,
-        bytesPerSnapshot: totalSnaps ? +(tslotBytes / totalSnaps).toFixed(1) : 0,
-        bytesWhenPresent: tslotCount ? +(tslotBytes / tslotCount).toFixed(1) : 0,
-      },
-    };
-  }
-  return byRole;
-}
+// Set inside main once the fleet exists, so the fatal-error path can still
+// log the fleet out (see main().catch at the bottom).
+let teardown = null;
 
 async function main() {
   const startIso = new Date().toISOString();
@@ -564,6 +520,32 @@ async function main() {
       if (candidate) candidate.isObserver = true;
     }
   }
+
+  // Teardown that ALWAYS runs (the load_players.mjs shape): a throw or a
+  // Ctrl-C mid-run must still log the fleet out (a lingering fleet's leases
+  // and linkdead entities are exactly what breaks the NEXT scenario's ramp),
+  // honor CLEANUP, and end the pool.
+  let stopping = false;
+  async function stop() {
+    if (stopping) return;
+    stopping = true;
+    for (const b of bots) b.close();
+    await sleep(300);
+    if (CLEANUP) {
+      console.log('[prof-load] cleanup enabled, deleting seeded accounts');
+      await cleanupBots(pool, records);
+    }
+    await pool.end();
+  }
+  teardown = stop;
+  process.once('SIGINT', () => {
+    stop()
+      .then(() => process.exit(130))
+      .catch((err) => {
+        console.error('[prof-load] stop failed:', err);
+        process.exit(1);
+      });
+  });
 
   // ---- join (CONNECT_CONCURRENCY at a time). Joined bots stand GEARED and
   // DISPERSED but idle: driving the workload during the ramp saturates the
@@ -644,11 +626,25 @@ async function main() {
       joinsDone = true;
       console.log(`[prof-load] joined ${joined}/${BOTS}`);
       for (const f of failures.slice(0, 5)) console.error(`  join failure: ${f}`);
+    })
+    // A throw ESCAPING the retry machinery (each bot.join is individually
+    // caught, so this is a harness bug, not a bot failure) must not become an
+    // unhandled rejection: record it, unblock the driver loop, and let the
+    // join gate fail the run with the evidence written.
+    .catch((err) => {
+      failures.push(`join machinery: ${err?.message ?? err}`);
+      console.error('[prof-load] join machinery failed:', err);
+      joinsDone = true;
     });
 
   // ---- warmup + measurement driver ----
   const perfMid = [];
   const loopLag = [];
+  // One input frame per bot per second at the DEFAULT step; the stagger key
+  // must use the SAME modulus as the cadence (the review round: a literal
+  // % 4 silently dropped most bots' inputs at any non-default STEP_MS).
+  const inputModulus = Math.max(1, Math.round(1000 / STEP_MS));
+  let serverPerfAtWindowOpen = null;
   let driving = false;
   let measuring = false;
   let settleAt = Number.POSITIVE_INFINITY;
@@ -689,17 +685,22 @@ async function main() {
             b.fishState = 'casting';
             b.castStartedAt = now;
           } else if (b.fishState !== 'idle' && now - b.castStartedAt > 12000) {
-            // A successful cast ALWAYS produces a bite within ~8.5 s plus the
-            // reel window, so 12 s with no outcome means the cast never
-            // started (facing denial, combat-camped shore, swim edge). The
-            // spot is bad for this bot: rotate to another discovered spot
-            // (which also teleport-drops any camping mob) and recast.
+            // With the TIER-3 rod the rig hands out, a successful cast always
+            // resolves within about 9.3 s: bite at most 8 - 1.5 x 2 = 5 s
+            // after the cast, plus the ~4.25 s reel window (fishing.ts
+            // FISH_BITE_DELAY_* and fishReelWindowSecFor at tier 3,
+            // uncommon). castStartedAt is deliberately NOT re-armed at the
+            // bite, so 12 s covers cast-to-outcome with wire slack; silence
+            // past it means the cast never started (facing denial,
+            // combat-camped shore, swim edge). The spot is bad for this bot:
+            // rotate to another discovered spot (which also teleport-drops
+            // any camping mob) and recast.
             b.fishState = 'idle';
             b.nextCastAt = now + 400;
             b.rotateSpot(spots);
           }
         }
-        if (step % Math.max(1, Math.round(1000 / STEP_MS)) === b.index % 4) {
+        if (step % inputModulus === b.index % inputModulus) {
           b.input({}, b.role === 'fish' ? b.spot.facing : 0);
         }
       }
@@ -710,6 +711,12 @@ async function main() {
         measuring = true;
         start = performance.now();
         expectedAt = performance.now() + STEP_MS;
+        // The /api/perf profile is a rolling 1200-CALLBACK ring, far wider
+        // than the window at shed cadence; snapshotting it at open lets a
+        // reader difference the close scrape against it.
+        serverPerfAtWindowOpen = await fetch(`${BASE}/api/perf`)
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null);
         console.log('[prof-load] measurement window open');
       }
     } else if (performance.now() - start >= DURATION_MS) {
@@ -740,9 +747,16 @@ async function main() {
   const perf = await fetch(`${BASE}/api/perf`)
     .then((r) => (r.ok ? r.json() : null))
     .catch(() => null);
-  const aliveEnd = live.filter((b) => b.alive);
+  const aliveAtEnd = bots.filter((b) => b.alive).length;
+  // Approximate normalization only: bytes accumulate over `live` while the
+  // divisor is the window-close liveness (a bled fleet FAILS the gate anyway,
+  // so the two populations only diverge on runs that already fail), and the
+  // loop overshoots DURATION_MS by up to one lagged step (under one percent).
   const seconds = DURATION_MS / 1000;
-  const observers = live.filter((b) => b.isObserver);
+  // EVERY staged observer reaches the verdict, dead or alive: a died
+  // observer's short gap count must fail the sample floor with its label
+  // rather than silently vanishing from the evidence.
+  const observers = bots.filter((b) => b.isObserver);
   const observerRows = observers.map((o) => ({
     label: `obs-${o.index}`,
     role: o.role,
@@ -752,38 +766,43 @@ async function main() {
     fishingOutcomes: o.fishingOutcomes,
   }));
   const report = {
-    base: BASE,
+    base: sanitizeBaseUrl(BASE),
     runId: RUN_ID,
     gitHead,
     startIso,
     bots: joined,
-    aliveAtEnd: aliveEnd.length,
+    aliveAtEnd,
     mode: MODE,
     stable: STABLE,
     durationMs: DURATION_MS,
+    warmupMs: WARMUP_MS,
+    connectConcurrency: CONNECT_CONCURRENCY,
     botLevel: BOT_LEVEL,
     tourSec: TOUR_SEC,
     nodesPerBot: NODES_PER_BOT,
     stepMs: STEP_MS,
     fishSpots: spots.length,
-    fishSpotRotations: bots.reduce((a, b) => a + (b.spotRotations ?? 0), 0),
+    fishSpotRotations: bots.reduce((a, b) => a + b.spotRotations, 0),
+    observersRequested: OBSERVERS,
     observerCount: observers.length,
     fleet: {
-      rxBytesPerSecondPerBot: aliveEnd.length
-        ? Math.round(live.reduce((a, b) => a + b.bytes, 0) / seconds / aliveEnd.length)
+      rxBytesPerSecondPerBot: aliveAtEnd
+        ? Math.round(live.reduce((a, b) => a + b.bytes, 0) / seconds / aliveAtEnd)
         : 0,
-      rxFramesPerSecondPerBot: aliveEnd.length
-        ? +(live.reduce((a, b) => a + b.frames, 0) / seconds / aliveEnd.length).toFixed(1)
+      rxFramesPerSecondPerBot: aliveAtEnd
+        ? +(live.reduce((a, b) => a + b.frames, 0) / seconds / aliveAtEnd).toFixed(1)
         : 0,
     },
-    roles: aggregateObservers(observers),
+    roles: aggregateObservers(observers, { gapStats, sampleStats }),
     rig: { loopLagMs: sampleStats(loopLag) },
+    serverPerfAtWindowOpen,
     serverPerfMid: perfMid,
     serverPerf: perf,
   };
   const verdict = evaluateProfessionsLoadRun({
     joined,
     expected: BOTS,
+    aliveAtEnd,
     mode: MODE,
     stable: STABLE,
     durationMs: DURATION_MS,
@@ -817,18 +836,26 @@ async function main() {
   for (const f of verdict.failures) console.error(`GATE FAIL: ${f}`);
   console.log(`verdict: ${verdict.ok ? 'PASS' : 'FAIL'}`);
   if (JSON_OUT) {
-    fs.writeFileSync(JSON_OUT, `${JSON.stringify(report, null, 2)}\n`);
-    console.log(`wrote ${JSON_OUT}`);
+    // Guarded: a bad path must cost the artifact, never the teardown or the
+    // verdict's exit code.
+    try {
+      fs.writeFileSync(JSON_OUT, `${JSON.stringify(report, null, 2)}\n`);
+      console.log(`wrote ${JSON_OUT}`);
+    } catch (err) {
+      console.error(`[prof-load] failed to write ${JSON_OUT}:`, err);
+    }
   }
 
-  for (const b of bots) b.close();
-  await sleep(300);
-  if (CLEANUP) await cleanupBots(pool, records);
-  await pool.end();
+  await stop();
   process.exit(verdict.ok ? 0 : 1);
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
   console.error('fatal:', err);
+  try {
+    await teardown?.();
+  } catch (stopErr) {
+    console.error('[prof-load] teardown after fatal error also failed:', stopErr);
+  }
   process.exit(1);
 });

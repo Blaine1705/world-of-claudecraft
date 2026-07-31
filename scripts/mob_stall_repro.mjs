@@ -109,8 +109,8 @@ import {
 } from 'node:fs';
 import { createInterface } from 'node:readline';
 import pg from 'pg';
-import { parse as parsePgTarget } from 'pg-connection-string';
 import WebSocket from 'ws';
+import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from './lib/loopback_guard.mjs';
 import {
   boundedInt,
   evaluateStaging,
@@ -326,50 +326,12 @@ function isAliveMob(entity) {
   return entity?.k === 'mob' && !entity.dead && (entity.hp ?? 1) > 0;
 }
 
-// --- Loopback safety: refuse any non-local target before doing anything else. ---
-
-function assertLoopback(urlStr, label = 'SERVER_URL') {
-  let u;
-  try {
-    u = new URL(urlStr);
-  } catch {
-    // Never echo the raw value: DATABASE_URL carries credentials.
-    throw new Error(`invalid ${label} (not a parseable URL)`);
-  }
-  const host = u.hostname.replace(/^\[/, '').replace(/\]$/, '');
-  const ok = host === 'localhost' || host === '127.0.0.1' || host === '::1';
-  if (!ok) {
-    throw new Error(
-      `refusing non-loopback ${label} host "${u.hostname}". This harness runs against a LOCAL ` +
-        'dev server and dev database only and must never touch production. Allowed hosts: ' +
-        'localhost, 127.0.0.1, ::1.',
-    );
-  }
-  return u;
-}
-
-// The DATABASE_URL guard must validate the host node-postgres will ACTUALLY use:
-// pg-connection-string honors a ?host= query override, so a WHATWG-hostname-only
-// check is bypassable (postgres://localhost/db?host=other passes it while pg
-// connects to "other"). Never echo the raw value: DATABASE_URL carries credentials.
-function assertLoopbackDb(urlStr) {
-  let host;
-  try {
-    host = String(parsePgTarget(urlStr).host ?? '').toLowerCase();
-  } catch {
-    throw new Error('invalid DATABASE_URL (not a parseable connection string)');
-  }
-  const bare = host.replace(/^\[/, '').replace(/\]$/, '');
-  const ok = bare === 'localhost' || bare === '127.0.0.1' || bare === '::1';
-  if (!ok) {
-    throw new Error(
-      `refusing non-loopback DATABASE_URL host "${host || '(none)'}". This harness runs ` +
-        'against a LOCAL dev server and dev database only and must never touch production. ' +
-        'Allowed hosts: localhost, 127.0.0.1, ::1.',
-    );
-  }
-  return bare;
-}
+// --- Loopback safety: refuse any non-local target before doing anything else.
+// The checks live in scripts/lib/loopback_guard.mjs (shared with
+// admin_professions_shot.mjs and load_professions.mjs, pinned by
+// tests/loopback_guard.test.ts); the DATABASE arm validates the host
+// node-postgres will ACTUALLY use (?host= override aware) and never echoes
+// the credential-bearing value. ---
 
 // --- Server-line handling (parsers live in ./lib/mob_stall_parse.mjs). ---
 
@@ -953,7 +915,7 @@ function printSummary(staging, bots) {
 
 async function main() {
   // Safety FIRST: refuse a non-loopback target before touching the DB or a server.
-  const url = assertLoopback(SERVER_URL);
+  const url = assertLoopbackUrl(SERVER_URL, 'SERVER_URL');
   console.log(`[mob-stall] target ${url.href} is loopback: ok`);
 
   if (!DATABASE_URL) {
@@ -961,7 +923,7 @@ async function main() {
   }
   // The DB gets disposable bot accounts AND a throwaway admin row, so it is
   // loopback-enforced exactly like the game-server target.
-  const dbHost = assertLoopbackDb(DATABASE_URL);
+  const dbHost = assertLoopbackDatabaseUrl(DATABASE_URL);
   console.log(`[mob-stall] database host ${dbHost} is loopback: ok`);
   if (EXTERNAL_SERVER && !SERVER_LOG) {
     throw new Error(

@@ -73,11 +73,14 @@ export interface ProfessionsObserverEvidence {
 
 export declare function sampleStats(values: ReadonlyArray<number>): SampleStats;
 export declare function profMinGapsFor(durationMs: number): number;
+
+export type ProfessionsVerdict = JitterVerdict;
 export declare function evaluateProfessionsLoadRun(run: {
   joined: number;
   expected: number;
+  aliveAtEnd: number;
   mode: 'gather' | 'fish' | 'mixed';
   stable: boolean;
   durationMs: number;
   observers: ReadonlyArray<ProfessionsObserverEvidence> | null | undefined;
-}): JitterVerdict;
+}): ProfessionsVerdict;

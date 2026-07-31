@@ -182,6 +182,7 @@ export function profMinGapsFor(durationMs) {
 export function evaluateProfessionsLoadRun({
   joined,
   expected,
+  aliveAtEnd,
   mode,
   stable,
   durationMs,
@@ -191,6 +192,15 @@ export function evaluateProfessionsLoadRun({
   if (!(Number.isFinite(joined) && joined === expected)) {
     failures.push(
       `joined ${joined} of ${expected} bots; partial joins always fail (lower BOTS for exploratory runs)`,
+    );
+  }
+  // Liveness is gated like the join: a fleet that bled sockets mid-window
+  // measured a shrinking population, and a dead observer's missing samples
+  // must fail the floors below rather than silently vanishing from the
+  // evidence (the caller hands over EVERY staged observer, dead or alive).
+  if (!(Number.isFinite(aliveAtEnd) && aliveAtEnd === expected)) {
+    failures.push(
+      `${aliveAtEnd} of ${expected} bots alive at window close; a bleeding fleet is not the staged scenario`,
     );
   }
   const minGaps = profMinGapsFor(durationMs);

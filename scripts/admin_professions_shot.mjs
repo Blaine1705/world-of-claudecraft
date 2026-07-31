@@ -21,10 +21,10 @@
 //     node scripts/admin_professions_shot.mjs
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
-import { parse as parsePgTarget } from 'pg-connection-string';
 import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from './lib/loopback_guard.mjs';
 import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const MODE = process.env.MODE === 'before' ? 'before' : 'after';
@@ -34,39 +34,21 @@ const SERVER_URL = process.env.SERVER_URL ?? 'http://127.0.0.1:8791';
 // touches must be loopback (the mob_stall_repro.mjs policy): the HTTP server,
 // the origin that receives the minted admin bearer via localStorage, AND the
 // database grant_admin.mjs will connect to (the arm that actually mints
-// superadmin runs on DATABASE_URL, which is independent of SERVER_URL).
-function assertLoopbackUrl(urlStr, label) {
-  const host = new URL(urlStr).hostname.replace(/^\[/, '').replace(/\]$/, '');
-  if (!['localhost', '127.0.0.1', '::1'].includes(host)) {
-    throw new Error(`${label} must be local (got ${host}); this tool creates staff accounts`);
-  }
-}
+// superadmin runs on DATABASE_URL, which is independent of SERVER_URL). The
+// checks live in scripts/lib/loopback_guard.mjs (shared with
+// mob_stall_repro.mjs and load_professions.mjs, pinned by
+// tests/loopback_guard.test.ts); the DATABASE arm validates the host
+// node-postgres will ACTUALLY use (?host= override aware) and never echoes
+// the credential-bearing value.
 assertLoopbackUrl(SERVER_URL, 'SERVER_URL');
 assertLoopbackUrl(GAME_URL, 'GAME_URL');
-// Mirror grant_admin.mjs's own resolution (.env fills only unset vars), then
-// validate the host node-postgres will ACTUALLY use: pg-connection-string
-// honors a ?host= query override, so a WHATWG-hostname-only check is
-// bypassable. Never echo the raw value: DATABASE_URL carries credentials.
+// Mirror grant_admin.mjs's own resolution (.env fills only unset vars).
 try {
   process.loadEnvFile?.();
 } catch {
   // .env is optional; the guard below still sees a directly-passed value.
 }
-{
-  let dbHost;
-  try {
-    dbHost = String(parsePgTarget(process.env.DATABASE_URL ?? '').host ?? '').toLowerCase();
-  } catch {
-    throw new Error('invalid DATABASE_URL (not a parseable connection string)');
-  }
-  const bare = dbHost.replace(/^\[/, '').replace(/\]$/, '');
-  if (!['localhost', '127.0.0.1', '::1'].includes(bare)) {
-    throw new Error(
-      `refusing non-loopback DATABASE_URL host "${dbHost || '(none)'}"; the superadmin grant ` +
-        'must only ever run against the disposable local dev database',
-    );
-  }
-}
+assertLoopbackDatabaseUrl(process.env.DATABASE_URL);
 const WS_BASE = SERVER_URL.replace(/^http/, 'ws');
 const OUT = process.env.SHOTS_DIR ?? 'docs/screenshots/r35-admin-professions-inspector';
 fs.mkdirSync(OUT, { recursive: true });

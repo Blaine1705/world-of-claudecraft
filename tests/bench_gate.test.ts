@@ -452,6 +452,7 @@ function profObserver(
 const PROF_RUN = {
   joined: 1000,
   expected: 1000,
+  aliveAtEnd: 1000,
   mode: 'mixed' as const,
   stable: true,
   durationMs: 30000,
@@ -495,6 +496,21 @@ describe('evaluateProfessionsLoadRun join and observer floors', () => {
     const v = evaluateProfessionsLoadRun({ ...PROF_RUN, observers: [] });
     expect(v.ok).toBe(false);
     expect(v.failures.some((f) => f.includes('no parsing observers'))).toBe(true);
+  });
+
+  it('fails a fleet that bled sockets mid-window, one below and non-finite', () => {
+    const observers = [profObserver(), fishObs];
+    const bled = evaluateProfessionsLoadRun({ ...PROF_RUN, aliveAtEnd: 999, observers });
+    expect(bled.ok).toBe(false);
+    expect(bled.failures).toHaveLength(1);
+    expect(bled.failures[0]).toContain('999 of 1000 bots alive');
+    const missing = evaluateProfessionsLoadRun({
+      ...PROF_RUN,
+      aliveAtEnd: Number.NaN,
+      observers,
+    });
+    expect(missing.ok).toBe(false);
+    expect(missing.failures.some((f) => f.includes('alive at window close'))).toBe(true);
   });
 
   it('refuses an observer one below the sample floor naming both counts', () => {
