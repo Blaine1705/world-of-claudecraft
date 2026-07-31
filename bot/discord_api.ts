@@ -59,12 +59,43 @@ export const consoleGovernorLog: GovernorLog = (level, message, fields) => {
   else console.warn(`${message} ${detail}`);
 };
 
+/** The four governor knobs, as `bot/config.ts` resolves them from env. */
+export interface GovernorConfig {
+  maxRps: number;
+  banPauseMs: number;
+  breakerLimit: number;
+  forbiddenTtlMs: number;
+}
+
+/**
+ * Build the production governor from config. This lives here, in the IO shell,
+ * rather than inline in `bot/main.ts`, for one reason: `main.ts` calls `main()`
+ * at module scope, so nothing there is reachable from a test, and a transposed
+ * pair of knobs at the construction site would ship in silence. As a named
+ * export the mapping is pinnable. The clock and the log sink are the shell's
+ * production ones, which is what keeps the governor module itself pure.
+ */
+export function governorFromConfig(config: GovernorConfig): RateGovernor {
+  return new RateGovernor({
+    clock: systemGovernorClock(),
+    maxRps: config.maxRps,
+    banPauseMs: config.banPauseMs,
+    breakerLimit: config.breakerLimit,
+    forbiddenTtlMs: config.forbiddenTtlMs,
+    log: consoleGovernorLog,
+  });
+}
+
 /** What the shell hands back to the governor, plus what only the shell needs. */
 interface RestResponse extends GovernorResponse {
   ok: boolean;
   /** Parsed success body, or null when there is none. */
   data: unknown;
-  /** Error body text, read only for a non-ok status that is not a 429. */
+  /**
+   * Body text for any non-ok status, a 429 included: a 429 that exhausts
+   * MAX_ATTEMPTS is returned rather than retried, and the throw below reports
+   * its text like any other failure. Empty for a success and for a 204.
+   */
   errorText: string;
 }
 

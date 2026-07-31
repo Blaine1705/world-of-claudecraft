@@ -78,9 +78,6 @@ export interface GovernorRequest {
   essential?: boolean;
 }
 
-/** Performs the actual request. The governor never constructs one itself. */
-export type GovernorSend = () => Promise<GovernorResponse>;
-
 export interface RateGovernorOptions {
   clock: GovernorClock;
   /** Global send-rate ceiling in requests per second. */
@@ -162,6 +159,15 @@ export const MAX_QUEUE_DEPTH = 256;
 
 /** Live rate state is kept for at most this many buckets (LRU beyond it). */
 export const MAX_TRACKED_BUCKETS = 512;
+
+/**
+ * Learned route-template-to-bucket mappings kept before LRU eviction. The same
+ * size as MAX_TRACKED_BUCKETS but a SEPARATE constant: it bounds a different
+ * population (route templates, one per interaction id on the callback path)
+ * with a different lifetime, and collapsing the two would tie a future change
+ * to one bound to the other silently.
+ */
+export const MAX_TRACKED_ROUTES = 512;
 
 /** Subjects remembered by the permanent-failure cache before LRU eviction. */
 export const MAX_FORBIDDEN_ENTRIES = 4096;
@@ -274,6 +280,30 @@ function skipsGlobalRate(template: string): boolean {
   // belongs to the interaction-response endpoint alone, and a future POST
   // somewhere else under /interactions/ must not inherit it silently.
   return template.startsWith('POST /interactions/') && template.endsWith('/callback');
+}
+
+/**
+ * The major parameter carried by a route template, or '' for a route that has
+ * none. The template keeps major ids, so this reads one back out of it.
+ *
+ * This exists because Discord's `X-RateLimit-Bucket` header is documented as
+ * NON-inclusive of the top-level (major) resource: the hash names a route
+ * SHAPE, not one live bucket. Two channels, or two guilds, hit on the same
+ * route answer with the SAME hash while holding genuinely separate limits, so
+ * the hash alone is not an identity. Pairing it with the major id is the
+ * composition every Discord client makes, for exactly this reason.
+ */
+export function majorParameterOf(template: string): string {
+  const spaceAt = template.indexOf(' ');
+  const parts = (spaceAt === -1 ? template : template.slice(spaceAt + 1)).split('/');
+  for (let i = 1; i < parts.length; i++) {
+    const segment = parts[i];
+    // The placeholders are what the template replaced a NON-major id with, so
+    // neither can ever be the major parameter.
+    if (segment === '' || segment === ':id' || segment === ':token') continue;
+    if (MAJOR_PARENTS.has(parts[i - 1])) return segment;
+  }
+  return '';
 }
 
 function headerNumber(headers: Readonly<Record<string, string>>, name: string): number | null {
@@ -502,13 +532,16 @@ export class RateGovernor {
         await this.waitForPause();
         await this.waitForBucket(template);
         await this.waitForGlobalSlot(template);
-        // Re-check the pause LAST. The bucket gate and the rate slot can each
-        // block for a long time, and a global 429 or a ban pause raised by
-        // another queue during that wait was declared after this request last
-        // looked. Without this second check it would send straight into a pause
-        // the governor had already announced, which is the exact traffic a pause
-        // exists to stop.
+        // Re-check BOTH gates last. The bucket gate and the rate slot can each
+        // block for a long time, and a global 429, a ban pause, or another
+        // template sharing this bucket exhausting it during that wait was
+        // declared after this request last looked. Without the second check it
+        // would send straight into a pause the governor had already announced,
+        // or into a bucket that reported Remaining 0 while it queued, which is
+        // the exact traffic both gates exist to stop. Both are no-ops when
+        // nothing is in force, so the re-check costs one map read.
         await this.waitForPause();
+        await this.waitForBucket(template);
 
         this.counters.requests++;
         const response = await send();
@@ -565,13 +598,22 @@ export class RateGovernor {
     const hash = response.headers['x-ratelimit-bucket'];
     if (hash !== undefined && hash !== '') {
       const previous = this.resolved.get(template);
-      this.rememberResolved(template, hash);
-      if (previous !== hash) {
-        // Retire the state held under the old key so it cannot answer for this
-        // bucket any more; the hash entry below is the single live one.
-        const stale = this.limits.get(previous ?? template);
-        this.limits.delete(previous ?? template);
-        if (stale !== undefined && !this.limits.has(hash)) this.limits.set(hash, stale);
+      const resolvedKey = this.rememberResolved(template, hash);
+      if (previous === undefined) {
+        // FIRST sighting only: carry the state built up under the provisional
+        // key onto the real one, so a response that arrived before Discord had
+        // named the bucket is not lost.
+        //
+        // A later hash CHANGE is deliberately not migrated. Other templates may
+        // still resolve to the old key (sharing one is the whole point of the
+        // remap), so deleting it would destroy THEIR gating state over a
+        // rotation that had nothing to do with them. The orphan ages out
+        // through the LRU instead.
+        const stale = this.limits.get(template);
+        this.limits.delete(template);
+        if (stale !== undefined && !this.limits.has(resolvedKey)) {
+          this.limits.set(resolvedKey, stale);
+        }
       }
     }
 
@@ -579,7 +621,7 @@ export class RateGovernor {
     const resetAfter = headerNumber(response.headers, 'x-ratelimit-reset-after');
     if (remaining === null && resetAfter === null) return;
 
-    const key = this.resolved.get(template) ?? template;
+    const key = this.bucketKeyFor(template);
     const state = this.limits.get(key) ?? { remaining: null, resetAt: null, lastUsedAt: now };
     if (remaining !== null) state.remaining = remaining;
     if (resetAfter !== null) state.resetAt = now + secondsToMs(resetAfter);
@@ -622,10 +664,17 @@ export class RateGovernor {
     // rate limit. The client this replaced defaulted a missing retry_after to
     // one second; that floor is kept deliberately.
     const retryAfterSeconds = bodyRetry ?? headerRetry;
-    const retryMs =
+    const named =
       retryAfterSeconds === null
         ? MISSING_RETRY_AFTER_MS
         : secondsToMs(Math.max(0, retryAfterSeconds));
+    // The floor covers a wait that is PRESENT but zero (or negative), not only an
+    // absent one. `retry_after: 0` is not nullish, so it used to slip past the
+    // fallback and produce a 0 ms wait: on an interaction route, which is exempt
+    // from the global rate cap, that is MAX_ATTEMPTS back-to-back sends into a
+    // live rate limit, the exact zero-delay retry loop this constant exists to
+    // prevent. A genuine sub-second wait (0.05) still gets its own 50 ms.
+    const retryMs = named > 0 ? named : MISSING_RETRY_AFTER_MS;
     const isGlobal = scope === 'global' || body.global === true;
 
     // A shared-scope 429 is another app's traffic against a shared resource, so
@@ -649,7 +698,7 @@ export class RateGovernor {
       return { retryMs: 0, countsAsFailure };
     }
 
-    const key = this.resolved.get(template) ?? template;
+    const key = this.bucketKeyFor(template);
     const state = this.limits.get(key) ?? { remaining: null, resetAt: null, lastUsedAt: now };
     state.remaining = 0;
     state.resetAt = Math.max(state.resetAt ?? 0, now + retryMs);
@@ -676,7 +725,7 @@ export class RateGovernor {
   /** Proactive gating: never dispatch from a bucket that reported Remaining 0. */
   private async waitForBucket(template: string): Promise<void> {
     for (;;) {
-      const key = this.resolved.get(template) ?? template;
+      const key = this.bucketKeyFor(template);
       const state = this.limits.get(key);
       if (state === undefined || state.remaining === null || state.remaining > 0) return;
       const resetAt = state.resetAt;
@@ -714,14 +763,24 @@ export class RateGovernor {
    * PATCH template a sweep hammers) is never the one thrown out. Losing an entry
    * is safe either way: the next response's header re-establishes it.
    */
-  private rememberResolved(template: string, hash: string): void {
+  private rememberResolved(template: string, hash: string): string {
+    // The hash is paired with the major parameter, never stored bare: Discord's
+    // hash is non-inclusive of the major resource, so two channels on one route
+    // share a hash while holding separate limits. See majorParameterOf.
+    const key = `${hash}|${majorParameterOf(template)}`;
     this.resolved.delete(template);
-    this.resolved.set(template, hash);
-    while (this.resolved.size > MAX_TRACKED_BUCKETS) {
+    this.resolved.set(template, key);
+    while (this.resolved.size > MAX_TRACKED_ROUTES) {
       const oldest = this.resolved.keys().next();
       if (oldest.done) break;
       this.resolved.delete(oldest.value);
     }
+    return key;
+  }
+
+  /** The key `limits` answers under for a template: the resolved bucket, else the template. */
+  private bucketKeyFor(template: string): string {
+    return this.resolved.get(template) ?? template;
   }
 
   private queueFor(template: string): QueueState {
