@@ -278,6 +278,48 @@ describe('scheduler driver', () => {
     task.stop();
   });
 
+  it('walks the cadence toward idle across real runs, and snaps back on work', async () => {
+    // The pure decay is pinned above; this is the DRIVER actually using it, which
+    // is the only thing that can catch the work signal being read backwards. The
+    // random source is the band centre, so every delay is exactly the interval and
+    // these are cadences rather than jittered samples of them.
+    const clock = syntheticClock();
+    const runAt: number[] = [];
+    let work = false;
+    const scheduler = new LoopScheduler(clockTimers(clock), () => 0.5);
+    const task = scheduler.add({
+      name: 'outbox',
+      cadence: OUTBOX,
+      run: async () => {
+        runAt.push(clock.now());
+        return work;
+      },
+    });
+
+    task.start();
+    // 3000 active, then each empty run doubles the wait: +6000, +12000, then the
+    // 15000 ceiling, and it STAYS there rather than creeping past.
+    await clock.advanceTo(3000);
+    expect(runAt).toEqual([3000]);
+    await clock.advanceTo(9000);
+    expect(runAt).toEqual([3000, 9000]);
+    await clock.advanceTo(21_000);
+    expect(runAt).toEqual([3000, 9000, 21_000]);
+    await clock.advanceTo(36_000);
+    expect(runAt).toEqual([3000, 9000, 21_000, 36_000]);
+    expect(task.intervalMs()).toBe(15_000);
+
+    // One run that finds work puts the loop straight back on its active cadence,
+    // so the next is 3000 later and not another idle window.
+    work = true;
+    await clock.advanceTo(51_000);
+    expect(runAt).toEqual([3000, 9000, 21_000, 36_000, 51_000]);
+    expect(task.intervalMs()).toBe(3000);
+    await clock.advanceTo(54_000);
+    expect(runAt).toEqual([3000, 9000, 21_000, 36_000, 51_000, 54_000]);
+    task.stop();
+  });
+
   it('chains the next run only after the previous one settles', async () => {
     const clock = syntheticClock();
     const runAt: number[] = [];
@@ -570,6 +612,11 @@ describe('scheduler debounce mode (the presence push)', () => {
     task.kick();
     expect(runAt).toEqual([]);
     await clock.advanceTo(4000);
+    expect(runAt).toEqual([4000]);
+    // Well past where each later kick WOULD have landed had it armed a timer of
+    // its own (5000 and 7999). Stopping at 4000 would miss exactly that leak: the
+    // first window still fires on time, and the orphaned timers fire afterwards.
+    await clock.advanceTo(50_000);
     expect(runAt).toEqual([4000]);
   });
 
