@@ -297,6 +297,27 @@ describe('byte caps + page sizes hold their literal values', () => {
     expect(DEFAULT_JSON_BODY_MAX_BYTES).toBe(65_536); // 64 KiB
   });
 
+  it('DB_POOL_MAX_CLIENTS env parsing is strict and fail-safe, never a zero-client pool', async () => {
+    const { parseDbPoolMaxClients } = await import('../../server/db');
+    // unset / blank / whitespace stay on the default (Number('') === 0 must
+    // NOT become a zero-client pool; the empty-numeric env trap)
+    expect(parseDbPoolMaxClients(undefined)).toBe(10);
+    expect(parseDbPoolMaxClients('')).toBe(10);
+    expect(parseDbPoolMaxClients('   ')).toBe(10);
+    // out-of-range and malformed values stay on the default per dimension
+    expect(parseDbPoolMaxClients('0')).toBe(10);
+    expect(parseDbPoolMaxClients('-5')).toBe(10);
+    expect(parseDbPoolMaxClients('201')).toBe(10);
+    expect(parseDbPoolMaxClients('abc')).toBe(10);
+    expect(parseDbPoolMaxClients('30x')).toBe(10); // strict: a typo must not half-parse to 30
+    expect(parseDbPoolMaxClients('2.5')).toBe(10); // whole clients only
+    // valid values parse, at both range edges
+    expect(parseDbPoolMaxClients('40')).toBe(40);
+    expect(parseDbPoolMaxClients(' 40 ')).toBe(40);
+    expect(parseDbPoolMaxClients('1')).toBe(1);
+    expect(parseDbPoolMaxClients('200')).toBe(200);
+  });
+
   it('daily-rewards paginated decode defaults', async () => {
     const {
       DAILY_DEFAULT_PAGE,

@@ -75,7 +75,20 @@ export const DATABASE_URL =
 // across the HTTP request path and the game loop. The pool is timeout-bounded on
 // every axis below so a slow or unreachable database degrades into fast, isolated
 // query failures instead of a process-wide stall.
-export const DB_POOL_MAX_CLIENTS = 10;
+// Env-tunable (DB_POOL_MAX_CLIENTS) because the R36 1,000-concurrent load
+// captures exhaust the default long before the loop does: at about 500 online
+// the 30 s autosave waves hold every client while login handshakes wait out
+// DB_POOL_CONNECT_TIMEOUT_MS and then breach the 10 s auth deadline. Parsing
+// is strict and fail-safe: a set-but-blank, non-numeric, non-integer, or
+// out-of-range value stays on the default (an empty string must never become
+// a zero-client pool, and a typo like "30x" must not half-parse).
+export function parseDbPoolMaxClients(raw: string | undefined): number {
+  const trimmed = (raw ?? '').trim();
+  if (trimmed === '') return 10;
+  const n = Number(trimmed);
+  return Number.isInteger(n) && n >= 1 && n <= 200 ? n : 10;
+}
+export const DB_POOL_MAX_CLIENTS = parseDbPoolMaxClients(process.env.DB_POOL_MAX_CLIENTS);
 
 // Pool checkout / connect wait: how long pool.connect() (and every pool.query,
 // which checks a client out first) may block waiting for a free client or a new
