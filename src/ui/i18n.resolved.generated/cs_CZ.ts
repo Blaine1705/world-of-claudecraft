@@ -966,13 +966,15 @@ export const cs_CZ: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, stínoskákací ropucha",
       "name_stormfeather_griffin": "Nebeský Bouřepero",
       "name_thunderstrut_gobbler": "Hromokrok, Velký krocan",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
       "desc_stalkglider_snail": "Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.",
       "desc_aether_hover_cycle": "Výkonné magitechnické kolo navržené pro rychlý, nízko se vznášející pohyb v boji.",
       "desc_shadowjump_toad": "Mohutná, jistonohá obří ropucha, vycvičená v bleskurychlých stínových skocích, které zvládnou jakýkoli terén.",
       "desc_stormfeather_griffin": "Vznešený bouřný gryf, který se plíží po zemi na rounami okovaných spárech, se složenými křídly.",
-      "desc_thunderstrut_gobbler": "Kolosální krocan zrozený z bouře, který se hrdě prochází z Probouzejícího se vrcholu, s ocasem rozevřeným jako bouřkový mrak."
+      "desc_thunderstrut_gobbler": "Kolosální krocan zrozený z bouře, který se hrdě prochází z Probouzejícího se vrcholu, s ocasem rozevřeným jako bouřkový mrak.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Stiskni {key} pro nasednutí na cvičného Udatného oře.",
@@ -9735,6 +9737,9 @@ export const cs_CZ: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Signet Poslední tvrze"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

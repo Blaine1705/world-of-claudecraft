@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ],
+  "es_ES": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ],
+  "fr_FR": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ],
+  "fr_CA": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ],
+  "de_DE": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ],
+  "nl_NL": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ],
+  "pl_PL": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ],
+  "id_ID": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ],
+  "tr_TR": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ],
+  "sv_SE": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ],
+  "vi_VN": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ],
+  "da_DK": [
+    "entities.items.reins_terrorspark_groundshaker.name",
+    "hudChrome.mounts.desc_terrorspark_groundshaker",
+    "hudChrome.mounts.name_terrorspark_groundshaker"
+  ]
 };

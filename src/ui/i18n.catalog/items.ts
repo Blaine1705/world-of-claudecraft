@@ -2279,6 +2279,7 @@ const ITEM_ENTITY_IDS = [
   'saltforged_grips',
   'mantle_of_the_unbroken_shore',
   'last_keep_signet',
+  'reins_terrorspark_groundshaker',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2370,6 +2371,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   saltforged_grips: 'Saltforged Grips',
   mantle_of_the_unbroken_shore: 'Mantle of the Unbroken Shore',
   last_keep_signet: 'Signet of the Last Keep',
+  reins_terrorspark_groundshaker: 'Ignition Key: Terrorspark Groundshaker',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {
