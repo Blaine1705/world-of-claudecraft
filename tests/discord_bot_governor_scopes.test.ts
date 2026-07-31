@@ -252,6 +252,29 @@ describe('rate governor 429 that names no usable wait', () => {
     expect(sentAt).toEqual([0, 30_000]);
   });
 
+  it('floors a retry-after HEADER of zero, the last path into the guard', async () => {
+    // Once a non-positive BODY value is nulled before the coalesce, a zero header
+    // with no body value is the only remaining way to reach the floor guard, so
+    // it is the only arm that can still kill a deletion of it. Without this the
+    // guard reads as covered while nothing exercises it.
+    const { governor, clock, slept } = governorFixture();
+    const { send, sentAt } = queuedSend(clock, [
+      res({
+        status: 429,
+        headers: { 'retry-after': '0' },
+        json: { message: 'You are being rate limited.' },
+      }),
+      res({}),
+    ]);
+
+    const pending = governor.run({ method: 'GET', path: '/guilds/1/roles' }, send);
+    await clock.runAll();
+    await pending;
+
+    expect(slept).toEqual([MISSING_RETRY_AFTER_MS]);
+    expect(sentAt).toEqual([0, 1000]);
+  });
+
   it('still floors a zero body value when no header names a wait either', async () => {
     // The complement, so the rule above cannot be implemented as "ignore the body
     // whenever it is zero and then give up": with nothing usable anywhere, the
