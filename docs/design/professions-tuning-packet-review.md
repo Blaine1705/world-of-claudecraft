@@ -3441,6 +3441,47 @@ close moves to the deferred fill. Phase 17 is BUILT. NEXT: phase 17 QA
 (ultracode, new session, fresh eyes over e753614ff2..db4f5ff1eb plus
 this close), then phase 18.
 
+**v0.33.0 second sync-merge premise corrections** (2026-07-31, the phase
+17 QA preamble; merge 051699610c brings release/v0.33.0 at 2ae71a7fbf:
+the warrior ground auras, the frozen-equip-slots retirement, the mage
+frozen and invisibility DR fixes). Seven-verifier release-merge audit:
+zero behavior findings; every conflict resolution verified against both
+parents, the worn-offhand instance payload now survives login THROUGH
+the phase 16 payload bound, and the full-repo tsc plus every touched
+suite is green. Corrections the merge forced:
+
+- The cherry-pick flag in the BUILT record ("release/v0.33.0 wants
+  dda84f425d cherry-picked") is SATISFIED and closed: the release
+  shipped its own re-pin (c0326ca444) inside this delta. The merge
+  takes the release's terrorspark pins wholesale, which supersedes the
+  BUILT record's "1280 KiB ceiling, 1024 KiB floor" re-base bullet: the
+  maintainer's canonical budget is 1200 KiB with a 512 KiB floor, the
+  sha256 pin above it already fails any byte drift, and adopting the
+  upstream copy removes a permanent future-conflict source. QA
+  decision: accepted as final, not re-tightened.
+- The release retired the frozen EQUIP_SLOTS list (it now lives in
+  launch_paperdoll_slots.ts for the launch-era records), so the
+  blob-growth fixture re-binds to ALL_EQUIP_SLOTS: it now instances all
+  twelve live slots exactly as its own comment always claimed, and the
+  settled ceiling re-measured 8,587 bytes under the kept 9,728 pin.
+- The parity pin moves 280 to 281 (the release's
+  reactiveAbilityWindowRemaining atop the packet's four members);
+  surface-inventory rows stay 201; the release added no routes and no
+  WS commands; the one new wire field (opRem) is symmetric end to end.
+- The deferred post-packet fill must RE-MEASURE at its own tip rather
+  than reuse 210/3,613 (true as stamped at the build tip): this delta
+  re-pends greater_invisibility in all 13 Latin overlays and adds 41
+  English-only-in-Latin auraOverlay keys. Ledger arithmetic word: the
+  "260 ledgered non-Latin stale rows" line counts the 255 stale rows
+  plus broadcastsLabel's five freshly FILLED rows; only the 255 need
+  re-translation.
+- Recorded, not fixed (pre-existing on both parents, not merge-caused):
+  src/main.ts IMMOBILE_AURA_KINDS hand-lists stun/root/incapacitate/
+  polymorph and omits stasis, so a stasis-held player's destination
+  marker misses the "held" state while the release's exported
+  MOVEMENT_LOCK_AURA_KINDS includes it; cosmetic, maintainer follow-up
+  candidate to import the shared set.
+
 ---
 
 ## Phase 18: final gate
