@@ -923,6 +923,23 @@ export const fr_FR: EnTranslations = {
       "separate": "Séparer {meter}",
       "regroup": "Regrouper {meter}"
     },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Le familier est à pleine santé",
       "disabledNoFood": "Aucune nourriture dans vos sacs ne peut soigner votre familier"

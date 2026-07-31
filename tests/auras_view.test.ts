@@ -106,6 +106,22 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
 });
 
 describe('createAurasView: derivation per mode', () => {
+  it('can keep only the local player auras for the compact target-frame summary', () => {
+    const state = createAurasView('all', deps(), { ownFirst: true, ownOnly: true }).tick(
+      entity([
+        aura({ id: 'foreign_dot', kind: 'dot', sourceId: 9 }),
+        aura({ id: 'own_buff', kind: 'buff_ap', sourceId: OWN_PLAYER_ID }),
+        aura({ id: 'own_dot', kind: 'dot', sourceId: OWN_PLAYER_ID }),
+      ]),
+    );
+
+    expect(state.count).toBe(2);
+    expect(state.slots.slice(0, state.count).map((slot) => slot.key)).toEqual([
+      'own_buff',
+      'own_dot',
+    ]);
+  });
+
   it("mode 'all' keeps every aura; mode 'debuffs' keeps only debuffs", () => {
     const auras = [
       aura({ id: 'might', kind: 'buff_ap', value: 50 }),

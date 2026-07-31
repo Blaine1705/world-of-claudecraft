@@ -187,6 +187,10 @@ export interface AuraSlotState {
   name: string;
   /** Raw seconds remaining, for the tooltip (read live by the pooled closure). */
   remaining: number;
+  /** Full authored duration, used by the detailed target-aura window's progress bar. */
+  duration?: number;
+  /** Caster entity id, used by the detailed target-aura window's source label. */
+  sourceId?: number;
   /** Whether this aura is the player's own cancelable buff (mode 'buffs', not a debuff):
    *  the buff bar offers right-click-cancel, a target's debuff strip is read-only. */
   cancelable: boolean;
@@ -255,6 +259,8 @@ function makeSlotState(): AuraSlotState {
     stacksText: '',
     name: '',
     remaining: 0,
+    duration: undefined,
+    sourceId: undefined,
     cancelable: false,
     effectHtml: '',
     own: false,
@@ -278,11 +284,12 @@ function makeSlotState(): AuraSlotState {
 export function createAurasView(
   mode: AuraMode,
   deps: AurasDeps,
-  opts?: { ownFirst?: boolean },
+  opts?: { ownFirst?: boolean; ownOnly?: boolean },
 ): AurasView {
   const slots: AuraSlotState[] = [];
   const state: AurasState = { slots, count: 0 };
   const ownFirst = opts?.ownFirst === true;
+  const ownOnly = opts?.ownOnly === true;
 
   return {
     tick(entity: AurasEntityInput): AurasState {
@@ -291,6 +298,7 @@ export function createAurasView(
       // so an in-game language switch lands on the next tick).
       const units = deps.durationUnits();
       const fill = (a: AuraInput, own: boolean): void => {
+        if (ownOnly && !own) return;
         // Temporal Echo marks are shown only to the chronomancer who placed them
         // (owner 2026-07-12): another caster's echo still heals in the sim but never
         // appears in this viewer's target/focus frame. ONLY the ownFirst views (the
@@ -325,6 +333,8 @@ export function createAurasView(
               : '';
         slot.name = deps.auraName(a);
         slot.remaining = a.remaining;
+        slot.duration = a.duration;
+        slot.sourceId = a.sourceId;
         // The buff bar (mode 'buffs', the player's own auras) offers right-click-cancel;
         // a helpful buff is cancelable, a debuff never. The target debuff strip
         // (mode 'debuffs') is read-only, so nothing there is cancelable.

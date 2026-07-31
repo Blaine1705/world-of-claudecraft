@@ -923,6 +923,23 @@ export const zh_TW: EnTranslations = {
       "separate": "分離{meter}",
       "regroup": "合併{meter}"
     },
+    "targetAuras": {
+      "title": "目標光環",
+      "keybindLabel": "目標增益與減益效果",
+      "all": "All",
+      "debuffs": "減益",
+      "buffs": "增益",
+      "unlock": "移動目標光環視窗",
+      "lock": "鎖定目標光環視窗",
+      "configureRows": "設定目標光環",
+      "fewerRows": "減少光環列數",
+      "moreRows": "增加光環列數",
+      "visibleRows": "偏好的光環列數：{count}",
+      "showSources": "顯示光環施放者",
+      "hideSources": "隱藏光環施放者",
+      "ownAura": "你的光環",
+      "opacity": "光環不透明度：{percent}"
+    },
     "petFeed": {
       "disabledFullHp": "寵物生命值已滿",
       "disabledNoFood": "你的背包中沒有可以治療寵物的食物"

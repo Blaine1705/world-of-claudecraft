@@ -923,6 +923,23 @@ export const da_DK: EnTranslations = {
       "separate": "Adskil {meter}",
       "regroup": "Saml {meter} igen"
     },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Kæledyret har fuldt helbred",
       "disabledNoFood": "Ingen mad i dine tasker vil hele dit kæledyr"

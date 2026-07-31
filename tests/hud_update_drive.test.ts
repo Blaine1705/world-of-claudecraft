@@ -457,6 +457,21 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the target debuff strip, tier-coarsened, swap-bypassed',
   },
   {
+    call: 'this.targetAurasView.tick',
+    band: 'frame',
+    gate: "target && target.kind !== 'object' && nonSelfRepaintDue(targetChanged, this.lastTargetDebuffsPaintAt, now, auraRefreshIntervalMs(fxTier)) && this.targetAurasWindow.isVisible",
+    surface: 'none',
+    why: 'derives the full target-aura model only while its window is visible, on the tier-coarsened cadence',
+  },
+  {
+    call: 'this.targetAurasWindow.paint',
+    band: 'frame',
+    gate: "target && target.kind !== 'object' && nonSelfRepaintDue(targetChanged, this.lastTargetDebuffsPaintAt, now, auraRefreshIntervalMs(fxTier)) && this.targetAurasWindow.isVisible",
+    surface: 'window',
+    guard: { kind: 'callsite' },
+    why: 'updates the pooled detailed target-aura panel, with a target swap bypassing the cadence',
+  },
+  {
     call: 'this.targetCastBarPainter.paint',
     band: 'frame',
     gate: "target && target.kind !== 'object'",
@@ -490,6 +505,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: "!(target && target.kind !== 'object')",
     surface: 'chrome',
     why: 'hides the target frame when there is no target',
+  },
+  {
+    call: 'this.targetAurasWindow.clear',
+    band: 'frame',
+    gate: "!(target && target.kind !== 'object')",
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'target_auras_window.ts',
+      proof: 'if (this.cleared) return;',
+    },
+    why: 'clears the target aura rows while preserving the always-visible transparent handle',
   },
   {
     call: 'this.totFramePainter.paint',
@@ -1270,6 +1297,20 @@ const observedKeys = scan.sites.map((s) => {
 });
 
 describe('Hud.update() drives exactly the registered set, on the registered bands', () => {
+  it('keeps the compact target strip own-only while the detailed window receives all auras', () => {
+    const source = readFileSync(HUD_PATH, 'utf8');
+    expect(source).toMatch(
+      /this\.targetDebuffsPainter\.paint\(this\.targetSummaryAurasView\.tick\(target\)\);\s*if \(this\.targetAurasWindow\.isVisible\) \{\s*const targetAuraState = this\.targetAurasView\.tick\(target\);\s*this\.targetAurasWindow\.paint\([^,]+, targetAuraState,/,
+    );
+  });
+
+  it('invalidates the low-tier aura cadence when the detail window is enabled', () => {
+    const source = readFileSync(HUD_PATH, 'utf8');
+    expect(source).toMatch(
+      /if \(this\.targetAurasWindow\.toggle\(\)\) \{[\s\S]{0,400}?this\.lastTargetDebuffsPaintAt = Number\.NEGATIVE_INFINITY;/,
+    );
+  });
+
   // ANTI-VACUITY FIRST, because every assertion after it is an empty-collection check and an
   // empty collection is what a narrowed walk produces. `readMethodCallSites` THROWS on a
   // missing class or method rather than returning nothing, which is the load-bearing half:
@@ -1337,7 +1378,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 39, chrome: 70, none: 14 });
+    ).toEqual({ window: 41, chrome: 70, none: 15 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1349,9 +1390,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     for (const row of HUD_UPDATE_DRIVES)
       if (row.guard) byKind[row.guard.kind] = (byKind[row.guard.kind] ?? 0) + 1;
     expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
-      module: 21,
+      module: 22,
       hud: 5,
-      callsite: 9,
+      callsite: 10,
       none: 4,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never
@@ -1408,6 +1449,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // an in-place comparison against the retained numbers; same guard, same place, no
         // per-frame allocation.
         'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
+        'target_auras_window.ts: if (this.cleared) return;',
         'vale_cup_betting.ts: if (view.sig !== this.lastSig) {',
         'vale_cup_briefing.ts: if (view.sig !== this.lastSig) {',
         'vale_cup_window.ts: if (view.sig === this.lastSig) return;',

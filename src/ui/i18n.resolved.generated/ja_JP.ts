@@ -923,6 +923,23 @@ export const ja_JP: EnTranslations = {
       "separate": "{meter}を分離",
       "regroup": "{meter}を統合"
     },
+    "targetAuras": {
+      "title": "ターゲットのオーラ",
+      "keybindLabel": "ターゲットのバフとデバフ",
+      "all": "All",
+      "debuffs": "デバフ",
+      "buffs": "バフ",
+      "unlock": "ターゲットオーラウィンドウを移動",
+      "lock": "ターゲットオーラウィンドウをロック",
+      "configureRows": "ターゲットオーラを設定",
+      "fewerRows": "オーラ行数を少なくする",
+      "moreRows": "オーラ行数を多くする",
+      "visibleRows": "優先するオーラ行数: {count}",
+      "showSources": "オーラの使用者名を表示",
+      "hideSources": "オーラの使用者名を非表示",
+      "ownAura": "自分のオーラ",
+      "opacity": "オーラの不透明度: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "ペットは満タンの体力です",
       "disabledNoFood": "バッグの中にペットを回復できる食べ物がありません"

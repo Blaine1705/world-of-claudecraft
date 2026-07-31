@@ -1651,6 +1651,9 @@ async function startGame(
           case 'meters':
             hud.toggleMeters();
             break;
+          case 'targetAuras':
+            hud.toggleTargetAuras();
+            break;
           case 'social':
             hud.toggleSocial();
             break;
@@ -1897,6 +1900,9 @@ async function startGame(
         break;
       case 'meters':
         hud.toggleMeters();
+        break;
+      case 'targetAuras':
+        hud.toggleTargetAuras();
         break;
       case 'social':
         hud.toggleSocial();

@@ -534,6 +534,8 @@ import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
 import { roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
+import { targetAuraSourceName } from './target_auras_view';
+import { TargetAurasWindow } from './target_auras_window';
 import { targetOfTargetId } from './target_of_target';
 import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
@@ -1571,6 +1573,7 @@ export class Hud {
   // The first-tier tutorial modal's focus trap (#profession-tutorial).
   private professionTutorialTrap: FocusTrapHandle | null = null;
   private meters: Meters;
+  private readonly targetAurasWindow: TargetAurasWindow;
   private tutorial = new TutorialOverlay();
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
@@ -1613,6 +1616,34 @@ export class Hud {
           bindActions: (onActivate) => this.bindContextMenuActions(onActivate),
           isMobileLayout: () => this.isMobileLayout(),
         }),
+    });
+    this.targetAurasWindow = new TargetAurasWindow({
+      root: $('#target-auras-window'),
+      writers: this.writerFacet,
+      document,
+      window,
+      storage: localStorage,
+      isMobileLayout: () => this.isMobileLayout(),
+      uiScale: getUiScale,
+      resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
+      renderTooltip: (name, remaining, effectHtml) =>
+        `<div class="tt-title">${esc(name)}</div>${effectHtml}<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`,
+      attachTooltip: (el, html) => this.attachTooltip(el, html),
+      formatCount: (count) => formatNumber(count, { maximumFractionDigits: 0 }),
+      formatPercent: (value) => formatNumber(value, { style: 'percent', maximumFractionDigits: 0 }),
+      unlockLabel: () => t('hudChrome.targetAuras.unlock'),
+      lockLabel: () => t('hudChrome.targetAuras.lock'),
+      configureRowsLabel: () => t('hudChrome.targetAuras.configureRows'),
+      fewerRowsLabel: () => t('hudChrome.targetAuras.fewerRows'),
+      moreRowsLabel: () => t('hudChrome.targetAuras.moreRows'),
+      visibleRowsLabel: (count) =>
+        t('hudChrome.targetAuras.visibleRows', {
+          count: formatNumber(count, { maximumFractionDigits: 0 }),
+        }),
+      showSourcesLabel: () => t('hudChrome.targetAuras.showSources'),
+      hideSourcesLabel: () => t('hudChrome.targetAuras.hideSources'),
+      ownAuraLabel: () => t('hudChrome.targetAuras.ownAura'),
+      opacityLabel: (percent) => t('hudChrome.targetAuras.opacity', { percent }),
     });
     this.actionBarController = new ActionBarController({
       storage: localStorage,
@@ -3786,8 +3817,12 @@ export class Hud {
   // painter's `own` class), so what you are maintaining reads at a glance among
   // other casters' auras. Extra prominence only, never less information, so every
   // graphics tier keeps it (gameplay-neutral-graphics invariant).
-  private readonly targetDebuffsView = createAurasView('all', this.aurasViewDeps, {
+  private readonly targetAurasView = createAurasView('all', this.aurasViewDeps, {
     ownFirst: true,
+  });
+  private readonly targetSummaryAurasView = createAurasView('all', this.aurasViewDeps, {
+    ownFirst: true,
+    ownOnly: true,
   });
   // The buff-bar painter alone gets attachCancel: right-clicking one of the local player's
   // own helpful buffs cancels it (classic convention). The debuff / target painters reuse
@@ -5344,6 +5379,7 @@ export class Hud {
     this.targetFrameMover?.relocalize();
     this.playerFrameMover?.relocalize();
     this.partyFrameMover?.relocalize();
+    this.targetAurasWindow.relocalize();
     if (this.questlogWindow.isOpen) this.questlogWindow.render();
     if ($('#bags').style.display !== 'none') this.renderBags();
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
@@ -7696,7 +7732,13 @@ export class Hud {
         )
       ) {
         this.lastTargetDebuffsPaintAt = now;
-        this.targetDebuffsPainter.paint(this.targetDebuffsView.tick(target));
+        this.targetDebuffsPainter.paint(this.targetSummaryAurasView.tick(target));
+        if (this.targetAurasWindow.isVisible) {
+          const targetAuraState = this.targetAurasView.tick(target);
+          this.targetAurasWindow.paint(entityDisplayName(target), targetAuraState, (sourceId) =>
+            targetAuraSourceName(sourceId, (id) => sim.entities.get(id), entityDisplayName),
+          );
+        }
       }
       // target/boss cast bar (e.g. Nythraxis' Deathless Rage), shown under the name +
       // HP so the raid sees exactly when to channel the wardstones. The target
@@ -7767,6 +7809,7 @@ export class Hud {
         this.lastAnnouncedTargetId = null;
       }
       this.targetFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
+      this.targetAurasWindow.clear();
       // Hide the target-of-target frame too. Its parent (#target-frame) is already
       // display:none, but paint hidden anyway to reset the painter's portrait gate +
       // cadence id so re-acquiring a target repaints the mini-frame immediately.
@@ -8964,6 +9007,15 @@ export class Hud {
 
   toggleMeters(): void {
     this.meters.toggle();
+  }
+
+  toggleTargetAuras(): void {
+    if (this.targetAurasWindow.toggle()) {
+      // The low preset may have painted the compact strip only moments ago. Force
+      // the newly enabled detail panel to populate on the very next HUD update
+      // instead of leaving it empty for the remainder of the coarsened interval.
+      this.lastTargetDebuffsPaintAt = Number.NEGATIVE_INFINITY;
+    }
   }
 
   // -------------------------------------------------------------------------
