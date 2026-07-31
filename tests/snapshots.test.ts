@@ -811,9 +811,14 @@ describe('delta snapshots', () => {
     expect(snap.self.opRem).toBe(4.25);
 
     const client = bareClient(session.pid, 'hunter');
+    const now = vi.spyOn(performance, 'now').mockReturnValue(10_000);
     (client as unknown as SnapshotApplier).applySnapshot(snap);
     expect(client.reactiveAbilityWindowRemaining('mongoose_bite')).toBe(4.25);
     expect(client.reactiveAbilityWindowRemaining('another_ability')).toBe(0);
+    now.mockReturnValue(12_500);
+    expect(client.reactiveAbilityWindowRemaining('mongoose_bite')).toBe(1.75);
+    now.mockReturnValue(14_250);
+    expect(client.reactiveAbilityWindowRemaining('mongoose_bite')).toBe(0);
 
     const releaseSnapshot = structuredClone(snap);
     delete releaseSnapshot.self.opRem;
@@ -827,6 +832,7 @@ describe('delta snapshots', () => {
     expect(expiredSnapshot.self.opRem).toBe(0);
     (client as unknown as SnapshotApplier).applySnapshot(expiredSnapshot);
     expect(client.reactiveAbilityWindowRemaining('mongoose_bite')).toBe(0);
+    now.mockRestore();
   });
 
   it('mirrors account-wide cosmetic unlocks from self snapshots', () => {

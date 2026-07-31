@@ -55,6 +55,67 @@ describe('PlayerAuraRings procedural ornaments', () => {
     rings.setRings([{ ...input('raised_guard'), visible: false }]);
     expect(rings.hasVisibleRings()).toBe(false);
   });
+
+  it('reuses ring resources when combat only changes visibility, color, or opacity', () => {
+    const rings = new PlayerAuraRings('high', true);
+    rings.setRings([{ ...input('raised_guard'), visible: false }]);
+    const initialChildren = [...rings.group.children];
+    const initialGeometries = initialChildren
+      .filter((child): child is THREE.Mesh => child instanceof THREE.Mesh)
+      .map((child) => child.geometry);
+    const initialMaterials = initialChildren
+      .filter((child): child is THREE.Mesh => child instanceof THREE.Mesh)
+      .map((child) => child.material);
+
+    rings.setRings([{ ...input('raised_guard'), color: '#ff6633', opacity: 0.4 }]);
+
+    expect(rings.group.children).toEqual(initialChildren);
+    expect(
+      rings.group.children
+        .filter((child): child is THREE.Mesh => child instanceof THREE.Mesh)
+        .map((child) => child.geometry),
+    ).toEqual(initialGeometries);
+    expect(
+      rings.group.children
+        .filter((child): child is THREE.Mesh => child instanceof THREE.Mesh)
+        .map((child) => child.material),
+    ).toEqual(initialMaterials);
+    const updatedColor = new THREE.Color('#ff6633');
+    expect(
+      (
+        initialChildren[0] as THREE.InstancedMesh<THREE.ShapeGeometry, THREE.MeshBasicMaterial>
+      ).material.color.toArray(),
+    ).toEqual(updatedColor.clone().multiplyScalar(2).toArray());
+    expect(
+      (
+        initialChildren[1] as THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>
+      ).material.color.toArray(),
+    ).toEqual(updatedColor.clone().multiplyScalar(1.35).toArray());
+    expect(
+      (
+        initialChildren[2] as THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>
+      ).material.color.toArray(),
+    ).toEqual(updatedColor.clone().multiplyScalar(1.8).toArray());
+    expect(rings.hasVisibleRings()).toBe(true);
+  });
+
+  it('refreshes opacity after a reduced-motion ring has settled', () => {
+    const rings = new PlayerAuraRings('high', true);
+    rings.setRings([input('raised_guard')]);
+    rings.update(true, 0, -40, 0, 1234, Number.NEGATIVE_INFINITY, 0, true);
+
+    rings.setRings([{ ...input('raised_guard'), opacity: 0.4 }]);
+    rings.update(true, 0, -40, 0, 1234, Number.NEGATIVE_INFINITY, 0, true);
+
+    const ringOpacities = rings.group.children
+      .filter(
+        (child): child is THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial> =>
+          child instanceof THREE.Mesh && child.geometry instanceof THREE.RingGeometry,
+      )
+      .map((child) => child.material.opacity);
+    expect(Math.max(...ringOpacities)).toBeCloseTo(0.4);
+  });
+
   it('builds the spell-specific number and kind of ornaments on every visible ring', () => {
     const rings = new PlayerAuraRings('high', true);
     rings.setRings([input('raised_guard'), input('iron_resolve')]);

@@ -355,8 +355,8 @@ describe('AuraOverlaySettingsPanel position controls', () => {
     expect(groundPart?.tagName).toBe('BUTTON');
     expect(groundPart?.type).toBe('button');
     expect(groundPart?.textContent).toBe('Ground Ring');
-    expect(groundPart?.title).toBe('Ground Ring — Spell Order');
-    expect(arcsPart?.title).toBe('Side Crescents — Spell Order');
+    expect(groundPart?.title).toBe('Ground Ring: Spell Order');
+    expect(arcsPart?.title).toBe('Side Crescents: Spell Order');
     expect(iconPart?.classList.contains('active')).toBe(true);
     expect(iconPart?.getAttribute('aria-pressed')).toBe('true');
     expect(arcsPart?.classList.contains('active')).toBe(false);

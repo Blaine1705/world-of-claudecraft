@@ -36,6 +36,7 @@ interface RingView {
   opacity: number;
   phase: number;
   quality: PlayerAuraRingQualityProfile;
+  visible: boolean;
   reducedMotionSettled: boolean;
 }
 
@@ -160,80 +161,94 @@ export class PlayerAuraRings {
   }
 
   setRings(inputs: readonly PlayerAuraRingInput[]): void {
-    const nextSignature = inputs
-      .map(
-        (input) =>
-          `${input.id}:${input.visible ? 1 : 0}:${input.color}:${input.opacity.toFixed(3)}:${input.scale.toFixed(3)}`,
-      )
-      .join('|');
-    if (nextSignature === this.signature) return;
-    this.signature = nextSignature;
-    for (const view of this.views) {
-      disposeDrapedMesh(view.core);
-      disposeDrapedMesh(view.glow);
-      view.ornamentMaterial.dispose();
+    const nextSignature = inputs.map((input) => `${input.id}:${input.scale.toFixed(3)}`).join('|');
+    if (nextSignature !== this.signature) {
+      this.signature = nextSignature;
+      for (const view of this.views) {
+        disposeDrapedMesh(view.core);
+        disposeDrapedMesh(view.glow);
+        view.ornamentMaterial.dispose();
+      }
+      this.group.clear();
+      this.views = [];
+      const layout = planPlayerAuraRings(inputs);
+      for (let i = 0; i < layout.length; i++) {
+        const band = layout[i];
+        const input = inputs[i];
+        const ornamentSpec = playerAuraOrnamentSpec(input.id);
+        const quality = playerAuraRingQualityProfile(this.tier, ornamentSpec.count, this.bloom);
+        const color = new THREE.Color(input.color);
+        const coreColor = color.clone().multiplyScalar(quality.coreColorGain);
+        const glowColor = color.clone().multiplyScalar(quality.glowColorGain);
+        const core = buildDrapedMesh(
+          band.innerRadius,
+          band.outerRadius,
+          coreColor,
+          input.opacity,
+          quality.radialSegments,
+        );
+        const glowWidth = Math.max(0.045, (band.outerRadius - band.innerRadius) * 0.8);
+        const glow = buildDrapedMesh(
+          Math.max(0.05, band.innerRadius - glowWidth),
+          band.outerRadius + glowWidth,
+          glowColor,
+          input.opacity * 0.2,
+          quality.radialSegments,
+        );
+        const ornamentColor = color.clone().multiplyScalar(quality.ornamentColorGain);
+        const decorMaterial = ornamentMaterial(ornamentColor, input.opacity * 0.82);
+        const decorGeometry = ornamentGeometry(ornamentSpec.kind);
+        const ornamentRadius = (band.innerRadius + band.outerRadius) / 2;
+        const ornaments = new THREE.InstancedMesh(
+          decorGeometry,
+          decorMaterial,
+          quality.ornamentCount,
+        );
+        ornaments.name = `player_aura_ornament_${input.id}_${ornamentSpec.kind}`;
+        ornaments.userData.auraProcId = input.id;
+        ornaments.frustumCulled = false;
+        this.group.add(ornaments, glow.mesh, core.mesh);
+        this.views.push({
+          core,
+          glow,
+          ornaments,
+          ornamentCount: quality.ornamentCount,
+          ornamentRadius,
+          ornamentSize: ornamentSpec.size,
+          ornamentMaterial: decorMaterial,
+          angularSpeed: ornamentSpec.angularSpeed,
+          opacity: input.opacity,
+          phase: i * 1.7,
+          quality,
+          visible: input.visible,
+          reducedMotionSettled: false,
+        });
+      }
+      this.anchorX = Number.NaN;
     }
-    this.group.clear();
-    this.views = [];
-    const layout = planPlayerAuraRings(inputs);
-    for (let i = 0; i < layout.length; i++) {
-      const band = layout[i];
+    for (let i = 0; i < this.views.length; i++) {
+      const view = this.views[i];
       const input = inputs[i];
-      if (!band.visible) continue;
-      const ornamentSpec = playerAuraOrnamentSpec(input.id);
-      const quality = playerAuraRingQualityProfile(this.tier, ornamentSpec.count, this.bloom);
-      const color = new THREE.Color(input.color);
-      const coreColor = color.clone().multiplyScalar(quality.coreColorGain);
-      const glowColor = color.clone().multiplyScalar(quality.glowColorGain);
-      const core = buildDrapedMesh(
-        band.innerRadius,
-        band.outerRadius,
-        coreColor,
-        input.opacity,
-        quality.radialSegments,
-      );
-      const glowWidth = Math.max(0.045, (band.outerRadius - band.innerRadius) * 0.8);
-      const glow = buildDrapedMesh(
-        Math.max(0.05, band.innerRadius - glowWidth),
-        band.outerRadius + glowWidth,
-        glowColor,
-        input.opacity * 0.2,
-        quality.radialSegments,
-      );
-      const ornamentColor = color.clone().multiplyScalar(quality.ornamentColorGain);
-      const decorMaterial = ornamentMaterial(ornamentColor, input.opacity * 0.82);
-      const decorGeometry = ornamentGeometry(ornamentSpec.kind);
-      const ornamentRadius = (band.innerRadius + band.outerRadius) / 2;
-      const ornaments = new THREE.InstancedMesh(
-        decorGeometry,
-        decorMaterial,
-        quality.ornamentCount,
-      );
-      ornaments.name = `player_aura_ornament_${input.id}_${ornamentSpec.kind}`;
-      ornaments.userData.auraProcId = input.id;
-      ornaments.frustumCulled = false;
-      this.group.add(ornaments, glow.mesh, core.mesh);
-      this.views.push({
-        core,
-        glow,
-        ornaments,
-        ornamentCount: quality.ornamentCount,
-        ornamentRadius,
-        ornamentSize: ornamentSpec.size,
-        ornamentMaterial: decorMaterial,
-        angularSpeed: ornamentSpec.angularSpeed,
-        opacity: input.opacity,
-        phase: i * 1.7,
-        quality,
-        reducedMotionSettled: false,
-      });
+      if ((input.visible && !view.visible) || input.opacity !== view.opacity) {
+        view.reducedMotionSettled = false;
+      }
+      view.visible = input.visible;
+      view.opacity = input.opacity;
+      view.core.mesh.visible = input.visible;
+      view.glow.mesh.visible = input.visible;
+      view.ornaments.visible = input.visible;
+      view.core.mesh.material.color.set(input.color).multiplyScalar(view.quality.coreColorGain);
+      view.glow.mesh.material.color.set(input.color).multiplyScalar(view.quality.glowColorGain);
+      view.ornamentMaterial.color.set(input.color).multiplyScalar(view.quality.ornamentColorGain);
     }
-    this.anchorX = Number.NaN;
-    this.group.visible = this.views.length > 0;
+    this.group.visible = this.hasVisibleRings();
   }
 
   hasVisibleRings(): boolean {
-    return this.views.length > 0;
+    for (const view of this.views) {
+      if (view.visible) return true;
+    }
+    return false;
   }
 
   update(
@@ -246,7 +261,7 @@ export class PlayerAuraRings {
     time: number,
     reducedMotion = false,
   ): void {
-    this.group.visible = visible && this.views.length > 0;
+    this.group.visible = visible && this.hasVisibleRings();
     if (!this.group.visible) return;
     this.group.position.set(x, baseY, z);
     const moved =
@@ -264,6 +279,7 @@ export class PlayerAuraRings {
     }
     for (let i = 0; i < this.views.length; i++) {
       const view = this.views[i];
+      if (!view.visible) continue;
       if (reducedMotion && !moved && view.reducedMotionSettled) continue;
       if (moved) {
         for (const [meshView, lift] of [

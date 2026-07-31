@@ -1640,7 +1640,7 @@ export class ClientWorld implements IWorld {
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
-  private counterfangWindowRemaining = 0;
+  private counterfangWindowDeadlineMs = 0;
   // inventory deltas arrive in snapshots, separate from the event frames the
   // HUD redraws on — the frame loop polls this so open panels re-render
   private invChanged = false;
@@ -2735,10 +2735,11 @@ export class ClientWorld implements IWorld {
     const s = snap.self;
     const e = s ? applyWire(s) : null;
     if (s && e) {
-      this.counterfangWindowRemaining =
+      const counterfangRemaining =
         typeof s.opRem === 'number' && Number.isFinite(s.opRem)
           ? Math.min(5, Math.max(0, s.opRem))
           : 0;
+      this.counterfangWindowDeadlineMs = now + counterfangRemaining * 1000;
       if (typeof this.spectating === 'string' && e.kind === 'player' && e.templateId in CLASSES) {
         this.cfg.playerClass = e.templateId as PlayerClass;
       }
@@ -3297,7 +3298,9 @@ export class ClientWorld implements IWorld {
 
   // --- IWorldCombat: ability casts, auto-attack, spirit release ---
   reactiveAbilityWindowRemaining(abilityId: string): number {
-    return abilityId === 'mongoose_bite' ? this.counterfangWindowRemaining : 0;
+    return abilityId === 'mongoose_bite'
+      ? Math.max(0, (this.counterfangWindowDeadlineMs - performance.now()) / 1000)
+      : 0;
   }
   castAbility(abilityId: string): void {
     if (this.deadTargetCast(this.known.find((k) => k.def.id === abilityId)?.def)) {
