@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { gapStats, sampleStats } from '../scripts/lib/bench_gate.mjs';
 import {
   aggregateObservers,
-  boundedInt,
+  boundedEnvInt,
   findFishingSpots,
   ipFor,
   lettersOf,
@@ -13,14 +13,14 @@ import {
   sanitizeBaseUrl,
 } from '../scripts/lib/prof_load_util.mjs';
 
-describe('boundedInt', () => {
+describe('boundedEnvInt', () => {
   it('clamps into range, falls back on non-numeric, floors decimals like parseInt', () => {
-    expect(boundedInt('40', 7, 1, 100)).toBe(40);
-    expect(boundedInt('0', 7, 1, 100)).toBe(1);
-    expect(boundedInt('999', 7, 1, 100)).toBe(100);
-    expect(boundedInt(undefined, 7, 1, 100)).toBe(7);
-    expect(boundedInt('abc', 7, 1, 100)).toBe(7);
-    expect(boundedInt('12.9', 7, 1, 100)).toBe(12);
+    expect(boundedEnvInt('40', 7, 1, 100)).toBe(40);
+    expect(boundedEnvInt('0', 7, 1, 100)).toBe(1);
+    expect(boundedEnvInt('999', 7, 1, 100)).toBe(100);
+    expect(boundedEnvInt(undefined, 7, 1, 100)).toBe(7);
+    expect(boundedEnvInt('abc', 7, 1, 100)).toBe(7);
+    expect(boundedEnvInt('12.9', 7, 1, 100)).toBe(12);
   });
 });
 

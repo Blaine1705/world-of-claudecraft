@@ -58,8 +58,14 @@ describe('assertLoopbackDatabaseUrl', () => {
     );
   });
 
-  it('fails closed on a hostless or unset connection string, never echoing it', () => {
-    expect(() => assertLoopbackDatabaseUrl('postgres:///db')).toThrow(/non-loopback|invalid/);
-    expect(() => assertLoopbackDatabaseUrl(undefined)).toThrow(/non-loopback|invalid/);
+  it('fails closed on a hostless or unset connection string, each with ITS message', () => {
+    // Split arms (the fix-round review: an alternation pins neither): the
+    // hostless string surfaces as the (none) refusal, the unset value as the
+    // explicit missing arm, and neither echoes the raw value.
+    expect(() => assertLoopbackDatabaseUrl('postgres:///db')).toThrow(
+      /non-loopback DATABASE_URL host "\(none\)"/,
+    );
+    expect(() => assertLoopbackDatabaseUrl(undefined)).toThrow(/missing DATABASE_URL/);
+    expect(() => assertLoopbackDatabaseUrl('')).toThrow(/missing DATABASE_URL/);
   });
 });

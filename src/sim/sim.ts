@@ -2699,10 +2699,11 @@ export class Sim {
         // shape's 16 characters (the craftedBy rule in professions/tools.ts),
         // so an oversized stored value is corrupt and DROPS on load rather
         // than truncating into a possible collision with a real player's
-        // name (phase 16 blob growth bound).
+        // name (phase 16 blob growth bound). Deleted, not set undefined: an
+        // explicit-undefined key survives 'in' checks and Object.keys.
         if (clean?.signer !== undefined) {
           if (typeof clean.signer !== 'string' || clean.signer.length > MAX_CRAFTED_BY_LENGTH) {
-            clean.signer = undefined;
+            delete clean.signer;
           }
         }
         if (clean) meta.equipmentInstance[slot as EquipSlot] = clean;
@@ -2718,6 +2719,18 @@ export class Sim {
         return slot;
       });
       for (const slot of meta.inventory) {
+        // The signer clamp covers BAGS too (the review round: the mint sites
+        // put signed instances into bags in the common case, so an
+        // equipment-only clamp missed the container that carries most of
+        // them). Same rule as the equip arm below: an oversized crafter name
+        // has no legal writer and DROPS, alone.
+        if (
+          slot.instance?.signer !== undefined &&
+          (typeof slot.instance.signer !== 'string' ||
+            slot.instance.signer.length > MAX_CRAFTED_BY_LENGTH)
+        ) {
+          delete slot.instance.signer;
+        }
         if (!slot.instance?.rift) continue;
         const clean = sanitizeRiftGearInstance(slot.itemId, slot.instance, player.id);
         if (clean) slot.instance = clean;

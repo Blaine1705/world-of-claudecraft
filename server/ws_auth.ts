@@ -65,9 +65,11 @@ const WS_AUTH_ERROR = {
 // moment the FIRST frame arrives (the ws.once('message') handler below runs
 // clearTimeout synchronously before authenticateWebSocket), so this bounds
 // upgrade-to-first-frame ONLY, never the handshake's database work. A slow
-// handshake surfaces instead as the caught rejection in that same handler,
-// which relabels it with the authTimedOut wire literal; do not read that
-// client-facing string as this deadline firing.
+// handshake that REJECTS (a pool checkout or statement timeout) surfaces as
+// the caught rejection in that same handler, which relabels it with the
+// authTimedOut wire literal (a slow-but-successful handshake surfaces as
+// nothing at all); do not read that client-facing string as this deadline
+// firing.
 const AUTH_TIMEOUT_MS = 10_000;
 
 // Only this upgrade path is accepted; any other path is destroyed at the socket.

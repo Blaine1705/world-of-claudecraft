@@ -34,9 +34,13 @@ export function assertLoopbackUrl(urlStr, label) {
  *  DATABASE_URL carries credentials. Fails closed on an unparseable or
  *  hostless connection string. Returns the bare loopback host. */
 export function assertLoopbackDatabaseUrl(raw, label = 'DATABASE_URL') {
+  // Explicit missing arm: pg-connection-string resolves '' against an
+  // internal sentinel base URL, which would otherwise surface as a
+  // baffling `host "base"` refusal the operator never typed.
+  if (!raw) throw new Error(`missing ${label}`);
   let dbHost;
   try {
-    dbHost = String(parsePgTarget(raw ?? '').host ?? '').toLowerCase();
+    dbHost = String(parsePgTarget(raw).host ?? '').toLowerCase();
   } catch {
     throw new Error(`invalid ${label} (not a parseable connection string)`);
   }

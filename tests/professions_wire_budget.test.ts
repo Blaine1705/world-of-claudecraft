@@ -224,7 +224,11 @@ describe('ncd bytes per player per tick under the delta rules (stable arm)', () 
     // The wire twin of tests/professions_node_persist.test.ts's 4096-byte
     // persistence ceiling: the same 120-entry record, absolute-deadline form
     // at day-scale deadline widths. Growth history there: 2048 -> 4096 when
-    // live nodes went 54 -> 120.
+    // live nodes went 54 -> 120. Width note (the fix-round review): the
+    // encoder's round2 collapses the accumulated float clock, so 10 chars per
+    // deadline is the true maximum at this magnitude; the next integer digit
+    // arrives past roughly 116 days of continuous realm uptime and costs
+    // about 120 bytes against the remaining headroom.
     expect(payload.length).toBeLessThanOrEqual(4096);
   });
 });

@@ -14,7 +14,7 @@ professions blob, 8,469 bytes measured, 9,728 pinned), and
 `tests/minimap_markers.test.ts` (the zone-scaling projection).
 
 Captured 2026-07-31 (UTC). All four scenarios joined exactly 1,000 of 1,000
-bots, held all 1,000 alive through the window, and passed the rig's own gate
+bots with all 1,000 alive at window close, and passed the rig's own gate
 (`evaluateProfessionsLoadRun`: unconditional join and liveness enforcement,
 per-observer sample floors, timer-wire arm purity, and window-scoped
 hollow-run evidence). Every artifact stamps `gitHead f881426ba1`, the branch
@@ -85,11 +85,14 @@ Capture protocol, learned the hard way:
   lease-holding zombie session that made a character unjoinable; that server
   defect was found and FIXED in this phase (the ws_auth readyState re-check),
   and post-fix the tail failures are clean rejections the ladder converges.
-- **Verify the fresh bind.** A dying server closes its listener before it
-  finishes draining, so a quick restart can leave the new process as an
-  EADDRINUSE zombie while the old one serves on. The capture wrapper aborts
-  unless the new server's log is EADDRINUSE-free, a listener exists, and
-  `/api/status` reports zero online.
+- **Verify the fresh bind, by hand, before every scenario.** A dying server
+  closes its listener before it finishes draining, so a quick restart can
+  leave the new process as an EADDRINUSE zombie while the old one serves on.
+  After starting the server and before starting the rig, check all three:
+  the new server's log contains no EADDRINUSE, something LISTENS on the port
+  (`lsof -nP -iTCP:8799 -sTCP:LISTEN`), and `/api/status` reports
+  `"players_online":0`. Abort the scenario if any check fails; the recipe
+  has no committed wrapper that does this for you.
 - **The rig measures itself.** `rig.loopLagMs` in each artifact is the
   driver-loop lag; at 1,000 sockets on the shared box its p95 ran 313 to
   508 ms across the four captures, so treat client-side GAP numbers as
@@ -102,19 +105,23 @@ Capture protocol, learned the hard way:
   (2.9 to 3.2) counts every ws frame, snapshots plus event frames; do not
   read it as the broadcast rate.
 - **The server phase table is a rolling ring, wider than the window.** The
-  `/api/perf` profile keeps the last 1200 LOOP CALLBACKS, about 11 minutes
-  at the shed cadence, so the close scrape (`serverPerf`) blends the ramp
-  and warmup with the window (the tell: `total.mean` sits below `total.p50`
-  in all four artifacts). Each artifact also stores
-  `serverPerfAtWindowOpen` so a reader can difference the two; the
-  window-scoped client evidence (mean inter-snapshot gap about 0.64 to
-  0.65 s) is the honest steady-state callback estimate, matching the ring's
-  p95 rather than its p50.
-- **Repeat runs accumulate rows on the throwaway database.** Cleanup deletes
-  the seeded accounts (cascade), but tables referencing them with
-  ON DELETE SET NULL (chat logs, reports, moderation trails) keep their
-  rows. Fine for a disposable container; never point the rig anywhere else
-  (the loopback guards refuse it).
+  `/api/perf` profile keeps the last 1200 LOOP CALLBACKS, roughly 10 to 13
+  minutes at the observed callback cadences, so the close scrape
+  (`serverPerf`) blends the ramp and warmup with the window (the tell:
+  `total.mean` sits below `total.p50` in all four artifacts, and the window
+  itself contributes only about 280 of the 1200 entries). Each artifact
+  also stores `serverPerfAtWindowOpen`; the ring is already full at window
+  open, so the two scrapes cannot be subtracted, but comparing them bounds
+  the pre-window drift. The window-scoped client evidence (mean
+  inter-snapshot gap about 0.64 to 0.65 s) is the honest steady-state
+  callback estimate, matching the ring's p95 rather than its p50.
+- **Repeat runs accumulate rows on the throwaway database.** Pass `CLEANUP=1`
+  to the rig invocation to delete the seeded accounts at teardown (the
+  recipe above omits it, so each scenario leaves its fleet's rows behind);
+  even with cleanup, tables referencing accounts with ON DELETE SET NULL
+  (chat logs, reports, moderation trails) keep their rows. Fine for a
+  disposable container; never point the rig anywhere else (the loopback
+  guards refuse it).
 
 ## Results
 
@@ -193,7 +200,7 @@ the legacy arm pays back.
 The fish scenario's larger snapshots are CO-LOCATION, not professions wire:
 1,000 anglers over 64 spots is about 16 players per interest set, and
 `bcastGrid` (the entity stream) carries the growth while `bcastSelf` stays
-flat across all four scenarios (15.3 to 17.4 ms mean). That matches the
+flat across all four scenarios (15.4 to 17.4 ms mean). That matches the
 packet's standing finding that professions self-deltas are cheap and
 crowding is the broadcast cost.
 

@@ -1,6 +1,6 @@
 import type { GapStats, SampleStats } from './bench_gate.mjs';
 
-export declare function boundedInt(
+export declare function boundedEnvInt(
   raw: string | undefined,
   fallback: number,
   min: number,

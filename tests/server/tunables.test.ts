@@ -15,6 +15,10 @@ import { describe, expect, it, vi } from 'vitest';
 // load-capture recipe tells operators to) would otherwise turn the literal
 // default pin below into a confusing red. Cleared before any dynamic import
 // of server/db can run; vitest gives this file a fresh module registry.
+// Load-bearing and narrow: ESM hoists the static imports above this line, so
+// the delete only protects the pin because server/db is reached EXCLUSIVELY
+// through the dynamic import inside its test; a future static import that
+// transitively pulls in server/db would silently defeat it.
 delete process.env.DB_POOL_MAX_CLIENTS;
 
 import { DESKTOP_LOGIN_TTL_MS } from '../../server/desktop_login';
@@ -339,12 +343,19 @@ describe('byte caps + page sizes hold their literal values', () => {
     );
   });
 
-  it('the craftedBy/signer clamp equals the auth name ceiling across the server/sim seam', async () => {
+  it('the craftedBy/signer clamp equals the ENFORCED auth name ceiling, behaviorally', async () => {
     // src/sim cannot import server/, so the 16 lives twice; this cross-tie is
     // what turns a future name-cap raise into a loud failure instead of a
-    // silent provenance drop (phase 16 review).
+    // silent provenance drop (phase 16 review). Anchored to the shape
+    // predicate that actually gates names (server/auth.ts validCharNameShape,
+    // whose regex quantifier is the real cap), NOT to reclaim_name's local
+    // sizing copy: a name exactly at the clamp must pass the gate and one
+    // character longer must fail it, so raising the regex alone reddens here.
+    const { validCharNameShape } = await import('../../server/auth');
     const { MAX_NAME_LEN } = await import('../../server/reclaim_name');
     const { MAX_CRAFTED_BY_LENGTH } = await import('../../src/sim/professions/tools');
+    expect(validCharNameShape('A'.repeat(MAX_CRAFTED_BY_LENGTH))).toBe(true);
+    expect(validCharNameShape('A'.repeat(MAX_CRAFTED_BY_LENGTH + 1))).toBe(false);
     expect(MAX_CRAFTED_BY_LENGTH).toBe(MAX_NAME_LEN);
     expect(MAX_CRAFTED_BY_LENGTH).toBe(16);
   });

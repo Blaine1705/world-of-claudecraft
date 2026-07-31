@@ -49,7 +49,7 @@ import { evaluateProfessionsLoadRun, gapStats, sampleStats } from './lib/bench_g
 import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from './lib/loopback_guard.mjs';
 import {
   aggregateObservers,
-  boundedInt,
+  boundedEnvInt,
   findFishingSpots,
   ipFor,
   lettersOf,
@@ -69,7 +69,7 @@ function randomLetters(n) {
   return s;
 }
 
-const BOTS = boundedInt(process.env.BOTS, 100, 1, 1200);
+const BOTS = boundedEnvInt(process.env.BOTS, 100, 1, 1200);
 const MODE = ['gather', 'fish', 'mixed'].includes(process.env.MODE ?? '')
   ? process.env.MODE
   : 'mixed';
@@ -77,15 +77,15 @@ const MODE = ['gather', 'fish', 'mixed'].includes(process.env.MODE ?? '')
 // silently measure the wrong arm: the gate fails any STABLE=1 run whose
 // observers never see the server's tw echo, and any STABLE=0 run that does.
 const STABLE = process.env.STABLE === '1';
-const DURATION_MS = boundedInt(process.env.DURATION_MS, 180000, 5000, 24 * 3600 * 1000);
-const CONNECT_CONCURRENCY = boundedInt(process.env.CONNECT_CONCURRENCY, 20, 1, 50);
-const STEP_MS = boundedInt(process.env.STEP_MS, 250, 50, 5000);
-const TOUR_SEC = boundedInt(process.env.TOUR_SEC, 6, 3, 120);
-const NODES_PER_BOT = boundedInt(process.env.NODES_PER_BOT, 40, 1, 120);
-const OBSERVERS = boundedInt(process.env.OBSERVERS, 32, 1, 128);
-const BOT_LEVEL = boundedInt(process.env.BOT_LEVEL, 60, 1, 60);
-const WARMUP_MS = boundedInt(process.env.WARMUP_MS, 45000, 2000, 300000);
-const REPORT_MS = boundedInt(process.env.REPORT_MS, 10000, 1000, 60000);
+const DURATION_MS = boundedEnvInt(process.env.DURATION_MS, 180000, 5000, 24 * 3600 * 1000);
+const CONNECT_CONCURRENCY = boundedEnvInt(process.env.CONNECT_CONCURRENCY, 20, 1, 50);
+const STEP_MS = boundedEnvInt(process.env.STEP_MS, 250, 50, 5000);
+const TOUR_SEC = boundedEnvInt(process.env.TOUR_SEC, 6, 3, 120);
+const NODES_PER_BOT = boundedEnvInt(process.env.NODES_PER_BOT, 40, 1, 120);
+const OBSERVERS = boundedEnvInt(process.env.OBSERVERS, 32, 1, 128);
+const BOT_LEVEL = boundedEnvInt(process.env.BOT_LEVEL, 60, 1, 60);
+const WARMUP_MS = boundedEnvInt(process.env.WARMUP_MS, 45000, 2000, 300000);
+const REPORT_MS = boundedEnvInt(process.env.REPORT_MS, 10000, 1000, 60000);
 const REALM = process.env.REALM_NAME ?? 'Claudemoon';
 const JSON_OUT = process.env.JSON_OUT ?? '';
 const CLEANUP = process.env.CLEANUP === '1';
@@ -146,10 +146,15 @@ const LOADTEST_PASSWORD_HASH = 'loadtest:token-only';
 
 // Batched seeding: three multi-row statements for the whole fleet instead of
 // three round trips per bot (the review round measured the serial version at
-// effective concurrency one). Collision honesty over convenience: the
-// accounts upsert only ever overwrites a row THIS harness family minted (the
-// password_hash predicate), and a colliding REAL account or character name
-// aborts the run loudly instead of clobbering or half-seeding.
+// effective concurrency one), all inside ONE transaction so a collision
+// abort leaves zero rows behind. Collision honesty over convenience: the
+// friendly name pre-check runs FIRST, the accounts upsert only ever
+// overwrites a row THIS harness family minted (the password_hash predicate),
+// and the characters insert arbitrates on the REAL uniqueness rule
+// (server/social_db.ts: the UNIQUE (realm, lower(name)) expression index; the
+// original global name constraint was dropped by that migration), so a clash
+// that races past the pre-check suppresses its row and trips the count guard
+// instead of half-seeding.
 async function seedBots(pool) {
   const usernames = [];
   const names = [];
@@ -159,62 +164,70 @@ async function seedBots(pool) {
     names.push(`P${RUN_ID}${lettersOf(i)}`.slice(0, 16));
     tokens.push(randomBytes(32).toString('hex'));
   }
-  const accounts = await pool.query(
-    `INSERT INTO accounts (username, password_hash)
-     SELECT u, $2 FROM unnest($1::text[]) AS u
-     ON CONFLICT (username) DO UPDATE SET password_hash = EXCLUDED.password_hash
-       WHERE accounts.password_hash = EXCLUDED.password_hash
-     RETURNING id, username`,
-    [usernames, LOADTEST_PASSWORD_HASH],
-  );
-  if (accounts.rows.length !== BOTS) {
-    const returned = new Set(accounts.rows.map((r) => r.username));
-    const collided = usernames.filter((u) => !returned.has(u));
-    throw new Error(
-      `account seeding collided with ${collided.length} existing non-loadtest account(s), ` +
-        `e.g. "${collided[0]}"; refusing to overwrite. Use a fresh RUN_ID.`,
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const nameClash = await client.query(
+      `SELECT name FROM characters WHERE realm = $2 AND lower(name) = ANY($1::text[]) LIMIT 3`,
+      [names.map((n) => n.toLowerCase()), REALM],
     );
-  }
-  const idByUsername = new Map(accounts.rows.map((r) => [r.username, r.id]));
-  const accountIds = usernames.map((u) => idByUsername.get(u));
-  await pool.query(
-    `INSERT INTO auth_tokens (token, account_id, expires_at)
-     SELECT t, a, now() + interval '12 hours'
-     FROM unnest($1::text[], $2::int[]) AS rows(t, a)`,
-    [tokens, accountIds],
-  );
-  // Character-name uniqueness is APP-enforced (the rename path's
-  // (realm, lower(name)) rule; the live table carries no unique name index,
-  // so ON CONFLICT cannot arbitrate here): pre-check and abort loudly rather
-  // than silently minting duplicates of a real player's name.
-  const nameClash = await pool.query(
-    `SELECT name FROM characters WHERE realm = $2 AND lower(name) = ANY($1::text[]) LIMIT 3`,
-    [names.map((n) => n.toLowerCase()), REALM],
-  );
-  if (nameClash.rows.length > 0) {
-    throw new Error(
-      `character seeding would duplicate existing name(s) e.g. "${nameClash.rows[0].name}"; ` +
-        'refusing. Use a fresh RUN_ID.',
+    if (nameClash.rows.length > 0) {
+      throw new Error(
+        `character seeding would duplicate existing name(s) e.g. "${nameClash.rows[0].name}"; ` +
+          'refusing. Use a fresh RUN_ID.',
+      );
+    }
+    const accounts = await client.query(
+      `INSERT INTO accounts (username, password_hash)
+       SELECT u, $2 FROM unnest($1::text[]) AS u
+       ON CONFLICT (username) DO UPDATE SET password_hash = EXCLUDED.password_hash
+         WHERE accounts.password_hash = EXCLUDED.password_hash
+       RETURNING id, username`,
+      [usernames, LOADTEST_PASSWORD_HASH],
     );
-  }
-  const characters = await pool.query(
-    `INSERT INTO characters (account_id, name, class, realm, state)
-     SELECT a, n, 'warrior', $3, NULL
-     FROM unnest($1::int[], $2::text[]) AS pairs(a, n)
-     RETURNING id, account_id`,
-    [accountIds, names, REALM],
-  );
-  if (characters.rows.length !== BOTS) {
-    throw new Error(
-      `character seeding wrote ${characters.rows.length} of ${BOTS} rows; aborting the run`,
+    if (accounts.rows.length !== BOTS) {
+      const returned = new Set(accounts.rows.map((r) => r.username));
+      const collided = usernames.filter((u) => !returned.has(u));
+      throw new Error(
+        `account seeding collided with ${collided.length} existing non-loadtest account(s), ` +
+          `e.g. "${collided[0]}"; refusing to overwrite. Use a fresh RUN_ID.`,
+      );
+    }
+    const idByUsername = new Map(accounts.rows.map((r) => [r.username, r.id]));
+    const accountIds = usernames.map((u) => idByUsername.get(u));
+    await client.query(
+      `INSERT INTO auth_tokens (token, account_id, expires_at)
+       SELECT t, a, now() + interval '12 hours'
+       FROM unnest($1::text[], $2::int[]) AS pairs(t, a)`,
+      [tokens, accountIds],
     );
+    const characters = await client.query(
+      `INSERT INTO characters (account_id, name, class, realm, state)
+       SELECT a, n, 'warrior', $3, NULL
+       FROM unnest($1::int[], $2::text[]) AS pairs(a, n)
+       ON CONFLICT (realm, lower(name)) DO NOTHING
+       RETURNING id, account_id`,
+      [accountIds, names, REALM],
+    );
+    if (characters.rows.length !== BOTS) {
+      throw new Error(
+        `character seeding wrote ${characters.rows.length} of ${BOTS} rows (a name clash raced ` +
+          'past the pre-check); aborting the run. Use a fresh RUN_ID.',
+      );
+    }
+    await client.query('COMMIT');
+    const charByAccount = new Map(characters.rows.map((r) => [r.account_id, r.id]));
+    return accountIds.map((accountId, i) => ({
+      token: tokens[i],
+      characterId: charByAccount.get(accountId),
+      accountId,
+    }));
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
   }
-  const charByAccount = new Map(characters.rows.map((r) => [r.account_id, r.id]));
-  return accountIds.map((accountId, i) => ({
-    token: tokens[i],
-    characterId: charByAccount.get(accountId),
-    accountId,
-  }));
 }
 
 async function cleanupBots(pool, records) {
@@ -490,13 +503,44 @@ async function main() {
   }
 
   const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL, max: 10 });
+
+  // Teardown that ALWAYS runs (the load_players.mjs shape), armed BEFORE
+  // seeding so even a mid-seed throw ends the pool and honors CLEANUP
+  // (records and bots are captured by reference and start empty): a throw or
+  // a Ctrl-C mid-run must still log the fleet out (a lingering fleet's
+  // leases and linkdead entities are exactly what breaks the NEXT scenario's
+  // ramp).
+  let records = [];
+  let bots = [];
+  let stopping = false;
+  async function stop() {
+    if (stopping) return;
+    stopping = true;
+    for (const b of bots) b.close();
+    await sleep(300);
+    if (CLEANUP) {
+      console.log('[prof-load] cleanup enabled, deleting seeded accounts');
+      await cleanupBots(pool, records);
+    }
+    await pool.end();
+  }
+  teardown = stop;
+  process.once('SIGINT', () => {
+    stop()
+      .then(() => process.exit(130))
+      .catch((err) => {
+        console.error('[prof-load] stop failed:', err);
+        process.exit(1);
+      });
+  });
+
   console.log(`[prof-load] seeding ${BOTS} bots (direct DB, run id ${RUN_ID})`);
-  const records = await seedBots(pool);
+  records = await seedBots(pool);
 
   // roles and observers: fish bots first so a mixed fleet interleaves both
   // roles across the observer stride. Routes and spots are assigned BEFORE
   // the join so seedSession can disperse each bot the moment it lands.
-  const bots = records.map((record, i) => {
+  bots = records.map((record, i) => {
     const role = i < fishCount ? 'fish' : 'gather';
     const bot = new Bot(i, record, role, false);
     if (role === 'gather') {
@@ -520,32 +564,6 @@ async function main() {
       if (candidate) candidate.isObserver = true;
     }
   }
-
-  // Teardown that ALWAYS runs (the load_players.mjs shape): a throw or a
-  // Ctrl-C mid-run must still log the fleet out (a lingering fleet's leases
-  // and linkdead entities are exactly what breaks the NEXT scenario's ramp),
-  // honor CLEANUP, and end the pool.
-  let stopping = false;
-  async function stop() {
-    if (stopping) return;
-    stopping = true;
-    for (const b of bots) b.close();
-    await sleep(300);
-    if (CLEANUP) {
-      console.log('[prof-load] cleanup enabled, deleting seeded accounts');
-      await cleanupBots(pool, records);
-    }
-    await pool.end();
-  }
-  teardown = stop;
-  process.once('SIGINT', () => {
-    stop()
-      .then(() => process.exit(130))
-      .catch((err) => {
-        console.error('[prof-load] stop failed:', err);
-        process.exit(1);
-      });
-  });
 
   // ---- join (CONNECT_CONCURRENCY at a time). Joined bots stand GEARED and
   // DISPERSED but idle: driving the workload during the ramp saturates the
@@ -707,16 +725,18 @@ async function main() {
     }
     if (!measuring) {
       if (now >= settleAt) {
+        // The /api/perf profile is a rolling 1200-CALLBACK ring, far wider
+        // than the window at shed cadence; snapshotting it at open lets a
+        // reader bound the ring's pre-window drift against the close scrape.
+        // Fetched BEFORE the clocks re-arm so its round trip is never
+        // charged to the first measured step's loop lag.
+        serverPerfAtWindowOpen = await fetch(`${BASE}/api/perf`)
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null);
         for (const b of bots) b.resetMeasurement();
         measuring = true;
         start = performance.now();
         expectedAt = performance.now() + STEP_MS;
-        // The /api/perf profile is a rolling 1200-CALLBACK ring, far wider
-        // than the window at shed cadence; snapshotting it at open lets a
-        // reader difference the close scrape against it.
-        serverPerfAtWindowOpen = await fetch(`${BASE}/api/perf`)
-          .then((r) => (r.ok ? r.json() : null))
-          .catch(() => null);
         console.log('[prof-load] measurement window open');
       }
     } else if (performance.now() - start >= DURATION_MS) {

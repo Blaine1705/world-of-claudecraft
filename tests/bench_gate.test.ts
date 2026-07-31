@@ -420,7 +420,7 @@ describe('sampleStats distribution summary', () => {
     }
   });
 
-  it('refuses a non-finite joined count as a join failure', () => {
+  it('refuses a non-finite joined count as a join failure, and ONLY that arm fires', () => {
     const v = evaluateProfessionsLoadRun({
       ...PROF_RUN,
       joined: Number.NaN,
@@ -430,7 +430,10 @@ describe('sampleStats distribution summary', () => {
       ],
     });
     expect(v.ok).toBe(false);
-    expect(v.failures.some((f) => f.includes('of 1000'))).toBe(true);
+    // The liveness arm also renders "of 1000", so the length pin plus the
+    // joined-specific prefix is what proves WHICH arm fired.
+    expect(v.failures).toHaveLength(1);
+    expect(v.failures[0]).toContain('joined NaN of 1000');
   });
 });
 

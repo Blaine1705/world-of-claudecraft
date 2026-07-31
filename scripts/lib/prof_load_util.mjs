@@ -3,8 +3,11 @@
 // in tests/prof_load_util.test.ts while the entry script stays an orchestrator.
 
 /** Integer env parsing with silent clamping into [min, max]; a non-numeric or
- *  unset value takes the fallback. The rig's historical knob behavior. */
-export function boundedInt(raw, fallback, min, max) {
+ *  unset value takes the fallback. Named apart from mob_stall_parse.mjs's
+ *  boundedInt on purpose: the two parse differently (this one is parseInt
+ *  semantics, the sibling is Number+trunc) and each preserves its own rig's
+ *  historical behavior; a shared name would invite silent cross-imports. */
+export function boundedEnvInt(raw, fallback, min, max) {
   const n = Number.parseInt(String(raw ?? ''), 10);
   if (!Number.isFinite(n)) return fallback;
   return Math.min(max, Math.max(min, n));
