@@ -150,15 +150,14 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     expect(sim.player.hp).toBe(sim.player.maxHp - 12);
   });
 
-  it('makes Consume mobile with Walking Hunger', () => {
-    const sim = simWithRows('warlock', { 11: 'wlk_r11_fel_concentration' });
-    expect(resolved(sim, 'drain_life').castWhileMoving).toBe(true);
+  it('makes Consume immune to damage pushback with Deep Hunger', () => {
+    const sim = simWithRows('warlock', { 11: 'wlk_r11_demon_armor' });
+    expect(resolved(sim, 'drain_life').damagePushbackImmune).toBe(true);
+    expect(resolved(sim, 'drain_life').castWhileMoving).toBeFalsy();
   });
 
-  it('Blood Credit pays 20% more mana per tap and arms nothing', () => {
-    // Balance pass: the instant-bolt relay is gone; the option is the classic
-    // Improved Life Tap (rank 3 at 20: 85 hp -> 102 mana).
-    const sim = simWithRows('warlock', { 11: 'wlk_r11_improved_life_tap' });
+  it('Blood Credit pays 50% more mana per tap and arms nothing', () => {
+    const sim = simWithRows('warlock', { 14: 'wlk_r14_ruin' });
     sim.player.hp = 1;
     sim.player.resource = 0;
 
@@ -171,7 +170,7 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     sim.player.hp = 100;
     sim.castAbility('life_tap');
     expect(sim.player.hp).toBe(15);
-    expect(sim.player.resource).toBe(102);
+    expect(sim.player.resource).toBe(128);
     expect(sim.player.auras.some((entry) => entry.id === 'wlk_blood_credit')).toBe(false);
   });
 
@@ -344,7 +343,7 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     expect(detonation(3)).toEqual({ damage: 10, foreignRemains: true });
   });
 
-  it('pins exact Cleansing Verdict and Voidfeast healing with correct dispel direction', () => {
+  it('pins exact Cleansing Verdict healing with correct dispel direction', () => {
     const paladin = simWithRows('paladin', { 8: 'pal_r8_cleansing_verdict' });
     const ally = addTarget(paladin, 2, false);
     ally.maxHp = 1_000;
@@ -364,22 +363,5 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     expect(ally.hp).toBe(540);
     expect(ally.auras.some((entry) => entry.id === 'magic_debuff')).toBe(false);
     expect(ally.auras.some((entry) => entry.id === 'magic_benefit')).toBe(true);
-
-    const warlock = simWithRows('warlock', { 8: 'wlk_r8_voidfeast' });
-    const enemy = addTarget(warlock);
-    enemy.auras.push(aura('magic_benefit', 'buff_ap', enemy.id, 'holy', 10));
-    enemy.auras.push(aura('magic_debuff', 'slow', warlock.playerId, 'shadow', 0.5));
-    warlock.player.hp = 1;
-    const expectedHeal = Math.round(warlock.player.maxHp * 0.06);
-    const warlockRng = warlock.ctx.rng as typeof warlock.ctx.rng & {
-      chance(probability: number): boolean;
-    };
-    warlockRng.chance = () => false;
-
-    runResolved(warlock, enemy, resolved(warlock, 'voidfeast'));
-
-    expect(warlock.player.hp).toBe(1 + expectedHeal);
-    expect(enemy.auras.some((entry) => entry.id === 'magic_benefit')).toBe(false);
-    expect(enemy.auras.some((entry) => entry.id === 'magic_debuff')).toBe(true);
   });
 });

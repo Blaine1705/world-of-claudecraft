@@ -316,6 +316,14 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "断罪",
+      "doomEmptyStatus": "断罪 {value}/{max}。",
+      "doomStatus": "断罪 {value}/{max}、残り {remaining}。"
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "魂の欠片"
+    },
     "spectate": {
       "banner": "{name}を観戦中"
     },
@@ -3270,6 +3278,7 @@ export const ja_JP: EnTranslations = {
       "none": "すべての条件に合うクラスはありません。一つ解除するともっと表示されます。"
     },
     "abilityHook": {
+      "evil_eye": "敵を一体指定し、その行動と苦痛から断罪を蓄積します。",
       "heroic_strike": "次の一撃にレイジを乗せ、より重い攻撃を予約します。",
       "revenge": "前方の敵を薙ぎ払い、回避または受け流しの後に消費なしで使えることがある。",
       "hamstring": "敵の移動を妨げ、逃走を阻止する。",
@@ -6473,6 +6482,7 @@ export const ja_JP: EnTranslations = {
     "tooltip": {
       "rank": "ランク{rank}",
       "cost": "{resource} {cost}",
+      "ruinCost": "{cost} Ruin",
       "range": "射程{range}ヤード",
       "rangeWithMin": "射程{min}-{max}ヤード",
       "instant": "即時",
@@ -7379,9 +7389,29 @@ export const ja_JP: EnTranslations = {
         "name": "黒腐れ",
         "description": "対象を堕落させ、18秒間で {damage} の暗黒ダメージを与えます。"
       },
+      "evil_eye": {
+        "name": "Evil Eye",
+        "description": "敵一体を呪いの焦点として指定します。邪眼を移しても断罪は維持されますが、20秒の有効時間は更新されません。"
+      },
+      "maledict_gaze": {
+        "name": "呪眼の凝視",
+        "description": "呪眼が選択中の主要な邪眼対象を2.5秒ごとに攻撃し、影ダメージを与えます。邪眼憑依中は攻撃速度が2倍になります。"
+      },
+      "needle_of_fate": {
+        "name": "運命の針",
+        "description": "敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を5生成し、邪眼がなければ先に対象を指定します。"
+      },
+      "sentence": {
+        "name": "宣告",
+        "description": "断罪をすべて消費して敵に宣告を下します。ダメージと追加効果は断罪20、50、80、100で強化されます。"
+      },
       "life_tap": {
         "name": "過酷な取引",
         "description": "体力{damage}をマナ{damage}に変換します。"
+      },
+      "cursed_accomplice": {
+        "name": "呪われた共犯者",
+        "description": "味方プレイヤーを選択していない場合は呪眼と結び、その凝視で断罪を2生成します。味方と結ぶと、その味方が邪眼対象へ与えるダメージで3生成します。発動は2秒に1回までです。"
       },
       "curse_of_agony": {
         "name": "苦悶の呪い",
@@ -7390,6 +7420,34 @@ export const ja_JP: EnTranslations = {
       "drain_life": {
         "name": "喰らう",
         "description": "対象の生命力を吸収し、5秒間、毎秒{damage}の体力を自分に移します。"
+      },
+      "litany_of_guilt": {
+        "name": "罪責の連祷",
+        "description": "主要な邪眼を8秒間呪います。断罪を獲得するたびに波動を放ち、8ヤード以内にいる他の敵最大4体にダメージを与えます。発動は1秒に1回までです。"
+      },
+      "umbral_anchor": {
+        "name": "影の錨",
+        "description": "初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。"
+      },
+      "hex_of_violence": {
+        "name": "暴虐の呪い",
+        "description": "敵を8秒間呪います。次の3回の攻撃行動ごとに断罪を7生成し、22の影ダメージで反撃します。"
+      },
+      "cruel_pact": {
+        "name": "残酷な契約",
+        "description": "最大体力の12%を捧げて断罪を20生成します。体力が15%以下では使用できません。"
+      },
+      "vicarious_suffering": {
+        "name": "苦痛の肩代わり",
+        "description": "8秒間苦痛を結び、敵の攻撃から最大15の断罪を生成します。自分に使うと受けるダメージが20%減少します。味方に使うと、そのダメージの最大20%を自分へ移しますが、体力が15%未満になることはありません。"
+      },
+      "possess_evil_eye": {
+        "name": "邪眼憑依",
+        "description": "呪術師が主要な邪眼へ10秒間憑依します。運命の針は詠唱1秒になり断罪をさらに2生成し、吸命は移動中も維持でき悪魔の光線を得て、宣告は遅れて25%の追加ダメージを放ちます。"
+      },
+      "coven": {
+        "name": "魔女盟約",
+        "description": "周囲の敵最大4体に15秒間持続する副次的な邪眼を作ります。断罪の共有量へ50%の効率で加算し、宣告の35%分の反響ダメージを受けます。"
       },
       "fear": {
         "name": "責め苦",
@@ -7402,6 +7460,10 @@ export const ja_JP: EnTranslations = {
       "shadowburn": {
         "name": "黄昏の火",
         "description": "対象に灼ける影を即座に叩き込み、{damage} の暗黒ダメージを与えます。"
+      },
+      "ruinous_brand": {
+        "name": "破滅の烙印",
+        "description": "敵1体に15秒間烙印を刻みます。次の3回の直接攻撃呪文は、烙印の敵自身には25%の反響ダメージを与え、別の対象に放つと50%のダメージを烙印の敵にも与えます。"
       },
       "wrath": {
         "name": "野生の稲妻",
@@ -7547,9 +7609,61 @@ export const ja_JP: EnTranslations = {
         "name": "チェインヒール",
         "description": "味方1体を大きく回復し、近くの味方最大2体に連鎖します。連鎖するごとに回復量が50%減少します。（回復スペシャライゼーション）"
       },
+      "soul_harvest": {
+        "name": "霊魂刈り",
+        "description": "敵の魂を切り裂いて{damage}のシャドウダメージを与え、魂の欠片を1個生成する。最大5個。"
+      },
+      "soul_lance": {
+        "name": "魂の槍",
+        "description": "霊魂の槍を放ち、{damage}のシャドウダメージを与える。対象に自分の納骨印がある場合、与えたダメージの50%が追加で印に蓄積される。"
+      },
+      "raise_graveguard": {
+        "name": "墓守の召喚",
+        "description": "頑強な墓守を呼び起こし、常に傍らで戦わせる。同時に操れる墓守は1体まで。"
+      },
+      "raise_skeletal_warrior": {
+        "name": "骸骨戦士の召喚",
+        "description": "魂の欠片を1個消費し、骸骨戦士を30秒間召喚する。一時的なアンデッドは最大3体。"
+      },
+      "raise_bone_mage": {
+        "name": "骨魔導士の召喚",
+        "description": "魂の欠片を2個消費し、遠隔攻撃を行う骨魔導士を30秒間召喚する。一時的なアンデッドは最大3体。"
+      },
+      "bone_armor": {
+        "name": "骨の鎧",
+        "description": "骨で身を包み、最大体力の20%に相当するダメージを吸収する。"
+      },
+      "corpse_explosion": {
+        "name": "骸の爆裂",
+        "description": "魂の欠片を2個消費し、指定地点で死の力を炸裂させ、周囲の敵に{damage}のシャドウダメージを与える。"
+      },
+      "funeral_harvest": {
+        "name": "葬送の収穫",
+        "description": "自分または自分のアンデッドが最近ダメージを与えた敵が死亡すると、魂の欠片を1個獲得します。発動は3秒に1回までです。"
+      },
+      "ossuary_mark": {
+        "name": "納骨印",
+        "description": "敵を12秒間マークし、自分と配下のアンデッドが与えたダメージの20%を蓄積する。再使用すると起爆する。マークされた敵が死亡すると、6メートル以内に爆発し、魂の欠片を1個生成する。"
+      },
+      "unholy_command": {
+        "name": "不浄の号令",
+        "description": "すべてのアンデッドに号令を下し、12秒間、与えるダメージを25%、行動速度を20%上昇させる。"
+      },
+      "reaping_command": {
+        "name": "刈り取りの号令",
+        "description": "魂の欠片を2個消費し、すべてのアンデッドの従者に対象を一斉攻撃させます。範囲攻撃を持つ従者は周囲の敵にも攻撃します。"
+      },
+      "sacrifice_undead": {
+        "name": "亡者の生贄",
+        "description": "一時的なアンデッドの従者を1体破壊し、最大体力の25%を回復する。"
+      },
+      "army_of_the_dead": {
+        "name": "亡者の軍勢",
+        "description": "骸骨戦士2体と骨魔導士1体を召喚し、20秒間の猛攻を仕掛ける。"
+      },
       "metamorphosis": {
-        "name": "悪魔変身",
-        "description": "悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックのタレント）"
+        "name": "リッチ形態",
+        "description": "20秒間リッチとなり、魂の欠片を3個生成し、呪文ダメージと詠唱速度を20%上昇させる。配下のアンデッドは与えるダメージが50%、行動速度が20%上昇する。（死霊術の象徴）"
       },
       "holy_shock": {
         "name": "ホーリーショック",
@@ -7811,9 +7925,17 @@ export const ja_JP: EnTranslations = {
         "name": "枝分かれの稲妻",
         "description": "対象地点へ雷を放ち、周囲の敵に{damage}のダメージを与える。（シャーマンのタレント）"
       },
+      "abyssal_rift": {
+        "name": "深淵の裂け目",
+        "description": "指定地点に裂け目を開き、8ヤード以内の敵を中心へ引き寄せ、{damage}の影ダメージを与えて2秒間スタンさせる。ボスはダメージを受けるが、引き寄せとスタンを無効化する。"
+      },
       "chaos_bolt": {
         "name": "破滅の矢",
         "description": "混沌の炎を放ち、{damage}の火属性ダメージを与える。（ウォーロックのタレント）"
+      },
+      "dark_pact": {
+        "name": "血の盟約",
+        "description": "現在の体力の10%を犠牲にし、最大体力の30%に相当するダメージ吸収シールドを8秒間得る。"
       },
       "cleansing_verdict": {
         "name": "浄化の裁定",
@@ -8006,6 +8128,10 @@ export const ja_JP: EnTranslations = {
       "smoke_screen": {
         "name": "スモークスクリーン",
         "description": "煙幕に紛れ、8秒間、回避率を30%上昇させる。"
+      },
+      "sacrilegious_march": {
+        "name": "冒涜の行進",
+        "description": "移動速度が35%上昇するが、毎秒最大体力の2%を犠牲にする。再使用で解除する。体力が20%になると自動的に解除される。"
       },
       "spellsteal": {
         "name": "魔法奪取",
@@ -10260,6 +10386,18 @@ export const ja_JP: EnTranslations = {
       },
       "water_elemental": {
         "name": "ウォーターエレメンタル"
+      },
+      "graveguard": {
+        "name": "墓守"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "骸骨戦士"
+      },
+      "necromancy_bone_mage": {
+        "name": "骨魔導士"
+      },
+      "necromancy_gravewing": {
+        "name": "墓翼"
       }
     },
     "npcs": {

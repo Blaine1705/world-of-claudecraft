@@ -148,6 +148,8 @@ const UI_PURE_CORES = [
   'src/ui/coords.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
+  'src/ui/hud/pet_bar_core.ts',
+  'src/ui/hud/warlock/doom_meter_view.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/stat_tooltip_view.ts',
@@ -225,6 +227,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/action_bar/action_bar_visibility_core.ts',
   'src/ui/hud/action_bar/mobile_action_page_view.ts',
   'src/ui/hud/action_bar/consumable_bar_view.ts',
+  'src/ui/hud/warlock/destruction_resource_view.ts',
   'src/ui/mobile_hud_layout.ts',
   'src/ui/mobile_fullscreen_window_core.ts',
   'src/ui/auras_view.ts',
@@ -262,6 +265,8 @@ const UI_PURE_CORES = [
 // water_core (the shore-depth sample shared by build + editor setLevel) follow
 // the same contract for the map editor's realtime terrain/water edits.
 const RENDER_PURE_CORES = [
+  'src/render/affliction_familiar_core.ts',
+  'src/render/ability_vfx_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/camera_boom_core.ts',
   'src/render/camera_director_core.ts',
@@ -270,8 +275,14 @@ const RENDER_PURE_CORES = [
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
+  'src/render/evil_eye_marker_core.ts',
+  'src/render/lich_audio_state_core.ts',
+  'src/render/needle_of_fate_vfx_core.ts',
+  'src/render/sentence_vfx_core.ts',
+  'src/render/umbral_anchor_vfx_core.ts',
   'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
+  'src/render/drain_channel_visual_core.ts',
   'src/render/env_prefilter_core.ts',
   'src/render/nameplate_extent_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
@@ -281,6 +292,8 @@ const RENDER_PURE_CORES = [
   'src/render/terrain_region_core.ts',
   'src/render/water_core.ts',
   'src/render/warrior_cast_fx_core.ts',
+  'src/render/characters/form_visual_selection_core.ts',
+  'src/render/characters/metamorph_wing_motion_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));
 

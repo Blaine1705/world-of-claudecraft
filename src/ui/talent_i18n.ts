@@ -81,6 +81,13 @@ type DisplayGlobalKey = Exclude<
   | 'ignitionPct'
   | 'manaPct'
   | 'manaRegenPct'
+  | 'warlockBlacktideSpeedPct'
+  | 'warlockLeadenHex'
+  | 'warlockShadowCredit'
+  | 'warlockAshenFocus'
+  | 'warlockUnbrokenRitual'
+  | 'warlockForbiddenReflection'
+  | 'warlockConsumeChannelDr'
 >;
 
 const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
@@ -106,6 +113,13 @@ const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
   'ignitionPct',
   'manaPct',
   'manaRegenPct',
+  'warlockBlacktideSpeedPct',
+  'warlockLeadenHex',
+  'warlockShadowCredit',
+  'warlockAshenFocus',
+  'warlockUnbrokenRitual',
+  'warlockForbiddenReflection',
+  'warlockConsumeChannelDr',
 ]);
 
 export interface TalentLocaleText {
@@ -844,6 +858,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Resiliencia arcana',
     'Aetheric Thesis': 'Tesis arcana',
     Chronomancy: 'Cronomancia',
+    Necromancy: 'Nigromancia',
+    'Grave Dominion': 'Dominio sepulcral',
     Afterflame: 'Inflamar',
     "Ancestor's Mercy": 'Sanación ancestral',
     'Ancient Lore': 'Conocimiento ancestral',
@@ -1324,6 +1340,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Resiliencia arcana',
     'Aetheric Thesis': 'Tesis arcana',
     Chronomancy: 'Cronomancia',
+    Necromancy: 'Nigromancia',
+    'Grave Dominion': 'Dominio sepulcral',
     Afterflame: 'Incendiar',
     "Ancestor's Mercy": 'Sanación ancestral',
     'Ancient Lore': 'Conocimiento ancestral',
@@ -1804,6 +1822,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Résilience des arcanes',
     'Aetheric Thesis': 'Thèse des arcanes',
     Chronomancy: 'Chronomancie',
+    Necromancy: 'Nécromancie',
+    'Grave Dominion': 'Domination sépulcrale',
     Afterflame: 'Embrasement',
     "Ancestor's Mercy": 'Soins ancestraux',
     'Ancient Lore': 'Savoir ancestral',
@@ -2284,6 +2304,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Résilience des arcanes',
     'Aetheric Thesis': 'Thèse des arcanes',
     Chronomancy: 'Chronomancie',
+    Necromancy: 'Nécromancie',
+    'Grave Dominion': 'Domination sépulcrale',
     Afterflame: 'Embrasement',
     "Ancestor's Mercy": 'Soins ancestraux',
     'Ancient Lore': 'Savoir ancestral',
@@ -2764,6 +2786,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Resilienza arcana',
     'Aetheric Thesis': 'Tesi arcana',
     Chronomancy: 'Cronomanzia',
+    Necromancy: 'Negromanzia',
+    'Grave Dominion': 'Dominio sepolcrale',
     Afterflame: 'Incenerimento',
     "Ancestor's Mercy": 'Guarigione ancestrale',
     'Ancient Lore': 'Conoscenza ancestrale',
@@ -3244,6 +3268,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Arkane Widerstandskraft',
     'Aetheric Thesis': 'Arkane These',
     Chronomancy: 'Chronomantie',
+    Necromancy: 'Nekromantie',
+    'Grave Dominion': 'Grabherrschaft',
     Afterflame: 'Entzünden',
     "Ancestor's Mercy": 'Heilung der Ahnen',
     'Ancient Lore': 'Wissen der Ahnen',
@@ -3724,6 +3750,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': '奥术坚韧',
     'Aetheric Thesis': '奥术论述',
     Chronomancy: '时光术',
+    Necromancy: '死灵术',
+    'Grave Dominion': '墓域统御',
     Afterflame: '点燃',
     "Ancestor's Mercy": '先祖治疗',
     'Ancient Lore': '先祖知识',
@@ -4204,6 +4232,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': '秘法韌性',
     'Aetheric Thesis': '秘法論述',
     Chronomancy: '時光術',
+    Necromancy: '死靈術',
+    'Grave Dominion': '墓域統御',
     Afterflame: '點燃',
     "Ancestor's Mercy": '先祖治療',
     'Ancient Lore': '先祖知識',
@@ -4684,6 +4714,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': '비전 탄력',
     'Aetheric Thesis': '비전 논제',
     Chronomancy: '시간술',
+    Necromancy: '강령술',
+    'Grave Dominion': '무덤 지배',
     Afterflame: '점화',
     "Ancestor's Mercy": '선조의 치유',
     'Ancient Lore': '선조의 지식',
@@ -5164,6 +5196,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': '秘術の弾力性',
     'Aetheric Thesis': '秘術の論文',
     Chronomancy: '時間術',
+    Necromancy: '死霊術',
+    'Grave Dominion': '墓所の支配',
     Afterflame: 'イグナイト',
     "Ancestor's Mercy": '祖霊の癒し',
     'Ancient Lore': '祖霊の知識',
@@ -5644,6 +5678,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Resiliência Arcana',
     'Aetheric Thesis': 'Tese Arcana',
     Chronomancy: 'Cronomancia',
+    Necromancy: 'Necromancia',
+    'Grave Dominion': 'Domínio sepulcral',
     Afterflame: 'Inflamar',
     "Ancestor's Mercy": 'Cura Ancestral',
     'Ancient Lore': 'Conhecimento Ancestral',
@@ -6124,6 +6160,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Тайная устойчивость',
     'Aetheric Thesis': 'Тайный трактат',
     Chronomancy: 'Хрономантия',
+    Necromancy: 'Некромантия',
+    'Grave Dominion': 'Власть могилы',
     Afterflame: 'Воспламенение',
     "Ancestor's Mercy": 'Исцеление предков',
     'Ancient Lore': 'Знания предков',
@@ -6492,6 +6530,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Éterický štít',
     'Aetheric Thesis': 'Éterická teze',
     Chronomancy: 'Chronomancie',
+    Necromancy: 'Nekromancie',
+    'Grave Dominion': 'Vláda hrobu',
     Afterflame: 'Dohořívání',
     "Ancestor's Mercy": 'Slitování předků',
     'Ancient Lore': 'Dávné vědění',
@@ -6892,6 +6932,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Arcane Veerkracht',
     'Aetheric Thesis': 'Arcane Verhandeling',
     Chronomancy: 'Chronomantie',
+    Necromancy: 'Necromantie',
+    'Grave Dominion': 'Grafheerschappij',
     Afterflame: 'Ontsteken',
     "Ancestor's Mercy": 'Voorouderlijke Genezing',
     'Ancient Lore': 'Voorouderlijke Kennis',
@@ -7292,6 +7334,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Arkaniczna odporność',
     'Aetheric Thesis': 'Arkaniczna teza',
     Chronomancy: 'Chronomancja',
+    Necromancy: 'Nekromancja',
+    'Grave Dominion': 'Władza grobu',
     Afterflame: 'Podpalenie',
     "Ancestor's Mercy": 'Uzdrawianie przodków',
     'Ancient Lore': 'Wiedza przodków',
@@ -7692,6 +7736,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Ketahanan Arkana',
     'Aetheric Thesis': 'Tesis Arkana',
     Chronomancy: 'Kronomansi',
+    Necromancy: 'Nekromansi',
+    'Grave Dominion': 'Kuasa Makam',
     Afterflame: 'Penyulutan',
     "Ancestor's Mercy": 'Penyembuhan Leluhur',
     'Ancient Lore': 'Pengetahuan Leluhur',
@@ -8092,6 +8138,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Gizem Dayanıklılığı',
     'Aetheric Thesis': 'Gizem Tezi',
     Chronomancy: 'Kronomansi',
+    Necromancy: 'Nekromansi',
+    'Grave Dominion': 'Mezar Hükümranlığı',
     Afterflame: 'Tutuşturma',
     "Ancestor's Mercy": 'Ata İyileştirmesi',
     'Ancient Lore': 'Ata Bilgisi',
@@ -8492,6 +8540,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Arkan motståndskraft',
     'Aetheric Thesis': 'Arkan tes',
     Chronomancy: 'Kronomanti',
+    Necromancy: 'Nekromanti',
+    'Grave Dominion': 'Gravvälde',
     Afterflame: 'Antänd',
     "Ancestor's Mercy": 'Förfäders läkning',
     'Ancient Lore': 'Förfäders kunskap',
@@ -8892,6 +8942,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Kiên Cường Bí Thuật',
     'Aetheric Thesis': 'Luận Thuyết Bí Thuật',
     Chronomancy: 'Thời Thuật',
+    Necromancy: 'Thuật Chiêu Hồn',
+    'Grave Dominion': 'Quyền Năng Mộ Địa',
     Afterflame: 'Bắt Lửa',
     "Ancestor's Mercy": 'Trị Liệu Tổ Tiên',
     'Ancient Lore': 'Tri Thức Tổ Tiên',
@@ -9292,6 +9344,8 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Aetheric Shell': 'Arkan Modstandskraft',
     'Aetheric Thesis': 'Arkan Afhandling',
     Chronomancy: 'Kronomanti',
+    Necromancy: 'Nekromanti',
+    'Grave Dominion': 'Gravherredømme',
     Afterflame: 'Antænd',
     "Ancestor's Mercy": 'Forfædres Helbredelse',
     'Ancient Lore': 'Forfædres Viden',
@@ -9881,7 +9935,17 @@ function abilityDescription(id: string): string {
 function authoredChoiceDescription(choice: TalentRowOption): string {
   const grantId = choice.effect.grant?.ability;
   if (!grantId) return choice.description;
-  return [abilityDescription(grantId), grantAbilityMetadata(grantId)].filter(Boolean).join(' ');
+  const lang = getLanguage();
+  const riderDescriptions = (choice.effect.ability ?? [])
+    .filter((mod) => mod.ability === grantId)
+    .flatMap((mod) =>
+      (mod.addEffects ?? []).map((effect) =>
+        addedEffectDescription(grantId, effect, lang, localeText[lang]),
+      ),
+    );
+  return [abilityDescription(grantId), ...riderDescriptions, grantAbilityMetadata(grantId)]
+    .filter(Boolean)
+    .join(' ');
 }
 
 function seconds(value: number, lang: SupportedLanguage): string {
@@ -9899,8 +9963,12 @@ function procTriggerDescription(
 ): string {
   const trigger = proc.trigger;
   switch (trigger.on) {
-    case 'castNth':
-      return `${abilityList(trigger.abilities)}${trigger.n > 1 ? ` x${trigger.n}` : ''}`;
+    case 'castNth': {
+      const cadence = `${abilityList(trigger.abilities)}${trigger.n > 1 ? ` x${trigger.n}` : ''}`;
+      return trigger.icd
+        ? `${cadence} (${seconds(trigger.icd, lang)} ${text.statLabels.cooldown})`
+        : cadence;
+    }
     case 'spellCrit':
       return `${text.statLabels.crit}: ${abilityList(trigger.abilities)}`;
     case 'shieldConsumed':
@@ -9980,7 +10048,18 @@ function procDescription(proc: ProcDef, lang: SupportedLanguage, text: TalentLoc
 type DescribedAddedEffect = Extract<
   AbilityEffect,
   {
-    type: 'root' | 'aoeRoot' | 'slow' | 'absorb' | 'dot' | 'extendDot' | 'interrupt' | 'consumeDot';
+    type:
+      | 'root'
+      | 'aoeRoot'
+      | 'slow'
+      | 'absorb'
+      | 'dot'
+      | 'extendDot'
+      | 'interrupt'
+      | 'silence'
+      | 'consumeDot'
+      | 'breakRoots'
+      | 'selfBuff';
   }
 >;
 
@@ -9993,7 +10072,10 @@ function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is De
     effect.type !== 'dot' &&
     effect.type !== 'extendDot' &&
     effect.type !== 'interrupt' &&
-    effect.type !== 'consumeDot'
+    effect.type !== 'silence' &&
+    effect.type !== 'consumeDot' &&
+    effect.type !== 'breakRoots' &&
+    effect.type !== 'selfBuff'
   ) {
     throw new Error(`Unsupported talent rider effect: ${effect.type}`);
   }
@@ -10026,8 +10108,17 @@ function addedEffectDescription(
       return `${name} -> ${abilityName(effect.dot)}: +${seconds(effect.seconds, lang)} (<= +${seconds(effect.maxBonus, lang)}).`;
     case 'interrupt':
       return `${name}: ${t('hudChrome.auraEffect.lockout')} (${seconds(effect.lockout, lang)}).`;
+    case 'silence':
+      return `${name}: ${t('hudChrome.auraEffect.silence')} (${seconds(effect.duration, lang)}).`;
     case 'consumeDot':
       return `${name} -> ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
+    case 'breakRoots':
+      return `${name}: ${t('hudChrome.auraEffect.root')} -> 0.`;
+    case 'selfBuff': {
+      const multiplierShaped = effect.kind === 'buff_speed' || effect.kind === 'buff_haste';
+      const value = multiplierShaped ? effect.value - 1 : effect.value;
+      return `${name}: +${formatPercent(value, lang)} (${seconds(effect.duration, lang)}).`;
+    }
   }
 }
 
@@ -10066,8 +10157,17 @@ function effectDescription(
 
   if (effect.grant) {
     parts.push(text.grant(abilityName(effect.grant.ability)));
-    const granted = abilityDescription(effect.grant.ability);
-    if (granted) parts.push(granted);
+    const grantId = effect.grant.ability;
+    const grantHasRiders = (effect.ability ?? []).some(
+      (mod) => mod.ability === grantId && (mod.addEffects?.length ?? 0) > 0,
+    );
+    if (grantId === 'spell_lock' && grantHasRiders) {
+      const interrupt = ABILITIES[grantId]?.effects.find((entry) => entry.type === 'interrupt');
+      if (interrupt) parts.push(addedEffectDescription(grantId, interrupt, lang, text));
+    } else {
+      const granted = abilityDescription(grantId);
+      if (granted) parts.push(granted);
+    }
     const metadata = grantAbilityMetadata(effect.grant.ability);
     if (metadata) parts.push(metadata);
   }
@@ -10091,6 +10191,43 @@ function effectDescription(
   }
 
   const global = effect.global ?? {};
+  const tuning = effect.tuning ?? {};
+  if (global.warlockBlacktideSpeedPct) {
+    parts.push(
+      `${abilityName('umbral_anchor')}: +${formatPercent(global.warlockBlacktideSpeedPct, lang)} ${t('hud.keybinds.categories.movement')} (${seconds(tuning.duration ?? 4, lang)}).`,
+    );
+  }
+  if (global.warlockLeadenHex) {
+    const maxStacks = tuning.maxStacks ?? 3;
+    parts.push(
+      `${abilityName('curse_of_exhaustion')}: ${t('hudChrome.auraEffect.slow', { pct: formatNumber(global.warlockLeadenHex * 100, lang) })} x${formatNumber(maxStacks, lang)} (${seconds(tuning.slowDuration ?? 5, lang)}); x${formatNumber(maxStacks, lang)} -> ${t('hudChrome.auraEffect.root')} (${seconds(tuning.rootDuration ?? 1.5, lang)}; ${seconds(tuning.rootLockDuration ?? 15, lang)} ${text.statLabels.cooldown}).`,
+    );
+  }
+  if (global.warlockShadowCredit) {
+    parts.push(
+      `>= ${formatPercent(global.warlockShadowCredit, lang)} ${t('classDetails.labels.resource')} -> ${abilityList(['needle_of_fate', 'soul_harvest', 'shadow_bolt'])}: -${formatPercent(1, lang)} ${text.statLabels.cost} x1; >= ${formatPercent(tuning.upperThresholdPct ?? 0.8, lang)} -> x${formatNumber(tuning.maxCharges ?? 2, lang)}.`,
+    );
+  }
+  if (global.warlockAshenFocus) {
+    parts.push(
+      `${t('hud.keybinds.categories.movement')} = 0 (${seconds(tuning.stationaryDuration ?? 1, lang)}) -> ${abilityList(['needle_of_fate', 'soul_harvest', 'shadow_bolt'])}: -${formatPercent(global.warlockAshenFocus, lang)} ${text.statLabels.castTime}.`,
+    );
+  }
+  if (global.warlockUnbrokenRitual) {
+    parts.push(
+      `${text.statLabels.castTime}: ${seconds(1, lang)} -> -${seconds(global.warlockUnbrokenRitual, lang)} ${text.statLabels.cooldown}.`,
+    );
+  }
+  if (global.warlockForbiddenReflection) {
+    parts.push(
+      `${text.statLabels.cooldown}: x2 (${seconds(tuning.reflectionWindow ?? 10, lang)}); ${seconds(global.warlockForbiddenReflection, lang)} ${text.statLabels.cooldown}.`,
+    );
+  }
+  if (global.warlockConsumeChannelDr) {
+    parts.push(
+      `${abilityName('drain_life')}: -${formatPercent(global.warlockConsumeChannelDr, lang)} ${text.statLabels.damage}.`,
+    );
+  }
   for (const [key, value] of Object.entries(global) as [GlobalKey, number][]) {
     if (value === undefined || value === 0) continue;
     if (NON_DISPLAY_GLOBALS.has(key)) continue;
@@ -10131,14 +10268,13 @@ function effectDescription(
 
   for (const mod of effect.ability ?? []) {
     const name = abilityName(mod.ability);
-    if (mod.dmgPct)
-      parts.push(
-        text.increase(
-          `${name} ${text.statLabels.damage}`,
-          formatPercent(mod.dmgPct, lang),
-          perRank,
-        ),
-      );
+    if (mod.dmgPct) {
+      const target =
+        mod.ability === 'life_tap'
+          ? `${name} ${t('classDetails.labels.resource')}`
+          : `${name} ${text.statLabels.damage}`;
+      parts.push(text.increase(target, formatPercent(mod.dmgPct, lang), perRank));
+    }
     if (mod.flatDmg)
       parts.push(
         text.increase(
@@ -10163,6 +10299,14 @@ function effectDescription(
           perRank,
         ),
       );
+    if (mod.cooldownFlat)
+      parts.push(
+        (mod.cooldownFlat < 0 ? text.reduce : text.increase)(
+          `${name} ${text.statLabels.cooldown}`,
+          seconds(Math.abs(mod.cooldownFlat), lang),
+          perRank,
+        ),
+      );
     if (mod.castPct)
       parts.push(
         (mod.castPct < 0 ? text.reduce : text.increase)(
@@ -10184,7 +10328,13 @@ function effectDescription(
       );
     }
     if (mod.damagePushbackImmune) {
-      parts.push(`${name}: ${text.statLabels.castTime} @ 0.`);
+      parts.push(
+        text.reduce(
+          `${name} ${text.statLabels.castTime} @ ${text.statLabels.damage}`,
+          formatPercent(1, lang),
+          perRank,
+        ),
+      );
     }
     if (mod.bonusCharges) parts.push(`${name}: +${formatNumber(mod.bonusCharges, lang)}x.`);
     for (const addedEffect of mod.addEffects ?? []) {

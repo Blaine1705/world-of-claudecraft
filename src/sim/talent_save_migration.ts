@@ -10,8 +10,11 @@ import type { CharacterState } from './sim';
 import { repairTalentLoadouts } from './talent_loadouts';
 import { MAX_LEVEL, type PlayerClass } from './types';
 
-/** Production character-JSON revision introduced by the v0.26 Talents V2 rollout. */
-export const CURRENT_CHARACTER_CONTENT_REVISION = 1;
+/**
+ * Production character-JSON revision. Revision 1 introduced Talents V2; revision
+ * 2 repairs saved Warlock loadout bars for the three overhauled specializations.
+ */
+export const CURRENT_CHARACTER_CONTENT_REVISION = 2;
 
 function migrationLevel(value: number): number {
   if (!Number.isFinite(value)) return 1;
@@ -38,8 +41,9 @@ function canSeedOnMainBar(cls: PlayerClass, abilityId: string): boolean {
 
 /**
  * Keep valid positions, drop obsolete/duplicate/passive entries, then fill empty
- * slots with deterministic baseline/spec actives. Computing seed candidates with
- * an empty row map prevents unselected row grants from leaking onto the bar.
+ * slots with deterministic baseline, specialization, and selected-row actives.
+ * The repaired allocation is already authoritative, so its grants cannot leak
+ * unselected row abilities onto the bar.
  */
 function migrateLoadoutBar(
   cls: PlayerClass,
@@ -64,8 +68,7 @@ function migrateLoadoutBar(
     return abilityId;
   });
 
-  const specOnly = computeTalentModifiers(cls, { spec: allocation.spec, rows: {} }, level);
-  const seedIds = abilitiesKnownAt(cls, level, specOnly)
+  const seedIds = abilitiesKnownAt(cls, level, fullMods)
     .map((entry) => entry.def.id)
     .filter((abilityId) => canSeedOnMainBar(cls, abilityId));
   for (const abilityId of seedIds) {
@@ -102,11 +105,16 @@ function migrateLoadouts(
  * are preserved. Reapplying the current revision is an identity operation.
  */
 export function migrateCharacterTalentsV2(cls: PlayerClass, state: CharacterState): CharacterState {
-  if (
-    Number.isSafeInteger(state.contentRevision) &&
-    (state.contentRevision as number) >= CURRENT_CHARACTER_CONTENT_REVISION
-  ) {
+  const revision = Number.isSafeInteger(state.contentRevision)
+    ? (state.contentRevision as number)
+    : 0;
+  if (revision >= CURRENT_CHARACTER_CONTENT_REVISION) {
     return state;
+  }
+  // Revision 2 changes only Warlock content. Other classes already on canonical
+  // revision 1 keep byte-identical talents/loadouts and receive only the marker.
+  if (revision >= 1 && cls !== 'warlock') {
+    return { ...state, contentRevision: CURRENT_CHARACTER_CONTENT_REVISION };
   }
 
   const level = migrationLevel(state.level);

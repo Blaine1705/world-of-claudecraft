@@ -316,6 +316,14 @@ export const en_CA: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "Condemnation",
+      "doomEmptyStatus": "{value} of {max} Condemnation.",
+      "doomStatus": "{value} of {max} Condemnation; {remaining}."
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "Soul Fragments"
+    },
     "spectate": {
       "banner": "Spectating {name}"
     },
@@ -3270,6 +3278,7 @@ export const en_CA: EnTranslations = {
       "none": "No class matches every filter. Clear one to see more."
     },
     "abilityHook": {
+      "evil_eye": "Names the enemy whose actions and suffering will feed your Condemnation.",
       "heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
@@ -6473,6 +6482,7 @@ export const en_CA: EnTranslations = {
     "tooltip": {
       "rank": "Rank {rank}",
       "cost": "{cost} {resource}",
+      "ruinCost": "{cost} Ruin",
       "range": "{range} yd range",
       "rangeWithMin": "{min}-{max} yd range",
       "instant": "Instant",
@@ -6869,7 +6879,7 @@ export const en_CA: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Rain of Fire",
-        "description": "Calls a rain of fire onto the target area for 4 sec, burning enemies for {damage} Fire damage each second."
+        "description": "Spends 3 Ruin to rain fire over the target area for {damage} Fire damage each second for 4 sec, increasing to 6 sec at rank 2. Desolation calls down the first wave immediately."
       },
       "volley": {
         "name": "Volley",
@@ -7379,9 +7389,29 @@ export const en_CA: EnTranslations = {
         "name": "Blackrot",
         "description": "Corrupts the target, causing {damage} Shadow damage over 18 sec."
       },
+      "evil_eye": {
+        "name": "Evil Eye",
+        "description": "Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry."
+      },
+      "maledict_gaze": {
+        "name": "Maledict Gaze",
+        "description": "Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed."
+      },
+      "needle_of_fate": {
+        "name": "Needle of Fate",
+        "description": "Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target."
+      },
+      "sentence": {
+        "name": "Sentence",
+        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation."
+      },
       "life_tap": {
         "name": "Hard Bargain",
         "description": "Converts {damage} health into {damage} mana."
+      },
+      "cursed_accomplice": {
+        "name": "Cursed Accomplice",
+        "description": "Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec."
       },
       "curse_of_agony": {
         "name": "Hex of Anguish",
@@ -7389,7 +7419,35 @@ export const en_CA: EnTranslations = {
       },
       "drain_life": {
         "name": "Consume",
-        "description": "Drains the target's life, transferring {damage} health to you each second for 5 sec."
+        "description": "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Affliction transfers all of it instead. When channeled on your primary Evil Eye, it consumes all Fate Threads at the start, and each Thread generates 1 extra Condemnation per tick."
+      },
+      "litany_of_guilt": {
+        "name": "Litany of Guilt",
+        "description": "Curses your primary Evil Eye for 8 sec. Condemnation gains release a wave that damages up to 4 other enemies within 8 yards, at most once per second."
+      },
+      "umbral_anchor": {
+        "name": "Umbral Anchor",
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
+      },
+      "hex_of_violence": {
+        "name": "Hex of Violence",
+        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 22 Shadow damage."
+      },
+      "cruel_pact": {
+        "name": "Cruel Pact",
+        "description": "Sacrifices 12% of your maximum health to restore 15% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health."
+      },
+      "vicarious_suffering": {
+        "name": "Vicarious Suffering",
+        "description": "Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health."
+      },
+      "possess_evil_eye": {
+        "name": "Possess the Evil Eye",
+        "description": "The Maledictor possesses your primary Evil Eye for 10 sec. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving and gains a demonic beam, and Sentence releases a delayed echo for 25% damage."
+      },
+      "coven": {
+        "name": "Coven",
+        "description": "Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage."
       },
       "fear": {
         "name": "Harrow",
@@ -7401,7 +7459,11 @@ export const en_CA: EnTranslations = {
       },
       "shadowburn": {
         "name": "Duskfire",
-        "description": "Instantly blasts the target with searing shadow for {damage} Shadow damage."
+        "description": "Spends 1 Ruin to execute an enemy below 20% health for {damage} Shadow damage. Refunds its Ruin if the claimed target dies within 5 sec."
+      },
+      "ruinous_brand": {
+        "name": "Ruinous Brand",
+        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
       },
       "wrath": {
         "name": "Wildbolt",
@@ -7547,9 +7609,61 @@ export const en_CA: EnTranslations = {
         "name": "Chain Heal",
         "description": "Heals a friendly target for 120 to 145, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
       },
+      "soul_harvest": {
+        "name": "Essence Reap",
+        "description": "Tears at the enemy soul for {damage} Shadow damage and creates 1 Soul Fragment, up to 5."
+      },
+      "soul_lance": {
+        "name": "Soul Lance",
+        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+      },
+      "raise_graveguard": {
+        "name": "Raise Graveguard",
+        "description": "Raises a durable Graveguard that remains at your side. You may control one Graveguard at a time."
+      },
+      "raise_skeletal_warrior": {
+        "name": "Raise Skeletal Warrior",
+        "description": "Spends 1 Soul Fragment to raise a Skeletal Warrior for 30 sec. You may command up to 3 temporary undead."
+      },
+      "raise_bone_mage": {
+        "name": "Raise Bone Mage",
+        "description": "Spends 2 Soul Fragments to raise a ranged Bone Mage for 30 sec. You may command up to 3 temporary undead."
+      },
+      "bone_armor": {
+        "name": "Bone Armor",
+        "description": "Wraps you in bone, absorbing damage equal to 20% of your maximum health."
+      },
+      "corpse_explosion": {
+        "name": "Corpse Explosion",
+        "description": "Spends 2 Soul Fragments to rupture death energy at the chosen location, dealing {damage} Shadow damage to nearby enemies."
+      },
+      "funeral_harvest": {
+        "name": "Funeral Harvest",
+        "description": "When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec."
+      },
+      "ossuary_mark": {
+        "name": "Ossuary Mark",
+        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+      },
+      "unholy_command": {
+        "name": "Unholy Command",
+        "description": "Commands all of your undead to deal 25% more damage and act 20% faster for 12 sec."
+      },
+      "reaping_command": {
+        "name": "Reaping Command",
+        "description": "Spends 2 Soul Fragments to command every undead servant to strike your target in unison. Cleaving servants also strike nearby enemies."
+      },
+      "sacrifice_undead": {
+        "name": "Sacrifice Undead",
+        "description": "Destroys one temporary undead servant to restore 25% of your maximum health."
+      },
+      "army_of_the_dead": {
+        "name": "Army of the Dead",
+        "description": "Tears open a grave portal and calls forth one Skeletal Warrior, one Bone Mage, and one Gravewing for a relentless 20 sec assault. They replace your current temporary undead."
+      },
       "metamorphosis": {
-        "name": "Dread Aspect",
-        "description": "Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)"
+        "name": "Lich Form",
+        "description": "Become a Lich for 20 sec, creating 3 Soul Fragments and increasing your spell damage and casting speed by 20%. Your undead deal 50% more damage and act 20% faster, and Soul Lance pierces through its target to strike up to 2 nearby enemies for 50% of its damage. (Necromancy signature)"
       },
       "holy_shock": {
         "name": "Holy Shock",
@@ -7621,7 +7735,7 @@ export const en_CA: EnTranslations = {
       },
       "conflagrate": {
         "name": "Conflagrate",
-        "description": "Consumes your Burning Pact on the enemy to ignite them for {damage} Fire damage. (Destruction signature)"
+        "description": "Advances one future tick of your Burning Pact, then ignites the target for {damage} Fire damage. Generates 1 Ruin and 1 Desolation. Holds 2 charges. (Destruction signature)"
       },
       "moonkin_form": {
         "name": "Moonwing Form",
@@ -7657,7 +7771,7 @@ export const en_CA: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Summon Pyre Colossus",
-        "description": "Binds a Pyre Colossus to your will — a hulking juggernaut with crushing melee and the deepest health and armor of any demon. A long cooldown gates its raw power. Summoning a new demon dismisses your current one. You may have one demon at a time."
+        "description": "Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights as a guardian for 15 sec without replacing your demon and answers each Ruin spender with Worldfire."
       },
       "summon_doomguard": {
         "name": "Summon Wraithborn",
@@ -7811,9 +7925,17 @@ export const en_CA: EnTranslations = {
         "name": "Skybranch",
         "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
       },
+      "abyssal_rift": {
+        "name": "Abyssal Rift",
+        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+      },
       "chaos_bolt": {
         "name": "Ruinbolt",
-        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
+        "description": "Spends 3 Ruin to hurl a heavy bolt of chaotic fire for {damage} Fire damage. Desolation shortens its cast by 30%."
+      },
+      "dark_pact": {
+        "name": "Sanguine Covenant",
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
       },
       "cleansing_verdict": {
         "name": "Cleansing Verdict",
@@ -8007,6 +8129,10 @@ export const en_CA: EnTranslations = {
         "name": "Smoke Screen",
         "description": "Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec."
       },
+      "sacrilegious_march": {
+        "name": "Sacrilegious March",
+        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
+      },
       "spellsteal": {
         "name": "Spellsteal",
         "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
@@ -8020,8 +8146,8 @@ export const en_CA: EnTranslations = {
         "description": "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec."
       },
       "spell_lock": {
-        "name": "Gag Order",
-        "description": "Silences the target mid-cast and prevents casting from that school for 5 sec."
+        "name": "Abyssal Gag",
+        "description": "Interrupts enemy spellcasting and prevents casting from that school for 4 sec."
       },
       "tranquility": {
         "name": "Gladesong",
@@ -10260,6 +10386,18 @@ export const en_CA: EnTranslations = {
       },
       "water_elemental": {
         "name": "Water Elemental"
+      },
+      "graveguard": {
+        "name": "Graveguard"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "Skeletal Warrior"
+      },
+      "necromancy_bone_mage": {
+        "name": "Bone Mage"
+      },
+      "necromancy_gravewing": {
+        "name": "Gravewing"
       }
     },
     "npcs": {

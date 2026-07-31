@@ -10,6 +10,7 @@ import {
   chronoOverlayCharges,
   combustionOverlayActive,
   frostOverlayCharges,
+  necromancyOverlayCharges,
   procOverlayState,
 } from '../src/ui/proc_overlay_view';
 
@@ -61,14 +62,33 @@ describe('frostOverlayCharges (Frost 5-Icicle variant)', () => {
   });
 });
 
+describe('necromancyOverlayCharges (Soul Fragment bank)', () => {
+  it('reads the Soul Fragment stack, including the wire-defaulted first stack', () => {
+    expect(necromancyOverlayCharges([])).toBe(0);
+    expect(necromancyOverlayCharges([{ id: 'soul_fragments' }])).toBe(1);
+    expect(necromancyOverlayCharges([{ id: 'soul_fragments', stacks: 3 }])).toBe(3);
+    expect(necromancyOverlayCharges([{ id: 'soul_fragments', stacks: 5 }])).toBe(5);
+  });
+
+  it('clamps malformed mirrored values and ignores unrelated auras', () => {
+    expect(necromancyOverlayCharges([{ id: 'form_lich', stacks: 2 }])).toBe(0);
+    expect(necromancyOverlayCharges([{ id: 'soul_fragments', stacks: 99 }])).toBe(5);
+    expect(necromancyOverlayCharges([{ id: 'soul_fragments', stacks: -2 }])).toBe(0);
+  });
+});
+
 function fakeWriters() {
   const classes = new Map<string, boolean>();
+  const attrs = new Map<string, string>();
   const writers = {
     toggleClass: (_el: HTMLElement, cls: string, on: boolean) => {
       classes.set(cls, on);
     },
+    setAttr: (_el: HTMLElement, name: string, value: string) => {
+      attrs.set(name, value);
+    },
   } as unknown as PainterHostWriters;
-  return { writers, classes };
+  return { writers, classes, attrs };
 }
 
 describe('ProcOverlayPainter class mapping', () => {
@@ -150,6 +170,46 @@ describe('ProcOverlayPainter class mapping', () => {
     expect(classes.get('hot')).toBe(true);
   });
 
+  it('lights one soul crystal per fragment and clears other themes', () => {
+    const { writers, classes, attrs } = fakeWriters();
+    const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
+
+    painter.paintNecromancyCharges(3);
+    expect(classes.get('necromancy')).toBe(true);
+    expect(classes.get('n1')).toBe(true);
+    expect(classes.get('n2')).toBe(true);
+    expect(classes.get('n3')).toBe(true);
+    expect(classes.get('n4')).toBe(false);
+    expect(classes.get('n5')).toBe(false);
+    expect(classes.get('frost')).toBe(false);
+    expect(classes.get('chrono')).toBe(false);
+    expect(classes.get('hot')).toBe(false);
+    expect(attrs.get('aria-hidden')).toBe('false');
+    expect(attrs.get('aria-valuenow')).toBe('3');
+
+    painter.paintNecromancyCharges(5);
+    expect(classes.get('n4')).toBe(true);
+    expect(classes.get('n5')).toBe(true);
+
+    painter.paintNecromancyCharges(0);
+    expect(classes.get('necromancy')).toBe(true);
+    expect(classes.get('n1')).toBe(false);
+    expect(classes.get('n5')).toBe(false);
+  });
+
+  it('clears every Necromancy class when another theme takes ownership', () => {
+    const { writers, classes, attrs } = fakeWriters();
+    const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
+    painter.paintNecromancyCharges(5);
+
+    painter.paintFrostCharges(2);
+    expect(classes.get('necromancy')).toBe(false);
+    expect(classes.get('n1')).toBe(false);
+    expect(classes.get('n5')).toBe(false);
+    expect(classes.get('frost')).toBe(true);
+    expect(attrs.get('aria-hidden')).toBe('true');
+  });
+
   it('pins the Fire phoenix during Combustion without requiring Hot Streak', () => {
     const { writers, classes } = fakeWriters();
     const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
@@ -193,6 +253,55 @@ describe('Frost phoenix visual progression', () => {
   });
 });
 
+describe('Necromancy Soul Fragment visual progression', () => {
+  it('renders five independently lit soul shards on a horizontal rail', () => {
+    const domSource = readFileSync(
+      new URL('../src/ui/proc_overlay_dom.ts', import.meta.url),
+      'utf8',
+    );
+    const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+    const bankRule = css.match(/#proc-overlay \.necromancy-bank\s*\{([^}]*)\}/)?.[1] ?? '';
+
+    expect(domSource).toContain('class="soul-rail"');
+    expect(domSource.match(/class="soul-crystal soul-crystal-[1-5]"/g)).toHaveLength(5);
+    expect(bankRule).toContain('width: 250px');
+    expect(bankRule).toContain('height: 86px');
+    for (let stack = 1; stack <= 5; stack++) {
+      expect(css).toContain(`#proc-overlay.necromancy.n${stack} .soul-crystal-${stack}`);
+      const positionRule =
+        css.match(
+          new RegExp(`#proc-overlay\\.necromancy \\.soul-crystal-${stack}\\s*\\{([^}]*)\\}`),
+        )?.[1] ?? '';
+      expect(positionRule).toContain('top: 50%');
+    }
+  });
+
+  it('keeps the empty bank visible and makes only its artwork draggable', () => {
+    const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+    const rule = css.match(/#proc-overlay\.necromancy\s*\{([^}]*)\}/)?.[1] ?? '';
+    const artworkRule =
+      css.match(
+        /#proc-overlay\.necromancy \.soul-rail,\s*#proc-overlay\.necromancy \.soul-crystal\s*\{([^}]*)\}/,
+      )?.[1] ?? '';
+
+    expect(rule).toContain('opacity: 0.72');
+    expect(rule).toContain('pointer-events: none');
+    expect(artworkRule).toContain('pointer-events: auto');
+    expect(artworkRule).toContain('cursor: grab');
+  });
+
+  it('adds a stronger persistent full-bank glow at five fragments', () => {
+    const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+    const fullRule = css.match(/#proc-overlay\.necromancy\.n5\s*\{([^}]*)\}/)?.[1] ?? '';
+    const flareRule =
+      css.match(/#proc-overlay\.necromancy\.n5 \.necromancy-bank::after\s*\{([^}]*)\}/)?.[1] ?? '';
+
+    expect(fullRule).toContain('opacity: 1');
+    expect(flareRule).toContain('opacity: 0.9');
+    expect(flareRule).toContain('animation: soul-bank-full-flare');
+  });
+});
+
 describe('Phoenix mobile size', () => {
   it('scales the shared proc overlay down only in touch layout', () => {
     const desktopCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
@@ -202,10 +311,13 @@ describe('Phoenix mobile size', () => {
     );
     const baseRule = desktopCss.match(/#proc-overlay\s*\{([^}]*)\}/)?.[1] ?? '';
     const mobileRule = mobileCss.match(/body\.mobile-touch #proc-overlay\s*\{([^}]*)\}/)?.[1] ?? '';
+    const necromancyMobileRule =
+      mobileCss.match(/body\.mobile-touch #proc-overlay\.necromancy\s*\{([^}]*)\}/)?.[1] ?? '';
 
     expect(baseRule).toContain('width: 300px');
     expect(baseRule).toContain('height: 232px');
     expect(baseRule).not.toContain('scale: 0.2');
     expect(mobileRule).toContain('scale: 0.2');
+    expect(necromancyMobileRule).toContain('scale: 0.55');
   });
 });

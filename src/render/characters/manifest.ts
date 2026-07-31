@@ -298,6 +298,7 @@ const TOLLING_BELL: ClipMap = {
 
 const PLAYERS = 'models/chars/players';
 const ENEMIES = 'models/chars/enemies';
+const FORMS = 'models/chars/forms';
 const CREATURES = 'models/creatures';
 const WEAPONS = 'models/weapons';
 
@@ -690,6 +691,26 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0x5a4030,
     tintStrength: 0.55,
   },
+  form_metamorph: {
+    url: `${FORMS}/metamorphosis.glb`,
+    height: 2.55,
+    // Generated Lich rig. Tripo bipeds face +X, while character visuals face
+    // +Z at world facing 0. Jump is intentionally absent: the generic biped
+    // jump distorted this winged silhouette, so airborne frames use Idle plus
+    // the controlled procedural wing pose in CharacterVisual.
+    yaw: -Math.PI / 2,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+  },
   // Druid Wolf Form AND shaman Shadewolf (ghost_wolf renders this visual with
   // the ghost material on top). Same custom baked wolf as the world wolves;
   // the tawny tint keeps the druid form readable against grey pack wolves.
@@ -872,6 +893,25 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: WATER_ELEMENTAL,
     attackTimeScale: 1.1,
   },
+  mob_gravewing: {
+    url: `${CREATURES}/gravewing.glb`,
+    height: 2.4,
+    // Tripo's rig faces +X; character visuals face +Z at world facing 0.
+    yaw: -Math.PI / 2,
+    // The source Attack clip is 6.625s. Gravewing swings every 1.8s, or about
+    // 1.29s with both Necromancy haste buffs, so play it in 1.10s and return
+    // to locomotion before another swing can restart the full-body one-shot.
+    attackTimeScale: 6,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      jump: 'Jump',
+    },
+  },
   mob_dragonkin: {
     url: `${CREATURES}/dragonevolved.glb`,
     height: 2.4,
@@ -908,8 +948,63 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.15,
   },
-  // warlock demon pets (emberkin/gloomshade) — one biped rig, the entity colour and
-  // the mob template's scale tell the little orange emberkin from the bulky gloomshade
+  // Dedicated Destruction summons generated through the creature pipeline.
+  // Their authored fel textures stay untinted. The manifest height combines
+  // with each MobTemplate scale to render Emberkin at 1.15 units, Gloomshade
+  // at 3.05 units, and the Pyre Colossus at 4.25 units.
+  mob_emberkin: {
+    url: `${CREATURES}/emberkin.glb`,
+    height: 2.1,
+    yaw: -Math.PI / 2,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+  },
+  mob_gloomshade: {
+    url: `${CREATURES}/gloomshade_chainwarden.glb`,
+    height: 2.75,
+    yaw: -Math.PI / 2,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+  },
+  mob_pyre_colossus: {
+    url: `${CREATURES}/pyre_colossus.glb`,
+    height: 2.5,
+    yaw: -Math.PI / 2,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+  },
+  // Shared fallback rig for the remaining warlock demons. The entity colour
+  // and the mob template's scale distinguish their silhouettes.
   mob_demon: {
     url: `${CREATURES}/demonalt.glb`,
     height: 1.8,
@@ -1224,9 +1319,10 @@ const MOB_KEYS: Record<string, string> = {
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',
   training_dummy: 'mob_training_dummy',
-  emberkin: 'mob_demon',
+  emberkin: 'mob_emberkin',
+  gloomshade: 'mob_gloomshade',
+  pyre_colossus: 'mob_pyre_colossus',
   water_elemental: 'mob_water_elemental',
-  gloomshade: 'mob_demon',
   duskborn: 'mob_demon',
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',
@@ -1273,6 +1369,10 @@ const MOB_KEYS: Record<string, string> = {
   nythraxis_heroic_warrior_add: 'skel_warrior',
   nythraxis_heroic_priest_add: 'skel_necromancer',
   nythraxis_heroic_rogue_add: 'skel_rogue',
+  graveguard: 'skel_warrior',
+  necromancy_skeletal_warrior: 'skel_minion',
+  necromancy_bone_mage: 'skel_mage',
+  necromancy_gravewing: 'mob_gravewing',
   brother_aldric_raid: 'npc_aldric',
   hollow_acolyte: 'skel_mage',
   sexton_marrow: 'skel_mage',

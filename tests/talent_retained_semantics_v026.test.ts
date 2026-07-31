@@ -153,12 +153,12 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(
       effect(resolved('priest', 'mind_sear', { 20: 'pri_r20_mind_sear' }), 'aoeDamage'),
     ).toMatchObject({ min: 24, max: 28 });
-    const carnage = ROW_TREES.warlock
+    const reflection = ROW_TREES.warlock
       .flatMap((row) => row.options)
       .find((option) => option.id === 'wlk_r20_grimoire_of_haste');
-    expect(carnage?.effect.proc?.responses).toContainEqual(
-      expect.objectContaining({ kind: 'absorb', amount: 90 }),
-    );
+    expect(reflection?.name).toBe('Forbidden Reflection');
+    expect(reflection?.effect.global?.warlockForbiddenReflection).toBe(60);
+    expect(reflection?.effect.tuning?.reflectionWindow).toBe(10);
   });
 
   it('scales both the flat bonus and coefficient of a weapon strike', () => {
@@ -257,37 +257,12 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(dot?.school).toBe('nature');
   });
 
-  it("applies conditional bolt damage only for the caster's DoT", () => {
-    const damage = (withOwnDot: boolean): number => {
-      const sim = harness(new Sim({ seed: 2611, playerClass: 'warlock', autoEquip: false }));
-      sim.setPlayerLevel(20);
-      expect(sim.selectTalentRow(14, 'wlk_r14_amplify_curse')).toBe(true);
-      const player = sim.player;
-      const target = spawnTarget(sim, player);
-      if (withOwnDot) {
-        target.auras.push({
-          id: 'corruption',
-          name: 'Blackrot',
-          kind: 'dot',
-          remaining: 18,
-          duration: 18,
-          value: 1,
-          sourceId: player.id,
-          school: 'shadow',
-        });
-      }
-      const res = sim.resolvedAbility('shadow_bolt');
-      if (!res) throw new Error('missing Gloom Bolt');
-      sim.events = [];
-      runEffects(sim.ctx, player, metaOf(sim), target, res);
-      const event = sim.events.find(
-        (candidate) => candidate.type === 'damage' && candidate.ability === res.def.name,
-      );
-      if (!event || event.type !== 'damage') throw new Error('missing Gloom Bolt damage');
-      return event.amount;
-    };
+  it("reduces each Warlock specialization's primary generator cost by 25%", () => {
+    const rows = { 14: 'wlk_r14_amplify_curse' };
 
-    expect(damage(true)).toBeGreaterThan(damage(false));
+    expect(resolved('warlock', 'needle_of_fate', rows, 'affliction').cost).toBe(23);
+    expect(resolved('warlock', 'soul_harvest', rows, 'demonology').cost).toBe(44);
+    expect(resolved('warlock', 'shadow_bolt', rows, 'destruction').cost).toBe(42);
   });
 
   it('Steady Rain prevents damage pushback without changing baseline channels', () => {

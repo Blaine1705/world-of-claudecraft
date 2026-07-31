@@ -17,6 +17,7 @@
 // deps at the identical call site, so the Sim's global draw order is unchanged
 // by the extraction.
 
+import { afflictionCanCastWhileMoving } from './combat/affliction';
 import { isRooted, isStunned } from './combat/cc';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import { GHOST_RUN_MULT } from './spirit';
@@ -168,6 +169,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
         casting != null &&
         (casting.def.castWhileMoving ||
           casting.castWhileMoving ||
+          afflictionCanCastWhileMoving(p, p.castingAbility) ||
           p.auras.some((a) => a.kind === 'ice_floes'));
       if (!mobile) deps.cancelCast(p);
     }

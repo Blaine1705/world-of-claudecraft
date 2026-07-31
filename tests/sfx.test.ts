@@ -15,6 +15,7 @@ interface FakeSource {
   started: boolean;
   stopAt: number | null;
   connect(n: unknown): unknown;
+  disconnect(): void;
   start(): void;
   stop(t?: number): void;
 }
@@ -77,6 +78,7 @@ function installAudioStub(): void {
         connect(n: unknown) {
           return n;
         },
+        disconnect() {},
         start() {
           this.started = true;
         },
@@ -110,6 +112,9 @@ beforeEach(() => {
   const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
   buffers.set('foot_grass', { duration: 0.48 });
   buffers.set('foot_wood', WOOD_BUFFER);
+  buffers.set('impact_shadow', { duration: 0.7 });
+  buffers.set('impact_bone', { duration: 0.5 });
+  buffers.set('proj_shadow', { duration: 0.65 });
 });
 
 describe('footstep audio', () => {
@@ -278,5 +283,64 @@ describe('footstep toggle', () => {
     sfx.footstep(0, 0, 0, 'grass', true, true);
     expect(sources.length).toBe(muted + 1);
     expect(lastSource().started).toBe(true);
+  });
+});
+
+describe('necromancy audio', () => {
+  it('uses distinct low-pitched cues for transformation, heartbeat, and soul consumption', () => {
+    const before = sources.length;
+
+    sfx.necromancy('lichTransform', 0, 0, 0, true);
+    expect(lastSource().playbackRate.value).toBeCloseTo(0.68);
+    expect(lastSource().buffer?.duration).toBe(0.7);
+    nowT += 4;
+    sfx.necromancy('lichHeartbeat', 0, 0, 0, true);
+    expect(lastSource().playbackRate.value).toBeCloseTo(0.55);
+    expect(lastSource().buffer?.duration).toBe(0.5);
+    nowT += 1;
+    sfx.necromancy('soulConsume', 0, 0, 0, true);
+    expect(lastSource().playbackRate.value).toBeCloseTo(0.74);
+    expect(lastSource().buffer?.duration).toBe(0.65);
+
+    expect(sources.length).toBe(before + 3);
+  });
+
+  it('isolates necromancy cooldowns from shared samples and other Liches', () => {
+    sfx.playAt('impact_shadow', 0, 0, 0, { cooldown: 10 });
+    const afterOrdinaryImpact = sources.length;
+
+    sfx.necromancy('lichTransform', 0, 0, 0, true);
+    sfx.necromancy('lichTransform', 10, 0, 10, false);
+
+    expect(sources.length).toBe(afterOrdinaryImpact + 2);
+  });
+
+  it('keys necromancy cooldowns by stable entity identity, not position', () => {
+    const before = sources.length;
+
+    sfx.necromancy('lichTransform', 4, 0, 4, false, 101);
+    sfx.necromancy('lichTransform', 4, 0, 4, false, 202);
+
+    expect(sources.length).toBe(before + 2);
+  });
+
+  it('prunes stale positional cooldown entries during a long session', () => {
+    const cooldowns = (
+      sfx as unknown as {
+        lastPlay: Map<string, number>;
+      }
+    ).lastPlay;
+    cooldowns.clear();
+
+    for (let sourceId = 0; sourceId < 200; sourceId++) {
+      sfx.necromancy('lichTransform', 0, 0, 0, false, sourceId);
+      lastSource().onended?.();
+    }
+    expect(cooldowns.size).toBe(200);
+
+    nowT += 61;
+    sfx.necromancy('lichTransform', 0, 0, 0, false, 999);
+
+    expect(cooldowns.size).toBe(1);
   });
 });

@@ -297,6 +297,30 @@ export type AuraKind =
   | 'form_fireball'
   | 'form_moonkin'
   | 'form_shadow'
+  // Necromancy secondary resource and signature transformation.
+  | 'soul_fragments'
+  | 'form_lich'
+  // Affliction's shared 0 to 100 Condemnation pool and its curse network.
+  | 'affliction_doom'
+  | 'affliction_eye'
+  | 'affliction_eye_secondary'
+  | 'affliction_accomplice'
+  | 'affliction_violence'
+  | 'affliction_vicarious'
+  | 'affliction_possession'
+  | 'affliction_litany'
+  | 'affliction_fate_threads'
+  | 'affliction_consume_threads'
+  // Short hostile tag used to award Funeral Harvest from recent owner or
+  // servant damage when the marked enemy dies.
+  | 'necromancy_harvest_mark'
+  // Ossuary Mark stores landed damage from its Necromancy owner and undead.
+  | 'necromancy_ossuary_mark'
+  // Spatial residue left by a recently slain enemy. value/value2 store world
+  // x/z so the authoritative aura also survives online replication/reconnect.
+  | 'necromancy_death_echo'
+  // Shared Warlock return point. value/value2/value3 store its world x/y/z.
+  | 'warlock_anchor'
   // Warlock Metamorphosis: a temporary demon transform (cosmetic scale + tint in render,
   // its damage/haste bonuses ride separate buff auras).
   | 'form_metamorph'
@@ -322,6 +346,12 @@ export type AuraKind =
   | 'brain_freeze'
   | 'winters_chill'
   | 'icicles'
+  // Destruction warlock secondary-resource and cast-shaping state.
+  | 'destruction_ruin'
+  | 'desolation'
+  | 'ruinous_brand'
+  | 'duskfire_claim'
+  | 'pyre_guardian'
   // Chronomancer offensive cooldown (combat/chronomancy.ts): while worn, Aether
   // Darts does not consume the caster's Arcane Charges.
   | 'perfect_moment'
@@ -446,6 +476,7 @@ export const FORM_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'form_fireball',
   'form_moonkin',
   'form_shadow',
+  'form_lich',
 ]);
 
 export function isFormAuraKind(kind: AuraKind): boolean {
@@ -1637,6 +1668,13 @@ export interface MobTemplate {
   petRanged?: {
     range: number;
     school: Aura['school'];
+    /** A successful projectile refreshes this magic-damage vulnerability.
+     *  Source ownership is keyed to the summoner, so multiple identical
+     *  servants refresh one debuff instead of stacking it. */
+    spellVuln?: {
+      amp: number;
+      duration: number;
+    };
     // Water Jet (mage water elemental): the pet-bar command channels a beam,
     // leaving `total` damage ticking over `duration` at `interval`.
     jet?: {
@@ -1647,6 +1685,13 @@ export interface MobTemplate {
       slow: number;
       cooldown: number;
     };
+  };
+  /** A melee servant periodically splashes a fraction of one weapon roll onto
+   *  nearby hostile enemies other than its primary target. */
+  petCleave?: {
+    radius: number;
+    mult: number;
+    cooldown: number;
   };
   /** False for utility-free ranged summons such as the mage Water Elemental. */
   petCanTaunt?: boolean;
@@ -1979,6 +2024,9 @@ export type AbilityEffect =
       canCrit?: boolean;
       frontal?: boolean;
       stunSec?: number;
+      // Pull every non-boss target to the blast center before applying the
+      // paired stun. Used by Abyssal Rift.
+      pullToCenter?: boolean;
       softCap?: number;
       rageOnHit?: { base: number; perTarget: number; capTargets: number };
     }
@@ -2108,6 +2156,11 @@ export type AbilityEffect =
       internalCooldown?: number;
       auraId?: string;
       auraName?: string;
+      // Optional sustained health price for a toggle buff. The aura pays this
+      // fraction of maximum health each second and switches itself off once
+      // the wearer reaches the configured health floor.
+      healthDrainPctMax?: number;
+      disableBelowHpPct?: number;
     }
   | { type: 'petBuff'; kind: AuraKind; value: number; duration: number }
   | { type: 'applyDebuff'; kind: AuraKind; value: number; duration: number }
@@ -2116,7 +2169,56 @@ export type AbilityEffect =
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
+  | { type: 'selfDamagePctCurrent'; pct: number }
   | { type: 'selfHealPctMax'; pct: number }
+  | { type: 'selfAbsorbPctMax'; pct: number; duration: number }
+  | { type: 'gainSoulFragments'; amount: number }
+  | {
+      type: 'summonUndead';
+      templateId: string;
+      temporary: boolean;
+      duration?: number;
+    }
+  | { type: 'commandUndead'; duration: number; dmgPct: number; hastePct: number }
+  | { type: 'sacrificeUndead'; healPctMax: number }
+  | { type: 'reapingCommand' }
+  | { type: 'armyOfDead'; duration: number }
+  | { type: 'empowerUndeadArmy'; duration: number; dmgPct: number; hastePct: number }
+  | {
+      type: 'necromancyOssuaryMark';
+      duration: number;
+      storedDamagePct: number;
+      soulLanceBonusPct: number;
+      deathRadius: number;
+    }
+  | { type: 'afflictionEvilEye' }
+  | { type: 'afflictionNeedle' }
+  | { type: 'afflictionSentence'; damageMult?: number; flat?: number }
+  | { type: 'afflictionAccomplice' }
+  | {
+      type: 'afflictionViolence';
+      duration: number;
+      charges: number;
+      doomPerProc: number;
+      damage: number;
+    }
+  | { type: 'afflictionCruelPact'; healthPct: number; manaPctMax: number; doom: number }
+  | { type: 'afflictionVicarious'; duration: number; maxDoom: number }
+  | { type: 'warlockUmbralAnchor'; duration: number; maxRange: number }
+  | {
+      type: 'afflictionCoven';
+      duration: number;
+      radius: number;
+      maxSecondary: number;
+    }
+  | { type: 'afflictionPossession'; duration: number }
+  | {
+      type: 'afflictionLitany';
+      duration: number;
+      radius: number;
+      maxTargets: number;
+      damage: number;
+    }
   | { type: 'selfHotPctMax'; pct: number; duration: number; interval: number }
   | { type: 'aoeAllyMaxHp'; pct: number; duration: number; radius: number }
   | { type: 'partyMeleeBuff'; attackSpeedMult: number; dmgPct: number; duration: number }
@@ -2159,7 +2261,11 @@ export type AbilityEffect =
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet
   | { type: 'dismissPet' } // release the caster's pet back to the wild
   | { type: 'summonPet'; templateId: string } // warlock demon summon: creates/replaces a controlled pet
-  | { type: 'summonDemon'; mobId: string }; // warlock: summon a demon pet (emberkin/gloomshade)
+  | { type: 'summonDemon'; mobId: string } // warlock: summon a demon pet (emberkin/gloomshade)
+  | { type: 'destructionConflagrate' }
+  | { type: 'ruinousBrand'; duration: number; charges: number }
+  | { type: 'duskfireClaim'; duration: number }
+  | { type: 'summonPyreColossus'; duration: number };
 
 export interface AbilityRank {
   rank: number;
@@ -2175,6 +2281,9 @@ export interface AbilityDef {
   name: string;
   class: PlayerClass;
   cost: number; // rage/mana/energy (rank 1; ranks may override)
+  // Destruction-only secondary-resource spend. Mana remains the primary cost;
+  // the cast lifecycle validates and spends this deterministic 0..5 meter too.
+  ruinCost?: number;
   castTime: number; // 0 = instant
   // Hold-to-charge spell. The server derives the released stage from its own
   // cast clock; clients send only the release intent.
@@ -2301,6 +2410,8 @@ export interface AbilityDef {
   // full 5-stack Icicles buff). Absent means any presence of the aura suffices.
   // The whole aura is still consumed on cast (consumeAuraKind removes it).
   requiresAuraStacks?: number;
+  // Necromancy spenders use Soul Fragments in addition to the ordinary mana bar.
+  soulFragmentCost?: number;
   // Spend-ALL ability (Iron Resolve): `cost` is only the MINIMUM gate; the
   // actual bill is the caster's resource bar (capped by spendResourceCap when
   // set), snapshotted into the resolved cost at apply time so both the spend and
@@ -3631,6 +3742,9 @@ export type SimEvent = { pid?: number } & (
         | 'heavyBolt'
         | 'beam'
         | 'bubbleBeam'
+        | 'drainBeam'
+        // Affliction companion's brief Eye-to-target ray. It is never a projectile.
+        | 'evilEyeGaze'
         | 'tick'
         | 'nova'
         | 'chainHeal'
@@ -3639,6 +3753,8 @@ export type SimEvent = { pid?: number } & (
         | 'shout'
         | 'weaponAura'
         | 'flourish'
+        // Ability-specific, entity-anchored activation with no travel component.
+        | 'selfCast'
         // Talent-moment effects: a proc arming (procSurge), a ward appearing
         // (wardBloom), a stored heal-echo firing (echoBurst), and a DoT being
         // detonated (detonate). Visual-only; whole-JSON wire needs no schema change.
@@ -3646,6 +3762,9 @@ export type SimEvent = { pid?: number } & (
         | 'wardBloom'
         | 'echoBurst'
         | 'detonate'
+        // Affliction's final Condemnation release. The level field carries the
+        // consumed 20 to 100 pool for presentation scaling only.
+        | 'sentenceBurst'
         // Chronomancy Temporal Echo (docs/prd/mage-chronomancy.md section 13):
         // a brief temporal glyph blooming directly OVER the marked ally on apply.
         // Target-anchored, no projectile travels to the ally. Visual-only.
@@ -3654,6 +3773,9 @@ export type SimEvent = { pid?: number } & (
         | 'temporalRewindNova'
         | 'frostCone'
         | 'fireCone'
+        // Necromancy Lich Form entry. The event is cosmetic and lets clients
+        // synchronize the eruption, camera impulse, and transformation sound.
+        | 'lichTransform'
         // A teleport step (Flickerstep / Shadowstep): the renderer SNAPS the
         // mover instead of arcing the reposition like a leap.
         | 'blinkStep';
@@ -3665,6 +3787,9 @@ export type SimEvent = { pid?: number } & (
       range?: number;
       angle?: number;
       level?: number;
+      // Fate Threads severed by Sentence. Presentation uses 1 to 3 to make
+      // the retained-thread verdict visibly stronger than a plain discharge.
+      threads?: number;
       // Stable presentation discriminator; renderers must not infer a player
       // attack animation from school or an English ability label.
       attackAnimation?: 'ranged-shot';
@@ -3685,7 +3810,18 @@ export type SimEvent = { pid?: number } & (
       x: number;
       z: number;
       school: string;
-      fx: 'burst' | 'nova' | 'orb' | 'meteorFall' | 'runeCircle' | 'snowZone';
+      fx:
+        | 'burst'
+        | 'nova'
+        | 'orb'
+        | 'meteorFall'
+        | 'runeCircle'
+        | 'snowZone'
+        // Periodic pulse of a persistent ground effect such as Rain of Fire.
+        | 'tick'
+        // Soul released by Sacrifice Undead. It starts at this world point and
+        // travels to targetId as a cosmetic homing projectile.
+        | 'soulTravel';
       // blast radius in yards; when set the renderer flashes a terrain-draped
       // AoE ring of this size under the burst so the impact area reads clearly
       radius?: number;
@@ -3702,6 +3838,10 @@ export type SimEvent = { pid?: number } & (
       // 'orb' only: the casting entity, keying halt/resume to their live orb
       // (one orb per caster: the cooldown far outlasts the flight).
       sourceId?: number;
+      // Optional entity destination for world-originating effects.
+      targetId?: number;
+      // Stable ability discriminator for ability-specific ground visuals.
+      ability?: string;
     }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide

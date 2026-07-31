@@ -1,7 +1,7 @@
 import type { SimContext } from '../sim_context';
 import type { Aura, AuraKind, Entity } from '../types';
 
-function matches(aura: Aura, abilityId?: string): boolean {
+function matches(aura: { empowerAbilities?: readonly string[] }, abilityId?: string): boolean {
   if (!aura.empowerAbilities) return true;
   return abilityId !== undefined && aura.empowerAbilities.includes(abilityId);
 }
@@ -26,7 +26,12 @@ export function consumeAuraKind(
   const idx = e.auras.findIndex((aura) => aura.kind === kind && matches(aura, abilityId));
   if (idx < 0) return null;
   if (EMPOWER_CAST_KINDS.has(kind)) e.castConsumedEmpower = true;
-  const [aura] = e.auras.splice(idx, 1);
+  const aura = e.auras[idx];
+  if ((aura.charges ?? 1) > 1) {
+    aura.charges = (aura.charges ?? 1) - 1;
+    return aura;
+  }
+  e.auras.splice(idx, 1);
   ctx.emit({
     type: 'aura',
     targetId: e.id,
@@ -53,11 +58,21 @@ export function hasNextExecuteFree(e: Entity, abilityId: string): boolean {
   );
 }
 
-export function nextCastCheapMultiplier(e: Entity, abilityId?: string): number | null {
+export function nextCastCheapMultiplierFromAuras(
+  auras: readonly {
+    kind: string;
+    value?: number;
+    empowerAbilities?: readonly string[];
+  }[],
+  abilityId?: string,
+): number | null {
   return (
-    e.auras.find((aura) => aura.kind === 'next_cast_cheap' && matches(aura, abilityId))?.value ??
-    null
+    auras.find((aura) => aura.kind === 'next_cast_cheap' && matches(aura, abilityId))?.value ?? null
   );
+}
+
+export function nextCastCheapMultiplier(e: Entity, abilityId?: string): number | null {
+  return nextCastCheapMultiplierFromAuras(e.auras, abilityId);
 }
 
 export const BATTLE_TRANCE_ABILITIES: ReadonlySet<string> = new Set([

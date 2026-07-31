@@ -13,6 +13,81 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warlock.doomLabel': '譴罪',
+  'hudChrome.warlock.doomEmptyStatus': '{value}/{max} 譴罪。',
+  'hudChrome.warlock.doomStatus': '{value}/{max} 譴罪；剩餘 {remaining}。',
+  'hudChrome.procOverlay.soulFragmentsMeter': '靈魂碎片',
+  'guide.abilityHook.evil_eye': '標記一名敵人，使其行動與承受的苦難為你累積譴罪。',
+  'entities.abilities.evil_eye.description':
+    '將一名敵人標記為詛咒焦點。移動邪眼會保留譴罪，但不會刷新其20秒的持續時間。',
+  'entities.abilities.maledict_gaze.name': '咒眼凝視',
+  'entities.abilities.maledict_gaze.description':
+    '你的咒眼每2.5秒攻擊所選的主要邪眼目標，造成暗影傷害。附身邪眼會使其攻擊速度加倍。',
+  'entities.abilities.needle_of_fate.name': '命運之針',
+  'entities.abilities.needle_of_fate.description':
+    '刺穿敵人，造成{damage}點暗影傷害。若目標帶有你的邪眼，則產生5點譴罪；若不存在邪眼，則先標記目標。',
+  'entities.abilities.sentence.name': '裁決',
+  'entities.abilities.sentence.description':
+    '消耗全部譴罪裁決敵人。傷害與附加效果會在20、50、80和100點譴罪時提升。',
+  'entities.abilities.cursed_accomplice.name': '受咒共犯',
+  'entities.abilities.cursed_accomplice.description':
+    '未選擇友方玩家時連結你的咒眼，使其凝視產生2點譴罪；連結友方玩家時，該玩家對邪眼目標造成傷害會產生3點。每2秒最多觸發一次。',
+  'entities.abilities.litany_of_guilt.name': '罪責禱文',
+  'entities.abilities.litany_of_guilt.description':
+    '詛咒你的主要邪眼8秒。每次獲得譴罪時會釋放衝擊波，對8碼內最多4名其他敵人造成傷害，每秒最多觸發一次。',
+  'entities.abilities.umbral_anchor.name': '暗影錨',
+  'entities.abilities.umbral_anchor.description':
+    '首次施放：在腳下錨定暗影，持續5分鐘。在40碼內再次施放可返回錨點，消耗錨點並觸發45秒冷卻。',
+  'entities.abilities.hex_of_violence.name': '暴行咒',
+  'entities.abilities.hex_of_violence.description':
+    '詛咒敵人8秒。其接下來的3次傷害行動各產生7點譴罪，並反噬22點暗影傷害。',
+  'entities.abilities.cruel_pact.name': '殘酷契約',
+  'entities.abilities.cruel_pact.description':
+    '犧牲最大生命值的12%以產生20點譴罪。生命值不高於15%時無法使用。',
+  'entities.abilities.vicarious_suffering.name': '苦痛轉承',
+  'entities.abilities.vicarious_suffering.description':
+    '連結苦痛8秒，受到敵對攻擊時最多產生15點譴罪。對自己使用時受到的傷害降低20%；對盟友使用時最多將20%的傷害轉移給你，但不會使你的生命值降至15%以下。',
+  'entities.abilities.possess_evil_eye.name': '附身邪眼',
+  'entities.abilities.possess_evil_eye.description':
+    '咒術者附身你的主要邪眼10秒。命運之針施法時間變為1秒並額外產生2點譴罪；吞噬可在移動中引導並獲得惡魔射線；裁決會延遲追加25%的傷害。',
+  'entities.abilities.coven.name': '巫契',
+  'entities.abilities.coven.description':
+    '在最多4名附近敵人身上製造持續15秒的次級邪眼。它們以50%的效率補充共享譴罪池，並承受裁決35%的回響傷害。',
+  'entities.mobs.necromancy_gravewing.name': '墓翼',
+  'entities.abilities.soul_harvest.name': '精華收割',
+  'entities.abilities.soul_harvest.description':
+    '撕裂敵人的靈魂，造成 {damage} 點暗影傷害，並產生 1 枚靈魂碎片，最多 5 枚。',
+  'entities.abilities.raise_graveguard.name': '喚醒墓衛',
+  'entities.abilities.raise_graveguard.description':
+    '召喚一名堅韌的墓衛常伴身側。同一時間只能控制一名墓衛。',
+  'entities.abilities.raise_skeletal_warrior.name': '喚醒骷髏戰士',
+  'entities.abilities.raise_skeletal_warrior.description':
+    '消耗 1 枚靈魂碎片，召喚一名骷髏戰士，持續 30 秒。最多可號令 3 名臨時亡靈。',
+  'entities.abilities.raise_bone_mage.name': '喚醒骸骨法師',
+  'entities.abilities.raise_bone_mage.description':
+    '消耗 2 枚靈魂碎片，召喚一名遠程骸骨法師，持續 30 秒。最多可號令 3 名臨時亡靈。',
+  'entities.abilities.bone_armor.name': '骸骨護甲',
+  'entities.abilities.bone_armor.description': '以骸骨環繞自身，吸收相當於最大生命值 20% 的傷害。',
+  'entities.abilities.corpse_explosion.name': '屍骸爆裂',
+  'entities.abilities.corpse_explosion.description':
+    '消耗 2 枚靈魂碎片，在目標地點引爆死亡能量，對附近敵人造成 {damage} 點暗影傷害。',
+  'entities.abilities.funeral_harvest.name': '葬魂收割',
+  'entities.abilities.funeral_harvest.description':
+    '當一個近期被你或你的亡靈傷害過的敵人死亡時，你獲得1枚靈魂碎片。每3秒最多觸發一次。',
+  'entities.abilities.unholy_command.name': '邪穢號令',
+  'entities.abilities.unholy_command.description':
+    '號令所有亡靈，使其傷害提高 25%、行動速度提高 20%，持續 12 秒。',
+  'entities.abilities.reaping_command.name': '收割號令',
+  'entities.abilities.reaping_command.description':
+    '消耗2枚靈魂碎片，命令所有亡靈僕從同時攻擊你的目標。擁有順劈攻擊的僕從也會攻擊附近敵人。',
+  'entities.abilities.sacrifice_undead.name': '獻祭亡靈',
+  'entities.abilities.sacrifice_undead.description': '摧毀一名臨時亡靈僕從，恢復最大生命值的 25%。',
+  'entities.abilities.army_of_the_dead.name': '亡者軍團',
+  'entities.abilities.army_of_the_dead.description':
+    '召喚兩名骷髏戰士和一名骸骨法師，發動持續 20 秒的猛烈攻勢。',
+  'entities.mobs.graveguard.name': '墓衛',
+  'entities.mobs.necromancy_skeletal_warrior.name': '骷髏戰士',
+  'entities.mobs.necromancy_bone_mage.name': '骸骨法師',
   'hudChrome.crafting.identity.ceilingRare': '精良品質上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -138,6 +213,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.name': '戰鼓',
   'entities.abilities.chain_lightning.name': '叉狀閃電',
   'entities.abilities.chaos_bolt.name': '毀滅箭',
+  'entities.abilities.abyssal_rift.name': '深淵裂隙',
+  'entities.abilities.abyssal_rift.description':
+    '在指定位置撕開一道裂隙，將8碼內的敵人拉向中心，造成{damage}點暗影傷害並使其昏迷2秒。首領會受到傷害，但免疫拉拽和昏迷。',
+  'entities.abilities.dark_pact.name': '猩紅契約',
+  'entities.abilities.dark_pact.description':
+    '犧牲目前生命值的10%，獲得相當於最大生命值30%的傷害吸收護盾，持續8秒。',
+  'entities.abilities.sacrilegious_march.name': '褻瀆行軍',
+  'entities.abilities.sacrilegious_march.description':
+    '移動速度提高35%，但每秒犧牲最大生命值的2%。再次施放可取消。生命值達到20%時會自動關閉。',
   'entities.abilities.cleansing_verdict.name': '淨化裁決',
   'entities.abilities.cleansing_verdict.description':
     '淨化一個友方目標身上的有害魔法效果，並為其恢復{damage}點生命值。',
@@ -2674,6 +2758,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '以痛苦烈焰灼燒敵人，造成 {damage} 點火焰傷害。施法迅速。',
   'entities.abilities.shadowburn.name': '暮焰',
   'entities.abilities.shadowburn.description': '立即以灼燒暗影轟擊目標，造成 {damage} 點暗影傷害。',
+  'entities.abilities.ruinous_brand.name': '毀滅烙印',
+  'entities.abilities.ruinous_brand.description':
+    '標記一名敵人15秒。你的接下來3個直接法術對被標記敵人造成25%的迴響傷害；若法術以其他目標為目標，則向被標記者複製50%的傷害。',
   'entities.abilities.wrath.name': '狂野奔雷',
   'entities.abilities.wrath.description': '投擲一道自然能量箭，造成 {damage} 點自然傷害。',
   'entities.abilities.healing_touch.name': '荒野癒合',
@@ -2863,9 +2950,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crusader_strike.name': '十字軍聖擊',
   'entities.abilities.crusader_strike.description':
     '打擊目標，造成武器傷害外加 {damage} 點神聖傷害。（聖騎士天賦）',
-  'entities.abilities.metamorphosis.name': '惡魔變形',
+  'entities.abilities.metamorphosis.name': '巫妖型態',
   'entities.abilities.metamorphosis.description':
-    '化為惡魔之力，使護甲和攻擊強度提高 20 秒。（術士天賦）',
+    '化身巫妖，持續 20 秒，產生 3 枚靈魂碎片，並使法術傷害和施法速度提高 20%。你的亡靈傷害提高 50%、行動速度提高 20%。（死靈術代表技能）',
   'entities.items.worn_sword.name': '鏽蝕短劍',
   'entities.items.gnarled_staff.name': '沼櫟法杖',
   'entities.items.rusty_dagger.name': '生鏽匕首',
@@ -8752,4 +8839,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': '沒有該 ID 的物品。',
   'devCommand.kitCurrentSpec': '目前專精',
   'hudChrome.enchanting.wornTag': '已裝備（{slot}）',
+  'entities.abilities.soul_lance.name': '靈魂長槍',
+  'entities.abilities.soul_lance.description':
+    '投擲一支幽魂長槍，造成 {damage} 點暗影傷害。若目標帶有你的藏骨印記，該傷害的 50% 會額外計入印記。',
+  'entities.abilities.ossuary_mark.name': '藏骨印記',
+  'entities.abilities.ossuary_mark.description':
+    '標記一名敵人 12 秒，儲存你與你的不死生物所造成傷害的 20%。再次施放可引爆印記。若被標記的敵人死亡，印記會在 6 碼範圍內爆炸並產生 1 個靈魂碎片。',
 };

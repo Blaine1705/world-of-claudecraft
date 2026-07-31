@@ -39,6 +39,7 @@ import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
+import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
@@ -2522,6 +2523,7 @@ export class ClientWorld implements IWorld {
       e.castingAbility = w.cast ?? null;
       e.castRemaining = w.castRem ?? 0;
       e.castTotal = w.castTot ?? 0;
+      e.castTargetId = w.castTgt ?? null;
       e.channeling = !!w.chan;
       e.sitting = !!w.sit;
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
@@ -3603,7 +3605,7 @@ export class ClientWorld implements IWorld {
   }
   setPetAutoTaunt(enabled: boolean): void {
     for (const e of this.entities.values()) {
-      if (e.kind === 'mob' && e.ownerId === this.playerId) {
+      if (isPrimaryOwnedPetEntity(e, this.playerId)) {
         e.petAutoTaunt = enabled;
         break;
       }
@@ -3613,7 +3615,7 @@ export class ClientWorld implements IWorld {
 
   setPetAutoWaterJet(enabled: boolean): void {
     for (const e of this.entities.values()) {
-      if (e.kind === 'mob' && e.ownerId === this.playerId) {
+      if (isPrimaryOwnedPetEntity(e, this.playerId)) {
         e.petAutoWaterJet = enabled;
         break;
       }

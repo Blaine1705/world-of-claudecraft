@@ -253,6 +253,7 @@ const HOT_PAINTERS: ReadonlyArray<{
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/action_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/warlock/doom_meter_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
   // party_below_target measures the target frame, its #tf-debuffs strip, the
   // party container, and (on mobile) the rows wrapper + move zone (five rect
@@ -565,6 +566,7 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
           procGlow: false,
           empowered: false,
           ariaLabel: 'A',
+          ariaDescription: '',
           keybindLabel: 'K',
         },
       ],

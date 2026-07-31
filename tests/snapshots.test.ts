@@ -466,6 +466,29 @@ describe('Combat Mech held weapon over the wire', () => {
   });
 });
 
+describe('channel target over the wire', () => {
+  it('lets a late observer reconstruct the Drain Life tether from snapshot state', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warlock' });
+    const caster = sim.player;
+    caster.castingAbility = 'drain_life';
+    caster.channeling = true;
+    caster.castRemaining = 3.25;
+    caster.castTotal = 5;
+    caster.castTargetId = 91;
+
+    const wire = wireEntity(caster);
+    expect(wire.castTgt).toBe(91);
+
+    const client = bareClient(caster.id + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(caster.id)!;
+    expect(mirrored.castingAbility).toBe('drain_life');
+    expect(mirrored.channeling).toBe(true);
+    expect(mirrored.castTargetId).toBe(91);
+    expect(mirrored.castRemaining).toBe(3.25);
+  });
+});
+
 // Operator-set account flair (the [AI] mark + an official streamer's links). The
 // wire keys `ai` and `slk` ARE the protocol, so pin both halves together: the REAL
 // server emit (wireEntity) into the REAL client mirror (applySnapshot). Pinning only

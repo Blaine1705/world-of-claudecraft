@@ -84,7 +84,11 @@ export function talentEffectIconRef(effect: TalentEffect | undefined): TalentIco
 }
 
 export function talentRowOptionIconRef(option: TalentRowOption): TalentIconRef {
-  return talentEffectIconRef(option.effect);
+  const derived = talentEffectIconRef(option.effect);
+  if (derived.kind === 'crest' && option.icon && ABILITIES[option.icon]) {
+    return { kind: 'ability', id: option.icon };
+  }
+  return derived;
 }
 
 export function talentSpecIconRef(spec: SpecDef): TalentSpecIconRef {

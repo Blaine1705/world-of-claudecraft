@@ -38,11 +38,17 @@ import { attachAvatarFallback } from '../ui/avatar_fallback';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
+import { AbilityVfx, AbilityVfxFx } from './ability_vfx';
+import type { AbilityVfxTextures } from './ability_vfx/fx_textures';
+import { shouldDrawLegacyCastSparkle, syncAbilityVfxCast } from './ability_vfx_registry';
+import { AbyssalRiftFx } from './abyssal_rift_fx';
+import { AfflictionFamiliar } from './affliction_familiar';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { attachBankerChestToNpcView } from './banker_chest';
 import { type BirdsView, buildBirds } from './birds';
+import { BurningPactMarkers } from './burning_pact_markers';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import {
@@ -84,6 +90,15 @@ import {
   preloadTrainingDummyAssets,
   trainingDummyAssetsReady,
 } from './characters/assets';
+import {
+  activeCharacterFormVisual,
+  characterFormMaskForAura,
+  characterFormReadyMask,
+  characterFormShadowPlan,
+  characterFormVisibility,
+  requestedCharacterForm,
+  resolvedCharacterForm,
+} from './characters/form_visual_selection_core';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import {
   playerRangedAttackAlreadyStarted,
@@ -103,6 +118,7 @@ import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { buildDoorBody } from './door_portal';
+import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
 import {
   createDrawStatsAccumulator,
   type DrawStatsAccumulator,
@@ -113,6 +129,7 @@ import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town';
 import { objectDisplayName } from './entity_labels';
 import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
+import { EvilEyeMarkers } from './evil_eye_markers';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
 import { buildFish, type FishView } from './fish';
@@ -146,6 +163,7 @@ import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene } from './jail_scene';
+import { stepLichHeartbeat } from './lich_audio_state_core';
 import { LightPulses } from './light_pulses';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import {
@@ -163,6 +181,10 @@ import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from './nameplate_projection';
+import { NecromancyArmyPortalFx } from './necromancy_army_portal_fx';
+import { NecromancyGroundFx } from './necromancy_ground_fx';
+import { NeedleOfFateVfx } from './needle_of_fate_vfx';
+import { isNeedleOfFateProjectile } from './needle_of_fate_vfx_core';
 import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
 import { buildEastbrookNoticeboard } from './noticeboard';
 import { resolveDirectPickEntityId } from './pick_resolution';
@@ -192,6 +214,7 @@ import { RingOfFrostVisuals } from './ring_of_frost_visual';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor } from './self_motion';
+import { SentenceVfx } from './sentence_vfx';
 import { isSharedGeometry, isSharedMaterial } from './shared_resource';
 import { buildClouds, buildSky, type SkyView } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
@@ -209,6 +232,7 @@ import { buildTerrain, type TerrainView } from './terrain';
 import { sparkleTexture } from './textures';
 import { targetIntensity } from './travel_speed_fx';
 import { TravelSpeedFxPainter } from './travel_speed_fx_painter';
+import { UmbralAnchorMarker } from './umbral_anchor_marker';
 import {
   BALL_RADIUS,
   buildValeCupBall,
@@ -644,6 +668,7 @@ export interface EntityView {
   bearVisual: CharacterVisual | null; // druid bear form, built lazily
   catVisual: CharacterVisual | null; // druid cat form, built lazily
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
+  metamorphVisual: CharacterVisual | null; // Necromancy Lich Form, built lazily
   fireballTravelVisual: FireballTravelVisual | null; // Mage travel form, built lazily
   iceBlockVisual: IceBlockVisual | null; // Ice Block shell, built lazily on first stasis
   temporalHourglassVisual: TemporalHourglassVisual | null;
@@ -722,6 +747,7 @@ export interface EntityView {
   // spatial-audio state: distance travelled since the last footfall, and edge
   // latches for jump/land/water-entry detection.
   stepAccum: number;
+  lichHeartbeatAt: number;
   waterContactSeen: boolean;
   waterContactActive: boolean;
   waterContactX: number;
@@ -945,6 +971,10 @@ export class Renderer {
   // bridge so the elemental enters Channel immediately instead of flashing its
   // short Waterbolt attack before `castingAbility` arrives.
   private waterJetVisualChannels = new Map<number, number>();
+  // Snapshot-observed Drain Life channels let late observers reconstruct the tether.
+  private snapshotDrainVisualChannels = new Set<number>();
+  private snapshotDemonicDrainVisualChannels = new Set<number>();
+  private drainChannelStopLatch = new DrainChannelStopLatch();
   private aoeRingNext = 0;
   private recklessSkulls = new RecklessSkullPainter();
   private groundAimReticle: GroundAimReticleVisual;
@@ -1149,12 +1179,19 @@ export class Renderer {
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
   vfx: Vfx;
+  private abilityVfx!: AbilityVfx;
+  private abilityVfxFx!: AbilityVfxFx;
+  private needleOfFateVfx!: NeedleOfFateVfx;
+  private sentenceVfx!: SentenceVfx;
   private lightPulses: LightPulses;
   // Flash a pooled talent-moment point light at an entity's feet (see
   // light_pulses.ts); bound once in the constructor over the views map.
   private pulseAt: (id: number, school: string, intensity: number, duration: number) => void;
   private frozenOrbFx!: FrozenOrbFx;
   private mageGroundFx!: MageGroundFx;
+  private necromancyGroundFx!: NecromancyGroundFx;
+  private necromancyArmyPortalFx!: NecromancyArmyPortalFx;
+  private abyssalRiftFx!: AbyssalRiftFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
   private readonly mageBarrierStateScratch: MageBarrierState = {
@@ -1356,6 +1393,8 @@ export class Renderer {
       LOW_GFX ? 150 : 130,
       LOW_GFX ? 520 : 470,
     );
+    setRenderCategory(this.umbralAnchorMarker.group, 'vfx');
+    this.scene.add(this.umbralAnchorMarker.group);
 
     // sky dome — follows the camera so the world strip never outruns it.
     // High tier: shader gradient + sun glow with biome-aware horizon tints;
@@ -1801,25 +1840,101 @@ export class Renderer {
         this.vfx.burst(new THREE.Vector3(x, gy + 0.4, z), 'fire', 34, 1.4);
       },
     );
+    this.necromancyGroundFx = new NecromancyGroundFx(this.scene, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
+    );
+    this.necromancyArmyPortalFx = new NecromancyArmyPortalFx(this.scene, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
+    );
+    this.abyssalRiftFx = new AbyssalRiftFx(this.scene, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
+    );
     this.ringOfFrostVisuals = new RingOfFrostVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
-    this.vfx = new Vfx(this.scene, (id, frac) => {
+    const vfxAnchor = (
+      id: number,
+      frac: number,
+      localX = 0,
+      localZ = 0,
+      out = new THREE.Vector3(),
+    ) => {
       const v = this.views.get(id);
       if (!v) return null;
       const e = this.sim.entities.get(id);
-      const h = v.height * (e?.scale ?? 1) * frac;
-      return new THREE.Vector3(v.group.position.x, v.group.position.y + h, v.group.position.z);
-    });
+      const entityScale = e?.scale ?? 1;
+      const h = v.height * entityScale * frac;
+      const yaw = v.group.rotation.y;
+      const cos = Math.cos(yaw);
+      const sin = Math.sin(yaw);
+      return out.set(
+        v.group.position.x + (localX * cos + localZ * sin) * entityScale,
+        v.group.position.y + h,
+        v.group.position.z + (-localX * sin + localZ * cos) * entityScale,
+      );
+    };
+    this.vfx = new Vfx(this.scene, vfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
+    const ribbonAnchor = (id: number, frac: number, out?: THREE.Vector3) =>
+      vfxAnchor(id, frac, 0, 0, out);
+    this.abilityVfxFx = new AbilityVfxFx(this.scene, this.camera, ribbonAnchor, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
+    );
+    this.abilityVfxFx.setViewportScale(
+      this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(),
+      60,
+    );
+    this.abilityVfx = new AbilityVfx({
+      vfx: this.vfx,
+      fx: this.abilityVfxFx,
+      anchor: vfxAnchor,
+      spawnAoeRing: (x, z, radius, school, colorHex) =>
+        this.spawnAoeRing(x, z, radius, school, colorHex),
+      triggerAttack: (id, abilityId) => this.triggerAttack(id, abilityId),
+      lightPulse: (id, school, intensity, duration) =>
+        this.pulseAt(id, school, intensity, duration),
+      isMob: (id) => this.sim.entities.get(id)?.kind === 'mob',
+      castingAbilityOf: (id) => this.sim.entities.get(id)?.castingAbility ?? null,
+      isMidOneShot: (id) => {
+        const view = this.views.get(id);
+        return view ? !!this.activeVisual(view)?.isMidOneShot : false;
+      },
+      localPlayerId: () => this.sim.player.id,
+      isInstantAbility: (abilityId) => {
+        const def = ABILITIES[abilityId];
+        return !def || (def.castTime <= 0 && !def.channel && !def.empowerStages);
+      },
+      addShake: (amount) => this.addShake(amount),
+    });
     this.pulseAt = (id, school, intensity, duration) => {
       const v = this.views.get(id);
       if (!v) return;
       this.lightPulses.pulse(v.group.position, school, intensity, duration);
     };
+    this.needleOfFateVfx = new NeedleOfFateVfx(
+      this.scene,
+      this.camera,
+      (id, heightFraction, out) => {
+        const view = this.views.get(id);
+        const entity = this.sim.entities.get(id);
+        if (!view || !entity || entity.dead) return false;
+        const entityScale = entity.scale;
+        out.set(
+          view.group.position.x,
+          view.group.position.y + view.height * entityScale * heightFraction,
+          view.group.position.z,
+        );
+        return true;
+      },
+      this.lowGfx,
+      (targetId) => this.pulseAt(targetId, 'shadow', 3.8, 0.28),
+    );
+    setRenderCategory(this.needleOfFateVfx.group, 'vfx');
+    this.sentenceVfx = this.createSentenceVfx();
+    setRenderCategory(this.sentenceVfx.group, 'vfx');
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
@@ -1844,6 +1959,33 @@ export class Renderer {
     window.visualViewport?.addEventListener('resize', resize);
     window.visualViewport?.addEventListener('scroll', resize);
     document.addEventListener('fullscreenchange', resize);
+  }
+
+  private createSentenceVfx(injectedTextures?: AbilityVfxTextures): SentenceVfx {
+    return new SentenceVfx(
+      this.scene,
+      this.camera,
+      (id, heightFraction, out) => {
+        const view = this.views.get(id);
+        const entity = this.sim.entities.get(id);
+        if (view) {
+          const entityScale = entity?.scale ?? 1;
+          out.set(
+            view.group.position.x,
+            view.group.position.y + view.height * entityScale * heightFraction,
+            view.group.position.z,
+          );
+          return true;
+        }
+        if (!entity) return false;
+        out.set(entity.pos.x, entity.pos.y + heightFraction * 2 * entity.scale, entity.pos.z);
+        return true;
+      },
+      this.lowGfx,
+      (sourceId, targetId, condemnation) =>
+        this.sentenceImpactFeedback(sourceId, targetId, condemnation),
+      injectedTextures,
+    );
   }
 
   private measureViewport(): { width: number; height: number } {
@@ -1901,6 +2043,7 @@ export class Renderer {
     }
     const devicePxHeight = this.webgl.domElement.clientHeight * this.webgl.getPixelRatio();
     this.vfx.setViewportScale(devicePxHeight, 60);
+    this.abilityVfxFx?.setViewportScale(devicePxHeight, 60);
     // Weapon-skin VFX point sprites size against the device-pixel height too:
     // future rigs read the module value, live rigs re-scale in place.
     setWeaponVfxViewportHeight(devicePxHeight);
@@ -1999,6 +2142,9 @@ export class Renderer {
     this.foliage.setGrassQuality(state.levels.grass);
     this.foliage.setModelQuality(state.levels.foliage);
     this.vfx.setQuality(state.levels.vfx);
+    this.abilityVfx.setQuality(state.levels.vfx);
+    this.necromancyArmyPortalFx.setQuality(state.levels.vfx);
+    this.abyssalRiftFx.setQuality(state.levels.vfx);
     this.effectivePointLights = Math.max(1, Math.round(GFX.maxPointLights * state.levels.lighting));
     if (Math.abs(previousScale - this.effectiveRenderScale) >= 0.001) this.applyResolution();
   }
@@ -2530,7 +2676,7 @@ export class Renderer {
   private createCharacterVisualWithRetry(
     e: Entity,
     slot: string,
-    formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel',
+    formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel' | 'form_metamorph',
   ): CharacterVisual | null {
     const now = performance.now();
     if (!this.viewCreateRetry.canAttempt(e.id, slot, now)) return null;
@@ -2587,9 +2733,15 @@ export class Renderer {
       fogFar,
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
-    this.vfx.update(dt);
+    this.vfx.update(dt, this.reducedMotion());
+    this.abilityVfx.update(dt, this.reducedMotion());
+    this.needleOfFateVfx.update(dt, this.reducedMotion());
+    this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
+    this.necromancyGroundFx.update(dt, this.reducedMotion());
+    this.necromancyArmyPortalFx.update(dt, this.reducedMotion());
+    this.abyssalRiftFx.update(dt, this.reducedMotion());
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
     this.ringOfFrostVisuals.update(dt);
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
@@ -2820,21 +2972,40 @@ export class Renderer {
   private buildPlayerPrewarmGroup(deadline: number): {
     group: THREE.Group;
     visualCount: number;
+    visuals: CharacterVisual[];
   } {
     const group = new THREE.Group();
     const p = this.sim.player;
     group.position.set(p.pos.x, p.pos.y, p.pos.z - 21);
     setRenderCategory(group, 'prewarm');
     let idx = 0;
+    const visuals: CharacterVisual[] = [];
     const place = (obj: THREE.Object3D): void => {
       obj.position.set(((idx % 8) - 3.5) * 2.8, 0, Math.floor(idx / 8) * 2.8);
       group.add(obj);
       idx++;
     };
+    // Build Metamorphosis before regular player variants so first activation
+    // cannot pay prepareVisual's clone, traversal and far-LOD bake cost in
+    // combat. The form also joins the existing shader compile pass.
+    const metamorphEntity = this.prewarmEntity(
+      'player',
+      'warlock',
+      CLASSES.warlock?.color ?? 0xffffff,
+      1,
+      0,
+      -10_999,
+    );
+    const metamorph = createCharacterVisual(metamorphEntity, 'form_metamorph');
+    if (metamorph) {
+      metamorph.setActive(true);
+      place(metamorph.root);
+      visuals.push(metamorph);
+    }
     for (const cls of ALL_CLASSES) {
       const variants = skinCount(`player_${cls}`);
       for (let skin = 0; skin < variants; skin++) {
-        if (performance.now() >= deadline) return { group, visualCount: idx };
+        if (performance.now() >= deadline) return { group, visualCount: idx, visuals };
         const color = CLASSES[cls]?.color ?? 0xffffff;
         const entity = this.prewarmEntity('player', cls, color, 1, skin, -11_000 - idx);
         const visual = createCharacterVisual(entity);
@@ -2842,9 +3013,10 @@ export class Renderer {
         if (!visual) continue;
         visual.root.visible = true;
         place(visual.root);
+        visuals.push(visual);
       }
     }
-    return { group, visualCount: idx };
+    return { group, visualCount: idx, visuals };
   }
 
   private buildObjectPrewarmGroup(): THREE.Group {
@@ -3068,6 +3240,7 @@ export class Renderer {
     let entityPrewarmGroup: THREE.Group | null = null;
     let npcPrewarmGroup: THREE.Group | null = null;
     let playerPrewarmGroup: THREE.Group | null = null;
+    let playerPrewarmInstances: CharacterVisual[] = [];
     let objectPrewarmGroup: THREE.Group | null = null;
     let propMaterialPrewarmGroup: THREE.Group | null = null;
     let foliagePrewarmGroup: THREE.Group | null = null;
@@ -3248,6 +3421,7 @@ export class Renderer {
           const built = this.buildPlayerPrewarmGroup(buildDeadline);
           playerPrewarmGroup = built.group;
           playerPrewarmVisuals = built.visualCount;
+          playerPrewarmInstances = built.visuals;
           this.scene.add(playerPrewarmGroup);
         },
         detail: () =>
@@ -3498,11 +3672,15 @@ export class Renderer {
       }
     } finally {
       this.vfx.clear();
+      this.abilityVfxFx.clear();
+      this.needleOfFateVfx.clear();
+      this.sentenceVfx.clear();
       if (doorPrewarmGroup) this.scene.remove(doorPrewarmGroup);
       if (interiorPrewarmGroup) this.scene.remove(interiorPrewarmGroup);
       if (entityPrewarmGroup) this.scene.remove(entityPrewarmGroup);
       if (npcPrewarmGroup) this.scene.remove(npcPrewarmGroup);
       if (playerPrewarmGroup) this.scene.remove(playerPrewarmGroup);
+      for (const visual of playerPrewarmInstances) visual.dispose();
       if (objectPrewarmGroup) {
         // Re-show the object lights hidden during the prewarm so the pooled objects
         // (reused for the live ground objects) light normally. (Cast: the manifest
@@ -3566,9 +3744,61 @@ export class Renderer {
 
   // Visual reactions to sim events (called by the HUD for every event,
   // including those between other players and mobs).
+  private sentenceImpactFeedback(sourceId: number, targetId: number, condemnation: number): void {
+    const tier =
+      condemnation >= 100
+        ? { light: 11.5, duration: 0.72 }
+        : condemnation >= 80
+          ? { light: 10.5, duration: 0.68 }
+          : condemnation >= 50
+            ? { light: 9, duration: 0.6 }
+            : { light: 7.5, duration: 0.52 };
+    this.pulseAt(targetId, 'shadow', tier.light, tier.duration);
+    if (sourceId === this.sim.playerId) {
+      this.addShake(condemnation >= 100 ? 0.9 : 0.48);
+      this.punchFov(condemnation >= 100 ? 4 : 1.6);
+    }
+  }
+
   handleEvent(ev: SimEvent): void {
     switch (ev.type) {
+      case 'castStart': {
+        if (ev.ability === 'needle_of_fate') {
+          this.needleOfFateVfx.beginCast(ev.entityId, ev.time);
+        }
+        break;
+      }
+      case 'castStop': {
+        this.needleOfFateVfx.endCast(ev.entityId);
+        break;
+      }
       case 'spellfx': {
+        if (ev.fx === 'lichTransform') {
+          if (!this.reducedMotion()) {
+            this.vfx.lichTransform(ev.sourceId);
+            this.pulseAt(ev.sourceId, 'shadow', 8, 0.6);
+          }
+          const view = this.views.get(ev.sourceId);
+          const source = this.sim.entities.get(ev.sourceId);
+          const x = view?.group.position.x ?? source?.pos.x;
+          const y = view?.group.position.y ?? source?.pos.y;
+          const z = view?.group.position.z ?? source?.pos.z;
+          if (x !== undefined && y !== undefined && z !== undefined) {
+            this.audioSink?.necromancy(
+              'lichTransform',
+              x,
+              y,
+              z,
+              ev.sourceId === this.sim.playerId,
+              ev.sourceId,
+            );
+          }
+          if (ev.sourceId === this.sim.playerId) {
+            this.addShake(0.42);
+            this.punchFov(2.6);
+          }
+          break;
+        }
         if (ev.fx === 'blinkStep') {
           // A teleport step (Flickerstep / Shadowstep): reset the cached self
           // position so the body snaps to the authoritative destination. A
@@ -3637,8 +3867,67 @@ export class Renderer {
           this.triggerAttack(ev.sourceId, warriorCast.abilityId);
           break;
         }
-        if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
-        else if (ev.fx === 'heavyBolt')
+        if (
+          ev.fx === 'projectile' &&
+          ev.ability === 'soul_harvest' &&
+          this.sim.entities.get(ev.sourceId)?.auras.some((aura) => aura.kind === 'form_lich')
+        ) {
+          const view = this.views.get(ev.sourceId);
+          if (view?.metamorphVisual?.metamorphHandWorldPositions(this.tmpV, this.tmpV2)) {
+            this.vfx.deathBolt(this.tmpV, this.tmpV2, ev.targetId);
+            view.metamorphVisual.pulseMetamorphosis();
+          } else {
+            this.vfx.projectile(ev.sourceId, ev.targetId, ev.school, 1.3);
+          }
+        } else if (
+          ev.fx === 'projectile' &&
+          ev.ability === 'soul_harvest' &&
+          this.abilityVfx.handleSpellfx(ev)
+        ) {
+          // Mortal Essence Reap uses the compact pooled shadow-fang sequence.
+        } else if (
+          ev.fx === 'projectile' &&
+          ev.ability === 'shadow_bolt' &&
+          this.abilityVfx.handleSpellfx(ev)
+        ) {
+          // Gloom Bolt uses its compact green shadow-fang and scaled Ruinbolt hit.
+        } else if (
+          (ev.ability === 'soul_lance' ||
+            ev.ability === 'ossuary_mark' ||
+            ev.ability === 'ossuary_mark_detonate') &&
+          this.abilityVfx.handleSpellfx(ev)
+        ) {
+          // Necromancy's spear, stored-soul seal and collapse use their
+          // class-owned premium sequences instead of generic shadow particles.
+        } else if (isNeedleOfFateProjectile(ev)) {
+          this.needleOfFateVfx.spawn(ev.sourceId, ev.targetId);
+        } else if (ev.fx === 'sentenceBurst') {
+          const condemnation = Math.max(20, Math.min(100, ev.level ?? 20));
+          if ((ev.threads ?? 0) > 0) {
+            this.sentenceVfx.trigger(ev.sourceId, ev.targetId, condemnation, ev.threads);
+          } else {
+            this.sentenceVfx.trigger(ev.sourceId, ev.targetId, condemnation);
+          }
+        } else if (
+          (ev.ability === 'immolate' ||
+            ev.ability === 'conflagrate' ||
+            ev.ability === 'shadowburn' ||
+            ev.ability === 'ruinous_brand' ||
+            ev.ability === 'reaping_command') &&
+          this.abilityVfx.handleSpellfx(ev)
+        ) {
+          // Destruction's setup, instants and Brand plus the composition-aware
+          // Necromancy command use their class-owned premium sequences.
+        } else if (
+          ev.fx === 'heavyBolt' &&
+          this.sim.entities.get(ev.sourceId)?.kind === 'player' &&
+          this.sim.entities.get(ev.sourceId)?.templateId === 'warlock' &&
+          this.abilityVfx.handleSpellfx({ ...ev, ability: 'chaos_bolt' })
+        ) {
+          // Ruinbolt is rendered by the pooled per-ability VFX subsystem.
+        } else if (ev.fx === 'projectile') {
+          this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
+        } else if (ev.fx === 'heavyBolt')
           // Pyroblast's boulder: the same homing comet, doubled up.
           this.vfx.projectile(ev.sourceId, ev.targetId, ev.school, 2);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
@@ -3652,6 +3941,28 @@ export class Renderer {
             const view = this.views.get(ev.sourceId);
             if (view) this.activeVisual(view)?.beginCastChannel();
           }
+        } else if (ev.fx === 'drainBeam') {
+          const duration = ev.duration ?? 5;
+          if (duration > 0 || this.sim.entities.has(ev.sourceId))
+            this.drainChannelStopLatch.noteEvent(ev.sourceId, ev.targetId, duration, this.time);
+          this.vfx.drainBeam(ev.sourceId, ev.targetId, duration);
+          if (duration > 0) {
+            const source = this.sim.entities.get(ev.sourceId);
+            if (
+              source?.auras.some(
+                (aura) => aura.kind === 'affliction_possession' && aura.remaining > 0,
+              )
+            ) {
+              this.vfx.demonicDrainBeam(ev.sourceId, ev.targetId, duration);
+              this.snapshotDemonicDrainVisualChannels.add(ev.sourceId);
+            }
+          } else {
+            this.snapshotDrainVisualChannels.delete(ev.sourceId);
+            this.snapshotDemonicDrainVisualChannels.delete(ev.sourceId);
+            this.vfx.demonicDrainBeam(ev.sourceId, ev.targetId, 0);
+          }
+        } else if (ev.fx === 'evilEyeGaze') {
+          this.vfx.evilEyeGaze(ev.sourceId, ev.targetId, ev.duration ?? 0.28);
         } else if (ev.fx === 'chainHeal') this.vfx.chainHealArc(ev.sourceId, ev.targetId);
         else if (ev.fx === 'procSurge') {
           this.vfx.procSurge(ev.targetId, ev.school);
@@ -3698,6 +4009,55 @@ export class Renderer {
         break;
       }
       case 'spellfxAt': {
+        if (ev.fx === 'soulTravel') {
+          if (ev.targetId !== undefined) {
+            const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
+            const targetId = ev.targetId;
+            this.vfx.soulTravel(ev.x, gy + 0.8, ev.z, targetId, (position: THREE.Vector3) => {
+              this.audioSink?.necromancy(
+                'soulConsume',
+                position.x,
+                position.y,
+                position.z,
+                targetId === this.sim.playerId,
+                targetId,
+              );
+            });
+          }
+          break;
+        }
+        if (ev.ability === 'abyssal_rift' && ev.fx === 'nova') {
+          this.abyssalRiftFx.spawn({
+            x: ev.x,
+            z: ev.z,
+            radius: ev.radius ?? 8,
+            duration: 2.2,
+          });
+        }
+        if (ev.ability === 'army_of_the_dead' && ev.fx === 'burst') {
+          this.necromancyArmyPortalFx.spawn({
+            x: ev.x,
+            z: ev.z,
+            facing:
+              ev.sourceId === undefined ? 0 : (this.sim.entities.get(ev.sourceId)?.facing ?? 0),
+            duration: 2.8,
+          });
+        }
+        if (this.abilityVfx.handleSpellfxAt(ev)) {
+          if (ev.ability === 'corpse_explosion' && ev.sourceId !== undefined) {
+            const lich = this.sim.entities
+              .get(ev.sourceId)
+              ?.auras.some((aura) => aura.kind === 'form_lich');
+            this.necromancyGroundFx.spawnDesecration({
+              x: ev.x,
+              z: ev.z,
+              radius: ev.radius ?? 8,
+              duration: lich ? 5 : 2.5,
+            });
+            if (lich) this.views.get(ev.sourceId)?.metamorphVisual?.pulseMetamorphosis();
+          }
+          break;
+        }
         // The Frozen Orb flight, animated locally from its three moments:
         // 'release' starts the drift, 'halt'/'resume' freeze and restart it at
         // the server's real coordinates when the orb latches onto an enemy.
@@ -3755,6 +4115,19 @@ export class Renderer {
         const at = new THREE.Vector3(ev.x, gy + 0.4, ev.z);
         this.vfx.burst(at, ev.school, ev.fx === 'nova' ? 34 : 22, ev.fx === 'nova' ? 1.4 : 1);
         if (ev.radius) this.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school);
+        if (
+          ev.ability === 'corpse_explosion' &&
+          ev.sourceId !== undefined &&
+          this.sim.entities.get(ev.sourceId)?.auras.some((aura) => aura.kind === 'form_lich')
+        ) {
+          this.necromancyGroundFx.spawnDesecration({
+            x: ev.x,
+            z: ev.z,
+            radius: ev.radius ?? 8,
+            duration: 5,
+          });
+          this.views.get(ev.sourceId)?.metamorphVisual?.pulseMetamorphosis();
+        }
         break;
       }
       case 'damage': {
@@ -3773,6 +4146,8 @@ export class Renderer {
           this.triggerHit(ev.targetId);
           if (ev.school === 'physical') this.vfx.meleeSpark(ev.targetId, ev.crit);
         }
+        if (attackAbilityId(ev.ability) === 'drain_life') this.vfx.drainLifeTick(ev.sourceId);
+        if (attackAbilityId(ev.ability) === 'chaos_bolt') this.abilityVfx.onDamage(ev);
         break;
       }
       case 'heal2':
@@ -4464,6 +4839,7 @@ export class Renderer {
       bearVisual: null,
       catVisual: null,
       travelVisual: null,
+      metamorphVisual: null,
       fireballTravelVisual: null,
       iceBlockVisual: null,
       temporalHourglassVisual: null,
@@ -4529,6 +4905,7 @@ export class Renderer {
       liveScale: e.scale,
       loco: newLocoTrack(),
       stepAccum: 0,
+      lichHeartbeatAt: 0,
       waterContactSeen: false,
       waterContactActive: false,
       waterContactX: e.pos.x,
@@ -4588,6 +4965,7 @@ export class Renderer {
     if (v.bearVisual?.root.visible) return v.bearVisual;
     if (v.catVisual?.root.visible) return v.catVisual;
     if (v.travelVisual?.root.visible) return v.travelVisual;
+    if (v.metamorphVisual?.root.visible) return v.metamorphVisual;
     return v.visual;
   }
 
@@ -4705,6 +5083,12 @@ export class Renderer {
   private yumiMazeViews = new Map<number, YumiMazeView>();
   // Blue/red team arrows above every yumi fighter (yumi_team_markers.ts).
   private readonly yumiTeamMarkers = new YumiTeamMarkers();
+  // Affliction's primary and Coven eyes remain actionable on every graphics tier.
+  private readonly evilEyeMarkers = new EvilEyeMarkers();
+  private readonly burningPactMarkers = new BurningPactMarkers();
+  private readonly umbralAnchorMarker = new UmbralAnchorMarker(this.groundSample);
+  // The approved Maledict Eye is cosmetic: one local, non-targetable Affliction familiar.
+  private readonly afflictionFamiliar = new AfflictionFamiliar();
   // Delve module interiors build asynchronously; track in-flight keys so a
   // per-frame ensureDelveInteriorsNear does not re-schedule a build mid-load.
   private pendingInteriors = new Set<string>();
@@ -5036,6 +5420,7 @@ export class Renderer {
       v.bearVisual?.dispose();
       v.catVisual?.dispose();
       v.travelVisual?.dispose();
+      v.metamorphVisual?.dispose();
       v.fireballTravelVisual?.dispose();
     } else {
       if (v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
@@ -5059,6 +5444,30 @@ export class Renderer {
     v.frostNovaRootVisual?.dispose();
     v.mageBarrierVisual?.dispose();
     this.views.delete(id);
+  }
+
+  private syncDrainChannelVisual(id: number, e: Entity): void {
+    const drainPlan = drainChannelVisualPlan(e);
+    const showDrain = this.drainChannelStopLatch.allowsSnapshot(
+      id,
+      drainPlan?.targetId ?? null,
+      this.time,
+    );
+    if (drainPlan && showDrain) {
+      this.vfx.drainBeam(id, drainPlan.targetId, drainPlan.duration);
+      this.snapshotDrainVisualChannels.add(id);
+      if (drainPlan.demonic) {
+        this.vfx.demonicDrainBeam(id, drainPlan.targetId, drainPlan.duration);
+        this.snapshotDemonicDrainVisualChannels.add(id);
+      } else if (this.snapshotDemonicDrainVisualChannels.delete(id)) {
+        this.vfx.demonicDrainBeam(id, drainPlan.targetId, 0);
+      }
+    } else if (!drainPlan && this.snapshotDrainVisualChannels.delete(id)) {
+      this.vfx.drainBeam(id, e.castTargetId ?? id, 0);
+    }
+    if (!drainPlan && this.snapshotDemonicDrainVisualChannels.delete(id)) {
+      this.vfx.demonicDrainBeam(id, e.castTargetId ?? id, 0);
+    }
   }
 
   // Build the dev-only Tab-target overlay. Called once from main.ts when
@@ -5255,35 +5664,35 @@ export class Renderer {
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
       if (!e) continue;
+      this.syncDrainChannelVisual(id, e);
       // form swaps (polymorph sheep, druid forms) — computed up front because
       // the shadow gates below must not run the base rig's proxy under a form.
       // One pass over the aura list instead of six .some() scans per entity per
       // frame; the flag combination below preserves the original precedence.
-      let hasPoly = false;
-      let hasBear = false;
+      let formMask = 0;
       let hasGhostWolf = false;
-      let hasCatForm = false;
-      let hasTravelForm = false;
-      let hasFireballForm = false;
       let hasStealth = false;
       let hasShadowform = false;
       let hasMoonkin = false;
-      let hasMetamorph = false;
+      let hasLegacyMetamorphAura = false;
+      let hasLichAura = false;
+      let soulFragments = 0;
       let hasIceBlock = false;
       let temporalHourglassMode: TemporalHourglassMode | null = null;
       let hasFrostNovaRoot = false;
       let mageBarrierState: MageBarrierState | null = null;
       for (const a of e.auras) {
-        if (a.kind === 'polymorph') hasPoly = true;
-        if (a.kind === 'form_bear') hasBear = true;
+        formMask |= characterFormMaskForAura(a);
         if (a.id === 'ghost_wolf') hasGhostWolf = true;
-        if (a.kind === 'form_cat') hasCatForm = true;
-        if (a.kind === 'form_travel') hasTravelForm = true;
-        if (a.kind === 'form_fireball') hasFireballForm = true;
         if (a.kind === 'stealth') hasStealth = true;
         if (a.kind === 'form_shadow') hasShadowform = true;
         if (a.kind === 'form_moonkin') hasMoonkin = true;
-        if (a.kind === 'form_metamorph') hasMetamorph = true;
+        if (a.kind === 'form_metamorph') hasLegacyMetamorphAura = true;
+        if (a.kind === 'form_lich') hasLichAura = true;
+        if (a.kind === 'soul_fragments') soulFragments = a.stacks ?? 0;
+        if (a.kind === 'necromancy_death_echo' && a.value2 !== undefined) {
+          this.necromancyGroundFx.syncDeathEcho(e.id, a.id, a.value, a.value2);
+        }
         if (a.id === 'ice_block' && a.kind === 'stasis') hasIceBlock = true;
         // Rime Snare victims wear the same ice shell (maintainer request);
         // the freeze aura is already wired, so this is render-only sugar.
@@ -5295,13 +5704,20 @@ export class Renderer {
         if (isFrostNovaRootAura(a)) hasFrostNovaRoot = true;
         mageBarrierState ??= mageBarrierStateForAura(a, this.mageBarrierStateScratch);
       }
-      const polyed = hasPoly;
-      const bear = !polyed && hasBear;
-      const ghostWolf = !polyed && !bear && hasGhostWolf;
-      const cat = !polyed && !bear && (ghostWolf || hasCatForm);
-      const travel = !polyed && !bear && !cat && hasTravelForm;
-      const fireballForm = !polyed && !bear && !cat && !travel && hasFireballForm;
+      const requestedForm = requestedCharacterForm(formMask);
+      const polyed = requestedForm === 'sheep';
+      const bear = requestedForm === 'bear';
+      const ghostWolf = requestedForm === 'cat' && hasGhostWolf;
+      const cat = requestedForm === 'cat';
+      const travel = requestedForm === 'travel';
+      const fireballForm = requestedForm === 'fireball';
+      const metamorphForm = requestedForm === 'metamorph';
       const _stealthed = hasStealth;
+      const displayScale = e.scale;
+      if (displayScale !== v.liveScale) {
+        v.liveScale = displayScale;
+        v.group.scale.setScalar(displayScale);
+      }
       // distance cull: far rigs are invisible specks but cost real draw calls
       const cdx = e.pos.x - p.pos.x,
         cdz = e.pos.z - p.pos.z;
@@ -5312,6 +5728,8 @@ export class Renderer {
       // smoothness: such an entity is exempt from BOTH the cadence throttle and
       // the crowd-pulled frozen-mesh swap below.
       const actionablePose = animatesEveryFrame(id, p.id, p.targetId, e.castingAbility);
+      let wantShadow = true;
+      let inProxyBand = false;
       if (isSelf) {
         v.group.visible = true;
         v.isFar = false;
@@ -5344,17 +5762,12 @@ export class Renderer {
           continue;
         }
         // mid-distance rigs keep rendering but leave the shadow pass
-        const wantShadow = d2 < shadowRangeSq;
-        const inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
+        wantShadow = d2 < shadowRangeSq;
+        inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
         if (v.visual) {
           visibleRigCount++; // crowd-density signal for next frame's adaptive LOD
           v.visual.setShadow(wantShadow);
           v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose);
-          // past the articulated gate the static-pose proxy carries the
-          // shadow; an active form's own rig keeps casting instead
-          v.visual.setProxyShadow(
-            !wantShadow && inProxyBand && !polyed && !bear && !cat && !travel && !fireballForm,
-          );
           // sheep/forms keep articulated shadows through the whole proxy band —
           // a frozen humanoid proxy silhouette would be wrong under a form
           const wantFormShadow = wantShadow || inProxyBand;
@@ -5362,6 +5775,7 @@ export class Renderer {
           v.bearVisual?.setShadow(wantFormShadow);
           v.catVisual?.setShadow(wantFormShadow);
           v.travelVisual?.setShadow(wantFormShadow);
+          v.metamorphVisual?.setShadow(wantFormShadow);
         }
         if (wantShadow !== v.shadowOn) {
           v.shadowOn = wantShadow;
@@ -5505,8 +5919,8 @@ export class Renderer {
       // the rest of the per-entity work (animation, footstep audio) is unaffected.
       let charOnScreen = true;
       if (this.cullCharacters && id !== p.id) {
-        this.cullSphere.center.set(x, y + v.height * 0.5 * e.scale, z);
-        this.cullSphere.radius = (v.height * 0.7 + 1.5) * e.scale;
+        this.cullSphere.center.set(x, y + v.height * 0.5 * v.liveScale, z);
+        this.cullSphere.radius = (v.height * 0.7 + 1.5) * v.liveScale;
         charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
       }
 
@@ -5546,13 +5960,6 @@ export class Renderer {
         v.visual.setWeaponStowed(e.weaponStowed);
       }
 
-      // live body-size buffs (Fiesta power-ups): scale the whole group so the
-      // rig, click proxy, and any form visual grow/shrink together.
-      if (e.scale !== v.liveScale) {
-        v.liveScale = e.scale;
-        v.group.scale.setScalar(e.scale);
-      }
-
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
       // A null build leaves the field unset; the shared gate retries after its cooldown.
       if (polyed && !v.sheepVisual) {
@@ -5583,20 +5990,45 @@ export class Renderer {
           v.group.add(built.root);
         }
       }
-      if (v.sheepVisual) v.sheepVisual.root.visible = polyed;
-      if (v.bearVisual) v.bearVisual.root.visible = bear;
-      if (v.catVisual) v.catVisual.root.visible = cat;
-      if (v.travelVisual) v.travelVisual.root.visible = travel;
-      const active =
-        polyed && v.sheepVisual
-          ? v.sheepVisual
-          : bear && v.bearVisual
-            ? v.bearVisual
-            : cat && v.catVisual
-              ? v.catVisual
-              : travel && v.travelVisual
-                ? v.travelVisual
-                : v.visual;
+      if (metamorphForm && !v.metamorphVisual) {
+        const built = this.createCharacterVisualWithRetry(e, 'form_metamorph', 'form_metamorph');
+        if (built) {
+          v.metamorphVisual = built;
+          v.group.add(built.root);
+        }
+      }
+      const formReadyMask = characterFormReadyMask(
+        v.sheepVisual,
+        v.bearVisual,
+        v.catVisual,
+        v.travelVisual,
+        v.metamorphVisual,
+      );
+      const resolvedForm = resolvedCharacterForm(requestedForm, formReadyMask);
+      const formVisibility = characterFormVisibility(resolvedForm);
+      v.sheepVisual?.setActive(formVisibility.sheep);
+      v.bearVisual?.setActive(formVisibility.bear);
+      v.catVisual?.setActive(formVisibility.cat);
+      v.travelVisual?.setActive(formVisibility.travel);
+      v.metamorphVisual?.setActive(formVisibility.metamorph);
+      const active = activeCharacterFormVisual(
+        resolvedForm,
+        v.visual,
+        v.sheepVisual,
+        v.bearVisual,
+        v.catVisual,
+        v.travelVisual,
+        v.metamorphVisual,
+      );
+      if (!e.templateId.startsWith('vision_')) {
+        active.clickProxy.userData.entityId = e.id;
+      }
+      if (v.clickTarget !== active.clickProxy) {
+        const clickIndex = this.clickTargets.indexOf(v.clickTarget);
+        if (clickIndex >= 0) this.clickTargets[clickIndex] = active.clickProxy;
+        v.clickTarget = active.clickProxy;
+      }
+      v.height = active.height;
       const ghost =
         ghostWolf ||
         shouldRenderStealthGhost(this.sim.playerId, e) ||
@@ -5605,15 +6037,29 @@ export class Renderer {
         e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
       active.setGhost(ghost);
       active.setSoulRend(characterSoulRendActive(e));
-      // Shadowform tints the base priest rig shadow-purple (no rig swap). Moonkin Form and
-      // Metamorphosis reuse the same tint treatment (a bright violet, and a dark fel demon);
-      // Metamorphosis also grows the body via Entity.scale in the sim.
       active.setShadowform(hasShadowform);
       active.setMoonkin(hasMoonkin);
-      active.setMetamorph(hasMetamorph);
-      v.visual.root.visible = active === v.visual && !fireballForm;
+      v.visual.setActive(formVisibility.base);
       // distant rigs swap to the single-draw baked idle-pose mesh
-      v.visual.setFar(v.isFar && active === v.visual && !fireballForm);
+      v.visual.setFar(v.isFar && active === v.visual && resolvedForm !== 'fireball');
+      v.sheepVisual?.setFar(v.isFar && active === v.sheepVisual);
+      v.bearVisual?.setFar(v.isFar && active === v.bearVisual);
+      v.catVisual?.setFar(v.isFar && active === v.catVisual);
+      v.travelVisual?.setFar(v.isFar && active === v.travelVisual);
+      v.metamorphVisual?.setFar(v.isFar && active === v.metamorphVisual);
+      const shadowPlan = characterFormShadowPlan(resolvedForm, {
+        isSelf,
+        nearShadow: wantShadow,
+        inProxyBand,
+        staticFar: v.isFar,
+      });
+      active.setShadow(shadowPlan.activeArticulated);
+      v.visual.setProxyShadow(shadowPlan.baseProxy);
+      v.sheepVisual?.setProxyShadow(shadowPlan.formProxy && active === v.sheepVisual);
+      v.bearVisual?.setProxyShadow(shadowPlan.formProxy && active === v.bearVisual);
+      v.catVisual?.setProxyShadow(shadowPlan.formProxy && active === v.catVisual);
+      v.travelVisual?.setProxyShadow(shadowPlan.formProxy && active === v.travelVisual);
+      v.metamorphVisual?.setProxyShadow(shadowPlan.formProxy && active === v.metamorphVisual);
 
       // animation state machine inputs, derived from render-space motion with
       // hysteresis so a one-frame speed dip can't reset the walk clip.
@@ -5746,7 +6192,7 @@ export class Renderer {
       // while wading, before the swim-pose latch, and uses old minus new surface
       // capsule footprints to create a coherent wake instead of detached rings.
       const contactLevel = wl;
-      const contactRadius = Math.min(1.25, Math.max(0.34, active.height * e.scale * 0.16));
+      const contactRadius = Math.min(1.25, Math.max(0.34, active.height * v.liveScale * 0.16));
       const waterDepth = contactLevel - ay;
       const contactImmersion = Number.isFinite(waterDepth)
         ? Math.min(1, Math.max(0, (waterDepth + 0.04) / (contactRadius * 0.85)))
@@ -5754,14 +6200,14 @@ export class Renderer {
       const contactAxisX = Math.sin(facing);
       const contactAxisZ = Math.cos(facing);
       const contactHalfLength = swimming
-        ? Math.min(1.05, Math.max(contactRadius * 0.9, active.height * e.scale * 0.3))
+        ? Math.min(1.05, Math.max(contactRadius * 0.9, active.height * v.liveScale * 0.3))
         : contactRadius * 0.22;
       const touchesWater =
         !visuallyDead &&
         !st.sitting &&
         Number.isFinite(contactLevel) &&
         waterDepth >= -0.035 &&
-        ay + active.height * e.scale * 0.82 > contactLevel;
+        ay + active.height * v.liveScale * 0.82 > contactLevel;
       const contactMode = waterContactFrameMode(
         Boolean(this.editorCam),
         charOnScreen,
@@ -5854,7 +6300,7 @@ export class Renderer {
       } else {
         if (v.waterContactActive) {
           const releaseHalfLength = v.wasSwimming
-            ? Math.min(1.05, Math.max(contactRadius * 0.9, active.height * e.scale * 0.3))
+            ? Math.min(1.05, Math.max(contactRadius * 0.9, active.height * v.liveScale * 0.3))
             : contactRadius * 0.22;
           this.waterView.releaseContact(
             v.waterContactX,
@@ -5889,7 +6335,7 @@ export class Renderer {
         const cadence = animCadenceFrames(d2, lodBands);
         animate = cadence <= 1 || (this.frameIdx + e.id) % cadence === 0;
       }
-      active.update(dt, st, animate);
+      active.update(dt, st, animate, this.reducedMotion());
       // weapon-skin VFX ride the humanoid rig's held weapon; advancing them is a
       // few uniform writes per handle, so they stay smooth at every LOD tier
       v.visual.updateWeaponVfx(dt);
@@ -5911,7 +6357,10 @@ export class Renderer {
         }
       }
 
-      if (st.casting) {
+      if (!syncAbilityVfxCast(e.castingAbility, this.abilityVfx, e)) {
+        this.abilityVfx.syncEntity(e);
+      }
+      if (shouldDrawLegacyCastSparkle(st.casting, e.castingAbility)) {
         this.vfx.castSparkle(
           e.id,
           waterJetVisualChannel
@@ -5920,6 +6369,9 @@ export class Renderer {
               ? 'shadow'
               : (ABILITIES[e.castingAbility!]?.school ?? 'arcane'),
           dt,
+          e.castingAbility === 'chaos_bolt' || e.castingAbility === 'soul_harvest'
+            ? this.abilityVfx.sparkleColorFor(e.castingAbility)
+            : undefined,
         );
       }
       if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {
@@ -5929,7 +6381,7 @@ export class Renderer {
         this.vfx.recklessFlame(e.id, dt);
         if (!v.recklessOn) {
           v.recklessOn = true;
-          this.recklessSkulls.spawn(v.group, active.height * e.scale);
+          this.recklessSkulls.spawn(v.group, active.height * v.liveScale);
         }
       } else if (v.recklessOn) {
         v.recklessOn = false;
@@ -5938,10 +6390,20 @@ export class Renderer {
       // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
       // (the auras themselves drop, but a corpse must not smolder for a frame).
       if (!e.dead) {
-        if (hasMetamorph) this.vfx.formAura(e.id, 'metamorph', dt);
-        else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
+        if (hasLegacyMetamorphAura) this.vfx.formAura(e.id, 'metamorph', dt);
+        else if (hasLichAura && !this.reducedMotion()) {
+          this.vfx.lichAura(e.id, dt, soulFragments);
+        } else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
         else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
       }
+      const heartbeat = stepLichHeartbeat(
+        v.lichHeartbeatAt,
+        this.time,
+        hasLichAura && !e.dead,
+        Boolean(sink) && d2 < SFX_MOVE_RANGE_SQ,
+      );
+      v.lichHeartbeatAt = heartbeat.nextAt;
+      if (heartbeat.play) sink?.necromancy('lichHeartbeat', ax, ay, az, isSelf, e.id);
       // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
       if (e.templateId === 'spirit_healer') this.vfx.castSparkle(e.id, 'holy', dt * 0.6);
 
@@ -6130,9 +6592,15 @@ export class Renderer {
       (this.scene.fog as THREE.Fog).far,
     );
     worldStart = markWorldPhase('water', worldStart);
-    this.vfx.update(dt);
+    this.vfx.update(dt, this.reducedMotion());
+    this.abilityVfx.update(dt, this.reducedMotion());
+    this.needleOfFateVfx.update(dt, this.reducedMotion());
+    this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
+    this.necromancyGroundFx.update(dt, this.reducedMotion());
+    this.necromancyArmyPortalFx.update(dt, this.reducedMotion());
+    this.abyssalRiftFx.update(dt, this.reducedMotion());
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
     this.ringOfFrostVisuals.update(dt);
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
@@ -6144,7 +6612,23 @@ export class Renderer {
     this.updateFiestaPowerups(dt);
     this.tickFiestaGlows(dt);
     for (const view of this.yumiMazeViews.values()) view.update(this.sim);
+    for (const id of this.snapshotDrainVisualChannels) {
+      if (!this.views.has(id)) this.snapshotDrainVisualChannels.delete(id);
+    }
+    for (const id of this.snapshotDemonicDrainVisualChannels) {
+      if (!this.views.has(id)) this.snapshotDemonicDrainVisualChannels.delete(id);
+    }
+    this.drainChannelStopLatch.prune(this.sim.entities);
     this.yumiTeamMarkers.update(this.sim, this.views);
+    this.evilEyeMarkers.update(this.sim, this.views, this.reducedMotion());
+    this.burningPactMarkers.update(this.sim, this.views, this.reducedMotion());
+    this.umbralAnchorMarker.update(
+      this.sim.entities.get(this.sim.playerId),
+      this.time,
+      this.reducedMotion(),
+      this.lowGfx,
+    );
+    this.afflictionFamiliar.update(this.sim, this.views, this.reducedMotion(), this.time);
     this.tickValeCupFx(dt);
     worldStart = markWorldPhase('vfx', worldStart);
 
@@ -6919,7 +7403,7 @@ export class Renderer {
       // fall back to the live entity position when the rig isn't being drawn
       if (v.group.visible) this.tmpV.copy(v.group.position);
       else this.tmpV.set(e.pos.x, e.pos.y, e.pos.z);
-      this.tmpV.y += v.height * e.scale + 1.0;
+      this.tmpV.y += v.height * v.liveScale + 1.0;
       if (!isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2)) {
         b.el.style.display = 'none';
         continue;
@@ -7047,7 +7531,7 @@ export class Renderer {
       const dead = !!e.dead;
       // body midpoint anchor (also the in-front-of-camera cull); ground-hug if dead
       this.tmpV.copy(v.group.position);
-      this.tmpV.y += v.height * e.scale * (dead ? 0.15 : 0.5);
+      this.tmpV.y += v.height * v.liveScale * (dead ? 0.15 : 0.5);
       this.tmpV.project(this.camera);
       if (this.tmpV.z > 1) continue;
       const midX = (this.tmpV.x * 0.5 + 0.5) * this.viewport.width;
@@ -7063,7 +7547,7 @@ export class Renderer {
       let topY = midY;
       if (!dead) {
         this.tmpV2.copy(v.group.position);
-        this.tmpV2.y += v.height * e.scale + 1.0;
+        this.tmpV2.y += v.height * v.liveScale + 1.0;
         if (isProjectedNameplateAnchorVisible(this.camera, this.tmpV2, this.tmpV3)) {
           this.tmpV2.project(this.camera);
           if (this.tmpV2.z <= 1) {

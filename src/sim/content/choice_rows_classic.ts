@@ -40,29 +40,6 @@ const priestManaHealingAbilityIds = [
   'prayer_of_healing',
 ];
 
-const warlockDamagingFireSpellAbilityIds = [
-  'immolate',
-  'searing_pain',
-  'rain_of_fire',
-  'chaos_bolt',
-  'conflagrate',
-];
-
-const warlockDamagingShadowSpellAbilityIds = [
-  'shadow_bolt',
-  'corruption',
-  'curse_of_agony',
-  'drain_life',
-  'shadowburn',
-  'siphon_life',
-  'death_coil',
-];
-
-const warlockDamagingFireOrShadowSpellAbilityIds = [
-  ...warlockDamagingFireSpellAbilityIds,
-  ...warlockDamagingShadowSpellAbilityIds,
-];
-
 export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
     {
@@ -1682,64 +1659,56 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
     {
       level: 5,
-      theme: 'malefic_cadence',
-      decision: 'Gloom-to-Blackrot cadence vs Blackrot control vs stronger Burning Pact',
+      theme: 'mobility',
+      decision: 'faster anchor vs post-anchor sprint vs sustained health-paid movement',
       options: [
         {
           id: 'wlk_r5_bane',
           name: 'Grave Rhythm',
-          description: 'Every 3rd Gloom Bolt makes your next Blackrot within 8 sec instant.',
-          icon: 'shadow_bolt',
-          effect: {
-            proc: {
-              id: 'wlk_grave_rhythm',
-              name: 'Grave Rhythm',
-              trigger: { on: 'castNth', n: 3, abilities: ['shadow_bolt'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['corruption'],
-                  duration: 8,
-                },
-              ],
-            },
-          },
+          description: 'Umbral Anchor recovers 15 sec faster.',
+          icon: 'umbral_anchor',
+          effect: { ability: [{ ability: 'umbral_anchor', cooldownFlat: -15 }] },
         },
         {
           id: 'wlk_r5_improved_corruption',
           name: 'Blacktide',
-          description: 'Blackrot also slows its target by 30% for 6 sec.',
-          icon: 'corruption',
+          description: 'Returning to Umbral Anchor grants 40% movement speed for 4 sec.',
+          icon: 'umbral_anchor',
           effect: {
-            ability: [
-              { ability: 'corruption', addEffects: [{ type: 'slow', mult: 0.7, duration: 6 }] },
-            ],
+            global: { warlockBlacktideSpeedPct: 0.4 },
+            tuning: { duration: 4 },
           },
         },
         {
-          // Balance pass: was Pact Reversal, one of FOUR instant-Gloom-Bolt
-          // relays. Now the fire lane's flat damage talent (Improved Immolate
-          // shape).
           id: 'wlk_r5_improved_immolate',
-          name: 'Pact Deepened',
-          description: 'Burning Pact deals 20% more damage.',
-          icon: 'immolate',
-          effect: { ability: [{ ability: 'immolate', dmgPct: 0.2 }] },
+          name: 'Sacrilegious March',
+          description:
+            'Grants Sacrilegious March: move 35% faster while sacrificing 2% maximum health each second.',
+          icon: 'sacrilegious_march',
+          effect: { grant: { ability: 'sacrilegious_march' } },
         },
       ],
     },
     {
       level: 8,
       theme: 'control',
-      decision: 'magic devour vs area fear vs sustained slow',
+      decision: 'ranged interrupt vs area fear vs escalating spell snare',
       options: [
         {
           id: 'wlk_r8_voidfeast',
-          name: 'Voidfeast',
-          description: 'Grants Voidfeast: devour a magic effect and heal yourself.',
-          icon: 'voidfeast',
-          effect: { grant: { ability: 'voidfeast' } },
+          name: 'Abyssal Gag',
+          description:
+            'Grants Abyssal Gag early. It interrupts the enemy and silences all of its spells for 4 sec.',
+          icon: 'spell_lock',
+          effect: {
+            grant: { ability: 'spell_lock' },
+            ability: [
+              {
+                ability: 'spell_lock',
+                addEffects: [{ type: 'silence', duration: 4 }],
+              },
+            ],
+          },
         },
         {
           id: 'wlk_r8_howl_of_terror',
@@ -1751,189 +1720,136 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r8_curse_of_exhaustion',
           name: 'Leaden Hex',
-          description: 'Grants Leaden Hex.',
+          description:
+            'Damaging spells apply a 5% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 1.5 sec and consumes them. A target can be rooted once every 15 sec.',
           icon: 'curse_of_exhaustion',
-          effect: { grant: { ability: 'curse_of_exhaustion' } },
+          effect: {
+            global: { warlockLeadenHex: 0.05 },
+            tuning: {
+              maxStacks: 3,
+              slowDuration: 5,
+              rootDuration: 1.5,
+              rootLockDuration: 15,
+            },
+          },
         },
       ],
     },
     {
       level: 11,
-      theme: 'dark_sustenance',
-      decision: 'richer Hard Bargain vs mobile Consume vs reactive ward',
+      theme: 'survival',
+      decision: 'stronger Fiendhide vs health-paid shield vs protected Consume channel',
       options: [
         {
-          // Balance pass: was an every-tap instant-bolt relay (a free, no
-          // cooldown trigger made every Gloom Bolt in the game instant). Now
-          // the classic Improved Life Tap.
           id: 'wlk_r11_improved_life_tap',
-          name: 'Blood Credit',
-          description: 'Hard Bargain grants 20% more mana.',
-          icon: 'life_tap',
-          effect: { ability: [{ ability: 'life_tap', buffPct: 0.2 }] },
+          name: 'Pact Deepened',
+          description: 'Fiendhide grants 50% more armor.',
+          icon: 'demon_skin',
+          effect: { ability: [{ ability: 'demon_skin', buffPct: 0.5 }] },
         },
         {
           id: 'wlk_r11_fel_concentration',
-          name: 'Walking Hunger',
-          description: 'Consume is channelable while moving.',
-          icon: 'drain_life',
-          effect: { ability: [{ ability: 'drain_life', castWhileMoving: true }] },
+          name: 'Sanguine Covenant',
+          description:
+            'Grants Sanguine Covenant: sacrifice 10% of your current health to absorb 30% of your maximum health for 8 sec.',
+          icon: 'dark_pact',
+          effect: { grant: { ability: 'dark_pact' } },
         },
         {
-          // Phase-2 defensive pass: the copy-paste shield becomes a demonic
-          // safety net: the pact pays out only if the beating continues.
           id: 'wlk_r11_demon_armor',
-          name: 'Fiendward',
+          name: 'Deep Hunger',
           description:
-            'Taking a hit for at least 15% of your maximum health binds your demon to you for 10 sec: if you fall below 35% health, it heals you for 15% of your maximum health. 20 sec internal cooldown.',
-          icon: 'demon_skin',
+            'While channeling Consume, you take 15% less damage and incoming hits do not delay the channel.',
+          icon: 'drain_life',
           effect: {
-            proc: {
-              id: 'wlk_demon_armor',
-              name: 'Fiendward',
-              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
-              responses: [
-                {
-                  kind: 'echo',
-                  belowFrac: 0.35,
-                  window: 10,
-                  healPctMaxHp: 0.15,
-                  name: 'Fiendward',
-                },
-              ],
-            },
+            ability: [
+              {
+                ability: 'drain_life',
+                damagePushbackImmune: true,
+              },
+            ],
+            global: { warlockConsumeChannelDr: 0.15 },
           },
         },
       ],
     },
     {
       level: 14,
-      theme: 'school_weaving',
-      decision: 'DoT-fed bolt damage vs harder Sear vs fire-fed shadow discount',
+      theme: 'resource_behavior',
+      decision: 'cheaper generator vs richer Hard Bargain vs spender-fed free generators',
       options: [
         {
           id: 'wlk_r14_amplify_curse',
           name: 'Deepened Hex',
-          description: 'Gloom Bolt deals 20% more damage to targets afflicted by your DoTs.',
+          description: "Your specialization's primary generator costs 25% less mana.",
           icon: 'curse_of_agony',
-          effect: { ability: [{ ability: 'shadow_bolt', dmgPctVsDotted: 0.2 }] },
+          effect: {
+            ability: [
+              { ability: 'needle_of_fate', costPct: -0.25 },
+              { ability: 'soul_harvest', costPct: -0.25 },
+              { ability: 'shadow_bolt', costPct: -0.25 },
+            ],
+          },
         },
         {
-          // Balance pass: was Ashen Relay (bolt-fed instant Burning Pact).
-          // Now a Sear lane talent for the school-weaving row.
           id: 'wlk_r14_ruin',
-          name: 'Ashen Focus',
-          description: 'Sear deals 25% more damage and costs 25% less.',
-          icon: 'shadowburn',
-          effect: { ability: [{ ability: 'searing_pain', dmgPct: 0.25, costPct: -0.25 }] },
+          name: 'Blood Credit',
+          description: 'Hard Bargain and Cruel Pact restore 50% more mana for the same health.',
+          icon: 'life_tap',
+          effect: {
+            ability: [
+              { ability: 'life_tap', buffPct: 0.5 },
+              { ability: 'cruel_pact', buffPct: 0.5 },
+            ],
+          },
         },
         {
           id: 'wlk_r14_shadow_mastery',
           name: 'Shadow Credit',
           description:
-            'Each damaging Fire spell makes your next damaging Shadow spell within 8 sec cost 50% less.',
+            'Spending at least 40% of your specialization resource grants 1 free generator. Spending at least 80% grants 2. Maximum 2 charges.',
           icon: 'shadow_bolt',
           effect: {
-            proc: {
-              id: 'wlk_umbral_mastery',
-              name: 'Shadow Credit',
-              trigger: { on: 'castNth', n: 1, abilities: warlockDamagingFireSpellAbilityIds },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_cheap',
-                  abilities: warlockDamagingShadowSpellAbilityIds,
-                  duration: 8,
-                  costPct: 0.5,
-                },
-              ],
-            },
+            global: { warlockShadowCredit: 0.4 },
+            tuning: { upperThresholdPct: 0.8, lowerCharges: 1, upperCharges: 2, maxCharges: 2 },
           },
         },
       ],
     },
     {
       level: 17,
-      theme: 'under_pressure',
-      decision: 'instant horror vs snap Harrow vs reactive self-heal',
+      theme: 'major_offense',
+      decision: 'faster signature window vs stationary focus vs periodic instant generator',
       options: [
         {
           id: 'wlk_r17_death_coil',
-          name: 'Morrowlash',
-          description: 'Grants Morrowlash.',
-          icon: 'death_coil',
-          effect: { grant: { ability: 'death_coil' } },
-        },
-        {
-          // Balance pass: was Cruel Awakening (every Harrow armed an instant
-          // bolt: fear, bolt breaks it, re-fear, forever). New talent in the
-          // slot on the Snap Bewitch precedent: instant cast, real cooldown.
-          id: 'wlk_r17_improved_fear',
-          name: 'Snapdread',
-          description: 'Harrow becomes instant but gains a 16 sec cooldown.',
-          icon: 'fear',
-          effect: { ability: [{ ability: 'fear', castPct: -1, cooldownFlat: 16 }] },
-        },
-        {
-          // Phase-2 defensive pass: the second warlock panic response becomes
-          // proactive leech sustain instead (Consume heals 100% of damage, so
-          // the damage boost is the healing boost).
-          id: 'wlk_r17_demonic_resilience',
-          name: 'Deep Hunger',
-          description: 'Consume deals 50% more damage.',
-          icon: 'demon_skin',
-          effect: { ability: [{ ability: 'drain_life', dmgPct: 0.5 }] },
-        },
-      ],
-    },
-    {
-      level: 20,
-      theme: 'final_pact',
-      decision: 'direct chaos burst vs damaging-cast ward vs curse-fed instant bolt',
-      options: [
-        {
-          id: 'wlk_r20_chaos_bolt',
-          name: 'Ruinbolt',
-          description: 'Grants Ruinbolt.',
-          icon: 'chaos_bolt',
-          effect: { grant: { ability: 'chaos_bolt' } },
-        },
-        {
-          id: 'wlk_r20_grimoire_of_haste',
-          name: 'Hellglass Ward',
-          description:
-            'Every 3rd damaging Fire or Shadow spell raises a demonic ward absorbing 90 damage for 10 sec.',
-          icon: 'summon_felhound',
+          name: 'Grand Malediction',
+          description: "Reduces your specialization's signature setup cooldown by 25%.",
+          icon: 'ruinous_brand',
           effect: {
-            proc: {
-              id: 'wlk_grimoire_of_carnage',
-              name: 'Hellglass Ward',
-              trigger: {
-                on: 'castNth',
-                n: 3,
-                abilities: warlockDamagingFireOrShadowSpellAbilityIds,
-              },
-              // target: 'self': the triggering casts are hostile, so the ward
-              // must land on the warlock, never the enemy hit by the 3rd cast.
-              responses: [
-                {
-                  kind: 'absorb',
-                  amount: 90,
-                  duration: 10,
-                  name: 'Hellglass Ward',
-                  target: 'self',
-                },
-              ],
-            },
+            ability: [
+              { ability: 'hex_of_violence', cooldownPct: -0.25 },
+              { ability: 'unholy_command', cooldownPct: -0.25 },
+              { ability: 'ruinous_brand', cooldownPct: -0.25 },
+            ],
           },
         },
         {
-          // Balance pass: Hexstorm survives as the warlock's ONE instant-bolt
-          // proc, now behind an internal cooldown.
-          id: 'wlk_r20_curse_mastery',
+          id: 'wlk_r17_improved_fear',
+          name: 'Ashen Focus',
+          description:
+            "After standing still for 1 sec, your specialization's primary generator casts 20% faster. Moving removes the benefit immediately.",
+          icon: 'shadow_bolt',
+          effect: {
+            global: { warlockAshenFocus: 0.2 },
+            tuning: { stationaryDuration: 1 },
+          },
+        },
+        {
+          id: 'wlk_r17_demonic_resilience',
           name: 'Hexstorm',
           description:
-            'Every 3rd Blackrot or Hex of Anguish makes your next Gloom Bolt within 8 sec instant, at most once every 10 sec.',
+            "Every 3rd primary generator makes your specialization's next generator within 8 sec instant, at most once every 10 sec.",
           icon: 'curse_of_agony',
           effect: {
             proc: {
@@ -1942,19 +1858,53 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
               trigger: {
                 on: 'castNth',
                 n: 3,
-                abilities: ['corruption', 'curse_of_agony'],
+                abilities: ['needle_of_fate', 'soul_harvest', 'shadow_bolt'],
                 icd: 10,
               },
               responses: [
                 {
                   kind: 'empowerNext',
                   aura: 'next_cast_instant',
-                  abilities: ['shadow_bolt'],
+                  abilities: ['needle_of_fate', 'soul_harvest', 'shadow_bolt'],
                   duration: 8,
                 },
               ],
             },
           },
+        },
+      ],
+    },
+    {
+      level: 20,
+      theme: 'capstone_utility',
+      decision: 'casting-driven class cooldowns vs one forbidden repeat vs battlefield rift',
+      options: [
+        {
+          id: 'wlk_r20_chaos_bolt',
+          name: 'Unbroken Ritual',
+          description:
+            'Each second spent casting or channeling reduces the remaining cooldown of your shared Warlock abilities by 0.5 sec. Does not affect specialization abilities or other capstone talents.',
+          icon: 'drain_life',
+          effect: { global: { warlockUnbrokenRitual: 0.5 } },
+        },
+        {
+          id: 'wlk_r20_grimoire_of_haste',
+          name: 'Forbidden Reflection',
+          description:
+            'The first shared Warlock ability with a cooldown creates a forbidden reflection. You may cast it once more within 10 sec for its normal cost without starting another cooldown. 60 sec internal cooldown.',
+          icon: 'summon_felhunter',
+          effect: {
+            global: { warlockForbiddenReflection: 60 },
+            tuning: { reflectionWindow: 10 },
+          },
+        },
+        {
+          id: 'wlk_r20_curse_mastery',
+          name: 'Abyssal Rift',
+          description:
+            'Grants Abyssal Rift: pull enemies within 8 yards to the chosen location, deal heavy Shadow damage, and stun them for 2 sec. Bosses take damage but cannot be pulled or stunned.',
+          icon: 'abyssal_rift',
+          effect: { grant: { ability: 'abyssal_rift' } },
         },
       ],
     },

@@ -152,13 +152,10 @@ export const SPEC_BASELINES: SpecBaselineTable = {
   },
   warlock: {
     affliction: {
-      // v0.28.x stat-identity pass: +2% was the lowest baseline on the table and
-      // it carried no flat stat. Lift to peer level and add the primary (Int).
       stats: { int: 6 },
-      global: { spellDmgPct: 0.06 },
       ability: [
-        { ability: 'corruption', dmgPct: 0.16, costPct: -0.15, castPct: -0.7 },
-        { ability: 'curse_of_agony', dmgPct: 0.09, costPct: -0.15 },
+        { ability: 'needle_of_fate', dmgPct: 0.08, costPct: -0.08 },
+        { ability: 'drain_life', costPct: -0.08 },
       ],
     },
     demonology: {
@@ -168,9 +165,8 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       // damage), so that direction would be a separate feature, not this pass.
       stats: { sta: 8, armorPct: 0.06, int: 6 },
       ability: [
-        { ability: 'shadow_bolt', costPct: -0.08 },
-        { ability: 'immolate', costPct: -0.08 },
-        { ability: 'demon_skin', dmgPct: 0.3 },
+        { ability: 'soul_harvest', costPct: -0.08, dmgPct: 0.08 },
+        { ability: 'bone_armor', costPct: -0.08 },
       ],
     },
     destruction: {

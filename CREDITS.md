@@ -206,6 +206,8 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated prop model (delve_pressure_plate) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (marsh_root_wall) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated creature model + animations (training_dummy) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
+| Generated creature model + animations (gravewing) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
+| Generated character form + animations (lich_form) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
 | Generated prop model (engineering_workbench) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (alchemy_cauldron) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (cooking_spit) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
@@ -221,6 +223,10 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated Eastbrook town kit (`eastbrook_bank`, `eastbrook_smithy`, `eastbrook_inn`, `eastbrook_chapel`, `eastbrook_weaving_workshop`, `eastbrook_toolworks`, `eastbrook_civic_well_beacon`, `eastbrook_market_stall`, `eastbrook_wall_wing`) | World of ClaudeCraft | Original deterministic procedural Three.js models produced via the img2threejs workflow and `scripts/assets/eastbrook_town` from the project-generated Eastbrook turnaround sheets | Project asset | With the project only |
 | Generated Eastbrook Ravenpost mailbox (`mailbox_pillar`) | World of ClaudeCraft | Original deterministic procedural Three.js model produced via the img2threejs workflow and `scripts/assets/eastbrook_mailbox` from the project-generated finishing-pass turnaround; replaces the historical Tripo mailbox while preserving its stable runtime path and gameplay contract | Project asset | With the project only |
 | Generated Eastbrook public noticeboard (`eastbrook_noticeboard`) | World of ClaudeCraft | Original deterministic procedural Three.js model produced via the img2threejs workflow and `scripts/assets/eastbrook_noticeboard` from the project-generated finishing-pass turnaround; blank notice shapes contain no readable or proprietary text | Project asset | With the project only |
+| Generated prop model (maledict_eye) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated creature model + animations (emberkin) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
+| Generated creature model + animations (pyre_colossus) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
+| Generated creature model + animations (gloomshade_chainwarden) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
 
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not

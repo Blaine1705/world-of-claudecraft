@@ -36,9 +36,10 @@
 // routes through the seam.
 
 import { hasUnbreakableMovementLock } from '../combat/cc';
-import { DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
+import { isTemporaryNecromancyUndead } from '../combat/necromancy';
+import { ABILITIES, DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
 import { createMob } from '../entity';
-import type { PetState } from '../sim';
+import type { PetState, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat } from '../threat';
 import {
@@ -51,6 +52,7 @@ import {
   type PetMode,
 } from '../types';
 import { startWaterJet } from './pet_ai';
+import { isPrimaryOwnedPetEntity } from './pet_selection';
 
 // Slice-only tuning consts, moved verbatim from sim.ts with the slice.
 const PET_TAUNT_RANGE = 5;
@@ -129,14 +131,29 @@ export function clearNonPlayerStatAuras(ctx: SimContext, target: Entity): void {
 export function petOf(ctx: SimContext, ownerPid: number, includeDead = false): Entity | null {
   for (const e of ctx.entities.values()) {
     if (
-      e.kind === 'mob' &&
-      e.ownerId === ownerPid &&
+      isPrimaryOwnedPetEntity(e, ownerPid) &&
       !ctx.isDelveCompanionMob(e) &&
       (includeDead || !e.dead)
     )
       return e;
   }
   return null;
+}
+
+/** Living combat units addressed by the owner's direct attack command.
+ *  Temporary Necromancy servants remain excluded from petOf so they never
+ *  replace or persist as the owner's primary pet, but still obey group attack
+ *  orders alongside the persistent Graveguard. */
+function combatCommandPetsOf(ctx: SimContext, ownerPid: number): Entity[] {
+  const pets: Entity[] = [];
+  const persistent = petOf(ctx, ownerPid);
+  if (persistent) pets.push(persistent);
+  for (const entity of ctx.entities.values()) {
+    if (entity.ownerId === ownerPid && !entity.dead && isTemporaryNecromancyUndead(entity)) {
+      pets.push(entity);
+    }
+  }
+  return pets;
 }
 
 export function serializePet(ctx: SimContext, ownerPid: number): PetState | null {
@@ -156,6 +173,21 @@ export function serializePet(ctx: SimContext, ownerPid: number): PetState | null
     autoTaunt: pet.petAutoTaunt,
     autoWaterJet: pet.petAutoWaterJet,
   };
+}
+
+export function canRestorePetState(meta: PlayerMeta, state: PetState): boolean {
+  const summonsTemplate = (ability: (typeof ABILITIES)[string]): boolean =>
+    ability.effects.some(
+      (effect) =>
+        (effect.type === 'summonDemon' && effect.mobId === state.templateId) ||
+        (effect.type === 'summonPet' && effect.templateId === state.templateId) ||
+        (effect.type === 'summonUndead' && effect.templateId === state.templateId),
+    );
+  const classCanSummon = Object.values(ABILITIES).some(
+    (ability) => ability.class === meta.cls && summonsTemplate(ability),
+  );
+  if (!classCanSummon) return true;
+  return meta.known.some((ability) => summonsTemplate(ability.def));
 }
 
 /** A summoned warlock demon (imp/voidwalker/succubus/felhunter/doomguard/infernal,
@@ -546,19 +578,21 @@ export function petAttack(ctx: SimContext, pid?: number): void {
   }
   if (petCommandBlockedByControl(ctx, r.e)) return;
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
-  const pet = petOf(ctx, r.e.id);
-  if (!pet) {
+  const pets = combatCommandPetsOf(ctx, r.e.id);
+  if (pets.length === 0) {
     ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
     return;
   }
   const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
-  if (!target || target.dead || !ctx.isHostileTo(pet, target)) {
+  if (!target || target.dead || !ctx.isHostileTo(pets[0], target)) {
     ctx.error(r.e.id, 'Your pet needs a hostile target.');
     return;
   }
-  pet.aggroTargetId = target.id;
-  pet.inCombat = true;
-  if (target.kind === 'mob' && target.hostile) addThreat(target, pet.id, 1);
+  for (const pet of pets) {
+    pet.aggroTargetId = target.id;
+    pet.inCombat = true;
+    if (target.kind === 'mob' && target.hostile) addThreat(target, pet.id, 1);
+  }
 }
 
 export function petTaunt(ctx: SimContext, pid?: number): void {

@@ -15,6 +15,14 @@ describe('Talents V2 icon routing', () => {
     return option;
   };
 
+  const warlockOption = (id: string) => {
+    const option = ROW_TREES.warlock
+      .flatMap((row) => row.options)
+      .find((candidate) => candidate.id === id);
+    if (!option) throw new Error(`Missing Warlock row option: ${id}`);
+    return option;
+  };
+
   const spec = (cls: 'warrior' | 'mage' | 'rogue', specId?: string): SpecDef => {
     const talents = talentsFor(cls);
     const found = specId
@@ -50,6 +58,17 @@ describe('Talents V2 icon routing', () => {
     expect(talentRowOptionIconRef(warriorOption('war_row_blood_offering'))).toEqual({
       kind: 'ability',
       id: 'combat_mastery',
+    });
+  });
+
+  it('uses authored ability icons for bespoke Warlock global mechanics', () => {
+    expect(talentRowOptionIconRef(warlockOption('wlk_r8_curse_of_exhaustion'))).toEqual({
+      kind: 'ability',
+      id: 'curse_of_exhaustion',
+    });
+    expect(talentRowOptionIconRef(warlockOption('wlk_r20_grimoire_of_haste'))).toEqual({
+      kind: 'ability',
+      id: 'summon_felhunter',
     });
   });
 

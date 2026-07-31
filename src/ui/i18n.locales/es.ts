@@ -13,6 +13,85 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warlock.doomLabel': 'Condena',
+  'hudChrome.warlock.doomEmptyStatus': '{value} de {max} de Condena.',
+  'hudChrome.warlock.doomStatus': '{value} de {max} de Condena; quedan {remaining}.',
+  'hudChrome.procOverlay.soulFragmentsMeter': 'Fragmentos de alma',
+  'guide.abilityHook.evil_eye':
+    'Señala al enemigo cuyas acciones y sufrimiento alimentarán tu Condena.',
+  'entities.abilities.evil_eye.name': 'Mal de ojo',
+  'entities.abilities.evil_eye.description':
+    'Marca a un enemigo como foco de tus maldiciones. Mover el Mal de ojo conserva la Condena, pero no renueva su duración de 20 s.',
+  'entities.abilities.maledict_gaze.name': 'Mirada maléfica',
+  'entities.abilities.maledict_gaze.description':
+    'Tu ojo maléfico ataca cada 2,5 s al objetivo principal de Mal de ojo e inflige daño de las Sombras. Poseer el Mal de ojo duplica su velocidad de ataque.',
+  'entities.abilities.needle_of_fate.name': 'Aguja del destino',
+  'entities.abilities.needle_of_fate.description':
+    'Perfora al enemigo e inflige {damage} de daño de las Sombras. Genera 5 de Condena si porta tu Mal de ojo; si no existe ninguno, primero marca al objetivo.',
+  'entities.abilities.sentence.name': 'Sentencia',
+  'entities.abilities.sentence.description':
+    'Consume toda la Condena para sentenciar al enemigo. El daño y los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena.',
+  'entities.abilities.cursed_accomplice.name': 'Cómplice maldito',
+  'entities.abilities.cursed_accomplice.description':
+    'Si no seleccionas a un jugador aliado, enlaza tu ojo maléfico y hace que su Mirada genere 2 de Condena. Al enlazar a un aliado, su daño al objetivo de Mal de ojo genera 3. Solo puede activarse una vez cada 2 s.',
+  'entities.abilities.litany_of_guilt.name': 'Liturgia de culpa',
+  'entities.abilities.litany_of_guilt.description':
+    'Maldice tu Mal de ojo principal durante 8 s. Obtener Condena libera una onda que daña a un máximo de 4 enemigos más en 8 m, como máximo una vez por segundo.',
+  'entities.abilities.umbral_anchor.name': 'Ancla umbría',
+  'entities.abilities.umbral_anchor.description':
+    'Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar, consumir el ancla e iniciar un tiempo de reutilización de 45 s.',
+  'entities.abilities.hex_of_violence.name': 'Maleficio de violencia',
+  'entities.abilities.hex_of_violence.description':
+    'Maldice al enemigo durante 8 s. Sus siguientes 3 acciones dañinas generan 7 de Condena cada una y le infligen 22 de daño de las Sombras.',
+  'entities.abilities.cruel_pact.name': 'Pacto cruel',
+  'entities.abilities.cruel_pact.description':
+    'Sacrifica un 12% de tu salud máxima para generar 20 de Condena. No se puede usar con un 15% de salud o menos.',
+  'entities.abilities.vicarious_suffering.name': 'Sufrimiento vicario',
+  'entities.abilities.vicarious_suffering.description':
+    'Enlaza el sufrimiento durante 8 s y genera hasta 15 de Condena con golpes hostiles. Sobre ti reduce un 20% el daño recibido. Sobre un aliado redirige hasta un 20% hacia ti sin bajarte del 15% de salud.',
+  'entities.abilities.possess_evil_eye.name': 'Poseer el Mal de ojo',
+  'entities.abilities.possess_evil_eye.description':
+    'El maldictor posee tu Mal de ojo principal durante 10 s. Aguja del destino se lanza en 1 s y genera 2 de Condena adicionales, Consumir se puede canalizar en movimiento y obtiene un rayo demoníaco, y Sentencia libera un eco retardado del 25% del daño.',
+  'entities.abilities.coven.name': 'Aquelarre',
+  'entities.abilities.coven.description':
+    'Crea Males de ojo secundarios sobre hasta 4 enemigos cercanos durante 15 s. Alimentan la reserva compartida de Condena al 50% y reciben un eco del 35% del daño de Sentencia.',
+  'entities.mobs.necromancy_gravewing.name': 'Alatumba',
+  'entities.abilities.soul_harvest.name': 'Cosecha de esencia',
+  'entities.abilities.soul_harvest.description':
+    'Desgarra el alma del enemigo, inflige {damage} de daño de Sombras y crea 1 fragmento de alma, hasta un máximo de 5.',
+  'entities.abilities.raise_graveguard.name': 'Alzar guardián de tumbas',
+  'entities.abilities.raise_graveguard.description':
+    'Alza un resistente guardián de tumbas que permanece a tu lado. Solo puedes controlar uno a la vez.',
+  'entities.abilities.raise_skeletal_warrior.name': 'Alzar guerrero esquelético',
+  'entities.abilities.raise_skeletal_warrior.description':
+    'Gasta 1 fragmento de alma para alzar un guerrero esquelético durante 30 s. Puedes dirigir hasta 3 no muertos temporales.',
+  'entities.abilities.raise_bone_mage.name': 'Alzar mago óseo',
+  'entities.abilities.raise_bone_mage.description':
+    'Gasta 2 fragmentos de alma para alzar un mago óseo a distancia durante 30 s. Puedes dirigir hasta 3 no muertos temporales.',
+  'entities.abilities.bone_armor.name': 'Armadura de huesos',
+  'entities.abilities.bone_armor.description':
+    'Te envuelve en huesos y absorbe una cantidad de daño equivalente al 20% de tu salud máxima.',
+  'entities.abilities.corpse_explosion.name': 'Explosión de cadáver',
+  'entities.abilities.corpse_explosion.description':
+    'Gasta 2 fragmentos de alma para hacer estallar energía de muerte en la ubicación elegida e infligir {damage} de daño de Sombras a los enemigos cercanos.',
+  'entities.abilities.funeral_harvest.name': 'Cosecha fúnebre',
+  'entities.abilities.funeral_harvest.description':
+    'Cuando muere un enemigo dañado recientemente por ti o por tus no muertos, obtienes 1 fragmento de alma. Solo puede ocurrir una vez cada 3 s.',
+  'entities.abilities.unholy_command.name': 'Mandato profano',
+  'entities.abilities.unholy_command.description':
+    'Ordena a todos tus no muertos que inflijan un 25% más de daño y actúen un 20% más rápido durante 12 s.',
+  'entities.abilities.reaping_command.name': 'Mandato: siega',
+  'entities.abilities.reaping_command.description':
+    'Gasta 2 fragmentos de alma para ordenar a todos tus sirvientes no muertos que golpeen al objetivo al unísono. Los sirvientes con ataques de barrido también golpean a los enemigos cercanos.',
+  'entities.abilities.sacrifice_undead.name': 'Sacrificar no muerto',
+  'entities.abilities.sacrifice_undead.description':
+    'Destruye un sirviente no muerto temporal para restaurar un 25% de tu salud máxima.',
+  'entities.abilities.army_of_the_dead.name': 'Ejército de los muertos',
+  'entities.abilities.army_of_the_dead.description':
+    'Alza dos guerreros esqueléticos y un mago óseo para lanzar un asalto implacable durante 20 s.',
+  'entities.mobs.graveguard.name': 'Guardián de tumbas',
+  'entities.mobs.necromancy_skeletal_warrior.name': 'Guerrero esquelético',
+  'entities.mobs.necromancy_bone_mage.name': 'Mago óseo',
   'hudChrome.bags.itemAriaMasterwork': '{item}, cantidad {count}, obra maestra',
   'hudChrome.archetypePair.tailoring+inscription': 'Tejedormago',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Encantar arma - Sello Rúnico',
@@ -3771,7 +3850,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball.name': 'Descarga de Ascuas',
   'entities.abilities.rain_of_fire.name': 'Lluvia de Fuego',
   'entities.abilities.rain_of_fire.description':
-    'Hace caer una lluvia de fuego sobre el área objetivo durante 4 s, quemando a los enemigos e infligiendo {damage} de daño de Fuego cada segundo.',
+    'Gasta 3 de Ruina para hacer llover fuego sobre el área objetivo, infligiendo {damage} de daño de Fuego cada segundo durante 6 s mientras sigues lanzando hechizos. Desolación adelanta la primera oleada.',
   'entities.abilities.volley.name': 'Andanada',
   'entities.abilities.volley.description':
     'Lanza una lluvia de flechas sobre el área objetivo durante 3 s, infligiendo {damage} de daño cada 0.5 s a los enemigos atrapados.',
@@ -4084,7 +4163,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Abrasa al enemigo con fuego agonizante por {damage} de daño de Fuego. Lanzamiento rápido.',
   'entities.abilities.shadowburn.name': 'Fuego Crepuscular',
   'entities.abilities.shadowburn.description':
-    'Explota al instante contra el objetivo con sombra abrasadora por {damage} de daño de las Sombras.',
+    'Gasta 1 de Ruina para ejecutar a un enemigo con menos del 20% de salud, infligiendo {damage} de daño de las Sombras. Recupera la Ruina si el objetivo reclamado muere en 5 s.',
+  'entities.abilities.ruinous_brand.name': 'Marca ruinosa',
+  'entities.abilities.ruinous_brand.description':
+    'Marca a un enemigo durante 15 s. Tus siguientes 3 hechizos directos replican un 25% del daño contra el enemigo marcado, o le copian un 50% del daño si se lanzan contra otro objetivo.',
   'entities.abilities.wrath.name': 'Descarga Silvestre',
   'entities.abilities.wrath.description':
     'Lanza una descarga de energía natural que inflige {damage} de daño de Naturaleza.',
@@ -4195,7 +4277,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Invoca a un Warfiend bajo el mando del brujo. El Warfiend es un demonio cuerpo a cuerpo resistente que se adentra en la batalla y aguanta por sí mismo. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez.',
   'entities.abilities.summon_infernal.name': 'Invocar Pyre Colossus',
   'entities.abilities.summon_infernal.description':
-    'Somete a un Pyre Colossus a tu voluntad: un coloso descomunal con un cuerpo a cuerpo demoledor y la mayor salud y armadura de todos los demonios. Un largo tiempo de reutilización refrena su poder bruto. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez.',
+    'Hace caer un Coloso de la Pira sobre el área objetivo, infligiendo 58-72 de daño de Fuego al impactar. Lucha como guardián durante 15 s sin reemplazar a tu demonio y responde a cada gasto de Ruina con Fuego del Mundo.',
   'entities.abilities.summon_doomguard.name': 'Invocar Wraithborn',
   'entities.abilities.summon_doomguard.description':
     'Somete a un Wraithborn a tu voluntad: un demonio de élite que descarga un fuerte daño de las Sombras desde lejos. Un largo tiempo de reutilización refrena su poder devastador. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez.',
@@ -4264,7 +4346,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Absorbe vida del enemigo, inflige {damage} de daño de las Sombras durante 30 s y te sana por el daño causado. (habilidad distintiva de Aflicción)',
   'entities.abilities.conflagrate.name': 'Conflagrar',
   'entities.abilities.conflagrate.description':
-    'Consume tu Inmolar en el enemigo para prenderlo e infligir {damage} de daño de Fuego. (habilidad distintiva de Destrucción)',
+    'Adelanta un pulso futuro de tu Pacto Ardiente y prende al objetivo por {damage} de daño de Fuego. Genera 1 de Ruina y 1 de Desolación. Tiene 2 cargas. (habilidad distintiva de Destrucción)',
   'entities.abilities.moonkin_form.name': 'Forma de lechúcico lunar',
   'entities.abilities.moonkin_form.description':
     'Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)',
@@ -4277,9 +4359,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crusader_strike.name': 'Golpe de cruzado',
   'entities.abilities.crusader_strike.description':
     'Golpea al objetivo con daño de arma más {damage} de daño Sagrado. (talento de paladín)',
-  'entities.abilities.metamorphosis.name': 'Metamorfosis',
+  'entities.abilities.metamorphosis.name': 'Forma de lich',
   'entities.abilities.metamorphosis.description':
-    'Asumes poder demoníaco, lo que aumenta la armadura y el poder de ataque durante 20 s. (talento de brujo)',
+    'Te conviertes en un lich durante 20 s, creas 3 fragmentos de alma y aumentas un 20% tu daño con hechizos y velocidad de lanzamiento. Tus no muertos infligen un 50% más de daño y actúan un 20% más rápido. (habilidad distintiva de Nigromancia)',
   'entities.items.worn_sword.name': 'Espada corta corroída',
   'entities.items.gnarled_staff.name': 'Bastón de Roble Pantanoso',
   'entities.items.rusty_dagger.name': 'Daga oxidada',
@@ -8554,7 +8636,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.chain_lightning.description':
     'Lanza un relámpago en el área objetivo que inflige {damage} de daño a los enemigos cercanos. (talento de Chamán)',
   'entities.abilities.chaos_bolt.description':
-    'Lanza una descarga de fuego caótico que inflige {damage} de daño de Fuego. (talento de Brujo)',
+    'Gasta 3 de Ruina para lanzar una pesada descarga de fuego caótico que inflige {damage} de daño de Fuego. Desolación reduce su lanzamiento un 30%.',
   'entities.abilities.cloak_of_shadows.description':
     'Te envuelve en sombras y absorbe 420 de daño durante 5 s. (talento de Pícaro)',
   'entities.abilities.cone_of_cold.description':

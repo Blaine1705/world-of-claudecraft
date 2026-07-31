@@ -21,6 +21,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { tickHunterTrap } from './combat/hunter_trap';
+import { isTemporaryNecromancyUndead } from './combat/necromancy';
 import { tickRingOfFrost } from './combat/ring_of_frost';
 import { tickTemporalHourglassGround } from './combat/temporal_hourglass';
 import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, zoneAt } from './data';
@@ -50,6 +51,7 @@ export type GroundAoE = {
   tickTimer: number;
   school: string;
   ability: string;
+  abilityId?: string;
   // Spell Power added per tick, snapshotted at cast time (caster ground AoEs).
   spBonus?: number;
   // Rune of Power (mage choice row): a FRIENDLY zone. When set, each pulse
@@ -179,7 +181,11 @@ export function runDespawnDecay(ctx: SimContext): void {
       e.overheadEmoteUntil = 0;
     }
   }
-  for (const id of despawnIds) dropEntityFromRoster(ctx, id);
+  for (const id of despawnIds) {
+    const entity = ctx.entities.get(id);
+    if (entity && isTemporaryNecromancyUndead(entity)) ctx.despawnPet(entity);
+    else dropEntityFromRoster(ctx, id);
+  }
 }
 
 // Fire delayed events whose time has come (subject to their guard), keep the rest.

@@ -29,6 +29,7 @@ const HARMFUL: AuraKind[] = [
   'cost_tax',
   'heal_absorb',
   'critvuln',
+  'affliction_fate_threads',
 ];
 
 const HELPFUL: AuraKind[] = [

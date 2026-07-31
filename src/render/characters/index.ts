@@ -21,9 +21,9 @@ export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';
  *  training dummy freeze). */
 export function createCharacterVisual(
   e: Entity,
-  formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel',
+  formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel' | 'form_metamorph',
 ): CharacterVisual | null {
-  // forms (sheep/bear/cat/travel) are their own models — skins and held weapons
+  // Forms are their own models. Skins and held weapons
   // only apply to the base body
   const key = formKey ?? visualKeyFor(e);
   // The class-agnostic Combat Mech adopts the wearer's independent mainhand and

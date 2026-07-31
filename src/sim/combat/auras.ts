@@ -41,10 +41,13 @@ import { pctValue, recalcPlayerStats } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
+import { tickAfflictionAura, tickMaledictGaze } from './affliction';
 import { isStunned } from './cc';
+import { detonateOssuaryMark, OSSUARY_MARK_ABILITY_ID } from './necromancy';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
+import { tickSacrilegiousMarch, tickWarlockTalentState } from './warlock_talents';
 
 const SECOND_WIND_THRESHOLD = 0.35;
 
@@ -218,6 +221,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   let statsDirty = false;
   // Talent-proc internal cooldowns age at the same cadence as auras.
   tickProcState(e, DT);
+  if (e.kind === 'player') {
+    const meta = ctx.players.get(e.id);
+    if (meta) tickWarlockTalentState(ctx, e, meta);
+  }
   // Walk a SNAPSHOT of e.auras, not the live array. A DoT tick's own
   // ctx.dealDamage call can splice an aura out of this SAME array mid-walk
   // (damage.ts's own backward sweeps remove a breaksOnDamage control aura, or a
@@ -235,6 +242,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
     const a = snapshot[i];
     if (!e.auras.includes(a)) continue; // removed by an earlier entry's side effect this tick
     a.remaining -= DT;
+    tickAfflictionAura(ctx, e, a, DT);
     // charge-limited thorns (Lightning Shield): age its internal cooldown so the
     // next melee hit can reflect once it elapses. No-op for ungated thorns.
     if (a.kind === 'thorns') tickThornsCooldown(a);
@@ -244,6 +252,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
         a.tickTimer += a.tickInterval;
         if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
           tickTemporalHourglassHealing(ctx, e, a);
+        } else if (a.id === 'sacrilegious_march' && a.kind === 'buff_speed') {
+          tickSacrilegiousMarch(ctx, e, a);
+        } else if (a.kind === 'affliction_eye') {
+          tickMaledictGaze(ctx, e, a);
         } else if (a.kind === 'dot') {
           let tickDamage = a.value;
           if (a.school === 'physical') {
@@ -321,6 +333,11 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       }
     }
     if (a.remaining <= CAST_COMPLETE_EPS) {
+      if (a.id === OSSUARY_MARK_ABILITY_ID && a.kind === 'necromancy_ossuary_mark') {
+        detonateOssuaryMark(ctx, e, a);
+        if (e.dead) return;
+        continue;
+      }
       // `i` indexes the snapshot, which no longer matches e.auras once a mid-tick
       // removal has shifted it, so splice the aura's actual live position. The
       // guard covers the one remaining self-removal window (an aura whose OWN

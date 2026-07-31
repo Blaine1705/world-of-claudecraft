@@ -7,6 +7,25 @@ import type { BiomeId } from '../sim/types';
 
 export type Surface = 'grass' | 'dirt' | 'stone' | 'wood' | 'snow' | 'water';
 
+export type AbilityAudioKind =
+  | 'windup'
+  | 'release'
+  | 'impact'
+  | 'pulse'
+  | 'crit'
+  | 'spirit'
+  | 'motif';
+
+export interface AbilityAudioOpts {
+  lite?: boolean;
+  finisher?: boolean;
+  archetype?: string;
+  buffStyle?: string;
+  sample?: string;
+  name?: string;
+  abilityId?: string;
+}
+
 export interface AmbientPointSource {
   readonly id: string;
   readonly kind: 'campfire' | 'forge';
@@ -34,6 +53,15 @@ export interface SpatialAudioSink {
     y: number,
     z: number,
     self: boolean,
+  ): void;
+  /** Lich Form entry, ambient pulse, and a sacrificed soul reaching its owner. */
+  necromancy(
+    kind: 'lichTransform' | 'lichHeartbeat' | 'soulConsume',
+    x: number,
+    y: number,
+    z: number,
+    self: boolean,
+    sourceId?: number,
   ): void;
   /** Per-frame ambience state around the player; the engine cross-fades loops.
    *  `crowd` is the Sowfield crowd-murmur level (0 away from the stadium,

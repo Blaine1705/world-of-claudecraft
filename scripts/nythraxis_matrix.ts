@@ -2,7 +2,6 @@ import { writeFileSync } from 'node:fs';
 import {
   defaultBuild,
   type TalentAllocation,
-  talentPointsAtLevel,
   validateAllocation,
 } from '../src/sim/content/talents';
 import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
@@ -401,7 +400,7 @@ const specs = {
       choices: {},
     },
     prepull: ['demon_skin'],
-    rotation: ['shadowburn', 'immolate', 'corruption', 'curse_of_agony', 'shadow_bolt'],
+    rotation: ['shadowburn', 'immolate', 'corruption', 'curse_of_agony', 'life_tap', 'shadow_bolt'],
   },
   afflictionWarlock: {
     key: 'affliction_warlock',
@@ -421,7 +420,17 @@ const specs = {
       choices: { wlk_dark_pact: 'wlk_pact_affliction' },
     },
     prepull: ['demon_skin'],
-    rotation: ['immolate', 'corruption', 'curse_of_agony', 'drain_life', 'shadow_bolt'],
+    rotation: [
+      'evil_eye',
+      'coven',
+      'hex_of_violence',
+      'vicarious_suffering',
+      'cruel_pact',
+      'sentence',
+      'drain_life',
+      'needle_of_fate',
+      'life_tap',
+    ],
   },
   demonologyWarlock: {
     key: 'demonology_warlock',
@@ -441,7 +450,16 @@ const specs = {
       choices: { wlk_dark_pact: 'wlk_pact_demonology' },
     },
     prepull: ['demon_skin'],
-    rotation: ['immolate', 'corruption', 'curse_of_agony', 'shadow_bolt'],
+    rotation: [
+      'metamorphosis',
+      'army_of_the_dead',
+      'unholy_command',
+      'raise_bone_mage',
+      'raise_skeletal_warrior',
+      'reaping_command',
+      'life_tap',
+      'soul_harvest',
+    ],
   },
   marksmanshipHunter: {
     key: 'marksmanship_hunter',
@@ -722,12 +740,16 @@ function equipBest(sim: Sim, pid: number, spec: Spec) {
 }
 
 function ensureTalents(sim: Sim, pid: number, spec: Spec) {
-  const check = validateAllocation(spec.cls, spec.talents, talentPointsAtLevel(20));
+  const canonical: TalentAllocation = {
+    ...defaultBuild(spec.cls, 20),
+    spec: spec.talents.spec,
+  };
+  const check = validateAllocation(spec.cls, canonical, 20);
   if (!check.ok) {
     console.warn(`Invalid talents for ${spec.key}: ${check.reason}`);
   }
-  if (!sim.applyTalents(spec.talents, pid)) {
-    sim.applyTalents(defaultBuild(spec.cls, talentPointsAtLevel(20)), pid);
+  if (!sim.applyTalents(canonical, pid)) {
+    sim.applyTalents(defaultBuild(spec.cls, 20), pid);
   }
 }
 
@@ -793,7 +815,12 @@ const SELF_BUFF_ABILITIES = new Set([
   'rockbiter_weapon',
   'demon_skin',
 ]);
-const TARGET_DEBUFF_ABILITIES = new Set(['demoralizing_roar', 'faerie_fire']);
+const TARGET_DEBUFF_ABILITIES = new Set([
+  'demoralizing_roar',
+  'evil_eye',
+  'faerie_fire',
+  'hex_of_violence',
+]);
 const FIVE_COMBO_FINISHERS = new Set(['eviscerate', 'rip', 'rupture', 'ferocious_bite']);
 
 function auraActive(entity: Entity, id: string, sourceId?: number): boolean {
@@ -807,6 +834,12 @@ function sunderStacks(target: Entity): number {
 }
 
 function shouldTryAbility(caster: Entity, target: Entity, ability: string): boolean {
+  if (
+    ability === 'life_tap' &&
+    (caster.resource > caster.maxResource * 0.3 || caster.hp <= caster.maxHp * 0.35)
+  ) {
+    return false;
+  }
   if (DOT_ABILITIES.has(ability) && auraActive(target, ability, caster.id)) return false;
   if (SELF_BUFF_ABILITIES.has(ability) && auraActive(caster, ability)) return false;
   if (TARGET_DEBUFF_ABILITIES.has(ability) && auraActive(target, ability, caster.id)) return false;
@@ -857,14 +890,15 @@ function setupHunterPet(sim: Sim, pid: number) {
   for (let i = 0; i < 20 * 7; i++) sim.tick();
 }
 
-function setupWarlockImp(sim: Sim, pid: number) {
+function setupWarlockPet(sim: Sim, pid: number, spec: Spec) {
   if (sim.petOf(pid)) return;
-  sim.castAbility('summon_imp', pid);
+  sim.castAbility(spec.key === 'demonology_warlock' ? 'raise_graveguard' : 'summon_imp', pid);
   for (let i = 0; i < 20 * 12 && sim.entities.get(pid)?.castingAbility; i++) sim.tick();
 }
 
 type Result = {
   key: string;
+  seed: number;
   killed: boolean;
   seconds: number;
   bossHp: number;
@@ -915,6 +949,8 @@ type Result = {
       dead: boolean;
       deathTime?: number;
       damageDone: number;
+      playerDamageDone: number;
+      petDamageDone: number;
       dps: number;
       healingDone: number;
       hps: number;
@@ -997,8 +1033,8 @@ function secureAddThreat(add: Entity, tankPid: number, lead: number): void {
   }
 }
 
-function runGroup(groupSpecs: Spec[], key: string): Result {
-  const sim = new Sim({ seed: 42, noPlayer: true, playerClass: 'warrior' });
+function runGroup(groupSpecs: Spec[], key: string, seed: number): Result {
+  const sim = new Sim({ seed, noPlayer: true, playerClass: 'warrior' });
   const pids = groupSpecs.map((spec, i) => sim.addPlayer(spec.cls, `${spec.key}_${i}`));
   for (let i = 0; i < pids.length; i++) {
     sim.players.get(pids[i])?.questsDone.add('q_nythraxis_bound_guardian');
@@ -1008,7 +1044,7 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
   }
   for (let i = 0; i < pids.length; i++) {
     if (groupSpecs[i].cls === 'hunter') setupHunterPet(sim, pids[i]);
-    if (groupSpecs[i].cls === 'warlock') setupWarlockImp(sim, pids[i]);
+    if (groupSpecs[i].cls === 'warlock') setupWarlockPet(sim, pids[i], groupSpecs[i]);
   }
   for (const pid of pids.slice(1)) {
     sim.partyInvite(pid, pids[0]);
@@ -1061,6 +1097,8 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
       finalResource: e.resource,
       dead: false,
       damageDone: 0,
+      playerDamageDone: 0,
+      petDamageDone: 0,
       dps: 0,
       healingDone: 0,
       hps: 0,
@@ -1340,6 +1378,11 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
         const metric = actorMetrics.get(creditId);
         if (metric) {
           metric.damageDone += event.amount;
+          if (source?.ownerId !== null && source?.ownerId !== undefined) {
+            metric.petDamageDone += event.amount;
+          } else {
+            metric.playerDamageDone += event.amount;
+          }
           addRecordValue(metric.damageDoneByAbility, event.ability, event.amount);
         }
         combatLog.push({
@@ -1638,6 +1681,7 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
   }
   return {
     key,
+    seed,
     killed: boss.dead,
     seconds,
     bossHp: boss.hp,
@@ -1684,6 +1728,11 @@ function hashString(value: string): number {
 }
 
 const limit = Number(process.env.MATRIX_LIMIT ?? '96');
+const seeds = (process.env.MATRIX_SEEDS ?? '42,1337,9001')
+  .split(',')
+  .map((value) => Number(value.trim()))
+  .filter((value) => Number.isInteger(value));
+if (seeds.length < 2) throw new Error('MATRIX_SEEDS must contain at least two integer seeds');
 const plans: { tank: Spec; healerSet: Spec[]; dpsSet: Spec[] }[] = [];
 for (const { tank } of tankPlans) {
   for (const healerSet of healerCombos) {
@@ -1701,14 +1750,16 @@ if (!Number.isInteger(shardCount) || shardCount < 1)
 if (!Number.isInteger(shardIndex) || shardIndex < 0 || shardIndex >= shardCount)
   throw new Error('MATRIX_SHARD_INDEX must be between 0 and MATRIX_SHARD_COUNT - 1');
 const selectedForShard = selected.filter((_, index) => index % shardCount === shardIndex);
-const attempted = plans.length;
+const attempted = plans.length * seeds.length;
 const results: Result[] = [];
 for (const { tank, healerSet, dpsSet } of selectedForShard) {
   const offTank = (
     tank.key === 'protection_paladin' ? specs.protectionWarrior : specs.protectionPaladin
   ) as Spec;
   const group = [tank, { ...offTank, role: 'offTank' as Role }, ...healerSet, ...dpsSet];
-  results.push(runGroup(group, planKey({ tank, healerSet, dpsSet })));
+  for (const seed of seeds) {
+    results.push(runGroup(group, planKey({ tank, healerSet, dpsSet }), seed));
+  }
 }
 
 const killed = results.filter((r) => r.killed);
@@ -1729,6 +1780,10 @@ const avgBy = (selector: (r: Result) => string, metric: (r: Result) => number) =
 
 const specDamage = new Map<string, { n: number; damage: number }>();
 const specDps = new Map<string, { n: number; dps: number }>();
+const specDamageBreakdown = new Map<
+  string,
+  { n: number; playerDamage: number; petDamage: number; combinedDamage: number; lifeTaps: number }
+>();
 const specHealing = new Map<string, { n: number; healing: number }>();
 const specResources = new Map<
   string,
@@ -1820,6 +1875,21 @@ for (const r of results) {
     dpsRow.dps += v / r.seconds;
     specDps.set(k, dpsRow);
   }
+  for (const actor of Object.values(r.actors)) {
+    const row = specDamageBreakdown.get(actor.spec) ?? {
+      n: 0,
+      playerDamage: 0,
+      petDamage: 0,
+      combinedDamage: 0,
+      lifeTaps: 0,
+    };
+    row.n++;
+    row.playerDamage += actor.playerDamageDone;
+    row.petDamage += actor.petDamageDone;
+    row.combinedDamage += actor.damageDone;
+    row.lifeTaps += actor.castsStarted.life_tap ?? 0;
+    specDamageBreakdown.set(actor.spec, row);
+  }
   for (const [k, v] of Object.entries(r.healing)) {
     const row = specHealing.get(k) ?? { n: 0, healing: 0 };
     row.n++;
@@ -1830,6 +1900,7 @@ for (const r of results) {
 
 const output = {
   attempted,
+  seeds,
   selected: selected.length,
   shardIndex,
   shardCount,
@@ -1859,6 +1930,16 @@ const output = {
   specDamage: [...specDamage.entries()]
     .map(([key, row]) => ({ key, avgDamage: Math.round(row.damage / row.n) }))
     .sort((a, b) => b.avgDamage - a.avgDamage),
+  specDamageBreakdown: [...specDamageBreakdown.entries()]
+    .map(([key, row]) => ({
+      key,
+      n: row.n,
+      avgPlayerDamage: Math.round(row.playerDamage / row.n),
+      avgPetDamage: Math.round(row.petDamage / row.n),
+      avgCombinedDamage: Math.round(row.combinedDamage / row.n),
+      avgLifeTaps: round1(row.lifeTaps / row.n),
+    }))
+    .sort((a, b) => b.avgCombinedDamage - a.avgCombinedDamage),
   specHealing: [...specHealing.entries()]
     .map(([key, row]) => ({ key, avgHealing: Math.round(row.healing / row.n) }))
     .sort((a, b) => b.avgHealing - a.avgHealing),

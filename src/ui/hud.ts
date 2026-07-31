@@ -29,6 +29,7 @@ import {
   normalizeStreamerLink,
   type StreamerLinks,
 } from '../sim/account_flair';
+import { isNecromancyUndead } from '../sim/combat/necromancy';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
@@ -339,6 +340,7 @@ import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
 import { LootWindowController } from './hud/loot/loot_window_controller';
+import { primaryOwnedPet } from './hud/pet_bar_core';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
 import { QuestDialogController } from './hud/quest/quest_dialog_controller';
 import { parseChatSegments } from './hud/quest/quest_link';
@@ -354,6 +356,7 @@ import { buildUnbindView } from './hud/vendor/unbind_view';
 import { renderUnbindWindow } from './hud/vendor/unbind_window';
 import { buildVendorView } from './hud/vendor/vendor_view';
 import { renderVendorWindow } from './hud/vendor/vendor_window';
+import { createDoomMeter, destructionRuinPips } from './hud/warlock';
 import {
   formatMoney as formatLocalizedMoney,
   formatNumber,
@@ -455,6 +458,7 @@ import {
   chronoOverlayCharges,
   combustionOverlayActive,
   frostOverlayCharges,
+  necromancyOverlayCharges,
   procOverlayState,
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
@@ -3259,6 +3263,23 @@ export class Hud {
       this.hotDomSkippedWrites++;
     },
   );
+  private readonly doomMeter = createDoomMeter(
+    document,
+    this.playerFrameEl.parentElement as HTMLElement,
+    this.playerFrameEl,
+    this.writerFacet,
+    {
+      label: () => t('hudChrome.warlock.doomLabel'),
+      formatCount: (value) => formatNumber(value, { maximumFractionDigits: 0 }),
+      formatEmptyStatus: (value, max) => t('hudChrome.warlock.doomEmptyStatus', { value, max }),
+      formatStatus: (value, max, seconds) =>
+        t('hudChrome.warlock.doomStatus', {
+          value,
+          max,
+          remaining: tPlural('hudChrome.plurals.secondsRemaining', seconds),
+        }),
+    },
+  );
   private readonly delvePainter = new DelveMapPainter(this.writerFacet, classCss);
   // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
   // facet-routed; structure from arenaInfo.match.yumi, dynamics from the
@@ -3289,7 +3310,7 @@ export class Hud {
   // (proc_overlay_drag), class-toggled per frame via the elided writers
   // (proc_overlay_painter + the pure proc_overlay_view rule).
   private readonly procOverlayEl = (() => {
-    const el = buildProcOverlay();
+    const el = buildProcOverlay(t('hudChrome.procOverlay.soulFragmentsMeter'));
     document.body.appendChild(el);
     // Owner request: grab the phoenix while it burns and park it anywhere;
     // the spot persists (viewport fractions, so a resize keeps it sensible).
@@ -5032,6 +5053,7 @@ export class Hud {
   }
 
   private refreshLocalizedDynamicUi(): void {
+    this.doomMeter.relocalize();
     this.syncDailyRewardsSurfaceLabels();
     this.storePromoCard?.relocalize({
       open: t('hudChrome.wocStore.title'),
@@ -5135,6 +5157,11 @@ export class Hud {
           cost: formatAbilityNumber(res.cost),
           resource: resourceDisplayName(this.sim.player.resourceType),
         }),
+      );
+    }
+    if ((a.ruinCost ?? 0) > 0) {
+      costLine.push(
+        t('abilityUi.tooltip.ruinCost', { cost: formatAbilityNumber(a.ruinCost ?? 0) }),
       );
     }
     const rangeLine = abilityRangeLine(a);
@@ -6571,10 +6598,7 @@ export class Hud {
   }
 
   private ownPet(): Entity | null {
-    for (const e of this.sim.entities.values()) {
-      if (e.kind === 'mob' && e.ownerId === this.sim.playerId) return e;
-    }
-    return null;
+    return primaryOwnedPet(this.sim.entities.values(), this.sim.playerId);
   }
 
   // The warrior stance bar: a small row of stance toggles stacked above the
@@ -7204,13 +7228,27 @@ export class Hud {
     );
     this.updateLowHealthVignette(p.hp, p.maxHp);
     this.updateLowResource(p);
+    this.doomMeter.paint({
+      affliction: this.sim.talentSpec === 'affliction',
+      auras: p.auras,
+    });
 
-    // combo points: character-bound (retail-style), so the row of pips rides the
-    // PLAYER frame (over the hp bar) and stays lit across target swaps until the
-    // points are spent or fade. The row is lazy-built ONCE (then only the `on`
-    // class is toggled per frame, through the elided writer), never rebuilt.
-    if (p.resourceType === 'energy') {
+    // Character-bound secondary resources share the five-pip row on the player
+    // frame. Energy users show combo points; committed Destruction shows Ruin.
+    // The row is lazy-built once and hot updates only toggle classes.
+    const ruinPips = destructionRuinPips(this.sim.talentSpec, p.auras);
+    const showingRuin = this.sim.talentSpec === 'destruction';
+    if (p.resourceType === 'energy' || showingRuin) {
       this.setDisplay(this.comboRowEl, 'flex');
+      this.toggleClass(this.comboRowEl, 'ruin', showingRuin);
+      const secondaryAmount = showingRuin ? ruinPips : p.comboPoints;
+      const secondaryLabel = showingRuin
+        ? t('abilityUi.tooltip.ruinCost', { cost: secondaryAmount })
+        : t('abilityUi.tooltip.requiresCombo');
+      this.writerFacet.setAttr(this.comboRowEl, 'aria-hidden', 'false');
+      this.writerFacet.setAttr(this.comboRowEl, 'aria-valuenow', String(secondaryAmount));
+      this.writerFacet.setAttr(this.comboRowEl, 'aria-valuetext', secondaryLabel);
+      this.writerFacet.setAttr(this.comboRowEl, 'aria-label', secondaryLabel);
       if (this.comboRowEl.children.length !== COMBO_PIP_COUNT) {
         this.comboRowEl.innerHTML = '';
         for (let i = 0; i < COMBO_PIP_COUNT; i++) {
@@ -7221,11 +7259,19 @@ export class Hud {
       }
       // indexed walk over the live collection: no per-frame array copy
       const pips = this.comboRowEl.children;
-      for (let i = 0; i < pips.length; i++) {
-        this.toggleClass(pips[i] as HTMLElement, 'on', i < p.comboPoints);
+      if (p.resourceType === 'energy') {
+        for (let i = 0; i < pips.length; i++) {
+          this.toggleClass(pips[i] as HTMLElement, 'on', i < p.comboPoints);
+        }
+      } else {
+        for (let i = 0; i < pips.length; i++) {
+          this.toggleClass(pips[i] as HTMLElement, 'on', i < ruinPips);
+        }
       }
     } else {
       this.setDisplay(this.comboRowEl, 'none');
+      this.toggleClass(this.comboRowEl, 'ruin', false);
+      this.writerFacet.setAttr(this.comboRowEl, 'aria-hidden', 'true');
     }
 
     // buff bar / debuff bar: the keyed-pool aura painter, driven by the auras_view core
@@ -7477,7 +7523,9 @@ export class Hud {
     // charges (one quarter per charge); every other spec/class keeps the fire
     // Heating Up / Hot Streak rule. Both routes clear the other's classes, so a
     // spec swap never strands a half-lit bird.
-    if (this.sim.talentSpec === 'arcane') {
+    if (this.sim.talentSpec === 'demonology') {
+      this.procOverlayPainter.paintNecromancyCharges(necromancyOverlayCharges(p.auras));
+    } else if (this.sim.talentSpec === 'arcane') {
       this.procOverlayPainter.paintChronoCharges(chronoOverlayCharges(p.auras));
     } else if (this.sim.talentSpec === 'frost') {
       this.procOverlayPainter.paintFrostCharges(frostOverlayCharges(p.auras));
@@ -14270,6 +14318,13 @@ function describeAbilitySummary(
       }),
     );
   }
+  if ((known.def.ruinCost ?? 0) > 0) {
+    parts.push(
+      t('abilityUi.tooltip.ruinCost', {
+        cost: formatAbilityNumber(known.def.ruinCost ?? 0),
+      }),
+    );
+  }
   parts.push(abilityCastLine(known, spellHaste));
   // Resolved cooldown (after talent cooldown modifiers), not the base def cooldown.
   if (known.cooldown > 0) {
@@ -14397,7 +14452,9 @@ function dungeonDisplayNameFromSource(name: string): string {
 
 function entityDisplayName(entity: Entity): string {
   if (entity.kind === 'mob')
-    return entity.ownerId !== null ? entity.name : mobDisplayName(entity.templateId);
+    return entity.ownerId !== null && !isNecromancyUndead(entity)
+      ? entity.name
+      : mobDisplayName(entity.templateId);
   if (entity.kind === 'npc') return npcDisplayName(entity.templateId);
   return entity.name;
 }

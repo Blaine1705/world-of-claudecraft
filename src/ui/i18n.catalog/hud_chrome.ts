@@ -10,6 +10,14 @@
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 
 export const hudChromeStrings = {
+  warlock: {
+    doomLabel: 'Condemnation',
+    doomEmptyStatus: '{value} of {max} Condemnation.',
+    doomStatus: '{value} of {max} Condemnation; {remaining}.',
+  },
+  procOverlay: {
+    soulFragmentsMeter: 'Soul Fragments',
+  },
   spectate: {
     banner: 'Spectating {name}',
   },

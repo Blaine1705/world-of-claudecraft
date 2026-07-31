@@ -6,7 +6,7 @@
 // parity drives both world shapes to identical output.
 
 import { describe, expect, it, vi } from 'vitest';
-import { type AbilityDef, type Aura, type ItemDef, MELEE_RANGE } from '../src/sim/types';
+import { type AbilityDef, type ItemDef, MELEE_RANGE } from '../src/sim/types';
 import {
   ABILITY_ICON_PREFIX,
   type ActionBarAbility,
@@ -198,6 +198,31 @@ describe('actionBarView: the four slot kinds classify correctly', () => {
 });
 
 describe('actionBarView: ability cooldown / usable / range / queued math', () => {
+  it('dims Ruin spenders below their secondary-resource cost and glows under Desolation', () => {
+    const spender = ability('chaos_bolt', { cost: 65, ruinCost: 3 });
+    const view = createActionBarView(descriptor(slot(1, { ability: spender })), fakeDeps());
+    expect(
+      view.tick(
+        world({
+          resource: 100,
+          auras: [{ kind: 'destruction_ruin', stacks: 2 }],
+        }),
+      ).slots[0].usable,
+    ).toBe(false);
+    const ready = view.tick(
+      world({
+        resource: 100,
+        auras: [
+          { kind: 'destruction_ruin', stacks: 3 },
+          { kind: 'desolation', stacks: 1 },
+        ],
+      }),
+    ).slots[0];
+    expect(ready.usable).toBe(true);
+    expect(ready.procGlow).toBe(true);
+    expect(ready.ariaDescription).toBe('guide.glossary.procTerm');
+  });
+
   it('cooldown sweep is clamped, the countdown shows above one second', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('frostbolt', { cooldown: 6 }) })),
@@ -243,6 +268,37 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     const near = view.tick(world({ resource: 60, targetPos: { x: 1, y: 1, z: 1 } })).slots[0];
     expect(near.usable).toBe(true);
     expect(near.outOfRange).toBe(false);
+  });
+
+  it('dims a Soul Fragment spender until the required stacks are banked', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('raise_bone_mage', {
+            cost: 20,
+            soulFragmentCost: 2,
+          }),
+        }),
+      ),
+      fakeDeps(),
+    );
+
+    expect(
+      view.tick(
+        world({
+          resource: 100,
+          auras: [{ kind: 'soul_fragments', stacks: 1 }],
+        }),
+      ).slots[0].usable,
+    ).toBe(false);
+    expect(
+      view.tick(
+        world({
+          resource: 100,
+          auras: [{ kind: 'soul_fragments', stacks: 2 }],
+        }),
+      ).slots[0].usable,
+    ).toBe(true);
   });
 
   it('a requiresStealth ability is usable only while the player is stealthed (issue #1890)', () => {
@@ -373,6 +429,43 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     expect(state.slots[1].empowered).toBe(false);
   });
 
+  it('shows the scoped Forbidden Reflection copy as ready over the original cooldown', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('fear', { cooldown: 40, cost: 20 }) }),
+        slot(2, { ability: ability('life_tap', { cooldown: 40 }) }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(
+      world({
+        cooldowns: new Map([
+          ['fear', 30],
+          ['life_tap', 30],
+        ]),
+        auras: [
+          {
+            kind: 'internal_cd',
+            empowerAbilities: ['fear'],
+          },
+        ],
+      }),
+    );
+
+    expect(state.slots[0]).toMatchObject({
+      cooldownRemaining: 0,
+      cooldownPercent: 0,
+      cdText: '',
+      procGlow: true,
+      empowered: true,
+    });
+    expect(state.slots[1]).toMatchObject({
+      cooldownRemaining: 30,
+      procGlow: false,
+      empowered: false,
+    });
+  });
+
   it('glows ONLY the free-proc-scoped abilities, not every button', () => {
     // A Hot Streak / Aether Rush style next_cast_free names its spenders; only
     // those slots may show the gold proc glow (freeCostAuraActive is scoped).
@@ -390,6 +483,21 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     );
     expect(state.slots[0].procGlow).toBe(true); // named -> glows
     expect(state.slots[1].procGlow).toBe(false); // not named -> no glow
+  });
+
+  it('highlights only the three abilities empowered by Possess the Evil Eye', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('needle_of_fate', { cost: 30 }) }),
+        slot(2, { ability: ability('drain_life', { cost: 35 }) }),
+        slot(3, { ability: ability('sentence', { cost: 40 }) }),
+        slot(4, { ability: ability('evil_eye', { cost: 25 }) }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(world({ auras: [{ kind: 'affliction_possession' }] }));
+
+    expect(state.slots.map((entry) => entry.empowered)).toEqual([true, true, true, false]);
   });
 
   it('lets unscoped next-cast auras empower every eligible ability slot', () => {
@@ -435,6 +543,50 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
 });
 
 describe('actionBarView: free-cost proc glow + kill-window (procGlow / usable)', () => {
+  it('keeps a Shadow Credit spell usable when mana covers its discounted cost', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('shadow_bolt', { cost: 40 }) })),
+      fakeDeps(),
+    );
+    const state = view.tick(
+      world({
+        resource: 25,
+        auras: [
+          {
+            kind: 'next_cast_cheap',
+            value: 0.5,
+            empowerAbilities: ['shadow_bolt'],
+          },
+        ],
+      }),
+    );
+
+    expect(state.slots[0].usable).toBe(true);
+    expect(state.slots[0].empowered).toBe(true);
+  });
+
+  it('does not discount abilities outside Shadow Credit scope', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('needle_of_fate', { cost: 40 }) })),
+      fakeDeps(),
+    );
+    const state = view.tick(
+      world({
+        resource: 25,
+        auras: [
+          {
+            kind: 'next_cast_cheap',
+            value: 0.5,
+            empowerAbilities: ['shadow_bolt'],
+          },
+        ],
+      }),
+    );
+
+    expect(state.slots[0].usable).toBe(false);
+    expect(state.slots[0].empowered).toBe(false);
+  });
+
   it('a Battle Trance proc glows and frees exactly the scoped abilities at zero rage', () => {
     const view = createActionBarView(
       descriptor(

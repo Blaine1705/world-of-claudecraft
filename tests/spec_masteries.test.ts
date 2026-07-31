@@ -69,7 +69,7 @@ describe('spec masteries', () => {
       ],
     });
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'affliction')?.mastery.effect).toEqual({
-      global: { dotDmgPct: 0.2 },
+      global: { spellDmgPct: 0.1 },
     });
     // Mage rework (owner leveling pass 2026-07-14): Fire's mastery is Ignition, a
     // crit-triggered burn (ignitionPct) plus a static +2% crit chance, not the old
@@ -97,7 +97,7 @@ describe('spec masteries', () => {
       global: { meleeHastePct: 0.1, extraAttackPct: 0.05 },
     });
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'demonology')?.mastery.effect).toEqual({
-      global: { petDmgSharePct: 0.2 },
+      global: { petDmgPct: 0.2, petDmgSharePct: 0.2 },
       stats: { staPct: 0.1 },
     });
   });
@@ -159,18 +159,14 @@ describe('spec masteries', () => {
       // feral_choice_bear node is retired.
       stats: { armorPct: 0.15 },
     });
-    // Balance pass (maintainer sheet): the scoped Ruinbolt/Gloom Bolt amp.
-    expect(TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect).toEqual({
-      ability: [
-        { ability: 'chaos_bolt', dmgPct: 0.2 },
-        { ability: 'shadow_bolt', dmgPct: 0.2 },
-      ],
-    });
+    // Destruction's mastery is now the rotational Desolation mechanic, owned
+    // by combat/destruction.ts rather than a flat TalentEffect modifier.
+    expect(TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect).toEqual({});
   });
 
   it('bakes DoT, HoT, absorb, cost, and melee damage mastery fields into abilities', () => {
     expect(effect(known('warlock', 'corruption'), 'dot').total).toBe(85);
-    expect(effect(known('warlock', 'corruption', 'affliction'), 'dot').total).toBe(102);
+    expect(mastery('warlock', 'affliction').global.spellDmgPct).toBeCloseTo(0.1);
 
     expect(effect(known('druid', 'rejuvenation'), 'hot').total).toBe(168);
     expect(effect(known('druid', 'rejuvenation', 'restoration'), 'hot').total).toBe(210);
@@ -243,32 +239,16 @@ describe('spec masteries', () => {
     expect(rangedBm / rangedNone).toBeCloseTo(1.35, 2);
   });
 
-  it('Veinleech (siphon_life) leeches: the affliction dot tick heals the caster', () => {
+  it('replaces Veinleech with the Evil Eye Condemnation signature', () => {
     const sim = new Sim({ seed: 12, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(20);
-    sim.setSpec('affliction'); // grants the Veinleech signature (siphon_life)
-    const caster = sim.player;
-    caster.hp = Math.round(caster.maxHp * 0.5); // leave room for the leech to heal
-    const target = createMob(9201, MOBS.forest_wolf, 20, {
-      x: caster.pos.x,
-      y: caster.pos.y,
-      z: caster.pos.z + 3,
-    });
-    target.hostile = true;
-    target.maxHp = target.hp = 100000;
-    (sim as unknown as { addEntity(e: Entity): void }).addEntity(target);
-    sim.targetEntity(target.id);
-    caster.facing = Math.atan2(target.pos.x - caster.pos.x, target.pos.z - caster.pos.z);
-    sim.castAbility('siphon_life');
+    sim.setSpec('affliction');
+    const knownIds = sim.players.get(sim.playerId)?.known.map((ability) => ability.def.id);
 
-    // Tick until a dot tick lands; the leech emits a heal2 whose target is the caster.
-    let selfHeal = false;
-    for (let i = 0; i < 20 * 6 && !selfHeal; i++) {
-      for (const ev of sim.tick()) {
-        if (ev.type === 'heal2' && ev.targetId === caster.id && ev.amount > 0) selfHeal = true;
-      }
-    }
-    expect(selfHeal).toBe(true);
+    expect(knownIds).toEqual(
+      expect.arrayContaining(['evil_eye', 'needle_of_fate', 'sentence', 'drain_life']),
+    );
+    expect(knownIds).not.toContain('siphon_life');
   });
 
   it('applies passive stat, pet damage, damage-share, and heal-crit masteries at runtime', () => {
@@ -430,9 +410,8 @@ describe('spec masteries', () => {
         restoration: { abilities: ['chain_heal', 'healing_wave'], costPct: -0.2 },
       },
       warlock: {
-        affliction: { global: 'dotDmgPct', value: 0.2 },
+        affliction: { global: 'spellDmgPct', value: 0.1 },
         demonology: { global: 'petDmgSharePct', value: 0.2 },
-        destruction: { abilities: ['chaos_bolt', 'shadow_bolt'], dmgPct: 0.2 },
       },
       druid: {
         balance: { global: 'spellDmgPct', value: 0.15 },

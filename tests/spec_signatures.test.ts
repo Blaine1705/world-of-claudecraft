@@ -45,6 +45,22 @@ function producesEffect(cls: PlayerClass, specId: string, sig: string): string {
   }
   p.facing = 0;
   sim.targetEntity(mob.id, pid);
+  // Destruction's signature is now a real rotational button: Conflagrate
+  // requires the caster's Burning Pact instead of working on a bare target.
+  if (sig === 'conflagrate') {
+    mob.auras.push({
+      id: 'immolate',
+      name: 'Burning Pact',
+      kind: 'dot',
+      value: 12,
+      remaining: 15,
+      duration: 15,
+      tickInterval: 3,
+      tickTimer: 3,
+      sourceId: pid,
+      school: 'fire',
+    });
+  }
   const before = {
     pA: p.auras.length,
     mA: mob.auras.length,

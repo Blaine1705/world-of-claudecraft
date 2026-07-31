@@ -236,8 +236,8 @@ export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> =
     },
     demonology: {
       primaryStat: 'int',
-      complexity: 'medium',
-      examples: ['metamorphosis', 'summon_felguard', 'summon_voidwalker', 'demon_skin'],
+      complexity: 'high',
+      examples: ['soul_harvest', 'raise_bone_mage', 'army_of_the_dead', 'metamorphosis'],
     },
     destruction: {
       primaryStat: 'int',

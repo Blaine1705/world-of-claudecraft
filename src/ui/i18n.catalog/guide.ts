@@ -624,6 +624,7 @@ export const guideStrings = {
   // One spoiler-safe, number-free line per signature ability (what it is for, when you
   // press it). Keyed by the sim ability id.
   abilityHook: {
+    evil_eye: 'Names the enemy whose actions and suffering will feed your Condemnation.',
     heroic_strike: 'Queues a heavier swing that spends rage on your next hit.',
     revenge: 'Sweeps enemies in front of you, with a chance to become free after a dodge or parry.',
     hamstring: "Cripples an enemy's movement to keep it from escaping.",

@@ -13,6 +13,84 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warlock.doomLabel': 'Осуждение',
+  'hudChrome.warlock.doomEmptyStatus': 'Осуждение: {value} из {max}.',
+  'hudChrome.warlock.doomStatus': 'Осуждение: {value} из {max}; осталось {remaining}.',
+  'hudChrome.procOverlay.soulFragmentsMeter': 'Осколки душ',
+  'guide.abilityHook.evil_eye':
+    'Отмечает врага, чьи действия и страдания будут накапливать ваше Осуждение.',
+  'entities.abilities.evil_eye.description':
+    'Отмечает одного врага как средоточие ваших проклятий. Перенос дурного глаза сохраняет Осуждение, но не обновляет его время действия в 20 сек.',
+  'entities.abilities.maledict_gaze.name': 'Проклятый взор',
+  'entities.abilities.maledict_gaze.description':
+    'Ваше проклятое око раз в 2,5 сек. атакует выбранную основную цель дурного глаза и наносит урон от Тьмы. Одержимость дурным глазом удваивает скорость атак.',
+  'entities.abilities.needle_of_fate.name': 'Игла судьбы',
+  'entities.abilities.needle_of_fate.description':
+    'Пронзает врага и наносит {damage} ед. урона от Тьмы. Если на цели есть ваш дурной глаз, создаёт 5 ед. Осуждения; если его нет, сначала отмечает цель.',
+  'entities.abilities.sentence.name': 'Приговор',
+  'entities.abilities.sentence.description':
+    'Расходует всё Осуждение и выносит врагу приговор. Урон и дополнительные эффекты усиливаются при 20, 50, 80 и 100 ед. Осуждения.',
+  'entities.abilities.cursed_accomplice.name': 'Проклятый сообщник',
+  'entities.abilities.cursed_accomplice.description':
+    'Если союзник не выбран, связывает вас с проклятым оком, и его взор создаёт 2 ед. Осуждения. При связи с союзником его урон по цели дурного глаза создаёт 3 ед. Эффект срабатывает не чаще раза в 2 сек.',
+  'entities.abilities.litany_of_guilt.name': 'Литания вины',
+  'entities.abilities.litany_of_guilt.description':
+    'Проклинает основную цель дурного глаза на 8 сек. Получение Осуждения выпускает волну, которая наносит урон максимум 4 другим противникам в радиусе 8 м. Эффект срабатывает не чаще раза в секунду.',
+  'entities.abilities.umbral_anchor.name': 'Сумрачный якорь',
+  'entities.abilities.umbral_anchor.description':
+    'Первое применение устанавливает у ваших ног теневой якорь на 5 мин. Повторное применение в пределах 40 м возвращает к нему, расходует якорь и запускает восстановление на 45 сек.',
+  'entities.abilities.hex_of_violence.name': 'Проклятие насилия',
+  'entities.abilities.hex_of_violence.description':
+    'Проклинает врага на 8 сек. Следующие 3 наносящих урон действия цели создают по 7 ед. Осуждения и наносят ей 22 ед. урона от Тьмы.',
+  'entities.abilities.cruel_pact.name': 'Жестокий договор',
+  'entities.abilities.cruel_pact.description':
+    'Жертвует 12% максимального здоровья и создаёт 20 ед. Осуждения. Нельзя применить при 15% здоровья или меньше.',
+  'entities.abilities.vicarious_suffering.name': 'Перенесённое страдание',
+  'entities.abilities.vicarious_suffering.description':
+    'Связывает страдания на 8 сек. и создаёт до 15 ед. Осуждения от вражеских ударов. На себе снижает получаемый урон на 20%. На союзнике перенаправляет вам до 20% урона, но не опускает ваше здоровье ниже 15%.',
+  'entities.abilities.possess_evil_eye.name': 'Одержимость дурным глазом',
+  'entities.abilities.possess_evil_eye.description':
+    'Проклинатель овладевает вашим основным дурным глазом на 10 сек. «Игла судьбы» применяется за 1 сек. и создаёт ещё 2 ед. Осуждения, «Поглощение» поддерживается в движении и получает демонический луч, а «Приговор» наносит с задержкой ещё 25% урона.',
+  'entities.abilities.coven.name': 'Ковен',
+  'entities.abilities.coven.description':
+    'Создаёт вторичные дурные глаза на срок 15 сек. не более чем на 4 ближайших врагах. Они пополняют общий запас Осуждения с эффективностью 50% и получают 35% урона «Приговора».',
+  'entities.mobs.necromancy_gravewing.name': 'Могильное крыло',
+  'entities.abilities.soul_harvest.name': 'Жатва сущности',
+  'entities.abilities.soul_harvest.description':
+    'Терзает душу противника, нанося {damage} ед. урона от темной магии, и создает 1 осколок души, максимум 5.',
+  'entities.abilities.raise_graveguard.name': 'Поднять могильного стража',
+  'entities.abilities.raise_graveguard.description':
+    'Поднимает стойкого могильного стража, который всегда остается рядом. Одновременно можно контролировать только одного.',
+  'entities.abilities.raise_skeletal_warrior.name': 'Поднять воина-скелета',
+  'entities.abilities.raise_skeletal_warrior.description':
+    'Расходует 1 осколок души и поднимает воина-скелета на 30 сек. Можно повелевать не более чем 3 временными мертвецами.',
+  'entities.abilities.raise_bone_mage.name': 'Поднять костяного мага',
+  'entities.abilities.raise_bone_mage.description':
+    'Расходует 2 осколка души и поднимает костяного мага дальнего боя на 30 сек. Можно повелевать не более чем 3 временными мертвецами.',
+  'entities.abilities.bone_armor.name': 'Костяной доспех',
+  'entities.abilities.bone_armor.description':
+    'Окутывает вас костями, поглощая урон в размере 20% от максимального запаса здоровья.',
+  'entities.abilities.corpse_explosion.name': 'Взрыв останков',
+  'entities.abilities.corpse_explosion.description':
+    'Расходует 2 осколка души и высвобождает энергию смерти в выбранной точке, нанося ближайшим противникам {damage} ед. урона от темной магии.',
+  'entities.abilities.funeral_harvest.name': 'Погребальная жатва',
+  'entities.abilities.funeral_harvest.description':
+    'Когда погибает противник, которому недавно нанесли урон вы или ваши мертвецы, вы получаете 1 осколок души. Эффект срабатывает не чаще раза в 3 сек.',
+  'entities.abilities.unholy_command.name': 'Нечестивый приказ',
+  'entities.abilities.unholy_command.description':
+    'Приказывает всем вашим мертвецам наносить на 25% больше урона и действовать на 20% быстрее в течение 12 сек.',
+  'entities.abilities.reaping_command.name': 'Приказ жатвы',
+  'entities.abilities.reaping_command.description':
+    'Расходует 2 осколка души и приказывает всем мёртвым слугам одновременно атаковать цель. Слуги с рассекающими ударами также атакуют ближайших противников.',
+  'entities.abilities.sacrifice_undead.name': 'Жертва мертвеца',
+  'entities.abilities.sacrifice_undead.description':
+    'Уничтожает одного временного мертвеца и восстанавливает 25% от максимального запаса здоровья.',
+  'entities.abilities.army_of_the_dead.name': 'Армия мертвых',
+  'entities.abilities.army_of_the_dead.description':
+    'Поднимает двух воинов-скелетов и одного костяного мага для неустанного штурма на 20 сек.',
+  'entities.mobs.graveguard.name': 'Могильный страж',
+  'entities.mobs.necromancy_skeletal_warrior.name': 'Воин-скелет',
+  'entities.mobs.necromancy_bone_mage.name': 'Костяной маг',
   'hudChrome.crafting.identity.ceilingRare': 'Потолок редкого',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -135,6 +213,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.name': 'Боевые барабаны',
   'entities.abilities.chain_lightning.name': 'Разветвленная молния',
   'entities.abilities.chaos_bolt.name': 'Стрела погибели',
+  'entities.abilities.abyssal_rift.name': 'Разлом Бездны',
+  'entities.abilities.abyssal_rift.description':
+    'Открывает разлом в выбранной точке, притягивает противников в радиусе 8 м к центру, наносит {damage} ед. урона от Тьмы и оглушает на 2 сек. Боссы получают урон, но невосприимчивы к притягиванию и оглушению.',
+  'entities.abilities.dark_pact.name': 'Кровавый завет',
+  'entities.abilities.dark_pact.description':
+    'Жертвует 10% текущего здоровья и создает на 8 сек. щит, поглощающий урон в размере 30% максимального здоровья.',
+  'entities.abilities.sacrilegious_march.name': 'Кощунственный марш',
+  'entities.abilities.sacrilegious_march.description':
+    'Повышает скорость передвижения на 35%, но каждую секунду расходует 2% максимального здоровья. Повторное применение отменяет эффект. Эффект отключается при 20% здоровья.',
   'entities.abilities.cleansing_verdict.name': 'Очищающий приговор',
   'entities.abilities.cleansing_verdict.description':
     'Рассеивает вредоносный магический эффект с союзника и восстанавливает ему {damage} ед. здоровья.',
@@ -2821,6 +2908,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.name': 'Сумеречный огонь',
   'entities.abilities.shadowburn.description':
     'Мгновенно поражает цель жгучей тьмой, нанося {damage} ед. урона от тёмной магии.',
+  'entities.abilities.ruinous_brand.name': 'Гибельное клеймо',
+  'entities.abilities.ruinous_brand.description':
+    'Помечает врага на 15 сек. Следующие 3 заклинания прямого урона наносят помеченному врагу ещё 25% урона, а при применении к другой цели копируют в него 50% урона.',
   'entities.abilities.wrath.name': 'Дикая стрела',
   'entities.abilities.wrath.description':
     'Метает сгусток природной энергии, нанося {damage} ед. урона от сил природы.',
@@ -3019,9 +3109,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crusader_strike.name': 'Удар воина Света',
   'entities.abilities.crusader_strike.description':
     'Бьет цель, нанося урон оружием плюс {damage} ед. урона от Света. (талант паладина)',
-  'entities.abilities.metamorphosis.name': 'Метаморфоза',
+  'entities.abilities.metamorphosis.name': 'Облик лича',
   'entities.abilities.metamorphosis.description':
-    'Принимает демоническую силу, повышая броню и силу атаки на 20 сек. (талант чернокнижника)',
+    'Вы становитесь личом на 20 сек., создаете 3 осколка души и повышаете урон от заклинаний и скорость их применения на 20%. Ваши мертвецы наносят на 50% больше урона и действуют на 20% быстрее. (знаковое умение некроманта)',
   'entities.items.worn_sword.name': 'Щербатый короткий меч',
   'entities.items.gnarled_staff.name': 'Посох мореного дуба',
   'entities.items.rusty_dagger.name': 'Ржавый кинжал',
@@ -9350,4 +9440,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': 'Нет предмета с таким идентификатором.',
   'devCommand.kitCurrentSpec': 'Текущая специализация',
   'hudChrome.enchanting.wornTag': 'Надето ({slot})',
+  'entities.abilities.soul_lance.name': 'Копьё душ',
+  'entities.abilities.soul_lance.description':
+    'Бросает призрачное копьё и наносит {damage} ед. урона от Тьмы. Если на цели есть ваша Метка оссуария, 50% нанесённого урона дополнительно сохраняется в метке.',
+  'entities.abilities.ossuary_mark.name': 'Метка оссуария',
+  'entities.abilities.ossuary_mark.description':
+    'Помечает врага на 12 сек. и сохраняет 20% урона, нанесённого вами и вашей нежитью. Повторное применение взрывает метку. Если помеченный враг погибает, метка взрывается в радиусе 6 м и создаёт 1 фрагмент души.',
 };

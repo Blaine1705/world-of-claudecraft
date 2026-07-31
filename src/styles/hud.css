@@ -564,6 +564,119 @@
     align-items: center;
     justify-content: center;
   }
+  .warlock-doom-frame {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 28px;
+    margin-bottom: 3px;
+    pointer-events: none;
+  }
+  .warlock-doom {
+    position: relative;
+    width: min(300px, 72vw);
+    height: 18px;
+    overflow: hidden;
+    border: 2px solid #5d3b78;
+    border-radius: 5px;
+    background:
+      linear-gradient(180deg, rgba(9, 4, 14, 0.96), rgba(25, 9, 34, 0.98)),
+      repeating-linear-gradient(90deg, transparent 0 23px, rgba(216, 174, 255, 0.08) 24px 25px);
+    box-shadow:
+      inset 0 0 7px rgba(0, 0, 0, 0.88),
+      0 0 7px rgba(128, 62, 174, 0.42);
+  }
+  .warlock-doom::before,
+  .warlock-doom::after {
+    content: "";
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    border: 1px solid #b790ce;
+    background: #21102d;
+    transform: translateY(-50%) rotate(45deg);
+  }
+  .warlock-doom::before {
+    left: 4px;
+  }
+  .warlock-doom::after {
+    right: 4px;
+  }
+  .warlock-doom-fill {
+    --doom-scale: 0;
+    position: absolute;
+    inset: 2px;
+    transform: scaleX(var(--doom-scale));
+    transform-origin: left center;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #351047 0%, #7f25a5 52%, #d27cff 100%);
+    box-shadow:
+      inset 0 1px rgba(255, 255, 255, 0.28),
+      0 0 10px rgba(197, 83, 255, 0.68);
+    transition: transform 120ms linear;
+  }
+  .warlock-doom-label {
+    position: absolute;
+    z-index: 4;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #f6e8ff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-shadow: 0 1px 2px #000;
+  }
+  .warlock-doom.warning {
+    border-color: #d24767;
+    animation: warlock-doom-warning 0.7s ease-in-out infinite alternate;
+  }
+  .warlock-doom.ready {
+    border-color: #e7b7ff;
+    box-shadow:
+      inset 0 0 7px rgba(0, 0, 0, 0.88),
+      0 0 14px rgba(211, 112, 255, 0.88);
+  }
+  @keyframes warlock-doom-warning {
+    from {
+      filter: brightness(0.85);
+    }
+    to {
+      filter: brightness(1.35);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .warlock-doom.warning {
+      animation: none;
+    }
+    .warlock-doom-fill {
+      transition: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .warlock-doom {
+      border-color: CanvasText;
+      background: Canvas;
+      box-shadow: none;
+      forced-color-adjust: none;
+    }
+    .warlock-doom-fill {
+      background: Highlight;
+      box-shadow: none;
+    }
+    .warlock-doom-label {
+      color: CanvasText;
+      text-shadow: none;
+    }
+    .warlock-doom.warning,
+    .warlock-doom.ready {
+      border-color: Highlight;
+      box-shadow: none;
+    }
+  }
   /* Player Frame Scale (--player-frame-scale, playerFrameScale setting): zoom
      like the global --ui-scale, so portrait, bars, and pips shrink or grow
      together, docked or detached. Applied to the frame's CHILDREN, never the
@@ -1079,6 +1192,49 @@
     /* Glow: decorative outer glow scales with --fx-shadow (0 at low). */
     box-shadow: 0 0 calc(5px * var(--fx-shadow, 1)) #ff5533aa;
     border-color: #ffad99;
+  }
+  .combo-row.ruin {
+    gap: 6px;
+  }
+  .combo-row.ruin .combo-pip {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px 5px 2px 5px;
+    border-color: var(--color-ruin-empty-border);
+    background: linear-gradient(135deg, var(--color-ruin-empty-start), var(--color-ruin-empty-end));
+    transform: rotate(45deg);
+  }
+  .combo-row.ruin .combo-pip.on {
+    border-color: var(--color-ruin-lit-border);
+    background: radial-gradient(
+      circle at 35% 30%,
+      var(--color-ruin-lit-core),
+      var(--color-ruin-lit-mid) 55%,
+      var(--color-ruin-lit-edge)
+    );
+    box-shadow:
+      0 0 calc(7px * var(--fx-shadow, 1)) var(--color-ruin-glow),
+      inset 0 0 3px var(--color-ruin-inner-shine);
+  }
+  @media (forced-colors: active) {
+    .combo-row.ruin .combo-pip {
+      border-color: GrayText;
+      background: Canvas;
+      box-shadow: none;
+    }
+    .combo-row.ruin .combo-pip.on {
+      border-color: Highlight;
+      background: Highlight;
+      outline: 1px solid CanvasText;
+      outline-offset: 1px;
+    }
+    .action-btn.unusable {
+      border-style: dashed;
+    }
+    .action-btn.proc {
+      border: 3px double Highlight;
+      animation: none;
+    }
   }
 
   /* ---------- buff bar ---------- */
@@ -6060,6 +6216,288 @@ body.reduce-motion #proc-overlay.chrono .chrono-left,
 body.reduce-motion #proc-overlay.chrono .chrono-right,
 body.reduce-motion #proc-overlay.chrono .chrono-bird::before,
 body.reduce-motion #proc-overlay.chrono .chrono-bird::after {
+  animation: none !important;
+}
+
+/* ---- Necromancy variant: the Soul Fragment bank ------------------------ */
+/* Five jagged soul shards sit on a horizontal runed rail. The empty bank stays
+   visible so Necromancers always see and can place their primary resource. */
+#proc-overlay .necromancy-bank {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 250px;
+  height: 86px;
+  translate: -50% -50%;
+  user-select: none;
+}
+#proc-overlay.necromancy {
+  opacity: 0.72;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+#proc-overlay.necromancy.n1 {
+  opacity: 0.96;
+}
+#proc-overlay.necromancy.n5 {
+  opacity: 1;
+}
+#proc-overlay.necromancy .fire-bird,
+#proc-overlay.necromancy .chrono-bird,
+#proc-overlay.necromancy .frost-bird {
+  display: none;
+}
+#proc-overlay.necromancy .necromancy-bank {
+  display: block;
+}
+#proc-overlay.necromancy .necromancy-bank::before,
+#proc-overlay.necromancy .necromancy-bank::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+#proc-overlay.necromancy .necromancy-bank::before {
+  inset: 13px -8px 8px;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse,
+    rgba(76, 29, 149, 0.3) 0,
+    rgba(46, 16, 101, 0.16) 38%,
+    transparent 72%
+  );
+  filter: blur(7px);
+}
+#proc-overlay.necromancy .necromancy-bank::after {
+  inset: -26px -20px;
+  z-index: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 10% 54%, rgba(216, 180, 254, 0.72) 0 2px, transparent 4px),
+    radial-gradient(circle at 28% 22%, rgba(168, 85, 247, 0.58) 0 2px, transparent 5px),
+    radial-gradient(circle at 50% 70%, rgba(233, 213, 255, 0.68) 0 2px, transparent 5px),
+    radial-gradient(circle at 72% 18%, rgba(168, 85, 247, 0.62) 0 2px, transparent 5px),
+    radial-gradient(circle at 90% 57%, rgba(216, 180, 254, 0.72) 0 2px, transparent 4px),
+    radial-gradient(ellipse, rgba(147, 51, 234, 0.45) 0, transparent 66%);
+  mix-blend-mode: screen;
+  filter: blur(1px);
+  opacity: 0;
+}
+#proc-overlay.necromancy.n5 .necromancy-bank::after {
+  opacity: 0.9;
+  animation: soul-bank-full-flare 1.8s ease-in-out infinite;
+}
+#proc-overlay.necromancy .soul-rail,
+#proc-overlay.necromancy .soul-crystal {
+  pointer-events: auto;
+  cursor: grab;
+}
+#proc-overlay.necromancy.dragging .soul-rail,
+#proc-overlay.necromancy.dragging .soul-crystal {
+  cursor: grabbing;
+}
+#proc-overlay.necromancy .soul-rail {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 50%;
+  z-index: 2;
+  height: 25px;
+  translate: 0 -50%;
+  border-top: 1px solid rgba(192, 132, 252, 0.54);
+  border-bottom: 1px solid rgba(46, 16, 101, 0.9);
+  clip-path: polygon(0 50%, 6% 4%, 94% 4%, 100% 50%, 94% 96%, 6% 96%);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 17px,
+      rgba(192, 132, 252, 0.22) 18px 20px,
+      transparent 21px 38px
+    ),
+    linear-gradient(rgba(46, 16, 101, 0.88), rgba(17, 7, 38, 0.96) 48%, rgba(3, 1, 9, 0.98));
+  box-shadow:
+    inset 0 1px rgba(233, 213, 255, 0.2),
+    inset 0 -5px 8px rgba(0, 0, 0, 0.72);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.82)) drop-shadow(0 0 5px rgba(88, 28, 135, 0.5));
+  opacity: 0.86;
+  transition:
+    opacity 0.2s ease,
+    filter 0.2s ease;
+}
+#proc-overlay.necromancy.n5 .soul-rail {
+  border-top-color: rgba(233, 213, 255, 0.9);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.82)) drop-shadow(0 0 12px rgba(147, 51, 234, 0.92));
+}
+#proc-overlay.necromancy .soul-crystal {
+  --soul-crystal-angle: 0deg;
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  width: 34px;
+  height: 58px;
+  translate: -50% -50%;
+  rotate: var(--soul-crystal-angle);
+  scale: 0.82;
+  opacity: 0.46;
+  clip-path: polygon(
+    48% 0,
+    82% 13%,
+    96% 39%,
+    76% 68%,
+    61% 100%,
+    43% 84%,
+    22% 98%,
+    28% 67%,
+    4% 41%,
+    19% 15%
+  );
+  background:
+    linear-gradient(146deg, rgba(216, 180, 254, 0.36) 0 16%, transparent 17% 100%),
+    linear-gradient(34deg, transparent 0 46%, rgba(192, 132, 252, 0.26) 48% 51%, transparent 53%),
+    linear-gradient(
+      112deg,
+      rgba(76, 29, 149, 0.96) 0 21%,
+      rgba(107, 33, 168, 0.9) 38%,
+      rgba(46, 16, 101, 0.96) 69%,
+      rgba(9, 3, 22, 0.98) 100%
+    );
+  box-shadow:
+    inset 5px 0 10px rgba(216, 180, 254, 0.18),
+    inset -5px -5px 10px rgba(9, 3, 22, 0.72);
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.84)) drop-shadow(0 0 4px rgba(88, 28, 135, 0.72));
+  transition:
+    opacity 0.18s ease,
+    scale 0.2s ease,
+    filter 0.2s ease;
+}
+#proc-overlay.necromancy .soul-crystal::before {
+  content: "";
+  position: absolute;
+  inset: 7px 8px 9px 10px;
+  clip-path: polygon(50% 0, 100% 30%, 64% 48%, 90% 100%, 42% 72%, 0 100%, 22% 43%, 0 25%);
+  background:
+    linear-gradient(64deg, transparent 0 45%, rgba(243, 232, 255, 0.72) 48% 52%, transparent 55%),
+    linear-gradient(rgba(216, 180, 254, 0.62), transparent 72%);
+  opacity: 0.28;
+}
+#proc-overlay.necromancy .soul-crystal::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 22px;
+  height: 38px;
+  translate: -50% -50%;
+  border-radius: 52% 48% 44% 56%;
+  background: radial-gradient(
+    ellipse,
+    rgba(255, 255, 255, 0.98) 0,
+    rgba(233, 213, 255, 0.9) 18%,
+    rgba(168, 85, 247, 0.5) 46%,
+    transparent 74%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  filter: blur(1px);
+}
+#proc-overlay.necromancy .soul-crystal-1 {
+  --soul-crystal-angle: -5deg;
+  left: 12%;
+  top: 50%;
+}
+#proc-overlay.necromancy .soul-crystal-2 {
+  --soul-crystal-angle: 3deg;
+  left: 31%;
+  top: 50%;
+}
+#proc-overlay.necromancy .soul-crystal-3 {
+  --soul-crystal-angle: -2deg;
+  left: 50%;
+  top: 50%;
+}
+#proc-overlay.necromancy .soul-crystal-4 {
+  --soul-crystal-angle: 4deg;
+  left: 69%;
+  top: 50%;
+}
+#proc-overlay.necromancy .soul-crystal-5 {
+  --soul-crystal-angle: -3deg;
+  left: 88%;
+  top: 50%;
+}
+#proc-overlay.necromancy.n1 .soul-crystal-1,
+#proc-overlay.necromancy.n2 .soul-crystal-2,
+#proc-overlay.necromancy.n3 .soul-crystal-3,
+#proc-overlay.necromancy.n4 .soul-crystal-4,
+#proc-overlay.necromancy.n5 .soul-crystal-5 {
+  opacity: 1;
+  scale: 1;
+  background:
+    linear-gradient(146deg, rgba(255, 255, 255, 0.92) 0 15%, transparent 17% 100%),
+    linear-gradient(34deg, transparent 0 46%, rgba(243, 232, 255, 0.82) 48% 51%, transparent 53%),
+    linear-gradient(
+      112deg,
+      rgba(243, 232, 255, 0.98) 0 14%,
+      rgba(192, 132, 252, 0.98) 32%,
+      rgba(126, 34, 206, 0.98) 66%,
+      rgba(46, 16, 101, 1) 100%
+    );
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.84)) drop-shadow(0 0 6px rgba(233, 213, 255, 0.94))
+    drop-shadow(0 0 15px rgba(147, 51, 234, 0.9));
+  animation: soul-crystal-ignite 0.34s ease-out 1;
+}
+#proc-overlay.necromancy.n1 .soul-crystal-1::after,
+#proc-overlay.necromancy.n2 .soul-crystal-2::after,
+#proc-overlay.necromancy.n3 .soul-crystal-3::after,
+#proc-overlay.necromancy.n4 .soul-crystal-4::after,
+#proc-overlay.necromancy.n5 .soul-crystal-5::after {
+  opacity: 0.9;
+}
+#proc-overlay.necromancy.n5 .soul-crystal {
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.84)) drop-shadow(0 0 9px rgba(255, 255, 255, 0.98))
+    drop-shadow(0 0 22px rgba(168, 85, 247, 1));
+}
+@keyframes soul-crystal-ignite {
+  0% {
+    opacity: 0.28;
+    scale: 0.62;
+  }
+  62% {
+    opacity: 1;
+    scale: 1.14;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+#proc-overlay.necromancy.n5 .soul-crystal::after {
+  opacity: 1;
+  filter: blur(0);
+}
+@keyframes soul-bank-full-flare {
+  0% {
+    opacity: 0.55;
+    scale: 0.94;
+  }
+  50% {
+    opacity: 0.9;
+    scale: 1.04;
+  }
+  100% {
+    opacity: 0.55;
+    scale: 0.94;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #proc-overlay.necromancy .soul-crystal,
+  #proc-overlay.necromancy .necromancy-bank::after {
+    animation: none !important;
+  }
+}
+body.reduce-motion #proc-overlay.necromancy .soul-crystal,
+body.reduce-motion #proc-overlay.necromancy .necromancy-bank::after {
   animation: none !important;
 }
 

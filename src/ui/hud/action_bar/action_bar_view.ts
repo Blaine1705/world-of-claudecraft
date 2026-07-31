@@ -24,7 +24,12 @@
 // the offline Sim and the online ClientWorld mirror expose (player.cooldowns is a
 // Map, inventory is InvSlot[]); the core never reaches for a Sim-only field.
 
-import { freeCostAuraActive } from '../../../sim/combat/empower_next';
+import { afflictionPossessionEmpowers } from '../../../sim/combat/affliction';
+import { destructionProcGlowActive, ruinAmountFromAuras } from '../../../sim/combat/destruction';
+import {
+  freeCostAuraActive,
+  nextCastCheapMultiplierFromAuras,
+} from '../../../sim/combat/empower_next';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
 import {
   type AbilityDef,
@@ -70,6 +75,7 @@ const NEXT_CAST_CHEAP: AuraKind = 'next_cast_cheap';
 const SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.slotAria';
 const EMPTY_SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.emptySlotAria';
 const ATTACK_NAME_KEY: TranslationKey = 'abilityUi.actionBar.attackName';
+const PROC_ARIA_KEY: TranslationKey = 'guide.glossary.procTerm';
 
 /** The ability fields the core reads. A structural subset of ResolvedAbility that
  *  both worlds expose (def + the talent-resolved cost). */
@@ -89,14 +95,6 @@ export interface ActionBarAuraInput {
   empowerAbilities?: readonly string[];
   /** Stacks, for a stack-gated ability (Glacial Spike needs 5 Icicles). */
   stacks?: number;
-}
-
-/** The aura fields the bar reads to derive the proc glow and next-cast
- *  empowerment: a structural subset of Aura both worlds mirror. */
-export interface ActionBarAuraInput {
-  kind: AuraKind;
-  value?: number;
-  empowerAbilities?: readonly string[];
 }
 
 /** One slot of the bar descriptor: slot identity plus host-resolved accessors to the
@@ -226,6 +224,7 @@ export interface ActionBarSlotState {
   procGlow: boolean;
   empowered: boolean;
   ariaLabel: string;
+  ariaDescription: string;
   keybindLabel: string;
 }
 
@@ -260,6 +259,7 @@ function makeSlotState(): ActionBarSlotState {
     procGlow: false,
     empowered: false,
     ariaLabel: '',
+    ariaDescription: '',
     keybindLabel: '',
   };
 }
@@ -298,6 +298,19 @@ function hasEmpoweringAura(
   return false;
 }
 
+function hasForbiddenReflection(
+  auras: readonly ActionBarAuraInput[] | undefined,
+  abilityId: string,
+): boolean {
+  if (!auras) return false;
+  for (const aura of auras) {
+    if (aura.kind === 'internal_cd' && aura.empowerAbilities?.includes(abilityId)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function inventoryCount(
   inventory: readonly { itemId: string; count: number }[],
   itemId: string,
@@ -327,6 +340,14 @@ export function createActionBarView(
     tick(world: ActionBarWorldInput): ActionBarState {
       const { player, target } = world;
       const tgtDist = target !== null && !target.dead ? dist2d(player.pos, target.pos) : null;
+      const ruin = ruinAmountFromAuras(player.auras);
+      let soulFragments = 0;
+      for (const aura of player.auras) {
+        if (aura.kind === 'soul_fragments') {
+          soulFragments = aura.stacks ?? 1;
+          break;
+        }
+      }
       let boundCount = 0;
 
       for (let i = 0; i < descriptor.slots.length; i++) {
@@ -365,6 +386,7 @@ export function createActionBarView(
             slot: slotLabel,
             ability: deps.t(ATTACK_NAME_KEY),
           });
+          slot.ariaDescription = '';
           slot.keybindLabel = sd.keybindLabel();
           continue;
         }
@@ -390,6 +412,7 @@ export function createActionBarView(
           slot.procGlow = false;
           slot.empowered = false;
           slot.ariaLabel = deps.t(EMPTY_SLOT_ARIA_KEY, { slot: slotLabel });
+          slot.ariaDescription = '';
           slot.keybindLabel = sd.keybindLabel();
           continue;
         }
@@ -427,6 +450,7 @@ export function createActionBarView(
             slot: slotLabel,
             ability: deps.itemName(item),
           });
+          slot.ariaDescription = '';
           slot.keybindLabel = sd.keybindLabel();
           continue;
         }
@@ -435,7 +459,8 @@ export function createActionBarView(
         // this guard mirrors the former `if (!known) continue` and narrows the type).
         if (ability === null) continue;
         const def = ability.def;
-        const cd = player.cooldowns.get(def.id) ?? 0;
+        const reflectionReady = hasForbiddenReflection(player.auras, def.id);
+        const cd = reflectionReady ? 0 : (player.cooldowns.get(def.id) ?? 0);
         const gcdActive = !def.offGcd && player.gcdRemaining > 0;
         const shown = Math.max(cd, gcdActive ? player.gcdRemaining : 0);
         const denom = cd > 0 ? def.cooldown : GCD;
@@ -483,6 +508,9 @@ export function createActionBarView(
         // the slot is usable at any resource and glows (the sim predicate is
         // imported so bar and combat can never disagree on the proc's scope).
         const freeByProc = ability.cost > 0 && freeCostAuraActive(player.auras, def.id);
+        const cheapCostMultiplier = nextCastCheapMultiplierFromAuras(player.auras, def.id);
+        const payableCost =
+          cheapCostMultiplier === null ? ability.cost : ability.cost * cheapCostMultiplier;
         // A kill-window ability (Victory Rush): usable only while its enabling
         // aura is worn, and it glows while the window is open.
         let windowOpen = true;
@@ -501,7 +529,9 @@ export function createActionBarView(
           windowGlow = windowOpen;
         }
         slot.usable =
-          (!(player.resource < ability.cost) || freeByProc) &&
+          (!(player.resource < payableCost) || freeByProc) &&
+          (def.ruinCost ?? 0) <= ruin &&
+          soulFragments >= (def.soulFragmentCost ?? 0) &&
           windowOpen &&
           !(maxCharges > 1 && chargesLeft <= 0) &&
           (!def.requiresStealth || player.stealthed);
@@ -514,12 +544,21 @@ export function createActionBarView(
         // Frost procs (combat/frost_mage.ts): Ice Lance glows on a banked
         // Fingers of Frost, Flurry on an armed Brain Freeze (the same shared
         // sim predicate idiom as freeCostAuraActive above).
-        slot.procGlow = freeByProc || windowGlow || frostProcGlowActive(player.auras ?? [], def.id);
-        slot.empowered = hasEmpoweringAura(player.auras, ability);
+        slot.procGlow =
+          reflectionReady ||
+          freeByProc ||
+          windowGlow ||
+          frostProcGlowActive(player.auras ?? [], def.id) ||
+          destructionProcGlowActive(player.auras ?? [], def.id);
+        slot.empowered =
+          reflectionReady ||
+          hasEmpoweringAura(player.auras, ability) ||
+          afflictionPossessionEmpowers(player.auras, def.id);
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,
           ability: deps.abilityName(def),
         });
+        slot.ariaDescription = slot.procGlow ? deps.t(PROC_ARIA_KEY) : '';
         slot.keybindLabel = sd.keybindLabel();
       }
 

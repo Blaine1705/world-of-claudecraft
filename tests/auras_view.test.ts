@@ -73,6 +73,10 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
   it('matches the exact shared set of harmful kinds', () => {
     expect([...DEBUFF_AURA_KINDS].sort()).toEqual(
       [
+        'affliction_eye',
+        'affliction_eye_secondary',
+        'affliction_fate_threads',
+        'affliction_violence',
         'attackspeed',
         'blind',
         'bleed_vuln',
@@ -82,6 +86,7 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
         'critvuln',
         'debuff_ap',
         'disarm',
+        'duskfire_claim',
         'dot',
         'expose',
         'faerie_fire',
@@ -90,8 +95,10 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
         'incapacitate',
         'lockout',
         'mortal_wound',
+        'necromancy_harvest_mark',
         'polymorph',
         'root',
+        'ruinous_brand',
         'sated',
         'silence',
         'slow',

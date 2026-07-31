@@ -55,6 +55,15 @@
     /* Per-school debuff border tints (WoW-style poison/magic/curse reads); physical
        keeps the base --color-debuff red. Driven by the aura node's data-school. */
     --color-debuff-fire: #e8722a;
+    --color-ruin-empty-border: #6b2b12;
+    --color-ruin-empty-start: #27100b;
+    --color-ruin-empty-end: #120706;
+    --color-ruin-lit-border: #ffd073;
+    --color-ruin-lit-core: #fff0a0;
+    --color-ruin-lit-mid: #ff6a1f;
+    --color-ruin-lit-edge: #8d1d08;
+    --color-ruin-glow: #ff5a1fcc;
+    --color-ruin-inner-shine: #fff4;
     --color-debuff-frost: #4aa3df;
     --color-debuff-arcane: #3f8cff;
     --color-debuff-shadow: #9b59d0;

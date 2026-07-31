@@ -65,6 +65,10 @@ import type {
   Vec3,
 } from './types';
 
+export interface DamageResolution {
+  landedHpLoss: number;
+}
+
 // Live primitive views onto the running Sim. These are GETTERS, not snapshots:
 // `time`/`tickCount` advance every tick, and the `rng`/`entities` identities are
 // shared so a consumer observes the same mutable world the Sim does (the engine
@@ -301,6 +305,12 @@ export interface SimContextCallbacks {
     // the Chronomancy Temporal Echo conversion; area Arcane damage heals the
     // marked ally at a reduced rate. Defaults false.
     aoe?: boolean,
+    // Optional out-parameter for consumers that must copy the exact landed HP
+    // loss before reactive healing runs later in the damage pipeline.
+    resolution?: DamageResolution,
+    // The amount is already an exact landed-HP-loss copy. Preserve immunities
+    // and lethal handling, but do not apply target modifiers, absorbs, or redirects again.
+    resolvedHpLoss?: boolean,
   ): void;
   handleDeath(entity: Entity, killer: Entity | null): void;
   cancelCast(entity: Entity): void;
@@ -360,7 +370,7 @@ export interface SimContextCallbacks {
     ability: string | null,
     kind: 'hit' | 'miss' | 'dodge',
     attackAnimationStarted?: boolean,
-  ): void;
+  ): number;
   cleanupYumiMatch(match: ArenaMatch): void;
   rollLoot(
     mob: Entity,

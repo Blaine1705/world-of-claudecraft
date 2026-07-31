@@ -1073,6 +1073,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.cast = e.castingAbility;
     out.castRem = round2(e.castRemaining);
     out.castTot = round2(e.castTotal);
+    if (e.castTargetId !== null) out.castTgt = e.castTargetId;
     if (e.channeling) out.chan = 1;
   }
   if (e.sitting || e.eating || e.drinking) out.sit = 1;

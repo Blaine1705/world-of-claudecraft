@@ -316,6 +316,14 @@ export const es: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "Condena",
+      "doomEmptyStatus": "{value} de {max} de Condena.",
+      "doomStatus": "{value} de {max} de Condena; quedan {remaining}."
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "Fragmentos de alma"
+    },
     "spectate": {
       "banner": "Observando a {name}"
     },
@@ -3270,6 +3278,7 @@ export const es: EnTranslations = {
       "none": "Ninguna clase coincide con todos los filtros. Quita uno para ver más."
     },
     "abilityHook": {
+      "evil_eye": "Señala al enemigo cuyas acciones y sufrimiento alimentarán tu Condena.",
       "heroic_strike": "Prepara un golpe más fuerte que gasta ira en tu próximo ataque.",
       "revenge": "Golpea a los enemigos frente a ti y puede volverse gratis después de esquivar o parar.",
       "hamstring": "Entorpece el movimiento de un enemigo para impedir que escape.",
@@ -6473,6 +6482,7 @@ export const es: EnTranslations = {
     "tooltip": {
       "rank": "Rango {rank}",
       "cost": "{cost} de {resource}",
+      "ruinCost": "{cost} Ruin",
       "range": "{range} m de alcance",
       "rangeWithMin": "{min}-{max} m de alcance",
       "instant": "Instantáneo",
@@ -6869,7 +6879,7 @@ export const es: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Lluvia de Fuego",
-        "description": "Hace caer una lluvia de fuego sobre el área objetivo durante 4 s, quemando a los enemigos e infligiendo {damage} de daño de Fuego cada segundo."
+        "description": "Gasta 3 de Ruina para hacer llover fuego sobre el área objetivo, infligiendo {damage} de daño de Fuego cada segundo durante 6 s mientras sigues lanzando hechizos. Desolación adelanta la primera oleada."
       },
       "volley": {
         "name": "Andanada",
@@ -7379,9 +7389,29 @@ export const es: EnTranslations = {
         "name": "Putrefacción Negra",
         "description": "Corrompe al objetivo y causa {damage} de daño de las Sombras durante 18 s."
       },
+      "evil_eye": {
+        "name": "Mal de ojo",
+        "description": "Marca a un enemigo como foco de tus maldiciones. Mover el Mal de ojo conserva la Condena, pero no renueva su duración de 20 s."
+      },
+      "maledict_gaze": {
+        "name": "Mirada maléfica",
+        "description": "Tu ojo maléfico ataca cada 2,5 s al objetivo principal de Mal de ojo e inflige daño de las Sombras. Poseer el Mal de ojo duplica su velocidad de ataque."
+      },
+      "needle_of_fate": {
+        "name": "Aguja del destino",
+        "description": "Perfora al enemigo e inflige {damage} de daño de las Sombras. Genera 5 de Condena si porta tu Mal de ojo; si no existe ninguno, primero marca al objetivo."
+      },
+      "sentence": {
+        "name": "Sentencia",
+        "description": "Consume toda la Condena para sentenciar al enemigo. El daño y los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena."
+      },
       "life_tap": {
         "name": "Trato Amargo",
         "description": "Convierte {damage} de salud en {damage} de maná."
+      },
+      "cursed_accomplice": {
+        "name": "Cómplice maldito",
+        "description": "Si no seleccionas a un jugador aliado, enlaza tu ojo maléfico y hace que su Mirada genere 2 de Condena. Al enlazar a un aliado, su daño al objetivo de Mal de ojo genera 3. Solo puede activarse una vez cada 2 s."
       },
       "curse_of_agony": {
         "name": "Sortilegio de Angustia",
@@ -7390,6 +7420,34 @@ export const es: EnTranslations = {
       "drain_life": {
         "name": "Consumir",
         "description": "Drena la vida del objetivo y te transfiere {damage} de salud cada segundo durante 5 s."
+      },
+      "litany_of_guilt": {
+        "name": "Liturgia de culpa",
+        "description": "Maldice tu Mal de ojo principal durante 8 s. Obtener Condena libera una onda que daña a un máximo de 4 enemigos más en 8 m, como máximo una vez por segundo."
+      },
+      "umbral_anchor": {
+        "name": "Ancla umbría",
+        "description": "Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar, consumir el ancla e iniciar un tiempo de reutilización de 45 s."
+      },
+      "hex_of_violence": {
+        "name": "Maleficio de violencia",
+        "description": "Maldice al enemigo durante 8 s. Sus siguientes 3 acciones dañinas generan 7 de Condena cada una y le infligen 22 de daño de las Sombras."
+      },
+      "cruel_pact": {
+        "name": "Pacto cruel",
+        "description": "Sacrifica un 12% de tu salud máxima para generar 20 de Condena. No se puede usar con un 15% de salud o menos."
+      },
+      "vicarious_suffering": {
+        "name": "Sufrimiento vicario",
+        "description": "Enlaza el sufrimiento durante 8 s y genera hasta 15 de Condena con golpes hostiles. Sobre ti reduce un 20% el daño recibido. Sobre un aliado redirige hasta un 20% hacia ti sin bajarte del 15% de salud."
+      },
+      "possess_evil_eye": {
+        "name": "Poseer el Mal de ojo",
+        "description": "El maldictor posee tu Mal de ojo principal durante 10 s. Aguja del destino se lanza en 1 s y genera 2 de Condena adicionales, Consumir se puede canalizar en movimiento y obtiene un rayo demoníaco, y Sentencia libera un eco retardado del 25% del daño."
+      },
+      "coven": {
+        "name": "Aquelarre",
+        "description": "Crea Males de ojo secundarios sobre hasta 4 enemigos cercanos durante 15 s. Alimentan la reserva compartida de Condena al 50% y reciben un eco del 35% del daño de Sentencia."
       },
       "fear": {
         "name": "Espanto",
@@ -7401,7 +7459,11 @@ export const es: EnTranslations = {
       },
       "shadowburn": {
         "name": "Fuego Crepuscular",
-        "description": "Explota al instante contra el objetivo con sombra abrasadora por {damage} de daño de las Sombras."
+        "description": "Gasta 1 de Ruina para ejecutar a un enemigo con menos del 20% de salud, infligiendo {damage} de daño de las Sombras. Recupera la Ruina si el objetivo reclamado muere en 5 s."
+      },
+      "ruinous_brand": {
+        "name": "Marca ruinosa",
+        "description": "Marca a un enemigo durante 15 s. Tus siguientes 3 hechizos directos replican un 25% del daño contra el enemigo marcado, o le copian un 50% del daño si se lanzan contra otro objetivo."
       },
       "wrath": {
         "name": "Descarga Silvestre",
@@ -7547,9 +7609,61 @@ export const es: EnTranslations = {
         "name": "Sanación en cadena",
         "description": "Sana una gran cantidad a un objetivo amistoso y luego salta a un máximo de 2 aliados cercanos adicionales, sanando un 50 % menos con cada salto. (habilidad distintiva de Restauración)"
       },
+      "soul_harvest": {
+        "name": "Cosecha de esencia",
+        "description": "Desgarra el alma del enemigo, inflige {damage} de daño de Sombras y crea 1 fragmento de alma, hasta un máximo de 5."
+      },
+      "soul_lance": {
+        "name": "Soul Lance",
+        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+      },
+      "raise_graveguard": {
+        "name": "Alzar guardián de tumbas",
+        "description": "Alza un resistente guardián de tumbas que permanece a tu lado. Solo puedes controlar uno a la vez."
+      },
+      "raise_skeletal_warrior": {
+        "name": "Alzar guerrero esquelético",
+        "description": "Gasta 1 fragmento de alma para alzar un guerrero esquelético durante 30 s. Puedes dirigir hasta 3 no muertos temporales."
+      },
+      "raise_bone_mage": {
+        "name": "Alzar mago óseo",
+        "description": "Gasta 2 fragmentos de alma para alzar un mago óseo a distancia durante 30 s. Puedes dirigir hasta 3 no muertos temporales."
+      },
+      "bone_armor": {
+        "name": "Armadura de huesos",
+        "description": "Te envuelve en huesos y absorbe una cantidad de daño equivalente al 20% de tu salud máxima."
+      },
+      "corpse_explosion": {
+        "name": "Explosión de cadáver",
+        "description": "Gasta 2 fragmentos de alma para hacer estallar energía de muerte en la ubicación elegida e infligir {damage} de daño de Sombras a los enemigos cercanos."
+      },
+      "funeral_harvest": {
+        "name": "Cosecha fúnebre",
+        "description": "Cuando muere un enemigo dañado recientemente por ti o por tus no muertos, obtienes 1 fragmento de alma. Solo puede ocurrir una vez cada 3 s."
+      },
+      "ossuary_mark": {
+        "name": "Ossuary Mark",
+        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+      },
+      "unholy_command": {
+        "name": "Mandato profano",
+        "description": "Ordena a todos tus no muertos que inflijan un 25% más de daño y actúen un 20% más rápido durante 12 s."
+      },
+      "reaping_command": {
+        "name": "Mandato: siega",
+        "description": "Gasta 2 fragmentos de alma para ordenar a todos tus sirvientes no muertos que golpeen al objetivo al unísono. Los sirvientes con ataques de barrido también golpean a los enemigos cercanos."
+      },
+      "sacrifice_undead": {
+        "name": "Sacrificar no muerto",
+        "description": "Destruye un sirviente no muerto temporal para restaurar un 25% de tu salud máxima."
+      },
+      "army_of_the_dead": {
+        "name": "Ejército de los muertos",
+        "description": "Alza dos guerreros esqueléticos y un mago óseo para lanzar un asalto implacable durante 20 s."
+      },
       "metamorphosis": {
-        "name": "Metamorfosis",
-        "description": "Asumes poder demoníaco, lo que aumenta la armadura y el poder de ataque durante 20 s. (talento de brujo)"
+        "name": "Forma de lich",
+        "description": "Te conviertes en un lich durante 20 s, creas 3 fragmentos de alma y aumentas un 20% tu daño con hechizos y velocidad de lanzamiento. Tus no muertos infligen un 50% más de daño y actúan un 20% más rápido. (habilidad distintiva de Nigromancia)"
       },
       "holy_shock": {
         "name": "Choque Sagrado",
@@ -7621,7 +7735,7 @@ export const es: EnTranslations = {
       },
       "conflagrate": {
         "name": "Conflagrar",
-        "description": "Consume tu Inmolar en el enemigo para prenderlo e infligir {damage} de daño de Fuego. (habilidad distintiva de Destrucción)"
+        "description": "Adelanta un pulso futuro de tu Pacto Ardiente y prende al objetivo por {damage} de daño de Fuego. Genera 1 de Ruina y 1 de Desolación. Tiene 2 cargas. (habilidad distintiva de Destrucción)"
       },
       "moonkin_form": {
         "name": "Forma de lechúcico lunar",
@@ -7657,7 +7771,7 @@ export const es: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Invocar Pyre Colossus",
-        "description": "Somete a un Pyre Colossus a tu voluntad: un coloso descomunal con un cuerpo a cuerpo demoledor y la mayor salud y armadura de todos los demonios. Un largo tiempo de reutilización refrena su poder bruto. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez."
+        "description": "Hace caer un Coloso de la Pira sobre el área objetivo, infligiendo 58-72 de daño de Fuego al impactar. Lucha como guardián durante 15 s sin reemplazar a tu demonio y responde a cada gasto de Ruina con Fuego del Mundo."
       },
       "summon_doomguard": {
         "name": "Invocar Wraithborn",
@@ -7811,9 +7925,17 @@ export const es: EnTranslations = {
         "name": "Relámpago Bifurcado",
         "description": "Lanza un relámpago en el área objetivo que inflige {damage} de daño a los enemigos cercanos. (talento de Chamán)"
       },
+      "abyssal_rift": {
+        "name": "Abyssal Rift",
+        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+      },
       "chaos_bolt": {
         "name": "Descarga de Ruina",
-        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Fuego. (talento de Brujo)"
+        "description": "Gasta 3 de Ruina para lanzar una pesada descarga de fuego caótico que inflige {damage} de daño de Fuego. Desolación reduce su lanzamiento un 30%."
+      },
+      "dark_pact": {
+        "name": "Sanguine Covenant",
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
       },
       "cleansing_verdict": {
         "name": "Veredicto Purificador",
@@ -8006,6 +8128,10 @@ export const es: EnTranslations = {
       "smoke_screen": {
         "name": "Cortina de Humo",
         "description": "Desapareces en una nube de humo, lo que aumenta tu probabilidad de esquivar un 30% durante 8 s."
+      },
+      "sacrilegious_march": {
+        "name": "Sacrilegious March",
+        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
       },
       "spellsteal": {
         "name": "Robar Hechizo",
@@ -10260,6 +10386,18 @@ export const es: EnTranslations = {
       },
       "water_elemental": {
         "name": "Elemental de agua"
+      },
+      "graveguard": {
+        "name": "Guardián de tumbas"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "Guerrero esquelético"
+      },
+      "necromancy_bone_mage": {
+        "name": "Mago óseo"
+      },
+      "necromancy_gravewing": {
+        "name": "Alatumba"
       }
     },
     "npcs": {

@@ -13,6 +13,81 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warlock.doomLabel': '谴罪',
+  'hudChrome.warlock.doomEmptyStatus': '{value}/{max} 谴罪。',
+  'hudChrome.warlock.doomStatus': '{value}/{max} 谴罪；剩余 {remaining}。',
+  'hudChrome.procOverlay.soulFragmentsMeter': '灵魂碎片',
+  'guide.abilityHook.evil_eye': '标记一个敌人，使其行动与承受的苦难为你积累谴罪。',
+  'entities.abilities.evil_eye.description':
+    '将一名敌人标记为诅咒焦点。移动邪眼会保留谴罪，但不会刷新其20秒的持续时间。',
+  'entities.abilities.maledict_gaze.name': '咒眼凝视',
+  'entities.abilities.maledict_gaze.description':
+    '你的咒眼每2.5秒攻击所选的主要邪眼目标，造成暗影伤害。附身邪眼会使其攻击速度加倍。',
+  'entities.abilities.needle_of_fate.name': '命运之针',
+  'entities.abilities.needle_of_fate.description':
+    '刺穿敌人，造成{damage}点暗影伤害。若目标带有你的邪眼，则生成5点谴罪；若不存在邪眼，则先标记目标。',
+  'entities.abilities.sentence.name': '裁决',
+  'entities.abilities.sentence.description':
+    '消耗全部谴罪裁决敌人。伤害与附加效果会在20、50、80和100点谴罪时提升。',
+  'entities.abilities.cursed_accomplice.name': '受咒同谋',
+  'entities.abilities.cursed_accomplice.description':
+    '未选择友方玩家时连接你的咒眼，使其凝视生成2点谴罪；连接友方玩家时，该玩家对邪眼目标造成伤害会生成3点。每2秒最多触发一次。',
+  'entities.abilities.litany_of_guilt.name': '罪责祷文',
+  'entities.abilities.litany_of_guilt.description':
+    '诅咒你的主要邪眼8秒。每次获得谴罪时会释放冲击波，对8码内最多4名其他敌人造成伤害，每秒最多触发一次。',
+  'entities.abilities.umbral_anchor.name': '暗影锚',
+  'entities.abilities.umbral_anchor.description':
+    '首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，消耗锚点并触发45秒冷却。',
+  'entities.abilities.hex_of_violence.name': '暴行咒',
+  'entities.abilities.hex_of_violence.description':
+    '诅咒敌人8秒。其接下来的3次伤害行为各生成7点谴罪，并反噬22点暗影伤害。',
+  'entities.abilities.cruel_pact.name': '残酷契约',
+  'entities.abilities.cruel_pact.description':
+    '牺牲最大生命值的12%以生成20点谴罪。生命值不高于15%时无法使用。',
+  'entities.abilities.vicarious_suffering.name': '苦痛转承',
+  'entities.abilities.vicarious_suffering.description':
+    '连接苦痛8秒，受到敌对攻击时最多生成15点谴罪。对自己使用时受到的伤害降低20%；对盟友使用时最多将20%的伤害转移给你，但不会使你的生命值降至15%以下。',
+  'entities.abilities.possess_evil_eye.name': '附身邪眼',
+  'entities.abilities.possess_evil_eye.description':
+    '咒术者附身你的主要邪眼10秒。命运之针施法时间变为1秒并额外生成2点谴罪；吞噬可在移动中引导并获得恶魔射线；裁决会延迟追加25%的伤害。',
+  'entities.abilities.coven.name': '巫契',
+  'entities.abilities.coven.description':
+    '在最多4名附近敌人身上制造持续15秒的次级邪眼。它们以50%的效率补充共享谴罪池，并承受裁决35%的回响伤害。',
+  'entities.mobs.necromancy_gravewing.name': '墓翼',
+  'entities.abilities.soul_harvest.name': '精华收割',
+  'entities.abilities.soul_harvest.description':
+    '撕扯敌人的灵魂，造成 {damage} 点暗影伤害，并生成 1 枚灵魂碎片，最多 5 枚。',
+  'entities.abilities.raise_graveguard.name': '唤醒墓卫',
+  'entities.abilities.raise_graveguard.description':
+    '召唤一名坚韧的墓卫常伴身侧。同一时间只能控制一名墓卫。',
+  'entities.abilities.raise_skeletal_warrior.name': '唤醒骷髅战士',
+  'entities.abilities.raise_skeletal_warrior.description':
+    '消耗 1 枚灵魂碎片，召唤一名骷髅战士，持续 30 秒。最多可号令 3 名临时亡灵。',
+  'entities.abilities.raise_bone_mage.name': '唤醒骸骨法师',
+  'entities.abilities.raise_bone_mage.description':
+    '消耗 2 枚灵魂碎片，召唤一名远程骸骨法师，持续 30 秒。最多可号令 3 名临时亡灵。',
+  'entities.abilities.bone_armor.name': '骸骨护甲',
+  'entities.abilities.bone_armor.description': '以骸骨环绕自身，吸收相当于最大生命值 20% 的伤害。',
+  'entities.abilities.corpse_explosion.name': '尸骸爆裂',
+  'entities.abilities.corpse_explosion.description':
+    '消耗 2 枚灵魂碎片，在目标地点引爆死亡能量，对附近敌人造成 {damage} 点暗影伤害。',
+  'entities.abilities.funeral_harvest.name': '葬魂收割',
+  'entities.abilities.funeral_harvest.description':
+    '当一个近期被你或你的亡灵伤害过的敌人死亡时，你获得1枚灵魂碎片。每3秒最多触发一次。',
+  'entities.abilities.unholy_command.name': '邪秽号令',
+  'entities.abilities.unholy_command.description':
+    '号令所有亡灵，使其伤害提高 25%、行动速度提高 20%，持续 12 秒。',
+  'entities.abilities.reaping_command.name': '收割号令',
+  'entities.abilities.reaping_command.description':
+    '消耗2枚灵魂碎片，命令所有亡灵仆从同时攻击你的目标。拥有顺劈攻击的仆从也会攻击附近敌人。',
+  'entities.abilities.sacrifice_undead.name': '献祭亡灵',
+  'entities.abilities.sacrifice_undead.description': '摧毁一名临时亡灵仆从，恢复最大生命值的 25%。',
+  'entities.abilities.army_of_the_dead.name': '亡者军团',
+  'entities.abilities.army_of_the_dead.description':
+    '召唤两名骷髅战士和一名骸骨法师，发动持续 20 秒的猛烈攻势。',
+  'entities.mobs.graveguard.name': '墓卫',
+  'entities.mobs.necromancy_skeletal_warrior.name': '骷髅战士',
+  'entities.mobs.necromancy_bone_mage.name': '骸骨法师',
   'hudChrome.crafting.identity.ceilingRare': '稀有品质上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -138,6 +213,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.name': '战鼓',
   'entities.abilities.chain_lightning.name': '叉状闪电',
   'entities.abilities.chaos_bolt.name': '毁灭箭',
+  'entities.abilities.abyssal_rift.name': '深渊裂隙',
+  'entities.abilities.abyssal_rift.description':
+    '在选定位置撕开一道裂隙，将8码内的敌人拉向中心，造成{damage}点暗影伤害并使其昏迷2秒。首领会受到伤害，但免疫拉拽和昏迷。',
+  'entities.abilities.dark_pact.name': '猩红契约',
+  'entities.abilities.dark_pact.description':
+    '牺牲当前生命值的10%，获得相当于最大生命值30%的伤害吸收护盾，持续8秒。',
+  'entities.abilities.sacrilegious_march.name': '亵渎行军',
+  'entities.abilities.sacrilegious_march.description':
+    '移动速度提高35%，但每秒牺牲最大生命值的2%。再次施放可取消。生命值达到20%时会自动关闭。',
   'entities.abilities.cleansing_verdict.name': '净化裁决',
   'entities.abilities.cleansing_verdict.description':
     '净化一个友方目标身上的有害魔法效果，并为其恢复{damage}点生命值。',
@@ -2672,6 +2756,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以痛苦烈焰灼烧敌人，造成 {damage} 点火焰伤害。施法迅速。',
   'entities.abilities.shadowburn.name': '暮火',
   'entities.abilities.shadowburn.description': '立即以灼热暗影轰击目标，造成 {damage} 点暗影伤害。',
+  'entities.abilities.ruinous_brand.name': '毁灭烙印',
+  'entities.abilities.ruinous_brand.description':
+    '标记一名敌人15秒。你的接下来3个直接法术对被标记敌人造成25%的回响伤害；若法术以其他目标为目标，则向被标记者复制50%的伤害。',
   'entities.abilities.wrath.name': '野性弹',
   'entities.abilities.wrath.description': '投掷一道自然能量箭，造成 {damage} 点自然伤害。',
   'entities.abilities.healing_touch.name': '野性愈合',
@@ -2860,9 +2947,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crusader_strike.name': '十字军打击',
   'entities.abilities.crusader_strike.description':
     '打击目标，造成武器伤害外加 {damage} 点神圣伤害。（圣骑士天赋）',
-  'entities.abilities.metamorphosis.name': '恶魔变形',
+  'entities.abilities.metamorphosis.name': '巫妖形态',
   'entities.abilities.metamorphosis.description':
-    '化为恶魔之力，使护甲和攻击强度提高 20 秒。（术士天赋）',
+    '化身巫妖，持续 20 秒，生成 3 枚灵魂碎片，并使法术伤害和施法速度提高 20%。你的亡灵伤害提高 50%、行动速度提高 20%。（死灵术标志技能）',
   'entities.items.worn_sword.name': '斑驳短剑',
   'entities.items.gnarled_staff.name': '沼橡法杖',
   'entities.items.rusty_dagger.name': '生锈匕首',
@@ -8750,4 +8837,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': '没有该 ID 对应的物品。',
   'devCommand.kitCurrentSpec': '当前专精',
   'hudChrome.enchanting.wornTag': '已装备（{slot}）',
+  'entities.abilities.soul_lance.name': '灵魂长枪',
+  'entities.abilities.soul_lance.description':
+    '投掷一支幽魂长枪，造成 {damage} 点暗影伤害。若目标带有你的藏骨印记，该伤害的 50% 会额外计入印记。',
+  'entities.abilities.ossuary_mark.name': '藏骨印记',
+  'entities.abilities.ossuary_mark.description':
+    '标记一个敌人 12 秒，储存你和你的亡灵造成伤害的 20%。再次施放可引爆印记。若被标记的敌人死亡，印记会在 6 码范围内爆炸并生成 1 个灵魂碎片。',
 };

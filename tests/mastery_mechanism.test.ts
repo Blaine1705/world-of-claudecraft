@@ -267,7 +267,7 @@ describe('crit-damage masteries are scoped to their channel (F4)', () => {
   });
 });
 
-describe('Demonology damage redirect is not double-modified (F7)', () => {
+describe('Necromancy Graveguard redirect is not double-modified (F7)', () => {
   it("a source's Defensive Stance cut is applied once, not again on the pet's share", () => {
     const sim = new Sim({ seed: 1, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(20);
@@ -275,8 +275,8 @@ describe('Demonology damage redirect is not double-modified (F7)', () => {
     const wl = sim.entities.get(sim.playerId) as Entity;
     wl.maxHp = wl.hp = 1_000_000;
     wl.resource = wl.maxResource;
-    // Bring up the demon: the summon is a multi-second cast, so tick past it.
-    sim.castAbility('summon_voidwalker', sim.playerId);
+    // Bring up the Graveguard: the summon is a multi-second cast, so tick past it.
+    sim.castAbility('raise_graveguard', sim.playerId);
     for (let i = 0; i < 20 * 12 && sim.player.castingAbility; i++) sim.tick();
     const pet = sim.petOf(sim.playerId) as Entity;
     expect(pet).toBeTruthy();
@@ -312,7 +312,7 @@ describe('Demonology damage redirect is not double-modified (F7)', () => {
     const wl = sim.player;
     wl.maxHp = wl.hp = 1_000_000;
     wl.resource = wl.maxResource;
-    sim.castAbility('summon_voidwalker');
+    sim.castAbility('raise_graveguard');
     for (let i = 0; i < 20 * 12 && wl.castingAbility; i++) sim.tick();
     const pet = sim.petOf(sim.playerId) as Entity;
     expect(pet).toBeTruthy();

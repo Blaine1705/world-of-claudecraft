@@ -7,17 +7,23 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { findBrowserPath } from '../../browser_path_resolve.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 let pagePromise = null;
 
+export function moduleImportUrl(path) {
+  return pathToFileURL(path).href;
+}
+
 async function launchPage() {
   const esbuild = await import('esbuild');
   const puppeteer = (await import('puppeteer-core')).default;
-  const { BROWSER_PATH } = await import(resolve(__dirname, '../../browser_path.mjs'));
+  const { BROWSER_PATH } = await import(
+    moduleImportUrl(resolve(__dirname, '../../browser_path.mjs'))
+  );
 
   const bundlePath = join(tmpdir(), `asset_pipeline_preview_${process.pid}.js`);
   await esbuild.build({

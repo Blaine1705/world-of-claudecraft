@@ -79,7 +79,7 @@
 | frost_nova | 1 | 10 | 35 | inst, 22cd | aoeRoot 8s r10, 6–7 |
 | | **2** | **16** | 50 | inst, 22cd | aoeRoot 8s r10, **12–14** |
 
-**NEW:**
+**NEW (shared / non-Destruction):**
 
 | Ability | Learn | Cost | Cast/CD | Effects |
 |---|---|---|---|---|
@@ -303,11 +303,35 @@
 |---|---|---|---|---|
 | `fear` | 14 | 40 | 1.5s, 20yd | incapacitate 8s (breaks on damage; reuses incapacitate — target cowers in place, no flee AI needed) |
 | `searing_pain` | 16 | 35 | 1.5s | directDamage 30–38 |
-| `shadowburn` | 20 | 70 | inst, 15cd | directDamage 56–66 |
+
+Committed Destruction excludes `corruption`, `curse_of_agony`, `searing_pain`,
+and `summon_doomguard`. Its reworked spell ladder overlays the shared Warlock
+ranks above:
+
+| Ability | Learn | Mana / Ruin | Cast/CD | Effects |
+|---|---|---|---|---|
+| `conflagrate` | 5 | 40 / +1 | inst, 2 charges, 12s recharge | requires own Burning Pact; advances one 3s DoT tick; 54-64 direct; +1 Desolation |
+| `chaos_bolt` (Ruinbolt) | 10 | 65 / 3 | 2.5s, no CD | 128-156 direct; Desolation makes the cast 30% faster |
+| `shadowburn` (Duskfire) | 14 | 35 / 1 | inst, 12cd | execute below 20%; 72-84 direct; Ruin refund if the claimed target dies within 5s |
+| `ruinous_brand` | 16 | 35 / none | inst, 20cd | marks for 15s; next 3 direct casts into another target copy 50% resolved damage |
+| `rain_of_fire` | 18 | 60 / 3 | inst, no CD | ground AoE 8-11 each second for 6s; Desolation makes the first wave immediate |
+| `summon_infernal` (Pyre Colossus) | 20 | 100 / none | 2.0s aimed, 180cd | impact AoE 58-72 in 6yd; 15s guardian; each Ruin spender triggers Worldfire |
 
 **Sanity** — L14: Corruption R2 (72) + CoA R2 (72) + 3× SB R3 (~143) ≈ 287 + Drain ✓ (~6 GCDs, dot-and-drain pace). L20: Corruption R3 + CoA R3 (220 over time) + 2–3 SB R4 (~152–228) ≥ 400 ✓.
 
 ---
+
+### Necromancy overlay
+
+Committed Necromancy replaces the shared damage ladder with its own soul and
+undead kit. Its non-summon additions are:
+
+| Ability | Rank | Learn | Cost | Cast/CD | Effects |
+|---|---:|---:|---:|---|---|
+| `soul_lance` | 1 | 9 | 35 | 1.6s, 8cd | 30-36 Shadow; adds another 50% of landed damage to Ossuary Mark |
+| | 2 | 14 | 50 | 1.6s, 8cd | 50-60 Shadow; same rider |
+| | 3 | 20 | 65 | 1.6s, 8cd | 74-88 Shadow; same rider |
+| `ossuary_mark` | 1 | 12 | 30 | instant, 20cd | 12s mark; stores 20% owner and undead damage; recast detonates; marked death bursts in 6 yards and creates 1 Soul Fragment |
 
 ## DRUID
 
@@ -376,7 +400,7 @@
 | Hunter | aspect_of_the_cheetah@14, aimed_shot@16, rapid_fire@20 | none |
 | Priest | heal@14 (R2@20), mind_flay@16, flash_heal@20 | none (drainTick healFrac 0) |
 | Shaman | frost_shock@14, ghost_wolf@16, stormstrike@20, frostbrand_weapon@12 (R2@20) | none (imbue reuse) |
-| Warlock | fear@14, searing_pain@16, shadowburn@20 | none (incapacitate reuse) |
+| Warlock | fear@14, Duskfire@14, Ruinous Brand@16, Rain of Fire@18, Pyre Colossus@20 | Ruin, Desolation, Brand echo, temporary guardian |
 | Druid | regrowth@14, barkskin@16, starfire@18 | none |
 
 Files to touch when implementing: `/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/src/sim/data.ts` (ABILITIES ranks + new entries, CLASSES.abilities arrays, 2 conjured-water items), `/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/src/sim/types.ts` (one new AbilityEffect variant `finisherStun`, XP_TABLE/MAX_LEVEL extension per the brief).

@@ -28,6 +28,7 @@ import {
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
 import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
+import { clearAfflictionState } from './combat/affliction';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import { auraReplacementConflicts } from './combat/aura_stacking';
 import {
@@ -83,6 +84,7 @@ import {
 } from './combat/heal';
 import { advanceHeroicLeap } from './combat/heroic_leap';
 import { tickNaturesFury } from './combat/natures_fury';
+import { clearOssuaryMarks, despawnTemporaryNecromancyUndead } from './combat/necromancy';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { rewindHealAmount } from './combat/rewind';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
@@ -359,7 +361,12 @@ import * as honorMod from './pvp';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { Rng } from './rng';
 import { persistedResource } from './serialize_resource';
-import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
+import {
+  createSimContext,
+  type DamageResolution,
+  type SimContext,
+  type SimContextHost,
+} from './sim_context';
 import * as chatMod from './social/chat';
 import * as tradeMod from './social/trade';
 import {
@@ -907,6 +914,8 @@ export interface ResolvedAbility {
   damagePushbackImmune?: boolean; // talent-granted immunity to damage-driven cast pushback
   charges?: number; // authored stored uses; undefined means one use
   bonusCharges?: number; // talent-added uses, kept distinct from native maxCharges
+  /** Destruction-only cast-time reservation; consumed once even if a projectile resists/fizzles. */
+  ruinousBrandCopy?: { targetId: number; value: number };
   /** 1-based authoritative charge stage for hold-to-charge spells. */
   empowerLevel?: number;
 }
@@ -2581,7 +2590,9 @@ export class Sim {
         this.worldContent.playerStart,
       );
     }
-    if (savedState?.pet) this.restorePet(player, savedState.pet);
+    if (savedState?.pet && petCommands.canRestorePetState(meta, savedState.pet)) {
+      this.restorePet(player, savedState.pet);
+    }
     // One-time Ravenpost welcome (doubles as the service announcement for
     // characters saved before mail existed). Flipped before the send so a
     // re-entrant save can never double-book the letter.
@@ -2855,6 +2866,9 @@ export class Sim {
     this.duelInvites.delete(pid);
     // mobs forget the leaving player; persistent hunter pets are serialized
     // with the character and removed from the live world instead of released
+    despawnTemporaryNecromancyUndead(this.ctx, pid);
+    clearOssuaryMarks(this.ctx, pid);
+    clearAfflictionState(this.ctx, pid);
     const pet = this.petOf(pid, true);
     if (pet) this.despawnPersistentPet(pet);
     for (const m of this.entities.values()) {
@@ -5092,13 +5106,26 @@ export class Sim {
   ): void {
     const source = this.entities.get(effect.sourceId);
     if (!source || source.dead) return;
-    this.emit({
-      type: 'spellfx',
-      sourceId: source.id,
-      targetId: source.id,
-      school: effect.school,
-      fx: 'tick',
-    });
+    if (effect.abilityId === 'rain_of_fire') {
+      this.emit({
+        type: 'spellfxAt',
+        x: effect.pos.x,
+        z: effect.pos.z,
+        school: effect.school,
+        fx: 'tick',
+        radius: effect.radius,
+        sourceId: source.id,
+        ability: effect.abilityId,
+      });
+    } else {
+      this.emit({
+        type: 'spellfx',
+        sourceId: source.id,
+        targetId: source.id,
+        school: effect.school,
+        fx: 'tick',
+      });
+    }
     // Rune of Power (mage choice row): a FRIENDLY zone pulse. Buffs every ally
     // standing inside (refresh keeps it while they stay near, and it falls off
     // one pulse after they leave) and returns before the hostile loop, so the
@@ -5789,6 +5816,8 @@ export class Sim {
     alreadyFinal = false,
     abilityId: string | null = null,
     aoe = false,
+    resolution?: DamageResolution,
+    resolvedHpLoss = false,
   ): void {
     dealDamageImpl(
       this.ctx,
@@ -5806,6 +5835,8 @@ export class Sim {
       alreadyFinal,
       abilityId,
       aoe,
+      resolution,
+      resolvedHpLoss,
     );
   }
 

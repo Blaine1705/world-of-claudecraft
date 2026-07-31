@@ -32,7 +32,11 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { clearAfflictionState } from '../combat/affliction';
 import { stripTemporalEchoes } from '../combat/chronomancy';
+import { clearDestructionState } from '../combat/destruction';
+import { clearDeathEchoes, clearOssuaryMarks } from '../combat/necromancy';
+import { reconcileWarlockTalentState } from '../combat/warlock_talents';
 import { abilitiesKnownAt } from '../content/classes';
 import {
   cloneAllocation,
@@ -179,6 +183,7 @@ function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
     cleanRemovedProcState(ctx, e, previousMods, meta.talentMods);
     normalizeAbilityCharges(e, meta, previousChargeCaps);
     stripOrphanedFormAuras(ctx, meta, e);
+    reconcileWarlockTalentState(ctx, e, meta);
   }
   // The heavy talent snapshot is wireRev-gated. Every live allocation change
   // reaches this one choke point, while character load uses the silent path in
@@ -260,6 +265,9 @@ function commitTalentAllocation(
   const previousSpec = meta.talents.spec;
   meta.talents = sanitized;
   recomputeTalents(ctx, meta);
+  if (previousSpec === 'destruction' && sanitized.spec !== 'destruction') {
+    clearDestructionState(ctx, player);
+  }
   if (previousSpec !== sanitized.spec) ctx.revalidateOffhandForSpec(player.id);
   // A spec-locked pet outlives its spec otherwise (owner report: the frost
   // Water Elemental kept fighting for a fire mage): if the ability that
@@ -273,6 +281,13 @@ function commitTalentAllocation(
   // from another chronomancer are untouched. No-op for every non-mage build.
   if (!meta.known.some((known) => known.def.id === 'temporal_echo')) {
     stripTemporalEchoes(ctx, player.id);
+  }
+  if (previousSpec === 'affliction' && sanitized.spec !== 'affliction') {
+    clearAfflictionState(ctx, player.id);
+  }
+  if (previousSpec === 'demonology' && sanitized.spec !== 'demonology') {
+    clearOssuaryMarks(ctx, player.id);
+    clearDeathEchoes(ctx, player);
   }
   if (successText) ctx.emit({ type: 'log', pid: player.id, text: successText, color: '#ffd100' });
   return true;
@@ -295,28 +310,43 @@ export function applyTalentAllocation(
 // summon->pet link is data-driven: any known summonDemon ability whose mobId
 // matches the live pet keeps it; no match, no pet.
 function dismissSpecLockedPet(ctx: SimContext, e: Entity, meta: PlayerMeta): void {
-  const pet = petOf(ctx, e.id);
-  if (!pet) return;
-  const summons = (def: (typeof ABILITIES)[string]) =>
+  const primaryPet = petOf(ctx, e.id, true);
+  const known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
+  const summons = (def: (typeof ABILITIES)[string], pet: Entity) =>
     def.effects.some(
       (eff) =>
         (eff.type === 'summonDemon' && eff.mobId === pet.templateId) ||
-        (eff.type === 'summonPet' && eff.templateId === pet.templateId),
+        (eff.type === 'summonPet' && eff.templateId === pet.templateId) ||
+        (eff.type === 'summonUndead' && eff.templateId === pet.templateId),
     );
-  // A pet no class summon creates (a tamed hunter beast) is never spec-bound.
-  const summonable = Object.values(ABILITIES).some((d) => d.class === meta.cls && summons(d));
-  if (!summonable) return;
-  const known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
-  if (known.some((k) => summons(k.def))) return;
-  despawnPersistentPet(ctx, pet);
-  // The registered despawn line (log.petFadesVoid, localized for every locale
-  // in sim_i18n), the same farewell a warlock demon gives.
-  ctx.emit({
-    type: 'log',
-    pid: e.id,
-    text: `${pet.name} fades back into the void.`,
-    color: '#b894ff',
-  });
+  for (const pet of [...ctx.entities.values()]) {
+    if (pet.kind !== 'mob' || pet.ownerId !== e.id) continue;
+    // A pet no class summon creates (a tamed hunter beast) is never spec-bound.
+    const summonable = Object.values(ABILITIES).some(
+      (def) => def.class === meta.cls && summons(def, pet),
+    );
+    if (!summonable || known.some((ability) => summons(ability.def, pet))) continue;
+    if (primaryPet?.id === pet.id) despawnPersistentPet(ctx, pet);
+    else ctx.despawnPet(pet);
+    ctx.emit({
+      type: 'log',
+      pid: e.id,
+      text: `${pet.name} fades back into the void.`,
+      color: '#b894ff',
+    });
+  }
+
+  const knowsNecromancy = known.some((ability) =>
+    ability.def.effects.some((effect) => effect.type === 'summonUndead'),
+  );
+  if (!knowsNecromancy) {
+    for (let i = e.auras.length - 1; i >= 0; i--) {
+      const aura = e.auras[i];
+      if (aura.kind !== 'soul_fragments' && aura.kind !== 'necromancy_death_echo') continue;
+      e.auras.splice(i, 1);
+      ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false });
+    }
+  }
 }
 
 // Legacy incremental API retained for old scripts. The node system is gone, so

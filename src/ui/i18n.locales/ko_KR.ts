@@ -13,6 +13,83 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warlock.doomLabel': '단죄',
+  'hudChrome.warlock.doomEmptyStatus': '단죄 {value}/{max}.',
+  'hudChrome.warlock.doomStatus': '단죄 {value}/{max}, 남은 시간 {remaining}.',
+  'hudChrome.procOverlay.soulFragmentsMeter': '영혼 조각',
+  'guide.abilityHook.evil_eye': '적 하나를 지정해 그 행동과 고통으로 단죄를 축적합니다.',
+  'entities.abilities.evil_eye.description':
+    '적 하나를 저주의 중심으로 지정합니다. 사안을 옮겨도 단죄는 유지되지만 20초의 만료 시간은 갱신되지 않습니다.',
+  'entities.abilities.maledict_gaze.name': '저주의 응시',
+  'entities.abilities.maledict_gaze.description':
+    '저주의 눈이 선택한 주 사안 대상을 2.5초마다 공격해 암흑 피해를 줍니다. 사안 빙의 중에는 공격 속도가 두 배가 됩니다.',
+  'entities.abilities.needle_of_fate.name': '운명의 바늘',
+  'entities.abilities.needle_of_fate.description':
+    '적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 5 생성하고, 사안이 없으면 먼저 대상을 지정합니다.',
+  'entities.abilities.sentence.name': '선고',
+  'entities.abilities.sentence.description':
+    '모든 단죄를 소모해 적에게 선고를 내립니다. 피해와 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다.',
+  'entities.abilities.cursed_accomplice.name': '저주받은 공모자',
+  'entities.abilities.cursed_accomplice.description':
+    '아군 플레이어를 선택하지 않았다면 저주의 눈과 연결해 응시가 단죄를 2 생성하게 합니다. 아군과 연결하면 그 아군이 사안 대상에게 피해를 줄 때 3을 생성합니다. 2초에 한 번만 발동합니다.',
+  'entities.abilities.litany_of_guilt.name': '죄책의 연도',
+  'entities.abilities.litany_of_guilt.description':
+    '주 사안을 8초 동안 저주합니다. 단죄를 얻을 때마다 파동을 일으켜 8미터 안의 다른 적 최대 4명에게 피해를 줍니다. 1초에 한 번만 발동합니다.',
+  'entities.abilities.umbral_anchor.name': '암영 닻',
+  'entities.abilities.umbral_anchor.description':
+    '처음 사용하면 발밑에 5분 동안 암영 닻을 설치합니다. 40미터 안에서 다시 사용하면 닻으로 돌아가며, 닻을 소모하고 45초의 재사용 대기시간이 시작됩니다.',
+  'entities.abilities.hex_of_violence.name': '폭력의 주술',
+  'entities.abilities.hex_of_violence.description':
+    '적을 8초 동안 저주합니다. 대상의 다음 3회 공격 행동은 각각 단죄를 7 생성하고 22의 암흑 피해를 되돌려 받습니다.',
+  'entities.abilities.cruel_pact.name': '잔혹한 계약',
+  'entities.abilities.cruel_pact.description':
+    '최대 생명력의 12%를 희생해 단죄를 20 생성합니다. 생명력이 15% 이하일 때는 사용할 수 없습니다.',
+  'entities.abilities.vicarious_suffering.name': '고통 전이',
+  'entities.abilities.vicarious_suffering.description':
+    '8초 동안 고통을 연결해 적의 공격으로 최대 15의 단죄를 생성합니다. 자신에게 사용하면 받는 피해가 20% 감소합니다. 아군에게 사용하면 피해의 최대 20%를 자신에게 옮기지만 생명력이 15% 아래로 내려가지는 않습니다.',
+  'entities.abilities.possess_evil_eye.name': '사안 빙의',
+  'entities.abilities.possess_evil_eye.description':
+    '저주술사가 주 사안에 10초 동안 빙의합니다. 운명의 바늘은 시전 시간이 1초가 되고 단죄를 2 더 생성하며, 흡명은 이동 중에도 정신 집중할 수 있고 악마 광선을 얻으며, 선고는 지연 후 25%의 추가 피해를 줍니다.',
+  'entities.abilities.coven.name': '마녀회',
+  'entities.abilities.coven.description':
+    '주변 적 최대 4명에게 15초 동안 유지되는 보조 사안을 만듭니다. 공유 단죄를 50% 효율로 채우며 선고 피해의 35%를 메아리로 받습니다.',
+  'entities.mobs.necromancy_gravewing.name': '묘지날개',
+  'entities.abilities.soul_harvest.name': '정수 수확',
+  'entities.abilities.soul_harvest.description':
+    '적의 영혼을 찢어 {damage}의 암흑 피해를 입히고 영혼 조각 1개를 생성합니다. 최대 5개.',
+  'entities.abilities.raise_graveguard.name': '무덤수호병 일으키기',
+  'entities.abilities.raise_graveguard.description':
+    '튼튼한 무덤수호병을 일으켜 곁에서 싸우게 합니다. 한 번에 1명만 조종할 수 있습니다.',
+  'entities.abilities.raise_skeletal_warrior.name': '해골 전사 일으키기',
+  'entities.abilities.raise_skeletal_warrior.description':
+    '영혼 조각 1개를 소모해 해골 전사를 30초 동안 일으킵니다. 임시 언데드는 최대 3명까지 지휘할 수 있습니다.',
+  'entities.abilities.raise_bone_mage.name': '뼈 마법사 일으키기',
+  'entities.abilities.raise_bone_mage.description':
+    '영혼 조각 2개를 소모해 원거리 뼈 마법사를 30초 동안 일으킵니다. 임시 언데드는 최대 3명까지 지휘할 수 있습니다.',
+  'entities.abilities.bone_armor.name': '뼈 갑옷',
+  'entities.abilities.bone_armor.description':
+    '뼈로 몸을 감싸 최대 생명력의 20%에 해당하는 피해를 흡수합니다.',
+  'entities.abilities.corpse_explosion.name': '시체 폭발',
+  'entities.abilities.corpse_explosion.description':
+    '영혼 조각 2개를 소모해 지정한 위치의 죽음 에너지를 폭발시키고 주위 적에게 {damage}의 암흑 피해를 입힙니다.',
+  'entities.abilities.funeral_harvest.name': '장송 수확',
+  'entities.abilities.funeral_harvest.description':
+    '자신이나 자신의 언데드가 최근 피해를 준 적이 죽으면 영혼 조각 1개를 얻습니다. 3초에 한 번만 발동합니다.',
+  'entities.abilities.unholy_command.name': '부정한 명령',
+  'entities.abilities.unholy_command.description':
+    '모든 언데드에게 명령해 12초 동안 공격력을 25%, 행동 속도를 20% 증가시킵니다.',
+  'entities.abilities.reaping_command.name': '수확의 명령',
+  'entities.abilities.reaping_command.description':
+    '영혼 조각 2개를 소모해 모든 언데드 하수인이 대상을 일제히 공격하게 합니다. 회전 공격을 지닌 하수인은 주위 적도 공격합니다.',
+  'entities.abilities.sacrifice_undead.name': '언데드 희생',
+  'entities.abilities.sacrifice_undead.description':
+    '임시 언데드 하수인 하나를 파괴해 최대 생명력의 25%를 회복합니다.',
+  'entities.abilities.army_of_the_dead.name': '망자의 군세',
+  'entities.abilities.army_of_the_dead.description':
+    '해골 전사 둘과 뼈 마법사 하나를 일으켜 20초 동안 거센 공세를 펼칩니다.',
+  'entities.mobs.graveguard.name': '무덤수호병',
+  'entities.mobs.necromancy_skeletal_warrior.name': '해골 전사',
+  'entities.mobs.necromancy_bone_mage.name': '뼈 마법사',
   'hudChrome.crafting.identity.ceilingRare': '희귀 상한',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -137,6 +214,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.name': '전쟁 북',
   'entities.abilities.chain_lightning.name': '갈래 번개',
   'entities.abilities.chaos_bolt.name': '파멸 화살',
+  'entities.abilities.abyssal_rift.name': '심연의 균열',
+  'entities.abilities.abyssal_rift.description':
+    '지정한 위치에 균열을 열어 8미터 안의 적을 중심으로 끌어당기고 {damage}의 암흑 피해를 입힌 뒤 2초 동안 기절시킵니다. 우두머리는 피해를 받지만 끌어당김과 기절에 면역입니다.',
+  'entities.abilities.dark_pact.name': '핏빛 계약',
+  'entities.abilities.dark_pact.description':
+    '현재 생명력의 10%를 희생해 최대 생명력의 30%에 해당하는 피해를 8초 동안 흡수합니다.',
+  'entities.abilities.sacrilegious_march.name': '불경한 행진',
+  'entities.abilities.sacrilegious_march.description':
+    '이동 속도가 35% 증가하지만 매초 최대 생명력의 2%를 희생합니다. 다시 사용하면 취소됩니다. 생명력이 20%가 되면 자동으로 해제됩니다.',
   'entities.abilities.cleansing_verdict.name': '정화의 심판',
   'entities.abilities.cleansing_verdict.description':
     '아군 대상의 해로운 마법 효과 하나를 정화하고 생명력을 {damage}만큼 회복합니다.',
@@ -2777,6 +2863,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.name': '황혼불꽃',
   'entities.abilities.shadowburn.description':
     '즉시 대상에게 타오르는 어둠을 폭발시켜 {damage}의 암흑 피해를 입힙니다.',
+  'entities.abilities.ruinous_brand.name': '파멸의 낙인',
+  'entities.abilities.ruinous_brand.description':
+    '적에게 15초 동안 낙인을 찍습니다. 다음 3회의 직접 공격 주문은 낙인 대상에게 25%의 반향 피해를 주며, 다른 대상에게 사용하면 피해의 50%를 낙인 대상에게 복제합니다.',
   'entities.abilities.wrath.name': '야생 벼락',
   'entities.abilities.wrath.description':
     '자연 에너지의 화살을 던져 {damage}의 자연 피해를 입힙니다.',
@@ -2974,9 +3063,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crusader_strike.name': '성전사의 일격',
   'entities.abilities.crusader_strike.description':
     '대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)',
-  'entities.abilities.metamorphosis.name': '악마 변신',
+  'entities.abilities.metamorphosis.name': '리치 형상',
   'entities.abilities.metamorphosis.description':
-    '악마의 힘을 받아 20초 동안 방어도와 전투력을 높입니다. (흑마법사 특성)',
+    '20초 동안 리치가 되어 영혼 조각 3개를 생성하고 주문 공격력과 시전 속도가 20% 증가합니다. 언데드의 공격력이 50%, 행동 속도가 20% 증가합니다. (강령술 대표 능력)',
   'entities.items.worn_sword.name': '흠집 난 쇼트소드',
   'entities.items.gnarled_staff.name': '늪참나무 지팡이',
   'entities.items.rusty_dagger.name': '녹슨 단검',
@@ -9169,4 +9258,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': '해당 ID를 가진 아이템이 없습니다.',
   'devCommand.kitCurrentSpec': '현재 전문화',
   'hudChrome.enchanting.wornTag': '착용 중 ({slot})',
+  'entities.abilities.soul_lance.name': '영혼 창',
+  'entities.abilities.soul_lance.description':
+    '유령 창을 던져 {damage}의 암흑 피해를 입힙니다. 대상에게 자신의 납골당 징표가 있으면 피해의 50%가 징표에 추가로 축적됩니다.',
+  'entities.abilities.ossuary_mark.name': '납골당 징표',
+  'entities.abilities.ossuary_mark.description':
+    '적을 12초 동안 표식하여 자신과 언데드가 입힌 피해의 20%를 저장합니다. 다시 사용하면 폭발합니다. 표식된 적이 죽으면 6미터 내에서 폭발하고 영혼 파편 1개를 생성합니다.',
 };

@@ -144,6 +144,16 @@ export interface GlobalModEffect {
   // a stacking burn (combat/fire_mage.ts igniteOnCrit copies the resolved
   // amount). Scales with level like every spec mastery.
   ignitionPct?: number;
+  // Warlock class-tree hooks. Numeric flags keep the accumulated modifier
+  // shape deterministic and let the combat modules no-op for every other
+  // class/build.
+  warlockBlacktideSpeedPct?: number;
+  warlockLeadenHex?: number;
+  warlockShadowCredit?: number;
+  warlockAshenFocus?: number;
+  warlockUnbrokenRitual?: number;
+  warlockForbiddenReflection?: number;
+  warlockConsumeChannelDr?: number;
 }
 
 export type ProcTrigger =
@@ -222,6 +232,10 @@ export interface TalentEffect {
   proc?: ProcDef;
   ability?: AbilityModEffect[];
   global?: GlobalModEffect;
+  // Authored values for bespoke module-backed mechanics. Runtime logic reads
+  // the named global hook; tooltip accuracy tests read these numbers so the
+  // hand-written description cannot drift from the implementation.
+  tuning?: Readonly<Record<string, number>>;
 }
 
 export interface SpecDef {
@@ -535,6 +549,13 @@ function zeroGlobal(): Required<GlobalModEffect> {
     blinkCast: 0,
     convergence: 0,
     ignitionPct: 0,
+    warlockBlacktideSpeedPct: 0,
+    warlockLeadenHex: 0,
+    warlockShadowCredit: 0,
+    warlockAshenFocus: 0,
+    warlockUnbrokenRitual: 0,
+    warlockForbiddenReflection: 0,
+    warlockConsumeChannelDr: 0,
   };
 }
 
@@ -637,6 +658,13 @@ export function accumulateTalentEffect(
     target.blinkCast += (source.blinkCast ?? 0) * multiplier;
     target.convergence += (source.convergence ?? 0) * multiplier;
     target.ignitionPct += (source.ignitionPct ?? 0) * multiplier;
+    target.warlockBlacktideSpeedPct += (source.warlockBlacktideSpeedPct ?? 0) * multiplier;
+    target.warlockLeadenHex += (source.warlockLeadenHex ?? 0) * multiplier;
+    target.warlockShadowCredit += (source.warlockShadowCredit ?? 0) * multiplier;
+    target.warlockAshenFocus += (source.warlockAshenFocus ?? 0) * multiplier;
+    target.warlockUnbrokenRitual += (source.warlockUnbrokenRitual ?? 0) * multiplier;
+    target.warlockForbiddenReflection += (source.warlockForbiddenReflection ?? 0) * multiplier;
+    target.warlockConsumeChannelDr += (source.warlockConsumeChannelDr ?? 0) * multiplier;
   }
   for (const ability of effect.ability ?? []) {
     const target = modifiers.abilities[ability.ability] ?? zeroAbilityMod();

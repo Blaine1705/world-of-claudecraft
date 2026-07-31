@@ -1,0 +1,1718 @@
+import { describe, expect, it, vi } from 'vitest';
+import { addSoulFragments, necromancyCastError } from '../src/sim/combat/necromancy';
+import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
+import { emptyModifiers, specLabel } from '../src/sim/content/talents';
+import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
+import { petCleaveAttack, petRangedAttack } from '../src/sim/pet/pet_ai';
+import { type ArenaMatch, Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
+import type { Entity, SimEvent } from '../src/sim/types';
+
+const NECROMANCY_IDS = new Set([
+  'graveguard',
+  'necromancy_skeletal_warrior',
+  'necromancy_bone_mage',
+  'necromancy_gravewing',
+]);
+
+function makeNecromancer(seed = 42): Sim {
+  const sim = new Sim({ seed, playerClass: 'warlock', autoEquip: true });
+  sim.setPlayerLevel(20);
+  sim.setSpec('demonology');
+  sim.player.resource = sim.player.maxResource;
+  return sim;
+}
+
+function knownAbilities(sim: Sim): string[] {
+  return sim.players.get(sim.playerId)?.known.map((ability) => ability.def.id) ?? [];
+}
+
+function addTarget(sim: Sim): Entity {
+  const p = sim.player;
+  const target = createMob(
+    (sim as unknown as { nextId: number }).nextId++,
+    MOBS.ridge_stalker,
+    20,
+    {
+      x: p.pos.x,
+      y: p.pos.y,
+      z: p.pos.z + 10,
+    },
+  );
+  target.maxHp = 100_000;
+  target.hp = target.maxHp;
+  target.weapon.min = 0;
+  target.weapon.max = 0;
+  target.hostile = true;
+  sim.addEntity(target);
+  sim.targetEntity(target.id);
+  p.facing = 0;
+  return target;
+}
+
+function addNearbyTarget(sim: Sim, primary: Entity, xOffset: number): Entity {
+  const target = createMob(
+    (sim as unknown as { nextId: number }).nextId++,
+    MOBS.ridge_stalker,
+    20,
+    {
+      x: primary.pos.x + xOffset,
+      y: primary.pos.y,
+      z: primary.pos.z,
+    },
+  );
+  target.maxHp = 100_000;
+  target.hp = target.maxHp;
+  target.weapon.min = 0;
+  target.weapon.max = 0;
+  target.hostile = true;
+  sim.addEntity(target);
+  return target;
+}
+
+function finishCast(sim: Sim, abilityId: string): void {
+  sim.player.resource = sim.player.maxResource;
+  sim.castAbility(abilityId);
+  for (let i = 0; i < 20 * 8 && sim.player.castingAbility; i++) sim.tick();
+  for (let i = 0; i < 40 && sim.player.gcdRemaining > 0; i++) sim.tick();
+}
+
+function drain(sim: Sim): SimEvent[] {
+  return (sim as unknown as { drainEvents(): SimEvent[] }).drainEvents();
+}
+
+function finishCastEvents(sim: Sim, abilityId: string): SimEvent[] {
+  sim.player.resource = sim.player.maxResource;
+  sim.castAbility(abilityId);
+  const events = drain(sim);
+  for (let i = 0; i < 20 * 8 && sim.player.castingAbility; i++) events.push(...sim.tick());
+  return events;
+}
+
+function castAndCollect(sim: Sim, abilityId: string, seconds = 4): SimEvent[] {
+  sim.player.resource = sim.player.maxResource;
+  sim.castAbility(abilityId);
+  const events = drain(sim);
+  for (let i = 0; i < 20 * seconds; i++) events.push(...sim.tick());
+  return events;
+}
+
+function fragmentCount(p: Entity): number {
+  return p.auras.find((aura) => aura.kind === 'soul_fragments')?.stacks ?? 0;
+}
+
+function deathEchoes(p: Entity): Entity['auras'] {
+  return p.auras.filter((aura) => aura.kind === 'necromancy_death_echo');
+}
+
+function ownedUndead(sim: Sim): Entity[] {
+  return [...sim.entities.values()].filter(
+    (entity) =>
+      entity.kind === 'mob' &&
+      entity.ownerId === sim.playerId &&
+      NECROMANCY_IDS.has(entity.templateId),
+  );
+}
+
+describe('Necromancy Warlock', () => {
+  it('replaces Demonology with the Necromancy identity while preserving its internal id', () => {
+    const sim = makeNecromancer();
+    const meta = sim.players.get(sim.playerId);
+    const known = knownAbilities(sim);
+
+    expect(meta?.talents.spec).toBe('demonology');
+    expect(specLabel('warlock', meta?.talents)).toBe('Necromancy');
+    expect(known).toEqual(
+      expect.arrayContaining([
+        'soul_harvest',
+        'soul_lance',
+        'raise_graveguard',
+        'raise_skeletal_warrior',
+        'raise_bone_mage',
+        'ossuary_mark',
+        'funeral_harvest',
+        'corpse_explosion',
+        'bone_armor',
+        'unholy_command',
+        'reaping_command',
+        'sacrifice_undead',
+        'army_of_the_dead',
+        'metamorphosis',
+      ]),
+    );
+    expect(known).toEqual(
+      expect.arrayContaining(['demon_skin', 'life_tap', 'umbral_anchor', 'fear', 'spell_lock']),
+    );
+    for (const removed of [
+      'shadow_bolt',
+      'immolate',
+      'corruption',
+      'curse_of_agony',
+      'drain_life',
+      'searing_pain',
+    ]) {
+      expect(known, removed).not.toContain(removed);
+    }
+  });
+
+  it('rebuilds the owner kit when changing from Destruction to Necromancy', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warlock', autoEquip: true });
+    sim.setPlayerLevel(20);
+
+    expect(sim.setSpec('destruction')).toBe(true);
+    expect(knownAbilities(sim)).toEqual(
+      expect.arrayContaining(['shadow_bolt', 'immolate', 'drain_life']),
+    );
+
+    expect(sim.setSpec('demonology')).toBe(true);
+    const known = knownAbilities(sim);
+    expect(known).toEqual(
+      expect.arrayContaining(['demon_skin', 'life_tap', 'umbral_anchor', 'fear', 'spell_lock']),
+    );
+    for (const removed of [
+      'shadow_bolt',
+      'immolate',
+      'corruption',
+      'curse_of_agony',
+      'drain_life',
+      'searing_pain',
+    ]) {
+      expect(known, removed).not.toContain(removed);
+    }
+  });
+
+  it('learns the retained Necromancy class kit at its original levels', () => {
+    const at = (level: number) =>
+      abilitiesKnownAt('warlock', level, {
+        ...emptyModifiers(),
+        spec: 'demonology',
+      }).map((ability) => ability.def.id);
+
+    const boundaries = [
+      { level: 1, learned: 'demon_skin' },
+      { level: 5, learned: 'umbral_anchor' },
+      { level: 6, learned: 'life_tap' },
+      { level: 9, learned: 'soul_lance' },
+      { level: 10, learned: 'spell_lock' },
+      { level: 12, learned: 'ossuary_mark' },
+      { level: 14, learned: 'fear' },
+    ] as const;
+    for (const { level, learned } of boundaries) {
+      expect(at(level), `${learned} at level ${level}`).toContain(learned);
+      if (level > 1) {
+        expect(at(level - 1), `${learned} before level ${level}`).not.toContain(learned);
+      }
+    }
+  });
+
+  it('defines Soul Lance and Ossuary Mark at their exact progression values', () => {
+    expect(ABILITIES.soul_lance).toMatchObject({
+      specs: ['demonology'],
+      learnLevel: 9,
+      cost: 35,
+      castTime: 1.6,
+      cooldown: 8,
+      range: 30,
+      school: 'shadow',
+      effects: [{ type: 'directDamage', min: 30, max: 36 }],
+      ranks: [
+        {
+          rank: 2,
+          level: 14,
+          cost: 50,
+          effects: [{ type: 'directDamage', min: 50, max: 60 }],
+        },
+        {
+          rank: 3,
+          level: 20,
+          cost: 65,
+          effects: [{ type: 'directDamage', min: 74, max: 88 }],
+        },
+      ],
+    });
+    expect(ABILITIES.ossuary_mark).toMatchObject({
+      specs: ['demonology'],
+      learnLevel: 12,
+      cost: 30,
+      castTime: 0,
+      cooldown: 20,
+      range: 30,
+      school: 'shadow',
+      effects: [
+        {
+          type: 'necromancyOssuaryMark',
+          duration: 12,
+          storedDamagePct: 0.2,
+          soulLanceBonusPct: 0.5,
+          deathRadius: 6,
+        },
+      ],
+    });
+  });
+
+  it('emits stable premium-VFX identities for Soul Lance and every Ossuary Mark phase', () => {
+    const sim = makeNecromancer();
+    const target = addTarget(sim);
+    sim.player.hitBonus = 1;
+
+    const applyEvents = finishCastEvents(sim, 'ossuary_mark');
+    expect(applyEvents).toContainEqual({
+      type: 'spellfx',
+      sourceId: sim.playerId,
+      targetId: target.id,
+      school: 'shadow',
+      fx: 'selfCast',
+      ability: 'ossuary_mark',
+    });
+
+    sim.player.gcdRemaining = 0;
+    const lanceEvents = castAndCollect(sim, 'soul_lance');
+    expect(lanceEvents).toContainEqual({
+      type: 'spellfx',
+      sourceId: sim.playerId,
+      targetId: target.id,
+      school: 'shadow',
+      fx: 'projectile',
+      ability: 'soul_lance',
+    });
+
+    sim.player.gcdRemaining = 0;
+    sim.castAbility('ossuary_mark');
+    expect(drain(sim)).toContainEqual({
+      type: 'spellfx',
+      sourceId: sim.playerId,
+      targetId: target.id,
+      school: 'shadow',
+      fx: 'nova',
+      ability: 'ossuary_mark_detonate',
+    });
+  });
+
+  it('stores owner and undead damage in Ossuary Mark but ignores outsiders', () => {
+    const sim = makeNecromancer();
+    const target = addTarget(sim);
+    finishCast(sim, 'raise_graveguard');
+    finishCast(sim, 'ossuary_mark');
+    const mark = target.auras.find((aura) => aura.kind === 'necromancy_ossuary_mark');
+    const graveguard = sim.petOf(sim.playerId);
+    if (!mark || !graveguard) throw new Error('Expected Ossuary Mark and Graveguard');
+    const storedBefore = mark.damageAccrued ?? 0;
+
+    sim.dealDamage(
+      sim.player,
+      target,
+      100,
+      false,
+      'shadow',
+      'Owner Test',
+      'hit',
+      true,
+      undefined,
+      true,
+      false,
+      true,
+      'owner_test',
+      false,
+      undefined,
+      true,
+    );
+    sim.dealDamage(
+      graveguard,
+      target,
+      100,
+      false,
+      'physical',
+      'Undead Test',
+      'hit',
+      true,
+      undefined,
+      true,
+      false,
+      true,
+      'undead_test',
+      false,
+      undefined,
+      true,
+    );
+
+    const outsiderId = sim.addPlayer('mage', 'Outsider');
+    const outsider = sim.entities.get(outsiderId);
+    if (!outsider) throw new Error('Expected outsider');
+    sim.dealDamage(
+      outsider,
+      target,
+      100,
+      false,
+      'arcane',
+      'Outsider Test',
+      'hit',
+      true,
+      undefined,
+      true,
+      false,
+      true,
+      'outsider_test',
+      false,
+      undefined,
+      true,
+    );
+
+    expect(mark.damageAccrued).toBeCloseTo(storedBefore + 40, 5);
+  });
+
+  it('feeds 70% of landed Soul Lance damage into Ossuary Mark', () => {
+    const sim = makeNecromancer();
+    const target = addTarget(sim);
+    sim.player.hitBonus = 1;
+    finishCast(sim, 'ossuary_mark');
+
+    const events = castAndCollect(sim, 'soul_lance', 8);
+    const lance = events.find(
+      (event): event is Extract<SimEvent, { type: 'damage' }> =>
+        event.type === 'damage' && event.targetId === target.id && event.ability === 'Soul Lance',
+    );
+    const mark = target.auras.find((aura) => aura.kind === 'necromancy_ossuary_mark');
+
+    expect(lance).toBeDefined();
+    expect(mark?.damageAccrued).toBeCloseTo((lance?.amount ?? 0) * 0.7, 5);
+  });
+
+  it('reactivates Ossuary Mark for free without restarting its cooldown', () => {
+    const sim = makeNecromancer();
+    const target = addTarget(sim);
+    sim.player.hitBonus = 1;
+    finishCast(sim, 'ossuary_mark');
+    sim.dealDamage(
+      sim.player,
+      target,
+      100,
+      false,
+      'shadow',
+      'Charge Mark',
+      'hit',
+      true,
+      undefined,
+      true,
+      false,
+      true,
+      'charge_mark',
+      false,
+      undefined,
+      true,
+    );
+    const hpBefore = target.hp;
+    const cooldownBefore = sim.player.cooldowns.get('ossuary_mark') ?? 0;
+    sim.player.resource = 0;
+
+    sim.castAbility('ossuary_mark');
+
+    expect(target.hp).toBe(hpBefore - 20);
+    expect(target.auras.some((aura) => aura.kind === 'necromancy_ossuary_mark')).toBe(false);
+    expect(sim.player.resource).toBe(0);
+    expect(sim.player.cooldowns.get('ossuary_mark')).toBeLessThanOrEqual(cooldownBefore);
+  });
+
+  it('detonates Ossuary Mark automatically when its duration expires', () => {
+    const sim = makeNecromancer();
+    const target = addTarget(sim);
+    sim.player.hitBonus = 1;
+    finishCast(sim, 'ossuary_mark');
+    sim.dealDamage(
+      sim.player,
+      target,
+      100,
+      false,
+      'shadow',
+      'Charge Mark',
+      'hit',
+      true,
+      undefined,
+      true,
+      false,
+      true,
+      'charge_mark',
+      false,
+      undefined,
+      true,
+    );
+    const hpBefore = target.hp;
+
+    for (
+      let tick = 0;
+      tick < 20 * 15 && target.auras.some((aura) => aura.kind === 'necromancy_ossuary_mark');
+      tick++
+    ) {
+      sim.tick();
+    }
+
+    expect(target.auras.some((aura) => aura.kind === 'necromancy_ossuary_mark')).toBe(false);
+    expect(target.hp).toBe(hpBefore - 20);
+  });
+
+  it('detonates a marked death around the victim and grants only one fragment', () => {
+    const sim = makeNecromancer();
+    const victim = addTarget(sim);
+    const nearby = addTarget(sim);
+    nearby.pos.x = victim.pos.x + 3;
+    nearby.pos.z = victim.pos.z;
+    nearby.prevPos = { ...nearby.pos };
+    sim.ctx.rebucket(nearby);
+    sim.targetEntity(victim.id);
+    sim.player.hitBonus = 1;
+    victim.maxHp = 200;
+    victim.hp = 200;
+    finishCast(sim, 'ossuary_mark');
+
+    for (const amount of [100, 100]) {
+      sim.dealDamage(
+        sim.player,
+        victim,
+        amount,
+        false,
+        'shadow',
+        'Marked Kill',
+        'hit',
+        true,
+        undefined,
+        true,
+        false,
+        true,
+        'marked_kill',
+        false,
+        undefined,
+        true,
+      );
+    }
+
+    expect(victim.dead).toBe(true);
+    expect(nearby.hp).toBe(nearby.maxHp - 40);
+    expect(fragmentCount(sim.player)).toBe(1);
+    expect(drain(sim)).toContainEqual({
+      type: 'spellfxAt',
+      x: victim.pos.x,
+      z: victim.pos.z,
+      school: 'shadow',
+      fx: 'nova',
+      radius: 6,
+      sourceId: sim.playerId,
+      ability: 'ossuary_mark_detonate',
+    });
+  });
+
+  it('keeps each committed Warlock kit free of legacy cross-spec fillers', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warlock', autoEquip: true });
+    sim.setPlayerLevel(20);
+
+    expect(sim.setSpec('destruction')).toBe(true);
+    expect(knownAbilities(sim)).toEqual(
+      expect.arrayContaining(['shadow_bolt', 'immolate', 'drain_life', 'life_tap']),
+    );
+
+    expect(sim.setSpec('affliction')).toBe(true);
+    expect(knownAbilities(sim)).toContain('drain_life');
+    expect(knownAbilities(sim)).not.toEqual(expect.arrayContaining(['immolate', 'searing_pain']));
+    expect(knownAbilities(sim)).not.toContain('life_tap');
+
+    expect(sim.setSpec(null)).toBe(true);
+    expect(knownAbilities(sim)).toEqual(
+      expect.arrayContaining(['corruption', 'curse_of_agony', 'drain_life']),
+    );
+    expect(knownAbilities(sim)).not.toEqual(expect.arrayContaining(['immolate', 'searing_pain']));
+
+    expect(sim.setSpec('affliction')).toBe(true);
+    sim.setPlayerLevel(13);
+    expect(knownAbilities(sim)).toContain('life_tap');
+    sim.setPlayerLevel(14);
+    expect(knownAbilities(sim)).not.toContain('life_tap');
+  });
+
+  it('spends fragments to make every undead reap the primary target in unison', () => {
+    const sim = makeNecromancer();
+    const primary = addTarget(sim);
+    const secondary = addTarget(sim);
+    secondary.pos.x = primary.pos.x + 2;
+    secondary.pos.z = primary.pos.z;
+    secondary.prevPos = { ...secondary.pos };
+    sim.ctx.rebucket(secondary);
+
+    finishCast(sim, 'raise_graveguard');
+    for (let fragment = 0; fragment < 5; fragment++) finishCast(sim, 'soul_harvest');
+    finishCast(sim, 'raise_skeletal_warrior');
+    finishCast(sim, 'raise_bone_mage');
+    expect(fragmentCount(sim.player)).toBe(2);
+
+    const undead = ownedUndead(sim);
+    sim.targetEntity(primary.id);
+    drain(sim);
+    const events = finishCastEvents(sim, 'reaping_command');
+    const primaryHits = events.filter(
+      (event): event is Extract<SimEvent, { type: 'damage' }> =>
+        event.type === 'damage' &&
+        event.targetId === primary.id &&
+        event.ability === 'Reaping Command',
+    );
+    const secondaryHits = events.filter(
+      (event): event is Extract<SimEvent, { type: 'damage' }> =>
+        event.type === 'damage' &&
+        event.targetId === secondary.id &&
+        event.ability === 'Reaping Command',
+    );
+
+    expect(fragmentCount(sim.player)).toBe(0);
+    expect(sim.player.cooldowns.get('reaping_command')).toBeGreaterThan(0);
+    expect(primaryHits).toHaveLength(undead.length);
+    expect(new Set(primaryHits.map((event) => event.sourceId))).toEqual(
+      new Set(undead.map((servant) => servant.id)),
+    );
+    expect(secondaryHits).toHaveLength(1);
+    expect(secondaryHits[0]?.sourceId).toBe(
+      undead.find((servant) => servant.templateId === 'necromancy_skeletal_warrior')?.id,
+    );
+    const graveguard = undead.find((servant) => servant.templateId === 'graveguard');
+    expect(primary.forcedTargetId).toBe(graveguard?.id);
+    expect(graveguard?.auras).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'reaping_command_graveguard',
+          kind: 'shield_wall',
+          value: 0.3,
+          duration: 4,
+        }),
+      ]),
+    );
+    expect(primary.auras).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'reaping_command_warrior',
+          kind: 'slow',
+          value: 0.6,
+          duration: 4,
+        }),
+        expect.objectContaining({
+          id: 'reaping_command_bone_mage',
+          kind: 'spellvuln',
+          value: 0.08,
+          duration: 6,
+        }),
+      ]),
+    );
+  });
+
+  it('lets Gravewing turn Reaping Command into an area vulnerability', () => {
+    const sim = makeNecromancer();
+    const primary = addTarget(sim);
+    const secondary = addTarget(sim);
+    secondary.pos.x = primary.pos.x + 2;
+    secondary.pos.z = primary.pos.z;
+    secondary.prevPos = { ...secondary.pos };
+    sim.ctx.rebucket(secondary);
+
+    finishCast(sim, 'army_of_the_dead');
+    addSoulFragments(sim.ctx, sim.player, 2);
+    sim.targetEntity(primary.id);
+    finishCast(sim, 'reaping_command');
+
+    for (const victim of [primary, secondary]) {
+      expect(victim.auras).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'reaping_command_gravewing',
+            kind: 'vulnerability',
+            value: 0.08,
+            duration: 5,
+          }),
+        ]),
+      );
+    }
+  });
+
+  it('refuses Reaping Command without undead before spending mana or fragments', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    addSoulFragments(sim.ctx, sim.player, 2);
+    const manaBefore = sim.player.resource;
+
+    sim.castAbility('reaping_command');
+
+    expect(fragmentCount(sim.player)).toBe(2);
+    expect(sim.player.resource).toBe(manaBefore);
+    expect(sim.player.cooldowns.has('reaping_command')).toBe(false);
+  });
+
+  it('commits every Reaping Command cleave before an earlier servant kills the primary', () => {
+    const sim = makeNecromancer();
+    const primary = addTarget(sim);
+    const secondary = addTarget(sim);
+    secondary.pos.x = primary.pos.x + 2;
+    secondary.pos.z = primary.pos.z;
+    secondary.prevPos = { ...secondary.pos };
+    sim.ctx.rebucket(secondary);
+
+    finishCast(sim, 'raise_graveguard');
+    addSoulFragments(sim.ctx, sim.player, 3);
+    finishCast(sim, 'raise_skeletal_warrior');
+    primary.hp = 1;
+    sim.targetEntity(primary.id);
+    drain(sim);
+
+    const events = finishCastEvents(sim, 'reaping_command');
+    const cleaves = events.filter(
+      (event): event is Extract<SimEvent, { type: 'damage' }> =>
+        event.type === 'damage' &&
+        event.targetId === secondary.id &&
+        event.ability === 'Reaping Command',
+    );
+
+    expect(primary.dead).toBe(true);
+    expect(cleaves).toHaveLength(1);
+    expect(cleaves[0]?.sourceId).toBe(
+      ownedUndead(sim).find((servant) => servant.templateId === 'necromancy_skeletal_warrior')?.id,
+    );
+  });
+
+  it('refuses Reaping Command with undead but fewer than two Soul Fragments', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    finishCast(sim, 'raise_graveguard');
+    addSoulFragments(sim.ctx, sim.player, 1);
+    const manaBefore = sim.player.resource;
+
+    sim.castAbility('reaping_command');
+
+    expect(fragmentCount(sim.player)).toBe(1);
+    expect(sim.player.resource).toBe(manaBefore);
+    expect(sim.player.cooldowns.has('reaping_command')).toBe(false);
+  });
+
+  it('harvests a recently marked death caused by another actor at the exact lockout', () => {
+    const sim = makeNecromancer();
+    const mark = (source: Entity, target: Entity) =>
+      sim.dealDamage(
+        source,
+        target,
+        1,
+        false,
+        'shadow',
+        'Test Mark',
+        'hit',
+        false,
+        undefined,
+        true,
+      );
+    const kill = (source: Entity, target: Entity) =>
+      sim.dealDamage(source, target, target.hp, false, 'physical', 'Third Party', 'hit');
+    const thirdParty = addTarget(sim);
+
+    const first = addTarget(sim);
+    mark(sim.player, first);
+    kill(thirdParty, first);
+    expect(first.dead).toBe(true);
+    expect(fragmentCount(sim.player)).toBe(1);
+
+    const locked = addTarget(sim);
+    mark(sim.player, locked);
+    for (let tick = 0; tick < 59; tick++) sim.tick();
+    kill(thirdParty, locked);
+    expect(locked.dead).toBe(true);
+    expect(fragmentCount(sim.player)).toBe(1);
+
+    sim.tick();
+    const afterLockout = addTarget(sim);
+    mark(sim.player, afterLockout);
+    kill(thirdParty, afterLockout);
+    expect(afterLockout.dead).toBe(true);
+    expect(fragmentCount(sim.player)).toBe(2);
+
+    const expired = addTarget(sim);
+    mark(sim.player, expired);
+    for (let tick = 0; tick < 101; tick++) sim.tick();
+    kill(thirdParty, expired);
+    expect(expired.dead).toBe(true);
+    expect(fragmentCount(sim.player)).toBe(2);
+  });
+
+  it('accepts undead damage but rejects non-undead owned mobs for Funeral Harvest', () => {
+    const sim = makeNecromancer();
+    const thirdParty = addTarget(sim);
+    finishCast(sim, 'raise_graveguard');
+    const graveguard = sim.petOf(sim.playerId);
+    if (!graveguard) throw new Error('Expected Graveguard');
+
+    const undeadVictim = addTarget(sim);
+    sim.dealDamage(graveguard, undeadVictim, 1, false, 'physical', 'Claw', 'hit');
+    sim.dealDamage(thirdParty, undeadVictim, undeadVictim.hp, false, 'physical', 'Finish', 'hit');
+    expect(fragmentCount(sim.player)).toBe(1);
+
+    for (let tick = 0; tick < 61; tick++) sim.tick();
+    const familiar = addTarget(sim);
+    familiar.ownerId = sim.playerId;
+    familiar.hostile = false;
+    const rejectedVictim = addTarget(sim);
+    sim.dealDamage(familiar, rejectedVictim, 1, false, 'shadow', 'Familiar Bite', 'hit');
+    sim.dealDamage(
+      thirdParty,
+      rejectedVictim,
+      rejectedVictim.hp,
+      false,
+      'physical',
+      'Finish',
+      'hit',
+    );
+    expect(fragmentCount(sim.player)).toBe(1);
+  });
+
+  it('harvests a one-shot ranked-arena elimination before the death clears marks', () => {
+    const sim = makeNecromancer();
+    const victimId = sim.addPlayer('warrior', 'Arena Victim');
+    const survivorId = sim.addPlayer('priest', 'Arena Survivor');
+    const victim = sim.entities.get(victimId);
+    if (!victim) throw new Error('Expected arena victim');
+    const match: ArenaMatch = {
+      id: 91,
+      format: '2v2',
+      teamA: [sim.playerId],
+      teamB: [victimId, survivorId],
+      slot: 0,
+      state: 'active',
+      timer: 0,
+      returns: new Map(),
+      ratingA: 1500,
+      ratingB: 1500,
+      defeated: new Set(),
+    };
+    sim.ctx.arenaMatches.set(sim.playerId, match);
+    sim.ctx.arenaMatches.set(victimId, match);
+    sim.ctx.arenaMatches.set(survivorId, match);
+
+    sim.dealDamage(sim.player, victim, victim.hp + 100, false, 'shadow', 'Arena Reap', 'hit');
+    const events = sim.drainEvents();
+
+    expect(victim.dead).toBe(true);
+    expect(match.defeated.has(victimId)).toBe(true);
+    const damageIndex = events.findIndex(
+      (event) => event.type === 'damage' && event.targetId === victimId,
+    );
+    const markIndex = events.findIndex(
+      (event) =>
+        event.type === 'aura' &&
+        event.targetId === victimId &&
+        event.gained === true &&
+        event.name === 'Funeral Harvest',
+    );
+    expect(damageIndex).toBeGreaterThanOrEqual(0);
+    expect(markIndex).toBeGreaterThan(damageIndex);
+    expect(fragmentCount(sim.player)).toBe(1);
+  });
+
+  it('builds Soul Fragments with its filler and spends exact amounts on undead', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+
+    for (let i = 0; i < 6; i++) finishCast(sim, 'soul_harvest');
+    expect(fragmentCount(sim.player)).toBe(5);
+
+    finishCast(sim, 'raise_graveguard');
+    expect(sim.petOf(sim.playerId)?.templateId).toBe('graveguard');
+    expect(fragmentCount(sim.player)).toBe(5);
+
+    finishCast(sim, 'raise_skeletal_warrior');
+    expect(fragmentCount(sim.player)).toBe(4);
+
+    finishCast(sim, 'raise_bone_mage');
+    expect(fragmentCount(sim.player)).toBe(2);
+    expect(ownedUndead(sim).map((pet) => pet.templateId)).toEqual(
+      expect.arrayContaining(['graveguard', 'necromancy_skeletal_warrior', 'necromancy_bone_mage']),
+    );
+    expect(sim.petOf(sim.playerId)?.templateId).toBe('graveguard');
+  });
+
+  it('refuses a spender without enough fragments and leaves mana untouched', () => {
+    const sim = makeNecromancer();
+    const manaBefore = sim.player.resource;
+
+    sim.castAbility('raise_bone_mage');
+
+    expect(fragmentCount(sim.player)).toBe(0);
+    expect(sim.player.resource).toBe(manaBefore);
+    expect(ownedUndead(sim)).toHaveLength(0);
+  });
+
+  it('caps the normal temporary army at three servants', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+
+    for (let fragment = 0; fragment < 5; fragment++) finishCast(sim, 'soul_harvest');
+    for (let summon = 0; summon < 4; summon++) {
+      finishCast(sim, 'raise_skeletal_warrior');
+    }
+
+    const temporary = ownedUndead(sim).filter((pet) => pet.templateId !== 'graveguard');
+    expect(temporary).toHaveLength(3);
+    expect(fragmentCount(sim.player)).toBe(2);
+  });
+
+  it('gives each undead servant a distinct combat role', () => {
+    expect(MOBS.graveguard.petRole).toBe('melee_tank');
+    expect(MOBS.graveguard.petCanTaunt).toBe(true);
+    expect(MOBS.necromancy_skeletal_warrior.petCleave).toEqual({
+      radius: 4,
+      mult: 0.45,
+      cooldown: 6,
+    });
+    expect(MOBS.necromancy_bone_mage.petRanged?.spellVuln).toEqual({
+      amp: 0.05,
+      duration: 6,
+    });
+  });
+
+  it('arms the Graveguard auto-taunt but leaves temporary damage servants passive', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    for (let attempt = 0; attempt < 5; attempt++) finishCast(sim, 'soul_harvest');
+
+    finishCast(sim, 'raise_graveguard');
+    finishCast(sim, 'raise_skeletal_warrior');
+
+    const graveguard = ownedUndead(sim).find((undead) => undead.templateId === 'graveguard');
+    const warrior = ownedUndead(sim).find(
+      (undead) => undead.templateId === 'necromancy_skeletal_warrior',
+    );
+    expect(graveguard?.petAutoTaunt).toBe(true);
+    expect(warrior?.petAutoTaunt).toBe(false);
+  });
+
+  it('rejects Unholy Command without undead and empowers every owned undead for 12 sec', () => {
+    const empty = makeNecromancer();
+    const manaBefore = empty.player.resource;
+    empty.castAbility('unholy_command');
+    expect(empty.player.resource).toBe(manaBefore);
+    expect(empty.player.cooldowns.has('unholy_command')).toBe(false);
+
+    const sim = makeNecromancer();
+    addTarget(sim);
+    addSoulFragments(sim as unknown as SimContext, sim.player, 1);
+    finishCast(sim, 'raise_graveguard');
+    finishCast(sim, 'raise_skeletal_warrior');
+    sim.player.gcdRemaining = 0;
+    sim.player.resource = sim.player.maxResource;
+
+    sim.castAbility('unholy_command');
+
+    const undead = ownedUndead(sim);
+    expect(undead).toHaveLength(2);
+    for (const servant of undead) {
+      expect(servant.auras).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'unholy_command',
+            kind: 'buff_dmg_done',
+            value: 0.25,
+            remaining: 12,
+            sourceId: sim.playerId,
+          }),
+          expect.objectContaining({
+            id: 'unholy_command_haste',
+            kind: 'pet_spellhaste',
+            value: 0.2,
+            remaining: 12,
+            sourceId: sim.playerId,
+          }),
+        ]),
+      );
+    }
+  });
+
+  it('lets the Skeletal Warrior cleave nearby secondary enemies', () => {
+    const sim = makeNecromancer();
+    const primary = addTarget(sim);
+    const secondary = createMob(
+      (sim as unknown as { nextId: number }).nextId++,
+      MOBS.ridge_stalker,
+      20,
+      {
+        x: primary.pos.x + 2,
+        y: primary.pos.y,
+        z: primary.pos.z,
+      },
+    );
+    secondary.maxHp = 100_000;
+    secondary.hp = secondary.maxHp;
+    secondary.hostile = true;
+    sim.addEntity(secondary);
+    for (let attempt = 0; attempt < 5 && fragmentCount(sim.player) < 1; attempt++) {
+      finishCast(sim, 'soul_harvest');
+    }
+    finishCast(sim, 'raise_skeletal_warrior');
+    const warrior = ownedUndead(sim).find(
+      (undead) => undead.templateId === 'necromancy_skeletal_warrior',
+    );
+    if (!warrior) throw new Error('Expected a Skeletal Warrior');
+    const cleave = MOBS.necromancy_skeletal_warrior.petCleave;
+    if (!cleave) throw new Error('Expected Skeletal Warrior cleave tuning');
+    const primaryHp = primary.hp;
+    const secondaryHp = secondary.hp;
+
+    petCleaveAttack(
+      (sim as unknown as { ctx: Parameters<typeof petCleaveAttack>[0] }).ctx,
+      warrior,
+      primary,
+      cleave,
+    );
+
+    expect(primary.hp).toBe(primaryHp);
+    expect(secondary.hp).toBeLessThan(secondaryHp);
+  });
+
+  it('does not consume combat RNG when Skeletal Warrior cleave has no secondary target', () => {
+    const sim = makeNecromancer();
+    const primary = addTarget(sim);
+    addSoulFragments(sim as unknown as SimContext, sim.player, 1);
+    finishCast(sim, 'raise_skeletal_warrior');
+    const warrior = ownedUndead(sim).find(isTemporaryUndead);
+    const cleave = MOBS.necromancy_skeletal_warrior.petCleave;
+    if (!warrior || !cleave) throw new Error('Expected Skeletal Warrior cleave');
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    const range = vi.spyOn(ctx.rng, 'range');
+
+    petCleaveAttack(ctx, warrior, primary, cleave);
+
+    expect(range).not.toHaveBeenCalled();
+  });
+
+  it('does not cleave a secondary target through blocked line of sight', () => {
+    const sim = makeNecromancer();
+    const primary = addTarget(sim);
+    const secondary = createMob(
+      (sim as unknown as { nextId: number }).nextId++,
+      MOBS.ridge_stalker,
+      20,
+      { x: primary.pos.x + 2, y: primary.pos.y, z: primary.pos.z },
+    );
+    secondary.maxHp = 100_000;
+    secondary.hp = secondary.maxHp;
+    secondary.hostile = true;
+    sim.addEntity(secondary);
+    addSoulFragments(sim as unknown as SimContext, sim.player, 1);
+    finishCast(sim, 'raise_skeletal_warrior');
+    const warrior = ownedUndead(sim).find(isTemporaryUndead);
+    const cleave = MOBS.necromancy_skeletal_warrior.petCleave;
+    if (!warrior || !cleave) throw new Error('Expected Skeletal Warrior cleave');
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    vi.spyOn(ctx, 'hasLineOfSight').mockReturnValue(false);
+    const hpBefore = secondary.hp;
+
+    petCleaveAttack(ctx, warrior, primary, cleave);
+
+    expect(secondary.hp).toBe(hpBefore);
+  });
+
+  it('lets the Bone Mage expose targets to increased spell damage', () => {
+    const sim = makeNecromancer();
+    const target = addTarget(sim);
+    for (let attempt = 0; attempt < 5 && fragmentCount(sim.player) < 2; attempt++) {
+      finishCast(sim, 'soul_harvest');
+    }
+    finishCast(sim, 'raise_bone_mage');
+    const mage = ownedUndead(sim).find((undead) => undead.templateId === 'necromancy_bone_mage');
+    if (!mage) throw new Error('Expected a Bone Mage');
+    const ranged = MOBS.necromancy_bone_mage.petRanged;
+    if (!ranged) throw new Error('Expected Bone Mage ranged tuning');
+    target.auras = target.auras.filter((aura) => aura.id !== 'raise_bone_mage');
+
+    petRangedAttack(
+      (sim as unknown as { ctx: Parameters<typeof petRangedAttack>[0] }).ctx,
+      mage,
+      target,
+      ranged,
+    );
+    for (
+      let tick = 0;
+      tick < 80 && !target.auras.some((aura) => aura.id === 'raise_bone_mage');
+      tick++
+    ) {
+      sim.tick();
+    }
+
+    expect(
+      target.auras.find((aura) => aura.id === 'raise_bone_mage' && aura.kind === 'spellvuln'),
+    ).toMatchObject({
+      value: 0.05,
+      duration: 6,
+      sourceId: sim.playerId,
+      school: 'shadow',
+    });
+  });
+
+  it('uses Bone Armor as a max-health shield', () => {
+    const sim = makeNecromancer();
+
+    finishCast(sim, 'bone_armor');
+
+    const shield = sim.player.auras.find((aura) => aura.id === 'bone_armor');
+    expect(shield?.kind).toBe('absorb');
+    expect(shield?.value).toBe(Math.round(sim.player.maxHp * 0.2));
+  });
+
+  it('Lich Form fills fragments and empowers the whole undead army', () => {
+    const sim = makeNecromancer();
+    finishCast(sim, 'raise_graveguard');
+    addTarget(sim);
+    for (let attempt = 0; attempt < 5 && fragmentCount(sim.player) === 0; attempt++) {
+      finishCast(sim, 'soul_harvest');
+    }
+    finishCast(sim, 'raise_skeletal_warrior');
+
+    const fragmentsBefore = fragmentCount(sim.player);
+    finishCast(sim, 'metamorphosis');
+
+    expect(sim.player.auras.some((aura) => aura.kind === 'form_lich')).toBe(true);
+    expect(fragmentCount(sim.player)).toBe(Math.min(5, fragmentsBefore + 3));
+    for (const undead of ownedUndead(sim)) {
+      expect(undead.auras).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'lich_form_army',
+            kind: 'buff_dmg_done',
+            value: 0.5,
+            duration: 20,
+            sourceId: sim.playerId,
+          }),
+          expect.objectContaining({
+            id: 'lich_form_army_haste',
+            kind: 'pet_spellhaste',
+            value: 0.2,
+            duration: 20,
+            sourceId: sim.playerId,
+          }),
+        ]),
+      );
+    }
+  });
+
+  it('makes Soul Lance pierce the two nearest enemies during Lich Form', () => {
+    const sim = makeNecromancer();
+    const primary = addTarget(sim);
+    const nearest = addNearbyTarget(sim, primary, 0.5);
+    const secondNearest = addNearbyTarget(sim, primary, 1);
+    const excluded = addNearbyTarget(sim, primary, 1.5);
+    for (const target of [primary, nearest, secondNearest, excluded]) {
+      target.weapon.speed = 1000;
+    }
+    sim.player.hitBonus = 1;
+    finishCast(sim, 'metamorphosis');
+    drain(sim);
+
+    const events = castAndCollect(sim, 'soul_lance', 8);
+    const primaryHit = events.find(
+      (event): event is Extract<SimEvent, { type: 'damage' }> =>
+        event.type === 'damage' && event.targetId === primary.id && event.ability === 'Soul Lance',
+    );
+    const pierceHits = events.filter(
+      (event): event is Extract<SimEvent, { type: 'damage' }> =>
+        event.type === 'damage' && event.ability === 'Lich Soul Lance',
+    );
+
+    expect(primaryHit).toBeDefined();
+    expect(pierceHits.map((event) => event.targetId)).toEqual([nearest.id, secondNearest.id]);
+    expect(pierceHits.map((event) => event.amount)).toEqual([
+      Math.max(1, Math.round((primaryHit?.amount ?? 0) * 0.5)),
+      Math.max(1, Math.round((primaryHit?.amount ?? 0) * 0.5)),
+    ]);
+    expect(pierceHits.some((event) => event.targetId === excluded.id)).toBe(false);
+    expect(events).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'spellfx',
+          sourceId: primary.id,
+          targetId: nearest.id,
+          fx: 'projectile',
+          ability: 'soul_lance',
+        }),
+        expect.objectContaining({
+          type: 'spellfx',
+          sourceId: primary.id,
+          targetId: secondNearest.id,
+          fx: 'projectile',
+          ability: 'soul_lance',
+        }),
+      ]),
+    );
+  });
+
+  it('keeps Soul Lance single-target outside Lich Form', () => {
+    const sim = makeNecromancer();
+    const primary = addTarget(sim);
+    addNearbyTarget(sim, primary, 0.5);
+    sim.player.hitBonus = 1;
+
+    const events = castAndCollect(sim, 'soul_lance', 8);
+
+    expect(
+      events.some((event) => event.type === 'damage' && event.ability === 'Lich Soul Lance'),
+    ).toBe(false);
+  });
+
+  it.each([
+    [0, 3],
+    [3, 5],
+    [4, 5],
+    [5, 5],
+  ])('Lich Form grants exactly three fragments from %i and caps at %i', (before, after) => {
+    const sim = makeNecromancer();
+    if (before > 0) addSoulFragments(sim as unknown as SimContext, sim.player, before);
+
+    finishCast(sim, 'metamorphosis');
+
+    expect(fragmentCount(sim.player)).toBe(after);
+    expect(sim.player.auras.filter((aura) => aura.kind === 'soul_fragments')).toHaveLength(1);
+  });
+
+  it('emits a transformation cue when Lich Form begins', () => {
+    const sim = makeNecromancer();
+    drain(sim);
+
+    sim.castAbility('metamorphosis');
+    const event = drain(sim).find(
+      (candidate) => candidate.type === 'spellfx' && candidate.fx === 'lichTransform',
+    );
+
+    expect(event).toMatchObject({
+      type: 'spellfx',
+      sourceId: sim.playerId,
+      targetId: sim.playerId,
+      school: 'shadow',
+      fx: 'lichTransform',
+      ability: 'metamorphosis',
+    });
+  });
+
+  it('identifies transformed Soul Harvest bolts for the dual-hand visual', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    finishCast(sim, 'metamorphosis');
+    drain(sim);
+
+    const events = finishCastEvents(sim, 'soul_harvest');
+
+    expect(
+      events.find(
+        (event) =>
+          event.type === 'spellfx' && event.fx === 'projectile' && event.ability === 'soul_harvest',
+      ),
+    ).toBeDefined();
+  });
+
+  it('marks Corpse Explosion so the renderer can leave a desecrated zone', () => {
+    const sim = makeNecromancer();
+    const corpse = addTarget(sim);
+    corpse.maxHp = 100;
+    corpse.hp = 100;
+    const corpsePos = { ...corpse.pos };
+    sim.dealDamage(sim.player, corpse, 100, false, 'shadow', 'Prepare Echo', 'hit');
+    const target = addTarget(sim);
+    target.pos.x = corpsePos.x;
+    target.pos.z = corpsePos.z;
+    target.prevPos = { ...target.pos };
+    sim.ctx.rebucket(target);
+    finishCast(sim, 'metamorphosis');
+    const fragmentsBeforeExplosion = fragmentCount(sim.player);
+    expect(fragmentsBeforeExplosion).toBeGreaterThanOrEqual(3);
+    drain(sim);
+    const hpBefore = target.hp;
+
+    sim.castAbilityAt('corpse_explosion', corpsePos);
+    const event = drain(sim).find(
+      (candidate) =>
+        candidate.type === 'spellfxAt' &&
+        candidate.fx === 'nova' &&
+        candidate.ability === 'corpse_explosion',
+    );
+
+    expect(event).toMatchObject({
+      type: 'spellfxAt',
+      x: corpsePos.x,
+      z: corpsePos.z,
+      school: 'shadow',
+      radius: 8,
+      ability: 'corpse_explosion',
+      sourceId: sim.playerId,
+    });
+    expect(target.hp).toBeLessThan(hpBefore);
+    expect(fragmentCount(sim.player)).toBe(fragmentsBeforeExplosion);
+    expect(deathEchoes(sim.player)).toHaveLength(0);
+  });
+
+  it('turns recent enemy deaths into three capped, positioned Death Echoes', () => {
+    const sim = makeNecromancer();
+    const positions = [
+      { x: 1, z: 7 },
+      { x: 3, z: 9 },
+      { x: 5, z: 11 },
+      { x: 7, z: 13 },
+    ];
+
+    for (const position of positions) {
+      const target = addTarget(sim);
+      target.pos.x = sim.player.pos.x + position.x;
+      target.pos.z = sim.player.pos.z + position.z;
+      target.prevPos = { ...target.pos };
+      target.maxHp = 100;
+      target.hp = 100;
+      sim.ctx.rebucket(target);
+      sim.dealDamage(sim.player, target, 100, false, 'shadow', 'Harvest Echo', 'hit');
+      sim.tick();
+    }
+
+    const echoes = deathEchoes(sim.player);
+    expect(echoes).toHaveLength(3);
+    expect(echoes.map((aura) => [aura.value, aura.value2])).toEqual([
+      [sim.player.pos.x + 7, sim.player.pos.z + 13],
+      [sim.player.pos.x + 3, sim.player.pos.z + 9],
+      [sim.player.pos.x + 5, sim.player.pos.z + 11],
+    ]);
+    expect(echoes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'necromancy_death_echo_0',
+          name: 'Death Echo',
+          kind: 'necromancy_death_echo',
+          duration: 15,
+          school: 'shadow',
+        }),
+      ]),
+    );
+  });
+
+  it('requires a nearby Death Echo for Corpse Explosion without spending fragments', () => {
+    const sim = makeNecromancer();
+    const target = addTarget(sim);
+    const hpBefore = target.hp;
+    const manaBefore = sim.player.resource;
+
+    sim.castAbilityAt('corpse_explosion', { x: target.pos.x, z: target.pos.z });
+    expect(drain(sim)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'error',
+          text: 'Corpse Explosion requires a nearby Death Echo.',
+        }),
+      ]),
+    );
+    expect(target.hp).toBe(hpBefore);
+    expect(sim.player.resource).toBe(manaBefore);
+    expect(sim.player.gcdRemaining).toBe(0);
+    expect(ABILITIES.corpse_explosion.soulFragmentCost).toBeUndefined();
+  });
+
+  it('passes the active Lich Form empowerment to undead raised during the form', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    finishCast(sim, 'metamorphosis');
+    finishCast(sim, 'raise_skeletal_warrior');
+
+    const warrior = ownedUndead(sim).find(
+      (undead) => undead.templateId === 'necromancy_skeletal_warrior',
+    );
+    expect(warrior?.auras).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'lich_form_army',
+          kind: 'buff_dmg_done',
+          value: 0.5,
+          sourceId: sim.playerId,
+        }),
+        expect.objectContaining({
+          id: 'lich_form_army_haste',
+          kind: 'pet_spellhaste',
+          value: 0.2,
+          sourceId: sim.playerId,
+        }),
+      ]),
+    );
+  });
+
+  it('Army of the Dead tears open a portal for one servant of every temporary type', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    addSoulFragments(sim as unknown as SimContext, sim.player, 5);
+    finishCast(sim, 'raise_graveguard');
+    finishCast(sim, 'raise_skeletal_warrior');
+    finishCast(sim, 'raise_bone_mage');
+    const graveguard = ownedUndead(sim).find((pet) => pet.templateId === 'graveguard');
+    const replacedIds = ownedUndead(sim)
+      .filter((pet) => pet.templateId !== 'graveguard')
+      .map((pet) => pet.id);
+    if (!graveguard) throw new Error('Expected a Graveguard');
+    drain(sim);
+
+    const events = finishCastEvents(sim, 'army_of_the_dead');
+
+    const temporary = ownedUndead(sim).filter((pet) => pet.templateId !== 'graveguard');
+    expect(temporary.map((pet) => pet.templateId)).toEqual([
+      'necromancy_skeletal_warrior',
+      'necromancy_bone_mage',
+      'necromancy_gravewing',
+    ]);
+    expect(sim.entities.get(graveguard.id)).toBe(graveguard);
+    expect(replacedIds.every((id) => !sim.entities.has(id))).toBe(true);
+    expect(temporary.every((pet) => pet.despawnTimer === 20)).toBe(true);
+    expect(MOBS.necromancy_gravewing.elite).toBe(true);
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfxAt',
+        x: sim.player.pos.x,
+        z: sim.player.pos.z + 2.5,
+        school: 'shadow',
+        fx: 'burst',
+        sourceId: sim.playerId,
+        ability: 'army_of_the_dead',
+      }),
+    );
+    const expectedFormation = [
+      [sim.player.pos.x - 1.15, sim.player.pos.z + 3.55],
+      [sim.player.pos.x, sim.player.pos.z + 3.55],
+      [sim.player.pos.x + 1.15, sim.player.pos.z + 3.55],
+    ];
+    temporary.forEach((pet, index) => {
+      expect(pet.pos.x).toBeCloseTo(expectedFormation[index][0], 6);
+      expect(pet.pos.z).toBeCloseTo(expectedFormation[index][1], 6);
+    });
+  });
+
+  it.each([
+    ['raise_skeletal_warrior', 1],
+    ['raise_bone_mage', 2],
+  ] as const)(
+    'treats the portal army as all three temporary slots and rejects %s without spending resources',
+    (abilityId, fragments) => {
+      const sim = makeNecromancer();
+      addTarget(sim);
+
+      finishCast(sim, 'army_of_the_dead');
+      addSoulFragments(sim as unknown as SimContext, sim.player, fragments);
+      sim.player.resource = sim.player.maxResource;
+      const manaBefore = sim.player.resource;
+      sim.castAbility(abilityId);
+
+      const temporary = ownedUndead(sim).filter((pet) => pet.templateId !== 'graveguard');
+      expect(temporary.map((pet) => pet.templateId)).toEqual([
+        'necromancy_skeletal_warrior',
+        'necromancy_bone_mage',
+        'necromancy_gravewing',
+      ]);
+      expect(fragmentCount(sim.player)).toBe(fragments);
+      expect(sim.player.resource).toBe(manaBefore);
+    },
+  );
+
+  it('reopens all temporary servant slots after the portal army expires', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+
+    finishCast(sim, 'army_of_the_dead');
+    for (let tick = 0; tick < 20 * 20 + 1; tick++) sim.tick();
+    expect(
+      ownedUndead(sim).filter((pet) => pet.templateId === 'necromancy_gravewing'),
+    ).toHaveLength(0);
+
+    addSoulFragments(sim as unknown as SimContext, sim.player, 1);
+    sim.player.resource = sim.player.maxResource;
+    const manaBefore = sim.player.resource;
+    sim.castAbility('raise_skeletal_warrior');
+
+    const temporary = ownedUndead(sim).filter((pet) => pet.templateId !== 'graveguard');
+    expect(temporary.map((pet) => pet.templateId)).toEqual(['necromancy_skeletal_warrior']);
+    expect(fragmentCount(sim.player)).toBe(0);
+    expect(sim.player.resource).toBe(manaBefore - 20);
+  });
+
+  it('despawns the entire portal army immediately when its owner dies', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    finishCast(sim, 'army_of_the_dead');
+    const armyIds = ownedUndead(sim)
+      .filter((pet) => pet.templateId !== 'graveguard')
+      .map((pet) => pet.id);
+    expect(armyIds).toHaveLength(3);
+
+    sim.dealDamage(null, sim.player, sim.player.maxHp + 1, false, 'physical', null, 'hit');
+
+    expect(sim.player.dead).toBe(true);
+    expect(armyIds.every((id) => !sim.entities.has(id))).toBe(true);
+  });
+
+  it('allows pet attack commands to direct Gravewing and the persistent Graveguard', () => {
+    const sim = makeNecromancer();
+    const target = addTarget(sim);
+    finishCast(sim, 'army_of_the_dead');
+    const gravewing = ownedUndead(sim).find((pet) => pet.templateId === 'necromancy_gravewing');
+    if (!gravewing) throw new Error('Expected Gravewing');
+    gravewing.aggroTargetId = null;
+    gravewing.inCombat = false;
+
+    sim.petAttack();
+
+    expect(gravewing.aggroTargetId).toBe(target.id);
+    expect(gravewing.inCombat).toBe(true);
+
+    finishCast(sim, 'raise_graveguard');
+    const graveguard = ownedUndead(sim).find((pet) => pet.templateId === 'graveguard');
+    if (!graveguard) throw new Error('Expected a Graveguard');
+    for (const pet of [gravewing, graveguard]) {
+      pet.aggroTargetId = null;
+      pet.inCombat = false;
+    }
+
+    sim.petAttack();
+
+    expect(gravewing.aggroTargetId).toBe(target.id);
+    expect(graveguard.aggroTargetId).toBe(target.id);
+  });
+
+  it('Sacrifice Undead consumes a temporary servant and restores health', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    for (let attempt = 0; attempt < 5 && fragmentCount(sim.player) === 0; attempt++) {
+      finishCast(sim, 'soul_harvest');
+    }
+    finishCast(sim, 'raise_skeletal_warrior');
+    expect(ownedUndead(sim).filter((pet) => pet.templateId !== 'graveguard')).toHaveLength(1);
+    sim.player.hp = Math.round(sim.player.maxHp * 0.5);
+    const hpBefore = sim.player.hp;
+
+    const victim = ownedUndead(sim).find((pet) => pet.templateId !== 'graveguard');
+    if (!victim) throw new Error('Expected a temporary undead');
+    drain(sim);
+    sim.castAbility('sacrifice_undead');
+    const sacrificeFx = drain(sim).find(
+      (event) => event.type === 'spellfxAt' && event.fx === 'soulTravel',
+    );
+
+    expect(sim.player.cooldowns.has('sacrifice_undead')).toBe(true);
+    expect(ownedUndead(sim).filter((pet) => pet.templateId !== 'graveguard')).toHaveLength(0);
+    expect(sim.player.hp).toBe(hpBefore + Math.round(sim.player.maxHp * 0.25));
+    expect(sacrificeFx).toMatchObject({
+      type: 'spellfxAt',
+      x: victim.pos.x,
+      z: victim.pos.z,
+      school: 'shadow',
+      fx: 'soulTravel',
+      targetId: sim.playerId,
+      ability: 'sacrifice_undead',
+    });
+  });
+
+  it('caps Sacrifice Undead healing at maximum health', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    addSoulFragments(sim as unknown as SimContext, sim.player, 1);
+    finishCast(sim, 'raise_skeletal_warrior');
+    sim.player.hp = sim.player.maxHp - 1;
+
+    sim.castAbility('sacrifice_undead');
+
+    expect(sim.player.hp).toBe(sim.player.maxHp);
+  });
+
+  it('Sacrifice Undead consumes the lowest-health temporary and never the Graveguard', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    for (let attempt = 0; attempt < 5; attempt++) finishCast(sim, 'soul_harvest');
+    finishCast(sim, 'raise_graveguard');
+    finishCast(sim, 'raise_skeletal_warrior');
+    finishCast(sim, 'raise_bone_mage');
+
+    const graveguard = ownedUndead(sim).find((undead) => undead.templateId === 'graveguard');
+    const warrior = ownedUndead(sim).find(
+      (undead) => undead.templateId === 'necromancy_skeletal_warrior',
+    );
+    const mage = ownedUndead(sim).find((undead) => undead.templateId === 'necromancy_bone_mage');
+    if (!graveguard || !warrior || !mage) throw new Error('Expected all three undead servants');
+
+    graveguard.hp = 1;
+    warrior.hp = Math.round(warrior.maxHp * 0.2);
+    mage.hp = Math.round(mage.maxHp * 0.4);
+    sim.castAbility('sacrifice_undead');
+
+    expect(sim.entities.has(graveguard.id)).toBe(true);
+    expect(sim.entities.has(warrior.id)).toBe(false);
+    expect(sim.entities.has(mage.id)).toBe(true);
+  });
+
+  it('Sacrifice Undead consumes the oldest temporary servant when health is tied', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    for (let attempt = 0; attempt < 3; attempt++) finishCast(sim, 'soul_harvest');
+    finishCast(sim, 'raise_skeletal_warrior');
+    finishCast(sim, 'raise_skeletal_warrior');
+
+    const warriors = ownedUndead(sim)
+      .filter((undead) => undead.templateId === 'necromancy_skeletal_warrior')
+      .sort((a, b) => a.id - b.id);
+    expect(warriors).toHaveLength(2);
+    for (const warrior of warriors) warrior.hp = Math.round(warrior.maxHp * 0.5);
+
+    sim.castAbility('sacrifice_undead');
+
+    expect(sim.entities.has(warriors[0].id)).toBe(false);
+    expect(sim.entities.has(warriors[1].id)).toBe(true);
+  });
+
+  it('does not arm Sacrifice Undead when there is no temporary servant', () => {
+    const sim = makeNecromancer();
+    sim.castAbility('sacrifice_undead');
+
+    expect(sim.player.cooldowns.has('sacrifice_undead')).toBe(false);
+  });
+
+  it('dismisses every Necromancy summon when the owner changes specialization', () => {
+    const sim = makeNecromancer();
+    addSoulFragments(sim as unknown as SimContext, sim.player, 1);
+    finishCast(sim, 'raise_graveguard');
+    finishCast(sim, 'raise_skeletal_warrior');
+    finishCast(sim, 'metamorphosis');
+    const summonIds = ownedUndead(sim).map((undead) => undead.id);
+    const target = addTarget(sim);
+    sim.ctx.applyAura(target, {
+      id: 'ossuary_mark',
+      name: 'Ossuary Mark',
+      kind: 'necromancy_ossuary_mark',
+      remaining: 12,
+      duration: 12,
+      value: 0.2,
+      sourceId: sim.playerId,
+      school: 'shadow',
+    });
+
+    expect(summonIds).toHaveLength(2);
+    expect(fragmentCount(sim.player)).toBe(3);
+    expect(sim.player.auras.some((aura) => aura.kind === 'form_lich')).toBe(true);
+    expect(sim.setSpec('affliction')).toBe(true);
+
+    for (const summonId of summonIds) expect(sim.entities.has(summonId)).toBe(false);
+    expect(sim.petOf(sim.playerId, true)).toBeNull();
+    expect(fragmentCount(sim.player)).toBe(0);
+    expect(sim.player.auras.some((aura) => aura.kind === 'form_lich')).toBe(false);
+    expect(target.auras.some((aura) => aura.kind === 'necromancy_ossuary_mark')).toBe(false);
+  });
+
+  it('removes temporary undead immediately when their owner leaves', () => {
+    const sim = makeNecromancer();
+    addSoulFragments(sim as unknown as SimContext, sim.player, 1);
+    finishCast(sim, 'raise_skeletal_warrior');
+    const warrior = ownedUndead(sim).find(isTemporaryUndead);
+    if (!warrior) throw new Error('Expected a temporary undead');
+
+    sim.removePlayer(sim.playerId);
+
+    expect(sim.entities.has(warrior.id)).toBe(false);
+  });
+
+  it('rejects a persisted Graveguard when restoring into a non-Necromancy build', () => {
+    const source = makeNecromancer();
+    finishCast(source, 'raise_graveguard');
+    const state = source.serializeCharacter(source.playerId);
+    if (!state) throw new Error('Expected a character snapshot');
+    state.talents = {
+      spec: 'affliction',
+      rows: { ...(state.talents?.rows ?? {}) },
+    };
+
+    const restored = new Sim({
+      seed: 43,
+      playerClass: 'warlock',
+      noPlayer: true,
+      autoEquip: true,
+    });
+    const pid = restored.addPlayer('warlock', 'Restored', { state });
+
+    expect(restored.petOf(pid, true)).toBeNull();
+  });
+
+  it('round-trips the persistent Graveguard without serializing temporary undead', () => {
+    const source = makeNecromancer();
+    addTarget(source);
+    addSoulFragments(source as unknown as SimContext, source.player, 1);
+    finishCast(source, 'raise_graveguard');
+    finishCast(source, 'raise_skeletal_warrior');
+    const state = source.serializeCharacter(source.playerId);
+    if (!state) throw new Error('Expected a character snapshot');
+    expect(state.pet?.templateId).toBe('graveguard');
+
+    const restored = new Sim({
+      seed: 44,
+      playerClass: 'warlock',
+      noPlayer: true,
+      autoEquip: true,
+    });
+    const pid = restored.addPlayer('warlock', 'Restored', { state });
+
+    expect(restored.petOf(pid, true)?.templateId).toBe('graveguard');
+    expect(
+      [...restored.entities.values()].filter(
+        (entity) => entity.ownerId === pid && entity.templateId === 'necromancy_skeletal_warrior',
+      ),
+    ).toHaveLength(0);
+    expect(restored.serializeCharacter(pid)?.pet?.templateId).toBe('graveguard');
+  });
+
+  it('gives slain temporary undead a bounded corpse lifetime', () => {
+    const sim = makeNecromancer();
+    addSoulFragments(sim as unknown as SimContext, sim.player, 1);
+    finishCast(sim, 'raise_skeletal_warrior');
+    const warrior = ownedUndead(sim).find(isTemporaryUndead);
+    if (!warrior) throw new Error('Expected a temporary undead');
+
+    sim.dealDamage(null, warrior, warrior.maxHp + 1, false, 'physical', null, 'hit');
+    for (let tick = 0; tick < 20 * 4; tick++) sim.tick();
+
+    expect(sim.entities.has(warrior.id)).toBe(false);
+  });
+
+  it('does not inspect the world roster for abilities without Necromancy effects', () => {
+    const ctx = {
+      get entities() {
+        throw new Error('unexpected entity scan');
+      },
+    } as unknown as SimContext;
+
+    expect(necromancyCastError(ctx, {} as Entity, ABILITIES.shadow_bolt)).toBeNull();
+  });
+
+  it('replays the same summon combat deterministically for a fixed seed', () => {
+    const run = () => {
+      const sim = makeNecromancer(17_031);
+      const target = addTarget(sim);
+      addSoulFragments(sim as unknown as SimContext, sim.player, 5);
+      finishCast(sim, 'raise_graveguard');
+      finishCast(sim, 'raise_skeletal_warrior');
+      finishCast(sim, 'raise_bone_mage');
+      drain(sim);
+
+      const events: SimEvent[] = [];
+      for (let tick = 0; tick < 20 * 8; tick++) events.push(...sim.tick());
+
+      return {
+        events,
+        undead: ownedUndead(sim)
+          .sort((a, b) => a.id - b.id)
+          .map((entity) => ({
+            id: entity.id,
+            templateId: entity.templateId,
+            hp: entity.hp,
+            pos: entity.pos,
+            cooldowns: [...entity.cooldowns.entries()],
+            aggroTargetId: entity.aggroTargetId,
+          })),
+        targetHp: target.hp,
+      };
+    };
+
+    expect(run()).toEqual(run());
+  });
+});
+
+function isTemporaryUndead(entity: Entity): boolean {
+  return entity.templateId !== 'graveguard';
+}

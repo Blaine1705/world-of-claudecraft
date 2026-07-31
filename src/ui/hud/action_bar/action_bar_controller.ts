@@ -139,6 +139,7 @@ export class ActionBarController {
 
   syncKnownAbilities(): void {
     const knownAbilityIds = [...this.deps.knownAbilityIds()];
+    const knownAbilityIdSet = new Set(knownAbilityIds);
     const autoPlaceAbilityIds = new Set<string>();
     const consider = (id: string): void => {
       // A passive (Measured Fury) is known but never castable, so it never
@@ -150,7 +151,16 @@ export class ActionBarController {
       if (this.shouldAutoPlaceOnForm(id, this.activeFormState)) autoPlaceAbilityIds.add(id);
     };
     if (this.knownAbilityIdsAtLastSync === null) {
-      if (!this.loadedFromStorage) {
+      const loadedWarlockBarNeedsOverhaulRepair =
+        this.loadedFromStorage &&
+        this.deps.playerClass === 'warlock' &&
+        this.actionState.some(
+          (action) =>
+            action?.type === 'ability' &&
+            ABILITIES[action.id]?.class === 'warlock' &&
+            !knownAbilityIdSet.has(action.id),
+        );
+      if (!this.loadedFromStorage || loadedWarlockBarNeedsOverhaulRepair) {
         for (const id of knownAbilityIds) consider(id);
       }
     } else {
@@ -168,7 +178,7 @@ export class ActionBarController {
     );
     this.actionState = synced.actions;
     if (synced.changed) this.saveActions();
-    this.knownAbilityIdsAtLastSync = new Set(knownAbilityIds);
+    this.knownAbilityIdsAtLastSync = knownAbilityIdSet;
   }
 
   addAbility(abilityId: string): boolean {
