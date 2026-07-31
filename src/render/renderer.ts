@@ -164,7 +164,7 @@ import { FrozenOrbFx } from './frozen_orb_fx';
 import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import { gardenMazeCameraLift } from './garden_maze_core';
-import { buildGatherNodes } from './gather_nodes';
+import { buildGatherNodes, resolveGatherNodePick } from './gather_nodes';
 import {
   GFX,
   type GfxBucketBands,
@@ -237,6 +237,14 @@ import { buildRealmFlora, type RealmFloraView } from './realm_flora';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { buildRiftRankBadge } from './rift_rank';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
+import {
+  captureSceneCensus,
+  createHitchTracker,
+  type HitchSummary,
+  type SceneCensusChild,
+  type SceneCensusHost,
+  type SceneCensusReport,
+} from './scene_census_core';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
@@ -1034,6 +1042,9 @@ function measureFeatureFootprint(root: THREE.Object3D): FeatureFootprint | null 
   return { centerX: center.x, centerZ: center.z, halfX: size.x / 2, halfZ: size.z / 2 };
 }
 
+// Diagnostics-only label (the census buckets and the renderTrace walker read
+// it); NEVER a behavior or visibility gate, so tagging an actionable object
+// (team rings, corpse beacon) can never become a graphics-fairness break.
 function setRenderCategory(obj: THREE.Object3D, category: RenderDiagnosticsCategory): void {
   obj.userData.renderCategory = category;
 }
@@ -1225,6 +1236,22 @@ export class Renderer {
   private drawStats: DrawStatsAccumulator | null = null;
   // Last completed frame's draw delta (what perfStats serves on composer tiers).
   private drawStatsFrame: DrawStatsCounters = { calls: 0, triangles: 0, points: 0, lines: 0 };
+  // Hitch correlation (scene_census_core): fed per frame only while the ?perf
+  // overlay has it enabled, so the fleet pays nothing for it. The sample is a
+  // reused scratch object so the per-frame path stays allocation-free.
+  private readonly hitchTracker = createHitchTracker();
+  private hitchLogEnabled = false;
+  private readonly hitchFrameScratch = {
+    atMs: 0,
+    frameMs: 0,
+    submitMs: 0,
+    programs: 0,
+    textures: 0,
+    createdViews: 0,
+  };
+  // The census burst inflates the following frame's dt; skip that one sample
+  // so the tracker never charges the census to the scene.
+  private hitchSkipNextFrame = false;
   private baseExposure = 1.12; // tone-mapping exposure at brightness 1.0
   private tmpV = new THREE.Vector3();
   private tmpPuff = new THREE.Vector3();
@@ -1888,10 +1915,13 @@ export class Renderer {
     setRenderCategory(this.fish.group, 'fish');
     this.scene.add(this.fish.group);
     this.motes = buildMotes(this.sim.cfg.seed);
+    setRenderCategory(this.motes.group, 'ambient');
     this.scene.add(this.motes.group);
     this.birds = buildBirds(this.sim.cfg.seed);
+    setRenderCategory(this.birds.group, 'ambient');
     this.scene.add(this.birds.group);
     this.impactSite = buildImpactSite(this.sim.cfg.seed);
+    setRenderCategory(this.impactSite.group, 'props');
     this.scene.add(this.impactSite.group);
     this.scene.add(this.impactSite.light);
     const props = buildProps(this.sim.cfg.seed, (delveId) =>
@@ -1931,12 +1961,14 @@ export class Renderer {
     // the fireLights budget (never the cull-toggled group) and its flames join the
     // campfire flicker + ember pass.
     this.valeCupStadium = buildValeCupStadium(this.sim.cfg.seed);
+    setRenderCategory(this.valeCupStadium.group, 'props');
     this.scene.add(this.valeCupStadium.group);
     // The private practice-pitch copy (shown at a far instance origin when the
     // local player is practicing; positioned/toggled by valeCupStadium.update).
+    setRenderCategory(this.valeCupStadium.practiceGroup, 'props');
     this.scene.add(this.valeCupStadium.practiceGroup);
     // The practice skybox (camera-centred; shown only while practicing, driven
-    // in updateAmbience). Category 'sky' so the FX governor treats it like the dome.
+    // in updateAmbience). Category 'sky' groups it with the dome in diagnostics.
     setRenderCategory(this.valeCupSky.mesh, 'sky');
     this.scene.add(this.valeCupSky.mesh);
     for (const light of this.valeCupStadium.lights) {
@@ -1957,6 +1989,7 @@ export class Renderer {
     }
     // Team glow rings under live match fighters (ally/enemy/self readability).
     this.valeCupTeamRings = buildValeCupTeamRings();
+    setRenderCategory(this.valeCupTeamRings.group, 'ui3d');
     this.scene.add(this.valeCupTeamRings.group);
     this.propsView = props;
 
@@ -3083,6 +3116,88 @@ export class Renderer {
     };
   }
 
+  /** Overlay-gated hitch correlation: enabled by the ?perf monitor only. */
+  setHitchLogEnabled(enabled: boolean): void {
+    if (this.hitchLogEnabled && !enabled) this.hitchTracker.reset();
+    this.hitchLogEnabled = enabled;
+  }
+
+  hitchStats(): HitchSummary | null {
+    return this.hitchLogEnabled ? this.hitchTracker.summary() : null;
+  }
+
+  /**
+   * One-shot MEASURED scene census (scene_census_core): per-category draw
+   * calls and triangles via bucket-visibility diffs through the real pipeline
+   * (composer and shadow passes included), plus the shadow pass share via a
+   * frozen-shadow render. On demand only (the ?perf overlay census button and
+   * the capture harness); the burst is excluded from the live draw-stats
+   * delta via discardOutOfBandDraws.
+   */
+  captureSceneCensus(): SceneCensusReport {
+    const info = this.webgl.info;
+    const children: SceneCensusChild[] = [];
+    for (const child of this.scene.children) {
+      // Lights stay untouched: hiding one changes the lighting state hash and
+      // recompiles programs mid-census, which would poison the diffs.
+      if ((child as { isLight?: boolean }).isLight) continue;
+      children.push({
+        category:
+          typeof child.userData.renderCategory === 'string'
+            ? (child.userData.renderCategory as string)
+            : 'unknown',
+        get visible() {
+          return child.visible;
+        },
+        setVisible(visible: boolean) {
+          child.visible = visible;
+        },
+      });
+    }
+    const host: SceneCensusHost = {
+      children: () => children,
+      render: () => {
+        if (this.post) this.post.render();
+        else this.webgl.render(this.scene, this.camera);
+      },
+      counters: () => ({
+        calls: info.render.calls,
+        triangles: info.render.triangles,
+        points: info.render.points,
+        lines: info.render.lines,
+      }),
+      resetCounters: () => info.reset(),
+      countersAutoReset: () => info.autoReset,
+      setCountersAutoReset: (autoReset: boolean) => {
+        info.autoReset = autoReset;
+      },
+      programCount: () => info.programs?.length ?? 0,
+      textureCount: () => info.memory.textures,
+      geometryCount: () => info.memory.geometries,
+      shadowsEnabled: () => this.webgl.shadowMap.enabled,
+      shadowAutoUpdate: () => this.webgl.shadowMap.autoUpdate,
+      setShadowAutoUpdate: (autoUpdate: boolean) => {
+        this.webgl.shadowMap.autoUpdate = autoUpdate;
+      },
+      discardOutOfBand: () => this.discardOutOfBandDraws(),
+    };
+    const p = this.sim.player;
+    try {
+      return captureSceneCensus(host, {
+        atMs: performance.now(),
+        tier: GFX.tier,
+        playerPosition: { x: roundMs(p.pos.x), y: roundMs(p.pos.y), z: roundMs(p.pos.z) },
+        cameraPosition: {
+          x: roundMs(this.camera.position.x),
+          y: roundMs(this.camera.position.y),
+          z: roundMs(this.camera.position.z),
+        },
+      });
+    } finally {
+      this.hitchSkipNextFrame = true;
+    }
+  }
+
   private recordRendererPhase(phase: RendererPhase, ms: number): void {
     if (!Number.isFinite(ms) || ms < 0) return;
     this.phaseSamples[phase].push(Math.min(250, ms));
@@ -4085,13 +4200,14 @@ export class Renderer {
     return Math.max(0, this.webgl.info.memory.textures - before);
   }
 
-  // Composer tiers only: drop an out-of-band render (prewarm pass, screenshot)
-  // from the draw-stats accumulator and zero the WebGL counters so the next
-  // sync() delta covers in-band work only. No-op on every other profile, where
-  // three's per-render auto-reset already isolates passes.
+  // Drop an out-of-band render burst (prewarm pass, screenshot, scene census)
+  // from the perf counters. The zeroing runs on EVERY profile so a synchronous
+  // perfStats() read right after the burst never serves a stale out-of-band
+  // pass (on auto-reset profiles the next live render would also clear it, but
+  // the census harness reads in the same task). The accumulator hand-off is
+  // composer-tiers-only, where the counters run monotonically.
   private discardOutOfBandDraws(): void {
-    if (!this.drawStats) return;
-    this.drawStats.noteOutOfBand(this.webgl.info.render);
+    if (this.drawStats) this.drawStats.noteOutOfBand(this.webgl.info.render);
     this.webgl.info.reset();
   }
 
@@ -5162,6 +5278,7 @@ export class Renderer {
     if (v.group.visible) {
       if (!this.valeCupBallTrail) {
         this.valeCupBallTrail = new ValeCupBallTrail();
+        setRenderCategory(this.valeCupBallTrail.group, 'vfx');
         this.scene.add(this.valeCupBallTrail.group);
       }
       this.valeCupBallTrail.emit(x, y + BALL_RADIUS * e.scale, z, speed, dt);
@@ -5169,6 +5286,7 @@ export class Renderer {
     if (speed > 6 && heightAbove < 0.5 && v.group.visible) {
       if (!this.valeCupBallDust) {
         this.valeCupBallDust = new ValeCupBallDust();
+        setRenderCategory(this.valeCupBallDust.group, 'vfx');
         this.scene.add(this.valeCupBallDust.group);
       }
       this.valeCupBallDust.kick(x, gy, z, dx, dz, dt);
@@ -5181,6 +5299,7 @@ export class Renderer {
     if (prevSpeed < 4 && speed > 13 && heightAbove < 0.7 && v.group.visible) {
       if (!this.valeCupBallDust) {
         this.valeCupBallDust = new ValeCupBallDust();
+        setRenderCategory(this.valeCupBallDust.group, 'vfx');
         this.scene.add(this.valeCupBallDust.group);
       }
       this.valeCupBallDust.burst(x, gy, z);
@@ -5241,6 +5360,7 @@ export class Renderer {
         blending: THREE.AdditiveBlending,
       });
       this.fiestaRing = new THREE.Mesh(geo, mat);
+      setRenderCategory(this.fiestaRing, 'vfx');
       this.scene.add(this.fiestaRing);
     }
     const m = this.fiestaRing;
@@ -5270,6 +5390,7 @@ export class Renderer {
           blending: THREE.AdditiveBlending,
         });
         m = new THREE.Mesh(geo, mat);
+        setRenderCategory(m, 'vfx');
         this.fiestaPowerupMeshes.set(p.id, m);
         this.scene.add(m);
       }
@@ -6266,6 +6387,7 @@ export class Renderer {
             fireLights: this.fireLights,
             lowGfx: this.lowGfx,
           });
+          setRenderCategory(view.group, 'dungeon');
           this.scene.add(view.group);
           this.yumiMazeViews.set(i, view);
         }
@@ -8010,6 +8132,7 @@ export class Renderer {
           });
           this.corpseBeacon = new THREE.Mesh(geo, mat);
           this.corpseBeacon.renderOrder = 2;
+          setRenderCategory(this.corpseBeacon, 'ui3d');
           this.scene.add(this.corpseBeacon);
         }
         this.corpseBeacon.visible = true;
@@ -8280,6 +8403,18 @@ export class Renderer {
       activeViews: this.views.size,
       visibleViews,
     };
+    if (this.hitchLogEnabled && this.hitchSkipNextFrame) {
+      this.hitchSkipNextFrame = false;
+    } else if (this.hitchLogEnabled) {
+      const sample = this.hitchFrameScratch;
+      sample.atMs = afterSubmit;
+      sample.frameMs = Math.min(250, Math.max(0, dt * 1000));
+      sample.submitMs = framePhaseMs.submit;
+      sample.programs = this.webgl.info.programs?.length ?? 0;
+      sample.textures = this.webgl.info.memory.textures;
+      sample.createdViews = createdViews;
+      this.hitchTracker.frame(sample);
+    }
     this.runtimeEntryElapsedMs += Math.min(250, Math.max(0, dt * 1000));
   }
 
@@ -8969,15 +9104,7 @@ export class Renderer {
       -(clientY / this.viewport.height) * 2 + 1,
     );
     this.raycaster.setFromCamera(ndc, this.camera);
-    const hits = this.raycaster.intersectObjects(this.gatherNodeMeshes, true);
-    for (const hit of hits) {
-      let o: THREE.Object3D | null = hit.object;
-      while (o) {
-        if (typeof o.userData.gatherNodeId === 'string') return o.userData.gatherNodeId as string;
-        o = o.parent;
-      }
-    }
-    return null;
+    return resolveGatherNodePick(this.raycaster.intersectObjects(this.gatherNodeMeshes, true));
   }
 
   pick(clientX: number, clientY: number): number | null {
