@@ -465,23 +465,89 @@ describe('permanent-failure cache: what must NOT enter it', () => {
     expect(sent).toEqual(['real', 'other']);
   });
 
-  it('bounds the cache, evicting the oldest subject rather than growing forever', async () => {
-    // A large-guild sweep that 403s on many members would otherwise grow this map
-    // without limit. Driving MAX_FORBIDDEN_ENTRIES real responses is far too slow,
-    // so the bound is proven at a small, injected size using the same code path.
-    const r = rig();
-    const cap = 32;
-    for (let i = 0; i < cap + 10; i++) {
-      await r.governor.run(
+  it('bounds the cache, evicting the OLDEST subject rather than growing forever', async () => {
+    // REGRESSION in the test, not the code. This case used to store 42 subjects
+    // against a real cap of 4096 and assert `42 <= 4096`, which is true of any
+    // implementation at all: deleting the eviction block outright left it green,
+    // so the bound it is named for was pinned by nothing. Its comment claimed the
+    // size was "injected", but MAX_FORBIDDEN_ENTRIES is a module constant with no
+    // seam, so the only honest way to observe the bound is to reach it.
+    // Its own governor rather than `rig()`: filling the cache takes more than
+    // MAX_FORBIDDEN_ENTRIES 403s, and every one of them is a counted invalid
+    // response, so the rig's breaker limit of 50 would open the breaker and
+    // refuse the rest long before the cache ever filled.
+    const clock = syntheticClock();
+    const sent: string[] = [];
+    const governor = new RateGovernor({
+      clock,
+      maxRps: 0,
+      banPauseMs: 60_000,
+      breakerLimit: Number.POSITIVE_INFINITY,
+      forbiddenTtlMs: TTL_MS,
+    });
+
+    const overflow = 5;
+    for (let i = 0; i < MAX_FORBIDDEN_ENTRIES + overflow; i++) {
+      // Ids are built by string interpolation over a small counter, never by
+      // adding to a snowflake-sized literal: past Number.MAX_SAFE_INTEGER the
+      // additions collapse onto a handful of values and the map never grows.
+      await governor.run(
         { method: 'PATCH', path: `/guilds/1/members/${i}`, subjectKey: `g1:u${i}` },
-        r.reply(`m${i}`, 403),
+        async () => {
+          sent.push(`m${i}`);
+          return { status: 403, headers: {}, json: {}, jsonParsed: true } as GovernorResponse;
+        },
       );
     }
-    // Every one of them is remembered here, because the real cap is far above
-    // this loop: the point of the assertion is that the count tracks reality.
-    expect(r.governor.snapshot().forbiddenEntries).toBe(cap + 10);
-    // And the map never exceeds the module's stated bound.
-    expect(r.governor.snapshot().forbiddenEntries).toBeLessThanOrEqual(MAX_FORBIDDEN_ENTRIES);
+    // Every subject really was driven through the insert path.
+    expect(sent.length).toBe(MAX_FORBIDDEN_ENTRIES + overflow);
+
+    // EXACTLY the cap. `toBeLessThanOrEqual` would also hold for a cache that
+    // evicted everything, or that stopped inserting once full.
+    expect(governor.snapshot().forbiddenEntries).toBe(MAX_FORBIDDEN_ENTRIES);
+    // The victims are the oldest subjects, and the newest are still remembered:
+    // an eviction that dropped the most recent entry would suppress nothing and
+    // re-sweep the member who just failed, on every sweep, forever.
+    for (let i = 0; i < overflow; i++) expect(governor.isForbidden(`g1:u${i}`)).toBe(false);
+    expect(governor.isForbidden(`g1:u${overflow}`)).toBe(true);
+    expect(governor.isForbidden(`g1:u${MAX_FORBIDDEN_ENTRIES + overflow - 1}`)).toBe(true);
+  });
+});
+
+describe('permanent-failure cache versus essential traffic', () => {
+  it('refuses an ESSENTIAL request for a cached subject too', async () => {
+    // `essential` buys survival of the invalid-request BREAKER and nothing else.
+    // The permanent-failure cache is a different control: it says this exact
+    // subject answered 401 or 403, which no amount of urgency changes, and
+    // sending anyway would spend invalid-request budget on a call already known
+    // to fail. Nothing pinned that the two controls stay separate, so widening
+    // the cache check to skip essential traffic stayed green.
+    const { governor, sent, reply } = rig();
+
+    await governor.run(
+      { method: 'PATCH', path: MEMBER_ONE, subjectKey: 'g1:u2' },
+      reply('first', 403),
+    );
+
+    const blocked = await blockedBy(
+      governor.run(
+        { method: 'PATCH', path: MEMBER_ONE, subjectKey: 'g1:u2', essential: true },
+        reply('essential', 200),
+      ),
+    );
+    expect(blocked.reason).toBe('forbidden-cached');
+    expect(sent).toEqual(['first']);
+    expect(governor.snapshot().forbiddenBlocks).toBe(1);
+
+    // The contrast arm: essential traffic for an UNCACHED subject still flows, so
+    // the assertion above is about the cache rather than about essential requests
+    // being refused in general.
+    const other = await governor.run(
+      { method: 'PATCH', path: MEMBER_TWO, subjectKey: 'g1:u3', essential: true },
+      reply('other', 204),
+    );
+    expect(other.status).toBe(204);
+    expect(sent).toEqual(['first', 'other']);
   });
 });
 

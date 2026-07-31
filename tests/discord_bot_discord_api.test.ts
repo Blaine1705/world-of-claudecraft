@@ -6,7 +6,12 @@
 // real global fetch and a real setTimeout-backed sleep, which is the arm a broken
 // default parameter would otherwise silently replace.
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { AUDIT_LOG_REASON, DiscordApi, sanitizeAuditReason } from '../bot/discord_api';
+import {
+  AUDIT_LOG_REASON,
+  DiscordApi,
+  governorFromConfig,
+  sanitizeAuditReason,
+} from '../bot/discord_api';
 import {
   DEFAULT_BAN_PAUSE_MS,
   DEFAULT_BREAKER_LIMIT,
@@ -494,6 +499,134 @@ describe('DiscordApi governor wiring', () => {
       'subject previously answered 401 or 403',
     );
     expect(calls.length).toBe(1);
+  });
+});
+
+describe('DiscordApi essential traffic survives an open breaker', () => {
+  /** A governor whose breaker is already open, driven there by counted 401s. */
+  async function openBreakerGovernor(): Promise<RateGovernor> {
+    const { governor } = testGovernor({ breakerLimit: 2 });
+    const { impl } = recordingFetch([
+      fakeResponse({ status: 401, text: 'no' }),
+      fakeResponse({ status: 401, text: 'no' }),
+    ]);
+    const api = new DiscordApi('tok', impl, governor);
+    await expect(api.createMessage('c1', { content: 'a' })).rejects.toThrow('-> 401');
+    await expect(api.createMessage('c2', { content: 'b' })).rejects.toThrow('-> 401');
+    expect(governor.snapshot().breakerState).toBe('open');
+    return governor;
+  }
+
+  // `essential: true` on the three interaction methods had no assertion anywhere:
+  // deleting it from all three left every suite green, while a slash-command
+  // reply would then be refused with 'breaker-open' for the whole quiet window
+  // and the user would see "the application did not respond". The breaker exists
+  // to stop SWEEPS, never a reply on a 3 second deadline.
+  const ESSENTIAL: { name: string; call: (api: DiscordApi) => Promise<void>; path: string }[] = [
+    {
+      name: 'respondInteraction',
+      call: (api) => api.respondInteraction('i1', 'tok1', { content: 'hi' }),
+      path: '/interactions/i1/tok1/callback',
+    },
+    {
+      name: 'deferInteraction',
+      call: (api) => api.deferInteraction('i2', 'tok2', true),
+      path: '/interactions/i2/tok2/callback',
+    },
+    {
+      name: 'editOriginalResponse',
+      call: (api) => api.editOriginalResponse('app1', 'tok3', { content: 'done' }),
+      path: '/webhooks/app1/tok3/messages/@original',
+    },
+  ];
+
+  for (const row of ESSENTIAL) {
+    it(`still dispatches ${row.name} while the breaker is open`, async () => {
+      const governor = await openBreakerGovernor();
+      const { calls, impl } = recordingFetch([fakeResponse({ status: 204 })]);
+      const api = new DiscordApi('tok', impl, governor);
+
+      await row.call(api);
+
+      // Actually reached the network, rather than being refused unsent.
+      expect(calls.length).toBe(1);
+      expect(calls[0].url).toBe(`${API}${row.path}`);
+      expect(governor.snapshot().breakerBlocks).toBe(0);
+    });
+  }
+
+  it('refuses a non-essential member write while the breaker is open', async () => {
+    // The contrast arm. Without it the three cases above would also pass for a
+    // breaker that never refused anything at all.
+    const governor = await openBreakerGovernor();
+    const { calls, impl } = recordingFetch([fakeResponse({ status: 204 })]);
+    const api = new DiscordApi('tok', impl, governor);
+
+    await expect(api.addMemberRole('g1', 'u1', 'r1')).rejects.toThrow(
+      'invalid-request breaker is open',
+    );
+    expect(calls.length).toBe(0);
+    expect(governor.snapshot().breakerBlocks).toBe(1);
+  });
+});
+
+describe('governorFromConfig', () => {
+  it('maps each config knob onto its OWN governor option', async () => {
+    // bot/main.ts calls `main()` at module scope, so nothing in that file is
+    // reachable from a test and the construction site was unpinned: transposing
+    // two knobs, or replacing all four with the DEFAULT_* constants, shipped in
+    // silence. The mapping lives here so it can be observed.
+    //
+    // Every value is distinct, and none is that knob's own default, so a
+    // transposition cannot land on the value it displaced and a dropped option
+    // cannot be masked by the fallback.
+    const config = {
+      maxRps: 1,
+      banPauseMs: 4321,
+      breakerLimit: 2,
+      forbiddenTtlMs: 8765,
+    };
+    expect(config.banPauseMs).not.toBe(DEFAULT_BAN_PAUSE_MS);
+    expect(config.breakerLimit).not.toBe(DEFAULT_BREAKER_LIMIT);
+    expect(config.forbiddenTtlMs).not.toBe(DEFAULT_FORBIDDEN_TTL_MS);
+
+    const governor = governorFromConfig(config);
+
+    // banPauseMs: a non-JSON 429 pauses for exactly the configured interval, and
+    // the log line reports it.
+    const logs: { level: string; message: string; fields: Record<string, string | number> }[] = [];
+    const observed = new RateGovernor({
+      clock: { now: () => 0, sleep: async () => {} },
+      ...config,
+      log: (level, message, fields) => logs.push({ level, message, fields }),
+    });
+    await observed.run({ method: 'GET', path: '/guilds/1/roles' }, async () => ({
+      status: 429,
+      headers: {},
+      jsonParsed: false,
+    }));
+    expect(logs[0].fields.pauseMs).toBe(config.banPauseMs);
+
+    // breakerLimit: the governor built by the factory opens on the 2nd counted
+    // failure, which is the configured limit and not DEFAULT_BREAKER_LIMIT.
+    const { impl } = recordingFetch([
+      fakeResponse({ status: 403, text: 'no' }),
+      fakeResponse({ status: 403, text: 'no' }),
+    ]);
+    const api = new DiscordApi('tok', impl, governor);
+    await expect(api.createMessage('c1', { content: 'a' })).rejects.toThrow('-> 403');
+    expect(governor.snapshot().breakerState).toBe('closed');
+    await expect(api.createMessage('c2', { content: 'b' })).rejects.toThrow('-> 403');
+    expect(governor.snapshot().breakerState).toBe('open');
+
+    // forbiddenTtlMs reached the governor as its own value: the 403 above was on
+    // a subject-less route, so the cache is empty and the TTL is observed through
+    // a fresh factory governor driven by a member write.
+    const ttlGovernor = governorFromConfig(config);
+    const member = recordingFetch([fakeResponse({ status: 403, text: 'no' })]);
+    const ttlApi = new DiscordApi('tok', member.impl, ttlGovernor);
+    await expect(ttlApi.setNickname('g1', 'u1', 'Aran (12)')).rejects.toThrow('-> 403');
+    expect(ttlGovernor.isForbidden('nick:g1:u1')).toBe(true);
   });
 });
 

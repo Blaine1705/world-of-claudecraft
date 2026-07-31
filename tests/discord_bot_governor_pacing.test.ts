@@ -268,6 +268,143 @@ describe('RateGovernor global send-rate cap', () => {
   });
 });
 
+describe('RateGovernor interaction-callback exemption boundary', () => {
+  it('exempts ONLY the /callback suffix, not every POST under /interactions/', async () => {
+    // The suffix half of the test had no arm at all: every interaction fixture in
+    // every suite ends in /callback, so deleting `endsWith('/callback')` left the
+    // whole suite green while handing a blanket global-rate exemption to any
+    // future POST under /interactions/. The exemption is grounded in the callback
+    // endpoint's hard 3 second deadline, which nothing else under that prefix has.
+    const { governor, clock } = makeGovernor(2);
+    const dispatched: { label: string; at: number }[] = [];
+    const send = (label: string) => async (): Promise<GovernorResponse> => {
+      dispatched.push({ label, at: clock.now() });
+      return reply();
+    };
+
+    const calls = [
+      // Exempt: neither waits for a slot nor consumes one.
+      governor.run(
+        { method: 'POST', path: `/interactions/11111111111111111/${INTERACTION_TOKEN}/callback` },
+        send('callback'),
+      ),
+      // NOT exempt: same prefix, no /callback suffix. It takes the first slot.
+      governor.run(
+        { method: 'POST', path: `/interactions/22222222222222222/${INTERACTION_TOKEN}` },
+        send('not-callback'),
+      ),
+      // So this one pays the full 500 ms spacing behind it. Drop the suffix test
+      // and the middle request is exempt too, leaving this at 0.
+      governor.run(
+        { method: 'POST', path: '/channels/33333333333333333/messages' },
+        send('message'),
+      ),
+    ];
+    await clock.runAll();
+    await Promise.all(calls);
+
+    const at = (label: string) => dispatched.find((d) => d.label === label)?.at;
+    expect(at('callback')).toBe(0);
+    expect(at('not-callback')).toBe(0);
+    expect(at('message')).toBe(500);
+  });
+});
+
+describe('RateGovernor bucket identity across major parameters', () => {
+  it('does NOT merge two major parameters that report the SAME bucket hash', async () => {
+    // REGRESSION, and the worst defect the Phase 2 QA round found. Discord
+    // documents X-RateLimit-Bucket as non-inclusive of the top-level (major)
+    // resource, so the hash names a route SHAPE: two channels posted to on the
+    // same route answer with the SAME hash while holding genuinely separate
+    // limits. Keying rate state on the bare hash merged them into one LimitState,
+    // and the bot posts to up to four distinct channel ids through one
+    // createMessage route, so this was live traffic and not a corner case.
+    //
+    // The failure is the one D2 exists to prevent: channel B reporting headroom
+    // overwrote channel A's exhausted window, and A's next post dispatched at
+    // Remaining 0. It also over-throttled in the other direction, letting one
+    // channel's spent window gate every other channel.
+    const { governor, clock } = makeGovernor(1000);
+    const sent: { label: string; at: number }[] = [];
+    const HASH = 'one-route-shape';
+    const send = (label: string, headers: Record<string, string>) => async () => {
+      sent.push({ label, at: clock.now() });
+      return reply(headers);
+    };
+
+    // Channel A reports its bucket exhausted for 10 seconds.
+    const a1 = governor.run(
+      { method: 'POST', path: '/channels/11111111111111111/messages' },
+      send('A1', {
+        'x-ratelimit-bucket': HASH,
+        'x-ratelimit-remaining': '0',
+        'x-ratelimit-reset-after': '10',
+      }),
+    );
+    await clock.runAll();
+    await a1;
+
+    // Channel B is a DIFFERENT bucket instance and says it has headroom.
+    const b1 = governor.run(
+      { method: 'POST', path: '/channels/22222222222222222/messages' },
+      send('B1', {
+        'x-ratelimit-bucket': HASH,
+        'x-ratelimit-remaining': '5',
+        'x-ratelimit-reset-after': '10',
+      }),
+    );
+    await clock.runAll();
+    await b1;
+
+    // Two real buckets, counted as two.
+    expect(governor.snapshot().trackedBuckets).toBe(2);
+
+    // Channel A's own window is still shut, so its next post waits it out. Under
+    // the merged key this went out at 2 ms instead, dispatching at Remaining 0.
+    const a2 = governor.run(
+      { method: 'POST', path: '/channels/11111111111111111/messages' },
+      send('A2', { 'x-ratelimit-bucket': HASH, 'x-ratelimit-remaining': '4' }),
+    );
+    await clock.runAll();
+    await a2;
+
+    expect(sent.map((s) => s.label)).toEqual(['A1', 'B1', 'A2']);
+    expect(sent.map((s) => s.at)).toEqual([0, 1, 10_000]);
+  });
+
+  it('KEEPS merging two templates that share a hash AND a major parameter', async () => {
+    // The complement, so the split above cannot be implemented as "never merge".
+    // Two routes in ONE guild that report one hash really are one bucket, and
+    // separating them would double count a limit they jointly spend.
+    const { governor, clock } = makeGovernor(1000);
+    const HASH = 'one-real-bucket';
+    const send = async (): Promise<GovernorResponse> =>
+      reply({
+        'x-ratelimit-bucket': HASH,
+        'x-ratelimit-remaining': '5',
+        'x-ratelimit-reset-after': '10',
+      });
+
+    const first = governor.run(
+      { method: 'PATCH', path: '/guilds/99887766554433221/members/11223344556677889' },
+      send,
+    );
+    await clock.runAll();
+    await first;
+    const second = governor.run(
+      {
+        method: 'PUT',
+        path: '/guilds/99887766554433221/members/11223344556677889/roles/33445566778899001',
+      },
+      send,
+    );
+    await clock.runAll();
+    await second;
+
+    expect(governor.snapshot().trackedBuckets).toBe(1);
+  });
+});
+
 describe('RateGovernor bucket remap onto the X-RateLimit-Bucket hash', () => {
   it('shares ONE limit state between two provisional routes that return the same hash', async () => {
     // Discord's real buckets do not line up with method-plus-route: several routes

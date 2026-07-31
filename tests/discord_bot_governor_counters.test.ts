@@ -554,6 +554,43 @@ describe('RateGovernor queueDepth gauge', () => {
     expect(after.requests).toBe(3);
   });
 
+  it('reads activeQueues NON-ZERO while queues are live, then drops drained ones', async () => {
+    // activeQueues exists so the queue map's bound is observable at all, but
+    // every assertion on it read 0, which is also what a hard-coded zero returns.
+    // Two DIFFERENT buckets held open at once is the reading that says the gauge
+    // tracks the map: one queue per template, and both dropped on drain.
+    const { governor, clock } = makeGovernor();
+    const gate = deferred<void>();
+    const send = async (): Promise<GovernorResponse> => {
+      await gate.promise;
+      return reply();
+    };
+
+    expect(governor.snapshot().activeQueues).toBe(0);
+
+    const inflight = [
+      governor.run(ROLES, send),
+      governor.run(ROLES, send),
+      governor.run(MESSAGES, send),
+    ];
+    const done = Promise.all(inflight);
+    await clock.advanceBy(0);
+
+    const during = governor.snapshot();
+    // Two templates, so two queues, even though three requests are in flight.
+    expect(during.activeQueues).toBe(2);
+    expect(during.queueDepth).toBe(3);
+
+    gate.resolve();
+    await clock.runAll();
+    await done;
+
+    // Dropped on drain: the map does not keep an entry per template it has ever
+    // seen, which on the per-interaction-id callback path would be one per slash
+    // command for the life of the process.
+    expect(governor.snapshot().activeQueues).toBe(0);
+  });
+
   it('returns queueDepth to 0 when the send callback THROWS, not only when it resolves', async () => {
     // The decrement lives in a finally. Without it one socket failure leaks a
     // permanent unit of depth and the gauge ratchets up for the process's life,
@@ -609,10 +646,12 @@ describe('RateGovernor trackedBuckets and forbiddenEntries gauges', () => {
     expect(governor.snapshot().trackedBuckets).toBe(2);
   });
 
-  it('counts two provisional templates that resolve to ONE bucket hash only once', async () => {
+  it('counts two templates sharing a hash AND a major parameter only once', async () => {
     // The remap onto X-RateLimit-Bucket is what stops a bucket being counted
     // twice. Without it the gauge would report 2 while the two routes actually
     // share one rate window, and the operator would read the wrong denominator.
+    // Both routes are in guild 1, so they share the major parameter too, which
+    // is what makes them one real bucket rather than merely one route shape.
     const { governor, clock } = makeGovernor();
 
     await settle(
@@ -623,12 +662,38 @@ describe('RateGovernor trackedBuckets and forbiddenEntries gauges', () => {
     );
     await settle(
       clock,
-      governor.run(MESSAGES, async () =>
+      governor.run(NICK, async () =>
         reply({ headers: { ...RATE_HEADERS, 'x-ratelimit-bucket': 'one-real-bucket' } }),
       ),
     );
 
     expect(governor.snapshot().trackedBuckets).toBe(1);
+  });
+
+  it('counts a shared hash across DIFFERENT major parameters as TWO buckets', async () => {
+    // The other half, and the one that decides whether the gauge is telling the
+    // truth. Discord documents X-RateLimit-Bucket as NON-inclusive of the major
+    // resource, so guild 1 and channel 9 legitimately answer with the same hash
+    // while holding separate limits. Keying rate state on the bare hash merged
+    // them into one LimitState: channel 9 reporting headroom then erased guild
+    // 1's exhausted window, and the next guild-1 write dispatched at
+    // Remaining 0. The gauge reads 2 because there really are 2.
+    const { governor, clock } = makeGovernor();
+
+    await settle(
+      clock,
+      governor.run(ROLES, async () =>
+        reply({ headers: { ...RATE_HEADERS, 'x-ratelimit-bucket': 'same-shape-hash' } }),
+      ),
+    );
+    await settle(
+      clock,
+      governor.run(MESSAGES, async () =>
+        reply({ headers: { ...RATE_HEADERS, 'x-ratelimit-bucket': 'same-shape-hash' } }),
+      ),
+    );
+
+    expect(governor.snapshot().trackedBuckets).toBe(2);
   });
 
   it('reports live forbidden subjects and drops the one invalidateForbidden names', async () => {

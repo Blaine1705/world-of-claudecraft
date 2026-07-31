@@ -20,6 +20,7 @@ import {
   type GovernorLogLevel,
   type GovernorResponse,
   MAX_ATTEMPTS,
+  MISSING_RETRY_AFTER_MS,
   RateGovernor,
   type RateGovernorOptions,
   type RateLimitScope,
@@ -186,6 +187,179 @@ describe('rate governor retry_after', () => {
 
     expect(slept).toEqual([7000]);
     expect(sentAt).toEqual([0, 7000]);
+  });
+});
+
+describe('rate governor 429 that names no usable wait', () => {
+  it('waits MISSING_RETRY_AFTER_MS when the 429 carries no retry_after anywhere', async () => {
+    // The floor had no assertion at all: setting MISSING_RETRY_AFTER_MS to 0 left
+    // every suite green while restoring the zero-delay retry loop it exists to
+    // prevent. A malformed 429 with no body value and no header must still cost a
+    // full second, not the 1 ms the global pacer alone would charge.
+    const { governor, clock, slept } = governorFixture();
+    const { send, sentAt } = queuedSend(clock, [
+      res({ status: 429, json: { message: 'You are being rate limited.' } }),
+      res({}),
+    ]);
+
+    const pending = governor.run({ method: 'GET', path: '/guilds/1/roles' }, send);
+    await clock.runAll();
+    await pending;
+
+    expect(MISSING_RETRY_AFTER_MS).toBe(1000);
+    expect(slept).toEqual([MISSING_RETRY_AFTER_MS]);
+    expect(sentAt).toEqual([0, 1000]);
+  });
+
+  it('applies the same floor to a retry_after that is PRESENT but zero', async () => {
+    // `retry_after: 0` is not nullish, so it slipped past the absent-value
+    // fallback and produced a 0 ms wait. On an interaction route, which is exempt
+    // from the global rate cap, that is MAX_ATTEMPTS back-to-back sends into a
+    // live limit with nothing pacing them at all.
+    const { governor, clock, slept } = governorFixture();
+    const { send, sentAt } = queuedSend(clock, [
+      res({ status: 429, json: { retry_after: 0 } }),
+      res({}),
+    ]);
+
+    const pending = governor.run({ method: 'GET', path: '/guilds/1/roles' }, send);
+    await clock.runAll();
+    await pending;
+
+    expect(slept).toEqual([MISSING_RETRY_AFTER_MS]);
+    expect(sentAt).toEqual([0, 1000]);
+  });
+
+  it('still honors a genuine SUB-second retry_after rather than rounding it up to the floor', async () => {
+    // The complement, so the floor cannot be implemented as "always wait at least
+    // a second": Discord's sub-second penalties are real and waiting 20x longer
+    // than asked would stall a sweep for no reason. 0.05 s is 50 ms exactly.
+    const { governor, clock, slept } = governorFixture();
+    const { send, sentAt } = queuedSend(clock, [
+      res({ status: 429, json: { retry_after: 0.05 } }),
+      res({}),
+    ]);
+
+    const pending = governor.run({ method: 'GET', path: '/guilds/1/roles' }, send);
+    await clock.runAll();
+    await pending;
+
+    expect(slept).toEqual([50]);
+    expect(slept).not.toContain(MISSING_RETRY_AFTER_MS);
+    expect(sentAt).toEqual([0, 50]);
+  });
+
+  it('does NOT let a short retry_after shorten a longer window the headers reported', async () => {
+    // absorb429 takes the MAX of the window already known and the one this retry
+    // implies. Dropping the max lets a 1 second retry_after overwrite a 60 second
+    // bucket window, and the next dispatch in that bucket goes out 59 seconds
+    // early, into a limit Discord's own headers said was still shut.
+    const { governor, clock } = governorFixture({ maxRps: 0 });
+    const { send, sentAt } = queuedSend(clock, [
+      res({
+        status: 429,
+        headers: { 'x-ratelimit-remaining': '0', 'x-ratelimit-reset-after': '60' },
+        json: { retry_after: 1 },
+      }),
+      res({}),
+    ]);
+
+    const pending = governor.run({ method: 'PATCH', path: '/guilds/1/members/2' }, send);
+    await clock.runAll();
+    await pending;
+
+    // Literals on both sides: the retry waits its own second, then the bucket
+    // gate holds it to the 60 second window.
+    expect(sentAt).toEqual([0, 60_000]);
+  });
+});
+
+describe('rate governor pause re-checks', () => {
+  it('honors a pause EXTENDED while a request is already asleep on it', async () => {
+    // waitForPause is a loop rather than one sleep, because a request already
+    // waiting cannot see a deadline moved out from under it otherwise. The only
+    // way to extend a pause is a request that got past the gate BEFORE the pause
+    // was declared, so one is held open by hand here and answered mid-pause.
+    const { governor, clock } = governorFixture({ maxRps: 0 });
+
+    let release: ((r: GovernorResponse) => void) | null = null;
+    let inflightCalls = 0;
+    const inflight = governor.run(
+      { method: 'POST', path: '/channels/2/messages' },
+      async (): Promise<GovernorResponse> => {
+        if (inflightCalls++ === 0) {
+          return new Promise<GovernorResponse>((resolve) => {
+            release = resolve;
+          });
+        }
+        return res({});
+      },
+    );
+    await clock.advanceBy(0);
+
+    // A global 429 declares a 10 second pause.
+    const firstPause = queuedSend(clock, [
+      res({ status: 429, headers: { 'x-ratelimit-scope': 'global' }, json: { retry_after: 10 } }),
+      res({}),
+    ]);
+    const paused = governor.run({ method: 'GET', path: '/guilds/1/roles' }, firstPause.send);
+    await clock.advanceBy(0);
+    expect(firstPause.sentAt).toEqual([0]);
+
+    // This one goes to sleep on that 10 second deadline.
+    const later = queuedSend(clock, [res({})]);
+    const waiting = governor.run({ method: 'POST', path: '/channels/3/messages' }, later.send);
+
+    // Halfway through it, the held request answers with a much longer global 429,
+    // moving the deadline from 10000 out to 105000.
+    await clock.advanceBy(5000);
+    (release as unknown as (r: GovernorResponse) => void)(
+      res({ status: 429, headers: { 'x-ratelimit-scope': 'global' }, json: { retry_after: 100 } }),
+    );
+
+    await clock.runAll();
+    await Promise.all([inflight, paused, waiting]);
+
+    // A single sleep would have released it at 10000, straight into a pause that
+    // by then had 95 more seconds to run.
+    expect(later.sentAt).toEqual([105_000]);
+  });
+
+  it('re-checks the pause AFTER the bucket gate, not only before it', async () => {
+    // The second waitForPause. A request parked in the bucket gate last looked at
+    // the pause before it was declared, so without the re-check it wakes and
+    // sends into a pause the governor had already announced, which is exactly the
+    // traffic a pause exists to stop.
+    const { governor, clock } = governorFixture({ maxRps: 0 });
+    const GATED = '/guilds/1/members/2';
+
+    const opener = queuedSend(clock, [
+      res({ headers: { 'x-ratelimit-remaining': '0', 'x-ratelimit-reset-after': '10' } }),
+    ]);
+    const first = governor.run({ method: 'PATCH', path: GATED }, opener.send);
+    await clock.advanceBy(0);
+    await first;
+    expect(opener.sentAt).toEqual([0]);
+
+    // The next write in that bucket parks until 10000.
+    const gated = queuedSend(clock, [res({})]);
+    const held = governor.run({ method: 'PATCH', path: GATED }, gated.send);
+
+    // A DIFFERENT bucket is then told to stop process-wide for 60 seconds.
+    await clock.advanceBy(5000);
+    const global429 = queuedSend(clock, [
+      res({ status: 429, headers: { 'x-ratelimit-scope': 'global' }, json: { retry_after: 60 } }),
+      res({}),
+    ]);
+    const other = governor.run({ method: 'GET', path: '/guilds/1/roles' }, global429.send);
+    await clock.advanceBy(0);
+    expect(global429.sentAt).toEqual([5000]);
+
+    await clock.runAll();
+    await Promise.all([held, other]);
+
+    // The bucket reopened at 10000; the pause runs to 65000 and wins.
+    expect(gated.sentAt).toEqual([65_000]);
   });
 });
 

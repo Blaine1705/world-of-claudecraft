@@ -5,8 +5,9 @@
 //
 // Time is the synthetic clock throughout and never vitest fake timers. The
 // governor CAPTURES its clock at construction, so a fake-timer test would not move
-// it at all, and the breaker edge is a strict `<` against a 10 minute window,
-// which a real timer is allowed to fire a hair early on. The virtual clock has
+// it at all, and the breaker ages an entry out at `<= cutoff`, so a failure exactly
+// one 10 minute window old has already left it: a real timer is allowed to fire a
+// hair early, which would make that boundary a coin flip. The virtual clock has
 // neither problem: nothing moves except when a test moves it.
 import { describe, expect, it } from 'vitest';
 import {
@@ -14,7 +15,9 @@ import {
   GovernorBlockedError,
   type GovernorRequest,
   type GovernorResponse,
+  MAX_QUEUE_DEPTH,
   MAX_TRACKED_BUCKETS,
+  MAX_TRACKED_ROUTES,
   RateGovernor,
   type RateGovernorOptions,
 } from '../bot/rate_governor';
@@ -292,6 +295,36 @@ describe('governor breaker open state (D3)', () => {
     snap = rig.governor.snapshot();
     expect(snap.breakerState).toBe('open');
     expect(snap.breakerOpens).toBe(1);
+  });
+
+  it('ages out an entry sitting EXACTLY on the window edge', async () => {
+    // The edge itself, which the drip test above cannot reach: its sends are 20 ms
+    // apart, so every timestamp is already strictly inside or outside and the
+    // comparison at the boundary is never exercised. `maxRps: 0` removes that
+    // spacing, which is the only way two failures can land exactly one window
+    // apart. The rule is `<= cutoff`, so a failure exactly BREAKER_WINDOW_MS old
+    // has left the window.
+    const rig = makeRig({ maxRps: 0, breakerLimit: 2 });
+
+    await call(rig, SWEEP, statusOnly(401));
+    expect(rig.clock.now()).toBe(0);
+    await rig.clock.advanceBy(BREAKER_WINDOW_MS);
+    await call(rig, SWEEP, statusOnly(401));
+    expect(rig.clock.now()).toBe(BREAKER_WINDOW_MS);
+
+    // Two counted failures against a limit of two, and it is still shut: the
+    // first is exactly one window old and no longer counts.
+    expect(rig.governor.snapshot().breakerState).toBe('closed');
+    expect(rig.governor.snapshot().breakerOpens).toBe(0);
+
+    // One millisecond INSIDE the window, so the assertion above cannot be passing
+    // for a breaker that simply stopped counting.
+    const inside = makeRig({ maxRps: 0, breakerLimit: 2 });
+    await call(inside, SWEEP, statusOnly(401));
+    await inside.clock.advanceBy(BREAKER_WINDOW_MS - 1);
+    await call(inside, SWEEP, statusOnly(401));
+    expect(inside.clock.now()).toBe(BREAKER_WINDOW_MS - 1);
+    expect(inside.governor.snapshot().breakerState).toBe('open');
   });
 });
 
@@ -591,8 +624,8 @@ describe('governor registry bounds', () => {
 
     const snap = rig.governor.snapshot();
     // Bounded rather than 600-and-climbing.
-    expect(snap.trackedRoutes).toBeLessThanOrEqual(512);
-    expect(snap.trackedBuckets).toBeLessThanOrEqual(512);
+    expect(snap.trackedRoutes).toBe(MAX_TRACKED_ROUTES);
+    expect(snap.trackedBuckets).toBeLessThanOrEqual(MAX_TRACKED_BUCKETS);
     // Every queue drained, so none are retained.
     expect(snap.activeQueues).toBe(0);
     expect(snap.queueDepth).toBe(0);
@@ -613,6 +646,114 @@ describe('governor registry bounds', () => {
     const before = rig.clock.now();
     await call(rig, SWEEP, OK);
     expect(rig.clock.now() - before).toBeGreaterThanOrEqual(2000);
+  });
+
+  it('keeps the HOT route resolved onto its HASH, not merely gated by its own template', async () => {
+    // The arm that makes the re-insertion line load bearing. The test above
+    // survives turning the LRU back into a plain FIFO, because once the hot
+    // route's mapping is evicted it simply keys its rate state under its own
+    // template, and a write-then-read pair against that template gates exactly
+    // the same way. Nothing observed whether the entry survived at all.
+    //
+    // Reading the state through a SIBLING template closes that: the sibling and
+    // the sweep are one bucket only while BOTH are still resolved onto the hash.
+    // Evict the sweep's mapping and it falls back to its own template, where the
+    // sibling's exhaustion is invisible and it dispatches straight through.
+    const rig = makeRig({ maxRps: 0, breakerLimit: 100_000 });
+    // Same guild as SWEEP, so they share the major parameter and are genuinely
+    // one bucket rather than merely one route shape.
+    const SIBLING: GovernorRequest = { method: 'PUT', path: '/guilds/1/members/2/roles/9' };
+    const SHARED_HASH = 'sweep-and-roles';
+    const hashed = (extra: Record<string, string> = {}): GovernorResponse => ({
+      status: 200,
+      headers: { 'x-ratelimit-bucket': SHARED_HASH, ...extra },
+      json: {},
+      jsonParsed: true,
+    });
+
+    await call(rig, SWEEP, hashed());
+    await call(rig, SIBLING, hashed());
+
+    // Flood the route map well past its bound, re-touching the sweep so it stays
+    // the most recently used entry. Ids are built by concatenation, never by
+    // adding to a literal past Number.MAX_SAFE_INTEGER.
+    for (let i = 0; i < MAX_TRACKED_ROUTES + 100; i++) {
+      if (i % 5 === 0) await call(rig, SWEEP, hashed());
+      const interactionId = `4000000000000000${String(i).padStart(3, '0')}`;
+      await call(
+        rig,
+        { method: 'POST', path: `/interactions/${interactionId}/tok/callback` },
+        {
+          status: 200,
+          headers: { 'x-ratelimit-bucket': `cold-${i}` },
+          json: {},
+          jsonParsed: true,
+        },
+      );
+    }
+    expect(rig.governor.snapshot().trackedRoutes).toBe(MAX_TRACKED_ROUTES);
+
+    // The SIBLING exhausts the shared bucket for 5 seconds.
+    await call(
+      rig,
+      SIBLING,
+      hashed({ 'x-ratelimit-remaining': '0', 'x-ratelimit-reset-after': '5' }),
+    );
+
+    // The sweep must see that exhaustion, which it can only do through the hash.
+    const before = rig.clock.now();
+    await call(rig, SWEEP, hashed());
+    expect(rig.clock.now() - before).toBe(5000);
+  });
+});
+
+describe('half-open probe released by a queue-full refusal', () => {
+  it('frees the probe latch when the probe is refused for a full queue', async () => {
+    // The probe latch is claimed in claimProbe and released in the job's finally,
+    // but a request refused for a FULL QUEUE never reaches that finally: it
+    // throws between the two. The one line that clears the latch on that path had
+    // no test, and without it probeInFlight stays true with no probe in flight,
+    // so every later non-essential request is refused for as long as the process
+    // lives. The breaker would never close again.
+    //
+    // Getting a probe to meet a full queue takes essential traffic: it is the
+    // only kind the open breaker still admits, so it is the only kind that can
+    // fill a queue while the breaker is open.
+    const rig = makeRig({ maxRps: 0 });
+    await openBreaker(rig);
+    await rig.clock.advanceBy(BREAKER_WINDOW_MS);
+
+    const ESSENTIAL_SWEEP: GovernorRequest = { ...SWEEP, essential: true };
+    const held: Promise<GovernorResponse>[] = [];
+    for (let i = 0; i < MAX_QUEUE_DEPTH; i++) {
+      held.push(
+        rig.governor.run(ESSENTIAL_SWEEP, async () => {
+          await rig.clock.sleep(1000);
+          return OK;
+        }),
+      );
+    }
+    // Read before any await: awaiting drains the queue and moves what this pins.
+    expect(rig.governor.snapshot().queueDepth).toBe(MAX_QUEUE_DEPTH);
+
+    // This one claims the breaker's single probe slot, then hits the full queue.
+    const refusedProbe = await rig.governor
+      .run(SWEEP, async () => OK)
+      .catch((e: unknown) => e as GovernorBlockedError);
+    expect(refusedProbe).toBeInstanceOf(GovernorBlockedError);
+    expect((refusedProbe as GovernorBlockedError).reason).toBe('queue-full');
+
+    await rig.clock.runAll();
+    await Promise.all(held);
+    expect(rig.governor.snapshot().queueDepth).toBe(0);
+
+    // The latch was freed, so the NEXT non-essential request becomes the probe
+    // and is actually sent. With the latch still held it is refused instead.
+    const sentBefore = rig.sent.length;
+    const probed = await call(rig, SWEEP, OK);
+    expect(probed.status).toBe(200);
+    expect(rig.sent.length).toBe(sentBefore + 1);
+    expect(rig.governor.snapshot().breakerState).toBe('closed');
   });
 });
 
@@ -646,7 +787,10 @@ describe('bucket registry cap on every insert path', () => {
     }
 
     const snap = rig.governor.snapshot();
-    expect(snap.trackedBuckets).toBeLessThanOrEqual(MAX_TRACKED_BUCKETS);
+    // EXACTLY the cap, not merely under it: `toBeLessThanOrEqual` also passes for
+    // an eviction pass that cleared the whole map, or that evicted far more than
+    // it had to, so the bound would be pinned in one direction only.
+    expect(snap.trackedBuckets).toBe(MAX_TRACKED_BUCKETS);
     // Non-trivial: the loop really did drive hundreds of distinct buckets
     // through the cap rather than collapsing onto a handful of keys.
     expect(snap.rateLimited).toBe(700);
@@ -675,7 +819,9 @@ describe('bucket registry cap on every insert path', () => {
     }
 
     const snap = rig.governor.snapshot();
-    expect(snap.trackedBuckets).toBeLessThanOrEqual(MAX_TRACKED_BUCKETS);
+    // Exactly the cap: an eviction pass that gave up on an all-live population
+    // and one that cleared the map both satisfy a `<=` assertion.
+    expect(snap.trackedBuckets).toBe(MAX_TRACKED_BUCKETS);
     // The window never elapsed, so this really was the all-live population.
     expect(rig.clock.now()).toBeLessThan(100_000_000);
     expect(rig.sent.length).toBe(700);
