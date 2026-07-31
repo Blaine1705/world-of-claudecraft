@@ -265,6 +265,14 @@ because dropping the one word is otherwise silent),
     query" is true of `bot/discord_api.ts` today but is a fact about the CALLERS, not a
     property of `redactPath`, so it stops being true the moment a phase adds a query
     parameter. Whichever phase adds one owns redacting it.
+- Ruled-acceptable residuals from PHASE 3, same footing as the Phase 2 ones below: the
+  `clearArmed()` inside `LoopTask.kick()` and the `if (this.active) return` guard in
+  `start()` both survive deletion and cannot be killed by any assertion. `schedule()` clears
+  the previously armed handle before arming the next, and the overlap guard absorbs a stale
+  timer that fires during a slow run, so both lines are defense in depth rather than load
+  bearing. They are kept because each is locally correct on its own terms; the test comments
+  say so explicitly rather than claiming coverage they do not have. Do not score either as a
+  surviving mutant.
 - Ruled-acceptable residuals, do NOT "fix" either and do not score either as a surviving
   mutant. Neither can be distinguished by any assertion, so a test for them is impossible
   rather than merely missing:
@@ -624,6 +632,17 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   are unreachable from any test, because `main.ts` calls `main()` at module scope. If a
   later phase needs them pinned, extract them into a sibling module first (the same move
   R6 made for the cadences); do not add a source-text pin.
+
+### Found during the Phase 3 review round (2026-07-31), OPEN
+
+- L13 (nice-to-have, retries, OPEN, natural home Phase 7 with the other supervision work):
+  a PERMANENTLY rejected nickname PATCH now retries every sweep forever with no backoff, and
+  after D5 it is the only remaining steady-state write. The governor's permanent-failure
+  cache covers 401 and 403 only, so a 400 (a computed nick Discord will never accept, an
+  over-long name after an unusual base) is retried indefinitely. Pre-existing, but D5 is what
+  made it the visible residue rather than one write among many. The fix shape is either
+  caching non-retryable 4xx per subject the way 401/403 already are, or a per-member failure
+  counter; both are governor surface, which Phase 2 owns and a QA round should not rewrite.
 
 ## Known gotchas for implementers
 

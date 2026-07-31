@@ -526,6 +526,9 @@ per reconnect, and it makes the push more correct (the previous code published w
 index happened to be resolved). Everything else is cadence-only: which function runs and what
 it does are unchanged.
 
+The deviation also applies to the op 8 backfill-complete kick, not only to GUILD_CREATE:
+both target the same paired task, so both now refresh the special roles first.
+
 A second, smaller deviation, on the error path: the roster push now STOPS at the first
 batch the server refuses instead of attempting the rest. Previously `call()` returned null
 and the loop carried on, spending a request per remaining batch against a server that had
@@ -548,5 +551,44 @@ its active one, so nothing observed the backoff through the driver at all; and t
 burst test stopped at the first deadline, so a kick that armed a SECOND timer rather than
 folding into the open window still passed. Both are now covered and the re-run is 15/15.
 
-Validation: `npx tsc --noEmit` clean, 413 bot tests green across 15 files, `npm run build:bot`
+Review round (qa-checklist plus test-coverage-auditor, both dispatched fresh). No blocking
+finding on the invariants; two BLOCKING coverage gaps and two real defects, all fixed here
+rather than carried.
+
+The defects. Suppressing the echo removed the thing that used to carry a bot-driven rename
+into the game: the members-meta `name` is player visible (the server stores it and
+`server/game.ts` emits it as the in-world nameplate), so a level-up would have shown the old
+level for up to a whole role-sync interval. A successful PATCH now pushes that member
+immediately, diff-guarded, so it is exactly one push and cannot re-open the echo loop. And
+`pushMembersMeta` answered the TRUTHY `{ updated: 0 }` for the server's over-cap silent drop,
+so the new diff would have marked a dropped batch clean; before diffing, the wholesale
+re-push healed that within one interval, and now it would have persisted for the life of the
+process. It reports the drop as a failure, and the callers treat `undefined` as a refusal too
+(`call` returns `env.data` verbatim, so a body with no data arrives as undefined).
+
+The coverage gaps. `bot/main.ts` had 205 changed lines, no test and no guard, so the packet's
+headline invariant was enforced only by a sentence in a CLAUDE.md;
+`tests/discord_bot_main_wiring.test.ts` is now a structural source pin over the
+comment-stripped file (no repeating timer, exactly seven registrations each reading its own
+D13 config field, tasks started before the gateway connects), which also closes D13 end to
+end. And the repeating-mode IDLE kick, the path GUILD_CREATE actually uses, had no driver
+coverage at all: every kick in the suite landed mid-run or after stop.
+
+A THIRD deviation the review found, now recorded rather than claimed away: the debounce
+follow-up window opens at run SETTLE, where the `presenceTimer` it replaces armed from EVENT
+time. A push that takes 2 s therefore delays the follow-up by 2 s more than before. It is
+kept, because guaranteeing a full quiet window BETWEEN pushes is the anti-storm direction,
+but the test could not tell the two apart (it resolved its gate before advancing, so both
+semantics gave the same number) and the code comment claimed exact reproduction. Both fixed.
+
+Second mutation round: 17 mutants over the review-round code and tests, 13 killed. Of the
+four survivors, one was DEAD CODE (an inner upper clamp in `nextIntervalMs` that the return's
+own cap already subsumed, now deleted: an unkillable line is either dead or untested), two
+were equivalent mutants whose test comments overclaimed (the `clearArmed()` inside `kick()`
+and the double-start guard are both defense in depth, since `schedule()` re-clears and the
+overlap guard absorbs a stale timer; the comments now say what the assertions establish), and
+one was a genuine gap in the new drained-queue identity test, which released every request
+from one shared gate and so never reached the moment the guard exists for.
+
+Validation: `npx tsc --noEmit` clean, 444 bot tests green across 16 files, `npm run build:bot`
 bundles, `npm run ci:changed` exits 0 with zero warnings in the touched files.
