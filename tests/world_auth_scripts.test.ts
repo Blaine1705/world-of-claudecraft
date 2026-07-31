@@ -48,9 +48,10 @@ const AUTHENTICATED_NODE_CLIENTS = [
   {
     // The phase 16 professions load rig; the spread carries the optional
     // stable timer-wire capability (STABLE=1) next to the shared auth shape.
+    // The literal is the biome-wrapped form, whitespace-normalized.
     path: 'scripts/load_professions.mjs',
     authSend:
-      'this.ws.send(JSON.stringify({ ...worldAuthMessage(this.token, this.characterId), ...authExtra }));',
+      'this.ws.send( JSON.stringify({ ...worldAuthMessage(this.token, this.characterId), ...authExtra }), );',
   },
   {
     path: 'scripts/mob_stall_repro.mjs',
