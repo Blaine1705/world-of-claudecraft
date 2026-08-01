@@ -697,6 +697,10 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     // processes that will actually boot. The env literal itself now lives in
     // server/realm.ts where the directory is parsed.
     expect(dbCode).toContain('const configuredRealmCount = REALM_DIRECTORY.length');
+    // And the OTHER half of the chain, so the whole REALMS -> REALM_DIRECTORY
+    // -> configuredRealmCount derivation stays pinned end to end: the env
+    // literal must still feed the directory parser where it now lives.
+    expect(codeOnly(read('server/realm.ts'))).toContain('parseRealms(process.env.REALMS)');
     const warnStart = dbCode.indexOf('if (configuredRealmCount * DB_POOL_MAX_CLIENTS >');
     expect(warnStart).toBeGreaterThan(-1);
     const warnBranch = dbCode.slice(warnStart, dbCode.indexOf('\n}', warnStart));

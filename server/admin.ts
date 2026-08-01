@@ -2289,8 +2289,10 @@ async function restoreSlotHandler(ctx: Ctx): Promise<void> {
     if (result === 'already_slotted') {
       return fail(ctx.res, 400, 'that profession already has a slotted effect');
     }
-    // Reachable past body validation: the pair-validity rule (which effects a
-    // profession accepts) lives with the sim, not the body check.
+    // Defense-in-depth only since the phase 18 close: restoreSlotBodyError
+    // now runs the same pure pair-validity policy BEFORE the audit write, so
+    // this arm is reachable only if the validator and the sim action ever
+    // disagree (a content change landing between the two checks).
     if (result === 'invalid_request') {
       return fail(ctx.res, 400, 'that effect cannot be slotted on that profession');
     }

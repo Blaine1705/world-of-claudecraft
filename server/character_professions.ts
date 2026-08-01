@@ -295,8 +295,10 @@ export function restoreItemBodyError(body: { itemId?: unknown; count?: unknown }
 }
 
 /** Validate a restore-slot request body, same contract as
- *  restoreItemBodyError: pre-audit refusal in English prose, runtime
- *  re-checks defensively (the sim action owns the pair-validity rule). */
+ *  restoreItemBodyError: pre-audit refusal in English prose. The STATIC
+ *  pair-validity policy is checked here too (co-owned with the sim action,
+ *  which re-checks defensively); only runtime state (online, tool owned,
+ *  already slotted) stays with the action. */
 export function restoreSlotBodyError(body: {
   professionId?: unknown;
   effectId?: unknown;

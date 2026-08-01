@@ -10253,11 +10253,10 @@ export class Hud {
           // single-surface rule: no toast, no extra sound cue). Unknown ids
           // render raw rather than crash, the stale-content doctrine: a
           // yet-unknown effect id still names itself legibly.
-          // hasOwn, not a bare index: the deny arms echo the SENDER's own
-          // command strings back as these ids, so a hand-built frame naming
-          // 'constructor' would otherwise resolve a prototype member and
-          // hand a non-key to t(). Matches the view core's guard on the same
-          // tables.
+          // The shared hasOwn-safe getters enforce the prototype-key rule:
+          // the deny arms echo the SENDER's own command strings back as
+          // these ids, so a bare index on a frame naming 'constructor' would
+          // resolve a prototype member and hand a non-key to t().
           const effectKey = ev.effectId !== undefined ? toolEffectNameKey(ev.effectId) : undefined;
           const effectName = effectKey ? t(effectKey) : (ev.effectId ?? '');
           const professionKey = gatheringProfessionNameKey(ev.professionId);

@@ -209,7 +209,10 @@ describe('server prose coupling (the count clamp and the error reverse map)', ()
       .map((m) => m[0])
       .join(' ');
     const proses = [...new Set([...validators.matchAll(/return '([^']+)'/g)].map((m) => m[1]))];
-    expect(proses.length).toBeGreaterThan(2); // the scan itself must be alive
+    // Floor just under the real count (4 distinct proses today, the phase 18
+    // pair-validity refusal included), the same doctrine as the admin scan
+    // above: a scan that silently stops resolving one prose fails HERE.
+    expect(proses.length).toBeGreaterThan(3);
     for (const prose of proses) {
       expect(
         ADMIN_ERROR_KEYS[prose.toLowerCase()],
