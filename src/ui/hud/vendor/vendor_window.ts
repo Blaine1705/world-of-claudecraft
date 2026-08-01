@@ -11,7 +11,7 @@ import type { ItemInstancePayload } from '../../../sim/types';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
-import { GATHERING_PROFESSION_NAME_KEYS } from '../../gathering_profession_name';
+import { gatheringProfessionNameKey } from '../../gathering_profession_name';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
@@ -69,7 +69,7 @@ function goodsPriceText(price: VendorPrice): string {
 function requirementText(row: VendorGoodsRow): string {
   const requirement = row.requirement;
   if (!requirement) return '';
-  const nameKey = GATHERING_PROFESSION_NAME_KEYS[requirement.professionId];
+  const nameKey = gatheringProfessionNameKey(requirement.professionId);
   if (nameKey === undefined) return '';
   return t('hudChrome.crafting.skillReqLine', {
     craft: t(nameKey),

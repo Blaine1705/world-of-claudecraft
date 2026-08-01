@@ -1218,6 +1218,9 @@ export class Hud {
   private errorTimer: number | undefined;
   private lastMirroredErrorText: string | undefined;
   private bannerTimer: number | undefined;
+  // The hideBannerImmediately re-arm's own handle, kept so repeat hides
+  // replace the pending re-arm instead of stacking one leaked timer each.
+  private bannerHideRearmTimer: number | undefined;
   // R38: the banner slot's scheduler (celebrations queue, ambient replaces;
   // the pure policy lives in banner_queue.ts, this class owns the timers).
   // Lazily created: several test harnesses build a bare Hud prototype
@@ -12719,8 +12722,12 @@ export class Hud {
     // Re-arm the advance ourselves (the fix-round review): the takeover
     // caller paints its own ambient right after, whose paint clears this
     // timer, but a future caller that hides WITHOUT showing must not leave
-    // surviving celebrations waiting on an unrelated banner.
-    window.setTimeout(() => {
+    // surviving celebrations waiting on an unrelated banner. The handle is
+    // kept so a second hide inside the gap replaces the pending re-arm
+    // rather than stacking another.
+    clearTimeout(this.bannerHideRearmTimer);
+    this.bannerHideRearmTimer = window.setTimeout(() => {
+      this.bannerHideRearmTimer = undefined;
       if (this.bannerTimer === undefined && this.bannerSource === null) this.advanceBannerSlot();
     }, BANNER_ADVANCE_GAP_MS);
     clearTimeout(this.bannerTimer);

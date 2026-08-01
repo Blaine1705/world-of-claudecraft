@@ -397,9 +397,14 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
       'src/ui/hud/vendor/vendor_window.ts',
     ]) {
       const source = withoutComments(file);
-      expect(source.includes('GATHERING_PROFESSION_NAME_KEYS'), `${file} consumes the table`).toBe(
-        true,
-      );
+      // Either spelling reads the ONE shared table: the raw map (behind an
+      // Object.hasOwn guard at the call site) or the hasOwn-safe getter the
+      // whole-branch review extracted beside it.
+      expect(
+        source.includes('GATHERING_PROFESSION_NAME_KEYS') ||
+          source.includes('gatheringProfessionNameKey('),
+        `${file} consumes the table`,
+      ).toBe(true);
       expect(source.includes("hudChrome.gathering.mining'"), `${file} has no private copy`).toBe(
         false,
       );

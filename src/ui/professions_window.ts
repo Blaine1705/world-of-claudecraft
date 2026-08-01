@@ -721,7 +721,11 @@ export class ProfessionsWindow {
    *  toolEffectResult can answer. */
   private armSentGuard(button: HTMLElement): void {
     button.dataset.sent = '1';
-    setTimeout(() => {
+    // Spelled window.setTimeout so the host reach is visible to the
+    // architecture sweep (UI_HOST_GLOBALS scans window.*, not bare timers),
+    // which puts this module back on the UI_DOM_MODULES ledger instead of
+    // arming a real host timer from the "reaches no host" bucket.
+    window.setTimeout(() => {
       if (button.isConnected) delete button.dataset.sent;
     }, SENT_GUARD_REARM_MS);
   }

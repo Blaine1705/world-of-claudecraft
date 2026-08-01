@@ -27,7 +27,7 @@ import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
 import { dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
-import { GATHERING_PROFESSION_NAME_KEYS } from './gathering_profession_name';
+import { gatheringProfessionNameKey } from './gathering_profession_name';
 import { buildGatheringProficiencyRows } from './gathering_view';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
@@ -271,7 +271,7 @@ export class CharWindow {
     const rows = buildGatheringProficiencyRows(world);
     const items = rows
       .map((r) => {
-        const key = GATHERING_PROFESSION_NAME_KEYS[r.professionId];
+        const key = gatheringProfessionNameKey(r.professionId);
         if (key === undefined) return '';
         const imageUrl = professionImageUrl(`gather_${r.professionId}`);
         const icon = imageUrl

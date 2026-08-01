@@ -1137,10 +1137,12 @@ const UI_DOM_MODULES = [
   'src/ui/proc_overlay_drag.ts',
   'src/ui/profession_identity_card.ts',
   'src/ui/profession_tutorial_window.ts',
-  // professions_window.ts is deliberately ABSENT: its only browser-global
-  // reach was a hand-rolled document.activeElement read, and moving that onto
-  // the shared focus_restore.ts seam left it host-free, so the default bucket
-  // scans it now.
+  // professions_window.ts is BACK on the ledger: the focus_restore move left
+  // it host-free for a while, but armSentGuard's one-shot re-arm timer is a
+  // real host reach, now spelled window.setTimeout so this sweep can see it
+  // (a bare setTimeout sat in the sweep's blind spot, the whole-branch
+  // review's note).
+  'src/ui/professions_window.ts',
   'src/ui/reconnect_overlay.ts',
   'src/ui/settings_controls.ts',
   'src/ui/social_window.ts',

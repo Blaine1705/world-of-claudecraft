@@ -21,3 +21,13 @@ export const GATHERING_PROFESSION_NAME_KEYS: Record<string, TranslationKey> = {
   herbalism: 'hudChrome.gathering.herbalism',
   fishing: 'hudChrome.gathering.fishing',
 };
+
+/** hasOwn-safe read of the table above: the map is a plain object literal, so
+ *  a bare bracket read of a prototype key ('constructor') would resolve a
+ *  function instead of undefined. Callers treat undefined as "render no
+ *  name"; use this getter rather than indexing the table directly. */
+export function gatheringProfessionNameKey(professionId: string): TranslationKey | undefined {
+  return Object.hasOwn(GATHERING_PROFESSION_NAME_KEYS, professionId)
+    ? GATHERING_PROFESSION_NAME_KEYS[professionId]
+    : undefined;
+}

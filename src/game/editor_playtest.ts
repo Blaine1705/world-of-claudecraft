@@ -1,4 +1,3 @@
-import { WORLD_SEED } from '../sim/world_seed';
 // Game-side reader for an editor play-test handoff. The map editor (its own
 // entry at /editor) serializes a custom world into sessionStorage and navigates
 // to the game page; this reads it back so the OFFLINE boot can run that world.
@@ -11,6 +10,7 @@ import { WORLD_SEED } from '../sim/world_seed';
 // malformed blob yields null and the normal start screen runs instead.
 
 import type { PlayerClass, WorldContent } from '../sim/types';
+import { WORLD_SEED } from '../sim/world_seed';
 
 export const EDITOR_PLAYTEST_KEY = 'woc_editor_playtest';
 

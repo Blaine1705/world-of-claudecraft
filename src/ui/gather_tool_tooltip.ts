@@ -27,7 +27,7 @@ import { isGatherToolUse } from '../sim/professions/tools';
 import { wieldRequirementForTier } from '../sim/professions/wield_gate';
 import type { ItemDef } from '../sim/types';
 import { esc } from './esc';
-import { GATHERING_PROFESSION_NAME_KEYS } from './gathering_profession_name';
+import { gatheringProfessionNameKey } from './gathering_profession_name';
 import { formatNumber, type TranslationKey, t } from './i18n';
 
 const KIND_KEYS: Record<GatheringProfessionId, TranslationKey> = {
@@ -133,7 +133,7 @@ export function gatherToolTooltipLines(item: ItemDef): string {
   // (professions/wield_gate.ts). Land tools only by construction: rods are
   // R22-exempt and their branch returned above, and tier 1 reads 0.
   const wieldReq = wieldRequirementForTier(use.tier);
-  const professionNameKey = GATHERING_PROFESSION_NAME_KEYS[use.professionId];
+  const professionNameKey = gatheringProfessionNameKey(use.professionId);
   // No printable profession name means no line, matching requirementText in
   // the vendor painter: a fallback through the KIND keys would render
   // "Requires Mining tool 40", a wrong sentence rather than a missing one.
