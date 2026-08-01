@@ -4,20 +4,40 @@
  * Does not call real BuildPatchTool or network.
  */
 import { describe, expect, it } from 'vitest';
-import {
-  DEFAULT_APP_LAUNCH,
-  DEFAULT_BUILD_ROOTS,
-  missingBptEnv,
-  parseArgs,
-  REQUIRED_ENV_KEYS,
-  redactArgsForLog,
-  resolveUploadPlan,
-  runCli,
-} from '../scripts/epic-bpt-upload.mjs';
+// @ts-expect-error untyped zero-dependency ops tool (scripts/*.mjs convention)
+import * as rawBpt from '../scripts/epic-bpt-upload.mjs';
+
+type BptHelpers = {
+  DEFAULT_APP_LAUNCH: { win: string; mac: string };
+  DEFAULT_BUILD_ROOTS: { win: string; mac: string };
+  REQUIRED_ENV_KEYS: readonly string[];
+  missingBptEnv: (env: NodeJS.ProcessEnv) => string[];
+  parseArgs: (argv: string[]) => { help?: boolean; dryRun?: boolean; errors: string[] };
+  resolveUploadPlan: (opts: {
+    os: string;
+    buildVersion: string;
+    env: NodeJS.ProcessEnv;
+    repoRoot: string;
+  }) => { bptArgs: string[] };
+  redactArgsForLog: (args: string[]) => string[];
+  runCli: (
+    argv: string[],
+    opts: {
+      env: NodeJS.ProcessEnv;
+      log?: (s: string) => void;
+      error?: (s: string) => void;
+      repoRoot?: string;
+      execBpt?: () => { status: number };
+    },
+  ) => number;
+};
+
+// Narrow the untyped script surface so noImplicitAny stays green under tsc.
+const bpt = rawBpt as BptHelpers;
 
 describe('epic-bpt-upload helpers', () => {
   it('lists every required env key (ops BPT family, not server EPIC_CLIENT_SECRET alone)', () => {
-    expect(REQUIRED_ENV_KEYS).toEqual([
+    expect(bpt.REQUIRED_ENV_KEYS).toEqual([
       'EPIC_BPT_BIN',
       'EPIC_BPT_ORGANIZATION_ID',
       'EPIC_BPT_PRODUCT_ID',
@@ -29,35 +49,35 @@ describe('epic-bpt-upload helpers', () => {
   });
 
   it('missingBptEnv reports all empty keys and none when provisioned', () => {
-    expect(missingBptEnv({})).toEqual(REQUIRED_ENV_KEYS);
-    expect(missingBptEnv({ EPIC_BPT_BIN: '  ' })).toContain('EPIC_BPT_BIN');
+    expect(bpt.missingBptEnv({})).toEqual(bpt.REQUIRED_ENV_KEYS);
+    expect(bpt.missingBptEnv({ EPIC_BPT_BIN: '  ' })).toContain('EPIC_BPT_BIN');
     const full: NodeJS.ProcessEnv = {};
-    for (const k of REQUIRED_ENV_KEYS) full[k] = `x-${k}`;
-    expect(missingBptEnv(full)).toEqual([]);
+    for (const k of bpt.REQUIRED_ENV_KEYS) full[k] = `x-${k}`;
+    expect(bpt.missingBptEnv(full)).toEqual([]);
   });
 
   it('parseArgs accepts help and dry-run without os', () => {
-    expect(parseArgs(['--help']).help).toBe(true);
-    expect(parseArgs(['--dry-run', '--os', 'win', '--build-version', '1']).dryRun).toBe(true);
+    expect(bpt.parseArgs(['--help']).help).toBe(true);
+    expect(bpt.parseArgs(['--dry-run', '--os', 'win', '--build-version', '1']).dryRun).toBe(true);
   });
 
   it('parseArgs rejects linux and unknown flags', () => {
-    const linux = parseArgs(['--os', 'linux', '--build-version', '1']);
+    const linux = bpt.parseArgs(['--os', 'linux', '--build-version', '1']);
     expect(linux.errors.some((e) => /linux/i.test(e))).toBe(true);
-    const bad = parseArgs(['--upload-prod']);
+    const bad = bpt.parseArgs(['--upload-prod']);
     expect(bad.errors.length).toBeGreaterThan(0);
   });
 
   it('default BuildRoots are loose release-epic dir trees only', () => {
-    expect(DEFAULT_BUILD_ROOTS.win).toContain('release-epic');
-    expect(DEFAULT_BUILD_ROOTS.win).toContain('win-unpacked');
-    expect(DEFAULT_BUILD_ROOTS.mac).toContain('mac-universal');
-    expect(DEFAULT_APP_LAUNCH.win).toMatch(/\.exe$/);
-    expect(DEFAULT_APP_LAUNCH.mac).toContain('.app');
+    expect(bpt.DEFAULT_BUILD_ROOTS.win).toContain('release-epic');
+    expect(bpt.DEFAULT_BUILD_ROOTS.win).toContain('win-unpacked');
+    expect(bpt.DEFAULT_BUILD_ROOTS.mac).toContain('mac-universal');
+    expect(bpt.DEFAULT_APP_LAUNCH.win).toMatch(/\.exe$/);
+    expect(bpt.DEFAULT_APP_LAUNCH.mac).toContain('.app');
   });
 
   it('resolveUploadPlan uses ClientSecretEnvVar never inline secret value', () => {
-    const plan = resolveUploadPlan({
+    const plan = bpt.resolveUploadPlan({
       os: 'win',
       buildVersion: '0.1.0-windows',
       env: {
@@ -81,7 +101,7 @@ describe('epic-bpt-upload helpers', () => {
 
   it('redactArgsForLog strips inline ClientSecret assignments', () => {
     expect(
-      redactArgsForLog(['-ClientSecret=abc', '-ClientSecretEnvVar=EPIC_BPT_CLIENT_SECRET']),
+      bpt.redactArgsForLog(['-ClientSecret=abc', '-ClientSecretEnvVar=EPIC_BPT_CLIENT_SECRET']),
     ).toEqual(['-ClientSecret=<redacted>', '-ClientSecretEnvVar=EPIC_BPT_CLIENT_SECRET']);
   });
 });
@@ -89,7 +109,7 @@ describe('epic-bpt-upload helpers', () => {
 describe('epic-bpt-upload runCli', () => {
   it('--help exits 0 without credentials', () => {
     const lines: string[] = [];
-    const code = runCli(['--help'], {
+    const code = bpt.runCli(['--help'], {
       env: {},
       log: (s) => lines.push(s),
       error: (s) => lines.push(s),
@@ -101,7 +121,7 @@ describe('epic-bpt-upload runCli', () => {
 
   it('fails closed with exit 1 when credentials missing', () => {
     const errs: string[] = [];
-    const code = runCli(['--os', 'win', '--build-version', '1.0.0'], {
+    const code = bpt.runCli(['--os', 'win', '--build-version', '1.0.0'], {
       env: {},
       log: () => {},
       error: (s) => errs.push(s),
@@ -114,14 +134,14 @@ describe('epic-bpt-upload runCli', () => {
 
   it('refuses missing --os / --build-version with exit 2', () => {
     expect(
-      runCli([], {
+      bpt.runCli([], {
         env: {},
         log: () => {},
         error: () => {},
       }),
     ).toBe(2);
     expect(
-      runCli(['--os', 'win'], {
+      bpt.runCli(['--os', 'win'], {
         env: {},
         log: () => {},
         error: () => {},
@@ -132,7 +152,7 @@ describe('epic-bpt-upload runCli', () => {
   it('dry-run works without secrets and never spawns BPT', () => {
     const lines: string[] = [];
     let spawned = false;
-    const code = runCli(['--dry-run', '--os', 'win', '--build-version', '1.0.0-test'], {
+    const code = bpt.runCli(['--dry-run', '--os', 'win', '--build-version', '1.0.0-test'], {
       env: {},
       repoRoot: '/tmp',
       execBpt: () => {
@@ -150,11 +170,11 @@ describe('epic-bpt-upload runCli', () => {
 
   it('real upload path fails closed before spawn when bin missing', () => {
     const full: NodeJS.ProcessEnv = {};
-    for (const k of REQUIRED_ENV_KEYS) full[k] = `/nonexistent-${k}`;
+    for (const k of bpt.REQUIRED_ENV_KEYS) full[k] = `/nonexistent-${k}`;
     full.EPIC_BPT_BIN = '/nonexistent/BuildPatchTool';
     full.EPIC_BPT_CLOUD_DIR = '/tmp';
     let spawned = false;
-    const code = runCli(['--os', 'win', '--build-version', '1.0.0-test'], {
+    const code = bpt.runCli(['--os', 'win', '--build-version', '1.0.0-test'], {
       env: full,
       repoRoot: '/tmp',
       execBpt: () => {
