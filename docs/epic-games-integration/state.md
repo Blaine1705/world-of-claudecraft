@@ -1,6 +1,6 @@
 # State: Epic Games Store integration (cross-phase cheat sheet)
 
-Current phase: Phase 6 complete. Next: Phase 7 (Client UI + i18n).
+Current phase: Phase 7 complete. Next: Phase 8 (Ops docs + BPT runbook).
 
 Read this first in every session. Locked decisions below override memory and
 ad-hoc invention. Research background: `research-brief.md`.
@@ -175,6 +175,10 @@ Client:
     reconcile-on-link/login, link cache, injectable deps, `stopEpicMirror`);
     `web_api.pushAchievementUnlocks` (O2 server-trusted path); dual fan-out
     from `deeds_records.ts` + `game.ts` login + `main.ts` shutdown
+  - Phase 7: `src/ui/epic_link.ts` (advert + shell capability gate; twin of
+    `steam_link.ts`); client API helpers on `Api` (`epicAdvert`, `epicStatus`,
+    `epicLink`, `unlinkEpic`); markup `#cs-epic-group` in `index.html` and
+    `play.html`; thin wire in `src/main.ts` (same refresh lifecycle as Steam)
 - Tests:
   - epic pins in `tests/electron_desktop_config.test.ts` and full epic
     packaging pins in `tests/electron_builder_config.test.ts`
@@ -190,6 +194,24 @@ Client:
     `tests/epic_achievement_map.test.ts`, unlock pins in
     `tests/server/epic_web_api.test.ts`; dual fan-out pins in
     `tests/deed_records.test.ts` and `tests/deeds_reconcile.test.ts`
+  - Phase 7: `tests/epic_link.test.ts` (advert/auth/capability matrix,
+    linked/unlinked, link/unlink error flash, settle signal, double-click
+    latch), `tests/epic_link_markup.test.ts` (index/play parity + data-i18n
+    keys); `UI_DOM_MODULES` pin for `src/ui/epic_link.ts`
+- Client UI + i18n (Phase 7):
+  - Catalog module: `src/ui/i18n.catalog/hud_chrome.ts` under `hudChrome.epic.*`
+  - Key prefixes: `hudChrome.epic.*` (title, link, unlink, linked, benefits,
+    noProof); `apiError.epic.*` already from Phase 3/5
+  - M16 non-Latin fills for wordy keys in
+    `src/ui/i18n.locales/{zh_CN,zh_TW,ja_JP,ko_KR,ru_RU}.ts` (Steam verb
+    vocabulary; Epic brand stays Latin). Other locales stay English pending
+    maintainer release fill.
+  - Gate order: unauthenticated hide -> `/api/status` `epic.enabled` advert
+    -> `GET /api/epic/status` enabled -> shell `epicLinkSupported` (or
+    proof-method fallback) for Link button only; Unlink when linked
+  - Markup selectors: `#cs-epic-group`, `#btn-epic-link`, `#epic-status`,
+    `#btn-epic-unlink`, `#epic-help`, `#epic-label`
+  - CSS family: `.cs-epic-group` stacked with wallet/github/steam cards
 - Desktop Epic shell (Phase 4):
   - Facade: `epicIntegrationEnabled`, `resolveEpicIds`,
     `parseLauncherExchangeCode`, `createEpicShell` returning

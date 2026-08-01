@@ -10,7 +10,7 @@
 | Phase 4: Desktop Epic shell | complete | 2026-07-31 | 2026-07-31 |
 | Phase 5: Server link verification | complete | 2026-07-31 | 2026-07-31 |
 | Phase 6: Achievement mirror | complete | 2026-07-31 | 2026-07-31 |
-| Phase 7: Client UI + i18n | not started | | |
+| Phase 7: Client UI + i18n | complete | 2026-07-31 | 2026-07-31 |
 | Phase 8: Ops docs + BPT runbook | not started | | |
 | Packet close QA (`qa-checklist.md`) | not started | | |
 
@@ -59,9 +59,9 @@
 - [x] Mirror tests
 
 ### Phase 7
-- [ ] `src/ui/epic_link.ts` + markup hooks
-- [ ] English catalog keys
-- [ ] UI tests for advert/capability/linked arms
+- [x] `src/ui/epic_link.ts` + markup hooks
+- [x] English catalog keys
+- [x] UI tests for advert/capability/linked arms
 
 ### Phase 8
 - [ ] desktop-release epic section
