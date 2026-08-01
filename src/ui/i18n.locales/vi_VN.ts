@@ -6,10 +6,13 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'apiError.epic.already_linked': 'Tài khoản của bạn đã liên kết với một tài khoản Epic.',
   'apiError.epic.banned': 'Không thể liên kết tài khoản Epic đó.',
   'apiError.epic.disabled': 'Hiện không thể liên kết Epic.',
-  'apiError.epic.invalid_token': 'Epic không thể xác minh yêu cầu liên kết này. Hãy thử lại từ ứng dụng máy tính.',
+  'apiError.epic.invalid_token':
+    'Epic không thể xác minh yêu cầu liên kết này. Hãy thử lại từ ứng dụng máy tính.',
   'apiError.epic.upstream': 'Epic không phản hồi. Hãy thử lại sau giây lát.',
-  'entities.abilities.greater_invisibility.description': 'Biến mất trong 20 giây và gỡ bỏ 2 hiệu ứng gây sát thương theo thời gian. Khi tàng hình kết thúc, bạn nhận ít hơn 90% sát thương trong 2 giây. (tài năng pháp sư)',
-  'entities.items.reins_terrorspark_groundshaker.name': 'Chìa Khóa Khởi Động: Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất',
+  'entities.abilities.greater_invisibility.description':
+    'Biến mất trong 20 giây và gỡ bỏ 2 hiệu ứng gây sát thương theo thời gian. Khi tàng hình kết thúc, bạn nhận ít hơn 90% sát thương trong 2 giây. (tài năng pháp sư)',
+  'entities.items.reins_terrorspark_groundshaker.name':
+    'Chìa Khóa Khởi Động: Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất',
   'hud.options.graphicsPresetInsane': 'Cực Đại',
   'hud.options.surfaceDetail': 'Chi Tiết Bề Mặt',
   'hud.options.surfaceDetailBasic': 'Cơ Bản',
@@ -37,7 +40,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.noProcs': 'Không có proc được hỗ trợ nào khả dụng cho nhân vật này.',
   'hudChrome.auraOverlay.opacity': 'Độ mờ',
   'hudChrome.auraOverlay.positioning': 'Định vị: {aura}',
-  'hudChrome.auraOverlay.previewHint': 'Dùng Thiết lập vị trí để di chuyển hào quang mà không che menu.',
+  'hudChrome.auraOverlay.previewHint':
+    'Dùng Thiết lập vị trí để di chuyển hào quang mà không che menu.',
   'hudChrome.auraOverlay.procs.aetherRush': 'Dòng Ê-te',
   'hudChrome.auraOverlay.procs.arcaneCharge': 'Điện Tích Bí Thuật',
   'hudChrome.auraOverlay.procs.battleTrance': 'Nhập Định Chiến Đấu',
@@ -55,13 +59,16 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.spellOrder': 'Thứ tự phép',
   'hudChrome.auraOverlay.spellPosition': 'Thứ tự phép {position} / {count}',
   'hudChrome.auraOverlay.title': 'Hào Quang',
-  'hudChrome.epic.benefits': 'Liên kết tài khoản Epic của bạn từ ứng dụng máy tính Epic để phản chiếu các kỳ công bạn đạt được thành thành tựu Epic.',
+  'hudChrome.epic.benefits':
+    'Liên kết tài khoản Epic của bạn từ ứng dụng máy tính Epic để phản chiếu các kỳ công bạn đạt được thành thành tựu Epic.',
   'hudChrome.epic.link': 'Liên kết Epic',
   'hudChrome.epic.linked': 'Đã liên kết với tài khoản Epic {id}',
-  'hudChrome.epic.noProof': 'Epic không cung cấp bằng chứng liên kết. Hãy khởi chạy từ Epic Games Store rồi thử lại.',
+  'hudChrome.epic.noProof':
+    'Epic không cung cấp bằng chứng liên kết. Hãy khởi chạy từ Epic Games Store rồi thử lại.',
   'hudChrome.epic.title': 'Epic',
   'hudChrome.epic.unlink': 'Hủy liên kết Epic',
-  'hudChrome.mounts.desc_terrorspark_groundshaker': 'Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.',
+  'hudChrome.mounts.desc_terrorspark_groundshaker':
+    'Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.',
   'hudChrome.mounts.name_terrorspark_groundshaker': 'Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất',
   'hudChrome.targetAuras.all': 'Tất cả',
   'hudChrome.targetAuras.buffs': 'Buff',
