@@ -288,14 +288,22 @@ For off-box safety, sync the directory to S3 occasionally:
     close it by deploying the server as soon as the clients are staged. (An
     old server answers a command it does not know by logging a protocol
     anomaly to the bot detector and spending a rate-limit token. The
-    professions tuning packet itself adds exactly one command, dev-gated and
-    called by nothing shipped; the v0.32.0 expansion it merged with adds
-    eleven more, none dev-gated, of which FOUR are reachable from the
-    shipped client's own surfaces: the mount key, the two race controls,
-    and the Settings unstuck action. On this leg an ordinary player
-    pressing the mount key or using unstuck spends rate-limit tokens and
-    logs anomalies until the server deploys, one more reason to keep the
-    binary-to-server gap short.)
+    professions tuning packet itself adds TWO commands, slot_tool_effect and
+    recharge_tool_effect, neither dev-gated, both wired to shipped
+    professions-window buttons; on this leg those buttons stay unreachable
+    for an ordinary player because an old server never mints a charm and
+    never sends the tslot rows the buttons render from, so only a hand-built
+    frame spends tokens through them. The v0.32.0 expansion the branch
+    merged with adds eleven more commands, none dev-gated, of which FOUR are
+    reachable from the shipped client's own surfaces: the mount key, the two
+    race controls, and the Settings unstuck action. On this leg an ordinary
+    player pressing the mount key or using unstuck spends rate-limit tokens
+    and logs anomalies until the server deploys, one more reason to keep the
+    binary-to-server gap short. One more version-skewed CONSUMER rides this
+    deploy: the discord-bot container's activity feed predates the packet's
+    masterwork and deed card kinds (and the expansion's vale_cup kind), so
+    restart the bot with the server or those cards post as empty embeds
+    Discord rejects until it picks up the new build.)
   Release-specific caveat for the professions tuning deploy: the guards above
   describe bundles built from this release onward. The bundle DEPLOYED TODAY
   predates them, and its trade window throws while rendering an offer that
@@ -332,10 +340,11 @@ For off-box safety, sync the directory to S3 occasionally:
   bundle.
   The caveats above were measured against 9d7a1a021, the commit deployed
   today; the branch has since merged the true v0.32.0 tip (0b427afca, 685
-  commits past the measured base), which is what the merged-branch numbers
-  above describe. If the live server moves before this branch deploys,
-  re-run the compatibility diff against the commit actually deployed before
-  trusting any "one new X" claim. The loot-table exclusion is enforced by
+  commits past the measured base) and then re-synced twice through
+  release/v0.33.0 (last at 2ae71a7fbf), which together are what the
+  merged-branch numbers above describe. If the live server moves before
+  this branch deploys, re-run the compatibility diff against the commit
+  actually deployed before trusting any "N new X" claim. The loot-table exclusion is enforced by
   `tests/stale_client_rollout.test.ts` for the deploy window (delete that
   pin once clients have rolled). Per-surface analysis for the professions
   tuning release: the stale-client compatibility phase of

@@ -9,7 +9,8 @@ CI-asserted. The CI-assertable half of the phase 16 budget split lives in
 tests: `tests/professions_wire_budget.test.ts` (ncd/tslot bytes per player per
 tick under the delta rules, both timer-wire arms, allocation stability of the
 empty arms), `tests/professions_blob_growth.test.ts` (the settled worst-case
-professions blob, 8,469 bytes measured, 9,728 pinned), and
+professions blob, 8,587 bytes measured after the v0.33.0 equip-slot
+retirement re-bound the fixture to all twelve live slots, 9,728 pinned), and
 `tests/professions_zone_scaling.test.ts` plus the minimap rim-cull arms in
 `tests/minimap_markers.test.ts` (the zone-scaling projection).
 
@@ -72,9 +73,12 @@ and `poolAtWindowClose` (waiting, total, idle) scraped from `/metrics`. That end
 `METRICS_TOKEN` (404 when the server has none, 401 on a wrong credential),
 so a run without the token stamps both pool fields null: disclosure, never a
 gate input, and such a run is still a valid capture. The four artifacts
-committed here predate every one of these fields, so their gate inputs live
-outside the files, in the run's console verdict and log; a recapture's
-artifact carries more than these do.
+committed here carry `verdict` and `observersRequested` but predate the pool
+gauges, `observerEvidence`, `reportMs`, and `gitDirty` (the whole-branch
+review corrected an earlier blanket "predate every one of these fields"
+claim here); the missing gate inputs live outside the files, in the run's
+console verdict and log, and a recapture's artifact carries more than these
+do.
 
 ## Capture machine
 
@@ -126,9 +130,9 @@ rest: `WARMUP_MS` 45000, `CONNECT_CONCURRENCY` 20, `OBSERVERS` 32, `TOUR_SEC`
 the mid-window `/api/perf` scrape cadence: a 180 s window at one scrape per
 10 s is the 18 entries in every artifact's `serverPerfMid`. Most of those
 knobs are stamped into each artifact (`warmupMs`, `connectConcurrency`,
-`tourSec`, `nodesPerBot`, `stepMs`, `botLevel`); `reportMs` and
-`observersRequested` are stamped by the CURRENT rig only, and the four
-artifacts committed here predate both fields. `REALM_NAME`
+`tourSec`, `nodesPerBot`, `stepMs`, `botLevel`, `observersRequested`);
+`reportMs` alone is stamped by the CURRENT rig only, and the four artifacts
+committed here predate that one field. `REALM_NAME`
 defaults to `Claudemoon` and must match the realm the server runs, so a
 locally renamed realm has to be passed to the rig as well.
 
