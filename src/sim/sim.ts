@@ -1326,8 +1326,10 @@ export interface PlayerMeta {
   // knownRecipes exactly once (professions/training.ts
   // grandfatherKnownRecipes), then persists true. Persisted in CharacterState.
   recipesGrandfathered: boolean;
-  // Craft output throttle (#1301): a rolling window of successful crafts,
-  // any recipe. Session-only (like lastActiveTick above), never persisted,
+  // Craft output throttle (#1301): a FIXED tumbling window of successful
+  // actions (five consumer families; see professions/action_throttle.ts,
+  // which states the tumbling semantics and their accepted straddle).
+  // Session-only (like lastActiveTick above), never persisted,
   // and deliberately so: a fresh login gets a fresh 60-second window rather
   // than carrying a logout-time throttle across sessions. (This used to cite
   // nodeHarvestReadyAt as its session-only exemplar; that field persists as

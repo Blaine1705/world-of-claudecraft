@@ -468,6 +468,7 @@ export const da_DK: AdminTranslations = {
   "profInspect.effectLabel": "Effect",
   "profInspect.effectOptionNone": "choose an effect",
   "profInspect.restoreSummary": "{id} x{count}",
+  "profInspect.slotPair": "{profession} / {effect}",
   "profInspect.offlineNote": "Restores need the character online on this realm.",
   "moderation.title": "Moderation",
   "moderation.reportsTitle": "Rapporter",

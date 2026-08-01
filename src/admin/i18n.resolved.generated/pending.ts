@@ -99,6 +99,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -192,6 +193,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -285,6 +287,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -378,6 +381,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -472,6 +476,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -565,6 +570,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -658,6 +664,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -751,6 +758,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -844,6 +852,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -937,6 +946,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -1030,6 +1040,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -1123,6 +1134,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -1216,6 +1228,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -1309,6 +1322,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -1402,6 +1416,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -1495,6 +1510,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -1588,6 +1604,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -1681,6 +1698,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -1774,6 +1792,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"
@@ -1867,6 +1886,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.restoreSlotButton",
     "profInspect.restoreSummary",
     "profInspect.savedBadge",
+    "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
     "profInspect.title"

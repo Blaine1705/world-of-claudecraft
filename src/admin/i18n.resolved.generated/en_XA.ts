@@ -468,6 +468,7 @@ export const en_XA: AdminTranslations = {
   "profInspect.effectLabel": "[Éƒƒéçţ]",
   "profInspect.effectOptionNone": "[çĥóóšé áñ éƒƒéçţ]",
   "profInspect.restoreSummary": "[{id} ẋ{count}]",
+  "profInspect.slotPair": "[{profession} / {effect}]",
   "profInspect.offlineNote": "[Ŕéšţóŕéš ñééð ţĥé çĥáŕáçţéŕ óñļíñé óñ ţĥíš ŕéáļɱ.]",
   "moderation.title": "[Ɱóðéŕáţíóñ]",
   "moderation.reportsTitle": "[Ŕéþóŕţš]",

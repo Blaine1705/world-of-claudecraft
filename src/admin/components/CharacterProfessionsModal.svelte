@@ -361,7 +361,10 @@
                 title={t('dialog.confirmRestoreSlot')}
                 rows={[
                   { label: t('dialog.character'), value: characterName },
-                  { label: t('dialog.slot'), value: `${professionId} / ${effectId}` },
+                  {
+                    label: t('dialog.slot'),
+                    value: t('profInspect.slotPair', { profession: professionId, effect: effectId }),
+                  },
                 ]}
                 onConfirm={confirmRestore}
                 onCancel={() => (restoreKind = null)}

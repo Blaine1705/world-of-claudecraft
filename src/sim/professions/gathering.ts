@@ -103,10 +103,13 @@ const MATERIAL_QTY_BY_RARITY: Record<MaterialRarity, number> = Object.freeze({
 
 // Zone x node-type material matrix (Professions 2.0): which item a
 // harvest grants in which zone, and the per-rarity unit counts. The zone-1
-// (eastbrook_vale) rows grant ONLY the dedicated sellValue-4 starter materials
+// (eastbrook_vale) rows grant ONLY the dedicated starter-material FAMILIES
 // (copper_ore/ironbark_log/silverleaf_herb), never the premium vendor
-// reagents: that is the stockpiling mitigation, so farming starter nodes
-// cannot pile up mid-tier trade goods. Exported so tests can pin the table
+// reagents: that is the stockpiling mitigation, scoped to what it actually
+// buys since D8: an out-tooled gatherer harvests the sellValue-8 FINE grade
+// of these same families here, so starter-node farming yields fine starter
+// materials, still never the mid-tier vendor reagents the mitigation
+// exists to keep off this faucet. Exported so tests can pin the table
 // contents.
 export const NODE_MATERIAL_TABLE: Record<
   GatherNodeType,

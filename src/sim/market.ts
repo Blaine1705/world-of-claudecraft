@@ -817,8 +817,14 @@ export class Market {
       // granted into the buyer's live bags on purchase. A payload the bound
       // rejects whole leaves the listing as dormant plain data, the same
       // doctrine as an unknown item id.
+      // The single-copy clamp keys on the RAW row's instance, not the
+      // post-bound survivor: a payload the bound rejects whole must still
+      // load as count 1, or a tampered instanced row would launder its
+      // count through deliberately corrupt payload bytes (the round 5
+      // finder caught the clamp reading the bound's output).
+      const hadInstance = !!(l.instance && typeof l.instance === 'object');
       let instance: ItemInstancePayload | undefined;
-      if (l.instance && typeof l.instance === 'object') {
+      if (hadInstance && l.instance) {
         const bounded = sanitizeItemInstancePayloadOnLoad(cloneItemInstancePayload(l.instance));
         for (const d of bounded.dropped) escrowDrops.push(`listing.${l.itemId}.${d}`);
         instance = bounded.payload;
@@ -828,7 +834,7 @@ export class Market {
         sellerKey: String(l.sellerKey ?? ''),
         sellerName: String(l.sellerName ?? l.sellerKey ?? '?'),
         itemId: l.itemId,
-        count: instance ? 1 : Math.max(1, l.count | 0),
+        count: hadInstance ? 1 : Math.max(1, l.count | 0),
         price: Math.max(
           MARKET_MIN_PRICE,
           Math.min(MARKET_MAX_PRICE, Math.floor(l.price) || MARKET_MIN_PRICE),

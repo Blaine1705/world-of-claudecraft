@@ -364,7 +364,7 @@ describe('persistence: pre-payload saves and size bounds', () => {
               sellerKey: 'k1',
               sellerName: 'Seller',
               itemId: HIDE,
-              count: 1,
+              count: 500,
               price: 100,
               instance: { signer: 'x'.repeat(5000) },
               secondsLeft: 1000,
@@ -381,6 +381,10 @@ describe('persistence: pre-payload saves and size bounds', () => {
     const listing = out.listings.find((l: { id: number }) => l.id === 900);
     expect(listing.itemId).toBe(HIDE);
     expect(listing.instance).toBeUndefined();
+    // The single-copy clamp keys on the RAW row's instance: a bound-rejected
+    // payload must not launder an inflated count through corrupt bytes (the
+    // round 5 finder caught the clamp reading the bound's output).
+    expect(listing.count).toBe(1);
     // The clone-mangled array instance dropped whole; the collection item
     // survives plain with its count.
     const coll = out.collections.find((c: { key: string }) => c.key === '7');

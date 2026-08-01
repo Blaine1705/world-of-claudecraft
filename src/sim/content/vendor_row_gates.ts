@@ -114,8 +114,11 @@ export interface VendorRowGateState {
 }
 
 /**
- * The one gate resolver, shared by the server-authoritative buy and the client
- * view so both answer identically. `proficiency` is the player's gathering
+ * The one gate resolver, shared by every ADVISORY consumer (the vendor
+ * window's requirement sub-line and the wiki table) so they all answer
+ * identically; per this file's header and R22, the buy path deliberately no
+ * longer reads it (the purchase is advisory, enforcement moved to wield
+ * time). `proficiency` is the player's gathering
  * counter map (`PlayerMeta.gatheringProficiency` in the sim, the mirrored
  * `IWorld.gatheringProficiency` in the client): an untracked or missing
  * profession reads 0, which locks every gated row rather than opening it.

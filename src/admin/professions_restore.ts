@@ -64,7 +64,12 @@ export function restoreSlot(
       title: t('dialog.confirmRestoreSlot'),
       rows: [
         { label: t('dialog.character'), value: characterName },
-        { label: t('dialog.slot'), value: `${professionId} / ${effectId}` },
+        {
+          label: t('dialog.slot'),
+          // Through a key, not template concatenation: composition typography
+          // (the separator) is the locale's call, the restoreSummary rule.
+          value: t('profInspect.slotPair', { profession: professionId, effect: effectId }),
+        },
         { label: t('dialog.reason'), value: note },
       ],
       endpoint: `/admin/api/moderation/characters/${characterId}/restore-slot`,
