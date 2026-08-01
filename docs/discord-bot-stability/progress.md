@@ -13,7 +13,7 @@
 | Phase 4: Server set-based endpoints | built | 2026-07-31 | 2026-07-31 |
 | Phase 4 QA | done | 2026-07-31 | 2026-07-31 |
 | Phase 5: Outbox + linked-member change feed | built | 2026-08-01 | 2026-08-01 |
-| Phase 5 QA | not started | | |
+| Phase 5 QA | done | 2026-08-01 | 2026-08-01 |
 | Phase 6: Bot consumes the new surface | not started | | |
 | Phase 6 QA | not started | | |
 | Phase 7: Supervision + deploy hardening | not started | | |
@@ -962,3 +962,73 @@ uniformity at the save site. Final D18 payload at the real (page-limited) worst 
 pre-paging whole-cap figure was 979,051 bytes). The full ladder was re-run green after the
 fix round, and the DB-gated integration file was re-executed against a fresh throwaway
 user-space Postgres 16.2 (15/15 with the database, clean skips without).
+
+### Phase 5 QA (2026-08-01)
+
+Release base first (standing rule 1): `origin/release/v0.33.0` had gained 49 commits since
+the build's sync (the v0.33.0 locale fill, the shader-compile-storm fix, release-side PR
+merges); merged clean as `ba694a51a` and audited with `release-merge-audit` (no discord
+surface in the delta, no new routes, no new db mocks, both sides of the three overlap
+files verified; the state.md `server/main.ts` coordinates drifted again and were traded
+for symbols). Upstream also cut `release/v0.34.0` (equal to main, containing all of
+v0.33.0); surfaced to the maintainer rather than retargeted mid-packet. The full server
+validation ladder was re-run green on the merged tree before any QA work, and the
+DB-gated integration file re-executed 15/15 against a throwaway user-space Postgres 16.2.
+
+**Audit.** Ultracode per D19: an 8-agent Workflow fan-out (blind feed-site sweep,
+correctness vs the D-invariants, test-coverage decisiveness, dead code, a fresh-eyes
+round over the build session's 12-fix hardening, privacy-security-review,
+database-performance-reviewer, qa-checklist), the idled privacy reviewer re-dispatched
+via the Agent tool per the known delivery trap, then an 8-skeptic adversarial-verify
+Workflow over every contested finding (file open, code quoted). About 38 findings raised;
+ZERO confirmed blocking (all three BLOCKING-labeled database-performance findings were
+refuted or downgraded by skeptics with quoted code). The blind sweep independently
+re-derived all 11 wired feed sites and every recorded exclusion, found no inverse-error
+enqueues, and surfaced the one real gap of the phase: the two rename writers
+(`renameCharacter`, `reclaimDeactivatedName`) move the bot-visible flex name, so the
+recorded exclusion's rationale was factually wrong.
+
+**Fix round** (`333f77787`, 16 files): wired feed sites 12 and 13 (the two renames) with
+by-value tests; widened cap eviction into the `EVICTION_LADDER` (link/unlink
+items are now the LAST thing spent, closing the privacy review's gap where id-less flex
+noise outlived link items) and rebuilt `trimToCap` as a single O(n) marking pass
+(measured 21 ms worst case before, sub-millisecond after); busted the winners snapshot on
+the payout runner's claim and mark stamps (the two content writers the bust doctrine
+missed, skeptic-verified as exactly two); NaN-guarded the announcement clamp; narrowed
+`DiscordOutboxLinkRow` to the four consumed fields; moved the outbox drains inside the
+requeue try; corrected the comments that overstated stale-serve, cross-process bust
+reach, requeue-overflow preservation, and the eviction survival claim; pinned the
+contract literals (cap 5000, TTL 30s, page 1000, relay/activity caps), the same-id
+re-link negative arm, the clamp edges, call-site single-flight, and D18-scaled the
+one-statement fixture to 5,000 ids; payload fixture now imports the real caps. One
+pre-existing em dash in a touched test comment fixed per the R9 precedent. Deliberate
+rejections and later-phase notes are recorded in state.md ("Phase 5 QA record").
+
+**Fresh-eyes round on the fix round** (`67841b744`), which caught the fix round's own
+defects exactly as the charter predicted: both new bust arms fired on write-nothing
+outcomes (claimPayout's 'existing' retry and markPayout's already-paid replay), so
+markPayout now answers 'updated' / 'already' / 'missing' and both arms bust on the real
+write alone; the eviction ladder gained a fourth rung so an id-carrying non-link item
+can never outlive a link item (a structural promise, pinned by tests no current site
+can reach); the NaN guard became NaN-only so an Infinity over-ask clamps up; and the
+honest-limit notes were completed. Its clean-category verdicts (the drains-in-try move,
+the db.ts wiring paths, the narrowing, the partial mocks) are recorded in the review
+transcript.
+
+**Mutation tally.** Spec pass (16 mutants, DB-free CI arm, isolated worktree): 15/16
+killed with named failing tests; the survivor (cap+1) was a real gap, every cap
+assertion tracked the imported constant, closed by the literal pins and re-verified
+KILLED. Fix-round pass over its own new code: 11/11 killed. Fresh-eyes-fix pass: 5/5
+killed. Combined: 32 mutants planted, all 32 killed by the final tree's suites.
+Honesty note: the first spec-pass run scored 12 false survivors because the driver's
+verdict heuristic tailed a merged stdout+stderr stream and lost the summary; judged by
+exit code plus extracted failing-test names after the fix, per the prove-the-tests-RAN
+rule.
+
+**Validation after both fix rounds:** `npx tsc --noEmit` clean; the server row plus http
+spine 582 passed in one run; Phase 5 suites green (link-changes 40, outbox 4, daily
+rewards 78, routes, queues, character/lease/game); integration 15/15 plus the payout
+moderation db file 26 with the database (clean skips without); `npm run build:server`
+exit 0; `npm run ci:changed` clean (warnings only, pre-existing). Full `npm run gate`
+not run for the known sibling-worktree malware false-positive (four foreign worktrees
+are parked inside the repo root); the steps it would add ran by hand above.
