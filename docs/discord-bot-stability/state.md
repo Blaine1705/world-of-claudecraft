@@ -1,15 +1,16 @@
 # State: Discord Bot Stability (cross-phase cheat sheet)
 
-Current phase: Phase 6 BUILT (2026-08-01), its dedicated QA session still owed (D19).
-Phases 1 to 5 built and QA'd.
-The packet's sync target is now `origin/release/v0.34.0` (the maintainer's retarget call,
-relayed in the Phase 6 handoff): at Phase 6 start it sat at `94f5ac63d`, equal to main's
-tip and a superset of v0.33.0, measured 90 ahead 2 behind and merged clean as `204e5a6cb`
-with a ZERO-FILE content delta (the branch already carried all of v0.33.0 at `462b1372a5`;
-the merge adopted only the two merge commits that landed v0.33.0 onto main), audited with
-`release-merge-audit`: every step N/A by construction, merged tree byte-identical to the
-QA-validated `8176b5a08`. The header numbers here go stale fast: MEASURE the freshly
-fetched tip at every phase start per the standing rules, never trust this line.
+Current phase: Phases 1 to 6 built and QA'd (Phase 6 QA closed 2026-08-01). Next:
+Phase 7 (supervision and deploy hardening).
+The packet's sync target is `origin/release/v0.34.0` (the maintainer's retarget call,
+relayed in the Phase 6 handoff). Phase 6 QA's sync merged the admin guild backoffice
+(PR #2590, 7 commits) as `50883ce3d`; the three Phase 5 feed sites in `server/db.ts`
+conflicted with upstream's `bustAdminGuildListReads` calls and were resolved as UNIONS
+(both effects side by side), audited with `release-merge-audit` (no internal-route or
+legacy-arm contact, admin routes carried their own inventory rows, feed-site contract
+premise intact: admin-guilds writes none of the feed tables and the flex payload has no
+guild field). The header numbers here go stale fast: MEASURE the freshly fetched tip at
+every phase start per the standing rules, never trust this line.
 
 ## Locked decisions
 
@@ -595,15 +596,39 @@ because dropping the one word is otherwise silent),
     member keeps their tier role and level-nick suffix on Discord (`syncRolesFor` has
     always returned early on unlinked); Phase 6 made the sweep set explicit, so a
     clear-on-unlink would now be easy to add if wanted.
-  - New tests: `tests/discord_bot_linked_sweep.test.ts` (50), `tests/discord_bot_sweep_cycle.test.ts`
-    (12, the D18 composed harness: 5000 roster / 1000 online / 300 linked, D6 by value,
-    the spread pinned at exactly one slice's writes per tick, steady-state zero writes
-    and zero meta pushes, discovery, the governor-refusal arm),
-    `tests/discord_bot_outbox.test.ts` (24). Extended: config (34), main-wiring (12,
-    including the idle-column and nextSlice-argument pins the QA round added),
-    server_client (49 at the client commit, 26 after the deletions landed).
-    Mutation tallies this phase: C 6/6, A 14/14, B 12/12, QA fix round 5/5, all with
+  - New tests: `tests/discord_bot_linked_sweep.test.ts` (62 after the QA session),
+    `tests/discord_bot_sweep_cycle.test.ts` (14, the D18 composed harness: 5000 roster /
+    1000 online / 300 linked, D6 by value, the spread pinned at exactly one slice's
+    writes per tick, steady-state zero writes and zero meta pushes, discovery, the
+    governor-refusal arm, the composed null-answer re-serve and unasked-id-injection
+    arms), `tests/discord_bot_outbox.test.ts` (28). Extended: config (34), main-wiring
+    (14, including the idle-column and nextSlice-argument pins the build's gate added
+    and the QA session's runSweepSlice body pins, GUILD_MEMBER_REMOVE forget pin,
+    no-bare-fetch pin, and SWEEP_SLICE_MS cadence-ban entry), server_client (49 at the
+    client commit, 26 after the deletions landed).
+    Mutation tallies, build phase: C 6/6, A 14/14, B 12/12, build QA-gate fix round
+    5/5. QA session (2026-08-01): spec pass 12/12 (all eight charter classes, the
+    governor bypass killed by the breaker-refusal pin), fix-round pass 15/15. All with
     rc!=0 plus named failing tests.
+  - Phase 6 QA session record (2026-08-01), the module-surface changes a later phase
+    must know: `LinkedSweep.forget(id)` is the single-member prune GUILD_MEMBER_REMOVE
+    now calls (drops linked/dirty/pass-cursor AND the noLinkRow memory, unlike an
+    unlink; a discovery cursor is deliberately not spliced); `applyFlexBatchResult`
+    takes an optional third `rosterHas` gate on ADDITIONS (main.ts and the rig pass
+    `(id) => memberRoles.has(id)`; `present` is stamped ABOVE the gate so authoritative
+    absence still removes only the truly absent); dirty-first preemption is BOUNDED by
+    alternation with pass-shaped work INCLUDING pending work (an in-flight cursor, an
+    armed discovery, a requested or due pass; the fresh-eyes round proved the
+    cursor-only bound starvable, and a pass or discovery that opens over an empty
+    candidate list falls back to serving dirty rather than answering null over work);
+    `restoreSlice` filters a 'pass' slice to the still-linked and restores a
+    'discovery' snapshot whole; the sweep write loop skips ids not in `memberRoles`
+    (mid-flight departure); the outbox failed-poll guard and main.ts's flex-batch
+    guard are `== null` (an undefined drain is the reachable data-less success
+    envelope); the outbox link-change apply runs BEFORE the post loops (the one
+    non-re-served stream; the ordered call-log pins in the outbox suite pin
+    'links' immediately after 'drain'). The didWork split and the breaker gate are
+    unchanged.
 
 ## Phase 5 feed-site enumeration (the linked-member change feed contract)
 
@@ -1128,6 +1153,19 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   arm of `kick()` has always run at once and is test-pinned as doing so; the follow-up is only
   the deferred half of the same kick, and jitter decorrelates chain arms, which an event
   trigger does not have.
+
+### Found during Phase 6 QA (2026-08-01), routed rather than fixed
+
+- L18 (nice-to-have, supervision, OPEN, natural home Phase 7 with L10 and L17):
+  `Gateway.reconnect()` never stops the heartbeat interval, and `removeAllListeners()`
+  strips the old socket's close handler, which is the only close-path caller of
+  `stopHeartbeat()`. A stale unacked-beat tick in the window before the new socket's
+  HELLO therefore terminates the NEW socket (`this.ws` is re-read at tick time), whose
+  close handler schedules another reconnect: one wasted reconnect cycle, self-healing.
+  Pre-existing and OUTSIDE the Phase 6 diff (found because the QA charter required
+  tracing the re-IDENTIFY path); skeptic-confirmed with quoted code. Phase 7 owns the
+  gateway's supervision surface, so the reconnect lifecycle fix (stop the heartbeat in
+  `reconnect()` or scope the tick to its own socket) lands there with its own tests.
 
 ## Known gotchas for implementers
 

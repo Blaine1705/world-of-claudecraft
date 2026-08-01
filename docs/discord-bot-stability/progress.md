@@ -15,7 +15,7 @@
 | Phase 5: Outbox + linked-member change feed | built | 2026-08-01 | 2026-08-01 |
 | Phase 5 QA | done | 2026-08-01 | 2026-08-01 |
 | Phase 6: Bot consumes the new surface | built | 2026-08-01 | 2026-08-01 |
-| Phase 6 QA | not started | | |
+| Phase 6 QA | complete | 2026-08-01 | 2026-08-01 |
 | Phase 7: Supervision + deploy hardening | not started | | |
 | Phase 7 QA | not started | | |
 | Phase 8: Observability | not started | | |
@@ -964,6 +964,99 @@ uniformity at the save site. Final D18 payload at the real (page-limited) worst 
 pre-paging whole-cap figure was 979,051 bytes). The full ladder was re-run green after the
 fix round, and the DB-gated integration file was re-executed against a fresh throwaway
 user-space Postgres 16.2 (15/15 with the database, clean skips without).
+
+### Phase 6 QA (2026-08-01)
+
+Release base first (standing rule 1): `origin/release/v0.34.0` had gained 7 commits since
+the Phase 6 build sync (PR #2590, the admin guild backoffice, 114 files); merged as
+`50883ce3d`. Two conflict files, both resolved as UNIONS: the three Phase 5 feed sites in
+`server/db.ts` (deleteCharacter, renameCharacter, reclaimDeactivatedName) now carry the
+branch's `enqueueLinkChange` AND upstream's `bustAdminGuildListReads` side by side, and
+`tests/character_db.test.ts` keeps both suites' assertions. `release-merge-audit` ran
+clean: the release touched no internal route or legacy discord arm, the admin routes
+carried their own surface-inventory rows (http spine 441 green), no branch injection seam
+was re-bound, and the feed-site contract premise survives (the admin-guilds feature
+writes none of characters/reward_points/discord_links, and the flex payload carries no
+guild field, so a guild rename is not a flex transition). 516 tests across the
+merge-affected suites green before any QA work.
+
+**Audit.** Ultracode per D19: a 15-agent Workflow (context loader, load-profile,
+correctness, test-coverage, and dead-code auditors plus qa-checklist, then 9 skeptic
+groups verifying every finding with the file open and code quoted). 15 findings raised;
+14 CONFIRMED, 1 REFUTED (the caller-less per-stream GETs are already recorded by D11).
+Zero audit findings were blocking. The load-profile agent independently recomputed the
+steady-state rate from source and matched the Phase 6 claim (one periodic outbox request
+at 4/min idle to 20/min busy, role-sync flex-batches only while a pass or dirty work
+exists at about 3 per 6.4 minute pass, presence per 4 s debounce window, hourly resync,
+zero steady-state Discord writes under D5; analytic 1 to 3 concurrent sockets, still
+VERIFY-AT-DEPLOY, no Discord credentials here). It also confirmed exactly one outbox
+loop, no poll timer outside the scheduler (the gateway heartbeat and reconnect one-shots
+and the shell abort deadlines are the sanctioned IO mechanics), and the sweep iterating
+the linked set.
+
+**Spec mutation pass** (isolated worktree outside the repo root, own npm ci): all eight
+charter classes planted, 12/12 KILLED with rc!=0 plus named failing tests (linked-set
+never-removes, the D6 seed-from-sent-set shape, the stale link-change apply, four
+per-stream fan-out skips, double dispatch, both didWork cadence pins including the
+winners reserved-read arm, the unbounded slice, and an addMemberRole governor bypass,
+killed by the breaker-refusal pin alone).
+
+**Fix round** (`7dd9e3096`): GUILD_MEMBER_REMOVE prunes the departed member from the
+sweep immediately via the new `LinkedSweep.forget` (departure does not delete the link
+row, so the pass was spending a slice slot plus doomed 404 writes on them until the next
+complete seed); flex-batch additions gained a roster gate so a stale in-flight answer
+cannot undo a departure or seed prune (`present` stamped above the gate, so authoritative
+absence still removes only the truly absent); the sweep write loop also skips a
+mid-flight departure; a restored PASS slice is filtered to the still-linked (a discovery
+snapshot restores whole, by design); the outbox failed-poll guard is `== null` (an
+undefined drain, the data-less success envelope, previously threw after the drain had
+consumed everything) and main.ts's flex-batch guard matches; the link-change apply moved
+BEFORE the post loops (the one non-re-served stream; the posts are governor-paced and can
+run minutes on a backlog, so apply-last left a process-death window for no ordering
+gain); the outboxIoFor pass-through seams (breakerState, applyLinkChanges, onError) are
+pinned end to end; the tautological governed-entry assertion (gated == writes + refusals,
+an invariant of the rig's own plumbing) became a by-value count with the production half
+pinned by a new no-bare-fetch main.ts pin; the three previously unpinned runSweepSlice
+lines got function-body-sliced source pins; SWEEP_SLICE_MS joined the cadence ban list;
+the stale pollRelay example in scheduler.ts was reworded. Dirty-first preemption is now
+BOUNDED: dirty and pass-shaped work alternate slices under contention.
+
+**Fresh-eyes on the fix round**, per the packet rule, earned its keep exactly as the
+Phase 3 precedent predicts: verdict NOT READY, one BLOCKING catch against the first fix
+shape. The alternation bound counted only a cursor already in flight, so a REQUESTED or
+DUE pass and an armed discovery walk still starved under sustained feed traffic
+(probe-confirmed: twelve dirty slices out of twelve, beginPass never reached). The bound
+now counts pending pass work too, with the reviewer's own caution honored: a discovery
+that opens over an EMPTY snapshot yields null and falls back to serving dirty rather
+than answering no-work while work exists (an empty PASS cannot coincide with dirty work,
+dirty being a subset of linked; an empty roster snapshot can). Its nice-to-haves were
+all applied (the departure write guard, the restore filter, a globalThis.fetch ban
+beside the no-bare-fetch pin). The corrected shape was implemented exactly along the
+reviewer's prescription and then mutation-checked rather than re-reviewed a third time:
+FM12 (cursor-only bound) dies on the new starvation arms, FM14 on the empty-snapshot
+fallback arm.
+
+**Fix-round mutation pass** (worktree at `7dd9e3096`): 15/15 KILLED with named tests,
+covering forget (both halves), the roster gate (dropped AND present-below-gate), the
+alternation (dropped AND narrowed back to cursor-only), the restore filter, the trailing
+dirty fallback, both `== null` guards, apply-first, the factory breaker hardcode, and
+the two main.ts wiring deletions. Combined session tally: 27 planted, 27 killed, zero
+survivors.
+
+**Validation on the final tree:** `npx tsc --noEmit` clean; the full bot ladder 18
+files / 584 tests green (linked_sweep 62, sweep_cycle 14, outbox 28, main-wiring 14);
+`npm run build:bot` exit 0; `npm run ci:changed` exit 0 (one release-side error-severity
+lint the merge swept into the changed set, the schema_wiring findIndex, fixed by hand;
+scoped biome writes on the session's own files only). Full `npm run gate` not run for
+the standing sibling-worktree malware-scan reason; the constituent steps ran by hand.
+
+**Ledgered:** L18 (gateway reconnect leaves the heartbeat interval running across the
+socket swap, one wasted reconnect cycle worst case; pre-existing, outside the Phase 6
+diff, routed to Phase 7 with the other supervision work). Recorded residuals from the
+build stand unchanged (the durable-mark-failure re-announce loop, the mid-seed
+presence-only eviction self-heal, the channel-unset drained-drop semantics, the
+breaker-gate flair lag bound, the pass floor, the unlinked-members-keep-flair maintainer
+flag). Connection count stays verify-at-deploy.
 
 ### Phase 6 (2026-08-01)
 
