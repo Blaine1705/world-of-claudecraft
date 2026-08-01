@@ -586,6 +586,13 @@ describe('the professions blob growth bound (phase 16)', () => {
         } as unknown as InvSlot['instance'],
       },
     ];
+    // The bank wiring too (one loader drive covers both arms): its RAW
+    // marker routes through the same doctrine helper.
+    s1.bank = {
+      inventory: [{ itemId: 'wolf_fang', count: 1, craftedRecipeId: 'b'.repeat(100_000) }],
+      purchasedSlots: 8,
+      bonusSlots: 0,
+    };
     const second = makeSim(47);
     const pid2 = second.addPlayer('warrior', 'MarkerBound', { state: s1 });
     const s2 = second.serializeCharacter(pid2) as CharacterState;
@@ -593,6 +600,9 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(row, 'the row itself survives (only its junk drops)').toBeTruthy();
     expect(row?.craftedRecipeId, 'the oversized marker dropped').toBeUndefined();
     expect(row?.instance, 'the refused rift dropped too').toBeUndefined();
+    const bankRow = s2.bank?.inventory?.find((slot) => slot.itemId === 'wolf_fang');
+    expect(bankRow, 'the bank row survives').toBeTruthy();
+    expect(bankRow?.craftedRecipeId, 'the bank marker dropped too').toBeUndefined();
   });
 
   it('a knownRecipes value stored as a STRING loads the character instead of throwing', () => {
