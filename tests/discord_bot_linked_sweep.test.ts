@@ -357,8 +357,13 @@ describe('flex-batch answers', () => {
     // re-adds them. Every leg of the heal is asserted by value, because the
     // heal is the reason the staleness is acceptable at all.
     const sweep = seeded([A, B]);
+    // The slice is LOAD-BEARING: its ids are what the stale answer below is
+    // built from, so deleting the take leaves nothing to answer with (the
+    // fresh-eyes round found the first cut used literals and the race was
+    // scene-setting).
     const slice = sweep.nextSlice(0, SWEEP_SLICE_MAX, 1000);
-    expect([...(slice?.ids ?? [])].sort()).toEqual([A, B].sort());
+    const sliceIds = [...(slice?.ids ?? [])];
+    expect([...sliceIds].sort()).toEqual([A, B].sort());
     // The feed unlinks A while the slice's answer is still in flight.
     const feed = sweep.applyLinkChangeItems([item(A, ['unlink'])], anyMember);
     expect(feed.removed).toEqual([A]);
@@ -366,7 +371,7 @@ describe('flex-batch answers', () => {
     expect(sweep.hasNoLinkRow(A)).toBe(true);
     // The stale answer lands: A is re-added (the staleness), but flagged
     // metaStale, which is what makes the wiring re-push their meta.
-    const stale = sweep.applyFlexBatchResult([A, B], authoritativeAnswer([A, B], [A, B]));
+    const stale = sweep.applyFlexBatchResult(sliceIds, authoritativeAnswer(sliceIds, sliceIds));
     expect(stale.added).toEqual([A]);
     expect(stale.metaStale).toEqual([A]);
     expect(sweep.has(A)).toBe(true);

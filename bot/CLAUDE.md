@@ -130,9 +130,10 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
 - Role sync (`role-sync`): one paced SLICE of the linked-member set per run, every
   `cfg.sweepSliceMs` (3 s) while a pass has ids left, decaying to `cfg.roleSyncIntervalMs`
   (5 min) between passes, which is the pass interval itself. The window is a FLOOR, not a
-  deadline: a pass opens at the first wake at or after it, and the decay walk from 3 s
-  doubles to the 300 s ceiling through wakes at 3, 9, 21, 45, 93, 189, then 381 s, so the
-  default effective gap between passes is about 6.4 minutes (an event kick bypasses it).
+  deadline: a pass opens at the first wake at or after it. The idle intervals double
+  3, 6, 12, 24, 48, 96, 192 s (the 300 s ceiling is never reached before a pass opens),
+  putting the cumulative wakes at 3, 9, 21, 45, 93, 189, then 381 s, so the default
+  effective gap between passes is about 6.4 minutes (an event kick bypasses it).
   `linked_sweep.ts` decides WHICH members, the scheduler decides WHEN. Kicked by `GUILD_CREATE` (preceded by
   `requestPass()`, because a kick alone only wakes the task early and it would find the
   pass window still open), by a COMPLETE roster seed, and by the outbox link-change feed

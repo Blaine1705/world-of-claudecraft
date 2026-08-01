@@ -438,12 +438,16 @@ describe('outbox poll didWork signal', () => {
     // The day was never marked, so the server keeps it; nothing is lost.
     expect(unset.marks).toEqual([]);
 
-    // Same signal for an ordinary durable failure (a 403 on the channel).
+    // Same signal for an ordinary durable failure (a 403 on the channel). The
+    // attempted-announce pin is what separates "backed off after trying" from
+    // "stopped consuming the winners stream", which the unset-channel arm above
+    // cannot see (its stub records nothing).
     const refused = recorder({
       envelope: envelope({ winners: { days: [winnersDay('2026-07-31')] } }),
       failWinners: () => true,
     });
     expect(await runOutboxPoll(refused.io)).toBe(false);
+    expect(refused.winners.map((d) => d.day)).toEqual(['2026-07-31']);
     expect(refused.marks).toEqual([]);
   });
 

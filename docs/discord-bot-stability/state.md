@@ -1,6 +1,7 @@
 # State: Discord Bot Stability (cross-phase cheat sheet)
 
-Current phase: Phase 6 IN PROGRESS (started 2026-08-01). Phases 1 to 5 built and QA'd.
+Current phase: Phase 6 BUILT (2026-08-01), its dedicated QA session still owed (D19).
+Phases 1 to 5 built and QA'd.
 The packet's sync target is now `origin/release/v0.34.0` (the maintainer's retarget call,
 relayed in the Phase 6 handoff): at Phase 6 start it sat at `94f5ac63d`, equal to main's
 tip and a superset of v0.33.0, measured 90 ahead 2 behind and merged clean as `204e5a6cb`
@@ -531,6 +532,79 @@ because dropping the one word is otherwise silent),
   a workflow trust-posture test) and extended `tests/deploy_discord_bot.test.ts` with the
   bot build and typecheck surface.
 
+- Phase 6 (bot consumes the new surface, built 2026-08-01; QA session still owed):
+  - New modules: `bot/linked_sweep.ts` (pure: the linked-member set fed by flex-batch
+    answers under the requested-echo contract, the outbox link-change stream read as a
+    KIND SEQUENCE via `terminalLinkKind` so a relink is not dropped, and the members-meta
+    `unapplied` signal, which the bot finally consumes per L14's condition; the noLinkRow
+    plus metaStale memory that re-pushes a member's meta on a fresh link, closing the
+    repoint staleness without touching L14; dirty-first slicing; pass windowing where the
+    window is a FLOOR; one idempotent discovery per complete seed, never periodic) and
+    `bot/outbox_consumer.ts` (injected-IO: breaker gate BEFORE the drain, per-item
+    catches, winners announce-then-mark, channel routing bound in the factory so a swap
+    is testable, didWork split by stream class: drained streams count by carriage, the
+    re-served winners read by successful announce).
+  - Client surface: `ServerClient.flexBatch` (list sent verbatim, `FLEX_BATCH_LIMIT`
+    1000) and `drainOutbox` on a per-call deadline (`DEFAULT_OUTBOX_TIMEOUT_MS` 70000,
+    above the server's 65s read deadline because a 200 is the outbox's only
+    acknowledgement); `pushMembersMeta` return widened to `MembersMetaPushResult`
+    (changed/skipped/unapplied were already flowing at runtime; the updated===0 refusal
+    stands). DELETED: `flex`, `drainRelay`, `drainActivity`, `dailyRewardWinners` (zero
+    references remain; the server-side same-name queue functions are unrelated and
+    untouched).
+  - Loops: 7 scheduler tasks became 5. The three 3s pollers are ONE `outbox` task
+    (activeMs `DISCORD_OUTBOX_POLL_MS` 3000 decaying to `DISCORD_OUTBOX_IDLE_MS` 15000,
+    poll deadline `DISCORD_OUTBOX_TIMEOUT_MS` 70000); `role-sync` is slice-driven
+    (activeMs `DISCORD_SWEEP_SLICE_MS` 3000, slice size `DISCORD_SWEEP_SLICE_SIZE` 100
+    chosen against the governor's 256 per-queue depth, idleMs the pass interval).
+    `DISCORD_RELAY_POLL_MS`, `relayPollMs` and `RELAY_POLL_MS` are DELETED; the key must
+    NOT be resurrected in `.env.example`. The five NEW keys are owed to `.env.example`
+    (harness-blocked, maintainer-only), commented beside the governor block:
+    `#DISCORD_SWEEP_SLICE_MS=3000`, `#DISCORD_SWEEP_SLICE_SIZE=100`,
+    `#DISCORD_OUTBOX_POLL_MS=3000`, `#DISCORD_OUTBOX_IDLE_MS=15000`,
+    `#DISCORD_OUTBOX_TIMEOUT_MS=70000`; Phase 7 documents all of them in DEPLOY.md (D13).
+  - Phase 5 QA contract notes, honored: exactly one serialized outbox poll (the
+    scheduler task overlap guard, pinned behaviorally); client timeout 70s above the
+    server deadline; winners consumption and mark on the ONE sequential task; a repoint
+    feed item is read as who to STOP flairing (the old id), the new identity arriving
+    via flex-batch or the resync. The flex-batch `requested` echo is compared against
+    the DISTINCT ids sent; a suspect answer applies positive evidence only.
+  - The hourly `FULL_RESYNC_INTERVAL_MS` meta resync is RETAINED unchanged (still the
+    heal for feed eviction, the cascade unlink, and the repoint identity); the bot now
+    also consumes `unapplied`, so L14's blocking condition is met, but shortening or
+    removing the resync stays a separate maintainer decision.
+  - Steady-state outbound profile (the incident metric): ONE periodic game-server
+    request (the outbox poll, 4/min idle, 20/min busy), role-sync flex-batch requests
+    only while a pass or dirty work exists, presence push per debounce window, plus
+    short-lived event-driven calls. Analytic bound: 1 to 3 concurrent established
+    sockets to the game server versus the incident's ~110. No Discord credentials exist
+    in this environment, so the live `lsof` measurement is VERIFY-AT-DEPLOY (recorded in
+    progress.md).
+  - Known accepted behavior changes, recorded in bot/CLAUDE.md: with a stream's channel
+    id unset, drained relay/activity items are dropped after a once-per-channel notice
+    (the old pollers checked the channel before draining); while the breaker is open the
+    skipped drain also delays link-change consumption (worst case about an hour if the
+    Phase 5 ladder evicted the items, healed by the resync); the pass window is a floor
+    (effective default gap about 6.4 minutes, event kicks bypass it).
+    Two residuals from the fresh-eyes round, pre-existing shapes recorded rather than
+    changed: a day that announces but whose MARK durably fails re-announces every poll
+    at the fast cadence (the at-least-once contract; a bounded re-announce is a Phase 7
+    or 8 candidate), and a presence-only id that arrives MID-seed can be evicted at
+    completeness and self-heals on its next presence event.
+  - Flagged for the maintainer, pre-existing, NOT changed here: a departed or unlinked
+    member keeps their tier role and level-nick suffix on Discord (`syncRolesFor` has
+    always returned early on unlinked); Phase 6 made the sweep set explicit, so a
+    clear-on-unlink would now be easy to add if wanted.
+  - New tests: `tests/discord_bot_linked_sweep.test.ts` (50), `tests/discord_bot_sweep_cycle.test.ts`
+    (12, the D18 composed harness: 5000 roster / 1000 online / 300 linked, D6 by value,
+    the spread pinned at exactly one slice's writes per tick, steady-state zero writes
+    and zero meta pushes, discovery, the governor-refusal arm),
+    `tests/discord_bot_outbox.test.ts` (24). Extended: config (34), main-wiring (12,
+    including the idle-column and nextSlice-argument pins the QA round added),
+    server_client (49 at the client commit, 26 after the deletions landed).
+    Mutation tallies this phase: C 6/6, A 14/14, B 12/12, QA fix round 5/5, all with
+    rc!=0 plus named failing tests.
+
 ## Phase 5 feed-site enumeration (the linked-member change feed contract)
 
 Every server-side site where a linked account's flex-relevant state changes (level, class,
@@ -831,7 +905,18 @@ route each to a phase or file it.
 Each of these is real and confirmed by an independent skeptic, and each was left for a
 later phase because its fix belongs to that phase's scope, not because it was dismissed.
 
-- L9 (should-fix, at-least-once, OPEN, natural home Phase 5 or 6): a `GovernorBlockedError`
+- L9 CLOSED by Phase 6, via the outbox transport plus a bot-side gate rather than a
+  bot-side mark protocol. The systematic loss window (a whole breaker quiet window of
+  drained-then-refused posts) is gone two ways: the server preserves all three in-memory
+  streams unless a poll answers 200 (the Phase 5 retry contract), and `runOutboxPoll`
+  refuses to DRAIN at all while the breaker is not closed, so nothing is pulled into
+  refusals in the first place; the sweep's own cheap refused writes keep supplying the
+  half-open probe, so the gate cannot deadlock recovery. The RESIDUAL, recorded not
+  fixed: a breaker that trips MID-fan-out still loses the already-drained items behind
+  it (bounded by one poll's drain), and a per-item post failure still costs that item,
+  both the pre-outbox loss shape. Winners were never exposed: at-least-once by mark.
+  Original report, kept for the record:
+- L9 (was: should-fix, at-least-once, natural home Phase 5 or 6): a `GovernorBlockedError`
   permanently LOSES already-drained relay and activity items. `createMessage` is not
   `essential`, so while the breaker is open every relay and activity post is refused
   unsent, and `bot/main.ts` has already drained those items server-side with only a
@@ -997,7 +1082,19 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   `discord_role` both null), is a server-side state change the bot cannot observe, so the diff
   has nothing to react to. The hourly resync is the interim answer; the linked-member change
   feed is the real one, and it removes the need for a periodic full push entirely.
-- L16 (correctness, roster seeding, OPEN, natural home Phase 6 with the D6 sweep-iteration
+- L16 CLOSED by Phase 6, exactly along this entry's fix shape: `seedSessionIds`
+  accumulates the ids seen across one COMPLETE seed (GUILD_CREATE resets it, chunks and
+  GUILD_MEMBER_ADD extend it), and `completeSeed()` diffs the UNION of every per-member
+  cache against it (memberRoles, memberNames, memberJoined, onlineUsers, voiceStates,
+  both nickname caches, lastPushedMeta; the QA round widened it from memberRoles alone so
+  a presence-seeded ghost id cannot survive), evicts the departed, prunes the linked
+  sweep set, and only then runs the flaired-ids reconcile, which therefore finally sees
+  an honest roster. Gated on `rosterComplete` so a partial seed can never evict live
+  members. `dailyActive.seen` is the one deliberate exclusion (empties on the day
+  rollover; the server-side grant dedupe key makes a rejoin grant a no-op). Pinned by
+  the union pin and forgetMember count in `tests/discord_bot_main_wiring.test.ts`.
+  Original report, kept for the record:
+- L16 (was: correctness, roster seeding, natural home Phase 6 with the D6 sweep-iteration
   work): `seedGuild` and the op 8 chunk handler only UPSERT, they never prune. A member who
   leaves while the gateway is disconnected fires no `GUILD_MEMBER_REMOVE`, and on reconnect they
   stay in `memberRoles` forever. `staleFlairedIds` diffs the server's flagged ids against

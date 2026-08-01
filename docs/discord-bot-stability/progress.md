@@ -14,7 +14,7 @@
 | Phase 4 QA | done | 2026-07-31 | 2026-07-31 |
 | Phase 5: Outbox + linked-member change feed | built | 2026-08-01 | 2026-08-01 |
 | Phase 5 QA | done | 2026-08-01 | 2026-08-01 |
-| Phase 6: Bot consumes the new surface | in progress | 2026-08-01 | |
+| Phase 6: Bot consumes the new surface | built | 2026-08-01 | 2026-08-01 |
 | Phase 6 QA | not started | | |
 | Phase 7: Supervision + deploy hardening | not started | | |
 | Phase 7 QA | not started | | |
@@ -65,11 +65,13 @@
 - [x] Full-envelope tests incl. empty-drain zero-query pin
 
 ### Phase 6
-- [ ] `flexBatch()` + `drainOutbox()`; old per-endpoint client methods deleted
-- [ ] Linked-set sweep through the governor with write spreading
-- [ ] One outbox loop replaces three pollers + per-user flex GETs
-- [ ] Dead code removed; steady-state connection count verified small
-- [ ] Integration test of a full sweep cycle at the D18 envelope
+- [x] `flexBatch()` + `drainOutbox()`; old per-endpoint client methods deleted
+- [x] Linked-set sweep through the governor with write spreading
+- [x] One outbox loop replaces three pollers + per-user flex GETs
+- [x] Dead code removed; steady-state connection count: analytic bound 1 to 3 sockets
+      (vs the incident's ~110); the live `lsof` measurement is VERIFY-AT-DEPLOY (no
+      Discord credentials in this environment, so the bot cannot run here)
+- [x] Integration test of a full sweep cycle at the D18 envelope
 
 ### Phase 7
 - [ ] Fatal gateway close exits nonzero; heartbeat file
@@ -976,6 +978,56 @@ construction (no overlaps, no legacy arms, no new routes, no changed helper sign
 no new db-mock sites); the merged tree is byte-identical to the QA-validated `8176b5a08`,
 so the Phase 5 QA validation ladder speaks for the merged result verbatim and no re-run
 was owed. package-lock.json did not move, so no `npm ci`; node v26.5.0 matches CI.
+
+**Build.** Three implementation agents off the Explore context packet, sequenced C plus A
+in parallel then B (the two main.ts editors never overlapped): `b343758d6` the client
+surface (flexBatch, drainOutbox on the 70s deadline, the pushMembersMeta type widening,
+6/6 mutation), `9321d6b66` the linked sweep (`bot/linked_sweep.ts` pure module, slice-driven
+role-sync, the L16 seed eviction, 14/14 mutation), `e3509f661` the consolidated outbox
+loop (`bot/outbox_consumer.ts`, three pollers and four client methods deleted, wiring and
+config pins reconciled, 12/12 mutation). Design decisions worth carrying: link-change
+kinds are read as a SEQUENCE (terminal kind wins) so a relink inside one dedupe window is
+not dropped; the module remembers no-link-row ids and re-pushes their meta on a fresh
+link (metaStale), closing the repoint staleness without weakening L14; discovery is one
+idempotent full-roster walk per complete seed, never periodic; the sweep's dirty queue is
+served ahead of the pass so a feed item syncs within one tick.
+
+**Mid-phase surprise.** `npm run ci:changed` was RED at the phase tip on three FORMAT
+errors in files this phase never touched (`server/daily_rewards_db.ts`,
+`tests/daily_rewards.test.ts`, `tests/server/discord_link_changes.test.ts`), all in
+hunks the Phase 5 QA fix rounds wrote; the drift predates Phase 6 (the retarget merge
+changed zero bytes). Formatted with the sanctioned scoped write as `5293970c8`. Lesson
+recorded to memory: a past "ci:changed clean" does not pin files, because the changed
+set moves with the default-branch ref and piping the run through tail masks its rc.
+
+**QA gate.** `qa-checklist` over the phase diff returned NOT READY with one BLOCKING
+finding, fixed with everything else in `62e152c45` (5/5 fix-round mutation): the winners
+stream is a RE-SERVED read, not a drained queue, so counting it toward didWork by
+carriage let an unpostable day (unset channel, the common deployment; a durable 403) pin
+the whole consolidated loop at 3s forever; didWork is now split by stream class. The
+should-fixes: the wiring test gained the idleMs column (deleting either idleMs
+previously left every suite green while the sweep woke every 3s between passes forever)
+and the `nextSlice(Date.now(), cfg.sweepSliceSize, cfg.roleSyncIntervalMs)` argument
+span (dropping the third argument silently made the sweep kick-only); the seed eviction
+now diffs the UNION of the per-member caches (a presence-seeded ghost id could survive
+a memberRoles-only diff); the in-flight-slice unlink race is pinned end to end through
+its meta-push heal. Comment honesty: armDiscovery's guard scope, the channel-unset drop
+semantics (a real behavior change vs the old pollers, now in bot/CLAUDE.md), the
+breaker-gate flair-lag bound, and the ~6.4 minute effective pass floor. A fresh-eyes
+pass then reviewed the fix round itself, per the packet rule that a fix round is
+unreviewed code: verdict READY, zero blocking or should-fix, and its four nice-to-haves
+were applied in the same session (the interleaving test's slice made load-bearing, the
+refused-winners arm pinning the attempted announce, the decay-walk wording made precise,
+and the two pre-existing residuals recorded in state.md: the durable-mark-failure
+re-announce loop and the mid-seed presence-only eviction self-heal).
+
+**Validation.** `npx tsc --noEmit` clean; the full bot ladder 20 files / 574 tests green
+at the B commit and re-run green after the fix round; `npm run build:bot` bundles;
+`npm run ci:changed` exit 0. Full `npm run gate` not run for the known reason (sibling
+worktrees red the malware scanner and abort it before tsc and the builds); the
+constituent steps above ran by hand. Acceptance greps recorded: zero references to any
+deleted client method, exactly 5 scheduler registrations, zero bare timers in main.ts,
+package.json and package-lock untouched (D7).
 
 ### Phase 5 QA (2026-08-01)
 
