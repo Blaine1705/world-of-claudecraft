@@ -7,25 +7,6 @@ import type { BiomeId } from '../sim/types';
 
 export type Surface = 'grass' | 'dirt' | 'stone' | 'wood' | 'snow' | 'water';
 
-export type AbilityAudioKind =
-  | 'windup'
-  | 'release'
-  | 'impact'
-  | 'pulse'
-  | 'crit'
-  | 'spirit'
-  | 'motif';
-
-export interface AbilityAudioOpts {
-  lite?: boolean;
-  finisher?: boolean;
-  archetype?: string;
-  buffStyle?: string;
-  sample?: string;
-  name?: string;
-  abilityId?: string;
-}
-
 export interface AmbientPointSource {
   readonly id: string;
   readonly kind: 'campfire' | 'forge';

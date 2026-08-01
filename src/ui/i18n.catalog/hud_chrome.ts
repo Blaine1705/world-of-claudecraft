@@ -15,7 +15,6 @@ export const hudChromeStrings = {
     fateThreadsLabel: 'Fate Threads',
     doomEmptyStatus: '{value} of {max} Condemnation.',
     doomStatus: '{value} of {max} Condemnation; {remaining}.',
-    fateThreadsLabel: 'Fate Threads',
     fateThreadsStatus: '{value} of {max} Fate Threads.',
     fateThreadsConsumeReady:
       'Three Fate Threads: Consume can weave them into additional Condemnation.',
