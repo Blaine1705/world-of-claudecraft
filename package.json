@@ -32,6 +32,7 @@
     "electron:build": "node scripts/electron-build.mjs build",
     "electron:build:steam": "node scripts/electron-build.mjs build steam",
     "electron:build:epic": "node scripts/electron-build.mjs build epic",
+    "epic:bpt-upload": "node scripts/epic-bpt-upload.mjs",
     "preview": "vite preview",
     "format": "biome format --write .",
     "format:check": "biome format .",
