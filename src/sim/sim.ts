@@ -963,6 +963,9 @@ export interface InstanceSlot {
   mobIds: number[];
   objectIds: number[];
   exitId: number | null;
+  // The exit portal a DungeonDef.bossExitPortal dungeon spawns at the final
+  // boss's death (also present in objectIds, which owns its teardown).
+  bossExitId: number | null;
   emptyFor: number;
   // Sim-time until this live claim may be manually replaced again. Claim-owned
   // authority prevents party roster or leadership churn from rotating away the
@@ -2052,6 +2055,7 @@ export class Sim {
             mobIds: [],
             objectIds: [],
             exitId: null,
+            bossExitId: null,
             emptyFor: 0,
             resetAvailableAt: 0,
             clearedBy: new Set(),
@@ -2081,6 +2085,7 @@ export class Sim {
           mobIds: [],
           objectIds: [],
           exitId: null,
+          bossExitId: null,
           emptyFor: 0,
           resetAvailableAt: 0,
           clearedBy: new Set(),
