@@ -6,10 +6,10 @@ D11 residual accepted (~1.32). Worktree
 `/home/fernandoramirez/Documents/world-of-claudecraft-ci-speed` on
 `feature/ci-speed`. PR #2737.
 
-**Next action:** Phase 4 QA close (qa-checklist stamp if needed), then Phase 5
-path filters. Do not raise N past 8. No more rename loops for D11.
-Release-arm live probe DEFERRED (OPEN item 6). Privacy-security PASS;
-test-coverage PASS after pin harden.
+**Next action:** Phase 5 path filters (do not start until owner kicks it). Do not
+raise N past 8. No more rename loops for D11. Release-arm live probe DEFERRED
+(OPEN item 6). Phase 4 QA PASS (privacy-security, test-coverage, scoped
+checklist).
 
 ## Locked decisions
 
