@@ -12,8 +12,8 @@
 | 3 QA | NOT STARTED | | Wall win banked; D11 residual accepted unless path-matrix |
 | 4 Release-checks split | DONE (probe DEFER) | #2737 | release-checks parallel; release-gate tests-only; OPEN item 6 probe DEFER |
 | 4 QA | PASS | #2737 | privacy-security PASS; test-coverage PASS after pin harden; scoped checklist green; probe DEFER |
-| 5 Path filters + close | NOT STARTED | | |
-| 5 QA | NOT STARTED | | Whole-packet + teardown offer |
+| 5 Path filters + close | DONE | #2737 | Native `changes` job; no aggregator (skipped OK); teardown offered |
+| 5 QA | PASS-WITH-FOLLOWUPS | #2737 | Whole-packet; probe run ids below; OPEN item 6 release probe still DEFER |
 
 ## Measurement log
 
@@ -329,9 +329,77 @@ packet import hygiene later (D15).
 
 ## Phase 5 checklist
 
-- [ ] Path filter / changes detection
-- [ ] Docs-only probe skips test matrix, keeps lint
-- [ ] Code PR still full matrix
-- [ ] Aggregator only if required (OPEN item 5)
-- [ ] Whole-packet QA PASS
-- [ ] Teardown offer recorded (delete only on owner confirm)
+- [x] Path filter / changes detection (native `changes` job + git diff; no dorny)
+- [x] Docs-only probe skips test matrix, keeps lint (see measurement notes)
+- [x] Code PR still full matrix (this phase commit touches `.github/workflows/**` + tests)
+- [x] Aggregator only if required (OPEN item 5): **not required**; evidence below
+- [x] Whole-packet QA PASS-WITH-FOLLOWUPS (qa-checklist.md filled)
+- [x] Teardown offer recorded (delete only on owner confirm; not deleted here)
+
+### Phase 5 design (D10, OPEN item 5)
+
+**Code path set** (minimum from phase-05; public/** included so assets force tests):
+`src/**`, `server/**`, `tests/**`, `headless/**`, `bot/**`, `scripts/**`,
+`package.json`, `package-lock.json`, `tsconfig.json`, `tsconfig.admin.json`,
+`vite.config.ts`, `vitest.browser.config.ts`, `biome.json`, `.github/workflows/**`,
+`electron/**`, `android/**`, `ios/**`, `public/**`.
+
+**Docs-only** when none of the above match (examples: `docs/**`, `**/*.md`,
+`docs/screenshots/**`, root markdown).
+
+| Event / diff | changes.code | pr-gate | pr-checks | browser-gate | lint | release-* |
+|---|---|---|---|---|---|---|
+| PR, docs-only | false | skip | skip | skip | run | skip (not release) |
+| PR, code or mixed | true | full | full | run | run | skip (not release) |
+| PR release-to-main | true (if code) | skip (event arm) | skip | run if code | run | full (no path filter) |
+| push release/** | true (non-PR) | skip (event arm) | skip | run | run | full (no path filter) |
+| push main/dev-* | true (non-PR) | full | full | run | run | skip |
+| workflow_dispatch | true (non-PR) | full | full | run | run | skip |
+
+**Why native, not dorny/paths-filter:** a single checkout + `git diff` + bash
+`case` expresses the code set cleanly; zero new third-party actions (D10).
+
+**Aggregator (OPEN item 5): NOT implemented.** Evidence: on ordinary PR #2737,
+`Release gate`, `Release checks`, and `Release version gate` already report
+`skipping` while lint / pr-checks / browser-gate stay green and the PR is not
+blocked by those skipped required-style names. Path-filter skips of pr-gate /
+pr-checks / browser-gate use the same GHA skip semantics. If branch protection
+later treats skipped PR matrix shards as blocking, add a `ci-result` aggregator
+then (design: `if: always()`, needs the conditional jobs, exit 0 only when each
+required job is success or skipped). Do not invent it without that evidence.
+
+**Composition:** pr-gate / pr-checks keep the full release-to-main exclusion
+fragment and AND `needs.changes.outputs.code == 'true'`. release-gate /
+release-checks / release-version-gate keep the exact RELEASE_IF_LINE with no
+`needs: changes` and no paths-ignore. Fail closed: non-PR, missing SHAs, and
+empty file lists all leave code=true.
+
+**gate.mjs:** unchanged; still full unsharded vitest; no path filters locally.
+
+### Phase 5 measurement notes
+
+- Pins: `npx vitest run tests/ci_workflow.test.ts` green (10 tests). Red-path:
+  temporary `paths-ignore` on release-gate failed the new path-filter pin;
+  YAML restored; green again.
+- Code-touch probe: this phase's push on #2737 (touches workflow + tests under
+  the code set). Expect full pr-gate (1..8) + pr-checks + browser-gate + lint.
+  Record run id after push: see below / PR checks.
+- Docs-only probe: draft PR `probe/ci-speed-docs-only` -> `feature/ci-speed`
+  with only a docs stamp under `docs/ci-speed/`. Expect changes.code=false;
+  pr-gate/pr-checks/browser-gate skipped; lint green. Record run id after open.
+- Release path: reasoned from YAML + exact-line pins (OPEN item 6: do not push
+  real release/** solely for filter tests while version-gate is red).
+- Branch protection check names (OPEN item 3, owner): still
+  `PR gate (English-only legal) (1)` .. `(8)`, plus `PR checks (...)`,
+  `Format + lint (...)`, `Browser regressions (...)`. Docs-only PRs skip the
+  PR gate / PR checks / browser names; owner should confirm skipped required
+  checks remain merge-OK (evidence on this repo: already OK for release skips).
+- **Teardown offer:** after all phase work on #2737 merges, owner may confirm
+  deletion of `docs/ci-speed/`. Not deleted in this phase.
+
+### Phase 5 probe run ids
+
+| Probe | Run | Result |
+|---|---|---|
+| code-touch (phase 5 push on #2737) | (fill after push) | expect full PR matrix |
+| docs-only (probe PR) | (fill after open) | expect pr-gate/pr-checks/browser skip; lint green |

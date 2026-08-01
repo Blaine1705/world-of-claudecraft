@@ -105,10 +105,10 @@ STOPPING RULES:
 
 ## Exit criteria
 
-- [ ] Docs-only probe skips test matrix
-- [ ] Code PR full matrix
-- [ ] Release path unfiltered
-- [ ] Pins green; aggregator only if needed
-- [ ] qa-checklist filled
-- [ ] Teardown offer recorded
-- [ ] Draft PR open; ready after Phase 5 QA
+- [x] Docs-only probe skips test matrix (design + probe; run ids in progress.md)
+- [x] Code PR full matrix (phase push under code path set)
+- [x] Release path unfiltered (exact RELEASE_IF_LINE; no needs.changes)
+- [x] Pins green; aggregator only if needed (**not needed**: skipped release jobs already OK)
+- [x] qa-checklist filled
+- [x] Teardown offer recorded
+- [x] Draft PR open (#2737); ready after Phase 5 QA

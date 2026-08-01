@@ -1,15 +1,16 @@
 # State: CI Speed (cross-phase cheat sheet)
 
-**Current phase:** Phase 4 code DONE (release-checks split). Locked **N=8**.
-Completeness **1939** Test Files. PR wall samples UNDER 8 min (424s / 442s).
-D11 residual accepted (~1.32). Worktree
+**Current phase:** Phase 5 DONE (path filters + whole-packet close). Locked
+**N=8**. Completeness **1939** Test Files. PR wall samples UNDER 8 min (424s /
+442s). D11 residual accepted (~1.32). Worktree
 `/home/fernandoramirez/Documents/world-of-claudecraft-ci-speed` on
 `feature/ci-speed`. PR #2737.
 
-**Next action:** Phase 5 path filters (do not start until owner kicks it). Do not
-raise N past 8. No more rename loops for D11. Release-arm live probe DEFERRED
-(OPEN item 6). Phase 4 QA PASS (privacy-security, test-coverage, scoped
-checklist).
+**Next action:** Owner merge of #2737 (or follow-ups). Optional: confirm
+deletion of `docs/ci-speed/` after merge (teardown offer; do not delete without
+explicit owner confirm). Do not raise N past 8. No more rename loops for D11.
+Release-arm live probe DEFERRED (OPEN item 6). Path-matrix balance only with
+owner OK (separate from Phase 5 path filters).
 
 ## Locked decisions
 
@@ -49,6 +50,7 @@ checklist).
   Release/** pushes always full release tier. Prefer zero new dependencies;
   `dorny/paths-filter` is allowed only if native path/`if` expressions cannot
   express the filter cleanly (justify in progress.md).
+  **Status:** native `changes` job landed in Phase 5; no dorny.
 - **D11 Balance metric:** after Phase 3, worst shard vitest **Duration**
   within **20%** of the median shard Duration on the same run.
   **Status after three rounds: MISS** (359.31 / 270.83 = 1.327 on 30712431702).
@@ -115,11 +117,9 @@ checklist).
 
 ## Pinned surfaces
 
-- `.github/workflows/ci.yml` (all jobs, if-conditions, matrix, concurrency)
+- `.github/workflows/ci.yml` (all jobs, if-conditions, matrix, concurrency, path filter)
 - `scripts/gate.mjs` (step list comments; no --shard)
-- `tests/ci_workflow.test.ts` (structural pins; `SHARD_N = 8`)
-- Optional new: small pure helper for shard-simulation in tests if Phase 3
-  needs a durable pin (prefer inline in the test file unless reused)
+- `tests/ci_workflow.test.ts` (structural pins; `SHARD_N = 8`; path-filter pins)
 
 ## OPEN items
 
@@ -130,9 +130,13 @@ checklist).
    progress.md; owner OK required to implement.
 3. **Branch protection check names:** owner action after Phase 2; track in
    progress.md. New names are `PR gate (English-only legal) (1)` through `(8)`.
+   Docs-only PRs additionally skip PR gate / PR checks / browser when the
+   path filter fires; confirm skipped required checks stay merge-OK.
 4. **Larger runners:** locked off (D1). Flip only with owner + cost note.
-5. **Aggregator job for path filters:** only if branch protection cannot
-   accept skipped required checks; Phase 5 decides with evidence.
+5. **Aggregator job for path filters:** CLOSED for this packet. Evidence on
+   #2737: release jobs already skip without blocking merge. No `ci-result`
+   invented. Reopen only if branch protection starts treating skipped PR
+   matrix checks as blocking.
 6. **release-version-gate red on v0.34.0:** observed 2026-08-01; not this
    packet's bug. Do not block speed work on it; use a scratch release branch
    with correct version surfaces for release probes, or defer release-arm
@@ -150,5 +154,8 @@ checklist).
 - Phase 4 code: `release-checks` parallel to tests-only `release-gate`; pins
   re-derived (check:types x2, no matrix.shard == 1); gate.mjs header notes both
   parallel pairs; release probe DEFERRED (OPEN item 6).
+- Phase 5 code: native `changes` job; pr-gate/pr-checks/browser-gate compose
+  with `needs.changes.outputs.code`; release jobs unfiltered; no aggregator;
+  whole-packet QA filled; teardown of `docs/ci-speed/` offered only.
 - PR: https://github.com/levy-street/world-of-claudecraft/pull/2737
-- Next: Phase 4 QA, then Phase 5. Path-matrix only with owner OK.
+- Packet close: pending owner merge + optional docs/ci-speed/ teardown confirm.
