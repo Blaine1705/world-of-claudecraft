@@ -2731,9 +2731,11 @@ export class Sim {
         if (!owned) continue;
         // Both branches hand back a payload THIS load owns (a fresh clone, or
         // a fresh rebuild), which is what lets the shared load bound delete
-        // keys in place (item_instance_load.ts). It bounds every string on
-        // the payload, not just the signer: the phase 16 first cut clamped
-        // the signer alone and left the rest of the shape unbounded.
+        // keys in place (item_instance_load.ts). Its arms are the module's
+        // own contract (key count, key length, string values at the top and
+        // one level into rolled/charges, the subtree JSON ceiling under
+        // them): the phase 16 first cut clamped the signer alone and left
+        // the rest of the shape unbounded.
         //
         // On the RIFT branch the signer arm is DEAD, and saying so is the
         // point: sanitizeRiftGearInstance REBUILDS the payload from bounded
@@ -2811,6 +2813,14 @@ export class Sim {
       // charge-bearing copies through the grant's fresh-slot clone.
       meta.vendorBuyback = (s.vendorBuyback ?? []).map((raw) => {
         const slot = cloneInvSlot(raw);
+        // Rift rebuild FIRST, the same order as the bags arm above (the
+        // whole-branch review: this arm skipped the rebuild, so the bound's
+        // deliberate rift skip left buyback rift rows unvalidated).
+        if (slot.instance?.rift) {
+          const rebuilt = sanitizeRiftGearInstance(slot.itemId, slot.instance, player.id);
+          if (rebuilt) slot.instance = rebuilt;
+          else delete slot.instance;
+        }
         // Buyback rows carry real signed instances (anything sold to a vendor
         // lands here for five minutes), so they take the same payload bound
         // as bags and equipment; the first cut reached neither this list nor
@@ -2827,7 +2837,7 @@ export class Sim {
       });
       // Bank sanitizes on load (never destroys items; a pre-bank save has no `bank`
       // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
-      meta.bank = sanitizeBankState(s.bank, meta.name, droppedInstanceJunk);
+      meta.bank = sanitizeBankState(s.bank, meta.name, droppedInstanceJunk, player.id);
       warnDroppedInstanceKeys(meta.name, droppedInstanceJunk);
       for (const q of s.questLog) {
         // Prune unknown quest ids at load (normalize on load, never crash): a save

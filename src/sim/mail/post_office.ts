@@ -24,6 +24,7 @@ import {
   WELCOME_LETTER,
 } from '../content/letters';
 import { ITEMS } from '../data';
+import { warnDroppedInstanceKeys } from '../item_instance_load';
 import { itemInstancePayloadsEqual } from '../item_instance_merge';
 import {
   countMatchingUnlocked,
@@ -895,6 +896,10 @@ export class PostOffice {
       items: InvSlot[];
       delaySeconds: number;
     }[] = [];
+    // One aggregated dev-channel line per BOOK load (the character-load
+    // idiom): the escrow bound reports what it dropped without logging per
+    // row on a systematically corrupt save.
+    const escrowDrops: string[] = [];
     for (const m of save.mail ?? []) {
       if (!m || typeof m.recipientKey !== 'string') continue;
       // Keep letters whose attached item id is no longer in ITEMS (a content
@@ -903,7 +908,9 @@ export class PostOffice {
       // its count to the identical-payload merge cap (the character-load rule).
       const items = (m.items ?? [])
         .filter((s) => s && typeof s.itemId === 'string')
-        .map((s) => sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance)));
+        .map((s) =>
+          sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance), escrowDrops),
+        );
       const kind: MailKind = m.kind === 'player' || m.kind === 'npc' ? m.kind : 'system';
       const recipientName = String(m.recipientName ?? m.recipientKey);
       const senderName = String(m.senderName ?? '?');
@@ -974,6 +981,7 @@ export class PostOffice {
         announced: deliverIn <= 0,
       });
     }
+    warnDroppedInstanceKeys('mail book', escrowDrops);
     const maxId = this.mail.reduce((mx, m) => Math.max(mx, m.id + 1), 1);
     this.nextMailId = Math.max(this.nextMailId, save.nextMailId ?? 1, maxId);
     for (const parcel of returnedParcels) this.book(parcel);

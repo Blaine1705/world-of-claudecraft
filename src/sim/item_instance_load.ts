@@ -54,6 +54,17 @@ export const MAX_INSTANCE_PAYLOAD_KEYS = 24;
  *  the progression rebuild (rift/progression.ts). */
 const SCANNED_SUB_OBJECT_KEYS: readonly string[] = ['rolled', 'charges'];
 
+/**
+ * The serialized-size ceiling for a NON-STRING value nested inside a scanned
+ * sub-object (rolled.stats is the real population: a small record of stat
+ * numbers, far under this). Bounds what the per-string rule cannot see: an
+ * object smuggling unbounded bytes through nesting (rolled.stats.x.y...),
+ * where each level individually passes every key and string arm. Measured on
+ * the JSON the save path would write, so the ceiling bounds exactly the
+ * growth the module exists to stop.
+ */
+export const MAX_INSTANCE_SUBTREE_JSON_LENGTH = 1024;
+
 export interface SanitizedItemInstancePayload {
   /** The cleaned payload, or undefined when nothing usable survives (the
    *  caller then removes the field entirely: an empty `{}` payload is worse
@@ -99,11 +110,26 @@ export function warnDroppedInstanceKeys(owner: string, dropped: readonly string[
  *    whole payload drops;
  *  - more own keys than MAX_INSTANCE_PAYLOAD_KEYS: the whole payload drops
  *    as corrupt, since no legal writer comes near that count;
+ *  - a KEY NAME past MAX_INSTANCE_STRING_LENGTH: that key drops with its
+ *    value (no legal key is longer than a short identifier, and the key
+ *    count arm alone would let one megabyte-long key through);
  *  - `signer`: kept only when it is a name a legal mint could have stamped
  *    (`isLegalCrafterName`), else dropped;
  *  - any other own string value past MAX_INSTANCE_STRING_LENGTH: dropped;
- *  - the same string rule one level into `rolled` and `charges`;
+ *  - the same key and string rules one level into `rolled` and `charges`,
+ *    plus the subtree JSON ceiling on any non-string value nested there
+ *    (rolled.stats and any deeper smuggling), so nesting cannot carry what
+ *    the flat rules bound. `rift` is deliberately not scanned: its payloads
+ *    are REBUILT from bounded progression inputs (sanitizeRiftGearInstance)
+ *    on every load arm before this bound runs;
  *  - a payload left with no own keys at all: dropped whole.
+ *
+ * What this deliberately does NOT bound: string values at depth 3+ outside
+ * the scanned sub-objects (an unknown TOP-LEVEL object key is bounded by the
+ * key count and key length arms only). The subtree ceiling inside the
+ * scanned pair is the growth backstop; widening it to unknown top-level
+ * objects would size-police the forward-compatibility surface this module
+ * promises to admit.
  */
 export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedItemInstancePayload {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
@@ -127,6 +153,15 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
   const dropped: string[] = [];
   for (const key of keys) {
     const value = record[key];
+    // Key-name bound BEFORE any value rule: the key count arm alone would
+    // pass one megabyte-long key carrying a short value. Reported under a
+    // fixed label because echoing a corrupt key into the log is the same
+    // unbounded-bytes problem wearing a log costume.
+    if (key.length > MAX_INSTANCE_STRING_LENGTH) {
+      delete record[key];
+      dropped.push('(overlong-key)');
+      continue;
+    }
     if (key === 'signer') {
       // The signer is a character NAME, so it answers to the name shape
       // rather than to the generic string ceiling: the whole signer
@@ -149,10 +184,33 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
     if (!value || typeof value !== 'object' || Array.isArray(value)) continue;
     const sub = value as Record<string, unknown>;
     for (const subKey of Object.keys(sub)) {
+      if (subKey.length > MAX_INSTANCE_STRING_LENGTH) {
+        delete sub[subKey];
+        dropped.push(`${key}.(overlong-key)`);
+        continue;
+      }
       const subValue = sub[subKey];
       if (typeof subValue === 'string' && subValue.length > MAX_INSTANCE_STRING_LENGTH) {
         delete sub[subKey];
         dropped.push(`${key}.${subKey}`);
+        continue;
+      }
+      // The nesting backstop: a non-string value here (rolled.stats is the
+      // legal case, a small record of numbers) answers to the subtree JSON
+      // ceiling, so unbounded bytes cannot ride depth the flat rules never
+      // reach. Total on unknown: a value JSON cannot serialize is corrupt by
+      // definition on a JSONB row and drops.
+      if (subValue !== null && typeof subValue === 'object') {
+        let size = Number.POSITIVE_INFINITY;
+        try {
+          size = JSON.stringify(subValue)?.length ?? Number.POSITIVE_INFINITY;
+        } catch {
+          // fall through with the infinite size: drop below.
+        }
+        if (size > MAX_INSTANCE_SUBTREE_JSON_LENGTH) {
+          delete sub[subKey];
+          dropped.push(`${key}.${subKey}`);
+        }
       }
     }
   }

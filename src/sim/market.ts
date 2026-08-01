@@ -12,6 +12,7 @@
 import { bagCapacity, canGrantCopies, instancedCountCap } from './bags';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
+import { sanitizeItemInstancePayloadOnLoad, warnDroppedInstanceKeys } from './item_instance_load';
 import {
   countMatchingUnlocked,
   grantCopies,
@@ -767,6 +768,8 @@ export class Market {
     // never lands, and `remapped` counts only reissues the book actually took.
     // (A listing whose item id is merely no longer in ITEMS is a different case
     // and is KEPT; see the loop below.)
+    // One aggregated dev-channel line per book load, the mail-book idiom.
+    const escrowDrops: string[] = [];
     const saved = (save.listings ?? []).filter((l) => l && typeof l.itemId === 'string');
     // Settle the id counter and reissue any collision BEFORE a single row is
     // pushed back. The house band is already in the book (seeded by the ctor)
@@ -795,10 +798,19 @@ export class Market {
       // A persisted instanced row rehydrates its payload (deep-cloned off the
       // raw blob) and clamps to the single-copy contract: no hand-edited save
       // can mint a counted stack of one escrowed special copy.
-      const instance =
-        l.instance && typeof l.instance === 'object'
-          ? cloneItemInstancePayload(l.instance)
-          : undefined;
+      // Through the SAME shared payload bound the escrow slots take (the
+      // phase 18 whole-branch review): the listing arm was the one instanced
+      // rehydration in either book that bypassed even sanitizeEscrowSlot, so
+      // an oversized or clone-mangled payload rode every market save and was
+      // granted into the buyer's live bags on purchase. A payload the bound
+      // rejects whole leaves the listing as dormant plain data, the same
+      // doctrine as an unknown item id.
+      let instance: ItemInstancePayload | undefined;
+      if (l.instance && typeof l.instance === 'object') {
+        const bounded = sanitizeItemInstancePayloadOnLoad(cloneItemInstancePayload(l.instance));
+        for (const d of bounded.dropped) escrowDrops.push(`listing.${l.itemId}.${d}`);
+        instance = bounded.payload;
+      }
       this.marketListings.push({
         id: plan.ids[i],
         sellerKey: String(l.sellerKey ?? ''),
@@ -827,9 +839,12 @@ export class Market {
         // its count to the identical-payload merge cap (the character-load rule).
         items: (c.items ?? [])
           .filter((s) => s && typeof s.itemId === 'string')
-          .map((s) => sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance))),
+          .map((s) =>
+            sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance), escrowDrops),
+          ),
       });
     }
+    warnDroppedInstanceKeys('market book', escrowDrops);
     this.nextListingId = plan.nextListingId;
     if (plan.remapped > 0) {
       // Dev-channel only: a boot-time repair the operator should see in the log.

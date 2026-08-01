@@ -20,6 +20,7 @@ import { addStacked, bagCapacity, bagsFullError, countFit, instancedCountCap } f
 import { ITEMS } from './data';
 import * as deedsMod from './deeds';
 import { sanitizeItemInstancePayloadOnLoad, warnDroppedInstanceKeys } from './item_instance_load';
+import { sanitizeRiftGearInstance } from './rift/progression';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
 
@@ -301,7 +302,12 @@ export function bankInfoFor(ctx: SimContext, pid: number): BankInfo | null {
  *  does, to aggregate every container into ONE line per character load), drops
  *  are pushed there instead of logged here; a sink-less call still logs one
  *  aggregate line per CALL, never one per row. */
-export function sanitizeBankState(raw: unknown, owner?: string, droppedSink?: string[]): BankState {
+export function sanitizeBankState(
+  raw: unknown,
+  owner?: string,
+  droppedSink?: string[],
+  ownerId?: number,
+): BankState {
   if (!raw || typeof raw !== 'object') {
     return { inventory: [], purchasedSlots: 0, bonusSlots: 0 };
   }
@@ -337,6 +343,18 @@ export function sanitizeBankState(raw: unknown, owner?: string, droppedSink?: st
         : { itemId: e.itemId, count };
       if (craftedRecipeId !== undefined) slot.craftedRecipeId = craftedRecipeId;
       const cleaned = cloneInvSlot(slot);
+      // Rift rebuild FIRST, exactly as the bags and equipment arms order it
+      // (the whole-branch review: this arm and the buyback arm skipped the
+      // rebuild, so the bound's deliberate rift skip left banked rift rows
+      // unvalidated). The rebuild reduces a corrupt-but-valid rift row to
+      // bounded keys; a refusal drops the instance silently, the equip arm's
+      // anti-tamper rule. ownerId absent (a sink-less unit caller) skips the
+      // rebuild rather than rebuilding against a wrong owner.
+      if (cleaned.instance?.rift && ownerId !== undefined) {
+        const rebuilt = sanitizeRiftGearInstance(cleaned.itemId, cleaned.instance, ownerId);
+        if (rebuilt) cleaned.instance = rebuilt;
+        else delete cleaned.instance;
+      }
       // The same load-side payload bound the carried bags and the equipment
       // map take (item_instance_load.ts), applied to the clone above rather
       // than to the stored row, which this function never owns.

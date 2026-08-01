@@ -11,6 +11,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   MAX_INSTANCE_PAYLOAD_KEYS,
   MAX_INSTANCE_STRING_LENGTH,
+  MAX_INSTANCE_SUBTREE_JSON_LENGTH,
   sanitizeItemInstancePayloadOnLoad,
   warnDroppedInstanceKeys,
 } from '../src/sim/item_instance_load';
@@ -250,5 +251,63 @@ describe('warnDroppedInstanceKeys', () => {
     } finally {
       spy.mockRestore();
     }
+  });
+});
+
+describe('the whole-branch tightening: key names, subtree size, and depth', () => {
+  it('pins the subtree ceiling literal', () => {
+    expect(MAX_INSTANCE_SUBTREE_JSON_LENGTH).toBe(1024);
+  });
+
+  it('an overlong TOP-LEVEL key drops with its value, under a fixed log label', () => {
+    // The key-count arm alone would pass ONE megabyte-long key: the key-name
+    // bound closes that, and the log label is fixed so a corrupt key cannot
+    // ride into the dev channel as unbounded bytes either.
+    const { payload, dropped } = sanitizeItemInstancePayloadOnLoad({
+      signer: 'Ayla',
+      ['k'.repeat(MAX_INSTANCE_STRING_LENGTH + 1)]: 'short',
+    });
+    expect(payload).toEqual({ signer: 'Ayla' });
+    expect(dropped).toEqual(['(overlong-key)']);
+  });
+
+  it('an overlong key INSIDE a scanned sub-object drops the same way', () => {
+    const { payload, dropped } = sanitizeItemInstancePayloadOnLoad({
+      rolled: { quality: 'fine', ['k'.repeat(MAX_INSTANCE_STRING_LENGTH + 1)]: 'short' },
+    });
+    expect(payload).toEqual({ rolled: { quality: 'fine' } });
+    expect(dropped).toEqual(['rolled.(overlong-key)']);
+  });
+
+  it('a legal rolled.stats record survives byte-identical', () => {
+    const legal = { rolled: { quality: 'fine', stats: { agi: 2, sta: 1 } } };
+    const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(structuredClone(legal));
+    expect(payload).toEqual(legal);
+    expect(dropped).toEqual([]);
+  });
+
+  it('an oversized rolled.stats subtree drops whole at the JSON ceiling', () => {
+    const fat: Record<string, string> = {};
+    for (let i = 0; i < 40; i++) fat[`s${i}`] = 'v'.repeat(30);
+    const { payload, dropped } = sanitizeItemInstancePayloadOnLoad({
+      rolled: { quality: 'fine', stats: fat },
+    });
+    expect(payload).toEqual({ rolled: { quality: 'fine' } });
+    expect(dropped).toEqual(['rolled.stats']);
+  });
+
+  it('a nesting bomb cannot smuggle bytes through depth the flat rules never reach', () => {
+    // Each level individually passes the key and string arms; the subtree
+    // ceiling measures the serialized whole, which is what the save path
+    // would actually write.
+    let bomb: Record<string, unknown> = { leaf: 'x'.repeat(60) };
+    for (let i = 0; i < 40; i++) bomb = { [`n${i}`]: bomb, pad: 'y'.repeat(50) };
+    const { payload, dropped } = sanitizeItemInstancePayloadOnLoad({
+      charges: { current: bomb },
+    });
+    // Drop-only semantics: the sub key goes, its emptied parent survives
+    // (the same residue the string arm always left), and the bytes are gone.
+    expect(payload).toEqual({ charges: {} });
+    expect(dropped).toEqual(['charges.current']);
   });
 });
