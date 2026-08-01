@@ -1,16 +1,17 @@
 # State: CI Speed (cross-phase cheat sheet)
 
-**Current phase:** Phase 2 implementation DONE with wall DEFER to Phase 3.
-Locked **N=8** on `pr-gate` and `release-gate`. N=6 green wall 594s (run
-30707931452) and N=8 first-attempt critical path ~520s worst job / ~524s wall
-(run 30708423524) both miss the ≤ 8 minute (480s) bar. Completeness holds at
-1926 Test Files on both measurements. Worktree
+**Current phase:** Phase 2 implementation DONE with wall **DEFER to Phase 3**.
+Locked **N=8** on `pr-gate` and `release-gate`. Completeness 1926 on all
+measurement runs. Post-lock walls: 449s UNDER (PR run 30709155848) then 514s
+OVER (dispatch 30709485828). Not three consecutive ≤ 480s; wall babysitting
+stopped by owner. PR #2737 green on lock commit. Worktree
 `/home/fernandoramirez/Documents/world-of-claudecraft-ci-speed` on
-`feature/ci-speed`, based on `origin/release/v0.34.0` (not behind release).
+`feature/ci-speed`.
 
-**Next action:** Phase 2 QA (`phase-02-qa.md`) then Phase 3 shard rebalance
-(rank heavy files under N=8, split pure monsters, re-check ≤ 8 min bar). Do
-not raise N past 8 without owner OK (D5/D6).
+**Next action:** Phase 2 QA if desired (`phase-02-qa.md`), else Phase 3 shard
+rebalance (rank heavy files under N=8, split pure monsters, re-check ≤ 8 min).
+Do not raise N past 8 without owner OK (D5/D6). No more wall re-run loops
+unless the owner restarts them.
 
 ## Locked decisions
 
@@ -34,10 +35,10 @@ not raise N past 8 without owner OK (D5/D6).
   past **8** without owner approval.
 - **D6 Shard N:** **LOCKED N=8** by Phase 2 measurement (see progress.md).
   Supersedes the prior toolchain packet's locked N=4 for this surface only.
-  N=6 missed the bar (594s green). N=8 critical path still above 480s
-  (worst job ~520s / wall ~524s on first attempt of 30708423524). Phase 3
-  must rebalance before re-checking the 8 minute bar. `fail-fast: false`
-  always. Half-core `maxWorkers` cap retained.
+  N=6 missed the bar (594s). N=8 walls straddle 480s (449s then 514s after
+  lock; earlier ~524s critical path). Phase 3 must rebalance before claiming
+  a stable ≤ 8 min bar. `fail-fast: false` always. Half-core `maxWorkers`
+  cap retained.
 - **D7 Minutes vs wall:** more shards and more jobs increase billed Actions
   minutes. Accepted for this packet in exchange for lower wall clock.
 - **D8 Enforcement parity:** PR tier and release tier must not drop checks.
@@ -141,6 +142,7 @@ not raise N past 8 without owner OK (D5/D6).
 - Phase 2 code: N=8 matrices on pr-gate + release-gate; `SHARD_N` pins;
   comments no longer say 4-shard; gate.mjs unsharded.
 - PR: https://github.com/levy-street/world-of-claudecraft/pull/2737
-- Phase 2 wall: **DEFER to Phase 3** with numbers (neither N in {6, 8} hit
-  ≤ 480s green wall; N=8 locked as max allowed without owner OK).
-- Next: Phase 2 QA, then Phase 3 (`phase-03-shard-rebalance.md`).
+- Phase 2 wall: **DEFER to Phase 3** with numbers (N=6=594s; N=8 samples
+  449s UNDER then 514s OVER; no three consecutive ≤ 480s; babysitting
+  stopped). N=8 locked as max allowed without owner OK.
+- Next: optional Phase 2 QA, then Phase 3 (`phase-03-shard-rebalance.md`).

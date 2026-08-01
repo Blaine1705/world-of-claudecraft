@@ -6,8 +6,8 @@
 |---|---|---|---|
 | 1 Fixed-cost waste | DONE | #2737 | Lint checkout 22 to 25s; job 59 to 68s |
 | 1 QA | PASS-WITH-FOLLOWUPS | #2737 ready | Docs + pin harden followups only; no BLOCKING |
-| 2 Shard count | DONE (wall DEFER) | #2737 | Locked N=8; walls still > 8 min; Phase 3 rebalance |
-| 2 QA | NOT STARTED | | Explicit DEFER numbers recorded; pins for N=8 |
+| 2 Shard count | DONE (wall DEFER) | #2737 | Locked N=8; DEFER ≤8 min; wall babysitting stopped |
+| 2 QA | NOT STARTED | | Ready for phase-02-qa.md; no more wall re-runs |
 | 3 Shard rebalance | NOT STARTED | | 20% balance; re-check ≤ 8 min under N=8 |
 | 3 QA | NOT STARTED | | |
 | 4 Release-checks split | NOT STARTED | | |
@@ -26,6 +26,8 @@ Append-only. Each row: date, phase, run id, wall (s), worst shard (s), N, notes.
 | 2026-08-01 | baseline | 30703789135 | 702 | 573 | 4 | main push green |
 | 2026-08-01 | p2-measure | 30707931452 | 594 | 502 | 6 | PR green; files sum 1926; MISS 8-min bar |
 | 2026-08-01 | p2-measure | 30708423524 | ~524 (att1) | 436 | 8 | att1 shard 4 flake then re-run green; files 1926; critical path shard 5 job 520s; MISS 8-min bar |
+| 2026-08-01 | p2-wall | 30709155848 | 449 | 376 | 8 | PR green (lock commit); files 1926; UNDER 8 min (7.48 min); not three-in-a-row |
+| 2026-08-01 | p2-wall | 30709485828 | 514 | 436 | 8 | workflow_dispatch green; files 1926; OVER 8 min (8.57 min); babysitting stopped |
 
 ### Phase 2 N=6 detail (run 30707931452, green)
 
@@ -62,7 +64,20 @@ made the run green; shard 4 re-attempt vitest 360.58s.
 | **sum** | | | **1926** | completeness OK |
 
 Worst/median vitest ≈ 435.88 / 246.84 ≈ 1.77. N=8 improves wall vs N=6 (594s ->
-~524s) but still above 480s. **Lock N=8. DEFER ≤ 8 min bar to Phase 3 rebalance.**
+~524s) but is not stable under 480s. **Lock N=8. DEFER ≤ 8 min bar to Phase 3
+rebalance.**
+
+### Phase 2 wall samples after lock (babysitting stopped)
+
+| Run | Event | Wall s | Worst vitest s | Files | vs 480s |
+|---|---|---|---|---|---|
+| 30709155848 | pull_request | 449 | 375.7 | 1926 | UNDER |
+| 30709485828 | workflow_dispatch | 514 | 436.31 | 1926 | OVER |
+
+D5 wants three consecutive green walls ≤ 480s. Observed variance straddles the
+bar (one under, one over). Owner stopped further re-runs; treat Phase 2 wall
+acceptance as **explicit DEFER to Phase 3** (rebalance heavy shards under N=8).
+PR #2737 remains green on the lock commit (N=8 matrix live).
 
 ### Phase 1 lint timing (checkout step seconds; target ≤ 40s checkout, ≤ 90s job)
 
