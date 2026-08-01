@@ -212,25 +212,12 @@ export function buildComposer(
   );
   composer.addPass(grade);
 
-  // Edge AA, after the grade so it works on the display-space image (SMAA's
-  // edge detector expects the gamma-encoded color OutputGradePass produces).
-  // Only the screen-fx tail below runs after it.
-  // Construction size is provisional; addPass and the setSize() member resize
-  // every pass to the live drawing-buffer extent.
-  // The AA policy uses SMAA from medium upward. Ultra and insane now run the
-  // same 1.75 cap as high: when both caps bind, 1.75 squared is 49 percent of
-  // the fragments at the old 2.5 cap, which leaves room for this fixed-cost
-  // edge pass.
-  // ?smaa=off is the dev-only perf-attribution kill switch. It keeps the
-  // post-AA cost attributable while comparing the revised tier policy.
-  if (plan.composerPasses.includes('smaa')) composer.addPass(new SMAAPass(size.x, size.y));
-
-  // Screen-fx tail pass (display space, after grade and after SMAA so it stays
-  // the LAST pass: the enable/disable trick below relies on that). Enabled
+  // Screen-fx pass (display space, straight after the grade and BEFORE the
+  // tail SMAA, whose last-pass position is a pinned contract: SMAA then
+  // anti-aliases the rippled image rather than the other way round). Enabled
   // through the boot prewarm frames so its shader compiles alongside
-  // everything else, then self-disables whenever no ripple/flash is live:
-  // EffectComposer re-targets renderToScreen to the last ENABLED pass, so
-  // toggling is free.
+  // everything else, then self-disables whenever no ripple/flash is live;
+  // EffectComposer simply skips a disabled pass, so toggling is free.
   const screenFx = new ShaderPass(ScreenFxShader);
   composer.addPass(screenFx);
   const rippleSlots = Array.from({ length: SCREEN_RIPPLE_SLOTS }, () => ({
@@ -244,6 +231,19 @@ export function buildComposer(
   let flash = 0;
   let aspect = width / Math.max(1, height);
   let screenFxWarm = 2; // main-loop frames to keep the pass compiled at boot
+
+  // Edge AA, after the grade so it works on the display-space image (SMAA's
+  // edge detector expects the gamma-encoded color OutputGradePass produces).
+  // It stays the LAST pass; the screen-fx pass above feeds into it.
+  // Construction size is provisional; addPass and the setSize() member resize
+  // every pass to the live drawing-buffer extent.
+  // The AA policy uses SMAA from medium upward. Ultra and insane now run the
+  // same 1.75 cap as high: when both caps bind, 1.75 squared is 49 percent of
+  // the fragments at the old 2.5 cap, which leaves room for this fixed-cost
+  // edge pass.
+  // ?smaa=off is the dev-only perf-attribution kill switch. It keeps the
+  // post-AA cost attributable while comparing the revised tier policy.
+  if (plan.composerPasses.includes('smaa')) composer.addPass(new SMAAPass(size.x, size.y));
 
   return {
     composer,

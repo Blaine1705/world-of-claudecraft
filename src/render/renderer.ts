@@ -4150,8 +4150,8 @@ export class Renderer {
       this.reducedMotion(),
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
-    this.vfx.update(dt);
     this.abilityVfx.update(dt);
+    this.vfx.update(dt);
     this.vfx.prepareDraw(this.camera);
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);

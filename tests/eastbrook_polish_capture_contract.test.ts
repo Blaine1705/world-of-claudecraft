@@ -367,7 +367,7 @@ describe('Eastbrook polish capture contract', () => {
       // well. So the composite mints fresh and matches no parent's literal.
       // No pipeline input or geometry value changed, and no capture was
       // retaken.
-      fingerprint: '2223641fdb6022c8aae48e9bf0f0f2edce61d0822d5b8c61a7045703acf2e29c',
+      fingerprint: '69a1db26a13326093d091a0fd31c1a625735baf90fc1a60b5ee45ec5f38f3e84',
 
       components: {
         captureContract: {
