@@ -2215,6 +2215,22 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // The consolidated bot poll: the relay, activity and linked-member change
+  // feeds drained together with the winner-day announcements, so the bot makes
+  // one request per interval instead of three plus a full member sweep. The
+  // second REGISTRY-ONLY internal route, same reason as flex-batch above (born
+  // after the migration, no handleDiscordInternal arm, so the handler anchors on
+  // the exported RouteDef symbol).
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'GET',
+    path: '/internal/discord/outbox',
+    handler: 'server/internal.ts outboxHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDiscord,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   // Daily-rewards ops family (v0.19.0, server/daily_rewards.ts): served by the
   // handleDailyRewardInternalApi sub-dispatcher, which the /internal composite
   // delegate tries FIRST (before handleInternalApi, whose terminal 404 would

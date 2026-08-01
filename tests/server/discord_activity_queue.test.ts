@@ -18,6 +18,7 @@ import {
   drainActivity,
   enqueueActivity,
   type QueuedActivity,
+  requeueActivity,
 } from '../../server/discord_activity';
 
 const MAX_QUEUE = 100; // mirrors the module-private backstop; the cap tests reach it exactly
@@ -200,5 +201,56 @@ describe('server activity queue: dedupe map sweep', () => {
     enqueueActivity(activity(6), 'sweep-filler-0', FRESH + 1);
     enqueueActivity(activity(7), 'sweep-filler-599', FRESH + 1);
     expect(activityQueueDepth()).toBe(1);
+  });
+});
+
+describe('server activity queue: requeue after a failed hand-off', () => {
+  beforeEach(() => {
+    drainActivity();
+  });
+
+  it('puts drained items back at the FRONT, in their original order', () => {
+    // The outbox drain (server/internal.ts) requeues everything it drained when the
+    // response it was building throws, so a failed poll costs the bot a retry and not
+    // the cards. Front, not back: these are older than whatever arrived meanwhile, and
+    // the bot consumes in FIFO order.
+    enqueueActivity(activity(1), null, 0);
+    enqueueActivity(activity(2), null, 0);
+    const drained = drainActivity();
+    enqueueActivity(activity(3), null, 0);
+
+    requeueActivity(drained);
+
+    expect(activityQueueDepth()).toBe(3);
+    expect(drainActivity()).toEqual([activity(1), activity(2), activity(3)]);
+  });
+
+  it('does not touch the dedupe map, so a requeued item keeps its own key claimed', () => {
+    // The requeued items are the SAME items that claimed their keys at enqueue, so
+    // re-claiming would only re-stamp a window that is already correct. What must NOT
+    // happen is a requeue releasing the key and letting the same moment post twice.
+    const key = 'requeue-dedupe';
+    enqueueActivity(activity(1), key, 0);
+    requeueActivity(drainActivity());
+
+    enqueueActivity(activity(2), key, DEDUPE_TTL_MS - 1);
+
+    expect(activityQueueDepth()).toBe(1); // still suppressed
+    expect(drainActivity()).toEqual([activity(1)]);
+  });
+
+  it('cannot grow the queue past the cap', () => {
+    // The requeue adds items without going through the enqueue trim, so it applies the
+    // same cap itself. The requeued items are the oldest present, so they are what the
+    // drop-the-oldest rule spends.
+    for (let n = 1; n <= MAX_QUEUE; n++) enqueueActivity(activity(n), null, 0);
+    const drained = drainActivity();
+    for (let n = 1; n <= MAX_QUEUE; n++) enqueueActivity(activity(MAX_QUEUE + n), null, 0);
+
+    requeueActivity(drained);
+
+    expect(activityQueueDepth()).toBe(MAX_QUEUE);
+    // The survivors are the ones the queue held, not the requeued ones.
+    expect(drainActivity()[0]).toEqual(activity(MAX_QUEUE + 1));
   });
 });

@@ -89,6 +89,7 @@ import {
 import { configureCommunityTestAccounts } from './community_test_accounts';
 import {
   bustDailyRewardBoardCache,
+  bustDailyRewardWinnersCache,
   dailyRewardEventsCutoffDay,
   handleDailyRewardApi,
   handleDailyRewardInternalApi,
@@ -748,6 +749,13 @@ function bustBoardCaches(): void {
   arenaLeaderboardCache['2v2'] = null;
   deedsBoardCache = null;
   bustDailyRewardBoardCache();
+  // Not a board: the Discord winner-announcement snapshot. The daily-reward ban
+  // and IP-ban writes fire this same hook, and they feed the
+  // daily_reward_excluded_accounts view that unannouncedWinnerDays filters its
+  // payouts through, so an exclusion is a content change a warm snapshot would
+  // hide. Without this a just-banned winner's username and wallet pubkey could
+  // still be announced publicly for up to the winners TTL.
+  bustDailyRewardWinnersCache();
 }
 setOnAccountModerated(bustBoardCaches);
 

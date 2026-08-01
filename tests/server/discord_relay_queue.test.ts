@@ -13,6 +13,7 @@ import {
   enqueueRelay,
   type QueuedRelay,
   relayQueueDepth,
+  requeueRelay,
 } from '../../server/discord_relay';
 
 const MAX_QUEUE = 50; // mirrors the module-private backstop; the cap tests reach it exactly
@@ -103,5 +104,48 @@ describe('server relay queue: overflow backstop', () => {
     expect(drained[0]).toEqual(relay(2));
     expect(drained[drained.length - 1]).toEqual(relay(MAX_QUEUE + 1));
     expect(drained.some((r) => r.accountId === 1)).toBe(false);
+  });
+});
+
+describe('server relay queue: requeue after a failed hand-off', () => {
+  beforeEach(() => {
+    drainRelay();
+  });
+
+  it('puts drained items back at the FRONT, in their original order', () => {
+    // The outbox drain (server/internal.ts) requeues everything it drained when the
+    // response it was building throws, so a failed poll costs the bot a retry and not
+    // the posts. Front, not back: these are older than whatever arrived meanwhile, and
+    // the bot consumes in FIFO order.
+    enqueueRelay(relay(1));
+    enqueueRelay(relay(2));
+    const drained = drainRelay();
+    enqueueRelay(relay(3));
+
+    requeueRelay(drained);
+
+    expect(relayQueueDepth()).toBe(3);
+    expect(drainRelay()).toEqual([relay(1), relay(2), relay(3)]);
+  });
+
+  it('does nothing at all for an empty requeue', () => {
+    enqueueRelay(relay(1));
+    requeueRelay([]);
+    expect(drainRelay()).toEqual([relay(1)]);
+  });
+
+  it('cannot grow the queue past the cap', () => {
+    // The requeue adds items without going through the enqueue trim, so it applies the
+    // same cap itself. The requeued items are the oldest present, so they are what the
+    // drop-the-oldest rule spends.
+    for (let n = 1; n <= MAX_QUEUE; n++) enqueueRelay(relay(n));
+    const drained = drainRelay();
+    for (let n = 1; n <= MAX_QUEUE; n++) enqueueRelay(relay(MAX_QUEUE + n));
+
+    requeueRelay(drained);
+
+    expect(relayQueueDepth()).toBe(MAX_QUEUE);
+    // The survivors are the ones the queue held, not the requeued ones.
+    expect(drainRelay()[0]).toEqual(relay(MAX_QUEUE + 1));
   });
 });

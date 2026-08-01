@@ -49,6 +49,18 @@ export function drainRelay(): QueuedRelay[] {
   return QUEUE.splice(0, QUEUE.length);
 }
 
+/**
+ * Put drained items BACK at the front, in their original order, so a poll whose response
+ * failed to build costs the bot a retry rather than the posts themselves (the outbox
+ * drain, server/internal.ts). The cap trim is the same drop-the-oldest rule an enqueue
+ * applies, so a requeue into an already-full queue cannot grow it.
+ */
+export function requeueRelay(items: readonly QueuedRelay[]): void {
+  if (items.length === 0) return;
+  QUEUE.unshift(...items);
+  if (QUEUE.length > MAX_QUEUE) QUEUE.splice(0, QUEUE.length - MAX_QUEUE);
+}
+
 /** Current queue depth (for tests / diagnostics). */
 export function relayQueueDepth(): number {
   return QUEUE.length;

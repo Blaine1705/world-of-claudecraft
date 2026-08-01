@@ -66,6 +66,19 @@ export function drainActivity(): QueuedActivity[] {
   return QUEUE.splice(0, QUEUE.length);
 }
 
+/**
+ * Put drained items BACK at the front, in their original order, so a poll whose response
+ * failed to build costs the bot a retry rather than the cards themselves (the outbox
+ * drain, server/internal.ts). The recentKeys dedupe map is deliberately untouched: these
+ * items already claimed their keys at enqueue and are the SAME items, so re-claiming
+ * would only re-stamp a window that is already correct.
+ */
+export function requeueActivity(items: readonly QueuedActivity[]): void {
+  if (items.length === 0) return;
+  QUEUE.unshift(...items);
+  if (QUEUE.length > MAX_QUEUE) QUEUE.splice(0, QUEUE.length - MAX_QUEUE);
+}
+
 /** Current queue depth (for tests / diagnostics). */
 export function activityQueueDepth(): number {
   return QUEUE.length;

@@ -9,6 +9,7 @@ import type {
   DailyRewardSpinResult,
   DailyRewardStatus,
 } from '../src/world_api';
+import { type CachedRead, createCachedRead } from './cached_read';
 import { DailyRewardScheduleCache } from './daily_reward_schedule';
 import { DAILY_REWARD_BOARD_TTL_MS, DailyRewardBoardCache } from './daily_rewards_board_cache';
 import {
@@ -18,6 +19,7 @@ import {
   type DailyRewardPayoutAttemptRow,
   type DailyRewardScoreRow,
   type DailyRewardTaskSeed,
+  type DailyRewardWinnerAnnouncement,
   PgDailyRewardDb,
   REWARD_DAY_SHAPE,
 } from './daily_rewards_db';
@@ -59,6 +61,27 @@ export const DAILY_OPS_LEADERBOARD_PAGE_SIZE = 50; // rows per ops leaderboard p
 export const DAILY_REWARD_SPLITS = [
   0.2, 0.15, 0.12, 0.1, 0.09, 0.08, 0.075, 0.07, 0.065, 0.05,
 ] as const;
+
+// Staleness ceiling on the cached unannounced-winner-days read, matching the
+// other shared-read caches in this process (DAILY_REWARD_BOARD_TTL_MS).
+export const DAILY_REWARD_WINNERS_TTL_MS = 30_000;
+
+// The limit every winners-cache refresh reads at. 5 is the ceiling any caller can
+// ask for (the GET /internal/discord/daily-rewards-winners clamp max, and the
+// fixed ask of the outbox drain), so one snapshot serves every limit and a
+// smaller one is a slice rather than a second read.
+const DAILY_REWARD_WINNERS_CACHE_LIMIT = 5;
+
+/**
+ * One unannounced winner day as the cache STORES it: the database row plus the
+ * two task names derived from that day's and the next day's runtime config. The
+ * derivation is part of the cached value so a warm read costs no config fetch
+ * either (see DailyRewardService.refreshWinnerDays).
+ */
+type DailyRewardWinnerDay = DailyRewardWinnerAnnouncement & {
+  taskName: string;
+  nextTaskName: string;
+};
 
 const SPIN_OUTCOMES = [
   { key: 's20', points: 20, weight: 25 },
@@ -744,7 +767,15 @@ function currentTaskMultiplier(
 }
 
 export class DailyRewardService {
-  constructor(private readonly db: DailyRewardDb = new PgDailyRewardDb()) {}
+  constructor(
+    private readonly db: DailyRewardDb = new PgDailyRewardDb(),
+    opts: { now?: () => number } = {},
+  ) {
+    this.winnersCache = createCachedRead(() => this.refreshWinnerDays(), {
+      ttlMs: DAILY_REWARD_WINNERS_TTL_MS,
+      now: opts.now,
+    });
+  }
 
   // One ranked snapshot per TTL window serves the four board reads status()
   // assembles; every board-changing write below busts it (see recordPoints
@@ -753,6 +784,71 @@ export class DailyRewardService {
     (day) => this.db.leaderboardSnapshot(day),
     { ttlMs: DAILY_REWARD_BOARD_TTL_MS },
   );
+
+  /**
+   * The unannounced-winner-days read behind a TTL. The Discord outbox poll asks
+   * for it on every drain and the answer is viewer-identical (one realm-wide
+   * set), so it goes through one cached read instead of the 1+N queries
+   * unannouncedWinnerDays costs per poll (server/CLAUDE.md, Hot paths).
+   *
+   * Every refresh reads at DAILY_REWARD_WINNERS_CACHE_LIMIT and stores days that
+   * are already FULLY DERIVED (see refreshWinnerDays), so one snapshot serves
+   * every caller: a smaller limit slices it rather than issuing a second read,
+   * and a warm poll costs zero database reads AND zero config fetches.
+   *
+   * BUST DOCTRINE. Every transition that moves a day into or out of the
+   * unannounced set, or changes the CONTENT of a day already in it, busts this:
+   *  - finalizeRewardDay: a day enters the set the moment finalizeDay resolves
+   *    'finalized'.
+   *  - markDiscordWinnersAnnounced: a day leaves it once discord_announced_at is
+   *    stamped; without that bust the bot can re-fetch an already-marked day for
+   *    a full TTL and announce it twice.
+   *  - voidPayout / restorePayout: a moderation edit to the payout rows a day
+   *    carries.
+   *  - the excluded-accounts writes (the daily-reward ban and IP-ban tables
+   *    behind the daily_reward_excluded_accounts view, which unannouncedWinnerDays
+   *    filters its payouts through): busted through bustDailyRewardWinnersCache,
+   *    which main.ts calls from the post-moderation hook beside the board busts.
+   * The last two are what server/CLAUDE.md's hot-path rule demands: an exclusion
+   * is a moderation action, and a warm snapshot would let a just-banned winner's
+   * username and wallet pubkey be announced publicly for up to a TTL. TTL alone
+   * only delays enforcement, so it is not an acceptable answer here.
+   *
+   * Peer realm processes still converge within one TTL, the same tradeoff the
+   * board caches make; the bust makes THIS process immediate.
+   */
+  private readonly winnersCache: CachedRead<DailyRewardWinnerDay[]>;
+
+  /**
+   * The winners-cache refresh: the unannounced days plus the announcement copy
+   * derived per day, so the snapshot is what a caller ships rather than raw rows.
+   *
+   * The derivation lives HERE, not in discordWinnerAnnouncements, because
+   * dailyRewardRuntimeConfig is a single-slot cache: deriving per call meant up
+   * to two config fetches on every outbox poll for a pending day (about 40 per
+   * minute at a 3 s poll), and each of those evicted the slot the player-facing
+   * status/spin paths share. Deriving per REFRESH makes it at most one fetch per
+   * distinct day per TTL.
+   */
+  private async refreshWinnerDays(): Promise<DailyRewardWinnerDay[]> {
+    const days = await this.db.unannouncedWinnerDays(DAILY_REWARD_WINNERS_CACHE_LIMIT);
+    // Each day names its own featured task and the NEXT day's, so the set asked
+    // about is the days themselves plus their successors, de-duplicated.
+    const rewardDays = [...new Set(days.flatMap((day) => [day.day, addRewardDays(day.day, 1)]))];
+    const taskNames = new Map(
+      await Promise.all(
+        rewardDays.map(
+          async (day) =>
+            [day, featuredDailyRewardTaskName(await dailyRewardRuntimeConfig(day))] as const,
+        ),
+      ),
+    );
+    return days.map((day) => ({
+      ...day,
+      taskName: taskNames.get(day.day) ?? DEFAULT_TASKS[0].title,
+      nextTaskName: taskNames.get(addRewardDays(day.day, 1)) ?? DEFAULT_TASKS[0].title,
+    }));
+  }
 
   private async eligibility(
     accountId: number,
@@ -935,6 +1031,16 @@ export class DailyRewardService {
   /** Drop the in-process board snapshot so the next ranked read refreshes. */
   bustBoardCache(): void {
     this.boardCache.bust();
+  }
+
+  /**
+   * Drop the cached unannounced-winner-days snapshot. The two real transitions
+   * bust it themselves (see the winnersCache doc comment); this is the handle a
+   * test needs, because a suite driving the module singleton over db fakes would
+   * otherwise carry one test's snapshot into the next.
+   */
+  bustWinnersCache(): void {
+    this.winnersCache.bust();
   }
 
   /** Board-cache refresh telemetry for the metrics surface (unwired for now). */
@@ -1248,23 +1354,14 @@ export class DailyRewardService {
   }
 
   async discordWinnerAnnouncements(limit = 1): Promise<unknown> {
-    const days = await this.db.unannouncedWinnerDays(limit);
-    const rewardDays = [...new Set(days.flatMap((day) => [day.day, addRewardDays(day.day, 1)]))];
-    const taskNames = new Map(
-      await Promise.all(
-        rewardDays.map(
-          async (day) =>
-            [day, featuredDailyRewardTaskName(await dailyRewardRuntimeConfig(day))] as const,
-        ),
-      ),
-    );
-    return {
-      days: days.map((day) => ({
-        ...day,
-        taskName: taskNames.get(day.day) ?? DEFAULT_TASKS[0].title,
-        nextTaskName: taskNames.get(addRewardDays(day.day, 1)) ?? DEFAULT_TASKS[0].title,
-      })),
-    };
+    // The snapshot arrives fully derived, so this method is a clamp and a copy:
+    // no database read and no config fetch on a warm cache, whatever the limit.
+    // Rows are copied on the way out, payout rows included, so a caller mutating
+    // its result can never poison the snapshot every other reader shares.
+    const days = (await this.winnersCache.read())
+      .slice(0, Math.max(1, Math.min(DAILY_REWARD_WINNERS_CACHE_LIMIT, limit)))
+      .map((day) => ({ ...day, payouts: day.payouts.map((payout) => ({ ...payout })) }));
+    return { days };
   }
 
   async markDiscordWinnersAnnounced(
@@ -1276,6 +1373,9 @@ export class DailyRewardService {
       return { error: 'invalid reward day', status: 400 };
     }
     const ok = await this.db.markWinnersAnnounced(day);
+    // A marked day LEAVES the unannounced set, so a warm snapshot still carrying
+    // it would let the bot re-fetch and re-announce it for a full TTL.
+    if (ok) this.winnersCache.bust();
     return ok ? { ok: true } : { error: 'reward day not found', status: 404 };
   }
 
@@ -1319,6 +1419,10 @@ export class DailyRewardService {
     await this.ensureSeeded(day, config);
     const startedAt = Date.now();
     const outcome = await this.db.finalizeDay(day, config.prizePoolUsd, DAILY_REWARD_SPLITS);
+    // Finalizing is what ADDS a day to the unannounced set, so the bot must see
+    // it on its next poll rather than up to a TTL later. The already_finalized
+    // arm added nothing, and the fast path above returns before reaching here.
+    if (outcome === 'finalized') this.winnersCache.bust();
     console.info(
       `[daily-rewards] finalize day=${day} realm=${REALM} outcome=${outcome} durationMs=${Date.now() - startedAt}`,
     );
@@ -1425,6 +1529,11 @@ export class DailyRewardService {
     if (result.outcome === 'invalid_status') {
       return { error: 'payout cannot be voided', status: 409 };
     }
+    // A voided payout is a moderation edit to a day that may still be waiting to
+    // be announced, so the warm snapshot must not outlive it (see the
+    // winnersCache bust doctrine). Only the successful arm busts: the two refusals
+    // above changed nothing, and evicting a good snapshot would only cost a read.
+    this.winnersCache.bust();
     return { ok: true, payout: result.payout };
   }
 
@@ -1443,6 +1552,9 @@ export class DailyRewardService {
     if (result.outcome === 'invalid_status') {
       return { error: 'payout cannot be restored', status: 409 };
     }
+    // Same reason as voidPayout: restoring moves a payout row inside a day the
+    // snapshot may still be holding.
+    this.winnersCache.bust();
     return { ok: true, payout: result.payout };
   }
 }
@@ -1486,6 +1598,17 @@ export const dailyRewardService = new DailyRewardService();
 // itself would hold no handle to the live instance.
 export function bustDailyRewardBoardCache(): void {
   dailyRewardService.bustBoardCache();
+}
+
+// Same instance-scoped reason as the board bust above: the winners snapshot lives
+// on the module singleton. main.ts wires this into bustBoardCaches, the
+// post-moderation hook, because the daily-reward ban and IP-ban writes feed the
+// daily_reward_excluded_accounts view that unannouncedWinnerDays filters its
+// payouts through: without the bust, a just-excluded winner's username and wallet
+// pubkey stay announceable for up to a TTL. A suite driving the real service over
+// db fakes also resets the snapshot through this handle.
+export function bustDailyRewardWinnersCache(): void {
+  dailyRewardService.bustWinnersCache();
 }
 
 export async function handleDailyRewardApi(

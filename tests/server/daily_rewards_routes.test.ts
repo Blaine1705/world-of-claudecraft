@@ -147,6 +147,7 @@ vi.mock('../../server/woc_balance', async (importOriginal) => {
 
 import {
   bustDailyRewardBoardCache,
+  bustDailyRewardWinnersCache,
   DailyRewardService,
   dailyRewardService,
   resetDailyRewardDbForTests,
@@ -367,8 +368,12 @@ beforeEach(() => {
   // ensureDay/seedTasks pair (the ensureDayThrows case would never reach its throw).
   resetDailyRewardSeedGateForTests();
   // The routes drive the module-load singleton, whose instance board cache
-  // would otherwise leak a board snapshot across tests.
+  // would otherwise leak a board snapshot across tests. The winner-days
+  // snapshot is the same shape of instance state on the same singleton (the
+  // finalize route below busts it for real), so it is reset here too rather
+  // than left to be discovered by whichever test first reads winners.
   bustDailyRewardBoardCache();
+  bustDailyRewardWinnersCache();
   // Default: the gate secret and the config URL are unset, so the config falls back
   // (no fetch) and the ops gate fails closed unless a test opts in.
   delete process.env[OPS_SECRET_ENV];

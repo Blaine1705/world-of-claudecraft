@@ -5,18 +5,21 @@ import { DISCORD_REWARD_GRANTS, discordStatusIndexForPoints } from '../src/sim/d
 import { dailyRewardService } from './daily_rewards';
 import { pool } from './db';
 import { discordFlexForAccount, discordFlexForAccounts, setDiscordPresenceCache } from './discord';
-import { drainActivity } from './discord_activity';
+import { drainActivity, requeueActivity } from './discord_activity';
 import {
   accountForDiscord,
   type DiscordMemberMetaRecord,
+  type DiscordOutboxLinkRow,
   discordForAccount,
   discordIdsWithGuildFlair,
+  discordLinksForAccounts,
   grantRewardPoints,
   loadRewardState,
   setDiscordGuildMember,
   setDiscordMemberMetaBulk,
 } from './discord_db';
-import { drainRelay } from './discord_relay';
+import { drainLinkChanges, requeueLinkChanges } from './discord_link_changes';
+import { drainRelay, requeueRelay } from './discord_relay';
 import type { GameServer } from './game';
 import {
   DEPLOY_SECRET_ENV,
@@ -370,6 +373,162 @@ export const flexBatchHandler: RouteHandler = async (ctx) => {
   return ok(ctx.res, { requested: ids.length, members: await discordFlexForAccounts(ids) });
 };
 
+// How many reward days one outbox drain carries. ONE, matching the bot's actual
+// consumption: it announces a day and then marks it, one per poll, so days two
+// through five of a ceiling ask are read, serialized and shipped without ever
+// being acted on. Every day carries its winners' usernames AND wallet pubkeys, so
+// the ask is the routine per-poll exposure of that data and is minimized to what
+// the caller uses. The standalone GET /internal/discord/daily-rewards-winners
+// keeps serving up to 5 until its D11 retirement (a backlog is drained there, or
+// across successive polls here), and the service still CACHES at its own ceiling,
+// so a wider ask stays a warm-cache slice rather than a second read.
+const OUTBOX_WINNER_DAY_LIMIT = 1;
+
+// How many link changes one outbox drain carries. Tied to FLEX_BATCH_CAP: a page
+// larger than the bot's flex-batch cap is more than it can act on in one cycle
+// anyway, since acting on a link change means asking flex-batch about it. It also
+// bounds the two things a single poll can cost: the serialization spike of the
+// response, and the number of items at risk when a poll fails (they are requeued,
+// so the risk is retry latency, not loss). A backlog pages out across successive
+// polls; the feed's own cap and eviction preference bound what waits. The value
+// is FLEX_BATCH_CAP's 1000, written as its own literal rather than derived: the
+// relationship is a ceiling ("never more than the bot can act on"), not an
+// identity, so a future change to either one should be a deliberate decision.
+export const OUTBOX_LINK_CHANGE_PAGE = 1000;
+
+/**
+ * GET /internal/discord/outbox -> everything the bot has to pick up, in ONE poll.
+ *
+ * The bot used to poll four endpoints on their own timers (relay, activity,
+ * daily-rewards-winners, and a full re-read of every online member to notice
+ * flex changes). This answers all of them together, so the bot's steady-state
+ * cost is one request per interval rather than four plus a sweep.
+ *
+ * RouteDef-ONLY by design, like flex-batch: a route born after the pipeline
+ * migration never gets a legacy handleDiscordInternal arm (server/http/CLAUDE.md),
+ * so there is nothing to keep in lockstep here.
+ *
+ * ORDER OF WORK, and it is deliberate:
+ *  1. Read the winner days FIRST, before anything is drained. It depends on
+ *     nothing the drains produce, and it is the most failure-prone await here (a
+ *     database read behind a TTL cache), so doing it first means a winners
+ *     failure refuses the poll without having consumed a single queued item.
+ *  2. Drain the three in-memory feeds. They are pure array splices, so a poll
+ *     that finds nothing queued costs zero further Postgres round trips.
+ *  3. Collect the account ids every drained item mentions. An EMPTY set issues no
+ *     identity query at all.
+ *  4. Otherwise resolve the whole union with ONE discordLinksForAccounts call.
+ *     The per-item discordForAccount that the relay and activity GETs run once
+ *     per item (or once per participant) never appears here: that N+1 is what
+ *     invariant D1 forbids on this path.
+ *
+ * RETRY CONTRACT (Phase 6's retry logic is written against this):
+ *  - `winners` is an IDEMPOTENT READ. It stays unannounced until the bot calls
+ *    the mark endpoint, so it is delivered at-least-once across retries and a
+ *    repeated poll simply re-reads the same days.
+ *  - The three in-memory streams are PRESERVED ON ERROR and CONSUMED ON SUCCESS.
+ *    Everything from the identity read to the response build runs inside a try
+ *    whose catch requeues all three drains at the front of their queues, in
+ *    order, before rethrowing. So a failed poll answers 500 with nothing lost and
+ *    the next poll carries the same items; a 200 is the only outcome that
+ *    consumes them, which is exactly what makes a bot-side retry safe.
+ *  - A 200 response is therefore the ONLY acknowledgement. A bot that drops a
+ *    successful response on the floor loses those items to its own next full
+ *    resync, not to this endpoint.
+ *
+ * The envelope field order is relay, activity, winners, linkChanges, and each
+ * stream keeps its queue's FIFO order. The three existing streams keep their
+ * per-endpoint item shapes byte-for-byte (invariant D11) so the Phase 6 bot
+ * reuses its current handlers unchanged; only linkChanges is a new shape.
+ */
+export const outboxHandler: RouteHandler = async (ctx) => {
+  const winners = await dailyRewardService.discordWinnerAnnouncements(OUTBOX_WINNER_DAY_LIMIT);
+  const relayItems = drainRelay();
+  const activityItems = drainActivity();
+  const linkChangeItems = drainLinkChanges(OUTBOX_LINK_CHANGE_PAGE);
+
+  try {
+    const accountIds = new Set<number>();
+    for (const it of relayItems) accountIds.add(it.accountId);
+    for (const it of activityItems) {
+      for (const accountId of it.accountIds) accountIds.add(accountId);
+    }
+    for (const it of linkChangeItems) accountIds.add(it.accountId);
+    const links = accountIds.size === 0 ? [] : await discordLinksForAccounts(pool, [...accountIds]);
+    const linkByAccount = new Map<number, DiscordOutboxLinkRow>(
+      links.map((row) => [row.account_id, row]),
+    );
+
+    const relay = relayItems.map((it) => {
+      const link = linkByAccount.get(it.accountId);
+      return {
+        ...it,
+        discordUserId: link?.discord_user_id ?? null,
+        discordUsername: link?.discord_username ?? null,
+        discordAvatar: link?.discord_avatar ?? null,
+      };
+    });
+
+    const activity: unknown[] = [];
+    for (const it of activityItems) {
+      const participants = it.accountIds.map((accountId, i) => {
+        const link = linkByAccount.get(accountId);
+        return {
+          name: it.names[i] ?? '',
+          discordUserId: link?.discord_user_id ?? null,
+          discordAvatar: link?.discord_avatar ?? null,
+        };
+      });
+      if (!participants.some((p) => p.discordUserId)) continue; // nobody linked
+      const { accountIds: _a, names: _n, ...rest } = it;
+      activity.push({ ...rest, participants });
+    }
+
+    const linkChanges: unknown[] = [];
+    for (const it of linkChangeItems) {
+      const link = linkByAccount.get(it.accountId);
+      // The carried id wins over the stored row: an 'unlink' item's discord_links
+      // row is already gone by the time this drains, so the id it carried at
+      // enqueue is the only way to tell the bot WHICH member to stop flairing.
+      const discordUserId = it.discordId ?? link?.discord_user_id ?? null;
+      // Neither source knows a Discord id, so this account is not linked and the
+      // bot has nothing to push for it. The points feed enqueues for unlinked
+      // accounts too (playtime grants reach every player), which is exactly the
+      // noise this drop exists to filter.
+      if (discordUserId === null) continue;
+      // The name and avatar may only describe the id being EMITTED. When an
+      // account repoints to a new Discord identity, the item carries the OLD id
+      // and the stored row already holds the NEW one, so decorating from the row
+      // would hand the bot user X's id wearing user Y's handle and avatar. The
+      // bot re-reads the account anyway; a null here is a missing decoration,
+      // where a mismatched one is a wrong claim about who someone is.
+      const identity = link?.discord_user_id === discordUserId ? link : undefined;
+      linkChanges.push({
+        accountId: it.accountId,
+        kinds: it.kinds,
+        discordUserId,
+        discordUsername: identity?.discord_username ?? null,
+        discordAvatar: identity?.discord_avatar ?? null,
+      });
+    }
+
+    return ok(ctx.res, {
+      relay: { items: relay },
+      activity: { items: activity },
+      winners,
+      linkChanges: { items: linkChanges },
+    });
+  } catch (err) {
+    // The queues are the bot's only copy of these items, so a failed response
+    // build must not be what deletes them. Order within each stream is restored
+    // (front-inserted, original order); the bot gets a 500 and retries.
+    requeueRelay(relayItems);
+    requeueActivity(activityItems);
+    requeueLinkChanges(linkChangeItems);
+    throw err;
+  }
+};
+
 function sanitizeVoiceMember(m: unknown): {
   id: string;
   name: string;
@@ -387,8 +546,8 @@ function sanitizeVoiceMember(m: unknown): {
 
 // ── Route table ────────────────────────────
 // All 12 handleInternalApi endpoints as RouteDefs for the shared dispatcher,
-// plus flex-batch, which is RouteDef-ONLY (born after the migration, so it has
-// no legacy ladder arm by design and nothing below it to keep in lockstep):
+// plus flex-batch and outbox, which are RouteDef-ONLY (born after the migration,
+// so they have no legacy ladder arm by design and nothing below to keep in lockstep):
 // the deploy-gated restart-countdown plus the 11 Discord-bot-gated routes
 // (including the two daily-rewards-winners routes added after the original
 // count of 9, and flaired-ids, added after the migration on BOTH arms per the
@@ -656,6 +815,14 @@ export const routes: RouteDef[] = [
     meta: INTERNAL_META,
     middleware: [discordGate],
     handler: flexBatchHandler,
+  },
+  {
+    method: 'GET',
+    path: '/internal/discord/outbox',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [discordGate],
+    handler: outboxHandler,
   },
   {
     method: 'GET',
