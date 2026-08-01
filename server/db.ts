@@ -2666,6 +2666,13 @@ export interface CharacterRow {
 // the ORDER BY uses a static JSONB expression literal (Postgres does not allow a
 // bound parameter for an ORDER BY expression), so the query string carries no
 // interpolation and there is no injection surface.
+//
+// LOCKSTEP: discordFlexRowsForDiscordIds (server/discord_db.ts) is the batched
+// read serving /internal/discord/flex-batch, and it repeats this ORDER BY inside
+// a LATERAL. Both endpoints stay live, so the two must agree on which character
+// is "top" or the bot renders a different one depending on which it called. The
+// ordering is restated there rather than shared because db.ts imports discord_db
+// (DISCORD_SCHEMA), so that module cannot import back from here.
 export async function highestCharacterForAccount(accountId: number): Promise<CharacterRow | null> {
   const res = await pool.query(
     `SELECT id, account_id, name, class, level, state, is_gm, force_rename

@@ -9,6 +9,12 @@
 // routes carry surface 'internal' + meta.envelope 'admin'). The secret gates move
 // to the requireInternalSecret middleware.
 //
+// POST /internal/discord/flex-batch is the exception and is NOT part of that
+// migration: it was born afterwards, so it is RouteDef-ONLY with no legacy ladder
+// arm and nothing to keep byte-identical (the new-route rule in
+// server/http/CLAUDE.md). Its "no legacy twin" shape is pinned below rather than
+// assumed.
+//
 // This file pins HANDLER behavior behind a PASSING gate (the exhaustive
 // unset-env-404 / wrong-secret-401 gate sweep lives in
 // tests/server/http/ownership_coverage.test.ts, so only one representative gate
@@ -39,10 +45,11 @@ vi.mock('../../server/discord_db', () => ({
   grantRewardPoints: vi.fn(),
   loadRewardState: vi.fn(),
   setDiscordGuildMember: vi.fn(),
-  setDiscordMemberMeta: vi.fn(),
+  setDiscordMemberMetaBulk: vi.fn(),
 }));
 vi.mock('../../server/discord', () => ({
   discordFlexForAccount: vi.fn(),
+  discordFlexForAccounts: vi.fn(),
   setDiscordPresenceCache: vi.fn(),
 }));
 vi.mock('../../server/discord_activity', () => ({ drainActivity: vi.fn() }));
@@ -60,12 +67,14 @@ import { dailyRewardService } from '../../server/daily_rewards';
 import { pool } from '../../server/db';
 import {
   type DiscordFlex,
+  type DiscordFlexBatchEntry,
   discordFlexForAccount,
+  discordFlexForAccounts,
   setDiscordPresenceCache,
 } from '../../server/discord';
 import type { QueuedActivity } from '../../server/discord_activity';
 import { drainActivity } from '../../server/discord_activity';
-import type { DiscordLinkRow } from '../../server/discord_db';
+import type { DiscordLinkRow, DiscordMemberMetaRecord } from '../../server/discord_db';
 import {
   accountForDiscord,
   discordForAccount,
@@ -73,7 +82,7 @@ import {
   grantRewardPoints,
   loadRewardState,
   setDiscordGuildMember,
-  setDiscordMemberMeta,
+  setDiscordMemberMetaBulk,
 } from '../../server/discord_db';
 import type { QueuedRelay } from '../../server/discord_relay';
 import { drainRelay } from '../../server/discord_relay';
@@ -96,9 +105,10 @@ const DISCORD_SECRET = 'discord-secret';
 const DEPLOY_HEADERS = { 'x-woc-deploy-secret': DEPLOY_SECRET };
 const DISCORD_HEADERS = { 'x-woc-discord-secret': DISCORD_SECRET };
 
-// The 12 routes as [method, path], the legacy handleInternalApi ladder order
+// The 13 routes as [method, path]: the legacy handleInternalApi ladder order
 // (the 11 migrated routes plus flaired-ids, added after the migration on both
-// arms per the dual-edit rule).
+// arms per the dual-edit rule), then flex-batch, which is RouteDef-ONLY and has
+// no legacy arm by design (a route born after the migration never gets one).
 const EXPECTED_ROUTES: ReadonlyArray<readonly [Method, string]> = [
   ['POST', '/internal/restart-countdown'],
   ['GET', '/internal/discord/flex'],
@@ -112,6 +122,7 @@ const EXPECTED_ROUTES: ReadonlyArray<readonly [Method, string]> = [
   ['POST', '/internal/discord/daily-rewards-winners/mark'],
   ['POST', '/internal/discord/members-meta'],
   ['GET', '/internal/discord/flaired-ids'],
+  ['POST', '/internal/discord/flex-batch'],
 ];
 
 /** Read status/body/content-type/headers off the fakeCtx's FakeRes. */
@@ -243,8 +254,8 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('internal route registration', () => {
-  it('registers exactly 12 routes matching the legacy method+path ladder', () => {
-    expect(routes).toHaveLength(12);
+  it('registers exactly 13 routes matching the legacy ladder plus RouteDef-only flex-batch', () => {
+    expect(routes).toHaveLength(13);
     const actual = routes.map((r) => `${r.method} ${r.path}`).sort();
     const expected = EXPECTED_ROUTES.map(([m, p]) => `${m} ${p}`).sort();
     expect(actual).toEqual(expected);
@@ -689,8 +700,19 @@ describe('discord/daily-rewards-winners', () => {
 // ---------------------------------------------------------------------------
 
 describe('discord/members-meta', () => {
+  /** The records the handler handed the bulk upsert on the most recent call. */
+  function pushedRecords(): DiscordMemberMetaRecord[] {
+    const calls = vi.mocked(setDiscordMemberMetaBulk).mock.calls;
+    return calls[calls.length - 1][1] as DiscordMemberMetaRecord[];
+  }
+
   it('slices id/name, keeps only a known role key, and skips entries with no id', async () => {
     process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
+      changed: 2,
+      skipped: 0,
+      unapplied: [],
+    });
 
     const r = await runRoute('POST', '/internal/discord/members-meta', {
       headers: DISCORD_HEADERS,
@@ -709,17 +731,34 @@ describe('discord/members-meta', () => {
     });
 
     expect(r.status).toBe(200);
-    expect(r.body).toEqual({ success: true, data: { updated: 2 }, error: null });
-    const calls = vi.mocked(setDiscordMemberMeta).mock.calls;
-    expect(calls).toHaveLength(2);
-    // 'mods' is a real special-role key; id/name slice to 32/64; finite joinedAt kept.
-    expect(calls[0]).toEqual([pool, 'd'.repeat(32), 'n'.repeat(64), 1_700_000_000_000, 'mods']);
-    // 'not-a-role' clears to null; no name/joinedAt provided -> nulls.
-    expect(calls[1]).toEqual([pool, 'u2', null, null, null]);
+    expect(r.body).toEqual({
+      success: true,
+      data: { updated: 2, changed: 2, skipped: 0, unapplied: [] },
+      error: null,
+    });
+    // ONE call carrying BOTH records, not one call per record.
+    expect(vi.mocked(setDiscordMemberMetaBulk)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(setDiscordMemberMetaBulk).mock.calls[0][0]).toBe(pool);
+    expect(pushedRecords()).toEqual([
+      // 'mods' is a real special-role key; id/name slice to 32/64; finite joinedAt kept.
+      {
+        discordUserId: 'd'.repeat(32),
+        nickname: 'n'.repeat(64),
+        joinedAtMs: 1_700_000_000_000,
+        roleKey: 'mods',
+      },
+      // 'not-a-role' clears to null; no name/joinedAt provided -> nulls.
+      { discordUserId: 'u2', nickname: null, joinedAtMs: null, roleKey: null },
+    ]);
   });
 
   it('slices each request at 1000 entries, at or above the bot batch size', async () => {
     process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
+      changed: 1000,
+      skipped: 0,
+      unapplied: [],
+    });
 
     // The bot splits its roster into MEMBERS_META_BATCH-sized requests on the
     // promise that the server processes AT LEAST that many entries per request;
@@ -739,11 +778,428 @@ describe('discord/members-meta', () => {
 
     expect(r.status).toBe(200);
     // Exactly the first 1000 process; the 1001st is sliced off by the cap.
-    expect(r.body).toEqual({ success: true, data: { updated: 1000 }, error: null });
-    const calls = vi.mocked(setDiscordMemberMeta).mock.calls;
-    expect(calls).toHaveLength(1000);
-    expect(calls[0][1]).toBe('u0');
-    expect(calls[999][1]).toBe('u999');
+    expect(r.body).toEqual({
+      success: true,
+      data: { updated: 1000, changed: 1000, skipped: 0, unapplied: [] },
+      error: null,
+    });
+    // The cap holds and the whole push is still ONE database call, which is the
+    // property the phase bought: 1000 members used to be 1000 serial UPDATEs.
+    expect(vi.mocked(setDiscordMemberMetaBulk)).toHaveBeenCalledTimes(1);
+    const records = pushedRecords();
+    expect(records).toHaveLength(1000);
+    expect(records[0].discordUserId).toBe('u0');
+    expect(records[999].discordUserId).toBe('u999');
+  });
+
+  it('issues the same single database call for one member as for a thousand', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
+      changed: 1,
+      skipped: 0,
+      unapplied: [],
+    });
+
+    await runRoute('POST', '/internal/discord/members-meta', {
+      headers: DISCORD_HEADERS,
+      body: { members: [{ discord_user_id: 'u1' }] },
+    });
+    expect(vi.mocked(setDiscordMemberMetaBulk)).toHaveBeenCalledTimes(1);
+
+    await runRoute('POST', '/internal/discord/members-meta', {
+      headers: DISCORD_HEADERS,
+      body: {
+        members: Array.from({ length: 1000 }, (_, i) => ({ discord_user_id: `u${i}` })),
+      },
+    });
+    // Two requests, two calls: the member count did not add any.
+    expect(vi.mocked(setDiscordMemberMetaBulk)).toHaveBeenCalledTimes(2);
+  });
+
+  it('turns a request of unusable entries into an empty record list, not a write', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
+      changed: 0,
+      skipped: 0,
+      unapplied: [],
+    });
+
+    const r = await runRoute('POST', '/internal/discord/members-meta', {
+      headers: DISCORD_HEADERS,
+      body: { members: [{ name: 'no id' }, 'not an object', 42] },
+    });
+
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { updated: 0, changed: 0, skipped: 0, unapplied: [] },
+      error: null,
+    });
+    // Not one of the three entries survived validation, so nothing reaches the
+    // database even though the upsert is still called: it owns the empty answer
+    // and short-circuits before any SQL (pinned as zero statements in
+    // tests/discord_db.test.ts, which is the layer that can count statements).
+    expect(pushedRecords()).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 11b. members-meta reports what it APPLIED, not what it read (ledger item L14).
+//
+// The old handler counted `updated++` once per record it iterated, so a push for
+// a Discord member with no discord_links row (every unlinked guild member) was
+// answered as accepted. The bot cached it as pushed and never re-sent it, so the
+// member's join date and staff flair never reached the game after they linked.
+//
+// The fix names the three outcomes separately. `updated` deliberately KEEPS its
+// old meaning (records accepted for application) because the bot's client turns
+// `updated === 0` on a non-empty push into a hard refusal that aborts the whole
+// sweep; the new `changed` / `skipped` / `unapplied` fields carry the truth, and
+// Phase 6 rewires the bot onto `unapplied`.
+// ---------------------------------------------------------------------------
+
+describe('discord/members-meta applied-vs-read reporting', () => {
+  const THREE_MEMBERS = [
+    { discord_user_id: 'changed1', name: 'New Name' },
+    { discord_user_id: 'identical1', name: 'Same Name' },
+    { discord_user_id: 'nolink1', name: 'Never Linked' },
+  ];
+
+  async function push(members: unknown[]) {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    return runRoute('POST', '/internal/discord/members-meta', {
+      headers: DISCORD_HEADERS,
+      body: { members },
+    });
+  }
+
+  it('names an id with no link row as unapplied and never counts it as changed', async () => {
+    vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
+      changed: 1,
+      skipped: 1,
+      unapplied: ['nolink1'],
+    });
+
+    const r = await push(THREE_MEMBERS);
+
+    expect(r.status).toBe(200);
+    // Built as a fresh literal, not spread from the mock's own return value.
+    expect(r.body).toEqual({
+      success: true,
+      data: { updated: 3, changed: 1, skipped: 1, unapplied: ['nolink1'] },
+      error: null,
+    });
+    // The whole point of L14: the id is NAMED, so the pusher can leave exactly
+    // that record dirty instead of caching a write that reached no row.
+    const data = (r.body as { data: { changed: number; unapplied: string[] } }).data;
+    expect(data.unapplied).toEqual(['nolink1']);
+    expect(data.changed).toBe(1);
+  });
+
+  it('reports zero changed and a non-zero skipped when identical meta is re-pushed', async () => {
+    // The post-restart case: the bot's diff cache is empty so it re-sends the
+    // whole roster, and nothing moved while it was down.
+    vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
+      changed: 0,
+      skipped: 2,
+      unapplied: [],
+    });
+
+    const r = await push([
+      { discord_user_id: 'identical1', name: 'Same Name' },
+      { discord_user_id: 'identical2', name: 'Also Same' },
+    ]);
+
+    expect(r.body).toEqual({
+      success: true,
+      data: { updated: 2, changed: 0, skipped: 2, unapplied: [] },
+      error: null,
+    });
+  });
+
+  it('counts in changed exactly the rows whose values really moved', async () => {
+    vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
+      changed: 2,
+      skipped: 1,
+      unapplied: [],
+    });
+
+    const r = await push([
+      { discord_user_id: 'changed1', name: 'A' },
+      { discord_user_id: 'changed2', name: 'B' },
+      { discord_user_id: 'identical1', name: 'Same' },
+    ]);
+
+    expect(r.body).toEqual({
+      success: true,
+      data: { updated: 3, changed: 2, skipped: 1, unapplied: [] },
+      error: null,
+    });
+  });
+
+  it('accounts for every accepted record exactly once across the three outcomes', async () => {
+    vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
+      changed: 1,
+      skipped: 1,
+      unapplied: ['nolink1'],
+    });
+
+    const r = await push(THREE_MEMBERS);
+    const data = (
+      r.body as {
+        data: { updated: number; changed: number; skipped: number; unapplied: string[] };
+      }
+    ).data;
+
+    // updated === changed + skipped + unapplied.length is the invariant that says
+    // no record was double-counted and none went missing between the classes.
+    expect(data.changed + data.skipped + data.unapplied.length).toBe(data.updated);
+  });
+
+  it('never answers a non-empty push with updated 0, which the bot reads as a refusal', async () => {
+    // REGRESSION PIN, the load-bearing one. bot/server_client.ts pushMembersMeta
+    // turns `updated === 0` on a non-empty push into null, and
+    // bot/member_writes.ts pushChangedMemberMeta ABORTS the whole run on a
+    // refusal, skipping every later batch. Both cases below are ordinary (a
+    // post-restart full re-push; a batch of guild members who never linked), so
+    // narrowing `updated` to rows-actually-written would make the bot stop
+    // pushing, re-send the same roster every sweep, and never populate its cache.
+    vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
+      changed: 0,
+      skipped: 0,
+      unapplied: ['nolink1', 'nolink2'],
+    });
+    const allUnlinked = await push([
+      { discord_user_id: 'nolink1' },
+      { discord_user_id: 'nolink2' },
+    ]);
+    expect((allUnlinked.body as { data: { updated: number } }).data.updated).toBe(2);
+
+    vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
+      changed: 0,
+      skipped: 2,
+      unapplied: [],
+    });
+    const nothingMoved = await push([
+      { discord_user_id: 'identical1' },
+      { discord_user_id: 'identical2' },
+    ]);
+    expect((nothingMoved.body as { data: { updated: number } }).data.updated).toBe(2);
+
+    // The over-cap silent drop the bot's guard was actually written for still
+    // answers 0, so the guard keeps the meaning it was added with.
+    const overCap = await push([]);
+    expect((overCap.body as { data: { updated: number } }).data.updated).toBe(0);
+  });
+
+  it('answers identically on the frozen legacy ladder arm and the RouteDef arm', async () => {
+    // members-meta is a MIGRATED route, so a behavior edit must land on both arms
+    // (the dual-edit rule). They share applyMemberMetaPush, and this is what says
+    // so from the outside: an edit that reaches only one arm fails here.
+    vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
+      changed: 1,
+      skipped: 1,
+      unapplied: ['nolink1'],
+    });
+
+    const viaRouteDef = await push(THREE_MEMBERS);
+    expect(viaRouteDef.status).toBe(200);
+
+    const req = makeReq({
+      method: 'POST',
+      url: '/internal/discord/members-meta',
+      headers: DISCORD_HEADERS,
+      body: { members: THREE_MEMBERS },
+    });
+    const res = new FakeRes();
+    await handleInternalApi(req, res as unknown as http.ServerResponse, null as never);
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toEqual(viaRouteDef.body);
+    // Non-vacuous: both arms really ran the upsert, and with the same records.
+    const calls = vi.mocked(setDiscordMemberMetaBulk).mock.calls;
+    expect(calls).toHaveLength(2);
+    expect(calls[1][1]).toEqual(calls[0][1]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 11c. discord/flex-batch (RouteDef-only): one batched read for many ids.
+// ---------------------------------------------------------------------------
+
+describe('discord/flex-batch', () => {
+  /** A batch entry, built fresh per call so no assertion compares an object to itself. */
+  function batchEntry(discordUserId: string): DiscordFlexBatchEntry {
+    return {
+      discord_user_id: discordUserId,
+      linked: true,
+      found: true,
+      username: 'coolguy',
+      statusTier: 3,
+      points: 500,
+      character: { name: 'Hero', class: 'Warrior', level: 40, profileUrl: 'https://x/p' },
+    };
+  }
+
+  /** The id list the handler passed to the batched read on its last call. */
+  function requestedIds(): string[] {
+    const calls = vi.mocked(discordFlexForAccounts).mock.calls;
+    return calls[calls.length - 1][0] as string[];
+  }
+
+  it('answers the whole batch with ONE read and echoes each linked payload', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    vi.mocked(discordFlexForAccounts).mockResolvedValue([batchEntry('u1'), batchEntry('u2')]);
+
+    const r = await runRoute('POST', '/internal/discord/flex-batch', {
+      headers: DISCORD_HEADERS,
+      body: { discord_user_ids: ['u1', 'u2'] },
+    });
+
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { requested: 2, members: [batchEntry('u1'), batchEntry('u2')] },
+      error: null,
+    });
+    expect(vi.mocked(discordFlexForAccounts)).toHaveBeenCalledTimes(1);
+    expect(requestedIds()).toEqual(['u1', 'u2']);
+    // The per-id route must not be reached: the batch is the whole point.
+    expect(vi.mocked(discordFlexForAccount)).not.toHaveBeenCalled();
+  });
+
+  it('yields no payload for an unlinked id rather than a fabricated one', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    // 'unlinked' has no discord_links row, so the batched read returns no row for
+    // it. Absence IS the answer (the per-id route's { linked: false } equivalent).
+    vi.mocked(discordFlexForAccounts).mockResolvedValue([batchEntry('linked')]);
+
+    const r = await runRoute('POST', '/internal/discord/flex-batch', {
+      headers: DISCORD_HEADERS,
+      body: { discord_user_ids: ['linked', 'unlinked'] },
+    });
+
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      // requested 2 against members 1 is exactly how a caller learns the missing
+      // id was unlinked rather than never asked about.
+      data: { requested: 2, members: [batchEntry('linked')] },
+      error: null,
+    });
+    // Both ids WERE asked about, so the absence is the database's answer and not
+    // the handler quietly dropping one before the read.
+    expect(requestedIds()).toEqual(['linked', 'unlinked']);
+  });
+
+  it('clamps the array, slices over-long ids, and drops non-strings like members-meta', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    vi.mocked(discordFlexForAccounts).mockResolvedValue([]);
+
+    await runRoute('POST', '/internal/discord/flex-batch', {
+      headers: DISCORD_HEADERS,
+      body: { discord_user_ids: ['d'.repeat(40), 42, null, { id: 'x' }, '', 'keep', 'keep'] },
+    });
+
+    // 32-char slice, non-strings and empties dropped, repeats collapsed. Same
+    // rules as the members-meta member list, so the two cannot drift.
+    expect(requestedIds()).toEqual(['d'.repeat(32), 'keep']);
+
+    await runRoute('POST', '/internal/discord/flex-batch', {
+      headers: DISCORD_HEADERS,
+      body: { discord_user_ids: Array.from({ length: 1001 }, (_, i) => `u${i}`) },
+    });
+
+    // The array cap is applied BEFORE per-entry validation, exactly like
+    // members-meta: the first 1000 survive and the 1001st is sliced off.
+    const capped = requestedIds();
+    expect(capped).toHaveLength(1000);
+    expect(capped[0]).toBe('u0');
+    expect(capped[999]).toBe('u999');
+    expect(capped).not.toContain('u1000');
+  });
+
+  it('reads nothing and answers an empty batch when the body carries no id list', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    vi.mocked(discordFlexForAccounts).mockResolvedValue([]);
+
+    const r = await runRoute('POST', '/internal/discord/flex-batch', {
+      headers: DISCORD_HEADERS,
+      body: { discord_user_ids: 'not-an-array' },
+    });
+
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      // requested 0 is the signal that separates a DROPPED request from a real
+      // empty answer. readBody turns an over-64-KiB or malformed body into {},
+      // which lands here, so without the echo this response is byte-identical to
+      // "all of your ids are unlinked" and a caller that strips flair for missing
+      // ids would mass-clear on a truncated push.
+      data: { requested: 0, members: [] },
+      error: null,
+    });
+    expect(requestedIds()).toEqual([]);
+  });
+
+  it('reports how many ids it accepted, so a caller can detect a dropped request', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    vi.mocked(discordFlexForAccounts).mockResolvedValue([batchEntry('u1')]);
+
+    // Three ids sent, three accepted, one linked. A caller comparing `requested`
+    // against what it sent sees 3 === 3 and trusts the two absences.
+    const honest = await runRoute('POST', '/internal/discord/flex-batch', {
+      headers: DISCORD_HEADERS,
+      body: { discord_user_ids: ['u1', 'u2', 'u3'] },
+    });
+    expect((honest.body as { data: { requested: number } }).data.requested).toBe(3);
+
+    // Same caller, body lost on the way in. requested 0 against 3 sent is the
+    // mismatch that tells it not to act on the absences.
+    vi.mocked(discordFlexForAccounts).mockResolvedValue([]);
+    const dropped = await runRoute('POST', '/internal/discord/flex-batch', {
+      headers: DISCORD_HEADERS,
+      body: {},
+    });
+    expect((dropped.body as { data: { requested: number } }).data.requested).toBe(0);
+    expect((dropped.body as { data: { members: unknown[] } }).data.members).toEqual([]);
+  });
+
+  it('is gated: a wrong secret is a 401 that never reaches the handler', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+
+    const r = await runRoute('POST', '/internal/discord/flex-batch', {
+      headers: { 'x-woc-discord-secret': 'wrong' },
+      body: { discord_user_ids: ['u1'] },
+    });
+
+    expect(r.status).toBe(401);
+    expect(r.reached).toBe(false);
+    expect(vi.mocked(discordFlexForAccounts)).not.toHaveBeenCalled();
+  });
+
+  it('has NO arm on the frozen legacy ladder (RouteDef-only by design)', async () => {
+    // D9: a route born after the pipeline migration never gets a legacy twin, so
+    // the legacy dispatcher must fall through to its terminal 404. If someone
+    // later adds a legacy arm, this fails and the dual-edit obligation is caught.
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+
+    const req = makeReq({
+      method: 'POST',
+      url: '/internal/discord/flex-batch',
+      headers: DISCORD_HEADERS,
+      body: { discord_user_ids: ['u1'] },
+    });
+    const res = new FakeRes();
+    await handleInternalApi(req, res as unknown as http.ServerResponse, null as never);
+
+    expect(res.statusCode).toBe(404);
+    expect(JSON.parse(res.body)).toEqual({
+      success: false,
+      data: null,
+      error: 'unknown endpoint',
+    });
+    expect(vi.mocked(discordFlexForAccounts)).not.toHaveBeenCalled();
   });
 });
 

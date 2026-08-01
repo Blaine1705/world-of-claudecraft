@@ -581,28 +581,241 @@ export async function discordIdsWithGuildFlair(pool: Pool): Promise<string[]> {
   return res.rows.map((r) => String(r.discord_user_id));
 }
 
+// The widest instant a JS Date can represent (ECMA-262: +/-8.64e15 ms from the
+// epoch). Number.isFinite admits values far beyond it, and new Date(1e20) is an
+// Invalid Date whose toISOString() THROWS.
+const MAX_EPOCH_MS = 8.64e15;
+
 /**
- * Upsert bot-pushed guild metadata (server join date + top special-role key) for a
- * Discord user, matched by discord_user_id. No-op when the id is not linked. Both
- * fields are optional; pass null to leave a field unchanged is NOT supported here
- * (callers always send the current values).
+ * A bot-pushed join timestamp as an ISO string, or null when it cannot represent
+ * an instant.
+ *
+ * Dropping to null rather than throwing is load-bearing now that the push is ONE
+ * statement. The old per-member loop built its Date inside the per-record call, so
+ * an unusable value spoiled only its own record and every record before it had
+ * already been written; here the whole batch is converted up front, so a single
+ * out-of-range value would abort all 1000 records BEFORE any SQL ran, and the bot
+ * would re-send the same poisoned set every sweep forever. Null is also the right
+ * answer semantically: the column is written with COALESCE, so a null leaves the
+ * stored join date alone instead of clearing it.
  */
-export async function setDiscordMemberMeta(
+function joinedAtIso(joinedAtMs: number | null): string | null {
+  if (joinedAtMs === null || !Number.isFinite(joinedAtMs)) return null;
+  if (Math.abs(joinedAtMs) > MAX_EPOCH_MS) return null;
+  return new Date(joinedAtMs).toISOString();
+}
+
+/** One bot-pushed guild-metadata record, already validated by the caller. */
+export interface DiscordMemberMetaRecord {
+  discordUserId: string;
+  nickname: string | null;
+  joinedAtMs: number | null;
+  roleKey: string | null;
+}
+
+/** What a bulk member-meta push actually did, per record class. */
+export interface DiscordMemberMetaResult {
+  /** Rows whose stored values really changed (a write landed). */
+  changed: number;
+  /** Rows that existed and already held the incoming values (no write needed). */
+  skipped: number;
+  /**
+   * Ids with NO discord_links row, so nothing could be applied for them. The
+   * caller needs the IDS, not just a count: an unlinked member's meta has to stay
+   * dirty on the pusher's side so it is re-sent once they link.
+   */
+  unapplied: string[];
+}
+
+/**
+ * Upsert bot-pushed guild metadata (server join date, in-server nickname, top
+ * special-role key) for MANY Discord users in ONE statement, and report what it
+ * actually did rather than what it read.
+ *
+ * This replaces the per-member serial UPDATE the members-meta endpoint used to
+ * run: a 1000-member push was 1000 round trips, and every one of them reported
+ * success even when it matched no row. Three properties matter here:
+ *
+ *  1. ONE statement regardless of member count (unnest of four parallel arrays).
+ *  2. A row whose stored values already match is NOT written. The `IS DISTINCT
+ *     FROM` row comparison is NULL-safe per field, so a NULL-to-NULL column
+ *     counts as unchanged rather than as a difference.
+ *  3. The three outcomes are reported separately. A Discord member with no link
+ *     row (every unlinked guild member) lands in `unapplied` instead of being
+ *     counted as written, which is what lets a caller keep re-sending them until
+ *     they link.
+ *
+ * The data-modifying CTE is load-bearing: `matched` and `updated` both read the
+ * SAME pre-statement snapshot, so `matched` classifies against the values as they
+ * were BEFORE the UPDATE rather than after it.
+ *
+ * Duplicate ids are the caller's to remove; this de-duplicates defensively,
+ * keeping the LAST occurrence, which is the state the old sequential loop left
+ * behind (later writes overwrote earlier ones).
+ */
+export async function setDiscordMemberMetaBulk(
   pool: Pool,
-  discordUserId: string,
-  nickname: string | null,
-  joinedAtMs: number | null,
-  roleKey: string | null,
-): Promise<void> {
-  const joinedAt = joinedAtMs !== null && Number.isFinite(joinedAtMs) ? new Date(joinedAtMs) : null;
+  records: readonly DiscordMemberMetaRecord[],
+): Promise<DiscordMemberMetaResult> {
+  const byId = new Map<string, DiscordMemberMetaRecord>();
+  for (const record of records) byId.set(record.discordUserId, record);
+  // Sorted by id, which is a deadlock guard rather than tidiness. A multi-row
+  // UPDATE takes its row locks in the order the plan feeds it, so two overlapping
+  // pushes presenting the same ids in DIFFERENT orders can deadlock, and Postgres
+  // aborts one of them. The old loop could not: it held exactly one row lock per
+  // autocommitted statement. Overlap is reachable (departed-flair clears run
+  // alongside the sweep, and several realm processes write this realm-agnostic
+  // table), so every caller is made to offer the same lock order.
+  const deduped = [...byId.values()].sort((a, b) =>
+    a.discordUserId < b.discordUserId ? -1 : a.discordUserId > b.discordUserId ? 1 : 0,
+  );
+  if (deduped.length === 0) return { changed: 0, skipped: 0, unapplied: [] };
+
+  const ids = deduped.map((r) => r.discordUserId);
+  const nicknames = deduped.map((r) => r.nickname);
+  const joinedAt = deduped.map((r) => joinedAtIso(r.joinedAtMs));
+  const roleKeys = deduped.map((r) => r.roleKey);
+
   // The in-server nickname (nick > global > username) is the preferred display
   // name; COALESCE keeps the OAuth-linked username when the bot sends nothing.
-  await pool.query(
-    `UPDATE discord_links
-        SET discord_username = COALESCE($2, discord_username),
-            discord_joined_at = COALESCE($3, discord_joined_at),
-            discord_role = $4
-      WHERE discord_user_id = $1`,
-    [discordUserId, nickname, joinedAt, roleKey],
+  // discord_role is assigned unconditionally, so a null CLEARS the stored role.
+  // Both rules are carried identically into the change comparison, so "would this
+  // write alter the row" is asked about the value that would actually be stored.
+  const res = await pool.query(
+    `WITH input AS (
+       SELECT * FROM unnest($1::text[], $2::text[], $3::timestamptz[], $4::text[])
+         AS t(discord_user_id, nickname, joined_at, role_key)
+     ),
+     matched AS (
+       SELECT i.discord_user_id,
+              (dl.discord_username, dl.discord_joined_at, dl.discord_role)
+                IS DISTINCT FROM
+              (COALESCE(i.nickname, dl.discord_username),
+               COALESCE(i.joined_at, dl.discord_joined_at),
+               i.role_key) AS will_change
+         FROM input i
+         JOIN discord_links dl ON dl.discord_user_id = i.discord_user_id
+     ),
+     updated AS (
+       UPDATE discord_links dl
+          SET discord_username = COALESCE(i.nickname, dl.discord_username),
+              discord_joined_at = COALESCE(i.joined_at, dl.discord_joined_at),
+              discord_role = i.role_key
+         FROM (SELECT * FROM input ORDER BY discord_user_id) i
+        WHERE dl.discord_user_id = i.discord_user_id
+          AND (dl.discord_username, dl.discord_joined_at, dl.discord_role)
+              IS DISTINCT FROM
+              (COALESCE(i.nickname, dl.discord_username),
+               COALESCE(i.joined_at, dl.discord_joined_at),
+               i.role_key)
+      RETURNING 1
+     )
+     SELECT (SELECT count(*) FROM updated) AS changed,
+            (SELECT count(*) FROM matched WHERE NOT will_change) AS skipped,
+            (SELECT COALESCE(array_agg(i.discord_user_id), ARRAY[]::text[])
+               FROM input i
+              WHERE NOT EXISTS (
+                SELECT 1 FROM matched m WHERE m.discord_user_id = i.discord_user_id
+              )) AS unapplied`,
+    [ids, nicknames, joinedAt, roleKeys],
   );
+  const row = res.rows[0];
+  return {
+    changed: Number(row?.changed ?? 0),
+    skipped: Number(row?.skipped ?? 0),
+    unapplied: Array.isArray(row?.unapplied) ? row.unapplied.map((id: unknown) => String(id)) : [],
+  };
+}
+
+/** One linked member's flex payload source row, straight off the batched read. */
+export interface DiscordFlexBatchRow {
+  discord_user_id: string;
+  account_id: number;
+  discord_username: string | null;
+  points: number;
+  lifetime_points: number;
+  /** The account's top character on this realm, or nulls when it has none. */
+  character_name: string | null;
+  character_class: string | null;
+  character_level: number | null;
+}
+
+/**
+ * Everything the Discord flex embed needs for MANY Discord ids, in ONE statement.
+ *
+ * The per-account path (discordFlexForAccount in server/discord.ts) costs four
+ * round trips per user: the link lookup, then highestCharacterForAccount,
+ * loadRewardState and discordForAccount. Asking it once per online Discord user
+ * is what amplified a single bot sweep into hundreds of uncached queries. This
+ * answers the whole batch with one round trip whose statement count does not move
+ * with the batch size.
+ *
+ * UNLINKED ids simply produce no row: the caller learns an id is unlinked by its
+ * ABSENCE from the result, and nothing is ever fabricated for it.
+ *
+ * Only the fields the payload uses are selected. In particular the character
+ * `state` JSONB blob is NOT read back (a 1000-member batch would drag megabytes
+ * of character state across the wire for one integer); the level is projected
+ * SQL-side with the same `state.level` over column-level precedence the
+ * per-account path applies in TypeScript. The guard around that projection makes
+ * it TOTAL, and all three of its parts are load-bearing: a bare `::int` cast
+ * raises on a non-numeric `level`, `jsonb_typeof` alone still admits a FLOAT
+ * (`'40.5'::int` raises too, which is why the cast goes through `numeric`), and
+ * `numeric::int` still raises out-of-range without the bounds test. Any one of
+ * those would take the WHOLE batch down over a single malformed character row,
+ * where the per-account path (`ch.state?.level ?? ch.level` in TypeScript)
+ * shrugs and answers. Falling back to the column matches what the row claims.
+ * Note the sibling `lifetimeXp` cast in the ORDER BY needs no such guard: the two
+ * expression indexes in server/db.ts are built on it, so a value that cannot cast
+ * could never have been stored. `state.level` has no equivalent proof.
+ *
+ * KEEP THE LATERAL'S ORDER BY IN LOCKSTEP with highestCharacterForAccount in
+ * server/db.ts. Both endpoints stay live, so if the two disagree about which
+ * character is "top" the bot shows a different character depending on which one
+ * it called. server/db.ts cannot be imported here (db.ts imports THIS module for
+ * DISCORD_SCHEMA, so the dependency runs one way only), which is why the ordering
+ * is restated rather than shared; tests/discord_db.test.ts pins this copy.
+ */
+export async function discordFlexRowsForDiscordIds(
+  pool: Pool,
+  discordUserIds: readonly string[],
+  realm: string,
+): Promise<DiscordFlexBatchRow[]> {
+  if (discordUserIds.length === 0) return [];
+  const res = await pool.query(
+    `SELECT dl.discord_user_id,
+            dl.account_id,
+            dl.discord_username,
+            COALESCE(rp.points, 0) AS points,
+            COALESCE(rp.lifetime_points, 0) AS lifetime_points,
+            ch.name AS character_name,
+            ch.class AS character_class,
+            ch.level AS character_level
+       FROM discord_links dl
+       LEFT JOIN reward_points rp ON rp.account_id = dl.account_id
+       LEFT JOIN LATERAL (
+         SELECT c.name, c.class,
+                CASE WHEN jsonb_typeof(c.state->'level') = 'number'
+                      AND (c.state->>'level')::numeric BETWEEN -2147483648 AND 2147483647
+                     THEN (c.state->>'level')::numeric::int ELSE c.level END AS level
+           FROM characters c
+          WHERE c.account_id = dl.account_id AND c.realm = $2
+          ORDER BY c.level DESC, ((c.state->>'lifetimeXp')::bigint) DESC NULLS LAST, c.id ASC
+          LIMIT 1
+       ) ch ON TRUE
+      WHERE dl.discord_user_id = ANY($1::text[])`,
+    [[...discordUserIds], realm],
+  );
+  return res.rows.map((row) => ({
+    discord_user_id: String(row.discord_user_id),
+    account_id: Number(row.account_id),
+    discord_username: row.discord_username ?? null,
+    points: Number(row.points ?? 0),
+    lifetime_points: Number(row.lifetime_points ?? 0),
+    character_name: row.character_name ?? null,
+    character_class: row.character_class ?? null,
+    // Nullish, not `=== null`: an ABSENT key is undefined, and Number(undefined)
+    // is NaN, which would ride out to the wire as a level of null-after-JSON.
+    character_level: row.character_level == null ? null : Number(row.character_level),
+  }));
 }

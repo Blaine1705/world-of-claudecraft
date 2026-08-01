@@ -37,6 +37,7 @@ import {
   consumeDiscordPendingLogin,
   createDiscordOAuthState,
   createDiscordPendingLogin,
+  discordFlexRowsForDiscordIds,
   discordForAccount,
   grantRewardPoints,
   linkDiscordToAccount,
@@ -94,7 +95,7 @@ import {
   recordAuthFailure,
   requestIp,
 } from './ratelimit';
-import { publicOriginFromRequest, REALM_PUBLIC_ORIGIN } from './realm';
+import { publicOriginFromRequest, REALM, REALM_PUBLIC_ORIGIN } from './realm';
 
 const STATE_TTL_MINUTES = 10;
 // A first-time login's "create new or link existing?" choice is parked this long
@@ -969,6 +970,55 @@ export async function discordFlexForAccount(accountId: number): Promise<DiscordF
         }
       : null,
   };
+}
+
+/** One entry of a batched flex read: the single-flex payload plus its Discord id. */
+export interface DiscordFlexBatchEntry extends DiscordFlex {
+  discord_user_id: string;
+  /** Always true: an entry only exists because a discord_links row matched. */
+  linked: true;
+}
+
+/**
+ * The flex payload for MANY Discord ids at once, for the bot's sweep.
+ *
+ * Field-for-field identical to discordFlexForAccount for any LINKED id, so the
+ * bot can render a batch entry and a single-endpoint payload through the same
+ * code. It costs one round trip for the whole batch instead of four per user.
+ *
+ * UNLINKED ids are ABSENT from the result rather than carrying a fabricated
+ * payload: the per-id endpoint answers { linked: false } for them, and the
+ * batch's equivalent of that answer is omission. Order follows the database's
+ * row order, so callers must key on discord_user_id, never on position.
+ */
+export async function discordFlexForAccounts(
+  discordUserIds: readonly string[],
+): Promise<DiscordFlexBatchEntry[]> {
+  if (discordUserIds.length === 0) return [];
+  const rows = await discordFlexRowsForDiscordIds(pool, discordUserIds, REALM);
+  const origin = REALM_PUBLIC_ORIGIN || '';
+  return rows.map((row) => {
+    const name = row.character_name;
+    return {
+      discord_user_id: row.discord_user_id,
+      linked: true as const,
+      found: name !== null,
+      username: row.discord_username,
+      // Every row IS a link row, so the tier is always derived (the per-account
+      // path's `link ? ... : 0` fork only exists to answer for an unlinked id).
+      statusTier: discordStatusIndexForPoints(row.lifetime_points),
+      points: row.points,
+      character:
+        name !== null
+          ? {
+              name,
+              class: row.character_class ?? '',
+              level: row.character_level ?? 0,
+              profileUrl: `${origin}/c/${encodeURIComponent(name)}`,
+            }
+          : null,
+    };
+  });
 }
 
 // ── small local helpers ────────────────────────────────────────────────────────

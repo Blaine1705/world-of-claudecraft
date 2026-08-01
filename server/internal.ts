@@ -4,16 +4,17 @@ import { specialRoleByKey } from '../src/sim/discord_roles';
 import { DISCORD_REWARD_GRANTS, discordStatusIndexForPoints } from '../src/sim/discord_tier';
 import { dailyRewardService } from './daily_rewards';
 import { pool } from './db';
-import { discordFlexForAccount, setDiscordPresenceCache } from './discord';
+import { discordFlexForAccount, discordFlexForAccounts, setDiscordPresenceCache } from './discord';
 import { drainActivity } from './discord_activity';
 import {
   accountForDiscord,
+  type DiscordMemberMetaRecord,
   discordForAccount,
   discordIdsWithGuildFlair,
   grantRewardPoints,
   loadRewardState,
   setDiscordGuildMember,
-  setDiscordMemberMeta,
+  setDiscordMemberMetaBulk,
 } from './discord_db';
 import { drainRelay } from './discord_relay';
 import type { GameServer } from './game';
@@ -24,7 +25,7 @@ import {
   DISCORD_SECRET_HEADER,
   requireInternalSecret,
 } from './http/middleware/require_internal_secret';
-import type { RouteDef, RouteMeta } from './http/types';
+import type { RouteDef, RouteHandler, RouteMeta } from './http/types';
 import { json, readBody } from './http_util';
 
 function ok(res: http.ServerResponse, data: unknown): void {
@@ -209,23 +210,11 @@ async function handleDiscordInternal(
 
   // POST /internal/discord/members-meta -> the bot pushes guild join dates + top
   // staff/special role for members; we store it on the matching linked accounts.
+  // One multi-row upsert for the whole push (applyMemberMetaPush), shared with
+  // the RouteDef arm so the two can never diverge.
   if (req.method === 'POST' && url.pathname === '/internal/discord/members-meta') {
     const body = await readBody(req).catch(() => ({}) as Record<string, unknown>);
-    const members = Array.isArray(body.members) ? body.members.slice(0, 1000) : [];
-    let updated = 0;
-    for (const m of members) {
-      const o = m && typeof m === 'object' ? (m as Record<string, unknown>) : {};
-      const id = typeof o.discord_user_id === 'string' ? o.discord_user_id.slice(0, 32) : '';
-      if (!id) continue;
-      const name = typeof o.name === 'string' ? o.name.slice(0, 64) : null;
-      const joinedAtMs =
-        typeof o.joinedAtMs === 'number' && Number.isFinite(o.joinedAtMs) ? o.joinedAtMs : null;
-      // Only accept a known special-role key; anything else clears the role.
-      const roleKey = typeof o.role === 'string' && specialRoleByKey(o.role) ? o.role : null;
-      await setDiscordMemberMeta(pool, id, name, joinedAtMs, roleKey);
-      updated++;
-    }
-    return ok(res, { updated });
+    return ok(res, await applyMemberMetaPush(body));
   }
 
   // GET /internal/discord/flaired-ids -> the discord ids whose stored link still
@@ -245,6 +234,137 @@ function clampInt(value: unknown, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
 }
 
+// How many members one members-meta push may carry, and how many Discord ids one
+// flex-batch request may ask about. Both are ARRAY caps applied before any
+// per-entry validation, so an over-cap request keeps its first N entries rather
+// than being refused. The real ceiling on either request is readBody's 64 KiB
+// body cap (server/http_util.ts DEFAULT_JSON_BODY_MAX_BYTES), which binds first
+// for full member records; flex-batch carries bare id strings, so 1000 of them is
+// roughly 23 KiB and the array cap is what binds there.
+const MEMBERS_META_CAP = 1000;
+const FLEX_BATCH_CAP = 1000;
+
+/**
+ * Validate a list of Discord user ids from a request body: cap the array, slice
+ * each id to the stored column width, drop anything that is not a non-empty
+ * string, and drop repeats. Mirrors the members-meta member-list validation so
+ * the two endpoints cannot drift on what they accept.
+ */
+function sanitizeDiscordIdList(value: unknown, cap: number): string[] {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set<string>();
+  for (const raw of value.slice(0, cap)) {
+    const id = typeof raw === 'string' ? raw.slice(0, 32) : '';
+    if (id) seen.add(id);
+  }
+  return [...seen];
+}
+
+/**
+ * Validate a members-meta request body into the records the bulk upsert takes.
+ * Every clamp is the one the per-member loop applied before it: the 1000-entry
+ * array cap, the 32-char id slice, the 64-char name slice, the finite-number
+ * joinedAtMs check, and the known-special-role-key check that clears anything
+ * else. Repeats collapse keeping the LAST occurrence, which is the row state the
+ * old sequential loop left behind.
+ */
+function parseMemberMetaRecords(body: Record<string, unknown>): DiscordMemberMetaRecord[] {
+  const members = Array.isArray(body.members) ? body.members.slice(0, MEMBERS_META_CAP) : [];
+  const byId = new Map<string, DiscordMemberMetaRecord>();
+  for (const m of members) {
+    const o = m && typeof m === 'object' ? (m as Record<string, unknown>) : {};
+    const id = typeof o.discord_user_id === 'string' ? o.discord_user_id.slice(0, 32) : '';
+    if (!id) continue;
+    const nickname = typeof o.name === 'string' ? o.name.slice(0, 64) : null;
+    const joinedAtMs =
+      typeof o.joinedAtMs === 'number' && Number.isFinite(o.joinedAtMs) ? o.joinedAtMs : null;
+    // Only accept a known special-role key; anything else clears the role.
+    const roleKey = typeof o.role === 'string' && specialRoleByKey(o.role) ? o.role : null;
+    byId.set(id, { discordUserId: id, nickname, joinedAtMs, roleKey });
+  }
+  return [...byId.values()];
+}
+
+/** The members-meta answer: what was accepted, and what actually happened to it. */
+interface MemberMetaPushResult {
+  /**
+   * Records ACCEPTED for application (validated, in-cap, de-duplicated). It keeps
+   * counting records READ rather than rows written, which is deliberate: the
+   * bot's client (bot/server_client.ts pushMembersMeta) treats `updated === 0` on
+   * a non-empty push as a hard refusal and aborts the whole sweep, so narrowing
+   * this to "rows we wrote" would make a post-restart full re-push (where nothing
+   * changed) and any all-unlinked batch read as a total failure. The over-cap
+   * silent drop that guard was written for still answers 0 here.
+   *
+   * One honest difference from the old loop, which incremented once per entry: a
+   * push carrying the SAME id twice now counts it once, because duplicates
+   * collapse before the count. The stored result is unchanged (the old loop's
+   * later write won, and de-duplication keeps the last occurrence).
+   */
+  updated: number;
+  /** Of those, the rows whose stored values really changed. */
+  changed: number;
+  /** Of those, the rows that existed and already matched (nothing written). */
+  skipped: number;
+  /**
+   * The accepted ids with NO discord_links row, so nothing could be applied. A
+   * count would not be enough: the pusher has to know WHICH ids to leave dirty so
+   * their meta is re-sent once they link. Bounded by the same array cap the
+   * request carries.
+   *
+   * `updated === changed + skipped + unapplied.length` holds absent a concurrent
+   * writer on the same rows. Under READ COMMITTED the classification and the
+   * UPDATE share one snapshot, but the UPDATE re-checks its predicate against the
+   * newest committed row version, so a row another transaction moved in between
+   * can fall out of both counts. Reporting the real numbers is worth more than an
+   * identity made true by deriving one of them from the others.
+   */
+  unapplied: string[];
+}
+
+/**
+ * The whole members-meta behavior, shared by BOTH dispatch arms so the RouteDef
+ * handler and the frozen legacy ladder branch cannot answer differently: they
+ * call this one function rather than each reproducing the logic (the dual-edit
+ * rule for a migrated route, server/http/CLAUDE.md).
+ */
+async function applyMemberMetaPush(body: Record<string, unknown>): Promise<MemberMetaPushResult> {
+  const records = parseMemberMetaRecords(body);
+  const applied = await setDiscordMemberMetaBulk(pool, records);
+  return { updated: records.length, ...applied };
+}
+
+/**
+ * POST /internal/discord/flex-batch -> the flex payload for many Discord ids in
+ * one request. The bot's sweep asked the per-id GET /internal/discord/flex once
+ * per online Discord user, and each of those cost up to four uncached queries;
+ * this answers the whole set with one batched read.
+ *
+ * RouteDef-ONLY by design: a route born after the pipeline migration never gets a
+ * legacy handleDiscordInternal arm (server/http/CLAUDE.md), so there is nothing
+ * to keep in lockstep here.
+ *
+ * Ids with no link row are ABSENT from `members` rather than carrying a
+ * fabricated payload, which is the batch equivalent of the per-id route's
+ * { linked: false }. Callers key on discord_user_id, never on position.
+ *
+ * `requested` echoes how many ids actually survived validation, and it is not
+ * decoration. Absence-means-unlinked is this endpoint's whole contract, and
+ * readBody rejects an over-cap or malformed body into an empty object, so without
+ * the echo a DROPPED request and a genuine "none of these are linked" answer are
+ * the same 200 { members: [] }. A caller that later strips flair for the ids
+ * missing from a response would mass-clear on a truncated request. Comparing
+ * `requested` against the number of ids it sent tells the caller which one it
+ * got. (The sibling members-meta has the same hazard and its own signal for it:
+ * an over-cap body answers updated 0, which its client already treats as a
+ * refusal.)
+ */
+export const flexBatchHandler: RouteHandler = async (ctx) => {
+  const body = await readBody(ctx.req).catch(() => ({}) as Record<string, unknown>);
+  const ids = sanitizeDiscordIdList(body.discord_user_ids, FLEX_BATCH_CAP);
+  return ok(ctx.res, { requested: ids.length, members: await discordFlexForAccounts(ids) });
+};
+
 function sanitizeVoiceMember(m: unknown): {
   id: string;
   name: string;
@@ -261,7 +381,9 @@ function sanitizeVoiceMember(m: unknown): {
 }
 
 // ── Route table ────────────────────────────
-// All 12 handleInternalApi endpoints as RouteDefs for the shared dispatcher:
+// All 12 handleInternalApi endpoints as RouteDefs for the shared dispatcher,
+// plus flex-batch, which is RouteDef-ONLY (born after the migration, so it has
+// no legacy ladder arm by design and nothing below it to keep in lockstep):
 // the deploy-gated restart-countdown plus the 11 Discord-bot-gated routes
 // (including the two daily-rewards-winners routes added after the original
 // count of 9, and flaired-ids, added after the migration on BOTH arms per the
@@ -519,22 +641,16 @@ export const routes: RouteDef[] = [
     middleware: [discordGate],
     handler: async (ctx) => {
       const body = await readBody(ctx.req).catch(() => ({}) as Record<string, unknown>);
-      const members = Array.isArray(body.members) ? body.members.slice(0, 1000) : [];
-      let updated = 0;
-      for (const m of members) {
-        const o = m && typeof m === 'object' ? (m as Record<string, unknown>) : {};
-        const id = typeof o.discord_user_id === 'string' ? o.discord_user_id.slice(0, 32) : '';
-        if (!id) continue;
-        const name = typeof o.name === 'string' ? o.name.slice(0, 64) : null;
-        const joinedAtMs =
-          typeof o.joinedAtMs === 'number' && Number.isFinite(o.joinedAtMs) ? o.joinedAtMs : null;
-        // Only accept a known special-role key; anything else clears the role.
-        const roleKey = typeof o.role === 'string' && specialRoleByKey(o.role) ? o.role : null;
-        await setDiscordMemberMeta(pool, id, name, joinedAtMs, roleKey);
-        updated++;
-      }
-      return ok(ctx.res, { updated });
+      return ok(ctx.res, await applyMemberMetaPush(body));
     },
+  },
+  {
+    method: 'POST',
+    path: '/internal/discord/flex-batch',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [discordGate],
+    handler: flexBatchHandler,
   },
   {
     method: 'GET',
