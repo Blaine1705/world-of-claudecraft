@@ -923,6 +923,23 @@ export const en_XA: EnTranslations = {
       "separate": "[Šéþáŕáţé {meter}]",
       "regroup": "[Ŕéĝŕóúþ {meter}]"
     },
+    "targetAuras": {
+      "title": "[Ţáŕĝéţ Áúŕáš]",
+      "keybindLabel": "[Ţáŕĝéţ Ɓúƒƒš áñð Ðéƀúƒƒš]",
+      "all": "[Áļļ]",
+      "debuffs": "[Ðéƀúƒƒš]",
+      "buffs": "[Ɓúƒƒš]",
+      "unlock": "[Ɱóʋé ţáŕĝéţ áúŕá ŵíñðóŵ]",
+      "lock": "[Ļóçķ ţáŕĝéţ áúŕá ŵíñðóŵ]",
+      "configureRows": "[Çóñƒíĝúŕé ţáŕĝéţ áúŕáš]",
+      "fewerRows": "[Þŕéƒéŕ ƒéŵéŕ áúŕá ŕóŵš]",
+      "moreRows": "[Þŕéƒéŕ ɱóŕé áúŕá ŕóŵš]",
+      "visibleRows": "[Þŕéƒéŕŕéð áúŕá ŕóŵš: {count}]",
+      "showSources": "[Šĥóŵ áúŕá šóúŕçéš]",
+      "hideSources": "[Ĥíðé áúŕá šóúŕçéš]",
+      "ownAura": "[Ýóúŕ áúŕá]",
+      "opacity": "[Áúŕá óþáçíţý: {percent}]"
+    },
     "petFeed": {
       "disabledFullHp": "[Þéţ íš áţ ƒúļļ ĥéáļţĥ]",
       "disabledNoFood": "[Ñó ƒóóð íñ ýóúŕ ƀáĝš ŵíļļ ĥéáļ ýóúŕ þéţ]"

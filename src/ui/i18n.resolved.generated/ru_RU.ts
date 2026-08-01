@@ -923,6 +923,23 @@ export const ru_RU: EnTranslations = {
       "separate": "Отделить: {meter}",
       "regroup": "Вернуть: {meter}"
     },
+    "targetAuras": {
+      "title": "Ауры цели",
+      "keybindLabel": "Усиления и ослабления цели",
+      "all": "All",
+      "debuffs": "Ослабления",
+      "buffs": "Усиления",
+      "unlock": "Переместить окно аур цели",
+      "lock": "Закрепить окно аур цели",
+      "configureRows": "Настроить ауры цели",
+      "fewerRows": "Уменьшить число строк аур",
+      "moreRows": "Увеличить число строк аур",
+      "visibleRows": "Предпочтительное число строк аур: {count}",
+      "showSources": "Показать создателей аур",
+      "hideSources": "Скрыть создателей аур",
+      "ownAura": "Ваша аура",
+      "opacity": "Непрозрачность аур: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Питомец полностью здоров",
       "disabledNoFood": "В ваших сумках нет еды, которая могла бы вылечить питомца"
