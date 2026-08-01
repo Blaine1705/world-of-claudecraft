@@ -17,12 +17,25 @@ official Discord server and the game two ways:
 Built like the server: `npm run bot` (esbuild bundle to `dist-bot/bot.cjs`, then run).
 Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`.
 
+**This directory is typechecked TWICE.** The repo-wide `npm run check:ts` includes `bot/`
+under the browser lib, and `npm run check:ts:bot` (`tsconfig.bot.json`, chained into
+`npm run check:types`) re-checks it with `lib: ES2022` and `types: node` alone. The second
+pass is the one that matters here: esbuild bundles a DOM global without complaint and the
+bot then dies at runtime in Node, which the repo-wide check cannot see because its lib
+includes `DOM` for the game client. Nothing in `bot/` may depend on a browser global.
+
 ## Files (one line each; each file's header comment is the reference)
 - `logic.ts`: **pure, IO-free** protocol/diff/message-builder logic. Unit-tested in
   `tests/discord_bot.test.ts`, except the diff-before-write predicates
   (`nicknameNeedsWrite`, `memberMetaChanged`/`changedMemberMeta`, `isSelfNickEcho`), which
   are pinned in `tests/discord_bot_diffs.test.ts` beside the write paths they serve.
-- `gateway.ts`: ws Gateway (v10) IO shell (HELLO/heartbeat, IDENTIFY, RESUME).
+- `gateway.ts`: ws Gateway (v10) IO shell (HELLO/heartbeat, IDENTIFY, RESUME). A FATAL
+  close code (`isFatalCloseCode` in `logic.ts`) now EXITS the process with 1 rather than
+  parking a live process that syncs nothing: every one of those codes needs a human (a
+  rotated token, an intent switched off in the developer portal), so the restart policy
+  is what should decide, and the visible crash loop is the intended outcome (R13; no
+  retry limiter, no backoff, no supervisor here). `process.exit` is the third injected
+  trailing seam, after the socket factory and the timers.
   Tested in `tests/discord_bot_gateway.test.ts`.
 - `rate_governor.ts`: **pure, IO-free** Discord rate-limit governor. Owns ALL REST
   pacing: serialized FIFO queues keyed by the PROVISIONAL route template, rate state
@@ -30,14 +43,19 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
   names a route shape, not one bucket: Discord documents it as non-inclusive of the
   top-level resource, so two channels share a hash and not a limit), proactive gating at
   `Remaining == 0`, the global pause (full `retry_after`, no ceiling), the Cloudflare ban
-  pause on a non-JSON 429, the invalid-request breaker, the 401/403 cache, and the Phase 8
-  counters. Only the rate state is remapped; the queues are never re-keyed, which is what
-  makes the remap safe mid-flight. Time is injected; it reads no clock.
+  pause on a non-JSON 429, the invalid-request breaker, the permanent-failure cache
+  (400, 401 and 403 for a subject-keyed request), and the Phase 8
+  counters. A 400 enters that cache but deliberately does NOT spend breaker budget:
+  the breaker counts against Discord's own invalid-request ban threshold, which counts
+  401, 403 and 429 and never 400. Only the rate state is remapped; the queues are
+  never re-keyed, which is what makes the remap safe mid-flight. Time is injected; it reads no clock.
 - `discord_api.ts`: thin Discord REST client (bot-token authed), an IO shell over the
   governor. Also owns the governor's production IO (`systemGovernorClock`,
   `consoleGovernorLog`) and `governorFromConfig`, the ONE construction site for a
   production governor: `main.ts` calls it, and `DiscordApi`'s own default routes through
-  it. Tested in `tests/discord_bot_discord_api.test.ts`.
+  it. Every dispatched call carries an abort deadline (`DISCORD_CALL_TIMEOUT_MS`), armed
+  INSIDE the send callback so it times Discord's answer and never the governor's queue
+  wait. Tested in `tests/discord_bot_discord_api.test.ts`.
 - `server_client.ts`: client for the game server's secret-gated `/internal/discord/*`
   endpoints (`x-woc-discord-secret`); grep `/internal/discord/` there for the live set.
   Tested in `tests/discord_bot_server_client.test.ts`.
@@ -61,6 +79,12 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
   from outside (the outbox link-change feed, the flex-batch echo, the members-meta linkage
   signal) and each signal is applied for exactly as much as it can prove. Tested in
   `tests/discord_bot_linked_sweep.test.ts` and `tests/discord_bot_sweep_cycle.test.ts`.
+- `liveness.ts`: the container healthcheck's evidence. A pure freshness rule
+  (`isHeartbeatFresh`, fresh means strictly under the stale window, and a FUTURE mtime is
+  fresh so a clock step never kills a working bot) plus the thin writer the
+  `heartbeat-file` task runs. The default path is `/tmp` because the runtime image runs as
+  USER node and only `/app/dist/media` is chowned. A failed write is logged once and
+  resolves false; it never throws. Tested in `tests/discord_bot_liveness.test.ts`.
 - `outbox_consumer.ts`: the consolidated poll's behavior, behind injected IO: the breaker
   gate, the per-stream fan-out, the winners announce-then-mark ordering, the didWork signal
   the cadence reads, and the factory that binds each stream's channel id and message
@@ -114,7 +138,8 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
   emits `:token` and `redactPath` redacts the throw; ids are deliberately kept.
 - **Secrets are env only**; never commit them. `DISCORD_BOT_SECRET` must match the server's.
 - **Privileged intents:** `GUILD_MEMBERS` + `GUILD_PRESENCES` must be enabled for the
-  application in the Discord developer portal, or IDENTIFY is rejected (close 4014).
+  application in the Discord developer portal, or IDENTIFY is rejected (close 4014). That
+  close is FATAL, so the bot exits 1 rather than retrying a handshake that cannot succeed.
 
 ## Poll loops (all on `scheduler.ts`, wired in main.ts)
 **There are no bare `setInterval` loops in `main.ts`, and a new loop must not add one**
@@ -174,22 +199,33 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   open the skipped drain also delays link-change consumption, so flair can lag until the
   breaker closes or, if the Phase 5 ladder evicted the items, until the hourly full-resync
   reconciliation heals it (about one hour worst case).
+- Liveness stamp (`heartbeat-file`): re-writes `cfg.heartbeatFile` every
+  `cfg.heartbeatIntervalMs` (`DISCORD_HEARTBEAT_INTERVAL_MS`, 30 s), and the compose
+  healthcheck compares that file's mtime against now. It is on the scheduler rather than
+  on a timer of its own precisely so that it PROVES something: the mtime advances only
+  while the scheduler is still driving runs, which is what separates a wedged bot from a
+  busy one (a Discord bot has no port to probe, and a process that reconnected to nothing
+  looks perfectly healthy from outside). An unwritable path is logged and the run still
+  settles, so a bad mount degrades the healthcheck and never the bot.
 - Daily engagement grant: first message or voice-join per member per day, deduped
   bot-side AND server-side (grant dedupe key), so it is exactly-once.
 - The adaptive active-to-idle backoff has two consumers: the outbox poll (D1: 3 s active
   decaying to 15 s idle) and the role sweep (slice interval decaying to the pass interval).
   Every other task sets `activeMs` only, so its cadence is constant. Backoff is only safe
   because recovery is instant: a run that finds work snaps straight back to `activeMs`.
-- **A run that never settles stops its loop for the life of the process** (ledger L10, open
-  until Phase 7). The next delay is armed only after the previous run settles, which is the
-  whole overlap guarantee, so a `run` that never resolves leaves the task claimed with
-  nothing armed, no counter and no log. A watchdog in the scheduler cannot fix it: recovery
-  needs the run CANCELLED, and the scheduler holds a promise it has no way to abort. The
-  real fix is a deadline on the fetch underneath (Phase 7 owns it; `server_client.ts`
-  already has TWO to copy, `SERVER_CALL_TIMEOUT_MS` for an ordinary call and
-  `DEFAULT_OUTBOX_TIMEOUT_MS` for the outbox poll, which is deliberately longer than the
-  server's own read deadline). Until then, every `run` handed to `scheduler.add` must be one
-  that always settles.
+- **Every `run` handed to `scheduler.add` must always settle** (ledger L10). The next delay
+  is armed only after the previous run settles, which is the whole overlap guarantee, so a
+  `run` that never resolves leaves the task claimed with nothing armed, no counter and no
+  log, for the life of the process. A watchdog in the scheduler cannot fix it: recovery
+  needs the run CANCELLED, and the scheduler holds a promise it has no way to abort. Only a
+  deadline on the IO underneath can, and as of Phase 7 both shells carry one, so every
+  run settles structurally: `SERVER_CALL_TIMEOUT_MS` for an ordinary game-server call and
+  `DEFAULT_OUTBOX_TIMEOUT_MS` for the outbox poll (deliberately longer than the server's own
+  read deadline) in `server_client.ts`, and `DISCORD_CALL_TIMEOUT_MS` in `discord_api.ts`.
+  That does not retire the rule, it satisfies it for today's tasks: NEW work behind a
+  seam that has no deadline (a bare promise, a stream, a lock) re-opens the same hole, so
+  a new `run` still has to settle by construction. A Discord deadline is armed INSIDE the
+  send callback, never around `governor.run`, or a legitimately queued request aborts.
 
 ## Diff before write (D5): nothing is written unless it changed
 `member_writes.ts` owns all three decisions, over the pure predicates in `logic.ts`, because
@@ -250,12 +286,16 @@ on). Governor knobs (all optional, safe defaults): `DISCORD_MAX_RPS` (8),
 `DISCORD_FORBIDDEN_TTL_MS` (86400000). Loop cadences (D13, all optional):
 `DISCORD_ROLE_SYNC_INTERVAL_MS` (300000), `DISCORD_PRESENCE_DEBOUNCE_MS` (4000),
 `DISCORD_OUTBOX_POLL_MS` (3000), `DISCORD_OUTBOX_IDLE_MS` (15000),
-`DISCORD_SWEEP_SLICE_MS` (3000); the defaults are `bot/cadence.ts`, so the value the suite
-pins and the value the bot falls back to cannot drift apart. The two knobs that are NOT
+`DISCORD_SWEEP_SLICE_MS` (3000), `DISCORD_HEARTBEAT_INTERVAL_MS` (30000); the defaults are
+`bot/cadence.ts`, so the value the suite
+pins and the value the bot falls back to cannot drift apart. The three knobs that are NOT
 cadences take their defaults from the module that spends them, for the same reason:
 `DISCORD_SWEEP_SLICE_SIZE` (100, `DEFAULT_SWEEP_SLICE_SIZE` in `linked_sweep.ts`, how many
-members one slice may write to) and `DISCORD_OUTBOX_TIMEOUT_MS` (70000,
-`DEFAULT_OUTBOX_TIMEOUT_MS` in `server_client.ts`, one poll's abort deadline). Each of these
+members one slice may write to), `DISCORD_OUTBOX_TIMEOUT_MS` (70000,
+`DEFAULT_OUTBOX_TIMEOUT_MS` in `server_client.ts`, one poll's abort deadline), and
+`DISCORD_HEARTBEAT_FILE` (`/tmp/discord-bot-heartbeat`, `DEFAULT_HEARTBEAT_FILE` in
+`liveness.ts`, the path the compose healthcheck stats; empty or whitespace falls back, and
+the value is trimmed). Each of these
 knobs falls back to its default for an empty or non-numeric value, never to 0. `DISCORD_WELCOME_CHANNEL_ID` is read but currently
 unwired (no welcome message is posted). Boot loads `.env`/`.env.local` when present but
 runs fine from ambient env alone (`process.loadEnvFile`).

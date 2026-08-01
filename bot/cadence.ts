@@ -44,3 +44,14 @@ export const OUTBOX_IDLE_MS = 15_000;
  * can pace without ever reaching its queue depth.
  */
 export const SWEEP_SLICE_MS = 3_000;
+
+/**
+ * How often the bot re-stamps its liveness file (D15).
+ *
+ * It is the fastest loop the bot runs, and it costs one small local write: the
+ * file's mtime is the container healthcheck's only evidence that the scheduler
+ * is still turning, so the interval sets how quickly a wedged bot is noticed.
+ * The stale window the healthcheck compares against is deliberately several of
+ * these, so a single slow tick is never mistaken for a dead process.
+ */
+export const HEARTBEAT_INTERVAL_MS = 30_000;

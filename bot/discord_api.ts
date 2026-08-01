@@ -22,8 +22,25 @@ import {
   RateGovernor,
   redactPath,
 } from './rate_governor';
+import type { TimerSeam } from './server_client';
 
 const API = 'https://discord.com/api/v10';
+
+/**
+ * How long ONE dispatched Discord call may run before its AbortController fires.
+ *
+ * Ledger L10/L17: a `fetch` on a stalled socket never settles, and every REST
+ * call here sits under a scheduler task that arms its next delay only after the
+ * run settles, so one hung request stops that loop for the life of the process.
+ * A deadline is the only thing that can recover it, because the scheduler holds a
+ * promise it has no way to abort.
+ *
+ * Deliberately generous, and deliberately a code constant rather than an env knob
+ * (the same shape as SERVER_CALL_TIMEOUT_MS, which it copies): its job is to
+ * bound a socket that has stopped talking, not to police a slow but live Discord.
+ * Named rather than inline so the suite can pin it against a literal.
+ */
+export const DISCORD_CALL_TIMEOUT_MS = 15_000;
 
 /**
  * Why the bot edited a member, written into Discord's audit log (D14). Plain
@@ -156,6 +173,11 @@ export class DiscordApi {
       breakerLimit: DEFAULT_BREAKER_LIMIT,
       forbiddenTtlMs: DEFAULT_FORBIDDEN_TTL_MS,
     }),
+    // The per-call deadline's timer pair, same forwarding-default convention.
+    private timers: TimerSeam = {
+      setTimeout: (fn, ms) => setTimeout(fn, ms),
+      clearTimeout: (handle) => clearTimeout(handle),
+    },
   ) {}
 
   /** Counters for Phase 8. */
@@ -184,68 +206,85 @@ export class DiscordApi {
     }
 
     const send = async (): Promise<RestResponse> => {
-      const resp = await this.fetchImpl(`${API}${path}`, {
-        method,
-        headers,
-        body: body === undefined ? undefined : JSON.stringify(body),
-      });
-      const collected = collectHeaders(resp.headers);
-      // A 204 has no body at all, so it short circuits before any read: falling
-      // through would lean entirely on a parse failure being caught.
-      if (resp.status === 204) {
-        return {
-          status: 204,
-          headers: collected,
-          jsonParsed: false,
-          ok: true,
-          data: null,
-          errorText: '',
-        };
-      }
-      if (resp.status === 429) {
-        // Read the body ONCE as text and parse from that. Whether it is JSON at
-        // all is the signal that separates a normal Discord 429 from a
-        // Cloudflare ban page, and a real Response body cannot be read twice.
-        const text = await resp.text().catch(() => '');
-        try {
+      // The deadline is armed HERE, inside the send callback, and never around
+      // `governor.run` below. The governor queues a request and dispatches it
+      // later, and a global pause after a 429 is measured in minutes, so a
+      // deadline wrapped around the queue wait would abort calls that were
+      // waiting exactly as designed. Armed at dispatch, it times the one thing it
+      // is meant to time: how long Discord takes to answer.
+      const controller = new AbortController();
+      const timer = this.timers.setTimeout(() => controller.abort(), DISCORD_CALL_TIMEOUT_MS);
+      try {
+        const resp = await this.fetchImpl(`${API}${path}`, {
+          method,
+          headers,
+          body: body === undefined ? undefined : JSON.stringify(body),
+          signal: controller.signal,
+        });
+        const collected = collectHeaders(resp.headers);
+        // A 204 has no body at all, so it short circuits before any read: falling
+        // through would lean entirely on a parse failure being caught.
+        if (resp.status === 204) {
           return {
-            status: 429,
-            headers: collected,
-            json: JSON.parse(text),
-            jsonParsed: true,
-            ok: false,
-            data: null,
-            errorText: text,
-          };
-        } catch {
-          return {
-            status: 429,
+            status: 204,
             headers: collected,
             jsonParsed: false,
-            ok: false,
+            ok: true,
             data: null,
-            errorText: text,
+            errorText: '',
           };
         }
-      }
-      if (resp.ok) {
+        if (resp.status === 429) {
+          // Read the body ONCE as text and parse from that. Whether it is JSON at
+          // all is the signal that separates a normal Discord 429 from a
+          // Cloudflare ban page, and a real Response body cannot be read twice.
+          const text = await resp.text().catch(() => '');
+          try {
+            return {
+              status: 429,
+              headers: collected,
+              json: JSON.parse(text),
+              jsonParsed: true,
+              ok: false,
+              data: null,
+              errorText: text,
+            };
+          } catch {
+            return {
+              status: 429,
+              headers: collected,
+              jsonParsed: false,
+              ok: false,
+              data: null,
+              errorText: text,
+            };
+          }
+        }
+        if (resp.ok) {
+          return {
+            status: resp.status,
+            headers: collected,
+            jsonParsed: true,
+            ok: true,
+            data: await resp.json().catch(() => null),
+            errorText: '',
+          };
+        }
         return {
           status: resp.status,
           headers: collected,
-          jsonParsed: true,
-          ok: true,
-          data: await resp.json().catch(() => null),
-          errorText: '',
+          jsonParsed: false,
+          ok: false,
+          data: null,
+          errorText: await resp.text().catch(() => ''),
         };
+      } finally {
+        // Inside the try, so the body reads above are covered by the same signal:
+        // a socket that delivered headers and then stalled mid-body is the same
+        // hang. Cleared on every path, including the abort itself, so a settled
+        // call never leaves a timer holding the event loop open.
+        this.timers.clearTimeout(timer);
       }
-      return {
-        status: resp.status,
-        headers: collected,
-        jsonParsed: false,
-        ok: false,
-        data: null,
-        errorText: await resp.text().catch(() => ''),
-      };
     };
 
     const resp = await this.governor.run(

@@ -1,5 +1,6 @@
-// The governor's permanent-failure cache (D4): the memory that stops a member who
-// answered 401 or 403 from being retried on every five-minute sweep, scoped to that
+// The governor's permanent-failure cache (D4, extended to 400 by Phase 7's L13): the
+// memory that stops a member whose write answered 400, 401 or 403 from being retried on
+// every five-minute sweep, scoped to that
 // one subject, expiring on its own, and droppable early when the bot's role position
 // moves and a past 403 stops meaning anything.
 //
@@ -102,7 +103,7 @@ describe('rate governor permanent-failure cache (D4)', () => {
     // vitest, so a bare string would also pass for a message that carried the
     // wrong route (or a raw path with a credential in it).
     expect(blocked.message).toBe(
-      `[bot] governor skipped ${MEMBER_TEMPLATE}: subject previously answered 401 or 403`,
+      `[bot] governor skipped ${MEMBER_TEMPLATE}: subject previously answered 400, 401 or 403`,
     );
     // The point of the whole cache: the second send was never called. Without
     // this the test would pass for a governor that dispatched and then threw.
@@ -379,13 +380,19 @@ describe('rate governor permanent-failure cache (D4)', () => {
 });
 
 describe('permanent-failure cache: what must NOT enter it', () => {
-  it('caches ONLY 401 and 403, never another failing status', async () => {
+  it('caches ONLY 400, 401 and 403, never another failing status', async () => {
     // The arm the suite was missing entirely. Every other test drives 401, 403,
     // 200 or 204, so widening the guard at the response path from
     // `status === 401 || status === 403` to `status >= 400` stayed green, and a
     // transient 500 or a 404 for a member who simply left would have poisoned
     // the cache for a full TTL and silently skipped that member on every sweep.
-    for (const status of [400, 404, 429, 500, 502]) {
+    //
+    // 400 left this list in Phase 7 and got its own describe below: it is a
+    // permanent rejection of the PAYLOAD, which the ones here are not. 404 is
+    // the sharpest remaining case, because it is exactly the shape a widened
+    // guard would swallow: a member who simply left, whose next write must go
+    // out normally the moment they rejoin.
+    for (const status of [404, 429, 500, 502]) {
       const r = rig();
       const subjectKey = `g1:${status}`;
       // The clock is driven, because a 429 waits out a retry: with no
@@ -514,6 +521,196 @@ describe('permanent-failure cache: what must NOT enter it', () => {
   });
 });
 
+describe('permanently rejected writes: 400 (L13)', () => {
+  it('caches a 400 for its subject and refuses the next write without sending it', async () => {
+    // The ledgered L13 defect. A nickname PATCH that Discord answers 400 is a
+    // computed nick it will never accept, and bot/member_writes.ts deliberately
+    // does not move its diff cache on a failed write, so the identical doomed
+    // request was rebuilt and re-sent on every sweep for the life of the process.
+    const { governor, sent, reply } = rig();
+
+    const first = await governor.run(
+      { method: 'PATCH', path: MEMBER_ONE, subjectKey: 'g1:u2' },
+      reply('first', 400),
+    );
+    // A 400 is a RESPONSE, not a throw: the IO shell owns what a status means.
+    expect(first.status).toBe(400);
+
+    const blocked = await blockedBy(
+      governor.run(
+        { method: 'PATCH', path: MEMBER_ONE, subjectKey: 'g1:u2' },
+        reply('second', 200),
+      ),
+    );
+    expect(blocked.reason).toBe('forbidden-cached');
+    expect(blocked.message).toBe(
+      `[bot] governor skipped ${MEMBER_TEMPLATE}: subject previously answered 400, 401 or 403`,
+    );
+    // The point of the whole cache: the second send was never called.
+    expect(sent).toEqual(['first']);
+    expect(governor.snapshot().forbiddenEntries).toBe(1);
+    expect(governor.snapshot().forbiddenBlocks).toBe(1);
+  });
+
+  it('retries the subject once the TTL has elapsed, so a fixed nick is not lost', async () => {
+    // The belief is BOUNDED, which is what makes caching a 400 safe at all: the
+    // payload Discord rejected was computed from the member's own state, and that
+    // state changes (a rename, a level-up). Deferring the next legitimate write by
+    // at most one TTL is the cost; losing it forever would not be acceptable.
+    const { governor, clock, sent, reply } = rig();
+
+    await governor.run(
+      { method: 'PATCH', path: MEMBER_ONE, subjectKey: 'g1:u2' },
+      reply('u2', 400),
+    );
+    expect(governor.isForbidden('g1:u2')).toBe(true);
+
+    await clock.advanceBy(TTL_MS - 1);
+    expect(governor.isForbidden('g1:u2')).toBe(true);
+    await clock.advanceBy(1);
+
+    const retried = await governor.run(
+      { method: 'PATCH', path: MEMBER_ONE, subjectKey: 'g1:u2' },
+      reply('retry', 204),
+    );
+    expect(retried.status).toBe(204);
+    expect(sent).toEqual(['u2', 'retry']);
+    expect(governor.snapshot().forbiddenEntries).toBe(0);
+  });
+
+  it('caches nothing for a 400 that carries NO subjectKey', async () => {
+    // A relay post or a slash-command reply is not about one member, so a 400 on
+    // it says nothing cacheable, and there would be no key to clear it under.
+    // Pinned by the entry COUNT, so dropping the subjectKey guard is caught even
+    // though the block it would cause is unreachable.
+    const { governor, sent, reply } = rig();
+
+    await governor.run({ method: 'POST', path: '/channels/9/messages' }, reply('first', 400));
+    expect(governor.snapshot().forbiddenEntries).toBe(0);
+
+    const second = await governor.run(
+      { method: 'POST', path: '/channels/9/messages' },
+      reply('second', 200),
+    );
+    expect(second.status).toBe(200);
+    expect(sent).toEqual(['first', 'second']);
+  });
+
+  it('caches per subject: a DIFFERENT member on the same route still dispatches', async () => {
+    // Both paths collapse to one bucket template, so a cache keyed by route would
+    // look identical here and would stop every member's write after one bad nick.
+    const { governor, sent, reply } = rig();
+
+    await governor.run(
+      { method: 'PATCH', path: MEMBER_ONE, subjectKey: 'g1:u2' },
+      reply('u2', 400),
+    );
+    const other = await governor.run(
+      { method: 'PATCH', path: MEMBER_TWO, subjectKey: 'g1:u3' },
+      reply('u3', 204),
+    );
+
+    expect(other.status).toBe(204);
+    expect(sent).toEqual(['u2', 'u3']);
+    expect(governor.isForbidden('g1:u2')).toBe(true);
+    expect(governor.isForbidden('g1:u3')).toBe(false);
+  });
+
+  it('spends NO invalid-request budget on a 400, unlike a 401 or a 403', async () => {
+    // The asymmetry is deliberate and load bearing. The breaker counts against
+    // Discord's own invalid-request ban threshold, and Discord counts 401, 403
+    // and 429 toward it, never 400. Adding 400 to the recordInvalid arm would let
+    // one bad nick shape swept across a few hundred members open the breaker and
+    // stop every non-essential Discord call the bot makes, which is far worse
+    // than the doomed writes it saves. Driven at a limit of 2 so the mutant trips.
+    const clock = syntheticClock();
+    const sent: string[] = [];
+    const governor = new RateGovernor({
+      clock,
+      maxRps: 0,
+      banPauseMs: 60_000,
+      breakerLimit: 2,
+      forbiddenTtlMs: TTL_MS,
+    });
+    const send = (label: string, status: number) => async () => {
+      sent.push(label);
+      return { status, headers: {}, json: {}, jsonParsed: true } as GovernorResponse;
+    };
+
+    // Five 400s, each for a DIFFERENT subject so the forbidden cache never
+    // refuses one of them and every single response reaches the classifier.
+    for (let i = 0; i < 5; i++) {
+      const answered = await governor.run(
+        { method: 'PATCH', path: `/guilds/1/members/${i}`, subjectKey: `g1:u${i}` },
+        send(`bad-${i}`, 400),
+      );
+      expect(answered.status).toBe(400);
+    }
+
+    const snap = governor.snapshot();
+    expect(snap.breakerState).toBe('closed');
+    expect(snap.breakerOpens).toBe(0);
+    // Every one of them WAS remembered, so this is about the breaker alone and
+    // not about the classifier having skipped the responses entirely.
+    expect(snap.forbiddenEntries).toBe(5);
+    expect(sent.length).toBe(5);
+
+    // The contrast: two 401s at the same limit DO open it, so the assertion above
+    // is about the status and not about a breaker that never trips in this rig.
+    await governor.run(
+      { method: 'PATCH', path: MEMBER_ONE, subjectKey: 'g1:auth1' },
+      send('auth1', 401),
+    );
+    await governor.run(
+      { method: 'PATCH', path: MEMBER_TWO, subjectKey: 'g1:auth2' },
+      send('auth2', 401),
+    );
+    expect(governor.snapshot().breakerState).toBe('open');
+  });
+
+  it('remembers a rejected NICKNAME under its own scope, leaving role writes alone', async () => {
+    // The real L13 shape, end to end through the shell, because the subject KEY
+    // is what decides how far the suppression reaches and only DiscordApi passes
+    // it. A nick Discord will not accept must stop being retried; the same
+    // member's tier-role sync must keep working, exactly as the B1 split below
+    // guarantees for a 403.
+    const calls: string[] = [];
+    const impl: typeof fetch = async (input, init) => {
+      const url = String(input);
+      calls.push(`${init?.method} ${url.replace('https://discord.com/api/v10', '')}`);
+      const nickPatch = init?.method === 'PATCH';
+      return {
+        ok: !nickPatch,
+        status: nickPatch ? 400 : 204,
+        headers: { forEach: () => {} },
+        json: async () => ({}),
+        text: async () => 'Invalid Form Body',
+      } as unknown as Response;
+    };
+    const api = new DiscordApi(
+      'tok',
+      impl,
+      new RateGovernor({
+        clock: syntheticClock(),
+        maxRps: 0,
+        banPauseMs: 60_000,
+        breakerLimit: 50,
+        forbiddenTtlMs: TTL_MS,
+      }),
+    );
+
+    await expect(api.setNickname('g1', 'u1', 'Aran (12)')).rejects.toThrow('-> 400');
+    // The retry the sweep would make next pass is refused before it is sent.
+    await expect(api.setNickname('g1', 'u1', 'Aran (12)')).rejects.toThrow(
+      'subject previously answered 400, 401 or 403',
+    );
+    // And the member's role writes are untouched.
+    await api.addMemberRole('g1', 'u1', 'r1');
+
+    expect(calls).toEqual(['PATCH /guilds/g1/members/u1', 'PUT /guilds/g1/members/u1/roles/r1']);
+  });
+});
+
 describe('permanent-failure cache versus essential traffic', () => {
   it('refuses an ESSENTIAL request for a cached subject too', async () => {
     // `essential` buys survival of the invalid-request BREAKER and nothing else.
@@ -606,7 +803,7 @@ describe('permanent-failure cache scoping across endpoints (B1 regression)', () 
     // The nickname failure IS still remembered, under its own scope, so the
     // suppression that D4 asks for is intact where it belongs.
     await expect(api.setNickname('g1', 'u1', 'Aran (13)')).rejects.toThrow(
-      'subject previously answered 401 or 403',
+      'subject previously answered 400, 401 or 403',
     );
     expect(calls.length).toBe(3);
   });

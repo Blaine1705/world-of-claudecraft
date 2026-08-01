@@ -2,6 +2,7 @@
 // committed). Missing-required values throw at boot with a clear message.
 
 import {
+  HEARTBEAT_INTERVAL_MS,
   OUTBOX_IDLE_MS,
   OUTBOX_POLL_MS,
   PRESENCE_DEBOUNCE_MS,
@@ -9,6 +10,7 @@ import {
   SWEEP_SLICE_MS,
 } from './cadence';
 import { DEFAULT_SWEEP_SLICE_SIZE } from './linked_sweep';
+import { DEFAULT_HEARTBEAT_FILE } from './liveness';
 import {
   DEFAULT_BAN_PAUSE_MS,
   DEFAULT_BREAKER_LIMIT,
@@ -50,7 +52,7 @@ export interface BotConfig {
   banPauseMs: number;
   /** Invalid responses in one 10 minute window that open the request breaker. */
   breakerLimit: number;
-  /** How long a member's 401 or 403 is remembered before it is retried. */
+  /** How long a member's 400, 401 or 403 is remembered before it is retried. */
   forbiddenTtlMs: number;
   /** How often the role sync, tier-role and special-role refresh sweeps run. */
   roleSyncIntervalMs: number;
@@ -66,6 +68,10 @@ export interface BotConfig {
   sweepSliceMs: number;
   /** How many linked members one sweep slice asks about (and may write to). */
   sweepSliceSize: number;
+  /** Where the liveness heartbeat file is written (the healthcheck reads its mtime). */
+  heartbeatFile: string;
+  /** How often that file is re-stamped. */
+  heartbeatIntervalMs: number;
 }
 
 function required(name: string): string {
@@ -154,6 +160,15 @@ export function loadConfig(): BotConfig {
     sweepSliceSize: positiveNumberFromEnv(
       process.env.DISCORD_SWEEP_SLICE_SIZE,
       DEFAULT_SWEEP_SLICE_SIZE,
+    ),
+    // Trimmed before the fallback, unlike the channel ids above: this is a
+    // filesystem PATH, and a stray space around it in a compose file or a .env
+    // would send the write somewhere the healthcheck never looks, which reads as
+    // a permanently unhealthy bot rather than as a typo.
+    heartbeatFile: process.env.DISCORD_HEARTBEAT_FILE?.trim() || DEFAULT_HEARTBEAT_FILE,
+    heartbeatIntervalMs: positiveNumberFromEnv(
+      process.env.DISCORD_HEARTBEAT_INTERVAL_MS,
+      HEARTBEAT_INTERVAL_MS,
     ),
   };
 }

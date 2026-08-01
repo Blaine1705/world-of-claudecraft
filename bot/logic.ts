@@ -81,6 +81,20 @@ export function requestGuildMembersPayload(guildId: string): Record<string, unkn
   };
 }
 
+// Close codes we cannot resume from / must not auto-reconnect (bad token, bad
+// intents, etc.), see Discord gateway close-code docs.
+const FATAL_CLOSE_CODES = new Set([4004, 4010, 4011, 4012, 4013, 4014]);
+
+/**
+ * True when a gateway close code means reconnecting can never work. The decision
+ * lives here rather than in the IO shell so the set is unit-testable on its own:
+ * every code in it describes something only a config or a token change fixes, and
+ * retrying one is a doomed handshake repeated forever.
+ */
+export function isFatalCloseCode(code: number): boolean {
+  return FATAL_CLOSE_CODES.has(code);
+}
+
 // ── Slash commands ───────────────────────────────────────────────────────────
 export const SLASH_COMMANDS = [
   { name: 'whoami', description: 'Show your World of ClaudeCraft link status and reward points' },

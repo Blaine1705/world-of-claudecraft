@@ -8,6 +8,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   AUDIT_LOG_REASON,
+  DISCORD_CALL_TIMEOUT_MS,
   DiscordApi,
   governorFromConfig,
   sanitizeAuditReason,
@@ -20,6 +21,7 @@ import {
   RateGovernor,
   type RateGovernorOptions,
 } from '../bot/rate_governor';
+import type { TimerHandle, TimerSeam } from '../bot/server_client';
 import { syntheticClock } from './helpers/synthetic_clock';
 
 const API = 'https://discord.com/api/v10';
@@ -108,6 +110,53 @@ function recordingFetch(responses: Response[]): { calls: FetchCall[]; impl: type
     return next;
   };
   return { calls, impl };
+}
+
+/** A TimerSeam that records rather than runs, so a deadline fires on command. */
+function manualTimers(): {
+  armed: { ms: number; fn: () => void }[];
+  cleared: TimerHandle[];
+  seam: TimerSeam;
+} {
+  const armed: { ms: number; fn: () => void }[] = [];
+  const cleared: TimerHandle[] = [];
+  let nextHandle = 1;
+  return {
+    armed,
+    cleared,
+    seam: {
+      setTimeout: (fn, ms) => {
+        armed.push({ fn, ms });
+        return nextHandle++;
+      },
+      clearTimeout: (handle) => {
+        cleared.push(handle);
+      },
+    },
+  };
+}
+
+/** The AbortError shape `fetch` rejects with, without reaching for DOMException. */
+function abortError(): Error {
+  return Object.assign(new Error('The operation was aborted'), { name: 'AbortError' });
+}
+
+/** A fetch that never answers, and rejects only when its signal is aborted. */
+function hangingFetch(): { impl: typeof fetch; signals: AbortSignal[] } {
+  const signals: AbortSignal[] = [];
+  const impl: typeof fetch = (_input, init) => {
+    const signal = init?.signal ?? undefined;
+    if (signal) signals.push(signal);
+    return new Promise<Response>((_resolve, reject) => {
+      signal?.addEventListener('abort', () => reject(abortError()));
+    });
+  };
+  return { impl, signals };
+}
+
+/** Let every already-resolved continuation run, without moving any clock. */
+async function flushMicrotasks(): Promise<void> {
+  for (let i = 0; i < 50; i++) await Promise.resolve();
 }
 
 afterEach(() => {
@@ -498,7 +547,7 @@ describe('DiscordApi governor wiring', () => {
     // The recording fetch has no second queued response, so a second dispatch
     // would throw "ran out of queued responses" rather than the block message.
     await expect(api.setNickname('g1', 'u1', 'Aran (13)')).rejects.toThrow(
-      'subject previously answered 401 or 403',
+      'subject previously answered 400, 401 or 403',
     );
     expect(calls.length).toBe(1);
   });
@@ -741,6 +790,82 @@ describe('governorFromConfig', () => {
   });
 });
 
+describe('DiscordApi per-call deadline (L10/L17)', () => {
+  it('pins the deadline against a literal, well clear of an ordinary Discord answer', () => {
+    // Against a literal, not against itself. Its job is to bound a socket that
+    // stopped talking, not to police a slow but live Discord, so it is
+    // deliberately generous: the failure it prevents is a run that never settles,
+    // and the scheduler arms the next delay only after a run settles, so ONE hung
+    // request stops that loop for the life of the process.
+    expect(DISCORD_CALL_TIMEOUT_MS).toBe(15000);
+  });
+
+  it('aborts a call that never answers, once the deadline fires', async () => {
+    const timers = manualTimers();
+    const { impl, signals } = hangingFetch();
+    const { governor } = testGovernor();
+    const api = new DiscordApi('tok', impl, governor, timers.seam);
+
+    const failure = api.guildRoles('g1').catch((e: Error) => e);
+    await flushMicrotasks();
+
+    // Armed at DISPATCH, with the signal handed to fetch and nothing aborted yet.
+    expect(timers.armed.map((t) => t.ms)).toEqual([DISCORD_CALL_TIMEOUT_MS]);
+    expect(signals.length).toBe(1);
+    expect(signals[0].aborted).toBe(false);
+
+    timers.armed[0].fn();
+
+    const err = await failure;
+    expect(signals[0].aborted).toBe(true);
+    // The rejection PROPAGATES rather than being swallowed into a null: this
+    // shell's convention is to throw on failure, and every scheduler task above
+    // it settles by rejection, which is what the always-settle rule needs.
+    expect((err as Error).name).toBe('AbortError');
+    // And the timer is released on the abort path too, not only on success.
+    expect(timers.cleared.length).toBe(1);
+  });
+
+  it('clears the deadline on a normal response', async () => {
+    // The other half: a timer left armed after every successful call would hold
+    // the event loop open and, at the sweep's request volume, accumulate.
+    const timers = manualTimers();
+    const { governor } = testGovernor();
+    const { impl } = recordingFetch([fakeResponse({ body: [] })]);
+
+    await new DiscordApi('tok', impl, governor, timers.seam).guildRoles('g1');
+
+    expect(timers.armed.map((t) => t.ms)).toEqual([DISCORD_CALL_TIMEOUT_MS]);
+    expect(timers.cleared).toEqual([1]);
+  });
+
+  it('arms the deadline per DISPATCH, never across the governor wait', async () => {
+    // The distinction the whole placement turns on. The governor queues requests
+    // and dispatches them later, and a 429 pause is honored in full, so a deadline
+    // wrapped around `governor.run` would time the QUEUE WAIT and abort calls that
+    // were waiting exactly as designed. Driven with a 30 second retry_after,
+    // which is twice the deadline: two sends, two separate deadlines, and the
+    // first one released before the wait even starts.
+    const timers = manualTimers();
+    const { governor, slept } = testGovernor();
+    const { impl } = recordingFetch([
+      fakeResponse({ status: 429, body: { retry_after: 30 } }),
+      fakeResponse({ body: [] }),
+    ]);
+
+    await new DiscordApi('tok', impl, governor, timers.seam).guildRoles('g1');
+
+    expect(slept).toEqual([30000]);
+    expect(timers.armed.map((t) => t.ms)).toEqual([
+      DISCORD_CALL_TIMEOUT_MS,
+      DISCORD_CALL_TIMEOUT_MS,
+    ]);
+    // BOTH released, and the first before the 30 second sleep: a single deadline
+    // spanning the pair would show one arm here instead of two.
+    expect(timers.cleared).toEqual([1, 2]);
+  });
+});
+
 describe('DiscordApi production defaults', () => {
   it('reads the global fetch at CALL time, not at construction', async () => {
     // Construction happens BEFORE the stub deliberately. A capture-form default
@@ -823,6 +948,43 @@ describe('DiscordApi production defaults', () => {
       expect(settled).toBe(true);
       expect(call).toBe(2);
       await pending;
+    } finally {
+      vi.useRealTimers();
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('arms the per-call deadline on the REAL global setTimeout', async () => {
+    // The third default seam, and the one whose absence is invisible: with the
+    // deadline armed on a no-op timer every call still works, and the only case
+    // that ever differs is the hung socket the deadline exists for.
+    //
+    // Constructed BEFORE the fake clock, per R16: the default seam FORWARDS to
+    // the global, so it reads the fake installed after construction. A capture
+    // form would have bound the real setTimeout here and nothing below would ever
+    // abort, however far the fake clock was advanced.
+    const api = new DiscordApi('tok');
+    vi.useFakeTimers();
+    vi.stubGlobal(
+      'fetch',
+      (_input: unknown, init?: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () => reject(abortError()));
+        }),
+    );
+
+    try {
+      let outcome: Error | null = null;
+      const pending = api.guildRoles('g1').catch((e: Error) => {
+        outcome = e;
+      });
+
+      await vi.advanceTimersByTimeAsync(DISCORD_CALL_TIMEOUT_MS - 1);
+      expect(outcome).toBe(null); // still inside the deadline
+
+      await vi.advanceTimersByTimeAsync(1);
+      await pending;
+      expect((outcome as Error | null)?.name).toBe('AbortError');
     } finally {
       vi.useRealTimers();
       vi.unstubAllGlobals();

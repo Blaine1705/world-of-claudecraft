@@ -5,6 +5,7 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+  HEARTBEAT_INTERVAL_MS,
   OUTBOX_IDLE_MS,
   OUTBOX_POLL_MS,
   PRESENCE_DEBOUNCE_MS,
@@ -13,6 +14,7 @@ import {
 } from '../bot/cadence';
 import { loadConfig } from '../bot/config';
 import { DEFAULT_SWEEP_SLICE_SIZE } from '../bot/linked_sweep';
+import { DEFAULT_HEARTBEAT_FILE } from '../bot/liveness';
 import { DEFAULT_OUTBOX_TIMEOUT_MS } from '../bot/server_client';
 
 // Every env key loadConfig reads. Each test starts from a clean slate of these,
@@ -43,6 +45,8 @@ const BOT_ENV_KEYS = [
   'DISCORD_OUTBOX_TIMEOUT_MS',
   'DISCORD_SWEEP_SLICE_MS',
   'DISCORD_SWEEP_SLICE_SIZE',
+  'DISCORD_HEARTBEAT_FILE',
+  'DISCORD_HEARTBEAT_INTERVAL_MS',
 ] as const;
 
 /** Fill the four required keys with obvious non-secret placeholders. */
@@ -261,6 +265,38 @@ describe('loadConfig nickname sync opt-out', () => {
   });
 });
 
+describe('loadConfig heartbeat file (D15)', () => {
+  it('defaults to the shared DEFAULT_HEARTBEAT_FILE, and to its literal value', () => {
+    // Both, because they say different things: the constant pins the SEAM (the
+    // config and the writer cannot disagree about where the file lives), and the
+    // literal pins the value, which is the one the container healthcheck and the
+    // runtime image's writable directory were both chosen against.
+    setRequired();
+    expect(loadConfig().heartbeatFile).toBe(DEFAULT_HEARTBEAT_FILE);
+    expect(loadConfig().heartbeatFile).toBe('/tmp/discord-bot-heartbeat');
+  });
+
+  it('takes an override verbatim', () => {
+    setRequired();
+    process.env.DISCORD_HEARTBEAT_FILE = '/var/run/woc/heartbeat';
+    expect(loadConfig().heartbeatFile).toBe('/var/run/woc/heartbeat');
+  });
+
+  it('falls back for an EMPTY or whitespace-only value, and trims the rest', () => {
+    // Whitespace is the arm a bare `||` misses: `' '` is truthy, so an override
+    // written as a padded line in a compose file or a .env would send the write
+    // to a path the healthcheck never stats, which reads as a permanently
+    // unhealthy container rather than as the typo it is.
+    setRequired();
+    for (const bad of ['', ' ', '   ', '\t', '\n']) {
+      process.env.DISCORD_HEARTBEAT_FILE = bad;
+      expect(loadConfig().heartbeatFile).toBe(DEFAULT_HEARTBEAT_FILE);
+    }
+    process.env.DISCORD_HEARTBEAT_FILE = '  /var/run/woc/heartbeat  ';
+    expect(loadConfig().heartbeatFile).toBe('/var/run/woc/heartbeat');
+  });
+});
+
 describe('loadConfig env-key inventory', () => {
   it('reads no env key that BOT_ENV_KEYS does not save and restore', () => {
     // The save/restore list above is what stops the developer's own shell (or
@@ -299,6 +335,16 @@ describe('bot loop cadences', () => {
     expect(OUTBOX_POLL_MS).toBe(3000);
     expect(OUTBOX_IDLE_MS).toBe(15000);
     expect(SWEEP_SLICE_MS).toBe(3000);
+    expect(HEARTBEAT_INTERVAL_MS).toBe(30000);
+  });
+
+  it('re-stamps the liveness file several times per role-sync pass', () => {
+    // The heartbeat is evidence the scheduler is still turning, so it has to be
+    // the cheap fast loop rather than another slow reconcile: the container's
+    // stale window is chosen as a multiple of this, and a heartbeat as slow as a
+    // pass would make "unhealthy" mean nothing until minutes after a wedge.
+    expect(HEARTBEAT_INTERVAL_MS).toBeLessThan(ROLE_SYNC_INTERVAL_MS);
+    expect(ROLE_SYNC_INTERVAL_MS / HEARTBEAT_INTERVAL_MS).toBeGreaterThanOrEqual(5);
   });
 
   it('keeps the presence debounce and outbox poll well under the role sync', () => {
@@ -483,6 +529,17 @@ describe('loadConfig cadence knobs (D13)', () => {
       fallback: 100,
       override: '37',
     },
+    // The Phase 7 liveness stamp (D15). A cadence like the first four: its
+    // default lives in bot/cadence.ts beside them, and it is the interval the
+    // container healthcheck's stale window is chosen against, so an operator
+    // slowing it down in an incident has to be able to reach it.
+    {
+      env: 'DISCORD_HEARTBEAT_INTERVAL_MS',
+      field: 'heartbeatIntervalMs',
+      constant: 'HEARTBEAT_INTERVAL_MS',
+      fallback: 30000,
+      override: '17500',
+    },
   ] as const;
 
   it('defaults each cadence to the value it had hard-coded, pinned against a LITERAL', () => {
@@ -498,6 +555,7 @@ describe('loadConfig cadence knobs (D13)', () => {
     expect(cfg.outboxTimeoutMs).toBe(70000);
     expect(cfg.sweepSliceMs).toBe(3000);
     expect(cfg.sweepSliceSize).toBe(100);
+    expect(cfg.heartbeatIntervalMs).toBe(30000);
   });
 
   it('falls back to the SHARED cadence module, not to a second copy of the numbers', () => {
@@ -511,7 +569,7 @@ describe('loadConfig cadence knobs (D13)', () => {
     // reads. The literals stay pinned above; this pins the SEAM.
     const source = readFileSync(new URL('../bot/config.ts', import.meta.url), 'utf8');
     expect(source).toMatch(
-      /import \{[^}]*OUTBOX_IDLE_MS[^}]*OUTBOX_POLL_MS[^}]*PRESENCE_DEBOUNCE_MS[^}]*ROLE_SYNC_INTERVAL_MS[^}]*SWEEP_SLICE_MS[^}]*\} from '\.\/cadence'/,
+      /import \{[^}]*HEARTBEAT_INTERVAL_MS[^}]*OUTBOX_IDLE_MS[^}]*OUTBOX_POLL_MS[^}]*PRESENCE_DEBOUNCE_MS[^}]*ROLE_SYNC_INTERVAL_MS[^}]*SWEEP_SLICE_MS[^}]*\} from '\.\/cadence'/,
     );
     // The slice SIZE is not a cadence, so it comes from the module that spends
     // it. Same seam, different owner, and it has to be pinned separately or an
@@ -524,6 +582,11 @@ describe('loadConfig cadence knobs (D13)', () => {
     expect(source).toMatch(
       /import \{[^}]*DEFAULT_OUTBOX_TIMEOUT_MS[^}]*\} from '\.\/server_client'/,
     );
+    // And the heartbeat PATH default comes from the module that owns the
+    // reasoning behind it (which directory the non-root runtime user can write),
+    // for the same reason: a second copy of the path here would be free to drift
+    // from the one the writer and the healthcheck agree on.
+    expect(source).toMatch(/import \{[^}]*DEFAULT_HEARTBEAT_FILE[^}]*\} from '\.\/liveness'/);
     for (const knob of CADENCE_KNOBS) {
       // Each env key resolved against its own imported constant, never a literal.
       expect(source).toMatch(
@@ -534,9 +597,12 @@ describe('loadConfig cadence knobs (D13)', () => {
     // BOTH sides, never a substring scan: `not.toContain('3000')` also fires on
     // 30000, 13000 and 130000, so the day a governor knob gains a plausible
     // default this file would go red for a number that is not a copy of anything.
-    for (const value of ['300_?000', '4_?000', '3_?000', '15_?000', '70_?000', '100']) {
+    for (const value of ['300_?000', '4_?000', '3_?000', '15_?000', '70_?000', '30_?000', '100']) {
       expect(source).not.toMatch(new RegExp(`(?<![0-9_])${value}(?![0-9_])`));
     }
+    // Nor a second copy of the heartbeat PATH, which is a string rather than a
+    // number and so escapes every scan above.
+    expect(source).not.toContain('/tmp/');
   });
 
   it('reads each cadence from its OWN key, with a distinct value per field', () => {

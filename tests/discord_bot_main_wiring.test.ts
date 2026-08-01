@@ -27,6 +27,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  HEARTBEAT_INTERVAL_MS,
   OUTBOX_IDLE_MS,
   OUTBOX_POLL_MS,
   PRESENCE_DEBOUNCE_MS,
@@ -71,6 +72,12 @@ const TASKS: readonly { name: string; field: string; idle?: string; run: string 
   // The paired task calls the tested helper, which is what receives the refresh
   // and the push; the case below pins which two it is handed.
   { name: 'special-roles-and-meta', field: 'roleSyncIntervalMs', run: 'refreshThenPushMeta' },
+  // The liveness stamp (D15). It belongs on the scheduler rather than on a timer
+  // of its own precisely because that is what makes it evidence: the file's mtime
+  // advances only while the scheduler is still driving runs, so the container
+  // healthcheck reading it can tell a wedged bot from a busy one. Registered here
+  // like every other loop, so it is covered by the exact-count assertion too.
+  { name: 'heartbeat-file', field: 'heartbeatIntervalMs', run: 'writeHeartbeatFile' },
 ];
 
 /**
@@ -107,10 +114,10 @@ describe('bot/main.ts loop wiring', () => {
 
   it('registers every loop on the scheduler, reading its D13 config field', () => {
     const source = mainSource();
-    // Exactly the five, not "at least": a sixth registration is a loop nobody
+    // Exactly the six, not "at least": a seventh registration is a loop nobody
     // has reviewed, and a missing one is a loop that silently stopped running.
     expect((source.match(/scheduler\.add\(/g) ?? []).length).toBe(TASKS.length);
-    expect(TASKS.length).toBe(5);
+    expect(TASKS.length).toBe(6);
 
     for (const task of TASKS) {
       // The name, its cadence AND its sweep must appear in ONE registration, so a
@@ -288,6 +295,7 @@ describe('bot/main.ts loop wiring', () => {
       'OUTBOX_POLL_MS',
       'OUTBOX_IDLE_MS',
       'SWEEP_SLICE_MS',
+      'HEARTBEAT_INTERVAL_MS',
     ]) {
       expect(source).not.toContain(name);
     }
@@ -296,7 +304,7 @@ describe('bot/main.ts loop wiring', () => {
     // substring scan: `not.toContain('3000')` also fires on 13000 and 300000, so
     // the day main.ts gains an unrelated literal this would go red for a number
     // that is not a copy of anything.
-    for (const value of ['300_?000', '4_?000', '3_?000', '15_?000']) {
+    for (const value of ['300_?000', '4_?000', '3_?000', '15_?000', '30_?000']) {
       expect(source).not.toMatch(new RegExp(`(?<![0-9_])${value}(?![0-9_])`));
     }
     // And the constants still hold the values the config falls back to, so this
@@ -306,6 +314,19 @@ describe('bot/main.ts loop wiring', () => {
     expect(OUTBOX_POLL_MS).toBe(3000);
     expect(OUTBOX_IDLE_MS).toBe(15000);
     expect(SWEEP_SLICE_MS).toBe(3000);
+    expect(HEARTBEAT_INTERVAL_MS).toBe(30000);
+  });
+
+  it('writes the heartbeat file to the CONFIGURED path, not a literal of its own', () => {
+    // The other half of the D15 knob. The cadence is covered by the registration
+    // pattern above; the PATH is a second field on the same task and nothing else
+    // reads it, so an inlined '/tmp/discord-bot-heartbeat' here would type-check,
+    // would pass every other assertion in this file, and would leave
+    // DISCORD_HEARTBEAT_FILE silently inert for a deployment that moved it.
+    const source = mainSource();
+    expect(source).toContain('writeHeartbeatFile(cfg.heartbeatFile)');
+    expect(source).not.toContain('/tmp/');
+    expect(source).not.toContain('DEFAULT_HEARTBEAT_FILE');
   });
 
   it('pins the sweep slice decisions no behavioral suite can reach', () => {

@@ -6,6 +6,9 @@
 // opens a socket; asserting the mocked constructor was called IS the proof that
 // the default routes through `ws`.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+// The close-code decision itself is pure and lives in bot/logic.ts; the shell
+// below only acts on it. Imported statically because logic.ts touches no socket.
+import { isFatalCloseCode } from '../bot/logic';
 
 /** Every socket the code under test constructed, in order. */
 const constructed: { url: string; socket: FakeSocket }[] = [];
@@ -68,24 +71,39 @@ function noopHandlers() {
 /** Timers that record rather than run, so no test waits on a real delay. */
 function fakeTimers() {
   const armed: { ms: number; fn: () => void }[] = [];
-  const intervals: { ms: number; fn: () => void }[] = [];
+  // `cleared` on the entry as well as the id log, so `tick` below can refuse to
+  // run a cancelled interval. A test that reaches for `.fn()` directly is
+  // simulating the callback; `tick` is simulating the CLOCK, and only the second
+  // can say anything about clearInterval having been called.
+  const intervals: { id: number; ms: number; fn: () => void; cleared: boolean }[] = [];
   const cleared: unknown[] = [];
   let nextInterval = 1;
   return {
     armed,
     intervals,
     cleared,
+    /** Fire an interval the way a real clock would: a cleared one never runs. */
+    tick: (index: number): void => {
+      const entry = intervals[index];
+      if (entry === undefined || entry.cleared) return;
+      entry.fn();
+    },
+    /** The intervals still armed. */
+    live: (): number[] => intervals.filter((i) => !i.cleared).map((i) => i.id),
     seam: {
       setTimeout: (fn: () => void, ms: number) => {
         armed.push({ fn, ms });
         return 0 as unknown as ReturnType<typeof setTimeout>;
       },
       setInterval: (fn: () => void, ms: number) => {
-        intervals.push({ fn, ms });
-        return nextInterval++ as unknown as ReturnType<typeof setInterval>;
+        const id = nextInterval++;
+        intervals.push({ id, fn, ms, cleared: false });
+        return id as unknown as ReturnType<typeof setInterval>;
       },
       clearInterval: (id: ReturnType<typeof setInterval>) => {
         cleared.push(id);
+        const entry = intervals.find((i) => i.id === (id as unknown as number));
+        if (entry !== undefined) entry.cleared = true;
       },
     },
   };
@@ -98,10 +116,15 @@ function rig(): {
   gateway: InstanceType<typeof Gateway>;
   factoryUrls: string[];
   sockets: FakeSocket[];
+  exits: number[];
 } {
   const timers = fakeTimers();
   const factoryUrls: string[] = [];
   const sockets: FakeSocket[] = [];
+  // The exit seam is injected in EVERY arm, not just the fatal-close ones: a
+  // fatal close now calls it, and the production default is a real
+  // `process.exit`, which inside vitest takes the whole worker down.
+  const exits: number[] = [];
   const gateway = new Gateway(
     'tok',
     'wss://gateway.discord.gg',
@@ -113,9 +136,10 @@ function rig(): {
       return s as unknown as never;
     },
     timers.seam,
+    (code) => exits.push(code),
   );
   gateway.connect(false);
-  return { socket: sockets[0], timers, gateway, factoryUrls, sockets };
+  return { socket: sockets[0], timers, gateway, factoryUrls, sockets, exits };
 }
 
 /** Deliver one gateway frame the way `ws` does, as a Buffer. */
@@ -324,6 +348,55 @@ describe('Gateway heartbeat', () => {
     expect(timers.cleared).toEqual([1]);
   });
 
+  it('clears the old interval BEFORE the new socket exists, so a stale beat cannot kill it (L18)', () => {
+    // The ledgered L18 defect, and the window it lives in is the whole point.
+    // op 7 reconnects with no close event, so onClose's stopHeartbeat never runs,
+    // and reconnect() calls removeAllListeners(), which strips the 'close'
+    // handler that was the only other caller. startHeartbeat's own leading
+    // stopHeartbeat does eventually clear it, but not until the NEW socket's
+    // HELLO arrives, and connect() has already pointed `this.ws` at that new
+    // socket. The heartbeat tick reads `this.ws` at FIRE time, so an unacked beat
+    // landing in that window terminates the socket that just replaced it, and the
+    // reconnect it triggers arrives back in the same state.
+    const { socket, timers, sockets } = rig();
+    frame(socket, { op: 10, d: { heartbeat_interval: 30_000 } });
+    timers.tick(0); // one beat goes out; nothing ACKs it
+
+    frame(socket, { op: 7 }); // RECONNECT: a new socket, and no HELLO on it yet
+    expect(sockets.length).toBe(2);
+
+    // Driven through `tick`, which honors clearInterval, rather than calling the
+    // callback directly: only a fake that can REFUSE to run a cancelled timer can
+    // tell a cleared interval from a live one.
+    timers.tick(0);
+    expect(sockets[1].terminated).toBe(0);
+    expect(socket.terminated).toBe(0);
+
+    // And the new socket's own heartbeat is the only one left armed.
+    frame(sockets[1], { op: 10, d: { heartbeat_interval: 30_000 } });
+    expect(timers.live()).toEqual([2]);
+  });
+
+  it('clears the old interval on an INVALID_SESSION reconnect too (L18)', () => {
+    // The other entry point into reconnect() that never sees a close. It arms a
+    // 1500 ms timer first, so the stale interval is live across that delay as
+    // well as across the new socket's handshake: a strictly wider window than op
+    // 7's, on the path a reconnect storm takes most often.
+    const { socket, timers, sockets } = rig();
+    frame(socket, { op: 10, d: { heartbeat_interval: 30_000 } });
+    frame(socket, { op: 0, s: 5, t: 'READY', d: { session_id: 'sess-1' } });
+    timers.tick(0);
+
+    frame(socket, { op: 9, d: true });
+    timers.armed[0].fn(); // the 1500 ms reconnect fires
+    expect(sockets.length).toBe(2);
+
+    timers.tick(0);
+    expect(sockets[1].terminated).toBe(0);
+    frame(sockets[1], { op: 10, d: { heartbeat_interval: 30_000 } });
+    expect(timers.live()).toEqual([2]);
+  });
+
   it('stops the heartbeat on close, so a reconnect does not stack a second one', () => {
     const { socket, timers } = rig();
     frame(socket, { op: 10, d: { heartbeat_interval: 30_000 } });
@@ -527,14 +600,37 @@ describe('Gateway resume', () => {
   });
 });
 
+describe('fatal gateway close codes', () => {
+  it('names every code a reconnect can never recover from', () => {
+    // The set by value, from the pure helper the shell reads. 4004 is a bad or
+    // rotated token and 4014 a privileged intent switched off in the developer
+    // portal: reconnecting on either is a doomed handshake repeated forever,
+    // which is the request amplification this packet exists to stop.
+    for (const code of [4004, 4010, 4011, 4012, 4013, 4014]) {
+      expect({ code, fatal: isFatalCloseCode(code) }).toEqual({ code, fatal: true });
+    }
+  });
+
+  it('leaves every recoverable close alone, including the fatal block neighbours', () => {
+    // 4008 (rate limited) and 4009 (session timed out) sit directly under the
+    // 4010 to 4014 block, so a range check written in place of the set would be
+    // invisible without them. 1000, 1001 and 1006 are the ordinary closes every
+    // production reconnect actually rides, and each one now decides whether the
+    // process lives.
+    for (const code of [1000, 1001, 1006, 4000, 4008, 4009]) {
+      expect({ code, fatal: isFatalCloseCode(code) }).toEqual({ code, fatal: false });
+    }
+  });
+});
+
 describe('Gateway close handling', () => {
   // One test per code rather than one loop over all of them: a loop stops at the
   // first failing row, so a regression affecting several codes would report as one.
   // The whole set matters, not just 4014: 4004 is a bad or rotated token, and
   // reconnecting on it hammers Discord with a doomed handshake forever.
   for (const code of [4004, 4010, 4011, 4012, 4013, 4014]) {
-    it(`does NOT reconnect after fatal close ${code}`, () => {
-      const { socket, timers, sockets } = rig();
+    it(`exits 1 after fatal close ${code} instead of reconnecting`, () => {
+      const { socket, timers, sockets, exits } = rig();
       const errors: unknown[][] = [];
       vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
         errors.push(args);
@@ -544,14 +640,23 @@ describe('Gateway close handling', () => {
 
       expect(timers.armed).toEqual([]);
       expect(sockets.length).toBe(1);
+      // D15/R13: the process ENDS so the container restart policy decides what
+      // happens next. Staying up while syncing nothing is the failure mode this
+      // replaces: no alert fires and the container looks healthy. Code 1 matches
+      // the top-level fatal handler in bot/main.ts.
+      expect(exits).toEqual([1]);
       // The log line is the only operator-visible signal that the bot stopped.
-      expect(errors).toEqual([[`[bot] gateway closed with fatal code ${code}; not reconnecting`]]);
+      expect(errors).toEqual([
+        [
+          `[bot] gateway closed with fatal code ${code}; not reconnecting, exiting so the restart policy can act`,
+        ],
+      ]);
     });
   }
 
   for (const code of [1000, 1001, 1006, 4000, 4009]) {
     it(`reconnects after non-fatal close ${code}, and actually opens the new socket`, () => {
-      const { socket, timers, sockets, factoryUrls } = rig();
+      const { socket, timers, sockets, factoryUrls, exits } = rig();
       vi.spyOn(console, 'error').mockImplementation(() => {});
 
       socket.emit('close', code);
@@ -563,6 +668,10 @@ describe('Gateway close handling', () => {
       // pass here, which would leave the bot silently offline after a drop.
       expect(sockets.length).toBe(2);
       expect(factoryUrls[1]).toBe('wss://gateway.discord.gg/?v=10&encoding=json');
+      // The other half of the fatal arm: an ordinary drop must never end the
+      // process. Widening the fatal set (or dropping the guard around the exit)
+      // would turn every routine reconnect into a container restart.
+      expect(exits).toEqual([]);
     });
   }
 

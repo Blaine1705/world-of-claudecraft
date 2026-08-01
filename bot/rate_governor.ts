@@ -20,8 +20,8 @@
 //    all, which is how Cloudflare answers once it has started banning;
 //  - an invalid-request circuit breaker over a rolling window, opening far below
 //    Discord's own ban threshold;
-//  - a permanent-failure cache, so a member that answers 401 or 403 is not
-//    retried on every sweep.
+//  - a permanent-failure cache, so a member whose write answers 400, 401 or 403
+//    is not retried on every sweep.
 //
 // Every numeric limit here comes from a response header or from configuration.
 // There are deliberately no per-route rate constants: Discord's per-route limits
@@ -86,7 +86,7 @@ export interface RateGovernorOptions {
   banPauseMs: number;
   /** Counted invalid responses in one window that open the breaker. */
   breakerLimit: number;
-  /** How long a 401 or 403 for a subject is remembered. */
+  /** How long a 400, 401 or 403 for a subject is remembered. */
   forbiddenTtlMs: number;
   log?: GovernorLog;
 }
@@ -484,7 +484,7 @@ export class RateGovernor {
       this.counters.forbiddenBlocks++;
       throw new GovernorBlockedError(
         'forbidden-cached',
-        `[bot] governor skipped ${template}: subject previously answered 401 or 403`,
+        `[bot] governor skipped ${template}: subject previously answered 400, 401 or 403`,
       );
     }
 
@@ -599,6 +599,28 @@ export class RateGovernor {
           // turned a long Discord penalty into a retry storm.
           if (outcome.retryMs > 0) await this.clock.sleep(outcome.retryMs);
           continue;
+        }
+
+        // L13: a 400 is Discord permanently REJECTING this payload shape. For a
+        // nickname PATCH that means a computed nick it will never accept, and
+        // member_writes.ts deliberately does not move its diff cache on a failed
+        // write, so without this the same doomed request is rebuilt and re-sent on
+        // every sweep for the life of the process. Caching it stops that, and the
+        // TTL bounds the belief: a later legitimate write for the same subject is
+        // deferred by at most one forbiddenTtlMs, never lost.
+        //
+        // Cached WITHOUT recordInvalid, unlike 401 and 403 below, and that
+        // asymmetry is deliberate. The breaker counts against Discord's own
+        // invalid-request ban threshold (see BREAKER_WINDOW_MS), and Discord
+        // counts 401, 403 and 429 toward it, never 400. Spending breaker budget
+        // on a status Discord does not penalize would let one bad nick shape
+        // across a sweep open the breaker and stop every non-essential call in
+        // the bot, which is a far worse outcome than the writes it would save.
+        // A 400 also leaves the probe alone (it falls through to settle(true)):
+        // an answer from Discord, however unhappy, is evidence the edge is
+        // talking to us again, which is the only question half-open asks.
+        if (response.status === 400 && request.subjectKey !== undefined) {
+          this.rememberForbidden(request.subjectKey);
         }
 
         if (response.status === 401 || response.status === 403) {

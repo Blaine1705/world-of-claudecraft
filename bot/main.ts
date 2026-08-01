@@ -16,6 +16,7 @@ import { loadConfig } from './config';
 import { DiscordApi, governorFromConfig } from './discord_api';
 import { Gateway } from './gateway';
 import { departedFromSeed, LinkedSweep, unappliedIdsFrom } from './linked_sweep';
+import { writeHeartbeatFile } from './liveness';
 import {
   allTierRoleNames,
   buildLevelNick,
@@ -847,6 +848,17 @@ async function main(): Promise<void> {
     name: 'tier-roles',
     cadence: { activeMs: cfg.roleSyncIntervalMs },
     run: () => refreshTierRoles(),
+  });
+  // The liveness stamp (D15). It is a scheduler task rather than a timer of its
+  // own precisely so that it proves something: the file's mtime only advances
+  // while the scheduler is still driving runs, so a container healthcheck reading
+  // it can tell a wedged bot from a busy one. A failed write is logged and the
+  // run still settles, so an unwritable path degrades the healthcheck rather than
+  // taking the bot down with it.
+  scheduler.add({
+    name: 'heartbeat-file',
+    cadence: { activeMs: cfg.heartbeatIntervalMs },
+    run: () => writeHeartbeatFile(cfg.heartbeatFile),
   });
   // The one pickup loop. `activeMs` is what the three 3 s pollers it replaces
   // each ran at, so a busy bot delivers exactly as promptly as before; every

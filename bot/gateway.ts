@@ -7,6 +7,7 @@ import {
   GATEWAY_OP,
   heartbeatIntervalMs,
   identifyPayload,
+  isFatalCloseCode,
   requestGuildMembersPayload,
   resumePayload,
 } from './logic';
@@ -29,10 +30,6 @@ export interface GatewayTimers {
   setInterval: (cb: () => void, ms: number) => ReturnType<typeof setInterval>;
   clearInterval: (id: ReturnType<typeof setInterval>) => void;
 }
-
-// Close codes we cannot resume from / must not auto-reconnect (bad token, bad
-// intents, etc.), see Discord gateway close-code docs.
-const FATAL_CLOSE_CODES = new Set([4004, 4010, 4011, 4012, 4013, 4014]);
 
 export class Gateway {
   private ws: WebSocket | null = null;
@@ -57,6 +54,16 @@ export class Gateway {
       setTimeout: (cb, ms) => setTimeout(cb, ms),
       setInterval: (cb, ms) => setInterval(cb, ms),
       clearInterval: (id) => clearInterval(id),
+    },
+    // The third seam, same convention: a fatal close ENDS the process (R13), and
+    // a test cannot let the real `process.exit` run. The default drains stderr
+    // before exiting: console.error writes to docker's log pipe asynchronously
+    // and process.exit() discards queued writes, so a bare exit can eat the very
+    // close-code line the crash loop's diagnosability depends on. Stream writes
+    // settle in order, so the empty write's callback runs only after the queued
+    // log line has been handed to the pipe.
+    private exitProcess: (code: number) => void = (code) => {
+      process.stderr.write('', () => process.exit(code));
     },
   ) {}
 
@@ -180,14 +187,32 @@ export class Gateway {
 
   private onClose(code: number): void {
     this.stopHeartbeat();
-    if (FATAL_CLOSE_CODES.has(code)) {
-      console.error(`[bot] gateway closed with fatal code ${code}; not reconnecting`);
+    if (isFatalCloseCode(code)) {
+      // EXIT, rather than sit there as a live process doing nothing (D15/R13).
+      // Every fatal code needs a human (a rotated token, an intent switched off
+      // in the developer portal), and a bot that stays up while syncing nothing
+      // is invisible: no alert fires and the container looks healthy. A nonzero
+      // exit hands the decision to the restart policy, and the resulting crash
+      // loop is the intended, VISIBLE outcome. Deliberately no retry limiter and
+      // no backoff here: that would be this process quietly re-implementing the
+      // supervisor it already has.
+      console.error(
+        `[bot] gateway closed with fatal code ${code}; not reconnecting, exiting so the restart policy can act`,
+      );
+      this.exitProcess(1);
       return;
     }
     this.timers.setTimeout(() => this.reconnect(true), 2000);
   }
 
   private reconnect(resume: boolean): void {
+    // L18: stop the heartbeat FIRST. Two of the three paths into reconnect (op 7
+    // and INVALID_SESSION) never saw a close, so onClose's stopHeartbeat did not
+    // run, and `removeAllListeners()` below then strips the 'close' handler that
+    // was the only other caller. The leaked interval's tick reads `this.ws` at
+    // FIRE time, and connect() has reassigned it by then, so a stale unacked beat
+    // terminates the socket that just replaced it.
+    this.stopHeartbeat();
     try {
       this.ws?.removeAllListeners();
       this.ws?.close();
