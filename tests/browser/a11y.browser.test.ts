@@ -26,6 +26,7 @@ import { t } from '../../src/ui/i18n';
 import { LeaderboardWindow } from '../../src/ui/leaderboard_window';
 import { MarketWindow } from '../../src/ui/market_window';
 import { OptionsWindow } from '../../src/ui/options_window';
+import { ProfessionsWindow } from '../../src/ui/professions_window';
 import { SocialWindow } from '../../src/ui/social_window';
 import { SpellbookWindow } from '../../src/ui/spellbook_window';
 import { TalentsWindow } from '../../src/ui/talents_window';
@@ -988,6 +989,87 @@ describe('axe: vendor window advisory rows', () => {
     const sub = advisory?.querySelector('.vi-sub')?.textContent ?? '';
     expect(sub.length).toBeGreaterThan(0);
     expect(advisory?.getAttribute('aria-label') ?? '').toContain(sub);
+    await expectClean(root);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Professions (#professions-window) - the tool-effect row's interactive chrome
+// (slot/recharge buttons, the R40 "Ask each use" checkbox), rendered through
+// the real window with the real styles. The phase 18 whole-branch review
+// found only the vendor arm covered the packet's new interactive chrome.
+// ---------------------------------------------------------------------------
+
+describe('axe: professions window tool-effect controls', () => {
+  it('slot button, recharge button, and mode checkbox are clean with real names', async () => {
+    const root = host('professions-window');
+    const world = {
+      craftingIdentity: {
+        version: 1,
+        synced: true,
+        craftSkills: {
+          engineering: 0,
+          alchemy: 0,
+          cooking: 30,
+          leatherworking: 0,
+          tailoring: 0,
+          inscription: 0,
+          enchanting: 0,
+          jewelcrafting: 60,
+          weaponcrafting: 25,
+          armorcrafting: 49,
+        },
+        activeArchetype: 'armorcrafting',
+        pairedMajor: 'weaponcrafting',
+        hobbyCraft: 'leatherworking',
+        attunedPairs: ['weaponcrafting+armorcrafting'],
+        switchCount: 2,
+        amendsProgress: 1,
+        amendsRequired: 11,
+      },
+      professionsState: { skills: [{ professionId: 'mining', skill: 30, maxSkill: 300 }] },
+      gatheringProficiency: { mining: 30 },
+      toolEffectSlots: [
+        {
+          professionId: 'mining',
+          effectId: 'gatherers_cache',
+          charges: 12,
+          maxCharges: 30,
+          confirmMode: 'prompt',
+          selfCrafted: true,
+        },
+      ],
+      inventory: [
+        { itemId: 'copper_mining_pick', count: 1 },
+        { itemId: 'artisans_eye', count: 1, instance: { signer: 'Testchar' } },
+      ],
+      player: { name: 'Testchar' },
+    };
+    const win = new ProfessionsWindow(
+      stubDeps({
+        root: () => root,
+        world: () => world as never,
+        consumePeek: () => false,
+        itemIcon: () => '<img alt="">',
+        moneyHtml: (copper: number) => `<span>${copper}c</span>`,
+        itemTooltip: () => '',
+      }),
+    );
+    win.open();
+    // The three controls the review named must actually render: a slot
+    // button (a second effect is slottable from bags), the recharge button
+    // on the live slot, and the R40 per-row mode checkbox.
+    const slot = root.querySelector<HTMLButtonElement>('[data-slot-effect]');
+    const recharge = root.querySelector<HTMLButtonElement>('[data-recharge-profession]');
+    const mode = root.querySelector<HTMLInputElement>('[data-slot-mode]');
+    expect(slot).not.toBeNull();
+    expect(recharge).not.toBeNull();
+    expect(mode).not.toBeNull();
+    // The checkbox's accessible name comes from its wrapping label text.
+    expect(mode?.closest('label')?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
+    // Buttons carry visible text as their accessible names, never bare icons.
+    expect(slot?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
+    expect(recharge?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
     await expectClean(root);
   });
 });

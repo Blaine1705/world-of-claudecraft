@@ -3874,6 +3874,17 @@
   body.mobile-touch #professions-window .prof-list {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* The tool-effect controls' touch floors, the body.mobile-touch twin of the
+     @media (pointer: coarse) rules in components.css (the map-zoom-btn idiom):
+     the coarse-pointer media rule serves real devices, and this class-scoped
+     twin serves the touch layout AND makes the floor measurable by the
+     browser target-size suite, whose Playwright context is fine-pointer and
+     can never match the media query. */
+  body.mobile-touch .prof-effect-btn,
+  body.mobile-touch .prof-effect-mode-toggle,
+  body.mobile-touch #confirm-dialog .cd-actions .btn {
+    min-height: 40px;
+  }
   /* On touch, stack the categories back into a single column so the large
      touch targets keep their full width. */
   body.mobile-touch .kb-cols {
