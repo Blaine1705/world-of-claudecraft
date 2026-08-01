@@ -1,15 +1,14 @@
 # State: CI Speed (cross-phase cheat sheet)
 
-**Current phase:** Phase 3 STOPPED after three pure split/rename rounds. Locked
-**N=8**. Completeness **1939** Test Files. Wall UNDER 8 min on solid PR samples
-(424s batch 2, 442s batch 3). D11 **not met** (~1.32 after batch 3); s5 is
-import-bound residual of sha1 partitioning, not a leftover monster. Accept D11
-MISS for this packet unless owner unlocks path-matrix. Worktree
+**Current phase:** Phase 4 code DONE (release-checks split). Locked **N=8**.
+Completeness **1939** Test Files. PR wall samples UNDER 8 min (424s / 442s).
+D11 residual accepted (~1.32). Worktree
 `/home/fernandoramirez/Documents/world-of-claudecraft-ci-speed` on
 `feature/ci-speed`. PR #2737.
 
-**Next action:** Phase 4 (release-checks) when ready, or path-matrix only with
-owner OK. Do not raise N past 8. No more rename loops for D11.
+**Next action:** Phase 4 QA (privacy-security, test-coverage, qa-checklist), then
+Phase 5 path filters. Do not raise N past 8. No more rename loops for D11.
+Release-arm live probe DEFERRED (OPEN item 6).
 
 ## Locked decisions
 
@@ -147,5 +146,8 @@ owner OK. Do not raise N past 8. No more rename loops for D11.
   comments no longer say 4-shard; gate.mjs unsharded.
 - Phase 3 code: tank/trend splits; s5 runtime renames; s5 import-heavy renames.
   D11 residual accepted for packet; path-matrix note only.
+- Phase 4 code: `release-checks` parallel to tests-only `release-gate`; pins
+  re-derived (check:types x2, no matrix.shard == 1); gate.mjs header notes both
+  parallel pairs; release probe DEFERRED (OPEN item 6).
 - PR: https://github.com/levy-street/world-of-claudecraft/pull/2737
-- Next: Phase 4, or path-matrix with owner OK if D11 must be hard-met.
+- Next: Phase 4 QA, then Phase 5. Path-matrix only with owner OK.

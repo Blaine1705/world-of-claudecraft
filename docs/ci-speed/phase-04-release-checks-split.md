@@ -101,8 +101,8 @@ STOPPING RULES:
 
 ## Exit criteria
 
-- [ ] release-checks parallel, complete step list
-- [ ] release-gate tests-only
-- [ ] Pins green and count-correct
-- [ ] Probe or deferred note
-- [ ] Draft PR open
+- [x] release-checks parallel, complete step list
+- [x] release-gate tests-only
+- [x] Pins green and count-correct
+- [x] Probe or deferred note (DEFERRED OPEN item 6)
+- [x] Draft PR open (#2737 stacked; Phases 1 to 4)

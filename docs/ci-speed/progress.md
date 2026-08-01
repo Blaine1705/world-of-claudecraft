@@ -10,8 +10,8 @@
 | 2 QA | NOT STARTED | | Ready for phase-02-qa.md; no more wall re-runs |
 | 3 Shard rebalance | STOPPED (D11 MISS) | #2737 | Three rounds; wall UNDER; D11 ~1.32; accept miss or path-matrix |
 | 3 QA | NOT STARTED | | Wall win banked; D11 residual accepted unless path-matrix |
-| 4 Release-checks split | NOT STARTED | | |
-| 4 QA | NOT STARTED | | |
+| 4 Release-checks split | DONE (probe DEFER) | #2737 | release-checks parallel; release-gate tests-only; OPEN item 6 probe DEFER |
+| 4 QA | NOT STARTED | | Pins green; red-path proven; probe deferred |
 | 5 Path filters + close | NOT STARTED | | |
 | 5 QA | NOT STARTED | | Whole-packet + teardown offer |
 
@@ -310,11 +310,20 @@ packet import hygiene later (D15).
 
 ## Phase 4 checklist
 
-- [ ] `release-checks` job parallel to release-gate
-- [ ] release-gate tests-only (no matrix.shard == 1 steps)
-- [ ] Pins re-derived from YAML
-- [ ] Scratch release probe or deferred note
-- [ ] Draft PR + Phase 4 QA PASS
+- [x] `release-checks` job parallel to release-gate (same if-fragment; no needs)
+- [x] release-gate tests-only (no matrix.shard == 1 steps; job-level I18N_RELEASE_TIER kept)
+- [x] Pins re-derived from YAML (check:types = 2 in check jobs; matrix.shard == 1 absent; both test jobs 4 steps)
+- [x] Scratch release probe **DEFERRED** (OPEN item 6: release-version-gate may be red on v0.34.0; do not block the packet). Ordinary PR path: both release jobs skip together via shared if. Live release-arm verification waits for a real release/** push with valid version surfaces, or a maintainer-owned probe.
+- [x] Stacked on PR #2737 (feature/ci-speed; Phases 1 to 4). Phase 4 QA still open.
+- [x] Base sync: merged origin/release/v0.34.0 (was 7 behind); re-count 0 behind.
+
+### Phase 4 measurement notes
+
+- This phase does **not** claim a PR wall change: PR path already had pr-checks parallel.
+- Expected release wall shape after this phase: max(release-gate slowest shard, release-checks), not release-gate shard-1 (tests then builds).
+- Red-path: temporary `if: matrix.shard == 1` inject on release-gate failed `splits the release tier...` and the shard pin; YAML restored; pins green again.
+- N stays 8; fail-fast false; gate.mjs unsharded; I18N_RELEASE_TIER only on release-gate job env (not on release-checks or pr-*).
+- Completeness baseline still 1939 Test Files (post Phase 3); no suite changes in this phase.
 
 ## Phase 5 checklist
 
