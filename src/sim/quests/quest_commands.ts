@@ -353,9 +353,14 @@ export function turnInQuestCore(
     if (obj.type === 'collect' && obj.itemId) {
       // Base grade first, then the fine grade, so a player holding both hands
       // over the plain ore and keeps the premium copies. Within each grade
-      // line, plain stacks are spent before instanced copies (the vendor-sell
-      // preference): a signed specimen survives any turn-in that plain copies
-      // can pay, and is consumed only when nothing plain remains.
+      // line, plain stacks are spent before instanced copies
+      // (removePreferFungible's own plain-first walk): a signed specimen
+      // survives any turn-in that plain copies can pay, and is consumed only
+      // when nothing plain remains. The trade and vendor arms additionally
+      // deprioritize the owner's self-signed CHARM copies; that charm-scoped
+      // rule is deliberately absent here because no shipped quest collects a
+      // charm (the grade-pool guard in tests/material_grades.test.ts keeps
+      // the collect vocabulary honest).
       for (const take of planGradeRemoval(
         obj.itemId,
         questObjectiveRequired(quest, qp, index),

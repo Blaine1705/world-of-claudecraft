@@ -11040,7 +11040,12 @@ export class Hud {
           // whose banner did NOT show immediately (a celebration held the
           // slot, so it parked or aged out) lays a log line instead; an
           // on-screen countdown needs none, and the tick cue fires always.
-          const text = t('hud.system.duelCountdown', { seconds: ev.seconds });
+          // Through the formatter like its arena sibling (the every-number
+          // contract); the phase 14 rewrite added the chat-log sink this
+          // number now reaches.
+          const text = t('hud.system.duelCountdown', {
+            seconds: formatNumber(ev.seconds, { maximumFractionDigits: 0 }),
+          });
           if (this.showBanner(text) !== 'show') this.log(text, '#fa6');
           audio.duelCountdownTick();
           break;

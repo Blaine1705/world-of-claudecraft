@@ -469,6 +469,7 @@ export const ko_KR: AdminTranslations = {
   "profInspect.effectOptionNone": "choose an effect",
   "profInspect.restoreSummary": "{id} x{count}",
   "profInspect.slotPair": "{profession} / {effect}",
+  "profInspect.chargesPair": "{current} / {max}",
   "profInspect.offlineNote": "Restores need the character online on this realm.",
   "moderation.title": "관리",
   "moderation.reportsTitle": "보고서",

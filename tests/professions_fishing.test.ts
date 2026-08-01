@@ -1963,3 +1963,27 @@ describe('fishing telemetry events (empty hook and the bags-full got-away)', () 
     expect(sawGotAway, 'no non-null row resolved against full bags').toBe(true);
   });
 });
+
+describe('the swim deny holds for the whole session (the jump-cast bypass, round 7)', () => {
+  it('a live cast cancels the tick the caster ends up swimming', () => {
+    // A cast pressed mid-leap over deep water passes the press-time deny
+    // (the airborne y-term sits above the surface) and used to splash into
+    // a live session: the vertical splash is not the move input the
+    // ordinary cancel watches. The session upkeep now enforces the same
+    // deny across the session's lifetime.
+    const sim = makeSim(4242);
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    sim.useItem('simple_fishing_pole');
+    expect(sim.player.castingAbility, 'the cast started legally on land').toBe('fishing');
+    // The splash: the player ends up in the lake's deep water mid-session.
+    teleportTo(sim, LAKE.x, LAKE.z);
+    sim.tick();
+    expect(sim.player.castingAbility, 'the session cancelled on swim entry').toBeNull();
+    // And a fresh legal cast still works afterward (cancel left no residue).
+    const dry = teleportToValeShore(sim);
+    void dry;
+    sim.useItem('simple_fishing_pole');
+    expect(sim.player.castingAbility).toBe('fishing');
+  });
+});

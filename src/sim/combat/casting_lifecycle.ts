@@ -298,6 +298,17 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
   // direct-assigned fishing cast (the parity cancel drives, hidden state
   // inert) decays exactly as before. Draws no rng on any path.
   if (p.castingAbility === FISHING_CAST_ID) {
+    // The swim deny holds for the WHOLE session, not just the cast press: a
+    // cast pressed mid-leap over deep water passes the press-time deny (the
+    // airborne y-term sits above the surface) and used to splash down into a
+    // live session the deny could never have granted, because the vertical
+    // splash is not the move input the ordinary cancel watches (the round 7
+    // finder). Enforcement of the existing R25-family deny, not a new rule;
+    // draw-free (the bite delay was drawn at the press, cancel spends none).
+    if (ctx.isSwimming(p)) {
+      cancelCast(ctx, p);
+      return;
+    }
     if (p.fishBiteAtTick > 0 && ctx.tickCount >= p.fishBiteAtTick) {
       // The bite: text-free personal event (bobber bite state plus the
       // always-audible cue). The reel window re-scans the rod at bite time,

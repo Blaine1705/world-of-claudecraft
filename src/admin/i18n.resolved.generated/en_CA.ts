@@ -469,6 +469,7 @@ export const en_CA: AdminTranslations = {
   "profInspect.effectOptionNone": "choose an effect",
   "profInspect.restoreSummary": "{id} x{count}",
   "profInspect.slotPair": "{profession} / {effect}",
+  "profInspect.chargesPair": "{current} / {max}",
   "profInspect.offlineNote": "Restores need the character online on this realm.",
   "moderation.title": "Moderation",
   "moderation.reportsTitle": "Reports",

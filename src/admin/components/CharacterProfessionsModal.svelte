@@ -263,7 +263,10 @@
                     <td>{slot.professionId}</td>
                     <td>{slot.effectId}</td>
                     <td class="num">
-                      {fmtNumber(slot.durability)} / {fmtNumber(slot.maxDurability)}
+                      {t('profInspect.chargesPair', {
+                        current: fmtNumber(slot.durability),
+                        max: fmtNumber(slot.maxDurability),
+                      })}
                     </td>
                     <td>{slot.craftedBy ?? t('common.emptyValue')}</td>
                     <td>{fireModeLabel(slot.confirmMode)}</td>

@@ -469,6 +469,7 @@ export const zh_TW: AdminTranslations = {
   "profInspect.effectOptionNone": "choose an effect",
   "profInspect.restoreSummary": "{id} x{count}",
   "profInspect.slotPair": "{profession} / {effect}",
+  "profInspect.chargesPair": "{current} / {max}",
   "profInspect.offlineNote": "Restores need the character online on this realm.",
   "moderation.title": "管理稽核",
   "moderation.reportsTitle": "報告",
