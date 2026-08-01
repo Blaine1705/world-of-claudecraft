@@ -87,7 +87,6 @@ export const EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY = Object.freeze({
     'eastbrook_fence_smithy_west',
     'eastbrook_fence_smithy_outer',
     'eastbrook_fence_smithy_east',
-    'eastbrook_fence_market_outer',
   ]),
   artisanRow: Object.freeze([]),
   benches: Object.freeze([

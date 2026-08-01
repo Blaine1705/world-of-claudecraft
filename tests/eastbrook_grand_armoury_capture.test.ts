@@ -764,7 +764,6 @@ describe('Eastbrook Grand Armoury capture contract', () => {
         'eastbrook_fence_smithy_west',
         'eastbrook_fence_smithy_outer',
         'eastbrook_fence_smithy_east',
-        'eastbrook_fence_market_outer',
       ],
       artisanRow: [],
       benches: [
