@@ -109,14 +109,6 @@ export function isActiveEscortee(ctx: SimContext, e: Entity): boolean {
   return false;
 }
 
-function idleEscortDefFor(ctx: SimContext, e: Entity): EscortDef | null {
-  for (const state of ctx.escortRuns.values()) {
-    if (state.npcId !== e.id || state.run !== null) continue;
-    return ESCORTS[state.escortId] ?? null;
-  }
-  return null;
-}
-
 // Interact hook: if this player stands near an idle escortee whose quest they
 // have active, start the run. Called with the player's explicit target first,
 // then with a proximity scan fallback (interaction.ts). Returns true when a
@@ -177,6 +169,15 @@ function fireAmbushes(ctx: SimContext, def: EscortDef, state: EscortRunState, np
       // ambushIds' live count and wedge (or re-attack) a still-walking run.
       mob.summonedAdd = true;
       ctx.addEntity(mob);
+      // A wave mob belongs to the RUN, not to the world: it was never placed by
+      // a CAMP, so it must never respawn in place. Without this a killed
+      // ambusher came back as a permanent orphan spawn (handleDeath gives every
+      // mob a respawnTimer and updateMob revives it), so each run silently added
+      // its whole wave to the zone forever. That is the mob-pile players
+      // reported along the escort routes in the July zones.
+      // It also keeps the walk honest: a wave that revived mid-run would make
+      // liveAmbushCount non-zero again and pause the escortee indefinitely.
+      mob.runScoped = true;
       // Commit the wave to the escortee, social_aggro-style; player damage
       // out-threats the seed immediately via the normal pull-over rules.
       mob.aiState = 'chase';
@@ -233,14 +234,12 @@ function endRun(
   outcome: 'success' | 'fail',
 ): void {
   if (npc) emitMobYell(ctx, npc, outcome === 'success' ? def.successText : def.failText);
-  // Surviving ambush mobs leave with the run (a failed wave never lingers to
-  // camp the respawned escortee). A SLAIN one is deliberately left alone: it
-  // carries summonedAdd, so mob/locomotion.ts unravels its corpse once the loot
-  // window lapses. Dropping it here instead would yank a corpse a player may be
-  // mid-loot on, which is the whole reason that arm waits for corpseTimer.
+  // Ambush mobs leave with the run, DEAD ONES INCLUDED (a failed wave never
+  // lingers to camp the respawned escortee, and a slain one must not be left as
+  // a permanent corpse now that it can no longer respawn away). Dropping by id
+  // covers both states, so nothing from the wave outlives its run.
   for (const id of state.run?.ambushIds ?? []) {
-    const mob = ctx.entities.get(id);
-    if (mob && !mob.dead) ctx.dropEntity(id);
+    if (ctx.entities.has(id)) ctx.dropEntity(id);
   }
   if (state.npcId !== null) ctx.dropEntity(state.npcId);
   state.npcId = null;
@@ -258,7 +257,7 @@ function creditEscort(ctx: SimContext, def: EscortDef, npc: Entity): void {
   const objective = quest.objectives[objectiveIndex];
   for (const meta of ctx.players.values()) {
     const qp = meta.questLog.get(def.questId);
-    if (!qp || qp.state !== 'active') continue;
+    if (qp?.state !== 'active') continue;
     const p = ctx.entities.get(meta.entityId);
     if (!p || p.dead || dist2d(p.pos, npc.pos) > def.creditRadius) continue;
     const required = questObjectiveRequired(quest, qp, objectiveIndex);

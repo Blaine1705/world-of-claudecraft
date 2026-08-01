@@ -71,7 +71,7 @@ const armouryFinalPipelineEnabled =
     item.src?.endsWith('eastbrook_grand_armoury-final.glb'),
   ) ?? false;
 const ARMOURY_SHIPPING_BYTE_CEILING = 160 * 1024;
-const ARMOURY_SHIPPING_SHA256 = 'c696bcd12c19ed1b697491f474a685435a4f2439daf81cf45f8f6d8a817373af';
+const ARMOURY_SHIPPING_SHA256 = '1414ab894e15f01dfcd90267fdaad0e580215bce0631d4a6978a4f83973f84c0';
 const MANIFEST_HASH_LENGTH = 12;
 
 function expectAssetExistsAndManifested(url: string): void {

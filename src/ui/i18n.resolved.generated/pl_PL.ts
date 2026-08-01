@@ -923,6 +923,23 @@ export const pl_PL: EnTranslations = {
       "separate": "Odłącz {meter}",
       "regroup": "Zgrupuj {meter} ponownie"
     },
+    "targetAuras": {
+      "title": "Aury celu",
+      "keybindLabel": "Wzmocnienia i osłabienia celu",
+      "all": "Wszystko",
+      "debuffs": "Osłabienia",
+      "buffs": "Wzmocnienia",
+      "unlock": "Przesuń okno aur celu",
+      "lock": "Zablokuj okno aur celu",
+      "configureRows": "Skonfiguruj aury celu",
+      "fewerRows": "Preferuj mniej rzędów aur",
+      "moreRows": "Preferuj więcej rzędów aur",
+      "visibleRows": "Preferowane rzędy aur: {count}",
+      "showSources": "Pokaż źródła aur",
+      "hideSources": "Ukryj źródła aur",
+      "ownAura": "Twoja aura",
+      "opacity": "Krycie aur: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Zwierzę ma pełne zdrowie",
       "disabledNoFood": "W twoich torbach nie ma jedzenia, które uleczy twoje zwierzę"
@@ -966,13 +983,15 @@ export const pl_PL: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Cienioskacząca Ropucha",
       "name_stormfeather_griffin": "Niebosiężny Burzopiór",
       "name_thunderstrut_gobbler": "Grzmotokroczek, Wielki Indyk",
+      "name_terrorspark_groundshaker": "Groziskra, Wstrząsacz Ziemi",
       "desc_valorsteed": "Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_grag_bear": "Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_stalkglider_snail": "Krzepki, powoli, lecz niezmordowanie pełznący ślimak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_aether_hover_cycle": "Potężny magitechniczny motocykl zaprojektowany do szybkiego, nisko unoszącego się przemieszczania w walce.",
       "desc_shadowjump_toad": "Ogromna, pewna kroku olbrzymia ropucha, wyszkolona w błyskawicznych, cienistych skokach, które pokonują każdy teren.",
       "desc_stormfeather_griffin": "Dostojny gryf burzy, który skrada się po ziemi na szponach okutych runami, ze złożonymi skrzydłami.",
-      "desc_thunderstrut_gobbler": "Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura."
+      "desc_thunderstrut_gobbler": "Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura.",
+      "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów."
     },
     "mountTraining": {
       "mountPrompt": "Naciśnij {key}, aby dosiąść treningowego Rumaka Męstwa.",
@@ -1278,6 +1297,51 @@ export const pl_PL: EnTranslations = {
       "badges": {
         "backgrounded": "W tle",
         "offline": "Offline"
+      }
+    },
+    "auraOverlay": {
+      "title": "Aury",
+      "currentClass": "Obecna klasa: {class}",
+      "previewHint": "Użyj Ustaw pozycje, aby przesunąć aurę bez zasłaniania menu.",
+      "noProcs": "Dla tej postaci nie jest dostępny żaden obsługiwany proc.",
+      "enabled": "Pokaż aurę",
+      "icon": "Ikona zaklęcia",
+      "arcs": "Boczne półksiężyce",
+      "groundRing": "Pierścień na ziemi",
+      "groundRingSpellOrder": "Pierścień na ziemi: kolejność zaklęć",
+      "crescentsSpellOrder": "Boczne półksiężyce: kolejność zaklęć",
+      "size": "Rozmiar",
+      "iconSize": "Rozmiar ikony",
+      "crescentBlockSize": "Rozmiar bloku półksiężyca",
+      "groundRingBlockSize": "Rozmiar bloku pierścienia na ziemi",
+      "opacity": "Krycie",
+      "color": "Kolor",
+      "allOn": "Włącz wszystko",
+      "allOff": "Wyłącz wszystko",
+      "reposition": "Ustaw pozycje",
+      "positioning": "Pozycjonowanie: {aura}",
+      "selectAura": "Aura",
+      "done": "Gotowe",
+      "moveLeft": "Przesuń w lewo",
+      "moveUp": "Przesuń w górę",
+      "moveDown": "Przesuń w dół",
+      "moveRight": "Przesuń w prawo",
+      "moveEarlier": "Przesuń zaklęcie do środka",
+      "moveLater": "Przesuń zaklęcie na zewnątrz",
+      "screenPosition": "Pozycja na ekranie",
+      "spellOrder": "Kolejność zaklęć",
+      "reset": "Resetuj pozycję",
+      "spellPosition": "Kolejność zaklęć {position} / {count}",
+      "procs": {
+        "revenge": "Odwet!",
+        "battleTrance": "Trans bojowy",
+        "overpowerCharge": "Wzmocnienie Krwawej ręki",
+        "suddenDeath": "Nagła śmierć",
+        "victoryRush": "Zryw zwycięstwa",
+        "enrage": "Rzeź: rozwścieczony",
+        "heatingUp": "Rozgrzewanie",
+        "arcaneCharge": "Ładunki Arkanów",
+        "aetherRush": "Napływ eteru"
       }
     },
     "playerCard": {
@@ -2083,6 +2147,14 @@ export const pl_PL: EnTranslations = {
       "benefits": "Połącz swoje konto Steam z poziomu aplikacji na komputer, aby zdobywane czyny znajdowały odbicie w osiągnięciach Steam.",
       "noTicket": "Steam nie wystawił biletu połączenia. Uruchom Steam i spróbuj ponownie."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Powiąż Epic",
+      "unlink": "Usuń powiązanie z Epic",
+      "linked": "Powiązane z kontem Epic {id}",
+      "benefits": "Powiąż swoje konto Epic z poziomu aplikacji Epic na komputer, aby zdobyte czyny odzwierciedlały się w osiągnięciach Epic.",
+      "noProof": "Epic nie dostarczył potwierdzenia powiązania. Uruchom grę z Epic Games Store i spróbuj ponownie."
+    },
     "mailbox": {
       "title": "Skrzynka pocztowa",
       "subtitle": "Krucza Poczta",
@@ -2127,6 +2199,7 @@ export const pl_PL: EnTranslations = {
         "noRecipient": "Nikt o tym imieniu nie ma tu skrzynki pocztowej.",
         "tooManyParcels": "List mieści najwyżej {count} paczek.",
         "noMailQuestItems": "Nie możesz wysyłać pocztą przedmiotów zadań.",
+        "noMailBound": "Ten przedmiot jest przywiązany i nie można go wysłać pocztą.",
         "notEnoughItems": "Nie masz aż tylu do wysłania.",
         "cantAffordPostage": "Nie stać cię na opłatę pocztową.",
         "recipientBoxFull": "Skrzynka odbiorcy jest pełna.",
@@ -2933,6 +3006,14 @@ export const pl_PL: EnTranslations = {
       "account_taken": "To konto Steam jest już połączone z innym kontem.",
       "upstream": "Steam nie odpowiada. Spróbuj ponownie za chwilę."
     },
+    "epic": {
+      "disabled": "Powiązanie z Epic jest obecnie niedostępne.",
+      "invalid_token": "Epic nie mógł zweryfikować tej prośby o powiązanie. Spróbuj ponownie z aplikacji na komputer.",
+      "banned": "Tego konta Epic nie można powiązać.",
+      "already_linked": "Twoje konto ma już powiązane konto Epic.",
+      "account_taken": "To konto Epic jest już powiązane z innym kontem.",
+      "upstream": "Epic nie odpowiedział. Spróbuj ponownie za chwilę."
+    },
     "wallet": {
       "handoff_invalid": "Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie."
     },
@@ -3537,14 +3618,6 @@ export const pl_PL: EnTranslations = {
       "reptile": {
         "name": "Gady",
         "desc": "Zimnokrwiste drapieżniki o własnym syczeniu i kłapaniu, odmienne od ciepłokrwistych bestii."
-      },
-      "murloc": {
-        "name": "Rechotopłetwi",
-        "desc": "Rechoczący rybi lud brzegów jeziora i przypływowych sadzawek, chętnie rojący się wokół każdego, kto podejdzie zbyt blisko wody."
-      },
-      "kobold": {
-        "name": "Urwisy",
-        "desc": "Krzątające się padlinożerne stworki i chochliki polan oraz żywopłotów, bardziej uciążliwe niż groźne, dopóki nie zbiorą się w większej liczbie."
       },
       "demon": {
         "name": "Demony",
@@ -6197,11 +6270,15 @@ export const pl_PL: EnTranslations = {
       "graphicsPresetMedium": "Średnie",
       "graphicsPresetHigh": "Wysokie",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Ekstremalne",
       "graphicsPresetAdvanced": "Zaawansowane",
       "terrainDetail": "Szczegółowość terenu",
       "foliageDensity": "Gęstość roślinności",
       "effectsQuality": "Efekty i oświetlenie",
       "shadowQuality": "Jakość cieni",
+      "surfaceDetail": "Szczegóły powierzchni",
+      "surfaceDetailBasic": "Podstawowe",
+      "surfaceDetailFull": "Pełne",
       "terrainLow": "Niska",
       "terrainHigh": "Wysoka",
       "touchOpacity": "Nieprzezroczystość sterowania dotykowego",
@@ -6378,6 +6455,7 @@ export const pl_PL: EnTranslations = {
       "floatingDodge": "Unik",
       "floatingParry": "Parowanie",
       "floatingResist": "Odparto",
+      "floatingEvade": "Uniknięcie",
       "floatingHealFull": "Pełne",
       "floatingHealAbsorbed": "Pochłonięte",
       "cannotMove": "Nie można się ruszyć!",
@@ -6390,6 +6468,7 @@ export const pl_PL: EnTranslations = {
       "dodged": "Twój {ability} zostaje uniknięty przez {target}.",
       "parried": "Twój {ability} zostaje sparowany przez {target}.",
       "resisted": "{target} odpiera twoje {ability}.",
+      "evaded": "{target} unika twojego {ability}.",
       "healSelf": "Twój {ability} leczy cię o {amount}.",
       "healSelfCrit": "Twój {ability} leczy cię krytycznie o {amount}.",
       "healOther": "Twój {ability} leczy {target} o {amount}.",
@@ -6490,7 +6569,8 @@ export const pl_PL: EnTranslations = {
       "tradeTooFar": "Cel jest zbyt daleko, by handlować.",
       "tradeExpired": "Prośba o wymianę wygasła.",
       "tradeFailed": "Wymiana nieudana: przedmioty lub pieniądze są już niedostępne.",
-      "tradeBound": "Ten przedmiot jest przywiązany i nie można go wymienić."
+      "tradeBound": "Ten przedmiot jest przywiązany i nie można go wymienić.",
+      "marketListBound": "Ten przedmiot jest przywiązany i nie można go wystawić na sprzedaż."
     },
     "logs": {
       "standUp": "Wstajesz.",
@@ -7235,7 +7315,7 @@ export const pl_PL: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Większa niewidzialność",
-        "description": "Znikasz na 20 sek.: usuwa 2 efekty obrażeń rozłożonych w czasie, a podczas niewidzialności i krótko po niej otrzymujesz o 90% mniej obrażeń. (talent maga)"
+        "description": "Znikasz na 20 s i usuwasz 2 efekty obrażeń w czasie. Gdy niewidzialność się kończy, przez 2 s otrzymujesz o 90% mniej obrażeń. (talent maga)"
       },
       "hot_streak": {
         "name": "Gorąca seria",
@@ -9574,6 +9654,18 @@ export const pl_PL: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Kłonóż Zulgara"
       },
+      "fanglords_beastspear": {
+        "name": "Włócznia Bestii Kłolorda"
+      },
+      "bloodmane_warleggings": {
+        "name": "Wojenne Nogawice Krwistej Grzywy"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Pnączoszponie Spodnie Skradania"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Słonecznokościsty Sarong Rytualny"
+      },
       "thick_winter_pelt": {
         "name": "Gruba Zimowa Skóra"
       },
@@ -9741,6 +9833,9 @@ export const pl_PL: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Sygnet Ostatniej Twierdzy"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Kluczyk zapłonu: Groziskra, Wstrząsacz Ziemi"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
@@ -10317,6 +10412,24 @@ export const pl_PL: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Owijki żmijowego chóru"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunika Tropiciela z Kotliny"
+      },
+      "verdant_heart_vestment": {
+        "name": "Szata Zieleniejącego Serca"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Słonecznokoścista Kolczuga Rytualna"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Wielki Kieł Kotliny"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Korona Słonecznokościstej Wyroczni"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Wojenne Nagolenniki Krwistej Grzywy"
       },
       "deathless_greatblade": {
         "name": "Nieśmiertelne wielkie ostrze"

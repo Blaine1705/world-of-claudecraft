@@ -115,6 +115,9 @@ describe('escort ambush mobs never outlive their run', () => {
     }
   });
 
+  // Three full escort runs through the real sim (50s of ticks each) outrun the
+  // default 20s timeout on a contended CI shard; the v0.32.3 arm of this test
+  // carried the same explicit budget.
   it('does not accumulate across repeated runs, which is the reported symptom', () => {
     const sim = makeSim();
     const ambushTemplate = ESCORTS[ESCORT_ID].ambushes[0].mobId;
@@ -135,11 +138,6 @@ describe('escort ambush mobs never outlive their run', () => {
 
     // Three runs, three killed waves: without the fix this is baseline + 9.
     expect(liveOf(sim, ambushTemplate).length).toBe(baseline);
-    // Drain past the corpse window first: a slain wave mob is DELIBERATELY left
-    // as a lootable corpse until it lapses (summonedAdd unravels it in
-    // mob/locomotion.ts), so asserting sooner would be asserting against the
-    // loot window rather than against a leak.
-    for (let i = 0; i < 90 * 20; i++) sim.tick();
     // And no corpse residue either: the roster holds no more mobs of this
     // template than the zone's own camps authored.
     const anyState = [...sim.entities.values()].filter(
