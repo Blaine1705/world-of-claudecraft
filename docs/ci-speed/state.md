@@ -1,17 +1,17 @@
 # State: CI Speed (cross-phase cheat sheet)
 
-**Current phase:** Phase 2 implementation DONE with wall **DEFER to Phase 3**.
-Locked **N=8** on `pr-gate` and `release-gate`. Completeness 1926 on all
-measurement runs. Post-lock walls: 449s UNDER (PR run 30709155848) then 514s
-OVER (dispatch 30709485828). Not three consecutive ≤ 480s; wall babysitting
-stopped by owner. PR #2737 green on lock commit. Worktree
+**Current phase:** Phase 3 implementation STOPPED after two split/rename rounds.
+Locked **N=8**. Completeness baseline now **1939** Test Files (was 1926). Wall
+sample UNDER 8 min (424s on PR run 30710958267). D11 balance **not met**
+(worst/median 1.315; need ≤ 1.20). Path-matrix design note written in
+progress.md; **not implemented** (needs owner OK). Worktree
 `/home/fernandoramirez/Documents/world-of-claudecraft-ci-speed` on
-`feature/ci-speed`.
+`feature/ci-speed`. PR #2737.
 
-**Next action:** Phase 2 QA if desired (`phase-02-qa.md`), else Phase 3 shard
-rebalance (rank heavy files under N=8, split pure monsters, re-check ≤ 8 min).
-Do not raise N past 8 without owner OK (D5/D6). No more wall re-run loops
-unless the owner restarts them.
+**Next action:** Owner chooses (a) path-matrix with explicit OK, (b) optional
+third rename round of s5 import-heavy files, or (c) accept D11 MISS and start
+Phase 4 (release-checks). Do not raise N past 8. No more endless wall re-run
+loops.
 
 ## Locked decisions
 
@@ -35,10 +35,9 @@ unless the owner restarts them.
   past **8** without owner approval.
 - **D6 Shard N:** **LOCKED N=8** by Phase 2 measurement (see progress.md).
   Supersedes the prior toolchain packet's locked N=4 for this surface only.
-  N=6 missed the bar (594s). N=8 walls straddle 480s (449s then 514s after
-  lock; earlier ~524s critical path). Phase 3 must rebalance before claiming
-  a stable ≤ 8 min bar. `fail-fast: false` always. Half-core `maxWorkers`
-  cap retained.
+  N=6 missed the bar (594s). N=8 walls straddle 480s pre-rebalance; post
+  Phase 3 batch 2 sample **424s UNDER**. `fail-fast: false` always. Half-core
+  `maxWorkers` cap retained.
 - **D7 Minutes vs wall:** more shards and more jobs increase billed Actions
   minutes. Accepted for this packet in exchange for lower wall clock.
 - **D8 Enforcement parity:** PR tier and release tier must not drop checks.
@@ -54,6 +53,7 @@ unless the owner restarts them.
   express the filter cleanly (justify in progress.md).
 - **D11 Balance metric:** after Phase 3, worst shard vitest **Duration**
   within **20%** of the median shard Duration on the same run.
+  **Status after two rounds: MISS** (351.26 / 267.21 = 1.315 on 30710958267).
 - **D12 Lint history:** no full-repo `fetch-depth: 0` solely for Biome
   changed-files. Base ref for `--since` must still be correct for PR and push
   events.
@@ -97,13 +97,17 @@ unless the owner restarts them.
 | PR wall (2026-08-01) | 12.8 / 14.2 / 11.7 min | runs 30705333396, 30704449673, 30703789135 |
 | Worst shard vitest | 683s (shard 3) | run 30705333396 |
 | Best shard vitest | 370s (shard 4) | same |
-| Suite files | 1,926 | live shard sum (N=6 and N=8) |
+| Suite files (pre Phase 3) | 1,926 | live shard sum (N=6 and N=8) |
+| Suite files (post Phase 3 splits) | 1,939 | run 30710958267 |
 | Suite tests | ~24.4k | live shard sum |
 | Prior N=4 ship wall | 184 / 194 / 188s | toolchain Phase 4, ~1,129 files |
 | Phase 2 N=6 green wall | 594s (9.90 min) | run 30707931452 |
 | Phase 2 N=6 worst vitest | 502.39s (shard 4) | same |
 | Phase 2 N=8 first attempt wall | ~524s (8.73 min) | run 30708423524 attempt 1 (shard 4 flaked; critical path was shard 5) |
 | Phase 2 N=8 worst vitest | 435.88s (shard 5) | same |
+| Phase 3 batch 2 wall | **424s (7.07 min)** | run 30710958267 |
+| Phase 3 batch 2 worst vitest | 351.26s (shard 5) | same; D11 ratio 1.315 |
+| Phase 3 batch 2 median vitest | 267.21s | same |
 | Lint checkout Phase 1 | 22 to 25s | runs 30707112749, 30707206995, 30707453993 |
 | Lint job Phase 1 | 59 to 68s | same three runs |
 | pr-checks | ~110s | not critical path |
@@ -119,11 +123,10 @@ unless the owner restarts them.
 
 ## OPEN items
 
-1. **Exact N (6 vs 8):** CLOSED. Locked N=8. OPEN for wall bar: Phase 3 must
-   rebalance to re-check ≤ 8 min (DEFERRED from Phase 2).
-2. **Heavy-file split list:** Phase 3 live ranking under locked N=8. Brainstorm
-   candidates are proxies only. N=8 worst shards (vitest Duration): shard 5
-   ~436s, shard 4 ~361s; imbalance worst/median ~1.77 on 30708423524.
+1. **Exact N (6 vs 8):** CLOSED. Locked N=8. Wall sample UNDER 8 min after
+   Phase 3 batch 2; three consecutive not re-babysat.
+2. **Heavy-file split list / D11:** Phase 3 two rounds done; D11 still MISS.
+   Path-matrix design note in progress.md. Owner OK required to implement.
 3. **Branch protection check names:** owner action after Phase 2; track in
    progress.md. New names are `PR gate (English-only legal) (1)` through `(8)`.
 4. **Larger runners:** locked off (D1). Flip only with owner + cost note.
@@ -141,8 +144,8 @@ unless the owner restarts them.
 - Phase 1 code: shallow lint checkout, concurrency cancel, Playwright cache.
 - Phase 2 code: N=8 matrices on pr-gate + release-gate; `SHARD_N` pins;
   comments no longer say 4-shard; gate.mjs unsharded.
+- Phase 3 code: tank_crit + professions_trend pure splits; s5 heavy pure
+  renames. D11 not met; path-matrix note only.
 - PR: https://github.com/levy-street/world-of-claudecraft/pull/2737
-- Phase 2 wall: **DEFER to Phase 3** with numbers (N=6=594s; N=8 samples
-  449s UNDER then 514s OVER; no three consecutive ≤ 480s; babysitting
-  stopped). N=8 locked as max allowed without owner OK.
-- Next: optional Phase 2 QA, then Phase 3 (`phase-03-shard-rebalance.md`).
+- Next: owner decision on D11 path (path-matrix / more renames / accept miss),
+  then Phase 3 QA or Phase 4.

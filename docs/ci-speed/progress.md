@@ -8,8 +8,8 @@
 | 1 QA | PASS-WITH-FOLLOWUPS | #2737 ready | Docs + pin harden followups only; no BLOCKING |
 | 2 Shard count | DONE (wall DEFER) | #2737 | Locked N=8; DEFER ≤8 min; wall babysitting stopped |
 | 2 QA | NOT STARTED | | Ready for phase-02-qa.md; no more wall re-runs |
-| 3 Shard rebalance | NOT STARTED | | 20% balance; re-check ≤ 8 min under N=8 |
-| 3 QA | NOT STARTED | | |
+| 3 Shard rebalance | STOPPED (D11 MISS) | #2737 | Two rounds; wall 424s UNDER; D11 1.315; path-matrix note |
+| 3 QA | NOT STARTED | | Blocked on D11 owner decision |
 | 4 Release-checks split | NOT STARTED | | |
 | 4 QA | NOT STARTED | | |
 | 5 Path filters + close | NOT STARTED | | |
@@ -28,6 +28,8 @@ Append-only. Each row: date, phase, run id, wall (s), worst shard (s), N, notes.
 | 2026-08-01 | p2-measure | 30708423524 | ~524 (att1) | 436 | 8 | att1 shard 4 flake then re-run green; files 1926; critical path shard 5 job 520s; MISS 8-min bar |
 | 2026-08-01 | p2-wall | 30709155848 | 449 | 376 | 8 | PR green (lock commit); files 1926; UNDER 8 min (7.48 min); not three-in-a-row |
 | 2026-08-01 | p2-wall | 30709485828 | 514 | 436 | 8 | workflow_dispatch green; files 1926; OVER 8 min (8.57 min); babysitting stopped |
+| 2026-08-01 | p3-b1 | 30710303793 | ~493 (att1) | 420 | 8 | after tank+trend splits; s4 teardown flake then re-run green; files 1939; D11 FAIL 1.60; wall OVER |
+| 2026-08-01 | p3-b2 | 30710958267 | 424 | 351 | 8 | after s5 heavy renames; green; files 1939; D11 FAIL 1.315 (need 1.20); wall UNDER 8 min (7.07); stretch MISS |
 
 ### Phase 2 N=6 detail (run 30707931452, green)
 
@@ -169,12 +171,114 @@ Remove any required checks still named only `(1)`..`(4)` if the org still pins N
 
 ## Phase 3 checklist
 
-- [ ] Live top-cost files under locked N=8
-- [ ] Pure splits (vale_cup pattern) with shard simulation
-- [ ] Worst Duration within 20% of median
-- [ ] Completeness holds
-- [ ] Three green runs; wall ≤ 8 min; stretch ≤ 6 min if hit
-- [ ] Draft PR + Phase 3 QA PASS
+- [x] Live top-cost files under locked N=8 (run 30709155848 ranking)
+- [x] Pure splits (vale_cup pattern) with shard simulation (two rounds)
+- [ ] Worst Duration within 20% of median (**MISS** after two rounds: 1.315)
+- [x] Completeness holds (1939 files post-split; was 1926)
+- [x] Wall ≤ 8 min on solid sample (424s on 30710958267); stretch ≤ 6 MISS
+- [ ] Draft PR + Phase 3 QA PASS (still open on #2737; D11 not met)
+
+### Phase 3 ranking (run 30709155848, N=8 pre-split)
+
+Global top Duration files (CI wall ms):
+
+| File | Shard | Duration s |
+|---|---|---|
+| tests/tank_crit_immunity.test.ts | 4 | 174.4 |
+| tests/professions_trend.test.ts | 5 | 104.8 |
+| tests/eastbrook_gameplay_integration.test.ts | 4 | 73.0 |
+| tests/mail_expiry.test.ts | 3 | 72.8 |
+| tests/corpse_harvest_sim.test.ts | 2 | 42.8 |
+
+Pre-split balance (same run): median 254.88s, worst 375.7s (s4), ratio 1.47.
+
+Vitest 4.1.10 shards by sha1 of path after `root` slice (leading `/tests/...`),
+sorted, then equal-size slices (see `node_modules/vitest/dist/chunks/coverage.DM_a_rWm.js`).
+
+### Phase 3 batch 1 (splits)
+
+- `tank_crit_immunity` -> util + warrior/paladin/druid pair files (6 tests preserved)
+- `professions_trend` -> util + classify / guild_letter / delivery / eligibility / content
+  (26 tests preserved)
+- Simulated destinations avoided stacking both monsters back on s4/s5
+- Local: 32/32 green on split files
+
+### Phase 3 batch 1 measure (run 30710303793)
+
+| Shard | Vitest Duration s | Test Files |
+|---|---|---|
+| 1 | 263.09 | 243 |
+| 2 | 272.10 | 243 |
+| 3 | 262.18 | 243 |
+| 4 | 274.34 (re) | 242 |
+| 5 | **420.50** | 242 |
+| 6 | 316.15 | 242 |
+| 7 | 261.60 | 242 |
+| 8 | 252.84 | 242 |
+| **sum** | | **1939** |
+
+Worst/median = 420.50 / 262.63 = **1.60**. s4 att1 EnvironmentTeardownError flake
+(all files passed); re-run green. s5 remained critical path: remaining cluster was
+escort + ambush + delivery + sfx_export + terrain_escape (not just file size).
+
+### Phase 3 batch 2 (pure renames off s5)
+
+Simulated sha1 moves (identical bodies):
+
+| From | To | Dest shard |
+|---|---|---|
+| escort.test.ts | escort_quest.test.ts | 2 |
+| escort_ambush_leak.test.ts | escort_ambush_convoy.test.ts | 8 |
+| professions_trend_delivery.test.ts | professions_trend_delivery_kind.test.ts | 8 |
+| sfx_export_bundle.test.ts | sfx_export_core.test.ts | 7 |
+| terrain_escape.test.ts | terrain_escape_walkout.test.ts | 4 |
+
+### Phase 3 batch 2 measure (run 30710958267, green)
+
+Wall createdAt 17:43:48Z to last job 17:50:52Z = **424s (7.07 min) UNDER 8 min**.
+
+| Shard | Vitest Duration s | Test Files | Notes |
+|---|---|---|---|
+| 1 | 244.29 | 243 | paladin pair ~47s |
+| 2 | 268.86 | 243 | warrior pair + escort_quest |
+| 3 | 283.16 | 243 | mail_expiry ~82s |
+| 4 | 265.55 | 242 | eastbrook_gameplay ~68s |
+| 5 | **351.26** | 242 | import-bound; max file ~13s |
+| 6 | 197.45 | 242 | druid pair ~35s |
+| 7 | 269.03 | 242 | guild_letter ~108s |
+| 8 | 187.67 | 242 | delivery_kind + ambush_convoy |
+| **sum** | | **1939** | completeness OK |
+
+Worst/median = 351.26 / 267.21 = **1.315** (need ≤ 1.20; target worst ≤ 320.65).
+D11 **FAIL** after two rounds. Wall clears Phase 2 DEFER sample (≤ 8 min) but
+stretch ≤ 6 min MISS. s5 is no longer test-time dominated: import cumulative ~407s
+vs ~100s on peer shards while tests sum only ~157s (many large-line low-ms files).
+
+### Phase 3 stop: path-matrix design note (not implemented)
+
+After two pure-split/rename rounds under locked N=8, D11 still fails. Further
+sha1 renames of import-heavy s5 files (`nythraxis_raid`, `daily_rewards`,
+`deeds_sites`, `eastbrook_layout`) could be a third cosmetic round, but the
+stopping rule is two rounds then stop.
+
+**Path-matrix alternative (owner OK required; do not implement without it):**
+
+1. Replace vitest `--shard=i/N` with an explicit path matrix in `ci.yml`, e.g.
+   eight fixed globs or enumerated heavy-file packs balanced by measured Duration
+   (not line count). Keep `npm test -- <paths>` or vitest project filters; never
+   bare `npx vitest`.
+2. Pros: stable balance independent of sha1; can pin monsters to light shards.
+3. Cons: matrix maintenance when files move; risk of dropped or double-run files
+   unless a completeness pin lists every `tests/**/*.test.ts` (or a generated
+   manifest); pin surface grows.
+4. Default remains `--shard` until the owner unlocks a path matrix.
+5. Completeness check would become: union of matrix path sets == full suite file
+   set (order-independent), asserted in `tests/ci_workflow.test.ts` or a small
+   pure helper.
+
+Next owner choice: (a) path-matrix design + implement with OK, (b) one more
+targeted rename of s5 import-heavy files, or (c) accept D11 MISS and proceed to
+Phase 4 with wall UNDER documented.
 
 ## Phase 4 checklist
 
