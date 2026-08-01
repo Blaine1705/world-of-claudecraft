@@ -314,4 +314,50 @@ describe('character visual manifest', () => {
       'mob_spearjaw',
     );
   });
+
+  it('keeps every player class default (skin 0) free of a corrupting full-body tint wash (issue #2678)', () => {
+    // Every player rig is ONE merged material for the whole body (skin, hair, and
+    // cloth share a single atlas), so VisualDef.tint multiplies the entire
+    // character, not just the piece it is meant to differentiate. player_priest,
+    // player_shaman, and player_warlock share their base model with another
+    // class (mage/mage/barbarian) and used tint to tell them apart, but at
+    // 0.4-0.5 strength the lerp toward the tint color read as a full-body wash
+    // that flattened skin tone along with cloth: a near-white-vs-cream lerp for
+    // priest, a saturated blue lerp for shaman, a saturated purple lerp for
+    // warlock. Kept subtle from here on, matching the same "avoid flooding" cap
+    // this file already applies to entity-tinted mobs sharing one material
+    // (mob_troll, mob_kobold, mob_ogre below stay at 0.12-0.2 for the identical
+    // reason).
+    const WASH_STRENGTH_CAP = 0.2;
+    for (const [key, visual] of Object.entries(VISUALS)) {
+      if (!key.startsWith('player_') || visual.tint === undefined) continue;
+      expect(
+        visual.tintStrength ?? 0.4,
+        `${key}.tintStrength must stay <= ${WASH_STRENGTH_CAP} so the default skin never reads as a full-body wash`,
+      ).toBeLessThanOrEqual(WASH_STRENGTH_CAP);
+    }
+
+    expect(VISUALS.player_priest.tint).toBe(0xf0e9d6);
+    expect(VISUALS.player_priest.tintStrength).toBeLessThanOrEqual(WASH_STRENGTH_CAP);
+    expect(VISUALS.player_shaman.tint).toBe(0x6f8fc9);
+    expect(VISUALS.player_shaman.tintStrength).toBeLessThanOrEqual(WASH_STRENGTH_CAP);
+    expect(VISUALS.player_warlock.tint).toBe(0x8d5fd3);
+    expect(VISUALS.player_warlock.tintStrength).toBeLessThanOrEqual(WASH_STRENGTH_CAP);
+
+    // Paladin is the reference clean default (issue #2678): its dedicated
+    // helmeted model ships its own texture and carries no tint at all. The
+    // classes sharing a base model with no differentiation need (warrior,
+    // hunter, rogue, mage, druid) must stay tint-free too, or their default
+    // would wash exactly like priest/shaman/warlock did.
+    for (const key of [
+      'player_warrior',
+      'player_paladin',
+      'player_hunter',
+      'player_rogue',
+      'player_mage',
+      'player_druid',
+    ]) {
+      expect(VISUALS[key].tint, key).toBeUndefined();
+    }
+  });
 });
