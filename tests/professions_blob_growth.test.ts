@@ -567,6 +567,34 @@ describe('the professions blob growth bound (phase 16)', () => {
     }
   });
 
+  it('the marker bound reaches a bag row whose rift the rebuild REFUSES (the F1 bypass)', () => {
+    // The fix-wave review loaded a 100,000-char marker through the real
+    // path and watched the rift-refusal continue skip the bound on exactly
+    // this shape while the diagnostic named every drop but this one. The
+    // bound now runs BEFORE the rift block; this arm drives the real loader
+    // so a control-flow reorder cannot re-open the skip silently.
+    const sim = ceilingSim();
+    const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
+    s1.inventory = [
+      ...(s1.inventory ?? []),
+      {
+        itemId: 'wolf_fang', // wrong item for any rift shell: the rebuild refuses
+        count: 1,
+        craftedRecipeId: 'r'.repeat(100_000),
+        instance: {
+          rift: { tier: 'C', upgradeLevel: 1, sourceEventId: 'evt_refused', gems: [] },
+        } as unknown as InvSlot['instance'],
+      },
+    ];
+    const second = makeSim(47);
+    const pid2 = second.addPlayer('warrior', 'MarkerBound', { state: s1 });
+    const s2 = second.serializeCharacter(pid2) as CharacterState;
+    const row = s2.inventory?.find((slot) => slot.itemId === 'wolf_fang');
+    expect(row, 'the row itself survives (only its junk drops)').toBeTruthy();
+    expect(row?.craftedRecipeId, 'the oversized marker dropped').toBeUndefined();
+    expect(row?.instance, 'the refused rift dropped too').toBeUndefined();
+  });
+
   it('a knownRecipes value stored as a STRING loads the character instead of throwing', () => {
     // THE CRASH REGRESSION. sanitizeKnownRecipeIds used to take an array and
     // call .filter on it, so a stored string threw `filter is not a

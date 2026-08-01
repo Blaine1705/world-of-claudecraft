@@ -114,9 +114,10 @@ export interface VendorRowGateState {
 }
 
 /**
- * The one gate resolver, shared by every ADVISORY consumer (the vendor
- * window's requirement sub-line and the wiki table) so they all answer
- * identically; per this file's header and R22, the buy path deliberately no
+ * The one gate resolver. Its single caller is the vendor window's advisory
+ * requirement sub-line (ui/hud/vendor/vendor_view.ts); the wiki table shares
+ * the CONSTANTS this file reads (the tier gate proficiencies), not the
+ * resolver. Per this file's header and R22, the buy path deliberately no
  * longer reads it (the purchase is advisory, enforcement moved to wield
  * time). `proficiency` is the player's gathering
  * counter map (`PlayerMeta.gatheringProficiency` in the sim, the mirrored

@@ -19,8 +19,11 @@ import type { BankInfo } from '../world_api';
 import { addStacked, bagCapacity, bagsFullError, countFit, instancedCountCap } from './bags';
 import { ITEMS } from './data';
 import * as deedsMod from './deeds';
-import { sanitizeItemInstancePayloadOnLoad, warnDroppedInstanceKeys } from './item_instance_load';
-import { MAX_KNOWN_RECIPE_ID_LENGTH } from './professions/training';
+import {
+  boundCraftedRecipeIdOnLoad,
+  sanitizeItemInstancePayloadOnLoad,
+  warnDroppedInstanceKeys,
+} from './item_instance_load';
 import { sanitizeRiftGearInstance } from './rift/progression';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
@@ -336,20 +339,16 @@ export function sanitizeBankState(
       };
       if (typeof e.itemId !== 'string' || e.itemId === '') continue;
       const hasInstance = !!e.instance && typeof e.instance === 'object';
-      // Length-bounded like every other recipe id (the round 4 finder: the
-      // bare typeof check kept an unbounded marker riding every autosave).
-      const craftedRecipeId =
-        typeof e.craftedRecipeId === 'string' &&
-        e.craftedRecipeId !== '' &&
-        e.craftedRecipeId.length <= MAX_KNOWN_RECIPE_ID_LENGTH
-          ? e.craftedRecipeId
-          : undefined;
-      if (
-        typeof e.craftedRecipeId === 'string' &&
-        e.craftedRecipeId.length > MAX_KNOWN_RECIPE_ID_LENGTH
-      ) {
-        localDrops.push(`bank.${e.itemId}.craftedRecipeId`);
-      }
+      // The ONE shared doctrine helper judges the RAW marker (the fix-wave
+      // review found this arm re-implementing the rule with its own quieter
+      // reporting: a non-string or oversized marker vanished silently here
+      // while the same corruption was reported on the bag and buyback arms).
+      const rawMarker: { itemId: string; craftedRecipeId?: unknown } = {
+        itemId: e.itemId,
+        craftedRecipeId: e.craftedRecipeId,
+      };
+      boundCraftedRecipeIdOnLoad(rawMarker, localDrops, 'bank');
+      const craftedRecipeId = rawMarker.craftedRecipeId as string | undefined;
       // The shared tamper ceiling (bags.ts instancedCountCap, also applied to
       // the carried-inventory hydration in Sim.addPlayer): merge-legal stack
       // cap for a counted instanced slot, 1 for a charge-bearing payload, and

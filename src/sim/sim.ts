@@ -2773,6 +2773,12 @@ export class Sim {
         // could salvage it (the fix-round review caught the two arms
         // disagreeing on exactly that blob). A refusal drops silently, same
         // as the equip arm's anti-tamper rule.
+        // The marker bound runs BEFORE the rift block: the refusal arm below
+        // continues past the rest of this iteration, and the fix-wave review
+        // proved a 100,000-char marker riding a refused-rift row through that
+        // skip while the diagnostic line silently named every drop but this
+        // one. Hoisting is the durable shape against the continue.
+        boundCraftedRecipeIdOnLoad(slot, droppedInstanceJunk, 'bag');
         if (slot.instance?.rift) {
           const rebuilt = sanitizeRiftGearInstance(slot.itemId, slot.instance, player.id);
           if (rebuilt) slot.instance = rebuilt;
@@ -2781,7 +2787,6 @@ export class Sim {
             continue;
           }
         }
-        boundCraftedRecipeIdOnLoad(slot, droppedInstanceJunk, 'bag');
         // The payload bound covers BAGS too (the review round: the mint sites
         // put signed instances into bags in the common case, so an
         // equipment-only clamp missed the container that carries most of

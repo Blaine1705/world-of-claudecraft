@@ -15,8 +15,10 @@
 //      chest, legs, gloves). These were the first consumer of arcane_shard,
 //      the material an epic/legendary disenchant yields
 //      (DISENCHANT_MATERIAL_BY_QUALITY in ../professions/enchanting.ts); the
-//      packet's two tool-effect charm recipes (content/recipes.ts, 5 shards
-//      each) are the other sinks, so shards spend three ways now.
+//      packet added three more: the two tool-effect charm recipes
+//      (content/recipes.ts, 5 shards each, one-time) and the repeatable
+//      tool-effect RECHARGE priced at the shard rung for an epic tool
+//      (professions/tools.ts), so shards spend four ways now.
 // Magnitude convention (the finishing-bonus sizing, tuned against the level-20
 // BiS gear budgets): a full set of enchants is roughly the last 15 to 25
 // percent on top of best gear per stat axis, never a gear tier of its own
@@ -310,9 +312,9 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
 
   // --- Greater tier: the top-end enchants on the highest-impact slots, one of
-  // the three arcane_shard sinks (the two charm recipes are the others). Each
-  // costs 1 shard plus arcane_essence; a modest step up on the same axis as
-  // its base. ---
+  // the four arcane_shard sinks (the two charm recipes and the epic-rung
+  // tool-effect recharge are the others). Each costs 1 shard plus
+  // arcane_essence; a modest step up on the same axis as its base. ---
   enchant_weapon_greater_might: {
     id: 'enchant_weapon_greater_might',
     name: 'Enchant Weapon - Greater Might',

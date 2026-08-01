@@ -20,6 +20,7 @@ import {
   moveBetweenContainers,
   sanitizeBankState,
 } from '../src/sim/bank';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type {
@@ -1637,33 +1638,57 @@ describe('the instanced move keeps the slot-level crafted marker (round 5)', () 
     // equipment: instance holds bind data, the marker rides the slot).
     const source: import('../src/sim/types').InvSlot[] = [
       {
-        itemId: 'prowlhide_jerkin',
+        itemId: 'eastbrook_arming_sword',
         count: 1,
         instance: { boundTo: 41 },
-        craftedRecipeId: 'recipe_prowlhide_jerkin',
+        craftedRecipeId: 'recipe_eastbrook_arming_sword',
       },
     ];
     const dest: import('../src/sim/types').InvSlot[] = [];
     const r = moveBetweenContainers(source, 0, undefined, dest, 24);
     expect(r.moved).toBe(1);
     expect(dest[0]).toEqual({
-      itemId: 'prowlhide_jerkin',
+      itemId: 'eastbrook_arming_sword',
       count: 1,
       instance: { boundTo: 41 },
-      craftedRecipeId: 'recipe_prowlhide_jerkin',
+      craftedRecipeId: 'recipe_eastbrook_arming_sword',
     });
     // And back out, still intact.
     const home: import('../src/sim/types').InvSlot[] = [];
     const r2 = moveBetweenContainers(dest, 0, undefined, home, 24);
     expect(r2.moved).toBe(1);
-    expect(home[0]?.craftedRecipeId).toBe('recipe_prowlhide_jerkin');
+    expect(home[0]?.craftedRecipeId).toBe('recipe_eastbrook_arming_sword');
     // The merge predicate still separates marked from unmarked: an unmarked
     // byte-equal instanced stack does not absorb the marked one.
     const mixed: import('../src/sim/types').InvSlot[] = [
-      { itemId: 'prowlhide_jerkin', count: 1, instance: { boundTo: 41 } },
+      { itemId: 'eastbrook_arming_sword', count: 1, instance: { boundTo: 41 } },
     ];
     const r3 = moveBetweenContainers(home, 0, undefined, mixed, 24);
     expect(r3.moved).toBe(1);
     expect(mixed).toHaveLength(2);
+    // Existence arm: the fixture pair is real shipped content, so a rename
+    // cannot leave this test exercising the unknown-item fallback.
+    expect(ITEMS.eastbrook_arming_sword).toBeTruthy();
+    expect(ALL_RECIPES.some((r) => r.id === 'recipe_eastbrook_arming_sword')).toBe(true);
+  });
+
+  it('a marked instanced slot does not count an unmarked stack as room (the stricter fit)', () => {
+    // The user-visible half of threading the marker through countFit: on a
+    // FULL destination whose only same-item stack is unmarked, the deposit
+    // now refuses no_fit instead of laundering the marker into that stack.
+    const dest: import('../src/sim/types').InvSlot[] = [
+      { itemId: 'eastbrook_arming_sword', count: 1, instance: { boundTo: 41 } },
+    ];
+    const source: import('../src/sim/types').InvSlot[] = [
+      {
+        itemId: 'eastbrook_arming_sword',
+        count: 1,
+        instance: { boundTo: 41 },
+        craftedRecipeId: 'recipe_eastbrook_arming_sword',
+      },
+    ];
+    const r = moveBetweenContainers(source, 0, undefined, dest, 1); // capacity 1: full
+    expect(r).toEqual({ moved: 0, refusal: 'no_fit' });
+    expect(source).toHaveLength(1); // all-or-nothing: nothing moved
   });
 });
