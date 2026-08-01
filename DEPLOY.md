@@ -290,10 +290,15 @@ For off-box safety, sync the directory to S3 occasionally:
     anomaly to the bot detector and spending a rate-limit token. The
     professions tuning packet itself adds TWO commands, slot_tool_effect and
     recharge_tool_effect, neither dev-gated, both wired to shipped
-    professions-window buttons; on this leg those buttons stay unreachable
-    for an ordinary player because an old server never mints a charm and
-    never sends the tslot rows the buttons render from, so only a hand-built
-    frame spends tokens through them. The v0.32.0 expansion the branch
+    professions-window buttons; on the FORWARD leg those buttons stay
+    unreachable for an ordinary player because an old server never mints a
+    charm and never sends the tslot rows the buttons render from, so only a
+    hand-built frame spends tokens through them. On a ROLLBACK leg the
+    premise flips: charms already crafted survive in bags (the pre-packet
+    loader keeps unknown-id slots as dormant data), so the slot buttons
+    render from real inventory and an ordinary click spends rate-limit
+    tokens and logs anomalies against the rolled-back server until the
+    packet server returns. The v0.32.0 expansion the branch
     merged with adds eleven more commands, none dev-gated, of which FOUR are
     reachable from the shipped client's own surfaces: the mount key, the two
     race controls, and the Settings unstuck action. On this leg an ordinary
