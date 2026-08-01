@@ -144,16 +144,26 @@ describeDb('discord set-based statements (real Postgres)', () => {
       // The phase's biggest database win, proved rather than asserted: the old
       // loop wrote a tuple for every member on every sweep.
       //
-      // xmin is the decisive evidence, and it is only decisive when it is sampled
-      // ACROSS the write. An UPDATE that rewrites a row stamps the new tuple with
-      // a new inserting-transaction id, so a no-op push must leave xmin exactly
-      // where it was. Sampling it twice in a row AFTER the push (as an earlier
-      // draft of this test did) compares the value against itself with nothing in
-      // between and can never fail, the constant-self-comparison trap. Likewise
-      // pg_stat_xact_user_tables is deliberately NOT used: it reports only the
-      // CURRENT transaction's activity, and every pool.query here is its own
-      // autocommit transaction, so both readings are always zero whatever the
-      // statement did.
+      // WHICH ASSERTION IS LOAD-BEARING, stated plainly because an earlier draft
+      // of this comment got it wrong. `changed` is the decisive one: it is not a
+      // counter kept beside the write, it IS count(*) over the UPDATE's RETURNING,
+      // so no mutation of this statement can make a row rewrite while `changed`
+      // stays 0. Mutation-checked in Phase 4 QA: stripping the UPDATE's predicate
+      // reds the `changed` line, and it reds FIRST, before either xmin line runs.
+      //
+      // The xmin pair is therefore DEFENSE IN DEPTH, kept deliberately rather than
+      // mistaken for the proof. It checks the tuple version directly, so it is the
+      // only thing here that would catch a rewrite arriving from OUTSIDE this
+      // statement (a trigger, a second statement added later, an ON UPDATE side
+      // effect), which `changed` by construction cannot see. It is also sampled
+      // ACROSS the push rather than twice afterwards: two consecutive reads with
+      // nothing in between, as the first draft had, compare a value with itself
+      // and can never fail.
+      //
+      // pg_stat_xact_user_tables is deliberately NOT used at all: it reports only
+      // the CURRENT transaction's activity, and every pool.query here is its own
+      // autocommit transaction, so both readings are zero whatever the statement
+      // did. That pin was removed rather than repaired.
       await seedLink(1, 'identical', {
         username: 'Same',
         joinedAt: '2023-11-14T22:13:20.000Z',
