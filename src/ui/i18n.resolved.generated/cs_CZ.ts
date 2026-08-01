@@ -6442,6 +6442,8 @@ export const cs_CZ: EnTranslations = {
       "joinParty": "Vstoupit do skupiny",
       "guildInvite": "{name} tě zve do cechu {guild}.",
       "joinGuild": "Vstoupit do cechu",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} s tebou chce obchodovat.",
       "openTrade": "Otevřít obchod",
       "duelRequest": "{name} tě vyzval(a) k duelu!",

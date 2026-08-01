@@ -263,6 +263,9 @@ const hudStringsEn = {
       joinParty: 'Join Party',
       guildInvite: '{name} invites you to join {guild}.',
       joinGuild: 'Join Guild',
+      guildInviteCancelled:
+        'A pending guild invitation was cancelled because the guild was renamed.',
+      guildRenamed: 'Your guild has been renamed to {name} by the moderation team.',
       tradeRequest: '{name} wants to trade with you.',
       openTrade: 'Open Trade',
       duelRequest: '{name} has challenged you to a duel!',

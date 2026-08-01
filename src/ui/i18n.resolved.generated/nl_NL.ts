@@ -6442,6 +6442,8 @@ export const nl_NL: EnTranslations = {
       "joinParty": "Groep betreden",
       "guildInvite": "{name} nodigt je uit om lid te worden van {guild}.",
       "joinGuild": "Gilde betreden",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} wil met je handelen.",
       "openTrade": "Handel openen",
       "duelRequest": "{name} heeft je uitgedaagd tot een duel!",

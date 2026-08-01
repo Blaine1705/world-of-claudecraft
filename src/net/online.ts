@@ -2212,6 +2212,7 @@ export class ClientWorld implements IWorld {
         this.applyChatFlairEvent(ev as SimEvent);
         this.applyUnstuckEvent(ev as SimEvent);
         this.applyPrestigeEvent(ev as SimEvent);
+        this.applyGuildRenamedEvent(ev as SimEvent);
         this.eventQueue.push(ev as SimEvent);
       }
       return;
@@ -2288,6 +2289,18 @@ export class ClientWorld implements IWorld {
     const v = this.socialDirty;
     this.socialDirty = false;
     return v;
+  }
+
+  private applyGuildRenamedEvent(ev: SimEvent): void {
+    if (
+      ev.type !== 'guildRenamed' ||
+      !this.socialInfo?.guild ||
+      this.socialInfo.guild.id !== ev.guildId
+    ) {
+      return;
+    }
+    this.socialInfo.guild.name = ev.newName;
+    this.socialDirty = true;
   }
 
   consumeProfanityChanged(): boolean {

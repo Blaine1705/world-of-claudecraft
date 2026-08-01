@@ -6442,6 +6442,8 @@ export const ru_RU: EnTranslations = {
       "joinParty": "Вступить в группу",
       "guildInvite": "{name} приглашает вас в {guild}.",
       "joinGuild": "Вступить в гильдию",
+      "guildInviteCancelled": "Ожидающее приглашение в гильдию отменено, потому что гильдия была переименована.",
+      "guildRenamed": "Команда модерации переименовала вашу гильдию в {name}.",
       "tradeRequest": "{name} хочет торговать с вами.",
       "openTrade": "Открыть обмен",
       "duelRequest": "{name} вызвал вас на дуэль!",

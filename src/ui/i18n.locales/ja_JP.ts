@@ -1886,6 +1886,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.joinParty': 'パーティに参加',
   'hud.prompts.guildInvite': '{name}があなたを{guild}に招待しています。',
   'hud.prompts.joinGuild': 'ギルドに参加',
+  'hud.prompts.guildInviteCancelled':
+    'ギルド名が変更されたため、保留中のギルド招待は取り消されました。',
+  'hud.prompts.guildRenamed': 'あなたのギルドは運営チームによって{name}に改名されました。',
   'hud.prompts.tradeRequest': '{name}が取引を希望しています。',
   'hud.prompts.openTrade': '取引を開く',
   'hud.prompts.duelRequest': '{name}があなたに決闘を申し込みました！',

@@ -6442,6 +6442,8 @@ export const tr_TR: EnTranslations = {
       "joinParty": "Gruba Katıl",
       "guildInvite": "{name} seni {guild} loncasına katılmaya davet ediyor.",
       "joinGuild": "Loncaya Katıl",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} seninle takas yapmak istiyor.",
       "openTrade": "Takas Aç",
       "duelRequest": "{name} seni bir düelloya davet etti!",

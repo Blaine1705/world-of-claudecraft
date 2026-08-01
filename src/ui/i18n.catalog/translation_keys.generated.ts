@@ -5848,6 +5848,8 @@ export type TranslationKeyFlat =
   | 'hud.prompts.decline'
   | 'hud.prompts.duelRequest'
   | 'hud.prompts.guildInvite'
+  | 'hud.prompts.guildInviteCancelled'
+  | 'hud.prompts.guildRenamed'
   | 'hud.prompts.joinGuild'
   | 'hud.prompts.joinParty'
   | 'hud.prompts.openTrade'
