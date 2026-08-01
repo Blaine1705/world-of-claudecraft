@@ -4,7 +4,7 @@
 
 | Phase | Status | PR | Notes |
 |---|---|---|---|
-| 1 Fixed-cost waste | NOT STARTED | | Lands packet + lint/concurrency/playwright |
+| 1 Fixed-cost waste | IN PROGRESS | | Shallow lint, concurrency, Playwright cache landed; draft PR next |
 | 1 QA | NOT STARTED | | |
 | 2 Shard count | NOT STARTED | | Measure N, lock, apply |
 | 2 QA | NOT STARTED | | Wall ≤ 8 min bar |
@@ -25,14 +25,20 @@ Append-only. Each row: date, phase, run id, wall (s), worst shard (s), N, notes.
 | 2026-08-01 | baseline | 30704449673 | 853 | 776 | 4 | PR green, vendor stack |
 | 2026-08-01 | baseline | 30703789135 | 702 | 573 | 4 | main push green |
 
+### Phase 1 lint timing (checkout step seconds; target ≤ 40s checkout, ≤ 90s job)
+
+| Date | Run | Lint checkout s | Lint job s | Notes |
+|---|---|---|---|---|
+| 2026-08-01 | (pending first CI after push) | | | Fill after draft PR CI runs |
+
 ## Phase 1 checklist
 
-- [ ] Worktree off latest release/**
-- [ ] Lint: no `fetch-depth: 0`; base ref still correct for PR and push
-- [ ] Concurrency cancel-in-progress for PRs; release isolated (D4)
-- [ ] Playwright Chromium cache on browser-gate
-- [ ] `tests/ci_workflow.test.ts` pins updated same commits
-- [ ] `docs/ci-speed/**` committed
+- [x] Worktree off latest release/**
+- [x] Lint: no `fetch-depth: 0`; base ref still correct for PR and push
+- [x] Concurrency cancel-in-progress for PRs; release isolated (D4)
+- [x] Playwright Chromium cache on browser-gate
+- [x] `tests/ci_workflow.test.ts` pins updated same commits
+- [x] `docs/ci-speed/**` committed
 - [ ] Three runs: lint checkout ≤ 40s, job ≤ 90s typical
 - [ ] Draft PR opened
 - [ ] Phase 1 QA PASS

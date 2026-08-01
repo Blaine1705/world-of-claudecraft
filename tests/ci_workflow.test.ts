@@ -35,6 +35,38 @@ describe('CI workflow parity', () => {
     expect(gate).toContain("['browser regressions', 'npm', ['run', 'test:browser']]");
   });
 
+  it('keeps lint shallow, cancels superseded PR runs, and caches Playwright Chromium', () => {
+    // D12: full-history checkout was pure waste for biome --changed --since.
+    // The base commit is fetched with --depth=1 in the determine-base step.
+    const lint = jobSource('lint');
+    // Fail if the lint checkout reintroduces a full-history with: block.
+    expect(lint).not.toMatch(
+      /Check out repository[\s\S]*?uses: actions\/checkout@[^\n]+\n\s+with:\n\s+fetch-depth:\s*0/,
+    );
+    expect(lint).not.toMatch(/^\s+fetch-depth:\s*0\s*$/m);
+    expect(lint).toContain('git fetch --no-tags --depth=1 origin');
+    expect(lint).toContain('npx @biomejs/biome ci --changed --since=');
+    // Push arm must still resolve a base without reintroducing full history:
+    // either the pre-push tip, HEAD~1, or the default branch tip.
+    expect(lint).toContain('BEFORE_SHA');
+    expect(lint).toContain('DEFAULT_BRANCH');
+
+    // D4: workflow-level concurrency cancels in-progress runs; group key
+    // includes event name and PR number/ref so release work stays isolated.
+    expect(workflow).toMatch(/\nconcurrency:\n {2}group:/);
+    expect(workflow).toContain('cancel-in-progress: true');
+    expect(workflow).toContain('github.event_name');
+    expect(workflow).toContain('github.event.pull_request.number || github.ref');
+
+    // Browser-gate reuses Chromium via actions/cache keyed on Playwright version.
+    const browserGate = jobSource('browser-gate');
+    expect(browserGate).toContain('Cache Playwright Chromium browsers');
+    expect(browserGate).toContain('actions/cache@');
+    expect(browserGate).toContain('~/.cache/ms-playwright');
+    expect(browserGate).toContain("require('playwright/package.json').version");
+    expect(browserGate).toContain('run: npx playwright install --with-deps chromium');
+  });
+
   it('posts the i18n coverage summary and diffs the committed artifacts in both jobs', () => {
     // The job-summary step is the out-of-band audit trail that replaced the
     // committed src/ui/i18n.status.summary.json; deleting it would silently

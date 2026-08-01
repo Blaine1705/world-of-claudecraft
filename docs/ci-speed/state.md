@@ -1,13 +1,12 @@
 # State: CI Speed (cross-phase cheat sheet)
 
-**Current phase:** Phase 1 NOT STARTED. Packet authored 2026-08-01 on
-`feature/ci-speed` / worktree
-`/home/fernandoramirez/Documents/world-of-claudecraft-ci-speed` from
-`origin/release/v0.34.0` at `94f5ac63d`.
+**Current phase:** Phase 1 IN PROGRESS (implementation landed; draft PR + lint
+timing + Phase 1 QA remain). Worktree
+`/home/fernandoramirez/Documents/world-of-claudecraft-ci-speed` on
+`feature/ci-speed`, based on `origin/release/v0.34.0` at `94f5ac63d`.
 
-**Next action:** start Phase 1 (`phase-01-fixed-cost-waste.md`) on a fresh
-worktree off the **latest** `release/**` tip (re-fetch; do not trust this
-header's tip).
+**Next action:** open/keep the draft PR, record three lint checkout timings
+from CI, then run Phase 1 QA (`phase-01-qa.md`).
 
 ## Locked decisions
 
@@ -123,6 +122,11 @@ header's tip).
 
 ## Resume point
 
-- Packet docs exist only in the planning worktree until Phase 1 merges.
-- No implementation commits yet.
-- First executable step: Phase 1 starter prompt.
+- Phase 1 code: shallow lint checkout (no `fetch-depth: 0`), workflow
+  concurrency with `cancel-in-progress: true` (group =
+  workflow+event_name+PR/ref), Playwright Chromium cache on browser-gate
+  keyed on `playwright` package version, pins in `tests/ci_workflow.test.ts`.
+- Still open for Phase 1: three-run lint timing in progress.md, draft PR,
+  Phase 1 QA PASS.
+- Local proof: `biome ci --changed --since=<merge-base-sha>` succeeds without
+  full history.
