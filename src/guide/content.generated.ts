@@ -382,6 +382,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Jawcrack"
       },
       {
+        "id": "berserker_rage",
+        "name": "Seething Fury"
+      },
+      {
         "id": "execute",
         "name": "Early Grave"
       },

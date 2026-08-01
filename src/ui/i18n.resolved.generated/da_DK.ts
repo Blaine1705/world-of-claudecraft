@@ -923,6 +923,23 @@ export const da_DK: EnTranslations = {
       "separate": "Adskil {meter}",
       "regroup": "Saml {meter} igen"
     },
+    "targetAuras": {
+      "title": "Målets auraer",
+      "keybindLabel": "Målets forstærkninger og svækkelser",
+      "all": "Alle",
+      "debuffs": "Svækkelser",
+      "buffs": "Forstærkninger",
+      "unlock": "Flyt vinduet med målets auraer",
+      "lock": "Lås vinduet med målets auraer",
+      "configureRows": "Konfigurer målets auraer",
+      "fewerRows": "Foretræk færre rækker med auraer",
+      "moreRows": "Foretræk flere rækker med auraer",
+      "visibleRows": "Foretrukne rækker med auraer: {count}",
+      "showSources": "Vis aurakilder",
+      "hideSources": "Skjul aurakilder",
+      "ownAura": "Din aura",
+      "opacity": "Auraernes uigennemsigtighed: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Kæledyret har fuldt helbred",
       "disabledNoFood": "Ingen mad i dine tasker vil hele dit kæledyr"
@@ -966,7 +983,7 @@ export const da_DK: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage Skyggehop-Tudsen",
       "name_stormfeather_griffin": "Himmelrækkende Stormfjer",
       "name_thunderstrut_gobbler": "Tordenspanker den Store Kalkun",
-      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
+      "name_terrorspark_groundshaker": "Skrækgnist, jordrysteren",
       "desc_valorsteed": "En hårdfør, sikker ganger, der giver øget rejsehastighed.",
       "desc_grag_bear": "En hårdfør, sikker bjørn, der giver øget rejsehastighed.",
       "desc_stalkglider_snail": "En robust, langsomt forbrændende snegl, der giver øget rejsehastighed.",
@@ -974,7 +991,7 @@ export const da_DK: EnTranslations = {
       "desc_shadowjump_toad": "En enorm, sikker kæmpetudse, trænet i lynhurtige skyggehop, der dækker ethvert terræn.",
       "desc_stormfeather_griffin": "En kongelig stormgrif, der bevæger sig hen over jorden på runebeslåede kløer, med sammenfoldede vinger.",
       "desc_thunderstrut_gobbler": "En kolossal, stormudklækket kalkun, der spankulerer ned fra Den Opvågnende Tinde, med halen udfoldet som en tordensky.",
-      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
+      "desc_terrorspark_groundshaker": "En kompakt panseret maskine med tunge larvebånd, en grovkalibret kanon og en saddel bygget til frygtløse førere."
     },
     "mountTraining": {
       "mountPrompt": "Tryk på {key} for at stige op på trænings-Modgangeren.",
@@ -1283,48 +1300,48 @@ export const da_DK: EnTranslations = {
       }
     },
     "auraOverlay": {
-      "title": "Auras",
-      "currentClass": "Current class: {class}",
-      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
-      "noProcs": "No supported proc is available for this character.",
-      "enabled": "Show Aura",
-      "icon": "Spell Icon",
-      "arcs": "Side Crescents",
-      "groundRing": "Ground Ring",
-      "groundRingSpellOrder": "Ground Ring: Spell Order",
-      "crescentsSpellOrder": "Side Crescents: Spell Order",
-      "size": "Size",
-      "iconSize": "Icon Size",
-      "crescentBlockSize": "Crescent Block Size",
-      "groundRingBlockSize": "Ground Ring Block Size",
-      "opacity": "Opacity",
-      "color": "Color",
-      "allOn": "All On",
-      "allOff": "All Off",
-      "reposition": "Setup Positions",
-      "positioning": "Positioning: {aura}",
+      "title": "Auraer",
+      "currentClass": "Nuværende klasse: {class}",
+      "previewHint": "Brug Opsæt positioner til at flytte en aura uden at dække menuen.",
+      "noProcs": "Der er ingen understøttet proc tilgængelig for denne karakter.",
+      "enabled": "Vis aura",
+      "icon": "Besværgelsesikon",
+      "arcs": "Sidehalvmåner",
+      "groundRing": "Jordring",
+      "groundRingSpellOrder": "Jordring: besværgelsesrækkefølge",
+      "crescentsSpellOrder": "Sidehalvmåner: besværgelsesrækkefølge",
+      "size": "Størrelse",
+      "iconSize": "Ikonstørrelse",
+      "crescentBlockSize": "Blokstørrelse for halvmåne",
+      "groundRingBlockSize": "Blokstørrelse for jordring",
+      "opacity": "Uigennemsigtighed",
+      "color": "Farve",
+      "allOn": "Slå alle til",
+      "allOff": "Slå alle fra",
+      "reposition": "Opsæt positioner",
+      "positioning": "Placering: {aura}",
       "selectAura": "Aura",
-      "done": "Done",
-      "moveLeft": "Move Left",
-      "moveUp": "Move Up",
-      "moveDown": "Move Down",
-      "moveRight": "Move Right",
-      "moveEarlier": "Move spell inward",
-      "moveLater": "Move spell outward",
-      "screenPosition": "Screen Position",
-      "spellOrder": "Spell Order",
-      "reset": "Reset Position",
-      "spellPosition": "Spell order {position} / {count}",
+      "done": "Færdig",
+      "moveLeft": "Flyt til venstre",
+      "moveUp": "Flyt op",
+      "moveDown": "Flyt ned",
+      "moveRight": "Flyt til højre",
+      "moveEarlier": "Flyt besværgelsen indad",
+      "moveLater": "Flyt besværgelsen udad",
+      "screenPosition": "Skærmposition",
+      "spellOrder": "Besværgelsesrækkefølge",
+      "reset": "Nulstil position",
+      "spellPosition": "Besværgelsesrækkefølge {position} / {count}",
       "procs": {
-        "revenge": "Revenge!",
-        "battleTrance": "Battle Trance",
-        "overpowerCharge": "Redhand Empowerment",
-        "suddenDeath": "Sudden Death",
-        "victoryRush": "Victory Rush",
-        "enrage": "Mayhem: Enraged",
-        "heatingUp": "Heating Up",
-        "arcaneCharge": "Arcane Charges",
-        "aetherRush": "Aether Rush"
+        "revenge": "Hævn!",
+        "battleTrance": "Kamptrance",
+        "overpowerCharge": "Rødhånd-forstærkning",
+        "suddenDeath": "Pludselig Død",
+        "victoryRush": "Sejrsrus",
+        "enrage": "Amok: Rasende",
+        "heatingUp": "Opvarmning",
+        "arcaneCharge": "Arkane ladninger",
+        "aetherRush": "Æterstrøm"
       }
     },
     "playerCard": {
@@ -2130,6 +2147,14 @@ export const da_DK: EnTranslations = {
       "linked": "Tilknyttet Steam-kontoen {id}",
       "benefits": "Tilknyt din Steam-konto fra skrivebordsappen for at spejle de bedrifter, du opnår, som Steam-præstationer.",
       "noTicket": "Steam udstedte ingen tilknytningsbillet. Start Steam, og prøv så igen."
+    },
+    "epic": {
+      "title": "Epic",
+      "link": "Tilknyt Epic",
+      "unlink": "Fjern Epic-tilknytning",
+      "linked": "Tilknyttet Epic-kontoen {id}",
+      "benefits": "Tilknyt din Epic-konto fra Epics skrivebordsapp for at spejle de bedrifter, du optjener, som Epic-præstationer.",
+      "noProof": "Epic leverede ikke et tilknytningsbevis. Start fra Epic Games Store, og prøv igen."
     },
     "mailbox": {
       "title": "Postkasse",
@@ -3021,6 +3046,14 @@ export const da_DK: EnTranslations = {
       "already_linked": "Din konto har allerede en tilknyttet Steam-konto.",
       "account_taken": "Den Steam-konto er allerede knyttet til en anden konto.",
       "upstream": "Steam svarede ikke. Prøv igen om et øjeblik."
+    },
+    "epic": {
+      "disabled": "Epic-tilknytning er ikke tilgængelig lige nu.",
+      "invalid_token": "Epic kunne ikke bekræfte denne tilknytningsanmodning. Prøv igen fra skrivebordsappen.",
+      "banned": "Denne Epic-konto kan ikke tilknyttes.",
+      "already_linked": "Din konto har allerede en tilknyttet Epic-konto.",
+      "account_taken": "Denne Epic-konto er allerede knyttet til en anden konto.",
+      "upstream": "Epic svarede ikke. Prøv igen om et øjeblik."
     },
     "wallet": {
       "handoff_invalid": "Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen."
@@ -6282,11 +6315,15 @@ export const da_DK: EnTranslations = {
       "graphicsPresetMedium": "Mellem",
       "graphicsPresetHigh": "Høj",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Ekstrem",
       "graphicsPresetAdvanced": "Avanceret",
       "terrainDetail": "Terrændetalje",
       "foliageDensity": "Løvtæthed",
       "effectsQuality": "Effekter og lys",
       "shadowQuality": "Skyggekvalitet",
+      "surfaceDetail": "Overfladedetaljer",
+      "surfaceDetailBasic": "Basis",
+      "surfaceDetailFull": "Fuld",
       "terrainLow": "Lav",
       "terrainHigh": "Høj",
       "touchOpacity": "Berøringskontrollers uigennemsigtighed",
@@ -6463,6 +6500,7 @@ export const da_DK: EnTranslations = {
       "floatingDodge": "Undvigelse",
       "floatingParry": "Pareret",
       "floatingResist": "Modstået",
+      "floatingEvade": "Undgået",
       "floatingHealFull": "Fuld",
       "floatingHealAbsorbed": "Absorberet",
       "cannotMove": "Kan ikke bevæge dig!",
@@ -6475,6 +6513,7 @@ export const da_DK: EnTranslations = {
       "dodged": "Din {ability} undviges af {target}.",
       "parried": "Din {ability} pareres af {target}.",
       "resisted": "{target} modstår din {ability}.",
+      "evaded": "Din {ability} undgås af {target}.",
       "healSelf": "Din {ability} helbreder dig for {amount}.",
       "healSelfCrit": "Din {ability} helbreder dig kritisk for {amount}.",
       "healOther": "Din {ability} helbreder {target} for {amount}.",
@@ -7330,7 +7369,7 @@ export const da_DK: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Større usynlighed",
-        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
+        "description": "Forsvind i 20 sek., og fjern 2 effekter med skade over tid. Når usynligheden slutter, tager du 90% mindre skade i 2 sek. (magikertalent)"
       },
       "hot_streak": {
         "name": "Hed stime",
@@ -9702,6 +9741,18 @@ export const da_DK: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Hugtandskniv fra Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Hugtandherrens Bæstspyd"
+      },
+      "bloodmane_warleggings": {
+        "name": "Blodmanke-Krigsbenskinner"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Rankeklo-Snigebukser"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Solben-Ritualsarong"
+      },
       "thick_winter_pelt": {
         "name": "Tyk Vinterpels"
       },
@@ -9877,7 +9928,7 @@ export const da_DK: EnTranslations = {
         "name": "Artisan's Eye"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Ignition Key: Terrorspark Groundshaker"
+        "name": "Tændingsnøgle: Skrækgnist, jordrysteren"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
@@ -10454,6 +10505,24 @@ export const da_DK: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Ormekor-Håndomvikling"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Bassinsnigerens Tunika"
+      },
+      "verdant_heart_vestment": {
+        "name": "Grønhjerte-Klædning"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Solben-Ritualbrynje"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Bassinets Storhugtand"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Solben-Orakelkrone"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Blodmanke-Krigsbenbeskyttere"
       },
       "deathless_greatblade": {
         "name": "Udødelig Storklinge"

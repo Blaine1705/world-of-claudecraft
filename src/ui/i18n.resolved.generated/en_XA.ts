@@ -923,6 +923,23 @@ export const en_XA: EnTranslations = {
       "separate": "[Šéþáŕáţé {meter}]",
       "regroup": "[Ŕéĝŕóúþ {meter}]"
     },
+    "targetAuras": {
+      "title": "[Ţáŕĝéţ Áúŕáš]",
+      "keybindLabel": "[Ţáŕĝéţ Ɓúƒƒš áñð Ðéƀúƒƒš]",
+      "all": "[Áļļ]",
+      "debuffs": "[Ðéƀúƒƒš]",
+      "buffs": "[Ɓúƒƒš]",
+      "unlock": "[Ɱóʋé ţáŕĝéţ áúŕá ŵíñðóŵ]",
+      "lock": "[Ļóçķ ţáŕĝéţ áúŕá ŵíñðóŵ]",
+      "configureRows": "[Çóñƒíĝúŕé ţáŕĝéţ áúŕáš]",
+      "fewerRows": "[Þŕéƒéŕ ƒéŵéŕ áúŕá ŕóŵš]",
+      "moreRows": "[Þŕéƒéŕ ɱóŕé áúŕá ŕóŵš]",
+      "visibleRows": "[Þŕéƒéŕŕéð áúŕá ŕóŵš: {count}]",
+      "showSources": "[Šĥóŵ áúŕá šóúŕçéš]",
+      "hideSources": "[Ĥíðé áúŕá šóúŕçéš]",
+      "ownAura": "[Ýóúŕ áúŕá]",
+      "opacity": "[Áúŕá óþáçíţý: {percent}]"
+    },
     "petFeed": {
       "disabledFullHp": "[Þéţ íš áţ ƒúļļ ĥéáļţĥ]",
       "disabledNoFood": "[Ñó ƒóóð íñ ýóúŕ ƀáĝš ŵíļļ ĥéáļ ýóúŕ þéţ]"
@@ -2131,6 +2148,14 @@ export const en_XA: EnTranslations = {
       "benefits": "[Ļíñķ ýóúŕ Šţéáɱ áççóúñţ ƒŕóɱ ţĥé ðéšķţóþ áþþ ţó ɱíŕŕóŕ ţĥé ðééðš ýóú éáŕñ íñţó Šţéáɱ áçĥíéʋéɱéñţš.]",
       "noTicket": "[Šţéáɱ ðíð ñóţ þŕóʋíðé á ļíñķ ţíçķéţ. Šţáŕţ Šţéáɱ, ţĥéñ ţŕý áĝáíñ.]"
     },
+    "epic": {
+      "title": "[Éþíç]",
+      "link": "[Ļíñķ Éþíç]",
+      "unlink": "[Úñļíñķ Éþíç]",
+      "linked": "[Ļíñķéð ţó Éþíç áççóúñţ {id}]",
+      "benefits": "[Ļíñķ ýóúŕ Éþíç áççóúñţ ƒŕóɱ ţĥé Éþíç ðéšķţóþ áþþ ţó ɱíŕŕóŕ ţĥé ðééðš ýóú éáŕñ íñţó Éþíç áçĥíéʋéɱéñţš.]",
+      "noProof": "[Éþíç ðíð ñóţ þŕóʋíðé á ļíñķ þŕóóƒ. Ļáúñçĥ ƒŕóɱ ţĥé Éþíç Ĝáɱéš Šţóŕé, ţĥéñ ţŕý áĝáíñ.]"
+    },
     "mailbox": {
       "title": "[Ɱáíļƀóẋ]",
       "subtitle": "[Ţĥé Ŕáʋéñþóšţ]",
@@ -3021,6 +3046,14 @@ export const en_XA: EnTranslations = {
       "already_linked": "[Ýóúŕ áççóúñţ áļŕéáðý ĥáš á ļíñķéð Šţéáɱ áççóúñţ.]",
       "account_taken": "[Ţĥáţ Šţéáɱ áççóúñţ íš áļŕéáðý ļíñķéð ţó áñóţĥéŕ áççóúñţ.]",
       "upstream": "[Šţéáɱ ðíð ñóţ ŕéšþóñð. Ţŕý áĝáíñ íñ á ɱóɱéñţ.]"
+    },
+    "epic": {
+      "disabled": "[Éþíç ļíñķíñĝ íš ñóţ áʋáíļáƀļé ŕíĝĥţ ñóŵ.]",
+      "invalid_token": "[Éþíç çóúļð ñóţ ʋéŕíƒý ţĥíš ļíñķ ŕéɋúéšţ. Ţŕý áĝáíñ ƒŕóɱ ţĥé ðéšķţóþ áþþ.]",
+      "banned": "[Ţĥáţ Éþíç áççóúñţ çáññóţ ƀé ļíñķéð.]",
+      "already_linked": "[Ýóúŕ áççóúñţ áļŕéáðý ĥáš á ļíñķéð Éþíç áççóúñţ.]",
+      "account_taken": "[Ţĥáţ Éþíç áççóúñţ íš áļŕéáðý ļíñķéð ţó áñóţĥéŕ áççóúñţ.]",
+      "upstream": "[Éþíç ðíð ñóţ ŕéšþóñð. Ţŕý áĝáíñ íñ á ɱóɱéñţ.]"
     },
     "wallet": {
       "handoff_invalid": "[Ţĥáţ ŵáļļéţ áúţĥóŕížáţíóñ éẋþíŕéð óŕ çóúļð ñóţ ƀé ʋéŕíƒíéð. Ţŕý áĝáíñ.]"
@@ -6282,11 +6315,15 @@ export const en_XA: EnTranslations = {
       "graphicsPresetMedium": "[Ɱéðíúɱ]",
       "graphicsPresetHigh": "[Ĥíĝĥ]",
       "graphicsPresetUltra": "[Úļţŕá]",
+      "graphicsPresetInsane": "[Íñšáñé]",
       "graphicsPresetAdvanced": "[Áðʋáñçéð]",
       "terrainDetail": "[Ţéŕŕáíñ Ðéţáíļ]",
       "foliageDensity": "[Ƒóļíáĝé Ðéñšíţý]",
       "effectsQuality": "[Éƒƒéçţš & Ļíĝĥţíñĝ]",
       "shadowQuality": "[Šĥáðóŵ Ɋúáļíţý]",
+      "surfaceDetail": "[Šúŕƒáçé Ðéţáíļ]",
+      "surfaceDetailBasic": "[Ɓášíç]",
+      "surfaceDetailFull": "[Ƒúļļ]",
       "terrainLow": "[Ļóŵ]",
       "terrainHigh": "[Ĥíĝĥ]",
       "touchOpacity": "[Ţóúçĥ Çóñţŕóļš Óþáçíţý]",
@@ -6463,6 +6500,7 @@ export const en_XA: EnTranslations = {
       "floatingDodge": "[Ðóðĝé]",
       "floatingParry": "[Þáŕŕý]",
       "floatingResist": "[Ŕéšíšţ]",
+      "floatingEvade": "[Éʋáðé]",
       "floatingHealFull": "[Ƒúļļ]",
       "floatingHealAbsorbed": "[Áƀšóŕƀéð]",
       "cannotMove": "[Çáñ'ţ ɱóʋé!]",
@@ -6475,6 +6513,7 @@ export const en_XA: EnTranslations = {
       "dodged": "[Ýóúŕ {ability} íš ðóðĝéð ƀý {target}.]",
       "parried": "[Ýóúŕ {ability} íš þáŕŕíéð ƀý {target}.]",
       "resisted": "[Ýóúŕ {ability} íš ŕéšíšţéð ƀý {target}.]",
+      "evaded": "[Ýóúŕ {ability} íš éʋáðéð ƀý {target}.]",
       "healSelf": "[Ýóúŕ {ability} ĥéáļš ýóú ƒóŕ {amount}.]",
       "healSelfCrit": "[Ýóúŕ {ability} çŕíţíçáļļý ĥéáļš ýóú ƒóŕ {amount}.]",
       "healOther": "[Ýóúŕ {ability} ĥéáļš {target} ƒóŕ {amount}.]",
@@ -9702,6 +9741,18 @@ export const en_XA: EnTranslations = {
       "wildheart_fangknife": {
         "name": "[Ƒáñĝķñíƒé óƒ Žúļĝáŕ]"
       },
+      "fanglords_beastspear": {
+        "name": "[Ƒáñĝļóŕð'š Ɓéášţšþéáŕ]"
+      },
+      "bloodmane_warleggings": {
+        "name": "[Ɓļóóðɱáñé Ŵáŕļéĝĝíñĝš]"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "[Ʋíñéçļáŵ Šţáļķíñĝ Ɓŕééçĥéš]"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "[Šúñƀóñé Ŕíţúáļ Šáŕóñĝ]"
+      },
       "thick_winter_pelt": {
         "name": "[Ţĥíçķ Ŵíñţéŕ Þéļţ]"
       },
@@ -10454,6 +10505,24 @@ export const en_XA: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "[Ŵýŕɱçĥóíŕ Ĥáñðŵŕáþš]"
+      },
+      "basin_stalkers_tunic": {
+        "name": "[Ɓášíñ Šţáļķéŕ'š Ţúñíç]"
+      },
+      "verdant_heart_vestment": {
+        "name": "[Ʋéŕðáñţ-Ĥéáŕţ Ʋéšţɱéñţ]"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "[Šúñƀóñé Ŕíţúáļ Ĥáúƀéŕķ]"
+      },
+      "greatfang_of_the_basin": {
+        "name": "[Ĝŕéáţƒáñĝ óƒ ţĥé Ɓášíñ]"
+      },
+      "sunbone_oracles_crown": {
+        "name": "[Šúñƀóñé Óŕáçļé'š Çŕóŵñ]"
+      },
+      "bloodmane_war_legguards": {
+        "name": "[Ɓļóóðɱáñé Ŵáŕ-Ļéĝĝúáŕðš]"
       },
       "deathless_greatblade": {
         "name": "[Ðéáţĥļéšš Ĝŕéáţƀļáðé]"

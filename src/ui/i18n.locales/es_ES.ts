@@ -11,6 +11,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es_ES: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.tradeAlreadyTrading': 'Ese jugador ya está tradeando.',
   'hudChrome.emotes.question': '¿Tío?',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Sigue subiendo {craft}: {points} puntos más para Especializado, y los costes de materiales bajan.',
@@ -352,6 +353,11 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Tu probabilidad de rechazar por completo un ataque cuerpo a cuerpo frontal, sin recibir daño. Un golpe por la espalda no se puede rechazar.',
   'hud.combat.floatingParry': 'Rechazo',
   'hud.combat.parried': '{target} rechaza tu {ability}.',
+  'hud.combat.floatingEvade': 'Eludido',
+  'hud.combat.evaded': '{target} elude tu {ability}.',
   'hudChrome.options.mouseoverCast': 'Lanzar al pasar el ratón sobre los marcos de grupo',
   'hudChrome.options.showTargetOfTarget': 'Mostrar objetivo del objetivo',
+  'hud.errors.marketListBound': 'Este objeto está vinculado y no puede ponerse a la venta.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Este objeto está vinculado y no puede enviarse por correo.',
 };

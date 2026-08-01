@@ -7,6 +7,16 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ko_KR: Record<string, string> = {
+  'onlinePlayers.autoRefresh': '자동 새로 고침({minutes}분)',
+  'onlinePlayers.count': '{count}명 접속 중',
+  'onlinePlayers.countFiltered': '접속 중 {total}명 중 {shown}명',
+  'onlinePlayers.filteredEmpty': '이 검색과 일치하는 접속 중인 플레이어가 없습니다',
+  'onlinePlayers.loadFailed': '접속 중인 플레이어를 불러오지 못했습니다',
+  'onlinePlayers.loading': '접속 중인 플레이어 불러오는 중…',
+  'onlinePlayers.refresh': '새로 고침',
+  'onlinePlayers.searchLabel': '접속 중인 플레이어 검색',
+  'onlinePlayers.searchPlaceholder': '플레이어, 직업, 지역 검색…',
+  'onlinePlayers.sortHint': '열을 클릭하여 정렬',
   'detail.dailyRewardsActions': '일일 보상 운영 조치',
   'detail.dailyRewardsBan': '일일 보상 참여 금지',
   'detail.dailyRewardsBanReason': '일일 보상 금지 사유: {value}',

@@ -150,6 +150,11 @@ import {
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
 
+// The online mirror decodes terse legacy wire JSON. Runtime guards below narrow
+// individual fields as they are consumed; this alias keeps the decoder local.
+// biome-ignore lint/suspicious/noExplicitAny: legacy wire JSON is intentionally loose at the boundary.
+type LooseJson = any;
+
 interface ClientWireAura {
   id: string;
   name: string;
@@ -372,7 +377,7 @@ export class Api {
     }
   }
 
-  private async post(path: string, body: unknown, base = this.base): Promise<any> {
+  private async post<T = LooseJson>(path: string, body: unknown, base = this.base): Promise<T> {
     const res = await fetch(apiUrl(path, base), {
       method: 'POST',
       headers: {
@@ -383,19 +388,19 @@ export class Api {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw apiErrorFromBody(data, res.status);
-    return data;
+    return data as T;
   }
 
-  private async get(path: string): Promise<any> {
+  private async get<T = LooseJson>(path: string): Promise<T> {
     const res = await fetch(apiUrl(path, this.base), {
       headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw apiErrorFromBody(data, res.status);
-    return data;
+    return data as T;
   }
 
-  private async delete(path: string, body: unknown): Promise<any> {
+  private async delete<T = LooseJson>(path: string, body: unknown): Promise<T> {
     const res = await fetch(apiUrl(path, this.base), {
       method: 'DELETE',
       headers: {
@@ -406,7 +411,7 @@ export class Api {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw apiErrorFromBody(data, res.status);
-    return data;
+    return data as T;
   }
 
   async register(
@@ -953,12 +958,29 @@ export class Api {
     await this.delete('/api/github', {});
   }
 
+  // The /api/status capability adverts (steam, epic, dev commands) are read
+  // back to back on the same refresh paths, so concurrent reads collapse into
+  // ONE request. In-flight only, keyed by the realm base: nothing is memoized
+  // past settle, so every non-overlapping call still reads the server fresh,
+  // and a realm switch mid-flight never serves the old realm's document.
+  private statusDocInFlight: { base: string; doc: Promise<any> } | null = null;
+
+  private statusDoc(): Promise<any> {
+    const hit = this.statusDocInFlight;
+    if (hit !== null && hit.base === this.base) return hit.doc;
+    const doc = this.get('/api/status').finally(() => {
+      if (this.statusDocInFlight?.doc === doc) this.statusDocInFlight = null;
+    });
+    this.statusDocInFlight = { base: this.base, doc };
+    return doc;
+  }
+
   // ── Steam link (deed achievement mirror) ───────────────────────────────────
   // The public capability advert: whether this server has the Steam surface
   // lit. Read BEFORE any authed steam call so a dark server renders no link UI.
   async steamAdvert(): Promise<boolean> {
     try {
-      const data = await this.get('/api/status');
+      const data = await this.statusDoc();
       return (data.steam as { enabled?: boolean } | undefined)?.enabled === true;
     } catch {
       return false;
@@ -971,7 +993,7 @@ export class Api {
   // so a forged true opens an inert window. Fails closed on any error.
   async devCommandsAdvert(): Promise<boolean> {
     try {
-      const data = await this.get('/api/status');
+      const data = await this.statusDoc();
       return data.dev_commands === true;
     } catch {
       return false;
@@ -992,6 +1014,36 @@ export class Api {
   // Unlink Steam from the current account. Idempotent.
   async unlinkSteam(): Promise<void> {
     await this.delete('/api/steam/link', {});
+  }
+
+  // ── Epic link (deed achievement mirror) ────────────────────────────────────
+  // The public capability advert: whether this server has the Epic surface lit.
+  // Read BEFORE any authed epic call so a dark server renders no link UI (D3, D18).
+  // Rides the shared single-flight status read: the Steam and Epic refreshes
+  // run back to back on every login path, and one document serves both.
+  async epicAdvert(): Promise<boolean> {
+    try {
+      const data = await this.statusDoc();
+      return (data.epic as { enabled?: boolean } | undefined)?.enabled === true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Current account's Epic link status ({ enabled, linked, epicAccountId? }).
+  async epicStatus(): Promise<Record<string, unknown>> {
+    return this.get('/api/epic/status');
+  }
+
+  // Link via a desktop-shell proof; the server verifies it upstream and answers
+  // the verified id (never client-named; D11, D17).
+  async epicLink(proof: string): Promise<{ linked: boolean; epicAccountId: string }> {
+    return this.post('/api/epic/link', { proof });
+  }
+
+  // Unlink Epic from the current account. Idempotent.
+  async unlinkEpic(): Promise<void> {
+    await this.delete('/api/epic/link', {});
   }
 
   // ── Shareable player card + referrals ──────────────────────────────────────
@@ -1272,6 +1324,7 @@ function blankEntity(id: number): Entity {
     spawnPos: { x: 0, y: 0, z: 0 },
     leashAnchor: null,
     evadeStall: 0,
+    chaseStall: 0,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
@@ -1455,9 +1508,6 @@ export class ClientWorld implements IWorld {
     radius: number;
     expiresAtMs: number;
   }> = [];
-  // The online client never registers rift collision regions (the server owns
-  // collision); 0 keeps rift camera occlusion a no-op here.
-  readonly riftCollisionToken = 0;
   // Lockpicking: rebuilt from the lockpick* events (there is no snapshot field).
   // Holds only the fog-windowed cells the server discloses.
   lockpickState: LockpickView | null = null;
@@ -2045,10 +2095,10 @@ export class ClientWorld implements IWorld {
   }
 
   private onMessage(raw: string): void {
-    let msg: any;
+    let msg: LooseJson;
     const parseStart = performance.now();
     try {
-      msg = JSON.parse(raw);
+      msg = JSON.parse(raw) as LooseJson;
     } catch {
       return;
     }
@@ -2378,7 +2428,7 @@ export class ClientWorld implements IWorld {
     }
   }
 
-  private applySnapshot(snap: any): void {
+  private applySnapshot(snap: LooseJson): void {
     const now = performance.now();
     if (typeof this.spectating === 'string' && typeof snap.self?.id === 'number') {
       this.playerId = snap.self.id;
@@ -2473,7 +2523,7 @@ export class ClientWorld implements IWorld {
       return typeof aura.rem === 'number' && Number.isFinite(aura.rem) ? aura.rem : 0;
     };
 
-    const applyWire = (w: any): Entity | null => {
+    const applyWire = (w: LooseJson): Entity | null => {
       let e = this.entities.get(w.id);
       // identity fields ride only in "full" records: first sight and changes
       const hasIdentity = w.k !== undefined;
@@ -3250,7 +3300,7 @@ export class ClientWorld implements IWorld {
     // computeQuestState here exactly as it does server-side (the offline Sim
     // re-derives the same set from live PlayerMeta.questCadence).
     const cadenceBlocked =
-      identity && identity.cadenceBlockedQuests && identity.cadenceBlockedQuests.length > 0
+      identity?.cadenceBlockedQuests && identity.cadenceBlockedQuests.length > 0
         ? new Set(identity.cadenceBlockedQuests)
         : undefined;
     return optimisticQuestState(

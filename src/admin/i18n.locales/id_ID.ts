@@ -7,6 +7,16 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const id_ID: Record<string, string> = {
+  'onlinePlayers.autoRefresh': 'Segarkan otomatis ({minutes} mnt)',
+  'onlinePlayers.count': '{count} daring',
+  'onlinePlayers.countFiltered': '{shown} dari {total} daring',
+  'onlinePlayers.filteredEmpty': 'tidak ada pemain daring yang cocok dengan pencarian ini',
+  'onlinePlayers.loadFailed': 'gagal memuat pemain daring',
+  'onlinePlayers.loading': 'memuat pemain daring…',
+  'onlinePlayers.refresh': 'Segarkan',
+  'onlinePlayers.searchLabel': 'Cari pemain daring',
+  'onlinePlayers.searchPlaceholder': 'Cari pemain, kelas, zona…',
+  'onlinePlayers.sortHint': 'klik kolom untuk mengurutkan',
   'detail.dailyRewardsActions': 'Tindakan moderasi Hadiah Harian',
   'detail.dailyRewardsBan': 'Larang mengikuti Hadiah Harian',
   'detail.dailyRewardsBanReason': 'Alasan larangan Hadiah Harian: {value}',

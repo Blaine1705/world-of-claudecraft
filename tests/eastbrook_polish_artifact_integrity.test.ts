@@ -609,15 +609,15 @@ function readJsonFile<T>(filePath: string): T {
 }
 
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
-  '10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab';
+  '4d3ec4b5413f6db4b30939ce883d093875f3a29a0ff6dcb32140cbaa783217bf';
 const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '49b3aece9a2b42365e5b6d1e806c674a8818c4a7995c64e9db120c7ddc949bf5';
+  '1276ca6bb0f63f19cd8f76ee1f4999d616b2bb006c69152713ab58752de0f623';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'b3a49fd4fa887920af5de4b6fb93e2b9b3c6c0351e9a2ba00d6567e44083e88b';
+  '9d38235f6a16ce60925c0faa28567775cbdb640f1749686c866ffeb9e5a10cb9';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1474,14 +1474,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // The release/v0.33.0 resync of the draw-call diet branch moved the
-    // runtimeRender.renderer.sha256 leaf (census hooks and the diet's batching
-    // seams merged over the streaming and cull deltas), so the composite
-    // polish provenance followed, and this seal follows the composite. Every
-    // measured value (frame timings, draw stats, triangle and scenario
+    // The graphics overhaul changed the fingerprinted runtimeRender inputs, so
+    // the composite polish provenance moved and this seal follows the composite.
+    // Every measured value (frame timings, draw stats, triangle and scenario
     // numbers) is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '99875450e29ab96bc623ae8640763199c50ec7241595039c4e7d405540964840',
+      '7c4dac9b0aca7cb191d8ab90feb0eb987eba9b1dcb70c4ff3cfee7e34aaeef26',
     );
   });
 

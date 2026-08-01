@@ -923,6 +923,23 @@ export const tr_TR: EnTranslations = {
       "separate": "Ayır: {meter}",
       "regroup": "Yeniden grupla: {meter}"
     },
+    "targetAuras": {
+      "title": "Hedef Auraları",
+      "keybindLabel": "Hedefin Takviyeleri ve Zayıflatmaları",
+      "all": "Tümü",
+      "debuffs": "Zayıflatmalar",
+      "buffs": "Takviyeler",
+      "unlock": "Hedef aura penceresini taşı",
+      "lock": "Hedef aura penceresini kilitle",
+      "configureRows": "Hedef auralarını yapılandır",
+      "fewerRows": "Daha az aura satırı tercih et",
+      "moreRows": "Daha fazla aura satırı tercih et",
+      "visibleRows": "Tercih edilen aura satırı: {count}",
+      "showSources": "Aura kaynaklarını göster",
+      "hideSources": "Aura kaynaklarını gizle",
+      "ownAura": "Auran",
+      "opacity": "Aura saydamlığı: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Evcil hayvanın canı dolu",
       "disabledNoFood": "Çantalarında evcil hayvanını iyileştirecek yiyecek yok"
@@ -966,7 +983,7 @@ export const tr_TR: EnTranslations = {
       "name_shadowjump_toad": "Gölge Sıçrayan Kurbağa Kama-Kage",
       "name_stormfeather_griffin": "Gökyüzü Erişimli Fırtınatüy",
       "name_thunderstrut_gobbler": "Gürlemeadım, Büyük Hindi",
-      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
+      "name_terrorspark_groundshaker": "Dehşetkıvılcım, Yer Sarsan",
       "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
       "desc_grag_bear": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.",
       "desc_stalkglider_snail": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve yavaş yanan bir salyangoz.",
@@ -974,7 +991,7 @@ export const tr_TR: EnTranslations = {
       "desc_shadowjump_toad": "Her arazi türünü aşan, şimşek hızındaki gölgeli sıçramalarla eğitilmiş, dev ve sağlam adımlı bir kurbağa.",
       "desc_stormfeather_griffin": "Rün nallı pençeleriyle yerde süzülen, kanatları katlı, asil bir fırtına grifonu.",
       "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi.",
-      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
+      "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine."
     },
     "mountTraining": {
       "mountPrompt": "Eğitim Yiğit Küheylanına binmek için {key} tuşuna bas.",
@@ -1283,48 +1300,48 @@ export const tr_TR: EnTranslations = {
       }
     },
     "auraOverlay": {
-      "title": "Auras",
-      "currentClass": "Current class: {class}",
-      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
-      "noProcs": "No supported proc is available for this character.",
-      "enabled": "Show Aura",
-      "icon": "Spell Icon",
-      "arcs": "Side Crescents",
-      "groundRing": "Ground Ring",
-      "groundRingSpellOrder": "Ground Ring: Spell Order",
-      "crescentsSpellOrder": "Side Crescents: Spell Order",
-      "size": "Size",
-      "iconSize": "Icon Size",
-      "crescentBlockSize": "Crescent Block Size",
-      "groundRingBlockSize": "Ground Ring Block Size",
-      "opacity": "Opacity",
-      "color": "Color",
-      "allOn": "All On",
-      "allOff": "All Off",
-      "reposition": "Setup Positions",
-      "positioning": "Positioning: {aura}",
+      "title": "Auralar",
+      "currentClass": "Mevcut sınıf: {class}",
+      "previewHint": "Menüyü kapatmadan bir aurayı taşımak için Konumları ayarla seçeneğini kullan.",
+      "noProcs": "Bu karakter için desteklenen bir proc yok.",
+      "enabled": "Aurayı göster",
+      "icon": "Büyü simgesi",
+      "arcs": "Yan hilaller",
+      "groundRing": "Yer halkası",
+      "groundRingSpellOrder": "Yer halkası: büyü sırası",
+      "crescentsSpellOrder": "Yan hilaller: büyü sırası",
+      "size": "Boyut",
+      "iconSize": "Simge boyutu",
+      "crescentBlockSize": "Hilal blok boyutu",
+      "groundRingBlockSize": "Yer halkası blok boyutu",
+      "opacity": "Saydamlık",
+      "color": "Renk",
+      "allOn": "Tümünü aç",
+      "allOff": "Tümünü kapat",
+      "reposition": "Konumları ayarla",
+      "positioning": "Konumlandırma: {aura}",
       "selectAura": "Aura",
-      "done": "Done",
-      "moveLeft": "Move Left",
-      "moveUp": "Move Up",
-      "moveDown": "Move Down",
-      "moveRight": "Move Right",
-      "moveEarlier": "Move spell inward",
-      "moveLater": "Move spell outward",
-      "screenPosition": "Screen Position",
-      "spellOrder": "Spell Order",
-      "reset": "Reset Position",
-      "spellPosition": "Spell order {position} / {count}",
+      "done": "Tamam",
+      "moveLeft": "Sola taşı",
+      "moveUp": "Yukarı taşı",
+      "moveDown": "Aşağı taşı",
+      "moveRight": "Sağa taşı",
+      "moveEarlier": "Büyüyü içe taşı",
+      "moveLater": "Büyüyü dışa taşı",
+      "screenPosition": "Ekran konumu",
+      "spellOrder": "Büyü sırası",
+      "reset": "Konumu Sıfırla",
+      "spellPosition": "Büyü sırası {position} / {count}",
       "procs": {
-        "revenge": "Revenge!",
-        "battleTrance": "Battle Trance",
-        "overpowerCharge": "Redhand Empowerment",
-        "suddenDeath": "Sudden Death",
-        "victoryRush": "Victory Rush",
-        "enrage": "Mayhem: Enraged",
-        "heatingUp": "Heating Up",
-        "arcaneCharge": "Arcane Charges",
-        "aetherRush": "Aether Rush"
+        "revenge": "İntikam!",
+        "battleTrance": "Savaş Transı",
+        "overpowerCharge": "Kızıl El Güçlendirmesi",
+        "suddenDeath": "Ani Ölüm",
+        "victoryRush": "Zafer Atılımı",
+        "enrage": "Kargaşa: Öfkeli",
+        "heatingUp": "Isınıyor",
+        "arcaneCharge": "Gizemli Yükler",
+        "aetherRush": "Aether Akını"
       }
     },
     "playerCard": {
@@ -2130,6 +2147,14 @@ export const tr_TR: EnTranslations = {
       "linked": "Bağlı Steam hesabı: {id}",
       "benefits": "Kazandığın yiğitliklerin Steam başarımlarına yansıması için Steam hesabını masaüstü uygulamasından bağla.",
       "noTicket": "Steam bir bağlantı bileti vermedi. Steam'i başlat, sonra tekrar dene."
+    },
+    "epic": {
+      "title": "Epic",
+      "link": "Epic bağla",
+      "unlink": "Epic bağlantısını kaldır",
+      "linked": "Epic hesabı {id} ile bağlı",
+      "benefits": "Kazandığın yiğitliklerin Epic başarımlarına yansıması için Epic masaüstü uygulamasından Epic hesabını bağla.",
+      "noProof": "Epic bir bağlantı kanıtı sağlamadı. Epic Games Store üzerinden başlatıp tekrar deneyin."
     },
     "mailbox": {
       "title": "Posta Kutusu",
@@ -3021,6 +3046,14 @@ export const tr_TR: EnTranslations = {
       "already_linked": "Hesabına zaten bağlı bir Steam hesabı var.",
       "account_taken": "Bu Steam hesabı zaten başka bir hesaba bağlı.",
       "upstream": "Steam yanıt vermedi. Birazdan tekrar dene."
+    },
+    "epic": {
+      "disabled": "Epic bağlantısı şu anda kullanılamıyor.",
+      "invalid_token": "Epic bu bağlantı isteğini doğrulayamadı. Masaüstü uygulamasından tekrar deneyin.",
+      "banned": "Bu Epic hesabı bağlanamıyor.",
+      "already_linked": "Hesabınızda zaten bağlı bir Epic hesabı var.",
+      "account_taken": "Bu Epic hesabı zaten başka bir hesaba bağlı.",
+      "upstream": "Epic yanıt vermedi. Birazdan tekrar deneyin."
     },
     "wallet": {
       "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene."
@@ -6282,11 +6315,15 @@ export const tr_TR: EnTranslations = {
       "graphicsPresetMedium": "Orta",
       "graphicsPresetHigh": "Yüksek",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Ekstrem",
       "graphicsPresetAdvanced": "Gelişmiş",
       "terrainDetail": "Arazi Ayrıntısı",
       "foliageDensity": "Bitki Yoğunluğu",
       "effectsQuality": "Efektler ve Aydınlatma",
       "shadowQuality": "Gölge Kalitesi",
+      "surfaceDetail": "Yüzey Detayı",
+      "surfaceDetailBasic": "Temel",
+      "surfaceDetailFull": "Tam",
       "terrainLow": "Düşük",
       "terrainHigh": "Yüksek",
       "touchOpacity": "Dokunmatik Denetim Saydamlığı",
@@ -6463,6 +6500,7 @@ export const tr_TR: EnTranslations = {
       "floatingDodge": "Savuşturma",
       "floatingParry": "Karşılama",
       "floatingResist": "Direnildi",
+      "floatingEvade": "Kaçınma",
       "floatingHealFull": "Dolu",
       "floatingHealAbsorbed": "Emildi",
       "cannotMove": "Hareket edemezsin!",
@@ -6475,6 +6513,7 @@ export const tr_TR: EnTranslations = {
       "dodged": "{ability} yeteneğin {target} tarafından savuşturuldu.",
       "parried": "{ability} yeteneğin {target} tarafından karşılandı.",
       "resisted": "{target}, {ability} yeteneğine direndi.",
+      "evaded": "{target}, {ability} yeteneğinden kaçındı.",
       "healSelf": "{ability} yeteneğin seni {amount} iyileştirdi.",
       "healSelfCrit": "{ability} yeteneğin seni kritik {amount} iyileştirdi.",
       "healOther": "{ability} yeteneğin {target} hedefini {amount} iyileştirdi.",
@@ -7330,7 +7369,7 @@ export const tr_TR: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Üstün Görünmezlik",
-        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
+        "description": "20 sn boyunca gözden kaybolursun ve zamana yayılan 2 hasar etkisini kaldırırsın. Görünmezlik sona erdiğinde 2 sn boyunca %90 daha az hasar alırsın. (büyücü yeteneği)"
       },
       "hot_streak": {
         "name": "Sıcak Seri",
@@ -9702,6 +9741,18 @@ export const tr_TR: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Zulgar'ın Diş Bıçağı"
       },
+      "fanglords_beastspear": {
+        "name": "Diş Lordu'nun Canavar Mızrağı"
+      },
+      "bloodmane_warleggings": {
+        "name": "Kanyeleli Savaş Dizlikleri"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Sarmaşık Pençeli Av Pantolonu"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Güneşkemik Ritüel Sarongu"
+      },
       "thick_winter_pelt": {
         "name": "Kalın Kış Postu"
       },
@@ -9877,7 +9928,7 @@ export const tr_TR: EnTranslations = {
         "name": "Artisan's Eye"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Ignition Key: Terrorspark Groundshaker"
+        "name": "Kontak Anahtarı: Dehşetkıvılcım, Yer Sarsan"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
@@ -10454,6 +10505,24 @@ export const tr_TR: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Ejderkorosu El Sargıları"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Çukur Avcısının Tüniği"
+      },
+      "verdant_heart_vestment": {
+        "name": "Yeşeren Kalbin Giysisi"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Güneşkemik Ritüel Zırh Gömleği"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Çukurun Büyük Dişi"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Güneşkemik Kâhin Tacı"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Kanyeleli Savaş Bacak Muhafızları"
       },
       "deathless_greatblade": {
         "name": "Ölümsüz Pala"

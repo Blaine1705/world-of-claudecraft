@@ -7,6 +7,16 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const vi_VN: Record<string, string> = {
+  'onlinePlayers.autoRefresh': 'Tự động làm mới ({minutes} phút)',
+  'onlinePlayers.count': '{count} đang trực tuyến',
+  'onlinePlayers.countFiltered': '{shown} trên {total} đang trực tuyến',
+  'onlinePlayers.filteredEmpty': 'không có người chơi trực tuyến nào khớp với tìm kiếm này',
+  'onlinePlayers.loadFailed': 'không tải được người chơi trực tuyến',
+  'onlinePlayers.loading': 'đang tải người chơi trực tuyến…',
+  'onlinePlayers.refresh': 'Làm mới',
+  'onlinePlayers.searchLabel': 'Tìm người chơi trực tuyến',
+  'onlinePlayers.searchPlaceholder': 'Tìm người chơi, lớp, khu vực…',
+  'onlinePlayers.sortHint': 'nhấp vào một cột để sắp xếp',
   'detail.dailyRewardsActions': 'Thao tác kiểm duyệt Phần Thưởng Hằng Ngày',
   'detail.dailyRewardsBan': 'Cấm tham gia Phần Thưởng Hằng Ngày',
   'detail.dailyRewardsBanReason': 'Lý do cấm Phần Thưởng Hằng Ngày: {value}',

@@ -810,10 +810,21 @@ function sm01(raw: number): number {
 export function columnBlendAt(zone: ZoneDef, x: number, z: number): number {
   const x0 = zone.xMin ?? STRIP_MIN_X;
   const x1 = zone.xMax ?? STRIP_MAX_X;
-  const xT =
-    x0 >= STRIP_MAX_X
-      ? sm01((x - (x0 - 30)) / 65) // an east column, entered moving +x
-      : 1 - sm01((x - (x1 - 35)) / 65); // a west column, entered moving -x
+  const finite = Number.isFinite(x) && Number.isFinite(z);
+  if (finite && (z <= zone.zMin - 30 || z >= zone.zMax + 35)) {
+    // One zT sm01 arm is saturated at these bounds, so zT and the final
+    // product are exactly +0. Skipping both blends is bit-identical.
+    return 0;
+  }
+  const east = x0 >= STRIP_MAX_X;
+  if (finite && (east ? x <= x0 - 30 : x >= x1 + 30)) {
+    // xT is exactly +0 on this side of the column transition, so the final
+    // product is exactly +0. The outer side stays blended until coast shaping.
+    return 0;
+  }
+  const xT = east
+    ? sm01((x - (x0 - 30)) / 65) // an east column, entered moving +x
+    : 1 - sm01((x - (x1 - 35)) / 65); // a west column, entered moving -x
   const zT = sm01((z - (zone.zMin - 30)) / 65) * (1 - sm01((z - (zone.zMax - 30)) / 65));
   return xT * zT;
 }
@@ -826,7 +837,7 @@ export function columnBlendAt(zone: ZoneDef, x: number, z: number): number {
 // arm probes zoneAt, so a static-ZONES loop here would return
 // {Infinity, -Infinity} the moment a custom map's bands disagree with the
 // builtin, and that pair reaches the terrain height smoothstep as NaN.
-export function worldXBoundsAt(z: number): { min: number; max: number } {
+function computeWorldXBounds(z: number): Readonly<{ min: number; max: number }> {
   const active = getActiveWorldContent().zones;
   const zones = active.length > 0 ? active : BUILTIN_WORLD.zones;
   let min = Infinity;
@@ -844,7 +855,55 @@ export function worldXBoundsAt(z: number): { min: number; max: number } {
       max = Math.max(max, zone.xMax ?? STRIP_MAX_X);
     }
   }
-  return { min, max };
+  return Object.freeze({ min, max });
+}
+
+interface WorldXBoundsIndex {
+  starts: readonly number[];
+  rows: readonly Readonly<{ min: number; max: number }>[];
+  south: Readonly<{ min: number; max: number }>;
+  nan: Readonly<{ min: number; max: number }>;
+}
+
+let worldXBoundsGeneration = -1;
+let worldXBoundsIndex: WorldXBoundsIndex | null = null;
+
+function buildWorldXBoundsIndex(): WorldXBoundsIndex {
+  // The SAME resolved list computeWorldXBounds walks: a custom map's band
+  // boundaries must seed the index rows, or every row between two custom
+  // boundaries reuses bounds computed at the wrong builtin boundary.
+  const active = getActiveWorldContent().zones;
+  const zones = active.length > 0 ? active : BUILTIN_WORLD.zones;
+  const starts = [...new Set(zones.flatMap((zone) => [zone.zMin, zone.zMax]))].sort(
+    (a, b) => a - b,
+  );
+  return {
+    starts,
+    rows: starts.map((z) => computeWorldXBounds(z)),
+    south: computeWorldXBounds(Number.NEGATIVE_INFINITY),
+    nan: computeWorldXBounds(Number.NaN),
+  };
+}
+
+export function worldXBoundsAt(z: number): Readonly<{ min: number; max: number }> {
+  const generation = getContentGeneration();
+  if (generation !== worldXBoundsGeneration || worldXBoundsIndex === null) {
+    worldXBoundsIndex = buildWorldXBoundsIndex();
+    worldXBoundsGeneration = generation;
+  }
+  if (Number.isNaN(z)) return worldXBoundsIndex.nan;
+  if (z < worldXBoundsIndex.starts[0]) return worldXBoundsIndex.south;
+
+  let lo = 0;
+  let hi = worldXBoundsIndex.starts.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (worldXBoundsIndex.starts[mid] <= z) lo = mid + 1;
+    else hi = mid;
+  }
+  // Zone membership is constant between sorted z boundaries. Reusing the
+  // frozen row removes the zone scan and result allocation bit-identically.
+  return worldXBoundsIndex.rows[lo - 1];
 }
 
 export function zoneWelcomeText(
@@ -1237,7 +1296,7 @@ export function delveSlotAt(delveIndex: number, z: number, modules: readonly str
 }
 
 // Memoized: the default chain is a pure function of the static DELVES table, and
-// callers (collision/camera fallback) hit it per-frame inside the delve band, so
+// callers (collision and render fallbacks) hit it per-frame inside the delve band, so
 // cache one frozen array per delve id instead of reallocating each call.
 const DEFAULT_DELVE_MODULES = new Map<string, readonly string[]>();
 

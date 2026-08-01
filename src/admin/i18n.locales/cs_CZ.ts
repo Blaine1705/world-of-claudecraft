@@ -7,6 +7,16 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const cs_CZ: Record<string, string> = {
+  'onlinePlayers.autoRefresh': 'Automatické obnovení ({minutes} min)',
+  'onlinePlayers.count': '{count} hráčů online',
+  'onlinePlayers.countFiltered': '{shown} z {total} online',
+  'onlinePlayers.filteredEmpty': 'tomuto hledání neodpovídá žádný hráč online',
+  'onlinePlayers.loadFailed': 'načtení hráčů online se nezdařilo',
+  'onlinePlayers.loading': 'načítají se hráči online…',
+  'onlinePlayers.refresh': 'Obnovit',
+  'onlinePlayers.searchLabel': 'Hledat hráče online',
+  'onlinePlayers.searchPlaceholder': 'Hledat hráče, třídu, zónu…',
+  'onlinePlayers.sortHint': 'kliknutím na sloupec seřadíte',
   'alert.passwordLength': 'Zadej nové heslo o délce 6 až 128 znaků.',
   'detail.resetPassword': 'Resetovat heslo',
   'dialog.actionResetPassword': 'Nastavit nové heslo a odhlásit všechna zařízení',
