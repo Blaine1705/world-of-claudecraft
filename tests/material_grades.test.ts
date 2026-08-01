@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { GATHER_NODE_TYPES, GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { ALL_RECIPES, TOOL_RECIPES } from '../src/sim/content/recipes';
-import { ITEMS } from '../src/sim/data';
+import { ITEMS, QUESTS } from '../src/sim/data';
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import {
   baseMaterialFor,
@@ -361,6 +361,39 @@ describe('the tool ladder the grades exist to build', () => {
     }
     // Non-vacuity: multi-reagent recipes exist, so the pair loop really ran.
     expect(checked).toBeGreaterThan(50);
+  });
+
+  it('no QUEST declares collect objectives sharing a grade pool either (the sibling guard)', () => {
+    // The same independent-per-line machinery runs quest collect credit
+    // (countAcrossGrades per objective) and turn-in consumption
+    // (planGradeRemoval per objective, no cross-line reservation), so the
+    // recipe disjointness rule above is load-bearing for quests too: a
+    // future quest declaring copper_ore AND fine_copper_ore as separate
+    // collect lines would credit both from one shared pool and complete
+    // while consuming only the first. No shipped quest does; this guard
+    // makes the constraint a red test instead of tribal knowledge (the
+    // whole-branch review found only the recipe half pinned).
+    let pairsChecked = 0;
+    for (const quest of Object.values(QUESTS)) {
+      const collects = quest.objectives.filter(
+        (o): o is Extract<(typeof quest.objectives)[number], { type: 'collect' }> =>
+          o.type === 'collect',
+      );
+      const pools = collects.map((o) => new Set(materialGradeIds(o.itemId)));
+      for (let i = 0; i < pools.length; i++) {
+        for (let j = i + 1; j < pools.length; j++) {
+          const shared = [...pools[i]].filter((id) => pools[j].has(id));
+          expect(
+            shared,
+            `${quest.id} declares collect objectives sharing a grade pool: ` +
+              `${collects[i].itemId} and ${collects[j].itemId}`,
+          ).toEqual([]);
+          pairsChecked += 1;
+        }
+      }
+    }
+    // Non-vacuity: multi-collect quests exist, so the pair loop really ran.
+    expect(pairsChecked).toBeGreaterThan(0);
   });
 
   it('the tier-4 pick was re-pointed off the circuit it used to sit in', () => {

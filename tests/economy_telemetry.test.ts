@@ -38,6 +38,11 @@ describe('copper flow source classification', () => {
       trade_accept: 'trade',
       vcup_bet: 'wager',
       dev_give: 'dev',
+      // The two movers the whole-branch review found booking under 'other':
+      // the riding lesson is a training fee, the companion upgrade a delve
+      // spend.
+      learn_riding: 'craft',
+      companion_upgrade: 'delve',
     };
     for (const [command, source] of Object.entries(expected)) {
       expect(copperFlowSourceForCommand(command), command).toBe(source);
@@ -210,12 +215,14 @@ describe('the classifier map is complete and its keys are real commands', () => 
       craft_item: 'craft',
       delve_buy: 'delve',
       delve_interact: 'delve',
+      companion_upgrade: 'delve',
       delve_rite_choose: 'delve',
       dev_give: 'dev',
       dev_level: 'dev',
       disenchant_item: 'craft',
       harvestCorpse: 'loot',
       harvest_node: 'loot',
+      learn_riding: 'craft',
       lockpick_action: 'delve',
       loot: 'loot',
       lootRoll: 'loot',

@@ -60,7 +60,24 @@ export function rekeyInstanceSigner(
   for (const slot of state.bank?.inventory ?? []) {
     if (rekeySigner(slot.instance, oldName, newName)) changed = true;
   }
+  // The buyback ring is the fifth signer-bearing blob region (the
+  // whole-branch review): a sold self-signed copy sits there for five
+  // minutes and buyBackItem re-grants the exact stale payload, so a rename
+  // landing inside that window would hand back a copy whose discount no
+  // longer answers to its owner (and after a reclaim, one naming a
+  // stranger).
+  for (const slot of state.vendorBuyback ?? []) {
+    if (rekeySigner(slot.instance, oldName, newName)) changed = true;
+  }
+  // BOTH equipment-map spellings: the loader still reads the legacy plural
+  // key this branch's earlier rift-gear saves wrote (sim.ts, `s.
+  // equipmentInstance ?? s.equipmentInstances`), so a sweep that walked only
+  // the modern key would leave a legacy blob's signers behind for exactly
+  // the reclaim case the sweep exists for.
   for (const instance of Object.values(state.equipmentInstance ?? {})) {
+    if (rekeySigner(instance, oldName, newName)) changed = true;
+  }
+  for (const instance of Object.values(state.equipmentInstances ?? {})) {
     if (rekeySigner(instance, oldName, newName)) changed = true;
   }
   for (const slot of Object.values(state.toolEffectSlots ?? {})) {

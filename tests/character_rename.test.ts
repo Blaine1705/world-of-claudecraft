@@ -215,3 +215,33 @@ describe('rekeyInstanceSigner (force-rename sweep)', () => {
     expect(skills.alchemy).toBe(BATTLEFIELD_XP_TRICKLE);
   });
 });
+
+describe('the whole-branch sweep completion: buyback and the legacy plural map', () => {
+  it('rewrites signers in the vendor buyback ring', () => {
+    // The fifth signer-bearing blob region: a sold self-signed copy waits
+    // here for five minutes and buyBackItem re-grants the exact payload, so
+    // a rename inside the window must follow it or the discount (and after
+    // a reclaim, the NAME) detaches from its owner.
+    const state = st({
+      vendorBuyback: [
+        { itemId: 'gatherers_cache', count: 1, instance: { signer: 'Oldname' } },
+        { itemId: 'gatherers_cache', count: 1, instance: { signer: 'SomeoneElse' } },
+      ],
+    });
+    expect(rekeyInstanceSigner(state, 'Oldname', 'Newname')).toBe(true);
+    expect(state.vendorBuyback).toEqual([
+      { itemId: 'gatherers_cache', count: 1, instance: { signer: 'Newname' } },
+      { itemId: 'gatherers_cache', count: 1, instance: { signer: 'SomeoneElse' } },
+    ]);
+  });
+
+  it('rewrites signers under the legacy plural equipmentInstances key too', () => {
+    // The loader still reads `equipmentInstance ?? equipmentInstances`, so a
+    // legacy blob's signers are live data the sweep must reach.
+    const state = st({
+      equipmentInstances: { chest: { signer: 'Oldname' } },
+    });
+    expect(rekeyInstanceSigner(state, 'Oldname', 'Newname')).toBe(true);
+    expect(state.equipmentInstances).toEqual({ chest: { signer: 'Newname' } });
+  });
+});

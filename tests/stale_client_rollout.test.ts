@@ -26,13 +26,16 @@ import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { DUNGEONS, ITEMS, MOBS } from '../src/sim/data';
 
 // Every item id THIS PACKET adds relative to the deployed release, measured
-// by diffing the content table keys against 9d7a1a021 (the fine-grade
-// materials plus the two new rods). The v0.32.0 expansion's own ~50 new ids
+// by diffing the content table keys against the release base (the fine-grade
+// materials, the two new rods, and the two phase 12 charm items, 13 in all;
+// the phase 11 first cut listed only its own eleven and the whole-branch
+// review caught the charms missing). The v0.32.0 expansion's own ~50 new ids
 // are deliberately NOT in this list: they are the release's to manage, and
 // its four heroic reins are pinned as the named exception below. A rename in
 // content breaks the existence arm loudly rather than letting the sweep go
 // vacuous.
 const NEW_RELEASE_ITEM_IDS = [
+  'artisans_eye',
   'fine_ashwood_log',
   'fine_copper_ore',
   'fine_elderwood_log',
@@ -42,6 +45,7 @@ const NEW_RELEASE_ITEM_IDS = [
   'fine_silverleaf_herb',
   'fine_sunpetal_herb',
   'fine_thorium_ore',
+  'gatherers_cache',
   'stormreel_fishing_rod',
   'tidewrought_fishing_rod',
 ] as const;

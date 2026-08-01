@@ -80,9 +80,18 @@ const SOURCE_BY_COMMAND: ReadonlyMap<string, CopperFlowSource> = new Map(
     delve_interact: 'delve',
     delve_rite_choose: 'delve',
     collect_delve_chest_loot: 'delve',
+    // The delve-companion upgrade spends copper alongside Marks: same
+    // surface as its delve_buy siblings (the whole-branch review found it
+    // booking under 'other').
+    companion_upgrade: 'delve',
     lockpick_action: 'delve',
     craft_item: 'craft',
     train_recipe: 'craft',
+    // Riding is the game's largest one-time TRAINING fee (80 gold at level
+    // 20): it books with the other training spends rather than in 'other',
+    // where the whole-branch review found it hiding from the exact
+    // does-the-faucet-cover-training question this module exists to answer.
+    learn_riding: 'craft',
     apply_enchant: 'craft',
     disenchant_item: 'craft',
     salvage_item: 'craft',
