@@ -6,7 +6,7 @@ const gate = readFileSync(new URL('../scripts/gate.mjs', import.meta.url), 'utf8
 
 // Locked shard count for pr-gate and release-gate matrices (Phase 2 of
 // docs/ci-speed). Supersedes the prior toolchain N=4 on this surface. Both
-// jobs share this N. Prefer this single constant over scattering /N literals.
+// test jobs share this N. Prefer this single constant over scattering /N literals.
 const SHARD_N = 8;
 const SHARD_MATRIX = Array.from({ length: SHARD_N }, (_, i) => i + 1).join(', ');
 
@@ -18,7 +18,13 @@ function jobSource(name: string): string {
 
 describe('CI workflow parity', () => {
   it('runs the canonical game and admin typecheck in CI and the local gate', () => {
+    // One occurrence in pr-checks and one in release-checks (the parallel
+    // check jobs). Neither test job typechecks.
     expect(workflow.match(/run: npm run check:types/g)).toHaveLength(2);
+    expect(jobSource('pr-checks')).toContain('run: npm run check:types');
+    expect(jobSource('release-checks')).toContain('run: npm run check:types');
+    expect(jobSource('pr-gate')).not.toContain('run: npm run check:types');
+    expect(jobSource('release-gate')).not.toContain('run: npm run check:types');
     expect(workflow).not.toContain('run: npx tsc --noEmit');
     expect(gate).toContain("['typecheck', 'npm', ['run', 'check:types']]");
   });
@@ -78,21 +84,23 @@ describe('CI workflow parity', () => {
     expect(browserGate).toContain('run: npx playwright install --with-deps chromium');
   });
 
-  it('posts the i18n coverage summary and diffs the committed artifacts in both jobs', () => {
+  it('posts the i18n coverage summary and diffs the committed artifacts in both check jobs', () => {
     // The job-summary step is the out-of-band audit trail that replaced the
     // committed src/ui/i18n.status.summary.json; deleting it would silently
     // drop the trail, and re-adding the summary to a freshness diff or to
     // gate.mjs would resurrect the aggregate merge conflicts the degit removed.
-    // The PR-tier copies of both steps live in pr-checks, not pr-gate.
+    // Coverage + freshness live in the parallel check jobs, not the test jobs.
     const prChecks = jobSource('pr-checks');
-    const releaseGate = jobSource('release-gate');
-    for (const job of [prChecks, releaseGate]) {
+    const releaseChecks = jobSource('release-checks');
+    for (const job of [prChecks, releaseChecks]) {
       expect(job).toContain('run: node scripts/i18n_coverage_summary.mjs');
       expect(job).toContain(
         'run: git diff --exit-code -- src/ui/i18n.resolved.generated src/admin/i18n.resolved.generated src/ui/i18n.catalog/translation_keys.generated.ts',
       );
       expect(job).not.toContain('src/ui/i18n.status.summary.json');
     }
+    expect(jobSource('pr-gate')).not.toContain('run: node scripts/i18n_coverage_summary.mjs');
+    expect(jobSource('release-gate')).not.toContain('run: node scripts/i18n_coverage_summary.mjs');
     expect(gate).not.toContain('src/ui/i18n.status.summary.json');
   });
 
@@ -100,6 +108,7 @@ describe('CI workflow parity', () => {
     const prGate = jobSource('pr-gate');
     const prChecks = jobSource('pr-checks');
     const releaseGate = jobSource('release-gate');
+    const releaseChecks = jobSource('release-checks');
     for (const job of [prGate, prChecks]) {
       expect(job).toContain(
         "github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))",
@@ -110,16 +119,23 @@ describe('CI workflow parity', () => {
       expect(job).toContain("github.event_name == 'workflow_dispatch'");
       expect(job).not.toContain('I18N_RELEASE_TIER');
     }
-    // Anchored to the JOB level (the 4-space env block): moving the flag onto
-    // a single step would silently run the release test shards at PR tier.
+    // Both release jobs share the same if-fragment so they skip or run together.
+    // Anchored to the JOB level (the 4-space env block) on the TEST job only:
+    // moving the flag onto a single step would silently run the other shards at
+    // PR tier; putting it on release-checks is unnecessary and would widen the
+    // env surface without changing enforcement.
+    const releaseIf =
+      "(github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))";
+    for (const job of [releaseGate, releaseChecks]) {
+      expect(job).toContain(releaseIf);
+      expect(job).toContain("github.event_name == 'pull_request' && github.base_ref == 'main'");
+      expect(job).toContain("startsWith(github.head_ref, 'release/')");
+      expect(job).toContain(
+        "github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/')",
+      );
+    }
     expect(releaseGate).toContain("\n    env:\n      I18N_RELEASE_TIER: '1'");
-    expect(releaseGate).toContain(
-      "github.event_name == 'pull_request' && github.base_ref == 'main'",
-    );
-    expect(releaseGate).toContain("startsWith(github.head_ref, 'release/')");
-    expect(releaseGate).toContain(
-      "github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/')",
-    );
+    expect(releaseChecks).not.toContain('I18N_RELEASE_TIER');
   });
 
   it('splits the PR tier into parallel test and checks jobs that cover every step', () => {
@@ -147,10 +163,41 @@ describe('CI workflow parity', () => {
     }
   });
 
+  it('splits the release tier into parallel test and checks jobs that cover every step', () => {
+    const releaseGate = jobSource('release-gate');
+    const releaseChecks = jobSource('release-checks');
+    // Mirror of the PR parallel pair (D8). No needs edge either way; checks
+    // job carries every serialized step that used to sit behind
+    // matrix.shard == 1 on release-gate; test job stays tests-only.
+    expect(releaseGate).not.toContain('needs:');
+    expect(releaseChecks).not.toContain('needs:');
+    expect(releaseGate).toContain('run: npm test');
+    expect(releaseChecks).not.toContain('run: npm test');
+    expect(releaseChecks).not.toContain('strategy:');
+    expect(releaseChecks).not.toContain('matrix:');
+    // Red-path pin: reintroducing single-shard gating on the test job fails.
+    expect(releaseGate).not.toContain('matrix.shard == 1');
+    expect(workflow).not.toContain('matrix.shard == 1');
+    for (const step of [
+      'run: npm run i18n:gen',
+      'run: node scripts/i18n_coverage_summary.mjs',
+      'run: git diff --exit-code -- src/ui/i18n.resolved.generated',
+      'run: npm run security:gate',
+      'run: npm run check:types',
+      'run: npm run build:env',
+      'run: npm run build:server',
+      'run: npm run build\n',
+    ]) {
+      expect(releaseChecks).toContain(step);
+      expect(releaseGate).not.toContain(step);
+    }
+  });
+
   it(`shards the PR and release test steps ${SHARD_N} ways and keeps the checks single-shard`, () => {
     const prGate = jobSource('pr-gate');
     const prChecks = jobSource('pr-checks');
     const releaseGate = jobSource('release-gate');
+    const releaseChecks = jobSource('release-checks');
     // Both test jobs fan the ONE suite across the same N-shard matrix. The run
     // line stays `npm test` (whose pretest regenerates the i18n artifacts in
     // every shard: the S3 guard, guide freshness, and the git-subprocess suites
@@ -194,32 +241,25 @@ describe('CI workflow parity', () => {
     expect(gate).not.toContain('--shard');
     expect(gate).toContain("'vitest (full suite)'");
     expect(gate).toContain('--maxWorkers=');
-    // pr-checks stays a single unsharded job: its serialized checks run once.
-    expect(prChecks).not.toContain('strategy:');
-    expect(prChecks).not.toContain('matrix:');
-    // pr-gate is tests-only, so nothing in it is gated to a single shard...
+    // Both check jobs stay single unsharded jobs: serialized checks run once.
+    for (const job of [prChecks, releaseChecks]) {
+      expect(job).not.toContain('strategy:');
+      expect(job).not.toContain('matrix:');
+    }
+    // Both test jobs are tests-only: nothing is gated to a single shard.
     expect(prGate).not.toContain('matrix.shard == 1');
-    // ...while release-gate keeps its serialized checks and builds on exactly
-    // one shard each (they are not partitionable and must not run N times):
-    // i18n:gen, the freshness diff, the coverage summary, the malware gate,
-    // typecheck, and the three builds. Every new non-test step added to
-    // release-gate needs the same single-shard condition, and this count.
-    expect(releaseGate.match(/if: matrix\.shard == 1/g)).toHaveLength(8);
+    expect(releaseGate).not.toContain('matrix.shard == 1');
     // The release TEST step itself must stay un-gated (run on every shard):
-    // name-to-run adjacency proves no if: line sits between them, so a
-    // compensating double-edit (gate the test step, un-gate a build; count
-    // still 8) cannot silently shrink the release tier to 1/N of the suite.
+    // name-to-run adjacency proves no if: line sits between them.
     expect(releaseGate).toMatch(
       new RegExp(
         String.raw`- name: Run tests \(release tier[^\n]*\n {8}run: npm test -- --shard=\$\{\{ matrix\.shard \}\}\/${SHARD_N}`,
       ),
     );
-    // Structural step counts close the remaining direction: a NEW step added
-    // to either matrix job changes these totals and must consciously update
-    // this test (an unconditioned addition to release-gate would otherwise
-    // run N times per release push; pr-gate stays exactly checkout,
-    // setup-node, npm ci, and the sharded test run).
+    // Structural step counts: each test job is exactly checkout, setup-node,
+    // npm ci, and the sharded test run. An unconditioned addition would run
+    // N times per push; a dropped step shrinks the job silently.
     expect(prGate.match(/\n {6}- name: /g)).toHaveLength(4);
-    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(12);
+    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(4);
   });
 });
