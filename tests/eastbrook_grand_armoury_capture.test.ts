@@ -165,7 +165,7 @@ function townPerfRaw({ rootVisible = true, shadowEnabled = true } = {}) {
     drawStats: {
       colorDraws: 18,
       shadowDraws: 9,
-      triangles: 29_644,
+      triangles: 29_436,
       buildingCount: 6,
       roofHideTargetCount: 6,
       microBatchCount: 2,
@@ -359,7 +359,7 @@ function validTownMetadata({
           ? {
               colorDraws: 18,
               shadowDraws: 9,
-              triangles: townContract?.townTriangles ?? 29_644,
+              triangles: townContract?.townTriangles ?? 29_436,
               buildingCount: 6,
               roofHideTargetCount: 6,
               microBatchCount: 2,
