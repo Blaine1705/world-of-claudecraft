@@ -29,7 +29,7 @@ concurrency:
 #                 registry-in-sync, s3_registered (every emit maps to a registered
 #                 key/RULE), and placeholder parity for the translations that
 #                 actually exist. An English-only PR (sparse overlay) passes here.
-#                 The test suite runs as a 8-shard matrix (each shard executes a
+#                 The test suite runs as an 8-shard matrix (each shard executes a
 #                 partition of the test files), so the job's wall time is the
 #                 slowest shard, not the whole suite.
 #
@@ -167,7 +167,7 @@ jobs:
 
   # The PR tier is two parallel jobs: pr-gate runs the test suite while pr-checks
   # runs the serialized checks, so the PR critical path is max(tests, checks)
-  # instead of their sum. pr-gate additionally fans the suite across a 8-shard
+  # instead of their sum. pr-gate additionally fans the suite across an 8-shard
   # matrix (vitest --shard: a sha1-hash partition of the test FILES), so its wall
   # time is the slowest shard. Locally `npm run gate` (scripts/gate.mjs) runs
   # the SAME combined step list serially with ONE full unsharded vitest run by

@@ -6,9 +6,9 @@
 |---|---|---|---|
 | 1 Fixed-cost waste | DONE | #2737 | Lint checkout 22 to 25s; job 59 to 68s |
 | 1 QA | PASS-WITH-FOLLOWUPS | #2737 ready | Docs + pin harden followups only; no BLOCKING |
-| 2 Shard count | NOT STARTED | | Measure N, lock, apply |
-| 2 QA | NOT STARTED | | Wall ≤ 8 min bar |
-| 3 Shard rebalance | NOT STARTED | | 20% balance; stretch ≤ 6 min |
+| 2 Shard count | DONE (wall DEFER) | #2737 | Locked N=8; walls still > 8 min; Phase 3 rebalance |
+| 2 QA | NOT STARTED | | Explicit DEFER numbers recorded; pins for N=8 |
+| 3 Shard rebalance | NOT STARTED | | 20% balance; re-check ≤ 8 min under N=8 |
 | 3 QA | NOT STARTED | | |
 | 4 Release-checks split | NOT STARTED | | |
 | 4 QA | NOT STARTED | | |
@@ -24,6 +24,45 @@ Append-only. Each row: date, phase, run id, wall (s), worst shard (s), N, notes.
 | 2026-08-01 | baseline | 30705333396 | 765 | 683 | 4 | PR green, eastbrook fence |
 | 2026-08-01 | baseline | 30704449673 | 853 | 776 | 4 | PR green, vendor stack |
 | 2026-08-01 | baseline | 30703789135 | 702 | 573 | 4 | main push green |
+| 2026-08-01 | p2-measure | 30707931452 | 594 | 502 | 6 | PR green; files sum 1926; MISS 8-min bar |
+| 2026-08-01 | p2-measure | 30708423524 | ~524 (att1) | 436 | 8 | att1 shard 4 flake then re-run green; files 1926; critical path shard 5 job 520s; MISS 8-min bar |
+
+### Phase 2 N=6 detail (run 30707931452, green)
+
+| Shard | Job s | Vitest Duration s | Test Files |
+|---|---|---|---|
+| 1 | 296 | 228.16 | 321 |
+| 2 | 394 | 326.96 | 321 |
+| 3 | 382 | 313.55 | 321 |
+| 4 | 575 | 502.39 | 321 |
+| 5 | 307 | 237.54 | 321 |
+| 6 | 310 | 241.97 | 321 |
+| **sum** | | | **1926** |
+
+Wall: createdAt 16:20:57Z to last job complete 16:30:51Z = **594s (9.90 min)**.
+Worst/median vitest = 502.39 / 313.55 ≈ 1.60. Completeness: 1926 matches suite baseline.
+
+### Phase 2 N=8 detail (run 30708423524)
+
+First attempt: wall ~524s (8.73 min) to last completing shard (shard 5 at 16:42:53Z);
+shard 4 failed with `EnvironmentTeardownError: Closing rpc while onUserConsoleLog
+was pending` (vitest worker teardown flake, not a suite shrink). Re-run --failed
+made the run green; shard 4 re-attempt vitest 360.58s.
+
+| Shard | Job s | Vitest Duration s | Test Files | Notes |
+|---|---|---|---|---|
+| 1 | 271 | 211.72 | 241 | att1 green |
+| 2 | 279 | 209.55 | 241 | att1 green |
+| 3 | 247 | 179.20 | 241 | att1 green |
+| 4 | 437 (re) | 360.58 (re) | 241 | att1 flake; re-run green |
+| 5 | 520 | 435.88 | 241 | worst vitest; drives critical path |
+| 6 | 333 | 258.19 | 241 | att1 green |
+| 7 | 283 | 208.15 | 240 | att1 green |
+| 8 | 315 | 246.84 | 240 | att1 green |
+| **sum** | | | **1926** | completeness OK |
+
+Worst/median vitest ≈ 435.88 / 246.84 ≈ 1.77. N=8 improves wall vs N=6 (594s ->
+~524s) but still above 480s. **Lock N=8. DEFER ≤ 8 min bar to Phase 3 rebalance.**
 
 ### Phase 1 lint timing (checkout step seconds; target ≤ 40s checkout, ≤ 90s job)
 
@@ -85,19 +124,37 @@ Install always runs after restore (`npx playwright install --with-deps chromium`
 
 ## Phase 2 checklist
 
-- [ ] Measure N=6 wall + completeness
-- [ ] Measure N=8 wall + completeness
-- [ ] Lock N in state.md
-- [ ] Matrix applied pr-gate + release-gate
-- [ ] Pins + comments updated (no hardcoded /4 left unless N=4, which it must not be)
-- [ ] gate.mjs still unsharded
-- [ ] Three consecutive green PR walls ≤ 8 min OR explicit deferral numbers to Phase 3
-- [ ] Branch-protection check names listed in PR body
-- [ ] Draft PR + Phase 2 QA PASS
+- [x] Measure N=6 wall + completeness (594s green, files 1926)
+- [x] Measure N=8 wall + completeness (~524s critical path, files 1926; shard 4 att1 flake)
+- [x] Lock N=8 in state.md (N=6 and N=8 both miss ≤ 8 min; max allowed without owner OK)
+- [x] Matrix applied pr-gate + release-gate (`shard: [1..8]`, `--shard=i/8`)
+- [x] Pins + comments updated (SHARD_N=8; no hardcoded /4 left)
+- [x] gate.mjs still unsharded
+- [x] Three consecutive green PR walls ≤ 8 min OR explicit deferral numbers to Phase 3
+  (**DEFER**: N=6=594s, N=8≈524s; Phase 3 rebalance required)
+- [x] Branch-protection check names listed in PR body (owner must update protection)
+- [ ] Draft PR + Phase 2 QA PASS (QA gate marks ready per phase-02-qa.md)
+
+### Branch protection check names (owner action, OPEN item 3)
+
+After Phase 2 the required PR-gate matrix checks become:
+
+- `PR gate (English-only legal) (1)`
+- `PR gate (English-only legal) (2)`
+- `PR gate (English-only legal) (3)`
+- `PR gate (English-only legal) (4)`
+- `PR gate (English-only legal) (5)`
+- `PR gate (English-only legal) (6)`
+- `PR gate (English-only legal) (7)`
+- `PR gate (English-only legal) (8)`
+
+Unchanged siblings: `Format + lint (Biome, changed files)`,
+`PR checks (freshness, typecheck, builds)`, `Browser regressions (Chromium)`.
+Remove any required checks still named only `(1)`..`(4)` if the org still pins N=4.
 
 ## Phase 3 checklist
 
-- [ ] Live top-cost files under locked N
+- [ ] Live top-cost files under locked N=8
 - [ ] Pure splits (vale_cup pattern) with shard simulation
 - [ ] Worst Duration within 20% of median
 - [ ] Completeness holds

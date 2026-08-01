@@ -1,15 +1,16 @@
 # State: CI Speed (cross-phase cheat sheet)
 
-**Current phase:** Phase 1 QA PASS-WITH-FOLLOWUPS. PR #2737 marked ready for
-review. Lint timings meet targets (checkout 22 to 25s; job 59 to 68s over three
-implementation runs; tip resample 25s / 63s on 30707518969). Playwright cache
-HIT proven on second PR run (30707206995) and tip (30707518969). Worktree
+**Current phase:** Phase 2 implementation DONE with wall DEFER to Phase 3.
+Locked **N=8** on `pr-gate` and `release-gate`. N=6 green wall 594s (run
+30707931452) and N=8 first-attempt critical path ~520s worst job / ~524s wall
+(run 30708423524) both miss the ≤ 8 minute (480s) bar. Completeness holds at
+1926 Test Files on both measurements. Worktree
 `/home/fernandoramirez/Documents/world-of-claudecraft-ci-speed` on
 `feature/ci-speed`, based on `origin/release/v0.34.0` (not behind release).
 
-**Next action:** Phase 2 (shard count: measure N=6 vs N=8, lock, apply). Do not
-change matrix.shard until Phase 2 starts. Optional pin harden followups from
-Phase 1 QA may land in a small commit before or during Phase 2.
+**Next action:** Phase 2 QA (`phase-02-qa.md`) then Phase 3 shard rebalance
+(rank heavy files under N=8, split pure monsters, re-check ≤ 8 min bar). Do
+not raise N past 8 without owner OK (D5/D6).
 
 ## Locked decisions
 
@@ -31,9 +32,12 @@ Phase 1 QA may land in a small commit before or during Phase 2.
   consecutive green runs. Phase 3 stretch ≤ **6 minutes** if balance allows;
   Phase 3 may still PASS on balance alone if wall stays ≤ 8. Do not raise N
   past **8** without owner approval.
-- **D6 Shard N:** choose from {6, 8} by Phase 2 measurement. Supersedes the
-  prior toolchain packet's locked N=4 for this surface only. `fail-fast:
-  false` always. Half-core `maxWorkers` cap retained.
+- **D6 Shard N:** **LOCKED N=8** by Phase 2 measurement (see progress.md).
+  Supersedes the prior toolchain packet's locked N=4 for this surface only.
+  N=6 missed the bar (594s green). N=8 critical path still above 480s
+  (worst job ~520s / wall ~524s on first attempt of 30708423524). Phase 3
+  must rebalance before re-checking the 8 minute bar. `fail-fast: false`
+  always. Half-core `maxWorkers` cap retained.
 - **D7 Minutes vs wall:** more shards and more jobs increase billed Actions
   minutes. Accepted for this packet in exchange for lower wall clock.
 - **D8 Enforcement parity:** PR tier and release tier must not drop checks.
@@ -92,10 +96,13 @@ Phase 1 QA may land in a small commit before or during Phase 2.
 | PR wall (2026-08-01) | 12.8 / 14.2 / 11.7 min | runs 30705333396, 30704449673, 30703789135 |
 | Worst shard vitest | 683s (shard 3) | run 30705333396 |
 | Best shard vitest | 370s (shard 4) | same |
-| Suite files | ~1,926 | worktree count + live sum |
+| Suite files | 1,926 | live shard sum (N=6 and N=8) |
 | Suite tests | ~24.4k | live shard sum |
 | Prior N=4 ship wall | 184 / 194 / 188s | toolchain Phase 4, ~1,129 files |
-| Lint checkout typical | 96 to 195s | sample of 16 runs |
+| Phase 2 N=6 green wall | 594s (9.90 min) | run 30707931452 |
+| Phase 2 N=6 worst vitest | 502.39s (shard 4) | same |
+| Phase 2 N=8 first attempt wall | ~524s (8.73 min) | run 30708423524 attempt 1 (shard 4 flaked; critical path was shard 5) |
+| Phase 2 N=8 worst vitest | 435.88s (shard 5) | same |
 | Lint checkout Phase 1 | 22 to 25s | runs 30707112749, 30707206995, 30707453993 |
 | Lint job Phase 1 | 59 to 68s | same three runs |
 | pr-checks | ~110s | not critical path |
@@ -105,18 +112,19 @@ Phase 1 QA may land in a small commit before or during Phase 2.
 
 - `.github/workflows/ci.yml` (all jobs, if-conditions, matrix, concurrency)
 - `scripts/gate.mjs` (step list comments; no --shard)
-- `tests/ci_workflow.test.ts` (structural pins)
+- `tests/ci_workflow.test.ts` (structural pins; `SHARD_N = 8`)
 - Optional new: small pure helper for shard-simulation in tests if Phase 3
   needs a durable pin (prefer inline in the test file unless reused)
 
 ## OPEN items
 
-1. **Exact N (6 vs 8):** Phase 2 measurement. Until then treat N as unset in
-   pins beyond "greater than 4".
-2. **Heavy-file split list:** Phase 3 live ranking under locked N. Brainstorm
-   candidates are proxies only.
+1. **Exact N (6 vs 8):** CLOSED. Locked N=8. OPEN for wall bar: Phase 3 must
+   rebalance to re-check ≤ 8 min (DEFERRED from Phase 2).
+2. **Heavy-file split list:** Phase 3 live ranking under locked N=8. Brainstorm
+   candidates are proxies only. N=8 worst shards (vitest Duration): shard 5
+   ~436s, shard 4 ~361s; imbalance worst/median ~1.77 on 30708423524.
 3. **Branch protection check names:** owner action after Phase 2; track in
-   progress.md.
+   progress.md. New names are `PR gate (English-only legal) (1)` through `(8)`.
 4. **Larger runners:** locked off (D1). Flip only with owner + cost note.
 5. **Aggregator job for path filters:** only if branch protection cannot
    accept skipped required checks; Phase 5 decides with evidence.
@@ -129,14 +137,10 @@ Phase 1 QA may land in a small commit before or during Phase 2.
 
 ## Resume point
 
-- Phase 1 code: shallow lint checkout (no full-history checkout), workflow
-  concurrency with `cancel-in-progress: true` (group =
-  workflow+event_name+PR/ref), Playwright Chromium cache on browser-gate
-  keyed on `playwright` package version, hardened pins in
-  `tests/ci_workflow.test.ts`.
-- PR: https://github.com/levy-street/world-of-claudecraft/pull/2737 (ready
-  after Phase 1 QA).
-- Phase 1 QA: PASS-WITH-FOLLOWUPS. security CLEAN; pin coverage PASS;
-  qa-checklist PASS-WITH-FOLLOWUPS. No BLOCKING.
-- Next: Phase 2 (`phase-02-shard-count.md`). Measure N=6 and N=8 walls +
-  completeness before locking N. Do not raise N past 8 without owner OK.
+- Phase 1 code: shallow lint checkout, concurrency cancel, Playwright cache.
+- Phase 2 code: N=8 matrices on pr-gate + release-gate; `SHARD_N` pins;
+  comments no longer say 4-shard; gate.mjs unsharded.
+- PR: https://github.com/levy-street/world-of-claudecraft/pull/2737
+- Phase 2 wall: **DEFER to Phase 3** with numbers (neither N in {6, 8} hit
+  ≤ 480s green wall; N=8 locked as max allowed without owner OK).
+- Next: Phase 2 QA, then Phase 3 (`phase-03-shard-rebalance.md`).

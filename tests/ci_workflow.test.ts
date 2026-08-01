@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest';
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const gate = readFileSync(new URL('../scripts/gate.mjs', import.meta.url), 'utf8');
 
-// Locked (or measurement) shard count for pr-gate and release-gate matrices.
-// Phase 2 of docs/ci-speed: escalate from the prior N=4; keep both jobs on the
-// same N. Prefer this single constant over scattering /N literals in pins.
+// Locked shard count for pr-gate and release-gate matrices (Phase 2 of
+// docs/ci-speed). Supersedes the prior toolchain N=4 on this surface. Both
+// jobs share this N. Prefer this single constant over scattering /N literals.
 const SHARD_N = 8;
 const SHARD_MATRIX = Array.from({ length: SHARD_N }, (_, i) => i + 1).join(', ');
 
@@ -173,12 +173,10 @@ describe('CI workflow parity', () => {
       'g',
     );
     expect(workflow.match(shardRunRe)).toHaveLength(2);
-    // Wrong denominator (legacy N=4 run lines) must not satisfy the pin when
-    // SHARD_N has moved on. Compare via a string so tsc does not fold the
-    // constant and flag an always-true arm.
-    const legacyFourRun = 'run: npm test -- --shard=${{ matrix.shard }}/4';
+    // Legacy N=4 run lines must not remain once SHARD_N has moved on.
+    // String(SHARD_N) comparison avoids tsc folding a constant always-true arm.
     if (String(SHARD_N) !== '4') {
-      expect(workflow).not.toContain(legacyFourRun);
+      expect(workflow).not.toMatch(/run: npm test -- --shard=\$\{\{ matrix\.shard \}\}\/4\b/);
       // Exact matrix of length 4 only (trailing newline after closing bracket).
       expect(workflow).not.toContain('shard: [1, 2, 3, 4]\n');
     }
