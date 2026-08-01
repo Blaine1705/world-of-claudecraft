@@ -9654,6 +9654,18 @@ export const en_CA: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Fangknife of Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Fanglord's Beastspear"
+      },
+      "bloodmane_warleggings": {
+        "name": "Bloodmane Warleggings"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Vineclaw Stalking Breeches"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sunbone Ritual Sarong"
+      },
       "thick_winter_pelt": {
         "name": "Thick Winter Pelt"
       },
@@ -10400,6 +10412,24 @@ export const en_CA: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Wyrmchoir Handwraps"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Basin Stalker's Tunic"
+      },
+      "verdant_heart_vestment": {
+        "name": "Verdant-Heart Vestment"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Sunbone Ritual Hauberk"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Greatfang of the Basin"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Sunbone Oracle's Crown"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Bloodmane War-Legguards"
       },
       "deathless_greatblade": {
         "name": "Deathless Greatblade"
