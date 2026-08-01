@@ -3892,8 +3892,10 @@ measure; its commit title says 1,317, its own count of the pending rows it
 filled), and the #2605/#2507 provenance threading). Twenty conflicts resolved (the merge commit body records the
 blends); the release-merge-audit ran as an 11-auditor workflow with paired
 adversarial verification, 26 findings confirmed, every packet-actionable one
-fixed on the branch in the same change. Corrections to figures earlier
-phases pinned, superseding them at this tip:
+fixed on the branch in the same change. The fix-round review closed on
+the branch tip and the full gate ran green there (PASS all 11 steps,
+exit code 0, read from the run's own captured line). Corrections to
+figures earlier phases pinned, superseding them at this tip:
 
 - Surface-inventory rows are 204, not 201: the release ADDED three routes
   (POST /api/epic/link, DELETE /api/epic/link, GET /api/epic/status), so the
@@ -3968,6 +3970,620 @@ bump-at-ship cadence):
   what let an emit-only field ship. A wire-field parity pin (the
   world_api_parity shape, over the aura wire keys) would make the next
   asymmetric field red at the release's own gate.
+
+---
+
+## Post-packet scoping (2026-08-01): proposed phases 19 to 21
+
+Run after the v0.34.0 re-target sync above, entry verified at the same
+tip (branch synced with release/v0.34.0, gate green per the sync block).
+The three maintainer items of 2026-08-01 were each investigated against
+the merged tree by its own investigator with paired adversarial
+verification (bank 16 claims CONFIRMED and 2 CORRECTED, map 27 CONFIRMED
+and 3 CORRECTED across two independent verifiers, vendor 25 of 25
+CONFIRMED, zero REFUTED) plus a completeness critic; the critic's one
+blocker (item 2 demanded a MEASURED proposal, not an estimate) was
+closed by authoring a concrete candidate node set and re-deriving its
+rule checks and numbers with a second independent script pass (three
+corrections, no refutations, folded in below). The phases below are
+PROPOSED, not started: the worklist awaits the maintainer's settlement
+of the decision list at the end of this section, including the
+packet-boundary question (Q1), and nothing here preempts the phase 18
+merge decision, which stands separate.
+
+### Phase 19 (proposed): bank "Deposit materials", the honest taxonomy
+
+Build: Fable xhigh. QA: ultracode, new session. Small phase; build and
+QA may pair with phase 21 in one session pair if the maintainer prefers
+(Q2).
+
+What the audit found (all claims adversarially verified). The
+deposit-all flow is pure client: `bank_window.ts` gates the button on
+`hasDepositableMaterials`, plans via `planDepositAllMaterials` against
+one snapshot, then replays each planned stack as an individual
+`bankDeposit(slot, count)` call (online: one `bank_deposit` wire message
+per stack; there is no bulk command). The sim validates proximity,
+alive-state, slot bounds, quest-kind deny, and capacity, but NEVER
+materialness: by design any non-quest item deposits one at a time
+(self-storage), so the material predicate exists only in the client, in
+`matchesCategory(item, 'material')` (`src/ui/bag_filter.ts`), which is
+`kind === 'junk' || kind === 'tool'`, shared by the bags chip, the bank
+chip, and the deposit plan and gate. Against the merged 810-item catalog
+that predicate matches 116 items and is badly stale: every one of the 45
+kind-tool items deposits today, including both charms
+(`gatherers_cache`/`artisans_eye` are kind `tool` by deliberate
+authoring), all 19 equipped-ladder gather implements, 17 cosmetic tokens
+(mechChroma plates and skinSelect), `heroic_mark`, the rift gems, and
+`riding_training`; kind `junk` itself is a four-way mix of 45 honest
+materials (node yields, fine grades, harvest components, pristine
+specimens, mob-drop reagents, salvage outputs, and the vendor staples
+including `arcanite_bar`), 5 unclassified non-poor oddments (four
+rare-mob trophies plus `last_keep_signet`, which is a PLACED zero-combat
+keep keepsake, not a mob trophy), 19 grey vendor trash, and 2 grey
+fishing catches; and the 7 raw-fish cooking reagents (kind `food`) are
+the only reagent class the predicate misses. Candidate predicates were
+measured against the honest-45 target: `junk` minus quality `poor`
+wrongly keeps only the 5 oddments; a derived source-or-reagent junk set
+is exact both ways and self-registers new content; a raw recipe-reagent
+set is dishonest in both directions (it pulls in 8 tools and drops the
+three eastbrook fine grades no recipe consumes). The repo's own comments
+record that there is no dedicated material kind
+(`src/sim/content/items.ts`), and `market_query.ts` already precedents
+carving a subcategory out of `junk|tool` (cosmetics).
+
+Scope. (1) One shared predicate module, module-first:
+`src/sim/material_taxonomy.ts` (sim leaf, the `market_query.ts`
+content-derived-classifier precedent; ui already imports sim leaves)
+exporting `isMaterialItem(def)` and, if the derived-set vehicle is
+chosen (Q8), a `MATERIAL_ITEM_IDS` set derived from the node-yield, grade,
+harvest-component, specimen, salvage, and junk-kind reagent-union
+tables, filtered per the maintainer's membership rulings (Q3 to Q6).
+(2) `bank_view.ts` `planDepositAllMaterials` and
+`hasDepositableMaterials` consume it, keeping both function names so
+the bank_window wiring pins survive. (3) The per-item deposit path is
+explicitly OUT of scope and must not narrow: the sim's any-non-quest
+self-storage behavior is deliberate, and the acceptance pins it. (4) If
+the chips are ruled in scope (Q7): the `bag_filter.ts` material arm
+delegates to the same module (bags and bank chips narrow together),
+optionally with a new chip for the displaced tools (new i18n and
+BAG_CATEGORIES surface); if the market is ruled in scope: the sim-side
+`market_query.ts` material arm delegates too (server-authoritative,
+server deploys first, benign for stale clients) with its
+`other`/`cosmetic` arms absorbing displaced kinds so nothing becomes
+unbrowsable. No IWorld facet change, no wire change, no DB change.
+Stale doc comments in `bank_view.ts` that say "junk/tool" update in the
+same change.
+
+Acceptance. (a) A census guard proves the deposit predicate matches
+EXACTLY the ruled material set on the live catalog: zero kind-tool
+items (the exclusion sweep must key on KIND, not use types:
+`simple_fishing_pole` is use-type `fishing` and six tools carry no use
+at all), zero equipment, quest, mount, or bag items, and every ruled-in
+class fully present. (b) Deposit-all over a bag holding one item of
+each excluded class plus one of each included class plans ONLY the
+included ones, replayed against a REAL Sim with zero error events.
+(c) The button disables when the bags hold only excluded items. (d) A
+kind-tool item still deposits through the per-item path (the overreach
+guard). (e) Chips and market behave per the scope ruling, with the
+market reachability doctrine intact (`tests/market_filters.test.ts`
+sweeps every catalog id against every non-all bucket and asserts every
+bucket is live; its material-bucket assertion pins
+`simple_fishing_pole` and `bone_fragments` by name, and narrowing
+moves the pole out while bone_fragments stays, so the assertion
+changes even though only one id moves buckets). (f) `npx tsc
+--noEmit` clean, existing suites green after pin updates, `npm run
+gate` PASS.
+
+Tests. UPDATE `tests/bag_filter.test.ts` and `tests/bank_filter.test.ts`
+(the keeps-junk-and-tools-as-materials pins flip),
+`tests/bank_view.test.ts` (the synthetic KINDS fixtures and the real-Sim
+MATS fixtures: `amber_hide` and `stag_antler` are quality-poor grey
+trash posing as materials today; replace with non-poor materials if
+grey is ruled out). ADD `tests/material_taxonomy.test.ts` with
+census-style membership pins per the test-pin trap index: exact-set
+equality against a sorted literal id list, kind-based class-exclusion
+sweeps, an inclusion sweep riding the existing
+`tests/crafting_materials_quality.test.ts` guard, and a completeness
+tripwire enumerating the ONLY allowed unclassified non-poor junk so a
+future junk item must be classified explicitly. UPDATE IF IN SCOPE:
+`tests/market_filters.test.ts`. KEEP: `tests/bank_window.test.ts`
+wiring pins, `tests/world_api_parity.test.ts` (untouched).
+
+Reviewers. frontend-seam-reviewer (ui pure cores and painter
+contracts), test-coverage-auditor (the phase is predominantly pin
+surgery plus a new membership guard), architecture-reviewer if the
+module lands in `src/sim` or `market_query.ts` changes (sim purity,
+content-import pattern), cross-platform-sync if the market arm changes
+(server-filter vs client-chrome drift across the deploy window),
+qa-checklist always. Not needed: database-performance-reviewer,
+migration-safety, privacy-security-review (no DB, no wire, no
+persisted-schema change).
+
+### Phase 20 (proposed): gathering coverage at the expanded world scale
+
+Build: Fable xhigh (measurement discipline; content-heavy). QA:
+ultracode, new session.
+
+What the audit found (27 claims CONFIRMED, 3 CORRECTED across two
+independent verifiers; every number scripted, scripts re-derived
+independently). Nothing is access-broken at the current scale: the
+whole placement family runs green on the merged tree
+(gather_node_placement, gather_nodes, fishing_zones,
+gather_nodes_render, plus the harvest and fishing siblings), and
+q_prof_intro's six Copper Dig veins measure 17.80 to 19.65yd against
+the 20yd findability pin. The emptiness is real and measured: all 11
+v0.32.0 expansion zones ship the deliberate starter kit of 2 nodes per
+type, all tier 1, all inside a 48 to 59yd hub ring; node density is
+0.28 to 0.46 per 10k sq yd against 1.39 in the tuned strip, 40yd
+coverage 9.0 to 15.5 percent against 36.4 to 43.2, median
+walkable-cell-to-nearest-node 114 to 212yd (16 to 30s at RUN_SPEED 7)
+against 44 to 52yd, and a full-zone circuit of 53 to 55s against the
+240s respawn (77 to 78 percent idle; per-zone harvest ceiling 90/hr
+against the strip's 270). The bottom-map zones by coordinates are
+farshore_isle, galecrest, and willowfen; all 11 zones measure equally
+deficient, the bottom three are not outliers. Tier-1 density additions
+are LEGAL under R37's sharpened guard (stations, catch tables, and
+above-tier-1 nodes are what it forbids); the zone-4 pass owns
+re-tiering, so all additions here stay tier 1 (the material_grades
+below-material-rung arm reds otherwise). Two prominent findings ride
+the decision list. First, nine expansion nodes sit inside the 5yd road
+band with no exemption pin (worst `ore_evergarden_1` at 0.42yd from
+the road center line, a node body in the roadway by the R11 standard):
+a rules-consistency defect the suite cannot see, NOT an accessibility
+break and NOT a merge-decision blocker (it predates this delta and the
+suite is green). Second, the two 4096-byte cooldown-blob pins bound
+any addition, and the WIRE arm binds first: the stable-arm ncd worst
+case (absolute deadlines at thirty days of uptime,
+`tests/professions_wire_budget.test.ts`) measures 3,624 B at 120 nodes
+and crosses 4096 at roughly +17 nodes, while the persist two-decimal
+real-record form (`tests/professions_node_persist.test.ts`) measures
+3,144 B and crosses at +36; both files carry the recorded v0.32.0
+2048-to-4096 raise as the precedent for a deliberate ceiling decision.
+Fishing: the R55 family in `tests/fishing_zones.test.ts` already
+proves every zone with a rod-tier row and declared lakes accepts a
+REAL startFishing cast (and the deny-while-swimming arm makes that a
+standable casting spot), so the genuinely missing validation is
+hub-reachable-shore and travel-distance arms plus per-lake sweeps: two
+decorative lakes hold no swim-depth water and pass silently
+(veiled_hollow's Mirrormere and farshore's east pond), and border
+waters ARE fishable declared water (the Lawnmere border mere carves
+swim-depth water into galecrest's south band), so Wickharbor's nearest
+fishable water is Mirror Tarn at a 200yd walk with the south mere bank
+at roughly 330yd as a second site, and the open sea is unfishable
+everywhere. One suite hole the authoring pass exposed: the render
+draws ONE world-spanning sea plane and the placement suite's dry-land
+arm screens only declared water bodies, so a suite-green node can
+render submerged; the authoring guard used below (ground at least 1yd
+above the sea plane) is a candidate new arm (Q15).
+
+The measured proposal (default variant, +36): bring the three
+bottom-map zones from 2 to 6 per type, D5's target, with the candidate
+set below. Every candidate was validated against every placement rule
+extracted predicate-for-predicate from the suite (dry land with 1yd
+freeboard including border waters, slope at the node and across the
+whole 5yd reach, world rim, sealed crests, foreign clearance,
+hub-flood reachability for the node cell AND its stand spot with zero
+existing-node regressions, zone containment, pairwise spacing, the
+cluster transitivity band, road band, terrain anchoring,
+DELIBERATE_DANGERS with zero new hot pairings, and the 37.4yd mailbox
+floor untouched at 57.9yd minimum), and the whole check was re-derived
+independently: all 36 pass all rules; partitions at 27/30/32 are
+IDENTICAL with candidates overlaid, the decisive cluster edges stay
+decisive, and the Eastbrook trio keeps the global spacing bracket.
+Corrections folded in from the verification: the tightest
+candidate-involved pair is 19.42yd cross-type
+(wood_farshore_isle_3/herb_farshore_isle_5), the nearest world boss
+(thunzharr_waking_peak) is 179yd from wood_galecrest_5, and six
+candidates clear the visual sea line by under 0.5yd
+(wood_willowfen_5 tightest at +0.01yd, then ore_farshore_isle_6,
+wood_farshore_isle_5, wood_willowfen_6, herb_farshore_isle_4,
+ore_willowfen_4): the build nudges those six upslope or records the
+sliver as accepted (Q15).
+
+Candidate set (id, x,z, intent). willowfen: ore_willowfen_3 (-470,330)
+Lilymoors west fen-pool bank (fishing shore nearby); ore_willowfen_4
+(-252,268) Bogshine east margin; ore_willowfen_5 (-384,512) Drowsy
+Flats southwest margin; ore_willowfen_6 (-358,604) north fen by the
+Tanglemouth road; wood_willowfen_3 (-458,264) Lilymoors north willow
+stand; wood_willowfen_4 (-232,420) east moor by the Windway track;
+wood_willowfen_5 (-254,500) Drowsy Flats east rise; wood_willowfen_6
+(-418,580) north fen west stand; herb_willowfen_3 (-296,332) Bogshine
+south pool shore; herb_willowfen_4 (-452,438) Willowweep pool margin
+(fishing shore); herb_willowfen_5 (-322,588) north fen east meadow;
+herb_willowfen_6 (-330,240) south fen off the Amberfen Steps road.
+galecrest: ore_galecrest_3 (474,298) Old Beacon road foot;
+ore_galecrest_4 (420,470) coast road south of Wickharbor;
+ore_galecrest_5 (330,600) Wreckfields approach; ore_galecrest_6
+(232,300) Howling Downs west; wood_galecrest_3 (250,432) Windway road
+south side; wood_galecrest_4 (350,480) mid downs on the tarn road;
+wood_galecrest_5 (250,648) Wreckfields west treeline rise, clear of
+the Warden and deckhand camps; wood_galecrest_6 (452,600) stable
+meadows east, outside the (500,500) 60yd mob-scan probe disc;
+herb_galecrest_3 (326,566) Mirror Tarn northeast shore (fishing
+bundling; moved from (330,562), whose cell the hub flood cannot
+enter); herb_galecrest_4 (240,352) west downs meadow; herb_galecrest_5
+(420,650) south Lawnmere bank approach, dry side of the z 680 to 700
+mere rect; herb_galecrest_6 (484,330) Beacon meadow at the eastern
+ridge foot (16yd rim margin). farshore_isle: ore_farshore_isle_3
+(232,30) causeway-approach meadow north of the Landing;
+ore_farshore_isle_4 (352,-48) south headland toward the cliffs;
+ore_farshore_isle_5 (430,-90) Sundered Cliffs meadow;
+ore_farshore_isle_6 (454,93) Riftfields east reach; wood_farshore_isle_3
+(279,-44) south strand west; wood_farshore_isle_4 (330,-70) south
+headland stand; wood_farshore_isle_5 (388,123) north coast east of
+Gull Mere (fishing bundling); wood_farshore_isle_6 (210,-24) Ferrywalk
+causeway approach; herb_farshore_isle_3 (245,55) west meadow off the
+shore road; herb_farshore_isle_4 (358,140) north shore east of Gull
+Mere, outside its blend footprint (fishing bundling);
+herb_farshore_isle_5 (295,-55) south strand patch; herb_farshore_isle_6
+(430,8) Riftfields patch.
+
+Measured after-state (the same 2yd lattice and denominator as the
+before-state census above; density per 10k sq yd; circuit is a greedy
+tour with 2.5s casts against the 240s respawn). farshore_isle: 6 to 18 nodes,
+density 0.46 to 1.39, 40yd coverage 15.5 to 45.3 percent, median/p90
+distance 114/208 to 43/97yd, circuit 53s at 78 percent idle to 200s at
+17. galecrest: 6 to 18, density 0.32 to 0.96, coverage 11.0 to 37.2,
+median/p90 134/254 to 50/98yd, circuit 53s at 78 percent idle to 248s
+at 0 (over the 240s respawn; Q16 decides whether to pull one far node
+inward, trading coverage for slack). willowfen: 6 to 18, density 0.32
+to 0.96, coverage 9.5 to 38.6, median/p90 132/248 to 48/96yd, circuit
+55s at 77 percent idle to 228s at 5. The after-state approaches the
+tuned strip's texture (density 1.39, coverage 36.4 to 43.2 percent,
+circuits 153 to 192s): farshore lands at tuned density and just above
+the coverage band (45.3), the two larger rects at 0.96, and the after
+circuits (200 to 248s) run longer than the strip's. Per-zone ceiling
+goes 90/hr to 270/hr, equal to the strip. Whole
+map 120 to 156 nodes, tier mix t1 102 to 138, t2 12, t3 6.
+
+Blob and pin arithmetic at the real candidate id spellings, verified
+independently: persist two-decimal 3,144 to 4,116 B (+20 OVER the 4096
+pin, crossing exactly at the 36th candidate); wire thirty-day form
+3,624 to 4,740 B (+644 OVER, crossing at +17); the integer form that the
+persist fixture and the wire legacy arm actually serialize stays under
+(3,648 B), so the persist ASSERTION stays green while its recorded
+two-decimal-headroom contract breaks, and the wire stable-arm pin,
+whose fixture serializes two-decimal thirty-day deadlines, reds
+outright: the ceiling decision
+(Q11) is unavoidable for any variant past +9, with 8192 the natural
+doubling step and the +132 full-D5 follow-on measuring 7,684 B wire.
+`tests/professions_blob_growth.test.ts` HOLDS (projected roughly 9,451
+against the 9,728 pin) with its headroom note gone stale. Render
+batches go 57 to 68 (11 new zone:type:band combos).
+`tests/professions_zone_rollout.test.ts`'s starter-pair pin reds: the
+cheap reshape keeps the three zones' ledger rows 'starter' and
+re-mints the pin to per-zone expected counts; flipping the rows to
+'complete' would ALSO demand a crafting station per zone (Q12).
+Verified NOT moved: minimap_markers (both fixture anchors sit far from
+every candidate; any relocation re-mints), quest_targets cluster arms,
+the placement suite's tuned-scope arms, DELIBERATE_DANGERS set,
+road-band exemption set, tier-ramp groupsChecked, gather_nodes
+(Copper Dig), professions_zone_scaling, the physics-audit sweeps, and
+the snapshots fixtures (GATHER_NODES[0] identity preserved when
+candidates insert inside each zone's section);
+server/economy_telemetry.ts is a checked no-op consumer (band and tier
+maps rebuild from content). The no-ceiling-raise variant, measured: +1
+per type per zone (+9, ids renumbered _3) is the LARGEST balanced
+subset keeping both blobs under 4096 (persist 3,387 B, wire 3,903 B;
++2 per type already reds the wire at 4,182); its coverage lands at
+18.3 to 25.4 percent with circuits at 47 to 61 percent idle, render
+batches 64, and it still re-mints the rollout pin and the render
+literals while moving NO byte pin.
+
+Scope. Data-as-code node additions in `src/sim/content/gather_nodes.ts`
+per the decided scope and variant (Q9, Q10), tier 1 only; the six near-waterline
+candidates nudged upslope or their freeboard recorded (Q15).
+Same-stroke obligations: extend the placement suite's design floors to
+the changed zones (count floor, a re-measured coverage floor with a
+non-vacuity counter-arm, the ceiling arm per Q10); the rollout-pin
+reshape per Q12; the blob ceiling decision per Q11 recorded in BOTH
+files' history comments; the road-band nine decided per Q13 (fix
+`ore_evergarden_1` at minimum, or pin the exemption set); the fishing
+geometry arms per Q14 and the sea-plane arm per Q15 if ruled in; wiki
+regen (`npm run wiki:content`, freshness-gated by `tests/guide.test.ts`);
+before/after screenshots (nodes are rendered world props; the
+pr-screenshots recipe, committed under docs/screenshots). Deeds
+adjacency is Q26. The render prop path needs no code change (batching
+is derived).
+
+Acceptance. (1) The named suites all green:
+gather_node_placement, gather_nodes, gather_nodes_render (re-pinned),
+quest_targets, professions_node_persist, professions_wire_budget (at
+the decided ceilings), professions_zone_rollout (re-minted),
+professions_blob_growth, material_grades, fishing_zones, guide,
+minimap_markers, snapshots, plus the parity goldens (new solid node
+bodies must not shift a golden; re-mint deliberately if a path crosses
+a new body). (2) The changed zones hit the decided per-type count with
+the re-measured coverage floor asserted non-vacuously and the
+before/after numbers recorded in this doc. (3) q_prof_intro untouched:
+every eastbrook ore node still within the 20yd pin. (4) All additions
+tier 1. (5) Both blob forms measured and inside the decided ceilings,
+the decision recorded in the tests' own comments per the v0.32.0
+precedent. (6) `npm run gate` PASS.
+
+Tests. As enumerated in the pin arithmetic above; plus NEW fishing
+geometry arms per Q14 (extend the R55 family in
+`tests/fishing_zones.test.ts` in its own house style, fixtures with
+counter-examples) and the sea-plane arm per Q15 in the placement
+suite; the placement floors keep `groupsChecked` honest as new ids
+match the tier-ramp discovery regex.
+
+Reviewers. test-coverage-auditor (the re-pins and new floors are the
+whole risk surface: non-vacuity, pin quality, no
+constant-self-comparison); architecture-reviewer (static collider-set
+growth vs determinism and parity, the derived-guard mesh:
+material_grades, fishing tiers, cluster partitions, zone rollout);
+database-performance-reviewer ONLY if the persist ceiling moves
+(characters.state row growth plus the ncd wire budget across
+sessions); frontend-seam-reviewer (render batch pins, minimap markers,
+guide regen, screenshot pairs); qa-checklist always. Not needed:
+migration-safety (nodeHarvestCooldowns is id-keyed with retired-id
+drop on load; additions are backward-safe), cross-platform-sync and
+privacy-security-review (no protocol shape change; payload size only,
+covered by the wire-budget pin).
+
+### Phase 21 (proposed): vendor buy multiples
+
+Build: Fable xhigh. QA: ultracode, new session.
+
+What the audit found (25 of 25 claims verified CONFIRMED). The buy
+click sends `{t:'cmd', cmd:'buy', npc, item}` and buys exactly one row
+unit, where a row unit is `vendorStackSize(def)` units (5 for
+food/drink, else 1); `items.buyItem` checks stock, price, dead, range,
+riding and mount gates, copper (unit price times stack), honor
+(per-PURCHASE, deliberately NOT stack-multiplied), then
+`ctx.canAddItem` before debit plus grant, and emits the `vendor`
+SimEvent with no log line. The `sell` and `discard` commands already
+carry an optional count with a sanitize idiom, and the packet's
+stale-client shape is send-the-field-only-when-non-default so the
+default frame stays byte-identical. Buyback is index-addressed
+per-unit-instance redemption (a structurally different shape). The
+delve and heroic Marks shops are separate commands, windows, and
+currencies (`delve_buy`, `heroic_buy`) selling single-purchase gear and
+tools with confirm-per-buy, so a qty widening does not flow into them.
+Vendor stock is membership-only (`npc.vendorItems.includes`): there is
+no limited-quantity row anywhere, so multi-buy needs no stock-decrement
+arm. Economy telemetry samples the copper DELTA per command dispatch,
+so one count-N purchase books one larger delta with zero telemetry
+change. No copper overflow guard exists on the buy path today; max
+`buyValue` is 800,000c, leaving roughly 1.1e10 as the safe-integer
+count headroom a guard must enforce deliberately.
+
+Scope, widening the existing `buy` command (no new command;
+COMMAND_NAMES stays at its current count, the command_schema pins and
+the REST surface corpus are untouched). (1) Wire: optional `count` on
+the buy frame, sent ONLY when count > 1 (the commission/confirmUse
+byte-identical idiom); server dispatch forwards it in the `sell`
+shape. An old client sends no count and buys exactly 1; a new client
+against an old server (the OTA-ahead window) has its field ignored and
+the server charges what it grants, a safe degrade in both directions.
+(2) Sim, module-first: a new pure leaf `src/sim/vendor_purchase.ts`
+beside `vendor_stack.ts` owning count sanitization (isFinite, floor,
+at least 1, hard cap per Q19) and purchase totals, overflow-guarded
+BEFORE the balance compare (the market ceiling idiom), with the
+copper/honor asymmetry explicit (copper is per unit times stack times
+count, honor is per purchase times count); `items.buyItem` stays thin
+and consumes it, forcing count 1 (or refusing) on `teachesRiding` and
+mount rows per Q23; the capacity pre-check stays
+`ctx.canAddItem(itemId, units)` before any debit. The sanitize idiom
+must NOT copy `sell`'s silent no-op arm verbatim: `sell` returns
+without a denial on a hostile count, and the acceptance states which
+behavior buy-count gets (Q20). The devVendor free-purchase arm
+(`freeVendor` zeroing costs while capacity still gates) gets defined
+count semantics and a test arm so it does not become an untested leaf.
+The stale `vendor_stack.ts` header comment (it contradicts the
+per-unit charge in code) is corrected in the same change. (3) Facet:
+`IWorldInventory.buyItem` widens with count, in BOTH worlds.
+STRUCTURAL-TYPING TRAP, named here so the implementer cannot miss it:
+`Sim.buyItem`'s third parameter is already the optional pid, so
+appending count third compiles green while offline callers' count
+lands in pid; the widening must take the `sellItem` parameter order
+(npcId, itemId, count, pid?) and update the server dispatch call to
+pass count third and pid fourth in the SAME change; tsc will not catch
+a miss. (4) UI: qty state and multiple-aware affordability in the pure
+core `vendor_view.ts` (Node-tested; the disable state tracks the
+SELECTED multiple); the control row and custom-amount prompt in the
+window layer reusing the quantity-prompt family and, if Q22 rules
+confirms in, the one confirm-dialog family with the fee-in-body
+template; the qty must thread the painter seam too (the
+`VendorWindowDeps.onBuy` callback type and both hud callback sites;
+online and offline share `renderVendor`); data-focus-key entries so
+the focus-across-rebuild ladder and gamepad reach the new controls;
+coarse-pointer 40px floors. Gamepad intent stated up front: the fixed
+1x/5x/10x row is the gamepad-complete path; the custom prompt either
+inherits the sell-prompt's pointer/keyboard-only precedent as a
+recorded limitation or gains stepper buttons (Q24). The R22 advisory
+ladder is qty-independent (wield requirement); only affordability
+changes with qty. The classic-fidelity anchor for the trigger is the
+shift-click stack-quantity picker precedent already used by the bags
+sell-split prompt (Q21 picks the trigger surface). (5) i18n: new
+`itemUi.vendor.*` keys (qty labels, custom-amount prompt, optional
+confirm title/body with item/count/price tokens, widened buy aria);
+the sim reuses the matcher-registered denials ("Not enough money.",
+"Your bags are full.") so zero new sim strings unless a summary line
+is ruled in (Q25), which then registers in sim_i18n in the SAME change
+(S3) and takes M16 non-Latin fills if wordy. EXCLUDED pending rulings:
+the delve and heroic Marks shops (Q17) and buyback multiples (Q18).
+
+Acceptance. (a) count omitted or 1 reproduces today's behavior
+byte-for-byte on the wire and in sim state; (b) with sufficient funds and space, count N buys N row units
+atomically: copper debits unit price times stack times N, honor debits
+per-purchase times N, bags gain stack times N, capacity and balances
+checked BEFORE any debit, and the shortfall cases (partial fit,
+partial affordability) resolve per the Q20 ruling;
+(c) hostile counts (0, negative, NaN, Infinity, fractional, 1e15)
+never mint copper, never overflow, never grant past capacity, and
+resolve per the ruled deny-vs-silent behavior; (d) the old-client
+frame buys exactly 1 against the new server; a new-client count
+against an old server charges exactly what it grants; (e)
+COMMAND_NAMES, command_schema, and world_api_parity counts unchanged,
+proven by running them; (f) desktop and mobile vendor windows expose
+1x/5x/10x/custom with 40px coarse floors, focus restore across the
+rebuild, aria naming qty and total price, and gamepad/keyboard reach
+via the existing focus keys; (g) every new player-visible string is a
+`t()` key, the S3 guard green; (h) `npm run gate` PASS.
+
+Tests. Extend `tests/items.test.ts` (multi-count arithmetic: food
+stack times count, honor times count, dual-price rows,
+capacity-refusal or clamp at count, insufficient-funds at count,
+sanitize edges, determinism drive with counts, the devVendor count
+arm). NEW `tests/vendor_purchase.test.ts` for the pure leaf (cap,
+floor, overflow bound: totals stay safe integers before compare,
+zero/negative handling per ruling, mount/riding force-1). Extend
+`tests/vendor_view.test.ts` (per-multiple affordability and totals)
+and the vendor window painter suite (qty controls, aria, focus-key
+survival). ADD a sender-side wire pin (the phase 14 confirmUse
+precedent): count absent from the frame when 1. ADD the mobile floor
+pin in `tests/mobile_window_layout.test.ts`. If the Marks shops are
+ruled OUT, add exclusion pins that `delve_buy`/`heroic_buy` remain
+single-unit. `tests/command_schema.test.ts` and
+`tests/world_api_parity.test.ts` should require NO edits; run them to
+prove it. The S3 guard (`tests/localization_fixes.test.ts`) stays
+green with any new sim emit registered.
+
+Reviewers. architecture-reviewer (new sim leaf purity, determinism, no
+DOM in sim); cross-platform-sync (facet widened in BOTH worlds,
+offline vs online behavior identical, stale-client arms both
+directions); privacy-security-review (client-supplied count on a money
+path: the negative/overflow copper-mint class, server re-validation);
+test-coverage-auditor (decisiveness of the qty-edge, overflow,
+sender-byte-identical, and exclusion pins); frontend-seam-reviewer
+(pure-core vs painter split, prompt/confirm family reuse, focus
+restore, touch floors, i18n sinks); qa-checklist always. Not needed:
+database-performance-reviewer, migration-safety (no schema, no new
+table). The RL env and the admin dashboard are verified clean for all
+three phases (no gather, vendor, bank, or buy surface in `headless/`
+or `python/`; `src/admin` hits are copper formatting and generated
+i18n only), so the coverage reviewers need not re-derive those
+surfaces.
+
+### Scoping decision list (the maintainer settles; nothing builds until then)
+
+Q1. Packet boundary: do phases 19 to 21 land in THIS doc as drafted,
+or in a successor worklist doc with the packet review closed at phase
+18? The drafts are written here either way; a successor doc would lift
+them verbatim.
+Q2. Phase order and pairing: the proposed order is 19 bank, 20 map, 21
+vendor (the maintainer's item order); 19 is small enough to pair with
+21 in one build session if preferred.
+Q3. Bank membership, grey trash: is quality-poor junk (19 vendor trash
+plus 2 fishing catches) IN or OUT of the deposit sweep? It deposits
+today; OUT makes the bank sweep disjoint from the vendor sell-all-junk
+sweep (which is exactly the quality-poor set), which looks intended
+but changes live behavior for pack rats.
+Q4. Bank membership, the 5 non-poor junk oddments: four rare-mob
+trophies (old_cragmaws_pelt, emberwing_cinderscale, guardian_core,
+gleamstag_charm) plus the placed keep keepsake last_keep_signet. IN
+lets the predicate be exactly junk-minus-poor with zero material loss;
+OUT requires the derived source-or-reagent set or an explicit item
+marker. The bucket mixes provenance, so a blanket trophy ruling may
+not fit all five.
+Q5. Bank membership, raw fish: do the 7 kind-food cooking reagents
+(raw_* fish plus glimmerfin_koi) count as depositable materials? They
+are the only reagent class the current predicate misses, and they
+would then match two chips.
+Q6. Bank membership, vendor staples: should vendor-buyable crafting
+staples count as depositable materials? Only the 6 reagent-only ids
+are actually decided here
+(smithing_flux, spool_of_thread, tanning_agent, cooking_salt,
+glass_vial, arcanite_bar); every other buyValue-bearing reagent stays
+in under any candidate. They deposit today; recommend they stay in.
+Q7. Bank scope: fix the DEPOSIT predicate only, or also narrow the
+shared Materials chip (bags plus bank) and the World Market material
+browse category to the same definition? One shared definition is the
+honest end state, but narrowing the chips leaves tools and cosmetics
+findable only under All unless a new chip lands (new i18n, new
+BAG_CATEGORIES surface), and the market arm pulls in the reachability
+pins and the two flipping fixtures named in the phase.
+Q8. Bank vehicle: derived source-or-reagent set (exact today,
+self-registering, but blind to a future material that is neither node
+yield nor reagent yet) vs an explicit ItemDef marker (hand-authored
+per item with a completeness guard)? This decides where authoring
+effort lands for every future item.
+Q9. Map scope: density-only additions NOW in the bottom three zones
+(the measured proposal), all 11 expansion zones (equally deficient by
+the numbers), or fold into the zone-4 design pass? Tier-1 additions
+are legal under R37's guard either way.
+Q10. Map variant: the +36 default (D5's 6 per type, near-strip
+coverage texture, 270/hr ceiling parity, REQUIRES the blob ceiling
+raise) vs
+the +9 no-raise maximum (3 per type, 135/hr, roughly half the strip's
+coverage texture, no byte pin moves) vs another count. This is also
+the ceiling-texture call for level-20 zones: does the strip's 270/hr
+equality extend to them?
+Q11. Map blob ceilings: if any variant past +9 is chosen, raise the
+wire AND persist pins (8192 is the natural doubling step) with the
+decision recorded in both files per the v0.32.0 precedent, sized
+anticipating the +132 full-D5 follow-on (7,684 B wire measured)?
+Q12. Map rollout ledger: re-mint the starter-pair pin to per-zone
+expected counts with the three zones' ledger rows staying 'starter'
+(the cheap reshape), or flip the rows to 'complete', which also
+demands a crafting station per zone (a bigger, zone-4-shaped
+decision)?
+Q13. Map road band: the nine unpinned in-band expansion nodes: fix
+(relocate ore_evergarden_1 at minimum, at 0.42yd it stands in the
+roadway by the R11 standard) or pin the exemption set as the tuned
+zones did?
+Q14. Map fishing geometry: extend the R55 family with
+hub-reachable-shore and travel-distance arms and per-lake sweeps? Are
+the two dead decorative lakes (Mirrormere, farshore east pond)
+intentional? Is Wickharbor's 200yd walk to Mirror Tarn acceptable
+given the open sea is unfishable (the south Lawnmere bank at roughly
+330yd is the alternative site the border waters offer)?
+Q15. Map sea-plane guard: adopt the authoring rule (ground at least
+1yd above the world sea plane) as a new placement-suite arm, since a
+suite-green node can render submerged today? And for the six
+candidates within 0.5yd of that line: nudge upslope in the build, or
+record the sliver of freeboard as accepted?
+Q16. Map galecrest circuit: accept the 248s full circuit at zero idle
+against the 240s respawn, or pull one far node (wood_galecrest_5 or
+herb_galecrest_5) toward the middle, trading a little coverage for
+slack?
+Q17. Vendor scope, Marks shops: delve_buy and heroic_buy are separate
+commands, windows, and currencies selling single-purchase gear and
+tools with confirm-per-buy; recommend excluding both from multiples
+(with exclusion pins). Confirm.
+Q18. Vendor scope, buyback: index-addressed per-unit instance rows
+make multi-buyback a structurally different change; recommend buyback
+stays one per click. Confirm.
+Q19. Vendor custom-amount cap: bag-fit-derived (countFit), a flat
+constant, or both, and is the computed max shown in the prompt?
+Q20. Vendor partial-fit and partial-affordability semantics: for a 10x
+buy that fits or affords only 7, refuse whole (the buy and delve-shop
+precedent) or clamp (the sell precedent)? If clamping, must the UI say
+so before the click? Related: does a hostile count deny with a toast
+or silently no-op (sell's idiom is a silent return; copying it
+verbatim swallows hostile counts)?
+Q21. Vendor trigger surface: a visible 1x/5x/10x/custom control row,
+shift-click opening the quantity prompt (the classic-fidelity
+precedent and the bags sell-split idiom), or both?
+Q22. Vendor confirm policy: no confirm (today's 1x behavior), confirm
+only custom amounts, or confirm above a copper threshold? (The Marks
+shops confirm every purchase; the plain vendor never confirms.)
+Q23. Vendor qty semantics on special rows: qty means row units
+(purchases), so 5x on a food row is 5 purchases equalling 25 units
+under the recommended model (matching the wire); confirm the wording,
+and confirm honor-priced, soulbound, mount, and teachesRiding rows
+force qty 1 (honor multiples would multiply the known
+duplicate-soulbound behavior).
+Q24. Vendor gamepad custom amount: recorded pointer/keyboard-only
+limitation (the sell-prompt precedent) or stepper buttons on the
+prompt?
+Q25. Vendor multi-buy feedback: stay silent like today's buy, or emit
+a summary log line (new sim English plus matcher row in the same
+change per S3, M16 fills if wordy)? Should the vendor SimEvent gain an
+optional count so FCT and the log can name the quantity?
+Q26. Deeds adjacency (cross-item): gather and fish visit marks are
+already written generically for every zone, but chronicle gatherer and
+first-cast deeds exist only for the three strip zones. Should the
+bottom-map zones get theirs in the same stroke as phase 20
+(cosmetic-only per the deeds doctrine), or defer to the zone-4 pass?
+Q27. Charm exchange flag (adjacent, pre-existing): the charms
+market-listing vs hand-to-hand intent question flagged at the v0.33.0
+merge audit is untouched by phase 19 but touches the same item defs;
+it stays flagged where that audit recorded it (the v0.33.0 sync-merge
+premise-corrections block, the R45 correction), restated here only so
+the lists cross-reference.
 
 ---
 
