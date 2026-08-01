@@ -265,3 +265,23 @@ describe('server prose coupling (the count clamp and the error reverse map)', ()
     expect(serverFitsClient && clientFitsServer).toBe(true);
   });
 });
+
+describe('restoreSlotBodyError refuses statically impossible pairs before any audit', () => {
+  it('fishing takes no effect and parked effects refuse on every land profession', () => {
+    // The module contract ("a fat-fingered request never leaves an audit row
+    // for a grant that was never possible") only holds if the PURE pair
+    // policy runs in the validator: the admin modal offers every profession
+    // times every effect, so 6 of the 12 selectable pairs are statically
+    // refused and used to reach the audit write first.
+    expect(restoreSlotBodyError({ professionId: 'fishing', effectId: 'gatherers_cache' })).toBe(
+      'that effect cannot be slotted on that profession',
+    );
+    expect(restoreSlotBodyError({ professionId: 'mining', effectId: 'quickening_charm' })).toBe(
+      'that effect cannot be slotted on that profession',
+    );
+    // A valid pair still passes: the policy gate must not over-refuse.
+    expect(
+      restoreSlotBodyError({ professionId: 'mining', effectId: 'gatherers_cache' }),
+    ).toBeNull();
+  });
+});

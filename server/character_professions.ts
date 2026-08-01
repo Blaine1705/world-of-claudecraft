@@ -26,7 +26,7 @@ import {
   NODE_HARVEST_TABLE,
   normalizeGatheringProficiency,
 } from '../src/sim/professions/gathering';
-import { normalizeToolEffectSlots } from '../src/sim/professions/tools';
+import { normalizeToolEffectSlots, slotToolEffectRefused } from '../src/sim/professions/tools';
 import { normalizeCraftSkills, tierForSkill } from '../src/sim/professions/wheel';
 import type { CharacterState } from '../src/sim/sim';
 import type { AdminCharacterProfessionsRow } from './admin_db';
@@ -309,6 +309,14 @@ export function restoreSlotBodyError(body: {
   }
   if (typeof body.effectId !== 'string' || !Object.hasOwn(TOOL_EFFECTS, body.effectId)) {
     return 'unknown tool effect id';
+  }
+  // The static pair-validity policy (fishing takes no effect; respawnSpeed
+  // effects are parked on every profession) is a pure content predicate, so
+  // it belongs HERE, ahead of the audit write: without it, 6 of the 12 pairs
+  // the admin modal offers were refusable only by the sim action, and each
+  // attempt left a moderation audit row for a grant that was never possible.
+  if (slotToolEffectRefused(body.professionId, body.effectId)) {
+    return 'that effect cannot be slotted on that profession';
   }
   return null;
 }
