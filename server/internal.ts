@@ -354,10 +354,15 @@ async function applyMemberMetaPush(body: Record<string, unknown>): Promise<Membe
  * the echo a DROPPED request and a genuine "none of these are linked" answer are
  * the same 200 { members: [] }. A caller that later strips flair for the ids
  * missing from a response would mass-clear on a truncated request. Comparing
- * `requested` against the number of ids it sent tells the caller which one it
- * got. (The sibling members-meta has the same hazard and its own signal for it:
- * an over-cap body answers updated 0, which its client already treats as a
- * refusal.)
+ * `requested` against the number of DISTINCT in-cap id strings it sent tells the
+ * caller which one it got. DISTINCT is load-bearing in that sentence: the count
+ * is taken AFTER the cap, the non-string drop and the de-duplication, so a caller
+ * that sent repeats and compared against its raw array length would read a
+ * perfectly delivered response as a truncated one. The bot's sweep holds its ids
+ * in a Set, so this cannot arise from the real client; the rule is written down
+ * for whoever wires the Phase 6 consumer. (The sibling members-meta has the same
+ * hazard and its own signal for it: an over-cap body answers updated 0, which its
+ * client already treats as a refusal.)
  */
 export const flexBatchHandler: RouteHandler = async (ctx) => {
   const body = await readBody(ctx.req).catch(() => ({}) as Record<string, unknown>);

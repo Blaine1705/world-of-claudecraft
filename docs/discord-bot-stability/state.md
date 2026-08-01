@@ -135,13 +135,16 @@ three poll-loop constants, moved out of `main.ts` by Phase 1 per R6), `bot/logic
 `bot/config.ts`. Build: `scripts/build_bot.mjs` -> `dist-bot/bot.cjs`; `package.json`
 `build:bot`, in the gate and both CI build jobs since Phase 1.
 
-Server: `server/internal.ts` (RouteDef table :329-549, FROZEN legacy twins :75-241),
-`server/discord.ts` (flex :950, status payload :798, presence cache :185),
-`server/discord_db.ts` (accountForDiscord, setDiscordMemberMetaBulk,
-discordFlexRowsForDiscordIds, reward_ledger DDL with its keep-forever note; line numbers
-dropped here deliberately, Phase 4 moved every one of them), `server/discord_relay.ts` (cap 50),
+Server: `server/internal.ts` (the `routes` RouteDef table, the FROZEN legacy twins under
+`handleDiscordInternal`, plus the Phase 4 helpers `sanitizeDiscordIdList`,
+`parseMemberMetaRecords`, `applyMemberMetaPush`, `flexBatchHandler`),
+`server/discord.ts` (discordFlexForAccount, discordFlexForAccounts, the status payload,
+the presence cache), `server/discord_db.ts` (accountForDiscord, setDiscordMemberMetaBulk,
+discordFlexRowsForDiscordIds, reward_ledger DDL with its keep-forever note),
+`server/discord_relay.ts` (cap 50),
 `server/discord_activity.ts` (cap 100, 30s dedupe), `server/db.ts`
-(highestCharacterForAccount :2669), `server/http/middleware/require_internal_secret.ts`,
+(highestCharacterForAccount, with the LOCKSTEP note above it),
+`server/http/middleware/require_internal_secret.ts`,
 `server/http/registry.ts` (:33, :123), `server/main.ts` (retention :3080-3087,
 GameStateSource :3008-3022), `server/reports.ts` (site-presence :285).
 

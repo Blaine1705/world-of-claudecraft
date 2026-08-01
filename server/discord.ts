@@ -986,6 +986,17 @@ export interface DiscordFlexBatchEntry extends DiscordFlex {
  * bot can render a batch entry and a single-endpoint payload through the same
  * code. It costs one round trip for the whole batch instead of four per user.
  *
+ * "Identical" is exact for every field a real character produces, and the ONE
+ * place the two can disagree is a malformed `state.level`, where the batch path
+ * is the better-behaved of the two. This path projects the level in SQL through
+ * a total guard (see discordFlexRowsForDiscordIds), so a float rounds to an int
+ * and a non-numeric value falls back to the `level` COLUMN; the per-account path
+ * is a bare `ch.state?.level ?? ch.level` in TypeScript, so it hands back 41.6
+ * for a float and the STRING "boom" in a field typed number. The sim only ever
+ * writes an integer there, so neither case is reachable from real data; the
+ * divergence is recorded rather than papered over because the parity test mocks
+ * the batched read and therefore cannot see it.
+ *
  * UNLINKED ids are ABSENT from the result rather than carrying a fabricated
  * payload: the per-id endpoint answers { linked: false } for them, and the
  * batch's equivalent of that answer is omission. Order follows the database's

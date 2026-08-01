@@ -372,8 +372,25 @@ describe('setDiscordMemberMetaBulk', () => {
     );
     // ...and IS DISTINCT FROM (not <>) is what makes a NULL-to-NULL column count
     // as unchanged rather than as a difference that rewrites the row forever.
-    expect(sql).toContain('IS DISTINCT FROM');
+    //
+    // ANCHORED to each clause, never a bare toContain('IS DISTINCT FROM'). The
+    // statement carries the row comparison TWICE and the two decide different
+    // numbers: the `matched` CTE's copy decides `skipped`, the UPDATE's WHERE
+    // decides `changed` and is the only thing that stops the write. An unanchored
+    // fragment scan is satisfied by EITHER copy, so deleting the UPDATE's
+    // predicate (every row rewrites, the phase's headline win gone) or inverting
+    // it to IS NOT DISTINCT FROM (only unchanged rows write) both leave this file
+    // green. Verified by mutation in Phase 4 QA: both mutants survive the whole
+    // DB-free suite, which is the arm CI actually runs, because the integration
+    // file that WOULD catch them skips without TEST_DATABASE_URL.
+    expect(sql).toContain(
+      '(dl.discord_username, dl.discord_joined_at, dl.discord_role) IS DISTINCT FROM (COALESCE(i.nickname, dl.discord_username), COALESCE(i.joined_at, dl.discord_joined_at), i.role_key) AS will_change',
+    );
+    expect(sql).toContain(
+      'WHERE dl.discord_user_id = i.discord_user_id AND (dl.discord_username, dl.discord_joined_at, dl.discord_role) IS DISTINCT FROM (COALESCE(i.nickname, dl.discord_username), COALESCE(i.joined_at, dl.discord_joined_at), i.role_key) RETURNING 1',
+    );
     expect(sql).not.toContain('<>');
+    expect(sql).not.toContain('IS NOT DISTINCT FROM');
     // The comparison must be against the value that would actually be STORED, so
     // the COALESCE rules appear on both the write and the compare.
     expect(sql).toContain(
@@ -410,6 +427,40 @@ describe('setDiscordMemberMetaBulk', () => {
       '2023-11-14T22:13:20.001Z',
     ]);
     expect(result).toEqual({ changed: 2, skipped: 0, unapplied: [] });
+  });
+
+  it('accepts the widest representable instant and rejects one millisecond past it', async () => {
+    // MAX_EPOCH_MS (8.64e15) is the ECMA-262 Date range, and it was previously
+    // unpinned on BOTH sides: the only rejected value any test used was 1e20,
+    // eight orders of magnitude clear of the bound, and the largest accepted one
+    // was ~1.7e12. A `>` to `>=` drift, or a wrong constant anywhere in that gap,
+    // survived the whole suite. These two records sit either side of the real
+    // edge, so the comparison and the constant are both pinned.
+    const { pool, calls } = makePool(() => counted('2', '0', []));
+    await setDiscordMemberMetaBulk(pool, [
+      metaRecord({ discordUserId: 'aaa-at-limit', joinedAtMs: 8.64e15 }),
+      metaRecord({ discordUserId: 'bbb-past-limit', joinedAtMs: 8.64e15 + 1 }),
+    ]);
+    expect(calls[0].params[2]).toEqual(['+275760-09-13T00:00:00.000Z', null]);
+  });
+
+  it('drops a NaN joinedAtMs rather than throwing inside the up-front conversion', async () => {
+    // The `!Number.isFinite` arm is unreachable from the one production caller
+    // (parseMemberMetaRecords already coerces non-finite values to null), but it
+    // is NOT redundant with the range check next to it: Infinity is caught by the
+    // bound, while NaN is not, since `NaN > 8.64e15` is false. With this arm gone
+    // a NaN reaches `new Date(NaN).toISOString()`, which throws a RangeError inside
+    // the up-front .map, aborting all 1000 records BEFORE any SQL runs, exactly the
+    // whole-batch failure this helper exists to prevent. Reached here by calling
+    // the exported function directly, since the helper itself is module-private.
+    const { pool, calls } = makePool(() => counted('1', '0', []));
+    const result = await setDiscordMemberMetaBulk(pool, [
+      metaRecord({ discordUserId: 'nan-join', joinedAtMs: Number.NaN }),
+      metaRecord({ discordUserId: 'ok-join', joinedAtMs: 1_700_000_000_000 }),
+    ]);
+    expect(calls).toHaveLength(1);
+    expect(calls[0].params[2]).toEqual([null, '2023-11-14T22:13:20.000Z']);
+    expect(result).toEqual({ changed: 1, skipped: 0, unapplied: [] });
   });
 
   it('reports changed, skipped and the unapplied ids, coercing bigint counts', async () => {
@@ -594,17 +645,35 @@ describe('discordFlexRowsForDiscordIds', () => {
       )
       .replace(/\bc\./g, '');
 
-    const perAccountSource = readFileSync(
-      new URL('../server/db.ts', import.meta.url),
-      'utf8',
-    ).replace(/\s+/g, ' ');
+    // The db.ts side is narrowed to the BODY of highestCharacterForAccount before
+    // it is searched. A whole-file `toContain` is not the pin it reads as: this
+    // very phase added a LOCKSTEP comment directly above that query which restates
+    // the clause in prose, so deleting `, id ASC` from the live ORDER BY while any
+    // comment or unrelated query elsewhere in this 3000-line file still spelled
+    // the old clause would leave the search satisfied and the two live endpoints
+    // silently disagreeing. Slicing to the function body is what makes the
+    // assertion answer "is the SHIPPING statement still in step", not "does this
+    // text appear somewhere in the file".
+    const dbSource = readFileSync(new URL('../server/db.ts', import.meta.url), 'utf8');
+    const fnStart = dbSource.indexOf(
+      'export async function highestCharacterForAccount(accountId: number)',
+    );
+    expect(fnStart).toBeGreaterThan(-1);
+    const fnEnd = dbSource.indexOf('\n}', fnStart);
+    expect(fnEnd).toBeGreaterThan(fnStart);
+    const perAccountQuery = dbSource.slice(fnStart, fnEnd).replace(/\s+/g, ' ');
+    // The slice must not swallow the next declaration, or the narrowing is undone.
+    expect(perAccountQuery).not.toContain('export async function listCharacters');
 
     expect(batchedOrderBy).toBe(
       "ORDER BY level DESC, ((state->>'lifetimeXp')::bigint) DESC NULLS LAST, id ASC",
     );
     // Non-vacuous on the db.ts side: the same de-aliased clause is really present
-    // there, so deleting or reordering it on either side fails this test.
-    expect(perAccountSource).toContain(batchedOrderBy);
+    // inside that function, so deleting or reordering it on either side fails.
+    expect(perAccountQuery).toContain(batchedOrderBy);
+    // ...and the LOCKSTEP comment sits ABOVE the function, i.e. outside the slice,
+    // which is what proves the assertion above cannot be satisfied by prose.
+    expect(perAccountQuery).not.toContain('LOCKSTEP');
   });
 
   it('returns nothing for an id with no link row (never a fabricated payload)', async () => {

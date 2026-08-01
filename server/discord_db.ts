@@ -769,9 +769,12 @@ export interface DiscordFlexBatchRow {
  * UNLINKED ids simply produce no row: the caller learns an id is unlinked by its
  * ABSENCE from the result, and nothing is ever fabricated for it.
  *
- * Only the fields the payload uses are selected. In particular the character
- * `state` JSONB blob is NOT read back (a 1000-member batch would drag megabytes
- * of character state across the wire for one integer); the level is projected
+ * Only narrow scalar columns are selected, never the character `state` JSONB blob
+ * (a 1000-member batch would drag megabytes of character state across the wire
+ * for one integer). `account_id` rides along as the row's identity even though
+ * the flex payload itself does not render it: it is what lets a caller join a
+ * row back to an account without a second lookup, and it is one int per row.
+ * Everything else selected IS a payload field. The level is projected
  * SQL-side with the same `state.level` over column-level precedence the
  * per-account path applies in TypeScript. The guard around that projection makes
  * it TOTAL, and all three of its parts are load-bearing: a bare `::int` cast

@@ -896,9 +896,16 @@ describe('discord/members-meta applied-vs-read reporting', () => {
     expect(data.changed).toBe(1);
   });
 
-  it('reports zero changed and a non-zero skipped when identical meta is re-pushed', async () => {
+  it('relays a zero-changed non-zero-skipped upsert report without rewriting it', async () => {
     // The post-restart case: the bot's diff cache is empty so it re-sends the
     // whole roster, and nothing moved while it was down.
+    //
+    // TITLE SCOPE: setDiscordMemberMetaBulk is mocked here, so this layer cannot
+    // and does not DECIDE that nothing moved; it pins that the handler relays the
+    // upsert's own classification untouched and computes `updated` independently
+    // of it (2 accepted against 0 changed). The real classification, where a
+    // genuinely identical re-push produces those numbers, is executed against
+    // Postgres in tests/discord_db_integration.test.ts.
     vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
       changed: 0,
       skipped: 2,
@@ -917,7 +924,12 @@ describe('discord/members-meta applied-vs-read reporting', () => {
     });
   });
 
-  it('counts in changed exactly the rows whose values really moved', async () => {
+  it('relays changed and skipped untouched while deriving updated itself', async () => {
+    // Same title scope as above: the 2/1 split is the mocked upsert's answer, and
+    // what this pins is that the handler passes it through unaltered while
+    // `updated` (3) comes from the accepted-record count, not from `changed`.
+    // Narrowing `updated` to applied.changed is the exact L14 regression, and the
+    // three differing numbers below are what make it fail here.
     vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
       changed: 2,
       skipped: 1,
@@ -986,10 +998,47 @@ describe('discord/members-meta applied-vs-read reporting', () => {
     ]);
     expect((nothingMoved.body as { data: { updated: number } }).data.updated).toBe(2);
 
-    // The over-cap silent drop the bot's guard was actually written for still
-    // answers 0, so the guard keeps the meaning it was added with.
-    const overCap = await push([]);
-    expect((overCap.body as { data: { updated: number } }).data.updated).toBe(0);
+    // And the one case that legitimately SHOULD answer 0 still does, so the bot's
+    // guard keeps the meaning it was added with: a body carrying no usable member
+    // at all. (This arm is an empty list, not the over-64-KiB body readBody
+    // rejects into {}; both reach parseMemberMetaRecords with nothing to accept
+    // and are the same code path from here on, but only the empty list is what is
+    // exercised below, so the comment says so rather than claiming the other.)
+    const emptyPush = await push([]);
+    expect((emptyPush.body as { data: { updated: number } }).data.updated).toBe(0);
+    const allJunk = await push([null, 42, { name: 'no id' }]);
+    expect((allJunk.body as { data: { updated: number } }).data.updated).toBe(0);
+  });
+
+  it('counts a repeated discord_user_id once, so updated matches what was applied', async () => {
+    // parseMemberMetaRecords collapses repeats keeping the LAST occurrence, and
+    // `updated` is read off the POST-dedupe array, so the de-duplication is
+    // OBSERVABLE at the route and had no test at any layer. It is also the one
+    // documented behavior change L14 made to `updated` (the old loop incremented
+    // once per entry, so a doubled id counted twice while only one row was ever
+    // written). Three entries, two of them the same id: the push must report two
+    // records and hand the upsert two, carrying the LAST values for the repeat.
+    vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
+      changed: 2,
+      skipped: 0,
+      unapplied: [],
+    });
+
+    const r = await push([
+      { discord_user_id: 'dup', name: 'first', role: 'mods' },
+      { discord_user_id: 'other', name: 'other' },
+      { discord_user_id: 'dup', name: 'last' },
+    ]);
+
+    expect((r.body as { data: { updated: number } }).data.updated).toBe(2);
+    const records = vi.mocked(setDiscordMemberMetaBulk).mock.calls[0][1];
+    // Pinned by VALUE, not by length: last-wins is what makes the stored row match
+    // what the old sequential loop left behind, and a first-wins collapse would
+    // keep the same count while storing the wrong name and a stale role.
+    expect(records).toEqual([
+      { discordUserId: 'dup', nickname: 'last', joinedAtMs: null, roleKey: null },
+      { discordUserId: 'other', nickname: 'other', joinedAtMs: null, roleKey: null },
+    ]);
   });
 
   it('answers identically on the frozen legacy ladder arm and the RouteDef arm', async () => {

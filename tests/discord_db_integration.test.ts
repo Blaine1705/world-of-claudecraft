@@ -142,8 +142,18 @@ describeDb('discord set-based statements (real Postgres)', () => {
 
     it('writes NO row version when the incoming values already match', async () => {
       // The phase's biggest database win, proved rather than asserted: the old
-      // loop wrote a tuple for every member on every sweep. n_tup_upd is the only
-      // thing that can actually say a no-op UPDATE was skipped.
+      // loop wrote a tuple for every member on every sweep.
+      //
+      // xmin is the decisive evidence, and it is only decisive when it is sampled
+      // ACROSS the write. An UPDATE that rewrites a row stamps the new tuple with
+      // a new inserting-transaction id, so a no-op push must leave xmin exactly
+      // where it was. Sampling it twice in a row AFTER the push (as an earlier
+      // draft of this test did) compares the value against itself with nothing in
+      // between and can never fail, the constant-self-comparison trap. Likewise
+      // pg_stat_xact_user_tables is deliberately NOT used: it reports only the
+      // CURRENT transaction's activity, and every pool.query here is its own
+      // autocommit transaction, so both readings are always zero whatever the
+      // statement did.
       await seedLink(1, 'identical', {
         username: 'Same',
         joinedAt: '2023-11-14T22:13:20.000Z',
@@ -157,25 +167,20 @@ describeDb('discord set-based statements (real Postgres)', () => {
       };
       await setDiscordMemberMetaBulk(pool, [record]);
 
-      const before = await pool.query(
-        `SELECT n_tup_upd FROM pg_stat_xact_user_tables
-          WHERE relname = 'discord_links' AND schemaname = $1`,
-        [SCHEMA],
-      );
+      const xminBefore = (await pool.query('SELECT xmin::text FROM discord_links')).rows[0].xmin;
       const second = await setDiscordMemberMetaBulk(pool, [record]);
-      const after = await pool.query(
-        `SELECT n_tup_upd FROM pg_stat_xact_user_tables
-          WHERE relname = 'discord_links' AND schemaname = $1`,
-        [SCHEMA],
-      );
+      const xminAfter = (await pool.query('SELECT xmin::text FROM discord_links')).rows[0].xmin;
 
       expect(second).toEqual({ changed: 0, skipped: 1, unapplied: [] });
-      // Cross-transaction stats are collected asynchronously, so the decisive
-      // evidence is the report itself plus the row's unchanged xmin below.
-      expect(Number(after.rows[0]?.n_tup_upd ?? 0)).toBe(Number(before.rows[0]?.n_tup_upd ?? 0));
-      const xmin = await pool.query('SELECT xmin::text FROM discord_links');
-      const again = await pool.query('SELECT xmin::text FROM discord_links');
-      expect(again.rows[0].xmin).toBe(xmin.rows[0].xmin);
+      expect(xminAfter).toBe(xminBefore);
+
+      // Non-vacuous: the SAME sampling, straddling a push that really does move a
+      // value, MUST show a new row version. Without this the pin above could hold
+      // simply because xmin never moves for any reason the test can produce.
+      const moved = await setDiscordMemberMetaBulk(pool, [{ ...record, nickname: 'Moved' }]);
+      const xminMoved = (await pool.query('SELECT xmin::text FROM discord_links')).rows[0].xmin;
+      expect(moved).toEqual({ changed: 1, skipped: 0, unapplied: [] });
+      expect(xminMoved).not.toBe(xminBefore);
     });
 
     it('treats a NULL-to-NULL column as unchanged, not as a difference', async () => {
@@ -238,7 +243,15 @@ describeDb('discord set-based statements (real Postgres)', () => {
       expect(bad.rows[0].discord_joined_at).toBeNull();
     });
 
-    it('runs one statement over a full 1000-record push and uses the unique index', async () => {
+    it('classifies a full 1000-record push in ONE executed statement', async () => {
+      // TITLE SCOPE, deliberate. An earlier title also claimed "uses the unique
+      // index", which this body never checked and MUST NOT: discord_links holds
+      // 200 freshly-ANALYZEd rows here, so a hash join over a Seq Scan is the
+      // correct and cheapest plan, and a "no Seq Scan" assertion would red on the
+      // optimal plan rather than on a regression. The read test next door can pin
+      // a plan because its LATERAL forbids pull-up at any table size; this
+      // statement has no such invariant, so the honest pin is the executed
+      // classification plus the statement count, both of which are below.
       for (let i = 1; i <= 200; i++) await seedLink(i, `u${i}`, { username: 'Old' });
       await pool.query('ANALYZE discord_links');
       const records = Array.from({ length: 1000 }, (_, i) => ({
@@ -248,7 +261,18 @@ describeDb('discord set-based statements (real Postgres)', () => {
         roleKey: null,
       }));
 
-      const result = await setDiscordMemberMetaBulk(pool, records);
+      // Counted here too, not only against the fake pool: this is the arm where
+      // the statement really executes, so "one statement" and "the counts are
+      // right" are proved by the same run rather than by two separate rigs.
+      let statements = 0;
+      const countingPool = {
+        query: (sql: string, params: unknown[]) => {
+          statements++;
+          return pool.query(sql, params as never[]);
+        },
+      } as unknown as Pool;
+      const result = await setDiscordMemberMetaBulk(countingPool, records);
+      expect(statements).toBe(1);
       // 200 linked rows change; the other 800 ids have no link row.
       expect(result.changed).toBe(200);
       expect(result.skipped).toBe(0);
@@ -357,19 +381,23 @@ describeDb('discord set-based statements (real Postgres)', () => {
     });
 
     it('probes the character index once per id and never re-scans per row', async () => {
-      // The scaling claim, planned rather than argued. Seeded at the packet's
-      // scale envelope shape (many linked accounts, several characters each) so
-      // the planner is choosing against real statistics.
-      await pool.query('INSERT INTO accounts (id) SELECT g FROM generate_series(1, 2000) g');
+      // The scaling claim, planned rather than argued. Seeded AT the packet's D18
+      // scale envelope (5,000 guild members, three characters each, so 15,000
+      // character rows) rather than at a convenient fraction of it, so the planner
+      // chooses against statistics the size production will actually show it. These
+      // are also the numbers the Phase 4 note reports its 6.6 ms measurement at; an
+      // earlier draft seeded 2,000 and 6,000, which left that figure unreproducible
+      // from the committed fixture.
+      await pool.query('INSERT INTO accounts (id) SELECT g FROM generate_series(1, 5000) g');
       await pool.query(
         `INSERT INTO discord_links (account_id, discord_user_id)
-         SELECT g, 'du' || g FROM generate_series(1, 2000) g`,
+         SELECT g, 'du' || g FROM generate_series(1, 5000) g`,
       );
       await pool.query(
         `INSERT INTO characters (account_id, name, class, level, state, realm)
          SELECT g, 'C' || g || '_' || s, 'warrior', (g % 20) + 1,
                 jsonb_build_object('level', (g % 20) + 1, 'lifetimeXp', g * 10), $1
-           FROM generate_series(1, 2000) g, generate_series(1, 3) s`,
+           FROM generate_series(1, 5000) g, generate_series(1, 3) s`,
         [REALM],
       );
       await pool.query('ANALYZE discord_links, characters, reward_points');
