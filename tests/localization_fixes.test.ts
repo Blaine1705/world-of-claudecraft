@@ -1117,6 +1117,17 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // 'Charge' row like the other boss mechanics).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/charge.ts'), 'utf8'),
     socialSrc,
+    // Whole-directory sweep (the phase 18 whole-branch review): EVERY
+    // src/sim/professions module is scanned, the same directory-glob treatment
+    // src/sim/social gets above, so a new module there (or a first emit added
+    // to one that predates this line: tool_effect_actions, fishing_zones,
+    // material_grades) sits under the drift guard from day one with no
+    // explicit entry. The per-file entries above are kept for their history
+    // notes; re-scanning a file only repeats a candidate, it cannot hide one.
+    socialSourceUnder(path.resolve(process.cwd(), 'src/sim/professions')),
+    // Quest-item presence probe (SimContext-holding, text-free today): the
+    // fourth module the whole-branch parity audit found outside the corpus.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/quests/quest_item_presence.ts'), 'utf8'),
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The
   // server (server/game.ts) is language-agnostic like the sim and re-localized
