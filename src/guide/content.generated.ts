@@ -4460,7 +4460,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "House Rules",
     "category": "pvp",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/pvp_card_duel_first_win.webp"
   },
   {
     "id": "prog_guildsworn",
@@ -4686,14 +4687,16 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "The Basin Bites Back",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_wildheart_basin.webp"
   },
   {
     "id": "dgn_wildheart_basin_heroic",
     "name": "Heroic: The Wildheart Basin",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_wildheart_basin_heroic.webp"
   },
   {
     "id": "chr_peaks_gatherer",

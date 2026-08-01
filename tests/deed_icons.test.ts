@@ -131,6 +131,15 @@ const BRANCH_DEED_ART_IDS = [
   'chr_hollow_rares',
 ] as const;
 
+// The final painted-icon replacement wave. These are separate freshly composed
+// generated crests, not recolours of one another or additions to the commissioned
+// deed batch. Their exact accepted identities are pinned by the wave manifest.
+const MISSING_PAINTED_DEED_IDS = [
+  'dgn_wildheart_basin',
+  'dgn_wildheart_basin_heroic',
+  'pvp_card_duel_first_win',
+] as const;
+
 describe('Book of Deeds webp icons', () => {
   it('has art-backed deed ids wired (guards the fixture)', () => {
     expect(DEED_IMAGE_IDS.size).toBeGreaterThan(0);
@@ -271,6 +280,45 @@ describe('Book of Deeds webp icons', () => {
     }
   });
 
+  it('A4) the three final generated crests keep their tighter reviewed frame geometry', async () => {
+    expect(MISSING_PAINTED_DEED_IDS).toHaveLength(3);
+    for (const id of MISSING_PAINTED_DEED_IDS) {
+      expect(DEED_IMAGE_IDS.has(id), `${id} must be wired`).toBe(true);
+      const decoded = await sharp(path.join(deedsDir, `${id}.webp`))
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      let minX = decoded.info.width;
+      let minY = decoded.info.height;
+      let maxX = -1;
+      let maxY = -1;
+      let visible = 0;
+      for (let y = 0; y < decoded.info.height; y++) {
+        for (let x = 0; x < decoded.info.width; x++) {
+          const alpha = decoded.data[(y * decoded.info.width + x) * decoded.info.channels + 3];
+          if (alpha < 8) continue;
+          visible++;
+          minX = Math.min(minX, x);
+          minY = Math.min(minY, y);
+          maxX = Math.max(maxX, x);
+          maxY = Math.max(maxY, y);
+        }
+      }
+      expect(minX, `${id} left alpha bound`).toBeGreaterThanOrEqual(14);
+      expect(minX, `${id} left alpha bound`).toBeLessThanOrEqual(15);
+      expect(minY, `${id} top alpha bound`).toBe(14);
+      expect(maxX, `${id} right alpha bound`).toBe(113);
+      expect(maxY, `${id} bottom alpha bound`).toBe(113);
+      expect(Math.abs((minX + maxX) / 2 - 63.5), `${id} horizontal center`).toBeLessThanOrEqual(
+        0.5,
+      );
+      expect(Math.abs((minY + maxY) / 2 - 63.5), `${id} vertical center`).toBe(0);
+      const coverage = visible / (decoded.info.width * decoded.info.height);
+      expect(coverage, `${id} visible coverage`).toBeGreaterThanOrEqual(0.41);
+      expect(coverage, `${id} visible coverage`).toBeLessThanOrEqual(0.45);
+    }
+  });
+
   it('B) commits only .webp art under public/ui/deeds (no png/stray files)', () => {
     const stray = existsSync(deedsDir)
       ? readdirSync(deedsDir)
@@ -312,6 +360,8 @@ describe('Book of Deeds webp icons', () => {
     // image URL and falls through to the procedural canvas path. A fully commissioned live
     // catalog makes this loop empty, so the synthetic id below keeps the branch pinned.
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
+    expect(artless, 'all live deeds must now resolve to painted art').toEqual([]);
+    expect(DEED_IMAGE_IDS.size, 'the complete live deed catalog is painted').toBe(226);
     for (const id of artless) {
       const crestId = deedCrestId(id, DEEDS[id].category);
       expect(deedImageUrl(crestId), `${id} -> ${crestId} must have no committed image`).toBeNull();

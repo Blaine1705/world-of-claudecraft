@@ -217,6 +217,16 @@ type Mapping = {
 const mapping = (): Mapping =>
   JSON.parse(readFileSync(path.join(itemsDir, 'mapping.json'), 'utf8')) as Mapping;
 
+function missingPaintedWaveItemIds(): string[] {
+  const accepted = JSON.parse(
+    readFileSync(
+      path.join(repoRoot, 'docs/achievements/missing-painted-icons-accepted-art.json'),
+      'utf8',
+    ),
+  ) as { targetSets: { items: string[] } };
+  return accepted.targetSets.items;
+}
+
 describe('item webp icons', () => {
   it('has image-backed item ids wired (guards the fixture)', () => {
     expect(ITEM_IMAGE_IDS.size).toBeGreaterThan(0);
@@ -267,6 +277,9 @@ describe('item webp icons', () => {
     for (const id of ITEM_ART_PENDING) {
       expect(itemImageUrl(id), `${id} must not resolve to uncommitted art`).toBeNull();
     }
+    expect(ITEM_ART_PENDING.size, 'the accepted painted-art wave clears all enumerated debt').toBe(
+      0,
+    );
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });
@@ -473,6 +486,24 @@ describe('item webp icons', () => {
       const owners = (m.generatedBatches ?? []).filter((batch) => batch.itemIds.includes(id));
       expect(owners, `${id} must have exactly one generated-art provenance owner`).toHaveLength(1);
       expect(owners[0].source).toBe('OpenAI built-in image generation');
+    }
+  });
+
+  it('F4) records every final-wave item once as project-generated art', () => {
+    const ids = missingPaintedWaveItemIds();
+    expect(ids).toHaveLength(101);
+    expect(ids).toEqual([...new Set(ids)].sort());
+    const m = mapping();
+    for (const id of ids) {
+      expect(itemImageUrl(id), `${id} runtime URL`).toBe(`/ui/items/${id}.webp`);
+      expect(
+        m.entries.some((entry) => entry.itemId === id),
+        `${id} must not inherit CraftPix`,
+      ).toBe(false);
+      const owners = (m.generatedBatches ?? []).filter((batch) => batch.itemIds.includes(id));
+      expect(owners, `${id} must have one generated provenance owner`).toHaveLength(1);
+      expect(owners[0].source).toBe('OpenAI built-in image generation');
+      expect(owners[0].license).toContain('project asset');
     }
   });
 
