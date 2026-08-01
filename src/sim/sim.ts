@@ -434,8 +434,8 @@ export type { MailSave } from './mail/post_office';
 export type { MarketSave } from './market';
 
 import { updateSwimFatigue } from './fatigue';
-import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
 import type { CombatExitMemory } from './instance_exit_memory';
+import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
 import {
   applyDungeonMobTuning,
   mobLevelForDungeonDifficulty,

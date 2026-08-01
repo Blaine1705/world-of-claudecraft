@@ -18,7 +18,6 @@ import {
 } from '../src/sim/data';
 import { spawnNythraxisAdds } from '../src/sim/encounters/nythraxis';
 import { COMBAT_EXIT_MEMORY_SECONDS } from '../src/sim/instance_exit_memory';
-import { resetEvadingMob } from '../src/sim/mob/locomotion';
 import {
   awardHeroicMarks,
   enterDungeon,
@@ -29,6 +28,7 @@ import {
   updateDoorTriggers,
   updateInstances,
 } from '../src/sim/instances/dungeons';
+import { resetEvadingMob } from '../src/sim/mob/locomotion';
 import { Sim } from '../src/sim/sim';
 import {
   dist2d,
