@@ -2147,6 +2147,14 @@ export const da_DK: EnTranslations = {
       "benefits": "Tilknyt din Steam-konto fra skrivebordsappen for at spejle de bedrifter, du opnår, som Steam-præstationer.",
       "noTicket": "Steam udstedte ingen tilknytningsbillet. Start Steam, og prøv så igen."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Postkasse",
       "subtitle": "Ravneposten",
@@ -2997,6 +3005,14 @@ export const da_DK: EnTranslations = {
       "already_linked": "Din konto har allerede en tilknyttet Steam-konto.",
       "account_taken": "Den Steam-konto er allerede knyttet til en anden konto.",
       "upstream": "Steam svarede ikke. Prøv igen om et øjeblik."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen."
@@ -6254,11 +6270,15 @@ export const da_DK: EnTranslations = {
       "graphicsPresetMedium": "Mellem",
       "graphicsPresetHigh": "Høj",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Insane",
       "graphicsPresetAdvanced": "Avanceret",
       "terrainDetail": "Terrændetalje",
       "foliageDensity": "Løvtæthed",
       "effectsQuality": "Effekter og lys",
       "shadowQuality": "Skyggekvalitet",
+      "surfaceDetail": "Surface Detail",
+      "surfaceDetailBasic": "Basic",
+      "surfaceDetailFull": "Full",
       "terrainLow": "Lav",
       "terrainHigh": "Høj",
       "touchOpacity": "Berøringskontrollers uigennemsigtighed",
@@ -6435,6 +6455,7 @@ export const da_DK: EnTranslations = {
       "floatingDodge": "Undvigelse",
       "floatingParry": "Pareret",
       "floatingResist": "Modstået",
+      "floatingEvade": "Undgået",
       "floatingHealFull": "Fuld",
       "floatingHealAbsorbed": "Absorberet",
       "cannotMove": "Kan ikke bevæge dig!",
@@ -6447,6 +6468,7 @@ export const da_DK: EnTranslations = {
       "dodged": "Din {ability} undviges af {target}.",
       "parried": "Din {ability} pareres af {target}.",
       "resisted": "{target} modstår din {ability}.",
+      "evaded": "Din {ability} undgås af {target}.",
       "healSelf": "Din {ability} helbreder dig for {amount}.",
       "healSelfCrit": "Din {ability} helbreder dig kritisk for {amount}.",
       "healOther": "Din {ability} helbreder {target} for {amount}.",
@@ -9632,6 +9654,18 @@ export const da_DK: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Hugtandskniv fra Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Hugtandherrens Bæstspyd"
+      },
+      "bloodmane_warleggings": {
+        "name": "Blodmanke-Krigsbenskinner"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Rankeklo-Snigebukser"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Solben-Ritualsarong"
+      },
       "thick_winter_pelt": {
         "name": "Tyk Vinterpels"
       },
@@ -10378,6 +10412,24 @@ export const da_DK: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Ormekor-Håndomvikling"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Bassinsnigerens Tunika"
+      },
+      "verdant_heart_vestment": {
+        "name": "Grønhjerte-Klædning"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Solben-Ritualbrynje"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Bassinets Storhugtand"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Solben-Orakelkrone"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Blodmanke-Krigsbenbeskyttere"
       },
       "deathless_greatblade": {
         "name": "Udødelig Storklinge"

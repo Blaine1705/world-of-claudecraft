@@ -75,7 +75,11 @@ import {
 } from './game/interactions';
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
-import { newKeyboardTurnState, stepKeyboardTurnFacing } from './game/keyboard_turn_facing';
+import {
+  type KeyboardTurnArgs,
+  newKeyboardTurnState,
+  stepKeyboardTurnFacing,
+} from './game/keyboard_turn_facing';
 import { applyMobileKeyboardViewport } from './game/keyboard_viewport_applier';
 import { shouldUseStaticBackdrop } from './game/landing_backdrop';
 import { createLandingThemeAudio } from './game/landing_theme';
@@ -98,6 +102,7 @@ import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
+import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
   type GameSettings,
   normalizeClickMoveButton,
@@ -280,6 +285,7 @@ import { renderDiscordWidget } from './ui/discord_widget';
 import { finderLootItemIds } from './ui/dungeon_finder_view';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
+import { refreshEpicLinkStatus, wireEpicLink } from './ui/epic_link';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { attachGatherNodeHoverTooltip, gatherNodeToolGateFor } from './ui/gather_node_tooltip';
 import { gatherToolNoNodeKey } from './ui/gathering_view';
@@ -827,6 +833,11 @@ function requestBrowserFullscreen(): void {
   const root = document.documentElement as FullscreenElement;
   const request = root.requestFullscreen?.bind(root) ?? root.webkitRequestFullscreen?.bind(root);
   if (!request) return;
+  // Fullscreen needs transient activation. Chrome logs a console error for every
+  // call made without it, whether or not the rejection is caught, so skip the
+  // call we already know will be refused. Browsers without userActivation still
+  // attempt it, which is the previous behavior.
+  if (navigator.userActivation && !navigator.userActivation.isActive) return;
   try {
     const result = request();
     if (result instanceof Promise) void result.catch(() => {});
@@ -1739,14 +1750,12 @@ async function startGame(
     if (characterOpen === lastCharacterOpen) return;
     lastCharacterOpen = characterOpen;
     entryDiagnostics.checkpoint(characterOpen ? 'character-open' : 'character-closed');
-    console.info(`[entry-diag] character ${characterOpen ? 'opened' : 'closed'}`);
   };
   const syncQuestDialogOpenDiagnostics = (): void => {
     const questDialogOpen = hud.questDialogOpen;
     if (questDialogOpen === lastQuestDialogOpen) return;
     lastQuestDialogOpen = questDialogOpen;
     entryDiagnostics.checkpoint(questDialogOpen ? 'quest-dialog-open' : 'quest-dialog-closed');
-    console.info(`[entry-diag] quest dialog ${questDialogOpen ? 'opened' : 'closed'}`);
   };
 
   const mobileControls = new MobileControls(input, {
@@ -1805,13 +1814,11 @@ async function startGame(
     if (optionsOpen !== lastOptionsOpen) {
       lastOptionsOpen = optionsOpen;
       entryDiagnostics.checkpoint(optionsOpen ? 'settings-open' : 'settings-closed');
-      console.info(`[entry-diag] settings ${optionsOpen ? 'opened' : 'closed'}`);
     }
   };
   hud.onQuestDialogStateChange = (open) => {
     lastQuestDialogOpen = open;
     entryDiagnostics.checkpoint(open ? 'quest-dialog-open' : 'quest-dialog-closed');
-    console.info(`[entry-diag] quest dialog ${open ? 'opened' : 'closed'}`);
     syncOverlayDiagnostics();
   };
   stopMobileMoreDiagnostics?.();
@@ -1828,7 +1835,6 @@ async function startGame(
       mobileControls.syncAutorun(false);
     }
     entryDiagnostics.checkpoint(open ? 'mobile-more-open' : 'mobile-more-closed');
-    console.info(`[entry-diag] mobile More ${open ? 'opened' : 'closed'}`);
   });
   hud.onResurrectAtSpiritHealer = () => {
     void stopAutorunForInteraction(world.resurrectAtSpiritHealer(), input, mobileControls);
@@ -2959,16 +2965,18 @@ async function startGame(
         }
       }
       if (best !== null) {
-        const e = world.entities.get(best)!;
-        world.targetEntity(best);
-        const target = resolvedClickMoveTarget({ x: e.pos.x, z: e.pos.z });
-        input.setClickMoveTarget(
-          target,
-          ATTACK_MOVE_MELEE_STOP,
-          best,
-          clickMovePathTo(target),
-          true,
-        );
+        const e = world.entities.get(best);
+        if (e) {
+          world.targetEntity(best);
+          const target = resolvedClickMoveTarget({ x: e.pos.x, z: e.pos.z });
+          input.setClickMoveTarget(
+            target,
+            ATTACK_MOVE_MELEE_STOP,
+            best,
+            clickMovePathTo(target),
+            true,
+          );
+        }
       }
     }
     // Chasing a target: once inside melee, start the auto-attack (once per target).
@@ -3219,6 +3227,15 @@ async function startGame(
   // channel, passed through on the one engage-edge frame so the server still
   // sees a manual turn (breaks /follow, marks anti-AFK activity).
   const kbTurn = newKeyboardTurnState();
+  const kbTurnArgs: KeyboardTurnArgs = {
+    turnLeft: false,
+    turnRight: false,
+    turnAllowed: false,
+    sentFacing: null,
+    serverFacing: 0,
+    echoMs: 0,
+    frameDt: 0,
+  };
   function updateCamera(frameDt: number, interpFacing: number): void {
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
@@ -3380,8 +3397,8 @@ async function startGame(
     return { mi, facing };
   }
 
-  function partyMemberIds(): Set<number> {
-    const ids = new Set<number>();
+  function partyMemberIds(ids: Set<number>): Set<number> {
+    ids.clear();
     for (const m of world.partyInfo?.members ?? []) {
       if (m.pid !== world.playerId) ids.add(m.pid);
     }
@@ -3394,6 +3411,8 @@ async function startGame(
   // hovered mob dying or turning hostile updates without waiting for a re-pick.
   const hoverPickGate = new HoverPickGate();
   let hoverPickedId: number | null = null;
+  const hoverPartyMemberIds = new Set<number>();
+  const hoverPvpOpponentIds = new Set<number>();
 
   function updateHoverCursor(): void {
     if (!input.hoverActive || input.isDragging() || hud.isModalOpen()) {
@@ -3405,8 +3424,10 @@ async function startGame(
       hoverPickedId = renderer.pick(input.hoverX, input.hoverY);
     }
     const entity = hoverPickedId !== null ? world.entities.get(hoverPickedId) : undefined;
-    const pvpOpponents = activePvpOpponentIds(world);
-    input.setHoverCursor(hoverCursorKind(entity, world.playerId, partyMemberIds(), pvpOpponents));
+    const pvpOpponents = activePvpOpponentIds(world, hoverPvpOpponentIds);
+    input.setHoverCursor(
+      hoverCursorKind(entity, world.playerId, partyMemberIds(hoverPartyMemberIds), pvpOpponents),
+    );
     // WoW-style mouseover tooltip (name / level / creature type) for a mob under
     // the cursor, reusing the same (gated) pick this function already does for
     // the hover-cursor kind above; the tooltip content still re-resolves every
@@ -3506,6 +3527,21 @@ async function startGame(
     getApm: () => inputMeter.apm(performance.now()),
   });
 
+  function visualFacingFor(
+    mi: ReturnType<typeof input.readMoveInput>,
+    baseFacing: number,
+  ): number | null {
+    return !movementFrozen() ? diagonalMovementVisualFacing(mi, baseFacing) : null;
+  }
+
+  const perfNetworkStats = {
+    connected: false,
+    snapInterval: 0,
+    lastSnapAge: -1,
+    alpha: 0,
+  };
+  const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
+
   function frame(now: number): void {
     requestAnimationFrame(frame);
     maybeWarmCurrentZone();
@@ -3540,15 +3576,26 @@ async function startGame(
       mobileControls.syncAutorun(false);
     }
     playerWasDead = playerDead;
-    perf.trace('input.updateTouchLook', () => input.updateTouchLook(frameDt), {
-      frameDtMs: frameDt * 1000,
-    });
-    perf.trace('input.gamepad', () => gamepad.poll(frameDt), {
-      frameDtMs: frameDt * 1000,
-    });
-    perf.trace('input.hoverCursor', () => updateHoverCursor(), {
-      active: input.hoverActive,
-    });
+    const frameDtMs = frameDt * 1000;
+    let traceStart = perf.startTrace();
+    try {
+      input.updateTouchLook(frameDt);
+    } finally {
+      perf.finishTrace('input.updateTouchLook', traceStart, 'frameDtMs', frameDtMs);
+    }
+    traceStart = perf.startTrace();
+    try {
+      gamepad.poll(frameDt);
+    } finally {
+      perf.finishTrace('input.gamepad', traceStart, 'frameDtMs', frameDtMs);
+    }
+    const hoverActive = input.hoverActive;
+    traceStart = perf.startTrace();
+    try {
+      updateHoverCursor();
+    } finally {
+      perf.finishTrace('input.hoverCursor', traceStart, 'active', hoverActive);
+    }
     perf.markInputFrame(performance.now());
 
     const mouselook = intro === null && input.isMouselookActive() && !movementFrozen();
@@ -3582,10 +3629,6 @@ async function startGame(
       ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
       : null;
 
-    const visualFacingFor = (
-      mi: ReturnType<typeof input.readMoveInput>,
-      baseFacing: number,
-    ): number | null => (!movementFrozen() ? diagonalMovementVisualFacing(mi, baseFacing) : null);
     if (offlineSim) {
       acc += frameDt;
       // Supply the UTC day for the delve daily reset (the sim never reads the wall
@@ -3602,30 +3645,43 @@ async function startGame(
         if (stepFacing !== null) offlineSim.player.facing = stepFacing;
         offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
         perf.markInputSent(performance.now());
-        const events = perf.time('sim', () =>
-          perf.trace('sim.tick', () => offlineSim.tick(), { mode: 'offline' }),
-        );
-        perf.time('events', () =>
-          perf.trace('hud.handleEvents', () => hud.handleEvents(events), {
-            mode: 'offline',
-            events: events.length,
-          }),
-        );
+        const simStart = perf.startTime();
+        let events: ReturnType<typeof offlineSim.tick>;
+        traceStart = perf.startTrace();
+        try {
+          events = offlineSim.tick();
+        } finally {
+          perf.finishTrace('sim.tick', traceStart, 'mode', 'offline');
+          perf.finishTime('sim', simStart);
+        }
+        const eventsLength = events.length;
+        const eventsStart = perf.startTime();
+        traceStart = perf.startTrace();
+        try {
+          hud.handleEvents(events);
+        } finally {
+          perf.finishTrace(
+            'hud.handleEvents',
+            traceStart,
+            'mode',
+            'offline',
+            'events',
+            eventsLength,
+          );
+          perf.finishTime('events', eventsStart);
+        }
         // A tick consumed the latched release facing (movementFacing fed
         // stepFacing above); drop it so it is not re-applied next frame.
         pendingReleaseFacing = null;
         acc -= DT;
       }
       const pp = offlineSim.player;
-      perf.trace(
-        'camera.follow',
-        () =>
-          updateCamera(frameDt, pp.prevFacing + wrapAngle(pp.facing - pp.prevFacing) * (acc / DT)),
-        {
-          mode: 'offline',
-          frameDtMs: frameDt * 1000,
-        },
-      );
+      traceStart = perf.startTrace();
+      try {
+        updateCamera(frameDt, pp.prevFacing + wrapAngle(pp.facing - pp.prevFacing) * (acc / DT));
+      } finally {
+        perf.finishTrace('camera.follow', traceStart, 'mode', 'offline', 'frameDtMs', frameDtMs);
+      }
       introCameraTick(now);
       renderer.camYaw = input.camYaw;
       renderer.camPitch = input.camPitch;
@@ -3635,28 +3691,50 @@ async function startGame(
       const offlineRenderFacing =
         visualFacingFor(input.readMoveInput(), movementFacing ?? offlineSim.player.facing) ??
         movementFacing;
-      perf.time('renderer', () =>
-        perf.trace(
+      const offlineAlpha = acc / DT;
+      const offlineViews = renderer.views.size;
+      const rendererStart = perf.startTime();
+      traceStart = perf.startTrace();
+      try {
+        renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null);
+      } finally {
+        perf.finishTrace(
           'renderer.sync',
-          () => renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null),
-          {
-            mode: 'offline',
-            views: renderer.views.size,
-            alpha: acc / DT,
-          },
-        ),
-      );
-      perf.trace('ui.clickMoveMarker', () => updateClickMoveMarker());
+          traceStart,
+          'mode',
+          'offline',
+          'views',
+          offlineViews,
+          'alpha',
+          offlineAlpha,
+        );
+        perf.finishTime('renderer', rendererStart);
+      }
+      traceStart = perf.startTrace();
+      try {
+        updateClickMoveMarker();
+      } finally {
+        perf.finishTrace('ui.clickMoveMarker', traceStart);
+      }
       perf.markInputVisible(performance.now());
       if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
-      perf.time('hud', () => perf.trace('hud.update', () => hud.update(), { mode: 'offline' }));
+      const hudStart = perf.startTime();
+      traceStart = perf.startTrace();
+      try {
+        hud.update();
+      } finally {
+        perf.finishTrace('hud.update', traceStart, 'mode', 'offline');
+        perf.finishTime('hud', hudStart);
+      }
       perf.tick(now);
       entryDiagnostics.renderedFrame(now);
       return;
     }
 
     // online: inputs stream on a timer inside ClientWorld; here we mirror state
-    const net = online!;
+    // (one of offlineSim/online is always set for a running frame loop)
+    if (!online) return;
+    const net = online;
     spectateBadge.update(net.spectating);
     const spectateFacing = net.consumeSpectateFacing();
     if (spectateFacing !== null) input.camYaw = spectateFacing;
@@ -3683,15 +3761,14 @@ async function startGame(
     // stutter this feature has chased). The turn flags are zeroed on the wire
     // while the local heading owns the channel, or the server would integrate
     // the turn a second time on top of the streamed facing.
-    const kbFacing = stepKeyboardTurnFacing(kbTurn, {
-      turnLeft: resolved.mi.turnLeft,
-      turnRight: resolved.mi.turnRight,
-      turnAllowed: net.spectating === null && !movementFrozen() && !isStunned(pe),
-      sentFacing: foreignFacing,
-      serverFacing: interpServerFacing,
-      echoMs: onlineInputEchoMs,
-      frameDt,
-    });
+    kbTurnArgs.turnLeft = resolved.mi.turnLeft;
+    kbTurnArgs.turnRight = resolved.mi.turnRight;
+    kbTurnArgs.turnAllowed = net.spectating === null && !movementFrozen() && !isStunned(pe);
+    kbTurnArgs.sentFacing = foreignFacing;
+    kbTurnArgs.serverFacing = interpServerFacing;
+    kbTurnArgs.echoMs = onlineInputEchoMs;
+    kbTurnArgs.frameDt = frameDt;
+    const kbFacing = stepKeyboardTurnFacing(kbTurn, kbTurnArgs);
     // wireFacing, not kbFacing: only input-derived headings go on the wire.
     // Streaming the seam/glide corrections (which chase the mirror) would
     // close a feedback loop through the server that at high RTT never
@@ -3727,29 +3804,53 @@ async function startGame(
       drainedEvents,
       net.playerId,
     );
-    perf.time('events', () =>
-      perf.trace('hud.handleEvents', () => hud.handleEvents(drainedEvents), {
-        mode: 'online',
-        events: drainedEvents.length,
-      }),
-    );
+    const drainedEventsLength = drainedEvents.length;
+    const eventsStart = perf.startTime();
+    traceStart = perf.startTrace();
+    try {
+      hud.handleEvents(drainedEvents);
+    } finally {
+      perf.finishTrace(
+        'hud.handleEvents',
+        traceStart,
+        'mode',
+        'online',
+        'events',
+        drainedEventsLength,
+      );
+      perf.finishTime('events', eventsStart);
+    }
     if (net.consumeProfanityChanged()) {
-      perf.trace('hud.setProfanityWords', () => hud.setProfanityWords(net.profanityWords), {
-        words: net.profanityWords.length,
-      });
+      const profanityWordsLength = net.profanityWords.length;
+      traceStart = perf.startTrace();
+      try {
+        hud.setProfanityWords(net.profanityWords);
+      } finally {
+        perf.finishTrace('hud.setProfanityWords', traceStart, 'words', profanityWordsLength);
+      }
     }
     if (net.consumeInventoryChanged()) {
-      perf.trace('hud.onInventoryChanged', () => hud.onInventoryChanged());
+      traceStart = perf.startTrace();
+      try {
+        hud.onInventoryChanged();
+      } finally {
+        perf.finishTrace('hud.onInventoryChanged', traceStart);
+      }
     }
     if (net.consumeCosmeticsChanged()) {
-      perf.trace('hud.onCosmeticsChanged', () => hud.onCosmeticsChanged());
+      traceStart = perf.startTrace();
+      try {
+        hud.onCosmeticsChanged();
+      } finally {
+        perf.finishTrace('hud.onCosmeticsChanged', traceStart);
+      }
     }
-    perf.setNetwork({
-      connected: net.connected,
-      snapInterval: Math.round(net.snapInterval),
-      lastSnapAge: net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1,
-      alpha: Math.round(alpha * 100) / 100,
-    });
+    perfNetworkStats.connected = net.connected;
+    perfNetworkStats.snapInterval = Math.round(net.snapInterval);
+    perfNetworkStats.lastSnapAge =
+      net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1;
+    perfNetworkStats.alpha = Math.round(alpha * 100) / 100;
+    perf.setNetwork(perfNetworkStats);
     // Always-on net-pipeline counters (net_pipeline_stats.ts): fold the
     // snapshots-applied-since-last-frame count, then publish the stats source
     // UNGATED (ruling R9), unlike the overlay-gated setNetwork above; the
@@ -3765,9 +3866,8 @@ async function startGame(
     // a delve (the portcullis door clamps are not mirrored client-side).
     const selfMotion: SelfMotionFrame | null = SELF_MOTION_DISABLED
       ? null
-      : {
-          enabled:
-            net.spectating === null &&
+      : selfMotionFrameBuffer.write(
+          net.spectating === null &&
             !movementFrozen() &&
             !playerImmobilized() &&
             !isDelvePos(pe.pos.x) &&
@@ -3780,53 +3880,84 @@ async function startGame(
             // not re-simulate: predicting a fall through it would fight the
             // authoritative pull-up and show the correction as a stutter.
             pe.climbing !== true,
-          moveInput: resolved.mi,
-          displayFacing: netFacing ?? interpServerFacing,
-          echoMs: onlineInputEchoMs,
-          jitterMs: onlineJitterMs,
+          resolved.mi,
+          netFacing ?? interpServerFacing,
+          onlineInputEchoMs,
+          onlineJitterMs,
           alpha,
           frameDt,
-        };
-    perf.trace('camera.follow', () => updateCamera(frameDt, kbFacing ?? interpServerFacing), {
-      mode: 'online',
-      alpha,
-      frameDtMs: frameDt * 1000,
-      lastSnapAge: net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1,
-    });
+        );
+    const cameraLastSnapAge = net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1;
+    traceStart = perf.startTrace();
+    try {
+      updateCamera(frameDt, kbFacing ?? interpServerFacing);
+    } finally {
+      perf.finishTrace(
+        'camera.follow',
+        traceStart,
+        'mode',
+        'online',
+        'alpha',
+        alpha,
+        'frameDtMs',
+        frameDtMs,
+        'lastSnapAge',
+        cameraLastSnapAge,
+      );
+    }
     introCameraTick(now);
     renderer.camYaw = input.camYaw;
     renderer.camPitch = input.camPitch;
     renderer.camDist = input.camDist;
     syncGroundAimReticle();
-    perf.time('renderer', () =>
-      perf.trace(
+    const onlineViews = renderer.views.size;
+    const rendererStart = perf.startTime();
+    traceStart = perf.startTrace();
+    try {
+      renderer.sync(
+        alpha,
+        frameDt,
+        // netFacing (mouselook, keyboard turn, click-move, release latch)
+        // is applied server-side the moment it arrives, so the model may
+        // show it immediately; without it the click-move yaw would lag
+        // the predicted position by a round trip and corners would slide.
+        net.spectating === null ? onlineRenderFacing : null,
+        adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
+        selfMotion,
+        selfAuthoritativeDiscontinuity,
+      );
+    } finally {
+      perf.finishTrace(
         'renderer.sync',
-        () =>
-          renderer.sync(
-            alpha,
-            frameDt,
-            // netFacing (mouselook, keyboard turn, click-move, release latch)
-            // is applied server-side the moment it arrives, so the model may
-            // show it immediately; without it the click-move yaw would lag
-            // the predicted position by a round trip and corners would slide.
-            net.spectating === null ? onlineRenderFacing : null,
-            adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
-            selfMotion,
-            selfAuthoritativeDiscontinuity,
-          ),
-        {
-          mode: 'online',
-          views: renderer.views.size,
-          alpha,
-          frameDtMs: frameDt * 1000,
-        },
-      ),
-    );
-    perf.trace('ui.clickMoveMarker', () => updateClickMoveMarker());
+        traceStart,
+        'mode',
+        'online',
+        'views',
+        onlineViews,
+        'alpha',
+        alpha,
+        'frameDtMs',
+        frameDtMs,
+      );
+      perf.finishTime('renderer', rendererStart);
+    }
+    traceStart = perf.startTrace();
+    try {
+      updateClickMoveMarker();
+    } finally {
+      perf.finishTrace('ui.clickMoveMarker', traceStart);
+    }
     maybeShowImmobileNote(now);
     perf.markInputVisible(performance.now());
     if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
-    perf.time('hud', () => perf.trace('hud.update', () => hud.update(), { mode: 'online' }));
+    const hudStart = perf.startTime();
+    traceStart = perf.startTrace();
+    try {
+      hud.update();
+    } finally {
+      perf.finishTrace('hud.update', traceStart, 'mode', 'online');
+      perf.finishTime('hud', hudStart);
+    }
     perf.tick(now);
     entryDiagnostics.renderedFrame(now);
   }
@@ -4083,7 +4214,7 @@ async function startGame(
           applyMouseCamera: (enabled) => applySetting('mouseCamera', enabled),
           isBlocked: () => intro !== null,
         });
-        (window as any).__game = {
+        (window as unknown as { __game?: Record<string, unknown> }).__game = {
           sim: world,
           world,
           renderer,
@@ -4094,6 +4225,7 @@ async function startGame(
           perf,
           gamepad,
           music,
+          sfx,
           /** Opens the board and drains queued sim events. Do not call sim.lockpickEngage directly offline. */
           lockpickEngage: (objectId: number, ante: number) =>
             hud.submitLockpickEngage(objectId, ante as 1 | 2 | 3),
@@ -4533,12 +4665,14 @@ function show(el: string): void {
   // Reset currently rendered classes to force re-render/animation when opening a panel
   for (const key of ['offline-class-details', 'charcreate-class-details']) {
     currentlyRenderedClass[key] = null;
-    if (revertTimeouts[key] !== null && revertTimeouts[key] !== undefined) {
-      window.clearTimeout(revertTimeouts[key]!);
+    const revertTimeout = revertTimeouts[key];
+    if (revertTimeout !== null && revertTimeout !== undefined) {
+      window.clearTimeout(revertTimeout);
       revertTimeouts[key] = null;
     }
-    if (hoverTimeouts[key] !== null && hoverTimeouts[key] !== undefined) {
-      window.clearTimeout(hoverTimeouts[key]!);
+    const hoverTimeout = hoverTimeouts[key];
+    if (hoverTimeout !== null && hoverTimeout !== undefined) {
+      window.clearTimeout(hoverTimeout);
       hoverTimeouts[key] = null;
     }
   }
@@ -5647,7 +5781,9 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
       button.textContent = t('auth.enterWorld');
     }
   }
-  const world = new ClientWorld(api.token!, c.id, c.class, api.base, getClientSeed());
+  const token = api.token;
+  if (token === null) return; // unreachable: entering a world requires a logged-in session
+  const world = new ClientWorld(token, c.id, c.class, api.base, getClientSeed());
   // Wire shareable player cards for this online session: publishing uploads the
   // composited PNG to this realm and returns an absolute public page URL, and
   // the referral provider feeds the card footer. Both are cleared on disconnect.
@@ -6293,8 +6429,10 @@ async function loadProjectStats(): Promise<void> {
         }),
       );
     }
-  } catch (err) {
-    console.error('Failed to fetch project stats:', err);
+  } catch {
+    // A marketing counter is not worth an error entry: the API being down or
+    // absent (offline play, a dev client with no server) is an ordinary state
+    // and the cache fallback below already handles it.
     // If API fails, fall back to cached data (even if expired)
     if (cached) {
       setAll(characterEls, String(cached.characters_created ?? '-'));
@@ -6327,7 +6465,10 @@ async function loadHighscores(): Promise<void> {
     return;
   }
   const esc = (s: string): string =>
-    s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+    s.replace(
+      /[&<>"]/g,
+      (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] ?? c,
+    );
   const rankLabel = t('game.leaderboard.rank');
   const nameLabel = t('game.leaderboard.name');
   const realmLabel = t('game.leaderboard.realmCol');
@@ -7340,7 +7481,7 @@ async function refreshGithubLinkStatus(): Promise<void> {
   } catch (err) {
     console.error('[github] could not load status', err);
   }
-  if (!status || status.enabled !== true) {
+  if (status?.enabled !== true) {
     group.hidden = true;
     return;
   }
@@ -8219,6 +8360,7 @@ function wireStartScreens(): void {
   void wireWallet();
   wireGithubLink();
   wireSteamLink(api);
+  wireEpicLink(api);
 
   // mode select
   const onlineBtn = $('#btn-online');
@@ -8265,6 +8407,7 @@ function wireStartScreens(): void {
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
     void refreshSteamLinkStatus(api);
+    void refreshEpicLinkStatus(api);
     // Mandatory recovery-email capture: block realm entry until a pre-email account
     // sets one (a fresh signup already has it, so this is a no-op there).
     await maybePromptRecoveryEmail();
@@ -9349,6 +9492,7 @@ function wireStartScreens(): void {
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
     void refreshSteamLinkStatus(api);
+    void refreshEpicLinkStatus(api);
     // A Discord login usually captured the email already, but confirm and prompt
     // if it did not (e.g. the address was missing on the Discord account).
     void maybePromptRecoveryEmail().then(() => goToLoggedInPlay());
@@ -9634,6 +9778,7 @@ function wireStartScreens(): void {
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
     void refreshSteamLinkStatus(api);
+    void refreshEpicLinkStatus(api);
     // (Discord status is refreshed by enterLoggedInChrome above.)
     // A just-completed Discord login lands straight in play; capture a recovery
     // email first if the Discord grant did not provide one. The desktop-login
@@ -9654,7 +9799,6 @@ function wireStartScreens(): void {
   // no-op when no session is in play, so it is safe to register unconditionally.
   const restampResumeMarker = () => {
     if (document.visibilityState === 'hidden') {
-      console.info('[entry-diag] page hidden; entry probe cleared as a lifecycle transition');
       refreshPlayMarker(Date.now());
       // A page that leaves the foreground mid-entry was not killed by a foreground
       // memory spike: a later eviction while backgrounded (or a deliberate reload,
@@ -9668,11 +9812,7 @@ function wireStartScreens(): void {
     }
   };
   document.addEventListener('visibilitychange', restampResumeMarker);
-  window.addEventListener('pageshow', (event) => {
-    console.info(`[entry-diag] pageshow persisted=${event.persisted}`);
-  });
-  window.addEventListener('pagehide', (event) => {
-    console.info(`[entry-diag] pagehide persisted=${event.persisted}; entry probe cleared`);
+  window.addEventListener('pagehide', () => {
     refreshPlayMarker(Date.now());
     stopActiveEntryDiagnostics();
     clearEntryProbe();

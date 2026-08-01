@@ -2147,6 +2147,14 @@ export const ru_RU: EnTranslations = {
       "benefits": "Привяжите аккаунт Steam в настольном приложении, чтобы ваши деяния отражались в достижениях Steam.",
       "noTicket": "Steam не выдал билет для привязки. Запустите Steam и повторите попытку."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Привязать Epic",
+      "unlink": "Отвязать Epic",
+      "linked": "Привязан аккаунт Epic {id}",
+      "benefits": "Привяжите аккаунт Epic в настольном приложении Epic, чтобы ваши деяния отражались в достижениях Epic.",
+      "noProof": "Epic не выдал подтверждение для привязки. Запустите игру из Epic Games Store и повторите попытку."
+    },
     "mailbox": {
       "title": "Почтовый ящик",
       "subtitle": "Вороновая почта",
@@ -2997,6 +3005,14 @@ export const ru_RU: EnTranslations = {
       "already_linked": "К вашему аккаунту уже привязан аккаунт Steam.",
       "account_taken": "Этот аккаунт Steam уже привязан к другому аккаунту.",
       "upstream": "Steam не отвечает. Повторите попытку чуть позже."
+    },
+    "epic": {
+      "disabled": "Привязка Epic сейчас недоступна.",
+      "invalid_token": "Epic не смог подтвердить этот запрос на привязку. Повторите попытку из настольного приложения.",
+      "banned": "Этот аккаунт Epic нельзя привязать.",
+      "already_linked": "К вашему аккаунту уже привязан аккаунт Epic.",
+      "account_taken": "Этот аккаунт Epic уже привязан к другому аккаунту.",
+      "upstream": "Epic не отвечает. Повторите попытку чуть позже."
     },
     "wallet": {
       "handoff_invalid": "Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку."
@@ -6254,11 +6270,15 @@ export const ru_RU: EnTranslations = {
       "graphicsPresetMedium": "Среднее",
       "graphicsPresetHigh": "Высокое",
       "graphicsPresetUltra": "Ультра",
+      "graphicsPresetInsane": "Экстремальное",
       "graphicsPresetAdvanced": "Расширенное",
       "terrainDetail": "Детализация местности",
       "foliageDensity": "Плотность растительности",
       "effectsQuality": "Эффекты и освещение",
       "shadowQuality": "Качество теней",
+      "surfaceDetail": "Детализация поверхностей",
+      "surfaceDetailBasic": "Базовая",
+      "surfaceDetailFull": "Полная",
       "terrainLow": "Низкая",
       "terrainHigh": "Высокая",
       "touchOpacity": "Прозрачность сенсорного управления",
@@ -6435,6 +6455,7 @@ export const ru_RU: EnTranslations = {
       "floatingDodge": "Уклон",
       "floatingParry": "Парировано",
       "floatingResist": "Сопротивление",
+      "floatingEvade": "Ускользание",
       "floatingHealFull": "Полное",
       "floatingHealAbsorbed": "Поглощено",
       "cannotMove": "Не двигается!",
@@ -6447,6 +6468,7 @@ export const ru_RU: EnTranslations = {
       "dodged": "{target} уклоняется от вашего {ability}.",
       "parried": "{target} парирует ваш {ability}.",
       "resisted": "{target} сопротивляется вашему {ability}.",
+      "evaded": "{target} ускользает от вашего {ability}.",
       "healSelf": "Ваше {ability} исцеляет вас на {amount}.",
       "healSelfCrit": "Ваше {ability} критически исцеляет вас на {amount}.",
       "healOther": "Ваше {ability} исцеляет {target} на {amount}.",
@@ -9632,6 +9654,18 @@ export const ru_RU: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Клыковый нож Зулгара"
       },
+      "fanglords_beastspear": {
+        "name": "Звериное копье Повелителя клыков"
+      },
+      "bloodmane_warleggings": {
+        "name": "Боевые поножи Кровавой Гривы"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Штаны лазутчика Лозокогтя"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Ритуальный саронг Солнечной Кости"
+      },
       "thick_winter_pelt": {
         "name": "Плотная зимняя шкура"
       },
@@ -10378,6 +10412,24 @@ export const ru_RU: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Обмотки змеиного хора"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Туника лазутчика Котловины"
+      },
+      "verdant_heart_vestment": {
+        "name": "Облачение Зеленеющего Сердца"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Ритуальная кольчуга Солнечной Кости"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Великий клык Котловины"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Корона оракула Солнечной Кости"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Боевые набедренники Кровавой Гривы"
       },
       "deathless_greatblade": {
         "name": "Бессмертный великий клинок"

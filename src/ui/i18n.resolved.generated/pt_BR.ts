@@ -2147,6 +2147,14 @@ export const pt_BR: EnTranslations = {
       "benefits": "Vincule sua conta Steam pelo aplicativo para desktop para espelhar os feitos que você ganhar como conquistas do Steam.",
       "noTicket": "O Steam não forneceu um tíquete de vinculação. Inicie o Steam e tente novamente."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Caixa de Correio",
       "subtitle": "O Correio dos Corvos",
@@ -2997,6 +3005,14 @@ export const pt_BR: EnTranslations = {
       "already_linked": "Sua conta já tem uma conta Steam vinculada.",
       "account_taken": "Essa conta Steam já está vinculada a outra conta.",
       "upstream": "O Steam não respondeu. Tente novamente em instantes."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Essa autorização de carteira expirou ou não pôde ser verificada. Tente novamente."
@@ -6254,11 +6270,15 @@ export const pt_BR: EnTranslations = {
       "graphicsPresetMedium": "Média",
       "graphicsPresetHigh": "Alta",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Extrema",
       "graphicsPresetAdvanced": "Avançada",
       "terrainDetail": "Detalhe do terreno",
       "foliageDensity": "Densidade da vegetação",
       "effectsQuality": "Efeitos e iluminação",
       "shadowQuality": "Qualidade das sombras",
+      "surfaceDetail": "Detalhe de superfícies",
+      "surfaceDetailBasic": "Básico",
+      "surfaceDetailFull": "Completo",
       "terrainLow": "Baixo",
       "terrainHigh": "Alto",
       "touchOpacity": "Opacidade dos controles de toque",
@@ -6435,6 +6455,7 @@ export const pt_BR: EnTranslations = {
       "floatingDodge": "Esquivou",
       "floatingParry": "Aparou",
       "floatingResist": "Resistiu",
+      "floatingEvade": "Evadiu",
       "floatingHealFull": "Cheio",
       "floatingHealAbsorbed": "Absorvido",
       "cannotMove": "Não pode se mover!",
@@ -6447,6 +6468,7 @@ export const pt_BR: EnTranslations = {
       "dodged": "{target} esquiva de seu {ability}.",
       "parried": "Seu {ability} foi aparado por {target}.",
       "resisted": "{target} resiste a seu {ability}.",
+      "evaded": "Seu {ability} foi evadido por {target}.",
       "healSelf": "Seu {ability} cura você em {amount}.",
       "healSelfCrit": "Seu {ability} cura você criticamente em {amount}.",
       "healOther": "Seu {ability} cura {target} em {amount}.",
@@ -9632,6 +9654,18 @@ export const pt_BR: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Adaga-Presa de Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Lança de Feras do Senhor das Presas"
+      },
+      "bloodmane_warleggings": {
+        "name": "Perneiras de Guerra Crina de Sangue"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Calções de Tocaia Garra-de-Vinha"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sarongue Ritual Ossossol"
+      },
       "thick_winter_pelt": {
         "name": "Pelagem Invernal Espessa"
       },
@@ -10378,6 +10412,24 @@ export const pt_BR: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Faixas de Mãos do Coro dos Vermes"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Túnica do Perseguidor da Bacia"
+      },
+      "verdant_heart_vestment": {
+        "name": "Vestimenta do Coração Verdejante"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Cota de Malha Ritual Ossossol"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Grande Presa da Bacia"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Coroa do Oráculo Ossossol"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Guarda-pernas de Guerra Crina de Sangue"
       },
       "deathless_greatblade": {
         "name": "Grande Lâmina Imortal"

@@ -2147,6 +2147,14 @@ export const pl_PL: EnTranslations = {
       "benefits": "Połącz swoje konto Steam z poziomu aplikacji na komputer, aby zdobywane czyny znajdowały odbicie w osiągnięciach Steam.",
       "noTicket": "Steam nie wystawił biletu połączenia. Uruchom Steam i spróbuj ponownie."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Skrzynka pocztowa",
       "subtitle": "Krucza Poczta",
@@ -2997,6 +3005,14 @@ export const pl_PL: EnTranslations = {
       "already_linked": "Twoje konto ma już połączone konto Steam.",
       "account_taken": "To konto Steam jest już połączone z innym kontem.",
       "upstream": "Steam nie odpowiada. Spróbuj ponownie za chwilę."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie."
@@ -6254,11 +6270,15 @@ export const pl_PL: EnTranslations = {
       "graphicsPresetMedium": "Średnie",
       "graphicsPresetHigh": "Wysokie",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Insane",
       "graphicsPresetAdvanced": "Zaawansowane",
       "terrainDetail": "Szczegółowość terenu",
       "foliageDensity": "Gęstość roślinności",
       "effectsQuality": "Efekty i oświetlenie",
       "shadowQuality": "Jakość cieni",
+      "surfaceDetail": "Surface Detail",
+      "surfaceDetailBasic": "Basic",
+      "surfaceDetailFull": "Full",
       "terrainLow": "Niska",
       "terrainHigh": "Wysoka",
       "touchOpacity": "Nieprzezroczystość sterowania dotykowego",
@@ -6435,6 +6455,7 @@ export const pl_PL: EnTranslations = {
       "floatingDodge": "Unik",
       "floatingParry": "Parowanie",
       "floatingResist": "Odparto",
+      "floatingEvade": "Uniknięcie",
       "floatingHealFull": "Pełne",
       "floatingHealAbsorbed": "Pochłonięte",
       "cannotMove": "Nie można się ruszyć!",
@@ -6447,6 +6468,7 @@ export const pl_PL: EnTranslations = {
       "dodged": "Twój {ability} zostaje uniknięty przez {target}.",
       "parried": "Twój {ability} zostaje sparowany przez {target}.",
       "resisted": "{target} odpiera twoje {ability}.",
+      "evaded": "{target} unika twojego {ability}.",
       "healSelf": "Twój {ability} leczy cię o {amount}.",
       "healSelfCrit": "Twój {ability} leczy cię krytycznie o {amount}.",
       "healOther": "Twój {ability} leczy {target} o {amount}.",
@@ -9632,6 +9654,18 @@ export const pl_PL: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Kłonóż Zulgara"
       },
+      "fanglords_beastspear": {
+        "name": "Włócznia Bestii Kłolorda"
+      },
+      "bloodmane_warleggings": {
+        "name": "Wojenne Nogawice Krwistej Grzywy"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Pnączoszponie Spodnie Skradania"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Słonecznokościsty Sarong Rytualny"
+      },
       "thick_winter_pelt": {
         "name": "Gruba Zimowa Skóra"
       },
@@ -10378,6 +10412,24 @@ export const pl_PL: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Owijki żmijowego chóru"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunika Tropiciela z Kotliny"
+      },
+      "verdant_heart_vestment": {
+        "name": "Szata Zieleniejącego Serca"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Słonecznokoścista Kolczuga Rytualna"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Wielki Kieł Kotliny"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Korona Słonecznokościstej Wyroczni"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Wojenne Nagolenniki Krwistej Grzywy"
       },
       "deathless_greatblade": {
         "name": "Nieśmiertelne wielkie ostrze"

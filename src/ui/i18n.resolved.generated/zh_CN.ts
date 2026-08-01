@@ -2147,6 +2147,14 @@ export const zh_CN: EnTranslations = {
       "benefits": "在桌面客户端中关联你的 Steam 账号，将你获得的功绩同步为 Steam 成就。",
       "noTicket": "Steam 未提供关联凭据。请先启动 Steam，然后重试。"
     },
+    "epic": {
+      "title": "Epic",
+      "link": "关联 Epic",
+      "unlink": "取消关联 Epic",
+      "linked": "已关联 Epic 账号 {id}",
+      "benefits": "在 Epic 桌面客户端中关联你的 Epic 账号，将你获得的功绩同步为 Epic 成就。",
+      "noProof": "Epic 未提供关联凭据。请从 Epic Games Store 启动，然后重试。"
+    },
     "mailbox": {
       "title": "邮箱",
       "subtitle": "渡鸦邮驿",
@@ -2997,6 +3005,14 @@ export const zh_CN: EnTranslations = {
       "already_linked": "你的账号已关联一个 Steam 账号。",
       "account_taken": "该 Steam 账号已关联到另一个账号。",
       "upstream": "Steam 未响应。请稍后重试。"
+    },
+    "epic": {
+      "disabled": "Epic 关联当前不可用。",
+      "invalid_token": "Epic 无法验证此关联请求。请在桌面客户端中重试。",
+      "banned": "该 Epic 账号无法关联。",
+      "already_linked": "你的账号已关联一个 Epic 账号。",
+      "account_taken": "该 Epic 账号已关联到另一个账号。",
+      "upstream": "Epic 未响应。请稍后重试。"
     },
     "wallet": {
       "handoff_invalid": "钱包授权已过期或无法验证。请重试。"
@@ -6254,11 +6270,15 @@ export const zh_CN: EnTranslations = {
       "graphicsPresetMedium": "中",
       "graphicsPresetHigh": "高",
       "graphicsPresetUltra": "超高",
+      "graphicsPresetInsane": "极致",
       "graphicsPresetAdvanced": "高级",
       "terrainDetail": "地形细节",
       "foliageDensity": "植被密度",
       "effectsQuality": "特效和光照",
       "shadowQuality": "阴影质量",
+      "surfaceDetail": "表面细节",
+      "surfaceDetailBasic": "基础",
+      "surfaceDetailFull": "完整",
       "terrainLow": "低",
       "terrainHigh": "高",
       "touchOpacity": "触控控件透明度",
@@ -6435,6 +6455,7 @@ export const zh_CN: EnTranslations = {
       "floatingDodge": "闪避",
       "floatingParry": "招架",
       "floatingResist": "抵抗",
+      "floatingEvade": "回避",
       "floatingHealFull": "已满",
       "floatingHealAbsorbed": "被吸收",
       "cannotMove": "无法移动！",
@@ -6447,6 +6468,7 @@ export const zh_CN: EnTranslations = {
       "dodged": "{target}闪避了你的{ability}。",
       "parried": "{target}招架了你的{ability}。",
       "resisted": "{target}抵抗了你的{ability}。",
+      "evaded": "{target}回避了你的{ability}。",
       "healSelf": "你的{ability}为你恢复 {amount} 点生命。",
       "healSelfCrit": "你的{ability}对你造成暴击治疗，恢复 {amount} 点生命。",
       "healOther": "你的{ability}为{target}恢复 {amount} 点生命。",
@@ -9632,6 +9654,18 @@ export const zh_CN: EnTranslations = {
       "wildheart_fangknife": {
         "name": "祖尔加的獠牙匕首"
       },
+      "fanglords_beastspear": {
+        "name": "獠牙领主的兽矛"
+      },
+      "bloodmane_warleggings": {
+        "name": "血鬃战争护腿"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "藤爪潜行马裤"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "日骨仪式纱笼"
+      },
       "thick_winter_pelt": {
         "name": "厚实的冬季毛皮"
       },
@@ -10378,6 +10412,24 @@ export const zh_CN: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "龙唱裹手"
+      },
+      "basin_stalkers_tunic": {
+        "name": "盆地潜猎者外衣"
+      },
+      "verdant_heart_vestment": {
+        "name": "翠心法衣"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "日骨仪式锁甲"
+      },
+      "greatfang_of_the_basin": {
+        "name": "盆地巨牙"
+      },
+      "sunbone_oracles_crown": {
+        "name": "日骨先知之冠"
+      },
+      "bloodmane_war_legguards": {
+        "name": "血鬃战争腿甲"
       },
       "deathless_greatblade": {
         "name": "不死巨刃"

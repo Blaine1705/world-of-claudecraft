@@ -2147,6 +2147,14 @@ export const ja_JP: EnTranslations = {
       "benefits": "デスクトップアプリからSteamアカウントを連携すると、獲得した功績がSteam実績に反映されます。",
       "noTicket": "Steamから連携チケットを取得できませんでした。Steamを起動してからもう一度お試しください。"
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Epicと連携",
+      "unlink": "Epic連携を解除",
+      "linked": "Epicアカウント {id} と連携済み",
+      "benefits": "EpicデスクトップアプリからEpicアカウントを連携すると、獲得した功績がEpic実績に反映されます。",
+      "noProof": "Epicから連携証明を取得できませんでした。Epic Games Storeから起動してからもう一度お試しください。"
+    },
     "mailbox": {
       "title": "メールボックス",
       "subtitle": "レイヴンポスト",
@@ -2997,6 +3005,14 @@ export const ja_JP: EnTranslations = {
       "already_linked": "このアカウントには既にSteamアカウントが連携されています。",
       "account_taken": "そのSteamアカウントは既に別のアカウントに連携されています。",
       "upstream": "Steamから応答がありません。しばらくしてからもう一度お試しください。"
+    },
+    "epic": {
+      "disabled": "Epic連携は現在利用できません。",
+      "invalid_token": "Epicがこの連携リクエストを確認できませんでした。デスクトップアプリからもう一度お試しください。",
+      "banned": "そのEpicアカウントは連携できません。",
+      "already_linked": "このアカウントには既にEpicアカウントが連携されています。",
+      "account_taken": "そのEpicアカウントは既に別のアカウントに連携されています。",
+      "upstream": "Epicから応答がありません。しばらくしてからもう一度お試しください。"
     },
     "wallet": {
       "handoff_invalid": "ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。"
@@ -6254,11 +6270,15 @@ export const ja_JP: EnTranslations = {
       "graphicsPresetMedium": "中",
       "graphicsPresetHigh": "高",
       "graphicsPresetUltra": "ウルトラ",
+      "graphicsPresetInsane": "極限",
       "graphicsPresetAdvanced": "詳細",
       "terrainDetail": "地形の詳細",
       "foliageDensity": "草木の密度",
       "effectsQuality": "エフェクトと照明",
       "shadowQuality": "影の品質",
+      "surfaceDetail": "表面ディテール",
+      "surfaceDetailBasic": "基本",
+      "surfaceDetailFull": "フル",
       "terrainLow": "低",
       "terrainHigh": "高",
       "touchOpacity": "タッチ操作の不透明度",
@@ -6435,6 +6455,7 @@ export const ja_JP: EnTranslations = {
       "floatingDodge": "回避",
       "floatingParry": "受け流し",
       "floatingResist": "抵抗",
+      "floatingEvade": "完全回避",
       "floatingHealFull": "満タン",
       "floatingHealAbsorbed": "吸収",
       "cannotMove": "動けない！",
@@ -6447,6 +6468,7 @@ export const ja_JP: EnTranslations = {
       "dodged": "{target}は{ability}を回避しました。",
       "parried": "{target}は{ability}を受け流しました。",
       "resisted": "{target}は{ability}に抵抗しました。",
+      "evaded": "{target}は{ability}を完全回避しました。",
       "healSelf": "{ability}が自分を{amount}回復しました。",
       "healSelfCrit": "{ability}が自分をクリティカルで{amount}回復しました。",
       "healOther": "{ability}が{target}を{amount}回復しました。",
@@ -9632,6 +9654,18 @@ export const ja_JP: EnTranslations = {
       "wildheart_fangknife": {
         "name": "ズルガーの牙小刀"
       },
+      "fanglords_beastspear": {
+        "name": "牙王の獣槍"
+      },
+      "bloodmane_warleggings": {
+        "name": "血鬣の戦脚甲"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "蔦爪の潜行ズボン"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "陽骨の儀式腰布"
+      },
       "thick_winter_pelt": {
         "name": "厚い冬毛皮"
       },
@@ -10378,6 +10412,24 @@ export const ja_JP: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "ワームクワイアの手巻き"
+      },
+      "basin_stalkers_tunic": {
+        "name": "盆地追跡者のチュニック"
+      },
+      "verdant_heart_vestment": {
+        "name": "翠心の祭服"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "陽骨の儀式ホーバーク"
+      },
+      "greatfang_of_the_basin": {
+        "name": "盆地の大牙"
+      },
+      "sunbone_oracles_crown": {
+        "name": "陽骨の託宣者の冠"
+      },
+      "bloodmane_war_legguards": {
+        "name": "血鬣の戦レッグガード"
       },
       "deathless_greatblade": {
         "name": "不死の大剣"

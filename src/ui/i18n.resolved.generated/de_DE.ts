@@ -2147,6 +2147,14 @@ export const de_DE: EnTranslations = {
       "benefits": "Verknüpfe dein Steam-Konto über die Desktop-App, um die Taten, die du erringst, als Steam-Errungenschaften zu spiegeln.",
       "noTicket": "Steam hat kein Verknüpfungsticket geliefert. Starte Steam und versuch es dann erneut."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Briefkasten",
       "subtitle": "Die Rabenpost",
@@ -2997,6 +3005,14 @@ export const de_DE: EnTranslations = {
       "already_linked": "Dein Konto ist bereits mit einem Steam-Konto verknüpft.",
       "account_taken": "Dieses Steam-Konto ist bereits mit einem anderen Konto verknüpft.",
       "upstream": "Steam hat nicht geantwortet. Versuch es gleich noch einmal."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut."
@@ -6254,11 +6270,15 @@ export const de_DE: EnTranslations = {
       "graphicsPresetMedium": "Mittel",
       "graphicsPresetHigh": "Hoch",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Extrem",
       "graphicsPresetAdvanced": "Erweitert",
       "terrainDetail": "Geländedetail",
       "foliageDensity": "Pflanzendichte",
       "effectsQuality": "Effekte und Licht",
       "shadowQuality": "Schattenqualität",
+      "surfaceDetail": "Oberflächendetail",
+      "surfaceDetailBasic": "Einfach",
+      "surfaceDetailFull": "Voll",
       "terrainLow": "Niedrig",
       "terrainHigh": "Hoch",
       "touchOpacity": "Deckkraft der Touch-Steuerung",
@@ -6435,6 +6455,7 @@ export const de_DE: EnTranslations = {
       "floatingDodge": "Ausgewichen",
       "floatingParry": "Pariert",
       "floatingResist": "Widerstand",
+      "floatingEvade": "Entgangen",
       "floatingHealFull": "Voll",
       "floatingHealAbsorbed": "Absorbiert",
       "cannotMove": "Bewegungsunfähig!",
@@ -6447,6 +6468,7 @@ export const de_DE: EnTranslations = {
       "dodged": "{target} weicht Eurem {ability} aus.",
       "parried": "Deine {ability} wird von {target} pariert.",
       "resisted": "{target} widersteht Eurem {ability}.",
+      "evaded": "{target} entgeht deiner {ability}.",
       "healSelf": "Euer {ability} heilt Euch um {amount}.",
       "healSelfCrit": "Euer {ability} heilt Euch kritisch um {amount}.",
       "healOther": "Euer {ability} heilt {target} um {amount}.",
@@ -9632,6 +9654,18 @@ export const de_DE: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Zulgars Fangmesser"
       },
+      "fanglords_beastspear": {
+        "name": "Bestienspeer des Fangfürsten"
+      },
+      "bloodmane_warleggings": {
+        "name": "Blutmähnen-Kriegsbeinschützer"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Rankenklauen-Pirschhose"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sonnenknochen-Ritualsarong"
+      },
       "thick_winter_pelt": {
         "name": "Dickes Winterfell"
       },
@@ -10378,6 +10412,24 @@ export const de_DE: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Wyrmchor-Handwickel"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunika des Beckenpirschers"
+      },
+      "verdant_heart_vestment": {
+        "name": "Grünherz-Gewand"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Sonnenknochen-Ritualkettenhemd"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Großfang des Beckens"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Sonnenknochen-Orakelkrone"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Blutmähnen-Kriegsbeinschienen"
       },
       "deathless_greatblade": {
         "name": "Todlose Großklinge"

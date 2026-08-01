@@ -2147,6 +2147,14 @@ export const id_ID: EnTranslations = {
       "benefits": "Tautkan akun Steam-mu dari aplikasi desktop agar jasa yang kamu raih tercermin sebagai pencapaian Steam.",
       "noTicket": "Steam tidak memberikan tiket penautan. Jalankan Steam, lalu coba lagi."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Kotak Surat",
       "subtitle": "Pos Gagak",
@@ -2997,6 +3005,14 @@ export const id_ID: EnTranslations = {
       "already_linked": "Akunmu sudah memiliki akun Steam yang tertaut.",
       "account_taken": "Akun Steam itu sudah tertaut ke akun lain.",
       "upstream": "Steam tidak merespons. Coba lagi dalam beberapa saat."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Otorisasi dompet itu telah kedaluwarsa atau tidak dapat diverifikasi. Coba lagi."
@@ -6254,11 +6270,15 @@ export const id_ID: EnTranslations = {
       "graphicsPresetMedium": "Sedang",
       "graphicsPresetHigh": "Tinggi",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Insane",
       "graphicsPresetAdvanced": "Lanjutan",
       "terrainDetail": "Detail Medan",
       "foliageDensity": "Kerapatan Dedaunan",
       "effectsQuality": "Efek & Pencahayaan",
       "shadowQuality": "Kualitas Bayangan",
+      "surfaceDetail": "Surface Detail",
+      "surfaceDetailBasic": "Basic",
+      "surfaceDetailFull": "Full",
       "terrainLow": "Rendah",
       "terrainHigh": "Tinggi",
       "touchOpacity": "Keburaman Kontrol Sentuh",
@@ -6435,6 +6455,7 @@ export const id_ID: EnTranslations = {
       "floatingDodge": "Elak",
       "floatingParry": "Tangkis",
       "floatingResist": "Ditahan",
+      "floatingEvade": "Hindar",
       "floatingHealFull": "Penuh",
       "floatingHealAbsorbed": "Diserap",
       "cannotMove": "Tidak bisa bergerak!",
@@ -6447,6 +6468,7 @@ export const id_ID: EnTranslations = {
       "dodged": "{ability}-mu dielakkan oleh {target}.",
       "parried": "{ability}-mu ditangkis oleh {target}.",
       "resisted": "{target} menahan {ability} milikmu.",
+      "evaded": "{ability}-mu dihindari oleh {target}.",
       "healSelf": "{ability}-mu menyembuhkanmu sebesar {amount}.",
       "healSelfCrit": "{ability}-mu menyembuhkanmu secara kritis sebesar {amount}.",
       "healOther": "{ability}-mu menyembuhkan {target} sebesar {amount}.",
@@ -9632,6 +9654,18 @@ export const id_ID: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Pisau Taring Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Tombak Binatang Fanglord"
+      },
+      "bloodmane_warleggings": {
+        "name": "Pelindung Kaki Perang Bloodmane"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Celana Pengintai Vineclaw"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sarung Ritual Sunbone"
+      },
       "thick_winter_pelt": {
         "name": "Bulu Musim Dingin yang Tebal"
       },
@@ -10378,6 +10412,24 @@ export const id_ID: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Pembalut Tangan Paduan Suara Wyrm"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunik Pengintai Cekungan"
+      },
+      "verdant_heart_vestment": {
+        "name": "Busana Jantung Hijau"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Zirah Ritual Sunbone"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Taring Agung Cekungan"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Mahkota Peramal Sunbone"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Zirah Kaki Perang Bloodmane"
       },
       "deathless_greatblade": {
         "name": "Bilah Agung Nirmaut"

@@ -2147,6 +2147,14 @@ export const ko_KR: EnTranslations = {
       "benefits": "데스크톱 앱에서 Steam 계정을 연동하면 획득한 업적이 Steam 도전 과제로 반영됩니다.",
       "noTicket": "Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Epic 연동",
+      "unlink": "Epic 연동 해제",
+      "linked": "Epic 계정 {id}에 연동됨",
+      "benefits": "Epic 데스크톱 앱에서 Epic 계정을 연동하면 획득한 업적이 Epic 도전 과제로 반영됩니다.",
+      "noProof": "Epic에서 연동 증명을 받지 못했습니다. Epic Games Store에서 실행한 뒤 다시 시도해 주세요."
+    },
     "mailbox": {
       "title": "우편함",
       "subtitle": "레이븐포스트",
@@ -2997,6 +3005,14 @@ export const ko_KR: EnTranslations = {
       "already_linked": "계정에 이미 연동된 Steam 계정이 있습니다.",
       "account_taken": "해당 Steam 계정은 이미 다른 계정에 연결되어 있습니다.",
       "upstream": "Steam이 응답하지 않습니다. 잠시 후 다시 시도해 주세요."
+    },
+    "epic": {
+      "disabled": "현재 Epic 연동을 사용할 수 없습니다.",
+      "invalid_token": "Epic이 이 연동 요청을 확인하지 못했습니다. 데스크톱 앱에서 다시 시도해 주세요.",
+      "banned": "해당 Epic 계정은 연동할 수 없습니다.",
+      "already_linked": "계정에 이미 연동된 Epic 계정이 있습니다.",
+      "account_taken": "해당 Epic 계정은 이미 다른 계정에 연결되어 있습니다.",
+      "upstream": "Epic이 응답하지 않습니다. 잠시 후 다시 시도해 주세요."
     },
     "wallet": {
       "handoff_invalid": "지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요."
@@ -6254,11 +6270,15 @@ export const ko_KR: EnTranslations = {
       "graphicsPresetMedium": "중간",
       "graphicsPresetHigh": "높음",
       "graphicsPresetUltra": "울트라",
+      "graphicsPresetInsane": "극한",
       "graphicsPresetAdvanced": "고급",
       "terrainDetail": "지형 세부 묘사",
       "foliageDensity": "초목 밀도",
       "effectsQuality": "효과 및 조명",
       "shadowQuality": "그림자 품질",
+      "surfaceDetail": "표면 디테일",
+      "surfaceDetailBasic": "기본",
+      "surfaceDetailFull": "전체",
       "terrainLow": "낮음",
       "terrainHigh": "높음",
       "touchOpacity": "터치 조작 투명도",
@@ -6435,6 +6455,7 @@ export const ko_KR: EnTranslations = {
       "floatingDodge": "회피",
       "floatingParry": "무기 막기",
       "floatingResist": "저항",
+      "floatingEvade": "완전 회피",
       "floatingHealFull": "가득 참",
       "floatingHealAbsorbed": "흡수됨",
       "cannotMove": "이동 불가!",
@@ -6447,6 +6468,7 @@ export const ko_KR: EnTranslations = {
       "dodged": "{target}이 {ability}을 회피했습니다.",
       "parried": "{target}이 당신의 {ability}을 무기로 막았습니다.",
       "resisted": "{target}이 {ability}을 저항했습니다.",
+      "evaded": "{target}이 당신의 {ability}을 완전히 회피했습니다.",
       "healSelf": "{ability}이 자신을 {amount}만큼 치유했습니다.",
       "healSelfCrit": "{ability}이 자신을 치명타 치유로 {amount}만큼 회복했습니다.",
       "healOther": "{ability}이 {target}을 {amount}만큼 치유했습니다.",
@@ -9632,6 +9654,18 @@ export const ko_KR: EnTranslations = {
       "wildheart_fangknife": {
         "name": "줄가르의 송곳니칼"
       },
+      "fanglords_beastspear": {
+        "name": "송곳니 군주의 야수창"
+      },
+      "bloodmane_warleggings": {
+        "name": "피갈기 전쟁 다리보호구"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "덩굴발톱 잠행 바지"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "태양뼈 의식 사롱"
+      },
       "thick_winter_pelt": {
         "name": "두꺼운 겨울 모피"
       },
@@ -10378,6 +10412,24 @@ export const ko_KR: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "용노래 손싸개"
+      },
+      "basin_stalkers_tunic": {
+        "name": "분지 추적자의 튜닉"
+      },
+      "verdant_heart_vestment": {
+        "name": "신록의 심장 예복"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "태양뼈 의식 사슬갑옷"
+      },
+      "greatfang_of_the_basin": {
+        "name": "분지의 대송곳니"
+      },
+      "sunbone_oracles_crown": {
+        "name": "태양뼈 예언자의 왕관"
+      },
+      "bloodmane_war_legguards": {
+        "name": "피갈기 전쟁 다리갑옷"
       },
       "deathless_greatblade": {
         "name": "불사 대검"

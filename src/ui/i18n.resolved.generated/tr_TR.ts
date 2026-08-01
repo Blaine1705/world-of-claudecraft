@@ -2147,6 +2147,14 @@ export const tr_TR: EnTranslations = {
       "benefits": "Kazandığın yiğitliklerin Steam başarımlarına yansıması için Steam hesabını masaüstü uygulamasından bağla.",
       "noTicket": "Steam bir bağlantı bileti vermedi. Steam'i başlat, sonra tekrar dene."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Posta Kutusu",
       "subtitle": "Kuzgun Postası",
@@ -2997,6 +3005,14 @@ export const tr_TR: EnTranslations = {
       "already_linked": "Hesabına zaten bağlı bir Steam hesabı var.",
       "account_taken": "Bu Steam hesabı zaten başka bir hesaba bağlı.",
       "upstream": "Steam yanıt vermedi. Birazdan tekrar dene."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene."
@@ -6254,11 +6270,15 @@ export const tr_TR: EnTranslations = {
       "graphicsPresetMedium": "Orta",
       "graphicsPresetHigh": "Yüksek",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Insane",
       "graphicsPresetAdvanced": "Gelişmiş",
       "terrainDetail": "Arazi Ayrıntısı",
       "foliageDensity": "Bitki Yoğunluğu",
       "effectsQuality": "Efektler ve Aydınlatma",
       "shadowQuality": "Gölge Kalitesi",
+      "surfaceDetail": "Surface Detail",
+      "surfaceDetailBasic": "Basic",
+      "surfaceDetailFull": "Full",
       "terrainLow": "Düşük",
       "terrainHigh": "Yüksek",
       "touchOpacity": "Dokunmatik Denetim Saydamlığı",
@@ -6435,6 +6455,7 @@ export const tr_TR: EnTranslations = {
       "floatingDodge": "Savuşturma",
       "floatingParry": "Karşılama",
       "floatingResist": "Direnildi",
+      "floatingEvade": "Kaçınma",
       "floatingHealFull": "Dolu",
       "floatingHealAbsorbed": "Emildi",
       "cannotMove": "Hareket edemezsin!",
@@ -6447,6 +6468,7 @@ export const tr_TR: EnTranslations = {
       "dodged": "{ability} yeteneğin {target} tarafından savuşturuldu.",
       "parried": "{ability} yeteneğin {target} tarafından karşılandı.",
       "resisted": "{target}, {ability} yeteneğine direndi.",
+      "evaded": "{target}, {ability} yeteneğinden kaçındı.",
       "healSelf": "{ability} yeteneğin seni {amount} iyileştirdi.",
       "healSelfCrit": "{ability} yeteneğin seni kritik {amount} iyileştirdi.",
       "healOther": "{ability} yeteneğin {target} hedefini {amount} iyileştirdi.",
@@ -9632,6 +9654,18 @@ export const tr_TR: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Zulgar'ın Diş Bıçağı"
       },
+      "fanglords_beastspear": {
+        "name": "Diş Lordu'nun Canavar Mızrağı"
+      },
+      "bloodmane_warleggings": {
+        "name": "Kanyeleli Savaş Dizlikleri"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Sarmaşık Pençeli Av Pantolonu"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Güneşkemik Ritüel Sarongu"
+      },
       "thick_winter_pelt": {
         "name": "Kalın Kış Postu"
       },
@@ -10378,6 +10412,24 @@ export const tr_TR: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Ejderkorosu El Sargıları"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Çukur Avcısının Tüniği"
+      },
+      "verdant_heart_vestment": {
+        "name": "Yeşeren Kalbin Giysisi"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Güneşkemik Ritüel Zırh Gömleği"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Çukurun Büyük Dişi"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Güneşkemik Kâhin Tacı"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Kanyeleli Savaş Bacak Muhafızları"
       },
       "deathless_greatblade": {
         "name": "Ölümsüz Pala"

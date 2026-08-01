@@ -155,6 +155,12 @@ import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
+// Imported from the mirror modules DIRECTLY (not the ./steam or ./epic
+// barrels), the same way deeds_records imports onDeedRecorded: the barrels
+// drag routes.ts (and its load-time requireAccount over the db module) into
+// every test that partial-mocks the db, the known overlay-mock breakage class.
+// Dual fan-out (D21): Steam and Epic reconcile independently.
+import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
 import { shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { mergedPrsForLogin } from './github_contributors';
@@ -220,11 +226,7 @@ import {
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
-// Imported from the mirror module DIRECTLY (not the ./steam barrel), the same
-// way deeds_records imports onDeedRecorded: the barrel drags routes.ts (and its
-// load-time requireAccount over the db module) into every test that
-// partial-mocks the db, the known overlay-mock breakage class.
-import { reconcileOnLogin } from './steam/mirror';
+import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { recordUnstuckEvent } from './unstuck_records';
@@ -921,6 +923,12 @@ interface WireAura {
   src?: number;
   // Encounter-owned control marker. Omitted for ordinary auras.
   ub?: 1;
+  // Break-threshold ARMED marker (Lingering Dread's soak-before-snap fear):
+  // presence only, never the live soak value - the number decrements per hit
+  // and would churn the stable aura cache, while the client (the victim-worn
+  // dread band in src/render/ability_vfx) only keys on whether the talent
+  // armed the fear at all. Omitted for ordinary auras.
+  bt?: 1;
 }
 
 interface WhoRosterRow {
@@ -1066,6 +1074,7 @@ function wireAura(a: Aura): WireAura {
   // (auras_view ownFirst). Omitted for the rare 0/absent source, which decodes to 0.
   if (a.sourceId) w.src = a.sourceId;
   if (a.unbreakableControl) w.ub = 1;
+  if (a.breakThreshold !== undefined) w.bt = 1;
   return w;
 }
 
@@ -2967,26 +2976,31 @@ export class GameServer {
     // loaded ids: every join-time grant is a deterministic function of the
     // already-durable blob, so a crash that loses the index rows costs nothing
     // to replay, and the batch is a DB write only (it never calls
-    // onDeedRecorded, so it never drives Steam; Steam's own login catch-up is
-    // reconcileOnLogin below). Fire-and-forget: it never blocks or reorders the
-    // join, and resumes skip it (they return above without reloading state).
+    // onDeedRecorded, so it never drives storefront mirrors; each storefront's
+    // own login catch-up is reconcileOnLogin below). Fire-and-forget: it never
+    // blocks or reorders the join, and resumes skip it (they return above
+    // without reloading state).
     reconcileCharacterDeeds({ characterId, accountId }, [
       ...(this.sim.meta(pid)?.deedsEarned.keys() ?? []),
     ]);
-    // Steam mirror drift heal (the steady-state counterpart to the link-time
-    // reconcile): a live achievement push can exhaust its retry ladder and
-    // drop, and an already-linked account never re-links, so the login
-    // reconcile is the only path that replays it. Chained BEHIND the deeds
-    // records FIFO rather than run beside it: reconcileOnLogin stamps a 6h TTL
-    // then reads earnedDeedIds, so if it ran before the reconcile above healed a
-    // dropped character_deeds row it would miss that id and the TTL would
-    // throttle the retry for 6h. Awaiting the tail first guarantees its read
-    // observes the healed rows. deedRecordsIdle is NOT awaited on the join path
-    // (join latency is unchanged); the continuation is fire-and-forget, fully
-    // guarded, per-account throttled, and a no-op unless STEAM_ENABLED and the
-    // account is linked.
+    // Storefront mirror drift heal (the steady-state counterpart to the
+    // link-time reconcile): a live achievement push can exhaust its retry
+    // ladder and drop, and an already-linked account never re-links, so the
+    // login reconcile is the only path that replays it. Chained BEHIND the
+    // deeds records FIFO rather than run beside it: each reconcileOnLogin
+    // stamps a 6h TTL then reads earnedDeedIds, so if it ran before the
+    // reconcile above healed a dropped character_deeds row it would miss that
+    // id and the TTL would throttle the retry for 6h. Awaiting the tail first
+    // guarantees its read observes the healed rows. deedRecordsIdle is NOT
+    // awaited on the join path (join latency is unchanged); the continuation
+    // is fire-and-forget, fully guarded, per-account throttled, and a no-op
+    // unless each storefront's flag is on and the account is linked. Steam and
+    // Epic run independently (D21): one outage must not block the other.
     void deedRecordsIdle()
-      .then(() => reconcileOnLogin(accountId))
+      .then(() => {
+        reconcileSteamOnLogin(accountId);
+        reconcileEpicOnLogin(accountId);
+      })
       .catch(() => {});
     openPlaySession(accountId, characterId, name, meta, initialLevel)
       .then((id) => {

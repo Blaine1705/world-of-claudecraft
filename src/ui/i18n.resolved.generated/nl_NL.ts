@@ -2147,6 +2147,14 @@ export const nl_NL: EnTranslations = {
       "benefits": "Koppel je Steam-account vanuit de desktop-app om de daden die je behaalt te spiegelen naar Steam-prestaties.",
       "noTicket": "Steam gaf geen koppelticket af. Start Steam en probeer het daarna opnieuw."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Brievenbus",
       "subtitle": "De Ravenpost",
@@ -2997,6 +3005,14 @@ export const nl_NL: EnTranslations = {
       "already_linked": "Je account heeft al een gekoppeld Steam-account.",
       "account_taken": "Dat Steam-account is al aan een ander account gekoppeld.",
       "upstream": "Steam reageerde niet. Probeer het zo meteen opnieuw."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw."
@@ -6254,11 +6270,15 @@ export const nl_NL: EnTranslations = {
       "graphicsPresetMedium": "Gemiddeld",
       "graphicsPresetHigh": "Hoog",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Insane",
       "graphicsPresetAdvanced": "Geavanceerd",
       "terrainDetail": "Terreindetail",
       "foliageDensity": "Bladerdichtheid",
       "effectsQuality": "Effecten en belichting",
       "shadowQuality": "Schaduwkwaliteit",
+      "surfaceDetail": "Surface Detail",
+      "surfaceDetailBasic": "Basic",
+      "surfaceDetailFull": "Full",
       "terrainLow": "Laag",
       "terrainHigh": "Hoog",
       "touchOpacity": "Doorzichtigheid aanraakbediening",
@@ -6435,6 +6455,7 @@ export const nl_NL: EnTranslations = {
       "floatingDodge": "Ontwijking",
       "floatingParry": "Parering",
       "floatingResist": "Weerstaan",
+      "floatingEvade": "Ontlopen",
       "floatingHealFull": "Vol",
       "floatingHealAbsorbed": "Geabsorbeerd",
       "cannotMove": "Kan niet bewegen!",
@@ -6447,6 +6468,7 @@ export const nl_NL: EnTranslations = {
       "dodged": "Je {ability} wordt ontweken door {target}.",
       "parried": "Je {ability} wordt gepareerd door {target}.",
       "resisted": "{target} weerstaat je {ability}.",
+      "evaded": "{target} ontloopt je {ability}.",
       "healSelf": "Je {ability} geneest je voor {amount}.",
       "healSelfCrit": "Je {ability} geneest je kritiek voor {amount}.",
       "healOther": "Je {ability} geneest {target} voor {amount}.",
@@ -9632,6 +9654,18 @@ export const nl_NL: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Slagtandmes van Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Beestenspeer van de Slagtandheer"
+      },
+      "bloodmane_warleggings": {
+        "name": "Bloedmanen-Oorlogsbeenkappen"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Rankklauw-Sluipbroek"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Zonnebeen-Rituele Sarong"
+      },
       "thick_winter_pelt": {
         "name": "Dikke Wintervacht"
       },
@@ -10378,6 +10412,24 @@ export const nl_NL: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Wurmkoor-Handwindsels"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tuniek van de Bekkensluiper"
+      },
+      "verdant_heart_vestment": {
+        "name": "Gewaad van het Groene Hart"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Zonnebeen-Rituele Maliënkolder"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Grootslagtand van het Bekken"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Zonnebeen-Orakelkroon"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Bloedmanen-Oorlogsbeenplaten"
       },
       "deathless_greatblade": {
         "name": "Doodloos Grootzwaard"

@@ -98,7 +98,7 @@ import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { rewindHealAmount } from './combat/rewind';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
-import { isSpellResisted } from './combat/spell_resist';
+import { isMobSpellResisted } from './combat/spell_resist';
 import { isCritImmuneTank } from './combat/tank_crit_immunity';
 import { warriorMeleeDefense } from './combat/warrior_hit_table';
 import { ensureWarriorStance } from './combat/warrior_stances';
@@ -563,7 +563,6 @@ import {
   type Aura,
   type AuraKind,
   angleTo,
-  armorReduction,
   assertCanonicalEastbrookNoticeboardDef,
   type CrowdControlDrCategory,
   type CrowdControlDrState,
@@ -606,6 +605,7 @@ import {
   type MountRaceSession,
   type MountTrainingSession,
   type MoveInput,
+  mobArmorReduction,
   type NoticeboardDef,
   type OverheadEmoteId,
   PARTY_XP_RANGE,
@@ -965,6 +965,9 @@ export interface InstanceSlot {
   mobIds: number[];
   objectIds: number[];
   exitId: number | null;
+  // The exit portal a DungeonDef.bossExitPortal dungeon spawns at the final
+  // boss's death (also present in objectIds, which owns its teardown).
+  bossExitId: number | null;
   emptyFor: number;
   // Sim-time until this live claim may be manually replaced again. Claim-owned
   // authority prevents party roster or leadership churn from rotating away the
@@ -2054,6 +2057,7 @@ export class Sim {
             mobIds: [],
             objectIds: [],
             exitId: null,
+            bossExitId: null,
             emptyFor: 0,
             resetAvailableAt: 0,
             clearedBy: new Set(),
@@ -2083,6 +2087,7 @@ export class Sim {
           mobIds: [],
           objectIds: [],
           exitId: null,
+          bossExitId: null,
           emptyFor: 0,
           resetAvailableAt: 0,
           clearedBy: new Set(),
@@ -5663,12 +5668,17 @@ export class Sim {
   ): void {
     const source = this.entities.get(effect.sourceId);
     if (!source || source.dead) return;
+    // The pulse cue anchors at the ZONE (the hazard is what ticks), not the
+    // caster, and names the ability so the renderer can play its authored fx.
     this.emit({
-      type: 'spellfx',
-      sourceId: source.id,
-      targetId: source.id,
+      type: 'spellfxAt',
+      x: effect.pos.x,
+      z: effect.pos.z,
       school: effect.school,
       fx: 'tick',
+      radius: effect.radius,
+      ability: effect.abilityId,
+      sourceId: source.id,
     });
     // Rune of Power (mage choice row): a FRIENDLY zone pulse. Buffs every ally
     // standing inside (refresh keeps it while they stay near, and it falls off
@@ -6731,7 +6741,7 @@ export class Sim {
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
     dmg *= this.petDamageMult(mob);
     const rawDmg = dmg; // pre-armor, post-crit/enrage — basis for cleave splash
-    dmg *= 1 - armorReduction(this.effectiveArmor(target), mob.level);
+    dmg *= 1 - mobArmorReduction(mob, target, this.effectiveArmor(target));
     const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
     if (blocked) {
       dmg = Math.max(1, dmg - target.blockValue);
@@ -6794,8 +6804,10 @@ export class Sim {
     pet.facing = steadyAngleTo(pet.pos, target.pos, pet.facing);
     pet.swingTimer -= DT;
     // Emit the projectile + resolve the hit (resisted, not missed: the same
-    // semantics as player casts). Shared by the instant path and the windup
-    // release below; the caller owns the swing-timer bookkeeping.
+    // semantics as player casts, but isMobSpellResisted floors a hostile mob's
+    // resist chance against a player-side target the same way swingMissChance
+    // floors mob melee miss). Shared by the instant path and the windup release
+    // below; the caller owns the swing-timer bookkeeping.
     const fire = () => {
       this.emit({
         type: 'spellfx',
@@ -6804,7 +6816,7 @@ export class Sim {
         school: spell.school,
         fx: 'projectile',
       });
-      if (isSpellResisted(this.rng, pet.level, target.level, pet.hitBonus)) {
+      if (isMobSpellResisted(this.rng, pet, target, pet.hitBonus)) {
         this.emit({
           type: 'damage',
           sourceId: pet.id,

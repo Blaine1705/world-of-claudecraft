@@ -15,8 +15,8 @@
     "cancelCast fishing arm via dealDamage (FISHING_CAST_ID, not pushback)",
     "multi-class casters: mage/priest/warlock"
   ],
-  "draws": 1914,
-  "drawDigest": "3d31648e",
+  "draws": 1916,
+  "drawDigest": "f966da6c",
   "frames": [
     {
       "tick": 0,
@@ -626,7 +626,7 @@
       "time": 3.5,
       "nextId": 824,
       "state": "e53f67bb",
-      "events": "b33e5d33",
+      "events": "cc6e8c50",
       "rng": {
         "draws": 230,
         "digest": "cd62f8b8"
@@ -1355,7 +1355,7 @@
       "time": 9.25,
       "nextId": 824,
       "state": "60acac40",
-      "events": "e0661d88",
+      "events": "73a0e7af",
       "rng": {
         "draws": 1470,
         "digest": "2f378883"
@@ -1910,7 +1910,7 @@
       "time": 10.75,
       "nextId": 824,
       "state": "3ec55b9b",
-      "events": "ebfa2953",
+      "events": "3638fd20",
       "rng": {
         "draws": 1773,
         "digest": "c674c85c"
@@ -2434,8 +2434,8 @@
       "state": "7527d630",
       "events": "71020064",
       "rng": {
-        "draws": 1855,
-        "digest": "25e24875"
+        "draws": 1856,
+        "digest": "940276e1"
       }
     },
     {
@@ -2445,8 +2445,8 @@
       "state": "73b2406e",
       "events": "e5580483",
       "rng": {
-        "draws": 1855,
-        "digest": "25e24875"
+        "draws": 1856,
+        "digest": "940276e1"
       },
       "label": "warlock-fishing-cancel",
       "players": [
@@ -2945,8 +2945,8 @@
       "state": "195258d0",
       "events": "741638a5",
       "rng": {
-        "draws": 1914,
-        "digest": "3d31648e"
+        "draws": 1916,
+        "digest": "f966da6c"
       }
     },
     {
@@ -2956,8 +2956,8 @@
       "state": "195258d0",
       "events": "741638a5",
       "rng": {
-        "draws": 1914,
-        "digest": "3d31648e"
+        "draws": 1916,
+        "digest": "f966da6c"
       },
       "label": "final",
       "players": [

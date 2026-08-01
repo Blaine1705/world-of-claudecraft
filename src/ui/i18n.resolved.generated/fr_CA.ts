@@ -2147,6 +2147,14 @@ export const fr_CA: EnTranslations = {
       "benefits": "Liez votre compte Steam depuis l'application de bureau pour que les hauts faits que vous obtenez se reflètent dans vos succès Steam.",
       "noTicket": "Steam n'a pas fourni de ticket de liaison. Lancez Steam, puis réessayez."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Boîte aux lettres",
       "subtitle": "La Poste aux Corbeaux",
@@ -2997,6 +3005,14 @@ export const fr_CA: EnTranslations = {
       "already_linked": "Votre compte est déjà lié à un compte Steam.",
       "account_taken": "Ce compte Steam est déjà lié à un autre compte.",
       "upstream": "Steam n'a pas répondu. Réessayez dans un instant."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez."
@@ -6254,11 +6270,15 @@ export const fr_CA: EnTranslations = {
       "graphicsPresetMedium": "Moyenne",
       "graphicsPresetHigh": "Haute",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Extrême",
       "graphicsPresetAdvanced": "Avancée",
       "terrainDetail": "Détail du terrain",
       "foliageDensity": "Densité de feuillage",
       "effectsQuality": "Effets et éclairage",
       "shadowQuality": "Qualité des ombres",
+      "surfaceDetail": "Détail des surfaces",
+      "surfaceDetailBasic": "Basique",
+      "surfaceDetailFull": "Complet",
       "terrainLow": "Bas",
       "terrainHigh": "Élevé",
       "touchOpacity": "Opacité des commandes tactiles",
@@ -6435,6 +6455,7 @@ export const fr_CA: EnTranslations = {
       "floatingDodge": "Esquive",
       "floatingParry": "Parade",
       "floatingResist": "Résisté",
+      "floatingEvade": "Évasion",
       "floatingHealFull": "Plein",
       "floatingHealAbsorbed": "Absorbé",
       "cannotMove": "Immobilisé !",
@@ -6447,6 +6468,7 @@ export const fr_CA: EnTranslations = {
       "dodged": "{target} esquive votre {ability}.",
       "parried": "Votre {ability} est parée par {target}.",
       "resisted": "{target} résiste à votre {ability}.",
+      "evaded": "Votre {ability} est évitée par {target}.",
       "healSelf": "Votre {ability} vous rend {amount} points de vie.",
       "healSelfCrit": "Votre {ability} vous rend un soin critique de {amount}.",
       "healOther": "Votre {ability} soigne {target} pour {amount}.",
@@ -9632,6 +9654,18 @@ export const fr_CA: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Couteau-croc de Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Épieu de bêtes du Seigneur des crocs"
+      },
+      "bloodmane_warleggings": {
+        "name": "Jambières de guerre Crin-de-sang"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Culottes de traque Griffe-de-liane"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sarong rituel Os-solaire"
+      },
       "thick_winter_pelt": {
         "name": "Épaisse fourrure d'hiver"
       },
@@ -10378,6 +10412,24 @@ export const fr_CA: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Bandes de mains du Choeur du Wyrm"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunique du traqueur du Bassin"
+      },
+      "verdant_heart_vestment": {
+        "name": "Vêtement du Cœur-verdoyant"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Haubert rituel Os-solaire"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Grand-croc du Bassin"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Couronne de l'oracle Os-solaire"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Garde-jambes de guerre Crin-de-sang"
       },
       "deathless_greatblade": {
         "name": "Grande lame immortelle"

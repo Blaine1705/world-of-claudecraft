@@ -2147,6 +2147,14 @@ export const it_IT: EnTranslations = {
       "benefits": "Collega il tuo account Steam dall'app desktop per rispecchiare le imprese che ottieni negli obiettivi di Steam.",
       "noTicket": "Steam non ha fornito un ticket di collegamento. Avvia Steam e riprova."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Cassetta postale",
       "subtitle": "La Posta dei Corvi",
@@ -2997,6 +3005,14 @@ export const it_IT: EnTranslations = {
       "already_linked": "Il tuo account ha già un account Steam collegato.",
       "account_taken": "Quell'account Steam è già collegato a un altro account.",
       "upstream": "Steam non ha risposto. Riprova tra un istante."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "L'autorizzazione del portafoglio è scaduta o non ha potuto essere verificata. Riprova."
@@ -6254,11 +6270,15 @@ export const it_IT: EnTranslations = {
       "graphicsPresetMedium": "Media",
       "graphicsPresetHigh": "Alta",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Estrema",
       "graphicsPresetAdvanced": "Avanzata",
       "terrainDetail": "Dettaglio terreno",
       "foliageDensity": "Densità vegetazione",
       "effectsQuality": "Effetti e luci",
       "shadowQuality": "Qualità ombre",
+      "surfaceDetail": "Dettaglio superfici",
+      "surfaceDetailBasic": "Base",
+      "surfaceDetailFull": "Completo",
       "terrainLow": "Basso",
       "terrainHigh": "Alto",
       "touchOpacity": "Opacità comandi touch",
@@ -6435,6 +6455,7 @@ export const it_IT: EnTranslations = {
       "floatingDodge": "Schivata",
       "floatingParry": "Parata",
       "floatingResist": "Resistito",
+      "floatingEvade": "Evitato",
       "floatingHealFull": "Pieno",
       "floatingHealAbsorbed": "Assorbito",
       "cannotMove": "Non puoi muoverti!",
@@ -6447,6 +6468,7 @@ export const it_IT: EnTranslations = {
       "dodged": "{target} schiva il tuo {ability}.",
       "parried": "Il tuo {ability} viene parato da {target}.",
       "resisted": "{target} resiste al tuo {ability}.",
+      "evaded": "Il tuo {ability} viene evitato da {target}.",
       "healSelf": "Il tuo {ability} ti cura di {amount}.",
       "healSelfCrit": "Il tuo {ability} ti cura criticamente di {amount}.",
       "healOther": "Il tuo {ability} cura {target} di {amount}.",
@@ -9632,6 +9654,18 @@ export const it_IT: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Pugnale Zanna di Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Spiedo da Bestie del Signore delle Zanne"
+      },
+      "bloodmane_warleggings": {
+        "name": "Cosciali da Guerra Criniera di Sangue"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Brache da Agguato Artiglio di Vite"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sarong Rituale Ossosole"
+      },
       "thick_winter_pelt": {
         "name": "Pelliccia Invernale Spessa"
       },
@@ -10378,6 +10412,24 @@ export const it_IT: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Bende del coro dei wyrm"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunica del Predatore del Bacino"
+      },
+      "verdant_heart_vestment": {
+        "name": "Veste del Cuore Verdeggiante"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Usbergo Rituale Ossosole"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Granzanna del Bacino"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Corona dell'Oracolo Ossosole"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Gambali da Guerra Criniera di Sangue"
       },
       "deathless_greatblade": {
         "name": "Spadone senza morte"

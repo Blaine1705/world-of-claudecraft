@@ -360,12 +360,15 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned: the review's roof-course offset fix and the
-      // makeOpenPitchedRoof coupling guard touched buildings_commerce.js, a
-      // pinned townAsset source-fingerprint input, so this composite mints
-      // fresh even though the fix only changes the bank's own geometry by a
-      // few millimeters and adds a runtime assertion. No recapture.
-      fingerprint: 'b3a49fd4fa887920af5de4b6fb93e2b9b3c6c0351e9a2ba00d6567e44083e88b',
+      // Deliberately re-pinned. Three independent causes stack in this merge:
+      // the 0.33.0 version sync moved every GLB source-fingerprint leaf
+      // (#2729), the graphics overhaul changed the renderer-integration and
+      // view-priority leaves, and this branch edits src/render/renderer.ts as
+      // well. So the composite mints fresh and matches no parent's literal.
+      // No pipeline input or geometry value changed, and no capture was
+      // retaken.
+      fingerprint: '69a1db26a13326093d091a0fd31c1a625735baf90fc1a60b5ee45ec5f38f3e84',
+
       components: {
         captureContract: {
           id: 'polish-v2',

@@ -2147,6 +2147,14 @@ export const cs_CZ: EnTranslations = {
       "benefits": "Propoj svůj účet Steam z desktopové aplikace a skutky, které vykonáš, se budou zrcadlit do achievementů ve službě Steam.",
       "noTicket": "Steam nevydal propojovací tiket. Spusť Steam a zkus to znovu."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Poštovní schránka",
       "subtitle": "Havraní pošta",
@@ -2997,6 +3005,14 @@ export const cs_CZ: EnTranslations = {
       "already_linked": "Tvůj účet už má propojený účet Steam.",
       "account_taken": "Tento účet Steam už je propojený s jiným účtem.",
       "upstream": "Steam neodpověděl. Zkus to za chvíli znovu."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu."
@@ -6254,11 +6270,15 @@ export const cs_CZ: EnTranslations = {
       "graphicsPresetMedium": "Střední",
       "graphicsPresetHigh": "Vysoká",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Insane",
       "graphicsPresetAdvanced": "Pokročilé",
       "terrainDetail": "Detail terénu",
       "foliageDensity": "Hustota vegetace",
       "effectsQuality": "Efekty a osvětlení",
       "shadowQuality": "Kvalita stínů",
+      "surfaceDetail": "Surface Detail",
+      "surfaceDetailBasic": "Basic",
+      "surfaceDetailFull": "Full",
       "terrainLow": "Nízký",
       "terrainHigh": "Vysoký",
       "touchOpacity": "Krytí dotykového ovládání",
@@ -6435,6 +6455,7 @@ export const cs_CZ: EnTranslations = {
       "floatingDodge": "Vyhnutí",
       "floatingParry": "Odraženo",
       "floatingResist": "Odoláno",
+      "floatingEvade": "Uniknutí",
       "floatingHealFull": "Plné",
       "floatingHealAbsorbed": "Pohlceno",
       "cannotMove": "Nemůžeš se hýbat!",
@@ -6447,6 +6468,7 @@ export const cs_CZ: EnTranslations = {
       "dodged": "{target} se vyhýbá tvé schopnosti {ability}.",
       "parried": "{target} odráží tvoji schopnost {ability}.",
       "resisted": "{target} odolává tvé schopnosti {ability}.",
+      "evaded": "{target} uniká tvé schopnosti {ability}.",
       "healSelf": "Tvoje {ability} tě léčí za {amount}.",
       "healSelfCrit": "Tvoje {ability} tě kriticky léčí za {amount}.",
       "healOther": "Tvoje {ability} léčí {target} za {amount}.",
@@ -9632,6 +9654,18 @@ export const cs_CZ: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Tesákový nůž Zulgara"
       },
+      "fanglords_beastspear": {
+        "name": "Zvířecí kopí Tesákopána"
+      },
+      "bloodmane_warleggings": {
+        "name": "Krvavohřívé válečné nohavice"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Liánodrápé plíživé kalhoty"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Slunečněkostní rituální sarong"
+      },
       "thick_winter_pelt": {
         "name": "Silná zimní kožešina"
       },
@@ -10378,6 +10412,24 @@ export const cs_CZ: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Omotávky dračího chóru"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunika plíživce z Kotliny"
+      },
+      "verdant_heart_vestment": {
+        "name": "Roucho zeleného srdce"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Slunečněkostní rituální hauberk"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Velký tesák Kotliny"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Slunečněkostní koruna orákula"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Krvavohřívé válečné chrániče nohou"
       },
       "deathless_greatblade": {
         "name": "Nesmrtelná velká čepel"
