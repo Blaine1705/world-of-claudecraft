@@ -249,7 +249,7 @@ import {
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
 import { gatherToolTooltipLines } from './gather_tool_tooltip';
-import { GATHERING_PROFESSION_NAME_KEYS } from './gathering_profession_name';
+import { gatheringProfessionNameKey } from './gathering_profession_name';
 import {
   buildGatheringProficiencyRows,
   gatherDeniedLineKey,
@@ -544,7 +544,7 @@ import { targetOfTargetId } from './target_of_target';
 import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
-import { TOOL_EFFECT_NAME_KEYS } from './tool_effect_name';
+import { toolEffectNameKey } from './tool_effect_name';
 import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
@@ -10258,14 +10258,9 @@ export class Hud {
           // 'constructor' would otherwise resolve a prototype member and
           // hand a non-key to t(). Matches the view core's guard on the same
           // tables.
-          const effectKey =
-            ev.effectId !== undefined && Object.hasOwn(TOOL_EFFECT_NAME_KEYS, ev.effectId)
-              ? TOOL_EFFECT_NAME_KEYS[ev.effectId]
-              : undefined;
+          const effectKey = ev.effectId !== undefined ? toolEffectNameKey(ev.effectId) : undefined;
           const effectName = effectKey ? t(effectKey) : (ev.effectId ?? '');
-          const professionKey = Object.hasOwn(GATHERING_PROFESSION_NAME_KEYS, ev.professionId)
-            ? GATHERING_PROFESSION_NAME_KEYS[ev.professionId]
-            : undefined;
+          const professionKey = gatheringProfessionNameKey(ev.professionId);
           const professionName = professionKey ? t(professionKey) : ev.professionId;
           const materialToken = ev.materialItemId ? grantItemToken(ev.materialItemId) : '';
           const countText = formatNumber(ev.count ?? 0, { maximumFractionDigits: 0 });
@@ -14120,9 +14115,7 @@ export class Hud {
     prompt: { effectId: string; charges: number },
     proceed: (confirmed: boolean) => void,
   ): void {
-    const nameKey = Object.hasOwn(TOOL_EFFECT_NAME_KEYS, prompt.effectId)
-      ? TOOL_EFFECT_NAME_KEYS[prompt.effectId]
-      : undefined;
+    const nameKey = toolEffectNameKey(prompt.effectId);
     // An unknown effect id (a newer server's catalog) cannot compose the
     // ask: degrade to an unconfirmed harvest rather than a broken dialog.
     if (nameKey === undefined) {

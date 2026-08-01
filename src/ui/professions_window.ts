@@ -21,7 +21,7 @@ import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
-import { GATHERING_PROFESSION_NAME_KEYS } from './gathering_profession_name';
+import { gatheringProfessionNameKey } from './gathering_profession_name';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { professionIconUrl } from './icons';
 import type { PainterHostPresentation } from './painter_host';
@@ -38,7 +38,7 @@ import {
   type RingArc,
   type RingLayout,
 } from './professions_view';
-import { TOOL_EFFECT_NAME_KEYS } from './tool_effect_name';
+import { toolEffectNameKey } from './tool_effect_name';
 import { svgIcon } from './ui_icons';
 
 // Ring node distance from the container center, in percent of the box
@@ -521,12 +521,10 @@ export class ProfessionsWindow {
   private gatheringHtml(model: ProfessionsViewModel): string {
     const rows = model.gathering
       .map((row) => {
-        // hasOwn, not a bare index: the id is wire-mirrored, and a prototype
-        // key would resolve a function that passes the undefined check and
-        // reaches t(). Same guard as the effect-name table below.
-        const key = Object.hasOwn(GATHERING_PROFESSION_NAME_KEYS, row.professionId)
-          ? GATHERING_PROFESSION_NAME_KEYS[row.professionId]
-          : undefined;
+        // The shared hasOwn-safe getter (one idiom for the rule): the id is
+        // wire-mirrored, and a bare index on a prototype key would resolve a
+        // function that passes the undefined check and reaches t().
+        const key = gatheringProfessionNameKey(row.professionId);
         if (key === undefined) return '';
         const pct = Math.round(row.bar.fillFraction * 100);
         return (
@@ -559,13 +557,8 @@ export class ProfessionsWindow {
     const effect = row.effect;
     let html = '';
     if (effect) {
-      // hasOwn, not a bare index: the row's effectId is a wire-mirrored
-      // string, and a prototype key ('constructor') would otherwise resolve
-      // a function that passes the undefined check and reaches t(). Matches
-      // the hud event arm's guard on the same table.
-      const nameKey = Object.hasOwn(TOOL_EFFECT_NAME_KEYS, effect.effectId)
-        ? TOOL_EFFECT_NAME_KEYS[effect.effectId]
-        : undefined;
+      // The shared hasOwn-safe getter, same rule as the profession name.
+      const nameKey = toolEffectNameKey(effect.effectId);
       if (nameKey !== undefined) {
         // Spent says so in words rather than showing "0 / 30", which reads
         // like a broken tool rather than a rechargeable one that has done its
@@ -611,9 +604,7 @@ export class ProfessionsWindow {
     }
     const slotButtons = row.slottable
       .map((effectId) => {
-        const nameKey = Object.hasOwn(TOOL_EFFECT_NAME_KEYS, effectId)
-          ? TOOL_EFFECT_NAME_KEYS[effectId]
-          : undefined;
+        const nameKey = toolEffectNameKey(effectId);
         if (nameKey === undefined) return '';
         return `<button type="button" class="btn prof-effect-btn" data-slot-profession="${esc(row.professionId)}" data-slot-effect="${esc(effectId)}" data-focus-key="slot:${esc(row.professionId)}:${esc(effectId)}">${esc(
           t('hudChrome.professions.toolEffectSlotButton', { effect: t(nameKey) }),

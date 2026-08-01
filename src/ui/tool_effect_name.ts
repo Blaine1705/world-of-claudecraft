@@ -25,3 +25,14 @@ export const TOOL_EFFECT_NAME_KEYS: Record<string, TranslationKey> = {
   artisans_eye: 'hudChrome.professions.toolEffectName.artisansEye',
   quickening_charm: 'hudChrome.professions.toolEffectName.quickeningCharm',
 };
+
+/** hasOwn-safe read of the table above, the twin of
+ *  gatheringProfessionNameKey: the map is a plain object literal, so a bare
+ *  bracket read of a wire-supplied prototype key ('constructor') would
+ *  resolve a function that passes an undefined check and reaches t(). Use
+ *  this getter rather than indexing the table directly. */
+export function toolEffectNameKey(effectId: string): TranslationKey | undefined {
+  return Object.hasOwn(TOOL_EFFECT_NAME_KEYS, effectId)
+    ? TOOL_EFFECT_NAME_KEYS[effectId]
+    : undefined;
+}
