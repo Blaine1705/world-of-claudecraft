@@ -1,6 +1,6 @@
 // The full local pre-merge gate: the CI checks from .github/workflows/ci.yml run
 // locally. Order: the PR tier's combined step list (CI splits it across the
-// parallel pr-gate and pr-checks jobs and fans the test step across a 4-shard
+// parallel pr-gate and pr-checks jobs and fans the test step across a 6-shard
 // matrix; this script runs the same list serially with ONE full unsharded
 // vitest run by design), with the parallel lint job's changed-files biome pulled forward
 // as an early fast-fail; on a release/** branch the steps run release-tier
