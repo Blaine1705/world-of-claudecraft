@@ -1,9 +1,16 @@
 import type { Entity } from '../sim/types';
 import { abilityHexColor } from './ability_vfx_core';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
+import {
+  CHARACTER_EFFECT_RECKLESSNESS,
+  CHARACTER_EFFECT_SANGUINE,
+  CHARACTER_EFFECT_SOUL_REND,
+  characterEffectFlags,
+  hasCharacterEffect,
+} from './character_effects_core';
 
 export function characterSoulRendActive(e: Entity): boolean {
-  return e.auras.some((a) => a.id === 'nythraxis_soul_rend');
+  return hasCharacterEffect(characterEffectFlags(e.auras), CHARACTER_EFFECT_SOUL_REND);
 }
 
 export interface CharacterWeaponAura {
@@ -43,6 +50,10 @@ export function characterWeaponAuraColor(e: Entity): number | null {
   return characterWeaponAuraInto(e, scratch)?.color ?? null;
 }
 
+export function characterSanguineAuraActive(e: Entity): boolean {
+  return hasCharacterEffect(characterEffectFlags(e.auras), CHARACTER_EFFECT_SANGUINE);
+}
+
 export function characterRecklessnessActive(e: Entity): boolean {
-  return e.auras.some((a) => a.kind === 'buff_reckless');
+  return hasCharacterEffect(characterEffectFlags(e.auras), CHARACTER_EFFECT_RECKLESSNESS);
 }
