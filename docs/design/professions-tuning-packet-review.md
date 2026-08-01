@@ -3657,6 +3657,231 @@ Build/review: ultracode. No separate QA (this IS the QA).
    first, iOS binary shipped per R34), then the merge decision with the
    maintainer.
 
+**Phase 18 COMPLETE, the final gate** (2026-08-01, Fable xhigh ultracode,
+new session, no authorship stake in any phase; this phase IS its own QA).
+Entry verified at cc4b405721 on the right branch; release/v0.33.0 UNMOVED
+at 2ae71a7fbf (merge-base equals the release tip; recorded, no re-sync
+owed). Verdict up front: the whole-branch review over 620+ files found NO
+blocking defect in the packet as built through phase 17; the phase 18
+rounds surfaced and closed one regression the phase's own first fix batch
+introduced (three red tests, two of them whole files silently collecting
+zero), one empirically verified sanitizer bypass in its own hardening, and
+a set of cross-arm completions (escrow bounds, escrow signer rekeys,
+copy-choice on the vendor and discard arms, dead gates on the two
+packet-new commands); the release-malware-audit is PASS across all 236
+flags; the live track saw every named surface behave; and the mutation
+ledger killed 15 of 15.
+
+Deterministic reconciliation (before any fan-out, every number by script):
+the stale-translation ledger resolves to exactly 53 keys with all 265
+non-Latin rows present and the ten freshly minted rows in place; the
+phase 11 wire-delta re-measure the first sync-correction block assigned to
+this phase lands exactly on the corrected figures (IWORLD_MEMBERS 281,
+surface-inventory rows 201, COMMAND_NAMES 187 at runtime, the OTA route
+module in the registry).
+
+Evidence, the whole-branch review: eight repo reviewers via the Agent tool
+over 2ae71a7fbf..HEAD (architecture: no blockers, the harvestNode
+argument-order footgun fixed; cross-platform-sync: no criticals, the S3
+scan corpus widened to glob src/sim/professions; database-performance:
+the DEPLOY pool runbook entry, the unstuck index premise, the dedupe map
+sized to the 1,000-player target; migration-safety: no blockers, the
+rollback-caveat class completed with questedHobbies; privacy-security: no
+criticals, the admin GET check and the wire-id echo clamp; test-coverage:
+zero blocking or should-fix, the strongest pin discipline it had audited;
+frontend-seam: all gates green, the touch floors made measurable and the
+professions axe arm added; qa-checklist NOT READY verdict on the interim
+tip, which was the fix-round regression, repaired and re-verified with the
+FULL suite green: 1885 files / 24,739 tests exit 0). A finder workflow in
+the pass-2 shape: six blind lenses disjoint from the reviewer domains,
+rounds to dry with paired adversarial verification per finding
+(correctness refuter + significance refuter, splits judged by the lead
+with the files open), a completeness critic; two session-limit waves
+killed agent cohorts mid-run and both resumes replayed the cached prefix
+free. Rounds 1-3: 19 findings survived verification (8 CONFIRMED two-zero,
+11 split), 1 refuted (accepted after the lead's spot-check).
+The full run: seven rounds (10, 5, 4, 7, 10, 4, 4 fresh survivors), 43
+surviving verified findings, 4 refuted with the refutations
+lead-spot-checked and accepted, ending at the raised round cap WITHOUT
+two consecutive dry rounds: coverage is bounded, not exhaustive, and is
+recorded as such (the yield curve by round 7 was comment drift,
+pre-existing-family echoes, and design flags). Disposition of the 43:
+every packet-introduced CONFIRMED finding fixed; the pre-existence
+refutations sorted into three coherent maintainer follow-ups (the
+dead/CC/busy/side-effect gate family across the instant professions
+commands, the crafted-provenance marker threading through the transfer
+and re-mint pipes beyond the bank arm this phase closed, and the
+balance flags); the rest were comment and doc drift, all corrected. The
+critic's final list is thirteen meta-gaps, of which nine are covered by
+evidence the workflow could not see (the Agent-tool reviewer reports:
+frontend seams, rollback documentation, RL-surface stability, rng
+draw-order, wire privacy, guide truth, deeds pins, admin restore
+authorization, and the browser suites this phase ran by hand) and four
+ride the decision list (the bot-detector forward leg on both copies,
+conservation-harness enrollment for the new movers, an RL env
+re-baseline at the maintainer's discretion, and the cross-phase
+pin-churn meta-audit).
+
+Findings, all applied per the standing rule, in five fix waves each
+reviewed by fresh eyes (the reviewer wave c71e19c440..30282da186 and
+4829706d3a; the rev-qa2 repairs 7ec45eb07c/3437f79070/85ba2cbf13 and its
+five-nit close ae5bae3d2c; the finder wave 2b4c2629c4/0b39622f01/
+7e108fa8bc/8310667698 plus the coverage completions ffb5593a78/
+d0ef0b8879; the fix-round-review close 139418208a and its tsc repair
+a9b46bfce5; the rounds 4-7 waves cc809fb699/7e131fa27d/ef42feb5f5/
+c8f385c25e, the marker-bound bypass close 2f09c97744 with its wiring
+pin c7cec5ffb4, and the rounds 6-7 close d8b9496744). The headline items: the wire-id echo clamp on both
+tool-effect deny paths (a hostile 16 KiB id no longer bounces back
+byte-for-byte); the dead gate on both packet-new commands (every adjacent
+surface refuses dead, and materials must not leave a ghost's bags); the
+seller-signed-charm copy-choice extended from the trade arm to vendor
+sell and discard (the predicate moved to items.ts, one definition for all
+four arms); the shared payload bound extended to the two persisted escrow
+books, where a corrupt row has no login to self-heal it, with the market
+listing arm routed through the bound it had bypassed entirely; the
+sanitizer hardened twice, the second time against the fix-round review's
+own empirical counterexamples (188 KB through ten thousand short keys,
+394 KB through five thousand small objects, both now dropping whole at
+the sub-object key ceiling); the rift rebuild completed onto the bank and
+buyback arms in the same rebuild-then-bound order as bags and equipment;
+the rename signer sweep completed across all five blob regions AND the
+renamer's own escrowed copies in both world-state books (stranger-held
+copies stay foreign, the accepted craftedBy limitation); the REALM
+directory import regression (two vi.mock factories left whole test files
+collecting ZERO tests, the silent-retire class, repaired across all eight
+realm-mock factories with the derivation pinned end to end); the GM
+restore-slot audit-before-validation contract break (the pure
+pair-validity policy now runs in the validator, so a statically
+impossible pair no longer writes a moderation audit row); the copper-flow
+census gains learn_riding and companion_upgrade (the game's largest
+one-time training fee was booking under 'other'); the stale-client deploy
+sweep gains the two phase 12 charm ids its own contract promised; the
+recipe grade-pool disjointness rule gains its quest-collect sibling
+guard; DEPLOY.md's command census corrected (two un-gated commands with
+shipped senders, not one dev-gated; the discord bot named as a
+version-skewed consumer; the sync framing moved to the anchor-rule
+shape); and the load-baseline doc's artifact provenance corrected against
+the four real JSONs (they carry verdict and observersRequested; the
+blanket predate-every-field claim was false) with the settled blob figure
+restated at 8,587 bytes.
+
+Mutation ledger (isolated worktree prof-packet-mut18 at a9b46bfce5, own
+npm ci, one mutant at a time, parsed pass AND fail counts so a kill is
+proven against tests that ran, finally-revert with porcelain verified
+between mutants, removed after the pass): M1/M2 the two dead gates, M3/M4
+the two copy-choice arms, M5 the key-length arm, M6 the subtree ceiling,
+M7 the escrow-bound bypass, M8 the listing-bound bypass, M9/M10 the two
+rift rebuilds, M11/M12 the two rename arms, M13 the copper-flow row, M14
+the restore pair-validity check, M15 the quest-overlap content mutant:
+ALL 15 KILLED with the named assertion.
+
+The live track (real dev server on :8787 with ALLOW_DEV_COMMANDS=1, the
+worktree client on :5175): online smoke over the production WebSocket
+protocol end to end (register via REST, world join with 54 entities,
+movement echo 18.7 yards on a real KeyW after the entry overlays were
+dismissed); the R65 consent row verified live in Options > Interface >
+Chat exactly as the ruling records it (the widened label wraps to about
+five lines against the 120px name column, toggle live, aria-busy
+cleared); the wiki tools table verified desktop AND mobile for mining and
+fishing (headers, the R66 Drowned Litany gate wording, the 85/100
+literals, and the mobile min-width 640 horizontal scroll with no body
+overflow); and the Yumi-maze minimap z-mirror ELEVATED from PLAUSIBLE to
+CONFIRMED, by code trace (the maze blit samples +Z down while the marker
+projection and the overworld blit run +Z up) and by live look (a player
+20 yards from the north shell renders with the maze bulk above them);
+pre-existing on both parents, the packet's minimap diff is the gather
+lock strike and a comment only, so it stays recorded-not-fixed with two
+committed evidence captures for the follow-up issue.
+
+The release-malware-audit: PASS. Scanner over 4,626 files, 236 flags,
+high=0; four judge agents dismissed all 236 with zero confirmed and zero
+uncertain (backdoor 25/25, the one shipped hit being the triple-gated
+/dev god amp with its pinning test; key-exfil and mining 18/18;
+rce-obfuscation 175/175 with zero dynamic execution in shipped runtime
+beyond the sanctioned gpu_preference file; supply-chain and web3 18/18
+with every transitive install script read and the wallet flow traced
+deserialize-only). The one changed instruction file was read by hand
+(benign). Stated limits: static plus contextual reading, no sandbox
+execution, transitive dependencies unaudited (pair with npm audit at
+release). Four non-blocking pre-existing advisories ride the decision
+list below.
+
+Screenshots (committed 0ffb6425ea, docs/screenshots/professions-final-gate/):
+the wiki tools table desktop and mobile for mining and fishing, the R65
+consent row desktop, the professions window desktop and mobile, the R22
+vendor advisory ladder desktop and mobile, the corpse-harvest lines both
+layouts, and the two Yumi-maze evidence captures. Per-phase before/after
+sets stand in their phase directories.
+
+The deploy runbook check: server deploys close the client-first window
+(the census paragraph now truthful per above); the iOS-binary premise is
+OPTIONAL per the first sync-correction block (the release's self-hosted
+OTA lane); the discord-bot container is named as a version-skewed
+consumer to restart with the server; the DB_POOL_MAX_CLIENTS runbook
+entry carries the measured 487-concurrent wall, the symptom pair, and
+the budget arithmetic.
+
+Final gate: PASS at d8b9496744, all 11 steps green, exit code 0 read
+explicitly from the run's own captured line (1,884 test files inside the
+full-suite step), on the committed idle tree with the maintainer's final
+icon art landed (4538ebc2ea). The informational I18N_RELEASE_TIER=1 run
+reds exactly as the deferral predicts (four suites fail on pending rows;
+the status registry re-measures at this tip as 10,431 keys x 21 locales
+with 4,293 pending rows and 220 blocked, a figure that includes
+non-packet keys the release added and supersedes every earlier stamped
+count per the re-measure rule): recorded as a measure for the deferred
+fill, never as pass/fail. One review-discipline judgment is recorded
+rather than hidden: the last small fix batch (comment corrections and
+test pins from the final review round) was not sent for a further agent
+review pass at the user's budget instruction; its one behavioral change
+(the marker-bound hoist) is pinned by a loader-driving test written
+against the reproduced bypass, and the full gate above ran over all of
+it.
+
+Recorded, not fixed, with reasons (beyond the standing phase 17 list,
+which stands): the pre-existing dead/CC gate split across the instant
+professions family (craft, train, enchant, salvage, unbind, station
+placement take no dead or CC gate on the release base; the two packet-new
+commands now gate dead, and session starts take no stun gate, all one
+coherent post-merge sweep candidate wanting its own ruling); the
+first-masterwork double Discord card (the deliberate arithmetic of two
+flagged phase 15 decisions, refuted as a defect); the admin professions
+modal's raw ids and raw level (provably no observable difference in any
+shipped locale; a maintainer judgment item); the deployed discord bot's
+missing default arm (pre-existing class, already live for vale_cup; the
+DEPLOY sentence covers the operational half); the market listing count
+clamp on a bound-rejected payload (no widening: the plain arm always
+accepted arbitrary counts); sanitizeBankState's opt-in ownerId (the one
+production caller passes it); escrow copies in STRANGERS' parcels and
+listings keep a renamed crafter's old signature (the accepted craftedBy
+limitation, now stated everywhere it applies); and 0b39622f01's commit
+body says ten test arms where nine landed (the record stands corrected
+here).
+
+Maintainer decision list at the merge (R61 through R66 are veto-able
+rulings, presented not re-litigated; new items get their own numbers):
+the ledger framing (53 keys / 265 non-Latin rows publish ACTIVELY FALSE
+statements in five shipped languages, prioritize the fill on that basis);
+the deferred-fill worklist (the {clears}/{tier4Prof}/{tier5Prof} token
+adds, the per-locale 85/100 pin, the toolCraftedOrMarks locale-side
+clears guard, the ja/zh currency unification, the ru/zh_TW polish, the
+re-measure at the fill's own tip); the R58 rollout flag (existing
+accounts default TRUE begin publishing masterwork and deed cards to the
+public Discord channel on deploy without a fresh prompt: a release-notes
+item); the IMMOBILE_AURA_KINDS stasis omission; the mediawiki seed
+fishing page; the /api/deeds/broadcasts rate-limit note; R63's stale
+wieldable-proviso clause; the dead/CC family ruling candidate above; the
+four malware-audit advisories (the @solana/web3.js phantom dependency and
+its scanner blind spot on transitive risky names, the
+signAndSendTransaction verb outside every web3 rule, the bigint-buffer
+1.1.5 upstream advisory, the wallet session secret in localStorage); and
+the Yumi-maze z-mirror follow-up issue to file after the merge decision.
+
+Phase 18 is COMPLETE. NEXT: the maintainer's merge decision. The branch
+stays LOCAL; no PR opens and nothing merges without the user's explicit
+go, and the locale fill remains deferred past the packet.
+
+
 ---
 
 ## Deferred and accepted, with reasons (pass-2 additions)
