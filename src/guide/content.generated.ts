@@ -1439,6 +1439,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Consume"
       },
       {
+        "id": "searing_pain",
+        "name": "Sear"
+      },
+      {
         "id": "soul_lance",
         "name": "Soul Lance"
       },
@@ -1483,6 +1487,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Ruinous Brand"
       },
       {
+        "id": "cinderhide",
+        "name": "Cinderhide"
+      },
+      {
         "id": "vicarious_suffering",
         "name": "Vicarious Suffering"
       },
@@ -1501,6 +1509,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "possess_evil_eye",
         "name": "Possess the Evil Eye"
+      },
+      {
+        "id": "hour_of_judgment",
+        "name": "Hour of Judgment"
       },
       {
         "id": "coven",
@@ -1545,6 +1557,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "sacrifice_undead",
         "name": "Sacrifice Undead"
+      },
+      {
+        "id": "raise_gravewing",
+        "name": "Raise Gravewing"
       },
       {
         "id": "army_of_the_dead",
@@ -10172,5 +10188,11 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.r"
       }
     ]
+  },
+  "mob_demonalt": {
+    "url": "models/creatures/demonalt.glb",
+    "idle": "Idle",
+    "height": 2.1,
+    "tintStrength": 0.35
   }
 };

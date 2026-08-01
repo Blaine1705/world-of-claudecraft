@@ -121,17 +121,20 @@ describe('Warlock pet signature skills', () => {
   it.each([
     ['emberkin', 8, 'emberkin_felbolt'],
     ['gloomshade', 15, 'gloomshade_abyssal_chain'],
-  ] as const)('routes %s autocast through the real pet AI update', (templateId, cooldown, ability) => {
-    const { sim, pet, target } = rig(templateId);
-    pet.aggroTargetId = target.id;
+  ] as const)(
+    'routes %s autocast through the real pet AI update',
+    (templateId, cooldown, ability) => {
+      const { sim, pet, target } = rig(templateId);
+      pet.aggroTargetId = target.id;
 
-    updatePet(sim.ctx, pet);
+      updatePet(sim.ctx, pet);
 
-    expect(pet.petSkillTimer).toBe(cooldown);
-    expect(sim.drainEvents()).toContainEqual(
-      expect.objectContaining({ type: 'spellfx', sourceId: pet.id, ability }),
-    );
-  });
+      expect(pet.petSkillTimer).toBe(cooldown);
+      expect(sim.drainEvents()).toContainEqual(
+        expect.objectContaining({ type: 'spellfx', sourceId: pet.id, ability }),
+      );
+    },
+  );
 
   it('has Gloomshade pull a distant normal enemy with its own readable cooldown', () => {
     const { sim, pet, target } = rig();

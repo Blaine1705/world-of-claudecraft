@@ -28,7 +28,6 @@ import {
 } from './bags';
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
-import { clearAfflictionState } from './combat/affliction';
 import { campSpawnOffset } from './camp_scatter';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
@@ -39,6 +38,7 @@ import {
   resolvePosition,
   seatGroundedAt,
 } from './colliders';
+import { clearAfflictionState } from './combat/affliction';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import { auraReplacementConflicts } from './combat/aura_stacking';
 import {

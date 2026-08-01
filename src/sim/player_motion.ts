@@ -17,8 +17,8 @@
 // deps at the identical call site, so the Sim's global draw order is unchanged
 // by the extraction.
 
-import { afflictionCanCastWhileMoving } from './combat/affliction';
 import { isInstancedRegion, MANTLE_REACH, slopeGlueHeight } from './colliders';
+import { afflictionCanCastWhileMoving } from './combat/affliction';
 import { isRooted, isStunned } from './combat/cc';
 import { mountMoveSpeedPct } from './content/mounts';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';

@@ -13,8 +13,8 @@ import { dist2d } from '../src/sim/types';
 
 function makeWarlock(seed = 7) {
   const sim = new Sim({ seed, playerClass: 'warlock' as any, autoEquip: true });
+  sim.setPlayerLevel(20);
   const p: any = sim.player;
-  p.level = 20;
   return { sim, p };
 }
 

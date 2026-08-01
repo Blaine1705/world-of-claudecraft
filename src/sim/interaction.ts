@@ -46,7 +46,6 @@ import {
   pruneCorpseLoot,
 } from './loot/loot_roll';
 import { applyFocusBonus, applyFocusTierBonus, type FocusAllocation } from './professions/focus';
-import { interactSoulwell } from './soulwell';
 import {
   forfeitsEveryMappedYield,
   type HarvestTier,
@@ -63,6 +62,7 @@ import {
 import { type HarvestYield, recordHarvestYield } from './professions/harvest_yields';
 import { bestOwnedAnyGatherToolTier, canHarvestMonsterMaterial } from './professions/tools';
 import type { SimContext } from './sim_context';
+import { interactSoulwell } from './soulwell';
 import {
   cloneItemInstancePayload,
   dist2d,

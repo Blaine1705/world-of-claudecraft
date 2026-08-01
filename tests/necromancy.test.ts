@@ -1558,25 +1558,28 @@ describe('Necromancy Warlock', () => {
   it.each([
     ['raise_skeletal_warrior', 1],
     ['raise_bone_mage', 2],
-  ] as const)('treats the portal army as all three temporary slots and rejects %s without spending resources', (abilityId, fragments) => {
-    const sim = makeNecromancer();
-    addTarget(sim);
+  ] as const)(
+    'treats the portal army as all three temporary slots and rejects %s without spending resources',
+    (abilityId, fragments) => {
+      const sim = makeNecromancer();
+      addTarget(sim);
 
-    finishCast(sim, 'army_of_the_dead');
-    addSoulFragments(sim as unknown as SimContext, sim.player, fragments);
-    sim.player.resource = sim.player.maxResource;
-    const manaBefore = sim.player.resource;
-    sim.castAbility(abilityId);
+      finishCast(sim, 'army_of_the_dead');
+      addSoulFragments(sim as unknown as SimContext, sim.player, fragments);
+      sim.player.resource = sim.player.maxResource;
+      const manaBefore = sim.player.resource;
+      sim.castAbility(abilityId);
 
-    const temporary = ownedUndead(sim).filter((pet) => pet.templateId !== 'graveguard');
-    expect(temporary.map((pet) => pet.templateId)).toEqual([
-      'necromancy_skeletal_warrior',
-      'necromancy_bone_mage',
-      'necromancy_gravewing',
-    ]);
-    expect(fragmentCount(sim.player)).toBe(fragments);
-    expect(sim.player.resource).toBe(manaBefore);
-  });
+      const temporary = ownedUndead(sim).filter((pet) => pet.templateId !== 'graveguard');
+      expect(temporary.map((pet) => pet.templateId)).toEqual([
+        'necromancy_skeletal_warrior',
+        'necromancy_bone_mage',
+        'necromancy_gravewing',
+      ]);
+      expect(fragmentCount(sim.player)).toBe(fragments);
+      expect(sim.player.resource).toBe(manaBefore);
+    },
+  );
 
   it('reopens the Dominion slots after the portal army expires', () => {
     const sim = makeNecromancer();

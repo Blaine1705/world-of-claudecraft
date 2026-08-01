@@ -70,8 +70,7 @@ function makeHarness({
   };
   const abilityVfx = {
     handleSpellfx: vi.fn(
-      (event: Extract<SimEvent, { type: 'spellfx' }>) =>
-        event.ability !== 'unknown_shadow_spell',
+      (event: Extract<SimEvent, { type: 'spellfx' }>) => event.ability !== 'unknown_shadow_spell',
     ),
     handleSpellfxAt: vi.fn(() => true),
   };

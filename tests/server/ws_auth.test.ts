@@ -228,28 +228,25 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expectNoAdmissionWork(fixture);
   });
 
-  it.each([
-    'auth-world',
-    'auth-world-3',
-    'auth-world-next',
-    'auth-world-01',
-    'auth-world-1.0',
-  ])('2d. rejects the non-current world auth discriminator %s before all admission work', async (authType) => {
-    const fixture = setup();
-    const { ws, deps, req } = fixture;
+  it.each(['auth-world', 'auth-world-3', 'auth-world-next', 'auth-world-01', 'auth-world-1.0'])(
+    '2d. rejects the non-current world auth discriminator %s before all admission work',
+    async (authType) => {
+      const fixture = setup();
+      const { ws, deps, req } = fixture;
 
-    await createWsAuth(deps).authenticateWebSocket(
-      asWs(ws),
-      JSON.stringify({ t: authType, token: 'tok', character: 7 }),
-      req,
-    );
+      await createWsAuth(deps).authenticateWebSocket(
+        asWs(ws),
+        JSON.stringify({ t: authType, token: 'tok', character: 7 }),
+        req,
+      );
 
-    expectSendThenClose(
-      ws,
-      errorFrame('Game and server versions are incompatible. Reload or update, then try again.'),
-    );
-    expectNoAdmissionWork(fixture);
-  });
+      expectSendThenClose(
+        ws,
+        errorFrame('Game and server versions are incompatible. Reload or update, then try again.'),
+      );
+      expectNoAdmissionWork(fixture);
+    },
+  );
 
   it('2e. admits the exact current world discriminator for both fresh and resume joins', async () => {
     const fresh = setup();

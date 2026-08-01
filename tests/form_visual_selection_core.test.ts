@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
-  CHARACTER_FORM_READY,
   activeCharacterFormVisual,
+  CHARACTER_FORM_READY,
   characterFormMaskForAura,
   characterFormReadyMask,
   characterFormShadowPlan,
@@ -116,22 +116,16 @@ describe('character form visual selection', () => {
 
     let ready = characterFormReadyMask(null, null, null, null, metamorph);
     let resolved = resolvedCharacterForm(requested, ready);
-    expect(
-      activeCharacterFormVisual(resolved, base, null, null, null, null, metamorph),
-    ).toBe(base);
+    expect(activeCharacterFormVisual(resolved, base, null, null, null, null, metamorph)).toBe(base);
 
     metamorph = lich;
     ready = characterFormReadyMask(null, null, null, null, metamorph);
     resolved = resolvedCharacterForm(requested, ready);
     expect(resolved).toBe('metamorph');
-    expect(
-      activeCharacterFormVisual(resolved, base, null, null, null, null, metamorph),
-    ).toBe(lich);
+    expect(activeCharacterFormVisual(resolved, base, null, null, null, null, metamorph)).toBe(lich);
 
     resolved = resolvedCharacterForm(requestedCharacterForm(0), ready);
-    expect(
-      activeCharacterFormVisual(resolved, base, null, null, null, null, metamorph),
-    ).toBe(base);
+    expect(activeCharacterFormVisual(resolved, base, null, null, null, null, metamorph)).toBe(base);
   });
 
   it.each([

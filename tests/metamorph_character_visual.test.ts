@@ -233,9 +233,8 @@ describe('Metamorphosis character integration', () => {
 
     visual.update(0.5, { ...idleState, moving: true, running: true }, true);
     visual.update(0.06, { ...idleState, airborne: true }, true);
-    const jumpActions = (
-      visual as unknown as { actions: Map<string, THREE.AnimationAction> }
-    ).actions;
+    const jumpActions = (visual as unknown as { actions: Map<string, THREE.AnimationAction> })
+      .actions;
     expect(
       (visual as unknown as { current: THREE.AnimationAction | null }).current?.getClip().name,
     ).toBe('Idle');

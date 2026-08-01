@@ -36,11 +36,7 @@ describe('Warlock Metamorphosis asset', () => {
         .listExtensionsUsed()
         .map((extension) => extension.extensionName)
         .sort(),
-    ).toEqual([
-      'EXT_meshopt_compression',
-      'EXT_texture_webp',
-      'KHR_mesh_quantization',
-    ]);
+    ).toEqual(['EXT_meshopt_compression', 'EXT_texture_webp', 'KHR_mesh_quantization']);
 
     for (const name of [
       'Armature',

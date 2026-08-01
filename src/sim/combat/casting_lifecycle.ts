@@ -132,6 +132,7 @@ import {
 } from './spell_combat';
 import { isSpellResisted } from './spell_resist';
 import { onCastCompleted } from './talent_procs';
+import { emitRainOfFireStop } from './warlock_meteor_events';
 import {
   armForbiddenReflection,
   ashenFocusCastTimeMult,
@@ -141,7 +142,6 @@ import {
   tickUnbrokenRitual,
 } from './warlock_talents';
 import { hasUmbralAnchor, UMBRAL_ANCHOR_ID, umbralAnchorCastError } from './warlock_utility';
-import { emitRainOfFireStop } from './warlock_meteor_events';
 
 // Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
 // for the shared-cooldown predicate. Moved with the casting slice (only callers).

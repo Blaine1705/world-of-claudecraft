@@ -4,6 +4,7 @@
 // The class tests that fight a live forest wolf keep the full built-in world:
 // they need a real camp mob.
 import { describe, expect, it } from 'vitest';
+import { computeTalentModifiers } from '../src/sim/content/talents';
 import { ABILITIES, abilitiesKnownAt, CLASSES, instanceOrigin, MOBS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL } from '../src/sim/types';
@@ -25,7 +26,27 @@ describe('nine classes', () => {
         (id) => !ABILITIES[id]?.specs && (ABILITIES[id]?.learnLevel ?? Infinity) <= MAX_LEVEL,
       );
       expect(kit.map((known) => known.def.id)).toEqual(sharedKit);
-      expect(abilitiesKnownAt(cls, 10).length).toBeLessThan(kit.length);
+      if (cls === 'warlock') {
+        // The overhauled Warlock completes its shared kit at level 10; its
+        // 10-20 progression now belongs to each specialization instead.
+        for (const spec of ['affliction', 'demonology', 'destruction'] as const) {
+          const at10 = abilitiesKnownAt(
+            cls,
+            10,
+            computeTalentModifiers(cls, { spec, rows: {} }, 10),
+          );
+          const atMax = abilitiesKnownAt(
+            cls,
+            MAX_LEVEL,
+            computeTalentModifiers(cls, { spec, rows: {} }, MAX_LEVEL),
+          );
+          expect(at10.length, `${spec} should keep learning after level 10`).toBeLessThan(
+            atMax.length,
+          );
+        }
+      } else {
+        expect(abilitiesKnownAt(cls, 10).length).toBeLessThan(kit.length);
+      }
       // every class's core kit keeps scaling: something reaches rank 3+ by 20
       expect(kit.some((k) => k.rank >= 3)).toBe(true);
       // resource type sane

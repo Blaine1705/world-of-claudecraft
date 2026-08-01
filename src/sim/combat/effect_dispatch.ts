@@ -25,6 +25,7 @@ import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
+import { summonSoulwell } from '../soulwell';
 import {
   abilityScalingPower,
   absorbBonus,
@@ -133,7 +134,6 @@ import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
 import { applyBlacktideReturnSpeed } from './warlock_talents';
 import { placeOrRecallUmbralAnchor } from './warlock_utility';
-import { summonSoulwell } from '../soulwell';
 
 export { SWEEP_MULT } from './area_echo';
 
