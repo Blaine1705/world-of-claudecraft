@@ -4696,35 +4696,40 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Harvest of the Heights",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_peaks_gatherer.webp"
   },
   {
     "id": "chr_marsh_rares_ii",
     "name": "The Glutton, Reckoned",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_marsh_rares_ii.webp"
   },
   {
     "id": "chr_peaks_rares_ii",
     "name": "More Names Cut into the Crag",
     "category": "chronicle",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_peaks_rares_ii.webp"
   },
   {
     "id": "chr_gleamstag",
     "name": "The Legend That Would Not Strike First",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_gleamstag.webp"
   },
   {
     "id": "chr_hollow_rares",
     "name": "The Herd Remembers",
     "category": "chronicle",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_hollow_rares.webp"
   }
 ];
 

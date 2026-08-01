@@ -4307,8 +4307,7 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'tanning_agent',
   'thorium_ore',
   'venom_gland',
-  // tool-effect charms (the acquisition craft; derived art, see
-  // scripts/assets/tool_effect_icons.mjs)
+  // tool-effect charms (the acquisition craft; original painted inventory art)
   'artisans_eye',
   'gatherers_cache',
   // junk

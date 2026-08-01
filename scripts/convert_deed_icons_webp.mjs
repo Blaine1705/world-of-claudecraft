@@ -1,6 +1,6 @@
-// Ingest the maintainer's hand-reviewed Book of Deeds icon set to shipping WebP.
+// Ingest the project's hand-reviewed Book of Deeds icon set to shipping WebP.
 //
-// The maintainer delivers one 512x512 transparent-background PNG per deed, named
+// The art delivery contains one 512x512 transparent-background PNG per deed, named
 // exactly `<deed_id>.png`. This tool downscales each to a 128px WebP under
 // public/ui/deeds/<deed_id>.webp (the raw unhashed /ui path, like the class-ability
 // icons) and regenerates src/ui/deed_image_ids.ts (the checked-in id list the icon
@@ -140,7 +140,7 @@ for (const f of readdirSync(OUT_DIR)) {
 // 2-space, trailing comma) so the file is format-stable and re-runs are a no-op diff.
 const idLines = finalIds.map((id) => `  '${id}',`).join('\n');
 const moduleText = `// Deed ids with committed painted art under public/ui/deeds/<id>.webp (128px WebP,
-// downscaled from the maintainer's 512px source set by scripts/convert_deed_icons_webp.mjs).
+// downscaled from reviewed 512px project sources by scripts/convert_deed_icons_webp.mjs).
 // GENERATED: do not hand-edit; re-run the script to regenerate. Imported by both the icon
 // system (icons.ts deedImageUrl, the static image branch) and the pure view core
 // (deeds_view.ts deedCrestId), so it stays a plain literal Set with no DOM or fs at runtime.

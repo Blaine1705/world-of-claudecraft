@@ -1,4 +1,3 @@
-import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -451,43 +450,5 @@ describe('the pure-leaf contract material_tier.ts depends on', () => {
     expect(code.match(/^\s*import\b/m), 'material_grades.ts must stay import-free').toBeNull();
     // Teeth check: the stripped source is still real code, not an empty string.
     expect(code).toContain('export function harvestGradeItemId');
-  });
-});
-
-describe('committed art', () => {
-  it('the committed fine icons still match their derivation from the base art', () => {
-    // The script's --check arm was documented as the thing that keeps the
-    // derivation honest after a base icon is repainted, but nothing invoked
-    // it, so a stale derived icon passed every guard in item_icons.test.ts (it
-    // decodes, it is wired, it has provenance, it is 128px, it is byte-distinct
-    // from every other icon: none of those notice it came from the OLD base).
-    // Running it here gives that claim teeth.
-    const here = path.dirname(fileURLToPath(import.meta.url));
-    const root = path.join(here, '..');
-    expect(() =>
-      execFileSync(process.execPath, ['scripts/assets/fine_material_icons.mjs', '--check'], {
-        cwd: root,
-        stdio: 'pipe',
-      }),
-    ).not.toThrow();
-  }, 30000);
-
-  it('the icon derivation script covers exactly the nine grade pairs', () => {
-    // The script cannot import the TS module, so it carries its own pair list.
-    // This is the tie that keeps the two from drifting: art for eight of nine
-    // would otherwise only surface as a red icon guard with no explanation.
-    const here = path.dirname(fileURLToPath(import.meta.url));
-    const src = readFileSync(
-      path.join(here, '..', 'scripts/assets/fine_material_icons.mjs'),
-      'utf8',
-    );
-    const table = src.slice(src.indexOf('const GRADE_PAIRS'), src.indexOf('// The rim:'));
-    const pairs = [...table.matchAll(/\['([a-z_]+)', '([a-z_]+)'\]/g)].map((m) => [m[1], m[2]]);
-    expect(pairs).toHaveLength(9);
-    expect(Object.fromEntries(pairs)).toEqual(
-      Object.fromEntries(
-        Object.entries(MATERIAL_GRADES).map(([baseItemId, row]) => [baseItemId, row.fineItemId]),
-      ),
-    );
   });
 });

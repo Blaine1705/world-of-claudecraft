@@ -7,9 +7,6 @@
 // Fishing has no world nodes, so it has no fine grades, and this file states
 // the fishing ladder's own invariant instead of widening that one into a
 // disjunction both could satisfy for different reasons.
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
@@ -208,37 +205,5 @@ describe('the crafted rod ladder', () => {
       // Marks, and still no copper price on the def itself.
       expect(ITEMS[recipe.resultItemId].buyValue).toBeUndefined();
     }
-  });
-});
-
-describe('the derived rod art stays honest', () => {
-  const here = path.dirname(fileURLToPath(import.meta.url));
-  const scriptSrc = readFileSync(
-    path.join(here, '..', 'scripts', 'assets', 'rod_tier_icons.mjs'),
-    'utf8',
-  );
-
-  it('the derivation script names exactly the rods the item table crafts', () => {
-    // The fine-material precedent: the script and the content table must name
-    // the same set, so a third crafted rod cannot ship with art for two.
-    // Whole-line // comments stripped first: the script's header names both
-    // rods in prose, and a scan that counted those would pass on a script that
-    // had stopped rendering one of them (the comment-gameable trap).
-    const code = scriptSrc.replace(/^\s*\/\/.*$/gm, '');
-    const named = [...code.matchAll(/itemId: '([a-z_]+)'/g)].map((m) => m[1]);
-    expect(named.sort()).toEqual(ROD_RECIPES.map((r) => r.resultItemId).sort());
-  });
-
-  it('the committed art matches its derivation (the --check arm, run for real)', async () => {
-    const { execFileSync } = await import('node:child_process');
-    // Runs the real script in its --check mode from the repo root, which is
-    // what makes the "deterministic, re-derivable" claim in its header an
-    // assertion rather than a comment.
-    expect(() =>
-      execFileSync(process.execPath, ['scripts/assets/rod_tier_icons.mjs', '--check'], {
-        cwd: path.join(here, '..'),
-        stdio: 'pipe',
-      }),
-    ).not.toThrow();
   });
 });

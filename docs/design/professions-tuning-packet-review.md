@@ -424,21 +424,12 @@ corrections.
 
 ### 8.0 Unbreak CI and the base (do these first)
 
-1. **Icon `--check` platform strategy** (BLOCKING). The fine-material and
-   rod icon checks do byte-equality against a fresh sharp render
-   (`scripts/assets/fine_material_icons.mjs`,
-   `scripts/assets/rod_tier_icons.mjs`), and sharp/libvips renders
-   different bytes on linux-x64 than the committed darwin bytes
-   (empirically reproduced in a linux/amd64 container with the identical
-   sharp/libvips versions; 6 of 11 icons differ).
-   `tests/material_grades.test.ts` and
-   `tests/professions_rod_recipes.test.ts` execFileSync the checks
-   unguarded and CI runs `npm test` on ubuntu-latest, so the FIRST PUSH of
-   this branch reds CI. Pick and implement one: platform-keyed committed
-   bytes, a CI-side regeneration step, or a structural-equality check
-   (decode and compare pixels within tolerance) instead of byte equality.
-   While there: unify the two checks' node spawn (one uses `'node'` from
-   PATH, the other `process.execPath`).
+1. **Icon `--check` platform strategy** (RESOLVED). The original derived-art
+   checks exposed a sharp/libvips byte drift between linux-x64 and darwin.
+   Final original paintings now replace those temporary renders, and the
+   derivation scripts and their platform-sensitive checks have been retired.
+   The item-art gate instead pins the final asset IDs, rejects the former
+   placeholder hashes, decodes the WebPs and verifies their shipping shape.
 2. **Release re-sync now, and every phase hereafter** per the How-to-run
    preamble (the branch is currently a full release generation stale).
 3. **The R37 guard**: a derived test asserting no zone or map beyond the
@@ -1578,9 +1569,8 @@ the docs slice and the adversarial round below. What each item settled:
    effect, pinned bidirectionally in
    tests/professions_tool_effect_craft.test.ts. The craft itself is the
    two TOOL_EFFECT_RECIPES (content/recipes.ts): the game's first
-   enchanting recipes, R45's trainer route, with derived charm icons
-   (scripts/assets/tool_effect_icons.mjs, the fine-material derivation
-   pattern) and the five non-Latin name fills.
+   enchanting recipes, R45's trainer route, with original painted charm icons
+   in the Chime-violet talisman family and the five non-Latin name fills.
 3. DONE: R39 pricing. The flat 4-count RechargeCost is retired for
    resolveRechargeToolEffect: material identity is the disenchant ladder
    (DISENCHANT_MATERIAL_BY_QUALITY, moved to the disenchant_reagents leaf

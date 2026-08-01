@@ -2442,10 +2442,10 @@
       ]
     },
     {
-      "source": "scripts/assets/fine_material_icons.mjs (deterministic derivation from the base material art in this same directory)",
+      "source": "OpenAI built-in image generation",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleReference": "each fine grade derives from its own base material icon, so the pair stays one painting",
-      "commonPrompt": "No prompt: a fine grade is the same material worked with a better tool, so the icon is its base art under a fixed warm highlight lift, saturation gain and luminous rim. Re-derive with `node scripts/assets/fine_material_icons.mjs`; verify with --check.",
+      "styleReference": "the matching copper_ore, iron_ore, thorium_ore, ironbark_log, ashwood_log, elderwood_log, silverleaf_herb, goldleaf_herb and sunpetal_herb icons, with their peer material families as secondary style references",
+      "commonPrompt": "Fresh original premium hand-painted classic-fantasy MMORPG inventory art of one unusually clean fine-grade material specimen, immediately recognizable as its base ore, log or herb. One centered tactile object with a strong silhouette, top-left key light, opaque blue-black or charcoal atmospheric vignette, even safe margins and crisp readability at 28px. Express the better grade inside the material through cleaner facets, selected grain or pristine foliage. No recolor, trace, halo, ring, aura, magic, border, text, watermark, extra objects or crop.",
       "itemIds": [
         "fine_copper_ore",
         "fine_iron_ore",
@@ -2459,10 +2459,10 @@
       ]
     },
     {
-      "source": "scripts/assets/rod_tier_icons.mjs (deterministic derivation from silverstream_fishing_rod.webp in this same directory)",
+      "source": "OpenAI built-in image generation",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleReference": "the shipped Silverstream Fishing Rod icon, so the whole rod ladder keeps one silhouette",
-      "commonPrompt": "No prompt: the two crafted rods are tier treatments of the top vendor rod, cold drained storm steel for tier 4 and lit tidal violet under a gold rim for tier 5. Unlike a fine material grade this is a convenience rather than the correct answer (a Stormreel is a different rod, not a better-worked Silverstream), so painted originals may replace these two files without touching anything else. Re-derive with `node scripts/assets/rod_tier_icons.mjs`; verify with --check.",
+      "styleReference": "simple_fishing_pole (licensed CraftPix Premium), plus the project-generated ironreel_fishing_rod and silverstream_fishing_rod, for the centered full rod-and-reel silhouette, dark inventory backdrop and painted material treatment",
+      "commonPrompt": "Fresh original premium hand-painted classic-fantasy MMORPG inventory icon of one complete crafted fishing rod and reel on a bottom-left to top-right diagonal, centered with safe margins on an opaque dark atmospheric vignette. Stormreel uses cold storm steel and restrained blue-white electrical accents; Tidewrought is an ornate sea-forged teal, violet, pearl and antique-gold successor. Each is a genuinely different physical rod, not a recolor or trace. No border, rarity frame, circular halo, text, watermark or crop.",
       "itemIds": [
         "stormreel_fishing_rod",
         "tidewrought_fishing_rod"
@@ -2478,10 +2478,10 @@
       ]
     },
     {
-      "source": "scripts/assets/tool_effect_icons.mjs (deterministic derivation from the arcane material art in this same directory)",
+      "source": "OpenAI built-in image generation",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleReference": "each charm derives from the arcane material it is condensed from (essence for the Cache, shard for the Eye), so the craft and its reagents stay one visual family",
-      "commonPrompt": "No prompt: a tool-effect charm is Enchanter work condensed from the arcane ladder, so the icon is its source art under a fixed hue turn, a bound ring and an effect glyph. Re-derive with `node scripts/assets/tool_effect_icons.mjs`; verify with --check.",
+      "styleReference": "arcane_essence and arcane_shard for Chime-violet material language; final_oath_medallion, architects_cornerstone and seal_of_the_nine_oaths for tangible talisman composition",
+      "commonPrompt": "Fresh original premium hand-painted classic dark-fantasy MMORPG inventory icon of one tangible Enchanter-crafted talisman with a suspension loop and a faceted violet-blue Chime core. Gatherer's Cache is a plump bronze-gold reliquary with abundance worked into its metal; Artisan's Eye is a slim engraved silver-and-gold almond-eye amulet with the shard as its iris. One centered physical object on an opaque near-black indigo vignette, readable at 128px. No flat glyph, spell icon, border, halo, text, watermark or crop.",
       "itemIds": [
         "gatherers_cache",
         "artisans_eye"

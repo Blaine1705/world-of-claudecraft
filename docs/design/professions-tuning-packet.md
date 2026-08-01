@@ -343,7 +343,7 @@ re-opened.
 
 Two premises in the original scope did not survive contact and are corrected
 here: the icons are NOT procedural (the compositor is unreachable for a
-non-weapon item, so each grade ships committed derived art plus provenance),
+non-weapon item, so each grade ships committed original painted art plus provenance),
 and eight of the nine names trip M16, so all nine carry non-Latin fills.
 
 Open after review, deliberately not resolved in this phase:
@@ -386,10 +386,10 @@ Open after review, deliberately not resolved in this phase:
   (`pristine_vein` / `ancient_heartwood` / `moonlit_bloom`), and is not a
   distinctive coin of another property. Verify against `tests/ip_scrub.test.ts`
   and `tests/originality_renames.test.ts` before authoring.
-- Nine committed derived-art icons (the base painting under the fine
-  treatment, rendered by `scripts/assets/fine_material_icons.mjs` and checked
-  structurally by its --check arm; the not-procedural correction above states
-  why).
+- Nine committed original painted icons, each authored against its matching
+  base material and peer material family. The fine grade is expressed inside
+  the specimen through cleaner facets, selected grain or pristine foliage,
+  without the former generic halo treatment.
   `tests/shipped_item_ids.test.ts` is append-only, so these ids are permanent
   once shipped.
 
@@ -461,12 +461,10 @@ session cap would have to rise. It did not: see the closeout below.
   reasonably wonder whether the omission is a decision or a gap. It is a
   decision: a monster material has no zone tier to outclass, which is the whole
   input to the grade rule.
-- **The rod icons are derived art, not paintings.** `scripts/assets/rod_tier_icons.mjs`
-  renders both crafted rods as tier treatments of the Silverstream art, which is
-  a weaker fit than the fine-material derivation it copies (a Stormreel is a
-  different rod, not a better-worked Silverstream). Deterministic, `--check`ed in
-  CI, and byte-distinct. Replacing either file with a painted original changes
-  nothing else.
+- **The rod icons are original paintings.** Stormreel and Tidewrought keep the
+  shipped rod family's centered diagonal composition, but each has its own
+  silhouette, reel, fittings and material language. They no longer inherit a
+  recolored Silverstream silhouette.
 
 ### Phase 7: tool effects and rare tools
 

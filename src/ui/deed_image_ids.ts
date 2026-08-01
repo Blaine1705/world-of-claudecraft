@@ -1,5 +1,5 @@
 // Deed ids with committed painted art under public/ui/deeds/<id>.webp (128px WebP,
-// downscaled from the maintainer's 512px source set by scripts/convert_deed_icons_webp.mjs).
+// downscaled from reviewed 512px project sources by scripts/convert_deed_icons_webp.mjs).
 // GENERATED: do not hand-edit; re-run the script to regenerate. Imported by both the icon
 // system (icons.ts deedImageUrl, the static image branch) and the pure view core
 // (deeds_view.ts deedCrestId), so it stays a plain literal Set with no DOM or fs at runtime.
@@ -7,6 +7,8 @@
 // equality, both directions), so a dropped file or an unwired id reds the suite.
 
 export const DEED_IMAGE_IDS: ReadonlySet<string> = new Set([
+  'chr_gleamstag',
+  'chr_hollow_rares',
   'chr_marsh_chapter_i',
   'chr_marsh_chapter_ii',
   'chr_marsh_chapter_iii',
@@ -14,13 +16,16 @@ export const DEED_IMAGE_IDS: ReadonlySet<string> = new Set([
   'chr_marsh_gatherer',
   'chr_marsh_hush_the_mending',
   'chr_marsh_rares',
+  'chr_marsh_rares_ii',
   'chr_marsh_unburst',
   'chr_peaks_chapter_i',
   'chr_peaks_chapter_ii',
   'chr_peaks_chapter_iii',
+  'chr_peaks_gatherer',
   'chr_peaks_glimmer_cast',
   'chr_peaks_moongate',
   'chr_peaks_rares',
+  'chr_peaks_rares_ii',
   'chr_peaks_sparring',
   'chr_peaks_waking_witness',
   'chr_vale_chapter_i',
