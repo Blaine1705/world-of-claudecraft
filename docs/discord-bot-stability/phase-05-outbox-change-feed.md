@@ -30,10 +30,27 @@ account's flex-relevant state changed.
 STEP 0 - PRE-FLIGHT.
   - SYNC THE RELEASE BASE FIRST (standing rule 1). `git fetch origin release/v0.33.0`, then
     `git rev-list --left-right --count HEAD...origin/release/v0.33.0` against the FRESHLY fetched
-    tip. Phase 4 QA left it 76 ahead / 0 behind. MEASURE rather than trust that: the Phase 4
-    BUILD recorded 70/0 and was 4 commits behind by the time QA checked, hours later. If it
-    moved, merge BEFORE any work, run the `release-merge-audit` skill, and record the sync in
-    progress.md either way, including "no-op, already current".
+    tip. MEASURE rather than trust any number written here: the Phase 4 BUILD recorded 70/0 and
+    was 4 commits behind by the time QA checked hours later.
+    **AS OF 2026-08-01 THIS IS A BIG ONE: 80 ahead / 235 BEHIND, and unlike the last two syncs
+    it genuinely collides.** The release brought the graphics overhaul, ability VFX integration,
+    the Wildheart Basin dungeon, and a whole new `server/epic/` route family. Budget real time
+    for STEP 0; it is not a formality this round.
+      - `git merge-tree` reports FOUR files changed on both sides, and all four are packet-owned:
+        `server/db.ts` (the packet added the LOCKSTEP note above `highestCharacterForAccount`;
+        the release adds 13 lines to the same file), `tests/server/http/surface_inventory.ts`
+        (the release adds 33 rows for the epic routes, the packet added the flex-batch row),
+        `tests/server/http/completeness.test.ts` and `tests/server/http/parity.test.ts` (both
+        carry ladder COUNT assertions the packet bumped 19 to 20 for flex-batch, and the release
+        moves them too). Expect count assertions to need reconciling by ADDING both sides, never
+        by taking one side's number.
+      - `release-merge-audit` is mandatory here and its Step 4 will actually bite: the new
+        `server/epic/` routes register in `server/http/registry.ts` and need their
+        `surface_inventory.ts` rows, so verify the merged corpus covers BOTH families before
+        trusting the four spine suites.
+      - Re-run the FULL validation ladder after the merge, not just the Phase 5 suites: a gate
+        that was green before a merge says nothing about the merged result.
+    Record the sync in progress.md either way, including "no-op, already current".
   - `git status` must be clean; ASK before touching anything if it is dirty. Another session
     shares this checkout and foreign worktrees are registered under `.worktrees/` and
     `.claude/worktrees/`. LEAVE THEM ALONE. Commits use EXPLICIT paths, never `git add -A`.
