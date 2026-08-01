@@ -510,14 +510,13 @@ describeDb('discord set-based statements (real Postgres)', () => {
       // Exactly the identity columns the outbox enriches with, proved against a
       // real row rather than only against the statement text: discord_email is
       // NOT among them, so a drain resolving thousands of accounts never
-      // materializes their email addresses.
+      // materializes their email addresses. Narrowed further in the Phase 5 QA
+      // round: guild_member and linked_at were dead payload no consumer read.
       expect(Object.keys(one ?? {}).sort()).toEqual([
         'account_id',
         'discord_avatar',
         'discord_user_id',
         'discord_username',
-        'guild_member',
-        'linked_at',
       ]);
       // 999 has no link row and produces no row rather than a null-filled one.
       expect(rows.some((r) => r.account_id === 999)).toBe(false);

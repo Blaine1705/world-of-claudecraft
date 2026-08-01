@@ -239,6 +239,26 @@ describe('server activity queue: requeue after a failed hand-off', () => {
     expect(drainActivity()).toEqual([activity(1)]);
   });
 
+  it('does nothing at all for an empty requeue', () => {
+    enqueueActivity(activity(1), null, 0);
+    requeueActivity([]);
+    expect(activityQueueDepth()).toBe(1);
+    expect(drainActivity()).toEqual([activity(1)]);
+  });
+
+  it('a repeat is still admitted at exactly the TTL after a requeue', () => {
+    // The other side of the untouched-dedupe rule: keeping the key claimed must not
+    // EXTEND the window either. The claim's stamp is the original enqueue's, so a
+    // repeat at exactly TTL from that stamp is admitted, requeue or no requeue.
+    const key = 'requeue-dedupe-boundary';
+    enqueueActivity(activity(1), key, 0);
+    requeueActivity(drainActivity());
+
+    enqueueActivity(activity(2), key, DEDUPE_TTL_MS);
+
+    expect(activityQueueDepth()).toBe(2);
+  });
+
   it('cannot grow the queue past the cap', () => {
     // The requeue adds items without going through the enqueue trim, so it applies the
     // same cap itself. The requeued items are the oldest present, so they are what the

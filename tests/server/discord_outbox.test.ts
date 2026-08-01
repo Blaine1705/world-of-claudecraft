@@ -43,11 +43,18 @@ vi.mock('../../server/discord', () => ({
   discordFlexForAccounts: vi.fn(),
   setDiscordPresenceCache: vi.fn(),
 }));
-vi.mock('../../server/discord_activity', () => ({
+// Partial mocks: the drains are fixtures, but the CAP constants must be the real
+// module's values or the worst-case payload fixture drifts from production.
+vi.mock('../../server/discord_activity', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../server/discord_activity')>()),
   drainActivity: vi.fn(),
   requeueActivity: vi.fn(),
 }));
-vi.mock('../../server/discord_relay', () => ({ drainRelay: vi.fn(), requeueRelay: vi.fn() }));
+vi.mock('../../server/discord_relay', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../server/discord_relay')>()),
+  drainRelay: vi.fn(),
+  requeueRelay: vi.fn(),
+}));
 vi.mock('../../server/daily_rewards', () => ({
   dailyRewardService: {
     discordWinnerAnnouncements: vi.fn(),
@@ -58,7 +65,7 @@ vi.mock('../../server/daily_rewards', () => ({
 import type * as http from 'node:http';
 import { dailyRewardService } from '../../server/daily_rewards';
 import type { QueuedActivity } from '../../server/discord_activity';
-import { drainActivity } from '../../server/discord_activity';
+import { ACTIVITY_MAX_QUEUE, drainActivity } from '../../server/discord_activity';
 import type { DiscordOutboxLinkRow } from '../../server/discord_db';
 import { discordLinksForAccounts } from '../../server/discord_db';
 import {
@@ -67,7 +74,7 @@ import {
   LINK_CHANGE_MAX_QUEUE,
 } from '../../server/discord_link_changes';
 import type { QueuedRelay } from '../../server/discord_relay';
-import { drainRelay } from '../../server/discord_relay';
+import { drainRelay, RELAY_MAX_QUEUE } from '../../server/discord_relay';
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
 import type { Method, Middleware } from '../../server/http/types';
@@ -78,11 +85,13 @@ const DISCORD_SECRET = 'discord-secret';
 const DISCORD_HEADERS = { 'x-woc-discord-secret': DISCORD_SECRET };
 const OUTBOX_PATH = '/internal/discord/outbox';
 
-// The caps the three feeds enforce. Relay and activity own theirs privately
-// (module-local MAX_QUEUE constants), so they are restated here as the fixture
-// sizes this file drives; the link-change cap is the exported constant.
-const RELAY_CAP = 50;
-const ACTIVITY_CAP = 100;
+// The caps the three feeds enforce, all imported from the owning modules so the
+// worst-case fixture tracks the REAL caps rather than a mirror that goes stale
+// the day a cap moves (Phase 5 QA: the mirrors were restated literals). The
+// payload-bound literals below stay literals on purpose: they are the measured
+// contract, not a derivation.
+const RELAY_CAP = RELAY_MAX_QUEUE;
+const ACTIVITY_CAP = ACTIVITY_MAX_QUEUE;
 
 /**
  * The bound on the serialized `data` payload, in bytes. The worst-case fixture
@@ -130,8 +139,6 @@ function linkRow(accountId: number): DiscordOutboxLinkRow {
     discord_user_id: String(300_000_000_000_000_000n + BigInt(accountId)),
     discord_username: `guildmember_${accountId}`,
     discord_avatar: `a1b2c3d4e5f6${String(accountId).padStart(20, '0')}`,
-    guild_member: true,
-    linked_at: '2026-01-01T00:00:00.000Z',
   };
 }
 
@@ -332,5 +339,17 @@ describe('discord/outbox payload size at the full-cap drain', () => {
     expect(items.map((it) => it.accountId)).toEqual(
       Array.from({ length: OUTBOX_LINK_CHANGE_PAGE }, (_, i) => i + 4),
     );
+  });
+});
+
+describe('outbox contract literals', () => {
+  // The D1 no-N+1 pins (ONE identity read for a mixed drain, ZERO for an empty
+  // one) live in tests/server/internal.test.ts describe('discord/outbox'), which
+  // drives the real route stack; this file only ARMS discordLinksForAccounts as a
+  // fixture. Recorded so nobody hunts for the guard here (Phase 5 QA, finding B1).
+  it('pins the page and cap literals the fixtures above are built from', () => {
+    expect(OUTBOX_LINK_CHANGE_PAGE).toBe(1000);
+    expect(RELAY_MAX_QUEUE).toBe(50);
+    expect(ACTIVITY_MAX_QUEUE).toBe(100);
   });
 });

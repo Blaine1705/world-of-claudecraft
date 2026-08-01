@@ -33,7 +33,10 @@ export interface QueuedActivity {
 }
 
 const QUEUE: QueuedActivity[] = [];
-const MAX_QUEUE = 100; // backstop so a stalled/absent bot can never grow this unbounded
+/** Backstop so a stalled/absent bot can never grow this unbounded (exported so the
+ * outbox payload-bound fixture builds its worst case from the REAL cap, not a mirror). */
+export const ACTIVITY_MAX_QUEUE = 100;
+const MAX_QUEUE = ACTIVITY_MAX_QUEUE;
 
 // Recent dedupe keys with their wall-clock time, so a moment that surfaces as
 // several sim events (a loot roll per candidate, an arena end per ally) is posted
@@ -71,7 +74,9 @@ export function drainActivity(): QueuedActivity[] {
  * failed to build costs the bot a retry rather than the cards themselves (the outbox
  * drain, server/internal.ts). The recentKeys dedupe map is deliberately untouched: these
  * items already claimed their keys at enqueue and are the SAME items, so re-claiming
- * would only re-stamp a window that is already correct.
+ * would only re-stamp a window that is already correct. HONEST LIMIT: as in
+ * requeueRelay, a queue that refilled past the cap during the failed poll spends the
+ * requeued (oldest) items first; "preserved on error" holds only up to the cap.
  */
 export function requeueActivity(items: readonly QueuedActivity[]): void {
   if (items.length === 0) return;

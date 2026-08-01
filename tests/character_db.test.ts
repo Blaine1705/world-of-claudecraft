@@ -147,7 +147,7 @@ describe('deleteCharacter', () => {
     const [sql, params] = dbMock.query.mock.calls[0];
     expect(sql).toMatch(/realm/i);
     expect(params).toContain(REALM);
-    // id + account + realm — the same three predicates getCharacter/renameCharacter use
+    // id + account + realm: the same three predicates getCharacter/renameCharacter use
     expect(params).toEqual(expect.arrayContaining([42, 7, REALM]));
   });
 
@@ -195,9 +195,14 @@ describe('renameCharacter', () => {
       rowCount: 1,
     } as any);
     expect((await renameCharacter(7, 42, 'Newname'))?.name).toBe('Newname');
+    // A landed rename moves the bot-visible flex name (and the profileUrl derived
+    // from it), so it is a flex transition (Phase 5 QA feed sweep).
+    expect(drainLinkChanges()).toEqual([{ accountId: 7, kinds: ['flex'] }]);
 
     dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as any);
     expect(await renameCharacter(7, 42, 'Newname')).toBeNull();
+    // No sanctioned rename matched: no transition, no feed item.
+    expect(drainLinkChanges()).toEqual([]);
   });
 });
 
@@ -213,7 +218,13 @@ describe('reclaimDeactivatedName', () => {
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
       .mockResolvedValueOnce({
         rows: [
-          { id: 99, name: 'SturdyStubs', deactivated_at: '2026-01-01T00:00:00Z', banned_at: null },
+          {
+            id: 99,
+            name: 'SturdyStubs',
+            account_id: 7,
+            deactivated_at: '2026-01-01T00:00:00Z',
+            banned_at: null,
+          },
         ],
         rowCount: 1,
       } as any) // holder lookup
@@ -235,6 +246,11 @@ describe('reclaimDeactivatedName', () => {
     expect(updateCall![1][1]).toBe('SturdyStubsa'); // archival placeholder
     expect(calls.map((c) => c[0])).toContain('COMMIT');
     expect(client.release).toHaveBeenCalledTimes(1);
+    // The archived name is bot-visible via the flex payload and deactivation keeps
+    // the link row, so the release enqueues ONE flex item for the HOLDER's account
+    // (Phase 5 QA feed sweep). The holder SELECT must carry account_id for it.
+    expect(calls[1][0]).toMatch(/c\.account_id/);
+    expect(drainLinkChanges()).toEqual([{ accountId: 7, kinds: ['flex'] }]);
   });
 
   it('does nothing and reports false when the name is held by a live account', async () => {
@@ -253,6 +269,8 @@ describe('reclaimDeactivatedName', () => {
     expect(verbs).not.toContain('COMMIT');
     expect(verbs).toContain('ROLLBACK');
     expect(verbs.some((s) => /UPDATE characters/i.test(s))).toBe(false);
+    // A refusal is not a transition: nothing may reach the change feed.
+    expect(drainLinkChanges()).toEqual([]);
   });
 
   it('does nothing when the name is not held at all', async () => {

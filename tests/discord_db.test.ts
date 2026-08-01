@@ -184,8 +184,6 @@ describe('discordLinksForAccounts', () => {
     discord_user_id: `du${accountId}`,
     discord_username: `un${accountId}`,
     discord_avatar: `av${accountId}`,
-    guild_member: false,
-    linked_at: 'x',
   });
 
   it('resolves a whole account set with ONE statement, however large the set', async () => {
@@ -195,7 +193,9 @@ describe('discordLinksForAccounts', () => {
     expect(await discordLinksForAccounts(one.pool, [1])).toEqual([row(1)]);
     expect(one.calls).toHaveLength(1);
 
-    const ids = Array.from({ length: 500 }, (_, i) => i + 1);
+    // 5,000 ids: the full D18 guild-member envelope, so the one-statement claim is
+    // pinned at the scale the invariant names rather than a tenth of it.
+    const ids = Array.from({ length: 5000 }, (_, i) => i + 1);
     const many = makePool((s) =>
       s.includes(SELECT) ? { rows: ids.map(row), rowCount: ids.length } : NONE,
     );
@@ -235,9 +235,11 @@ describe('discordLinksForAccounts', () => {
     // copying that column here would materialize thousands of email addresses one
     // spread away from a response the bot receives, for a field no caller on this
     // path reads.
-    expect(sql).toContain(
-      'SELECT account_id, discord_user_id, discord_username, discord_avatar, guild_member, linked_at',
-    );
+    expect(sql).toContain('SELECT account_id, discord_user_id, discord_username, discord_avatar');
+    // Narrowed in the Phase 5 QA round: guild_member and linked_at were dead
+    // payload no outbox consumer read, so the identity read carries identity only.
+    expect(sql).not.toContain('guild_member');
+    expect(sql).not.toContain('linked_at');
     // Stated as its own negative, so a re-widened list cannot pass by prefix.
     expect(sql).not.toContain('discord_email');
   });

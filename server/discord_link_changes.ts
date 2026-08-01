@@ -30,13 +30,16 @@
 // At the D18 envelope (1,000 concurrent players, the 5-minute playtime sweep) that is
 // about 3.3 items per second, so a queue sized at the 5,000-member envelope fills after
 // roughly 25 minutes of bot absence, not the days a "one item per guild member" reading
-// would suggest. Past that point the EVICTION PREFERENCE is what keeps the feed useful:
-// the oldest item that is playtime noise (kinds exactly ['points'] and no carried
-// Discord id) goes first, so 'link'/'unlink' items (whose carried discordId is the bot's
-// only copy of which member to start or stop flairing) and 'flex' items survive a long
-// outage. Only when no such noise item is left does the plain oldest-first rule apply.
-// Either way the drop is bounded staleness, not data loss: the bot's periodic full
-// re-read of the linked set heals anything the feed dropped.
+// would suggest. Past that point the EVICTION LADDER is what keeps the feed useful,
+// three tiers, each oldest-first, the next tier consulted only when the previous is
+// exhausted: (1) playtime noise (kinds exactly ['points'] and no carried Discord id),
+// the class the drain drops anyway when the account resolves unlinked; (2) any other
+// id-less item without a 'link'/'unlink' kind (a 'flex' or mixed item whose staleness
+// the bot's periodic resync heals); (3) plain oldest-first. 'link'/'unlink' items
+// (whose carried discordId is the bot's only copy of which member to start or stop
+// flairing) are therefore the LAST thing the cap spends, surviving until nothing else
+// is left to evict. Either way the drop is bounded staleness, not data loss: the bot's
+// periodic full re-read of the linked set heals anything the feed dropped.
 //
 // PER PROCESS, like relay and activity: this queue is in-memory and lives in ONE realm
 // process. An enqueue fires on whichever process served the write, so a fleet's changes
@@ -80,6 +83,21 @@ function isPlaytimeNoise(item: QueuedLinkChange): boolean {
   return item.discordId === undefined && item.kinds.length === 1 && item.kinds[0] === 'points';
 }
 
+/**
+ * The middle rung of the eviction ladder: no carried id and no 'link'/'unlink' kind.
+ * These are 'flex' (or mixed flex/points) items that fire for every account, linked or
+ * not, so at the cap they are the same resolve-or-drop lottery as playtime noise; what
+ * they are NOT is a link transition whose carried id the bot can never re-learn from a
+ * resync. Spending them before any 'link'/'unlink' item is what makes the header's
+ * survival claim true rather than aspirational (found by the Phase 5 QA privacy
+ * review: the old two-rung rule let an id-less flex item outlive a link item).
+ */
+function isEvictableFlexNoise(item: QueuedLinkChange): boolean {
+  return (
+    item.discordId === undefined && !item.kinds.includes('link') && !item.kinds.includes('unlink')
+  );
+}
+
 /** How long an undrained item stays open to absorb further changes for its account. */
 export const LINK_CHANGE_DEDUPE_TTL_MS = 30_000;
 
@@ -103,17 +121,39 @@ function forgetPending(item: QueuedLinkChange): void {
   if (pending.get(item.accountId)?.item === item) pending.delete(item.accountId);
 }
 
+// The eviction ladder, cheapest loss first (see the CAP note at the top). The final
+// rung accepts anything, so the ladder always finds enough to evict.
+const EVICTION_LADDER: ReadonlyArray<(item: QueuedLinkChange) => boolean> = [
+  isPlaytimeNoise,
+  isEvictableFlexNoise,
+  () => true,
+];
+
 /**
- * Bring the queue back to the cap, preferring playtime noise over everything else (see
- * the CAP note at the top). The queue is FIFO, so the first matching index IS the oldest
- * such item; with no noise left the fallback is index 0, plain oldest-first.
+ * Bring the queue back to the cap by walking the eviction ladder: all of tier 1
+ * (oldest-first) before any of tier 2, and so on (see the CAP note at the top). One
+ * marking pass per rung plus one compaction pass, so a burst requeue at the cap costs
+ * O(queue) rather than the O(queue * evictions) the old per-eviction findIndex rescan
+ * paid (measured at 21 ms for a 1,000-item requeue into a full queue; this shape is
+ * well under a millisecond there).
  */
 function trimToCap(): void {
-  while (QUEUE.length > LINK_CHANGE_MAX_QUEUE) {
-    const noise = QUEUE.findIndex(isPlaytimeNoise);
-    const [dropped] = QUEUE.splice(noise === -1 ? 0 : noise, 1);
-    forgetPending(dropped);
+  const excess = QUEUE.length - LINK_CHANGE_MAX_QUEUE;
+  if (excess <= 0) return;
+  const drop = new Set<QueuedLinkChange>();
+  for (const rung of EVICTION_LADDER) {
+    if (drop.size >= excess) break;
+    for (const item of QUEUE) {
+      if (drop.size >= excess) break;
+      if (!drop.has(item) && rung(item)) drop.add(item);
+    }
   }
+  let write = 0;
+  for (const item of QUEUE) {
+    if (drop.has(item)) forgetPending(item);
+    else QUEUE[write++] = item;
+  }
+  QUEUE.length = write;
 }
 
 /**

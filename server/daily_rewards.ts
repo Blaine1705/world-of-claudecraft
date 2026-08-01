@@ -805,6 +805,10 @@ export class DailyRewardService {
    *    a full TTL and announce it twice.
    *  - voidPayout / restorePayout: a moderation edit to the payout rows a day
    *    carries.
+   *  - markPayout's claim and mark arms (Phase 5 QA): the payout runner stamping
+   *    status / tx_signature / paid_at is content of a possibly-unannounced day.
+   *    The resend arms are exempt because they write only the payout-ATTEMPTS
+   *    table, which unannouncedWinnerDays never selects.
    *  - the excluded-accounts writes (the daily-reward ban and IP-ban tables
    *    behind the daily_reward_excluded_accounts view, which unannouncedWinnerDays
    *    filters its payouts through): busted through bustDailyRewardWinnersCache,
@@ -813,6 +817,11 @@ export class DailyRewardService {
    * is a moderation action, and a warm snapshot would let a just-banned winner's
    * username and wallet pubkey be announced publicly for up to a TTL. TTL alone
    * only delays enforcement, so it is not an acceptable answer here.
+   * ACCEPTED TTL-BOUNDED GAPS, named so nobody re-derives them as oversights: a
+   * LOGIN from an already-banned IP moves an account into the excluded view with
+   * no moderation write and so no bust (converges within one TTL), and an
+   * operator edit to the runtime task config leaves the derived taskName copy
+   * stale for up to one TTL (announcement prose only).
    *
    * Peer realm processes still converge within one TTL, the same tradeoff the
    * board caches make; the bust makes THIS process immediate.
@@ -1357,9 +1366,16 @@ export class DailyRewardService {
     // The snapshot arrives fully derived, so this method is a clamp and a copy:
     // no database read and no config fetch on a warm cache, whatever the limit.
     // Rows are copied on the way out, payout rows included, so a caller mutating
-    // its result can never poison the snapshot every other reader shares.
+    // its result can never poison the snapshot every other reader shares. The copy
+    // is one level deep because every day and payout field is a primitive today; a
+    // future nested-object field would need to join the copy, or the snapshot
+    // aliases it to every caller.
+    // NaN falls back to 1 explicitly: Math.max(1, Math.min(5, NaN)) is NaN, and
+    // slice(0, NaN) is an EMPTY slice, so an unguarded NaN limit would silently
+    // serve zero days rather than the minimum.
+    const asked = Number.isFinite(limit) ? limit : 1;
     const days = (await this.winnersCache.read())
-      .slice(0, Math.max(1, Math.min(DAILY_REWARD_WINNERS_CACHE_LIMIT, limit)))
+      .slice(0, Math.max(1, Math.min(DAILY_REWARD_WINNERS_CACHE_LIMIT, asked)))
       .map((day) => ({ ...day, payouts: day.payouts.map((payout) => ({ ...payout })) }));
     return { days };
   }
@@ -1479,6 +1495,10 @@ export class DailyRewardService {
       if (result.outcome === 'invalid_status') {
         return { error: 'payout cannot be claimed', status: 409 };
       }
+      // A claim stamps status and tx_signature on a payout row a day still in the
+      // unannounced set carries, so the warm snapshot must not outlive it (the
+      // winnersCache bust doctrine). Success arm only, like voidPayout.
+      this.winnersCache.bust();
       return { ok: true, payout: result.payout };
     }
     if (status === 'resend_processing') {
@@ -1507,6 +1527,9 @@ export class DailyRewardService {
       return ok ? { ok: true } : { error: 'resend attempt not found', status: 404 };
     }
     const ok = await this.db.markPayout(day, rank, status, txSignature, error);
+    // Same doctrine as the claim arm above: paid/failed stamps (status, paid_at,
+    // tx_signature) are content of a possibly-unannounced day. Success arm only.
+    if (ok) this.winnersCache.bust();
     return ok ? { ok: true } : { error: 'payout not found', status: 404 };
   }
 

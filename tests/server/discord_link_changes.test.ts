@@ -506,3 +506,69 @@ describe('discord link change feed: dedupe never crosses a drain', () => {
     expect(drainLinkChanges()).toEqual([change(1)]);
   });
 });
+
+describe('discord link change feed: the eviction ladder and the contract literals', () => {
+  beforeEach(() => {
+    drainLinkChanges();
+  });
+
+  // The module's contract constants, pinned as LITERALS. Every other assertion in
+  // this file compares against the imported constant, so an accidental edit to the
+  // constant moves both sides at once and nothing reds; these two lines are what
+  // make that edit visible (the Phase 5 QA mutation pass proved the gap: a cap
+  // raised by one survived the whole suite). 5000 is the D18 guild-member
+  // envelope; 30s matches the activity feed's dedupe window.
+  it('pins the cap and the dedupe TTL to their contract values', () => {
+    expect(LINK_CHANGE_MAX_QUEUE).toBe(5000);
+    expect(LINK_CHANGE_DEDUPE_TTL_MS).toBe(30_000);
+  });
+
+  it('spends an id-less flex item before an OLDER link item when no points noise is left', () => {
+    // The middle rung. Under the old two-rung rule (points noise, then plain
+    // oldest-first) this overflow evicted the link item at index 0, exactly the item
+    // whose carried id the bot can never re-learn; the ladder spends the id-less flex
+    // noise instead, however much older the link item is.
+    enqueueLinkChange({ accountId: 1, discordId: 'du1', kinds: ['link'] }, 0);
+    for (let n = 2; n <= LINK_CHANGE_MAX_QUEUE; n++) enqueueLinkChange(change(n), 0);
+    expect(linkChangeDepth()).toBe(LINK_CHANGE_MAX_QUEUE);
+
+    enqueueLinkChange(change(LINK_CHANGE_MAX_QUEUE + 1), 0);
+
+    expect(linkChangeDepth()).toBe(LINK_CHANGE_MAX_QUEUE);
+    const drained = drainLinkChanges();
+    // The link item survived at the head; the OLDEST id-less flex item (account 2)
+    // is what went.
+    expect(drained[0]).toEqual({ accountId: 1, discordId: 'du1', kinds: ['link'] });
+    expect(drained.some((c) => c.accountId === 2)).toBe(false);
+    expect(drained[drained.length - 1]).toEqual(change(LINK_CHANGE_MAX_QUEUE + 1));
+  });
+
+  it('spends points noise before id-less flex noise, however much older the flex item is', () => {
+    // Rung order: tier 1 (points noise) is exhausted before tier 2 (id-less flex) is
+    // touched, so the OLDEST item in the queue survives an overflow while a NEWER
+    // points item goes.
+    enqueueLinkChange({ accountId: 1, kinds: ['flex'] }, 0);
+    enqueueLinkChange({ accountId: 2, kinds: ['points'] }, 0);
+    for (let n = 3; n <= LINK_CHANGE_MAX_QUEUE; n++) enqueueLinkChange(change(n), 0);
+
+    enqueueLinkChange(change(LINK_CHANGE_MAX_QUEUE + 1), 0);
+
+    const drained = drainLinkChanges();
+    expect(drained[0]).toEqual({ accountId: 1, kinds: ['flex'] });
+    expect(drained.some((c) => c.accountId === 2)).toBe(false);
+  });
+
+  it('a mixed-kind item that includes unlink survives both noise rungs', () => {
+    // The rung predicate is about link/unlink membership, not kind count: an item that
+    // merged points into an unlink still carries the only copy of the member to stop
+    // flairing, so an overflow spends a newer plain-flex item instead.
+    enqueueLinkChange({ accountId: 1, discordId: 'du1', kinds: ['unlink', 'points'] }, 0);
+    for (let n = 2; n <= LINK_CHANGE_MAX_QUEUE; n++) enqueueLinkChange(change(n), 0);
+
+    enqueueLinkChange(change(LINK_CHANGE_MAX_QUEUE + 1), 0);
+
+    const drained = drainLinkChanges();
+    expect(drained[0]).toEqual({ accountId: 1, discordId: 'du1', kinds: ['unlink', 'points'] });
+    expect(drained.some((c) => c.accountId === 2)).toBe(false);
+  });
+});

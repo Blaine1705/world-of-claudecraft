@@ -248,8 +248,9 @@ class FakeDailyRewardDb implements DailyRewardDb {
   async markPayout(): Promise<boolean> {
     return true;
   }
+  claimPayoutResult: DailyRewardPayoutClaimResult = { outcome: 'not_found' };
   async claimPayout(): Promise<DailyRewardPayoutClaimResult> {
-    return { outcome: 'not_found' };
+    return this.claimPayoutResult;
   }
   async claimPayoutResend(): Promise<DailyRewardPayoutAttemptClaimResult> {
     return { outcome: 'not_found' };
@@ -809,6 +810,112 @@ describe('daily rewards', () => {
       clock.ms += 1;
       await service.discordWinnerAnnouncements(1);
       expect(db.unannouncedWinnerDaysCalls).toBe(2);
+    });
+
+    it('busts when the payout runner claims a payout, the processing stamp', async () => {
+      // claimPayout stamps status and tx_signature on a payout row of a day the
+      // snapshot may still be holding (Phase 5 QA: this arm and the paid/failed
+      // mark below were the two content writers the bust doctrine missed).
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      db.claimPayoutResult = { outcome: 'claimed', payout: payoutRow('2026-06-30', 1) };
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(
+        service.markPayout({ day: '2026-06-30', rank: 1, status: 'processing', txSignature: 's1' }),
+      ).resolves.toMatchObject({ ok: true });
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(2);
+    });
+
+    it('busts when the payout runner marks a payout paid', async () => {
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(
+        service.markPayout({ day: '2026-06-30', rank: 1, status: 'paid', txSignature: 's1' }),
+      ).resolves.toMatchObject({ ok: true });
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(2);
+    });
+
+    it('does not bust on a resend stamp, which the announcement never reads', async () => {
+      // The resend arms write only the payout-ATTEMPTS table, which
+      // unannouncedWinnerDays never selects, so evicting the snapshot for them
+      // would be churn with nothing to converge on.
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(
+        service.markPayout({
+          day: '2026-06-30',
+          rank: 1,
+          status: 'resent',
+          txSignature: 's1',
+          operationId: 'resend-op-1',
+        }),
+      ).resolves.toMatchObject({ ok: true });
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+    });
+
+    it('clamps the ask at both edges and serves every limit from ONE snapshot', async () => {
+      // The clamp maths: 0 and NaN fall to the floor of 1, an over-ask is capped
+      // at the 5-day snapshot width. NaN is the treacherous one: unguarded,
+      // Math.max(1, Math.min(5, NaN)) is NaN and slice(0, NaN) is EMPTY, so a
+      // malformed limit would silently serve zero days.
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [
+        winnerDay('2026-06-25'),
+        winnerDay('2026-06-26'),
+        winnerDay('2026-06-27'),
+        winnerDay('2026-06-28'),
+        winnerDay('2026-06-29'),
+        winnerDay('2026-06-30'),
+      ];
+      const { service } = cachedService(db);
+
+      expect(dayNames(await service.discordWinnerAnnouncements(0))).toEqual(['2026-06-25']);
+      expect(dayNames(await service.discordWinnerAnnouncements(99))).toEqual([
+        '2026-06-25',
+        '2026-06-26',
+        '2026-06-27',
+        '2026-06-28',
+        '2026-06-29',
+      ]);
+      expect(dayNames(await service.discordWinnerAnnouncements(Number.NaN))).toEqual([
+        '2026-06-25',
+      ]);
+      // Every ask above was a slice of the same snapshot, never a second read.
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+    });
+
+    it('collapses two concurrent cold reads into one database read (single-flight)', async () => {
+      // Pinned at the call site the outbox actually uses, not just at the
+      // createCachedRead factory: the second reader joins the first's in-flight
+      // refresh rather than issuing its own.
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      const { service } = cachedService(db);
+
+      const [first, second] = await Promise.all([
+        service.discordWinnerAnnouncements(1),
+        service.discordWinnerAnnouncements(1),
+      ]);
+
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+      expect(second).toEqual(first);
     });
 
     it('leaves the snapshot alone when a payout moderation matched no row', async () => {

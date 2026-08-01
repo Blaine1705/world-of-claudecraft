@@ -5,7 +5,7 @@ import { DISCORD_REWARD_GRANTS, discordStatusIndexForPoints } from '../src/sim/d
 import { dailyRewardService } from './daily_rewards';
 import { pool } from './db';
 import { discordFlexForAccount, discordFlexForAccounts, setDiscordPresenceCache } from './discord';
-import { drainActivity, requeueActivity } from './discord_activity';
+import { drainActivity, type QueuedActivity, requeueActivity } from './discord_activity';
 import {
   accountForDiscord,
   type DiscordMemberMetaRecord,
@@ -18,8 +18,12 @@ import {
   setDiscordGuildMember,
   setDiscordMemberMetaBulk,
 } from './discord_db';
-import { drainLinkChanges, requeueLinkChanges } from './discord_link_changes';
-import { drainRelay, requeueRelay } from './discord_relay';
+import {
+  drainLinkChanges,
+  type QueuedLinkChange,
+  requeueLinkChanges,
+} from './discord_link_changes';
+import { drainRelay, type QueuedRelay, requeueRelay } from './discord_relay';
 import type { GameServer } from './game';
 import {
   DEPLOY_SECRET_ENV,
@@ -382,6 +386,13 @@ export const flexBatchHandler: RouteHandler = async (ctx) => {
 // keeps serving up to 5 until its D11 retirement (a backlog is drained there, or
 // across successive polls here), and the service still CACHES at its own ceiling,
 // so a wider ask stays a warm-cache slice rather than a second read.
+// DELIBERATE DEFERRAL (Phase 5 QA): the minimization here is to the number of
+// DAYS, not the per-day FIELDS. A winner row still carries tx_signature and the
+// voided_by_* operator identity, which announcing does not need, because the
+// stream's item shape is pinned byte-for-byte to the standalone GET (the D11
+// parity that lets Phase 6 reuse the bot handler unchanged). Narrowing the
+// fields is the D11-retirement follow-up's work, alongside dropping the
+// standalone routes.
 const OUTBOX_WINNER_DAY_LIMIT = 1;
 
 // How many link changes one outbox drain carries. Tied to FLEX_BATCH_CAP: a page
@@ -411,8 +422,13 @@ export const OUTBOX_LINK_CHANGE_PAGE = 1000;
  * ORDER OF WORK, and it is deliberate:
  *  1. Read the winner days FIRST, before anything is drained. It depends on
  *     nothing the drains produce, and it is the most failure-prone await here (a
- *     database read behind a TTL cache), so doing it first means a winners
- *     failure refuses the poll without having consumed a single queued item.
+ *     database read behind a TTL cache). Precisely: a COLD or just-busted winners
+ *     cache whose refresh fails refuses the poll before a single queued item is
+ *     consumed, while a WARM cache stale-serves through a refresh failure
+ *     (createCachedRead's deliberate resilience). Stale-serve is safe here: it
+ *     can only re-serve an UNMARKED day, which the retry contract below already
+ *     delivers at-least-once, and a marked day can never be stale-served because
+ *     markDiscordWinnersAnnounced busts the cache on success.
  *  2. Drain the three in-memory feeds. They are pure array splices, so a poll
  *     that finds nothing queued costs zero further Postgres round trips.
  *  3. Collect the account ids every drained item mentions. An EMPTY set issues no
@@ -443,11 +459,16 @@ export const OUTBOX_LINK_CHANGE_PAGE = 1000;
  */
 export const outboxHandler: RouteHandler = async (ctx) => {
   const winners = await dailyRewardService.discordWinnerAnnouncements(OUTBOX_WINNER_DAY_LIMIT);
-  const relayItems = drainRelay();
-  const activityItems = drainActivity();
-  const linkChangeItems = drainLinkChanges(OUTBOX_LINK_CHANGE_PAGE);
-
+  // The drains live INSIDE the try so the requeue guarantee is enforced by
+  // structure rather than by the accident that a splice cannot throw: anything
+  // that fails after the first item leaves a queue puts every drained item back.
+  let relayItems: QueuedRelay[] = [];
+  let activityItems: QueuedActivity[] = [];
+  let linkChangeItems: QueuedLinkChange[] = [];
   try {
+    relayItems = drainRelay();
+    activityItems = drainActivity();
+    linkChangeItems = drainLinkChanges(OUTBOX_LINK_CHANGE_PAGE);
     const accountIds = new Set<number>();
     for (const it of relayItems) accountIds.add(it.accountId);
     for (const it of activityItems) {

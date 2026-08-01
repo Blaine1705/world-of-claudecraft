@@ -1381,6 +1381,29 @@ describe('link and unlink change-feed enqueues', () => {
     ]);
   });
 
+  it('does NOT report an unlink when the chooser re-links the SAME discord id', async () => {
+    // The repoint guard's negative arm (Phase 5 QA): previousLink.discord_user_id
+    // equals the incoming id, so this is a refresh, not a repoint, and a phantom
+    // unlink would make the bot strip the member it should leave alone.
+    pendingRows = [{ ...PENDING }];
+    findAccountRows = [
+      { id: 1, username: 'maxp', password_hash: await hashPassword('correcthorse') },
+    ];
+    ownerRows = [];
+    linkRow = [{ account_id: 1, discord_user_id: PENDING.discord_user_id }];
+    const res = makeRes();
+
+    await loginLink(
+      makeReq({ body: { linkToken: 't', username: 'maxp', password: 'correcthorse' } }),
+      res,
+    );
+
+    expect(parse(res).status).toBe(200);
+    expect(drainLinkChanges()).toEqual([
+      { accountId: 1, discordId: PENDING.discord_user_id, kinds: ['link', 'points'] },
+    ]);
+  });
+
   it('enqueues nothing when the chooser link 409s on a foreign-owned discord id', async () => {
     pendingRows = [{ ...PENDING }];
     findAccountRows = [
@@ -1430,6 +1453,27 @@ describe('link and unlink change-feed enqueues', () => {
     expect(res.body).toContain('"ok":true');
     expect(drainLinkChanges()).toEqual([
       { accountId: 1, discordId: OLD_DISCORD_ID, kinds: ['unlink', 'link', 'points'] },
+    ]);
+  });
+
+  it('does NOT report an unlink when the OAuth callback re-links the SAME id', async () => {
+    // completeLink's copy of the same guard, driven through the real callback.
+    stateRows = [
+      { state: 's', code_verifier: 'v', mode: 'link', account_id: 1, redirect_to: null },
+    ];
+    ownerRows = [];
+    linkRow = [{ account_id: 1, discord_user_id: '999999999999999999' }];
+    mockDiscordFetch();
+    const res = makeRes();
+
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+
+    expect(res.body).toContain('"ok":true');
+    expect(drainLinkChanges()).toEqual([
+      { accountId: 1, discordId: '999999999999999999', kinds: ['link', 'points'] },
     ]);
   });
 

@@ -155,12 +155,7 @@ export async function discordForAccount(
  */
 export type DiscordOutboxLinkRow = Pick<
   DiscordLinkRow,
-  | 'account_id'
-  | 'discord_user_id'
-  | 'discord_username'
-  | 'discord_avatar'
-  | 'guild_member'
-  | 'linked_at'
+  'account_id' | 'discord_user_id' | 'discord_username' | 'discord_avatar'
 >;
 
 /**
@@ -194,7 +189,7 @@ export async function discordLinksForAccounts(
 ): Promise<DiscordOutboxLinkRow[]> {
   if (accountIds.length === 0) return [];
   const res = await pool.query(
-    `SELECT account_id, discord_user_id, discord_username, discord_avatar, guild_member, linked_at
+    `SELECT account_id, discord_user_id, discord_username, discord_avatar
        FROM discord_links WHERE account_id = ANY($1::int[])`,
     [[...new Set(accountIds)]],
   );
