@@ -350,6 +350,43 @@ describe('persistence: pre-payload saves and size bounds', () => {
     expect(reserialized.collections).toEqual(oldSave.collections);
   });
 
+  it('loadMarket runs the shared payload bound on listings AND collections', () => {
+    // The listing arm used to bypass even sanitizeEscrowSlot; both routes now
+    // bound on the real load path. A junk payload downgrades the row to
+    // dormant plain data instead of riding every market save.
+    const sim = makeWorld();
+    sim.loadMarket(
+      JSON.parse(
+        JSON.stringify({
+          listings: [
+            {
+              id: 900,
+              sellerKey: 'k1',
+              sellerName: 'Seller',
+              itemId: HIDE,
+              count: 1,
+              price: 100,
+              instance: { signer: 'x'.repeat(5000) },
+              secondsLeft: 1000,
+            },
+          ],
+          collections: [
+            { key: '7', copper: 0, items: [{ itemId: HIDE, count: 2, instance: [1, 2, 3] }] },
+          ],
+          nextListingId: 1001,
+        }),
+      ),
+    );
+    const out = JSON.parse(JSON.stringify(sim.serializeMarket()));
+    const listing = out.listings.find((l: { id: number }) => l.id === 900);
+    expect(listing.itemId).toBe(HIDE);
+    expect(listing.instance).toBeUndefined();
+    // The clone-mangled array instance dropped whole; the collection item
+    // survives plain with its count.
+    const coll = out.collections.find((c: { key: string }) => c.key === '7');
+    expect(coll.items[0]).toEqual({ itemId: HIDE, count: 2 });
+  });
+
   it('a maximally instanced seller book serializes inside a stated byte budget', () => {
     // 12 fully-instanced listings (the per-seller cap) with worst-case-ish
     // payloads must stay small: a future ItemInstancePayload field that

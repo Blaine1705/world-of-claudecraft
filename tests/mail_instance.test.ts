@@ -328,6 +328,36 @@ describe('return flight and persistence', () => {
     expect(secondGen.mail[0].items).toEqual(save.mail[0].items);
   });
 
+  it('loadMail runs the shared payload bound on attachments (the whole-branch escrow fix)', () => {
+    // The book-level proof the unit arms cannot give: a junk payload on a
+    // persisted parcel is bounded ON THE REAL LOAD PATH, so it cannot ride
+    // every mail save forever nor be granted into live bags on take.
+    const sim = makeWorld();
+    sim.loadMail({
+      mail: [
+        {
+          id: 1,
+          recipientKey: 'Rex',
+          recipientName: 'Rex',
+          senderName: 'Sender',
+          kind: 'player',
+          subject: 'junk',
+          body: 'oversized signer',
+          copper: 0,
+          items: [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'x'.repeat(5000) } }],
+          deliverIn: 0,
+          secondsLeft: 1000,
+          read: false,
+        },
+      ],
+      nextMailId: 2,
+    });
+    const letter = bookOf(sim).find((m) => m.items.length > 0);
+    // The oversized signer dropped and the emptied payload dropped whole; the
+    // attachment itself survives as plain recoverable data.
+    expect(letter?.items[0]).toEqual({ itemId: 'wolf_fang', count: 1 });
+  });
+
   it('the soulbound-return sweep keeps the returned parcel payload', () => {
     // A payload-carrying parcel whose item became soulbound after it was sent:
     // the load-time migration returns it to the sender WITH the payload.
