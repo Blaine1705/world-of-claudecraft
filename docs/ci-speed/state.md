@@ -1,12 +1,12 @@
 # State: CI Speed (cross-phase cheat sheet)
 
-**Current phase:** Phase 1 IN PROGRESS (implementation landed; draft PR + lint
+**Current phase:** Phase 1 IN PROGRESS (implementation + draft PR #2737; lint
 timing + Phase 1 QA remain). Worktree
 `/home/fernandoramirez/Documents/world-of-claudecraft-ci-speed` on
 `feature/ci-speed`, based on `origin/release/v0.34.0` at `94f5ac63d`.
 
-**Next action:** open/keep the draft PR, record three lint checkout timings
-from CI, then run Phase 1 QA (`phase-01-qa.md`).
+**Next action:** record three lint checkout timings from PR #2737 CI runs,
+then run Phase 1 QA (`phase-01-qa.md`). Do not mark ready until QA.
 
 ## Locked decisions
 

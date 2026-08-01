@@ -43,27 +43,32 @@ describe('CI workflow parity', () => {
     expect(lint).not.toMatch(
       /Check out repository[\s\S]*?uses: actions\/checkout@[^\n]+\n\s+with:\n\s+fetch-depth:\s*0/,
     );
-    expect(lint).not.toMatch(/^\s+fetch-depth:\s*0\s*$/m);
+    expect(lint).not.toMatch(/^\s+fetch-depth:\s*(?:0|"0")\s*$/m);
     expect(lint).toContain('git fetch --no-tags --depth=1 origin');
     expect(lint).toContain('npx @biomejs/biome ci --changed --since=');
     // Push arm must still resolve a base without reintroducing full history:
-    // either the pre-push tip, HEAD~1, or the default branch tip.
+    // pre-push tip, HEAD~1, or the default branch tip.
     expect(lint).toContain('BEFORE_SHA');
+    expect(lint).toContain('HEAD~1');
     expect(lint).toContain('DEFAULT_BRANCH');
 
     // D4: workflow-level concurrency cancels in-progress runs; group key
     // includes event name and PR number/ref so release work stays isolated.
-    expect(workflow).toMatch(/\nconcurrency:\n {2}group:/);
-    expect(workflow).toContain('cancel-in-progress: true');
-    expect(workflow).toContain('github.event_name');
-    expect(workflow).toContain('github.event.pull_request.number || github.ref');
+    // Adjacency pin so a comment or job-level block cannot satisfy the shape.
+    expect(workflow).toMatch(
+      /\nconcurrency:\n {2}group: \$\{\{ github\.workflow \}\}-\$\{\{ github\.event_name \}\}-\$\{\{ github\.event\.pull_request\.number \|\| github\.ref \}\}\n {2}cancel-in-progress: true\n/,
+    );
 
     // Browser-gate reuses Chromium via actions/cache keyed on Playwright version.
+    // Name-to-uses adjacency + cache-before-install order so comments alone fail.
     const browserGate = jobSource('browser-gate');
-    expect(browserGate).toContain('Cache Playwright Chromium browsers');
-    expect(browserGate).toContain('actions/cache@');
-    expect(browserGate).toContain('~/.cache/ms-playwright');
+    expect(browserGate).toMatch(
+      /- name: Cache Playwright Chromium browsers\n(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@[^\n]+\n {8}with:\n {10}path: ~\/\.cache\/ms-playwright\n/,
+    );
     expect(browserGate).toContain("require('playwright/package.json').version");
+    expect(browserGate.indexOf('Cache Playwright Chromium browsers')).toBeLessThan(
+      browserGate.indexOf('run: npx playwright install --with-deps chromium'),
+    );
     expect(browserGate).toContain('run: npx playwright install --with-deps chromium');
   });
 

@@ -4,7 +4,7 @@
 
 | Phase | Status | PR | Notes |
 |---|---|---|---|
-| 1 Fixed-cost waste | IN PROGRESS | | Shallow lint, concurrency, Playwright cache landed; draft PR next |
+| 1 Fixed-cost waste | IN PROGRESS | #2737 (draft) | Shallow lint, concurrency, Playwright cache; timing TBD |
 | 1 QA | NOT STARTED | | |
 | 2 Shard count | NOT STARTED | | Measure N, lock, apply |
 | 2 QA | NOT STARTED | | Wall ≤ 8 min bar |
@@ -40,7 +40,7 @@ Append-only. Each row: date, phase, run id, wall (s), worst shard (s), N, notes.
 - [x] `tests/ci_workflow.test.ts` pins updated same commits
 - [x] `docs/ci-speed/**` committed
 - [ ] Three runs: lint checkout ≤ 40s, job ≤ 90s typical
-- [ ] Draft PR opened
+- [x] Draft PR opened (#2737 against release/v0.34.0)
 - [ ] Phase 1 QA PASS
 
 ## Phase 2 checklist
