@@ -11,7 +11,7 @@
 | Phase 5: Server link verification | complete | 2026-07-31 | 2026-07-31 |
 | Phase 6: Achievement mirror | complete | 2026-07-31 | 2026-07-31 |
 | Phase 7: Client UI + i18n | complete | 2026-07-31 | 2026-07-31 |
-| Phase 8: Ops docs + BPT runbook | not started | | |
+| Phase 8: Ops docs + BPT runbook | complete | 2026-07-31 | 2026-07-31 |
 | Packet close QA (`qa-checklist.md`) | not started | | |
 
 ## Deliverable checklists
@@ -64,13 +64,17 @@
 - [x] UI tests for advert/capability/linked arms
 
 ### Phase 8
-- [ ] desktop-release epic section
-- [ ] BPT runbook / script
-- [ ] DEPLOY.md env keys
-- [ ] Portal checklist
-- [ ] progress/state closed for packet
+- [x] desktop-release epic section (channel table, build env, Win+Mac only, BPT pointer)
+- [x] BPT runbook (`docs/epic-games-integration/bpt-upload.md`) + fail-closed
+      `scripts/epic-bpt-upload.mjs` (not in pretest/gate/CI)
+- [x] DEPLOY.md `EPIC_*` keys + dark default; docker-compose pass-through
+- [x] Portal checklist (`docs/epic-games-integration/portal-checklist.md`)
+- [x] progress/state closed for Phase 8; next is whole-packet QA
 
 ## Notes
 
 - Packet authored 2026-07-31 from research + Steam twin audit.
-- Epic org credentials intentionally not required to start Phases 1 to 7.
+- Epic org credentials intentionally not required to start Phases 1 to 8 docs.
+- Phase 8 does not claim live BPT upload or store submission; those need real
+  org access later. Whole-packet QA is `docs/epic-games-integration/qa-checklist.md`
+  (not marked complete until a dedicated QA session runs it).

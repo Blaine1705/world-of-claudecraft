@@ -1,6 +1,9 @@
 # State: Epic Games Store integration (cross-phase cheat sheet)
 
-Current phase: Phase 7 complete. Next: Phase 8 (Ops docs + BPT runbook).
+Current phase: Phase 8 complete (Ops docs + BPT runbook). Next: whole-packet
+QA via `docs/epic-games-integration/qa-checklist.md`, then open a PR when
+authorized. Live Epic portal credentials and BPT upload are not required for
+the code PR while the feature stays dark (`EPIC_ENABLED` default off).
 
 Read this first in every session. Locked decisions below override memory and
 ad-hoc invention. Research background: `research-brief.md`.
@@ -59,8 +62,10 @@ ad-hoc invention. Research background: `research-brief.md`.
   - `EPIC_CLIENT_ID`
   - `EPIC_CLIENT_SECRET` (server only, never logged)
   Names may gain a `WOC_` prefix only if an existing collision forces it; prefer
-  the short forms above for parity with `STEAM_*`. Document finals in DEPLOY.md
-  when Phase 8 lands.
+  the short forms above for parity with `STEAM_*`. Finals documented in
+  `DEPLOY.md` (Phase 8). BPT upload uses a separate `EPIC_BPT_*` family
+  (`docs/epic-games-integration/bpt-upload.md`); never put BPT secrets on the
+  game server or in the desktop stamp.
 - **D16 Env keys (desktop build / dev).**
   - Build stamp for epic channel (required non-empty; refuse otherwise, like
     `WOC_STEAM_APP_ID` for steam):
@@ -259,7 +264,25 @@ Client:
     refused too)
   - `files` / `asarUnpack` kept as arrays for Phase 4 EOS native re-include;
     no real SDK vendored yet
-- Docs: this directory; short epic row in `docs/desktop-release.md` channel table
+- Docs (Phase 8):
+  - `docs/desktop-release.md`: epic channel table row + full Epic section
+    (build keys, `release-epic/` layouts, BPT pointer, Win+Mac only)
+  - `docs/epic-games-integration/bpt-upload.md`: BPT install, UploadBinary
+    shape, Dev vs Live, what not to upload, credential placeholders
+  - `docs/epic-games-integration/portal-checklist.md`: product, sandboxes,
+    clients, IARC, store assets, achievements from `achievement_map.ts`,
+    Dev smoke before store review
+  - `DEPLOY.md`: `EPIC_*` server keys + dark default; no login-with-Epic
+  - `docker-compose.yml`: pass-through for `EPIC_*` (same pattern as Steam)
+  - Optional ops script: `scripts/epic-bpt-upload.mjs` +
+    `tests/epic_bpt_upload.test.ts`; package.json `epic:bpt-upload` (not in
+    pretest / gate / default CI)
+- Maintainer still needs (real org access; not code gates):
+  - Epic org + product + Dev/Live sandboxes
+  - EOS server client secret + BPT credentials (separate)
+  - Windows + Mac artifacts; IARC; store page assets
+  - Portal achievement ids matching `server/epic/achievement_map.ts`
+  - First real BPT upload + Dev smoke + store submission when ready
 
 ## Open items (do not invent answers mid-phase)
 
