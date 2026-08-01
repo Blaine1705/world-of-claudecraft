@@ -8082,6 +8082,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.already_linked': '계정에 이미 연동된 Steam 계정이 있습니다.',
   'apiError.steam.account_taken': '해당 Steam 계정은 이미 다른 계정에 연결되어 있습니다.',
   'apiError.steam.upstream': 'Steam이 응답하지 않습니다. 잠시 후 다시 시도해 주세요.',
+  'apiError.epic.disabled': '현재 Epic 연동을 사용할 수 없습니다.',
+  'apiError.epic.invalid_token':
+    'Epic이 이 연동 요청을 확인하지 못했습니다. 데스크톱 앱에서 다시 시도해 주세요.',
+  'apiError.epic.banned': '해당 Epic 계정은 연동할 수 없습니다.',
+  'apiError.epic.already_linked': '계정에 이미 연동된 Epic 계정이 있습니다.',
+  'apiError.epic.account_taken': '해당 Epic 계정은 이미 다른 계정에 연결되어 있습니다.',
+  'apiError.epic.upstream': 'Epic이 응답하지 않습니다. 잠시 후 다시 시도해 주세요.',
   'apiError.db.conflict': '변경 사항이 다른 업데이트와 충돌했습니다. 다시 시도해 주세요.',
   'apiError.rate_limit.exceeded': '요청이 너무 많습니다. {seconds} 후에 다시 시도하세요.',
   'apiError.internal.error': '서버 측에서 문제가 발생했습니다. 다시 시도해 주세요.',
@@ -8950,6 +8957,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '데스크톱 앱에서 Steam 계정을 연동하면 획득한 업적이 Steam 도전 과제로 반영됩니다.',
   'hudChrome.steam.noTicket':
     'Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요.',
+  'hudChrome.epic.link': 'Epic 연동',
+  'hudChrome.epic.unlink': 'Epic 연동 해제',
+  'hudChrome.epic.linked': 'Epic 계정 {id}에 연동됨',
+  'hudChrome.epic.benefits':
+    'Epic 데스크톱 앱에서 Epic 계정을 연동하면 획득한 업적이 Epic 도전 과제로 반영됩니다.',
+  'hudChrome.epic.noProof':
+    'Epic에서 연동 증명을 받지 못했습니다. Epic Games Store에서 실행한 뒤 다시 시도해 주세요.',
+  'hudChrome.epic.title': 'Epic',
   'hudChrome.deeds.title': '업적의 서',
   'hudChrome.deeds.close': '업적의 서 닫기',
   'hudChrome.deeds.searchPlaceholder': '업적 검색',

@@ -8099,6 +8099,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.already_linked': 'このアカウントには既にSteamアカウントが連携されています。',
   'apiError.steam.account_taken': 'そのSteamアカウントは既に別のアカウントに連携されています。',
   'apiError.steam.upstream': 'Steamから応答がありません。しばらくしてからもう一度お試しください。',
+  'apiError.epic.disabled': 'Epic連携は現在利用できません。',
+  'apiError.epic.invalid_token':
+    'Epicがこの連携リクエストを確認できませんでした。デスクトップアプリからもう一度お試しください。',
+  'apiError.epic.banned': 'そのEpicアカウントは連携できません。',
+  'apiError.epic.already_linked': 'このアカウントには既にEpicアカウントが連携されています。',
+  'apiError.epic.account_taken': 'そのEpicアカウントは既に別のアカウントに連携されています。',
+  'apiError.epic.upstream': 'Epicから応答がありません。しばらくしてからもう一度お試しください。',
   'apiError.db.conflict': 'その変更が別の更新と競合しました。もう一度お試しください。',
   'apiError.rate_limit.exceeded': 'リクエストが多すぎます。{seconds} 後に再度お試しください。',
   'apiError.internal.error': 'サーバー側で問題が発生しました。もう一度お試しください。',
@@ -8963,6 +8970,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'デスクトップアプリからSteamアカウントを連携すると、獲得した功績がSteam実績に反映されます。',
   'hudChrome.steam.noTicket':
     'Steamから連携チケットを取得できませんでした。Steamを起動してからもう一度お試しください。',
+  'hudChrome.epic.link': 'Epicと連携',
+  'hudChrome.epic.unlink': 'Epic連携を解除',
+  'hudChrome.epic.linked': 'Epicアカウント {id} と連携済み',
+  'hudChrome.epic.benefits':
+    'EpicデスクトップアプリからEpicアカウントを連携すると、獲得した功績がEpic実績に反映されます。',
+  'hudChrome.epic.noProof':
+    'Epicから連携証明を取得できませんでした。Epic Games Storeから起動してからもう一度お試しください。',
+  'hudChrome.epic.title': 'Epic',
   'hudChrome.deeds.title': '功績の書',
   'hudChrome.deeds.close': '功績の書を閉じる',
   'hudChrome.deeds.searchPlaceholder': '功績を検索',

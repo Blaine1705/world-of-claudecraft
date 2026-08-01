@@ -1071,6 +1071,7 @@ const UI_DOM_MODULES = [
   'src/ui/dialog_key_activation.ts',
   'src/ui/discord_widget.ts',
   'src/ui/entry_guard_banner.ts',
+  'src/ui/epic_link.ts',
   'src/ui/focus_manager.ts',
   'src/ui/focus_restore.ts',
   'src/ui/form_draft.ts',
