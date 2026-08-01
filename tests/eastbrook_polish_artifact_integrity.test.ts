@@ -609,15 +609,15 @@ function readJsonFile<T>(filePath: string): T {
 }
 
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
-  '10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab';
+  '4d3ec4b5413f6db4b30939ce883d093875f3a29a0ff6dcb32140cbaa783217bf';
 const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'ebf13ee4db8448fe73effb3994f4b0fd0037c73b8bec5cdf940b3b8cdda0d6a2';
+  'aeb5c59e34489efd23274c661cc7942c9f55af2d0b1daa2c90fe36094cacc4e9';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '57747bfcf6f7bcde711e33da5a0905ec8c798fd19729d595ec62b91cdb1119f2';
+  '9d38235f6a16ce60925c0faa28567775cbdb640f1749686c866ffeb9e5a10cb9';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1475,13 +1475,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
     // Removing the stray eastbrook_fence_market_outer segment moved the
-    // rebuilt-town placement inventory and its live triangle budget, which
-    // moved the composite polish provenance embedded in the after-* files, so
-    // this seal follows the composite. Every measured value (frame timings,
-    // draw stats, triangle and scenario numbers) is byte-identical to the
-    // frozen polish-v2 capture, and no capture was retaken.
+    // rebuilt-town placement inventory in the after-* files, so this seal
+    // follows that content change. Every measured value (frame timings, draw
+    // stats, triangle and scenario numbers) is byte-identical, and no
+    // capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '377f5e3a231f33c3627c8f53479c35d4f41b114f41e6fca4ac80936ab08c4102',
+      '98fd978113f598e679dcb643e6b7c40b23bcb2fa20381e34e74828b8fbdc4cc1',
     );
   });
 
