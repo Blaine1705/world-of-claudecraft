@@ -28,6 +28,37 @@ const CHECK_RUN_STEPS = [
 const RELEASE_IF_LINE =
   "    if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))";
 
+// PR-tier event routing (release-to-main exclusion + non-release push + dispatch).
+// Path-filter arm is AND-composed separately so either arm can be pinned alone.
+const PR_TIER_EVENT_FRAGMENT =
+  "(github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch'";
+
+// Exact composed if for pr-gate and pr-checks after Phase 5 path filters (D10).
+// Extra parens around the event fragment keep || from binding past the && code arm.
+const PR_TIER_IF_LINE = `    if: (${PR_TIER_EVENT_FRAGMENT}) && needs.changes.outputs.code == 'true'`;
+
+// Minimum code path globs the changes job must classify as code=true (D10).
+const CODE_PATH_GLOBS = [
+  'src/*',
+  'server/*',
+  'tests/*',
+  'headless/*',
+  'bot/*',
+  'scripts/*',
+  'package.json',
+  'package-lock.json',
+  'tsconfig.json',
+  'tsconfig.admin.json',
+  'vite.config.ts',
+  'vitest.browser.config.ts',
+  'biome.json',
+  '.github/workflows/*',
+  'electron/*',
+  'android/*',
+  'ios/*',
+  'public/*',
+] as const;
+
 function jobSource(name: string): string {
   const match = workflow.match(new RegExp(`\\n  ${name}:[\\s\\S]*?(?=\\n  [a-z][a-z-]+:|$)`));
   if (!match) throw new Error(`missing CI job: ${name}`);
@@ -128,13 +159,12 @@ describe('CI workflow parity', () => {
     const releaseGate = jobSource('release-gate');
     const releaseChecks = jobSource('release-checks');
     for (const job of [prGate, prChecks]) {
-      expect(job).toContain(
-        "github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))",
-      );
-      expect(job).toContain(
-        "github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')",
-      );
-      expect(job).toContain("github.event_name == 'workflow_dispatch'");
+      // Exact composed if: event routing AND code path filter (D10). Dropping
+      // either arm breaks release-to-main exclusion or docs-only skip.
+      const ifLines = job.match(/^\s{4}if: .+$/gm) ?? [];
+      expect(ifLines).toEqual([PR_TIER_IF_LINE]);
+      expect(job).toContain(PR_TIER_EVENT_FRAGMENT);
+      expect(job).toContain("needs.changes.outputs.code == 'true'");
       expect(job).not.toContain('I18N_RELEASE_TIER');
     }
     // Both release jobs share the exact same job-level if line so they skip or
@@ -148,6 +178,11 @@ describe('CI workflow parity', () => {
       // Exactly one job-level if: line, equal to the literal (no widen).
       const ifLines = job.match(/^\s{4}if: .+$/gm) ?? [];
       expect(ifLines).toEqual([RELEASE_IF_LINE]);
+      // Red-path: path filters must never land on release jobs (D10).
+      expect(job).not.toContain('needs: changes');
+      expect(job).not.toContain('needs.changes');
+      expect(job).not.toContain('paths-ignore');
+      expect(job).not.toContain('paths:');
     }
     expect(releaseGate).toContain("\n    env:\n      I18N_RELEASE_TIER: '1'");
     expect(releaseChecks).not.toContain('I18N_RELEASE_TIER');
@@ -156,11 +191,12 @@ describe('CI workflow parity', () => {
   it('splits the PR tier into parallel test and checks jobs that cover every step', () => {
     const prGate = jobSource('pr-gate');
     const prChecks = jobSource('pr-checks');
-    // Parallel means no needs edge in either direction, and splitting must not
-    // DROP a check: the checks job carries every serialized step the single
-    // pr-gate job used to run, while pr-gate keeps the test suite.
-    expect(prGate).not.toContain('needs:');
-    expect(prChecks).not.toContain('needs:');
+    // Parallel means no needs edge between the pair. Both may need `changes`
+    // for the path filter; neither may wait on the other (would re-serialize).
+    expect(prGate).toMatch(/^\s{4}needs: changes\s*$/m);
+    expect(prChecks).toMatch(/^\s{4}needs: changes\s*$/m);
+    expect(prGate).not.toMatch(/needs:\s*\[?[^\n]*pr-checks/);
+    expect(prChecks).not.toMatch(/needs:\s*\[?[^\n]*pr-gate/);
     expect(prGate).toContain('run: npm test');
     expect(prChecks).not.toContain('run: npm test');
     for (const step of CHECK_RUN_STEPS) {
@@ -192,6 +228,57 @@ describe('CI workflow parity', () => {
     // An accidental extra step on the checks job would otherwise stay green.
     expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(11);
     expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(11);
+  });
+
+  it('classifies docs-only PRs via a native changes job and keeps release unfiltered', () => {
+    // D10: native git-diff classifier (no dorny/paths-filter). Output code=true
+    // forces the full PR tier; code=false skips pr-gate/pr-checks/browser-gate.
+    // lint stays unfiltered. Release jobs never consult the output.
+    const changes = jobSource('changes');
+    expect(changes).toContain('id: filter');
+    expect(changes).toContain('outputs:');
+    expect(changes).toContain('code: ${{ steps.filter.outputs.code }}');
+    expect(changes).toContain('fetch-depth: 0');
+    expect(changes).toContain('EVENT_NAME');
+    expect(changes).toContain('BASE_SHA');
+    expect(changes).toContain('HEAD_SHA');
+    // Non-PR events and empty/missing diffs fail closed toward code=true.
+    expect(changes).toContain('non-PR event: full PR tier (code=true)');
+    expect(changes).toContain('echo "code=$code" >> "$GITHUB_OUTPUT"');
+    expect(changes).toContain('code=false');
+    expect(changes).toContain('code=true');
+    for (const glob of CODE_PATH_GLOBS) {
+      expect(changes).toContain(glob);
+    }
+    // No third-party path-filter action (D10: justify dorny in progress.md if added).
+    expect(workflow).not.toContain('dorny/paths-filter');
+    expect(workflow).not.toContain('paths-filter@');
+
+    const lint = jobSource('lint');
+    expect(lint).not.toContain('needs: changes');
+    expect(lint).not.toContain('needs.changes');
+    // lint has no job-level if: (always runs, including docs-only).
+    expect(lint.match(/^\s{4}if: .+$/gm) ?? []).toEqual([]);
+
+    const browserGate = jobSource('browser-gate');
+    expect(browserGate).toMatch(/^\s{4}needs: changes\s*$/m);
+    const browserIf = browserGate.match(/^\s{4}if: .+$/gm) ?? [];
+    expect(browserIf).toEqual(["    if: needs.changes.outputs.code == 'true'"]);
+
+    // Aggregator only if branch protection cannot accept skipped checks. This
+    // packet does not invent one without evidence (OPEN item 5: skipped release
+    // jobs already show as skipping on ordinary PRs without blocking merge).
+    expect(workflow).not.toMatch(/\n  ci-result:/);
+    expect(workflow).not.toMatch(/\n  ci-success:/);
+
+    // Red-path structural: a paths-ignore on either release job would silently
+    // shrink release-tier enforcement on a docs-only release push.
+    for (const name of ['release-gate', 'release-checks', 'release-version-gate'] as const) {
+      const job = jobSource(name);
+      expect(job).not.toContain('paths-ignore');
+      expect(job).not.toContain('needs.changes');
+      expect(job).not.toMatch(/^\s{4}needs:/m);
+    }
   });
 
   it(`shards the PR and release test steps ${SHARD_N} ways and keeps the checks single-shard`, () => {
