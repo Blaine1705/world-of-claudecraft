@@ -570,10 +570,7 @@ describe('discord link change feed: the eviction ladder and the contract literal
 
     // Overflow with a LINK item, so neither noise rung can absorb the eviction into
     // the incoming item itself and the id-less flex rung is exhausted first choice.
-    enqueueLinkChange(
-      { accountId: 990_001, discordId: 'du990001', kinds: ['link'] },
-      0,
-    );
+    enqueueLinkChange({ accountId: 990_001, discordId: 'du990001', kinds: ['link'] }, 0);
 
     const drained = drainLinkChanges();
     // Rung 2 spent the oldest id-less flex item (account 2); both link items AND the

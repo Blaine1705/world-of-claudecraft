@@ -940,7 +940,9 @@ describe('daily rewards', () => {
       ]);
       // Infinity is an over-ask, so it clamps UP to the ceiling, not down to the
       // floor (the NaN guard is NaN-only on purpose).
-      expect(dayNames(await service.discordWinnerAnnouncements(Number.POSITIVE_INFINITY))).toHaveLength(5);
+      expect(
+        dayNames(await service.discordWinnerAnnouncements(Number.POSITIVE_INFINITY)),
+      ).toHaveLength(5);
       // Every ask above was a slice of the same snapshot, never a second read.
       expect(db.unannouncedWinnerDaysCalls).toBe(1);
     });

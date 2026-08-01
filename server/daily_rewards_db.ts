@@ -888,8 +888,7 @@ export class PgDailyRewardDb implements DailyRewardDb {
             )`,
         [day, REALM, rank, status, txSignature, error],
       );
-      let outcome: DailyRewardPayoutMarkOutcome =
-        (res.rowCount ?? 0) === 1 ? 'updated' : 'missing';
+      let outcome: DailyRewardPayoutMarkOutcome = (res.rowCount ?? 0) === 1 ? 'updated' : 'missing';
       if (outcome === 'missing' && status === 'paid' && txSignature) {
         const existing = await client.query(
           `SELECT 1
