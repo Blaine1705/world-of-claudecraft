@@ -360,10 +360,13 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Repinned after merging release/v0.33.0 into the graphics overhaul.
-      // The composite was recomputed from the resolved renderer inputs; the
-      // accepted Eastbrook evidence and its baseline revision are unchanged.
-      fingerprint: '2c7e1ade68cbb9469991343ef174a0cc95de848052901dc8dd4461a6077d0a2d',
+      // Deliberately re-pinned: the graphics overhaul changed the fingerprinted
+      // runtimeRender inputs (the renderer integration and view-priority policy
+      // leaves), so this composite mints fresh on top of the 0.33.0 version
+      // sync's re-mint. The GLB source-fingerprint leaves are unchanged from
+      // release/v0.33.0, no pipeline input or geometry value changed, and no
+      // capture was retaken.
+      fingerprint: '9d38235f6a16ce60925c0faa28567775cbdb640f1749686c866ffeb9e5a10cb9',
       components: {
         captureContract: {
           id: 'polish-v2',
