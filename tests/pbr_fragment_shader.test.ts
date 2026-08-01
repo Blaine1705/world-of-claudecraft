@@ -110,6 +110,7 @@ describe('PBR character rim fragment pruning', () => {
     }));
     vi.doMock('../src/render/assets/preload', () => ({
       registerPreload: () => undefined,
+      registerDeferredPreload: () => undefined,
     }));
     vi.doMock('../src/render/textures', () => ({
       groundDetailTexture: () => new THREE.Texture(),

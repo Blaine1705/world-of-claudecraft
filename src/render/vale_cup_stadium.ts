@@ -43,7 +43,7 @@ import {
 import { terrainHeight } from '../sim/world';
 import type { CupInfo } from '../world_api/vale_cup';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
 import { casterShadowMayReachCamera, type ScenerySphere } from './resident_scenery_core';
 import { groundSplatMaps } from './textures';
@@ -92,8 +92,9 @@ export interface ValeCupStadiumView {
 // ---------------------------------------------------------------------------
 // CC0 kit pieces (KayKit Dungeon Remastered), extracted with the dungeon.ts
 // recipe: merged float-attribute geometry + the pack's shared atlas material.
-// registerPreload() folds the fetches into the boot gate so buildValeCupStadium
-// can read the cache synchronously in the renderer ctor.
+// registerDeferredPreload() folds the fetches into the boot gate so
+// buildValeCupStadium can read the cache synchronously in the renderer ctor; the
+// deferred lane keeps them off the launcher until world entry opens it.
 // ---------------------------------------------------------------------------
 
 const KIT_PIECES = [
@@ -173,7 +174,7 @@ export function ensureValeCupAssets(): Promise<void> {
 
 // Boot-gate the kit fetches (tier-INDEPENDENT set, the props.ts preload law);
 // headless/test imports never fetch.
-if (typeof window !== 'undefined') registerPreload(ensureValeCupAssets());
+if (typeof window !== 'undefined') registerDeferredPreload(() => ensureValeCupAssets());
 
 function kitAsset(name: KitPiece): KitAsset {
   const a = kitAssets.get(name);

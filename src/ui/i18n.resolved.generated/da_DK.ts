@@ -340,11 +340,14 @@ export const da_DK: EnTranslations = {
       "menuButton": "Frigørelse",
       "help": "Redning: /unstuck starter en stillestående nedtælling, der flytter dig til et nærliggende tilgængeligt sikkert sted.",
       "helpAtGraveyard": "Redning: /unstuck starter en stillestående nedtælling og sender derefter din ånd til den nærmeste kirkegård. At vende tilbage via Den Blege Vogter kræver Vogterens Klokke.",
+      "helpUnstuckSickness": "Redning: /unstuck starter en stillestående nedtælling og flytter dig derefter til den nærmeste kirkegård, hvor du genoplives, hvis du var faldet. Frigørelsessyge bliver på dig i op til 5 minutter.",
       "started": "Frigørelse om {seconds} sekunder. At bevæge dig, kæmpe, tage skade eller begynde en anden handling annullerer den.",
       "countdown": "Frigørelse: {seconds}",
       "completed": "Flyttet til det nærmeste tilgængelige sikre sted.",
       "completedAtGraveyard": "Din ånd er vendt tilbage til den nærmeste kirkegård. Tal med Den Blege Vogter for at acceptere Vogterens Klokke.",
       "revivedAtGraveyard": "Du er blevet returneret til den nærmeste kirkegård og genoplivet. Vogterens Klokke tynger dig.",
+      "movedToGraveyard": "Du er blevet flyttet til den nærmeste kirkegård. Frigørelsessyge tynger dig.",
+      "revivedAtGraveyardUnstuck": "Du er blevet flyttet til den nærmeste kirkegård og genoplivet. Frigørelsessyge tynger dig.",
       "cancelledMoved": "Frigørelse annulleret, fordi du flyttede dig.",
       "cancelledDamaged": "Frigørelse annulleret, fordi du tog skade.",
       "cancelledCombat": "Frigørelse annulleret, fordi du kom i kamp.",
@@ -885,6 +888,13 @@ export const da_DK: EnTranslations = {
       "heroicName": "Heroisk {name}",
       "heroicLocked": "Du er låst til Heroisk {name}."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Etage {current} af {total}",
+      "closesIn": "Lukker om {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NØ",
@@ -912,6 +922,23 @@ export const da_DK: EnTranslations = {
       "dock": "Sæt denne måler tilbage i målervinduet",
       "separate": "Adskil {meter}",
       "regroup": "Saml {meter} igen"
+    },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Kæledyret har fuldt helbred",
@@ -956,13 +983,15 @@ export const da_DK: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage Skyggehop-Tudsen",
       "name_stormfeather_griffin": "Himmelrækkende Stormfjer",
       "name_thunderstrut_gobbler": "Tordenspanker den Store Kalkun",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "desc_valorsteed": "En hårdfør, sikker ganger, der giver øget rejsehastighed.",
       "desc_grag_bear": "En hårdfør, sikker bjørn, der giver øget rejsehastighed.",
       "desc_stalkglider_snail": "En robust, langsomt forbrændende snegl, der giver øget rejsehastighed.",
       "desc_aether_hover_cycle": "En kraftfuld magitek-cykel designet til hurtig, lavtsvævende forflytning i kamp.",
       "desc_shadowjump_toad": "En enorm, sikker kæmpetudse, trænet i lynhurtige skyggehop, der dækker ethvert terræn.",
       "desc_stormfeather_griffin": "En kongelig stormgrif, der bevæger sig hen over jorden på runebeslåede kløer, med sammenfoldede vinger.",
-      "desc_thunderstrut_gobbler": "En kolossal, stormudklækket kalkun, der spankulerer ned fra Den Opvågnende Tinde, med halen udfoldet som en tordensky."
+      "desc_thunderstrut_gobbler": "En kolossal, stormudklækket kalkun, der spankulerer ned fra Den Opvågnende Tinde, med halen udfoldet som en tordensky.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Tryk på {key} for at stige op på trænings-Modgangeren.",
@@ -1268,6 +1297,51 @@ export const da_DK: EnTranslations = {
       "badges": {
         "backgrounded": "I baggrunden",
         "offline": "Offline"
+      }
+    },
+    "auraOverlay": {
+      "title": "Auras",
+      "currentClass": "Current class: {class}",
+      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
+      "noProcs": "No supported proc is available for this character.",
+      "enabled": "Show Aura",
+      "icon": "Spell Icon",
+      "arcs": "Side Crescents",
+      "groundRing": "Ground Ring",
+      "groundRingSpellOrder": "Ground Ring: Spell Order",
+      "crescentsSpellOrder": "Side Crescents: Spell Order",
+      "size": "Size",
+      "iconSize": "Icon Size",
+      "crescentBlockSize": "Crescent Block Size",
+      "groundRingBlockSize": "Ground Ring Block Size",
+      "opacity": "Opacity",
+      "color": "Color",
+      "allOn": "All On",
+      "allOff": "All Off",
+      "reposition": "Setup Positions",
+      "positioning": "Positioning: {aura}",
+      "selectAura": "Aura",
+      "done": "Done",
+      "moveLeft": "Move Left",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "moveRight": "Move Right",
+      "moveEarlier": "Move spell inward",
+      "moveLater": "Move spell outward",
+      "screenPosition": "Screen Position",
+      "spellOrder": "Spell Order",
+      "reset": "Reset Position",
+      "spellPosition": "Spell order {position} / {count}",
+      "procs": {
+        "revenge": "Revenge!",
+        "battleTrance": "Battle Trance",
+        "overpowerCharge": "Redhand Empowerment",
+        "suddenDeath": "Sudden Death",
+        "victoryRush": "Victory Rush",
+        "enrage": "Mayhem: Enraged",
+        "heatingUp": "Heating Up",
+        "arcaneCharge": "Arcane Charges",
+        "aetherRush": "Aether Rush"
       }
     },
     "playerCard": {
@@ -2073,6 +2147,14 @@ export const da_DK: EnTranslations = {
       "benefits": "Tilknyt din Steam-konto fra skrivebordsappen for at spejle de bedrifter, du opnår, som Steam-præstationer.",
       "noTicket": "Steam udstedte ingen tilknytningsbillet. Start Steam, og prøv så igen."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Postkasse",
       "subtitle": "Ravneposten",
@@ -2117,7 +2199,7 @@ export const da_DK: EnTranslations = {
         "noRecipient": "Ingen med det navn har en postkasse her.",
         "tooManyParcels": "Et brev kan højst rumme {count} pakker.",
         "noMailQuestItems": "Du kan ikke sende opgavegenstande med posten.",
-        "noMailBound": "That item is bound and cannot be mailed.",
+        "noMailBound": "Den genstand er bundet og kan ikke sendes med posten.",
         "notEnoughItems": "Du har ikke så mange at sende.",
         "cantAffordPostage": "Du har ikke råd til portoen.",
         "recipientBoxFull": "Modtagerens postkasse er fuld.",
@@ -2924,8 +3006,19 @@ export const da_DK: EnTranslations = {
       "account_taken": "Den Steam-konto er allerede knyttet til en anden konto.",
       "upstream": "Steam svarede ikke. Prøv igen om et øjeblik."
     },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
+    },
     "wallet": {
       "handoff_invalid": "Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen."
+    },
+    "ota_updates": {
+      "invalid_input": "Ugyldig indtastning."
     }
   },
   "guide": {
@@ -3525,14 +3618,6 @@ export const da_DK: EnTranslations = {
       "reptile": {
         "name": "Krybdyr",
         "desc": "Koldblodede jægere med en hvislen og et snap, der er helt deres egne, og som adskiller sig fra de varmblodede dyr."
-      },
-      "murloc": {
-        "name": "Kvækfinner",
-        "desc": "Kvækkende fiskefolk fra søbred og tidevandspøl, hurtige til at sværme om alt, der vader for tæt på."
-      },
-      "kobold": {
-        "name": "Skælme",
-        "desc": "Flakkende ådselsædere og ånder fra lysning og hæk, mere til gene end fare, indtil de samles i flok."
       },
       "demon": {
         "name": "Dæmoner",
@@ -6478,12 +6563,12 @@ export const da_DK: EnTranslations = {
       "arenaQueueTrading": "Afslut din handel, før du stiller dig i kø.",
       "arenaQueueInstance": "Du kan ikke stille dig i kø inde fra en instans.",
       "tradeInProgress": "En handel er allerede i gang.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Den spiller handler allerede.",
       "tradeTooFar": "Målet er for langt væk til at handle.",
       "tradeExpired": "Handelsanmodningen er udløbet.",
       "tradeFailed": "Handel mislykkedes: genstande eller penge er ikke længere tilgængelige.",
       "tradeBound": "Den genstand er bundet og kan ikke handles.",
-      "marketListBound": "That item is bound and cannot be listed."
+      "marketListBound": "Den genstand er bundet og kan ikke sættes til salg."
     },
     "logs": {
       "standUp": "Du rejser dig op.",
@@ -6839,7 +6924,8 @@ export const da_DK: EnTranslations = {
       "incomplete": "Den quest er ikke fuldført.",
       "giverMissing": "Den quest-giver er ikke i nærheden.",
       "turnInMissing": "Den quest-aflevering er ikke i nærheden.",
-      "tooFar": "For langt væk."
+      "tooFar": "For langt væk.",
+      "escortAway": "Din eskorte er ikke på sin post lige nu og vender snart tilbage."
     }
   },
   "itemUi": {
@@ -7227,7 +7313,7 @@ export const da_DK: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Større usynlighed",
-        "description": "Forsvind i 20 sek.: fjerner 2 skader over tid-effekter, og du tager 90% mindre skade, mens du er usynlig og kort tid derefter. (magikertalent)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Hed stime",
@@ -9733,6 +9819,9 @@ export const da_DK: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Segl fra Den Sidste Borg"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
@@ -12842,7 +12931,7 @@ export const da_DK: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Wren Bragt Hjem",
-        "text": "Min lærling Wren gik ud for at gå Guldsmeltets linje for to dage siden og kom aldrig tilbage. Jeg fandt hendes spor, hun sidder under vejmarkeringerne sydvest for Nordlys-Trapperne, for bange for ulvene til at bevæge sig. Jeg kan ikke forlade kæret, {playerName}. Følg hende til Veylas lejr på Trapperne. Hun vil være sikker under lysene.",
+        "text": "Min lærling Wren gik ud for at gå Guldsmeltets linje for to dage siden og kom aldrig tilbage. Jeg fandt hendes spor, hun sidder under vejmarkeringerne nordøst for Nordlys-Trapperne, for bange for ulvene til at bevæge sig. Jeg kan ikke forlade kæret, {playerName}. Følg hende til Veylas lejr på Trapperne. Hun vil være sikker under lysene.",
         "completion": "Pigen er indenfor, svøbt i halvdelen af mine tæpper og snakker stjernerne ned fra himlen. Du gjorde noget venligt i dag, {playerName}. Sløret ser ikke mange af den slags.",
         "objectives": {
           "0": {
@@ -13526,7 +13615,7 @@ export const da_DK: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Kommer Hjem",
-        "text": "Min Bram tog båden ud den morgen, net-bruddet åbnede sig, og havet kastede ham tilbage et sted forbi Landgangspynten. Jeg hørte ham tre nætter siden, {playerName}, kalde over vandet, og jeg var for bange til at gå. Jeg er stadig for bange. Vær sød. Hans båd ligger vraget på nordkysten. Følg ham hjem til mig.",
+        "text": "Min Bram tog båden ud den morgen, net-bruddet åbnede sig, og havet kastede ham tilbage et sted forbi Landgangspynten. Jeg hørte ham tre nætter siden, {playerName}, kalde over vandet, og jeg var for bange til at gå. Jeg er stadig for bange. Vær sød. Hans båd ligger vraget på sydkysten. Følg ham hjem til mig.",
         "completion": "Bram! Du bragte ham tilbage til mig hel, {playerName}. Vi græd begge, og ingen af os skammer sig. Hvad end bruddene tager fra denne ø næste gang, får de ikke min familie. Ikke mere.",
         "objectives": {
           "0": {

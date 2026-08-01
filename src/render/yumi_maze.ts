@@ -12,7 +12,7 @@ import { groundHeight } from '../sim/world';
 import { YUMI_MAZE_WALL_HEIGHT, yumiMazeLayout } from '../sim/yumi_maze_layout';
 import type { IWorld } from '../world_api';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { EMISSIVE_LIGHT, surfaceMat } from './gfx';
 import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
 import {
@@ -36,7 +36,7 @@ const loadedYumiMazeGltf = new Map<YumiMazeAssetKind, THREE.Group>();
 
 if (typeof window !== 'undefined') {
   for (const [kind, url] of Object.entries(YUMI_MAZE_ASSET_URL) as [YumiMazeAssetKind, string][]) {
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(url).then((gltf) => {
         loadedYumiMazeGltf.set(kind, gltf.scene);
       }),

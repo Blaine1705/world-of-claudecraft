@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
 import { applySurfaceDetail, type SurfaceFamily } from './worn_stone';
@@ -48,7 +48,7 @@ let loadedNormal: THREE.Texture | null = null;
 let loadedRough: THREE.Texture | null = null;
 
 if (typeof window !== 'undefined') {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadTexture(EASTBROOK_SURFACE_ATLAS_URL).then((texture) => {
       // Loader-cache results are immutable shared resources. Eastbrook identity
       // metadata stays module/root-side; consumers bind this exact texture.
@@ -58,12 +58,12 @@ if (typeof window !== 'undefined') {
   // Non-srgb loads keep loadTexture's default NoColorSpace, which is what
   // normal/roughness data needs. Preload sets stay tier-independent (the
   // import-time tier is only a guess); Lambert tiers simply never bind these.
-  registerPreload(
+  registerDeferredPreload(() =>
     loadTexture(EASTBROOK_SURFACE_NORMAL_URL).then((texture) => {
       loadedNormal = texture;
     }),
   );
-  registerPreload(
+  registerDeferredPreload(() =>
     loadTexture(EASTBROOK_SURFACE_ROUGH_URL).then((texture) => {
       loadedRough = texture;
     }),

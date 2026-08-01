@@ -5,9 +5,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../src/render/assets/loader', () => ({
   loadTexture: vi.fn(async () => ({ image: null })),
+  releaseTexture: vi.fn(),
 }));
 vi.mock('../src/render/assets/preload', () => ({
   registerPreload: vi.fn(),
+  registerDeferredPreload: vi.fn(),
 }));
 
 import { Vfx } from '../src/render/vfx';

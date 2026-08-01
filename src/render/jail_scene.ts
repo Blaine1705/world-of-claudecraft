@@ -7,7 +7,7 @@
 import * as THREE from 'three';
 import { JAIL_CAGE_HALF, JAIL_CENTER, JAIL_GATE, JAIL_OUTER_HALF } from '../sim/jail';
 import { groundHeight } from '../sim/world';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { buildDungeonPropMesh, ensureDungeonAssets, loadKitModules } from './dungeon';
 import { EMISSIVE_LIGHT, GFX } from './gfx';
 import { residentSceneMayReachRenderVolumes, type ScenerySphere } from './resident_scenery_core';
@@ -32,7 +32,7 @@ export function ensureJailAssets(): Promise<void> {
 
 // Same boot-preload fold as the dungeon kit: the renderer builds the jail
 // synchronously right after assetsReady(), so the modules must be resolved.
-if (typeof window !== 'undefined') registerPreload(ensureJailAssets());
+if (typeof window !== 'undefined') registerDeferredPreload(() => ensureJailAssets());
 
 const MODULE_SCALE = 2; // KayKit walls are 4u tall/long -> 8u here (dungeon.ts convention)
 const MODULE_LEN = 4 * MODULE_SCALE;

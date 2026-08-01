@@ -12,6 +12,7 @@ vi.mock('../src/render/assets/loader', async (importOriginal) => {
 });
 vi.mock('../src/render/assets/preload', () => ({
   registerPreload: () => {},
+  registerDeferredPreload: () => {},
 }));
 vi.mock('../src/render/textures', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../src/render/textures')>();

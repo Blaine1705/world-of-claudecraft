@@ -11,7 +11,7 @@ import {
   ARENA_X_MIN,
   arenaOrigin,
   BUILTIN_WORLD,
-  COMMUNITY_RIFT_SLOT_COUNT,
+  RIFT_SLOT_COUNT,
   DELVE_BAND_X_MIN,
   DELVE_LIST,
   DELVE_SLOT_COUNT,
@@ -326,7 +326,7 @@ function buildPoints(): HeightPoint[] {
       addStencil(`delve ${delve.id} slot ${slot}`, origin.x, origin.z, 120);
     }
   }
-  for (let slot = 0; slot < COMMUNITY_RIFT_SLOT_COUNT; slot++) {
+  for (let slot = 0; slot < RIFT_SLOT_COUNT; slot++) {
     for (let floor = 0; floor < RIFT_MAX_FLOORS; floor++) {
       const origin = riftInstanceOrigin(slot, floor);
       addStencil(`rift slot ${slot} floor ${floor}`, origin.x, origin.z, 160);

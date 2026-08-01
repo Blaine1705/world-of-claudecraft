@@ -530,6 +530,7 @@ describe('options_view: main menu routing', () => {
       'hudChrome.controller.title',
       'hud.options.graphics',
       'hud.options.interface',
+      'hudChrome.auraOverlay.title',
       'hud.options.audio',
       'hudChrome.perf.title',
       'hudChrome.unstuck.menuButton',
@@ -543,6 +544,10 @@ describe('options_view: main menu routing', () => {
     const interfaceRows = offline.filter((e) => e.labelKey === 'hud.options.interface');
     expect(interfaceRows).toHaveLength(1);
     expect(interfaceRows[0].action).toEqual({ kind: 'goto', view: 'interface' });
+    expect(offline.find((e) => e.labelKey === 'hudChrome.auraOverlay.title')?.action).toEqual({
+      kind: 'goto',
+      view: 'auras',
+    });
   });
 
   it('adds the online-only Report a Bug row when bug reporting is available', () => {

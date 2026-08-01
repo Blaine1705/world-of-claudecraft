@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
 import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
@@ -103,7 +103,7 @@ export const questObjectCacheInternalsForTest = {
 if (typeof window !== 'undefined') {
   const urls = [...new Set(Object.values(QUEST_OBJECT_URLS))];
   for (const url of urls) {
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(url)
         .then((g) => {
           gltfByUrl.set(url, g);

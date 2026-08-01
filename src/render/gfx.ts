@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { NATIVE_APP } from '../client_origin';
+import { tightMemoryDeviceHint } from '../device_memory_hint';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
 import { gfxAaPolicy } from './gfx_aa_policy_core';
@@ -85,6 +86,8 @@ export interface GfxRuntimeHints {
   narrowViewport: boolean;
   gpuRenderer?: string;
   nativeApp?: boolean;
+  /** 4 GB-class device or a fresh entry-crash marker (src/device_memory_hint.ts). */
+  tightMemory?: boolean;
   platform?: 'ios' | 'android' | 'other';
   graphicsPreset?: number;
   terrainDetail?: number;
@@ -97,6 +100,9 @@ export interface GfxRuntimeHints {
 export interface GfxSettings {
   readonly graphicsConfigVersion: number;
   readonly tier: GfxTier;
+  /** Static presentation tier for optional effects controlled by the preset/sub-knob. */
+  readonly effectsTier: GfxTier;
+  readonly tightMemory: boolean;
   readonly bucketBands: GfxBucketBands;
   readonly bucketBaselines: GfxBucketLevels;
   readonly budget: GfxRuntimeBudget;
@@ -867,6 +873,10 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
   // tier (and its density/VFX progression) while routing the packaged iOS app through the
   // bounded-residency material/world path from scene construction onward.
   const nativeIosMemoryProfile = hints?.nativeApp === true && hints.platform === 'ios';
+  // The stricter 4 GB-class rung. The native shell can measure physicalMemory,
+  // while either native WKWebView or iOS Safari can stamp the same marker after
+  // a foreground entry kill. Both WebKit hosts share the WebContent ceiling.
+  const tightMemoryProfile = hints?.platform === 'ios' && hints?.tightMemory === true;
   // Phone-class browsers live under a hard per-process memory ceiling (iOS WebKit evicts the
   // WebContent process outright); shed the largest one-shot GPU allocations there. Shadow-map
   // texels, MSAA, and DPR are cosmetic sharpness only, so this never crosses the
@@ -883,6 +893,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
   let settings: GfxSettings = {
     graphicsConfigVersion: GFX_CONFIG_VERSION,
     tier,
+    effectsTier: tier,
     bucketBands,
     bucketBaselines: bucketBaselines(bucketBands),
     budget: GFX_BUDGETS[tier],
@@ -974,7 +985,12 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     maxPointLights: nativeIosMemoryProfile ? 2 : constrainedMemory ? 3 : 6,
     constrainedMemory,
     nativeIosMemoryProfile,
-    maxPooledCharacterVisuals: nativeIosMemoryProfile ? 6 : Number.POSITIVE_INFINITY,
+    tightMemory: tightMemoryProfile,
+    maxPooledCharacterVisuals: tightMemoryProfile
+      ? 4
+      : nativeIosMemoryProfile
+        ? 6
+        : Number.POSITIVE_INFINITY,
     // Extra articulated rigs are skinning + draw-call cost, so the phone-class
     // memory profiles and the low tier (which includes software GL) opt out and
     // keep the straight-to-frozen far LOD.
@@ -1046,6 +1062,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     if (effectsValue < EFFECTS_QUALITY_LOW_CUTOFF)
       settings = {
         ...settings,
+        effectsTier: 'low',
         composer: false,
         gradePass: true,
         ao: false,
@@ -1148,6 +1165,7 @@ function runtimeHints(): GfxRuntimeHints {
         : false,
     gpuRenderer: probeGpuRenderer(),
     nativeApp: NATIVE_APP,
+    tightMemory: tightMemoryDeviceHint(),
     platform: mobilePlatformFromNavigator(nav),
     graphicsPreset: storedNumericSetting('graphicsPreset'),
     terrainDetail: storedNumericSetting('terrainDetail'),
@@ -1421,6 +1439,7 @@ export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
 
 export const gfxInternalsForTest = {
   settingsFor,
+  runtimeHints,
   mobilePlatformFromNavigator,
   probeGpuRenderer,
   resetGpuRendererProbe: () => {

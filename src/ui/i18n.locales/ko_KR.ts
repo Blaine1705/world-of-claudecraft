@@ -2270,6 +2270,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': '그 퀘스트를 주는 대상이 근처에 없습니다.',
   'questUi.errors.turnInMissing': '그 퀘스트를 보고할 대상이 근처에 없습니다.',
   'questUi.errors.tooFar': '너무 멉니다.',
+  'questUi.errors.escortAway': '호송할 대상이 지금 자리에 없습니다. 잠시 후 그곳으로 돌아옵니다.',
   'itemUi.money.goldShort': '금',
   'itemUi.money.silverShort': '은',
   'itemUi.money.copperShort': '동',
@@ -4357,6 +4358,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': '영웅의 징표',
   'hudChrome.raidLockout.heroicName': '영웅: {name}',
   'hudChrome.raidLockout.heroicLocked': '영웅 난이도 {name}에 귀속되었습니다.',
+  'hudChrome.riftTracker.title': '균열',
+  'hudChrome.riftTracker.floor': '{total}층 중 {current}층',
+  'hudChrome.riftTracker.closesIn': '균열이 {time} 후 닫힙니다',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
   'entities.items.morthens_cryptforged_hauberk.name': '모르텐의 묘지주조 사슬갑옷',
   'entities.items.shadowpulse_handwraps.name': '어둠파동 손싸개',
   'entities.items.bonechill_striders.name': '뼈서리 장화',
@@ -4602,7 +4608,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': '숯불 워든에게 보고',
   'entities.quests.q_fs_bram_come_home.title': '브람아 돌아오렴',
   'entities.quests.q_fs_bram_come_home.text':
-    '그물 균열이 열리던 아침에 우리 브람이 배를 몰고 나갔는데, 바다가 그이를 선착장 곶 너머 어딘가로 내던졌어요. 사흘 전 밤에 그이가 물 너머로 부르는 소리를 들었어요, {playerName}. 그런데도 나는 무서워서 가지 못했어요. 지금도 무서워요. 부탁이에요. 그이의 배가 북쪽 물가에 부서져 있어요. 그이를 집까지 데려다주세요.',
+    '그물 균열이 열리던 아침에 우리 브람이 배를 몰고 나갔는데, 바다가 그이를 선착장 곶 너머 어딘가로 내던졌어요. 사흘 전 밤에 그이가 물 너머로 부르는 소리를 들었어요, {playerName}. 그런데도 나는 무서워서 가지 못했어요. 지금도 무서워요. 부탁이에요. 그이의 배가 남쪽 물가에 부서져 있어요. 그이를 집까지 데려다주세요.',
   'entities.quests.q_fs_bram_come_home.completion':
     '브람! 그이를 성한 몸으로 데려다주셨군요, {playerName}. 우리 둘 다 울었지만 부끄럽지 않아요. 균열이 이 섬에서 다음에 무엇을 앗아 가든, 내 가족만은 안 돼요. 이제 다시는요.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
@@ -4688,7 +4694,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_rime_unbound.objectives.0.label': '서리 정령 처치',
   'entities.quests.q_fv_seeing_wren_home.title': '렌을 바래다주는 길',
   'entities.quests.q_fv_seeing_wren_home.text':
-    '내 견습생 렌이 이틀 전에 금빛눈녹이 길을 살피러 나갔다가 돌아오지 않았네. 발자국은 찾았어. 오로라 계단 남서쪽 길표지 아래 웅크리고 있는데, 늑대가 무서워 꼼짝을 못 하고 있지. 나는 늪을 비울 수가 없네, {playerName}. 그 아이를 계단 위 베일라의 야영지까지 데려다주게. 빛 아래라면 안전할 걸세.',
+    '내 견습생 렌이 이틀 전에 금빛눈녹이 길을 살피러 나갔다가 돌아오지 않았네. 발자국은 찾았어. 오로라 계단 북동쪽 길표지 아래 웅크리고 있는데, 늑대가 무서워 꼼짝을 못 하고 있지. 나는 늪을 비울 수가 없네, {playerName}. 그 아이를 계단 위 베일라의 야영지까지 데려다주게. 빛 아래라면 안전할 걸세.',
   'entities.quests.q_fv_seeing_wren_home.completion':
     '그 아이는 안에 있네. 내 담요를 절반이나 두르고서 하늘의 별을 다 헤아릴 기세로 떠들고 있지. 오늘 자네는 고운 일을 했어, {playerName}. 서리장막 봉우리에서는 좀처럼 보기 힘든 일이라네.',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
@@ -6762,12 +6768,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.duskGreeter': '수호자 샐윈, 엘더글림',
   'guide.worldPage.duskPlaceNotes':
     '엘더글림은 큰 나무 아래 모여 있다. 황혼 동굴과 그 전망대는 들어가는 길이자 골짜기를 처음 내려다보는 곳이다. 고대나무 숲과 별내림 분지는 고요한 남쪽을 지키고, 가라앉은 궁정은 동쪽에 수풀 우거진 폐허를 품으며, 빛나는 심처와 수정 여울은 북쪽에서 은은히 빛난다.',
-  'guide.family.murloc.name': '개굴지느러미족',
-  'guide.family.murloc.desc':
-    '호숫가와 조수 웅덩이에 사는 개골거리는 물고기 인간들로, 물가에 너무 가까이 들어오는 것은 무엇이든 재빨리 떼 지어 덮칩니다.',
-  'guide.family.kobold.name': '장난꾸러기 정령',
-  'guide.family.kobold.desc':
-    '숲속 공터와 산울타리를 종종거리며 뒤지는 약탈꾼과 요정들로, 수가 모이기 전까지는 위협이라기보다 골칫거리에 가깝습니다.',
   'guide.family.demon.name': '악마',
   'guide.family.demon.desc':
     '균열 너머에서 온 침략자들로, 온통 불길과 악의뿐입니다. 악마 하나가 서 있는 곳이라면, 균열이 결코 멀지 않습니다.',
@@ -8076,6 +8076,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': '요청이 너무 큽니다. 데이터를 줄여 다시 시도하세요.',
   'apiError.body.unsupported_media_type': '지원되지 않는 요청 형식입니다.',
   'apiError.deeds.invalid_input': '입력이 올바르지 않습니다.',
+  'apiError.ota_updates.invalid_input': '입력이 올바르지 않습니다.',
   'apiError.steam.disabled': '현재 Steam 연동을 사용할 수 없습니다.',
   'apiError.wallet.handoff_invalid':
     '지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요.',
@@ -8085,6 +8086,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.already_linked': '계정에 이미 연동된 Steam 계정이 있습니다.',
   'apiError.steam.account_taken': '해당 Steam 계정은 이미 다른 계정에 연결되어 있습니다.',
   'apiError.steam.upstream': 'Steam이 응답하지 않습니다. 잠시 후 다시 시도해 주세요.',
+  'apiError.epic.disabled': '현재 Epic 연동을 사용할 수 없습니다.',
+  'apiError.epic.invalid_token':
+    'Epic이 이 연동 요청을 확인하지 못했습니다. 데스크톱 앱에서 다시 시도해 주세요.',
+  'apiError.epic.banned': '해당 Epic 계정은 연동할 수 없습니다.',
+  'apiError.epic.already_linked': '계정에 이미 연동된 Epic 계정이 있습니다.',
+  'apiError.epic.account_taken': '해당 Epic 계정은 이미 다른 계정에 연결되어 있습니다.',
+  'apiError.epic.upstream': 'Epic이 응답하지 않습니다. 잠시 후 다시 시도해 주세요.',
   'apiError.db.conflict': '변경 사항이 다른 업데이트와 충돌했습니다. 다시 시도해 주세요.',
   'apiError.rate_limit.exceeded': '요청이 너무 많습니다. {seconds} 후에 다시 시도하세요.',
   'apiError.internal.error': '서버 측에서 문제가 발생했습니다. 다시 시도해 주세요.',
@@ -8953,6 +8961,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '데스크톱 앱에서 Steam 계정을 연동하면 획득한 업적이 Steam 도전 과제로 반영됩니다.',
   'hudChrome.steam.noTicket':
     'Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요.',
+  'hudChrome.epic.link': 'Epic 연동',
+  'hudChrome.epic.unlink': 'Epic 연동 해제',
+  'hudChrome.epic.linked': 'Epic 계정 {id}에 연동됨',
+  'hudChrome.epic.benefits':
+    'Epic 데스크톱 앱에서 Epic 계정을 연동하면 획득한 업적이 Epic 도전 과제로 반영됩니다.',
+  'hudChrome.epic.noProof':
+    'Epic에서 연동 증명을 받지 못했습니다. Epic Games Store에서 실행한 뒤 다시 시도해 주세요.',
+  'hudChrome.epic.title': 'Epic',
   'hudChrome.deeds.title': '업적의 서',
   'hudChrome.deeds.close': '업적의 서 닫기',
   'hudChrome.deeds.searchPlaceholder': '업적 검색',
@@ -9056,6 +9072,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '그림자 도약 두꺼비 카마카게',
   'hudChrome.mounts.name_stormfeather_griffin': '하늘닿이 폭풍깃',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',
+  'hudChrome.mounts.name_terrorspark_groundshaker': '대지를 뒤흔드는 테러스파크',
   'hudChrome.mounts.desc_valorsteed': '여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.',
   'hudChrome.mounts.desc_grag_bear': '여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.',
   'hudChrome.mounts.desc_stalkglider_snail': '여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.',
@@ -9067,6 +9084,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     '깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.',
+  'hudChrome.mounts.desc_terrorspark_groundshaker':
+    '묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.',
   'hudChrome.mounts.emptyTitle': '보유한 탈것 없음',
   'hudChrome.mounts.emptyStableHint':
     '20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.',
@@ -9167,11 +9186,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '몇 가지 자주 쓰는 명령어는 외워 둘 만합니다. /w 이름은 귓속말을 보내고, /r은 마지막으로 받은 귓속말에 답하며, /invite는 상대를 파티로 초대하고, /follow는 친구 뒤를 따라 걷게 하며, /roll은 파티가 함께 볼 주사위를 굴리고, /who는 접속 중인 사람을 보여주며, /afk는 자리 비움으로 표시합니다. 전체 목록은 게임에서 /help를 입력해 확인하세요.',
   'guide.social.slashHeading': '유용한 슬래시 명령어',
   // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.helpUnstuckSickness':
+    '탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 가장 가까운 묘지로 이동시키며 쓰러져 있었다면 부활시킵니다. 최대 5분 동안 탈출의 후유증이 남습니다.',
   'hudChrome.unstuck.menuButton': '갇힘 탈출',
   'hudChrome.unstuck.help':
     '탈출: /unstuck은 제자리에서 카운트다운을 시작한 뒤 주변의 도달 가능한 안전한 위치로 이동합니다.',
   'hudChrome.unstuck.helpAtGraveyard':
     '탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 영혼을 가장 가까운 묘지로 보냅니다. 되살아나려면 영혼 치유사에게서 수호자의 대가를 받아야 합니다.',
+  'hudChrome.unstuck.movedToGraveyard':
+    '가장 가까운 묘지로 이동했습니다. 탈출의 후유증이 당신을 짓누릅니다.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    '가장 가까운 묘지로 이동해 부활했습니다. 탈출의 후유증이 당신을 짓누릅니다.',
   'hudChrome.unstuck.started':
     '{seconds}초 후 탈출합니다. 이동, 전투, 피해를 받거나 다른 행동을 시작하면 취소됩니다.',
   'hudChrome.unstuck.countdown': '갇힘 탈출: {seconds}',
@@ -9378,7 +9403,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '깜빡임 걸음, 서리장막 및 상급 투명화의 재사용 대기시간을 즉시 초기화합니다. (마법사 특성)',
   'entities.abilities.greater_invisibility.name': '상급 투명화',
   'entities.abilities.greater_invisibility.description':
-    '20초 동안 모습을 감춥니다. 지속 피해 효과 2개를 제거하고 투명 상태인 동안과 해제 직후 받는 피해가 90% 감소합니다. (마법사 특성)',
+    '20초 동안 사라지며 지속 피해 효과를 2개 제거합니다. 투명화가 끝나면 2초 동안 받는 피해가 90% 감소합니다. (마법사 특성)',
   'entities.abilities.hot_streak.name': '몰아치는 열기',
   'entities.abilities.hot_streak.description':
     '지속 효과: 화염 주문(화염구, 화염 작렬, 불태우기, 불덩이 작렬 또는 불기둥)으로 연속 두 번 치명타를 적중시키면 다음 불덩이 작렬 또는 불기둥이 즉시 시전되고 마나를 소모하지 않습니다. 소모 주문은 무료 시전을 포함해 다음 연속 발동 조건에 포함됩니다. 불기둥은 적중한 적의 수와 관계없이 한 번만 계산되며 최초 충격만 조건에 포함됩니다. (화염)',
@@ -9843,6 +9868,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '마지막 요새',
   'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
+  'entities.items.reins_terrorspark_groundshaker.name': '테러스파크 시동 열쇠',
   'entities.dungeons.the_last_keep.leaveText':
     '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',
   'entities.items.wildheart_tuskblade.name': '야생심장 엄니대검',
@@ -10649,4 +10675,59 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.levels': '레벨 {min}부터 {max}까지',
   'hudChrome.continentMap.toZone': '지역 지도',
   'hudChrome.enchanting.wornTagIndexed': '착용 중 ({slot} {index})',
+  'hudChrome.targetAuras.title': '대상 오라',
+  'hudChrome.targetAuras.keybindLabel': '대상 강화 및 약화 효과',
+  'hudChrome.targetAuras.debuffs': '약화 효과',
+  'hudChrome.targetAuras.buffs': '강화 효과',
+  'hudChrome.targetAuras.unlock': '대상 오라 창 이동',
+  'hudChrome.targetAuras.lock': '대상 오라 창 잠금',
+  'hudChrome.targetAuras.configureRows': '대상 오라 설정',
+  'hudChrome.targetAuras.fewerRows': '오라 행 수 줄이기',
+  'hudChrome.targetAuras.moreRows': '오라 행 수 늘리기',
+  'hudChrome.targetAuras.visibleRows': '선호하는 오라 행 수: {count}',
+  'hudChrome.targetAuras.showSources': '오라 시전자 이름 표시',
+  'hudChrome.targetAuras.hideSources': '오라 시전자 이름 숨기기',
+  'hudChrome.targetAuras.ownAura': '내 오라',
+  'hudChrome.targetAuras.opacity': '오라 불투명도: {percent}',
+  'hudChrome.auraOverlay.title': '오라',
+  'hudChrome.auraOverlay.currentClass': '현재 직업: {class}',
+  'hudChrome.auraOverlay.previewHint': '위치 설정으로 오라를 옮겨 메뉴를 가리지 마세요.',
+  'hudChrome.auraOverlay.noProcs': '이 캐릭터에 지원되는 발동이 없습니다.',
+  'hudChrome.auraOverlay.enabled': '오라 표시',
+  'hudChrome.auraOverlay.icon': '주문 아이콘',
+  'hudChrome.auraOverlay.arcs': '측면 초승달',
+  'hudChrome.auraOverlay.groundRing': '지면 고리',
+  'hudChrome.auraOverlay.groundRingSpellOrder': '지면 고리: 주문 순서',
+  'hudChrome.auraOverlay.crescentsSpellOrder': '측면 초승달: 주문 순서',
+  'hudChrome.auraOverlay.size': '크기',
+  'hudChrome.auraOverlay.iconSize': '아이콘 크기',
+  'hudChrome.auraOverlay.crescentBlockSize': '초승달 블록 크기',
+  'hudChrome.auraOverlay.groundRingBlockSize': '지면 고리 블록 크기',
+  'hudChrome.auraOverlay.opacity': '불투명도',
+  'hudChrome.auraOverlay.color': '색상',
+  'hudChrome.auraOverlay.allOn': '모두 켜기',
+  'hudChrome.auraOverlay.allOff': '모두 끄기',
+  'hudChrome.auraOverlay.reposition': '위치 설정',
+  'hudChrome.auraOverlay.positioning': '배치: {aura}',
+  'hudChrome.auraOverlay.selectAura': '오라',
+  'hudChrome.auraOverlay.done': '완료',
+  'hudChrome.auraOverlay.moveLeft': '왼쪽 이동',
+  'hudChrome.auraOverlay.moveUp': '위로 이동',
+  'hudChrome.auraOverlay.moveDown': '아래로 이동',
+  'hudChrome.auraOverlay.moveRight': '오른쪽 이동',
+  'hudChrome.auraOverlay.moveEarlier': '주문을 안쪽으로',
+  'hudChrome.auraOverlay.moveLater': '주문을 바깥쪽으로',
+  'hudChrome.auraOverlay.screenPosition': '화면 위치',
+  'hudChrome.auraOverlay.spellOrder': '주문 순서',
+  'hudChrome.auraOverlay.reset': '위치 초기화',
+  'hudChrome.auraOverlay.spellPosition': '주문 순서 {position} / {count}',
+  'hudChrome.auraOverlay.procs.revenge': '복수!',
+  'hudChrome.auraOverlay.procs.battleTrance': '전투 명상',
+  'hudChrome.auraOverlay.procs.overpowerCharge': '적수 강화',
+  'hudChrome.auraOverlay.procs.suddenDeath': '급사',
+  'hudChrome.auraOverlay.procs.victoryRush': '승리의 돌진',
+  'hudChrome.auraOverlay.procs.enrage': '혼란: 격노',
+  'hudChrome.auraOverlay.procs.heatingUp': '달아오름',
+  'hudChrome.auraOverlay.procs.arcaneCharge': '비전 충전',
+  'hudChrome.auraOverlay.procs.aetherRush': '에테르 쇄도',
 };

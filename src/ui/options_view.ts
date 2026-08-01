@@ -261,6 +261,7 @@ export type OptionsPanelId =
   | 'controller'
   | 'graphics'
   | 'interface'
+  | 'auras'
   | 'audio'
   | 'performance'
   | 'bugreport';
@@ -284,6 +285,7 @@ export function buildOptionsMenu(opts: { bugReportAvailable: boolean }): Options
     { labelKey: 'hudChrome.controller.title', action: { kind: 'goto', view: 'controller' } },
     { labelKey: 'hud.options.graphics', action: { kind: 'goto', view: 'graphics' } },
     { labelKey: 'hud.options.interface', action: { kind: 'goto', view: 'interface' } },
+    { labelKey: 'hudChrome.auraOverlay.title', action: { kind: 'goto', view: 'auras' } },
     { labelKey: 'hud.options.audio', action: { kind: 'goto', view: 'audio' } },
     { labelKey: 'hudChrome.perf.title', action: { kind: 'goto', view: 'performance' } },
   ];

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { applyWornStone } from './worn_stone';
@@ -18,7 +18,7 @@ let loadedDoorArchGltf: THREE.Group | null = null;
 let loadedWildheartGateGltf: THREE.Group | null = null;
 
 if (typeof window !== 'undefined') {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(DOOR_ARCH_ASSET_URL).then((gltf) => {
       const scene = gltf.scene;
       // The GLB opening faces its local X axis; the procedural arch it
@@ -35,7 +35,7 @@ if (typeof window !== 'undefined') {
       loadedDoorArchGltf = scene;
     }),
   );
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(WILDHEART_GATE_ASSET_URL).then((gltf) => {
       gltf.scene.traverse((child) => {
         if (!(child instanceof THREE.Mesh)) return;
@@ -380,7 +380,7 @@ function fittedPropClone(
 }
 
 if (typeof window !== 'undefined') {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(RIFT_GATE_URL)
       .then((gltf) => {
         // Per-portal views clone the scene but SHARE geometry/material refs with
@@ -395,7 +395,7 @@ if (typeof window !== 'undefined') {
         riftGateGltf = null;
       }),
   );
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(RIFT_ROCK_URL)
       .then((gltf) => {
         markGltfShared(gltf);
@@ -405,7 +405,7 @@ if (typeof window !== 'undefined') {
         riftRockGltf = null;
       }),
   );
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(RIFT_FLAME_URL)
       .then((gltf) => {
         markGltfShared(gltf);
@@ -415,7 +415,7 @@ if (typeof window !== 'undefined') {
         riftFlameGltf = null;
       }),
   );
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(RIFT_RUNE_URL)
       .then((gltf) => {
         markGltfShared(gltf);

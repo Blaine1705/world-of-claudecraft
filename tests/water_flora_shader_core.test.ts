@@ -31,7 +31,10 @@ describe('water flora packed ORM shader', () => {
     vi.doMock('../src/render/assets/loader', () => ({
       loadGltf: vi.fn(() => new Promise(() => {})),
     }));
-    vi.doMock('../src/render/assets/preload', () => ({ registerPreload: vi.fn() }));
+    vi.doMock('../src/render/assets/preload', () => ({
+      registerPreload: vi.fn(),
+      registerDeferredPreload: vi.fn(),
+    }));
     const { waterFloraShaderInternalsForTest } = await import('../src/render/water_flora');
 
     const orm = new THREE.Texture();
@@ -70,7 +73,10 @@ describe('water flora packed ORM shader', () => {
     vi.doMock('../src/render/assets/loader', () => ({
       loadGltf: vi.fn(() => new Promise(() => {})),
     }));
-    vi.doMock('../src/render/assets/preload', () => ({ registerPreload: vi.fn() }));
+    vi.doMock('../src/render/assets/preload', () => ({
+      registerPreload: vi.fn(),
+      registerDeferredPreload: vi.fn(),
+    }));
     const { waterFloraShaderInternalsForTest } = await import('../src/render/water_flora');
 
     const makeMaterial = (): {

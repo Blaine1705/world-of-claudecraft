@@ -15,6 +15,9 @@ vi.mock('../src/render/assets/loader', () => ({
 
 vi.mock('../src/render/assets/preload', () => ({
   registerPreload: mocks.registerPreload,
+  // Deferred lane: start the thunk immediately so the existing registration
+  // assertions still observe the same in-flight promise they did eagerly.
+  registerDeferredPreload: (start: () => Promise<unknown>) => mocks.registerPreload(start()),
 }));
 
 vi.mock('../src/render/worn_stone', () => ({

@@ -23,6 +23,9 @@ async function compileWornShader(
     registerPreload: (promise: Promise<unknown>) => {
       pending.push(promise);
     },
+    registerDeferredPreload: (start: () => Promise<unknown>) => {
+      pending.push(start());
+    },
   }));
 
   const { applySurfaceDetail } = await import('../src/render/worn_stone');

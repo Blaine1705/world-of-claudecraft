@@ -340,11 +340,14 @@ export const ja_JP: EnTranslations = {
       "menuButton": "スタック解除",
       "help": "復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。",
       "helpAtGraveyard": "復帰：/unstuck はその場でカウントダウンを開始し、完了すると魂を最寄りの墓地へ送ります。生き返るには霊魂の癒し手から番人の代償を受ける必要があります。",
+      "helpUnstuckSickness": "復帰：/unstuck はその場でカウントダウンを開始し、完了すると最寄りの墓地へ移動します。倒れていた場合は蘇生します。スタック解除の後遺症が最大5分間残ります。",
       "started": "{seconds}秒後にスタックを解除します。移動、戦闘、被ダメージ、別の行動を始めるとキャンセルされます。",
       "countdown": "スタック解除：{seconds}",
       "completed": "到達可能な最寄りの安全な場所へ移動しました。",
       "completedAtGraveyard": "魂は最寄りの墓地へ戻りました。霊魂の癒し手に話しかけ、番人の代償を受けてください。",
       "revivedAtGraveyard": "最寄りの墓地へ戻され、蘇生しました。番人の代償があなたにのしかかっています。",
+      "movedToGraveyard": "最寄りの墓地へ移動しました。スタック解除の後遺症があなたにのしかかっています。",
+      "revivedAtGraveyardUnstuck": "最寄りの墓地へ移動し、蘇生しました。スタック解除の後遺症があなたにのしかかっています。",
       "cancelledMoved": "移動したため、スタック解除をキャンセルしました。",
       "cancelledDamaged": "ダメージを受けたため、スタック解除をキャンセルしました。",
       "cancelledCombat": "戦闘に入ったため、スタック解除をキャンセルしました。",
@@ -885,6 +888,13 @@ export const ja_JP: EnTranslations = {
       "heroicName": "ヒロイック:{name}",
       "heroicLocked": "ヒロイックの{name}にロックされています。"
     },
+    "riftTracker": {
+      "title": "リフト",
+      "floor": "フロア {current}/{total}",
+      "closesIn": "リフトは{time}後に閉じます",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "北",
       "NE": "北東",
@@ -912,6 +922,23 @@ export const ja_JP: EnTranslations = {
       "dock": "このメーターをメーターウィンドウに戻す",
       "separate": "{meter}を分離",
       "regroup": "{meter}を統合"
+    },
+    "targetAuras": {
+      "title": "ターゲットのオーラ",
+      "keybindLabel": "ターゲットのバフとデバフ",
+      "all": "All",
+      "debuffs": "デバフ",
+      "buffs": "バフ",
+      "unlock": "ターゲットオーラウィンドウを移動",
+      "lock": "ターゲットオーラウィンドウをロック",
+      "configureRows": "ターゲットオーラを設定",
+      "fewerRows": "オーラ行数を少なくする",
+      "moreRows": "オーラ行数を多くする",
+      "visibleRows": "優先するオーラ行数: {count}",
+      "showSources": "オーラの使用者名を表示",
+      "hideSources": "オーラの使用者名を非表示",
+      "ownAura": "自分のオーラ",
+      "opacity": "オーラの不透明度: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "ペットは満タンの体力です",
@@ -956,13 +983,15 @@ export const ja_JP: EnTranslations = {
       "name_shadowjump_toad": "影跳びのカマカゲ",
       "name_stormfeather_griffin": "スカイリーチ・ストームフェザー",
       "name_thunderstrut_gobbler": "大七面鳥サンダーストラット",
+      "name_terrorspark_groundshaker": "地揺らしのテラースパーク",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
       "desc_aether_hover_cycle": "低空ホバーで戦場を駆け抜けるために設計された強力な魔導バイク。",
       "desc_shadowjump_toad": "どんな地形も影の跳躍で瞬時に越える、巨大で足取り確かなガマ。",
       "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。",
-      "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。"
+      "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。",
+      "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。"
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
@@ -1268,6 +1297,51 @@ export const ja_JP: EnTranslations = {
       "badges": {
         "backgrounded": "バックグラウンド",
         "offline": "オフライン"
+      }
+    },
+    "auraOverlay": {
+      "title": "オーラ",
+      "currentClass": "現在のクラス: {class}",
+      "previewHint": "「位置を設定」でオーラを動かし、メニューを隠さないようにします。",
+      "noProcs": "このキャラクターに対応する発動効果がありません。",
+      "enabled": "オーラを表示",
+      "icon": "スペルアイコン",
+      "arcs": "サイドクレセント",
+      "groundRing": "グラウンドリング",
+      "groundRingSpellOrder": "グラウンドリング: スペル順",
+      "crescentsSpellOrder": "サイドクレセント: スペル順",
+      "size": "サイズ",
+      "iconSize": "アイコンサイズ",
+      "crescentBlockSize": "クレセントブロックサイズ",
+      "groundRingBlockSize": "グラウンドリングブロックサイズ",
+      "opacity": "不透明度",
+      "color": "色",
+      "allOn": "すべてオン",
+      "allOff": "すべてオフ",
+      "reposition": "位置を設定",
+      "positioning": "配置: {aura}",
+      "selectAura": "オーラ",
+      "done": "完了",
+      "moveLeft": "左へ移動",
+      "moveUp": "上へ移動",
+      "moveDown": "下へ移動",
+      "moveRight": "右へ移動",
+      "moveEarlier": "スペルを内側へ",
+      "moveLater": "スペルを外側へ",
+      "screenPosition": "画面位置",
+      "spellOrder": "スペル順",
+      "reset": "位置をリセット",
+      "spellPosition": "スペル順 {position} / {count}",
+      "procs": {
+        "revenge": "リベンジ！",
+        "battleTrance": "バトルトランス",
+        "overpowerCharge": "レッドハンドエンパワー",
+        "suddenDeath": "サドンデス",
+        "victoryRush": "ビクトリーラッシュ",
+        "enrage": "メイヘム: エンレイジ",
+        "heatingUp": "ヒーティングアップ",
+        "arcaneCharge": "アーケインチャージ",
+        "aetherRush": "エーテルラッシュ"
       }
     },
     "playerCard": {
@@ -2072,6 +2146,14 @@ export const ja_JP: EnTranslations = {
       "linked": "Steamアカウント {id} と連携済み",
       "benefits": "デスクトップアプリからSteamアカウントを連携すると、獲得した功績がSteam実績に反映されます。",
       "noTicket": "Steamから連携チケットを取得できませんでした。Steamを起動してからもう一度お試しください。"
+    },
+    "epic": {
+      "title": "Epic",
+      "link": "Epicと連携",
+      "unlink": "Epic連携を解除",
+      "linked": "Epicアカウント {id} と連携済み",
+      "benefits": "EpicデスクトップアプリからEpicアカウントを連携すると、獲得した功績がEpic実績に反映されます。",
+      "noProof": "Epicから連携証明を取得できませんでした。Epic Games Storeから起動してからもう一度お試しください。"
     },
     "mailbox": {
       "title": "メールボックス",
@@ -2924,8 +3006,19 @@ export const ja_JP: EnTranslations = {
       "account_taken": "そのSteamアカウントは既に別のアカウントに連携されています。",
       "upstream": "Steamから応答がありません。しばらくしてからもう一度お試しください。"
     },
+    "epic": {
+      "disabled": "Epic連携は現在利用できません。",
+      "invalid_token": "Epicがこの連携リクエストを確認できませんでした。デスクトップアプリからもう一度お試しください。",
+      "banned": "そのEpicアカウントは連携できません。",
+      "already_linked": "このアカウントには既にEpicアカウントが連携されています。",
+      "account_taken": "そのEpicアカウントは既に別のアカウントに連携されています。",
+      "upstream": "Epicから応答がありません。しばらくしてからもう一度お試しください。"
+    },
     "wallet": {
       "handoff_invalid": "ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。"
+    },
+    "ota_updates": {
+      "invalid_input": "入力が無効です。"
     }
   },
   "guide": {
@@ -3525,14 +3618,6 @@ export const ja_JP: EnTranslations = {
       "reptile": {
         "name": "爬虫類",
         "desc": "独特の威嚇音と鋭い一撃を持つ、冷血のハンターたち。温血の獣たちとは一線を画します。"
-      },
-      "murloc": {
-        "name": "クロークフィン",
-        "desc": "湖岸や潮だまりに棲む、しわがれ声の魚人たち。近づきすぎた者には、すぐさま群れをなして襲いかかります。"
-      },
-      "kobold": {
-        "name": "いたずら小妖",
-        "desc": "林間や生け垣をちょろちょろと駆け回る、漁り屋の小妖たち。数が揃うまでは、脅威というより厄介者です。"
       },
       "demon": {
         "name": "デーモン",
@@ -6839,7 +6924,8 @@ export const ja_JP: EnTranslations = {
       "incomplete": "そのクエストは完了していません。",
       "giverMissing": "そのクエストの依頼主が近くにいません。",
       "turnInMissing": "そのクエストの報告先が近くにいません。",
-      "tooFar": "遠すぎます。"
+      "tooFar": "遠すぎます。",
+      "escortAway": "護衛する相手は今その場所にいません。しばらくすれば戻ってきます。"
     }
   },
   "itemUi": {
@@ -7227,7 +7313,7 @@ export const ja_JP: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "グレーターインビジビリティ",
-        "description": "20秒間姿を消します。継続ダメージ効果を2個解除し、透明状態の間と解除直後は受けるダメージが90%減少します。（メイジタレント）"
+        "description": "20 秒間姿を消し、継続ダメージ効果を 2 つ取り除く。透明化が終了すると、2 秒間、受けるダメージが 90% 減少する。（メイジのタレント）"
       },
       "hot_streak": {
         "name": "ホットストリーク",
@@ -9733,6 +9819,9 @@ export const ja_JP: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "最後の砦の印章"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "テラースパークの始動キー"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"
@@ -12842,7 +12931,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "レンを送り届けて",
-        "text": "弟子のレンが二日前にゴールドメルトの罠のラインを見回りに出て、戻ってこない。足跡は見つけた。オーロラの階段の南西の道標の下に隠れて、狼が怖くて動けずにいるんだ。わたしは沼を離れられない、{playerName}。あの子を階段のヴェイラの野営まで歩かせてやってくれ。光の下なら安全だ。",
+        "text": "弟子のレンが二日前にゴールドメルトの罠のラインを見回りに出て、戻ってこない。足跡は見つけた。オーロラの階段の北東の道標の下に隠れて、狼が怖くて動けずにいるんだ。わたしは沼を離れられない、{playerName}。あの子を階段のヴェイラの野営まで歩かせてやってくれ。光の下なら安全だ。",
         "completion": "あの子は中にいるよ。わたしの毛布を半分体に巻きつけて、空から星を語り落とす勢いでしゃべっている。今日、お前は優しいことをしたね、{playerName}。この果ての地では、めったに見られないものだよ。",
         "objectives": {
           "0": {
@@ -13526,7 +13615,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "ブラムを家へ",
-        "text": "うちのブラムは、網場の裂け目が開いたあの朝に船を出して、海は船着き場の岬の先のどこかに彼を打ち返した。三晩前に聞いたんだ、{playerName}、水の向こうから呼ぶ声を。なのに怖くて行けなかった。今でも怖い。お願いだ。彼の船は北の岸で難破している。彼を家まで連れて帰っておくれ。",
+        "text": "うちのブラムは、網場の裂け目が開いたあの朝に船を出して、海は船着き場の岬の先のどこかに彼を打ち返した。三晩前に聞いたんだ、{playerName}、水の向こうから呼ぶ声を。なのに怖くて行けなかった。今でも怖い。お願いだ。彼の船は南の岸で難破している。彼を家まで連れて帰っておくれ。",
         "completion": "ブラム！五体満足で連れ帰ってくれたんだね、{playerName}。ふたりして泣いたけど、どちらも恥じてなんかいないよ。裂け目どもが次にこの島から何を奪おうと、うちの家族だけは渡さない。もう二度と。",
         "objectives": {
           "0": {
