@@ -415,16 +415,22 @@ describe('dedupe key semantics (the pure claim/release layer, R60)', () => {
     expect(claimDedupeKey('r60:backoff', 102_000)).toBe(true);
   });
 
-  it('a live-key flood past the 512 cap evicts oldest-first instead of rescanning forever', () => {
+  it('a live-key flood past the 4096 cap evicts oldest-first instead of rescanning forever', () => {
     // Stamps sit far past any real-clock stamp the suites above left behind,
-    // so those leftovers read as expired and are pruned first; these 600 are
+    // so those leftovers read as expired and are pruned first; these 4200 are
     // all inside one TTL of each other, so expiry alone cannot shrink the
-    // map and the overflow backstop must evict from the OLD end.
+    // map and the overflow backstop must evict from the OLD end. The cap is
+    // sized for the 1,000-concurrent target (the whole-branch db review):
+    // eviction inside a TTL costs a duplicate card and an extra opt-out
+    // read, so the flood here must exceed the cap, not sit at it.
     const base = 9_000_000_000_000;
-    for (let i = 0; i < 600; i++) claimDedupeKey(`r60:ov:${i}`, base + i);
+    for (let i = 0; i < 4200; i++) claimDedupeKey(`r60:ov:${i}`, base + i);
     // The oldest key was evicted: it re-claims inside what would have been
     // its own TTL window. The newest key survived and still dedupes.
-    expect(claimDedupeKey('r60:ov:0', base + 700)).toBe(true);
-    expect(claimDedupeKey('r60:ov:599', base + 700)).toBe(false);
+    expect(claimDedupeKey('r60:ov:0', base + 4300)).toBe(true);
+    expect(claimDedupeKey('r60:ov:4199', base + 4300)).toBe(false);
+    // And a population UNDER the cap never evicts: key 200 was claimed after
+    // the flood start yet inside the TTL, so it still dedupes.
+    expect(claimDedupeKey('r60:ov:200', base + 4300)).toBe(false);
   });
 });

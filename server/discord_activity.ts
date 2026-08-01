@@ -50,7 +50,17 @@ const MAX_QUEUE = 100; // backstop so a stalled/absent bot can never grow this u
 // several sim events (a loot roll per candidate, an arena end per ally) is posted
 // once. Keys expire after DEDUPE_TTL_MS.
 const DEDUPE_TTL_MS = 30_000;
-const MAX_RECENT_KEYS = 512;
+// Sized for the 1,000-concurrent load target the packet was measured
+// against, not for comfort at today's population: the map is SHARED across
+// every activity kind (rareloot per roll id, duel, vale_cup, deed,
+// masterwork per account), so at the old 512 cap a sustained rate above
+// about 17 keyed events per second would keep the live set at the cap and
+// the oldest-first backstop would evict aged masterwork windows still
+// inside their TTL, each eviction buying one duplicate card plus one extra
+// opt-out db read inside the window it was supposed to own. 4096 keys is
+// about 8x that rate before eviction starts, and the memory (a short
+// string and a number per entry) is negligible.
+const MAX_RECENT_KEYS = 4096;
 // After a rejected gated read the claimant re-opens the key only this far
 // into the future: a single blip costs one card (a retry lands 2s later),
 // while a sustained outage still costs at most one read per backoff window

@@ -1269,9 +1269,13 @@ export async function handleAdminApi(
       return ok(res, await listCharacters(search, sort, dir, page, limit));
     }
     // R35 professions inspector (the RouteDef twin's exact shape: live
-    // serializeCharacter snapshot when online, stored blob otherwise).
+    // serializeCharacter snapshot when online, stored blob otherwise). The
+    // explicit GET check matches every sibling branch in this ladder: the
+    // central ADMIN_ROUTE_PERMISSIONS gate already refuses other methods, but
+    // this branch must not silently start serving one the day someone adds a
+    // POST permission for the path.
     const characterProfessionsMatch = /^\/admin\/api\/characters\/(\d+)\/professions$/.exec(path);
-    if (characterProfessionsMatch) {
+    if (req.method === 'GET' && characterProfessionsMatch) {
       const id = Number(characterProfessionsMatch[1]);
       // Live snapshot FIRST (the RouteDef twin's exact shape): a live read
       // discards the blob, so the query skips fetching it.

@@ -46,7 +46,7 @@ import {
   recordCharacterCreation,
 } from './player_metrics_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
-import { REALM } from './realm';
+import { REALM, REALM_DIRECTORY } from './realm';
 import { chooseArchiveName } from './reclaim_name';
 import { SOCIAL_SCHEMA } from './social_db';
 import { UNSTUCK_SCHEMA } from './unstuck_db';
@@ -143,8 +143,12 @@ console.log(
 // (true of the shipped single-box deployment); directory entries hosted on
 // their own databases have their own budgets, so the warning below names the
 // assumption instead of pretending to know each realm's DATABASE_URL.
-const realmDirectoryEntries = (process.env.REALMS ?? '').split(',');
-const configuredRealmCount = realmDirectoryEntries.filter((e) => e.trim() !== '').length;
+// Counted through the SAME parser the realm directory ships from
+// (REALM_DIRECTORY dedupes names and drops malformed or non-origin entries),
+// so the warning's arithmetic matches the processes that will actually boot
+// rather than raw comma segments. Unset REALMS parses to the single-realm
+// fallback entry, which can never trip the ceiling on its own.
+const configuredRealmCount = REALM_DIRECTORY.length;
 if (configuredRealmCount * DB_POOL_MAX_CLIENTS > DB_POOL_MAX_CLIENTS_CEILING) {
   console.warn(
     `db pool: ${configuredRealmCount} realms x ${DB_POOL_MAX_CLIENTS} clients = ${configuredRealmCount * DB_POOL_MAX_CLIENTS} connections, past the ${DB_POOL_MAX_CLIENTS_CEILING} usable on stock postgres:16 (max_connections 100, 3 superuser-reserved) and before ensureSchema's one boot client per realm. If every realm shares this DATABASE_URL, logins will fail with "too many clients" at peak: lower DB_POOL_MAX_CLIENTS or raise max_connections.`,
