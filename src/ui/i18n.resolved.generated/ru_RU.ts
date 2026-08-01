@@ -926,7 +926,7 @@ export const ru_RU: EnTranslations = {
     "targetAuras": {
       "title": "Ауры цели",
       "keybindLabel": "Усиления и ослабления цели",
-      "all": "All",
+      "all": "Все",
       "debuffs": "Ослабления",
       "buffs": "Усиления",
       "unlock": "Переместить окно аур цели",

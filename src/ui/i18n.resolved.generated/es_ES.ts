@@ -924,21 +924,21 @@ export const es_ES: EnTranslations = {
       "regroup": "Reagrupar {meter}"
     },
     "targetAuras": {
-      "title": "Target Auras",
-      "keybindLabel": "Target Buffs and Debuffs",
-      "all": "All",
-      "debuffs": "Debuffs",
-      "buffs": "Buffs",
-      "unlock": "Move target aura window",
-      "lock": "Lock target aura window",
-      "configureRows": "Configure target auras",
-      "fewerRows": "Prefer fewer aura rows",
-      "moreRows": "Prefer more aura rows",
-      "visibleRows": "Preferred aura rows: {count}",
-      "showSources": "Show aura sources",
-      "hideSources": "Hide aura sources",
-      "ownAura": "Your aura",
-      "opacity": "Aura opacity: {percent}"
+      "title": "Auras del objetivo",
+      "keybindLabel": "Beneficios y perjuicios del objetivo",
+      "all": "Todos",
+      "debuffs": "Perjuicios",
+      "buffs": "Beneficios",
+      "unlock": "Mover la ventana de auras del objetivo",
+      "lock": "Bloquear la ventana de auras del objetivo",
+      "configureRows": "Configurar las auras del objetivo",
+      "fewerRows": "Preferir menos filas de auras",
+      "moreRows": "Preferir más filas de auras",
+      "visibleRows": "Filas de auras preferidas: {count}",
+      "showSources": "Mostrar las fuentes de las auras",
+      "hideSources": "Ocultar las fuentes de las auras",
+      "ownAura": "Tu aura",
+      "opacity": "Opacidad de las auras: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "La mascota tiene la salud al maximo",
@@ -983,7 +983,7 @@ export const es_ES: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, el Sapo Saltasombras",
       "name_stormfeather_griffin": "Plumatormenta Alcanzacielos",
       "name_thunderstrut_gobbler": "Pavoneatruenos, el Gran Pavo",
-      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
+      "name_terrorspark_groundshaker": "Aterrachispa, Sacudetierras",
       "desc_valorsteed": "Un corcel resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_grag_bear": "Un oso resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_stalkglider_snail": "Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.",
@@ -991,7 +991,7 @@ export const es_ES: EnTranslations = {
       "desc_shadowjump_toad": "Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.",
       "desc_stormfeather_griffin": "Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.",
       "desc_thunderstrut_gobbler": "Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta.",
-      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
+      "desc_terrorspark_groundshaker": "Una máquina blindada y compacta con orugas pesadas, un cañón de gran calibre y una silla hecha para pilotos intrépidos."
     },
     "mountTraining": {
       "mountPrompt": "Pulsa {key} para montar el Corcel del Valor de entrenamiento.",
@@ -1301,47 +1301,47 @@ export const es_ES: EnTranslations = {
     },
     "auraOverlay": {
       "title": "Auras",
-      "currentClass": "Current class: {class}",
-      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
-      "noProcs": "No supported proc is available for this character.",
-      "enabled": "Show Aura",
-      "icon": "Spell Icon",
-      "arcs": "Side Crescents",
-      "groundRing": "Ground Ring",
-      "groundRingSpellOrder": "Ground Ring: Spell Order",
-      "crescentsSpellOrder": "Side Crescents: Spell Order",
-      "size": "Size",
-      "iconSize": "Icon Size",
-      "crescentBlockSize": "Crescent Block Size",
-      "groundRingBlockSize": "Ground Ring Block Size",
-      "opacity": "Opacity",
+      "currentClass": "Clase actual: {class}",
+      "previewHint": "Usa Configurar posiciones para mover un aura sin tapar el menú.",
+      "noProcs": "No hay ningún proc compatible para este personaje.",
+      "enabled": "Mostrar aura",
+      "icon": "Icono de hechizo",
+      "arcs": "Medialunas laterales",
+      "groundRing": "Anillo en el suelo",
+      "groundRingSpellOrder": "Anillo en el suelo: orden de hechizos",
+      "crescentsSpellOrder": "Medialunas laterales: orden de hechizos",
+      "size": "Tamaño",
+      "iconSize": "Tamaño del icono",
+      "crescentBlockSize": "Tamaño de bloque de medialuna",
+      "groundRingBlockSize": "Tamaño de bloque del anillo en el suelo",
+      "opacity": "Opacidad",
       "color": "Color",
-      "allOn": "All On",
-      "allOff": "All Off",
-      "reposition": "Setup Positions",
-      "positioning": "Positioning: {aura}",
+      "allOn": "Activar todas",
+      "allOff": "Desactivar todas",
+      "reposition": "Configurar posiciones",
+      "positioning": "Posicionando: {aura}",
       "selectAura": "Aura",
-      "done": "Done",
-      "moveLeft": "Move Left",
-      "moveUp": "Move Up",
-      "moveDown": "Move Down",
-      "moveRight": "Move Right",
-      "moveEarlier": "Move spell inward",
-      "moveLater": "Move spell outward",
-      "screenPosition": "Screen Position",
-      "spellOrder": "Spell Order",
-      "reset": "Reset Position",
-      "spellPosition": "Spell order {position} / {count}",
+      "done": "Listo",
+      "moveLeft": "Mover a la izquierda",
+      "moveUp": "Mover arriba",
+      "moveDown": "Mover abajo",
+      "moveRight": "Mover a la derecha",
+      "moveEarlier": "Mover el hechizo hacia dentro",
+      "moveLater": "Mover el hechizo hacia fuera",
+      "screenPosition": "Posición en pantalla",
+      "spellOrder": "Orden de hechizos",
+      "reset": "Restablecer posición",
+      "spellPosition": "Orden de hechizos {position} / {count}",
       "procs": {
-        "revenge": "Revenge!",
-        "battleTrance": "Battle Trance",
-        "overpowerCharge": "Redhand Empowerment",
-        "suddenDeath": "Sudden Death",
-        "victoryRush": "Victory Rush",
-        "enrage": "Mayhem: Enraged",
-        "heatingUp": "Heating Up",
-        "arcaneCharge": "Arcane Charges",
-        "aetherRush": "Aether Rush"
+        "revenge": "¡Venganza!",
+        "battleTrance": "Trance de Batalla",
+        "overpowerCharge": "Potenciación de Mano Roja",
+        "suddenDeath": "Muerte Súbita",
+        "victoryRush": "Ímpetu de Victoria",
+        "enrage": "Estrago: Enfurecido",
+        "heatingUp": "Calentando",
+        "arcaneCharge": "Cargas Arcanas",
+        "aetherRush": "Oleada de Éter"
       }
     },
     "playerCard": {
@@ -2149,11 +2149,11 @@ export const es_ES: EnTranslations = {
     },
     "epic": {
       "title": "Epic",
-      "link": "Link Epic",
-      "unlink": "Unlink Epic",
-      "linked": "Linked to Epic account {id}",
-      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
-      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+      "link": "Vincular Epic",
+      "unlink": "Desvincular Epic",
+      "linked": "Vinculado a la cuenta de Epic {id}",
+      "benefits": "Vincula tu cuenta de Epic desde la aplicación de escritorio de Epic para reflejar las gestas que consigas en logros de Epic.",
+      "noProof": "Epic no proporcionó una prueba de vinculación. Inicia desde la Epic Games Store y vuelve a intentarlo."
     },
     "mailbox": {
       "title": "Buzón",
@@ -3007,12 +3007,12 @@ export const es_ES: EnTranslations = {
       "upstream": "Steam no respondió. Inténtalo de nuevo en un momento."
     },
     "epic": {
-      "disabled": "Epic linking is not available right now.",
-      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
-      "banned": "That Epic account cannot be linked.",
-      "already_linked": "Your account already has a linked Epic account.",
-      "account_taken": "That Epic account is already linked to another account.",
-      "upstream": "Epic did not respond. Try again in a moment."
+      "disabled": "La vinculación con Epic no está disponible en este momento.",
+      "invalid_token": "Epic no pudo verificar esta solicitud de vinculación. Inténtalo de nuevo desde la aplicación de escritorio.",
+      "banned": "Esa cuenta de Epic no se puede vincular.",
+      "already_linked": "Tu cuenta ya tiene una cuenta de Epic vinculada.",
+      "account_taken": "Esa cuenta de Epic ya está vinculada a otra cuenta.",
+      "upstream": "Epic no respondió. Inténtalo de nuevo en un momento."
     },
     "wallet": {
       "handoff_invalid": "La autorización de la cartera ha caducado o no se ha podido verificar. Inténtalo de nuevo."
@@ -7315,7 +7315,7 @@ export const es_ES: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Invisibilidad mejorada",
-        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
+        "description": "Desapareces durante 20 s y eliminas 2 efectos de daño periódico. Cuando termina la invisibilidad, recibes un 90% menos de daño durante 2 s. (Talento de mago)"
       },
       "hot_streak": {
         "name": "Racha ardiente",
@@ -9835,7 +9835,7 @@ export const es_ES: EnTranslations = {
         "name": "Sello del Last Keep"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Ignition Key: Terrorspark Groundshaker"
+        "name": "Llave de encendido: Aterrachispa, Sacudetierras"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"

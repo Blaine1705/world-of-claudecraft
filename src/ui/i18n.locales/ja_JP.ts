@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.targetAuras.all': 'すべて',
   'hudChrome.crafting.identity.ceilingRare': 'レア上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',

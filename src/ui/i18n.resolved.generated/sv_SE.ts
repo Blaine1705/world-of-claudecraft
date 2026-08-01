@@ -924,21 +924,21 @@ export const sv_SE: EnTranslations = {
       "regroup": "Gruppera {meter} igen"
     },
     "targetAuras": {
-      "title": "Target Auras",
-      "keybindLabel": "Target Buffs and Debuffs",
-      "all": "All",
-      "debuffs": "Debuffs",
-      "buffs": "Buffs",
-      "unlock": "Move target aura window",
-      "lock": "Lock target aura window",
-      "configureRows": "Configure target auras",
-      "fewerRows": "Prefer fewer aura rows",
-      "moreRows": "Prefer more aura rows",
-      "visibleRows": "Preferred aura rows: {count}",
-      "showSources": "Show aura sources",
-      "hideSources": "Hide aura sources",
-      "ownAura": "Your aura",
-      "opacity": "Aura opacity: {percent}"
+      "title": "Målets auror",
+      "keybindLabel": "Målets buffar och debuffar",
+      "all": "Alla",
+      "debuffs": "Debuffar",
+      "buffs": "Buffar",
+      "unlock": "Flytta fönstret för målets auror",
+      "lock": "Lås fönstret för målets auror",
+      "configureRows": "Konfigurera målets auror",
+      "fewerRows": "Föredra färre aurarader",
+      "moreRows": "Föredra fler aurarader",
+      "visibleRows": "Önskat antal aurarader: {count}",
+      "showSources": "Visa aurakällor",
+      "hideSources": "Dölj aurakällor",
+      "ownAura": "Din aura",
+      "opacity": "Auraopacitet: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Husdjuret har fulla livspunkter",
@@ -983,7 +983,7 @@ export const sv_SE: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Skuggsprångspaddan",
       "name_stormfeather_griffin": "Himmelsvidd Stormfjäder",
       "name_thunderstrut_gobbler": "Åskstoltsern, Den stora kalkonen",
-      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
+      "name_terrorspark_groundshaker": "Skräckgnista, markskakaren",
       "desc_valorsteed": "En uthållig, säkerfotad stridshäst som ger ökad reshastighet.",
       "desc_grag_bear": "En uthållig, säkerfotad björn som ger ökad reshastighet.",
       "desc_stalkglider_snail": "En robust, långsamt brinnande snigel som ger ökad reshastighet.",
@@ -991,7 +991,7 @@ export const sv_SE: EnTranslations = {
       "desc_shadowjump_toad": "En massiv, säkerfotad jättepadda, tränad i blixtsnabba skuggsprång som täcker all terräng.",
       "desc_stormfeather_griffin": "En kunglig stormgrip som smyger fram på runskodda klor, med vingarna hopfällda.",
       "desc_thunderstrut_gobbler": "En kolossal stormkläckt kalkon som stoltserar ner från Den vaknande toppen, med stjärten spretande som ett åskmoln.",
-      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
+      "desc_terrorspark_groundshaker": "En kompakt bepansrad maskin med tunga larvband, en grovkalibrig kanon och en sadel byggd för orädda förare."
     },
     "mountTraining": {
       "mountPrompt": "Tryck på {key} för att sitta upp på övnings-Tapperhetshästen.",
@@ -1300,48 +1300,48 @@ export const sv_SE: EnTranslations = {
       }
     },
     "auraOverlay": {
-      "title": "Auras",
-      "currentClass": "Current class: {class}",
-      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
-      "noProcs": "No supported proc is available for this character.",
-      "enabled": "Show Aura",
-      "icon": "Spell Icon",
-      "arcs": "Side Crescents",
-      "groundRing": "Ground Ring",
-      "groundRingSpellOrder": "Ground Ring: Spell Order",
-      "crescentsSpellOrder": "Side Crescents: Spell Order",
-      "size": "Size",
-      "iconSize": "Icon Size",
-      "crescentBlockSize": "Crescent Block Size",
-      "groundRingBlockSize": "Ground Ring Block Size",
-      "opacity": "Opacity",
-      "color": "Color",
-      "allOn": "All On",
-      "allOff": "All Off",
-      "reposition": "Setup Positions",
-      "positioning": "Positioning: {aura}",
+      "title": "Auror",
+      "currentClass": "Nuvarande klass: {class}",
+      "previewHint": "Använd Ställ in positioner för att flytta en aura utan att täcka menyn.",
+      "noProcs": "Ingen proc som stöds är tillgänglig för den här karaktären.",
+      "enabled": "Visa aura",
+      "icon": "Besvärjelseikon",
+      "arcs": "Sidohalvmånar",
+      "groundRing": "Markring",
+      "groundRingSpellOrder": "Markring: besvärjelseordning",
+      "crescentsSpellOrder": "Sidohalvmånar: besvärjelseordning",
+      "size": "Storlek",
+      "iconSize": "Ikonstorlek",
+      "crescentBlockSize": "Blockstorlek för halvmåne",
+      "groundRingBlockSize": "Blockstorlek för markring",
+      "opacity": "Opacitet",
+      "color": "Färg",
+      "allOn": "Slå på alla",
+      "allOff": "Stäng av alla",
+      "reposition": "Ställ in positioner",
+      "positioning": "Placering: {aura}",
       "selectAura": "Aura",
-      "done": "Done",
-      "moveLeft": "Move Left",
-      "moveUp": "Move Up",
-      "moveDown": "Move Down",
-      "moveRight": "Move Right",
-      "moveEarlier": "Move spell inward",
-      "moveLater": "Move spell outward",
-      "screenPosition": "Screen Position",
-      "spellOrder": "Spell Order",
-      "reset": "Reset Position",
-      "spellPosition": "Spell order {position} / {count}",
+      "done": "Klar",
+      "moveLeft": "Flytta vänster",
+      "moveUp": "Flytta upp",
+      "moveDown": "Flytta ned",
+      "moveRight": "Flytta höger",
+      "moveEarlier": "Flytta besvärjelsen inåt",
+      "moveLater": "Flytta besvärjelsen utåt",
+      "screenPosition": "Skärmposition",
+      "spellOrder": "Besvärjelseordning",
+      "reset": "Återställ position",
+      "spellPosition": "Besvärjelseordning {position} / {count}",
       "procs": {
-        "revenge": "Revenge!",
-        "battleTrance": "Battle Trance",
-        "overpowerCharge": "Redhand Empowerment",
-        "suddenDeath": "Sudden Death",
-        "victoryRush": "Victory Rush",
-        "enrage": "Mayhem: Enraged",
-        "heatingUp": "Heating Up",
-        "arcaneCharge": "Arcane Charges",
-        "aetherRush": "Aether Rush"
+        "revenge": "Hämnd!",
+        "battleTrance": "Stridstrans",
+        "overpowerCharge": "Rödhandsförstärkning",
+        "suddenDeath": "Plötslig död",
+        "victoryRush": "Segerrus",
+        "enrage": "Kalabalik: Rasande",
+        "heatingUp": "Uppvärmning",
+        "arcaneCharge": "Arkana laddningar",
+        "aetherRush": "Eterrusning"
       }
     },
     "playerCard": {
@@ -2149,11 +2149,11 @@ export const sv_SE: EnTranslations = {
     },
     "epic": {
       "title": "Epic",
-      "link": "Link Epic",
-      "unlink": "Unlink Epic",
-      "linked": "Linked to Epic account {id}",
-      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
-      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+      "link": "Länka Epic",
+      "unlink": "Ta bort Epic-länkning",
+      "linked": "Länkat till Epic-kontot {id}",
+      "benefits": "Länka ditt Epic-konto från Epics skrivbordsapp för att spegla bedrifterna du tjänar in som Epic-prestationer.",
+      "noProof": "Epic angav inget länkningsbevis. Starta från Epic Games Store och försök igen."
     },
     "mailbox": {
       "title": "Brevlåda",
@@ -3007,12 +3007,12 @@ export const sv_SE: EnTranslations = {
       "upstream": "Steam svarade inte. Försök igen om en stund."
     },
     "epic": {
-      "disabled": "Epic linking is not available right now.",
-      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
-      "banned": "That Epic account cannot be linked.",
-      "already_linked": "Your account already has a linked Epic account.",
-      "account_taken": "That Epic account is already linked to another account.",
-      "upstream": "Epic did not respond. Try again in a moment."
+      "disabled": "Epic-länkning är inte tillgänglig just nu.",
+      "invalid_token": "Epic kunde inte verifiera den här länkningsbegäran. Försök igen från skrivbordsappen.",
+      "banned": "Det Epic-kontot kan inte länkas.",
+      "already_linked": "Ditt konto har redan ett länkat Epic-konto.",
+      "account_taken": "Det Epic-kontot är redan länkat till ett annat konto.",
+      "upstream": "Epic svarade inte. Försök igen om en stund."
     },
     "wallet": {
       "handoff_invalid": "Den plånboksbehörigheten har gått ut eller kunde inte verifieras. Försök igen."
@@ -6270,15 +6270,15 @@ export const sv_SE: EnTranslations = {
       "graphicsPresetMedium": "Medel",
       "graphicsPresetHigh": "Hög",
       "graphicsPresetUltra": "Ultra",
-      "graphicsPresetInsane": "Insane",
+      "graphicsPresetInsane": "Extrem",
       "graphicsPresetAdvanced": "Avancerad",
       "terrainDetail": "Terrängdetalj",
       "foliageDensity": "Lövverkstäthet",
       "effectsQuality": "Effekter och ljus",
       "shadowQuality": "Skuggkvalitet",
-      "surfaceDetail": "Surface Detail",
-      "surfaceDetailBasic": "Basic",
-      "surfaceDetailFull": "Full",
+      "surfaceDetail": "Ytdetaljer",
+      "surfaceDetailBasic": "Grundläggande",
+      "surfaceDetailFull": "Fullständig",
       "terrainLow": "Låg",
       "terrainHigh": "Hög",
       "touchOpacity": "Pekkontrollernas opacitet",
@@ -7315,7 +7315,7 @@ export const sv_SE: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Förbättrad osynlighet",
-        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
+        "description": "Försvinn i 20 sek och ta bort 2 effekter med skada över tid. När osynligheten upphör tar du 90% mindre skada i 2 sek. (magikertalang)"
       },
       "hot_streak": {
         "name": "Het svit",
@@ -9835,7 +9835,7 @@ export const sv_SE: EnTranslations = {
         "name": "Sista fästets signetring"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Ignition Key: Terrorspark Groundshaker"
+        "name": "Tändningsnyckel: Skräckgnista, markskakaren"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

@@ -924,21 +924,21 @@ export const fr_CA: EnTranslations = {
       "regroup": "Regrouper {meter}"
     },
     "targetAuras": {
-      "title": "Target Auras",
-      "keybindLabel": "Target Buffs and Debuffs",
-      "all": "All",
-      "debuffs": "Debuffs",
-      "buffs": "Buffs",
-      "unlock": "Move target aura window",
-      "lock": "Lock target aura window",
-      "configureRows": "Configure target auras",
-      "fewerRows": "Prefer fewer aura rows",
-      "moreRows": "Prefer more aura rows",
-      "visibleRows": "Preferred aura rows: {count}",
-      "showSources": "Show aura sources",
-      "hideSources": "Hide aura sources",
-      "ownAura": "Your aura",
-      "opacity": "Aura opacity: {percent}"
+      "title": "Auras de la cible",
+      "keybindLabel": "Améliorations et affaiblissements de la cible",
+      "all": "Tous",
+      "debuffs": "Affaiblissements",
+      "buffs": "Améliorations",
+      "unlock": "Déplacer la fenêtre des auras de la cible",
+      "lock": "Verrouiller la fenêtre des auras de la cible",
+      "configureRows": "Configurer les auras de la cible",
+      "fewerRows": "Préférer moins de rangées d’auras",
+      "moreRows": "Préférer plus de rangées d’auras",
+      "visibleRows": "Rangées d’auras préférées : {count}",
+      "showSources": "Afficher les sources des auras",
+      "hideSources": "Masquer les sources des auras",
+      "ownAura": "Votre aura",
+      "opacity": "Opacité des auras : {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Le familier est à pleine santé",
@@ -983,7 +983,7 @@ export const fr_CA: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, le Crapaud Saute-Ombre",
       "name_stormfeather_griffin": "Plume-d’Orage Toise-Ciel",
       "name_thunderstrut_gobbler": "Pavane-Tonnerre, le Grand Dindon",
-      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
+      "name_terrorspark_groundshaker": "Terrétincelle, l’Ébranleur de sol",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_stalkglider_snail": "Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.",
@@ -991,7 +991,7 @@ export const fr_CA: EnTranslations = {
       "desc_shadowjump_toad": "Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.",
       "desc_stormfeather_griffin": "Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.",
       "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.",
-      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
+      "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides."
     },
     "mountTraining": {
       "mountPrompt": "Appuyez sur {key} pour monter le Valorsteed d'entraînement.",
@@ -1301,47 +1301,47 @@ export const fr_CA: EnTranslations = {
     },
     "auraOverlay": {
       "title": "Auras",
-      "currentClass": "Current class: {class}",
-      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
-      "noProcs": "No supported proc is available for this character.",
-      "enabled": "Show Aura",
-      "icon": "Spell Icon",
-      "arcs": "Side Crescents",
-      "groundRing": "Ground Ring",
-      "groundRingSpellOrder": "Ground Ring: Spell Order",
-      "crescentsSpellOrder": "Side Crescents: Spell Order",
-      "size": "Size",
-      "iconSize": "Icon Size",
-      "crescentBlockSize": "Crescent Block Size",
-      "groundRingBlockSize": "Ground Ring Block Size",
-      "opacity": "Opacity",
-      "color": "Color",
-      "allOn": "All On",
-      "allOff": "All Off",
-      "reposition": "Setup Positions",
-      "positioning": "Positioning: {aura}",
+      "currentClass": "Classe actuelle : {class}",
+      "previewHint": "Utilisez Configurer les positions pour déplacer une aura sans masquer le menu.",
+      "noProcs": "Aucun proc pris en charge n’est disponible pour ce personnage.",
+      "enabled": "Afficher l’aura",
+      "icon": "Icône du sort",
+      "arcs": "Croissants latéraux",
+      "groundRing": "Anneau au sol",
+      "groundRingSpellOrder": "Anneau au sol : ordre des sorts",
+      "crescentsSpellOrder": "Croissants latéraux : ordre des sorts",
+      "size": "Taille",
+      "iconSize": "Taille de l’icône",
+      "crescentBlockSize": "Taille des blocs du croissant",
+      "groundRingBlockSize": "Taille des blocs de l’anneau au sol",
+      "opacity": "Opacité",
+      "color": "Couleur",
+      "allOn": "Tout activer",
+      "allOff": "Tout désactiver",
+      "reposition": "Configurer les positions",
+      "positioning": "Positionnement : {aura}",
       "selectAura": "Aura",
-      "done": "Done",
-      "moveLeft": "Move Left",
-      "moveUp": "Move Up",
-      "moveDown": "Move Down",
-      "moveRight": "Move Right",
-      "moveEarlier": "Move spell inward",
-      "moveLater": "Move spell outward",
-      "screenPosition": "Screen Position",
-      "spellOrder": "Spell Order",
-      "reset": "Reset Position",
-      "spellPosition": "Spell order {position} / {count}",
+      "done": "Terminé",
+      "moveLeft": "Déplacer vers la gauche",
+      "moveUp": "Déplacer vers le haut",
+      "moveDown": "Déplacer vers le bas",
+      "moveRight": "Déplacer vers la droite",
+      "moveEarlier": "Déplacer le sort vers l’intérieur",
+      "moveLater": "Déplacer le sort vers l’extérieur",
+      "screenPosition": "Position à l’écran",
+      "spellOrder": "Ordre des sorts",
+      "reset": "Réinitialiser la position",
+      "spellPosition": "Ordre des sorts {position} / {count}",
       "procs": {
-        "revenge": "Revenge!",
-        "battleTrance": "Battle Trance",
-        "overpowerCharge": "Redhand Empowerment",
-        "suddenDeath": "Sudden Death",
-        "victoryRush": "Victory Rush",
-        "enrage": "Mayhem: Enraged",
-        "heatingUp": "Heating Up",
-        "arcaneCharge": "Arcane Charges",
-        "aetherRush": "Aether Rush"
+        "revenge": "Vengeance !",
+        "battleTrance": "Transe de combat",
+        "overpowerCharge": "Renforcement de Main rouge",
+        "suddenDeath": "Mort subite",
+        "victoryRush": "Ruée victorieuse",
+        "enrage": "Carnage : enragé",
+        "heatingUp": "Montée en chaleur",
+        "arcaneCharge": "Charges des Arcanes",
+        "aetherRush": "Ruée d’Aether"
       }
     },
     "playerCard": {
@@ -2149,11 +2149,11 @@ export const fr_CA: EnTranslations = {
     },
     "epic": {
       "title": "Epic",
-      "link": "Link Epic",
-      "unlink": "Unlink Epic",
-      "linked": "Linked to Epic account {id}",
-      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
-      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+      "link": "Lier Epic",
+      "unlink": "Délier Epic",
+      "linked": "Lié au compte Epic {id}",
+      "benefits": "Liez votre compte Epic depuis l’application de bureau Epic pour refléter les hauts faits que vous obtenez dans les succès Epic.",
+      "noProof": "Epic n’a pas fourni de preuve de liaison. Lancez le jeu depuis l’Epic Games Store, puis réessayez."
     },
     "mailbox": {
       "title": "Boîte aux lettres",
@@ -3007,12 +3007,12 @@ export const fr_CA: EnTranslations = {
       "upstream": "Steam n'a pas répondu. Réessayez dans un instant."
     },
     "epic": {
-      "disabled": "Epic linking is not available right now.",
-      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
-      "banned": "That Epic account cannot be linked.",
-      "already_linked": "Your account already has a linked Epic account.",
-      "account_taken": "That Epic account is already linked to another account.",
-      "upstream": "Epic did not respond. Try again in a moment."
+      "disabled": "La liaison Epic n’est pas disponible pour le moment.",
+      "invalid_token": "Epic n’a pas pu vérifier cette demande de liaison. Réessayez depuis l’application de bureau.",
+      "banned": "Ce compte Epic ne peut pas être lié.",
+      "already_linked": "Votre compte est déjà lié à un compte Epic.",
+      "account_taken": "Ce compte Epic est déjà lié à un autre compte.",
+      "upstream": "Epic n’a pas répondu. Réessayez dans un instant."
     },
     "wallet": {
       "handoff_invalid": "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez."
@@ -7315,7 +7315,7 @@ export const fr_CA: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Invisibilité accrue",
-        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
+        "description": "Vous disparaissez pendant 20 s et dissipez 2 effets de dégâts sur la durée. À la fin de l’invisibilité, vous subissez 90% de dégâts en moins pendant 2 s. (Talent de mage)"
       },
       "hot_streak": {
         "name": "Suite flamboyante",
@@ -9835,7 +9835,7 @@ export const fr_CA: EnTranslations = {
         "name": "Chevalière de The Last Keep"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Ignition Key: Terrorspark Groundshaker"
+        "name": "Clé de contact : Terrétincelle, l’Ébranleur de sol"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"

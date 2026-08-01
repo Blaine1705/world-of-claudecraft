@@ -924,21 +924,21 @@ export const cs_CZ: EnTranslations = {
       "regroup": "Znovu seskupit {meter}"
     },
     "targetAuras": {
-      "title": "Target Auras",
-      "keybindLabel": "Target Buffs and Debuffs",
-      "all": "All",
-      "debuffs": "Debuffs",
-      "buffs": "Buffs",
-      "unlock": "Move target aura window",
-      "lock": "Lock target aura window",
-      "configureRows": "Configure target auras",
-      "fewerRows": "Prefer fewer aura rows",
-      "moreRows": "Prefer more aura rows",
-      "visibleRows": "Preferred aura rows: {count}",
-      "showSources": "Show aura sources",
-      "hideSources": "Hide aura sources",
-      "ownAura": "Your aura",
-      "opacity": "Aura opacity: {percent}"
+      "title": "Aury cíle",
+      "keybindLabel": "Buffy a debuffy cíle",
+      "all": "Vše",
+      "debuffs": "Debuffy",
+      "buffs": "Buffy",
+      "unlock": "Přesunout okno aur cíle",
+      "lock": "Zamknout okno aur cíle",
+      "configureRows": "Nastavit aury cíle",
+      "fewerRows": "Upřednostnit méně řad aur",
+      "moreRows": "Upřednostnit více řad aur",
+      "visibleRows": "Preferované řady aur: {count}",
+      "showSources": "Zobrazit zdroje aur",
+      "hideSources": "Skrýt zdroje aur",
+      "ownAura": "Tvá aura",
+      "opacity": "Neprůhlednost aur: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Mazlíček má plné zdraví",
@@ -983,7 +983,7 @@ export const cs_CZ: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, stínoskákací ropucha",
       "name_stormfeather_griffin": "Nebeský Bouřepero",
       "name_thunderstrut_gobbler": "Hromokrok, Velký krocan",
-      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
+      "name_terrorspark_groundshaker": "Hrůzojiskra, otřásač země",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
       "desc_stalkglider_snail": "Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.",
@@ -991,7 +991,7 @@ export const cs_CZ: EnTranslations = {
       "desc_shadowjump_toad": "Mohutná, jistonohá obří ropucha, vycvičená v bleskurychlých stínových skocích, které zvládnou jakýkoli terén.",
       "desc_stormfeather_griffin": "Vznešený bouřný gryf, který se plíží po zemi na rounami okovaných spárech, se složenými křídly.",
       "desc_thunderstrut_gobbler": "Kolosální krocan zrozený z bouře, který se hrdě prochází z Probouzejícího se vrcholu, s ocasem rozevřeným jako bouřkový mrak.",
-      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
+      "desc_terrorspark_groundshaker": "Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty."
     },
     "mountTraining": {
       "mountPrompt": "Stiskni {key} pro nasednutí na cvičného Udatného oře.",
@@ -1300,48 +1300,48 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "auraOverlay": {
-      "title": "Auras",
-      "currentClass": "Current class: {class}",
-      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
-      "noProcs": "No supported proc is available for this character.",
-      "enabled": "Show Aura",
-      "icon": "Spell Icon",
-      "arcs": "Side Crescents",
-      "groundRing": "Ground Ring",
-      "groundRingSpellOrder": "Ground Ring: Spell Order",
-      "crescentsSpellOrder": "Side Crescents: Spell Order",
-      "size": "Size",
-      "iconSize": "Icon Size",
-      "crescentBlockSize": "Crescent Block Size",
-      "groundRingBlockSize": "Ground Ring Block Size",
-      "opacity": "Opacity",
-      "color": "Color",
-      "allOn": "All On",
-      "allOff": "All Off",
-      "reposition": "Setup Positions",
-      "positioning": "Positioning: {aura}",
+      "title": "Aury",
+      "currentClass": "Aktuální třída: {class}",
+      "previewHint": "Pomocí Nastavit pozice přesuň auru, aniž bys zakryl nabídku.",
+      "noProcs": "Pro tuto postavu není k dispozici žádný podporovaný proc.",
+      "enabled": "Zobrazit auru",
+      "icon": "Ikona kouzla",
+      "arcs": "Boční půlměsíce",
+      "groundRing": "Kruh na zemi",
+      "groundRingSpellOrder": "Kruh na zemi: pořadí kouzel",
+      "crescentsSpellOrder": "Boční půlměsíce: pořadí kouzel",
+      "size": "Velikost",
+      "iconSize": "Velikost ikony",
+      "crescentBlockSize": "Velikost bloku půlměsíce",
+      "groundRingBlockSize": "Velikost bloku kruhu na zemi",
+      "opacity": "Neprůhlednost",
+      "color": "Barva",
+      "allOn": "Vše zapnout",
+      "allOff": "Vše vypnout",
+      "reposition": "Nastavit pozice",
+      "positioning": "Umístění: {aura}",
       "selectAura": "Aura",
-      "done": "Done",
-      "moveLeft": "Move Left",
-      "moveUp": "Move Up",
-      "moveDown": "Move Down",
-      "moveRight": "Move Right",
-      "moveEarlier": "Move spell inward",
-      "moveLater": "Move spell outward",
-      "screenPosition": "Screen Position",
-      "spellOrder": "Spell Order",
-      "reset": "Reset Position",
-      "spellPosition": "Spell order {position} / {count}",
+      "done": "Hotovo",
+      "moveLeft": "Posunout doleva",
+      "moveUp": "Posunout nahoru",
+      "moveDown": "Posunout dolů",
+      "moveRight": "Posunout doprava",
+      "moveEarlier": "Posunout kouzlo dovnitř",
+      "moveLater": "Posunout kouzlo ven",
+      "screenPosition": "Pozice na obrazovce",
+      "spellOrder": "Pořadí kouzel",
+      "reset": "Resetovat pozici",
+      "spellPosition": "Pořadí kouzel {position} / {count}",
       "procs": {
-        "revenge": "Revenge!",
-        "battleTrance": "Battle Trance",
-        "overpowerCharge": "Redhand Empowerment",
-        "suddenDeath": "Sudden Death",
-        "victoryRush": "Victory Rush",
-        "enrage": "Mayhem: Enraged",
-        "heatingUp": "Heating Up",
-        "arcaneCharge": "Arcane Charges",
-        "aetherRush": "Aether Rush"
+        "revenge": "Odveta!",
+        "battleTrance": "Bojový trans",
+        "overpowerCharge": "Posílení Rudé ruky",
+        "suddenDeath": "Náhlá smrt",
+        "victoryRush": "Vítězný nápor",
+        "enrage": "Vřava: rozzuřen",
+        "heatingUp": "Zahřívání",
+        "arcaneCharge": "Arkánové náboje",
+        "aetherRush": "Éterický nával"
       }
     },
     "playerCard": {
@@ -2149,11 +2149,11 @@ export const cs_CZ: EnTranslations = {
     },
     "epic": {
       "title": "Epic",
-      "link": "Link Epic",
-      "unlink": "Unlink Epic",
-      "linked": "Linked to Epic account {id}",
-      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
-      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+      "link": "Propojit Epic",
+      "unlink": "Zrušit propojení s Epic",
+      "linked": "Propojeno s účtem Epic {id}",
+      "benefits": "Propoj svůj účet Epic z desktopové aplikace Epic, aby se tvé získané skutky promítly do úspěchů Epic.",
+      "noProof": "Epic neposkytl doklad o propojení. Spusť hru z Epic Games Store a zkus to znovu."
     },
     "mailbox": {
       "title": "Poštovní schránka",
@@ -3007,12 +3007,12 @@ export const cs_CZ: EnTranslations = {
       "upstream": "Steam neodpověděl. Zkus to za chvíli znovu."
     },
     "epic": {
-      "disabled": "Epic linking is not available right now.",
-      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
-      "banned": "That Epic account cannot be linked.",
-      "already_linked": "Your account already has a linked Epic account.",
-      "account_taken": "That Epic account is already linked to another account.",
-      "upstream": "Epic did not respond. Try again in a moment."
+      "disabled": "Propojení s Epic momentálně není k dispozici.",
+      "invalid_token": "Epic nemohl ověřit tento požadavek na propojení. Zkus to znovu z desktopové aplikace.",
+      "banned": "Tento účet Epic nelze propojit.",
+      "already_linked": "Tvůj účet již má propojený účet Epic.",
+      "account_taken": "Tento účet Epic je již propojen s jiným účtem.",
+      "upstream": "Epic neodpověděl. Zkus to za chvíli znovu."
     },
     "wallet": {
       "handoff_invalid": "Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu."
@@ -6270,15 +6270,15 @@ export const cs_CZ: EnTranslations = {
       "graphicsPresetMedium": "Střední",
       "graphicsPresetHigh": "Vysoká",
       "graphicsPresetUltra": "Ultra",
-      "graphicsPresetInsane": "Insane",
+      "graphicsPresetInsane": "Extrémní",
       "graphicsPresetAdvanced": "Pokročilé",
       "terrainDetail": "Detail terénu",
       "foliageDensity": "Hustota vegetace",
       "effectsQuality": "Efekty a osvětlení",
       "shadowQuality": "Kvalita stínů",
-      "surfaceDetail": "Surface Detail",
-      "surfaceDetailBasic": "Basic",
-      "surfaceDetailFull": "Full",
+      "surfaceDetail": "Detail povrchů",
+      "surfaceDetailBasic": "Základní",
+      "surfaceDetailFull": "Plný",
       "terrainLow": "Nízký",
       "terrainHigh": "Vysoký",
       "touchOpacity": "Krytí dotykového ovládání",
@@ -7315,7 +7315,7 @@ export const cs_CZ: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Dokonalá neviditelnost",
-        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
+        "description": "Zmizíš na 20 s a odstraníš 2 efekty poškození v čase. Když neviditelnost skončí, utrpíš o 90% nižší poškození po dobu 2 s. (mágovský talent)"
       },
       "hot_streak": {
         "name": "Žhavá série",
@@ -9835,7 +9835,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Signet Poslední tvrze"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Ignition Key: Terrorspark Groundshaker"
+        "name": "Klíček zapalování: Hrůzojiskra, otřásač země"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

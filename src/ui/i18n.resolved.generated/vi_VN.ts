@@ -924,21 +924,21 @@ export const vi_VN: EnTranslations = {
       "regroup": "Ghép lại {meter}"
     },
     "targetAuras": {
-      "title": "Target Auras",
-      "keybindLabel": "Target Buffs and Debuffs",
-      "all": "All",
-      "debuffs": "Debuffs",
-      "buffs": "Buffs",
-      "unlock": "Move target aura window",
-      "lock": "Lock target aura window",
-      "configureRows": "Configure target auras",
-      "fewerRows": "Prefer fewer aura rows",
-      "moreRows": "Prefer more aura rows",
-      "visibleRows": "Preferred aura rows: {count}",
-      "showSources": "Show aura sources",
-      "hideSources": "Hide aura sources",
-      "ownAura": "Your aura",
-      "opacity": "Aura opacity: {percent}"
+      "title": "Hào Quang Mục Tiêu",
+      "keybindLabel": "Buff và Debuff Mục Tiêu",
+      "all": "Tất cả",
+      "debuffs": "Debuff",
+      "buffs": "Buff",
+      "unlock": "Di chuyển cửa sổ hào quang mục tiêu",
+      "lock": "Khóa cửa sổ hào quang mục tiêu",
+      "configureRows": "Cấu hình hào quang mục tiêu",
+      "fewerRows": "Ưu tiên ít hàng hào quang hơn",
+      "moreRows": "Ưu tiên nhiều hàng hào quang hơn",
+      "visibleRows": "Số hàng hào quang mong muốn: {count}",
+      "showSources": "Hiện nguồn hào quang",
+      "hideSources": "Ẩn nguồn hào quang",
+      "ownAura": "Hào quang của bạn",
+      "opacity": "Độ mờ hào quang: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Thú cưng đang đầy máu",
@@ -983,7 +983,7 @@ export const vi_VN: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Cóc Nhảy Bóng Tối",
       "name_stormfeather_griffin": "Stormfeather Vươn Trời",
       "name_thunderstrut_gobbler": "Thunderstrut, Gà Tây Vĩ Đại",
-      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
+      "name_terrorspark_groundshaker": "Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất",
       "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_stalkglider_snail": "Một chú ốc sên bền bỉ, dẻo dai, giúp tăng tốc độ di chuyển.",
@@ -991,7 +991,7 @@ export const vi_VN: EnTranslations = {
       "desc_shadowjump_toad": "Một con cóc khổng lồ, bước chân vững chãi, được huấn luyện những cú nhảy bóng tối nhanh như chớp có thể vượt qua mọi địa hình.",
       "desc_stormfeather_griffin": "Một con sư tử đầu chim bão uy nghi, rảo bước trên mặt đất bằng những móng vuốt được bọc rune, đôi cánh xếp gọn.",
       "desc_thunderstrut_gobbler": "Một con gà tây khổng lồ nở ra từ giông bão, sải bước xuống từ Đỉnh Tỉnh Thức, đuôi xòe rộng như đám mây giông.",
-      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
+      "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ."
     },
     "mountTraining": {
       "mountPrompt": "Nhấn {key} để cưỡi Valorsteed huấn luyện.",
@@ -1300,48 +1300,48 @@ export const vi_VN: EnTranslations = {
       }
     },
     "auraOverlay": {
-      "title": "Auras",
-      "currentClass": "Current class: {class}",
-      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
-      "noProcs": "No supported proc is available for this character.",
-      "enabled": "Show Aura",
-      "icon": "Spell Icon",
-      "arcs": "Side Crescents",
-      "groundRing": "Ground Ring",
-      "groundRingSpellOrder": "Ground Ring: Spell Order",
-      "crescentsSpellOrder": "Side Crescents: Spell Order",
-      "size": "Size",
-      "iconSize": "Icon Size",
-      "crescentBlockSize": "Crescent Block Size",
-      "groundRingBlockSize": "Ground Ring Block Size",
-      "opacity": "Opacity",
-      "color": "Color",
-      "allOn": "All On",
-      "allOff": "All Off",
-      "reposition": "Setup Positions",
-      "positioning": "Positioning: {aura}",
-      "selectAura": "Aura",
-      "done": "Done",
-      "moveLeft": "Move Left",
-      "moveUp": "Move Up",
-      "moveDown": "Move Down",
-      "moveRight": "Move Right",
-      "moveEarlier": "Move spell inward",
-      "moveLater": "Move spell outward",
-      "screenPosition": "Screen Position",
-      "spellOrder": "Spell Order",
-      "reset": "Reset Position",
-      "spellPosition": "Spell order {position} / {count}",
+      "title": "Hào Quang",
+      "currentClass": "Lớp hiện tại: {class}",
+      "previewHint": "Dùng Thiết lập vị trí để di chuyển hào quang mà không che menu.",
+      "noProcs": "Không có proc được hỗ trợ nào khả dụng cho nhân vật này.",
+      "enabled": "Hiện hào quang",
+      "icon": "Biểu tượng phép",
+      "arcs": "Vành trăng bên",
+      "groundRing": "Vòng mặt đất",
+      "groundRingSpellOrder": "Vòng mặt đất: thứ tự phép",
+      "crescentsSpellOrder": "Vành trăng bên: thứ tự phép",
+      "size": "Kích thước",
+      "iconSize": "Kích thước biểu tượng",
+      "crescentBlockSize": "Kích thước khối vành trăng",
+      "groundRingBlockSize": "Kích thước khối vòng mặt đất",
+      "opacity": "Độ mờ",
+      "color": "Màu sắc",
+      "allOn": "Bật tất cả",
+      "allOff": "Tắt tất cả",
+      "reposition": "Thiết lập vị trí",
+      "positioning": "Định vị: {aura}",
+      "selectAura": "Hào quang",
+      "done": "Xong",
+      "moveLeft": "Di chuyển sang trái",
+      "moveUp": "Di chuyển lên",
+      "moveDown": "Di chuyển xuống",
+      "moveRight": "Di chuyển sang phải",
+      "moveEarlier": "Di chuyển phép vào trong",
+      "moveLater": "Di chuyển phép ra ngoài",
+      "screenPosition": "Vị trí trên màn hình",
+      "spellOrder": "Thứ tự phép",
+      "reset": "Đặt Lại Vị Trí",
+      "spellPosition": "Thứ tự phép {position} / {count}",
       "procs": {
-        "revenge": "Revenge!",
-        "battleTrance": "Battle Trance",
-        "overpowerCharge": "Redhand Empowerment",
-        "suddenDeath": "Sudden Death",
-        "victoryRush": "Victory Rush",
-        "enrage": "Mayhem: Enraged",
-        "heatingUp": "Heating Up",
-        "arcaneCharge": "Arcane Charges",
-        "aetherRush": "Aether Rush"
+        "revenge": "Phục Thù!",
+        "battleTrance": "Nhập Định Chiến Đấu",
+        "overpowerCharge": "Tăng Cường Bàn Tay Đẫm Máu",
+        "suddenDeath": "Đột Tử",
+        "victoryRush": "Đà Chiến Thắng",
+        "enrage": "Cuồng Loạn: Phẫn Nộ",
+        "heatingUp": "Đang Nóng Lên",
+        "arcaneCharge": "Điện Tích Bí Thuật",
+        "aetherRush": "Dòng Ê-te"
       }
     },
     "playerCard": {
@@ -2149,11 +2149,11 @@ export const vi_VN: EnTranslations = {
     },
     "epic": {
       "title": "Epic",
-      "link": "Link Epic",
-      "unlink": "Unlink Epic",
-      "linked": "Linked to Epic account {id}",
-      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
-      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+      "link": "Liên kết Epic",
+      "unlink": "Hủy liên kết Epic",
+      "linked": "Đã liên kết với tài khoản Epic {id}",
+      "benefits": "Liên kết tài khoản Epic của bạn từ ứng dụng máy tính Epic để phản chiếu các kỳ công bạn đạt được thành thành tựu Epic.",
+      "noProof": "Epic không cung cấp bằng chứng liên kết. Hãy khởi chạy từ Epic Games Store rồi thử lại."
     },
     "mailbox": {
       "title": "Hòm Thư",
@@ -3007,12 +3007,12 @@ export const vi_VN: EnTranslations = {
       "upstream": "Steam không phản hồi. Hãy thử lại sau giây lát."
     },
     "epic": {
-      "disabled": "Epic linking is not available right now.",
-      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
-      "banned": "That Epic account cannot be linked.",
-      "already_linked": "Your account already has a linked Epic account.",
-      "account_taken": "That Epic account is already linked to another account.",
-      "upstream": "Epic did not respond. Try again in a moment."
+      "disabled": "Hiện không thể liên kết Epic.",
+      "invalid_token": "Epic không thể xác minh yêu cầu liên kết này. Hãy thử lại từ ứng dụng máy tính.",
+      "banned": "Không thể liên kết tài khoản Epic đó.",
+      "already_linked": "Tài khoản của bạn đã liên kết với một tài khoản Epic.",
+      "account_taken": "Tài khoản Epic đó đã được liên kết với một tài khoản khác.",
+      "upstream": "Epic không phản hồi. Hãy thử lại sau giây lát."
     },
     "wallet": {
       "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại."
@@ -6270,15 +6270,15 @@ export const vi_VN: EnTranslations = {
       "graphicsPresetMedium": "Trung Bình",
       "graphicsPresetHigh": "Cao",
       "graphicsPresetUltra": "Cực Cao",
-      "graphicsPresetInsane": "Insane",
+      "graphicsPresetInsane": "Cực Đại",
       "graphicsPresetAdvanced": "Nâng Cao",
       "terrainDetail": "Chi Tiết Địa Hình",
       "foliageDensity": "Mật Độ Cây Cỏ",
       "effectsQuality": "Hiệu Ứng & Ánh Sáng",
       "shadowQuality": "Chất Lượng Bóng Đổ",
-      "surfaceDetail": "Surface Detail",
-      "surfaceDetailBasic": "Basic",
-      "surfaceDetailFull": "Full",
+      "surfaceDetail": "Chi Tiết Bề Mặt",
+      "surfaceDetailBasic": "Cơ Bản",
+      "surfaceDetailFull": "Đầy Đủ",
       "terrainLow": "Thấp",
       "terrainHigh": "Cao",
       "touchOpacity": "Độ Mờ Điều Khiển Cảm Ứng",
@@ -7315,7 +7315,7 @@ export const vi_VN: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Tàng Hình Cao Cấp",
-        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
+        "description": "Biến mất trong 20 giây và gỡ bỏ 2 hiệu ứng gây sát thương theo thời gian. Khi tàng hình kết thúc, bạn nhận ít hơn 90% sát thương trong 2 giây. (tài năng pháp sư)"
       },
       "hot_streak": {
         "name": "Chuỗi Nóng",
@@ -9835,7 +9835,7 @@ export const vi_VN: EnTranslations = {
         "name": "Nhẫn Ấn Của The Last Keep"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Ignition Key: Terrorspark Groundshaker"
+        "name": "Chìa Khóa Khởi Động: Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
