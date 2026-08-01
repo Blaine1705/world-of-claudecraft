@@ -32,6 +32,7 @@
 // inside a character load.
 
 import { isLegalCrafterName } from './professions/tools';
+import { MAX_KNOWN_RECIPE_ID_LENGTH } from './professions/training';
 import type { ItemInstancePayload } from './types';
 
 /**
@@ -67,6 +68,32 @@ const SCANNED_SUB_OBJECT_KEYS: readonly string[] = ['rolled', 'charges'];
  * growth the module exists to stop.
  */
 export const MAX_INSTANCE_SUBTREE_JSON_LENGTH = 1024;
+
+/**
+ * The slot-LEVEL sibling of the payload bound: `InvSlot.craftedRecipeId` is a
+ * persisted string on the same rows, kept on load by a bare typeof check, so
+ * a hand-edited row could ride an unbounded marker forever (the round 4
+ * finder). Same drop-only doctrine, same ceiling as every other recipe id
+ * (MAX_KNOWN_RECIPE_ID_LENGTH); a dropped marker only costs the crafted
+ * provenance the corrupt row could never legally have carried. Mutates the
+ * caller-owned clone in place and reports through the same dropped-path
+ * channel as the payload bound.
+ */
+export function boundCraftedRecipeIdOnLoad(
+  slot: { itemId: string; craftedRecipeId?: unknown },
+  dropped: string[],
+  containerLabel: string,
+): void {
+  if (slot.craftedRecipeId === undefined) return;
+  if (
+    typeof slot.craftedRecipeId !== 'string' ||
+    slot.craftedRecipeId === '' ||
+    slot.craftedRecipeId.length > MAX_KNOWN_RECIPE_ID_LENGTH
+  ) {
+    delete slot.craftedRecipeId;
+    dropped.push(`${containerLabel}.${slot.itemId}.craftedRecipeId`);
+  }
+}
 
 export interface SanitizedItemInstancePayload {
   /** The cleaned payload, or undefined when nothing usable survives (the

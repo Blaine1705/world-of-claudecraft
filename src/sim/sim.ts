@@ -227,7 +227,11 @@ import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } fr
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
 import * as interaction from './interaction';
-import { sanitizeItemInstancePayloadOnLoad, warnDroppedInstanceKeys } from './item_instance_load';
+import {
+  boundCraftedRecipeIdOnLoad,
+  sanitizeItemInstancePayloadOnLoad,
+  warnDroppedInstanceKeys,
+} from './item_instance_load';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
@@ -2777,6 +2781,7 @@ export class Sim {
             continue;
           }
         }
+        boundCraftedRecipeIdOnLoad(slot, droppedInstanceJunk, 'bag');
         // The payload bound covers BAGS too (the review round: the mint sites
         // put signed instances into bags in the common case, so an
         // equipment-only clamp missed the container that carries most of
@@ -2823,6 +2828,7 @@ export class Sim {
           if (rebuilt) slot.instance = rebuilt;
           else delete slot.instance;
         }
+        boundCraftedRecipeIdOnLoad(slot, droppedInstanceJunk, 'buyback');
         // Buyback rows carry real signed instances (anything sold to a vendor
         // lands here for five minutes), so they take the same payload bound
         // as bags and equipment; the first cut reached neither this list nor

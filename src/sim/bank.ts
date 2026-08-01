@@ -20,6 +20,7 @@ import { addStacked, bagCapacity, bagsFullError, countFit, instancedCountCap } f
 import { ITEMS } from './data';
 import * as deedsMod from './deeds';
 import { sanitizeItemInstancePayloadOnLoad, warnDroppedInstanceKeys } from './item_instance_load';
+import { MAX_KNOWN_RECIPE_ID_LENGTH } from './professions/training';
 import { sanitizeRiftGearInstance } from './rift/progression';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
@@ -335,10 +336,20 @@ export function sanitizeBankState(
       };
       if (typeof e.itemId !== 'string' || e.itemId === '') continue;
       const hasInstance = !!e.instance && typeof e.instance === 'object';
+      // Length-bounded like every other recipe id (the round 4 finder: the
+      // bare typeof check kept an unbounded marker riding every autosave).
       const craftedRecipeId =
-        typeof e.craftedRecipeId === 'string' && e.craftedRecipeId !== ''
+        typeof e.craftedRecipeId === 'string' &&
+        e.craftedRecipeId !== '' &&
+        e.craftedRecipeId.length <= MAX_KNOWN_RECIPE_ID_LENGTH
           ? e.craftedRecipeId
           : undefined;
+      if (
+        typeof e.craftedRecipeId === 'string' &&
+        e.craftedRecipeId.length > MAX_KNOWN_RECIPE_ID_LENGTH
+      ) {
+        localDrops.push(`bank.${e.itemId}.craftedRecipeId`);
+      }
       // The shared tamper ceiling (bags.ts instancedCountCap, also applied to
       // the carried-inventory hydration in Sim.addPlayer): merge-legal stack
       // cap for a counted instanced slot, 1 for a charge-bearing payload, and

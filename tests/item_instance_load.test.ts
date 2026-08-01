@@ -11,6 +11,7 @@
 // serialize to the same bytes. Everything else in this file is a drop arm.
 import { describe, expect, it, vi } from 'vitest';
 import {
+  boundCraftedRecipeIdOnLoad,
   MAX_INSTANCE_PAYLOAD_KEYS,
   MAX_INSTANCE_STRING_LENGTH,
   MAX_INSTANCE_SUBTREE_JSON_LENGTH,
@@ -330,5 +331,23 @@ describe('the whole-branch tightening: key names, subtree size, and depth', () =
     // (the same residue the string arm always left), and the bytes are gone.
     expect(payload).toEqual({ charges: {} });
     expect(dropped).toEqual(['charges.current']);
+  });
+});
+
+describe('boundCraftedRecipeIdOnLoad: the slot-level sibling bound', () => {
+  it('keeps a legal marker, drops an oversized or non-string one, and reports the path', () => {
+    const dropped: string[] = [];
+    const legal = { itemId: 'hide', craftedRecipeId: 'recipe_prowlhide_jerkin' };
+    boundCraftedRecipeIdOnLoad(legal, dropped, 'bag');
+    expect(legal.craftedRecipeId).toBe('recipe_prowlhide_jerkin');
+    expect(dropped).toEqual([]);
+    const over = { itemId: 'hide', craftedRecipeId: 'r'.repeat(65) };
+    boundCraftedRecipeIdOnLoad(over, dropped, 'bag');
+    expect('craftedRecipeId' in over).toBe(false);
+    expect(dropped).toEqual(['bag.hide.craftedRecipeId']);
+    const nonString = { itemId: 'hide', craftedRecipeId: 41 as unknown };
+    boundCraftedRecipeIdOnLoad(nonString, dropped, 'buyback');
+    expect('craftedRecipeId' in nonString).toBe(false);
+    expect(dropped).toEqual(['bag.hide.craftedRecipeId', 'buyback.hide.craftedRecipeId']);
   });
 });
