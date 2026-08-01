@@ -8,9 +8,13 @@
 // cooldown), so the TWO player-reachable actions here (slot and recharge)
 // resolve their whole decision through the pure resolvers in tools.ts before
 // any mutation, consume their price with no partial arm (the charm copy, the
-// arcane materials), and report through the one text-free personal
-// `toolEffectResult` event so no refusal is ever silent on a player-reachable
-// path. The third action, `restoreToolEffectSlotAction`, is the R35 GM
+// arcane materials), and report every RESOLVER refusal through the one
+// text-free personal `toolEffectResult` event. The one pre-resolver refusal,
+// the dead gate, answers with the family's shared error line instead (a
+// deliberate exception: no new wire reason, and the chat line is not
+// silent), so the professions window's event-driven repaint does not fire
+// for it and the sent-guard's one-shot re-arm timer covers the button.
+// The third action, `restoreToolEffectSlotAction`, is the R35 GM
 // restore: charm-free, delegate-free (no `Sim` method, no IWorld member, no
 // wire command), reachable from the server ADMIN runtime alone, and the one
 // arm that does NOT call `resolveSlotToolEffect`. It carries its OWN copy of

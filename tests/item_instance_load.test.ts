@@ -1,8 +1,10 @@
 // The load-side instance-payload bound (src/sim/item_instance_load.ts),
-// exercised directly. Four load sites share this one function (equipment,
-// bags, vendor buyback, bank), so its arms are pinned HERE once rather than
-// four times through four fixtures; tests/professions_blob_growth.test.ts
-// then proves each site really routes through it on a real save.
+// exercised directly. Six load sites share this one function (equipment,
+// bags, vendor buyback, bank, and the two escrow books via sanitizeEscrowSlot
+// and the market listing arm), so its arms are pinned HERE once rather than
+// once per fixture; tests/professions_blob_growth.test.ts proves the four
+// character containers route through it on a real save, and the
+// mail/market instance suites prove the two books do.
 //
 // The load-bearing claim is IDENTITY ON LEGAL DATA: a payload no rule
 // touches must come back the same object, with the same key order, and
@@ -294,6 +296,25 @@ describe('the whole-branch tightening: key names, subtree size, and depth', () =
     });
     expect(payload).toEqual({ rolled: { quality: 'fine' } });
     expect(dropped).toEqual(['rolled.stats']);
+  });
+
+  it('a FLAT wide sub-object cannot smuggle bytes either (the fix-round counterexamples)', () => {
+    // Both empirically-verified bypasses of the first tightening: many short
+    // keys with short string values (188 KB survived whole), and many small
+    // object values each under the subtree ceiling (394 KB survived whole).
+    // The sub-object own-key ceiling closes both: width drops whole, the
+    // top-level key-count doctrine one level down.
+    const wideStrings: Record<string, string> = {};
+    for (let i = 0; i < 10_000; i++) wideStrings[`k${i}`] = 'abcdefgh';
+    const a = sanitizeItemInstancePayloadOnLoad({ signer: 'Ayla', rolled: wideStrings });
+    expect(a.payload).toEqual({ signer: 'Ayla' });
+    expect(a.dropped).toEqual(['rolled']);
+
+    const wideObjects: Record<string, { pad: string }> = {};
+    for (let i = 0; i < 5_000; i++) wideObjects[`k${i}`] = { pad: 'x'.repeat(60) };
+    const b = sanitizeItemInstancePayloadOnLoad({ charges: wideObjects });
+    expect(b.payload).toBeUndefined();
+    expect(b.dropped).toEqual(['charges', 'payload']);
   });
 
   it('a nesting bomb cannot smuggle bytes through depth the flat rules never reach', () => {

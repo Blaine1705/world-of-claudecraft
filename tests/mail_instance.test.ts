@@ -358,6 +358,51 @@ describe('return flight and persistence', () => {
     expect(letter?.items[0]).toEqual({ itemId: 'wolf_fang', count: 1 });
   });
 
+  it('rekeyMailOwner follows the escrowed payload signers on the recipient arm only', () => {
+    const sim = makeWorld();
+    sim.loadMail({
+      mail: [
+        {
+          id: 1,
+          recipientKey: 'Oldname',
+          recipientName: 'Oldname',
+          senderName: 'Someone',
+          kind: 'player',
+          subject: 'own',
+          body: 'incoming holding',
+          copper: 0,
+          items: [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Oldname' } }],
+          deliverIn: 0,
+          secondsLeft: 1000,
+          read: false,
+        },
+        {
+          id: 2,
+          recipientKey: 'Stranger',
+          recipientName: 'Stranger',
+          senderName: 'Oldname',
+          kind: 'player',
+          subject: 'foreign',
+          body: 'a copy in a stranger parcel stays foreign-held',
+          copper: 0,
+          items: [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Oldname' } }],
+          deliverIn: 0,
+          secondsLeft: 1000,
+          read: false,
+        },
+      ],
+      nextMailId: 3,
+    });
+    expect(sim.rekeyMailOwner(9, 'Oldname', 'Newname')).toBe(true);
+    const own = bookOf(sim).find((m) => m.subject === 'own');
+    const foreign = bookOf(sim).find((m) => m.subject === 'foreign');
+    expect((own as unknown as { recipientKey: string }).recipientKey).toBe('9');
+    expect(own?.items[0]?.instance).toEqual({ signer: 'Newname' });
+    expect(foreign?.items[0]?.instance, 'stranger parcel untouched').toEqual({
+      signer: 'Oldname',
+    });
+  });
+
   it('the soulbound-return sweep keeps the returned parcel payload', () => {
     // A payload-carrying parcel whose item became soulbound after it was sent:
     // the load-time migration returns it to the sender WITH the payload.

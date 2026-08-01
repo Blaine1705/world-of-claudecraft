@@ -340,11 +340,12 @@ For off-box safety, sync the directory to S3 occasionally:
   bundle.
   The caveats above were measured against 9d7a1a021, the commit deployed
   today; the branch has since merged the true v0.32.0 tip (0b427afca, 685
-  commits past the measured base) and then re-synced twice through
-  release/v0.33.0 (last at 2ae71a7fbf), which together are what the
+  commits past the measured base) and then re-synced repeatedly through
+  release/v0.33.0, last at 2ae71a7fbf, which together are what the
   merged-branch numbers above describe. If the live server moves before
   this branch deploys, re-run the compatibility diff against the commit
-  actually deployed before trusting any "N new X" claim. The loot-table exclusion is enforced by
+  actually deployed before trusting any "N new X" claim.
+  The loot-table exclusion is enforced by
   `tests/stale_client_rollout.test.ts` for the deploy window (delete that
   pin once clients have rolled). Per-surface analysis for the professions
   tuning release: the stale-client compatibility phase of

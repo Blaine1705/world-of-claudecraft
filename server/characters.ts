@@ -635,17 +635,19 @@ async function renameHandler(ctx: Ctx): Promise<void> {
     if (rt.rekeyMailOwner(character.id, character.name, c.name)) {
       await rt.saveMail();
     }
-    // The renamed character's OWN signed instances (bags, bank, equipped) still
-    // carry the old signer name in their persisted blob; sweep it so the
-    // self-signed crafting discount, Battlefield Experience attribution, and
-    // the eqi inspect wire follow the new name. Only the persisted blob needs
-    // the sweep: the market/mail rekeys above reach WORLD state that lives in
-    // the running server regardless of sessions, but a character's live
-    // entity/meta exists only while joined, and the isCharacterOnline gate
-    // above guarantees there is none at rename time. Foreign-held copies
-    // signed with the old name live in other characters' blobs and are out of
-    // scope. renameCharacter's RETURNING row carries the current blob, and the
-    // no-nonce save is safe for the same offline reason.
+    // The renamed character's OWN signed instances still carry the old signer
+    // name; two sweeps split the work by WHERE the copies live. The market and
+    // mail rekeys above cover the world-state books (ownership keys, display
+    // names, AND the renamer's own escrowed payload signers, the fix-round
+    // completion); this blob sweep covers the five signer-bearing regions of
+    // the persisted character state, so the self-signed crafting discount,
+    // Battlefield Experience attribution, and the eqi inspect wire follow the
+    // new name everywhere a copy can come back from. A live entity/meta needs
+    // no sweep: the isCharacterOnline gate above guarantees there is none at
+    // rename time. Foreign-held copies signed with the old name live in other
+    // characters' blobs or parcels and are out of scope. renameCharacter's
+    // RETURNING row carries the current blob, and the no-nonce save is safe
+    // for the same offline reason.
     if (c.state && rekeyInstanceSigner(c.state, character.name, c.name)) {
       await charactersDb.saveCharacterState(c.id, c.level, c.state);
     }

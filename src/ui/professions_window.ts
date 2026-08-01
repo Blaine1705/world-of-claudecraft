@@ -652,16 +652,18 @@ export class ProfessionsWindow {
     //
     // The sent-guard: one command per painted button. The repaint that
     // answers the command replaces the node (fresh dataset), and every
-    // server-REACHED refusal emits the event that triggers it; until then, a
+    // RESOLVER refusal emits the event that triggers it; until then, a
     // double-click or a held Enter's key repeats on the SAME button send
     // nothing more. Guarding beats disabling, because disabling the focused
     // button drops keyboard focus to <body> before the repaint can restore
-    // it. THE RESIDUAL: a frame that never reaches the sim (the reconnect
-    // window's closed socket, spectate's command drop, a lane-refused frame)
-    // answers with nothing, so the one-shot timer below re-arms the node
-    // rather than leaving it dead until a reopen; if the real answer then
-    // arrives late, a duplicate send is refused server-side (no_gain or
-    // already_full), so the race costs nothing.
+    // it. THE RESIDUALS the one-shot timer below covers: a frame that never
+    // reaches the sim (the reconnect window's closed socket, spectate's
+    // command drop, a lane-refused frame) answers with nothing, and the
+    // sim's PRE-RESOLVER dead gate answers on the chat line with no
+    // toolEffectResult (the deliberate no-new-wire-reason choice), so both
+    // leave the node for the re-arm rather than dead until a reopen; if a
+    // real answer then arrives late, a duplicate send is refused server-side
+    // (no_gain or already_full), so the race costs nothing.
     for (const button of el.querySelectorAll<HTMLElement>('[data-slot-effect]')) {
       button.addEventListener('click', () => {
         if (button.dataset.sent !== undefined) return;

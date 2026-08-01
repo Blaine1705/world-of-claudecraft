@@ -387,6 +387,59 @@ describe('persistence: pre-payload saves and size bounds', () => {
     expect(coll.items[0]).toEqual({ itemId: HIDE, count: 2 });
   });
 
+  it('rekeyMarketSeller follows the escrowed payload signers too (the fix-round completion)', () => {
+    // The ownership keys were rekeyed but the escrowed copies kept the dead
+    // name, so a cancel or expiry handed back a copy whose discount no
+    // longer answered to its owner. Foreign signers stay untouched (the
+    // accepted craftedBy limitation).
+    const sim = makeWorld();
+    sim.loadMarket(
+      JSON.parse(
+        JSON.stringify({
+          listings: [
+            {
+              id: 901,
+              sellerKey: 'Oldname',
+              sellerName: 'Oldname',
+              itemId: HIDE,
+              count: 1,
+              price: 100,
+              instance: { signer: 'Oldname' },
+              secondsLeft: 1000,
+            },
+            {
+              id: 902,
+              sellerKey: 'Stranger',
+              sellerName: 'Stranger',
+              itemId: HIDE,
+              count: 1,
+              price: 100,
+              instance: { signer: 'Oldname' },
+              secondsLeft: 1000,
+            },
+          ],
+          collections: [
+            {
+              key: '77',
+              copper: 0,
+              items: [{ itemId: HIDE, count: 1, instance: { signer: 'Oldname' } }],
+            },
+          ],
+          nextListingId: 1001,
+        }),
+      ),
+    );
+    expect(sim.rekeyMarketSeller(77, 'Oldname', 'Newname')).toBe(true);
+    const out = JSON.parse(JSON.stringify(sim.serializeMarket()));
+    const own = out.listings.find((l: { id: number }) => l.id === 901);
+    const foreign = out.listings.find((l: { id: number }) => l.id === 902);
+    expect(own.sellerKey).toBe('77');
+    expect(own.instance).toEqual({ signer: 'Newname' });
+    expect(foreign.instance, 'a stranger listing is foreign-held').toEqual({ signer: 'Oldname' });
+    const coll = out.collections.find((c: { key: string }) => c.key === '77');
+    expect(coll.items[0].instance).toEqual({ signer: 'Newname' });
+  });
+
   it('a maximally instanced seller book serializes inside a stated byte budget', () => {
     // 12 fully-instanced listings (the per-seller cap) with worst-case-ish
     // payloads must stay small: a future ItemInstancePayload field that

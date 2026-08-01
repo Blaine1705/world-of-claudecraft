@@ -10,6 +10,7 @@
 // (enforced by tests/architecture.test.ts). The market draws NO rng.
 
 import { bagCapacity, canGrantCopies, instancedCountCap } from './bags';
+import { rekeySigner } from './character_rename';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
 import { sanitizeItemInstancePayloadOnLoad, warnDroppedInstanceKeys } from './item_instance_load';
@@ -237,7 +238,18 @@ export class Market {
         if (listing.sellerKey !== key || listing.sellerName !== newName) changed = true;
         listing.sellerKey = key;
         listing.sellerName = newName;
+        // The escrowed payload follows its owner through the rename the same
+        // way the blob sweep's buyback arm does (the fix-round review): a
+        // cancel or expiry hands this exact copy back, and a stale signer
+        // would detach the original-crafter discount, or after a reclaim
+        // name a stranger. Foreign signers are untouched (the accepted
+        // craftedBy limitation).
+        if (rekeySigner(listing.instance, oldName, newName)) changed = true;
       }
+    }
+    const collection = this.marketCollections.get(key);
+    for (const slot of collection?.items ?? []) {
+      if (rekeySigner(slot.instance, oldName, newName)) changed = true;
     }
     return changed;
   }

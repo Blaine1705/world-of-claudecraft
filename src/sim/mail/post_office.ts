@@ -17,6 +17,7 @@
 // Date.now (enforced by tests/architecture.test.ts). The post draws NO rng.
 
 import { bagCapacity, canGrantCopies, instancedCountCap } from '../bags';
+import { rekeySigner } from '../character_rename';
 import {
   HEROIC_MARK_LETTER,
   type LetterDef,
@@ -763,6 +764,19 @@ export class PostOffice {
         }
         m.recipientKey = key;
         m.recipientName = newName;
+      }
+      // The escrowed payloads follow their owner through the rename the same
+      // way the blob sweep's buyback arm does (the fix-round review): a
+      // parcel addressed to this character (incoming holdings and every
+      // return flight, which re-addresses to the sender) hands these exact
+      // copies back, and a stale signer would detach the original-crafter
+      // discount, or after a reclaim name a stranger. Scoped to the
+      // recipient arm on purpose: a copy sitting in a STRANGER's parcel is
+      // foreign-held, the accepted craftedBy limitation.
+      if (m.recipientKey === key) {
+        for (const slot of m.items) {
+          if (rekeySigner(slot.instance, oldName, newName)) changed = true;
+        }
       }
     }
     return changed;

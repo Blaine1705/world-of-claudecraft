@@ -1103,15 +1103,28 @@ describe('the dead gate on both player-reachable actions (the whole-branch harde
   });
 
   it('a dead player cannot recharge: materials stay and the same line answers', () => {
+    // Decisive fixture (the fix-round review): the slot is DEPLETED and the
+    // materials are IN THE BAGS, so a live recharge here would succeed and
+    // consume; only the dead gate stands between the attempt and the spend.
     const sim = simHolding('copper_mining_pick');
     sim.slotToolEffect('mining', 'gatherers_cache');
-    expect(metaOf(sim).toolEffectSlots?.mining).toBeDefined();
+    const slot = metaOf(sim).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    slot.durability = 0;
+    sim.addItem('arcane_dust', 10);
     sim.player.dead = true;
     sim.player.hp = 0;
     sim.drainEvents();
     sim.rechargeToolEffect('mining');
     const err = sim.drainEvents().find((e) => e.type === 'error');
     expect(err).toMatchObject({ text: "You can't do that while dead." });
+    expect(sim.countItem('arcane_dust'), 'materials untouched').toBe(10);
+    expect(slot.durability, 'no refill happened').toBe(0);
+    // Alive-control: the SAME sim recharges fine, so the gate is the refusal.
+    sim.player.dead = false;
+    sim.rechargeToolEffect('mining');
+    expect(sim.countItem('arcane_dust')).toBeLessThan(10);
+    expect(slot.durability).toBeGreaterThan(0);
   });
 
   it('the same player alive can slot, so the gate is the refusal and not a broken fixture', () => {

@@ -1,10 +1,13 @@
 // The load-side shape bound for a persisted per-instance item payload
-// (`ItemInstancePayload`, types.ts). ONE sanitizer, four call sites: the
+// (`ItemInstancePayload`, types.ts). ONE sanitizer, six call sites: the
 // equipment map, the carried bags and the vendor buyback rows (all in
-// Sim.addPlayer) plus the bank inventory (bank.ts sanitizeBankState). Phase
-// 16's first cut clamped only `signer`, and only on two of those four, so a
-// signed copy loaded through the bank or the buyback list kept an unbounded
-// name, and every OTHER payload string stayed unbounded everywhere. A
+// Sim.addPlayer), the bank inventory (bank.ts sanitizeBankState), and the
+// two persisted escrow books (item_instance_transfer.ts sanitizeEscrowSlot
+// for mail attachments and market collections, plus market.ts's listing
+// arm). Phase 16's first cut clamped only `signer`, and only on two of the
+// character containers, so a signed copy loaded through the bank or the
+// buyback list kept an unbounded name, and every OTHER payload string
+// stayed unbounded everywhere. A
 // payload is JSONB this process wrote rather than something a client sent,
 // but a hand-edited or corrupted row rides every autosave whole, forever:
 // that is the growth this bound exists to stop, and it is the same
@@ -117,11 +120,14 @@ export function warnDroppedInstanceKeys(owner: string, dropped: readonly string[
  *    (`isLegalCrafterName`), else dropped;
  *  - any other own string value past MAX_INSTANCE_STRING_LENGTH: dropped;
  *  - the same key and string rules one level into `rolled` and `charges`,
- *    plus the subtree JSON ceiling on any non-string value nested there
- *    (rolled.stats and any deeper smuggling), so nesting cannot carry what
- *    the flat rules bound. `rift` is deliberately not scanned: its payloads
- *    are REBUILT from bounded progression inputs (sanitizeRiftGearInstance)
- *    on every load arm before this bound runs;
+ *    each of which also takes the own-key COUNT ceiling (a flat ten-thousand
+ *    short-key record passed every per-key arm and carried 188 KB whole, the
+ *    fix-round counterexample) plus the subtree JSON ceiling on any
+ *    non-string value nested there (rolled.stats and any deeper smuggling),
+ *    so neither width nor depth can carry what the flat rules bound. `rift`
+ *    is deliberately not scanned: its payloads are REBUILT from bounded
+ *    progression inputs (sanitizeRiftGearInstance) on every load arm before
+ *    this bound runs;
  *  - a payload left with no own keys at all: dropped whole.
  *
  * What this deliberately does NOT bound: string values at depth 3+ outside
@@ -183,6 +189,17 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
     if (!SCANNED_SUB_OBJECT_KEYS.includes(key)) continue;
     if (!value || typeof value !== 'object' || Array.isArray(value)) continue;
     const sub = value as Record<string, unknown>;
+    // The sub-object takes the SAME own-key ceiling as the payload (the
+    // fix-round review ran the counterexample: ten thousand short keys with
+    // short string values passed every per-key and per-value arm and carried
+    // 188 KB whole). No legal writer puts more than a handful of keys in
+    // rolled or charges; a wider record is corrupt, and it drops WHOLE, the
+    // key-count doctrine of the top level.
+    if (Object.keys(sub).length > MAX_INSTANCE_PAYLOAD_KEYS) {
+      delete record[key];
+      dropped.push(key);
+      continue;
+    }
     for (const subKey of Object.keys(sub)) {
       if (subKey.length > MAX_INSTANCE_STRING_LENGTH) {
         delete sub[subKey];
