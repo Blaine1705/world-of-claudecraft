@@ -12,7 +12,7 @@
 | Phase 3 QA | done | 2026-07-31 | 2026-07-31 |
 | Phase 4: Server set-based endpoints | built | 2026-07-31 | 2026-07-31 |
 | Phase 4 QA | done | 2026-07-31 | 2026-07-31 |
-| Phase 5: Outbox + linked-member change feed | not started | | |
+| Phase 5: Outbox + linked-member change feed | built | 2026-08-01 | 2026-08-01 |
 | Phase 5 QA | not started | | |
 | Phase 6: Bot consumes the new surface | not started | | |
 | Phase 6 QA | not started | | |
@@ -59,10 +59,10 @@
       tally 10/10 plus the CI-floor gap it exposed
 
 ### Phase 5
-- [ ] `server/discord_link_changes.ts` bounded FIFO + every feed site enumerated in state.md
-- [ ] `GET /internal/discord/outbox` RouteDef + spine rows, batched account lookups
-- [ ] Query-count + payload assertions at the D18 envelope; winners fetch at-most-once pin
-- [ ] Full-envelope tests incl. empty-drain zero-query pin
+- [x] `server/discord_link_changes.ts` bounded FIFO + every feed site enumerated in state.md
+- [x] `GET /internal/discord/outbox` RouteDef + spine rows, batched account lookups
+- [x] Query-count + payload assertions at the D18 envelope; winners fetch at-most-once pin
+- [x] Full-envelope tests incl. empty-drain zero-query pin
 
 ### Phase 6
 - [ ] `flexBatch()` + `drainOutbox()`; old per-endpoint client methods deleted
@@ -897,3 +897,68 @@ without it (the DB gate intact); `tests/duplicate_test_blocks.test.ts` and
 Full `npm run gate` was NOT run, for the known reason: sibling sessions have worktrees parked
 under `.worktrees/` and `.claude/worktrees/`, the malware scanner walks the whole tree, and the
 gate aborts there BEFORE tsc and the builds. Those post-abort steps were run by hand above.
+
+### Phase 5 (2026-08-01)
+
+Release base FIRST (standing rule 1): `origin/release/v0.33.0` had moved a LOT, 81 ahead and
+235 BEHIND (the graphics overhaul, ability VFX, Wildheart Basin, and the new `server/epic/`
+route family), merged before any Phase 5 work as `890d99cd7` (808 files) and audited with the
+`release-merge-audit` skill. The four both-sides files the phase doc warned about all
+auto-merged and were verified against BOTH parents: `server/db.ts` kept the LOCKSTEP note and
+gained the release's `epic_links` DDL, `surface_inventory.ts` kept the flex-batch row beside
+the release's three epic rows, and the completeness/parity ladder pins needed no reconciling
+because the epic additions and the internal-ladder count sit on different assertions. No
+discord/internal surface drifted (the release never touched `server/internal.ts`,
+`server/discord*.ts`, or `server/daily_rewards.ts`), the three release-authored
+`vi.mock('../server/db')` sites were diffed against the branch's db exports (the branch added
+none, so the known mock trap cannot fire), and the full server validation ladder was re-run
+green on the merged tree before Phase 5 started.
+
+**Build.** The feed-site enumeration ran as a Workflow fan-out (7 agents: three transition-class
+sweeps, streams/shapes, planning docs, winners cache, then a completeness critic over the
+union; 30-tool-call budgets and report-first lines; 7 of 7 delivered). The critic re-derived
+the write sets from the SQL and closed the charter questions: two level writers, two points
+writers, one link upserter, one unlink deleter, class immutable after creation, no
+restore/transfer/merge path, the cascade unlink code-unreachable in-process. The full
+enumeration (11 wired sites, each with its test, plus the deliberate exclusions with reasons)
+is now a named section of state.md. Agent A built `server/discord_link_changes.ts` (cap 5000
+per the D18 member envelope, 30s per-account dedupe that never consults drained history, with
+a 9/9 mutation pass on its 19-test suite); Agent B wired all eleven sites (the saveCharacter
+delta-gate seeds from the loaded blob rather than `initialLevel`, so GM/PBE join-time raises
+report on first save; the repoint pin captures the designed kinds merge); Agent C added
+`discordLinksForAccounts`, the outbox RouteDef (internal ladder 20 to 21), and the winners
+TTL cache, and probed the ANY() plan on a throwaway user-space Postgres rather than assuming
+it (index scan at a 50-id ask, a CORRECT seq scan at 200 ids over 5,000 rows, so the
+integration pin names the index at sample size and never asserts no-Seq-Scan).
+
+**Validation.** `npx tsc --noEmit` clean; the state.md server row 201 passed; the four http
+spine suites 376 passed; new plus touched files 230 passed with 14 DB-gated skips (the same
+14 executed against the throwaway Postgres during the build); `npm run build:server` exit 0;
+`npm run ci:changed` exit 0. Full `npm run gate` NOT run, same known reason as Phase 4:
+sibling worktrees red the malware scanner and the gate aborts before tsc and the builds, so
+those steps ran by hand above. Reviewers dispatched fresh over the diff:
+privacy-security-review and database-performance-reviewer (migration-safety skipped: no DDL,
+no persisted-shape change).
+
+**Review round.** privacy-security returned no blocking findings and four should-fixes;
+database-performance returned a BLOCK verdict with three findings. One of the three was
+REFUTED with quoted code and recorded in state.md (the claimed cross-process double-announce
+window requires two processes serving the same realm; the deployment model is
+process-per-realm and `unannouncedWinnerDays` is realm-scoped). Everything else confirmed
+became a 12-fix round, applied and mutation-checked 17/17: winners-read-before-drain plus
+requeue-on-error so a failed poll loses nothing (the retry contract is documented in the
+handler for Phase 6: a 200 is the only acknowledgement), a linkage-aware eviction preference
+at cap (playtime noise first, so link/unlink ids survive a bot outage), paged link-change
+drains (`OUTBOX_LINK_CHANGE_PAGE` 1000), the winners ask minimized to 1 day per poll,
+repoint items no longer decorate one user's id with another's handle, the per-day taskName
+derivation moved inside the winners cache refresh (a warm poll costs zero fetches AND zero
+DB reads), moderation busts wired for void/restore/exclusion per the server/CLAUDE.md
+hot-path rule (the excluded-accounts surface is a view, so the bust rides the moderation
+hook in `bustBoardCaches`), `discord_email` dropped from the batched identity read, a
+second EXPLAIN case at the page-size ask (probed live: the planner CORRECTLY seq-scans a
+1000-id ask over 5,000 rows, so that case pins `Actual Loops === 1` only), and clock
+uniformity at the save site. Final D18 payload at the real (page-limited) worst case:
+279,891 bytes serialized in 0.27 ms, pinned under 420,000 with a 270,000 floor (the
+pre-paging whole-cap figure was 979,051 bytes). The full ladder was re-run green after the
+fix round, and the DB-gated integration file was re-executed against a fresh throwaway
+user-space Postgres 16.2 (15/15 with the database, clean skips without).

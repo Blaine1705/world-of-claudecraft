@@ -1,9 +1,11 @@
 # State: Discord Bot Stability (cross-phase cheat sheet)
 
-Current phase: Phase 4 BUILT (2026-07-31); Phase 4 QA is next. Phases 1 to 3 built and QA'd
-(Phase 3 on 2026-07-31, Phases 1 and 2 on 2026-07-30). The release base was re-synced during
-Phase 3 QA (`origin/release/v0.33.0` at `2ae71a7fb`, merged as `104994c21`, zero conflicts,
-audited); Phase 4 re-measured it at its start and it had not moved (70 ahead, 0 behind).
+Current phase: Phase 5 BUILT (2026-08-01); Phase 5 QA is next. Phases 1 to 4 built and QA'd.
+The release base was re-synced at the START of Phase 5 (`origin/release/v0.33.0` at
+`506cbdf19`, 81 ahead 235 BEHIND, merged as `890d99cd7`, 808 files, audited with
+`release-merge-audit`; the four both-sides files all auto-merged and were verified against
+both parents). The header number here goes stale fast: MEASURE the freshly fetched tip at
+every phase start per the standing rules, never trust this line.
 
 ## Locked decisions
 
@@ -142,11 +144,15 @@ Server: `server/internal.ts` (the `routes` RouteDef table, the FROZEN legacy twi
 the presence cache), `server/discord_db.ts` (accountForDiscord, setDiscordMemberMetaBulk,
 discordFlexRowsForDiscordIds, reward_ledger DDL with its keep-forever note),
 `server/discord_relay.ts` (cap 50),
-`server/discord_activity.ts` (cap 100, 30s dedupe), `server/db.ts`
+`server/discord_activity.ts` (cap 100, 30s dedupe), `server/discord_link_changes.ts`
+(Phase 5: cap 5000, 30s per-account dedupe, drained only by the outbox), `server/db.ts`
 (highestCharacterForAccount, with the LOCKSTEP note above it),
 `server/http/middleware/require_internal_secret.ts`,
-`server/http/registry.ts` (:33, :123), `server/main.ts` (retention :3080-3087,
-GameStateSource :3008-3022), `server/reports.ts` (site-presence :285).
+`server/http/registry.ts` (the `import { routes as internalRoutes }` block and the
+`...internalRoutes` spread in the apiRoutes assembly; coordinates traded for symbols in
+Phase 5 because the v0.33.0 merge landed the epic route family around both),
+`server/main.ts` (retention :3080-3087, GameStateSource :3008-3022, both re-verified after
+the Phase 5 release merge), `server/reports.ts` (site-presence :285, likewise re-verified).
 
 The line numbers that survive above are the files NO phase of this packet has
 edited, so their coordinates are as good as the day they were written; the ones
@@ -242,11 +248,100 @@ because dropping the one word is otherwise silent),
   non-string drop and the de-duplication, so a caller that sent repeats would read a
   perfectly delivered response as a truncated one. The bot holds its sweep ids in a `Set`,
   so this is a contract note rather than a live defect (Phase 4 QA).
-  Still planned: `GET /internal/discord/outbox` (Phase 5).
+  BUILT in Phase 5: `GET /internal/discord/outbox` (RouteDef-only behind `discordGate`, the
+  SECOND no-legacy-twin internal row after flex-batch; internal ladder counts moved 20 to 21
+  in `completeness.test.ts` and `ownership_coverage.test.ts`). One request drains all four
+  streams into `{ relay: { items }, activity: { items }, winners, linkChanges: { items } }`,
+  envelope key order pinned, per-endpoint item shapes preserved byte-for-byte so Phase 6
+  reuses the bot-side handlers (proved by running one fixture through both the old GETs and
+  the outbox). Identity resolution is ONE `discordLinksForAccounts` IN query over the
+  deduplicated union of relay, activity, and link-change account ids (zero
+  `discordForAccount` calls); an empty drain performs zero identity queries unconditionally
+  and zero winners queries on a warm cache. Link-change items enrich as
+  `{ accountId, kinds, discordUserId, discordUsername, discordAvatar }`; the carried
+  discordId takes precedence (an unlink's row is gone by drain time) and items with neither
+  a carried id nor a link row are DROPPED as unlinked-account noise (the playtime grant
+  path enqueues for unlinked accounts by design).
+  Review-round hardening (2026-08-01, privacy-security + database-performance):
+  - RETRY CONTRACT, written in the handler doc comment for Phase 6: winners is read FIRST
+    (before any drain) and is an idempotent at-least-once read; the three in-memory streams
+    are PRESERVED ON ERROR (the catch requeues all three drains front-of-queue via the new
+    `requeueRelay` / `requeueActivity` / `requeueLinkChanges` helpers, then rethrows) and
+    consumed only by a 200, which is the sole acknowledgement.
+  - Link changes drain a PAGE per poll (`OUTBOX_LINK_CHANGE_PAGE` 1000, the flex-batch cap
+    ceiling); a backlog pages out across successive polls, bounding both the serialization
+    spike and the amount at risk per failed poll.
+  - The winners ask is `OUTBOX_WINNER_DAY_LIMIT` 1 (the bot announces one day per poll;
+    minimizes routine wallet-pubkey exposure; the standalone GET serves up to 5 until D11
+    retirement).
+  - Repoint identity: name/avatar decorate ONLY when the resolved row's id equals the id
+    being emitted; a repoint item (old id carried, row holds the new identity) emits nulls
+    rather than one user's id wearing another's handle.
+  - REFUTED reviewer finding, recorded so it is not re-litigated: a claimed cross-process
+    double-announce window on the winners cache requires two processes serving the SAME
+    realm, and the deployment model is process-per-realm (`server/realm.ts`: "each instance
+    hosts exactly one realm"; `unannouncedWinnerDays` filters `WHERE d.realm = $1` on the
+    process REALM), so no second process can hold a warm cache containing another realm's
+    day. If same-realm horizontal scaling ever arrives it breaks the ENTIRE in-memory feed
+    transport (relay, activity, this feed), not just the cache; the hardening to take then
+    is mark-as-claim (`AND discord_announced_at IS NULL`, rowCount decides) plus bot-side
+    mark-first-announce-on-ok.
+  - Kept deliberately, with reasons: link-change items carry `accountId` (relay items
+    already expose it, and Phase 6 may want it; revisit at minimization) and the noise
+    class evicted first at cap (kinds exactly ['points'], no carried id) includes LINKED
+    accounts' point changes too, because the enqueue site cannot tell them apart; points
+    staleness heals on the bot's periodic resync, a lost link/unlink id does not.
 - New modules: `bot/cadence.ts` (the three poll-loop DEFAULTS, values only; `config.ts`
   layers the env overrides over them as of Phase 3), `bot/rate_governor.ts` (Phase 2, pure
-  and clock-injected), `bot/scheduler.ts` and `bot/member_writes.ts` (Phase 3). Still
-  planned: the change feed.
+  and clock-injected), `bot/scheduler.ts` and `bot/member_writes.ts` (Phase 3), and
+  `server/discord_link_changes.ts` (Phase 5: the linked-member change feed, pure and
+  dependency-free; `enqueueLinkChange(change, now)` / `drainLinkChanges()` /
+  `linkChangeDepth()`, `LINK_CHANGE_MAX_QUEUE` 5000 sized to the D18 member envelope
+  because dedupe bounds live entries to distinct accounts, `LINK_CHANGE_DEDUPE_TTL_MS`
+  30_000 matching `discord_activity.ts`. Dedupe merges kinds set-union into the account's
+  OPEN item, first-observed discordId wins, the TTL window is minted-anchored so a merge
+  never slides it, and dedupe NEVER consults drained or evicted history: a change deduped
+  against an item the bot already received would be a change the bot never sees, which is
+  the exact staleness bug this packet exists to kill. Review round added: an EVICTION
+  PREFERENCE at cap (the oldest playtime-noise item, kinds exactly ['points'] with no
+  carried id, goes before anything else, so link/unlink/flex survive a long bot outage),
+  `drainLinkChanges(max)` paging that clears only the page's dedupe entries, and
+  `requeueLinkChanges` (front-insert restoring each item's ORIGINAL mint stamp via a
+  WeakMap so a requeue can never extend a dedupe window; a newer open item keeps pending
+  ownership)).
+- Phase 5 server additions (existing modules): `discordLinksForAccounts` in
+  `server/discord_db.ts` (the set-based sibling of `discordForAccount`,
+  `account_id = ANY($1::int[])`, empty input short-circuits with zero statements, executed
+  and plan-probed in `tests/discord_db_integration.test.ts` at a 5,000-row seed);
+  `outboxHandler` RouteDef in `server/internal.ts`; the winners TTL cache in
+  `server/daily_rewards.ts` (`DAILY_REWARD_WINNERS_TTL_MS` 30_000 over
+  `unannouncedWinnerDays(5)` via `createCachedRead`, rows copied on the way out, busted at
+  `finalizeRewardDay` after `db.finalizeDay` resolves 'finalized' AND at
+  `markDiscordWinnersAnnounced` on a successful mark, AND per the review round at every
+  moderation-reachable content mutation: `voidPayout` / `restorePayout` success arms, and
+  the excluded-accounts surface (a VIEW over `daily_reward_bans` / `daily_reward_ip_bans`
+  whose backing writes fire the moderation hook, so the bust rides `bustBoardCaches` in
+  `server/main.ts`), per the server/CLAUDE.md rule that anything a moderation action can
+  change must be bust-wired in the same change. The per-day taskName derivation also moved
+  INTO the cache refresh, so a warm poll costs zero DB reads AND zero config fetches and
+  the single-slot `dailyRewardRuntimeConfig` cache is no longer thrashed by polling;
+  `bustWinnersCache()` / `bustDailyRewardWinnersCache()` are the bust plus test-reset
+  hooks, and the service constructor takes an optional injected `now`).
+- New tests (Phase 5): `tests/server/discord_link_changes.test.ts` (19 tests at build, 9/9
+  mutation pass, extended by the review round for eviction preference, paging, and requeue)
+  and `tests/server/discord_outbox.test.ts` (the D18 payload bound at the REAL worst case,
+  the page-limited drain: measured 279,891 bytes serialized in 0.27 ms, pinned under
+  420,000 with a 270,000 floor against hollow fixtures; the pre-paging whole-cap figure was
+  979,051 bytes, kept here for the record; plus the paging continuity pin and the
+  link-change overflow survivor pin), with
+  extensions in `tests/server/internal.test.ts` (the ONE-identity-query pin over a mixed
+  drain, the zero-query empty-drain pin, shape-preservation fixtures through old and new
+  routes), `tests/discord_db.test.ts`, `tests/discord_db_integration.test.ts`,
+  `tests/daily_rewards.test.ts` (cache hit/miss/bust arms on an injected clock),
+  `tests/server/daily_rewards_routes.test.ts` (cache reset in setup),
+  `tests/character_db.test.ts`, `tests/character_lease_game.test.ts`,
+  `tests/game_sessions.test.ts`, `tests/discord_server.test.ts` (the per-transition-class
+  enqueue pins).
 - New server functions (Phase 4, all in existing modules; no new server module was needed):
   `discordFlexRowsForDiscordIds` and `setDiscordMemberMetaBulk` in `server/discord_db.ts`,
   `discordFlexForAccounts` in `server/discord.ts`, and `flexBatchHandler` plus the shared
@@ -417,6 +512,70 @@ because dropping the one word is otherwise silent),
   R17 (comment-stripped source, line and adjacency anchors, a pr-checks step count, and
   a workflow trust-posture test) and extended `tests/deploy_discord_bot.test.ts` with the
   bot build and typecheck surface.
+
+## Phase 5 feed-site enumeration (the linked-member change feed contract)
+
+Every server-side site where a linked account's flex-relevant state changes (level, class,
+top character, reward points or the derived status tier, link/unlink), enumerated by a
+7-agent Workflow fan-out whose completeness critic re-derived the write sets from the SQL
+independently of the sweeps. This list is the contract: a transition NOT wired below is
+either covered by a listed chokepoint or deliberately excluded with its reason. If a future
+change adds a NEW writer of `characters.level`, `characters` rows, `reward_points`, or
+`discord_links`, it must enqueue into `server/discord_link_changes.ts` in the same change.
+
+Chokepoint proof (critic-verified, 2026-08-01): `characters.level` is written ONLY by
+`saveCharacterState` and `saveCharacterAndMarketState` (server/db.ts); `characters` rows are
+inserted only by `createCharacterCapped` and the community-test roster INSERT inside
+`createAccount`, and deleted only by `deleteCharacter`; `reward_points` is written only by
+`grantRewardPoints` and `claimSwag` (server/discord_db.ts); links move only through
+`linkDiscordToAccount` / `unlinkDiscord`, whose only callers live in server/discord.ts.
+Sim-side, every XP source funnels through the single exported `grantXp`
+(src/sim/combat/damage.ts), which owns the only `p.level++` and the only 'levelup' emit;
+`Sim.setPlayerLevel` emits NO event (dev_level, the GM join arm, PBE boost), which is why
+the save-time delta gate exists. Class is immutable after creation (no UPDATE sets it).
+There is no restore, undelete, realm-transfer, or account-merge path.
+
+Wired sites (11), each with an enqueue and a by-value test:
+
+| # | kind | site | transition | test |
+|---|---|---|---|---|
+| 1 | flex | `server/game.ts` `GameServer.detectActivity`, 'levelup' arm | every organic level-up, real time (DB lags until next save; site 2 heals) | `tests/game_sessions.test.ts` |
+| 2 | flex | `server/game.ts` `GameServer.saveCharacter`, post-save block after the `saved === false` fence | delta-gated persisted level change; covers autosave, leave, shutdown, and every silent `setPlayerLevel` path; tracker seeds from the LOADED blob, not `initialLevel`, so GM/PBE join raises report on first save | `tests/character_lease_game.test.ts` |
+| 3 | flex | `server/db.ts` `createCharacterCapped`, post-commit | character created (top-character candidate; class fixed forever here) | `tests/character_db.test.ts` |
+| 4 | flex | `server/db.ts` `deleteCharacter`, rowCount > 0 only | character deleted (top character can change) | `tests/character_db.test.ts` |
+| 5 | flex | `server/db.ts` `createAccount`, community-test roster arm, post-commit | flag-gated roster insert instantly defines the top character | `tests/character_db.test.ts` |
+| 6 | points | `server/discord_db.ts` `grantRewardPoints`, post-commit | every grant and clawback (link, guild, playtime, booster, daily_active); BOTH no-op arms excluded (zero/non-finite delta, dedupe-key replay); fires for unlinked accounts by design, the outbox drain filters | `tests/discord_db.test.ts` |
+| 7 | points | `server/discord_db.ts` `claimSwag`, ok AND price > 0 | spendable points decrease on a paid claim (tier never moves, lifetime untouched) | `tests/discord_db.test.ts` |
+| 8 | link/unlink | `server/discord.ts` `completeLink` | settings-page OAuth link; a REPOINT pre-reads the old row and emits old-id unlink before new-id link (the per-account dedupe merges them, old id wins, by design) | `tests/discord_server.test.ts` |
+| 9 | link | `server/discord.ts` `handleDiscordLoginNew`, fresh-provision arm | first-time Discord signup links the new account | `tests/discord_server.test.ts` |
+| 10 | link | `server/discord.ts` `handleDiscordLoginLink` | chooser links an existing account; same pre-read plus repoint treatment as site 8 | `tests/discord_server.test.ts` |
+| 11 | unlink | `server/discord.ts` `handleDiscordUnlink` | the ONLY `unlinkDiscord` caller; the pre-read is both the discordId source and the no-op discriminator (a repeat DELETE enqueues nothing) | `tests/discord_server.test.ts` |
+
+Sites 8, 10, and 11 carry the two sanctioned cold-path pre-reads (`discordForAccount`
+before the link write): rare user-initiated flows, and the only way to carry the discordId
+an unlink item needs (the row is gone by drain time).
+
+Deliberately NOT wired, each with its reason (do not re-litigate without new facts):
+- lifetimeXp-only movement: affects only the `highestCharacterForAccount` tiebreak between
+  same-level siblings; enqueueing it would turn the 30s autosave sweep into a per-player
+  metronome; the bot's periodic full resync heals the rare tiebreak flip.
+- Renames (`renameCharacter`, `reclaimDeactivatedName`, `moderationForceRename`): the name
+  is outside the flex definition. NOTE for any future widening: `reclaimDeactivatedName` is
+  the writer everybody misses (it renames a deactivated holder's character with no player
+  request on that account, and deactivation preserves the link row); its SELECT would also
+  need `c.account_id` added before it could enqueue.
+- `discord_links` ON DELETE CASCADE: code-unreachable in-process. The only
+  `DELETE FROM accounts` is `deleteUnusedFederatedProvision`, whose NOT EXISTS
+  `discord_links` guard refuses linked accounts; the cascade fires only on out-of-band SQL,
+  where no server code runs. Heal: the bot's periodic full resync (the
+  diff-cache-needs-an-expiry rule).
+- Account deactivation (`handleAccountDeactivate`): outside the flex definition today; the
+  link row survives, and the flex read paths do not consult deactivation status, so the bot
+  keeps flexing deactivated accounts. Pre-existing behavior, flagged for the maintainer,
+  not a Phase 5 change.
+- members-meta / `setDiscordGuildMember` mirror writes: bot-driven mirrors of bot-side
+  state; the one server-decided consequence (the one-time guild grant) rides site 6.
+- `touchCharacterLogin` (last_login only) and the hotbar UPDATE: not flex-relevant.
 
 ## Rulings settled during authoring (2026-07-30)
 
