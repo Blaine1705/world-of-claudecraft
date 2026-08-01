@@ -15,7 +15,7 @@ import type { TradeInfo } from '../../world_api';
 import { addStacked, bagCapacity, countFit, removeStacked } from '../bags';
 import { RIFT_GEAR_ITEM_IDS } from '../content/rift/items';
 import { ITEMS } from '../data';
-import { removePreferFungible } from '../items';
+import { removePreferFungible, sellerSignedCharmDeprioritize } from '../items';
 import type { PlayerMeta, TradeSession } from '../sim';
 import type { SimContext } from '../sim_context';
 import { dist2d, type InvSlot, type ItemInstancePayload } from '../types';
@@ -194,28 +194,12 @@ export function tradeSetOffer(
 // to its owner, or gets spared while a plain copy crosses in its place.
 type PendingGrant = { itemId: string; plainCount: number; instances: ItemInstancePayload[] };
 
-/** The trade copy-choice predicate (the phase 12 QA hand-off), built per
- *  offer slot and shared VERBATIM by the real removal (removeOffer) and the
- *  capacity model (fitsAfterSwap), so the copy the model prices is the copy
- *  the transfer ships (#2139: a pre-check that disagrees with the real grant
- *  re-opens the overflow class, in both directions). Scoped to charm items
- *  (use.type 'toolEffect'): the deprioritization exists to spare the
- *  seller's original-crafter RECHARGE discount, and widening it to every
- *  signed instance would silently reroute commission and masterwork
- *  equipment trades, where the seller's signature is the very thing the
- *  buyer is trading for. The signer compare keys on the display name (the
- *  craft signing rule's own key): after a sanctioned rename the seller's
- *  older copies carry the old name and ship in the pre-fix order, the same
- *  accepted limitation `craftedBy` carries. A resolve-less seller ships
- *  signer-blind exactly as before. */
-export function sellerSignedCharmDeprioritize(
-  sellerName: string | undefined,
-  itemId: string,
-): ((instance: ItemInstancePayload) => boolean) | undefined {
-  if (sellerName === undefined) return undefined;
-  if (ITEMS[itemId]?.use?.type !== 'toolEffect') return undefined;
-  return (instance) => instance.signer === sellerName;
-}
+// The copy-choice predicate moved to items.ts (the phase 18 whole-branch
+// review widened it to the vendor and discard arms, and items.ts cannot
+// import from social/ without a cycle); re-exported here so every existing
+// importer and the source-scrape pins keep their seam. One definition still
+// feeds the real removal AND the capacity model below.
+export { sellerSignedCharmDeprioritize };
 
 function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): PendingGrant[] {
   const grants: PendingGrant[] = [];

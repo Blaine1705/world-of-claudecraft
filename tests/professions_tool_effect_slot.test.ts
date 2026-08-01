@@ -1085,3 +1085,42 @@ describe('the deny echo clamps wire-supplied ids (the whole-branch hardening)', 
     });
   });
 });
+
+describe('the dead gate on both player-reachable actions (the whole-branch hardening)', () => {
+  it('a dead player cannot slot: the charm stays in the bags and the family line answers', () => {
+    // R31 doctrine, the family standard: every adjacent surface (vendor buy/
+    // sell, harvest, fishing, delve buy) refuses dead, and these two commands
+    // consume real materials, so a ghost must not spend them.
+    const sim = simHolding('copper_mining_pick');
+    sim.player.dead = true;
+    sim.player.hp = 0;
+    sim.drainEvents();
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots, 'no slot minted while dead').toBeUndefined();
+    expect(sim.countItem('gatherers_cache'), 'the charm is not consumed').toBe(5);
+    const err = sim.drainEvents().find((e) => e.type === 'error');
+    expect(err).toMatchObject({ text: "You can't do that while dead." });
+  });
+
+  it('a dead player cannot recharge: materials stay and the same line answers', () => {
+    const sim = simHolding('copper_mining_pick');
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining).toBeDefined();
+    sim.player.dead = true;
+    sim.player.hp = 0;
+    sim.drainEvents();
+    sim.rechargeToolEffect('mining');
+    const err = sim.drainEvents().find((e) => e.type === 'error');
+    expect(err).toMatchObject({ text: "You can't do that while dead." });
+  });
+
+  it('the same player alive can slot, so the gate is the refusal and not a broken fixture', () => {
+    const sim = simHolding('copper_mining_pick');
+    sim.player.dead = true;
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots).toBeUndefined();
+    sim.player.dead = false;
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining).toBeDefined();
+  });
+});

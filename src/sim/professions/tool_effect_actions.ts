@@ -88,6 +88,16 @@ export function slotToolEffectAction(
   const effectId = boundEchoedWireId(effectIdWire);
   const r = ctx.resolve(pid);
   if (!r) return;
+  // Dead gate, matching every adjacent disposal/purchase surface (the vendor
+  // family, harvest, fishing, delve buy): a dead or ghost-released player
+  // spends nothing here. The refusal is the family's shared error line, not
+  // a new toolEffectResult reason, so the wire enum is untouched. Both
+  // player-reachable actions in this module carry it; the GM restore does
+  // not (an operator restore may legitimately target a dead character).
+  if (r.e.dead) {
+    ctx.error(r.meta.entityId, "You can't do that while dead.");
+    return;
+  }
   const resolved = resolveSlotToolEffect(
     r.meta.inventory,
     professionId,
@@ -252,6 +262,12 @@ export function rechargeToolEffectAction(
   const professionId = boundEchoedWireId(professionIdWire);
   const r = ctx.resolve(pid);
   if (!r) return;
+  // Same dead gate as slotToolEffectAction, for the same family-consistency
+  // reason (materials must not leave a dead player's bags).
+  if (r.e.dead) {
+    ctx.error(r.meta.entityId, "You can't do that while dead.");
+    return;
+  }
   // `effectId` rides every deny that HAS a slot resolved: the client renders
   // the effect's name into the line, and an omitted id renders an empty
   // name ("  is already fully charged.").

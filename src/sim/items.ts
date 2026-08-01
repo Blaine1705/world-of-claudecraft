@@ -230,12 +230,35 @@ export function removePreferFungible(
   return consumed;
 }
 
+/** The owner copy-choice predicate (the phase 12 QA hand-off, widened by the
+ *  phase 18 whole-branch review): built per removal and shared VERBATIM by
+ *  every disposal arm that can consume an instanced charm copy (the trade
+ *  removal and capacity model in social/trade.ts, the vendor sell walks, and
+ *  discardItem), so the owner's self-signed copies always go LAST and a
+ *  routine disposal cannot silently retire the R48 original-crafter recharge
+ *  discount. Scoped to charm items (use.type 'toolEffect'): widening it to
+ *  every signed instance would silently reroute commission and masterwork
+ *  equipment trades, where the signature is the very thing being traded. The
+ *  signer compare keys on the display name (the craft signing rule's own
+ *  key): after a sanctioned rename the owner's older copies carry the old
+ *  name and ship in the pre-fix order, the same accepted limitation
+ *  `craftedBy` carries. A resolve-less owner ships signer-blind as before. */
+export function sellerSignedCharmDeprioritize(
+  sellerName: string | undefined,
+  itemId: string,
+): ((instance: ItemInstancePayload) => boolean) | undefined {
+  if (sellerName === undefined) return undefined;
+  if (ITEMS[itemId]?.use?.type !== 'toolEffect') return undefined;
+  return (instance) => instance.signer === sellerName;
+}
+
 function removeVendorSellUnits(
   ctx: SimContext,
   itemId: string,
   count: number,
   pid: number,
   skip?: (instance: ItemInstancePayload) => boolean,
+  deprioritize?: (instance: ItemInstancePayload) => boolean,
 ): VendorRemovedUnit[] {
   const r = ctx.resolve(pid);
   if (!r) return [];
@@ -253,21 +276,31 @@ function removeVendorSellUnits(
     left -= take;
     if (s.count <= 0) meta.inventory.splice(i, 1);
   }
-  for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
-    const s = meta.inventory[i];
-    if (s.itemId !== itemId || !s.instance || skip?.(s.instance)) continue;
-    const take = Math.min(s.count, left);
-    for (let unit = 0; unit < take; unit++) {
-      const finalUnitOfSlot = take >= s.count && unit === take - 1;
-      consumed.push({
-        instance: finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance),
-        craftedRecipeId: s.craftedRecipeId,
-      });
+  // Two instanced passes over the same highest-index-first order, mirroring
+  // removePreferFungible: the preferred class first, then (only if still
+  // short) the deprioritized class, so a vendor sale spares the seller's own
+  // self-signed charm copies exactly the way a trade does. With no predicate
+  // the first pass is the whole old walk.
+  const instancedWalk = (takeDeprioritized: boolean): void => {
+    for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
+      const s = meta.inventory[i];
+      if (s.itemId !== itemId || !s.instance || skip?.(s.instance)) continue;
+      if ((deprioritize?.(s.instance) ?? false) !== takeDeprioritized) continue;
+      const take = Math.min(s.count, left);
+      for (let unit = 0; unit < take; unit++) {
+        const finalUnitOfSlot = take >= s.count && unit === take - 1;
+        consumed.push({
+          instance: finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance),
+          craftedRecipeId: s.craftedRecipeId,
+        });
+      }
+      s.count -= take;
+      left -= take;
+      if (s.count <= 0) meta.inventory.splice(i, 1);
     }
-    s.count -= take;
-    left -= take;
-    if (s.count <= 0) meta.inventory.splice(i, 1);
-  }
+  };
+  instancedWalk(false);
+  if (deprioritize && left > 0) instancedWalk(true);
   ctx.onInventoryChangedForQuests?.(meta);
   return consumed;
 }
@@ -285,7 +318,17 @@ export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: nu
   if (def.noDiscard) return;
   const discardCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
   if (discardCount <= 0) return;
-  removePreferFungible(ctx, itemId, discardCount, meta.entityId);
+  // The copy-choice rule on the discard arm (the phase 18 whole-branch
+  // review): with a plain and a self-signed charm copy in the bags, the
+  // discard consumes the plain one and the recharge discount survives.
+  removePreferFungible(
+    ctx,
+    itemId,
+    discardCount,
+    meta.entityId,
+    undefined,
+    sellerSignedCharmDeprioritize(meta.name, itemId),
+  );
   ctx.emit({
     type: 'log',
     // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
@@ -859,6 +902,10 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
     sellableCount,
     meta.entityId,
     (instance) => instance.boundTo !== undefined,
+    // The copy-choice rule on the vendor arm too (the phase 18 whole-branch
+    // review): the seller's own self-signed charm copies go last, so selling
+    // one of two charms never silently retires the recharge discount.
+    sellerSignedCharmDeprioritize(meta.name, itemId),
   );
   for (const unit of consumedUnits) {
     recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId);
@@ -945,6 +992,9 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
       count,
       meta.entityId,
       (instance) => instance.boundTo !== undefined,
+      // Same copy-choice rule as sellItem; unreachable for charms today
+      // (rare quality, never poor), carried for the same-walk symmetry.
+      sellerSignedCharmDeprioritize(meta.name, itemId),
     );
     for (const unit of consumedUnits) {
       recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId);

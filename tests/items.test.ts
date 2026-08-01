@@ -282,6 +282,39 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     expect(meta.vendorBuyback[0]).toEqual({ itemId: 'wolf_fang', count: 1 });
   });
 
+  it("sellItem spares the seller's self-signed charm copy (the copy-choice rule, vendor arm)", () => {
+    // The trade arm already consumed foreign copies first (phase 14); the
+    // phase 18 whole-branch review found the vendor and discard arms still
+    // took the highest-index copy, which after a fresh craft is the
+    // seller's own self-signed one, silently retiring the R48 recharge
+    // discount. Foreign first, self-signed only when nothing else remains.
+    const sim = makeWorld();
+    const { pid, meta } = vendorPlayer(sim);
+    sim.addItemInstance('gatherers_cache', { signer: 'Cedric' }, pid, 1);
+    sim.addItemInstance('gatherers_cache', { signer: 'Aleph' }, pid, 1); // highest index
+    items.sellItem(ctxOf(sim), 'gatherers_cache', 1, pid);
+    const buyback = meta.vendorBuyback as { instance?: { signer?: string } }[];
+    expect(buyback[0]?.instance?.signer, 'the FOREIGN copy sold').toBe('Cedric');
+    const kept = (meta.inventory as { itemId: string; instance?: { signer?: string } }[]).filter(
+      (s) => s.itemId === 'gatherers_cache',
+    );
+    expect(kept).toHaveLength(1);
+    expect(kept[0]?.instance?.signer, 'the self-signed copy stays').toBe('Aleph');
+  });
+
+  it('discardItem spares the self-signed charm copy the same way', () => {
+    const sim = makeWorld();
+    const { pid, meta } = vendorPlayer(sim);
+    sim.addItemInstance('gatherers_cache', { signer: 'Cedric' }, pid, 1);
+    sim.addItemInstance('gatherers_cache', { signer: 'Aleph' }, pid, 1);
+    items.discardItem(ctxOf(sim), 'gatherers_cache', 1, pid);
+    const kept = (meta.inventory as { itemId: string; instance?: { signer?: string } }[]).filter(
+      (s) => s.itemId === 'gatherers_cache',
+    );
+    expect(kept).toHaveLength(1);
+    expect(kept[0]?.instance?.signer, 'the self-signed copy survives the discard').toBe('Aleph');
+  });
+
   it('buyItem sells drink in a stack of 5 but other goods one at a time, all at the listed price', () => {
     const sim = makeWorld();
     const { pid, wilkes, meta } = vendorPlayer(sim);
