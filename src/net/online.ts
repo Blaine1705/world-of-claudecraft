@@ -172,6 +172,7 @@ interface ClientWireAura {
   emp?: Aura['empowerAbilities'];
   src?: number;
   ub?: 1;
+  bt?: 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -2772,6 +2773,13 @@ export class ClientWorld implements IWorld {
             // (auras_view ownFirst). An old server omits it; 0 matches no player id.
             rec.sourceId = a.src ?? 0;
             rec.unbreakableControl = a.ub === 1 ? true : undefined;
+            // Presence-only mirror of the break-threshold armed marker (the
+            // server emits bt = 1 when breakThreshold is defined): the one
+            // client reader is the Lingering Dread victim-band alias, which
+            // gates on breakThreshold !== undefined and never reads the
+            // value (ability_vfx/painter.ts). An old server omits it and the
+            // band stays off, exactly the offline-parity gap this closes.
+            rec.breakThreshold = a.bt === 1 ? 1 : undefined;
           }
         } else {
           e.auras = wireAuras.map((a) => ({
@@ -2790,6 +2798,7 @@ export class ClientWorld implements IWorld {
             charges: a.charges,
             empowerAbilities: a.emp,
             unbreakableControl: a.ub === 1 ? true : undefined,
+            breakThreshold: a.bt === 1 ? 1 : undefined,
           }));
         }
       }

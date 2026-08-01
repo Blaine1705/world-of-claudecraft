@@ -13,7 +13,11 @@ import { bagCapacity, canGrantCopies, instancedCountCap } from './bags';
 import { rekeySigner } from './character_rename';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
-import { sanitizeItemInstancePayloadOnLoad, warnDroppedInstanceKeys } from './item_instance_load';
+import {
+  boundCraftedRecipeIdOnLoad,
+  sanitizeItemInstancePayloadOnLoad,
+  warnDroppedInstanceKeys,
+} from './item_instance_load';
 import {
   countMatchingUnlocked,
   grantCopies,
@@ -937,7 +941,7 @@ export class Market {
         for (const d of bounded.dropped) escrowDrops.push(`listing.${l.itemId}.${d}`);
         instance = bounded.payload;
       }
-      this.marketListings.push({
+      const listing = {
         id: plan.ids[i],
         sellerKey: String(l.sellerKey ?? ''),
         sellerName: String(l.sellerName ?? l.sellerKey ?? '?'),
@@ -953,7 +957,13 @@ export class Market {
         house: false,
         ...(instance ? { instance } : {}),
         ...(typeof l.craftedRecipeId === 'string' ? { craftedRecipeId: l.craftedRecipeId } : {}),
-      });
+      };
+      // The slot-level marker bound every other persisted marker load takes
+      // (bag/buyback/bank; item_instance_load.ts doctrine): a listing row can
+      // persist to expiry and re-grant into live bags via grantCopies, so a
+      // bare typeof keep would carry an empty or unbounded marker unreported.
+      boundCraftedRecipeIdOnLoad(listing, escrowDrops, 'listing');
+      this.marketListings.push(listing);
     }
     for (const c of save.collections ?? []) {
       if (!c || typeof c.key !== 'string') continue;
@@ -966,12 +976,19 @@ export class Market {
         // its count to the identical-payload merge cap (the character-load rule).
         items: (c.items ?? [])
           .filter((s) => s && typeof s.itemId === 'string')
-          .map((s) => ({
-            ...sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance), escrowDrops),
-            ...(typeof s.craftedRecipeId === 'string'
-              ? { craftedRecipeId: s.craftedRecipeId }
-              : {}),
-          })),
+          .map((s) => {
+            const slot: InvSlot = {
+              ...sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance), escrowDrops),
+              ...(typeof s.craftedRecipeId === 'string'
+                ? { craftedRecipeId: s.craftedRecipeId }
+                : {}),
+            };
+            // Same slot-level marker bound as the listing arm above: a
+            // collection slot persists until collected and grants straight
+            // into live bags, the same forever-row class as mail.
+            boundCraftedRecipeIdOnLoad(slot, escrowDrops, 'collection');
+            return slot;
+          }),
       });
     }
     warnDroppedInstanceKeys('market book', escrowDrops);

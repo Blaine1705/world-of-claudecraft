@@ -25,7 +25,7 @@ import {
   WELCOME_LETTER,
 } from '../content/letters';
 import { ITEMS } from '../data';
-import { warnDroppedInstanceKeys } from '../item_instance_load';
+import { boundCraftedRecipeIdOnLoad, warnDroppedInstanceKeys } from '../item_instance_load';
 import { itemInstancePayloadsEqual } from '../item_instance_merge';
 import {
   countMatchingUnlocked,
@@ -962,10 +962,21 @@ export class PostOffice {
       // strips a crafted item's provenance out of an in-flight attachment.
       const items = (m.items ?? [])
         .filter((s) => s && typeof s.itemId === 'string')
-        .map((s) => ({
-          ...sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance), escrowDrops),
-          ...(typeof s.craftedRecipeId === 'string' ? { craftedRecipeId: s.craftedRecipeId } : {}),
-        }));
+        .map((s) => {
+          const slot: InvSlot = {
+            ...sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance), escrowDrops),
+            ...(typeof s.craftedRecipeId === 'string'
+              ? { craftedRecipeId: s.craftedRecipeId }
+              : {}),
+          };
+          // The slot-level marker bound every other persisted marker load
+          // takes (bag/buyback/bank; item_instance_load.ts doctrine): a mail
+          // row can persist forever with no login to self-heal it, so a bare
+          // typeof keep would ride an empty or unbounded marker through every
+          // serializeMail. Drop-only, reported on the book's aggregate line.
+          boundCraftedRecipeIdOnLoad(slot, escrowDrops, 'mail');
+          return slot;
+        });
       const kind: MailKind = m.kind === 'player' || m.kind === 'npc' ? m.kind : 'system';
       const recipientName = String(m.recipientName ?? m.recipientKey);
       const senderName = String(m.senderName ?? '?');

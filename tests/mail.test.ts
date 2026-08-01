@@ -15,7 +15,7 @@ import {
   MAIL_POSTAGE,
 } from '../src/sim/mail/post_office';
 import { Sim } from '../src/sim/sim';
-import { type SimEvent, type WorldContent } from '../src/sim/types';
+import type { SimEvent, WorldContent } from '../src/sim/types';
 
 // Mailboxes are system-owned and still spawn with this fixture. Ambient camps,
 // NPCs and quest objects are irrelevant to delivery/index invariants and would
@@ -672,6 +672,46 @@ describe('persistence and rename', () => {
     // The already-delivered letter never re-toasts after a load.
     const events = tickFor(sim2, 2);
     expect(events.some((e) => e.type === 'mailArrived' && e.senderName === 'Alice')).toBe(false);
+  });
+
+  it('bounds a persisted attachment craftedRecipeId like every other marker load', () => {
+    // The v0.34.0 merge-audit finding, mail arm: an in-flight attachment row
+    // can persist forever with no login to self-heal it, so the release's
+    // bare-typeof marker keep (#2605) must take the same drop-only bound as
+    // bag/buyback/bank (item_instance_load.ts boundCraftedRecipeIdOnLoad).
+    // Driven through the REAL loadMail path.
+    const sim = makeWorld();
+    sim.loadMail({
+      mail: [
+        {
+          recipientKey: '4242',
+          recipientName: 'Later',
+          senderName: 'Ghost',
+          kind: 'player',
+          subject: 'Markers',
+          body: 'x',
+          copper: 0,
+          delaySeconds: 0,
+          items: [
+            { itemId: 'wolf_fang', count: 1, craftedRecipeId: 'recipe_tough_jerky' },
+            { itemId: 'wolf_fang', count: 1, craftedRecipeId: 'r'.repeat(65) },
+            { itemId: 'wolf_fang', count: 1, craftedRecipeId: '' },
+          ],
+        },
+      ],
+    } as never);
+    // biome-ignore lint/suspicious/noExplicitAny: read the raw book directly.
+    const letter = (sim.postOffice as any).mail.find(
+      (m: { subject: string }) => m.subject === 'Markers',
+    );
+    if (!letter) throw new Error('missing marker letter');
+    expect(letter.items.map((s: { craftedRecipeId?: string }) => s.craftedRecipeId)).toEqual([
+      'recipe_tough_jerky',
+      undefined,
+      undefined,
+    ]);
+    expect('craftedRecipeId' in letter.items[1]).toBe(false);
+    expect('craftedRecipeId' in letter.items[2]).toBe(false);
   });
 
   it('rekeys name-keyed letters onto the stable character id on rename', () => {

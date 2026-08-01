@@ -718,6 +718,51 @@ describe('the World Market — the Merchant', () => {
     expect(new Set(ids).size).toBe(ids.length); // no id collisions
   });
 
+  it('bounds a persisted craftedRecipeId on both book arms like every other marker load', () => {
+    // The v0.34.0 merge-audit finding: the release's marker re-attach (#2605)
+    // kept a persisted craftedRecipeId on a bare typeof check while every
+    // other marker load (bag/buyback/bank) takes boundCraftedRecipeIdOnLoad,
+    // and a market row persists to expiry and grants into live bags with no
+    // login to self-heal it. Driven through the REAL loadMarket path: a legal
+    // marker survives both arms, an over-ceiling and an empty one drop whole.
+    const sim = makeWorld();
+    const listingRow = (id: number, craftedRecipeId: string) => ({
+      id,
+      sellerKey: 'k1',
+      sellerName: 'Seller',
+      itemId: 'wolf_fang',
+      count: 1,
+      price: 100,
+      secondsLeft: 600,
+      craftedRecipeId,
+    });
+    sim.loadMarket({
+      listings: [listingRow(5000, 'recipe_tough_jerky'), listingRow(5001, 'r'.repeat(65))],
+      collections: [
+        {
+          key: 'k1',
+          copper: 0,
+          items: [
+            { itemId: 'wolf_fang', count: 1, craftedRecipeId: 'recipe_tough_jerky' },
+            { itemId: 'wolf_fang', count: 1, craftedRecipeId: '' },
+          ],
+        },
+      ],
+      nextListingId: 5002,
+    } as never);
+    const legal = sim.marketListings.find((l) => l.id === 5000);
+    const over = sim.marketListings.find((l) => l.id === 5001);
+    expect(legal?.craftedRecipeId).toBe('recipe_tough_jerky');
+    expect(over && 'craftedRecipeId' in over).toBe(false);
+    const col = (
+      sim.market as unknown as {
+        marketCollections: Map<string, { items: { itemId: string; craftedRecipeId?: string }[] }>;
+      }
+    ).marketCollections.get('k1');
+    expect(col?.items[0].craftedRecipeId).toBe('recipe_tough_jerky');
+    expect(col && 'craftedRecipeId' in col.items[1]).toBe(false);
+  });
+
   // ---------------------------------------------------------------------------
   // Listing-id bands (#2463). House stock is reseeded from the id counter every
   // boot and is never persisted; player listings are replayed from the save with

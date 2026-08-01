@@ -4,7 +4,7 @@ import {
   screeSpotAt,
   screeSpotsInBounds,
 } from '../src/render/cliff_scree_core';
-import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
+import { BUILTIN_WORLD, GATHER_NODES, setActiveWorldContent } from '../src/sim/data';
 import type { WorldContent } from '../src/sim/types';
 import {
   groundHeight,
@@ -69,6 +69,38 @@ describe('cliff scree placement', () => {
       for (const zone of BUILTIN_WORLD.zones) {
         const d = Math.hypot(s.x - zone.hub.x, s.z - zone.hub.z);
         expect(d).toBeGreaterThanOrEqual(15);
+      }
+    }
+  });
+
+  it('never places inside a gather node footprint (the harvest disc plus margin)', () => {
+    // The v0.34.0 merge audit: scree had road and hub exclusions but no
+    // gather-node exclusion, and at the SHIPPED seed 22 boulders landed
+    // inside 5yd harvest discs, two essentially ON node props. The shipped
+    // seed is therefore the decisive one here: with the exclusion removed
+    // this sweep fails at 20061 (the measured regression), not just in
+    // principle. 6 = INTERACT_RANGE + 1yd of visual margin
+    // (cliff_scree_core.ts NODE_EXCLUSION_RADIUS).
+    const SHIPPED_SEED = 20061;
+    const pad = 6 + 6.5; // exclusion radius + one full candidate cell
+    for (const seed of [SHIPPED_SEED, SEED]) {
+      for (const node of GATHER_NODES) {
+        for (
+          let ci = Math.floor((node.pos.x - pad) / 6.5);
+          ci <= Math.ceil((node.pos.x + pad) / 6.5);
+          ci++
+        ) {
+          for (
+            let cj = Math.floor((node.pos.z - pad) / 6.5);
+            cj <= Math.ceil((node.pos.z + pad) / 6.5);
+            cj++
+          ) {
+            const spot = screeSpotAt(seed, ci, cj);
+            if (!spot) continue;
+            const d = Math.hypot(spot.x - node.pos.x, spot.z - node.pos.z);
+            expect(d, `${node.id} seed ${seed} cell ${ci},${cj}`).toBeGreaterThanOrEqual(6);
+          }
+        }
       }
     }
   });

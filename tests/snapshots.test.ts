@@ -4608,6 +4608,36 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     expect(mirror.unbreakableControl).toBe(true);
   });
 
+  it('round-trips the break-threshold armed marker so the dread band renders online', () => {
+    // The v0.34.0 merge audit: the release added the presence-only bt emit
+    // (server/game.ts WireAura) for the Lingering Dread victim band, but no
+    // client decode existed, so the band (ability_vfx/painter.ts, gated on
+    // breakThreshold !== undefined) could never render for online mirrors.
+    // Presence-only both ways: the value never crosses the wire.
+    const talentedFear: Aura = {
+      id: 'fear_incap',
+      name: 'Fear',
+      kind: 'stasis',
+      remaining: 8,
+      duration: 8,
+      value: 0,
+      sourceId: 0,
+      school: 'shadow',
+      breakThreshold: 120,
+    };
+    const { wire, mirror } = roundTrip(talentedFear);
+    expect(wireAura(wire, 'fear_incap').bt).toBe(1);
+    expect('breakThreshold' in wireAura(wire, 'fear_incap')).toBe(false); // presence-only: no value leak
+    expect(mirror.breakThreshold).not.toBeUndefined();
+
+    // And the negative arm: an untalented fear (no threshold) stays unmarked
+    // and mirrors to undefined, so the band gate stays closed.
+    const plainFear: Aura = { ...talentedFear, breakThreshold: undefined };
+    const plain = roundTrip(plainFear);
+    expect('bt' in wireAura(plain.wire, 'fear_incap')).toBe(false);
+    expect(plain.mirror.breakThreshold).toBeUndefined();
+  });
+
   it('round-trips the imbue judgement range (value2/value3), value omitted when 0', () => {
     const imbue: Aura = {
       id: 'holy_might',
