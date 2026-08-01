@@ -1,13 +1,15 @@
 # State: CI Speed (cross-phase cheat sheet)
 
-**Current phase:** Phase 1 IMPLEMENTATION DONE (draft PR #2737). Lint timings
-meet targets (checkout 22 to 25s; job 59 to 68s over three runs). Phase 1 QA
-not yet run. Worktree
+**Current phase:** Phase 1 QA PASS-WITH-FOLLOWUPS. PR #2737 marked ready for
+review. Lint timings meet targets (checkout 22 to 25s; job 59 to 68s over three
+implementation runs; tip resample 25s / 63s on 30707518969). Playwright cache
+HIT proven on second PR run (30707206995) and tip (30707518969). Worktree
 `/home/fernandoramirez/Documents/world-of-claudecraft-ci-speed` on
-`feature/ci-speed`, based on `origin/release/v0.34.0` at `94f5ac63d`.
+`feature/ci-speed`, based on `origin/release/v0.34.0` (not behind release).
 
-**Next action:** run Phase 1 QA (`phase-01-qa.md`). Do not mark the PR ready
-until QA PASSes.
+**Next action:** Phase 2 (shard count: measure N=6 vs N=8, lock, apply). Do not
+change matrix.shard until Phase 2 starts. Optional pin harden followups from
+Phase 1 QA may land in a small commit before or during Phase 2.
 
 ## Locked decisions
 
@@ -94,8 +96,10 @@ until QA PASSes.
 | Suite tests | ~24.4k | live shard sum |
 | Prior N=4 ship wall | 184 / 194 / 188s | toolchain Phase 4, ~1,129 files |
 | Lint checkout typical | 96 to 195s | sample of 16 runs |
+| Lint checkout Phase 1 | 22 to 25s | runs 30707112749, 30707206995, 30707453993 |
+| Lint job Phase 1 | 59 to 68s | same three runs |
 | pr-checks | ~110s | not critical path |
-| browser-gate | ~95s | Chromium install ~23s |
+| browser-gate | ~95s | Chromium install ~23s on cold; cache HIT skips browser download |
 
 ## Pinned surfaces
 
@@ -120,6 +124,8 @@ until QA PASSes.
    packet's bug. Do not block speed work on it; use a scratch release branch
    with correct version surfaces for release probes, or defer release-arm
    verification.
+7. **Phase 1 pin harden followups:** cache key consumption, PR base-arm
+   adjacency, cache-order match index (see progress.md). Not BLOCKING.
 
 ## Resume point
 
@@ -128,10 +134,9 @@ until QA PASSes.
   workflow+event_name+PR/ref), Playwright Chromium cache on browser-gate
   keyed on `playwright` package version, hardened pins in
   `tests/ci_workflow.test.ts`.
-- Draft PR: https://github.com/levy-street/world-of-claudecraft/pull/2737
-- Lint timings recorded (three green jobs under target). Still open: Phase 1
-  QA PASS only.
-- Local proof: `biome ci --changed --since=<merge-base-sha>` succeeds without
-  full history.
-- Reviews: privacy-security-review clean; test-coverage-auditor PASS after pin
-  harden.
+- PR: https://github.com/levy-street/world-of-claudecraft/pull/2737 (ready
+  after Phase 1 QA).
+- Phase 1 QA: PASS-WITH-FOLLOWUPS. security CLEAN; pin coverage PASS;
+  qa-checklist PASS-WITH-FOLLOWUPS. No BLOCKING.
+- Next: Phase 2 (`phase-02-shard-count.md`). Measure N=6 and N=8 walls +
+  completeness before locking N. Do not raise N past 8 without owner OK.

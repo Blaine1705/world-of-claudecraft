@@ -4,8 +4,8 @@
 
 | Phase | Status | PR | Notes |
 |---|---|---|---|
-| 1 Fixed-cost waste | IMPLEMENTATION DONE | #2737 (draft) | Lint checkout 22 to 25s; job 59 to 68s; await Phase 1 QA |
-| 1 QA | NOT STARTED | | |
+| 1 Fixed-cost waste | DONE | #2737 | Lint checkout 22 to 25s; job 59 to 68s |
+| 1 QA | PASS-WITH-FOLLOWUPS | #2737 ready | Docs + pin harden followups only; no BLOCKING |
 | 2 Shard count | NOT STARTED | | Measure N, lock, apply |
 | 2 QA | NOT STARTED | | Wall ≤ 8 min bar |
 | 3 Shard rebalance | NOT STARTED | | 20% balance; stretch ≤ 6 min |
@@ -29,12 +29,24 @@ Append-only. Each row: date, phase, run id, wall (s), worst shard (s), N, notes.
 
 | Date | Run | Lint checkout s | Lint job s | Notes |
 |---|---|---|---|---|
-| 2026-08-01 | 30707112749 | 25 | 59 | PR push #1; Biome 1s; success (later cancelled mid-matrix) |
-| 2026-08-01 | 30707206995 | 22 | 68 | PR push #2 (pin harden); success |
+| 2026-08-01 | 30707112749 | 25 | 59 | PR push #1; Biome 1s; success (later cancelled mid-matrix by supersession) |
+| 2026-08-01 | 30707206995 | 22 | 68 | PR push #2 (pin harden); success; later cancelled mid-matrix |
 | 2026-08-01 | 30707453993 | 24 | 60 | workflow_dispatch on branch; success |
+| 2026-08-01 | 30707518969 | 25 | 63 | tip resample after docs timing commit; lint success |
 
-Baseline was 96 to 195s checkout (outlier 588s). All three Phase 1 checkouts
+Baseline was 96 to 195s checkout (outlier 588s). All Phase 1 checkouts
 are ≤ 40s and jobs ≤ 90s.
+
+### Phase 1 Playwright cache evidence
+
+| Date | Run | Event | Cache key result | Notes |
+|---|---|---|---|---|
+| 2026-08-01 | 30707112749 | pull_request | MISS | First PR run; saved `playwright-chromium-Linux-1.61.1` |
+| 2026-08-01 | 30707206995 | pull_request | HIT | Second PR run; install still ran (OS deps); no browser download |
+| 2026-08-01 | 30707453993 | workflow_dispatch | MISS | Expected: GHA cache scope is `refs/heads/*` vs PR `refs/pull/<n>/merge` |
+| 2026-08-01 | 30707518969 | pull_request | HIT | Tip PR run; hit primary key; no browser download |
+
+Install always runs after restore (`npx playwright install --with-deps chromium`).
 
 ## Phase 1 checklist
 
@@ -46,7 +58,30 @@ are ≤ 40s and jobs ≤ 90s.
 - [x] `docs/ci-speed/**` committed
 - [x] Three runs: lint checkout ≤ 40s, job ≤ 90s typical (22/25/24s; 68/59/60s)
 - [x] Draft PR opened (#2737 against release/v0.34.0)
-- [ ] Phase 1 QA PASS
+- [x] Phase 1 QA PASS-WITH-FOLLOWUPS (2026-08-01)
+
+### Phase 1 QA evidence (2026-08-01)
+
+- Worktree: `/home/fernandoramirez/Documents/world-of-claudecraft-ci-speed` on
+  `feature/ci-speed`. Base sync: ahead of `origin/release/v0.34.0`, not behind.
+- Pins: `npx vitest run tests/ci_workflow.test.ts` green (8 tests).
+- Red-path local proofs: lint `fetch-depth: 0` fails pins; `cancel-in-progress:
+  false` fails; group without `event_name` fails; job-level-only concurrency
+  fails adjacency; cache after install fails order; wrong cache path fails.
+- Concurrency live: PR runs 30707112749 and 30707206995 cancelled mid-matrix
+  after superseding pushes (same `CI-pull_request-<n>` group).
+- Reviewers: privacy-security-review CLEAN; test-coverage-auditor PASS;
+  qa-checklist PASS-WITH-FOLLOWUPS (docs hygiene + optional pin harden).
+
+### Phase 1 followups (owner-visible; not BLOCKING)
+
+| Severity | Item | Owner |
+|---|---|---|
+| SHOULD-FIX | Pin harden: require cache `key:` to consume `steps.playwright-version.outputs.version` (not mere `require('playwright/...')` presence) | Phase 2 or small follow commit |
+| SHOULD-FIX | Pin harden: PR arm `BASE_REF` / `ref=origin/$BASE_REF` adjacency, not bare token contains | Phase 2 or small follow commit |
+| SHOULD-FIX | Pin harden: cache-before-install order against name→uses match, not raw `indexOf` of the step title | Phase 2 or small follow commit |
+| NICE-TO-HAVE | Ban `fetch-depth: '0'` (single quotes) on lint | optional |
+| NICE-TO-HAVE | `git fetch ... -- "$REF"` defense-in-depth in determine-base | optional |
 
 ## Phase 2 checklist
 
