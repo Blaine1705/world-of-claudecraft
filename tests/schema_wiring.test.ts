@@ -558,13 +558,17 @@ describe('ensureSchema wires every schema module at boot', () => {
       'guilds_realm_lower_name_prefix',
       'guilds_realm_created_id',
     ]);
-    const guildPrefix = CONCURRENT_INDEX_MIGRATIONS.at(-2);
+    const guildPrefix = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'guilds_realm_lower_name_prefix',
+    );
     expect(guildPrefix?.createSql).toContain('ON guilds(realm, lower(name) text_pattern_ops)');
     expect(guildPrefix?.checkSql).toContain("to_regclass('guilds_realm_lower_name_prefix')");
     expect(guildPrefix?.dropSql).toBe(
       'DROP INDEX CONCURRENTLY IF EXISTS guilds_realm_lower_name_prefix',
     );
-    const guildCreated = CONCURRENT_INDEX_MIGRATIONS.at(-1);
+    const guildCreated = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'guilds_realm_created_id',
+    );
     expect(guildCreated?.createSql).toContain('ON guilds(realm, created_at, id)');
     expect(guildCreated?.checkSql).toContain("to_regclass('guilds_realm_created_id')");
     expect(guildCreated?.dropSql).toBe('DROP INDEX CONCURRENTLY IF EXISTS guilds_realm_created_id');
