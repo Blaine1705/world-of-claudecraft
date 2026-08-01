@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   clampOverlayAnchor,
+  nudgeOverlayAnchor,
   parseOverlayAnchor,
   serializeOverlayAnchor,
 } from '../src/ui/proc_overlay_drag';
@@ -45,5 +46,35 @@ describe('parse / serialize round-trip', () => {
     expect(parseOverlayAnchor('{"fx":null,"fy":0.5}')).toBeNull();
     // A finite but out-of-range stored value is clamped into 0..1.
     expect(parseOverlayAnchor('{"fx":7,"fy":-3}')).toEqual({ fx: 1, fy: 0 });
+  });
+});
+
+describe('nudgeOverlayAnchor', () => {
+  it('moves one keyboard step in every arrow direction', () => {
+    const start = { fx: 0.5, fy: 0.5 };
+    expect(nudgeOverlayAnchor(start, 'ArrowLeft', 10, 300, 232, 1000, 800)).toEqual({
+      fx: 0.49,
+      fy: 0.5,
+    });
+    expect(nudgeOverlayAnchor(start, 'ArrowRight', 10, 300, 232, 1000, 800)).toEqual({
+      fx: 0.51,
+      fy: 0.5,
+    });
+    expect(nudgeOverlayAnchor(start, 'ArrowUp', 10, 300, 232, 1000, 800)).toEqual({
+      fx: 0.5,
+      fy: 0.4875,
+    });
+    expect(nudgeOverlayAnchor(start, 'ArrowDown', 10, 300, 232, 1000, 800)).toEqual({
+      fx: 0.5,
+      fy: 0.5125,
+    });
+    expect(nudgeOverlayAnchor(start, 'Enter', 10, 300, 232, 1000, 800)).toBeNull();
+  });
+
+  it('keeps keyboard movement inside the viewport', () => {
+    expect(nudgeOverlayAnchor({ fx: 0, fy: 0 }, 'ArrowLeft', 10, 300, 232, 1000, 800)).toEqual({
+      fx: 0.15,
+      fy: 0.145,
+    });
   });
 });

@@ -278,6 +278,7 @@ import { resumeDroppedPrewarmEntries } from './prewarm_resume';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
+import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
 import { isOwnedPetHostile } from './reaction';
 import { buildRealmFlora, type RealmFloraView } from './realm_flora';
 import {
@@ -1298,7 +1299,11 @@ export class Renderer {
   private readonly camDirector = createCameraDirector();
   // Player-pose mirror from last frame: any change while a directive runs is
   // manual camera input (or the follow system), which cancels the directive.
-  private readonly camMirror = { yaw: Number.NaN, pitch: Number.NaN, dist: Number.NaN };
+  private readonly camMirror = {
+    yaw: Number.NaN,
+    pitch: Number.NaN,
+    dist: Number.NaN,
+  };
   // Death-drift arming: only an alive-to-dead EDGE of the SAME viewed entity
   // arms one drift (a spectate switch onto a corpse never does), and a
   // cancelled drift stays cancelled for that death.
@@ -2458,7 +2463,21 @@ export class Renderer {
     this.mageGroundFx = new MageGroundFx(
       this.scene,
       (x, z) => groundHeight(x, z, this.sim.cfg.seed),
-      (x, z) => {
+      (x, z, meteor) => {
+        if (
+          meteor.ability &&
+          this.abilityVfx.handleSpellfxAt({
+            x,
+            z,
+            school: 'fire',
+            fx: 'nova',
+            radius: meteor.radius,
+            sourceId: meteor.sourceId,
+            ability: meteor.ability,
+          })
+        ) {
+          return;
+        }
         const gy = groundHeight(x, z, this.sim.cfg.seed);
         this.vfx.burst(new THREE.Vector3(x, gy + 0.4, z), 'fire', 34, 1.4);
       },
@@ -5715,8 +5734,73 @@ export class Renderer {
           this.triggerAttack(ev.sourceId, warriorCast.abilityId);
           break;
         }
-        if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
-        else if (ev.fx === 'heavyBolt')
+        if (
+          ev.fx === 'projectile' &&
+          ev.ability === 'soul_harvest' &&
+          this.sim.entities.get(ev.sourceId)?.auras.some((aura) => aura.kind === 'form_lich')
+        ) {
+          const view = this.views.get(ev.sourceId);
+          if (view?.metamorphVisual?.metamorphHandWorldPositions(this.tmpV, this.tmpV2)) {
+            this.vfx.deathBolt(this.tmpV, this.tmpV2, ev.targetId);
+            view.metamorphVisual.pulseMetamorphosis();
+          } else {
+            this.vfx.projectile(ev.sourceId, ev.targetId, ev.school, 1.3);
+          }
+        } else if (
+          ev.fx === 'projectile' &&
+          ev.ability === 'soul_harvest' &&
+          this.abilityVfx.handleSpellfx(ev)
+        ) {
+          // Mortal Essence Reap uses the compact pooled shadow-fang sequence.
+        } else if (
+          ev.fx === 'projectile' &&
+          ev.ability === 'shadow_bolt' &&
+          this.abilityVfx.handleSpellfx(ev)
+        ) {
+          // Gloom Bolt uses its compact green shadow-fang and scaled Ruinbolt hit.
+        } else if (
+          (ev.ability === 'soul_lance' ||
+            ev.ability === 'ossuary_mark' ||
+            ev.ability === 'ossuary_mark_detonate') &&
+          this.abilityVfx.handleSpellfx(ev)
+        ) {
+          // Necromancy's spear, stored-soul seal and collapse use their
+          // class-owned premium sequences instead of generic shadow particles.
+        } else if (
+          (ev.ability === 'emberkin_felbolt' || ev.ability === 'gloomshade_abyssal_chain') &&
+          this.abilityVfx.handleSpellfx(ev)
+        ) {
+          // Destruction's permanent demons use their authored cast clips and
+          // signature fel/void reads instead of generic school particles.
+        } else if (isNeedleOfFateProjectile(ev)) {
+          this.needleOfFateVfx.spawn(ev.sourceId, ev.targetId);
+        } else if (ev.fx === 'sentenceBurst') {
+          const condemnation = Math.max(20, Math.min(100, ev.level ?? 20));
+          if ((ev.threads ?? 0) > 0) {
+            this.sentenceVfx.trigger(ev.sourceId, ev.targetId, condemnation, ev.threads);
+          } else {
+            this.sentenceVfx.trigger(ev.sourceId, ev.targetId, condemnation);
+          }
+        } else if (
+          (ev.ability === 'immolate' ||
+            ev.ability === 'conflagrate' ||
+            ev.ability === 'shadowburn' ||
+            ev.ability === 'ruinous_brand' ||
+            ev.ability === 'reaping_command') &&
+          this.abilityVfx.handleSpellfx(ev)
+        ) {
+          // Destruction's setup, instants and Brand plus the composition-aware
+          // Necromancy command use their class-owned premium sequences.
+        } else if (
+          ev.fx === 'heavyBolt' &&
+          this.sim.entities.get(ev.sourceId)?.kind === 'player' &&
+          this.sim.entities.get(ev.sourceId)?.templateId === 'warlock' &&
+          this.abilityVfx.handleSpellfx({ ...ev, ability: 'chaos_bolt' })
+        ) {
+          // Ruinbolt is rendered by the pooled per-ability VFX subsystem.
+        } else if (ev.fx === 'projectile') {
+          this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
+        } else if (ev.fx === 'heavyBolt')
           // Pyroblast's boulder: the same homing comet, doubled up.
           this.vfx.projectile(ev.sourceId, ev.targetId, ev.school, 2);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
@@ -5770,7 +5854,7 @@ export class Renderer {
           if (src && src.kind === 'mob' && !src.castingAbility) {
             const view = this.views.get(ev.sourceId);
             const vis = view ? this.activeVisual(view) : null;
-            if (!vis?.isMidOneShot) this.triggerAttack(ev.sourceId);
+            if (!vis?.isMidOneShot) this.triggerAttack(ev.sourceId, ev.ability);
           }
         }
         break;
@@ -5795,6 +5879,8 @@ export class Renderer {
             z: ev.z,
             radius: ev.radius ?? 8,
             duration: ev.duration ?? 2,
+            sourceId: ev.sourceId,
+            ability: ev.ability,
           });
           break;
         }
@@ -6350,6 +6436,14 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = body!;
+    } else if (e.kind === 'object' && e.objectItemId === 'soulwell') {
+      // Temporary Warlock party utility: bespoke procedural prop today, kept
+      // behind buildSoulwell so a generated GLB can replace it later.
+      objectPoolKey = null;
+      const built = buildSoulwell(e.id);
+      body = built.group;
+      height = built.height;
+      objectMesh = body;
     } else if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
       // Delve interactables: skip the object pool (each is unique/stateful) and
       // build a dedicated procedural mesh that matches the crypt aesthetic.
@@ -7787,6 +7881,7 @@ export class Renderer {
       } else {
         // Object views usually own their geometries. Door portal resources are
         // shared and prewarmed, so they must survive interest churn.
+        if (v.objectMesh) disposeSoulwellVisual(v.objectMesh);
         v.group.traverse((o) => {
           const mesh = o as THREE.Mesh;
           if (mesh.isMesh && !isSharedGeometry(mesh.geometry)) mesh.geometry.dispose();
@@ -8297,6 +8392,9 @@ export class Renderer {
               glow.position.y = baseLocalY + Math.sin(this.time * 2.4 + e.id) * 0.06;
             }
           }
+        }
+        if (vis && e.objectItemId === 'soulwell' && v.objectMesh) {
+          syncSoulwellVisual(v.objectMesh, this.time, e.id);
         }
         continue;
       }

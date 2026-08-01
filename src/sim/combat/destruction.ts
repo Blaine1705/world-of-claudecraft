@@ -14,6 +14,7 @@ import { grantShadowCredit } from './warlock_talents';
 
 export const RUIN_MAX = 5;
 export const RUIN_DURATION = 3600;
+export const RUIN_OUT_OF_COMBAT_CAP = 3;
 export const DESOLATION_MAX_STACKS = 2;
 export const DESOLATION_DURATION = 15;
 export const DESOLATION_RUINBOLT_CAST_MULT = 0.7;
@@ -91,6 +92,12 @@ export function gainRuin(ctx: SimContext, player: Entity, amount: number): void 
     sourceId: player.id,
     school: 'fire',
   });
+}
+
+export function regenerateRuinOutOfCombat(ctx: SimContext, player: Entity, meta: PlayerMeta): void {
+  if (player.inCombat || !isCommittedDestruction(ctx, meta)) return;
+  if (ruinAmount(player) >= RUIN_OUT_OF_COMBAT_CAP) return;
+  gainRuin(ctx, player, 1);
 }
 
 export function spendRuin(ctx: SimContext, player: Entity, amount: number): boolean {
@@ -291,6 +298,8 @@ export function summonPyreColossus(
     fx: 'meteorFall',
     radius: 6,
     duration: 0.35,
+    sourceId: player.id,
+    ability: 'summon_infernal',
   });
   ctx.emit({
     type: 'log',

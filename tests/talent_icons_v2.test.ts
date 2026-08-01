@@ -61,15 +61,15 @@ describe('Talents V2 icon routing', () => {
     });
   });
 
-  it('uses authored ability icons for bespoke Warlock global mechanics', () => {
-    expect(talentRowOptionIconRef(warlockOption('wlk_r8_curse_of_exhaustion'))).toEqual({
-      kind: 'ability',
-      id: 'curse_of_exhaustion',
-    });
-    expect(talentRowOptionIconRef(warlockOption('wlk_r20_grimoire_of_haste'))).toEqual({
-      kind: 'ability',
-      id: 'summon_felhunter',
-    });
+  it('routes every Warlock choice through its unique authored talent icon', () => {
+    for (const row of ROW_TREES.warlock) {
+      for (const option of row.options) {
+        expect(talentRowOptionIconRef(warlockOption(option.id))).toEqual({
+          kind: 'ability',
+          id: option.id,
+        });
+      }
+    }
   });
 
   it('uses the authored Mage spec panel art for all three mage specs', () => {

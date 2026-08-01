@@ -116,6 +116,29 @@ function ownedUndead(sim: Sim): Entity[] {
 }
 
 describe('Necromancy Warlock', () => {
+  it('learns the Necromancy core kit at the assigned levels', () => {
+    const at = (level: number) =>
+      abilitiesKnownAt('warlock', level, {
+        ...emptyModifiers(),
+        spec: 'demonology',
+      }).map((known) => known.def.id);
+
+    expect(at(1)).toEqual(expect.arrayContaining(['soul_harvest', 'raise_graveguard']));
+    expect(at(4)).not.toContain('raise_skeletal_warrior');
+    expect(at(5)).toEqual(expect.arrayContaining(['raise_skeletal_warrior', 'funeral_harvest']));
+    expect(at(7)).toContain('searing_pain');
+    expect(at(6)).not.toContain('sacrifice_undead');
+    expect(at(8)).toEqual(expect.arrayContaining(['raise_bone_mage', 'bone_armor']));
+    expect(at(9)).toContain('soul_lance');
+    expect(at(11)).toContain('corpse_explosion');
+    expect(at(12)).toContain('ossuary_mark');
+    expect(at(13)).toContain('unholy_command');
+    expect(at(14)).toContain('reaping_command');
+    expect(at(7)).toContain('sacrifice_undead');
+    expect(at(15)).not.toContain('army_of_the_dead');
+    expect(at(16)).toContain('army_of_the_dead');
+  });
+
   it('replaces Demonology with the Necromancy identity while preserving its internal id', () => {
     const sim = makeNecromancer();
     const meta = sim.players.get(sim.playerId);
@@ -150,7 +173,6 @@ describe('Necromancy Warlock', () => {
       'corruption',
       'curse_of_agony',
       'drain_life',
-      'searing_pain',
     ]) {
       expect(known, removed).not.toContain(removed);
     }
@@ -176,13 +198,12 @@ describe('Necromancy Warlock', () => {
       'corruption',
       'curse_of_agony',
       'drain_life',
-      'searing_pain',
     ]) {
       expect(known, removed).not.toContain(removed);
     }
   });
 
-  it('learns the retained Necromancy class kit at its original levels', () => {
+  it('learns the retained Necromancy class kit at its assigned levels', () => {
     const at = (level: number) =>
       abilitiesKnownAt('warlock', level, {
         ...emptyModifiers(),
@@ -196,7 +217,7 @@ describe('Necromancy Warlock', () => {
       { level: 9, learned: 'soul_lance' },
       { level: 10, learned: 'spell_lock' },
       { level: 12, learned: 'ossuary_mark' },
-      { level: 14, learned: 'fear' },
+      { level: 10, learned: 'fear' },
     ] as const;
     for (const { level, learned } of boundaries) {
       expect(at(level), `${learned} at level ${level}`).toContain(learned);
@@ -511,14 +532,14 @@ describe('Necromancy Warlock', () => {
 
     expect(sim.setSpec('affliction')).toBe(true);
     expect(knownAbilities(sim)).toContain('drain_life');
-    expect(knownAbilities(sim)).not.toEqual(expect.arrayContaining(['immolate', 'searing_pain']));
+    expect(knownAbilities(sim)).not.toEqual(expect.arrayContaining(['immolate']));
     expect(knownAbilities(sim)).not.toContain('life_tap');
 
     expect(sim.setSpec(null)).toBe(true);
     expect(knownAbilities(sim)).toEqual(
       expect.arrayContaining(['corruption', 'curse_of_agony', 'drain_life']),
     );
-    expect(knownAbilities(sim)).not.toEqual(expect.arrayContaining(['immolate', 'searing_pain']));
+    expect(knownAbilities(sim)).not.toEqual(expect.arrayContaining(['immolate']));
 
     expect(sim.setSpec('affliction')).toBe(true);
     sim.setPlayerLevel(13);
@@ -1383,28 +1404,25 @@ describe('Necromancy Warlock', () => {
   it.each([
     ['raise_skeletal_warrior', 1],
     ['raise_bone_mage', 2],
-  ] as const)(
-    'treats the portal army as all three temporary slots and rejects %s without spending resources',
-    (abilityId, fragments) => {
-      const sim = makeNecromancer();
-      addTarget(sim);
+  ] as const)('treats the portal army as all three temporary slots and rejects %s without spending resources', (abilityId, fragments) => {
+    const sim = makeNecromancer();
+    addTarget(sim);
 
-      finishCast(sim, 'army_of_the_dead');
-      addSoulFragments(sim as unknown as SimContext, sim.player, fragments);
-      sim.player.resource = sim.player.maxResource;
-      const manaBefore = sim.player.resource;
-      sim.castAbility(abilityId);
+    finishCast(sim, 'army_of_the_dead');
+    addSoulFragments(sim as unknown as SimContext, sim.player, fragments);
+    sim.player.resource = sim.player.maxResource;
+    const manaBefore = sim.player.resource;
+    sim.castAbility(abilityId);
 
-      const temporary = ownedUndead(sim).filter((pet) => pet.templateId !== 'graveguard');
-      expect(temporary.map((pet) => pet.templateId)).toEqual([
-        'necromancy_skeletal_warrior',
-        'necromancy_bone_mage',
-        'necromancy_gravewing',
-      ]);
-      expect(fragmentCount(sim.player)).toBe(fragments);
-      expect(sim.player.resource).toBe(manaBefore);
-    },
-  );
+    const temporary = ownedUndead(sim).filter((pet) => pet.templateId !== 'graveguard');
+    expect(temporary.map((pet) => pet.templateId)).toEqual([
+      'necromancy_skeletal_warrior',
+      'necromancy_bone_mage',
+      'necromancy_gravewing',
+    ]);
+    expect(fragmentCount(sim.player)).toBe(fragments);
+    expect(sim.player.resource).toBe(manaBefore);
+  });
 
   it('reopens all temporary servant slots after the portal army expires', () => {
     const sim = makeNecromancer();

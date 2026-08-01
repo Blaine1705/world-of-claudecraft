@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { dealDamage } from '../src/sim/combat/damage';
 import { gainRuin, spendRuin } from '../src/sim/combat/destruction';
 import { consumeFreeCostFor } from '../src/sim/combat/empower_next';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
@@ -115,7 +116,7 @@ describe('warlock class talent tree', () => {
     });
   });
 
-  it('implements Sanguine Covenant and protects the shared Consume channel', () => {
+  it('implements Sanguine Covenant', () => {
     const pact = rig({ 11: 'wlk_r11_fel_concentration' });
     const hpBefore = pact.player.hp;
     pact.sim.castAbility('dark_pact');
@@ -125,30 +126,9 @@ describe('warlock class talent tree', () => {
       value: Math.round(pact.player.maxHp * 0.3),
       remaining: 8,
     });
-
-    const hunger = rig({ 11: 'wlk_r11_demon_armor' });
-    const attacker = addTarget(hunger.sim);
-    hunger.sim.castAbility('drain_life');
-    const castBefore = hunger.player.castRemaining;
-    const hpBeforeHit = hunger.player.hp;
-    (
-      hunger.sim as unknown as {
-        dealDamage(
-          source: Entity,
-          target: Entity,
-          amount: number,
-          crit: boolean,
-          school: string,
-          ability: string,
-          kind: 'hit',
-        ): void;
-      }
-    ).dealDamage(attacker, hunger.player, 100, false, 'shadow', 'Test', 'hit');
-    expect(hpBeforeHit - hunger.player.hp).toBe(85);
-    expect(hunger.player.castRemaining).toBe(castBefore);
   });
 
-  it('makes Pact Deepened increase Fiendhide armor by 50%', () => {
+  it('makes Pact Deepened double Fiendhide armor', () => {
     const base = rig({});
     const deepened = rig({ 11: 'wlk_r11_improved_life_tap' });
     const baseArmor = base.player.stats.armor;
@@ -158,7 +138,25 @@ describe('warlock class talent tree', () => {
     deepened.sim.castAbility('demon_skin');
 
     expect(base.player.stats.armor - baseArmor).toBe(80);
-    expect(deepened.player.stats.armor - deepenedArmor).toBe(120);
+    expect(deepened.player.stats.armor - deepenedArmor).toBe(160);
+  });
+
+  it('makes Pact Deepened reduce magic damage by 5% only while Fiendhide is active', () => {
+    const { sim, player } = rig({ 11: 'wlk_r11_improved_life_tap' });
+    const source = addTarget(sim);
+    const hpBefore = player.hp;
+
+    dealDamage(sim.ctx, source, player, 100, false, 'fire', 'Test Flame', 'hit');
+    expect(player.hp).toBe(hpBefore - 100);
+
+    player.hp = hpBefore;
+    sim.castAbility('demon_skin');
+    dealDamage(sim.ctx, source, player, 100, false, 'fire', 'Test Flame', 'hit');
+    expect(player.hp).toBe(hpBefore - 95);
+
+    player.hp = hpBefore;
+    dealDamage(sim.ctx, source, player, 100, false, 'physical', 'Test Strike', 'hit');
+    expect(player.hp).toBe(hpBefore - 100);
   });
 
   it('awards one or two Shadow Credit charges from real specialization spending', () => {
@@ -208,6 +206,17 @@ describe('warlock class talent tree', () => {
     expect(player.hp).toBe(hpBeforeCopy - Math.round(hpBeforeCopy * 0.1));
     expect(player.cooldowns.get('dark_pact')).toBeCloseTo(remaining);
     expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection')).toBe(false);
+  });
+
+  it('does not waste Forbidden Reflection on Soulwell', () => {
+    const { sim, player } = rig({ 20: 'wlk_r20_grimoire_of_haste' });
+
+    sim.castAbility('soulwell');
+    tick(sim, 80);
+
+    expect(player.cooldowns.has('soulwell')).toBe(true);
+    expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection')).toBe(false);
+    expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection_lock')).toBe(false);
   });
 
   it('removes transient talent state when the selected rows change', () => {

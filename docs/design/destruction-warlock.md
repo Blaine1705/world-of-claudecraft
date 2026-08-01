@@ -7,7 +7,11 @@ engine or Necromancy's summon economy.
 
 ## Resource: Ruin
 
-- Ruin has five visible pips and persists as synchronized aura state.
+- Ruin has five visible marks and persists as synchronized aura state.
+- Its dedicated draggable ritual meter sits away from the player unit frame. Empty
+  obsidian seals ignite individually, and the complete bank gains a full-state flare.
+- While out of combat, the normal two-second resource tick generates one Ruin up to
+  three. The last two marks must be earned in combat.
 - Gloom Bolt generates one Ruin when its projectile lands.
 - Conflagrate generates one Ruin and one Desolation.
 - Ruinbolt and Rain of Fire cost three Ruin.
@@ -32,9 +36,20 @@ for 25% damage when cast into the branded enemy, or copy 50% of their resolved d
 damage to it when cast into another target. The echoes cannot recurse, generate Ruin,
 or repeat proc rolls.
 
+## Permanent demons
+
+- Emberkin is the Warlock's shared starter demon before specialization. Choosing
+  Destruction keeps it; choosing Affliction or Necromancy removes it from the known
+  spellbook. It casts Felbolt from range, using its authored cast animation and a
+  compact green fel projectile. Its summon ranks at levels 1, 8, 14, and 20 grow its
+  visual scale from 0.55 to 0.85 without changing its combat role.
+- Gloomshade is the tank option. It taunts normally and automatically uses Abyssal
+  Chain every fifteen seconds when an ordinary enemy moves 8 to 20 yards away,
+  pulling it back to melee range. Bosses and control-immune enemies cannot be pulled.
+
 ## Major cooldown
 
-Pyre Colossus is a two-second aimed cast with a three-minute cooldown. It impacts
+Pyre Colossus is an instant aimed cast with a three-minute cooldown. It impacts
 for area Fire damage, fights for fifteen seconds as a guardian without replacing
 the normal demon, and answers each Ruin spender with one deterministic Worldfire
 attack.
@@ -56,16 +71,16 @@ pass in every non-English locale except Spanish before release:
 | Level | Addition |
 | --- | --- |
 | 5 | Destruction specialization, Ruin, and Conflagrate |
-| 10 | Ruinbolt |
-| 14 | Duskfire |
-| 16 | Ruinous Brand |
-| 12 | Rain of Fire, rank 1 (4 sec) |
+| 5 | Ruinbolt |
+| 12 | Duskfire |
+| 10 | Ruinous Brand |
+| 8 | Rain of Fire, rank 1 (4 sec) |
 | 18 | Rain of Fire, rank 2 (6 sec) |
-| 20 | Pyre Colossus |
+| 13 | Pyre Colossus |
 
-Blackrot, Hex of Anguish, Sear, and Wraithborn are excluded from committed
-Destruction. Their definitions remain intact for other Warlock specializations and
-save compatibility.
+Blackrot, Hex of Anguish, and Sear are excluded from committed Destruction. Duskborn,
+Spellhound, Warfiend, and Wraithborn have been retired from the Warlock class rather
+than retained as hidden summons.
 
 ## Tuning anchors
 
@@ -76,4 +91,4 @@ save compatibility.
 | Duskfire | 35 / costs 1 | instant, 12s cooldown | 72-84 below 20% health |
 | Ruinous Brand | 35 / none | instant, 20s cooldown | three 50% copies |
 | Rain of Fire | 45-60 / costs 3 | instant, no cooldown | 5-7 per wave for 4s; rank 2: 8-11 for 6s |
-| Pyre Colossus | 100 / none | 2s aimed, 180s cooldown | 58-72 impact plus Worldfire |
+| Pyre Colossus | 100 / none | instant aimed, 180s cooldown | 58-72 impact plus Worldfire |

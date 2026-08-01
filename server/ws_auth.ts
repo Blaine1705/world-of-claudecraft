@@ -19,6 +19,7 @@ import {
   type BankBonusSource,
   ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
+  PET_SPECIAL_WIRE_VERSION,
   STABLE_TIMER_WIRE_VERSION,
 } from '../src/world_api';
 import type {
@@ -262,6 +263,8 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     // strings, booleans, and unknown future versions stay on the legacy wire.
     const timerWireVersion: 1 | typeof STABLE_TIMER_WIRE_VERSION =
       msg.timerWire === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
+    const petSpecialWireVersion: 0 | typeof PET_SPECIAL_WIRE_VERSION =
+      msg.petSpecialWire === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0;
     const account = await accountAndScopeForToken(token);
     if (account === null || account.scope !== 'full' || !Number.isFinite(characterId)) {
       rejectHandshake(ws, WS_AUTH_ERROR.notAuthenticated);
@@ -315,6 +318,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       adminPermissions,
       clientSeed,
       timerWireVersion,
+      petSpecialWireVersion,
       // The character's stored action-bar layout, sent once to the owning client
       // so it restores at login on any device (game.join re-validates it).
       hotbarLayout: character.hotbar_layout ?? null,

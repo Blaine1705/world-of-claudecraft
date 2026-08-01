@@ -1451,6 +1451,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Umbral Anchor"
       },
       {
+        "id": "soulwell",
+        "name": "Soulwell"
+      },
+      {
         "id": "chaos_bolt",
         "name": "Ruinbolt"
       },
@@ -1475,18 +1479,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Duskfire"
       },
       {
-        "id": "summon_succubus",
-        "name": "Summon Duskborn"
-      },
-      {
-        "id": "summon_felhunter",
-        "name": "Summon Spellhound"
-      },
-      {
-        "id": "summon_felguard",
-        "name": "Summon Warfiend"
-      },
-      {
         "id": "ruinous_brand",
         "name": "Ruinous Brand"
       },
@@ -1497,10 +1489,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "summon_infernal",
         "name": "Summon Pyre Colossus"
-      },
-      {
-        "id": "summon_doomguard",
-        "name": "Summon Wraithborn"
       },
       {
         "id": "rain_of_fire",
@@ -2172,38 +2160,10 @@ export const GUIDE_WARLOCK_PETS: GuideWarlockPet[] = [
     "still": "/guide-stills/mob_gloomshade.webp"
   },
   {
-    "id": "duskborn",
-    "name": "Duskborn",
-    "model": "mob_demon",
-    "tint": "#c6469b",
-    "still": "/guide-stills/mob_demon__c6469b.webp"
-  },
-  {
-    "id": "spellhound",
-    "name": "Spellhound",
-    "model": "mob_demonalt",
-    "tint": "#4a7d4a",
-    "still": "/guide-stills/mob_demonalt__4a7d4a.webp"
-  },
-  {
-    "id": "warfiend",
-    "name": "Warfiend",
-    "model": "mob_demonalt",
-    "tint": "#6e5a2a",
-    "still": "/guide-stills/mob_demonalt__6e5a2a.webp"
-  },
-  {
     "id": "pyre_colossus",
     "name": "Pyre Colossus",
     "model": "mob_pyre_colossus",
     "still": "/guide-stills/mob_pyre_colossus.webp"
-  },
-  {
-    "id": "wraithborn",
-    "name": "Wraithborn",
-    "model": "mob_demonalt",
-    "tint": "#7a3a8e",
-    "still": "/guide-stills/mob_demonalt__7a3a8e.webp"
   }
 ];
 
@@ -9995,22 +9955,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "yaw": -1.5707963267948966
   },
   "mob_gloomshade": {
-    "url": "models/creatures/gloomshade_chainwarden.glb",
+    "url": "models/creatures/gloomshade_abyssal_guardian.glb",
     "idle": "Idle",
-    "height": 2.75,
+    "height": 2.6,
     "yaw": -1.5707963267948966
-  },
-  "mob_demon": {
-    "url": "models/creatures/demonalt.glb",
-    "idle": "Idle",
-    "height": 1.8,
-    "tintStrength": 0.5
-  },
-  "mob_demonalt": {
-    "url": "models/creatures/demonalt.glb",
-    "idle": "Idle",
-    "height": 2.1,
-    "tintStrength": 0.35
   },
   "mob_pyre_colossus": {
     "url": "models/creatures/pyre_colossus.glb",

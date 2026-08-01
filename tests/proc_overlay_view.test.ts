@@ -210,6 +210,64 @@ describe('ProcOverlayPainter class mapping', () => {
     expect(attrs.get('aria-hidden')).toBe('true');
   });
 
+  it('lights every Destruction threshold, exposes a stable meter name, and clears other themes', () => {
+    const { writers, classes, attrs } = fakeWriters();
+    const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
+
+    for (let amount = 0; amount <= 5; amount++) {
+      painter.paintDestructionMarks(amount, 'Ruin', `${amount} of 5 Ruin`);
+      expect(classes.get('destruction')).toBe(true);
+      for (let mark = 1; mark <= 5; mark++) {
+        expect(classes.get(`r${mark}`)).toBe(mark <= amount);
+      }
+    }
+
+    expect(classes.get('necromancy')).toBe(false);
+    expect(classes.get('frost')).toBe(false);
+    expect(classes.get('chrono')).toBe(false);
+    expect(classes.get('hot')).toBe(false);
+    expect(attrs.get('aria-hidden')).toBe('false');
+    expect(attrs.get('aria-valuenow')).toBe('5');
+    expect(attrs.get('aria-valuetext')).toBe('5 of 5 Ruin');
+    expect(attrs.get('aria-label')).toBe('Ruin');
+    expect(attrs.get('tabindex')).toBe('0');
+  });
+
+  it('clears every Destruction mark and restores the meter label on a theme switch', () => {
+    const { writers, classes, attrs } = fakeWriters();
+    const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
+    painter.paintDestructionMarks(5, 'Ruin', '5 of 5 Ruin');
+
+    painter.paintNecromancyCharges(2, 'Soul Fragments');
+    expect(classes.get('destruction')).toBe(false);
+    for (let mark = 1; mark <= 5; mark++) {
+      expect(classes.get(`r${mark}`)).toBe(false);
+    }
+    expect(classes.get('necromancy')).toBe(true);
+    expect(attrs.get('aria-label')).toBe('Soul Fragments');
+    expect(attrs.get('aria-valuetext')).toBe('Soul Fragments');
+  });
+
+  it('clears every Destruction mark from each non-Destruction painter path', () => {
+    const paintOtherThemes = [
+      (painter: ProcOverlayPainter) => painter.paint('hot'),
+      (painter: ProcOverlayPainter) => painter.paintChronoCharges(2),
+      (painter: ProcOverlayPainter) => painter.paintFrostCharges(2),
+      (painter: ProcOverlayPainter) => painter.paintNecromancyCharges(2, 'Soul Fragments'),
+    ];
+
+    for (const paintOtherTheme of paintOtherThemes) {
+      const { writers, classes } = fakeWriters();
+      const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
+      painter.paintDestructionMarks(5, 'Ruin', '5 of 5 Ruin');
+      paintOtherTheme(painter);
+      expect(classes.get('destruction')).toBe(false);
+      for (let mark = 1; mark <= 5; mark++) {
+        expect(classes.get(`r${mark}`)).toBe(false);
+      }
+    }
+  });
+
   it('pins the Fire phoenix during Combustion without requiring Hot Streak', () => {
     const { writers, classes } = fakeWriters();
     const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
@@ -302,6 +360,75 @@ describe('Necromancy Soul Fragment visual progression', () => {
   });
 });
 
+describe('Destruction Ruin visual progression', () => {
+  it('renders five independently lit marks in a dedicated ritual bank', () => {
+    const domSource = readFileSync(
+      new URL('../src/ui/proc_overlay_dom.ts', import.meta.url),
+      'utf8',
+    );
+    const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+    const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+
+    expect(domSource).toContain('class="ruin-ritual"');
+    expect(domSource.match(/class="ruin-mark ruin-mark-[1-5]"/g)).toHaveLength(5);
+    for (let stack = 1; stack <= 5; stack++) {
+      expect(domSource.match(new RegExp(`class="ruin-mark ruin-mark-${stack}"`, 'g'))).toHaveLength(
+        1,
+      );
+      expect(css).toContain(`#proc-overlay.destruction.r${stack} .ruin-mark-${stack}`);
+    }
+    expect(hudSource).toContain('const ruinPips = destructionRuinPips');
+    expect(hudSource).toMatch(/paintDestructionMarks\(\s*ruinPips/);
+    expect(hudSource).toContain("t('hudChrome.procOverlay.ruinMeter')");
+    expect(hudSource).toContain("t('hudChrome.procOverlay.ruinStatus'");
+    expect(css).not.toContain('.combo-row.ruin');
+  });
+
+  it('exposes a bounded keyboard-movable meter and honors motion preferences', () => {
+    const domSource = readFileSync(
+      new URL('../src/ui/proc_overlay_dom.ts', import.meta.url),
+      'utf8',
+    );
+    const dragSource = readFileSync(
+      new URL('../src/ui/proc_overlay_drag.ts', import.meta.url),
+      'utf8',
+    );
+    const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+
+    expect(domSource).toContain("el.setAttribute('role', 'meter')");
+    expect(domSource).toContain("el.setAttribute('aria-valuemin', '0')");
+    expect(domSource).toContain("el.setAttribute('aria-valuemax', '5')");
+    expect(domSource).toContain("el.setAttribute('tabindex', '-1')");
+    expect(domSource).toContain("el.setAttribute('aria-keyshortcuts'");
+    expect(dragSource).toContain("el.addEventListener('keydown'");
+    expect(css).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?#proc-overlay\.destruction[\s\S]*?transition: none !important;/,
+    );
+    expect(css).toMatch(
+      /body\.reduce-motion #proc-overlay\.destruction[\s\S]*?transition: none !important;/,
+    );
+  });
+
+  it('keeps the empty bank visible, draggable, and gives the full bank a flare', () => {
+    const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+    const rootRule = css.match(/#proc-overlay\.destruction\s*\{([^}]*)\}/)?.[1] ?? '';
+    const artworkRule =
+      css.match(
+        /#proc-overlay\.destruction \.ruin-ritual,\s*#proc-overlay\.destruction \.ruin-mark\s*\{([^}]*)\}/,
+      )?.[1] ?? '';
+    const fullRule = css.match(/#proc-overlay\.destruction\.r5\s*\{([^}]*)\}/)?.[1] ?? '';
+    const flareRule =
+      css.match(/#proc-overlay\.destruction\.r5 \.ruin-ritual::after\s*\{([^}]*)\}/)?.[1] ?? '';
+
+    expect(rootRule).toContain('opacity: 0.76');
+    expect(rootRule).toContain('pointer-events: none');
+    expect(artworkRule).toContain('pointer-events: auto');
+    expect(artworkRule).toContain('cursor: grab');
+    expect(fullRule).toContain('opacity: 1');
+    expect(flareRule).toContain('animation: ruin-bank-full-flare');
+  });
+});
+
 describe('Phoenix mobile size', () => {
   it('scales the shared proc overlay down only in touch layout', () => {
     const desktopCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
@@ -313,11 +440,14 @@ describe('Phoenix mobile size', () => {
     const mobileRule = mobileCss.match(/body\.mobile-touch #proc-overlay\s*\{([^}]*)\}/)?.[1] ?? '';
     const necromancyMobileRule =
       mobileCss.match(/body\.mobile-touch #proc-overlay\.necromancy\s*\{([^}]*)\}/)?.[1] ?? '';
+    const destructionMobileRule =
+      mobileCss.match(/body\.mobile-touch #proc-overlay\.destruction\s*\{([^}]*)\}/)?.[1] ?? '';
 
     expect(baseRule).toContain('width: 300px');
     expect(baseRule).toContain('height: 232px');
     expect(baseRule).not.toContain('scale: 0.2');
     expect(mobileRule).toContain('scale: 0.2');
     expect(necromancyMobileRule).toContain('scale: 0.55');
+    expect(destructionMobileRule).toContain('scale: 0.6');
   });
 });

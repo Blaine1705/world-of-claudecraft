@@ -178,6 +178,13 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
       expect(rendered.get('wlk_r14_ruin')).toContain('Trato');
       expect(rendered.get('wlk_r14_ruin')).toContain('Pacto');
       expect(rendered.get('wlk_r17_death_coil')).toContain('25');
+      expect(rendered.get('wlk_r17_death_coil')).toContain('Maleficio de violencia');
+      expect(rendered.get('wlk_r17_death_coil')).toContain('Mandato profano');
+      expect(rendered.get('wlk_r17_death_coil')).toContain('Marca ruinosa');
+      expect(rendered.get('wlk_r20_chaos_bolt')).toContain('habilidades de clase de brujo');
+      expect(rendered.get('wlk_r20_chaos_bolt')).toContain('talentos finales');
+      expect(rendered.get('wlk_r20_grimoire_of_haste')).toContain('esa misma habilidad');
+      expect(rendered.get('wlk_r20_grimoire_of_haste')).toContain('una vez cada 60 s');
       expect(rendered.get('wlk_r20_curse_mastery')).toContain('90');
     } finally {
       setLanguage('en');
@@ -266,7 +273,8 @@ const PCT_FIELDS = new Set([
   'warlockLeadenHex',
   'warlockShadowCredit',
   'warlockAshenFocus',
-  'warlockConsumeChannelDr',
+  'warlockSoulwellWardPct',
+  'warlockFiendhideMagicDrPct',
   'upperThresholdPct',
 ]);
 

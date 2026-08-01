@@ -73,6 +73,9 @@
     top: 14px;
     height: 156px;
   }
+  body.mobile-touch #proc-overlay.destruction {
+    scale: 0.6;
+  }
   /* The HUD overlay must let one-finger panning reach scrollable windows (Bag,
      Market, etc.) on iOS: Safari intersects touch-action down the ancestor
      chain, so `none` here would block child scroll containers and a child's
@@ -1751,7 +1754,7 @@
     left: 50%;
     bottom: calc(66px + env(safe-area-inset-bottom));
     width: min(246px, 62vw);
-    height: 20px;
+    height: 40px;
     margin: 0;
     transform: translateX(-50%);
   }
@@ -1761,6 +1764,11 @@
   }
   body.mobile-touch .warlock-doom-label {
     font-size: 10px;
+  }
+  body.mobile-touch .warlock-fate-threads {
+    width: 170px;
+    height: 21px;
+    gap: 17px;
   }
   body.mobile-touch #player-frame .portrait-wrap {
     z-index: 3;

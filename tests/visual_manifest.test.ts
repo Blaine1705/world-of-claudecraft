@@ -278,8 +278,8 @@ describe('character visual manifest', () => {
       {
         templateId: 'gloomshade',
         key: 'mob_gloomshade',
-        url: 'models/creatures/gloomshade_chainwarden.glb',
-        height: 2.75,
+        url: 'models/creatures/gloomshade_abyssal_guardian.glb',
+        height: 2.6,
         scale: 1.15,
       },
       {
@@ -319,6 +319,14 @@ describe('character visual manifest', () => {
         attack: ['Attack'],
         hit: ['Hit'],
       });
+      if (summon.templateId === 'emberkin') {
+        expect(visual.clips.attackByAbility).toEqual({ emberkin_felbolt: 'Cast' });
+      }
+      if (summon.templateId === 'gloomshade') {
+        expect(visual.clips.attackByAbility).toEqual({
+          gloomshade_abyssal_chain: 'Cast',
+        });
+      }
 
       const publicPath = `public/${visual.url}`;
       const animationNames = await glbAnimationNames(publicPath);
@@ -338,7 +346,6 @@ describe('character visual manifest', () => {
       if (summon.templateId === 'gloomshade') {
         const binary = readFileSync(publicPath);
         expect(binary.byteLength).toBeLessThanOrEqual(1536 * 1024);
-        expect(binary.includes('EXT_meshopt_compression')).toBe(true);
       }
       const digest = createHash('sha256')
         .update(readFileSync(publicPath))

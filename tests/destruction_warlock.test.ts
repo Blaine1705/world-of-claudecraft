@@ -29,6 +29,11 @@ function addDummy(sim: Sim, id: number, offsetX = 0, hp = 1_000_000): Entity {
   });
   mob.hostile = true;
   mob.maxHp = mob.hp = hp;
+  mob.aiState = 'attack';
+  mob.aggroTargetId = p.id;
+  mob.combatTimer = 0;
+  p.inCombat = true;
+  p.combatTimer = 0;
   (sim as unknown as { addEntity(e: Entity): void }).addEntity(mob);
   return mob;
 }
@@ -107,20 +112,17 @@ describe('destruction progression', () => {
 
   it('introduces the spec loop in stages from Conflagrate to the Pyre Colossus', () => {
     expect(destructionKnownAt(5)).toContain('conflagrate');
-    expect(destructionKnownAt(5)).not.toContain('chaos_bolt');
+    expect(destructionKnownAt(5)).toContain('chaos_bolt');
+    expect(destructionKnownAt(4)).not.toContain('chaos_bolt');
 
-    expect(destructionKnownAt(10)).toContain('chaos_bolt');
-    expect(destructionKnownAt(10)).not.toContain('shadowburn');
-
-    expect(destructionKnownAt(14)).toContain('shadowburn');
-    expect(destructionKnownAt(14)).not.toContain('ruinous_brand');
-
-    expect(destructionKnownAt(11)).not.toContain('rain_of_fire');
-    expect(destructionKnownAt(12)).toContain('rain_of_fire');
-    expect(destructionKnownAt(16)).toContain('ruinous_brand');
-    expect(destructionKnownAt(18)).toContain('rain_of_fire');
-    expect(destructionKnownAt(19)).not.toContain('summon_infernal');
-    expect(destructionKnownAt(20)).toContain('summon_infernal');
+    expect(destructionKnownAt(8)).toContain('rain_of_fire');
+    expect(destructionKnownAt(7)).not.toContain('rain_of_fire');
+    expect(destructionKnownAt(10)).toContain('ruinous_brand');
+    expect(destructionKnownAt(9)).not.toContain('ruinous_brand');
+    expect(destructionKnownAt(12)).toContain('shadowburn');
+    expect(destructionKnownAt(11)).not.toContain('shadowburn');
+    expect(destructionKnownAt(13)).toContain('summon_infernal');
+    expect(destructionKnownAt(12)).not.toContain('summon_infernal');
     for (const retired of [
       'corruption',
       'curse_of_agony',
@@ -135,6 +137,14 @@ describe('destruction progression', () => {
     expect(destructionKnownAt(20)).toEqual(
       expect.arrayContaining(['summon_imp', 'summon_voidwalker']),
     );
+    expect(destructionKnownAt(20)).toHaveLength(17);
+    expect(
+      destructionKnownAt(20).filter((id) =>
+        ABILITIES[id]?.effects.some(
+          (effect) => effect.type === 'summonDemon' || effect.type === 'summonPyreColossus',
+        ),
+      ),
+    ).toEqual(['summon_imp', 'summon_voidwalker', 'summon_infernal']);
     expect(ABILITIES.rain_of_fire.effects).toEqual([
       expect.objectContaining({ type: 'groundAoE', min: 5, max: 7, duration: 4 }),
     ]);
@@ -181,7 +191,7 @@ describe('destruction progression', () => {
     }
   });
 
-  it('applies the reduced transfer across all five live Destruction Consume ticks', () => {
+  it('applies the reduced transfer across all three live Destruction Consume ticks', () => {
     const { sim, p } = destructionAt();
     const mob = addDummy(sim, 9789);
     sim.targetEntity(mob.id);
@@ -201,9 +211,9 @@ describe('destruction progression', () => {
       (event) => event.type === 'heal2' && event.ability === consume.def.name,
     );
 
-    expect(heals).toHaveLength(5);
+    expect(heals).toHaveLength(3);
     expect(heals).toEqual(
-      Array.from({ length: 5 }, () =>
+      Array.from({ length: 3 }, () =>
         expect.objectContaining({
           type: 'heal2',
           sourceId: p.id,
@@ -212,7 +222,7 @@ describe('destruction progression', () => {
         }),
       ),
     );
-    expect(p.hp).toBe(1 + expectedHeal * 5);
+    expect(p.hp).toBe(1 + expectedHeal * 3);
   });
 
   it('pins the siege tuning anchors and the shared major-offense/capstone choices', () => {
@@ -223,7 +233,7 @@ describe('destruction progression', () => {
       effects: [{ type: 'directDamage', min: 128, max: 156 }],
     });
     expect(ABILITIES.summon_infernal).toMatchObject({
-      castTime: 2,
+      castTime: 0,
       cooldown: 180,
       effects: [
         { type: 'aoeDamage', min: 58, max: 72, radius: 6 },
@@ -250,6 +260,35 @@ describe('destruction progression', () => {
 });
 
 describe('Ruin engine and Desolation', () => {
+  it('builds one Ruin per classic tick out of combat up to three, but not while fighting', () => {
+    const { sim, p } = destructionAt();
+
+    expect(ruinAmount(p)).toBe(0);
+    collect(sim, 1.9);
+    expect(ruinAmount(p)).toBe(0);
+    collect(sim, 0.1);
+    expect(ruinAmount(p)).toBe(1);
+    collect(sim, 2);
+    expect(ruinAmount(p)).toBe(2);
+    collect(sim, 2);
+    expect(ruinAmount(p)).toBe(3);
+
+    collect(sim, 8);
+    expect(ruinAmount(p)).toBe(3);
+
+    giveRuin(p, 0);
+    p.inCombat = true;
+    p.combatTimer = 0;
+    collect(sim, 2);
+    expect(ruinAmount(p)).toBe(0);
+
+    p.inCombat = false;
+    p.combatTimer = 5;
+    expect(sim.setSpec('affliction')).toBe(true);
+    collect(sim, 6);
+    expect(ruinAmount(p)).toBe(0);
+  });
+
   it('clears Destruction-only state when the player leaves the specialization', () => {
     const { sim, p } = destructionAt();
     const mob = addDummy(sim, 9700);
@@ -874,7 +913,19 @@ describe('Pyre Colossus', () => {
 
     const impactHp = mob.hp;
     sim.castAbility('summon_infernal', undefined, { x: mob.pos.x, z: mob.pos.z });
-    collect(sim, 3);
+    const summonEvents = collect(sim, 3);
+    expect(
+      summonEvents.filter(
+        (event) => event.type === 'spellfxAt' && (event.fx === 'nova' || event.fx === 'meteorFall'),
+      ),
+    ).toEqual([
+      expect.objectContaining({
+        type: 'spellfxAt',
+        fx: 'meteorFall',
+        sourceId: p.id,
+        radius: 6,
+      }),
+    ]);
     const owned = [...sim.entities.values()].filter((entity) => entity.ownerId === p.id);
     expect(owned.some((entity) => entity.templateId === 'emberkin')).toBe(true);
     expect(owned.some((entity) => entity.templateId === 'pyre_colossus')).toBe(true);
@@ -939,32 +990,29 @@ describe('Pyre Colossus', () => {
     ['chaos_bolt', 3],
     ['rain_of_fire', 3],
     ['shadowburn', 1],
-  ] as const)(
-    '%s triggers exactly one literal Worldfire without generating Ruin',
-    (abilityId, cost) => {
-      const { sim, p } = destructionAt();
-      const mob = addDummy(sim, 9720, 0);
-      sim.targetEntity(mob.id);
-      p.facing = 0;
-      summonPyreColossus(sim.ctx, p);
-      giveRuin(p, cost);
-      if (abilityId === 'shadowburn') mob.hp = Math.floor(mob.maxHp * 0.1);
+  ] as const)('%s triggers exactly one literal Worldfire without generating Ruin', (abilityId, cost) => {
+    const { sim, p } = destructionAt();
+    const mob = addDummy(sim, 9720, 0);
+    sim.targetEntity(mob.id);
+    p.facing = 0;
+    summonPyreColossus(sim.ctx, p);
+    giveRuin(p, cost);
+    if (abilityId === 'shadowburn') mob.hp = Math.floor(mob.maxHp * 0.1);
 
-      if (abilityId === 'rain_of_fire') {
-        sim.castAbility(abilityId, undefined, { x: mob.pos.x, z: mob.pos.z });
-      } else {
-        sim.castAbility(abilityId);
-      }
-      const events = collect(sim, 5);
-      const worldfires = events.filter(
-        (event) =>
-          event.type === 'damage' && event.targetId === mob.id && event.ability === 'Worldfire',
-      );
-      expect(worldfires).toHaveLength(1);
-      expect(worldfires[0]).toMatchObject({ amount: 48, school: 'fire' });
-      expect(ruinAmount(p)).toBe(0);
-    },
-  );
+    if (abilityId === 'rain_of_fire') {
+      sim.castAbility(abilityId, undefined, { x: mob.pos.x, z: mob.pos.z });
+    } else {
+      sim.castAbility(abilityId);
+    }
+    const events = collect(sim, 5);
+    const worldfires = events.filter(
+      (event) =>
+        event.type === 'damage' && event.targetId === mob.id && event.ability === 'Worldfire',
+    );
+    expect(worldfires).toHaveLength(1);
+    expect(worldfires[0]).toMatchObject({ amount: 48, school: 'fire' });
+    expect(ruinAmount(p)).toBe(0);
+  });
 
   it('answers a committed Ruinbolt before impact even when its projectile later fizzles', () => {
     const { sim, p } = destructionAt();

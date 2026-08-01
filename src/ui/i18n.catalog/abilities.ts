@@ -1201,6 +1201,11 @@ const classAbilityNamesEn = {
         'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown.',
       ],
       [
+        'soulwell',
+        'Soulwell',
+        'Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown.',
+      ],
+      [
         'hex_of_violence',
         'Hex of Violence',
         'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 22 Shadow damage.',
@@ -1568,12 +1573,12 @@ const classAbilityNamesEn = {
       [
         'summon_imp',
         'Summon Emberkin',
-        'Summons an Emberkin under the command of the Warlock. The Emberkin hurls Ashbolts at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+        'Summons an Emberkin under the command of the Warlock. The Emberkin casts Felbolt at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time.',
       ],
       [
         'summon_voidwalker',
         'Summon Gloomshade',
-        'Summons a Gloomshade under the command of the Warlock. The Gloomshade is a sturdy demon that taunts your enemies and soaks up punishment. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+        'Summons a Gloomshade under the command of the Warlock. This sturdy demon taunts enemies and uses Abyssal Chain to drag distant normal enemies back into reach. Bosses cannot be pulled. Summoning a new demon dismisses your current one. You may have one demon at a time.',
       ],
       [
         'summon_succubus',

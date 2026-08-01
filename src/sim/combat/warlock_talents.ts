@@ -50,6 +50,7 @@ const REFLECTION_LOCK = 60;
 const BLACKTIDE_SPEED_ID = 'wlk_blacktide_speed';
 const BLACKTIDE_SPEED_DURATION = 4;
 const LEVEL_20_ABILITY_IDS = new Set(['abyssal_rift']);
+const FORBIDDEN_REFLECTION_EXCLUDED_IDS = new Set(['soulwell']);
 
 function warlockMods(ctx: SimContext, player: Entity) {
   const meta = ctx.players.get(player.id);
@@ -309,6 +310,7 @@ export function armForbiddenReflection(
     meta.cls !== 'warlock' ||
     ctx.playerMods(meta).global.warlockForbiddenReflection <= 0 ||
     !isSharedWarlockAbility(ability) ||
+    FORBIDDEN_REFLECTION_EXCLUDED_IDS.has(ability.id) ||
     player.auras.some((aura) => aura.id === REFLECTION_LOCK_ID)
   ) {
     return;

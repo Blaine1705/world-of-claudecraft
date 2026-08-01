@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { onCastCompleted, onHotExpired } from '../src/sim/combat/talent_procs';
+import { WARLOCK_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -247,6 +248,43 @@ describe('druid wave 2 choice rows', () => {
 });
 
 describe('warlock wave 2 choice rows', () => {
+  it('names Grand Malediction targets and describes class talents without internal shared jargon', () => {
+    const dreadChorus = WARLOCK_CHOICE_ROWS.rows
+      .find((row) => row.level === 8)
+      ?.options.find((option) => option.id === 'wlk_r8_howl_of_terror');
+    expect(dreadChorus?.description).toBe(
+      'Grants Dread Chorus: frighten enemies within 8 yards for up to 3 sec. Damage may break the effect. 40 sec cooldown.',
+    );
+    const shadowCredit = WARLOCK_CHOICE_ROWS.rows
+      .find((row) => row.level === 14)
+      ?.options.find((option) => option.id === 'wlk_r14_shadow_mastery');
+    expect(shadowCredit?.description).toBe(
+      'Each time you spend at least 40% of your specialization resource, you gain 1 free generator. Spending at least 80% at once grants 2. Separate triggers can accumulate up to 2 charges.',
+    );
+
+    const grandMalediction = WARLOCK_CHOICE_ROWS.rows
+      .find((row) => row.level === 17)
+      ?.options.find((option) => option.id === 'wlk_r17_death_coil');
+    expect(grandMalediction?.description).toBe(
+      "Reduces your specialization's setup cooldown by 25%: Hex of Violence (Affliction; punishes the enemy's damaging actions), Unholy Command (Necromancy; briefly empowers all your undead), or Ruinous Brand (Destruction; echoes your direct spells).",
+    );
+
+    const capstones = WARLOCK_CHOICE_ROWS.rows.find((row) => row.level === 20)?.options ?? [];
+    const unbrokenRitual = capstones.find((option) => option.id === 'wlk_r20_chaos_bolt');
+    const forbiddenReflection = capstones.find(
+      (option) => option.id === 'wlk_r20_grimoire_of_haste',
+    );
+    expect(unbrokenRitual?.description).toBe(
+      'Each second spent casting or channeling reduces the remaining cooldown of your Warlock class abilities by 0.5 sec. Does not affect specialization abilities or capstone talents.',
+    );
+    expect(forbiddenReflection?.description).toBe(
+      'The first Warlock class ability with a cooldown that you use, except Soulwell, creates a forbidden reflection. You may use that same ability once more within 10 sec for its normal cost without starting another cooldown. This effect can occur once every 60 sec.',
+    );
+    expect(`${unbrokenRitual?.description} ${forbiddenReflection?.description}`).not.toMatch(
+      /\bshared\b/i,
+    );
+  });
+
   it('Grand Malediction reduces an already-known setup cooldown for every specialization', () => {
     for (const [spec, ability, cooldown] of [
       ['affliction', 'hex_of_violence', 11.25],

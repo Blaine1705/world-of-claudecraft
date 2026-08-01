@@ -12,6 +12,8 @@ export interface DoomMeterStrings {
   formatCount(value: number): string;
   formatEmptyStatus(value: string, max: string): string;
   formatStatus(value: string, max: string, seconds: number): string;
+  fateThreadsLabel(): string;
+  formatFateThreadsStatus(value: string, max: string): string;
 }
 
 export function createDoomMeter(
@@ -40,11 +42,40 @@ export function createDoomMeter(
   const label = doc.createElement('span');
   label.className = 'warlock-doom-label';
 
+  const fateThreadsRoot = doc.createElement('div');
+  fateThreadsRoot.className = 'warlock-fate-threads';
+  fateThreadsRoot.setAttribute('role', 'meter');
+  fateThreadsRoot.setAttribute('aria-label', strings.fateThreadsLabel());
+  fateThreadsRoot.setAttribute('aria-valuemin', '0');
+  fateThreadsRoot.setAttribute('aria-valuemax', '3');
+
+  const fateThreadRail = doc.createElement('span');
+  fateThreadRail.className = 'warlock-fate-thread-rail';
+  fateThreadRail.setAttribute('aria-hidden', 'true');
+  const fateThreadEye = doc.createElement('span');
+  fateThreadEye.className = 'warlock-fate-thread-eye';
+  fateThreadEye.setAttribute('aria-hidden', 'true');
+  const fateThreadPips = Array.from({ length: 3 }, (_, index) => {
+    const pip = doc.createElement('span');
+    pip.className = `warlock-fate-thread fate-${index + 1}`;
+    pip.setAttribute('aria-hidden', 'true');
+    return pip;
+  });
+
   root.append(fill, label);
-  frame.appendChild(root);
+  fateThreadsRoot.append(fateThreadRail, fateThreadEye, ...fateThreadPips);
+  frame.append(root, fateThreadsRoot);
   parent.insertBefore(frame, before);
 
-  const painter = new DoomMeterPainter(writers, frame, root, fill, label);
+  const painter = new DoomMeterPainter(
+    writers,
+    frame,
+    root,
+    fill,
+    label,
+    fateThreadsRoot,
+    fateThreadPips,
+  );
   return {
     paint(input): void {
       if (!input.affliction) {
@@ -52,11 +83,18 @@ export function createDoomMeter(
         return;
       }
       painter.paint(
-        doomMeterState(input, strings.formatCount, strings.formatEmptyStatus, strings.formatStatus),
+        doomMeterState(
+          input,
+          strings.formatCount,
+          strings.formatEmptyStatus,
+          strings.formatStatus,
+          strings.formatFateThreadsStatus,
+        ),
       );
     },
     relocalize(): void {
       writers.setAttr(root, 'aria-label', strings.label());
+      writers.setAttr(fateThreadsRoot, 'aria-label', strings.fateThreadsLabel());
     },
   };
 }

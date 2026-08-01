@@ -159,7 +159,7 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     castAbility(sim.ctx, 'drain_life', p.id);
     updateCasting(sim.ctx, p, meta);
 
-    expect(p.channelTicksLeft).toBe(4);
+    expect(p.channelTicksLeft).toBe(2);
     expect(sim.ctx.pendingProjectiles).toHaveLength(1);
     for (let tick = 0; tick < 20 && mob.hp === mobHp0; tick++) {
       advancePendingProjectiles(sim.ctx);

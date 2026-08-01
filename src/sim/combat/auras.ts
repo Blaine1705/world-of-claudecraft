@@ -43,6 +43,7 @@ import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { tickAfflictionAura, tickMaledictGaze } from './affliction';
 import { isStunned } from './cc';
+import { regenerateRuinOutOfCombat } from './destruction';
 import { detonateOssuaryMark, OSSUARY_MARK_ABILITY_ID } from './necromancy';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
 import { onHotExpired, tickProcState } from './talent_procs';
@@ -81,6 +82,7 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
 
 export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
+  regenerateRuinOutOfCombat(ctx, p, meta);
   // Lifesap restores whichever resource bar is currently live, including across
   // form changes. Hard control stills the sap rather than banking free resource.
   if (!isStunned(p)) {

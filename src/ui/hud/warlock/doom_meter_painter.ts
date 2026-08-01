@@ -8,6 +8,8 @@ export class DoomMeterPainter {
     private readonly root: HTMLElement,
     private readonly fill: HTMLElement,
     private readonly label: HTMLElement,
+    private readonly fateThreadsRoot: HTMLElement,
+    private readonly fateThreadPips: readonly HTMLElement[],
   ) {}
 
   paint(state: DoomMeterState): void {
@@ -18,6 +20,12 @@ export class DoomMeterPainter {
     this.writers.setAttr(this.root, 'aria-valuetext', state.ariaValueText);
     this.writers.toggleClass(this.root, 'warning', state.warning);
     this.writers.toggleClass(this.root, 'ready', state.ready);
+    this.writers.setAttr(this.fateThreadsRoot, 'aria-valuenow', String(state.fateThreads));
+    this.writers.setAttr(this.fateThreadsRoot, 'aria-valuetext', state.fateThreadsAriaValueText);
+    this.writers.toggleClass(this.fateThreadsRoot, 'ready', state.fateThreadsReady);
+    for (let i = 0; i < this.fateThreadPips.length; i++) {
+      this.writers.toggleClass(this.fateThreadPips[i], 'on', i < state.fateThreads);
+    }
   }
 
   hide(): void {

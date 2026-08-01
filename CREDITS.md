@@ -34,8 +34,9 @@ If you fork this project, or redistribute the repository or a build of it, the
 following assets are **not** yours to pass on. Remove or replace them first, or
 get written permission.
 
-- **The CraftPix class ability icons** (`public/ui/skills/<class>/*.webp`, every
-  class ability icon shipped there). These were **purchased by the Levy Street account**
+- **The CraftPix class ability icons** (the legacy IDs recorded in each
+  `public/ui/skills/<class>/mapping.json`, excluding generated Warlock batches).
+  These were **purchased by the Levy Street account**
   (callum@levystreet.com) under a CraftPix premium royalty-free licence. That
   licence permits Levy Street to use them in this game. It does **not** permit
   you to redistribute, resell, sub-license, or otherwise pass them to a third
@@ -128,7 +129,8 @@ than free, so ask before you rely on it.
 | Bag icons (`public/ui/items/{backpack,linen_pouch,travelers_knapsack,wolfhide_satchel,gravewoven_bag,mistcallers_duffel}.webp`, encoded to 128px WebP via `scripts/convert_item_icons_webp.mjs`) | World of ClaudeCraft | Project art created for this game; provenance per icon in `public/ui/items/mapping.json` | Project asset | With the project only |
 | Professions 2.0 art set (`public/ui/professions/*.webp`, the `woc_professions_art` material icons recorded in `public/ui/items/mapping.json`, and the inline maker's-mark glyph in `src/ui/ui_icons.ts`) | World of ClaudeCraft | Maintainer-commissioned original art created for this game and normalized through the profession/item pipelines; provenance per raster in the corresponding mapping file | Project asset, rights reserved | **No, permission required** |
 | Generated item icon rebrand (`public/ui/items/*.webp`, exact IDs under `generatedBatches` in `public/ui/items/mapping.json`) | World of ClaudeCraft | Project-generated with OpenAI image generation, reviewed and optimized locally | Project asset, rights reserved | **No, permission required** |
-| Class ability icons (`public/ui/skills/<class>/*.webp`, re-encoded from the source-pack PNGs to WebP via `scripts/convert_skill_icons_webp.mjs`; all 9 classes: paladin, hunter, priest, warlock, rogue, warrior, mage, druid, shaman; source packs paladin/archer/priest/warlock/thief/warrior/berserker/demon/druid/pyromancer/cryomancer/aeromancer/lightning-mage/earth-magician/100-rpg-skill-icons/100-skill-icons-pack-for-rpg + per-ability fill sets) | CraftPix | https://craftpix.net | CraftPix premium (royalty-free commercial), purchased by Levy Street account (callum@levystreet.com) | **No, permission required** |
+| Legacy class ability icons (the CraftPix IDs recorded outside `generatedBatches` in each `public/ui/skills/<class>/mapping.json`) | CraftPix | https://craftpix.net | CraftPix premium (royalty-free commercial), purchased by Levy Street account (callum@levystreet.com) | **No, permission required** |
+| Generated Warlock spell and talent icons (exact IDs under `generatedBatches` in `public/ui/skills/warlock/mapping.json`) | World of ClaudeCraft | Project-generated with OpenAI image generation from the authored spell and talent descriptions, then reviewed and optimized locally | Project asset, rights reserved | **No, permission required** |
 | Collective Reversal and Hourglass of Suspension ability icons (`public/ui/skills/mage/collective_reversal.webp`, `public/ui/skills/mage/temporal_hourglass.webp`) | World of ClaudeCraft project owner | Owner-provided original artwork | Used with permission (Levy Street) | **No, permission required** |
 | Season 1 Armory weapon models, source images, generated store thumbnails, and promotional card (Guildmark, Emberwrought, Hoarfrost, and Fallen Star collections, in `public/models/weapons/`, `public/ui/weapons/`, and `public/ui/store/`) | World of ClaudeCraft | Project-generated via `scripts/asset_pipeline` (Tripo AI 3D); storefront renders composited locally, with the text-free promo background derived through OpenAI image editing | Project asset, rights reserved | **No, permission required** |
 | Tripo3d vegetation prop models (`public/models/props/reeds.glb`) | World of ClaudeCraft | Project-generated via Tripo3d (text-to-3D), owned under the Tripo3d paid-plan license | Project asset, rights reserved | **No, permission required** |
@@ -253,7 +255,7 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated prop model (maledict_eye) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated creature model + animations (emberkin) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
 | Generated creature model + animations (pyre_colossus) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
-| Generated creature model + animations (gloomshade_chainwarden) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
+| Generated creature model + animations (gloomshade_abyssal_guardian) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
 
 | Generated prop model (wildheart_jaguar_gate) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (wildheart_ritual_pyramid) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |

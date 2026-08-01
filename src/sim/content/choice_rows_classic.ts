@@ -1671,14 +1671,14 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r5_bane',
           name: 'Grave Rhythm',
           description: 'Umbral Anchor recovers 15 sec faster.',
-          icon: 'umbral_anchor',
+          icon: 'wlk_r5_bane',
           effect: { ability: [{ ability: 'umbral_anchor', cooldownFlat: -15 }] },
         },
         {
           id: 'wlk_r5_improved_corruption',
           name: 'Blacktide',
           description: 'Returning to Umbral Anchor grants 40% movement speed for 4 sec.',
-          icon: 'umbral_anchor',
+          icon: 'wlk_r5_improved_corruption',
           effect: {
             global: { warlockBlacktideSpeedPct: 0.4 },
             tuning: { duration: 4 },
@@ -1689,7 +1689,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Sacrilegious March',
           description:
             'Grants Sacrilegious March: move 35% faster while sacrificing 2% maximum health each second.',
-          icon: 'sacrilegious_march',
+          icon: 'wlk_r5_improved_immolate',
           effect: { grant: { ability: 'sacrilegious_march' } },
         },
       ],
@@ -1704,7 +1704,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Abyssal Gag',
           description:
             'Grants Abyssal Gag early. It interrupts the enemy and silences all of its spells for 4 sec.',
-          icon: 'spell_lock',
+          icon: 'wlk_r8_voidfeast',
           effect: {
             grant: { ability: 'spell_lock' },
             ability: [
@@ -1718,8 +1718,9 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r8_howl_of_terror',
           name: 'Dread Chorus',
-          description: 'Grants Dread Chorus.',
-          icon: 'howl_of_terror',
+          description:
+            'Grants Dread Chorus: frighten enemies within 8 yards for up to 3 sec. Damage may break the effect. 40 sec cooldown.',
+          icon: 'wlk_r8_howl_of_terror',
           effect: { grant: { ability: 'howl_of_terror' } },
         },
         {
@@ -1727,7 +1728,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Leaden Hex',
           description:
             'Damaging spells apply a 5% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 1.5 sec and consumes them. A target can be rooted once every 15 sec.',
-          icon: 'curse_of_exhaustion',
+          icon: 'wlk_r8_curse_of_exhaustion',
           effect: {
             global: { warlockLeadenHex: 0.05 },
             tuning: {
@@ -1743,37 +1744,36 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 11,
       theme: 'survival',
-      decision: 'stronger Fiendhide vs health-paid shield vs protected Consume channel',
+      decision: 'stronger Fiendhide vs health-paid shield vs party Soulwell ward',
       options: [
         {
           id: 'wlk_r11_improved_life_tap',
           name: 'Pact Deepened',
-          description: 'Fiendhide grants 50% more armor.',
-          icon: 'demon_skin',
-          effect: { ability: [{ ability: 'demon_skin', buffPct: 0.5 }] },
+          description:
+            'Fiendhide grants 100% more armor and reduces magic damage taken by 5% while active.',
+          icon: 'wlk_r11_improved_life_tap',
+          effect: {
+            ability: [{ ability: 'demon_skin', buffPct: 1 }],
+            global: { warlockFiendhideMagicDrPct: 0.05 },
+          },
         },
         {
           id: 'wlk_r11_fel_concentration',
           name: 'Sanguine Covenant',
           description:
             'Grants Sanguine Covenant: sacrifice 10% of your current health to absorb 30% of your maximum health for 8 sec.',
-          icon: 'dark_pact',
+          icon: 'wlk_r11_fel_concentration',
           effect: { grant: { ability: 'dark_pact' } },
         },
         {
           id: 'wlk_r11_demon_armor',
           name: 'Deep Hunger',
           description:
-            'While channeling Consume, you take 15% less damage and incoming hits do not delay the channel.',
-          icon: 'drain_life',
+            'The first time each group member touches your Soulwell, it shields them for 15% of their maximum health for 30 sec. Each player can gain this shield once per Soulwell.',
+          icon: 'wlk_r11_demon_armor',
           effect: {
-            ability: [
-              {
-                ability: 'drain_life',
-                damagePushbackImmune: true,
-              },
-            ],
-            global: { warlockConsumeChannelDr: 0.15 },
+            global: { warlockSoulwellWardPct: 0.15 },
+            tuning: { soulwellWardDuration: 30 },
           },
         },
       ],
@@ -1787,7 +1787,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r14_amplify_curse',
           name: 'Deepened Hex',
           description: "Your specialization's primary generator costs 25% less mana.",
-          icon: 'curse_of_agony',
+          icon: 'wlk_r14_amplify_curse',
           effect: {
             ability: [
               { ability: 'needle_of_fate', costPct: -0.25 },
@@ -1800,7 +1800,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r14_ruin',
           name: 'Blood Credit',
           description: 'Hard Bargain and Cruel Pact restore 50% more mana for the same health.',
-          icon: 'life_tap',
+          icon: 'wlk_r14_ruin',
           effect: {
             ability: [
               { ability: 'life_tap', buffPct: 0.5 },
@@ -1812,8 +1812,8 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r14_shadow_mastery',
           name: 'Shadow Credit',
           description:
-            'Spending at least 40% of your specialization resource grants 1 free generator. Spending at least 80% grants 2. Maximum 2 charges.',
-          icon: 'shadow_bolt',
+            'Each time you spend at least 40% of your specialization resource, you gain 1 free generator. Spending at least 80% at once grants 2. Separate triggers can accumulate up to 2 charges.',
+          icon: 'wlk_r14_shadow_mastery',
           effect: {
             global: { warlockShadowCredit: 0.4 },
             tuning: { upperThresholdPct: 0.8, lowerCharges: 1, upperCharges: 2, maxCharges: 2 },
@@ -1829,8 +1829,9 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r17_death_coil',
           name: 'Grand Malediction',
-          description: "Reduces your specialization's signature setup cooldown by 25%.",
-          icon: 'ruinous_brand',
+          description:
+            "Reduces your specialization's setup cooldown by 25%: Hex of Violence (Affliction; punishes the enemy's damaging actions), Unholy Command (Necromancy; briefly empowers all your undead), or Ruinous Brand (Destruction; echoes your direct spells).",
+          icon: 'wlk_r17_death_coil',
           effect: {
             ability: [
               { ability: 'hex_of_violence', cooldownPct: -0.25 },
@@ -1844,7 +1845,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Ashen Focus',
           description:
             "After standing still for 1 sec, your specialization's primary generator casts 20% faster. Moving removes the benefit immediately.",
-          icon: 'shadow_bolt',
+          icon: 'wlk_r17_improved_fear',
           effect: {
             global: { warlockAshenFocus: 0.2 },
             tuning: { stationaryDuration: 1 },
@@ -1855,7 +1856,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Hexstorm',
           description:
             "Every 3rd primary generator makes your specialization's next generator within 8 sec instant, at most once every 10 sec.",
-          icon: 'curse_of_agony',
+          icon: 'wlk_r17_demonic_resilience',
           effect: {
             proc: {
               id: 'wlk_curse_mastery',
@@ -1888,16 +1889,16 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r20_chaos_bolt',
           name: 'Unbroken Ritual',
           description:
-            'Each second spent casting or channeling reduces the remaining cooldown of your shared Warlock abilities by 0.5 sec. Does not affect specialization abilities or other capstone talents.',
-          icon: 'drain_life',
+            'Each second spent casting or channeling reduces the remaining cooldown of your Warlock class abilities by 0.5 sec. Does not affect specialization abilities or capstone talents.',
+          icon: 'wlk_r20_chaos_bolt',
           effect: { global: { warlockUnbrokenRitual: 0.5 } },
         },
         {
           id: 'wlk_r20_grimoire_of_haste',
           name: 'Forbidden Reflection',
           description:
-            'The first shared Warlock ability with a cooldown creates a forbidden reflection. You may cast it once more within 10 sec for its normal cost without starting another cooldown. 60 sec internal cooldown.',
-          icon: 'summon_felhunter',
+            'The first Warlock class ability with a cooldown that you use, except Soulwell, creates a forbidden reflection. You may use that same ability once more within 10 sec for its normal cost without starting another cooldown. This effect can occur once every 60 sec.',
+          icon: 'wlk_r20_grimoire_of_haste',
           effect: {
             global: { warlockForbiddenReflection: 60 },
             tuning: { reflectionWindow: 10 },
@@ -1908,7 +1909,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Abyssal Rift',
           description:
             'Grants Abyssal Rift: pull enemies within 8 yards to the chosen location, deal heavy Shadow damage, and stun them for 2 sec. Bosses take damage but cannot be pulled or stunned.',
-          icon: 'abyssal_rift',
+          icon: 'wlk_r20_curse_mastery',
           effect: { grant: { ability: 'abyssal_rift' } },
         },
       ],

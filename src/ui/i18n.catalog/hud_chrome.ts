@@ -14,9 +14,17 @@ export const hudChromeStrings = {
     doomLabel: 'Condemnation',
     doomEmptyStatus: '{value} of {max} Condemnation.',
     doomStatus: '{value} of {max} Condemnation; {remaining}.',
+    fateThreadsLabel: 'Fate Threads',
+    fateThreadsStatus: '{value} of {max} Fate Threads.',
+    fateThreadsConsumeReady:
+      'Three Fate Threads: Consume can weave them into additional Condemnation.',
+    fateThreadsSentenceReady:
+      'Three Fate Threads: Sentence can consume them for 18% increased damage.',
   },
   procOverlay: {
     soulFragmentsMeter: 'Soul Fragments',
+    ruinMeter: 'Ruin',
+    ruinStatus: '{value} of {max} Ruin',
   },
   spectate: {
     banner: 'Spectating {name}',

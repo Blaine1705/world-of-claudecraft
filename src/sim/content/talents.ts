@@ -153,7 +153,8 @@ export interface GlobalModEffect {
   warlockAshenFocus?: number;
   warlockUnbrokenRitual?: number;
   warlockForbiddenReflection?: number;
-  warlockConsumeChannelDr?: number;
+  warlockSoulwellWardPct?: number;
+  warlockFiendhideMagicDrPct?: number;
 }
 
 export type ProcTrigger =
@@ -555,7 +556,8 @@ function zeroGlobal(): Required<GlobalModEffect> {
     warlockAshenFocus: 0,
     warlockUnbrokenRitual: 0,
     warlockForbiddenReflection: 0,
-    warlockConsumeChannelDr: 0,
+    warlockSoulwellWardPct: 0,
+    warlockFiendhideMagicDrPct: 0,
   };
 }
 
@@ -664,7 +666,8 @@ export function accumulateTalentEffect(
     target.warlockAshenFocus += (source.warlockAshenFocus ?? 0) * multiplier;
     target.warlockUnbrokenRitual += (source.warlockUnbrokenRitual ?? 0) * multiplier;
     target.warlockForbiddenReflection += (source.warlockForbiddenReflection ?? 0) * multiplier;
-    target.warlockConsumeChannelDr += (source.warlockConsumeChannelDr ?? 0) * multiplier;
+    target.warlockSoulwellWardPct += (source.warlockSoulwellWardPct ?? 0) * multiplier;
+    target.warlockFiendhideMagicDrPct += (source.warlockFiendhideMagicDrPct ?? 0) * multiplier;
   }
   for (const ability of effect.ability ?? []) {
     const target = modifiers.abilities[ability.ability] ?? zeroAbilityMod();

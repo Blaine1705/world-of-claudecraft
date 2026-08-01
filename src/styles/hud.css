@@ -566,10 +566,11 @@
   }
   .warlock-doom-frame {
     display: none;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 28px;
+    height: 48px;
     margin-bottom: 3px;
     pointer-events: none;
   }
@@ -640,6 +641,145 @@
       inset 0 0 7px rgba(0, 0, 0, 0.88),
       0 0 14px rgba(211, 112, 255, 0.88);
   }
+  .warlock-fate-threads {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    width: 184px;
+    height: 24px;
+    margin-top: -1px;
+    isolation: isolate;
+  }
+  .warlock-fate-threads::before,
+  .warlock-fate-threads::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+  .warlock-fate-threads::before {
+    z-index: -2;
+    inset: -8px -28px -5px;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse,
+      rgba(132, 57, 184, 0.22) 0,
+      rgba(52, 17, 76, 0.12) 42%,
+      transparent 72%
+    );
+    opacity: 0.62;
+  }
+  .warlock-fate-threads::after {
+    z-index: -1;
+    inset: -12px -36px -8px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 28% 48%, rgba(154, 225, 255, 0.72) 0 1px, transparent 4px),
+      radial-gradient(circle at 50% 20%, rgba(232, 182, 255, 0.86) 0 2px, transparent 5px),
+      radial-gradient(circle at 72% 48%, rgba(255, 125, 196, 0.72) 0 1px, transparent 4px),
+      radial-gradient(ellipse, rgba(184, 83, 255, 0.32), transparent 68%);
+    opacity: 0;
+  }
+  .warlock-fate-threads.ready::after {
+    opacity: 1;
+    animation: warlock-fate-ready-aura 1.35s ease-in-out infinite;
+  }
+  .warlock-fate-thread-rail {
+    position: absolute;
+    z-index: 0;
+    left: 14px;
+    right: 14px;
+    top: 4px;
+    height: 15px;
+    border-bottom: 2px solid rgba(126, 75, 159, 0.76);
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 92%, rgba(198, 126, 255, 0.16), transparent 68%);
+    box-shadow:
+      0 2px 4px rgba(8, 2, 12, 0.9),
+      inset 0 -1px rgba(226, 182, 255, 0.28);
+  }
+  .warlock-fate-thread-eye {
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: 49%;
+    width: 39px;
+    height: 17px;
+    border: 1px solid rgba(164, 103, 204, 0.72);
+    border-radius: 72% 18% 72% 18%;
+    background: radial-gradient(
+      circle,
+      rgba(180, 92, 222, 0.28) 0 22%,
+      rgba(34, 11, 47, 0.92) 25% 58%,
+      transparent 61%
+    );
+    box-shadow: 0 0 7px rgba(122, 44, 166, 0.48);
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+  .warlock-fate-thread-eye::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    border: 1px solid rgba(236, 200, 255, 0.76);
+    border-radius: 50%;
+    background: #3b174e;
+    box-shadow: 0 0 5px rgba(210, 124, 255, 0.58);
+    transform: translate(-50%, -50%);
+  }
+  .warlock-fate-thread {
+    position: relative;
+    z-index: 3;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #644377;
+    border-radius: 3px 8px 3px 8px;
+    background: linear-gradient(145deg, #211128, #0d0711);
+    box-shadow:
+      0 2px 3px rgba(0, 0, 0, 0.82),
+      inset 2px 2px rgba(235, 204, 255, 0.05);
+    opacity: 0.72;
+    transform: rotate(45deg) scale(0.86);
+    transition:
+      opacity 160ms ease,
+      transform 200ms ease,
+      filter 200ms ease;
+  }
+  .warlock-fate-thread::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 50% 10% 50% 10%;
+    background: #35203d;
+    transform: rotate(-45deg);
+  }
+  .warlock-fate-thread.on {
+    border-color: #d4a2ef;
+    background: radial-gradient(circle at 32% 24%, #f7e7ff, #b65ce0 38%, #592071 78%);
+    box-shadow:
+      0 0 9px rgba(205, 104, 255, 0.92),
+      0 0 17px rgba(113, 45, 157, 0.58),
+      inset 2px 2px rgba(255, 255, 255, 0.42);
+    opacity: 1;
+    filter: saturate(1.15);
+    transform: rotate(45deg) scale(1);
+  }
+  .warlock-fate-thread.on::after {
+    background: #fff1ff;
+    box-shadow: 0 0 5px #f4c7ff;
+  }
+  .warlock-fate-threads.ready .warlock-fate-thread.on {
+    animation: warlock-fate-thread-beat 1.35s ease-in-out infinite;
+  }
+  .warlock-fate-threads.ready .fate-2 {
+    animation-delay: 90ms;
+  }
+  .warlock-fate-threads.ready .fate-3 {
+    animation-delay: 180ms;
+  }
   @keyframes warlock-doom-warning {
     from {
       filter: brightness(0.85);
@@ -648,11 +788,37 @@
       filter: brightness(1.35);
     }
   }
+  @keyframes warlock-fate-thread-beat {
+    0%,
+    100% {
+      filter: brightness(0.94) saturate(1.1);
+    }
+    50% {
+      filter: brightness(1.5) saturate(1.35);
+    }
+  }
+  @keyframes warlock-fate-ready-aura {
+    0%,
+    100% {
+      opacity: 0.48;
+      transform: scale(0.96);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.04);
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     .warlock-doom.warning {
       animation: none;
     }
     .warlock-doom-fill {
+      transition: none;
+    }
+    .warlock-fate-thread,
+    .warlock-fate-threads.ready::after,
+    .warlock-fate-threads.ready .warlock-fate-thread.on {
+      animation: none;
       transition: none;
     }
   }
@@ -675,6 +841,19 @@
     .warlock-doom.ready {
       border-color: Highlight;
       box-shadow: none;
+    }
+    .warlock-fate-thread-rail,
+    .warlock-fate-thread-eye,
+    .warlock-fate-thread {
+      border-color: GrayText;
+      background: Canvas;
+      box-shadow: none;
+    }
+    .warlock-fate-thread.on {
+      border-color: Highlight;
+      background: Highlight;
+      outline: 1px solid CanvasText;
+      outline-offset: 1px;
     }
   }
   /* Player Frame Scale (--player-frame-scale, playerFrameScale setting): zoom
@@ -1192,41 +1371,7 @@
     box-shadow: 0 0 calc(5px * var(--fx-shadow, 1)) #ff5533aa;
     border-color: #ffad99;
   }
-  .combo-row.ruin {
-    gap: 6px;
-  }
-  .combo-row.ruin .combo-pip {
-    width: 10px;
-    height: 10px;
-    border-radius: 2px 5px 2px 5px;
-    border-color: var(--color-ruin-empty-border);
-    background: linear-gradient(135deg, var(--color-ruin-empty-start), var(--color-ruin-empty-end));
-    transform: rotate(45deg);
-  }
-  .combo-row.ruin .combo-pip.on {
-    border-color: var(--color-ruin-lit-border);
-    background: radial-gradient(
-      circle at 35% 30%,
-      var(--color-ruin-lit-core),
-      var(--color-ruin-lit-mid) 55%,
-      var(--color-ruin-lit-edge)
-    );
-    box-shadow:
-      0 0 calc(7px * var(--fx-shadow, 1)) var(--color-ruin-glow),
-      inset 0 0 3px var(--color-ruin-inner-shine);
-  }
   @media (forced-colors: active) {
-    .combo-row.ruin .combo-pip {
-      border-color: GrayText;
-      background: Canvas;
-      box-shadow: none;
-    }
-    .combo-row.ruin .combo-pip.on {
-      border-color: Highlight;
-      background: Highlight;
-      outline: 1px solid CanvasText;
-      outline-offset: 1px;
-    }
     .action-btn.unusable {
       border-style: dashed;
     }
@@ -1685,11 +1830,32 @@
       0 0 6px #ffd10033;
   }
   .pet-btn.autocast {
-    border-color: #ffe77a;
+    border-color: var(--gold);
     box-shadow:
-      inset 0 0 0 1px #ffe77aaa,
-      0 0 10px #ffe77a66,
-      0 0 18px #ffd10033;
+      inset 0 0 0 1px color-mix(in srgb, var(--gold) 67%, transparent),
+      0 0 10px color-mix(in srgb, var(--gold) 40%, transparent),
+      0 0 18px color-mix(in srgb, var(--gold) 20%, transparent);
+  }
+  @media (forced-colors: active) {
+    /* The normal gold glow is flattened by the system palette. Keep autocast
+       readable with both a thicker outline and a persistent non-colour glyph. */
+    .pet-btn.autocast {
+      outline: 3px double Highlight;
+      outline-offset: -5px;
+    }
+    .pet-btn.autocast::after {
+      content: "↻";
+      position: absolute;
+      right: 1px;
+      bottom: 0;
+      z-index: 3;
+      color: Highlight;
+      background: Canvas;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1;
+      pointer-events: none;
+    }
   }
   .pet-btn.cooldown,
   .pet-btn.disabled {
@@ -1976,6 +2142,28 @@
       inset 0 1px 0 #ffffff28;
     animation: action-empowered-pulse 1.15s ease-in-out infinite;
   }
+  .action-btn.fate-consume-ready,
+  .mobile-action-slot.fate-consume-ready {
+    border-color: #76e1cf;
+    outline: 1px solid #a77cff;
+    outline-offset: 1px;
+    box-shadow:
+      0 0 10px rgba(93, 229, 208, 0.9),
+      0 0 20px rgba(129, 73, 218, 0.72),
+      inset 0 0 7px rgba(113, 238, 219, 0.48);
+    animation: fate-consume-button-pulse 1.05s ease-in-out infinite alternate;
+  }
+  .action-btn.fate-sentence-ready,
+  .mobile-action-slot.fate-sentence-ready {
+    border-color: #ff789d;
+    outline: 1px solid #d99cff;
+    outline-offset: 1px;
+    box-shadow:
+      0 0 10px rgba(255, 84, 137, 0.92),
+      0 0 20px rgba(159, 64, 220, 0.76),
+      inset 0 0 7px rgba(255, 102, 153, 0.52);
+    animation: fate-sentence-button-pulse 0.92s ease-in-out infinite alternate;
+  }
   @keyframes action-empowered-pulse {
     0%,
     100% {
@@ -1991,10 +2179,41 @@
         inset 0 1px 0 #ffffff34;
     }
   }
+  @keyframes fate-consume-button-pulse {
+    from {
+      filter: brightness(0.94) saturate(1.05);
+    }
+    to {
+      filter: brightness(1.22) saturate(1.28);
+    }
+  }
+  @keyframes fate-sentence-button-pulse {
+    from {
+      filter: brightness(0.94) saturate(1.05);
+    }
+    to {
+      filter: brightness(1.3) saturate(1.35);
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     .action-btn.proc,
-    .action-btn.empowered {
+    .action-btn.empowered,
+    .action-btn.fate-consume-ready,
+    .action-btn.fate-sentence-ready,
+    .mobile-action-slot.fate-consume-ready,
+    .mobile-action-slot.fate-sentence-ready {
       animation: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .action-btn.fate-consume-ready,
+    .action-btn.fate-sentence-ready,
+    .mobile-action-slot.fate-consume-ready,
+    .mobile-action-slot.fate-sentence-ready {
+      border-color: Highlight;
+      outline: 2px double Highlight;
+      outline-offset: 2px;
+      box-shadow: none;
     }
   }
   .action-btn:not(.empty)[draggable="true"] {
@@ -7151,6 +7370,266 @@ body.reduce-motion #proc-overlay.chrono .chrono-right,
 body.reduce-motion #proc-overlay.chrono .chrono-bird::before,
 body.reduce-motion #proc-overlay.chrono .chrono-bird::after {
   animation: none !important;
+}
+
+/* ---- Destruction variant: the Ruin ritual bank ------------------------- */
+/* Five forged seals rise in a shallow crown around a broken ritual ring. The
+   bank remains readable at zero and ignites one rune for each held Ruin. */
+#proc-overlay .ruin-ritual {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 270px;
+  height: 112px;
+  translate: -50% -50%;
+  user-select: none;
+}
+#proc-overlay.destruction {
+  opacity: 0.76;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+#proc-overlay.destruction.r1 {
+  opacity: 0.94;
+}
+#proc-overlay.destruction.r5 {
+  opacity: 1;
+}
+#proc-overlay.destruction .fire-bird,
+#proc-overlay.destruction .chrono-bird,
+#proc-overlay.destruction .frost-bird,
+#proc-overlay.destruction .necromancy-bank {
+  display: none;
+}
+#proc-overlay.destruction .ruin-ritual {
+  display: block;
+}
+#proc-overlay.destruction .ruin-ritual,
+#proc-overlay.destruction .ruin-mark {
+  pointer-events: auto;
+  cursor: grab;
+}
+#proc-overlay.destruction.dragging .ruin-ritual,
+#proc-overlay.destruction.dragging .ruin-mark {
+  cursor: grabbing;
+}
+#proc-overlay.destruction .ruin-ritual::before,
+#proc-overlay.destruction .ruin-ritual::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+#proc-overlay.destruction .ruin-ritual::before {
+  inset: 22px -6px 0;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse,
+    var(--color-ruin-ritual-aura) 0,
+    var(--color-ruin-ritual-shadow) 36%,
+    transparent 72%
+  );
+  filter: blur(8px);
+}
+#proc-overlay.destruction .ruin-ritual::after {
+  inset: -20px -28px;
+  z-index: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 14% 58%, var(--color-ruin-full-flare) 0 2px, transparent 5px),
+    radial-gradient(circle at 32% 18%, var(--color-ruin-glow) 0 2px, transparent 6px),
+    radial-gradient(circle at 50% 5%, var(--color-ruin-full-flare) 0 3px, transparent 7px),
+    radial-gradient(circle at 68% 18%, var(--color-ruin-glow) 0 2px, transparent 6px),
+    radial-gradient(circle at 86% 58%, var(--color-ruin-full-flare) 0 2px, transparent 5px),
+    radial-gradient(ellipse, var(--color-ruin-ritual-aura) 0, transparent 68%);
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+#proc-overlay.destruction.r5 .ruin-ritual::after {
+  opacity: 1;
+  animation: ruin-bank-full-flare 1.65s ease-in-out infinite;
+}
+#proc-overlay.destruction .ruin-ring {
+  position: absolute;
+  left: 15px;
+  right: 15px;
+  top: 33px;
+  z-index: 2;
+  height: 70px;
+  border-top: 3px solid var(--color-ruin-empty-border);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 4%, var(--color-ruin-ring-highlight), transparent 68%);
+  box-shadow:
+    inset 0 3px var(--color-ruin-ritual-shadow),
+    0 -1px var(--color-ruin-inner-shine);
+  opacity: 0.76;
+  pointer-events: auto;
+  cursor: grab;
+}
+#proc-overlay.destruction.r5 .ruin-ring {
+  border-top-color: var(--color-ruin-lit-border);
+  filter: drop-shadow(0 0 8px var(--color-ruin-glow));
+}
+#proc-overlay.destruction .ruin-mark {
+  --ruin-mark-angle: 0deg;
+  position: absolute;
+  z-index: 3;
+  width: 43px;
+  height: 50px;
+  translate: -50% -50%;
+  rotate: var(--ruin-mark-angle);
+  scale: 0.86;
+  clip-path: polygon(50% 0, 91% 19%, 100% 67%, 72% 100%, 28% 100%, 0 67%, 9% 19%);
+  background: var(--color-ruin-empty-border);
+  filter: drop-shadow(0 3px 3px var(--color-ruin-ritual-shadow));
+  opacity: 0.7;
+  transition:
+    opacity 0.18s ease,
+    scale 0.22s ease,
+    filter 0.22s ease;
+}
+#proc-overlay.destruction .ruin-mark::before,
+#proc-overlay.destruction .ruin-mark::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+#proc-overlay.destruction .ruin-mark::before {
+  inset: 3px;
+  clip-path: inherit;
+  background: linear-gradient(145deg, var(--color-ruin-empty-start), var(--color-ruin-empty-end));
+  box-shadow: inset 4px 3px 6px var(--color-ruin-ritual-shadow);
+}
+#proc-overlay.destruction .ruin-mark::after {
+  inset: 10px 12px 9px;
+  clip-path: polygon(50% 0, 78% 30%, 62% 46%, 88% 100%, 50% 72%, 12% 100%, 38% 46%, 22% 30%);
+  background: var(--color-ruin-rune-dim);
+  filter: drop-shadow(0 0 2px var(--color-ruin-empty-border));
+}
+#proc-overlay.destruction .ruin-mark-1 {
+  --ruin-mark-angle: -11deg;
+  left: 10%;
+  top: 66%;
+}
+#proc-overlay.destruction .ruin-mark-2 {
+  --ruin-mark-angle: -5deg;
+  left: 30%;
+  top: 45%;
+}
+#proc-overlay.destruction .ruin-mark-3 {
+  left: 50%;
+  top: 35%;
+}
+#proc-overlay.destruction .ruin-mark-4 {
+  --ruin-mark-angle: 5deg;
+  left: 70%;
+  top: 45%;
+}
+#proc-overlay.destruction .ruin-mark-5 {
+  --ruin-mark-angle: 11deg;
+  left: 90%;
+  top: 66%;
+}
+#proc-overlay.destruction.r1 .ruin-mark-1,
+#proc-overlay.destruction.r2 .ruin-mark-2,
+#proc-overlay.destruction.r3 .ruin-mark-3,
+#proc-overlay.destruction.r4 .ruin-mark-4,
+#proc-overlay.destruction.r5 .ruin-mark-5 {
+  scale: 1;
+  opacity: 1;
+  background: var(--color-ruin-lit-border);
+  filter: drop-shadow(0 3px 3px var(--color-ruin-ritual-shadow))
+    drop-shadow(0 0 9px var(--color-ruin-glow));
+  animation: ruin-mark-ignite 0.28s ease-out;
+}
+#proc-overlay.destruction.r1 .ruin-mark-1::before,
+#proc-overlay.destruction.r2 .ruin-mark-2::before,
+#proc-overlay.destruction.r3 .ruin-mark-3::before,
+#proc-overlay.destruction.r4 .ruin-mark-4::before,
+#proc-overlay.destruction.r5 .ruin-mark-5::before {
+  background: radial-gradient(
+    circle at 42% 30%,
+    var(--color-ruin-lit-core),
+    var(--color-ruin-lit-mid) 42%,
+    var(--color-ruin-lit-edge) 82%
+  );
+  box-shadow: inset 0 0 7px var(--color-ruin-inner-shine);
+}
+#proc-overlay.destruction.r1 .ruin-mark-1::after,
+#proc-overlay.destruction.r2 .ruin-mark-2::after,
+#proc-overlay.destruction.r3 .ruin-mark-3::after,
+#proc-overlay.destruction.r4 .ruin-mark-4::after,
+#proc-overlay.destruction.r5 .ruin-mark-5::after {
+  background: var(--color-ruin-lit-core);
+  filter: drop-shadow(0 0 4px var(--color-ruin-lit-core));
+}
+@keyframes ruin-mark-ignite {
+  0% {
+    scale: 0.72;
+    filter: brightness(2.2) drop-shadow(0 0 18px var(--color-ruin-lit-core));
+  }
+  100% {
+    scale: 1;
+  }
+}
+@keyframes ruin-bank-full-flare {
+  0%,
+  100% {
+    opacity: 0.5;
+    scale: 0.96;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.04;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #proc-overlay.destruction,
+  #proc-overlay.destruction .ruin-ring,
+  #proc-overlay.destruction .ruin-mark,
+  #proc-overlay.destruction.r5 .ruin-ritual::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+body.reduce-motion #proc-overlay.destruction,
+body.reduce-motion #proc-overlay.destruction .ruin-ring,
+body.reduce-motion #proc-overlay.destruction .ruin-mark,
+body.reduce-motion #proc-overlay.destruction.r5 .ruin-ritual::after {
+  animation: none !important;
+  transition: none !important;
+}
+@media (forced-colors: active) {
+  #proc-overlay.destruction .ruin-ring {
+    border-top-color: CanvasText;
+    background: Canvas;
+    box-shadow: none;
+    filter: none;
+  }
+  #proc-overlay.destruction .ruin-mark {
+    background: GrayText;
+    filter: none;
+  }
+  #proc-overlay.destruction .ruin-mark::before {
+    background: Canvas;
+    box-shadow: none;
+  }
+  #proc-overlay.destruction.r1 .ruin-mark-1,
+  #proc-overlay.destruction.r2 .ruin-mark-2,
+  #proc-overlay.destruction.r3 .ruin-mark-3,
+  #proc-overlay.destruction.r4 .ruin-mark-4,
+  #proc-overlay.destruction.r5 .ruin-mark-5 {
+    background: Highlight;
+    filter: none;
+  }
+  #proc-overlay.destruction.r1 .ruin-mark-1::before,
+  #proc-overlay.destruction.r2 .ruin-mark-2::before,
+  #proc-overlay.destruction.r3 .ruin-mark-3::before,
+  #proc-overlay.destruction.r4 .ruin-mark-4::before,
+  #proc-overlay.destruction.r5 .ruin-mark-5::before {
+    background: Highlight;
+  }
 }
 
 /* ---- Necromancy variant: the Soul Fragment bank ------------------------ */

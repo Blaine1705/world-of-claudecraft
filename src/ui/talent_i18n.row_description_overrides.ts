@@ -14,12 +14,26 @@ type RetainedRowDescriptionId =
   | 'mag_r20_overflowing_power'
   | 'dru_r20_improved_hurricane';
 
-type DescriptionMap = Readonly<Record<RetainedRowDescriptionId, string>>;
+type OptionalRetainedRowDescriptionId =
+  | 'wlk_r17_death_coil'
+  | 'wlk_r20_chaos_bolt'
+  | 'wlk_r20_grimoire_of_haste';
+
+type DescriptionMap = Readonly<
+  Record<RetainedRowDescriptionId, string> &
+    Partial<Record<OptionalRetainedRowDescriptionId, string>>
+>;
 
 export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
   Record<SupportedLanguage, DescriptionMap>
 > = {
   es: {
+    wlk_r17_death_coil:
+      'Reduce un 25 % la reutilización de la preparación de tu especialización: Maleficio de violencia (Aflicción; castiga las acciones dañinas del enemigo), Mandato profano (Nigromancia; potencia brevemente a todos tus no-muertos) o Marca ruinosa (Destrucción; hace eco de tus hechizos directos).',
+    wlk_r20_chaos_bolt:
+      'Cada segundo que pasas lanzando o canalizando reduce 0,5 s la reutilización restante de tus habilidades de clase de brujo. No afecta a las habilidades de especialización ni a los talentos finales.',
+    wlk_r20_grimoire_of_haste:
+      'La primera habilidad de clase de brujo con reutilización que usas crea un reflejo prohibido. Puedes volver a usar esa misma habilidad una vez durante los siguientes 10 s por su coste normal sin iniciar otra reutilización. Este efecto solo puede ocurrir una vez cada 60 s.',
     mag_r5_blink_cast: 'Puedes usar Paso Fugaz en mitad de un lanzamiento sin interrumpirlo.',
     mag_r8_temporal_rift:
       'Lanzar tu barrera personal elimina los efectos de inmovilización que te afectan.',
@@ -40,6 +54,12 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Cada punto de ira que gastas reduce en 0,1 s el tiempo de reutilización de tus grandes habilidades ofensivas, hasta 10 s cada 30 s.',
   },
   es_ES: {
+    wlk_r17_death_coil:
+      'Reduce un 25 % la reutilización de la preparación de tu especialización: Maleficio de violencia (Aflicción; castiga las acciones dañinas del enemigo), Mandato profano (Nigromancia; potencia brevemente a todos tus no-muertos) o Marca ruinosa (Destrucción; hace eco de tus hechizos directos).',
+    wlk_r20_chaos_bolt:
+      'Cada segundo que pasas lanzando o canalizando reduce 0,5 s la reutilización restante de tus habilidades de clase de brujo. No afecta a las habilidades de especialización ni a los talentos finales.',
+    wlk_r20_grimoire_of_haste:
+      'La primera habilidad de clase de brujo con reutilización que usas crea un reflejo prohibido. Puedes volver a usar esa misma habilidad una vez durante los siguientes 10 s por su coste normal sin iniciar otra reutilización. Este efecto solo puede ocurrir una vez cada 60 s.',
     mag_r5_blink_cast: 'Puedes usar Paso Fugaz en mitad de un lanzamiento sin interrumpirlo.',
     mag_r8_temporal_rift:
       'Lanzar tu barrera personal elimina los efectos de inmovilización que te afectan.',

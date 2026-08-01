@@ -51,9 +51,11 @@ import {
   PET_GROWL_INTERVAL,
   type PetMode,
 } from '../types';
-import { startWaterJet } from './pet_ai';
+import { petRangedAttack, startWaterJet } from './pet_ai';
 import { isPrimaryOwnedPetEntity } from './pet_selection';
 import { petCanForceTaunt } from './pet_taunt_gate';
+import { warlockPetScaleAtLevel } from './warlock_pet_growth';
+import { useWarlockPetSkill } from './warlock_pet_skills';
 
 // Slice-only tuning consts, moved verbatim from sim.ts with the slice.
 const PET_TAUNT_RANGE = 5;
@@ -64,6 +66,11 @@ const DEMON_HEAL_DURATION = 5;
 const DEMON_HEAL_TICK = 1;
 const TAMED_TARGET_RESPAWN_SECONDS = 60;
 const PET_NAME_RE = /^[A-Za-z][A-Za-z '-]{1,15}$/;
+
+function templateHasPetSpecial(templateId: string): boolean {
+  const template = MOBS[templateId];
+  return !!template && (!!template.petChainPull || !!template.petRanged?.active);
+}
 
 // A live pet check fails while inside a delve even for owners with a valid
 // equipped pet (it is stowed for the run, see stowPetForDelve/restorePetFromDelveStash),
@@ -173,6 +180,7 @@ export function serializePet(ctx: SimContext, ownerPid: number): PetState | null
     mode: pet.petMode,
     autoTaunt: pet.petAutoTaunt,
     autoWaterJet: pet.petAutoWaterJet,
+    autoSkill: pet.petAutoSkill,
   };
 }
 
@@ -225,12 +233,17 @@ export function restorePet(ctx: SimContext, owner: Entity, state: PetState): voi
   const level = owner.level;
   const pos = ctx.groundPos(owner.pos.x + 2, owner.pos.z + 1);
   const pet = createMob(ctx.nextId++, template, level, pos);
+  pet.scale = warlockPetScaleAtLevel(template, level);
   pet.name = cleanPetName(state.name) ?? template.name;
   pet.ownerId = owner.id;
   pet.petMode = state.mode ?? 'defensive';
   pet.petTauntTimer = 0;
   pet.petAutoTaunt = state.autoTaunt ?? false;
   pet.petAutoWaterJet = state.autoWaterJet ?? false;
+  pet.petSkillTimer = 0;
+  pet.petAutoSkill =
+    owner.petSpecialCommandsSupported !== false &&
+    (state.autoSkill ?? templateHasPetSpecial(state.templateId));
   pet.petManualTauntPending = false;
   pet.hostile = false;
   pet.aiState = state.dead ? 'dead' : 'idle';
@@ -264,7 +277,7 @@ export function syncPetLevel(ctx: SimContext, owner: Entity): void {
   pet.weapon = scaled.weapon;
   pet.stats.armor = scaled.stats.armor;
   pet.moveSpeed = scaled.moveSpeed;
-  pet.scale = scaled.scale;
+  pet.scale = warlockPetScaleAtLevel(template, owner.level);
   pet.color = scaled.color;
   pet.hp = pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, Math.round(pet.maxHp * hpFrac)));
 }
@@ -305,6 +318,8 @@ export function completeTame(ctx: SimContext, p: Entity, target: Entity): void {
   pet.petTauntTimer = 0;
   pet.petAutoTaunt = false;
   pet.petAutoWaterJet = false;
+  pet.petSkillTimer = 0;
+  pet.petAutoSkill = false;
   pet.petManualTauntPending = false;
   pet.hostile = false;
   pet.aiState = 'idle';
@@ -387,6 +402,7 @@ export function createDemonPet(
     owner.level,
     ctx.groundPos(owner.pos.x + 2, owner.pos.z + 1),
   );
+  pet.scale = warlockPetScaleAtLevel(template, owner.level);
   pet.name = template.name;
   pet.ownerId = owner.id;
   pet.petMode = 'defensive';
@@ -401,6 +417,8 @@ export function createDemonPet(
   pet.petAutoTaunt =
     template.petRole === 'melee_tank' && petCanForceTaunt(mobId) && !ctx.partyOf(owner.id);
   pet.petAutoWaterJet = false;
+  pet.petSkillTimer = 0;
+  pet.petAutoSkill = owner.petSpecialCommandsSupported !== false && templateHasPetSpecial(mobId);
   pet.petManualTauntPending = false;
   pet.hostile = false;
   pet.aiState = 'idle';
@@ -661,6 +679,37 @@ export function petWaterJet(ctx: SimContext, pid?: number): void {
   startWaterJet(ctx, pet, target, jet);
 }
 
+/** Manual pet-bar cast for a template-authored signature ability. Gloomshade
+ *  pulls with Abyssal Chain; Emberkin launches an extra Felbolt. */
+export function petSpecial(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  if (!isPetClass(r.meta.cls)) {
+    ctx.error(r.e.id, 'Only pet classes can command pets.');
+    return;
+  }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
+  r.meta.lastActiveTick = ctx.tickCount;
+  const pet = petOf(ctx, r.e.id);
+  if (!pet) {
+    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
+    return;
+  }
+  // Manual commands share the pet AI's control gate: a stunned demon cannot
+  // bypass its own incapacitation merely because the owner pressed the bar.
+  if (ctx.isStunned(pet)) return;
+  if (!templateHasPetSpecial(pet.templateId) || (pet.petSkillTimer ?? 0) > 0) return;
+  const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
+  if (!target || target.dead || !ctx.isHostileTo(pet, target)) {
+    ctx.error(r.e.id, 'Your pet needs a hostile target.');
+    return;
+  }
+  if (!useWarlockPetSkill(ctx, pet, target, petRangedAttack)) return;
+  pet.aggroTargetId = target.id;
+  pet.inCombat = true;
+  if (target.kind === 'mob' && target.hostile) addThreat(target, pet.id, 1);
+}
+
 export function feedPet(ctx: SimContext, itemId: string, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -828,6 +877,28 @@ export function setPetAutoWaterJet(ctx: SimContext, enabled: boolean, pid?: numb
     return;
   }
   pet.petAutoWaterJet = enabled;
+}
+
+/** Autocast toggle for the signature ability shown on a Warlock pet's bar. */
+export function setPetAutoSpecial(ctx: SimContext, enabled: boolean, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  if (!isPetClass(r.meta.cls)) {
+    ctx.error(r.e.id, 'Only pet classes can command pets.');
+    return;
+  }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
+  r.meta.lastActiveTick = ctx.tickCount;
+  const pet = petOf(ctx, r.e.id, true);
+  if (!pet) {
+    ctx.error(r.e.id, noPetError(r.e));
+    return;
+  }
+  if (!templateHasPetSpecial(pet.templateId)) {
+    pet.petAutoSkill = false;
+    return;
+  }
+  pet.petAutoSkill = enabled;
 }
 
 // -------------------------------------------------------------------------

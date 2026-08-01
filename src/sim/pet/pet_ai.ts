@@ -51,6 +51,7 @@ import {
   steadyAngleTo,
 } from '../types';
 import { petCanForceTaunt } from './pet_taunt_gate';
+import { tryUseWarlockPetSkill } from './warlock_pet_skills';
 
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
 const PET_LEASH = 40; // yards from the owner before a pet gives up its target
@@ -91,6 +92,10 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
   if (ctx.isStunned(pet)) return;
   ctx.syncPetAspect(pet, owner);
   pet.petTauntTimer = Math.max(0, pet.petTauntTimer - DT);
+  if (pet.petSkillTimer !== undefined) {
+    pet.petSkillTimer = Math.max(0, pet.petSkillTimer - DT);
+    if (pet.petSkillTimer < 1e-6) pet.petSkillTimer = 0;
+  }
   if (!pet.inCombat && ctx.tickCount % 40 === 0 && pet.hp < pet.maxHp) {
     pet.hp = Math.min(pet.maxHp, pet.hp + Math.max(1, Math.round(pet.maxHp * 0.02)));
   }
@@ -117,6 +122,7 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
     }
     const reach = ranged ? ranged.range : MELEE_RANGE * 0.8;
     const d = dist2d(pet.pos, target.pos);
+    if (tryUseWarlockPetSkill(ctx, pet, target, petRangedAttack)) return;
     if (d > reach) {
       if (!ctx.isRooted(pet))
         ctx.moveToward(pet, target.pos, pet.moveSpeed * ctx.moveSpeedMult(pet));
@@ -360,6 +366,8 @@ export function petRangedAttack(
   ranged: {
     range: number;
     school: Aura['school'];
+    ability?: string;
+    name?: string;
     spellVuln?: {
       amp: number;
       duration: number;
@@ -379,6 +387,7 @@ export function petRangedAttack(
     targetId: target.id,
     school: ranged.school,
     fx: 'projectile',
+    ability: ranged.ability,
   });
   // The imp's bolt resolves on arrival (projectile_travel), not the tick it is hurled;
   // it fizzles if the pet or its target dies before impact.
@@ -389,7 +398,21 @@ export function petRangedAttack(
       (ctx.effectiveAttackPower(src) / 14) * src.weapon.speed;
     if (crit) dmg *= 2;
     dmg *= petDamageMult(ctx, src);
-    ctx.dealDamage(src, tgt, Math.max(1, Math.round(dmg)), crit, ranged.school, null, 'hit');
+    ctx.dealDamage(
+      src,
+      tgt,
+      Math.max(1, Math.round(dmg)),
+      crit,
+      ranged.school,
+      ranged.name ?? null,
+      'hit',
+      false,
+      undefined,
+      true,
+      false,
+      false,
+      ranged.ability ?? null,
+    );
     if (ranged.spellVuln && src.ownerId !== null && !tgt.dead) {
       ctx.applyAura(tgt, {
         id: 'raise_bone_mage',

@@ -87,7 +87,8 @@ type DisplayGlobalKey = Exclude<
   | 'warlockAshenFocus'
   | 'warlockUnbrokenRitual'
   | 'warlockForbiddenReflection'
-  | 'warlockConsumeChannelDr'
+  | 'warlockSoulwellWardPct'
+  | 'warlockFiendhideMagicDrPct'
 >;
 
 const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
@@ -119,7 +120,8 @@ const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
   'warlockAshenFocus',
   'warlockUnbrokenRitual',
   'warlockForbiddenReflection',
-  'warlockConsumeChannelDr',
+  'warlockSoulwellWardPct',
+  'warlockFiendhideMagicDrPct',
 ]);
 
 export interface TalentLocaleText {
@@ -10221,11 +10223,6 @@ function effectDescription(
   if (global.warlockForbiddenReflection) {
     parts.push(
       `${text.statLabels.cooldown}: x2 (${seconds(tuning.reflectionWindow ?? 10, lang)}); ${seconds(global.warlockForbiddenReflection, lang)} ${text.statLabels.cooldown}.`,
-    );
-  }
-  if (global.warlockConsumeChannelDr) {
-    parts.push(
-      `${abilityName('drain_life')}: -${formatPercent(global.warlockConsumeChannelDr, lang)} ${text.statLabels.damage}.`,
     );
   }
   for (const [key, value] of Object.entries(global) as [GlobalKey, number][]) {

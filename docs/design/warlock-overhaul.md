@@ -66,11 +66,11 @@ remain live for Affliction, Necromancy, and Destruction.
 | Level | Job | Options |
 |---:|---|---|
 | 5 | Mobility | Grave Rhythm shortens Umbral Anchor; Blacktide grants 40% movement speed for 4 sec after returning; Sacrilegious March is a toggled 35% speed increase that drains 2% maximum health each second and ends at 20% health. |
-| 8 | Crowd control | Abyssal Gag unlocks the interrupt early and upgrades it to a 4 sec silence; Dread Chorus supplies area fear; Leaden Hex stacks a 5% slow up to 15%, then the next damaging spell roots for 1.5 sec and consumes the stacks. |
-| 11 | Survival | Pact Deepened strengthens Fiendhide; Sanguine Covenant trades 10% current health for a 30% maximum-health absorb; Deep Hunger grants 15% damage reduction and damage-pushback immunity while channeling Consume. Deep Hunger needs a Necromancy replacement now that Consume is not part of that kit. |
-| 14 | Resource behavior | Deepened Hex discounts the active spec's generator; Blood Credit improves Hard Bargain's mana return; Shadow Credit grants one or two free generators when at least 40% or 80% of the specialization resource is spent at once. |
-| 17 | Major offense | Grand Malediction shortens the active spec's signature setup cooldown; Ashen Focus shortens generator casts by 20% after standing still for 1 sec; Hexstorm periodically makes the next generator instant. |
-| 20 | Capstone utility | Unbroken Ritual turns casting time into shared-class cooldown recovery; Forbidden Reflection permits one repeat of the first shared cooldown used in each 60 sec window; Abyssal Rift pulls enemies within 8 yards, deals heavy Shadow damage, and stuns non-bosses for 2 sec. |
+| 8 | Crowd control | Abyssal Gag unlocks the interrupt early and upgrades it to a 4 sec silence; Dread Chorus fears enemies within 8 yards for up to 3 sec on a 40 sec cooldown; Leaden Hex stacks a 5% slow up to 15%, then the next damaging spell roots for 1.5 sec and consumes the stacks. |
+| 11 | Survival | Pact Deepened doubles Fiendhide's armor and grants 5% magic damage reduction while it is active; Sanguine Covenant trades 10% current health for a 30% maximum-health absorb; Deep Hunger makes the first touch of each Soulwell shield every eligible group member for 15% maximum health for 30 seconds. Later touches still replenish Soul Stones but cannot renew that well's shield. |
+| 14 | Resource behavior | Deepened Hex discounts the active spec's generator; Blood Credit improves Hard Bargain's mana return; each Shadow Credit trigger grants one free generator after spending at least 40% of the specialization resource, grants two after spending at least 80% at once, and can accumulate up to two charges across separate triggers. |
+| 17 | Major offense | Grand Malediction shortens Hex of Violence for Affliction, Unholy Command for Necromancy, or Ruinous Brand for Destruction; Ashen Focus shortens generator casts by 20% after standing still for 1 sec; Hexstorm periodically makes the next generator instant. |
+| 20 | Capstone utility | Unbroken Ritual turns casting time into Warlock class-ability cooldown recovery; Forbidden Reflection permits one repeat of the first eligible Warlock class ability with a cooldown used in each 60 sec window, excluding Soulwell; Abyssal Rift pulls enemies within 8 yards, deals heavy Shadow damage, and stuns non-bosses for 2 sec. |
 
 Stable `wlk_r*` option identifiers are retained so persisted allocations repair to the
 new class-wide behavior instead of losing their row selections.
@@ -115,13 +115,13 @@ maintaining a checklist of periodic effects.
 | 5 | Needle of Fate | 25/30/35 | 1.5 sec | None | 30 | Deals 18-22, 32-38, or 48-56 Shadow damage at levels 5, 12, and 20. Generates 5 on the primary Eye. |
 | 5 | Sentence | 40 | Instant | None | 30 | Requires at least 20 and the primary Eye. Consumes the full pool. Level-20 base damage before mastery is 55/160/300/440 at 20/50/80/100. |
 | 7 | Cursed Accomplice | 40 | Instant | None | 40 | With no allied player selected, links the Maledict Eye and its Gaze generates 2. With an allied player selected, their damage to an Eye generates 3. One link; at most once every 2 sec. |
-| 9 | Consume | 40/55/70 | 5 sec channel | None | 20 | Shared Warlock spell with five ticks for 7/12/17 damage at levels 9, 14, and 20. It transfers 70% of that damage as health; Affliction transfers the full amount and generates 2 Condemnation per primary-Eye tick plus 5 on completion. |
-| 11 | Litany of Guilt | 50/65 | Instant | 20 sec | 30 | For 8 sec, Condemnation gains damage up to four other enemies within 8 yards of the primary Eye, at most once per second. |
+| 7 | Consume | 25/35/45 | 3 sec channel | None | 20 | Shared Warlock spell with three ticks for 7/12/17 damage at levels 7, 14, and 20. It transfers 70% of that damage as health; Affliction transfers the full amount and generates 2 Condemnation per primary-Eye tick plus 3 on completion. Casting Sentence cancels the channel. |
+| 10 | Litany of Guilt | 50/65 | Instant | 20 sec | 30 | For 8 sec, Condemnation gains damage up to four other enemies within 8 yards of the primary Eye, at most once per second. |
 | 12 | Hex of Violence | 55 | Instant | 15 sec | 30 | For 8 sec, the enemy's next three damaging actions each generate 7 and retaliate for 22 Shadow damage. |
-| 14 | Cruel Pact | 0 | Instant | 20 sec | Self | Replaces Hard Bargain for Affliction. Sacrifices 12% maximum health, restores 15% maximum mana, and generates 20 Condemnation. Unusable at or below 20% health. |
-| 16 | Vicarious Suffering | 50 | Instant | 30 sec | 40 | Marks self or an ally for 8 sec. Hostile hits generate 3 each, up to 15 total. Self-casts reduce damage by 20%; allied casts redirect up to 20% without taking the Warlock below 15% health. |
-| 18 | Possess the Evil Eye | 75 | Instant | 45 sec | 30 | The Maledictor possesses the primary Eye for 10 sec, empowering Needle of Fate, Consume, and Sentence without pausing Condemnation expiry. |
-| 20 | Coven | 120 | Instant | 90 sec | 30 | Requires the primary Eye. Adds up to four secondary Eyes for 15 sec within 15 yards. |
+| 9 | Cruel Pact | 0 | Instant | 20 sec | Self | Replaces Hard Bargain for Affliction. Sacrifices 12% maximum health, restores 15% maximum mana, and generates 20 Condemnation. Unusable at or below 20% health. |
+| 14 | Vicarious Suffering | 50 | Instant | 30 sec | 40 | Marks self or an ally for 8 sec. Hostile hits generate 3 each, up to 15 total. Self-casts reduce damage by 20%; allied casts redirect up to 20% without taking the Warlock below 15% health. |
+| 13 | Possess the Evil Eye | 75 | Instant | 45 sec | 30 | The Maledictor possesses the primary Evil Eye for 10 sec, empowering Needle of Fate, Consume, and Sentence without pausing Condemnation expiry. |
+| 17 | Coven | 120 | Instant | 90 sec | 30 | Requires the primary Eye. Adds up to four secondary Eyes for 15 sec within 15 yards. |
 
 At 50 Condemnation, Sentence heals the Warlock for 20% of primary damage dealt. At 80,
 it also deals 35% splash damage within 8 yards. At 100, it deals 20% more damage to
@@ -144,7 +144,7 @@ event, and receive a 35% Sentence echo. The shared resource remains capped at 10
 - Sentence commits the complete pool, so poor timing is expensive.
 - Lower generation when enemies cannot act or allies cannot reach the Eye.
 - Evil Eye placement and target switching demand attention.
-- Cruel Pact replaces Hard Bargain at level 14 and combines its mana return with
+- Cruel Pact replaces Hard Bargain at level 9 and combines its mana return with
   Affliction's health-paid Condemnation generation.
 
 ### Talent directions
@@ -156,7 +156,7 @@ The tree should offer equally viable paths for:
 - Sentence thresholds, echoes, and spending decisions.
 - Vitality stealing and personal survival.
 
-The shared choice rows must resolve through each specialization's actual kit. Deepened
+The class talent rows must resolve through each specialization's actual kit. Deepened
 Hex empowers Needle of Fate, Essence Reap, or Gloom Bolt; Hexstorm can make the next of
 those generators instant; Grand Malediction reduces the signature setup cooldown of
 Affliction, Necromancy, or Destruction rather than granting a dead spell-specific bonus.
@@ -190,7 +190,8 @@ power window instead of playing as another direct-damage caster.
   replaces the current temporary wave with one Skeletal Warrior, one Bone Mage, and
   one elite Gravewing for 20 seconds.
 - Keep the owner kit focused: Gloom Bolt, Burning Pact, Blackrot, Hex of Anguish,
-  Consume, and Sear are not available to committed Necromancy.
+  and Consume are not available to committed Necromancy. Sear remains a shared
+  level-7 filler for Necromancy and Affliction.
 - Soul Lance enters at level 9 as an 8 sec caster-owned nuke. It costs mana, not
   Soul Fragments, and contributes another 50% of its landed damage to Ossuary Mark.
 - Ossuary Mark enters at level 12. It stores 20% of landed damage from the

@@ -18,7 +18,7 @@ const POSSESSED_MALEDICT_GAZE_INTERVAL = 1.25;
 const MALEDICT_GAZE_RANGE = 30;
 const ENEMY_ACTION_GAIN = 2;
 const DRAIN_TICK_GAIN = 2;
-const DRAIN_COMPLETION_GAIN = 5;
+const DRAIN_COMPLETION_GAIN = 3;
 const FATE_THREAD_DOOM_PER_TICK = 1;
 const SENTENCE_SPLASH_RADIUS = 8;
 const SENTENCE_SPLASH_MULT = 0.35;
@@ -387,7 +387,7 @@ export function resolveNeedleOfFate(ctx: SimContext, warlock: Entity, target: En
   gainDoom(
     ctx,
     warlock,
-    eyeGeneration(eye, 5 + (hasAfflictionPossession(warlock) ? POSSESSED_NEEDLE_DOOM_BONUS : 0)),
+    eyeGeneration(eye, 7 + (hasAfflictionPossession(warlock) ? POSSESSED_NEEDLE_DOOM_BONUS : 0)),
   );
   if (eye.kind !== 'affliction_eye') return;
   const threads = fateThreadAura(target, warlock.id);
@@ -591,10 +591,10 @@ export function applyCoven(
 }
 
 function sentenceBaseDamage(doom: number): number {
-  if (doom <= 20) return 55;
-  if (doom <= 50) return Math.round(55 + ((doom - 20) / 30) * 105);
-  if (doom <= 80) return Math.round(160 + ((doom - 50) / 30) * 140);
-  return Math.round(300 + ((doom - 80) / 20) * 140);
+  if (doom <= 20) return 83;
+  if (doom <= 50) return Math.round(83 + ((doom - 20) / 30) * 157);
+  if (doom <= 80) return Math.round(240 + ((doom - 50) / 30) * 210);
+  return Math.round(450 + ((doom - 80) / 20) * 210);
 }
 
 export function resolveSentence(

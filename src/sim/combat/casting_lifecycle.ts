@@ -673,6 +673,13 @@ export function castAbility(
     ctx.error(p.id, 'You are stunned!');
     return;
   }
+  // Sentence is Affliction's decisive release: pressing it during Consume
+  // deliberately cuts the drain instead of being rejected by the generic busy
+  // guard. The normal Sentence gates below still own target, resource, GCD, and
+  // cost validation.
+  if (abilityId === 'sentence' && p.castingAbility === 'drain_life' && p.channeling) {
+    cancelCast(ctx, p);
+  }
   // Blink While Casting (mage choice row): Flickerstep slips through the busy
   // guard AND the GCD, an escape button that never touches the cast in
   // progress (the cast survives the relocation: player_motion only breaks
@@ -1151,8 +1158,8 @@ export function castAbility(
     p.channelTickEvery = channelDuration / channelTicks;
     // Consume is a sustained drain, so its first pulse starts on the first sim
     // update instead of leaving a full one-second dead period at channel start.
-    // Starting at one DT preserves the authored five-tick budget: a zero timer
-    // would also fire once more exactly as the five-second channel completes.
+    // Starting at one DT preserves the authored three-tick budget: a zero timer
+    // would also fire once more exactly as the three-second channel completes.
     p.channelTickTimer = ability.id === 'drain_life' ? DT : p.channelTickEvery;
     p.channelTicksLeft = channelTicks;
     if (ability.id === 'drain_life') {
@@ -1670,7 +1677,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
           }
         }
         if (res.def.id === 'drain_life' && tgt.dead && src.castingAbility === res.def.id) {
-          // The first pulse is front-loaded, so the fifth can land just before
+          // The first pulse is front-loaded, so the third can land just before
           // the channel's visual tail ends. All authored pulses were completed:
           // preserve Consume's completion gain before stopping the dead-target beam.
           if (completionDoom > 0) gainDoom(ctx, src, completionDoom);

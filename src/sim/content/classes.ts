@@ -139,7 +139,15 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startWeapon: 'gnarled_staff',
     startChest: 'apprentice_robe',
     startItems: START_RATIONS_MANA,
-    ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'arcane' },
+    ranged: {
+      min: 3,
+      max: 6,
+      speed: 1.8,
+      maxRange: 30,
+      minRange: 0,
+      wand: true,
+      school: 'arcane',
+    },
     abilities: [
       'fireball',
       'frost_armor',
@@ -334,7 +342,15 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startWeapon: 'gnarled_staff',
     startChest: 'apprentice_robe',
     startItems: START_RATIONS_MANA,
-    ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'holy' },
+    ranged: {
+      min: 3,
+      max: 6,
+      speed: 1.8,
+      maxRange: 30,
+      minRange: 0,
+      wand: true,
+      school: 'holy',
+    },
     abilities: [
       'smite',
       'lesser_heal',
@@ -390,7 +406,15 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startWeapon: 'gnarled_staff',
     startChest: 'apprentice_robe',
     startItems: START_RATIONS_MANA,
-    ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'shadow' },
+    ranged: {
+      min: 3,
+      max: 6,
+      speed: 1.8,
+      maxRange: 30,
+      minRange: 0,
+      wand: true,
+      school: 'shadow',
+    },
     abilities: [
       'shadow_bolt',
       'summon_imp',
@@ -406,22 +430,20 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'summon_voidwalker',
       'curse_of_agony',
       'drain_life',
+      'searing_pain',
       'soul_lance',
       'litany_of_guilt',
       'umbral_anchor',
+      'soulwell',
       'chaos_bolt',
       'hex_of_violence',
       'ossuary_mark',
       'fear',
       'cruel_pact',
       'shadowburn',
-      'summon_succubus',
-      'summon_felhunter',
-      'summon_felguard',
       'ruinous_brand',
       'vicarious_suffering',
       'summon_infernal',
-      'summon_doomguard',
       'rain_of_fire',
       'spell_lock',
       'possess_evil_eye',
@@ -457,7 +479,15 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     // school. Form-aware: available only in caster form and Moonwing Form; the
     // bear/cat/travel shapeshifts fight with claws (see combat/form_swing.ts
     // rangedAutoProfile, which the auto-attack loop resolves through).
-    ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'nature' },
+    ranged: {
+      min: 3,
+      max: 6,
+      speed: 1.8,
+      maxRange: 30,
+      minRange: 0,
+      wand: true,
+      school: 'nature',
+    },
     abilities: [
       'wrath',
       'healing_touch',
@@ -567,7 +597,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     exclusiveGroup: 'warrior_shout',
     // 1800s matches the other five standardized class raid buffs (int, armor,
     // AP, stamina, stats all run 30 min); 120s was the odd one out.
-    effects: [{ type: 'buffTarget', kind: 'buff_ap_pct', value: 10, duration: 1800, party: true }],
+    effects: [
+      {
+        type: 'buffTarget',
+        kind: 'buff_ap_pct',
+        value: 10,
+        duration: 1800,
+        party: true,
+      },
+    ],
     description: 'A shout that increases the attack power of all party members by $b% for 30 min.',
   },
   demoralizing_shout: {
@@ -736,7 +774,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 15,
         effects: [
           { type: 'weaponStrike', bonus: 15, cannotBeDodged: true },
-          { type: 'selfBuff', kind: 'overpower_charge', value: 0.2, duration: 15 },
+          {
+            type: 'selfBuff',
+            kind: 'overpower_charge',
+            value: 0.2,
+            duration: 15,
+          },
         ],
       },
     ],
@@ -987,7 +1030,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'aoeDamage', min: 15, max: 20, radius: 8, frontal: true, stunSec: 3 }],
+    effects: [
+      {
+        type: 'aoeDamage',
+        min: 15,
+        max: 20,
+        radius: 8,
+        frontal: true,
+        stunSec: 3,
+      },
+    ],
     description:
       'Send a shockwave through the ground: enemies in front of you within 8 yards take $d damage and are stunned for 3 sec. (Protection)',
   },
@@ -1213,7 +1265,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     threat: { flat: 30 },
-    effects: [{ type: 'aoeDamage', min: 18, max: 24, radius: 8, frontal: true, softCap: 5 }],
+    effects: [
+      {
+        type: 'aoeDamage',
+        min: 18,
+        max: 24,
+        radius: 8,
+        frontal: true,
+        softCap: 5,
+      },
+    ],
     description:
       'Attack in a wide arc, dealing 18 to 24 Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)',
   },
@@ -1272,7 +1333,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     offGcd: true,
     exclusiveGroup: 'warrior_stance',
-    effects: [{ type: 'selfBuff', kind: 'defensive_stance', value: 0.9, duration: 3600 }],
+    effects: [
+      {
+        type: 'selfBuff',
+        kind: 'defensive_stance',
+        value: 0.9,
+        duration: 3600,
+      },
+    ],
     description:
       'A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast Battle Stance to return to the offensive.',
   },
@@ -1431,7 +1499,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'arcane',
     requiresTarget: false,
-    effects: [{ type: 'buffTarget', kind: 'buff_int_pct', value: 5, duration: 1800, party: true }],
+    effects: [
+      {
+        type: 'buffTarget',
+        kind: 'buff_int_pct',
+        value: 5,
+        duration: 1800,
+        party: true,
+      },
+    ],
     description: 'Increases the Intellect of all party members by $b% for 30 min.',
   },
   frostbolt: {
@@ -1569,13 +1645,31 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'frost',
     requiresTarget: false,
-    effects: [{ type: 'frozenOrb', min: 8, max: 11, radius: 6, duration: 8, interval: 1 }],
+    effects: [
+      {
+        type: 'frozenOrb',
+        min: 8,
+        max: 11,
+        radius: 6,
+        duration: 8,
+        interval: 1,
+      },
+    ],
     ranks: [
       {
         rank: 2,
         level: 18,
         cost: 70,
-        effects: [{ type: 'frozenOrb', min: 14, max: 18, radius: 6, duration: 8, interval: 1 }],
+        effects: [
+          {
+            type: 'frozenOrb',
+            min: 14,
+            max: 18,
+            radius: 6,
+            duration: 8,
+            interval: 1,
+          },
+        ],
       },
     ],
     description:
@@ -1859,8 +1953,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'directDamage', min: 27, max: 35 }],
     ranks: [
-      { rank: 2, level: 12, cost: 60, effects: [{ type: 'directDamage', min: 44, max: 54 }] },
-      { rank: 3, level: 18, cost: 85, effects: [{ type: 'directDamage', min: 68, max: 82 }] },
+      {
+        rank: 2,
+        level: 12,
+        cost: 60,
+        effects: [{ type: 'directDamage', min: 44, max: 54 }],
+      },
+      {
+        rank: 3,
+        level: 18,
+        cost: 85,
+        effects: [{ type: 'directDamage', min: 68, max: 82 }],
+      },
     ],
     description: 'Blasts the enemy for $d Fire damage. Instant.',
   },
@@ -1879,8 +1983,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 8, max: 8 }], // per missile
     ranks: [
-      { rank: 2, level: 14, cost: 75, effects: [{ type: 'directDamage', min: 14, max: 14 }] },
-      { rank: 3, level: 20, cost: 105, effects: [{ type: 'directDamage', min: 22, max: 22 }] },
+      {
+        rank: 2,
+        level: 14,
+        cost: 75,
+        effects: [{ type: 'directDamage', min: 14, max: 14 }],
+      },
+      {
+        rank: 3,
+        level: 20,
+        cost: 105,
+        effects: [{ type: 'directDamage', min: 22, max: 22 }],
+      },
     ],
     description:
       'Launches Aether Darts at the enemy, causing $d Arcane damage each second for 3 sec.',
@@ -1897,7 +2011,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'arcane',
     requiresTarget: true,
     effects: [{ type: 'polymorph', duration: 15 }],
-    ranks: [{ rank: 2, level: 18, cost: 70, effects: [{ type: 'polymorph', duration: 20 }] }],
+    ranks: [
+      {
+        rank: 2,
+        level: 18,
+        cost: 70,
+        effects: [{ type: 'polymorph', duration: 20 }],
+      },
+    ],
     description:
       'Transforms the enemy into a toad for up to $t sec. The toad wanders and heals rapidly. Any damage breaks the effect. Beasts and humanoids only.',
   },
@@ -1995,7 +2116,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'rain_of_fire',
     name: 'Rain of Fire',
     class: 'warlock',
-    learnLevel: 12,
+    learnLevel: 8,
     cost: 45,
     ruinCost: 3,
     castTime: 0,
@@ -2084,7 +2205,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: false,
     targetMode: 'position',
-    effects: [{ type: 'groundAoE', min: 13, max: 17, radius: 8, duration: 6, interval: 1.5 }],
+    effects: [
+      {
+        type: 'groundAoE',
+        min: 13,
+        max: 17,
+        radius: 8,
+        duration: 6,
+        interval: 1.5,
+      },
+    ],
     description:
       'Shakes the target area for 6 sec, battering enemies for $d Nature damage every 1.5 sec.',
   },
@@ -2157,8 +2287,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 62, max: 74 }],
     ranks: [
-      { rank: 2, level: 12, cost: 70, effects: [{ type: 'heal', min: 105, max: 125 }] },
-      { rank: 3, level: 18, cost: 95, effects: [{ type: 'heal', min: 150, max: 178 }] },
+      {
+        rank: 2,
+        level: 12,
+        cost: 70,
+        effects: [{ type: 'heal', min: 105, max: 125 }],
+      },
+      {
+        rank: 3,
+        level: 18,
+        cost: 95,
+        effects: [{ type: 'heal', min: 150, max: 178 }],
+      },
     ],
     description:
       'Draws an ally a moment forward in time, mending $d health as the body settles into its healthier future self. (Chronomancy signature)',
@@ -2394,7 +2534,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'arcane',
     requiresTarget: false, // instant, self-centered: no target needed
-    effects: [{ type: 'rewind', fraction: 0.3, maxHpFraction: 0.35, windowSec: 5, radius: 40 }],
+    effects: [
+      {
+        type: 'rewind',
+        fraction: 0.3,
+        maxHpFraction: 0.35,
+        windowSec: 5,
+        radius: 40,
+      },
+    ],
     description:
       'Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)',
   },
@@ -2590,9 +2738,24 @@ export const ABILITIES: Record<string, AbilityDef> = {
     awardsCombo: 1,
     effects: [{ type: 'weaponStrike', bonus: 3 }],
     ranks: [
-      { rank: 2, level: 8, cost: 45, effects: [{ type: 'weaponStrike', bonus: 6 }] },
-      { rank: 3, level: 14, cost: 45, effects: [{ type: 'weaponStrike', bonus: 12 }] },
-      { rank: 4, level: 20, cost: 45, effects: [{ type: 'weaponStrike', bonus: 18 }] },
+      {
+        rank: 2,
+        level: 8,
+        cost: 45,
+        effects: [{ type: 'weaponStrike', bonus: 6 }],
+      },
+      {
+        rank: 3,
+        level: 14,
+        cost: 45,
+        effects: [{ type: 'weaponStrike', bonus: 12 }],
+      },
+      {
+        rank: 4,
+        level: 20,
+        cost: 45,
+        effects: [{ type: 'weaponStrike', bonus: 18 }],
+      },
     ],
     description: 'An instant strike for weapon damage plus $d. Awards 1 combo point.',
   },
@@ -2637,19 +2800,40 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     awardsCombo: 1,
-    effects: [{ type: 'weaponStrike', bonus: 11, requiresBehind: true, weaponMult: 1.5 }],
+    effects: [
+      {
+        type: 'weaponStrike',
+        bonus: 11,
+        requiresBehind: true,
+        weaponMult: 1.5,
+      },
+    ],
     ranks: [
       {
         rank: 2,
         level: 12,
         cost: 60,
-        effects: [{ type: 'weaponStrike', bonus: 20, requiresBehind: true, weaponMult: 1.5 }],
+        effects: [
+          {
+            type: 'weaponStrike',
+            bonus: 20,
+            requiresBehind: true,
+            weaponMult: 1.5,
+          },
+        ],
       },
       {
         rank: 3,
         level: 18,
         cost: 60,
-        effects: [{ type: 'weaponStrike', bonus: 32, requiresBehind: true, weaponMult: 1.5 }],
+        effects: [
+          {
+            type: 'weaponStrike',
+            bonus: 32,
+            requiresBehind: true,
+            weaponMult: 1.5,
+          },
+        ],
       },
     ],
     description:
@@ -2759,7 +2943,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     awardsCombo: 1,
     requiresStealth: true,
-    effects: [{ type: 'weaponStrike', bonus: 28, requiresBehind: true, weaponMult: 2.5 }],
+    effects: [
+      {
+        type: 'weaponStrike',
+        bonus: 28,
+        requiresBehind: true,
+        weaponMult: 2.5,
+      },
+    ],
     description:
       'Strike from the shadows for 250% weapon damage plus $d. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.',
   },
@@ -3007,7 +3198,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 3,
         level: 16,
         cost: 50,
-        effects: [{ type: 'imbue', bonus: 11, duration: 30, judgeMin: 30, judgeMax: 44 }],
+        effects: [
+          {
+            type: 'imbue',
+            bonus: 11,
+            duration: 30,
+            judgeMin: 30,
+            judgeMax: 44,
+          },
+        ],
       },
     ],
     description:
@@ -3027,9 +3226,24 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 42, max: 51 }],
     ranks: [
-      { rank: 2, level: 8, cost: 50, effects: [{ type: 'heal', min: 76, max: 90 }] },
-      { rank: 3, level: 14, cost: 70, effects: [{ type: 'heal', min: 122, max: 144 }] },
-      { rank: 4, level: 20, cost: 117, effects: [{ type: 'heal', min: 275, max: 322 }] },
+      {
+        rank: 2,
+        level: 8,
+        cost: 50,
+        effects: [{ type: 'heal', min: 76, max: 90 }],
+      },
+      {
+        rank: 3,
+        level: 14,
+        cost: 70,
+        effects: [{ type: 'heal', min: 122, max: 144 }],
+      },
+      {
+        rank: 4,
+        level: 20,
+        cost: 117,
+        effects: [{ type: 'heal', min: 275, max: 322 }],
+      },
     ],
     description: 'Heals a friendly target for $d.',
   },
@@ -3046,7 +3260,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     exclusiveGroup: 'paladin_aura',
     effects: [
-      { type: 'buffTarget', kind: 'buff_armor_pct', value: 10, duration: 1800, party: true },
+      {
+        type: 'buffTarget',
+        kind: 'buff_armor_pct',
+        value: 10,
+        duration: 1800,
+        party: true,
+      },
     ],
     description: 'Increases the armor of all party members by $b% for 30 min.',
   },
@@ -3077,7 +3297,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'holy',
     requiresTarget: true,
     targetType: 'friendly',
-    effects: [{ type: 'buffTarget', kind: 'buff_ap_pct', value: 10, duration: 1800, party: true }],
+    effects: [
+      {
+        type: 'buffTarget',
+        kind: 'buff_ap_pct',
+        value: 10,
+        duration: 1800,
+        party: true,
+      },
+    ],
     description:
       'Blesses the party, increasing the attack power of all party members by $b% for 30 min.',
   },
@@ -3095,7 +3323,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'absorb', amount: 50, duration: 10 }],
     ranks: [
-      { rank: 2, level: 14, cost: 25, effects: [{ type: 'absorb', amount: 110, duration: 10 }] },
+      {
+        rank: 2,
+        level: 14,
+        cost: 25,
+        effects: [{ type: 'absorb', amount: 110, duration: 10 }],
+      },
     ],
     description: 'A holy shield absorbs $d damage for 10 sec.',
   },
@@ -3130,7 +3363,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'holy',
     requiresTarget: true,
     effects: [{ type: 'stun', duration: 3 }],
-    ranks: [{ rank: 2, level: 16, cost: 45, effects: [{ type: 'stun', duration: 4 }] }],
+    ranks: [
+      {
+        rank: 2,
+        level: 16,
+        cost: 45,
+        effects: [{ type: 'stun', duration: 4 }],
+      },
+    ],
     description: 'Stuns the target for $t sec.',
   },
   lay_on_hands: {
@@ -3146,7 +3386,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 250, max: 250 }],
-    ranks: [{ rank: 2, level: 18, cost: 0, effects: [{ type: 'heal', min: 600, max: 600 }] }],
+    ranks: [
+      {
+        rank: 2,
+        level: 18,
+        cost: 0,
+        effects: [{ type: 'heal', min: 600, max: 600 }],
+      },
+    ],
     description: 'A massive surge of healing: restores $d health. 10 min cooldown.',
   },
   holy_taunt: {
@@ -3178,7 +3425,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 62, max: 76 }],
-    ranks: [{ rank: 2, level: 20, cost: 46, effects: [{ type: 'heal', min: 90, max: 110 }] }],
+    ranks: [
+      {
+        rank: 2,
+        level: 20,
+        cost: 46,
+        effects: [{ type: 'heal', min: 90, max: 110 }],
+      },
+    ],
     description: 'A quick, efficient flash of Light that heals a friendly target for $d.',
   },
   exorcism: {
@@ -3206,7 +3460,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'holy',
     requiresTarget: false,
-    effects: [{ type: 'groundAoE', min: 28, max: 34, radius: 8, duration: 10, interval: 2 }],
+    effects: [
+      {
+        type: 'groundAoE',
+        min: 28,
+        max: 34,
+        radius: 8,
+        duration: 10,
+        interval: 2,
+      },
+    ],
     description:
       'Consecrates the ground beneath you, searing nearby enemies for $d Holy damage every 2 sec for 10 sec.',
   },
@@ -3302,9 +3565,24 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'weaponDamage', bonus: 5 }],
     ranks: [
-      { rank: 2, level: 8, cost: 25, effects: [{ type: 'weaponDamage', bonus: 11 }] },
-      { rank: 3, level: 14, cost: 35, effects: [{ type: 'weaponDamage', bonus: 18 }] },
-      { rank: 4, level: 20, cost: 45, effects: [{ type: 'weaponDamage', bonus: 27 }] },
+      {
+        rank: 2,
+        level: 8,
+        cost: 25,
+        effects: [{ type: 'weaponDamage', bonus: 11 }],
+      },
+      {
+        rank: 3,
+        level: 14,
+        cost: 35,
+        effects: [{ type: 'weaponDamage', bonus: 18 }],
+      },
+      {
+        rank: 4,
+        level: 20,
+        cost: 45,
+        effects: [{ type: 'weaponDamage', bonus: 27 }],
+      },
     ],
     description: 'A strong melee attack that increases damage by $d. Activates on your next swing.',
   },
@@ -3382,8 +3660,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 13, max: 17 }],
     ranks: [
-      { rank: 2, level: 12, cost: 40, effects: [{ type: 'directDamage', min: 24, max: 30 }] },
-      { rank: 3, level: 18, cost: 55, effects: [{ type: 'directDamage', min: 38, max: 47 }] },
+      {
+        rank: 2,
+        level: 12,
+        cost: 40,
+        effects: [{ type: 'directDamage', min: 24, max: 30 }],
+      },
+      {
+        rank: 3,
+        level: 18,
+        cost: 55,
+        effects: [{ type: 'directDamage', min: 38, max: 47 }],
+      },
     ],
     description: 'An instant shot that deals $d Arcane damage.',
   },
@@ -3527,7 +3815,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 15, max: 20 }],
     ranks: [
-      { rank: 2, level: 8, cost: 32, effects: [{ type: 'directDamage', min: 26, max: 33 }] },
+      {
+        rank: 2,
+        level: 8,
+        cost: 32,
+        effects: [{ type: 'directDamage', min: 26, max: 33 }],
+      },
       {
         rank: 3,
         level: 14,
@@ -3559,9 +3852,24 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 47, max: 58 }],
     ranks: [
-      { rank: 2, level: 6, cost: 45, effects: [{ type: 'heal', min: 72, max: 86 }] },
-      { rank: 3, level: 12, cost: 65, effects: [{ type: 'heal', min: 110, max: 132 }] },
-      { rank: 4, level: 20, cost: 85, effects: [{ type: 'heal', min: 160, max: 192 }] },
+      {
+        rank: 2,
+        level: 6,
+        cost: 45,
+        effects: [{ type: 'heal', min: 72, max: 86 }],
+      },
+      {
+        rank: 3,
+        level: 12,
+        cost: 65,
+        effects: [{ type: 'heal', min: 110, max: 132 }],
+      },
+      {
+        rank: 4,
+        level: 20,
+        cost: 85,
+        effects: [{ type: 'heal', min: 160, max: 192 }],
+      },
     ],
     description: 'Heals a friendly target for $d.',
   },
@@ -3577,7 +3885,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'holy',
     requiresTarget: true,
     targetType: 'friendly',
-    effects: [{ type: 'buffTarget', kind: 'buff_sta_pct', value: 5, duration: 1800, party: true }],
+    effects: [
+      {
+        type: 'buffTarget',
+        kind: 'buff_sta_pct',
+        value: 5,
+        duration: 1800,
+        party: true,
+      },
+    ],
     description: 'Increases the Stamina of all party members by $b% for 30 min.',
   },
   shadow_word_pain: {
@@ -3622,9 +3938,24 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'absorb', amount: 48, duration: 30 }],
     ranks: [
-      { rank: 2, level: 12, cost: 70, effects: [{ type: 'absorb', amount: 90, duration: 30 }] },
-      { rank: 3, level: 18, cost: 100, effects: [{ type: 'absorb', amount: 145, duration: 30 }] },
-      { rank: 4, level: 20, cost: 130, effects: [{ type: 'absorb', amount: 210, duration: 30 }] },
+      {
+        rank: 2,
+        level: 12,
+        cost: 70,
+        effects: [{ type: 'absorb', amount: 90, duration: 30 }],
+      },
+      {
+        rank: 3,
+        level: 18,
+        cost: 100,
+        effects: [{ type: 'absorb', amount: 145, duration: 30 }],
+      },
+      {
+        rank: 4,
+        level: 20,
+        cost: 130,
+        effects: [{ type: 'absorb', amount: 210, duration: 30 }],
+      },
     ],
     description: 'Shields the target, absorbing $d damage for 30 sec.',
   },
@@ -3670,8 +4001,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 42, max: 46 }],
     ranks: [
-      { rank: 2, level: 14, cost: 70, effects: [{ type: 'directDamage', min: 60, max: 66 }] },
-      { rank: 3, level: 20, cost: 95, effects: [{ type: 'directDamage', min: 86, max: 94 }] },
+      {
+        rank: 2,
+        level: 14,
+        cost: 70,
+        effects: [{ type: 'directDamage', min: 60, max: 66 }],
+      },
+      {
+        rank: 3,
+        level: 20,
+        cost: 95,
+        effects: [{ type: 'directDamage', min: 86, max: 94 }],
+      },
     ],
     description: "Blasts the target's mind for $d Shadow damage.",
   },
@@ -3688,7 +4029,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 165, max: 195 }],
-    ranks: [{ rank: 2, level: 20, cost: 130, effects: [{ type: 'heal', min: 335, max: 390 }] }],
+    ranks: [
+      {
+        rank: 2,
+        level: 20,
+        cost: 130,
+        effects: [{ type: 'heal', min: 335, max: 390 }],
+      },
+    ],
     description: 'A slow but powerful prayer that heals a friendly target for $d.',
   },
   mind_flay: {
@@ -3775,8 +4123,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'imbue', bonus: 5, duration: 300 }],
     ranks: [
-      { rank: 2, level: 8, cost: 30, effects: [{ type: 'imbue', bonus: 9, duration: 300 }] },
-      { rank: 3, level: 16, cost: 45, effects: [{ type: 'imbue', bonus: 14, duration: 300 }] },
+      {
+        rank: 2,
+        level: 8,
+        cost: 30,
+        effects: [{ type: 'imbue', bonus: 9, duration: 300 }],
+      },
+      {
+        rank: 3,
+        level: 16,
+        cost: 45,
+        effects: [{ type: 'imbue', bonus: 14, duration: 300 }],
+      },
     ],
     description:
       'Imbues your weapon with the fury of stone: each swing deals $d additional damage for 5 min.',
@@ -3796,7 +4154,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: true,
     targetType: 'friendly',
-    effects: [{ type: 'chainHeal', min: 120, max: 145, jumps: 2, falloff: 0.5, radius: 12 }],
+    effects: [
+      {
+        type: 'chainHeal',
+        min: 120,
+        max: 145,
+        jumps: 2,
+        falloff: 0.5,
+        radius: 12,
+      },
+    ],
     description:
       'Heals a friendly target for 120 to 145, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)',
   },
@@ -3814,7 +4181,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 36, max: 44 }],
     ranks: [
-      { rank: 2, level: 6, cost: 40, castTime: 2.0, effects: [{ type: 'heal', min: 56, max: 68 }] },
+      {
+        rank: 2,
+        level: 6,
+        cost: 40,
+        castTime: 2.0,
+        effects: [{ type: 'heal', min: 56, max: 68 }],
+      },
       {
         rank: 3,
         level: 12,
@@ -3852,8 +4225,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 19, max: 22 }],
     ranks: [
-      { rank: 2, level: 10, cost: 45, effects: [{ type: 'directDamage', min: 33, max: 38 }] },
-      { rank: 3, level: 16, cost: 65, effects: [{ type: 'directDamage', min: 54, max: 61 }] },
+      {
+        rank: 2,
+        level: 10,
+        cost: 45,
+        effects: [{ type: 'directDamage', min: 33, max: 38 }],
+      },
+      {
+        rank: 3,
+        level: 16,
+        cost: 65,
+        effects: [{ type: 'directDamage', min: 54, max: 61 }],
+      },
     ],
     description: 'Instantly shocks the target with concussive force for $d Nature damage.',
   },
@@ -3954,7 +4337,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'imbue', bonus: 8, duration: 300 }],
     ranks: [
-      { rank: 2, level: 18, cost: 40, effects: [{ type: 'imbue', bonus: 13, duration: 300 }] },
+      {
+        rank: 2,
+        level: 18,
+        cost: 40,
+        effects: [{ type: 'imbue', bonus: 13, duration: 300 }],
+      },
     ],
     description:
       'Imbues your weapon with elemental fire: each swing deals $d additional Fire damage for 5 min.',
@@ -3990,7 +4378,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'imbue', bonus: 8, duration: 300 }],
     ranks: [
-      { rank: 2, level: 20, cost: 40, effects: [{ type: 'imbue', bonus: 13, duration: 300 }] },
+      {
+        rank: 2,
+        level: 20,
+        cost: 40,
+        effects: [{ type: 'imbue', bonus: 13, duration: 300 }],
+      },
     ],
     description:
       'Imbues your weapon with biting frost: each swing deals $d additional damage for 5 min.',
@@ -4073,23 +4466,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'shadow',
     requiresTarget: true,
-    effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 18, max: 22 }],
+    effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 22, max: 27 }],
     ranks: [
       {
         rank: 2,
         level: 12,
         cost: 30,
-        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 32, max: 38 }],
+        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 40, max: 48 }],
       },
       {
         rank: 3,
         level: 20,
         cost: 35,
-        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 48, max: 56 }],
+        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 60, max: 70 }],
       },
     ],
     description:
-      'Pierces the enemy for $d Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target.',
+      'Pierces the enemy for $d Shadow damage and generates 7 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target.',
   },
   sentence: {
     id: 'sentence',
@@ -4156,14 +4549,21 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Cruel Pact',
     class: 'warlock',
     specs: ['affliction'],
-    learnLevel: 14,
+    learnLevel: 9,
     cost: 0,
     castTime: 0,
     cooldown: 20,
     range: 0,
     school: 'shadow',
     requiresTarget: false,
-    effects: [{ type: 'afflictionCruelPact', healthPct: 0.12, manaPctMax: 0.15, doom: 20 }],
+    effects: [
+      {
+        type: 'afflictionCruelPact',
+        healthPct: 0.12,
+        manaPctMax: 0.15,
+        doom: 20,
+      },
+    ],
     description:
       'Sacrifices 12% of your maximum health to restore 15% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
   },
@@ -4172,7 +4572,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Vicarious Suffering',
     class: 'warlock',
     specs: ['affliction'],
-    learnLevel: 16,
+    learnLevel: 14,
     cost: 50,
     castTime: 0,
     cooldown: 30,
@@ -4189,7 +4589,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Possess the Evil Eye',
     class: 'warlock',
     specs: ['affliction'],
-    learnLevel: 18,
+    learnLevel: 13,
     cost: 75,
     castTime: 0,
     cooldown: 45,
@@ -4206,7 +4606,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Coven',
     class: 'warlock',
     specs: ['affliction'],
-    learnLevel: 20,
+    learnLevel: 17,
     cost: 120,
     castTime: 0,
     cooldown: 90,
@@ -4366,8 +4766,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'lifeTap', hp: 30, mana: 30 }],
     ranks: [
-      { rank: 2, level: 14, cost: 0, effects: [{ type: 'lifeTap', hp: 55, mana: 55 }] },
-      { rank: 3, level: 20, cost: 0, effects: [{ type: 'lifeTap', hp: 85, mana: 85 }] },
+      {
+        rank: 2,
+        level: 14,
+        cost: 0,
+        effects: [{ type: 'lifeTap', hp: 55, mana: 55 }],
+      },
+      {
+        rank: 3,
+        level: 20,
+        cost: 0,
+        effects: [{ type: 'lifeTap', hp: 85, mana: 85 }],
+      },
     ],
     description: 'Converts $d health into $d mana.',
   },
@@ -4405,10 +4815,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Consume',
     class: 'warlock',
     excludeSpecs: ['demonology'],
-    learnLevel: 9,
-    cost: 40,
+    learnLevel: 7,
+    cost: 25,
     castTime: 0,
-    channel: { duration: 5, ticks: 5 },
+    channel: { duration: 3, ticks: 3 },
     cooldown: 0,
     range: 20,
     school: 'shadow',
@@ -4418,13 +4828,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
       {
         rank: 2,
         level: 14,
-        cost: 55,
+        cost: 35,
         effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 0.7 }],
       },
       {
         rank: 3,
         level: 20,
-        cost: 70,
+        cost: 45,
         effects: [{ type: 'drainTick', min: 17, max: 17, healFrac: 0.7 }],
       },
     ],
@@ -4466,7 +4876,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Litany of Guilt',
     class: 'warlock',
     specs: ['affliction'],
-    learnLevel: 11,
+    learnLevel: 10,
     cost: 50,
     castTime: 0,
     cooldown: 20,
@@ -4517,11 +4927,27 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown.',
   },
+  soulwell: {
+    id: 'soulwell',
+    name: 'Soulwell',
+    class: 'warlock',
+    learnLevel: 8,
+    cost: 80,
+    castTime: 3,
+    cooldown: 300,
+    range: 0,
+    school: 'shadow',
+    requiresTarget: false,
+    requiresOutOfCombat: true,
+    effects: [{ type: 'summonSoulwell', duration: 180 }],
+    description:
+      'Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown.',
+  },
   fear: {
     id: 'fear',
     name: 'Harrow',
     class: 'warlock',
-    learnLevel: 14,
+    learnLevel: 10,
     cost: 40,
     castTime: 1.5,
     cooldown: 0,
@@ -4537,14 +4963,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'searing_pain',
     name: 'Sear',
     class: 'warlock',
-    learnLevel: 14,
+    learnLevel: 7,
     cost: 35,
     castTime: 1.5,
     cooldown: 0,
     range: 30,
     school: 'fire',
     requiresTarget: true,
-    excludeSpecs: ['demonology', 'destruction'],
+    excludeSpecs: ['destruction'],
     effects: [{ type: 'directDamage', min: 30, max: 38 }],
     description: 'Sears the enemy with agonizing fire for $d Fire damage. Quick to cast.',
   },
@@ -4552,7 +4978,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'shadowburn',
     name: 'Duskfire',
     class: 'warlock',
-    learnLevel: 14,
+    learnLevel: 12,
     cost: 35,
     ruinCost: 1,
     castTime: 0,
@@ -4573,7 +4999,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'ruinous_brand',
     name: 'Ruinous Brand',
     class: 'warlock',
-    learnLevel: 16,
+    learnLevel: 10,
     cost: 35,
     castTime: 0,
     cooldown: 20,
@@ -4599,15 +5025,35 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: false,
     effects: [{ type: 'summonDemon', mobId: 'emberkin' }],
+    ranks: [
+      {
+        rank: 2,
+        level: 8,
+        cost: 50,
+        effects: [{ type: 'summonDemon', mobId: 'emberkin' }],
+      },
+      {
+        rank: 3,
+        level: 14,
+        cost: 50,
+        effects: [{ type: 'summonDemon', mobId: 'emberkin' }],
+      },
+      {
+        rank: 4,
+        level: 20,
+        cost: 50,
+        effects: [{ type: 'summonDemon', mobId: 'emberkin' }],
+      },
+    ],
     description:
-      'Summons an Emberkin under the command of the Warlock. The Emberkin hurls Ashbolts at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      'Summons an Emberkin under the command of the Warlock. The Emberkin casts Felbolt at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time.',
   },
   summon_voidwalker: {
     id: 'summon_voidwalker',
     name: 'Summon Gloomshade',
     class: 'warlock',
     excludeSpecs: ['affliction', 'demonology'],
-    learnLevel: 8,
+    learnLevel: 5,
     cost: 80,
     castTime: 5,
     cooldown: 0,
@@ -4616,63 +5062,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'summonDemon', mobId: 'gloomshade' }],
     description:
-      'Summons a Gloomshade under the command of the Warlock. The Gloomshade is a sturdy demon that taunts your enemies and soaks up punishment. Summoning a new demon dismisses your current one. You may have one demon at a time.',
-  },
-  summon_succubus: {
-    id: 'summon_succubus',
-    name: 'Summon Duskborn',
-    class: 'warlock',
-    excludeSpecs: ['affliction', 'demonology', 'destruction'],
-    learnLevel: 12,
-    cost: 100,
-    castTime: 5,
-    cooldown: 0,
-    range: 0,
-    school: 'shadow',
-    requiresTarget: false,
-    effects: [{ type: 'summonDemon', mobId: 'duskborn' }],
-    description:
-      'Summons a Duskborn under the command of the Warlock. The Duskborn is a fragile demon that strikes quickly and hits hard in melee. Summoning a new demon dismisses your current one. You may have one demon at a time.',
-  },
-  summon_felhunter: {
-    id: 'summon_felhunter',
-    name: 'Summon Spellhound',
-    class: 'warlock',
-    excludeSpecs: ['affliction', 'demonology', 'destruction'],
-    learnLevel: 14,
-    cost: 120,
-    castTime: 5,
-    cooldown: 0,
-    range: 0,
-    school: 'shadow',
-    requiresTarget: false,
-    effects: [{ type: 'summonDemon', mobId: 'spellhound' }],
-    description:
-      'Summons a Spellhound under the command of the Warlock. The Spellhound harries enemies from range with Gloombite and excels at hunting spellcasters. Summoning a new demon dismisses your current one. You may have one demon at a time.',
-  },
-  summon_felguard: {
-    id: 'summon_felguard',
-    name: 'Summon Warfiend',
-    class: 'warlock',
-    excludeSpecs: ['affliction', 'demonology', 'destruction'],
-    learnLevel: 16,
-    cost: 150,
-    castTime: 5,
-    cooldown: 0,
-    range: 0,
-    school: 'shadow',
-    requiresTarget: false,
-    effects: [{ type: 'summonDemon', mobId: 'warfiend' }],
-    description:
-      'Summons a Warfiend under the command of the Warlock. The Warfiend is a durable melee demon that wades into battle and holds its own. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      'Summons a Gloomshade under the command of the Warlock. This sturdy demon taunts enemies and uses Abyssal Chain to drag distant normal enemies back into reach. Bosses cannot be pulled. Summoning a new demon dismisses your current one. You may have one demon at a time.',
   },
   summon_infernal: {
     id: 'summon_infernal',
     name: 'Summon Pyre Colossus',
     class: 'warlock',
-    learnLevel: 20,
+    learnLevel: 13,
     cost: 100,
-    castTime: 2,
+    castTime: 0,
     cooldown: 180,
     range: 30,
     school: 'fire',
@@ -4686,23 +5084,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights as a guardian for 15 sec without replacing your demon and answers each Ruin spender with Worldfire.',
   },
-  summon_doomguard: {
-    id: 'summon_doomguard',
-    name: 'Summon Wraithborn',
-    class: 'warlock',
-    excludeSpecs: ['affliction', 'demonology', 'destruction'],
-    learnLevel: 20,
-    cost: 150,
-    castTime: 6,
-    cooldown: 180,
-    range: 0,
-    school: 'shadow',
-    requiresTarget: false,
-    effects: [{ type: 'summonDemon', mobId: 'wraithborn' }],
-    description:
-      'Binds a Wraithborn to your will — an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
-  },
-
   soul_harvest: {
     id: 'soul_harvest',
     name: 'Essence Reap',
@@ -4843,7 +5224,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Funeral Harvest',
     class: 'warlock',
     specs: ['demonology'],
-    learnLevel: 12,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 0,
@@ -4885,7 +5266,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Unholy Command',
     class: 'warlock',
     specs: ['demonology'],
-    learnLevel: 14,
+    learnLevel: 13,
     cost: 40,
     castTime: 0,
     cooldown: 45,
@@ -4901,7 +5282,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Reaping Command',
     class: 'warlock',
     specs: ['demonology'],
-    learnLevel: 16,
+    learnLevel: 14,
     cost: 45,
     soulFragmentCost: 2,
     castTime: 0,
@@ -4919,7 +5300,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Sacrifice Undead',
     class: 'warlock',
     specs: ['demonology'],
-    learnLevel: 17,
+    learnLevel: 7,
     cost: 0,
     castTime: 0,
     cooldown: 30,
@@ -4934,7 +5315,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Army of the Dead',
     class: 'warlock',
     specs: ['demonology'],
-    learnLevel: 20,
+    learnLevel: 16,
     cost: 100,
     castTime: 1.5,
     cooldown: 120,
@@ -4967,8 +5348,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
         castTime: 2.0,
         effects: [{ type: 'directDamage', min: 24, max: 29 }],
       },
-      { rank: 3, level: 14, cost: 48, effects: [{ type: 'directDamage', min: 38, max: 45 }] },
-      { rank: 4, level: 20, cost: 70, effects: [{ type: 'directDamage', min: 60, max: 71 }] },
+      {
+        rank: 3,
+        level: 14,
+        cost: 48,
+        effects: [{ type: 'directDamage', min: 38, max: 45 }],
+      },
+      {
+        rank: 4,
+        level: 20,
+        cost: 70,
+        effects: [{ type: 'directDamage', min: 60, max: 71 }],
+      },
     ],
     description: 'Hurls a bolt of nature energy for $d Nature damage.',
   },
@@ -4986,9 +5377,25 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 37, max: 51 }],
     ranks: [
-      { rank: 2, level: 8, cost: 45, castTime: 3.0, effects: [{ type: 'heal', min: 68, max: 86 }] },
-      { rank: 3, level: 14, cost: 75, effects: [{ type: 'heal', min: 115, max: 140 }] },
-      { rank: 4, level: 20, cost: 110, effects: [{ type: 'heal', min: 254, max: 302 }] },
+      {
+        rank: 2,
+        level: 8,
+        cost: 45,
+        castTime: 3.0,
+        effects: [{ type: 'heal', min: 68, max: 86 }],
+      },
+      {
+        rank: 3,
+        level: 14,
+        cost: 75,
+        effects: [{ type: 'heal', min: 115, max: 140 }],
+      },
+      {
+        rank: 4,
+        level: 20,
+        cost: 110,
+        effects: [{ type: 'heal', min: 254, max: 302 }],
+      },
     ],
     description: 'Heals a friendly target for $d.',
   },
@@ -5005,7 +5412,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [
-      { type: 'buffTarget', kind: 'buff_stats_pct', value: 5, duration: 1800, party: true },
+      {
+        type: 'buffTarget',
+        kind: 'buff_stats_pct',
+        value: 5,
+        duration: 1800,
+        party: true,
+      },
     ],
     description:
       'Places the Wildward on the party, increasing all attributes of all party members by $b% for 30 min.',
@@ -5315,7 +5728,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     awardsCombo: 1,
     requiresForm: 'cat',
     effects: [{ type: 'weaponStrike', bonus: 12 }],
-    ranks: [{ rank: 2, level: 18, cost: 45, effects: [{ type: 'weaponStrike', bonus: 20 }] }],
+    ranks: [
+      {
+        rank: 2,
+        level: 18,
+        cost: 45,
+        effects: [{ type: 'weaponStrike', bonus: 20 }],
+      },
+    ],
     description: 'Claw the enemy for weapon damage plus $d. Awards 1 combo point. Wolf Form only.',
   },
   ferocious_bite: {
@@ -5612,7 +6032,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
       // Deep Wounds passive (Arms restructure 2026-07-08): Maiming Strike leaves
       // a bleed. Arms-scoped naturally (mortal_strike is Arms-granted). A distinct
       // auraId keeps it from overwriting the mortal_wound healing debuff above.
-      { type: 'dot', total: 30, duration: 6, interval: 3, auraId: 'deep_wounds' },
+      {
+        type: 'dot',
+        total: 30,
+        duration: 6,
+        interval: 3,
+        auraId: 'deep_wounds',
+      },
     ],
     description:
       'A vicious strike dealing weapon damage plus $d and reducing healing the target receives by 50% for 10 sec. Applies Gaping Wounds (bleed). (Arms signature)',
@@ -5947,7 +6373,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'partyMeleeBuff', attackSpeedMult: 1 / 1.1, dmgPct: 0.1, duration: 20 }],
+    effects: [
+      {
+        type: 'partyMeleeBuff',
+        attackSpeedMult: 1 / 1.1,
+        dmgPct: 0.1,
+        duration: 20,
+      },
+    ],
     description:
       'Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec.',
   },
@@ -6664,7 +7097,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'frost',
     requiresTarget: false,
-    effects: [{ type: 'aoeAllyAbsorb', amount: 130, duration: 60, radius: 30, maxTargets: 5 }],
+    effects: [
+      {
+        type: 'aoeAllyAbsorb',
+        amount: 130,
+        duration: 60,
+        radius: 30,
+        maxTargets: 5,
+      },
+    ],
     description:
       'Shields you and up to 4 nearby allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)',
   },
@@ -6715,7 +7156,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // A FRIENDLY ground zone at the caster's feet: each pulse buffs allies
     // standing inside (the groundAoE allyBuffPct rider; no damage, no rng).
     effects: [
-      { type: 'groundAoE', min: 0, max: 0, radius: 8, duration: 15, interval: 2, allyBuffPct: 0.1 },
+      {
+        type: 'groundAoE',
+        min: 0,
+        max: 0,
+        radius: 8,
+        duration: 15,
+        interval: 2,
+        allyBuffPct: 0.1,
+      },
     ],
     description:
       'Inscribe a rune of power at your feet for 15 sec: allies standing within 8 yd deal 10% more damage. (Mage talent)',
@@ -6979,9 +7428,17 @@ function scaleEffect(
         max: Math.round(eff.max * (eff.type === 'aoeHeal' ? healMult : dmgMult) + flat),
       };
     case 'aoeRoot':
-      return { ...eff, min: Math.round(eff.min * dmgMult), max: Math.round(eff.max * dmgMult) };
+      return {
+        ...eff,
+        min: Math.round(eff.min * dmgMult),
+        max: Math.round(eff.max * dmgMult),
+      };
     case 'drainTick':
-      return { ...eff, min: Math.round(eff.min * dmgMult), max: Math.round(eff.max * dmgMult) };
+      return {
+        ...eff,
+        min: Math.round(eff.min * dmgMult),
+        max: Math.round(eff.max * dmgMult),
+      };
     case 'afflictionSentence':
       return {
         ...eff,
@@ -7026,7 +7483,10 @@ function scaleEffect(
         max: Math.round(eff.max * healMult + flat),
       };
     case 'hot':
-      return { ...eff, total: Math.round(eff.total * healMult * hotMult + flat) };
+      return {
+        ...eff,
+        total: Math.round(eff.total * healMult * hotMult + flat),
+      };
     case 'consumeAura':
       // `flat` is added once, to the PRIMARY magnitude only: deal when present,
       // else heal (a dual deal+heal def must not double-apply a flat talent mod).
@@ -7046,7 +7506,10 @@ function scaleEffect(
           : undefined,
       };
     case 'absorb':
-      return { ...eff, amount: Math.round(eff.amount * healMult * absorbMult + flat) };
+      return {
+        ...eff,
+        amount: Math.round(eff.amount * healMult * absorbMult + flat),
+      };
     // Only the buff kinds whose value is a flat MAGNITUDE (armor, attack power, a flat
     // primary stat, spell power, thorns damage) scale with a damage-power mod. Every
     // other selfBuff/buffTarget kind is a rate, multiplier, percent, or a locked

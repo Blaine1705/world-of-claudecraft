@@ -59,7 +59,11 @@ const GM_TEST_WORLD: WorldContent = {
   groundObjects: [],
 };
 
-import { ONLINE_WORLD_AUTH_TYPE, ONLINE_WORLD_LAYOUT_VERSION } from '../src/world_api';
+import {
+  ONLINE_WORLD_AUTH_TYPE,
+  ONLINE_WORLD_LAYOUT_VERSION,
+  PET_SPECIAL_WIRE_VERSION,
+} from '../src/world_api';
 
 function fakeReq(headers: Record<string, string>, remoteAddress: string) {
   const req: any = new EventEmitter();
@@ -103,12 +107,14 @@ describe('websocket authentication', () => {
   });
 
   it('sends credentials as an auth message instead of query params', () => {
+    expect(PET_SPECIAL_WIRE_VERSION).toBe(1);
     expect(buildWebSocketAuthMessage('a'.repeat(64), 42)).toEqual({
       t: ONLINE_WORLD_AUTH_TYPE,
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: '',
       timerWire: 2,
+      petSpecialWire: PET_SPECIAL_WIRE_VERSION,
     });
   });
 
@@ -119,6 +125,7 @@ describe('websocket authentication', () => {
       character: 42,
       clientSeed: 'seed-123',
       timerWire: 2,
+      petSpecialWire: PET_SPECIAL_WIRE_VERSION,
     });
   });
 });

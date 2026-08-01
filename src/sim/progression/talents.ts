@@ -55,7 +55,7 @@ import {
   talentsFor,
   validateAllocation,
 } from '../content/talents';
-import { ABILITIES } from '../data';
+import { ABILITIES, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { despawnPersistentPet, petOf } from '../pet/pet_commands';
 import type { PlayerMeta } from '../sim';
@@ -336,7 +336,8 @@ function dismissSpecLockedPet(ctx: SimContext, e: Entity, meta: PlayerMeta): voi
       (def) => def.class === meta.cls && summons(def, pet),
     );
     if (!summonable || known.some((ability) => summons(ability.def, pet))) continue;
-    if (primaryPet?.id === pet.id) despawnPersistentPet(ctx, pet);
+    if (MOBS[pet.templateId]?.family === 'demon') ctx.despawnPet(pet);
+    else if (primaryPet?.id === pet.id) despawnPersistentPet(ctx, pet);
     else ctx.despawnPet(pet);
     ctx.emit({
       type: 'log',

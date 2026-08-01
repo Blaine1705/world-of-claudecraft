@@ -173,9 +173,12 @@ export const IWORLD_MEMBERS = [
   { name: 'revivePet', kind: 'method' },
   { name: 'petAttack', kind: 'method' },
   { name: 'petWaterJet', kind: 'method' },
+  { name: 'petSpecialCommandsSupported', kind: 'data' },
+  { name: 'petSpecial', kind: 'method' },
   { name: 'petTaunt', kind: 'method' },
   { name: 'setPetAutoTaunt', kind: 'method' },
   { name: 'setPetAutoWaterJet', kind: 'method' },
+  { name: 'setPetAutoSpecial', kind: 'method' },
   { name: 'feedPet', kind: 'method' },
   { name: 'healPet', kind: 'method' },
   { name: 'setPetMode', kind: 'method' },
@@ -499,10 +502,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // marketListInstance, leaving 276. Reactive aura timing adds
     // reactiveAbilityWindowRemaining, leaving 277; this branch removes the
     // renderer-only riftCollisionToken with third-person camera collision,
-    // leaving 276.
-    expect(IWORLD_MEMBERS.length).toBe(276);
+    // leaving 276. The controlled Warlock pet's signature-skill command and
+    // autocast toggle add two methods.
+    expect(IWORLD_MEMBERS.length).toBe(278);
     expect(DATA_MEMBERS.length).toBe(71);
-    expect(METHOD_MEMBERS.length).toBe(205);
+    expect(METHOD_MEMBERS.length).toBe(207);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -696,6 +700,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyLeave',
       'partyPromote',
       'petAttack',
+      'petSpecial',
+      'petSpecialCommandsSupported',
       'petTaunt',
       'petWaterJet',
       'pickUpObject',
@@ -741,6 +747,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setDungeonDifficulty',
       'setMarker',
       'setPartyLootMaster',
+      'setPetAutoSpecial',
       'setPetAutoTaunt',
       'setPetAutoWaterJet',
       'setPetMode',
@@ -844,6 +851,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketInfo',
       'moveInput',
       'partyInfo',
+      'petSpecialCommandsSupported',
       'player',
       'playerId',
       'prestigeRank',
@@ -1003,6 +1011,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyLeave',
       'partyPromote',
       'petAttack',
+      'petSpecial',
       'petTaunt',
       'petWaterJet',
       'pickUpObject',
@@ -1037,6 +1046,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setDungeonDifficulty',
       'setMarker',
       'setPartyLootMaster',
+      'setPetAutoSpecial',
       'setPetAutoTaunt',
       'setPetAutoWaterJet',
       'setPetMode',
@@ -1287,10 +1297,13 @@ const FACET_PET = [
   'renamePet',
   'revivePet',
   'petAttack',
+  'petSpecialCommandsSupported',
+  'petSpecial',
   'petWaterJet',
   'petTaunt',
   'setPetAutoTaunt',
   'setPetAutoWaterJet',
+  'setPetAutoSpecial',
   'feedPet',
   'healPet',
   'setPetMode',
@@ -1615,8 +1628,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(276);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(276);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(278);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(278);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

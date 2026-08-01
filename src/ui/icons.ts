@@ -34,13 +34,55 @@ const TAU = Math.PI * 2;
 // ---------------------------------------------------------------------------
 
 const PALETTES = {
-  steel: { base: '#aebdc8', light: '#eef4f8', dark: '#4e5a66', glow: '#cfe4ff', accent: '#2b333c' },
-  gold: { base: '#e8b33a', light: '#ffe9a8', dark: '#8a5f12', glow: '#ffd97a', accent: '#5c3e08' },
-  blood: { base: '#c0392b', light: '#ff8a70', dark: '#5e120c', glow: '#ff5533', accent: '#2e0805' },
-  bone: { base: '#e8e0cc', light: '#fffaf0', dark: '#8f8468', glow: '#fff8d8', accent: '#4a4334' },
-  ember: { base: '#ff7a1a', light: '#ffd9a0', dark: '#8a2a08', glow: '#ffb45e', accent: '#401004' },
-  ice: { base: '#9fd8ff', light: '#eafaff', dark: '#2a6ea8', glow: '#c8f0ff', accent: '#123c5e' },
-  venom: { base: '#7ad94a', light: '#d8ffb0', dark: '#2a6e18', glow: '#a8ff70', accent: '#0d330a' },
+  steel: {
+    base: '#aebdc8',
+    light: '#eef4f8',
+    dark: '#4e5a66',
+    glow: '#cfe4ff',
+    accent: '#2b333c',
+  },
+  gold: {
+    base: '#e8b33a',
+    light: '#ffe9a8',
+    dark: '#8a5f12',
+    glow: '#ffd97a',
+    accent: '#5c3e08',
+  },
+  blood: {
+    base: '#c0392b',
+    light: '#ff8a70',
+    dark: '#5e120c',
+    glow: '#ff5533',
+    accent: '#2e0805',
+  },
+  bone: {
+    base: '#e8e0cc',
+    light: '#fffaf0',
+    dark: '#8f8468',
+    glow: '#fff8d8',
+    accent: '#4a4334',
+  },
+  ember: {
+    base: '#ff7a1a',
+    light: '#ffd9a0',
+    dark: '#8a2a08',
+    glow: '#ffb45e',
+    accent: '#401004',
+  },
+  ice: {
+    base: '#9fd8ff',
+    light: '#eafaff',
+    dark: '#2a6ea8',
+    glow: '#c8f0ff',
+    accent: '#123c5e',
+  },
+  venom: {
+    base: '#7ad94a',
+    light: '#d8ffb0',
+    dark: '#2a6e18',
+    glow: '#a8ff70',
+    accent: '#0d330a',
+  },
   arcanePink: {
     base: '#c66ee8',
     light: '#f0c8ff',
@@ -69,7 +111,13 @@ const PALETTES = {
     glow: '#9fe070',
     accent: '#0d2e0a',
   },
-  sky: { base: '#6fb6ff', light: '#d4ecff', dark: '#1f5a9e', glow: '#a0d4ff', accent: '#0c2c50' },
+  sky: {
+    base: '#6fb6ff',
+    light: '#d4ecff',
+    dark: '#1f5a9e',
+    glow: '#a0d4ff',
+    accent: '#0c2c50',
+  },
   earthBrown: {
     base: '#a8703c',
     light: '#e0b070',
@@ -91,8 +139,20 @@ const PALETTES = {
     glow: '#d8aa6a',
     accent: '#33200c',
   },
-  cloth: { base: '#b0a4d8', light: '#e0d8f4', dark: '#5a4e84', glow: '#d0c4f0', accent: '#2a2444' },
-  pink: { base: '#f0a8c0', light: '#ffe0ec', dark: '#a05878', glow: '#ffd0e0', accent: '#4e2030' },
+  cloth: {
+    base: '#b0a4d8',
+    light: '#e0d8f4',
+    dark: '#5a4e84',
+    glow: '#d0c4f0',
+    accent: '#2a2444',
+  },
+  pink: {
+    base: '#f0a8c0',
+    light: '#ffe0ec',
+    dark: '#a05878',
+    glow: '#ffd0e0',
+    accent: '#4e2030',
+  },
 } satisfies Record<string, IconPalette>;
 type PaletteName = keyof typeof PALETTES;
 
@@ -2407,7 +2467,12 @@ function r(
   prims: (PrimitiveName | Placement)[],
   fx?: FxName[],
 ): IconRecipe {
-  return { bg, pal, prims: prims.map((p) => (typeof p === 'string' ? { p } : p)), fx };
+  return {
+    bg,
+    pal,
+    prims: prims.map((p) => (typeof p === 'string' ? { p } : p)),
+    fx,
+  };
 }
 
 const ABILITY_RECIPES: Record<string, IconRecipe> = {
@@ -2450,6 +2515,8 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   pet_attack: r('blood', 'blood', ['fang'], ['motion']),
   pet_growl: r('fury', 'gold', ['roar'], ['arcs']),
   pet_water_jet: r('frost', 'ice', ['bolt', 'snowflake'], ['drips']),
+  emberkin_felbolt: r('fire', 'venom', ['bolt', 'flame'], ['glow']),
+  gloomshade_abyssal_chain: r('shadow', 'shadowPurple', ['tendrils', 'sigil_rune'], ['arcs']),
   pet_feed: r('food', 'ember', ['meat']), // roasted meat: hunters feed, not magic-heal
   pet_mend: r('shadow', 'shadowPurple', ['heart'], ['drips']),
   pet_passive: r('nature', 'earthBrown', ['paw']),
@@ -3532,7 +3599,10 @@ function qualityFx(quality: string | undefined): FxName[] | undefined {
   return undefined;
 }
 
-function trinketPrimitive(name: string): { p: PrimitiveName; pal: PaletteName } {
+function trinketPrimitive(name: string): {
+  p: PrimitiveName;
+  pal: PaletteName;
+} {
   if (has(name, ['skull', 'head'])) return { p: 'skull', pal: 'bone' };
   if (has(name, ['bone'])) return { p: 'bone', pal: 'bone' };
   if (has(name, ['pelt', 'hide', 'fur', 'scrap', 'bandana', 'cloth']))
@@ -3812,6 +3882,26 @@ function weaponIconUrl(id: string): string | null {
 // fall through to the procedural ABILITY_RECIPES below. ABILITY_IMAGE_IDS and abilityImageUrl
 // are exported for the gate in tests/skill_icons.test.ts.
 const SKILL_ICON_DIR = '/ui/skills';
+const WARLOCK_TALENT_IMAGE_IDS = new Set<string>([
+  'wlk_r5_bane',
+  'wlk_r5_improved_corruption',
+  'wlk_r5_improved_immolate',
+  'wlk_r8_voidfeast',
+  'wlk_r8_howl_of_terror',
+  'wlk_r8_curse_of_exhaustion',
+  'wlk_r11_improved_life_tap',
+  'wlk_r11_fel_concentration',
+  'wlk_r11_demon_armor',
+  'wlk_r14_amplify_curse',
+  'wlk_r14_ruin',
+  'wlk_r14_shadow_mastery',
+  'wlk_r17_death_coil',
+  'wlk_r17_improved_fear',
+  'wlk_r17_demonic_resilience',
+  'wlk_r20_chaos_bolt',
+  'wlk_r20_grimoire_of_haste',
+  'wlk_r20_curse_mastery',
+]);
 export const ABILITY_IMAGE_IDS = new Set<string>([
   // paladin (CraftPix premium "RPG Paladin skill icons" pack)
   'seal_of_righteousness',
@@ -3869,6 +3959,50 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'summon_doomguard',
   'life_tap',
   'searing_pain',
+  // OpenAI-generated Warlock spell art. These complete the current ability catalog while
+  // preserving the existing CraftPix-backed ids above.
+  'rain_of_fire',
+  'evil_eye',
+  'maledict_gaze',
+  'needle_of_fate',
+  'sentence',
+  'cursed_accomplice',
+  'hex_of_violence',
+  'cruel_pact',
+  'vicarious_suffering',
+  'possess_evil_eye',
+  'coven',
+  'soul_lance',
+  'litany_of_guilt',
+  'umbral_anchor',
+  'soulwell',
+  'ruinous_brand',
+  'soul_harvest',
+  'raise_graveguard',
+  'raise_skeletal_warrior',
+  'raise_bone_mage',
+  'bone_armor',
+  'corpse_explosion',
+  'funeral_harvest',
+  'ossuary_mark',
+  'unholy_command',
+  'reaping_command',
+  'sacrifice_undead',
+  'army_of_the_dead',
+  'metamorphosis',
+  'siphon_life',
+  'conflagrate',
+  'spell_lock',
+  'voidfeast',
+  'sacrilegious_march',
+  'dark_pact',
+  'abyssal_rift',
+  'howl_of_terror',
+  'curse_of_exhaustion',
+  'death_coil',
+  'chaos_bolt',
+  // Choice-row talents use their own images instead of borrowing spell art.
+  ...WARLOCK_TALENT_IMAGE_IDS,
   // rogue (CraftPix premium "RPG Thief skill icons" pack). garrote/sap/expose_armor/blind
   // have no fitting art (no garrote-wire, blackjack, armor-shred, or eye-powder) — procedural.
   'sinister_strike',
@@ -4105,7 +4239,13 @@ export function abilityImageUrl(id: string): string | null {
           id === 'elemental_convergence' ||
           id === 'overflowing_power'
         ? 'mage'
-        : null);
+        : WARLOCK_TALENT_IMAGE_IDS.has(id) ||
+            id === 'summon_succubus' ||
+            id === 'summon_felhunter' ||
+            id === 'summon_felguard' ||
+            id === 'summon_doomguard'
+          ? 'warlock'
+          : null);
   return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;
 }
 

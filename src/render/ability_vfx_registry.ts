@@ -37,11 +37,19 @@ import {
   SOUL_LANCE_VFX_FULL_SPEC,
   SOUL_LANCE_VFX_SPEC,
 } from './necromancy_vfx_specs';
+import {
+  EMBERKIN_FELBOLT_VFX_FULL_SPEC,
+  EMBERKIN_FELBOLT_VFX_SPEC,
+  GLOOMSHADE_ABYSSAL_CHAIN_VFX_FULL_SPEC,
+  GLOOMSHADE_ABYSSAL_CHAIN_VFX_SPEC,
+} from './warlock_pet_vfx_specs';
 import { ABYSSAL_RIFT_VFX_FULL_SPEC, ABYSSAL_RIFT_VFX_SPEC } from './warlock_vfx_specs';
 
 // Generated gallery projections remain untouched. Class-owned bespoke
 // identities resolve through this narrow runtime seam instead.
 export function abilityVfxSpec(abilityId: string): AbilityVfxSpec | undefined {
+  if (abilityId === 'emberkin_felbolt') return EMBERKIN_FELBOLT_VFX_SPEC;
+  if (abilityId === 'gloomshade_abyssal_chain') return GLOOMSHADE_ABYSSAL_CHAIN_VFX_SPEC;
   if (abilityId === 'shadow_bolt') return GLOOM_BOLT_VFX_SPEC;
   if (abilityId === 'chaos_bolt') return RUINBOLT_VFX_SPEC;
   if (abilityId === 'immolate') return BURNING_PACT_VFX_SPEC;
@@ -63,6 +71,8 @@ export function abilityVfxSpec(abilityId: string): AbilityVfxSpec | undefined {
 }
 
 export function abilityVfxFullSpec(abilityId: string): AbilityVfxFullSpec | undefined {
+  if (abilityId === 'emberkin_felbolt') return EMBERKIN_FELBOLT_VFX_FULL_SPEC;
+  if (abilityId === 'gloomshade_abyssal_chain') return GLOOMSHADE_ABYSSAL_CHAIN_VFX_FULL_SPEC;
   if (abilityId === 'shadow_bolt') return GLOOM_BOLT_VFX_FULL_SPEC;
   if (abilityId === 'chaos_bolt') return RUINBOLT_VFX_FULL_SPEC;
   if (abilityId === 'immolate') return BURNING_PACT_VFX_FULL_SPEC;

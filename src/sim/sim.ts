@@ -1601,6 +1601,7 @@ export interface PetState {
   mode?: PetMode;
   autoTaunt?: boolean;
   autoWaterJet?: boolean;
+  autoSkill?: boolean;
 }
 
 // PendingMobRespawn is exported so SimContext can type the live `pendingMobRespawns`
@@ -1639,6 +1640,8 @@ function freshCounters(): RewardCounters {
 // isShamanShock/ignoresDamagePushback) live in combat/casting_lifecycle.ts (C4a).
 
 export class Sim {
+  // Offline/local Sim always has the implementation bundled with its HUD.
+  readonly petSpecialCommandsSupported = true;
   // `world` stays optional (a custom map for play-test, else undefined for the
   // built-in world); everything else is defaulted to a concrete value below.
   cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
@@ -6313,6 +6316,10 @@ export class Sim {
     petCommands.petWaterJet(this.ctx, pid);
   }
 
+  petSpecial(pid?: number): void {
+    petCommands.petSpecial(this.ctx, pid);
+  }
+
   feedPet(itemId: string, pid?: number): void {
     petCommands.feedPet(this.ctx, itemId, pid);
   }
@@ -6335,6 +6342,10 @@ export class Sim {
 
   setPetAutoWaterJet(enabled: boolean, pid?: number): void {
     petCommands.setPetAutoWaterJet(this.ctx, enabled, pid);
+  }
+
+  setPetAutoSpecial(enabled: boolean, pid?: number): void {
+    petCommands.setPetAutoSpecial(this.ctx, enabled, pid);
   }
 
   // despawnPet (summoned-demon hard despawn: player-target + threat scrub) moved to

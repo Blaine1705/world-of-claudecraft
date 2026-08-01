@@ -351,10 +351,6 @@ export function dealDamage(
     for (const aura of target.auras) {
       if (aura.kind === 'buff_dr' || aura.kind === 'die_by_sword') reduction += aura.value;
     }
-    if (target.channeling && target.castingAbility === 'drain_life' && target.kind === 'player') {
-      const meta = ctx.players.get(target.id);
-      if (meta) reduction += ctx.playerMods(meta).global.warlockConsumeChannelDr;
-    }
     if (reduction > 0) amount = Math.round(amount * Math.max(0, 1 - reduction));
   }
 
@@ -364,6 +360,22 @@ export function dealDamage(
       if (aura.kind === 'buff_dr_phys') reduction += aura.value;
     }
     if (reduction > 0) amount = Math.round(amount * Math.max(0, 1 - reduction));
+  }
+
+  // Pact Deepened: Fiendhide's magic reduction exists only while the authored
+  // armor aura is active. Physical hits continue through the normal armor path.
+  if (
+    !resolvedHpLoss &&
+    source &&
+    source.id !== target.id &&
+    amount > 0 &&
+    school !== 'physical' &&
+    target.kind === 'player' &&
+    target.auras.some((aura) => aura.id === 'demon_skin' && aura.kind === 'buff_armor')
+  ) {
+    const targetMeta = ctx.players.get(target.id);
+    const magicCut = targetMeta ? ctx.playerMods(targetMeta).global.warlockFiendhideMagicDrPct : 0;
+    if (magicCut > 0) amount = Math.round(amount * Math.max(0, 1 - magicCut));
   }
 
   // Gloamveil Form (Shadowform): while in the form, the caster's SHADOW-school damage

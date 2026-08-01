@@ -76,6 +76,8 @@ const SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.slotAria';
 const EMPTY_SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.emptySlotAria';
 const ATTACK_NAME_KEY: TranslationKey = 'abilityUi.actionBar.attackName';
 const PROC_ARIA_KEY: TranslationKey = 'guide.glossary.procTerm';
+const FATE_CONSUME_READY_ARIA_KEY: TranslationKey = 'hudChrome.warlock.fateThreadsConsumeReady';
+const FATE_SENTENCE_READY_ARIA_KEY: TranslationKey = 'hudChrome.warlock.fateThreadsSentenceReady';
 
 /** The ability fields the core reads. A structural subset of ResolvedAbility that
  *  both worlds expose (def + the talent-resolved cost). */
@@ -188,6 +190,8 @@ export interface ActionBarWorldInput {
   inventory: readonly { itemId: string; count: number }[];
   /** Aura-derived because the online player entity's local cache is not wired. */
   stealthed: boolean;
+  /** Fate Threads attached to this Warlock's primary Evil Eye, 0 to 3. */
+  fateThreads?: number;
 }
 
 /** One slot's derived state. All fields are mutated IN PLACE each tick; the object
@@ -219,6 +223,8 @@ export interface ActionBarSlotState {
    *  NEVER shed by a graphics tier. */
   procGlow: boolean;
   empowered: boolean;
+  fateConsumeReady: boolean;
+  fateSentenceReady: boolean;
   ariaLabel: string;
   ariaDescription: string;
   keybindLabel: string;
@@ -254,6 +260,8 @@ function makeSlotState(): ActionBarSlotState {
     queued: false,
     procGlow: false,
     empowered: false,
+    fateConsumeReady: false,
+    fateSentenceReady: false,
     ariaLabel: '',
     ariaDescription: '',
     keybindLabel: '',
@@ -378,6 +386,8 @@ export function createActionBarView(
           slot.queued = player.autoAttack;
           slot.procGlow = false;
           slot.empowered = false;
+          slot.fateConsumeReady = false;
+          slot.fateSentenceReady = false;
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
             ability: deps.t(ATTACK_NAME_KEY),
@@ -407,6 +417,8 @@ export function createActionBarView(
           slot.queued = false;
           slot.procGlow = false;
           slot.empowered = false;
+          slot.fateConsumeReady = false;
+          slot.fateSentenceReady = false;
           slot.ariaLabel = deps.t(EMPTY_SLOT_ARIA_KEY, { slot: slotLabel });
           slot.ariaDescription = '';
           slot.keybindLabel = sd.keybindLabel();
@@ -442,6 +454,8 @@ export function createActionBarView(
           slot.queued = false;
           slot.procGlow = false;
           slot.empowered = false;
+          slot.fateConsumeReady = false;
+          slot.fateSentenceReady = false;
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
             ability: deps.itemName(item),
@@ -550,11 +564,20 @@ export function createActionBarView(
           reflectionReady ||
           hasEmpoweringAura(player.auras, ability) ||
           afflictionPossessionEmpowers(player.auras, def.id);
+        const fateThreadsReady = (world.fateThreads ?? 0) >= 3;
+        slot.fateConsumeReady = fateThreadsReady && def.id === 'drain_life';
+        slot.fateSentenceReady = fateThreadsReady && def.id === 'sentence';
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,
           ability: deps.abilityName(def),
         });
-        slot.ariaDescription = slot.procGlow ? deps.t(PROC_ARIA_KEY) : '';
+        slot.ariaDescription = slot.fateConsumeReady
+          ? deps.t(FATE_CONSUME_READY_ARIA_KEY)
+          : slot.fateSentenceReady
+            ? deps.t(FATE_SENTENCE_READY_ARIA_KEY)
+            : slot.procGlow
+              ? deps.t(PROC_ARIA_KEY)
+              : '';
         slot.keybindLabel = sd.keybindLabel();
       }
 

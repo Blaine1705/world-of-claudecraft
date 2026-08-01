@@ -278,6 +278,10 @@
 | | **2** | **8** | 38 | **2.2** | **24–31** |
 | | **3** | **14** | 55 | **2.7** | **42–53** |
 | | **4** | **20** | 80 | **3.0** | **68–84** |
+| summon_imp | 1 | 1 | 50 | 5.0 | Emberkin scale 0.55 |
+| | **2** | **8** | 50 | 5.0 | **scale 0.65** |
+| | **3** | **14** | 50 | 5.0 | **scale 0.75** |
+| | **4** | **20** | 50 | 5.0 | **scale 0.85** |
 | immolate | 1 | 1 | 25 | 2.0 | 11 + dot 20/15s |
 | | **2** | **10** | 40 | 2.0 | **22** + dot **35/15s** (5×7) |
 | | **3** | **16** | 60 | 2.0 | **38** + dot **60/15s** (5×12) |
@@ -290,9 +294,9 @@
 | life_tap | 1 | 6 | 0 | inst | hp 30 → mana 30 |
 | | **2** | **14** | 0 | inst | **55 → 55** |
 | | **3** | **20** | 0 | inst | **85 → 85** |
-| drain_life | 1 | 10 | 35 | 5s chan ×5 | 7/tick, healFrac 1 |
-| | **2** | **14** | 50 | 5s chan ×5 | **12**/tick |
-| | **3** | **20** | 70 | 5s chan ×5 | **17**/tick |
+| drain_life | 1 | 7 | 25 | 3s chan ×3 | 7/tick, healFrac 1 |
+| | **2** | **14** | 35 | 3s chan ×3 | **12**/tick |
+| | **3** | **20** | 45 | 3s chan ×3 | **17**/tick |
 | demon_skin | 1 | 1 | 20 | inst | buff_armor 30, 30min |
 | | **2** | **12** | 35 | inst | buff_armor **55** |
 | | **3** | **20** | 50 | inst | buff_armor **80** |
@@ -302,20 +306,22 @@
 | Ability | Learn | Cost | Cast/CD | Effects |
 |---|---|---|---|---|
 | `fear` | 14 | 40 | 1.5s, 20yd | incapacitate 8s (breaks on damage; reuses incapacitate — target cowers in place, no flee AI needed) |
-| `searing_pain` | 16 | 35 | 1.5s | directDamage 30–38 |
+| `searing_pain` | 7 | 35 | 1.5s | directDamage 30–38 |
 
-Committed Destruction excludes `corruption`, `curse_of_agony`, `searing_pain`,
-and `summon_doomguard`. Its reworked spell ladder overlays the shared Warlock
-ranks above:
+Committed Destruction excludes `corruption`, `curse_of_agony`, and `searing_pain`.
+The retired Duskborn, Spellhound, Warfiend, and Wraithborn summons no longer belong
+to any Warlock spellbook. Emberkin is shared before specialization and remains known
+only by Destruction after the level 5 specialization choice. Its reworked spell ladder
+overlays the shared Warlock ranks above:
 
 | Ability | Learn | Mana / Ruin | Cast/CD | Effects |
 |---|---|---|---|---|
 | `conflagrate` | 5 | 40 / +1 | inst, 2 charges, 12s recharge | requires own Burning Pact; advances one 3s DoT tick; 54-64 direct; +1 Desolation |
-| `chaos_bolt` (Ruinbolt) | 10 | 65 / 3 | 2.5s, no CD | 128-156 direct; Desolation makes the cast 30% faster |
-| `shadowburn` (Duskfire) | 14 | 35 / 1 | inst, 12cd | execute below 20%; 72-84 direct; Ruin refund if the claimed target dies within 5s |
-| `ruinous_brand` | 16 | 35 / none | inst, 20cd | marks for 15s; next 3 direct casts into another target copy 50% resolved damage |
-| `rain_of_fire` | 18 | 60 / 3 | inst, no CD | ground AoE 8-11 each second for 6s; Desolation makes the first wave immediate |
-| `summon_infernal` (Pyre Colossus) | 20 | 100 / none | 2.0s aimed, 180cd | impact AoE 58-72 in 6yd; 15s guardian; each Ruin spender triggers Worldfire |
+| `chaos_bolt` (Ruinbolt) | 5 | 65 / 3 | 2.5s, no CD | 128-156 direct; Desolation makes the cast 30% faster |
+| `shadowburn` (Duskfire) | 12 | 35 / 1 | inst, 12cd | execute below 20%; 72-84 direct; Ruin refund if the claimed target dies within 5s |
+| `ruinous_brand` | 10 | 35 / none | inst, 20cd | marks for 15s; next 3 direct casts into another target copy 50% resolved damage |
+| `rain_of_fire` | 8 | 60 / 3 | inst, no CD | ground AoE 8-11 each second for 6s; Desolation makes the first wave immediate |
+| `summon_infernal` (Pyre Colossus) | 13 | 100 / none | instant aimed, 180cd | impact AoE 58-72 in 6yd; 15s guardian; each Ruin spender triggers Worldfire |
 
 **Sanity** — L14: Corruption R2 (72) + CoA R2 (72) + 3× SB R3 (~143) ≈ 287 + Drain ✓ (~6 GCDs, dot-and-drain pace). L20: Corruption R3 + CoA R3 (220 over time) + 2–3 SB R4 (~152–228) ≥ 400 ✓.
 

@@ -96,6 +96,7 @@ interface WorldOpts {
     [id: string]: { charges: number; recharge?: number; rechargeLength?: number } | undefined;
   };
   stealthed?: boolean;
+  fateThreads?: number;
   auras?: ActionBarAuraInput[];
 }
 
@@ -117,6 +118,7 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
     target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
     inventory: opts.inventory ?? [],
     stealthed: opts.stealthed ?? false,
+    fateThreads: opts.fateThreads ?? 0,
   };
 }
 
@@ -221,6 +223,35 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     expect(ready.usable).toBe(true);
     expect(ready.procGlow).toBe(true);
     expect(ready.ariaDescription).toBe('guide.glossary.procTerm');
+  });
+
+  it('gives Consume and Sentence distinct readiness cues at three Fate Threads', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('drain_life') }),
+        slot(2, { ability: ability('sentence') }),
+        slot(3, { ability: ability('needle_of_fate') }),
+      ),
+      fakeDeps(),
+    );
+
+    const unthreaded = view.tick(world({ fateThreads: 2 }));
+    expect(unthreaded.slots[0].fateConsumeReady).toBe(false);
+    expect(unthreaded.slots[1].fateSentenceReady).toBe(false);
+
+    const ready = view.tick(world({ fateThreads: 3 }));
+    expect(ready.slots[0]).toMatchObject({
+      fateConsumeReady: true,
+      fateSentenceReady: false,
+    });
+    expect(ready.slots[1]).toMatchObject({
+      fateConsumeReady: false,
+      fateSentenceReady: true,
+    });
+    expect(ready.slots[2]).toMatchObject({
+      fateConsumeReady: false,
+      fateSentenceReady: false,
+    });
   });
 
   it('cooldown sweep is clamped, the countdown shows above one second', () => {

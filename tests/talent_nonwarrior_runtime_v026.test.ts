@@ -150,9 +150,9 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     expect(sim.player.hp).toBe(sim.player.maxHp - 12);
   });
 
-  it('makes Consume immune to damage pushback with Deep Hunger', () => {
+  it('leaves Consume unchanged when Deep Hunger empowers Soulwell', () => {
     const sim = simWithRows('warlock', { 11: 'wlk_r11_demon_armor' });
-    expect(resolved(sim, 'drain_life').damagePushbackImmune).toBe(true);
+    expect(resolved(sim, 'drain_life').damagePushbackImmune).toBeFalsy();
     expect(resolved(sim, 'drain_life').castWhileMoving).toBeFalsy();
   });
 

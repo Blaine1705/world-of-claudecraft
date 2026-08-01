@@ -129,6 +129,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   dismissPet: 'other',
   summonPet: 'other',
   summonDemon: 'other',
+  summonSoulwell: 'other',
   destructionConflagrate: 'damage',
   ruinousBrand: 'other',
   duskfireClaim: 'other',

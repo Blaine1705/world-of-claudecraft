@@ -564,7 +564,8 @@ export class AbilityVfx {
             this.spawned++;
           }
         }
-        if (!plan.whirl && ev.attackAnimation !== 'ranged-shot') this.mobThrowFallback(ev.sourceId);
+        if (!plan.whirl && ev.attackAnimation !== 'ranged-shot')
+          this.mobThrowFallback(ev.sourceId, ev.ability);
         break;
       }
       case 'lightning':
@@ -576,7 +577,7 @@ export class AbilityVfx {
           if (full)
             fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
         }
-        if (!plan.whirl) this.mobThrowFallback(ev.sourceId);
+        if (!plan.whirl) this.mobThrowFallback(ev.sourceId, ev.ability);
         break;
       case 'beam':
         // Channel rays (drains, mind flay): the school beam recolored plus a
@@ -587,7 +588,7 @@ export class AbilityVfx {
           fx.beamRibbon(ev.sourceId, ev.targetId, plan.color);
           this.spawned++;
         }
-        if (!plan.whirl) this.mobThrowFallback(ev.sourceId);
+        if (!plan.whirl) this.mobThrowFallback(ev.sourceId, ev.ability);
         break;
       case 'windup':
         // The generic windup arm's whole job is the throw animation: keep it.
@@ -763,7 +764,7 @@ export class AbilityVfx {
         color: planCast(spec, this.quality, tier).color,
       };
       this.beamChannels.set(ev.sourceId, ch);
-      this.mobThrowFallback(ev.sourceId);
+      this.mobThrowFallback(ev.sourceId, abilityId);
     }
     ch.lastAt = nowSec;
     ch.targetId = ev.targetId;
@@ -1335,12 +1336,12 @@ export class AbilityVfx {
   // hurling an instant bolt/ray with NO cast state has nothing else animating
   // the throw, so play its attack one-shot at launch. Claiming an event must
   // not lose that read.
-  private mobThrowFallback(sourceId: number): void {
+  private mobThrowFallback(sourceId: number, abilityId?: string): void {
     const d = this.deps;
     if (!d.isMob?.(sourceId)) return;
     if (d.castingAbilityOf?.(sourceId)) return;
     if (d.isMidOneShot?.(sourceId)) return;
-    d.triggerAttack(sourceId);
+    d.triggerAttack(sourceId, abilityId);
   }
 
   private spawnRing(entityId: number, plan: AbilityVfxPlan, school: string): void {

@@ -33,6 +33,7 @@ import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
+import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -539,6 +540,43 @@ describe('channel target over the wire', () => {
     expect(mirrored.channeling).toBe(true);
     expect(mirrored.castTargetId).toBe(91);
     expect(mirrored.castRemaining).toBe(3.25);
+  });
+});
+
+describe('pet signature skill over the wire', () => {
+  it('mirrors the visible cooldown and autocast state used by the pet bar', () => {
+    const pet = createMob(9301, MOBS.gloomshade, 20, { x: 0, y: 0, z: 0 });
+    pet.ownerId = 42;
+    pet.petSkillTimer = 12.35;
+    pet.petAutoSkill = true;
+
+    const wire = wireEntity(pet);
+    expect(wire.ps).toBe(12.35);
+    expect(wire.px).toBe(1);
+
+    const client = bareClient(42);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(pet.id)!;
+    expect(mirrored.petSkillTimer).toBe(12.35);
+    expect(mirrored.petAutoSkill).toBe(true);
+  });
+
+  it('keeps a ready manual signature skill sparse and resets stale mirror state', () => {
+    const pet = createMob(9302, MOBS.emberkin, 20, { x: 0, y: 0, z: 0 });
+    pet.ownerId = 42;
+    const readyWire = wireEntity(pet);
+    expect(readyWire).not.toHaveProperty('ps');
+    expect(readyWire).not.toHaveProperty('px');
+
+    const client = bareClient(42);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [{ ...readyWire, ps: 4, px: 1 }],
+    });
+    (client as any).applySnapshot({ t: 'snap', ents: [readyWire] });
+    const mirrored = client.entities.get(pet.id)!;
+    expect(mirrored.petSkillTimer).toBe(0);
+    expect(mirrored.petAutoSkill).toBe(false);
   });
 });
 
@@ -5029,6 +5067,153 @@ describe('authoritative interaction command outcomes', () => {
     expect(fc.sent).toContainEqual({ t: 'commandOutcome', rid: 43, ok: true });
     expect(server.sim.countItem('supply_crate', session.pid)).toBe(1);
     expect(object.lootable).toBe(false);
+  });
+});
+
+describe('negotiated Warlock pet-special wire v1', () => {
+  it('advertises the button only to capable clients and disables hidden legacy autocast', () => {
+    const server = new GameServer();
+    const legacyWire = fakeWs();
+    const capableWire = fakeWs();
+    const legacy = joinServer(server, legacyWire, 1, 'Legacy', 'warlock');
+    const capable = joinServer(server, capableWire, 2, 'Capable', 'warlock', {
+      petSpecialWireVersion: 1,
+    } as Parameters<GameServer['join']>[7]);
+    const legacyOwner = server.sim.entities.get(legacy.pid)!;
+    const capableOwner = server.sim.entities.get(capable.pid)!;
+
+    summonPet(server.sim.ctx, legacyOwner, 'gloomshade');
+    summonPet(server.sim.ctx, capableOwner, 'gloomshade');
+    const legacyPet = petOf(server.sim.ctx, legacy.pid)!;
+    const capablePet = petOf(server.sim.ctx, capable.pid)!;
+    expect(legacyPet.petAutoSkill).toBe(false);
+    expect(capablePet.petAutoSkill).toBe(true);
+
+    const legacyTarget = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, {
+      x: legacyPet.pos.x,
+      y: legacyPet.pos.y,
+      z: legacyPet.pos.z + 12,
+    });
+    const capableTarget = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, {
+      x: capablePet.pos.x,
+      y: capablePet.pos.y,
+      z: capablePet.pos.z + 12,
+    });
+    server.sim.addEntity(legacyTarget);
+    server.sim.addEntity(capableTarget);
+    legacyOwner.targetId = legacyTarget.id;
+    capableOwner.targetId = capableTarget.id;
+
+    server.handleMessage(legacy, JSON.stringify({ t: 'cmd', cmd: 'pet_special' }));
+    expect(legacyPet.petSkillTimer).toBe(0);
+    expect(
+      Math.hypot(legacyTarget.pos.x - legacyPet.pos.x, legacyTarget.pos.z - legacyPet.pos.z),
+    ).toBe(12);
+    server.handleMessage(capable, JSON.stringify({ t: 'cmd', cmd: 'pet_special' }));
+    expect(capablePet.petSkillTimer).toBe(15);
+    expect(
+      Math.hypot(capableTarget.pos.x - capablePet.pos.x, capableTarget.pos.z - capablePet.pos.z),
+    ).toBeCloseTo(2.8, 1);
+
+    server.handleMessage(
+      legacy,
+      JSON.stringify({ t: 'cmd', cmd: 'pet_auto_special', enabled: true }),
+    );
+    expect(petOf(server.sim.ctx, legacy.pid)?.petAutoSkill).toBe(false);
+    server.handleMessage(
+      capable,
+      JSON.stringify({ t: 'cmd', cmd: 'pet_auto_special', enabled: false }),
+    );
+    expect(petOf(server.sim.ctx, capable.pid)?.petAutoSkill).toBe(false);
+    server.handleMessage(
+      capable,
+      JSON.stringify({ t: 'cmd', cmd: 'pet_auto_special', enabled: 'true' }),
+    );
+    expect(petOf(server.sim.ctx, capable.pid)?.petAutoSkill).toBe(false);
+    server.handleMessage(
+      capable,
+      JSON.stringify({ t: 'cmd', cmd: 'pet_auto_special', enabled: true }),
+    );
+    expect(petOf(server.sim.ctx, capable.pid)?.petAutoSkill).toBe(true);
+
+    broadcast(server);
+    const legacySnap = lastSnap(legacyWire.sent);
+    const capableSnap = lastSnap(capableWire.sent);
+    expect(legacySnap.psw).toBeUndefined();
+    expect(capableSnap.psw).toBe(1);
+
+    const legacyClient = bareClient(legacy.pid, 'warlock');
+    const capableClient = bareClient(capable.pid, 'warlock');
+    (legacyClient as any).applySnapshot(legacySnap);
+    (capableClient as any).applySnapshot(capableSnap);
+    expect(legacyClient.petSpecialCommandsSupported).toBe(false);
+    expect(capableClient.petSpecialCommandsSupported).toBe(true);
+
+    (capableClient as any).applySnapshot({ ...capableSnap, psw: 2 });
+    expect(capableClient.petSpecialCommandsSupported).toBe(false);
+  });
+
+  it('disarms a legacy restored special pet before the first server tick', () => {
+    const source = new Sim({ seed: 991, playerClass: 'warlock', noPlayer: true });
+    const sourcePid = source.addPlayer('warlock', 'Source');
+    source.setPlayerLevel(20, sourcePid);
+    const sourceOwner = source.entities.get(sourcePid)!;
+    summonPet(source.ctx, sourceOwner, 'gloomshade');
+    const state = source.serializeCharacter(sourcePid)!;
+    state.pet = serializePet(source.ctx, sourcePid);
+
+    const server = new GameServer();
+    const wire = fakeWs();
+    const joined = server.join(wire.ws, 3, 3, 'LegacyRestore', 'warlock', state);
+    if ('error' in joined) throw new Error(joined.error);
+
+    expect(petOf(server.sim.ctx, joined.pid)?.petAutoSkill).toBe(false);
+  });
+
+  it('refreshes pet-special capability on linkdead resume and disarms a downgrade', () => {
+    const server = new GameServer();
+    const firstWire = fakeWs();
+    const original = joinServer(server, firstWire, 4, 'ResumeDemonist', 'warlock', {
+      petSpecialWireVersion: 1,
+    } as Parameters<GameServer['join']>[7]);
+    const owner = server.sim.entities.get(original.pid)!;
+    summonPet(server.sim.ctx, owner, 'gloomshade');
+    const pet = petOf(server.sim.ctx, original.pid)!;
+    expect(pet.petAutoSkill).toBe(true);
+
+    firstWire.ws.readyState = 3;
+    expect(server.socketClosed(original, firstWire.ws)).toBe(true);
+    const legacyWire = fakeWs();
+    const legacyResume = server.join(legacyWire.ws, 4, 4, 'ResumeDemonist', 'warlock', null);
+    if ('error' in legacyResume) throw new Error(legacyResume.error);
+    expect(legacyResume).toBe(original);
+    expect(legacyResume.petSpecialWireVersion).toBe(0);
+    expect(owner.petSpecialCommandsSupported).toBe(false);
+    expect(pet.petAutoSkill).toBe(false);
+    legacyWire.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(legacyWire.sent).psw).toBeUndefined();
+
+    legacyWire.ws.readyState = 3;
+    expect(server.socketClosed(legacyResume, legacyWire.ws)).toBe(true);
+    const capableWire = fakeWs();
+    const capableResume = server.join(
+      capableWire.ws,
+      4,
+      4,
+      'ResumeDemonist',
+      'warlock',
+      null,
+      false,
+      { petSpecialWireVersion: 1 } as Parameters<GameServer['join']>[7],
+    );
+    if ('error' in capableResume) throw new Error(capableResume.error);
+    expect(capableResume).toBe(original);
+    expect(capableResume.petSpecialWireVersion).toBe(1);
+    expect(owner.petSpecialCommandsSupported).toBe(true);
+    capableWire.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(capableWire.sent).psw).toBe(1);
   });
 });
 

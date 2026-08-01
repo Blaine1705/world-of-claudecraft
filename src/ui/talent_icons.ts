@@ -1,6 +1,6 @@
 import type { SpecDef, TalentEffect, TalentRowOption } from '../sim/content/talents';
 import { ABILITIES } from '../sim/data';
-import { type IconKind, iconDataUrl } from './icons';
+import { abilityImageUrl, type IconKind, iconDataUrl } from './icons';
 
 export interface TalentIconRef {
   kind: Extract<IconKind, 'ability' | 'crest'>;
@@ -84,10 +84,10 @@ export function talentEffectIconRef(effect: TalentEffect | undefined): TalentIco
 }
 
 export function talentRowOptionIconRef(option: TalentRowOption): TalentIconRef {
-  const derived = talentEffectIconRef(option.effect);
-  if (derived.kind === 'crest' && option.icon && ABILITIES[option.icon]) {
+  if (option.icon && abilityImageUrl(option.icon)) {
     return { kind: 'ability', id: option.icon };
   }
+  const derived = talentEffectIconRef(option.effect);
   return derived;
 }
 

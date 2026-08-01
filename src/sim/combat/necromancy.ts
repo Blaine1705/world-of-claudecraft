@@ -338,6 +338,8 @@ function createUndead(
   pet.petMode = 'defensive';
   pet.petAutoTaunt = template.petCanTaunt === true;
   pet.petAutoWaterJet = false;
+  pet.petSkillTimer = 0;
+  pet.petAutoSkill = false;
   pet.petManualTauntPending = false;
   pet.hostile = false;
   pet.aiState = 'idle';

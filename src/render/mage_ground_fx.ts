@@ -32,6 +32,10 @@ export interface MeteorFallSpawn {
   z: number;
   radius: number;
   duration: number; // seconds of fall
+  /** Optional authored landing identity. Generic mage meteors omit this and
+   *  retain their legacy fire burst. */
+  sourceId?: number;
+  ability?: string;
 }
 
 export interface RuneCircleSpawn {
@@ -76,6 +80,7 @@ interface MeteorFx {
   duration: number;
   elapsed: number;
   landed: boolean;
+  spawn: MeteorFallSpawn;
 }
 
 interface RuneFx {
@@ -107,7 +112,7 @@ interface SnowFx {
 export class MageGroundFx {
   private readonly scene: THREE.Scene;
   private readonly groundY: (x: number, z: number) => number;
-  private readonly onMeteorLand: (x: number, z: number) => void;
+  private readonly onMeteorLand: (x: number, z: number, spawn: MeteorFallSpawn) => void;
   private readonly meteors: MeteorFx[] = [];
   private readonly runes: RuneFx[] = [];
   private readonly snows: SnowFx[] = [];
@@ -121,7 +126,7 @@ export class MageGroundFx {
   constructor(
     scene: THREE.Scene,
     groundY: (x: number, z: number) => number,
-    onMeteorLand: (x: number, z: number) => void,
+    onMeteorLand: (x: number, z: number, spawn: MeteorFallSpawn) => void,
   ) {
     this.scene = scene;
     this.groundY = groundY;
@@ -266,6 +271,7 @@ export class MageGroundFx {
       duration: Math.max(0.3, opts.duration),
       elapsed: 0,
       landed: false,
+      spawn: { ...opts },
     });
   }
 
@@ -766,7 +772,7 @@ export class MageGroundFx {
         m.boundaryMat.opacity = 0;
         m.flameMat.opacity = 0;
         m.flames.visible = false;
-        this.onMeteorLand(m.x, m.z);
+        this.onMeteorLand(m.x, m.z, m.spawn);
       }
       if (m.landed) {
         const scorchElapsed = m.elapsed - m.duration;

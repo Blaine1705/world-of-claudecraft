@@ -474,21 +474,17 @@ The current combat loop is mechanically mature:
 
 ##### Priority 0 (implemented): finish the permanent-pet cleanup
 
-The agreed direction is Emberkin plus one taunting option. The actual generated
-level-20 kit still exposes Emberkin, Gloomshade, Duskborn, Spellhound, and Warfiend.
+The Warlock now publishes only the summons that serve the agreed class and
+specialization identities:
 
-Keep:
+- Emberkin is the shared level 1 companion before specialization and becomes
+  Destruction-only once a specialization is chosen at level 5.
+- Gloomshade is Destruction's permanent solo tank option.
+- Pyre Colossus is Destruction's temporary major summon.
 
-- Emberkin as the default Destruction companion.
-- Gloomshade if a solo taunt pet remains necessary.
-
-Remove from committed Destruction:
-
-- Duskborn.
-- Spellhound.
-- Warfiend.
-
-This is implementation cleanup, not a need for replacement abilities.
+Duskborn, Spellhound, Warfiend, and Wraithborn were removed from the Warlock class and
+pet catalogs instead of remaining hidden behind specialization exclusions. This was
+implementation cleanup, not a need for replacement abilities.
 
 ##### Priority 0 (implemented): treat impact presentation as part of the mechanics
 

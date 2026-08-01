@@ -132,6 +132,7 @@ import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
 import { applyBlacktideReturnSpeed } from './warlock_talents';
 import { placeOrRecallUmbralAnchor } from './warlock_utility';
+import { summonSoulwell } from '../soulwell';
 
 export { SWEEP_MULT } from './area_echo';
 
@@ -221,7 +222,12 @@ function removeRootAuras(ctx: SimContext, entity: Entity): void {
     const aura = entity.auras[index];
     if (aura.kind !== 'root' || isUnbreakableControlAura(aura)) continue;
     entity.auras.splice(index, 1);
-    ctx.emit({ type: 'aura', targetId: entity.id, name: aura.name, gained: false });
+    ctx.emit({
+      type: 'aura',
+      targetId: entity.id,
+      name: aura.name,
+      gained: false,
+    });
   }
 }
 
@@ -305,7 +311,12 @@ export function runEffects(
     if (sf >= 0) {
       const lost = p.auras[sf];
       p.auras.splice(sf, 1);
-      ctx.emit({ type: 'aura', targetId: p.id, name: lost.name, gained: false });
+      ctx.emit({
+        type: 'aura',
+        targetId: p.id,
+        name: lost.name,
+        gained: false,
+      });
       recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
     }
   }
@@ -396,7 +407,12 @@ export function runEffects(
             const charge = p.auras[chargeIndex];
             weaponMult *= 1 + charge.value * (charge.stacks ?? 1);
             p.auras.splice(chargeIndex, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: charge.name, gained: false });
+            ctx.emit({
+              type: 'aura',
+              targetId: p.id,
+              name: charge.name,
+              gained: false,
+            });
           }
         }
         if (
@@ -551,7 +567,12 @@ export function runEffects(
           if (echoIdx >= 0) {
             const echoAura = p.auras[echoIdx];
             p.auras.splice(echoIdx, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: echoAura.name, gained: false });
+            ctx.emit({
+              type: 'aura',
+              targetId: p.id,
+              name: echoAura.name,
+              gained: false,
+            });
             if (!target.dead) {
               // The echo is a REAL second projectile (owner playtest: the
               // instant copy looked superimposed): it visibly leaves the
@@ -791,7 +812,12 @@ export function runEffects(
           if (echoIdx >= 0) {
             const echoAura = p.auras[echoIdx];
             p.auras.splice(echoIdx, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: echoAura.name, gained: false });
+            ctx.emit({
+              type: 'aura',
+              targetId: p.id,
+              name: echoAura.name,
+              gained: false,
+            });
             if (!healTarget.dead && healed > 0) {
               const echoHeal = Math.max(1, Math.round(healed * echoAura.value));
               ctx.applyHeal(p, healTarget, echoHeal, ability.name, ability.id, false, false);
@@ -920,7 +946,12 @@ export function runEffects(
           const a = p.auras[i];
           if (a.kind === 'imbue' && a.id !== ability.id) {
             p.auras.splice(i, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
+            ctx.emit({
+              type: 'aura',
+              targetId: p.id,
+              name: a.name,
+              gained: false,
+            });
           }
         }
         ctx.applyAura(p, {
@@ -946,7 +977,12 @@ export function runEffects(
         }
         const seal = p.auras[sealIdx];
         p.auras.splice(sealIdx, 1);
-        ctx.emit({ type: 'aura', targetId: p.id, name: seal.name, gained: false });
+        ctx.emit({
+          type: 'aura',
+          targetId: p.id,
+          name: seal.name,
+          gained: false,
+        });
         // Judgement is an instant holy nuke; scale it with Spell Power too.
         const baseDmg = ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15);
         let dmg =
@@ -1141,7 +1177,12 @@ export function runEffects(
           const aura = p.auras[i];
           if (isDebuffAura(aura.kind, aura.value) && !isUnbreakableControlAura(aura)) {
             p.auras.splice(i, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+            ctx.emit({
+              type: 'aura',
+              targetId: p.id,
+              name: aura.name,
+              gained: false,
+            });
           }
         }
         break;
@@ -1312,7 +1353,12 @@ export function runEffects(
             : 0;
         const remainingDamage = Math.round(dot.value * ticksLeft);
         target.auras.splice(dotIndex, 1);
-        ctx.emit({ type: 'aura', targetId: target.id, name: dot.name, gained: false });
+        ctx.emit({
+          type: 'aura',
+          targetId: target.id,
+          name: dot.name,
+          gained: false,
+        });
         ctx.emit({
           type: 'spellfx',
           sourceId: p.id,
@@ -1441,10 +1487,13 @@ export function runEffects(
         // an aimed blast, the entity-anchored nova otherwise).
         const aoeCenter = p.castAim ?? p.pos;
         if (ability.id === 'corpse_explosion' && !consumeDeathEcho(ctx, p, aoeCenter)) break;
-        if (p.castAim) {
-          // sourceId attributes the landing to its caster so the renderer can
-          // fly the ability's authored projectile volley from the caster's
-          // hands to the aimed point (Splitshot's fan of arrows).
+        // Pyre Colossus owns a falling-meteor cue that carries the same
+        // ability id into its authored landing sequence. Emitting the generic
+        // nova here as well would show two impacts for one instant cast.
+        const hasAuthoredMeteorImpact = ability.effects.some(
+          (abilityEffect) => abilityEffect.type === 'summonPyreColossus',
+        );
+        if (p.castAim && !hasAuthoredMeteorImpact) {
           ctx.emit({
             type: 'spellfxAt',
             x: aoeCenter.x,
@@ -1455,7 +1504,7 @@ export function runEffects(
             ability: ability.id,
             sourceId: p.id,
           });
-        } else {
+        } else if (!p.castAim) {
           ctx.emit({
             type: 'spellfx',
             sourceId: p.id,
@@ -1983,7 +2032,12 @@ export function runEffects(
         )) {
           const a = p.auras[i];
           p.auras.splice(i, 1);
-          ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
+          ctx.emit({
+            type: 'aura',
+            targetId: p.id,
+            name: a.name,
+            gained: false,
+          });
         }
         const kind = eff.apPct !== undefined ? 'buff_ap_pct' : 'buff_ap';
         const value = eff.apPct ?? eff.amount ?? 0;
@@ -2103,7 +2157,12 @@ export function runEffects(
           const gone = p.auras[i];
           p.auras.splice(i, 1);
           removed++;
-          ctx.emit({ type: 'aura', targetId: p.id, name: gone.name, gained: false });
+          ctx.emit({
+            type: 'aura',
+            targetId: p.id,
+            name: gone.name,
+            gained: false,
+          });
         }
         // The stealth kind doubles as a MOVEMENT factor in moveSpeedMult
         // (rogue stealth walks slower); an invisible mage keeps full speed,
@@ -2290,7 +2349,12 @@ export function runEffects(
         }
         const consumed = target.auras[auraIdx];
         target.auras.splice(auraIdx, 1);
-        ctx.emit({ type: 'aura', targetId: target.id, name: consumed.name, gained: false });
+        ctx.emit({
+          type: 'aura',
+          targetId: target.id,
+          name: consumed.name,
+          gained: false,
+        });
         if (eff.deal) {
           let dmg =
             ctx.rng.range(eff.deal.min, eff.deal.max) +
@@ -2355,7 +2419,12 @@ export function runEffects(
             const source = ctx.entities.get(aura.sourceId);
             if (source && MOBS[source.templateId]?.boss) continue;
             p.auras.splice(i, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+            ctx.emit({
+              type: 'aura',
+              targetId: p.id,
+              name: aura.name,
+              gained: false,
+            });
           }
         }
         break;
@@ -2411,7 +2480,12 @@ export function runEffects(
           if (existing >= 0) {
             p.auras.splice(existing, 1);
             if (eff.kind === 'stealth') p.stealthed = false; // toggled back out of stealth
-            ctx.emit({ type: 'aura', targetId: p.id, name: ability.name, gained: false });
+            ctx.emit({
+              type: 'aura',
+              targetId: p.id,
+              name: ability.name,
+              gained: false,
+            });
             recalcPlayerStats(
               p,
               meta.cls,
@@ -2432,7 +2506,12 @@ export function runEffects(
             const a = p.auras[i];
             if (isFormAuraKind(a.kind) && a.kind !== eff.kind) {
               p.auras.splice(i, 1);
-              ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
+              ctx.emit({
+                type: 'aura',
+                targetId: p.id,
+                name: a.name,
+                gained: false,
+              });
             }
           }
         }
@@ -2446,7 +2525,12 @@ export function runEffects(
         )) {
           const a = p.auras[i];
           p.auras.splice(i, 1);
-          ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
+          ctx.emit({
+            type: 'aura',
+            targetId: p.id,
+            name: a.name,
+            gained: false,
+          });
         }
         if (eff.kind === 'overpower_charge') {
           const existing = p.auras.find((aura) => aura.kind === 'overpower_charge');
@@ -2853,7 +2937,12 @@ export function runEffects(
             : Math.min(eff.maxStacks, (existing.stacks ?? 1) + 1);
           existing.value = eff.armor;
           existing.remaining = existing.duration;
-          ctx.emit({ type: 'aura', targetId: target.id, name: ability.name, gained: true });
+          ctx.emit({
+            type: 'aura',
+            targetId: target.id,
+            name: ability.name,
+            gained: true,
+          });
         } else {
           ctx.applyAura(target, {
             id: ability.id,
@@ -2920,6 +3009,12 @@ export function runEffects(
       }
       case 'summonDemon': {
         ctx.summonPet(p, eff.mobId);
+        break;
+      }
+      case 'summonSoulwell': {
+        if (!summonSoulwell(ctx, p, eff.duration)) {
+          ctx.error(p.id, 'Line of sight.');
+        }
         break;
       }
     }

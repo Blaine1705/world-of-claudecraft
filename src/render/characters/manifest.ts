@@ -1249,7 +1249,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // Dedicated Destruction summons generated through the creature pipeline.
   // Their authored fel textures stay untinted. The manifest height combines
   // with each MobTemplate scale to render Emberkin at 1.15 units, Gloomshade
-  // at 3.05 units, and the Pyre Colossus at 4.25 units.
+  // at 3.0 units, and the Pyre Colossus at 4.25 units.
   mob_emberkin: {
     url: `${CREATURES}/emberkin.glb`,
     height: 2.1,
@@ -1265,11 +1265,12 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Death',
       cast: 'Cast',
       jump: 'Jump',
+      attackByAbility: { emberkin_felbolt: 'Cast' },
     },
   },
   mob_gloomshade: {
-    url: `${CREATURES}/gloomshade_chainwarden.glb`,
-    height: 2.75,
+    url: `${CREATURES}/gloomshade_abyssal_guardian.glb`,
+    height: 2.6,
     yaw: -Math.PI / 2,
     attackTimeScale: 6,
     deathTimeScale: 3,
@@ -1282,6 +1283,7 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Death',
       cast: 'Cast',
       jump: 'Jump',
+      attackByAbility: { gloomshade_abyssal_chain: 'Cast' },
     },
   },
   mob_pyre_colossus: {

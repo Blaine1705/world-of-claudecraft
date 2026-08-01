@@ -159,7 +159,7 @@ export const TALENT_ABILITIES_V2_B = {
     id: 'chaos_bolt',
     name: 'Ruinbolt',
     class: 'warlock',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 65,
     ruinCost: 3,
     castTime: 2.5,

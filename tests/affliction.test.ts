@@ -103,23 +103,23 @@ describe('Affliction Warlock', () => {
     );
     expect(ABILITIES.maledict_gaze.passive).toBe(true);
     expect(at(7)).toContain('cursed_accomplice');
-    expect(at(9)).toContain('drain_life');
-    expect(at(10)).not.toContain('litany_of_guilt');
-    expect(at(11)).toContain('litany_of_guilt');
+    expect(at(6)).not.toContain('drain_life');
+    expect(at(7)).toContain('drain_life');
+    expect(at(7)).toContain('searing_pain');
+    expect(at(9)).toContain('cruel_pact');
+    expect(at(9)).not.toContain('litany_of_guilt');
+    expect(at(10)).toContain('litany_of_guilt');
     expect(at(12)).toContain('hex_of_violence');
     expect(at(13)).toContain('life_tap');
-    expect(at(13)).not.toContain('cruel_pact');
-    expect(at(14)).toContain('cruel_pact');
+    expect(at(13)).toContain('possess_evil_eye');
     expect(at(14)).not.toContain('life_tap');
-    expect(at(16)).toContain('vicarious_suffering');
-    expect(at(17)).not.toContain('possess_evil_eye');
-    expect(at(18)).toContain('possess_evil_eye');
-    expect(at(20)).toContain('coven');
+    expect(at(14)).toContain('vicarious_suffering');
+    expect(at(16)).not.toContain('coven');
+    expect(at(17)).toContain('coven');
     expect(at(20)).not.toEqual(
       expect.arrayContaining([
         'shadow_bolt',
         'immolate',
-        'searing_pain',
         'corruption',
         'curse_of_agony',
         'siphon_life',
@@ -132,6 +132,17 @@ describe('Affliction Warlock', () => {
         'summon_doomguard',
       ]),
     );
+  });
+
+  it('authors Consume as a three-second, three-pulse channel with proportional mana costs', () => {
+    expect(ABILITIES.drain_life).toMatchObject({
+      cost: 25,
+      channel: { duration: 3, ticks: 3 },
+      ranks: [
+        { rank: 2, level: 14, cost: 35 },
+        { rank: 3, level: 20, cost: 45 },
+      ],
+    });
   });
 
   it('turns Condemnation gains into bounded Litany cleave around the primary Eye', () => {
@@ -385,7 +396,7 @@ describe('Affliction Warlock', () => {
     expect(sim.player.castTotal).toBeCloseTo(1, 5);
     while (sim.player.castingAbility) sim.tick();
     for (let i = 0; i < 200 && ctx(sim).pendingProjectiles.length > 0; i++) sim.tick();
-    expect(doomValue(sim.player)).toBe(7);
+    expect(doomValue(sim.player)).toBe(9);
   });
 
   it('keeps Consume channeling while moving during possession', () => {
@@ -508,14 +519,14 @@ describe('Affliction Warlock', () => {
     ).toBe(false);
   });
 
-  it('lets Needle auto-mark only when no eye exists and awards 5 Condemnation', () => {
+  it('lets Needle auto-mark only when no eye exists and awards 7 Condemnation', () => {
     const sim = makeAffliction();
     const first = addTarget(sim, 8);
     const second = addTarget(sim, 12);
 
     const events = finishCast(sim, 'needle_of_fate', first);
     expect(eye(first, sim.playerId)).toBe(true);
-    expect(doomValue(sim.player)).toBe(5);
+    expect(doomValue(sim.player)).toBe(7);
     expect(events).toContainEqual(
       expect.objectContaining({
         type: 'spellfx',
@@ -529,7 +540,7 @@ describe('Affliction Warlock', () => {
     finishCast(sim, 'needle_of_fate', second);
     expect(eye(first, sim.playerId)).toBe(true);
     expect(eye(second, sim.playerId)).toBe(false);
-    expect(doomValue(sim.player)).toBe(5);
+    expect(doomValue(sim.player)).toBe(7);
   });
 
   it('stacks and refreshes up to three Fate Threads only on the primary Evil Eye', () => {
@@ -588,7 +599,7 @@ describe('Affliction Warlock', () => {
     finishCast(sim, 'needle_of_fate', second);
 
     expect(eye(second, sim.playerId)).toBe(true);
-    expect(doomValue(sim.player)).toBe(5);
+    expect(doomValue(sim.player)).toBe(7);
   });
 
   it('does not rebuild Affliction state when an in-flight Needle lands after leaving the spec', () => {
@@ -649,59 +660,56 @@ describe('Affliction Warlock', () => {
     expect(sim.player.auras.find((aura) => aura.kind === 'affliction_doom')?.remaining).toBe(20);
   });
 
-  it('builds 15 Condemnation from a complete five-tick Consume channel', () => {
+  it('builds 9 Condemnation from a complete three-tick Consume channel', () => {
     const sim = makeAffliction();
     const target = addTarget(sim);
     finishCast(sim, 'evil_eye', target);
 
     finishCast(sim, 'drain_life', target);
 
-    expect(doomValue(sim.player)).toBe(15);
+    expect(doomValue(sim.player)).toBe(9);
   });
 
-  it.each([1, 2, 3])(
-    'spends %i Fate Threads at Consume start and adds one Condemnation per Thread per tick',
-    (threadCount) => {
-      const sim = makeAffliction();
-      const target = addTarget(sim);
-      finishCast(sim, 'evil_eye', target);
-      for (let cast = 0; cast < threadCount; cast++) {
-        finishCast(sim, 'needle_of_fate', target);
-      }
-      consumeDoom(ctx(sim), sim.player);
-      const primaryEye = target.auras.find((aura) => aura.kind === 'affliction_eye');
-      if (!primaryEye) throw new Error('Expected primary Evil Eye');
-      primaryEye.tickTimer = 1000;
-      sim.targetEntity(target.id);
-      sim.player.resource = sim.player.maxResource;
+  it.each([
+    1, 2, 3,
+  ])('spends %i Fate Threads at Consume start and adds one Condemnation per Thread per tick', (threadCount) => {
+    const sim = makeAffliction();
+    const target = addTarget(sim);
+    finishCast(sim, 'evil_eye', target);
+    for (let cast = 0; cast < threadCount; cast++) {
+      finishCast(sim, 'needle_of_fate', target);
+    }
+    consumeDoom(ctx(sim), sim.player);
+    const primaryEye = target.auras.find((aura) => aura.kind === 'affliction_eye');
+    if (!primaryEye) throw new Error('Expected primary Evil Eye');
+    primaryEye.tickTimer = 1000;
+    sim.targetEntity(target.id);
+    sim.player.resource = sim.player.maxResource;
 
-      sim.castAbility('drain_life');
+    sim.castAbility('drain_life');
 
-      expect(fateThreads(target, sim.playerId)).toBe(0);
-      expect(
-        sim.player.auras.find((aura) => aura.kind === 'affliction_consume_threads')?.stacks,
-      ).toBe(threadCount);
-      const doomDeltas: number[] = [];
-      let previousDoom = doomValue(sim.player);
-      for (
-        let tick = 0;
-        tick < 20 * 7 && (sim.player.castingAbility || ctx(sim).pendingProjectiles.length > 0);
-        tick++
-      ) {
-        sim.tick();
-        const currentDoom = doomValue(sim.player);
-        if (currentDoom === previousDoom) continue;
-        doomDeltas.push(currentDoom - previousDoom);
-        previousDoom = currentDoom;
-      }
+    expect(fateThreads(target, sim.playerId)).toBe(0);
+    expect(
+      sim.player.auras.find((aura) => aura.kind === 'affliction_consume_threads')?.stacks,
+    ).toBe(threadCount);
+    const doomDeltas: number[] = [];
+    let previousDoom = doomValue(sim.player);
+    for (
+      let tick = 0;
+      tick < 20 * 7 && (sim.player.castingAbility || ctx(sim).pendingProjectiles.length > 0);
+      tick++
+    ) {
+      sim.tick();
+      const currentDoom = doomValue(sim.player);
+      if (currentDoom === previousDoom) continue;
+      doomDeltas.push(currentDoom - previousDoom);
+      previousDoom = currentDoom;
+    }
 
-      expect(doomDeltas).toEqual([...Array(5).fill(2 + threadCount), 5]);
-      expect(doomValue(sim.player)).toBe(15 + threadCount * 5);
-      expect(sim.player.auras.some((aura) => aura.kind === 'affliction_consume_threads')).toBe(
-        false,
-      );
-    },
-  );
+    expect(doomDeltas).toEqual([...Array(3).fill(2 + threadCount), 3]);
+    expect(doomValue(sim.player)).toBe(9 + threadCount * 3);
+    expect(sim.player.auras.some((aura) => aura.kind === 'affliction_consume_threads')).toBe(false);
+  });
 
   it('still spends Fate Threads when Consume is interrupted and does not leak their bonus', () => {
     const sim = makeAffliction();
@@ -727,7 +735,7 @@ describe('Affliction Warlock', () => {
 
     finishCast(sim, 'drain_life', target);
 
-    expect(doomValue(sim.player)).toBe(15);
+    expect(doomValue(sim.player)).toBe(9);
   });
 
   it('renders Consume as one sustained green beam without per-tick projectiles', () => {
@@ -748,7 +756,7 @@ describe('Affliction Warlock', () => {
           event.fx === 'drainBeam' &&
           event.sourceId === sim.playerId &&
           event.targetId === target.id &&
-          event.duration === 5,
+          event.duration === 3,
       ),
     ).toHaveLength(1);
     expect(
@@ -830,7 +838,39 @@ describe('Affliction Warlock', () => {
     ).toBe(true);
   });
 
-  it('keeps all 15 Condemnation when the fifth Consume tick is lethal', () => {
+  it('cancels an active Consume channel when Sentence is cast', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim);
+    finishCast(sim, 'evil_eye', target);
+    gainDoom(ctx(sim), sim.player, 50);
+    sim.targetEntity(target.id);
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('drain_life');
+
+    while (sim.player.gcdRemaining > 0) sim.tick();
+    expect(sim.player.castingAbility).toBe('drain_life');
+    expect(sim.player.channeling).toBe(true);
+    sim.drainEvents();
+
+    sim.castAbility('sentence');
+    const events = sim.drainEvents();
+    for (let tick = 0; tick < 200 && ctx(sim).pendingProjectiles.length > 0; tick++) {
+      events.push(...sim.tick());
+    }
+
+    expect(sim.player.castingAbility).toBeNull();
+    expect(sim.player.channeling).toBe(false);
+    expect(doomValue(sim.player)).toBe(0);
+    expect(sentenceBursts(events)).toHaveLength(1);
+    expect(
+      events.some(
+        (event) =>
+          event.type === 'castStop' && event.entityId === sim.playerId && event.success === false,
+      ),
+    ).toBe(true);
+  });
+
+  it('keeps all 9 Condemnation when the third Consume tick is lethal', () => {
     const sim = makeAffliction();
     const target = addTarget(sim);
     finishCast(sim, 'evil_eye', target);
@@ -840,7 +880,7 @@ describe('Affliction Warlock', () => {
     if (effect?.type !== 'drainTick') throw new Error('Expected drain tick');
     const tickDamage =
       effect.min + channelTickBonus(abilityScalingPower(sim.player, resolved.def), resolved.def);
-    target.hp = tickDamage * 5;
+    target.hp = tickDamage * 3;
     const primaryEye = target.auras.find((aura) => aura.kind === 'affliction_eye');
     if (!primaryEye) throw new Error('Expected primary Evil Eye');
     primaryEye.tickTimer = 1000;
@@ -848,7 +888,7 @@ describe('Affliction Warlock', () => {
     finishCast(sim, 'drain_life', target);
 
     expect(target.dead).toBe(true);
-    expect(doomValue(sim.player)).toBe(15);
+    expect(doomValue(sim.player)).toBe(9);
   });
 
   it('keeps consecutive long-range Consume completion bonuses isolated', () => {
@@ -872,7 +912,7 @@ describe('Affliction Warlock', () => {
     }
     for (let i = 0; i < 60; i++) sim.tick();
 
-    expect(doomValue(sim.player)).toBe(30);
+    expect(doomValue(sim.player)).toBe(18);
   });
 
   it('normalizes an accomplice contribution to one gain every two seconds', () => {
@@ -1097,7 +1137,7 @@ describe('Affliction Warlock', () => {
       expect(doomValue(sim.player)).toBe(0);
     }
 
-    expect(losses).toEqual([61, 176, 330, 484]);
+    expect(losses).toEqual([91, 264, 495, 726]);
   });
 
   it('can retain Fate Threads for a stronger Sentence instead of feeding them to Consume', () => {
@@ -1178,7 +1218,7 @@ describe('Affliction Warlock', () => {
     healingSim.player.hp = 1;
     gainDoom(ctx(healingSim), healingSim.player, 50);
     finishCast(healingSim, 'sentence', healingTarget);
-    expect(healingSim.player.hp).toBe(36);
+    expect(healingSim.player.hp).toBe(54);
 
     const splashSim = makeAffliction(502);
     const splashTarget = addTarget(splashSim, 8);
@@ -1189,7 +1229,7 @@ describe('Affliction Warlock', () => {
     const nearHp = nearby.hp;
     const farHp = distant.hp;
     finishCast(splashSim, 'sentence', splashTarget);
-    expect(nearHp - nearby.hp).toBe(115);
+    expect(nearHp - nearby.hp).toBe(173);
     expect(distant.hp).toBe(farHp);
 
     const bossSim = makeAffliction(503);
@@ -1214,9 +1254,9 @@ describe('Affliction Warlock', () => {
             event.type === 'damage' && event.targetId === boss.id && event.ability === 'Sentence',
         )
         .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0),
-    ).toBe(581);
+    ).toBe(871);
     expect(boss.hp).toBeLessThan(bossHp);
-    expect(bossNearbyHp - bossNearby.hp).toBe(169);
+    expect(bossNearbyHp - bossNearby.hp).toBe(254);
 
     const executeSim = makeAffliction(504);
     const executeTarget = addTarget(executeSim);
@@ -1353,13 +1393,13 @@ describe('Affliction Warlock', () => {
     expect(eye(secondary, sim.playerId, true)).toBe(true);
 
     finishCast(sim, 'needle_of_fate', secondary);
-    expect(doomValue(sim.player)).toBe(3);
+    expect(doomValue(sim.player)).toBe(4);
     expect(fateThreads(secondary, sim.playerId)).toBe(0);
 
-    gainDoom(ctx(sim), sim.player, 17);
+    gainDoom(ctx(sim), sim.player, 16);
     const secondaryHp = secondary.hp;
     const events = finishCast(sim, 'sentence', primary);
-    expect(secondaryHp - secondary.hp).toBe(21);
+    expect(secondaryHp - secondary.hp).toBe(32);
     expect(sentenceBursts(events)).toHaveLength(1);
   });
 
@@ -1387,7 +1427,7 @@ describe('Affliction Warlock', () => {
     // Coven echoes 35% of the shared mastery-adjusted verdict, not 35% of the
     // boss-only 20% amplified primary hit. Moving it out of the splash radius
     // isolates the Coven component.
-    expect(secondaryHp - secondary.hp).toBe(169);
+    expect(secondaryHp - secondary.hp).toBe(254);
   });
 
   it('requires the primary Evil Eye for Sentence and preserves resources on a secondary Eye', () => {
@@ -1425,11 +1465,11 @@ describe('Affliction Warlock', () => {
     finishCast(sim, 'possess_evil_eye', primary);
 
     finishCast(sim, 'needle_of_fate', secondary);
-    expect(doomValue(sim.player)).toBe(4);
+    expect(doomValue(sim.player)).toBe(5);
 
     finishCast(sim, 'hex_of_violence', secondary);
     ctx(sim).dealDamage(secondary, victim, 10, false, 'physical', 'Claw', 'hit');
-    expect(doomValue(sim.player)).toBe(9);
+    expect(doomValue(sim.player)).toBe(10);
   });
 
   it('does not echo Sentence into a secondary Eye that is no longer hostile', () => {

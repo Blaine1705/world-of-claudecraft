@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
+import { NECROMANCY_MOBS } from '../src/sim/content/necromancy';
 import {
   computeTalentModifiers,
   rowTreeFor,
@@ -42,6 +43,25 @@ function abilityEffects(id: string) {
 }
 
 describe('warlock low-level sustained damage tuning', () => {
+  it('keeps the temporary undead army near thirty-two raw DPS at level 20', () => {
+    const ids = [
+      'necromancy_skeletal_warrior',
+      'necromancy_bone_mage',
+      'necromancy_gravewing',
+    ] as const;
+    const armyDps = ids.reduce((sum, id) => {
+      const undead = NECROMANCY_MOBS[id];
+      return sum + (undead.dmgBase + undead.dmgPerLevel * 19) / undead.attackSpeed;
+    }, 0);
+    const graveguard = NECROMANCY_MOBS.graveguard;
+    const graveguardDps =
+      (graveguard.dmgBase + graveguard.dmgPerLevel * 19) / graveguard.attackSpeed;
+
+    expect(armyDps).toBeGreaterThan(30);
+    expect(armyDps).toBeLessThan(35);
+    expect(graveguardDps).toBeCloseTo(13.9, 1);
+  });
+
   it('uses the shared Talents V2 row jobs from mobility through capstone utility', () => {
     expect(CHOICE_ROWS.warlock.rows.map((row) => [row.level, row.theme])).toEqual([
       [5, 'mobility'],
@@ -53,47 +73,48 @@ describe('warlock low-level sustained damage tuning', () => {
     ]);
   });
 
-  it.each(['affliction', 'demonology', 'destruction'] as const)(
-    'keeps every shared row option functional for %s',
-    (specId) => {
-      const baseline = computeTalentModifiers('warlock', { spec: specId, rows: {} }, 20);
-      const known = new Set(
-        abilitiesKnownAt('warlock', 20, baseline).map((ability) => ability.def.id),
-      );
+  it.each([
+    'affliction',
+    'demonology',
+    'destruction',
+  ] as const)('keeps every shared row option functional for %s', (specId) => {
+    const baseline = computeTalentModifiers('warlock', { spec: specId, rows: {} }, 20);
+    const known = new Set(
+      abilitiesKnownAt('warlock', 20, baseline).map((ability) => ability.def.id),
+    );
 
-      for (const row of CHOICE_ROWS.warlock.rows) {
-        for (const talent of row.options) {
-          const abilityRelevant =
-            talent.effect.ability?.some((mod) => known.has(mod.ability)) ?? false;
-          const grantRelevant = talent.effect.grant
-            ? abilitiesKnownAt(
+    for (const row of CHOICE_ROWS.warlock.rows) {
+      for (const talent of row.options) {
+        const abilityRelevant =
+          talent.effect.ability?.some((mod) => known.has(mod.ability)) ?? false;
+        const grantRelevant = talent.effect.grant
+          ? abilitiesKnownAt(
+              'warlock',
+              20,
+              computeTalentModifiers(
                 'warlock',
+                { spec: specId, rows: { [row.level]: talent.id } },
                 20,
-                computeTalentModifiers(
-                  'warlock',
-                  { spec: specId, rows: { [row.level]: talent.id } },
-                  20,
-                ),
-              ).some((ability) => ability.def.id === talent.effect.grant?.ability)
-            : false;
-          const trigger =
-            talent.effect.proc?.trigger.on === 'castNth' ||
-            talent.effect.proc?.trigger.on === 'spellCrit'
-              ? talent.effect.proc.trigger.abilities
-              : undefined;
-          const procRelevant =
-            talent.effect.proc !== undefined &&
-            (trigger === undefined || trigger.some((ability) => known.has(ability)));
-          const universal = talent.effect.stats !== undefined || talent.effect.global !== undefined;
+              ),
+            ).some((ability) => ability.def.id === talent.effect.grant?.ability)
+          : false;
+        const trigger =
+          talent.effect.proc?.trigger.on === 'castNth' ||
+          talent.effect.proc?.trigger.on === 'spellCrit'
+            ? talent.effect.proc.trigger.abilities
+            : undefined;
+        const procRelevant =
+          talent.effect.proc !== undefined &&
+          (trigger === undefined || trigger.some((ability) => known.has(ability)));
+        const universal = talent.effect.stats !== undefined || talent.effect.global !== undefined;
 
-          expect(
-            abilityRelevant || grantRelevant || procRelevant || universal,
-            `${talent.id} is dead for ${specId}`,
-          ).toBe(true);
-        }
+        expect(
+          abilityRelevant || grantRelevant || procRelevant || universal,
+          `${talent.id} is dead for ${specId}`,
+        ).toBe(true);
       }
-    },
-  );
+    }
+  });
 
   it('keeps Gloomshade clearly below Emberkin damage after the Emberkin tuning pass', () => {
     const impDps = rawPetDps('emberkin');
