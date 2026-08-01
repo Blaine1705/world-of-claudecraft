@@ -368,6 +368,7 @@ const RENDER_PURE_CORES = [
   'src/render/warrior_cast_fx_core.ts',
   'src/render/characters/form_visual_selection_core.ts',
   'src/render/characters/metamorph_wing_motion_core.ts',
+  'src/render/warlock_meteor_fx_core.ts',
   'src/render/zone_feature_visibility_core.ts',
   'src/render/characters/skeleton_update_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',

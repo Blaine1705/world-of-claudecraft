@@ -349,6 +349,11 @@ import {
   writeViewCandidate,
 } from './view_candidate_pool_core';
 import { ViewCreateRetryGate } from './view_create_retry';
+import {
+  routeWarlockMeteorSpellfxAt,
+  WarlockMeteorFx,
+  warlockMeteorDensityScale,
+} from './warlock_meteor_fx';
 import { type WarriorCastVisualPlan, warriorCastVisualPlan } from './warrior_cast_fx_core';
 import { RecklessSkullPainter } from './warrior_cast_fx_painter';
 import { buildWater, type WaterView } from './water';
@@ -1649,6 +1654,7 @@ export class Renderer {
   ) => void;
   private frozenOrbFx!: FrozenOrbFx;
   private mageGroundFx!: MageGroundFx;
+  private warlockMeteorFx!: WarlockMeteorFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private riftDeathZoneVisuals!: import('./rift_death_zone').RiftDeathZoneVisuals;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
@@ -2480,6 +2486,22 @@ export class Renderer {
         }
         const gy = groundHeight(x, z, this.sim.cfg.seed);
         this.vfx.burst(new THREE.Vector3(x, gy + 0.4, z), 'fire', 34, 1.4);
+      },
+    );
+    this.warlockMeteorFx = new WarlockMeteorFx(
+      this.scene,
+      (x, z) => groundHeight(x, z, this.sim.cfg.seed),
+      (impact) => {
+        if (impact.kind !== 'infernal') return;
+        this.abilityVfx.handleSpellfxAt({
+          x: impact.x,
+          z: impact.z,
+          school: 'fire',
+          fx: 'nova',
+          radius: impact.radius,
+          sourceId: impact.sourceId,
+          ability: 'summon_infernal',
+        });
       },
     );
     this.ringOfFrostVisuals = new RingOfFrostVisuals(this.scene, (x, z) =>
@@ -4188,6 +4210,7 @@ export class Renderer {
     this.vfx.prepareDraw(this.camera);
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
+    this.warlockMeteorFx.update(dt, this.reducedMotion());
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
     this.ringOfFrostVisuals.update(dt);
     if (this.riftDeathZoneVisuals) {
@@ -5860,6 +5883,14 @@ export class Renderer {
         break;
       }
       case 'spellfxAt': {
+        if (
+          routeWarlockMeteorSpellfxAt(
+            ev,
+            this.warlockMeteorFx,
+            warlockMeteorDensityScale(coerceFxTier(document.documentElement.dataset.fxLevel)),
+          )
+        )
+          break;
         // Spec-driven ground-cast visuals claim the point-anchored cues first
         // (aimed 'nova'/'burst' landings and 'tick' zone pulses). The painter
         // deliberately never claims meteorFall/snowZone/runeCircle/orb: those
@@ -9342,6 +9373,7 @@ export class Renderer {
     this.abilityVfx.update(dt);
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
+    this.warlockMeteorFx.update(dt, this.reducedMotion());
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
     this.ringOfFrostVisuals.update(dt);
     if (this.riftDeathZoneVisuals) {

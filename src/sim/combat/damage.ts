@@ -84,6 +84,7 @@ import {
   recordOssuaryMarkDamage,
 } from './necromancy';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
+import { emitRainOfFireStop } from './warlock_meteor_events';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
@@ -1145,6 +1146,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   e.auras = aurasSurvivingDeath(e.auras);
   e.ccDr.clear();
   stopChannelVisual(ctx, e);
+  emitRainOfFireStop(ctx, e);
   e.castingAbility = null;
   e.castTargetId = null;
   // Hidden per-cast state: death ends any gather/fishing session, so

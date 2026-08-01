@@ -4655,11 +4655,16 @@ export type SimEvent = { pid?: number } & (
       x: number;
       z: number;
       school: string;
+      // 'tick' is a ground-zone pulse (Consecration et al) anchored at the
+      // ZONE, not the caster; the other kinds are impact/lifetime visuals.
       fx:
         | 'burst'
         | 'nova'
         | 'orb'
         | 'meteorFall'
+        | 'felMeteorRain'
+        | 'felMeteorRainStop'
+        | 'felMeteorFall'
         | 'runeCircle'
         | 'snowZone'
         // Periodic pulse of a persistent ground effect such as Rain of Fire.

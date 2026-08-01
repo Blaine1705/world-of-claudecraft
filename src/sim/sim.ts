@@ -3253,6 +3253,10 @@ export class Sim {
   preparePlayerLeave(pid: number): void {
     const meta = this.players.get(pid);
     if (!meta) return;
+    if (!meta.leaving) {
+      const leavingEntity = this.entities.get(pid);
+      if (leavingEntity?.castingAbility === 'rain_of_fire') cancelCastImpl(this.ctx, leavingEntity);
+    }
     meta.leaving = true;
     // Dungeon Finder teardown FIRST, while the leaver's party/roster still resolves
     // (drops their queue unit, fails their proposal, closes their listing, withdraws

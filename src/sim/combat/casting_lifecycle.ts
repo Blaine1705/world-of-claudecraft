@@ -141,6 +141,7 @@ import {
   tickUnbrokenRitual,
 } from './warlock_talents';
 import { hasUmbralAnchor, UMBRAL_ANCHOR_ID, umbralAnchorCastError } from './warlock_utility';
+import { emitRainOfFireStop } from './warlock_meteor_events';
 
 // Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
 // for the shared-cooldown predicate. Moved with the casting slice (only callers).
@@ -395,6 +396,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
         fireChannelTick();
       }
       stopChannelVisual(ctx, p);
+      emitRainOfFireStop(ctx, p);
       completeAfflictionDrain(
         ctx,
         p,
@@ -527,6 +529,7 @@ function fireQueuedCast(ctx: SimContext, p: Entity): void {
 export function cancelCast(ctx: SimContext, p: Entity): void {
   stopChannelVisual(ctx, p);
   clearAfflictionConsumeThreads(ctx, p);
+  emitRainOfFireStop(ctx, p);
   p.castingAbility = null;
   p.castRemaining = 0;
   p.channeling = false;
@@ -1165,6 +1168,21 @@ export function castAbility(
       consumeFateThreadsForDrain(ctx, p, target, channelDuration);
     }
     p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
+    if (ability.id === 'rain_of_fire') {
+      const center = ability.selfCentered ? p.pos : (p.castAim ?? p.pos);
+      const radius = res.effects.find((effect) => effect.type === 'aoeDamage')?.radius;
+      ctx.emit({
+        type: 'spellfxAt',
+        x: center.x,
+        z: center.z,
+        school: ability.school,
+        fx: 'felMeteorRain',
+        radius,
+        duration: channelDuration,
+        sourceId: p.id,
+        ability: ability.id,
+      });
+    }
     ctx.emit({
       type: 'castStart',
       entityId: p.id,
@@ -1447,15 +1465,17 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     const center = res.def.selfCentered ? p.pos : (p.castAim ?? p.pos);
     const isSpell = res.def.school !== 'physical';
     const radius = res.effects.find((eff) => eff.type === 'aoeDamage')?.radius;
-    ctx.emit({
-      type: 'spellfxAt',
-      x: center.x,
-      z: center.z,
-      school: res.def.school,
-      fx: 'nova',
-      radius,
-      ability: res.def.id,
-    });
+    if (res.def.id !== 'rain_of_fire') {
+      ctx.emit({
+        type: 'spellfxAt',
+        x: center.x,
+        z: center.z,
+        school: res.def.school,
+        fx: 'nova',
+        radius,
+        ability: res.def.id,
+      });
+    }
     const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def);
     // How many enemies this pulse actually struck: Blizzard's Frozen Orb
     // refund (frostMageChannelPulse below) scales with it.
