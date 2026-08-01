@@ -83,6 +83,22 @@ CREATE TABLE IF NOT EXISTS reward_points (
 );
 -- Append-only audit of every grant/spend. dedupe_key makes one-time and
 -- once-per-day grants exactly-once (partial UNIQUE below); spends use a NULL key.
+-- RETENTION: KEEP FOREVER, deliberately. Two reasons, and the second is the one
+-- that actually forecloses a prune:
+--   1. It is the audit trail the authored reward balance is reconstructed and
+--      disputed from. reward_points holds only the running totals, so a deleted
+--      ledger row can never be re-derived from anything else.
+--   2. For the ONE-TIME grants the partial dedupe_key index IS the idempotency
+--      record ('link', 'guild_member', 'booster' in src/sim/discord_tier.ts):
+--      their keys never change, so pruning an old row re-arms the grant and it
+--      pays out a second time. (The daily grant is date-scoped and could safely
+--      be pruned on its own; the one-time keys are what rule out a blanket prune.)
+-- Growth is one row per grant or spend. The binding term is that daily grant, so
+-- it is linear in daily-active linked accounts times days: order 365k rows a year
+-- at the 1,000-DAU scale envelope, tens of MB a year with both indexes. That is
+-- growth, not a bound, and it is accepted knowingly rather than overlooked. It
+-- therefore registers NO prune with server/retention_sweep.ts; the ON DELETE
+-- CASCADE on account_id still erases a deleted account's rows.
 CREATE TABLE IF NOT EXISTS reward_ledger (
   id BIGSERIAL PRIMARY KEY,
   account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
