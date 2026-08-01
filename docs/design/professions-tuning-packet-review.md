@@ -3985,13 +3985,13 @@ CONFIRMED, zero REFUTED) plus a completeness critic; the critic's one
 blocker (item 2 demanded a MEASURED proposal, not an estimate) was
 closed by authoring a concrete candidate node set and re-deriving its
 rule checks and numbers with a second independent script pass (three
-corrections, no refutations, folded in below). The phases below are
-PROPOSED, not started: the worklist awaits the maintainer's settlement
-of the decision list at the end of this section, including the
-packet-boundary question (Q1), and nothing here preempts the phase 18
-merge decision, which stands separate.
+corrections, no refutations, folded in below). The phases below were drafted
+as proposed and the decision list was SETTLED by the maintainer the
+same day (the settlement block after the list): the worklist is live,
+on this same branch and in this same doc per Q1. Nothing here preempts
+the phase 18 merge decision, which stands separate.
 
-### Phase 19 (proposed): bank "Deposit materials", the honest taxonomy
+### Phase 19: bank "Deposit materials", the honest taxonomy
 
 Build: Fable xhigh. QA: ultracode, new session. Small phase; build and
 QA may pair with phase 21 in one session pair if the maintainer prefers
@@ -4099,7 +4099,7 @@ qa-checklist always. Not needed: database-performance-reviewer,
 migration-safety, privacy-security-review (no DB, no wire, no
 persisted-schema change).
 
-### Phase 20 (proposed): gathering coverage at the expanded world scale
+### Phase 20: gathering coverage at the expanded world scale
 
 Build: Fable xhigh (measurement discipline; content-heavy). QA:
 ultracode, new session.
@@ -4322,7 +4322,7 @@ drop on load; additions are backward-safe), cross-platform-sync and
 privacy-security-review (no protocol shape change; payload size only,
 covered by the wire-budget pin).
 
-### Phase 21 (proposed): vendor buy multiples
+### Phase 21: vendor buy multiples
 
 Build: Fable xhigh. QA: ultracode, new session.
 
@@ -4457,7 +4457,7 @@ or `python/`; `src/admin` hits are copper formatting and generated
 i18n only), so the coverage reviewers need not re-derive those
 surfaces.
 
-### Scoping decision list (the maintainer settles; nothing builds until then)
+### Scoping decision list (settled 2026-08-01; the block at the end records the answers)
 
 Q1. Packet boundary: do phases 19 to 21 land in THIS doc as drafted,
 or in a successor worklist doc with the packet review closed at phase
@@ -4584,6 +4584,38 @@ merge audit is untouched by phase 19 but touches the same item defs;
 it stays flagged where that audit recorded it (the v0.33.0 sync-merge
 premise-corrections block, the R45 correction), restated here only so
 the lists cross-reference.
+
+Settled with the maintainer, 2026-08-01, same sitting. Q1: phases 19
+to 21 stay in THIS doc on the same branch
+(feature/professions-tuning-packet). Q3/Q4/Q5: grey trash, the five
+oddments, and raw fish are OUT of the deposit sweep; Q6: the six
+vendor staples are IN, so the ruled material set is exactly the
+honest-45. Q7: the deposit sweep and the shared Materials chips narrow
+together; the market arm defers. Q8: the derived source-or-reagent set
+is the vehicle, with the exact-id tripwire guard. Q9/Q10/Q11: the +36
+bottom-three candidate set ships, with BOTH blob pins raised to 8192
+and the decision recorded in both files per the v0.32.0 precedent.
+Q13: relocate ore_evergarden_1 and pin the remaining eight in-band
+nodes as recorded exemptions. Q14: the fishing geometry arms are IN.
+Q15: the sea-plane guard arm is IN and the six near-waterline
+candidates are nudged upslope. Q20: shortfalls refuse whole and
+hostile counts deny with the existing toast. Q21: the visible
+1x/5x/10x/custom control row is the one trigger surface (no
+shift-click path). Q22: no confirm dialog at any count. Q26: the
+bottom-zone deeds land in the same stroke as phase 20.
+
+Session defaults, presented and unopposed rather than individually
+ruled, veto-able like every default: Q2 build order 19 then 20 then 21
+(19 may pair with 21 in one session pair); Q12 the rollout ledger
+keeps the three zones' rows 'starter' with the pin re-minted to
+per-zone counts; Q16 the galecrest 248s circuit is accepted and
+recorded; Q17/Q18 the Marks shops and buyback stay excluded, with
+exclusion pins; Q19 the custom-amount cap is countFit-derived with the
+computed max shown in the prompt; Q23 honor-priced, soulbound, mount,
+and teachesRiding rows force qty 1; Q24 the custom prompt inherits the
+pointer/keyboard-only precedent as a recorded limitation (the fixed
+row is the gamepad path); Q25 multi-buy stays silent (no new log line,
+the vendor SimEvent unchanged). Q27 stands informational.
 
 ---
 
