@@ -55,7 +55,9 @@ describe('displaceEpicLink', () => {
 
     const calls = client.query.mock.calls;
     expect(calls[0][0]).toBe('BEGIN');
-    expect(calls[1][0]).toMatch(/FOR UPDATE/);
+    // The lock must ride THIS table: FOR UPDATE alone would pass a rewrite
+    // that locks the wrong one.
+    expect(calls[1][0]).toMatch(/FROM epic_links[\s\S]*FOR UPDATE/);
     expect(calls[1][1]).toEqual([EPIC_ID]);
     // The guarded DELETE can only remove a DIFFERENT account's row.
     expect(calls[2][0]).toMatch(/DELETE FROM epic_links/);

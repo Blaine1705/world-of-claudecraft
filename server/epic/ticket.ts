@@ -248,8 +248,16 @@ export function buildExternalAccountMappingUrl(opts: {
   return url.toString();
 }
 
+/** Product user id shape from the mapping response: same conservative bound as
+ *  EPIC_ACCOUNT_ID. The value is interpolated into the Stats unlock URL PATH
+ *  (buildUnlockAchievementsRequest), and encodeURIComponent leaves dots alone,
+ *  so a dot-segment-bearing value would survive into the path and normalize;
+ *  the clamp excludes dots (and every other reserved byte) outright. */
+const PRODUCT_USER_ID = /^[A-Za-z0-9_-]{8,128}$/;
+
 /** Parse a 2xx external-accounts mapping body for one requested Epic account
- *  id. Returns the product user id string, or null when unmapped / malformed. */
+ *  id. Returns the product user id string, or null when unmapped / malformed /
+ *  outside the PRODUCT_USER_ID shape clamp. */
 export function parseExternalAccountMappingResponse(
   body: unknown,
   epicAccountId: string,
@@ -258,7 +266,7 @@ export function parseExternalAccountMappingResponse(
   const ids = (body as { ids?: unknown }).ids;
   if (ids === null || typeof ids !== 'object') return null;
   const puid = (ids as Record<string, unknown>)[epicAccountId];
-  if (typeof puid !== 'string' || puid.length === 0) return null;
+  if (typeof puid !== 'string' || !PRODUCT_USER_ID.test(puid)) return null;
   return puid;
 }
 

@@ -15,7 +15,7 @@ current Epic Developer Portal docs when UI labels move:
 - [Epic Games Store publishing tools](https://dev.epicgames.com/docs/epic-games-store)
 - [Manage Artifacts](https://dev.epicgames.com/docs/epic-games-store/store-presence/manage-artifacts)
 - [BuildPatch Tool (latest)](https://dev.epicgames.com/docs/epic-games-store/publishing-tools/uploading-binaries/buildpatch-tool-latest)
-- [Release Management](https://dev.epicgames.com/docs/epic-games-store/publishing-process/release-management)
+- [Release Management](https://dev.epicgames.com/docs/epic-games-store/publishing-tools/publishing-process/release-management)
 - Portal home: [dev.epicgames.com/portal](https://dev.epicgames.com/portal)
 
 ## 1. Organization and product

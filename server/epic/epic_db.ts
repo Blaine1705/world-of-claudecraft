@@ -4,7 +4,7 @@
 // ONLY, deliberately mirroring server/steam/steam_db.ts: modules that stub the
 // db module in tests never need fakes for these functions.
 //
-// A epic_links row is a cosmetic-mirror pointer (which Epic account mirrors
+// An epic_links row is a cosmetic-mirror pointer (which Epic account mirrors
 // this WoCC account's deed unlocks), never an identity or session source.
 // Nothing in this module (or anywhere in server/epic/) reads or writes
 // auth_tokens or mints credentials; the forbidden-login test pins that.

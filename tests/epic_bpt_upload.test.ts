@@ -1,8 +1,13 @@
 /**
  * Pins for the optional Epic BPT upload helper: fail-closed without credentials,
- * --help without secrets, no linux os, dry-run never spawns when gated.
- * Does not call real BuildPatchTool or network.
+ * --help without secrets, no linux os, dry-run never spawns when gated, and the
+ * spawn tail (argv handed to BPT, exit-code propagation, spawn-error arm)
+ * through the injected execBpt seam. Does not call real BuildPatchTool or
+ * network.
  */
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error untyped zero-dependency ops tool (scripts/*.mjs convention)
 import * as rawBpt from '../scripts/epic-bpt-upload.mjs';
@@ -27,7 +32,11 @@ type BptHelpers = {
       log?: (s: string) => void;
       error?: (s: string) => void;
       repoRoot?: string;
-      execBpt?: () => { status: number };
+      execBpt?: (
+        bin: string,
+        args: string[],
+        env: NodeJS.ProcessEnv,
+      ) => { status: number | null; error?: Error | null };
     },
   ) => number;
 };
@@ -186,5 +195,72 @@ describe('epic-bpt-upload runCli', () => {
     });
     expect(code).toBe(1);
     expect(spawned).toBe(false);
+  });
+
+  // The spawn tail through the injected execBpt seam: a fully provisioned run
+  // must actually hand BPT the resolved bin and argv, propagate a non-zero BPT
+  // exit code, and map a spawn failure to exit 1. Fixtures are a temp file
+  // (the "binary") and a temp dir (the BuildRoot); no real BPT, no network.
+  function provisionedFixture(): { env: NodeJS.ProcessEnv; bin: string; buildRoot: string } {
+    const root = mkdtempSync(join(tmpdir(), 'woc-bpt-test-'));
+    const bin = join(root, 'BuildPatchTool');
+    writeFileSync(bin, '#!/bin/sh\n');
+    const buildRoot = join(root, 'win-unpacked');
+    mkdirSync(buildRoot);
+    const env: NodeJS.ProcessEnv = {};
+    for (const k of bpt.REQUIRED_ENV_KEYS) env[k] = `x-${k}`;
+    env.EPIC_BPT_BIN = bin;
+    env.EPIC_BPT_BUILD_ROOT = buildRoot;
+    return { env, bin, buildRoot };
+  }
+
+  it('a provisioned run spawns BPT with the resolved bin and UploadBinary argv (secret only by env var name)', () => {
+    const { env, bin, buildRoot } = provisionedFixture();
+    const received: { bin: string; args: string[] }[] = [];
+    const code = bpt.runCli(['--os', 'win', '--build-version', '1.2.3-win'], {
+      env,
+      repoRoot: '/tmp',
+      execBpt: (spawnBin, args) => {
+        received.push({ bin: spawnBin, args });
+        return { status: 0 };
+      },
+      log: () => {},
+      error: () => {},
+    });
+    expect(code).toBe(0);
+    expect(received).toHaveLength(1);
+    expect(received[0].bin).toBe(bin);
+    expect(received[0].args).toContain('-mode=UploadBinary');
+    expect(received[0].args).toContain('-BuildVersion=1.2.3-win');
+    expect(received[0].args).toContain(`-BuildRoot=${buildRoot}`);
+    expect(received[0].args).toContain('-ClientSecretEnvVar=EPIC_BPT_CLIENT_SECRET');
+    // The secret VALUE never rides argv, only the env var name above.
+    expect(received[0].args.join(' ')).not.toContain('x-EPIC_BPT_CLIENT_SECRET');
+  });
+
+  it('propagates a non-zero BPT exit code as its own', () => {
+    const { env } = provisionedFixture();
+    const code = bpt.runCli(['--os', 'win', '--build-version', '1.2.3-win'], {
+      env,
+      repoRoot: '/tmp',
+      execBpt: () => ({ status: 7 }),
+      log: () => {},
+      error: () => {},
+    });
+    expect(code).toBe(7);
+  });
+
+  it('maps a spawn failure (error, null status) to exit 1', () => {
+    const { env } = provisionedFixture();
+    const errs: string[] = [];
+    const code = bpt.runCli(['--os', 'win', '--build-version', '1.2.3-win'], {
+      env,
+      repoRoot: '/tmp',
+      execBpt: () => ({ status: null, error: new Error('spawn ENOENT') }),
+      log: () => {},
+      error: (s) => errs.push(s),
+    });
+    expect(code).toBe(1);
+    expect(errs.join('\n')).toMatch(/failed to spawn/i);
   });
 });

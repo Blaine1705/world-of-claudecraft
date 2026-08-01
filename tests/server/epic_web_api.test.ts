@@ -4,7 +4,7 @@
 // outcome), the verdict pass-throughs, and the secret-embedding request the
 // shell feeds to fetch. No module mocks: the injection seam exists precisely
 // so this file can run the REAL shell code.
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   buildClientCredentialsTokenRequest,
@@ -20,7 +20,23 @@ import {
   parseClientCredentialsTokenResponse,
   parseExternalAccountMappingResponse,
 } from '../../server/epic/ticket';
-import { pushAchievementUnlocks, verifyLinkProof } from '../../server/epic/web_api';
+import {
+  PUID_CACHE_MAX,
+  pushAchievementUnlock,
+  pushAchievementUnlocks,
+  resetEpicWebApiCachesForTests,
+  UPSTREAM_TIMEOUT_MS,
+  verifyLinkProof,
+} from '../../server/epic/web_api';
+
+// The push path memoizes the client token and the product-user mapping per
+// process; every case starts from a cold cache so call-count pins stay exact.
+beforeEach(() => {
+  resetEpicWebApiCachesForTests();
+});
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 const OPTS = {
   clientId: 'CID',
@@ -192,16 +208,25 @@ describe('O2 unlock request builders (host/path/field pins)', () => {
     });
     expect(url).toBe(EPIC_CONNECT_TOKEN_URL);
     expect(url).toBe('https://api.epicgames.dev/auth/v1/oauth/token');
+    // The grant literal itself, pinned so an edit to the shared constant cannot
+    // move both sides of the comparison below at once.
+    expect(CLIENT_CREDENTIALS_GRANT).toBe('client_credentials');
     expect(body.get('grant_type')).toBe(CLIENT_CREDENTIALS_GRANT);
     expect(headers['Content-Type']).toBe('application/x-www-form-urlencoded');
     expect(headers.Authorization).toBe(`Basic ${Buffer.from('K:S', 'utf8').toString('base64')}`);
   });
 
   it('buildExternalAccountMappingUrl pins user accounts path and epicgames provider', () => {
+    // The provider literal itself, pinned for the same both-sides-move reason.
+    expect(EPIC_IDENTITY_PROVIDER).toBe('epicgames');
     const url = buildExternalAccountMappingUrl({ epicAccountId: 'acct1' });
     expect(url).toBe(
       `${EPIC_GS_HOST}/user/v1/accounts?accountId=acct1&identityProviderId=${EPIC_IDENTITY_PROVIDER}`,
     );
+  });
+
+  it('the upstream fetch deadline is 5s (a drift to a hung-click magnitude reds here)', () => {
+    expect(UPSTREAM_TIMEOUT_MS).toBe(5000);
   });
 
   it('buildUnlockAchievementsRequest pins Stats Achievements unlock path and body field', () => {
@@ -223,6 +248,28 @@ describe('O2 unlock request builders (host/path/field pins)', () => {
     expect(parseExternalAccountMappingResponse(MAPPING_BODY, UNLOCK_OPTS.epicAccountId)).toBe(PUID);
     expect(parseExternalAccountMappingResponse({ ids: {} }, UNLOCK_OPTS.epicAccountId)).toBeNull();
   });
+
+  it('mapping parse clamps the product user id shape (it is interpolated into the unlock URL path)', () => {
+    const bodyWith = (puid: string) => ({ ids: { [UNLOCK_OPTS.epicAccountId]: puid } });
+    // Dot segments must die at the parse: encodeURIComponent leaves dots
+    // alone, so a dot-bearing value would survive into the Stats path and
+    // normalize to a different endpoint on the same host.
+    expect(
+      parseExternalAccountMappingResponse(
+        bodyWith('../../auth/v1/oauth/token'),
+        UNLOCK_OPTS.epicAccountId,
+      ),
+    ).toBeNull();
+    expect(
+      parseExternalAccountMappingResponse(bodyWith('short'), UNLOCK_OPTS.epicAccountId),
+    ).toBeNull();
+    expect(
+      parseExternalAccountMappingResponse(bodyWith('x'.repeat(129)), UNLOCK_OPTS.epicAccountId),
+    ).toBeNull();
+    expect(parseExternalAccountMappingResponse(bodyWith(PUID), UNLOCK_OPTS.epicAccountId)).toBe(
+      PUID,
+    );
+  });
 });
 
 describe('pushAchievementUnlocks (mocked fetchImpl)', () => {
@@ -241,10 +288,26 @@ describe('pushAchievementUnlocks (mocked fetchImpl)', () => {
       ),
     ).toBe(true);
     expect(fetchImpl).toHaveBeenCalledTimes(3);
+    // Authorization threading, pinned per hop: the token mint carries Basic
+    // clientId:clientSecret, and the MINTED token (never the client secret)
+    // rides Bearer on the mapping read and the unlock POST. Without these
+    // pins a credential misroute (secret as Bearer, blank token, no header)
+    // would stay green.
+    const tokenCall = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect((tokenCall[1].headers as Record<string, string>).Authorization).toBe(
+      `Basic ${Buffer.from('CID:CSEC', 'utf8').toString('base64')}`,
+    );
+    const mappingCall = fetchImpl.mock.calls[1] as unknown as [string, RequestInit];
+    expect((mappingCall[1].headers as Record<string, string>).Authorization).toBe(
+      'Bearer eg1~client-token',
+    );
     const unlockCall = fetchImpl.mock.calls[2] as unknown as [string, RequestInit];
     expect(unlockCall[0]).toContain('/stats/v1/DEP/players/');
     expect(unlockCall[0]).toContain('/achievements/unlock');
     expect(unlockCall[1].method).toBe('POST');
+    expect((unlockCall[1].headers as Record<string, string>).Authorization).toBe(
+      'Bearer eg1~client-token',
+    );
     expect(JSON.parse(String(unlockCall[1].body))).toEqual({
       achievementIds: ['ACH_FIRST_STEPS', 'ACH_LEVEL_CAP'],
     });
@@ -289,5 +352,158 @@ describe('pushAchievementUnlocks (mocked fetchImpl)', () => {
       true,
     );
     expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it('pushAchievementUnlock (singular) delegates to the batch path with one name', async () => {
+    const fetchImpl = vi.fn(async (url: string) => {
+      if (String(url).includes('/auth/v1/oauth/token')) return jsonResponse(CLIENT_TOKEN_BODY);
+      if (String(url).includes('/user/v1/accounts')) return jsonResponse(MAPPING_BODY);
+      if (String(url).includes('/achievements/unlock')) return new Response(null, { status: 200 });
+      throw new Error(`unexpected url ${url}`);
+    });
+    expect(
+      await pushAchievementUnlock(
+        {
+          clientId: UNLOCK_OPTS.clientId,
+          clientSecret: UNLOCK_OPTS.clientSecret,
+          deploymentId: UNLOCK_OPTS.deploymentId,
+          epicAccountId: UNLOCK_OPTS.epicAccountId,
+          achName: 'ACH_ONLY',
+        },
+        fetchImpl as never,
+      ),
+    ).toBe(true);
+    const unlockCall = fetchImpl.mock.calls[2] as unknown as [string, RequestInit];
+    expect(JSON.parse(String(unlockCall[1].body))).toEqual({ achievementIds: ['ACH_ONLY'] });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Push-path caches: the client token memo and the product-user mapping cache.
+// Without them every push attempt costs three upstream round trips (token,
+// mapping, unlock) and a mass-reconnect reconcile multiplies that per account.
+// ---------------------------------------------------------------------------
+
+describe('push-path caching (token memo + mapping cache)', () => {
+  const walkImpl = (
+    calls: { token: number; mapping: number; unlock: number },
+    unlockStatus = 200,
+  ) =>
+    vi.fn(async (url: string) => {
+      if (String(url).includes('/auth/v1/oauth/token')) {
+        calls.token++;
+        return jsonResponse(CLIENT_TOKEN_BODY);
+      }
+      if (String(url).includes('/user/v1/accounts')) {
+        calls.mapping++;
+        return jsonResponse(MAPPING_BODY);
+      }
+      if (String(url).includes('/achievements/unlock')) {
+        calls.unlock++;
+        return new Response(null, { status: unlockStatus });
+      }
+      throw new Error(`unexpected url ${url}`);
+    });
+
+  it('a second push reuses the memoized token and cached mapping: one round trip, not three', async () => {
+    const calls = { token: 0, mapping: 0, unlock: 0 };
+    const fetchImpl = walkImpl(calls);
+    expect(
+      await pushAchievementUnlocks({ ...UNLOCK_OPTS, achNames: ['ACH_A'] }, fetchImpl as never),
+    ).toBe(true);
+    expect(
+      await pushAchievementUnlocks({ ...UNLOCK_OPTS, achNames: ['ACH_B'] }, fetchImpl as never),
+    ).toBe(true);
+    expect(calls).toEqual({ token: 1, mapping: 1, unlock: 2 });
+  });
+
+  it('the mapping cache reaches its real cap and evicts the OLDEST entry, keeping the rest', async () => {
+    // Per-account fetch that maps every requested account id (the shared
+    // MAPPING_BODY only maps one), counting mapping reads per account.
+    const mappingReads = new Map<string, number>();
+    const fetchImpl = vi.fn(async (url: string) => {
+      if (String(url).includes('/auth/v1/oauth/token')) return jsonResponse(CLIENT_TOKEN_BODY);
+      if (String(url).includes('/user/v1/accounts')) {
+        const acct = new URL(String(url)).searchParams.get('accountId') ?? '';
+        mappingReads.set(acct, (mappingReads.get(acct) ?? 0) + 1);
+        return jsonResponse({ ids: { [acct]: PUID } });
+      }
+      if (String(url).includes('/achievements/unlock')) return new Response(null, { status: 200 });
+      throw new Error(`unexpected url ${url}`);
+    });
+    const push = (acct: string) =>
+      pushAchievementUnlocks(
+        { ...UNLOCK_OPTS, epicAccountId: acct, achNames: ['ACH_A'] },
+        fetchImpl as never,
+      );
+    const acctId = (n: number) => `epicacct${String(n).padStart(8, '0')}`;
+    // Fill the cache to its REAL cap (a bound never reached is constant-true).
+    for (let n = 1; n <= PUID_CACHE_MAX; n++) await push(acctId(n));
+    // One past the cap evicts exactly the oldest (Map insertion order).
+    await push(acctId(PUID_CACHE_MAX + 1));
+    // Survivor first (before reinsertion churn moves the eviction line): the
+    // second-oldest entry is still served from cache.
+    await push(acctId(2));
+    expect(mappingReads.get(acctId(2))).toBe(1);
+    // The evicted oldest must re-read the mapping.
+    await push(acctId(1));
+    expect(mappingReads.get(acctId(1))).toBe(2);
+    expect(mappingReads.get(acctId(PUID_CACHE_MAX + 1))).toBe(1);
+  });
+
+  it('the token memo honors expires_in: past the lifetime the next push re-mints', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-07-31T12:00:00Z'));
+    const calls = { token: 0, mapping: 0, unlock: 0 };
+    const fetchImpl = walkImpl(calls);
+    await pushAchievementUnlocks({ ...UNLOCK_OPTS, achNames: ['ACH_A'] }, fetchImpl as never);
+    expect(calls.token).toBe(1);
+    // CLIENT_TOKEN_BODY reports expires_in 3600s; one hour later the memo has
+    // aged out (the refresh margin already retired it a minute early).
+    vi.setSystemTime(new Date('2026-07-31T13:00:01Z'));
+    await pushAchievementUnlocks({ ...UNLOCK_OPTS, achNames: ['ACH_B'] }, fetchImpl as never);
+    expect(calls.token).toBe(2);
+  });
+
+  it('a 401 unlock invalidates the token memo so the next push mints fresh', async () => {
+    const calls = { token: 0, mapping: 0, unlock: 0 };
+    const failing = walkImpl(calls, 401);
+    expect(
+      await pushAchievementUnlocks({ ...UNLOCK_OPTS, achNames: ['ACH_A'] }, failing as never),
+    ).toBe(false);
+    expect(calls.token).toBe(1);
+    const healthy = walkImpl(calls);
+    expect(
+      await pushAchievementUnlocks({ ...UNLOCK_OPTS, achNames: ['ACH_A'] }, healthy as never),
+    ).toBe(true);
+    // A fresh mint, not the revoked memo. The mapping cache is untouched by
+    // the 401 (the mapping was valid; only the token was refused).
+    expect(calls.token).toBe(2);
+    expect(calls.mapping).toBe(1);
+  });
+
+  it('an unmapped (null) mapping is never cached: the next push asks Epic again', async () => {
+    const calls = { token: 0, mapping: 0, unlock: 0 };
+    const unmapped = vi.fn(async (url: string) => {
+      if (String(url).includes('/auth/v1/oauth/token')) {
+        calls.token++;
+        return jsonResponse(CLIENT_TOKEN_BODY);
+      }
+      if (String(url).includes('/user/v1/accounts')) {
+        calls.mapping++;
+        return jsonResponse({ ids: {} });
+      }
+      throw new Error(`unexpected url ${url}`);
+    });
+    expect(
+      await pushAchievementUnlocks({ ...UNLOCK_OPTS, achNames: ['ACH_A'] }, unmapped as never),
+    ).toBe(false);
+    const healthy = walkImpl(calls);
+    expect(
+      await pushAchievementUnlocks({ ...UNLOCK_OPTS, achNames: ['ACH_A'] }, healthy as never),
+    ).toBe(true);
+    // The player connected to the product between the two pushes: the second
+    // mapping read must reach Epic (2 total), not serve a cached miss.
+    expect(calls.mapping).toBe(2);
   });
 });

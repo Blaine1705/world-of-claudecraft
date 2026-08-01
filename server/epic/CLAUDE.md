@@ -57,7 +57,7 @@ or reorder a deed, and the 50 ms world loop never awaits any of it.
 5. If that Epic id is already linked to another WoCC account, **reclaim by
    proof**: displace the old row (`displaceEpicLink`). Fresh verified control
    wins over a stale (possibly stolen) link.
-6. A `epic_links` row is a cosmetic-mirror pointer only. It is never used to
+6. An `epic_links` row is a cosmetic-mirror pointer only. It is never used to
    mint `auth_tokens` or any session.
 
 ## Achievement unlock path (O2, server-trusted)
@@ -82,7 +82,7 @@ or reorder a deed, and the 50 ms world loop never awaits any of it.
 
 ## Rules
 - **Linking is allowed; LOGIN WITH EPIC DOES NOT EXIST.** Nothing here calls
-  `newToken` or touches `auth_tokens`; a `epic_links` row is a cosmetic-mirror
+  `newToken` or touches `auth_tokens`; an `epic_links` row is a cosmetic-mirror
   pointer, never an identity or credential source.
   `tests/server/epic_routes.test.ts` source-scans the directory for this
   (includes `achievement_map.ts`).

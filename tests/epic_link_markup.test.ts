@@ -31,16 +31,23 @@ describe('character-select Epic card entry parity', () => {
   });
 
   it('both entries carry the ids the wiring binds', () => {
+    // Exactly the ids src/ui/epic_link.ts looks up; a rename here strands the
+    // wiring silently at runtime.
     for (const file of ['index.html', 'play.html']) {
       const block = epicGroupBlock(file);
-      for (const id of [
-        'cs-epic-group',
-        'btn-epic-link',
-        'epic-status',
-        'btn-epic-unlink',
-        'epic-help',
-        'epic-label',
-      ]) {
+      for (const id of ['cs-epic-group', 'btn-epic-link', 'epic-status', 'btn-epic-unlink']) {
+        expect(block, `${file} is missing #${id}`).toContain(`id="${id}"`);
+      }
+    }
+  });
+
+  it('both entries carry the markup-only ids kept for Steam-card symmetry', () => {
+    // Nothing binds these two (the block-extraction helper anchors on
+    // epic-help); they exist so the epic card's markup shape stays the byte
+    // twin of the Steam card's.
+    for (const file of ['index.html', 'play.html']) {
+      const block = epicGroupBlock(file);
+      for (const id of ['epic-help', 'epic-label']) {
         expect(block, `${file} is missing #${id}`).toContain(`id="${id}"`);
       }
     }

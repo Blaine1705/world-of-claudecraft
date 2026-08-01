@@ -1,7 +1,7 @@
 # State: Epic Games Store integration
 
 Status: **code complete, dark by default.** Packet implementation and close QA
-are done. Open a PR for the dark surface when ready. Live portal, BPT, Dev smoke,
+are done; the dark surface ships via PR 2709. Live portal, BPT, Dev smoke,
 and production lighting are ops:
 
 - https://github.com/levy-street/world-of-claudecraft/issues/2708

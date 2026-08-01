@@ -3160,6 +3160,21 @@
         display: none;
       }
     }
+    /* The 1800px threshold above was tuned for the two-to-three-card bar.
+       With BOTH storefront cards lit (Steam and Epic advertised together,
+       the four-card worst case beside wallet + developer) the captioned
+       cards alone run past 1300px, so a 1920px bar wraps tall again: in
+       that state the captions drop up to a wider threshold. Caption text is
+       helper copy only; every action keeps its title/aria text, so nothing
+       actionable is hidden. */
+    @media (max-width: 2199px) {
+      body:not(.mobile-touch)
+        #charselect-panel.cs-wow
+        .cs-head-row:has(.cs-steam-group:not([hidden])):has(.cs-epic-group:not([hidden]))
+        .cs-wallet-help {
+        display: none;
+      }
+    }
     body:not(.mobile-touch) #charselect-panel.cs-wow .cs-list-col {
       position: absolute;
       right: var(--cs-stage-gutter);

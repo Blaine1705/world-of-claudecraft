@@ -3170,9 +3170,10 @@ export async function startServer(): Promise<http.Server> {
     // drain tail against a 5s deadline, so a stuck upstream cannot hang the
     // shutdown; failures are swallowed inside the worker, so this never
     // throws. A no-op when that mirror is dark. Steam and Epic drain
-    // independently (D21).
-    await stopSteamMirror(5000);
-    await stopEpicMirror(5000);
+    // independently (D21) and CONCURRENTLY: the two stops share one 5s
+    // wall-clock budget, so a wedged Steam upstream cannot delay the Epic
+    // drain (or double the shutdown window) by serializing behind it.
+    await Promise.all([stopSteamMirror(5000), stopEpicMirror(5000)]);
     // Drop every character load lease this process holds so a clean restart can
     // reload its characters immediately instead of waiting out the lease TTL.
     // Runs before pool.end(); a failure here must not abort the shutdown, so log

@@ -4,7 +4,7 @@
 //
 // THE HARD RULE, pinned by tests/server/epic_routes.test.ts: linking is
 // allowed, LOGIN WITH EPIC DOES NOT EXIST. Nothing in server/epic/ calls
-// newToken, reads or writes auth_tokens, or mints any credential; a
+// newToken, reads or writes auth_tokens, or mints any credential; an
 // epic_links row is a cosmetic-mirror pointer for the deeds achievement
 // mirror, never an identity or session source. Login stays email + Discord
 // only, everywhere, always.
@@ -104,7 +104,14 @@ async function linkHandler(ctx: Ctx): Promise<void> {
     // Flip the displaced account's cached mirror view in-request so its
     // in-flight pushes revalidate against a now-empty link and drop, exactly as
     // unlink does. A peer realm process still heals via its own push-time read.
-    if (displaced.displacedAccountId !== null) onLinkChanged(displaced.displacedAccountId, null);
+    if (displaced.displacedAccountId !== null) {
+      // Operator-visible trace for the reclaim: numeric account ids only (the
+      // secrets rule keeps upstream identifiers out of log lines).
+      console.warn(
+        `epic link: account ${accountId} reclaimed a linked Epic account from account ${displaced.displacedAccountId}`,
+      );
+      onLinkChanged(displaced.displacedAccountId, null);
+    }
   } else {
     // The Epic id is free. Plain insert; it re-classifies a 23505 in case a
     // concurrent request beat the pre-checks, both arms the same 409s the

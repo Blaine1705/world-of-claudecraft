@@ -486,3 +486,45 @@ describe('link settle signal', () => {
     expect(epicLink).toHaveBeenCalledWith('exchangecode');
   });
 });
+
+// The browser guard's FALSE arm: every DESKTOP_APP read above is forced true
+// so the bridge path is reachable, which leaves `DESKTOP_APP ? ... : null`
+// itself unexercised. Re-import with the web value and prove a fully capable
+// bridge is still never consulted.
+describe('web build (DESKTOP_APP false) never consults the bridge', () => {
+  let epic: typeof import('../src/ui/epic_link');
+  beforeEach(async () => {
+    vi.resetModules();
+    vi.doMock('../src/net/online', () => ({ DESKTOP_APP: false }));
+    epic = await import('../src/ui/epic_link');
+  });
+  afterEach(() => {
+    // Restore the file-wide desktop-arm mock for any later import.
+    vi.doMock('../src/net/online', () => ({ DESKTOP_APP: true }));
+  });
+
+  it('shows status but hides Link, and a forced click mints and posts nothing', async () => {
+    const elements = installDom();
+    const epicLinkProof = vi.fn(async () => 'exchangecode');
+    installBridge({ epicLinkProof, epicLinkSupported: async () => true });
+    const epicLink = vi.fn(async () => ({}));
+    const api = {
+      token: 'session-token',
+      epicAdvert: async () => true,
+      epicStatus: async () => ({ enabled: true, linked: false }),
+      epicLink,
+    } as unknown as Api;
+
+    epic.wireEpicLink(api);
+    await settleMicrotasks();
+    // The lit advert still renders the card (web players see link state)...
+    expect(elements['cs-epic-group'].hidden).toBe(false);
+    // ...but a web build can never mint a proof, so Link stays hidden even
+    // though the installed bridge would answer capability true.
+    expect(elements['btn-epic-link'].hidden).toBe(true);
+    elements['btn-epic-link'].listeners.click();
+    await settleMicrotasks();
+    expect(epicLinkProof).not.toHaveBeenCalled();
+    expect(epicLink).not.toHaveBeenCalled();
+  });
+});
