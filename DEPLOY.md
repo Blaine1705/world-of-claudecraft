@@ -326,7 +326,7 @@ For off-box safety, sync the directory to S3 occasionally:
   so a solo or free-for-all heroic clear that drops one freezes a stale
   session's corpse loot window the same way, and the v0.34.0 sync widened
   the same arm: the release's Heroic Wildheart Basin loot pass (Zulgar) put
-  six more epic and uncommon ids into heroic boss loot that a stale bundle
+  six more epic ids into heroic boss loot that a stale bundle
   does not know. The reins odds are the mount drop rates (0.5 and 0.1
   percent) while the Wildheart ids drop at ordinary heroic rates, the party
   need/greed path is already guarded at the base, and the frozen id set

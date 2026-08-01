@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   compactScreeMatrices,
+  SCREE_CELL,
   screeSpotAt,
   screeSpotsInBounds,
 } from '../src/render/cliff_scree_core';
@@ -82,27 +83,33 @@ describe('cliff scree placement', () => {
     // principle. 6 = INTERACT_RANGE + 1yd of visual margin
     // (cliff_scree_core.ts NODE_EXCLUSION_RADIUS).
     const SHIPPED_SEED = 20061;
-    const pad = 6 + 6.5; // exclusion radius + one full candidate cell
+    const pad = 6 + SCREE_CELL; // exclusion radius + one full candidate cell
+    let spotsSeen = 0;
     for (const seed of [SHIPPED_SEED, SEED]) {
       for (const node of GATHER_NODES) {
         for (
-          let ci = Math.floor((node.pos.x - pad) / 6.5);
-          ci <= Math.ceil((node.pos.x + pad) / 6.5);
+          let ci = Math.floor((node.pos.x - pad) / SCREE_CELL);
+          ci <= Math.ceil((node.pos.x + pad) / SCREE_CELL);
           ci++
         ) {
           for (
-            let cj = Math.floor((node.pos.z - pad) / 6.5);
-            cj <= Math.ceil((node.pos.z + pad) / 6.5);
+            let cj = Math.floor((node.pos.z - pad) / SCREE_CELL);
+            cj <= Math.ceil((node.pos.z + pad) / SCREE_CELL);
             cj++
           ) {
             const spot = screeSpotAt(seed, ci, cj);
             if (!spot) continue;
+            spotsSeen++;
             const d = Math.hypot(spot.x - node.pos.x, spot.z - node.pos.z);
             expect(d, `${node.id} seed ${seed} cell ${ci},${cj}`).toBeGreaterThanOrEqual(6);
           }
         }
       }
     }
+    // Non-vacuity: the sweep must actually see surviving neighbours, or a
+    // content or cell retune could hollow this pin out silently (measured
+    // 365 + 400 surviving spots across the two seeds at the fix round).
+    expect(spotsSeen).toBeGreaterThan(200);
   });
 
   it('keeps tier-gated visual scree out of the shared walkable heightfield', () => {

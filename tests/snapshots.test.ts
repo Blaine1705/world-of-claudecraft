@@ -4638,6 +4638,49 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     expect(plain.mirror.breakThreshold).toBeUndefined();
   });
 
+  it('clears the armed marker through the in-place decode arm when bt drops', () => {
+    // The 20 Hz path: a persisting aura re-uses its mirrored record through
+    // the sameAuraShape fast path (aura identity unchanged between
+    // snapshots), which is the ONE arm where `= undefined` carries clearing
+    // semantics: a fear_incap slot re-armed by an untalented fear must lose
+    // the band, not wear a stale one. roundTrip cannot reach this arm (it
+    // builds a fresh client per call), so this drives two snapshots into
+    // one client by hand.
+    const sim = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: WIRE_TEST_WORLD,
+    });
+    const pid = sim.addPlayer('warrior', 'Dreaded');
+    const e = sim.entities.get(pid)!;
+    e.auras.push({
+      id: 'fear_incap',
+      name: 'Fear',
+      kind: 'stasis',
+      remaining: 8,
+      duration: 8,
+      value: 0,
+      sourceId: 0,
+      school: 'shadow',
+      breakThreshold: 120,
+    });
+    const client = bareClient(999);
+    (client as any).applySnapshot(JSON.parse(JSON.stringify({ t: 'snap', ents: [wireEntity(e)] })));
+    const armed = client.entities.get(pid)!.auras.find((a) => a.id === 'fear_incap')!;
+    expect(armed.breakThreshold).not.toBeUndefined();
+
+    // Same aura identity, threshold gone: the in-place arm must CLEAR it.
+    e.auras[e.auras.length - 1].breakThreshold = undefined;
+    (client as any).applySnapshot(JSON.parse(JSON.stringify({ t: 'snap', ents: [wireEntity(e)] })));
+    const mirrored = client.entities.get(pid)!.auras.find((a) => a.id === 'fear_incap')!;
+    // The fast path updates the SAME record object; assert both the clear
+    // and the reuse, so this pin cannot silently slide onto the fresh-array
+    // arm if the shape check ever changes.
+    expect(mirrored).toBe(armed);
+    expect(mirrored.breakThreshold).toBeUndefined();
+  });
+
   it('round-trips the imbue judgement range (value2/value3), value omitted when 0', () => {
     const imbue: Aura = {
       id: 'holy_might',

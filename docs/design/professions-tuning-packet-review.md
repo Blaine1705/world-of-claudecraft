@@ -3887,8 +3887,9 @@ Run 2026-08-01 after phase 18 closed: release/v0.33.0 merged to main and the
 branch re-based its sync onto release/v0.34.0 (94f5ac63d8, 290 commits and
 949 files over the old base 2ae71a7fbf: the graphics overhaul, ability VFX,
 the Epic storefront integration, Wildheart Basin polish, classic Evade, the
-release's own 1,367-row locale fill, and the #2605/#2507 provenance
-threading). Twenty conflicts resolved (the merge commit body records the
+release's own locale fill (1,367 rows added to src/ui/i18n.locales/ by
+measure; its commit title says 1,317, its own count of the pending rows it
+filled), and the #2605/#2507 provenance threading). Twenty conflicts resolved (the merge commit body records the
 blends); the release-merge-audit ran as an 11-auditor workflow with paired
 adversarial verification, 26 findings confirmed, every packet-actionable one
 fixed on the branch in the same change. Corrections to figures earlier
@@ -3913,10 +3914,15 @@ phases pinned, superseding them at this tip:
   new overworld collider class, the 11 expansion-hub mailboxes, sits no
   closer than 37.4yd to any node).
 - Merged-world measurement re-records, each in its own reviewed commit:
-  the terrain-height parity corpus re-recorded at 139,339 points (heights
-  bit-identical; the packet's 21 nodes moved the point set), the
-  deploy-window heroic-loot snapshot took the union set (six Wildheart
-  Basin ids), the parity goldens re-minted, the playthrough's five hunted
+  the terrain-height parity corpus re-recorded at 139,363 points, up 24
+  from the fixture's 139,339, the fix-round review's re-derivation of the
+  cause: the packet's Gullhaven fishing lake stencil in farshore.ts adds
+  the points, and 64 lanes of GENUINE height change sit inside that lake's
+  carve disc (so e55f711163's commit body, which claims 139,339,
+  bit-identical heights, and a gather-node cause, is wrong on all three
+  clauses; the record stands corrected here); the deploy-window
+  heroic-loot snapshot took the union set (six Wildheart Basin ids, all
+  epic), the parity goldens re-minted, the playthrough's five hunted
   literals re-hunted, and the chronomancy DPS-gap floor re-measured per the
   phase 11 precedent: seeds 1/2/3 read piro 26.1/29.5/59.4 and cryo
   39.1/14.1/35.2 percent, the floor moved to 12 percent under the new min,
@@ -3957,6 +3963,11 @@ bump-at-ship cadence):
   every spellfxAt, zone pulse ticks) has no measurement anywhere, a
   candidate for the next load-baseline recapture along with the mailbox
   entity-count note in that doc.
+- One systemic gap the bt episode exposes, a follow-up candidate: no test
+  pins the server WireAura key set against the client decoder's, which is
+  what let an emit-only field ship. A wire-field parity pin (the
+  world_api_parity shape, over the aura wire keys) would make the next
+  asymmetric field red at the release's own gate.
 
 ---
 

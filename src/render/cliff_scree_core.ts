@@ -146,6 +146,9 @@ function computeSpot(seed: number, ci: number, cj: number): ScreeSpot | null {
     const dz = z - zone.hub.z;
     if (dx * dx + dz * dz < HUB_EXCLUSION_RADIUS * HUB_EXCLUSION_RADIUS) return null;
   }
+  // Static GATHER_NODES by design, unlike the active-content hub read above:
+  // gather nodes are not part of WorldContent, so a custom map has none to
+  // exclude around and the builtin table is the only source there is.
   for (const node of GATHER_NODES) {
     const dx = x - node.pos.x;
     const dz = z - node.pos.z;

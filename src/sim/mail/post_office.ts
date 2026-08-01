@@ -974,7 +974,7 @@ export class PostOffice {
           // row can persist forever with no login to self-heal it, so a bare
           // typeof keep would ride an empty or unbounded marker through every
           // serializeMail. Drop-only, reported on the book's aggregate line.
-          boundCraftedRecipeIdOnLoad(slot, escrowDrops, 'mail');
+          boundCraftedRecipeIdOnLoad(slot, escrowDrops, 'mailSlot');
           return slot;
         });
       const kind: MailKind = m.kind === 'player' || m.kind === 'npc' ? m.kind : 'system';

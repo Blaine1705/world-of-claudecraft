@@ -14,8 +14,13 @@
 // as a whole: a solo or FFA heroic clear of any of them
 // can hand a stale bundle an id it cannot resolve. That residual arm is the
 // release's own, recorded in DEPLOY.md beside the surfaced forced-refresh
-// question; the exception arm below pins it to EXACTLY those four ids so a
-// fifth mount or any packet id entering heroic loot still reds here.
+// question; the reins pin below holds it to EXACTLY those four mount ids.
+// The v0.34.0 merge widened the same release-owned arm again: the Heroic
+// Wildheart Basin loot pass (Zulgar) put six epic ids into
+// HEROIC_BOSS_LOOT, deliberately admitted into the frozen snapshot at the
+// merge (the audited union; DEPLOY.md's loot-window paragraph records it),
+// so the frozen set is now reins exceptions plus the Wildheart six, and
+// any FURTHER id, packet or release, still reds here.
 //
 // The pin is deliberately RELEASE-SCOPED: once the deploy window closes (the
 // maintainer's call, after clients roll), the ids may enter loot tables and
@@ -91,15 +96,18 @@ describe('new release item ids stay out of loot containers (deploy window)', () 
 
   it('freezes the heroic loot id set for the deploy window (the reins are the exception)', () => {
     // The recorded residual arm (see the file banner): the expansion shipped
-    // exactly four reins into heroic boss loot on deployed-base encounters.
-    // The whole table's id set is frozen for the window, not just the
-    // reins_ slice: a fifth mount, a rift id, a packet id, or ANY new id
-    // entering HEROIC_BOSS_LOOT while stale bundles live is a new
-    // deployed-bundle throw arm and must be a deliberate decision recorded
-    // here. Release-scoped like the file: delete with it once clients roll.
-    // The snapshot is `vitest -u`-updatable, so the literal reins array
-    // below is the real teeth: NEVER blanket-update this snapshot while the
-    // deploy window is open; a diff here IS the finding.
+    // exactly four reins into heroic boss loot on deployed-base encounters,
+    // and the v0.34.0 merge deliberately admitted the six Wildheart Basin
+    // epics beside them (the audited union; the decision is recorded in the
+    // banner and DEPLOY.md). The whole table's id set is frozen for the
+    // window, not just the reins_ slice: a fifth mount, a rift id, a packet
+    // id, or ANY new id entering HEROIC_BOSS_LOOT while stale bundles live
+    // is a new deployed-bundle throw arm and must be a deliberate decision
+    // recorded here, the way the Wildheart six were. Release-scoped like
+    // the file: delete with it once clients roll. The snapshot is
+    // `vitest -u`-updatable, so the literal reins array below is the real
+    // teeth: never blanket-update this snapshot while the deploy window is
+    // open without recording the decision; a diff here IS the finding.
     const heroicIds = [...new Set(collectItemIds(Object.values(HEROIC_BOSS_LOOT), []))].sort();
     const reins = heroicIds.filter((id) => id.startsWith('reins_'));
     expect(reins).toEqual([

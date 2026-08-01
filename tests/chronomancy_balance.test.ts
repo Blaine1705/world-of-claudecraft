@@ -263,8 +263,11 @@ describe('Chronomancy Phase 3 balance targets', () => {
     // already records) and the re-measure reads piro 26.1/29.5/59.4 and
     // cryo 39.1/14.1/35.2 percent over seeds 1/2/3: seed 2's cryo run is an
     // unlucky frost draw sequence (its piro run in the identical fight is
-    // fine), so the ASSERTED floor moves to 12 percent, just under the new
-    // measured min, to keep catching regression without seed-shopping. The
+    // fine), so the ASSERTED floor moves to 12 percent, 2.1 points under
+    // the new measured min: wider headroom than the v0.32.0 precedent's 0.7
+    // because the per-seed spread is now 25 points and a knife-edge floor
+    // would re-trip on the next content sync, at the acknowledged cost of
+    // detection power on the cryo arm (20 down to 12). The
     // now eight-point shortfall against the 22 percent target on that seed
     // is the class owner's re-tune call, flagged in the v0.34.0 merge-audit
     // record (the consReact floor above documents the same

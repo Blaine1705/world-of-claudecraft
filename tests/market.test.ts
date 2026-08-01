@@ -95,7 +95,7 @@ function marketSellerKey(pid: number): string {
   return String(pid);
 }
 
-describe('the World Market — the Merchant', () => {
+describe('the World Market: the Merchant', () => {
   it('spawns a single Merchant who keeps standing house stock', () => {
     const sim = makeWorld();
     const merchants = [...sim.entities.values()].filter((e) => e.templateId === 'the_merchant');
@@ -737,7 +737,11 @@ describe('the World Market — the Merchant', () => {
       craftedRecipeId,
     });
     sim.loadMarket({
-      listings: [listingRow(5000, 'recipe_tough_jerky'), listingRow(5001, 'r'.repeat(65))],
+      listings: [
+        listingRow(5000, 'recipe_tough_jerky'),
+        listingRow(5001, 'r'.repeat(65)),
+        listingRow(5002, ''),
+      ],
       collections: [
         {
           key: 'k1',
@@ -745,15 +749,18 @@ describe('the World Market — the Merchant', () => {
           items: [
             { itemId: 'wolf_fang', count: 1, craftedRecipeId: 'recipe_tough_jerky' },
             { itemId: 'wolf_fang', count: 1, craftedRecipeId: '' },
+            { itemId: 'wolf_fang', count: 1, craftedRecipeId: 'r'.repeat(65) },
           ],
         },
       ],
-      nextListingId: 5002,
+      nextListingId: 5003,
     } as never);
     const legal = sim.marketListings.find((l) => l.id === 5000);
     const over = sim.marketListings.find((l) => l.id === 5001);
+    const empty = sim.marketListings.find((l) => l.id === 5002);
     expect(legal?.craftedRecipeId).toBe('recipe_tough_jerky');
     expect(over && 'craftedRecipeId' in over).toBe(false);
+    expect(empty && 'craftedRecipeId' in empty).toBe(false);
     const col = (
       sim.market as unknown as {
         marketCollections: Map<string, { items: { itemId: string; craftedRecipeId?: string }[] }>;
@@ -761,6 +768,7 @@ describe('the World Market — the Merchant', () => {
     ).marketCollections.get('k1');
     expect(col?.items[0].craftedRecipeId).toBe('recipe_tough_jerky');
     expect(col && 'craftedRecipeId' in col.items[1]).toBe(false);
+    expect(col && 'craftedRecipeId' in col.items[2]).toBe(false);
   });
 
   // ---------------------------------------------------------------------------

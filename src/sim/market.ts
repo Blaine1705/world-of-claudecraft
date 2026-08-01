@@ -962,7 +962,12 @@ export class Market {
       // (bag/buyback/bank; item_instance_load.ts doctrine): a listing row can
       // persist to expiry and re-grant into live bags via grantCopies, so a
       // bare typeof keep would carry an empty or unbounded marker unreported.
-      boundCraftedRecipeIdOnLoad(listing, escrowDrops, 'listing');
+      // 'listingSlot', not 'listing': the payload bound above already emits
+      // listing.<itemId>.craftedRecipeId for a dropped PAYLOAD key of the
+      // same name (payloads legitimately carry one, items.ts), so the
+      // slot-level marker drop needs its own label to stay tellable apart
+      // in the one aggregated book line.
+      boundCraftedRecipeIdOnLoad(listing, escrowDrops, 'listingSlot');
       this.marketListings.push(listing);
     }
     for (const c of save.collections ?? []) {
@@ -986,7 +991,7 @@ export class Market {
             // Same slot-level marker bound as the listing arm above: a
             // collection slot persists until collected and grants straight
             // into live bags, the same forever-row class as mail.
-            boundCraftedRecipeIdOnLoad(slot, escrowDrops, 'collection');
+            boundCraftedRecipeIdOnLoad(slot, escrowDrops, 'collectionSlot');
             return slot;
           }),
       });
