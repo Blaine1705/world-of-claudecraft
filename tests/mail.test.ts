@@ -15,7 +15,7 @@ import {
   MAIL_POSTAGE,
 } from '../src/sim/mail/post_office';
 import { Sim } from '../src/sim/sim';
-import type { SimEvent, WorldContent } from '../src/sim/types';
+import { type SimEvent, type WorldContent } from '../src/sim/types';
 
 // Mailboxes are system-owned and still spawn with this fixture. Ambient camps,
 // NPCs and quest objects are irrelevant to delivery/index invariants and would
@@ -64,6 +64,41 @@ describe('mailboxes in the world', () => {
       expect(box?.lootable).toBe(true);
       expect(box?.objectItemId).toBeNull();
     }
+  });
+
+  it('covers every current town hub with a usable Ravenpost mailbox', () => {
+    const sim = makeWorld();
+    const boxes = sim.postOffice.mailboxIds.map((id) => sim.entities.get(id));
+    const missingHubNames: string[] = [];
+
+    for (const zone of BUILTIN_WORLD.zones) {
+      const mailbox = boxes.find(
+        (box) =>
+          box?.kind === 'object' &&
+          box.templateId === 'mailbox' &&
+          Math.hypot(box.pos.x - zone.hub.x, box.pos.z - zone.hub.z) <= zone.hub.radius,
+      );
+      if (!mailbox) {
+        missingHubNames.push(zone.hub.name);
+        continue;
+      }
+
+      const pid = sim.addPlayer('warrior', `Postie ${zone.id}`);
+      const player = sim.entities.get(pid);
+      if (!player) throw new Error(`missing test player for ${zone.id}`);
+      player.pos = { ...mailbox.pos };
+      player.prevPos = { ...player.pos };
+      sim.rebucket(player);
+
+      sim.interact(pid);
+      expect(
+        sim.drainEvents().some((event) => event.type === 'mailbox' && event.pid === pid),
+        zone.hub.name,
+      ).toBe(true);
+      expect(sim.mailInfoFor(pid), zone.hub.name).not.toBeNull();
+    }
+
+    expect(missingHubNames).toEqual([]);
   });
 
   it('keyboard interact at a mailbox emits the open-mailbox cue', () => {

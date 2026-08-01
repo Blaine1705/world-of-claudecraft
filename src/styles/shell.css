@@ -1419,6 +1419,13 @@
   .hs-vlvl {
     color: var(--color-text-muted, #b9ac82);
   }
+  /* The `<Guild>` tag beside a ranked player's name. It rides inside .hs-name
+     rather than as its own grid column, so both the desktop grid and the mobile
+     stacked areas below keep their existing column/area sets. */
+  .hs-guild {
+    color: var(--color-text-muted, #b9ac82);
+    font-size: 11px;
+  }
   .hs-lvl,
   .hs-vlvl {
     text-align: center;

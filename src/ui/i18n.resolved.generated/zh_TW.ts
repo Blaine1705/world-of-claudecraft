@@ -926,7 +926,7 @@ export const zh_TW: EnTranslations = {
     "targetAuras": {
       "title": "目標光環",
       "keybindLabel": "目標增益與減益效果",
-      "all": "All",
+      "all": "全部",
       "debuffs": "減益",
       "buffs": "增益",
       "unlock": "移動目標光環視窗",

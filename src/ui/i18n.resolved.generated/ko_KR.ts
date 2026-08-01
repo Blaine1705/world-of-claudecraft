@@ -926,7 +926,7 @@ export const ko_KR: EnTranslations = {
     "targetAuras": {
       "title": "대상 오라",
       "keybindLabel": "대상 강화 및 약화 효과",
-      "all": "All",
+      "all": "전체",
       "debuffs": "약화 효과",
       "buffs": "강화 효과",
       "unlock": "대상 오라 창 이동",

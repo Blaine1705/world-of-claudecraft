@@ -112,6 +112,7 @@ import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack
 import { fogFarForBuiltGround } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
+import { raceCompileGate } from './compile_gate';
 import { trackWebGLContext } from './context_release';
 import {
   animatesEveryFrame,
@@ -273,6 +274,7 @@ import {
   remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
 } from './prewarm_policy';
+import { resumeDroppedPrewarmEntries } from './prewarm_resume';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
@@ -418,6 +420,12 @@ const VIEW_COMPILE_GATE_MAX_MS = 1500;
 // Reserve at the tail of the view-build budget so the compile + final-frame
 // steps always start before the prewarm deadline (runEntry skips late entries).
 const PREWARM_BUILD_RESERVE_MS = 3000;
+// A manifest entry dropped by the deadline above is resumed once, in
+// background idle time after world entry, instead of being permanently
+// skipped (issue #2571: an abandoned entry's compile debt otherwise pays out
+// later as a mid-play shader-compile stall). Each resumed entry gets its own
+// fresh window so one slow entry cannot immediately re-drop the next.
+const PREWARM_RESUME_ENTRY_MAX_MS = 4000;
 const VIEW_PREWARM_MAX_VIEWS_LOW = 48;
 const VIEW_PREWARM_MAX_VIEWS_HIGH = 72;
 // Constrained (phone WebKit): build only self plus one required/nearby view at
@@ -946,6 +954,12 @@ export interface EntityView {
   compilePending: boolean;
   // Resolves when compilePending clears, including the bounded fail-soft timeout.
   compileReady: Promise<void> | null;
+  // A live material-variant swap (gateSwapFlagOnCompile) is still linking off-thread
+  // for a target whose .visible the per-frame loop recomputes every tick (the mount
+  // root, the base visual root after a skin/visual-key swap): those lines AND this
+  // in so a plain hide would not be overwritten later the same frame. See #2571.
+  mountCompilePending: boolean;
+  visualCompilePending: boolean;
   lastOverheadEmoteKey: string | null;
   recklessOn?: boolean;
   // render-space position last frame, for true u/s locomotion speed
@@ -4817,11 +4831,16 @@ export class Renderer {
     const constrainedPrewarm = policy.minimalManifest;
     const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);
     const started = performance.now();
-    const deadline = started + maxMs;
+    // Extended by resumeDroppedPrewarmEntries below when a dropped entry is
+    // resumed in idle time, so its own internal deadline checks see fresh room.
+    let deadline = started + maxMs;
     // Stop the archetype-build steps early so the later entries, crucially
     // programs.compile, still START before `deadline` (runEntry skips anything
     // that begins past it). Compiling is what kills the in-world freeze.
-    const buildDeadline = deadline - PREWARM_BUILD_RESERVE_MS;
+    // Mutable: extended alongside `deadline` when a dropped entry is resumed, so
+    // a resumed entities.player-archetypes/entities.npc-archetypes does not see
+    // a stale, already-past budget and silently build nothing (#2571 review).
+    let buildDeadline = deadline - PREWARM_BUILD_RESERVE_MS;
     const manifestEntries: RendererPrewarmManifestEntryStats[] = [];
     const startCounts = this.prewarmCounts();
     const createdViewTypes: string[] = [];
@@ -4861,6 +4880,12 @@ export class Renderer {
     let compileMode: RendererPrewarmStats['compileMode'] = 'none';
     let compileMs = 0;
     let compileTimedOut = false;
+    // How many of [player/entity/npc]PrewarmGroup actually had a skinned-shadow
+    // pre-compile pass run against them: 0 on a resumed programs.compile whose
+    // archetype groups were already torn down by the main pass's cleanup, so the
+    // detail string below does not overstate what a resumed run actually did
+    // (#2571 review).
+    let compiledSkinnedShadowGroups = 0;
     let textureUploads = 0;
     let diagnosticsBaseline: RendererPrewarmDiagnosticsBaselineStats | null = null;
 
@@ -4871,15 +4896,40 @@ export class Renderer {
       required: boolean;
       /** This small entry still runs if an earlier required view consumed maxMs. */
       deadlineExempt?: boolean;
+      /**
+       * False for an entry the background resume pass must never rerun: one whose
+       * run() presents real frames in a tight synchronous loop (sky.current-zone,
+       * render.settle-passes: reviving THAT after world entry is the exact same
+       * long-task freeze this pass exists to prevent, just relocated) or spawns a
+       * visible, un-hideable side effect on the live, shared systems (vfx.atlas's
+       * particle burst has no group to gate, unlike foliage/landmark/interior).
+       * Left permanently dropped is the correct outcome for these; defaults true.
+       */
+      resumable?: boolean;
       run: () => void | Promise<void>;
       detail?: () => string;
     };
 
-    const runEntry = async (entry: PrewarmManifestEntry): Promise<void> => {
+    // Entries the deadline dropped this pass (runEntry's skip branch below).
+    // Resumed once in background idle time after the loop finishes instead of
+    // being left permanently skipped (issue #2571).
+    const droppedEntries: PrewarmManifestEntry[] = [];
+
+    const runEntry = async (
+      entry: PrewarmManifestEntry,
+      // Resumed entries record into their OWN array (see the resume kickoff
+      // below), never back into `manifestEntries`: that array already backs
+      // the FROZEN counts on the stats object this function returns, and a
+      // resumed entry pushing into it later would grow the array while
+      // manifestCompleted/manifestTimedOut/etc. stayed stuck at their
+      // original values, an array-vs-counters disagreement on anything that
+      // reads this.lastPrewarmStats after a resume (#2571 review).
+      target: RendererPrewarmManifestEntryStats[] = manifestEntries,
+    ): Promise<void> => {
       const before = this.prewarmCounts();
       const entryStarted = performance.now();
       if (entryStarted >= deadline && !entry.deadlineExempt) {
-        manifestEntries.push({
+        target.push({
           id: entry.id,
           category: entry.category,
           priority: entry.priority,
@@ -4896,6 +4946,7 @@ export class Renderer {
           textureDelta: 0,
           detail: entry.detail?.(),
         });
+        if (entry.resumable !== false) droppedEntries.push(entry);
         return;
       }
       let status: RendererPrewarmManifestEntryStats['status'] = 'completed';
@@ -4912,7 +4963,7 @@ export class Renderer {
       }
       const after = this.prewarmCounts();
       const entryEnded = performance.now();
-      manifestEntries.push({
+      target.push({
         id: entry.id,
         category: entry.category,
         priority: entry.priority,
@@ -4929,6 +4980,75 @@ export class Renderer {
         textureDelta: after.textures - before.textures,
         detail: entry.detail?.(),
       });
+    };
+
+    // Hide every temp prewarm group currently staged in the scene without
+    // removing it. Three's compile()/compileAsync() traverse the whole scene
+    // regardless of visibility (see prewarm_pass.ts), so a hidden group still
+    // links its programs; the point is keeping a resumed entry's staged group
+    // (e.g. the Mirefen impact-site clone, positioned right next to the
+    // player) from ever painting a live frame once the loading screen is gone.
+    const hidePrewarmArtifacts = (): void => {
+      for (const group of [
+        doorPrewarmGroup,
+        interiorPrewarmGroup,
+        entityPrewarmGroup,
+        npcPrewarmGroup,
+        playerPrewarmGroup,
+        objectPrewarmGroup,
+        propMaterialPrewarmGroup,
+        foliagePrewarmGroup,
+        landmarkPrewarmGroup,
+      ]) {
+        if (group) group.visible = false;
+      }
+    };
+
+    // Tear down every temp prewarm group staged so far. Shared by the main
+    // pass's finally block and, with clearVfx false, by the background resume
+    // pass: vfx.clear() wipes the whole pooled particle system, which is fine
+    // behind the loading screen but would erase live gameplay particles if
+    // called after world entry (the resumed vfx.atlas burst instead decays on
+    // its own once the real per-frame update loop is ticking).
+    const cleanupPrewarmArtifacts = (opts: { clearVfx: boolean }): void => {
+      if (opts.clearVfx) {
+        this.vfx.clear();
+        this.abilityVfxFx.clear();
+      }
+      if (doorPrewarmGroup) this.scene.remove(doorPrewarmGroup);
+      if (interiorPrewarmGroup) this.scene.remove(interiorPrewarmGroup);
+      if (entityPrewarmGroup) this.scene.remove(entityPrewarmGroup);
+      if (npcPrewarmGroup) this.scene.remove(npcPrewarmGroup);
+      for (const item of entityPrewarmPool) this.storePooledVisual(item.key, item.visual);
+      for (const item of npcPrewarmPool) this.storePooledVisual(item.key, item.visual);
+      if (playerPrewarmGroup) this.scene.remove(playerPrewarmGroup);
+      if (objectPrewarmGroup) {
+        // Re-show the object lights hidden during the prewarm so the pooled objects
+        // (reused for the live ground objects) light normally. (Cast: the manifest
+        // closure assignment is invisible to TS flow analysis here.)
+        (objectPrewarmGroup as THREE.Group).traverse((o: THREE.Object3D) => {
+          if ((o as THREE.PointLight).isPointLight) o.visible = true;
+        });
+        this.scene.remove(objectPrewarmGroup);
+      }
+      if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
+      if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
+      if (greatTreePrewarmGroup) this.scene.remove(greatTreePrewarmGroup);
+      if (landmarkPrewarmGroup) this.scene.remove(landmarkPrewarmGroup);
+      if (weatherPrewarmActive) this.weather.endPrewarm();
+      doorPrewarmGroup = null;
+      interiorPrewarmGroup = null;
+      entityPrewarmGroup = null;
+      npcPrewarmGroup = null;
+      entityPrewarmPool = [];
+      npcPrewarmPool = [];
+      playerPrewarmGroup = null;
+      objectPrewarmGroup = null;
+      propMaterialPrewarmGroup = null;
+      foliagePrewarmGroup = null;
+      greatTreePrewarmGroup = null;
+      landmarkPrewarmGroup = null;
+      weatherPrewarmActive = false;
     };
 
     const manifest: PrewarmManifestEntry[] = [
@@ -5212,6 +5332,11 @@ export class Renderer {
         category: 'vfx',
         priority: 60,
         required: false,
+        // Unlike foliage/landmark/interior, this spawns real particles into the
+        // shared pooled VFX system with no group to hide: resuming it live would
+        // be an unprompted, unexplained particle burst near the player
+        // mid-gameplay, not a hidden-then-revealed compile (#2571 review).
+        resumable: false,
         run: () => {
           const offsets = [
             [0, -4],
@@ -5283,7 +5408,10 @@ export class Renderer {
           if (this.webgl.compileAsync) {
             compileMode = 'async';
             for (const group of [playerPrewarmGroup, entityPrewarmGroup, npcPrewarmGroup]) {
-              if (group) await this.compileSkinnedShadowPrograms(group);
+              if (group) {
+                await this.compileSkinnedShadowPrograms(group);
+                compiledSkinnedShadowGroups++;
+              }
             }
             let settled = false;
             const compilePromise = this.webgl
@@ -5304,13 +5432,18 @@ export class Renderer {
             compileMs = roundMs(performance.now() - compileStart);
           }
         },
-        detail: () => `mode=${compileMode};timedOut=${compileTimedOut}`,
+        detail: () =>
+          `mode=${compileMode};timedOut=${compileTimedOut};skinnedShadowGroups=${compiledSkinnedShadowGroups}`,
       },
       {
         id: 'sky.current-zone',
         category: 'sky',
         priority: 90,
         required: false,
+        // Resuming this live would run real presented renders in a tight
+        // synchronous loop after the loading curtain is gone: the same
+        // long-task freeze this pass exists to prevent (#2571 review).
+        resumable: false,
         run: () => {
           const points = [p.pos, activeZone.hub];
           for (const point of points) {
@@ -5326,6 +5459,10 @@ export class Renderer {
         category: this.post ? 'post' : 'world',
         priority: 100,
         required: false,
+        // Same reason as sky.current-zone above: a tight loop of real presented
+        // renders, not an off-thread compile. Resuming it live would reintroduce
+        // the exact long-task freeze this pass exists to prevent.
+        resumable: false,
         run: () => {
           const minPasses = this.lowGfx ? 8 : 10;
           while (renderPasses < minPasses && performance.now() < deadline) {
@@ -5396,29 +5533,44 @@ export class Renderer {
         }
       }
     } finally {
-      this.vfx.clear();
-      this.abilityVfxFx.clear();
-      if (doorPrewarmGroup) this.scene.remove(doorPrewarmGroup);
-      if (interiorPrewarmGroup) this.scene.remove(interiorPrewarmGroup);
-      if (entityPrewarmGroup) this.scene.remove(entityPrewarmGroup);
-      if (npcPrewarmGroup) this.scene.remove(npcPrewarmGroup);
-      for (const item of entityPrewarmPool) this.storePooledVisual(item.key, item.visual);
-      for (const item of npcPrewarmPool) this.storePooledVisual(item.key, item.visual);
-      if (playerPrewarmGroup) this.scene.remove(playerPrewarmGroup);
-      if (objectPrewarmGroup) {
-        // Re-show the object lights hidden during the prewarm so the pooled objects
-        // (reused for the live ground objects) light normally. (Cast: the manifest
-        // closure assignment is invisible to TS flow analysis here.)
-        (objectPrewarmGroup as THREE.Group).traverse((o: THREE.Object3D) => {
-          if ((o as THREE.PointLight).isPointLight) o.visible = true;
+      cleanupPrewarmArtifacts({ clearVfx: true });
+    }
+
+    if (droppedEntries.length > 0) {
+      // Fire-and-forget: world-entry timing must not depend on this, so the
+      // stats below are computed and returned immediately regardless. Pay down
+      // whatever the deadline dropped once idle time actually shows up instead
+      // of leaving it permanently unpaid (issue #2571).
+      const resume = droppedEntries.slice();
+      // Recorded separately from `manifestEntries`: that array already backs
+      // the frozen counts on the `stats` this function returns below, so a
+      // resumed entry must never push back into it (see runEntry's `target`
+      // param above).
+      const resumedManifestEntries: RendererPrewarmManifestEntryStats[] = [];
+      console.info(
+        `[entry-guard] prewarm resume scheduled: dropped=[${resume.map((entry) => entry.id).join(',')}]`,
+      );
+      void resumeDroppedPrewarmEntries(resume, {
+        idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
+        extendDeadline: () => {
+          deadline = performance.now() + PREWARM_RESUME_ENTRY_MAX_MS;
+          buildDeadline = deadline - PREWARM_BUILD_RESERVE_MS;
+        },
+        runEntry: (entry) => runEntry(entry, resumedManifestEntries),
+        afterEntry: hidePrewarmArtifacts,
+      })
+        .then(() => {
+          const outcomes = resumedManifestEntries
+            .map((entry) => `${entry.id}=${entry.status}`)
+            .join(',');
+          console.info(`[entry-guard] prewarm resume done: ${outcomes}`);
+        })
+        .catch((err) => {
+          console.warn('Renderer prewarm resume failed', err);
+        })
+        .finally(() => {
+          cleanupPrewarmArtifacts({ clearVfx: false });
         });
-        this.scene.remove(objectPrewarmGroup);
-      }
-      if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
-      if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
-      if (greatTreePrewarmGroup) this.scene.remove(greatTreePrewarmGroup);
-      if (landmarkPrewarmGroup) this.scene.remove(landmarkPrewarmGroup);
-      if (weatherPrewarmActive) this.weather.endPrewarm();
     }
 
     const elapsed = performance.now() - started;
@@ -6563,6 +6715,8 @@ export class Renderer {
       isFar: false,
       compilePending: false,
       compileReady: null,
+      mountCompilePending: false,
+      visualCompilePending: false,
       lastOverheadEmoteKey: null,
       lastX: e.pos.x,
       lastZ: e.pos.z,
@@ -6609,38 +6763,91 @@ export class Renderer {
     }
   }
 
+  // Shared core for every compile gate below: link `target`'s programs OFF the
+  // main thread (KHR_parallel_shader_compile via compileAsync) against the live
+  // scene's exact lights + environment, racing the shared fail-soft ceiling so a
+  // driver that never reports completion can't strand a caller hidden forever.
+  //
+  // Deliberately ONE call per gated target, not batched into one call per frame.
+  // #2571's third fix asked for exactly that batching, on the premise that "each
+  // gated view calls compileAsync with the whole scene individually", checked
+  // against the pinned three.js WebGLRenderer.compile()/compileAsync() source
+  // directly rather than assumed. `compile(scene, camera, targetScene)` gathers
+  // LIGHTS from `targetScene` (here `this.scene`, for a correct
+  // NUM_POINT_LIGHTS/... shader variant) but only calls getProgram/prepareMaterial
+  // by traversing `scene` (here `target`, the one gated node): "Only initialize
+  // materials in the new scene, not the targetScene" per its own source comment.
+  // So the expensive part (shader source generation, program acquisition) is
+  // already scoped to the single target, never the whole scene; only the light
+  // GATHERING walk re-scans `this.scene` on every call, and it is a plain
+  // isLight check over the scene graph, not a shader compile. At the runtime
+  // view-create budget (see VIEW_CREATE_BUDGET_HIGH; the boot prewarm's much
+  // larger manifest is a separate, one-time pass with its own budgets), a
+  // worst-case frame pays that redundant light-gather walk a handful of times,
+  // never a redundant scene-wide shader compile. Batching multiple targets into
+  // one compileAsync call is not achievable through the public API without either
+  // reparenting each already-placed target out of its real scene position
+  // (breaking its transform) or cloning every target into a scratch batch
+  // container purely to compile it (paying a real allocation/traversal cost to
+  // save a cheap boolean-flag walk). Given the traversal that actually matters is
+  // already correctly scoped, and a real batch would cost more than it saves,
+  // this stays one call per target.
+  private compileGate(target: THREE.Object3D): Promise<void> {
+    return raceCompileGate(
+      () => this.webgl.compileAsync(target, this.camera, this.scene),
+      VIEW_COMPILE_GATE_MAX_MS,
+    );
+  }
+
   // Generic anti-freeze layer. A freshly-streamed view links its shader programs
   // SYNCHRONOUSLY on first draw - a 50-1700ms frame stall (the open-world travel
-  // hitch). Instead link them OFF the main thread (KHR_parallel_shader_compile via
-  // compileAsync) against the live scene's exact lights + environment, and keep the
-  // view hidden until ready: it pops in a frame or two late rather than freezing.
-  // Unlike the boot prewarm this enumerates NOTHING, so new content and render-state
-  // variants the prewarm cannot anticipate (e.g. the env-map-lit material that links
-  // only when you walk into a biome) never hitch in-world. The prewarm stays a pure
+  // hitch). Instead link them OFF the main thread and keep the view hidden until
+  // ready: it pops in a frame or two late rather than freezing. Unlike the boot
+  // prewarm this enumerates NOTHING, so new content and render-state variants the
+  // prewarm cannot anticipate (e.g. the env-map-lit material that links only when
+  // you walk into a biome) never hitch in-world. The prewarm stays a pure
   // optimization: already-compiled spawn content resolves instantly, no pop-in.
   private gateViewOnCompile(view: EntityView, group: THREE.Group): Promise<void> | null {
     if (!this.asyncCompileSupported) return null;
     view.compilePending = true;
     group.visible = false;
-    return new Promise<void>((resolve) => {
-      let settled = false;
-      const clear = (): void => {
-        if (settled) return;
-        settled = true;
-        view.compilePending = false;
-        resolve();
-      };
-      const guard = setTimeout(clear, VIEW_COMPILE_GATE_MAX_MS);
-      try {
-        this.webgl
-          .compileAsync(group, this.camera, this.scene)
-          .then(clear, clear)
-          .finally(() => clearTimeout(guard));
-      } catch {
-        clearTimeout(guard);
-        clear();
-      }
+    return this.compileGate(group).then(() => {
+      view.compilePending = false;
     });
+  }
+
+  // Sibling to gateViewOnCompile for a live material-variant swap on an
+  // ALREADY-VISIBLE entity (a gear/weapon-skin prop just attached to a
+  // character already on screen, see #2571 commit 2). Hiding the WHOLE
+  // character like a brand-new view would be a worse regression than the
+  // freeze this prevents, so this hides only the swapped node: the rest of
+  // the character keeps animating and drawing normally, and the new prop
+  // pops in a frame or two late instead of stalling the frame. Safe only for
+  // a node nothing else drives the visibility of per frame (a weapon/offhand
+  // payload, once attached, is left alone); for one the per-frame loop
+  // recomputes every tick, use gateSwapFlagOnCompile instead.
+  private gateSwapOnCompile(target: THREE.Object3D): void {
+    if (!this.asyncCompileSupported || !target.visible) return;
+    target.visible = false;
+    void this.compileGate(target).then(() => {
+      target.visible = true;
+    });
+  }
+
+  // Sibling to gateSwapOnCompile for a swap whose .visible the per-frame loop
+  // ALREADY recomputes every tick (the mount root, the base visual root after
+  // a skin or visual-key swap): a direct hide would be overwritten later the
+  // same frame, so this compiles in the background and reports back through a
+  // caller-owned flag those per-frame lines AND against instead. The caller
+  // sets its pending flag to true BEFORE calling this, so onSettled MUST still
+  // run when the gate is a no-op (unsupported browser): otherwise the flag is
+  // permanently stuck true and the target stays hidden forever.
+  private gateSwapFlagOnCompile(target: THREE.Object3D, onSettled: () => void): void {
+    if (!this.asyncCompileSupported) {
+      onSettled();
+      return;
+    }
+    void this.compileGate(target).then(onSettled);
   }
 
   /** The visual the player currently sees (form swaps hide the base rig). */
@@ -6674,7 +6881,6 @@ export class Renderer {
     if (!next) return;
     next.setShadow(v.shadowOn);
     next.setFar(v.isFar);
-    next.root.visible = v.visual.root.visible;
     const oldClickTarget = v.clickTarget;
     const idx = this.clickTargets.indexOf(oldClickTarget);
     v.visual.dispose();
@@ -6692,6 +6898,13 @@ export class Renderer {
     v.weaponStowed = false; // next was built drawn (fresh stow transition); the diff re-sheathes
     v.group.add(next.root);
     this.reconcileViewLights(v);
+    // A live base-visual replace (race/mech toggle) is exactly a brand-new
+    // rig's materials linking for the first time; gate it the same as a
+    // gear swap rather than freezing the frame it lands on (#2571).
+    v.visualCompilePending = true;
+    this.gateSwapFlagOnCompile(next.root, () => {
+      v.visualCompilePending = false;
+    });
   }
 
   private reconcileViewLights(v: EntityView): void {
@@ -8131,23 +8344,37 @@ export class Renderer {
         charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
       }
 
-      // live skin swap, appearance changed (in-game changer or a multiplayer peer)
+      // live skin swap: appearance changed (in-game changer or a multiplayer peer).
+      // NOT gated: unlike a base-visual swap, the old rig is not being replaced,
+      // just re-textured in place, so there is no reason to hide the whole
+      // character while its shader links. Hiding it (as an earlier version of
+      // this fix did, reusing visualCompilePending) made a skin change worse
+      // than the freeze it was meant to prevent (up to 1500ms with the whole
+      // character invisible). Every player skin variant is already compiled by
+      // the boot prewarm anyway (see entities.player-archetypes); an uncached
+      // mob/NPC skin combo still pays the old synchronous first-draw cost, same
+      // as before this fix (#2571 review).
       if (e.skin !== v.skin) {
         v.skin = e.skin;
         v.visual.setSkin(e.skin);
       }
 
       // live held-weapon swap, equipped mainhand changed (self equip or a peer's
-      // gear update); setWeapon no-ops on classes with a fixed weapon (hunter)
+      // gear update); setWeapon no-ops on classes with a fixed weapon (hunter).
+      // Gated per newly attached payload: nothing else in this loop drives its own
+      // .visible, so first-sight materials link off-thread instead of freezing the
+      // frame the gear lands on (#2571).
       if (e.mainhandItemId !== v.mainhandItemId) {
         v.mainhandItemId = e.mainhandItemId;
-        v.visual.setWeapon(e.mainhandItemId);
+        const changed = v.visual.setWeapon(e.mainhandItemId);
+        if (changed) for (const node of changed) this.gateSwapOnCompile(node);
         this.reconcileViewLights(v);
       }
 
       if (e.offhandItemId !== v.offhandItemId) {
         v.offhandItemId = e.offhandItemId;
-        v.visual.setOffhand(e.offhandItemId);
+        const changed = v.visual.setOffhand(e.offhandItemId);
+        if (changed) for (const node of changed) this.gateSwapOnCompile(node);
         this.reconcileViewLights(v);
       }
 
@@ -8155,7 +8382,8 @@ export class Renderer {
       // or a peer, via the identity wire); replaces the held model + rarity VFX
       if (e.weaponSkinId !== v.weaponSkinId) {
         v.weaponSkinId = e.weaponSkinId;
-        v.visual.setWeaponSkin(e.weaponSkinId);
+        const changed = v.visual.setWeaponSkin(e.weaponSkinId);
+        if (changed) for (const node of changed) this.gateSwapOnCompile(node);
         this.reconcileViewLights(v);
       }
       const weaponAura = characterWeaponAuraInto(e, this.weaponAuraScratch);
@@ -8228,6 +8456,13 @@ export class Renderer {
           v.mountVisual = createMountVisual(mountSpec.visualKey);
           v.group.add(v.mountVisual.root); // group.scale already carries e.scale
           v.mountVisualKey = mountSpec.visualKey;
+          // A newly summoned mount is exactly a brand-new rig's materials
+          // linking for the first time; gate it like a gear swap instead of
+          // freezing the frame the mount lands on (#2571).
+          v.mountCompilePending = true;
+          this.gateSwapFlagOnCompile(v.mountVisual.root, () => {
+            v.mountCompilePending = false;
+          });
         } else {
           void preloadMountAssets(mountSpec.visualKey).catch((err) =>
             console.error('Failed to preload mount model:', err),
@@ -8239,7 +8474,7 @@ export class Renderer {
         v.mountVisual = null;
         v.mountVisualKey = '';
       }
-      if (v.mountVisual) v.mountVisual.root.visible = mountShown;
+      if (v.mountVisual) v.mountVisual.root.visible = mountShown && !v.mountCompilePending;
       v.mountLift = mountShown && v.mountVisual ? mountSpec.seat : 0;
       const active =
         polyed && v.sheepVisual
@@ -8271,7 +8506,7 @@ export class Renderer {
       active.setShadowform(hasShadowform);
       active.setMoonkin(hasMoonkin);
       active.setMetamorph(hasMetamorph);
-      v.visual.root.visible = active === v.visual && !fireballForm;
+      v.visual.root.visible = active === v.visual && !fireballForm && !v.visualCompilePending;
       // saddle lift: the rider (click proxy included, a root child) sits at
       // the seat height while mounted; 0 whenever the mount is absent/hidden.
       // seatFwd slides the rider along facing onto saddles that sit off the

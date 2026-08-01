@@ -453,6 +453,17 @@ describe('Eastbrook authored gameplay data integration', () => {
       },
       { x: 6, z: 294 },
       { x: 6, z: 654 },
+      { x: -33, z: 1025 },
+      { x: 397, z: 1905 },
+      { x: -23, z: 1555 },
+      { x: -353, z: 2067 },
+      { x: -354, z: 356 },
+      { x: -364, z: 1415 },
+      { x: 354, z: 1436 },
+      { x: -294, z: 815 },
+      { x: 314, z: 816 },
+      { x: 427, z: 355 },
+      { x: 299, z: 76 },
     ]);
     expect(PLAYER_START).toEqual({ x: 2, z: -2 });
     expect(EASTBROOK_LAYOUT.services.graveyard.position).toEqual({ x: -14, z: -14 });

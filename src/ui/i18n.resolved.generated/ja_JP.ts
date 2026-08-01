@@ -926,7 +926,7 @@ export const ja_JP: EnTranslations = {
     "targetAuras": {
       "title": "ターゲットのオーラ",
       "keybindLabel": "ターゲットのバフとデバフ",
-      "all": "All",
+      "all": "すべて",
       "debuffs": "デバフ",
       "buffs": "バフ",
       "unlock": "ターゲットオーラウィンドウを移動",

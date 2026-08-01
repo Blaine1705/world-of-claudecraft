@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.targetAuras.all': 'Все',
   'hudChrome.crafting.identity.ceilingRare': 'Потолок редкого',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',

@@ -487,6 +487,10 @@ async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<Leaderboar
     prestigeRank: r.prestigeRank,
     // a deed id (never display text); the client localizes via deed_i18n
     title: r.activeTitle,
+    // The guild tag shown beside the name. Omitted (not null) for an unguilded
+    // character, the `realm` treatment below, so an unguilded row is byte-unchanged
+    // on the wire.
+    ...(r.guild ? { guild: r.guild } : {}),
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
   // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
@@ -2031,7 +2035,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const callerToken = bearerToken(req);
       if (!callerToken)
         return json(res, 401, { error: 'not authenticated', code: 'auth.required' });
-      return handleAccountChangePassword(req, res, accountId, callerToken);
+      return handleAccountChangePassword(req, res, accountId, callerToken, {
+        disconnectAccount: (id, reason) => liveGame().disconnectAccount(id, reason),
+      });
     }
     // Password reset is for users who are locked out, so both routes are
     // unauthenticated (rate-limited + web-login guarded above, and each handler is
@@ -2040,7 +2046,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return handleAccountPasswordForgot(req, res);
     }
     if (req.method === 'POST' && url === '/api/account/password/reset') {
-      return handleAccountPasswordReset(req, res);
+      return handleAccountPasswordReset(req, res, {
+        disconnectAccount: (id, reason) => liveGame().disconnectAccount(id, reason),
+      });
     }
     if (req.method === 'POST' && url === '/api/account/logout') {
       const callerToken = bearerToken(req);

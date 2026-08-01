@@ -924,21 +924,21 @@ export const nl_NL: EnTranslations = {
       "regroup": "{meter} weer samenvoegen"
     },
     "targetAuras": {
-      "title": "Target Auras",
-      "keybindLabel": "Target Buffs and Debuffs",
-      "all": "All",
+      "title": "Auras van het doel",
+      "keybindLabel": "Buffs en debuffs van het doel",
+      "all": "Alle",
       "debuffs": "Debuffs",
       "buffs": "Buffs",
-      "unlock": "Move target aura window",
-      "lock": "Lock target aura window",
-      "configureRows": "Configure target auras",
-      "fewerRows": "Prefer fewer aura rows",
-      "moreRows": "Prefer more aura rows",
-      "visibleRows": "Preferred aura rows: {count}",
-      "showSources": "Show aura sources",
-      "hideSources": "Hide aura sources",
-      "ownAura": "Your aura",
-      "opacity": "Aura opacity: {percent}"
+      "unlock": "Venster met auras van het doel verplaatsen",
+      "lock": "Venster met auras van het doel vergrendelen",
+      "configureRows": "Auras van het doel instellen",
+      "fewerRows": "Voorkeur voor minder aurarijen",
+      "moreRows": "Voorkeur voor meer aurarijen",
+      "visibleRows": "Voorkeursaantal aurarijen: {count}",
+      "showSources": "Aurabronnen tonen",
+      "hideSources": "Aurabronnen verbergen",
+      "ownAura": "Jouw aura",
+      "opacity": "Auradekking: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Huisdier heeft volledige gezondheid",
@@ -983,7 +983,7 @@ export const nl_NL: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage de Schaduwspringpad",
       "name_stormfeather_griffin": "Hemelreik Stormveder",
       "name_thunderstrut_gobbler": "Donderstap de Grote Kalkoen",
-      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
+      "name_terrorspark_groundshaker": "Schrikvonk, de Grondschudder",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
       "desc_stalkglider_snail": "Een taaie, langzaam brandende slak die extra reissnelheid geeft.",
@@ -991,7 +991,7 @@ export const nl_NL: EnTranslations = {
       "desc_shadowjump_toad": "Een enorme, standvastige reuzenpad, getraind in bliksemsnelle schaduwsprongen die elk terrein overbruggen.",
       "desc_stormfeather_griffin": "Een koninklijke stormgriffioen die met runenbeslagen klauwen over de grond sluipt, vleugels opgevouwen.",
       "desc_thunderstrut_gobbler": "Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk.",
-      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
+      "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten."
     },
     "mountTraining": {
       "mountPrompt": "Druk op {key} om op de trainings-Moedros te stijgen.",
@@ -1300,48 +1300,48 @@ export const nl_NL: EnTranslations = {
       }
     },
     "auraOverlay": {
-      "title": "Auras",
-      "currentClass": "Current class: {class}",
-      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
-      "noProcs": "No supported proc is available for this character.",
-      "enabled": "Show Aura",
-      "icon": "Spell Icon",
-      "arcs": "Side Crescents",
-      "groundRing": "Ground Ring",
-      "groundRingSpellOrder": "Ground Ring: Spell Order",
-      "crescentsSpellOrder": "Side Crescents: Spell Order",
-      "size": "Size",
-      "iconSize": "Icon Size",
-      "crescentBlockSize": "Crescent Block Size",
-      "groundRingBlockSize": "Ground Ring Block Size",
-      "opacity": "Opacity",
-      "color": "Color",
-      "allOn": "All On",
-      "allOff": "All Off",
-      "reposition": "Setup Positions",
-      "positioning": "Positioning: {aura}",
+      "title": "Aura’s",
+      "currentClass": "Huidige klasse: {class}",
+      "previewHint": "Gebruik Posities instellen om een aura te verplaatsen zonder het menu te bedekken.",
+      "noProcs": "Er is geen ondersteunde proc beschikbaar voor dit personage.",
+      "enabled": "Aura tonen",
+      "icon": "Spreukpictogram",
+      "arcs": "Zijhalvemanen",
+      "groundRing": "Grondring",
+      "groundRingSpellOrder": "Grondring: spreukvolgorde",
+      "crescentsSpellOrder": "Zijhalvemanen: spreukvolgorde",
+      "size": "Grootte",
+      "iconSize": "Pictogramgrootte",
+      "crescentBlockSize": "Blokgrootte halvemaan",
+      "groundRingBlockSize": "Blokgrootte grondring",
+      "opacity": "Dekking",
+      "color": "Kleur",
+      "allOn": "Alles aan",
+      "allOff": "Alles uit",
+      "reposition": "Posities instellen",
+      "positioning": "Positioneren: {aura}",
       "selectAura": "Aura",
-      "done": "Done",
-      "moveLeft": "Move Left",
-      "moveUp": "Move Up",
-      "moveDown": "Move Down",
-      "moveRight": "Move Right",
-      "moveEarlier": "Move spell inward",
-      "moveLater": "Move spell outward",
-      "screenPosition": "Screen Position",
-      "spellOrder": "Spell Order",
-      "reset": "Reset Position",
-      "spellPosition": "Spell order {position} / {count}",
+      "done": "Klaar",
+      "moveLeft": "Naar links verplaatsen",
+      "moveUp": "Omhoog verplaatsen",
+      "moveDown": "Omlaag verplaatsen",
+      "moveRight": "Naar rechts verplaatsen",
+      "moveEarlier": "Spreuk naar binnen verplaatsen",
+      "moveLater": "Spreuk naar buiten verplaatsen",
+      "screenPosition": "Schermpositie",
+      "spellOrder": "Spreukvolgorde",
+      "reset": "Positie resetten",
+      "spellPosition": "Spreukvolgorde {position} / {count}",
       "procs": {
-        "revenge": "Revenge!",
-        "battleTrance": "Battle Trance",
-        "overpowerCharge": "Redhand Empowerment",
-        "suddenDeath": "Sudden Death",
-        "victoryRush": "Victory Rush",
-        "enrage": "Mayhem: Enraged",
-        "heatingUp": "Heating Up",
-        "arcaneCharge": "Arcane Charges",
-        "aetherRush": "Aether Rush"
+        "revenge": "Wraak!",
+        "battleTrance": "Gevechtstrance",
+        "overpowerCharge": "Roodhand-versterking",
+        "suddenDeath": "Plotse Dood",
+        "victoryRush": "Overwinningsroes",
+        "enrage": "Amok: Razend",
+        "heatingUp": "Opwarmen",
+        "arcaneCharge": "Arcane ladingen",
+        "aetherRush": "Aetherstormloop"
       }
     },
     "playerCard": {
@@ -2149,11 +2149,11 @@ export const nl_NL: EnTranslations = {
     },
     "epic": {
       "title": "Epic",
-      "link": "Link Epic",
-      "unlink": "Unlink Epic",
-      "linked": "Linked to Epic account {id}",
-      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
-      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+      "link": "Epic koppelen",
+      "unlink": "Epic ontkoppelen",
+      "linked": "Gekoppeld aan Epic-account {id}",
+      "benefits": "Koppel je Epic-account via de Epic-desktop-app om de daden die je verdient te spiegelen naar Epic-prestaties.",
+      "noProof": "Epic heeft geen koppelingsbewijs geleverd. Start via de Epic Games Store en probeer het opnieuw."
     },
     "mailbox": {
       "title": "Brievenbus",
@@ -3007,12 +3007,12 @@ export const nl_NL: EnTranslations = {
       "upstream": "Steam reageerde niet. Probeer het zo meteen opnieuw."
     },
     "epic": {
-      "disabled": "Epic linking is not available right now.",
-      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
-      "banned": "That Epic account cannot be linked.",
-      "already_linked": "Your account already has a linked Epic account.",
-      "account_taken": "That Epic account is already linked to another account.",
-      "upstream": "Epic did not respond. Try again in a moment."
+      "disabled": "Epic-koppeling is momenteel niet beschikbaar.",
+      "invalid_token": "Epic kon dit koppelingsverzoek niet verifiëren. Probeer het opnieuw vanuit de desktop-app.",
+      "banned": "Dat Epic-account kan niet worden gekoppeld.",
+      "already_linked": "Je account heeft al een gekoppeld Epic-account.",
+      "account_taken": "Dat Epic-account is al gekoppeld aan een ander account.",
+      "upstream": "Epic reageerde niet. Probeer het zo meteen opnieuw."
     },
     "wallet": {
       "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw."
@@ -6270,15 +6270,15 @@ export const nl_NL: EnTranslations = {
       "graphicsPresetMedium": "Gemiddeld",
       "graphicsPresetHigh": "Hoog",
       "graphicsPresetUltra": "Ultra",
-      "graphicsPresetInsane": "Insane",
+      "graphicsPresetInsane": "Extreem",
       "graphicsPresetAdvanced": "Geavanceerd",
       "terrainDetail": "Terreindetail",
       "foliageDensity": "Bladerdichtheid",
       "effectsQuality": "Effecten en belichting",
       "shadowQuality": "Schaduwkwaliteit",
-      "surfaceDetail": "Surface Detail",
-      "surfaceDetailBasic": "Basic",
-      "surfaceDetailFull": "Full",
+      "surfaceDetail": "Oppervlaktedetail",
+      "surfaceDetailBasic": "Basis",
+      "surfaceDetailFull": "Volledig",
       "terrainLow": "Laag",
       "terrainHigh": "Hoog",
       "touchOpacity": "Doorzichtigheid aanraakbediening",
@@ -7315,7 +7315,7 @@ export const nl_NL: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Grotere onzichtbaarheid",
-        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
+        "description": "Verdwijn 20 sec. en verwijder 2 effecten met schade over tijd. Wanneer de onzichtbaarheid eindigt, krijg je 2 sec. lang 90% minder schade. (magiërstalent)"
       },
       "hot_streak": {
         "name": "Hete reeks",
@@ -9835,7 +9835,7 @@ export const nl_NL: EnTranslations = {
         "name": "Zegel van de Laatste Burcht"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Ignition Key: Terrorspark Groundshaker"
+        "name": "Contactsleutel: Schrikvonk, de Grondschudder"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

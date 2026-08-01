@@ -924,21 +924,21 @@ export const id_ID: EnTranslations = {
       "regroup": "Gabungkan kembali {meter}"
     },
     "targetAuras": {
-      "title": "Target Auras",
-      "keybindLabel": "Target Buffs and Debuffs",
-      "all": "All",
-      "debuffs": "Debuffs",
-      "buffs": "Buffs",
-      "unlock": "Move target aura window",
-      "lock": "Lock target aura window",
-      "configureRows": "Configure target auras",
-      "fewerRows": "Prefer fewer aura rows",
-      "moreRows": "Prefer more aura rows",
-      "visibleRows": "Preferred aura rows: {count}",
-      "showSources": "Show aura sources",
-      "hideSources": "Hide aura sources",
-      "ownAura": "Your aura",
-      "opacity": "Aura opacity: {percent}"
+      "title": "Aura Target",
+      "keybindLabel": "Buff dan Debuff Target",
+      "all": "Semua",
+      "debuffs": "Debuff",
+      "buffs": "Buff",
+      "unlock": "Pindahkan jendela aura target",
+      "lock": "Kunci jendela aura target",
+      "configureRows": "Atur aura target",
+      "fewerRows": "Utamakan lebih sedikit baris aura",
+      "moreRows": "Utamakan lebih banyak baris aura",
+      "visibleRows": "Baris aura yang diinginkan: {count}",
+      "showSources": "Tampilkan sumber aura",
+      "hideSources": "Sembunyikan sumber aura",
+      "ownAura": "Aura Anda",
+      "opacity": "Opasitas aura: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Peliharaan sudah dalam kondisi darah penuh",
@@ -983,7 +983,7 @@ export const id_ID: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage Sang Kodok Lompat-Bayangan",
       "name_stormfeather_griffin": "Stormfeather Penjelajah Langit",
       "name_thunderstrut_gobbler": "Thunderstrut Sang Kalkun Agung",
-      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
+      "name_terrorspark_groundshaker": "Percik Teror, Pengguncang Bumi",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_stalkglider_snail": "Siput ulet berenergi tahan lama yang memberikan kecepatan perjalanan tambahan.",
@@ -991,7 +991,7 @@ export const id_ID: EnTranslations = {
       "desc_shadowjump_toad": "Kodok raksasa masif berpijakan mantap, terlatih dalam lompatan bayangan secepat kilat yang mampu menjangkau medan apa pun.",
       "desc_stormfeather_griffin": "Griffin badai yang anggun, melangkah di tanah dengan cakar bersepatu rune, sayap terlipat rapat.",
       "desc_thunderstrut_gobbler": "Kalkun raksasa tetasan badai yang melenggak-lenggok turun dari Puncak yang Terjaga, ekornya terkembang bagai awan guntur.",
-      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
+      "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut."
     },
     "mountTraining": {
       "mountPrompt": "Tekan {key} untuk menaiki Valorsteed latihan.",
@@ -1300,48 +1300,48 @@ export const id_ID: EnTranslations = {
       }
     },
     "auraOverlay": {
-      "title": "Auras",
-      "currentClass": "Current class: {class}",
-      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
-      "noProcs": "No supported proc is available for this character.",
-      "enabled": "Show Aura",
-      "icon": "Spell Icon",
-      "arcs": "Side Crescents",
-      "groundRing": "Ground Ring",
-      "groundRingSpellOrder": "Ground Ring: Spell Order",
-      "crescentsSpellOrder": "Side Crescents: Spell Order",
-      "size": "Size",
-      "iconSize": "Icon Size",
-      "crescentBlockSize": "Crescent Block Size",
-      "groundRingBlockSize": "Ground Ring Block Size",
-      "opacity": "Opacity",
-      "color": "Color",
-      "allOn": "All On",
-      "allOff": "All Off",
-      "reposition": "Setup Positions",
-      "positioning": "Positioning: {aura}",
+      "title": "Aura",
+      "currentClass": "Kelas saat ini: {class}",
+      "previewHint": "Gunakan Atur posisi untuk memindahkan aura tanpa menutupi menu.",
+      "noProcs": "Tidak ada proc yang didukung untuk karakter ini.",
+      "enabled": "Tampilkan aura",
+      "icon": "Ikon mantra",
+      "arcs": "Bulan sabit samping",
+      "groundRing": "Cincin tanah",
+      "groundRingSpellOrder": "Cincin tanah: urutan mantra",
+      "crescentsSpellOrder": "Bulan sabit samping: urutan mantra",
+      "size": "Ukuran",
+      "iconSize": "Ukuran ikon",
+      "crescentBlockSize": "Ukuran blok bulan sabit",
+      "groundRingBlockSize": "Ukuran blok cincin tanah",
+      "opacity": "Opasitas",
+      "color": "Warna",
+      "allOn": "Nyalakan semua",
+      "allOff": "Matikan semua",
+      "reposition": "Atur posisi",
+      "positioning": "Penempatan: {aura}",
       "selectAura": "Aura",
-      "done": "Done",
-      "moveLeft": "Move Left",
-      "moveUp": "Move Up",
-      "moveDown": "Move Down",
-      "moveRight": "Move Right",
-      "moveEarlier": "Move spell inward",
-      "moveLater": "Move spell outward",
-      "screenPosition": "Screen Position",
-      "spellOrder": "Spell Order",
-      "reset": "Reset Position",
-      "spellPosition": "Spell order {position} / {count}",
+      "done": "Selesai",
+      "moveLeft": "Pindah ke kiri",
+      "moveUp": "Pindah ke atas",
+      "moveDown": "Pindah ke bawah",
+      "moveRight": "Pindah ke kanan",
+      "moveEarlier": "Pindahkan mantra ke dalam",
+      "moveLater": "Pindahkan mantra ke luar",
+      "screenPosition": "Posisi layar",
+      "spellOrder": "Urutan mantra",
+      "reset": "Atur Ulang Posisi",
+      "spellPosition": "Urutan mantra {position} / {count}",
       "procs": {
-        "revenge": "Revenge!",
-        "battleTrance": "Battle Trance",
-        "overpowerCharge": "Redhand Empowerment",
-        "suddenDeath": "Sudden Death",
-        "victoryRush": "Victory Rush",
-        "enrage": "Mayhem: Enraged",
-        "heatingUp": "Heating Up",
-        "arcaneCharge": "Arcane Charges",
-        "aetherRush": "Aether Rush"
+        "revenge": "Balas Dendam!",
+        "battleTrance": "Kesurupan Pertempuran",
+        "overpowerCharge": "Penguatan Tangan Merah",
+        "suddenDeath": "Kematian Mendadak",
+        "victoryRush": "Terjangan Kemenangan",
+        "enrage": "Huru-hara: Murka",
+        "heatingUp": "Memanas",
+        "arcaneCharge": "Muatan Arkan",
+        "aetherRush": "Terjangan Aether"
       }
     },
     "playerCard": {
@@ -2149,11 +2149,11 @@ export const id_ID: EnTranslations = {
     },
     "epic": {
       "title": "Epic",
-      "link": "Link Epic",
-      "unlink": "Unlink Epic",
-      "linked": "Linked to Epic account {id}",
-      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
-      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+      "link": "Tautkan Epic",
+      "unlink": "Putuskan tautan Epic",
+      "linked": "Tertaut ke akun Epic {id}",
+      "benefits": "Tautkan akun Epic Anda dari aplikasi desktop Epic agar jasa yang Anda peroleh tercermin sebagai pencapaian Epic.",
+      "noProof": "Epic tidak memberikan bukti penautan. Jalankan dari Epic Games Store, lalu coba lagi."
     },
     "mailbox": {
       "title": "Kotak Surat",
@@ -3007,12 +3007,12 @@ export const id_ID: EnTranslations = {
       "upstream": "Steam tidak merespons. Coba lagi dalam beberapa saat."
     },
     "epic": {
-      "disabled": "Epic linking is not available right now.",
-      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
-      "banned": "That Epic account cannot be linked.",
-      "already_linked": "Your account already has a linked Epic account.",
-      "account_taken": "That Epic account is already linked to another account.",
-      "upstream": "Epic did not respond. Try again in a moment."
+      "disabled": "Penautan Epic sedang tidak tersedia.",
+      "invalid_token": "Epic tidak dapat memverifikasi permintaan penautan ini. Coba lagi dari aplikasi desktop.",
+      "banned": "Akun Epic tersebut tidak dapat ditautkan.",
+      "already_linked": "Akun Anda sudah memiliki akun Epic yang tertaut.",
+      "account_taken": "Akun Epic tersebut sudah tertaut ke akun lain.",
+      "upstream": "Epic tidak merespons. Coba lagi sebentar lagi."
     },
     "wallet": {
       "handoff_invalid": "Otorisasi dompet itu telah kedaluwarsa atau tidak dapat diverifikasi. Coba lagi."
@@ -6270,15 +6270,15 @@ export const id_ID: EnTranslations = {
       "graphicsPresetMedium": "Sedang",
       "graphicsPresetHigh": "Tinggi",
       "graphicsPresetUltra": "Ultra",
-      "graphicsPresetInsane": "Insane",
+      "graphicsPresetInsane": "Ekstrem",
       "graphicsPresetAdvanced": "Lanjutan",
       "terrainDetail": "Detail Medan",
       "foliageDensity": "Kerapatan Dedaunan",
       "effectsQuality": "Efek & Pencahayaan",
       "shadowQuality": "Kualitas Bayangan",
-      "surfaceDetail": "Surface Detail",
-      "surfaceDetailBasic": "Basic",
-      "surfaceDetailFull": "Full",
+      "surfaceDetail": "Detail Permukaan",
+      "surfaceDetailBasic": "Dasar",
+      "surfaceDetailFull": "Penuh",
       "terrainLow": "Rendah",
       "terrainHigh": "Tinggi",
       "touchOpacity": "Keburaman Kontrol Sentuh",
@@ -7315,7 +7315,7 @@ export const id_ID: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Ketaklihatan Agung",
-        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
+        "description": "Menghilang selama 20 dtk dan menghapus 2 efek kerusakan seiring waktu. Saat ketaklihatan berakhir, kamu menerima 90% lebih sedikit kerusakan selama 2 dtk. (talenta mage)"
       },
       "hot_streak": {
         "name": "Rentetan Membara",
@@ -9835,7 +9835,7 @@ export const id_ID: EnTranslations = {
         "name": "Cincin Stempel Last Keep"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Ignition Key: Terrorspark Groundshaker"
+        "name": "Kunci Kontak: Percik Teror, Pengguncang Bumi"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

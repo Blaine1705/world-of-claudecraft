@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.targetAuras.all': '全部',
   'hudChrome.crafting.identity.ceilingRare': '稀有品质上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
