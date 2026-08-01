@@ -1,42 +1,41 @@
-# Epic Games Store integration packet
+# Epic Games Store integration
 
-Ship World of ClaudeCraft on the Epic Games Store as a third desktop distribution
-channel (beside website downloads and Steam), with the same merge-safe, env-gated
-shape as the existing Steam link + Book of Deeds achievement mirror.
+World of ClaudeCraft ships on the Epic Games Store as a third desktop
+distribution channel (beside website downloads and Steam), with the same
+merge-safe, env-gated shape as the Steam link and Book of Deeds achievement
+mirror.
 
-Branch: `feature/epic-games-integration` off `release/v0.33.0`.
-Worktree: `/home/fernandoramirez/Documents/woc-epic-games-integration`.
+The implementation is **dark by default**: `EPIC_ENABLED` must be exactly `1`
+to light server routes, status advert, mirror, and client link UI. Default CI
+and `npm test` need no Epic secrets.
 
-## Reading order
+## Maintainer docs (keep these)
 
-1. [research-brief.md](research-brief.md): web + codebase research, options, risks.
-2. [implementation-plan.md](implementation-plan.md): workflow, review matrix, phase summary.
-3. [state.md](state.md): locked decisions (D1+), validation matrix, key paths. Read first every session.
-4. [progress.md](progress.md): phase status and deliverable checklists.
-5. [qa-checklist.md](qa-checklist.md): whole-feature integration matrix at packet close.
-
-## Phases
-
-| Phase | File |
+| Doc | Use |
 |---|---|
-| 1. Desktop channel plumbing | [phase-01-channel-plumbing.md](phase-01-channel-plumbing.md) |
-| 2. Epic packaging channel | [phase-02-packaging-channel.md](phase-02-packaging-channel.md) |
-| 3. Server dark surface | [phase-03-server-dark-surface.md](phase-03-server-dark-surface.md) |
-| 4. Desktop Epic shell | [phase-04-desktop-epic-shell.md](phase-04-desktop-epic-shell.md) |
-| 5. Server link verification | [phase-05-server-link-verification.md](phase-05-server-link-verification.md) |
-| 6. Achievement mirror | [phase-06-achievement-mirror.md](phase-06-achievement-mirror.md) |
-| 7. Client UI + i18n | [phase-07-client-ui-i18n.md](phase-07-client-ui-i18n.md) |
-| 8. Ops docs + BPT runbook | [phase-08-ops-docs-bpt.md](phase-08-ops-docs-bpt.md) |
+| [state.md](state.md) | Locked product decisions (D1+), env keys, routes, code anchors |
+| [portal-checklist.md](portal-checklist.md) | Epic Developer Portal sequence after org access |
+| [bpt-upload.md](bpt-upload.md) | BuildPatchTool upload runbook + fail-closed helper |
+| [docs/desktop-release.md](../desktop-release.md) | Epic packaging channel (build env, `release-epic/`) |
+| [DEPLOY.md](../../DEPLOY.md) | Server `EPIC_*` runtime keys and dark default |
 
-Each phase file embeds a ready starter prompt. Run one phase per focused session.
-Epic org / Developer Portal setup proceeds in parallel and is not a blocker for
-phases 1 to 7 (D3, D26).
+## Ops follow-up
+
+Code can merge while the surface stays dark. Live portal setup, first BPT
+upload, Dev sandbox smoke, store submission, and production lighting are tracked
+in:
+
+- **https://github.com/levy-street/world-of-claudecraft/issues/2708**
+
+Open items called out there include EOS C SDK vendor path (O3), Mac artifact
+naming (O4), and store support URL (O5).
 
 ## Non-goals (v1)
 
-- Login with Epic
+- Login with Epic (identity stays email + Discord)
 - Linux EGS depot
 - Epic friends / social overlay product surface
 - In-app Epic checkout or Web Shop
-- Enabling electron-updater on Epic builds
-- Requiring Epic secrets for website/steam/CI default paths
+- electron-updater on Epic builds (BPT owns patches)
+- Requiring Epic secrets for website / steam / default CI paths
+- Turning on `EPIC_ENABLED` in production as the default

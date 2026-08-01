@@ -5,10 +5,10 @@ uploads loose binaries with Epic's BuildPatchTool. Companion to
 `docs/desktop-release.md` (Epic section) and
 `docs/epic-games-integration/portal-checklist.md`.
 
-**Status for this packet:** product submission may still be in flight. You
-**cannot** complete a real BPT upload until the Epic organization, product,
-artifacts, and BPT credentials exist. Docs and the optional script land now so
-the steps are mechanical when access arrives. No secrets belong in the repo.
+**Status:** product submission may still be in flight. You **cannot** complete a
+real BPT upload until the Epic organization, product, artifacts, and BPT
+credentials exist (tracked in #2708). Docs and the optional script make the
+steps mechanical when access arrives. No secrets belong in the repo.
 
 Official source of truth for BPT flags and portal UI:
 

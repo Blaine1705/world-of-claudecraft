@@ -5,10 +5,9 @@ belong in this file or in git. Product submission may still be in flight when
 this checklist is read; it is the order of operations once the org exists, not
 a claim that every step is already finished.
 
-Code on `feature/epic-games-integration` stays **merge-safe and dark** without
-portal credentials (`EPIC_ENABLED` off; routes answer `epic.disabled`). Store
-submission and live BPT upload are **ops**, not a code PR requirement, as long
-as the feature remains dark.
+Server and client code stays **merge-safe and dark** without portal credentials
+(`EPIC_ENABLED` off; routes answer `epic.disabled`). Store submission and live
+BPT upload are **ops** (issue #2708), not a dark-code merge requirement.
 
 Stable concepts only (product, sandbox, client, artifact, offer, IARC). Prefer
 current Epic Developer Portal docs when UI labels move:
@@ -74,7 +73,7 @@ Checklist:
 - [ ] Register each mapped `ACH_*` id in the Epic portal achievement set for this product
 - [ ] Hidden deeds in the map (`hid_*` -> `ACH_*`) registered as hidden achievements
 - [ ] Do not invent alternate spellings; portal id must match the map string exactly
-- [ ] Art icons and XP values are maintainer portal work (out of scope for the code packet)
+- [ ] Art icons and XP values are maintainer portal work (ops; tracked in #2708)
 - [ ] After portal registration, smoke: link a Dev account, unlock a mapped deed, confirm Epic shows the achievement
 
 Full launch set is the map export (on the order of 75 entries; hard cap 100).
@@ -117,7 +116,7 @@ With `EPIC_ENABLED` unset or not exactly `1`: every `/api/epic/*` answers
 ## 9. Store review and Live
 
 Submit for store review **only after** Dev sandbox smoke of packaging + (if
-lit) link/mirror and UI (Phases 6 to 7 behavior) looks good.
+lit) link/mirror and client UI looks good.
 
 - [ ] Store page complete, IARC complete, Dev binary attached
 - [ ] Submit for Epic store review per current Self-Publishing / SPT process

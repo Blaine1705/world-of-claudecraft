@@ -17,10 +17,13 @@ inside the app, and "Continue with Discord" opens the player's default browser o
 `worldofclaudecraft://desktop-login` deep link. There is no Steam or Epic sign-in on
 any channel; on the Steam channel the shell's one Steam surface is the account-link
 ticket behind the Book of Deeds achievement mirror (`electron/steam.cjs`). Epic
-account-link and achievement mirror surfaces land with the Epic Games Store
-integration packet (`docs/epic-games-integration/`). Packaging, BuildPatchTool
-upload, portal checklist, and server env keys are in this runbook (Epic section
-below), `docs/epic-games-integration/bpt-upload.md`, and `DEPLOY.md`.
+account-link and achievement mirror surfaces live under
+`docs/epic-games-integration/` (dark by default; see `DEPLOY.md`). Packaging,
+BuildPatchTool upload, portal checklist, and server env keys are in this runbook
+(Epic section below), `docs/epic-games-integration/bpt-upload.md`,
+`docs/epic-games-integration/portal-checklist.md`, and `DEPLOY.md`. Live portal
+and store work is tracked in
+https://github.com/levy-street/world-of-claudecraft/issues/2708.
 
 The build stamps `wocDesktop` into the packaged `package.json` (electron-builder
 `extraMetadata`, wired in `scripts/electron-build.mjs` +
