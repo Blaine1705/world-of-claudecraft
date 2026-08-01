@@ -511,7 +511,7 @@ describe('loadConfig cadence knobs (D13)', () => {
     // reads. The literals stay pinned above; this pins the SEAM.
     const source = readFileSync(new URL('../bot/config.ts', import.meta.url), 'utf8');
     expect(source).toMatch(
-      /import \{[^}]*OUTBOX_IDLE_MS[^}]*OUTBOX_POLL_MS[^}]*PRESENCE_DEBOUNCE_MS[^}]*ROLE_SYNC_INTERVAL_MS[^}]*\} from '\.\/cadence'/,
+      /import \{[^}]*OUTBOX_IDLE_MS[^}]*OUTBOX_POLL_MS[^}]*PRESENCE_DEBOUNCE_MS[^}]*ROLE_SYNC_INTERVAL_MS[^}]*SWEEP_SLICE_MS[^}]*\} from '\.\/cadence'/,
     );
     // The slice SIZE is not a cadence, so it comes from the module that spends
     // it. Same seam, different owner, and it has to be pinned separately or an

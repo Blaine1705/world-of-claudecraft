@@ -129,8 +129,11 @@ armed only after the previous run SETTLES, delays are jittered so loops armed in
 not stay phase-locked, and repeated event kicks coalesce into exactly one follow-up run.
 - Role sync (`role-sync`): one paced SLICE of the linked-member set per run, every
   `cfg.sweepSliceMs` (3 s) while a pass has ids left, decaying to `cfg.roleSyncIntervalMs`
-  (5 min) between passes, which is the pass interval itself. `linked_sweep.ts` decides
-  WHICH members, the scheduler decides WHEN. Kicked by `GUILD_CREATE` (preceded by
+  (5 min) between passes, which is the pass interval itself. The window is a FLOOR, not a
+  deadline: a pass opens at the first wake at or after it, and the decay walk from 3 s
+  doubles to the 300 s ceiling through wakes at 3, 9, 21, 45, 93, 189, then 381 s, so the
+  default effective gap between passes is about 6.4 minutes (an event kick bypasses it).
+  `linked_sweep.ts` decides WHICH members, the scheduler decides WHEN. Kicked by `GUILD_CREATE` (preceded by
   `requestPass()`, because a kick alone only wakes the task early and it would find the
   pass window still open), by a COMPLETE roster seed, and by the outbox link-change feed
   when it moved something.
@@ -157,6 +160,16 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   a winners day is marked back on the server ONLY after its post landed, so a failed post
   retries (at-least-once, duplicates accepted); and the poll runs on its own much longer
   deadline (`cfg.outboxTimeoutMs`, 70 s), which must stay ABOVE the server's read deadline.
+  didWork is split by stream class: the three DRAINED streams count by carriage, the
+  re-served winners read counts by successful announce, so an unpostable winners day (unset
+  channel, durable 403) cannot pin the loop at the active cadence forever.
+  Two honest limits of the consolidation, both deliberate: with a stream's channel id UNSET,
+  drained relay/activity items are dropped after a once-per-channel notice (the pre-outbox
+  pollers checked the channel BEFORE draining and left items queued; the drain is now
+  all-streams-at-once, so per-stream pre-checks are impossible), and while the breaker is
+  open the skipped drain also delays link-change consumption, so flair can lag until the
+  breaker closes or, if the Phase 5 ladder evicted the items, until the hourly full-resync
+  reconciliation heals it (about one hour worst case).
 - Daily engagement grant: first message or voice-join per member per day, deduped
   bot-side AND server-side (grant dedupe key), so it is exactly-once.
 - The adaptive active-to-idle backoff has two consumers: the outbox poll (D1: 3 s active

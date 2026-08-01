@@ -699,7 +699,25 @@ async function main(): Promise<void> {
    */
   const completeSeed = async (): Promise<void> => {
     if (rosterComplete(seedSessionIds.size, memberTotal)) {
-      for (const id of departedFromSeed(memberRoles.keys(), seedSessionIds)) {
+      // The diff runs over the UNION of every per-member cache, not just
+      // memberRoles: a presence or voice event can seed onlineUsers or
+      // voiceStates with an id that never got a member upsert, and an id only
+      // ever diffed against memberRoles would ghost there forever. Any live
+      // member is in seedSessionIds, so over-inclusion evicts nothing real.
+      // (dailyActive.seen is the one deliberate exclusion: it empties itself on
+      // the day rollover, and the server-side grant dedupe key makes a rejoin
+      // grant a no-op, so evicting it here would add risk for no leak.)
+      const cachedIds = new Set<string>([
+        ...memberRoles.keys(),
+        ...memberNames.keys(),
+        ...memberJoined.keys(),
+        ...onlineUsers,
+        ...voiceStates.keys(),
+        ...nickCaches.memberNicks.keys(),
+        ...nickCaches.lastWrittenNick.keys(),
+        ...lastPushedMeta.keys(),
+      ]);
+      for (const id of departedFromSeed(cachedIds, seedSessionIds)) {
         memberNames.delete(id);
         memberRoles.delete(id);
         memberJoined.delete(id);

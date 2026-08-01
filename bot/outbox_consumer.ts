@@ -151,10 +151,18 @@ function callFailed(result: unknown): boolean {
  *
  * The return value is the scheduler's didWork signal, so it decides the cadence:
  * true holds the fast active interval while a backlog exists, false lets each
- * empty run decay the delay toward idle. It is computed from what the DRAIN
- * carried, not from what was successfully posted: a poll that drained fifty
- * relay items and had every post refused still found work, and backing off then
- * would be exactly backwards.
+ * empty run decay the delay toward idle. The signal is split by stream class:
+ *
+ * - The three DRAINED streams (relay, activity, link changes) count by
+ *   CARRIAGE, not post outcome: the drain consumed them, so fifty relay items
+ *   with every post refused still means a backlog existed, and backing off
+ *   then would be exactly backwards.
+ * - The winners stream counts by PROGRESS (a day successfully announced). It is
+ *   a re-served READ, not a drained queue: the server answers the same
+ *   unannounced day on every poll until a mark lands, so counting it by
+ *   carriage would let a day that can never be posted (an unset channel, a
+ *   durable 403) hold the fast cadence forever, for every stream at once now
+ *   that this is the one loop. Found by the Phase 6 QA gate.
  */
 export async function runOutboxPoll(io: OutboxIo): Promise<boolean> {
   // THE BREAKER GATE, and it is the reason this returns before the drain rather
@@ -181,11 +189,7 @@ export async function runOutboxPoll(io: OutboxIo): Promise<boolean> {
   const activityItems = listOf(streams.activity?.items);
   const winnerDays = listOf(streams.winners?.days);
   const linkChanges = listOf(streams.linkChanges?.items);
-  const didWork =
-    relayItems.length > 0 ||
-    activityItems.length > 0 ||
-    winnerDays.length > 0 ||
-    linkChanges.length > 0;
+  const consumedWork = relayItems.length > 0 || activityItems.length > 0 || linkChanges.length > 0;
 
   const report = (error: unknown, where: string): void => {
     // The unset-channel case has already been reported once by the factory;
@@ -217,11 +221,16 @@ export async function runOutboxPoll(io: OutboxIo): Promise<boolean> {
   // unannounced server-side until the mark lands, which is what makes the stream
   // at-least-once: a failed post leaves it to be re-served next poll. Marking
   // first would make it at-most-once, and the day nobody saw would be gone.
+  let winnersProgress = false;
   for (const day of winnerDays) {
     let announced = false;
     try {
       await io.postWinnersDay(day);
       announced = true;
+      // Progress is the ANNOUNCE, whatever the mark below does: a posted day is
+      // real work even if it will be re-served, while a day that cannot post at
+      // all must not hold the cadence (see the didWork split above).
+      winnersProgress = true;
     } catch (error) {
       report(error, 'winners');
     }
@@ -247,5 +256,5 @@ export async function runOutboxPoll(io: OutboxIo): Promise<boolean> {
   // Last, and outside any catch: it is a pure in-memory belief update over the
   // sweep, so it cannot fail, and it runs whatever the posts above did.
   io.applyLinkChanges(linkChanges);
-  return didWork;
+  return consumedWork || winnersProgress;
 }

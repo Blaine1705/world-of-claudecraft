@@ -31,7 +31,6 @@ vi.mock('../server/woc_balance', () => ({
 }));
 
 import {
-  addRewardDays,
   currentDailyRewardDay,
   DAILY_REWARD_WINNERS_TTL_MS,
   type DailyRewardRuntimeConfig,

@@ -350,6 +350,33 @@ describe('flex-batch answers', () => {
     const second = sweep.applyFlexBatchResult([A], authoritativeAnswer([A], [A]));
     expect(second.metaStale).toEqual([]);
   });
+
+  it('an unlink raced by its own in-flight slice heals through the meta push', () => {
+    // The documented staleness (Phase 6 QA): the slice holding A is already in
+    // flight when the feed unlinks A, so the stale answer's positive evidence
+    // re-adds them. Every leg of the heal is asserted by value, because the
+    // heal is the reason the staleness is acceptable at all.
+    const sweep = seeded([A, B]);
+    const slice = sweep.nextSlice(0, SWEEP_SLICE_MAX, 1000);
+    expect([...(slice?.ids ?? [])].sort()).toEqual([A, B].sort());
+    // The feed unlinks A while the slice's answer is still in flight.
+    const feed = sweep.applyLinkChangeItems([item(A, ['unlink'])], anyMember);
+    expect(feed.removed).toEqual([A]);
+    expect(sweep.has(A)).toBe(false);
+    expect(sweep.hasNoLinkRow(A)).toBe(true);
+    // The stale answer lands: A is re-added (the staleness), but flagged
+    // metaStale, which is what makes the wiring re-push their meta.
+    const stale = sweep.applyFlexBatchResult([A, B], authoritativeAnswer([A, B], [A, B]));
+    expect(stale.added).toEqual([A]);
+    expect(stale.metaStale).toEqual([A]);
+    expect(sweep.has(A)).toBe(true);
+    // The re-pushed meta answers unapplied (the row really is gone), and the
+    // outcome unlinks them again: healed with no resync and no feed replay.
+    const heal = sweep.applyMetaPushOutcome([A, B], [A]);
+    expect(heal.removed).toEqual([A]);
+    expect(sweep.has(A)).toBe(false);
+    expect(sweep.hasNoLinkRow(A)).toBe(true);
+  });
 });
 
 describe('members-meta linkage signal', () => {

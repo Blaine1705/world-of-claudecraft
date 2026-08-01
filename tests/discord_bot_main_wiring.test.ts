@@ -49,21 +49,28 @@ function mainSource(): string {
  * (tier-roles and special-roles-and-meta both read roleSyncIntervalMs) leaves
  * every assertion in this file green while the wrong sweep runs on each tick.
  */
-const TASKS = [
+const TASKS: readonly { name: string; field: string; idle?: string; run: string }[] = [
   { name: 'presence-push', field: 'presenceDebounceMs', run: 'pushPresence' },
   // The sweep's ACTIVE cadence is the slice interval, not the pass interval: the
   // pass interval is its idleMs, and a registration reading roleSyncIntervalMs
   // as activeMs would collapse one paced pass back into a burst every 5 minutes.
-  { name: 'role-sync', field: 'sweepSliceMs', run: 'runSweepSlice' },
+  //
+  // The `idle` column is load bearing (Phase 6 QA): the registration span
+  // otherwise accepts anything short of the next scheduler.add, so DELETING an
+  // idleMs left every assertion green while the sweep woke every 3 seconds
+  // between passes forever, the storm shape this packet exists to remove.
+  { name: 'role-sync', field: 'sweepSliceMs', idle: 'roleSyncIntervalMs', run: 'runSweepSlice' },
   { name: 'tier-roles', field: 'roleSyncIntervalMs', run: 'refreshTierRoles' },
   // The three separate 3 s pollers (relay, activity, daily-rewards-winners) are
   // one task now. Its run is the tested consumer, which owns the breaker gate,
-  // the per-stream fan-out and the announce-then-mark ordering.
-  { name: 'outbox', field: 'outboxPollMs', run: 'runOutboxPoll' },
+  // the per-stream fan-out and the announce-then-mark ordering. Its idle bound
+  // is the D1 decay ceiling; without the column, dropping it pins the poll at
+  // the active cadence with cfg.outboxIdleMs left as dead config.
+  { name: 'outbox', field: 'outboxPollMs', idle: 'outboxIdleMs', run: 'runOutboxPoll' },
   // The paired task calls the tested helper, which is what receives the refresh
   // and the push; the case below pins which two it is handed.
   { name: 'special-roles-and-meta', field: 'roleSyncIntervalMs', run: 'refreshThenPushMeta' },
-] as const;
+];
 
 /**
  * Every event-driven kick, and exactly how many times it appears.
@@ -113,12 +120,33 @@ describe('bot/main.ts loop wiring', () => {
       // one of the two patterns, because the other one simply runs on into its
       // neighbour and finds the sweep there.
       const within = '((?!scheduler\\.add\\()[\\s\\S])';
+      // A task with an `idle` column must spell BOTH bounds inside the one
+      // cadence object; one without must spell activeMs alone (a stray idleMs
+      // on a task that never earned one would be an unreviewed cadence change).
+      const cadence = task.idle
+        ? `cadence: \\{ activeMs: cfg\\.${task.field}, idleMs: cfg\\.${task.idle} \\}`
+        : `cadence: \\{ activeMs: cfg\\.${task.field} \\}`;
       const pattern = new RegExp(
-        `name: '${task.name}'${within}{0,240}?cadence: \\{ activeMs: cfg\\.${task.field}` +
-          `${within}{0,900}?${task.run}\\(`,
+        `name: '${task.name}'${within}{0,240}?${cadence}${within}{0,900}?${task.run}\\(`,
       );
       expect(source).toMatch(pattern);
     }
+  });
+
+  it('hands the sweep decision its clock, its slice size and its pass interval', () => {
+    // Phase 6 QA: nothing else can guard this call. The sweep-cycle rig mirrors
+    // main.ts rather than importing it (main() runs at module scope), so a
+    // dropped argument is invisible to every behavioral suite: without the
+    // third argument passDue never fires and the periodic pass silently becomes
+    // kick-only; without the second, DISCORD_SWEEP_SLICE_SIZE is inert and the
+    // slice falls back to the module default.
+    const source = mainSource();
+    expect(source).toContain(
+      'linkedSweep.nextSlice(Date.now(), cfg.sweepSliceSize, cfg.roleSyncIntervalMs)',
+    );
+    // Exactly one decision site: a second nextSlice call would be a second
+    // consumer of the cursor, and the slice protocol assumes one.
+    expect((source.match(/linkedSweep\.nextSlice\(/g) ?? []).length).toBe(1);
   });
 
   it('kicks every task the events are supposed to kick, exactly as often', () => {
@@ -316,8 +344,15 @@ describe('bot/main.ts loop wiring', () => {
     // down never fired GUILD_MEMBER_REMOVE, so the seed diff is the only thing
     // that ever drops them. Their per-member maps go, and the diff caches have
     // to go with them or a rejoin is compared against a pre-departure record.
+    // The diff runs over the UNION of the per-member caches (Phase 6 QA): a
+    // presence or voice event can seed onlineUsers or voiceStates with an id
+    // that never got a member upsert, and a diff over memberRoles alone would
+    // ghost it forever, so the union members are pinned here by name.
     expect(source).toMatch(
-      /departedFromSeed\(memberRoles\.keys\(\), seedSessionIds\)[\s\S]{0,400}?forgetMember\(nickCaches, lastPushedMeta, id\)/,
+      /const cachedIds = new Set<string>\(\[[\s\S]{0,400}?memberRoles\.keys\(\)[\s\S]{0,400}?\.\.\.onlineUsers,[\s\S]{0,400}?voiceStates\.keys\(\)[\s\S]{0,400}?\]\)/,
+    );
+    expect(source).toMatch(
+      /departedFromSeed\(cachedIds, seedSessionIds\)[\s\S]{0,400}?forgetMember\(nickCaches, lastPushedMeta, id\)/,
     );
     // Exactly three, so a fourth clearing path added without forgetting the
     // member (or one of these quietly dropped) fails here, not in production.

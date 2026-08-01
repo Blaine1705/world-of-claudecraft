@@ -285,6 +285,11 @@ export class LinkedSweep {
    * and a reconnect storm therefore arms it repeatedly; re-arming would restart
    * the full-roster walk from the beginning each time and turn the storm into a
    * continuous roster rescan, which is the load this phase exists to remove.
+   * The honest limit (Phase 6 QA): the guard covers OVERLAPPING discoveries
+   * only. Reconnects spaced further apart than one walk (about 150 s at the
+   * 5000-member envelope) each run their own; that is one batched request per
+   * slice, still far cheaper than the per-member reads this replaced, and the
+   * walk doubles as the reconnect's linkage heal.
    * Returns whether it armed, so the caller (and a test) can tell.
    */
   armDiscovery(rosterIds: Iterable<string>): boolean {
@@ -355,6 +360,15 @@ export class LinkedSweep {
    * Ids the answer carries that were never asked about are ignored: only what
    * was sent can be reasoned about, and a malformed answer must not be able to
    * inject members into the set.
+   *
+   * One deliberate staleness (Phase 6 QA): an unlink applied while the slice
+   * containing that member was IN FLIGHT is re-added here by the stale answer's
+   * positive evidence. The heal is the noLinkRow memory: the feed's unlink
+   * recorded the id there, so the re-add reports the member in `metaStale`, the
+   * resulting meta push comes back `unapplied` for them, and
+   * applyMetaPushOutcome removes them again, all within the same slice's
+   * follow-through. Pinned by "an unlink raced by its own in-flight slice heals
+   * through the meta push" in the suite.
    */
   applyFlexBatchResult(sentIds: readonly string[], result: FlexBatchLike): FlexBatchSummary {
     const sent = new Set(sentIds);

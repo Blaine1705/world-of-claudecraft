@@ -421,6 +421,55 @@ describe('outbox poll didWork signal', () => {
     expect(await runOutboxPoll(rec.io)).toBe(true);
   });
 
+  it('backs off when the only stream is a winners day that cannot post', async () => {
+    // The winners stream is a re-served READ, not a drained queue: the server
+    // answers the SAME unannounced day on every poll until a mark lands. So a
+    // day that cannot post (an unset channel, a durable 403) must read as no
+    // work, or it pins the whole consolidated loop at the 3 s active cadence
+    // for the life of the process. Found by the Phase 6 QA gate; the unset
+    // daily-rewards channel is the common deployment, not a corner case.
+    const unset = recorder({
+      envelope: envelope({ winners: { days: [winnersDay('2026-07-31')] } }),
+    });
+    unset.io.postWinnersDay = async () => {
+      throw new OutboxChannelUnsetError('dailyRewards');
+    };
+    expect(await runOutboxPoll(unset.io)).toBe(false);
+    // The day was never marked, so the server keeps it; nothing is lost.
+    expect(unset.marks).toEqual([]);
+
+    // Same signal for an ordinary durable failure (a 403 on the channel).
+    const refused = recorder({
+      envelope: envelope({ winners: { days: [winnersDay('2026-07-31')] } }),
+      failWinners: () => true,
+    });
+    expect(await runOutboxPoll(refused.io)).toBe(false);
+    expect(refused.marks).toEqual([]);
+  });
+
+  it('counts an announced winners day as work even when its mark failed', async () => {
+    // Progress is the ANNOUNCE: a posted day is real work (and the re-serve
+    // after a failed mark needs the fast cadence to land the mark promptly).
+    // A drained stream beside it must also still count when the winners day is
+    // the one that failed, so the two signals stay independent.
+    const rec = recorder({
+      envelope: envelope({ winners: { days: [winnersDay('2026-07-31')] } }),
+      markResult: () => null,
+    });
+    expect(await runOutboxPoll(rec.io)).toBe(true);
+    expect(rec.winners.map((d) => d.day)).toEqual(['2026-07-31']);
+
+    const mixed = recorder({
+      envelope: envelope({
+        relay: { items: [relayItem('c9')] },
+        winners: { days: [winnersDay('2026-08-01')] },
+      }),
+      failWinners: () => true,
+    });
+    expect(await runOutboxPoll(mixed.io)).toBe(true);
+    expect(mixed.relay.map((i) => i.commandId)).toEqual(['c9']);
+  });
+
   it('tolerates a payload that omits a stream entirely', async () => {
     // Network input, whatever the types say: an older server build or a proxy
     // that trimmed the body would otherwise throw inside the loop, and by then
