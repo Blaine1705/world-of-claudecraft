@@ -691,10 +691,12 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     expect(dbCode).toContain('db pool: DB_POOL_MAX_CLIENTS=${DB_POOL_MAX_CLIENTS}');
     // biome-ignore lint/suspicious/noTemplateCurlyInString: pins the UNEVALUATED token in raw source
     expect(dbCode).toContain('DB_POOL_CONNECT_TIMEOUT_MS=${DB_POOL_CONNECT_TIMEOUT_MS}');
-    // The realm count comes from REALMS, the directory the launcher exports to
-    // every child (scripts/dev-realms.mjs) and production sets on every realm
-    // process, since pools have no cross-process coordination.
-    expect(dbCode).toContain('process.env.REALMS');
+    // The realm count comes from the PARSED realm directory (REALM_DIRECTORY,
+    // which dedupes names and drops malformed or non-origin REALMS entries),
+    // not raw comma segments, so the warning's arithmetic matches the realm
+    // processes that will actually boot. The env literal itself now lives in
+    // server/realm.ts where the directory is parsed.
+    expect(dbCode).toContain('const configuredRealmCount = REALM_DIRECTORY.length');
     const warnStart = dbCode.indexOf('if (configuredRealmCount * DB_POOL_MAX_CLIENTS >');
     expect(warnStart).toBeGreaterThan(-1);
     const warnBranch = dbCode.slice(warnStart, dbCode.indexOf('\n}', warnStart));
