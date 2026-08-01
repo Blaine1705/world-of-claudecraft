@@ -340,11 +340,14 @@ export const pl_PL: EnTranslations = {
       "menuButton": "Wyzwolenie",
       "help": "Ratunek: /unstuck rozpoczyna nieruchome odliczanie, które przeniesie cię do pobliskiego, osiągalnego bezpiecznego miejsca.",
       "helpAtGraveyard": "Ratunek: /unstuck rozpoczyna nieruchome odliczanie, a następnie wysyła twojego ducha na najbliższy cmentarz. Powrót przez Bladego Strażnika wymaga Opłaty Strażnika.",
+      "helpUnstuckSickness": "Ratunek: /unstuck rozpoczyna nieruchome odliczanie, a następnie przenosi cię na najbliższy cmentarz i wskrzesza, jeśli padłeś. Choroba Wyzwolenia pozostaje na tobie do 5 minut.",
       "started": "Wyzwolenie za {seconds} sekund. Poruszenie się, walka, otrzymanie obrażeń lub rozpoczęcie innej czynności anuluje je.",
       "countdown": "Wyzwolenie: {seconds}",
       "completed": "Przeniesiono do najbliższego osiągalnego bezpiecznego miejsca.",
       "completedAtGraveyard": "Twój duch powrócił na najbliższy cmentarz. Porozmawiaj z Bladym Strażnikiem, aby przyjąć Opłatę Strażnika.",
       "revivedAtGraveyard": "Zostałeś przeniesiony na najbliższy cmentarz i wskrzeszony. Opłata Strażnika ciąży na tobie.",
+      "movedToGraveyard": "Zostałeś przeniesiony na najbliższy cmentarz. Choroba Wyzwolenia ciąży na tobie.",
+      "revivedAtGraveyardUnstuck": "Zostałeś przeniesiony na najbliższy cmentarz i wskrzeszony. Choroba Wyzwolenia ciąży na tobie.",
       "cancelledMoved": "Wyzwolenie anulowane, ponieważ się poruszyłeś.",
       "cancelledDamaged": "Wyzwolenie anulowane, ponieważ otrzymałeś obrażenia.",
       "cancelledCombat": "Wyzwolenie anulowane, ponieważ wszedłeś do walki.",
@@ -885,6 +888,13 @@ export const pl_PL: EnTranslations = {
       "heroicName": "Heroiczny {name}",
       "heroicLocked": "Jesteś przypisany do heroicznego {name}."
     },
+    "riftTracker": {
+      "title": "Szczelina",
+      "floor": "Piętro {current} z {total}",
+      "closesIn": "Zamyka się za {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "Pn",
       "NE": "PnW",
@@ -912,6 +922,23 @@ export const pl_PL: EnTranslations = {
       "dock": "Zadokuj ten licznik z powrotem w oknie liczników",
       "separate": "Odłącz {meter}",
       "regroup": "Zgrupuj {meter} ponownie"
+    },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Zwierzę ma pełne zdrowie",
@@ -956,13 +983,15 @@ export const pl_PL: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Cienioskacząca Ropucha",
       "name_stormfeather_griffin": "Niebosiężny Burzopiór",
       "name_thunderstrut_gobbler": "Grzmotokroczek, Wielki Indyk",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "desc_valorsteed": "Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_grag_bear": "Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_stalkglider_snail": "Krzepki, powoli, lecz niezmordowanie pełznący ślimak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_aether_hover_cycle": "Potężny magitechniczny motocykl zaprojektowany do szybkiego, nisko unoszącego się przemieszczania w walce.",
       "desc_shadowjump_toad": "Ogromna, pewna kroku olbrzymia ropucha, wyszkolona w błyskawicznych, cienistych skokach, które pokonują każdy teren.",
       "desc_stormfeather_griffin": "Dostojny gryf burzy, który skrada się po ziemi na szponach okutych runami, ze złożonymi skrzydłami.",
-      "desc_thunderstrut_gobbler": "Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura."
+      "desc_thunderstrut_gobbler": "Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Naciśnij {key}, aby dosiąść treningowego Rumaka Męstwa.",
@@ -1268,6 +1297,51 @@ export const pl_PL: EnTranslations = {
       "badges": {
         "backgrounded": "W tle",
         "offline": "Offline"
+      }
+    },
+    "auraOverlay": {
+      "title": "Auras",
+      "currentClass": "Current class: {class}",
+      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
+      "noProcs": "No supported proc is available for this character.",
+      "enabled": "Show Aura",
+      "icon": "Spell Icon",
+      "arcs": "Side Crescents",
+      "groundRing": "Ground Ring",
+      "groundRingSpellOrder": "Ground Ring: Spell Order",
+      "crescentsSpellOrder": "Side Crescents: Spell Order",
+      "size": "Size",
+      "iconSize": "Icon Size",
+      "crescentBlockSize": "Crescent Block Size",
+      "groundRingBlockSize": "Ground Ring Block Size",
+      "opacity": "Opacity",
+      "color": "Color",
+      "allOn": "All On",
+      "allOff": "All Off",
+      "reposition": "Setup Positions",
+      "positioning": "Positioning: {aura}",
+      "selectAura": "Aura",
+      "done": "Done",
+      "moveLeft": "Move Left",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "moveRight": "Move Right",
+      "moveEarlier": "Move spell inward",
+      "moveLater": "Move spell outward",
+      "screenPosition": "Screen Position",
+      "spellOrder": "Spell Order",
+      "reset": "Reset Position",
+      "spellPosition": "Spell order {position} / {count}",
+      "procs": {
+        "revenge": "Revenge!",
+        "battleTrance": "Battle Trance",
+        "overpowerCharge": "Redhand Empowerment",
+        "suddenDeath": "Sudden Death",
+        "victoryRush": "Victory Rush",
+        "enrage": "Mayhem: Enraged",
+        "heatingUp": "Heating Up",
+        "arcaneCharge": "Arcane Charges",
+        "aetherRush": "Aether Rush"
       }
     },
     "playerCard": {
@@ -2117,6 +2191,7 @@ export const pl_PL: EnTranslations = {
         "noRecipient": "Nikt o tym imieniu nie ma tu skrzynki pocztowej.",
         "tooManyParcels": "List mieści najwyżej {count} paczek.",
         "noMailQuestItems": "Nie możesz wysyłać pocztą przedmiotów zadań.",
+        "noMailBound": "Ten przedmiot jest przywiązany i nie można go wysłać pocztą.",
         "notEnoughItems": "Nie masz aż tylu do wysłania.",
         "cantAffordPostage": "Nie stać cię na opłatę pocztową.",
         "recipientBoxFull": "Skrzynka odbiorcy jest pełna.",
@@ -2925,6 +3000,9 @@ export const pl_PL: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie."
+    },
+    "ota_updates": {
+      "invalid_input": "Nieprawidłowe dane."
     }
   },
   "guide": {
@@ -3524,14 +3602,6 @@ export const pl_PL: EnTranslations = {
       "reptile": {
         "name": "Gady",
         "desc": "Zimnokrwiste drapieżniki o własnym syczeniu i kłapaniu, odmienne od ciepłokrwistych bestii."
-      },
-      "murloc": {
-        "name": "Rechotopłetwi",
-        "desc": "Rechoczący rybi lud brzegów jeziora i przypływowych sadzawek, chętnie rojący się wokół każdego, kto podejdzie zbyt blisko wody."
-      },
-      "kobold": {
-        "name": "Urwisy",
-        "desc": "Krzątające się padlinożerne stworki i chochliki polan oraz żywopłotów, bardziej uciążliwe niż groźne, dopóki nie zbiorą się w większej liczbie."
       },
       "demon": {
         "name": "Demony",
@@ -6473,10 +6543,12 @@ export const pl_PL: EnTranslations = {
       "arenaQueueTrading": "Zakończ wymianę przed dołączeniem do kolejki.",
       "arenaQueueInstance": "Nie możesz dołączyć do kolejki będąc wewnątrz instancji.",
       "tradeInProgress": "Wymiana już trwa.",
+      "tradeAlreadyTrading": "Ten gracz już prowadzi wymianę.",
       "tradeTooFar": "Cel jest zbyt daleko, by handlować.",
       "tradeExpired": "Prośba o wymianę wygasła.",
       "tradeFailed": "Wymiana nieudana: przedmioty lub pieniądze są już niedostępne.",
-      "tradeBound": "Ten przedmiot jest przywiązany i nie można go wymienić."
+      "tradeBound": "Ten przedmiot jest przywiązany i nie można go wymienić.",
+      "marketListBound": "Ten przedmiot jest przywiązany i nie można go wystawić na sprzedaż."
     },
     "logs": {
       "standUp": "Wstajesz.",
@@ -6832,7 +6904,8 @@ export const pl_PL: EnTranslations = {
       "incomplete": "To zadanie nie jest ukończone.",
       "giverMissing": "Tego zleceniodawcy nie ma w pobliżu.",
       "turnInMissing": "Miejsca oddania tego zadania nie ma w pobliżu.",
-      "tooFar": "Za daleko."
+      "tooFar": "Za daleko.",
+      "escortAway": "Osoba, którą masz eskortować, nie jest teraz na miejscu. Wróci tam wkrótce."
     }
   },
   "itemUi": {
@@ -7220,7 +7293,7 @@ export const pl_PL: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Większa niewidzialność",
-        "description": "Znikasz na 20 sek.: usuwa 2 efekty obrażeń rozłożonych w czasie, a podczas niewidzialności i krótko po niej otrzymujesz o 90% mniej obrażeń. (talent maga)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Gorąca seria",
@@ -9726,6 +9799,9 @@ export const pl_PL: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Sygnet Ostatniej Twierdzy"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
@@ -12835,7 +12911,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Odprowadzenie Wren do Domu",
-        "text": "Moja uczennica Wren wyszła dwa dni temu, by przejść linię Złotego Roztopu, i nigdy nie wróciła. Znalazłam jej ślady, schowała się pod znacznikami drogi na południowy zachód od Stopni Zorzy, zbyt przerażona wilkami, by się ruszyć. Nie mogę opuścić mokradła, {playerName}. Odprowadź ją do obozu Veyli na Stopniach. Będzie bezpieczna pod światłami.",
+        "text": "Moja uczennica Wren wyszła dwa dni temu, by przejść linię Złotego Roztopu, i nigdy nie wróciła. Znalazłam jej ślady, schowała się pod znacznikami drogi na północny wschód od Stopni Zorzy, zbyt przerażona wilkami, by się ruszyć. Nie mogę opuścić mokradła, {playerName}. Odprowadź ją do obozu Veyli na Stopniach. Będzie bezpieczna pod światłami.",
         "completion": "Dziewczyna jest w środku, owinięta w połowę moich koców i gadająca tak, że gwiazdy pospadałyby z nieba. Zrobiłeś dziś coś dobrego, {playerName}. Kraina niewiele takich rzeczy widuje.",
         "objectives": {
           "0": {
@@ -13519,7 +13595,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Wraca do Domu",
-        "text": "Mój Bram wypłynął łodzią rano, gdy otworzył się Wyłom Sieci, a morze wyrzuciło go gdzieś za Przystanią. Słyszałam go trzy noce temu, {playerName}, wołającego nad wodą, i byłam zbyt przerażona, by iść. Wciąż jestem zbyt przerażona. Proszę. Jego łódź leży rozbita na północnym brzegu. Odprowadź go do mnie do domu.",
+        "text": "Mój Bram wypłynął łodzią rano, gdy otworzył się Wyłom Sieci, a morze wyrzuciło go gdzieś za Przystanią. Słyszałam go trzy noce temu, {playerName}, wołającego nad wodą, i byłam zbyt przerażona, by iść. Wciąż jestem zbyt przerażona. Proszę. Jego łódź leży rozbita na południowym brzegu. Odprowadź go do mnie do domu.",
         "completion": "Bram! Przyprowadziłeś go do mnie całego, {playerName}. Oboje płakaliśmy i żadne z nas się tego nie wstydzi. Cokolwiek wyłomy zabiorą z tej wyspy następnym razem, nie dostaną mojej rodziny. Już nie.",
         "objectives": {
           "0": {

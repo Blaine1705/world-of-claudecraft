@@ -340,6 +340,7 @@
       <div id="quest-tracker"></div>
       <div id="deed-tracker"></div>
       <div id="delve-tracker"></div>
+      <div id="rift-tracker"></div>
     </div>
 
     <div id="bottom-bar">
@@ -365,6 +366,33 @@
           <div id="actionbar2" class="panel"></div>
           <div id="actionbar" class="panel"></div>
           <div id="xpbar"><div class="fill"></div><div class="rested"></div><div class="ticks"></div><div class="label"></div></div>
+        </div>
+        <div id="target-auras-window" class="panel mt-panel ta-panel" role="region" aria-labelledby="target-auras-title" style="display: none">
+          <div class="panel-title">
+            <span id="target-auras-title" class="mt-title-label ta-title" data-i18n="hudChrome.targetAuras.title">Target Auras</span>
+          </div>
+          <div class="ta-target"></div>
+          <div class="ta-filters">
+            <button type="button" class="mt-tab" data-aura-filter="all" data-i18n="hudChrome.targetAuras.all">All</button>
+            <button type="button" class="mt-tab" data-aura-filter="debuffs" data-i18n="hudChrome.targetAuras.debuffs">Debuffs</button>
+            <button type="button" class="mt-tab" data-aura-filter="buffs" data-i18n="hudChrome.targetAuras.buffs">Buffs</button>
+          </div>
+          <div class="ta-sections">
+            <section class="ta-section ta-debuff-section">
+              <div class="ta-section-title">
+                <span class="ta-debuff-label" data-i18n="hudChrome.targetAuras.debuffs">Debuffs</span>
+                <span class="ta-debuff-count"></span>
+              </div>
+              <div class="ta-rows ta-debuff-rows"></div>
+            </section>
+            <section class="ta-section ta-buff-section">
+              <div class="ta-section-title">
+                <span class="ta-buff-label" data-i18n="hudChrome.targetAuras.buffs">Buffs</span>
+                <span class="ta-buff-count"></span>
+              </div>
+              <div class="ta-rows ta-buff-rows"></div>
+            </section>
+          </div>
         </div>
         <div id="heal-window" class="panel mt-panel">
           <div class="panel-title">
@@ -1227,19 +1255,19 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.32.0-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.32.4-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.32.0-win.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.32.4-win.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="linux"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.32.0-linux-x86_64.AppImage"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.32.4-linux-x86_64.AppImage"
               data-i18n="download.linuxCta"
             >Download for Linux</a>
           </div>
@@ -1448,7 +1476,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.32.0</div>
+      <div id="game-version">v0.32.4</div>
       </div>
       <div class="footer-legal-row">
         <a href="/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" data-i18n="footer.whitepaper">Whitepaper</a>
