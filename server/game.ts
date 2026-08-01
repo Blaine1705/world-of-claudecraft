@@ -239,7 +239,9 @@ const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
 // entities enter interest just past that, and known entities persist a
 // little farther so the boundary doesn't churn create/destroy cycles.
 const INTEREST_RADIUS = 90;
-const INTEREST_DROP_RADIUS = 100;
+// Exported so the idle-mob-tick radius below (and its test) stay pinned to this
+// exact number instead of drifting into a second copy.
+export const INTEREST_DROP_RADIUS = 100;
 // Stationary quest/vendor npcs anchor map markers, so they keep the legacy
 // radius; once known they cost a handful of bytes per snapshot anyway.
 const NPC_INTEREST_RADIUS = 120;
@@ -1530,6 +1532,21 @@ export class GameServer {
       worldBossAtBoot: true,
       // Ranked rift portals spawn on the live realm (dev/test worlds opt in).
       riftPortals: true,
+      // Distance-cull idle-mob AI (issue #2703): shouldSkipIdleMobTick skips a
+      // wild, unbuffed, out-of-combat mob's per-tick aggro scan and wander
+      // movement while it sits farther than this from EVERY connected player,
+      // and it plainly never fires when nobody is connected at all. The world
+      // grew from 3 zones to 11 (vite.config.ts) with it, so a realm's total mob
+      // count and its per-mob terrain-height cost both grew well past what this
+      // knob was originally sized against, and this Sim never opted in: every
+      // mob everywhere paid full AI cost on every 50 ms tick regardless of
+      // player proximity, which is what turned "nobody online" into a
+      // multiples-of-idle CPU baseline as the world grew. INTEREST_DROP_RADIUS
+      // is the exact distance a mob remains rendered to a viewer, so a culled
+      // mob can never be one a player can actually see sit still, and it is
+      // well past MAX_AGGRO_RADIUS (20 yd, mob/aggro_ranges.ts), so culling
+      // never skips a scan that could have pulled someone.
+      idleMobTickRadius: INTEREST_DROP_RADIUS,
       lockoutNowMs: () => Date.now(),
       // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
       // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).

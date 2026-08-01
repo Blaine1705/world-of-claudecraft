@@ -357,12 +357,34 @@ describe('tick perf capture lifecycle', () => {
     // 'beast', so every one of its per-entity mob.update laps must be attributed to
     // BOTH the aggregate 'sim.mob.update' and the 'sim.mob.update|beast' family bucket.
     const server = new GameServer();
-    const sim = (server as unknown as { sim: { addEntity: (e: Entity) => void } }).sim;
+    const sim = (
+      server as unknown as {
+        sim: {
+          addEntity: (e: Entity) => void;
+          addPlayer: (c: string, n: string) => number;
+          entities: Map<number, Entity>;
+        };
+      }
+    ).sim;
     // Placed far outside the [-180, 180] world so it just idles alone for the window;
-    // it still runs one updateMob (one mob.update lap) every tick it is alive.
+    // it still runs one updateMob (one mob.update lap) every tick it is alive. GameServer
+    // opts every Sim it builds into idleMobTickRadius (#2703: distance-cull idle-mob AI so
+    // an idle server does not pay full AI cost for a mob no one is near), and a fresh
+    // GameServer's Sim starts with zero players, so an idle mob would otherwise be culled
+    // outright: stand a player at the wolf's own spot so it stays inside the radius and the
+    // lap still fires, which is what this test is actually pinning.
     const wolf = createMob(900401, MOBS.forest_wolf, 5, { x: 500, y: 0, z: 500 });
     wolf.aiState = 'idle';
     sim.addEntity(wolf);
+    // Stand the watcher 40 yd off (inside idleMobTickRadius so the mob is not culled,
+    // outside MAX_AGGRO_RADIUS so the idle-scan's aggro-detection callback never visits
+    // it and never resolves this deliberately-templateless mob through isTrivialTo).
+    const watcherId = sim.addPlayer('warrior', 'Watcher');
+    const watcher = sim.entities.get(watcherId);
+    if (watcher) {
+      watcher.pos = { x: 500, y: 0, z: 540 };
+      watcher.prevPos = { ...watcher.pos };
+    }
 
     // Record which lap names the profiler's add() is called with. The spy is
     // timing-independent: it proves the probe routed a beast mob's mob.update time to
@@ -406,11 +428,30 @@ describe('tick perf capture lifecycle', () => {
     // then resolves undefined -> 'other', and the lap must land in 'sim.mob.update|other'
     // (registered, so TickProfiler.add never silently drops it).
     const server = new GameServer();
-    const sim = (server as unknown as { sim: { addEntity: (e: Entity) => void } }).sim;
+    const sim = (
+      server as unknown as {
+        sim: {
+          addEntity: (e: Entity) => void;
+          addPlayer: (c: string, n: string) => number;
+          entities: Map<number, Entity>;
+        };
+      }
+    ).sim;
     const orphan = createMob(900402, MOBS.forest_wolf, 5, { x: 500, y: 0, z: 500 });
     orphan.templateId = 'not_a_real_mob_family_zzz'; // absent from MOBS -> family fallback
     orphan.aiState = 'idle';
     sim.addEntity(orphan);
+    // See the sibling test above: a fresh GameServer's Sim opts into idleMobTickRadius
+    // (#2703) and starts with zero players, so an idle mob with nobody near it is culled
+    // outright. Stand the watcher 40 yd off (inside idleMobTickRadius so the mob is not
+    // culled, outside MAX_AGGRO_RADIUS so the idle-scan's aggro-detection callback never
+    // visits it and never resolves this deliberately-templateless mob through isTrivialTo).
+    const watcherId = sim.addPlayer('warrior', 'Watcher');
+    const watcher = sim.entities.get(watcherId);
+    if (watcher) {
+      watcher.pos = { x: 500, y: 0, z: 540 };
+      watcher.prevPos = { ...watcher.pos };
+    }
 
     const profiler = (
       server as unknown as { tickProfiler: { add: (p: string, ms: number) => void } }
