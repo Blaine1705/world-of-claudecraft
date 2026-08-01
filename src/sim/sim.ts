@@ -379,7 +379,11 @@ import {
   type MobileCraftingStation,
   placeMobileStationForPlayer,
 } from './professions/mobile_station';
-import { applyNodeReadiness, serializeNodeReadiness } from './professions/node_persist';
+import {
+  applyNodeReadiness,
+  isLiveGatherNodeId,
+  serializeNodeReadiness,
+} from './professions/node_persist';
 import { updateProfNudges } from './professions/prof_nudges';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
 import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
@@ -8030,10 +8034,11 @@ export class Sim {
   // command arrives on, same as buyItem/useItem above.
   // `confirmEffectUse` (R40) sits before pid to match the IWorld facet's
   // (nodeId, confirmEffectUse?) shape positionally; pid stays last, the
-  // slotToolEffect convention. Callers naming a pid pass undefined through
-  // the consent slot.
+  // slotToolEffect convention, and the module implementation takes the same
+  // order so the forward cannot transpose them. Callers naming a pid pass
+  // undefined through the consent slot.
   harvestNode(nodeId: string, confirmEffectUse?: boolean, pid?: number): boolean {
-    return harvestNodeImpl(this.ctx, nodeId, pid, confirmEffectUse === true);
+    return harvestNodeImpl(this.ctx, nodeId, confirmEffectUse === true, pid);
   }
 
   // IWorld read surface (IWorldProfessions): whether the given node is
@@ -8059,7 +8064,10 @@ export class Sim {
   nodeRespawnSecondsFor(nodeId: string, pid: number): number | null {
     const meta = this.players.get(pid);
     if (!meta) return null;
-    if (!gatherNodeById(nodeId)) return null;
+    // Existence via the node_persist id map (O(1)): this read runs on the
+    // tooltip path, where gatherNodeById's linear GATHER_NODES scan would be
+    // paid per call for a lookup that only needs membership.
+    if (!isLiveGatherNodeId(nodeId)) return null;
     return nodeRespawnRemainingSec(meta, nodeId, this.time);
   }
 

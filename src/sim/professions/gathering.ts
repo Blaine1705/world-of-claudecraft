@@ -593,11 +593,15 @@ export function gatherCastDurationSec(
 // on THIS harvest. Defaults false (fail-safe: an old bundle that never sends
 // the flag skips the effect and keeps the charge); an 'always' slot ignores
 // it entirely, so every pre-prompt caller is byte-identical.
+// Parameter order matches the `Sim.harvestNode` delegate positionally
+// (nodeId, then consent, then pid), so a caller written against either
+// signature cannot silently land a pid in the consent slot or the reverse
+// (the whole-branch review found the two disagreed, an any-cast footgun).
 export function harvestNode(
   ctx: SimContext,
   nodeId: string,
-  pid?: number,
   confirmEffectUse = false,
+  pid?: number,
 ): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
@@ -827,7 +831,7 @@ export function useGatherToolItem(
   // false is the fail-safe arm: a 'prompt' slot never fires here and never
   // spends. The three client dispatch sites resolve the node locally and
   // send harvest_node with the consent instead.
-  return harvestNode(ctx, best.id, pid);
+  return harvestNode(ctx, best.id, false, pid);
 }
 
 // Completion of a running gather cast, reached through the

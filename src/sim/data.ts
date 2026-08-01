@@ -774,8 +774,9 @@ export function zoneAt(x: number, z: number): ZoneDef {
 // zone, this reports "nowhere" honestly. Callers that must distinguish the open
 // world from an instanced interior (the far-east dungeon/arena/delve plane at
 // INSTANCE_X_BASE, which zoneAt would misreport as a real zone) use this one.
-// Reads the static ZONES, exactly like zoneAt, so a custom play-test map's zones
-// never redefine world policy.
+// Reads the static ZONES deliberately, UNLIKE zoneAt (which resolves the
+// active world content so an editor play-test map can reshape lookups): a
+// custom play-test map's zones never redefine world policy.
 export function zoneContaining(x: number, z: number): ZoneDef | null {
   for (const zone of ZONES) {
     if (z < zone.zMin || z >= zone.zMax) continue;

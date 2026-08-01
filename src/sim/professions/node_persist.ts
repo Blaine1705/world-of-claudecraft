@@ -43,6 +43,14 @@ const LIVE_NODE_RESPAWN: ReadonlyMap<string, number> = new Map(
 
 const positive = (n: number): boolean => Number.isFinite(n) && n > 0;
 
+/** O(1) live-node membership off the map above: the countdown read
+ *  (Sim.nodeRespawnSecondsFor) runs on the tooltip path and only needs
+ *  existence, so it must not pay gatherNodeById's linear GATHER_NODES scan
+ *  per call (the whole-branch review's note). */
+export function isLiveGatherNodeId(nodeId: string): boolean {
+  return LIVE_NODE_RESPAWN.has(nodeId);
+}
+
 /** Snapshot the live readiness map as remaining-time deltas. Returns undefined
  *  when no timer is still running (zero-default omission), so a character with
  *  every node ready serializes byte-identically to one saved before the field
@@ -59,7 +67,13 @@ export function serializeNodeReadiness(
 ): Record<string, number> | undefined {
   const out: Record<string, number> = {};
   let any = false;
-  for (const [nodeId, readyAt] of Object.entries(nodeHarvestReadyAt)) {
+  // KEY-SORTED like the packet's other persisted maps (questedHobbies,
+  // toolEffectSlots via the fixed id walk), so persisted blob diffs stay
+  // readable instead of carrying per-player harvest insertion order. Readers
+  // are keyed lookups; only the serialized text changes.
+  for (const [nodeId, readyAt] of Object.entries(nodeHarvestReadyAt).sort(([a], [b]) =>
+    a < b ? -1 : a > b ? 1 : 0,
+  )) {
     // Two-decimal rounding, the ncd wire's round2 applied to persistence: a
     // remaining is (accumulated DT sum) minus (accumulated DT sum), so the
     // raw float serializes at up to 18 characters and an all-nodes record
