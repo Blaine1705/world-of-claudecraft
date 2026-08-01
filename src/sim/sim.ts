@@ -3725,6 +3725,14 @@ export class Sim {
     deedsMod.markDeedsDirty(this.ctx, pid); // soc_guild_joined reads the stamped name
   }
 
+  /** Rename an existing guild identity without applying leave/join semantics. */
+  renamePlayerGuild(pid: number, oldName: string, newName: string): void {
+    const e = this.entities.get(pid);
+    if (!e || e.guild !== oldName) return;
+    valeCupMod.vcupRenameGuild(this.ctx, pid, oldName, newName);
+    e.guild = newName;
+  }
+
   /** Cosmetic skin-select event: rolls a rarity rank (once) and emits the
    *  personal `skinEvent` cue that opens the client overlay. Re-using the token
    *  re-shows the already-rolled rank — no reroll — so a player can't spam-roll.

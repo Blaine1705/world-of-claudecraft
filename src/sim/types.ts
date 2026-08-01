@@ -4065,6 +4065,14 @@ export type SimEvent = { pid?: number } & (
   // a guild invitation from an online guild officer/leader; resolved by name
   // server-side so it carries no pid
   | { type: 'guildInvite'; fromName: string; guildName: string }
+  // An admin rename invalidated an already-open guild invitation. Structured
+  // and neutral: the client owns the localized feedback and receives neither
+  // the old guild name nor a moderation reason.
+  | { type: 'guildInviteCancelled' }
+  // A guild rename committed while this member was online. The stable id lets
+  // the client patch only the matching social mirror; the new display name is
+  // player-controlled and must be escaped at every HTML sink.
+  | { type: 'guildRenamed'; guildId: number; newName: string }
   | { type: 'tradeRequest'; fromPid: number; fromName: string }
   | { type: 'tradeDone' }
   | { type: 'duelRequest'; fromPid: number; fromName: string }
