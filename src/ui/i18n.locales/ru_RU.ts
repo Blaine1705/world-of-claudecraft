@@ -8227,6 +8227,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.already_linked': 'К вашему аккаунту уже привязан аккаунт Steam.',
   'apiError.steam.account_taken': 'Этот аккаунт Steam уже привязан к другому аккаунту.',
   'apiError.steam.upstream': 'Steam не отвечает. Повторите попытку чуть позже.',
+  'apiError.epic.disabled': 'Привязка Epic сейчас недоступна.',
+  'apiError.epic.invalid_token':
+    'Epic не смог подтвердить этот запрос на привязку. Повторите попытку из настольного приложения.',
+  'apiError.epic.banned': 'Этот аккаунт Epic нельзя привязать.',
+  'apiError.epic.already_linked': 'К вашему аккаунту уже привязан аккаунт Epic.',
+  'apiError.epic.account_taken': 'Этот аккаунт Epic уже привязан к другому аккаунту.',
+  'apiError.epic.upstream': 'Epic не отвечает. Повторите попытку чуть позже.',
   'apiError.db.conflict': 'Изменение конфликтует с другим обновлением. Повторите попытку.',
   'apiError.rate_limit.exceeded': 'Слишком много запросов. Повторите попытку через {seconds}.',
   'apiError.internal.error': 'На нашей стороне произошла ошибка. Повторите попытку.',
@@ -9111,6 +9118,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Привяжите аккаунт Steam в настольном приложении, чтобы ваши деяния отражались в достижениях Steam.',
   'hudChrome.steam.noTicket':
     'Steam не выдал билет для привязки. Запустите Steam и повторите попытку.',
+  'hudChrome.epic.link': 'Привязать Epic',
+  'hudChrome.epic.unlink': 'Отвязать Epic',
+  'hudChrome.epic.linked': 'Привязан аккаунт Epic {id}',
+  'hudChrome.epic.benefits':
+    'Привяжите аккаунт Epic в настольном приложении Epic, чтобы ваши деяния отражались в достижениях Epic.',
+  'hudChrome.epic.noProof':
+    'Epic не выдал подтверждение для привязки. Запустите игру из Epic Games Store и повторите попытку.',
+  'hudChrome.epic.title': 'Epic',
   'hudChrome.deeds.title': 'Книга деяний',
   'hudChrome.deeds.close': 'Закрыть Книгу деяний',
   'hudChrome.deeds.searchPlaceholder': 'Поиск деяний',

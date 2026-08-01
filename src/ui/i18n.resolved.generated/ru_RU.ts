@@ -2130,6 +2130,14 @@ export const ru_RU: EnTranslations = {
       "benefits": "Привяжите аккаунт Steam в настольном приложении, чтобы ваши деяния отражались в достижениях Steam.",
       "noTicket": "Steam не выдал билет для привязки. Запустите Steam и повторите попытку."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Привязать Epic",
+      "unlink": "Отвязать Epic",
+      "linked": "Привязан аккаунт Epic {id}",
+      "benefits": "Привяжите аккаунт Epic в настольном приложении Epic, чтобы ваши деяния отражались в достижениях Epic.",
+      "noProof": "Epic не выдал подтверждение для привязки. Запустите игру из Epic Games Store и повторите попытку."
+    },
     "mailbox": {
       "title": "Почтовый ящик",
       "subtitle": "Вороновая почта",
@@ -2982,12 +2990,12 @@ export const ru_RU: EnTranslations = {
       "upstream": "Steam не отвечает. Повторите попытку чуть позже."
     },
     "epic": {
-      "disabled": "Epic linking is not available right now.",
-      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
-      "banned": "That Epic account cannot be linked.",
-      "already_linked": "Your account already has a linked Epic account.",
-      "account_taken": "That Epic account is already linked to another account.",
-      "upstream": "Epic did not respond. Try again in a moment."
+      "disabled": "Привязка Epic сейчас недоступна.",
+      "invalid_token": "Epic не смог подтвердить этот запрос на привязку. Повторите попытку из настольного приложения.",
+      "banned": "Этот аккаунт Epic нельзя привязать.",
+      "already_linked": "К вашему аккаунту уже привязан аккаунт Epic.",
+      "account_taken": "Этот аккаунт Epic уже привязан к другому аккаунту.",
+      "upstream": "Epic не отвечает. Повторите попытку чуть позже."
     },
     "wallet": {
       "handoff_invalid": "Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку."
