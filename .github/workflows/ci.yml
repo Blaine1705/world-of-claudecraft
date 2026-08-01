@@ -29,7 +29,7 @@ concurrency:
 #                 registry-in-sync, s3_registered (every emit maps to a registered
 #                 key/RULE), and placeholder parity for the translations that
 #                 actually exist. An English-only PR (sparse overlay) passes here.
-#                 The test suite runs as a 6-shard matrix (each shard executes a
+#                 The test suite runs as a 8-shard matrix (each shard executes a
 #                 partition of the test files), so the job's wall time is the
 #                 slowest shard, not the whole suite.
 #
@@ -42,7 +42,7 @@ concurrency:
 #   release-gate  full 21-locale tier. Runs on release/** pushes and on the
 #                 release-to-main PR merge result, with I18N_RELEASE_TIER=1. A merely
 #                 `pending` (untranslated) key cannot survive this gate. Its test
-#                 step runs the same 6-shard matrix as pr-gate; the serialized
+#                 step runs the same 8-shard matrix as pr-gate; the serialized
 #                 checks and builds run once, on shard 1 only.
 #
 # The release tier is a superset: its `npm test` runs every PR-tier check plus the
@@ -167,7 +167,7 @@ jobs:
 
   # The PR tier is two parallel jobs: pr-gate runs the test suite while pr-checks
   # runs the serialized checks, so the PR critical path is max(tests, checks)
-  # instead of their sum. pr-gate additionally fans the suite across a 6-shard
+  # instead of their sum. pr-gate additionally fans the suite across a 8-shard
   # matrix (vitest --shard: a sha1-hash partition of the test FILES), so its wall
   # time is the slowest shard. Locally `npm run gate` (scripts/gate.mjs) runs
   # the SAME combined step list serially with ONE full unsharded vitest run by
@@ -184,7 +184,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
 
     steps:
       - name: Check out repository
@@ -206,8 +206,8 @@ jobs:
       # lives in pr-checks.
       # Full Sim suites are CPU-heavy. Keep each shard at half the runner's
       # available cores, matching the bounded local gate.
-      - name: Run tests (PR tier, shard ${{ matrix.shard }} of 6)
-        run: npm test -- --shard=${{ matrix.shard }}/6 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
+      - name: Run tests (PR tier, shard ${{ matrix.shard }} of 8)
+        run: npm test -- --shard=${{ matrix.shard }}/8 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
 
   # Runs in parallel with pr-gate: same if-condition, no needs edge in either
   # direction. The default pull_request merge-ref checkout MUST be preserved
@@ -278,14 +278,14 @@ jobs:
     env:
       I18N_RELEASE_TIER: '1'
 
-    # The same 6-shard matrix as pr-gate: the test step partitions across the
-    # six runners, while every serialized check and build below carries a
+    # The same 8-shard matrix as pr-gate: the test step partitions across the
+    # eight runners, while every serialized check and build below carries a
     # single-shard condition so it runs exactly once (on shard 1) instead of
-    # six times. fail-fast stays off so shards report independently.
+    # eight times. fail-fast stays off so shards report independently.
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
 
     steps:
       - name: Check out repository
@@ -334,8 +334,8 @@ jobs:
       # matter which shard they hash into.
       # Full Sim suites are CPU-heavy. Keep each shard at half the runner's
       # available cores, matching the bounded local gate.
-      - name: Run tests (release tier - 21-locale + empty-pending, shard ${{ matrix.shard }} of 6)
-        run: npm test -- --shard=${{ matrix.shard }}/6 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
+      - name: Run tests (release tier - 21-locale + empty-pending, shard ${{ matrix.shard }} of 8)
+        run: npm test -- --shard=${{ matrix.shard }}/8 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
 
       - name: Typecheck
         if: matrix.shard == 1

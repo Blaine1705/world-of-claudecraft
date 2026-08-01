@@ -7,7 +7,7 @@ const gate = readFileSync(new URL('../scripts/gate.mjs', import.meta.url), 'utf8
 // Locked (or measurement) shard count for pr-gate and release-gate matrices.
 // Phase 2 of docs/ci-speed: escalate from the prior N=4; keep both jobs on the
 // same N. Prefer this single constant over scattering /N literals in pins.
-const SHARD_N = 6;
+const SHARD_N = 8;
 const SHARD_MATRIX = Array.from({ length: SHARD_N }, (_, i) => i + 1).join(', ');
 
 function jobSource(name: string): string {
