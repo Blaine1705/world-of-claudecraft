@@ -160,10 +160,17 @@ describeDb('discord set-based statements (real Postgres)', () => {
       // nothing in between, as the first draft had, compare a value with itself
       // and can never fail.
       //
-      // pg_stat_xact_user_tables is deliberately NOT used at all: it reports only
-      // the CURRENT transaction's activity, and every pool.query here is its own
-      // autocommit transaction, so both readings are zero whatever the statement
-      // did. That pin was removed rather than repaired.
+      // pg_stat_xact_user_tables is deliberately NOT used, and the reason is NOT
+      // that it reads zero. That was this session's first guess and a direct probe
+      // against Postgres 16.2 disproved it: the view emits one row per user table
+      // (so a ?? 0 fallback never fires) and the counter really did move 0 to 1
+      // across two separate autocommit pool.query calls with an UPDATE between
+      // them, because a backend accumulates pending per-relation stats locally and
+      // flushes them at most once a second. It was dropped because that makes it
+      // TIMING-dependent: it only reads that way while node-postgres keeps handing
+      // back the same idle backend and while the flush window has not turned over,
+      // so it can both miss a write and red without one. xmin straddling the write
+      // proves the same property deterministically.
       await seedLink(1, 'identical', {
         username: 'Same',
         joinedAt: '2023-11-14T22:13:20.000Z',
@@ -177,9 +184,13 @@ describeDb('discord set-based statements (real Postgres)', () => {
       };
       await setDiscordMemberMetaBulk(pool, [record]);
 
-      const xminBefore = (await pool.query('SELECT xmin::text FROM discord_links')).rows[0].xmin;
+      const xminBefore = (
+        await pool.query("SELECT xmin::text FROM discord_links WHERE discord_user_id = 'identical'")
+      ).rows[0].xmin;
       const second = await setDiscordMemberMetaBulk(pool, [record]);
-      const xminAfter = (await pool.query('SELECT xmin::text FROM discord_links')).rows[0].xmin;
+      const xminAfter = (
+        await pool.query("SELECT xmin::text FROM discord_links WHERE discord_user_id = 'identical'")
+      ).rows[0].xmin;
 
       expect(second).toEqual({ changed: 0, skipped: 1, unapplied: [] });
       expect(xminAfter).toBe(xminBefore);
@@ -188,7 +199,9 @@ describeDb('discord set-based statements (real Postgres)', () => {
       // value, MUST show a new row version. Without this the pin above could hold
       // simply because xmin never moves for any reason the test can produce.
       const moved = await setDiscordMemberMetaBulk(pool, [{ ...record, nickname: 'Moved' }]);
-      const xminMoved = (await pool.query('SELECT xmin::text FROM discord_links')).rows[0].xmin;
+      const xminMoved = (
+        await pool.query("SELECT xmin::text FROM discord_links WHERE discord_user_id = 'identical'")
+      ).rows[0].xmin;
       expect(moved).toEqual({ changed: 1, skipped: 0, unapplied: [] });
       expect(xminMoved).not.toBe(xminBefore);
     });
@@ -246,6 +259,13 @@ describeDb('discord set-based statements (real Postgres)', () => {
         { discordUserId: 'mmm-bad', nickname: 'B', joinedAtMs: 1e20, roleKey: null },
         { discordUserId: 'zzz-last', nickname: 'C', joinedAtMs: 1_700_000_000_001, roleKey: null },
       ]);
+      // Note what this DECIDES, not just what it observes: an unusable joinedAtMs is
+      // a silent coercion. The record is still counted in `changed` (its nickname
+      // moved), it is NOT reported in `unapplied`, and COALESCE leaves whatever join
+      // date was already stored alone. So a caller cannot distinguish "we kept your
+      // old join date" from "we accepted the one you sent". That is the deliberate
+      // choice (the alternative aborts the whole batch, the failure this helper
+      // exists to prevent) and it is written down here so it stays a choice.
       expect(result).toEqual({ changed: 3, skipped: 0, unapplied: [] });
       const bad = await pool.query(
         "SELECT discord_joined_at FROM discord_links WHERE discord_user_id = 'mmm-bad'",
@@ -396,8 +416,16 @@ describeDb('discord set-based statements (real Postgres)', () => {
       // character rows) rather than at a convenient fraction of it, so the planner
       // chooses against statistics the size production will actually show it. These
       // are also the numbers the Phase 4 note reports its 6.6 ms measurement at; an
-      // earlier draft seeded 2,000 and 6,000, which left that figure unreproducible
-      // from the committed fixture.
+      // earlier draft seeded 2,000 and 6,000, so the committed fixture did not even
+      // stand at the envelope the note quotes. It still does not REPRODUCE that
+      // figure and is not meant to: the statement here runs under EXPLAIN ANALYZE,
+      // whose per-node instrumentation makes its Execution Time incomparable to a
+      // production timing. What the fixture buys is the right planner inputs.
+      //
+      // The two Actual Loops pins below are table-size sensitive by nature, so this
+      // seeding is part of their contract rather than incidental: re-run this file
+      // against a real Postgres after changing either number. Verified green at
+      // 5000/15000 in Phase 4 QA.
       await pool.query('INSERT INTO accounts (id) SELECT g FROM generate_series(1, 5000) g');
       await pool.query(
         `INSERT INTO discord_links (account_id, discord_user_id)

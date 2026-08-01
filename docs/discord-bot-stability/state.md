@@ -148,6 +148,16 @@ discordFlexRowsForDiscordIds, reward_ledger DDL with its keep-forever note),
 `server/http/registry.ts` (:33, :123), `server/main.ts` (retention :3080-3087,
 GameStateSource :3008-3022), `server/reports.ts` (site-presence :285).
 
+The line numbers that survive above are the files NO phase of this packet has
+edited, so their coordinates are as good as the day they were written; the ones
+this packet moves carry symbol names instead. That split is the working rule for
+this paragraph, not an oversight: Phase 4 QA removed the `server/internal.ts`,
+`server/discord.ts` and `server/db.ts` coordinates specifically because Phase 4
+had moved every one of them (the routes table alone slid from :329 to :451) while
+the stale span still read as correct. Any phase that edits `registry.ts`,
+`main.ts` or `reports.ts` should trade their numbers for symbols in the same
+change rather than re-measure them.
+
 Deploy: `docker-compose.yml` (bot service :201-224, game healthcheck exemplar
 :171-199), `deploy/user-data.sh` (Caddy 404 block :84-92), `Dockerfile` (:11, :29,
 :37), `DEPLOY.md`, `deploy/game_watchdog.sh`.
@@ -227,7 +237,12 @@ because dropping the one word is otherwise silent),
   `{ requested, members: [...] }` where each member is the per-id flex payload plus
   `discord_user_id` and `linked: true`, and an UNLINKED id is ABSENT rather than stubbed.
   `requested` echoes the accepted id count so a caller can tell a dropped request from a
-  genuinely empty answer. Still planned: `GET /internal/discord/outbox` (Phase 5).
+  genuinely empty answer. **Phase 6 must compare it against the number of DISTINCT in-cap id
+  strings it sent, not its raw array length**: the count is taken after the cap, the
+  non-string drop and the de-duplication, so a caller that sent repeats would read a
+  perfectly delivered response as a truncated one. The bot holds its sweep ids in a `Set`,
+  so this is a contract note rather than a live defect (Phase 4 QA).
+  Still planned: `GET /internal/discord/outbox` (Phase 5).
 - New modules: `bot/cadence.ts` (the three poll-loop DEFAULTS, values only; `config.ts`
   layers the env overrides over them as of Phase 3), `bot/rate_governor.ts` (Phase 2, pure
   and clock-injected), `bot/scheduler.ts` and `bot/member_writes.ts` (Phase 3). Still

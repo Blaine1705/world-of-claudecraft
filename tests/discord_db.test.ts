@@ -391,6 +391,10 @@ describe('setDiscordMemberMetaBulk', () => {
     );
     expect(sql).not.toContain('<>');
     expect(sql).not.toContain('IS NOT DISTINCT FROM');
+    // EXACTLY two copies. The whole argument for anchoring above is that the count
+    // matters, so a third copy added later must not slip past assertions that only
+    // ask whether each of the two known clauses is present.
+    expect(sql.split('IS DISTINCT FROM')).toHaveLength(3);
     // The comparison must be against the value that would actually be STORED, so
     // the COALESCE rules appear on both the write and the compare.
     expect(sql).toContain(
@@ -436,12 +440,31 @@ describe('setDiscordMemberMetaBulk', () => {
     // was ~1.7e12. A `>` to `>=` drift, or a wrong constant anywhere in that gap,
     // survived the whole suite. These two records sit either side of the real
     // edge, so the comparison and the constant are both pinned.
+    //
+    // BOTH SIDES OF ZERO, not just both sides of the positive edge. The guard is
+    // Math.abs(joinedAtMs) > MAX_EPOCH_MS, so pinning only +8.64e15 and
+    // +8.64e15 + 1 leaves `Math.abs(` deletable: a finite -8.64e15 - 1 (which
+    // parseMemberMetaRecords accepts, it only checks Number.isFinite) would then
+    // reach new Date(...).toISOString() and throw a RangeError inside the up-front
+    // map, aborting all 1000 records before any SQL runs. That mutant survived the
+    // first version of this test and was caught by the fix-round review.
+    //
+    // Ids are named so the deadlock-guard sort keeps them in this order: the
+    // arrays are built AFTER `deduped` is sorted by discordUserId, so every
+    // expectation below is in sorted-id order, not input order.
     const { pool, calls } = makePool(() => counted('2', '0', []));
     await setDiscordMemberMetaBulk(pool, [
       metaRecord({ discordUserId: 'aaa-at-limit', joinedAtMs: 8.64e15 }),
       metaRecord({ discordUserId: 'bbb-past-limit', joinedAtMs: 8.64e15 + 1 }),
+      metaRecord({ discordUserId: 'ccc-at-limit-negative', joinedAtMs: -8.64e15 }),
+      metaRecord({ discordUserId: 'ddd-past-limit-negative', joinedAtMs: -8.64e15 - 1 }),
     ]);
-    expect(calls[0].params[2]).toEqual(['+275760-09-13T00:00:00.000Z', null]);
+    expect(calls[0].params[2]).toEqual([
+      '+275760-09-13T00:00:00.000Z',
+      null,
+      '-271821-04-20T00:00:00.000Z',
+      null,
+    ]);
   });
 
   it('drops a NaN joinedAtMs rather than throwing inside the up-front conversion', async () => {
@@ -655,15 +678,21 @@ describe('discordFlexRowsForDiscordIds', () => {
     // assertion answer "is the SHIPPING statement still in step", not "does this
     // text appear somewhere in the file".
     const dbSource = readFileSync(new URL('../server/db.ts', import.meta.url), 'utf8');
-    const fnStart = dbSource.indexOf(
-      'export async function highestCharacterForAccount(accountId: number)',
-    );
+    // Anchored on the bare name, NOT the full one-line signature: that declaration
+    // is 99 characters against biome's lineWidth of 100, so a two-character rename
+    // would wrap the parameter list and turn this pin red with no defect behind it.
+    const fnStart = dbSource.indexOf('function highestCharacterForAccount(');
     expect(fnStart).toBeGreaterThan(-1);
     const fnEnd = dbSource.indexOf('\n}', fnStart);
     expect(fnEnd).toBeGreaterThan(fnStart);
     const perAccountQuery = dbSource.slice(fnStart, fnEnd).replace(/\s+/g, ' ');
-    // The slice must not swallow the next declaration, or the narrowing is undone.
-    expect(perAccountQuery).not.toContain('export async function listCharacters');
+    // The slice must not swallow whatever follows. Asserted STRUCTURALLY (no second
+    // top-level declaration inside it, exactly one query) rather than by naming the
+    // current next function: a guard that names `listCharacters` goes quietly
+    // constant-true the day anything is inserted between the two, which is the same
+    // rotting-anchor shape this narrowing exists to remove.
+    expect(perAccountQuery).not.toContain('export ');
+    expect(perAccountQuery.split('pool.query(')).toHaveLength(2);
 
     expect(batchedOrderBy).toBe(
       "ORDER BY level DESC, ((state->>'lifetimeXp')::bigint) DESC NULLS LAST, id ASC",

@@ -1018,9 +1018,13 @@ describe('discord/members-meta applied-vs-read reporting', () => {
     // once per entry, so a doubled id counted twice while only one row was ever
     // written). Three entries, two of them the same id: the push must report two
     // records and hand the upsert two, carrying the LAST values for the repeat.
+    // changed is 1, NOT 2, on purpose: with the mock echoing 2 the `updated` line
+    // below would pass whether `updated` came from the post-dedupe record count or
+    // from applied.changed, which is the exact L14 regression. Three distinct
+    // numbers (3 sent, 2 accepted, 1 changed) make it discriminate.
     vi.mocked(setDiscordMemberMetaBulk).mockResolvedValue({
-      changed: 2,
-      skipped: 0,
+      changed: 1,
+      skipped: 1,
       unapplied: [],
     });
 
@@ -1166,6 +1170,28 @@ describe('discord/flex-batch', () => {
     expect(capped[0]).toBe('u0');
     expect(capped[999]).toBe('u999');
     expect(capped).not.toContain('u1000');
+  });
+
+  it('counts requested AFTER de-duplication, which is the contract Phase 6 compares against', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    vi.mocked(discordFlexForAccounts).mockResolvedValue([batchEntry('u1')]);
+
+    // Four entries, two of them the same id. `requested` is 3, not 4: it counts
+    // what survived validation, and de-duplication runs before the count. A caller
+    // comparing it against its RAW array length would read this healthy response as
+    // a truncated one, which is the opposite of what the field exists to signal, so
+    // the rule is pinned here rather than left in a comment for Phase 6 to rediscover.
+    const r = await runRoute('POST', '/internal/discord/flex-batch', {
+      headers: DISCORD_HEADERS,
+      body: { discord_user_ids: ['u1', 'u2', 'u1', 'u3'] },
+    });
+
+    expect(r.body).toEqual({
+      success: true,
+      data: { requested: 3, members: [batchEntry('u1')] },
+      error: null,
+    });
+    expect(requestedIds()).toEqual(['u1', 'u2', 'u3']);
   });
 
   it('reads nothing and answers an empty batch when the body carries no id list', async () => {
