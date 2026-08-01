@@ -10,7 +10,7 @@
 | Phase 2 QA | done | 2026-07-30 | 2026-07-30 |
 | Phase 3: Loop scheduler + diff-before-write | built | 2026-07-31 | 2026-07-31 |
 | Phase 3 QA | done | 2026-07-31 | 2026-07-31 |
-| Phase 4: Server set-based endpoints | not started | | |
+| Phase 4: Server set-based endpoints | built | 2026-07-31 | 2026-07-31 |
 | Phase 4 QA | not started | | |
 | Phase 5: Outbox + linked-member change feed | not started | | |
 | Phase 5 QA | not started | | |
@@ -48,10 +48,12 @@
       diff-arm tests
 
 ### Phase 4
-- [ ] `POST /internal/discord/flex-batch` RouteDef + spine rows + R1-rig tests + query-count pin
-- [ ] members-meta bulk upsert with unchanged-skip, BOTH arms
-- [ ] `reward_ledger` keep-forever comment
-- [ ] Tests for `server/discord_relay.ts` and `server/discord_activity.ts`
+- [x] `POST /internal/discord/flex-batch` RouteDef + spine rows + R1-rig tests + query-count pin
+- [x] members-meta bulk upsert with unchanged-skip, BOTH arms
+- [x] `reward_ledger` keep-forever comment
+- [x] Tests for `server/discord_relay.ts` and `server/discord_activity.ts`
+- [x] L14 closed on the server side (added, not in the original checklist): members-meta
+      reports `changed` / `skipped` / `unapplied` instead of counting what it read
 
 ### Phase 5
 - [ ] `server/discord_link_changes.ts` bounded FIFO + every feed site enumerated in state.md
@@ -702,3 +704,90 @@ void>` signature admits, and `forgetMember` deleting `memberNames` is a no-op at
 **Validation.** `npx tsc --noEmit` clean, 330 bot tests green across 10 files, `npm run
 build:bot` bundles, `npm run ci:changed` exits 0. Full `npm run gate` at close, with the one
 known malware-step failure caused by a sibling session's worktree parked under `.worktrees/`.
+
+### Phase 4 (2026-07-31)
+
+Release base FIRST (standing rule 1): NO-OP. `origin/release/v0.33.0` was freshly fetched and
+measured at 70 ahead, 0 behind, so it had not moved since the Phase 3 QA merge (`104994c21`)
+and there was nothing to merge. Recorded here because the rule asks for the record either way.
+
+**What shipped.** Three commits: `08ecaf2b6` (the queue tests), `44e937cb7` (both set-based
+statements plus the new endpoint), `ae1a1b776` (the reward_ledger retention note). The
+prompt's five-commit split assumed the changes were separable; `server/internal.ts` and
+`server/discord_db.ts` each carry BOTH features at interleaved hunks, so splitting flex-batch
+from members-meta would have produced commits that do not typecheck, which is worse than one
+commit that says so in its body. The ledger comment did split cleanly and was kept separate.
+
+**flex-batch.** `POST /internal/discord/flex-batch` is RouteDef-only behind the same
+`discordGate` as its siblings, with a hand-added `surface_inventory.ts` row anchored on the
+exported `flexBatchHandler` symbol (the registry-only form the five `/api` precedents use) and
+the two internal-ladder counts bumped 19 to 20. It has no `handleDiscordInternal` arm and a
+test drives the legacy dispatcher to prove the terminal 404, so a later accidental legacy twin
+fails loudly. The read is ONE statement: `discord_links` filtered by `ANY($1::text[])`, left
+joined to `reward_points`, with a `LATERAL ... LIMIT 1` for the top character. The character
+`state` blob is deliberately NOT selected (a 1000-member batch would drag megabytes of JSONB
+for one integer); the level is projected SQL-side.
+
+**members-meta.** One multi-row upsert over four unnested arrays inside a data-modifying CTE,
+skipping rows whose stored values are not `IS DISTINCT FROM` the incoming ones. Both dispatch
+arms call one shared `applyMemberMetaPush`, which is stronger than the dual-edit rule asks for:
+they cannot diverge because there is only one body. `setDiscordMemberMeta` was deleted rather
+than left beside its replacement, since the endpoint was its only caller.
+
+**The L14 decision, which needed the maintainer.** The phase's acceptance criterion asked for
+`updated` to count only rows actually changed. Tracing the bot showed that would break it:
+`ServerClient.pushMembersMeta` turns `updated === 0` on a non-empty push into `null` and
+`pushChangedMemberMeta` aborts the whole run on a refusal. Two ordinary cases answer zero under
+the narrowed meaning (a post-restart full re-push where nothing moved, and any batch of
+never-linked members, which is most batches since the bot pushes ALL guild members), so the
+sweep would stop at its first batch forever. That is exactly the phase's own stopping rule, so
+the two shapes went to the maintainer, who chose the additive one: `updated` keeps counting
+records accepted, and `changed` / `skipped` / `unapplied` carry the truth. **Phase 6 may now
+revisit the bot's hourly `FULL_RESYNC_INTERVAL_MS`, but must NOT remove it until the bot
+actually consumes `unapplied`**, because until then the resync is still the only thing that
+heals a member cached as pushed.
+
+**Review round.** privacy-security-review, migration-safety and database-performance-reviewer,
+the three Review Dispatch Matrix rows that match. No CRITICAL findings. Acted on: the
+out-of-range `joinedAtMs` that would have thrown BEFORE the query and killed all 1000 records
+(the old loop lost only the offending one); the flex-batch fail-open where a truncated body and
+a genuinely empty answer were byte-identical (now separated by the echoed `requested` count);
+the non-total `::int` cast on `state.level`, where one malformed character row would deny the
+read for the whole batch; a lock-ordering deadlock class the multi-row UPDATE introduced and
+the old per-row loop could not (deduped ids are now sorted); the one-sided LOCKSTEP pin, which
+asserted the ordering clause only on the new side and would have stayed green while `db.ts`
+drifted; and two comments that overstated what they guaranteed (the `updated === changed +
+skipped + unapplied.length` identity does not hold under a concurrent writer, and the
+reward_ledger justification was broader than what is true).
+
+**The BLOCKING finding, closed rather than deferred.** Both reviewers independently flagged
+that neither new statement was ever executed: `tests/discord_db.test.ts` routes a fake pool on
+SQL text, so it can count statements but cannot parse or plan one. A throwaway Postgres 16 was
+stood up with no Docker and no sudo (zonky portable binaries), and the work landed as
+`tests/discord_db_integration.test.ts`, DB-gated so it skips green in CI. It caught one
+over-specific assertion of mine and confirmed the rest: the classification triple, the no-op
+skip leaving `xmin` untouched, NULL-safe comparison, realm scoping, epoch survival, and the
+`state.level` fallbacks for a float, a string and a missing key. The measured plan at the
+packet's scale envelope (5000 links, 15000 characters, 1000 ids) is a nested loop over
+`characters_account` with a top-N sort per outer row: **6.6 ms, 5028 buffer hits**.
+
+**Mutation check.** Eight mutations across the new code, 8 killed, 0 survivors, including the
+one that matters most (narrowing `updated` to `applied.changed`, caught by three tests). One
+trap struck during the run and is now recorded in state.md: the inverse-edit restore anchored
+on a fragment that was not unique and put two lines back in the wrong function. It was caught
+by `tsc` plus a `git diff --stat` comparison against the pre-run numbers and repaired by hand.
+
+**Validation.** `npx tsc --noEmit` clean. `npx vitest run` green across the four discord server
+suites (165), the four http spine suites (372), the two new queue suites plus the duplicate
+guard (24), the flex-batch mapping suite (7), and the DB-gated integration suite (12 passed
+with `TEST_DATABASE_URL`, 12 skipped without it). `npm run build:server` green,
+`npm run ci:changed` exits 0. Full `npm run gate` was NOT run: it aborts at the malware step
+while sibling worktrees sit under `.worktrees/` and `.claude/worktrees/`, which is the known
+environmental failure, so the steps after it were run by hand instead.
+
+**Deferred, with reasons.** No `bot/` file was touched (D11 and scope; Phase 6 consumes
+`unapplied`). No observability on the new statements, which is Phase 8's row and named as F8 by
+the database reviewer. The two `discord_db` helpers carry no internal cap of their own beyond
+the handler's 1000, left alone deliberately because a silent slice inside a database helper
+would drop members without saying so. Discord ids are still length-sliced rather than
+shape-validated, which is unchanged behavior from members-meta and kept symmetric on purpose.

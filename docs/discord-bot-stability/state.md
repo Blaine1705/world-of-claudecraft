@@ -1,8 +1,9 @@
 # State: Discord Bot Stability (cross-phase cheat sheet)
 
-Current phase: Phase 3 BUILT and QA'd (2026-07-31); Phase 4 is next. Phases 1 and 2 built
-and QA'd (2026-07-30). The release base was re-synced during Phase 3 QA
-(`origin/release/v0.33.0` at `2ae71a7fb`, merged as `104994c21`, zero conflicts, audited).
+Current phase: Phase 4 BUILT (2026-07-31); Phase 4 QA is next. Phases 1 to 3 built and QA'd
+(Phase 3 on 2026-07-31, Phases 1 and 2 on 2026-07-30). The release base was re-synced during
+Phase 3 QA (`origin/release/v0.33.0` at `2ae71a7fb`, merged as `104994c21`, zero conflicts,
+audited); Phase 4 re-measured it at its start and it had not moved (70 ahead, 0 behind).
 
 ## Locked decisions
 
@@ -136,8 +137,9 @@ three poll-loop constants, moved out of `main.ts` by Phase 1 per R6), `bot/logic
 
 Server: `server/internal.ts` (RouteDef table :329-549, FROZEN legacy twins :75-241),
 `server/discord.ts` (flex :950, status payload :798, presence cache :185),
-`server/discord_db.ts` (accountForDiscord :134, setDiscordMemberMeta :590,
-reward_ledger DDL :86-95), `server/discord_relay.ts` (cap 50),
+`server/discord_db.ts` (accountForDiscord, setDiscordMemberMetaBulk,
+discordFlexRowsForDiscordIds, reward_ledger DDL with its keep-forever note; line numbers
+dropped here deliberately, Phase 4 moved every one of them), `server/discord_relay.ts` (cap 50),
 `server/discord_activity.ts` (cap 100, 30s dedupe), `server/db.ts`
 (highestCharacterForAccount :2669), `server/http/middleware/require_internal_secret.ts`,
 `server/http/registry.ts` (:33, :123), `server/main.ts` (retention :3080-3087,
@@ -215,12 +217,26 @@ because dropping the one word is otherwise silent),
   sizes (`trackedBuckets`, `trackedRoutes`, `activeQueues`) exist so the LRU bounds are
   observable at all; the first two are capped by `MAX_TRACKED_BUCKETS` and
   `MAX_TRACKED_ROUTES` (separate constants, same value, different populations).
-- New endpoints: (pending; planned `POST /internal/discord/flex-batch`,
-  `GET /internal/discord/outbox`)
+- New endpoints: `POST /internal/discord/flex-batch` (Phase 4, RouteDef-ONLY: the first
+  `/internal/*` route with no legacy `handleDiscordInternal` arm, since a route born after
+  the pipeline migration never gets one). Body `{ discord_user_ids: [...] }`, capped at 1000
+  and validated exactly like the members-meta member list; answers
+  `{ requested, members: [...] }` where each member is the per-id flex payload plus
+  `discord_user_id` and `linked: true`, and an UNLINKED id is ABSENT rather than stubbed.
+  `requested` echoes the accepted id count so a caller can tell a dropped request from a
+  genuinely empty answer. Still planned: `GET /internal/discord/outbox` (Phase 5).
 - New modules: `bot/cadence.ts` (the three poll-loop DEFAULTS, values only; `config.ts`
   layers the env overrides over them as of Phase 3), `bot/rate_governor.ts` (Phase 2, pure
   and clock-injected), `bot/scheduler.ts` and `bot/member_writes.ts` (Phase 3). Still
   planned: the change feed.
+- New server functions (Phase 4, all in existing modules; no new server module was needed):
+  `discordFlexRowsForDiscordIds` and `setDiscordMemberMetaBulk` in `server/discord_db.ts`,
+  `discordFlexForAccounts` in `server/discord.ts`, and `flexBatchHandler` plus the shared
+  `applyMemberMetaPush` / `parseMemberMetaRecords` / `sanitizeDiscordIdList` in
+  `server/internal.ts`. `setDiscordMemberMeta` (the per-member serial UPDATE) was REMOVED,
+  not kept beside its replacement: `server/internal.ts` was its only caller, so leaving it
+  would have been dead code. Both members-meta dispatch arms now call one shared function
+  rather than each reproducing the body, which is a stronger form of the dual-edit rule.
 - New tests: `tests/discord_bot_config.test.ts` (config arms + the cadence pins),
   `tests/discord_bot_server_client.test.ts` (call envelope, secret header, deadline,
   production-default path), `tests/discord_bot_discord_api.test.ts` (auth headers, the
@@ -251,6 +267,20 @@ because dropping the one word is otherwise silent),
   `tests/discord_bot_member_writes.test.ts` (the composed write paths: the zero-write steady
   state, the failure arm asserting the CACHE rather than a call count, the batching, and the
   echo arms). `tests/discord_bot_governor_pacing.test.ts` gained the L11 and L12 arms.
+  Phase 4 adds four SERVER files. `tests/server/discord_relay_queue.test.ts` and
+  `tests/server/discord_activity_queue.test.ts` are the first coverage either in-memory queue
+  has ever had (FIFO drain, the caps REACHED and the survivors pinned, the dedupe TTL on both
+  sides of the boundary, the 512-key sweep); their names avoid `tests/discord_relay.test.ts`,
+  which covers the unrelated sim module, and each says so in a header comment.
+  `tests/server/discord_flex_batch.test.ts` owns the row-to-payload mapping, including the
+  parity pin that runs `discordFlexForAccount` and `discordFlexForAccounts` over the SAME
+  account data and compares their output rather than restating the fields twice.
+  `tests/discord_db_integration.test.ts` is the DB-gated arm (skips green without
+  `TEST_DATABASE_URL`) that actually EXECUTES the two new statements: `tests/discord_db.test.ts`
+  drives them through a fake pool routing on SQL text, so nothing there parses or plans a line
+  of them. It proves the changed/skipped/unapplied classification, the no-op skip writing no
+  row version, NULL-safe comparison, realm scoping, the malformed-`state.level` fallbacks, and
+  the plan shape at scale.
 - New shared test helper: `tests/helpers/synthetic_clock.ts`, a fully virtual clock.
   Phase 3's scheduler drives it rather than vitest fake timers, as ruled.
 - OPEN, from the Phase 2 privacy-security review (no blocking findings; L1 confirmed
@@ -658,7 +688,31 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
 
 ### Found during Phase 3 QA (2026-07-31), routed rather than fixed
 
-- L14 (correctness, server side of the diff, OPEN, natural home Phase 4 with the set-based
+- L14 CLOSED by Phase 4 (`44e937cb7`), on the SERVER side only; the bot half is Phase 6.
+  members-meta now reports what it applied: `changed` (rows whose stored values really moved),
+  `skipped` (rows that existed and already matched), and `unapplied` (the ids with NO link
+  row). The report is the id LIST, not the `rowCount` this entry originally asked for, because
+  a count cannot tell the pusher WHICH members to leave dirty; the phase-04 file supersedes the
+  wording below on that point.
+  ONE THING THIS ENTRY ASKED FOR WAS DELIBERATELY NOT DONE, and Phase 6 must not undo the
+  reason. `updated` still counts records ACCEPTED, not rows written. Narrowing it, which is
+  what "report rowCount" reads as, breaks the CURRENT bot: `ServerClient.pushMembersMeta`
+  (`bot/server_client.ts`) turns `updated === 0` on a non-empty push into `null`, and
+  `pushChangedMemberMeta` (`bot/member_writes.ts`) ABORTS the whole run on a refusal, skipping
+  every later batch. Two ordinary situations would then answer zero: a post-restart full
+  re-push where nothing changed, and any batch of guild members who never linked (the bot
+  pushes ALL members, so most batches). The result would be a sweep that never populates its
+  cache and never reaches its later batches. The stopping rule in the phase-04 file covers
+  exactly this and the shape was taken to the maintainer, who chose the additive one.
+  Proof: `tests/server/internal.test.ts` "discord/members-meta applied-vs-read reporting"
+  (an unlinked id is named in `unapplied` and not counted in `changed`; an identical re-push
+  reports zero changed and non-zero skipped; a regression pin asserts a non-empty push never
+  answers `updated` 0), plus `tests/discord_db_integration.test.ts` running the real statement
+  against Postgres 16. Phase 6 may now revisit the bot's hourly `FULL_RESYNC_INTERVAL_MS`, but
+  it must NOT be removed until the bot actually consumes `unapplied`: until then the resync is
+  still the only thing that heals a member whose meta was cached as pushed. Original report,
+  kept for the record:
+- L14 (correctness, server side of the diff, was OPEN, natural home Phase 4 with the set-based
   endpoints): `/internal/discord/members-meta` reports every record it ITERATED as updated
   (`server/internal.ts`, `updated++` per record), not every row it actually wrote.
   `setDiscordMemberMeta` is a bare `UPDATE discord_links ... WHERE discord_user_id = $1`, so a
@@ -839,3 +893,34 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   `Promise<boolean | void>` can hold, and `forgetMember` deleting `memberNames` is a no-op at
   both of its call sites. Record the diagnosis where the next reader will look, the way this
   file's suites already record their honest limits, rather than inventing a rig to kill it.
+- **The bot's members-meta client refuses on `updated === 0`, one layer ABOVE `pushRejected`.**
+  Reading `pushRejected` alone (it only refuses null and undefined) says any truthy body is
+  accepted, and that is the trap: `ServerClient.pushMembersMeta` turns `updated === 0` on a
+  non-empty push into `null` FIRST, and `pushChangedMemberMeta` then aborts the whole run,
+  skipping every later batch. So the server cannot narrow `updated` to "rows written" without a
+  paired bot change: a post-restart re-push (nothing changed) and any all-unlinked batch would
+  both read as total failures. Phase 4 hit this against its own acceptance criterion and the
+  additive shape was chosen deliberately (see L14). Whenever a phase changes a response field
+  the bot reads, trace the WHOLE client path, not just the obvious predicate.
+- **An inverse-edit restore must be anchored on something UNIQUE.** Mutation checks in an
+  uncommitted tree cannot use `git checkout` (it destroys the work), so the restore is a
+  reverse string replace, and a first-occurrence replace of a GENERIC fragment lands in the
+  wrong function. Struck live in Phase 4: restoring `  const res = await pool.query(` put an
+  early return from one function into a different one further up the file, and the "did the
+  original text come back" assertion passed because the text WAS back, just in the wrong place.
+  Include enough surrounding context to make the anchor unique, and after any mutation run
+  verify with `git diff --stat` against the pre-run numbers, not just a grep for the symbol.
+- **Novel SQL needs an executed test, not a text pin.** `tests/discord_db.test.ts` drives
+  `discord_db` through a fake pool that routes on SQL text: excellent for statement COUNTS and
+  bound parameters, blind to whether the statement parses, plans, or means what it says. Phase 4
+  shipped a data-modifying CTE, multi-argument `unnest`, a row-constructor `IS DISTINCT FROM`
+  and a `LATERAL`, none of which any text pin can validate. The answer is a DB-gated
+  `*_integration.test.ts` (skips green without `TEST_DATABASE_URL`), and a throwaway Postgres
+  can be stood up here with no Docker and no sudo from the zonky portable PG16 binaries on
+  Maven Central. It caught a real over-specific plan assertion and confirmed the level guard;
+  do not let the next phase's SQL ship on text pins alone.
+- **`jsonb_typeof(x) = 'number'` does NOT make `::int` safe.** JSON numbers include floats, and
+  `'40.5'::int` raises just like `'boom'::int` does; `numeric::int` still raises out of range.
+  A total guard needs all three parts (type check, cast through `numeric`, bounds test). In a
+  batched read this matters far more than in a per-row one: one malformed row denies the read
+  for every OTHER member in the batch, where the per-account TypeScript path shrugged.
