@@ -118,7 +118,7 @@ on the slow side of the hash today:
 
 - `tests/corpse_harvest_sim.test.ts` (~3.7k lines, shard 3)
 - `tests/server/admin.test.ts` (~3.0k, shard 3)
-- `tests/nythraxis_raid.test.ts` (~2.7k, shard 3)
+- `tests/nythraxis_raid_unit.test.ts` (~2.7k, shard 3)
 - `tests/hud_perf_budget.test.ts` (~2.7k, shard 3)
 - `tests/localization_coverage.test.ts` (~1.8k, shard 3)
 - `tests/guide.test.ts` (~1.7k, shard 3)
