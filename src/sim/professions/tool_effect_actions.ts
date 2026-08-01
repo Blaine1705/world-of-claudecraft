@@ -52,6 +52,19 @@ import {
 } from './tools';
 
 /**
+ * Ceiling for a wire-supplied id echoed back inside a `toolEffectResult`
+ * event. The longest shipped profession or effect id is 16 chars; the server
+ * forwards `msg.profession` / `msg.effect` after only a typeof check, so the
+ * deny arms (above all `invalid_request`) would otherwise serialize a
+ * hostile id of up to the 16 KiB frame cap straight back to its sender.
+ */
+export const MAX_ECHOED_WIRE_ID_LENGTH = 64;
+
+function boundEchoedWireId(id: string): string {
+  return id.length > MAX_ECHOED_WIRE_ID_LENGTH ? id.slice(0, MAX_ECHOED_WIRE_ID_LENGTH) : id;
+}
+
+/**
  * Slot `effectId` onto `professionId`, consuming one charm copy from bags.
  * The resolver owns all seven refusals plus WHICH copy is consumed (self-signed
  * first, unsigned second, first signed third), and the consumed copy's
@@ -61,11 +74,18 @@ import {
  */
 export function slotToolEffectAction(
   ctx: SimContext,
-  professionId: string,
-  effectId: string,
+  professionIdWire: string,
+  effectIdWire: string,
   confirmMode: ToolEffectConfirmMode = 'always',
   pid?: number,
 ): void {
+  // Bound the raw wire ids before ANY use: every deny below echoes them back
+  // to the sender inside the result event, and the server passes them through
+  // after only a typeof check, so an unclamped id would ride a 16 KiB junk
+  // string byte-for-byte back onto the wire. A legal id is 16 chars or less;
+  // the clamp is invisible to every valid request.
+  const professionId = boundEchoedWireId(professionIdWire);
+  const effectId = boundEchoedWireId(effectIdWire);
   const r = ctx.resolve(pid);
   if (!r) return;
   const resolved = resolveSlotToolEffect(
@@ -225,9 +245,11 @@ export function restoreToolEffectSlotAction(
  */
 export function rechargeToolEffectAction(
   ctx: SimContext,
-  professionId: string,
+  professionIdWire: string,
   pid?: number,
 ): void {
+  // Same wire-id clamp as slotToolEffectAction, for the same echo reason.
+  const professionId = boundEchoedWireId(professionIdWire);
   const r = ctx.resolve(pid);
   if (!r) return;
   // `effectId` rides every deny that HAS a slot resolved: the client renders

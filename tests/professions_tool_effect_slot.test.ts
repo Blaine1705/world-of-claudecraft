@@ -8,7 +8,12 @@
 // moved every golden in the suite for a feature no scenario uses. Several arms
 // below assert absence specifically, not emptiness.
 import { describe, expect, it } from 'vitest';
-import { TOOL_EFFECT_IDS, TOOL_EFFECTS } from '../src/sim/content/professions';
+import {
+  GATHERING_PROFESSION_IDS,
+  TOOL_EFFECT_IDS,
+  TOOL_EFFECTS,
+} from '../src/sim/content/professions';
+import { MAX_ECHOED_WIRE_ID_LENGTH } from '../src/sim/professions/tool_effect_actions';
 import {
   MAX_CRAFTED_BY_LENGTH,
   normalizeToolEffectSlots,
@@ -1017,5 +1022,66 @@ describe('the id tables and the load normalizer, directly', () => {
     if (live?.logging) live.logging.durability -= 4;
     expect(state.toolEffectSlots?.mining?.durability).toBe(saved.mining);
     expect(state.toolEffectSlots?.logging?.durability).toBe(saved.logging);
+  });
+});
+
+describe('the deny echo clamps wire-supplied ids (the whole-branch hardening)', () => {
+  it('pins the ceiling literal and that every shipped id sits far under it', () => {
+    // 64 is the wire contract: the deny arms echo the raw client strings and
+    // the clamp is the only bound between a 16 KiB junk id and the sender.
+    expect(MAX_ECHOED_WIRE_ID_LENGTH).toBe(64);
+    for (const id of [...GATHERING_PROFESSION_IDS, ...TOOL_EFFECT_IDS]) {
+      expect(id.length, id).toBeLessThan(MAX_ECHOED_WIRE_ID_LENGTH);
+    }
+  });
+
+  it('a slot deny echoes an oversized professionId clamped, never byte-for-byte', () => {
+    const sim = simHolding('copper_mining_pick');
+    const junk = 'x'.repeat(5000);
+    sim.drainEvents();
+    sim.slotToolEffect(junk, 'gatherers_cache');
+    expect(sim.drainEvents().find((e) => e.type === 'toolEffectResult')).toMatchObject({
+      action: 'slot',
+      ok: false,
+      professionId: junk.slice(0, MAX_ECHOED_WIRE_ID_LENGTH),
+    });
+  });
+
+  it('a slot deny clamps an oversized effectId the same way', () => {
+    const sim = simHolding('copper_mining_pick');
+    const junk = 'e'.repeat(5000);
+    sim.drainEvents();
+    sim.slotToolEffect('mining', junk);
+    expect(sim.drainEvents().find((e) => e.type === 'toolEffectResult')).toMatchObject({
+      action: 'slot',
+      ok: false,
+      effectId: junk.slice(0, MAX_ECHOED_WIRE_ID_LENGTH),
+    });
+  });
+
+  it('a recharge deny clamps the oversized professionId too', () => {
+    const sim = makeSim();
+    const junk = 'r'.repeat(16000);
+    sim.drainEvents();
+    sim.rechargeToolEffect(junk);
+    expect(sim.drainEvents().find((e) => e.type === 'toolEffectResult')).toMatchObject({
+      action: 'recharge',
+      ok: false,
+      professionId: junk.slice(0, MAX_ECHOED_WIRE_ID_LENGTH),
+    });
+  });
+
+  it('a valid id is untouched by the clamp on a real deny', () => {
+    // The clamp must be invisible to legal traffic: a genuine deny still
+    // names the exact profession the player asked about.
+    const sim = makeSim(); // no tool at all
+    sim.drainEvents();
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(sim.drainEvents().find((e) => e.type === 'toolEffectResult')).toMatchObject({
+      action: 'slot',
+      ok: false,
+      professionId: 'mining',
+      effectId: 'gatherers_cache',
+    });
   });
 });
