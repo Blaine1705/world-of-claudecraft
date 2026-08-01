@@ -10,6 +10,24 @@ const gate = readFileSync(new URL('../scripts/gate.mjs', import.meta.url), 'utf8
 const SHARD_N = 8;
 const SHARD_MATRIX = Array.from({ length: SHARD_N }, (_, i) => i + 1).join(', ');
 
+// Shared serialized check-run lines for both pr-checks and release-checks (D8).
+// One list so a step added on one arm only fails the other arm's pin.
+const CHECK_RUN_STEPS = [
+  'run: npm run i18n:gen',
+  'run: node scripts/i18n_coverage_summary.mjs',
+  'run: git diff --exit-code -- src/ui/i18n.resolved.generated',
+  'run: npm run security:gate',
+  'run: npm run check:types',
+  'run: npm run build:env',
+  'run: npm run build:server',
+  'run: npm run build\n',
+] as const;
+
+// Exact job-level if line for both release jobs. toContain alone would allow a
+// widened expression that still embeds this fragment and could run on ordinary PRs.
+const RELEASE_IF_LINE =
+  "    if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))";
+
 function jobSource(name: string): string {
   const match = workflow.match(new RegExp(`\\n  ${name}:[\\s\\S]*?(?=\\n  [a-z][a-z-]+:|$)`));
   if (!match) throw new Error(`missing CI job: ${name}`);
@@ -119,20 +137,17 @@ describe('CI workflow parity', () => {
       expect(job).toContain("github.event_name == 'workflow_dispatch'");
       expect(job).not.toContain('I18N_RELEASE_TIER');
     }
-    // Both release jobs share the same if-fragment so they skip or run together.
-    // Anchored to the JOB level (the 4-space env block) on the TEST job only:
-    // moving the flag onto a single step would silently run the other shards at
-    // PR tier; putting it on release-checks is unnecessary and would widen the
-    // env surface without changing enforcement.
-    const releaseIf =
-      "(github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))";
+    // Both release jobs share the exact same job-level if line so they skip or
+    // run together. Exact-line match (not bare toContain of the fragment) so a
+    // widened condition that still embeds the fragment cannot sneak ordinary
+    // feature PRs onto release-checks. Anchored to the JOB level env block on
+    // the TEST job only: moving the flag onto a single step would silently run
+    // the other shards at PR tier; putting it on release-checks is unnecessary.
     for (const job of [releaseGate, releaseChecks]) {
-      expect(job).toContain(releaseIf);
-      expect(job).toContain("github.event_name == 'pull_request' && github.base_ref == 'main'");
-      expect(job).toContain("startsWith(github.head_ref, 'release/')");
-      expect(job).toContain(
-        "github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/')",
-      );
+      expect(job).toContain(RELEASE_IF_LINE);
+      // Exactly one job-level if: line, equal to the literal (no widen).
+      const ifLines = job.match(/^\s{4}if: .+$/gm) ?? [];
+      expect(ifLines).toEqual([RELEASE_IF_LINE]);
     }
     expect(releaseGate).toContain("\n    env:\n      I18N_RELEASE_TIER: '1'");
     expect(releaseChecks).not.toContain('I18N_RELEASE_TIER');
@@ -148,16 +163,7 @@ describe('CI workflow parity', () => {
     expect(prChecks).not.toContain('needs:');
     expect(prGate).toContain('run: npm test');
     expect(prChecks).not.toContain('run: npm test');
-    for (const step of [
-      'run: npm run i18n:gen',
-      'run: node scripts/i18n_coverage_summary.mjs',
-      'run: git diff --exit-code -- src/ui/i18n.resolved.generated',
-      'run: npm run security:gate',
-      'run: npm run check:types',
-      'run: npm run build:env',
-      'run: npm run build:server',
-      'run: npm run build\n',
-    ]) {
+    for (const step of CHECK_RUN_STEPS) {
       expect(prChecks).toContain(step);
       expect(prGate).not.toContain(step);
     }
@@ -178,19 +184,14 @@ describe('CI workflow parity', () => {
     // Red-path pin: reintroducing single-shard gating on the test job fails.
     expect(releaseGate).not.toContain('matrix.shard == 1');
     expect(workflow).not.toContain('matrix.shard == 1');
-    for (const step of [
-      'run: npm run i18n:gen',
-      'run: node scripts/i18n_coverage_summary.mjs',
-      'run: git diff --exit-code -- src/ui/i18n.resolved.generated',
-      'run: npm run security:gate',
-      'run: npm run check:types',
-      'run: npm run build:env',
-      'run: npm run build:server',
-      'run: npm run build\n',
-    ]) {
+    for (const step of CHECK_RUN_STEPS) {
       expect(releaseChecks).toContain(step);
       expect(releaseGate).not.toContain(step);
     }
+    // Named-step count: checkout, setup-node, npm ci, plus the eight checks.
+    // An accidental extra step on the checks job would otherwise stay green.
+    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(11);
+    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(11);
   });
 
   it(`shards the PR and release test steps ${SHARD_N} ways and keeps the checks single-shard`, () => {

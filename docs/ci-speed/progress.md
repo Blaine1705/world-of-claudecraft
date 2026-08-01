@@ -324,6 +324,8 @@ packet import hygiene later (D15).
 - Red-path: temporary `if: matrix.shard == 1` inject on release-gate failed `splits the release tier...` and the shard pin; YAML restored; pins green again.
 - N stays 8; fail-fast false; gate.mjs unsharded; I18N_RELEASE_TIER only on release-gate job env (not on release-checks or pr-*).
 - Completeness baseline still 1939 Test Files (post Phase 3); no suite changes in this phase.
+- Pin harden (test-coverage-auditor SHOULD-FIX): exact job-level `if:` line match for both release jobs; shared `CHECK_RUN_STEPS` for PR/release parity; named-step count 11 on both check jobs.
+- Reviewers: privacy-security PASS (0 BLOCKING/SHOULD-FIX; NIT on workflow_dispatch staying PR-tier only, pre-existing). test-coverage PASS after pin harden.
 
 ## Phase 5 checklist
 
