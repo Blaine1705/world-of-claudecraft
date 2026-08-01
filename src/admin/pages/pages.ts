@@ -12,6 +12,7 @@ export type AdminPage =
   | 'accounts'
   | 'characters'
   | 'online-players'
+  | 'guilds'
   | 'moderation'
   | 'moderation-history'
   | 'suspicious-players'
@@ -62,6 +63,7 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
       // The live roster moved off the Overview dashboard onto its own page, so it
       // keeps the already-localized title that panel used.
       { id: 'online-players', labelKey: 'online.title', permission: 'accounts.read' },
+      { id: 'guilds', labelKey: 'nav.guilds', permission: 'accounts.read' },
     ],
   },
   {

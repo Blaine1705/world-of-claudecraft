@@ -1871,6 +1871,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.joinParty': '파티 참가',
   'hud.prompts.guildInvite': '{name}님이 {guild}에 초대했습니다.',
   'hud.prompts.joinGuild': '길드 참가',
+  'hud.prompts.guildInviteCancelled': '길드 이름이 변경되어 대기 중인 길드 초대가 취소되었습니다.',
+  'hud.prompts.guildRenamed': '운영팀이 회원님의 길드 이름을 {name}(으)로 변경했습니다.',
   'hud.prompts.tradeRequest': '{name}님이 거래를 원합니다.',
   'hud.prompts.openTrade': '거래 열기',
   'hud.prompts.duelRequest': '{name}님이 결투를 신청했습니다!',

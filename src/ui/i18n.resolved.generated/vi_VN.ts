@@ -6442,6 +6442,8 @@ export const vi_VN: EnTranslations = {
       "joinParty": "Gia Nhập Tổ Đội",
       "guildInvite": "{name} mời bạn gia nhập {guild}.",
       "joinGuild": "Gia Nhập Bang Hội",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} muốn giao dịch với bạn.",
       "openTrade": "Mở Giao Dịch",
       "duelRequest": "{name} đã thách đấu tay đôi với bạn!",

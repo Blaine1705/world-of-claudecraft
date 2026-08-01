@@ -6442,6 +6442,8 @@ export const ko_KR: EnTranslations = {
       "joinParty": "파티 참가",
       "guildInvite": "{name}님이 {guild}에 초대했습니다.",
       "joinGuild": "길드 참가",
+      "guildInviteCancelled": "길드 이름이 변경되어 대기 중인 길드 초대가 취소되었습니다.",
+      "guildRenamed": "운영팀이 회원님의 길드 이름을 {name}(으)로 변경했습니다.",
       "tradeRequest": "{name}님이 거래를 원합니다.",
       "openTrade": "거래 열기",
       "duelRequest": "{name}님이 결투를 신청했습니다!",

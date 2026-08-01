@@ -1590,6 +1590,16 @@ export class GameServer {
     return this.sessionsByCharacterId.has(characterId);
   }
 
+  // Cheap admin readout: character ids with a live socket only. Linkdead
+  // sessions stay resident for resume semantics but are not shown as online.
+  liveCharacterIds(): Set<number> {
+    const ids = new Set<number>();
+    for (const session of this.sessionsByCharacterId.values()) {
+      if (!session.linkdead && session.ws.readyState === 1) ids.add(session.characterId);
+    }
+    return ids;
+  }
+
   // -------------------------------------------------------------------------
   // Social presence/transport: bridges the persistent SocialService to the
   // live client map + sim. Keyed by character id (stable across sessions),
@@ -1924,6 +1934,17 @@ export class GameServer {
       },
       pushSnapshot: (id) => {
         void this.sendSocialSnapshot(id);
+      },
+      onGuildRenamed: (id, guildId, oldName, newName) => {
+        const s = this.sessionByCharacterId(id);
+        if (!s) return;
+        // Vale Cup banner/credit identity moves before the live entity stamp;
+        // this is a rename, never a leave/rejoin or a deed transition.
+        this.sim.renamePlayerGuild(s.pid, oldName, newName);
+        this.send(s, {
+          t: 'events',
+          list: [{ type: 'guildRenamed', guildId, newName }],
+        });
       },
       onBlocksChanged: (id, ids) => {
         const s = this.sessionByCharacterId(id);

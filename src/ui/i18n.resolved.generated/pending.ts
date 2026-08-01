@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ],
+  "es_ES": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ],
+  "fr_FR": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ],
+  "fr_CA": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ],
+  "de_DE": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ],
+  "nl_NL": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ],
+  "pl_PL": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ],
+  "id_ID": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ],
+  "tr_TR": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ],
+  "sv_SE": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ],
+  "vi_VN": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ],
+  "da_DK": [
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed"
+  ]
 };

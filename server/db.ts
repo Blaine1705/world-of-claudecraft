@@ -10,6 +10,8 @@ import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ActionBarLayout } from '../src/world_api/action_bar';
+import { bustAdminGuildListReads } from './admin_guilds_read';
+import { ADMIN_GUILDS_SCHEMA } from './admin_guilds_schema';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import { validCharName } from './auth';
 import type { BankBonusFacts } from './bank_entitlements';
@@ -1105,6 +1107,7 @@ export async function ensureSchema(): Promise<void> {
     // fresh database SCHEMA alone could not create it.
     await client.query(DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL);
     await client.query(SOCIAL_SCHEMA);
+    await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(OAUTH_SCHEMA);
     // Discord integration tables (links, oauth states, pending logins, reward
     // economy). FK-references accounts(id), so it runs after SCHEMA. Applied
@@ -2929,6 +2932,7 @@ export async function reclaimDeactivatedName(name: string): Promise<boolean> {
     // a feed item. After COMMIT, on the released path only: every refusal above
     // rolled back without touching the row (Phase 5 QA feed sweep).
     enqueueLinkChange({ accountId: row.account_id, kinds: ['flex'] }, Date.now());
+    bustAdminGuildListReads();
     return true;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -2948,6 +2952,7 @@ export async function deleteCharacter(accountId: number, characterId: number): P
   // promotes the next-ordered one (or none). A miss (wrong owner, wrong realm,
   // already gone) changes nothing and must not enqueue.
   if (deleted) enqueueLinkChange({ accountId, kinds: ['flex'] }, Date.now());
+  if (deleted) bustAdminGuildListReads();
   return deleted;
 }
 
@@ -3010,6 +3015,7 @@ export async function renameCharacter(
   // exclusion's stated reason ("the name is outside the flex definition") was
   // wrong about the payload.
   if (row) enqueueLinkChange({ accountId, kinds: ['flex'] }, Date.now());
+  if (row) bustAdminGuildListReads();
   return row;
 }
 

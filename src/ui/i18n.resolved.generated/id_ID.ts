@@ -6442,6 +6442,8 @@ export const id_ID: EnTranslations = {
       "joinParty": "Gabung Party",
       "guildInvite": "{name} mengundang Anda untuk bergabung dengan {guild}.",
       "joinGuild": "Gabung Guild",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} ingin berdagang dengan Anda.",
       "openTrade": "Buka Perdagangan",
       "duelRequest": "{name} menantang Anda untuk berduel!",
