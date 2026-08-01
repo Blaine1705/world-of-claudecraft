@@ -179,25 +179,23 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
       expect(me?.castAim?.z).toBeCloseTo(0, 1);
     });
 
-    if (c.spell !== 'rain_of_fire') {
-      it(`${c.spell} (${c.cls}) emits a radius-carrying aimed pulse on channel tick`, () => {
-        const sim = castGroundSpell(c.cls, c.spell, { x: 16, z: 0 });
-        const radius = sim.known
-          .find((k) => k.def.id === c.spell)
-          ?.def.effects.find((eff) => eff.type === 'aoeDamage')?.radius;
-        sim.drainEvents();
+    it(`${c.spell} (${c.cls}) emits a radius-carrying aimed pulse on channel tick`, () => {
+      const sim = castGroundSpell(c.cls, c.spell, { x: 16, z: 0 });
+      const radius = sim.known
+        .find((k) => k.def.id === c.spell)
+        ?.def.effects.find((eff) => eff.type === 'aoeDamage')?.radius;
+      sim.drainEvents();
 
-        let fx: ReturnType<typeof aimedFx>;
-        for (let i = 0; i < 40 && !fx; i++) {
-          fx = sim.tick().find((e) => e.type === 'spellfxAt');
-        }
+      let fx: ReturnType<typeof aimedFx>;
+      for (let i = 0; i < 40 && !fx; i++) {
+        fx = sim.tick().find((e) => e.type === 'spellfxAt');
+      }
 
-        expect(fx).toBeDefined();
-        expect(fx?.x).toBeCloseTo(16, 1);
-        expect(fx?.z).toBeCloseTo(0, 1);
-        expect(fx?.radius).toBe(radius);
-      });
-    }
+      expect(fx).toBeDefined();
+      expect(fx?.x).toBeCloseTo(16, 1);
+      expect(fx?.z).toBeCloseTo(0, 1);
+      expect(fx?.radius).toBe(radius);
+    });
   }
 
   it('Rain of Fire creates an instant lingering zone that damages the aimed area', () => {

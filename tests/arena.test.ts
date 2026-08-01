@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cameraOcclusion, lineOfSightClear, resolveMovement } from '../src/sim/colliders';
+import { lineOfSightClear, resolveMovement } from '../src/sim/colliders';
 import { AFFLICTION_EYE_DEATH_GAIN, doomValue } from '../src/sim/combat/affliction';
 import {
   ARENA_SLOT_COUNT,

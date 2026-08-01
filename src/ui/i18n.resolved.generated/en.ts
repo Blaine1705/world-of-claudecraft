@@ -318,11 +318,17 @@ export const en: EnTranslations = {
   "hudChrome": {
     "warlock": {
       "doomLabel": "Condemnation",
+      "fateThreadsLabel": "Fate Threads",
       "doomEmptyStatus": "{value} of {max} Condemnation.",
-      "doomStatus": "{value} of {max} Condemnation; {remaining}."
+      "doomStatus": "{value} of {max} Condemnation; {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Fate Threads.",
+      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
+      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
     },
     "procOverlay": {
-      "soulFragmentsMeter": "Soul Fragments"
+      "soulFragmentsMeter": "Soul Fragments",
+      "ruinMeter": "Ruin",
+      "ruinStatus": "{value} of {max} Ruin"
     },
     "spectate": {
       "banner": "Spectating {name}"
@@ -1765,15 +1771,29 @@ export const en: EnTranslations = {
       "absorb": "Absorbs {value} damage",
       "healAbsorb": "Absorbs {value} incoming healing",
       "thorns": "Deals {value} {school} damage to attackers",
+      "stasis": "Immune and unable to act",
       "slow": "Reduces movement speed by {pct}%",
       "speed": "Increases movement speed by {pct}%",
       "attackSpeedSlow": "Slows attack speed by {pct}%",
       "attackSpeedFast": "Increases attack speed by {pct}%",
       "haste": "Increases attack and casting speed by {pct}%",
+      "petDamage": "Increases pet damage by {pct}%",
+      "petHaste": "Increases pet action speed by {pct}%",
+      "spellDamage": "Increases spell damage by {pct}%",
+      "spellHaste": "Increases spell casting speed by {pct}%",
+      "sated": "Cannot benefit from another group haste effect",
+      "cauterizeFatigue": "Cauterize cannot prevent another lethal hit",
+      "castShield": "Casting cannot be interrupted or delayed by damage",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "elementalConvergencePrimed": "Your next spell from the other elemental school grants Elemental Convergence",
+      "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
+      "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
+      "leadenHexLock": "Leaden Hex cannot root this target again yet",
+      "forbiddenReflectionReady": "Your next eligible shared Warlock cooldown can be cast again",
+      "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
+      "internalCooldown": "This effect cannot trigger again until the timer expires",
       "battleStance": "Battle Stance: 10% more rage generation",
       "berserkerStance": "Berserker Stance: crits 3% more often and hit 3% harder",
       "crit": "Increases critical strike chance by {pct}%",
@@ -1787,6 +1807,13 @@ export const en: EnTranslations = {
       "revengeFree": "Your next Revenge costs no Rage",
       "victoryRush": "Victory Rush is ready",
       "maxHpPct": "Increases maximum health by {pct}%",
+      "enrage": "Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%",
+      "suddenDeath": "Your next Execute costs no Rage and ignores its health requirement",
+      "aoeEcho": "{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies",
+      "sureCrit": "{charges} damaging ability casts are guaranteed critical strikes",
+      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
+      "arcaneCharge": "{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana",
+      "physicalReduction": "Reduces Physical damage taken by {pct}%",
       "temporalHourglass": "Immune and unable to act; restores health and accelerates cooldown recovery. Right-click to cancel.",
       "tongues": "Increases casting time by {pct}%",
       "combustionCrit": "Your Fire spells always critically strike",
@@ -1796,6 +1823,10 @@ export const en: EnTranslations = {
       "freeCast": "Your next cast costs nothing",
       "instantCast": "Your next spell with a cast time is instant",
       "cheapCast": "Your next spell costs {pct}% less",
+      "freeExecute": "Your next eligible execute ability costs nothing",
+      "resourceSap": "Restores {value} of your current resource every {interval} sec",
+      "nextAttackCrit": "Your next attack is guaranteed to critically strike",
+      "healEcho": "Falling below {threshold}% health restores {value} health",
       "increase": {
         "ap": "Increases attack power by {value}",
         "sp": "Increases spell power by {value}",
@@ -1834,6 +1865,8 @@ export const en: EnTranslations = {
       "mortalWound": "Reduces healing received by {pct}%",
       "vulnerability": "Increases damage taken by {pct}%",
       "physVuln": "Increases physical damage taken by {pct}%",
+      "bleedVuln": "Increases bleed damage taken by {pct}%",
+      "sourceVuln": "Takes {pct}% more damage from the caster who applied this effect",
       "spellVuln": "Increases magic damage taken by {pct}%",
       "critVuln": "Increases chance to be critically hit by {pct}%",
       "costTax": "Increases ability costs by {pct}%",
@@ -1853,8 +1886,39 @@ export const en: EnTranslations = {
       "formCat": "Wolf Form: melee damage and energy",
       "formTravel": "Fleet Form: movement speed increased by {pct}%",
       "formFireball": "Ember Form: movement speed increased by {pct}%; attacks and spells are disabled",
+      "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
+      "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
+      "resourceCount": "{value} of {max}",
+      "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
+      "afflictionEye": "Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
+      "afflictionEyeSecondary": "Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
+      "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
+      "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
+      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
+      "afflictionPossession": "Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence",
+      "afflictionJudgment": "Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation",
+      "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
+      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick",
+      "afflictionConsumeThreads": "Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick",
+      "necromancyHarvestMark": "Death can create 1 Soul Fragment and leaves a Death Echo for Corpse Explosion",
+      "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
+      "necromancyDeathEcho": "Corpse Explosion can consume this echo within {radius} yd of its aim",
+      "warlockAnchor": "Recast within {range} yd to return here and consume the anchor",
+      "formMetamorph": "Demon form: body size increased by {pct}%; other bonuses ride separate buffs",
+      "energyRegen": "Increases Energy regeneration by {pct}%",
       "defensiveStance": "Guarded Stance: reduced damage taken, more threat",
       "righteousFury": "Burning Oath: greatly increased threat from Holy damage",
+      "overpowerCharge": "{stacks} charges: your next Maiming Strike deals {pct}% more damage",
+      "sweepingStrikes": "Single-target strikes also hit {targets} nearby enemy for {pct}% damage",
+      "fingersOfFrost": "{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage",
+      "brainFreeze": "Your next Flurry is instant and ignores its cooldown",
+      "wintersChill": "{charges} charges: compatible spells treat this target as frozen",
+      "icicles": "{value} of {max} Icicles; at {max}, Glacial Spike can be cast",
+      "desolation": "{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately",
+      "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
+      "duskfireClaim": "Death grants {value} Ruin",
+      "pyreGuardian": "Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
+      "perfectMoment": "Aether Darts does not consume Arcane Charges",
       "scale": "Size increased by {pct}%",
       "jump": "Jump height increased by {pct}%",
       "school": {
@@ -3546,7 +3610,7 @@ export const en: EnTranslations = {
       "conjure_water": "Conjures drinks that restore mana, so you can refill between pulls.",
       "conjure_food": "Conjures food that restores health when you sit down to eat.",
       "shadow_bolt": "A bolt of shadow you cast at a target, your go-to nuke.",
-      "summon_imp": "Calls up an Emberkin that flings firebolts at enemies from range.",
+      "summon_imp": "Calls up an Emberkin that casts Felbolt at enemies from range.",
       "demon_skin": "A lasting self-buff that toughens your skin and adds armor.",
       "immolate": "Sets a target alight for an opening hit and a burn that lingers.",
       "corruption": "Rots a target with shadow that ticks while you do other things.",
@@ -3559,8 +3623,8 @@ export const en: EnTranslations = {
       "thorns": "Wards an ally so melee attackers hurt themselves for striking."
     },
     "petHook": {
-      "emberkin": "A ranged firebolt demon that chips at enemies from a safe distance.",
-      "gloomshade": "A sturdy demon that taunts and soaks hits so you can cast in peace.",
+      "emberkin": "A ranged demon whose signature Felbolt chips at enemies from a safe distance.",
+      "gloomshade": "A sturdy tank demon that taunts and uses Abyssal Chain to pull fleeing normal enemies back into reach; bosses resist the pull.",
       "duskborn": "A fast melee demon that hits hard but folds under pressure.",
       "spellhound": "A shadow skirmisher that hounds enemy casters.",
       "warfiend": "A durable melee bruiser, the all-rounder once you can summon it.",
@@ -6649,6 +6713,10 @@ export const en: EnTranslations = {
     "pet": {
       "attack": "Attack",
       "waterJet": "Water Jet",
+      "felbolt": "Felbolt",
+      "abyssalChain": "Abyssal Chain",
+      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
+      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
       "taunt": "Taunt",
       "healDemon": "Heal Demon",
       "healPet": "Feed Pet",
@@ -6659,6 +6727,10 @@ export const en: EnTranslations = {
       "petAttackDesc": "Command your pet to attack your current hostile target.",
       "waterJetTitle": "Water Jet",
       "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
+      "felboltTitle": "Felbolt",
+      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "abyssalChainTitle": "Abyssal Chain",
+      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
       "petTauntTitle": "Pet Taunt",
       "petTauntDesc": "Command your pet to engage and Growl when in range. 10 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "healDemonDesc": "Spend mana to channel healing into your demon over 5 seconds.",
@@ -7021,6 +7093,7 @@ export const en: EnTranslations = {
       "clickDestroy": "Click to destroy",
       "useFishing": "Use: Fish in nearby waters.",
       "useHealingPotion": "Use: Instantly restores {amount} health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
       "useManaPotion": "Use: Instantly restores {amount} mana. Usable in combat. 2 min cooldown.",
       "clickUseInstant": "Click to use instantly in combat",
       "clickUse": "Click to use",
@@ -7769,11 +7842,19 @@ export const en: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Litany of Guilt",
-        "description": "Curses your primary Evil Eye for 8 sec. Condemnation gains release a wave that damages up to 4 other enemies within 8 yards, at most once per second."
+        "description": "Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+      },
+      "cinderhide": {
+        "name": "Cinderhide",
+        "description": "Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%."
       },
       "umbral_anchor": {
         "name": "Umbral Anchor",
         "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
+      },
+      "soulwell": {
+        "name": "Soulwell",
+        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
@@ -7789,7 +7870,11 @@ export const en: EnTranslations = {
       },
       "possess_evil_eye": {
         "name": "Possess the Evil Eye",
-        "description": "The Maledictor possesses your primary Evil Eye for 10 sec. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving and gains a demonic beam, and Sentence releases a delayed echo for 25% damage."
+        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage."
+      },
+      "hour_of_judgment": {
+        "name": "Hour of Judgment",
+        "description": "Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation."
       },
       "coven": {
         "name": "Coven",
@@ -7965,15 +8050,15 @@ export const en: EnTranslations = {
       },
       "raise_graveguard": {
         "name": "Raise Graveguard",
-        "description": "Raises a durable Graveguard that remains at your side. You may control one Graveguard at a time."
+        "description": "Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec."
       },
       "raise_skeletal_warrior": {
         "name": "Raise Skeletal Warrior",
-        "description": "Spends 1 Soul Fragment to raise a Skeletal Warrior for 30 sec. You may command up to 3 temporary undead."
+        "description": "Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec."
       },
       "raise_bone_mage": {
         "name": "Raise Bone Mage",
-        "description": "Spends 2 Soul Fragments to raise a ranged Bone Mage for 30 sec. You may command up to 3 temporary undead."
+        "description": "Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%."
       },
       "bone_armor": {
         "name": "Bone Armor",
@@ -7997,15 +8082,19 @@ export const en: EnTranslations = {
       },
       "reaping_command": {
         "name": "Reaping Command",
-        "description": "Spends 2 Soul Fragments to command every undead servant to strike your target in unison. Cleaving servants also strike nearby enemies."
+        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
       },
       "sacrifice_undead": {
         "name": "Sacrifice Undead",
-        "description": "Destroys one temporary undead servant to restore 25% of your maximum health."
+        "description": "Destroys one Dominion servant to restore 25% of your maximum health."
+      },
+      "raise_gravewing": {
+        "name": "Raise Gravewing",
+        "description": "Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec."
       },
       "army_of_the_dead": {
         "name": "Army of the Dead",
-        "description": "Tears open a grave portal and calls forth one Skeletal Warrior, one Bone Mage, and one Gravewing for a relentless 20 sec assault. They replace your current temporary undead."
+        "description": "Tears open a grave portal for 20 sec, temporarily raising every Dominion archetype not already serving you. Your chosen servants remain after the portal closes."
       },
       "metamorphosis": {
         "name": "Lich Form",
@@ -8097,11 +8186,11 @@ export const en: EnTranslations = {
       },
       "summon_imp": {
         "name": "Summon Emberkin",
-        "description": "Summons an Emberkin under the command of the Warlock. The Emberkin hurls Ashbolts at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time."
+        "description": "Summons an Emberkin under the command of the Warlock. The Emberkin casts Felbolt at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time."
       },
       "summon_voidwalker": {
         "name": "Summon Gloomshade",
-        "description": "Summons a Gloomshade under the command of the Warlock. The Gloomshade is a sturdy demon that taunts your enemies and soaks up punishment. Summoning a new demon dismisses your current one. You may have one demon at a time."
+        "description": "Summons a Gloomshade under the command of the Warlock. This sturdy demon taunts enemies and uses Abyssal Chain to drag distant normal enemies back into reach. Bosses cannot be pulled. Summoning a new demon dismisses your current one. You may have one demon at a time."
       },
       "summon_succubus": {
         "name": "Summon Duskborn",
@@ -8117,7 +8206,7 @@ export const en: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Summon Pyre Colossus",
-        "description": "Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights as a guardian for 15 sec without replacing your demon and answers each Ruin spender with Worldfire."
+        "description": "Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Ruin every 1 sec."
       },
       "summon_doomguard": {
         "name": "Summon Wraithborn",
@@ -9968,6 +10057,9 @@ export const en: EnTranslations = {
       },
       "conjured_bread4": {
         "name": "Conjured Feastloaf"
+      },
+      "soul_stone": {
+        "name": "Soul Stone"
       },
       "bristleback_maul": {
         "name": "Gallowglass Hammer"

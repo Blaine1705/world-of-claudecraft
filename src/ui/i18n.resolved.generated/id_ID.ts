@@ -318,11 +318,17 @@ export const id_ID: EnTranslations = {
   "hudChrome": {
     "warlock": {
       "doomLabel": "Condemnation",
+      "fateThreadsLabel": "Fate Threads",
       "doomEmptyStatus": "{value} of {max} Condemnation.",
-      "doomStatus": "{value} of {max} Condemnation; {remaining}."
+      "doomStatus": "{value} of {max} Condemnation; {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Fate Threads.",
+      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
+      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
     },
     "procOverlay": {
-      "soulFragmentsMeter": "Soul Fragments"
+      "soulFragmentsMeter": "Soul Fragments",
+      "ruinMeter": "Ruin",
+      "ruinStatus": "{value} of {max} Ruin"
     },
     "spectate": {
       "banner": "Menonton {name}"
@@ -1765,15 +1771,29 @@ export const id_ID: EnTranslations = {
       "absorb": "Menyerap {value} kerusakan",
       "healAbsorb": "Menyerap {value} penyembuhan masuk",
       "thorns": "Inflige {value} de daño de {school} a los atacantes",
+      "stasis": "Immune and unable to act",
       "slow": "Reduce la velocidad de movimiento un {pct}%",
       "speed": "Aumenta la velocidad de movimiento un {pct}%",
       "attackSpeedSlow": "Reduce la velocidad de ataque un {pct}%",
       "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
+      "petDamage": "Increases pet damage by {pct}%",
+      "petHaste": "Increases pet action speed by {pct}%",
+      "spellDamage": "Increases spell damage by {pct}%",
+      "spellHaste": "Increases spell casting speed by {pct}%",
+      "sated": "Cannot benefit from another group haste effect",
+      "cauterizeFatigue": "Cauterize cannot prevent another lethal hit",
+      "castShield": "Casting cannot be interrupted or delayed by damage",
       "dmgDone": "Meningkatkan kerusakan yang diberikan sebesar {pct}%",
       "dmgDoneReduce": "Mengurangi kerusakan yang diberikan sebesar {pct}%",
       "heatingUp": "Serangan kritis pembangun Api berturutan berikutmu memberikan Hot Streak; pembangun yang tidak kritis menghapus Heating Up",
       "elementalConvergencePrimed": "Mantra berikutmu dari sekolah elemen lain memberikan Konvergensi Elemen",
+      "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
+      "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
+      "leadenHexLock": "Leaden Hex cannot root this target again yet",
+      "forbiddenReflectionReady": "Your next eligible shared Warlock cooldown can be cast again",
+      "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
+      "internalCooldown": "This effect cannot trigger again until the timer expires",
       "battleStance": "Kuda-kuda Tempur: penghasilan amarah 10% lebih banyak",
       "berserkerStance": "Kuda-kuda Berserker: kritis 3% lebih sering dan menghantam 3% lebih keras",
       "crit": "Meningkatkan peluang serangan kritis sebesar {pct}%",
@@ -1787,6 +1807,13 @@ export const id_ID: EnTranslations = {
       "revengeFree": "Balas Dendam berikutnya tidak membutuhkan Amarah",
       "victoryRush": "Terjangan Kemenangan siap digunakan",
       "maxHpPct": "Meningkatkan nyawa maksimum sebesar {pct}%",
+      "enrage": "Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%",
+      "suddenDeath": "Your next Execute costs no Rage and ignores its health requirement",
+      "aoeEcho": "{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies",
+      "sureCrit": "{charges} damaging ability casts are guaranteed critical strikes",
+      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
+      "arcaneCharge": "{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana",
+      "physicalReduction": "Reduces Physical damage taken by {pct}%",
       "temporalHourglass": "Kebal dan tidak dapat bertindak; memulihkan kesehatan dan mempercepat pemulihan jeda. Klik kanan untuk membatalkan.",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
       "combustionCrit": "Mantra Api-mu selalu menghasilkan serangan kritis",
@@ -1796,6 +1823,10 @@ export const id_ID: EnTranslations = {
       "freeCast": "Rapalan berikutmu tidak membutuhkan biaya",
       "instantCast": "Mantra berikutmu yang memiliki waktu rapalan menjadi seketika",
       "cheapCast": "Mantra berikutmu menghabiskan {pct}% lebih sedikit mana",
+      "freeExecute": "Your next eligible execute ability costs nothing",
+      "resourceSap": "Restores {value} of your current resource every {interval} sec",
+      "nextAttackCrit": "Your next attack is guaranteed to critically strike",
+      "healEcho": "Falling below {threshold}% health restores {value} health",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Meningkatkan daya mantra sebesar {value}",
@@ -1834,6 +1865,8 @@ export const id_ID: EnTranslations = {
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
+      "bleedVuln": "Increases bleed damage taken by {pct}%",
+      "sourceVuln": "Takes {pct}% more damage from the caster who applied this effect",
       "spellVuln": "Aumenta el daño mágico recibido un {pct}%",
       "critVuln": "Aumenta la probabilidad de recibir golpes críticos un {pct}%",
       "costTax": "Aumenta los costes de habilidades un {pct}%",
@@ -1853,8 +1886,39 @@ export const id_ID: EnTranslations = {
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Wujud Fleet: kecepatan gerak meningkat sebesar {pct}%",
       "formFireball": "Ember Form: kecepatan gerak meningkat {pct}%; serangan dan mantra dinonaktifkan",
+      "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
+      "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
+      "resourceCount": "{value} of {max}",
+      "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
+      "afflictionEye": "Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
+      "afflictionEyeSecondary": "Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
+      "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
+      "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
+      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
+      "afflictionPossession": "Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence",
+      "afflictionJudgment": "Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation",
+      "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
+      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick",
+      "afflictionConsumeThreads": "Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick",
+      "necromancyHarvestMark": "Death can create 1 Soul Fragment and leaves a Death Echo for Corpse Explosion",
+      "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
+      "necromancyDeathEcho": "Corpse Explosion can consume this echo within {radius} yd of its aim",
+      "warlockAnchor": "Recast within {range} yd to return here and consume the anchor",
+      "formMetamorph": "Demon form: body size increased by {pct}%; other bonuses ride separate buffs",
+      "energyRegen": "Increases Energy regeneration by {pct}%",
       "defensiveStance": "Kuda-kuda Waspada: kerusakan yang diterima berkurang, ancaman bertambah",
       "righteousFury": "Sumpah Membara: ancaman dari kerusakan Suci sangat meningkat",
+      "overpowerCharge": "{stacks} charges: your next Maiming Strike deals {pct}% more damage",
+      "sweepingStrikes": "Single-target strikes also hit {targets} nearby enemy for {pct}% damage",
+      "fingersOfFrost": "{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage",
+      "brainFreeze": "Your next Flurry is instant and ignores its cooldown",
+      "wintersChill": "{charges} charges: compatible spells treat this target as frozen",
+      "icicles": "{value} of {max} Icicles; at {max}, Glacial Spike can be cast",
+      "desolation": "{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately",
+      "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
+      "duskfireClaim": "Death grants {value} Ruin",
+      "pyreGuardian": "Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
+      "perfectMoment": "Aether Darts does not consume Arcane Charges",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "school": {
@@ -6649,6 +6713,10 @@ export const id_ID: EnTranslations = {
     "pet": {
       "attack": "Serang",
       "waterJet": "Pancaran Air",
+      "felbolt": "Felbolt",
+      "abyssalChain": "Abyssal Chain",
+      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
+      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
       "taunt": "Provokasi",
       "healDemon": "Sembuhkan Iblis",
       "healPet": "Sembuhkan Peliharaan",
@@ -6659,6 +6727,10 @@ export const id_ID: EnTranslations = {
       "petAttackDesc": "Perintahkan peliharaan Anda untuk menyerang target bermusuhan Anda saat ini.",
       "waterJetTitle": "Pancaran Air",
       "waterJetDesc": "Perintahkan Elemental Air-mu untuk menyalurkan aliran yang memperlambat selama 3 detik. Jeda 8 detik. Klik kanan untuk mengaktifkan secara otomatis setiap kali jeda selesai.",
+      "felboltTitle": "Felbolt",
+      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "abyssalChainTitle": "Abyssal Chain",
+      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
       "petTauntTitle": "Provokasi Peliharaan",
       "petTauntDesc": "Perintahkan peliharaan Anda untuk menyerbu dan Menggeram saat dalam jangkauan. Waktu jeda 10 detik.",
       "healDemonDesc": "Habiskan mana untuk menyalurkan penyembuhan ke iblis Anda selama 5 detik.",
@@ -7021,6 +7093,7 @@ export const id_ID: EnTranslations = {
       "clickDestroy": "Klik untuk menghancurkan",
       "useFishing": "Pakai: Memancing di perairan terdekat.",
       "useHealingPotion": "Pakai: Memulihkan {amount} nyawa seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.",
+      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
       "useManaPotion": "Pakai: Memulihkan {amount} mana seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.",
       "clickUseInstant": "Klik untuk memakai seketika dalam pertempuran",
       "clickUse": "Klik untuk memakai",
@@ -7769,11 +7842,19 @@ export const id_ID: EnTranslations = {
       },
       "litany_of_guilt": {
         "name": "Litany of Guilt",
-        "description": "Curses your primary Evil Eye for 8 sec. Condemnation gains release a wave that damages up to 4 other enemies within 8 yards, at most once per second."
+        "description": "Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+      },
+      "cinderhide": {
+        "name": "Cinderhide",
+        "description": "Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%."
       },
       "umbral_anchor": {
         "name": "Umbral Anchor",
         "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
+      },
+      "soulwell": {
+        "name": "Soulwell",
+        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
@@ -7789,7 +7870,11 @@ export const id_ID: EnTranslations = {
       },
       "possess_evil_eye": {
         "name": "Possess the Evil Eye",
-        "description": "The Maledictor possesses your primary Evil Eye for 10 sec. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving and gains a demonic beam, and Sentence releases a delayed echo for 25% damage."
+        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage."
+      },
+      "hour_of_judgment": {
+        "name": "Hour of Judgment",
+        "description": "Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation."
       },
       "coven": {
         "name": "Coven",
@@ -7965,15 +8050,15 @@ export const id_ID: EnTranslations = {
       },
       "raise_graveguard": {
         "name": "Raise Graveguard",
-        "description": "Raises a durable Graveguard that remains at your side. You may control one Graveguard at a time."
+        "description": "Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec."
       },
       "raise_skeletal_warrior": {
         "name": "Raise Skeletal Warrior",
-        "description": "Spends 1 Soul Fragment to raise a Skeletal Warrior for 30 sec. You may command up to 3 temporary undead."
+        "description": "Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec."
       },
       "raise_bone_mage": {
         "name": "Raise Bone Mage",
-        "description": "Spends 2 Soul Fragments to raise a ranged Bone Mage for 30 sec. You may command up to 3 temporary undead."
+        "description": "Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%."
       },
       "bone_armor": {
         "name": "Bone Armor",
@@ -7997,15 +8082,19 @@ export const id_ID: EnTranslations = {
       },
       "reaping_command": {
         "name": "Reaping Command",
-        "description": "Spends 2 Soul Fragments to command every undead servant to strike your target in unison. Cleaving servants also strike nearby enemies."
+        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
       },
       "sacrifice_undead": {
         "name": "Sacrifice Undead",
-        "description": "Destroys one temporary undead servant to restore 25% of your maximum health."
+        "description": "Destroys one Dominion servant to restore 25% of your maximum health."
+      },
+      "raise_gravewing": {
+        "name": "Raise Gravewing",
+        "description": "Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec."
       },
       "army_of_the_dead": {
         "name": "Army of the Dead",
-        "description": "Tears open a grave portal and calls forth one Skeletal Warrior, one Bone Mage, and one Gravewing for a relentless 20 sec assault. They replace your current temporary undead."
+        "description": "Tears open a grave portal for 20 sec, temporarily raising every Dominion archetype not already serving you. Your chosen servants remain after the portal closes."
       },
       "metamorphosis": {
         "name": "Metamorfosis",
@@ -8117,7 +8206,7 @@ export const id_ID: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Panggil Raksasa Pyre",
-        "description": "Mengikat Raksasa Pyre pada kehendakmu, monster kekar dengan serangan jarak dekat yang meremukkan serta nyawa dan zirah terdalam di antara semua iblis. Waktu jeda yang panjang membatasi kekuatan mentahnya. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu."
+        "description": "Menjatuhkan Raksasa Pyre di area sasaran dan memberikan 58-72 kerusakan Api saat mendarat. Ia bertarung selama 30 dtk tanpa menggantikan iblismu, membakar musuh di sekitar setiap 2 dtk, dan menghasilkan 1 Ruin setiap detik."
       },
       "summon_doomguard": {
         "name": "Panggil Wraithborn",
@@ -9968,6 +10057,9 @@ export const id_ID: EnTranslations = {
       },
       "conjured_bread4": {
         "name": "Roti Perjamuan Sihir"
+      },
+      "soul_stone": {
+        "name": "Soul Stone"
       },
       "bristleback_maul": {
         "name": "Palu Gallowglass"
