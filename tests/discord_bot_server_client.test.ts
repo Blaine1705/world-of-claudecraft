@@ -156,11 +156,11 @@ describe('ServerClient request envelope', () => {
     // What this DOES pin is that a GET reaches fetch with no body at all.
     const timers = fakeTimers();
     const { calls, impl } = recordingFetch(() =>
-      fakeResponse({ body: { success: true, data: { items: [] }, error: null } }),
+      fakeResponse({ body: { success: true, data: { ids: [] }, error: null } }),
     );
     const client = new ServerClient('http://host', 'sekrit', impl, timers.seam);
 
-    await client.drainRelay();
+    await client.flairedIds();
 
     expect(calls[0].init.body).toBe(undefined);
     expect('body' in calls[0].init).toBe(true);
@@ -199,15 +199,6 @@ const ROUTE_ROWS: {
   body: string | undefined;
   data: unknown;
 }[] = [
-  {
-    name: 'flex',
-    methodName: 'flex',
-    drive: (c) => c.flex('u 1'),
-    method: 'GET',
-    path: '/internal/discord/flex?discord_user_id=u%201',
-    body: undefined,
-    data: { linked: true },
-  },
   {
     name: 'flexBatch',
     methodName: 'flexBatch',
@@ -280,35 +271,6 @@ const ROUTE_ROWS: {
     data: {},
   },
   {
-    name: 'drainRelay',
-    methodName: 'drainRelay',
-    drive: (c) => c.drainRelay(),
-    method: 'GET',
-    path: '/internal/discord/relay',
-    body: undefined,
-    data: { items: [] },
-  },
-  {
-    name: 'drainActivity',
-    methodName: 'drainActivity',
-    drive: (c) => c.drainActivity(),
-    method: 'GET',
-    path: '/internal/discord/activity',
-    body: undefined,
-    data: { items: [] },
-  },
-  {
-    name: 'dailyRewardWinners',
-    methodName: 'dailyRewardWinners',
-    drive: (c) => c.dailyRewardWinners(),
-    method: 'GET',
-    // limit=2 decides how many days of winners can still be announced after a
-    // missed run; shrinking it silently drops a day.
-    path: '/internal/discord/daily-rewards-winners?limit=2',
-    body: undefined,
-    data: { days: [] },
-  },
-  {
     name: 'pushMembersMeta',
     methodName: 'pushMembersMeta',
     drive: (c) =>
@@ -374,9 +336,9 @@ describe('ServerClient envelope handling', () => {
     );
     const client = new ServerClient('http://host', 'sekrit', impl, timers.seam);
 
-    expect(await client.drainRelay()).toEqual([]);
+    expect(await client.flairedIds()).toBe(null);
     expect(reads).toEqual([]);
-    expect(errors).toEqual([['[bot] server GET /internal/discord/relay -> 500']]);
+    expect(errors).toEqual([['[bot] server GET /internal/discord/flaired-ids -> 500']]);
   });
 
   it('treats a 3xx as not-ok, not just a 5xx', async () => {
@@ -392,7 +354,7 @@ describe('ServerClient envelope handling', () => {
     );
     const client = new ServerClient('http://host', 'sekrit', impl, timers.seam);
 
-    expect(await client.drainRelay()).toEqual([]);
+    expect(await client.flairedIds()).toBe(null);
     expect(reads).toEqual([]);
   });
 
@@ -408,24 +370,6 @@ describe('ServerClient envelope handling', () => {
 });
 
 describe('ServerClient response unwrapping', () => {
-  it('returns the payload each accessor is named for, not the envelope', async () => {
-    // The route table above asserts what goes OUT; this asserts what comes back.
-    // Each of these reaches into a differently-named field of `data`, so a
-    // copy-paste slip (activity reading `days`, winners reading `items`) yields
-    // undefined, and the `?? []` fallback then hides it as an empty feed.
-    expect(await clientReturning({ linked: true, level: 12 }).client.flex('u1')).toEqual({
-      linked: true,
-      level: 12,
-    });
-    expect(await clientReturning({ items: [{ id: 'a' }] }).client.drainActivity()).toEqual([
-      { id: 'a' },
-    ]);
-    expect(
-      await clientReturning({ days: [{ day: '2026-07-30' }] }).client.dailyRewardWinners(),
-    ).toEqual([{ day: '2026-07-30' }]);
-    expect(await clientReturning({ ids: ['a'] }).client.flairedIds()).toEqual(['a']);
-  });
-
   it('covers every public method of the class in the route table', () => {
     // Ties the table to the SURFACE: a method added to ServerClient without a
     // row here would otherwise ship with no path assertion at all, which is the
@@ -436,30 +380,6 @@ describe('ServerClient response unwrapping', () => {
       .sort();
     const covered = [...new Set(ROUTE_ROWS.map((r) => r.methodName))].sort();
     expect(covered).toEqual(publicMethods);
-  });
-});
-
-describe('ServerClient drain fallbacks', () => {
-  it('answers with an empty list when the call fails, for every drain', async () => {
-    // Each drain ends in `?? []`. Without it a failed call hands the caller
-    // undefined and the poll loop throws on the next `.length`, killing the
-    // loop rather than skipping one cycle. drainRelay is covered above; these
-    // are the two that were not.
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    const timers = fakeTimers();
-    const failing = () =>
-      new ServerClient(
-        'http://host',
-        'sekrit',
-        recordingFetch(() => fakeResponse({ status: 500 })).impl,
-        timers.seam,
-      );
-
-    expect(await failing().drainActivity()).toEqual([]);
-    expect(await failing().dailyRewardWinners()).toEqual([]);
-    // And a 200 whose envelope carries no list at all.
-    expect(await clientReturning({}).client.drainActivity()).toEqual([]);
-    expect(await clientReturning({}).client.dailyRewardWinners()).toEqual([]);
   });
 });
 
@@ -938,9 +858,10 @@ describe('ServerClient call deadline', () => {
 
   it('keeps each in-flight call on its OWN handle and signal when they overlap', async () => {
     // The sequential test above cannot see a shared handle: call 2 arms after
-    // call 1 has already cleared. The bot's poll loops genuinely overlap (six
-    // of them, two on a 3 second tick), so a shared controller would let one
-    // call's deadline abort another's request.
+    // call 1 has already cleared. The bot's calls genuinely overlap (the sweep
+    // and the outbox poll both tick every 3 seconds, and the event handlers fire
+    // between them), so a shared controller would let one call's deadline abort
+    // another's request.
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const timers = fakeTimers();
     const settle: ((r: Response) => void)[] = [];
@@ -992,7 +913,7 @@ describe('ServerClient production defaults', () => {
     // secret header, its method, its body, and its abort signal unnoticed.
     vi.stubGlobal('fetch', async (input: unknown, init?: RequestInit) => {
       seen.push({ url: String(input), init });
-      return fakeResponse({ body: { success: true, data: { items: [{ id: 7 }] }, error: null } });
+      return fakeResponse({ body: { success: true, data: { ids: ['u7'] }, error: null } });
     });
     // Delegates to the real timer so the deadline is a genuine handle the
     // client's finally can clear.
@@ -1007,13 +928,13 @@ describe('ServerClient production defaults', () => {
     });
 
     try {
-      expect(await client.drainRelay()).toEqual([{ id: 7 }]);
+      expect(await client.flairedIds()).toEqual(['u7']);
     } finally {
       vi.unstubAllGlobals();
     }
 
     expect(seen.length).toBe(1);
-    expect(seen[0].url).toBe('http://host:8787/internal/discord/relay');
+    expect(seen[0].url).toBe('http://host:8787/internal/discord/flaired-ids');
     expect(seen[0].init?.method).toBe('GET');
     // The shared secret is the whole authentication story for /internal/*: a
     // forwarder that drops `init` would strip it and every call would 401.
@@ -1027,7 +948,7 @@ describe('ServerClient production defaults', () => {
     expect(armed.map((a) => a.ms)).toEqual([8000]);
     // And the default clearTimeout really cancels THAT handle. Without this the
     // member could be a no-op and every call would leak a live 8 second timer;
-    // the relay poller runs every 3 seconds, so the backlog is permanent.
+    // the outbox poll runs every 3 seconds, so the backlog is permanent.
     expect(cleared).toEqual([armed[0].handle]);
   });
 });

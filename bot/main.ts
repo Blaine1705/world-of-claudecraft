@@ -18,11 +18,8 @@ import { Gateway } from './gateway';
 import { departedFromSeed, LinkedSweep, unappliedIdsFrom } from './linked_sweep';
 import {
   allTierRoleNames,
-  buildActivityMessage,
-  buildDailyRewardWinnersMessage,
   buildLevelNick,
   buildLinkContent,
-  buildRelayMessage,
   buildWhoamiContent,
   claimDailyActive,
   clearDepartedFlair,
@@ -56,6 +53,7 @@ import {
   refreshThenPushMeta,
   writeMemberNickname,
 } from './member_writes';
+import { outboxIoFor, runOutboxPoll } from './outbox_consumer';
 import { LoopScheduler } from './scheduler';
 import { ServerClient, type VoiceMemberPush } from './server_client';
 
@@ -736,50 +734,51 @@ async function main(): Promise<void> {
       .catch((e) => console.error('[bot] daily-active grant failed', e));
   };
 
-  // Drain + deliver queued in-game "!" community posts (LFG etc.) to the relay
-  // channel as rich embeds with a "respond in game" button.
-  const pollRelay = async (): Promise<void> => {
-    if (!cfg.relayChannelId) return;
-    const items = await server.drainRelay();
-    for (const item of items) {
-      await discord
-        .createMessage(cfg.relayChannelId, buildRelayMessage(item, cfg.gameUrl))
-        .catch((e) => console.error('[bot] relay post failed', e));
-    }
-  };
-
-  // Drain + post the significant-activity feed (level-ups, rare drops, duels, arena).
-  const pollActivity = async (): Promise<void> => {
-    if (!cfg.activityChannelId) return;
-    const items = await server.drainActivity();
-    for (const item of items) {
-      await discord
-        .createMessage(cfg.activityChannelId, buildActivityMessage(item))
-        .catch((e) => console.error('[bot] activity post failed', e));
-    }
-  };
-
-  let dailyRewardsChannelMissingLogged = false;
-  const pollDailyRewardWinners = async (): Promise<void> => {
-    if (!cfg.dailyRewardsChannelId) {
-      if (!dailyRewardsChannelMissingLogged) {
-        console.error(
-          '[bot] missing DISCORD_DAILY_REWARDS_CHANNEL_ID; skipping daily rewards winner announcements',
-        );
-        dailyRewardsChannelMissingLogged = true;
+  // Everything the consolidated outbox poll needs, bound once: which channel each
+  // stream posts to, which builder shapes it, and what a link-change item does to
+  // the sweep. Every DECISION lives in bot/outbox_consumer.ts, where a test can
+  // reach it; this is only the binding.
+  //
+  // The three poll loops this replaces (relay, activity, daily-rewards winners)
+  // each ran their own timer and their own request against a server that usually
+  // had nothing for any of them. One request now answers all three, plus the
+  // link-change feed that tells the sweep which members actually moved, which is
+  // what let the periodic full-roster rescan go.
+  const outboxIo = outboxIoFor({
+    createMessage: (channelId, payload) => discord.createMessage(channelId, payload),
+    markDailyRewardWinners: (day) => server.markDailyRewardWinners(day),
+    channels: {
+      relay: cfg.relayChannelId,
+      activity: cfg.activityChannelId,
+      dailyRewards: cfg.dailyRewardsChannelId,
+    },
+    gameUrl: cfg.gameUrl,
+    // Read fresh per run, never captured: the gate exists to notice the breaker
+    // opening between polls.
+    breakerState: () => governor.snapshot().breakerState,
+    drain: () => server.drainOutbox(cfg.outboxTimeoutMs),
+    applyLinkChanges: (items) => {
+      // The roster check gates every ADDITION: an id that is not in the guild
+      // cannot be flaired, and adding it would put a permanent member in the
+      // pass that no removal path can reach.
+      const summary = linkedSweep.applyLinkChangeItems(items, (id) => memberRoles.has(id));
+      // A fresh or re-pointed link row carries null meta columns, so the record
+      // the bot believes it pushed for these ids describes a row that no longer
+      // exists; leaving it cached would suppress their join date and staff flair
+      // until the hourly resync.
+      for (const id of summary.metaStale) lastPushedMeta.delete(id);
+      // Dirty-queue work is served AHEAD of the pass, so this kick syncs a
+      // changed member within one tick instead of at the next pass window. It is
+      // deliberately NOT a requestPass: the feed named exactly who moved, and a
+      // whole pass over everyone is not what one member's points change asks for.
+      if (summary.added.length || summary.removed.length || summary.dirtied.length) {
+        roleSyncTask.kick();
       }
-      return;
-    }
-    const days = await server.dailyRewardWinners();
-    for (const day of days) {
-      try {
-        await discord.createMessage(cfg.dailyRewardsChannelId, buildDailyRewardWinnersMessage(day));
-        await server.markDailyRewardWinners(day.day);
-      } catch (e) {
-        console.error('[bot] daily rewards winners post failed', e);
-      }
-    }
-  };
+    },
+    onError: (e, where) => console.error(`[bot] outbox ${where} post failed`, e),
+    onMissingChannel: (channel) =>
+      console.error(`[bot] no channel id configured for the outbox ${channel} stream; skipping it`),
+  });
 
   // ── background loops ─────────────────────────────────────────────────────────
   // Every cadence in this file lives here, on one scheduler. These were six bare
@@ -790,12 +789,11 @@ async function main(): Promise<void> {
   // overlap is impossible by construction, and jitters them so loops armed in one
   // boot do not stay phase-locked on the same tick.
   //
-  // Which function runs, and what it does, is unchanged. Only the mechanism is
-  // new: the intervals are the same values (now D13 env-overridable, defaulting to
-  // exactly today's numbers), and the special-roles refresh still runs immediately
-  // before the roster push rather than beside it.
-  // The sweep is the one task with a real ACTIVE-to-IDLE spread, and the two
-  // numbers mean different things. `activeMs` paces the slices INSIDE a pass:
+  // The intervals are D13 env-overridable, and the special-roles refresh still
+  // runs immediately before the roster push rather than beside it.
+  // The sweep is one of the two tasks with a real ACTIVE-to-IDLE spread (the
+  // outbox poll below is the other), and its two numbers mean different things.
+  // `activeMs` paces the slices INSIDE a pass:
   // every slice reports work, so the cadence stays there for as long as the pass
   // has ids left. `idleMs` is the pass interval itself: once the pass drains,
   // each empty run decays the delay toward it, so between passes the task costs
@@ -813,16 +811,14 @@ async function main(): Promise<void> {
     cadence: { activeMs: cfg.roleSyncIntervalMs },
     run: () => refreshTierRoles(),
   });
-  scheduler.add({ name: 'relay', cadence: { activeMs: cfg.relayPollMs }, run: () => pollRelay() });
+  // The one pickup loop. `activeMs` is what the three 3 s pollers it replaces
+  // each ran at, so a busy bot delivers exactly as promptly as before; every
+  // empty drain then decays the delay toward `idleMs`, and the first item to
+  // arrive snaps it straight back, so the quiet-hours saving costs no latency.
   scheduler.add({
-    name: 'activity',
-    cadence: { activeMs: cfg.relayPollMs },
-    run: () => pollActivity(),
-  });
-  scheduler.add({
-    name: 'daily-rewards-winners',
-    cadence: { activeMs: cfg.relayPollMs },
-    run: () => pollDailyRewardWinners(),
+    name: 'outbox',
+    cadence: { activeMs: cfg.outboxPollMs, idleMs: cfg.outboxIdleMs },
+    run: () => runOutboxPoll(outboxIo),
   });
   const memberMetaTask = scheduler.add({
     name: 'special-roles-and-meta',

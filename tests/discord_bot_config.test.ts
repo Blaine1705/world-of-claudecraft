@@ -5,13 +5,15 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+  OUTBOX_IDLE_MS,
+  OUTBOX_POLL_MS,
   PRESENCE_DEBOUNCE_MS,
-  RELAY_POLL_MS,
   ROLE_SYNC_INTERVAL_MS,
   SWEEP_SLICE_MS,
 } from '../bot/cadence';
 import { loadConfig } from '../bot/config';
 import { DEFAULT_SWEEP_SLICE_SIZE } from '../bot/linked_sweep';
+import { DEFAULT_OUTBOX_TIMEOUT_MS } from '../bot/server_client';
 
 // Every env key loadConfig reads. Each test starts from a clean slate of these,
 // so a value left by another test (or by the developer's own shell) can never
@@ -36,7 +38,9 @@ const BOT_ENV_KEYS = [
   'DISCORD_FORBIDDEN_TTL_MS',
   'DISCORD_ROLE_SYNC_INTERVAL_MS',
   'DISCORD_PRESENCE_DEBOUNCE_MS',
-  'DISCORD_RELAY_POLL_MS',
+  'DISCORD_OUTBOX_POLL_MS',
+  'DISCORD_OUTBOX_IDLE_MS',
+  'DISCORD_OUTBOX_TIMEOUT_MS',
   'DISCORD_SWEEP_SLICE_MS',
   'DISCORD_SWEEP_SLICE_SIZE',
 ] as const;
@@ -292,15 +296,32 @@ describe('bot loop cadences', () => {
   it('pins each cadence against its literal', () => {
     expect(ROLE_SYNC_INTERVAL_MS).toBe(300000);
     expect(PRESENCE_DEBOUNCE_MS).toBe(4000);
-    expect(RELAY_POLL_MS).toBe(3000);
+    expect(OUTBOX_POLL_MS).toBe(3000);
+    expect(OUTBOX_IDLE_MS).toBe(15000);
     expect(SWEEP_SLICE_MS).toBe(3000);
   });
 
-  it('keeps the presence debounce and relay poll well under the role sync', () => {
-    // The ordering is the point: presence and relay are player-visible loops,
-    // role sync is the slow reconcile.
+  it('keeps the presence debounce and outbox poll well under the role sync', () => {
+    // The ordering is the point: presence and the outbox pickup are
+    // player-visible loops, role sync is the slow reconcile.
     expect(PRESENCE_DEBOUNCE_MS).toBeLessThan(ROLE_SYNC_INTERVAL_MS);
-    expect(RELAY_POLL_MS).toBeLessThan(ROLE_SYNC_INTERVAL_MS);
+    expect(OUTBOX_POLL_MS).toBeLessThan(ROLE_SYNC_INTERVAL_MS);
+  });
+
+  it('gives the outbox poll a real active-to-idle band, and a deadline above both', () => {
+    // The band has to be a genuine spread or the D1 backoff is inert: an idle
+    // interval at or below the active one makes nextIntervalMs decay by nothing
+    // at all, and the loop would keep polling every 3 seconds forever.
+    expect(OUTBOX_IDLE_MS).toBeGreaterThan(OUTBOX_POLL_MS);
+    // Five times, which the scheduler's doubling decay reaches in three empty
+    // runs: slow enough that a bursty feed is not pushed straight to its slowest
+    // cadence, fast enough that a quiet bot stops paying for polls nobody reads.
+    expect(OUTBOX_IDLE_MS / OUTBOX_POLL_MS).toBe(5);
+    // And ONE poll may outlive several idle windows: a 200 is the outbox's only
+    // acknowledgement, so the deadline is set by the server's read deadline, not
+    // by the cadence. The chain arms after the run SETTLES, so a slow poll costs
+    // latency and never an overlapping second poll.
+    expect(DEFAULT_OUTBOX_TIMEOUT_MS).toBeGreaterThan(OUTBOX_IDLE_MS);
   });
 
   it('paces sweep slices far under the pass interval they subdivide', () => {
@@ -418,12 +439,31 @@ describe('loadConfig cadence knobs (D13)', () => {
       fallback: 4000,
       override: '7500',
     },
+    // The three Phase 6 outbox knobs. The first two are the poll's active and
+    // idle cadence; the third is a request DEADLINE rather than an interval, so
+    // its default lives with the client that spends it (the same reasoning the
+    // slice size gets below) and it is the one knob whose constant comes from
+    // bot/server_client.ts.
     {
-      env: 'DISCORD_RELAY_POLL_MS',
-      field: 'relayPollMs',
-      constant: 'RELAY_POLL_MS',
+      env: 'DISCORD_OUTBOX_POLL_MS',
+      field: 'outboxPollMs',
+      constant: 'OUTBOX_POLL_MS',
       fallback: 3000,
       override: '11000',
+    },
+    {
+      env: 'DISCORD_OUTBOX_IDLE_MS',
+      field: 'outboxIdleMs',
+      constant: 'OUTBOX_IDLE_MS',
+      fallback: 15000,
+      override: '21000',
+    },
+    {
+      env: 'DISCORD_OUTBOX_TIMEOUT_MS',
+      field: 'outboxTimeoutMs',
+      constant: 'DEFAULT_OUTBOX_TIMEOUT_MS',
+      fallback: 70000,
+      override: '65500',
     },
     // The two Phase 6 sweep knobs. The slice interval is a cadence like the
     // three above; the slice SIZE is a threshold, so its default lives beside
@@ -453,7 +493,9 @@ describe('loadConfig cadence knobs (D13)', () => {
     const cfg = loadConfig();
     expect(cfg.roleSyncIntervalMs).toBe(300000);
     expect(cfg.presenceDebounceMs).toBe(4000);
-    expect(cfg.relayPollMs).toBe(3000);
+    expect(cfg.outboxPollMs).toBe(3000);
+    expect(cfg.outboxIdleMs).toBe(15000);
+    expect(cfg.outboxTimeoutMs).toBe(70000);
     expect(cfg.sweepSliceMs).toBe(3000);
     expect(cfg.sweepSliceSize).toBe(100);
   });
@@ -469,12 +511,19 @@ describe('loadConfig cadence knobs (D13)', () => {
     // reads. The literals stay pinned above; this pins the SEAM.
     const source = readFileSync(new URL('../bot/config.ts', import.meta.url), 'utf8');
     expect(source).toMatch(
-      /import \{[^}]*PRESENCE_DEBOUNCE_MS[^}]*RELAY_POLL_MS[^}]*ROLE_SYNC_INTERVAL_MS[^}]*\} from '\.\/cadence'/,
+      /import \{[^}]*OUTBOX_IDLE_MS[^}]*OUTBOX_POLL_MS[^}]*PRESENCE_DEBOUNCE_MS[^}]*ROLE_SYNC_INTERVAL_MS[^}]*\} from '\.\/cadence'/,
     );
-    // The slice SIZE is the one default that is not a cadence, so it comes from
-    // the module that spends it. Same seam, different owner, and it has to be
-    // pinned separately or an inlined 100 would pass every other case here.
+    // The slice SIZE is not a cadence, so it comes from the module that spends
+    // it. Same seam, different owner, and it has to be pinned separately or an
+    // inlined 100 would pass every other case here.
     expect(source).toMatch(/import \{[^}]*DEFAULT_SWEEP_SLICE_SIZE[^}]*\} from '\.\/linked_sweep'/);
+    // The outbox DEADLINE likewise: it is chosen against the server's own read
+    // deadline, and the client that spends it owns that reasoning. A second copy
+    // of 70000 here is the drift this pin exists to prevent, since the two would
+    // then be free to move apart and nothing would fail.
+    expect(source).toMatch(
+      /import \{[^}]*DEFAULT_OUTBOX_TIMEOUT_MS[^}]*\} from '\.\/server_client'/,
+    );
     for (const knob of CADENCE_KNOBS) {
       // Each env key resolved against its own imported constant, never a literal.
       expect(source).toMatch(
@@ -485,7 +534,7 @@ describe('loadConfig cadence knobs (D13)', () => {
     // BOTH sides, never a substring scan: `not.toContain('3000')` also fires on
     // 30000, 13000 and 130000, so the day a governor knob gains a plausible
     // default this file would go red for a number that is not a copy of anything.
-    for (const value of ['300_?000', '4_?000', '3_?000', '100']) {
+    for (const value of ['300_?000', '4_?000', '3_?000', '15_?000', '70_?000', '100']) {
       expect(source).not.toMatch(new RegExp(`(?<![0-9_])${value}(?![0-9_])`));
     }
   });

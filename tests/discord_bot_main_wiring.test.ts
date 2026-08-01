@@ -26,7 +26,12 @@
 // matching for an unrelated reason fails rather than passing over nothing.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { PRESENCE_DEBOUNCE_MS, RELAY_POLL_MS, ROLE_SYNC_INTERVAL_MS } from '../bot/cadence';
+import {
+  OUTBOX_IDLE_MS,
+  OUTBOX_POLL_MS,
+  PRESENCE_DEBOUNCE_MS,
+  ROLE_SYNC_INTERVAL_MS,
+} from '../bot/cadence';
 
 /** main.ts with block and line comments removed. */
 function mainSource(): string {
@@ -41,16 +46,20 @@ function mainSource(): string {
  *
  * The `run` column is not decoration. Without it the per-task pattern stops at
  * the cadence, so swapping the BODIES of two registrations that share an interval
- * (relay and activity both read relayPollMs) leaves every assertion in this file
- * green while the relay channel quietly receives the activity feed.
+ * (tier-roles and special-roles-and-meta both read roleSyncIntervalMs) leaves
+ * every assertion in this file green while the wrong sweep runs on each tick.
  */
 const TASKS = [
   { name: 'presence-push', field: 'presenceDebounceMs', run: 'pushPresence' },
-  { name: 'role-sync', field: 'roleSyncIntervalMs', run: 'syncAllOnlineRoles' },
+  // The sweep's ACTIVE cadence is the slice interval, not the pass interval: the
+  // pass interval is its idleMs, and a registration reading roleSyncIntervalMs
+  // as activeMs would collapse one paced pass back into a burst every 5 minutes.
+  { name: 'role-sync', field: 'sweepSliceMs', run: 'runSweepSlice' },
   { name: 'tier-roles', field: 'roleSyncIntervalMs', run: 'refreshTierRoles' },
-  { name: 'relay', field: 'relayPollMs', run: 'pollRelay' },
-  { name: 'activity', field: 'relayPollMs', run: 'pollActivity' },
-  { name: 'daily-rewards-winners', field: 'relayPollMs', run: 'pollDailyRewardWinners' },
+  // The three separate 3 s pollers (relay, activity, daily-rewards-winners) are
+  // one task now. Its run is the tested consumer, which owns the breaker gate,
+  // the per-stream fan-out and the announce-then-mark ordering.
+  { name: 'outbox', field: 'outboxPollMs', run: 'runOutboxPoll' },
   // The paired task calls the tested helper, which is what receives the refresh
   // and the push; the case below pins which two it is handed.
   { name: 'special-roles-and-meta', field: 'roleSyncIntervalMs', run: 'refreshThenPushMeta' },
@@ -66,7 +75,10 @@ const TASKS = [
  */
 const KICKS = [
   { call: 'presenceTask.kick()', times: 1 },
-  { call: 'roleSyncTask.kick()', times: 1 },
+  // Three: GUILD_CREATE, the completed roster seed, and the outbox link-change
+  // feed. The last one is what makes a member whose game-side state just moved
+  // sync within one tick instead of at the next pass window.
+  { call: 'roleSyncTask.kick()', times: 3 },
   { call: 'memberMetaTask.kick()', times: 2 },
 ] as const;
 
@@ -87,10 +99,10 @@ describe('bot/main.ts loop wiring', () => {
 
   it('registers every loop on the scheduler, reading its D13 config field', () => {
     const source = mainSource();
-    // Exactly the seven, not "at least": an eighth registration is a loop nobody
+    // Exactly the five, not "at least": a sixth registration is a loop nobody
     // has reviewed, and a missing one is a loop that silently stopped running.
     expect((source.match(/scheduler\.add\(/g) ?? []).length).toBe(TASKS.length);
-    expect(TASKS.length).toBe(7);
+    expect(TASKS.length).toBe(5);
 
     for (const task of TASKS) {
       // The name, its cadence AND its sweep must appear in ONE registration, so a
@@ -129,12 +141,53 @@ describe('bot/main.ts loop wiring', () => {
     expect(source).toMatch(
       /case 'GUILD_CREATE'[\s\S]{0,4000}?roleSyncTask\.kick\(\)[\s\S]{0,80}?memberMetaTask\.kick\(\)/,
     );
+    // The GUILD_CREATE kick is preceded by a requestPass, IMMEDIATELY: a kick
+    // alone only wakes the task early, and it would then find the pass window
+    // still open and hand back no work at all, which is exactly backwards on the
+    // one event that means the bot's view of the guild may be stale.
+    expect(source).toMatch(/linkedSweep\.requestPass\(\);\s*roleSyncTask\.kick\(\)/);
     // The backfill kick must sit INSIDE the final-chunk guard, not merely near
     // chunk_index: without the guard it fires once per chunk, which on a large
     // guild is a sweep per chunk during exactly the reconnect this coalesces.
     expect(source).toMatch(
-      /idx >= count - 1[\s\S]{0,200}?memberMetaTask\.kick\(\)[\s\S]{0,160}?reconcileDepartedMembers\(/,
+      /idx >= count - 1[\s\S]{0,200}?memberMetaTask\.kick\(\)[\s\S]{0,160}?completeSeed\(/,
     );
+  });
+
+  it('wires the outbox poll to the breaker, the deadline and the sweep', () => {
+    // The four bindings the consolidated poll cannot work without, none of them
+    // reachable from a test: bot/outbox_consumer.ts owns every decision, and
+    // what main.ts hands it is exactly what nothing else can say.
+    const source = mainSource();
+
+    // The breaker state is read through a THUNK, not captured at wiring time: a
+    // captured value would freeze the gate at whatever the breaker was during
+    // boot, which is 'closed', and the gate would never fire again.
+    expect(source).toMatch(/breakerState: \(\) => governor\.snapshot\(\)\.breakerState/);
+    // The poll runs on its OWN much longer deadline. Dropping the argument falls
+    // back to the client default, which happens to be the same number today, so
+    // the D13 knob would go silently inert with every other assertion green.
+    expect(source).toMatch(/drain: \(\) => server\.drainOutbox\(cfg\.outboxTimeoutMs\)/);
+    // The link-change fan-out, in order: the roster gate on every addition, then
+    // the cached-record eviction for the ids whose link row is new. Losing the
+    // eviction suppresses their join date and staff flair until the hourly
+    // resync, and losing the roster gate puts a non-member permanently in the
+    // pass where no removal path can reach them.
+    expect(source).toMatch(
+      /linkedSweep\.applyLinkChangeItems\(items, \(id\) => memberRoles\.has\(id\)\)[\s\S]{0,400}?for \(const id of summary\.metaStale\) lastPushedMeta\.delete\(id\)/,
+    );
+    // And the kick is CONDITIONAL on the feed having moved something. Kicking
+    // unconditionally would wake the sweep on every poll, which at the outbox
+    // cadence is a slice every 3 seconds forever.
+    expect(source).toMatch(
+      /summary\.added\.length \|\| summary\.removed\.length \|\| summary\.dirtied\.length[\s\S]{0,60}?roleSyncTask\.kick\(\)/,
+    );
+    // The three pollers it replaces are GONE, not merely unregistered: a
+    // surviving helper is a second consumer of queues that only one client may
+    // drain, and the drain is destructive.
+    for (const dead of ['pollRelay', 'pollActivity', 'pollDailyRewardWinners']) {
+      expect(source).not.toContain(dead);
+    }
   });
 
   it('publishes a successful rename immediately, and re-syncs the diff cache', () => {
@@ -200,14 +253,28 @@ describe('bot/main.ts loop wiring', () => {
     // actually reads them. Importing the constant here and hard-coding it into a
     // task would type-check and would silently ignore the env override.
     const source = mainSource();
-    for (const name of ['ROLE_SYNC_INTERVAL_MS', 'PRESENCE_DEBOUNCE_MS', 'RELAY_POLL_MS']) {
+    for (const name of [
+      'ROLE_SYNC_INTERVAL_MS',
+      'PRESENCE_DEBOUNCE_MS',
+      'OUTBOX_POLL_MS',
+      'OUTBOX_IDLE_MS',
+    ]) {
       expect(source).not.toContain(name);
+    }
+    // Nor as a bare number, which is the other way to bypass the knob and the
+    // one an import scan cannot see. Word-bounded on BOTH sides, never a
+    // substring scan: `not.toContain('3000')` also fires on 13000 and 300000, so
+    // the day main.ts gains an unrelated literal this would go red for a number
+    // that is not a copy of anything.
+    for (const value of ['300_?000', '4_?000', '3_?000', '15_?000']) {
+      expect(source).not.toMatch(new RegExp(`(?<![0-9_])${value}(?![0-9_])`));
     }
     // And the constants still hold the values the config falls back to, so this
     // file's claim about "the same cadences as before" is anchored to numbers.
     expect(ROLE_SYNC_INTERVAL_MS).toBe(300000);
     expect(PRESENCE_DEBOUNCE_MS).toBe(4000);
-    expect(RELAY_POLL_MS).toBe(3000);
+    expect(OUTBOX_POLL_MS).toBe(3000);
+    expect(OUTBOX_IDLE_MS).toBe(15000);
   });
 
   it('starts the tasks BEFORE the gateway connects', () => {
@@ -245,9 +312,16 @@ describe('bot/main.ts loop wiring', () => {
     expect(source).toMatch(
       /reconcileDepartedMembers[\s\S]{0,1200}?forgetMember\(nickCaches, lastPushedMeta, record\.discord_user_id\)/,
     );
-    // Exactly two, so a third clearing path added without forgetting the member
-    // (or one of these two quietly dropped) fails here rather than in production.
-    expect((source.match(/forgetMember\(/g) ?? []).length).toBe(2);
+    // The completed-seed eviction (L16): a member who left while the gateway was
+    // down never fired GUILD_MEMBER_REMOVE, so the seed diff is the only thing
+    // that ever drops them. Their per-member maps go, and the diff caches have
+    // to go with them or a rejoin is compared against a pre-departure record.
+    expect(source).toMatch(
+      /departedFromSeed\(memberRoles\.keys\(\), seedSessionIds\)[\s\S]{0,400}?forgetMember\(nickCaches, lastPushedMeta, id\)/,
+    );
+    // Exactly three, so a fourth clearing path added without forgetting the
+    // member (or one of these quietly dropped) fails here, not in production.
+    expect((source.match(/forgetMember\(/g) ?? []).length).toBe(3);
   });
 
   it('keeps the presence push on the debounce mode, not a poll loop', () => {

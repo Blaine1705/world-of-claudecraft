@@ -12,7 +12,25 @@
 
 export const ROLE_SYNC_INTERVAL_MS = 5 * 60_000;
 export const PRESENCE_DEBOUNCE_MS = 4_000;
-export const RELAY_POLL_MS = 3_000; // how often the bot pulls queued in-game "!" posts
+
+/**
+ * The consolidated outbox poll, ACTIVE: how often the bot picks up queued work
+ * (in-game "!" posts, the activity feed, reward-winner days, link changes) while
+ * there is any. It is the cadence the three separate 3 s poll loops it replaces
+ * each ran at, so a busy bot delivers exactly as promptly as before on a quarter
+ * of the requests.
+ */
+export const OUTBOX_POLL_MS = 3_000;
+
+/**
+ * The same poll, IDLE: where the cadence decays to once the drains come back
+ * empty (D1). This is the first task to use the scheduler's active-to-idle
+ * backoff, and the pair is the point: a bot with nothing queued costs a wake
+ * every fifteen seconds instead of twenty polls a minute, and the first item to
+ * arrive snaps it straight back to OUTBOX_POLL_MS, so the quiet-hours saving
+ * costs no latency at all when something finally happens.
+ */
+export const OUTBOX_IDLE_MS = 15_000;
 
 /**
  * How long the linked-member sweep waits between SLICES while a pass is live.

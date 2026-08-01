@@ -56,6 +56,15 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
 - `member_writes.ts`: the diff-before-write paths (nickname, members-meta, the
   member-update echo decision) with their cache bookkeeping, behind injected IO. Tested in
   `tests/discord_bot_member_writes.test.ts`.
+- `linked_sweep.ts`: **pure, IO-free.** Who is believed to have a linked game account, and
+  the paced pass that re-syncs their flair one bounded SLICE at a time. Every belief is fed
+  from outside (the outbox link-change feed, the flex-batch echo, the members-meta linkage
+  signal) and each signal is applied for exactly as much as it can prove. Tested in
+  `tests/discord_bot_linked_sweep.test.ts` and `tests/discord_bot_sweep_cycle.test.ts`.
+- `outbox_consumer.ts`: the consolidated poll's behavior, behind injected IO: the breaker
+  gate, the per-stream fan-out, the winners announce-then-mark ordering, the didWork signal
+  the cadence reads, and the factory that binds each stream's channel id and message
+  builder. Tested in `tests/discord_bot_outbox.test.ts`.
 - `main.ts`: wiring only: guild state seeded from `GUILD_CREATE` (plus the op 8
   member backfill for large guilds), kept live by the `GUILD_MEMBER_*` events,
   event dispatch, and the scheduler task registrations.
@@ -118,34 +127,52 @@ finished, so once a sweep ran long the sweeps stacked and a slow minute became a
 survived restarts. Every loop is a `scheduler.add({...})` task instead: the next delay is
 armed only after the previous run SETTLES, delays are jittered so loops armed in one boot do
 not stay phase-locked, and repeated event kicks coalesce into exactly one follow-up run.
-- Role sync (`role-sync`) and special-roles refresh + members-meta push
-  (`special-roles-and-meta`): every `cfg.roleSyncIntervalMs` (5 min), plus a coalescing
-  `kick()` on `GUILD_CREATE`; the meta task is also kicked when the op 8 member backfill
-  finishes. The refresh and the push are ONE task because the push reads the index the
-  refresh rebuilds, so their ordering is load bearing. Tier-role refresh (`tier-roles`) runs
-  once at startup (before the gateway connects) and on the same 5 min cadence.
+- Role sync (`role-sync`): one paced SLICE of the linked-member set per run, every
+  `cfg.sweepSliceMs` (3 s) while a pass has ids left, decaying to `cfg.roleSyncIntervalMs`
+  (5 min) between passes, which is the pass interval itself. `linked_sweep.ts` decides
+  WHICH members, the scheduler decides WHEN. Kicked by `GUILD_CREATE` (preceded by
+  `requestPass()`, because a kick alone only wakes the task early and it would find the
+  pass window still open), by a COMPLETE roster seed, and by the outbox link-change feed
+  when it moved something.
+- Special-roles refresh + members-meta push (`special-roles-and-meta`): every
+  `cfg.roleSyncIntervalMs` (5 min), plus a coalescing `kick()` on `GUILD_CREATE` and when
+  the op 8 member backfill finishes. The refresh and the push are ONE task because the push
+  reads the index the refresh rebuilds, so their ordering is load bearing. Tier-role refresh
+  (`tier-roles`) runs once at startup (before the gateway connects) and on the same 5 min
+  cadence.
   The role sync also sets the level-on-name nickname (`buildLevelNick`; the base name
   fallback can be the member's own already-suffixed live nick, so `buildLevelNick` strips any
   existing suffix first to stay idempotent across re-syncs; `DISCORD_SYNC_NICKNAMES=0`
   disables).
 - Presence push (`presence-push`): a `debounce` task, so voice/presence events open one
   `cfg.presenceDebounceMs` (4 s) window and every event inside it folds into one push.
-- Relay, activity feed, daily-rewards winners: drained every `cfg.relayPollMs` (3 s), one
-  task each. Daily-rewards days are marked back on the server only after a successful post,
-  so a failed post retries (at-least-once).
+- Outbox (`outbox`): the ONE pickup loop, every `cfg.outboxPollMs` (3 s) while it keeps
+  finding work, decaying to `cfg.outboxIdleMs` (15 s) once the drains come back empty.
+  `GET /internal/discord/outbox` answers four streams at once (relay posts, the activity
+  feed, the reward-winner days, and the link-change feed), replacing the three separate
+  3 s pollers and the sweep's full flex re-read. `outbox_consumer.ts` owns what it does with
+  them: it will NOT drain while the rate governor's breaker is open or half-open (those
+  posts are non-essential, so the governor would refuse them, and a 200 is the outbox's only
+  acknowledgement, so draining into refusals loses the items); each post is caught per item;
+  a winners day is marked back on the server ONLY after its post landed, so a failed post
+  retries (at-least-once, duplicates accepted); and the poll runs on its own much longer
+  deadline (`cfg.outboxTimeoutMs`, 70 s), which must stay ABOVE the server's read deadline.
 - Daily engagement grant: first message or voice-join per member per day, deduped
   bot-side AND server-side (grant dedupe key), so it is exactly-once.
-- The adaptive active-to-idle backoff exists in the scheduler but no task uses it yet: every
-  task above sets `activeMs` only, so its cadence is constant. The consolidated outbox poll
-  (D1: 3 s active decaying to 15 s idle) is the first consumer, in Phase 6.
+- The adaptive active-to-idle backoff has two consumers: the outbox poll (D1: 3 s active
+  decaying to 15 s idle) and the role sweep (slice interval decaying to the pass interval).
+  Every other task sets `activeMs` only, so its cadence is constant. Backoff is only safe
+  because recovery is instant: a run that finds work snaps straight back to `activeMs`.
 - **A run that never settles stops its loop for the life of the process** (ledger L10, open
   until Phase 7). The next delay is armed only after the previous run settles, which is the
   whole overlap guarantee, so a `run` that never resolves leaves the task claimed with
   nothing armed, no counter and no log. A watchdog in the scheduler cannot fix it: recovery
   needs the run CANCELLED, and the scheduler holds a promise it has no way to abort. The
-  real fix is a deadline on the fetch underneath (Phase 7 owns it, and `server_client.ts`
-  already has `SERVER_CALL_TIMEOUT_MS` to copy). Until then, every `run` handed to
-  `scheduler.add` must be one that always settles.
+  real fix is a deadline on the fetch underneath (Phase 7 owns it; `server_client.ts`
+  already has TWO to copy, `SERVER_CALL_TIMEOUT_MS` for an ordinary call and
+  `DEFAULT_OUTBOX_TIMEOUT_MS` for the outbox poll, which is deliberately longer than the
+  server's own read deadline). Until then, every `run` handed to `scheduler.add` must be one
+  that always settles.
 
 ## Diff before write (D5): nothing is written unless it changed
 `member_writes.ts` owns all three decisions, over the pure predicates in `logic.ts`, because
@@ -205,9 +232,14 @@ on). Governor knobs (all optional, safe defaults): `DISCORD_MAX_RPS` (8),
 `DISCORD_BAN_PAUSE_MS` (600000), `DISCORD_BREAKER_LIMIT` (300),
 `DISCORD_FORBIDDEN_TTL_MS` (86400000). Loop cadences (D13, all optional):
 `DISCORD_ROLE_SYNC_INTERVAL_MS` (300000), `DISCORD_PRESENCE_DEBOUNCE_MS` (4000),
-`DISCORD_RELAY_POLL_MS` (3000); the defaults are `bot/cadence.ts`, so the value the suite
-pins and the value the bot falls back to cannot drift apart. Each of these knobs falls back
-to its default for an empty or non-numeric value, never to 0. `DISCORD_WELCOME_CHANNEL_ID` is read but currently
+`DISCORD_OUTBOX_POLL_MS` (3000), `DISCORD_OUTBOX_IDLE_MS` (15000),
+`DISCORD_SWEEP_SLICE_MS` (3000); the defaults are `bot/cadence.ts`, so the value the suite
+pins and the value the bot falls back to cannot drift apart. The two knobs that are NOT
+cadences take their defaults from the module that spends them, for the same reason:
+`DISCORD_SWEEP_SLICE_SIZE` (100, `DEFAULT_SWEEP_SLICE_SIZE` in `linked_sweep.ts`, how many
+members one slice may write to) and `DISCORD_OUTBOX_TIMEOUT_MS` (70000,
+`DEFAULT_OUTBOX_TIMEOUT_MS` in `server_client.ts`, one poll's abort deadline). Each of these
+knobs falls back to its default for an empty or non-numeric value, never to 0. `DISCORD_WELCOME_CHANNEL_ID` is read but currently
 unwired (no welcome message is posted). Boot loads `.env`/`.env.local` when present but
 runs fine from ambient env alone (`process.loadEnvFile`).
 

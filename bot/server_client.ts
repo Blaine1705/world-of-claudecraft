@@ -182,13 +182,6 @@ export class ServerClient {
     }
   }
 
-  flex(discordUserId: string): Promise<(FlexData & { linked: boolean }) | null> {
-    return this.call(
-      'GET',
-      `/internal/discord/flex?discord_user_id=${encodeURIComponent(discordUserId)}`,
-    );
-  }
-
   /**
    * The flex payload for many Discord ids in one request, replacing one `flex`
    * call per online member.
@@ -254,26 +247,15 @@ export class ServerClient {
     });
   }
 
-  /** Drain queued in-game "!" community posts for delivery to Discord. */
-  async drainRelay(): Promise<RelayItem[]> {
-    const data = await this.call<{ items: RelayItem[] }>('GET', '/internal/discord/relay');
-    return data?.items ?? [];
-  }
-
-  /** Drain the significant-activity feed (level-ups, rare drops, duels, arena). */
-  async drainActivity(): Promise<ActivityItem[]> {
-    const data = await this.call<{ items: ActivityItem[] }>('GET', '/internal/discord/activity');
-    return data?.items ?? [];
-  }
-
-  async dailyRewardWinners(): Promise<DailyRewardWinnersDay[]> {
-    const data = await this.call<{ days: DailyRewardWinnersDay[] }>(
-      'GET',
-      '/internal/discord/daily-rewards-winners?limit=2',
-    );
-    return data?.days ?? [];
-  }
-
+  /**
+   * Mark a reward day announced, so the outbox stops serving it.
+   *
+   * The three per-stream drains that used to sit here (relay, activity, and the
+   * winners GET) are gone: `drainOutbox` carries all three, and keeping a second
+   * way to consume them would mean two clients racing for the same queues. This
+   * is the one half of the winners flow that is NOT a read, and it is what makes
+   * that stream at-least-once rather than at-most-once.
+   */
   markDailyRewardWinners(day: string): Promise<unknown> {
     return this.call('POST', '/internal/discord/daily-rewards-winners/mark', { day });
   }

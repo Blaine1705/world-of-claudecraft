@@ -2,8 +2,9 @@
 // committed). Missing-required values throw at boot with a clear message.
 
 import {
+  OUTBOX_IDLE_MS,
+  OUTBOX_POLL_MS,
   PRESENCE_DEBOUNCE_MS,
-  RELAY_POLL_MS,
   ROLE_SYNC_INTERVAL_MS,
   SWEEP_SLICE_MS,
 } from './cadence';
@@ -14,6 +15,7 @@ import {
   DEFAULT_FORBIDDEN_TTL_MS,
   DEFAULT_MAX_RPS,
 } from './rate_governor';
+import { DEFAULT_OUTBOX_TIMEOUT_MS } from './server_client';
 
 export interface BotConfig {
   /** Discord bot token (Bot <token>). */
@@ -54,8 +56,12 @@ export interface BotConfig {
   roleSyncIntervalMs: number;
   /** How long a burst of voice/presence events is collapsed before one push. */
   presenceDebounceMs: number;
-  /** How often the relay, activity and daily-rewards drains poll the server. */
-  relayPollMs: number;
+  /** How often the consolidated outbox poll runs while it keeps finding work. */
+  outboxPollMs: number;
+  /** Where that cadence decays to once the drains come back empty. */
+  outboxIdleMs: number;
+  /** How long ONE outbox poll may run before its abort deadline fires. */
+  outboxTimeoutMs: number;
   /** How long the linked-member sweep waits between slices while a pass is live. */
   sweepSliceMs: number;
   /** How many linked members one sweep slice asks about (and may write to). */
@@ -129,7 +135,16 @@ export function loadConfig(): BotConfig {
       process.env.DISCORD_PRESENCE_DEBOUNCE_MS,
       PRESENCE_DEBOUNCE_MS,
     ),
-    relayPollMs: positiveNumberFromEnv(process.env.DISCORD_RELAY_POLL_MS, RELAY_POLL_MS),
+    outboxPollMs: positiveNumberFromEnv(process.env.DISCORD_OUTBOX_POLL_MS, OUTBOX_POLL_MS),
+    outboxIdleMs: positiveNumberFromEnv(process.env.DISCORD_OUTBOX_IDLE_MS, OUTBOX_IDLE_MS),
+    // The one cadence knob whose default does NOT live in bot/cadence.ts: it is
+    // a request deadline, not a loop interval, and it is chosen against the
+    // server's own read deadline. Importing the client's constant is what keeps
+    // the fallback here and the drainOutbox default from drifting apart.
+    outboxTimeoutMs: positiveNumberFromEnv(
+      process.env.DISCORD_OUTBOX_TIMEOUT_MS,
+      DEFAULT_OUTBOX_TIMEOUT_MS,
+    ),
     sweepSliceMs: positiveNumberFromEnv(process.env.DISCORD_SWEEP_SLICE_MS, SWEEP_SLICE_MS),
     // The slice SIZE is a threshold rather than a cadence, so its default lives
     // beside the sweep that spends it (the same reason the governor's
