@@ -624,6 +624,11 @@ Its own phase because it is the only one that touches persistence and the wire.
     key, which resets node respawn timers, so the relog exploit D6 closes
     reopens for the duration of the rollback window. No player value is
     lost; noted so the reopened exploit is a known trade, not a surprise.
+  - `questedHobbies`: a binary that predates the field erases the key on the
+    first autosave, so a make-amends return after the rollback falls back to
+    the skill-default hobby instead of the one the player quested for. Small
+    value at stake (the choice can be re-quested), listed because this class
+    promises to be complete.
   - The inverse direction, recorded here for completeness because it is the
     one irreversible UPGRADE in the set: the `tierMailSent` prune. The first
     load by a pruning binary permanently drops non-major acknowledgements

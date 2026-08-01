@@ -90,8 +90,11 @@ CREATE INDEX IF NOT EXISTS unstuck_reports_created
 -- seq-scans the whole telemetry table per deletion. Partial (IS NOT NULL)
 -- because the RI lookup always binds the column, and NULLed rows need no
 -- entry. Built by the boot DDL transaction (timeout 0, advisory-locked):
--- acceptable ONLY because the table is new this release, so the first
--- post-deploy build has a near-empty backlog.
+-- acceptable ONLY because unstuck_reports is cooldown-gated, low-volume
+-- telemetry (one row per terminal /unstuck, 90-day retention, shipped in
+-- v0.32.0), so the first post-deploy build covers at most one release of
+-- sparse rows and finishes in seconds. Do NOT copy this pattern onto a
+-- busy table: there the build belongs in the post-commit CONCURRENTLY arm.
 CREATE INDEX IF NOT EXISTS unstuck_reports_character
   ON unstuck_reports(character_id) WHERE character_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS unstuck_reports_account

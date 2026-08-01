@@ -598,6 +598,19 @@ For off-box safety, sync the directory to S3 occasionally:
     keep-forever-shaped: their raw value is trimmed, so an empty or whitespace line
     also reads as the DEFAULT, but an explicit `0` is a live value: a 00:00 UTC
     sweep hour, or a zero-row budget that disables the nightly sweep.
+- **`DB_POOL_MAX_CLIENTS`: production deliberately stays at the default of 10.**
+  The load rig measured the wall this buys: on the 10-client default a login ramp
+  pins the pool from roughly 487 concurrent players, `woc_db_pool_clients{state="waiting"}`
+  oscillates with the 30-second autosave waves, and joins slow to a crawl, while the
+  players already in stay playable. The SYMPTOM an operator sees is players reporting
+  "Authentication timed out" while `woc_db_pool_clients{state="waiting"}` holds above
+  zero between autosave waves; that pair means pool saturation, not an auth outage.
+  The response: raise `DB_POOL_MAX_CLIENTS` a few clients at a time (it accepts 1 to 97
+  and rejects loudly outside that), never straight to the ceiling, and keep the budget
+  arithmetic in view: realms sharing one `DATABASE_URL` multiply, and each realm also
+  takes one boot client, so realms x pool + realms must stay at or under the 97 usable
+  connections on stock `postgres:16` (`max_connections` 100, 3 superuser-reserved).
+  The boot log warns when the configured multiplication breaks that budget.
 - **Nightly retention sweep.** The batched retention prunes run once per UTC day
   at `RETENTION_SWEEP_UTC_HOUR` (default 05:00 UTC) behind a database advisory
   lock, so with several processes on one database exactly one of them sweeps.

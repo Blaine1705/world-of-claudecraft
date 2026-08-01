@@ -348,8 +348,11 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(() => counters.copperSpent('vendor', 20)).not.toThrow();
     expect(() => counters.harvest('mirefen_marsh', '2')).not.toThrow();
     expect(() => counters.fishingCast('mirefen_marsh', '1')).not.toThrow();
-    // Both arms of the koi split: the koi arm touches TWO counters, so a throw
-    // from the first must not skip the second's own guard either.
+    // Both arms of the koi split reach the sink without propagating. (The
+    // implementation guards both increments under ONE shared try, so a throw
+    // from the first counter would skip the second by design: dropping the
+    // whole sample is the module's swallow contract, and this assertion can
+    // only observe that nothing escapes.)
     expect(() => counters.fishingCatch('mirefen_marsh', '1', false)).not.toThrow();
     expect(() => counters.fishingCatch('mirefen_marsh', '1', true)).not.toThrow();
     expect(() => counters.fishingGotAway('mirefen_marsh', '1')).not.toThrow();

@@ -725,9 +725,10 @@ must be re-derived if either number is ever tuned on its own.
   release-tier fill budget, and the `toolEffectSlots` rollback across the
   acquisition-craft boundary (DESTRUCTIVE of real player value now: the
   slot's charm cost, its recharges, and its `craftedBy` provenance all
-  erase on the first autosave under a binary that predates the
-  `toolEffectSlots` field itself, release/v0.32.0 and earlier, because
-  such a binary rebuilds the character state without the key; a
+  erase on the first autosave under ANY binary that predates the
+  `toolEffectSlots` field, which is every binary off this branch: the
+  v0.32.x production line AND the unmerged release/v0.33.0 base alike,
+  because such a binary rebuilds the character state without the key; a
   mid-packet binary that knows the field preserves it losslessly. See
   "Rollback erases newer fields" in
   docs/design/professions-tuning-packet.md).
