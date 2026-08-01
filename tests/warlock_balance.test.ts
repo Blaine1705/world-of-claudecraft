@@ -126,12 +126,12 @@ describe('warlock low-level sustained damage tuning', () => {
     expect(voidwalkerDps / impDps).toBeGreaterThan(0.65);
   });
 
-  it('trims the two strongest maintenance DoTs without changing Shadow Bolt base damage', () => {
+  it('pins the maintenance DoTs and the Ruination Gloom Bolt capstone rank', () => {
     expect(dotTotal('corruption')).toBe(85);
     expect(dotTotal('curse_of_agony')).toBe(78);
 
     const shadowBolt = ABILITIES.shadow_bolt.ranks?.find((rank) => rank.rank === 4);
-    expect(shadowBolt?.effects).toEqual([{ type: 'directDamage', min: 68, max: 84 }]);
+    expect(shadowBolt?.effects).toEqual([{ type: 'directDamage', min: 190, max: 235 }]);
   });
 
   it('keeps mastery tuning and the shared generator-resource row canonical', () => {

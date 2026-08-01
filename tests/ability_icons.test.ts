@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
-import { abilityIconRecipe, hasExplicitAbilityIcon } from '../src/ui/icons';
+import { abilityIconRecipe, hasExplicitAbilityIcon, hasExplicitAuraIcon } from '../src/ui/icons';
 
 // Every class ability must have a deliberate, visually distinct icon.
 // The procedural fallback (school + name keywords) collides for many ids
@@ -23,7 +23,9 @@ describe('ability icons', () => {
 
   it('every ability has an explicit (non-fallback) icon recipe', () => {
     const missing = abilityIds.filter((id) => !hasExplicitAbilityIcon(id));
-    expect(missing, `abilities relying on the procedural fallback: ${missing.join(', ')}`).toEqual([]);
+    expect(missing, `abilities relying on the procedural fallback: ${missing.join(', ')}`).toEqual(
+      [],
+    );
   });
 
   it('no two abilities resolve to an identical icon', () => {
@@ -37,5 +39,18 @@ describe('ability icons', () => {
     const collisions = [...byRecipe.values()].filter((ids) => ids.length > 1);
     const report = collisions.map((ids) => ids.join(' = ')).join('\n');
     expect(collisions, `colliding icon groups:\n${report}`).toEqual([]);
+  });
+
+  it('has explicit buff-bar icons for every Warlock specialization resource and guardian window', () => {
+    for (const id of [
+      'aura_soul_fragments',
+      'aura_affliction_doom',
+      'aura_destruction_ruin',
+      'aura_desolation',
+      'aura_duskfire_claim',
+      'aura_pyre_guardian',
+    ]) {
+      expect(hasExplicitAuraIcon(id), id).toBe(true);
+    }
   });
 });

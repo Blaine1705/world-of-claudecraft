@@ -448,6 +448,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'rain_of_fire',
       'spell_lock',
       'possess_evil_eye',
+      'hour_of_judgment',
       'coven',
       'soul_harvest',
       'raise_graveguard',
@@ -459,6 +460,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'unholy_command',
       'reaping_command',
       'sacrifice_undead',
+      'raise_gravewing',
       'army_of_the_dead',
     ],
     color: 0xa785e6,
@@ -4594,13 +4596,32 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 75,
     castTime: 0,
     cooldown: 45,
+    offGcd: true,
     range: 30,
     school: 'shadow',
     requiresTarget: true,
     projectile: false,
-    effects: [{ type: 'afflictionPossession', duration: 10 }],
+    effects: [{ type: 'afflictionPossession', duration: 15, doom: 35 }],
     description:
-      'The Maledictor possesses your primary Evil Eye for 10 sec. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving and gains a demonic beam, and Sentence releases a delayed echo for 25% damage.',
+      'The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage.',
+  },
+  hour_of_judgment: {
+    id: 'hour_of_judgment',
+    name: 'Hour of Judgment',
+    class: 'warlock',
+    specs: ['affliction'],
+    learnLevel: 20,
+    cost: 0,
+    castTime: 0,
+    cooldown: 90,
+    offGcd: true,
+    range: 30,
+    school: 'shadow',
+    requiresTarget: true,
+    projectile: false,
+    effects: [{ type: 'afflictionJudgment', duration: 15, doom: 40, refund: 50 }],
+    description:
+      'Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation.',
   },
   coven: {
     id: 'coven',
@@ -4631,28 +4652,28 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'shadow',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 13, max: 18 }],
+    effects: [{ type: 'directDamage', min: 36, max: 50 }],
     ranks: [
       {
         rank: 2,
         level: 8,
         cost: 38,
         castTime: 2.2,
-        effects: [{ type: 'directDamage', min: 24, max: 31 }],
+        effects: [{ type: 'directDamage', min: 67, max: 87 }],
       },
       {
         rank: 3,
         level: 14,
         cost: 55,
         castTime: 2.7,
-        effects: [{ type: 'directDamage', min: 42, max: 53 }],
+        effects: [{ type: 'directDamage', min: 118, max: 148 }],
       },
       {
         rank: 4,
         level: 20,
         cost: 80,
         castTime: 3.0,
-        effects: [{ type: 'directDamage', min: 68, max: 84 }],
+        effects: [{ type: 'directDamage', min: 190, max: 235 }],
       },
     ],
     description: 'Sends a shadowy bolt at the enemy for $d Shadow damage.',
@@ -4698,8 +4719,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'fire',
     requiresTarget: true,
     effects: [
-      { type: 'directDamage', min: 11, max: 11 },
-      { type: 'dot', total: 20, duration: 15, interval: 3 },
+      { type: 'directDamage', min: 31, max: 31 },
+      { type: 'dot', total: 56, duration: 15, interval: 3 },
     ],
     ranks: [
       {
@@ -4707,8 +4728,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 10,
         cost: 40,
         effects: [
-          { type: 'directDamage', min: 22, max: 22 },
-          { type: 'dot', total: 35, duration: 15, interval: 3 },
+          { type: 'directDamage', min: 62, max: 62 },
+          { type: 'dot', total: 98, duration: 15, interval: 3 },
         ],
       },
       {
@@ -4716,8 +4737,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 16,
         cost: 60,
         effects: [
-          { type: 'directDamage', min: 38, max: 38 },
-          { type: 'dot', total: 60, duration: 15, interval: 3 },
+          { type: 'directDamage', min: 106, max: 106 },
+          { type: 'dot', total: 168, duration: 15, interval: 3 },
         ],
       },
     ],
@@ -5126,10 +5147,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['destruction'],
     effects: [
       { type: 'aoeDamage', min: 58, max: 72, radius: 6 },
-      { type: 'summonPyreColossus', duration: 15 },
+      { type: 'summonPyreColossus', duration: 30 },
     ],
     description:
-      'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights as a guardian for 15 sec without replacing your demon and answers each Ruin spender with Worldfire.',
+      'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Ruin every 1 sec.',
   },
   soul_harvest: {
     id: 'soul_harvest',
@@ -5184,7 +5205,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'summonUndead', templateId: 'graveguard', temporary: false }],
     description:
-      'Raises a durable Graveguard that remains at your side. You may control one Graveguard at a time.',
+      'Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec.',
   },
   raise_skeletal_warrior: {
     id: 'raise_skeletal_warrior',
@@ -5204,11 +5225,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
         type: 'summonUndead',
         templateId: 'necromancy_skeletal_warrior',
         temporary: true,
-        duration: 30,
       },
     ],
     description:
-      'Spends 1 Soul Fragment to raise a Skeletal Warrior for 30 sec. You may command up to 3 temporary undead.',
+      'Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec.',
   },
   raise_bone_mage: {
     id: 'raise_bone_mage',
@@ -5228,11 +5248,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
         type: 'summonUndead',
         templateId: 'necromancy_bone_mage',
         temporary: true,
-        duration: 30,
       },
     ],
     description:
-      'Spends 2 Soul Fragments to raise a ranged Bone Mage for 30 sec. You may command up to 3 temporary undead.',
+      'Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%.',
   },
   bone_armor: {
     id: 'bone_armor',
@@ -5355,7 +5374,30 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: false,
     effects: [{ type: 'sacrificeUndead', healPctMax: 0.25 }],
-    description: 'Destroys one temporary undead servant to restore 25% of your maximum health.',
+    description: 'Destroys one Dominion servant to restore 25% of your maximum health.',
+  },
+  raise_gravewing: {
+    id: 'raise_gravewing',
+    name: 'Raise Gravewing',
+    class: 'warlock',
+    specs: ['demonology'],
+    learnLevel: 17,
+    cost: 45,
+    soulFragmentCost: 2,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'shadow',
+    requiresTarget: false,
+    effects: [
+      {
+        type: 'summonUndead',
+        templateId: 'necromancy_gravewing',
+        temporary: true,
+      },
+    ],
+    description:
+      'Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec.',
   },
   army_of_the_dead: {
     id: 'army_of_the_dead',
@@ -5371,7 +5413,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'armyOfDead', duration: 20 }],
     description:
-      'Tears open a grave portal and calls forth one Skeletal Warrior, one Bone Mage, and one Gravewing for a relentless 20 sec assault. They replace your current temporary undead.',
+      'Tears open a grave portal for 20 sec, temporarily raising every Dominion archetype not already serving you. Your chosen servants remain after the portal closes.',
   },
 
   // ====================== DRUID ======================
@@ -6452,6 +6494,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'metamorphosis',
     name: 'Lich Form',
     class: 'warlock',
+    specs: ['demonology'],
     learnLevel: 10,
     cost: 0,
     castTime: 0,
@@ -6786,6 +6829,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'conflagrate',
     name: 'Conflagrate',
     class: 'warlock',
+    specs: ['destruction'],
     learnLevel: 10,
     cost: 40,
     castTime: 0,
@@ -6794,7 +6838,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'fire',
     requiresTarget: true,
-    effects: [{ type: 'destructionConflagrate' }, { type: 'directDamage', min: 54, max: 64 }],
+    effects: [{ type: 'destructionConflagrate' }, { type: 'directDamage', min: 151, max: 179 }],
     description:
       'Advances one future tick of your Burning Pact, then ignites the target for $d Fire damage. Generates 1 Ruin and 1 Desolation. Holds 2 charges. (Destruction signature)',
   },

@@ -80,12 +80,13 @@ export const NECROMANCY_MOBS: Record<string, MobTemplate> = {
     maxLevel: 60,
     family: 'undead',
     elite: true,
-    // Gravewing is the elite third lane of Army of the Dead, beside one
-    // Skeletal Warrior and one Bone Mage.
+    // Gravewing keeps its elite durability and area profile, but its sustained
+    // weapon budget matches the other persistent Dominion choices. Army of the
+    // Dead still makes the missing archetypes fight together temporarily.
     hpBase: 38,
     hpPerLevel: 14,
-    dmgBase: 4,
-    dmgPerLevel: 1.3,
+    dmgBase: 2,
+    dmgPerLevel: 1.405,
     attackSpeed: 1.8,
     armorPerLevel: 28,
     moveSpeed: 5.6,

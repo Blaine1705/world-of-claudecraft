@@ -32,6 +32,12 @@ import {
 } from '../../../sim/combat/empower_next';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
 import {
+  dominionCompositionMaskForOwner,
+  dominionSummonBlockFromMask,
+  dominionTemplateForAbility,
+  type OwnedDominionServant,
+} from '../../../sim/combat/necromancy_dominion';
+import {
   type AbilityDef,
   type AuraKind,
   dist2d,
@@ -93,6 +99,7 @@ export interface ActionBarAbility {
 
 export interface ActionBarAuraInput {
   kind: AuraKind;
+  sourceId?: number;
   value?: number;
   empowerAbilities?: readonly string[];
   /** Stacks, for a stack-gated ability (Glacial Spike needs 5 Icicles). */
@@ -145,6 +152,7 @@ export interface ActionBarDeps {
 
 /** The player fields the bar reads; a structural subset both worlds mirror. */
 export interface ActionBarPlayerInput {
+  id: number;
   autoAttack: boolean;
   dead: boolean;
   resource: number;
@@ -180,6 +188,7 @@ export interface ActionBarPlayerInput {
 export interface ActionBarTargetInput {
   dead: boolean;
   pos: Vec3;
+  auras: readonly ActionBarAuraInput[];
 }
 
 /** The world subset one tick reads: the player, the current target, and inventory
@@ -192,6 +201,7 @@ export interface ActionBarWorldInput {
   stealthed: boolean;
   /** Fate Threads attached to this Warlock's primary Evil Eye, 0 to 3. */
   fateThreads?: number;
+  entities: Iterable<OwnedDominionServant>;
 }
 
 /** One slot's derived state. All fields are mutated IN PLACE each tick; the object
@@ -345,6 +355,7 @@ export function createActionBarView(
       const { player, target } = world;
       const tgtDist = target !== null && !target.dead ? dist2d(player.pos, target.pos) : null;
       const ruin = ruinAmountFromAuras(player.auras);
+      let dominionComposition: number | null = null;
       let soulFragments = 0;
       for (const aura of player.auras) {
         if (aura.kind === 'soul_fragments') {
@@ -538,11 +549,32 @@ export function createActionBarView(
           }
           windowGlow = windowOpen;
         }
+        const requiresPrimaryEye =
+          def.id === 'sentence' ||
+          def.id === 'coven' ||
+          def.id === 'possess_evil_eye' ||
+          def.id === 'hour_of_judgment';
+        const primaryEyeReady =
+          !requiresPrimaryEye ||
+          target?.auras.some(
+            (aura) => aura.sourceId === player.id && aura.kind === 'affliction_eye',
+          ) === true;
+        const dominionTemplateId = dominionTemplateForAbility(def.id);
+        let dominionReady = true;
+        if (dominionTemplateId !== null) {
+          if (dominionComposition === null) {
+            dominionComposition = dominionCompositionMaskForOwner(world.entities, player.id);
+          }
+          dominionReady =
+            dominionSummonBlockFromMask(dominionComposition, dominionTemplateId) === null;
+        }
         slot.usable =
           (!(player.resource < payableCost) || freeByProc) &&
           (def.ruinCost ?? 0) <= ruin &&
           soulFragments >= (def.soulFragmentCost ?? 0) &&
           windowOpen &&
+          primaryEyeReady &&
+          dominionReady &&
           !(maxCharges > 1 && chargesLeft <= 0) &&
           (!def.requiresStealth || world.stealthed);
         slot.outOfRange =

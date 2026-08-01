@@ -99,7 +99,8 @@ export interface AuraInput {
   value: number;
   // Optional effect-descriptor inputs (DoT/HoT tick interval, secondary values, magic
   // school). Present on the offline Sim aura; the online ClientWorld mirror may omit
-  // them, in which case auraEffectDescriptor falls back to its defaults.
+  // them, in which case auraEffectDescriptor falls back to its defaults. A newer
+  // server's unknown AuraKind safely omits the effect line until this client knows it.
   value2?: number;
   value3?: number;
   tickInterval?: number;
@@ -141,9 +142,8 @@ export interface AurasDeps {
   auraName(aura: AuraInput): string;
   /** The formatted stack count (host: `formatNumber(stacks, {maximumFractionDigits:0})`). */
   formatStacks(stacks: number): string;
-  /** The one-line aura effect-summary HTML the tooltip prepends (or '' when the aura has
-   *  no descriptor). Injected so the i18n-free core never calls t(): the host builds the
-   *  localized, esc'd HTML from the pure aura_effect descriptor. */
+  /** The one-line aura effect-summary HTML the tooltip prepends. Every AuraKind has an
+   *  exhaustive descriptor; injected so the i18n-free core never calls t(). */
   auraEffectHtml(aura: AuraInput): string;
   /** The localized single-letter duration unit suffixes the compact label appends
    *  (host: `t('hudChrome.unitFrame.durationUnitSeconds'/'...Minutes'/'...Hours'/

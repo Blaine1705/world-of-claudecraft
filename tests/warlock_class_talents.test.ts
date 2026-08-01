@@ -4,6 +4,7 @@ import { gainRuin, spendRuin } from '../src/sim/combat/destruction';
 import { consumeFreeCostFor } from '../src/sim/combat/empower_next';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { canUseForbiddenReflection } from '../src/sim/combat/warlock_talents';
+import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -190,6 +191,27 @@ describe('warlock class talent tree', () => {
     tick(sim, 20);
     expect(player.cooldowns.get('umbral_anchor')).toBeCloseTo(8.5);
     expect(player.cooldowns.get('hex_of_violence')).toBeCloseTo(9);
+  });
+
+  it('keeps specialization signatures out of the shared-capstone classifier', () => {
+    expect(ABILITIES.conflagrate.specs).toEqual(['destruction']);
+    expect(ABILITIES.metamorphosis.specs).toEqual(['demonology']);
+
+    const { sim, player } = rig({ 20: 'wlk_r20_chaos_bolt' }, 'destruction');
+    addTarget(sim);
+    player.cooldowns.set('umbral_anchor', 10);
+    player.cooldowns.set('conflagrate', 10);
+    sim.castAbility('shadow_bolt');
+    tick(sim, 20);
+
+    expect(player.cooldowns.get('umbral_anchor')).toBeCloseTo(8.5);
+    expect(player.cooldowns.get('conflagrate')).toBeCloseTo(9);
+  });
+
+  it('does not arm Forbidden Reflection from a specialization signature', () => {
+    const { sim, player } = rig({ 20: 'wlk_r20_grimoire_of_haste' }, 'demonology');
+    sim.castAbility('metamorphosis');
+    expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection')).toBe(false);
   });
 
   it('lets Forbidden Reflection repeat one shared cooldown without restarting it', () => {

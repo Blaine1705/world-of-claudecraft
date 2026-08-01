@@ -2799,6 +2799,16 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
     ],
     ['glow', 'arcs'],
   ),
+  hour_of_judgment: r(
+    'shadow',
+    'venom',
+    [
+      { p: 'eye', s: 0.82 },
+      { p: 'sunburst', s: 1.08, pal: 'shadowPurple' },
+      { p: 'skull', ...BR, s: 0.48, pal: 'blood' },
+    ],
+    ['glow', 'arcs'],
+  ),
   // druid
   wrath: r('nature', 'leafGreen', ['bolt', { p: 'leaf', ...BR }], ['glow']),
   healing_touch: r('nature', 'leafGreen', ['hand', { p: 'leaf', ...TL }], ['sparkle']),
@@ -2959,6 +2969,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   raise_graveguard: r('shadow', 'bone', ['skull', { p: 'shield', ...BR }], ['glow']),
   raise_skeletal_warrior: r('shadow', 'bone', ['skull', { p: 'sword', ...BR }], ['arcs', 'glow']),
   raise_bone_mage: r('shadow', 'venom', ['skull', { p: 'sigil_rune', ...BR }], ['glow']),
+  raise_gravewing: r('shadow', 'bone', ['wing', { p: 'skull', ...BR }], ['motion', 'glow']),
   bone_armor: r('steel', 'bone', ['chestplate', { p: 'shield', ...BR }], ['glow']),
   corpse_explosion: r('shadow', 'venom', ['skull'], ['drips', 'glow']),
   litany_of_guilt: r('shadow', 'shadowPurple', ['scroll', { p: 'skull', ...BR }], ['arcs', 'glow']),
@@ -3375,6 +3386,14 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_cost_tax: r('shadow', 'shadowPurple', ['gem', { p: 'droplet', ...BR }], ['drips']),
   aura_heal_absorb: r('shadow', 'shadowPurple', ['heart'], ['drips']),
   aura_form_bear: r('earth', 'earthBrown', ['paw']),
+  // Warlock specialization resources and offensive windows use aura_<kind>
+  // identities because they are not all applied by a matching AbilityDef.
+  aura_soul_fragments: r('shadow', 'venom', ['skull'], ['sparkle', 'glow']),
+  aura_affliction_doom: r('shadow', 'shadowPurple', ['scroll', { p: 'skull', ...BR }], ['glow']),
+  aura_destruction_ruin: r('fire', 'ember', ['gem', { p: 'flame', ...BR }], ['crack', 'glow']),
+  aura_desolation: r('fire', 'ember', ['sunburst', { p: 'bolt', ...BR }], ['crack']),
+  aura_duskfire_claim: r('shadow', 'ember', ['skull', { p: 'flame', ...BR }], ['glow']),
+  aura_pyre_guardian: r('fire', 'ember', ['meteor', { p: 'fist', ...BR }], ['glow']),
   // Inert rolling-window markers (kind 'internal_cd': Heating Up, the temporal
   // accumulator, the Water Jet counter). A single ember-on-gold "charging" look;
   // without it every marker warned to the console and fell back, once per frame.
@@ -4797,6 +4816,9 @@ export function abilityIconRecipe(id: string): IconRecipe {
 }
 export function hasExplicitAbilityIcon(id: string): boolean {
   return id in ABILITY_RECIPES;
+}
+export function hasExplicitAuraIcon(id: string): boolean {
+  return id in AURA_RECIPES;
 }
 
 const DEFAULT_ICON_SIZE = 96; // crisp at 46px buttons on 2x displays

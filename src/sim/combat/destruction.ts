@@ -9,7 +9,7 @@
 import { createDemonPet } from '../pet/pet_commands';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
-import { type AbilityDef, type Aura, dist2d, type Entity } from '../types';
+import type { AbilityDef, Aura, Entity } from '../types';
 import { grantShadowCredit } from './warlock_talents';
 
 export const RUIN_MAX = 5;
@@ -22,8 +22,11 @@ export const RUINOUS_BRAND_CHARGES = 3;
 export const RUINOUS_BRAND_COPY_PCT = 0.5;
 export const RUINOUS_BRAND_SELF_PCT = 0.25;
 export const RUINOUS_BRAND_DURATION = 15;
-export const PYRE_COLOSSUS_DURATION = 15;
-export const PYRE_WORLDFIRE_RANGE = 30;
+export const PYRE_COLOSSUS_DURATION = 30;
+export const PYRE_AURA_INTERVAL = 2;
+export const PYRE_AURA_RADIUS = 8;
+export const PYRE_AURA_DAMAGE = 84;
+export const PYRE_RUIN_INTERVAL = 1;
 
 const RUIN_AURA_ID = 'destruction_ruin';
 const DESOLATION_AURA_ID = 'desolation';
@@ -289,6 +292,9 @@ export function summonPyreColossus(
     duration,
     sourceId: player.id,
     school: 'fire',
+    tickInterval: PYRE_RUIN_INTERVAL,
+    tickTimer: PYRE_RUIN_INTERVAL,
+    icd: PYRE_AURA_INTERVAL,
   });
   ctx.emit({
     type: 'spellfxAt',
@@ -307,6 +313,50 @@ export function summonPyreColossus(
     color: '#ff7a32',
     pid: player.id,
   });
+}
+
+export function tickPyreGuardian(ctx: SimContext, guardian: Entity, aura: Aura): void {
+  if (guardian.templateId !== 'pyre_colossus' || aura.kind !== 'pyre_guardian') return;
+  const owner = ctx.entities.get(aura.sourceId);
+  if (!owner || owner.dead || owner.kind !== 'player') return;
+  gainRuin(ctx, owner, 1);
+  aura.icd = (aura.icd ?? PYRE_AURA_INTERVAL) - PYRE_RUIN_INTERVAL;
+  if (aura.icd > 0) return;
+  aura.icd += PYRE_AURA_INTERVAL;
+  ctx.emit({
+    type: 'spellfxAt',
+    x: guardian.pos.x,
+    z: guardian.pos.z,
+    school: 'fire',
+    fx: 'nova',
+    radius: PYRE_AURA_RADIUS,
+    sourceId: guardian.id,
+    ability: 'summon_infernal',
+  });
+  for (const target of ctx.entities.values()) {
+    if (target.dead || !ctx.isHostileTo(guardian, target)) continue;
+    if (
+      Math.hypot(target.pos.x - guardian.pos.x, target.pos.z - guardian.pos.z) > PYRE_AURA_RADIUS
+    ) {
+      continue;
+    }
+    ctx.dealDamage(
+      guardian,
+      target,
+      PYRE_AURA_DAMAGE,
+      false,
+      'fire',
+      'Pyre Aura',
+      'hit',
+      true,
+      undefined,
+      false,
+      false,
+      false,
+      'summon_infernal',
+      true,
+    );
+  }
 }
 
 export function destructionOnDeath(ctx: SimContext, target: Entity): void {
@@ -413,62 +463,6 @@ function copyRuinousBrandDamage(
     false,
     undefined,
     true,
-  );
-}
-
-export function destructionOnRuinSpent(
-  ctx: SimContext,
-  player: Entity,
-  target: Entity | null,
-  ability: AbilityDef,
-): void {
-  if ((ability.ruinCost ?? 0) <= 0) return;
-  const guardian = [...ctx.entities.values()].find(
-    (entity) =>
-      entity.ownerId === player.id &&
-      entity.templateId === 'pyre_colossus' &&
-      !entity.dead &&
-      entity.auras.some((aura) => aura.id === 'pyre_guardian'),
-  );
-  if (!guardian) return;
-  const validTarget = (candidate: Entity | null): candidate is Entity =>
-    candidate !== null &&
-    !candidate.dead &&
-    ctx.isHostileTo(player, candidate) &&
-    dist2d(guardian.pos, candidate.pos) <= PYRE_WORLDFIRE_RANGE &&
-    ctx.hasLineOfSight(guardian, candidate);
-  const spenderTarget = validTarget(target) ? target : null;
-  const guardianTarget =
-    guardian.aggroTargetId !== null ? (ctx.entities.get(guardian.aggroTargetId) ?? null) : null;
-  const selectedTarget =
-    player.targetId !== null ? (ctx.entities.get(player.targetId) ?? null) : null;
-  const selected =
-    spenderTarget ??
-    (validTarget(guardianTarget) ? guardianTarget : null) ??
-    (validTarget(selectedTarget) ? selectedTarget : null);
-  if (!selected) return;
-  const amount = Math.max(1, Math.round(18 + player.level * 1.5));
-  ctx.emit({
-    type: 'spellfx',
-    sourceId: guardian.id,
-    targetId: selected.id,
-    school: 'fire',
-    fx: 'heavyBolt',
-  });
-  ctx.dealDamage(
-    guardian,
-    selected,
-    amount,
-    false,
-    'fire',
-    'Worldfire',
-    'hit',
-    false,
-    undefined,
-    true,
-    false,
-    true,
-    null,
   );
 }
 

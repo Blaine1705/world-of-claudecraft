@@ -135,7 +135,7 @@ import {
 } from './ability_damage';
 import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
 import { ArenaWindow } from './arena_window';
-import { auraDisplayNameFromSource } from './aura_display_name';
+import { auraDisplayNameForHud, auraDisplayNameFromSource } from './aura_display_name';
 import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
 import { AuraOverlayController } from './aura_overlay_controller';
@@ -3800,7 +3800,7 @@ export class Hud {
     view: {
       iconId: (a) => (ABILITIES[a.id] ? a.id : `aura_${a.kind}`),
       auraName: (a) =>
-        ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : auraDisplayNameFromSource(a.name),
+        auraDisplayNameForHud(a.name, ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : null),
       formatStacks: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
       // Units are never rendered here (Infinity remaining -> blank label), so the
       // shared container is returned unrefreshed.
@@ -3885,7 +3885,7 @@ export class Hud {
   private readonly aurasViewDeps: AurasDeps = {
     iconId: (a) => (ABILITIES[a.id] ? a.id : `aura_${a.kind}`),
     auraName: (a) =>
-      ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : auraDisplayNameFromSource(a.name),
+      auraDisplayNameForHud(a.name, ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : null),
     formatStacks: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
     durationUnits: () => {
       const u = this.auraDurationUnits;
@@ -4728,8 +4728,9 @@ export class Hud {
   }
 
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
-  // (aura_effect.ts) resolved to localized, esc'd text. Empty when the aura has no
-  // descriptor. Injected into the auras view so the i18n-free core never calls t().
+  // (aura_effect.ts) resolved to localized, esc'd text. The descriptor is exhaustive
+  // for current AuraKinds and safely omits an unknown mixed-release kind. Injected so
+  // the view never calls t().
   private auraEffectTooltipHtml(a: AuraEffectInput & { id?: string }): string {
     const effect = auraEffectDescriptor(a);
     if (!effect) return '';
@@ -5423,9 +5424,10 @@ export class Hud {
     const buffs: BuffStatSource[] = p.auras.map((a) => ({
       kind: a.kind,
       value: a.value,
-      name: ABILITIES[a.id]
-        ? abilityDisplayName(ABILITIES[a.id])
-        : auraDisplayNameFromSource(a.name),
+      name: auraDisplayNameForHud(
+        a.name,
+        ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : null,
+      ),
     }));
     return buildStatTooltip(stat, {
       cls: sim.cfg.playerClass,
@@ -8180,6 +8182,7 @@ export class Hud {
       actionBarWorld.inventory = sim.inventory;
       actionBarWorld.stealthed = stealthed;
       actionBarWorld.fateThreads = fateThreads;
+      actionBarWorld.entities = sim.entities.values();
     } else {
       actionBarWorld = {
         player: p,
@@ -8187,6 +8190,7 @@ export class Hud {
         inventory: sim.inventory,
         stealthed,
         fateThreads,
+        entities: sim.entities.values(),
       };
       this.actionBarWorldInput = actionBarWorld;
     }

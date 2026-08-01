@@ -209,6 +209,7 @@ function fakeDeps(): ActionBarDeps {
 function idleWorld(): ActionBarWorldInput {
   return {
     player: {
+      id: 1,
       autoAttack: false,
       dead: false,
       resource: 100,
@@ -222,6 +223,7 @@ function idleWorld(): ActionBarWorldInput {
     target: null,
     inventory: [],
     stealthed: false,
+    entities: [],
   };
 }
 

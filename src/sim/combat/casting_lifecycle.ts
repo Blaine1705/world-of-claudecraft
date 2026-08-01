@@ -92,7 +92,6 @@ import {
 import {
   consumeDesolationForCast,
   destructionCastTimeMult,
-  destructionOnRuinSpent,
   hasBurningPact,
   reserveRuinousBrandCopy,
   ruinAmount,
@@ -1292,9 +1291,7 @@ function spendAbilityCost(
     }
     return;
   }
-  if (spendRuin(ctx, p, res.def.ruinCost ?? 0) && (res.def.ruinCost ?? 0) > 0) {
-    destructionOnRuinSpent(ctx, p, target, res.def);
-  }
+  spendRuin(ctx, p, res.def.ruinCost ?? 0);
   spendResource(p, res.cost);
   // Overflowing Power (mage choice row): every 10% of maximum mana actually
   // spent shaves manaDefCdrPer10 seconds off the mage defensive cooldowns,

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { applyDuskfireClaim, ruinAmount, summonPyreColossus } from '../src/sim/combat/destruction';
+import {
+  applyDuskfireClaim,
+  PYRE_COLOSSUS_DURATION,
+  ruinAmount,
+  summonPyreColossus,
+} from '../src/sim/combat/destruction';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import { ABILITIES, MOBS } from '../src/sim/data';
@@ -230,16 +235,41 @@ describe('destruction progression', () => {
       castTime: 2.5,
       cooldown: 0,
       ruinCost: 3,
-      effects: [{ type: 'directDamage', min: 128, max: 156 }],
+      effects: [{ type: 'directDamage', min: 358, max: 437 }],
     });
+    expect(ABILITIES.shadow_bolt.effects).toEqual([{ type: 'directDamage', min: 36, max: 50 }]);
+    expect(ABILITIES.shadow_bolt.ranks?.map((rank) => rank.effects)).toEqual([
+      [{ type: 'directDamage', min: 67, max: 87 }],
+      [{ type: 'directDamage', min: 118, max: 148 }],
+      [{ type: 'directDamage', min: 190, max: 235 }],
+    ]);
+    expect(ABILITIES.immolate.effects).toEqual([
+      { type: 'directDamage', min: 31, max: 31 },
+      { type: 'dot', total: 56, duration: 15, interval: 3 },
+    ]);
+    expect(ABILITIES.immolate.ranks?.map((rank) => rank.effects)).toEqual([
+      [
+        { type: 'directDamage', min: 62, max: 62 },
+        { type: 'dot', total: 98, duration: 15, interval: 3 },
+      ],
+      [
+        { type: 'directDamage', min: 106, max: 106 },
+        { type: 'dot', total: 168, duration: 15, interval: 3 },
+      ],
+    ]);
+    expect(ABILITIES.conflagrate.effects).toEqual([
+      { type: 'destructionConflagrate' },
+      { type: 'directDamage', min: 151, max: 179 },
+    ]);
     expect(ABILITIES.summon_infernal).toMatchObject({
       castTime: 0,
       cooldown: 180,
       effects: [
         { type: 'aoeDamage', min: 58, max: 72, radius: 6 },
-        { type: 'summonPyreColossus', duration: 15 },
+        { type: 'summonPyreColossus', duration: 30 },
       ],
     });
+    expect(PYRE_COLOSSUS_DURATION).toBe(30);
 
     const majorOffense = computeTalentModifiers('warlock', {
       spec: 'destruction',
@@ -893,7 +923,7 @@ describe('Destruction finishers and target switching', () => {
 });
 
 describe('Pyre Colossus', () => {
-  it('falls as a temporary guardian and answers Ruin spenders with Worldfire', () => {
+  it('serves for 30 sec without replacing the controlled demon', () => {
     const { sim, p } = destructionAt();
     const mob = addDummy(sim, 9708);
     sim.targetEntity(mob.id);
@@ -933,49 +963,95 @@ describe('Pyre Colossus', () => {
     expect(serializePet(sim.ctx, p.id)?.templateId).toBe('emberkin');
     expect(mob.hp).toBeLessThan(impactHp);
 
-    resetGcd(p);
-    p.resource = p.maxResource;
-    sim.castAbility('chaos_bolt');
-    const events = collect(sim, 4);
-    expect(
-      events.some(
-        (event) =>
-          event.type === 'damage' &&
-          event.targetId === mob.id &&
-          event.ability === 'Worldfire' &&
-          event.amount > 0,
-      ),
-    ).toBe(true);
-
-    collect(sim, 16);
+    collect(sim, 30);
     const remaining = [...sim.entities.values()].filter((entity) => entity.ownerId === p.id);
     expect(remaining.some((entity) => entity.templateId === 'pyre_colossus')).toBe(false);
     expect(remaining.some((entity) => entity.templateId === 'emberkin')).toBe(true);
   });
 
-  it('does not fire Worldfire through invalid range and despawns on owner death', () => {
+  it('pulses nearby enemies every 2 sec and generates 1 Ruin every 1 sec', () => {
     const { sim, p } = destructionAt();
-    const mob = addDummy(sim, 9716);
-    sim.targetEntity(mob.id);
+    const primary = addDummy(sim, 9716);
+    const nearby = addDummy(sim, 9717, 4);
+    const boundary = addDummy(sim, 9718, 7.99);
+    const outside = addDummy(sim, 9719, 8.01);
+    const friendly = addDummy(sim, 9720, 2);
+    friendly.hostile = false;
+    sim.targetEntity(primary.id);
     p.facing = 0;
-    sim.castAbility('summon_infernal', undefined, { x: mob.pos.x, z: mob.pos.z });
+    sim.castAbility('summon_infernal', undefined, { x: primary.pos.x, z: primary.pos.z });
     collect(sim, 3);
     const guardian = [...sim.entities.values()].find(
       (entity) => entity.ownerId === p.id && entity.templateId === 'pyre_colossus',
     );
-    expect(guardian).toBeDefined();
-
     if (!guardian) throw new Error('no Pyre guardian');
-    mob.pos.x = guardian.pos.x + 500;
-    mob.prevPos = { ...mob.pos };
-    (sim as any).rebucket(mob);
-    giveRuin(p, 3);
-    resetGcd(p);
-    sim.castAbility('rain_of_fire', undefined, { x: p.pos.x, z: p.pos.z });
+    giveRuin(p, 0);
+    sim.drainEvents();
+
+    const events = collect(sim, 4.1);
+    const pulses = events.filter(
+      (event) => event.type === 'damage' && event.ability === 'Pyre Aura',
+    );
+
     expect(
-      collect(sim, 1).some((event) => event.type === 'damage' && event.ability === 'Worldfire'),
+      pulses.filter((event) => event.type === 'damage' && event.targetId === primary.id),
+    ).toHaveLength(2);
+    expect(
+      pulses.filter((event) => event.type === 'damage' && event.targetId === nearby.id),
+    ).toHaveLength(2);
+    expect(
+      pulses.filter((event) => event.type === 'damage' && event.targetId === boundary.id),
+    ).toHaveLength(2);
+    expect(
+      pulses.filter((event) => event.type === 'damage' && event.targetId === outside.id),
+    ).toHaveLength(0);
+    expect(
+      pulses.filter((event) => event.type === 'damage' && event.targetId === friendly.id),
+    ).toHaveLength(0);
+    expect(pulses.every((event) => event.type === 'damage' && event.amount === 84)).toBe(true);
+    expect(ruinAmount(p)).toBe(4);
+  });
+
+  it('caps generated Ruin at five and no longer fires Worldfire from spenders', () => {
+    const { sim, p } = destructionAt();
+    const mob = addDummy(sim, 9721, 0);
+    sim.targetEntity(mob.id);
+    p.facing = 0;
+    summonPyreColossus(sim.ctx, p);
+    const guardian = [...sim.entities.values()].find(
+      (entity) => entity.ownerId === p.id && entity.templateId === 'pyre_colossus',
+    );
+    expect(guardian?.auras.find((aura) => aura.kind === 'pyre_guardian')).toMatchObject({
+      duration: 30,
+      remaining: 30,
+    });
+    giveRuin(p, 4);
+
+    const generation = collect(sim, 3.1);
+    expect(ruinAmount(p)).toBe(5);
+    expect(
+      generation.some((event) => event.type === 'damage' && event.ability === 'Worldfire'),
     ).toBe(false);
 
+    resetGcd(p);
+    p.resource = p.maxResource;
+    sim.castAbility('chaos_bolt');
+    const spender = collect(sim, 3);
+    expect(spender.some((event) => event.type === 'damage' && event.ability === 'Worldfire')).toBe(
+      false,
+    );
+  });
+
+  it('despawns immediately on owner death', () => {
+    const { sim, p } = destructionAt();
+    const mob = addDummy(sim, 9722);
+    sim.targetEntity(mob.id);
+    summonPyreColossus(sim.ctx, p);
+    const guardian = [...sim.entities.values()].find(
+      (entity) => entity.ownerId === p.id && entity.templateId === 'pyre_colossus',
+    );
+
+    if (!guardian) throw new Error('no Pyre guardian');
     const observerId = sim.addPlayer('mage', 'Observer');
     const observer = sim.entities.get(observerId);
     if (!observer) throw new Error('no observer');

@@ -44,6 +44,7 @@ import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '..
 import { tickAfflictionAura, tickMaledictGaze } from './affliction';
 import { isStunned } from './cc';
 import { regenerateRuinOutOfCombat } from './destruction';
+import { tickPyreGuardian } from './destruction';
 import { detonateOssuaryMark, OSSUARY_MARK_ABILITY_ID } from './necromancy';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
 import { onHotExpired, tickProcState } from './talent_procs';
@@ -253,7 +254,9 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       a.tickTimer = (a.tickTimer ?? a.tickInterval) - DT;
       if (a.tickTimer <= CAST_COMPLETE_EPS) {
         a.tickTimer += a.tickInterval;
-        if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
+        if (a.kind === 'pyre_guardian') {
+          tickPyreGuardian(ctx, e, a);
+        } else if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
           tickTemporalHourglassHealing(ctx, e, a);
         } else if (a.id === 'sacrilegious_march' && a.kind === 'buff_speed') {
           tickSacrilegiousMarch(ctx, e, a);

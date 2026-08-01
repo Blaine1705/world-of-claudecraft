@@ -24,10 +24,13 @@ const FATE_THREAD_DOOM_PER_TICK = 1;
 const SENTENCE_SPLASH_RADIUS = 8;
 const SENTENCE_SPLASH_MULT = 0.35;
 const SENTENCE_COVEN_ECHO_MULT = 0.35;
+export const SENTENCE_THREAT_MULT = 0.35;
 const POSSESSED_NEEDLE_CAST_TIME = 1;
 const POSSESSED_NEEDLE_DOOM_BONUS = 2;
 const POSSESSED_SENTENCE_ECHO_DELAY = 0.75;
-const POSSESSED_SENTENCE_ECHO_MULT = 0.25;
+const POSSESSED_SENTENCE_ECHO_MULT = 0.6;
+const POSSESSED_SENTENCE_DAMAGE_MULT = 1.25;
+export const JUDGMENT_SENTENCE_DAMAGE_MULT = 1.2;
 const POSSESSED_SENTENCE_ECHO_ID = 'possess_evil_eye_sentence_echo';
 const LITANY_PULSE_INTERVAL = 1;
 const POSSESSED_ABILITY_IDS = new Set(['needle_of_fate', 'drain_life', 'sentence']);
@@ -98,8 +101,14 @@ function eyeAura(target: Entity, warlockId: number): Aura | undefined {
   );
 }
 
-function eyeGeneration(eye: Aura, amount: number): number {
-  return Math.round(amount * (eye.kind === 'affliction_eye_secondary' ? 0.5 : 1));
+function eyeGeneration(eye: Aura, amount: number, warlock: Entity): number {
+  const eyeMult = eye.kind === 'affliction_eye_secondary' ? 0.5 : 1;
+  const judgmentMult =
+    eye.kind === 'affliction_eye' &&
+    warlock.auras.some((aura) => aura.kind === 'affliction_judgment')
+      ? 2
+      : 1;
+  return Math.round(amount * eyeMult * judgmentMult);
 }
 
 function fateThreadAura(target: Entity, warlockId: number): Aura | undefined {
@@ -134,6 +143,7 @@ const OWNED_AFFLICTION_KINDS = new Set([
   'affliction_violence',
   'affliction_vicarious',
   'affliction_possession',
+  'affliction_judgment',
   'affliction_litany',
   'affliction_fate_threads',
   'affliction_consume_threads',
@@ -186,7 +196,13 @@ export function afflictionCanCastWhileMoving(
   return abilityId === 'drain_life' && hasAfflictionPossession(entity);
 }
 
-export function applyEvilEyePossession(ctx: SimContext, warlock: Entity, duration: number): void {
+export function applyEvilEyePossession(
+  ctx: SimContext,
+  warlock: Entity,
+  duration: number,
+  doom = 0,
+): void {
+  if (doom > 0) gainDoom(ctx, warlock, doom);
   ctx.applyAura(warlock, {
     id: 'possess_evil_eye',
     name: 'Possess the Evil Eye',
@@ -196,6 +212,62 @@ export function applyEvilEyePossession(ctx: SimContext, warlock: Entity, duratio
     value: 1,
     sourceId: warlock.id,
     school: 'shadow',
+  });
+}
+
+function grantFateThreads(ctx: SimContext, target: Entity, warlock: Entity, stacks: number): void {
+  const bounded = Math.min(FATE_THREAD_MAX, Math.max(0, Math.floor(stacks)));
+  if (bounded === 0) return;
+  const existing = fateThreadAura(target, warlock.id);
+  if (existing) {
+    existing.stacks = bounded;
+    existing.value = bounded;
+    existing.remaining = FATE_THREAD_DURATION;
+    existing.duration = FATE_THREAD_DURATION;
+    return;
+  }
+  ctx.applyAura(target, {
+    id: 'needle_of_fate',
+    name: 'Fate Threads',
+    kind: 'affliction_fate_threads',
+    remaining: FATE_THREAD_DURATION,
+    duration: FATE_THREAD_DURATION,
+    value: bounded,
+    stacks: bounded,
+    sourceId: warlock.id,
+    school: 'shadow',
+  });
+}
+
+export function applyHourOfJudgment(
+  ctx: SimContext,
+  warlock: Entity,
+  target: Entity,
+  duration: number,
+  doom: number,
+  refund: number,
+): void {
+  gainDoom(ctx, warlock, doom);
+  grantFateThreads(ctx, target, warlock, FATE_THREAD_MAX);
+  applyEvilEyePossession(ctx, warlock, duration);
+  ctx.applyAura(warlock, {
+    id: 'hour_of_judgment',
+    name: 'Hour of Judgment',
+    kind: 'affliction_judgment',
+    remaining: duration,
+    duration,
+    value: refund,
+    charges: 1,
+    sourceId: warlock.id,
+    school: 'shadow',
+  });
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: warlock.id,
+    targetId: target.id,
+    school: 'shadow',
+    fx: 'evilEyeGaze',
+    ability: 'hour_of_judgment',
   });
 }
 
@@ -375,7 +447,7 @@ export function tickMaledictGaze(ctx: SimContext, target: Entity, aura: Aura): v
       (candidate.icd ?? 0) <= 0,
   );
   if (!accomplice) return;
-  gainDoom(ctx, warlock, accomplice.value);
+  gainDoom(ctx, warlock, eyeGeneration(aura, accomplice.value, warlock));
   accomplice.icd = accomplice.icdMax ?? ACCOMPLICE_INTERVAL;
 }
 
@@ -388,7 +460,11 @@ export function resolveNeedleOfFate(ctx: SimContext, warlock: Entity, target: En
   gainDoom(
     ctx,
     warlock,
-    eyeGeneration(eye, 7 + (hasAfflictionPossession(warlock) ? POSSESSED_NEEDLE_DOOM_BONUS : 0)),
+    eyeGeneration(
+      eye,
+      7 + (hasAfflictionPossession(warlock) ? POSSESSED_NEEDLE_DOOM_BONUS : 0),
+      warlock,
+    ),
   );
   if (eye.kind !== 'affliction_eye') return;
   const threads = fateThreadAura(target, warlock.id);
@@ -591,11 +667,11 @@ export function applyCoven(
   }
 }
 
-function sentenceBaseDamage(doom: number): number {
-  if (doom <= 20) return 83;
-  if (doom <= 50) return Math.round(83 + ((doom - 20) / 30) * 157);
-  if (doom <= 80) return Math.round(240 + ((doom - 50) / 30) * 210);
-  return Math.round(450 + ((doom - 80) / 20) * 210);
+export function sentenceBaseDamage(doom: number): number {
+  if (doom <= 20) return 138;
+  if (doom <= 50) return Math.round(138 + ((doom - 20) / 30) * 262);
+  if (doom <= 80) return Math.round(400 + ((doom - 50) / 30) * 350);
+  return Math.round(750 + ((doom - 80) / 20) * 350);
 }
 
 export function resolveSentence(
@@ -612,11 +688,24 @@ export function resolveSentence(
   const doom = consumeDoom(ctx, warlock);
   if (doom < 20) return;
   if (threads) removeOwnedAura(ctx, target, threads);
+  const judgment = warlock.auras.find(
+    (aura) => aura.kind === 'affliction_judgment' && aura.remaining > 0,
+  );
   const levelScale = Math.max(0.25, Math.min(1, warlock.level / 20));
   const threadDamageMult = 1 + threadCount * FATE_THREAD_SENTENCE_DAMAGE_PER_STACK;
   const sharedDamage = Math.round(
-    sentenceBaseDamage(doom) * levelScale * damageMult * threadDamageMult + flat,
+    sentenceBaseDamage(doom) *
+      levelScale *
+      damageMult *
+      threadDamageMult *
+      (possessed ? POSSESSED_SENTENCE_DAMAGE_MULT : 1) *
+      (judgment ? JUDGMENT_SENTENCE_DAMAGE_MULT : 1) +
+      flat,
   );
+  if (judgment && (judgment.charges ?? 0) > 0) {
+    judgment.charges = Math.max(0, (judgment.charges ?? 0) - 1);
+    gainDoom(ctx, warlock, judgment.value);
+  }
   let primaryDamage = sharedDamage;
   const normalMob =
     target.kind === 'mob' && !MOBS[target.templateId]?.boss && !MOBS[target.templateId]?.elite;
@@ -636,7 +725,7 @@ export function resolveSentence(
     abilityName,
     'hit',
     false,
-    undefined,
+    { mult: SENTENCE_THREAT_MULT },
     true,
     false,
     false,
@@ -688,7 +777,7 @@ export function resolveSentence(
         abilityName,
         'hit',
         true,
-        undefined,
+        { mult: SENTENCE_THREAT_MULT },
         false,
         false,
         false,
@@ -717,7 +806,7 @@ export function resolveSentence(
       abilityName,
       'hit',
       true,
-      undefined,
+      { mult: SENTENCE_THREAT_MULT },
       false,
       false,
       false,
@@ -779,7 +868,7 @@ export function afflictionDrainTickDoom(
 ): number {
   const eye = eyeAura(target, warlock.id);
   if (!eye || !afflictionMeta(ctx, warlock)) return 0;
-  return eyeGeneration(eye, DRAIN_TICK_GAIN + threadBonus);
+  return eyeGeneration(eye, DRAIN_TICK_GAIN + threadBonus, warlock);
 }
 
 export function afflictionDrainCompletionDoom(
@@ -789,7 +878,7 @@ export function afflictionDrainCompletionDoom(
 ): number {
   const eye = eyeAura(target, warlock.id);
   if (!eye || !afflictionMeta(ctx, warlock)) return 0;
-  return eyeGeneration(eye, DRAIN_COMPLETION_GAIN);
+  return eyeGeneration(eye, DRAIN_COMPLETION_GAIN, warlock);
 }
 
 export function completeAfflictionDrain(
@@ -834,6 +923,12 @@ export function afflictionTargetCastError(
     return 'That ability is not ready yet.';
   }
   if (
+    ability.id === 'hour_of_judgment' &&
+    !target?.auras.some((aura) => aura.kind === 'affliction_eye' && aura.sourceId === player.id)
+  ) {
+    return 'That ability is not ready yet.';
+  }
+  if (
     ability.id === 'litany_of_guilt' &&
     !target?.auras.some((aura) => aura.kind === 'affliction_eye' && aura.sourceId === player.id)
   ) {
@@ -873,20 +968,16 @@ export function tickAfflictionAura(ctx: SimContext, target: Entity, aura: Aura, 
  * next pull. Feeding the kill back into `gainDoom` keeps the ramp alive across a
  * questing pull chain, and refreshes the expiry exactly like every other
  * generation event. Secondary (Coven) Eyes pay the same halved rate as every
- * other generation path, via `eyeGeneration`.
+ * other generation path, via `eyeGeneration`. This belongs to the shared death
+ * lifecycle so ranked-arena and direct scripted deaths cannot bypass it.
  */
-function afflictionEyeDeath(ctx: SimContext, target: Entity, actualDamage: number): void {
-  // `target.dead` is still false here and the auras are still attached: the
-  // lethal blow lands in dealDamage well before handleDeath flips the flag and
-  // sheds them, so this is the last frame the Eye is observable. The same two
-  // guards make a follow-up hit on the corpse (already dead, or zero landed
-  // damage) a no-op, so a single death pays out once.
-  if (actualDamage <= 0 || target.dead || target.hp > 0) return;
+export function afflictionOnDeath(ctx: SimContext, target: Entity): void {
+  if (target.dead) return;
   for (const eye of target.auras) {
     if (eye.kind !== 'affliction_eye' && eye.kind !== 'affliction_eye_secondary') continue;
     const warlock = ctx.entities.get(eye.sourceId);
     if (!warlock || warlock.id === target.id) continue;
-    gainDoom(ctx, warlock, eyeGeneration(eye, AFFLICTION_EYE_DEATH_GAIN));
+    gainDoom(ctx, warlock, eyeGeneration(eye, AFFLICTION_EYE_DEATH_GAIN, warlock));
   }
 }
 
@@ -896,9 +987,6 @@ export function onAfflictionDamage(
   target: Entity,
   actualDamage: number,
 ): void {
-  // Runs ahead of the source guard below so a kill by an ally, or by a
-  // source-less tick, still feeds the caster who owns the Eye.
-  afflictionEyeDeath(ctx, target, actualDamage);
   if (!source || source.id === target.id || actualDamage <= 0) return;
   const sourceCanTrigger = source.auras.some((aura) =>
     AFFLICTION_SOURCE_DAMAGE_KINDS.has(aura.kind),
@@ -910,7 +998,7 @@ export function onAfflictionDamage(
     if (eye.kind !== 'affliction_eye' && eye.kind !== 'affliction_eye_secondary') continue;
     const warlock = ctx.entities.get(eye.sourceId);
     if (warlock) {
-      gainDoom(ctx, warlock, eyeGeneration(eye, ENEMY_ACTION_GAIN));
+      gainDoom(ctx, warlock, eyeGeneration(eye, ENEMY_ACTION_GAIN, warlock));
     }
   }
 
@@ -919,7 +1007,11 @@ export function onAfflictionDamage(
     const warlock = ctx.entities.get(violence.sourceId);
     if (!warlock || warlock.dead) continue;
     const marked = eyeAura(source, warlock.id);
-    gainDoom(ctx, warlock, marked ? eyeGeneration(marked, violence.value) : violence.value);
+    gainDoom(
+      ctx,
+      warlock,
+      marked ? eyeGeneration(marked, violence.value, warlock) : violence.value,
+    );
     violence.charges = Math.max(0, (violence.charges ?? 0) - 1);
     ctx.dealDamage(
       warlock,
@@ -951,7 +1043,7 @@ export function onAfflictionDamage(
     if (!warlock || !eyeAura(target, warlock.id)) continue;
     const marked = eyeAura(target, warlock.id);
     if (!marked) continue;
-    gainDoom(ctx, warlock, eyeGeneration(marked, accomplice.value));
+    gainDoom(ctx, warlock, eyeGeneration(marked, accomplice.value, warlock));
     accomplice.icd = accomplice.icdMax ?? ACCOMPLICE_INTERVAL;
   }
 

@@ -274,17 +274,13 @@
 
 | Ability | Rank | Learn | Cost | Cast | Effect values |
 |---|---|---|---|---|---|
-| shadow_bolt | 1 | 1 | 25 | 1.7 | 13–18 |
-| | **2** | **8** | 38 | **2.2** | **24–31** |
-| | **3** | **14** | 55 | **2.7** | **42–53** |
-| | **4** | **20** | 80 | **3.0** | **68–84** |
-| summon_imp | 1 | 1 | 50 | 5.0 | Emberkin scale 0.55 |
-| | **2** | **8** | 50 | 5.0 | **scale 0.65** |
-| | **3** | **14** | 50 | 5.0 | **scale 0.75** |
-| | **4** | **20** | 50 | 5.0 | **scale 0.85** |
-| immolate | 1 | 1 | 25 | 2.0 | 11 + dot 20/15s |
-| | **2** | **10** | 40 | 2.0 | **22** + dot **35/15s** (5×7) |
-| | **3** | **16** | 60 | 2.0 | **38** + dot **60/15s** (5×12) |
+| shadow_bolt | 1 | 1 | 25 | 1.7 | 36–50 |
+| | **2** | **8** | 38 | **2.2** | **67–87** |
+| | **3** | **14** | 55 | **2.7** | **118–148** |
+| | **4** | **20** | 80 | **3.0** | **190–235** |
+| immolate | 1 | 1 | 25 | 2.0 | 31 + dot 56/15s |
+| | **2** | **10** | 40 | 2.0 | **62** + dot **98/15s** |
+| | **3** | **16** | 60 | 2.0 | **106** + dot **168/15s** |
 | corruption | 1 | 4 | 35 | 2.0 | dot 40/18s |
 | | **2** | **12** | 55 | 2.0 | dot **72/18s** (6×12) |
 | | **3** | **18** | 75 | 2.0 | dot **108/18s** (6×18) |
@@ -294,9 +290,9 @@
 | life_tap | 1 | 6 | 0 | inst | hp 30 → mana 30 |
 | | **2** | **14** | 0 | inst | **55 → 55** |
 | | **3** | **20** | 0 | inst | **85 → 85** |
-| drain_life | 1 | 7 | 25 | 3s chan ×3 | 7/tick, healFrac 1 |
-| | **2** | **14** | 35 | 3s chan ×3 | **12**/tick |
-| | **3** | **20** | 45 | 3s chan ×3 | **17**/tick |
+| drain_life | 1 | 10 | 35 | 5s chan ×5 | 7/tick, healFrac 1 |
+| | **2** | **14** | 50 | 5s chan ×5 | **12**/tick |
+| | **3** | **20** | 70 | 5s chan ×5 | **17**/tick |
 | demon_skin | 1 | 1 | 20 | inst | buff_armor 30, 30min |
 | | **2** | **12** | 35 | inst | buff_armor **55** |
 | | **3** | **20** | 50 | inst | buff_armor **80** |
@@ -306,24 +302,24 @@
 | Ability | Learn | Cost | Cast/CD | Effects |
 |---|---|---|---|---|
 | `fear` | 14 | 40 | 1.5s, 20yd | incapacitate 8s (breaks on damage; reuses incapacitate — target cowers in place, no flee AI needed) |
-| `searing_pain` | 7 | 35 | 1.5s | directDamage 30–38 |
+| `searing_pain` | 16 | 35 | 1.5s | directDamage 30–38 |
 
-Committed Destruction excludes `corruption`, `curse_of_agony`, and `searing_pain`.
-The retired Duskborn, Spellhound, Warfiend, and Wraithborn summons no longer belong
-to any Warlock spellbook. Emberkin is shared before specialization and remains known
-only by Destruction after the level 5 specialization choice. Its reworked spell ladder
-overlays the shared Warlock ranks above:
+Committed Destruction excludes `corruption`, `curse_of_agony`, `searing_pain`,
+and `summon_doomguard`. Its reworked spell ladder overlays the shared Warlock
+ranks above:
 
 | Ability | Learn | Mana / Ruin | Cast/CD | Effects |
 |---|---|---|---|---|
-| `conflagrate` | 5 | 40 / +1 | inst, 2 charges, 12s recharge | requires own Burning Pact; advances one 3s DoT tick; 54-64 direct; +1 Desolation |
-| `chaos_bolt` (Ruinbolt) | 5 | 65 / 3 | 2.5s, no CD | 128-156 direct; Desolation makes the cast 30% faster |
-| `shadowburn` (Duskfire) | 12 | 35 / 1 | inst, 12cd | execute below 20%; 72-84 direct; Ruin refund if the claimed target dies within 5s |
-| `ruinous_brand` | 10 | 35 / none | inst, 20cd | marks for 15s; next 3 direct casts into another target copy 50% resolved damage |
-| `rain_of_fire` | 8 | 60 / 3 | inst, no CD | ground AoE 8-11 each second for 6s; Desolation makes the first wave immediate |
-| `summon_infernal` (Pyre Colossus) | 13 | 100 / none | instant aimed, 180cd | impact AoE 58-72 in 6yd; 15s guardian; each Ruin spender triggers Worldfire |
+| `conflagrate` | 5 | 40 / +1 | inst, 2 charges, 12s recharge | requires own Burning Pact; advances one 3s DoT tick; 151-179 direct; +1 Desolation |
+| `chaos_bolt` (Ruinbolt) | 10 | 65 / 3 | 2.5s, no CD | 358-437 direct; Desolation makes the cast 30% faster |
+| `shadowburn` (Duskfire) | 14 | 35 / 1 | inst, 12cd | execute below 20%; 72-84 direct; Ruin refund if the claimed target dies within 5s |
+| `ruinous_brand` | 16 | 35 / none | inst, 20cd | marks for 15s; next 3 direct casts into another target copy 50% resolved damage |
+| `rain_of_fire` | 18 | 60 / 3 | inst, no CD | ground AoE 8-11 each second for 6s; Desolation makes the first wave immediate |
+| `summon_infernal` (Pyre Colossus) | 20 | 100 / +1/sec | 2.0s aimed, 180cd | impact AoE 58-72 in 6yd; 30s guardian; 84 Fire every 2s to enemies within 8yd |
 
-**Sanity** — L14: Corruption R2 (72) + CoA R2 (72) + 3× SB R3 (~143) ≈ 287 + Drain ✓ (~6 GCDs, dot-and-drain pace). L20: Corruption R3 + CoA R3 (220 over time) + 2–3 SB R4 (~152–228) ≥ 400 ✓.
+**Siege tuning:** the committed Destruction ladder is deliberately much heavier
+than the legacy shared Warlock values. The matched Nythraxis benchmark measures
+156.8 active DPS at level 20 in pre-raid gear.
 
 ---
 
@@ -338,6 +334,17 @@ undead kit. Its non-summon additions are:
 | | 2 | 14 | 50 | 1.6s, 8cd | 50-60 Shadow; same rider |
 | | 3 | 20 | 65 | 1.6s, 8cd | 74-88 Shadow; same rider |
 | `ossuary_mark` | 1 | 12 | 30 | instant, 20cd | 12s mark; stores 20% owner and undead damage; recast detonates; marked death bursts in 6 yards and creates 1 Soul Fragment |
+
+The summon ladder uses two persistent Dominion slots. Only one servant of each
+archetype may serve at a time, and blocked summons spend no mana or Soul Fragments.
+
+| Ability | Learn | Mana / Fragments | Cast/CD | Dominion role |
+|---|---:|---:|---|---|
+| `raise_graveguard` | 1 | 0 / 0 | 2.5s, 3cd | Permanent defensive companion; auto-taunts, intercepts 20% owner damage, and Reaping grants 30% damage reduction for 4s |
+| `raise_skeletal_warrior` | 5 | 20 / 1 | instant | Persistent melee choice; cleaves for 45% every 6s and Reaping slows by 40% for 4s |
+| `raise_bone_mage` | 8 | 35 / 2 | instant | Persistent ranged choice; attacks apply 5% magic vulnerability for 6s and Reaping raises it to 8% |
+| `raise_gravewing` | 17 | 45 / 2 | instant | Persistent area choice; cleaves for 65% every 5s and Reaping applies 8% general vulnerability for 5s |
+| `army_of_the_dead` | 20 | 100 / 0 | 1.5s, 120cd | For 20s, temporarily fills every missing Dominion archetype; chosen servants persist afterward |
 
 ## DRUID
 
@@ -409,7 +416,7 @@ undead kit. Its non-summon additions are:
 | Warlock | fear@14, Duskfire@14, Ruinous Brand@16, Rain of Fire@18, Pyre Colossus@20 | Ruin, Desolation, Brand echo, temporary guardian |
 | Druid | regrowth@14, barkskin@16, starfire@18 | none |
 
-Files to touch when implementing: `src/sim/data.ts` (ABILITIES ranks + new entries, CLASSES.abilities arrays, 2 conjured-water items), `src/sim/types.ts` (one new AbilityEffect variant `finisherStun`, XP_TABLE/MAX_LEVEL extension per the brief).
+Files to touch when implementing: `/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/src/sim/data.ts` (ABILITIES ranks + new entries, CLASSES.abilities arrays, 2 conjured-water items), `/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/src/sim/types.ts` (one new AbilityEffect variant `finisherStun`, XP_TABLE/MAX_LEVEL extension per the brief).
 
 ---
 

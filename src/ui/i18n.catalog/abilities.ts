@@ -1228,7 +1228,12 @@ const classAbilityNamesEn = {
       [
         'possess_evil_eye',
         'Possess the Evil Eye',
-        'The Maledictor possesses your primary Evil Eye for 10 sec. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving and gains a demonic beam, and Sentence releases a delayed echo for 25% damage.',
+        'The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage.',
+      ],
+      [
+        'hour_of_judgment',
+        'Hour of Judgment',
+        'Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation.',
       ],
       [
         'coven',
@@ -1413,17 +1418,17 @@ const classAbilityNamesEn = {
       [
         'raise_graveguard',
         'Raise Graveguard',
-        'Raises a durable Graveguard that remains at your side. You may control one Graveguard at a time.',
+        'Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec.',
       ],
       [
         'raise_skeletal_warrior',
         'Raise Skeletal Warrior',
-        'Spends 1 Soul Fragment to raise a Skeletal Warrior for 30 sec. You may command up to 3 temporary undead.',
+        'Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec.',
       ],
       [
         'raise_bone_mage',
         'Raise Bone Mage',
-        'Spends 2 Soul Fragments to raise a ranged Bone Mage for 30 sec. You may command up to 3 temporary undead.',
+        'Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%.',
       ],
       [
         'bone_armor',
@@ -1453,17 +1458,22 @@ const classAbilityNamesEn = {
       [
         'reaping_command',
         'Reaping Command',
-        'Spends 2 Soul Fragments to command every undead servant to strike your target in unison. Cleaving servants also strike nearby enemies.',
+        'Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit.',
       ],
       [
         'sacrifice_undead',
         'Sacrifice Undead',
-        'Destroys one temporary undead servant to restore 25% of your maximum health.',
+        'Destroys one Dominion servant to restore 25% of your maximum health.',
+      ],
+      [
+        'raise_gravewing',
+        'Raise Gravewing',
+        'Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec.',
       ],
       [
         'army_of_the_dead',
         'Army of the Dead',
-        'Tears open a grave portal and calls forth one Skeletal Warrior, one Bone Mage, and one Gravewing for a relentless 20 sec assault. They replace your current temporary undead.',
+        'Tears open a grave portal for 20 sec, temporarily raising every Dominion archetype not already serving you. Your chosen servants remain after the portal closes.',
       ],
       [
         'metamorphosis',
@@ -1603,7 +1613,7 @@ const classAbilityNamesEn = {
       [
         'summon_infernal',
         'Summon Pyre Colossus',
-        'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights as a guardian for 15 sec without replacing your demon and answers each Ruin spender with Worldfire.',
+        'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Ruin every 1 sec.',
       ],
       [
         'summon_doomguard',

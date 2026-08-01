@@ -8,6 +8,7 @@ import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
+import { auraDisplayNameForHud } from '../src/ui/aura_display_name';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { Hud } from '../src/ui/hud';
 import {
@@ -561,7 +562,9 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
       'Condemnation',
       'Soul Fragments',
       'Umbral Anchor',
+      'Fate Threads',
       'Possess the Evil Eye',
+      'Hour of Judgment',
       'Coven',
       'Sacrilegious March',
       'Sanguine Covenant',
@@ -573,6 +576,7 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
       expect(localizeSimAuraName(name), `no Warlock aura matcher row for '${name}'`).not.toBeNull();
     }
     expect(localizeSimAuraName('Shadow Credit')).not.toBe('Shadow Credit');
+    expect(auraDisplayNameForHud('Fate Threads', '命运之针')).toBe('命运丝线');
     setLanguage('en');
   });
 

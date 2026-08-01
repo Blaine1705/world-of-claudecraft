@@ -6833,7 +6833,12 @@ export class GameServer {
         for (let i = 0; i < events.length; i++) {
           const ev = events[i];
           if (suppressedInvites?.has(ev)) continue;
-          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty)) continue;
+          const sourceOwnerId =
+            ev.type === 'damage'
+              ? (ev.sourceOwnerId ?? this.sim.entities.get(ev.sourceId)?.ownerId ?? null)
+              : null;
+          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty, sourceOwnerId))
+            continue;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (

@@ -12,6 +12,7 @@ import { armoryCollectionStrings, armorySkinStrings } from './armory';
 export const hudChromeStrings = {
   warlock: {
     doomLabel: 'Condemnation',
+    fateThreadsLabel: 'Fate Threads',
     doomEmptyStatus: '{value} of {max} Condemnation.',
     doomStatus: '{value} of {max} Condemnation; {remaining}.',
     fateThreadsLabel: 'Fate Threads',
@@ -1880,11 +1881,19 @@ export const hudChromeStrings = {
     absorb: 'Absorbs {value} damage',
     healAbsorb: 'Absorbs {value} incoming healing',
     thorns: 'Deals {value} {school} damage to attackers',
+    stasis: 'Immune and unable to act',
     slow: 'Reduces movement speed by {pct}%',
     speed: 'Increases movement speed by {pct}%',
     attackSpeedSlow: 'Slows attack speed by {pct}%',
     attackSpeedFast: 'Increases attack speed by {pct}%',
     haste: 'Increases attack and casting speed by {pct}%',
+    petDamage: 'Increases pet damage by {pct}%',
+    petHaste: 'Increases pet action speed by {pct}%',
+    spellDamage: 'Increases spell damage by {pct}%',
+    spellHaste: 'Increases spell casting speed by {pct}%',
+    sated: 'Cannot benefit from another group haste effect',
+    cauterizeFatigue: 'Cauterize cannot prevent another lethal hit',
+    castShield: 'Casting cannot be interrupted or delayed by damage',
     // wordy (M16): filled in the five non-Latin locales in this change.
     dmgDone: 'Increases damage dealt by {pct}%',
     dmgDoneReduce: 'Reduces damage dealt by {pct}%',
@@ -1892,6 +1901,12 @@ export const hudChromeStrings = {
       'Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up',
     elementalConvergencePrimed:
       'Your next spell from the other elemental school grants Elemental Convergence',
+    cooldownCap: '{used} of {cap} sec of cooldown reduction used in this window',
+    funeralHarvestLock: 'Funeral Harvest cannot create another Soul Fragment yet',
+    leadenHexLock: 'Leaden Hex cannot root this target again yet',
+    forbiddenReflectionReady: 'Your next eligible shared Warlock cooldown can be cast again',
+    forbiddenReflectionLock: 'Forbidden Reflection cannot be prepared again yet',
+    internalCooldown: 'This effect cannot trigger again until the timer expires',
     battleStance: 'Battle Stance: 10% more rage generation',
     berserkerStance: 'Berserker Stance: crits 3% more often and hit 3% harder',
     crit: 'Increases critical strike chance by {pct}%',
@@ -1907,6 +1922,17 @@ export const hudChromeStrings = {
     revengeFree: 'Your next Revenge costs no Rage',
     victoryRush: 'Victory Rush is ready',
     maxHpPct: 'Increases maximum health by {pct}%',
+    enrage:
+      'Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%',
+    suddenDeath: 'Your next Execute costs no Rage and ignores its health requirement',
+    aoeEcho:
+      '{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies',
+    sureCrit: '{charges} damaging ability casts are guaranteed critical strikes',
+    temporalEcho:
+      "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
+    arcaneCharge:
+      '{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana',
+    physicalReduction: 'Reduces Physical damage taken by {pct}%',
     temporalHourglass:
       'Immune and unable to act; restores health and accelerates cooldown recovery. Right-click to cancel.',
     tongues: 'Increases casting time by {pct}%',
@@ -1917,6 +1943,10 @@ export const hudChromeStrings = {
     freeCast: 'Your next cast costs nothing',
     instantCast: 'Your next spell with a cast time is instant',
     cheapCast: 'Your next spell costs {pct}% less',
+    freeExecute: 'Your next eligible execute ability costs nothing',
+    resourceSap: 'Restores {value} of your current resource every {interval} sec',
+    nextAttackCrit: 'Your next attack is guaranteed to critically strike',
+    healEcho: 'Falling below {threshold}% health restores {value} health',
     increase: {
       ap: 'Increases attack power by {value}',
       sp: 'Increases spell power by {value}',
@@ -1958,6 +1988,8 @@ export const hudChromeStrings = {
     mortalWound: 'Reduces healing received by {pct}%',
     vulnerability: 'Increases damage taken by {pct}%',
     physVuln: 'Increases physical damage taken by {pct}%',
+    bleedVuln: 'Increases bleed damage taken by {pct}%',
+    sourceVuln: 'Takes {pct}% more damage from the caster who applied this effect',
     spellVuln: 'Increases magic damage taken by {pct}%',
     critVuln: 'Increases chance to be critically hit by {pct}%',
     costTax: 'Increases ability costs by {pct}%',
@@ -1977,8 +2009,55 @@ export const hudChromeStrings = {
     formCat: 'Wolf Form: melee damage and energy',
     formTravel: 'Fleet Form: movement speed increased by {pct}%',
     formFireball: 'Ember Form: movement speed increased by {pct}%; attacks and spells are disabled',
+    formMoonkin:
+      'Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%',
+    formShadow: 'Gloamveil Form: Shadow damage increased by {pct}%',
+    resourceCount: '{value} of {max}',
+    formLich: 'Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage',
+    afflictionEye:
+      'Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation',
+    afflictionEyeSecondary:
+      'Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage',
+    afflictionAccomplice:
+      'Qualifying damage grants {value} Condemnation, at most once every {interval} sec',
+    afflictionViolence:
+      '{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back',
+    afflictionVicarious:
+      'Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation',
+    afflictionPossession: 'Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence',
+    afflictionJudgment:
+      'Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation',
+    afflictionLitany:
+      'Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec',
+    afflictionFateThreads:
+      '{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick',
+    afflictionConsumeThreads:
+      'Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick',
+    necromancyHarvestMark:
+      'Death can create 1 Soul Fragment and leaves a Death Echo for Corpse Explosion',
+    necromancyOssuaryMark:
+      'Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment',
+    necromancyDeathEcho: 'Corpse Explosion can consume this echo within {radius} yd of its aim',
+    warlockAnchor: 'Recast within {range} yd to return here and consume the anchor',
+    formMetamorph: 'Demon form: body size increased by {pct}%; other bonuses ride separate buffs',
+    energyRegen: 'Increases Energy regeneration by {pct}%',
     defensiveStance: 'Guarded Stance: reduced damage taken, more threat',
     righteousFury: 'Burning Oath: greatly increased threat from Holy damage',
+    overpowerCharge: '{stacks} charges: your next Maiming Strike deals {pct}% more damage',
+    sweepingStrikes: 'Single-target strikes also hit {targets} nearby enemy for {pct}% damage',
+    fingersOfFrost:
+      '{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage',
+    brainFreeze: 'Your next Flurry is instant and ignores its cooldown',
+    wintersChill: '{charges} charges: compatible spells treat this target as frozen',
+    icicles: '{value} of {max} Icicles; at {max}, Glacial Spike can be cast',
+    desolation:
+      '{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately',
+    ruinousBrand:
+      '{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target',
+    duskfireClaim: 'Death grants {value} Ruin',
+    pyreGuardian:
+      'Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec',
+    perfectMoment: 'Aether Darts does not consume Arcane Charges',
     scale: 'Size increased by {pct}%',
     jump: 'Jump height increased by {pct}%',
     // Localized damage-school names spliced into {school} above.

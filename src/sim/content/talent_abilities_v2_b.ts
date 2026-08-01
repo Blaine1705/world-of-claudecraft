@@ -169,7 +169,7 @@ export const TALENT_ABILITIES_V2_B = {
     requiresTarget: true,
     specs: ['destruction'],
     projectileFx: 'heavyBolt',
-    effects: [{ type: 'directDamage', min: 128, max: 156 }],
+    effects: [{ type: 'directDamage', min: 358, max: 437 }],
     description:
       'Spends 3 Ruin to hurl a heavy bolt of chaotic fire for $d Fire damage. Desolation shortens its cast by 30%.',
   },

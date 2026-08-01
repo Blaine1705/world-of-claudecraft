@@ -81,6 +81,7 @@ function fakeDeps(): ActionBarDeps {
 }
 
 interface WorldOpts {
+  playerId?: number;
   autoAttack?: boolean;
   dead?: boolean;
   resource?: number;
@@ -91,6 +92,12 @@ interface WorldOpts {
   playerPos?: { x: number; y: number; z: number };
   targetPos?: { x: number; y: number; z: number } | null;
   targetDead?: boolean;
+  targetAuras?: ActionBarAuraInput[];
+  entities?: Iterable<{
+    ownerId?: number | null;
+    templateId: string;
+    dead?: boolean;
+  }>;
   inventory?: { itemId: string; count: number }[];
   abilityCharges?: {
     [id: string]: { charges: number; recharge?: number; rechargeLength?: number } | undefined;
@@ -104,6 +111,7 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
   const targetPos = opts.targetPos === undefined ? null : opts.targetPos;
   return {
     player: {
+      id: opts.playerId ?? 1,
       autoAttack: opts.autoAttack ?? false,
       dead: opts.dead ?? false,
       resource: opts.resource ?? 100,
@@ -115,10 +123,18 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       abilityCharges: opts.abilityCharges,
       auras: opts.auras ?? [],
     },
-    target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
+    target:
+      targetPos === null
+        ? null
+        : {
+            dead: opts.targetDead ?? false,
+            pos: targetPos,
+            auras: opts.targetAuras ?? [],
+          },
     inventory: opts.inventory ?? [],
     stealthed: opts.stealthed ?? false,
     fateThreads: opts.fateThreads ?? 0,
+    entities: opts.entities ?? [],
   };
 }
 
@@ -330,6 +346,75 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
         }),
       ).slots[0].usable,
     ).toBe(true);
+  });
+
+  it('dims primary-Eye abilities until the selected target has the owned primary Eye', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('hour_of_judgment', { requiresTarget: true, range: 30 }),
+        }),
+      ),
+      fakeDeps(),
+    );
+    const targetPos = { x: 5, y: 0, z: 0 };
+
+    expect(view.tick(world({ playerId: 7, targetPos })).slots[0].usable).toBe(false);
+    expect(
+      view.tick(
+        world({
+          playerId: 7,
+          targetPos,
+          targetAuras: [{ kind: 'affliction_eye_secondary', sourceId: 7 }],
+        }),
+      ).slots[0].usable,
+    ).toBe(false);
+    expect(
+      view.tick(
+        world({
+          playerId: 7,
+          targetPos,
+          targetAuras: [{ kind: 'affliction_eye', sourceId: 7 }],
+        }),
+      ).slots[0].usable,
+    ).toBe(true);
+  });
+
+  it('dims duplicate and over-cap Dominion summons without hiding valid composition choices', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('raise_skeletal_warrior', { soulFragmentCost: 1 }),
+        }),
+        slot(2, { ability: ability('raise_bone_mage', { soulFragmentCost: 2 }) }),
+        slot(3, { ability: ability('raise_gravewing', { soulFragmentCost: 1 }) }),
+      ),
+      fakeDeps(),
+    );
+    const base = {
+      playerId: 7,
+      auras: [{ kind: 'soul_fragments' as const, stacks: 5 }],
+    };
+    const oneServant = view.tick(
+      world({
+        ...base,
+        entities: new Map([
+          [1, { ownerId: 7, templateId: 'necromancy_skeletal_warrior' }],
+        ]).values(),
+      }),
+    );
+    expect(oneServant.slots.map((slotState) => slotState.usable)).toEqual([false, true, true]);
+
+    const fullDominion = view.tick(
+      world({
+        ...base,
+        entities: new Map([
+          [1, { ownerId: 7, templateId: 'necromancy_skeletal_warrior' }],
+          [2, { ownerId: 7, templateId: 'necromancy_bone_mage' }],
+        ]).values(),
+      }),
+    );
+    expect(fullDominion.slots.map((slotState) => slotState.usable)).toEqual([false, false, false]);
   });
 
   it('a requiresStealth ability is usable only while the player is stealthed (issue #1890)', () => {

@@ -19,7 +19,7 @@ describe('Nythraxis matrix DPS rotations', () => {
     expect(source).toContain("prepull: ['lightning_shield']");
     expect(source).toContain("rotation: ['flame_shock', 'earth_shock', 'lightning_bolt']");
     expect(source).toContain("'raise_bone_mage'");
-    expect(source).toContain("'raise_skeletal_warrior'");
+    expect(source).toContain("'raise_gravewing'");
     expect(source).toContain("'reaping_command'");
     expect(source).toContain("'soul_harvest'");
     expect(source).toContain("'evil_eye'");
@@ -53,14 +53,41 @@ describe('Nythraxis matrix DPS rotations', () => {
     expect(source).toContain('petDamageDone');
     expect(source).toContain('bossDamageDone');
     expect(source).toContain('specDamageBreakdown');
+    expect(source).toContain('specActiveDps');
     expect(source).toContain('avgLifeTaps');
+    expect(source).toContain("damageBucket === 'boss' ? 'damage_boss' : 'damage_add'");
+    expect(source).toContain('row.bossDamage += actor.bossDamageDone');
+    expect(source).toContain('row.addDamage += actor.addDamageDone');
+    expect(source).toContain('const encounterStart =');
+    expect(source).toContain('const seconds = combatElapsed(');
+    expect(source).toContain('if (!metric.dead) metric.activeDamageDone += event.amount');
+    expect(source).toContain(
+      'metric.activeDps = activeDps(metric.activeDamageDone, seconds, metric.deathTime)',
+    );
+  });
+
+  it('aims position-targeted cooldowns at the selected encounter target', () => {
+    expect(source).toContain("known?.def.targetMode === 'position'");
+    expect(source).toContain('sim.castAbility(ability, pid, aim)');
   });
 
   it('normalizes the legacy matrix fixtures through the canonical talent allocation', () => {
-    expect(source).toContain('const canonical: TalentAllocation');
-    expect(source).toContain('spec: spec.talents.spec');
+    expect(source).toContain('const canonical = benchmarkAllocation(');
+    expect(source).toContain('defaultBuild(spec.cls, 20)');
+    expect(source).toContain("spec.talents.spec ?? ''");
+    expect(source).toContain('spec.benchmarkRows');
     expect(source).toContain('validateAllocation(spec.cls, canonical');
     expect(source).toContain('sim.applyTalents(canonical, pid)');
+    expect(source.match(/benchmarkRows: WARLOCK_BENCHMARK_ROWS/g)).toHaveLength(3);
+  });
+
+  it('uses matched comparison plans when MATRIX_COMPARE_SPECS is set', () => {
+    expect(source).toContain("process.env.MATRIX_COMPARE_SPECS ?? ''");
+    expect(source).toContain('comparisonPlans({');
+    expect(source).toContain(
+      'dpsSet: [...plan.baselineDps.map(specForKey), specForKey(plan.comparedKey)]',
+    );
+    expect(source).toContain('for (const seed of seeds)');
   });
 
   it('builds complete paired raids and separates setup time from combat time', () => {

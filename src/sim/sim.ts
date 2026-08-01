@@ -4121,6 +4121,12 @@ export class Sim {
   }
 
   emit(ev: SimEvent): void {
+    if (ev.type === 'damage' && ev.sourceOwnerId === undefined) {
+      const sourceOwnerId = this.entities.get(ev.sourceId)?.ownerId;
+      if (sourceOwnerId !== null && sourceOwnerId !== undefined) {
+        ev.sourceOwnerId = sourceOwnerId;
+      }
+    }
     this.events.push(ev);
   }
 

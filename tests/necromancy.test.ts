@@ -153,6 +153,7 @@ describe('Necromancy Warlock', () => {
         'raise_graveguard',
         'raise_skeletal_warrior',
         'raise_bone_mage',
+        'raise_gravewing',
         'ossuary_mark',
         'funeral_harvest',
         'corpse_explosion',
@@ -176,6 +177,21 @@ describe('Necromancy Warlock', () => {
     ]) {
       expect(known, removed).not.toContain(removed);
     }
+  });
+
+  it('explains each summon role and the persistent two-slot Dominion in ability tooltips', () => {
+    expect(ABILITIES.raise_graveguard.description).toContain('intercepts 20%');
+    expect(ABILITIES.raise_graveguard.description).toContain('take 30% less damage for 4 sec');
+    expect(ABILITIES.raise_skeletal_warrior.description).toContain('persistent');
+    expect(ABILITIES.raise_skeletal_warrior.description).toContain('2-slot Dominion');
+    expect(ABILITIES.raise_skeletal_warrior.description).toContain('45% damage every 6 sec');
+    expect(ABILITIES.raise_bone_mage.description).toContain('5% more magic damage for 6 sec');
+    expect(ABILITIES.raise_bone_mage.description).toContain('raises that weakness to 8%');
+    expect(ABILITIES.raise_gravewing.description).toContain('65% damage every 5 sec');
+    expect(ABILITIES.raise_gravewing.description).toContain('take 8% more damage for 5 sec');
+    expect(ABILITIES.army_of_the_dead.description).toContain('not already serving you');
+    expect(ABILITIES.army_of_the_dead.description).toContain('chosen servants remain');
+    expect(ABILITIES.sacrifice_undead.description).toContain('Dominion servant');
   });
 
   it('rebuilds the owner kit when changing from Destruction to Necromancy', () => {
@@ -859,18 +875,91 @@ describe('Necromancy Warlock', () => {
     expect(ownedUndead(sim)).toHaveLength(0);
   });
 
-  it('caps the normal temporary army at three servants', () => {
+  it('caps Dominion at two unique servants', () => {
     const sim = makeNecromancer();
     addTarget(sim);
 
     for (let fragment = 0; fragment < 5; fragment++) finishCast(sim, 'soul_harvest');
-    for (let summon = 0; summon < 4; summon++) {
-      finishCast(sim, 'raise_skeletal_warrior');
-    }
+    finishCast(sim, 'raise_skeletal_warrior');
+    finishCast(sim, 'raise_bone_mage');
+    sim.castAbility('raise_gravewing');
 
     const temporary = ownedUndead(sim).filter((pet) => pet.templateId !== 'graveguard');
-    expect(temporary).toHaveLength(3);
+    expect(temporary.map((pet) => pet.templateId)).toEqual([
+      'necromancy_skeletal_warrior',
+      'necromancy_bone_mage',
+    ]);
     expect(fragmentCount(sim.player)).toBe(2);
+  });
+
+  it('makes Dominion a persistent two-servant choice with unique archetypes', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    addSoulFragments(sim.ctx, sim.player, 5);
+
+    finishCast(sim, 'raise_skeletal_warrior');
+    const fragmentsAfterWarrior = fragmentCount(sim.player);
+    const manaBeforeDuplicate = sim.player.resource;
+    sim.castAbility('raise_skeletal_warrior');
+
+    expect(
+      ownedUndead(sim).filter((servant) => servant.templateId === 'necromancy_skeletal_warrior'),
+    ).toHaveLength(1);
+    expect(fragmentCount(sim.player)).toBe(fragmentsAfterWarrior);
+    expect(sim.player.resource).toBe(manaBeforeDuplicate);
+
+    finishCast(sim, 'raise_bone_mage');
+    expect(
+      ownedUndead(sim)
+        .filter((servant) => servant.templateId !== 'graveguard')
+        .map((servant) => servant.templateId),
+    ).toEqual(['necromancy_skeletal_warrior', 'necromancy_bone_mage']);
+
+    const fragmentsAtCap = fragmentCount(sim.player);
+    const manaAtCap = sim.player.resource;
+    sim.castAbility('raise_gravewing');
+    expect(fragmentCount(sim.player)).toBe(fragmentsAtCap);
+    expect(sim.player.resource).toBe(manaAtCap);
+    expect(ownedUndead(sim).filter((servant) => servant.templateId !== 'graveguard')).toHaveLength(
+      2,
+    );
+
+    for (let tick = 0; tick < 20 * 31; tick++) sim.tick();
+    expect(
+      ownedUndead(sim)
+        .filter((servant) => servant.templateId !== 'graveguard')
+        .map((servant) => servant.templateId),
+    ).toEqual(['necromancy_skeletal_warrior', 'necromancy_bone_mage']);
+  });
+
+  it('summons a persistent Gravewing and rejects its duplicate without spending resources', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    addSoulFragments(sim.ctx, sim.player, 4);
+    const manaBefore = sim.player.resource;
+
+    sim.castAbility('raise_gravewing');
+
+    const gravewing = ownedUndead(sim).find(
+      (servant) => servant.templateId === 'necromancy_gravewing',
+    );
+    if (!gravewing) throw new Error('Expected Gravewing');
+    expect(gravewing.despawnTimer).toBeUndefined();
+    expect(fragmentCount(sim.player)).toBe(2);
+    expect(sim.player.resource).toBe(manaBefore - 45);
+
+    sim.player.gcdRemaining = 0;
+    const fragmentsBeforeDuplicate = fragmentCount(sim.player);
+    const manaBeforeDuplicate = sim.player.resource;
+    sim.castAbility('raise_gravewing');
+    expect(fragmentCount(sim.player)).toBe(fragmentsBeforeDuplicate);
+    expect(sim.player.resource).toBe(manaBeforeDuplicate);
+    expect(
+      ownedUndead(sim).filter((servant) => servant.templateId === 'necromancy_gravewing'),
+    ).toHaveLength(1);
+
+    for (let tick = 0; tick < 20 * 31; tick++) sim.tick();
+    expect(sim.entities.has(gravewing.id)).toBe(true);
   });
 
   it('gives each undead servant a distinct combat role', () => {
@@ -885,9 +974,16 @@ describe('Necromancy Warlock', () => {
       amp: 0.05,
       duration: 6,
     });
+    expect(MOBS.necromancy_gravewing.dmgBase).toBe(8);
+    expect(MOBS.necromancy_gravewing.dmgPerLevel).toBe(2);
+    expect(MOBS.necromancy_gravewing.petCleave).toEqual({
+      radius: 5,
+      mult: 0.65,
+      cooldown: 5,
+    });
   });
 
-  it('arms the Graveguard auto-taunt but leaves temporary damage servants passive', () => {
+  it('arms the Graveguard auto-taunt but leaves Dominion damage servants passive', () => {
     const sim = makeNecromancer();
     addTarget(sim);
     for (let attempt = 0; attempt < 5; attempt++) finishCast(sim, 'soul_harvest');
@@ -990,7 +1086,7 @@ describe('Necromancy Warlock', () => {
     const primary = addTarget(sim);
     addSoulFragments(sim as unknown as SimContext, sim.player, 1);
     finishCast(sim, 'raise_skeletal_warrior');
-    const warrior = ownedUndead(sim).find(isTemporaryUndead);
+    const warrior = ownedUndead(sim).find(isDominionServant);
     const cleave = MOBS.necromancy_skeletal_warrior.petCleave;
     if (!warrior || !cleave) throw new Error('Expected Skeletal Warrior cleave');
     const ctx = (sim as unknown as { ctx: SimContext }).ctx;
@@ -1016,7 +1112,7 @@ describe('Necromancy Warlock', () => {
     sim.addEntity(secondary);
     addSoulFragments(sim as unknown as SimContext, sim.player, 1);
     finishCast(sim, 'raise_skeletal_warrior');
-    const warrior = ownedUndead(sim).find(isTemporaryUndead);
+    const warrior = ownedUndead(sim).find(isDominionServant);
     const cleave = MOBS.necromancy_skeletal_warrior.petCleave;
     if (!warrior || !cleave) throw new Error('Expected Skeletal Warrior cleave');
     const ctx = (sim as unknown as { ctx: SimContext }).ctx;
@@ -1356,14 +1452,8 @@ describe('Necromancy Warlock', () => {
   it('Army of the Dead tears open a portal for one servant of every temporary type', () => {
     const sim = makeNecromancer();
     addTarget(sim);
-    addSoulFragments(sim as unknown as SimContext, sim.player, 5);
     finishCast(sim, 'raise_graveguard');
-    finishCast(sim, 'raise_skeletal_warrior');
-    finishCast(sim, 'raise_bone_mage');
     const graveguard = ownedUndead(sim).find((pet) => pet.templateId === 'graveguard');
-    const replacedIds = ownedUndead(sim)
-      .filter((pet) => pet.templateId !== 'graveguard')
-      .map((pet) => pet.id);
     if (!graveguard) throw new Error('Expected a Graveguard');
     drain(sim);
 
@@ -1376,7 +1466,6 @@ describe('Necromancy Warlock', () => {
       'necromancy_gravewing',
     ]);
     expect(sim.entities.get(graveguard.id)).toBe(graveguard);
-    expect(replacedIds.every((id) => !sim.entities.has(id))).toBe(true);
     expect(temporary.every((pet) => pet.despawnTimer === 20)).toBe(true);
     expect(MOBS.necromancy_gravewing.elite).toBe(true);
     expect(events).toContainEqual(
@@ -1399,6 +1488,69 @@ describe('Necromancy Warlock', () => {
       expect(pet.pos.x).toBeCloseTo(expectedFormation[index][0], 6);
       expect(pet.pos.z).toBeCloseTo(expectedFormation[index][1], 6);
     });
+  });
+
+  it('Army of the Dead preserves Dominion and temporarily fills its missing archetype', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    addSoulFragments(sim.ctx, sim.player, 5);
+    finishCast(sim, 'raise_skeletal_warrior');
+    finishCast(sim, 'raise_bone_mage');
+    const dominionIds = ownedUndead(sim)
+      .filter((servant) => servant.templateId !== 'graveguard')
+      .map((servant) => servant.id);
+
+    finishCast(sim, 'army_of_the_dead');
+
+    const duringArmy = ownedUndead(sim).filter((servant) => servant.templateId !== 'graveguard');
+    expect(duringArmy.map((servant) => servant.templateId)).toEqual([
+      'necromancy_skeletal_warrior',
+      'necromancy_bone_mage',
+      'necromancy_gravewing',
+    ]);
+    expect(dominionIds.every((id) => sim.entities.has(id))).toBe(true);
+    expect(
+      duringArmy.find((servant) => servant.templateId === 'necromancy_gravewing')?.despawnTimer,
+    ).toBeGreaterThan(0);
+    expect(
+      duringArmy
+        .filter((servant) => servant.templateId !== 'necromancy_gravewing')
+        .every((servant) => servant.despawnTimer === undefined),
+    ).toBe(true);
+
+    for (let tick = 0; tick < 20 * 21; tick++) sim.tick();
+    expect(
+      ownedUndead(sim)
+        .filter((servant) => servant.templateId !== 'graveguard')
+        .map((servant) => servant.templateId),
+    ).toEqual(['necromancy_skeletal_warrior', 'necromancy_bone_mage']);
+    expect(dominionIds.every((id) => sim.entities.has(id))).toBe(true);
+  });
+
+  it('Army of the Dead fills both missing archetypes around one chosen servant', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    addSoulFragments(sim.ctx, sim.player, 2);
+    finishCast(sim, 'raise_gravewing');
+    const chosen = ownedUndead(sim).find(
+      (servant) => servant.templateId === 'necromancy_gravewing',
+    );
+    if (!chosen) throw new Error('Expected chosen Gravewing');
+
+    finishCast(sim, 'army_of_the_dead');
+
+    const army = ownedUndead(sim).filter((servant) => servant.templateId !== 'graveguard');
+    expect(army.map((servant) => servant.templateId)).toEqual([
+      'necromancy_gravewing',
+      'necromancy_skeletal_warrior',
+      'necromancy_bone_mage',
+    ]);
+    expect(chosen.despawnTimer).toBeUndefined();
+    expect(
+      army
+        .filter((servant) => servant.id !== chosen.id)
+        .every((servant) => (servant.despawnTimer ?? 0) > 0),
+    ).toBe(true);
   });
 
   it.each([
@@ -1424,7 +1576,7 @@ describe('Necromancy Warlock', () => {
     expect(sim.player.resource).toBe(manaBefore);
   });
 
-  it('reopens all temporary servant slots after the portal army expires', () => {
+  it('reopens the Dominion slots after the portal army expires', () => {
     const sim = makeNecromancer();
     addTarget(sim);
 
@@ -1460,6 +1612,26 @@ describe('Necromancy Warlock', () => {
     expect(armyIds.every((id) => !sim.entities.has(id))).toBe(true);
   });
 
+  it('keeps pet damage attributed after owner death despawns the source', () => {
+    const sim = makeNecromancer();
+    const target = addTarget(sim);
+    addSoulFragments(sim.ctx, sim.player, 1);
+    finishCast(sim, 'raise_skeletal_warrior');
+    const warrior = ownedUndead(sim).find(
+      (pet) => pet.templateId === 'necromancy_skeletal_warrior',
+    );
+    if (!warrior) throw new Error('Expected Skeletal Warrior');
+    drain(sim);
+
+    sim.ctx.dealDamage(warrior, target, 17, false, 'physical', 'Dominion Test', 'hit');
+    sim.dealDamage(null, sim.player, sim.player.maxHp + 1, false, 'physical', null, 'hit');
+
+    expect(sim.entities.has(warrior.id)).toBe(false);
+    expect(
+      drain(sim).find((event) => event.type === 'damage' && event.ability === 'Dominion Test'),
+    ).toMatchObject({ sourceId: warrior.id, sourceOwnerId: sim.playerId, amount: 17 });
+  });
+
   it('allows pet attack commands to direct Gravewing and the persistent Graveguard', () => {
     const sim = makeNecromancer();
     const target = addTarget(sim);
@@ -1488,7 +1660,7 @@ describe('Necromancy Warlock', () => {
     expect(graveguard.aggroTargetId).toBe(target.id);
   });
 
-  it('Sacrifice Undead consumes a temporary servant and restores health', () => {
+  it('Sacrifice Undead consumes a Dominion servant and restores health', () => {
     const sim = makeNecromancer();
     addTarget(sim);
     for (let attempt = 0; attempt < 5 && fragmentCount(sim.player) === 0; attempt++) {
@@ -1500,7 +1672,7 @@ describe('Necromancy Warlock', () => {
     const hpBefore = sim.player.hp;
 
     const victim = ownedUndead(sim).find((pet) => pet.templateId !== 'graveguard');
-    if (!victim) throw new Error('Expected a temporary undead');
+    if (!victim) throw new Error('Expected a Dominion servant');
     drain(sim);
     sim.castAbility('sacrifice_undead');
     const sacrificeFx = drain(sim).find(
@@ -1533,7 +1705,7 @@ describe('Necromancy Warlock', () => {
     expect(sim.player.hp).toBe(sim.player.maxHp);
   });
 
-  it('Sacrifice Undead consumes the lowest-health temporary and never the Graveguard', () => {
+  it('Sacrifice Undead consumes the lowest-health Dominion servant and never the Graveguard', () => {
     const sim = makeNecromancer();
     addTarget(sim);
     for (let attempt = 0; attempt < 5; attempt++) finishCast(sim, 'soul_harvest');
@@ -1558,29 +1730,44 @@ describe('Necromancy Warlock', () => {
     expect(sim.entities.has(mage.id)).toBe(true);
   });
 
-  it('Sacrifice Undead consumes the oldest temporary servant when health is tied', () => {
+  it('Sacrifice Undead consumes the oldest Dominion servant when health is tied', () => {
     const sim = makeNecromancer();
     addTarget(sim);
     for (let attempt = 0; attempt < 3; attempt++) finishCast(sim, 'soul_harvest');
     finishCast(sim, 'raise_skeletal_warrior');
-    finishCast(sim, 'raise_skeletal_warrior');
+    finishCast(sim, 'raise_bone_mage');
 
-    const warriors = ownedUndead(sim)
-      .filter((undead) => undead.templateId === 'necromancy_skeletal_warrior')
+    const servants = ownedUndead(sim)
+      .filter(isDominionServant)
       .sort((a, b) => a.id - b.id);
-    expect(warriors).toHaveLength(2);
-    for (const warrior of warriors) warrior.hp = Math.round(warrior.maxHp * 0.5);
+    expect(servants).toHaveLength(2);
+    for (const servant of servants) servant.hp = Math.round(servant.maxHp * 0.5);
 
     sim.castAbility('sacrifice_undead');
 
-    expect(sim.entities.has(warriors[0].id)).toBe(false);
-    expect(sim.entities.has(warriors[1].id)).toBe(true);
+    expect(sim.entities.has(servants[0].id)).toBe(false);
+    expect(sim.entities.has(servants[1].id)).toBe(true);
   });
 
-  it('does not arm Sacrifice Undead when there is no temporary servant', () => {
+  it('does not arm Sacrifice Undead when there is no Dominion servant', () => {
     const sim = makeNecromancer();
     sim.castAbility('sacrifice_undead');
 
+    expect(sim.player.cooldowns.has('sacrifice_undead')).toBe(false);
+  });
+
+  it('does not sacrifice the Graveguard when it is the only undead servant', () => {
+    const sim = makeNecromancer();
+    finishCast(sim, 'raise_graveguard');
+    const graveguard = ownedUndead(sim).find((servant) => servant.templateId === 'graveguard');
+    if (!graveguard) throw new Error('Expected Graveguard');
+    sim.player.hp = Math.round(sim.player.maxHp * 0.5);
+    const hpBefore = sim.player.hp;
+
+    sim.castAbility('sacrifice_undead');
+
+    expect(sim.entities.has(graveguard.id)).toBe(true);
+    expect(sim.player.hp).toBe(hpBefore);
     expect(sim.player.cooldowns.has('sacrifice_undead')).toBe(false);
   });
 
@@ -1615,12 +1802,12 @@ describe('Necromancy Warlock', () => {
     expect(target.auras.some((aura) => aura.kind === 'necromancy_ossuary_mark')).toBe(false);
   });
 
-  it('removes temporary undead immediately when their owner leaves', () => {
+  it('removes Dominion servants immediately when their owner leaves', () => {
     const sim = makeNecromancer();
     addSoulFragments(sim as unknown as SimContext, sim.player, 1);
     finishCast(sim, 'raise_skeletal_warrior');
-    const warrior = ownedUndead(sim).find(isTemporaryUndead);
-    if (!warrior) throw new Error('Expected a temporary undead');
+    const warrior = ownedUndead(sim).find(isDominionServant);
+    if (!warrior) throw new Error('Expected a Dominion servant');
 
     sim.removePlayer(sim.playerId);
 
@@ -1648,7 +1835,7 @@ describe('Necromancy Warlock', () => {
     expect(restored.petOf(pid, true)).toBeNull();
   });
 
-  it('round-trips the persistent Graveguard without serializing temporary undead', () => {
+  it('round-trips the persistent Graveguard without serializing Dominion servants', () => {
     const source = makeNecromancer();
     addTarget(source);
     addSoulFragments(source as unknown as SimContext, source.player, 1);
@@ -1675,12 +1862,12 @@ describe('Necromancy Warlock', () => {
     expect(restored.serializeCharacter(pid)?.pet?.templateId).toBe('graveguard');
   });
 
-  it('gives slain temporary undead a bounded corpse lifetime', () => {
+  it('gives slain Dominion servants a bounded corpse lifetime', () => {
     const sim = makeNecromancer();
     addSoulFragments(sim as unknown as SimContext, sim.player, 1);
     finishCast(sim, 'raise_skeletal_warrior');
-    const warrior = ownedUndead(sim).find(isTemporaryUndead);
-    if (!warrior) throw new Error('Expected a temporary undead');
+    const warrior = ownedUndead(sim).find(isDominionServant);
+    if (!warrior) throw new Error('Expected a Dominion servant');
 
     sim.dealDamage(null, warrior, warrior.maxHp + 1, false, 'physical', null, 'hit');
     for (let tick = 0; tick < 20 * 4; tick++) sim.tick();
@@ -1731,14 +1918,14 @@ describe('Necromancy Warlock', () => {
   });
 });
 
-function isTemporaryUndead(entity: Entity): boolean {
+function isDominionServant(entity: Entity): boolean {
   return entity.templateId !== 'graveguard';
 }
 
-// Necromancy sustain and bounded minion upkeep: the deliberate Ossuary Mark
-// detonation pays health back (a natural expiry does not), and Reaping Command
-// buys each temporary servant one, and only one, extra slice of life.
-describe('Necromancy sustain and upkeep', () => {
+// Necromancy sustain and persistent Dominion behavior: deliberate Ossuary Mark
+// detonation pays health back (a natural expiry does not), while Reaping Command
+// leaves persistent servant lifetimes unchanged.
+describe('Necromancy sustain and Dominion persistence', () => {
   function bankOssuaryDamage(sim: Sim, target: Entity, amount: number): void {
     sim.dealDamage(
       sim.player,
@@ -1842,7 +2029,7 @@ describe('Necromancy sustain and upkeep', () => {
     expect(sim.player.hp).toBe(sim.player.maxHp);
   });
 
-  it('extends every living temporary servant once with Reaping Command and never twice', () => {
+  it('keeps persistent Dominion servants free of upkeep timers after Reaping Command', () => {
     const sim = makeNecromancer();
     const primary = addTarget(sim);
     finishCast(sim, 'raise_graveguard');
@@ -1853,34 +2040,25 @@ describe('Necromancy sustain and upkeep', () => {
 
     const graveguard = ownedUndead(sim).find((undead) => undead.templateId === 'graveguard');
     const temporary = ownedUndead(sim)
-      .filter(isTemporaryUndead)
+      .filter(isDominionServant)
       .sort((a, b) => a.id - b.id);
     if (!graveguard) throw new Error('Expected a Graveguard');
     expect(temporary).toHaveLength(2);
     expect(graveguard.despawnTimer).toBeUndefined();
 
-    const before = temporary.map((undead) => undead.despawnTimer ?? 0);
-    for (const remaining of before) {
-      expect(remaining).toBeGreaterThan(0);
-      expect(remaining).toBeLessThanOrEqual(30);
-    }
+    expect(temporary.every((undead) => undead.despawnTimer === undefined)).toBe(true);
 
     castReapingCommand(sim);
-    const afterFirst = temporary.map((undead) => undead.despawnTimer ?? 0);
-    afterFirst.forEach((remaining, index) => {
-      expect(remaining).toBeCloseTo(before[index] + 8, 10);
-      expect(remaining).toBeLessThanOrEqual(38);
-    });
-    for (const undead of temporary) {
-      expect(undead.auras.some((aura) => aura.id === 'reaping_command_upkeep')).toBe(true);
-    }
+    expect(temporary.every((undead) => undead.despawnTimer === undefined)).toBe(true);
+    expect(
+      temporary.every(
+        (undead) => !undead.auras.some((aura) => aura.id === 'reaping_command_upkeep'),
+      ),
+    ).toBe(true);
     expect(graveguard.despawnTimer).toBeUndefined();
 
     castReapingCommand(sim);
-    const afterSecond = temporary.map((undead) => undead.despawnTimer ?? 0);
-    afterSecond.forEach((remaining, index) => {
-      expect(remaining).toBe(afterFirst[index]);
-    });
+    expect(temporary.every((undead) => undead.despawnTimer === undefined)).toBe(true);
     expect(graveguard.despawnTimer).toBeUndefined();
   });
 });

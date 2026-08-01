@@ -131,6 +131,34 @@ describe('headless environment protocol validation', () => {
     expect(encodeObs(sim)[readyIndex]).toBe(1);
   });
 
+  it('marks Dominion summons ready only when the requested archetype fits the live composition', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warlock', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('demonology');
+    sim.player.resource = sim.player.maxResource;
+    addSoulFragments(sim as unknown as SimContext, sim.player, 5);
+    const readiness = (abilityId: string): number => {
+      const slot = sim.known.findIndex((ability) => ability.def.id === abilityId);
+      if (slot < 0) throw new Error(`Expected ${abilityId}`);
+      return encodeObs(sim)[16 + slot * 2];
+    };
+
+    expect(readiness('raise_skeletal_warrior')).toBe(1);
+    sim.castAbility('raise_skeletal_warrior');
+    while (sim.player.castingAbility) sim.tick();
+    sim.player.gcdRemaining = 0;
+    expect(readiness('raise_skeletal_warrior')).toBe(0);
+    expect(readiness('raise_bone_mage')).toBe(1);
+    expect(readiness('raise_gravewing')).toBe(1);
+
+    sim.castAbility('raise_bone_mage');
+    while (sim.player.castingAbility) sim.tick();
+    sim.player.gcdRemaining = 0;
+    expect(readiness('raise_skeletal_warrior')).toBe(0);
+    expect(readiness('raise_bone_mage')).toBe(0);
+    expect(readiness('raise_gravewing')).toBe(0);
+  });
+
   it('exposes the exact specialization resource in the shared secondary-resource scalar', () => {
     const affliction = new Sim({ seed: 7, playerClass: 'warlock', autoEquip: true });
     affliction.setPlayerLevel(20);
@@ -145,7 +173,7 @@ describe('headless environment protocol validation', () => {
     expect(encodeObs(necromancy)[13]).toBeCloseTo(0.6);
   });
 
-  it('marks Sentence and Possess ready only on the owned primary Evil Eye', () => {
+  it('marks Sentence, Possess, and Hour ready only on the owned primary Evil Eye', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(20);
     sim.setSpec('affliction');
@@ -163,9 +191,13 @@ describe('headless environment protocol validation', () => {
     const possessSlot = sim.known.findIndex((ability) => ability.def.id === 'possess_evil_eye');
     if (possessSlot < 0) throw new Error('Expected Possess the Evil Eye');
     const possessReadyIndex = 16 + possessSlot * 2;
+    const hourSlot = sim.known.findIndex((ability) => ability.def.id === 'hour_of_judgment');
+    if (hourSlot < 0) throw new Error('Expected Hour of Judgment');
+    const hourReadyIndex = 16 + hourSlot * 2;
 
     expect(encodeObs(sim)[readyIndex]).toBe(0);
     expect(encodeObs(sim)[possessReadyIndex]).toBe(0);
+    expect(encodeObs(sim)[hourReadyIndex]).toBe(0);
     gainDoom(sim as unknown as SimContext, sim.player, 20);
     expect(encodeObs(sim)[readyIndex]).toBe(0);
     const eye: Aura = {
@@ -181,14 +213,17 @@ describe('headless environment protocol validation', () => {
     target.auras.push(eye);
     expect(encodeObs(sim)[readyIndex]).toBe(0);
     expect(encodeObs(sim)[possessReadyIndex]).toBe(0);
+    expect(encodeObs(sim)[hourReadyIndex]).toBe(0);
 
     eye.kind = 'affliction_eye';
     expect(encodeObs(sim)[readyIndex]).toBe(1);
     expect(encodeObs(sim)[possessReadyIndex]).toBe(1);
+    expect(encodeObs(sim)[hourReadyIndex]).toBe(1);
 
     eye.sourceId = sim.playerId + 1;
     expect(encodeObs(sim)[readyIndex]).toBe(0);
     expect(encodeObs(sim)[possessReadyIndex]).toBe(0);
+    expect(encodeObs(sim)[hourReadyIndex]).toBe(0);
   });
 
   it('reports a Forbidden Reflection copy as ready despite the original cooldown', () => {

@@ -249,8 +249,10 @@ magic should alter the battlefield.
 - Owner offense: Essence Reap, Soul Lance, Ossuary Mark, and Corpse Explosion.
 - Army: Graveguard, Skeletal Warrior, Bone Mage, Gravewing, Unholy Command, and
   Reaping Command.
-- Army of the Dead replaces the temporary wave with one Warrior, one Bone Mage, and
-  one Gravewing emerging through a shared level-20 grave portal.
+- Warrior, Bone Mage, and Gravewing are persistent, unique Dominion choices with two
+  available slots. Their ability tooltips state their passive and Reaping benefits.
+- Army of the Dead temporarily fills only the missing Dominion archetypes through a
+  shared level-20 grave portal; the chosen servants remain when it closes.
 - Death and conversion: Funeral Harvest and Sacrifice Undead.
 - Defense and signature window: Bone Armor and Lich Form.
 
@@ -264,7 +266,7 @@ creates different timing outcomes.
 | Design need | Coverage | Evidence |
 | --- | --- | --- |
 | Persistent guardian | Complete | Graveguard |
-| Small temporary army | Complete | Warrior, Mage, and Gravewing within a three-slot cap |
+| Bounded army choice | Complete | Two persistent Dominion slots chosen from Warrior, Mage, and Gravewing |
 | Direct command | Complete | Reaping Command and Unholy Command |
 | Owner-cast damage loop | Complete | Essence Reap, Soul Lance, and Ossuary Mark |
 | Death payoff | Complete | Eligible marked deaths leave a capped, 15-second Death Echo |
@@ -318,12 +320,12 @@ Examples include a piercing Soul Lance, an Essence Reap which tears through seve
 targets, or a Reaping Command which leaves a death echo. The form should not replace
 the full action bar, but it should be recognizable from play as well as from the model.
 
-##### Priority 1: reduce resummon maintenance
+##### Priority 1 (implemented): remove resummon maintenance
 
-Thirty-second temporary servants create periodic upkeep. Reaping Command, Unholy
-Command, or a future talent can refresh a bounded portion of remaining duration when
-used well. The interesting decision should be which servants to field and when to
-convert them, not watching three independent expiry timers.
+Warrior, Bone Mage, and Gravewing now persist without upkeep timers. Dominion has two
+slots and permits only one of each archetype, so the player chooses a composition
+instead of cycling every summon button. Army of the Dead preserves that composition
+and temporarily fills only what is missing.
 
 ##### Priority 2: broaden sacrifice through talents
 
@@ -334,10 +336,10 @@ and death layers are sound, not a reason to add more baseline buttons.
 
 #### Necromancy recommendation
 
-The Death Echo seam, composition-dependent Reaping Command, and transformative Lich
-Form are now implemented. The remaining baseline question is play feel: test army
-maintenance and Sacrifice Undead before deciding whether either belongs in the
-specialization talent tree.
+The Death Echo seam, composition-dependent Reaping Command, transformative Lich Form,
+and persistent two-slot Dominion are now implemented. The remaining baseline question
+is play feel: test deliberate composition changes and Sacrifice Undead before deciding
+whether broader sacrifice conversions belong in the specialization talent tree.
 
 ### Affliction
 
@@ -348,7 +350,8 @@ specialization talent tree.
   and Sentence.
 - Reactive generation: Cursed Accomplice, Hex of Violence, Cruel Pact, and Vicarious
   Suffering.
-- Multi-target and power windows: Litany of Guilt, Possess the Evil Eye, and Coven.
+- Multi-target and power windows: Litany of Guilt, Possess the Evil Eye, Hour of
+  Judgment, and Coven.
 
 The spec has a genuinely distinct identity. Condemnation comes from what the
 Warlock, enemy, companion, and one selected ally do around Evil Eye. Sentence asks
@@ -365,6 +368,7 @@ when to commit the entire pool. It is not a weak copy of World of Warcraft Affli
 | One-ally interaction | Complete | Cursed Accomplice and Vicarious Suffering |
 | Sustain and forbidden cost | Complete | Consume and Cruel Pact |
 | Multi-target expression | Complete but late | Litany at 11 and Coven at 20 |
+| Major offensive cooldown | Complete | Hour of Judgment concentrates generation, Threads, Possession, and a one-use Sentence refund |
 | Persistent deterioration | Complete | Fate Threads visibly coil around the victim and alter Consume or Sentence |
 | More than one spending decision | Complete | Consume converts Threads into generation; Sentence consumes retained Threads for damage |
 | Kit purity | Complete | Burning Pact and Sear are no longer committed Affliction abilities |
@@ -439,7 +443,7 @@ curse.
 
 - Core offense: Gloom Bolt, Burning Pact, Conflagrate, Ruinbolt, Duskfire, Ruinous
   Brand, and Rain of Fire.
-- Major summon: Pyre Colossus and its Worldfire response to Ruin spenders.
+- Major summon: Pyre Colossus, its two-second fire aura, and one Ruin generated per second.
 - Shared tools: Fiendhide, Hard Bargain, Consume, Umbral Anchor, Harrow, and Abyssal
   Gag.
 - Permanent summons: Emberkin and the taunting Gloomshade.
@@ -452,7 +456,8 @@ The current combat loop is mechanically mature:
 - Ruinbolt and Rain of Fire create single-target versus ground-area expenditure.
 - Duskfire rewards a correct execution read.
 - Ruinous Brand creates a bounded single-target or two-target copy decision.
-- Pyre Colossus reacts to spenders instead of being an unrelated damage-over-time pet.
+- Pyre Colossus creates a thirty-second burn-and-resource window instead of being an
+  unrelated damage-over-time pet.
 
 #### Coverage
 
@@ -464,7 +469,7 @@ The current combat loop is mechanically mature:
 | Execute | Complete | Duskfire and its refund |
 | Single-target versus area choice | Complete | Ruinbolt versus Rain of Fire |
 | Two-target conversion | Complete | Ruinous Brand |
-| Major catastrophic summon | Complete | Pyre Colossus plus Worldfire |
+| Major catastrophic summon | Complete | Pyre Colossus plus its periodic fire aura and Ruin generation |
 | Movement weakness with limited answers | Complete | Long casts plus bounded instant tools and Umbral Anchor |
 | Permanent pet identity | Complete | Emberkin is the offensive companion; Gloomshade is the solo taunt option |
 | Mid-level spender choice | Complete | Rain of Fire gains an early rank at 12 and its full rank at 18 |

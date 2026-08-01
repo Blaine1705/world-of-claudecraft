@@ -18,6 +18,9 @@
 //     value is a 0..1 fraction shown as a percent.
 import type { AuraKind } from '../sim/types';
 import {
+  ENRAGE_DMG_DONE,
+  ENRAGE_HASTE_PCT,
+  ENRAGE_MOVE_MULT,
   FAERIE_FIRE_ARMOR_PCT,
   RECKLESSNESS_RAGE_GEN,
   SUNDER_ARMOR_PCT_PER_STACK,
@@ -36,6 +39,7 @@ export interface AuraEffectInput {
   tickInterval?: number;
   school?: AuraSchool;
   stacks?: number;
+  charges?: number;
 }
 
 export interface AuraEffectDescriptor {
@@ -62,8 +66,8 @@ const flatStat = (statKey: string, value: number): AuraEffectDescriptor => ({
 });
 
 /**
- * Describe an aura's gameplay effect, or null if the kind has no meaningful
- * one-line summary (the tooltip then falls back to name + remaining time only).
+ * Describe an aura's gameplay effect. This switch is intentionally exhaustive:
+ * adding an AuraKind without player-facing explanation is a compile-time error.
  */
 export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
   if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
@@ -74,6 +78,23 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   }
   if (a.id === 'convergence_mark' && a.kind === 'internal_cd') {
     return { key: `${KEY}.elementalConvergencePrimed`, nums: {} };
+  }
+  if (a.kind === 'internal_cd') {
+    if (a.id === 'colossal_might_cap' || a.id === 'overflowing_power_cap') {
+      return { key: `${KEY}.cooldownCap`, nums: { used: round(a.value), cap: 10 } };
+    }
+    if (a.id === 'funeral_harvest_lockout') {
+      return { key: `${KEY}.funeralHarvestLock` };
+    }
+    if (a.id === 'wlk_leaden_root_lock') {
+      return { key: `${KEY}.leadenHexLock` };
+    }
+    if (a.id === 'wlk_forbidden_reflection') {
+      return { key: `${KEY}.forbiddenReflectionReady` };
+    }
+    if (a.id === 'wlk_forbidden_reflection_lock') {
+      return { key: `${KEY}.forbiddenReflectionLock` };
+    }
   }
   switch (a.kind) {
     case 'dot':
@@ -90,6 +111,8 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return { key: `${KEY}.healAbsorb`, nums: { value: round(a.value) } };
     case 'thorns':
       return { key: `${KEY}.thorns`, nums: { value: round(a.value) }, school: a.school };
+    case 'stasis':
+      return { key: `${KEY}.stasis` };
 
     case 'slow':
       return { key: `${KEY}.slow`, nums: { pct: pctFromMult(a.value) } };
@@ -115,6 +138,22 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return flatStat('armor', a.value);
     case 'buff_spellpower':
       return { key: `${KEY}.increase.sp`, nums: { value: round(a.value) } };
+    case 'pet_damage_pct':
+      return { key: `${KEY}.petDamage`, nums: { pct: Math.abs(round(a.value)) } };
+    case 'pet_spellhaste':
+      return { key: `${KEY}.petHaste`, nums: { pct: pctFromFrac(a.value) } };
+    case 'buff_spellcrit':
+      return { key: `${KEY}.crit`, nums: { pct: pctFromFrac(a.value) } };
+    case 'buff_spelldmg':
+      return { key: `${KEY}.spellDamage`, nums: { pct: pctFromFrac(a.value) } };
+    case 'buff_spellhaste':
+      return { key: `${KEY}.spellHaste`, nums: { pct: pctFromFrac(a.value) } };
+    case 'sated':
+      return { key: `${KEY}.sated` };
+    case 'cauterize_fatigue':
+      return { key: `${KEY}.cauterizeFatigue` };
+    case 'cast_shield':
+      return { key: `${KEY}.castShield` };
     // Mage empowerment moments (owner playtest: every worn buff should read).
     case 'combustion':
       return { key: `${KEY}.combustionCrit`, nums: {} };
@@ -126,10 +165,21 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return { key: `${KEY}.iceFloesCasts`, nums: { n: round(a.value) } };
     case 'next_cast_free':
       return { key: `${KEY}.freeCast`, nums: {} };
+    case 'next_execute_free':
+      return { key: `${KEY}.freeExecute` };
     case 'next_cast_instant':
       return { key: `${KEY}.instantCast`, nums: {} };
     case 'next_cast_cheap':
       return { key: `${KEY}.cheapCast`, nums: { pct: pctFromFrac(a.value) } };
+    case 'resource_sap':
+      return { key: `${KEY}.resourceSap`, nums: { value: round(a.value), interval: 2 } };
+    case 'next_attack_crit':
+      return { key: `${KEY}.nextAttackCrit` };
+    case 'heal_echo':
+      return {
+        key: `${KEY}.healEcho`,
+        nums: { value: round(a.value), threshold: pctFromFrac(a.value2 ?? 0) },
+      };
     case 'buff_int':
       return flatStat('int', a.value);
     case 'buff_agi':
@@ -203,6 +253,10 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return { key: `${KEY}.critVuln`, nums: { pct: pctFromFrac(a.value) } };
     case 'cost_tax':
       return { key: `${KEY}.costTax`, nums: { pct: pctFromFrac(a.value) } };
+    case 'bleed_vuln':
+      return { key: `${KEY}.bleedVuln`, nums: { pct: pctFromFrac(a.value) } };
+    case 'vuln_source':
+      return { key: `${KEY}.sourceVuln`, nums: { pct: pctFromFrac(a.value) } };
 
     // Crowd control / silence-family: the meaningful summary is the restriction,
     // not a number.
@@ -246,10 +300,136 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return { key: `${KEY}.berserkerStance` };
     case 'form_fireball':
       return { key: `${KEY}.formFireball`, nums: { pct: pctFromMult(a.value) } };
+    case 'form_moonkin':
+      return { key: `${KEY}.formMoonkin`, nums: { pct: 20, armorPct: 50 } };
+    case 'form_shadow':
+      return { key: `${KEY}.formShadow`, nums: { pct: Math.abs(round(a.value)) } };
+    case 'soul_fragments':
+      return {
+        key: `${KEY}.resourceCount`,
+        nums: { value: a.stacks ?? round(a.value), max: 5 },
+      };
+    case 'form_lich':
+      return { key: `${KEY}.formLich`, nums: { targets: 2, pct: 50 } };
+    case 'affliction_doom':
+      return {
+        key: `${KEY}.resourceCount`,
+        nums: { value: a.stacks ?? round(a.value), max: 100 },
+      };
+    case 'affliction_eye':
+      return {
+        key: `${KEY}.afflictionEye`,
+        nums: { interval: a.tickInterval ?? 2.5, pct: 100 },
+      };
+    case 'affliction_eye_secondary':
+      return { key: `${KEY}.afflictionEyeSecondary`, nums: { doomPct: 50, echoPct: 35 } };
+    case 'affliction_accomplice':
+      return {
+        key: `${KEY}.afflictionAccomplice`,
+        nums: { value: round(a.value), interval: 2 },
+      };
+    case 'affliction_violence':
+      return {
+        key: `${KEY}.afflictionViolence`,
+        nums: {
+          charges: a.charges ?? 1,
+          doom: round(a.value),
+          damage: round(a.value2 ?? 0),
+        },
+      };
+    case 'affliction_vicarious':
+      return { key: `${KEY}.afflictionVicarious`, nums: { pct: 20, max: round(a.value) } };
+    case 'affliction_possession':
+      return { key: `${KEY}.afflictionPossession`, nums: {} };
+    case 'affliction_judgment':
+      return {
+        key: `${KEY}.afflictionJudgment`,
+        nums: { eyePct: 100, sentencePct: 20, refund: round(a.value) },
+      };
+    case 'affliction_litany':
+      return {
+        key: `${KEY}.afflictionLitany`,
+        nums: {
+          damage: round(a.value),
+          targets: round(a.value3 ?? 0),
+          radius: round(a.value2 ?? 0),
+        },
+      };
+    case 'affliction_fate_threads': {
+      const stacks = a.stacks ?? round(a.value);
+      return {
+        key: `${KEY}.afflictionFateThreads`,
+        nums: { stacks, sentencePct: stacks * 6, doom: stacks },
+      };
+    }
+    case 'affliction_consume_threads': {
+      const stacks = a.stacks ?? round(a.value);
+      return { key: `${KEY}.afflictionConsumeThreads`, nums: { stacks, doom: stacks } };
+    }
+    case 'necromancy_harvest_mark':
+      return { key: `${KEY}.necromancyHarvestMark` };
+    case 'necromancy_ossuary_mark':
+      return {
+        key: `${KEY}.necromancyOssuaryMark`,
+        nums: {
+          storedPct: pctFromFrac(a.value),
+          lancePct: pctFromFrac(a.value2 ?? 0),
+          radius: round(a.value3 ?? 0),
+        },
+      };
+    case 'necromancy_death_echo':
+      return { key: `${KEY}.necromancyDeathEcho`, nums: { radius: 6 } };
+    case 'warlock_anchor':
+      return { key: `${KEY}.warlockAnchor`, nums: { range: 40 } };
+    case 'form_metamorph':
+      return { key: `${KEY}.formMetamorph`, nums: { pct: 35 } };
+    case 'buff_energyregen':
+      return { key: `${KEY}.energyRegen`, nums: { pct: pctFromFrac(a.value) } };
     case 'defensive_stance':
       return { key: `${KEY}.defensiveStance` };
     case 'righteous_fury':
       return { key: `${KEY}.righteousFury` };
+    case 'overpower_charge': {
+      const stacks = a.stacks ?? 1;
+      return {
+        key: `${KEY}.overpowerCharge`,
+        nums: { stacks, pct: pctFromFrac(a.value) * stacks },
+      };
+    }
+    case 'sweeping_strikes':
+      return { key: `${KEY}.sweepingStrikes`, nums: { pct: 100, targets: 1 } };
+    case 'fingers_of_frost':
+      return { key: `${KEY}.fingersOfFrost`, nums: { charges: a.stacks ?? 1, pct: 300 } };
+    case 'brain_freeze':
+      return { key: `${KEY}.brainFreeze` };
+    case 'winters_chill':
+      return { key: `${KEY}.wintersChill`, nums: { charges: a.charges ?? 1 } };
+    case 'icicles':
+      return { key: `${KEY}.icicles`, nums: { value: a.stacks ?? 1, max: 5 } };
+    case 'destruction_ruin':
+      return {
+        key: `${KEY}.resourceCount`,
+        nums: { value: a.stacks ?? round(a.value), max: 5 },
+      };
+    case 'desolation':
+      return {
+        key: `${KEY}.desolation`,
+        nums: { charges: a.stacks ?? 1, castPct: 30 },
+      };
+    case 'ruinous_brand':
+      return {
+        key: `${KEY}.ruinousBrand`,
+        nums: { charges: a.stacks ?? 1, otherPct: pctFromFrac(a.value), selfPct: 25 },
+      };
+    case 'duskfire_claim':
+      return { key: `${KEY}.duskfireClaim`, nums: { value: Math.max(1, round(a.value)) } };
+    case 'pyre_guardian':
+      return {
+        key: `${KEY}.pyreGuardian`,
+        nums: { ruin: 1, ruinInterval: 1, damage: 84, damageInterval: 2, radius: 8 },
+      };
+    case 'perfect_moment':
+      return { key: `${KEY}.perfectMoment` };
 
     // Fiesta power-ups: value is a body-size / jump-height multiplier.
     case 'buff_scale':
@@ -313,7 +493,49 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       // Rallying Cry: value is the temporary max-health fraction.
       return { key: `${KEY}.maxHpPct`, nums: { pct: pctFromFrac(a.value) } };
 
+    case 'enrage':
+      return {
+        key: `${KEY}.enrage`,
+        nums: {
+          damagePct: pctFromFrac(ENRAGE_DMG_DONE),
+          hastePct: pctFromFrac(ENRAGE_HASTE_PCT),
+          movePct: pctFromMult(ENRAGE_MOVE_MULT),
+        },
+      };
+    case 'sudden_death':
+      return { key: `${KEY}.suddenDeath` };
+    case 'aoe_echo':
+      return { key: `${KEY}.aoeEcho`, nums: { charges: a.charges ?? 1, pct: 40, targets: 4 } };
+    case 'sure_crit':
+      return { key: `${KEY}.sureCrit`, nums: { charges: a.charges ?? 1 } };
+    case 'internal_cd':
+      return { key: `${KEY}.internalCooldown` };
+    case 'temporal_echo': {
+      const singlePct = pctFromFrac(a.value);
+      return {
+        key: `${KEY}.temporalEcho`,
+        nums: { singlePct, areaPct: singlePct >= 35 ? 15 : 6 },
+      };
+    }
+    case 'arcane_charge': {
+      const stacks = a.stacks ?? round(a.value);
+      return {
+        key: `${KEY}.arcaneCharge`,
+        nums: {
+          stacks,
+          damagePct: stacks * 30,
+          castPct: stacks * 5,
+          costMult: 2 ** stacks,
+        },
+      };
+    }
+    case 'buff_dr':
+      return { key: `${KEY}.damageReduction`, nums: { pct: pctFromFrac(a.value) } };
+    case 'buff_dr_phys':
+      return { key: `${KEY}.physicalReduction`, nums: { pct: pctFromFrac(a.value) } };
+
     default:
+      a.kind satisfies never;
       return null;
   }
 }

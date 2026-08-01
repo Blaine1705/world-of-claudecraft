@@ -1,6 +1,11 @@
 import { AFFLICTION_DOOM_MAX, doomValue } from './combat/affliction';
 import { ruinAmount } from './combat/destruction';
 import { soulFragmentCount } from './combat/necromancy';
+import {
+  dominionCompositionMaskForOwner,
+  dominionSummonBlockFromMask,
+  dominionTemplateForAbility,
+} from './combat/necromancy_dominion';
 import { canUseForbiddenReflection } from './combat/warlock_talents';
 import { noticeboardDefByEntityId } from './content/noticeboards';
 import { CLASSES, ITEMS, QUEST_ORDER, QUESTS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
@@ -177,6 +182,7 @@ export function encodeObs(sim: Sim): number[] {
 
   // --- abilities (10 x 2 = 20) ---
   const selectedTarget = p.targetId !== null ? (sim.entities.get(p.targetId) ?? null) : null;
+  let dominionComposition: number | null = null;
   for (let i = 0; i < ABILITY_SLOTS; i++) {
     const known = sim.known[i];
     if (!known) {
@@ -196,12 +202,21 @@ export function encodeObs(sim: Sim): number[] {
     const requiresPrimaryEye =
       known.def.id === 'sentence' ||
       known.def.id === 'coven' ||
-      known.def.id === 'possess_evil_eye';
+      known.def.id === 'possess_evil_eye' ||
+      known.def.id === 'hour_of_judgment';
     const afflictionEyeReady =
       !requiresPrimaryEye ||
       !!selectedTarget?.auras.some(
         (aura) => aura.sourceId === p.id && aura.kind === 'affliction_eye',
       );
+    const dominionTemplateId = dominionTemplateForAbility(known.def.id);
+    let dominionReady = true;
+    if (dominionTemplateId !== null) {
+      if (dominionComposition === null) {
+        dominionComposition = dominionCompositionMaskForOwner(sim.entities.values(), p.id);
+      }
+      dominionReady = dominionSummonBlockFromMask(dominionComposition, dominionTemplateId) === null;
+    }
     const ready =
       cd <= 0 &&
       p.resource >= known.cost &&
@@ -209,6 +224,7 @@ export function encodeObs(sim: Sim): number[] {
       soulFragmentCount(p) >= (known.def.soulFragmentCost ?? 0) &&
       requiredAuraReady &&
       afflictionEyeReady &&
+      dominionReady &&
       (known.def.offGcd || p.gcdRemaining <= 0);
     obs.push(ready ? 1 : 0);
     obs.push(known.def.cooldown > 0 ? cd / known.def.cooldown : 0);

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { lineOfSightClear, resolveMovement } from '../src/sim/colliders';
+import { cameraOcclusion, lineOfSightClear, resolveMovement } from '../src/sim/colliders';
+import { AFFLICTION_EYE_DEATH_GAIN, doomValue } from '../src/sim/combat/affliction';
 import {
   ARENA_SLOT_COUNT,
   ARENA_X_MIN,
@@ -357,6 +358,40 @@ describe('arena: a full bout', () => {
     expect(ea.hp).toBe(ea.maxHp);
     expect(eb.hp).toBe(eb.maxHp);
     expect(eb.dead).toBe(false);
+  });
+
+  it('pays an Affliction Eye death through ranked-arena elimination', () => {
+    const { sim, a, b } = queueDuo('warlock', 'warrior', (world, warlockId) => {
+      world.setPlayerLevel(20, warlockId);
+      expect(world.setSpec('affliction', warlockId)).toBe(true);
+    });
+    startBout(sim);
+    const warlock = sim.entities.get(a)!;
+    const target = sim.entities.get(b)!;
+    target.auras.push({
+      id: 'evil_eye',
+      name: 'Evil Eye',
+      kind: 'affliction_eye',
+      remaining: 3600,
+      duration: 3600,
+      value: 1,
+      sourceId: a,
+      school: 'shadow',
+    });
+    sim.drainEvents();
+
+    (sim as any).dealDamage(warlock, target, 99999, false, 'shadow', 'Test', 'hit');
+    const events = sim.drainEvents();
+
+    expect(target.dead).toBe(true);
+    expect(events).toContainEqual({
+      type: 'aura',
+      targetId: a,
+      name: 'Condemnation',
+      gained: true,
+    });
+    expect(AFFLICTION_EYE_DEATH_GAIN).toBe(10);
+    expect(doomValue(warlock)).toBe(0);
   });
 
   it('a slot frees up after the bout so the arena can host again', () => {
@@ -775,26 +810,29 @@ describe('arena: class ability target filters', () => {
     },
   ];
 
-  it.each(aoeCases)(
-    'lets $cls $ability hit active arena opponents',
-    ({ cls, ability, level, beforeQueue, setup }) => {
-      const { sim, a, b } = queueDuo(cls, 'warrior', (world, a) => beforeQueue?.(world, a));
-      const caster = sim.entities.get(a)!;
-      const target = sim.entities.get(b)!;
-      sim.setPlayerLevel(level, a);
-      sim.setPlayerLevel(level, b);
-      setup?.(sim, a);
-      startBout(sim);
-      teleport(sim, b, caster.pos.x, caster.pos.z + 3);
-      caster.resource = caster.maxResource;
-      caster.gcdRemaining = 0;
+  it.each(aoeCases)('lets $cls $ability hit active arena opponents', ({
+    cls,
+    ability,
+    level,
+    beforeQueue,
+    setup,
+  }) => {
+    const { sim, a, b } = queueDuo(cls, 'warrior', (world, a) => beforeQueue?.(world, a));
+    const caster = sim.entities.get(a)!;
+    const target = sim.entities.get(b)!;
+    sim.setPlayerLevel(level, a);
+    sim.setPlayerLevel(level, b);
+    setup?.(sim, a);
+    startBout(sim);
+    teleport(sim, b, caster.pos.x, caster.pos.z + 3);
+    caster.resource = caster.maxResource;
+    caster.gcdRemaining = 0;
 
-      const startHp = target.hp;
-      sim.castAbility(ability, a);
+    const startHp = target.hp;
+    sim.castAbility(ability, a);
 
-      expect(target.hp).toBeLessThan(startHp);
-    },
-  );
+    expect(target.hp).toBeLessThan(startHp);
+  });
 });
 
 describe('arena: enclosing walls', () => {
@@ -858,57 +896,56 @@ describe('arena: enclosing walls', () => {
     expect(westDistance).toBeCloseTo(eastDistance, 5);
   });
 
-  it.each(Array.from({ length: ARENA_SLOT_COUNT }, (_, slot) => slot))(
-    'sweeps high-speed movement against all four walls in slot %s',
-    (slot) => {
-      const sim = makeWorld();
-      const o = arenaOrigin(slot);
-      const xLimit = DUNGEON_WALL_X - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
-      const zMinLimit = ARENA_LAYOUT.zMin + DUNGEON_WALL_HW + PLAYER_BODY_RADIUS;
-      const zMaxLimit = ARENA_LAYOUT.zMax - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
-      // Sweep lanes are obstacle-free rows/columns of the SLOT'S map (even
-      // slots Coliseum, odd slots Drowned Court): the z row dodges each map's
-      // cover (screens/posts vs colonnades) and the x+19 column runs outside
-      // every pillar, stub, and reliquary, so each sweep exercises the WALL
-      // collider, not interior cover (pinned in tests/arena_layout.test.ts).
-      const rowZ = slot % 2 === 1 ? -2 : -6;
-      const cases = [
-        {
-          from: { x: o.x, z: o.z + rowZ },
-          to: { x: o.x - DUNGEON_WALL_X - 10, z: o.z + rowZ },
-          inside: (x: number, _z: number) => x >= o.x - xLimit - 1e-6,
-        },
-        {
-          from: { x: o.x, z: o.z + rowZ },
-          to: { x: o.x + DUNGEON_WALL_X + 10, z: o.z + rowZ },
-          inside: (x: number, _z: number) => x <= o.x + xLimit + 1e-6,
-        },
-        {
-          from: { x: o.x + 19, z: o.z + 2 },
-          to: { x: o.x + 19, z: o.z + ARENA_LAYOUT.zMin - 10 },
-          inside: (_x: number, z: number) => z >= o.z + zMinLimit - 1e-6,
-        },
-        {
-          from: { x: o.x + 19, z: o.z + 2 },
-          to: { x: o.x + 19, z: o.z + ARENA_LAYOUT.zMax + 10 },
-          inside: (_x: number, z: number) => z <= o.z + zMaxLimit + 1e-6,
-        },
-      ];
+  it.each(
+    Array.from({ length: ARENA_SLOT_COUNT }, (_, slot) => slot),
+  )('sweeps high-speed movement against all four walls in slot %s', (slot) => {
+    const sim = makeWorld();
+    const o = arenaOrigin(slot);
+    const xLimit = DUNGEON_WALL_X - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
+    const zMinLimit = ARENA_LAYOUT.zMin + DUNGEON_WALL_HW + PLAYER_BODY_RADIUS;
+    const zMaxLimit = ARENA_LAYOUT.zMax - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
+    // Sweep lanes are obstacle-free rows/columns of the SLOT'S map (even
+    // slots Coliseum, odd slots Drowned Court): the z row dodges each map's
+    // cover (screens/posts vs colonnades) and the x+19 column runs outside
+    // every pillar, stub, and reliquary, so each sweep exercises the WALL
+    // collider, not interior cover (pinned in tests/arena_layout.test.ts).
+    const rowZ = slot % 2 === 1 ? -2 : -6;
+    const cases = [
+      {
+        from: { x: o.x, z: o.z + rowZ },
+        to: { x: o.x - DUNGEON_WALL_X - 10, z: o.z + rowZ },
+        inside: (x: number, _z: number) => x >= o.x - xLimit - 1e-6,
+      },
+      {
+        from: { x: o.x, z: o.z + rowZ },
+        to: { x: o.x + DUNGEON_WALL_X + 10, z: o.z + rowZ },
+        inside: (x: number, _z: number) => x <= o.x + xLimit + 1e-6,
+      },
+      {
+        from: { x: o.x + 19, z: o.z + 2 },
+        to: { x: o.x + 19, z: o.z + ARENA_LAYOUT.zMin - 10 },
+        inside: (_x: number, z: number) => z >= o.z + zMinLimit - 1e-6,
+      },
+      {
+        from: { x: o.x + 19, z: o.z + 2 },
+        to: { x: o.x + 19, z: o.z + ARENA_LAYOUT.zMax + 10 },
+        inside: (_x: number, z: number) => z <= o.z + zMaxLimit + 1e-6,
+      },
+    ];
 
-      for (const testCase of cases) {
-        const result = resolveMovement(
-          sim.cfg.seed,
-          testCase.from.x,
-          testCase.from.z,
-          testCase.to.x,
-          testCase.to.z,
-          PLAYER_BODY_RADIUS,
-        );
-        expect(testCase.inside(result.x, result.z)).toBe(true);
-        expect(result).not.toEqual(testCase.to);
-      }
-    },
-  );
+    for (const testCase of cases) {
+      const result = resolveMovement(
+        sim.cfg.seed,
+        testCase.from.x,
+        testCase.from.z,
+        testCase.to.x,
+        testCase.to.z,
+        PLAYER_BODY_RADIUS,
+      );
+      expect(testCase.inside(result.x, result.z)).toBe(true);
+      expect(result).not.toEqual(testCase.to);
+    }
+  });
 
   it('blocks line of sight through both side walls', () => {
     const sim = makeWorld();

@@ -9,9 +9,12 @@ import {
   FATE_THREAD_MAX,
   FATE_THREAD_SENTENCE_DAMAGE_PER_STACK,
   gainDoom,
+  JUDGMENT_SENTENCE_DAMAGE_MULT,
   maledictGazeDamage,
   resolveNeedleOfFate,
   resolveSentence,
+  SENTENCE_THREAT_MULT,
+  sentenceBaseDamage,
 } from '../src/sim/combat/affliction';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { emptyModifiers } from '../src/sim/content/talents';
@@ -137,6 +140,8 @@ describe('Affliction Warlock', () => {
     expect(at(14)).toContain('vicarious_suffering');
     expect(at(16)).not.toContain('coven');
     expect(at(17)).toContain('coven');
+    expect(at(19)).not.toContain('hour_of_judgment');
+    expect(at(20)).toContain('hour_of_judgment');
     expect(at(20)).not.toEqual(
       expect.arrayContaining([
         'shadow_bolt',
@@ -373,7 +378,7 @@ describe('Affliction Warlock', () => {
     expect(gazeCount(true)).toBe(2);
   });
 
-  it('possesses the primary Evil Eye for 10 sec without refreshing Condemnation', () => {
+  it('turns Possess the Evil Eye into a 15 sec off-GCD burst window', () => {
     const sim = makeAffliction();
     const target = addTarget(sim, 8);
     finishCast(sim, 'evil_eye', target);
@@ -381,18 +386,129 @@ describe('Affliction Warlock', () => {
     sim.player.gcdRemaining = 0;
     sim.player.resource = sim.player.maxResource;
     const mana = sim.player.resource;
-    const doomBefore = sim.player.auras.find((aura) => aura.kind === 'affliction_doom');
-    const remainingBefore = doomBefore?.remaining;
-
+    sim.player.gcdRemaining = 1;
     sim.targetEntity(target.id);
     sim.castAbility('possess_evil_eye');
 
     const possession = sim.player.auras.find((aura) => aura.kind === 'affliction_possession');
-    expect(possession?.remaining).toBe(10);
+    expect(possession?.remaining).toBe(15);
     expect(sim.player.resource).toBe(mana - 75);
     expect(sim.player.cooldowns.get('possess_evil_eye')).toBe(45);
+    expect(doomValue(sim.player)).toBe(75);
+    expect(sim.player.gcdRemaining).toBe(1);
+  });
+
+  it('opens Hour of Judgment with three Threads, Possession, and accelerated Condemnation', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 8);
+    finishCast(sim, 'evil_eye', target);
+    sim.player.gcdRemaining = 1;
+    sim.player.resource = sim.player.maxResource;
+    sim.targetEntity(target.id);
+
+    expect(ABILITIES.hour_of_judgment).toMatchObject({
+      cost: 0,
+      castTime: 0,
+      cooldown: 90,
+      offGcd: true,
+      range: 30,
+      requiresTarget: true,
+      effects: [{ type: 'afflictionJudgment', duration: 15, doom: 40, refund: 50 }],
+    });
+
+    sim.castAbility('hour_of_judgment');
+
+    expect(sim.player.cooldowns.get('hour_of_judgment')).toBe(90);
+    expect(sim.player.gcdRemaining).toBe(1);
     expect(doomValue(sim.player)).toBe(40);
-    expect(doomBefore?.remaining).toBe(remainingBefore);
+    expect(fateThreads(target, sim.playerId)).toBe(3);
+    expect(target.auras.find((aura) => aura.kind === 'affliction_fate_threads')?.id).toBe(
+      'needle_of_fate',
+    );
+    expect(sim.player.auras.find((aura) => aura.kind === 'affliction_judgment')?.remaining).toBe(
+      15,
+    );
+    expect(sim.player.auras.find((aura) => aura.kind === 'affliction_possession')?.remaining).toBe(
+      15,
+    );
+
+    sim.player.gcdRemaining = 0;
+    finishCast(sim, 'needle_of_fate', target);
+    expect(doomValue(sim.player)).toBe(54);
+  });
+
+  it('does not double Hour of Judgment generation through a secondary Eye', () => {
+    const sim = makeAffliction();
+    const primary = addTarget(sim, 8);
+    const secondary = addTarget(sim, 10);
+    finishCast(sim, 'evil_eye', primary);
+    finishCast(sim, 'coven', primary);
+    expect(eye(secondary, sim.playerId, true)).toBe(true);
+    finishCast(sim, 'hour_of_judgment', primary);
+
+    finishCast(sim, 'needle_of_fate', secondary);
+
+    expect(doomValue(sim.player)).toBe(44);
+  });
+
+  it('refunds 50 Condemnation from only the first Sentence during Hour of Judgment', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 8);
+    finishCast(sim, 'evil_eye', target);
+    finishCast(sim, 'hour_of_judgment', target);
+    gainDoom(ctx(sim), sim.player, 40);
+
+    finishCast(sim, 'sentence', target);
+    expect(doomValue(sim.player)).toBe(50);
+
+    gainDoom(ctx(sim), sim.player, 30);
+    finishCast(sim, 'sentence', target);
+    expect(doomValue(sim.player)).toBe(0);
+  });
+
+  it('increases Sentence damage by 20% throughout Hour of Judgment', () => {
+    const sentenceHit = (judgment: boolean): number => {
+      const sim = makeAffliction(1944);
+      const target = addTarget(sim, 8);
+      finishCast(sim, 'evil_eye', target);
+      if (judgment) {
+        sim.player.auras.push({
+          id: 'hour_of_judgment',
+          name: 'Hour of Judgment',
+          kind: 'affliction_judgment',
+          remaining: 15,
+          duration: 15,
+          value: 50,
+          charges: 0,
+          sourceId: sim.playerId,
+          school: 'shadow',
+        });
+      }
+      gainDoom(ctx(sim), sim.player, 50);
+      const hpBefore = target.hp;
+
+      resolveSentence(ctx(sim), sim.player, target, 'Sentence');
+
+      return hpBefore - target.hp;
+    };
+
+    expect(JUDGMENT_SENTENCE_DAMAGE_MULT).toBe(1.2);
+    expect(sentenceHit(true) / sentenceHit(false)).toBe(1.2);
+  });
+
+  it('refuses Hour of Judgment unless the selected enemy bears the primary Evil Eye', () => {
+    const sim = makeAffliction();
+    const marked = addTarget(sim, 8);
+    const unmarked = addTarget(sim, 10);
+    finishCast(sim, 'evil_eye', marked);
+    sim.player.gcdRemaining = 0;
+    sim.targetEntity(unmarked.id);
+
+    sim.castAbility('hour_of_judgment');
+
+    expect(sim.player.cooldowns.has('hour_of_judgment')).toBe(false);
+    expect(sim.player.auras.some((aura) => aura.kind === 'affliction_judgment')).toBe(false);
+    expect(doomValue(sim.player)).toBe(0);
   });
 
   it('refuses possession unless the selected enemy bears the primary Evil Eye', () => {
@@ -428,7 +544,7 @@ describe('Affliction Warlock', () => {
     expect(sim.player.castTotal).toBeCloseTo(1, 5);
     while (sim.player.castingAbility) sim.tick();
     for (let i = 0; i < 200 && ctx(sim).pendingProjectiles.length > 0; i++) sim.tick();
-    expect(doomValue(sim.player)).toBe(9);
+    expect(doomValue(sim.player)).toBe(42);
   });
 
   it('keeps Consume channeling while moving during possession', () => {
@@ -450,7 +566,7 @@ describe('Affliction Warlock', () => {
     expect(sim.player.castingAbility).toBe('drain_life');
   });
 
-  it('delays a 25% Sentence discharge without rebounding it through Coven', () => {
+  it('delays a 60% Sentence discharge without rebounding it through Coven', () => {
     const sim = makeAffliction();
     const primary = addTarget(sim, 8);
     const secondary = addTarget(sim, 10);
@@ -495,9 +611,27 @@ describe('Affliction Warlock', () => {
             event.ability === 'Demonic Sentence',
         )
         .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0),
-    ).toBe(Math.round(initialPrimaryDamage * 0.25));
+    ).toBe(Math.round(initialPrimaryDamage * 0.6));
     expect(secondary.hp).toBe(secondaryAfterSentence);
     expect(sentenceBursts(delayedEvents)).toHaveLength(0);
+  });
+
+  it('increases the primary Sentence hit by exactly 25% during Possession', () => {
+    const sentenceHit = (possessed: boolean): number => {
+      const sim = makeAffliction(1942);
+      const target = addTarget(sim, 8);
+      finishCast(sim, 'evil_eye', target);
+      if (possessed) finishCast(sim, 'possess_evil_eye', target);
+      consumeDoom(ctx(sim), sim.player);
+      gainDoom(ctx(sim), sim.player, 50);
+      const hpBefore = target.hp;
+
+      resolveSentence(ctx(sim), sim.player, target, 'Sentence');
+
+      return hpBefore - target.hp;
+    };
+
+    expect(sentenceHit(true) / sentenceHit(false)).toBe(1.25);
   });
 
   it('moves one primary Evil Eye without refreshing Condemnation', () => {
@@ -631,7 +765,7 @@ describe('Affliction Warlock', () => {
     finishCast(sim, 'needle_of_fate', second);
 
     expect(eye(second, sim.playerId)).toBe(true);
-    expect(doomValue(sim.player)).toBe(7);
+    expect(doomValue(sim.player)).toBe(AFFLICTION_EYE_DEATH_GAIN + 7);
   });
 
   it('does not rebuild Affliction state when an in-flight Needle lands after leaving the spec', () => {
@@ -1140,6 +1274,7 @@ describe('Affliction Warlock', () => {
   });
 
   it('spends the full pool with Sentence and scales its damage at 20, 50, 80, and 100', () => {
+    expect([20, 50, 80, 100].map(sentenceBaseDamage)).toEqual([138, 400, 750, 1100]);
     const losses: number[] = [];
     for (const amount of [20, 50, 80, 100]) {
       const sim = makeAffliction(amount);
@@ -1171,7 +1306,25 @@ describe('Affliction Warlock', () => {
       expect(doomValue(sim.player)).toBe(0);
     }
 
-    expect(losses).toEqual([91, 264, 495, 726]);
+    expect(losses).toEqual([152, 440, 825, 1210]);
+  });
+
+  it('routes Sentence through the Evil Eye at 35% of normal threat', () => {
+    const sim = makeAffliction(1943);
+    const target = addTarget(sim, 8);
+    finishCast(sim, 'evil_eye', target);
+    gainDoom(ctx(sim), sim.player, 20);
+    const hpBefore = target.hp;
+    const threatBefore = target.threat.get(sim.playerId) ?? 0;
+
+    resolveSentence(ctx(sim), sim.player, target, 'Sentence');
+
+    const damage = hpBefore - target.hp;
+    expect(SENTENCE_THREAT_MULT).toBe(0.35);
+    expect((target.threat.get(sim.playerId) ?? 0) - threatBefore).toBeCloseTo(
+      damage * SENTENCE_THREAT_MULT,
+      5,
+    );
   });
 
   it('can retain Fate Threads for a stronger Sentence instead of feeding them to Consume', () => {
@@ -1252,7 +1405,7 @@ describe('Affliction Warlock', () => {
     healingSim.player.hp = 1;
     gainDoom(ctx(healingSim), healingSim.player, 50);
     finishCast(healingSim, 'sentence', healingTarget);
-    expect(healingSim.player.hp).toBe(54);
+    expect(healingSim.player.hp).toBe(89);
 
     const splashSim = makeAffliction(502);
     const splashTarget = addTarget(splashSim, 8);
@@ -1263,7 +1416,7 @@ describe('Affliction Warlock', () => {
     const nearHp = nearby.hp;
     const farHp = distant.hp;
     finishCast(splashSim, 'sentence', splashTarget);
-    expect(nearHp - nearby.hp).toBe(173);
+    expect(nearHp - nearby.hp).toBe(289);
     expect(distant.hp).toBe(farHp);
 
     const bossSim = makeAffliction(503);
@@ -1288,9 +1441,9 @@ describe('Affliction Warlock', () => {
             event.type === 'damage' && event.targetId === boss.id && event.ability === 'Sentence',
         )
         .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0),
-    ).toBe(871);
+    ).toBe(1452);
     expect(boss.hp).toBeLessThan(bossHp);
-    expect(bossNearbyHp - bossNearby.hp).toBe(254);
+    expect(bossNearbyHp - bossNearby.hp).toBe(424);
 
     const executeSim = makeAffliction(504);
     const executeTarget = addTarget(executeSim);
@@ -1369,6 +1522,26 @@ describe('Affliction Warlock', () => {
     expect(doomValue(sim.player)).toBe(doomBefore + 2);
   });
 
+  it('doubles Eye-linked Cursed Accomplice generation during Hour of Judgment', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 8);
+    finishCast(sim, 'evil_eye', target);
+    finishCast(sim, 'cursed_accomplice');
+    finishCast(sim, 'hour_of_judgment', target);
+    sim.player.inCombat = true;
+    target.inCombat = true;
+    const primaryEye = target.auras.find((aura) => aura.kind === 'affliction_eye');
+    const link = sim.player.auras.find((aura) => aura.kind === 'affliction_accomplice');
+    if (!primaryEye || !link) throw new Error('Expected Eye and accomplice link');
+    const doomBefore = doomValue(sim.player);
+    primaryEye.tickTimer = 0.05;
+    link.icd = 0;
+
+    sim.tick();
+
+    expect(doomValue(sim.player)).toBe(doomBefore + 4);
+  });
+
   it('creates up to four temporary secondary eyes with Coven', () => {
     const sim = makeAffliction();
     const primary = addTarget(sim, 8);
@@ -1433,7 +1606,7 @@ describe('Affliction Warlock', () => {
     gainDoom(ctx(sim), sim.player, 16);
     const secondaryHp = secondary.hp;
     const events = finishCast(sim, 'sentence', primary);
-    expect(secondaryHp - secondary.hp).toBe(32);
+    expect(secondaryHp - secondary.hp).toBe(53);
     expect(sentenceBursts(events)).toHaveLength(1);
   });
 
@@ -1461,7 +1634,7 @@ describe('Affliction Warlock', () => {
     // Coven echoes 35% of the shared mastery-adjusted verdict, not 35% of the
     // boss-only 20% amplified primary hit. Moving it out of the splash radius
     // isolates the Coven component.
-    expect(secondaryHp - secondary.hp).toBe(254);
+    expect(secondaryHp - secondary.hp).toBe(424);
   });
 
   it('requires the primary Evil Eye for Sentence and preserves resources on a secondary Eye', () => {
@@ -1499,11 +1672,11 @@ describe('Affliction Warlock', () => {
     finishCast(sim, 'possess_evil_eye', primary);
 
     finishCast(sim, 'needle_of_fate', secondary);
-    expect(doomValue(sim.player)).toBe(5);
+    expect(doomValue(sim.player)).toBe(39);
 
     finishCast(sim, 'hex_of_violence', secondary);
     ctx(sim).dealDamage(secondary, victim, 10, false, 'physical', 'Claw', 'hit');
-    expect(doomValue(sim.player)).toBe(10);
+    expect(doomValue(sim.player)).toBe(44);
   });
 
   it('feeds Condemnation and refreshes the expiry when a primary Eye target dies', () => {
@@ -1522,6 +1695,17 @@ describe('Affliction Warlock', () => {
     expect(target.dead).toBe(true);
     expect(doomValue(sim.player)).toBe(10 + AFFLICTION_EYE_DEATH_GAIN);
     expect(doomRemaining(sim.player)).toBe(AFFLICTION_DOOM_DURATION);
+  });
+
+  it('pays the primary Eye when a scripted death enters through the shared lifecycle', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 8);
+    finishCast(sim, 'evil_eye', target);
+
+    ctx(sim).handleDeath(target, sim.player);
+
+    expect(target.dead).toBe(true);
+    expect(doomValue(sim.player)).toBe(AFFLICTION_EYE_DEATH_GAIN);
   });
 
   it('halves the Eye death Condemnation on a secondary Coven Eye', () => {

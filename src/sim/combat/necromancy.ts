@@ -1,16 +1,18 @@
-import {
-  isTemporaryNecromancyUndeadTemplateId,
-  NECROMANCY_TEMPORARY_UNDEAD_SLOTS,
-} from '../content/necromancy';
+import { isTemporaryNecromancyUndeadTemplateId } from '../content/necromancy';
 import { MOBS } from '../data';
 import { createMob } from '../entity';
 import { petDamageMult } from '../pet/pet_ai';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import { type AbilityDef, armorReduction, type Entity } from '../types';
+import {
+  dominionSummonBlock,
+  missingDominionTemplates,
+  NECROMANCY_DOMINION_CAP,
+} from './necromancy_dominion';
 
 export const SOUL_FRAGMENT_CAP = 5;
-export const TEMPORARY_UNDEAD_CAP = 3;
+export const TEMPORARY_UNDEAD_CAP = NECROMANCY_DOMINION_CAP;
 export const DEATH_ECHO_CAP = 3;
 export const DEATH_ECHO_DURATION = 15;
 export const DEATH_ECHO_CONSUME_RADIUS = 6;
@@ -27,16 +29,6 @@ export const SOUL_LANCE_ABILITY_ID = 'soul_lance';
 // expiry path in combat/auras.ts keeps calling detonateOssuaryMark without the
 // deliberate flag.
 export const OSSUARY_DETONATE_HEAL_PCT = 0.25;
-// Bounded minion upkeep: Reaping Command buys each LIVING temporary servant one
-// extra slice of life, exactly once in that servant's lifetime, so a 30 sec
-// summon can never live past 38 sec however often the command is pressed. The
-// permanent Graveguard carries no despawn timer and is untouched.
-export const REAPING_UPKEEP_BONUS = 8;
-const REAPING_UPKEEP_AURA_ID = 'reaping_command_upkeep';
-// The "already extended" latch rides the servant itself as a long-lived marker
-// aura (the funeral_harvest_lockout / soul_fragments idiom in this file), so it
-// dies with the servant and needs no new Entity field.
-const REAPING_UPKEEP_LATCH_DURATION = 3600;
 const DEATH_ECHO_ID_PREFIX = 'necromancy_death_echo_';
 const FUNERAL_HARVEST_MARK_DURATION = 5;
 const FUNERAL_HARVEST_LOCKOUT = 3;
@@ -272,14 +264,6 @@ export function despawnTemporaryNecromancyUndead(ctx: SimContext, ownerId: numbe
   }
 }
 
-function temporaryUndeadSlotCost(templateId: string): number {
-  return NECROMANCY_TEMPORARY_UNDEAD_SLOTS[templateId] ?? 0;
-}
-
-function occupiedTemporaryUndeadSlots(undead: readonly Entity[]): number {
-  return undead.reduce((total, entity) => total + temporaryUndeadSlotCost(entity.templateId), 0);
-}
-
 export function necromancyCastError(
   ctx: SimContext,
   owner: Entity,
@@ -300,7 +284,6 @@ export function necromancyCastError(
   const checksReapingCommand = ability.effects.some((effect) => effect.type === 'reapingCommand');
   if (!temporarySummon && !checksSacrifice && !checksCommand && !checksReapingCommand) return null;
 
-  let occupiedSlots = 0;
   let hasTemporary = false;
   let hasUndead = false;
   for (const entity of ctx.entities.values()) {
@@ -315,12 +298,11 @@ export function necromancyCastError(
     hasUndead = true;
     if (isTemporaryNecromancyUndead(entity)) {
       hasTemporary = true;
-      occupiedSlots += temporaryUndeadSlotCost(entity.templateId);
     }
   }
   if (
     temporarySummon?.type === 'summonUndead' &&
-    occupiedSlots + temporaryUndeadSlotCost(temporarySummon.templateId) > TEMPORARY_UNDEAD_CAP
+    dominionSummonBlock(ownedNecromancyUndead(ctx, owner.id), temporarySummon.templateId)
   ) {
     return 'That ability is not ready yet.';
   }
@@ -380,25 +362,20 @@ export function summonUndead(
   temporary: boolean,
   duration?: number,
   spawnAt?: { x: number; z: number },
+  bypassDominion = false,
 ): Entity | null {
-  if (temporary) {
-    const active = ownedNecromancyUndead(ctx, owner.id).filter(isTemporaryNecromancyUndead);
-    if (
-      occupiedTemporaryUndeadSlots(active) + temporaryUndeadSlotCost(templateId) >
-      TEMPORARY_UNDEAD_CAP
-    )
-      return null;
-  } else {
+  if (
+    temporary &&
+    !bypassDominion &&
+    dominionSummonBlock(ownedNecromancyUndead(ctx, owner.id), templateId)
+  ) {
+    return null;
+  }
+  if (!temporary) {
     const existing = ctx.petOf(owner.id, true);
     if (existing) ctx.despawnPet(existing);
   }
-  const summoned = createUndead(
-    ctx,
-    owner,
-    templateId,
-    temporary ? (duration ?? 30) : undefined,
-    spawnAt,
-  );
+  const summoned = createUndead(ctx, owner, templateId, temporary ? duration : undefined, spawnAt);
   const lichForm = owner.auras.find((aura) => aura.kind === 'form_lich');
   if (summoned && lichForm) {
     commandUndead(ctx, owner, lichForm.remaining, 0.5, 0.2, 'lich_form_army');
@@ -514,35 +491,12 @@ function applyReapingRider(
   }
 }
 
-// Convert, do not refresh: every living temporary servant that has never been
-// extended gains REAPING_UPKEEP_BONUS seconds of remaining life and is latched
-// so a second Reaping Command cannot extend it again. Draws no rng and never
-// touches the Graveguard (permanent undead have no despawnTimer).
-function extendTemporaryUndeadUpkeep(ctx: SimContext, owner: Entity): void {
-  for (const undead of ownedNecromancyUndead(ctx, owner.id)) {
-    if (!isTemporaryNecromancyUndead(undead) || undead.despawnTimer === undefined) continue;
-    if (undead.auras.some((aura) => aura.id === REAPING_UPKEEP_AURA_ID)) continue;
-    undead.despawnTimer += REAPING_UPKEEP_BONUS;
-    ctx.applyAura(undead, {
-      id: REAPING_UPKEEP_AURA_ID,
-      name: 'Unholy Upkeep',
-      kind: 'internal_cd',
-      remaining: REAPING_UPKEEP_LATCH_DURATION,
-      duration: REAPING_UPKEEP_LATCH_DURATION,
-      value: 0,
-      sourceId: owner.id,
-      school: 'shadow',
-    });
-  }
-}
-
 export function reapWithUndead(
   ctx: SimContext,
   owner: Entity,
   target: Entity,
   abilityName: string,
 ): void {
-  extendTemporaryUndeadUpkeep(ctx, owner);
   const intents = ownedNecromancyUndead(ctx, owner.id)
     .sort((a, b) => a.id - b.id)
     .flatMap((undead) => {
@@ -965,7 +919,6 @@ export function sacrificeUndead(
 }
 
 export function raiseArmyOfDead(ctx: SimContext, owner: Entity, duration: number): void {
-  despawnTemporaryNecromancyUndead(ctx, owner.id);
   const facing = Number.isFinite(owner.facing) ? owner.facing : 0;
   const forwardX = Math.sin(facing);
   const forwardZ = Math.cos(facing);
@@ -986,10 +939,20 @@ export function raiseArmyOfDead(ctx: SimContext, owner: Entity, duration: number
     ['necromancy_bone_mage', 0],
     ['necromancy_gravewing', 1.15],
   ] as const;
+  const missing = new Set(missingDominionTemplates(ownedNecromancyUndead(ctx, owner.id)));
   for (const [templateId, lateral] of formation) {
-    summonUndead(ctx, owner, templateId, true, duration, {
-      x: portal.x + forwardX * 1.05 + rightX * lateral,
-      z: portal.z + forwardZ * 1.05 + rightZ * lateral,
-    });
+    if (!missing.has(templateId)) continue;
+    summonUndead(
+      ctx,
+      owner,
+      templateId,
+      true,
+      duration,
+      {
+        x: portal.x + forwardX * 1.05 + rightX * lateral,
+        z: portal.z + forwardZ * 1.05 + rightZ * lateral,
+      },
+      true,
+    );
   }
 }

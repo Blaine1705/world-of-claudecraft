@@ -58,7 +58,12 @@ import {
   xpForLevel,
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
-import { clearAfflictionState, mitigateVicariousSuffering, onAfflictionDamage } from './affliction';
+import {
+  afflictionOnDeath,
+  clearAfflictionState,
+  mitigateVicariousSuffering,
+  onAfflictionDamage,
+} from './affliction';
 import { isUnbreakableControlAura } from './cc';
 import { stopChannelVisual } from './channel_visuals';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
@@ -1128,6 +1133,7 @@ function reflectSpellWard(
 }
 
 export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
+  afflictionOnDeath(ctx, e);
   destructionOnDeath(ctx, e);
   necromancyOnDeath(ctx, e);
   resetProcState(e);

@@ -309,6 +309,7 @@ export type AuraKind =
   | 'affliction_violence'
   | 'affliction_vicarious'
   | 'affliction_possession'
+  | 'affliction_judgment'
   | 'affliction_litany'
   | 'affliction_fate_threads'
   | 'affliction_consume_threads'
@@ -2482,7 +2483,8 @@ export type AbilityEffect =
       radius: number;
       maxSecondary: number;
     }
-  | { type: 'afflictionPossession'; duration: number }
+  | { type: 'afflictionPossession'; duration: number; doom: number }
+  | { type: 'afflictionJudgment'; duration: number; doom: number; refund: number }
   | {
       type: 'afflictionLitany';
       duration: number;
@@ -4152,6 +4154,9 @@ export type SimEvent = { pid?: number } & (
   | {
       type: 'damage';
       sourceId: number;
+      // Snapshotted when the event is emitted so pet/guardian damage remains
+      // attributable after owner death despawns the source before hosts consume it.
+      sourceOwnerId?: number;
       targetId: number;
       amount: number;
       crit: boolean;

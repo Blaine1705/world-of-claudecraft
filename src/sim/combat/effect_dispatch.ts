@@ -54,6 +54,7 @@ import {
   applyCursedAccomplice,
   applyEvilEyePossession,
   applyHexOfViolence,
+  applyHourOfJudgment,
   applyLitanyOfGuilt,
   applyVicariousSuffering,
   moveEvilEye,
@@ -2845,7 +2846,11 @@ export function runEffects(
         break;
       }
       case 'afflictionPossession': {
-        applyEvilEyePossession(ctx, p, eff.duration);
+        applyEvilEyePossession(ctx, p, eff.duration, eff.doom);
+        break;
+      }
+      case 'afflictionJudgment': {
+        if (target) applyHourOfJudgment(ctx, p, target, eff.duration, eff.doom, eff.refund);
         break;
       }
       case 'afflictionLitany': {
