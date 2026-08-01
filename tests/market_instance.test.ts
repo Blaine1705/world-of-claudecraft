@@ -157,10 +157,10 @@ describe('marketBuy / marketCancel: the payload crosses intact', () => {
     expect(got).toHaveLength(1);
     expect(got[0].instance).toEqual(ENCHANTED);
     expect(playerListings(sim)).toHaveLength(0);
-    expect(sim.players.get(buyer)?.copper).toBe(100000 - 1000);
+    expect(sim.players.get(buyer)!.copper).toBe(100000 - 1000);
     // Proceeds (less the 5% cut) wait in the seller's collection.
     sim.marketCollect(pid);
-    expect(sim.players.get(pid)?.copper).toBe(100000 + 950);
+    expect(sim.players.get(pid)!.copper).toBe(100000 + 950);
   });
 
   it('buy capacity-models the payload: plain-stack room is not instanced room', () => {
@@ -183,7 +183,7 @@ describe('marketBuy / marketCancel: the payload crosses intact', () => {
     sim.marketBuy(id, buyer);
     expect(errorTexts(sim.drainEvents())).toContain('Your bags are full.');
     expect(playerListings(sim)).toHaveLength(1);
-    expect(sim.players.get(buyer)?.copper).toBe(100000);
+    expect(sim.players.get(buyer)!.copper).toBe(100000);
     // A byte-equal signed stack with room IS instanced room: the buy lands.
     const plainIdx = buyerMeta.inventory.findIndex((s) => s.itemId === HIDE && !s.instance);
     buyerMeta.inventory[plainIdx] = { itemId: HIDE, count: 1, instance: { ...SIGNED } };
@@ -239,8 +239,7 @@ describe('browse rows: the display payload is trimmed to the public allowlist', 
     sim.addItem(HIDE, 3, pid);
     sim.marketList(HIDE, 3, 100, pid);
     const info = sim.marketInfoFor(pid);
-    if (!info) throw new Error('missing market info');
-    const rows = info.listings.filter((l) => l.mine);
+    const rows = info!.listings.filter((l) => l.mine);
     expect(rows).toHaveLength(2);
     const instanced = rows.find((l) => l.instance);
     const plain = rows.find((l) => !l.instance);
@@ -269,7 +268,7 @@ describe('browse rows: the display payload is trimmed to the public allowlist', 
       house: false,
       instance: { signer: 'Lister', bindOnTrade: true, boundTo: 7 },
     });
-    const row = sim.marketInfoFor(pid)?.listings.find((l) => l.instance);
+    const row = sim.marketInfoFor(pid)!.listings.find((l) => l.instance);
     expect(row?.instance).toEqual({ signer: 'Lister' });
   });
 });

@@ -126,7 +126,7 @@ describe('mailSend: instanced attachments', () => {
     const codes = mailCodes(sim.drainEvents());
     expect(codes).toContain('sent');
     expect(slotsOf(sim, sender, BOOTS)).toHaveLength(0);
-    expect(sim.players.get(sender)?.copper).toBe(10000 - MAIL_POSTAGE);
+    expect(sim.players.get(sender)!.copper).toBe(10000 - MAIL_POSTAGE);
 
     tickFor(sim, MAIL_DELIVERY_SECONDS + 1);
     moveToMailbox(sim, recipient);
@@ -179,7 +179,7 @@ describe('mailSend: instanced attachments', () => {
     expect(codes).toContain('notEnoughItems');
     expect(codes).not.toContain('sent');
     expect(slotsOf(sim, sender, HIDE)).toHaveLength(1);
-    expect(sim.players.get(sender)?.copper).toBe(10000);
+    expect(sim.players.get(sender)!.copper).toBe(10000);
   });
 
   it('armed and stamped copies are refused with noMailBound, payload intact', () => {
@@ -193,7 +193,7 @@ describe('mailSend: instanced attachments', () => {
       const kept = slotsOf(sim, sender, HIDE);
       expect(kept).toHaveLength(1);
       expect(kept[0].instance).toEqual(locked);
-      expect(sim.players.get(sender)?.copper).toBe(10000);
+      expect(sim.players.get(sender)!.copper).toBe(10000);
     }
   });
 
@@ -238,7 +238,7 @@ describe('mailSend: instanced attachments', () => {
     );
     expect(mailCodes(sim.drainEvents())).not.toContain('sent');
     expect(slotsOf(sim, sender, HIDE).reduce((n, s) => n + s.count, 0)).toBe(2);
-    expect(sim.players.get(sender)?.copper).toBe(10000);
+    expect(sim.players.get(sender)!.copper).toBe(10000);
   });
 
   it('the plain fungible path is unchanged: parcel rows carry no instance key', () => {
@@ -407,8 +407,7 @@ describe('mailInfoFor: display payloads are trimmed', () => {
     const info = sim.mailInfoFor(recipient);
     const letter = info?.messages.find((m) => m.items.length > 0);
     expect(letter?.items[0].instance).toEqual({ signer: 'Sender' });
-    if (!letter) throw new Error('missing delivered letter');
-    sim.mailTake(letter.id, recipient);
+    sim.mailTake(letter!.id, recipient);
     expect(slotsOf(sim, recipient, HIDE)[0].instance).toEqual(CHARGED);
   });
 });

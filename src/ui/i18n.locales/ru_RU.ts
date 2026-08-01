@@ -2307,6 +2307,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': 'Выдавший это задание не рядом.',
   'questUi.errors.turnInMissing': 'Место сдачи этого задания не рядом.',
   'questUi.errors.tooFar': 'Слишком далеко.',
+  'questUi.errors.escortAway': 'Тот, кого вы должны сопроводить, сейчас не на месте. Он скоро туда вернётся.',
   'itemUi.money.goldShort': 'з',
   'itemUi.money.silverShort': 'с',
   'itemUi.money.copperShort': 'м',
@@ -4395,6 +4396,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': 'Героический знак',
   'hudChrome.raidLockout.heroicName': 'Героический режим: {name}',
   'hudChrome.raidLockout.heroicLocked': 'Вы закреплены за героическим подземельем: {name}.',
+  'hudChrome.riftTracker.title': 'Разлом',
+  'hudChrome.riftTracker.floor': 'Этаж {current} из {total}',
+  'hudChrome.riftTracker.closesIn': 'Разлом закроется через {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
   'entities.items.morthens_cryptforged_hauberk.name': 'Кольчуга Мортена из гробничной стали',
   'entities.items.shadowpulse_handwraps.name': 'Обмотки теневого пульса',
   'entities.items.bonechill_striders.name': 'Сапоги костяного холода',
@@ -4682,7 +4688,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_moss_and_mending.objectives.1.label': 'Солёный мох Дальнего Берега',
   'entities.quests.q_fs_bram_come_home.title': 'Вернись домой, Брам',
   'entities.quests.q_fs_bram_come_home.text':
-    'Мой Брам вывел лодку в то самое утро, когда раскрылся прорыв у сетей, и море выбросило его где-то за мысом у Пристани. Три ночи назад я слышала его, {playerName}, — он звал через воду, а я побоялась пойти. Я и сейчас боюсь. Прошу тебя. Его лодка лежит разбитой на северном берегу. Доведи его до дома, ко мне.',
+    'Мой Брам вывел лодку в то самое утро, когда раскрылся прорыв у сетей, и море выбросило его где-то за мысом у Пристани. Три ночи назад я слышала его, {playerName}, — он звал через воду, а я побоялась пойти. Я и сейчас боюсь. Прошу тебя. Его лодка лежит разбитой на южном берегу. Доведи его до дома, ко мне.',
   'entities.quests.q_fs_bram_come_home.completion':
     'Брам! Ты вернул мне его целым, {playerName}. Мы оба плакали, и никому из нас не стыдно. Что бы прорывы ни забрали у этого острова дальше, моей семьи им не видать. Больше никогда.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
@@ -4756,7 +4762,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_sprung_traps.objectives.1.label': 'Капкан возвращён',
   'entities.quests.q_fv_seeing_wren_home.title': 'Проводить Рен домой',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Моя ученица Рен два дня назад ушла обходить линию у Золотой Проталины и не вернулась. Я нашёл её следы: она забилась под дорожные вехи к юго-западу от Ступеней Сияния и от страха перед волками не может сдвинуться с места. Мне нельзя оставить топь, {playerName}. Доведи её до лагеря Вейлы на Ступенях. Под огнями она будет в безопасности.',
+    'Моя ученица Рен два дня назад ушла обходить линию у Золотой Проталины и не вернулась. Я нашёл её следы: она забилась под дорожные вехи к северо-востоку от Ступеней Сияния и от страха перед волками не может сдвинуться с места. Мне нельзя оставить топь, {playerName}. Доведи её до лагеря Вейлы на Ступенях. Под огнями она будет в безопасности.',
   'entities.quests.q_fv_seeing_wren_home.completion':
     'Девочка внутри, закутана в половину моих одеял и болтает так, что звёзды с неба сыплются. Ты сделал сегодня доброе дело, {playerName}. Предел таких видит немного.',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
@@ -6864,12 +6870,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.duskGreeter': 'Хранительница Сэльвин, Элдерглим',
   'guide.worldPage.duskPlaceNotes':
     'Элдерглим собрался под великим древом. Сумеречная пещера и её смотровая площадка служат входом и первым видом на долину; Древняя роща и Котловина Звездопада хранят тихий юг; Затонувший двор скрывает заросшие руины на востоке; а Мерцающая глубь и Хрустальные отмели светятся на севере.',
-  'guide.family.murloc.name': 'Квакопёры',
-  'guide.family.murloc.desc':
-    'Квакающий рыбий народец озёрных берегов и приливных луж, что мигом накидывается стаей на всякого, кто зайдёт в воду слишком близко.',
-  'guide.family.kobold.name': 'Проныры',
-  'guide.family.kobold.desc':
-    'Суетливые мусорщики и духи полян и живых изгородей, скорее докука, чем угроза, пока их не наберётся много.',
   'guide.family.demon.name': 'Демоны',
   'guide.family.demon.desc':
     'Захватчики из-за разломов, сплошь огонь и злоба. Где стоит один из них, там и прорыв недалеко.',
@@ -8217,6 +8217,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': 'Запрос слишком большой. Повторите попытку с меньшим объёмом данных.',
   'apiError.body.unsupported_media_type': 'Неподдерживаемый формат запроса.',
   'apiError.deeds.invalid_input': 'Недопустимые данные.',
+  'apiError.ota_updates.invalid_input': 'Недопустимые данные.',
   'apiError.steam.disabled': 'Привязка Steam сейчас недоступна.',
   'apiError.wallet.handoff_invalid':
     'Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку.',
@@ -8226,6 +8227,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.already_linked': 'К вашему аккаунту уже привязан аккаунт Steam.',
   'apiError.steam.account_taken': 'Этот аккаунт Steam уже привязан к другому аккаунту.',
   'apiError.steam.upstream': 'Steam не отвечает. Повторите попытку чуть позже.',
+  'apiError.epic.disabled': 'Привязка Epic сейчас недоступна.',
+  'apiError.epic.invalid_token':
+    'Epic не смог подтвердить этот запрос на привязку. Повторите попытку из настольного приложения.',
+  'apiError.epic.banned': 'Этот аккаунт Epic нельзя привязать.',
+  'apiError.epic.already_linked': 'К вашему аккаунту уже привязан аккаунт Epic.',
+  'apiError.epic.account_taken': 'Этот аккаунт Epic уже привязан к другому аккаунту.',
+  'apiError.epic.upstream': 'Epic не отвечает. Повторите попытку чуть позже.',
   'apiError.db.conflict': 'Изменение конфликтует с другим обновлением. Повторите попытку.',
   'apiError.rate_limit.exceeded': 'Слишком много запросов. Повторите попытку через {seconds}.',
   'apiError.internal.error': 'На нашей стороне произошла ошибка. Повторите попытку.',
@@ -9110,6 +9118,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Привяжите аккаунт Steam в настольном приложении, чтобы ваши деяния отражались в достижениях Steam.',
   'hudChrome.steam.noTicket':
     'Steam не выдал билет для привязки. Запустите Steam и повторите попытку.',
+  'hudChrome.epic.link': 'Привязать Epic',
+  'hudChrome.epic.unlink': 'Отвязать Epic',
+  'hudChrome.epic.linked': 'Привязан аккаунт Epic {id}',
+  'hudChrome.epic.benefits':
+    'Привяжите аккаунт Epic в настольном приложении Epic, чтобы ваши деяния отражались в достижениях Epic.',
+  'hudChrome.epic.noProof':
+    'Epic не выдал подтверждение для привязки. Запустите игру из Epic Games Store и повторите попытку.',
+  'hudChrome.epic.title': 'Epic',
   'hudChrome.deeds.title': 'Книга деяний',
   'hudChrome.deeds.close': 'Закрыть Книгу деяний',
   'hudChrome.deeds.searchPlaceholder': 'Поиск деяний',
@@ -9216,6 +9232,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': 'Кама-Кагэ, жаба теневых прыжков',
   'hudChrome.mounts.name_stormfeather_griffin': 'Штормокрыл Поднебесный',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
+  'hudChrome.mounts.name_terrorspark_groundshaker': 'Страхоискр, сотрясатель земли',
   'hudChrome.mounts.desc_valorsteed':
     'Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.',
   'hudChrome.mounts.desc_grag_bear':
@@ -9230,6 +9247,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт.',
+  'hudChrome.mounts.desc_terrorspark_groundshaker':
+    'Компактная бронированная машина с тяжёлыми гусеницами, крупнокалиберной пушкой и седлом для бесстрашных пилотов.',
   'hudChrome.mounts.emptyTitle': 'Скакунов пока нет',
   'hudChrome.mounts.emptyStableHint':
     'Достигните 20 уровня и возьмите урок верховой езды у старшей конюшей Марлы в конюшнях к западу от Хайвотча.',
@@ -9331,11 +9350,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Несколько повседневных команд стоит запомнить: /w Имя отправляет шёпот, а /r отвечает на последний полученный, /invite приглашает кого-то в вашу группу, /follow пристраивает вас следом за другом, /roll бросает кости на виду у группы, /who показывает, кто в сети, а /afk отмечает вас отошедшим. Введите /help в игре, чтобы увидеть полный список.',
   'guide.social.slashHeading': 'Удобные команды с косой чертой',
   // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.helpUnstuckSickness': 'Спасение: /unstuck запускает неподвижный отсчёт, после которого вас перенесёт на ближайшее кладбище и воскресит, если вы пали. Болезнь спасения останется на вас до 5 минут.',
   'hudChrome.unstuck.menuButton': 'Выбраться',
   'hudChrome.unstuck.help':
     'Спасение: /unstuck запускает неподвижный отсчёт, после которого вы окажетесь в ближайшем доступном безопасном месте.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Спасение: /unstuck запускает неподвижный отсчёт, после которого ваш дух отправится на ближайшее кладбище. Чтобы вернуться к жизни, примите Подать Хранителя у Целителя душ.',
+  'hudChrome.unstuck.movedToGraveyard': 'Вас перенесли на ближайшее кладбище. Болезнь спасения тяготит вас.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck': 'Вас перенесли на ближайшее кладбище и воскресили. Болезнь спасения тяготит вас.',
   'hudChrome.unstuck.started':
     'Перемещение из ловушки через {seconds} сек. Движение, бой, получение урона или другое действие отменят его.',
   'hudChrome.unstuck.countdown': 'Выбраться: {seconds}',
@@ -9553,7 +9575,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Мгновенно завершает восстановление «Мерцающего шага», «Морозной завесы» и «Великой невидимости». (талант мага)',
   'entities.abilities.greater_invisibility.name': 'Великая невидимость',
   'entities.abilities.greater_invisibility.description':
-    'Вы исчезаете на 20 сек.: снимает 2 эффекта периодического урона, а получаемый урон снижается на 90% во время невидимости и ненадолго после неё. (талант мага)',
+    'Исчезаете на 20 сек. и снимаете 2 эффекта периодического урона. Когда невидимость заканчивается, получаемый урон снижается на 90% на 2 сек. (Талант мага)',
   'entities.abilities.hot_streak.name': 'Полоса везения',
   'entities.abilities.hot_streak.description':
     'Пассивно: два критических попадания подряд огненными заклинаниями («Огненный шар», «Огненный взрыв», «Ожог», «Огненная глыба» или «Огненный столб») делают следующую «Огненную глыбу» или «Огненный столб» мгновенными и бесплатными. Расходующие эффект заклинания, включая бесплатные, учитываются для следующей серии. «Огненный столб» учитывается один раз независимо от числа поражённых врагов, и только его первый удар может быть засчитан. (ветка «Огонь»)',
@@ -9697,6 +9719,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.maxHpPct': 'Повышает максимальное здоровье на {pct}%',
   'hud.combat.floatingParry': 'Парировано',
   'hud.combat.parried': '{target} парирует ваш {ability}.',
+  'hud.combat.floatingEvade': 'Ускользание',
+  'hud.combat.evaded': '{target} ускользает от вашего {ability}.',
   'hudChrome.options.mouseoverCast': 'Применение по наведению на рамки группы',
   'hudChrome.options.showTargetOfTarget': 'Показывать цель цели',
   'hudChrome.options.stickyTarget': 'Сохранять цель при клике по земле',
@@ -10023,6 +10047,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': 'Последний оплот',
   'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
+  'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Страхоискра',
   'entities.dungeons.the_last_keep.leaveText': 'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
   'entities.items.wildheart_tuskblade.name': 'Клыкастый клинок Дикого Сердца',
   'entities.items.wildheart_hexwood_staff.name': 'Посох колдовского дерева из Котловины',
@@ -10838,4 +10863,59 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.levels': 'Уровни {min} до {max}',
   'hudChrome.continentMap.toZone': 'Карта региона',
   'hudChrome.enchanting.wornTagIndexed': 'Надето ({slot} {index})',
+  'hudChrome.targetAuras.title': 'Ауры цели',
+  'hudChrome.targetAuras.keybindLabel': 'Усиления и ослабления цели',
+  'hudChrome.targetAuras.debuffs': 'Ослабления',
+  'hudChrome.targetAuras.buffs': 'Усиления',
+  'hudChrome.targetAuras.unlock': 'Переместить окно аур цели',
+  'hudChrome.targetAuras.lock': 'Закрепить окно аур цели',
+  'hudChrome.targetAuras.configureRows': 'Настроить ауры цели',
+  'hudChrome.targetAuras.fewerRows': 'Уменьшить число строк аур',
+  'hudChrome.targetAuras.moreRows': 'Увеличить число строк аур',
+  'hudChrome.targetAuras.visibleRows': 'Предпочтительное число строк аур: {count}',
+  'hudChrome.targetAuras.showSources': 'Показать создателей аур',
+  'hudChrome.targetAuras.hideSources': 'Скрыть создателей аур',
+  'hudChrome.targetAuras.ownAura': 'Ваша аура',
+  'hudChrome.targetAuras.opacity': 'Непрозрачность аур: {percent}',
+  'hudChrome.auraOverlay.title': 'Ауры',
+  'hudChrome.auraOverlay.currentClass': 'Текущий класс: {class}',
+  'hudChrome.auraOverlay.previewHint': 'Используйте «Настроить позиции», чтобы сдвинуть ауру и не перекрывать меню.',
+  'hudChrome.auraOverlay.noProcs': 'Для этого персонажа нет поддерживаемых срабатываний.',
+  'hudChrome.auraOverlay.enabled': 'Показывать ауру',
+  'hudChrome.auraOverlay.icon': 'Значок заклинания',
+  'hudChrome.auraOverlay.arcs': 'Боковые серпы',
+  'hudChrome.auraOverlay.groundRing': 'Кольцо на земле',
+  'hudChrome.auraOverlay.groundRingSpellOrder': 'Кольцо на земле: порядок заклинаний',
+  'hudChrome.auraOverlay.crescentsSpellOrder': 'Боковые серпы: порядок заклинаний',
+  'hudChrome.auraOverlay.size': 'Размер',
+  'hudChrome.auraOverlay.iconSize': 'Размер значка',
+  'hudChrome.auraOverlay.crescentBlockSize': 'Размер блока серпа',
+  'hudChrome.auraOverlay.groundRingBlockSize': 'Размер блока кольца',
+  'hudChrome.auraOverlay.opacity': 'Непрозрачность',
+  'hudChrome.auraOverlay.color': 'Цвет',
+  'hudChrome.auraOverlay.allOn': 'Все вкл.',
+  'hudChrome.auraOverlay.allOff': 'Все выкл.',
+  'hudChrome.auraOverlay.reposition': 'Настроить позиции',
+  'hudChrome.auraOverlay.positioning': 'Позиция: {aura}',
+  'hudChrome.auraOverlay.selectAura': 'Аура',
+  'hudChrome.auraOverlay.done': 'Готово',
+  'hudChrome.auraOverlay.moveLeft': 'Влево',
+  'hudChrome.auraOverlay.moveUp': 'Вверх',
+  'hudChrome.auraOverlay.moveDown': 'Вниз',
+  'hudChrome.auraOverlay.moveRight': 'Вправо',
+  'hudChrome.auraOverlay.moveEarlier': 'Сдвинуть заклинание внутрь',
+  'hudChrome.auraOverlay.moveLater': 'Сдвинуть заклинание наружу',
+  'hudChrome.auraOverlay.screenPosition': 'Позиция на экране',
+  'hudChrome.auraOverlay.spellOrder': 'Порядок заклинаний',
+  'hudChrome.auraOverlay.reset': 'Сбросить позицию',
+  'hudChrome.auraOverlay.spellPosition': 'Порядок заклинаний {position} / {count}',
+  'hudChrome.auraOverlay.procs.revenge': 'Месть!',
+  'hudChrome.auraOverlay.procs.battleTrance': 'Боевой транс',
+  'hudChrome.auraOverlay.procs.overpowerCharge': 'Усиление красной руки',
+  'hudChrome.auraOverlay.procs.suddenDeath': 'Внезапная смерть',
+  'hudChrome.auraOverlay.procs.victoryRush': 'Победный натиск',
+  'hudChrome.auraOverlay.procs.enrage': 'Хаос: Ярость',
+  'hudChrome.auraOverlay.procs.heatingUp': 'Разогрев',
+  'hudChrome.auraOverlay.procs.arcaneCharge': 'Чародейские заряды',
+  'hudChrome.auraOverlay.procs.aetherRush': 'Эфирный натиск',
 };

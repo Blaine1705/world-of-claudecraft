@@ -1116,6 +1116,21 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // OTA update check (server/ota_updates.ts): registry-only RouteDef, same
+  // new-route rule as the deeds trio. The Capgo capacitor-updater plugin in
+  // the native mobile shells POSTs its device/version check-in here; the
+  // server answers from the cached self-hosted bundle manifest (no DB), and
+  // OTA_MANIFEST_URL unset keeps the feature dark (always "no update").
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/ota/updates',
+    handler: 'server/ota_updates.ts otaUpdatesHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: 'publicReadRateLimited',
+    requireOwnedExpected: null,
+  },
   // Steam link family (server/steam/routes.ts): registry-only RouteDefs, same
   // new-route rule as the deeds pair. The whole trio is env-gated dark
   // (steam.disabled 503 until STEAM_ENABLED=1); the auth scopes below describe
@@ -1145,6 +1160,39 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     method: 'GET',
     path: '/api/steam/status',
     handler: 'server/steam/routes.ts statusHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  // Epic link family (server/epic/routes.ts): registry-only RouteDefs, twin of
+  // the Steam trio. Env-gated dark (epic.disabled 503 until EPIC_ENABLED=1);
+  // linking is NEVER an identity or session source.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/epic/link',
+    handler: 'server/epic/routes.ts linkHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'epicLinkRateLimited',
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'DELETE',
+    path: '/api/epic/link',
+    handler: 'server/epic/routes.ts unlinkHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/epic/status',
+    handler: 'server/epic/routes.ts statusHandler (registry-only RouteDef)',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.bearer,
     limiter: null,

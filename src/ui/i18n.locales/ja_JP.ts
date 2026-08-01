@@ -2282,6 +2282,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': 'そのクエストの依頼主が近くにいません。',
   'questUi.errors.turnInMissing': 'そのクエストの報告先が近くにいません。',
   'questUi.errors.tooFar': '遠すぎます。',
+  'questUi.errors.escortAway': '護衛する相手は今その場所にいません。しばらくすれば戻ってきます。',
   'itemUi.money.goldShort': '金',
   'itemUi.money.silverShort': '銀',
   'itemUi.money.copperShort': '銅',
@@ -4368,6 +4369,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': '英雄の証',
   'hudChrome.raidLockout.heroicName': 'ヒロイック:{name}',
   'hudChrome.raidLockout.heroicLocked': 'ヒロイックの{name}にロックされています。',
+  'hudChrome.riftTracker.title': 'リフト',
+  'hudChrome.riftTracker.floor': 'フロア {current}/{total}',
+  'hudChrome.riftTracker.closesIn': 'リフトは{time}後に閉じます',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
   'entities.items.morthens_cryptforged_hauberk.name': 'モルセンの墓鋳ホーバーク',
   'entities.items.shadowpulse_handwraps.name': 'シャドウパルスの手巻き',
   'entities.items.bonechill_striders.name': 'ボーンチルのストライダー',
@@ -4615,7 +4621,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': '守将コールファストに報告した',
   'entities.quests.q_fs_bram_come_home.title': 'ブラムを家へ',
   'entities.quests.q_fs_bram_come_home.text':
-    'うちのブラムは、網場の裂け目が開いたあの朝に船を出して、海は船着き場の岬の先のどこかに彼を打ち返した。三晩前に聞いたんだ、{playerName}、水の向こうから呼ぶ声を。なのに怖くて行けなかった。今でも怖い。お願いだ。彼の船は北の岸で難破している。彼を家まで連れて帰っておくれ。',
+    'うちのブラムは、網場の裂け目が開いたあの朝に船を出して、海は船着き場の岬の先のどこかに彼を打ち返した。三晩前に聞いたんだ、{playerName}、水の向こうから呼ぶ声を。なのに怖くて行けなかった。今でも怖い。お願いだ。彼の船は南の岸で難破している。彼を家まで連れて帰っておくれ。',
   'entities.quests.q_fs_bram_come_home.completion':
     'ブラム！五体満足で連れ帰ってくれたんだね、{playerName}。ふたりして泣いたけど、どちらも恥じてなんかいないよ。裂け目どもが次にこの島から何を奪おうと、うちの家族だけは渡さない。もう二度と。',
   'entities.quests.q_fs_bram_come_home.objectives.0.label': '漁師ブラムをカモメ港まで送り届けた',
@@ -4700,7 +4706,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_rime_unbound.objectives.0.label': '霧氷の精霊を倒した',
   'entities.quests.q_fv_seeing_wren_home.title': 'レンを送り届けて',
   'entities.quests.q_fv_seeing_wren_home.text':
-    '弟子のレンが二日前にゴールドメルトの罠のラインを見回りに出て、戻ってこない。足跡は見つけた。オーロラの階段の南西の道標の下に隠れて、狼が怖くて動けずにいるんだ。わたしは沼を離れられない、{playerName}。あの子を階段のヴェイラの野営まで歩かせてやってくれ。光の下なら安全だ。',
+    '弟子のレンが二日前にゴールドメルトの罠のラインを見回りに出て、戻ってこない。足跡は見つけた。オーロラの階段の北東の道標の下に隠れて、狼が怖くて動けずにいるんだ。わたしは沼を離れられない、{playerName}。あの子を階段のヴェイラの野営まで歩かせてやってくれ。光の下なら安全だ。',
   'entities.quests.q_fv_seeing_wren_home.completion':
     'あの子は中にいるよ。わたしの毛布を半分体に巻きつけて、空から星を語り落とす勢いでしゃべっている。今日、お前は優しいことをしたね、{playerName}。この果ての地では、めったに見られないものだよ。',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
@@ -6763,12 +6769,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.duskGreeter': '守り手セルウィン、エルダーグリーム',
   'guide.worldPage.duskPlaceNotes':
     'エルダーグリームは大樹の下に集う。ダスクフォール洞窟とその見晴らし台が入り口であり、谷を初めて望む場所でもある。長老樹の森と星降りの盆地は静かな南を守り、沈んだ宮廷は東で草に覆われた遺跡を抱え、輝きの深みと水晶の浅瀬は北で淡く光る。',
-  'guide.family.murloc.name': 'クロークフィン',
-  'guide.family.murloc.desc':
-    '湖岸や潮だまりに棲む、しわがれ声の魚人たち。近づきすぎた者には、すぐさま群れをなして襲いかかります。',
-  'guide.family.kobold.name': 'いたずら小妖',
-  'guide.family.kobold.desc':
-    '林間や生け垣をちょろちょろと駆け回る、漁り屋の小妖たち。数が揃うまでは、脅威というより厄介者です。',
   'guide.family.demon.name': 'デーモン',
   'guide.family.demon.desc':
     '裂け目の彼方から来た侵略者たち。その身は炎と悪意のかたまりです。一体がいるところ、次元の裂け目は決して遠くありません。',
@@ -8089,6 +8089,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': 'リクエストが大きすぎます。データを減らしてもう一度お試しください。',
   'apiError.body.unsupported_media_type': 'サポートされていないリクエスト形式です。',
   'apiError.deeds.invalid_input': '入力が無効です。',
+  'apiError.ota_updates.invalid_input': '入力が無効です。',
   'apiError.steam.disabled': 'Steam連携は現在利用できません。',
   'apiError.wallet.handoff_invalid':
     'ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。',
@@ -8098,6 +8099,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.already_linked': 'このアカウントには既にSteamアカウントが連携されています。',
   'apiError.steam.account_taken': 'そのSteamアカウントは既に別のアカウントに連携されています。',
   'apiError.steam.upstream': 'Steamから応答がありません。しばらくしてからもう一度お試しください。',
+  'apiError.epic.disabled': 'Epic連携は現在利用できません。',
+  'apiError.epic.invalid_token':
+    'Epicがこの連携リクエストを確認できませんでした。デスクトップアプリからもう一度お試しください。',
+  'apiError.epic.banned': 'そのEpicアカウントは連携できません。',
+  'apiError.epic.already_linked': 'このアカウントには既にEpicアカウントが連携されています。',
+  'apiError.epic.account_taken': 'そのEpicアカウントは既に別のアカウントに連携されています。',
+  'apiError.epic.upstream': 'Epicから応答がありません。しばらくしてからもう一度お試しください。',
   'apiError.db.conflict': 'その変更が別の更新と競合しました。もう一度お試しください。',
   'apiError.rate_limit.exceeded': 'リクエストが多すぎます。{seconds} 後に再度お試しください。',
   'apiError.internal.error': 'サーバー側で問題が発生しました。もう一度お試しください。',
@@ -8962,6 +8970,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'デスクトップアプリからSteamアカウントを連携すると、獲得した功績がSteam実績に反映されます。',
   'hudChrome.steam.noTicket':
     'Steamから連携チケットを取得できませんでした。Steamを起動してからもう一度お試しください。',
+  'hudChrome.epic.link': 'Epicと連携',
+  'hudChrome.epic.unlink': 'Epic連携を解除',
+  'hudChrome.epic.linked': 'Epicアカウント {id} と連携済み',
+  'hudChrome.epic.benefits':
+    'EpicデスクトップアプリからEpicアカウントを連携すると、獲得した功績がEpic実績に反映されます。',
+  'hudChrome.epic.noProof':
+    'Epicから連携証明を取得できませんでした。Epic Games Storeから起動してからもう一度お試しください。',
+  'hudChrome.epic.title': 'Epic',
   'hudChrome.deeds.title': '功績の書',
   'hudChrome.deeds.close': '功績の書を閉じる',
   'hudChrome.deeds.searchPlaceholder': '功績を検索',
@@ -9067,6 +9083,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '影跳びのカマカゲ',
   'hudChrome.mounts.name_stormfeather_griffin': 'スカイリーチ・ストームフェザー',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
+  'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのテラースパーク',
   'hudChrome.mounts.desc_valorsteed': '頑健で足取り確かな駿馬。移動速度を高める。',
   'hudChrome.mounts.desc_grag_bear': '頑健で足取り確かな熊。移動速度を高める。',
   'hudChrome.mounts.desc_stalkglider_snail': '粘り強くゆっくり燃えるカタツムリ。移動速度を高める。',
@@ -9078,6 +9095,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     '嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。',
+  'hudChrome.mounts.desc_terrorspark_groundshaker':
+    '重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。',
   'hudChrome.mounts.emptyTitle': 'マウントは未入手',
   'hudChrome.mounts.emptyStableHint':
     'レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。',
@@ -9176,11 +9195,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '日々使う便利なコマンドをいくつか覚えておくとよいでしょう。/w 名前 でウィスパーを送り、/r で最後に受け取ったウィスパーに返信します。/invite で誰かをパーティに誘い、/follow で仲間の後ろについて歩き、/roll でグループの全員に見えるサイコロを振り、/who でオンラインの相手を確認し、/afk で離席中を示します。全一覧はゲーム内で /help と打てば見られます。',
   'guide.social.slashHeading': '便利なスラッシュコマンド',
   // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.helpUnstuckSickness':
+    '復帰：/unstuck はその場でカウントダウンを開始し、完了すると最寄りの墓地へ移動します。倒れていた場合は蘇生します。スタック解除の後遺症が最大5分間残ります。',
   'hudChrome.unstuck.menuButton': 'スタック解除',
   'hudChrome.unstuck.help':
     '復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。',
   'hudChrome.unstuck.helpAtGraveyard':
     '復帰：/unstuck はその場でカウントダウンを開始し、完了すると魂を最寄りの墓地へ送ります。生き返るには霊魂の癒し手から番人の代償を受ける必要があります。',
+  'hudChrome.unstuck.movedToGraveyard':
+    '最寄りの墓地へ移動しました。スタック解除の後遺症があなたにのしかかっています。',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    '最寄りの墓地へ移動し、蘇生しました。スタック解除の後遺症があなたにのしかかっています。',
   'hudChrome.unstuck.started':
     '{seconds}秒後にスタックを解除します。移動、戦闘、被ダメージ、別の行動を始めるとキャンセルされます。',
   'hudChrome.unstuck.countdown': 'スタック解除：{seconds}',
@@ -9388,7 +9413,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'フリッカーステップ、フロストヴェール、グレーターインビジビリティのクールダウンを完了させます。（メイジタレント）',
   'entities.abilities.greater_invisibility.name': 'グレーターインビジビリティ',
   'entities.abilities.greater_invisibility.description':
-    '20秒間姿を消します。継続ダメージ効果を2個解除し、透明状態の間と解除直後は受けるダメージが90%減少します。（メイジタレント）',
+    '20 秒間姿を消し、継続ダメージ効果を 2 つ取り除く。透明化が終了すると、2 秒間、受けるダメージが 90% 減少する。（メイジのタレント）',
   'entities.abilities.hot_streak.name': 'ホットストリーク',
   'entities.abilities.hot_streak.description':
     'パッシブ：火系呪文（ファイアボール、ファイアブラスト、スコーチ、パイロブラスト、フレイムストライク）で2回連続してクリティカルを出すと、次のパイロブラストまたはフレイムストライクが即時発動となり、コストがなくなります。消費呪文は無料発動も含めて次の連続判定に加算されます。フレイムストライクは命中した敵の数にかかわらず1回のみ加算され、最初の着弾だけが判定されます。（火）',
@@ -9529,6 +9554,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.maxHpPct': '最大体力を{pct}%上昇させる',
   'hud.combat.floatingParry': '受け流し',
   'hud.combat.parried': '{target}は{ability}を受け流しました。',
+  'hud.combat.floatingEvade': '完全回避',
+  'hud.combat.evaded': '{target}は{ability}を完全回避しました。',
   'hudChrome.options.mouseoverCast': 'パーティフレームでマウスオーバーキャスト',
   'hudChrome.options.showTargetOfTarget': 'ターゲットのターゲットを表示',
   'hudChrome.options.stickyTarget': '地面クリックでターゲットを維持',
@@ -9850,6 +9877,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最後の砦',
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.last_keep_signet.name': '最後の砦の印章',
+  'entities.items.reins_terrorspark_groundshaker.name': 'テラースパークの始動キー',
   'entities.dungeons.the_last_keep.leaveText': '砦の扉を閉め、ドレイクランドの風の中へ戻った。',
   'entities.items.wildheart_tuskblade.name': 'ワイルドハートの牙大剣',
   'entities.items.wildheart_hexwood_staff.name': '盆地の呪木杖',
@@ -10654,4 +10682,60 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.levels': 'レベル {min} から {max}',
   'hudChrome.continentMap.toZone': 'ゾーンマップ',
   'hudChrome.enchanting.wornTagIndexed': '装備中 ({slot}{index})',
+  'hudChrome.targetAuras.title': 'ターゲットのオーラ',
+  'hudChrome.targetAuras.keybindLabel': 'ターゲットのバフとデバフ',
+  'hudChrome.targetAuras.debuffs': 'デバフ',
+  'hudChrome.targetAuras.buffs': 'バフ',
+  'hudChrome.targetAuras.unlock': 'ターゲットオーラウィンドウを移動',
+  'hudChrome.targetAuras.lock': 'ターゲットオーラウィンドウをロック',
+  'hudChrome.targetAuras.configureRows': 'ターゲットオーラを設定',
+  'hudChrome.targetAuras.fewerRows': 'オーラ行数を少なくする',
+  'hudChrome.targetAuras.moreRows': 'オーラ行数を多くする',
+  'hudChrome.targetAuras.visibleRows': '優先するオーラ行数: {count}',
+  'hudChrome.targetAuras.showSources': 'オーラの使用者名を表示',
+  'hudChrome.targetAuras.hideSources': 'オーラの使用者名を非表示',
+  'hudChrome.targetAuras.ownAura': '自分のオーラ',
+  'hudChrome.targetAuras.opacity': 'オーラの不透明度: {percent}',
+  'hudChrome.auraOverlay.title': 'オーラ',
+  'hudChrome.auraOverlay.currentClass': '現在のクラス: {class}',
+  'hudChrome.auraOverlay.previewHint':
+    '「位置を設定」でオーラを動かし、メニューを隠さないようにします。',
+  'hudChrome.auraOverlay.noProcs': 'このキャラクターに対応する発動効果がありません。',
+  'hudChrome.auraOverlay.enabled': 'オーラを表示',
+  'hudChrome.auraOverlay.icon': 'スペルアイコン',
+  'hudChrome.auraOverlay.arcs': 'サイドクレセント',
+  'hudChrome.auraOverlay.groundRing': 'グラウンドリング',
+  'hudChrome.auraOverlay.groundRingSpellOrder': 'グラウンドリング: スペル順',
+  'hudChrome.auraOverlay.crescentsSpellOrder': 'サイドクレセント: スペル順',
+  'hudChrome.auraOverlay.size': 'サイズ',
+  'hudChrome.auraOverlay.iconSize': 'アイコンサイズ',
+  'hudChrome.auraOverlay.crescentBlockSize': 'クレセントブロックサイズ',
+  'hudChrome.auraOverlay.groundRingBlockSize': 'グラウンドリングブロックサイズ',
+  'hudChrome.auraOverlay.opacity': '不透明度',
+  'hudChrome.auraOverlay.color': '色',
+  'hudChrome.auraOverlay.allOn': 'すべてオン',
+  'hudChrome.auraOverlay.allOff': 'すべてオフ',
+  'hudChrome.auraOverlay.reposition': '位置を設定',
+  'hudChrome.auraOverlay.positioning': '配置: {aura}',
+  'hudChrome.auraOverlay.selectAura': 'オーラ',
+  'hudChrome.auraOverlay.done': '完了',
+  'hudChrome.auraOverlay.moveLeft': '左へ移動',
+  'hudChrome.auraOverlay.moveUp': '上へ移動',
+  'hudChrome.auraOverlay.moveDown': '下へ移動',
+  'hudChrome.auraOverlay.moveRight': '右へ移動',
+  'hudChrome.auraOverlay.moveEarlier': 'スペルを内側へ',
+  'hudChrome.auraOverlay.moveLater': 'スペルを外側へ',
+  'hudChrome.auraOverlay.screenPosition': '画面位置',
+  'hudChrome.auraOverlay.spellOrder': 'スペル順',
+  'hudChrome.auraOverlay.reset': '位置をリセット',
+  'hudChrome.auraOverlay.spellPosition': 'スペル順 {position} / {count}',
+  'hudChrome.auraOverlay.procs.revenge': 'リベンジ！',
+  'hudChrome.auraOverlay.procs.battleTrance': 'バトルトランス',
+  'hudChrome.auraOverlay.procs.overpowerCharge': 'レッドハンドエンパワー',
+  'hudChrome.auraOverlay.procs.suddenDeath': 'サドンデス',
+  'hudChrome.auraOverlay.procs.victoryRush': 'ビクトリーラッシュ',
+  'hudChrome.auraOverlay.procs.enrage': 'メイヘム: エンレイジ',
+  'hudChrome.auraOverlay.procs.heatingUp': 'ヒーティングアップ',
+  'hudChrome.auraOverlay.procs.arcaneCharge': 'アーケインチャージ',
+  'hudChrome.auraOverlay.procs.aetherRush': 'エーテルラッシュ',
 };

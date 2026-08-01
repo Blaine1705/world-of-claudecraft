@@ -112,6 +112,7 @@ export const IWORLD_MEMBERS = [
   { name: 'questsDone', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
+  { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
   { name: 'castAbility', kind: 'method' },
   { name: 'castAbilityAt', kind: 'method' },
   { name: 'castAbilityBySlot', kind: 'method' },
@@ -321,6 +322,7 @@ export const IWORLD_MEMBERS = [
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
+  { name: 'riftEventMsRemaining', kind: 'method' }, // ms until the rift event stops admitting parties
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
   { name: 'setDungeonDifficulty', kind: 'method' },
   { name: 'buyHeroicVendorItem', kind: 'method' },
@@ -493,11 +495,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Rift + mounts surface. The v0.31.0 base merge added the release's three new
     // members on top of the branch's 272; making reins usable items then removed
     // two (selectedMount + selectMount) for 273; the v0.32.0 base merge adds
-    // activeMasterLootRolls, leaving 274; the instance-payload pipes add
-    // marketListInstance, leaving 275.
-    expect(IWORLD_MEMBERS.length).toBe(275);
+    // activeMasterLootRolls, leaving 274; the rift floor timer HUD adds
+    // riftEventMsRemaining and the instance-payload pipes add
+    // marketListInstance, leaving 276. Reactive aura timing adds
+    // reactiveAbilityWindowRemaining, leaving 277.
+    expect(IWORLD_MEMBERS.length).toBe(277);
     expect(DATA_MEMBERS.length).toBe(72);
-    expect(METHOD_MEMBERS.length).toBe(203);
+    expect(METHOD_MEMBERS.length).toBe(205);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -706,6 +710,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questState',
       'questsDone',
       'raidLockouts',
+      'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
       'realm',
       'recipeList',
@@ -723,6 +728,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'ridingTrained',
       'riftBossDeathZones',
       'riftCollisionToken',
+      'riftEventMsRemaining',
       'riftFloor',
       'salvageItem',
       'saveActionBarLayout',
@@ -1007,6 +1013,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'prestige',
       'questState',
       'raidLockouts',
+      'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
       'releaseEmpoweredAbility',
       'releaseSpirit',
@@ -1019,6 +1026,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'revivePet',
       'ridingTrained',
       'riftBossDeathZones',
+      'riftEventMsRemaining',
       'salvageItem',
       'saveActionBarLayout',
       'saveLoadout',
@@ -1142,6 +1150,7 @@ const FACET_COMBAT = [
   'known',
   'activeFrostRings',
   'activeTemporalHourglasses',
+  'reactiveAbilityWindowRemaining',
   'castAbility',
   'castAbilityAt',
   'castAbilityBySlot',
@@ -1415,6 +1424,7 @@ const FACET_DUNGEONS = [
   'riftCollisionToken',
   'riftFloor',
   'riftBossDeathZones',
+  'riftEventMsRemaining',
   'dungeonDifficulty',
   'setDungeonDifficulty',
   'buyHeroicVendorItem',
@@ -1607,8 +1617,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(275);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(275);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(277);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(277);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

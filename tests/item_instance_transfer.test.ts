@@ -56,9 +56,8 @@ describe('publicInstanceView: the display trim', () => {
   it('never aliases the live rolled maps into the projection', () => {
     const live: ItemInstancePayload = { rolled: { stats: { str: 2 } } };
     const pub = publicInstanceView(live);
-    if (!pub.rolled?.stats) throw new Error('missing projected rolled stats');
-    pub.rolled.stats.str = 99;
-    expect(live.rolled?.stats?.str).toBe(2);
+    pub.rolled!.stats!.str = 99;
+    expect(live.rolled!.stats!.str).toBe(2);
   });
 
   it('matches the eqi wire allowlist in server/game.ts: widen both or neither', () => {
@@ -162,6 +161,25 @@ describe('canGrantCopies / grantCopies: the shared exchange-pipe pair', () => {
     expect(canGrantCopies(signedStack, 1, 'pristine_hide', 1)).toBe(false);
   });
 
+  // #2605 review (Rubsey/OSSBrain): canGrantCopies must model the same
+  // craftedRecipeId bucketing grantCopies grants with, or a pre-check can see
+  // room in an existing marker-free stack the real grant (addStacked, keyed
+  // on the marker) cannot merge into, overfilling the recipient's bags past
+  // the modelled cap.
+  it('capacity: a marker-free stack is not room for a crafted-provenance grant, and the reverse', () => {
+    const plainStack: InvSlot[] = [{ itemId: 'pristine_hide', count: 1 }];
+    // One free slot short: the plain stack tops up for a marker-free grant,
+    // but a crafted-marker grant of the same itemId cannot merge into it and
+    // needs its own fresh slot.
+    expect(canGrantCopies(plainStack, 1, 'pristine_hide', 1)).toBe(true);
+    expect(canGrantCopies(plainStack, 1, 'pristine_hide', 1, undefined, 'recipe_x')).toBe(false);
+    const craftedStack: InvSlot[] = [
+      { itemId: 'pristine_hide', count: 1, craftedRecipeId: 'recipe_x' },
+    ];
+    expect(canGrantCopies(craftedStack, 1, 'pristine_hide', 1, undefined, 'recipe_x')).toBe(true);
+    expect(canGrantCopies(craftedStack, 1, 'pristine_hide', 1)).toBe(false);
+  });
+
   it('grant routes instanced copies through addItemInstance with a DEEP CLONE', () => {
     const calls: { kind: string; instance?: ItemInstancePayload }[] = [];
     const ctx = {
@@ -186,9 +204,8 @@ describe('canGrantCopies / grantCopies: the shared exchange-pipe pair', () => {
     const granted = calls[1].instance;
     expect(granted).toEqual(source);
     expect(granted).not.toBe(source);
-    if (!granted?.rolled?.stats) throw new Error('missing granted rolled stats');
-    granted.rolled.stats.agi = 99;
-    expect(source.rolled?.stats?.agi).toBe(2);
+    granted!.rolled!.stats!.agi = 99;
+    expect(source.rolled!.stats!.agi).toBe(2);
   });
 });
 

@@ -138,6 +138,7 @@ const simFiles = walk(simRoot);
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/aura_overlay_view.ts',
   'src/ui/proc_overlay_view.ts',
   'src/ui/camera_prompt_core.ts',
   'src/ui/chat_ignore_core.ts',
@@ -247,6 +248,7 @@ const UI_PURE_CORES = [
   'src/ui/mobile_hud_layout.ts',
   'src/ui/mobile_fullscreen_window_core.ts',
   'src/ui/auras_view.ts',
+  'src/ui/target_auras_view.ts',
   'src/ui/minimap_markers.ts',
   'src/ui/gathering_view.ts',
   'src/ui/gather_tool_tooltip.ts',
@@ -273,6 +275,7 @@ const UI_PURE_CORES = [
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/ui/trade_view.ts',
+  'src/ui/hud/rift/rift_floor_tracker_view.ts',
   'src/ui/safe_local_storage.ts',
 ].map((rel) => join(repoRoot, rel));
 
@@ -326,6 +329,7 @@ const RENDER_PURE_CORES = [
   'src/render/foliage_lod.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
+  'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
   'src/render/zone_feature_visibility_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
@@ -1253,6 +1257,7 @@ const UI_DOM_MODULES = [
   'src/ui/dialog_key_activation.ts',
   'src/ui/discord_widget.ts',
   'src/ui/entry_guard_banner.ts',
+  'src/ui/epic_link.ts',
   'src/ui/focus_manager.ts',
   'src/ui/focus_restore.ts',
   'src/ui/form_draft.ts',
@@ -1297,6 +1302,9 @@ const UI_DOM_MODULES = [
   'src/ui/mobile_wallet_launcher.ts',
   'src/ui/mount_race_controls.ts',
   'src/ui/mount_race_strip.ts',
+  'src/ui/aura_overlay_config.ts',
+  'src/ui/aura_overlay_controller.ts',
+  'src/ui/aura_overlay_settings.ts',
   'src/ui/movable_frame.ts',
   'src/ui/native_update_prompt.ts',
   'src/ui/options_window.ts',
@@ -1317,9 +1325,11 @@ const UI_DOM_MODULES = [
   'src/ui/social_window.ts',
   'src/ui/spectate_badge.ts',
   'src/ui/spellbook_window.ts',
+  'src/ui/start_skin_picker_portraits.ts',
   'src/ui/steam_link.ts',
   'src/ui/store_stack_diag.ts',
   'src/ui/talents_window.ts',
+  'src/ui/target_auras_window.ts',
   'src/ui/theme.ts',
   'src/ui/touch_item_drag.ts',
   'src/ui/touch_tap.ts',

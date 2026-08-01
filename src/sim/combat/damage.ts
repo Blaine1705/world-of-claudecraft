@@ -143,7 +143,25 @@ export function dealDamage(
   // Classic mechanics make it immune while it retreats, so it can't be chipped
   // down or killed outright for a risk-free kill. Owned pets use pet AI, not
   // wild-mob leash recovery, and must not inherit this immunity from stale state.
-  if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return 0;
+  // Direct attacks report an Evade result (FCT word + combat log line); DoT and
+  // reflect ticks stay silent so a dotted evader does not spam a word per tick.
+  // The early return keeps every downstream effect off: no threat, no combat
+  // entry, no stealth break, no tap.
+  if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) {
+    if (direct && source) {
+      ctx.emit({
+        type: 'damage',
+        sourceId: source.id,
+        targetId: target.id,
+        amount: 0,
+        crit: false,
+        school,
+        ability,
+        kind: 'evade',
+      });
+    }
+    return 0;
+  }
   amount = Math.max(0, amount);
   const attackAnimation = attackAnimationStarted ? { attackAnimationStarted: true as const } : {};
 
@@ -485,12 +503,21 @@ export function dealDamage(
     }
   }
 
-  // duels end at 1 hp, nobody dies
+  // duels end at 1 hp, nobody dies. A duel that already ended earlier THIS
+  // SAME tick (endDuel defers the ctx.duels delete to tick-tail, see
+  // social/duel.ts) still matches here on purpose: a reciprocal lethal hit
+  // against the other duelist, resolving later in the same tick, must be
+  // clamped too instead of producing a real death on a simultaneous double-kill.
+  // Keyed purely on lifetime (still live, or ended this very tick) rather than
+  // `duel.state === 'active'`: state is never flipped when a duel ends, so an
+  // ended entry that outlives its own tick (only reachable today via
+  // Sim.removePlayer ending a duel outside a tick) would otherwise still clamp
+  // for one extra tick.
   const duel = target.kind === 'player' ? ctx.duels.get(target.id) : undefined;
   if (
     guardianWardRestore === 0 &&
     duel &&
-    duel.state === 'active' &&
+    (duel.endedTick === undefined || duel.endedTick === ctx.tickCount) &&
     sourcePlayer &&
     (sourcePlayer.id === duel.a || sourcePlayer.id === duel.b)
   ) {
