@@ -16,7 +16,7 @@
 | Phase 5 QA | done | 2026-08-01 | 2026-08-01 |
 | Phase 6: Bot consumes the new surface | built | 2026-08-01 | 2026-08-01 |
 | Phase 6 QA | complete | 2026-08-01 | 2026-08-01 |
-| Phase 7: Supervision + deploy hardening | not started | | |
+| Phase 7: Supervision + deploy hardening | built | 2026-08-01 | 2026-08-01 |
 | Phase 7 QA | not started | | |
 | Phase 8: Observability | not started | | |
 | Phase 8 QA | not started | | |
@@ -74,10 +74,13 @@
 - [x] Integration test of a full sweep cycle at the D18 envelope
 
 ### Phase 7
-- [ ] Fatal gateway close exits nonzero; heartbeat file
-- [ ] Compose healthcheck + mem_limit + stop_grace_period for the bot service
-- [ ] Caddy 404s `/internal/*`
-- [ ] Deploy test pins extended; DEPLOY.md bot section + runbook
+- [x] Fatal gateway close exits nonzero; heartbeat file
+- [x] Compose healthcheck + mem_limit + stop_grace_period for the bot service
+- [x] Caddy 404s `/internal/*`
+- [x] Deploy test pins extended; DEPLOY.md bot section + runbook
+- [x] Ledger burn-down routed here by state.md (added, not in the original checklist):
+      L18 reconnect lifecycle, L10/L17 Discord call deadline, L13 permanent-400 caching,
+      L6 bot-specific tsconfig
 
 ### Phase 8
 - [ ] Counters ride presence POST (both arms), clamped server-side
@@ -1191,3 +1194,84 @@ moderation db file 26 with the database (clean skips without); `npm run build:se
 exit 0; `npm run ci:changed` clean (warnings only, pre-existing). Full `npm run gate`
 not run for the known sibling-worktree malware false-positive (four foreign worktrees
 are parked inside the repo root); the steps it would add ran by hand above.
+
+### Phase 7 (2026-08-01)
+
+Release sync: NO-OP. `origin/release/v0.34.0` on a fresh fetch measured 101 ahead /
+0 behind, so the Phase 6 QA session's merge (`50883ce3d`) had already captured the tip
+and there was nothing to merge and no release-merge audit.
+
+Built as three parallel Agent slices per the phase file (no Workflow), each owning a
+disjoint file set, with the cross-slice contract (module names, env keys, defaults, the
+Caddy matcher string, the tsconfig shape) fixed by the orchestrator up front so the
+slices could not drift. The known idle-without-report delivery trap struck on all three
+agents; one SendMessage nudge each recovered the full reports.
+
+What shipped, beyond the checklist headline:
+
+- A fatal gateway close now logs and exits 1 through a third trailing injectable
+  constructor seam (`exitProcess`), the same convention as the Phase 1 socket/timer
+  seams; the close-code decision moved to `bot/logic.ts` as the pure `isFatalCloseCode`.
+  R13 stands: the crash loop under `restart: unless-stopped` is the desired visible
+  failure, no retry limiter added.
+- L18 closed: `reconnect()` now calls `stopHeartbeat()` before swapping sockets. The
+  decisive test needed the gateway suite's fake timer rig extended to MODEL
+  clearInterval (a cancelled interval refuses to tick), because the pre-existing
+  "does not stack a second interval" shape passes with or without the fix; the bug
+  lives only in the window between `reconnect()` and the new socket's HELLO.
+- The heartbeat file: `bot/liveness.ts` (named to avoid colliding with the gateway's
+  protocol heartbeat), wired as the SIXTH scheduler task `heartbeat-file`; the wiring
+  pin moved 5 to 6, BOT_ENV_KEYS 24 to 26 (`DISCORD_HEARTBEAT_FILE`,
+  `DISCORD_HEARTBEAT_INTERVAL_MS`). `writeHeartbeatFile` returns a boolean rather than
+  void so the logged-not-fatal failure path is assertable without a console spy.
+- L10/L17 closed: `DISCORD_CALL_TIMEOUT_MS` (15000, a code constant copying the
+  sanctioned `SERVER_CALL_TIMEOUT_MS` pattern) arms an AbortController INSIDE the
+  governor-dispatched send closure, so queue wait never counts against the deadline
+  and a stalled Discord socket can no longer park a scheduler loop for the life of
+  the process. The `bot/CLAUDE.md` settle rule was rewritten to match: both IO shells
+  now carry deadlines, and the always-settle rule stays normative for new runs.
+- L13 closed with one deliberate deviation from the plan's "same arm" phrasing: a 400
+  with a subject key now populates the forbidden cache (TTL-bounded, so a later
+  legitimate write for the same subject is deferred at most `DISCORD_FORBIDDEN_TTL_MS`,
+  never lost) but spends NO invalid-request breaker budget, because Discord's ban
+  counter tracks 401/403/429 and never 400, and a counted 400 swept across a few
+  hundred members would open the breaker guild-wide. Pinned in both directions and
+  mutation-confirmed (adding 400 to the `recordInvalid` arm turns the suite red).
+- L6 closed: `tsconfig.bot.json` (lib ES2022, types node, include bot) ADDED to the
+  checked set beside the root config, `check:ts:bot` chained into `check:types`. The
+  Node-only typecheck surfaced ZERO latent DOM globals across all 13 bot files, and the
+  gate was proven non-vacuous with a scratch probe (document/localStorage red as TS2584
+  under the same flags): fetch/AbortController/Response all resolve from @types/node.
+- Deploy: the compose healthcheck probes heartbeat-file FRESHNESS (missing, unreadable,
+  and stale all exit nonzero) with a node one-liner containing no `$` (compose would
+  interpolate it); `stop_grace_period: 15s`, `mem_limit`/`memswap_limit: 512m`, each
+  with a why-paragraph comment in the game service's style. The build session also
+  found and fixed a gap nothing in the plan named: compose forwarded only 13 env keys,
+  so ALL ELEVEN tunable knobs were inert in production; 14 keys were added to the
+  passthrough (the 11 knobs plus the three heartbeat keys) or DEPLOY.md's incident
+  levers would have documented a lie.
+- Caddy: `/internal/*` joined the @ops 404 matcher in BOTH `deploy/user-data.sh`
+  heredocs (byte-identical, tab-indented) and both DEPLOY.md snippets. The old matcher
+  string is a strict PREFIX of the new one, so the pre-existing watchdog pins would
+  have stayed vacuously green; `tests/deploy_watchdog.test.ts` now counts both forms
+  at 3 so a stale short copy cannot ride back in via a by-hand retrofit.
+- DEPLOY.md gained its first `## Discord bot` section (27 env keys with incident
+  guidance, health verification, the by-design crash-loop paragraph, and the
+  incident-2026-07-29 runbook with healthy-reading lines), and the four falsified edge
+  claims were rewritten (R12): the restart-countdown parenthetical, the metrics
+  three-ops-paths claim, the by-hand retrofit snippet, and the section 4 TLS snippet.
+
+Mutation tally across both build agents: 12 planted, 12 killed with named failing
+tests (6 bot-side including the reconnect and deadline arms, 6 deploy-side including
+unhardening the bot service while the game stays hardened, which proves the
+service-slice helper is real).
+
+Validation: `npx tsc --noEmit` and `npx tsc -p tsconfig.bot.json` clean;
+263 tests green across the nine bot and deploy suites in one run; `npm run build:bot`
+bundles; `npm run ci:changed` exit 0 (warnings only, pre-existing). Full
+`npm run gate` not run for the known sibling-worktree malware false-positive
+(`.worktrees/fix-play-map-level-toggle` is still parked in the repo root); the gate's
+constituent steps ran by hand above.
+
+Reviewers: privacy-security-review plus a fresh-eyes coverage reviewer over the
+combined diff (verdicts recorded in the Phase 7 section of state.md).

@@ -209,7 +209,7 @@ because dropping the one word is otherwise silent),
   `memberMetaChanged` with `changedMemberMeta`, `isSelfNickEcho`) plus the now-named
   `MemberMetaRecord`. `bot/main.ts` holds no `setInterval` at all. Ledger items L7 and L12
   closed here, L11 found already closed and pinned.
-- New env keys (Phase 3, the D13 cadences; DEPLOY.md documentation is still Phase 7):
+- New env keys (Phase 3, the D13 cadences; DEPLOY.md documentation landed in Phase 7):
   `DISCORD_ROLE_SYNC_INTERVAL_MS` (300000), `DISCORD_PRESENCE_DEBOUNCE_MS` (4000),
   `DISCORD_RELAY_POLL_MS` (3000). Unlike the governor knobs the defaults are NOT new
   constants: they are the existing `bot/cadence.ts` values, which `bot/config.ts` imports,
@@ -225,7 +225,7 @@ because dropping the one word is otherwise silent),
   `#DISCORD_ROLE_SYNC_INTERVAL_MS=300000`, `#DISCORD_PRESENCE_DEBOUNCE_MS=4000`,
   `#DISCORD_RELAY_POLL_MS=3000`.
 - New env keys (Phase 2, the first four; R8 satisfied and re-verified in Phase 2 QA against
-  the file itself, each commented default matching its exported `DEFAULT_*` constant. DEPLOY.md documentation is still Phase 7 per D13):
+  the file itself, each commented default matching its exported `DEFAULT_*` constant. DEPLOY.md documentation landed in Phase 7 per D13):
   `DISCORD_MAX_RPS` (8), `DISCORD_BAN_PAUSE_MS` (600000),
   `DISCORD_BREAKER_LIMIT` (300), `DISCORD_FORBIDDEN_TTL_MS` (86400000).
   The defaults are exported from `bot/rate_governor.ts` as `DEFAULT_MAX_RPS`,
@@ -563,7 +563,8 @@ because dropping the one word is otherwise silent),
     (harness-blocked, maintainer-only), commented beside the governor block:
     `#DISCORD_SWEEP_SLICE_MS=3000`, `#DISCORD_SWEEP_SLICE_SIZE=100`,
     `#DISCORD_OUTBOX_POLL_MS=3000`, `#DISCORD_OUTBOX_IDLE_MS=15000`,
-    `#DISCORD_OUTBOX_TIMEOUT_MS=70000`; Phase 7 documents all of them in DEPLOY.md (D13).
+    `#DISCORD_OUTBOX_TIMEOUT_MS=70000`; Phase 7 documented all of them in DEPLOY.md
+    (D13, done 2026-08-01; the `.env.example` fills remain owed to the maintainer).
   - Phase 5 QA contract notes, honored: exactly one serialized outbox poll (the
     scheduler task overlap guard, pinned behaviorally); client timeout 70s above the
     server deadline; winners consumption and mark on the ONE sequential task; a repoint
@@ -630,6 +631,96 @@ because dropping the one word is otherwise silent),
     'links' immediately after 'drain'). The didWork split and the breaker gate are
     unchanged.
 
+- Phase 7 (supervision + deploy hardening, built 2026-08-01; QA session still owed):
+  - New modules: `bot/liveness.ts` (exports `DEFAULT_HEARTBEAT_FILE`
+    '/tmp/discord-bot-heartbeat', the pure `isHeartbeatFresh(mtimeMs, nowMs, staleMs)`,
+    and `writeHeartbeatFile(path)`, which returns a boolean, true written, false
+    logged-and-failed, and ALWAYS settles); `tsconfig.bot.json` (lib ES2022, types node,
+    include bot, extending the root config; ADDED beside it, root include keeps `bot`,
+    `check:ts:bot` chained into `check:types`, `check:ts` unchanged). `bot/logic.ts`
+    gained `isFatalCloseCode` (the FATAL_CLOSE_CODES set moved out of gateway.ts so the
+    close-code decision is pure and directly tested, D8).
+  - Gateway: a THIRD trailing injectable constructor seam `exitProcess` (default
+    `process.exit`, forward-to-the-global per R15). A fatal close now logs and exits 1
+    (matching main.ts's fatal handler; R13: the crash loop is the desired visible
+    failure). `reconnect()` calls `stopHeartbeat()` before swapping sockets, closing
+    L18 at all three entry points (onClose timeout, INVALID_SESSION, op 7).
+  - discord_api: `DISCORD_CALL_TIMEOUT_MS` 15000, a CODE CONSTANT copying the
+    sanctioned `SERVER_CALL_TIMEOUT_MS` pattern (R14), deliberately not an env key; a
+    trailing `TimerSeam` param (type imported from server_client.ts); the
+    AbortController is armed INSIDE the governor-dispatched send closure, so queue wait
+    (a ban pause can be minutes) never counts against the deadline. Closes L10 and,
+    structurally, L17: every run now settles because both IO shells carry deadlines.
+  - Governor (L13): a 400 on a subject-keyed request now populates the forbidden cache
+    exactly like 401/403 (TTL-bounded by `DISCORD_FORBIDDEN_TTL_MS`, so a later
+    legitimate write for the same subject is deferred at most one TTL, never lost) but
+    spends NO invalid-request breaker budget: Discord's ban counter tracks 401, 403 and
+    429, never 400, and a counted 400 swept across a few hundred members would open the
+    breaker guild-wide. Pinned in both directions; the pre-dispatch refusal message now
+    says "subject previously answered 400, 401 or 403".
+  - New env keys (Phase 7): `DISCORD_HEARTBEAT_FILE` ('/tmp/discord-bot-heartbeat',
+    default exported from `bot/liveness.ts`) and `DISCORD_HEARTBEAT_INTERVAL_MS`
+    (30000, default `HEARTBEAT_INTERVAL_MS` in `bot/cadence.ts`), both in BOT_ENV_KEYS
+    (now 26). Probe-side only: `DISCORD_HEARTBEAT_STALE_MS` (90000), read by the
+    compose healthcheck one-liner and NEVER by the bot, so it is deliberately NOT in
+    BOT_ENV_KEYS. All three are forwarded by compose. The two bot keys are OWED to
+    `.env.example` (harness-blocked, maintainer-only), commented beside the Phase 6
+    cadence keys: `#DISCORD_HEARTBEAT_FILE=/tmp/discord-bot-heartbeat`,
+    `#DISCORD_HEARTBEAT_INTERVAL_MS=30000` (and `#DISCORD_HEARTBEAT_STALE_MS=90000`
+    beside them if the maintainer wants the probe knob visible too).
+  - Scheduler tasks 5 to 6: `heartbeat-file` (activeMs `cfg.heartbeatIntervalMs`, run
+    `writeHeartbeatFile`); the wiring pin moved to 6 with a TASKS row, and
+    `HEARTBEAT_INTERVAL_MS` joined the cadence-literal ban and value pins.
+  - Compose (discord-bot service): freshness healthcheck (node one-liner, no `$`
+    anywhere in it because compose interpolates; `Number(...)||90000` on purpose,
+    since an unset host key arrives as '' and Number('') is 0, falsy, so the default
+    holds; missing, unreadable and stale all exit nonzero; interval 15s, timeout 5s,
+    retries 4, start_period 60s covering the first jittered write);
+    `stop_grace_period: 15s`; `mem_limit`/`memswap_limit` 512m; and a 14-key env
+    passthrough (the 11 tunable knobs plus the three heartbeat keys). Before this the
+    container saw only 13 keys and EVERY knob was inert in production, a gap nothing
+    in the plan had named.
+  - Caddy: the @ops matcher is now `@ops path /livez /readyz /metrics /internal/*` in
+    BOTH user-data.sh heredocs (byte-identical, tab-indented) and both DEPLOY.md
+    snippets; the edge 404 is defense in depth, the shared secret header remains the
+    gate; lands on a live host only at the next prod rollout (O7) or via the by-hand
+    retrofit in DEPLOY.md.
+  - DEPLOY.md gained its first `## Discord bot` section (27 env keys with defaults and
+    incident guidance, health verification, the by-design crash-loop paragraph, the
+    incident-2026-07-29 runbook with healthy-reading lines) and the four falsified
+    edge claims were rewritten per R12.
+  - Mutation tallies, build phase: bot slice 6/6 killed, deploy slice 6/6 killed, all
+    with rc!=0 plus named failing tests.
+  - Review round (privacy-security-review plus a fresh-eyes coverage reviewer, both
+    over the combined uncommitted diff): ZERO blocking either side. Applied from the
+    security review: the default `exitProcess` drains stderr before `process.exit`
+    (console.error to docker's log pipe is async and a bare exit can eat the fatal
+    close-code line the crash loop's diagnosability depends on); the DEPLOY.md Caddy
+    retrofit now covers BOTH Caddyfile shapes (a bare `respond` never runs inside a
+    `handle { reverse_proxy }` block, which is exactly what user-data.sh writes,
+    because `handle` precedes `respond` in Caddy's directive order; hosts with an
+    existing @ops matcher just extend its path list); a /tmp-isolation caveat in the
+    liveness header (the world-writable path is safe only while the container's /tmp
+    is private; a shared mount would make it a symlink write primitive). Applied from
+    the coverage review: the probe pin now runs THROUGH the comparison and both exit
+    arms; the probe string is EXECUTED against real files (fresh, stale, missing,
+    padded path, non-positive knob); the probe trims the path exactly as config.ts
+    does (the asymmetric trim was a real bug: a padded override sent the write and
+    the stat to two different names, container permanently unhealthy); the staleness
+    guard became `s>0?s:90000` so a negative falls back instead of pinning unhealthy;
+    a GAME_SERVER_URL row warning (a bot outside the compose network must use a
+    private address, the edge now 404s /internal/*); and the "401 or 403" wording in
+    config.ts and DEPLOY.md now includes 400.
+  - Declared residuals for the Phase 7 QA session, judged not worth code this round:
+    `start_period: 60s` has no relational pin against `HEARTBEAT_INTERVAL_MS` (the
+    stale window does, `>= 2x`), so raising the interval erodes the boot margin
+    silently; the gateway's exit code 1 and main.ts's fatal-handler 1 are two
+    unlinked literals (one convention, no shared constant, would drift silently);
+    the staleness bound is probe-side-only BY DESIGN (the writer must not widen the
+    window it is judged by), so the "either side moves" agreement pin is
+    deliberately half-scoped to the path; and nothing asserts the negative
+    direction that the GAME service's own hardening block was left untouched
+    (the service-slice helper plus the unhardened-bot mutant cover the inverse).
 ## Phase 5 feed-site enumeration (the linked-member change feed contract)
 
 Every server-side site where a linked account's flex-relevant state changes (level, class,
@@ -951,7 +1042,10 @@ later phase because its fix belongs to that phase's scope, not because it was di
   quiet window. Phases 5 and 6 own the drain protocol (the outbox change feed), so the
   fix belongs there: mark-after-successful-post, the way the daily-rewards winners
   already work.
-- L10 (nice-to-have, supervision, OPEN, natural home Phase 7): `bot/discord_api.ts`
+- L10 CLOSED by Phase 7: `DISCORD_CALL_TIMEOUT_MS` (15000, the sanctioned
+  `SERVER_CALL_TIMEOUT_MS` pattern per R14) arms an AbortController inside the
+  governor-dispatched send closure, so the deadline covers dispatch, never queue wait.
+  Original entry: `bot/discord_api.ts`
   passes no `AbortSignal` or timeout to `fetch`, unlike `bot/server_client.ts` with its
   `SERVER_CALL_TIMEOUT_MS`. A Discord call that stalls therefore holds its bucket's FIFO
   and, if it was the half-open probe, the probe latch, for as long as the runtime's own
@@ -1020,7 +1114,12 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
 
 ### Found during Phase 1 QA (2026-07-30), OPEN
 
-- L6 (nice-to-have, toolchain, OPEN): `bot/` type-checks against the shared tsconfig,
+- L6 CLOSED by Phase 7: `tsconfig.bot.json` (lib ES2022, types node, include bot) is
+  ADDED beside the root config and `check:ts:bot` is chained into `check:types`, so a
+  Node-missing DOM global now fails a pinned check; the Node-only pass surfaced ZERO
+  latent errors across all 13 bot files, and the gate was proven non-vacuous with a
+  scratch probe (document/localStorage red as TS2584 under the same flags). Original
+  entry: `bot/` type-checks against the shared tsconfig,
   whose `lib` is `["ES2022","DOM","DOM.Iterable"]` with `types: ["vite/client","node"]`.
   A Node-missing DOM global therefore passes BOTH `tsc` and `build:bot` (esbuild does not
   typecheck) and only fails at runtime in the container. A bot-specific tsconfig would
@@ -1057,7 +1156,11 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
 
 ### Found during the Phase 3 review round (2026-07-31), OPEN
 
-- L13 (nice-to-have, retries, OPEN, natural home Phase 7 with the other supervision work):
+- L13 CLOSED by Phase 7, via the first of the two fix shapes below: a subject-keyed 400
+  now populates the forbidden cache like 401/403 (TTL-bounded), while deliberately
+  spending NO invalid-request breaker budget (Discord's ban counter tracks 401/403/429,
+  never 400; a counted 400 swept across a few hundred members would open the breaker
+  guild-wide). Original entry:
   a PERMANENTLY rejected nickname PATCH now retries every sweep forever with no backoff, and
   after D5 it is the only remaining steady-state write. The governor's permanent-failure
   cache covers 401 and 403 only, so a 400 (a computed nick Discord will never accept, an
@@ -1128,7 +1231,11 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   also grows monotonically. The fix is to collect the ids present across a COMPLETE seed and
   drop every cached id outside that set, which is real new state on the seed path and belongs
   with the sweep-iteration change rather than in a QA round.
-- L17 (robustness, OPEN, natural home Phase 7 with L10): a run handed to `scheduler.add` that
+- L17 CLOSED by Phase 7 along this entry's own fix shape: the deadline landed on the
+  Discord shell (`DISCORD_CALL_TIMEOUT_MS`), and server_client already had its two, so
+  every current run settles structurally; the always-settle rule in `bot/CLAUDE.md`
+  stays normative for any NEW run behind a seam without a deadline. Original entry: a
+  run handed to `scheduler.add` that
   never settles stops that loop for the life of the process, with no counter and no log. Ruled
   DEFER rather than watchdogged: recovery needs the run CANCELLED, and the scheduler holds a
   promise it cannot abort, so a watchdog that only logs would advertise coverage it does not
@@ -1156,8 +1263,12 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
 
 ### Found during Phase 6 QA (2026-08-01), routed rather than fixed
 
-- L18 (nice-to-have, supervision, OPEN, natural home Phase 7 with L10 and L17):
-  `Gateway.reconnect()` never stops the heartbeat interval, and `removeAllListeners()`
+- L18 CLOSED by Phase 7: `reconnect()` now calls `stopHeartbeat()` before swapping
+  sockets, covering all three entry points (the onClose timeout, INVALID_SESSION,
+  op 7). The decisive test needed the gateway suite's fake timer rig extended to MODEL
+  clearInterval (a cancelled interval refuses to tick), because the pre-existing
+  "does not stack a second interval" shape passes with or without the fix. Original
+  entry: `Gateway.reconnect()` never stops the heartbeat interval, and `removeAllListeners()`
   strips the old socket's close handler, which is the only close-path caller of
   `stopHeartbeat()`. A stale unacked-beat tick in the window before the new socket's
   HELLO therefore terminates the NEW socket (`this.ws` is re-read at tick time), whose
@@ -1371,3 +1482,42 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   both miss a real write and red without one. Use xmin. The wider rule is the one that cost
   the time here: on a question about what a database actually does, one probe outranks any
   number of agents agreeing from the documentation.
+- **The runtime image writes almost nowhere.** The bot container runs as `USER node` and
+  only `/app/dist/media` is chowned; `/app` and everything else under it is root-owned
+  COPY output. A file the bot must write (the Phase 7 heartbeat) has exactly three honest
+  homes: `/tmp/<name>` (the Debian base ships /tmp as 1777; no Dockerfile change), a new
+  chowned dir in the Dockerfile, or a compose `tmpfs:` mount. Phase 7 chose /tmp. Verify
+  writability against the Dockerfile, never assume it.
+- **An env key the compose service does not forward is INERT in production.** Until Phase 7
+  the discord-bot service forwarded 13 of 24 keys, so every governor and cadence knob the
+  packet had shipped read its default in the container no matter what the host `.env`
+  said. Adding a bot env key now means THREE places in one change: `bot/config.ts` +
+  BOT_ENV_KEYS, the compose passthrough (pinned by the key-array test in
+  `tests/deploy_discord_bot.test.ts`), and DEPLOY.md (D13).
+- **Extending a pinned string keeps the OLD pin vacuously green when the old text is a
+  prefix of the new.** `'@ops path /livez /readyz /metrics'` is a prefix of the Phase 7
+  matcher, so every toContain/split pin on the short form still passed after the change.
+  When a phase extends a pinned literal, re-pin the LONG form and keep a counted pin on
+  the short form so a stale copy of the old text cannot ride back in (shape in
+  `tests/deploy_watchdog.test.ts`).
+- **A window bug needs a fake that can REFUSE to fire.** L18 lived only in the gap between
+  `reconnect()` and the new socket's HELLO, and the obvious "does not stack a second
+  interval" test passes with or without the fix because `startHeartbeat` clears the old
+  timer itself eventually. The gateway suite's timer rig now MODELS clearInterval
+  (`timers.tick(i)` refuses a cancelled interval, `timers.live()` lists armed ones);
+  driving a stored callback with `.fn()` directly bypasses cancellation and proves
+  nothing.
+- **The gateway's production `exitProcess` default is a real `process.exit`.** Any test
+  that emits a fatal close through a hand-built `Gateway` must inject the sixth
+  constructor argument or it takes the vitest worker down with it; the suite's `rig()`
+  injects it in every arm, not only the fatal ones.
+- **The compose healthcheck probe guards its staleness knob with `s>0?s:default`, and
+  the shape is load bearing, do not "simplify" it.** Compose passes '' for an unset
+  host key and `Number('')` is 0; a garbage value is NaN; a negative would make
+  `age < stale` unsatisfiable and pin the container permanently unhealthy. None of the
+  three is `> 0`, so all fall back, matching the bot side's `positiveNumberFromEnv`.
+  A `||` accepts a negative (truthy) and a `??` accepts '' as 0; both ship a
+  permanently red healthcheck for an operator typo. The probe is also EXECUTED by
+  `tests/deploy_discord_bot.test.ts` (real node, real files, fresh/stale/missing/
+  padded/non-positive), because every structural pin over a YAML string is a substring
+  scan that an unparsable or verdict-inverted one-liner slips straight through.
