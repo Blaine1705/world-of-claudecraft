@@ -47,7 +47,6 @@ export const es_ES: Record<string, string> = {
   'stats.avgTick': 'tick medio',
   'stats.serverRss': 'rss del servidor',
   'online.title': 'Jugadores en línea',
-  'online.refreshHint': 'se actualiza cada 5 s',
   'online.empty': 'nadie en línea ahora mismo',
   'online.colCharacter': 'Personaje',
   'online.colClass': 'Clase',
@@ -451,6 +450,7 @@ export const es_ES: Record<string, string> = {
   'error.invalidStreamerLink':
     'Un enlace de streamer debe ser un enlace https en el dominio de la plataforma.',
   'nav.history': 'Historial',
+  'nav.unstuckReports': 'Informes de Desatascar',
   'moderationHistory.actionKick': 'Expulsado',
   'moderationHistory.actionKill': 'Eliminado',
   'moderationHistory.actionIpBlock': 'IP bloqueada',

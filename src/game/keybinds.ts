@@ -191,6 +191,13 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['Shift+KeyH'],
   },
   {
+    id: 'targetAuras',
+    label: 'Target Buffs and Debuffs',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyJ'],
+  },
+  {
     id: 'social',
     label: 'Friends & Guild',
     category: 'Interface',
@@ -219,6 +226,15 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['KeyY'],
   },
+  // Mount / dismount toggle: Backquote avoids the release-owned KeyZ layers
+  // for weapon sheathing and the Book of Deeds.
+  {
+    id: 'mount',
+    label: 'Mount / Dismount',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Backquote'],
+  },
   {
     id: 'leaderboard',
     label: 'Leaderboard',
@@ -241,10 +257,7 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['KeyU'],
   },
   // The Book of Deeds parks on the shifted layer of KeyZ, like Damage Meters
-  // does on H and the Shift+digit secondary bar: the bare letter stays free
-  // (the persistence suite and player muscle memory both treat KeyZ as the
-  // rebindable spare), and the shipped default survives the
-  // interface-overhaul revert unchanged. Rebindable like any other action.
+  // does on H and the Shift+digit secondary bar. Rebindable like any other action.
   {
     id: 'deeds',
     label: 'Book of Deeds',

@@ -1,10 +1,13 @@
 import * as fs from 'node:fs';
+import { tmpdir } from 'node:os';
 import * as path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { resolveReportTarget } from '../server/report_target';
 import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i18n';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES, ITEMS } from '../src/sim/data';
+import { Sim } from '../src/sim/sim';
+import type { SimEvent } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { Hud } from '../src/ui/hud';
 import {
@@ -44,6 +47,7 @@ import {
   renderTalentManifestEntry,
   talentTranslationManifest,
 } from '../src/ui/talent_i18n';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 // Lazy locale flip: the non-en game locales are no longer statically resident. Every
 // describe below setLanguage(non-en)s and reads synchronously through t() / localizeSimText /
@@ -933,14 +937,24 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   // through SimContext. Scan ALL of them alongside sim.ts so every language-agnostic sim
   // emit stays under the drift guard; they are re-localized client-side by the same
   // matchers. When a slice moves emit literals out of the monolith, append its path here.
+  // The one automatic input in a hand-curated list, and so the one whose
+  // disappearance nobody would catch by reading a diff. It walks to any depth
+  // (#2489): the single-level read this replaces would have dropped every emit
+  // in a src/sim/social subdirectory the day one appeared, leaving this guard
+  // green over a quietly smaller corpus. Takes a root rather than closing over
+  // socialDir, so the recursion case at the end of this file drives the exact
+  // producer the corpus uses, not a restatement of it.
   const socialDir = path.resolve(process.cwd(), 'src/sim/social');
-  const socialSrc = fs.existsSync(socialDir)
-    ? fs
-        .readdirSync(socialDir)
-        .filter((f) => f.endsWith('.ts'))
-        .map((f) => fs.readFileSync(path.join(socialDir, f), 'utf8'))
-        .join('\n')
-    : '';
+  const socialSourceUnder = (root: string): string =>
+    tsFilesUnder(root)
+      .map(({ full }) => fs.readFileSync(full, 'utf8'))
+      .join('\n');
+  // No existsSync fallback to ''. That arm made a MOVED or renamed
+  // src/sim/social scan NOTHING with this guard still green, which is the same
+  // silence #2489 is about wearing a different hat; a directory that is gone
+  // now throws where a reader can see it.
+  const socialFiles = tsFilesUnder(socialDir);
+  const socialSrc = socialSourceUnder(socialDir);
   const simSrc = [
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/sim.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/damage.ts'), 'utf8'),
@@ -949,12 +963,20 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/auto_attack.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/progression/talents.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/progression/xp.ts'), 'utf8'),
-    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/locomotion.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/mob_swing.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/lifecycle.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_commands.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/dungeons.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/heroic_vendor.ts'), 'utf8'),
+    // Overworld portal transitions (the Veiled Hollow cave). The live flavor
+    // lines are data-routed (PortalDef enterText/leaveText, matched by the
+    // sim_i18n EXACT map via log.veilEnter/log.veilLeave); scanning the module
+    // keeps any FUTURE literal emit added here under the drift guard.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/portals.ts'), 'utf8'),
+    // Swim fatigue (the Hollow's open-sea turn-back): the warning literal is
+    // variable-routed via FATIGUE_WARNING but matched by the sim_i18n EXACT
+    // map (log.seaFatigue); scanning keeps future literal emits guarded.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/fatigue.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/runs.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/lockpick_controller.ts'), 'utf8'),
     // DL1: Drowned Litany boss/rite/rooms emit surfaces.
@@ -990,6 +1012,17 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // #1121: per-player node harvest command denials (dead gate, unknown node,
     // range, respawn timer, bag-full pre-check).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/gathering.ts'), 'utf8'),
+    // Procedural Rifts: the run lifecycle's player-facing emits (enter/descend/
+    // exit, pylons, "all rifts unstable"), the forge/lockpick result lines, and
+    // the portal announcements, re-localized via the sim.rift.* rules.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/runs.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/progression.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/rift_lockpick.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/portals.ts'), 'utf8'),
+    // Mob locomotion: the deathZoneCast/deathZoneStrike driver emits def.detonateText
+    // at zone expiry (type:'log', telegraph:true). These are the only player-facing
+    // emits in this file; re-localized via the sim.rift.detonate* rules.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/locomotion.ts'), 'utf8'),
     // Professions 2.0: the fishing command bodies moved out of sim.ts.
     // Three literals have their ONLY emitter occurrences here ("No fish are
     // biting.", "A rare catch! Something gleams on your line.", "You need to
@@ -1071,6 +1104,12 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Bank system: the pooled bank deposit/withdraw/buy-slots command bodies
     // emit the quest-item/full/afford/max-slots refusals + the purchase notice.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/bank.ts'), 'utf8'),
+    // Riding lesson: the mount_train_begin guard refusals and the driver's
+    // notices (level/range/quest/in-progress/success/left-yard literals).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts_training.ts'), 'utf8'),
+    // Mounts: the toggleMount/selectMount guard refusals and the ridingTrained
+    // error (RIDING_UNTRAINED_MSG) that the riding-skill gate emits.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts.ts'), 'utf8'),
     // Heroic anti-kite mob charge: the "unleashes" announce line (the mechanic
     // name doubles as the mob_charge_stun debuff, localized via AURA_NAME_KEY's
     // 'Charge' row like the other boss mechanics).
@@ -1219,13 +1258,119 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   it('s3_registered: every sim.ts emit maps to a registered key/RULE (PR tier)', () => {
     setLanguage('en');
     const cands = candidateStrings();
-    expect(cands.length, 'sanity: should enumerate many emit sites').toBeGreaterThan(80);
+    expect(cands.length, 'sanity: should enumerate many emit sites').toBeGreaterThan(400);
     const leaks: string[] = [];
     for (const { type, s } of cands) {
       if (!recognized(type, s)) leaks.push(`(${type}) ${JSON.stringify(s)}`);
     }
     setLanguage('en');
     expect(leaks, 'unregistered sim emit strings (add a key/RULE to sim_i18n.ts)').toEqual([]);
+  });
+
+  // BUG #12 regression: the trade-accept-race deny path ('That player is already
+  // trading.', emitted from src/sim/social/trade.ts's tradeAccept when a second
+  // invitee accepts a stale invite while the inviter is already trading someone
+  // else) was miscategorized into the V07_SLASH allowlist, a backstop meant for
+  // undated slash-command diagnostics, not trade errors. That let it bypass
+  // candidateStrings() (and so s3_registered above) despite carrying no real
+  // hud.errors key, unlike its sibling 'A trade is already in progress.'. Drive
+  // the real race through the real Sim to prove the exact string still ships,
+  // then check it against the same exact-map extraction s3_registered itself
+  // uses, so this fails for the true reason (no key), not a stand-in.
+  it('the real trade-accept-race deny text has its own hud.errors key, not a V07_SLASH leak', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const a = sim.addPlayer('warrior', 'Anna');
+    const b = sim.addPlayer('mage', 'Bert');
+    const c = sim.addPlayer('warrior', 'Cara');
+    sim.tradeRequest(b, a);
+    sim.tradeRequest(c, a);
+    sim.tradeAccept(b);
+    sim.events.length = 0;
+    sim.tradeAccept(c);
+    const err = sim.events.find(
+      (e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error',
+    );
+    expect(err?.text).toBe('That player is already trading.');
+
+    expect(
+      arms.localizeErrorText.exact.has('That player is already trading.'),
+      'That player is already trading. must be a real hud.errors EXACT key, matching its sibling A trade is already in progress.',
+    ).toBe(true);
+    expect(
+      ALLOW_V07_SLASH.has('That player is already trading.'),
+      'That player is already trading. must not be parked in the V07_SLASH slash-command backstop allowlist',
+    ).toBe(false);
+  });
+
+  it('the src/sim/social glob still reaches its modules and feeds the corpus', () => {
+    // These bind the GLOB, where the floor above binds the total. Measured, so
+    // the difference is on the record: the corpus is 428 with the glob and 290
+    // without it, so the 400 floor does now catch a glob that empties
+    // completely (the 80 it replaced did not, which is what let this input be
+    // the quiet one). What the floor still cannot localize is a PARTIAL loss,
+    // and it cannot say which input went missing; these can, and they are the
+    // input a subdirectory or a rename would empty.
+    expect(
+      socialFiles.map((f) => f.file),
+      'the src/sim/social walk reaches every module in the directory',
+    ).toEqual([
+      'arena.ts',
+      'away.ts',
+      'card_duel.ts',
+      'card_duel_queue.ts',
+      'chat.ts',
+      'chat_readouts.ts',
+      'duel.ts',
+      'dungeon_finder.ts',
+      'fiesta.ts',
+      'fiesta_bots.ts',
+      'party.ts',
+      'ready_check.ts',
+      'trade.ts',
+      'vale_cup.ts',
+      'vale_cup_bots.ts',
+      'yumi.ts',
+    ]);
+    expect(
+      scanEmitCandidates(socialSrc, '').length,
+      'the social glob still contributes its emits to the S3 corpus',
+    ).toBeGreaterThan(220);
+  });
+
+  it('the corpus reads the tree through the shared walker, with no flat reader beside it', () => {
+    // The sibling of the pins in steam_routes / mobile_window_coverage /
+    // professions_silent_loot, and the same reasoning: src/sim/social is flat,
+    // so a second producer for socialSrc built on its own flat read would join
+    // the identical text to the corpus today and nothing here would notice.
+    const own = fs
+      .readFileSync(path.resolve(process.cwd(), 'tests/localization_fixes.test.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    // Both needles assembled from halves so neither matches its own line.
+    expect(own.split(`readdir${'Sync('}`).length - 1).toBe(0);
+    expect(own).toContain(`helpers/ts_files${'_under'}`);
+  });
+
+  it('the social glob descends, so an emit in a SUBDIRECTORY is scanned too (#2489)', () => {
+    // src/sim/social is flat today, so no assertion over the real tree can tell
+    // a recursive read from the single-level one it replaces. Drive the real
+    // producer over a fixture tree and hand its output to the real scanner: a
+    // nested emit has to arrive as a candidate, or the day social grows a
+    // folder its player text leaves the drift guard unnoticed.
+    const fixture = fs.mkdtempSync(path.join(tmpdir(), 'woc-social-scan-'));
+    try {
+      fs.mkdirSync(path.join(fixture, 'cards', 'deeper'), { recursive: true });
+      fs.writeFileSync(
+        path.join(fixture, 'cards', 'deeper', 'nested_emit.ts'),
+        "export function f(ctx: Ctx, pid: number) {\n  ctx.error(pid, 'Fixture nested social emit.');\n}\n",
+      );
+      fs.writeFileSync(path.join(fixture, 'notes.md'), "ctx.error(pid, 'Not source.');\n");
+      const found = scanEmitCandidates(socialSourceUnder(fixture), '').map((c) => c.tmpl);
+      expect(found).toContain('Fixture nested social emit.');
+      expect(found).not.toContain('Not source.');
+    } finally {
+      fs.rmSync(fixture, { recursive: true, force: true });
+    }
   });
 
   // RELEASE TIER: the same coverage across all 21 locales, and where a real matcher
@@ -1235,7 +1380,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     's3_localized: every emit is recognized in all 21 locales and not left English where a matcher resolves it',
     () => {
       const cands = candidateStrings();
-      expect(cands.length, 'sanity: should enumerate many emit sites').toBeGreaterThan(80);
+      expect(cands.length, 'sanity: should enumerate many emit sites').toBeGreaterThan(400);
       const leaks: string[] = [];
       for (const lang of supportedLanguages) {
         setLanguage(lang);

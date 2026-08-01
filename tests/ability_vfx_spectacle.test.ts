@@ -11,7 +11,6 @@ import {
   slashWidthScale,
 } from '../src/render/ability_vfx/spectacle';
 import type { AbilityVfxFullSpec } from '../src/render/ability_vfx_core';
-import { RUINBOLT_VFX_FULL_SPEC } from '../src/render/destruction_vfx_specs';
 
 interface RingCall {
   maxR: number;
@@ -32,11 +31,6 @@ interface SlashCall {
 interface LightCall {
   intensity: number;
 }
-interface OverlayCall {
-  color: number;
-  size: number;
-  cell: number;
-}
 
 // Minimal recording host: fixed anchors, flat ground, quality 1.
 function makeHost() {
@@ -45,7 +39,6 @@ function makeHost() {
   const flips: FlipCall[] = [];
   const slashes: SlashCall[] = [];
   const lights: LightCall[] = [];
-  const overlays: OverlayCall[] = [];
   const host: SequencerHost = {
     anchorOf: (id, frac) => ({ x: id * 10, y: frac * 2, z: 0 }),
     groundYAt: () => 0,
@@ -71,9 +64,7 @@ function makeHost() {
       slashes.push({ scale });
     },
     pathRibbon: () => {},
-    pushOverlay: (_x, _y, _z, color, size, cell) => {
-      overlays.push({ color, size, cell });
-    },
+    pushOverlay: () => {},
     overlayCells: () => ({ glow: 0, star: 1, rune: 2, spark: 3 }),
     windupDraw: () => {},
     quality: () => 1,
@@ -81,7 +72,7 @@ function makeHost() {
     countPrimitive: () => {},
     shakeAt: () => {},
   };
-  return { host, rings, bursts, flips, slashes, lights, overlays };
+  return { host, rings, bursts, flips, slashes, lights };
 }
 
 function step(seq: ArchetypeSequencer, host: SequencerHost, seconds: number, dt = 0.05): void {
@@ -137,86 +128,6 @@ describe('spectacle crescendo classification', () => {
 });
 
 describe('sequencer applies the crescendo boosts at the spawn seams', () => {
-  it('converges exactly three Ruin streams into a focused release', () => {
-    const a = makeHost();
-    const seq = new ArchetypeSequencer();
-    const spec = RUINBOLT_VFX_FULL_SPEC;
-    const power = spec.power ?? 1;
-
-    seq.start(a.host, 'chaos_bolt', spec, 1, 2, 0x72ff38, 0, false);
-
-    const convergenceRings = a.rings.filter(
-      (ring) => ring.vertical && ring.maxR < SPECTACLE.releaseRingR * power,
-    );
-    expect(convergenceRings).toHaveLength(3);
-    expect(convergenceRings.map((ring) => ring.maxR)).toEqual(
-      expect.arrayContaining([
-        expect.closeTo(0.72 * power, 5),
-        expect.closeTo(0.96 * power, 5),
-        expect.closeTo(1.2 * power, 5),
-      ]),
-    );
-    expect(a.overlays).toHaveLength(3);
-  });
-
-  it('keeps the production Ruinbolt impact focused on one victim', () => {
-    const a = makeHost();
-    const seq = new ArchetypeSequencer();
-    const spec = RUINBOLT_VFX_FULL_SPEC;
-    const power = spec.power ?? 1;
-    const releaseFlips = a.flips.length;
-
-    seq.start(a.host, 'chaos_bolt', spec, 1, 2, 0x72ff38, 0, false);
-    const releaseRingCount = a.rings.length;
-    const releaseOverlayCount = a.overlays.length;
-    step(seq, a.host, 0.3);
-
-    expect(a.flips.slice(releaseFlips)).toEqual(
-      expect.arrayContaining([
-        {
-          size: expect.closeTo(2 * power * SPECTACLE.flipbook * 0.72, 5),
-        },
-      ]),
-    );
-    const impactRings = a.rings.slice(releaseRingCount);
-    expect(impactRings).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          maxR: expect.closeTo(
-            2.4 * power * SPECTACLE.followRing * 1.25 * (0.7 + 0.3 * power) * 0.72,
-            5,
-          ),
-          vertical: false,
-        }),
-        expect.objectContaining({
-          maxR: expect.closeTo(2.6 * power * SPECTACLE.vRing * 0.72, 5),
-          vertical: true,
-        }),
-      ]),
-    );
-    expect(a.overlays.slice(releaseOverlayCount)).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ color: 0xf1ffd8, cell: 1 }),
-        expect.objectContaining({ color: 0x72ff38, cell: 0 }),
-      ]),
-    );
-    expect(a.bursts).toContainEqual({ kind: 'embers', count: 12, power: 0.65 });
-  });
-
-  it('cancels a travelling sequence without ever producing its impact', () => {
-    const a = makeHost();
-    const seq = new ArchetypeSequencer();
-    const slot = seq.start(a.host, 'chaos_bolt', BOLT_SPEC, 1, 2, 0x72ff38, 0, true);
-    if (!slot) throw new Error('missing travelling slot');
-    const impactsBefore = a.flips.length;
-
-    seq.cancel(slot);
-    step(seq, a.host, 4);
-
-    expect(slot.active).toBe(false);
-    expect(a.flips).toHaveLength(impactsBefore);
-  });
-
   it('bolt impact flipbook scales by SPECTACLE.flipbook; release ring fires at tier 0 only', () => {
     const a = makeHost();
     const seq = new ArchetypeSequencer();

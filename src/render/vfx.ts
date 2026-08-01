@@ -1,24 +1,32 @@
 import * as THREE from 'three';
-import { loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
-import {
-  type DrainLifeParticleKind,
-  type DrainLifeParticleSink,
-  DrainLifeVfx,
-} from './drain_life_vfx';
+import { loadTexture, releaseTexture } from './assets/loader';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
+import {
+  insertActiveParticleSlot,
+  pointSpriteBoundingRadius,
+  spriteEarlyRejectRadiusSq,
+} from './vfx_pool_core';
 
 // Spell & ambience particle system. One pooled THREE.Points cloud drawn with
 // additive blending; projectiles are lightweight emitters that home on their
 // target and burst on arrival. Particles sample a 4x4 atlas of Kenney
-// particle-pack sprites (black-background, additive-ready, CC0) — flames,
-// sparks, magic wisps, smoke — built once at startup from the preloaded PNGs.
+// particle-pack sprites (black-background, additive-ready, CC0): flames,
+// sparks, magic wisps, smoke, built once at startup from the preloaded PNGs.
 //
 // On the composer tiers, colors are pushed past 1.0 (the HDR HalfFloat target
 // preserves them) so projectile cores, novas and heal pillars bloom; the low
 // tier keeps plain colors (same sprites, no HDR boost).
 
 const CAPACITY = 4096;
+const DRAW_STRIDE = 11;
+const DRAW_POSITION = 0;
+const DRAW_COLOR = 3;
+const DRAW_SIZE = 6;
+const DRAW_ALPHA = 7;
+const DRAW_SPRITE = 8;
+const DRAW_ROTATION = 9;
+const DRAW_RADIUS_SQ = 10;
 
 // HDR multipliers (graphics-plan step 9); 1.0 on the no-composer path
 function hdr(k: number): number {
@@ -63,7 +71,7 @@ function projectileSchoolColors(
 
 // ---------------------------------------------------------------------------
 // Sprite atlas: 16 cherry-picked Kenney sprites in a 4x4 grid. Order defines
-// the cell index used by the shader — append only.
+// the cell index used by the shader: append only.
 // ---------------------------------------------------------------------------
 
 const ATLAS_GRID = 4;
@@ -110,7 +118,7 @@ const SPR = {
 
 const spriteImages: (TexImageSource | null)[] = SPRITE_FILES.map(() => null);
 for (let i = 0; i < SPRITE_FILES.length; i++) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadTexture(`/vfx/${SPRITE_FILES[i]}.png`, { srgb: true }).then((tex) => {
       spriteImages[i] = tex.image as TexImageSource;
       return tex;
@@ -118,14 +126,28 @@ for (let i = 0; i < SPRITE_FILES.length; i++) {
   );
 }
 
+interface ParticleAtlas {
+  texture: THREE.CanvasTexture;
+  earlyRejectRadiusSq: Float32Array;
+}
+
+// The composed atlas canvas, kept module-level and reused. A SECOND Vfx in the
+// same page is real (the editor viewport's reload() builds a fresh Renderer, and
+// each Renderer owns a Vfx), and composeAtlasCanvas() releases its source
+// sprites, so recomposing would silently paint all 16 cells as fallback discs.
+// Retaining the one 1024x1024 canvas instead of 16 decoded sources is also the
+// cheaper half of that trade.
+let atlasCanvas: HTMLCanvasElement | null = null;
+
 // Compose the atlas once. Any cell whose PNG is unavailable (e.g. unit tests
 // that construct Vfx without the preload gate) falls back to a soft painted
 // disc so the system always renders something sane.
-function buildAtlasTexture(): THREE.CanvasTexture {
+function composeAtlasCanvas(): HTMLCanvasElement {
   const size = ATLAS_GRID * ATLAS_CELL;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('2D canvas context unavailable');
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, size, size);
   for (let i = 0; i < SPRITE_FILES.length; i++) {
@@ -150,12 +172,57 @@ function buildAtlasTexture(): THREE.CanvasTexture {
       ctx.fillRect(x, y, ATLAS_CELL, ATLAS_CELL);
     }
   }
-  const tex = new THREE.CanvasTexture(canvas);
+  // The canvas now owns every cell's pixels, so the 16 source sprites (decoded
+  // RGBA, their loader cache entries, and the THREE wrappers that are never
+  // uploaded to the GPU) are dead weight from here on: ~16 MB retained for
+  // nothing, on a process whose memory ceiling is what kills world entry on
+  // 4 GB iPhones. Safe to drop because nothing recomposes this canvas (see
+  // atlasCanvas above) and no context-restore path re-reads the sources: a lost
+  // WebGL context is a dead session here, handled out of band by the entry crash
+  // guard, never re-uploaded from CPU-side copies.
+  for (let i = 0; i < SPRITE_FILES.length; i++) {
+    spriteImages[i] = null;
+    releaseTexture(`/vfx/${SPRITE_FILES[i]}.png`, { srgb: true });
+  }
+  return canvas;
+}
+
+/** A per-Vfx CanvasTexture over the one shared, already-composed atlas canvas.
+ *  A fresh texture object per instance keeps each renderer's GPU upload its own
+ *  (two live Vfx never share one texture), while the composed pixels are built
+ *  exactly once. */
+function buildAtlasTexture(): ParticleAtlas {
+  atlasCanvas ??= composeAtlasCanvas();
+  const tex = new THREE.CanvasTexture(atlasCanvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.minFilter = THREE.LinearFilter;
   tex.magFilter = THREE.LinearFilter;
   tex.generateMipmaps = false;
-  return tex;
+
+  // The live fragment shader discards black atlas borders after sampling.
+  // Bound every sprite from the exact composed canvas so it can reject a
+  // strict subset of those fragments before rotation and the texture tap.
+  const earlyRejectRadiusSq = new Float32Array(SPRITE_FILES.length);
+  earlyRejectRadiusSq.fill(0.5);
+  try {
+    // Read back from the retained composed canvas: composeAtlasCanvas() runs at
+    // most once per page, so its local 2d context is not in scope here.
+    const size = atlasCanvas.width;
+    const ctx = atlasCanvas.getContext('2d')!;
+    const pixels = ctx.getImageData(0, 0, size, size).data;
+    for (let i = 0; i < SPRITE_FILES.length; i++) {
+      earlyRejectRadiusSq[i] = spriteEarlyRejectRadiusSq(
+        pixels,
+        size,
+        (i % ATLAS_GRID) * ATLAS_CELL,
+        Math.floor(i / ATLAS_GRID) * ATLAS_CELL,
+        ATLAS_CELL,
+      );
+    }
+  } catch {
+    // A restricted canvas keeps the original full-point path.
+  }
+  return { texture: tex, earlyRejectRadiusSq };
 }
 
 export const SCHOOL_COLORS: Record<string, number> = {
@@ -165,7 +232,7 @@ export const SCHOOL_COLORS: Record<string, number> = {
   shadow: 0x9a5df0,
   holy: 0xffe9a0,
   nature: 0x86e86a,
-  // warm steel-spark — near-white crossed the bloom threshold colorlessly and
+  // warm steel-spark: near-white crossed the bloom threshold colorlessly and
   // melee hits read as faint white noise
   physical: 0xffd28a,
 };
@@ -186,7 +253,6 @@ interface Projectile {
   // Visual heft multiplier (Pyroblast's heavyBolt = 2): scales the comet core,
   // trail and impact flash; mechanics and speed are untouched.
   scale?: number;
-  onImpact?: (position: THREE.Vector3) => void;
 }
 
 interface BubbleBeam {
@@ -205,13 +271,7 @@ function projectileSprites(school: string): { core: number; trail: number } {
     : { core: SPR.glowCore, trail: SPR.sparkle };
 }
 
-export type EntityAnchor = (
-  id: number,
-  heightFrac: number,
-  localX?: number,
-  localZ?: number,
-  out?: THREE.Vector3,
-) => THREE.Vector3 | null;
+export type EntityAnchor = (id: number, heightFrac: number) => THREE.Vector3 | null;
 
 export class Vfx {
   private points: THREE.Points;
@@ -225,10 +285,20 @@ export class Vfx {
   private alphaAttr: Float32Array;
   private spriteAttr: Float32Array;
   private rotAttr: Float32Array;
+  private activeSlots: Int32Array;
+  private activeSlotFlags: Uint8Array;
+  private activeCount = 0;
+  private drawData: Float32Array;
+  private drawBuffer: THREE.InterleavedBuffer;
+  private spriteRadiusSq: Float32Array;
+  private cloudWarmed = false;
+  private readonly particleBounds = new THREE.Sphere();
+  private pointProjectionScale = 1 / Math.tan(Math.PI / 6);
+  private readonly cullFrustum = new THREE.Frustum();
+  private readonly cullViewProjection = new THREE.Matrix4();
   private head = 0;
   private projectiles: Projectile[] = [];
   private bubbleBeams: BubbleBeam[] = [];
-  private drainLifeVfx: DrainLifeVfx;
   private tmpColor = new THREE.Color();
   private tmpDirection = new THREE.Vector3();
   private readonly beamUp = new THREE.Vector3(0, 1, 0);
@@ -253,24 +323,52 @@ export class Vfx {
     this.alphaAttr = new Float32Array(CAPACITY);
     this.spriteAttr = new Float32Array(CAPACITY);
     this.rotAttr = new Float32Array(CAPACITY);
+    this.activeSlots = new Int32Array(CAPACITY);
+    this.activeSlotFlags = new Uint8Array(CAPACITY);
+    this.drawData = new Float32Array(CAPACITY * DRAW_STRIDE);
+    this.drawBuffer = new THREE.InterleavedBuffer(this.drawData, DRAW_STRIDE);
+    this.drawBuffer.setUsage(THREE.DynamicDrawUsage);
 
     const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(this.pos, 3));
-    geo.setAttribute('aColor', new THREE.BufferAttribute(this.col, 3));
-    geo.setAttribute('aSize', new THREE.BufferAttribute(this.size, 1));
-    geo.setAttribute('aAlpha', new THREE.BufferAttribute(this.alphaAttr, 1));
-    geo.setAttribute('aSprite', new THREE.BufferAttribute(this.spriteAttr, 1));
-    geo.setAttribute('aRot', new THREE.BufferAttribute(this.rotAttr, 1));
-    // huge static bounding sphere: particles fly everywhere, skip recompute
+    geo.setAttribute(
+      'position',
+      new THREE.InterleavedBufferAttribute(this.drawBuffer, 3, DRAW_POSITION),
+    );
+    geo.setAttribute(
+      'aColor',
+      new THREE.InterleavedBufferAttribute(this.drawBuffer, 3, DRAW_COLOR),
+    );
+    geo.setAttribute('aSize', new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_SIZE));
+    geo.setAttribute(
+      'aAlpha',
+      new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_ALPHA),
+    );
+    geo.setAttribute(
+      'aSprite',
+      new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_SPRITE),
+    );
+    geo.setAttribute(
+      'aRot',
+      new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_ROTATION),
+    );
+    geo.setAttribute(
+      'aRadiusSq',
+      new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_RADIUS_SQ),
+    );
+    geo.setDrawRange(0, 0);
+    // Keep the historical static geometry bound. Camera-aware point culling is
+    // separate and cannot affect transparent sorting against renderOrder peers.
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(450, 0, 0), 2400);
 
+    const atlas = buildAtlasTexture();
+    this.spriteRadiusSq = atlas.earlyRejectRadiusSq;
     const mat = new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       uniforms: {
         uScale: { value: 600 },
-        uAtlas: { value: buildAtlasTexture() },
+        uAtlas: { value: atlas.texture },
       },
       vertexShader: `
         attribute vec3 aColor;
@@ -278,16 +376,20 @@ export class Vfx {
         attribute float aAlpha;
         attribute float aSprite;
         attribute float aRot;
+        attribute float aRadiusSq;
         varying vec3 vColor;
         varying float vAlpha;
-        varying float vSprite;
-        varying float vRot;
+        varying vec2 vCell;
+        varying vec2 vRotCs;
+        varying float vRadiusSq;
         uniform float uScale;
         void main() {
           vColor = aColor;
           vAlpha = aAlpha;
-          vSprite = aSprite;
-          vRot = aRot;
+          float idx = floor(aSprite + 0.5);
+          vCell = vec2(mod(idx, ${ATLAS_GRID}.0), floor(idx / ${ATLAS_GRID}.0));
+          vRotCs = vec2(cos(aRot), sin(aRot));
+          vRadiusSq = aRadiusSq;
           vec4 mv = modelViewMatrix * vec4(position, 1.0);
           gl_PointSize = clamp(aSize * uScale / max(1.0, -mv.z), 0.0, 110.0);
           gl_Position = projectionMatrix * mv;
@@ -297,17 +399,19 @@ export class Vfx {
         uniform sampler2D uAtlas;
         varying vec3 vColor;
         varying float vAlpha;
-        varying float vSprite;
-        varying float vRot;
+        varying vec2 vCell;
+        varying vec2 vRotCs;
+        varying float vRadiusSq;
         void main() {
-          // rotate the point coord around its centre, clamped inside the cell
           vec2 pc = gl_PointCoord - 0.5;
-          float cs = cos(vRot), sn = sin(vRot);
-          pc = vec2(pc.x * cs - pc.y * sn, pc.x * sn + pc.y * cs);
+          if (dot(pc, pc) > vRadiusSq) discard;
+          // rotate the point coord around its centre, clamped inside the cell
+          pc = vec2(
+            pc.x * vRotCs.x - pc.y * vRotCs.y,
+            pc.x * vRotCs.y + pc.y * vRotCs.x
+          );
           pc = clamp(pc + 0.5, 0.01, 0.99);
-          float idx = floor(vSprite + 0.5);
-          vec2 cell = vec2(mod(idx, ${ATLAS_GRID}.0), floor(idx / ${ATLAS_GRID}.0));
-          vec2 uv = (cell + pc) / ${ATLAS_GRID}.0;
+          vec2 uv = (vCell + pc) / ${ATLAS_GRID}.0;
           uv.y = 1.0 - uv.y; // canvas row 0 is the visual top
           vec3 tex = texture2D(uAtlas, uv).rgb;
           float lum = max(tex.r, max(tex.g, tex.b));
@@ -320,45 +424,24 @@ export class Vfx {
     this.points.userData.renderCategory = 'vfx';
     this.points.frustumCulled = false;
     this.points.renderOrder = 5;
-    scene.add(this.points);
-    const drainParticleSink: DrainLifeParticleSink = (
-      kind,
-      x,
-      y,
-      z,
-      vx,
-      vy,
-      vz,
-      color,
-      size,
-      lifetime,
-      gravity,
-    ) => {
-      this.spawn(
-        x,
-        y,
-        z,
-        vx,
-        vy,
-        vz,
-        color,
-        size,
-        lifetime,
-        gravity,
-        this.drainParticleSprite(kind),
-      );
+    // The first zero-count submit still compiles the exact shader and uploads
+    // the atlas on constrained prewarm profiles that skip the explicit burst.
+    this.points.visible = true;
+    this.points.onAfterRender = () => {
+      this.cloudWarmed = true;
+      if (this.points.geometry.drawRange.count === 0) this.points.visible = false;
     };
-    this.drainLifeVfx = new DrainLifeVfx(scene, anchor, drainParticleSink);
+    scene.add(this.points);
   }
 
   setViewportScale(heightPx: number, fovDeg: number): void {
     const mat = this.points.material as THREE.ShaderMaterial;
     mat.uniforms.uScale.value = heightPx / (2 * Math.tan((fovDeg * Math.PI) / 360));
+    this.pointProjectionScale = 1 / Math.tan((fovDeg * Math.PI) / 360);
   }
 
   setQuality(level: number): void {
     this.quality = Math.min(1, Math.max(0, Number.isFinite(level) ? level : 1));
-    this.drainLifeVfx.setQuality(this.quality);
   }
 
   prewarm(at: THREE.Vector3): void {
@@ -386,13 +469,18 @@ export class Vfx {
   clear(): void {
     this.projectiles.length = 0;
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
-    this.drainLifeVfx.clear();
     this.life.fill(0);
     this.size.fill(0);
     this.alphaAttr.fill(0);
-    const geo = this.points.geometry;
-    (geo.attributes.aSize as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aAlpha as THREE.BufferAttribute).needsUpdate = true;
+    this.activeCount = 0;
+    this.activeSlotFlags.fill(0);
+    this.points.geometry.setDrawRange(0, 0);
+    this.points.visible = !this.cloudWarmed;
+  }
+
+  onContextRestored(): void {
+    this.cloudWarmed = false;
+    this.points.visible = true;
   }
 
   private scaledCount(count: number): number {
@@ -431,6 +519,10 @@ export class Vfx {
   ): void {
     const i = this.head;
     this.head = (this.head + 1) % CAPACITY;
+    if (this.activeSlotFlags[i] === 0) {
+      this.activeSlotFlags[i] = 1;
+      this.activeCount = insertActiveParticleSlot(this.activeSlots, this.activeCount, i);
+    }
     this.pos[i * 3] = x;
     this.pos[i * 3 + 1] = y;
     this.pos[i * 3 + 2] = z;
@@ -450,18 +542,70 @@ export class Vfx {
     this.rotAttr[i] = rot;
   }
 
-  private drainParticleSprite(kind: DrainLifeParticleKind): number {
-    switch (kind) {
-      case 'extraction':
-        return SPR.magicWisp;
-      case 'absorption':
-      case 'transfer':
-        return SPR.glowCore;
-      case 'tick':
-        return SPR.sparkBurst;
-      case 'residue':
-        return SPR.smoke;
+  private packRenderCloud(camera: THREE.Camera): void {
+    const geo = this.points.geometry;
+    if (this.activeCount === 0) {
+      geo.setDrawRange(0, 0);
+      this.points.visible = !this.cloudWarmed;
+      return;
     }
+
+    this.cullViewProjection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    this.cullFrustum.setFromProjectionMatrix(this.cullViewProjection);
+    const perspective = (camera as THREE.PerspectiveCamera).isPerspectiveCamera === true;
+    const cameraProjectionScale = Math.abs(camera.projectionMatrix.elements[5]);
+    let count = 0;
+    for (let active = 0; active < this.activeCount; active++) {
+      const slot = this.activeSlots[active];
+      if (this.life[slot] <= 0) continue;
+      const src3 = slot * 3;
+      const x = this.pos[src3];
+      const y = this.pos[src3 + 1];
+      const z = this.pos[src3 + 2];
+      if (perspective) {
+        this.particleBounds.center.set(x, y, z);
+        this.particleBounds.radius = pointSpriteBoundingRadius(
+          this.size[slot],
+          this.pointProjectionScale,
+          cameraProjectionScale,
+        );
+        if (!this.cullFrustum.intersectsSphere(this.particleBounds)) continue;
+      }
+
+      const dst = count * DRAW_STRIDE;
+      this.drawData[dst + DRAW_POSITION] = x;
+      this.drawData[dst + DRAW_POSITION + 1] = y;
+      this.drawData[dst + DRAW_POSITION + 2] = z;
+      this.drawData[dst + DRAW_COLOR] = this.col[src3];
+      this.drawData[dst + DRAW_COLOR + 1] = this.col[src3 + 1];
+      this.drawData[dst + DRAW_COLOR + 2] = this.col[src3 + 2];
+      this.drawData[dst + DRAW_SIZE] = this.size[slot];
+      this.drawData[dst + DRAW_ALPHA] = this.alphaAttr[slot];
+      const sprite = this.spriteAttr[slot];
+      this.drawData[dst + DRAW_SPRITE] = sprite;
+      this.drawData[dst + DRAW_ROTATION] = this.rotAttr[slot];
+      this.drawData[dst + DRAW_RADIUS_SQ] = this.spriteRadiusSq[sprite] ?? 0.5;
+      count++;
+    }
+
+    geo.setDrawRange(0, count);
+    this.points.visible = count > 0 || !this.cloudWarmed;
+    if (count === 0) return;
+
+    // The packed prefix fully supersedes any range queued while this cloud was
+    // off-screen. One interleaved range replaces six separate buffer uploads.
+    this.drawBuffer.clearUpdateRanges();
+    this.drawBuffer.addUpdateRange(0, count * DRAW_STRIDE);
+    this.drawBuffer.needsUpdate = true;
+  }
+
+  /**
+   * Cull only after the renderer has applied this frame's camera pose. The
+   * per-particle spheres contain every point-sprite corner, so rejected points
+   * contribute no scene-target pixel for the later bloom pass to spread.
+   */
+  prepareDraw(camera: THREE.Camera): void {
+    this.packRenderCloud(camera);
   }
 
   // ---------------------------------------------------------------------
@@ -471,18 +615,6 @@ export class Vfx {
   projectile(sourceId: number, targetId: number, school: string, scale = 1, color?: number): void {
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
-    this.projectileFrom(from, targetId, school, scale, 26, undefined, color);
-  }
-
-  private projectileFrom(
-    from: THREE.Vector3,
-    targetId: number,
-    school: string,
-    scale: number,
-    speed = 26,
-    onImpact?: (position: THREE.Vector3) => void,
-    color?: number,
-  ): void {
     const colors = projectileSchoolColors(school, color);
     const sprites = projectileSprites(school);
     this.projectiles.push({
@@ -491,88 +623,12 @@ export class Vfx {
       color: colors.base,
       coreColor: colors.core,
       trailColor: colors.trail,
-      speed,
+      speed: 26,
       ttl: 3,
       coreSprite: sprites.core,
       trailSprite: sprites.trail,
       scale,
-      onImpact,
     });
-  }
-
-  deathBolt(leftHand: THREE.Vector3, rightHand: THREE.Vector3, targetId: number): void {
-    this.projectileFrom(leftHand, targetId, 'shadow', 1.28, 31);
-    this.projectileFrom(rightHand, targetId, 'shadow', 1.28, 31);
-    for (const hand of [leftHand, rightHand]) {
-      for (let i = 0; i < this.scaledCount(7); i++) {
-        const angle = (i / 7) * Math.PI * 2;
-        this.spawn(
-          hand.x,
-          hand.y,
-          hand.z,
-          Math.cos(angle) * 1.4,
-          0.25 + Math.random() * 0.8,
-          Math.sin(angle) * 1.4,
-          i % 2 === 0 ? 0xe5b8ff : 0x8f35db,
-          0.28,
-          0.38,
-          0.4,
-          SPR.magicWisp,
-        );
-      }
-    }
-  }
-
-  soulTravel(
-    x: number,
-    y: number,
-    z: number,
-    targetId: number,
-    onImpact?: (position: THREE.Vector3) => void,
-  ): void {
-    this.projectileFrom(new THREE.Vector3(x, y, z), targetId, 'shadow', 1.2, 14, onImpact);
-    for (let i = 0; i < this.scaledCount(14); i++) {
-      const angle = (i / 14) * Math.PI * 2;
-      this.spawn(
-        x,
-        y,
-        z,
-        Math.cos(angle) * (0.8 + Math.random()),
-        0.8 + Math.random() * 1.2,
-        Math.sin(angle) * (0.8 + Math.random()),
-        i % 3 === 0 ? 0xead0ff : 0xa84dff,
-        0.3 + Math.random() * 0.18,
-        0.7,
-        -0.35,
-        SPR.magicWisp,
-      );
-    }
-  }
-
-  lichTransform(entityId: number): void {
-    const feet = this.anchor(entityId, 0.08);
-    const center = this.anchor(entityId, 0.48);
-    if (!feet || !center) return;
-    for (let i = 0; i < this.scaledCount(52); i++) {
-      const angle = (i / 52) * Math.PI * 2 + Math.random() * 0.08;
-      const speed = 3.2 + Math.random() * 5.2;
-      const rising = i % 3 === 0;
-      this.spawn(
-        rising ? center.x + (Math.random() - 0.5) * 0.7 : feet.x,
-        rising ? center.y - 0.6 + Math.random() * 1.2 : feet.y,
-        rising ? center.z + (Math.random() - 0.5) * 0.7 : feet.z,
-        Math.cos(angle) * (rising ? 0.8 : speed),
-        rising ? 3.6 + Math.random() * 3.8 : 0.7 + Math.random() * 2.4,
-        Math.sin(angle) * (rising ? 0.8 : speed),
-        rising ? 0xe2b6ff : i % 2 === 0 ? 0xad4cff : 0x4b176c,
-        rising ? 0.38 : 0.54,
-        0.85 + Math.random() * 0.5,
-        rising ? -0.6 : 2.5,
-        rising ? SPR.magicWisp : SPR.sparkBurst,
-      );
-    }
-    this.spawn(center.x, center.y, center.z, 0, 0.4, 0, 0xf1d6ff, 2.6, 0.28, 0, SPR.flash);
-    this.spawn(feet.x, feet.y, feet.z, 0, 0.1, 0, 0xbd59ff, 3.4, 0.5, 0, SPR.ring);
   }
 
   beam(sourceId: number, targetId: number, school: string, colorOverride?: number): void {
@@ -637,7 +693,6 @@ export class Vfx {
     water.renderOrder = 5;
     core.renderOrder = 6;
     const group = new THREE.Group();
-    group.name = 'drain-life-beam';
     group.userData.renderCategory = 'vfx';
     group.add(water, core);
     this.scene.add(group);
@@ -652,28 +707,6 @@ export class Vfx {
     (stream.water.material as THREE.Material).dispose();
     (stream.core.material as THREE.Material).dispose();
     this.bubbleBeams.splice(index, 1);
-  }
-
-  /** Drain Life's sustained tether: a narrow green core with life motes flowing
-   * from the victim back toward the caster. */
-  drainBeam(sourceId: number, targetId: number, duration: number): void {
-    this.drainLifeVfx.drain(sourceId, targetId, duration);
-  }
-
-  /** Possessed companion contribution to Drain Life, from the Eye beside the
-   * caster to the same victim as the caster's ordinary tether. */
-  demonicDrainBeam(casterId: number, targetId: number, duration: number): void {
-    this.drainLifeVfx.demonicDrain(casterId, targetId, duration);
-  }
-
-  /** The Affliction companion's own attack: a very brief sickly-green ray
-   * wrapped in violet shadow, fired from the Eye rather than the caster. */
-  evilEyeGaze(casterId: number, targetId: number, duration = 0.28): void {
-    this.drainLifeVfx.evilEyeGaze(casterId, targetId, duration);
-  }
-
-  drainLifeTick(casterId: number): void {
-    this.drainLifeVfx.tick(casterId);
   }
 
   // Chain Heal's signature arc: a bright green cord that lifts in a gentle parabola
@@ -744,6 +777,8 @@ export class Vfx {
   lightningProjectile(sourceId: number, targetId: number, color?: number): void {
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
+    // A color override tints the bolt per ability: the head stays pushed toward
+    // white so it still reads as a hot electric core.
     const head =
       color === undefined
         ? new THREE.Color(0xeaf6ff)
@@ -751,9 +786,9 @@ export class Vfx {
     this.projectiles.push({
       pos: from.clone(),
       targetId,
-      color: new THREE.Color(color ?? 0x66b8ff).multiplyScalar(hdr(1.7)),
-      coreColor: head.multiplyScalar(hdr(3.0)),
-      trailColor: new THREE.Color(color ?? 0x3f9bff).multiplyScalar(hdr(1.9)),
+      color: new THREE.Color(color ?? 0x66b8ff).multiplyScalar(hdr(1.7)), // electric blue (impact tint)
+      coreColor: head.multiplyScalar(hdr(3.0)), // hot white-blue head
+      trailColor: new THREE.Color(color ?? 0x3f9bff).multiplyScalar(hdr(1.9)), // crackle
       speed: 26,
       ttl: 3,
       coreSprite: SPR.glowCore,
@@ -1215,6 +1250,34 @@ export class Vfx {
     }
   }
 
+  /** A quick yellow-orange shimmer ringing a rider as a mount is summoned (and on
+   *  a dismount/live swap): tighter and shorter-lived than levelUpPillar so it
+   *  reads as a conjure sparkle, not a level-up. Fired on the mountKey-change edge. */
+  mountSummonGlow(targetId: number): void {
+    const at = this.anchor(targetId, 0);
+    if (!at) return;
+    const cream = new THREE.Color(0xffe0a0).multiplyScalar(hdr(1.8));
+    const amber = new THREE.Color(0xffb347).multiplyScalar(hdr(1.8));
+    const ember = new THREE.Color(0xff9a3c).multiplyScalar(hdr(1.8));
+    for (let i = 0; i < this.scaledCount(34); i++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.25 + Math.random() * 0.6;
+      this.spawn(
+        at.x + Math.sin(a) * r,
+        at.y + Math.random() * 0.25,
+        at.z + Math.cos(a) * r,
+        0,
+        3.0 + Math.random() * 2.2,
+        0,
+        i % 3 === 0 ? ember : i % 3 === 1 ? amber : cream,
+        0.36,
+        0.75 + Math.random() * 0.3,
+        -1,
+        i % 3 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+  }
+
   // Vale Cup celebration: one team-colored firework shell (per-particle colors,
   // the levelUpPillar/burst pattern). The renderer staggers several calls per
   // goal to read as a volley; colors alternate through the scoring nation's
@@ -1386,32 +1449,75 @@ export class Vfx {
     }
   }
 
-  lichAura(entityId: number, dt: number, soulFragments: number): void {
-    const full = soulFragments >= 5;
-    const count = this.emitCount(full ? 42 : 26, dt);
-    if (!count) return;
-    const feet = this.anchor(entityId, 0.1);
-    if (!feet) return;
+  /** Mossy slime path a gliding snail mount leaves while moving: near-still
+   *  ground-level motes that linger, so the ride draws a fading trail. */
+  mountSlimeTrail(at: THREE.Vector3, dt: number): void {
+    if (!this.emitChance(16, dt)) return;
+    this.spawn(
+      at.x + (Math.random() - 0.5) * 0.5,
+      at.y + 0.07,
+      at.z + (Math.random() - 0.5) * 0.5,
+      0,
+      0.02,
+      0,
+      Math.random() < 0.35 ? 0x9fd94f : 0x5da83e,
+      0.55 + Math.random() * 0.35,
+      2.6 + Math.random() * 1.2,
+      0,
+      SPR.glowSoft,
+    );
+  }
+
+  /** Aether exhaust streaming off the back of a hover mount (yaw = facing,
+   *  forward = (sin yaw, cos yaw)): a soft dribble at idle, a stream on the
+   *  move. */
+  mountExhaust(at: THREE.Vector3, yaw: number, dt: number, moving: boolean): void {
+    if (!this.emitChance(moving ? 34 : 12, dt)) return;
+    const bx = -Math.sin(yaw);
+    const bz = -Math.cos(yaw);
+    const speed = moving ? 3.2 : 1.1;
+    this.spawn(
+      at.x + bx * 1.1 + (Math.random() - 0.5) * 0.3,
+      at.y + 0.85 + (Math.random() - 0.5) * 0.25,
+      at.z + bz * 1.1 + (Math.random() - 0.5) * 0.3,
+      bx * speed + (Math.random() - 0.5) * 0.6,
+      0.25 + Math.random() * 0.4,
+      bz * speed + (Math.random() - 0.5) * 0.6,
+      Math.random() < 0.3 ? 0xd98aff : 0x8ed2ff,
+      0.28 + Math.random() * 0.2,
+      0.5 + Math.random() * 0.3,
+      0,
+      SPR.sparkle,
+    );
+  }
+
+  /**
+   * Ground impact puff: the visual weight of a landing, and the scuff of a
+   * body striding up onto a ledge. `power` (0..1) scales count, spread, and
+   * lift, so a hop kicks a wisp and a real drop throws a ring of dust.
+   * Tinted by surface so grass, stone, and snow do not all throw brown dirt.
+   */
+  groundPuff(at: THREE.Vector3, power: number, color: number): void {
+    const p = Math.min(1, Math.max(0, power));
+    const count = Math.round((2 + p * 7) * (0.4 + 0.6 * this.quality));
     for (let i = 0; i < count; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const radius = 0.35 + Math.random() * (full ? 0.85 : 0.62);
-      const smoke = Math.random() < 0.34;
+      // Ring outward, barely rising: dust rolls away from the feet, it does
+      // not fountain up like a spell effect.
+      const a = (i / count) * Math.PI * 2 + Math.random() * 0.6;
+      const speed = (0.7 + Math.random() * 1.1) * (0.5 + p);
       this.spawn(
-        feet.x + Math.cos(angle) * radius,
-        feet.y + Math.random() * 0.45,
-        feet.z + Math.sin(angle) * radius,
-        -Math.sin(angle) * 0.34,
-        0.65 + Math.random() * (full ? 1.35 : 0.8),
-        Math.cos(angle) * 0.34,
-        smoke ? 0x271032 : full ? 0xe1a7ff : 0x9b4be5,
-        smoke ? 0.55 : full ? 0.32 : 0.26,
-        smoke ? 1.4 : 0.9 + Math.random() * 0.5,
-        -0.35,
-        smoke ? SPR.smoke : SPR.magicWisp,
+        at.x + Math.sin(a) * 0.22,
+        at.y + 0.07,
+        at.z + Math.cos(a) * 0.22,
+        Math.sin(a) * speed,
+        0.35 + Math.random() * 0.45 * p,
+        Math.cos(a) * speed,
+        color,
+        0.3 + 0.45 * p + Math.random() * 0.15,
+        0.35 + 0.35 * p,
+        1.6,
+        SPR.smoke,
       );
-    }
-    if (full && this.emitChance(3.5, dt)) {
-      this.spawn(feet.x, feet.y + 0.12, feet.z, 0, 0.15, 0, 0xd995ff, 2.3, 0.55, 0, SPR.ring);
     }
   }
 
@@ -1453,9 +1559,7 @@ export class Vfx {
 
   // ---------------------------------------------------------------------
 
-  update(dt: number, reducedMotion = false): void {
-    this.drainLifeVfx.update(dt, reducedMotion);
-
+  update(dt: number): void {
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) {
       const stream = this.bubbleBeams[i];
       stream.remaining -= dt;
@@ -1559,7 +1663,6 @@ export class Vfx {
             k % 2 === 0 ? SPR.sparkle : SPR.sparkBurst,
           );
         }
-        pr.onImpact?.(target);
         this.projectiles.splice(i, 1);
         continue;
       }
@@ -1649,27 +1752,28 @@ export class Vfx {
       }
     }
 
-    // advance the pool
-    for (let i = 0; i < CAPACITY; i++) {
-      if (this.life[i] <= 0) {
-        if (this.size[i] !== 0) this.size[i] = 0;
+    // Advance only live state slots, compacting expired entries in place. The
+    // active prefix stays numerically sorted, so draw packing is the same
+    // ascending physical-slot filter as the original fixed-pool scan.
+    let write = 0;
+    for (let active = 0; active < this.activeCount; active++) {
+      const slot = this.activeSlots[active];
+      const slot3 = slot * 3;
+      this.life[slot] -= dt;
+      const f = Math.max(0, this.life[slot] / this.maxLife[slot]);
+      this.vel[slot3 + 1] -= this.grav[slot] * dt;
+      this.pos[slot3] += this.vel[slot3] * dt;
+      this.pos[slot3 + 1] += this.vel[slot3 + 1] * dt;
+      this.pos[slot3 + 2] += this.vel[slot3 + 2] * dt;
+      this.alphaAttr[slot] = f < 0.25 ? f * 4 : 1;
+      if (this.life[slot] > 0) {
+        this.activeSlots[write++] = slot;
         continue;
       }
-      this.life[i] -= dt;
-      const f = Math.max(0, this.life[i] / this.maxLife[i]);
-      this.vel[i * 3 + 1] -= this.grav[i] * dt;
-      this.pos[i * 3] += this.vel[i * 3] * dt;
-      this.pos[i * 3 + 1] += this.vel[i * 3 + 1] * dt;
-      this.pos[i * 3 + 2] += this.vel[i * 3 + 2] * dt;
-      this.alphaAttr[i] = f < 0.25 ? f * 4 : 1;
-      if (this.life[i] <= 0) this.size[i] = 0;
+
+      this.size[slot] = 0;
+      this.activeSlotFlags[slot] = 0;
     }
-    const geo = this.points.geometry;
-    (geo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aSize as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aAlpha as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aColor as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aSprite as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aRot as THREE.BufferAttribute).needsUpdate = true;
+    this.activeCount = write;
   }
 }

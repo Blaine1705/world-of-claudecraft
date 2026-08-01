@@ -88,6 +88,11 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'raging_gale',
       'raised_guard',
       'pummel',
+      // Seething Fury: authored as a plain L10 active (def below) but orphaned
+      // when the v2 talent integration deleted the v1 class-tree grant
+      // (war_berserker_rage) without re-homing it - abilitiesKnownAt could
+      // never return it (owner report: unfindable on a live L20 warrior).
+      'berserker_rage',
       'execute',
       'furious_mending',
       'iron_resolve',
@@ -2904,7 +2909,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     spendsCombo: true,
-    effects: [{ type: 'dot', total: 96, duration: 16, interval: 2 }],
+    // 16 base + 16/combo point: totals 96 at 5 combo points, same max payoff as
+    // the old flat total, but now scales with combo points banked like every
+    // other finisher in this kit.
+    // Deliberate divergence from classic Rupture, which scales its DURATION
+    // with combo points (8 sec plus 2 sec per point) at a roughly flat per-tick
+    // value. This world's 1 to 20 level band compresses fight lengths, so a
+    // fixed 16 sec window with a combo-scaled tick reads better and keeps the
+    // bleed comparable to the other finishers here. Do not "fix" it back to
+    // duration scaling without retuning the whole rogue bleed budget.
+    effects: [{ type: 'dot', total: 16, duration: 16, interval: 2, perCombo: 16 }],
     description: 'Finishing move that wounds the target, causing it to bleed for $d over 16 sec.',
   },
   vanish: {
@@ -5567,7 +5581,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     spendsCombo: true,
     requiresForm: 'cat',
-    effects: [{ type: 'dot', total: 60, duration: 12, interval: 2 }],
+    // 10 base + 10/combo point: totals 60 at 5 combo points, same max payoff as
+    // the old flat total, but now scales with combo points banked like every
+    // other finisher in this kit.
+    effects: [{ type: 'dot', total: 10, duration: 12, interval: 2, perCombo: 10 }],
     description:
       'Finishing move that causes $d Bleed damage over 12 sec. Consumes combo points. Wolf Form only.',
   },
@@ -6016,6 +6033,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       { type: 'directDamage', min: 90, max: 110 },
       { type: 'chainDamage', min: 60, max: 75, jumps: 2, falloff: 1, radius: 10 },
+      { type: 'selfBuff', kind: 'buff_armor', value: 150, duration: 10 },
     ],
     description:
       'Hurls a radiant aegis at an enemy for 90 to 110 Holy damage, then bounces to 2 nearby enemies for 60 to 75 Holy damage each. (Protection signature)',
@@ -6567,13 +6585,19 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'arcane',
     requiresTarget: false,
-    // One dispatch applies the vanish, the damage cut (duration + linger so it
-    // survives an early break), and strips up to two DoTs (effect_dispatch).
+    // One dispatch strips up to two DoTs and applies the vanish. Its configured
+    // damage cut starts only once that vanish ends (effect_dispatch).
     effects: [
-      { type: 'greaterInvisibility', duration: 20, drValue: 0.9, linger: 3, removeDotCount: 2 },
+      {
+        type: 'greaterInvisibility',
+        duration: 20,
+        drValue: 0.9,
+        afterDuration: 2,
+        removeDotCount: 2,
+      },
     ],
     description:
-      'Vanish for 20 sec: removes 2 damage-over-time effects and you take 90% less damage while invisible and shortly after. (Mage talent)',
+      'Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)',
   },
   rings_of_frost: {
     id: 'rings_of_frost',
@@ -6941,7 +6965,12 @@ function scaleEffect(
       // fraction again would double-apply the talent/global damage modifier.
       return eff.directPct
         ? { ...eff }
-        : { ...eff, total: Math.round(eff.total * dmgMult * dotMult + flat) };
+        : {
+            ...eff,
+            total: Math.round(eff.total * dmgMult * dotMult + flat),
+            perCombo:
+              eff.perCombo === undefined ? undefined : Math.round(eff.perCombo * dmgMult * dotMult),
+          };
     case 'aoeDamage':
     case 'aoeHeal':
       return {
@@ -7069,7 +7098,12 @@ function scaleEffect(
 // mods stack on top and also tune cost / cast time / cooldown.
 function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
   const am = mods.abilities[entry.def.id];
-  const physical = entry.def.school === 'physical';
+  // The melee bucket also covers hunter's ranged-AP shots regardless of magic school:
+  // `scalesWith: 'ranged'` is exclusively set on hunter abilities (arcane_shot, serpent_sting,
+  // and wyvern_sting are non-physical), so this widening cannot reach any other class's
+  // melee/spell split. Without it, Marksmanship's Iron Aim ("ranged ability damage") silently
+  // never applied to Arcane Shot, the spec's arcane-school nuke.
+  const physical = entry.def.school === 'physical' || entry.def.scalesWith === 'ranged';
   const globalDmg = physical ? mods.global.meleeDmgPct : mods.global.spellDmgPct;
   const dmgMult = 1 + globalDmg + (am?.dmgPct ?? 0);
   const healMult = 1 + mods.global.healPct + (am?.dmgPct ?? 0);

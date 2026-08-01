@@ -13,13 +13,13 @@ import {
   type AbilityVfxPlan,
   type AbilityVfxSpec,
   abilityHexColor,
-  abilityVfxChargeStreams,
   abilityVfxColor,
   localCasterTier,
   planCast,
   planImpact,
 } from '../ability_vfx_core';
-import { abilityVfxFullSpec, abilityVfxSpec } from '../ability_vfx_registry';
+import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
+import { ABILITY_VFX_SPECS } from '../ability_vfx_specs';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
 import { type AbilityVfxFx, asOrbitStyle, type ParticleBurstKind } from './fx';
@@ -274,7 +274,7 @@ const HOSTILE_AURA_SUFFIXES = new Set(['_slow', '_root']);
 const auraSpecIdMemo = new Map<string, string | null>();
 const auraHostileWornMemo = new Set<string>();
 function auraSpecId(auraId: string): string | null {
-  if (abilityVfxSpec(auraId) !== undefined) return auraId;
+  if (ABILITY_VFX_SPECS[auraId] !== undefined) return auraId;
   let base = auraSpecIdMemo.get(auraId);
   if (base === undefined) {
     base = null;
@@ -282,7 +282,7 @@ function auraSpecId(auraId: string): string | null {
     for (const s of AURA_ID_SUFFIXES) {
       if (auraId.endsWith(s)) {
         const stripped = auraId.slice(0, -s.length);
-        if (abilityVfxSpec(stripped) !== undefined) {
+        if (ABILITY_VFX_SPECS[stripped] !== undefined) {
           base = stripped;
           hostile = HOSTILE_AURA_SUFFIXES.has(s);
         }
@@ -469,9 +469,9 @@ export class AbilityVfx {
   // its generic school-colored arm), false to fall through unchanged.
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
     if (!ev.ability || !CAST_FX.has(ev.fx)) return false;
-    const spec = abilityVfxSpec(ev.ability);
+    const spec = ABILITY_VFX_SPECS[ev.ability];
     if (!spec) return false;
-    const full = abilityVfxFullSpec(ev.ability);
+    const full = ABILITY_VFX_FULL_SPECS[ev.ability];
     // Beam-archetype channels (mind rays, drains) never fly a projectile:
     // every tick's cast-fx event feeds the channel tracker, which draws the
     // crescendoing cord and lands the full impact stack once, on the last tick.
@@ -834,7 +834,7 @@ export class AbilityVfx {
   handleSpellfxAt(ev: AbilityVfxSpellfxAtEvent): boolean {
     if (!ev.ability) return false;
     if (ev.fx !== 'nova' && ev.fx !== 'burst' && ev.fx !== 'tick') return false;
-    const spec = abilityVfxSpec(ev.ability);
+    const spec = ABILITY_VFX_SPECS[ev.ability];
     if (!spec) return false;
     const casterId = ev.sourceId ?? -1;
     const fx = this.deps.fx;
@@ -851,7 +851,7 @@ export class AbilityVfx {
       this.recordStat(ev.ability, true);
       return true;
     }
-    const full = abilityVfxFullSpec(ev.ability);
+    const full = ABILITY_VFX_FULL_SPECS[ev.ability];
     // recurring emits of the same aimed nova replay only the cheap re-hit
     const seqKey = `${casterId}:${ev.ability}`;
     const lastSeq = this.pointSeqAt.get(seqKey);
@@ -997,9 +997,9 @@ export class AbilityVfx {
       return;
     }
     const abilityId = attackAbilityId(ev.ability);
-    const spec = abilityId ? abilityVfxSpec(abilityId) : undefined;
+    const spec = abilityId ? ABILITY_VFX_SPECS[abilityId] : undefined;
     if (!spec || !abilityId) return;
-    const full = abilityVfxFullSpec(abilityId);
+    const full = ABILITY_VFX_FULL_SPECS[abilityId];
     const arch = full?.archetype ?? spec.a ?? 'strike';
     const isCastMoment = !!full && (arch === 'strike' || arch === 'dash' || arch === 'buff');
     // Local-player crit hitstop + screen pop (gallery critHit feel): body and
@@ -1068,7 +1068,7 @@ export class AbilityVfx {
     if (!ev.gained) return;
     const abilityId = ev.ability ?? abilityIdGuess;
     if (!abilityId) return;
-    const spec = abilityVfxSpec(abilityId);
+    const spec = ABILITY_VFX_SPECS[abilityId];
     if (!spec) return;
     this.deps.vfx.buffSwirl(ev.targetId, planCast(spec, this.quality, 0).swirlColor);
   }
@@ -1077,7 +1077,7 @@ export class AbilityVfx {
   // undefined to keep the generic school color. Cached parse, zero allocation:
   // safe to call every frame from the renderer's entity sync.
   sparkleColorFor(abilityId: string | null | undefined): number | undefined {
-    const spec = abilityId ? abilityVfxSpec(abilityId) : undefined;
+    const spec = abilityId ? ABILITY_VFX_SPECS[abilityId] : undefined;
     return spec ? abilityVfxColor(spec) : undefined;
   }
 
@@ -1102,11 +1102,11 @@ export class AbilityVfx {
     let glowStrength = 0;
     let glowSlow = false;
     if (e.castingAbility) {
-      const spec = abilityVfxSpec(e.castingAbility);
+      const spec = ABILITY_VFX_SPECS[e.castingAbility];
       if (spec) {
         const progress =
           e.castTotal > 0 ? Math.min(1, Math.max(0, 1 - e.castRemaining / e.castTotal)) : 0;
-        const full = abilityVfxFullSpec(e.castingAbility);
+        const full = ABILITY_VFX_FULL_SPECS[e.castingAbility];
         const style = full?.windupStyle ?? 'orb';
         glowColor = rimColorOf(full, spec);
         glowStrength = 1.2 * (full?.power ?? 1);
@@ -1119,8 +1119,6 @@ export class AbilityVfx {
             progress,
             style,
             this.deps.localPlayerId?.() === e.id,
-            abilityVfxChargeStreams(full),
-            rimColorOf(full, spec),
           )
         ) {
           this.spawned = 1;
@@ -1164,11 +1162,11 @@ export class AbilityVfx {
         auraId = FEAR_BREAK_SPEC_ID;
         hostileWorn = true;
       }
-      const spec = abilityVfxSpec(auraId);
+      const spec = ABILITY_VFX_SPECS[auraId];
       if (spec === undefined) continue;
       // maintenance passives (stances, spellbook traits): no read at all
       if (isPassiveAura(auraId)) continue;
-      const full = abilityVfxFullSpec(auraId);
+      const full = ABILITY_VFX_FULL_SPECS[auraId];
       const wornDebuff = hostileWorn && full?.debuff !== undefined;
       // barrier specs wear the translucent fresnel shell while the aura lives
       if (full?.barrier && !wornDebuff) fx.holdShell(e.id, abilityVfxColor(spec));
@@ -1271,8 +1269,8 @@ export class AbilityVfx {
     // shows the armed strike's color while queued and reverts on release. No
     // gain swirl: arming a level-1 filler is a tell, not a ceremony.
     if (e.queuedOnSwing && bands < 3) {
-      const qspec = abilityVfxSpec(e.queuedOnSwing);
-      const qfull = abilityVfxFullSpec(e.queuedOnSwing);
+      const qspec = ABILITY_VFX_SPECS[e.queuedOnSwing];
+      const qfull = ABILITY_VFX_FULL_SPECS[e.queuedOnSwing];
       const qstyle = qspec ? asOrbitStyle(qfull?.buff?.orbit ?? qspec.bo) : null;
       if (qspec !== undefined && qstyle !== null) {
         if (orbitTier < 0) orbitTier = this.biasFor(e.id, this.budget.peek(e.id, this.now()));
@@ -1296,8 +1294,8 @@ export class AbilityVfx {
   }
 
   // Advances the primitive engine (ribbons, rings, decals, orbit/windup draw).
-  update(dt: number, reducedMotion = false): void {
-    this.deps.fx.update(dt, reducedMotion);
+  update(dt: number): void {
+    this.deps.fx.update(dt);
     // a broken beam channel (interrupt, death, retarget mid-cord) simply
     // expires: the cord stops being fed and no final impact ever lands
     if (this.beamChannels.size > 0) {

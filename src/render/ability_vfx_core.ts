@@ -59,7 +59,6 @@ export type AbilityVfxWindupStyle =
   | 'none'
   | 'stance'
   | 'vortex'
-  | 'compression'
   | 'weapon'
   | 'orb'
   | 'runes'
@@ -95,9 +94,6 @@ export interface AbilityVfxImpactSpec {
   blood?: boolean | number;
   liteAudio?: boolean;
   sample?: string;
-  // Keep a marquee hit visually concentrated around one victim rather than
-  // reading as an area attack. Painters may tighten sheets and wavefronts.
-  focused?: boolean;
 }
 
 export interface AbilityVfxBuffSpec {
@@ -139,13 +135,6 @@ export interface AbilityVfxFullSpec {
   archetype: AbilityVfxArchetype;
   palette: string;
   power?: number;
-  // Frequently repeated rotational fillers keep the same authored sequence,
-  // pools, quality tiers, and cleanup, but opt out of gallery-scale
-  // crescendo multipliers reserved for finishers and heavier attacks.
-  filler?: boolean;
-  // Number of authored resource streams that converge during the windup and
-  // release. Defaults to one and is capped at three for the pooled renderer.
-  chargeStreams?: number;
   windup?: number;
   windupStyle?: AbilityVfxWindupStyle;
   motifs?: AbilityVfxMotif[];
@@ -156,20 +145,7 @@ export interface AbilityVfxFullSpec {
   bolt?: {
     speed?: number;
     headScale?: number;
-    style?:
-      | 'rock'
-      | 'shard'
-      | 'comet'
-      | 'arrow'
-      | 'wisp'
-      | 'felLance'
-      | 'shadowFang'
-      | 'essenceLance'
-      | 'soulLance';
-    // Optional shaped-head colors. The main tint still owns the trail; these
-    // let a shared silhouette carry a class-specific dark core and hot tip.
-    core?: string;
-    accent?: string;
+    style?: 'rock' | 'shard' | 'comet' | 'arrow' | 'wisp';
     coils?: boolean;
     jagged?: boolean;
     forkEvery?: number;
@@ -274,12 +250,6 @@ export function abilityHexColor(value: string): number {
 // The compact spec's main color.
 export function abilityVfxColor(spec: AbilityVfxSpec): number {
   return abilityHexColor(spec.c);
-}
-
-export function abilityVfxChargeStreams(spec: AbilityVfxFullSpec | undefined): number {
-  const streams = spec?.chargeStreams;
-  if (!Number.isFinite(streams)) return 1;
-  return Math.min(3, Math.max(1, Math.round(streams ?? 1)));
 }
 
 function clamp(value: number, min: number, max: number): number {

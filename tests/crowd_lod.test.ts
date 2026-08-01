@@ -5,6 +5,7 @@ import {
   animatesEveryFrame,
   animCadenceFrames,
   characterLodBands,
+  characterLodBandsInto,
   crowdLodScaleSq,
   FAR_ANIM_RANGE_SCALE_MAX,
   farAnimCadence,
@@ -12,6 +13,20 @@ import {
   midAnimCadence,
   showsStaticFarMesh,
 } from '../src/render/crowd_lod';
+import { assertAllocationStable } from './util/alloc_probe';
+
+describe('character LOD allocation budget', () => {
+  it('fills one caller-owned band plan', () => {
+    const out = characterLodBands(0, 625, 3600, 1, 0);
+    expect(() =>
+      assertAllocationStable(
+        () => characterLodBandsInto(out, 20, 625, 3600, 1, 0),
+        64,
+        'character LOD plan',
+      ),
+    ).not.toThrow();
+  });
+});
 
 describe('crowdLodScaleSq', () => {
   it('leaves ordinary scenes at full range', () => {
@@ -92,6 +107,23 @@ describe('animatesEveryFrame', () => {
 
   it('exempts anything mid-cast, even an untargeted stranger', () => {
     expect(animatesEveryFrame(STRANGER, SELF, TARGET, 'fireball')).toBe(true);
+  });
+
+  it("exempts the local player's pet while it is fighting", () => {
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, null, true, SELF, TARGET, null)).toBe(true);
+  });
+
+  it("exempts a monster fighting the local player's pet", () => {
+    const PET = 4;
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, null, true, null, PET, SELF)).toBe(true);
+  });
+
+  it('exempts an ally fighting the current target', () => {
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, null, true, null, TARGET, null)).toBe(true);
+  });
+
+  it('does not exempt idle pets outside combat', () => {
+    expect(animatesEveryFrame(STRANGER, SELF, TARGET, null, false, SELF, TARGET, null)).toBe(false);
   });
 
   it('does not exempt an idle, untargeted stranger', () => {

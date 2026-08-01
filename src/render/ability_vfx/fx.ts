@@ -15,7 +15,7 @@ import { AbilityVfxRibbons, type BoltTrailStyle, type RibbonAnchor } from './rib
 import { ShockRings } from './rings';
 import { ArchetypeSequencer, type SequencerHost } from './sequencer';
 import { BuffShells } from './shells';
-import { SPECTACLE, usesCrescendoScale } from './spectacle';
+import { isCrescendoArchetype, SPECTACLE } from './spectacle';
 import { asSpiritPath, SpiritApparitions, type SpiritAtKind } from './spirits';
 
 export type { DecalStyle } from './decals';
@@ -68,7 +68,7 @@ const ORBIT_STYLE_SET = new Set<string>([
   'leaves',
 ]);
 
-// Resolve an authored buff-orbit name ('none', unknown, or absent ? null).
+// Resolve an authored buff-orbit name ('none', unknown, or absent → null).
 export function asOrbitStyle(v: string | null | undefined): OrbitStyle | null {
   return v != null && ORBIT_STYLE_SET.has(v) ? (v as OrbitStyle) : null;
 }
@@ -90,7 +90,7 @@ const MAX_WINDUPS = 24;
 const WINDUP_LEAN_RAD = 0.085;
 
 // Cap on the one-shot buff-application glow pulse (fx.glowPulse): applied rig
-// emissive peaks at min(0.85, 0.9 * 0.38) ? 0.34 and fast-decays to nothing in
+// emissive peaks at min(0.85, 0.9 * 0.38) ≈ 0.34 and fast-decays to nothing in
 // ~0.4s. Sustained body tint is reserved for cast windups and the morph/
 // ultimate rims the painter grants explicitly.
 const BUFF_APPLICATION_PULSE_MAX = 0.9;
@@ -105,7 +105,7 @@ function wantsScreenFx(spec: AbilityVfxFullSpec, tier: number): boolean {
   if (tier !== 0 || spec.screenFx === false) return false;
   if (spec.screenFx === true) return true;
   return (
-    usesCrescendoScale(spec) ||
+    isCrescendoArchetype(spec.archetype) ||
     spec.finisher === true ||
     (spec.archetype === 'nova' && (spec.nova?.radius ?? 5) >= 7)
   );
@@ -114,7 +114,7 @@ function wantsScreenFx(spec: AbilityVfxFullSpec, tier: number): boolean {
 // Ripple+flash strength for a sequence's landing: crescendo impacts ride the
 // spectacle constants (gallery-scale), everything else keeps the gentle ask.
 function screenFxStrengthOf(spec: AbilityVfxFullSpec): number {
-  if (!usesCrescendoScale(spec)) return spec.finisher ? 1 : 0.8;
+  if (!isCrescendoArchetype(spec.archetype)) return spec.finisher ? 1 : 0.8;
   return spec.finisher ? SPECTACLE.screenFxFinisher : SPECTACLE.screenFx;
 }
 
@@ -133,22 +133,13 @@ interface OrbitBand {
   stamp: number;
 }
 
-export type WindupStyle =
-  | 'none'
-  | 'orb'
-  | 'runes'
-  | 'vortex'
-  | 'compression'
-  | 'ascend'
-  | 'stance'
-  | 'weapon';
+export type WindupStyle = 'none' | 'orb' | 'runes' | 'vortex' | 'ascend' | 'stance' | 'weapon';
 
 const WINDUP_STYLE_SET = new Set<string>([
   'none',
   'orb',
   'runes',
   'vortex',
-  'compression',
   'ascend',
   'stance',
   'weapon',
@@ -156,10 +147,8 @@ const WINDUP_STYLE_SET = new Set<string>([
 
 interface WindupState {
   colorHex: number;
-  accentHex: number;
   progress: number;
   style: WindupStyle;
-  streams: number;
   stamp: number;
 }
 
@@ -266,8 +255,8 @@ const ORBIT_DNA: Record<
   },
 };
 
-// Gallery ORBIT_TEX names mapped onto the overlay atlas's four cells (chip ?
-// spark is the closest fragment read; rays ? star; paw ? rune glyph).
+// Gallery ORBIT_TEX names mapped onto the overlay atlas's four cells (chip →
+// spark is the closest fragment read; rays → star; paw → rune glyph).
 const ORBIT_TEX_CELL: Record<string, number | undefined> = {
   star: OVERLAY_CELL.star,
   glow: OVERLAY_CELL.glow,
@@ -306,7 +295,6 @@ export class AbilityVfxFx implements SequencerHost {
   private orbits = new Map<number, OrbitBand[]>();
   private orbitBandCount = 0;
   private time = 0;
-  private reducedMotionActive = false;
   private frame = 0;
   private qualityLevel = 1;
   // Camera-right on the ground plane, refreshed once per update: entities
@@ -610,24 +598,6 @@ export class AbilityVfxFx implements SequencerHost {
       true,
     );
     const screen = wantsScreenFx(spec, tier);
-    const onTerminate = slot
-      ? (x: number, y: number, z: number) => {
-          this.sequencer.cancel(slot);
-          if (tier < 2) {
-            this.particleBurst?.(x, y, z, colorHex, tier === 0 ? 6 : 3, 0.35, 'smoke');
-            if (tier === 0)
-              this.particleBurst?.(
-                x,
-                y,
-                z,
-                abilityHexColor(spec.rim ?? '#d8ff58'),
-                4,
-                0.3,
-                'embers',
-              );
-          }
-        }
-      : null;
     const b = spec.bolt;
     if (!b) {
       this.ribbons.spawnTrail(
@@ -641,7 +611,6 @@ export class AbilityVfxFx implements SequencerHost {
               if (screen) this.screenFxAt(x, y, z, screenFxStrengthOf(spec));
             }
           : null,
-        onTerminate,
       );
       return;
     }
@@ -660,8 +629,6 @@ export class AbilityVfxFx implements SequencerHost {
         speed,
         style,
         headSize: hs,
-        coreHex: b.core ? abilityHexColor(b.core) : undefined,
-        accentHex: b.accent ? abilityHexColor(b.accent) : undefined,
         coils: fullTier && b.coils === true,
         jagTrail: fullTier && b.jagged === true,
         forkEvery: fullTier ? (b.forkEvery ?? 0) : 0,
@@ -677,7 +644,6 @@ export class AbilityVfxFx implements SequencerHost {
         if (slot) this.sequencer.triggerImpact(this, slot, x, y, z);
         if (screen) this.screenFxAt(x, y, z, screenFxStrengthOf(spec));
       },
-      onTerminate,
     );
     // staggered barrage riding behind the lead projectile (gallery volley):
     // followers keep the style head and trail, shed the garnish, land with a
@@ -693,8 +659,6 @@ export class AbilityVfxFx implements SequencerHost {
           speed,
           style,
           headSize: hs * 0.75,
-          coreHex: b.core ? abilityHexColor(b.core) : undefined,
-          accentHex: b.accent ? abilityHexColor(b.accent) : undefined,
           coils: false,
           jagTrail: false,
           forkEvery: 0,
@@ -749,24 +713,6 @@ export class AbilityVfxFx implements SequencerHost {
       },
     );
     const screen = wantsScreenFx(spec, tier);
-    const onTerminate = slot
-      ? (ax: number, ay: number, az: number) => {
-          this.sequencer.cancel(slot);
-          if (tier < 2) {
-            this.particleBurst?.(ax, ay, az, colorHex, tier === 0 ? 6 : 3, 0.35, 'smoke');
-            if (tier === 0)
-              this.particleBurst?.(
-                ax,
-                ay,
-                az,
-                abilityHexColor(spec.rim ?? '#d8ff58'),
-                4,
-                0.3,
-                'embers',
-              );
-          }
-        }
-      : null;
     const b = spec.bolt;
     const style: BoltTrailStyle = b?.style ?? PROJ_STYLE_BY_PALETTE[spec.palette] ?? 'comet';
     const speed = b?.speed ?? 26;
@@ -799,7 +745,6 @@ export class AbilityVfxFx implements SequencerHost {
         if (slot) this.sequencer.triggerImpact(this, slot, ax, ay, az);
         if (screen) this.screenFxAt(ax, ay, az, screenFxStrengthOf(spec));
       },
-      onTerminate,
     );
     // the fan: followers aim at spread points around the landing so the
     // volley reads as a scatter of shots blanketing the aimed area
@@ -1056,7 +1001,7 @@ export class AbilityVfxFx implements SequencerHost {
     // easeInOutSine ramp); the visual's spring recoils it forward on release
     const p = Math.min(1, Math.max(0, progress));
     this.bodyLeanCb?.(entityId, WINDUP_LEAN_RAD * (0.5 - 0.5 * Math.cos(Math.PI * p)));
-    this.drawWindup(entityId, s, colorHex, progress, 1, colorHex, this.reducedMotionActive);
+    this.drawWindup(entityId, s, colorHex, progress);
   }
 
   quality(): number {
@@ -1292,8 +1237,6 @@ export class AbilityVfxFx implements SequencerHost {
     progress: number,
     style: WindupStyle = 'orb',
     priority = false,
-    streams = 1,
-    accentHex = colorHex,
   ): boolean {
     if (style === 'none') return false;
     let w = this.windups.get(entityId);
@@ -1306,15 +1249,13 @@ export class AbilityVfxFx implements SequencerHost {
         if (oldest.done) return false;
         this.windups.delete(oldest.value);
       }
-      w = { colorHex, accentHex, progress, style, streams, stamp: this.frame };
+      w = { colorHex, progress, style, stamp: this.frame };
       this.windups.set(entityId, w);
       started = true;
     }
     w.colorHex = colorHex;
-    w.accentHex = accentHex;
     w.progress = progress;
     w.style = style;
-    w.streams = Math.min(3, Math.max(1, Math.round(streams)));
     w.stamp = this.frame;
     return started;
   }
@@ -1356,9 +1297,8 @@ export class AbilityVfxFx implements SequencerHost {
 
   // ---- frame advance ------------------------------------------------------
 
-  update(dt: number, reducedMotion = false): void {
+  update(dt: number): void {
     this.time += dt;
-    this.reducedMotionActive = reducedMotion;
     this.shakeRecent = Math.max(0, this.shakeRecent - dt * 0.8);
     this.camera.getWorldPosition(camPosScratch);
     camRightScratch.set(1, 0, 0).applyQuaternion(this.camera.quaternion);
@@ -1376,7 +1316,7 @@ export class AbilityVfxFx implements SequencerHost {
       const at = s.entityId >= 0 ? this.anchor(s.entityId, 0.5) : s;
       if (at) this.screenFxAt(at.x, at.y, at.z, s.strength);
     }
-    this.ribbons.update(dt, camPosScratch, reducedMotion);
+    this.ribbons.update(dt, camPosScratch);
     this.rings.update(dt, this.camera.quaternion);
     this.flipbooks.update(dt, this.camera.quaternion);
     this.decals.update(dt);
@@ -1387,13 +1327,13 @@ export class AbilityVfxFx implements SequencerHost {
     this.overlay.beginFrame();
     // styled bolt heads ride this frame's overlay batch (positions were just
     // advanced by ribbons.update above)
-    this.ribbons.drawHeads(this.time, this.headSink, reducedMotion);
+    this.ribbons.drawHeads(this.time, this.headSink);
     for (const [id, w] of this.windups) {
       if (w.stamp !== this.frame) {
         this.windups.delete(id);
         continue;
       }
-      this.drawWindup(id, w.style, w.colorHex, w.progress, w.streams, w.accentHex, reducedMotion);
+      this.drawWindup(id, w.style, w.colorHex, w.progress);
     }
     for (const [id, bands] of this.orbits) {
       for (let i = bands.length - 1; i >= 0; i--) {
@@ -1463,7 +1403,6 @@ export class AbilityVfxFx implements SequencerHost {
   //   orb     a glow converging and swelling between the hands (the default)
   //   runes   a rotating rune circle at the feet, tightening as the cast fills
   //   vortex  wide sparks pulled inward, the drain-cast read
-  //   compression compact paired wisps collapsing into a sharp hand point
   //   ascend  a rising mote column crowned by a star near completion
   //   stance  low dust drifting at the feet (warrior stances)
   //   weapon  a hand-height star building along the weapon
@@ -1472,13 +1411,10 @@ export class AbilityVfxFx implements SequencerHost {
     style: WindupStyle,
     colorHex: number,
     progress: number,
-    streams = 1,
-    accentHex = colorHex,
-    reducedMotion = false,
   ): void {
     const p = Math.min(1, Math.max(0, progress));
     const q = 0.75 + 0.25 * this.qualityLevel;
-    const pulse = reducedMotion ? 1 : 1 + 0.07 * Math.sin(this.time * 14);
+    const pulse = 1 + 0.07 * Math.sin(this.time * 14);
     if (style === 'runes') {
       const feet = this.anchor(entityId, 0.04);
       if (!feet) return;
@@ -1586,46 +1522,6 @@ export class AbilityVfxFx implements SequencerHost {
       );
       return;
     }
-    if (style === 'compression') {
-      const at = this.anchor(entityId, 0.58);
-      if (!at) return;
-      const reach = 0.18 + 1.05 * (1 - p);
-      const coreSize = (0.14 + 0.22 * p) * pulse * q;
-      for (let stream = 0; stream < streams; stream++) {
-        const baseAngle =
-          (reducedMotion ? 0 : this.time * (3.6 + stream * 0.25)) +
-          (stream * Math.PI * 2) / streams +
-          entityId * 0.37;
-        const streamColor = stream % 2 === 0 ? colorHex : accentHex;
-        for (let node = 0; node < 3; node++) {
-          const along = (node + 1) / 3;
-          const radius = reach * along;
-          const angle = baseAngle - along * (1.8 + 0.65 * p);
-          this.overlay.push(
-            at.x + Math.cos(angle) * radius,
-            at.y + 0.1 + (stream - (streams - 1) * 0.5) * 0.08 * (1 - p),
-            at.z + Math.sin(angle) * radius,
-            streamColor,
-            (0.065 + 0.025 * along) * q,
-            OVERLAY_CELL.spark,
-            0.5 + 0.38 * p,
-            1.8 + 0.45 * p,
-          );
-        }
-      }
-      this.overlay.push(at.x, at.y + 0.1, at.z, colorHex, coreSize, OVERLAY_CELL.glow, 0.75, 1.25);
-      this.overlay.push(
-        at.x,
-        at.y + 0.1,
-        at.z,
-        accentHex,
-        coreSize * 0.42,
-        OVERLAY_CELL.spark,
-        0.55 + 0.4 * p,
-        2.8,
-      );
-      return;
-    }
     // orb (default) and vortex share the hand orb; vortex pulls from wider out
     const at = this.anchor(entityId, 0.58);
     if (!at) return;
@@ -1641,32 +1537,7 @@ export class AbilityVfxFx implements SequencerHost {
       0.5 + 0.5 * p,
       2.6,
     );
-    if (style === 'vortex' && streams > 1) {
-      const streamReach = 0.22 + 1.85 * (1 - p);
-      for (let stream = 0; stream < streams; stream++) {
-        const baseAngle =
-          this.time * (2.8 + stream * 0.2) + (stream * Math.PI * 2) / streams + entityId * 0.37;
-        const streamColor = stream % 2 === 0 ? colorHex : accentHex;
-        for (let node = 0; node < 3; node++) {
-          const along = (node + 1) / 3;
-          const radius = streamReach * along;
-          const angle = baseAngle - along * (1.4 + 0.8 * p);
-          this.overlay.push(
-            at.x + Math.cos(angle) * radius,
-            at.y +
-              0.12 +
-              (stream - (streams - 1) * 0.5) * 0.16 * (1 - p) +
-              Math.sin(this.time * 6 + stream + node) * 0.05,
-            at.z + Math.sin(angle) * radius,
-            streamColor,
-            (0.12 + 0.055 * along) * q,
-            node === 2 ? OVERLAY_CELL.star : OVERLAY_CELL.spark,
-            0.62 + 0.3 * p,
-            2.2 + 0.45 * p,
-          );
-        }
-      }
-    } else if (this.qualityLevel >= 0.5) {
+    if (this.qualityLevel >= 0.5) {
       const motes = style === 'vortex' ? 4 : 2;
       const reach = style === 'vortex' ? 1.9 : 0.9;
       for (let k = 0; k < motes; k++) {

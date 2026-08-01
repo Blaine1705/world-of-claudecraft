@@ -163,6 +163,7 @@ describe('i18n whole-catalog completeness', () => {
       'hudChrome.discord.title', // "Discord" - brand
       'hudChrome.discord.open', // "Discord" - brand
       'hudChrome.steam.title', // "Steam" - brand
+      'hudChrome.epic.title', // "Epic" - brand
       'hudChrome.discord.panelTitle', // "World of ClaudeCraft" - brand
       'hudChrome.discord.linkedTitle', // "Discord: {name}" - brand + player name
       'hudChrome.keybinds.discord', // "Discord" - brand (Key Bindings action label)
@@ -172,6 +173,23 @@ describe('i18n whole-catalog completeness', () => {
       'guide.controls.discord', // "Discord" - brand (Guide controls-page action label)
       'desktop.crash.title', // "World of ClaudeCraft" - brand (desktop crash dialog title)
       'auth.emailPlaceholder', // "you@example.com" - RFC 2606 example address, kept verbatim
+      // Rift boss mechanic names: authored fantasy proper nouns that do not translate.
+      'abilityUi.cast.rift_frost_execution',
+      'abilityUi.cast.rift_frost_strike',
+      'abilityUi.cast.rift_ember_execution',
+      'abilityUi.cast.rift_ember_strike',
+      'abilityUi.cast.rift_venom_execution',
+      'abilityUi.cast.rift_venom_strike',
+      'abilityUi.cast.rift_necro_execution',
+      'abilityUi.cast.rift_necro_strike',
+      'abilityUi.cast.rift_brute_execution',
+      'abilityUi.cast.rift_brute_strike',
+      'abilityUi.cast.rift_arcane_execution',
+      'abilityUi.cast.rift_arcane_strike',
+      'abilityUi.cast.rift_storm_execution',
+      'abilityUi.cast.rift_storm_strike',
+      'abilityUi.cast.rift_tide_execution',
+      'abilityUi.cast.rift_tide_strike',
     ]);
     const wordy = (v: string) => /[a-z]{4,}/.test(v.replace(/\{[^}]*\}/g, ''));
     // The command center is enabled only in Vite development builds and cannot reach

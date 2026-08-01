@@ -43,6 +43,9 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
 - `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
   one draw per material (`assets.ts` `assembleModel` calls it). Read its
   header bind-pose proof before touching bone inverses.
+- `skin_gpu_layout.ts`: compacts merged palettes to every matrix the shader
+  fetches, narrows exact joint indices, and crops unused RGBA32F bone-texture
+  rows without changing skin weights, matrix values, draws, or shader math.
 - `visual.ts`: `CharacterVisual`, the mixer + `BaseState` machine, LOD/shadow/ghost
   plumbing, one-shot triggers, death/revive edge logic.
 - `preview.ts`: `CharacterPreview`, the character-creation turntable (own scene/
@@ -99,6 +102,13 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
 - Death/revive are **edge-triggered locally** from `s.dead` (clamped one-shot);
   `flourish` plays on respawn. One-shots clamp on the last frame, see the
   T-pose-pop comment in `playOneShot`.
+- **Never leave the rig at zero weight.** A SkinnedMesh renders BIND pose (the
+  T-pose) whenever the mixer's scheduled actions sum below 1, and the base-state
+  fade only runs on an EDGE, so a partner-less `fadeIn` sticks for as long as a
+  held state (strafe/cast/walk) lasts. Start every clip through `beginAction`
+  (crossfade only when the outgoing action still drives the rig, else snap to
+  full weight); the per-frame `scanAnimRepair` watchdog (`anim_state.ts`) is the
+  backstop that re-drives the base pose after 3 starved frames.
 
 ## Adding things (module-first: where NEW work lands, and its test)
 - **New family/key:** a declarative `VisualDef` in `VISUALS` (existing `ClipMap`
@@ -111,7 +121,10 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
   then have the renderer set the new flag. New pose LOGIC goes in the pure
   `anim_state.ts` half a Vitest imports directly, never inline in `visual.ts`.
 - **Tests:** `tests/visual_manifest.test.ts` pins the `VISUALS`/clip contract,
-  `tests/visual_anim_state.test.ts` the pose selection. Fix bugs test-first:
+  `tests/character_clipmaps.test.ts` gates every ClipMap name against the clips
+  actually in the shipped GLB (both graphics tiers), `tests/character_anim_state.test.ts`
+  the pure pose/watchdog math, `tests/character_tpose_repair.test.ts` the live
+  mixer weights across death, respawn and repeated swings. Fix bugs test-first:
   reproduce there (or in `tests/rig_merge.test.ts` for merge math), then the
   smallest change that turns it green.
 

@@ -69,6 +69,11 @@
     --color-debuff-shadow: #9b59d0;
     --color-debuff-nature: #35a835;
     --color-debuff-holy: #d8b56b;
+    --color-aura-rpg-gold: #ffe14d;
+    --color-aura-rpg-violet: #bd63ff;
+    --color-aura-rpg-electric: #3dc7ff;
+    --aura-glow-core: 5px;
+    --aura-glow-halo: 16px;
 
     --color-bg-dark: #08080d;
     --color-bg-input: #0a0a0f;
@@ -145,6 +150,7 @@
     /* overworld world-map window (resolved by map_window_painter.ts via
        getComputedStyle: a 2D canvas context cannot read a CSS var directly).
        Exact pre-existing values from the inline updateMapWindow/drawMapDetail. */
+    --color-map-ocean: #142c54;
     --color-map-label: #ffe9a0;
     --color-map-outline: #000;
     --color-map-portal-dot: #c084ff;
@@ -160,6 +166,10 @@
     --color-map-player: #fff;
     --color-map-ally-friend: #4ade80;
     --color-map-ally-guild: #60a5fa;
+    /* party member dots (issue 2652): class-colored when alive; this token
+       replaces the class color for a dead member, matching
+       --color-minimap-party-dead below. */
+    --color-map-party-dead: #9a9a9a;
     --color-map-rock: #8c8b86;
     --color-map-tree: #2f6b34;
     --color-map-oak: #4f8c3a;
@@ -175,6 +185,21 @@
     --color-map-graveyard: #8a929c;
     --color-map-mudhut: #7a6a4a;
     --color-map-campfire: #ff9a3c;
+    /* continent overview: the open water the world_overview plate is letterboxed
+       into (resolved by continent_map_painter.ts). Its own token rather than
+       --color-map-ocean above, because the plate is a tall portrait crop of the
+       world bounds and so leaves a wide band of flat fill down both sides of the
+       square map canvas: that band has to read as the SAME sea the plate paints,
+       not as the per-zone map's dark off-map backdrop. Sampled from the plate's
+       deep-water margin; re-sample it whenever the art is swapped. */
+    --color-map-continent-ocean: #0a4d7b;
+    /* continent overview: clickable zone regions (resolved by
+       continent_map_painter.ts). Idle border, hovered fill + border, and the
+       current-zone border, all drawn over the painted world_overview plate. */
+    --color-map-region-stroke: rgba(255, 233, 160, 0.35);
+    --color-map-region-hover-fill: rgba(255, 233, 160, 0.18);
+    --color-map-region-hover-stroke: #ffe9a0;
+    --color-map-region-current-stroke: #ffd100;
 
     /* overworld minimap markers (resolved by minimap_painter.ts via getComputedStyle:
        a 2D canvas context cannot read a CSS var directly). Exact pre-existing values

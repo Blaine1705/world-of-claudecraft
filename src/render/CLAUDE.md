@@ -20,7 +20,10 @@ Everything else is a sibling module in one of these families:
   `dungeon.ts` (instanced/merged GLBs), `water.ts` (terrain-aware water bodies;
   shore-depth and tier core in `water_core.ts`, sleeping GPU height field and
   facing-aligned character volume wakes in `water_simulation.ts`), `sky.ts`. Event/minigame scenes follow
-  the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`.
+  the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`. Rift
+  portals: `door_portal.ts` also builds the bespoke world-rift gate GLB with
+  its rank-tinted energy membrane (`buildRiftGateBody`), and `rift_rank.ts` is
+  the floating C/B/A/S rank badge above a world rift portal.
 - **Per-frame overlay/FX modules** ticked from `sync()`: `vfx.ts` (pooled
   particles), `weather.ts`, `character_effects.ts`.
 - **The nameplate suite** (below) owns all overhead text and badges.
@@ -39,6 +42,16 @@ Everything else is a sibling module in one of these families:
 - `self_motion.ts`/`facing_smooth.ts`: pure display-only self layers (bounded
   online pose extrapolation + rate-limited self yaw; never touch world state,
   see `src/net/CLAUDE.md`).
+- `step_smooth_core.ts`/`ground_tilt_core.ts`: the grounded-presentation pair
+  the entity loop drives per body. The first eases the vertical step the
+  physics solver takes inside one tick (leashed to a step, exact while
+  airborne so jumps and landings keep their impact); the second leans a body
+  toward the surface under it, in the body's own frame, partial and clamped
+  and damped. Both display-only: collision keeps using the physical pose.
+  Terrain gradients resample on a per-body TIME budget, never a frame count
+  (a frame cadence starves on a slow client). Landing dust rides the same
+  loop through `Vfx.groundPuff`, scaled by the display-derived fall speed
+  because the wire carries no vy for remote bodies.
 - `camera_boom_core.ts`/`camera_feel_core.ts`/`camera_director_core.ts`: the
   AAA chase-camera feel stack `updateCamera` composes (spring-arm pivot lag,
   look-ahead + FOV kicks + landing thump, directed zone-vista/death-drift
@@ -66,11 +79,8 @@ combo; allocation-free: `nameplatePlanInto` fills a caller-owned `NameplatePlan`
 `nameplate_painter.ts` does the Three projection, DOM writes, and ALL the
 localization (per-tier cadence via `ui_tier_knobs.nameplateIntervalSec`); the
 significant-contributor name glow lives there too. Narrow helpers:
-`nameplate_combo/threat/projection/declutter.ts` (the last one is the
-classic-style vertical stacking pass: plates only ever move UP from their own
-anchor, the current target is pinned, and separation follows each plate's real
-height from `nameplate_extent_core.ts`) plus `entity_labels.ts` (shared
-localized display names). Drive changes from `tests/nameplate_*.test.ts`.
+`nameplate_combo/threat/projection/declutter.ts` plus `entity_labels.ts`
+(shared localized display names). Drive changes from `tests/nameplate_*.test.ts`.
 
 ## gfx.ts: the shared core (read this before touching any subsystem)
 - **`GFX` quality tiers** (`low`/`medium`/`high`/`ultra`). Every tier-dependent knob lives
@@ -104,9 +114,22 @@ localized display names). Drive changes from `tests/nameplate_*.test.ts`.
 rules, all CI-enforced:
 - **Cache results are IMMUTABLE: clone before mutating.** `releaseGltf(url)` drops
   the cache entry after geometry is extracted.
-- **`preload.ts` is the boot gate.** Subsystems call `registerPreload(promise)` at
-  import time and `startGame` awaits `assetsReady()`, so `build*()` can read resolved
-  assets synchronously. A new module-load fetch MUST `registerPreload`.
+- **`preload.ts` is the boot gate, and it has TWO lanes.** `startGame` awaits
+  `assetsReady()` either way, so `build*()` still reads resolved assets
+  synchronously; the lanes differ only in WHEN the fetch starts. A new module-load
+  fetch MUST register in one of them, and for world content that is the deferred one:
+  - `registerDeferredPreload(() => load...())` for world content. Nothing runs until
+    `startGame` calls `beginDeferredPreloads()`. The thunk must CREATE the promise
+    when invoked, never close over one already in flight.
+  - `registerPreload(promise)` stays eager, for the few assets the LAUNCHER itself
+    draws. Today that is `characters/assets.ts` (the character-creation preview) and
+    `placed_assets.ts` (which runs during world build, not at import).
+  Fetching world content at import meant merely reaching the home screen decoded the
+  whole set, and the spike crossed WKWebView's per-process ceiling: a 12 GB iPhone 17
+  Pro was killed 1.6s in and reloaded forever, unseen by the entry crash guard (it
+  only arms inside `startGame`). Guarded by `tests/defer_launcher_preloads.test.ts`,
+  which also pins that the lane opens BEFORE the `assetsReady()` that gates the
+  Renderer, and fails on any new eager registrant outside the two allowed files.
 - **Preload sets are tier-INDEPENDENT.** They freeze at the import-time tier
   guess but placement runs against the LIVE tier, so a preload set must be a
   superset of EVERY tier's placement set or world entry crashes with "asset not
@@ -119,6 +142,9 @@ rules, all CI-enforced:
   so it covers your module.
 
 ## i18n: overhead labels are the only string surface here
+One deliberate exception: `scene_census_core.ts`'s table/format helpers feed the
+`?perf` overlay, a dev diagnostic that stays English by the `src/game/CLAUDE.md`
+perf-overlay carve-out; never reuse them in player-facing chrome.
 The renderer is geometry/shaders; the overhead-text surface is
 `nameplate_painter.ts` (owns `t`/`tEntity`/`formatNumber`) plus
 `entity_labels.ts` (localized display-name helpers, lifted out of `renderer.ts`
@@ -153,7 +179,15 @@ collision/movement.
   `package.json` is n8ao's peer dependency, not imported directly, so don't
   remove it as "unused." Don't bump Three or swap the chain casually: shaders
   here patch the pinned release's shader chunks via `onBeforeCompile`, so any
-  bump means re-verifying every patched chunk.
+  bump means re-verifying every patched chunk. A bump also touches KTX2:
+  `assets/ktx2_support.ts` hand-builds a `workerConfig` on its no-context
+  fallback arm (a shape KTX2Loader owns and can change between releases), and
+  the shipped `public/basis/` transcoder must be regenerated from the new three
+  via `node scripts/patch_basis_transcoder.mjs` (never a raw copy: the shipped
+  JS carries an eval-free embind patch so the KTX2 blob worker survives the
+  Electron shell CSP, which has no 'unsafe-eval'). `tests/glb_texture_compression.test.ts`
+  pins shipped === patch(vendored) and `tests/basis_transcoder_csp.test.ts` pins
+  the no-dynamic-code invariant; both go red on a raw re-copy.
 - Reuse, don't allocate: instancing for repeats, merge one-offs per
   (material, z-band), share materials via `surfaceMat`, distance-cull/LOD in
   `sync` (see the `*_RANGE_SQ` constants). No per-frame `new THREE.*` in hot paths;

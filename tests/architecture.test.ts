@@ -111,6 +111,19 @@ function forbiddenRenderCoreImport(spec: string): string | null {
 const IMPORT_RE = /\b(?:import|export)\b[^;'"]*?\bfrom\s*['"]([^'"]+)['"]/g;
 const DYN_IMPORT_RE = /\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
 const DOM_GLOBAL_RE = /\b(document|window|navigator|localStorage|sessionStorage)\s*[.[]/;
+
+// Value-position sibling of DOM_GLOBAL_RE above. The member-access form requires an
+// identifier immediately after a `.`/`[`, so it cannot see a browser global reached
+// any other way: a feature-detect (`typeof localStorage !== 'undefined' ?
+// localStorage : null`, the shape guild_hide_offline.ts and party_collapse.ts each
+// used to duplicate before being unified into src/ui/safe_local_storage.ts), a type
+// check against the same global (`instanceof Document` / `instanceof Window` /
+// `instanceof Storage`), or the global handed over bare in assignment/return/argument
+// position. Scoped narrower than the src/ui module-classification sweep's
+// UI_HOST_VALUE_RE below (no prose-safety burden here: a pure core carries no
+// player-facing English the way an i18n catalog does).
+const DOM_GLOBAL_VALUE_RE =
+  /\btypeof\s+(?:document|window|navigator|localStorage|sessionStorage)\b|\binstanceof\s+(?:Document|Window|Navigator|Storage)\b|(?:[=(]|\breturn\b)\s*(?:document|window|navigator|localStorage|sessionStorage)\s*[),;]/;
 const NONDETERMINISM_RE = /\b(Math\.random|Date\.now|performance\.now)\b/;
 
 const simFiles = walk(simRoot);
@@ -125,6 +138,7 @@ const simFiles = walk(simRoot);
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/aura_overlay_view.ts',
   'src/ui/proc_overlay_view.ts',
   'src/ui/camera_prompt_core.ts',
   'src/ui/chat_ignore_core.ts',
@@ -155,6 +169,10 @@ const UI_PURE_CORES = [
   'src/ui/stat_tooltip_view.ts',
   'src/ui/target_portrait_view.ts',
   'src/ui/target_rank_view.ts',
+  'src/ui/meters_breakdown_view.ts',
+  'src/ui/meters_frame_core.ts',
+  'src/ui/meters_menu_view.ts',
+  'src/ui/meters_rows_view.ts',
   'src/ui/mob_tooltip_view.ts',
   'src/ui/player_tooltip_view.ts',
   'src/ui/talents_view.ts',
@@ -167,6 +185,7 @@ const UI_PURE_CORES = [
   'src/ui/disenchant_yield_view.ts',
   'src/ui/material_hint_view.ts',
   'src/ui/bag_instance_glyph_view.ts',
+  'src/ui/item_slot_labels.ts',
   'src/ui/bank_view.ts',
   'src/ui/item_set_tooltip_view.ts',
   'src/ui/weapon_proc_view.ts',
@@ -199,6 +218,7 @@ const UI_PURE_CORES = [
   'src/ui/quality_glow.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/map_window_view.ts',
+  'src/ui/continent_map_view.ts',
   'src/ui/map_quest_list_view.ts',
   'src/ui/arena_window_view.ts',
   'src/ui/dungeon_finder_view.ts',
@@ -231,11 +251,13 @@ const UI_PURE_CORES = [
   'src/ui/mobile_hud_layout.ts',
   'src/ui/mobile_fullscreen_window_core.ts',
   'src/ui/auras_view.ts',
+  'src/ui/target_auras_view.ts',
   'src/ui/minimap_markers.ts',
   'src/ui/gathering_view.ts',
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/fct_core.ts',
   'src/ui/fct_event.ts',
+  'src/ui/heal_landing_feedback_core.ts',
   'src/ui/window_drag_core.ts',
   'src/ui/window_resize_core.ts',
   'src/ui/window_stack_state_core.ts',
@@ -248,13 +270,23 @@ const UI_PURE_CORES = [
   'src/ui/perf_nudge_view.ts',
   'src/ui/hud/loot/corpse_harvest_view.ts',
   'src/ui/town_focus_view.ts',
+  'src/ui/mount_race_view.ts',
   'src/ui/pet_action_icons.ts',
   'src/ui/loading_slow_hint_core.ts',
   'src/ui/reconnect_status_core.ts',
   'src/ui/chat_bubble_style.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
+  'src/ui/trade_view.ts',
+  'src/ui/hud/rift/rift_floor_tracker_view.ts',
+  'src/ui/safe_local_storage.ts',
 ].map((rel) => join(repoRoot, rel));
+
+// The one pure core allowed to trip DOM_GLOBAL_VALUE_RE: the shared safeLocalStorage()
+// feature-detect every persisted-toggle pure core now imports instead of duplicating.
+// Every OTHER registered pure core must stay clear of it; the honesty check below
+// keeps this from becoming a blanket exemption nobody needs.
+const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_storage.ts')]);
 
 // Pure logic cores that live in src/render (the painter half is Three-side):
 // cast_bar (the overhead cast/channel state) and nameplate_view (the per-entity
@@ -264,14 +296,23 @@ const UI_PURE_CORES = [
 // terrain_region_core (editor partial-rebuild chunk/texel selection math) and
 // water_core (the shore-depth sample shared by build + editor setLevel) follow
 // the same contract for the map editor's realtime terrain/water edits.
+// day_night_core is the clock-to-grade math of the world day/night cycle
+// (Date.now stays in the renderer that calls it), so a Vitest can drive any
+// moment of the cycle.
 const RENDER_PURE_CORES = [
   'src/render/affliction_familiar_core.ts',
   'src/render/ability_vfx_core.ts',
   'src/render/arena_water_band_core.ts',
+  'src/render/blade_grass_dense_core.ts',
   'src/render/camera_boom_core.ts',
+  'src/render/compile_gate.ts',
   'src/render/camera_director_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
+  'src/render/character_effects_core.ts',
+  'src/render/character_view_core.ts',
+  'src/render/chunk_residency_core.ts',
+  'src/render/cliff_scree_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
@@ -280,20 +321,55 @@ const RENDER_PURE_CORES = [
   'src/render/needle_of_fate_vfx_core.ts',
   'src/render/sentence_vfx_core.ts',
   'src/render/umbral_anchor_vfx_core.ts',
+  'src/render/foliage_shader_core.ts',
+  'src/render/gfx_aa_policy_core.ts',
+  'src/render/gfx_override_core.ts',
+  'src/render/ground_aim_reticle_core.ts',
   'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
   'src/render/drain_channel_visual_core.ts',
   'src/render/env_prefilter_core.ts',
-  'src/render/nameplate_extent_core.ts',
+  'src/render/environment_transition_core.ts',
+  'src/render/ground_tilt_core.ts',
+  'src/render/grass_cap_collapse_core.ts',
+  'src/render/step_smooth_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
+  'src/render/occluder_fade_core.ts',
+  'src/render/point_light_shader_core.ts',
+  'src/render/dynamic_resolution_core.ts',
+  'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
-  'src/render/prewarm_policy.ts',
+  'src/render/opaque_draw_order_core.ts',
+  'src/render/perceptual_lod_core.ts',
+  'src/render/prop_cell_core.ts',
+  'src/render/race_line_core.ts',
+  'src/render/renderer_frame_telemetry_core.ts',
+  'src/render/scene_census_core.ts',
+  'src/render/sea_mist_core.ts',
+  'src/render/shadow_pass_gate_core.ts',
   'src/render/terrain_region_core.ts',
+  'src/render/terrain_splat_presence_core.ts',
+  'src/render/vfx_pool_core.ts',
+  'src/render/view_candidate_pool_core.ts',
   'src/render/water_core.ts',
+  'src/render/water_flora_core.ts',
+  'src/render/water_flora_shader_core.ts',
+  'src/render/day_night_core.ts',
+  'src/render/authored_walls_core.ts',
+  'src/render/garden_maze_core.ts',
+  'src/render/garden_parterre_core.ts',
+  'src/render/foliage_lod.ts',
+  'src/render/prewarm_pass.ts',
+  'src/render/prewarm_policy.ts',
+  'src/render/prewarm_resume.ts',
+  'src/render/resident_scenery_core.ts',
+  'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
   'src/render/characters/form_visual_selection_core.ts',
   'src/render/characters/metamorph_wing_motion_core.ts',
+  'src/render/zone_feature_visibility_core.ts',
+  'src/render/characters/skeleton_update_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
@@ -306,7 +382,11 @@ const RENDER_PURE_CORES = [
 // updating this list) fails the cross-check instead of silently escaping the
 // reverse-completeness guard.
 const BARE_NAMED = [
+  'src/render/foliage_lod.ts',
+  'src/render/compile_gate.ts',
+  'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
+  'src/render/prewarm_resume.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/unit_portrait.ts',
@@ -322,6 +402,7 @@ const BARE_NAMED = [
   'src/ui/compass.ts',
   'src/ui/coords.ts',
   'src/ui/bag_item_context_menu.ts',
+  'src/ui/item_slot_labels.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/swing_timer.ts',
@@ -339,6 +420,7 @@ const BARE_NAMED = [
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/render/cast_bar.ts',
+  'src/ui/safe_local_storage.ts',
 ].map((rel) => join(repoRoot, rel));
 
 function importSpecs(src: string): string[] {
@@ -598,11 +680,52 @@ describe('src/ui pure-core invariants', () => {
     ).toEqual([]);
   });
 
-  it('touches no DOM/browser globals', () => {
-    const violations = scanLines(UI_PURE_CORES, DOM_GLOBAL_RE);
+  it('touches no DOM/browser globals (member access AND value-position typeof/instanceof/direct-assign)', () => {
+    const memberViolations = scanLines(UI_PURE_CORES, DOM_GLOBAL_RE);
+    const valueScanFiles = UI_PURE_CORES.filter((f) => !DOM_GLOBAL_VALUE_ALLOWLIST.has(f));
+    const valueViolations = scanLines(valueScanFiles, DOM_GLOBAL_VALUE_RE);
+    const violations = [...memberViolations, ...valueViolations];
     expect(
       violations,
       `src/ui pure cores must run headless (no DOM globals):\n${violations.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  // Honesty check for DOM_GLOBAL_VALUE_ALLOWLIST (mirrors the UI_DOM_MODULES honesty
+  // check below): the exemption must name an actually-registered pure core that
+  // actually needs it, so it cannot rot into a blanket opt-out nobody uses.
+  it('keeps the value-position DOM exemption honest (registered, and still needs it)', () => {
+    for (const f of DOM_GLOBAL_VALUE_ALLOWLIST) {
+      const shown = relative(repoRoot, f);
+      expect(
+        UI_PURE_CORES,
+        `${shown} must be a registered pure core to need this exemption`,
+      ).toContain(f);
+      const code = stripComments(readFileSync(f, 'utf8'));
+      expect(
+        DOM_GLOBAL_VALUE_RE.test(code),
+        `${shown} no longer trips DOM_GLOBAL_VALUE_RE; drop the stale exemption`,
+      ).toBe(true);
+    }
+  });
+
+  // Regression for the purity-guard gap: DOM_GLOBAL_RE above only matches member
+  // access (window.x), so a pure core probing localStorage in VALUE position
+  // (`typeof localStorage !== 'undefined' ? localStorage : null`) was entirely
+  // invisible to it. party_collapse.ts and guild_hide_offline.ts each used to
+  // duplicate exactly that idiom; the fix moves it into the one shared module
+  // allowed to use it (src/ui/safe_local_storage.ts) and adds DOM_GLOBAL_VALUE_RE
+  // to catch a future regression of the same shape. This pins the two ORIGINAL
+  // files clean of the raw idiom using the real production regex, not a copy.
+  it('party_collapse.ts / guild_hide_offline.ts no longer carry the raw value-position localStorage probe', () => {
+    const files = [
+      join(repoRoot, 'src/ui/party_collapse.ts'),
+      join(repoRoot, 'src/ui/guild_hide_offline.ts'),
+    ];
+    const violations = scanLines(files, DOM_GLOBAL_VALUE_RE);
+    expect(
+      violations,
+      `these pure cores must import safeLocalStorage from src/ui/safe_local_storage.ts rather than duplicating the value-position probe:\n${violations.join('\n')}`,
     ).toEqual([]);
   });
 
@@ -664,6 +787,29 @@ describe('purity scan matchers keep their teeth (the shared DOM / determinism re
       'const navigatorState = 1;',
     ]) {
       expect(DOM_GLOBAL_RE.test(negative), negative).toBe(false);
+    }
+  });
+
+  it('DOM_GLOBAL_VALUE_RE matches the value-position idiom (typeof/instanceof/direct-assign) and rejects benign lookalikes', () => {
+    for (const positive of [
+      "typeof localStorage !== 'undefined' ? localStorage : null",
+      "typeof window === 'undefined'",
+      'const s = localStorage;',
+      'return sessionStorage;',
+      'callback(document)',
+      'x instanceof Storage',
+      'y instanceof Window',
+    ]) {
+      expect(DOM_GLOBAL_VALUE_RE.test(positive), positive).toBe(true);
+    }
+    for (const negative of [
+      'const windowless = computeViewport();',
+      "'Press M to close the map window. Then click the marker.',",
+      'const typeofWindow = probe();',
+      'this.documentTitle = t;',
+      'const storageQuota = 5;',
+    ]) {
+      expect(DOM_GLOBAL_VALUE_RE.test(negative), negative).toBe(false);
     }
   });
 
@@ -753,6 +899,75 @@ describe('src/render pure-core invariants', () => {
   });
 });
 
+// Pure re-derivation of "the registered cores whose name is bare (not _view/_core)"
+// from a pair of pure-core arrays. Factored into a function (rather than inlined in
+// the `it()` below) so the regression test further down can run the EXACT same
+// derivation against a mutated copy of the real arrays instead of hand-duplicating
+// the logic, which would risk the two silently drifting apart.
+function deriveBareNamedCores(uiCores: string[], renderCores: string[]): string[] {
+  const viewOrCoreRe = /_(?:view|core)\.ts$/;
+  return [
+    ...new Set(
+      [...uiCores, ...renderCores]
+        .filter((f) => !viewOrCoreRe.test(f))
+        .map((f) => relative(repoRoot, f)),
+    ),
+  ].sort();
+}
+
+// Independent, hand-maintained pin for the BARE_NAMED forward-completeness check
+// below. Deliberately NOT derived from UI_PURE_CORES / RENDER_PURE_CORES (the arrays
+// deriveBareNamedCores() above already cross-references): a synchronized two-list
+// delete (the same bare-named path removed from BOTH its purity allowlist AND
+// BARE_NAMED in the same edit) keeps the derived check green, because derivedBare is
+// computed FROM the very arrays the delete just shrank, so both sides lose the same
+// entry and the equality holds despite the module silently dropping out of every
+// purity scan. This literal array is the third, independent pin: extend it BY HAND
+// in the same change that adds, renames, or removes a bare-named core from either
+// allowlist, so a synchronized delete leaves BARE_NAMED disagreeing with THIS list
+// instead of only agreeing with itself.
+const EXPECTED_BARE_NAMED = [
+  'src/game/ui_effects_profile.ts',
+  'src/game/ui_tier_knobs.ts',
+  'src/render/cast_bar.ts',
+  'src/render/compile_gate.ts',
+  'src/render/foliage_lod.ts',
+  'src/render/prewarm_pass.ts',
+  'src/render/prewarm_policy.ts',
+  'src/render/prewarm_resume.ts',
+  'src/ui/absorb_bar.ts',
+  'src/ui/bag_item_context_menu.ts',
+  'src/ui/chat_bubble_style.ts',
+  'src/ui/clock.ts',
+  'src/ui/compass.ts',
+  'src/ui/coords.ts',
+  'src/ui/fct_event.ts',
+  'src/ui/focus_order.ts',
+  'src/ui/gather_tool_tooltip.ts',
+  'src/ui/guild_hide_offline.ts',
+  'src/ui/hud/delve/delve_map.ts',
+  'src/ui/hud/quest/quest_tracker.ts',
+  'src/ui/item_slot_labels.ts',
+  'src/ui/live_region_politeness.ts',
+  'src/ui/log_event_route.ts',
+  'src/ui/low_health.ts',
+  'src/ui/low_resource.ts',
+  'src/ui/minimap_markers.ts',
+  'src/ui/mob_idle_sfx.ts',
+  'src/ui/mobile_hud_layout.ts',
+  'src/ui/party_collapse.ts',
+  'src/ui/party_frames.ts',
+  'src/ui/pet_action_icons.ts',
+  'src/ui/quality_glow.ts',
+  'src/ui/rest_indicator.ts',
+  'src/ui/roving_index.ts',
+  'src/ui/safe_local_storage.ts',
+  'src/ui/swing_timer.ts',
+  'src/ui/unit_frame.ts',
+  'src/ui/unit_portrait.ts',
+  'src/ui/xp_bar.ts',
+];
+
 describe('curated bare-named pure cores (cross-check)', () => {
   // Bare names are enforced by this curated cross-check while *_view / *_core are
   // auto-swept by onDiskCores(): the sweep's /_(?:view|core)\.ts$/ regex cannot see a
@@ -780,15 +995,45 @@ describe('curated bare-named pure cores (cross-check)', () => {
     // basename is bare (not _view / _core). A new bare-named core added to an allowlist
     // but forgotten here would escape both onDiskCores() (bare name) and the loop above
     // (not listed), reopening the gap; this equality makes that omission fail.
-    const viewOrCoreRe = /_(?:view|core)\.ts$/;
-    const derivedBare = [...UI_PURE_CORES, ...RENDER_PURE_CORES]
-      .filter((f) => !viewOrCoreRe.test(f))
-      .map((f) => relative(repoRoot, f))
-      .sort();
+    const derivedBare = deriveBareNamedCores(UI_PURE_CORES, RENDER_PURE_CORES);
+    const bareNamedRel = [...new Set(BARE_NAMED.map((f) => relative(repoRoot, f)))].sort();
     expect(
-      [...new Set(derivedBare)],
+      derivedBare,
       'BARE_NAMED must equal the registered cores whose name is bare (not _view/_core)',
-    ).toEqual([...new Set(BARE_NAMED.map((f) => relative(repoRoot, f)))].sort());
+    ).toEqual(bareNamedRel);
+
+    // Independent third pin (not derived from the arrays above): catches a
+    // synchronized delete that the derived check just above cannot (see
+    // EXPECTED_BARE_NAMED's own comment). Extend EXPECTED_BARE_NAMED by hand
+    // whenever a bare-named core is added, renamed, or removed.
+    expect(
+      bareNamedRel,
+      `BARE_NAMED must equal the hand-maintained EXPECTED_BARE_NAMED pin (update BOTH together):\n${bareNamedRel.join('\n')}`,
+    ).toEqual(EXPECTED_BARE_NAMED);
+  });
+
+  // Regression: the derived-completeness check above re-derives its expected list
+  // FROM UI_PURE_CORES / RENDER_PURE_CORES, the very arrays a delete would shrink.
+  // A synchronized two-list delete (the same bare-named path removed from BOTH its
+  // purity allowlist AND BARE_NAMED in one edit) keeps that check green, because
+  // both sides lose the same entry together, while the module silently drops out of
+  // every purity scan (it is bare-named, so onDiskCores()'s *_view/*_core sweep
+  // cannot see it either). EXPECTED_BARE_NAMED is hand-maintained and independent of
+  // the arrays under test, so it disagrees with BARE_NAMED after the same mutation.
+  it('the independent EXPECTED_BARE_NAMED pin catches a synchronized delete the derived check misses', () => {
+    const target = join(repoRoot, 'src/ui/party_collapse.ts');
+    const mutatedUiCores = UI_PURE_CORES.filter((f) => f !== target);
+    const mutatedBareNamed = BARE_NAMED.filter((f) => f !== target);
+
+    const derivedBare = deriveBareNamedCores(mutatedUiCores, RENDER_PURE_CORES);
+    const mutatedBareNamedRel = [
+      ...new Set(mutatedBareNamed.map((f) => relative(repoRoot, f))),
+    ].sort();
+    // The OLD derived check: still green after the synchronized delete (the gap).
+    expect(derivedBare).toEqual(mutatedBareNamedRel);
+    // The NEW independent pin: red, because EXPECTED_BARE_NAMED still lists
+    // party_collapse.ts and the mutated BARE_NAMED no longer does.
+    expect(mutatedBareNamedRel).not.toEqual(EXPECTED_BARE_NAMED);
   });
 });
 
@@ -805,11 +1050,17 @@ describe('curated bare-named pure cores (cross-check)', () => {
 // next module of the same shape would have had to remember to copy.
 //
 // This sweep makes the classification total. Every src/ui/**/*.ts lands in
-// exactly one bucket:
+// exactly one of THIS sweep's buckets. That is a statement about which gate
+// owns a module here, not a claim that no other gate also covers it: a
+// *_window.ts is deliberately covered twice, by this sweep as a module and by
+// the painter gate as a painter, and the two answer different questions.
+// The buckets:
 //
 //   pure core       *_view / *_core, or a bare name registered in UI_PURE_CORES
 //                   -> the pure-core sweeps above
-//   painter         *_painter
+//   painter         *_painter (and *_window / *_controller, which this sweep ALSO
+//                   keeps; see SWEPT_BY_NAME_RE below for why the coverage is
+//                   deliberately double rather than exclusive)
 //                   -> tests/hud_perf_budget.test.ts
 //   painter helper  registered in UI_PAINTER_HELPERS
 //                   -> the hard contract below: host-agnostic, deterministic,
@@ -837,16 +1088,29 @@ describe('curated bare-named pure cores (cross-check)', () => {
 // already owns `document` gains nothing from re-registering the day it also calls
 // `addEventListener`, and the hazard here is the UNCLASSIFIED module.
 //
-// The one caveat on "non-voluntary", worth knowing because it is the cheapest way
-// out: a module named *_painter.ts leaves this sweep for the painter gate, where
-// CANVAS_PAINTERS is a plain exemption list with no host scan behind it. That gate
-// predates this one and closing it is its own change.
+// A module named *_painter.ts leaves this sweep for the painter gate, so that gate
+// is load-bearing for this one. It used to be the cheapest way out, because
+// CANVAS_PAINTERS there was a plain exemption list with no scan behind it. It is now
+// a scanned bucket: a parked DOM module has to pass the same exact-count raw-write
+// and forced-reflow scans every other painter passes, and additionally an identity
+// proof (name a 2D context type AND draw on one) that a real DOM module fails. The
+// scans are the durable half; the identity proof is a source-text check and two
+// lines of dead canvas code would satisfy it.
 
 const uiRoot = join(repoRoot, 'src', 'ui');
 
 // The filename families the other two sweeps already own. *_view / *_core is
-// onDiskCores() above; *_painter is findUiPainters() in hud_perf_budget.test.ts,
-// which matches the same suffix.
+// onDiskCores() above; *_painter is findUiPainters() in hud_perf_budget.test.ts.
+//
+// That gate also sweeps the OTHER two DOM-adapter names, *_window.ts (the second
+// painter name src/ui/CLAUDE.md sanctions) and *_controller.ts (the HUD-domain
+// adapter name in src/ui/hud/CLAUDE.md), and this regex deliberately does NOT:
+// both are DOUBLE-COVERED, and the two gates cover different things. There they
+// hold the painter contract that survives a cold cadence (no forced-reflow layout
+// read, no repeating driver of their own); here they are classified as modules,
+// which is what pins that a window or controller owning browser state is
+// registered rather than assumed. Adding either name here would drop those modules
+// out of THIS sweep to buy nothing.
 const SWEPT_BY_NAME_RE = /_(?:view|core|painter)\.ts$/;
 
 // The host surface this sweep looks for. It takes several patterns rather than
@@ -869,9 +1133,13 @@ const SWEPT_BY_NAME_RE = /_(?:view|core|painter)\.ts$/;
 // portrait_chip, proc_overlay_dom), a `typeof window !== 'undefined'` probe, a
 // `(globalThis as {...}).ResizeObserver` cast, `instanceof HTMLElement`
 // (dialog_key_activation), and a bare `new Date()`.
-// (DOM_GLOBAL_RE itself is deliberately left alone: widening it would redden the
-// two registered pure cores that probe `typeof localStorage`, which is a separate
-// change with a separate blast radius.)
+// (DOM_GLOBAL_RE itself is deliberately left alone here too: the src/ui pure-core
+// scan above layers its own narrower value-position sibling, DOM_GLOBAL_VALUE_RE,
+// on top of it instead, scoped to that one file family and allowlisting only
+// src/ui/safe_local_storage.ts, the shared `typeof localStorage` feature-detect
+// guild_hide_offline.ts and party_collapse.ts both used to duplicate. Widening
+// DOM_GLOBAL_RE itself would still touch sim/world_api/render, which have no
+// instance of this idiom today and stay out of scope for this fix.)
 //
 // Deliberately OUT of scope, so the absence is a decision rather than an
 // oversight: `setTimeout` / `setInterval` / `queueMicrotask` / `fetch` /
@@ -1022,6 +1290,7 @@ const UI_DOM_MODULES = [
   'src/ui/charselect_news.ts',
   'src/ui/chat_command_menu.ts',
   'src/ui/claudium_window.ts',
+  'src/ui/continent_art.ts',
   'src/ui/crafting_window.ts',
   'src/ui/daily_rewards_window.ts',
   'src/ui/deeds_window.ts',
@@ -1030,7 +1299,10 @@ const UI_DOM_MODULES = [
   'src/ui/dialog_key_activation.ts',
   'src/ui/discord_widget.ts',
   'src/ui/entry_guard_banner.ts',
+  'src/ui/epic_link.ts',
   'src/ui/focus_manager.ts',
+  'src/ui/focus_restore.ts',
+  'src/ui/form_draft.ts',
   'src/ui/gather_node_tooltip.ts',
   'src/ui/gpu_notice_toast.ts',
   'src/ui/hud.ts',
@@ -1056,16 +1328,25 @@ const UI_DOM_MODULES = [
   'src/ui/hud/vendor/vendor_window.ts',
   'src/ui/i18n.ts',
   'src/ui/icon_prewarm.ts',
+  'src/ui/icon_prewarm_worker.ts',
   'src/ui/icons.ts',
   'src/ui/inspect_window.ts',
   'src/ui/item_drop_hit_test.ts',
   'src/ui/loading_slow_hint.ts',
   'src/ui/loading_tips.ts',
   'src/ui/mailbox_window.ts',
+  'src/ui/map_art.ts',
+  'src/ui/map_bg.ts',
   'src/ui/market_window.ts',
   'src/ui/meters.ts',
+  'src/ui/meters_frame.ts',
   'src/ui/minimap_gilded_ornament.ts',
   'src/ui/mobile_wallet_launcher.ts',
+  'src/ui/mount_race_controls.ts',
+  'src/ui/mount_race_strip.ts',
+  'src/ui/aura_overlay_config.ts',
+  'src/ui/aura_overlay_controller.ts',
+  'src/ui/aura_overlay_settings.ts',
   'src/ui/movable_frame.ts',
   'src/ui/native_update_prompt.ts',
   'src/ui/options_window.ts',
@@ -1086,9 +1367,11 @@ const UI_DOM_MODULES = [
   'src/ui/social_window.ts',
   'src/ui/spectate_badge.ts',
   'src/ui/spellbook_window.ts',
+  'src/ui/start_skin_picker_portraits.ts',
   'src/ui/steam_link.ts',
   'src/ui/store_stack_diag.ts',
   'src/ui/talents_window.ts',
+  'src/ui/target_auras_window.ts',
   'src/ui/theme.ts',
   'src/ui/touch_item_drag.ts',
   'src/ui/touch_tap.ts',
@@ -1138,10 +1421,12 @@ describe('src/ui module classification (every module is swept by exactly one gat
     // pin here would stay green.
     expect(residual).toContain(join(repoRoot, 'src/ui/i18n.resolved.generated/en.ts'));
     expect(residual.filter((f) => f.includes('i18n')).length).toBeGreaterThan(50);
-    // A *_window.ts painter stays in THIS sweep's domain on purpose. The painter
-    // gate matches *_painter.ts only (findUiPainters in hud_perf_budget.test.ts),
-    // so adding _window to SWEPT_BY_NAME_RE would drop every window painter out of
-    // BOTH gates rather than hand it to the other one.
+    // A *_window.ts painter stays in THIS sweep's domain on purpose, and is swept by
+    // the painter gate as well (PAINTER_FILE_RE in hud_perf_budget.test.ts matches
+    // all three DOM-adapter names). The double coverage is the design: that gate owns
+    // the layout-read and repeating-driver contract, this one owns the DOM-module
+    // classification. Adding _window or _controller to SWEPT_BY_NAME_RE would drop
+    // those modules out of this sweep and buy nothing, since the other gate has them.
     expect(SWEPT_BY_NAME_RE.test('src/ui/hud/vendor/vendor_window.ts')).toBe(false);
     expect(residual).toContain(join(repoRoot, 'src/ui/hud/vendor/vendor_window.ts'));
   });

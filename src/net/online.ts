@@ -10,6 +10,7 @@ import {
 } from '../sim/account_flair';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
+import { MOUNT_RACE_COURSE, type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
 import {
   computeTalentModifiers,
@@ -59,14 +60,17 @@ import {
   type LootRollChoice,
   type LootRollGroupStatus,
   type LootRollPrompt,
+  type MasterLootPrompt,
   type MasterLootThreshold,
   type MoveInput,
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  type RiftTier,
   type RiteIntensity,
   type SimEvent,
   type SportRole,
+  TICK_RATE,
   type VcBracket,
   type VcNationId,
   type WeaponSkinType,
@@ -105,6 +109,7 @@ import {
   type LockpickView,
   type MailInfo,
   type MarketInfo,
+  type MountRaceView,
   ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   type OverheadEmoteId,
@@ -113,6 +118,7 @@ import {
   type PresenceStatus,
   type RaidLockout,
   type RecipeDef,
+  type RiftFloorView,
   type SocialInfo,
   type TradeInfo,
   type VcSharedCupInfo,
@@ -142,6 +148,11 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
+
+// The online mirror decodes terse legacy wire JSON. Runtime guards below narrow
+// individual fields as they are consumed; this alias keeps the decoder local.
+// biome-ignore lint/suspicious/noExplicitAny: legacy wire JSON is intentionally loose at the boundary.
+type LooseJson = any;
 
 interface ClientWireAura {
   id: string;
@@ -365,7 +376,7 @@ export class Api {
     }
   }
 
-  private async post(path: string, body: unknown, base = this.base): Promise<any> {
+  private async post<T = LooseJson>(path: string, body: unknown, base = this.base): Promise<T> {
     const res = await fetch(apiUrl(path, base), {
       method: 'POST',
       headers: {
@@ -376,19 +387,19 @@ export class Api {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw apiErrorFromBody(data, res.status);
-    return data;
+    return data as T;
   }
 
-  private async get(path: string): Promise<any> {
+  private async get<T = LooseJson>(path: string): Promise<T> {
     const res = await fetch(apiUrl(path, this.base), {
       headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw apiErrorFromBody(data, res.status);
-    return data;
+    return data as T;
   }
 
-  private async delete(path: string, body: unknown): Promise<any> {
+  private async delete<T = LooseJson>(path: string, body: unknown): Promise<T> {
     const res = await fetch(apiUrl(path, this.base), {
       method: 'DELETE',
       headers: {
@@ -399,7 +410,7 @@ export class Api {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw apiErrorFromBody(data, res.status);
-    return data;
+    return data as T;
   }
 
   async register(
@@ -945,12 +956,29 @@ export class Api {
     await this.delete('/api/github', {});
   }
 
+  // The /api/status capability adverts (steam, epic, dev commands) are read
+  // back to back on the same refresh paths, so concurrent reads collapse into
+  // ONE request. In-flight only, keyed by the realm base: nothing is memoized
+  // past settle, so every non-overlapping call still reads the server fresh,
+  // and a realm switch mid-flight never serves the old realm's document.
+  private statusDocInFlight: { base: string; doc: Promise<any> } | null = null;
+
+  private statusDoc(): Promise<any> {
+    const hit = this.statusDocInFlight;
+    if (hit !== null && hit.base === this.base) return hit.doc;
+    const doc = this.get('/api/status').finally(() => {
+      if (this.statusDocInFlight?.doc === doc) this.statusDocInFlight = null;
+    });
+    this.statusDocInFlight = { base: this.base, doc };
+    return doc;
+  }
+
   // ── Steam link (deed achievement mirror) ───────────────────────────────────
   // The public capability advert: whether this server has the Steam surface
   // lit. Read BEFORE any authed steam call so a dark server renders no link UI.
   async steamAdvert(): Promise<boolean> {
     try {
-      const data = await this.get('/api/status');
+      const data = await this.statusDoc();
       return (data.steam as { enabled?: boolean } | undefined)?.enabled === true;
     } catch {
       return false;
@@ -963,7 +991,7 @@ export class Api {
   // so a forged true opens an inert window. Fails closed on any error.
   async devCommandsAdvert(): Promise<boolean> {
     try {
-      const data = await this.get('/api/status');
+      const data = await this.statusDoc();
       return data.dev_commands === true;
     } catch {
       return false;
@@ -984,6 +1012,36 @@ export class Api {
   // Unlink Steam from the current account. Idempotent.
   async unlinkSteam(): Promise<void> {
     await this.delete('/api/steam/link', {});
+  }
+
+  // ── Epic link (deed achievement mirror) ────────────────────────────────────
+  // The public capability advert: whether this server has the Epic surface lit.
+  // Read BEFORE any authed epic call so a dark server renders no link UI (D3, D18).
+  // Rides the shared single-flight status read: the Steam and Epic refreshes
+  // run back to back on every login path, and one document serves both.
+  async epicAdvert(): Promise<boolean> {
+    try {
+      const data = await this.statusDoc();
+      return (data.epic as { enabled?: boolean } | undefined)?.enabled === true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Current account's Epic link status ({ enabled, linked, epicAccountId? }).
+  async epicStatus(): Promise<Record<string, unknown>> {
+    return this.get('/api/epic/status');
+  }
+
+  // Link via a desktop-shell proof; the server verifies it upstream and answers
+  // the verified id (never client-named; D11, D17).
+  async epicLink(proof: string): Promise<{ linked: boolean; epicAccountId: string }> {
+    return this.post('/api/epic/link', { proof });
+  }
+
+  // Unlink Epic from the current account. Idempotent.
+  async unlinkEpic(): Promise<void> {
+    await this.delete('/api/epic/link', {});
   }
 
   // ── Shareable player card + referrals ──────────────────────────────────────
@@ -1080,8 +1138,11 @@ const ACTION_BAR_SAVE_DEBOUNCE_MS = 1500;
 // schedule reaches the cap, so across 40 attempts the total runs from roughly
 // 4.6 minutes (every draw at the floor) to 9.4 minutes (every draw at the
 // ceiling), with an expected total near 8 minutes, before giving up for good.
-const RECONNECT_BASE_DELAY_MS = 1_000;
-const RECONNECT_MAX_DELAY_MS = 15_000;
+// Exported for the reconnect-overlay show-grace pin (tests/reconnect_overlay
+// .test.ts): the grace must clear attempt 1's full jitter band, and a band
+// widened here without that pin would quietly reintroduce the veil blink.
+export const RECONNECT_BASE_DELAY_MS = 1_000;
+export const RECONNECT_MAX_DELAY_MS = 15_000;
 const RECONNECT_MAX_ATTEMPTS = 40;
 // A pre-layout-gate server accepts only `t:'auth'`, so it rejects our current
 // discriminator with this otherwise-generic literal. During a handshake only,
@@ -1133,6 +1194,7 @@ function blankEntity(id: number): Entity {
     onGround: true,
     jumping: false,
     fallStartY: 0,
+    fatigueTicks: 0,
     hp: 1,
     maxHp: 1,
     resource: 0,
@@ -1226,6 +1288,8 @@ function blankEntity(id: number): Entity {
     pulseTimer: 0,
     stompTimer: 0,
     bigCastTimer: 0,
+    deathZoneCastTimer: 0,
+    deathZoneStrikeTimer: 0,
     infernoTimer: 0,
     infernoRemaining: 0,
     infernoPulsesFired: 0,
@@ -1239,6 +1303,7 @@ function blankEntity(id: number): Entity {
     detonateTimer: Infinity,
     firedSummons: 0,
     summonedIds: [],
+    summonedAdd: false,
     enraged: false,
     healedThisPull: false,
     threat: new Map(),
@@ -1254,6 +1319,7 @@ function blankEntity(id: number): Entity {
     spawnPos: { x: 0, y: 0, z: 0 },
     leashAnchor: null,
     evadeStall: 0,
+    chaseStall: 0,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
@@ -1279,6 +1345,9 @@ function blankEntity(id: number): Entity {
     color: 0xffffff,
     skinCatalog: 'class',
     skin: 0,
+    mountKey: '',
+    mountCastRemaining: 0,
+    mountCastKey: '',
     mainhandItemId: null,
     offhandItemId: null,
     weaponSkinLoadout: {},
@@ -1310,6 +1379,7 @@ export class ClientWorld implements IWorld {
   bags: (string | null)[] = [null, null, null, null];
   vendorBuyback: InvSlot[] = [];
   equipment: Partial<Record<EquipSlot, string>> = {};
+  equipmentInstances: import('../sim/entity').PlayerEquipmentInstances = {};
   copper = 0;
   // --- IWorldCosmetics: account cosmetics (completed-quest + mech-chroma ids),
   // mirrored from snapshot self. ---
@@ -1412,9 +1482,49 @@ export class ClientWorld implements IWorld {
   // applyLockpickEvent. delveClears is a NON-IWorld mirror behind delveShopOffers. ---
   delveRun: DelveRunInfo | null = null;
   companionState: DelveCompanionInfo | null = null;
+  // Active procedural Rift floor, rebuilt from the riftState event (no snapshot
+  // field). The renderer regenerates geometry/style from this descriptor.
+  riftFloor: RiftFloorView | null = null;
+  // The riftState event's expiresAtMs mirrored verbatim: an epoch-ms deadline the
+  // server computed via ctx.lockoutNowMs() (real Date.now() on the live server, the
+  // same clock raidLockouts() already relies on). Null while riftFloor is null or
+  // the run has no backing event (a dev-spawned rift). riftEventMsRemaining()
+  // subtracts Date.now() fresh on every call, so the HUD's "closes in" countdown
+  // ticks locally without a snapshot round trip.
+  private riftEventExpiresAtMs: number | null = null;
+  // Active lethal boss death zones, mirrored from riftDeathZoneSpawn events.
+  // Each entry stores the zone geometry and the wall-clock expiry (ms, performance.now
+  // scale). riftBossDeathZones() converts these to RiftBossDeathZoneView on demand.
+  // Cleared on riftState(active:false) so stale zones from a previous run never
+  // bleed into a new floor. Late joiners missing an in-flight zone are accepted.
+  private activeBossDeathZones: Array<{
+    x: number;
+    z: number;
+    radius: number;
+    expiresAtMs: number;
+  }> = [];
   // Lockpicking: rebuilt from the lockpick* events (there is no snapshot field).
   // Holds only the fog-windowed cells the server discloses.
   lockpickState: LockpickView | null = null;
+  // Show-jumping race: updated immediately from mountRace* events and reconciled
+  // from the authoritative self snapshot after reconnects. Internal shape carries
+  // wall-clock anchors (performance.now scale, render-interpolation timing only):
+  // goDeadlineMs for the 3..2..1 countdown and deadlineMs for the timed lap, so
+  // mountRaceView() can count both down; the server stays authoritative (its end
+  // event clears the mirror). clearedMask/cleared mirror the any-order jump progress.
+  private mountRaceMirror: {
+    raceId: string;
+    phase: 'countdown' | 'racing';
+    clearedMask: number;
+    cleared: number;
+    jumpsTotal: number;
+    goDeadlineMs: number;
+    deadlineMs: number;
+    timeLimitTicks: number;
+  } | null = null;
+  // Riding lesson liveness, mirrored from mountTrain* events and reconciled from
+  // the authoritative self snapshot for legacy mountLessonActive() consumers.
+  private mountLessonActiveMirror = false;
   delveMarks = 0;
   companionUpgrades: Record<string, number> = {};
   // Flat per-craft skill tracking (#1126). NOT yet mirrored over the wire: this
@@ -1514,6 +1624,10 @@ export class ClientWorld implements IWorld {
   private lootRollPrompts: LootRollPrompt[] = []; // open need-greed rolls, mirrored from the self-wire
   // group-visible choices on the open rolls (the vote strip), mirrored from the self-wire
   private lootRollGroup: LootRollGroupStatus[] = [];
+  // curate-phase master-loot assignments this player is the master looter of,
+  // mirrored from the self-wire. Server-filtered to the master looter, so an
+  // ordinary candidate's mirror is always empty.
+  private masterLootPrompts: MasterLootPrompt[] = [];
   // bumped whenever a fresh social snapshot lands, so an open panel re-renders
   private socialDirty = false;
   // snapshot interpolation
@@ -1577,6 +1691,7 @@ export class ClientWorld implements IWorld {
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
+  private counterfangWindowDeadlineMs = 0;
   // inventory deltas arrive in snapshots, separate from the event frames the
   // HUD redraws on — the frame loop polls this so open panels re-render
   private invChanged = false;
@@ -1797,7 +1912,7 @@ export class ClientWorld implements IWorld {
 
   setMoveInput(input: unknown, facing?: unknown): void {
     Object.assign(this.moveInput, sanitizeMoveInput(input));
-    if (arguments.length > 1) this.setMouselookFacing(facing);
+    if (facing !== undefined) this.setMouselookFacing(facing);
   }
 
   setMouselookFacing(facing: unknown): void {
@@ -1956,10 +2071,10 @@ export class ClientWorld implements IWorld {
   }
 
   private onMessage(raw: string): void {
-    let msg: any;
+    let msg: LooseJson;
     const parseStart = performance.now();
     try {
-      msg = JSON.parse(raw);
+      msg = JSON.parse(raw) as LooseJson;
     } catch {
       return;
     }
@@ -2009,6 +2124,15 @@ export class ClientWorld implements IWorld {
         this.cfg.playerClass = this.ownPlayerClass;
         this.spectateFacingPending = false;
         this.pendingSpectateFacing = null;
+        // marketInfo is delta-omitted (s.market only streams when it changes),
+        // so the mirror otherwise still holds the pre-drop echo at the instant
+        // onReconnected() below fires: that echo was pushed and echoed back
+        // before the socket died, so it trivially matches the window's own
+        // query and the reconnect resync (issue #2416) would never detect the
+        // fresh-join reset. Nulling it here forces MarketWindow to treat the
+        // resync as pending until a genuinely post-reconnect market snapshot
+        // decodes.
+        this.marketInfo = null;
         this.onReconnected?.();
       }
       this.connected = true;
@@ -2077,12 +2201,18 @@ export class ClientWorld implements IWorld {
     if (msg.t === 'events') {
       for (const ev of msg.list) {
         this.applyLockpickEvent(ev as SimEvent);
+        this.applyMountRaceEvent(ev as SimEvent);
+        this.applyMountTrainEvent(ev as SimEvent);
         this.applyCraftResultEvent(ev as SimEvent);
+        this.applyRiftStateEvent(ev as SimEvent);
+        this.applyRiftDeathZoneSpawnEvent(ev as SimEvent);
         this.applyMasterworkEvent(ev as SimEvent);
         this.applyDisenchantResultEvent(ev as SimEvent);
         this.applyEnchantResultEvent(ev as SimEvent);
         this.applySalvageResultEvent(ev as SimEvent);
         this.applyChatFlairEvent(ev as SimEvent);
+        this.applyUnstuckEvent(ev as SimEvent);
+        this.applyPrestigeEvent(ev as SimEvent);
         this.eventQueue.push(ev as SimEvent);
       }
       return;
@@ -2274,7 +2404,7 @@ export class ClientWorld implements IWorld {
     }
   }
 
-  private applySnapshot(snap: any): void {
+  private applySnapshot(snap: LooseJson): void {
     const now = performance.now();
     if (typeof this.spectating === 'string' && typeof snap.self?.id === 'number') {
       this.playerId = snap.self.id;
@@ -2369,7 +2499,7 @@ export class ClientWorld implements IWorld {
       return typeof aura.rem === 'number' && Number.isFinite(aura.rem) ? aura.rem : 0;
     };
 
-    const applyWire = (w: any): Entity | null => {
+    const applyWire = (w: LooseJson): Entity | null => {
       let e = this.entities.get(w.id);
       // identity fields ride only in "full" records: first sight and changes
       const hasIdentity = w.k !== undefined;
@@ -2390,6 +2520,7 @@ export class ClientWorld implements IWorld {
         e.name = w.nm;
         e.level = w.lv;
         e.skin = w.sk ?? 0;
+        e.mountKey = w.mnt ?? ''; // active rideable mount ('' dismounted); feeds speed + render
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.offhandItemId = w.oh ?? null; // equipped offhand → held weapon model (render-only)
         e.weaponSkinId = w.wsk ?? null; // active weapon-skin cosmetic (render-only)
@@ -2430,6 +2561,7 @@ export class ClientWorld implements IWorld {
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
+        e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
         e.objectItemId = w.obj ?? null;
         e.guild = w.gd ?? '';
         e.title = w.title ?? null; // Book of Deeds active title (a deed id)
@@ -2525,7 +2657,17 @@ export class ClientWorld implements IWorld {
       e.castTotal = w.castTot ?? 0;
       e.castTargetId = w.castTgt ?? null;
       e.channeling = !!w.chan;
+      // Mount summon/dismount transition (volatile): absent decodes to idle. Feeds
+      // the summon FX / call pose and (for the local player) the self-extrapolator's
+      // movement root, which reads mountCastRemaining.
+      e.mountCastRemaining = w.mcr ?? 0;
+      e.mountCastKey = w.mck ?? '';
       e.sitting = !!w.sit;
+      e.riftSliding = !!w.sld;
+      e.climbing = !!w.cl;
+      // Quantized 1..99 progress through the pull (see server snapshot);
+      // undefined when not climbing so the visual falls back to its own clock.
+      e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.weaponStowed = !!w.ws;
       e.aggroTargetId = w.aggro ?? null;
@@ -2645,6 +2787,11 @@ export class ClientWorld implements IWorld {
     const s = snap.self;
     const e = s ? applyWire(s) : null;
     if (s && e) {
+      const counterfangRemaining =
+        typeof s.opRem === 'number' && Number.isFinite(s.opRem)
+          ? Math.min(5, Math.max(0, s.opRem))
+          : 0;
+      this.counterfangWindowDeadlineMs = now + counterfangRemaining * 1000;
       if (typeof this.spectating === 'string' && e.kind === 'player' && e.templateId in CLASSES) {
         this.cfg.playerClass = e.templateId as PlayerClass;
       }
@@ -2807,6 +2954,8 @@ export class ClientWorld implements IWorld {
       e.spellHaste = s.sh ?? 0;
       e.critChance = s.crit ?? 0.05;
       e.dodgeChance = s.dodge ?? 0.05;
+      e.blockChance = s.blk ?? 0;
+      e.blockValue = s.bval ?? 0;
       // Crit/haste/hit RATING are informational paper-doll stats (combat values ride
       // crit/sh above, and hit resolves server-side); sent always like the other self
       // stats so the online character sheet shows them instead of the blankEntity 0.
@@ -2874,6 +3023,7 @@ export class ClientWorld implements IWorld {
         this.invChanged = true;
       }
       if (s.equip !== undefined) this.equipment = s.equip;
+      if (s.einst !== undefined) this.equipmentInstances = s.einst;
       // IWorldCosmetics facet (W7) self-decode: cosmetics is delta-guarded (a
       // missing field keeps the prior mirror); normalizeAccountCosmetics rebuilds it.
       if (s.cosmetics !== undefined) {
@@ -2884,6 +3034,38 @@ export class ClientWorld implements IWorld {
         this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
+      // IWorldMounts self-decode: mntOwn is delta-guarded (omitted keeps the prior
+      // mirror). The owned collection is mirrored VERBATIM (no horse prepend): the
+      // horse is no longer auto-owned, so an empty owned list is legal and the
+      // server is the sole authority on what is collected. There is no `mntSel`
+      // any more; a legacy server still sending it is simply ignored.
+      if (Array.isArray(s.mntOwn)) {
+        this.selfOwnedMounts = (s.mntOwn as unknown[])
+          .map((k) => normalizeMountKey(typeof k === 'string' ? k : ''))
+          .filter((k): k is MountKey => k !== '');
+      }
+      if (s.mntRtd !== undefined) this.selfRidingTrained = s.mntRtd === true;
+      if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
+      if (s.mntRace !== undefined) {
+        const view = s.mntRace as MountRaceView | null;
+        if (!view) {
+          this.mountRaceMirror = null;
+        } else {
+          const goTicksLeft = Math.max(0, Number(view.goTicksLeft) || 0);
+          const ticksLeft = Math.max(0, Number(view.ticksLeft) || 0);
+          const timeLimitTicks = Math.max(0, Number(view.timeLimitTicks) || 0);
+          this.mountRaceMirror = {
+            raceId: String(view.raceId),
+            phase: view.phase === 'racing' ? 'racing' : 'countdown',
+            clearedMask: Math.max(0, Number(view.clearedMask) || 0),
+            cleared: Math.max(0, Number(view.cleared) || 0),
+            jumpsTotal: Math.max(0, Number(view.jumpsTotal) || 0),
+            goDeadlineMs: now + (goTicksLeft / TICK_RATE) * 1000,
+            deadlineMs: now + (ticksLeft / TICK_RATE) * 1000,
+            timeLimitTicks,
+          };
+        }
+      }
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
       // IWorldTalents facet (W7) self-decode: tal is delta-guarded (omitted keeps
@@ -2966,6 +3148,7 @@ export class ClientWorld implements IWorld {
       if (s.atitle !== undefined) this.activeTitle = s.atitle ?? null;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
       if (s.lrollg !== undefined) this.lootRollGroup = s.lrollg ?? [];
+      if (s.mloot !== undefined) this.masterLootPrompts = s.mloot ?? [];
       if (s.drun !== undefined) this.delveRun = s.drun;
       if (s.dcompanion !== undefined) this.companionState = s.dcompanion;
       if (s.dmarks !== undefined) this.delveMarks = s.dmarks ?? 0;
@@ -3088,7 +3271,7 @@ export class ClientWorld implements IWorld {
     // computeQuestState here exactly as it does server-side (the offline Sim
     // re-derives the same set from live PlayerMeta.questCadence).
     const cadenceBlocked =
-      identity && identity.cadenceBlockedQuests && identity.cadenceBlockedQuests.length > 0
+      identity?.cadenceBlockedQuests && identity.cadenceBlockedQuests.length > 0
         ? new Set(identity.cadenceBlockedQuests)
         : undefined;
     return optimisticQuestState(
@@ -3166,6 +3349,11 @@ export class ClientWorld implements IWorld {
   }
 
   // --- IWorldCombat: ability casts, auto-attack, spirit release ---
+  reactiveAbilityWindowRemaining(abilityId: string): number {
+    return abilityId === 'mongoose_bite'
+      ? Math.max(0, (this.counterfangWindowDeadlineMs - performance.now()) / 1000)
+      : 0;
+  }
   castAbility(abilityId: string): void {
     if (this.deadTargetCast(this.known.find((k) => k.def.id === abilityId)?.def)) {
       this.eventQueue.push({ type: 'error', text: 'You have no target.', reason: 'target_dead' });
@@ -3204,6 +3392,9 @@ export class ClientWorld implements IWorld {
   }
   stopAutoAttack(): void {
     this.cmd({ cmd: 'stopattack' });
+  }
+  unstuck(): void {
+    this.cmd({ cmd: 'unstuck' });
   }
   releaseSpirit(): void {
     this.cmd({ cmd: 'release' });
@@ -3329,6 +3520,9 @@ export class ClientWorld implements IWorld {
   lootRollGroupStatus(): LootRollGroupStatus[] {
     return this.lootRollGroup;
   }
+  activeMasterLootRolls(): MasterLootPrompt[] {
+    return this.masterLootPrompts;
+  }
   pickUpObject(id: number): Promise<boolean> {
     return this.cmdWithOutcome({ cmd: 'pickup', id });
   }
@@ -3367,6 +3561,15 @@ export class ClientWorld implements IWorld {
   }
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
+  }
+  upgradeRiftItem(itemId: string): void {
+    this.cmd({ cmd: 'rift_upgrade_item', item: itemId });
+  }
+  enchantRiftItem(itemId: string, stat: string): void {
+    this.cmd({ cmd: 'rift_enchant_item', item: itemId, stat });
+  }
+  socketRiftGem(itemId: string, gemId: string): void {
+    this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId });
   }
   get bagCapacity(): number {
     return bagCapacity(this.bags);
@@ -3413,8 +3616,12 @@ export class ClientWorld implements IWorld {
   // never predicted. The server re-validates ownership/eligibility/throttle in
   // the sim resolvers and answers with the personal disenchantResult/
   // enchantResult/salvageResult event plus the denc/ench/salv self-delta.
-  disenchantItem(itemId: string): void {
-    this.cmd({ cmd: 'disenchant_item', item: itemId });
+  disenchantItem(itemId: string, target?: { slotIndex: number }): void {
+    if (target === undefined) {
+      this.cmd({ cmd: 'disenchant_item', item: itemId });
+    } else {
+      this.cmd({ cmd: 'disenchant_item', item: itemId, slot: target.slotIndex });
+    }
   }
   // `slot` rides only when the target is a WORN piece (the in-place arm); a
   // bagged target sends a message byte-identical to the pre-feature form. The
@@ -3453,8 +3660,13 @@ export class ClientWorld implements IWorld {
   sellAllJunk(): void {
     this.cmd({ cmd: 'sell_all_junk' });
   }
-  buyBackItem(itemId: string): void {
-    this.cmd({ cmd: 'buyback', item: itemId });
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    instance?: ItemInstancePayload,
+    craftedRecipeId?: string,
+  ): void {
+    this.cmd({ cmd: 'buyback', item: itemId, index, instance, craftedRecipeId });
   }
   // --- IWorldCosmetics: skin + mech-chroma equips. Optimistic local nudge, then
   // the snake_case cmd (change_skin/claim_event_skin/unequip_mech_chroma); the
@@ -3474,6 +3686,114 @@ export class ClientWorld implements IWorld {
   claimEventSkin(skin: number): void {
     const idx = Math.max(0, Math.floor(skin));
     this.cmd({ cmd: 'claim_event_skin', skin: idx });
+  }
+  // --- IWorldMounts: collection + dismount. Summoning a specific mount is an
+  // item use, not a mount command, so nothing here sends one. The toggle stays
+  // authoritative because the server's combat gate can refuse it, and the active
+  // identity mirror (mnt) lands on the next snapshot either way. ---
+  ownedMounts(): readonly MountKey[] {
+    return this.selfOwnedMounts;
+  }
+  ridingTrained(): boolean {
+    return this.selfRidingTrained;
+  }
+  toggleMounted(): void {
+    this.cmd({ cmd: 'mount_toggle' });
+  }
+  // --- riding skill purchase: server-authoritative; on success the snapshot
+  // delta (mntRtd=true) confirms the skill was granted. ---
+  learnRiding(npcId: number): void {
+    this.cmd({ cmd: 'learn_riding', npc: npcId });
+  }
+  // --- riding lesson: fully server-authoritative, no optimistic local nudge;
+  // feedback rides the mountTrain* events straight to the HUD (drainEvents), no
+  // mirrored state. ---
+  mountTrainBegin(): void {
+    this.cmd({ cmd: 'mount_train_begin' });
+  }
+  // --- show-jumping race: start/cancel commands (platform and eligibility are
+  // re-validated server-side); events update the read immediately and the self
+  // snapshot reconciles it after reconnects. Both count down against wall-clock
+  // anchors while the server remains authoritative. ---
+  mountRaceStart(): void {
+    this.cmd({ cmd: 'mount_race_start' });
+  }
+  mountRaceCancel(): void {
+    this.cmd({ cmd: 'mount_race_cancel' });
+  }
+  mountLessonActive(): boolean {
+    return this.mountLessonActiveMirror;
+  }
+  mountRaceView(): MountRaceView | null {
+    const s = this.mountRaceMirror;
+    if (!s) return null;
+    const now = performance.now();
+    const goMs = Math.max(0, s.goDeadlineMs - now);
+    const remMs = Math.max(0, s.deadlineMs - now);
+    return {
+      raceId: s.raceId,
+      phase: s.phase,
+      clearedMask: s.clearedMask,
+      cleared: s.cleared,
+      jumpsTotal: s.jumpsTotal,
+      goTicksLeft: s.phase === 'countdown' ? Math.round((goMs / 1000) * TICK_RATE) : 0,
+      ticksLeft: s.phase === 'racing' ? Math.round((remMs / 1000) * TICK_RATE) : s.timeLimitTicks,
+      timeLimitTicks: s.timeLimitTicks,
+    };
+  }
+  // Mirror the authoritative race lifecycle into mountRaceMirror. Gate positions
+  // never ride the wire (the racing line derives from the shared
+  // MOUNT_RACE_COURSE content); the events still flow to the HUD (drainEvents)
+  // for the countdown/banners.
+  private applyMountRaceEvent(ev: SimEvent): void {
+    if (ev.type === 'mountRaceCountdown') {
+      this.mountRaceMirror = {
+        raceId: ev.raceId,
+        phase: 'countdown',
+        clearedMask: 0,
+        cleared: 0,
+        jumpsTotal: MOUNT_RACE_COURSE.jumps.length,
+        goDeadlineMs: performance.now() + (ev.countdownTicks / TICK_RATE) * 1000,
+        deadlineMs: 0,
+        timeLimitTicks: 0,
+      };
+    } else if (ev.type === 'mountRaceStart') {
+      const s = this.mountRaceMirror;
+      const deadlineMs = performance.now() + (ev.timeLimitTicks / TICK_RATE) * 1000;
+      if (s && s.raceId === ev.raceId) {
+        s.phase = 'racing';
+        s.jumpsTotal = ev.jumpsTotal;
+        s.timeLimitTicks = ev.timeLimitTicks;
+        s.deadlineMs = deadlineMs;
+      } else {
+        // A start without a preceding countdown mirror (late join / dropped
+        // event): build the racing mirror straight from the start event.
+        this.mountRaceMirror = {
+          raceId: ev.raceId,
+          phase: 'racing',
+          clearedMask: 0,
+          cleared: 0,
+          jumpsTotal: ev.jumpsTotal,
+          goDeadlineMs: 0,
+          deadlineMs,
+          timeLimitTicks: ev.timeLimitTicks,
+        };
+      }
+    } else if (ev.type === 'mountRaceJump') {
+      const s = this.mountRaceMirror;
+      if (s && s.raceId === ev.raceId) {
+        s.clearedMask = ev.mask;
+        s.cleared = ev.cleared;
+        s.jumpsTotal = ev.jumpsTotal;
+      }
+    } else if (ev.type === 'mountRaceEnd') {
+      if (this.mountRaceMirror?.raceId === ev.raceId) this.mountRaceMirror = null;
+    }
+  }
+  // Mirror riding-lesson liveness for legacy mountLessonActive() consumers.
+  private applyMountTrainEvent(ev: SimEvent): void {
+    if (ev.type === 'mountTrainSession') this.mountLessonActiveMirror = true;
+    else if (ev.type === 'mountTrainEnd') this.mountLessonActiveMirror = false;
   }
   toggleWeaponStow(): void {
     // Optimistic local nudge (like changeSkin/playEmote) so the sheathe pose and
@@ -3939,6 +4259,19 @@ export class ClientWorld implements IWorld {
     // never trust the wire: re-sanitize the links, same as the identity decode
     this.rememberFlair(ev.from, ev.flair.ai === true, normalizeStreamerLinks(ev.flair.links));
   }
+  // Mirror the authoritative prestige rank into this.prestigeRank the moment
+  // the event lands (issue #2137). The self snapshot's `prk` field is the
+  // convergence arm (same pattern as applyCraftResultEvent above), but the
+  // server sends this tick's `events` frame BEFORE the next `snap` frame that
+  // carries the bumped rank: without this immediacy arm, an already-open
+  // character sheet's renderCharIfOpen() (triggered by this very event) reads
+  // the STALE prestigeRank still on the mirror, so the sheet freezes one rank
+  // behind the chat line's "Prestige Rank N" until an unrelated repaint (or
+  // the next snapshot) catches it up.
+  private applyPrestigeEvent(ev: SimEvent): void {
+    if (ev.type !== 'prestige') return;
+    this.prestigeRank = ev.rank;
+  }
   // --- IWorldMarket: World Market browse/list/buy/cancel/collect command sends
   // (snake_case wire strings). marketInfo is a snapshot read (mirror field above). ---
   marketSearch(query: MarketQuery): void {
@@ -3955,6 +4288,12 @@ export class ClientWorld implements IWorld {
   }
   marketList(itemId: string, count: number, price: number): void {
     this.cmd({ cmd: 'market_list', item: itemId, count, price });
+  }
+  marketListInstance(itemId: string, price: number, instance: ItemInstancePayload): void {
+    // The payload is a SELECTOR, not content: the server re-resolves it against
+    // the sender's own inventory and escrows the actual held copy, so nothing
+    // here can mint state.
+    this.cmd({ cmd: 'market_list_instance', item: itemId, price, instance });
   }
   marketBuy(listingId: number): void {
     this.cmd({ cmd: 'market_buy', id: listingId });
@@ -3974,7 +4313,13 @@ export class ClientWorld implements IWorld {
       subject,
       body,
       copper,
-      items: items.map((s) => ({ itemId: s.itemId, count: s.count })),
+      items: items.map((s) => ({
+        itemId: s.itemId,
+        count: s.count,
+        // The payload is a SELECTOR (the market_list_instance rule): the
+        // server re-resolves it against the sender's own bags.
+        ...(s.instance ? { instance: s.instance } : {}),
+      })),
     });
   }
   mailTake(mailId: number): void {
@@ -4048,9 +4393,35 @@ export class ClientWorld implements IWorld {
   buyHeroicVendorItem(itemId: string): void {
     this.cmd({ cmd: 'heroic_buy', itemId });
   }
+  // Live lethal death zones on the current rift boss floor. Mirrored from
+  // riftDeathZoneSpawn events emitted at zone-placement time; the client counts
+  // each zone down locally and drops it when remaining falls to zero.
+  riftBossDeathZones(): import('../world_api/dungeons').RiftBossDeathZoneView[] {
+    const now = performance.now();
+    const out: import('../world_api/dungeons').RiftBossDeathZoneView[] = [];
+    for (const z of this.activeBossDeathZones) {
+      const remaining = (z.expiresAtMs - now) / 1000;
+      if (remaining > 0) out.push({ x: z.x, z: z.z, radius: z.radius, remaining });
+    }
+    return out;
+  }
+  // Milliseconds remaining before the current rift's backing world event stops
+  // admitting new parties (null outside a rift, or for a dev-spawned rift). See the
+  // riftEventExpiresAtMs field above for the mirrored deadline this subtracts from.
+  riftEventMsRemaining(): number | null {
+    if (this.riftEventExpiresAtMs === null) return null;
+    return Math.max(0, this.riftEventExpiresAtMs - Date.now());
+  }
   // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
   // remaining time is derived locally so the countdown ticks down without traffic.
   private selfLockouts: Record<string, number> = {};
+  // The owned collection, mirrored from `s.mntOwn`. Starts empty: nothing is owned
+  // until the server says so (the horse is no longer auto-granted), so an empty list
+  // is the correct pre-snapshot state.
+  private selfOwnedMounts: MountKey[] = [];
+  // Riding skill, mirrored from the snapshot `s.mntRtd`. False until the server
+  // confirms the player purchased it from Marla.
+  private selfRidingTrained = false;
   raidLockouts(): RaidLockout[] {
     const now = Date.now();
     const src = this.selfLockouts ?? {};
@@ -4097,6 +4468,44 @@ export class ClientWorld implements IWorld {
   }
   // Mirror the authoritative craftResult event into lastCraftResult (#1127).
   // The event still flows to the HUD (drainEvents) for a toast/log line.
+  private applyRiftStateEvent(ev: SimEvent): void {
+    if (ev.type !== 'riftState') return;
+    this.riftFloor = ev.active
+      ? {
+          eventId: ev.eventId,
+          instanceId: ev.instanceId,
+          seed: ev.seed,
+          baseLevel: ev.baseLevel,
+          floorIndex: ev.floorIndex,
+          floorCount: ev.floorCount,
+          origin: ev.origin,
+          contentId: ev.contentId,
+          contentHash: ev.contentHash,
+          upgrade: ev.upgrade,
+          name: ev.name,
+          themeName: ev.themeName,
+          tier: ev.tier,
+        }
+      : null;
+    this.riftEventExpiresAtMs = ev.active ? ev.expiresAtMs : null;
+    // Clear death zones on rift exit / floor change so stale rings from a
+    // previous run never bleed into a new floor.
+    if (!ev.active) this.activeBossDeathZones = [];
+  }
+
+  // Mirror a spawned lethal boss death zone so riftBossDeathZones() returns
+  // the live ring for the renderer. The zone counts down via wall-clock; no
+  // tick dependency needed. Expired entries are lazily dropped by the reader.
+  private applyRiftDeathZoneSpawnEvent(ev: SimEvent): void {
+    if (ev.type !== 'riftDeathZoneSpawn') return;
+    this.activeBossDeathZones.push({
+      x: ev.x,
+      z: ev.z,
+      radius: ev.radius,
+      expiresAtMs: performance.now() + ev.durationSecs * 1000,
+    });
+  }
+
   private applyCraftResultEvent(ev: SimEvent): void {
     if (ev.type !== 'craftResult') return;
     this.lastCraftResult = {
@@ -4109,6 +4518,24 @@ export class ClientWorld implements IWorld {
       reason: ev.reason,
     };
   }
+  // A successful recovery is intentionally shorter than the normal large-delta
+  // snapshot snap threshold. Mirror its authoritative event immediately so an
+  // eight-yard correction never spends a frame interpolating back into the wall.
+  private applyUnstuckEvent(ev: SimEvent): void {
+    if (ev.type !== 'unstuck' || ev.phase !== 'completed') return;
+    const p = this.entities.get(ev.pid ?? this.playerId);
+    if (!p) return;
+    p.pos = {
+      x: ev.destination.x,
+      y: ev.destination.y,
+      z: ev.destination.z,
+    };
+    p.prevPos = { ...p.pos };
+    p.vx = 0;
+    p.vy = 0;
+    p.vz = 0;
+  }
+
   // Mirror the authoritative masterwork event into lastMasterwork
   // (Professions 2.0), modeled exactly on applyCraftResultEvent
   // above. The event still flows to the HUD (drainEvents) for a future

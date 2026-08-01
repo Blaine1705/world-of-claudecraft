@@ -119,6 +119,9 @@ beforeEach(() => {
   process.env.DISCORD_GUILD_ID = '111111111111111111';
   // Auto-join is off by default; the auto-join describe sets a bot token per case.
   delete process.env.DISCORD_BOT_TOKEN;
+  // server/env.ts loads the machine .env at import; a developer's real guild
+  // invite must not leak into the DEFAULT_INVITE assertions.
+  delete process.env.DISCORD_GUILD_INVITE;
   linkRow = [];
   ownerRows = [];
   rewardRows = [];
@@ -1118,6 +1121,9 @@ describe('POST /api/auth/discord/login/new', () => {
       status: 409,
       data: { error: 'already_linked', code: 'discord.already_linked' },
     });
+    expect(
+      dbMock.query.mock.calls.some((call) => String(call[0]).includes('DELETE FROM accounts')),
+    ).toBe(true);
   });
 
   it('provisions a password-less account, links it, and returns a session', async () => {

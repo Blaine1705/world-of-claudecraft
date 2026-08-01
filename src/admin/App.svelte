@@ -21,6 +21,7 @@
   import Overview from './pages/Overview.svelte';
   import Accounts from './pages/Accounts.svelte';
   import Characters from './pages/Characters.svelte';
+  import OnlinePlayers from './pages/OnlinePlayers.svelte';
   import Usage from './pages/Usage.svelte';
   import TickPerf from './pages/TickPerf.svelte';
   import Moderation from './pages/Moderation.svelte';
@@ -32,6 +33,7 @@
   import ChatFilter from './pages/ChatFilter.svelte';
   import BlockedIps from './pages/BlockedIps.svelte';
   import BugReports from './pages/BugReports.svelte';
+  import UnstuckReports from './pages/UnstuckReports.svelte';
   import IpAssociations from './pages/IpAssociations.svelte';
   import Staff from './pages/Staff.svelte';
 
@@ -45,6 +47,7 @@
     overview: Overview,
     accounts: Accounts,
     characters: Characters,
+    'online-players': OnlinePlayers,
     usage: Usage,
     'tick-perf': TickPerf,
     moderation: Moderation,
@@ -56,6 +59,7 @@
     'chat-filter': ChatFilter,
     'blocked-ips': BlockedIps,
     'bug-reports': BugReports,
+    'unstuck-reports': UnstuckReports,
     staff: Staff,
   } satisfies Record<AdminPage, Component>;
   // Permission route guard (presentation only; the server re-checks every

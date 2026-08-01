@@ -145,6 +145,7 @@ function spawnGroundHourglass(
     tickTimer: effect.groundDuration,
     school: 'arcane',
     ability: abilityName,
+    abilityId: TEMPORAL_HOURGLASS_ID,
     temporalHourglass: {
       id: `${caster.id}:${Math.round(ctx.time / DT)}`,
       abilityId: TEMPORAL_HOURGLASS_ID,
@@ -157,7 +158,7 @@ function spawnGroundHourglass(
       allyCooldownRate: effect.allyCooldownRate,
       createdTick: ctx.tickCount,
       sourceOrigin: { ...caster.pos },
-      sourceZoneId: zoneAt(caster.pos.z).id,
+      sourceZoneId: zoneAt(caster.pos.x, caster.pos.z).id,
     },
   });
 }

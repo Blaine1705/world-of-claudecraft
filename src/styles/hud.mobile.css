@@ -69,6 +69,10 @@
   body.mobile-touch #proc-overlay.necromancy {
     scale: 0.55;
   }
+  body.mobile-touch .aura-overlay-arc {
+    top: 14px;
+    height: 156px;
+  }
   /* The HUD overlay must let one-finger panning reach scrollable windows (Bag,
      Market, etc.) on iOS: Safari intersects touch-action down the ancestor
      chain, so `none` here would block child scroll containers and a child's
@@ -493,6 +497,20 @@
      re-tuned per layout tier (see the tiers section); --btn-scale
      (actionButtonScale) and --touch-opacity (touchOpacity) are reused
      directly, not forked. */
+  /* The race timer and pre-GO button sit higher on touch so they clear the
+     mobile controls at the bottom of the screen. */
+  body.mobile-touch #mount-race-strip,
+  body.mobile-touch #race-start-btn {
+    bottom: max(34vh, calc(220px + env(safe-area-inset-bottom)));
+  }
+  body.mobile-touch #mount-race-strip {
+    max-width: calc(100vw - 24px);
+    padding: 8px 14px;
+    font-size: 16px;
+  }
+  body.mobile-touch #mount-race-strip .mr-timer {
+    width: 110px;
+  }
   body.mobile-touch #mobile-action-ring {
     /* Chrome-scale folded into every ring size var (the arc offsets below are
        expressed in these vars, so the whole cluster shrinks proportionally and keeps
@@ -2157,6 +2175,84 @@
     overflow-x: hidden;
     z-index: 25;
   }
+  body.mobile-touch #target-auras-window {
+    display: none !important;
+    position: fixed;
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    top: max(220px, calc(env(safe-area-inset-top) + 8px));
+    width: min(
+      280px,
+      calc(100% - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right)))
+    );
+    max-height: min(35vh, 280px);
+    /* Aura rows own their scrolling viewport. Keep the frame overflow visible
+       so the settings disclosure can extend past a narrow single-column frame. */
+    overflow: visible;
+    transform: translateX(-50%);
+  }
+  body.mobile-touch #target-auras-window.ta-filter-debuffs,
+  body.mobile-touch #target-auras-window.ta-filter-buffs {
+    width: min(
+      240px,
+      calc(100% - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right)))
+    );
+  }
+  body.mobile-touch #target-auras-window .ta-row {
+    --ta-row-height: 19px;
+    height: 19px;
+    grid-template-rows: 1fr;
+  }
+  body.mobile-touch #target-auras-window .ta-icon {
+    height: 17px;
+  }
+  body.mobile-touch #target-auras-window.ta-show-sources .ta-row {
+    --ta-row-height: 40px;
+    height: 40px;
+    grid-template-rows: 20px 18px;
+  }
+  body.mobile-touch #target-auras-window.ta-show-sources .ta-icon {
+    height: 38px;
+  }
+  body.mobile-touch #target-auras-window .ta-move-btn {
+    display: none;
+  }
+  body.mobile-touch #target-auras-window .ta-rows-config-btn,
+  body.mobile-touch #target-auras-window .ta-visible-rows-step,
+  body.mobile-touch #target-auras-window .ta-visible-rows-value {
+    width: 40px;
+    height: 40px;
+  }
+  body.mobile-touch #target-auras-window .ta-rows-config-btn {
+    flex-basis: 40px;
+  }
+  body.mobile-touch #target-auras-window .ta-visible-rows-control {
+    top: 44px;
+    right: auto;
+    gap: 16px;
+    padding: 6px 8px;
+    width: min(232px, calc(100vw - 8px));
+  }
+  body.mobile-touch #target-auras-window .ta-opacity-control {
+    min-height: 40px;
+  }
+  body.mobile-touch #target-auras-window .ta-opacity-slider {
+    min-height: 40px;
+  }
+  body.mobile-touch #target-auras-window .ta-filters .mt-tab {
+    min-height: 40px;
+  }
+  /* Detached meter windows are a DESKTOP affordance: popping one out, dragging
+     it and resizing it are all pointer gestures the mobile HUD does not offer,
+     and a phone has no room for three floating panels over the action ring. The
+     tabbed meters window above already reaches all three meters here, so the
+     mobile decision for #heal-window / #threat-window is: never shown. The
+     tab right-click that would separate them is a desktop gesture too. */
+  body.mobile-touch #heal-window,
+  body.mobile-touch #threat-window {
+    display: none !important;
+  }
   /* Left-handed mirror: swap the move joystick (and the utility cluster and
      action ring that hug the two corners, see below) so the movement stick
      sits under the right thumb. Opt-in via the "Left-handed Touch" toggle in
@@ -2526,7 +2622,9 @@
     }
     body.mobile-touch .armory-card {
       width: 100%;
-      max-width: 116px;
+      /* 112px keeps the square art + copy fully inside a 390px landscape
+         store viewport (the previous 116px card overran it by 3.625px). */
+      max-width: 112px;
       justify-self: center;
     }
     body.mobile-touch .armory-card-copy {
@@ -2873,31 +2971,17 @@
     overflow-y: visible;
     min-height: 0;
   }
-  /* The desktop one-row control layout (components.css .mkt-controls) caps the search
-     box and each filter select to a max-width so they sit side by side; on the narrow
-     mobile sheet there is no room for that, so stack search and every filter select
-     back to one full-width control per row (the pre-landscape-relayout mobile shape).
-     Each of .mkt-search/.mkt-filters/.mkt-filter also carries a desktop flex-basis
-     (200px / auto / 140px) meant as a WIDTH in the desktop row layout; once the
-     container flips to flex-direction: column, that basis becomes a HEIGHT instead,
-     ballooning the search box to hundreds of pixels tall and clipping the filters
-     and the listing body out of the window. Neutralize the main-size basis here so
-     column stacking only changes layout direction, never element size. */
+  /* The desktop grid shares columns between search and every filter. The mobile sheet
+     deliberately reduces that same grid to one full-width control per row. */
   body.mobile-touch .mkt-controls {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     align-items: stretch;
   }
   body.mobile-touch .mkt-search {
-    flex: 0 0 auto;
     max-width: none;
     min-height: 40px;
   }
-  body.mobile-touch .mkt-filters {
-    flex: 0 0 auto;
-    flex-direction: column;
-  }
   body.mobile-touch .mkt-filter {
-    flex: 0 0 auto;
     max-width: none;
   }
   /* The desktop landscape relayout (components.css .mkt-list) auto-fills
@@ -3100,6 +3184,22 @@
     min-height: 40px;
     font-size: 16px;
   }
+  /* The corpse harvest picker's checkbox rows are the one loot-window control
+     the 40px floor above does NOT reach, and that is deliberate rather than an
+     oversight, so it is recorded here where the next person will look.
+     They are <label>s, so the whole row is the hit area, but the row is only
+     about 16px tall (a 12px line beside a UA-default ~13px checkbox). Raising
+     it to 40px was tried and reverted: at the in-game landscape metrics
+     (844x390) the corpse popup is already pinned at its cap, the
+     `body.mobile-touch .window` max-height above, which resolves to 350 of the
+     viewport's 390 CSS px and is already scrolling. Three rows going 16px to
+     40px pushes 72px of content, the Harvest button included, straight past a
+     fixed bottom edge.
+     Trading the primary action's reachability for the row's tap size is a worse
+     outcome than the gap, and closing it properly means a layout pass on the
+     popup (a denser row, or a scroll region that pins the button), which is its
+     own change. The rows do clear the WCAG 2.2 SC 2.5.8 24px minimum in the
+     horizontal axis and miss it vertically. */
   /* Short landscape phones keep only actionable roll cards (hud.ts filters the
      answered watch rows). The desktop vote monitor is useful context, but its
      multi-row strip makes one mobile card taller than the rail's usable height
@@ -4158,6 +4258,7 @@
     right: 10px !important;
     width: auto !important;
     box-sizing: border-box;
+    transform: none;
   }
   body.mobile-touch #report-window select,
   body.mobile-touch #report-window textarea {
@@ -4371,6 +4472,12 @@
      40x40 floor (desktop is 32x32). box-sizing keeps the 2px border inside the box. */
   body.mobile-touch .map-zoom-btn {
     min-width: 40px;
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  /* the continent level toggle is the touch way to reach the world overview
+     (no right-click on touch); raise it to the 40x40 floor. */
+  body.mobile-touch #map-level-toggle {
     min-height: 40px;
     box-sizing: border-box;
   }
@@ -5007,6 +5114,18 @@
       min-width: 128px;
       max-height: min(135px, calc(var(--app-vh) / var(--ui-scale, 1) - 112px));
       transform: none;
+    }
+    /* The centre-top lane is clear of the target/party stack on the left and
+       minimap/player auras on the right. The independently scrolling aura lists
+       keep the automatic panel from covering either actionable rail. */
+    body.mobile-touch #target-auras-window {
+      top: max(6px, env(safe-area-inset-top));
+      width: min(
+        280px,
+        calc(100% - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right)))
+      );
+      max-height: min(190px, calc(100dvh - max(12px, env(safe-area-inset-top))));
+      height: min(190px, calc(100dvh - max(12px, env(safe-area-inset-top))));
     }
     body.mobile-touch #banner {
       top: 18%;

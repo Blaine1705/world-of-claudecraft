@@ -306,17 +306,12 @@ function isolate(): void {
 type MainModule = typeof import('../../../server/main');
 
 // A Dispatch that BAKES IN the /api dispatch mode: it flips the flag (legacy vs
-// new) via the test-only setter, drives the real routeHttpRequest, then polls
-// res.writableEnded (routeHttpRequest is synchronous fire-and-forget).
+// new) via the test-only setter and drives the real routeHttpRequest. The shared
+// captureResponse helper waits on FakeRes's end signal.
 function makeModedDispatch(main: MainModule, mode: 'legacy' | 'new'): Dispatch {
-  return async (req, res) => {
+  return (req, res) => {
     main.setApiDispatchModeForTests(mode);
     main.routeHttpRequest(req, res);
-    let ticks = 0;
-    while (!(res as unknown as { writableEnded: boolean }).writableEnded) {
-      if (ticks++ > MAX_POLL_TICKS) throw new Error('response never ended');
-      await new Promise((r) => setImmediate(r));
-    }
   };
 }
 
@@ -465,6 +460,19 @@ describe('/api dispatch parity (legacy flag vs new flag)', () => {
     expect(JSON.parse(newCap.body as string).steam).toEqual({ enabled: true });
   });
 
+  it('the /api/status epic advert DIVERGES under EPIC_ENABLED=1: false on legacy, true on new', async () => {
+    // Twin of the Steam status advert above: Epic routes are registry-only
+    // (server/epic/routes.ts), so the legacy ladder hardcodes epic.enabled=false
+    // while the migrated statusHandler reads epicEnabled() live.
+    const { oldCap, newCap } = await captureWithEnv({ EPIC_ENABLED: '1' }, () =>
+      makeReq({ method: 'GET', url: '/api/status' }),
+    );
+    expect(oldCap.status).toBe(200);
+    expect(newCap.status).toBe(200);
+    expect(JSON.parse(oldCap.body as string).epic).toEqual({ enabled: false });
+    expect(JSON.parse(newCap.body as string).epic).toEqual({ enabled: true });
+  });
+
   it('the /api/status dev_commands advert AGREES on both arms under ALLOW_DEV_COMMANDS=1', async () => {
     // Unlike steam.enabled directly above, dev_commands must NOT diverge: the dev_*
     // cheats ride the WEBSOCKET dispatcher, which both ladders serve identically, so
@@ -528,6 +536,38 @@ describe('/api dispatch parity (legacy flag vs new flag)', () => {
     );
     expect(oldCap.status).toBe(404);
     expect(newCap.status).not.toBe(404);
+  });
+
+  it('the Epic link surface 404s on the legacy ladder but is served on the new arm', async () => {
+    // Twin of the Steam registry-only pin: /api/epic/status exists only as a
+    // RouteDef. Legacy 404s; new arm serves (401 without bearer when enabled).
+    const { oldCap, newCap } = await captureWithEnv({ EPIC_ENABLED: '1' }, () =>
+      makeReq({ method: 'GET', url: '/api/epic/status' }),
+    );
+    expect(oldCap.status).toBe(404);
+    expect(newCap.status).not.toBe(404);
+  });
+
+  it('the OTA update check 404s on the legacy ladder but is served on the new arm', async () => {
+    // POST /api/ota/updates is a registry-only RouteDef (the deeds/steam
+    // new-route rule). Under legacy dispatch the ladder has no such arm, so it
+    // falls through to 404; under new dispatch the router serves it. The env
+    // key is FORCED unset (a developer .env may set it) so the handler takes
+    // the fail-closed no-update 200 and the case never performs an outbound
+    // manifest fetch.
+    const { oldCap, newCap } = await captureWithEnv({ OTA_MANIFEST_URL: undefined }, () =>
+      makeReq({
+        method: 'POST',
+        url: '/api/ota/updates',
+        body: { platform: 'ios', version_name: 'builtin', version_build: '0.32.0' },
+      }),
+    );
+    expect(oldCap.status).toBe(404);
+    expect(newCap.status).toBe(200);
+    expect(JSON.parse(newCap.body as string)).toEqual({
+      message: 'No new version available',
+      error: 'no_new_version_available',
+    });
   });
 
   it('GET /api/perf-report is identical old-vs-new and is a 404 (re-pins the masked /api/perf-report)', async () => {

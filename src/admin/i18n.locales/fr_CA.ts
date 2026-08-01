@@ -47,7 +47,6 @@ export const fr_CA: Record<string, string> = {
   'stats.avgTick': 'tick moyen',
   'stats.serverRss': 'rss serveur',
   'online.title': 'Joueurs en ligne',
-  'online.refreshHint': 'actualisé toutes les 5 s',
   'online.empty': "personne en ligne pour l'instant",
   'online.colCharacter': 'Personnage',
   'online.colClass': 'Classe',
@@ -465,4 +464,7 @@ export const fr_CA: Record<string, string> = {
   'moderationHistoryPage.colTarget': 'Cible',
   'moderationHistoryPage.colModerator': 'Modérateur',
   'moderationHistoryPage.colReason': 'Motif',
+  'dialog.actionResetChatStrikes': 'Remettre à zéro les infractions de clavardage de ce compte',
+  'dialog.confirmResetChatStrikes': 'Confirmer la remise à zéro des infractions de clavardage',
+  'moderationHistory.actionResetChatStrikes': 'Infractions de clavardage réinitialisées',
 };

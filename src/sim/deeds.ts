@@ -28,11 +28,13 @@
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
-import { ITEMS, MOBS, ZONES, zoneAt } from './data';
+import { ITEMS, MOBS, zoneAt } from './data';
+import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
+  type DamageEventKind,
   DEED_STAT_KEYS,
   type DeedFlagId,
   type DeedMeterId,
@@ -95,16 +97,20 @@ export const GROUND_PICKUP_PROVING_QUESTS: readonly string[] = [
   'q_glimmermere_light',
 ];
 
-// The highest level any giantslayer-creditable mob can ever spawn at: heroic
-// instances pin every mob to 22 (content/dungeon_difficulty.ts), two above
-// the player cap, and nothing outside heroic exceeds the cap itself (dummies,
-// the world boss, and owned pets are excluded from the killing-blow credit).
-// cmb_giantslayer needs a blow five levels up, so past this ceiling minus
-// five the deed is permanently out of reach for the character. PINNED:
-// shipping a higher-level creditable mob is a conscious re-decision of the
-// stranded threshold (the content-integrity test cross-checks the ceiling
+// The highest level any giantslayer-creditable mob can ever spawn at: S-rank
+// rift floors now hold a flat level 23 (rift/ranks.ts RIFT_MAX_MOB_LEVEL),
+// heroic instances pin every mob to 22 (content/dungeon_difficulty.ts), and
+// nothing else exceeds the player cap itself (dummies, the world boss, and
+// owned pets are excluded from the killing-blow credit). cmb_giantslayer needs
+// a blow five levels up, so past this ceiling minus five (23 - 5 = 18) the
+// deed is permanently out of reach; a capped player (20) is at level 20 which
+// is above 18, so the deed IS permanently stranded in rifts for capped
+// characters and the retro auto-heal DOES fire. Giantslayer is no longer
+// earnable inside S-rank rifts (maintainer-accepted in v0.23.0 rank retune).
+// PINNED: shipping a higher-level creditable mob is a conscious re-decision of
+// the stranded threshold (the content-integrity test cross-checks the ceiling
 // against the real tables).
-export const MAX_CREDITABLE_MOB_LEVEL = 22;
+export const MAX_CREDITABLE_MOB_LEVEL = 23;
 
 // Dungeon final bosses whose kill credit bumps deedStats.dungeonClears (keys
 // '<dungeonId>' and '<dungeonId>:heroic') and the dungeonFinalBossKills
@@ -116,6 +122,9 @@ const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   ysolei: 'drowned_temple',
   korzul_the_gravewyrm: 'gravewyrm_sanctum',
   nythraxis_scourge_of_thornpeak: 'nythraxis_boss_arena',
+  // Without this entry Zulgar kills write no dungeonClears record, so the
+  // dgn_wildheart_basin deed pair ships permanently unearnable (0/1 forever).
+  wildheart_high_priest: 'wildheart_basin',
 };
 
 // Perfection tasks: zero player deaths inside the boss's heroic instance
@@ -190,8 +199,12 @@ const SANCTUM_SPEED_DEED = 'dgn_sanctum_speed';
 
 // The named overworld terrors whose kill credit feeds a 'slain:<templateId>'
 // visited mark (the chr_*_rares deeds). Pinned so the visited set stays
-// bounded by construction.
-const RARE_SLAIN_TEMPLATES = new Set([
+// bounded by construction; every live rare CAMPS mob belongs here UNLESS it
+// already has an alternate credit path (the content-integrity test in
+// tests/deeds_content.test.ts cross-checks the exact set against CAMPS/MOBS,
+// with sethrael_palecoil as the one documented exception: its kill is
+// required by q_palecoil, which already feeds prog_mere_at_rest).
+export const RARE_SLAIN_TEMPLATES = new Set([
   'old_greyjaw',
   'mogger',
   'grix_the_tunnelking',
@@ -200,10 +213,16 @@ const RARE_SLAIN_TEMPLATES = new Set([
   'mirejaw_the_ravenous',
   'sloomtooth_the_drowned',
   'sister_nhalia',
+  'grubjaw',
   'ironvein_foreman',
   'brutok_skullsmasher',
   'voskar_emberwing',
   'marrowlord_varkas',
+  'old_cragmaw',
+  'shardlord_kazzix',
+  'gleamstag',
+  'old_marrowshell',
+  'aurelhorn',
 ]);
 
 // Zone fishing catches that count as "a fish" for the chr_ first-cast deeds
@@ -721,24 +740,9 @@ const FLAGS: Record<DeedFlagId, (meta: PlayerMeta, e: Entity) => boolean> = {
   // Guild membership is server-stamped onto the entity; offline it stays ''
   // (never satisfiable there, matching the offline-sandbox model).
   guildMember: (_m, e) => e.guild !== '',
-  // Slot list PINNED as of v1 (the launch EQUIP_SLOTS); a future twelfth slot
-  // does not grow this deed.
-  allEquipSlotsFilled: (m) =>
-    (
-      [
-        'mainhand',
-        'helmet',
-        'neck',
-        'shoulder',
-        'chest',
-        'waist',
-        'legs',
-        'gloves',
-        'feet',
-        'ring1',
-        'ring2',
-      ] as const
-    ).every((slot) => !!m.equipment[slot]),
+  // Slot list PINNED as of v1 (LAUNCH_PAPERDOLL_SLOTS); a future twelfth slot
+  // does not grow this deed, so already-earned rows keep their meaning.
+  allEquipSlotsFilled: (m) => LAUNCH_PAPERDOLL_SLOTS.every((slot) => !!m.equipment[slot]),
   nonDefaultSkin: (m) => m.skinCatalog === 'mech' || m.skin > 0,
   // The marked set resets whenever the authoritative reward window advances,
   // so containment of all four ids already means one complete circuit.
@@ -969,7 +973,7 @@ function sweepProximityMarks(ctx: SimContext): void {
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e || e.dead) continue;
-    const zone = zoneAt(e.pos.z);
+    const zone = zoneAt(e.pos.x, e.pos.z);
     for (const poi of zone.pois ?? []) {
       // The mark keys on the stable poi id, never the display label (a label copy
       // edit must not strand exploration progress). Custom-map pois may omit the
@@ -1052,9 +1056,10 @@ export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
     if (bagId) markItemDiscovered(ctx, meta, bagId);
   }
   for (const slot of meta.vendorBuyback) {
-    // Buyback entries persist bare {itemId, count} today, but the rolled
-    // quality rides along like the sibling loops so a future instance payload
-    // cannot silently under-credit quality-first discoveries.
+    // Buyback entries can carry an instance payload (masterwork/signed sales,
+    // #2398); the rolled quality rides along like the sibling loops so
+    // quality-first discovery credit is never under-counted for a row that
+    // preserved its instance.
     markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality);
   }
 }
@@ -1132,7 +1137,7 @@ export function onDamageDealtForDeeds(
   target: Entity,
   amount: number,
   crit: boolean,
-  kind: 'hit' | 'miss' | 'dodge',
+  kind: DamageEventKind,
 ): void {
   if (source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
@@ -1334,7 +1339,11 @@ export function onMobKillCreditForDeeds(
   eligible: PlayerMeta[],
 ): void {
   const tmpl = MOBS[mob.templateId];
-  bumpDeedStat(ctx, credited, 'kills', 1);
+  // A shared kill credits XP, quest progress, and loot to every eligible
+  // party member (damage.ts), not just the tapper: the lifetime kills
+  // counter must match, like every sibling stat in this file (dungeon
+  // clears, thunzharr kills, the rare-slain marks two lines below).
+  for (const meta of eligible) bumpDeedStat(ctx, meta, 'kills', 1);
 
   // chr_vale_packbreaker: three forest_wolf kill credits inside a rolling
   // 10 s window (session-scoped times; pruned on every push).
@@ -1642,7 +1651,7 @@ export function onCupTouchForDeeds(ctx: SimContext, match: CupMatchForDeeds, pid
 export function onCupGoalForDeeds(
   ctx: SimContext,
   match: CupMatchForDeeds,
-  team: 'A' | 'B',
+  _team: 'A' | 'B',
   scorerPid: number | null,
 ): void {
   if (!match.rated || scorerPid === null) return;

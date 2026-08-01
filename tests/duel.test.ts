@@ -1,13 +1,24 @@
 import { describe, expect, it } from 'vitest';
 import { applyRuinousBrand } from '../src/sim/combat/destruction';
-import { MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity } from '../src/sim/types';
+import type { Aura, Entity, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
+// Duels are player-vs-player; the only ambient dependency is givePet, which
+// adopts a wild mob. Keep the real forest_wolf camps as that mob supply and
+// strip the rest of the ambient world (subsystem-world pattern, see
+// tests/dot_final_tick.test.ts).
+const DUEL_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((c) => c.mobId === 'forest_wolf'),
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: DUEL_TEST_WORLD });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
@@ -82,7 +93,7 @@ describe('duel: non-lethal cleanup', () => {
     (sim as any).applyAura(eb, opponentDot(ea.id));
     (sim as any).dealDamage(ea, eb, eb.hp + 1000, false, 'physical', 'Finisher', 'hit');
 
-    expect((sim as any).duels.has(b)).toBe(false); // duel is over
+    expect(sim.duelFor(b)).toBeNull(); // duel is over
     expect(eb.dead).toBe(false);
     expect(eb.hp).toBe(1);
 
@@ -103,13 +114,52 @@ describe('duel: non-lethal cleanup', () => {
     (sim as any).applyAura(eb, opponentDot(ea.id));
     eb.hp = 30; // wounded but alive
 
-    // Bet flees past the forfeit distance, ending the duel as a draw.
-    teleport(sim, b, 400, -40);
+    // Bet flees past the forfeit distance, ending the duel as a draw (a
+    // quiet vale spot clear of camps: the old far point is island land now).
+    teleport(sim, b, 40, -140);
     sim.tick();
     expect((sim as any).duels.has(b)).toBe(false);
 
     for (let i = 0; i < 20 * 3; i++) sim.tick();
     expect(eb.dead).toBe(false);
+  });
+});
+
+describe('duel: same-tick reciprocal lethal hits', () => {
+  it('does not let a real death slip through when both duelists land a lethal hit in the same tick', () => {
+    const { sim, a, b } = startedDuel();
+    const ea = sim.entities.get(a)!;
+    const eb = sim.entities.get(b)!;
+    (sim as any).drainEvents();
+
+    // Aleph's blow lands first and ends the duel via the 1-HP guard. Before
+    // the duel entry is purged, Bet's own lethal blow against Aleph resolves
+    // in the SAME tick (the real projectile-resolution path can produce this
+    // when both attacks land in one tick). Neither hit may produce a real
+    // death: duels never kill.
+    (sim as any).dealDamage(ea, eb, eb.hp + 1000, false, 'physical', 'Finisher', 'hit');
+    (sim as any).dealDamage(eb, ea, ea.hp + 1000, false, 'physical', 'Finisher', 'hit');
+
+    expect(eb.dead).toBe(false);
+    expect(eb.hp).toBe(1);
+    expect(ea.dead).toBe(false);
+    expect(ea.hp).toBe(1);
+    expect(sim.duelFor(a)).toBeNull();
+    expect(sim.duelFor(b)).toBeNull();
+
+    // Only the first lethal hit should have resolved the duel: the deed
+    // ledgers and the duelEnd broadcast must not double-count the reciprocal
+    // hit that landed against an already-ended bout.
+    const aMeta = sim.players.get(a)!;
+    const bMeta = sim.players.get(b)!;
+    expect(aMeta.deedStats.counters.duelsWon ?? 0).toBe(1);
+    expect(bMeta.deedStats.counters.duelsLost ?? 0).toBe(1);
+    expect(bMeta.deedStats.counters.duelsWon ?? 0).toBe(0);
+    expect(aMeta.deedStats.counters.duelsLost ?? 0).toBe(0);
+    const duelEndEvents = ((sim as any).events as { type: string }[]).filter(
+      (e) => e.type === 'duelEnd',
+    );
+    expect(duelEndEvents.length).toBe(1);
   });
 });
 
@@ -144,7 +194,7 @@ describe('duel: PvP combat affordances', () => {
 
     (sim as any).dealDamage(pet, eb, eb.hp + 1000, false, 'physical', 'Pet Bite', 'hit');
 
-    expect((sim as any).duels.has(b)).toBe(false);
+    expect(sim.duelFor(b)).toBeNull();
     expect(eb.dead).toBe(false);
     expect(eb.hp).toBe(1);
   });
@@ -166,12 +216,18 @@ describe('duel: PvP combat affordances', () => {
     expect(warlock.hp).toBeLessThan(hpBeforeTap);
     expect(warlock.resource).toBeGreaterThan(manaBeforeTap);
 
-    warlock.gcdRemaining = 0;
-    warlock.resource = warlock.maxResource;
-    sim.castAbility('curse_of_agony', a);
     // The curse is a projectile now: it applies when the bolt reaches the warrior
-    // (projectile_travel), a few ticks after the cast, so let it land.
-    for (let i = 0; i < 20 && (sim as any).pendingProjectiles.length > 0; i++) sim.tick();
+    // (projectile_travel), a few ticks after the cast, so let each land. A bolt
+    // can also MISS on the spell hit table (the roll rides the shared rng
+    // stream, which world-gen shifts), so retry the cast rather than pin a
+    // stream position.
+    for (let attempt = 0; attempt < 8; attempt++) {
+      warlock.gcdRemaining = 0;
+      warlock.resource = warlock.maxResource;
+      sim.castAbility('curse_of_agony', a);
+      for (let i = 0; i < 20 && (sim as any).pendingProjectiles.length > 0; i++) sim.tick();
+      if (warrior.auras.some((aura) => aura.id === 'curse_of_agony')) break;
+    }
     expect(warrior.auras.some((aura) => aura.id === 'curse_of_agony')).toBe(true);
 
     warlock.gcdRemaining = 0;

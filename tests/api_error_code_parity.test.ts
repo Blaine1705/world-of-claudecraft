@@ -100,7 +100,14 @@ const KNOWN_CODES = [
   'steam.already_linked',
   'steam.account_taken',
   'steam.upstream',
+  'epic.disabled',
+  'epic.invalid_token',
+  'epic.banned',
+  'epic.already_linked',
+  'epic.account_taken',
+  'epic.upstream',
   'wallet.handoff_invalid',
+  'ota_updates.invalid_input',
 ];
 
 // The parametric contract pins: the matcher

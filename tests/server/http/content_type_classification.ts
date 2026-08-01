@@ -57,6 +57,7 @@ export type ContentTypeClass = (typeof CONTENT_TYPE_CLASSES)[number];
 // row carries their class); this map is the /api contract slice.
 export const API_CONTENT_TYPE: Readonly<Record<string, ContentTypeClass>> = {
   '/api/native-attestation/challenge': PROBLEM_JSON,
+  '/api/ota/updates': PROBLEM_JSON,
   '/api/site-presence': LEGACY_OKFALSE_405,
   '/api/register': PROBLEM_JSON,
   '/api/login': PROBLEM_JSON,
@@ -144,6 +145,8 @@ export const API_CONTENT_TYPE: Readonly<Record<string, ContentTypeClass>> = {
   '/api/deeds/broadcasts': PROBLEM_JSON,
   '/api/steam/link': PROBLEM_JSON,
   '/api/steam/status': PROBLEM_JSON,
+  '/api/epic/link': PROBLEM_JSON,
+  '/api/epic/status': PROBLEM_JSON,
   '/api/card': BINARY,
   '/api/referrals': PROBLEM_JSON,
   '/api/discord/swag/claim': PROBLEM_JSON,

@@ -29,14 +29,15 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
-import { lockNormalDungeonResetOnBossKill } from '../instances/dungeons';
+import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
 import { pvpDamageMultiplier } from '../pvp';
+import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { DamageResolution, SimContext } from '../sim_context';
 import { vcupBothSeated } from '../social/vale_cup';
 import { addThreat, canDetectStealthedTarget, clearThreat } from '../threat';
-import type { Entity } from '../types';
+import type { DamageEventKind, Entity } from '../types';
 import {
   berserkerCritDamage,
   dist2d,
@@ -81,7 +82,10 @@ import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
-const CORPSE_DURATION = 60;
+// Exported so the respawn policy's guard can check it against the zone tiers:
+// updateMob defers an in-place respawn while a corpse is still lootable, so the
+// effective delay is max(tier, this). See tests/respawn_policy.test.ts.
+export const CORPSE_DURATION = 60;
 // Self attack-speed buff a wounded frenzyOnHit mob gains; sole user maybeFrenzyOnHit.
 const BLOOD_FRENZY_AURA_ID = 'blood_frenzy';
 const VICTORY_RUSH_WINDOW = 20;
@@ -109,7 +113,7 @@ export function dealDamage(
   crit: boolean,
   school: string,
   ability: string | null,
-  kind: 'hit' | 'miss' | 'dodge',
+  kind: DamageEventKind,
   noRage = false,
   threatOpts?: { flat?: number; mult?: number },
   // Whether this is a DIRECT attack (auto-attack swing or a direct-hit spell) as
@@ -136,28 +140,68 @@ export function dealDamage(
   // full immunities and lethal handling, but must not be mitigated, amplified,
   // absorbed, or redirected a second time.
   resolvedHpLoss = false,
-): void {
+): number {
   if (resolution) resolution.landedHpLoss = 0;
   if (resolvedHpLoss) alreadyFinal = true;
-  if (target.dead) return;
+  if (target.dead) return 0;
   if (
     source?.kind === 'mob' &&
     source.ownerId !== null &&
     target.kind === 'player' &&
     !canDetectStealthedTarget(source, target, PET_STEALTH_DETECTION_RADIUS)
   )
-    return;
-  if (target.gm || target.devGod) return; // GMs and /dev god are invulnerable (every damage path funnels here)
+    return 0;
+  if (target.gm || target.devGod) {
+    // GMs and /dev god are invulnerable (every damage path funnels here). For
+    // /dev god under ALLOW_DEV_COMMANDS the hit still EMITS as a zero-damage
+    // event: the renderer keys attacker swing animations and FCT off damage
+    // events, so a silent return made every melee mob look like it "follows
+    // but never attacks" during god-mode playtests (the live-test report).
+    // Presentation only, no threat, procs, deed counters, or rng. Real GMs
+    // (production, no devCommands) stay fully silent as before.
+    if (target.devGod && ctx.devCommands && source) {
+      ctx.emit({
+        type: 'damage',
+        sourceId: source.id,
+        targetId: target.id,
+        amount: 0,
+        crit: false,
+        school,
+        ability,
+        kind,
+        ...(attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
+      });
+    }
+    return 0;
+  }
   // Ice Block (Cold Coffin): while encased in stasis the mage is FULLY immune to
   // damage (owner 2026-07-13), so nothing gets through until it is cancelled or
   // expires. Every damage path funnels here, so this covers melee, spells, and DoTs.
-  if (target.auras.some((a) => a.kind === 'stasis')) return;
+  if (target.auras.some((a) => a.kind === 'stasis')) return 0;
   // A wild mob that broke leash is in 'evade': it has dropped its hate table
   // and walks home without fighting back, healing to full only on arrival.
   // Classic mechanics make it immune while it retreats, so it can't be chipped
   // down or killed outright for a risk-free kill. Owned pets use pet AI, not
   // wild-mob leash recovery, and must not inherit this immunity from stale state.
-  if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return;
+  // Direct attacks report an Evade result (FCT word + combat log line); DoT and
+  // reflect ticks stay silent so a dotted evader does not spam a word per tick.
+  // The early return keeps every downstream effect off: no threat, no combat
+  // entry, no stealth break, no tap.
+  if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) {
+    if (direct && source) {
+      ctx.emit({
+        type: 'damage',
+        sourceId: source.id,
+        targetId: target.id,
+        amount: 0,
+        crit: false,
+        school,
+        ability,
+        kind: 'evade',
+      });
+    }
+    return 0;
+  }
   amount = Math.max(0, amount);
   const attackAnimation = attackAnimationStarted ? { attackAnimationStarted: true as const } : {};
 
@@ -168,10 +212,16 @@ export function dealDamage(
 
   // [dev] A god-mode player (/dev god) hits for 100x so a solo tester can chew
   // through raid bosses to inspect drops without one-shotting them past their phase
-  // transitions. Gated on devCommands so it can NEVER apply in production (where gm
+  // transitions. Gated on devCommands so it can never apply in production (where gm
   // marks real, non-fighting game masters). Draws no rng.
   if (!resolvedHpLoss && source?.devGod && source.kind === 'player' && ctx.devCommands)
     amount = Math.round(amount * 100);
+  // Dev "smite" mode: a flagged player's hit one-shots any mob (overrides the
+  // rolled amount before mitigation, so armor/absorb can't save the target). Only
+  // the player's own damage, only vs mobs; never touches players/NPCs/PvP.
+  if (source?.oneShot && source.kind === 'player' && target.kind === 'mob' && ctx.devCommands) {
+    amount = target.maxHp * 1000 + 1_000_000;
+  }
 
   // Master Armorer is a live equipment condition, not a stat baked at talent
   // recompute time. It applies to every school while the Arms warrior's current
@@ -507,12 +557,21 @@ export function dealDamage(
     }
   }
 
-  // duels end at 1 hp, nobody dies
+  // duels end at 1 hp, nobody dies. A duel that already ended earlier THIS
+  // SAME tick (endDuel defers the ctx.duels delete to tick-tail, see
+  // social/duel.ts) still matches here on purpose: a reciprocal lethal hit
+  // against the other duelist, resolving later in the same tick, must be
+  // clamped too instead of producing a real death on a simultaneous double-kill.
+  // Keyed purely on lifetime (still live, or ended this very tick) rather than
+  // `duel.state === 'active'`: state is never flipped when a duel ends, so an
+  // ended entry that outlives its own tick (only reachable today via
+  // Sim.removePlayer ending a duel outside a tick) would otherwise still clamp
+  // for one extra tick.
   const duel = target.kind === 'player' ? ctx.duels.get(target.id) : undefined;
   if (
     guardianWardRestore === 0 &&
     duel &&
-    duel.state === 'active' &&
+    (duel.endedTick === undefined || duel.endedTick === ctx.tickCount) &&
     sourcePlayer &&
     (sourcePlayer.id === duel.a || sourcePlayer.id === duel.b)
   ) {
@@ -536,7 +595,7 @@ export function dealDamage(
       if (resolution) resolution.landedHpLoss = amount;
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.endDuel(duel, sourcePlayer.id);
-      return;
+      return amount;
     }
   }
 
@@ -584,7 +643,7 @@ export function dealDamage(
       if (resolution) resolution.landedHpLoss = amount;
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.fiestaTakedown(match, sourcePlayer.id, target);
-      return;
+      return amount;
     }
   }
 
@@ -615,7 +674,7 @@ export function dealDamage(
       if (resolution) resolution.landedHpLoss = amount;
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.yumiPlayerDown(match, target, sourcePlayer.id);
-      return;
+      return amount;
     }
   }
 
@@ -630,7 +689,7 @@ export function dealDamage(
     sourcePlayer &&
     ctx.isArenaCrossTeam(match, sourcePlayer.id, target.id)
   ) {
-    if (match.defeated.has(target.id)) return;
+    if (match.defeated.has(target.id)) return 0;
     if (target.hp - amount <= 0) {
       amount = Math.max(0, target.hp);
       target.hp = 0;
@@ -657,7 +716,7 @@ export function dealDamage(
       if (loserTeam && ctx.isArenaTeamWiped(match, loserTeam)) {
         ctx.endArenaMatch(match, loserTeam === 'A' ? 'B' : 'A', 'defeat');
       }
-      return;
+      return amount;
     }
   }
 
@@ -713,7 +772,7 @@ export function dealDamage(
         attackAnimationStarted,
       );
       if (resolution) resolution.landedHpLoss = landedHpLoss;
-      return;
+      return landedHpLoss;
     }
   }
 
@@ -969,6 +1028,7 @@ export function dealDamage(
       handleDeath(ctx, target, source);
     }
   }
+  return amount;
 }
 
 // Reactive beast "Frenzy": when a mob with the frenzyOnHit trait is struck by a
@@ -1028,7 +1088,7 @@ function reflectSpellWard(
   source: Entity | null,
   target: Entity,
   amount: number,
-  kind: 'hit' | 'miss' | 'dodge',
+  kind: DamageEventKind,
   school: string,
 ): void {
   if (source?.kind !== 'player' || source.id === target.id) return;
@@ -1109,6 +1169,15 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     clearAfflictionState(ctx, e.id);
     const meta = ctx.players.get(e.id);
     if (meta) meta.counters.deaths++;
+    // Death force-dismounts (the mount bolts); the persisted selection stays,
+    // so remounting after the corpse run is one keypress. Stats recalc on the
+    // next mount toggle / resurrect recalc, and a dead player draws no swings,
+    // so the stale crit mirror is inert. Draws no rng. Any in-flight summon or
+    // dismount transition is cancelled too, so a mid-cast death does not leave a
+    // rooted, half-summoned player.
+    e.mountKey = '';
+    e.mountCastRemaining = 0;
+    e.mountCastKey = '';
     // The Book of Deeds death hook (lifetime deaths counter, the Keeper's Toll
     // delight, perfection-window taints, the world-boss survival record) already
     // ran above, before the hate tables were cleared.
@@ -1177,9 +1246,14 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     }
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
-    e.respawnTimer =
-      template?.respawnSeconds ??
-      ctx.cfg.respawnSeconds * (template?.respawnMult ?? (template?.rare ? 4 : 1));
+    // Respawn cadence is the zone's, not one flat world timer: the policy leaf
+    // reads the mob's SPAWN point so a corpse dragged across a border still
+    // returns on its home band's schedule. Draws no rng.
+    // A run-scoped mob (an escort ambush wave) was never placed by a camp, so it
+    // has no home to return to and never respawns in place; its run drops it.
+    e.respawnTimer = e.runScoped
+      ? Number.POSITIVE_INFINITY
+      : resolveRespawnSeconds(template, e.spawnPos, ctx.cfg.respawnSeconds);
     // A fixed respawn also caps corpse decay so the mob returns on schedule whether
     // or not its loot was looted (training dummy: 10s).
     if (template?.respawnSeconds !== undefined) {
@@ -1370,6 +1444,9 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
     ctx.awardHeroicMarks(e, heroicRewardRecipients);
+    // A bossExitPortal dungeon opens its far-end exit the moment the final
+    // boss falls (both difficulties; no-op everywhere else).
+    spawnBossExitPortal(ctx, e);
     // Nythraxis normal and heroic raid lockouts use a wider room sweep than
     // generic dungeon claims. Run it after heroic settlement so its lock stamp
     // cannot make first-clear participants look previously rewarded.

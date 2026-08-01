@@ -34,7 +34,7 @@ import {
   hotTickBonus,
 } from '../spell_scaling';
 import { stunDrCategory } from '../stun_dr';
-import { addThreat } from '../threat';
+import { addThreat, dropThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import {
   angleTo,
@@ -91,7 +91,7 @@ import {
   summonPyreColossus,
 } from './destruction';
 import { extendOwnedDot } from './dot_mutation';
-import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
+import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { fireGuaranteedCrit, personalBarrierIdForSpec } from './fire_mage';
@@ -104,6 +104,10 @@ import {
 } from './frost_mage';
 import { spawnFrozenOrb } from './frozen_orb';
 import { glacialFrontContains } from './glacial_front';
+import {
+  applyGreaterInvisibilityAftereffect,
+  GREATER_INVISIBILITY_DR_AURA_ID,
+} from './greater_invisibility';
 import { livingGroupRaidInRadius } from './group_targeting';
 import { applyGroupHaste } from './haste_burst';
 import { armHeroicLeap, relocateSwept } from './heroic_leap';
@@ -123,7 +127,7 @@ import {
 import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
-import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
 import { applyBlacktideReturnSpeed } from './warlock_talents';
@@ -155,6 +159,49 @@ function preservesStealth(ability: AbilityDef): boolean {
     ability.id === 'sap' ||
     ability.id === 'shadowstep'
   );
+}
+
+function dropsCombatOnStealth(ability: AbilityDef): boolean {
+  return ability.id === 'vanish';
+}
+
+function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): void {
+  p.combatTimer = 5;
+  p.inCombat = false;
+  p.autoAttack = false;
+  p.targetId = null;
+  p.queuedOnSwing = null;
+  delete p.queuedOnSwingFree;
+  delete p.queuedOnSwingCostMultiplier;
+
+  const pet = ctx.petOf(p.id);
+  const escapeIds = pet ? [p.id, pet.id] : [p.id];
+  if (pet) {
+    pet.combatTimer = 5;
+    pet.inCombat = false;
+    pet.aggroTargetId = null;
+    pet.targetId = null;
+  }
+
+  for (const entity of ctx.entities.values()) {
+    if (entity.kind !== 'mob' || entity.dead || !ctx.isHostileTo(p, entity)) continue;
+    let dropped = false;
+    for (const id of escapeIds) {
+      if (entity.threat.has(id) || entity.forcedTargetId === id) dropped = true;
+      dropThreat(entity, id);
+      if (entity.aggroTargetId === id) {
+        entity.aggroTargetId = null;
+        dropped = true;
+      }
+    }
+    if (!dropped) continue;
+    if (entity.ownerId !== null) {
+      if (entity.aggroTargetId === null) entity.inCombat = false;
+    } else if (entity.threat.size === 0 && entity.aggroTargetId === null) {
+      entity.aiState = 'evade';
+      entity.inCombat = false;
+    }
+  }
 }
 
 // Resolve the exclusiveGroup for an AURA id: either a plain ability id (a
@@ -308,12 +355,13 @@ export function runEffects(
     }
   }
 
-  if (
-    ability.requiresAuraKind &&
-    !res.effects.some((effect) => effect.type === 'afflictionSentence')
-  ) {
-    consumeAuraKind(ctx, p, ability.requiresAuraKind);
-  }
+  // requiresAuraKind (Glacial Spike's Icicles, Victory Rush's kill window) is now
+  // consumed atomically at cast commit in casting_lifecycle.ts's applyAbility,
+  // alongside spendAbilityCost/armAbilityCooldown, not here: a ranged ability's
+  // runEffects can run ticks after the cast committed (once its projectile
+  // lands), which used to leave the gating aura alive for a same-tick second
+  // cast attempt (issue #2632). Sentence is the exception: resolveSentence owns
+  // consuming its Doom pool after the cast is committed.
 
   for (const eff of res.effects) {
     switch (eff.type) {
@@ -460,8 +508,7 @@ export function runEffects(
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
         const finalDamage = Math.round(dmg);
         lastDirectDamage = finalDamage;
-        const directDamageResolution = { landedHpLoss: 0 };
-        ctx.dealDamage(
+        const resolvedDamage = ctx.dealDamage(
           p,
           target,
           finalDamage,
@@ -476,18 +523,25 @@ export function runEffects(
           false,
           ability.id,
           false,
-          directDamageResolution,
         );
-        lastResolvedDirectDamage = directDamageResolution.landedHpLoss;
+        lastResolvedDirectDamage = resolvedDamage;
         if (ability.id === 'soul_lance') {
           pierceLichSoulLance(ctx, p, target, lastResolvedDirectDamage);
         }
         if (areaEcho) {
           areaEchoDealt = true;
-          echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
+          echoAreaDamage(ctx, p, target, resolvedDamage, ability.school, ability.name, threatOpts);
         }
         if (sweeping)
-          sweepStrikeDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
+          sweepStrikeDamage(
+            ctx,
+            p,
+            target,
+            resolvedDamage,
+            ability.school,
+            ability.name,
+            threatOpts,
+          );
         // Power Echo (mage choice row): the armed echo repeats the SAME
         // resolved amount at its fraction on the same target (already rolled,
         // post crit; no new rng draw), consumed BEFORE the repeat so a copy
@@ -510,6 +564,7 @@ export function runEffects(
                 targetId: target.id,
                 school: ability.school,
                 fx: 'projectile',
+                ability: ability.id,
               });
               scheduleProjectile(ctx, p, target, (src, tgt) => {
                 ctx.dealDamage(
@@ -685,11 +740,12 @@ export function runEffects(
           targetId: ally.id,
           school: 'arcane',
           fx: 'temporalGlyph',
+          ability: ability.id,
         });
         break;
       }
       case 'massResurrectGroup': {
-        resurrectDeadGroupMembers(ctx, p, eff.hpFrac);
+        resurrectDeadGroupMembers(ctx, p, eff.hpFrac, ability.id);
         break;
       }
       case 'perfectMoment': {
@@ -794,6 +850,7 @@ export function runEffects(
             targetId: chain[i].id,
             school: ability.school,
             fx: 'chainHeal',
+            ability: ability.id,
           });
           const hopAmount = Math.max(1, Math.round(baseAmount * eff.falloff ** i));
           ctx.applyHeal(p, chain[i], hopAmount, ability.name, ability.id);
@@ -937,13 +994,16 @@ export function runEffects(
         const scriptedChannel = interruptedDef
           ? undefined
           : SCRIPTED_INTERRUPTIBLE_CHANNELS[target.castingAbility];
+        // `school` is undefined exactly when BOTH lookups came up empty (both
+        // carry a required school field), so this guard is the old
+        // `!interruptedDef && !scriptedChannel` immunity check.
+        const school = interruptedDef?.school ?? scriptedChannel?.school;
         if (
-          (!interruptedDef && !scriptedChannel) ||
+          school === undefined ||
           interruptedDef?.school === 'physical' ||
           interruptedDef?.uninterruptible
         )
           break;
-        const school = interruptedDef?.school ?? scriptedChannel!.school;
         const remaining = ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.lockout);
         ctx.cancelCast(target);
         if (eff.rageOnInterrupt && meta.cls === 'warrior' && p.resourceType === 'rage') {
@@ -977,6 +1037,10 @@ export function runEffects(
           ctx.applyNonPlayerStatAura(target, aura, -1);
           target.auras.splice(index, 1);
           ctx.emit({ type: 'aura', targetId: target.id, name: aura.name, gained: false });
+          if (aura.kind === 'stealth') {
+            target.stealthed = target.auras.some((entry) => entry.kind === 'stealth');
+          }
+          applyGreaterInvisibilityAftereffect(ctx, target, aura);
           if (eff.steal && offensive) {
             ctx.applyAura(p, { ...aura, sourceId: p.id });
           }
@@ -1024,6 +1088,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'nova',
+          ability: ability.id,
         });
         const fearBreakPct = mods.global.fearBreakPct;
         let feared = 0;
@@ -1108,6 +1173,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'echoBurst',
+          ability: ability.id,
         });
         break;
       }
@@ -1194,8 +1260,14 @@ export function runEffects(
             e.type === 'aoeRoot',
         );
         if (eff.directPct !== undefined && lastDirectDamage <= 0) break;
+        // Combo-point finishers (rupture/rip, spendsCombo: true) add a perCombo
+        // term to the base total, mirroring finisherDamage/finisherHaste/
+        // finisherStun below: spentCombo is already 0 for any ability that
+        // doesn't spend combo, so this is a no-op for every other dot.
         const dotTotal =
-          eff.directPct === undefined ? eff.total : Math.round(lastDirectDamage * eff.directPct);
+          eff.directPct === undefined
+            ? eff.total + (eff.perCombo ?? 0) * spentCombo
+            : Math.round(lastDirectDamage * eff.directPct);
         const dotBase = Math.max(1, Math.round(dotTotal / (eff.duration / eff.interval)));
         // Physical bleeds (Rend, Rupture, Garrote, Rip) scale off melee Attack
         // Power here just like a spell DoT scales off Spell Power; `hybrid` still
@@ -1247,6 +1319,7 @@ export function runEffects(
           targetId: target.id,
           school: dot.school,
           fx: 'detonate',
+          ability: ability.id,
         });
         if (remainingDamage > 0) {
           ctx.dealDamage(
@@ -1369,6 +1442,9 @@ export function runEffects(
         const aoeCenter = p.castAim ?? p.pos;
         if (ability.id === 'corpse_explosion' && !consumeDeathEcho(ctx, p, aoeCenter)) break;
         if (p.castAim) {
+          // sourceId attributes the landing to its caster so the renderer can
+          // fly the ability's authored projectile volley from the caster's
+          // hands to the aimed point (Splitshot's fan of arrows).
           ctx.emit({
             type: 'spellfxAt',
             x: aoeCenter.x,
@@ -1376,8 +1452,8 @@ export function runEffects(
             school: ability.school,
             fx: 'nova',
             radius: eff.radius,
-            sourceId: p.id,
             ability: ability.id,
+            sourceId: p.id,
           });
         } else {
           ctx.emit({
@@ -1386,6 +1462,7 @@ export function runEffects(
             targetId: p.id,
             school: ability.school,
             fx: 'nova',
+            ability: ability.id,
           });
         }
         const aoeSpBonus = directHitBonus(
@@ -1448,7 +1525,7 @@ export function runEffects(
           if (aoeCrit)
             dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
           // Armor only mitigates physical damage, mirroring the single-target
-          // path above — spell-school AoE (Arcane Explosion, Consecration) is
+          // path above - spell-school AoE (Arcane Explosion, Consecration) is
           // not reduced by the target's armor.
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
           // Soft-cap scale (Revenge above 5 targets): applied after the roll and
@@ -1522,7 +1599,10 @@ export function runEffects(
           res.castTime,
           true,
         );
-        const baseAmount = ctx.rng.range(eff.min, eff.max) + chainSpBonus;
+        // Resolve the shared primary amount once before applying hop falloff.
+        // Fractional spell-power coefficients must not make later hops round
+        // from a hidden value that differs from the primary damage players saw.
+        const baseAmount = Math.round(ctx.rng.range(eff.min, eff.max) + chainSpBonus);
         const hitsPrimary = eff.hitsPrimary === true && target !== null;
         const hitList: Entity[] = hitsPrimary && target ? [target] : [];
         const excluded = new Set<number>([p.id]);
@@ -1558,6 +1638,7 @@ export function runEffects(
             targetId: m.id,
             school: ability.school,
             fx: 'projectile',
+            ability: ability.id,
           });
           let dmg = baseAmount * eff.falloff ** i;
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
@@ -1587,6 +1668,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'nova',
+          ability: ability.id,
         });
         // AoE heals take the same per-target coefficient penalty as AoE damage.
         const aoeHealBonus = directHealBonus(p.spellPower, res.castTime, true);
@@ -1605,6 +1687,7 @@ export function runEffects(
           p,
           eff,
           ability.name,
+          ability.id,
           directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
         );
         break;
@@ -1665,8 +1748,8 @@ export function runEffects(
             fx: 'runeCircle',
             radius: eff.radius,
             sourceId: p.id,
-            ability: ability.id,
             duration: eff.duration,
+            ability: ability.id,
           });
         }
         // A snaring frost zone (Blizzard) snows over its area for its life.
@@ -1679,6 +1762,7 @@ export function runEffects(
             fx: 'snowZone',
             radius: eff.radius,
             duration: eff.duration,
+            ability: ability.id,
           });
         }
         if (p.castAim) {
@@ -1689,8 +1773,8 @@ export function runEffects(
             school: ability.school,
             fx: 'nova',
             sourceId: p.id,
-            ability: ability.id,
             radius: eff.radius,
+            ability: ability.id,
           });
         } else {
           ctx.emit({
@@ -1699,6 +1783,7 @@ export function runEffects(
             targetId: p.id,
             school: ability.school,
             fx: 'nova',
+            ability: ability.id,
           });
         }
         // A delayed zone (Meteor's fall) skips the on-cast pulse: its first
@@ -1770,6 +1855,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'nova',
+          ability: ability.id,
         });
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (m.dead) continue;
@@ -1803,6 +1889,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx,
+          ability: ability.id,
           range: stage.range,
           angle,
           level,
@@ -1999,11 +2086,17 @@ export function runEffects(
         break;
       }
       case 'greaterInvisibility': {
-        // One dispatch applies the whole package so the two self-auras carry
-        // distinct ids (the selfBuff case keys auras by the ability id alone):
-        // strip up to N DoTs (newest first), vanish via the stealth machinery
-        // (applyAura sets stealthed), and a buff_dr cut that outlives the
-        // vanish by `linger` so it survives an early break. Draws no rng.
+        // Strip up to N DoTs (newest first), then vanish through the shared
+        // stealth machinery. value2/value3 carry the configured defensive
+        // aftereffect so whichever normal path ends the vanish applies it once.
+        // A reset-assisted recast may have just ended the previous vanish, so
+        // clear that aftereffect before entering invisibility again.
+        const existingDr = p.auras.findIndex((a) => a.id === GREATER_INVISIBILITY_DR_AURA_ID);
+        if (existingDr >= 0) {
+          const gone = p.auras[existingDr];
+          p.auras.splice(existingDr, 1);
+          ctx.emit({ type: 'aura', targetId: p.id, name: gone.name, gained: false });
+        }
         let removed = 0;
         for (let i = p.auras.length - 1; i >= 0 && removed < eff.removeDotCount; i--) {
           if (p.auras[i].kind !== 'dot') continue;
@@ -2022,16 +2115,8 @@ export function runEffects(
           remaining: eff.duration,
           duration: eff.duration,
           value: 1,
-          sourceId: p.id,
-          school: ability.school,
-        });
-        ctx.applyAura(p, {
-          id: `${ability.id}_dr`,
-          name: ability.name,
-          kind: 'buff_dr',
-          remaining: eff.duration + eff.linger,
-          duration: eff.duration + eff.linger,
-          value: eff.drValue,
+          value2: eff.drValue,
+          value3: eff.afterDuration,
           sourceId: p.id,
           school: ability.school,
         });
@@ -2075,6 +2160,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'nova',
+          ability: ability.id,
         });
         // Materialize before movement so displacement cannot perturb iteration.
         for (const hostile of [...ctx.hostilesInRadius(p, p.pos, eff.radius)]) {
@@ -2118,6 +2204,7 @@ export function runEffects(
             school: ability.school,
             fx: 'nova',
             radius: eff.radius,
+            ability: ability.id,
           });
         } else {
           ctx.emit({
@@ -2126,6 +2213,7 @@ export function runEffects(
             targetId: p.id,
             school: ability.school,
             fx: 'nova',
+            ability: ability.id,
           });
         }
         // Control-only roots (for example Frost Trap) must not turn spell power
@@ -2239,7 +2327,10 @@ export function runEffects(
         break;
       }
       case 'breakRoots': {
-        removeRootAuras(ctx, p);
+        // Self-cast only: a personal barrier laid on a friendly TARGET (the
+        // Chronomancy Temporal Barrier can shield an ally) must not cleanse
+        // the caster's own root just because they cast the spell.
+        if (!target || target === p) removeRootAuras(ctx, p);
         break;
       }
       case 'breakControl': {
@@ -2302,6 +2393,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'blinkStep',
+          ability: ability.id,
         });
         break;
       }
@@ -2402,6 +2494,9 @@ export function runEffects(
             fx: 'lichTransform',
             ability: ability.id,
           });
+        }
+        if (eff.kind === 'stealth' && dropsCombatOnStealth(ability)) {
+          dropSelfFromHostileFocus(ctx, p);
         }
         recalcPlayerStats(
           p,

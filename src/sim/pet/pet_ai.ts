@@ -50,6 +50,7 @@ import {
   RUN_SPEED,
   steadyAngleTo,
 } from '../types';
+import { petCanForceTaunt } from './pet_taunt_gate';
 
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
 const PET_LEASH = 40; // yards from the owner before a pet gives up its target
@@ -124,7 +125,7 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
       pet.facing = steadyAngleTo(pet.pos, target.pos, pet.facing);
       if (
         target.kind === 'mob' &&
-        !ranged &&
+        petCanForceTaunt(pet.templateId) &&
         pet.petTauntTimer <= 0 &&
         (pet.petAutoTaunt || pet.petManualTauntPending)
       ) {
@@ -244,9 +245,15 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
 
   const swim = ctx.mobCanSwim(MOBS[pet.templateId]);
   const recompute = (): void => {
-    pet.petPath = findPlayerPath(ctx.cfg.seed, pet.pos, owner.pos, PET_PATH_SPAN, false, swim).map(
-      (w) => ({ x: w.x, y: 0, z: w.z }),
-    );
+    pet.petPath = findPlayerPath(
+      ctx.cfg.seed,
+      pet.pos,
+      owner.pos,
+      PET_PATH_SPAN,
+      false,
+      swim,
+      ctx.riftCollisionToken,
+    ).map((w) => ({ x: w.x, y: 0, z: w.z }));
     pet.petPathCooldown = PET_PATH_RECALC;
   };
   // recompute when the throttle has elapsed and the cache is stale: empty, or
@@ -272,7 +279,14 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
     // transition. Below the explicit recovery boundary, preserve the clear-line
     // run-home behavior.
     (d > PET_FORCE_RECOVERY_DISTANCE ||
-      !lineOfSightClear(ctx.cfg.seed, pet.pos, owner.pos, BODY_RADIUS))
+      !lineOfSightClear(
+        ctx.cfg.seed,
+        pet.pos,
+        owner.pos,
+        BODY_RADIUS,
+        undefined,
+        ctx.riftCollisionToken,
+      ))
   ) {
     recompute();
     if (pet.petPath.length <= 1) {

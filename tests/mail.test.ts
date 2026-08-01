@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_MARK_LETTER, QUEST_LETTERS, WELCOME_LETTER } from '../src/sim/content/letters';
 import { MAILBOXES } from '../src/sim/content/mailboxes';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import {
   MAIL_ATTACHMENT_EXPIRY_SECONDS,
   MAIL_DELIVERY_SECONDS,
@@ -14,9 +15,20 @@ import {
   MAIL_POSTAGE,
 } from '../src/sim/mail/post_office';
 import { Sim } from '../src/sim/sim';
-import type { SimEvent } from '../src/sim/types';
+import { type SimEvent, type WorldContent } from '../src/sim/types';
 
-const makeWorld = () => new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+// Mailboxes are system-owned and still spawn with this fixture. Ambient camps,
+// NPCs and quest objects are irrelevant to delivery/index invariants and would
+// turn every simulated minute into a continent-wide AI benchmark.
+const MAIL_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
+const makeWorld = () =>
+  new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: MAIL_TEST_WORLD });
 
 function moveToMailbox(sim: Sim, pid: number): void {
   const box = sim.entities.get(sim.postOffice.mailboxIds[0]);
@@ -52,6 +64,41 @@ describe('mailboxes in the world', () => {
       expect(box?.lootable).toBe(true);
       expect(box?.objectItemId).toBeNull();
     }
+  });
+
+  it('covers every current town hub with a usable Ravenpost mailbox', () => {
+    const sim = makeWorld();
+    const boxes = sim.postOffice.mailboxIds.map((id) => sim.entities.get(id));
+    const missingHubNames: string[] = [];
+
+    for (const zone of BUILTIN_WORLD.zones) {
+      const mailbox = boxes.find(
+        (box) =>
+          box?.kind === 'object' &&
+          box.templateId === 'mailbox' &&
+          Math.hypot(box.pos.x - zone.hub.x, box.pos.z - zone.hub.z) <= zone.hub.radius,
+      );
+      if (!mailbox) {
+        missingHubNames.push(zone.hub.name);
+        continue;
+      }
+
+      const pid = sim.addPlayer('warrior', `Postie ${zone.id}`);
+      const player = sim.entities.get(pid);
+      if (!player) throw new Error(`missing test player for ${zone.id}`);
+      player.pos = { ...mailbox.pos };
+      player.prevPos = { ...player.pos };
+      sim.rebucket(player);
+
+      sim.interact(pid);
+      expect(
+        sim.drainEvents().some((event) => event.type === 'mailbox' && event.pid === pid),
+        zone.hub.name,
+      ).toBe(true);
+      expect(sim.mailInfoFor(pid), zone.hub.name).not.toBeNull();
+    }
+
+    expect(missingHubNames).toEqual([]);
   });
 
   it('keyboard interact at a mailbox emits the open-mailbox cue', () => {
@@ -122,6 +169,29 @@ describe('sending a letter', () => {
     expect(
       events.some((e) => e.type === 'mailArrived' && e.pid === bob && e.senderName === 'Alice'),
     ).toBe(true);
+  });
+
+  it('streams older delivered mail beyond the first fifty rows so it can be opened', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 100_000;
+    moveToMailbox(sim, alice);
+
+    for (let i = 0; i < 60; i++) {
+      sim.mailSend('Bob', `Letter ${i}`, `Body ${i}`, 0, [], alice);
+    }
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    moveToMailbox(sim, bob);
+
+    const info = sim.mailInfoFor(bob);
+    expect(info).not.toBeNull();
+    expect(info?.totalCount).toBe(61);
+    expect(info?.messages).toHaveLength(61);
+    expect(info?.messages.some((m) => m.subject === 'Letter 0')).toBe(true);
+    expect(info?.messages.some((m) => m.subject === 'Letter 59')).toBe(true);
   });
 
   it('refuses what the post refuses', () => {
@@ -200,6 +270,67 @@ describe('sending a letter', () => {
 
     sim.mailDelete(gift.id, bob);
     expect(sim.mailInfoFor(bob)?.messages.some((m) => m.id === gift.id)).toBe(false);
+  });
+
+  // Review follow-up on PR #2605 (EnriqueGF, medium): mail was a third laundering
+  // channel for a crafted item's provenance marker (bags.ts InvSlot.craftedRecipeId),
+  // structurally identical to the trade and market paths the PR fixed. Escrowing via
+  // removeVendorSellUnits (instead of a blind removeFungibleItem) and re-granting with
+  // { craftedRecipeId } on mailTake must keep the marker across the flight.
+  it('carries the craftedRecipeId marker through a mailed attachment', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    const bobMeta = sim.meta(bob);
+    if (!aliceMeta || !bobMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    // One crafted copy and one plain (drop-sourced) copy of the same item id, so the
+    // escrow must keep them in separate provenance buckets rather than collapsing them.
+    sim.addItem('roasted_boar', 1, alice, { craftedRecipeId: 'r_roasted_boar' });
+    sim.addItem('roasted_boar', 1, alice);
+    moveToMailbox(sim, alice);
+    sim.mailSend(
+      'Bob',
+      'Provisions',
+      'Eat well.',
+      0,
+      [{ itemId: 'roasted_boar', count: 2 }],
+      alice,
+    );
+    expect(sim.countItem('roasted_boar', alice)).toBe(0);
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+
+    moveToMailbox(sim, bob);
+    const info = sim.mailInfoFor(bob);
+    const parcel = info?.messages.find((m) => m.subject === 'Provisions');
+    if (!parcel) throw new Error('parcel not delivered');
+    // The escrow must have split the attachment into two provenance buckets.
+    expect(parcel.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          itemId: 'roasted_boar',
+          count: 1,
+          craftedRecipeId: 'r_roasted_boar',
+        }),
+        expect.objectContaining({ itemId: 'roasted_boar', count: 1 }),
+      ]),
+    );
+    expect(parcel.items.find((s) => s.craftedRecipeId !== undefined)?.craftedRecipeId).toBe(
+      'r_roasted_boar',
+    );
+
+    sim.mailTake(parcel.id, bob);
+    const bobMeta2 = sim.meta(bob);
+    if (!bobMeta2) throw new Error('no meta');
+    const crafted = bobMeta2.inventory.find(
+      (s) => s.itemId === 'roasted_boar' && s.craftedRecipeId === 'r_roasted_boar',
+    );
+    const plain = bobMeta2.inventory.find(
+      (s) => s.itemId === 'roasted_boar' && s.craftedRecipeId === undefined,
+    );
+    expect(crafted?.count).toBe(1);
+    expect(plain?.count).toBe(1);
   });
 });
 
@@ -474,7 +605,14 @@ describe('unread index equivalence (finding 4)', () => {
 
 describe('quest thank-you letters', () => {
   it('the giver writes after an authored quest turn-in', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
+    // QUESTS is a static data table (src/sim/data), not world content, so the
+    // dev turn-in and its thank-you letter work in the mailbox-only world too.
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: true,
+      world: MAIL_TEST_WORLD,
+    });
     const pid = sim.primaryId;
     expect(QUEST_LETTERS.q_wolves).toBeDefined();
     expect(sim.completeQuestForDev('q_wolves', pid)).toBe(true);

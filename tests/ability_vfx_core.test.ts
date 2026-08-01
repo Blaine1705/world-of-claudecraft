@@ -9,7 +9,6 @@ import {
   ABILITY_VFX_CASTER_CAP,
   ABILITY_VFX_GLOBAL_CAP,
   AbilityVfxBudget,
-  abilityVfxChargeStreams,
   abilityVfxColor,
   BURST_COUNT_MAX,
   BURST_COUNT_MIN,
@@ -22,10 +21,7 @@ import {
   TIER2_BURST_COUNT_MAX,
   VOLLEY_MAX,
 } from '../src/render/ability_vfx_core';
-import { ABILITY_VFX_FULL_SPECS } from '../src/render/ability_vfx_full_specs';
-import { abilityVfxFullSpec, abilityVfxSpec } from '../src/render/ability_vfx_registry';
 import { ABILITY_VFX_SPECS } from '../src/render/ability_vfx_specs';
-import { RUINBOLT_VFX_FULL_SPEC, RUINBOLT_VFX_SPEC } from '../src/render/destruction_vfx_specs';
 import { ABILITIES } from '../src/sim/data';
 
 // Pet-management commands with authored visuals but no ABILITIES record.
@@ -47,44 +43,6 @@ describe('ABILITY_VFX_SPECS table', () => {
       expect(value, `${id}: color out of range`).toBeLessThanOrEqual(0xffffff);
       expect(value, `${id}: cached parse drifted`).toBe(abilityVfxColor(spec));
     }
-  });
-
-  it('authors Ruinbolt as the one three-stream, focused fel bolt', () => {
-    const compact = abilityVfxSpec('chaos_bolt');
-    const full = abilityVfxFullSpec('chaos_bolt');
-
-    expect(compact).toBe(RUINBOLT_VFX_SPEC);
-    expect(full).toBe(RUINBOLT_VFX_FULL_SPEC);
-    expect(compact).toMatchObject({
-      p: 'venom',
-      b: { v: 26, h: 1.65, j: 1, co: 1 },
-      a: 'bolt',
-    });
-    expect(full).toMatchObject({
-      archetype: 'bolt',
-      palette: 'venom',
-      chargeStreams: 3,
-      windup: 2.5,
-      windupStyle: 'vortex',
-      bolt: {
-        speed: 26,
-        headScale: 1.65,
-        style: 'felLance',
-        jagged: true,
-        coils: true,
-      },
-      impact: {
-        focused: true,
-        flipbook: true,
-        vRing: true,
-        debris: true,
-        smoke: true,
-      },
-    });
-    expect(abilityVfxChargeStreams(full)).toBe(3);
-    expect(abilityVfxChargeStreams(ABILITY_VFX_FULL_SPECS.fireball)).toBe(1);
-    expect(ABILITY_VFX_SPECS.chaos_bolt).not.toBe(RUINBOLT_VFX_SPEC);
-    expect(ABILITY_VFX_FULL_SPECS.chaos_bolt).not.toBe(RUINBOLT_VFX_FULL_SPEC);
   });
 });
 

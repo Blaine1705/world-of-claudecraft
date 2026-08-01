@@ -16,6 +16,8 @@ import {
   CAMPS,
   DUNGEON_LIST,
   QUESTS,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
   setActiveWorldContent,
   ZONES,
 } from '../src/sim/data';
@@ -36,6 +38,7 @@ const hud = hudSource.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/
 const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 
 const MAP_COLOR_TOKENS = [
+  '--color-map-ocean',
   '--color-map-label',
   '--color-map-outline',
   '--color-map-portal-dot',
@@ -44,6 +47,7 @@ const MAP_COLOR_TOKENS = [
   '--color-map-player',
   '--color-map-ally-friend',
   '--color-map-ally-guild',
+  '--color-map-party-dead',
   '--color-map-rock',
   '--color-map-tree',
   '--color-map-oak',
@@ -60,6 +64,11 @@ const MAP_COLOR_TOKENS = [
   '--color-map-mudhut',
   '--color-map-campfire',
 ];
+
+// The classColor resolver every MapWindowPainter call site now takes (issue 2652),
+// mirroring how minimap_painter.test.ts stubs the same seam. Distinct per class so
+// a color assertion is decisive rather than "some string".
+const classColor = (cls: string): string => `color:${cls}`;
 
 /** One label rasterized into its own offscreen canvas by the sprite cache. */
 interface LabelSprite {
@@ -157,6 +166,9 @@ function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
         trace.blits.push({ sprite: image as LabelSprite, dx: rest[0], dy: rest[1] });
       }
     },
+    // the painter floods the ocean before the zone bg blit; the fake context
+    // must answer every call it makes, not only the path-building ones
+    fillRect(): void {},
     beginPath(): void {
       commands = [];
     },
@@ -268,17 +280,33 @@ describe('map_window_painter: no magic values', () => {
     }
   });
 
+  it('caches bounded decorations per zone instead of generating the whole world', () => {
+    expect(code).toContain('decorationsByZone.get(opts.zone.id)');
+    expect(code).toContain('generateDecorationsInBounds(world.cfg.seed, opts.zoneBg.region)');
+    expect(code).toContain('decorationsByZone.set(opts.zone.id, decorations)');
+    expect(code).not.toContain('generateDecorations(world.cfg.seed)');
+  });
+
   it('draws the active-world armoury footprint with its dedicated token', () => {
     const trace = newTrace();
     installMapStyleGlobals(trace);
     const ctx = fakeMapContext(trace);
-    const painter = new MapWindowPainter();
+    const painter = new MapWindowPainter(classColor);
     const world = mapWorld();
     const emptyProps = emptyZoneProps();
     const background = { width: 560, height: 560 } as HTMLCanvasElement;
+    const zone = ZONES[0];
     const options = {
-      zone: ZONES[0],
-      bg: background,
+      zone,
+      zoneBg: {
+        canvas: background,
+        region: {
+          minX: zone.xMin ?? STRIP_MIN_X,
+          maxX: zone.xMax ?? STRIP_MAX_X,
+          minZ: zone.zMin,
+          maxZ: zone.zMax,
+        },
+      },
       canvasSize: 560,
       zoom: 6,
       center: { x: 17.5, z: -5.5 },
@@ -327,10 +355,6 @@ describe('map_window_painter: no magic values', () => {
     ]);
     expect(trace.styleReads.filter((token) => token.endsWith('building-armoury'))).toHaveLength(2);
   });
-
-  it('caches the whole-world decorations once instead of regenerating per redraw', () => {
-    expect(code).toContain('if (!this.decorations) this.decorations = generateDecorations(');
-  });
 });
 
 describe('map_window_painter: cadence + cached background preserved', () => {
@@ -341,13 +365,15 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(hud).toContain('this.mapPainter.paintOverworld(ctx, this.sim, {');
   });
 
-  it('blits the Hud-owned cached terrain background rather than rebuilding it', () => {
-    // The painter receives the cached bg and only drawImages it (no terrain build).
+  it('accepts only the current Hud-owned zone background and never prewarms all zones', () => {
+    // The painter receives one cached bg and only drawImages it (no terrain build).
     expect(code).toContain('ctx.drawImage(');
     expect(code).not.toContain('paintTerrainRows');
     expect(code).not.toContain('renderTerrainCanvas');
-    // Hud keeps the bg cache + prewarm and passes the cached canvas in each redraw.
-    expect(hud).toContain('bg: this.mapZoneBg(zone)');
+    expect(code).toContain('zoneBg: MapZoneBg');
+    expect(code).not.toContain('zoneBgs');
+    expect(hud).toContain('canvas: this.mapZoneBg(zone)');
+    expect(hud).not.toContain('prewarmAllZones');
   });
 });
 
@@ -542,7 +568,18 @@ function expectedLabels(): Set<string> {
 function labelPaintOptions(ping?: { x: number; z: number }) {
   return {
     zone: LABEL_ZONE,
-    bg: { width: 560, height: 560 } as HTMLCanvasElement,
+    // The committed zone background, in the painter's own shape: a cached
+    // canvas plus the world region it covers (the painter composites only the
+    // current zone's plate, so it needs the rect to place it).
+    zoneBg: {
+      canvas: { width: 560, height: 560 } as HTMLCanvasElement,
+      region: {
+        minX: LABEL_ZONE.xMin ?? STRIP_MIN_X,
+        maxX: LABEL_ZONE.xMax ?? STRIP_MAX_X,
+        minZ: LABEL_ZONE.zMin,
+        maxZ: LABEL_ZONE.zMax,
+      },
+    },
     canvasSize: 560,
     zoom: 1,
     center: null,
@@ -557,7 +594,7 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     setActiveWorldContent(BUILTIN_WORLD);
     const ctx = fakeMapContext(trace);
 
-    new MapWindowPainter().paintOverworld(ctx, labelWorld(), labelPaintOptions());
+    new MapWindowPainter(classColor).paintOverworld(ctx, labelWorld(), labelPaintOptions());
 
     // The whole point of the change: no ctx.font assignment, no fillText,
     // strokeText or measureText on the surface the painter draws to.
@@ -574,7 +611,11 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     setActiveWorldContent(BUILTIN_WORLD);
     const world = labelWorld();
 
-    new MapWindowPainter().paintOverworld(fakeMapContext(trace), world, labelPaintOptions());
+    new MapWindowPainter(classColor).paintOverworld(
+      fakeMapContext(trace),
+      world,
+      labelPaintOptions(),
+    );
 
     // The same pure model the painter builds, so this pins the painter's OFFSETS
     // and rounding rather than re-deriving the projection.
@@ -621,7 +662,11 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     installMapStyleGlobals(trace);
     setActiveWorldContent(BUILTIN_WORLD);
 
-    new MapWindowPainter().paintOverworld(fakeMapContext(trace), labelWorld(), labelPaintOptions());
+    new MapWindowPainter(classColor).paintOverworld(
+      fakeMapContext(trace),
+      labelWorld(),
+      labelPaintOptions(),
+    );
 
     expect(trace.blits.length).toBeGreaterThan(0);
     const fractional = trace.blits.filter(
@@ -635,7 +680,11 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     installMapStyleGlobals(trace);
     setActiveWorldContent(BUILTIN_WORLD);
 
-    new MapWindowPainter().paintOverworld(fakeMapContext(trace), labelWorld(), labelPaintOptions());
+    new MapWindowPainter(classColor).paintOverworld(
+      fakeMapContext(trace),
+      labelWorld(),
+      labelPaintOptions(),
+    );
 
     const title = trace.sprites.find((s) => spriteText(s) === LABEL_ZONE.name);
     expect(title?.ink.map(inkStyle)).toEqual([
@@ -678,7 +727,7 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     installMapStyleGlobals(trace);
     setActiveWorldContent(BUILTIN_WORLD);
     const ctx = fakeMapContext(trace);
-    const painter = new MapWindowPainter();
+    const painter = new MapWindowPainter(classColor);
     const world = labelWorld();
 
     painter.paintOverworld(ctx, world, labelPaintOptions());
@@ -698,7 +747,11 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     setActiveWorldContent(BUILTIN_WORLD);
     const ctx = fakeMapContext(trace);
 
-    const result = new MapWindowPainter().paintOverworld(ctx, labelWorld(), labelPaintOptions());
+    const result = new MapWindowPainter(classColor).paintOverworld(
+      ctx,
+      labelWorld(),
+      labelPaintOptions(),
+    );
 
     const badges = result.questAreas.reduce((n, area) => n + area.numbers.length, 0);
     const expected =
@@ -718,7 +771,11 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     installMapStyleGlobals(trace);
     setActiveWorldContent(BUILTIN_WORLD);
 
-    new MapWindowPainter().paintOverworld(fakeMapContext(trace), labelWorld(), labelPaintOptions());
+    new MapWindowPainter(classColor).paintOverworld(
+      fakeMapContext(trace),
+      labelWorld(),
+      labelPaintOptions(),
+    );
 
     // The model plots friends before guild members, so the dot fills follow.
     const allyDots = trace.fills
@@ -735,7 +792,7 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     installMapStyleGlobals(trace);
     setActiveWorldContent(BUILTIN_WORLD);
 
-    new MapWindowPainter().paintOverworld(
+    new MapWindowPainter(classColor).paintOverworld(
       fakeMapContext(trace),
       readyGlyphWorld(),
       labelPaintOptions(),
@@ -754,7 +811,7 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     installMapStyleGlobals(trace);
     setActiveWorldContent(BUILTIN_WORLD);
     const ctx = fakeMapContext(trace);
-    const painter = new MapWindowPainter();
+    const painter = new MapWindowPainter(classColor);
     const world = crowdedAllyWorld(TEXT_SPRITE_LIMIT + 8);
 
     painter.paintOverworld(ctx, world, labelPaintOptions());
@@ -773,7 +830,7 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     installMapStyleGlobals(trace);
     setActiveWorldContent(BUILTIN_WORLD);
     const ctx = fakeMapContext(trace);
-    const painter = new MapWindowPainter();
+    const painter = new MapWindowPainter(classColor);
     const world = labelWorld();
 
     for (const zone of ZONES) {
@@ -788,7 +845,7 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     installMapStyleGlobals(trace);
     setActiveWorldContent(BUILTIN_WORLD);
     const ctx = fakeMapContext(trace);
-    const painter = new MapWindowPainter();
+    const painter = new MapWindowPainter(classColor);
     const world = labelWorld();
 
     painter.paintOverworld(ctx, world, labelPaintOptions());
@@ -831,7 +888,7 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
       installMapStyleGlobals(trace);
       setActiveWorldContent(BUILTIN_WORLD);
 
-      const result = new MapWindowPainter().paintOverworld(
+      const result = new MapWindowPainter(classColor).paintOverworld(
         fakeMapContext(trace),
         world,
         labelPaintOptions(),
@@ -871,7 +928,7 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     installMapStyleGlobals(trace);
     setActiveWorldContent(BUILTIN_WORLD);
 
-    const result = new MapWindowPainter().paintOverworld(
+    const result = new MapWindowPainter(classColor).paintOverworld(
       fakeMapContext(trace),
       labelWorld(),
       labelPaintOptions(),
@@ -894,7 +951,7 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     setActiveWorldContent(BUILTIN_WORLD);
     const { world } = sharedCampWorld();
 
-    const result = new MapWindowPainter().paintOverworld(
+    const result = new MapWindowPainter(classColor).paintOverworld(
       fakeMapContext(trace),
       world,
       labelPaintOptions(),
@@ -926,7 +983,7 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     installMapStyleGlobals(trace);
     setActiveWorldContent(BUILTIN_WORLD);
 
-    new MapWindowPainter().paintOverworld(
+    new MapWindowPainter(classColor).paintOverworld(
       fakeMapContext(trace),
       labelWorld(),
       labelPaintOptions({ x: 0, z: LABEL_ZONE_CZ }),
@@ -945,5 +1002,137 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
       { op: 'stroke', color: 'paint:--color-map-outline', text: '!' },
       { op: 'fill', color: 'paint:--color-map-npc-quest', text: '!' },
     ]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Party markers (issue 2652): a class-colored dot + name label per member,
+// live world position, distinct from the ally dots and the player arrow.
+// ---------------------------------------------------------------------------
+
+/** labelWorld plus a three-member party: self (pid 1, must draw no marker of
+ *  its own), one alive member of a distinct class, and one dead member. */
+function partyWorld(): IWorld {
+  const world = labelWorld() as unknown as { partyInfo: unknown };
+  world.partyInfo = {
+    leader: 1,
+    raid: false,
+    master: { enabled: false, looter: 0, threshold: 'uncommon' },
+    members: [
+      { pid: 1, name: 'Painter', cls: 'warrior', dead: 0, x: 0, z: LABEL_ZONE_CZ },
+      { pid: 2, name: 'Ally', cls: 'mage', dead: 0, x: 20, z: LABEL_ZONE_CZ },
+      { pid: 3, name: 'Fallen', cls: 'priest', dead: 1, x: -20, z: LABEL_ZONE_CZ },
+    ],
+  };
+  return world as unknown as IWorld;
+}
+
+describe('map_window_painter: party markers', () => {
+  it('draws a class-colored dot for an alive member and the dead token for a fallen one', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    new MapWindowPainter(classColor).paintOverworld(
+      fakeMapContext(trace),
+      partyWorld(),
+      labelPaintOptions(),
+    );
+
+    const aliveDot = trace.fills.find(
+      (fill) => fill.style === 'color:mage' && fill.commands.join() === 'arc',
+    );
+    expect(aliveDot, 'expected the alive mage member to fill in its class color').toBeDefined();
+    const deadDot = trace.fills.find(
+      (fill) => fill.style === 'paint:--color-map-party-dead' && fill.commands.join() === 'arc',
+    );
+    expect(deadDot, 'expected the dead member to fill in the party-dead token').toBeDefined();
+    // Self never gets a party marker: only the arrow (moveTo/lineTo/lineTo/closePath)
+    // may fill in warrior's classColor.
+    const selfColorFills = trace.fills.filter((fill) => fill.style === 'color:warrior');
+    expect(selfColorFills).toEqual([]);
+  });
+
+  it('labels each member by name, anchored the same as an ally dot', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const world = partyWorld();
+
+    new MapWindowPainter(classColor).paintOverworld(
+      fakeMapContext(trace),
+      world,
+      labelPaintOptions(),
+    );
+
+    const model = buildOverworldMapModel({
+      world,
+      props: BUILTIN_WORLD.props,
+      zone: LABEL_ZONE,
+      zoom: 1,
+      center: null,
+      canvasSize: 560,
+      decorations: [],
+      ping: null,
+    });
+    expect(model.party.map((m) => m.name)).toEqual(['Ally', 'Fallen']);
+    const anchorOf = (text: string): { x: number; y: number } => {
+      const blit = trace.blits.find((b) => spriteText(b.sprite) === text);
+      if (!blit) throw new Error(`no blit for ${text}`);
+      return blitAnchor(blit);
+    };
+    const at = (x: number, y: number): { x: number; y: number } => ({
+      x: Math.round(x),
+      y: Math.round(y),
+    });
+    const ally = model.party.find((m) => m.name === 'Ally');
+    const fallen = model.party.find((m) => m.name === 'Fallen');
+    expect(anchorOf('Ally')).toEqual(at(ally?.mx ?? 0, (ally?.my ?? 0) - 8));
+    expect(anchorOf('Fallen')).toEqual(at(fallen?.mx ?? 0, (fallen?.my ?? 0) - 8));
+    // Self ('Painter') never mints a party-name sprite; the only 'Painter' text
+    // anywhere on this canvas would be one, and the player arrow carries no label.
+    expect(trace.sprites.some((s) => spriteText(s) === 'Painter')).toBe(false);
+  });
+
+  it('outlines every party dot in the outline token at the label width', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    new MapWindowPainter(classColor).paintOverworld(
+      fakeMapContext(trace),
+      partyWorld(),
+      labelPaintOptions(),
+    );
+
+    const partyFills = trace.fills.filter(
+      (fill) =>
+        (fill.style === 'color:mage' || fill.style === 'paint:--color-map-party-dead') &&
+        fill.commands.join() === 'arc',
+    );
+    expect(partyFills).toHaveLength(2);
+    const partyStrokes = partyFills.map((fill) => {
+      const stroke = trace.strokes.find((s) => s.at > fill.at);
+      if (!stroke) throw new Error('expected a stroke to follow each party dot fill');
+      return { style: stroke.style, lineWidth: stroke.lineWidth };
+    });
+    expect(partyStrokes).toEqual(
+      partyFills.map(() => ({ style: 'paint:--color-map-outline', lineWidth: 3 })),
+    );
+  });
+
+  it('draws nothing for a solo player (no partyInfo)', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    new MapWindowPainter(classColor).paintOverworld(
+      fakeMapContext(trace),
+      labelWorld(),
+      labelPaintOptions(),
+    );
+
+    expect(trace.fills.some((fill) => fill.style.startsWith('color:'))).toBe(false);
+    expect(trace.fills.some((fill) => fill.style === 'paint:--color-map-party-dead')).toBe(false);
   });
 });

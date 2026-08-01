@@ -86,6 +86,7 @@ import {
   handleClaudiumApi,
   handleClaudiumStripeWebhook,
 } from './claudium';
+import { configureCommunityTestAccounts } from './community_test_accounts';
 import {
   bustDailyRewardBoardCache,
   dailyRewardEventsCutoffDay,
@@ -129,6 +130,9 @@ import {
   primarySlugForAccount,
   pruneChatLogsBatch,
   pruneClientPerfReportsBatch,
+  pruneEmailChangeRequestsBatch,
+  pruneEmailLogBatch,
+  prunePasswordResetRequestsBatch,
   reclaimDeactivatedName,
   referralCountForAccount,
   releaseAllCharacterLeases,
@@ -177,6 +181,7 @@ import {
 } from './discord';
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
+import { stopEpicMirror } from './epic/mirror';
 import { GameServer } from './game';
 import {
   handleGitHubCallback,
@@ -300,6 +305,8 @@ import {
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { stopSteamMirror } from './steam/mirror';
 import { passesTurnstile } from './turnstile';
+import { pruneUnstuckReports, UNSTUCK_REPORT_RETENTION_DAYS } from './unstuck_db';
+import { stopUnstuckRecords, UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS } from './unstuck_records';
 import { MAX_ASSET_BYTES } from './user_assets';
 import {
   assetBytesCore,
@@ -479,6 +486,10 @@ async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<Leaderboar
     prestigeRank: r.prestigeRank,
     // a deed id (never display text); the client localizes via deed_i18n
     title: r.activeTitle,
+    // The guild tag shown beside the name. Omitted (not null) for an unguilded
+    // character, the `realm` treatment below, so an unguilded row is byte-unchanged
+    // on the wire.
+    ...(r.guild ? { guild: r.guild } : {}),
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
   // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
@@ -1857,14 +1868,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'GET' && url === '/api/status') {
       // steam.enabled is the capability advert clients read before rendering any
-      // Steam link UI. HARDCODED false on the legacy ladder: the Steam surface
-      // exists only as RouteDefs (server/steam/routes.ts), which the legacy arm
-      // never serves, so every /api/steam/* 404s here. Advertising the capability
-      // on an arm that then 404s it would strand a client into a dead link flow.
-      // Under the default 'new' dispatch the migrated statusHandler
-      // (server/leaderboard.ts) reads the real steamEnabled(), where the routes
-      // are live. This is a deliberate divergence from the new arm under
-      // STEAM_ENABLED=1 (pinned in tests/server/http/parity.test.ts).
+      // Steam / Epic link UI. HARDCODED false on the legacy ladder: those surfaces
+      // exist only as RouteDefs (server/steam/routes.ts, server/epic/routes.ts),
+      // which the legacy arm never serves, so every /api/steam/* and /api/epic/*
+      // 404s here. Advertising the capability on an arm that then 404s it would
+      // strand a client into a dead link flow. Under the default 'new' dispatch
+      // the migrated statusHandler (server/leaderboard.ts) reads the real
+      // steamEnabled() / epicEnabled(), where the routes are live. This is a
+      // deliberate divergence from the new arm under STEAM_ENABLED=1 or
+      // EPIC_ENABLED=1 (pinned in tests/server/http/parity.test.ts).
       return json(res, 200, {
         ok: true,
         realm: REALM,
@@ -1875,6 +1887,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         players_cap: canonicalPlayersCap(),
         names: [...liveGame().clients.values()].map((s) => s.name),
         steam: { enabled: false },
+        epic: { enabled: false },
         // The /dev GUI capability advert. NOT hardcoded like steam.enabled above:
         // the dev_* cheats ride the websocket dispatcher, which this arm serves
         // exactly as the migrated one does, so advertising the real env here
@@ -2014,7 +2027,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const callerToken = bearerToken(req);
       if (!callerToken)
         return json(res, 401, { error: 'not authenticated', code: 'auth.required' });
-      return handleAccountChangePassword(req, res, accountId, callerToken);
+      return handleAccountChangePassword(req, res, accountId, callerToken, {
+        disconnectAccount: (id, reason) => liveGame().disconnectAccount(id, reason),
+      });
     }
     // Password reset is for users who are locked out, so both routes are
     // unauthenticated (rate-limited + web-login guarded above, and each handler is
@@ -2023,7 +2038,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return handleAccountPasswordForgot(req, res);
     }
     if (req.method === 'POST' && url === '/api/account/password/reset') {
-      return handleAccountPasswordReset(req, res);
+      return handleAccountPasswordReset(req, res, {
+        disconnectAccount: (id, reason) => liveGame().disconnectAccount(id, reason),
+      });
     }
     if (req.method === 'POST' && url === '/api/account/logout') {
       const callerToken = bearerToken(req);
@@ -2818,6 +2835,7 @@ export async function startServer(): Promise<http.Server> {
   // primes activeConfig() for the request path (a request-time read returns this
   // same memoized Config).
   const config = activeConfig();
+  configureCommunityTestAccounts(config.provisionTestAccounts);
   // Point the contributor-stats reader at the one boot Config, replacing its former
   // duplicate GITHUB_REPO/GITHUB_TOKEN module reads (configure<Domain>Runtime).
   configureGithubContributorsRuntime({
@@ -2866,9 +2884,15 @@ export async function startServer(): Promise<http.Server> {
   }
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
+  const prunedUnstuckReports = await pruneUnstuckReports(pool);
+  if (prunedUnstuckReports > 0)
+    console.log(
+      `pruned ${prunedUnstuckReports} unstuck report row(s) older than ${UNSTUCK_REPORT_RETENTION_DAYS} days`,
+    );
   await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
+  await game.loadRifts();
   await game.loadChatFilter();
   await game.loadBlockedIps();
   void game.recordOnlineSnapshot();
@@ -2876,6 +2900,9 @@ export async function startServer(): Promise<http.Server> {
     .then((count) => recordSitePresenceSample(count))
     .catch((err) => console.error('site presence sample failed:', err));
   setInterval(() => {
+    void pruneUnstuckReports(pool).catch((err) =>
+      console.error('unstuck report prune failed:', err),
+    );
     void pruneExpiredOAuthGrants(pool).catch((err) =>
       console.error('oauth grant prune failed:', err),
     );
@@ -3077,6 +3104,19 @@ export async function startServer(): Promise<http.Server> {
         pruneBatch: (n) =>
           pruneAccountIpAssociationsBatch(pool, config.accountIpAssociationRetentionDays, n),
       },
+      {
+        name: 'password_reset_requests',
+        pruneBatch: (n) =>
+          prunePasswordResetRequestsBatch(config.passwordResetRequestRetentionDays, n),
+      },
+      {
+        name: 'email_change_requests',
+        pruneBatch: (n) => pruneEmailChangeRequestsBatch(config.emailChangeRequestRetentionDays, n),
+      },
+      {
+        name: 'email_log',
+        pruneBatch: (n) => pruneEmailLogBatch(config.emailLogRetentionDays, n),
+      },
     ],
     // The fold precondition makes sample pruning lossless; skip the whole group
     // when retention is off so quiet configs write nothing to world_state.
@@ -3102,6 +3142,7 @@ export async function startServer(): Promise<http.Server> {
     // close below (their intervals are unref()'d, but an in-flight tick could still
     // fire before pool.end()).
     await businessMetrics.stop();
+    game.beginShutdown();
     // Same rationale for the retention sweep: an in-flight prune batch must not
     // race the pool close below.
     await retentionSweep.stop();
@@ -3109,6 +3150,7 @@ export async function startServer(): Promise<http.Server> {
     await game.saveAll('shutdown');
     await game.saveMarket();
     await game.saveMail();
+    await game.saveRifts();
     await game.endAllPlaySessions();
     // Drain any bank_ledger writes still queued on the FIFO tail BEFORE the lease
     // sweep: once the leases drop, a replacement process can load the same character
@@ -3124,14 +3166,22 @@ export async function startServer(): Promise<http.Server> {
     // go missing until that character's next login (the join reconcile is the
     // only heal). Rejections log inside the writer, so the drain never throws.
     await deedRecordsIdle();
-    // Stop and drain the Steam mirror's in-memory push FIFO too (right after the
-    // deeds records it observes): an unlock still queued here would be lost on
-    // pool.end(), and the next reconcile (on link or on login) is its only
-    // replay. stopSteamMirror flips the shutdown flag and races the drain tail
-    // against a 5s deadline, so a stuck upstream cannot hang the shutdown;
-    // failures are swallowed inside the worker, so this never throws. A no-op
-    // when the mirror is dark.
-    await stopSteamMirror(5000);
+    // Stop accepted /unstuck report intake and drain only to a finite deadline.
+    // Per-query timeouts bound an active write; deadline expiry aborts retry
+    // delays and drops queued telemetry before the shared pool closes.
+    const unstuckReportsDrained = await stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS);
+    if (!unstuckReportsDrained) console.warn('unstuck report drain deadline reached');
+    // Stop and drain each storefront mirror's in-memory push FIFO too (right
+    // after the deeds records they observe): an unlock still queued here would
+    // be lost on pool.end(), and the next reconcile (on link or on login) is
+    // its only replay. Each stop*Mirror flips its shutdown flag and races the
+    // drain tail against a 5s deadline, so a stuck upstream cannot hang the
+    // shutdown; failures are swallowed inside the worker, so this never
+    // throws. A no-op when that mirror is dark. Steam and Epic drain
+    // independently (D21) and CONCURRENTLY: the two stops share one 5s
+    // wall-clock budget, so a wedged Steam upstream cannot delay the Epic
+    // drain (or double the shutdown window) by serializing behind it.
+    await Promise.all([stopSteamMirror(5000), stopEpicMirror(5000)]);
     // Drop every character load lease this process holds so a clean restart can
     // reload its characters immediately instead of waiting out the lease TTL.
     // Runs before pool.end(); a failure here must not abort the shutdown, so log

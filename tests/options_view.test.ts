@@ -119,33 +119,61 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
     ]);
   });
 
-  it('the graphics preset picker is an enumerated choice [1..5] that re-renders', () => {
+  it('the graphics preset picker is an enumerated choice that re-renders, insane above ultra', () => {
     const controls = buildGraphicsControls(makeSource({ graphicsPreset: 3 }), {
       touch: false,
       nativeShell: false,
     });
     const preset = find(controls, 'graphicsPreset');
     expect(preset).toMatchObject({ control: 'choice', current: 3, rerender: true });
+    // Display order climbs the quality ladder (6 = Insane sits above 4 =
+    // Ultra) with the expert Advanced profile (5) last; the VALUES are the
+    // persisted historical numbers and never renumber.
     if (preset?.control === 'choice')
-      expect(preset.options.map((o) => o.value)).toEqual([1, 2, 3, 4, 5]);
+      expect(preset.options.map((o) => o.value)).toEqual([1, 2, 3, 4, 6, 5]);
   });
 
-  it('reveals the four advanced sub-pickers only at preset 5', () => {
+  it('reveals the five advanced sub-pickers only at preset 5', () => {
     const advanced = buildGraphicsControls(makeSource({ graphicsPreset: 5 }), {
       touch: false,
       nativeShell: false,
     });
-    expect(keysOf(advanced).slice(0, 5)).toEqual([
+    expect(keysOf(advanced).slice(0, 6)).toEqual([
       'graphicsPreset',
       'terrainDetail',
       'foliageDensity',
+      'surfaceDetail',
       'effectsQuality',
       'shadowQuality',
     ]);
-    // each advanced sub-picker is a low/high choice that does NOT re-render
+    // Each advanced sub-picker is a level-ladder choice that does NOT
+    // re-render. The persisted values are backward-compatible: the
+    // historical binary rows stored 0 (Low) and 1 (High), which keep their
+    // meaning on the four-step ladder (0 / 0.5 / 1 / 2).
     const terrain = find(advanced, 'terrainDetail');
     expect(terrain).toMatchObject({ control: 'choice', rerender: false });
-    if (terrain?.control === 'choice') expect(terrain.options.map((o) => o.value)).toEqual([0, 1]);
+    if (terrain?.control === 'choice')
+      expect(terrain.options.map((o) => o.value)).toEqual([0, 0.5, 1, 2]);
+    const foliage = find(advanced, 'foliageDensity');
+    if (foliage?.control === 'choice')
+      expect(foliage.options.map((o) => o.value)).toEqual([0, 0.5, 1, 2]);
+    const surface = find(advanced, 'surfaceDetail');
+    if (surface?.control === 'choice')
+      expect(surface.options.map((o) => o.value)).toEqual([0, 0.5, 1, 2]);
+    const shadows = find(advanced, 'shadowQuality');
+    if (shadows?.control === 'choice')
+      expect(shadows.options.map((o) => o.value)).toEqual([0, 0.5, 1, 2]);
+    // Effects & Lighting stops at High (the full high-tier post stack).
+    const effects = find(advanced, 'effectsQuality');
+    if (effects?.control === 'choice')
+      expect(effects.options.map((o) => o.value)).toEqual([0, 0.5, 1]);
+    // Nearest-option select: a stored 0.5 highlights Medium, never High.
+    const stored = buildGraphicsControls(makeSource({ graphicsPreset: 5, terrainDetail: 0.5 }), {
+      touch: false,
+      nativeShell: false,
+    });
+    const storedTerrain = find(stored, 'terrainDetail');
+    if (storedTerrain?.control === 'choice') expect(storedTerrain.current).toBe(0.5);
   });
 
   it('the interfaceMode choice re-renders; browserEffects does not', () => {
@@ -495,30 +523,43 @@ describe('options_view: interface tab taxonomy', () => {
 // Main menu routing (cluster 5)
 // ---------------------------------------------------------------------------
 describe('options_view: main menu routing', () => {
-  it('routes each row to its sub-view, with logout + close, omitting bug report offline', () => {
+  it('routes each row to its sub-view, with unstuck before logout + close, omitting bug report offline', () => {
     const offline = buildOptionsMenu({ bugReportAvailable: false });
     expect(offline.map((e) => e.labelKey)).toEqual([
       'hud.options.keyBindings',
       'hudChrome.controller.title',
       'hud.options.graphics',
       'hud.options.interface',
+      'hudChrome.auraOverlay.title',
       'hud.options.audio',
       'hudChrome.perf.title',
+      'hudChrome.unstuck.menuButton',
       'hud.options.logout',
       'hud.options.returnToGame',
     ]);
+    expect(offline.at(-3)?.action).toEqual({ kind: 'unstuck' });
     expect(offline.at(-2)?.action).toEqual({ kind: 'logout' });
     expect(offline.at(-1)?.action).toEqual({ kind: 'close' });
     // exactly one interface entry (no duplicates), routing to the interface view
     const interfaceRows = offline.filter((e) => e.labelKey === 'hud.options.interface');
     expect(interfaceRows).toHaveLength(1);
     expect(interfaceRows[0].action).toEqual({ kind: 'goto', view: 'interface' });
+    expect(offline.find((e) => e.labelKey === 'hudChrome.auraOverlay.title')?.action).toEqual({
+      kind: 'goto',
+      view: 'auras',
+    });
   });
 
   it('adds the online-only Report a Bug row when bug reporting is available', () => {
     const online = buildOptionsMenu({ bugReportAvailable: true });
     const bug = online.find((e) => e.labelKey === 'hudChrome.bugReport.menuButton');
     expect(bug?.action).toEqual({ kind: 'goto', view: 'bugreport' });
+    expect(online.slice(-4)).toEqual([
+      { labelKey: 'hudChrome.bugReport.menuButton', action: { kind: 'goto', view: 'bugreport' } },
+      { labelKey: 'hudChrome.unstuck.menuButton', action: { kind: 'unstuck' } },
+      { labelKey: 'hud.options.logout', action: { kind: 'logout' } },
+      { labelKey: 'hud.options.returnToGame', action: { kind: 'close' } },
+    ]);
   });
 });
 

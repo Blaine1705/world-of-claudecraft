@@ -39,12 +39,14 @@ talk only to the **`SimContext` seam** (`sim_context.ts`).
 - **`types.ts`**: ALL shared types AND the global tuning constants + classic-era formulas (`TICK_RATE`, `DT`, `GCD`, ranges, `XP_TABLE`, hit/armor/rage math, post-cap `virtualLevel`/prestige). Plus the `SimEvent` union and the `Entity` shape.
 - `data.ts`: merges `content/*` into the flat tables (`ABILITIES`, `MOBS`, `NPCS`, `QUESTS`, `ITEMS`, `CAMPS`, `DUNGEONS`) and owns world-layout consts (`WORLD_SIZE`, `instanceOrigin`, `arenaOrigin`, `zoneAt`, `dungeonAt`).
 - `entity.ts`: `createPlayer/createMob/createNpc/createGroundObject` + `recalcPlayerStats` (the ONE place derived stats are computed from class/level/gear/auras/talent `mods`).
-- `player_motion.ts`: the pure player-movement kernel (`stepPlayerMotion`: turn integration, wish vector, slope gates, swept static collision, the vertical pass) plus `moveSpeedMult`/`jumpMult`/`isSwimming` and the locomotion-feel constants. `Sim.updatePlayerMovement` wraps it behind `PlayerMotionDeps` (fiesta speed, delve-aware `resolveMove`, cast/damage callbacks); the online display-only self extrapolator (`src/render/self_motion.ts`) binds pure/no-op deps so BOTH hosts run the same math, pinned by `tests/player_motion.test.ts` (client-dep-shape vs live-Sim parity, bit for bit). Changing movement here means keeping that parity test green.
+- `player_motion.ts`: the pure player-movement kernel (`stepPlayerMotion`: turn integration, wish vector, slope gates, swept static collision, the vertical pass) plus `moveSpeedMult`/`jumpMult`/`isSwimming` and the locomotion-feel constants, including the parkour arms (air control, coyote time, ledge momentum, and the standable-prop support/mantle pass fed by `colliders.ts` `supportHeightAt`; behavior pinned by `tests/parkour.test.ts`). `Sim.updatePlayerMovement` wraps it behind `PlayerMotionDeps` (fiesta speed, delve-aware `resolveMove`, cast/damage callbacks); the online display-only self extrapolator (`src/render/self_motion.ts`) binds pure/no-op deps so BOTH hosts run the same math, pinned by `tests/player_motion.test.ts` (client-dep-shape vs live-Sim parity, bit for bit). Changing movement here means keeping that parity test green.
 - `entity_roster.ts`: roster ops the coordinator drives: `addEntity`/`dropEntity`/`rebucket`, despawn decay, the delayed-event drain, and the ground-AoE tick. Keeps only the delve release arm (`releaseSpiritInDelve`); the general death/release system is `spirit.ts` (see the module table).
 - `rng.ts`: `class Rng` (mulberry32) + stateless `hash2/noise2/fbm2` for terrain.
 - `world.ts`: `groundHeight`/`terrainHeight` (pure fn of x,z,seed), `WATER_LEVEL`, `generateDecorations`. **Renderer samples the same fns**: keep them identical. The voxel layer below derives from them too.
 - `voxel.ts` + `voxel_mesh.ts`: the true-3D voxel density field layered over the `world.ts` heightfield, plus its chunked mesher. Tunnels/overhangs come ONLY from hand-authored capsules in `content/tunnels.ts` subtracted from solid terrain; away from a tunnel the field's surface must stay byte-identical to `terrainHeight`, so a heightfield edit is also a voxel edit. Engine-only so far (proven by tests, not yet wired into the renderer; `colliders.ts`/`pathfind.ts` are still heightfield-only).
-- `colliders.ts`: `resolvePosition` (static collision + slide); reads `PROPS` and the dungeon/arena layouts.
+- **`physics/`**: the character physics engine (own `CLAUDE.md`): continuous swept collision against the extruded-2D collider set, multi-pass sliding, depenetration, and STEP UP so a walking body climbs low stones and kerbs with no jump. `player_motion.ts` runs it for the OPEN WORLD; instanced interiors stay on `resolveMove`. Pure leaf set (no `SimContext`), pinned by `tests/physics_character.test.ts`.
+- `decoration_dims.ts`: pure leaf, THE source of truth for scatter-decoration size (`rockHeight`/`rockRadius`/`ROCK_SINK_UNITS`). `colliders.ts` builds rock colliders from it and `src/render/foliage.ts` scales the rock GLBs to it, so a stone's silhouette and its collision top cannot drift.
+- `colliders.ts`: `resolvePosition` (static collision + slide); reads `PROPS` and the dungeon/arena layouts. Parkour heights live here: low props carry a `moveTopY` movement top (`standable` for crates/rocks and the climbable roofs: stall canopies, the dock hut), the optional `MoverHeight` param lets a mover whose feet clear a top pass over it, and `supportHeightAt` is the standable-surface query the movement kernel maxes against the terrain. Callers passing no height (mobs, pathfinding) collide full-height as before.
 - `dungeon_layout.ts`: plain-number interior layouts; single source for BOTH render geometry and `colliders.ts` interior sets.
 - `pathfind.ts`: local A* (`findPath`); the player-tuned wrapper `findPlayerPath` (body radius, climb, swim) is what warrior Charge calls via `findChargePath`.
 - `threat.ts`: classic-era hate-table math (`addThreat`, `threatModifier`, taunt, stealth detection). Already pure; modules import it directly.
@@ -72,21 +74,24 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `progression/talents.ts` | `applyTalents`/`spendTalent`/`setSpec`/`respec`/loadouts/`recomputeTalents` |
 | `mob/targeting.ts` | `updateMobTarget`, `retargetMob`, highest-threat target, trivial-target check |
 | `mob/combat_profile.ts` | mob combat profile selection, effective melee reach, and the general chase/attack profile runner |
+| `mob/reachability.ts` | the unreachable-target stall detector (`chaseStalledUnreachable` over `Entity.chaseStall`): the classic evade trigger consumed by `mob/combat_profile.ts`'s engaged postludes; draws no rng |
 | `mob/locomotion.ts` | `updateMob` dispatcher, `resetEvadingMob`, flee recovery, spawn-block; `onBossDeath` points-at `encounters/nythraxis` |
 | `mob/mob_swing.ts` | the mob on-hit affix cascade (`runMobSwingAffixes`); the base hit-table shell stays on `Sim` |
 | `mob/lifecycle.ts` | `respawnMob`, despawn summoned adds, frenzy packmates, death-throes, corpse detonate |
 | `mob/social_aggro.ts` + `mob/yells.ts` | flee-for-help rally pull; boss bark broadcast (`MobTemplate.yells`) |
 | `encounters/nythraxis.ts` | the whole Nythraxis raid encounter (per-tick driver, reset/wipe/init, dialogue scheduler, adds + boss mechanics, the Aldric transition + wardstones, the relic/grave-vision quest chain, the encounter CC-immunity predicates) |
 | `world_boss.ts` | hourly world bosses: spawn/scale/announce, contributor tracking, personal loot (`rollWorldBossLoot`), per-boss loot lockouts |
-| `spirit.ts` | death/release/resurrection: graveyards + spirit healers, the ghost run, `releasePlayerSpirit`/`resurrectAtCorpse`/`resurrectAtSpiritHealer` (sickness rules live in the `resurrection.ts` leaf) |
+| `spirit.ts` | death/release/resurrection: graveyards + spirit healers, the ghost run, `releasePlayerSpirit`/`resurrectAtCorpse`/`resurrectAtSpiritHealer`, plus the two `/unstuck` outcomes `moveToGraveyardForUnstuck`/`reviveAtGraveyardForUnstuck` (sickness rules live in the `resurrection.ts` leaf) |
 | `pet/pet_ai.ts` | `updatePet`, follow, ranged attack, target pick |
 | `pet/pet_commands.ts` | the pet command surface + `petOf`/`summonPet`/tame/despawn/`syncPetLevel`/`serializePet`/`restorePet` and the delve pet-park round-trip (`stowPetForDelve`/`restorePetFromDelveStash`) |
 | `items.ts` | equip/use/discard + vendor buy/sell/buyback command bodies (W2 move out of `sim.ts`) |
+| `item_instance_transfer.ts` | shared instanced-transfer rules for the anonymous exchange pipes (market listings + mail parcels, issue 1165): the transfer-lock predicate, the public display trim, payload-matching escrow removal, escrow-slot sanitizing; consumed by `market.ts`, `mail/post_office.ts`, and the ui staging gates (the `removePreferFungible` cross-import precedent) |
 | `interaction.ts` | `lootCorpse`/`pickUpObject`/`interact` + corpse harvest and party auto-loot (W3) |
 | `bags.ts` | pooled bag capacity: the backpack plus equipped bag items raise one flat slot budget |
 | `quests/quest_credit.ts` | kill/collect quest credit + turn-in readiness |
 | `quests/quest_commands.ts` | accept/abandon/turn-in verbs + `queueQuestLetter` (W4; dev arm in `quests/dev_quest_commands.ts`) |
 | `instances/dungeons.ts` | door triggers, enter/leave, instance slots, raid lockouts + raid gates, and the manual instance-reset lifecycle (`resetDungeonInstances` behind `/dungeon reset`, character-keyed cooldowns on the `dungeonResetLocks` primitive, `inheritDungeonResetLocks` on party join) |
+| `rift/runs.ts` + `rift/portals.ts` | procedural "Rift" run lifecycle (enter/descend/exit, floor gates, level-20 gate, Heroic Mark rewards) + the ranked (C/B/A/S) world-portal scheduler. See `docs/design/rift-portals.md` |
 | `instances/difficulty.ts` + `instances/heroic_vendor.ts` | heroic dungeons: tuning + `dungeonDifficulty`/`setDungeonDifficulty`, `awardHeroicMarks` and kill lockouts; the Heroic Quartermaster marks vendor |
 | `delves/runs.ts` | delve run lifecycle (`updateDelveRuns`, modules, rewards, shop) |
 | `delves/lockpick_controller.ts` | the lockpick session machine |
@@ -99,6 +104,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `social/vale_cup.ts` + `social/vale_cup_bots.ts` | Vale Cup boarball: brackets, the one match slot, the `vcup*` seam arms (pure ball math in the `vale_cup_ball.ts`/`vale_cup_layout.ts` leaves); its tick phase draws ZERO shared rng |
 | `social/yumi.ts` | Protect Yumi 3v3/5v5 maze mode (layout leaf `yumi_maze_layout.ts`) |
 | `social/ready_check.ts` | `/ready`: the `readyChecks` primitive + the `updateReadyChecks` phase |
+| `unstuck.ts` | `/unstuck` recovery countdown, the graveyard move (alive) or graveyard revive (dead), cancellation, and cooldown. Charges Unstuck Sickness, never a death |
 | `social/card_duel.ts` | the Card Duel minigame (Card Master NPC): queue/match state, the `updateCardDuelQueue` (pairing) and `updateCardDuelDeadlines` (AFK forfeit/void) phases |
 | `instances/card_master.ts` | the Card Master NPC proximity gate (`cardMasterInRange`) `social/card_duel.ts` queues against |
 | `social/trade.ts` + `social/chat.ts` | player trade; the `chat()` router, emotes, whispers, channel membership (readout formatters in `social/chat_readouts.ts`). `Sim` keeps only a thin `chat()` delegate for the `IWorld` facade; new slash commands land in `social/chat.ts`, never on `Sim` |
@@ -120,15 +126,23 @@ a row here or a Key files entry (`sim.ts`, `sim_context.ts`, `entity_roster.ts`)
 these before inlining pure logic in a system module: `spell_scaling.ts` (spell/attack
 power coefficients), `stun_dr.ts` (CC diminishing-return categories), `item_level.ts`/
 `item_budget.ts`/`item_level_req.ts` (drop power math), `equipment_rules.ts` (equip
-legality), `cooldown_persist.ts` (cooldown save/load), `tab_target.ts`/`assist.ts`/
+legality), `launch_paperdoll_slots.ts` (the FROZEN launch-era eleven-slot list, for
+launch-era completeness records ONLY: never validate a slot against it, use
+`isEquipSlot` from `types.ts`, which is derived from the live `ALL_EQUIP_SLOTS`),
+`cooldown_persist.ts` (cooldown save/load), `unstuck_cooldown.ts` (the hidden
+recovery timer across competitive resets), `tab_target.ts`/`assist.ts`/
 `dead_target.ts` (target cycling, /assist, dead-target selectability), `flee_speed.ts`,
 `mob/scan_counters.ts` (the per-tick mob scan-visit tally the server reads post-tick),
+`mob/mechanic_spacing.ts` (the rift boss shared mechanic spacing lock and its
+oldest-due drain; stamped per-spawn by `rift/runs.ts`, consumed by the
+`runMobAttackMechanics` drivers),
 `lockpick.ts` (the minigame core behind `delves/lockpick_controller.ts`), `map_doc.ts`
 (the custom-map document/validator), `geometry2d.ts`, `market_query.ts`,
 `market_listing_ids.ts` (the World Market's id allocator: the reserved house band plus
 the load-time reissue that keeps one row per id),
 `vendor_stack.ts`, `loot_master.ts`, `aura_classify.ts` (buff-vs-debuff, shared with the
-HUD), `resurrection.ts` (sickness rules shared by every death site), and the combat
+HUD), `resurrection.ts` (both sicknesses, The Keeper's Toll and the shorter Unstuck one,
+shared by every death site), and the combat
 leaves `spell_resist.ts`/`ranged_shot.ts`/`aura_stacking.ts`/`aura_cancel.ts`/
 `exclusive_aura.ts`/`form_swing.ts`, `jail.ts` (moderation-jail cage layout, gate
 teleport, visitor spot; the jail SYSTEM logic stays on `Sim`), and

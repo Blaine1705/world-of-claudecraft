@@ -72,6 +72,40 @@ describe('leaderboard_window: WCAG chrome (live region + focusable controls + fo
   });
 });
 
+describe('leaderboard_window: guild tag beside the ranked name', () => {
+  it('renders the guild as a tag inside the name cell on both the row and the sticky standing', () => {
+    // Inside .lb-name, not a seventh grid column: the row grid is shared by every
+    // tab, so a column here would misalign all of them (the Renown tab's realm tag
+    // is the same treatment).
+    expect(code).toContain('<span class="lb-guild"');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
+    expect(code).toContain('${esc(r.name)}${this.guildTagHtml(r.guild)}');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
+    expect(code).toContain('${esc(standing.name)}${this.guildTagHtml(standing.guild)}');
+  });
+
+  it('escapes the player-authored guild name and labels the tag from the catalog', () => {
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
+    expect(code).toContain('${esc(guild)}');
+    expect(code).not.toMatch(/\$\{guild\}/);
+    expect(code).toContain("t('hudChrome.leaderboard.guildName')");
+  });
+
+  it('renders no tag at all for an unguilded row', () => {
+    expect(code).toMatch(/if \(!guild\) return '';/);
+  });
+
+  it('feeds the viewer their own guild so the sticky standing can carry the tag', () => {
+    expect(code).toContain('guild: world.player.guild');
+  });
+
+  it('writes the angle brackets as HTML entities, not literal markup', () => {
+    // The classic `<Guild>` nameplate convention; a literal '<' here would open a tag.
+    expect(code).toContain('&lt;');
+    expect(code).toContain('&gt;');
+  });
+});
+
 describe('leaderboard_window: async + page wiring contracts (the painter half)', () => {
   it('maps a rejected / offline fetch to the error input (catch sets the result null)', () => {
     // The view test proves buildLeaderboardView({kind:'error'}) -> error; this pins
@@ -85,7 +119,7 @@ describe('leaderboard_window: async + page wiring contracts (the painter half)',
     // close() hides the window without clearing innerHTML, and a newer render
     // (tab switch, page change) owns the shared body; a late-resolving fetch
     // must bail on either rather than repaint stale rows.
-    expect(code).toContain("if (seq !== this.renderSeq || el.style.display !== 'block') return;");
+    expect(code).toContain("if (seq !== this.renderSeq || el.style.display !== 'flex') return;");
   });
 
   it('stamps a render epoch and bails every stale board response against it', () => {
@@ -148,6 +182,22 @@ describe('leaderboard_window: guild board tab (Players / Guilds)', () => {
     expect(code).toContain('aria-label="${esc(t(\'hudChrome.leaderboard.tabsLabel\'))}"');
   });
 
+  it('opens as a flex column and re-emits window-fill on the board body every render', () => {
+    // The board must follow the window box once the user drags the window to a
+    // size, instead of staying pinned to .lb-body's authored 56vh cap (which left
+    // a dead band under a truncated board). That needs two halves, both here:
+    //
+    // 1. the window is the flex COLUMN container. A stylesheet display can never
+    //    beat the inline one the painter writes, so the open value itself carries
+    //    it (the #mailbox-window family); 'block' would silently kill the fill.
+    expect(code).toContain("this.deps.root().style.display = 'flex';");
+    expect(code).toContain("return this.deps.root().style.display === 'flex';");
+    // 2. .lb-body is the marked fill child. render() rebuilds the window's whole
+    //    innerHTML on every open, tab switch and page change, so the class has to
+    //    come from the emitted HTML, not a one-time stamp at open.
+    expect(code).toContain('<div class="lb-body window-fill" id="lb-body-panel" role="tabpanel">');
+  });
+
   it('drives keyboard tab nav through the shared roving core and refocuses the active tab', () => {
     // Arrow/Home/End routed through the tested rovingTarget core (not bespoke math).
     expect(code).toContain("rovingTarget(ke.key, i, tabs.length, 'horizontal')");
@@ -200,7 +250,7 @@ describe('leaderboard_window: developers board tab', () => {
 
   it('guards against painting the dev board into a window closed or superseded mid-fetch', () => {
     expect(code).toMatch(
-      /renderDevBoard[\s\S]{0,400}if \(seq !== this\.renderSeq \|\| el\.style\.display !== 'block'\) return;/,
+      /renderDevBoard[\s\S]{0,400}if \(seq !== this\.renderSeq \|\| el\.style\.display !== 'flex'\) return;/,
     );
   });
 
@@ -285,7 +335,7 @@ describe('leaderboard_window: Renown (deeds) board tab', () => {
 
   it('guards against painting the Renown board into a window closed or superseded mid-fetch', () => {
     expect(code).toMatch(
-      /renderDeedsBoard\([\s\S]{0,500}if \(seq !== this\.renderSeq \|\| el\.style\.display !== 'block'\) return;/,
+      /renderDeedsBoard\([\s\S]{0,500}if \(seq !== this\.renderSeq \|\| el\.style\.display !== 'flex'\) return;/,
     );
   });
 });

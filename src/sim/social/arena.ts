@@ -37,10 +37,14 @@ import {
   type Entity,
   emptyMoveInput,
 } from '../types';
+import { clearCooldownsPreservingUnstuck } from '../unstuck_cooldown';
+import { duelFor } from './duel';
 
 // Deep-copy the CC diminishing-return map so a snapshot never shares mutable
 // state objects with the live entity (values are re-derived each restore).
-function cloneCcDr(
+// Exported: vale_cup.ts reuses this to restore its own pre-match pools
+// (mirroring this same free-full-restore fix, see snapshotArenaReturnPools).
+export function cloneCcDr(
   src: Map<CrowdControlDrCategory, CrowdControlDrState>,
 ): Map<CrowdControlDrCategory, CrowdControlDrState> {
   const out = new Map<CrowdControlDrCategory, CrowdControlDrState>();
@@ -49,8 +53,11 @@ function cloneCcDr(
 }
 
 // Deep-copy the recharge-model charge pools (Entity.abilityCharges) so a
-// snapshot never shares mutable state objects with the live entity.
-function cloneAbilityCharges(src: Entity['abilityCharges']): ArenaReturnPools['abilityCharges'] {
+// snapshot never shares mutable state objects with the live entity. Exported
+// for the same reason as cloneCcDr above.
+export function cloneAbilityCharges(
+  src: Entity['abilityCharges'],
+): ArenaReturnPools['abilityCharges'] {
   const out: ArenaReturnPools['abilityCharges'] = {};
   if (src) for (const [id, state] of Object.entries(src)) out[id] = { ...state };
   return out;
@@ -117,11 +124,15 @@ export function arenaQueueJoin(
     ctx.error(id, 'You are already in an arena match.');
     return;
   }
+  if (ctx.vcupSeatedOrQueued(id)) {
+    ctx.error(id, 'You are already in an arena match.');
+    return;
+  }
   if (r.e.dead) {
     ctx.error(id, 'You cannot queue for the arena while dead.');
     return;
   }
-  if (ctx.duels.has(id)) {
+  if (duelFor(ctx, id) !== null) {
     ctx.error(id, 'You cannot queue while dueling.');
     return;
   }
@@ -200,7 +211,11 @@ export function arenaQueueJoin(
         ctx.error(id, `${mMeta.name} is already in the arena queue.`);
         return;
       }
-      if (ctx.duels.has(mPid)) {
+      if (ctx.vcupSeatedOrQueued(mPid)) {
+        ctx.error(id, `${mMeta.name} is already in an arena match.`);
+        return;
+      }
+      if (duelFor(ctx, mPid) !== null) {
         ctx.error(id, `${mMeta.name} cannot queue while dueling.`);
         return;
       }
@@ -267,7 +282,11 @@ export function arenaQueueJoin(
       ctx.error(id, `${mMeta.name} is already in the arena queue.`);
       return;
     }
-    if (ctx.duels.has(mPid)) {
+    if (ctx.vcupSeatedOrQueued(mPid)) {
+      ctx.error(id, `${mMeta.name} is already in an arena match.`);
+      return;
+    }
+    if (duelFor(ctx, mPid) !== null) {
       ctx.error(id, `${mMeta.name} cannot queue while dueling.`);
       return;
     }
@@ -632,8 +651,17 @@ export function matchmakeArena1v1(ctx: SimContext): void {
       const e = ctx.entities.get(id);
       // A queued player who walked into a dungeon/instance is not matchable: the
       // bout would teleport them back inside fully restored (issue #1600). Same
-      // x-band test the queue-join guard uses.
-      return !!e && !e.dead && !ctx.arenaMatches.has(id) && e.pos.x <= DUNGEON_X_THRESHOLD;
+      // x-band test the queue-join guard uses. Also drop anyone who slipped into
+      // a Vale Cup match/queue after joining here (arenaQueueJoin already blocks
+      // this at entry; this is the defense-in-depth re-check for paths that seat
+      // a player into Vale Cup without going through that guard, e.g. practice).
+      return (
+        !!e &&
+        !e.dead &&
+        !ctx.arenaMatches.has(id) &&
+        e.pos.x <= DUNGEON_X_THRESHOLD &&
+        !ctx.vcupSeatedOrQueued(id)
+      );
     });
     if (ctx.arenaQueue1v1.length < 2 || freeArenaSlot(ctx, '1v1') === null) return;
     const aPid = ctx.arenaQueue1v1[0];
@@ -661,7 +689,15 @@ export function pruneTeamQueue(ctx: SimContext, fmt: '2v2' | 'fiesta'): void {
       const e = ctx.entities.get(id);
       // Drop the whole unit if any member walked into a dungeon/instance while
       // queued: the bout would return them inside fully restored (issue #1600).
-      return !!e && !e.dead && !ctx.arenaMatches.has(id) && e.pos.x <= DUNGEON_X_THRESHOLD;
+      // Also drop the unit if a member slipped into a Vale Cup match/queue
+      // after joining here (see matchmakeArena1v1's matching comment).
+      return (
+        !!e &&
+        !e.dead &&
+        !ctx.arenaMatches.has(id) &&
+        e.pos.x <= DUNGEON_X_THRESHOLD &&
+        !ctx.vcupSeatedOrQueued(id)
+      );
     });
   if (fmt === 'fiesta') ctx.arenaQueueFiesta = ctx.arenaQueueFiesta.filter(keep);
   else ctx.arenaQueue2v2 = ctx.arenaQueue2v2.filter(keep);
@@ -920,7 +956,7 @@ export function readyArenaFighter(
     // intentionally strips ALL auras (including The Keeper's Toll) so a PvE penalty
     // never carries into a normalized match.
     e.auras = [];
-    e.cooldowns.clear();
+    clearCooldownsPreservingUnstuck(e.cooldowns);
     e.abilityCharges = undefined; // charge pools refill (recreated lazily at full)
     e.ccDr.clear();
   }

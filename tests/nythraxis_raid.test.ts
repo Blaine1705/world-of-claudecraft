@@ -3,14 +3,32 @@ import { nextRaidResetMs } from '../server/raid_reset';
 import { visualKeyFor } from '../src/render/characters/manifest';
 import { dungeonDaisHasRaisedPlatform } from '../src/render/dungeon';
 import { isBlocked } from '../src/sim/colliders';
-import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
 import { nythraxisGravebreakerOnMobSwing } from '../src/sim/encounters/nythraxis';
 import { isShieldItem } from '../src/sim/equipment_rules';
 import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
-import { type Aura, armorReduction, dist2d, type Entity } from '../src/sim/types';
+import {
+  type Aura,
+  armorReduction,
+  dist2d,
+  type Entity,
+  type WorldContent,
+} from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+
+// The raid assertions run inside the Nythraxis instance band (x > 3000): the
+// boss, adds, Aldric, and wardstones are all spawned by the encounter/dungeon
+// code from the global registries, never from the overworld placements. So
+// spawning every ambient realm mob only makes each tick scan unrelated
+// overworld AI (the fiesta/arena subsystem-world precedent).
+const NYTHRAXIS_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
 
 type TickEvent = ReturnType<Sim['tick']>[number];
 type TimedEvent = { at: number; event: TickEvent };
@@ -36,7 +54,14 @@ function isDamageEvent(event: TickEvent): event is DamageEvent {
 }
 
 function makeWorld(lockoutNowMs?: () => number, raidResetMs?: (nowMs: number) => number) {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, lockoutNowMs, raidResetMs });
+  return new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    noPlayer: true,
+    lockoutNowMs,
+    raidResetMs,
+    world: NYTHRAXIS_TEST_WORLD,
+  });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
@@ -290,7 +315,11 @@ describe('Nythraxis raid encounter', () => {
   });
 
   it('defines four Nythraxis equipment drops with 3 percent legendary rolls', () => {
-    const loot = MOBS.nythraxis_scourge_of_thornpeak.loot.filter((entry) => entry.itemId);
+    // Equipment drops only: the collectible mount reins (kind 'mount') is its
+    // own independent draw outside the four roll groups, pinned by tests/mounts.test.ts.
+    const loot = MOBS.nythraxis_scourge_of_thornpeak.loot.filter(
+      (entry) => entry.itemId && ITEMS[entry.itemId]?.kind !== 'mount',
+    );
     const groups = new Map<string, typeof loot>();
     for (const entry of loot) {
       expect(entry.rollGroup).toMatch(/^nythraxis_drop_[1-5]$/);
@@ -568,13 +597,20 @@ describe('Nythraxis raid encounter', () => {
       .filter(isTimedChatEvent)
       .filter((row) => row.event.text === 'Kneel before your king' && row.event.from === boss.name);
 
-    // Releases ride landed swings now: cadence-driven but swing-quantized. At
-    // least 5 releases fit in 66s, each a full cadence apart, and the kneel
-    // line lands on every third RELEASE.
+    // Releases ride landed swings now: cadence-driven (12s) but
+    // swing-quantized (2.6s swings that can miss). A release the previous
+    // wait DELAYED compresses the next gap by that wait, so the per-gap
+    // floor is the cadence minus two swings of quantization slack (one
+    // phase, one miss), and the telescoped first-to-last span pins the true
+    // cadence RATE without any per-gap stream luck. At least 5 releases fit
+    // in 66s, and the kneel line lands on every third RELEASE.
     expect(gravebreakerFx.length).toBeGreaterThanOrEqual(5);
     for (let i = 1; i < gravebreakerFx.length; i++) {
-      expect(gravebreakerFx[i].at - gravebreakerFx[i - 1].at).toBeGreaterThanOrEqual(9);
+      expect(gravebreakerFx[i].at - gravebreakerFx[i - 1].at).toBeGreaterThanOrEqual(12 - 2 * 2.6);
     }
+    const first = gravebreakerFx[0];
+    const last = gravebreakerFx[gravebreakerFx.length - 1];
+    expect(last.at - first.at).toBeGreaterThanOrEqual((gravebreakerFx.length - 1) * 12 - 2 * 2.6);
     expect(kneelYells).toHaveLength(Math.floor(gravebreakerFx.length / 3));
     kneelYells.forEach((yell, i) => {
       expect(yell.at).toBeCloseTo(gravebreakerFx[i * 3 + 2].at, 5);
