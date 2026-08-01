@@ -182,7 +182,12 @@ export async function runOutboxPoll(io: OutboxIo): Promise<boolean> {
   // A failed poll: the server preserved every stream, so this costs one cycle of
   // latency and nothing else. Counted as no work, so a server that is refusing
   // sees the cadence decay instead of a retry every three seconds.
-  if (envelope === null) return false;
+  //
+  // `== null` on purpose: null is ServerClient's failure signal, but a success
+  // envelope with no data field resolves to UNDEFINED (the callFailed reasoning
+  // below), and a strict null check let that shape through to throw on the
+  // first property read. Neither shape observed anything, so neither is work.
+  if (envelope == null) return false;
 
   const streams = envelope as Partial<OutboxEnvelope>;
   const relayItems = listOf(streams.relay?.items);
@@ -197,6 +202,15 @@ export async function runOutboxPoll(io: OutboxIo): Promise<boolean> {
     if (error instanceof OutboxChannelUnsetError) return;
     io.onError?.(error, where);
   };
+
+  // The link changes apply FIRST, before any post, and outside any catch: a
+  // pure in-memory belief update over the sweep, so it cannot fail, and it is
+  // the one stream here the server does NOT re-serve (the drain consumed it).
+  // The post loops below are sequential and governor-paced, so on a backlog
+  // they can run for minutes; applying after them left a process death
+  // mid-loop to lose these beliefs for no ordering gain at all, since nothing
+  // below reads them.
+  io.applyLinkChanges(linkChanges);
 
   // Sequential, and each post in its own catch. Sequential because the governor
   // paces these anyway and a burst of parallel posts would only queue deeper;
@@ -243,8 +257,8 @@ export async function runOutboxPoll(io: OutboxIo): Promise<boolean> {
     //
     // Caught as well as result-checked, even though the client this is wired to
     // answers nullish rather than rejecting. An escaping throw would skip the
-    // link-change apply below, and that stream is the one thing here the server
-    // does NOT re-serve: it is drained, so the beliefs it carries would be lost.
+    // rest of the winner days and turn one bad mark call into a poll-wide
+    // failure the didWork signal misreads.
     try {
       if (callFailed(await io.markWinnersDay(day.day))) {
         report(new Error(`day ${day.day} was posted but not marked`), 'winners-mark');
@@ -253,8 +267,5 @@ export async function runOutboxPoll(io: OutboxIo): Promise<boolean> {
       report(error, 'winners-mark');
     }
   }
-  // Last, and outside any catch: it is a pure in-memory belief update over the
-  // sweep, so it cannot fail, and it runs whatever the posts above did.
-  io.applyLinkChanges(linkChanges);
   return consumedWork || winnersProgress;
 }

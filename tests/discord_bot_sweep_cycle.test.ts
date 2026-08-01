@@ -120,6 +120,12 @@ interface Rig {
   /** Ids whose Discord writes the fake governor refuses, standing in for a breaker. */
   blocked: Set<string>;
   /**
+   * Fault injection for the fake server's flex-batch: `fail` answers null (the
+   * ServerClient failure shape), `injectUnasked` appends a member the slice
+   * never asked about (a buggy or compromised answer).
+   */
+  flexAnswer: { fail: boolean; injectUnasked: string };
+  /**
    * Push every roster member's meta, the shape the hourly full resync takes.
    * `unapplied` is the ids the server reports it could not apply, or 'omit' for
    * a server that does not report the field at all.
@@ -196,29 +202,35 @@ function buildRig(): Rig {
       governed({ atMs: clock.now(), kind: 'role-remove', userId, value: roleId }),
   };
 
+  const flexAnswer = { fail: false, injectUnasked: '' };
+  const flexMember = (id: string) => {
+    const account = accounts.get(id) as Account;
+    return {
+      discord_user_id: id,
+      linked: true as const,
+      found: true,
+      username: account.username,
+      statusTier: account.statusTier,
+      points: 0,
+      character: {
+        name: account.username,
+        class: account.className,
+        level: account.level,
+        profileUrl: '',
+      },
+    };
+  };
   const server = {
     flexBatch: async (askIds: string[]) => {
       flexCalls.push({ atMs: clock.now(), ids: [...askIds] });
+      if (flexAnswer.fail) return null;
       const distinct = [...new Set(askIds)];
-      const members = distinct
-        .filter((id) => accounts.has(id))
-        .map((id) => {
-          const account = accounts.get(id) as Account;
-          return {
-            discord_user_id: id,
-            linked: true as const,
-            found: true,
-            username: account.username,
-            statusTier: account.statusTier,
-            points: 0,
-            character: {
-              name: account.username,
-              class: account.className,
-              level: account.level,
-              profileUrl: '',
-            },
-          };
-        });
+      const members = distinct.filter((id) => accounts.has(id)).map(flexMember);
+      // An unasked id rides OUTSIDE the requested echo, exactly as a malicious
+      // answer would: the echo still matches, so the answer reads authoritative.
+      if (flexAnswer.injectUnasked && accounts.has(flexAnswer.injectUnasked)) {
+        members.push(flexMember(flexAnswer.injectUnasked));
+      }
       return { requested: distinct.length, members };
     },
     pushMembersMeta: async (records: MemberMetaRecord[]) => {
@@ -302,15 +314,17 @@ function buildRig(): Rig {
     const slice = sweep.nextSlice(clock.now(), SLICE_SIZE, PASS_MS);
     if (slice === null) return false;
     const result = await server.flexBatch(slice.ids);
-    if (result === null) {
+    if (result == null) {
       sweep.restoreSlice(slice);
       return false;
     }
-    const outcome = sweep.applyFlexBatchResult(slice.ids, result);
+    const outcome = sweep.applyFlexBatchResult(slice.ids, result, (id) => memberRoles.has(id));
     for (const id of outcome.metaStale) lastPushedMeta.delete(id);
     const asked = new Set(slice.ids);
     for (const member of result.members) {
-      if (!asked.has(member.discord_user_id)) continue;
+      if (!asked.has(member.discord_user_id) || !memberRoles.has(member.discord_user_id)) {
+        continue;
+      }
       try {
         await syncRolesFor(member.discord_user_id, member);
       } catch {
@@ -359,6 +373,7 @@ function buildRig(): Rig {
     lastPushedMeta,
     memberRoles,
     blocked,
+    flexAnswer,
     pushRosterMeta,
   };
 }
@@ -573,11 +588,70 @@ describe('the sweep at the D18 envelope', () => {
     expect(rig.writes.filter((w) => w.kind === 'nick').length).toBe(LINKED_SIZE);
     expect(rig.writes.filter((w) => w.kind === 'role-add').length).toBe(LINKED_SIZE);
     expect(rig.writes.filter((w) => w.kind === 'role-remove').length).toBe(0);
-    // Nothing reached the wire without passing the gate: the gate is the only
-    // thing that appends to the log, and its counter is incremented before the
-    // refusal check, so gated == delivered + refused holds exactly.
-    expect(rig.gated()).toBe(rig.writes.length + rig.refusals());
+    // The gate saw EXACTLY the writes the fixture predicts, stated by value.
+    // (An earlier form asserted gated == writes + refusals, which is an
+    // invariant of this rig's own plumbing and could never fail; Phase 6 QA
+    // replaced it.) The production half of the claim, that bot/main.ts has no
+    // write path around the shells at all, is pinned by the no-bare-fetch test
+    // in tests/discord_bot_main_wiring.test.ts.
+    expect(rig.gated()).toBe(LINKED_SIZE * 2);
     expect(rig.refusals()).toBe(0);
+  });
+
+  it('re-serves a slice through the composed loop when the server answers null', async () => {
+    // The rig-level version of the unit arm beside it: here the NULL answer
+    // travels the same path main.ts runs (nextSlice, flexBatch, restoreSlice),
+    // driven by the scheduler, so deleting the restore in the loop is visible
+    // somewhere a suite actually executes.
+    const rig = buildRig();
+    await completeSeed(rig);
+    const writesBefore = rig.writes.length;
+
+    rig.flexAnswer.fail = true;
+    rig.sweep.requestPass();
+    await kickAndSettle(rig);
+
+    const failedAsk = rig.flexCalls.at(-1)?.ids ?? [];
+    expect(failedAsk.length).toBe(SLICE_SIZE);
+    // Nothing was observed, so no belief moved and nothing was written.
+    expect(rig.sweep.linkedIds().length).toBe(LINKED_SIZE);
+    expect(rig.writes.length).toBe(writesBefore);
+
+    // The healed server is asked about the SAME ids first: the slice went back
+    // to the front rather than being skipped for the rest of the pass.
+    rig.flexAnswer.fail = false;
+    const callsBefore = rig.flexCalls.length;
+    await advanceUntil(rig, () => rig.flexCalls.length > callsBefore);
+    expect(rig.flexCalls[callsBefore].ids).toEqual(failedAsk);
+  });
+
+  it('never aims a write at an id the slice did not ask about', async () => {
+    // A buggy or compromised server answer carrying an extra member must not be
+    // able to steer role or nickname writes at an arbitrary guild member, and
+    // must not inject them into the linked set either.
+    // Seed FIRST: during discovery the roster walk legitimately asks about
+    // every member, stranger included (they answer absent, being unlinked).
+    // The injection starts afterwards, on a steady-state pass that asks only
+    // about the linked set, so every answer then carries them UNASKED.
+    const rig = buildRig();
+    await completeSeed(rig);
+    const stranger = rig.roster[1];
+    expect(rig.sweep.has(stranger)).toBe(false);
+    rig.accounts.set(stranger, {
+      level: 42,
+      className: 'mage',
+      statusTier: 5,
+      username: 'Stranger',
+    });
+    rig.flexAnswer.injectUnasked = stranger;
+
+    rig.sweep.requestPass();
+    await kickAndSettle(rig);
+    await advanceUntil(rig, () => !rig.sweep.isPassInProgress());
+
+    expect(rig.writes.filter((w) => w.userId === stranger)).toEqual([]);
+    expect(rig.metaPushes.filter((m) => m.discord_user_id === stranger)).toEqual([]);
+    expect(rig.sweep.has(stranger)).toBe(false);
   });
 
   it('keeps a refused member retryable and finishes the slice around them', async () => {

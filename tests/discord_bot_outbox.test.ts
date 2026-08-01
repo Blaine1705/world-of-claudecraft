@@ -200,7 +200,7 @@ describe('outbox poll breaker gate', () => {
     });
 
     expect(await runOutboxPoll(rec.io)).toBe(true);
-    expect(rec.calls).toEqual(['drain', 'relay:c1', 'links:0']);
+    expect(rec.calls).toEqual(['drain', 'links:0', 'relay:c1']);
   });
 });
 
@@ -248,11 +248,11 @@ describe('outbox poll fan-out', () => {
     expect(await runOutboxPoll(rec.io)).toBe(true);
     expect(rec.calls).toEqual([
       'drain',
+      'links:1',
       'relay:c1',
       'relay:c2',
       'relay:c3',
       'activity:levelup',
-      'links:1',
     ]);
     expect(rec.errors).toEqual([{ where: 'relay', message: 'relay c2 refused' }]);
   });
@@ -287,7 +287,7 @@ describe('outbox winners announce-then-mark', () => {
 
     await runOutboxPoll(rec.io);
 
-    expect(rec.calls).toEqual(['drain', 'winners:2026-07-31', 'mark:2026-07-31', 'links:0']);
+    expect(rec.calls).toEqual(['drain', 'links:0', 'winners:2026-07-31', 'mark:2026-07-31']);
   });
 
   it('never marks a day whose announcement failed, and still handles the next one', async () => {
@@ -306,10 +306,10 @@ describe('outbox winners announce-then-mark', () => {
 
     expect(rec.calls).toEqual([
       'drain',
+      'links:0',
       'winners:2026-07-30',
       'winners:2026-07-31',
       'mark:2026-07-31',
-      'links:0',
     ]);
     // Exactly the second day, so the failed one is genuinely left for the server
     // to re-serve on the next poll.
@@ -330,7 +330,7 @@ describe('outbox winners announce-then-mark', () => {
       });
 
       expect(await runOutboxPoll(rec.io)).toBe(true);
-      expect(rec.calls).toEqual(['drain', 'winners:2026-07-31', 'mark:2026-07-31', 'links:0']);
+      expect(rec.calls).toEqual(['drain', 'links:0', 'winners:2026-07-31', 'mark:2026-07-31']);
       expect(rec.errors).toEqual([
         { where: 'winners-mark', message: 'day 2026-07-31 was posted but not marked' },
       ]);
@@ -340,8 +340,9 @@ describe('outbox winners announce-then-mark', () => {
   it('survives a mark that REJECTS, so the link changes still land', async () => {
     // The wired client answers nullish rather than rejecting, so this arm is
     // defensive. It is worth having because of what an escaping throw would
-    // skip: the link-change apply is the one stream the server does NOT re-serve
-    // (it was drained), so those beliefs would be lost rather than delayed.
+    // skip: the remaining winner days, and (before the apply moved ahead of the
+    // posts) the link-change beliefs; the apply-first order is pinned by the
+    // ordered call logs above, this arm keeps the catch honest.
     const rec = recorder({
       envelope: envelope({
         winners: { days: [winnersDay('2026-07-31')] },
@@ -384,6 +385,21 @@ describe('outbox poll didWork signal', () => {
     const empty = recorder({ envelope: envelope() });
     expect(await runOutboxPoll(empty.io)).toBe(false);
     expect(empty.calls).toEqual(['drain', 'links:0']);
+  });
+
+  it('treats an UNDEFINED drain like a failed poll rather than throwing', async () => {
+    // ServerClient resolves undefined for a success envelope with no data field
+    // (a proxy-trimmed body, an older build), and the types cannot see it. A
+    // strict === null guard let that shape through to a TypeError on the first
+    // property read, with the drain already consumed. Same contract as null:
+    // nothing was observed, so nothing is posted, applied, or counted as work.
+    const rec = recorder({
+      drain: async () => undefined as unknown as OutboxEnvelope,
+    });
+
+    expect(await runOutboxPoll(rec.io)).toBe(false);
+    expect(rec.calls).toEqual(['drain']);
+    expect(rec.links).toEqual([]);
   });
 
   it('answers true for each stream ON ITS OWN', async () => {
@@ -483,7 +499,7 @@ describe('outbox poll didWork signal', () => {
     });
 
     expect(await runOutboxPoll(rec.io)).toBe(true);
-    expect(rec.calls).toEqual(['drain', 'relay:c1', 'links:0']);
+    expect(rec.calls).toEqual(['drain', 'links:0', 'relay:c1']);
   });
 });
 
@@ -624,6 +640,70 @@ describe('outbox channel routing', () => {
     await expect(wired.io.postRelay(relayItem('c1'))).rejects.toBeInstanceOf(
       OutboxChannelUnsetError,
     );
+  });
+});
+
+describe('outbox factory pass-through seams', () => {
+  // Phase 6 QA: every routing test above runs the factory with a closed breaker
+  // and no link changes, so a factory that HARDCODED breakerState to 'closed',
+  // dropped applyLinkChanges, or swallowed onError passed the whole ladder while
+  // production lost the breaker gate, the link-change feed, or the error log.
+  // One arm per forwarded seam, each driven END TO END through runOutboxPoll.
+
+  it('forwards breakerState, so an open breaker reaches the gate through the factory', async () => {
+    let drains = 0;
+    const io = outboxIoFor({
+      createMessage: async () => {},
+      markDailyRewardWinners: async () => ({ ok: true }),
+      channels: { relay: 'r', activity: 'a', dailyRewards: 'd' },
+      gameUrl: 'https://game.test',
+      breakerState: () => 'open',
+      drain: async () => {
+        drains++;
+        return envelope({ relay: { items: [relayItem('c1')] } });
+      },
+      applyLinkChanges: () => {},
+    });
+
+    expect(await runOutboxPoll(io)).toBe(false);
+    // Not merely "posted nothing": the drain itself never happened, which only
+    // holds if the factory handed the REAL breaker thunk through.
+    expect(drains).toBe(0);
+  });
+
+  it('forwards applyLinkChanges, so drained items reach the sweep through the factory', async () => {
+    const applied: OutboxLinkChangeItem[][] = [];
+    const io = outboxIoFor({
+      createMessage: async () => {},
+      markDailyRewardWinners: async () => ({ ok: true }),
+      channels: { relay: 'r', activity: 'a', dailyRewards: 'd' },
+      gameUrl: 'https://game.test',
+      breakerState: () => 'closed',
+      drain: async () => envelope({ linkChanges: { items: [linkChange('u9')] } }),
+      applyLinkChanges: (items) => applied.push([...items]),
+    });
+
+    expect(await runOutboxPoll(io)).toBe(true);
+    expect(applied).toEqual([[linkChange('u9')]]);
+  });
+
+  it('forwards onError, so a failed post reaches the log through the factory', async () => {
+    const errors: string[] = [];
+    const io = outboxIoFor({
+      createMessage: async () => {
+        throw new Error('post refused');
+      },
+      markDailyRewardWinners: async () => ({ ok: true }),
+      channels: { relay: 'r', activity: 'a', dailyRewards: 'd' },
+      gameUrl: 'https://game.test',
+      breakerState: () => 'closed',
+      drain: async () => envelope({ relay: { items: [relayItem('c1')] } }),
+      applyLinkChanges: () => {},
+      onError: (_error, where) => errors.push(where),
+    });
+
+    expect(await runOutboxPoll(io)).toBe(true);
+    expect(errors).toEqual(['relay']);
   });
 });
 

@@ -31,6 +31,7 @@ import {
   OUTBOX_POLL_MS,
   PRESENCE_DEBOUNCE_MS,
   ROLE_SYNC_INTERVAL_MS,
+  SWEEP_SLICE_MS,
 } from '../bot/cadence';
 
 /** main.ts with block and line comments removed. */
@@ -286,6 +287,7 @@ describe('bot/main.ts loop wiring', () => {
       'PRESENCE_DEBOUNCE_MS',
       'OUTBOX_POLL_MS',
       'OUTBOX_IDLE_MS',
+      'SWEEP_SLICE_MS',
     ]) {
       expect(source).not.toContain(name);
     }
@@ -303,6 +305,49 @@ describe('bot/main.ts loop wiring', () => {
     expect(PRESENCE_DEBOUNCE_MS).toBe(4000);
     expect(OUTBOX_POLL_MS).toBe(3000);
     expect(OUTBOX_IDLE_MS).toBe(15000);
+    expect(SWEEP_SLICE_MS).toBe(3000);
+  });
+
+  it('pins the sweep slice decisions no behavioral suite can reach', () => {
+    // Phase 6 QA: the D18 rig MIRRORS this loop rather than importing it, so
+    // these three lines had no guard at all: deleting the null-answer restore
+    // silently skips a whole slice on every failed flex-batch call, deleting
+    // the asked-set filter lets a buggy or compromised server answer aim role
+    // and nickname writes at arbitrary guild members, and deleting the
+    // metaStale drop suppresses a freshly linked member's join date and staff
+    // flair until the hourly resync. Sliced to the function body first, per the
+    // clause-anchor rule: a whole-file search is satisfied by a comment.
+    const source = mainSource();
+    const start = source.indexOf('const runSweepSlice');
+    const end = source.indexOf('const gateway = new Gateway', start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const body = source.slice(start, end);
+    // `== null` and not `=== null`: flexBatch resolves undefined for a success
+    // envelope with no data field, and that answer observed nothing either.
+    expect(body).toContain('if (result == null)');
+    expect(body).toContain('linkedSweep.restoreSlice(slice);');
+    expect(body).toContain(
+      'if (!asked.has(member.discord_user_id) || !memberRoles.has(member.discord_user_id))',
+    );
+    expect(body).toContain('for (const id of outcome.metaStale) lastPushedMeta.delete(id);');
+    // The roster gate on flex-batch additions, the in-flight departure race.
+    expect(body).toMatch(
+      /applyFlexBatchResult\(slice\.ids, result, \(id\) =>\s*memberRoles\.has\(id\)/,
+    );
+  });
+
+  it('routes every Discord and game-server call through the shells: no bare fetch', () => {
+    // The production half of the governed-entry-point claim: the sweep-cycle
+    // rig can only prove its own wiring routes through the gate, so what pins
+    // bot/main.ts is that it has no way to reach the network except DiscordApi
+    // and ServerClient, both of which the governor and call() own.
+    const source = mainSource();
+    expect(source).not.toMatch(/[^.\w]fetch\s*\(/);
+    // The class above deliberately excludes dotted access, so ban the one
+    // dotted spelling that is still a bare network path in Node.
+    expect(source).not.toContain('globalThis.fetch');
+    expect(source).not.toContain('fetchImpl');
   });
 
   it('starts the tasks BEFORE the gateway connects', () => {
@@ -335,6 +380,18 @@ describe('bot/main.ts loop wiring', () => {
     expect(source).toMatch(
       /case 'GUILD_MEMBER_REMOVE'[\s\S]{0,1200}?forgetMember\(nickCaches, lastPushedMeta, userId\)/,
     );
+    // And the sweep stops asking about them NOW (Phase 6 QA): departure does
+    // not delete the link row, so without this the pass spends a slice slot
+    // plus doomed 404 writes on them until the next complete seed. Sliced to
+    // the case body so proximity cannot stand in for containment.
+    {
+      const start = source.indexOf("case 'GUILD_MEMBER_REMOVE'");
+      const end = source.indexOf("case 'GUILD_MEMBERS_CHUNK'", start);
+      expect(start).toBeGreaterThan(-1);
+      expect(end).toBeGreaterThan(start);
+      expect(source.slice(start, end)).toContain('linkedSweep.forget(userId);');
+      expect((source.match(/linkedSweep\.forget\(/g) ?? []).length).toBe(1);
+    }
     // The flaired-ids reconcile: the member left while the bot was offline, so
     // their stored flair is cleared by the roster sweep instead.
     expect(source).toMatch(

@@ -205,6 +205,16 @@ export class LinkedSweep {
   /** The ids of the pass in flight, front to back. Empty means no pass. */
   private cursor: string[] = [];
   private cursorSource: PassSource = 'pass';
+  /**
+   * Whether the previous slice came from the dirty queue. Read by nextSlice to
+   * bound dirty-first preemption: while pass-shaped work exists (an in-flight
+   * cursor, an armed discovery walk, or a requested or due pass), dirty and
+   * pass slices ALTERNATE, so a sustained feed (steady playtime-points items
+   * are enough at the D18 envelope) cannot starve the pass indefinitely. The
+   * pass is the safety net for exactly the members nothing reported moving,
+   * so an unbounded preemption would quietly delete it.
+   */
+  private lastSliceWasDirty = false;
   /** A roster snapshot waiting to be walked as a discovery pass. */
   private discovery: string[] | null = null;
   private passRequested = false;
@@ -348,6 +358,22 @@ export class LinkedSweep {
   }
 
   /**
+   * Drop one member from every set this module holds: the single-member form
+   * of pruneToRoster, for GUILD_MEMBER_REMOVE. Without it a departed member
+   * with a live game link stays in the pass until the next COMPLETE roster
+   * seed: flex-batch answers by link row (departure does not unlink), so every
+   * pass produces a doomed 404 role write and nickname PATCH for them.
+   *
+   * Departure also ends the no-link-row bookkeeping, unlike an unlink: there
+   * is no member left whose meta could be re-pushed, and a rejoin arrives
+   * through GUILD_MEMBER_ADD and the feed with fresh state.
+   */
+  forget(id: string): boolean {
+    this.noLinkRow.delete(id);
+    return this.unlink(id);
+  }
+
+  /**
    * Apply a flex-batch answer for the ids that were sent.
    *
    * Positive evidence (a member came back) always applies. NEGATIVE evidence
@@ -370,7 +396,11 @@ export class LinkedSweep {
    * follow-through. Pinned by "an unlink raced by its own in-flight slice heals
    * through the meta push" in the suite.
    */
-  applyFlexBatchResult(sentIds: readonly string[], result: FlexBatchLike): FlexBatchSummary {
+  applyFlexBatchResult(
+    sentIds: readonly string[],
+    result: FlexBatchLike,
+    rosterHas?: (id: string) => boolean,
+  ): FlexBatchSummary {
     const sent = new Set(sentIds);
     const authoritative = result.requested === sent.size;
     const present = new Set<string>();
@@ -381,6 +411,14 @@ export class LinkedSweep {
       const id = member.discord_user_id;
       if (!sent.has(id) || present.has(id)) continue;
       present.add(id);
+      // The roster gate mirrors applyLinkChangeItems, for the race an in-flight
+      // slice opens: a departure or pruneToRoster that lands while the request
+      // is out must not be undone by the stale answer's positive evidence,
+      // because the re-added id would have no removal path until the next
+      // complete seed. `present` is stamped above the gate on purpose, so an
+      // authoritative answer's negative evidence still reads the id as
+      // answered rather than as absent.
+      if (rosterHas && !rosterHas(id)) continue;
       if (this.noLinkRow.delete(id)) metaStale.push(id);
       if (!this.linked.has(id)) {
         this.linked.add(id);
@@ -486,20 +524,42 @@ export class LinkedSweep {
     passIntervalMs?: number,
   ): SweepSlice | null {
     const size = resolveSliceSize(sliceSize);
-    if (this.dirty.size > 0) {
-      const ids = [...this.dirty].slice(0, size);
-      for (const id of ids) this.dirty.delete(id);
-      return { ids, source: 'dirty', opensPass: false };
+    // Dirty first, but BOUNDED: after a dirty slice, pass-shaped work gets the
+    // next one, so under sustained feed traffic the two alternate instead of
+    // the dirty queue preempting the pass forever. "Pass-shaped work" counts
+    // PENDING work too, not just a cursor already in flight: a requested or
+    // due pass, or an armed discovery walk, that never gets to OPEN is starved
+    // just as thoroughly as one stalled mid-cursor (the fresh-eyes round
+    // proved the cursor-only bound starvable twelve slices out of twelve).
+    // The cost is one slice interval of extra latency for a dirty member, and
+    // only while pass work is actually contending; otherwise dirty is served
+    // on every slice exactly as before.
+    const passWork =
+      this.cursor.length > 0 ||
+      this.discovery !== null ||
+      this.passRequested ||
+      this.passDue(nowMs, passIntervalMs);
+    if (this.dirty.size > 0 && !(this.lastSliceWasDirty && passWork)) {
+      return this.takeDirty(size);
     }
+    this.lastSliceWasDirty = false;
     if (this.cursor.length > 0) return this.takeFromCursor(size, false);
     if (this.discovery !== null) {
       const candidates = this.discovery;
       this.discovery = null;
-      return this.beginPass(candidates, 'discovery', nowMs, size);
+      const opened = this.beginPass(candidates, 'discovery', nowMs, size);
+      if (opened !== null) return opened;
     }
     if (this.passRequested || this.passDue(nowMs, passIntervalMs)) {
-      return this.beginPass([...this.linked], 'pass', nowMs, size);
+      const opened = this.beginPass([...this.linked], 'pass', nowMs, size);
+      if (opened !== null) return opened;
     }
+    // A pass or discovery that opened over NOTHING yields null above; dirty
+    // work must still be served then, or the alternation gate would answer
+    // null while work exists (an empty discovery snapshot is the reachable
+    // case: dirty implies linked non-empty, so an empty PASS cannot coincide
+    // with dirty work, but an empty roster snapshot can).
+    if (this.dirty.size > 0) return this.takeDirty(size);
     return null;
   }
 
@@ -523,7 +583,20 @@ export class LinkedSweep {
       return;
     }
     this.cursorSource = slice.source;
-    this.cursor.unshift(...slice.ids);
+    // A 'pass' cursor holds exactly the linked set, so ids unlinked or
+    // forgotten while the failed slice was in flight do not go back; a
+    // 'discovery' snapshot holds unlinked ids by design and answers for them
+    // harmlessly, so it is restored whole.
+    const ids = slice.source === 'pass' ? slice.ids.filter((id) => this.linked.has(id)) : slice.ids;
+    this.cursor.unshift(...ids);
+  }
+
+  /** Take up to `size` ids off the dirty queue, oldest first. */
+  private takeDirty(size: number): SweepSlice {
+    const ids = [...this.dirty].slice(0, size);
+    for (const id of ids) this.dirty.delete(id);
+    this.lastSliceWasDirty = true;
+    return { ids, source: 'dirty', opensPass: false };
   }
 
   /** Take the front of the pass in flight. */

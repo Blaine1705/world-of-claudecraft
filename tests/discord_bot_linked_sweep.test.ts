@@ -511,15 +511,20 @@ describe('pass scheduling', () => {
   });
 
   it('takes a dirty queue larger than one slice a slice at a time', () => {
+    // The periodic pass is deliberately UNCONFIGURED here (a virgin sweep's
+    // first pass is otherwise always due, and the alternation bound would
+    // interleave it after the first dirty slice): this arm isolates the dirty
+    // queue's own pacing; the interleaving with contending pass work has its
+    // own describe below.
     const sweep = seeded([]);
     sweep.applyLinkChangeItems(
       ids(5).map((id) => item(id, ['link'])),
       anyMember,
     );
-    const first = sweep.nextSlice(10_000, 2, 5_000);
+    const first = sweep.nextSlice(10_000, 2, undefined);
     expect(first?.ids).toEqual(ids(5).slice(0, 2));
     expect(sweep.dirtyIds()).toEqual(ids(5).slice(2));
-    const second = sweep.nextSlice(10_000, 2, 5_000);
+    const second = sweep.nextSlice(10_000, 2, undefined);
     expect(second?.ids).toEqual(ids(5).slice(2, 4));
   });
 });
@@ -717,5 +722,210 @@ describe('set invariants', () => {
     sweep.nextSlice(10_000, 1, 5_000);
     expect(sweep.isPassInProgress()).toBe(false);
     expect(sweep.passSource()).toBe(null);
+  });
+});
+
+describe('forgetting a departed member (GUILD_MEMBER_REMOVE)', () => {
+  // Phase 6 QA: departure does not delete the link row, so flex-batch keeps
+  // answering for a departed member and the pass would keep spending a slice
+  // slot plus doomed 404 writes on them until the next complete seed. forget()
+  // is the single-member prune the GUILD_MEMBER_REMOVE handler calls.
+
+  it('drops the member from the linked and dirty sets and reports whether they were linked', () => {
+    const sweep = seeded([A, B]);
+    sweep.applyLinkChangeItems([item(A, ['flex'])], anyMember);
+    expect(sweep.dirtyIds()).toEqual([A]);
+
+    expect(sweep.forget(A)).toBe(true);
+    expect(sweep.has(A)).toBe(false);
+    expect(sweep.dirtyIds()).toEqual([]);
+    expect(sweep.size()).toBe(1);
+    // Idempotent, and honest about it: a repeat (or a never-linked id) is false.
+    expect(sweep.forget(A)).toBe(false);
+    expect(sweep.forget(C)).toBe(false);
+  });
+
+  it('removes them from a pass in flight but leaves a discovery walk alone', () => {
+    const sweep = seeded([A, B, C]);
+    sweep.requestPass();
+    const first = sweep.nextSlice(0, 1, Number.POSITIVE_INFINITY);
+    expect(first?.source).toBe('pass');
+    expect(sweep.remainingInPass()).toBe(2);
+
+    sweep.forget(B);
+    expect(sweep.remainingInPass()).toBe(1);
+    expect(sweep.nextSlice(0, 10, Number.POSITIVE_INFINITY)?.ids).toEqual([C]);
+
+    // A discovery cursor is a ROSTER snapshot that holds unlinked ids by design
+    // and answers for them harmlessly, so it is deliberately not spliced.
+    const discovering = seeded([A]);
+    discovering.armDiscovery([A, B, C]);
+    const dFirst = discovering.nextSlice(0, 1, undefined);
+    expect(dFirst?.source).toBe('discovery');
+    expect(discovering.remainingInPass()).toBe(2);
+    discovering.forget(A);
+    expect(discovering.has(A)).toBe(false);
+    expect(discovering.remainingInPass()).toBe(2);
+  });
+
+  it('ends the no-link-row bookkeeping, unlike an unlink', () => {
+    // An unlink keeps the memory (the member is still in the guild, so a fresh
+    // link must re-push their meta); a departure has no member left to re-push.
+    const sweep = new LinkedSweep();
+    sweep.applyMetaPushOutcome([A], [A]);
+    expect(sweep.hasNoLinkRow(A)).toBe(true);
+    sweep.forget(A);
+    expect(sweep.hasNoLinkRow(A)).toBe(false);
+  });
+});
+
+describe('flex-batch roster gate (the in-flight departure race)', () => {
+  // A slice's answer can arrive AFTER a departure or a seed prune removed the
+  // member: positive evidence from that stale answer must not re-add an id no
+  // removal path could then reach until the next complete seed. The gate
+  // mirrors applyLinkChangeItems' roster check.
+
+  it('cannot re-add a member the roster no longer has', () => {
+    const sweep = seeded([A]);
+    sweep.forget(A);
+
+    const summary = sweep.applyFlexBatchResult([A], authoritativeAnswer([A], [A]), rosterOf(B));
+    expect(summary.added).toEqual([]);
+    expect(summary.metaStale).toEqual([]);
+    expect(sweep.has(A)).toBe(false);
+    expect(sweep.size()).toBe(0);
+  });
+
+  it('still reads a gated id as ANSWERED, so absence removes only the truly absent', () => {
+    // B is still linked, off the roster only as far as the GATE can see (the
+    // caller's roster predicate and the linked set are updated by different
+    // paths, and this module cannot assume they agree). The answer carries B,
+    // so B must count as present: not re-added, and NOT removed as absent.
+    // A, sent and genuinely absent from an authoritative answer, is removed.
+    // Stamping `present` above the gate is what keeps the two verdicts
+    // independent: stamping below it would read every gated id as absent and
+    // unlink them on the spot.
+    const sweep = seeded([A, B]);
+
+    const summary = sweep.applyFlexBatchResult(
+      [A, B],
+      authoritativeAnswer([A, B], [B]),
+      rosterOf(A),
+    );
+    expect(summary.added).toEqual([]);
+    expect(summary.removed).toEqual([A]);
+    expect(sweep.has(A)).toBe(false);
+    // B survives: the gate blocks ADDITIONS only, and B answered.
+    expect(sweep.has(B)).toBe(true);
+  });
+
+  it('applies exactly as before when no gate is supplied', () => {
+    const sweep = new LinkedSweep();
+    const summary = sweep.applyFlexBatchResult([A], authoritativeAnswer([A], [A]));
+    expect(summary.added).toEqual([A]);
+    expect(sweep.has(A)).toBe(true);
+  });
+});
+
+describe('dirty and pass alternation (bounded preemption)', () => {
+  it('alternates dirty and cursor slices, so a busy feed cannot starve the pass', () => {
+    // The sustained-feed shape: one dirty id arrives before EVERY ask. Unbounded
+    // dirty-first would never serve the cursor again, and the pass is the safety
+    // net for exactly the members nothing reported moving.
+    const linked = ids(6);
+    const sweep = seeded(linked);
+    sweep.requestPass();
+    const sources: string[] = [sweep.nextSlice(0, 1, Number.POSITIVE_INFINITY)?.source ?? 'none'];
+    for (const feeder of linked) {
+      sweep.applyLinkChangeItems([item(feeder, ['flex'])], anyMember);
+      sources.push(sweep.nextSlice(0, 1, Number.POSITIVE_INFINITY)?.source ?? 'none');
+    }
+    expect(sources).toEqual(['pass', 'dirty', 'pass', 'dirty', 'pass', 'dirty', 'pass']);
+    // The pass ADVANCED under pressure (5 remaining after the opening slice,
+    // 2 now), and once the feed quiets the rest drains to completion.
+    expect(sweep.remainingInPass()).toBe(2);
+    drainPass(sweep, 0, 1, Number.POSITIVE_INFINITY);
+    expect(sweep.remainingInPass()).toBe(0);
+    expect(sweep.dirtyIds()).toEqual([]);
+  });
+
+  it('still serves dirty back to back when no pass is contending', () => {
+    const sweep = seeded([A, B]);
+    sweep.applyLinkChangeItems([item(A, ['flex'])], anyMember);
+    expect(sweep.nextSlice(0, 1, Number.POSITIVE_INFINITY)?.source).toBe('dirty');
+    sweep.applyLinkChangeItems([item(B, ['flex'])], anyMember);
+    expect(sweep.nextSlice(0, 1, Number.POSITIVE_INFINITY)?.source).toBe('dirty');
+  });
+});
+
+describe('alternation covers PENDING pass work (the fresh-eyes starvation catch)', () => {
+  // The first bound only counted a cursor already in flight, and the fresh-eyes
+  // probe starved a requested pass and an armed discovery twelve slices out of
+  // twelve: dirty won every ask, so beginPass was never reached. The bound now
+  // counts pass-shaped work that has not opened yet.
+
+  it('a requested pass opens under sustained dirt', () => {
+    const linked = ids(4);
+    const sweep = seeded(linked);
+    sweep.requestPass();
+    const sources: string[] = [];
+    for (const feeder of linked) {
+      sweep.applyLinkChangeItems([item(feeder, ['flex'])], anyMember);
+      sources.push(sweep.nextSlice(0, 1, Number.POSITIVE_INFINITY)?.source ?? 'none');
+    }
+    expect(sources).toEqual(['pass', 'dirty', 'pass', 'dirty']);
+    expect(sweep.isPassRequested()).toBe(false);
+  });
+
+  it('an armed discovery walk opens under sustained dirt', () => {
+    const sweep = seeded([A]);
+    sweep.armDiscovery([A, B, C]);
+    const sources: string[] = [];
+    for (let i = 0; i < 4; i++) {
+      sweep.applyLinkChangeItems([item(A, ['flex'])], anyMember);
+      sources.push(sweep.nextSlice(0, 1, undefined)?.source ?? 'none');
+    }
+    expect(sources).toEqual(['discovery', 'dirty', 'discovery', 'dirty']);
+    expect(sweep.isDiscoveryPending()).toBe(false);
+  });
+
+  it('serves dirty when an armed discovery turns out empty, never answering null over work', () => {
+    // The caution the fix round was warned about: beginPass over an empty
+    // snapshot yields null, and the gate must fall back to the dirty queue
+    // rather than reporting no work while work exists. (An empty PASS cannot
+    // coincide with dirty work, since dirty is a subset of linked; an empty
+    // roster snapshot can.)
+    const sweep = seeded([A]);
+    sweep.armDiscovery([]);
+    sweep.applyLinkChangeItems([item(A, ['flex'])], anyMember);
+    const slice = sweep.nextSlice(0, 1, Number.POSITIVE_INFINITY);
+    expect(slice?.source).toBe('dirty');
+    expect(slice?.ids).toEqual([A]);
+    expect(sweep.isDiscoveryPending()).toBe(false);
+  });
+});
+
+describe('restoring a slice after a mid-flight forget', () => {
+  it('drops a forgotten member from a restored PASS slice, restores a discovery snapshot whole', () => {
+    const sweep = seeded([A, B, C]);
+    sweep.requestPass();
+    const slice = sweep.nextSlice(0, 2, Number.POSITIVE_INFINITY);
+    expect(slice?.source).toBe('pass');
+    expect(slice?.ids).toEqual([A, B]);
+    sweep.forget(A);
+    sweep.restoreSlice(slice as SweepSlice);
+    // A does not come back: the pass cursor holds exactly the linked set.
+    expect(sweep.nextSlice(0, 10, Number.POSITIVE_INFINITY)?.ids).toEqual([B, C]);
+
+    // A discovery snapshot holds unlinked ids by design and answers for them
+    // harmlessly, so the restore keeps it whole.
+    const discovering = seeded([D]);
+    discovering.armDiscovery([D, E]);
+    const dSlice = discovering.nextSlice(0, 2, undefined);
+    expect(dSlice?.source).toBe('discovery');
+    expect(dSlice?.ids).toEqual([D, E]);
+    discovering.forget(D);
+    discovering.restoreSlice(dSlice as SweepSlice);
+    expect(discovering.nextSlice(0, 10, undefined)?.ids).toEqual([D, E]);
   });
 });

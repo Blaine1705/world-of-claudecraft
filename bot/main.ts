@@ -361,16 +361,22 @@ async function main(): Promise<void> {
     const slice = linkedSweep.nextSlice(Date.now(), cfg.sweepSliceSize, cfg.roleSyncIntervalMs);
     if (slice === null) return false;
     const result = await server.flexBatch(slice.ids);
-    if (result === null) {
+    if (result == null) {
       // server_client answers null for a failed call rather than throwing, so
-      // this is the only failure signal there is. Nothing was observed, so no
-      // belief may move: the slice goes back to be re-served, and the run counts
-      // as empty so the cadence backs off instead of retrying every three
-      // seconds against a server that is already refusing.
+      // this is the only failure signal there is (`== null` because a success
+      // envelope with no data field resolves to undefined, which observed
+      // nothing either). Nothing was observed, so no belief may move: the
+      // slice goes back to be re-served, and the run counts as empty so the
+      // cadence backs off instead of retrying every three seconds against a
+      // server that is already refusing.
       linkedSweep.restoreSlice(slice);
       return false;
     }
-    const outcome = linkedSweep.applyFlexBatchResult(slice.ids, result);
+    // The roster gate keeps a stale answer from re-adding a member a departure
+    // or the seed prune removed while this request was in flight.
+    const outcome = linkedSweep.applyFlexBatchResult(slice.ids, result, (id) =>
+      memberRoles.has(id),
+    );
     // A member whose link row is new has meta the bot believes it already
     // pushed, attached to a row that no longer exists. Dropping the cached
     // record BEFORE syncing them is what lets the nickname write's own push
@@ -379,10 +385,15 @@ async function main(): Promise<void> {
     for (const id of outcome.metaStale) lastPushedMeta.delete(id);
     const asked = new Set(slice.ids);
     for (const member of result.members) {
-      // Only ids this slice actually asked about: the sweep's writes are driven
-      // by the answer, and an answer carrying an id nobody asked for must not be
-      // able to aim a role write at an arbitrary guild member.
-      if (!asked.has(member.discord_user_id)) continue;
+      // Only ids this slice actually asked about AND still in the guild: the
+      // sweep's writes are driven by the answer, an answer carrying an id
+      // nobody asked for must not be able to aim a role write at an arbitrary
+      // guild member, and a member who departed while the slice was in flight
+      // must not get one last doomed 404 pass (their re-add is already gated
+      // on the same roster).
+      if (!asked.has(member.discord_user_id) || !memberRoles.has(member.discord_user_id)) {
+        continue;
+      }
       try {
         await syncRolesFor(member.discord_user_id, member);
       } catch (e) {
@@ -545,6 +556,12 @@ async function main(): Promise<void> {
           // Drop the diff caches too, or a member who leaves and rejoins would be
           // compared against their pre-departure record and never re-pushed.
           forgetMember(nickCaches, lastPushedMeta, userId);
+          // And the sweep stops asking about them NOW, not at the next complete
+          // seed: departure does not delete the link row, so flex-batch keeps
+          // answering for them, and every pass until a reconnect would spend a
+          // slice slot plus a doomed 404 role write and nickname PATCH on a
+          // member the guild no longer has.
+          linkedSweep.forget(userId);
           break;
         }
         case 'GUILD_MEMBERS_CHUNK': {
@@ -785,10 +802,12 @@ async function main(): Promise<void> {
       // exists; leaving it cached would suppress their join date and staff flair
       // until the hourly resync.
       for (const id of summary.metaStale) lastPushedMeta.delete(id);
-      // Dirty-queue work is served AHEAD of the pass, so this kick syncs a
-      // changed member within one tick instead of at the next pass window. It is
-      // deliberately NOT a requestPass: the feed named exactly who moved, and a
-      // whole pass over everyone is not what one member's points change asks for.
+      // Dirty-queue work is served ahead of the pass (bounded: dirty and
+      // pass-shaped work, pending or in flight, alternate slices, so a busy
+      // feed cannot starve the pass), so this kick syncs a changed member
+      // within a tick or two instead of at the next pass window. It is deliberately NOT a
+      // requestPass: the feed named exactly who moved, and a whole pass over
+      // everyone is not what one member's points change asks for.
       if (summary.added.length || summary.removed.length || summary.dirtied.length) {
         roleSyncTask.kick();
       }

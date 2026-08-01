@@ -64,11 +64,11 @@ export interface TaskOptions {
   /**
    * Resolve true when the run did work. void or undefined counts as no work.
    *
-   * The `void` in this union is load bearing rather than sloppy: most tasks are
-   * existing `Promise<void>` sweeps wired straight through as
-   * `run: () => pollRelay()`, and `Promise<void>` is NOT assignable to
-   * `Promise<boolean | undefined>`, so the narrower type biome suggests would
-   * force a wrapper around every one of those call sites.
+   * The `void` in this union is load bearing rather than sloppy: several tasks
+   * are existing `Promise<void>` sweeps wired straight through, the way
+   * `run: () => refreshTierRoles()` is, and `Promise<void>` is NOT assignable
+   * to `Promise<boolean | undefined>`, so the narrower type biome suggests
+   * would force a wrapper around every one of those call sites.
    */
   // biome-ignore lint/suspicious/noConfusingVoidType: see the doc comment above
   run: () => Promise<boolean | void>;

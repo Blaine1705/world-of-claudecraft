@@ -134,7 +134,10 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   3, 6, 12, 24, 48, 96, 192 s (the 300 s ceiling is never reached before a pass opens),
   putting the cumulative wakes at 3, 9, 21, 45, 93, 189, then 381 s, so the default
   effective gap between passes is about 6.4 minutes (an event kick bypasses it).
-  `linked_sweep.ts` decides WHICH members, the scheduler decides WHEN. Kicked by `GUILD_CREATE` (preceded by
+  `linked_sweep.ts` decides WHICH members, the scheduler decides WHEN. Feed-dirtied members
+  are served ahead of the pass, BOUNDED: dirty and pass-shaped work (an in-flight cursor,
+  an armed discovery walk, or a requested or due pass) alternate slices, so a busy feed
+  cannot starve the pass indefinitely. Kicked by `GUILD_CREATE` (preceded by
   `requestPass()`, because a kick alone only wakes the task early and it would find the
   pass window still open), by a COMPLETE roster seed, and by the outbox link-change feed
   when it moved something.
@@ -266,7 +269,9 @@ exactly one dynamic `process.env[...]` lookup, so read a new key as a direct
 - Guild state is seeded from `GUILD_CREATE` and then kept live: `GUILD_MEMBER_ADD`
   seeds a joiner's roles/join date, `GUILD_MEMBER_UPDATE` reconciles a member's
   role set (so a role granted or revoked after boot reflects on the next push), and
-  `GUILD_MEMBER_REMOVE` clears their stored flair. Guilds above the IDENTIFY
+  `GUILD_MEMBER_REMOVE` clears their stored flair and prunes them from the linked
+  sweep (departure does not delete the link row, so without the prune the pass would
+  keep spending doomed writes on them until the next complete seed). Guilds above the IDENTIFY
   `large_threshold` (250, the gateway max) omit offline members from
   `GUILD_CREATE`, so the bot backfills the full roster with
   `REQUEST_GUILD_MEMBERS` (op 8, streamed back as `GUILD_MEMBERS_CHUNK`). After
