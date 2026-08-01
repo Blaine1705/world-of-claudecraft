@@ -8,8 +8,8 @@
 | 1 QA | PASS-WITH-FOLLOWUPS | #2737 ready | Docs + pin harden followups only; no BLOCKING |
 | 2 Shard count | DONE (wall DEFER) | #2737 | Locked N=8; DEFER ≤8 min; wall babysitting stopped |
 | 2 QA | NOT STARTED | | Ready for phase-02-qa.md; no more wall re-runs |
-| 3 Shard rebalance | STOPPED (D11 MISS) | #2737 | Two rounds; wall 424s UNDER; D11 1.315; path-matrix note |
-| 3 QA | NOT STARTED | | Blocked on D11 owner decision |
+| 3 Shard rebalance | STOPPED (D11 MISS) | #2737 | Three rounds; wall UNDER; D11 ~1.32; accept miss or path-matrix |
+| 3 QA | NOT STARTED | | Wall win banked; D11 residual accepted unless path-matrix |
 | 4 Release-checks split | NOT STARTED | | |
 | 4 QA | NOT STARTED | | |
 | 5 Path filters + close | NOT STARTED | | |
@@ -30,6 +30,7 @@ Append-only. Each row: date, phase, run id, wall (s), worst shard (s), N, notes.
 | 2026-08-01 | p2-wall | 30709485828 | 514 | 436 | 8 | workflow_dispatch green; files 1926; OVER 8 min (8.57 min); babysitting stopped |
 | 2026-08-01 | p3-b1 | 30710303793 | ~493 (att1) | 420 | 8 | after tank+trend splits; s4 teardown flake then re-run green; files 1939; D11 FAIL 1.60; wall OVER |
 | 2026-08-01 | p3-b2 | 30710958267 | 424 | 351 | 8 | after s5 heavy renames; green; files 1939; D11 FAIL 1.315 (need 1.20); wall UNDER 8 min (7.07); stretch MISS |
+| 2026-08-01 | p3-b3 | 30712431702 | 442 | 359 | 8 | s5 import-heavies renamed off; green; files 1939; D11 FAIL 1.327; wall UNDER (7.37); s5 still import-bound |
 
 ### Phase 2 N=6 detail (run 30707931452, green)
 
@@ -254,31 +255,58 @@ D11 **FAIL** after two rounds. Wall clears Phase 2 DEFER sample (≤ 8 min) but
 stretch ≤ 6 min MISS. s5 is no longer test-time dominated: import cumulative ~407s
 vs ~100s on peer shards while tests sum only ~157s (many large-line low-ms files).
 
-### Phase 3 stop: path-matrix design note (not implemented)
+### Phase 3 batch 3 (s5 import-heavy renames)
 
-After two pure-split/rename rounds under locked N=8, D11 still fails. Further
-sha1 renames of import-heavy s5 files (`nythraxis_raid`, `daily_rewards`,
-`deeds_sites`, `eastbrook_layout`) could be a third cosmetic round, but the
-stopping rule is two rounds then stop.
+Simulated destinations (all distinct; none on s5):
+
+| From | To | Dest |
+|---|---|---|
+| nythraxis_raid.test.ts | nythraxis_raid_unit.test.ts | 4 |
+| daily_rewards.test.ts | daily_rewards_table.test.ts | 3 |
+| deeds_sites.test.ts | deeds_sites_pin.test.ts | 7 |
+| eastbrook_layout.test.ts | eastbrook_layout_suite.test.ts | 1 |
+| deed_records.test.ts | deed_records_table.test.ts | 8 |
+
+### Phase 3 batch 3 measure (run 30712431702, green)
+
+Wall **442s (7.37 min) UNDER 8 min**. Files 1939.
+
+| Shard | Duration s | Import s | Tests s |
+|---|---|---|---|
+| 1 | 260.83 | 108 | 266 |
+| 2 | 291.05 | 106 | 331 |
+| 3 | 277.99 | 115 | 346 |
+| 4 | 263.66 | 94 | 313 |
+| **5** | **359.31** | **420** | **149** |
+| 6 | 204.68 | 85 | 229 |
+| 7 | 206.63 | 81 | 257 |
+| 8 | 292.25 | 159 | 323 |
+
+Worst/median = 359.31 / 270.83 = **1.327** (still FAIL D11). The five large-line
+files are confirmed **absent** from s5; top s5 test times are only ~13s. s5 remains
+**import-bound residual of the sha1 partition** (many medium files, high cumulative
+import), not a single monster left to rename. Pure renames cannot close D11.
+
+### Phase 3 stop: accept D11 residual + path-matrix note
+
+**Recommendation locked for this packet:** bank the wall win (UNDER 8 min on
+solid green PR runs), accept D11 MISS (~1.32), do not keep renaming. Proceed to
+Phase 4 when ready. Path matrix only with owner OK if D11 must be hard-met.
 
 **Path-matrix alternative (owner OK required; do not implement without it):**
 
 1. Replace vitest `--shard=i/N` with an explicit path matrix in `ci.yml`, e.g.
-   eight fixed globs or enumerated heavy-file packs balanced by measured Duration
-   (not line count). Keep `npm test -- <paths>` or vitest project filters; never
-   bare `npx vitest`.
-2. Pros: stable balance independent of sha1; can pin monsters to light shards.
-3. Cons: matrix maintenance when files move; risk of dropped or double-run files
-   unless a completeness pin lists every `tests/**/*.test.ts` (or a generated
-   manifest); pin surface grows.
-4. Default remains `--shard` until the owner unlocks a path matrix.
-5. Completeness check would become: union of matrix path sets == full suite file
-   set (order-independent), asserted in `tests/ci_workflow.test.ts` or a small
-   pure helper.
+   eight fixed globs or enumerated packs balanced by measured Duration (or a
+   generated file list with a completeness pin). Keep `npm test -- <paths>`;
+   never bare `npx vitest`.
+2. Pros: stable balance independent of sha1; can rebalance import-heavy packs.
+3. Cons: matrix maintenance; dropped/double-run risk without a full-suite
+   completeness pin (manifest or set-equality test).
+4. Default remains `--shard`.
+5. Completeness: union of matrix path sets == full suite file set.
 
-Next owner choice: (a) path-matrix design + implement with OK, (b) one more
-targeted rename of s5 import-heavy files, or (c) accept D11 MISS and proceed to
-Phase 4 with wall UNDER documented.
+Owner path: (a) path-matrix with OK, (b) accept D11 MISS and Phase 4, (c) out-of-
+packet import hygiene later (D15).
 
 ## Phase 4 checklist
 

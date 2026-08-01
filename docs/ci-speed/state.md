@@ -1,17 +1,15 @@
 # State: CI Speed (cross-phase cheat sheet)
 
-**Current phase:** Phase 3 implementation STOPPED after two split/rename rounds.
-Locked **N=8**. Completeness baseline now **1939** Test Files (was 1926). Wall
-sample UNDER 8 min (424s on PR run 30710958267). D11 balance **not met**
-(worst/median 1.315; need ≤ 1.20). Path-matrix design note written in
-progress.md; **not implemented** (needs owner OK). Worktree
+**Current phase:** Phase 3 STOPPED after three pure split/rename rounds. Locked
+**N=8**. Completeness **1939** Test Files. Wall UNDER 8 min on solid PR samples
+(424s batch 2, 442s batch 3). D11 **not met** (~1.32 after batch 3); s5 is
+import-bound residual of sha1 partitioning, not a leftover monster. Accept D11
+MISS for this packet unless owner unlocks path-matrix. Worktree
 `/home/fernandoramirez/Documents/world-of-claudecraft-ci-speed` on
 `feature/ci-speed`. PR #2737.
 
-**Next action:** Owner chooses (a) path-matrix with explicit OK, (b) optional
-third rename round of s5 import-heavy files, or (c) accept D11 MISS and start
-Phase 4 (release-checks). Do not raise N past 8. No more endless wall re-run
-loops.
+**Next action:** Phase 4 (release-checks) when ready, or path-matrix only with
+owner OK. Do not raise N past 8. No more rename loops for D11.
 
 ## Locked decisions
 
@@ -53,7 +51,8 @@ loops.
   express the filter cleanly (justify in progress.md).
 - **D11 Balance metric:** after Phase 3, worst shard vitest **Duration**
   within **20%** of the median shard Duration on the same run.
-  **Status after two rounds: MISS** (351.26 / 267.21 = 1.315 on 30710958267).
+  **Status after three rounds: MISS** (359.31 / 270.83 = 1.327 on 30712431702).
+  Residual is s5 import cumulative (~420s) with low test sum (~149s).
 - **D12 Lint history:** no full-repo `fetch-depth: 0` solely for Biome
   changed-files. Base ref for `--since` must still be correct for PR and push
   events.
@@ -107,7 +106,8 @@ loops.
 | Phase 2 N=8 worst vitest | 435.88s (shard 5) | same |
 | Phase 3 batch 2 wall | **424s (7.07 min)** | run 30710958267 |
 | Phase 3 batch 2 worst vitest | 351.26s (shard 5) | same; D11 ratio 1.315 |
-| Phase 3 batch 2 median vitest | 267.21s | same |
+| Phase 3 batch 3 wall | **442s (7.37 min)** | run 30712431702 |
+| Phase 3 batch 3 worst vitest | 359.31s (shard 5) | D11 ratio 1.327; import residual |
 | Lint checkout Phase 1 | 22 to 25s | runs 30707112749, 30707206995, 30707453993 |
 | Lint job Phase 1 | 59 to 68s | same three runs |
 | pr-checks | ~110s | not critical path |
@@ -125,8 +125,9 @@ loops.
 
 1. **Exact N (6 vs 8):** CLOSED. Locked N=8. Wall sample UNDER 8 min after
    Phase 3 batch 2; three consecutive not re-babysat.
-2. **Heavy-file split list / D11:** Phase 3 two rounds done; D11 still MISS.
-   Path-matrix design note in progress.md. Owner OK required to implement.
+2. **Heavy-file split list / D11:** Phase 3 three rounds done; D11 still MISS.
+   Pure renames exhausted for s5 import residual. Path-matrix note in
+   progress.md; owner OK required to implement.
 3. **Branch protection check names:** owner action after Phase 2; track in
    progress.md. New names are `PR gate (English-only legal) (1)` through `(8)`.
 4. **Larger runners:** locked off (D1). Flip only with owner + cost note.
@@ -144,8 +145,7 @@ loops.
 - Phase 1 code: shallow lint checkout, concurrency cancel, Playwright cache.
 - Phase 2 code: N=8 matrices on pr-gate + release-gate; `SHARD_N` pins;
   comments no longer say 4-shard; gate.mjs unsharded.
-- Phase 3 code: tank_crit + professions_trend pure splits; s5 heavy pure
-  renames. D11 not met; path-matrix note only.
+- Phase 3 code: tank/trend splits; s5 runtime renames; s5 import-heavy renames.
+  D11 residual accepted for packet; path-matrix note only.
 - PR: https://github.com/levy-street/world-of-claudecraft/pull/2737
-- Next: owner decision on D11 path (path-matrix / more renames / accept miss),
-  then Phase 3 QA or Phase 4.
+- Next: Phase 4, or path-matrix with owner OK if D11 must be hard-met.
