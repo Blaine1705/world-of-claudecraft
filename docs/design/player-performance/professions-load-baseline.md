@@ -231,7 +231,11 @@ Capture protocol, learned the hard way:
   hourly, across the zones `eligibleRiftZones()` in `src/sim/rift/portals.ts`
   returns): a recapture at the merged tip reads about ten entities higher from
   rift portal ground objects, from the rift cadence and not from anything the
-  professions path does.
+  professions path does. The v0.34.0 sync adds more capture-time deltas of
+  the same class: the 11 expansion-hub mailboxes, and event-frame growth the
+  release added (ability ids on every spellfxAt emit, zone pulse ticks) that
+  no baseline has measured yet; fold both into the next recapture's
+  provenance note rather than comparing raw counts across syncs.
 
 ## Results
 

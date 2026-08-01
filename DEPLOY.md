@@ -324,10 +324,14 @@ For off-box safety, sync the directory to S3 occasionally:
   heroic loot of five encounters the deployed bundle already knows (the
   Morthen, Vael, Ysolei, and Korzul heroic finales plus the Nythraxis raid),
   so a solo or free-for-all heroic clear that drops one freezes a stale
-  session's corpse loot window the same way. The odds are the mount drop
-  rates (0.5 and 0.1 percent), the party need/greed path is already guarded
-  at the base, and the exception set is pinned to exactly those four ids by
-  the deploy-window test. Rift-run loot is a second release-content arm on
+  session's corpse loot window the same way, and the v0.34.0 sync widened
+  the same arm: the release's Heroic Wildheart Basin loot pass (Zulgar) put
+  six more epic and uncommon ids into heroic boss loot that a stale bundle
+  does not know. The reins odds are the mount drop rates (0.5 and 0.1
+  percent) while the Wildheart ids drop at ordinary heroic rates, the party
+  need/greed path is already guarded at the base, and the frozen id set
+  (reins exceptions plus the Wildheart additions) is pinned by the
+  deploy-window test's snapshot. Rift-run loot is a second release-content arm on
   the same window (the run builders push the rift catalog onto boss corpse
   lists at runtime, outside every content-table sweep); it requires the
   stale tab to get inside a rift at all, and whether the old bundle's
@@ -345,8 +349,9 @@ For off-box safety, sync the directory to S3 occasionally:
   bundle.
   The caveats above were measured against 9d7a1a021, the commit deployed
   today; the branch has since merged the true v0.32.0 tip (0b427afca, 685
-  commits past the measured base) and then re-synced repeatedly through
-  release/v0.33.0, last at 2ae71a7fbf, which together are what the
+  commits past the measured base), re-synced repeatedly through
+  release/v0.33.0 (last at 2ae71a7fbf), and then merged release/v0.34.0
+  (94f5ac63d8, at merge 706bec2d21), which together are what the
   merged-branch numbers above describe. If the live server moves before
   this branch deploys, re-run the compatibility diff against the commit
   actually deployed before trusting any "N new X" claim.

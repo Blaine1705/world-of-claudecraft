@@ -2,6 +2,19 @@
 
 Paste everything below the line into a fresh Fable session.
 
+CORRECTIONS (2026-08-01, after the re-target ran): the PREAMBLE below was
+EXECUTED that day: release/v0.34.0 (94f5ac63d8) is merged at 706bec2d21,
+the release-merge-audit ran (11 auditors, 26 confirmed findings, all
+packet-actionable ones fixed on the branch), and the gate is green; a
+re-run should verify the branch tip against the review doc's "v0.34.0
+re-target sync" block and go STRAIGHT to scoping. Two premises below were
+falsified by the audit and stand corrected: the 5x map expansion is NOT in
+the v0.33.0-to-v0.34.0 delta (the column zones landed in v0.32.0; no zone
+rect moved in this delta), so scoping item 2 reads "the world grew
+five-fold over the packet's lifetime" rather than "just grew", its audit
+targets the CURRENT expanded scale, and its blocker clause is moot for
+this delta (the placement suite is green over the 120 merged nodes).
+
 ---
 
 Run the v0.34.0 re-target and the post-packet SCOPING pass for the

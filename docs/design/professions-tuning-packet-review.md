@@ -3881,6 +3881,82 @@ Phase 18 is COMPLETE. NEXT: the maintainer's merge decision. The branch
 stays LOCAL; no PR opens and nothing merges without the user's explicit
 go, and the locale fill remains deferred past the packet.
 
+## v0.34.0 re-target sync (merge 706bec2d21) and its audit corrections
+
+Run 2026-08-01 after phase 18 closed: release/v0.33.0 merged to main and the
+branch re-based its sync onto release/v0.34.0 (94f5ac63d8, 290 commits and
+949 files over the old base 2ae71a7fbf: the graphics overhaul, ability VFX,
+the Epic storefront integration, Wildheart Basin polish, classic Evade, the
+release's own 1,367-row locale fill, and the #2605/#2507 provenance
+threading). Twenty conflicts resolved (the merge commit body records the
+blends); the release-merge-audit ran as an 11-auditor workflow with paired
+adversarial verification, 26 findings confirmed, every packet-actionable one
+fixed on the branch in the same change. Corrections to figures earlier
+phases pinned, superseding them at this tip:
+
+- Surface-inventory rows are 204, not 201: the release ADDED three routes
+  (POST /api/epic/link, DELETE /api/epic/link, GET /api/epic/status), so the
+  phase 11 sentence "the release added no routes and no WS commands" is
+  false for THIS sync. IWORLD_MEMBERS is 280 (the release removed the
+  renderer-only riftCollisionToken with third-person camera collision;
+  tests/world_api_parity.test.ts re-pinned). COMMAND_NAMES stays 187.
+- The one new wire field this sync brings is WireAura.bt (presence-only,
+  the Lingering Dread break-armed marker). The release shipped it
+  emit-only; the audit fix added the client decode on both aura arms
+  (src/net/online.ts) with a round-trip pin in tests/snapshots.test.ts, so
+  the per-sync wire-symmetry precedent (v0.33.0's opRem) holds again.
+- The 5x world expansion did NOT arrive in this delta: the column zones
+  landed in v0.32.0 and no zone rect moved between 2ae71a7fbf and
+  94f5ac63d8. The post-packet map scoping item audits gathering content at
+  the CURRENT expanded scale; nothing in this sync newly breaks placements
+  (the placement suite is green over the 120 merged nodes, and the only
+  new overworld collider class, the 11 expansion-hub mailboxes, sits no
+  closer than 37.4yd to any node).
+- Merged-world measurement re-records, each in its own reviewed commit:
+  the terrain-height parity corpus re-recorded at 139,339 points (heights
+  bit-identical; the packet's 21 nodes moved the point set), the
+  deploy-window heroic-loot snapshot took the union set (six Wildheart
+  Basin ids), the parity goldens re-minted, the playthrough's five hunted
+  literals re-hunted, and the chronomancy DPS-gap floor re-measured per the
+  phase 11 precedent: seeds 1/2/3 read piro 26.1/29.5/59.4 and cryo
+  39.1/14.1/35.2 percent, the floor moved to 12 percent under the new min,
+  and the eight-point seed-2 shortfall against the 22 percent design
+  target is a CLASS OWNER re-tune flag, not a code defect (the piro run in
+  the identical fight is healthy, so it is stream luck, not mechanics).
+- Audit fixes landed on the branch: the persisted craftedRecipeId marker on
+  BOTH escrow books (mail attachments; market listings and collections) now
+  takes boundCraftedRecipeIdOnLoad like every other marker load, driven by
+  loadMail/loadMarket tests (the release's bare-typeof re-attach met the
+  packet's bound doctrine for the first time on the merged tree); and
+  cliff scree placement gained a gather-node exclusion
+  (NODE_EXCLUSION_RADIUS 6yd) after the audit measured 22 boulders inside
+  harvest discs at the shipped seed, two essentially on node props, on the
+  fairness argument that the node prop is actionable information.
+
+Decision-list updates from this sync (everything else in the phase 18 list
+HOLDS: the ledger framing stands untouched by the release fill, which has
+zero overlap with the 53 stale keys; the deferred-fill worklist, the
+IMMOBILE_AURA_KINDS stasis omission, the mediawiki fishing page, the
+/api/deeds/broadcasts rate-limit note, and all four malware advisories are
+unchanged; version surfaces are consistently 0.33.0, the repo's
+bump-at-ship cadence):
+
+- The crafted-marker threading family: the release CLOSED the trade,
+  market, mail, and buyback legs (#2605/#2507). Still open of the phase 18
+  record: the enchant re-mint wash (the bagged apply-enchant consumes a
+  plain crafted stack without capturing its marker while the worn arm
+  preserves it through the equip bridge; pre-existing on every ref, now
+  arm-asymmetric, which arguably raises its priority).
+- R58's surface enumeration gains a third out-of-flag deed surface: the
+  release's Epic achievements mirror (dark by default, EPIC_ENABLED
+  unset) exports earned deeds like the Steam mirror does.
+- Two release-owned quirks recorded, not fixed here: mail's attachment cap
+  validates pre-split, so the provenance bucket split can book more than
+  MAIL_MAX_ATTACHMENTS parcel rows per letter (downstream claim/UI arms
+  are safe); and the event-frame growth the release added (ability ids on
+  every spellfxAt, zone pulse ticks) has no measurement anywhere, a
+  candidate for the next load-baseline recapture along with the mailbox
+  entity-count note in that doc.
 
 ---
 
