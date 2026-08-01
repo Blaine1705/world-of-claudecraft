@@ -14,6 +14,93 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': '전체',
+  'hudChrome.warlock.doomLabel': '단죄',
+  'hudChrome.warlock.fateThreadsLabel': '운명의 실타래',
+  'hudChrome.warlock.doomEmptyStatus': '단죄 {value}/{max}.',
+  'hudChrome.warlock.doomStatus': '단죄 {value}/{max}, 남은 시간 {remaining}.',
+  'hudChrome.procOverlay.soulFragmentsMeter': '영혼 조각',
+  'guide.abilityHook.evil_eye': '적 하나를 지정해 그 행동과 고통으로 단죄를 축적합니다.',
+  'entities.abilities.evil_eye.description':
+    '적 하나를 저주의 중심으로 지정합니다. 사안을 옮겨도 단죄는 유지되지만 20초의 만료 시간은 갱신되지 않습니다.',
+  'entities.abilities.maledict_gaze.name': '저주의 응시',
+  'entities.abilities.maledict_gaze.description':
+    '저주의 눈이 선택한 주 사안 대상을 2.5초마다 공격해 암흑 피해를 줍니다. 사안 빙의 중에는 공격 속도가 두 배가 됩니다.',
+  'entities.abilities.needle_of_fate.name': '운명의 바늘',
+  'entities.abilities.needle_of_fate.description':
+    '적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 5 생성하고, 사안이 없으면 먼저 대상을 지정합니다.',
+  'entities.abilities.sentence.name': '선고',
+  'entities.abilities.sentence.description':
+    '모든 단죄를 소모해 적에게 선고를 내립니다. 피해와 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다.',
+  'entities.abilities.cursed_accomplice.name': '저주받은 공모자',
+  'entities.abilities.cursed_accomplice.description':
+    '아군 플레이어를 선택하지 않았다면 저주의 눈과 연결해 응시가 단죄를 2 생성하게 합니다. 아군과 연결하면 그 아군이 사안 대상에게 피해를 줄 때 3을 생성합니다. 2초에 한 번만 발동합니다.',
+  'entities.abilities.litany_of_guilt.name': '죄책의 연도',
+  'entities.abilities.litany_of_guilt.description':
+    '주 사안을 8초 동안 저주합니다. 단죄를 얻을 때마다 파동을 일으켜 8미터 안의 다른 적 최대 4명에게 피해를 줍니다. 1초에 한 번만 발동합니다.',
+  'entities.abilities.umbral_anchor.name': '암영 닻',
+  'entities.abilities.umbral_anchor.description':
+    '처음 사용하면 발밑에 5분 동안 암영 닻을 설치합니다. 40미터 안에서 다시 사용하면 닻으로 돌아가며, 닻을 소모하고 45초의 재사용 대기시간이 시작됩니다.',
+  'entities.abilities.hex_of_violence.name': '폭력의 주술',
+  'entities.abilities.hex_of_violence.description':
+    '적을 8초 동안 저주합니다. 대상의 다음 3회 공격 행동은 각각 단죄를 7 생성하고 22의 암흑 피해를 되돌려 받습니다.',
+  'entities.abilities.cruel_pact.name': '잔혹한 계약',
+  'entities.abilities.cruel_pact.description':
+    '최대 생명력의 12%를 희생해 단죄를 20 생성합니다. 생명력이 15% 이하일 때는 사용할 수 없습니다.',
+  'entities.abilities.vicarious_suffering.name': '고통 전이',
+  'entities.abilities.vicarious_suffering.description':
+    '8초 동안 고통을 연결해 적의 공격으로 최대 15의 단죄를 생성합니다. 자신에게 사용하면 받는 피해가 20% 감소합니다. 아군에게 사용하면 피해의 최대 20%를 자신에게 옮기지만 생명력이 15% 아래로 내려가지는 않습니다.',
+  'entities.abilities.possess_evil_eye.name': '사안 빙의',
+  'entities.abilities.possess_evil_eye.description':
+    '저주술사가 주 사안에 15초 동안 빙의하고 단죄를 35 생성합니다. 운명의 바늘은 시전 시간이 1초가 되고 단죄를 2 더 생성하며, 흡명은 이동 중에도 정신 집중할 수 있고, 선고는 피해가 25% 증가하며 지연 후 60%의 추가 피해를 줍니다.',
+  'entities.abilities.hour_of_judgment.name': '심판의 시간',
+  'entities.abilities.hour_of_judgment.description':
+    '15초 동안 주 사안에 심판을 내려 단죄 40과 운명의 실 3개를 얻고 빙의를 활성화하며, 주 사안을 통해 생성되는 단죄를 두 배로 만들고 선고의 피해를 20% 증가시킵니다. 첫 번째 선고는 단죄 50을 돌려받습니다.',
+  'entities.abilities.coven.name': '마녀회',
+  'entities.abilities.coven.description':
+    '주변 적 최대 4명에게 15초 동안 유지되는 보조 사안을 만듭니다. 공유 단죄를 50% 효율로 채우며 선고 피해의 35%를 메아리로 받습니다.',
+  'entities.mobs.necromancy_gravewing.name': '묘지날개',
+  'entities.abilities.soul_harvest.name': '정수 수확',
+  'entities.abilities.soul_harvest.description':
+    '적의 영혼을 찢어 {damage}의 암흑 피해를 입히고 영혼 조각 1개를 생성합니다. 최대 5개.',
+  'entities.abilities.raise_graveguard.name': '무덤수호병 일으키기',
+  'entities.abilities.raise_graveguard.description':
+    '영구적인 방어형 동료를 일으킵니다. 무덤수호병은 자동으로 도발하고 무덤 지배로 당신이 받는 피해의 20%를 대신 받으며, 수확 명령 시 도발하고 4초 동안 받는 피해가 30% 감소합니다.',
+  'entities.abilities.raise_skeletal_warrior.name': '해골 전사 일으키기',
+  'entities.abilities.raise_skeletal_warrior.description':
+    '영혼 조각 1개를 소모해 영구적인 해골 전사를 2칸 지배에 추가합니다. 하나만 섬길 수 있습니다. 6초마다 주변 적에게 45% 휩쓸기 피해를 주며, 수확 명령 시 대상을 4초 동안 40% 느려지게 합니다.',
+  'entities.abilities.raise_bone_mage.name': '뼈 마법사 일으키기',
+  'entities.abilities.raise_bone_mage.description':
+    '영혼 조각 2개를 소모해 영구적인 원거리 뼈 마법사를 2칸 지배에 추가합니다. 하나만 섬길 수 있습니다. 공격이 6초 동안 받는 마법 피해를 5% 증가시키며, 수확 명령 시 8%로 강화합니다.',
+  'entities.abilities.bone_armor.name': '뼈 갑옷',
+  'entities.abilities.bone_armor.description':
+    '뼈로 몸을 감싸 최대 생명력의 20%에 해당하는 피해를 흡수합니다.',
+  'entities.abilities.corpse_explosion.name': '시체 폭발',
+  'entities.abilities.corpse_explosion.description':
+    '영혼 조각 2개를 소모해 지정한 위치의 죽음 에너지를 폭발시키고 주위 적에게 {damage}의 암흑 피해를 입힙니다.',
+  'entities.abilities.funeral_harvest.name': '장송 수확',
+  'entities.abilities.funeral_harvest.description':
+    '자신이나 자신의 언데드가 최근 피해를 준 적이 죽으면 영혼 조각 1개를 얻습니다. 3초에 한 번만 발동합니다.',
+  'entities.abilities.unholy_command.name': '부정한 명령',
+  'entities.abilities.unholy_command.description':
+    '모든 언데드에게 명령해 12초 동안 공격력을 25%, 행동 속도를 20% 증가시킵니다.',
+  'entities.abilities.reaping_command.name': '수확의 명령',
+  'entities.abilities.reaping_command.description':
+    '영혼 조각 2개를 소모해 모든 언데드 하수인이 일제히 공격하게 합니다. 무덤수호병은 도발하고 방어하며, 해골 전사는 발을 묶고, 뼈 마법사는 마법 방어를 노출하며, 무덤날개는 적중한 모든 적을 찢습니다.',
+  'entities.abilities.sacrifice_undead.name': '언데드 희생',
+  'entities.abilities.sacrifice_undead.description':
+    '지배 하수인 하나를 파괴해 최대 생명력의 25%를 회복합니다.',
+  'entities.abilities.army_of_the_dead.name': '망자의 군세',
+  'entities.abilities.raise_gravewing.name': '무덤날개 일으키기',
+  'entities.abilities.raise_gravewing.description':
+    '영혼 조각 2개를 소모해 영구적인 무덤날개를 2칸 지배에 추가합니다. 하나만 섬길 수 있습니다. 5초마다 주변 적에게 65% 휩쓸기 피해를 주며, 수확 명령 시 적중한 모든 적이 5초 동안 8% 더 큰 피해를 받습니다.',
+  'entities.abilities.cinderhide.name': '잿가죽',
+  'entities.abilities.cinderhide.description':
+    '피부를 식은 용암 찌꺼기처럼 10초 동안 굳혀 받는 모든 피해를 25% 감소시킵니다.',
+  'entities.abilities.army_of_the_dead.description':
+    '무덤 차원문을 20초 동안 열어 아직 섬기지 않는 모든 지배 유형을 임시로 일으킵니다. 선택한 하수인은 차원문이 닫힌 뒤에도 남습니다.',
+  'entities.mobs.graveguard.name': '무덤수호병',
+  'entities.mobs.necromancy_skeletal_warrior.name': '해골 전사',
+  'entities.mobs.necromancy_bone_mage.name': '뼈 마법사',
   'hudChrome.crafting.identity.ceilingRare': '희귀 상한',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -2929,7 +3016,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '흑마법사의 명령을 따르는 전쟁마귀를 소환합니다. 전쟁마귀는 전장에 뛰어들어 굳건히 버티는 튼튼한 근접 악마입니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다.',
   'entities.abilities.summon_infernal.name': '화염거상 소환',
   'entities.abilities.summon_infernal.description':
-    '화염거상을 당신의 의지에 결속합니다. 화염거상은 모든 악마 중 가장 높은 생명력과 방어도를 지닌 거대한 파괴자로, 강력한 근접 공격을 가합니다. 긴 재사용 대기시간이 그 막강한 힘을 제한합니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다.',
+    '대상 지역에 화염거상을 불러내 착지 시 58-72의 화염 피해를 줍니다. 기존 악마를 대체하지 않고 30초 동안 싸우며, 2초마다 주위 적을 불태우고 1초마다 파멸을 1 생성합니다.',
   'entities.abilities.summon_doomguard.name': '망령태생 소환',
   'entities.abilities.summon_doomguard.description':
     '망령태생을 당신의 의지에 결속합니다. 망령태생은 멀리서 강력한 암흑 피해를 퍼붓는 정예 악마입니다. 긴 재사용 대기시간이 그 파괴적인 힘을 제한합니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다.',
@@ -7142,6 +7229,95 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.haste': '공격 속도와 시전 속도를 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.dmgDone': '입히는 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.dmgDoneReduce': '입히는 피해가 {pct}% 감소합니다',
+  'hudChrome.auraEffect.stasis': '면역 상태가 되지만 행동할 수 없습니다',
+  'hudChrome.auraEffect.petDamage': '소환수의 공격력이 {pct}% 증가합니다',
+  'hudChrome.auraEffect.petHaste': '소환수의 행동 속도가 {pct}% 증가합니다',
+  'hudChrome.auraEffect.spellDamage': '주문 공격력이 {pct}% 증가합니다',
+  'hudChrome.auraEffect.spellHaste': '주문 시전 속도가 {pct}% 증가합니다',
+  'hudChrome.auraEffect.sated': '다른 파티 가속 효과를 받을 수 없습니다',
+  'hudChrome.auraEffect.cauterizeFatigue': '소작이 다음 치명타를 막을 수 없습니다',
+  'hudChrome.auraEffect.castShield': '피해를 받아도 시전이 방해되거나 지연되지 않습니다',
+  'hudChrome.auraEffect.cooldownCap':
+    '이 구간에서 재사용 대기시간 감소 {used}/{cap}초를 사용했습니다',
+  'hudChrome.auraEffect.funeralHarvestLock': '장례 수확이 아직 다음 영혼 조각을 생성할 수 없습니다',
+  'hudChrome.auraEffect.leadenHexLock':
+    '납빛 주술이 아직 이 대상을 다시 이동 불가로 만들 수 없습니다',
+  'hudChrome.auraEffect.forbiddenReflectionReady':
+    '다음 적용 가능한 흑마법사 공용 재사용 기술을 다시 사용할 수 있습니다',
+  'hudChrome.auraEffect.forbiddenReflectionLock': '금지된 반영을 아직 다시 준비할 수 없습니다',
+  'hudChrome.auraEffect.internalCooldown': '타이머가 끝날 때까지 이 효과가 다시 발동하지 않습니다',
+  'hudChrome.auraEffect.enrage':
+    '공격력이 {damagePct}%, 공격 속도가 {hastePct}%, 이동 속도가 {movePct}% 증가합니다',
+  'hudChrome.auraEffect.suddenDeath':
+    '다음 마무리 일격은 분노를 소모하지 않고 생명력 조건을 무시합니다',
+  'hudChrome.auraEffect.aoeEcho':
+    '메아리 {charges}회 남음: 단일 대상 기술이 주변 최대 {targets}명에게 {pct}% 피해를 줍니다',
+  'hudChrome.auraEffect.sureCrit': '다음 공격 기술 {charges}회가 반드시 치명타로 적중합니다',
+  'hudChrome.auraEffect.temporalEcho':
+    '시전자의 비전 피해가 단일 대상 피해의 {singlePct}%, 광역 피해의 {areaPct}%만큼 당신을 치유합니다',
+  'hudChrome.auraEffect.arcaneCharge':
+    '비전 충전 {stacks}중첩: 에테르 쇄도의 피해가 {damagePct}% 증가하고 시전이 {castPct}% 빨라지며 마나가 {costMult}배 듭니다',
+  'hudChrome.auraEffect.physicalReduction': '받는 물리 피해가 {pct}% 감소합니다',
+  'hudChrome.auraEffect.freeExecute': '다음 적용 가능한 처형 기술이 자원을 소모하지 않습니다',
+  'hudChrome.auraEffect.resourceSap': '{interval}초마다 현재 자원을 {value} 회복합니다',
+  'hudChrome.auraEffect.nextAttackCrit': '다음 공격이 반드시 치명타로 적중합니다',
+  'hudChrome.auraEffect.healEcho': '생명력이 {threshold}% 미만이 되면 생명력을 {value} 회복합니다',
+  'hudChrome.auraEffect.bleedVuln': '받는 출혈 피해가 {pct}% 증가합니다',
+  'hudChrome.auraEffect.sourceVuln': '이 효과를 건 시전자에게 받는 피해가 {pct}% 증가합니다',
+  'hudChrome.auraEffect.formMoonkin':
+    '달날개 변신: 주문 공격력이 {pct}%, 방어도가 {armorPct}% 증가합니다',
+  'hudChrome.auraEffect.formShadow': '어스름장막 변신: 암흑 피해가 {pct}% 증가합니다',
+  'hudChrome.auraEffect.formLich': '영혼 창이 주변 최대 {targets}명에게도 {pct}% 피해를 줍니다',
+  'hudChrome.auraEffect.afflictionEye':
+    '저주의 시선이 {interval}초마다 공격하며, 이 사안에서 발동한 효과는 규탄을 {pct}% 생성합니다',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    '이 사안의 효과는 규탄을 {doomPct}% 생성하며, 선고가 이곳에 {echoPct}% 피해로 메아리칩니다',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    '조건을 만족하는 피해가 규탄을 {value} 생성합니다. {interval}초에 한 번만 발동합니다',
+  'hudChrome.auraEffect.afflictionViolence':
+    '보복 {charges}회 남음: 적의 공격이 규탄을 {doom} 생성하고 {damage}의 암흑 피해로 반격합니다',
+  'hudChrome.auraEffect.afflictionVicarious':
+    '받는 피해의 {pct}%를 이전하거나 감소시키고 규탄을 최대 {max} 생성합니다',
+  'hudChrome.auraEffect.afflictionPossession':
+    '운명의 바늘, 생명력 흡수, 저주의 시선, 선고를 강화합니다',
+  'hudChrome.auraEffect.afflictionJudgment':
+    '주 사안의 규탄 생성량이 {eyePct}% 증가하고 선고 피해가 {sentencePct}% 증가하며 첫 선고가 규탄 {refund}을 돌려줍니다',
+  'hudChrome.auraEffect.afflictionLitany':
+    '규탄을 얻을 때 {radius}미터 내 최대 {targets}명에게 {damage}의 암흑 피해를 줍니다. 초당 한 번만 발동합니다',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '운명의 실 {stacks}중첩: 선고 피해가 {sentencePct}% 증가하거나 생명력 흡수 매 틱이 규탄을 {doom} 추가 생성합니다',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    '생명력 흡수가 운명의 실 {stacks}중첩을 소모해 매 틱 규탄을 {doom} 추가 생성합니다',
+  'hudChrome.auraEffect.necromancyHarvestMark':
+    '대상이 죽으면 영혼 조각 1개를 생성하고 시체 폭발용 죽음의 메아리를 남길 수 있습니다',
+  'hudChrome.auraEffect.necromancyOssuaryMark':
+    '당신과 언데드가 준 피해의 {storedPct}%와 영혼 창 피해의 추가 {lancePct}%를 저장합니다. 다시 사용하면 폭발합니다. 죽으면 {radius}미터 내에서 폭발하고 영혼 조각 1개를 생성합니다',
+  'hudChrome.auraEffect.necromancyDeathEcho':
+    '시체 폭발이 조준 지점 {radius}미터 안의 이 메아리를 소모할 수 있습니다',
+  'hudChrome.auraEffect.warlockAnchor':
+    '{range}미터 안에서 다시 사용하면 이곳으로 돌아오고 닻을 소모합니다',
+  'hudChrome.auraEffect.formMetamorph':
+    '악마 형상: 몸집이 {pct}% 커지며 다른 보너스는 별도 강화 효과로 표시됩니다',
+  'hudChrome.auraEffect.energyRegen': '기력 회복 속도가 {pct}% 증가합니다',
+  'hudChrome.auraEffect.overpowerCharge':
+    '충전 {stacks}중첩: 다음 치명타 일격의 피해가 {pct}% 증가합니다',
+  'hudChrome.auraEffect.sweepingStrikes':
+    '단일 대상 공격이 주변 적 {targets}명에게도 {pct}% 피해를 줍니다',
+  'hudChrome.auraEffect.fingersOfFrost':
+    '충전 {charges}회 남음: 얼음창이 대상을 빙결 상태로 간주하고 빙결 피해 {pct}%를 줍니다',
+  'hudChrome.auraEffect.brainFreeze': '다음 눈보라가 즉시 시전되고 재사용 대기시간을 무시합니다',
+  'hudChrome.auraEffect.wintersChill':
+    '충전 {charges}회 남음: 적용 가능한 주문이 이 대상을 빙결 상태로 간주합니다',
+  'hudChrome.auraEffect.icicles':
+    '고드름 {value}/{max}개. {max}개면 빙하 쐐기를 사용할 수 있습니다',
+  'hudChrome.auraEffect.desolation':
+    '충전 {charges}회 남음: 다음 혼돈의 화살 시전이 {castPct}% 빨라지거나 불의 비가 즉시 떨어집니다',
+  'hudChrome.auraEffect.ruinousBrand':
+    '복제 {charges}회 남음: 직접 주문 피해의 {otherPct}%를 이곳에 복제하며, 이곳이 주 대상이면 {selfPct}%를 복제합니다',
+  'hudChrome.auraEffect.duskfireClaim': '대상이 죽으면 파멸을 {value} 얻습니다',
+  'hudChrome.auraEffect.pyreGuardian':
+    '{ruinInterval}초마다 파멸을 {ruin} 생성하고 {damageInterval}초마다 {radius}미터 내에 {damage}의 화염 피해를 줍니다',
+  'hudChrome.auraEffect.perfectMoment': '에테르 화살이 비전 충전을 소모하지 않습니다',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     '다음에 다른 원소 계열 주문을 시전하면 원소 융합이 발동합니다',
   'hudChrome.auraEffect.heatingUp':

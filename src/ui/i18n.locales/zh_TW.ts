@@ -14,6 +14,91 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': '全部',
+  'hudChrome.warlock.doomLabel': '譴罪',
+  'hudChrome.warlock.fateThreadsLabel': '命運絲線',
+  'hudChrome.warlock.doomEmptyStatus': '{value}/{max} 譴罪。',
+  'hudChrome.warlock.doomStatus': '{value}/{max} 譴罪；剩餘 {remaining}。',
+  'hudChrome.procOverlay.soulFragmentsMeter': '靈魂碎片',
+  'guide.abilityHook.evil_eye': '標記一名敵人，使其行動與承受的苦難為你累積譴罪。',
+  'entities.abilities.evil_eye.description':
+    '將一名敵人標記為詛咒焦點。移動邪眼會保留譴罪，但不會刷新其20秒的持續時間。',
+  'entities.abilities.maledict_gaze.name': '咒眼凝視',
+  'entities.abilities.maledict_gaze.description':
+    '你的咒眼每2.5秒攻擊所選的主要邪眼目標，造成暗影傷害。附身邪眼會使其攻擊速度加倍。',
+  'entities.abilities.needle_of_fate.name': '命運之針',
+  'entities.abilities.needle_of_fate.description':
+    '刺穿敵人，造成{damage}點暗影傷害。若目標帶有你的邪眼，則產生5點譴罪；若不存在邪眼，則先標記目標。',
+  'entities.abilities.sentence.name': '裁決',
+  'entities.abilities.sentence.description':
+    '消耗全部譴罪裁決敵人。傷害與附加效果會在20、50、80和100點譴罪時提升。',
+  'entities.abilities.cursed_accomplice.name': '受咒共犯',
+  'entities.abilities.cursed_accomplice.description':
+    '未選擇友方玩家時連結你的咒眼，使其凝視產生2點譴罪；連結友方玩家時，該玩家對邪眼目標造成傷害會產生3點。每2秒最多觸發一次。',
+  'entities.abilities.litany_of_guilt.name': '罪責禱文',
+  'entities.abilities.litany_of_guilt.description':
+    '詛咒你的主要邪眼8秒。每次獲得譴罪時會釋放衝擊波，對8碼內最多4名其他敵人造成傷害，每秒最多觸發一次。',
+  'entities.abilities.umbral_anchor.name': '暗影錨',
+  'entities.abilities.umbral_anchor.description':
+    '首次施放：在腳下錨定暗影，持續5分鐘。在40碼內再次施放可返回錨點，消耗錨點並觸發45秒冷卻。',
+  'entities.abilities.hex_of_violence.name': '暴行咒',
+  'entities.abilities.hex_of_violence.description':
+    '詛咒敵人8秒。其接下來的3次傷害行動各產生7點譴罪，並反噬22點暗影傷害。',
+  'entities.abilities.cruel_pact.name': '殘酷契約',
+  'entities.abilities.cruel_pact.description':
+    '犧牲最大生命值的12%以產生20點譴罪。生命值不高於15%時無法使用。',
+  'entities.abilities.vicarious_suffering.name': '苦痛轉承',
+  'entities.abilities.vicarious_suffering.description':
+    '連結苦痛8秒，受到敵對攻擊時最多產生15點譴罪。對自己使用時受到的傷害降低20%；對盟友使用時最多將20%的傷害轉移給你，但不會使你的生命值降至15%以下。',
+  'entities.abilities.possess_evil_eye.name': '附身邪眼',
+  'entities.abilities.possess_evil_eye.description':
+    '咒術者附身你的主要邪眼15秒，並產生35點譴罪。命運之針施法時間變為1秒並額外產生2點譴罪；吞噬可在移動中引導；裁決造成的傷害提高25%，並在延遲後追加60%的傷害。',
+  'entities.abilities.hour_of_judgment.name': '審判時刻',
+  'entities.abilities.hour_of_judgment.description':
+    '對你的主要邪眼降下持續15秒的審判，獲得40點譴罪和3層命運絲線，啟動附身，使透過主要邪眼產生的譴罪加倍，並使裁決傷害提高20%。第一次裁決返還50點譴罪。',
+  'entities.abilities.coven.name': '巫契',
+  'entities.abilities.coven.description':
+    '在最多4名附近敵人身上製造持續15秒的次級邪眼。它們以50%的效率補充共享譴罪池，並承受裁決35%的回響傷害。',
+  'entities.mobs.necromancy_gravewing.name': '墓翼',
+  'entities.abilities.soul_harvest.name': '精華收割',
+  'entities.abilities.soul_harvest.description':
+    '撕裂敵人的靈魂，造成 {damage} 點暗影傷害，並產生 1 枚靈魂碎片，最多 5 枚。',
+  'entities.abilities.raise_graveguard.name': '喚醒墓衛',
+  'entities.abilities.raise_graveguard.description':
+    '喚醒一名永久的防禦型夥伴。墓衛會自動嘲諷，透過墓域為你攔截20%的傷害；收割號令會使其嘲諷並在4秒內受到的傷害降低30%。',
+  'entities.abilities.raise_skeletal_warrior.name': '喚醒骷髏戰士',
+  'entities.abilities.raise_skeletal_warrior.description':
+    '消耗1枚靈魂碎片，將一名永久骷髏戰士加入你的2槽統御。只能有一名為你效命。它每6秒對附近敵人造成45%的順劈傷害，收割號令會使目標緩速40%，持續4秒。',
+  'entities.abilities.raise_bone_mage.name': '喚醒骸骨法師',
+  'entities.abilities.raise_bone_mage.description':
+    '消耗2枚靈魂碎片，將一名永久遠程骸骨法師加入你的2槽統御。只能有一名為你效命。它的攻擊使目標受到的魔法傷害提高5%，持續6秒；收割號令將此弱點提高至8%。',
+  'entities.abilities.bone_armor.name': '骸骨護甲',
+  'entities.abilities.bone_armor.description': '以骸骨環繞自身，吸收相當於最大生命值 20% 的傷害。',
+  'entities.abilities.corpse_explosion.name': '屍骸爆裂',
+  'entities.abilities.corpse_explosion.description':
+    '消耗 2 枚靈魂碎片，在目標地點引爆死亡能量，對附近敵人造成 {damage} 點暗影傷害。',
+  'entities.abilities.funeral_harvest.name': '葬魂收割',
+  'entities.abilities.funeral_harvest.description':
+    '當一個近期被你或你的亡靈傷害過的敵人死亡時，你獲得1枚靈魂碎片。每3秒最多觸發一次。',
+  'entities.abilities.unholy_command.name': '邪穢號令',
+  'entities.abilities.unholy_command.description':
+    '號令所有亡靈，使其傷害提高 25%、行動速度提高 20%，持續 12 秒。',
+  'entities.abilities.reaping_command.name': '收割號令',
+  'entities.abilities.reaping_command.description':
+    '消耗2枚靈魂碎片，命令所有亡靈僕從同時攻擊。墓衛嘲諷並防禦，骷髏戰士牽制目標，骸骨法師暴露魔法防禦，墓翼撕裂所有被擊中的敵人。',
+  'entities.abilities.sacrifice_undead.name': '獻祭亡靈',
+  'entities.abilities.sacrifice_undead.description': '摧毀一名統御僕從，恢復最大生命值的 25%。',
+  'entities.abilities.raise_gravewing.name': '喚醒墓翼',
+  'entities.abilities.raise_gravewing.description':
+    '消耗2枚靈魂碎片，將一隻永久墓翼加入你的2槽統御。只能有一隻為你效命。它每5秒對附近敵人造成65%的順劈傷害，收割號令使所有被擊中的敵人在5秒內受到的傷害提高8%。',
+  'entities.abilities.army_of_the_dead.name': '亡者軍團',
+  'entities.abilities.army_of_the_dead.description':
+    '開啟一座持續20秒的墓穴傳送門，暫時喚醒尚未為你效命的所有統御原型。傳送門關閉後，你選擇的僕從仍會留下。',
+  'entities.abilities.cinderhide.name': '熔渣皮膚',
+  'entities.abilities.cinderhide.description':
+    '使皮膚硬化為冷卻的熔渣，持續10秒，受到的所有傷害降低25%。',
+  'entities.mobs.graveguard.name': '墓衛',
+  'entities.mobs.necromancy_skeletal_warrior.name': '骷髏戰士',
+  'entities.mobs.necromancy_bone_mage.name': '骸骨法師',
   'hudChrome.crafting.identity.ceilingRare': '精良品質上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -2816,7 +2901,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '召喚一隻聽從術士命令的戰魔。戰魔是一種堅韌的近戰惡魔，會衝入戰鬥並獨當一面。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
   'entities.abilities.summon_infernal.name': '召喚烈焰巨像',
   'entities.abilities.summon_infernal.description':
-    '將一隻烈焰巨像束縛於你的意志之下，這是一頭巨大的猛獸，擁有毀滅性的近戰攻擊，以及所有惡魔中最雄厚的生命值與護甲。漫長的冷卻時間限制了牠的原始力量。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
+    '使一隻烈焰巨像降臨目標區域，落地時造成58-72點火焰傷害。牠會戰鬥30秒而不取代你的惡魔，每2秒灼燒附近敵人，並且每秒產生1點毀滅。',
   'entities.abilities.summon_doomguard.name': '召喚怨魂裔',
   'entities.abilities.summon_doomguard.description':
     '將一隻怨魂裔束縛於你的意志之下，這是一種精英惡魔，會從遠處降下沉重的暗影傷害。漫長的冷卻時間限制了牠的毀滅性力量。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
@@ -6844,6 +6929,82 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.haste': '攻擊與施法速度提高 {pct}%',
   'hudChrome.auraEffect.dmgDone': '造成的傷害提高 {pct}%',
   'hudChrome.auraEffect.dmgDoneReduce': '造成的傷害降低 {pct}%',
+  'hudChrome.auraEffect.stasis': '免疫所有效果且無法行動',
+  'hudChrome.auraEffect.petDamage': '寵物造成的傷害提高 {pct}%',
+  'hudChrome.auraEffect.petHaste': '寵物的行動速度提高 {pct}%',
+  'hudChrome.auraEffect.spellDamage': '法術傷害提高 {pct}%',
+  'hudChrome.auraEffect.spellHaste': '施法速度提高 {pct}%',
+  'hudChrome.auraEffect.sated': '無法再獲得團隊加速效果',
+  'hudChrome.auraEffect.cauterizeFatigue': '灸灼無法再次阻止致命傷害',
+  'hudChrome.auraEffect.castShield': '施法不會因受到傷害而中斷或延遲',
+  'hudChrome.auraEffect.cooldownCap': '此時間窗已使用 {used}/{cap} 秒冷卻縮減',
+  'hudChrome.auraEffect.funeralHarvestLock': '葬禮收割暫時無法再次產生靈魂碎片',
+  'hudChrome.auraEffect.leadenHexLock': '鉛沉妖術暫時無法再次定身此目標',
+  'hudChrome.auraEffect.forbiddenReflectionReady': '下一個符合條件的術士共用冷卻技能可再次施放',
+  'hudChrome.auraEffect.forbiddenReflectionLock': '禁忌映像暫時無法再次準備',
+  'hudChrome.auraEffect.internalCooldown': '計時結束前此效果無法再次觸發',
+  'hudChrome.auraEffect.enrage':
+    '造成的傷害提高 {damagePct}%，攻擊速度提高 {hastePct}%，移動速度提高 {movePct}%',
+  'hudChrome.auraEffect.suddenDeath': '下一次斬殺不消耗怒氣並無視生命值要求',
+  'hudChrome.auraEffect.aoeEcho':
+    '剩餘 {charges} 次迴響：單體技能對附近最多 {targets} 個敵人造成 {pct}% 傷害',
+  'hudChrome.auraEffect.sureCrit': '接下來 {charges} 個傷害技能必定造成致命一擊',
+  'hudChrome.auraEffect.temporalEcho':
+    '施法者的秘法傷害會治療你，單體傷害轉化 {singlePct}%，範圍傷害轉化 {areaPct}%',
+  'hudChrome.auraEffect.arcaneCharge':
+    '{stacks} 層秘法充能：乙太湧動傷害提高 {damagePct}%，施法加快 {castPct}%，法力消耗變為 {costMult} 倍',
+  'hudChrome.auraEffect.physicalReduction': '受到的物理傷害降低 {pct}%',
+  'hudChrome.auraEffect.freeExecute': '下一個符合條件的斬殺技能不消耗資源',
+  'hudChrome.auraEffect.resourceSap': '每 {interval} 秒恢復 {value} 點目前資源',
+  'hudChrome.auraEffect.nextAttackCrit': '下一次攻擊必定造成致命一擊',
+  'hudChrome.auraEffect.healEcho': '生命值低於 {threshold}% 時恢復 {value} 點生命值',
+  'hudChrome.auraEffect.bleedVuln': '受到的流血傷害提高 {pct}%',
+  'hudChrome.auraEffect.sourceVuln': '受到施加此效果的施法者造成的傷害提高 {pct}%',
+  'hudChrome.auraEffect.formMoonkin': '月翼形態：法術傷害提高 {pct}%，護甲提高 {armorPct}%',
+  'hudChrome.auraEffect.formShadow': '幽幕形態：暗影傷害提高 {pct}%',
+  'hudChrome.auraEffect.formLich': '靈魂長槍還會對附近最多 {targets} 個敵人造成 {pct}% 傷害',
+  'hudChrome.auraEffect.afflictionEye':
+    '惡咒凝視每 {interval} 秒攻擊一次；此邪眼上的效果產生 {pct}% 的定罪值',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    '此邪眼上的效果產生 {doomPct}% 的定罪值；宣判在此迴響並造成 {echoPct}% 傷害',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    '符合條件的傷害產生 {value} 點定罪值，每 {interval} 秒最多一次',
+  'hudChrome.auraEffect.afflictionViolence':
+    '剩餘 {charges} 次報復；敵人攻擊會產生 {doom} 點定罪值並反擊 {damage} 點暗影傷害',
+  'hudChrome.auraEffect.afflictionVicarious':
+    '轉移或降低 {pct}% 的受到傷害，並可產生最多 {max} 點定罪值',
+  'hudChrome.auraEffect.afflictionPossession': '強化命運之針、汲取生命、惡咒凝視和宣判',
+  'hudChrome.auraEffect.afflictionJudgment':
+    '主邪眼產生的定罪值提高 {eyePct}%；宣判傷害提高 {sentencePct}%，第一次返還 {refund} 點定罪值',
+  'hudChrome.auraEffect.afflictionLitany':
+    '獲得定罪值時，對 {radius} 碼內最多 {targets} 個敵人造成 {damage} 點暗影傷害，每秒最多一次',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '{stacks} 層命運絲線：宣判傷害提高 {sentencePct}%，或使汲取生命每次額外產生 {doom} 點定罪值',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    '汲取生命正在消耗 {stacks} 層命運絲線，每次額外產生 {doom} 點定罪值',
+  'hudChrome.auraEffect.necromancyHarvestMark':
+    '目標死亡時可產生 1 個靈魂碎片，並留下可供屍體爆炸使用的死亡迴響',
+  'hudChrome.auraEffect.necromancyOssuaryMark':
+    '儲存你和不死僕從造成傷害的 {storedPct}%，並額外儲存靈魂長槍傷害的 {lancePct}%；再次施放引爆。目標死亡時在 {radius} 碼內爆炸並產生 1 個靈魂碎片',
+  'hudChrome.auraEffect.necromancyDeathEcho': '屍體爆炸可消耗瞄準點 {radius} 碼內的此迴響',
+  'hudChrome.auraEffect.warlockAnchor': '在 {range} 碼內再次施放可返回此處並消耗錨點',
+  'hudChrome.auraEffect.formMetamorph': '惡魔形態：體型增大 {pct}%；其他加成由獨立增益提供',
+  'hudChrome.auraEffect.energyRegen': '能量恢復速度提高 {pct}%',
+  'hudChrome.auraEffect.overpowerCharge': '{stacks} 層充能：下一次致殘打擊傷害提高 {pct}%',
+  'hudChrome.auraEffect.sweepingStrikes': '單體攻擊還會對附近 {targets} 個敵人造成 {pct}% 傷害',
+  'hudChrome.auraEffect.fingersOfFrost':
+    '剩餘 {charges} 層：冰霜長矛視目標為凍結狀態，並造成 {pct}% 的凍結傷害',
+  'hudChrome.auraEffect.brainFreeze': '下一次冰風暴瞬發且無視冷卻時間',
+  'hudChrome.auraEffect.wintersChill': '剩餘 {charges} 層：符合條件的法術視此目標為凍結狀態',
+  'hudChrome.auraEffect.icicles': '{value}/{max} 根冰柱；達到 {max} 根時可施放冰川尖刺',
+  'hudChrome.auraEffect.desolation':
+    '剩餘 {charges} 層：下一次混沌箭施法加快 {castPct}%，或下一次火焰之雨立即落下',
+  'hudChrome.auraEffect.ruinousBrand':
+    '剩餘 {charges} 次複製：直接法術在此複製 {otherPct}% 傷害；若此目標也是主目標則複製 {selfPct}%',
+  'hudChrome.auraEffect.duskfireClaim': '目標死亡時獲得 {value} 點毀滅',
+  'hudChrome.auraEffect.pyreGuardian':
+    '每 {ruinInterval} 秒產生 {ruin} 點毀滅，並每 {damageInterval} 秒對 {radius} 碼內敵人造成 {damage} 點火焰傷害',
+  'hudChrome.auraEffect.perfectMoment': '乙太飛彈不會消耗秘法充能',
   'hudChrome.auraEffect.elementalConvergencePrimed': '你的下一個不同元素學派法術將觸發元素匯聚',
   'hudChrome.auraEffect.heatingUp':
     '你的下一個火焰生成技能若連續造成致命一擊，會獲得熾熱連擊；未造成致命一擊則移除熱力迸發',

@@ -14,6 +14,93 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': 'すべて',
+  'hudChrome.warlock.doomLabel': '断罪',
+  'hudChrome.warlock.fateThreadsLabel': '運命の糸',
+  'hudChrome.warlock.doomEmptyStatus': '断罪 {value}/{max}。',
+  'hudChrome.warlock.doomStatus': '断罪 {value}/{max}、残り {remaining}。',
+  'hudChrome.procOverlay.soulFragmentsMeter': '魂の欠片',
+  'guide.abilityHook.evil_eye': '敵を一体指定し、その行動と苦痛から断罪を蓄積します。',
+  'entities.abilities.evil_eye.description':
+    '敵一体を呪いの焦点として指定します。邪眼を移しても断罪は維持されますが、20秒の有効時間は更新されません。',
+  'entities.abilities.maledict_gaze.name': '呪眼の凝視',
+  'entities.abilities.maledict_gaze.description':
+    '呪眼が選択中の主要な邪眼対象を2.5秒ごとに攻撃し、影ダメージを与えます。邪眼憑依中は攻撃速度が2倍になります。',
+  'entities.abilities.needle_of_fate.name': '運命の針',
+  'entities.abilities.needle_of_fate.description':
+    '敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を5生成し、邪眼がなければ先に対象を指定します。',
+  'entities.abilities.sentence.name': '宣告',
+  'entities.abilities.sentence.description':
+    '断罪をすべて消費して敵に宣告を下します。ダメージと追加効果は断罪20、50、80、100で強化されます。',
+  'entities.abilities.cursed_accomplice.name': '呪われた共犯者',
+  'entities.abilities.cursed_accomplice.description':
+    '味方プレイヤーを選択していない場合は呪眼と結び、その凝視で断罪を2生成します。味方と結ぶと、その味方が邪眼対象へ与えるダメージで3生成します。発動は2秒に1回までです。',
+  'entities.abilities.litany_of_guilt.name': '罪責の連祷',
+  'entities.abilities.litany_of_guilt.description':
+    '主要な邪眼を8秒間呪います。断罪を獲得するたびに波動を放ち、8ヤード以内にいる他の敵最大4体にダメージを与えます。発動は1秒に1回までです。',
+  'entities.abilities.umbral_anchor.name': '影の錨',
+  'entities.abilities.umbral_anchor.description':
+    '初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。',
+  'entities.abilities.hex_of_violence.name': '暴虐の呪い',
+  'entities.abilities.hex_of_violence.description':
+    '敵を8秒間呪います。次の3回の攻撃行動ごとに断罪を7生成し、22の影ダメージで反撃します。',
+  'entities.abilities.cruel_pact.name': '残酷な契約',
+  'entities.abilities.cruel_pact.description':
+    '最大体力の12%を捧げて断罪を20生成します。体力が15%以下では使用できません。',
+  'entities.abilities.vicarious_suffering.name': '苦痛の肩代わり',
+  'entities.abilities.vicarious_suffering.description':
+    '8秒間苦痛を結び、敵の攻撃から最大15の断罪を生成します。自分に使うと受けるダメージが20%減少します。味方に使うと、そのダメージの最大20%を自分へ移しますが、体力が15%未満になることはありません。',
+  'entities.abilities.possess_evil_eye.name': '邪眼憑依',
+  'entities.abilities.possess_evil_eye.description':
+    '呪術師が主要な邪眼へ15秒間憑依し、断罪を35生成します。運命の針は詠唱1秒になり断罪をさらに2生成し、吸命は移動中も維持でき、宣告は25%多くダメージを与えて遅れて60%の追加ダメージを放ちます。',
+  'entities.abilities.hour_of_judgment.name': '審判の刻',
+  'entities.abilities.hour_of_judgment.description':
+    '主要な邪眼へ15秒間の審判を下し、断罪を40と運命の糸を3獲得して憑依を発動し、主要な邪眼を通じて生成する断罪を2倍にして、宣告のダメージを20%増加させます。最初の宣告は断罪を50返還します。',
+  'entities.abilities.coven.name': '魔女盟約',
+  'entities.abilities.coven.description':
+    '周囲の敵最大4体に15秒間持続する副次的な邪眼を作ります。断罪の共有量へ50%の効率で加算し、宣告の35%分の反響ダメージを受けます。',
+  'entities.mobs.necromancy_gravewing.name': '墓翼',
+  'entities.abilities.soul_harvest.name': '霊魂刈り',
+  'entities.abilities.soul_harvest.description':
+    '敵の魂を切り裂いて{damage}のシャドウダメージを与え、魂の欠片を1個生成する。最大5個。',
+  'entities.abilities.raise_graveguard.name': '墓守の召喚',
+  'entities.abilities.raise_graveguard.description':
+    '永続する防御型の相棒を呼び起こす。墓守は自動で挑発し、墓所の支配であなたへのダメージの20%を肩代わりする。リーピング・コマンドでは挑発し、4秒間受けるダメージが30%減少する。',
+  'entities.abilities.raise_skeletal_warrior.name': '骸骨戦士の召喚',
+  'entities.abilities.raise_skeletal_warrior.description':
+    '魂の欠片を1個消費し、永続する骸骨戦士を2枠のドミニオンに加える。同時に従えるのは1体まで。6秒ごとに周囲へ45%の薙ぎ払いダメージを与え、リーピング・コマンドでは対象を4秒間40%減速させる。',
+  'entities.abilities.raise_bone_mage.name': '骨魔導士の召喚',
+  'entities.abilities.raise_bone_mage.description':
+    '魂の欠片を2個消費し、永続する遠隔型の骨魔導士を2枠のドミニオンに加える。同時に従えるのは1体まで。攻撃は6秒間受ける魔法ダメージを5%増加させ、リーピング・コマンドでは8%に強化する。',
+  'entities.abilities.bone_armor.name': '骨の鎧',
+  'entities.abilities.bone_armor.description':
+    '骨で身を包み、最大体力の20%に相当するダメージを吸収する。',
+  'entities.abilities.corpse_explosion.name': '骸の爆裂',
+  'entities.abilities.corpse_explosion.description':
+    '魂の欠片を2個消費し、指定地点で死の力を炸裂させ、周囲の敵に{damage}のシャドウダメージを与える。',
+  'entities.abilities.funeral_harvest.name': '葬送の収穫',
+  'entities.abilities.funeral_harvest.description':
+    '自分または自分のアンデッドが最近ダメージを与えた敵が死亡すると、魂の欠片を1個獲得します。発動は3秒に1回までです。',
+  'entities.abilities.unholy_command.name': '不浄の号令',
+  'entities.abilities.unholy_command.description':
+    'すべてのアンデッドに号令を下し、12秒間、与えるダメージを25%、行動速度を20%上昇させる。',
+  'entities.abilities.reaping_command.name': '刈り取りの号令',
+  'entities.abilities.reaping_command.description':
+    '魂の欠片を2個消費し、すべてのアンデッドの従者に一斉攻撃させる。墓守は挑発して身を固め、骸骨戦士は足止めし、骨魔導士は魔法防御を暴き、墓翼は命中した全敵を引き裂く。',
+  'entities.abilities.sacrifice_undead.name': '亡者の生贄',
+  'entities.abilities.sacrifice_undead.description':
+    'ドミニオンの従者を1体破壊し、最大体力の25%を回復する。',
+  'entities.abilities.army_of_the_dead.name': '亡者の軍勢',
+  'entities.abilities.raise_gravewing.name': '墓翼の召喚',
+  'entities.abilities.raise_gravewing.description':
+    '魂の欠片を2個消費し、永続する墓翼を2枠のドミニオンに加える。同時に従えるのは1体まで。5秒ごとに周囲へ65%の薙ぎ払いダメージを与え、リーピング・コマンドでは命中した全敵の受けるダメージを5秒間8%増加させる。',
+  'entities.abilities.cinderhide.name': '燼皮',
+  'entities.abilities.cinderhide.description':
+    '皮膚を冷えた鉱滓のように10秒間硬化させ、受けるすべてのダメージを25%減少させる。',
+  'entities.abilities.army_of_the_dead.description':
+    '墓所の門を20秒間開き、まだ従えていない全ドミニオン系統を一時的に呼び起こす。選んだ従者は門が閉じた後も残る。',
+  'entities.mobs.graveguard.name': '墓守',
+  'entities.mobs.necromancy_skeletal_warrior.name': '骸骨戦士',
+  'entities.mobs.necromancy_bone_mage.name': '骨魔導士',
   'hudChrome.crafting.identity.ceilingRare': 'レア上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -2948,7 +3035,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ウォーロックの命令に従うウォーフィーンドを召喚します。ウォーフィーンドは戦場に踏み込んで持ちこたえる頑丈な近接悪魔です。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。',
   'entities.abilities.summon_infernal.name': 'パイアコロッサスの召喚',
   'entities.abilities.summon_infernal.description':
-    'パイアコロッサスを意のままに束縛します。圧倒的な近接攻撃と、あらゆる悪魔の中で最も深い生命力と防御力を備えた巨大な破壊兵器です。長い再使用時間がその純然たる力を制限します。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。',
+    '対象地点にパイアコロッサスを呼び下ろし、着地時に58-72の火炎ダメージを与えます。現在の悪魔と入れ替わらず30秒間戦い、2秒ごとに周囲の敵を焼き、1秒ごとに破滅を1生成します。',
   'entities.abilities.summon_doomguard.name': 'レイスボーンの召喚',
   'entities.abilities.summon_doomguard.description':
     'レイスボーンを意のままに束縛します。遠方から強力なシャドウダメージを降らせるエリート悪魔です。長い再使用時間がその破壊的な力を制限します。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。',
@@ -7145,6 +7232,95 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.haste': '攻撃速度と詠唱速度を{pct}%上昇させる',
   'hudChrome.auraEffect.dmgDone': '与えるダメージを{pct}%上昇させる',
   'hudChrome.auraEffect.dmgDoneReduce': '与えるダメージを{pct}%低下させる',
+  'hudChrome.auraEffect.stasis': '無敵になるが行動できない',
+  'hudChrome.auraEffect.petDamage': 'ペットのダメージが{pct}%増加する',
+  'hudChrome.auraEffect.petHaste': 'ペットの行動速度が{pct}%上昇する',
+  'hudChrome.auraEffect.spellDamage': '呪文ダメージが{pct}%増加する',
+  'hudChrome.auraEffect.spellHaste': '呪文の詠唱速度が{pct}%上昇する',
+  'hudChrome.auraEffect.sated': '別のグループ加速効果を受けられない',
+  'hudChrome.auraEffect.cauterizeFatigue': 'コーテライズは次の致死ダメージを防げない',
+  'hudChrome.auraEffect.castShield': 'ダメージで詠唱が中断または遅延しない',
+  'hudChrome.auraEffect.cooldownCap': 'この時間枠でクールダウン短縮を{used}/{cap}秒使用済み',
+  'hudChrome.auraEffect.funeralHarvestLock':
+    'フューネラル・ハーベストはまだ次の魂の欠片を生成できない',
+  'hudChrome.auraEffect.leadenHexLock': 'レドン・ヘックスはまだこの対象を再び移動不能にできない',
+  'hudChrome.auraEffect.forbiddenReflectionReady':
+    '次の対象となるウォーロック共通クールダウンを再使用できる',
+  'hudChrome.auraEffect.forbiddenReflectionLock':
+    'フォービドゥン・リフレクションはまだ再準備できない',
+  'hudChrome.auraEffect.internalCooldown': 'タイマー終了までこの効果は再発動しない',
+  'hudChrome.auraEffect.enrage':
+    '与えるダメージが{damagePct}%、攻撃速度が{hastePct}%、移動速度が{movePct}%上昇する',
+  'hudChrome.auraEffect.suddenDeath': '次のエグゼキュートは怒気を消費せず、体力条件を無視する',
+  'hudChrome.auraEffect.aoeEcho':
+    '残り{charges}回：単体アビリティが近くの最大{targets}体にも{pct}%のダメージを与える',
+  'hudChrome.auraEffect.sureCrit': '次のダメージアビリティ{charges}回が必ずクリティカルになる',
+  'hudChrome.auraEffect.temporalEcho':
+    '術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる',
+  'hudChrome.auraEffect.arcaneCharge':
+    '秘術チャージ{stacks}：エーテル・サージのダメージが{damagePct}%増加、詠唱が{castPct}%短縮、マナ消費が{costMult}倍になる',
+  'hudChrome.auraEffect.physicalReduction': '受ける物理ダメージが{pct}%減少する',
+  'hudChrome.auraEffect.freeExecute': '次の対象となる処刑アビリティはコストを消費しない',
+  'hudChrome.auraEffect.resourceSap': '{interval}秒ごとに現在のリソースを{value}回復する',
+  'hudChrome.auraEffect.nextAttackCrit': '次の攻撃が必ずクリティカルになる',
+  'hudChrome.auraEffect.healEcho': '体力が{threshold}%未満になると体力を{value}回復する',
+  'hudChrome.auraEffect.bleedVuln': '受ける出血ダメージが{pct}%増加する',
+  'hudChrome.auraEffect.sourceVuln': 'この効果を付与した術者から受けるダメージが{pct}%増加する',
+  'hudChrome.auraEffect.formMoonkin':
+    'ムーンウィング形態：呪文ダメージが{pct}%、アーマーが{armorPct}%増加する',
+  'hudChrome.auraEffect.formShadow': 'グロームヴェイル形態：影ダメージが{pct}%増加する',
+  'hudChrome.auraEffect.formLich':
+    'ソウル・ランスが近くの最大{targets}体にも{pct}%のダメージを与える',
+  'hudChrome.auraEffect.afflictionEye':
+    'マレディクト・ゲイズが{interval}秒ごとに攻撃し、この邪眼での効果は断罪を{pct}%生成する',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    'この邪眼での効果は断罪を{doomPct}%生成し、センテンスがここへ{echoPct}%のダメージで反響する',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    '対象となるダメージが断罪を{value}生成する。{interval}秒に1回まで',
+  'hudChrome.auraEffect.afflictionViolence':
+    '報復は残り{charges}回。敵の攻撃で断罪を{doom}生成し、{damage}の影ダメージを返す',
+  'hudChrome.auraEffect.afflictionVicarious':
+    '受けるダメージの{pct}%を転送または軽減し、断罪を最大{max}生成する',
+  'hudChrome.auraEffect.afflictionPossession':
+    'ニードル・オブ・フェイト、ドレイン・ライフ、マレディクト・ゲイズ、センテンスを強化する',
+  'hudChrome.auraEffect.afflictionJudgment':
+    '主邪眼の断罪生成が{eyePct}%増加し、センテンスのダメージが{sentencePct}%増加、最初の1回は断罪を{refund}返還する',
+  'hudChrome.auraEffect.afflictionLitany':
+    '断罪獲得時、{radius}ヤード内の最大{targets}体に{damage}の影ダメージを与える。1秒に1回まで',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '運命の糸{stacks}：センテンスのダメージが{sentencePct}%増加、またはドレイン・ライフの各ティックが断罪を{doom}追加生成する',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    'ドレイン・ライフが運命の糸{stacks}を消費し、各ティックで断罪を{doom}追加生成する',
+  'hudChrome.auraEffect.necromancyHarvestMark':
+    '死亡時に魂の欠片を1個生成し、コープス・エクスプロージョン用のデス・エコーを残すことがある',
+  'hudChrome.auraEffect.necromancyOssuaryMark':
+    'あなたとアンデッドのダメージの{storedPct}%、ソウル・ランスはさらに{lancePct}%を蓄積する。再使用で爆発。死亡時は{radius}ヤード内で爆発し魂の欠片を1個生成する',
+  'hudChrome.auraEffect.necromancyDeathEcho':
+    'コープス・エクスプロージョンは照準地点から{radius}ヤード以内のこの残響を消費できる',
+  'hudChrome.auraEffect.warlockAnchor':
+    '{range}ヤード以内で再使用するとここへ戻り、アンカーを消費する',
+  'hudChrome.auraEffect.formMetamorph':
+    '悪魔形態：体格が{pct}%大きくなる。ほかのボーナスは別のバフで表示される',
+  'hudChrome.auraEffect.energyRegen': 'エネルギー回復速度が{pct}%上昇する',
+  'hudChrome.auraEffect.overpowerCharge':
+    'チャージ{stacks}：次のメイミング・ストライクのダメージが{pct}%増加する',
+  'hudChrome.auraEffect.sweepingStrikes':
+    '単体攻撃が近くの敵{targets}体にも{pct}%のダメージを与える',
+  'hudChrome.auraEffect.fingersOfFrost':
+    '残り{charges}チャージ：アイス・ランスは対象を凍結扱いにし、凍結時ダメージ{pct}%を与える',
+  'hudChrome.auraEffect.brainFreeze': '次のフラーリィが即時発動し、クールダウンを無視する',
+  'hudChrome.auraEffect.wintersChill':
+    '残り{charges}チャージ：対象となる呪文はこの敵を凍結扱いにする',
+  'hudChrome.auraEffect.icicles':
+    'アイシクル{value}/{max}。{max}でグレイシャル・スパイクを使用できる',
+  'hudChrome.auraEffect.desolation':
+    '残り{charges}チャージ：次のカオス・ボルトの詠唱が{castPct}%短縮、または次のレイン・オブ・ファイアが即着弾する',
+  'hudChrome.auraEffect.ruinousBrand':
+    '残り{charges}回：直接呪文がここへ{otherPct}%のダメージを複製し、ここが主対象なら{selfPct}%を複製する',
+  'hudChrome.auraEffect.duskfireClaim': '対象の死亡時にルインを{value}得る',
+  'hudChrome.auraEffect.pyreGuardian':
+    '{ruinInterval}秒ごとにルインを{ruin}生成し、{damageInterval}秒ごとに{radius}ヤード内へ{damage}の火ダメージを与える',
+  'hudChrome.auraEffect.perfectMoment': 'エーテル・ダーツが秘術チャージを消費しない',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     '次に異なる属性の呪文を唱えると、エレメンタル・コンバージェンスが発動します',
   'hudChrome.auraEffect.heatingUp':
