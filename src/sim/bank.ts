@@ -105,10 +105,20 @@ export function moveBetweenContainers(
   // be split from its units), merging into a byte-equal dest stack when one has
   // room and taking a fresh (deep-cloned) dest slot otherwise.
   if (slot.instance) {
-    if (countFit(dest, destCapacity, slot.itemId, slot.count, slot.instance) < slot.count) {
+    // craftedRecipeId rides the move exactly as on the fungible arm below:
+    // the round 5 finder caught this arm dropping the slot-level crafted
+    // marker on deposit, which for commissioned sub-rare equipment (whose
+    // crafted provenance lives ONLY at slot level) silently laundered the
+    // provenance through the bank. addStacked's merge predicate already
+    // compares the marker, so a marker-bearing slot never merges into an
+    // unmarked stack.
+    if (
+      countFit(dest, destCapacity, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId) <
+      slot.count
+    ) {
       return { moved: 0, refusal: 'no_fit' };
     }
-    addStacked(dest, slot.itemId, slot.count, slot.instance);
+    addStacked(dest, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId);
     source.splice(sourceIndex, 1);
     return { moved: slot.count };
   }

@@ -1628,3 +1628,42 @@ describe('server-stamped bank bonus', () => {
     expect(m.bankBonusSources).toEqual(SOURCES);
   });
 });
+
+describe('the instanced move keeps the slot-level crafted marker (round 5)', () => {
+  it('an instanced marker-bearing slot round-trips the bank with craftedRecipeId intact', () => {
+    // The instanced arm used to call addStacked without slot.craftedRecipeId,
+    // so a deposit stripped the crafted-provenance marker from exactly the
+    // shape that carries it ONLY at slot level (commissioned sub-rare
+    // equipment: instance holds bind data, the marker rides the slot).
+    const source: import('../src/sim/types').InvSlot[] = [
+      {
+        itemId: 'prowlhide_jerkin',
+        count: 1,
+        instance: { boundTo: 41 },
+        craftedRecipeId: 'recipe_prowlhide_jerkin',
+      },
+    ];
+    const dest: import('../src/sim/types').InvSlot[] = [];
+    const r = moveBetweenContainers(source, 0, undefined, dest, 24);
+    expect(r.moved).toBe(1);
+    expect(dest[0]).toEqual({
+      itemId: 'prowlhide_jerkin',
+      count: 1,
+      instance: { boundTo: 41 },
+      craftedRecipeId: 'recipe_prowlhide_jerkin',
+    });
+    // And back out, still intact.
+    const home: import('../src/sim/types').InvSlot[] = [];
+    const r2 = moveBetweenContainers(dest, 0, undefined, home, 24);
+    expect(r2.moved).toBe(1);
+    expect(home[0]?.craftedRecipeId).toBe('recipe_prowlhide_jerkin');
+    // The merge predicate still separates marked from unmarked: an unmarked
+    // byte-equal instanced stack does not absorb the marked one.
+    const mixed: import('../src/sim/types').InvSlot[] = [
+      { itemId: 'prowlhide_jerkin', count: 1, instance: { boundTo: 41 } },
+    ];
+    const r3 = moveBetweenContainers(home, 0, undefined, mixed, 24);
+    expect(r3.moved).toBe(1);
+    expect(mixed).toHaveLength(2);
+  });
+});
