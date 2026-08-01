@@ -16,30 +16,56 @@ is therefore a first-class deliverable, not a side effect.
 This is Phase 5 of the Discord Bot Stability packet: Outbox + linked-member change feed.
 Model: Opus 4.8 or newer, xhigh effort. Harness: Claude Code.
 Worktree: /home/fernandoramirez/Documents/world-of-claudecraft (branch feature/discord-bot-stability).
-ULTRACODE: not required, but the feed-site enumeration in STEP 1 must be EXHAUSTIVE; give the
-Explore agent "very thorough" breadth and treat its output as a deliverable, not a hint.
+ULTRACODE: not required for the build, but the feed-site enumeration in STEP 1 must be
+EXHAUSTIVE. Run it as a WORKFLOW fan-out, not as background Agent-tool agents: settled across
+Phases 3 and 4, Agent-tool background agents on this repo idle without reporting, while Workflow
+agents deliver (Phase 4 QA: 37 of 37 across three fan-outs, zero deaths). Give EVERY agent a hard
+30-tool-call budget plus a report-first line ("at call 25, STOP and write your report with
+whatever you have"), or it dies at the turn limit with nothing recoverable.
 
 Goal: one server-side outbox that the bot can drain in a single request, fed by a bounded
 linked-member change feed wired at EVERY site where the server already learns a linked
 account's flex-relevant state changed.
 
-STEP 0 - PRE-FLIGHT: run `git status` in the worktree and confirm it is clean; ASK before
-touching anything if it is dirty (this checkout may be shared, and commits use EXPLICIT paths,
-never `git add -A`). Memory scan of MEMORY.md for: server hot-path and cached-read traps, pg
-traps, HTTP pipeline traps, and the daily-rewards module memo traps.
+STEP 0 - PRE-FLIGHT.
+  - SYNC THE RELEASE BASE FIRST (standing rule 1). `git fetch origin release/v0.33.0`, then
+    `git rev-list --left-right --count HEAD...origin/release/v0.33.0` against the FRESHLY fetched
+    tip. Phase 4 QA left it 76 ahead / 0 behind. MEASURE rather than trust that: the Phase 4
+    BUILD recorded 70/0 and was 4 commits behind by the time QA checked, hours later. If it
+    moved, merge BEFORE any work, run the `release-merge-audit` skill, and record the sync in
+    progress.md either way, including "no-op, already current".
+  - `git status` must be clean; ASK before touching anything if it is dirty. Another session
+    shares this checkout and foreign worktrees are registered under `.worktrees/` and
+    `.claude/worktrees/`. LEAVE THEM ALONE. Commits use EXPLICIT paths, never `git add -A`.
+  - `node -v` should be v26.5.0.
+  - Memory scan of MEMORY.md for: server hot-path and cached-read traps, pg traps, HTTP pipeline
+    traps, the daily-rewards module memo traps, and these, which Phase 4 QA proved out live:
+    novel-sql-needs-an-executed-test, no-docker-userspace-postgres (the exact working recipe),
+    vacuous-bound-pin-trap, early-exit-pins-need-work-remaining, regex-source-pins-are-weaker-
+    than-they-read, mutation-checks-commit-first, inverse-edit-restore-needs-unique-anchor,
+    worktree-cwd-drift-misroutes-git, fanout-agent-delivery-traps, big-diff-reviewer-turn-budgets.
+    Confirm a memory file exists before citing it; there is no "test-pin trap index" and never
+    was. The equivalent list is "Known gotchas for implementers" at the bottom of state.md,
+    which Phase 4 QA extended by four entries that bear directly on this phase.
 
 STEP 1 - LOAD CONTEXT (do NOT read the planning docs directly): spawn an Explore agent, breadth
 "very thorough", over docs/discord-bot-stability/state.md, docs/discord-bot-stability/
 progress.md, docs/discord-bot-stability/phase-05-outbox-change-feed.md, and these files:
-  - server/internal.ts (the RouteDef table around :329-549, especially the relay, activity, and
-    daily-rewards-winners handlers and their enrichment loops; the FROZEN legacy ladder
-    :75-241; the Phase 4 flex-batch route as the template for a new RouteDef)
+  - server/internal.ts (the `routes` RouteDef table, especially the relay, activity, and
+    daily-rewards-winners handlers and their enrichment loops; the FROZEN legacy ladder under
+    `handleDiscordInternal`; the Phase 4 `flexBatchHandler` route as the template for a new
+    RouteDef, and `applyMemberMetaPush` as the template for sharing one body across both arms).
+    Cite SYMBOLS, never line numbers: Phase 4 moved every anchor in this file (the routes table
+    slid from :329 to :451) while the stale span still read as correct, which is why the
+    coordinates that used to be printed here are gone
   - server/discord_relay.ts and server/discord_activity.ts (the bounded-FIFO pattern the new
     module copies: cap constant, drain splice, depth accessor, injected `now` dedupe)
-  - server/discord_db.ts (discordForAccount :122, accountForDiscord :134, linkDiscordToAccount
-    :146, unlinkDiscord :190, grantRewardPoints :382, setDiscordGuildMember :210)
-  - server/discord.ts (discordFlexForAccount around :950, the link and unlink call sites, the
-    status tier helper) and server/db.ts (highestCharacterForAccount around :2669)
+  - server/discord_db.ts (discordForAccount, accountForDiscord, linkDiscordToAccount,
+    unlinkDiscord, grantRewardPoints, setDiscordGuildMember, and the two Phase 4 set-based
+    statements discordFlexRowsForDiscordIds and setDiscordMemberMetaBulk)
+  - server/discord.ts (discordFlexForAccount and its batched sibling discordFlexForAccounts, the
+    link and unlink call sites, the status tier helper) and server/db.ts
+    (highestCharacterForAccount, whose ORDER BY the Phase 4 LATERAL restates in lockstep)
   - server/daily_rewards.ts (discordWinnerAnnouncements and markDiscordWinnersAnnounced, and
     whatever caching or memoization already sits under them)
   - server/http/registry.ts, server/http/middleware/require_internal_secret.ts
@@ -98,6 +124,38 @@ STEP 2 - EXECUTE: three agents, run in the order below.
     day-finalization bust site cannot be located, surface that rather than shipping a cache
     that can serve a stale winner day.
 Give each agent the Explore summary, not the raw planning docs.
+
+WHAT PHASE 4 HANDED YOU, so you build against the real surface rather than the plan's memory:
+  - `POST /internal/discord/flex-batch` already exists and is the TEMPLATE for the outbox route:
+    RouteDef-only behind `discordGate`, no legacy arm, `surface_inventory.ts` row hand-added and
+    anchored on the exported `flexBatchHandler` symbol, internal ladder counts bumped to 20.
+    Copy that shape exactly; do not invent a second one.
+  - members-meta already answers `{ updated, changed, skipped, unapplied }`. `updated` counts
+    records ACCEPTED, not rows written, by maintainer ruling (L14, CLOSED). Do not narrow it.
+  - `requested` on flex-batch is a POST-de-duplication count. If this phase adds any similar
+    echo, say in its doc comment what it counts, and pin it with a test; Phase 4 QA had to add
+    both after the fact.
+  - Two set-based statements now exist to copy from: `discordFlexRowsForDiscordIds` (the ANY()
+    plus LATERAL read) and `setDiscordMemberMetaBulk` (the data-modifying CTE). The outbox's
+    "one IN query across all four streams" is the same shape as the first.
+
+TEST-PIN RULES this phase inherits, every one paid for by a real defect in Phase 4 QA:
+  - Run the mutation pass TWICE, once with `TEST_DATABASE_URL` and once WITHOUT. CI never sets
+    it, so a mutant that dies only in an `*_integration.test.ts` is an unguarded regression in
+    the pipeline. Phase 4's headline finding was exactly this, and it was invisible to reading.
+  - A `toContain` over SQL must anchor its CLAUSE and pin the OCCURRENCE COUNT. A statement can
+    spell the same predicate twice in places that decide different numbers, and a bare fragment
+    scan is satisfied by either.
+  - A source-file `toContain` must slice to the function body first. A comment restating the
+    clause satisfies a whole-file search, and this packet writes exactly such comments.
+  - Do not assert "no Seq Scan" on a small fixture: over a few hundred freshly-ANALYZEd rows a
+    seq scan IS the correct plan, so the assertion reds on correctness. Pin plans by PROPERTY
+    (loop counts, index name present) and seed AT the D18 envelope, 5,000 members, so the
+    planner sees production-sized statistics.
+  - If this phase adds SQL beyond the module's existing vocabulary, it needs a DB-gated
+    `*_integration.test.ts` that EXECUTES it. Stand up the throwaway Postgres with the
+    no-docker-userspace-postgres recipe (about 3 minutes, no Docker, no sudo) and tear it down
+    after. If you skip it, say so rather than implying coverage.
 
 INVARIANTS IN PLAY:
   - D1 (transport): ONE consolidated outbox poll draining relay, activity, winners, and linked
@@ -186,6 +244,19 @@ STEP 7 - FINAL RESPONSE: phase status, files touched (absolute paths), the feed-
 enumeration count and any transition deliberately not wired with its reason, validation results
 command by command, reviewer verdicts, deferrals, and a one-line handoff for the Phase 5 QA
 session.
+
+KNOWN GATE FAILURE, exactly ONE, do not chase it and do not report it as a regression:
+`tests/malware_scan.test.ts` and the gate's malware step fail whenever a sibling session has a
+worktree parked under `.worktrees/` or `.claude/worktrees/`, because the scanner walks the whole
+tree. Diagnose by running the scanner from INSIDE a clean detached worktree of HEAD created
+OUTSIDE the repo root, and remove your OWN worktree before gating. The gate aborts there BEFORE
+tsc and the builds, so run those by hand.
+
+OWED TO THE MAINTAINER, do not work around it: the three Phase 3 D13 cadence keys
+(`DISCORD_ROLE_SYNC_INTERVAL_MS`=300000, `DISCORD_PRESENCE_DEBOUNCE_MS`=4000,
+`DISCORD_RELAY_POLL_MS`=3000) are still absent from `.env.example`. Every `.env*` path is denied
+at the HARNESS level for both Read and Bash, so no session can add them. Phase 4 added no env
+key. If Phase 5 adds one, it inherits the same block: do the rest and re-surface the request.
 
 STOPPING RULES:
   - STOP AND SURFACE if a flex-relevant state transition has NO locatable server-side change

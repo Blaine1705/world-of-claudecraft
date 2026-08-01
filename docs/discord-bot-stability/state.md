@@ -942,3 +942,45 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   A total guard needs all three parts (type check, cast through `numeric`, bounds test). In a
   batched read this matters far more than in a per-row one: one malformed row denies the read
   for every OTHER member in the batch, where the per-account TypeScript path shrugged.
+- **A text pin over SQL must name its CLAUSE, because a statement can carry the same
+  fragment twice.** `setDiscordMemberMetaBulk` spells the row comparison in two places
+  that decide different numbers: the `matched` CTE decides `skipped`, the UPDATE's WHERE
+  decides `changed` and is the only thing that stops the write. A bare
+  `expect(sql).toContain('IS DISTINCT FROM')` is satisfied by EITHER, so deleting the
+  UPDATE's copy (every row rewrites every sweep) or inverting it to `IS NOT DISTINCT FROM`
+  (only unchanged rows write) both survived the whole DB-free suite. Proved by mutation in
+  Phase 4 QA, not argued. Pin the contiguous normalized clause including its neighbours
+  (`makePool` collapses whitespace, so the anchor survives reformatting), and pin the
+  OCCURRENCE COUNT as well, since the entire argument for anchoring is that the count
+  matters. The same trap has a source-file form: the Phase 4 lockstep pin searched all of
+  `server/db.ts` for the shared ORDER BY, and this phase's own LOCKSTEP COMMENT restates
+  that clause, so deleting `, id ASC` from the live query while the comment stood would
+  have passed. Slice to the function body first.
+- **A DB-gated suite is not coverage for CI, and reasoning about the gap is not enough.**
+  `tests/*_integration.test.ts` skips green without `TEST_DATABASE_URL` and CI never sets
+  it, so anything only the executed arm can catch is unguarded in the pipeline. The way to
+  find out which guarantees those are is mechanical: run the mutation pass TWICE, once with
+  the database and once without, and treat every mutant that survives the DB-free run as a
+  missing structural pin. Phase 4 QA did this and found two, both on the phase's headline
+  behavior. Doing it costs one extra run; not doing it is how an executed guarantee gets
+  believed to be a structural one.
+- **A no-op-write test cannot be proved by the counter derived from the write.** In
+  `setDiscordMemberMetaBulk`, `changed` IS `count(*)` over the UPDATE's `RETURNING`, so it
+  can never disagree with what the statement wrote and it reds FIRST on any mutation of
+  that statement. An xmin comparison sitting after it is therefore defense in depth against
+  a rewrite arriving from OUTSIDE the statement (a trigger, a second statement added later),
+  never the proof, and a test comment that calls it "the decisive evidence" is telling a
+  future reader they may delete the line that actually discriminates. Sample xmin ACROSS the
+  write all the same (two consecutive reads afterwards compare a value with itself), and add
+  a positive-direction case so the signal is known to move at all.
+- **`pg_stat_xact_user_tables` is not what its name implies, and four agents got this
+  wrong.** The reading is not "only the current transaction, so a standalone SELECT always
+  sees zero". Probed directly against Postgres 16.2 in Phase 4 QA: the view emits one row
+  per user table (so a `?? 0` fallback never fires) and `n_tup_upd` really does move 0 to 1
+  across two separate autocommit `pool.query` calls with an UPDATE between them, because a
+  backend accumulates pending per-relation stats locally and flushes them at most once a
+  second. It is still the wrong pin, but for a different reason: it depends on node-postgres
+  handing back the same idle backend and on the flush window not turning over, so it can
+  both miss a real write and red without one. Use xmin. The wider rule is the one that cost
+  the time here: on a question about what a database actually does, one probe outranks any
+  number of agents agreeing from the documentation.

@@ -11,7 +11,7 @@
 | Phase 3: Loop scheduler + diff-before-write | built | 2026-07-31 | 2026-07-31 |
 | Phase 3 QA | done | 2026-07-31 | 2026-07-31 |
 | Phase 4: Server set-based endpoints | built | 2026-07-31 | 2026-07-31 |
-| Phase 4 QA | not started | | |
+| Phase 4 QA | done | 2026-07-31 | 2026-07-31 |
 | Phase 5: Outbox + linked-member change feed | not started | | |
 | Phase 5 QA | not started | | |
 | Phase 6: Bot consumes the new surface | not started | | |
@@ -54,6 +54,9 @@
 - [x] Tests for `server/discord_relay.ts` and `server/discord_activity.ts`
 - [x] L14 closed on the server side (added, not in the original checklist): members-meta
       reports `changed` / `skipped` / `unapplied` instead of counting what it read
+- [x] Phase 4 QA: release base re-synced and audited, 31 findings adversarially verified,
+      14 survivors all applied, fix round reviewed by fresh eyes and re-fixed, mutation
+      tally 10/10 plus the CI-floor gap it exposed
 
 ### Phase 5
 - [ ] `server/discord_link_changes.ts` bounded FIFO + every feed site enumerated in state.md
@@ -791,3 +794,106 @@ the database reviewer. The two `discord_db` helpers carry no internal cap of the
 the handler's 1000, left alone deliberately because a silent slice inside a database helper
 would drop members without saying so. Discord ids are still length-sliced rather than
 shape-validated, which is unchanged behavior from members-meta and kept symmetric on purpose.
+
+### Phase 4 QA (2026-07-31)
+
+Release base FIRST (standing rule 1): `origin/release/v0.33.0` had moved again, 75 ahead and
+4 BEHIND, so it was merged before any QA work (`487aaa68b`, 62 files) and audited with the
+`release-merge-audit` skill. Clean by construction: the incoming delta is the buff/debuff target
+aura HUD feature (`src/ui/`, `src/game/`, `src/styles/`, the resolved i18n tables and their
+suites) and it intersects the 70 files this packet owns in exactly ZERO places. No route, no
+`server/` file, and no new `vi.mock('../server/db')` site in the delta, so steps 3 through 6 of
+the audit are N/A by construction rather than by inspection. Note for later phases: the Phase 4
+BUILD recorded this sync as a no-op at 70/0, and four commits landed between that check and
+this one, which is exactly why the rule says to measure against a freshly fetched tip every
+time rather than trust the previous phase's number.
+
+**Verdict: PASS-WITH-FOLLOWUPS.** The implementation is sound and needed no production change:
+every one of the three server files came out of this round comment-only. Both statements do
+what they claim, the call chains are genuinely one round trip with no per-id loop anywhere,
+unlinked ids are absent rather than stubbed, the flex-batch clamps really do match members-meta
+entry for entry, the LATERAL's ORDER BY is in lockstep with `highestCharacterForAccount`
+including the realm scoping, and D9, D10, D11, D12 and D18 all hold. What this round found was
+in the TESTS, and the headline finding is one that only an executed mutation pass could have
+surfaced.
+
+**The one that matters: the phase's biggest database win was unpinned on the arm CI runs.**
+`setDiscordMemberMetaBulk`'s no-op-write skip was guarded by `expect(sql).toContain('IS DISTINCT
+FROM')`. The statement carries that fragment TWICE, once in the `matched` CTE that decides
+`skipped` and once in the UPDATE's WHERE that decides `changed` and actually stops the write, so
+an unanchored scan is satisfied by either copy. Two mutations prove it: deleting the predicate
+from the UPDATE (every row rewrites on every sweep, the exact regression the phase exists to
+prevent) and inverting it to `IS NOT DISTINCT FROM` (only unchanged rows write) BOTH left the
+entire default suite green. They die only in `tests/discord_db_integration.test.ts`, which skips
+without `TEST_DATABASE_URL`, and CI never sets it. So the executed arm carried a guarantee the
+structural arm was believed to carry, and nothing said so. Both clauses are pinned as contiguous
+anchored text now, the occurrence count is pinned too, and both mutants die DB-free.
+
+**The findings.** Three parallel audit agents raised 31, each handed to an independent skeptic
+told to refute by default with the file open and the code quoted. 6 came back CONFIRMED, 9
+PARTIAL, 16 REFUTED; 14 had an actionable core and every one is applied. The skeptics earned
+their keep twice over. One refuted an empty-string-nickname bug by quoting
+`bot/member_writes.ts` `return nick || global || username || 'Member'`, which makes the input
+unreachable, and by showing the clamp and the comment are byte-identical to their pre-Phase-4
+form. Another refused a plan pin this round was about to add: asserting "no Seq Scan on
+`discord_links`" over a 200-row freshly-ANALYZEd table would have reddened on the CORRECT plan,
+so that test was retitled to what it proves instead of being given a false assertion.
+
+**The fix round was itself wrong twice, and both times something else caught it.** Its first
+comment claimed xmin was the decisive evidence for the no-op write; mutation isolation shows
+`changed` is, because `changed` IS `count(*)` over the UPDATE's `RETURNING` and reds first, so
+the xmin pair is defense in depth and now says so. Then the fresh-eyes review ran its own
+mutation battery and found a survivor this round had missed: with only the positive edge of
+`MAX_EPOCH_MS` pinned, deleting `Math.abs` left the suite green, and a finite `-8.64e15 - 1`
+would have thrown inside the up-front conversion and aborted all 1000 records. Both sides of
+zero are pinned now.
+
+**A claim this session got wrong, corrected in the record.** The `pg_stat_xact_user_tables`
+assertions were called constant-true by me and by all three fix-round reviewers, on the reading
+that the view reports only the current transaction. A direct probe against Postgres 16.2 says
+otherwise: the view emits one row per user table, and the counter moved 0 to 1 across two
+separate autocommit `pool.query` calls with an UPDATE between them, because a backend
+accumulates pending per-relation stats locally and flushes at most once a second. The assertion
+stays deleted, but for the true reason (it depends on node-postgres handing back the same idle
+backend and on the flush window, so it can both miss a write and red without one) rather than
+the false one. Four agents agreeing is not evidence; the probe is.
+
+**Mutation results.** 10 mutations planted against the real implementation, one at a time,
+restored by `git checkout` against a committed tree and verified byte-identical afterwards:
+10/10 killed with `TEST_DATABASE_URL` set, and 10/10 again on a full re-run against the final
+tree. The 6 DB-touching ones were then re-run WITHOUT the database, which is what CI does: 4
+killed, 2 survived, and those 2 are the headline finding above. After the fix, both die DB-free.
+The fix round's own new tests were mutation-checked too (5 planted: the epoch bound, the NaN
+arm, first-wins dedupe, the lockstep comment-restatement bypass, and an always-rewriting UPDATE
+used to isolate the xmin pin), plus the review's Math.abs survivor after it was closed. Items 7
+and 8 of the planned list needed a database and got one: a throwaway user-space Postgres 16.2
+stood up per the no-Docker recipe, used for every DB-arm run in this session, and torn down at
+the end. Nothing was skipped and nothing was reported as killed that was not run.
+
+**Deliberate residuals, each re-checked rather than re-reported.** No observability on the new
+statements (Phase 8 owns counters; verified `server/discord_db.ts` still emits none). The two
+`discord_db` helpers still carry no internal cap beyond the handler's 1000, because a silent
+slice inside a database helper would drop members without saying so. Discord ids are still
+length-sliced rather than shape-validated, symmetric with members-meta on purpose. The
+members-meta response can still carry roughly 23 KB of `unapplied` ids, bounded by the same cap,
+and the bot ignores the field until Phase 6.
+
+**Followups.** The `requested` echo is a post-de-duplication count, so Phase 6 must compare it
+against the number of DISTINCT in-cap ids it sent, not its raw array length; the bot holds those
+ids in a `Set` so this is a contract note rather than a live defect, and it is now written in
+state.md and pinned by a test. `FULL_RESYNC_INTERVAL_MS` still must not be removed until the bot
+consumes `unapplied`.
+
+**Still owed to the maintainer, unchanged and re-surfaced.** The three Phase 3 D13 cadence keys
+(`DISCORD_ROLE_SYNC_INTERVAL_MS` 300000, `DISCORD_PRESENCE_DEBOUNCE_MS` 4000,
+`DISCORD_RELAY_POLL_MS` 3000) are still absent from `.env.example`. Re-verified this session:
+every `.env*` path is denied at the HARNESS level for both Read and Bash, so no session in this
+environment can add them. Phase 4 added no env key of its own.
+
+**Validation.** `npx tsc --noEmit` clean; the state.md server row 173 passed; the four http spine
+suites 372 passed; the Phase 4 suites 35 passed with the database and 23 passed plus 12 skipped
+without it (the DB gate intact); `tests/duplicate_test_blocks.test.ts` and
+`tests/architecture.test.ts` green; `npm run build:server` exit 0; `npm run ci:changed` exit 0.
+Full `npm run gate` was NOT run, for the known reason: sibling sessions have worktrees parked
+under `.worktrees/` and `.claude/worktrees/`, the malware scanner walks the whole tree, and the
+gate aborts there BEFORE tsc and the builds. Those post-abort steps were run by hand above.
