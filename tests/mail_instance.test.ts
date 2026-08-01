@@ -394,9 +394,14 @@ describe('return flight and persistence', () => {
       nextMailId: 3,
     });
     expect(sim.rekeyMailOwner(9, 'Oldname', 'Newname')).toBe(true);
-    const own = bookOf(sim).find((m) => m.subject === 'own');
-    const foreign = bookOf(sim).find((m) => m.subject === 'foreign');
-    expect((own as unknown as { recipientKey: string }).recipientKey).toBe('9');
+    const letters = bookOf(sim) as unknown as {
+      subject: string;
+      recipientKey: string;
+      items: { instance?: unknown }[];
+    }[];
+    const own = letters.find((m) => m.subject === 'own');
+    const foreign = letters.find((m) => m.subject === 'foreign');
+    expect(own?.recipientKey).toBe('9');
     expect(own?.items[0]?.instance).toEqual({ signer: 'Newname' });
     expect(foreign?.items[0]?.instance, 'stranger parcel untouched').toEqual({
       signer: 'Oldname',
