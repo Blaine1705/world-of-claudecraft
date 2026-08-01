@@ -107,7 +107,6 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
-import { MAILBOXES } from './content/mailboxes';
 import { DEFAULT_MOUNT, type MountKey } from './content/mounts';
 import type { GatheringProfessionId } from './content/professions';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
@@ -171,7 +170,6 @@ import {
   isRiftPos,
   MOBS,
   migrateLegacyInstancePos,
-  NPCS,
   QUESTS,
   RIFT_SLOT_COUNT,
   riftInstanceOrigin,
@@ -3913,6 +3911,10 @@ export class Sim {
         prestigeRank: meta.prestigeRank,
         // the selected Book of Deeds title (a deed id), like the server fill
         title: meta.activeTitle,
+        // The guild tag beside the name, read off the passive display field the
+        // host stamps (setPlayerGuild). Omitted rather than empty, like the server
+        // fill; offline that is always the case, since guilds are server-only.
+        ...(e.guild ? { guild: e.guild } : {}),
       }));
     return Promise.resolve(paginateLeaderboard(rows, page, pageSize));
   }

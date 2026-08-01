@@ -2488,9 +2488,12 @@
   }
   /* Players (lifetime-XP) board: the base grid plus the trailing Book of
      Deeds title column (the Renown tab's .lb-deed-title treatment; the muted
-     cell ellipsizes, so a long title never widens the row). */
+     cell ellipsizes, so a long title never widens the row). The name cell now
+     also carries the `<Guild>` tag, so the two text columns SHARE the leftover
+     width (both minmax(0, ...) so either can ellipsize instead of widening the
+     row) with the name taking the larger part. */
   .lb-row-players {
-    grid-template-columns: 44px 1fr 44px 48px 96px 90px;
+    grid-template-columns: 44px minmax(0, 1.9fr) 44px 48px 96px minmax(0, 1fr);
   }
   .lb-row.lb-daily {
     grid-template-columns: 44px 1fr 96px;
@@ -2515,6 +2518,13 @@
     grid-template-columns: 44px 1fr 56px 110px;
   }
   .lb-realm {
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  /* The `<Guild>` tag beside a ranked player's name (player board + the sticky
+     standing row). Rides inside .lb-name like the Renown tab's realm tag, so the
+     shared row grid keeps its column set. */
+  .lb-guild {
     color: var(--color-text-muted);
     font-size: 11px;
   }
