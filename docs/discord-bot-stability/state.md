@@ -1,14 +1,14 @@
 # State: Discord Bot Stability (cross-phase cheat sheet)
 
-Current phase: Phase 5 QA COMPLETE (2026-08-01); Phase 6 is next. Phases 1 to 5 built and
-QA'd. The release base was re-synced at the start of Phase 5 QA (`origin/release/v0.33.0`
-at `462b1372a5`, 86 ahead 49 behind, merged clean as `ba694a51a`, audited with
-`release-merge-audit`: no discord surface touched, both sides of the three overlap files
-verified). NOTE FOR THE NEXT PHASE START: upstream has cut `release/v0.34.0` (equal to
-main's tip and containing all of v0.33.0); whether the packet retargets is the
-maintainer's call, surfaced in the Phase 5 QA final report rather than decided mid-packet.
-The header numbers here go stale fast: MEASURE the freshly fetched tip at every phase
-start per the standing rules, never trust this line.
+Current phase: Phase 6 IN PROGRESS (started 2026-08-01). Phases 1 to 5 built and QA'd.
+The packet's sync target is now `origin/release/v0.34.0` (the maintainer's retarget call,
+relayed in the Phase 6 handoff): at Phase 6 start it sat at `94f5ac63d`, equal to main's
+tip and a superset of v0.33.0, measured 90 ahead 2 behind and merged clean as `204e5a6cb`
+with a ZERO-FILE content delta (the branch already carried all of v0.33.0 at `462b1372a5`;
+the merge adopted only the two merge commits that landed v0.33.0 onto main), audited with
+`release-merge-audit`: every step N/A by construction, merged tree byte-identical to the
+QA-validated `8176b5a08`. The header numbers here go stale fast: MEASURE the freshly
+fetched tip at every phase start per the standing rules, never trust this line.
 
 ## Locked decisions
 
@@ -98,8 +98,9 @@ start per the standing rules, never trust this line.
 
 ## Every phase starts here (standing rules, set by the user 2026-07-30)
 
-1. **Sync the release base FIRST.** `git fetch origin release/v0.33.0`, then
-   `git rev-list --left-right --count HEAD...origin/release/v0.33.0`. If behind, merge
+1. **Sync the release base FIRST.** `git fetch origin release/v0.34.0` (the sync target
+   since Phase 6; earlier phases tracked v0.33.0), then
+   `git rev-list --left-right --count HEAD...origin/release/v0.34.0`. If behind, merge
    the release branch into `feature/discord-bot-stability` BEFORE doing the phase's
    work, so each phase eats one small conflict set instead of handing a huge one to a
    later phase. Compare against the FRESHLY fetched tip, not a stale tracking ref.

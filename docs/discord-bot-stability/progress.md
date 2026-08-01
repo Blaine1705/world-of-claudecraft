@@ -14,7 +14,7 @@
 | Phase 4 QA | done | 2026-07-31 | 2026-07-31 |
 | Phase 5: Outbox + linked-member change feed | built | 2026-08-01 | 2026-08-01 |
 | Phase 5 QA | done | 2026-08-01 | 2026-08-01 |
-| Phase 6: Bot consumes the new surface | not started | | |
+| Phase 6: Bot consumes the new surface | in progress | 2026-08-01 | |
 | Phase 6 QA | not started | | |
 | Phase 7: Supervision + deploy hardening | not started | | |
 | Phase 7 QA | not started | | |
@@ -962,6 +962,20 @@ uniformity at the save site. Final D18 payload at the real (page-limited) worst 
 pre-paging whole-cap figure was 979,051 bytes). The full ladder was re-run green after the
 fix round, and the DB-gated integration file was re-executed against a fresh throwaway
 user-space Postgres 16.2 (15/15 with the database, clean skips without).
+
+### Phase 6 (2026-08-01)
+
+Release base FIRST (standing rule 1), with the sync target RETARGETED per the maintainer's
+call relayed in the Phase 6 handoff: upstream cut `release/v0.34.0` equal to main's tip and
+a superset of v0.33.0, so this and later phases measure against it. Freshly fetched,
+`origin/release/v0.34.0` sat at `94f5ac63d`, 90 ahead 2 behind, and merged clean as
+`204e5a6cb` with a ZERO-FILE content delta: the branch already carried all of v0.33.0
+(`462b1372a5`), so the merge adopted only the two merge commits that landed v0.33.0 onto
+main (PRs #2731 and #2733). `release-merge-audit` ran and every step is N/A by
+construction (no overlaps, no legacy arms, no new routes, no changed helper signatures,
+no new db-mock sites); the merged tree is byte-identical to the QA-validated `8176b5a08`,
+so the Phase 5 QA validation ladder speaks for the merged result verbatim and no re-run
+was owed. package-lock.json did not move, so no `npm ci`; node v26.5.0 matches CI.
 
 ### Phase 5 QA (2026-08-01)
 
