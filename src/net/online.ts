@@ -1317,6 +1317,7 @@ function blankEntity(id: number): Entity {
     spawnPos: { x: 0, y: 0, z: 0 },
     leashAnchor: null,
     evadeStall: 0,
+    chaseStall: 0,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
