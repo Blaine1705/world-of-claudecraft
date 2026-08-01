@@ -493,9 +493,9 @@ describe('pet_commands module (P1b)', () => {
     const sim = new Sim({ seed: 22, playerClass: 'warlock', noPlayer: true }) as AnySim;
     const wpid = sim.addPlayer('warlock', 'Demonist') as number;
     const warlock = sim.entities.get(wpid) as AnyEntity;
-    summonPet(sim.ctx, warlock, 'spellhound');
+    summonPet(sim.ctx, warlock, 'emberkin');
     const pet = petOf(sim.ctx, wpid) as AnyEntity;
-    expect(pet.templateId).toBe('spellhound');
+    expect(pet.templateId).toBe('emberkin');
     setPetAutoTaunt(sim.ctx, true, wpid);
     expect(pet.petAutoTaunt).toBe(false);
     expect(petTauntReadout(sim.ctx, warlock)).toBe('This pet cannot taunt.');

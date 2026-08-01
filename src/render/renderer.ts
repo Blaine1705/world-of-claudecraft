@@ -4316,7 +4316,7 @@ export class Renderer {
       this.reducedMotion(),
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
-    this.abilityVfx.update(dt);
+    this.abilityVfx.update(dt, this.reducedMotion());
     this.vfx.update(dt);
     this.vfx.prepareDraw(this.camera);
     this.needleOfFateVfx.update(dt, this.reducedMotion());
@@ -5864,6 +5864,45 @@ export class Renderer {
           }
           break;
         }
+        if (
+          ev.fx === 'projectile' &&
+          ev.ability === 'soul_harvest' &&
+          this.sim.entities.get(ev.sourceId)?.auras.some((aura) => aura.kind === 'form_lich')
+        ) {
+          const view = this.views.get(ev.sourceId);
+          if (view?.metamorphVisual?.metamorphHandWorldPositions(this.tmpV, this.tmpV2)) {
+            this.vfx.deathBolt(this.tmpV, this.tmpV2, ev.targetId);
+            view.metamorphVisual.pulseMetamorphosis();
+          } else {
+            this.vfx.projectile(ev.sourceId, ev.targetId, ev.school, 1.3);
+          }
+          break;
+        }
+        if (isNeedleOfFateProjectile(ev)) {
+          this.needleOfFateVfx.spawn(ev.sourceId, ev.targetId);
+          break;
+        }
+        if (ev.fx === 'sentenceBurst') {
+          const condemnation = Math.max(20, Math.min(100, ev.level ?? 20));
+          if ((ev.threads ?? 0) > 0) {
+            this.sentenceVfx.trigger(ev.sourceId, ev.targetId, condemnation, ev.threads);
+          } else {
+            this.sentenceVfx.trigger(ev.sourceId, ev.targetId, condemnation);
+          }
+          break;
+        }
+        if (
+          ev.fx === 'heavyBolt' &&
+          !ev.ability &&
+          this.sim.entities.get(ev.sourceId)?.kind === 'player' &&
+          this.sim.entities.get(ev.sourceId)?.templateId === 'warlock' &&
+          this.abilityVfx.handleSpellfx({ ...ev, ability: 'chaos_bolt' })
+        ) {
+          // The legacy Ruinbolt wire cue predates ability ids. Alias it before
+          // the generic registry claim so only Warlocks receive Chaos Bolt's
+          // authored projectile identity.
+          break;
+        }
         // Goad: the warrior audibly swears at the victim - a grawlix bark over
         // the caster's head, riding the completion cue every client receives,
         // so other players see the taunt too. Before the claim: the painter
@@ -5952,71 +5991,7 @@ export class Renderer {
           this.triggerAttack(ev.sourceId, warriorCast.abilityId);
           break;
         }
-        if (
-          ev.fx === 'projectile' &&
-          ev.ability === 'soul_harvest' &&
-          this.sim.entities.get(ev.sourceId)?.auras.some((aura) => aura.kind === 'form_lich')
-        ) {
-          const view = this.views.get(ev.sourceId);
-          if (view?.metamorphVisual?.metamorphHandWorldPositions(this.tmpV, this.tmpV2)) {
-            this.vfx.deathBolt(this.tmpV, this.tmpV2, ev.targetId);
-            view.metamorphVisual.pulseMetamorphosis();
-          } else {
-            this.vfx.projectile(ev.sourceId, ev.targetId, ev.school, 1.3);
-          }
-        } else if (
-          ev.fx === 'projectile' &&
-          ev.ability === 'soul_harvest' &&
-          this.abilityVfx.handleSpellfx(ev)
-        ) {
-          // Mortal Essence Reap uses the compact pooled shadow-fang sequence.
-        } else if (
-          ev.fx === 'projectile' &&
-          ev.ability === 'shadow_bolt' &&
-          this.abilityVfx.handleSpellfx(ev)
-        ) {
-          // Gloom Bolt uses its compact green shadow-fang and scaled Ruinbolt hit.
-        } else if (
-          (ev.ability === 'soul_lance' ||
-            ev.ability === 'ossuary_mark' ||
-            ev.ability === 'ossuary_mark_detonate') &&
-          this.abilityVfx.handleSpellfx(ev)
-        ) {
-          // Necromancy's spear, stored-soul seal and collapse use their
-          // class-owned premium sequences instead of generic shadow particles.
-        } else if (
-          (ev.ability === 'emberkin_felbolt' || ev.ability === 'gloomshade_abyssal_chain') &&
-          this.abilityVfx.handleSpellfx(ev)
-        ) {
-          // Destruction's permanent demons use their authored cast clips and
-          // signature fel/void reads instead of generic school particles.
-        } else if (isNeedleOfFateProjectile(ev)) {
-          this.needleOfFateVfx.spawn(ev.sourceId, ev.targetId);
-        } else if (ev.fx === 'sentenceBurst') {
-          const condemnation = Math.max(20, Math.min(100, ev.level ?? 20));
-          if ((ev.threads ?? 0) > 0) {
-            this.sentenceVfx.trigger(ev.sourceId, ev.targetId, condemnation, ev.threads);
-          } else {
-            this.sentenceVfx.trigger(ev.sourceId, ev.targetId, condemnation);
-          }
-        } else if (
-          (ev.ability === 'immolate' ||
-            ev.ability === 'conflagrate' ||
-            ev.ability === 'shadowburn' ||
-            ev.ability === 'ruinous_brand' ||
-            ev.ability === 'reaping_command') &&
-          this.abilityVfx.handleSpellfx(ev)
-        ) {
-          // Destruction's setup, instants and Brand plus the composition-aware
-          // Necromancy command use their class-owned premium sequences.
-        } else if (
-          ev.fx === 'heavyBolt' &&
-          this.sim.entities.get(ev.sourceId)?.kind === 'player' &&
-          this.sim.entities.get(ev.sourceId)?.templateId === 'warlock' &&
-          this.abilityVfx.handleSpellfx({ ...ev, ability: 'chaos_bolt' })
-        ) {
-          // Ruinbolt is rendered by the pooled per-ability VFX subsystem.
-        } else if (ev.fx === 'projectile') {
+        if (ev.fx === 'projectile') {
           this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
         } else if (ev.fx === 'heavyBolt')
           // Pyroblast's boulder: the same homing comet, doubled up.
@@ -6121,7 +6096,13 @@ export class Renderer {
           routeWarlockMeteorSpellfxAt(
             ev,
             this.warlockMeteorFx,
-            warlockMeteorDensityScale(coerceFxTier(document.documentElement.dataset.fxLevel)),
+            warlockMeteorDensityScale(
+              coerceFxTier(
+                typeof document === 'undefined'
+                  ? undefined
+                  : document.documentElement.dataset.fxLevel,
+              ),
+            ),
           )
         )
           break;
@@ -9737,7 +9718,7 @@ export class Renderer {
       this.sim.questState('q_riding_lessons') === 'active' && !this.sim.mountRaceView(),
       this.time,
     );
-    this.abilityVfx.update(dt);
+    this.abilityVfx.update(dt, this.reducedMotion());
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);

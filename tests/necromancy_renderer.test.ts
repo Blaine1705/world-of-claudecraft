@@ -69,7 +69,10 @@ function makeHarness({
     burst: vi.fn(),
   };
   const abilityVfx = {
-    handleSpellfx: vi.fn(() => true),
+    handleSpellfx: vi.fn(
+      (event: Extract<SimEvent, { type: 'spellfx' }>) =>
+        event.ability !== 'unknown_shadow_spell',
+    ),
     handleSpellfxAt: vi.fn(() => true),
   };
   const audio = vi.fn();

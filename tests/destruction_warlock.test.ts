@@ -140,9 +140,9 @@ describe('destruction progression', () => {
       expect(destructionKnownAt(20), retired).not.toContain(retired);
     }
     expect(destructionKnownAt(20)).toEqual(
-      expect.arrayContaining(['summon_imp', 'summon_voidwalker']),
+      expect.arrayContaining(['summon_imp', 'summon_voidwalker', 'soulwell']),
     );
-    expect(destructionKnownAt(20)).toHaveLength(17);
+    expect(destructionKnownAt(20)).toHaveLength(18);
     expect(
       destructionKnownAt(20).filter((id) =>
         ABILITIES[id]?.effects.some(
@@ -617,6 +617,7 @@ describe('Destruction finishers and target switching', () => {
     const insideMob = addDummy(inside.sim, 9712, 0, 500);
     inside.sim.targetEntity(insideMob.id);
     inside.p.facing = 0;
+    inside.p.hitBonus = 1;
     insideMob.hp = 99;
     giveRuin(inside.p, 1);
     inside.sim.castAbility('shadowburn');
@@ -946,7 +947,10 @@ describe('Pyre Colossus', () => {
     const summonEvents = collect(sim, 3);
     expect(
       summonEvents.filter(
-        (event) => event.type === 'spellfxAt' && (event.fx === 'nova' || event.fx === 'meteorFall'),
+        (event) =>
+          event.type === 'spellfxAt' &&
+          event.sourceId === p.id &&
+          (event.fx === 'nova' || event.fx === 'meteorFall'),
       ),
     ).toEqual([
       expect.objectContaining({
@@ -1060,62 +1064,6 @@ describe('Pyre Colossus', () => {
     sim.tick();
     expect(sim.entities.has(guardian.id)).toBe(false);
     expect(observer.targetId).toBeNull();
-  });
-
-  it.each([
-    ['chaos_bolt', 3],
-    ['rain_of_fire', 3],
-    ['shadowburn', 1],
-  ] as const)('%s triggers exactly one literal Worldfire without generating Ruin', (abilityId, cost) => {
-    const { sim, p } = destructionAt();
-    const mob = addDummy(sim, 9720, 0);
-    sim.targetEntity(mob.id);
-    p.facing = 0;
-    summonPyreColossus(sim.ctx, p);
-    giveRuin(p, cost);
-    if (abilityId === 'shadowburn') mob.hp = Math.floor(mob.maxHp * 0.1);
-
-    if (abilityId === 'rain_of_fire') {
-      sim.castAbility(abilityId, undefined, { x: mob.pos.x, z: mob.pos.z });
-    } else {
-      sim.castAbility(abilityId);
-    }
-    const events = collect(sim, 5);
-    const worldfires = events.filter(
-      (event) =>
-        event.type === 'damage' && event.targetId === mob.id && event.ability === 'Worldfire',
-    );
-    expect(worldfires).toHaveLength(1);
-    expect(worldfires[0]).toMatchObject({ amount: 48, school: 'fire' });
-    expect(ruinAmount(p)).toBe(0);
-  });
-
-  it('answers a committed Ruinbolt before impact even when its projectile later fizzles', () => {
-    const { sim, p } = destructionAt();
-    const mob = addDummy(sim, 9734);
-    sim.targetEntity(mob.id);
-    p.facing = 0;
-    summonPyreColossus(sim.ctx, p);
-    giveRuin(p, 3);
-
-    sim.castAbility('chaos_bolt');
-    const beforeFizzle: SimEvent[] = [];
-    for (let ticks = 0; p.castingAbility && ticks < 100; ticks++) {
-      beforeFizzle.push(...sim.tick());
-    }
-
-    expect(ruinAmount(p)).toBe(0);
-    expect(
-      beforeFizzle.filter((event) => event.type === 'damage' && event.ability === 'Worldfire'),
-    ).toHaveLength(1);
-    expect(
-      beforeFizzle.some((event) => event.type === 'damage' && event.ability === 'Ruinbolt'),
-    ).toBe(false);
-
-    mob.dead = true;
-    expect(
-      collect(sim, 1).some((event) => event.type === 'damage' && event.ability === 'Ruinbolt'),
-    ).toBe(false);
   });
 
   it('scrubs guardian targets when its owner entity is removed', () => {

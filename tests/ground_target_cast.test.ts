@@ -3,8 +3,6 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import type { GroundAoE } from '../src/sim/entity_roster';
 import { Sim } from '../src/sim/sim';
-import { readyArenaFighter } from '../src/sim/social/arena';
-import { fiestaDownEntity } from '../src/sim/social/fiesta';
 import type { PlayerClass } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { OPEN_FIELD, placePlayerInOpenField } from './helpers/open_field';
@@ -239,7 +237,7 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
     expect(mob.hp).toBeLessThan(hp0);
   });
 
-  it('Rain of Fire emits one authored fel meteor shower for its full channel', () => {
+  it('Rain of Fire emits one authored fel meteor shower for its full ground-zone lifetime', () => {
     const sim = castGroundSpell('warlock', 'rain_of_fire', { x: 16, z: 3 });
     const events = sim.tick();
 
@@ -255,7 +253,7 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
         x: 16,
         z: 3,
         radius: 7,
-        duration: 4,
+        duration: 6,
         sourceId: sim.playerId,
       }),
     ]);
@@ -273,123 +271,6 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
     expect(channelEvents.some((event) => event.type === 'spellfxAt' && event.fx === 'nova')).toBe(
       false,
     );
-    expect(channelEvents).toContainEqual({
-      type: 'castStop',
-      entityId: sim.playerId,
-      success: true,
-    });
-    expect(channelEvents).toContainEqual({
-      type: 'spellfxAt',
-      x: 16,
-      z: 3,
-      school: 'fire',
-      fx: 'felMeteorRainStop',
-      duration: 0,
-      sourceId: sim.playerId,
-      ability: 'rain_of_fire',
-    });
-  });
-
-  it('Rain of Fire identifies its authoritative stop when movement cancels the channel', () => {
-    const sim = castGroundSpell('warlock', 'rain_of_fire', { x: 16, z: 3 });
-    sim.tick();
-    sim.moveInput.forward = true;
-
-    const cancelEvents = sim.tick();
-
-    expect(sim.entities.get(sim.playerId)?.channeling).toBe(false);
-    expect(cancelEvents).toContainEqual({
-      type: 'castStop',
-      entityId: sim.playerId,
-      success: false,
-    });
-    expect(cancelEvents).toContainEqual({
-      type: 'spellfxAt',
-      x: 16,
-      z: 3,
-      school: 'fire',
-      fx: 'felMeteorRainStop',
-      duration: 0,
-      sourceId: sim.playerId,
-      ability: 'rain_of_fire',
-    });
-  });
-
-  it('Rain of Fire emits its point-anchored stop when the caster dies', () => {
-    const sim = castGroundSpell('warlock', 'rain_of_fire', { x: 16, z: 3 });
-    sim.tick();
-    const caster = sim.entities.get(sim.playerId);
-    if (!caster) throw new Error('no caster');
-
-    sim.dealDamage(null, caster, caster.maxHp * 2, false, 'shadow', 'Test', 'hit');
-
-    expect(sim.drainEvents()).toContainEqual(
-      expect.objectContaining({
-        type: 'spellfxAt',
-        fx: 'felMeteorRainStop',
-        x: 16,
-        z: 3,
-        sourceId: sim.playerId,
-      }),
-    );
-  });
-
-  it('Rain of Fire emits its point-anchored stop before a disconnect teardown', () => {
-    const sim = castGroundSpell('warlock', 'rain_of_fire', { x: 16, z: 3 });
-    sim.tick();
-
-    sim.preparePlayerLeave(sim.playerId);
-
-    expect(sim.drainEvents()).toContainEqual(
-      expect.objectContaining({
-        type: 'spellfxAt',
-        fx: 'felMeteorRainStop',
-        x: 16,
-        z: 3,
-        sourceId: sim.playerId,
-      }),
-    );
-    expect(sim.entities.get(sim.playerId)?.channeling).toBe(false);
-  });
-
-  it('Rain of Fire stops when an arena reset force-clears the channel', () => {
-    const sim = castGroundSpell('warlock', 'rain_of_fire', { x: 16, z: 3 });
-    sim.tick();
-    const caster = sim.entities.get(sim.playerId);
-    if (!caster) throw new Error('no caster');
-
-    readyArenaFighter(sim.ctx, caster, { clearPrep: true });
-
-    expect(sim.drainEvents()).toContainEqual(
-      expect.objectContaining({
-        type: 'spellfxAt',
-        fx: 'felMeteorRainStop',
-        x: 16,
-        z: 3,
-        sourceId: sim.playerId,
-      }),
-    );
-    expect(caster.channeling).toBe(false);
-  });
-
-  it('Rain of Fire stops when a Fiesta or Yumi down force-clears the channel', () => {
-    const sim = castGroundSpell('warlock', 'rain_of_fire', { x: 16, z: 3 });
-    sim.tick();
-    const caster = sim.entities.get(sim.playerId);
-    if (!caster) throw new Error('no caster');
-
-    fiestaDownEntity(sim.ctx, caster, null);
-
-    expect(sim.drainEvents()).toContainEqual(
-      expect.objectContaining({
-        type: 'spellfxAt',
-        fx: 'felMeteorRainStop',
-        x: 16,
-        z: 3,
-        sourceId: sim.playerId,
-      }),
-    );
-    expect(caster.channeling).toBe(false);
   });
 
   it('a completed ground-targeted channel clears castAim (always cleared on resolve)', () => {

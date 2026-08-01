@@ -915,7 +915,14 @@ export function sacrificeUndead(
     ability: 'sacrifice_undead',
   });
   ctx.despawnPet(victim);
-  ctx.applyHeal(owner, owner, Math.round(owner.maxHp * healPctMax), abilityName);
+  ctx.applyHeal(
+    owner,
+    owner,
+    Math.round(owner.maxHp * healPctMax),
+    abilityName,
+    'sacrifice_undead',
+    false,
+  );
 }
 
 export function raiseArmyOfDead(ctx: SimContext, owner: Entity, duration: number): void {

@@ -845,8 +845,10 @@ describe('Necromancy Warlock', () => {
   it('builds Soul Fragments with its filler and spends exact amounts on undead', () => {
     const sim = makeNecromancer();
     addTarget(sim);
-
-    for (let i = 0; i < 6; i++) finishCast(sim, 'soul_harvest');
+    for (let i = 0; i < 6; i++) {
+      sim.player.hitBonus = 1;
+      finishCast(sim, 'soul_harvest');
+    }
     expect(fragmentCount(sim.player)).toBe(5);
 
     finishCast(sim, 'raise_graveguard');
@@ -879,7 +881,7 @@ describe('Necromancy Warlock', () => {
     const sim = makeNecromancer();
     addTarget(sim);
 
-    for (let fragment = 0; fragment < 5; fragment++) finishCast(sim, 'soul_harvest');
+    addSoulFragments(sim.ctx, sim.player, 5);
     finishCast(sim, 'raise_skeletal_warrior');
     finishCast(sim, 'raise_bone_mage');
     sim.castAbility('raise_gravewing');
@@ -974,8 +976,8 @@ describe('Necromancy Warlock', () => {
       amp: 0.05,
       duration: 6,
     });
-    expect(MOBS.necromancy_gravewing.dmgBase).toBe(8);
-    expect(MOBS.necromancy_gravewing.dmgPerLevel).toBe(2);
+    expect(MOBS.necromancy_gravewing.dmgBase).toBe(2);
+    expect(MOBS.necromancy_gravewing.dmgPerLevel).toBe(1.405);
     expect(MOBS.necromancy_gravewing.petCleave).toEqual({
       radius: 5,
       mult: 0.65,
@@ -1733,7 +1735,7 @@ describe('Necromancy Warlock', () => {
   it('Sacrifice Undead consumes the oldest Dominion servant when health is tied', () => {
     const sim = makeNecromancer();
     addTarget(sim);
-    for (let attempt = 0; attempt < 3; attempt++) finishCast(sim, 'soul_harvest');
+    addSoulFragments(sim.ctx, sim.player, 3);
     finishCast(sim, 'raise_skeletal_warrior');
     finishCast(sim, 'raise_bone_mage');
 

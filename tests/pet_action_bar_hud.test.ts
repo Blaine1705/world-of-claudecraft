@@ -10,8 +10,10 @@ vi.mock('../src/game/audio', () => ({
 vi.mock('../src/render/characters', () => ({ CharacterPreview: class {} }));
 vi.mock('../src/render/characters/assets', () => ({ preloadMechAssets: vi.fn() }));
 vi.mock('../src/render/characters/portrait', () => ({
+  onPortraitUpdate: vi.fn(),
   onPortraitsReady: vi.fn(),
   playerPortraitDataUrl: vi.fn(),
+  portraitsReady: vi.fn(() => false),
   visualPortraitDataUrl: vi.fn(),
 }));
 vi.mock('../src/ui/icons', () => ({

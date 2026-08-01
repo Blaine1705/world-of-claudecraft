@@ -18,12 +18,14 @@ function makeHarness() {
       endCast: typeof endCast;
     };
     vfx: { projectile: typeof genericProjectile };
+    abilityVfx: { handleSpellfx: ReturnType<typeof vi.fn> };
     sim: { entities: Map<number, never> };
     views: Map<number, never>;
     triggerAttack: ReturnType<typeof vi.fn>;
   };
   renderer.needleOfFateVfx = { spawn: needleSpawn, beginCast, endCast };
   renderer.vfx = { projectile: genericProjectile };
+  renderer.abilityVfx = { handleSpellfx: vi.fn(() => false) };
   renderer.sim = { entities: new Map<number, never>() };
   renderer.views = new Map<number, never>();
   renderer.triggerAttack = vi.fn();

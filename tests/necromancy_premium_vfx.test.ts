@@ -371,10 +371,8 @@ describe('Necromancy premium VFX', () => {
       'utf8',
     );
 
-    expect(casting).toContain("ability.id === 'soul_lance'");
-    expect(renderer).toContain("ev.ability === 'soul_lance'");
-    expect(renderer).toContain("ev.ability === 'ossuary_mark'");
-    expect(renderer).toContain("ev.ability === 'ossuary_mark_detonate'");
+    expect(casting).toContain('ability: ability.id');
+    expect(renderer).toContain('this.abilityVfx.handleSpellfx(ev)');
     expect(renderer).toContain('this.abilityVfx.handleSpellfxAt(ev)');
     expect(renderer).toContain('this.necromancyGroundFx.syncDeathEcho');
     expect(renderer).toContain('this.abilityVfx.handleSpellfxAt(ev)');

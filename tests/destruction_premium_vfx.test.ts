@@ -188,9 +188,7 @@ describe('Destruction premium VFX', () => {
     );
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
 
-    for (const ability of ['immolate', 'conflagrate', 'shadowburn']) {
-      expect(casting).toContain(`ability.id === '${ability}'`);
-    }
+    expect(casting).toContain('ability: ability.id');
     expect(effects).toContain('abilityId: ability.id');
     expect(effects).toContain('ability: ability.id');
     expect(renderer).toContain('this.abilityVfx.handleSpellfx(ev)');

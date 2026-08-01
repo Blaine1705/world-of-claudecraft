@@ -27,7 +27,10 @@ function makeHarness() {
     time: number;
     triggerAttack: ReturnType<typeof vi.fn>;
     triggerHit: ReturnType<typeof vi.fn>;
-    abilityVfx: { onDamage: ReturnType<typeof vi.fn> };
+    abilityVfx: {
+      handleSpellfx: ReturnType<typeof vi.fn>;
+      onDamage: ReturnType<typeof vi.fn>;
+    };
   };
   renderer.drainChannelStopLatch = new DrainChannelStopLatch();
   renderer.snapshotDrainVisualChannels = new Set();
@@ -39,7 +42,7 @@ function makeHarness() {
   renderer.time = 1;
   renderer.triggerAttack = vi.fn();
   renderer.triggerHit = vi.fn();
-  renderer.abilityVfx = { onDamage: vi.fn() };
+  renderer.abilityVfx = { handleSpellfx: vi.fn(() => false), onDamage: vi.fn() };
   return { renderer, drainBeam, demonicDrainBeam, drainLifeTick };
 }
 

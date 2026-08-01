@@ -7,7 +7,9 @@ interface RuinboltRendererHarness {
 }
 
 function makeHarness(sourceClass = 'warlock', claim = true) {
-  const handleSpellfx = vi.fn(() => claim);
+  const handleSpellfx = vi.fn((event: Extract<SimEvent, { type: 'spellfx' }>) =>
+    Boolean(claim && event.ability),
+  );
   const onDamage = vi.fn();
   const projectile = vi.fn();
   const meleeSpark = vi.fn();
@@ -66,7 +68,7 @@ describe('Ruinbolt renderer routing', () => {
     expect(harness.projectile).not.toHaveBeenCalled();
   });
 
-  it('routes only chaos_bolt damage into its premium impact painter', () => {
+  it('routes damage through the canonical per-ability impact painter', () => {
     const harness = makeHarness();
     const ruinbolt: SimEvent = {
       type: 'damage',
@@ -85,22 +87,24 @@ describe('Ruinbolt renderer routing', () => {
 
     const unrelated = makeHarness();
     unrelated.renderer.handleEvent({ ...ruinbolt, ability: 'shadow_bolt' });
-    expect(unrelated.onDamage).not.toHaveBeenCalled();
+    expect(unrelated.onDamage).toHaveBeenCalledWith({ ...ruinbolt, ability: 'shadow_bolt' });
   });
 
-  it('leaves unrelated heavy bolts on the existing generic renderer path', () => {
-    const harness = makeHarness('mage');
+  it('leaves an unregistered heavy bolt on the existing generic renderer path', () => {
+    const harness = makeHarness('mage', false);
 
-    harness.renderer.handleEvent({
+    const event: SimEvent = {
       type: 'spellfx',
       sourceId: 11,
       targetId: 22,
       school: 'fire',
       fx: 'heavyBolt',
-      ability: 'pyroblast',
-    });
+      ability: 'unknown_heavy_bolt',
+    };
 
-    expect(harness.handleSpellfx).not.toHaveBeenCalled();
+    harness.renderer.handleEvent(event);
+
+    expect(harness.handleSpellfx).toHaveBeenCalledWith(event);
     expect(harness.projectile).toHaveBeenCalledWith(11, 22, 'fire', 2);
   });
 });

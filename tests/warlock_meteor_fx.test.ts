@@ -240,7 +240,7 @@ describe('Warlock fel meteor visuals', () => {
     );
     expect(renderer).toMatch(/if\s*\(impact\.kind !== 'infernal'\) return/);
     expect(renderer).toMatch(
-      /warlockMeteorDensityScale\(\s*coerceFxTier\(document\.documentElement\.dataset\.fxLevel\),?\s*\)/,
+      /warlockMeteorDensityScale\(\s*coerceFxTier\(\s*typeof document === 'undefined'\s*\?\s*undefined\s*:\s*document\.documentElement\.dataset\.fxLevel,?\s*\),?\s*\)/,
     );
     expect(warlockMeteorDensityScale('low')).toBe(0.55);
     expect(warlockMeteorDensityScale('high')).toBe(1);

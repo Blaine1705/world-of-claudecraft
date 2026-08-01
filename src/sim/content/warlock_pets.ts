@@ -69,68 +69,6 @@ export const WARLOCK_PET_MOBS: Record<string, MobTemplate> = {
       cooldown: 15,
     },
   },
-  // Glass-cannon melee striker: hits hard and fast on a light frame, but
-  // folds quickly under retaliation — the warlock's leveling DPS demon.
-  duskborn: {
-    id: 'duskborn',
-    name: 'Duskborn',
-    minLevel: 1,
-    maxLevel: 60,
-    family: 'demon',
-    hpBase: 34,
-    hpPerLevel: 14,
-    dmgBase: 7,
-    dmgPerLevel: 2.1,
-    attackSpeed: 1.7,
-    armorPerLevel: 12,
-    moveSpeed: 5.4,
-    aggroRadius: 8,
-    loot: [],
-    scale: 0.95,
-    color: 0xc6469b,
-  },
-  // Anti-caster hound: a ranged Shadow Bite skirmisher with the emberkin's
-  // reach but a sturdier body, the classic counter-pick against enemy
-  // spellcasters.
-  spellhound: {
-    id: 'spellhound',
-    name: 'Spellhound',
-    minLevel: 1,
-    maxLevel: 60,
-    family: 'demon',
-    hpBase: 46,
-    hpPerLevel: 18,
-    dmgBase: 6,
-    dmgPerLevel: 1.7,
-    attackSpeed: 2.0,
-    armorPerLevel: 20,
-    moveSpeed: 5.6,
-    aggroRadius: 8,
-    loot: [],
-    scale: 1.0,
-    color: 0x4a7d4a,
-    petRanged: { range: 25, school: 'shadow' },
-  },
-  // All-rounder warfiend: deeper health and armor than the duskborn with nearly
-  // its damage — the warlock's durable melee bruiser once it can be summoned.
-  warfiend: {
-    id: 'warfiend',
-    name: 'Warfiend',
-    minLevel: 1,
-    maxLevel: 60,
-    family: 'demon',
-    hpBase: 80,
-    hpPerLevel: 30,
-    dmgBase: 7,
-    dmgPerLevel: 2.0,
-    attackSpeed: 2.2,
-    armorPerLevel: 38,
-    moveSpeed: 5.2,
-    aggroRadius: 8,
-    loot: [],
-    scale: 1.25,
-    color: 0x6e5a2a,
-  },
   // Bound pyre colossus: a hulking, slow-swinging juggernaut with the deepest
   // health and armor of any demon and crushing melee — a long-cooldown power
   // summon.

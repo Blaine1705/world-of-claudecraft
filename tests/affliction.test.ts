@@ -434,7 +434,7 @@ describe('Affliction Warlock', () => {
 
     sim.player.gcdRemaining = 0;
     finishCast(sim, 'needle_of_fate', target);
-    expect(doomValue(sim.player)).toBe(54);
+    expect(doomValue(sim.player)).toBe(58);
   });
 
   it('does not double Hour of Judgment generation through a secondary Eye', () => {
@@ -448,7 +448,7 @@ describe('Affliction Warlock', () => {
 
     finishCast(sim, 'needle_of_fate', secondary);
 
-    expect(doomValue(sim.player)).toBe(44);
+    expect(doomValue(sim.player)).toBe(45);
   });
 
   it('refunds 50 Condemnation from only the first Sentence during Hour of Judgment', () => {
@@ -544,7 +544,7 @@ describe('Affliction Warlock', () => {
     expect(sim.player.castTotal).toBeCloseTo(1, 5);
     while (sim.player.castingAbility) sim.tick();
     for (let i = 0; i < 200 && ctx(sim).pendingProjectiles.length > 0; i++) sim.tick();
-    expect(doomValue(sim.player)).toBe(42);
+    expect(doomValue(sim.player)).toBe(44);
   });
 
   it('keeps Consume channeling while moving during possession', () => {
@@ -1339,6 +1339,7 @@ describe('Affliction Warlock', () => {
       }
       consumeDoom(ctx(sim), sim.player);
       gainDoom(ctx(sim), sim.player, 50);
+      sim.player.hitBonus = 1;
       const hpBefore = target.hp;
       const events = finishCast(sim, 'sentence', target);
       return { loss: hpBefore - target.hp, events, sim, target };
@@ -1672,11 +1673,11 @@ describe('Affliction Warlock', () => {
     finishCast(sim, 'possess_evil_eye', primary);
 
     finishCast(sim, 'needle_of_fate', secondary);
-    expect(doomValue(sim.player)).toBe(39);
+    expect(doomValue(sim.player)).toBe(40);
 
     finishCast(sim, 'hex_of_violence', secondary);
     ctx(sim).dealDamage(secondary, victim, 10, false, 'physical', 'Claw', 'hit');
-    expect(doomValue(sim.player)).toBe(44);
+    expect(doomValue(sim.player)).toBe(45);
   });
 
   it('feeds Condemnation and refreshes the expiry when a primary Eye target dies', () => {

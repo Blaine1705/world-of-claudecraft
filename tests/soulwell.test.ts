@@ -3,6 +3,7 @@ import { isBlocked } from '../src/sim/colliders';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { ITEMS } from '../src/sim/data';
 import { createGroundObject } from '../src/sim/entity';
+import { runDespawnDecay } from '../src/sim/entity_roster';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import {
@@ -225,10 +226,10 @@ describe('Warlock Soulwell', () => {
     const { sim, owner } = world();
     const well = summon(sim, owner);
 
-    for (let i = 0; i < 20 * 179; i++) sim.tick();
+    for (let i = 0; i < 20 * 179; i++) runDespawnDecay(ctx(sim));
     expect(sim.entities.has(well.id)).toBe(true);
 
-    for (let i = 0; i < 21; i++) sim.tick();
+    for (let i = 0; i < 21; i++) runDespawnDecay(ctx(sim));
     expect(sim.entities.has(well.id)).toBe(false);
   });
 

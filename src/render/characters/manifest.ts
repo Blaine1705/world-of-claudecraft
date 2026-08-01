@@ -1738,7 +1738,6 @@ const MOB_KEYS: Record<string, string> = {
   gloomshade: 'mob_gloomshade',
   pyre_colossus: 'mob_pyre_colossus',
   water_elemental: 'mob_water_elemental',
-  duskborn: 'mob_demon',
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',
   wild_boar: 'mob_boar',

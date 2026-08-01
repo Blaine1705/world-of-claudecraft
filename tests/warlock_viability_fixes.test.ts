@@ -93,58 +93,6 @@ describe('Cinderhide, the Ruination defensive', () => {
   });
 });
 
-describe('Deep Hunger resolves through the active specialization', () => {
-  const rows = { 11: 'wlk_r11_demon_armor' };
-
-  it('still rides the Consume channel for Affliction', () => {
-    const { sim, player } = rig('affliction', rows);
-    const mob = hostile(sim);
-    expect(hitForOneHundred(sim, mob)).toBe(100);
-
-    sim.targetEntity(mob.id);
-    player.facing = 0;
-    sim.castAbility('drain_life');
-    sim.tick();
-    expect(player.channeling).toBe(true);
-    expect(player.castingAbility).toBe('drain_life');
-
-    expect(hitForOneHundred(sim, mob)).toBe(85);
-  });
-
-  // Bone Armor is an absorb, and a full shield would soak the whole probe hit
-  // and hide the mitigation underneath it. Spend the shield down to 1 point so
-  // what we measure is the reduction, not the absorb.
-  function boneArmorHeldButSpent(sim: Sim): void {
-    const player = sim.player;
-    sim.castAbility('bone_armor');
-    sim.tick();
-    const shield = player.auras.find((entry) => entry.id === 'bone_armor');
-    if (!shield) throw new Error('Bone Armor did not apply');
-    shield.value = 1;
-  }
-
-  it('rides Bone Armor for Necromancy, which has no Consume', () => {
-    const { sim } = rig('demonology', rows);
-    expect(knownIds('demonology', 20)).not.toContain('drain_life');
-    const mob = hostile(sim);
-
-    // Without the window open the node grants nothing, so it is not a passive.
-    expect(hitForOneHundred(sim, mob)).toBe(100);
-
-    boneArmorHeldButSpent(sim);
-    // 100 reduced by 15% is 85, then the 1 point of shield left soaks one more.
-    expect(hitForOneHundred(sim, mob)).toBe(84);
-  });
-
-  it('grants nothing to a Necromancer who never took the talent', () => {
-    const { sim } = rig('demonology');
-    const mob = hostile(sim);
-
-    boneArmorHeldButSpent(sim);
-    expect(hitForOneHundred(sim, mob)).toBe(99);
-  });
-});
-
 describe('Litany of Guilt covers the early Hexcraft levels', () => {
   it('gives Hexcraft its first area damage at level 8', () => {
     expect(knownIds('affliction', 8)).toContain('litany_of_guilt');

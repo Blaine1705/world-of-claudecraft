@@ -1776,7 +1776,20 @@ export function runEffects(
         // Visual riders (owner playtest): a delayed FIRE zone is a falling
         // meteor (the ball drops over the fall delay); a friendly zone is an
         // inscribed rune circle for its whole life. Cosmetic only.
-        if (eff.delayed && ability.school === 'fire') {
+        const isRainOfFire = ability.id === 'rain_of_fire';
+        if (isRainOfFire) {
+          ctx.emit({
+            type: 'spellfxAt',
+            x: zoneCenter.x,
+            z: zoneCenter.z,
+            school: ability.school,
+            fx: 'felMeteorRain',
+            radius: eff.radius,
+            duration: eff.duration,
+            sourceId: p.id,
+            ability: ability.id,
+          });
+        } else if (eff.delayed && ability.school === 'fire') {
           ctx.emit({
             type: 'spellfxAt',
             x: zoneCenter.x,
@@ -1815,7 +1828,7 @@ export function runEffects(
             ability: ability.id,
           });
         }
-        if (p.castAim) {
+        if (p.castAim && !isRainOfFire) {
           ctx.emit({
             type: 'spellfxAt',
             x: zoneCenter.x,
