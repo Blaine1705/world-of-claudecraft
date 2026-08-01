@@ -529,6 +529,44 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect('junk0' in (row?.instance ?? {})).toBe(false);
   });
 
+  it('the buyback and bank arms rebuild a valid rift row too (the whole-branch completion)', () => {
+    // The rebuild ran only on equipment and bags; the whole-branch review
+    // found the bound's deliberate rift skip left the bank and buyback rows
+    // as the two containers where an over-keyed valid-rift row was still
+    // destroyed whole by the key-count arm. Same order pin as the bags arm
+    // above, on both remaining containers.
+    const sim = ceilingSim();
+    const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
+    const junkKeys = Object.fromEntries(
+      Array.from({ length: 30 }, (_, i) => [`junk${i}`, i] as const),
+    );
+    const riftRow = {
+      itemId: 'riftbound_band_of_might',
+      count: 1,
+      instance: {
+        ...junkKeys,
+        rift: { tier: 'C', upgradeLevel: 1, sourceEventId: 'evt_order_pin', gems: [] },
+      } as unknown as InvSlot['instance'],
+    };
+    s1.vendorBuyback = [JSON.parse(JSON.stringify(riftRow))];
+    s1.bank = {
+      inventory: [JSON.parse(JSON.stringify(riftRow))],
+      purchasedSlots: 8,
+      bonusSlots: 0,
+    };
+    const second = makeSim(43);
+    const pid2 = second.addPlayer('warrior', 'RiftBooks', { state: s1 });
+    const s2 = second.serializeCharacter(pid2) as CharacterState;
+    for (const [container, row] of [
+      ['buyback', s2.vendorBuyback?.[0]],
+      ['bank', s2.bank?.inventory?.find((slot) => slot.itemId === 'riftbound_band_of_might')],
+    ] as const) {
+      const rebuilt = row?.instance?.rift as { sourceEventId?: string } | undefined;
+      expect(rebuilt?.sourceEventId, `${container} rift survives rebuilt`).toBe('evt_order_pin');
+      expect('junk0' in (row?.instance ?? {}), `${container} junk gone`).toBe(false);
+    }
+  });
+
   it('a knownRecipes value stored as a STRING loads the character instead of throwing', () => {
     // THE CRASH REGRESSION. sanitizeKnownRecipeIds used to take an array and
     // call .filter on it, so a stored string threw `filter is not a
