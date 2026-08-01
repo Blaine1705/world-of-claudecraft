@@ -1,12 +1,13 @@
 # State: CI Speed (cross-phase cheat sheet)
 
-**Current phase:** Phase 1 IN PROGRESS (implementation + draft PR #2737; lint
-timing + Phase 1 QA remain). Worktree
+**Current phase:** Phase 1 IMPLEMENTATION DONE (draft PR #2737). Lint timings
+meet targets (checkout 22 to 25s; job 59 to 68s over three runs). Phase 1 QA
+not yet run. Worktree
 `/home/fernandoramirez/Documents/world-of-claudecraft-ci-speed` on
 `feature/ci-speed`, based on `origin/release/v0.34.0` at `94f5ac63d`.
 
-**Next action:** record three lint checkout timings from PR #2737 CI runs,
-then run Phase 1 QA (`phase-01-qa.md`). Do not mark ready until QA.
+**Next action:** run Phase 1 QA (`phase-01-qa.md`). Do not mark the PR ready
+until QA PASSes.
 
 ## Locked decisions
 
@@ -122,11 +123,15 @@ then run Phase 1 QA (`phase-01-qa.md`). Do not mark ready until QA.
 
 ## Resume point
 
-- Phase 1 code: shallow lint checkout (no `fetch-depth: 0`), workflow
+- Phase 1 code: shallow lint checkout (no full-history checkout), workflow
   concurrency with `cancel-in-progress: true` (group =
   workflow+event_name+PR/ref), Playwright Chromium cache on browser-gate
-  keyed on `playwright` package version, pins in `tests/ci_workflow.test.ts`.
-- Still open for Phase 1: three-run lint timing in progress.md, draft PR,
-  Phase 1 QA PASS.
+  keyed on `playwright` package version, hardened pins in
+  `tests/ci_workflow.test.ts`.
+- Draft PR: https://github.com/levy-street/world-of-claudecraft/pull/2737
+- Lint timings recorded (three green jobs under target). Still open: Phase 1
+  QA PASS only.
 - Local proof: `biome ci --changed --since=<merge-base-sha>` succeeds without
   full history.
+- Reviews: privacy-security-review clean; test-coverage-auditor PASS after pin
+  harden.

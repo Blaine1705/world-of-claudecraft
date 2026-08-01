@@ -4,7 +4,7 @@
 
 | Phase | Status | PR | Notes |
 |---|---|---|---|
-| 1 Fixed-cost waste | IN PROGRESS | #2737 (draft) | Shallow lint, concurrency, Playwright cache; timing TBD |
+| 1 Fixed-cost waste | IMPLEMENTATION DONE | #2737 (draft) | Lint checkout 22 to 25s; job 59 to 68s; await Phase 1 QA |
 | 1 QA | NOT STARTED | | |
 | 2 Shard count | NOT STARTED | | Measure N, lock, apply |
 | 2 QA | NOT STARTED | | Wall ≤ 8 min bar |
@@ -29,7 +29,12 @@ Append-only. Each row: date, phase, run id, wall (s), worst shard (s), N, notes.
 
 | Date | Run | Lint checkout s | Lint job s | Notes |
 |---|---|---|---|---|
-| 2026-08-01 | (pending first CI after push) | | | Fill after draft PR CI runs |
+| 2026-08-01 | 30707112749 | 25 | 59 | PR push #1; Biome 1s; success (later cancelled mid-matrix) |
+| 2026-08-01 | 30707206995 | 22 | 68 | PR push #2 (pin harden); success |
+| 2026-08-01 | 30707453993 | 24 | 60 | workflow_dispatch on branch; success |
+
+Baseline was 96 to 195s checkout (outlier 588s). All three Phase 1 checkouts
+are ≤ 40s and jobs ≤ 90s.
 
 ## Phase 1 checklist
 
@@ -39,7 +44,7 @@ Append-only. Each row: date, phase, run id, wall (s), worst shard (s), N, notes.
 - [x] Playwright Chromium cache on browser-gate
 - [x] `tests/ci_workflow.test.ts` pins updated same commits
 - [x] `docs/ci-speed/**` committed
-- [ ] Three runs: lint checkout ≤ 40s, job ≤ 90s typical
+- [x] Three runs: lint checkout ≤ 40s, job ≤ 90s typical (22/25/24s; 68/59/60s)
 - [x] Draft PR opened (#2737 against release/v0.34.0)
 - [ ] Phase 1 QA PASS
 
