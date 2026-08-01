@@ -32,7 +32,7 @@
 // material, never photoreal.
 import type * as THREE from 'three';
 import { loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX, type SurfaceMatOpts, surfaceMat } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
 
@@ -397,7 +397,7 @@ if (GFX.surfaceDetail) {
         t.needsUpdate = true;
         return t;
       });
-    registerPreload(
+    registerDeferredPreload(() =>
       Promise.all([
         prep('NormalGL'),
         // aoSpan 0 also means the set ships no AmbientOcclusion (Metal013)

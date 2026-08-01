@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { compactScreeMatrices, SCREE_CELL, screeSinkY, screeSpotAt } from './cliff_scree_core';
 import { GFX } from './gfx';
 import { applySurfaceDetail } from './worn_stone';
@@ -50,10 +50,16 @@ export interface CliffScreeView {
 // preload of the same URLs, so this costs no extra network); the normal boot
 // flow awaits the gate, letting build read the resolved models synchronously
 const loadedRocks: GLTF[] = [];
-const rocksReady = Promise.all(MODEL_URLS.map((url) => loadGltf(url))).then((gltfs) => {
-  loadedRocks.push(...gltfs);
-});
-registerPreload(rocksReady);
+// Deferred lane: the thunk CREATES the fetch when the lane opens, never closes
+// over one already in flight. The build retry below shares the same promise.
+let rocksReady: Promise<void> | null = null;
+function loadRocks(): Promise<void> {
+  rocksReady ??= Promise.all(MODEL_URLS.map((url) => loadGltf(url))).then((gltfs) => {
+    loadedRocks.push(...gltfs);
+  });
+  return rocksReady;
+}
+registerDeferredPreload(loadRocks);
 
 // media-manifest coverage hook (tests/render_glb_replacement_assets.test.ts)
 export const cliffScreePreloadInternalsForTest = { rockUrls: MODEL_URLS };
@@ -186,7 +192,10 @@ export function buildCliffScree(seed: number): CliffScreeView {
   tryBuild();
   // fail-soft: a lost fetch just leaves the group empty (the boot preload
   // gate has already surfaced the error where it matters)
-  if (!ready) void rocksReady.then(tryBuild).catch(() => undefined);
+  if (!ready)
+    void loadRocks()
+      .then(tryBuild)
+      .catch(() => undefined);
 
   // per-slot current cell (packed); 0x7fffffff = never placed
   const slotCell = new Int32Array(POOL).fill(0x7fffffff);

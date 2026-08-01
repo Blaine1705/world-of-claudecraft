@@ -22,7 +22,7 @@
 // both ways so the depth/shadow variant compiles too.
 import * as THREE from 'three';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
@@ -34,7 +34,7 @@ let greatTreeScene: THREE.Group | null = null;
 // decorated clone would compile the same plain programs the foliage prewarm
 // already covers (the round-10 medium regate).
 if (GFX.surfaceDetail) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(GREAT_TREE_URL).then((gltf) => {
       greatTreeScene = gltf.scene;
     }),

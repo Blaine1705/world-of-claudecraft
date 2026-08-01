@@ -108,6 +108,11 @@ export function createEntryDiagnosticsController(options: {
     if (STICKY_CHECKPOINTS.has(nextCheckpoint)) stickyCheckpoint = nextCheckpoint;
     if (resetTarget === stickyCheckpoint) stickyCheckpoint = null;
     persistence.checkpoint(nextCheckpoint, wallNow(), diagnostics);
+    // Tracked for every checkpoint, quiet or not: the foreground resume path
+    // below re-stamps the last one, so skipping this for quiet checkpoints
+    // would silently drop the most recent breadcrumb from a resumed session.
+    lastCheckpoint = nextCheckpoint;
+    lastDiagnostics = diagnostics;
     if (!QUIET_CHECKPOINTS.has(nextCheckpoint)) {
       log(`[entry-diag] checkpoint=${nextCheckpoint}`, diagnostics);
     }

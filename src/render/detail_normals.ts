@@ -13,7 +13,7 @@
 // texture, shared by every stone material that opts in.
 import * as THREE from 'three';
 import { loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
 
 /** Subtle by design: the grain must read as surface response, not noise. */
@@ -26,7 +26,7 @@ let stoneNormal: THREE.Texture | null = null;
 // mirroring terrain.ts's GFX.terrainSplat gate. Consumers fail soft on null:
 // the material simply ships without the detail grain.
 if (GFX.standardMaterials) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadTexture('/textures/terrain/Rock051_NormalGL.jpg', { repeat: true }).then((tex) => {
       const detail = tex.clone();
       detail.wrapS = THREE.RepeatWrapping;

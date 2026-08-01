@@ -889,7 +889,11 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       coarsePointer: hints?.coarsePointer ?? false,
       narrowViewport: hints?.narrowViewport ?? false,
     });
-  const aaPolicy = gfxAaPolicy(tier, { constrainedMemory, nativeIosMemoryProfile });
+  const aaPolicy = gfxAaPolicy(tier, {
+    constrainedMemory,
+    nativeIosMemoryProfile,
+    tightMemory: tightMemoryProfile,
+  });
   let settings: GfxSettings = {
     graphicsConfigVersion: GFX_CONFIG_VERSION,
     tier,
@@ -949,24 +953,28 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // occlude world sightlines. Keep the constrained profile on the full placement
     // set and reduce only non-occluding grass below.
     leanFoliage: tier === 'low' || (tier === 'medium' && weakIntegratedGpu),
-    grassRadius: nativeIosMemoryProfile
-      ? 52
-      : tier === 'low'
-        ? 80
-        : tier === 'medium'
-          ? constrainedMemory
-            ? 62
-            : 76
-          : 82,
-    grassStep: nativeIosMemoryProfile
-      ? 2.75
-      : tier === 'low'
-        ? 2.05
-        : tier === 'medium'
-          ? constrainedMemory
-            ? 2.35
-            : 2.0
-          : 1.8,
+    grassRadius: tightMemoryProfile
+      ? 34
+      : nativeIosMemoryProfile
+        ? 52
+        : tier === 'low'
+          ? 80
+          : tier === 'medium'
+            ? constrainedMemory
+              ? 62
+              : 76
+            : 82,
+    grassStep: tightMemoryProfile
+      ? 3.8
+      : nativeIosMemoryProfile
+        ? 2.75
+        : tier === 'low'
+          ? 2.05
+          : tier === 'medium'
+            ? constrainedMemory
+              ? 2.35
+              : 2.0
+            : 1.8,
     farGrassDensityFloor: nativeIosMemoryProfile
       ? 0.5
       : constrainedMemory

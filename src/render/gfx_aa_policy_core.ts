@@ -4,6 +4,8 @@ export type GfxPostAa = 'none' | 'smaa';
 export interface GfxAaDeviceHints {
   readonly constrainedMemory?: boolean;
   readonly nativeIosMemoryProfile?: boolean;
+  /** 4 GB-class WebKit rung: the strictest DPR cap, below native iOS. */
+  readonly tightMemory?: boolean;
 }
 
 export interface GfxAaPolicy {
@@ -35,6 +37,11 @@ const STANDARD_POLICIES: Record<GfxAaTier, GfxAaPolicy> = {
  * another scene draw. Low keeps its existing no-AA path.
  */
 export function gfxAaPolicy(tier: GfxAaTier, hints: GfxAaDeviceHints = {}): GfxAaPolicy {
+  // The 4 GB-class rung is stricter than the native iOS profile: both WebKit
+  // hosts share the WebContent ceiling, and DPR is the largest single lever.
+  if (hints.tightMemory) {
+    return { pixelRatioCap: 1, msaaSamples: 0, postAa: 'none' };
+  }
   if (hints.nativeIosMemoryProfile) {
     return { pixelRatioCap: 1.25, msaaSamples: 0, postAa: 'none' };
   }

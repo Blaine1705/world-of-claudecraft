@@ -29,7 +29,7 @@
 // here, a cutout canopy has no coherent view-ray height field to walk.
 import type * as THREE from 'three';
 import { loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { patchCanopyDetailShaderSource } from './foliage_shader_core';
 import { GFX } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
@@ -135,7 +135,7 @@ if (GFX.canopyDetail) {
       t.needsUpdate = true;
       return t;
     });
-  registerPreload(
+  registerDeferredPreload(() =>
     Promise.all([prep('NormalGL'), prep('AmbientOcclusion')]).then(([n, a]) => {
       TEX.normal = n;
       TEX.ao = a;
