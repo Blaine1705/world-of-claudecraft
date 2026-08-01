@@ -6,6 +6,8 @@
 // the production defaults are still the real globals.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  DEFAULT_OUTBOX_TIMEOUT_MS,
+  FLEX_BATCH_LIMIT,
   SERVER_CALL_TIMEOUT_MS,
   ServerClient,
   type TimerHandle,
@@ -64,6 +66,46 @@ function fakeTimers(): {
     },
   };
   return { armed, cleared, seam };
+}
+
+/** A timer pair over a VIRTUAL clock, for the deadlines that differ per call:
+ *  `advance(ms)` moves the clock and fires everything that has come due, so a
+ *  test can prove a call was still alive at one deadline and dead at another. */
+function clockTimers(): {
+  advance: (ms: number) => void;
+  armed: { ms: number }[];
+  seam: TimerSeam;
+} {
+  let now = 0;
+  let nextHandle = 1;
+  const armed: { ms: number }[] = [];
+  const pending = new Map<TimerHandle, { at: number; fn: () => void }>();
+  const seam: TimerSeam = {
+    setTimeout: (fn, ms) => {
+      const handle = nextHandle++;
+      armed.push({ ms });
+      pending.set(handle, { at: now + ms, fn });
+      return handle;
+    },
+    clearTimeout: (handle) => {
+      pending.delete(handle);
+    },
+  };
+  const advance = (ms: number) => {
+    now += ms;
+    for (const [handle, timer] of [...pending]) {
+      if (timer.at <= now) {
+        pending.delete(handle);
+        timer.fn();
+      }
+    }
+  };
+  return { advance, armed, seam };
+}
+
+/** Yield past the microtask queue so a settled promise has run its handlers. */
+function flush(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
 /** A client whose every call succeeds with `data`, plus the recorded calls. */
@@ -165,6 +207,30 @@ const ROUTE_ROWS: {
     path: '/internal/discord/flex?discord_user_id=u%201',
     body: undefined,
     data: { linked: true },
+  },
+  {
+    name: 'flexBatch',
+    methodName: 'flexBatch',
+    drive: (c) => c.flexBatch(['u1', 'u2']),
+    method: 'POST',
+    // A POST, unlike the per-id `flex` GET: the id list travels in the body.
+    path: '/internal/discord/flex-batch',
+    body: '{"discord_user_ids":["u1","u2"]}',
+    data: { requested: 2, members: [] },
+  },
+  {
+    name: 'drainOutbox',
+    methodName: 'drainOutbox',
+    drive: (c) => c.drainOutbox(),
+    method: 'GET',
+    path: '/internal/discord/outbox',
+    body: undefined,
+    data: {
+      relay: { items: [] },
+      activity: { items: [] },
+      winners: { days: [] },
+      linkChanges: { items: [] },
+    },
   },
   {
     name: 'roles',
@@ -433,6 +499,265 @@ describe('ServerClient flairedIds null-versus-empty contract', () => {
   });
 });
 
+describe('ServerClient flexBatch', () => {
+  it('pins the batch cap at the server literal', () => {
+    // The server caps the id ARRAY at 1000 (FLEX_BATCH_CAP in server/internal.ts)
+    // and keeps the first 1000, so a caller that batches above this loses the
+    // tail with a 200 to show for it.
+    expect(FLEX_BATCH_LIMIT).toBe(1000);
+  });
+
+  it('sends the id list VERBATIM: no slice at the cap and no de-duplication', async () => {
+    // Batching belongs to the caller. A slice here would drop ids without saying
+    // so, and the `requested` echo is the caller's only way to tell a truncated
+    // request from a genuinely unlinked set: it counts what the caller BELIEVES
+    // it sent, so a client that quietly changed the list would make the echo
+    // answer a question nobody asked.
+    const overCap = [...Array(FLEX_BATCH_LIMIT + 2)].map((_v, i) => `u${i}`);
+    const withRepeats = [...overCap, 'u0', 'u1'];
+    const { calls, client } = clientReturning({ requested: FLEX_BATCH_LIMIT, members: [] });
+
+    await client.flexBatch(withRepeats);
+
+    const sent = JSON.parse(String(calls[0].init.body)).discord_user_ids as string[];
+    // Past the cap, so the assertion cannot pass on a list that never reached it.
+    expect(sent.length).toBe(FLEX_BATCH_LIMIT + 4);
+    expect(sent[FLEX_BATCH_LIMIT + 1]).toBe(`u${FLEX_BATCH_LIMIT + 1}`);
+    expect(sent.slice(-2)).toEqual(['u0', 'u1']);
+  });
+
+  it('sends the discord_user_ids key even for an empty ask', async () => {
+    // The server reads body.discord_user_ids and answers an absent key with an
+    // empty list, so a renamed key looks exactly like "nobody is linked".
+    const { calls, client } = clientReturning({ requested: 0, members: [] });
+    await client.flexBatch([]);
+    expect(calls[0].init.body).toBe('{"discord_user_ids":[]}');
+  });
+
+  it('returns requested and members unwrapped from the envelope', async () => {
+    const { client } = clientReturning({
+      requested: 2,
+      members: [
+        {
+          discord_user_id: 'u1',
+          linked: true,
+          found: true,
+          username: 'ann',
+          statusTier: 3,
+          points: 12,
+          character: { name: 'Annthar', class: 'warrior', level: 20, profileUrl: '/c/Annthar' },
+        },
+        {
+          discord_user_id: 'u2',
+          linked: true,
+          found: false,
+          username: null,
+          statusTier: 0,
+          points: 0,
+          character: null,
+        },
+      ],
+    });
+
+    // Spelled out fresh rather than compared against the response object: the
+    // fake hands the client the very object it would then be asserted against,
+    // and a self-comparison passes however the client mangles it.
+    expect(await client.flexBatch(['u1', 'u2'])).toEqual({
+      requested: 2,
+      members: [
+        {
+          discord_user_id: 'u1',
+          linked: true,
+          found: true,
+          username: 'ann',
+          statusTier: 3,
+          points: 12,
+          character: { name: 'Annthar', class: 'warrior', level: 20, profileUrl: '/c/Annthar' },
+        },
+        {
+          discord_user_id: 'u2',
+          linked: true,
+          found: false,
+          username: null,
+          statusTier: 0,
+          points: 0,
+          character: null,
+        },
+      ],
+    });
+  });
+
+  it('answers null on a non-ok status, a failed envelope, and a thrown fetch', async () => {
+    // Null is the whole failure vocabulary. It matters here more than on the
+    // older calls: absence from `members` MEANS unlinked, so a caller must never
+    // read a failure as a well-formed answer about nobody.
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const timers = fakeTimers();
+    const from = (respond: () => Promise<Response> | Response) =>
+      new ServerClient('http://host', 'sekrit', recordingFetch(respond).impl, timers.seam);
+
+    expect(await from(() => fakeResponse({ status: 500 })).flexBatch(['u1'])).toBe(null);
+    expect(
+      await from(() =>
+        fakeResponse({
+          body: { success: false, data: { requested: 1, members: [] }, error: 'no' },
+        }),
+      ).flexBatch(['u1']),
+    ).toBe(null);
+    expect(await from(() => Promise.reject(new Error('socket hang up'))).flexBatch(['u1'])).toBe(
+      null,
+    );
+  });
+});
+
+describe('ServerClient drainOutbox', () => {
+  it('returns all four streams unwrapped from the envelope', async () => {
+    const { client } = clientReturning({
+      relay: { items: [{ commandId: 'c1', message: 'lfg deadmines' }] },
+      activity: { items: [{ kind: 'levelup', level: 20 }] },
+      winners: { days: [{ day: '2026-07-31', taskName: 'gather' }] },
+      linkChanges: {
+        items: [
+          {
+            accountId: 7,
+            kinds: ['link', 'flex'],
+            discordUserId: 'u1',
+            discordUsername: 'ann',
+            discordAvatar: null,
+          },
+        ],
+      },
+    });
+
+    // Fresh literal, not the response object: distinct payloads per stream, so
+    // reading the wrong key (activity from `relay`, winners from `items`) fails
+    // instead of quietly yielding undefined the consumer reads as an empty feed.
+    expect(await client.drainOutbox()).toEqual({
+      relay: { items: [{ commandId: 'c1', message: 'lfg deadmines' }] },
+      activity: { items: [{ kind: 'levelup', level: 20 }] },
+      winners: { days: [{ day: '2026-07-31', taskName: 'gather' }] },
+      linkChanges: {
+        items: [
+          {
+            accountId: 7,
+            kinds: ['link', 'flex'],
+            discordUserId: 'u1',
+            discordUsername: 'ann',
+            discordAvatar: null,
+          },
+        ],
+      },
+    });
+  });
+
+  it('answers null on a non-ok status, a failed envelope, and a thrown fetch', async () => {
+    // A null here means "nothing was acknowledged", and that is exactly right:
+    // the server preserves its three in-memory streams unless it answered 200,
+    // so a failed poll costs one cycle of latency and nothing else.
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const timers = fakeTimers();
+    const empty = { relay: { items: [] }, activity: { items: [] } };
+    const from = (respond: () => Promise<Response> | Response) =>
+      new ServerClient('http://host', 'sekrit', recordingFetch(respond).impl, timers.seam);
+
+    expect(await from(() => fakeResponse({ status: 503 })).drainOutbox()).toBe(null);
+    expect(
+      await from(() =>
+        fakeResponse({ body: { success: false, data: empty, error: 'busy' } }),
+      ).drainOutbox(),
+    ).toBe(null);
+    expect(await from(() => Promise.reject(new Error('ECONNRESET'))).drainOutbox()).toBe(null);
+  });
+
+  it('pins the outbox deadline above the server read deadline', () => {
+    // 70 s, chosen against the server's 65 s driver-side backstop
+    // (DB_QUERY_TIMEOUT_MS in server/db.ts). Under it, the client could abandon a
+    // poll the server goes on to answer 200 to, and a 200 is what CONSUMES the
+    // three queues: those items would be delivered to nobody.
+    expect(DEFAULT_OUTBOX_TIMEOUT_MS).toBe(70_000);
+    expect(DEFAULT_OUTBOX_TIMEOUT_MS).toBeGreaterThan(65_000);
+    expect(DEFAULT_OUTBOX_TIMEOUT_MS).toBeGreaterThan(SERVER_CALL_TIMEOUT_MS);
+  });
+
+  it('stays alive past 8000 ms and aborts at 70000 ms', async () => {
+    // The two literals in one run. Firing only the ordinary per-call deadline
+    // leaves the poll untouched, which is the arm that fails if drainOutbox
+    // stops passing its override down to call(); the abort then lands at 70000.
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const timers = clockTimers();
+    const signals: AbortSignal[] = [];
+    const impl: typeof fetch = (_input, init) =>
+      new Promise<Response>((_resolve, reject) => {
+        const signal = init?.signal as AbortSignal;
+        signals.push(signal);
+        signal.addEventListener('abort', () => reject(new Error('The operation was aborted')));
+      });
+    const client = new ServerClient('http://host', 'sekrit', impl, timers.seam);
+
+    let settled = false;
+    const pending = client.drainOutbox().then((r) => {
+      settled = true;
+      return r;
+    });
+    expect(timers.armed.map((a) => a.ms)).toEqual([70_000]);
+
+    timers.advance(SERVER_CALL_TIMEOUT_MS);
+    await flush();
+    expect(signals[0].aborted).toBe(false);
+    expect(settled).toBe(false);
+
+    timers.advance(DEFAULT_OUTBOX_TIMEOUT_MS - SERVER_CALL_TIMEOUT_MS);
+    expect(signals[0].aborted).toBe(true);
+    expect(await pending).toBe(null);
+  });
+
+  it('leaves every OTHER call on the 8000 ms deadline', async () => {
+    // The complement, and the one that fails if the override was implemented by
+    // raising the shared default instead: on the same client and the same clock,
+    // a roles() call started beside the poll dies at 8000 while the poll lives.
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const timers = clockTimers();
+    const signals: AbortSignal[] = [];
+    const impl: typeof fetch = (_input, init) =>
+      new Promise<Response>((_resolve, reject) => {
+        const signal = init?.signal as AbortSignal;
+        signals.push(signal);
+        signal.addEventListener('abort', () => reject(new Error('The operation was aborted')));
+      });
+    const client = new ServerClient('http://host', 'sekrit', impl, timers.seam);
+
+    const poll = client.drainOutbox();
+    const roles = client.roles('u1');
+    expect(timers.armed.map((a) => a.ms)).toEqual([70_000, 8000]);
+
+    timers.advance(SERVER_CALL_TIMEOUT_MS);
+    expect(signals[0].aborted).toBe(false);
+    expect(signals[1].aborted).toBe(true);
+    expect(await roles).toBe(null);
+
+    timers.advance(DEFAULT_OUTBOX_TIMEOUT_MS);
+    expect(await poll).toBe(null);
+  });
+
+  it('honors a caller-supplied deadline over the default', async () => {
+    const timers = clockTimers();
+    const { impl } = recordingFetch(() =>
+      fakeResponse({
+        body: {
+          success: true,
+          data: { relay: { items: [] }, activity: { items: [] } },
+          error: null,
+        },
+      }),
+    );
+    const client = new ServerClient('http://host', 'sekrit', impl, timers.seam);
+
+    await client.drainOutbox(1234);
+
+    expect(timers.armed.map((a) => a.ms)).toEqual([1234]);
+  });
+});
+
 describe('ServerClient pushMembersMeta silent-drop warning', () => {
   it('warns when a NON-EMPTY push processed zero rows', async () => {
     // The server coerces an over-cap body to an empty member list and still
@@ -503,6 +828,64 @@ describe('ServerClient pushMembersMeta silent-drop warning', () => {
     );
     await failed.pushMembersMeta([member]);
     expect(errors).toEqual([['[bot] server POST /internal/discord/members-meta -> 500']]);
+  });
+});
+
+describe('ServerClient pushMembersMeta result shape', () => {
+  const MEMBER = { discord_user_id: 'u1', name: 'A', joinedAtMs: null, role: null };
+
+  it('hands the caller changed, skipped and unapplied, not just updated', async () => {
+    // The server has answered all four since Phase 4. `unapplied` is the one the
+    // caller cannot do without: those ids have no link row, so their meta was
+    // accepted and applied to nothing, and a caller that marked them clean would
+    // never re-push them once they link.
+    const { client } = clientReturning({
+      updated: 3,
+      changed: 1,
+      skipped: 1,
+      unapplied: ['u3'],
+    });
+
+    const result = await client.pushMembersMeta([
+      MEMBER,
+      { discord_user_id: 'u2', name: 'B', joinedAtMs: 2, role: null },
+      { discord_user_id: 'u3', name: 'C', joinedAtMs: 3, role: null },
+    ]);
+
+    // Fresh literal: the fake returns the same object the assertion would
+    // otherwise be comparing against itself.
+    expect(result).toEqual({ updated: 3, changed: 1, skipped: 1, unapplied: ['u3'] });
+  });
+
+  it('does NOT read unapplied ids as a failed push', async () => {
+    // A batch where every id is unlinked is a complete, successful push: the
+    // server read the records and there was nowhere to put them. Refusing it
+    // would stop the sweep on a routine answer, and the refusal arm sits right
+    // beside this one.
+    const { client } = clientReturning({
+      updated: 1,
+      changed: 0,
+      skipped: 0,
+      unapplied: ['u1'],
+    });
+
+    expect(await client.pushMembersMeta([MEMBER])).toEqual({
+      updated: 1,
+      changed: 0,
+      skipped: 0,
+      unapplied: ['u1'],
+    });
+  });
+
+  it('still refuses a non-empty push that processed zero rows, with all four fields present', async () => {
+    // The L14 regression pin. The wider return type must not have relaxed the
+    // one response the client treats as a hard failure: `updated: 0` on a
+    // non-empty push is the server's over-cap silent-drop signature, and the
+    // caller marks a batch clean from this return value.
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { client } = clientReturning({ updated: 0, changed: 0, skipped: 0, unapplied: [] });
+
+    expect(await client.pushMembersMeta([MEMBER])).toBeNull();
   });
 });
 
