@@ -33,7 +33,7 @@ DEFERRED with evidence (run id or command output).
 |---|---|---|
 | S1 | Single `ci.yml` for the gate (D2) | PASS: only `.github/workflows/ci.yml` owns PR/release gate |
 | S2 | `release-checks` parallel to release tests (no needs between them) | PASS: both jobs no needs; shared exact RELEASE_IF_LINE; Phase 4 |
-| S3 | Docs-only PR skips test matrix; code PR does not | PASS (design + pins); live probe run ids in progress.md Phase 5 notes after push |
+| S3 | Docs-only PR skips test matrix; code PR does not | PASS: docs-only run 30721982405 (pr-gate/pr-checks/browser skipped, lint green); code-touch 30721929850 (full PR matrix green) |
 | S4 | `tests/ci_workflow.test.ts` green and matches YAML | PASS: 10 tests green; path-filter + release unfiltered pins |
 | S5 | No em dashes / en dashes / emojis in packet commits or new copy | PASS: scan of Phase 5 docs/YAML/test comments (ASCII punctuation only) |
 

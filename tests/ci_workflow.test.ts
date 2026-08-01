@@ -57,6 +57,13 @@ const CODE_PATH_GLOBS = [
   'android/*',
   'ios/*',
   'public/*',
+  // Security-adjacent / deploy surfaces: must not skip malware+builds (privacy review).
+  'deploy/*',
+  'mediawiki/*',
+  'Dockerfile',
+  'Dockerfile.*',
+  'docker-compose.yml',
+  'docker-compose.yaml',
 ] as const;
 
 function jobSource(name: string): string {
@@ -242,8 +249,13 @@ describe('CI workflow parity', () => {
     expect(changes).toContain('EVENT_NAME');
     expect(changes).toContain('BASE_SHA');
     expect(changes).toContain('HEAD_SHA');
+    // changes must always run (no job-level if). Gating it to pull_request only
+    // would leave needs.changes dependents skipped on push to main/dev.
+    expect(changes.match(/^\s{4}if: .+$/gm) ?? []).toEqual([]);
     // Non-PR events and empty/missing diffs fail closed toward code=true.
     expect(changes).toContain('non-PR event: full PR tier (code=true)');
+    expect(changes).toContain('missing PR base/head SHAs: full PR tier (code=true)');
+    expect(changes).toContain('empty file list: full PR tier (code=true)');
     expect(changes).toContain('echo "code=$code" >> "$GITHUB_OUTPUT"');
     expect(changes).toContain('code=false');
     expect(changes).toContain('code=true');
@@ -253,6 +265,10 @@ describe('CI workflow parity', () => {
     // No third-party path-filter action (D10: justify dorny in progress.md if added).
     expect(workflow).not.toContain('dorny/paths-filter');
     expect(workflow).not.toContain('paths-filter@');
+    // Workflow-level path filters would skip the whole workflow (including
+    // release-to-main). Job-level paths-ignore is invalid YAML but still banned.
+    // Allow the changes job's case arms and comments only: ban on: block keys.
+    expect(workflow).not.toMatch(/\non:\n(?:[ \t]+[^\n]+\n)*?[ \t]+paths(-ignore)?:/);
 
     const lint = jobSource('lint');
     expect(lint).not.toContain('needs: changes');

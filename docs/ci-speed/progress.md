@@ -338,11 +338,13 @@ packet import hygiene later (D15).
 
 ### Phase 5 design (D10, OPEN item 5)
 
-**Code path set** (minimum from phase-05; public/** included so assets force tests):
+**Code path set** (phase-05 minimum plus deploy/Docker/mediawiki after privacy
+review; public/** included so assets force tests):
 `src/**`, `server/**`, `tests/**`, `headless/**`, `bot/**`, `scripts/**`,
 `package.json`, `package-lock.json`, `tsconfig.json`, `tsconfig.admin.json`,
 `vite.config.ts`, `vitest.browser.config.ts`, `biome.json`, `.github/workflows/**`,
-`electron/**`, `android/**`, `ios/**`, `public/**`.
+`electron/**`, `android/**`, `ios/**`, `public/**`, `deploy/**`, `mediawiki/**`,
+`Dockerfile` / `Dockerfile.*`, `docker-compose.yml` / `docker-compose.yaml`.
 
 **Docs-only** when none of the above match (examples: `docs/**`, `**/*.md`,
 `docs/screenshots/**`, root markdown).
@@ -401,5 +403,16 @@ empty file lists all leave code=true.
 
 | Probe | Run | Result |
 |---|---|---|
-| code-touch (phase 5 push on #2737) | (fill after push) | expect full PR matrix |
-| docs-only (probe PR) | (fill after open) | expect pr-gate/pr-checks/browser skip; lint green |
+| code-touch (#2737, workflow+tests) | **30721929850** | success: changes + lint + pr-checks + browser + pr-gate (1..8) all green; release skipped |
+| docs-only (#2741 probe PR) | **30721982405** | success: changes + lint green; pr-gate / pr-checks / browser **skipped**; release skipped |
+
+Docs-only probe PR: https://github.com/levy-street/world-of-claudecraft/pull/2741
+(safe to close after stamp; not part of packet merge).
+
+Reviewers (Phase 5): privacy-security **PASS** (SHOULD-FIX residual: deploy/Docker
+outside code set; addressed by expanding globs). test-coverage **PASS** (SHOULD-FIX
+pin hardens applied: changes always-run, fail-closed message pins, on: paths ban).
+
+Code path set refined after privacy review: also `deploy/*`, `mediawiki/*`,
+`Dockerfile` / `Dockerfile.*`, `docker-compose.yml` / `.yaml` so those surfaces
+cannot skip malware + builds.

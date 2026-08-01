@@ -143,7 +143,9 @@ jobs:
               vite.config.ts|vitest.browser.config.ts|\
               biome.json|\
               .github/workflows/*|\
-              electron/*|android/*|ios/*|public/*)
+              electron/*|android/*|ios/*|public/*|\
+              deploy/*|mediawiki/*|\
+              Dockerfile|Dockerfile.*|docker-compose.yml|docker-compose.yaml)
                 code=true
                 break
                 ;;
