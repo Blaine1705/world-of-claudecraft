@@ -195,7 +195,13 @@ async function runRoute(
   return { reached, ...readRes(ctx.res) };
 }
 
-/** A full DiscordLinkRow for a linked account id (du<id>/un<id>/av<id>). */
+/**
+ * A full DiscordLinkRow for a linked account id (du<id>/un<id>/av<id>).
+ * Deliberately WIDER than the DiscordOutboxLinkRow contract (which is four
+ * fields): the mock hands the handler more than production would, and the
+ * shape pins below prove none of the extra fields, discord_email above all,
+ * can leak into a response.
+ */
 function linkRow(accountId: number): DiscordLinkRow {
   return {
     account_id: accountId,

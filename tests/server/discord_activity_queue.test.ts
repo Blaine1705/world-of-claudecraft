@@ -240,6 +240,9 @@ describe('server activity queue: requeue after a failed hand-off', () => {
   });
 
   it('does nothing at all for an empty requeue', () => {
+    // Pins the observable no-op, honestly NOT the early-return guard itself:
+    // without the guard, unshift() with no arguments and an under-cap trim are
+    // both no-ops too, so no assertion can tell the two implementations apart.
     enqueueActivity(activity(1), null, 0);
     requeueActivity([]);
     expect(activityQueueDepth()).toBe(1);

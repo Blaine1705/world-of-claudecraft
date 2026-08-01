@@ -31,14 +31,15 @@
 // about 3.3 items per second, so a queue sized at the 5,000-member envelope fills after
 // roughly 25 minutes of bot absence, not the days a "one item per guild member" reading
 // would suggest. Past that point the EVICTION LADDER is what keeps the feed useful,
-// three tiers, each oldest-first, the next tier consulted only when the previous is
+// four rungs, each oldest-first, the next rung consulted only when the previous is
 // exhausted: (1) playtime noise (kinds exactly ['points'] and no carried Discord id),
 // the class the drain drops anyway when the account resolves unlinked; (2) any other
 // id-less item without a 'link'/'unlink' kind (a 'flex' or mixed item whose staleness
-// the bot's periodic resync heals); (3) plain oldest-first. 'link'/'unlink' items
-// (whose carried discordId is the bot's only copy of which member to start or stop
-// flairing) are therefore the LAST thing the cap spends, surviving until nothing else
-// is left to evict. Either way the drop is bounded staleness, not data loss: the bot's
+// the bot's periodic resync heals); (3) anything else without a 'link'/'unlink' kind,
+// id-carrying included; (4) plain oldest-first. 'link'/'unlink' items (whose carried
+// discordId is the bot's only copy of which member to start or stop flairing) are
+// therefore the LAST thing the cap spends, surviving until nothing else is left to
+// evict. Either way the drop is bounded staleness, not data loss: the bot's
 // periodic full re-read of the linked set heals anything the feed dropped.
 //
 // PER PROCESS, like relay and activity: this queue is in-memory and lives in ONE realm
@@ -122,10 +123,16 @@ function forgetPending(item: QueuedLinkChange): void {
 }
 
 // The eviction ladder, cheapest loss first (see the CAP note at the top). The final
-// rung accepts anything, so the ladder always finds enough to evict.
+// rung accepts anything, so the ladder always finds enough to evict. The third rung
+// exists so the "link/unlink go last" promise is STRUCTURAL rather than an accident
+// of today's enqueue sites: rung 2 keys on `discordId === undefined`, so an
+// id-carrying non-link item (no site mints one today, but nothing stops a future
+// flex site that happens to know the id) would otherwise skip straight to the
+// anything-goes rung and could outlive a link item (QA fresh-eyes round).
 const EVICTION_LADDER: ReadonlyArray<(item: QueuedLinkChange) => boolean> = [
   isPlaytimeNoise,
   isEvictableFlexNoise,
+  (item) => !item.kinds.includes('link') && !item.kinds.includes('unlink'),
   () => true,
 ];
 
@@ -140,6 +147,10 @@ const EVICTION_LADDER: ReadonlyArray<(item: QueuedLinkChange) => boolean> = [
 function trimToCap(): void {
   const excess = QUEUE.length - LINK_CHANGE_MAX_QUEUE;
   if (excess <= 0) return;
+  // Identity-keyed marking assumes each item object appears in QUEUE at most once,
+  // which every path guarantees (enqueue mints fresh objects, merges never push,
+  // requeue re-inserts a freshly spliced page). A duplicate identity would be
+  // dropped in both positions while counting as one eviction.
   const drop = new Set<QueuedLinkChange>();
   for (const rung of EVICTION_LADDER) {
     if (drop.size >= excess) break;
@@ -227,6 +238,11 @@ export function drainLinkChanges(max?: number): QueuedLinkChange[] {
  * Merging into a requeued item is NOT the "dedupe against drained history" defect the
  * header forbids: these items were never delivered, so a change folded into one still
  * reaches the bot on the next poll.
+ *
+ * HONEST LIMIT, as in requeueRelay/requeueActivity: a queue that refilled past the
+ * cap during the failed poll evicts on the requeue, so "costs the bot nothing but a
+ * retry" holds only up to the cap. The eviction ladder still applies, so requeued
+ * link/unlink items are the last thing spent.
  */
 export function requeueLinkChanges(items: readonly QueuedLinkChange[]): void {
   if (items.length === 0) return;

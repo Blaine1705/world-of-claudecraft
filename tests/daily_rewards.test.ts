@@ -7,6 +7,7 @@ import type {
   DailyRewardPayoutActor,
   DailyRewardPayoutAttemptClaimResult,
   DailyRewardPayoutClaimResult,
+  DailyRewardPayoutMarkOutcome,
   DailyRewardPayoutModerationResult,
   DailyRewardPayoutRow,
   DailyRewardScoreRow,
@@ -245,8 +246,9 @@ class FakeDailyRewardDb implements DailyRewardDb {
   async markWinnersAnnounced(): Promise<boolean> {
     return this.markWinnersAnnouncedOk;
   }
-  async markPayout(): Promise<boolean> {
-    return true;
+  markPayoutOutcome: DailyRewardPayoutMarkOutcome = 'updated';
+  async markPayout(): Promise<DailyRewardPayoutMarkOutcome> {
+    return this.markPayoutOutcome;
   }
   claimPayoutResult: DailyRewardPayoutClaimResult = { outcome: 'not_found' };
   async claimPayout(): Promise<DailyRewardPayoutClaimResult> {
@@ -846,6 +848,45 @@ describe('daily rewards', () => {
       expect(db.unannouncedWinnerDaysCalls).toBe(2);
     });
 
+    it("does not bust on a claim retry that matched an already-claimed row ('existing')", async () => {
+      // claimPayout's 'existing' outcome is the runner's idempotent retry and
+      // writes NOTHING; busting on every retry would evict a healthy snapshot
+      // exactly when the runner is retrying (QA fresh-eyes round: the first shape
+      // of this fix busted here too).
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      db.claimPayoutResult = { outcome: 'existing', payout: payoutRow('2026-06-30', 1) };
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(
+        service.markPayout({ day: '2026-06-30', rank: 1, status: 'processing', txSignature: 's1' }),
+      ).resolves.toMatchObject({ ok: true });
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+    });
+
+    it("does not bust on a paid-mark replay that wrote nothing ('already')", async () => {
+      // markPayout answers 'already' for a re-posted paid mark with the same
+      // signature (a dropped response, retried). Nothing moved, so the snapshot
+      // stays; only a real 'updated' write busts.
+      const db = new FakeDailyRewardDb();
+      db.winnerAnnouncements = [winnerDay('2026-06-30')];
+      db.markPayoutOutcome = 'already';
+      const { service, clock } = cachedService(db);
+
+      await service.discordWinnerAnnouncements(1);
+      await expect(
+        service.markPayout({ day: '2026-06-30', rank: 1, status: 'paid', txSignature: 's1' }),
+      ).resolves.toMatchObject({ ok: true });
+
+      clock.ms += 1;
+      await service.discordWinnerAnnouncements(1);
+      expect(db.unannouncedWinnerDaysCalls).toBe(1);
+    });
+
     it('does not bust on a resend stamp, which the announcement never reads', async () => {
       // The resend arms write only the payout-ATTEMPTS table, which
       // unannouncedWinnerDays never selects, so evicting the snapshot for them
@@ -897,6 +938,9 @@ describe('daily rewards', () => {
       expect(dayNames(await service.discordWinnerAnnouncements(Number.NaN))).toEqual([
         '2026-06-25',
       ]);
+      // Infinity is an over-ask, so it clamps UP to the ceiling, not down to the
+      // floor (the NaN guard is NaN-only on purpose).
+      expect(dayNames(await service.discordWinnerAnnouncements(Number.POSITIVE_INFINITY))).toHaveLength(5);
       // Every ask above was a slice of the same snapshot, never a second read.
       expect(db.unannouncedWinnerDaysCalls).toBe(1);
     });

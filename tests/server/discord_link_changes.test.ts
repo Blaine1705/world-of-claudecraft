@@ -558,6 +558,62 @@ describe('discord link change feed: the eviction ladder and the contract literal
     expect(drained.some((c) => c.accountId === 2)).toBe(false);
   });
 
+  it('spends an id-CARRYING flex item before an older link item (the third rung)', () => {
+    // No production site mints an id-carrying non-link item today, so this pins the
+    // STRUCTURAL promise rather than a current path: if a future flex site passes the
+    // id it happens to know, the ladder must still spend that item before any
+    // link/unlink item, not fall through to plain oldest-first.
+    enqueueLinkChange({ accountId: 1, discordId: 'du1', kinds: ['link'] }, 0);
+    for (let n = 2; n < LINK_CHANGE_MAX_QUEUE; n++) enqueueLinkChange(change(n), 0);
+    enqueueLinkChange({ accountId: 990_000, discordId: 'du990000', kinds: ['flex'] }, 0);
+    expect(linkChangeDepth()).toBe(LINK_CHANGE_MAX_QUEUE);
+
+    // Overflow with a LINK item, so neither noise rung can absorb the eviction into
+    // the incoming item itself and the id-less flex rung is exhausted first choice.
+    enqueueLinkChange(
+      { accountId: 990_001, discordId: 'du990001', kinds: ['link'] },
+      0,
+    );
+
+    const drained = drainLinkChanges();
+    // Rung 2 spent the oldest id-less flex item (account 2); both link items AND the
+    // id-carrying flex item survive.
+    expect(drained[0]).toEqual({ accountId: 1, discordId: 'du1', kinds: ['link'] });
+    expect(drained.some((c) => c.accountId === 2)).toBe(false);
+    expect(drained.some((c) => c.accountId === 990_000)).toBe(true);
+    expect(drained[drained.length - 1]).toEqual({
+      accountId: 990_001,
+      discordId: 'du990001',
+      kinds: ['link'],
+    });
+  });
+
+  it('spends an id-carrying flex item before a link item once id-less noise is gone', () => {
+    // The rung-3 discrimination itself: ONLY a link item and an id-carrying flex item
+    // in the queue... impossible at the real cap without filler, so the filler here is
+    // id-carrying flex too. The eviction must take the OLDEST non-link item (account
+    // 2), never the link item at the head.
+    enqueueLinkChange({ accountId: 1, discordId: 'du1', kinds: ['link'] }, 0);
+    for (let n = 2; n <= LINK_CHANGE_MAX_QUEUE; n++) {
+      enqueueLinkChange({ accountId: n, discordId: `du${n}`, kinds: ['flex'] }, 0);
+    }
+    expect(linkChangeDepth()).toBe(LINK_CHANGE_MAX_QUEUE);
+
+    enqueueLinkChange(
+      { accountId: LINK_CHANGE_MAX_QUEUE + 1, discordId: 'duX', kinds: ['unlink'] },
+      0,
+    );
+
+    const drained = drainLinkChanges();
+    expect(drained[0]).toEqual({ accountId: 1, discordId: 'du1', kinds: ['link'] });
+    expect(drained.some((c) => c.accountId === 2)).toBe(false);
+    expect(drained[drained.length - 1]).toEqual({
+      accountId: LINK_CHANGE_MAX_QUEUE + 1,
+      discordId: 'duX',
+      kinds: ['unlink'],
+    });
+  });
+
   it('a mixed-kind item that includes unlink survives both noise rungs', () => {
     // The rung predicate is about link/unlink membership, not kind count: an item that
     // merged points into an unlink still carries the only copy of the member to stop

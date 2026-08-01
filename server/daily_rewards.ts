@@ -1372,8 +1372,10 @@ export class DailyRewardService {
     // aliases it to every caller.
     // NaN falls back to 1 explicitly: Math.max(1, Math.min(5, NaN)) is NaN, and
     // slice(0, NaN) is an EMPTY slice, so an unguarded NaN limit would silently
-    // serve zero days rather than the minimum.
-    const asked = Number.isFinite(limit) ? limit : 1;
+    // serve zero days rather than the minimum. NaN alone: an Infinity over-ask
+    // clamps UP to the ceiling like any other over-ask (Number.isFinite here
+    // would send it to the floor instead).
+    const asked = Number.isNaN(limit) ? 1 : limit;
     const days = (await this.winnersCache.read())
       .slice(0, Math.max(1, Math.min(DAILY_REWARD_WINNERS_CACHE_LIMIT, asked)))
       .map((day) => ({ ...day, payouts: day.payouts.map((payout) => ({ ...payout })) }));
@@ -1497,8 +1499,12 @@ export class DailyRewardService {
       }
       // A claim stamps status and tx_signature on a payout row a day still in the
       // unannounced set carries, so the warm snapshot must not outlive it (the
-      // winnersCache bust doctrine). Success arm only, like voidPayout.
-      this.winnersCache.bust();
+      // winnersCache bust doctrine). 'claimed' ONLY: the 'existing' arm is the
+      // runner's idempotent retry and writes nothing, and busting on every retry
+      // would evict a healthy snapshot exactly when the runner is unhealthy
+      // (caught by the QA fresh-eyes round; 'like voidPayout' was wrong because
+      // voidPayout has no no-op success arm).
+      if (result.outcome === 'claimed') this.winnersCache.bust();
       return { ok: true, payout: result.payout };
     }
     if (status === 'resend_processing') {
@@ -1526,11 +1532,13 @@ export class DailyRewardService {
       );
       return ok ? { ok: true } : { error: 'resend attempt not found', status: 404 };
     }
-    const ok = await this.db.markPayout(day, rank, status, txSignature, error);
+    const outcome = await this.db.markPayout(day, rank, status, txSignature, error);
     // Same doctrine as the claim arm above: paid/failed stamps (status, paid_at,
-    // tx_signature) are content of a possibly-unannounced day. Success arm only.
-    if (ok) this.winnersCache.bust();
-    return ok ? { ok: true } : { error: 'payout not found', status: 404 };
+    // tx_signature) are content of a possibly-unannounced day. 'updated' ONLY:
+    // 'already' is the runner re-posting a paid mark after a dropped response,
+    // which wrote nothing (the outcome split exists for exactly this decision).
+    if (outcome === 'updated') this.winnersCache.bust();
+    return outcome !== 'missing' ? { ok: true } : { error: 'payout not found', status: 404 };
   }
 
   async voidPayout(
