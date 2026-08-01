@@ -15,6 +15,7 @@ import { DISCORD_REWARD_GRANTS } from '../src/sim/discord_tier';
 import { loadConfig } from './config';
 import { DiscordApi, governorFromConfig } from './discord_api';
 import { Gateway } from './gateway';
+import { departedFromSeed, LinkedSweep, unappliedIdsFrom } from './linked_sweep';
 import {
   allTierRoleNames,
   buildActivityMessage,
@@ -28,6 +29,7 @@ import {
   clearedMemberMeta,
   computeRoleSync,
   type DailyActiveState,
+  type FlexData,
   GUILD_LARGE_THRESHOLD,
   indexSpecialRoleIds,
   isSlashCommand,
@@ -151,6 +153,20 @@ async function main(): Promise<void> {
   // The members-meta record we last successfully PUSHED, per member. Written only
   // after the server accepted it, so a failed push retries on the next sweep.
   const lastPushedMeta = new Map<string, MemberMetaRecord>();
+  // Who is believed to have a linked game account, and how far the current sweep
+  // pass has got. The sweep reads THIS rather than onlineUsers: an online member
+  // with no linked account can never produce a role or nickname write, and a
+  // linked member who is offline in Discord still needs one when their level
+  // moves. Every belief in it is fed from outside (the link-change feed, the
+  // flex-batch echo, the members-meta linkage signal), so the module itself
+  // stays pure and the wiring below is the only thing that talks to the network.
+  const linkedSweep = new LinkedSweep();
+  // The member ids observed during the CURRENT seed session: a small guild's
+  // GUILD_CREATE, or a large guild's GUILD_CREATE plus every op 8 chunk, plus
+  // anyone who joined while that was streaming. Diffed against the caches once
+  // the seed is complete, which is the only way a member who left while the
+  // gateway was down is ever evicted (L16).
+  const seedSessionIds = new Set<string>();
   // When that cache was last thrown away wholesale. It has to be, periodically:
   // the cache records what the bot believes the server holds, and the server can
   // lose those values with nothing to tell the bot (see dueForFullResync).
@@ -159,6 +175,15 @@ async function main(): Promise<void> {
   const nickCaches = { memberNicks, memberNames, lastWrittenNick };
   const metaIo = {
     pushMembersMeta: (records: MemberMetaRecord[]) => server.pushMembersMeta(records),
+    // A members-meta push the bot was making anyway reports which of the ids it
+    // accepted had NO link row, which decides linkage for every id in the batch
+    // at no extra request. On the hourly full resync the batch is the whole
+    // roster, so that is a complete reconciliation of the sweep's member set.
+    // A response that does not carry the field at all decides nothing
+    // (unappliedIdsFrom answers undefined), never "all of them are linked".
+    onBatchOutcome: (batchIds: string[], result: unknown) => {
+      linkedSweep.applyMetaPushOutcome(batchIds, unappliedIdsFrom(result));
+    },
   };
   let voiceChannelName: string | null = null; // resolved from GUILD_CREATE channels
   let memberTotal = 0; // total guild members (from GUILD_CREATE member_count)
@@ -248,11 +273,17 @@ async function main(): Promise<void> {
     }
   };
 
-  // ── role sync (poll the server for online linked members) ────────────────────
-  const syncRolesFor = async (userId: string): Promise<void> => {
-    // One flex read drives both the status-tier roles AND the level-on-name nick.
-    const flex = await server.flex(userId);
-    if (!flex?.linked) return;
+  // ── role sync (one paced slice of the linked-member set at a time) ───────────
+  // The flex payload arrives as an ARGUMENT now rather than being fetched here.
+  // It used to be one GET per member per sweep, which at a thousand concurrent
+  // players was a thousand uncached server reads every five minutes; the sweep
+  // below asks about a whole slice in one flex-batch request instead. What this
+  // function does with the payload is unchanged.
+  const syncRolesFor = async (
+    userId: string,
+    flex: FlexData & { linked: boolean },
+  ): Promise<void> => {
+    if (!flex.linked) return;
     const { toAdd, toRemove } =
       tierRoleIds.size > 0
         ? computeRoleSync({
@@ -310,8 +341,60 @@ async function main(): Promise<void> {
       if (outcome === 'written') await pushMemberMeta(userId);
     }
   };
-  const syncAllOnlineRoles = async (): Promise<void> => {
-    for (const userId of onlineUsers) await syncRolesFor(userId);
+
+  /**
+   * ONE slice of the sweep, which is what the role-sync task now runs.
+   *
+   * The sweep this replaces did the whole population in a single run: it walked
+   * every online member, spent one server read each, and queued whatever Discord
+   * writes came out of them all at once. That is the shape that turned a slow
+   * minute into a storm, because the burst lands on the rate governor's queues
+   * faster than they drain and every later run piles onto the same queues.
+   * Handing back one bounded slice per run turns the same work into a spread:
+   * the module decides WHICH members, the scheduler decides WHEN, and neither
+   * needs to know about the other.
+   *
+   * Returns whether it did work, which is the scheduler's didWork signal: a
+   * slice snaps the cadence back to the slice interval so the rest of the pass
+   * follows promptly, and an empty run decays it toward the full sweep interval
+   * so an idle bot is not paying for a wake every three seconds.
+   */
+  const runSweepSlice = async (): Promise<boolean> => {
+    const slice = linkedSweep.nextSlice(Date.now(), cfg.sweepSliceSize, cfg.roleSyncIntervalMs);
+    if (slice === null) return false;
+    const result = await server.flexBatch(slice.ids);
+    if (result === null) {
+      // server_client answers null for a failed call rather than throwing, so
+      // this is the only failure signal there is. Nothing was observed, so no
+      // belief may move: the slice goes back to be re-served, and the run counts
+      // as empty so the cadence backs off instead of retrying every three
+      // seconds against a server that is already refusing.
+      linkedSweep.restoreSlice(slice);
+      return false;
+    }
+    const outcome = linkedSweep.applyFlexBatchResult(slice.ids, result);
+    // A member whose link row is new has meta the bot believes it already
+    // pushed, attached to a row that no longer exists. Dropping the cached
+    // record BEFORE syncing them is what lets the nickname write's own push
+    // through; leaving it would suppress their join date and staff flair until
+    // the hourly resync.
+    for (const id of outcome.metaStale) lastPushedMeta.delete(id);
+    const asked = new Set(slice.ids);
+    for (const member of result.members) {
+      // Only ids this slice actually asked about: the sweep's writes are driven
+      // by the answer, and an answer carrying an id nobody asked for must not be
+      // able to aim a role write at an arbitrary guild member.
+      if (!asked.has(member.discord_user_id)) continue;
+      try {
+        await syncRolesFor(member.discord_user_id, member);
+      } catch (e) {
+        // Per member, so one refusal (a governor-blocked write, an open breaker)
+        // costs that member's turn and not the rest of the slice. Their caches
+        // are left untouched by the write paths, so the next pass retries them.
+        console.error('[bot] sweep sync failed for', member.discord_user_id, e);
+      }
+    }
+    return true;
   };
 
   // ── gateway dispatch ─────────────────────────────────────────────────────────
@@ -328,7 +411,7 @@ async function main(): Promise<void> {
           // departed-member reconcile when done. A small guild's GUILD_CREATE is
           // already the complete roster, so it reconciles right away.
           if (memberTotal > GUILD_LARGE_THRESHOLD) gateway.requestGuildMembers(cfg.guildId);
-          else void reconcileDepartedMembers().catch((e) => console.error(e));
+          else void completeSeed().catch((e) => console.error(e));
           schedulePresencePush();
           // Sync tier roles for everyone online right away, so a freshly linked
           // member's role matches their points without waiting for the poll, and
@@ -340,6 +423,12 @@ async function main(): Promise<void> {
           // reconnect storm delivers a burst of them, and a burst of fire-and-
           // forget sweeps is how a blip became a sustained storm. Kicks against an
           // in-flight sweep collapse into exactly one follow-up.
+          //
+          // The sweep's kick is preceded by a requestPass, because a kick alone
+          // only wakes the task EARLY: it would find the pass window still open
+          // and hand back no work at all, which is exactly backwards on the one
+          // event that means the bot's view of the guild may be stale.
+          linkedSweep.requestPass();
           roleSyncTask.kick();
           memberMetaTask.kick();
           // One-time "bot online" announcement so the integration is visibly live.
@@ -380,6 +469,12 @@ async function main(): Promise<void> {
           // and their meta can be pushed without waiting for a restart/re-seed.
           const userId = upsertMemberFromPayload(d);
           if (!userId) return;
+          // A joiner counts as observed by the seed session in flight. Without
+          // this, someone who joins DURING a large guild's op 8 backfill is in
+          // the caches but not in the seed, and the completeness diff below
+          // would read them as departed and evict them the moment the last
+          // chunk lands.
+          seedSessionIds.add(userId);
           // Mark membership + grant the member reward (server dedupes). No channel
           // welcome message is posted (intentionally quiet).
           void server.setMember(userId, true);
@@ -459,7 +554,10 @@ async function main(): Promise<void> {
           // batch of members (incl. offline). Upsert them, apply any presences,
           // then push everyone's meta after the final chunk.
           if (String(d.guild_id ?? '') !== cfg.guildId) return;
-          for (const m of asArray(d.members)) upsertMemberFromPayload(m);
+          for (const m of asArray(d.members)) {
+            const id = upsertMemberFromPayload(m);
+            if (id) seedSessionIds.add(id);
+          }
           for (const p of asArray(d.presences)) {
             const pu = (p.user ?? {}) as Record<string, unknown>;
             const pid = String(pu.id ?? '');
@@ -473,7 +571,7 @@ async function main(): Promise<void> {
             // Same coalescing reason as GUILD_CREATE: a reconnect re-runs the whole
             // op 8 backfill, so the final chunk arrives once per reconnect.
             memberMetaTask.kick();
-            void reconcileDepartedMembers().catch((e) => console.error(e));
+            void completeSeed().catch((e) => console.error(e));
           }
           break;
         }
@@ -495,13 +593,20 @@ async function main(): Promise<void> {
   });
 
   function seedGuild(d: Record<string, unknown>): void {
+    // A GUILD_CREATE opens a new seed session, so the accumulator starts empty:
+    // it has to describe THIS seed alone, or a member who left between two
+    // reconnects would still be counted as observed and never evicted.
+    seedSessionIds.clear();
     if (typeof d.member_count === 'number') memberTotal = d.member_count;
     for (const ch of asArray(d.channels)) {
       if (String(ch.id ?? '') === cfg.voiceChannelId && typeof ch.name === 'string') {
         voiceChannelName = ch.name;
       }
     }
-    for (const m of asArray(d.members)) upsertMemberFromPayload(m);
+    for (const m of asArray(d.members)) {
+      const id = upsertMemberFromPayload(m);
+      if (id) seedSessionIds.add(id);
+    }
     for (const v of asArray(d.voice_states)) {
       const id = String(v.user_id ?? '');
       const channelId = typeof v.channel_id === 'string' ? v.channel_id : null;
@@ -571,6 +676,48 @@ async function main(): Promise<void> {
       },
       setMember: (id, guildMember) => server.setMember(id, guildMember),
     });
+  };
+
+  /**
+   * Everything a finished roster seed has to settle, in the order it has to
+   * settle in. Called from BOTH completion sites: a small guild's GUILD_CREATE
+   * is already the whole roster, and a large guild's is complete only once the
+   * final op 8 chunk has landed.
+   *
+   * The eviction is ledger item L16. Nothing ever removed a member from the
+   * per-member maps except GUILD_MEMBER_REMOVE, which does not fire for someone
+   * who left while the gateway was down, so their name, roles, join date and
+   * presence stayed cached for the life of the process: a slow leak, a member
+   * the sweep kept trying to write to, and, because the departed-flair reconcile
+   * diffs the server's flagged ids against those same maps, a departed member
+   * who could never be recognized as departed. Evicting first is what makes the
+   * reconcile below see an honest roster.
+   *
+   * It is gated on COMPLETENESS for the reason `rosterComplete` exists: diffing
+   * a partial seed would read merely-unseeded members as departed and evict the
+   * live roster. Discovery is armed either way, because the linked set is empty
+   * at boot and a bot that never discovers anyone never syncs anyone, which
+   * would be a worse failure than a late prune.
+   */
+  const completeSeed = async (): Promise<void> => {
+    if (rosterComplete(seedSessionIds.size, memberTotal)) {
+      for (const id of departedFromSeed(memberRoles.keys(), seedSessionIds)) {
+        memberNames.delete(id);
+        memberRoles.delete(id);
+        memberJoined.delete(id);
+        voiceStates.delete(id);
+        onlineUsers.delete(id);
+        forgetMember(nickCaches, lastPushedMeta, id);
+      }
+      linkedSweep.pruneToRoster(new Set(memberRoles.keys()));
+    }
+    // One discovery per complete seed, never on a timer: a periodic full-roster
+    // rescan is the cost this phase removed. armDiscovery is idempotent while
+    // one is outstanding, which matters because Discord re-sends GUILD_CREATE on
+    // every re-IDENTIFY, so a reconnect storm reaches here repeatedly.
+    linkedSweep.armDiscovery(memberRoles.keys());
+    roleSyncTask.kick();
+    await reconcileDepartedMembers();
   };
 
   // Daily Discord-engagement reward: the first time a linked member posts a message
@@ -647,10 +794,19 @@ async function main(): Promise<void> {
   // new: the intervals are the same values (now D13 env-overridable, defaulting to
   // exactly today's numbers), and the special-roles refresh still runs immediately
   // before the roster push rather than beside it.
+  // The sweep is the one task with a real ACTIVE-to-IDLE spread, and the two
+  // numbers mean different things. `activeMs` paces the slices INSIDE a pass:
+  // every slice reports work, so the cadence stays there for as long as the pass
+  // has ids left. `idleMs` is the pass interval itself: once the pass drains,
+  // each empty run decays the delay toward it, so between passes the task costs
+  // a wake every few minutes that does no IO at all. The window is a floor
+  // rather than a deadline, since a pass can only start on a wake: the decayed
+  // delay means the next one opens at the first wake at or after the window,
+  // and GUILD_CREATE's requestPass is what makes a reconnect skip the wait.
   const roleSyncTask = scheduler.add({
     name: 'role-sync',
-    cadence: { activeMs: cfg.roleSyncIntervalMs },
-    run: () => syncAllOnlineRoles(),
+    cadence: { activeMs: cfg.sweepSliceMs, idleMs: cfg.roleSyncIntervalMs },
+    run: () => runSweepSlice(),
   });
   scheduler.add({
     name: 'tier-roles',

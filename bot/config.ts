@@ -1,7 +1,13 @@
 // Bot configuration from env. All secrets are server-side env only (never
 // committed). Missing-required values throw at boot with a clear message.
 
-import { PRESENCE_DEBOUNCE_MS, RELAY_POLL_MS, ROLE_SYNC_INTERVAL_MS } from './cadence';
+import {
+  PRESENCE_DEBOUNCE_MS,
+  RELAY_POLL_MS,
+  ROLE_SYNC_INTERVAL_MS,
+  SWEEP_SLICE_MS,
+} from './cadence';
+import { DEFAULT_SWEEP_SLICE_SIZE } from './linked_sweep';
 import {
   DEFAULT_BAN_PAUSE_MS,
   DEFAULT_BREAKER_LIMIT,
@@ -50,6 +56,10 @@ export interface BotConfig {
   presenceDebounceMs: number;
   /** How often the relay, activity and daily-rewards drains poll the server. */
   relayPollMs: number;
+  /** How long the linked-member sweep waits between slices while a pass is live. */
+  sweepSliceMs: number;
+  /** How many linked members one sweep slice asks about (and may write to). */
+  sweepSliceSize: number;
 }
 
 function required(name: string): string {
@@ -120,5 +130,15 @@ export function loadConfig(): BotConfig {
       PRESENCE_DEBOUNCE_MS,
     ),
     relayPollMs: positiveNumberFromEnv(process.env.DISCORD_RELAY_POLL_MS, RELAY_POLL_MS),
+    sweepSliceMs: positiveNumberFromEnv(process.env.DISCORD_SWEEP_SLICE_MS, SWEEP_SLICE_MS),
+    // The slice SIZE is a threshold rather than a cadence, so its default lives
+    // beside the sweep that spends it (the same reason the governor's
+    // DEFAULT_* constants live in rate_governor.ts). It is the operator's lever
+    // for the one thing a slice bounds: how many Discord writes a single tick
+    // can queue.
+    sweepSliceSize: positiveNumberFromEnv(
+      process.env.DISCORD_SWEEP_SLICE_SIZE,
+      DEFAULT_SWEEP_SLICE_SIZE,
+    ),
   };
 }

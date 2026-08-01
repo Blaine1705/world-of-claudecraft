@@ -84,6 +84,19 @@ export interface MetaPushIo {
    * every member in it until some later unrelated field happened to move.
    */
   pushMembersMeta: (records: MemberMetaRecord[]) => Promise<unknown>;
+  /**
+   * Called once per ACCEPTED batch with the ids it carried and the raw response,
+   * so a caller can read the linkage signal riding on it (the response reports
+   * which accepted ids had no link row). Optional, and deliberately not called
+   * for a refused batch: a refusal says nothing about linkage, and inferring
+   * from one would let a transport failure empty the sweep's member set.
+   *
+   * A callback rather than a widened return type because the two consumers want
+   * different things: the caller of these functions wants the records that
+   * landed, and this wants the response, per batch, while the batching loop
+   * still knows which ids were in it.
+   */
+  onBatchOutcome?: (batchIds: string[], result: unknown) => void;
 }
 
 /**
@@ -119,11 +132,20 @@ export async function pushChangedMemberMeta(
 ): Promise<MemberMetaRecord[]> {
   const pushed: MemberMetaRecord[] = [];
   for (const batch of chunk(changedMemberMeta(records, lastPushed), batchSize)) {
-    if (pushRejected(await io.pushMembersMeta(batch))) return pushed;
+    const result = await io.pushMembersMeta(batch);
+    if (pushRejected(result)) return pushed;
     for (const record of batch) {
       lastPushed.set(record.discord_user_id, record);
       pushed.push(record);
     }
+    // AFTER the cache moves, so an observer cannot be undone by the write that
+    // follows it. The batch stays cached even for ids the server could not apply
+    // (L14): leaving them dirty would re-push most of the guild every sweep, so
+    // the correction rides the linkage signal instead.
+    io.onBatchOutcome?.(
+      batch.map((record) => record.discord_user_id),
+      result,
+    );
   }
   return pushed;
 }
@@ -139,8 +161,10 @@ export async function pushOneMemberMeta(
   io: MetaPushIo,
 ): Promise<boolean> {
   if (!memberMetaChanged(record, lastPushed.get(record.discord_user_id))) return false;
-  if (pushRejected(await io.pushMembersMeta([record]))) return false;
+  const result = await io.pushMembersMeta([record]);
+  if (pushRejected(result)) return false;
   lastPushed.set(record.discord_user_id, record);
+  io.onBatchOutcome?.([record.discord_user_id], result);
   return true;
 }
 

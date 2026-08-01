@@ -4,8 +4,14 @@
 // it key by key so nothing leaks into another test file.
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { PRESENCE_DEBOUNCE_MS, RELAY_POLL_MS, ROLE_SYNC_INTERVAL_MS } from '../bot/cadence';
+import {
+  PRESENCE_DEBOUNCE_MS,
+  RELAY_POLL_MS,
+  ROLE_SYNC_INTERVAL_MS,
+  SWEEP_SLICE_MS,
+} from '../bot/cadence';
 import { loadConfig } from '../bot/config';
+import { DEFAULT_SWEEP_SLICE_SIZE } from '../bot/linked_sweep';
 
 // Every env key loadConfig reads. Each test starts from a clean slate of these,
 // so a value left by another test (or by the developer's own shell) can never
@@ -31,6 +37,8 @@ const BOT_ENV_KEYS = [
   'DISCORD_ROLE_SYNC_INTERVAL_MS',
   'DISCORD_PRESENCE_DEBOUNCE_MS',
   'DISCORD_RELAY_POLL_MS',
+  'DISCORD_SWEEP_SLICE_MS',
+  'DISCORD_SWEEP_SLICE_SIZE',
 ] as const;
 
 /** Fill the four required keys with obvious non-secret placeholders. */
@@ -285,6 +293,7 @@ describe('bot loop cadences', () => {
     expect(ROLE_SYNC_INTERVAL_MS).toBe(300000);
     expect(PRESENCE_DEBOUNCE_MS).toBe(4000);
     expect(RELAY_POLL_MS).toBe(3000);
+    expect(SWEEP_SLICE_MS).toBe(3000);
   });
 
   it('keeps the presence debounce and relay poll well under the role sync', () => {
@@ -292,6 +301,26 @@ describe('bot loop cadences', () => {
     // role sync is the slow reconcile.
     expect(PRESENCE_DEBOUNCE_MS).toBeLessThan(ROLE_SYNC_INTERVAL_MS);
     expect(RELAY_POLL_MS).toBeLessThan(ROLE_SYNC_INTERVAL_MS);
+  });
+
+  it('paces sweep slices far under the pass interval they subdivide', () => {
+    // The two are a pair, not two independent knobs: the slice cadence is what
+    // spreads ONE pass across the interval, so a slice interval at or above the
+    // pass interval would collapse the spread back into a burst per pass, which
+    // is the shape this phase removed. Many slices per pass is the whole point,
+    // so the ratio is asserted rather than a bare ordering.
+    expect(SWEEP_SLICE_MS).toBeLessThan(ROLE_SYNC_INTERVAL_MS);
+    expect(ROLE_SYNC_INTERVAL_MS / SWEEP_SLICE_MS).toBeGreaterThanOrEqual(10);
+  });
+
+  it('bounds one slice under the governor queue depth it has to fit in', () => {
+    // The default slice size is chosen against the rate governor, not the
+    // server: a slice's worst case is one nickname PATCH plus a role add and a
+    // role remove per member, so the burst it can queue is three writes per
+    // member. MAX_QUEUE_DEPTH is 256 per bucket queue, and those writes spread
+    // across three queues, so the binding comparison is per queue.
+    expect(DEFAULT_SWEEP_SLICE_SIZE).toBe(100);
+    expect(DEFAULT_SWEEP_SLICE_SIZE).toBeLessThan(256);
   });
 });
 
@@ -396,6 +425,24 @@ describe('loadConfig cadence knobs (D13)', () => {
       fallback: 3000,
       override: '11000',
     },
+    // The two Phase 6 sweep knobs. The slice interval is a cadence like the
+    // three above; the slice SIZE is a threshold, so its default lives beside
+    // the sweep that spends it rather than in bot/cadence.ts, and the seam
+    // assertion below reads it from bot/linked_sweep.ts instead.
+    {
+      env: 'DISCORD_SWEEP_SLICE_MS',
+      field: 'sweepSliceMs',
+      constant: 'SWEEP_SLICE_MS',
+      fallback: 3000,
+      override: '9500',
+    },
+    {
+      env: 'DISCORD_SWEEP_SLICE_SIZE',
+      field: 'sweepSliceSize',
+      constant: 'DEFAULT_SWEEP_SLICE_SIZE',
+      fallback: 100,
+      override: '37',
+    },
   ] as const;
 
   it('defaults each cadence to the value it had hard-coded, pinned against a LITERAL', () => {
@@ -407,6 +454,8 @@ describe('loadConfig cadence knobs (D13)', () => {
     expect(cfg.roleSyncIntervalMs).toBe(300000);
     expect(cfg.presenceDebounceMs).toBe(4000);
     expect(cfg.relayPollMs).toBe(3000);
+    expect(cfg.sweepSliceMs).toBe(3000);
+    expect(cfg.sweepSliceSize).toBe(100);
   });
 
   it('falls back to the SHARED cadence module, not to a second copy of the numbers', () => {
@@ -422,6 +471,10 @@ describe('loadConfig cadence knobs (D13)', () => {
     expect(source).toMatch(
       /import \{[^}]*PRESENCE_DEBOUNCE_MS[^}]*RELAY_POLL_MS[^}]*ROLE_SYNC_INTERVAL_MS[^}]*\} from '\.\/cadence'/,
     );
+    // The slice SIZE is the one default that is not a cadence, so it comes from
+    // the module that spends it. Same seam, different owner, and it has to be
+    // pinned separately or an inlined 100 would pass every other case here.
+    expect(source).toMatch(/import \{[^}]*DEFAULT_SWEEP_SLICE_SIZE[^}]*\} from '\.\/linked_sweep'/);
     for (const knob of CADENCE_KNOBS) {
       // Each env key resolved against its own imported constant, never a literal.
       expect(source).toMatch(
@@ -432,7 +485,7 @@ describe('loadConfig cadence knobs (D13)', () => {
     // BOTH sides, never a substring scan: `not.toContain('3000')` also fires on
     // 30000, 13000 and 130000, so the day a governor knob gains a plausible
     // default this file would go red for a number that is not a copy of anything.
-    for (const value of ['300_?000', '4_?000', '3_?000']) {
+    for (const value of ['300_?000', '4_?000', '3_?000', '100']) {
       expect(source).not.toMatch(new RegExp(`(?<![0-9_])${value}(?![0-9_])`));
     }
   });
