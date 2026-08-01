@@ -923,6 +923,23 @@ export const ko_KR: EnTranslations = {
       "separate": "{meter} 분리",
       "regroup": "{meter} 통합"
     },
+    "targetAuras": {
+      "title": "대상 오라",
+      "keybindLabel": "대상 강화 및 약화 효과",
+      "all": "All",
+      "debuffs": "약화 효과",
+      "buffs": "강화 효과",
+      "unlock": "대상 오라 창 이동",
+      "lock": "대상 오라 창 잠금",
+      "configureRows": "대상 오라 설정",
+      "fewerRows": "오라 행 수 줄이기",
+      "moreRows": "오라 행 수 늘리기",
+      "visibleRows": "선호하는 오라 행 수: {count}",
+      "showSources": "오라 시전자 이름 표시",
+      "hideSources": "오라 시전자 이름 숨기기",
+      "ownAura": "내 오라",
+      "opacity": "오라 불투명도: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "펫의 체력이 가득 찼습니다",
       "disabledNoFood": "가방에 펫을 치유할 음식이 없습니다"
