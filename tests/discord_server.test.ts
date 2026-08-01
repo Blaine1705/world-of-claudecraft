@@ -28,6 +28,7 @@ import {
   handleNativeDiscordExchange,
   handleSwagClaim,
 } from '../server/discord';
+import { drainLinkChanges } from '../server/discord_link_changes';
 import { resetNativeDiscordHandoffsForTest } from '../server/native_discord_handoff';
 import { resetAuthFailures, resetDiscordRateLimits } from '../server/ratelimit';
 
@@ -134,6 +135,9 @@ beforeEach(() => {
   resetDiscordRateLimits();
   resetNativeDiscordHandoffsForTest();
   resetAuthFailures();
+  // The link/unlink handlers and the reward grants they trigger write into the
+  // module-global linked-member change feed; start every test with an empty queue.
+  drainLinkChanges();
   dbMock.query.mockReset();
   dbMock.query.mockImplementation((sql: string) => Promise.resolve(defaultRouter(sql)));
 });
@@ -1315,5 +1319,140 @@ describe('POST /api/auth/discord/login/link', () => {
     const calls = dbMock.query.mock.calls.map((c) => String(c[0]));
     expect(calls.some((c) => c.includes('DELETE FROM discord_pending_logins'))).toBe(false);
     expect(calls.some((c) => c.includes('INSERT INTO discord_links'))).toBe(false);
+  });
+});
+
+// The four link/unlink transitions on the linked-member change feed. All four sites
+// sit inside the shared exported handlers, which BOTH dispatch arms (the RouteDef
+// registry and the retained legacy ladder in main.ts) call, so one enqueue each
+// covers both arms by construction.
+describe('link and unlink change-feed enqueues', () => {
+  const PENDING = {
+    token: 't',
+    discord_user_id: '999999999999999999',
+    discord_username: 'Maxp',
+    discord_avatar: null,
+    guild_member: false,
+  };
+  // An older Discord identity already attached to the account, for the repoint cases.
+  const OLD_DISCORD_ID = '111111111111111112';
+
+  it('carries the discord id when the chooser links an existing account', async () => {
+    pendingRows = [{ ...PENDING }];
+    findAccountRows = [
+      { id: 1, username: 'maxp', password_hash: await hashPassword('correcthorse') },
+    ];
+    ownerRows = [];
+    linkRow = []; // no prior link on this account: a plain unlinked-to-linked move
+    const res = makeRes();
+
+    await loginLink(
+      makeReq({ body: { linkToken: 't', username: 'maxp', password: 'correcthorse' } }),
+      res,
+    );
+
+    expect(parse(res).status).toBe(200);
+    // grantLinkRewards runs on the same request, so its points enqueue merges into
+    // this account's open item. One item, one bot re-push, both facts recorded.
+    expect(drainLinkChanges()).toEqual([
+      { accountId: 1, discordId: '999999999999999999', kinds: ['link', 'points'] },
+    ]);
+  });
+
+  it('reports a chooser repoint as an unlink of the OLD id plus a link of the new one', async () => {
+    pendingRows = [{ ...PENDING }];
+    findAccountRows = [
+      { id: 1, username: 'maxp', password_hash: await hashPassword('correcthorse') },
+    ];
+    ownerRows = [];
+    linkRow = [{ account_id: 1, discord_user_id: OLD_DISCORD_ID }];
+    const res = makeRes();
+
+    await loginLink(
+      makeReq({ body: { linkToken: 't', username: 'maxp', password: 'correcthorse' } }),
+      res,
+    );
+
+    expect(parse(res).status).toBe(200);
+    // Both kinds on one item, and the id is the OLD one (first observed wins): the
+    // stranded Discord user is the one the bot has to strip.
+    expect(drainLinkChanges()).toEqual([
+      { accountId: 1, discordId: OLD_DISCORD_ID, kinds: ['unlink', 'link', 'points'] },
+    ]);
+  });
+
+  it('enqueues nothing when the chooser link 409s on a foreign-owned discord id', async () => {
+    pendingRows = [{ ...PENDING }];
+    findAccountRows = [
+      { id: 1, username: 'maxp', password_hash: await hashPassword('correcthorse') },
+    ];
+    ownerRows = [{ account_id: 2 }]; // owned by someone else, so linkDiscordToAccount is false
+    linkRow = [];
+    const res = makeRes();
+
+    await loginLink(
+      makeReq({ body: { linkToken: 't', username: 'maxp', password: 'correcthorse' } }),
+      res,
+    );
+
+    expect(parse(res).status).toBe(409);
+    expect(drainLinkChanges()).toEqual([]);
+  });
+
+  it('enqueues a link for a freshly provisioned Discord account', async () => {
+    pendingRows = [{ ...PENDING }];
+    ownerRows = []; // unknown Discord id: the provision arm, not the existing-owner one
+    accountInsertRow = [{ id: 5, username: 'Maxp', password_hash: 'h' }];
+    const res = makeRes();
+
+    await loginNew(makeReq({ body: { linkToken: 't' } }), res);
+
+    expect(parse(res).status).toBe(200);
+    expect(drainLinkChanges()).toEqual([
+      { accountId: 5, discordId: '999999999999999999', kinds: ['link', 'points'] },
+    ]);
+  });
+
+  it('reports an OAuth-callback repoint the same way as the chooser', async () => {
+    stateRows = [
+      { state: 's', code_verifier: 'v', mode: 'link', account_id: 1, redirect_to: null },
+    ];
+    ownerRows = [];
+    linkRow = [{ account_id: 1, discord_user_id: OLD_DISCORD_ID }];
+    mockDiscordFetch();
+    const res = makeRes();
+
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+
+    expect(res.body).toContain('"ok":true');
+    expect(drainLinkChanges()).toEqual([
+      { accountId: 1, discordId: OLD_DISCORD_ID, kinds: ['unlink', 'link', 'points'] },
+    ]);
+  });
+
+  it('enqueues an unlink with the row id, and nothing when there was no row', async () => {
+    accountByIdRows = [{ id: 1, username: 'maxp', password_set: true }];
+    linkRow = [{ account_id: 1, discord_user_id: '999999999999999999' }];
+    const res = makeRes();
+
+    await handleDiscordUnlink(makeReq(), res, 1);
+
+    expect(parse(res).status).toBe(200);
+    // unlinkDiscord deletes by account_id and returns void, so the pre-read is the
+    // only source of the id the bot needs to strip roles from.
+    expect(drainLinkChanges()).toEqual([
+      { accountId: 1, discordId: '999999999999999999', kinds: ['unlink'] },
+    ]);
+
+    // That DELETE is an unconditional idempotent no-op, so a repeat unlink on an
+    // already-unlinked account must not manufacture a phantom transition.
+    linkRow = [];
+    const again = makeRes();
+    await handleDiscordUnlink(makeReq(), again, 1);
+    expect(parse(again).status).toBe(200);
+    expect(drainLinkChanges()).toEqual([]);
   });
 });

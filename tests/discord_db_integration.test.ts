@@ -1,5 +1,6 @@
-// Opt-in real-Postgres coverage for the two set-based Discord statements added
-// with POST /internal/discord/flex-batch and the members-meta bulk upsert.
+// Opt-in real-Postgres coverage for the set-based Discord statements: the two
+// added with POST /internal/discord/flex-batch and the members-meta bulk upsert,
+// plus the batched identity read GET /internal/discord/outbox drains through.
 //
 // WHY THIS FILE EXISTS: tests/discord_db.test.ts drives both functions through a
 // fake pool that routes on SQL TEXT, so it can pin the shape, the bound
@@ -18,7 +19,11 @@
 
 import { Pool } from 'pg';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { discordFlexRowsForDiscordIds, setDiscordMemberMetaBulk } from '../server/discord_db';
+import {
+  discordFlexRowsForDiscordIds,
+  discordLinksForAccounts,
+  setDiscordMemberMetaBulk,
+} from '../server/discord_db';
 
 const DB_URL = process.env.TEST_DATABASE_URL;
 const SCHEMA = 'discord_db_integration_test';
@@ -484,6 +489,131 @@ describeDb('discord set-based statements (real Postgres)', () => {
       // correct choice, so the assertion is on the loop count, not the node type).
       const linkScan = nodes.find((n) => String(n['Relation Name']) === 'discord_links');
       expect(Number(linkScan?.['Actual Loops'])).toBe(1);
+    }, 120_000);
+  });
+
+  // -------------------------------------------------------------------------
+  // discordLinksForAccounts (the outbox drain's one identity read)
+  // -------------------------------------------------------------------------
+
+  describe('discordLinksForAccounts', () => {
+    it('answers a mixed present/absent account set with the right rows', async () => {
+      await seedLink(1, 'du1', { username: 'One' });
+      await seedLink(2, 'du2', { username: 'Two' });
+
+      const rows = await discordLinksForAccounts(pool, [1, 2, 999]);
+
+      expect(rows.map((r) => r.account_id).sort((a, b) => a - b)).toEqual([1, 2]);
+      const one = rows.find((r) => r.account_id === 1);
+      expect(one?.discord_user_id).toBe('du1');
+      expect(one?.discord_username).toBe('One');
+      // Exactly the identity columns the outbox enriches with, proved against a
+      // real row rather than only against the statement text: discord_email is
+      // NOT among them, so a drain resolving thousands of accounts never
+      // materializes their email addresses.
+      expect(Object.keys(one ?? {}).sort()).toEqual([
+        'account_id',
+        'discord_avatar',
+        'discord_user_id',
+        'discord_username',
+        'guild_member',
+        'linked_at',
+      ]);
+      // 999 has no link row and produces no row rather than a null-filled one.
+      expect(rows.some((r) => r.account_id === 999)).toBe(false);
+    });
+
+    it('reads the whole account set through the primary-key index in ONE pass', async () => {
+      // Seeded AT the packet's D18 envelope (5,000 linked guild members) rather
+      // than at a convenient fraction, so the planner decides against statistics
+      // production will really show it. That size is load-bearing in both
+      // directions and was measured, not assumed: at this table size a 50-id ask
+      // plans an Index Scan on discord_links_pkey, while a 200-id ask over the
+      // same 5,000 rows correctly plans a Seq Scan (1% of the table is worth an
+      // index probe, 4% is not). So the pin below is on the SAMPLE-SIZED read,
+      // and it deliberately asserts the index is used rather than that no Seq
+      // Scan exists anywhere: at a larger ask a seq scan is the cheap and correct
+      // plan, and pinning against it would red on the optimal choice.
+      //
+      // What a regression here WOULD look like: the loop count moving off 1, i.e.
+      // a plan that touches discord_links once per requested id instead of once
+      // for the whole set. That is the property making the outbox drain flat.
+      await pool.query('INSERT INTO accounts (id) SELECT g FROM generate_series(1, 5000) g');
+      await pool.query(
+        `INSERT INTO discord_links (account_id, discord_user_id, discord_username, discord_avatar)
+         SELECT g, 'du' || g, 'un' || g, 'av' || g FROM generate_series(1, 5000) g`,
+      );
+      await pool.query('ANALYZE discord_links');
+
+      // 50 accounts spread across the table, plus three that were never linked,
+      // plus a repeat of the first (the de-duplication is what keeps the bound
+      // array the size the plan is costed for).
+      const present = Array.from({ length: 50 }, (_, i) => i * 97 + 1);
+      const requested = [...present, 90_001, 90_002, 90_003, present[0]];
+
+      // Capture the statement the MODULE issues, then explain exactly that:
+      // re-typing the SQL here would pin a copy free to drift from what ships.
+      let captured = '';
+      const capturingPool = {
+        query: (sql: string, params: unknown[]) => {
+          captured = sql;
+          return pool.query(sql, params as never[]);
+        },
+      } as unknown as Pool;
+      const rows = await discordLinksForAccounts(capturingPool, requested);
+      expect(rows).toHaveLength(50);
+      expect(rows.map((r) => r.account_id).sort((a, b) => a - b)).toEqual(present);
+
+      const explain = await pool.query(`EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) ${captured}`, [
+        [...new Set(requested)],
+      ]);
+      const nodes = planNodes(explain.rows[0]['QUERY PLAN'][0].Plan);
+
+      expect(nodes.some((n) => String(n['Index Name']) === 'discord_links_pkey')).toBe(true);
+      const linkScan = nodes.find((n) => String(n['Relation Name']) === 'discord_links');
+      expect(Number(linkScan?.['Actual Loops'])).toBe(1);
+      expect(Number(linkScan?.['Actual Rows'])).toBe(50);
+    }, 120_000);
+
+    it('stays a ONE-PASS read at the outbox page size of 1000 ids', async () => {
+      // The ask the endpoint really makes. server/internal.ts pages the
+      // link-change drain at OUTBOX_LINK_CHANGE_PAGE (1000), and a poll can also
+      // mention relay issuers and activity participants, so 1000 ids over the
+      // 5,000-row D18 envelope is the size the plan has to hold up at, not the
+      // 50-id sample the case above pins.
+      //
+      // WHAT IS ASSERTED, and what deliberately is NOT. Only Actual Loops === 1:
+      // the flatness property that makes a drain cost one pass rather than one
+      // probe per id. At 20% selectivity the planner correctly picks a Seq Scan,
+      // so a "no Seq Scan" or an index-name assertion here would red on the
+      // OPTIMAL plan; the index pin stays on the 50-id case above, where an index
+      // probe is what the planner should and does choose.
+      await pool.query('INSERT INTO accounts (id) SELECT g FROM generate_series(1, 5000) g');
+      await pool.query(
+        `INSERT INTO discord_links (account_id, discord_user_id, discord_username, discord_avatar)
+         SELECT g, 'du' || g, 'un' || g, 'av' || g FROM generate_series(1, 5000) g`,
+      );
+      await pool.query('ANALYZE discord_links');
+
+      const requested = Array.from({ length: 1000 }, (_, i) => i + 1);
+      let captured = '';
+      const capturingPool = {
+        query: (sql: string, params: unknown[]) => {
+          captured = sql;
+          return pool.query(sql, params as never[]);
+        },
+      } as unknown as Pool;
+      const rows = await discordLinksForAccounts(capturingPool, requested);
+      expect(rows).toHaveLength(1000);
+
+      const explain = await pool.query(`EXPLAIN (ANALYZE, FORMAT JSON) ${captured}`, [requested]);
+      const nodes = planNodes(explain.rows[0]['QUERY PLAN'][0].Plan);
+
+      const linkScan = nodes.find((n) => String(n['Relation Name']) === 'discord_links');
+      // Non-vacuous: the statement really did touch the table it is planned over.
+      expect(linkScan).toBeDefined();
+      expect(Number(linkScan?.['Actual Loops'])).toBe(1);
+      expect(Number(linkScan?.['Actual Rows'])).toBe(1000);
     }, 120_000);
   });
 });

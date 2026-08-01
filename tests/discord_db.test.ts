@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import {
   accountForDiscord,
   claimSwag,
@@ -9,6 +9,7 @@ import {
   type DiscordMemberMetaRecord,
   discordFlexRowsForDiscordIds,
   discordIdsWithGuildFlair,
+  discordLinksForAccounts,
   grantRewardPoints,
   linkDiscordToAccount,
   loadRewardState,
@@ -16,6 +17,7 @@ import {
   setDiscordLinkEmail,
   setDiscordMemberMetaBulk,
 } from '../server/discord_db';
+import { drainLinkChanges } from '../server/discord_link_changes';
 
 // discord_db functions take the pg `pool` as an argument, so a fake pool (no
 // vi.mock needed) drives every branch. The fake routes by normalized SQL and
@@ -37,6 +39,13 @@ function makePool(handler: Handler) {
 }
 
 const NONE: Result = { rows: [], rowCount: 0 };
+
+// The linked-member change feed is a module-global singleton that grantRewardPoints
+// and claimSwag now write into, so every test starts from an empty queue and no
+// block can inherit another's items.
+beforeEach(() => {
+  drainLinkChanges();
+});
 
 describe('linkDiscordToAccount', () => {
   it('refuses when the discord id already belongs to a different account', async () => {
@@ -164,6 +173,85 @@ describe('discordIdsWithGuildFlair', () => {
   });
 });
 
+describe('discordLinksForAccounts', () => {
+  const SELECT = 'FROM discord_links WHERE account_id = ANY($1::int[])';
+
+  // No discord_email: the SELECT is deliberately narrower than discordForAccount's
+  // (see the "narrows away discord_email" case below), so a fixture carrying one
+  // would model a row this statement cannot produce.
+  const row = (accountId: number) => ({
+    account_id: accountId,
+    discord_user_id: `du${accountId}`,
+    discord_username: `un${accountId}`,
+    discord_avatar: `av${accountId}`,
+    guild_member: false,
+    linked_at: 'x',
+  });
+
+  it('resolves a whole account set with ONE statement, however large the set', async () => {
+    // The reason the function exists: the outbox drain resolves every account in
+    // one pass, where the relay/activity GETs run discordForAccount per item.
+    const one = makePool((s) => (s.includes(SELECT) ? { rows: [row(1)], rowCount: 1 } : NONE));
+    expect(await discordLinksForAccounts(one.pool, [1])).toEqual([row(1)]);
+    expect(one.calls).toHaveLength(1);
+
+    const ids = Array.from({ length: 500 }, (_, i) => i + 1);
+    const many = makePool((s) =>
+      s.includes(SELECT) ? { rows: ids.map(row), rowCount: ids.length } : NONE,
+    );
+    await discordLinksForAccounts(many.pool, ids);
+    expect(many.calls).toHaveLength(1);
+    expect(many.calls[0].params).toEqual([ids]);
+  });
+
+  it('issues NO statement at all for an empty account list', async () => {
+    const { pool, calls } = makePool(() => ({ rows: [row(1)], rowCount: 1 }));
+    expect(await discordLinksForAccounts(pool, [])).toEqual([]);
+    expect(calls).toHaveLength(0);
+  });
+
+  it('de-duplicates ids before binding, so one account is asked about once', async () => {
+    // A drain can carry the same account in several streams (a relay post AND a
+    // points change), and the bound array is what the planner probes with.
+    const { pool, calls } = makePool((s) =>
+      s.includes(SELECT) ? { rows: [row(4), row(9)], rowCount: 2 } : NONE,
+    );
+    await discordLinksForAccounts(pool, [4, 9, 4, 9, 4]);
+    expect(calls).toHaveLength(1);
+    expect(calls[0].params).toEqual([[4, 9]]);
+  });
+
+  it('narrows away discord_email, through one set membership test', async () => {
+    const { pool, calls } = makePool(() => NONE);
+    await discordLinksForAccounts(pool, [1]);
+    const sql = calls[0].sql;
+    // Anchored on the CONTIGUOUS clause and counted: a bare toContain of the
+    // predicate alone would also be satisfied by a comment mentioning it, or by a
+    // second clause elsewhere in the statement deciding a different set of rows.
+    expect(sql.split(SELECT)).toHaveLength(2);
+    // The column list is the outbox's identity fields and nothing else. It is
+    // deliberately NARROWER than the per-account discordForAccount, which also
+    // selects discord_email: one drain resolves thousands of accounts at once, so
+    // copying that column here would materialize thousands of email addresses one
+    // spread away from a response the bot receives, for a field no caller on this
+    // path reads.
+    expect(sql).toContain(
+      'SELECT account_id, discord_user_id, discord_username, discord_avatar, guild_member, linked_at',
+    );
+    // Stated as its own negative, so a re-widened list cannot pass by prefix.
+    expect(sql).not.toContain('discord_email');
+  });
+
+  it('answers with no row for an account that has no link (absence is the answer)', async () => {
+    // Built fresh rather than reusing row(): the fake hands its own object back,
+    // so asserting against that object would compare the result with its source.
+    const { pool } = makePool((s) => (s.includes(SELECT) ? { rows: [row(1)], rowCount: 1 } : NONE));
+    const rows = await discordLinksForAccounts(pool, [1, 2]);
+    expect(rows.map((r) => r.account_id)).toEqual([1]);
+    expect(rows[0].discord_user_id).toBe('du1');
+  });
+});
+
 describe('setDiscordLinkEmail', () => {
   it('updates the stored Discord email when a fresh grant provides one', async () => {
     const { pool, calls, didRun } = makePool(() => ({ rows: [], rowCount: 1 }));
@@ -284,6 +372,87 @@ describe('claimSwag', () => {
     const res = await claimSwag(pool, 1, 'title_discordian', 0);
     expect(res.ok).toBe(true);
     expect(didRun('UPDATE reward_points SET points = points -')).toBe(false);
+  });
+});
+
+// The two reward_points writers are the only points sites on the linked-member
+// change feed, so each one has to distinguish a real balance write from the arms
+// that return an unchanged balance. A feed item for a no-op costs the bot a full
+// member re-push for nothing.
+describe('reward points feed enqueues', () => {
+  it('enqueues exactly one points item for the account a real grant credited', async () => {
+    const { pool } = makePool((s) => {
+      if (s.includes('INSERT INTO reward_ledger') && s.includes('ON CONFLICT'))
+        return { rows: [{ id: 1 }], rowCount: 1 };
+      if (s.includes('INSERT INTO reward_points'))
+        return { rows: [{ points: '300', lifetime_points: '300' }], rowCount: 1 };
+      return NONE;
+    });
+
+    await grantRewardPoints(pool, 77, 300, 'guild_member', 'guild:77');
+
+    expect(drainLinkChanges()).toEqual([{ accountId: 77, kinds: ['points'] }]);
+  });
+
+  it('enqueues nothing when the truncated delta is zero (no balance write at all)', async () => {
+    const { pool, didRun } = makePool(() => NONE);
+
+    await grantRewardPoints(pool, 77, 0.4, 'playtime');
+
+    expect(didRun('INSERT INTO reward_points')).toBe(false);
+    expect(drainLinkChanges()).toEqual([]);
+  });
+
+  it('enqueues nothing on a dedupe-key replay (the balance is returned unchanged)', async () => {
+    const { pool, didRun } = makePool((s) => {
+      if (s.includes('INSERT INTO reward_ledger') && s.includes('ON CONFLICT')) return NONE;
+      if (s.includes('SELECT points, lifetime_points FROM reward_points'))
+        return { rows: [{ points: '250', lifetime_points: '250' }], rowCount: 1 };
+      return NONE;
+    });
+
+    await grantRewardPoints(pool, 77, 250, 'link', 'link:77');
+
+    expect(didRun('INSERT INTO reward_points')).toBe(false);
+    expect(drainLinkChanges()).toEqual([]);
+  });
+
+  it('enqueues a points item for a priced swag claim that actually spent', async () => {
+    const { pool } = makePool((s) => {
+      if (s.includes('INSERT INTO swag_claims')) return { rows: [{ id: 1 }], rowCount: 1 };
+      if (s.includes('UPDATE reward_points SET points = points -'))
+        return { rows: [{ points: '500' }], rowCount: 1 };
+      return NONE;
+    });
+
+    expect(await claimSwag(pool, 88, 'chroma_blurple', 1000)).toEqual({
+      ok: true,
+      reason: 'ok',
+      points: 500,
+    });
+    expect(drainLinkChanges()).toEqual([{ accountId: 88, kinds: ['points'] }]);
+  });
+
+  it('enqueues nothing for a refused claim or a cost-0 claim that only reads', async () => {
+    const refused = makePool((s) => {
+      if (s.includes('INSERT INTO swag_claims')) return { rows: [{ id: 1 }], rowCount: 1 };
+      if (s.includes('UPDATE reward_points SET points = points -')) return NONE; // cannot afford
+      return NONE;
+    });
+    expect(await claimSwag(refused.pool, 88, 'chroma_blurple', 1000)).toEqual({
+      ok: false,
+      reason: 'points',
+    });
+    expect(drainLinkChanges()).toEqual([]);
+
+    const free = makePool((s) => {
+      if (s.includes('INSERT INTO swag_claims')) return { rows: [{ id: 1 }], rowCount: 1 };
+      if (s.includes('SELECT points FROM reward_points'))
+        return { rows: [{ points: '0' }], rowCount: 1 };
+      return NONE;
+    });
+    expect((await claimSwag(free.pool, 88, 'title_discordian', 0)).ok).toBe(true);
+    expect(drainLinkChanges()).toEqual([]);
   });
 });
 

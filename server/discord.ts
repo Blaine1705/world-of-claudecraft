@@ -48,6 +48,7 @@ import {
   setDiscordLinkEmail,
   unlinkDiscord,
 } from './discord_db';
+import { enqueueLinkChange } from './discord_link_changes';
 import {
   buildAuthorizeUrl,
   buildGuildJoinRequest,
@@ -362,6 +363,10 @@ async function completeLink(
   mode: DiscordLinkMode,
 ): Promise<void> {
   if (accountId === null) return respond(400, { ok: false, mode, error: 'no_session' });
+  // Read the existing link before the upsert: linkDiscordToAccount returns only a
+  // boolean, so this is the one chance to learn that this account is REPOINTING off
+  // an older Discord id. One extra query on a rare, user-initiated OAuth path.
+  const previousLink = await discordForAccount(pool, accountId);
   const linked = await linkDiscordToAccount(pool, accountId, {
     discordUserId: user.id,
     username: discordDisplayName(user),
@@ -373,6 +378,18 @@ async function completeLink(
     note('discord.link.conflict');
     return respond(409, { ok: false, mode, error: 'already_linked' });
   }
+  // A repoint strands the old Discord user, so it is an unlink of that id plus a
+  // link of the new one. The feed dedupes per account, so these two normally merge
+  // into a single item carrying kinds ['unlink','link'] and the OLD id (first id
+  // observed wins); that is the designed shape, and the drain resolves the
+  // authoritative link anyway.
+  if (previousLink && previousLink.discord_user_id !== user.id) {
+    enqueueLinkChange(
+      { accountId, discordId: previousLink.discord_user_id, kinds: ['unlink'] },
+      Date.now(),
+    );
+  }
+  enqueueLinkChange({ accountId, discordId: user.id, kinds: ['link'] }, Date.now());
   await captureDiscordEmail(accountId, user.email, user.emailVerified);
   await grantLinkRewards(accountId, guildMember);
   note('discord.link.success');
@@ -533,6 +550,11 @@ export async function handleDiscordLoginNew(
       } else {
         accountId = account.id;
         username = account.username;
+        // Fresh-provision arm only: the account was created moments ago, so this is
+        // a guaranteed unlinked-to-linked transition with no prior id to strand. The
+        // existing-owner arm below is not a link transition (the link already
+        // existed); its guild grant rides the points site in grantRewardPoints.
+        enqueueLinkChange({ accountId, discordId: user.id, kinds: ['link'] }, Date.now());
         await grantLinkRewards(accountId, pending.guild_member);
         note('discord.login.provisioned');
       }
@@ -614,6 +636,10 @@ export async function handleDiscordLoginLink(
   // Commit: consume the token (single-use guard) only now, then link + mint.
   const consumed = await consumeDiscordPendingLogin(pool, linkToken);
   if (!consumed) return json(res, 400, { error: 'expired', code: 'discord.expired' });
+  // Same pre-read rationale as completeLink: the chooser can attach a Discord id to
+  // an account that already carries a different one, and the upsert's boolean cannot
+  // report that. Rare, user-initiated, password-verified path.
+  const previousLink = await discordForAccount(pool, account.id);
   const linked = await linkDiscordToAccount(pool, account.id, {
     discordUserId: consumed.discord_user_id,
     username: consumed.discord_username,
@@ -622,6 +648,18 @@ export async function handleDiscordLoginLink(
     guildMember: consumed.guild_member,
   });
   if (!linked) return json(res, 409, { error: 'already_linked', code: 'discord.already_linked' });
+  // A repoint strands the old Discord user; per-account dedupe normally merges the
+  // pair into one item with kinds ['unlink','link'] carrying the OLD id.
+  if (previousLink && previousLink.discord_user_id !== consumed.discord_user_id) {
+    enqueueLinkChange(
+      { accountId: account.id, discordId: previousLink.discord_user_id, kinds: ['unlink'] },
+      Date.now(),
+    );
+  }
+  enqueueLinkChange(
+    { accountId: account.id, discordId: consumed.discord_user_id, kinds: ['link'] },
+    Date.now(),
+  );
   // Seed the existing account's recovery email from the captured Discord address
   // if it still has none (never overwrites an owner-set one).
   await captureDiscordEmail(account.id, consumed.discord_email, consumed.discord_email_verified);
@@ -866,7 +904,19 @@ export async function handleDiscordUnlink(
     await updatePasswordHash(accountId, await hashPassword(next));
     note('discord.unlink.set_password');
   }
+  // The only way to carry the Discord id into the change feed: unlinkDiscord deletes
+  // by account_id and returns void. It also settles whether this is a real
+  // transition, because that DELETE is an unconditional idempotent no-op, so a
+  // repeat unlink on an already-unlinked account must enqueue NOTHING rather than a
+  // phantom unlink the bot would act on. Rare, user-initiated cold path.
+  const existingLink = await discordForAccount(pool, accountId);
   await unlinkDiscord(pool, accountId);
+  if (existingLink) {
+    enqueueLinkChange(
+      { accountId, discordId: existingLink.discord_user_id, kinds: ['unlink'] },
+      Date.now(),
+    );
+  }
   note('discord.unlink');
   return json(res, 200, { unlinked: true });
 }

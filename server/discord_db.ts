@@ -14,6 +14,7 @@
 //                            ledger), and mutated server-side only.
 import type { Pool } from 'pg';
 import { discordStatusIndexForPoints } from '../src/sim/discord_tier';
+import { enqueueLinkChange } from './discord_link_changes';
 import { discordAvatarUrl } from './discord_oauth';
 import { isUniqueViolation } from './http_util';
 
@@ -145,6 +146,59 @@ export async function discordForAccount(
     [accountId],
   );
   return res.rows[0] ?? null;
+}
+
+/**
+ * The subset of a link row the batched read below selects: the identity the outbox
+ * drain enriches items with, and nothing else. It is deliberately NOT the full
+ * DiscordLinkRow, because that carries discord_email (see the SELECT note below).
+ */
+export type DiscordOutboxLinkRow = Pick<
+  DiscordLinkRow,
+  | 'account_id'
+  | 'discord_user_id'
+  | 'discord_username'
+  | 'discord_avatar'
+  | 'guild_member'
+  | 'linked_at'
+>;
+
+/**
+ * The discord_links rows for MANY accounts, in ONE statement: the set-based
+ * sibling of discordForAccount, over a NARROWER column list.
+ *
+ * Called by the consolidated outbox drain (GET /internal/discord/outbox,
+ * server/internal.ts), which resolves every drained relay issuer, activity
+ * participant and link-change account to its Discord identity in one pass. The
+ * per-item discordForAccount the relay and activity GETs run costs one round trip
+ * per ITEM, and a full drain carries thousands; collapsing that N+1 into a single
+ * statement is invariant D1.
+ *
+ * discord_email is NOT selected, and that is the one deliberate difference from
+ * discordForAccount's column list. A full drain resolves thousands of accounts at
+ * once, so copying the column here would materialize thousands of email addresses
+ * in the drain's row map, one accidental spread away from a response the bot
+ * receives, to serve a field no caller on this path reads. The narrow return type
+ * is what makes that structural rather than a convention: a handler cannot reach
+ * for an address the row does not carry.
+ *
+ * Empty input short-circuits with ZERO statements rather than binding an empty
+ * array. Ids are de-duplicated before binding, so an account appearing in several
+ * streams of one drain is asked about once. An account with no link row simply
+ * produces no row: absence IS the answer, which is what discordForAccount's null
+ * says per account.
+ */
+export async function discordLinksForAccounts(
+  pool: Pool,
+  accountIds: readonly number[],
+): Promise<DiscordOutboxLinkRow[]> {
+  if (accountIds.length === 0) return [];
+  const res = await pool.query(
+    `SELECT account_id, discord_user_id, discord_username, discord_avatar, guild_member, linked_at
+       FROM discord_links WHERE account_id = ANY($1::int[])`,
+    [[...new Set(accountIds)]],
+  );
+  return res.rows;
 }
 
 export async function accountForDiscord(pool: Pool, discordUserId: string): Promise<number | null> {
@@ -446,6 +500,15 @@ export async function grantRewardPoints(
       [accountId, amount],
     );
     await client.query('COMMIT');
+    // The one write funnel for every grant (link, guild, playtime, booster,
+    // daily_active, operator clawbacks), so the change feed is wired here rather
+    // than at the callers: this single site covers both dispatch arms of
+    // /internal/discord/grant and /internal/discord/member. Reached only on a real
+    // balance write: the zero/non-finite early return and the dedupe-key replay both
+    // return above without touching reward_points. After COMMIT, never mid-
+    // transaction. Unlinked accounts enqueue too (the playtime grant path); the
+    // outbox drain is what filters by linkage.
+    enqueueLinkChange({ accountId, kinds: ['points'] }, Date.now());
     return rowToRewardState(upd.rows[0]);
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -507,6 +570,10 @@ export async function claimSwag(
       points = Number(cur.rows[0]?.points ?? 0);
     }
     await client.query('COMMIT');
+    // Spendable points moved only on the priced arm; a cost-0 title claim reads the
+    // balance and leaves it untouched, so it is not a points transition. The refusal
+    // arms (already claimed, cannot afford) roll back above and never reach here.
+    if (price > 0) enqueueLinkChange({ accountId, kinds: ['points'] }, Date.now());
     return { ok: true, reason: 'ok', points };
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});

@@ -31,12 +31,16 @@ import {
   setAccountWeaponSkinLoadout,
   touchLogin,
 } from '../server/db';
+import { drainLinkChanges } from '../server/discord_link_changes';
 import { REALM } from '../server/realm';
 
 beforeEach(() => {
   configureCommunityTestAccounts(false);
   dbMock.query.mockReset();
   dbMock.connect.mockReset();
+  // The roster/create/delete sites write into the module-global linked-member
+  // change feed, so start every test with an empty queue.
+  drainLinkChanges();
 });
 
 describe('community test account transaction', () => {
@@ -717,5 +721,95 @@ describe('createCharacterCapped', () => {
     expect(client.query.mock.calls.map((c) => c[0])).toContain('ROLLBACK');
     expect(client.query.mock.calls.map((c) => c[0])).not.toContain('COMMIT');
     expect(client.release).toHaveBeenCalledTimes(1);
+  });
+});
+
+// The characters-table writers on the linked-member change feed. A create can make the
+// account's top character (and fixes that character's class forever), a delete can
+// promote the next one, and the community-test roster defines a top character the
+// instant it commits. The enqueue lives inside these db functions rather than at the
+// routes so the RouteDef arm, its retained legacy twin in main.ts, and the PBE boost
+// roster are all covered by one site each.
+describe('character roster feed enqueues', () => {
+  it('enqueues one flex item for the account a successful create belongs to', async () => {
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 2 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ id: 42, account_id: 7 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // player metric facts
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
+
+    await createCharacterCapped(7, 'Feedtest', 'mage', 10);
+
+    expect(drainLinkChanges()).toEqual([{ accountId: 7, kinds: ['flex'] }]);
+  });
+
+  it('enqueues nothing when the create is refused at the realm cap', async () => {
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 10 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
+
+    await expect(createCharacterCapped(7, 'Overflow', 'warrior', 10)).resolves.toBeNull();
+
+    expect(drainLinkChanges()).toEqual([]);
+  });
+
+  it('enqueues for a delete that matched a row, never for one that matched none', async () => {
+    dbMock.query.mockResolvedValueOnce({ rowCount: 0 } as any);
+    expect(await deleteCharacter(7, 42)).toBe(false);
+    expect(drainLinkChanges()).toEqual([]);
+
+    dbMock.query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    expect(await deleteCharacter(7, 42)).toBe(true);
+    expect(drainLinkChanges()).toEqual([{ accountId: 7, kinds: ['flex'] }]);
+  });
+
+  it('enqueues the community-test roster only once the transaction commits', async () => {
+    configureCommunityTestAccounts(true);
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query.mockImplementation(async (sql: string, params?: unknown[]) => {
+      if (/INSERT INTO accounts/i.test(sql)) {
+        return { rows: [{ id: 42, username: 'tester', password_hash: 'hash' }], rowCount: 1 };
+      }
+      if (/INSERT INTO characters/i.test(sql)) {
+        return { rows: [{ id: 100, name: params?.[1] }], rowCount: 1 };
+      }
+      return { rows: [], rowCount: 0 };
+    });
+
+    await createAccount('tester', 'hash');
+
+    // Nine roster characters, one item: the feed's unit is the account, not the row.
+    expect(drainLinkChanges()).toEqual([{ accountId: 42, kinds: ['flex'] }]);
+  });
+
+  it('enqueues nothing when the roster transaction rolls back', async () => {
+    configureCommunityTestAccounts(true);
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    let characterInsert = 0;
+    client.query.mockImplementation(async (sql: string) => {
+      if (/INSERT INTO accounts/i.test(sql)) {
+        return { rows: [{ id: 42, username: 'tester', password_hash: 'hash' }], rowCount: 1 };
+      }
+      if (/INSERT INTO characters/i.test(sql) && ++characterInsert === 4) {
+        throw new Error('character write failed');
+      }
+      return { rows: [{ id: 100 }], rowCount: 1 };
+    });
+
+    await expect(createAccount('tester', 'hash')).rejects.toThrow('character write failed');
+
+    // Three characters inserted before the failure, all of them rolled back: a feed
+    // item here would tell the bot to re-read a roster that does not exist.
+    expect(drainLinkChanges()).toEqual([]);
   });
 });

@@ -26,6 +26,7 @@ import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
 import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
 import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
+import { enqueueLinkChange } from './discord_link_changes';
 import { GITHUB_SCHEMA } from './github_db';
 import { isUniqueViolation } from './http_util';
 import { MAPS_SCHEMA } from './maps_db';
@@ -1552,6 +1553,10 @@ export async function createAccount(
       }
     }
     await client.query('COMMIT');
+    // The roster is inserted at its authored level, so the account has a top
+    // character from this moment. After COMMIT only: a rolled-back provisioning
+    // transaction inserted nothing and must not enqueue.
+    enqueueLinkChange({ accountId: account.id, kinds: ['flex'] }, Date.now());
     return account;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -2858,6 +2863,12 @@ export async function createCharacterCapped(
     );
     await recordCharacterCreation(client, accountId, REALM);
     await client.query('COMMIT');
+    // A created character can become the account's top one, and its class is fixed
+    // here forever (no statement ever updates characters.class). Enqueued inside the
+    // db function rather than at the route so the RouteDef arm, its retained legacy
+    // twin in main.ts, and the PBE boost roster are all covered by one site. After
+    // COMMIT: a rolled-back create must never have enqueued.
+    enqueueLinkChange({ accountId, kinds: ['flex'] }, Date.now());
     return res.rows[0];
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -2927,7 +2938,12 @@ export async function deleteCharacter(accountId: number, characterId: number): P
     'DELETE FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
     [characterId, accountId, REALM],
   );
-  return (res.rowCount ?? 0) > 0;
+  const deleted = (res.rowCount ?? 0) > 0;
+  // Only a delete that matched a row is a transition: deleting the top character
+  // promotes the next-ordered one (or none). A miss (wrong owner, wrong realm,
+  // already gone) changes nothing and must not enqueue.
+  if (deleted) enqueueLinkChange({ accountId, kinds: ['flex'] }, Date.now());
+  return deleted;
 }
 
 // How many characters this account has on each realm, deliberately NOT
