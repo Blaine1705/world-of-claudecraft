@@ -5127,6 +5127,14 @@ export class Renderer {
         // Spec-driven per-ability visuals claim the event first; unknown
         // ability/fx falls through to the generic school-colored arms below.
         if (this.abilityVfx.handleSpellfx(ev)) break;
+        // 'selfCast' is a renderer-only cue this layer introduced (see
+        // casting_lifecycle: the silent completions that emit no damage,
+        // projectile or castFx). It has no legacy meaning, so an ability the
+        // painter declines (no spec, or an archetype it does not claim) must
+        // draw NOTHING rather than reach the terminal school nova below and
+        // pop a burst that never existed before (sport_second_wind is the
+        // reachable case today).
+        if (ev.fx === 'selfCast') break;
         if (ev.fx === 'blinkStep') {
           // A teleport step (Flickerstep / Shadowstep): reset the cached self
           // position so the body snaps to the authoritative destination. A
@@ -7455,7 +7463,8 @@ export class Renderer {
               !v.mountVisual &&
               !fireballForm,
           );
-          // sheep/forms keep articulated shadows through the whole proxy band,           // a frozen humanoid proxy silhouette would be wrong under a form
+          // sheep/forms keep articulated shadows through the whole proxy band:
+          // a frozen humanoid proxy silhouette would be wrong under a form
           const wantFormShadow = wantShadow || inProxyBand;
           v.sheepVisual?.setShadow(wantFormShadow);
           v.bearVisual?.setShadow(wantFormShadow);
@@ -9400,7 +9409,8 @@ export class Renderer {
         continue;
       }
       // culled rigs (beyond ENTITY_DRAW_RANGE) stop updating group.position,
-      // so a yell from 80 to 100u away would hang frozen over empty terrain,       // fall back to the live entity position when the rig isn't being drawn
+      // so a yell from 80 to 100u away would hang frozen over empty terrain:
+      // fall back to the live entity position when the rig isn't being drawn
       if (v.group.visible) this.tmpV.copy(v.group.position);
       else this.tmpV.set(e.pos.x, e.pos.y, e.pos.z);
       this.tmpV.y += (v.height + v.mountLift) * e.scale + 1.0;
