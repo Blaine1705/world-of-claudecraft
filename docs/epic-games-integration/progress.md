@@ -12,7 +12,7 @@
 | Phase 6: Achievement mirror | complete | 2026-07-31 | 2026-07-31 |
 | Phase 7: Client UI + i18n | complete | 2026-07-31 | 2026-07-31 |
 | Phase 8: Ops docs + BPT runbook | complete | 2026-07-31 | 2026-07-31 |
-| Packet close QA (`qa-checklist.md`) | not started | | |
+| Packet close QA (`qa-checklist.md`) | complete | 2026-07-31 | 2026-07-31 |
 
 ## Deliverable checklists
 
@@ -76,5 +76,9 @@
 - Packet authored 2026-07-31 from research + Steam twin audit.
 - Epic org credentials intentionally not required to start Phases 1 to 8 docs.
 - Phase 8 does not claim live BPT upload or store submission; those need real
-  org access later. Whole-packet QA is `docs/epic-games-integration/qa-checklist.md`
-  (not marked complete until a dedicated QA session runs it).
+  org access later.
+- Packet close QA (2026-07-31): full `qa-checklist.md` automatable matrix green
+  with zero Epic secrets; `npm run gate` PASS; release merged to latest
+  `origin/release/v0.33.0`. One tsc fix in `tests/epic_bpt_upload.test.ts`.
+  Live portal / BPT / Dev smoke remain ops (not dark-PR blockers). Ready to
+  open a PR when authorized; keep `EPIC_ENABLED` dark until secrets exist.

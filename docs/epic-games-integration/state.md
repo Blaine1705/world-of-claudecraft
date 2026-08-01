@@ -1,9 +1,10 @@
 # State: Epic Games Store integration (cross-phase cheat sheet)
 
-Current phase: Phase 8 complete (Ops docs + BPT runbook). Next: whole-packet
-QA via `docs/epic-games-integration/qa-checklist.md`, then open a PR when
-authorized. Live Epic portal credentials and BPT upload are not required for
-the code PR while the feature stays dark (`EPIC_ENABLED` default off).
+Current phase: packet QA complete. Branch is ready to open a PR when
+authorized. Keep `EPIC_ENABLED` dark until real server secrets exist. Live
+Epic portal credentials, BPT upload, and Dev sandbox smoke are ops work after
+org access (not dark-PR blockers). See `qa-checklist.md` for evidence from
+the 2026-07-31 close session (gate green, zero Epic secrets).
 
 Read this first in every session. Locked decisions below override memory and
 ad-hoc invention. Research background: `research-brief.md`.
