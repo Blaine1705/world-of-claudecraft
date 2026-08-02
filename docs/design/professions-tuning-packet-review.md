@@ -4087,6 +4087,55 @@ Gate: `npm run gate` PASS on this tree, fix round and this block
 staged, is the sync's exit condition; the run and its result are
 recorded in the session memory alongside this block.
 
+### Incremental sync (merge 4c27cf7f1f, 2026-08-02, phase 20 build session)
+
+The release moved again between the entry sync above and the phase 20
+build proper, so the build session re-synced before touching content.
+Merge 4c27cf7f1f brought origin/release/v0.34.0 at 1348366901, 31
+commits, all of them the CI wall-clock recovery packet: workflow
+concurrency regrouped by event name with cancel-in-progress, the
+release-checks job split parallel to the release-gate tests, docs-only
+path filters for PR jobs, an N=8 vitest shard matrix, nine test-file
+renames, the tank_crit_immunity split into a shared util plus three
+per-class pair suites, and the professions_trend split into five
+suites plus a util. Zero conflicts, and the audit verified why that is
+honest: the branch carries no edits of its own to any of the four
+both-sides files (.github/workflows/ci.yml, scripts/gate.mjs,
+tests/ci_workflow.test.ts, tests/professions_deeds_playthrough.test.ts;
+their apparent branch-side diffs are release-lineage inherited through
+the earlier syncs), so the merged result is the release side verbatim
+and nothing on either side was dropped.
+
+Audit: the release-merge-audit skill ran as a 17-agent workflow (five
+domain auditors, adversarial verification per finding, completeness
+critic; the critic closed its own three coverage gaps with green runs,
+including all five release-modified suites it found unexercised, 112
+tests passing, and a block-count proof that the professions_trend and
+tank_crit splits preserved every original test case, 26 and 6). Verdict
+CLEAN: no blockers, no should-fix. Fixes applied in the same stroke,
+all of them stale test-filename anchors the release's own rename sweep
+missed (docs/healing-monte-carlo-analysis.md, two src/sim/world.ts
+comment anchors and one in src/sim/content/wraithwood.ts, the
+eastbrook visual-acceptance automatedEvidence row, and the branch-owned
+professions_trend precedent citation in
+tests/professions_mastery_reset.test.ts).
+
+Recorded, not fixed: the CI-speed packet's sharding is vitest's own
+sha1-contiguous --shard, NOT the LPT path-matrix packs its commit
+subjects suggest; the LPT and stripe sequencers shipped deliberately
+UNWIRED after two D11 misses (pinned by tests/ci_workflow.test.ts, with
+passWithNoTests false as the empty-pack guard), so branch-only test
+files are always covered and any future re-wiring must re-validate the
+hand-kept DURATION_WEIGHT_OVERLAY, whose 25 path keys have no
+existence guard. The guild_letter_online db mock covers 11 of the 24
+names server/game.ts imports (pre-existing on both parents, throws
+only if a future edit exercises an unmocked path). Phase 20 premise
+notes: the delta holds zero src/ files, every suite the phase 20
+acceptance names survives under its unrenamed filename, and deed
+grant-site assertions now belong in tests/deeds_sites_pin.test.ts (the
+release renamed deeds_sites.test.ts; catalog pins stay in the
+untouched tests/deeds_content.test.ts).
+
 ---
 
 ## Post-packet scoping (2026-08-01): proposed phases 19 to 21
