@@ -326,6 +326,15 @@ const IMPOSTOR_WIND_GLSL = `
 
 const materialCache = new Map<ImpostorCategory, THREE.MeshLambertMaterial>();
 
+// The one live atlas. A same-session world rebuild bakes a fresh one; the
+// previous texture must be released or each rebuild leaks its GPU pages.
+let liveAtlas: THREE.Texture | null = null;
+
+function adoptAtlas(atlas: THREE.Texture): void {
+  if (liveAtlas && liveAtlas !== atlas) liveAtlas.dispose();
+  liveAtlas = atlas;
+}
+
 function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THREE.Material {
   const cached = materialCache.get(category);
   if (cached) {
@@ -499,6 +508,7 @@ export function createImpostorSession(): ImpostorSession | null {
     finalize(webgl, parent) {
       if (archetypes.length === 0) return [];
       const { texture, rects } = bakeAtlas(webgl, archetypes);
+      adoptAtlas(texture);
       const registrations: ImpostorRegistration[] = [];
       for (const acc of buckets) {
         if (acc.items.length === 0) continue;
