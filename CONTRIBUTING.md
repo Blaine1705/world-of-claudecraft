@@ -37,20 +37,23 @@ There's a place for everyone here:
 
 ## Getting started
 
-You'll need [Node.js 26](https://nodejs.org/) and **pnpm 10.14.x** (pinned via
-`packageManager` in `package.json`). Older Node majors are untested. For the
-multiplayer server you'll also want [Docker](https://www.docker.com/) to run
-Postgres.
+You'll need [Node.js 26](https://nodejs.org/) and **pnpm 10.34.x** (exact pin in
+`package.json` `packageManager`, currently `pnpm@10.34.5`). Older Node majors
+are untested. For the multiplayer server you'll also want
+[Docker](https://www.docker.com/) to run Postgres.
+
+**Corepack is not required.** Install pnpm once with the npm that ships with
+Node. That path is the same on macOS, Linux, and Windows.
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<your-username>/world-of-claudecraft.git
 cd world-of-claudecraft
 
-# 2. Enable pnpm (prefer Corepack; some nvm builds omit it)
-corepack enable
-corepack prepare pnpm@10.14.0 --activate
-# Fallback when corepack is missing: npm install -g pnpm@10.14.0
+# 2. Install pnpm once (same command on macOS, Linux, Windows)
+#    Match the packageManager pin in package.json (today: 10.34.5).
+npm install -g pnpm@10.34.5
+pnpm --version   # should print 10.34.5 (or the pin in package.json)
 
 # 3. Install dependencies (uses the global content-addressable store)
 pnpm install --frozen-lockfile
@@ -85,11 +88,16 @@ The [README](README.md) has the full host, develop, and play guide, and the
 
 ### Multi-worktree installs (agents and parallel branches)
 
-pnpm stores packages once under a shared content-addressable store (default:
-`~/Library/pnpm/store` on macOS, `~/.local/share/pnpm/store` on Linux,
-`%LOCALAPPDATA%\pnpm\store` on Windows). Each worktree only links into that
-store, so spinning a second (or twentieth) worktree is much cheaper than a full
-`npm ci` copy.
+pnpm stores packages once under a shared content-addressable store. Defaults:
+
+| OS | Default store path |
+|---|---|
+| macOS | `~/Library/pnpm/store` |
+| Linux | `~/.local/share/pnpm/store` |
+| Windows | `%LOCALAPPDATA%\pnpm\store` |
+
+Each worktree only links into that store, so spinning a second (or twentieth)
+worktree is much cheaper than a full per-tree copy.
 
 ```bash
 git worktree add ../wocc-my-task -b feature/my-task origin/release/v0.34.0
@@ -99,16 +107,26 @@ pnpm run gate:fast               # day-loop; full gate remains the merge bar
 ```
 
 Override the store path if needed: `pnpm config set store-dir /path/to/store`
-(or `PNPM_STORE_DIR`). Keep one pnpm major across machines so the store layout
-matches (`packageManager` pins 10.14.0).
+(or `PNPM_STORE_DIR`). Keep the same `packageManager` pin across machines.
 
-**Windows notes.** Use the same Corepack path, or install pnpm via
-`npm install -g pnpm@10.14.0`. Git Bash, PowerShell, and cmd all work; pnpm
-invokes scripts with the platform shell. If a script fails to find `.cmd`
-shims, set `script-shell` only as a last resort (`pnpm config set script-shell
-"C:\\Windows\\System32\\cmd.exe"`). Prefer not to run from a path that needs
-Developer Mode for symlinks; pnpm falls back to junctions/copies when
-symlinks are blocked, at a small install-time cost.
+### Cross-platform notes (macOS / Linux / Windows)
+
+The developer loop is the same on all three: Node 26, `npm install -g pnpm@…`
+matching `packageManager`, then `pnpm install --frozen-lockfile` and
+`pnpm run …`. CI uses `pnpm/action-setup` with the same pin (not Corepack).
+
+- **Layout.** This repo sets `node-linker=hoisted` in `.npmrc`, so
+  `node_modules` is a flat npm-like tree. That avoids Windows Developer Mode
+  symlink requirements that pure isolated pnpm layouts can hit.
+- **Windows shells.** Git Bash, PowerShell, and cmd all work. Gate scripts
+  already spawn `npm`/`npx`/`pnpm` via a shell on Windows so `.cmd` shims resolve.
+  Only if a script still fails to find a shim, set
+  `pnpm config set script-shell "C:\\Windows\\System32\\cmd.exe"` as a last resort.
+- **Windows Defender.** Can slow package installs; optional exclusion:
+  `Add-MpPreference -ExclusionPath $(pnpm store path)` (admin PowerShell).
+- **Corepack.** Optional only. Do not document it as required: many nvm / Node
+  installs omit it, and pnpm 10+ can self-align to `packageManager` once any
+  matching major is on PATH.
 
 **Native / optional platform packages.** Install scripts are allowlisted in
 `package.json` under `pnpm.onlyBuiltDependencies` (esbuild, sharp,

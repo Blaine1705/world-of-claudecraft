@@ -113,7 +113,7 @@ sudo git -C private/bot_detector pull
 #    mem_limit exists to prevent. 2g is ample for this tree's install and tsc; the
 #    swap bound matches so the gate cannot push the host into swap either.
 sudo docker run --rm --memory 2g --memory-swap 2g -v /opt/eastbrook:/src:ro -w /app node:26-slim \
-  sh -c 'cp -a /src/. /app && find /app \( -name .git -o -name .env \) -prune -exec rm -rf {} + && corepack enable && corepack prepare pnpm@10.14.0 --activate && pnpm install --frozen-lockfile --ignore-scripts && npx tsc --noEmit'
+  sh -c 'cp -a /src/. /app && find /app \( -name .git -o -name .env \) -prune -exec rm -rf {} + && npm install -g pnpm@10.34.5 && pnpm install --frozen-lockfile --ignore-scripts && npx tsc --noEmit'
 #    Red means STOP, do not deploy: the image would build fine and fail at runtime.
 #    One exception: exit code 137 means the container hit the 2g memory bound (a
 #    gate-environment failure, not a type error); raise the bound or run the gate

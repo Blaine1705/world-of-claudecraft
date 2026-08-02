@@ -44,9 +44,9 @@ Most directories above have their own `CLAUDE.md` with local conventions; read i
 
 ## Commands
 Install once per clone/worktree with **pnpm** (pinned via `packageManager` in
-`package.json`; shared content-addressable store makes multi-worktree installs cheap):
-`corepack enable && corepack prepare pnpm@10.14.0 --activate` (or
-`npm install -g pnpm@10.14.0` when corepack is missing), then
+`package.json`, currently `pnpm@10.34.5`; shared content-addressable store makes
+multi-worktree installs cheap). **Corepack is not required.** Same on macOS,
+Linux, and Windows: `npm install -g pnpm@10.34.5` (match the pin), then
 `pnpm install --frozen-lockfile`. Never commit `package-lock.json`. Full policy:
 CONTRIBUTING.md. After install, `pnpm run <script>` and `npm run <script>` both work;
 the nested `npm run` forms below are the package.json script names.
@@ -165,11 +165,13 @@ with `npm run gate` (above) before calling it done.
   TypeScript 6 JS API wrapper because svelte-check needs that API; never collapse the dual
   alias yourself (the collapse triggers live in CONTRIBUTING.md, "TypeScript toolchain", and
   `tests/server/new_endpoint.test.ts` pins both arms). **Package manager is pnpm**
-  (`packageManager: pnpm@10.14.0`, single lockfile `pnpm-lock.yaml`, `.npmrc`
-  `node-linker=hoisted` for npm-compatible layout + shared store). Install with
-  `pnpm install --frozen-lockfile`; regenerate the lockfile only via `pnpm install` /
-  `pnpm add` / `pnpm update` (never hand-edit; never reintroduce `package-lock.json`).
-  CI is `pnpm install --frozen-lockfile`. Full policy: CONTRIBUTING.md.
+  (`packageManager: pnpm@10.34.5`, single lockfile `pnpm-lock.yaml`, `.npmrc`
+  `node-linker=hoisted` for npm-compatible layout + shared store). Install pnpm
+  with `npm install -g pnpm@10.34.5` (Corepack not required; same on macOS/Linux/
+  Windows), then `pnpm install --frozen-lockfile`. Regenerate the lockfile only via
+  `pnpm install` / `pnpm add` / `pnpm update` (never hand-edit; never reintroduce
+  `package-lock.json`). CI is `pnpm/action-setup` + frozen install. Full policy:
+  CONTRIBUTING.md.
 - **Keep the dependency set tiny.** Don't add packages without a clear need. (Svelte
   and `@sveltejs/vite-plugin-svelte` are the one sanctioned exception, scoped to the
   `src/admin/` dashboard bundle; the game/guide/play entries stay framework-free.)

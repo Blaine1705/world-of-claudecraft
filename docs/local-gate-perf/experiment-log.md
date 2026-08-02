@@ -22,7 +22,7 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 | 2026-08-02 | 6 | isolate:false pure-approx (904 no-sim-import files) | isolate true 115.4s green | isolate false 70.0s, 71 files fail + worker crash | M1 | drop | Faster but unsafe; not a proven pure project |
 | 2026-08-02 | 6 | isolate:false 20 pure helper files | isolate true 1.69s | isolate false 1.17s green | M1 | drop (too small) | ~0.5s absolute; not worth projects scaffold |
 | 2026-08-02 | 6 | fileParallelism / maxWorkers note | defaults true; gate passes --maxWorkers | no config change | M1 | drop (no change) | gate_workers remains sole worker policy |
-| 2026-08-02 | 7 | pnpm full migration + shared store | secondary npm ci ~59s | 2nd worktree pnpm hoisted ~14s (~4x); CI on pnpm frozen-lockfile | M1 darwin/arm64 Node 26.5 pnpm 10.14 | keep | Option A single lockfile; see detail |
+| 2026-08-02 | 7 | pnpm full migration + shared store | secondary npm ci ~59s | 2nd worktree pnpm hoisted ~14s (~4x); CI on pnpm frozen-lockfile | M1 darwin/arm64 Node 26.5 pnpm 10.34.5 | keep | Option A single lockfile; Corepack not required; see detail |
 
 ## Detail template (copy below for long notes)
 
@@ -264,15 +264,19 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
   cheaper than per-worktree `npm ci`, and a deliberate full migration keeps CI
   and lockfile policy single-source.
 - Change (keep):
-  - `packageManager: pnpm@10.14.0`; `pnpm-lock.yaml` only (removed `package-lock.json`)
+  - `packageManager: pnpm@10.34.5` (latest 10.x; deliberately not pnpm 11);
+    `pnpm-lock.yaml` only (removed `package-lock.json`)
+  - Install path: `npm install -g pnpm@10.34.5` (Corepack not required; same on
+    macOS/Linux/Windows). CI: `pnpm/action-setup@v4` with the same pin.
   - `.npmrc`: `node-linker=hoisted`, `auto-install-peers=true`,
     `strict-peer-dependencies=false`
   - `package.json` `pnpm.onlyBuiltDependencies` for native/binary install scripts
-  - CI: `pnpm/action-setup@v4` + `cache: pnpm` + `pnpm install --frozen-lockfile`
+  - CI: `cache: pnpm` + `pnpm install --frozen-lockfile`
   - Gate dep-sync / SFX messages point at `pnpm install --frozen-lockfile`
   - `release_version` no longer rewrites a lockfile version field (pnpm has none)
   - malware scan accepts `pnpm-lock.yaml` (YAML line scan for non-registry sources)
-  - CONTRIBUTING multi-worktree + Windows notes; DEPLOY docker type-check uses pnpm
+  - CONTRIBUTING multi-worktree + cross-platform notes; DEPLOY docker type-check
+    uses `npm install -g pnpm@10.34.5` then frozen install
   - Fingerprint leaf `package-lock.json` -> `pnpm-lock.yaml`; size-preserving GLB
     remint + polish seal re-pins
 - Dropped mid-experiment: default isolated linker (broke `@gltf-transform/core` /
@@ -285,5 +289,6 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 - After metrics: second worktree pnpm (hoisted, warm store) ~14s
 - Pass/fail: phase test set green; full `pnpm run gate` green with GATE_MAX_WORKERS=4 (~682s, multi-session machine; 8-worker runs hit timeout flakes under concurrent load, same free-mem clamp story)
 - Decision: keep
-- Follow-ups: Phase 8 task cache; agents without corepack use `npm i -g pnpm@10.14.0`
+- Follow-ups: Phase 8 task cache; bump `packageManager` + CI pin together when
+  moving pnpm versions
 

@@ -186,7 +186,7 @@ describe('update runbook guards', () => {
     expect(deployDoc).toContain(
       [
         'sudo docker run --rm --memory 2g --memory-swap 2g -v /opt/eastbrook:/src:ro -w /app node:26-slim \\',
-        "  sh -c 'cp -a /src/. /app && find /app \\( -name .git -o -name .env \\) -prune -exec rm -rf {} + && corepack enable && corepack prepare pnpm@10.14.0 --activate && pnpm install --frozen-lockfile --ignore-scripts && npx tsc --noEmit'",
+        "  sh -c 'cp -a /src/. /app && find /app \\( -name .git -o -name .env \\) -prune -exec rm -rf {} + && npm install -g pnpm@10.34.5 && pnpm install --frozen-lockfile --ignore-scripts && npx tsc --noEmit'",
       ].join('\n'),
     );
   });
