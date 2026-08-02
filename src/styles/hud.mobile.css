@@ -3088,6 +3088,17 @@
   body.mobile-touch #woc-market-window label.wm-offer-next {
     min-height: 40px;
   }
+  /* The combobox parts the desktop sheet sizes by padding alone. The options are
+     the tap targets here, and the clear button inherits the shared .x-btn floor. */
+  body.mobile-touch #woc-market-window .wm-combo-item {
+    min-height: 44px;
+  }
+  body.mobile-touch #woc-market-window .wm-combo-chosen {
+    min-height: 44px;
+  }
+  body.mobile-touch #woc-market-window .wm-combo-list {
+    max-height: 40vh;
+  }
   body.mobile-touch #woc-market-window label.wm-terms input,
   body.mobile-touch #woc-market-window label.wm-offer-next input {
     width: 24px;

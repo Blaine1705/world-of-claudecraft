@@ -5023,8 +5023,9 @@ export const hudChromeStrings = {
     sellEmpty:
       'No eligible items in your bags. The Exchange takes non-soulbound equipment of epic quality or better.',
     sellSelectAria: 'Select {item} to list',
-    sellSearch: 'Find an item',
     sellSearchPlaceholder: 'Type to filter your bags',
+    sellClear: 'Clear {item} and choose another',
+    sellClearTitle: 'Clear selection',
     sellChoose: 'Item to list',
     sellNoMatches: 'No items match that search',
     sellBuyNowAboveStart: 'The buy-now price must be higher than the starting bid.',

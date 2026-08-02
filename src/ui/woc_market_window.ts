@@ -26,6 +26,7 @@ import type { ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { userFacingApiError } from './api_error_i18n';
 import { markDialogRoot } from './dialog_root';
+import { dropdownKeyNav } from './dropdown_nav';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
@@ -40,6 +41,7 @@ import {
   buildWocMarketView,
   type WocMarketTab,
   type WocMarketViewModel,
+  type WocSellRowModel,
   wocMarketViewSig,
 } from './woc_market_view';
 
@@ -97,6 +99,9 @@ export class WocMarketWindow {
   private opener: HTMLElement | null = null;
   private renderSeq = 0;
   private lastSig = '';
+  /** The model the live DOM was built from, so a keyboard index always resolves
+   *  against the rows on screen rather than a freshly rebuilt list. */
+  private lastModel: WocMarketViewModel | null = null;
 
   private tab: WocMarketTab = 'browse';
   private status: WocMarketStatus | null = null;
@@ -119,9 +124,17 @@ export class WocMarketWindow {
   // checkbox and submit would then read the reset value. On a money surface
   // that means listing with the wrong format, duration, or terms flag.
   private sellFormat: 'auction' | 'buy_now' = 'auction';
-  /** Sell-tab search text. Painter state as well as a text input, because the
-   *  filter is applied while BUILDING the option list, not read back from it. */
+  /** Sell-tab combobox: the typed query, whether the listbox is open, and the
+   *  active (highlighted) option. All painter state, not DOM state: the window
+   *  rebuilds from state on the slow poll band, so anything held only in the DOM
+   *  would collapse the listbox mid-interaction. form_draft carries the input's
+   *  value AND its caret across that rebuild, so typing survives it. */
   private sellSearch = '';
+  private sellOpen = false;
+  private sellActive = -1;
+  /** True for the duration of render(). Any focus movement inside that window is
+   *  the rebuild tearing down its own nodes, never the user leaving the control. */
+  private rendering = false;
   private sellDurationHours: number | null = null;
   private sellOfferNext = false;
   private acceptTerms = false;
@@ -282,9 +295,31 @@ export class WocMarketWindow {
       markDialogRoot(root, { labelledBy: 'woc-market-title' });
       root.addEventListener('click', (e) => this.onClick(e));
       root.addEventListener('change', (e) => this.onChange(e));
+      root.addEventListener('input', (e) => this.onInput(e));
+      // mousedown, NOT click: the options are non-focusable divs, so a click would
+      // blur the input first and focusout would close the listbox out from under
+      // the selection. preventDefault keeps focus where it is.
+      root.addEventListener('mousedown', (e) => this.onComboMouseDown(e as MouseEvent));
+      root.addEventListener('mousemove', (e) => this.onComboMouseMove(e as MouseEvent));
+      root.addEventListener('keydown', (e) => this.onKeyDown(e as KeyboardEvent));
+      // Closing on focusout keeps the listbox from outliving the control. Guarded
+      // on relatedTarget so moving focus WITHIN the combobox does not close it.
+      root.addEventListener('focusout', (e) => this.onFocusOut(e as FocusEvent));
     }
     const model = this.buildModel();
+    this.lastModel = model;
     this.lastSig = wocMarketViewSig(model);
+    this.rendering = true;
+    try {
+      this.renderInner(root, model);
+    } finally {
+      this.rendering = false;
+    }
+  }
+
+  /** The body of render(), split out so the `rendering` flag can wrap all of it
+   *  including the focus restore, which is itself a focus movement. */
+  private renderInner(root: HTMLElement, model: WocMarketViewModel): void {
     const focusKey = captureFocusKey(root);
     const draft = captureFormDraft(root);
     // The shared tooltip box is anchored to an element this rebuild is about to
@@ -650,40 +685,67 @@ export class WocMarketWindow {
       (r) => query === '' || this.itemName(r.itemId).toLowerCase().includes(query),
     );
     const selected = model.sell.rows.find((r) => r.index === this.sellIndex) ?? null;
-    const options = matches
-      .map(
-        (r) =>
-          `<option value="${r.index}" ${r.index === this.sellIndex ? 'selected' : ''}>${esc(
-            this.itemName(r.itemId),
-          )}</option>`,
-      )
-      .join('');
-    const picker =
-      `<label class="wm-sell-search">${esc(t('hudChrome.wocMarket.sellSearch'))}` +
-      `<input type="text" data-field="sell-search" data-focus-key="wm-sell-search" ` +
-      `placeholder="${esc(t('hudChrome.wocMarket.sellSearchPlaceholder'))}" ` +
-      `value="${esc(this.sellSearch)}" /></label>` +
-      `<label class="wm-sell-pick">${esc(t('hudChrome.wocMarket.sellChoose'))}` +
-      `<select data-field="sell-item" data-focus-key="wm-sell-item" size="1">` +
-      `<option value="">${esc(
-        matches.length === 0
-          ? t('hudChrome.wocMarket.sellNoMatches')
-          : // tPlural, not a flat key: "Choose from 1 items" is what a
-            // {count} template produces, and the plural category differs per locale.
-            tPlural('hudChrome.plurals.wocMarketSellChoose', matches.length, {
-              count: formatNumber(matches.length),
-            }),
-      )}</option>${options}</select></label>` +
-      // The chosen item still renders as a real cell so the hover inspector
-      // survives the switch: a native <option> cannot carry a tooltip.
-      (selected
-        ? `<div class="wm-sell-chosen">${this.itemCellHtml(
-            selected.itemId,
-            selected.quality,
-            `sell:${selected.index}`,
-            selected.instance,
+    // An ARIA 1.2 combobox (the social_window typeahead pattern), not a native
+    // select: options carry the item ICON, which a native <option> cannot. The
+    // options are non-focusable role=option divs on purpose, exactly as that
+    // sibling documents: DOM focus stays on the input and aria-activedescendant
+    // moves, so focusable options would also be dragged into the window's
+    // focus-trap cycle.
+    const listId = 'wm-sell-listbox';
+    const open = this.sellOpen && selected === null;
+    const active =
+      open && this.sellActive >= 0 && this.sellActive < matches.length ? this.sellActive : -1;
+    const optionsHtml =
+      matches.length === 0
+        ? `<div class="wm-combo-empty" role="option" aria-selected="false" aria-disabled="true">${esc(
+            t('hudChrome.wocMarket.sellNoMatches'),
           )}</div>`
-        : '');
+        : matches
+            .map(
+              (r, i) =>
+                `<div class="wm-combo-item${i === active ? ' wm-combo-active' : ''}" ` +
+                `id="${listId}-o${i}" role="option" aria-selected="${i === active ? 'true' : 'false'}" ` +
+                `data-sell-index="${r.index}" data-opt="${i}">` +
+                `<img class="wm-combo-icon" src="${iconDataUrl('item', r.itemId, 28)}" alt="" />` +
+                `<span class="wm-combo-name" style="color: ${
+                  QUALITY_COLOR[r.quality] ?? 'var(--color-quality-default)'
+                }">${esc(this.itemName(r.itemId))}</span></div>`,
+            )
+            .join('');
+    const control = selected
+      ? // Selected: the item renders INSIDE the control as a real cell, so the
+        // hover stats card still works, with a clear button on the far right.
+        `<div class="wm-combo-chosen">` +
+        this.itemCellHtml(
+          selected.itemId,
+          selected.quality,
+          `sell:${selected.index}`,
+          selected.instance,
+        ) +
+        `<button type="button" class="x-btn wm-combo-clear" data-action="sell-clear" ` +
+        `data-focus-key="wm-sell-clear" aria-label="${esc(
+          t('hudChrome.wocMarket.sellClear', { item: this.itemName(selected.itemId) }),
+        )}" title="${esc(t('hudChrome.wocMarket.sellClearTitle'))}">${svgIcon('close')}</button>` +
+        `</div>`
+      : `<input type="text" class="wm-combo-input" role="combobox" ` +
+        `aria-autocomplete="list" aria-controls="${listId}" aria-expanded="${open}" ` +
+        (active >= 0 ? `aria-activedescendant="${listId}-o${active}" ` : '') +
+        `autocomplete="off" spellcheck="false" ` +
+        `data-field="sell-search" data-focus-key="wm-sell-search" ` +
+        `placeholder="${esc(t('hudChrome.wocMarket.sellSearchPlaceholder'))}" ` +
+        `value="${esc(this.sellSearch)}" />`;
+    const picker =
+      `<label class="wm-sell-pick" for="wm-sell-combo-input">${esc(
+        t('hudChrome.wocMarket.sellChoose'),
+      )}</label>` +
+      `<div class="wm-combo" data-combo>${control}` +
+      `<div class="wm-combo-list" id="${listId}" role="listbox" aria-label="${esc(
+        // tPlural, not a flat key: "Choose from 1 items" is what a {count}
+        // template produces, and the plural category differs per locale.
+        tPlural('hudChrome.plurals.wocMarketSellChoose', matches.length, {
+          count: formatNumber(matches.length),
+        }),
+      )}" ${open ? '' : 'hidden'}>${optionsHtml}</div></div>`;
     // Selected BY VALUE from painter state (never by index: a server-side
     // reorder of the allowlist would otherwise silently change the default).
     const chosenDuration =
@@ -911,6 +973,133 @@ export class WocMarketWindow {
     return Math.round(dollars * 100);
   }
 
+  /** Typing in the combobox filters and opens the listbox. */
+  private onInput(e: Event): void {
+    const target = e.target as HTMLElement | null;
+    if (target?.getAttribute('data-field') !== 'sell-search') return;
+    this.sellSearch = (target as HTMLInputElement).value;
+    this.sellOpen = true;
+    // A fresh query invalidates the highlight: keeping the index would leave it
+    // pointing at whatever now happens to sit in that position.
+    this.sellActive = -1;
+    this.render();
+  }
+
+  /**
+   * Combobox keyboard handling, delegated to the shared dropdownKeyNav core.
+   *
+   * Space is deliberately NOT passed through. That core was written for a
+   * button-triggered listbox where Space means activate; in a text combobox Space
+   * is content, and routing it would make the space bar select an item instead of
+   * typing. Every other key (arrows, Home, End, Enter, Escape, Tab) keeps the
+   * shared semantics rather than a second hand-rolled copy of them.
+   */
+  private onKeyDown(e: KeyboardEvent): void {
+    const target = e.target as HTMLElement | null;
+    if (target?.getAttribute('data-field') !== 'sell-search') return;
+    if (e.key === ' ') return;
+    const matches = this.sellMatches();
+    const action = dropdownKeyNav(e.key, this.sellOpen, this.sellActive, matches.length);
+    switch (action.kind) {
+      case 'open':
+        e.preventDefault();
+        this.sellOpen = true;
+        this.sellActive = action.index;
+        this.render();
+        return;
+      case 'move':
+        e.preventDefault();
+        this.sellActive = action.index;
+        this.render();
+        return;
+      case 'select': {
+        e.preventDefault();
+        const pick = matches[this.sellActive];
+        // Enter with nothing highlighted is a no-op, not a silent pick of the
+        // first row: the seller has not chosen anything yet.
+        if (pick) this.commitSellPick(pick.index);
+        return;
+      }
+      case 'close':
+        e.preventDefault();
+        this.sellOpen = false;
+        this.sellActive = -1;
+        this.render();
+        return;
+      case 'tab':
+        // No preventDefault: let Tab move on natively (the shared core's note).
+        this.sellOpen = false;
+        this.sellActive = -1;
+        this.render();
+        return;
+      default:
+        return;
+    }
+  }
+
+  private onComboMouseDown(e: MouseEvent): void {
+    const option = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-sell-index]');
+    if (!option) return;
+    e.preventDefault();
+    const index = Number(option.dataset.sellIndex);
+    if (Number.isInteger(index)) this.commitSellPick(index);
+  }
+
+  private onComboMouseMove(e: MouseEvent): void {
+    if (!this.sellOpen) return;
+    const option = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-opt]');
+    if (!option) return;
+    const next = Number(option.dataset.opt);
+    // Repaint only on a real change: the pointer fires mousemove continuously.
+    if (!Number.isInteger(next) || next === this.sellActive) return;
+    this.sellActive = next;
+    this.render();
+  }
+
+  /**
+   * Close the listbox when focus genuinely leaves the combobox.
+   *
+   * The `rendering` guard is load-bearing, not defensive. Every render() replaces
+   * this subtree, and the browser moves focus off the input as part of removing
+   * it, firing focusout with a null relatedTarget: indistinguishable from the user
+   * clicking away. Checking isConnected does NOT separate them, which cost real
+   * debugging time here: the node is still attached at the moment the event fires,
+   * so the guard passed and the rebuild closed its own listbox. The symptom looked
+   * nothing like the cause, because each keystroke re-rendered, the rebuild
+   * cleared sellOpen, and the NEXT key therefore read the list as closed, so Enter
+   * and Escape silently fell through to dropdownKeyNav's collapsed branch.
+   */
+  private onFocusOut(e: FocusEvent): void {
+    if (this.rendering || !this.sellOpen) return;
+    const target = e.target as HTMLElement | null;
+    const combo = target?.closest('[data-combo]');
+    if (!combo) return;
+    const next = e.relatedTarget as Node | null;
+    if (next && combo.contains(next)) return;
+    this.sellOpen = false;
+    this.sellActive = -1;
+    this.render();
+  }
+
+  /** The rows the current query matches. One definition, used by the markup and
+   *  by the keyboard handler, so the highlight index can never mean two things. */
+  private sellMatches(): WocSellRowModel[] {
+    const model = this.lastModel;
+    if (!model || model.kind !== 'ready') return [];
+    const query = this.sellSearch.trim().toLowerCase();
+    return model.sell.rows.filter(
+      (r) => query === '' || this.itemName(r.itemId).toLowerCase().includes(query),
+    );
+  }
+
+  private commitSellPick(index: number): void {
+    this.sellIndex = index;
+    this.sellOpen = false;
+    this.sellActive = -1;
+    this.sellSearch = '';
+    this.render();
+  }
+
   private onChange(e: Event): void {
     const target = e.target as HTMLElement | null;
     if (!target) return;
@@ -923,18 +1112,6 @@ export class WocMarketWindow {
         this.sellFormat = value;
         this.render();
       }
-      return;
-    }
-    if (field === 'sell-search') {
-      this.sellSearch = (target as HTMLInputElement).value;
-      this.render();
-      return;
-    }
-    if (field === 'sell-item') {
-      const raw = (target as HTMLSelectElement).value;
-      // The empty prompt option clears the selection rather than selecting index 0.
-      this.sellIndex = raw === '' ? null : Number(raw);
-      this.render();
       return;
     }
     if (field === 'sell-duration') {
@@ -1002,8 +1179,13 @@ export class WocMarketWindow {
         this.page += 1;
         void this.reloadBrowseOnly();
         break;
-      case 'sell-select':
-        this.sellIndex = Number(target.getAttribute('data-index'));
+      case 'sell-clear':
+        // Back to search mode with an empty query, so the seller can pick again
+        // without first clearing the box themselves.
+        this.sellIndex = null;
+        this.sellSearch = '';
+        this.sellOpen = false;
+        this.sellActive = -1;
         this.render();
         break;
       case 'place-bid':

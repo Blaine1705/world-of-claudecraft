@@ -409,55 +409,202 @@ describe('woc_market_window: the item inspector on hover', () => {
   });
 });
 
-describe('woc_market_window: the sell tab is a searchable picker', () => {
-  it('offers a search box and a select, not a button per bag item', () => {
-    // A full bag is 70+ tradable items; the old wrapped grid pushed the whole
-    // form below the fold before a seller could reach it.
-    expect(painter).toContain('data-field="sell-search"');
-    expect(painter).toContain('data-field="sell-item"');
-    // No per-item selection button survives.
-    expect(painter).not.toContain('data-action="sell-select"');
-    expect(painter).not.toContain('class="wm-sell-item');
-  });
-
-  it('filters on the item NAME, case-insensitively', () => {
+describe('woc_market_window: the sell tab is an ARIA combobox', () => {
+  it('is a role=combobox input owning a role=listbox, not a native select', () => {
+    // A native <option> cannot carry an icon, which is why this stopped being a
+    // <select>. The ARIA contract is what makes the replacement usable.
     const sell = between('private sellHtml(', 'private activityHtml(');
-    expect(sell).toContain('this.sellSearch.trim().toLowerCase()');
-    expect(sell).toContain('this.itemName(r.itemId).toLowerCase().includes(query)');
+    expect(sell).toContain('role="combobox"');
+    expect(sell).toContain('aria-autocomplete="list"');
+    expect(sell).toContain('aria-controls="${listId}"');
+    expect(sell).toContain('aria-expanded="${open}"');
+    expect(sell).toContain('role="listbox"');
+    // No select and no per-item button survives.
+    expect(sell).not.toContain('<select data-field="sell-item"');
+    expect(sell).not.toContain('data-action="sell-select"');
   });
 
-  it('keeps the search text in painter state, not only in the input', () => {
-    // form_draft carries text inputs across a rebuild, but the filter is applied
-    // while BUILDING the option list, so the value has to be readable there too.
-    expect(painter).toContain('private sellSearch = ');
-    const onChange = between(
-      'private onChange(e: Event): void {',
-      'private async reloadBrowseOnly(',
-    );
-    expect(onChange).toContain("field === 'sell-search'");
-    expect(onChange).toContain('this.sellSearch = ');
-  });
-
-  it('the empty prompt option CLEARS the selection rather than picking index 0', () => {
-    // '' coerces to 0 through Number(), which would silently select the first bag
-    // slot the moment a seller chose the prompt.
-    const onChange = between(
-      'private onChange(e: Event): void {',
-      'private async reloadBrowseOnly(',
-    );
-    expect(onChange).toContain("this.sellIndex = raw === '' ? null : Number(raw)");
-  });
-
-  it('still renders the chosen item as a hoverable cell', () => {
-    // A native <option> cannot carry a tooltip, so the inspector would have been
-    // lost on this tab without a real cell for the selection.
+  it('points aria-activedescendant at the highlighted option, and only when there is one', () => {
+    // The whole reason DOM focus can stay on the input: the active option is
+    // announced by id rather than by moving focus.
     const sell = between('private sellHtml(', 'private activityHtml(');
-    expect(sell).toContain('wm-sell-chosen');
+    expect(sell).toContain('aria-activedescendant="${listId}-o${active}"');
+    expect(sell).toContain('active >= 0 ?');
+  });
+
+  it('renders options as NON-focusable divs, never buttons', () => {
+    // A focusable option would be pulled into the window's focus-trap cycle and
+    // fight the aria-activedescendant model (the social_window note).
+    const sell = between('private sellHtml(', 'private activityHtml(');
+    const options = sell.slice(sell.indexOf('wm-combo-item'));
+    expect(options).toContain('role="option"');
+    expect(options.slice(0, 400)).not.toContain('<button');
+    expect(options).not.toContain('tabindex');
+  });
+
+  it('shows an ICON next to every option name', () => {
+    const sell = between('private sellHtml(', 'private activityHtml(');
+    expect(sell).toContain('wm-combo-icon');
+    expect(sell).toContain("iconDataUrl('item', r.itemId, 28)");
+  });
+
+  it('renders the selected item INSIDE the control, hoverable, with a clear button', () => {
+    const sell = between('private sellHtml(', 'private activityHtml(');
+    expect(sell).toContain('wm-combo-chosen');
+    // A real cell, so the shared stats tooltip still attaches to it.
     expect(sell).toContain('`sell:${selected.index}`');
+    // The clear button reuses the shared .x-btn chrome family and its close glyph.
+    expect(sell).toContain('class="x-btn wm-combo-clear"');
+    expect(sell).toContain('data-action="sell-clear"');
+    expect(sell).toContain("svgIcon('close')");
+  });
+
+  it('the clear button is named for the item it clears, not just "clear"', () => {
+    // Several controls on this tab would otherwise share the accessible name "X".
+    const sell = between('private sellHtml(', 'private activityHtml(');
+    expect(sell).toContain("t('hudChrome.wocMarket.sellClear', { item:");
+  });
+
+  it('clearing returns to an EMPTY search, ready to pick again', () => {
+    const onClick = between("case 'sell-clear':", "case 'place-bid':");
+    expect(onClick).toContain('this.sellIndex = null');
+    expect(onClick).toContain("this.sellSearch = ''");
+    expect(onClick).toContain('this.sellOpen = false');
+  });
+
+  it('filters on the item NAME, case-insensitively, in one place', () => {
+    // One definition shared by the markup and the key handler, so a highlight
+    // index cannot mean a different row in each.
+    const matches = between(
+      'private sellMatches(): WocSellRowModel[] {',
+      'private commitSellPick(',
+    );
+    expect(matches).toContain('this.sellSearch.trim().toLowerCase()');
+    expect(matches).toContain('this.itemName(r.itemId).toLowerCase().includes(query)');
+  });
+
+  it('keeps the query, the open flag and the highlight in PAINTER state', () => {
+    // The window rebuilds from state on the slow poll band; DOM-only state would
+    // collapse the listbox mid-interaction.
+    expect(painter).toContain('private sellSearch = ');
+    expect(painter).toContain('private sellOpen = false');
+    expect(painter).toContain('private sellActive = -1');
+  });
+
+  it('resolves the highlight against the RENDERED model, not a fresh one', () => {
+    // The index must mean the row the seller can see. Rebuilding the model in the
+    // key handler would resolve it against an inventory that may have moved on.
+    expect(painter).toContain('private lastModel: WocMarketViewModel | null = null');
+    const matches = between(
+      'private sellMatches(): WocSellRowModel[] {',
+      'private commitSellPick(',
+    );
+    expect(matches).toContain('this.lastModel');
+  });
+
+  it('reuses the shared dropdownKeyNav core rather than a second key model', () => {
+    expect(painter).toContain("import { dropdownKeyNav } from './dropdown_nav'");
+    expect(painter).toContain(
+      'dropdownKeyNav(e.key, this.sellOpen, this.sellActive, matches.length)',
+    );
+    for (const kind of ['open', 'move', 'select', 'close', 'tab']) {
+      expect(painter, `unhandled nav action: ${kind}`).toContain(`case '${kind}':`);
+    }
+  });
+
+  it('does NOT route Space to that core: in a text field Space is content', () => {
+    // dropdownKeyNav maps Space to activate, which is right for a button trigger
+    // and wrong here: the space bar would select an item instead of typing.
+    const keydown = between(
+      'private onKeyDown(e: KeyboardEvent): void {',
+      'private onComboMouseDown(',
+    );
+    expect(keydown).toContain("if (e.key === ' ') return;");
+    const spaceGuard = keydown.indexOf("e.key === ' '");
+    const navCall = keydown.indexOf('dropdownKeyNav(');
+    expect(spaceGuard).toBeGreaterThanOrEqual(0);
+    expect(navCall).toBeGreaterThan(spaceGuard);
+  });
+
+  it('Enter with nothing highlighted picks nothing', () => {
+    // Committing the first match on a bare Enter would list an item the seller
+    // never chose.
+    const keydown = between(
+      'private onKeyDown(e: KeyboardEvent): void {',
+      'private onComboMouseDown(',
+    );
+    expect(keydown).toContain('if (pick) this.commitSellPick(pick.index)');
+  });
+
+  it('Tab closes the list WITHOUT preventDefault, so focus advances natively', () => {
+    const keydown = between(
+      'private onKeyDown(e: KeyboardEvent): void {',
+      'private onComboMouseDown(',
+    );
+    const tabArm = keydown.slice(keydown.indexOf("case 'tab':"));
+    expect(tabArm).toContain('this.sellOpen = false');
+    // The CALL, not the word: the arm's comment explains why it is absent.
+    expect(tabArm.slice(0, tabArm.indexOf('return'))).not.toContain('e.preventDefault()');
+  });
+
+  it('selects on mousedown, not click, so the blur cannot beat the selection', () => {
+    // The options are non-focusable, so a click would blur the input first and
+    // focusout would close the listbox before the pick landed.
+    expect(painter).toContain("root.addEventListener('mousedown'");
+    const down = between(
+      'private onComboMouseDown(e: MouseEvent): void {',
+      'private onComboMouseMove(',
+    );
+    expect(down).toContain('e.preventDefault()');
+    expect(down).toContain('commitSellPick');
+  });
+
+  it('repaints on hover only when the active option actually changes', () => {
+    // mousemove fires continuously; repainting per event would rebuild the whole
+    // subtree dozens of times per second.
+    // Anchored on the next method SIGNATURE, not on a doc comment: the comment
+    // above onFocusOut was rewritten and silently broke this slice.
+    const move = between(
+      'private onComboMouseMove(e: MouseEvent): void {',
+      'private onFocusOut(e: FocusEvent): void {',
+    );
+    expect(move).toContain('next === this.sellActive');
+  });
+
+  it('closes on focusout only when focus leaves the whole combobox', () => {
+    const out = between('private onFocusOut(e: FocusEvent): void {', 'private sellMatches()');
+    expect(out).toContain('combo.contains(next)');
+  });
+
+  it('ignores the focusout its OWN rebuild causes', () => {
+    // The bug this pins cost real debugging time and looked nothing like its
+    // cause. Every render() replaces the subtree, and the browser moves focus off
+    // the input while removing it, firing focusout with a null relatedTarget. The
+    // rebuild therefore closed its own listbox, so the NEXT keystroke saw the list
+    // as closed and Enter/Escape fell through to dropdownKeyNav's collapsed
+    // branch: the widget looked like it had broken state, not a focus problem.
+    expect(painter).toContain('private rendering = false');
+    const out = between('private onFocusOut(e: FocusEvent): void {', 'private sellMatches()');
+    expect(out).toContain('if (this.rendering');
+    // The flag must cover the focus RESTORE too, which is itself a focus move.
+    const render = between('render(): void {', 'private renderInner(');
+    expect(render).toContain('this.rendering = true');
+    expect(render).toContain('finally');
+    expect(render).toContain('this.rendering = false');
+  });
+
+  it('does NOT rely on isConnected to tell a rebuild from a real blur', () => {
+    // The first attempt did, and it silently failed: the node is still attached at
+    // the moment focusout fires, so the guard passed every time.
+    const out = between('private onFocusOut(e: FocusEvent): void {', 'private sellMatches()');
+    expect(out).not.toContain('isConnected');
   });
 
   it('tells the seller when a search matches nothing', () => {
     expect(painter).toContain('hudChrome.wocMarket.sellNoMatches');
+    const sell = between('private sellHtml(', 'private activityHtml(');
+    // The empty row is marked disabled so a screen reader does not offer it.
+    expect(sell).toContain('aria-disabled="true"');
   });
 });
 
@@ -534,5 +681,23 @@ describe('woc_market_window: the picker prompt counts correctly', () => {
     }
     // And the singular really is singular.
     expect(decl).toContain("one: 'Choose from {count} item'");
+  });
+});
+
+describe('woc_market_window: the listbox must stay in flow', () => {
+  it('is NOT absolutely positioned, because an overflow ancestor clips it', () => {
+    // .wm-body is overflow-y: auto. An absolute menu still had layout, so it
+    // looked open and its options reported real rects, but it was clipped to a
+    // two-pixel sliver and the pointer hit the window behind it: every option was
+    // unclickable while appearing perfectly normal in a screenshot.
+    const css = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
+    const start = css.indexOf('#woc-market-window .wm-combo-list {');
+    expect(start).toBeGreaterThan(0);
+    const rule = css.slice(start, css.indexOf('}', start));
+    expect(rule).not.toContain('position: absolute');
+    expect(rule).not.toContain('z-index');
+    // It scrolls itself rather than growing without bound.
+    expect(rule).toContain('max-height');
+    expect(rule).toContain('overflow-y: auto');
   });
 });

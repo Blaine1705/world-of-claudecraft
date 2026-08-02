@@ -16140,24 +16140,77 @@
     flex-direction: column;
     gap: 8px;
   }
-  #woc-market-window .wm-sell-search,
   #woc-market-window .wm-sell-pick {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
     font-size: 13px;
   }
-  /* The chosen item, rendered as a real cell so the hover inspector still works:
-     a native <option> cannot carry a tooltip. */
-  #woc-market-window .wm-sell-chosen {
+  /* The combobox stacks its parts IN FLOW, and the listbox is deliberately not
+     absolutely positioned. .wm-body is an overflow-y: auto ancestor, so an
+     absolute menu was clipped to a two-pixel sliver: it still had layout, so it
+     looked open and its options reported real rects, but the pointer hit the
+     window behind it and nothing was clickable. Escaping the clip would mean
+     measuring and portalling, which is the forced-reflow read this cold window
+     may not do. In flow the form below simply shifts down while the list is open. */
+  #woc-market-window .wm-combo {
+    display: flex;
+    flex-direction: column;
+  }
+  #woc-market-window .wm-combo-input {
+    width: 100%;
+  }
+  /* The selected item lives INSIDE the control: a real cell (so the hover stats
+     card still works) plus the clear button pinned to the far right. */
+  #woc-market-window .wm-combo-chosen {
     display: flex;
     align-items: center;
     gap: 6px;
     min-height: 40px;
     padding: 6px 8px;
     border: 1px solid var(--gold);
-    border-radius: 6px;
-    background: var(--panel-bg);
+    border-radius: 4px;
+    background: #1a1410;
+  }
+  #woc-market-window .wm-combo-clear {
+    margin-left: auto;
+    flex: none;
+  }
+  #woc-market-window .wm-combo-list {
+    margin-top: 2px;
+    max-height: 240px;
+    overflow-y: auto;
+    background: #12100e;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    box-shadow: 0 6px 16px #000000a6;
+  }
+  #woc-market-window .wm-combo-list[hidden] {
+    display: none;
+  }
+  #woc-market-window .wm-combo-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 4px 8px;
+    cursor: var(--cursor-point);
+  }
+  /* Hover and keyboard highlight are the SAME visual state: the active option is
+     the one Enter commits, whichever input moved it there. */
+  #woc-market-window .wm-combo-item:hover,
+  #woc-market-window .wm-combo-active {
+    background: linear-gradient(#2a2436, #161220);
+  }
+  #woc-market-window .wm-combo-icon {
+    width: 28px;
+    height: 28px;
+    flex: none;
+  }
+  #woc-market-window .wm-combo-name {
+    font-weight: 600;
+  }
+  #woc-market-window .wm-combo-empty {
+    padding: 10px 8px;
+    color: var(--color-text-muted);
+    font-size: 12px;
   }
   #woc-market-window .wm-activity ul {
     list-style: none;
