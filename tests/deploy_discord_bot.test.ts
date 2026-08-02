@@ -250,8 +250,11 @@ describe('Discord bot container supervision', () => {
 // permanently unhealthy (or worse, healthy over a wedge). So EXECUTE the extracted
 // string the way docker will, with the real node binary, against real files in the
 // three states the acceptance list names, and hold its verdict to the same pure rule
-// (`isHeartbeatFresh`) the module documents. Margins are minutes, not milliseconds, so
-// wall-clock slop between utimes and the probe run cannot flip a case.
+// (`isHeartbeatFresh`) the module documents. The far fixtures use minute margins, so
+// wall-clock slop between utimes and the probe run cannot flip them; the boundary
+// fixtures deliberately sit 5s either side of the probe's own window, sized against a
+// sub-second spawn (the one case slop could flip is near-fresh, and only under
+// pathological contention).
 describe('Discord bot healthcheck probe, executed', () => {
   const dir = mkdtempSync(join(tmpdir(), 'wocc-heartbeat-probe-'));
   afterAll(() => rmSync(dir, { recursive: true, force: true }));

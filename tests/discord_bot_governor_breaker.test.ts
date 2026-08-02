@@ -407,15 +407,17 @@ describe('governor breaker half-open probe (D3)', () => {
     expect(snap.breakerOpens).toBe(1);
   });
 
-  it('closes on a probe answered 400: an answer is an answer, and no breaker budget is spent (L13)', async () => {
+  it('closes on a probe answered 400: an answer is an answer (L13)', async () => {
     // The Phase 7 comment on the 400 arm claims three directions at once: the
     // subject is cached, no invalid-request budget is spent, and the half-open
     // probe settles as SUCCESS (an answer from Discord, however unhappy, is
     // evidence the edge is talking to us again, which is the only question
-    // half-open asks). The first two are pinned in the forbidden suite; this is
-    // the third, previously unguarded: a refactor moving the 400 branch to
-    // settle(false) would re-open the breaker on every probe for as long as a
-    // sweep keeps producing one rejected nick shape, latching every
+    // half-open asks). The first two are pinned DECISIVELY in the forbidden
+    // suite only (here the opening 401s have aged out of the window by probe
+    // time, so a budget-spending 400 could not trip the count either way); this
+    // arm owns the third, previously unguarded: a refactor moving the 400
+    // branch to settle(false) would re-open the breaker on every probe for as
+    // long as a sweep keeps producing one rejected nick shape, latching every
     // non-essential call off indefinitely.
     const rig = makeRig();
     await openBreaker(rig);

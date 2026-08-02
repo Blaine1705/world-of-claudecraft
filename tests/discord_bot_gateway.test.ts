@@ -262,16 +262,22 @@ describe('Gateway production defaults', () => {
     }) as never);
     const prevExitCode = process.exitCode;
 
-    constructed[0].socket.emit('close', 4004);
+    // finally, because the seam stages process.exitCode = 1 and a failing
+    // expect would otherwise leave the worker's exitCode dirty for the rest of
+    // the file (bounded today, nothing else reads it, but hygiene is cheap).
+    try {
+      constructed[0].socket.emit('close', 4004);
 
-    // exitCode is staged FIRST so any other loop end still exits nonzero, then
-    // the drain hands the queued close-code line to the pipe, then the exit.
-    // The order array is the pin: a drain-less default reads ['exit:1'].
-    expect(process.exitCode).toBe(1);
-    expect(order).toEqual(['drain', 'exit:1']);
-    expect(writeSpy).toHaveBeenCalledTimes(1);
-    expect(exitSpy).toHaveBeenCalledTimes(1);
-    process.exitCode = prevExitCode;
+      // exitCode is staged FIRST so any other loop end still exits nonzero, then
+      // the drain hands the queued close-code line to the pipe, then the exit.
+      // The order array is the pin: a drain-less default reads ['exit:1'].
+      expect(process.exitCode).toBe(1);
+      expect(order).toEqual(['drain', 'exit:1']);
+      expect(writeSpy).toHaveBeenCalledTimes(1);
+      expect(exitSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      process.exitCode = prevExitCode;
+    }
   });
 
   it('exits anyway after EXIT_DRAIN_BACKSTOP_MS when the stderr drain never completes', async () => {
@@ -292,15 +298,18 @@ describe('Gateway production defaults', () => {
     vi.spyOn(process.stderr, 'write').mockImplementation((() => true) as never);
     const prevExitCode = process.exitCode;
 
-    constructed[0].socket.emit('close', 4014);
+    try {
+      constructed[0].socket.emit('close', 4014);
 
-    expect(process.exitCode).toBe(1); // staged even while the drain hangs
-    expect(exits).toEqual([]);
-    await vi.advanceTimersByTimeAsync(EXIT_DRAIN_BACKSTOP_MS - 1);
-    expect(exits).toEqual([]); // one tick early: the bound is exact, not fuzzy
-    await vi.advanceTimersByTimeAsync(1);
-    expect(exits).toEqual([1]); // the log line is lost, the exit is not
-    process.exitCode = prevExitCode;
+      expect(process.exitCode).toBe(1); // staged even while the drain hangs
+      expect(exits).toEqual([]);
+      await vi.advanceTimersByTimeAsync(EXIT_DRAIN_BACKSTOP_MS - 1);
+      expect(exits).toEqual([]); // one tick early: the bound is exact, not fuzzy
+      await vi.advanceTimersByTimeAsync(1);
+      expect(exits).toEqual([1]); // the log line is lost, the exit is not
+    } finally {
+      process.exitCode = prevExitCode;
+    }
   });
 });
 
