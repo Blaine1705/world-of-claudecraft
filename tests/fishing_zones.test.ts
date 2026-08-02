@@ -1119,16 +1119,35 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
     // lakes today, and the count pin keeps this sweep from emptying quietly.
     const dead: string[] = [];
     let checked = 0;
+    let lakesChecked = 0;
     for (const zone of ZONES) {
       if (!FISHING_ZONE_ROD_TIERS[zone.id] || zone.lakes.length === 0) continue;
       checked += 1;
+      lakesChecked += zone.lakes.length;
       for (const lake of zone.lakes) {
         if (spotForLake(zone.id, lake) === null) dead.push(`${zone.id}:${lake.x},${lake.z}`);
       }
     }
     expect(checked).toBe(14);
+    // Per-LAKE non-vacuity (the QA round): the zone count alone let a zone
+    // quietly shed lakes (willowfen alone declares 19), shrinking the sweep
+    // with a green suite. A lake added or removed anywhere re-mints this.
+    expect(lakesChecked).toBe(61);
     expect(dead.sort()).toEqual(DECORATIVE_LAKES);
   });
+
+  const swimDepthCellsIn = (lake: { x: number; z: number; radius: number }): number => {
+    let wet = 0;
+    for (let dx = -lake.radius; dx <= lake.radius; dx += 0.5) {
+      for (let dz = -lake.radius; dz <= lake.radius; dz += 0.5) {
+        if (dx * dx + dz * dz > lake.radius * lake.radius) continue;
+        const x = lake.x + dx;
+        const z = lake.z + dz;
+        if (terrainHeight(x, z, WORLD_SEED) < waterLevelAt(x, z) - PLAYER_SWIM_DEPTH) wet++;
+      }
+    }
+    return wet;
+  };
 
   it('the decorative-lake exemptions genuinely hold no swim-depth water', () => {
     // The exemption's own non-rot arm: a decorative disc that gains real
@@ -1141,25 +1160,37 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
       const lake = zone?.lakes.find((l) => l.x === lx && l.z === lz);
       expect(lake, `${entry} names a declared lake`).toBeDefined();
       if (!lake) continue;
-      let wet = 0;
-      for (let dx = -lake.radius; dx <= lake.radius; dx += 0.5) {
-        for (let dz = -lake.radius; dz <= lake.radius; dz += 0.5) {
-          if (dx * dx + dz * dz > lake.radius * lake.radius) continue;
-          const x = lake.x + dx;
-          const z = lake.z + dz;
-          if (terrainHeight(x, z, WORLD_SEED) < waterLevelAt(x, z) - PLAYER_SWIM_DEPTH) wet++;
-        }
-      }
+      const wet = swimDepthCellsIn(lake);
       expect(wet, `${entry} holds swim-depth water and must leave the decorative list`).toBe(0);
     }
+    // Positive control (the QA round): the same census over a live lake must
+    // find water, or a broken predicate (a sign flip, waterLevelAt going
+    // -Infinity inside declared bodies) would measure zero everywhere and
+    // green this arm exactly when it is most needed. Mirror Tarn is
+    // galecrest's one lake and fully swim-depth (1257 of 1257 in-disc cells
+    // when this landed).
+    const tarn = ZONES.find((z) => z.id === 'galecrest')?.lakes.find(
+      (l) => l.x === 300 && l.z === 560,
+    );
+    expect(tarn, 'the Mirror Tarn positive control names a declared lake').toBeDefined();
+    if (tarn) expect(swimDepthCellsIn(tarn)).toBeGreaterThan(0);
   });
 
-  it('every zone hub is a bounded walk from its nearest fishable shore', () => {
+  it('every zone hub is a bounded walk from a fishable shore', () => {
     // Q14's travel-distance claim, measured rather than asserted: the
-    // straight-line hub distance to the nearest accepted casting spot, per
-    // rod-row zone. Wickharbor is the shipped worst by a wide margin (the
-    // Mirror Tarn shore, measured 230yd; the next zone sits at 137yd), the
-    // ruling accepted it with the south Lawnmere bank as the second site
+    // straight-line hub distance to an accepted casting spot, per rod-row
+    // zone. Metric honesty (the QA round): fishableSpotOn returns the FIRST
+    // accept of its ring scan, not the spot nearest the hub, so this measures
+    // an UPPER bound on the true nearest-shore walk. That is the right
+    // direction for the ceiling (if the probe spot is within it, the nearest
+    // shore certainly is), and the number is stable because the probe's
+    // parameters (0.7r start, radius + 10 outer, 72 spokes, 1yd step) are
+    // this file's own literals: for galecrest's one 10yd lake the geometry
+    // bounds any such probe inside roughly 213 to 253yd of the hub, so
+    // editing those literals is a deliberate re-measure of this arm, never a
+    // silent drift. Wickharbor is the shipped worst by a wide margin (the
+    // Mirror Tarn shore, probe-measured 230yd; the next zone sits at 137yd),
+    // the ruling accepted it with the south Lawnmere bank as the second site
     // (the border-water arm below), and the bracket pins that acceptance:
     // a ceiling under 240 that the shipped worst genuinely bites.
     let worst = 0;
@@ -1290,7 +1321,21 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
     const zone = ZONES.find((z) => z.id === 'farshore_isle');
     expect(zone).toBeDefined();
     if (!zone) return;
+    // Rect guards (the QA round): floodFromHub degenerates to a single x
+    // column on a rect-less zone (`zone.xMin ?? 0`), and the flood clips at
+    // the rect, so both halves below only mean something with the probe
+    // point INSIDE a real rect. The gather counter-arm pins containment for
+    // exactly this reason ("failing to reach it is the wall's doing and not
+    // the bounding box's"); without it, a farshore rect re-mint that expels
+    // the point would hollow the verdict into a vacuous green.
+    expect(zone.xMin, 'farshore rect').toBeDefined();
+    expect(zone.xMax, 'farshore rect').toBeDefined();
+    if (zone.xMin === undefined || zone.xMax === undefined) return;
     const OFF_STRAND_SEA_FLOOR = { x: 296, z: -172 };
+    expect(OFF_STRAND_SEA_FLOOR.x).toBeGreaterThan(zone.xMin);
+    expect(OFF_STRAND_SEA_FLOOR.x).toBeLessThan(zone.xMax);
+    expect(OFF_STRAND_SEA_FLOOR.z).toBeGreaterThan(zone.zMin);
+    expect(OFF_STRAND_SEA_FLOOR.z).toBeLessThan(zone.zMax);
     expect(terrainHeight(OFF_STRAND_SEA_FLOOR.x, OFF_STRAND_SEA_FLOOR.z, WORLD_SEED)).toBeLessThan(
       waterLevel(),
     );
@@ -1338,9 +1383,12 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
     expect(accepted, 'no accepted cast on the galecrest Lawnmere bank').not.toBeNull();
     if (!accepted) return;
     expect(zoneAt(accepted.x, accepted.z).id).toBe('galecrest');
-    const d = Math.hypot(accepted.x - 420, accepted.z - 360);
-    expect(d).toBeGreaterThan(300);
-    expect(d).toBeLessThan(360);
+    // The ruling's rough-330yd distance is carried by the scan-rect literals
+    // and the hub pin above, not by a bracket on the measured distance (the
+    // QA round): every point of the scanned bank rect lies 322.6 to 358.0yd
+    // from the pinned hub, so a distance bracket inside that range could
+    // never fail while those literals stand. The rect literals ARE the
+    // record of the second site.
   });
 
   it('the open sea is unfishable: a seaward coastal cast denies with the no-water error', () => {
@@ -1349,6 +1397,13 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
     // 24yd probe walk finds no fishable sample. The farshore south strand
     // faces open ocean with no declared body in reach; the same rod that
     // accepts on Gull Mere denies here.
+    // Premise first, the sibling arms' idiom (the QA round): the water this
+    // cast faces really is open sea (terrain below the WORLD plane, outside
+    // every declared body: -7.70 against -4.5 at the 24yd sample when this
+    // landed), so a strand-lifting terrain edit cannot silently degrade this
+    // into a duplicate of the dry-hillside deny while it stays green.
+    expect(terrainHeight(295, -94, WORLD_SEED)).toBeLessThan(waterLevel());
+    expect(Number.isFinite(waterLevelAt(295, -94))).toBe(false);
     const sim = makeSim();
     const meta = sim.meta(sim.playerId) as PlayerMeta;
     sim.addItem('silverstream_fishing_rod', 1);

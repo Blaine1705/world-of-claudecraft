@@ -160,6 +160,11 @@ describe('the write ceiling, the load clamp, and the record bound stay coupled',
     const twoDecimalBytes = JSON.stringify(twoDecimal).length;
     expect(twoDecimalBytes).toBeGreaterThan(4096);
     expect(twoDecimalBytes).toBeLessThanOrEqual(8192);
+    // Form ordering, kept live (the QA round): the integer bound above is
+    // strictly subsumed by the two-decimal bound, and this is the assertion
+    // that says so, so the wider-form premise behind the wire twin's
+    // plus-four-bytes-per-entry arithmetic cannot rot silently.
+    expect(twoDecimalBytes).toBeGreaterThan(JSON.stringify(all).length);
     // The load side must survive the same scale: no cap, break, or dedupe may
     // shrink a full record on the way back in.
     expect(Object.keys(applyNodeReadiness(all, 0)).length).toBe(GATHER_NODES.length);

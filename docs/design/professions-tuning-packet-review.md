@@ -4098,13 +4098,18 @@ release-checks job split parallel to the release-gate tests, docs-only
 path filters for PR jobs, an N=8 vitest shard matrix, nine test-file
 renames, the tank_crit_immunity split into a shared util plus three
 per-class pair suites, and the professions_trend split into five
-suites plus a util. Zero conflicts, and the audit verified why that is
-honest: the branch carries no edits of its own to any of the four
-both-sides files (.github/workflows/ci.yml, scripts/gate.mjs,
-tests/ci_workflow.test.ts, tests/professions_deeds_playthrough.test.ts;
-their apparent branch-side diffs are release-lineage inherited through
-the earlier syncs), so the merged result is the release side verbatim
-and nothing on either side was dropped.
+suites plus a util. Zero conflicts, and the audit's zero-conflict
+reasoning is corrected here at the QA round: three of the four
+apparently-both-sides files (.github/workflows/ci.yml, scripts/gate.mjs,
+tests/ci_workflow.test.ts) carry an EMPTY branch-side diff against the
+merge base (their apparent branch-side changes are release-lineage
+inherited through the earlier syncs), so for them the merged result is
+the release side verbatim; tests/professions_deeds_playthrough.test.ts
+is the opposite case, carrying real branch-own edits (the koi literal,
+the silverstream rod add, and the 706bec2d21 re-record), and its merged
+result is the branch side plus the release's single anchor-rename line.
+Either way the merge preserved both sides and nothing was dropped; only
+this record's original no-branch-edits characterization was wrong.
 
 Audit: the release-merge-audit skill ran as a 17-agent workflow (five
 domain auditors, adversarial verification per finding, completeness
@@ -4114,11 +4119,14 @@ tests passing, and a block-count proof that the professions_trend and
 tank_crit splits preserved every original test case, 26 and 6). Verdict
 CLEAN: no blockers, no should-fix. Fixes applied in the same stroke,
 all of them stale test-filename anchors the release's own rename sweep
-missed (docs/healing-monte-carlo-analysis.md, two src/sim/world.ts
+missed, seven citation sites across five files
+(docs/healing-monte-carlo-analysis.md, three src/sim/world.ts
 comment anchors and one in src/sim/content/wraithwood.ts, the
 eastbrook visual-acceptance automatedEvidence row, and the branch-owned
 professions_trend precedent citation in
-tests/professions_mastery_reset.test.ts).
+tests/professions_mastery_reset.test.ts; the a380151f66 commit message
+undercounts these as six sites with two world.ts anchors, corrected
+here at the QA round).
 
 Recorded, not fixed: the CI-speed packet's sharding is vitest's own
 sha1-contiguous --shard, NOT the LPT path-matrix packs its commit

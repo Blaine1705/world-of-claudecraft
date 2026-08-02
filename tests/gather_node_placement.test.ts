@@ -438,7 +438,11 @@ describe('gather node placement: every node sits on ground a player can work', (
     // Both directions at once: a new sub-margin node reds (it is not in the
     // list), and a relocated exemption reds too (the list would then name a
     // node that no longer violates, and the exemption must be retired with
-    // the fix rather than mask the next violator).
+    // the fix rather than mask the next violator). Edge note (the QA round):
+    // the tightest PASSING node is ore_palmreach_1 at 1.012yd of freeboard,
+    // 0.012 above the margin, so a Palmreach-coast terrain touch is the
+    // likeliest next arrival here; that failure means terrain moved under a
+    // node, not that this pin broke.
     const below = GATHER_NODES.filter((n) => seaFreeboardAt(n.pos.x, n.pos.z) < WATER_MARGIN)
       .map((n) => n.id)
       .sort();
@@ -1189,6 +1193,12 @@ describe('gather node placement: every node sits on ground a player can work', (
     // wood_mirefen_t2 (0.3yd) and ore_evergarden_1 (0.42yd) is a body
     // standing in the road surface, so an exempt node drifting under a full
     // yard from the center line reds here even while it stays on the list.
+    // Edge notes (the QA round): both edges are deliberately thin. The
+    // tightest node OUTSIDE the 5yd screen is wood_palmreach_1 at 5.192yd
+    // (0.192 from joining this list), and the tightest exemption above the
+    // verge floor is ore_galecrest_1 at 1.169yd (0.169 of floor margin), so
+    // either failure most likely means a road or node moved, not a broken
+    // arm.
     for (const id of EXPANSION_ROAD_EXEMPT) {
       const node = GATHER_NODES.find((n) => n.id === id);
       expect(node, `${id} names a live node`).toBeDefined();
@@ -1289,9 +1299,13 @@ describe('gather node placement: every node sits on ground a player can work', (
   });
 
   it('the bottom-zone count floor is exercised by real content, not passing by slack', () => {
-    // Exact, like the tuned twin above: every bottom-map zone carries exactly
-    // six of each type, so the floor moved with the content and bites on the
-    // first drained node.
+    // The floor moved with the content: the LEANEST zone/type kit measures
+    // exactly six, so the floor bites on the first drained node. Prose
+    // honesty (the QA round): this arm and the count floor above bound only
+    // the minimum, so a SEVENTH vein would pass here; per-kit exactness is
+    // pinned by the per-zone count map in
+    // tests/professions_zone_rollout.test.ts, and this arm owns only the
+    // floor's non-vacuity.
     let leanestTotal = Number.POSITIVE_INFINITY;
     for (const zone of BOTTOM_ZONES) {
       for (const type of GATHER_NODE_TYPES) {
@@ -1350,6 +1364,24 @@ describe('gather node placement: every node sits on ground a player can work', (
     for (const zone of BOTTOM_ZONES) {
       const ceiling = perHour(GATHER_NODES.filter((n) => n.zoneId === zone.id).length);
       expect(ceiling, `${zone.id} harvest ceiling`).toBe(270);
+    }
+  });
+
+  it('every node level equals its zone authored level (the ceil-midpoint rule)', () => {
+    // The one GatherNodeDef field no other arm pinned (the QA round): level
+    // feeds the profession-XP green/gray curve (gatherActionXp in
+    // src/sim/professions/gathering.ts), and the GatherNodeDef doc in
+    // src/sim/types.ts states the authoring rule this arm enforces: every
+    // node of every tier carries the ceil of its zone levelRange midpoint
+    // (willowfen and galecrest 20, farshore_isle 5, the strip 4/10/17).
+    // World-wide and cross-table (node records against zone records), so a
+    // record drifting from its zone's number reds here by name.
+    for (const node of GATHER_NODES) {
+      const zone = ZONES.find((zn) => zn.id === node.zoneId);
+      expect(zone, `${node.id} names a live zone`).toBeDefined();
+      if (!zone) continue;
+      const [lo, hi] = zone.levelRange;
+      expect(node.level, `${node.id} level`).toBe(Math.ceil((lo + hi) / 2));
     }
   });
 

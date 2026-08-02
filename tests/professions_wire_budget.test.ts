@@ -296,16 +296,26 @@ describe('ncd on the legacy per-tick arm', () => {
     const fc = rawWs();
     const session = joinServer(server, fc, 1, 'Legacy');
     const meta = mustMeta(server, session.pid);
-    for (const node of GATHER_NODES) meta.nodeHarvestReadyAt[node.id] = server.sim.time + 240;
+    // Fractional deadlines on purpose (the QA round): a whole-second offset
+    // broadcast in the same instant encodes as the integer "240" (3 chars per
+    // entry, 3,648 bytes total), which understates the legacy worst case the
+    // same way measuring the stable arm at sim.time near zero understated it
+    // above. round2 keeps the two decimals, so this fixture builds the widest
+    // remaining-seconds record a live tick can produce.
+    for (const node of GATHER_NODES) meta.nodeHarvestReadyAt[node.id] = server.sim.time + 239.95;
     broadcast(server);
     const raw = lastRawSnap(fc.sent);
     const m = raw.match(/"ncd":(\{[^}]*\})/);
     expect(m).not.toBeNull();
     const payload = m?.[1] ?? '';
     expect(Object.keys(JSON.parse(payload))).toHaveLength(GATHER_NODES.length);
-    // 8192 since the phase 20 density pass, with the stable arm above (the
+    // 8192 since the phase 20 density pass, with the stable arm above. The
     // legacy remaining-seconds form is narrower than the thirty-day
-    // absolute-deadline form, so the same ceiling bounds both).
+    // absolute-deadline form, so the same ceiling bounds both, and at two
+    // decimals it is byte-for-byte the persist two-decimal record (4,116 at
+    // 156 nodes): over the old 4096 pin, so this arm's raise is load-bearing
+    // too, not slack inherited from the stable arm.
+    expect(payload.length).toBeGreaterThan(4096);
     expect(payload.length).toBeLessThanOrEqual(8192);
     // This payload repeats per player per tick at 20 Hz for a pre-stable
     // client while anything cools: that per-tick repetition is exactly why

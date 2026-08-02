@@ -363,7 +363,6 @@ import {
   emptyGatheringProficiency,
   foldPendingGatherGrants,
   gatheringSkillsView,
-  gatherNodeById,
   harvestNode as harvestNodeImpl,
   isNodeHarvestableBy,
   nodeRespawnRemainingSec,
@@ -8128,7 +8127,10 @@ export class Sim {
   nodeHarvestableByMeFor(nodeId: string, pid: number): boolean {
     const meta = this.players.get(pid);
     if (!meta) return false;
-    if (!gatherNodeById(nodeId)) return false;
+    // Existence via the node_persist id map (O(1)), the same reasoning as
+    // nodeRespawnSecondsFor below: this read runs on the tooltip path and
+    // only needs membership, never the record.
+    if (!isLiveGatherNodeId(nodeId)) return false;
     return isNodeHarvestableBy(meta, nodeId, this.time);
   }
 

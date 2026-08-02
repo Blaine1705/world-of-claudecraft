@@ -933,8 +933,10 @@ export const GATHER_NODES: GatherNodeDef[] = [
     zoneId: 'willowfen',
     type: 'ore',
     // Bogshine east margin. Nudged off (-252,268) at authoring (Q15): 1.48yd
-    // of world-sea freeboard sat inside the guard's half-yard near band; the
-    // moved spot clears at 1.76.
+    // of world-sea freeboard, inside the half-yard-above-the-guard band the
+    // Q15 pass treated as too close (authoring practice, a recorded session
+    // default; the suite itself enforces only the 1yd guard). The moved spot
+    // clears at 1.76.
     pos: { x: -251, z: 268 },
     level: 20,
     tier: 1,
@@ -1257,7 +1259,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'wood_galecrest_6',
     zoneId: 'galecrest',
     type: 'wood',
-    // Stable meadows east, outside the (500,500) 60yd mob-scan probe disc.
+    // Stable meadows east.
     pos: { x: 452, z: 600 },
     level: 20,
     tier: 1,
