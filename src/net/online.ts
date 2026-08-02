@@ -1319,6 +1319,8 @@ function blankEntity(id: number): Entity {
     leashAnchor: null,
     evadeStall: 0,
     chaseStall: 0,
+    evadeEpoch: 0,
+    combatExitHoldUntil: 0,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
@@ -3597,8 +3599,14 @@ export class ClientWorld implements IWorld {
   discardItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'discard', item: itemId, count });
   }
-  buyItem(npcId: number, itemId: string): void {
-    this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
+  buyItem(npcId: number, itemId: string, bulk?: boolean): void {
+    // `bulk` rides the wire only when true (the craftItem `commission` idiom
+    // above): an ordinary buy stays byte-identical to the pre-#2374 message.
+    if (bulk === true) {
+      this.cmd({ cmd: 'buy', npc: npcId, item: itemId, bulk: true });
+    } else {
+      this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
+    }
   }
   harvestNode(nodeId: string): Promise<boolean> {
     return this.cmdWithOutcome({ cmd: 'harvest_node', node: nodeId });

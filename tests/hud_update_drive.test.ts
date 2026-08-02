@@ -397,14 +397,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     band: 'frame',
     gate: '',
     surface: 'chrome',
-    why: 'the SELF buff row: never tier-gated, every frame on every graphics preset (the debuff row below shares this rule; only the TARGET debuffs strip is tier-coarsened)',
+    why: 'the SELF buff row: never tier-gated, every frame on every graphics preset (the debuff row below and the target debuffs strip further down share this rule)',
   },
   {
     call: 'this.debuffBarPainter.paint',
     band: 'frame',
     gate: '',
     surface: 'chrome',
-    why: 'the SELF debuff row: never tier-gated (your own debuffs are the ACTIONABLE read, docs/design/graphics-settings-fairness.md), so it paints every frame on every graphics preset, unlike the target debuffs strip',
+    why: 'the SELF debuff row: never tier-gated (your own debuffs are the ACTIONABLE read, docs/design/graphics-settings-fairness.md), so it paints every frame on every graphics preset, same as the target debuffs strip',
   },
   {
     call: 'this.targetReannounce.mark',

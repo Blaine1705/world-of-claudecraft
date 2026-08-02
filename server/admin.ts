@@ -1,4 +1,5 @@
 import type * as http from 'node:http';
+import { verifyLoginTwoFactor } from './account';
 import {
   accountDetail,
   associationsForIp,
@@ -149,6 +150,12 @@ const ADMIN_LOGIN_MAX_PER_MINUTE = 10;
 // bad-password response so it never reveals whether the account exists.
 const ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS =
   'too many failed attempts, wait a few minutes and try again';
+// Second factor, mirroring server/auth_routes.ts loginHandler exactly: an account
+// with TOTP enabled (account.totp_enabled_at) must supply a live code or a recovery
+// code before a token is minted. Without one, the response is a 200 CHALLENGE (never
+// a token), so the client shows the code step; with a wrong one it is a 401 that also
+// counts against the same per-account throttle as a bad password.
+const ADMIN_LOGIN_INVALID_TWO_FACTOR_CODE = 'invalid authentication code';
 const MAX_PAGE_LIMIT = 200;
 const DEFAULT_PAGE_LIMIT = 25;
 const ACTIVITY_WINDOW_DAYS = 30;
@@ -471,6 +478,17 @@ async function handleLogin(req: http.IncomingMessage, res: http.ServerResponse):
   const staff = await adminRolesForAccount(account.id);
   if (staff === null) {
     return fail(res, 403, 'this account does not have admin access');
+  }
+  if (account.totp_enabled_at) {
+    const code = typeof body.code === 'string' ? body.code : '';
+    const recoveryCode = typeof body.recoveryCode === 'string' ? body.recoveryCode : '';
+    if (!code && !recoveryCode) {
+      return ok(res, { twoFactorRequired: true });
+    }
+    if (!(await verifyLoginTwoFactor(account, code, recoveryCode))) {
+      recordAuthFailure(username);
+      return fail(res, 401, ADMIN_LOGIN_INVALID_TWO_FACTOR_CODE);
+    }
   }
   clearAuthFailures(username);
   await touchLogin(account.id);
@@ -1537,6 +1555,9 @@ function makeRealAdminDb() {
     touchLogin,
     newToken,
     verifyPassword,
+    // Login second factor: an account with TOTP enabled must supply a live code or
+    // a recovery code before a token is minted (mirrors server/auth_routes.ts).
+    verifyLoginTwoFactor,
     // Admin-initiated password reset: existence check, credential write, sign out
     // every device, and its moderation-history audit row.
     accountById,
@@ -1617,7 +1638,9 @@ const MODERATION_ACTION_SCHEMA = enum_(['suspend', 'unsuspend', 'ban', 'unban'] 
  * POST /admin/api/login: anonymous, its own in-handler rateLimited limiter PLUS the
  * per-account failed-login throttle (mirrors server/auth_routes.ts loginHandler),
  * so a distributed attack spread across many source IPs cannot bypass a lockout by
- * never repeating an IP.
+ * never repeating an IP. Also mirrors loginHandler's second-factor gate: a staff
+ * account with TOTP enabled must supply a live code or a recovery code before a
+ * token is minted, so 2FA is never bypassable for the highest-privilege surface.
  */
 async function loginHandler(ctx: Ctx): Promise<void> {
   if (!adminDb().rateLimited(ctx.req, ADMIN_LOGIN_MAX_PER_MINUTE).allowed) {
@@ -1639,6 +1662,17 @@ async function loginHandler(ctx: Ctx): Promise<void> {
   const staff = await adminDb().adminRolesForAccount(account.id);
   if (staff === null) {
     return fail(ctx.res, 403, 'this account does not have admin access');
+  }
+  if (account.totp_enabled_at) {
+    const code = typeof body.code === 'string' ? body.code : '';
+    const recoveryCode = typeof body.recoveryCode === 'string' ? body.recoveryCode : '';
+    if (!code && !recoveryCode) {
+      return ok(ctx.res, { twoFactorRequired: true });
+    }
+    if (!(await adminDb().verifyLoginTwoFactor(account, code, recoveryCode))) {
+      adminDb().recordAuthFailure(username);
+      return fail(ctx.res, 401, ADMIN_LOGIN_INVALID_TWO_FACTOR_CODE);
+    }
   }
   adminDb().clearAuthFailures(username);
   await adminDb().touchLogin(account.id);

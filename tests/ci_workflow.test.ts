@@ -73,6 +73,16 @@ function jobSource(name: string): string {
 }
 
 describe('CI workflow parity', () => {
+  it('cancels a superseded PR run without letting PR traffic cancel release pushes', () => {
+    // Anchored above the first job so a future job named "concurrency" cannot
+    // be mistaken for this block. D4: group includes event_name so pull_request
+    // and push never share a cancel group; cancel-in-progress stays true.
+    const concurrency = workflow.slice(0, workflow.indexOf('\njobs:'));
+    expect(concurrency).toMatch(
+      /\nconcurrency:\n {2}group: \$\{\{ github\.workflow \}\}-\$\{\{ github\.event_name \}\}-\$\{\{ github\.event\.pull_request\.number \|\| github\.ref \}\}\n {2}cancel-in-progress: true\n/,
+    );
+  });
+
   it('runs the canonical game and admin typecheck in CI and the local gate', () => {
     // One occurrence in pr-checks and one in release-checks (the parallel
     // check jobs). Neither test job typechecks.
@@ -231,10 +241,20 @@ describe('CI workflow parity', () => {
       expect(releaseChecks).toContain(step);
       expect(releaseGate).not.toContain(step);
     }
-    // Named-step count: checkout, setup-node, npm ci, plus the eight checks.
+    // Named-step count: checkout, setup-node, npm ci, plus nine check steps
+    // (i18n gen/summary/freshness, malware, tsc cache, typecheck, three builds).
     // An accidental extra step on the checks job would otherwise stay green.
-    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(11);
-    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(11);
+    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(12);
+    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(12);
+    // tsc incremental cache (#2758) must land on both check jobs, never on a
+    // matrixed test job (would N-way cache thrash or reintroduce shard-1 gates).
+    for (const job of [releaseChecks, jobSource('pr-checks')]) {
+      expect(job).toContain('Cache tsc incremental buildinfo');
+      expect(job).toContain('path: node_modules/.cache/tsc');
+      expect(job).not.toContain('if: matrix.shard == 1');
+    }
+    expect(jobSource('pr-gate')).not.toContain('Cache tsc incremental buildinfo');
+    expect(releaseGate).not.toContain('Cache tsc incremental buildinfo');
   });
 
   it('classifies docs-only PRs via a native changes job and keeps release unfiltered', () => {
@@ -351,6 +371,8 @@ describe('CI workflow parity', () => {
       expect(job).not.toContain('matrix:');
     }
     // Both test jobs are tests-only: nothing is gated to a single shard.
+    // Phase 4 moved serialized checks to release-checks; matrix.shard == 1
+    // must not return on either test job (would re-serialize or shrink).
     expect(prGate).not.toContain('matrix.shard == 1');
     expect(releaseGate).not.toContain('matrix.shard == 1');
     // The release TEST step itself must stay un-gated (run on every shard):

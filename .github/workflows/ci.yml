@@ -15,6 +15,8 @@ permissions:
 # Cancel superseded pull_request runs for the same PR. Group by event name plus
 # PR number (or ref for pushes) so release/** pushes and other events stay
 # isolated from ordinary PR traffic and cannot cancel each other (D4).
+# cancel-in-progress is true for every event in this group; release isolation
+# comes from the event_name segment, not from disabling cancel on push.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -355,6 +357,19 @@ jobs:
       - name: Malicious-code gate
         run: npm run security:gate
 
+      # tsc's own incremental cache (node_modules/.cache/tsc/buildinfo.json, via
+      # check:ts's --incremental flag). Keyed on the lockfile and tsconfig so a
+      # dependency or compiler-option change starts clean; tsc still verifies
+      # every file's content hash against the cache, so a stale restore only
+      # saves the unchanged-file re-check, never hides a real type error.
+      - name: Cache tsc incremental buildinfo
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.cache/tsc
+          key: tsc-buildinfo-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json') }}-${{ github.sha }}
+          restore-keys: |
+            tsc-buildinfo-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json') }}-
+
       - name: Typecheck
         run: npm run check:types
 
@@ -456,6 +471,17 @@ jobs:
       # priors; the full agent-judged pass is the `release-malware-audit` skill.
       - name: Malicious-code gate
         run: npm run security:gate
+
+      # Same tsc incremental cache as pr-checks (#2758). release-checks is not
+      # matrixed, so no matrix.shard gate (Phase 4: checks run once, not on
+      # release-gate shard 1).
+      - name: Cache tsc incremental buildinfo
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.cache/tsc
+          key: tsc-buildinfo-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json') }}-${{ github.sha }}
+          restore-keys: |
+            tsc-buildinfo-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json') }}-
 
       - name: Typecheck
         run: npm run check:types

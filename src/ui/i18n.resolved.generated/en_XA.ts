@@ -7038,6 +7038,8 @@ export const en_XA: EnTranslations = {
       "close": "[Çļóšé ʋéñðóŕ]",
       "hint": "[Çļíçķ áñ íţéɱ íñ ýóúŕ ƀáĝš ţó šéļļ íţ ŵĥíļé ţĥíš ŵíñðóŵ íš óþéñ.]",
       "buyAria": "[Ɓúý {item} ƒóŕ {price}]",
+      "buyStack": "[Ɓúý {count}]",
+      "buyStackAria": "[Ɓúý {count} {item} ƒóŕ {price}]",
       "buybackTitle": "[Ɓúýƀáçķ]",
       "buybackEmpty": "[Ñó íţéɱš]",
       "buybackAria": "[Ɓúý ƀáçķ {item} ƒóŕ {price}]",
