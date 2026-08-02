@@ -83,6 +83,14 @@ import {
   clearHunterTalentState,
   hasHunterTalent,
 } from './hunter_shared';
+import {
+  clearOssuaryMarks,
+  despawnTemporaryNecromancyUndead,
+  isTemporaryNecromancyUndead,
+  markFuneralHarvestDamage,
+  necromancyOnDeath,
+  recordOssuaryMarkDamage,
+} from './necromancy';
 import { cleanupPaladinAegis } from './paladin_aegis';
 import { stripBeaconOfLight } from './paladin_beacon';
 import { protectionConsecrationDamageReduction } from './paladin_consecration';
@@ -107,14 +115,6 @@ import { vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
 import { foulPlayGuardsBreak } from './rogue_talents';
 import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
-import {
-  clearOssuaryMarks,
-  despawnTemporaryNecromancyUndead,
-  isTemporaryNecromancyUndead,
-  markFuneralHarvestDamage,
-  necromancyOnDeath,
-  recordOssuaryMarkDamage,
-} from './necromancy';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 import { emitRainOfFireStop } from './warlock_meteor_events';
 
@@ -548,7 +548,10 @@ export function dealDamage(
       }
     }
   }
-  if (amount > 0) {
+  // Same `!resolvedHpLoss` guard as the Debt of Light block above: an amount that
+  // is ALREADY an exact landed-HP-loss copy (the Ruinous Brand echo) has passed
+  // through the target's absorbs once and must not be soaked a second time.
+  if (!resolvedHpLoss && amount > 0) {
     for (let i = target.auras.length - 1; i >= 0 && amount > 0; i--) {
       const a = target.auras[i];
       if (a.kind !== 'absorb') continue;

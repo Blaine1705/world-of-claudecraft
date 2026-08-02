@@ -5512,7 +5512,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: true,
     specs: ['destruction'],
-    requiresTargetHpBelow: 0.2,
+    // executeThreshold, not requiresTargetHpBelow: Duskfire is STRICTLY below 20%
+    // (a target sitting exactly on the line is not claimable), which is what its
+    // description promises and what the Ruin-refund window is tuned around.
+    // Warrior Execute keeps the looser at-or-below requiresTargetHpBelow gate.
+    executeThreshold: 0.2,
     effects: [
       { type: 'duskfireClaim', duration: 5 },
       { type: 'directDamage', min: 72, max: 84 },
@@ -8210,12 +8214,22 @@ function scaleEffect(
         min: Math.round(eff.min * dmgMult + flat),
         max: Math.round(eff.max * dmgMult + flat),
       };
-    case 'dot':
+    case 'dot': {
       // A directPct rider snapshots an already-scaled direct hit; scaling the
       // fraction again would double-apply the talent/global damage modifier.
-      return eff.directPct
-        ? { ...eff }
-        : { ...eff, total: Math.round(eff.total * dmgMult * dotMult + flat) };
+      if (eff.directPct) return { ...eff };
+      const scaled = { ...eff, total: Math.round(eff.total * dmgMult * dotMult + flat) };
+      // A combo-scaled finisher bleed (Bloodrift) derives its tick value from
+      // baseTotal + perComboTotal x points, IGNORING `total`, so scaling `total`
+      // alone would leave the whole payload inert against damage modifiers.
+      // (baseDuration/perComboDuration are seconds, not damage: Bleed Out buys
+      // more ticks at the same scaled value, so they are deliberately untouched.)
+      if (eff.perComboTotal !== undefined) {
+        scaled.baseTotal = Math.round((eff.baseTotal ?? 0) * dmgMult * dotMult + flat);
+        scaled.perComboTotal = Math.round(eff.perComboTotal * dmgMult * dotMult);
+      }
+      return scaled;
+    }
     case 'aoeDamage':
     case 'aoeHeal':
       return {

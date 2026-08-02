@@ -585,8 +585,15 @@ export function createActionBarView(
           def.id === 'tidecall' && mendingCurrentTargetCapped(player.id, target);
         const freeBySolarReprisal = solarReprisalMakesAbilityFree(player, def.id);
         const cheapCostMultiplier = nextCastCheapMultiplierFromAuras(player.auras, def.id);
-        const payableCost =
-          cheapCostMultiplier === null ? ability.cost : ability.cost * cheapCostMultiplier;
+        // Same fold order as the sim's cost resolution (casting_lifecycle): the
+        // empower-cheap multiplier applies to the authored cost first, then the
+        // shaman Flow State discount shapes the result. Composing them here (not
+        // picking one) is what keeps the bar and combat from disagreeing about
+        // whether a slot is affordable.
+        const payableCost = flowStateDiscountedCost(
+          player.auras,
+          cheapCostMultiplier === null ? ability.cost : ability.cost * cheapCostMultiplier,
+        );
         // A kill-window ability (Victory Rush): usable only while its enabling
         // aura is worn, and it glows while the window is open.
         let windowOpen = true;
@@ -666,6 +673,7 @@ export function createActionBarView(
           radiantResonanceActive ||
           windowGlow ||
           frostProcGlowActive(player.auras ?? [], def.id) ||
+          destructionProcGlowActive(player.auras ?? [], def.id) ||
           packlordActionGlowActive(player.auras ?? [], def.id) ||
           thundercallPayoffGlowActive(player.auras ?? [], def.id) ||
           flowStateReady ||
@@ -673,7 +681,9 @@ export function createActionBarView(
           sunVerdictAbilityGlowActive(target?.auras, player.id, def.id) ||
           (def.id === 'divine_ascension' && ascensionReady);
         slot.empowered =
+          reflectionReady ||
           hasEmpoweringAura(player.auras, ability) ||
+          afflictionPossessionEmpowers(player.auras, def.id) ||
           tidecallTargetCapped ||
           dawnsWrathActive ||
           solarReprisalActive ||
@@ -681,19 +691,13 @@ export function createActionBarView(
           ascensionEmpowered;
         slot.ascensionSpender = ascensionEmpowered;
         slot.ascensionCostLabel = ascensionEmpowered ? deps.formatCount(-1) : '';
-        const ariaKey = ascensionEmpowered ? ASCENSION_SPENDER_ARIA_KEY : SLOT_ARIA_KEY;
-        slot.ariaLabel = deps.t(ariaKey, { slot: slotLabel, ability: deps.abilityName(def) });
-        slot.empowered =
-          reflectionReady ||
-          hasEmpoweringAura(player.auras, ability) ||
-          afflictionPossessionEmpowers(player.auras, def.id);
         const fateThreadsReady = (world.fateThreads ?? 0) >= 3;
         slot.fateConsumeReady = fateThreadsReady && def.id === 'drain_life';
         slot.fateSentenceReady = fateThreadsReady && def.id === 'sentence';
-        slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
-          slot: slotLabel,
-          ability: deps.abilityName(def),
-        });
+        // The Ascension spender label replaces the plain slot aria-label, so the
+        // key is chosen here rather than assigned twice.
+        const ariaKey = ascensionEmpowered ? ASCENSION_SPENDER_ARIA_KEY : SLOT_ARIA_KEY;
+        slot.ariaLabel = deps.t(ariaKey, { slot: slotLabel, ability: deps.abilityName(def) });
         slot.ariaDescription = slot.fateConsumeReady
           ? deps.t(FATE_CONSUME_READY_ARIA_KEY)
           : slot.fateSentenceReady

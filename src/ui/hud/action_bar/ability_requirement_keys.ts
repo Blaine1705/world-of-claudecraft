@@ -50,8 +50,13 @@ export function abilityRequirementKeys(
   if (def.spendsCombo) out.push({ key: 'requiresCombo' });
   if (def.requiresDodgeProc) out.push({ key: 'requiresDodge' });
   if (def.requiresOutOfCombat) out.push({ key: 'requiresOutOfCombat' });
-  if (def.requiresTargetHpBelow !== undefined) {
-    out.push({ key: 'requiresTargetHealthBelow', percent: def.requiresTargetHpBelow * 100 });
+  // Both execute-window fields surface the same player-facing requirement; only
+  // the boundary differs (executeThreshold is strict, requiresTargetHpBelow is
+  // at-or-below), so reading one and not the other silently hid the requirement
+  // on every strict-threshold ability.
+  const executeWindowPct = def.executeThreshold ?? def.requiresTargetHpBelow;
+  if (executeWindowPct !== undefined) {
+    out.push({ key: 'requiresTargetHealthBelow', percent: executeWindowPct * 100 });
   }
   if (def.onNextSwing) out.push({ key: 'onNextSwing' });
   if (def.offGcd) out.push({ key: 'offGlobalCooldown' });

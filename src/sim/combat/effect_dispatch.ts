@@ -2032,6 +2032,12 @@ export function runEffects(
         // an aimed blast, the entity-anchored nova otherwise).
         const aoeCenter = p.castAim ?? p.pos;
         if (ability.id === 'corpse_explosion' && !consumeDeathEcho(ctx, p, aoeCenter)) break;
+        // Pyre Colossus owns a falling-meteor cue that carries the same ability id
+        // into its authored landing sequence. Emitting the generic nova here as
+        // well would show two impacts for one instant cast.
+        const hasAuthoredMeteorImpact = ability.effects.some(
+          (abilityEffect) => abilityEffect.type === 'summonPyreColossus',
+        );
         if (ability.id === 'bastion_sweep') {
           // The cast-start event was emitted before the authored wind-up. The
           // deferred impact phase owns only authoritative damage and hit flashes.
@@ -2045,7 +2051,7 @@ export function runEffects(
             ability: ability.id,
             range: eff.radius,
           });
-        } else if (p.castAim) {
+        } else if (p.castAim && !hasAuthoredMeteorImpact) {
           // sourceId attributes the landing to its caster so the renderer can
           // fly the ability's authored projectile volley from the caster's
           // hands to the aimed point (Splitshot's fan of arrows).
