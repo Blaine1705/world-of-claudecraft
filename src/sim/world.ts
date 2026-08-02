@@ -2025,7 +2025,7 @@ export const EMBER_VOLCANOES = [
 // padK: where the flat melt floor ends, as a fraction of r. The default 0.95
 // keeps the whole model footprint on level ground; the Drakemaw vent keeps
 // the original tight eye (0.55) because its shore is the escape bench's
-// wade-out ramp (DRAKEMAW_ESCAPE), pinned by tests/terrain_escape.test.ts.
+// wade-out ramp (DRAKEMAW_ESCAPE), pinned by tests/terrain_escape_walkout.test.ts.
 export const EMBER_LAVA_POOLS = [
   { x: 390, z: 2320, r: 14, floor: 12, padK: 0.55 }, // the vent inside the Drakemaw crater
   { x: 446, z: 2220, r: 11, floor: -0.5 },
@@ -2038,7 +2038,7 @@ export const EMBER_LAVA_POOLS = [
   // the Moltenmaw: an open lava-lake field east of the caldera. The big eye
   // sits at (423, 2347) so its whole model footprint (r * 1.15) stays clear
   // of the Drakemaw escape bench ring (benchFade 23 from the vent), whose
-  // every-azimuth dry-shore guarantee is pinned by tests/terrain_escape.
+  // every-azimuth dry-shore guarantee is pinned by tests/terrain_escape_walkout.
   { x: 423, z: 2347, r: 16, floor: -1.2 },
   { x: 438, z: 2326, r: 10, floor: -1.2 },
 ] as const;
@@ -2080,7 +2080,7 @@ function emberShapingOffset(x: number, z: number, seed: number): number {
 //   never drains into it.
 // Both pull terrain TO their target (never only downward): a raise-and-cut
 // makes the shore and channel floors deterministic, with no one-way dips
-// where the old lip crossed the mouth. tests/terrain_escape.test.ts walks
+// where the old lip crossed the mouth. tests/terrain_escape_walkout.test.ts walks
 // a real player from the reported stranding spot around the ring and out.
 const DRAKEMAW_ESCAPE = {
   x: 390,

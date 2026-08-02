@@ -110,7 +110,7 @@ describe('applyMasteryReset (pure, in place)', () => {
 
   it('the letter id is registered in the LETTER_IDS table of world_entity_i18n.ts', () => {
     // LETTER_IDS is a module-private const, so pin it by source scan (the
-    // professions_trend.test.ts precedent for the guild trend letters).
+    // professions_trend_content.test.ts precedent for the guild trend letters).
     const src = fs.readFileSync(path.resolve(process.cwd(), 'src/ui/world_entity_i18n.ts'), 'utf8');
     const start = src.indexOf('const LETTER_IDS = [');
     expect(start, 'the LETTER_IDS declaration should exist').toBeGreaterThan(-1);
