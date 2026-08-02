@@ -66,7 +66,7 @@ function purgeItem(itemId: string): void {
 // The marquee bar, mirrored from server/deeds_records.ts isMarqueeDeed (kept
 // inline so this suite stays sim-pure: importing the server module drags the
 // db pool into the graph; the REAL predicate agreeing with these inputs is
-// pinned in tests/deed_records.test.ts, profession exemplar included).
+// pinned in tests/deed_records_table.test.ts, profession exemplar included).
 function marqueeBar(deedId: string): boolean {
   const def = DEEDS[deedId];
   return def.renown >= 25 || def.reward !== undefined;
