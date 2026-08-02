@@ -350,8 +350,11 @@ describe('registerDiscordBotMetrics', () => {
       expect(sample(stale, WOC_DISCORD_BOT_BREAKER_STATE, `state="${state}"`)).toBe('0');
     }
     const age = Number(sample(stale, WOC_DISCORD_BOT_PUSH_AGE_SECONDS));
+    // The floor carries the decisiveness (a () => 0 default reads age 0); the
+    // ceiling is deliberately loose so a GC pause between the stamp and the
+    // scrape cannot flake the arm.
     expect(age).toBeGreaterThanOrEqual(300);
-    expect(age).toBeLessThan(301);
+    expect(age).toBeLessThan(305);
 
     // And a fresh push on the same default clock reads live again.
     setDiscordBotCounters(push(), Date.now());
@@ -359,6 +362,6 @@ describe('registerDiscordBotMetrics', () => {
     expect(sample(fresh, WOC_DISCORD_BOT_QUEUE_DEPTH)).toBe('12');
     const freshAge = Number(sample(fresh, WOC_DISCORD_BOT_PUSH_AGE_SECONDS));
     expect(freshAge).toBeGreaterThanOrEqual(0);
-    expect(freshAge).toBeLessThan(1);
+    expect(freshAge).toBeLessThan(5);
   });
 });

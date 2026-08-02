@@ -89,8 +89,9 @@ includes `DOM` for the game client. Nothing in `bot/` may depend on a browser gl
   attached to the presence POST (Phase 8), so telemetry needs no loop of its own. The shape
   is a fixed key set built as a fresh literal in one order (the server pins it, and
   `JSON.stringify` follows source order), and collection is TOTAL: a snapshot that throws or
-  answers with anything malformed yields no `counters` key at all, never a failed presence
-  push. Tested in `tests/discord_bot_presence_counters.test.ts`.
+  is not a record at all yields no `counters` key, and a wrong-typed individual field
+  normalizes to 0 inside an otherwise-shipped block; either way the presence push itself
+  never fails. Tested in `tests/discord_bot_presence_counters.test.ts`.
 - `outbox_consumer.ts`: the consolidated poll's behavior, behind injected IO: the breaker
   gate, the per-stream fan-out, the winners announce-then-mark ordering, the didWork signal
   the cadence reads, and the factory that binds each stream's channel id and message

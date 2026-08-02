@@ -1,7 +1,7 @@
 # State: Discord Bot Stability (cross-phase cheat sheet)
 
-Current phase: Phases 1 to 6 built and QA'd (Phase 6 QA closed 2026-08-01). Next:
-Phase 7 (supervision and deploy hardening).
+Current phase: Phases 1 to 8 built and QA'd (Phase 8 QA closed 2026-08-02). Next:
+Phase 9 (/api/discord caching).
 The packet's sync target is `origin/release/v0.34.0` (the maintainer's retarget call,
 relayed in the Phase 6 handoff). Phase 6 QA's sync merged the admin guild backoffice
 (PR #2590, 7 commits) as `50883ce3d`; the three Phase 5 feed sites in `server/db.ts`
@@ -196,8 +196,12 @@ because dropping the one word is otherwise silent),
 
 - Phase 1: `bot` added to the tsconfig `include` (it surfaced ZERO latent type errors,
   so no behavior-preserving fixes were needed); `build:bot` added to the gate step list
-  and to both CI jobs that build the server (`pr-checks`, and `release-gate` under
-  `if: matrix.shard == 1`); injected IO seams on all three shells; cadence constants
+  and to both CI jobs that build the server (originally `pr-checks` plus `release-gate`
+  under `if: matrix.shard == 1`; the v0.34.0 CI-speed sync, merged by Phase 8 QA on
+  2026-08-02, moved the release tier's serialized checks into an unsharded
+  `release-checks` job, so the bot build now lives UNGATED on `pr-checks` and
+  `release-checks`, 13 named steps each, and `matrix.shard == 1` no longer appears
+  anywhere in the workflow); injected IO seams on all three shells; cadence constants
   extracted per R6.
 - Phase 2: `bot/rate_governor.ts`, the pure governor every Discord REST call is now
   dispatched through; `bot/discord_api.ts` reduced to an IO shell over it (the 10 second
@@ -833,21 +837,26 @@ because dropping the one word is otherwise silent),
     wire); the with-counters envelope row now builds its body through
     `withPresenceCounters`, so the byte pin sees the PRODUCTION key order; and
     the stale-read defensive copy is pinned.
-  - Declared residuals for the Phase 8 QA session, judged not worth code this
-    round: the restart guard is NOT an anti-abuse bound, a `DISCORD_BOT_SECRET`
-    holder can inflate the counter series (alternating high/low pushes, or just
-    honestly huge totals); the trust model is now stated in the metrics module
-    header (secret holders are trusted for metric integrity; memory, series
-    count and label values stay hard-bounded regardless of the caller). A
-    garbage `breakerState` from a non-current pusher sanitizes to an
-    affirmative 'closed' rather than to null (the current bot normalizes
-    bot-side, so only a broken or hostile pusher can hit the arm; QA may weigh
-    null-for-garbage). `BOT_COUNTER_MAX` and `PRESENCE_COUNTER_CAP` are the
-    same 1e9 declared on both sides of the trust boundary with no shared pin
-    (the server clamp is the authoritative one, the bot clamp is defense in
-    depth, and drift in either direction is harmless). The push-age
-    `Math.max(0, ...)` arm is unreachable without a backwards clock
-    (no-change-needed).
+  - Declared residuals, as RULED by the Phase 8 QA session (2026-08-02): the
+    restart guard is NOT an anti-abuse bound, a `DISCORD_BOT_SECRET` holder can
+    inflate the counter series (alternating high/low pushes, or just honestly
+    huge totals); the trust model is stated in the metrics module header
+    (secret holders are trusted for metric integrity; memory, series count and
+    label values stay hard-bounded regardless of the caller); UPHELD, no code.
+    A garbage `breakerState` no longer sanitizes to 'closed': the QA session
+    took the null-for-garbage arm (`a174d2963`), so the SERVER stores null and
+    the one-hot gauge renders no claim, the same shape staleness takes. The
+    SURVIVING residual is the bot-side normalizer, which still reports
+    'closed' for an out-of-allowlist value: its input is the same-process
+    typed governor (garbage is unreachable from the real bot), the wire
+    contract keeps a required non-null field, and changing it would churn the
+    byte-for-byte envelope pin for an arm only a hostile secret-holder can
+    reach, whom the trust model already covers. `BOT_COUNTER_MAX` and
+    `PRESENCE_COUNTER_CAP` are the same 1e9 declared on both sides of the
+    trust boundary with no shared pin (the server clamp is the authoritative
+    one, the bot clamp is defense in depth, and drift in either direction is
+    harmless); UPHELD, no pin. The push-age `Math.max(0, ...)` arm is
+    unreachable without a backwards clock (no-change-needed); UPHELD.
 ## Phase 5 feed-site enumeration (the linked-member change feed contract)
 
 Every server-side site where a linked account's flex-relevant state changes (level, class,

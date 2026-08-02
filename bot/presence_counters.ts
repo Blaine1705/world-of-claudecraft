@@ -13,9 +13,11 @@
 //     envelope pin in tests/discord_bot_server_client.test.ts sees.
 //  2. Telemetry may NEVER cost a presence push. Presence is what the HUD's
 //     Discord widget renders; counters are diagnostics. So collection is a
-//     TOTAL function: a snapshot accessor that throws, answers with a hostile
-//     object, or answers with fields of the wrong type yields null, and the
-//     push goes out with no counters block at all rather than not going out.
+//     TOTAL function: a snapshot accessor that throws, or that answers with
+//     something that is not a record at all, yields null and the push goes out
+//     with no counters block; an individual field of the wrong type normalizes
+//     to 0 inside an otherwise-shipped block. Either way the push itself never
+//     fails for a diagnostic reason.
 //
 // Nothing here reads a clock, a socket or the governor's internals: it takes a
 // reader callback, so a test drives every arm with a plain function.
