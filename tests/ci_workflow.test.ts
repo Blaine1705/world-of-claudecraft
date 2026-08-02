@@ -13,9 +13,9 @@ const shardPartition = readFileSync(
   'utf8',
 );
 
-// Locked shard count for pr-gate and release-gate matrices (Phase 2 of
-// docs/ci-speed). Supersedes the prior toolchain N=4 on this surface. Both
-// test jobs share this N. Prefer this single constant over scattering /N literals.
+// Locked shard count for pr-gate and release-gate matrices (CI speed packet).
+// Supersedes the prior toolchain N=4 on this surface. Both test jobs share this
+// N. Prefer this single constant over scattering /N literals.
 const SHARD_N = 8;
 const SHARD_MATRIX = Array.from({ length: SHARD_N }, (_, i) => i + 1).join(', ');
 
