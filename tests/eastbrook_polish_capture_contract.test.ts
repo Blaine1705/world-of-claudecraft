@@ -360,15 +360,11 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned. Four independent causes now stack: the 0.33.0
-      // version sync moved every GLB source-fingerprint leaf (#2729), the
-      // graphics overhaul and the ability-VFX integration each changed the
-      // renderer-integration and view-priority leaves, and this branch edits
-      // src/render/renderer.ts for the compile gates. So the composite mints
-      // fresh and matches no parent's literal. No pipeline input or geometry
-      // value changed, and no capture was retaken (the five per-asset seal
-      // suites stay green untouched).
-      fingerprint: '2172d6960ce3057f6b64d2a1d178ab2b7df5f6802636010b1fa06e57a452106a',
+      // Deliberately re-pinned after the happy-dom package-lock add (local-gate
+      // perf Phase 5). package-lock.json is a hashed leaf of every Eastbrook-era
+      // source fingerprint, so the composite mints fresh with no geometry or
+      // capture change. Fingerprint-only GLB stamps kept shipping sizes identical.
+      fingerprint: '0fd0da65d403278b600e98143ba25b062065a66acfd51daf74c0f3ee0b2320cf',
       components: {
         captureContract: {
           id: 'polish-v2',

@@ -381,7 +381,8 @@ export default defineConfig({
     passWithNoTests: false,
     globalSetup: ['./tests/global_setup.ts'],
     // Runs per test file (unlike globalSetup, which runs once outside any
-    // jsdom environment); see the file for why this is needed on Node 22+.
+    // DOM environment). Needed on Node 22+ for jsdom and happy-dom files;
+    // no-op when `window` is absent (default node env). See the file.
     setupFiles: ['./tests/jsdom_local_storage_setup.ts'],
     // Two kinds of exclusion, kept together:
     // - agent-runtime directories may contain local worktree copies, and their tracked

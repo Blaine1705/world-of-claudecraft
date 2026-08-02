@@ -12,6 +12,11 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 | 2026-08-02 | 4 | experimental.fsModuleCache in vite.config test | full cold ~245-277s (prior); multi-file no-cache transform ~3-5s | full cold 252.8s green / warm 241.3s; multi-file transform 1.4s cold / 0.45s warm | M1 darwin/arm64 16c/128GiB vitest 4.1.10 | keep | Default path under node_modules; see detail |
 | 2026-08-02 | 4 | npm scripts test:related + test:changed | ad-hoc npx vitest related/changed only | package scripts + docs; gate:fast still owns day-loop orchestration | M1 | keep | Align with Phase 3; do not duplicate gate:fast |
 | 2026-08-02 | 4 | optional @vitest/ui dependency | n/a | not added | M1 | drop | Opt-in DX only; would bloat default install; re-open later if needed |
+| 2026-08-02 | 5 | add happy-dom@20.11.1 devDependency | jsdom only | happy-dom + jsdom both present | M1 vitest 4.1.10 | keep | Vitest first-class env; needed before pragma migration |
+| 2026-08-02 | 5 | pilot 10 UI/admin files to happy-dom | n/a | 9/10 green; form_draft CSS selector gap | M1 | partial | Keep pilot path; form_draft stays jsdom |
+| 2026-08-02 | 5 | migrate remaining jsdom pragmas to happy-dom | 112 jsdom files | 103 happy-dom + 9 jsdom exceptions | M1 | partial keep | Per-file pragmas (repo pattern); see exceptions in baselines |
+| 2026-08-02 | 5 | localStorage setup under happy-dom | Node 22+ broken global | setup still green | M1 | keep | No setup change required beyond comment |
+| 2026-08-02 | 5 | package-lock asset source-fingerprint remint | seal suites red after lock add | fingerprint-only GLB stamp + pin sweep green | M1 | keep (required side effect) | Sizes unchanged; not a geometry rebuild |
 
 ## Detail template (copy below for long notes)
 
@@ -162,3 +167,36 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
   - Phase 5 happy-dom
   - Do not treat warm/related/`gate:fast` as merge bar
   - Optional: document "never clearCache while another vitest is running"
+
+---
+
+### 2026-08-02 - Phase 5 - happy-dom for DOM tests (partial keep)
+
+- Hypothesis: Vitest-first-class happy-dom is faster than jsdom for the ~112
+  `// @vitest-environment jsdom` files without rewriting UI tests.
+- Change:
+  - devDependency `happy-dom@^20.11.1` (jsdom kept)
+  - 103 test files: pragma `jsdom` -> `happy-dom`
+  - 9 explicit jsdom exceptions (API gaps: `window.confirm`/`alert`, selectors,
+    `DOMTokenList` prototype spies, click/draggable/datetime)
+  - Comments on `tests/jsdom_local_storage_setup.ts`, `tests/admin/_setup.ts`,
+    `vite.config.ts` setupFiles note both DOM envs
+  - Lockfile-driven fingerprint-only remint of 13 shipping GLBs (Eastbrook + tank),
+    media manifest regen, polish provenance remint, pin updates
+- Commands:
+  - Baseline: `WOC_SKIP_PRETEST=1 npx vitest run --maxWorkers=8` on the 112 DOM files
+  - Pilot batches; bulk pragma migration; exception reverts
+  - `node tmp/remint_source_fingerprints.mjs` (not committed); polish remint script;
+    `node scripts/build_media_manifest.mjs generate`
+  - Asset seal suite + DOM suite + full suite recheck
+- Before metrics (DOM subset, all jsdom): Duration **16.68s**, environment **31.09s**
+- After metrics (103 happy-dom + 9 jsdom):
+  - cold Duration **14.69s**, environment **14.48s** (~2s / ~12% wall; ~2.1x env)
+  - warm Duration **10.53s**, environment **14.22s**
+  - DOM 112 files / 1110 tests PASS
+- Pass/fail: DOM green; asset seals green after remint; admin/svelte mostly happy-dom
+- Decision: **partial keep** (not full drop, not 100% migration)
+- Follow-ups:
+  - Phase 6 pool/projects/isolation
+  - Optional later: polyfill `window.confirm`/`alert` or selector gaps to shrink exceptions
+  - Full gate remains merge bar; happy-dom is not a merge-bar change by itself

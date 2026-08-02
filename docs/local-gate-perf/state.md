@@ -2,8 +2,8 @@
 
 Resume point for the next session. Keep current after every phase.
 
-**Current phase:** Phase 4 complete.  
-**Next action:** run Phase 5 starter prompt (`phase-05-happy-dom.md`).  
+**Current phase:** Phase 5 complete.  
+**Next action:** run Phase 6 starter prompt (`phase-06-pool-projects-isolation.md`).  
 **Worktree:** `/Users/fernando/Documents/wocc-gate-perf-research`  
 **Branch:** `feature/local-gate-perf`  
 **Base:** always `origin/release/v0.34.0`
@@ -97,7 +97,7 @@ Fill as phases ship:
 - (Phase 2) gate dedupe approach: **Option C + B** generate-once in gate (`i18n:gen` + freshness + `wiki:content`), vitest step sets `WOC_SKIP_PRETEST=1` (`scripts/pretest.mjs` no-op), client step runs `build:bundle` (no re-gen). Standalone `npm test` / `npm run build` still full regen.
 - (Phase 3) new scripts: `gate:fast` (`scripts/gate_fast.mjs` + `lib/gate_fast_plan.mjs`); worker tiers via `GATE_WORKER_TIER` + `GATE_WORKER_TIER_CAPS` in `lib/gate_workers.mjs`; docs `docs/local-gate-perf/tier-workers.md`, `docs/qa-gate.md`, CONTRIBUTING pointer
 - (Phase 4) vitest cache flags: `test.experimental.fsModuleCache: true` in `vite.config.ts` (store under `node_modules/.experimental-vitest-cache`); scripts `test:related`, `test:changed`; `@vitest/ui` dropped
-- (Phase 5) happy-dom adoption scope:
+- (Phase 5) happy-dom adoption scope: **partial keep** `happy-dom@^20.11.1`; 103/112 DOM files use `// @vitest-environment happy-dom`; 9 files stay on jsdom (see experiment-log / baselines); jsdom kept as dep; lockfile change re-stamped Eastbrook asset source fingerprints (sizes unchanged)
 - (Phase 6) pool/projects kept:
 - (Phase 7) package manager decision:
 - (Phase 8) task cache tool:

@@ -133,7 +133,7 @@ suites can overlap; sum of file times exceeds suite wall).
 | 2 | M1 | 291.5 (composite) | 245.4 | -44.8 (see notes) | keep |
 | 3 | M1 | n/a (day-loop focus) | n/a | gate:fast 25.4s vs full ~291s | keep |
 | 4 warm path | M1 | n/a (vitest focus) | cold 252.8 / warm 241.3 | ~11s warm full-suite; multi-file transform 3.1s -> 0.45s | keep |
-| 5 | | | | | |
+| 5 happy-dom | M1 | n/a (DOM focus) | DOM cold 14.7 / warm 10.5; full suite recheck separate | DOM subset env 31s -> 14.5s; partial keep | partial keep |
 | 6 | | | | | |
 | 7 | | | | | |
 | 8 cold/warm | | | | | |
@@ -269,3 +269,47 @@ Vitest guidance: fs cache helps most on small re-runs with large module graphs).
 **Caveat:** do not run `--clearCache` while another vitest process is using the same
 cache (observed ENOENT storm under concurrent clear). Not a suite correctness flake
 when used single-flight.
+
+## Phase 5 - happy-dom for DOM tests (after)
+
+**Decision:** Partial keep. Default DOM pragma is `// @vitest-environment happy-dom`
+(103 of 112 previously-jsdom files). Keep `jsdom` as a devDependency for an explicit
+exception list of 9 files. Adding `happy-dom` touched `package-lock.json`, which is a
+fingerprinted asset-pipeline input; fingerprint-only re-stamped Eastbrook-era shipping
+GLBs (sizes unchanged) and re-pinned seals in the same change.
+
+### DOM subset (112 files, 1110 tests, M1, maxWorkers=8, WOC_SKIP_PRETEST=1)
+
+| Mode | Duration s | Environment s (sum) | Transform s | Result |
+|---|---:|---:|---:|---|
+| Baseline all jsdom (pre change) | 16.68 | 31.09 | 28.33 | PASS |
+| Mixed happy-dom+jsdom cold (after clearCache) | 14.69 | 14.48 | 30.65 | PASS |
+| Mixed warm | 10.53 | 14.22 | 3.02 | PASS |
+
+Cold wall win about **2 s** (~12%) on the DOM subset; environment setup about **2.1x**
+faster. Full-suite wall is dominated by sim/server files, so happy-dom is not treated
+as a merge-bar change.
+
+### Exception list (remain `// @vitest-environment jsdom`)
+
+| File | Gap under happy-dom 20.11.1 |
+|---|---|
+| `tests/form_draft.test.ts` | attribute selectors with quote/bracket values fail restore |
+| `tests/vendor_window_painter.test.ts` | bubbled `MouseEvent('click')` does not fire handlers |
+| `tests/bags_window_instance_marker.test.ts` | `HTMLImageElement.draggable` not reflected |
+| `tests/deeds_window_focus.test.ts` | escaped quote selectors rejected by querySelector |
+| `tests/spellbook_tick_repaint.test.ts` | `DOMTokenList` global prototype undefined for spies |
+| `tests/admin/staff_page.test.ts` | `window.confirm` missing (`vi.spyOn` fails) |
+| `tests/admin/blocked_ips.test.ts` | `window.confirm` missing |
+| `tests/admin/account_flair_controls.test.ts` | `window.alert` missing |
+| `tests/admin/ip_associations.test.ts` | datetime-local `expiresAt` not read from input |
+
+Admin Svelte testing-library suite: green under happy-dom except the four admin
+exceptions above. `tests/jsdom_local_storage_setup.ts` still covers both environments
+on Node 22+.
+
+### Full suite recheck (M1, maxWorkers=8, WOC_SKIP_PRETEST=1, after clearCache)
+
+| Result | Duration s | Notes |
+|---|---:|---|
+| PASS 1945 files / 24693 tests (8 skipped files, 74 skipped tests) | 347.0 | Machine load high (user ~2533s); not comparable to Phase 4 241-253s quiet wall. Correctness green only. |
