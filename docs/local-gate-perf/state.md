@@ -2,8 +2,8 @@
 
 Resume point for the next session. Keep current after every phase.
 
-**Current phase:** Phase 10 complete.  
-**Next action:** run Phase 11 starter prompt (`phase-11-cross-platform-tier-matrix.md`).  
+**Current phase:** Phase 11 complete.  
+**Next action:** run Phase 12 starter prompt (`phase-12-final-qa-and-close.md`).  
 **Worktree:** `/Users/fernando/Documents/wocc-gate-perf-research`  
 **Branch:** `feature/local-gate-perf`  
 **Base:** always `origin/release/v0.34.0`
@@ -90,6 +90,7 @@ Always before calling a phase complete:
 | `scripts/gate_profile.mjs` | Phase 1 measurement CLI (timed steps + slow files) |
 | `scripts/lib/gate_profile.mjs` | Pure helpers for gate_profile (tested) |
 | `docs/local-gate-perf/tier-workers.md` | Cross-OS worker tier guidance |
+| `docs/local-gate-perf/platform-matrix.md` | Phase 11 OS matrix + which-command table |
 | `package.json` | scripts: test, test:related, test:changed, test:turbo (exp), test:bun (exp), pretest, gate, gate:fast, build, build:bundle, check:types |
 | `scripts/test_turbo_experimental.mjs` | Phase 10 experimental turbo-test launcher (npx --yes; not default) |
 | `scripts/test_bun_experimental.mjs` | Phase 10 experimental bun launcher (not default) |
@@ -129,7 +130,10 @@ Fill as phases ship:
   (1775 fails + 511 load-errors). Bun native green on pure helpers, no full-suite
   adopt path; bunx vitest no faster. Deno skipped. No CI dual-run. No permanent
   turbo-test dep (fingerprint lockfile leaf). Scripts: `test:turbo`, `test:bun`.
-- (Phase 11) tier matrix doc path:
+- (Phase 11) tier matrix doc path: `docs/local-gate-perf/platform-matrix.md`
+  (contributor "which command"; OS matrix macOS verified / Linux CI smoke /
+  Windows smoke). Pointers in `docs/qa-gate.md`, CONTRIBUTING, tier-workers.
+  Machine inventory: M1 + CI-L1 (GHA ubuntu-latest 4c/16GB low) + empty W1.
 - (Phase 12) teardown:
 
 ## OPEN items
@@ -139,4 +143,6 @@ Fill as phases ship:
 3. Owner sign-off if `gate:fast` is ever allowed as pre-push instead of full gate
    (default: no; pre-push floor stays as today).
 4. ~~Cold empty-store install and second-worktree install timings (deferred to Phase 7).~~ **Closed: see baselines.**
-5. Low/medium tier machine baselines still empty (only M1 high-tier filled).
+5. Low/medium tier **local** machine baselines still empty (only M1 high-tier
+   filled; CI-L1 is a Linux proxy from GHA specs, not a timed unsharded gate).
+6. Windows host (W1) still untested for full gate / gate:fast wall (smoke only).

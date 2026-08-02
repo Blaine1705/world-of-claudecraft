@@ -71,6 +71,10 @@ npm run gate:fast
 
 ## Cross-platform notes
 
+Full OS status matrix (verified / smoke / untested) and the contributor
+"which command should I run?" table live in
+[`platform-matrix.md`](platform-matrix.md).
+
 | OS | Notes |
 |---|---|
 | macOS | Primary agent host; multi-worktree freemem clamp is the usual limiter |

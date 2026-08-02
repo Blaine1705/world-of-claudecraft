@@ -36,6 +36,8 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 | 2026-08-02 | 10 | Bun 1.3.14 native `bun test` pure helpers | vitest 0.91s | 72/72 in 65ms | M1 | drop as default | works on pure unit; not full suite |
 | 2026-08-02 | 10 | bunx vitest pure set (12 files) | node vitest 2.20s | bunx 2.50s both 128/128 | M1 | drop | no wall win as vitest host |
 | 2026-08-02 | 10 | Deno as runner | n/a | not installed on host | M1 | drop | expected skip |
+| 2026-08-02 | 11 | platform + tier matrix docs | gaps undocumented | platform-matrix.md; macOS verified; Linux/Windows smoke | M1 + CI-L1 proxy | keep | no large script rewrite; biome format fix only |
+| 2026-08-02 | 11 | gate:fast revalidation | Phase 3 ~25s | default 28.6s (8w); low tier 22.7s (2w) | M1 darwin/arm64 | keep | day-loop still well under agent band |
 
 ## Detail template (copy below for long notes)
 
@@ -461,5 +463,44 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 - Follow-ups:
   - Phase 11 tier matrix
   - Owner would need a near-100% green turbo-test or Bun story before reopening adopt
+
+---
+
+### 2026-08-02 - Phase 11 - cross-platform and machine-tier matrix
+
+- Hypothesis: Contributors and agents need a single place that says which command
+  to run by tier and role, and an honest Windows/macOS/Linux status (verified vs
+  smoke vs untested) without reopening Phase 10 runners.
+- Change:
+  - New `docs/local-gate-perf/platform-matrix.md` (OS matrix, machine inventory
+    aliases, "Which command should I run?" for human/agent/low/high)
+  - `baselines.md` inventory: M1 + CI-L1 (GHA ubuntu-latest 4 vCPU / 16 GB, low
+    tier proxy) + empty W1 Windows slot
+  - Short pointers in `docs/qa-gate.md`, `CONTRIBUTING.md`, `tier-workers.md`
+  - Small in-scope fix: Biome format on `scripts/test_turbo_experimental.mjs`
+    (Phase 10 leftover blocking `gate:fast` biome step)
+  - No large cross-platform script rewrite; win32 `shell: true` already present
+    on gate / gate_fast / gate_profile / pretest
+- Commands:
+  - `git fetch origin release/v0.34.0 && git merge` (already up to date)
+  - `node scripts/gate_profile.mjs --facts`
+  - `node scripts/gate_profile.mjs --dry-run --skip-browser`
+  - `pnpm run gate:fast` (default workers)
+  - `GATE_WORKER_TIER=low pnpm run gate:fast`
+  - `npx @biomejs/biome check --write scripts/test_turbo_experimental.mjs`
+- Before metrics: OS gaps only partially noted in tier-workers; no single matrix
+- After metrics (M1, freemem ~18-20 GiB, Node 26.5, pnpm 10.34.5):
+  - gate:fast default **28.55s real**, workers=8, PASS
+  - gate:fast `GATE_WORKER_TIER=low` **22.66s real**, workers=2, PASS
+  - (Low tier not slower here because related vitest was empty/near-empty and
+    fixed steps dominate; tier caps still matter for full gate under load)
+  - gate_profile dry-run step list OK
+- Pass/fail: macOS day-loop green; Linux install/tests proven via CI only;
+  Windows untested on a real host (documented as smoke + follow-ups)
+- Decision: **keep** docs matrix; do not expand into multi-OS wall campaigns
+- Follow-ups:
+  - Phase 12 final QA and packet close
+  - Volunteer Windows host for W1 full gate / gate:fast walls
+  - Optional local Linux unsharded full-gate wall (distinct from CI shards)
 
 

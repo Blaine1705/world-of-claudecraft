@@ -26,15 +26,11 @@ console.error(
   '[test:turbo] EXPERIMENTAL: not the merge-bar runner. Default remains vitest (npm test / gate).',
 );
 
-const result = spawnSync(
-  'npx',
-  ['--yes', PKG, '--jobs', jobs, ...extra],
-  {
-    stdio: 'inherit',
-    shell: process.platform === 'win32',
-    env: process.env,
-  },
-);
+const result = spawnSync('npx', ['--yes', PKG, '--jobs', jobs, ...extra], {
+  stdio: 'inherit',
+  shell: process.platform === 'win32',
+  env: process.env,
+});
 
 if (result.error) {
   console.error('[test:turbo] failed to spawn npx:', result.error.message);

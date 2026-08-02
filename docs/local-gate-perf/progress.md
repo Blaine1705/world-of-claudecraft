@@ -16,7 +16,7 @@ Status: not-started / in-progress / blocked / complete / dropped
 | 8 | Task cache (turbo or wireit) | complete | 2026-08-02 | 2026-08-02 | turbo 2.10.8 keep; warm pure steps FULL TURBO ~87ms |
 | 9 | Suite cost reduction | complete | 2026-08-02 | 2026-08-02 | EMPTY/STABLE subsystem worlds keep; corpse empty drop |
 | 10 | Experimental runners spike | complete | 2026-08-02 | 2026-08-02 | not default: turbo-test wall win, pass rate fail; Bun pure only |
-| 11 | Cross-platform and tier matrix | not-started | | | |
+| 11 | Cross-platform and tier matrix | complete | 2026-08-02 | 2026-08-02 | platform-matrix.md; macOS verified; Linux/Windows smoke |
 | 12 | Final QA and packet close | not-started | | | |
 
 ## Per-phase deliverables
@@ -88,9 +88,10 @@ Status: not-started / in-progress / blocked / complete / dropped
 - [x] No default gate swap; locked in state.md; experimental `test:turbo` / `test:bun` only
 
 ### Phase 11 - Cross-platform and tier matrix
-- [ ] Validation matrix filled for Windows, macOS, Linux (as available)
-- [ ] Low/medium/high guidance in CONTRIBUTING or docs
-- [ ] Agent workflow docs (worktree + store + gate:fast)
+- [x] Validation matrix filled for Windows, macOS, Linux (as available)
+- [x] Low/medium/high guidance in CONTRIBUTING or docs
+- [x] Agent workflow docs (worktree + store + gate:fast)
+  (platform-matrix.md; macOS verified gate:fast; Linux CI-L1 proxy; Windows smoke)
 
 ### Phase 12 - Final QA and close
 - [ ] `npm run gate` (or evolved) green on worktree

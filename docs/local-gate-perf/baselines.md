@@ -49,12 +49,16 @@ Record:
 
 | Alias | OS | Arch | CPUs | RAM GB | Tier | Owner/host notes |
 |---|---|---|---|---|---|---|
-| M1 | darwin | arm64 | 16 | 128 GiB (137 GB decimal) | high | Fernando local; free RAM at Phase 1 start ~8.8 GiB under multi-session load |
-| M2 | | | | | | |
-| M3 | | | | | | |
+| M1 | darwin | arm64 | 16 | 128 GiB (137 GB decimal) | high | Fernando local; free RAM at Phase 1 start ~8.8 GiB under multi-session load; Phase 11 recheck freemem ~18-20 GiB |
+| CI-L1 | linux (GHA ubuntu-latest) | x64 | 4 | 16 GB | low | Proxy only: public GitHub-hosted runner specs; CI uses 8 vitest shards + half-core maxWorkers per job, not unsharded local gate |
+| W1 | win32 | n/a | n/a | n/a | n/a | No Windows baseline host this packet (smoke only; see platform-matrix.md) |
+| M2 | | | | | | reserved for a future medium-tier local host |
+| M3 | | | | | | reserved for a future low-tier local host |
 
 Tier guide: low (4-8 CPUs, 8-16 GB), medium (8-12 CPUs, 16-32 GB), high (12+ CPUs, 32+ GB).
-Classification is implemented in `classifyMachineTier` (both dimensions must clear the high bar).
+Classification is implemented in `classifyMachineTier` (both dimensions must clear the high bar;
+low needs both CPUs <= 8 and RAM <= 16 GB). Full platform matrix:
+`docs/local-gate-perf/platform-matrix.md`.
 
 ## Phase 0 / Phase 1 cold full gate (before packet code changes)
 
@@ -139,6 +143,7 @@ suites can overlap; sum of file times exceeds suite wall).
 | 8 cold/warm | M1 | 411.8 (load) | n/a (vitest always) | pure multi-task 24s -> 87ms warm | keep |
 | 9 suite cost | M1 | n/a (file-level) | see Phase 9 table | top heavies 7-50x faster per file | keep |
 | 10 runners | M1 | n/a (no default swap) | turbo 126s red; vitest ~241-401s | not default; 811/1960 files red under turbo-test | drop |
+| 11 platform matrix | M1 + CI-L1 proxy | n/a (docs + gate:fast) | n/a | macOS verified; Linux smoke via CI; Windows smoke (scripts only) | keep |
 
 ## Target bands (aspirational, not hard CI fail)
 
@@ -477,4 +482,29 @@ Not installed on measurement host. Dropped without install (expected).
 
 `tmp/phase10/turbo-full.json`, `tmp/phase10/turbo-full.stderr`,
 `tmp/phase10/vitest-full.log`, pure pilot logs under `tmp/phase10/`.
+
+## Phase 11 - cross-platform and tier matrix (after)
+
+**Decision:** Keep documentation matrix + contributor "which command" guidance.
+No large platform script rewrite. Small biome format fix on
+`scripts/test_turbo_experimental.mjs` (Phase 10 leftover) so `gate:fast` stays green.
+
+### Validation (M1, 2026-08-02, SHA ~eee2655082 + Phase 11 WIP)
+
+| Path | Seconds | Workers | Result |
+|---|---:|---:|---|
+| `pnpm run gate:fast` (default) | 28.55 | 8 | PASS 5 steps; related on experimental script only |
+| `GATE_WORKER_TIER=low pnpm run gate:fast` | 22.66 | 2 | PASS 5 steps (day-loop wall dominated by malware/guards/types, not workers) |
+| `node scripts/gate_profile.mjs --facts` | n/a | 8 planned | darwin arm64 high tier |
+| `node scripts/gate_profile.mjs --dry-run --skip-browser` | 0 | 8 | planned step list OK |
+
+### Platform fill
+
+| OS | Status | Evidence |
+|---|---|---|
+| macOS | verified | M1 full packet + Phase 11 gate:fast |
+| Linux | smoke | CI-L1 ubuntu-latest (install + sharded tests); no local unsharded wall |
+| Windows | smoke | win32 shell spawn policy in gate scripts; no local host |
+
+Contributor matrix: `docs/local-gate-perf/platform-matrix.md`.
 

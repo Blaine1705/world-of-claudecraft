@@ -56,7 +56,9 @@ full gate. Vitest workers still use `computeGateWorkers` (CPU/2 and free-mem cla
 Optional `GATE_WORKER_TIER=low|medium|high` caps workers after that clamp; see
 [`docs/local-gate-perf/tier-workers.md`](local-gate-perf/tier-workers.md). Opt in to
 branch-wide `vitest --changed <ref>` with `GATE_FAST_BASE=<ref>` when you deliberately
-want that broader (and slower) selection.
+want that broader (and slower) selection. **Which command for your tier / agent vs
+human:** [`docs/local-gate-perf/platform-matrix.md`](local-gate-perf/platform-matrix.md)
+(macOS verified; Linux smoke via CI; Windows smoke until a host fills the matrix).
 
 For a narrower loop without malware/biome/types, use the thin wrappers (same Vitest CLI;
 not a merge bar):

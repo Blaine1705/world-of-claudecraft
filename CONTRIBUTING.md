@@ -255,6 +255,8 @@ browser tests, SFX check, i18n freshness, and production builds. Details and wor
 tier presets (`GATE_WORKER_TIER`, `GATE_MAX_WORKERS`) are in
 [`docs/qa-gate.md`](docs/qa-gate.md) and
 [`docs/local-gate-perf/tier-workers.md`](docs/local-gate-perf/tier-workers.md).
+**Which command for low vs high tier, agent vs human, and OS status:**
+[`docs/local-gate-perf/platform-matrix.md`](docs/local-gate-perf/platform-matrix.md).
 
 Thinner Vitest helpers (also not merge bars): `npm run test:related -- <source.ts>`
 and `npm run test:changed` (optional git base after `--`). Prefer those or
