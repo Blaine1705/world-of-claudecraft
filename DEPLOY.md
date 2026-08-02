@@ -570,9 +570,10 @@ way to run a realm with no Discord integration. Set the required keys in the hos
 
 ### Environment keys
 
-Compose passes every key below from the host `.env` into the container, so changing
-a tunable is an edit plus `sudo docker compose --profile discord up -d discord-bot`,
-never an image rebuild. Every numeric key falls back to its built-in default on an
+Compose passes every key below from the host `.env` into the container (the one
+exception is `GAME_SERVER_URL`, which compose pins to the in-network address, so
+repointing it is a `docker-compose.yml` edit), so changing a tunable is an edit plus
+`sudo docker compose --profile discord up -d discord-bot`, never an image rebuild. Every numeric key falls back to its built-in default on an
 empty or non-positive value, so an unset key is always safe and a blank line in
 `.env` never means zero.
 
@@ -589,7 +590,7 @@ empty or non-positive value, so an unset key is always safe and a blank line in
 
 | Key | Default | What it does / incident guidance |
 |---|---|---|
-| `GAME_SERVER_URL` | `http://game:8787` from compose (`http://127.0.0.1:8787` in code) | Base URL for the internal API. Leave the compose value alone unless the game runs outside this compose network, and in that case point it at a private or loopback address of the game host, never the public domain: the edge answers 404 for all of `/internal/*`, so a bot aimed through Caddy syncs nothing. |
+| `GAME_SERVER_URL` | `http://game:8787` from compose (`http://127.0.0.1:8787` in code) | Base URL for the internal API. Compose pins this one (no host `.env` interpolation), so changing it means editing `docker-compose.yml`. Leave the compose value alone unless the game runs outside this compose network, and in that case point it at a private or loopback address of the game host, never the public domain: the edge answers 404 for all of `/internal/*`, so a bot aimed through Caddy syncs nothing, and every internal call carries `DISCORD_BOT_SECRET` over plain `http`, so any hop that leaves the host or the private network exposes the shared secret in transit regardless of what the edge answers. |
 | `PUBLIC_GAME_URL` | `http://localhost:8787` from compose (`https://worldofclaudecraft.com` in code) | The public URL shown in bot replies and deep-link buttons. Set it to your real domain, or players get links they cannot use. |
 
 **Channel ids** (each feature is off when its channel is unset):
@@ -637,7 +638,7 @@ bot's share of game-server request volume):
 | Key | Default | What it does / incident guidance |
 |---|---|---|
 | `DISCORD_HEARTBEAT_FILE` | `/tmp/discord-bot-heartbeat` | The file the bot's scheduler stamps. Both the bot and the healthcheck read this key, so change it in the host `.env` only, where both see the same value. |
-| `DISCORD_HEARTBEAT_INTERVAL_MS` | `30000` | How often the scheduler loop rewrites the stamp. Lower it for a faster unhealthy signal, but keep it well under the staleness window below. |
+| `DISCORD_HEARTBEAT_INTERVAL_MS` | `30000` | How often the scheduler loop rewrites the stamp. Time-to-red is set by the staleness window below, not by this, so lowering this alone buys nothing: to detect a wedge sooner, lower `DISCORD_HEARTBEAT_STALE_MS` and keep it a comfortable multiple of this interval. |
 | `DISCORD_HEARTBEAT_STALE_MS` | `90000` | Healthcheck side ONLY (the bot itself never reads it): how old the stamp may be before Docker calls the container unhealthy. Keep it a comfortable multiple of the interval, so one slow write is not read as a stall. Empty, non-numeric and non-positive values all fall back to the default, same as the bot's own numeric knobs. |
 
 Not every deadline is an env key. Three request bounds are code constants in `bot/`,
@@ -658,7 +659,8 @@ whose loops have stopped turning:
 sudo docker inspect --format '{{json .State.Health}}' eastbrook-discord-bot
 
 # the same thing by hand: how old the heartbeat stamp is, in milliseconds
-sudo docker exec eastbrook-discord-bot node -e "const s=require('fs').statSync('/tmp/discord-bot-heartbeat');console.log(Date.now()-s.mtimeMs)"
+# (resolves DISCORD_HEARTBEAT_FILE the same way the probe does, so it follows an override)
+sudo docker exec eastbrook-discord-bot node -e "const p=(process.env.DISCORD_HEARTBEAT_FILE||'').trim()||'/tmp/discord-bot-heartbeat';const s=require('fs').statSync(p);console.log(p, Date.now()-s.mtimeMs)"
 ```
 
 Healthy is an age under 90000 (`DISCORD_HEARTBEAT_STALE_MS`). A red healthcheck

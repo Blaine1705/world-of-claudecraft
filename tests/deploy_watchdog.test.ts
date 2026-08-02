@@ -157,7 +157,14 @@ describe('game watchdog install', () => {
   // by-hand retrofit (matcher, validate, reload) or the fix never reaches a host that
   // is already running.
   it('documents the by-hand Caddy retrofit for an already-provisioned host', () => {
-    expect(deployDoc).toContain('@ops path /livez /readyz /metrics /internal/*');
+    // Counted, not just contained, mirroring the user-data.sh pins above: the doc
+    // carries TWO @ops snippets (the first-boot Caddyfile mirror and the
+    // retrofit), and a bare toContain is satisfied by either, so the first-boot
+    // mirror reverting to the short form would hand an operator a snippet that
+    // leaves /internal/* public while this stayed green. The prefix count catches
+    // a stale short-form copy riding back in (it would push the count to 4).
+    expect(deployDoc.split('@ops path /livez /readyz /metrics /internal/*')).toHaveLength(3);
+    expect(deployDoc.split('@ops path /livez /readyz /metrics')).toHaveLength(3);
     expect(deployDoc).toContain('respond @ops 404');
     expect(deployDoc).toContain('sudo caddy validate --config /etc/caddy/Caddyfile');
     expect(deployDoc).toContain('sudo systemctl reload caddy');

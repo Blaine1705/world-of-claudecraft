@@ -1,5 +1,13 @@
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
+import {
+  chmodSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  utimesSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
@@ -196,6 +204,24 @@ describe('Discord bot container supervision', () => {
     expect(discordBotService).toContain('start_period: 60s');
   });
 
+  it('gives the probe cycle real margins, pinned relationally and by value', () => {
+    // start_period gets the same relational treatment as the stale window: the
+    // first jittered write can land about 1.1x the interval after boot, so the
+    // boot margin must scale with the cadence. The literal above pins today's
+    // value; this pins the RELATION, so raising HEARTBEAT_INTERVAL_MS in
+    // bot/cadence.ts without widening start_period fails here instead of
+    // silently eroding the margin (a declared Phase 7 residual, now closed).
+    const startPeriod = /start_period: (\d+)s/.exec(discordBotService);
+    expect(startPeriod).not.toBeNull();
+    expect(Number(startPeriod?.[1]) * 1000).toBeGreaterThanOrEqual(2 * HEARTBEAT_INTERVAL_MS);
+    // The remaining probe knobs fall back to docker defaults when deleted, which
+    // is silent: losing `retries: 4` falls back to 3 and shortens the unhealthy
+    // verdict by one probe cycle.
+    expect(discordBotService).toContain('interval: 15s');
+    expect(discordBotService).toContain('timeout: 5s');
+    expect(discordBotService).toContain('retries: 4');
+  });
+
   // Silent drift here is the whole hazard of a file-based heartbeat: the writer and the
   // prober agree on nothing at compile time, so a path changed on one side leaves a
   // healthcheck that is permanently red (prober watching a file nobody writes) or
@@ -234,8 +260,14 @@ describe('Discord bot healthcheck probe, executed', () => {
   // code. Both heartbeat keys are always set explicitly (to '' when the case means
   // "unset") so an ambient value in the test environment cannot leak in.
   const probeExit = (heartbeatFile: string, staleMs: string) => {
+    // Loud, not vacuous: `node -e ''` exits 0, so a failed extraction would turn
+    // every all-zeros case below (the padded path, the non-positive knobs) into a
+    // pass that executed nothing. The structural suite reds too, but each executed
+    // case should fail by NAME when the extraction breaks.
+    if (!healthcheckProbe)
+      throw new Error('healthcheck probe not extracted from docker-compose.yml');
     try {
-      execFileSync(process.execPath, ['-e', healthcheckProbe ?? ''], {
+      execFileSync(process.execPath, ['-e', healthcheckProbe], {
         env: {
           ...process.env,
           DISCORD_HEARTBEAT_FILE: heartbeatFile,
@@ -264,10 +296,42 @@ describe('Discord bot healthcheck probe, executed', () => {
     const stale = stampFile('stale', 10 * 60 * 1000);
     expect(probeExit(fresh, '')).toBe(0);
     expect(probeExit(stale, '')).toBe(1);
-    // The pure rule is the documented decision; the probe is its YAML twin. Holding
-    // the executed verdicts to it is what keeps the two from drifting apart.
-    expect(isHeartbeatFresh(Date.now() - 1000, Date.now(), 90000)).toBe(true);
-    expect(isHeartbeatFresh(Date.now() - 10 * 60 * 1000, Date.now(), 90000)).toBe(false);
+    // The pure rule is the documented decision; the probe is its YAML twin. The
+    // agreement is driven with the window READ FROM THE PROBE, at fixtures a few
+    // seconds either side of it, so the executed verdict and isHeartbeatFresh are
+    // held to the SAME boundary: hand-restating 90000 here proved nothing, since
+    // far-away fixtures agree under any window. (5s margins are safe: the probe
+    // run lands well within them, and the value drift itself is what the
+    // relational >= 2x interval pin above guards.)
+    const winMatch = /const stale=s>0\?s:(\d+)(?!\d)/.exec(healthcheckProbe ?? '');
+    expect(winMatch).not.toBeNull();
+    const win = Number(winMatch?.[1]);
+    const nearFresh = stampFile('near-fresh', win - 5000);
+    const nearStale = stampFile('near-stale', win + 5000);
+    expect(probeExit(nearFresh, '')).toBe(0);
+    expect(probeExit(nearStale, '')).toBe(1);
+    expect(isHeartbeatFresh(Date.now() - (win - 5000), Date.now(), win)).toBe(true);
+    expect(isHeartbeatFresh(Date.now() - (win + 5000), Date.now(), win)).toBe(false);
+  });
+
+  it('answers unhealthy when the heartbeat path cannot be statted (a denied parent directory)', () => {
+    // "Unreadable" needs precision: stat needs no read permission on the FILE, so
+    // a chmod-000 stamp still reads healthy while fresh, and correctly so (mtime
+    // is the only evidence the probe needs, and a stamp the bot cannot WRITE goes
+    // stale within one window anyway). The arm the catch actually guards beyond
+    // ENOENT is stat DENIAL, which takes a denied parent directory. Root stats
+    // through anything, so the fixture is skipped there rather than left vacuous.
+    if (process.getuid?.() === 0) return;
+    const deniedDir = join(dir, 'denied');
+    mkdirSync(deniedDir);
+    const target = join(deniedDir, 'hb');
+    writeFileSync(target, 'probe fixture');
+    chmodSync(deniedDir, 0o000);
+    try {
+      expect(probeExit(target, '')).toBe(1);
+    } finally {
+      chmodSync(deniedDir, 0o755);
+    }
   });
 
   it('answers unhealthy for a missing file', () => {
@@ -302,6 +366,48 @@ describe('Discord bot runtime configuration passthrough', () => {
     for (const key of FORWARDED_KNOBS) {
       expect(discordBotService).toContain(`${key}: ${composeEnv(key)}`);
     }
+  });
+});
+
+describe('Discord bot DEPLOY.md contract', () => {
+  const deployDoc = read('DEPLOY.md');
+
+  it('documents every env key the bot reads, plus the probe-only staleness knob', () => {
+    // D13 says every bot env key is documented in DEPLOY.md, and until now the
+    // rule was enforced nowhere: the compose passthrough got a by-name pin this
+    // phase for exactly this failure shape (11 knobs the bot read and compose
+    // forwarded to nobody), so the doc table gets the same treatment. The key
+    // set is scraped from bot/config.ts the way the config suite does it, so a
+    // key added there without a doc row fails here by name.
+    const stripped = read('bot/config.ts')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/.*$/gm, '');
+    const keys = new Set<string>();
+    for (const m of stripped.matchAll(/process\.env\.([A-Z_0-9]+)/g)) keys.add(m[1]);
+    for (const m of stripped.matchAll(/required\('([A-Z_0-9]+)'\)/g)) keys.add(m[1]);
+    // Vacuity floor at the real count: a scrape that quietly stopped matching
+    // would otherwise assert nothing.
+    expect(keys.size).toBeGreaterThanOrEqual(26);
+    // The TABLE ROW form, not a bare backticked mention: several keys also
+    // appear in prose (incident guidance, the runbook), so a deleted row would
+    // otherwise stay green on its prose echo (proved by mutation: dropping the
+    // DISCORD_MAX_RPS row passed the bare-backtick form).
+    for (const key of keys) expect(deployDoc).toContain(`| \`${key}\` |`);
+    // Probe-side only, deliberately absent from BOT_ENV_KEYS and from config.ts,
+    // still an operator lever that needs its row.
+    expect(deployDoc).toContain('| `DISCORD_HEARTBEAT_STALE_MS` |');
+  });
+
+  it('carries the health-verification commands the runbook names, override-safe', () => {
+    expect(deployDoc).toContain(
+      "sudo docker inspect --format '{{json .State.Health}}' eastbrook-discord-bot",
+    );
+    // The by-hand freshness check must resolve DISCORD_HEARTBEAT_FILE exactly
+    // like the probe (trimmed, with the same fallback), or on a host that set
+    // the override it throws ENOENT mid-incident and reads as a dead bot.
+    expect(deployDoc).toContain(
+      "const p=(process.env.DISCORD_HEARTBEAT_FILE||'').trim()||'/tmp/discord-bot-heartbeat'",
+    );
   });
 });
 

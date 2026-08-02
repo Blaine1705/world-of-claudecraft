@@ -272,7 +272,11 @@ services:
     # a file that exists proves the process started once, while an mtime inside the
     # window proves the scheduler loop is still turning, which is the failure that
     # actually happens (a live process whose loops have stalled). Missing,
-    # unreadable, and stale all exit nonzero, hence the try/catch around statSync.
+    # un-stat-able (a denied path), and stale all exit nonzero, hence the try/catch
+    # around statSync. A chmod-000 heartbeat FILE still stats fine (stat needs no
+    # read permission) and reads healthy while fresh, which is correct: mtime is the
+    # only evidence the probe needs, and a file the bot cannot WRITE stops advancing
+    # and goes stale within one window anyway.
     # The s>0?s:90000 guard is deliberate: compose passes '' for an unset host key
     # and Number('') is 0, a garbage value is NaN, and a negative would make the
     # comparison unsatisfiable (permanently unhealthy); none of the three is > 0,
@@ -292,9 +296,11 @@ services:
       start_period: 60s
     # Time docker allows between SIGTERM and SIGKILL. Far shorter than the game's 75s
     # because the bot has no save or drain obligations: nothing durable lives in this
-    # process. 15s covers an in-flight Discord call plus the outbox ack riding
-    # DISCORD_CALL_TIMEOUT_MS, and a SIGKILL after that loses nothing, since the outbox
-    # is server-side and redelivers anything unacked on the next poll.
+    # process, and it installs no SIGTERM handler, so node's default disposition ends
+    # it immediately and the grace window is rarely consumed at all. Any positive
+    # value is therefore enough; safety comes from the outbox living server-side and
+    # redelivering anything unacked on the next poll, not from covering an in-flight
+    # call (a Discord call can ride DISCORD_CALL_TIMEOUT_MS for 15s on its own).
     stop_grace_period: 15s
     # Container memory ceiling. A relay bot's working set is tens of MiB, so 512m is
     # generous headroom rather than a tight fit; the ceiling exists for the neighbours,
