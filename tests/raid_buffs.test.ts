@@ -179,7 +179,7 @@ describe('standardized percent raid buffs', () => {
     expect(sim.entities.get(ally)!.stats.armor).toBe(armorBefore);
   });
 
-  it('keeps Dawn Devotion from two Paladins as separate source-owned buffs', () => {
+  it('does not stack Dawn Devotion from two Paladins (the second replaces the first)', () => {
     const sim = makeWorld();
     const first = sim.addPlayer('paladin', 'Ald');
     const second = sim.addPlayer('paladin', 'Borin');
@@ -197,12 +197,65 @@ describe('standardized percent raid buffs', () => {
     ready(sim, second);
     sim.castAbility('dawn_devotion', second);
 
+    // One aura, owned by the later caster, at its own full duration: the +40 AP
+    // is granted once no matter how many Paladins run the same Devotion.
     const devotions = target.auras.filter((a) => a.id === 'dawn_devotion');
-    expect(devotions).toHaveLength(2);
-    expect(devotions.map((a) => a.sourceId).sort()).toEqual([first, second].sort());
-    expect(devotions.every((a) => a.value === 40)).toBe(true);
-    expect(devotions.find((a) => a.sourceId === first)?.remaining).toBe(1200);
-    expect(devotions.find((a) => a.sourceId === second)?.remaining).toBe(1800);
+    expect(devotions).toHaveLength(1);
+    expect(devotions[0].sourceId).toBe(second);
+    expect(devotions[0].value).toBe(40);
+    expect(devotions[0].remaining).toBe(1800);
+  });
+
+  it('grants every Paladin party aura once across casters, and keeps distinct ones', () => {
+    // Each aura is one per target regardless of caster; two Paladins running the
+    // SAME aura is a refresh, not a double dip. Distinct auras still coexist.
+    const perAura: Array<[string, number]> = [
+      ['devotion_ward', 4],
+      ['retribution_aura', 7],
+      ['dawn_devotion', 5],
+      ['grace_devotion', 8],
+      ['radiant_devotion', 10],
+    ];
+    for (const [abilityId, learnLevel] of perAura) {
+      const sim = makeWorld();
+      const first = sim.addPlayer('paladin', 'Ald');
+      const second = sim.addPlayer('paladin', 'Borin');
+      const targetId = sim.addPlayer('warrior', 'War');
+      const target = sim.entities.get(targetId)!;
+      sim.setPlayerLevel(learnLevel, first);
+      sim.setPlayerLevel(learnLevel, second);
+      formParty(sim, first, [second, targetId]);
+
+      ready(sim, first);
+      sim.castAbility(abilityId, first);
+      expect(target.auras.filter((a) => a.id === abilityId)).toHaveLength(1);
+
+      ready(sim, second);
+      sim.castAbility(abilityId, second);
+
+      const applied = target.auras.filter((a) => a.id === abilityId);
+      expect(applied).toHaveLength(1);
+      expect(applied[0].sourceId).toBe(second);
+    }
+
+    // Two Paladins on DIFFERENT auras are additive, exactly as before: Bastion
+    // Devotion and Requital Aura are separate effects, not two copies of one.
+    const sim = makeWorld();
+    const first = sim.addPlayer('paladin', 'Ald');
+    const second = sim.addPlayer('paladin', 'Borin');
+    const targetId = sim.addPlayer('warrior', 'War');
+    const target = sim.entities.get(targetId)!;
+    sim.setPlayerLevel(10, first);
+    sim.setPlayerLevel(10, second);
+    formParty(sim, first, [second, targetId]);
+
+    ready(sim, first);
+    sim.castAbility('devotion_ward', first);
+    ready(sim, second);
+    sim.castAbility('retribution_aura', second);
+
+    expect(target.auras.filter((a) => a.id === 'devotion_ward')).toHaveLength(1);
+    expect(target.auras.filter((a) => a.id === 'retribution_aura')).toHaveLength(1);
   });
 
   it('does not stack Sureflight Aura from two hunters (same-class group buff)', () => {

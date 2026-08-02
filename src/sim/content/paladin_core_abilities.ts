@@ -64,7 +64,7 @@ const common: AbilityDef[] = [
       },
     ],
     description:
-      'Reduce damage taken by you and party members by 5% until death or replacement. Only this aura and Requital Aura replace each other; Radiant, Dawn, and Grace Devotion coexist.',
+      'Reduce damage taken by you and party members by 5% until death or replacement. Replaces your own Requital Aura. Another Paladin casting Bastion Devotion refreshes it instead of stacking; Radiant, Dawn, and Grace Devotion coexist.',
   },
   {
     id: 'hammer_of_grace',
@@ -784,7 +784,7 @@ const devotions: AbilityDef[] = [
       { type: 'buffTarget', kind: 'buff_spellpower', value: 20, duration: 1800, party: true },
     ],
     description:
-      'Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion, but coexists with Devotions from other Paladins.',
+      'Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion. Another Paladin casting Radiant Devotion refreshes it instead of stacking; a different Devotion coexists.',
   },
   {
     id: 'dawn_devotion',
@@ -799,7 +799,7 @@ const devotions: AbilityDef[] = [
     requiresTarget: false,
     effects: [{ type: 'buffTarget', kind: 'buff_ap', value: 40, duration: 1800, party: true }],
     description:
-      'Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion, but coexists with Devotions from other Paladins and with Warrior shouts.',
+      'Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion. Another Paladin casting Dawn Devotion refreshes it instead of stacking; a different Devotion, and Warrior shouts, coexist.',
   },
   {
     id: 'grace_devotion',
@@ -823,7 +823,7 @@ const devotions: AbilityDef[] = [
       },
     ],
     description:
-      'You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion, but coexists with Devotions from other Paladins.',
+      'You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion. Another Paladin casting Grace Devotion refreshes it instead of stacking; a different Devotion coexists.',
   },
 ];
 

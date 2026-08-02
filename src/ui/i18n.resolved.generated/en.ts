@@ -7657,7 +7657,7 @@ export const en: EnTranslations = {
       },
       "devotion_ward": {
         "name": "Bastion Devotion",
-        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Only this aura and Requital Aura replace each other; Radiant, Dawn, and Grace Devotion coexist."
+        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Replaces your own Requital Aura. Another Paladin casting Bastion Devotion refreshes it instead of stacking; Radiant, Dawn, and Grace Devotion coexist."
       },
       "hammer_of_grace": {
         "name": "Hammer of Grace",
@@ -7681,15 +7681,15 @@ export const en: EnTranslations = {
       },
       "radiant_devotion": {
         "name": "Radiant Devotion",
-        "description": "Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion, but coexists with Devotions from other Paladins."
+        "description": "Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion. Another Paladin casting Radiant Devotion refreshes it instead of stacking; a different Devotion coexists."
       },
       "dawn_devotion": {
         "name": "Dawn Devotion",
-        "description": "Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion, but coexists with Devotions from other Paladins and with Warrior shouts."
+        "description": "Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion. Another Paladin casting Dawn Devotion refreshes it instead of stacking; a different Devotion, and Warrior shouts, coexist."
       },
       "grace_devotion": {
         "name": "Grace Devotion",
-        "description": "You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion, but coexists with Devotions from other Paladins."
+        "description": "You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion. Another Paladin casting Grace Devotion refreshes it instead of stacking; a different Devotion coexists."
       },
       "recall_the_fallen": {
         "name": "Recall the Fallen",
@@ -7817,7 +7817,7 @@ export const en: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Requital Aura",
-        "description": "Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take {buff} Holy damage, and affected allies deal {buff} additional Holy damage with auto-attacks."
+        "description": "Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take {buff} Holy damage, and affected allies deal {buff} additional Holy damage with auto-attacks. Replaces your own Bastion Devotion. Another Paladin casting Requital Aura refreshes it instead of stacking."
       },
       "tame_beast": {
         "name": "Wildbond",
