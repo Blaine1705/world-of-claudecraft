@@ -172,7 +172,11 @@ describe('talent production save migrations', () => {
     expect(migrated.loadouts?.[0].bar).not.toContain('berserk');
   });
 
-  it('leaves revision-2 non-Druids alone: the druid reset must not spill over', () => {
+  it('re-qualifies a revision-2 Hunter: revision 2 is ambiguous across the merged fleet', () => {
+    // The class wave and the Warlock overhaul each shipped a revision 2 with a
+    // DIFFERENT class set, so a stored 2 cannot be trusted to mean either one.
+    // Every class redesigned anywhere in the wave therefore re-qualifies at
+    // revision 4: rows wipe, spec survives, and the bar is scrubbed.
     const legacy = cloneFixture();
     legacy.contentRevision = 2;
     legacy.level = 20;
@@ -184,10 +188,29 @@ describe('talent production save migrations', () => {
     const migrated = migrateCharacterTalentsV2('hunter', legacy);
 
     expect(migrated.contentRevision).toBe(CURRENT_CHARACTER_CONTENT_REVISION);
-    expect(migrated.talents).toEqual({
-      spec: 'beast_mastery',
-      rows: { 5: 'hun_r5_tactical_retreat', 20: 'hun_r20_overdraw' },
-    });
+    expect(migrated.talents).toEqual({ spec: 'beast_mastery', rows: {} });
+  });
+
+  it('scrubs a retired ability off an untouched class bar without granting a repick', () => {
+    // The universal scrub is the safety net: a class NOT in the redesigned set
+    // keeps its deliberate row picks, but a slot naming an ability it cannot use
+    // is still dead and must go.
+    const legacy = cloneFixture();
+    legacy.contentRevision = 1;
+    legacy.level = 20;
+    legacy.talents = { spec: 'arms', rows: {} };
+    legacy.loadouts = [
+      {
+        name: 'Arms',
+        alloc: { spec: 'arms', rows: {} },
+        bar: ['heroic_strike', 'judgement', null, null, null],
+      },
+    ];
+    legacy.activeLoadout = 0;
+
+    const migrated = migrateCharacterTalentsV2('warrior', legacy);
+
+    expect(migrated.loadouts?.[0]?.bar).not.toContain('judgement');
   });
 
   it('migrates revision-1 Warlock loadout bars to the overhauled specialization kit', () => {
@@ -207,7 +230,10 @@ describe('talent production save migrations', () => {
     const bar = migrated.loadouts?.[0].bar ?? [];
 
     expect(migrated.contentRevision).toBe(CURRENT_CHARACTER_CONTENT_REVISION);
-    expect(migrated.talents).toEqual(state.talents);
+    // Warlock is in REDESIGNED_AT_CURRENT_REVISION, so its rows wipe for a free
+    // repick (its row ids were reused with changed meaning) while the spec
+    // survives. Same contract the Druid redesign set.
+    expect(migrated.talents).toEqual({ spec: 'destruction', rows: {} });
     expect(bar).toEqual(
       expect.arrayContaining([
         'shadow_bolt',
@@ -225,7 +251,7 @@ describe('talent production save migrations', () => {
     );
   });
 
-  it('seeds the active granted by a selected Warlock row into a migrated loadout bar', () => {
+  it('drops a wiped Warlock row grant off the bar rather than re-seeding it', () => {
     const state = cloneFixture();
     state.contentRevision = 1;
     state.level = 8;
@@ -242,8 +268,12 @@ describe('talent production save migrations', () => {
     const migrated = migrateCharacterTalentsV2('warlock', state);
     const bar = migrated.loadouts?.[0].bar ?? [];
 
-    expect(bar).toContain('spell_lock');
+    // The row wipe means no row-granted ability can be seeded: spell_lock is
+    // granted BY wlk_r8_voidfeast, which the repick just cleared. The retired
+    // voidfeast id is scrubbed either way, which is the point of the pass.
     expect(bar).not.toContain('voidfeast');
+    expect(bar).not.toContain('spell_lock');
+    expect(migrated.talents).toEqual({ spec: 'affliction', rows: {} });
   });
 
   it('loads, saves, and reloads the migrated Warrior without duplicate learning or neutral-state loss', () => {
