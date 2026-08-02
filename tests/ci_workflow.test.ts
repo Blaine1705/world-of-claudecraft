@@ -11,6 +11,16 @@ function jobSource(name: string): string {
 }
 
 describe('CI workflow parity', () => {
+  it('cancels a superseded PR run but never a superseded push-to-branch run', () => {
+    // Anchored above the first job (`\n\njobs:`) so a future job named "concurrency"
+    // could never be mistaken for this block.
+    const concurrency = workflow.slice(0, workflow.indexOf('\njobs:'));
+    expect(concurrency).toContain(
+      'group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}',
+    );
+    expect(concurrency).toContain("cancel-in-progress: ${{ github.event_name == 'pull_request' }}");
+  });
+
   it('runs the canonical game and admin typecheck in CI and the local gate', () => {
     expect(workflow.match(/run: npm run check:types/g)).toHaveLength(2);
     expect(workflow).not.toContain('run: npx tsc --noEmit');

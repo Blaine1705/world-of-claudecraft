@@ -12,6 +12,18 @@ on:
 permissions:
   contents: read
 
+# A push to an open PR never cancelled its superseded run (no concurrency group), so a
+# quick follow-up push left the stale run's jobs occupying runner slots for the full 8 to
+# 14 minutes of `pr-gate` alongside the new run's own jobs, competing for this account's
+# shared concurrent-job pool and inflating queue time for every other run in flight, not
+# just this one. Grouping and cancelling by PR number fixes that; push events (main,
+# dev-*, release/**) fall back to `github.ref` and are NOT cancelled; those are typically
+# one push per merge, and losing an in-flight release-gate run to a fast follow-up push
+# is a worse trade than the queue time it would save.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 # Two-tier i18n gate, split by git ref in this one file:
 #
 #   pr-gate       cheap, English-only-legal tier. Runs on pull requests, on pushes
