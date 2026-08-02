@@ -14,6 +14,7 @@
 // Keep the step list in sync with .github/workflows/ci.yml (and vice versa).
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
+import { gateVitestSkipPretestEnv } from './lib/gate_artifact_skip.mjs';
 import { computeGateWorkers } from './lib/gate_workers.mjs';
 import {
   formatInstallSyncFailure,
@@ -94,7 +95,8 @@ if (missingAudioTools.length > 0) {
 const branch =
   spawnSync('git', ['branch', '--show-current'], { encoding: 'utf8', shell }).stdout?.trim() ?? '';
 const releaseTier = branch.startsWith('release/');
-const env = releaseTier ? { ...process.env, I18N_RELEASE_TIER: '1' } : process.env;
+// Base env for every step. Per-step overlays (e.g. pretest skip on vitest) merge on top.
+const baseEnv = releaseTier ? { ...process.env, I18N_RELEASE_TIER: '1' } : { ...process.env };
 
 const I18N_ARTIFACTS = [
   'src/ui/i18n.resolved.generated',
@@ -102,6 +104,11 @@ const I18N_ARTIFACTS = [
   'src/ui/i18n.catalog/translation_keys.generated.ts',
 ];
 
+// Generate-once orchestration (Phase 2): i18n + wiki run here, pretest and the
+// client build do not regenerate them. Freshness still fails the gate on drift.
+// Standalone `npm test` / `npm run build` keep full regeneration (no skip env /
+// still invoke i18n:gen + wiki via build).
+// Each step: [name, cmd, args, hint?, envOverlay?]
 const steps = [
   ['i18n artifacts', 'npm', ['run', 'i18n:gen']],
   [
@@ -111,23 +118,32 @@ const steps = [
     'the regenerated i18n artifacts differ from the staged/committed copies: stage them ' +
       `(git add ${I18N_ARTIFACTS.join(' ')}) and re-run`,
   ],
+  ['wiki content', 'npm', ['run', 'wiki:content']],
   ['malware scan', 'npm', ['run', 'security:gate']],
   ['biome (changed files)', 'npm', ['run', 'ci:changed']],
   ['sfx check', 'npm', ['run', 'sfx:check']],
-  ['vitest (full suite)', 'npm', ['test', '--', `--maxWorkers=${workers}`]],
+  [
+    'vitest (full suite)',
+    'npm',
+    ['test', '--', `--maxWorkers=${workers}`],
+    undefined,
+    gateVitestSkipPretestEnv(),
+  ],
   ['browser regressions', 'npm', ['run', 'test:browser']],
   ['typecheck', 'npm', ['run', 'check:types']],
   ['env build', 'npm', ['run', 'build:env']],
   ['server build', 'npm', ['run', 'build:server']],
-  ['client build', 'npm', ['run', 'build']],
+  // build:bundle assumes i18n + wiki already exist from the steps above.
+  ['client build', 'npm', ['run', 'build:bundle']],
 ];
 
 if (releaseTier) {
   console.log(`[gate] release branch "${branch}": running release-tier (I18N_RELEASE_TIER=1)`);
 }
 
-for (const [name, cmd, args, hint] of steps) {
+for (const [name, cmd, args, hint, envOverlay] of steps) {
   console.log(`\n[gate] ${name}: ${cmd} ${args.join(' ')}`);
+  const env = envOverlay ? { ...baseEnv, ...envOverlay } : baseEnv;
   const res = spawnSync(cmd, args, { stdio: 'inherit', env, shell });
   if (res.status !== 0) {
     console.error(`\n[gate] FAIL at "${name}" (exit ${res.status ?? 'killed'})`);

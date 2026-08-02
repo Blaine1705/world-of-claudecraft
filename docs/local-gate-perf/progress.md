@@ -7,7 +7,7 @@ Status: not-started / in-progress / blocked / complete / dropped
 | Phase | Title | Status | Started | Completed | Notes |
 |---|---|---|---|---|---|
 | 1 | Baseline harness and machine-tier protocol | complete | 2026-08-02 | 2026-08-02 | M1 high-tier baseline 336.3s full gate |
-| 2 | Gate orchestration dedupe | not-started | | | |
+| 2 | Gate orchestration dedupe | complete | 2026-08-02 | 2026-08-02 | generate-once + pretest skip + build:bundle |
 | 3 | Tiered local gate + tier worker presets | not-started | | | |
 | 4 | Vitest warm path | not-started | | | |
 | 5 | happy-dom for DOM tests | not-started | | | |
@@ -30,10 +30,10 @@ Status: not-started / in-progress / blocked / complete / dropped
 - [x] Tests for any new pure helpers under `scripts/` or `tests/`
 
 ### Phase 2 - Gate orchestration dedupe
-- [ ] One gate run does not triple-regenerate i18n/wiki without need
-- [ ] pretest / gate / build interaction documented
-- [ ] Before/after wall for gate steps that regenerate artifacts
-- [ ] Full gate green
+- [x] One gate run does not triple-regenerate i18n/wiki without need
+- [x] pretest / gate / build interaction documented
+- [x] Before/after wall for gate steps that regenerate artifacts
+- [x] Full gate green (see baselines.md / experiment-log; profile JSON under tmp/)
 
 ### Phase 3 - Tiered local gate + tier worker presets
 - [ ] Documented `gate:fast` (or equivalent) for agents/day-to-day

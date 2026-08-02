@@ -29,6 +29,8 @@ export interface GateProfileStep {
   name: string;
   cmd: string;
   args: string[];
+  /** Optional env overlay (e.g. WOC_SKIP_PRETEST=1 on the vitest step). */
+  env?: Record<string, string>;
 }
 
 export interface TimedStepResult {
@@ -62,8 +64,9 @@ export declare function classifyMachineTier(input: {
 
 export declare function collectMachineFacts(
   osApi: {
-    platform: string;
-    arch: string;
+    // node:os uses functions; tests may inject plain strings.
+    platform: string | (() => string);
+    arch: string | (() => string);
     availableParallelism?: () => number;
     cpus: () => { length: number };
     totalmem: () => number;

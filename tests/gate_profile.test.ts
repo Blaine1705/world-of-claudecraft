@@ -237,6 +237,7 @@ describe('buildGateProfileSteps', () => {
     expect(names).toEqual([
       'i18n artifacts',
       'i18n freshness',
+      'wiki content',
       'malware scan',
       'biome (changed files)',
       'sfx check',
@@ -249,6 +250,10 @@ describe('buildGateProfileSteps', () => {
     ]);
     const vitest = steps.find((s) => s.name === 'vitest (full suite)');
     expect(vitest?.args).toEqual(['test', '--', '--maxWorkers=8']);
+    // Generate-once: skip pretest after i18n + wiki; client build is bundle-only.
+    expect(vitest?.env).toEqual({ WOC_SKIP_PRETEST: '1' });
+    const client = steps.find((s) => s.name === 'client build');
+    expect(client?.args).toEqual(['run', 'build:bundle']);
   });
 
   it('honors skip flags without dropping unskipped steps', () => {
@@ -261,6 +266,7 @@ describe('buildGateProfileSteps', () => {
     expect(steps.map((s) => s.name)).toEqual([
       'i18n artifacts',
       'i18n freshness',
+      'wiki content',
       'malware scan',
       'biome (changed files)',
       'sfx check',

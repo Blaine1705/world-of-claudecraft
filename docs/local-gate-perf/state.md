@@ -2,8 +2,8 @@
 
 Resume point for the next session. Keep current after every phase.
 
-**Current phase:** Phase 1 complete.  
-**Next action:** run Phase 2 starter prompt (`phase-02-gate-orchestration-dedupe.md`).  
+**Current phase:** Phase 2 complete.  
+**Next action:** run Phase 3 starter prompt (`phase-03-tiered-local-gate.md`).  
 **Worktree:** `/Users/fernando/Documents/wocc-gate-perf-research`  
 **Branch:** `feature/local-gate-perf`  
 **Base:** always `origin/release/v0.34.0`
@@ -72,11 +72,13 @@ Always before calling a phase complete:
 
 | Path | Role |
 |---|---|
-| `scripts/gate.mjs` | Local full gate |
+| `scripts/gate.mjs` | Local full gate (generate-once i18n/wiki; vitest skips pretest; client uses build:bundle) |
+| `scripts/pretest.mjs` | `npm test` lifecycle; honors `WOC_SKIP_PRETEST=1` |
+| `scripts/lib/gate_artifact_skip.mjs` | Pure skip helper for pretest (tested) |
 | `scripts/lib/gate_workers.mjs` | Worker CPU/mem policy |
 | `scripts/gate_profile.mjs` | Phase 1 measurement CLI (timed steps + slow files) |
 | `scripts/lib/gate_profile.mjs` | Pure helpers for gate_profile (tested) |
-| `package.json` | scripts: test, pretest, gate, build, check:types |
+| `package.json` | scripts: test, pretest, gate, build, build:bundle, check:types |
 | `vite.config.ts` | Vitest `test` block |
 | `vitest.browser.config.ts` | Browser suite |
 | `.github/workflows/ci.yml` | CI shards and checks |
@@ -89,7 +91,7 @@ Always before calling a phase complete:
 Fill as phases ship:
 
 - (Phase 1) timing harness path: `scripts/gate_profile.mjs` + `scripts/lib/gate_profile.mjs` (tests: `tests/gate_profile.test.ts`); M1 baseline full gate 336.3s / vitest 277.5s / workers 8 at SHA 2a79ba8a0d
-- (Phase 2) gate dedupe approach:
+- (Phase 2) gate dedupe approach: **Option C + B** generate-once in gate (`i18n:gen` + freshness + `wiki:content`), vitest step sets `WOC_SKIP_PRETEST=1` (`scripts/pretest.mjs` no-op), client step runs `build:bundle` (no re-gen). Standalone `npm test` / `npm run build` still full regen.
 - (Phase 3) new scripts (`gate:fast`, ...):
 - (Phase 4) vitest cache flags:
 - (Phase 5) happy-dom adoption scope:

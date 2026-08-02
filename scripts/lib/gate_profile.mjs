@@ -26,8 +26,8 @@ export function classifyMachineTier({ cpuCount, totalMemBytes }) {
  * surfaces so tests do not depend on the live machine.
  *
  * @param {{
- *   platform: string,
- *   arch: string,
+ *   platform: string | (() => string),
+ *   arch: string | (() => string),
  *   availableParallelism?: () => number,
  *   cpus: () => { length: number },
  *   totalmem: () => number,
@@ -218,6 +218,7 @@ export function parseGateProfileArgs(argv) {
 /**
  * Gate step list aligned with scripts/gate.mjs (names + npm/git commands).
  * Preflights (dep sync, ffmpeg) are measured separately by the entry script.
+ * Generate-once: i18n + wiki once; vitest skips pretest; client uses build:bundle.
  *
  * @param {number} workers
  * @param {{
@@ -226,6 +227,7 @@ export function parseGateProfileArgs(argv) {
  *   skipVitest?: boolean,
  *   skipTypes?: boolean,
  * }} [opts]
+ * @returns {Array<{ name: string, cmd: string, args: string[], env?: Record<string, string> }>}
  */
 export function buildGateProfileSteps(workers, opts = {}) {
   const I18N_ARTIFACTS = [
@@ -233,7 +235,7 @@ export function buildGateProfileSteps(workers, opts = {}) {
     'src/admin/i18n.resolved.generated',
     'src/ui/i18n.catalog/translation_keys.generated.ts',
   ];
-  /** @type {Array<{ name: string, cmd: string, args: string[] }>} */
+  /** @type {Array<{ name: string, cmd: string, args: string[], env?: Record<string, string> }>} */
   const steps = [
     { name: 'i18n artifacts', cmd: 'npm', args: ['run', 'i18n:gen'] },
     {
@@ -241,6 +243,7 @@ export function buildGateProfileSteps(workers, opts = {}) {
       cmd: 'git',
       args: ['diff', '--exit-code', '--', ...I18N_ARTIFACTS],
     },
+    { name: 'wiki content', cmd: 'npm', args: ['run', 'wiki:content'] },
     { name: 'malware scan', cmd: 'npm', args: ['run', 'security:gate'] },
     { name: 'biome (changed files)', cmd: 'npm', args: ['run', 'ci:changed'] },
     { name: 'sfx check', cmd: 'npm', args: ['run', 'sfx:check'] },
@@ -250,6 +253,8 @@ export function buildGateProfileSteps(workers, opts = {}) {
       name: 'vitest (full suite)',
       cmd: 'npm',
       args: ['test', '--', `--maxWorkers=${workers}`],
+      // Mirror gate.mjs: skip pretest after generate-once (i18n + wiki above).
+      env: { WOC_SKIP_PRETEST: '1' },
     });
   }
   if (!opts.skipBrowser) {
@@ -262,7 +267,7 @@ export function buildGateProfileSteps(workers, opts = {}) {
     steps.push(
       { name: 'env build', cmd: 'npm', args: ['run', 'build:env'] },
       { name: 'server build', cmd: 'npm', args: ['run', 'build:server'] },
-      { name: 'client build', cmd: 'npm', args: ['run', 'build'] },
+      { name: 'client build', cmd: 'npm', args: ['run', 'build:bundle'] },
     );
   }
   return steps;
@@ -344,6 +349,7 @@ Options:
 Environment:
   GATE_MAX_WORKERS     Same override as scripts/gate.mjs when --workers is unset
   WOC_SKIP_DEP_SYNC=1  Skip npm ls preflight (same as gate.mjs)
+  WOC_SKIP_PRETEST=1   Applied to the vitest step after generate-once (same as gate.mjs)
 
 Examples:
   node scripts/gate_profile.mjs --facts

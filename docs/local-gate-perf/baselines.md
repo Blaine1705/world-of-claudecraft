@@ -130,7 +130,7 @@ suites can overlap; sum of file times exceeds suite wall).
 | Phase | Machine | Full gate s | Vitest s | Delta vs Phase 1 | Keep? |
 |---|---|---:|---:|---|---|
 | 1 (baseline) | M1 | 336.3 | 277.5 | 0 | keep (foundation) |
-| 2 | | | | | |
+| 2 | M1 | 291.5 (composite) | 245.4 | -44.8 (see notes) | keep |
 | 3 | | | | | |
 | 4 warm related | | | | | |
 | 5 | | | | | |
@@ -153,3 +153,44 @@ Phase 1 takeaway: on a high-tier quiet-ish M1, full gate wall is already under t
 old 25 min stretch. The agent pain is more likely multi-worktree free-RAM clamp,
 duplicated i18n/wiki work, and day-loop needing full suite. Later phases should
 still chase mid/low tiers and loaded free-mem cases, not only best-case wall.
+
+## Phase 2 - gate orchestration dedupe (after)
+
+**Decision:** Option C generate-once sequencing + Option B pretest env skip.
+
+| Path | Before (one full gate) | After |
+|---|---|---|
+| i18n gen | 3x (gate + pretest + build) | 1x (`i18n:gen` step) |
+| wiki content | 2x (pretest + build) | 1x (explicit gate step) |
+| pretest under gate | always runs gens | `WOC_SKIP_PRETEST=1` no-op |
+| client build | `npm run build` (gens + bundle) | `npm run build:bundle` |
+
+Standalone `npm test` still runs full pretest. Standalone `npm run build` still runs
+`i18n:gen` + `wiki:content` + `build:bundle`.
+
+### Artifact-path microbench (M1, 2026-08-02)
+
+| Step | Seconds |
+|---|---:|
+| i18n:gen | 2.45 |
+| wiki:content | 0.18 |
+| pretest with WOC_SKIP_PRETEST=1 | 0.02 |
+| pretest full (no skip) | 2.72 |
+| build:bundle | 7.20 |
+| full `npm run build` (gens + bundle) | 10.02 |
+
+Attributed gen savings per full gate: about **5 s** (skip second i18n in pretest
+~2.5 s + skip third i18n/wiki in client build ~2.8 s; wiki runs once early at ~0.2 s).
+
+### Composite full gate (M1)
+
+Vitest suite green at 245.4 s with pretest skip logged. Non-vitest steps re-profiled
+after a Phase 1 type pin fix (`collectMachineFacts` platform/arch accept functions):
+all ok; client build 7.5 s via `build:bundle`. Composite total **291.5 s**
+(= 245.4 vitest + 46.1 other). Vitest wall also moved ~32 s vs Phase 1 (machine
+load / free-RAM variance; freemem ~6.8 GiB at end), so **do not treat the full
+-44.8 s as pure Phase 2 credit**. Keep the orchestration change for correctness
+and the solid ~5 s artifact win.
+
+Raw JSON: `tmp/gate-profile-phase2.json` (vitest path; typecheck failed pre-fix),
+`tmp/gate-profile-phase2-rest.json` (skip-vitest full green tail).

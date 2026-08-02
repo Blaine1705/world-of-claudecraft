@@ -167,9 +167,10 @@ if (args.steps) {
     for (const step of steps) {
       console.log(`\n[gate_profile] ${step.name}: ${step.cmd} ${step.args.join(' ')}`);
       const started = performance.now();
+      const stepEnv = step.env ? { ...env, ...step.env } : env;
       const res = spawnSync(step.cmd, step.args, {
         stdio: 'inherit',
-        env,
+        env: stepEnv,
         shell,
         cwd: ROOT,
       });
