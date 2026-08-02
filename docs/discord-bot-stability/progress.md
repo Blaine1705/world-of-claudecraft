@@ -17,7 +17,7 @@
 | Phase 6: Bot consumes the new surface | built | 2026-08-01 | 2026-08-01 |
 | Phase 6 QA | complete | 2026-08-01 | 2026-08-01 |
 | Phase 7: Supervision + deploy hardening | built | 2026-08-01 | 2026-08-01 |
-| Phase 7 QA | not started | | |
+| Phase 7 QA | complete | 2026-08-02 | 2026-08-02 |
 | Phase 8: Observability | not started | | |
 | Phase 8 QA | not started | | |
 | Phase 9: /api/discord caching | not started | | |
@@ -1275,3 +1275,111 @@ constituent steps ran by hand above.
 
 Reviewers: privacy-security-review plus a fresh-eyes coverage reviewer over the
 combined diff (verdicts recorded in the Phase 7 section of state.md).
+
+### Phase 7 QA (2026-08-02)
+
+Release sync FIRST (standing rule 1): REAL. `origin/release/v0.34.0` measured 105
+ahead / 32 behind on a fresh fetch, merged as `502fa16a1` (122 files). Two content
+conflicts, both unions: package.json kept the release's incremental `check:ts`
+beside the packet's `check:ts:bot` chain, and tests/ci_workflow.test.ts needed the
+counts re-measured. The real merge trap was three both-sides-moved-a-count pins
+that merged as CLEAN CONTEXT: the packet moved the release-gate single-shard,
+release-gate step, and pr-checks step counts up one (the bot build) and the release
+moved the same three up one (the tsc buildinfo cache restore), so both sides made
+the identical textual change and the union needed one more than either
+(10, 14, 13), taken from the merged workflow by measurement rather than by
+arithmetic. A fourth fallout surfaced only in the deploy suite: the Phase 7 pin
+held `check:ts` to exact equality with `tsc --noEmit`, and the release's
+incremental flags broke it without breaking its intent; it now accepts a
+project-less `tsc --noEmit` and rejects a `-p`/`--project` redirect, which is the
+regression it was written against. The `release-merge-audit` skill came back
+clean: the incoming server/game.ts hunks (the hotbar resume guard, the buyItem
+bulk argument) touch neither Phase 5 feed site, no `/internal/discord` surface
+moved, no endpoint was added, and the release-authored `../server/db` mock site
+needs nothing the branch added. 738 targeted tests green on the merged tree
+before any QA work. One premise correction worth naming twice: release commit
+`40212c559` teaches the malware scanner to skip `.worktrees` (any depth) plus
+`.claude/worktrees` and `.codex/worktrees`, so the parked-sibling-worktree gate
+failure every session since Phase 2 has worked around is RETIRED and
+`npm run gate` runs end to end again.
+
+**Verdict: PASS.** Everything found was fixed in-session; the only open items
+predate the session and stay owed where they were (the maintainer-owed
+`.env.example` fills, and O7, the prod rollout that actually lands the deploy
+assets on the host).
+
+Method: the D19 ultracode audit Workflow, 7 finders (two correctness lanes,
+docs-accuracy, test-coverage-auditor, dead-code, privacy-security-review,
+qa-checklist) each on a hard 30-tool-call budget, then one adversarial skeptic
+per unique finding with the file open and quoting code: 38 raw findings, 32
+unique, 27 CONFIRMED (1 blocking, 9 should-fix, 17 nits including judgment
+records), 5 refuted, 0 lost, 39 agents with zero deaths and zero empty results.
+The qa-checklist lane reported READY with the validation matrix green and
+confirmed no other Review Dispatch Matrix row matches the diff.
+
+**The blocking finding, confirmed twice independently.** The gateway's production
+`exitProcess` default was the ONE injected default in bot/ with no default-path
+arm: every suite arm injects the sixth constructor argument (it must, or the real
+`process.exit` kills the vitest worker), and bot/main.ts constructs with three
+arguments, so production runs ONLY the untested path. The audit's coverage lane
+found it by reading; the mutation pass found it the same hour by planting a
+drain-less default that survived all 40 gateway tests. The fix hardened the seam
+as well as pinning it, because the security review's stderr drain had an unbounded
+hang in it: a blocked docker log pipe defers the write callback forever, leaving a
+live process with a dead gateway while the heartbeat task keeps the healthcheck
+GREEN, the exact zombie wearing the exact green light this phase exists to end.
+The default now stages `process.exitCode` first, arms an unref'd
+`EXIT_DRAIN_BACKSTOP_MS` (1000 ms) backstop that exits with the log line lost
+rather than not exiting at all, then drains; two new R16-form default-path arms
+pin the staged code, the drain-then-exit order, the literal 1, and the exact
+backstop bound.
+
+The other fixes, all applied (blocking, should-fix, and nit alike per standing
+rule 3): the 400-answered half-open probe direction got its breaker-suite arm
+(the comment claimed settle-as-success; nothing drove it); the liveness
+never-rejects contract got its synchronous-throw arm (only a rejection was
+pinned, so a then/catch refactor letting a sync throw escape survived);
+start_period got the relational pin the declared residual asked judgment on
+(>= 2x HEARTBEAT_INTERVAL_MS, beside new literals for interval/timeout/retries,
+whose deletion falls back to docker defaults silently); the executed-probe suite
+got a denied-parent-dir fixture (with the honest finding that "unreadable" meant
+un-STAT-able all along: a chmod-000 file stats fine, reads healthy while fresh,
+and self-heals via staleness because the bot cannot write it either), a loud
+extraction guard (a failed extraction ran `node -e ''` and passed every
+all-zeros case), and boundary agreement driven by the window READ FROM THE PROBE
+rather than a restated 90000; DEPLOY.md gained a contract suite (every
+config-scraped env key must have a TABLE ROW, the probe-only staleness knob
+included, plus the runbook command literals) and counted @ops snippets matching
+the user-data.sh pins; and the docs/comments were corrected where they were
+wrong (stop_grace covers no drain because the bot installs no SIGTERM handler;
+GAME_SERVER_URL is compose-pinned, not .env-passed, and carries the shared
+secret in cleartext off-network; the staleness window, not the write interval,
+is the detection lever; the by-hand freshness command now resolves the path
+override exactly like the probe).
+
+Mutation: 21 planted this session, 19 killed, every run with rc!=0 plus named
+failing tests plus a Test Files line, patch-applied and restore-verified. The
+spec pass (12) killed 10; the stale-bound shift-by-one survived BY DESIGN in
+both directions and the relational-pin ruling was judged and UPHELD (the floor
+rejects the flapping direction; the magnitude is operator policy whose literal
+pin would duplicate the default, the drift shape the compose comment rejects);
+the drain-less-default survivor was the real gap above. The fix-round pass (9)
+ended 9/9, after one of its own pins was strengthened by its own mutant: the
+DEPLOY.md key pin as bare backticks survived a deleted table row on the key's
+prose echo, and now demands the row form. Two harness misfires were caught by
+the landing-proof discipline and redone rather than scored (a shell-escaped
+perl variable interpolating empty, a first-occurrence delete landing in the
+game service); both are recorded to memory as
+mutation-edits-need-landing-proof.
+
+The fix round was itself reviewed by a fresh-eyes agent (4 nits, zero blocking,
+all applied): exitCode restores moved into finally, the 400-probe arm's title
+stopped claiming the budget direction its own aged-window fixture cannot decide
+(the forbidden suite owns that kill), and the executed-probe header stopped
+claiming minute margins for the 5s boundary fixtures the same round added.
+
+Validation at close: `npx tsc --noEmit` and `npx tsc -p tsconfig.bot.json`
+clean; 300+ tests green across the ten bot and deploy suites; `npm run
+build:bot` bundles; `npm run ci:changed` exit 0 with zero errors (the one
+format error it caught mid-round was fixed scoped); full `npm run gate` PASS
+end to end, the packet's first since the worktree false-positive began.

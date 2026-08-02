@@ -672,10 +672,12 @@ because dropping the one word is otherwise silent),
     `writeHeartbeatFile`); the wiring pin moved to 6 with a TASKS row, and
     `HEARTBEAT_INTERVAL_MS` joined the cadence-literal ban and value pins.
   - Compose (discord-bot service): freshness healthcheck (node one-liner, no `$`
-    anywhere in it because compose interpolates; `Number(...)||90000` on purpose,
-    since an unset host key arrives as '' and Number('') is 0, falsy, so the default
-    holds; missing, unreadable and stale all exit nonzero; interval 15s, timeout 5s,
-    retries 4, start_period 60s covering the first jittered write);
+    anywhere in it because compose interpolates; the staleness knob is guarded
+    `s>0?s:90000` on purpose, since an unset host key arrives as '' and Number('')
+    is 0, a garbage value is NaN, and a negative would pin the container
+    permanently unhealthy, so empty, non-numeric and non-positive all fall back;
+    missing, un-stat-able (a denied path) and stale all exit nonzero; interval 15s,
+    timeout 5s, retries 4, start_period 60s covering the first jittered write);
     `stop_grace_period: 15s`; `mem_limit`/`memswap_limit` 512m; and a 14-key env
     passthrough (the 11 tunable knobs plus the three heartbeat keys). Before this the
     container saw only 13 keys and EVERY knob was inert in production, a gap nothing
@@ -721,6 +723,50 @@ because dropping the one word is otherwise silent),
     deliberately half-scoped to the path; and nothing asserts the negative
     direction that the GAME service's own hardening block was left untouched
     (the service-slice helper plus the unhardened-bot mutant cover the inverse).
+  - Phase 7 QA session (2026-08-02, verdict PASS; the full narrative is in
+    progress.md). What a later phase must know:
+    - The gateway default `exitProcess` is HARDENED and PINNED: it stages
+      `process.exitCode = code`, arms an unref'd backstop
+      (`EXIT_DRAIN_BACKSTOP_MS`, 1000, exported from `bot/gateway.ts` per the R14
+      pattern), then drains stderr and exits. Two R16-form default-path arms in
+      `tests/discord_bot_gateway.test.ts` pin the staged code, drain-then-exit
+      order, the literal 1, and the backstop bound. It had been the ONE injected
+      default in bot/ with no default-path test, over the phase's headline
+      behavior (found by the audit and by mutation independently).
+    - Residual outcomes: start_period now has the relational pin
+      (>= 2x `HEARTBEAT_INTERVAL_MS`, plus literals for interval/timeout/retries
+      whose deletion silently falls back to docker defaults); the two exit-code 1
+      literals stay unlinked, judged ACCEPTED (docker restarts on any exit code,
+      so drift has no production consequence and the gateway side is pinned per
+      fatal code); the stale-window relational-only pin was mutation-tested in
+      both one-interval directions and UPHELD; the game-service-untouched
+      negative stays with the service-slice helper.
+    - The 400 arm's three directions are split across two suites on purpose:
+      cache-and-no-budget in `tests/discord_bot_governor_forbidden.test.ts`,
+      probe-settles-as-success in `tests/discord_bot_governor_breaker.test.ts`
+      (whose fixture's opening 401s age out by probe time, so it deliberately
+      does not claim the budget direction).
+    - `writeHeartbeatFile` is pinned against a SYNCHRONOUSLY throwing writer as
+      well as a rejecting one (a then/catch refactor letting a sync throw escape
+      into the scheduler survived until then).
+    - Adding a bot env key is now FOUR places, the fourth enforced:
+      `bot/config.ts` + BOT_ENV_KEYS, the compose passthrough, and a DEPLOY.md
+      TABLE ROW; `tests/deploy_discord_bot.test.ts` scrapes config.ts and
+      demands `| \`KEY\` |` per key (row form, see the gotcha below), plus the
+      probe-only `DISCORD_HEARTBEAT_STALE_MS` row and the runbook command
+      literals; `tests/deploy_watchdog.test.ts` counts the DEPLOY.md @ops
+      snippets 3/3 like the user-data.sh pins.
+    - Probe truth, in the comments now: the catch arm guards MISSING and
+      un-STAT-able (denied parent dir; executed fixture, skipped as root); a
+      chmod-000 heartbeat FILE stats fine and correctly reads healthy while
+      fresh, then self-heals via staleness because the bot cannot write it
+      either. stop_grace_period covers no drain (no SIGTERM handler; safety is
+      server-side outbox redelivery). GAME_SERVER_URL is compose-pinned, never
+      .env-passed, and carries the shared secret in cleartext off-network.
+    - Mutation tally: 21 planted / 19 killed / 1 designed survivor (the stale
+      bound, ruling upheld) / 1 real gap (the exit default, fixed and re-proven
+      9/9 in the fix-round pass). Fresh-eyes round over the fixes: 4 nits, all
+      applied.
 ## Phase 5 feed-site enumeration (the linked-member change feed contract)
 
 Every server-side site where a linked account's flex-relevant state changes (level, class,
@@ -1300,16 +1346,17 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   settimeout-fractional-delay-fires-early) do not exist in the memory store, and neither
   does env-empty-numeric-default-shift, which phase-02 cites; the rules themselves are
   real and are now written down here and at the seams that depend on them.
-- **A sibling session's git worktree parked INSIDE the repo root fails the gate, and the
-  failure looks like yours.** `scripts/malware_scan.mjs` and `tests/malware_scan.test.ts`
-  walk the whole working tree, so a checkout under `.worktrees/<branch>/` contributes every
-  `child_process` import and `new Function` in it as a high-severity `rce-obfuscation`
-  finding. Phase 2 QA hit this: `npm run gate` aborted at the malware step with 194 high
-  findings, 100 percent of them inside `.worktrees/fix-play-map-level-toggle`, a worktree
-  another session registered mid-session. Diagnose it by running the scanner in a clean
-  detached worktree of HEAD (it passed there, 4445 files, 0 high) rather than by triaging
-  the findings, and do NOT delete another session's worktree. Worktrees under
-  `.claude/worktrees/` are equally exposed, so remove your own before gating.
+- **RETIRED by the v0.34.0 sync (Phase 7 QA, 2026-08-02): a sibling session's parked
+  worktree no longer fails the gate.** Release commit `40212c559` taught
+  `scripts/malware_scan.mjs` to skip `.worktrees` by basename at any depth, plus
+  `.claude/worktrees` and `.codex/worktrees` by path, so the recurring
+  194-high-findings malware-step abort (struck first in Phase 2 QA, then every phase
+  with `.worktrees/fix-play-map-level-toggle` parked) is gone and `npm run gate` runs
+  end to end again. Kept for the record: the failure mode was a whole-tree scan
+  reading a nested checkout's `child_process` imports as `rce-obfuscation` findings;
+  if a worktree is ever parked somewhere OUTSIDE the skipped roots it would resurface,
+  and the diagnosis is still "run the scanner in a clean detached worktree of HEAD",
+  never triaging the findings.
 - **Discord's `X-RateLimit-Bucket` is NOT a bucket identity on its own.** It is
   documented as non-inclusive of the top-level (major) resource, so two channels or two
   guilds hit on the same route answer with the SAME hash while holding separate limits.
@@ -1511,6 +1558,13 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   that emits a fatal close through a hand-built `Gateway` must inject the sixth
   constructor argument or it takes the vitest worker down with it; the suite's `rig()`
   injects it in every arm, not only the fatal ones.
+- **A documentation-table pin needs the ROW form, because keys echo in prose.** A
+  DEPLOY.md env key appears both as its table row and in incident-guidance prose, so
+  `toContain('\`KEY\`')` survives the row's deletion on the prose echo: proved by
+  mutation in Phase 7 QA (the DISCORD_MAX_RPS row deleted, bare-backtick pin green).
+  Pin `| \`KEY\` |`. Same family as the SQL clause-anchor rule: when the same
+  fragment legitimately appears twice deciding different things, anchor the copy
+  that carries the contract.
 - **The compose healthcheck probe guards its staleness knob with `s>0?s:default`, and
   the shape is load bearing, do not "simplify" it.** Compose passes '' for an unset
   host key and `Number('')` is 0; a garbage value is NaN; a negative would make
