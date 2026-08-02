@@ -381,14 +381,20 @@ describe('tick perf capture lifecycle', () => {
     // it and never resolves this deliberately-templateless mob through isTrivialTo).
     const watcherId = sim.addPlayer('warrior', 'Watcher');
     const watcher = sim.entities.get(watcherId);
-    if (watcher) {
-      watcher.pos = { x: 500, y: 0, z: 540 };
-      watcher.prevPos = { ...watcher.pos };
-    }
+    // Decisive, not a soft skip: if addPlayer ever stops resolving the id it just
+    // returned, the watcher would silently stay at spawn (outside the wolf's cull
+    // radius) and this test would go on to fail later on a missing family lap, with a
+    // message that points nowhere near the real cause. Fail here, at the placement.
+    expect(watcher).toBeDefined();
+    watcher!.pos = { x: 500, y: 0, z: 540 };
+    watcher!.prevPos = { ...watcher!.pos };
 
-    // Record which lap names the profiler's add() is called with. The spy is
-    // timing-independent: it proves the probe routed a beast mob's mob.update time to
-    // the family bucket regardless of how small the measured ms rounds to.
+    // Record which lap names the profiler's add() is called with, AND how many of the
+    // wolf's OWN mob.update laps land in the beast bucket specifically (via the same
+    // real cfg.perfLap probe GameServer wires, wrapped so both the wolf-specific count
+    // and the aggregate spy below observe every call). The spy is timing-independent: it
+    // proves the probe routed a beast mob's mob.update time to the family bucket
+    // regardless of how small the measured ms rounds to.
     const profiler = (
       server as unknown as { tickProfiler: { add: (p: string, ms: number) => void } }
     ).tickProfiler;
@@ -398,10 +404,24 @@ describe('tick perf capture lifecycle', () => {
       addCalls.set(phase, (addCalls.get(phase) ?? 0) + 1);
       origAdd(phase, ms);
     };
+    let wolfBeastLaps = 0;
+    const simCfg = (
+      server as unknown as { sim: { cfg: { perfLap?: (p: string, e?: Entity) => void } } }
+    ).sim.cfg;
+    const origPerfLap = simCfg.perfLap;
+    simCfg.perfLap = (phase: string, entity?: Entity) => {
+      if (entity === wolf && phase === 'mob.update') wolfBeastLaps++;
+      origPerfLap?.(phase, entity);
+    };
 
     server.startPerfCapture(3000);
     runCaptureWindow(server, 7);
 
+    // Pin the WOLF's own lap count, not just "some beast fired": the world may hold
+    // other real beasts, so a family-wide floor alone would stay green even if the
+    // watcher placement (and therefore the wolf's own culling exemption) silently broke,
+    // as long as some other beast happened to still be in range of a player.
+    expect(wolfBeastLaps).toBeGreaterThanOrEqual(60);
     // The placed wolf runs mob.update once per tick for all 60 committed ticks, so the
     // beast bucket is add()-ed at least 60 times (the world may hold other beasts too).
     expect(addCalls.get('sim.mob.update|beast') ?? 0).toBeGreaterThanOrEqual(60);

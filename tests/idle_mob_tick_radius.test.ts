@@ -100,7 +100,12 @@ describe('idle-mob distance culling is wired into the production server (#2703)'
     phaseTotalsWith.clear();
     phaseTotalsWithout.clear();
 
-    const TICKS = 200;
+    // Deliberately slow (two full 11-zone `Sim` builds plus the unthrottled arm's real
+    // per-tick terrain-height wander), so it carries its own explicit budget below
+    // rather than relying on the global testTimeout (vite.config.ts), matching the
+    // sibling budget test at tests/mob_update_perf.test.ts. 60 ticks is enough to keep
+    // the 5x ratio assertion decisive while keeping the slow arm's cost down.
+    const TICKS = 60;
     for (let i = 0; i < TICKS; i++) {
       mark = performance.now();
       withRadius.tick();
@@ -129,5 +134,5 @@ describe('idle-mob distance culling is wired into the production server (#2703)'
     // "the wiring silently stopped culling" without pinning a hardware-speed
     // sensitive absolute millisecond budget.
     expect(mobUpdateWith).toBeLessThan(mobUpdateWithout / 5);
-  });
+  }, 60_000);
 });
