@@ -261,11 +261,13 @@ jobs:
   # The PR tier is two parallel jobs: pr-gate runs the test suite while pr-checks
   # runs the serialized checks, so the PR critical path is max(tests, checks)
   # instead of their sum. pr-gate additionally fans the suite across an 8-shard
-  # matrix (vitest --shard: a sha1-hash partition of the test FILES), so its wall
-  # time is the slowest shard. Locally `npm run gate` (scripts/gate.mjs) runs
-  # the SAME combined step list serially with ONE full unsharded vitest run by
-  # design (bounded workers); keep that script's step list in sync when adding
-  # or removing a step in either job.
+  # matrix (vitest --shard=i/8). File packs are LPT-balanced by
+  # scripts/ci_balanced_sequencer.mjs (import-cost weights), not vitest's default
+  # sha1-contiguous slices, so heavy import graphs do not cluster on one shard
+  # (D11 path-matrix). Wall time is still the slowest shard. Locally
+  # `npm run gate` (scripts/gate.mjs) runs the SAME combined step list serially
+  # with ONE full unsharded vitest run by design (bounded workers); keep that
+  # script's step list in sync when adding or removing a step in either job.
   pr-gate:
     name: PR gate (English-only legal)
     # Compose release-to-main exclusion with the code path filter (D10). Do not
@@ -298,9 +300,9 @@ jobs:
 
       # `npm test` regenerates the i18n artifacts itself (pretest) in EVERY
       # shard BY DESIGN (the S3 guard, guide freshness, and the git-subprocess
-      # suites need the generated artifacts no matter which shard they hash
-      # into), so this job needs no explicit i18n:gen step; the freshness diff
-      # lives in pr-checks.
+      # suites need the generated artifacts no matter which shard the balanced
+      # sequencer assigns them to), so this job needs no explicit i18n:gen step;
+      # the freshness diff lives in pr-checks.
       # Full Sim suites are CPU-heavy. Keep each shard at half the runner's
       # available cores, matching the bounded local gate.
       - name: Run tests (PR tier, shard ${{ matrix.shard }} of 8)
@@ -420,9 +422,9 @@ jobs:
 
       # `npm test` regenerates the i18n artifacts itself (pretest) in EVERY
       # shard BY DESIGN (the S3 guard, guide freshness, and the git-subprocess
-      # suites need the generated artifacts no matter which shard they hash
-      # into), so this job needs no explicit i18n:gen step; the freshness diff
-      # lives in release-checks.
+      # suites need the generated artifacts no matter which shard the balanced
+      # sequencer assigns them to), so this job needs no explicit i18n:gen step;
+      # the freshness diff lives in release-checks.
       # Full Sim suites are CPU-heavy. Keep each shard at half the runner's
       # available cores, matching the bounded local gate.
       - name: Run tests (release tier - 21-locale + empty-pending, shard ${{ matrix.shard }} of 8)

@@ -1,16 +1,15 @@
 # State: CI Speed (cross-phase cheat sheet)
 
-**Current phase:** Phase 5 DONE (path filters + whole-packet close). Locked
-**N=8**. Completeness **1939** Test Files. PR wall samples UNDER 8 min (424s /
-442s). D11 residual accepted (~1.32). Worktree
+**Current phase:** Phase 5 DONE + D11 path-matrix **IN PROGRESS** (owner OK).
+Locked **N=8**. Completeness baseline **1939** Test Files (re-measure after
+path-matrix probes). PR wall samples UNDER 8 min (424s / 442s). Worktree
 `/home/fernandoramirez/Documents/world-of-claudecraft-ci-speed` on
 `feature/ci-speed`. PR #2737.
 
-**Next action:** Owner merge of #2737 (or follow-ups). Optional: confirm
-deletion of `docs/ci-speed/` after merge (teardown offer; do not delete without
-explicit owner confirm). Do not raise N past 8. No more rename loops for D11.
-Release-arm live probe DEFERRED (OPEN item 6). Path-matrix balance only with
-owner OK (separate from Phase 5 path filters).
+**Next action:** Land path-matrix probes (three green PR walls, D11 ≤ 1.20).
+Optional: confirm deletion of `docs/ci-speed/` after merge (teardown offer; do
+not delete without explicit owner confirm). Do not raise N past 8. No more
+rename loops for D11. Release-arm live probe DEFERRED (OPEN item 6).
 
 ## Locked decisions
 
@@ -53,8 +52,10 @@ owner OK (separate from Phase 5 path filters).
   **Status:** native `changes` job landed in Phase 5; no dorny.
 - **D11 Balance metric:** after Phase 3, worst shard vitest **Duration**
   within **20%** of the median shard Duration on the same run.
-  **Status after three rounds: MISS** (359.31 / 270.83 = 1.327 on 30712431702).
-  Residual is s5 import cumulative (~420s) with low test sum (~149s).
+  **Status after three pure-rename rounds: MISS** (359.31 / 270.83 = 1.327 on
+  30712431702). Residual is s5 import cumulative (~420s).
+  **Path-matrix follow-on (owner OK):** BalancedSequencer LPT packs under
+  `--shard=i/8` (see `docs/ci-speed/phase-d11-path-matrix.md`). Probes pending.
 - **D12 Lint history:** no full-repo `fetch-depth: 0` solely for Biome
   changed-files. Base ref for `--since` must still be correct for PR and push
   events.
@@ -119,15 +120,18 @@ owner OK (separate from Phase 5 path filters).
 
 - `.github/workflows/ci.yml` (all jobs, if-conditions, matrix, concurrency, path filter)
 - `scripts/gate.mjs` (step list comments; no --shard)
-- `tests/ci_workflow.test.ts` (structural pins; `SHARD_N = 8`; path-filter pins)
+- `scripts/ci_shard_partition.mjs` + `scripts/ci_balanced_sequencer.mjs` (D11 LPT packs)
+- `vite.config.ts` `sequence.sequencer` wire
+- `tests/ci_workflow.test.ts` (structural pins; `SHARD_N = 8`; path-filter + sequencer pins)
+- `tests/ci_shard_partition.test.ts` (completeness + balance)
 
 ## OPEN items
 
 1. **Exact N (6 vs 8):** CLOSED. Locked N=8. Wall sample UNDER 8 min after
    Phase 3 batch 2; three consecutive not re-babysat.
-2. **Heavy-file split list / D11:** Phase 3 three rounds done; D11 still MISS.
-   Pure renames exhausted for s5 import residual. Path-matrix note in
-   progress.md; owner OK required to implement.
+2. **Heavy-file split list / D11:** Phase 3 three rounds done; pure renames
+   exhausted. Path-matrix implement IN PROGRESS (owner OK 2026-08-02): LPT
+   BalancedSequencer; close when three green walls show D11 ≤ 1.20.
 3. **Branch protection check names:** owner action after Phase 2; track in
    progress.md. New names are `PR gate (English-only legal) (1)` through `(8)`.
    Docs-only PRs additionally skip PR gate / PR checks / browser when the

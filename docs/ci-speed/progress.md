@@ -14,6 +14,7 @@
 | 4 QA | PASS | #2737 | privacy-security PASS; test-coverage PASS after pin harden; scoped checklist green; probe DEFER |
 | 5 Path filters + close | DONE | #2737 | Native `changes` job; no aggregator (skipped OK); teardown offered |
 | 5 QA | PASS-WITH-FOLLOWUPS | #2737 | Whole-packet; probe run ids below; OPEN item 6 release probe still DEFER |
+| D11 path-matrix | IN PROGRESS | #2737 | Owner OK; LPT BalancedSequencer under --shard=i/8; probes pending |
 
 ## Measurement log
 
@@ -31,6 +32,7 @@ Append-only. Each row: date, phase, run id, wall (s), worst shard (s), N, notes.
 | 2026-08-01 | p3-b1 | 30710303793 | ~493 (att1) | 420 | 8 | after tank+trend splits; s4 teardown flake then re-run green; files 1939; D11 FAIL 1.60; wall OVER |
 | 2026-08-01 | p3-b2 | 30710958267 | 424 | 351 | 8 | after s5 heavy renames; green; files 1939; D11 FAIL 1.315 (need 1.20); wall UNDER 8 min (7.07); stretch MISS |
 | 2026-08-01 | p3-b3 | 30712431702 | 442 | 359 | 8 | s5 import-heavies renamed off; green; files 1939; D11 FAIL 1.327; wall UNDER (7.37); s5 still import-bound |
+| 2026-08-02 | d11-design | (local) | | | 8 | Owner OK path-matrix; design in phase-d11-path-matrix.md; LPT sequencer landed; CI probes TBD |
 
 ### Phase 2 N=6 detail (run 30707931452, green)
 
@@ -307,6 +309,28 @@ Phase 4 when ready. Path matrix only with owner OK if D11 must be hard-met.
 
 Owner path: (a) path-matrix with OK, (b) accept D11 MISS and Phase 4, (c) out-of-
 packet import hygiene later (D15).
+
+### D11 path-matrix implementation (owner OK, 2026-08-02)
+
+**Chosen approach:** keep `npm test -- --shard=i/8` and N=8; replace vitest's
+default sha1-contiguous packs via `sequence.sequencer = BalancedSequencer`
+(`scripts/ci_balanced_sequencer.mjs` + pure `scripts/ci_shard_partition.mjs`).
+
+Weights: byte size + boosts for three/render/electron/server/sim/jsdom/admin/
+i18n/ui/net/game/parity + Phase 3 duration overlay for known monsters. LPT
+assigns each file to the lightest pack.
+
+**CI shape unchanged:** fail-fast false, half-core maxWorkers, pretest via
+npm test, gate.mjs unsharded, Phase 5 path filters intact, release unfiltered,
+I18N_RELEASE_TIER job-level on release-gate.
+
+**Pins:** `tests/ci_shard_partition.test.ts` (completeness + balance);
+`tests/ci_workflow.test.ts` red-path for sequencer wire and no-sha1.
+
+**Probes:** three green PR walls with worst/median Duration ≤ 1.20 and files
+sum == suite; record run ids below when green.
+
+Design write-up: `docs/ci-speed/phase-d11-path-matrix.md`.
 
 ## Phase 4 checklist
 

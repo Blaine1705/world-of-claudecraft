@@ -3,6 +3,15 @@ import { describe, expect, it } from 'vitest';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const gate = readFileSync(new URL('../scripts/gate.mjs', import.meta.url), 'utf8');
+const viteConfig = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
+const balancedSequencer = readFileSync(
+  new URL('../scripts/ci_balanced_sequencer.mjs', import.meta.url),
+  'utf8',
+);
+const shardPartition = readFileSync(
+  new URL('../scripts/ci_shard_partition.mjs', import.meta.url),
+  'utf8',
+);
 
 // Locked shard count for pr-gate and release-gate matrices (Phase 2 of
 // docs/ci-speed). Supersedes the prior toolchain N=4 on this surface. Both
@@ -304,8 +313,8 @@ describe('CI workflow parity', () => {
     // Aggregator only if branch protection cannot accept skipped checks. This
     // packet does not invent one without evidence (OPEN item 5: skipped release
     // jobs already show as skipping on ordinary PRs without blocking merge).
-    expect(workflow).not.toMatch(/\n  ci-result:/);
-    expect(workflow).not.toMatch(/\n  ci-success:/);
+    expect(workflow).not.toMatch(/\n {2}ci-result:/);
+    expect(workflow).not.toMatch(/\n {2}ci-success:/);
 
     // Red-path structural: a paths-ignore on either release job would silently
     // shrink release-tier enforcement on a docs-only release push.
@@ -387,5 +396,26 @@ describe('CI workflow parity', () => {
     // N times per push; a dropped step shrinks the job silently.
     expect(prGate.match(/\n {6}- name: /g)).toHaveLength(4);
     expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(4);
+  });
+
+  it('wires the D11 balanced path-matrix sequencer (not default sha1 contiguous packs)', () => {
+    // Red-path: dropping the custom sequencer reverts --shard to vitest's sha1
+    // contiguous slices and reopens the s5 import residual (D11 MISS ~1.32).
+    expect(viteConfig).toContain("from './scripts/ci_balanced_sequencer.mjs'");
+    expect(viteConfig).toContain('sequencer: BalancedSequencer');
+    expect(viteConfig).toMatch(/sequence:\s*\{\s*sequencer:\s*BalancedSequencer/);
+    // Sequencer must extend BaseSequencer and call LPT partition (not sha1).
+    expect(balancedSequencer).toContain("from 'vitest/node'");
+    expect(balancedSequencer).toContain('extends BaseSequencer');
+    expect(balancedSequencer).toContain('partitionByLpt');
+    expect(balancedSequencer).toContain('weightForTestFile');
+    expect(balancedSequencer).not.toMatch(/hash\s*\(\s*['"]sha1['"]/);
+    // Pure partition module stays free of vitest (Node unit tests import it).
+    expect(shardPartition).toContain('export function partitionByLpt');
+    expect(shardPartition).toContain('export function weightForTestFile');
+    expect(shardPartition).not.toContain("from 'vitest");
+    // Workflow comments must not re-claim sha1 as the live pack strategy.
+    expect(workflow).toContain('ci_balanced_sequencer.mjs');
+    expect(workflow).toMatch(/LPT-balanced|import-cost weights/);
   });
 });

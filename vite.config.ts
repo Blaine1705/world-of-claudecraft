@@ -10,6 +10,9 @@ import { loadBrowserslistFloors } from './scripts/browserslist_targets.mjs';
 // Untyped zero-dep build helper (same convention as the other scripts/*.mjs tools).
 // vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
 import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
+// CI path-matrix equivalent: LPT packs for --shard=i/N (see scripts/ci_balanced_sequencer.mjs).
+// Untyped .mjs import, same convention as other scripts/* tools outside tsconfig include.
+import { BalancedSequencer } from './scripts/ci_balanced_sequencer.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
 
@@ -373,6 +376,13 @@ export default defineConfig({
     env: {
       DATABASE_URL:
         process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
+    },
+    // D11 path-matrix: replace vitest's default sha1-contiguous --shard packs
+    // with LPT packs weighted for import cost so heavy three/render/electron
+    // suites do not cluster on one matrix cell. Local unsharded runs ignore this
+    // (shard() is only called when --shard is set). gate.mjs stays unsharded.
+    sequence: {
+      sequencer: BalancedSequencer,
     },
     globalSetup: ['./tests/global_setup.ts'],
     // Runs per test file (unlike globalSetup, which runs once outside any
