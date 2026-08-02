@@ -1319,6 +1319,8 @@ function blankEntity(id: number): Entity {
     leashAnchor: null,
     evadeStall: 0,
     chaseStall: 0,
+    evadeEpoch: 0,
+    combatExitHoldUntil: 0,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
