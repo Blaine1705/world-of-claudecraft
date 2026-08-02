@@ -19,6 +19,7 @@ import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_d
 import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '../data';
 import { createGroundObject, createMob } from '../entity';
 import {
+  COMBAT_EXIT_MEMORY_SECONDS,
   type CombatExitThreatEntry,
   recordCombatExit,
   takeCombatExit,
@@ -564,6 +565,14 @@ function scrubInstanceThreat(ctx: SimContext, inst: InstanceSlot, pid: number): 
     const priorThreat = mob.threat.get(pid);
     if (mob.inCombat && priorThreat !== undefined && priorThreat > 0) {
       mobThreat.push([id, priorThreat, mob.evadeEpoch]);
+      // Hold this mob's evade-home reset open until the memory window lapses
+      // (issue #2653): a genuinely-fighting leaver's mob must not heal or
+      // clear its hate table out from under a same-claim re-entry. Extends
+      // rather than shortens an already-live hold from an earlier leaver.
+      mob.combatExitHoldUntil = Math.max(
+        mob.combatExitHoldUntil,
+        ctx.time + COMBAT_EXIT_MEMORY_SECONDS,
+      );
     }
     dropThreat(mob, pid);
     for (const srcId of [...mob.threat.keys()]) {
@@ -582,16 +591,19 @@ function scrubInstanceThreat(ctx: SimContext, inst: InstanceSlot, pid: number): 
 // exact threat scrubbed at the door and force any mob that lost its target back
 // into the fight, instead of letting it sit idle/evading until manually re-pulled.
 // A lapsed or absent memory entry is a no-op: the claim resets exactly as before.
+//
+// Safe to restore unconditionally (no evadeEpoch check needed): resetEvadingMob
+// defers on `combatExitHoldUntil` for exactly this window, so a mob this snapshot
+// covers cannot have evade-reset or been re-pulled by anyone else in the meantime
+// (an 'evade' mob is damage-immune, see combat/damage.ts). A mob that DID evade
+// since (e.g. it was never actually held, a stale/foreign id) is caught below by
+// the dead/missing guard; `evadeEpoch` stays on the snapshot only as a diagnostic.
 function resumeRememberedCombat(ctx: SimContext, inst: InstanceSlot, pid: number): void {
   const rec = takeCombatExit(inst.combatExitMemory, pid, ctx.time);
   if (!rec) return;
-  for (const [mobId, threat, evadeEpoch] of rec.mobThreat) {
+  for (const [mobId, threat] of rec.mobThreat) {
     const mob = ctx.entities.get(mobId);
     if (!mob || mob.dead) continue;
-    // The mob fully evade-reset since this snapshot was taken: it is a
-    // different pull now (possibly someone else's fresh one), so the old
-    // threat value must not be grafted onto it (issue #2653 follow-up).
-    if (mob.evadeEpoch !== evadeEpoch) continue;
     mob.threat.set(pid, threat);
     if (mob.aggroTargetId === null) retargetMob(ctx, mob);
   }

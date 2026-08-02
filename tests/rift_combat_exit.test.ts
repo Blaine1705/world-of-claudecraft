@@ -205,48 +205,108 @@ describe('rift combat-exit memory (issue #2653, no free combat reset)', () => {
     );
   });
 
-  it('does not resume a snapshot onto a mob that has fully evade-reset and been freshly re-pulled since', () => {
+  it('a forced evade-home reset is deferred while a live exit memory could still apply, so a mid-window fresh re-pull can never happen', () => {
     const sim = makeSim();
     const a = sim.addPlayer('warrior', 'Wanderer');
-    const b = sim.addPlayer('warrior', 'Tank');
     sim.enterRift(SEED, 20, a);
     const inst = sim.riftInstances.find((i: any) => i.partyKey !== null)!;
     const mob = sim.entities.get(inst.mobIds[0]) as AnyEntity;
     const ea = sim.entities.get(a) as AnyEntity;
     teleport(sim, ea, mob.pos.x + 2, mob.pos.z);
     ea.maxHp = ea.hp = 1_000_000;
-    sim.dealDamage(ea, mob, 100, false, 'physical', 'Strike', 'hit', true);
+    sim.dealDamage(ea, mob, mob.maxHp - 40, false, 'physical', 'Strike', 'hit', true);
     expect(mob.threat.get(a)).toBeGreaterThan(0);
 
     sim.leaveRift(a);
     expect(inst.combatExitMemory.size).toBe(1);
 
-    // The pack fully evades home (a real evade-home reset, not the hand-rolled
-    // simulateNaturalReset above) before A returns: this is a genuinely
-    // DIFFERENT pull now.
+    // Something (a stray leash break, a manual call) tries to run the
+    // evade-home reset while A's exit memory is still live: it must defer
+    // rather than heal/clear the pack out from under a same-run return.
     resetEvadingMob(sim.ctx, mob);
-    expect(mob.inCombat).toBe(false);
+    expect(mob.inCombat).toBe(true);
+    expect(mob.hp).toBeLessThan(mob.maxHp); // never healed
 
-    // The tank joins and re-pulls the same mob fresh, at a much lower threat
-    // than A's stale snapshot.
-    sim.enterRift(SEED, 20, b);
-    const eb = sim.entities.get(b) as AnyEntity;
-    teleport(sim, eb, mob.pos.x + 2, mob.pos.z);
-    eb.maxHp = eb.hp = 1_000_000;
-    sim.dealDamage(eb, mob, 25, false, 'physical', 'Strike', 'hit', true);
-    const freshThreat = mob.threat.get(b);
-    expect(freshThreat).toBeGreaterThan(0);
-    expect(mob.aggroTargetId).toBe(b);
-
-    // A walks back in inside the original memory window: the stale, much
-    // higher snapshot must NOT be grafted onto this new pull and rip the
-    // tank's aggro.
+    // A returns inside the window: the exact fight resumes, HP included.
     sim.time += 5;
     sim.enterRift(SEED, 20, a);
 
-    expect(mob.threat.has(a)).toBe(false);
-    expect(mob.threat.get(b)).toBe(freshThreat);
-    expect(mob.aggroTargetId).toBe(b);
+    expect(mob.threat.get(a)).toBeGreaterThan(0);
+    expect(mob.aggroTargetId).toBe(a);
+    expect(mob.inCombat).toBe(true);
+  });
+
+  it('re-entering after a REAL tick loop (leave, natural leash-and-evade reset, return before expiry) resumes the exact fight, not a fresh healed pull', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Ticker');
+    const p = sim.entities.get(pid) as AnyEntity;
+    sim.enterRift(SEED, 20, pid);
+    const inst = sim.riftInstances.find((i: any) => i.partyKey !== null)!;
+    const mob = sim.entities.get(inst.mobIds[0]) as AnyEntity;
+    teleport(sim, p, mob.pos.x + 2, mob.pos.z);
+    p.maxHp = p.hp = 1_000_000;
+    sim.dealDamage(p, mob, mob.maxHp - 40, false, 'physical', 'Strike', 'hit', true);
+    const damagedHp = mob.hp;
+    expect(damagedHp).toBeLessThan(mob.maxHp);
+    const priorThreat = mob.threat.get(pid);
+    expect(priorThreat).toBeGreaterThan(0);
+
+    sim.leaveRift(pid);
+
+    // Run the REAL tick loop: the leaver's teleport to the overworld drags the
+    // mob past its leash within a few seconds (issue #2653's own finding for
+    // rifts), well inside the memory window.
+    for (let i = 0; i < 20 * 15; i++) sim.tick();
+
+    // Held, not reset: no heal, no idle, no dropped hate table.
+    expect(mob.hp).toBe(damagedHp);
+    expect(mob.aiState).toBe('evade');
+    expect(mob.inCombat).toBe(true);
+
+    // Structurally unpullable while held: an 'evade' mob is damage-immune
+    // (combat/damage.ts).
+    const strangerPid = sim.addPlayer('warrior', 'Stranger');
+    sim.enterRift(SEED, 20, strangerPid);
+    const stranger = sim.entities.get(strangerPid) as AnyEntity;
+    teleport(sim, stranger, mob.pos.x + 2, mob.pos.z);
+    stranger.maxHp = stranger.hp = 1_000_000;
+    sim.dealDamage(stranger, mob, 25, false, 'physical', 'Strike', 'hit', true);
+    expect(mob.threat.has(strangerPid)).toBe(false);
+    expect(mob.hp).toBe(damagedHp);
+
+    sim.enterRift(SEED, 20, pid);
+
+    expect(mob.threat.get(pid)).toBe(priorThreat);
+    expect(mob.aggroTargetId).toBe(pid);
+    expect(mob.aiState).toBe('chase');
+    expect(mob.hp).toBe(damagedHp); // the exact fight resumed, not a fresh healed pack
+  });
+
+  it('re-entering after a REAL tick loop past the full window earns a genuine reset (full heal, idle, empty hate table)', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'TooLate');
+    const p = sim.entities.get(pid) as AnyEntity;
+    sim.enterRift(SEED, 20, pid);
+    const inst = sim.riftInstances.find((i: any) => i.partyKey !== null)!;
+    const mob = sim.entities.get(inst.mobIds[0]) as AnyEntity;
+    teleport(sim, p, mob.pos.x + 2, mob.pos.z);
+    p.maxHp = p.hp = 1_000_000;
+    sim.dealDamage(p, mob, mob.maxHp - 40, false, 'physical', 'Strike', 'hit', true);
+    expect(mob.hp).toBeLessThan(mob.maxHp);
+
+    sim.leaveRift(pid);
+
+    // Tick well past COMBAT_EXIT_MEMORY_SECONDS: the hold lapses and the
+    // deferred reset finally fires.
+    for (let i = 0; i < 20 * (COMBAT_EXIT_MEMORY_SECONDS + 10); i++) sim.tick();
+
+    expect(mob.hp).toBe(mob.maxHp);
+    expect(mob.aiState).toBe('idle');
+    expect(mob.inCombat).toBe(false);
+
+    sim.enterRift(SEED, 20, pid);
+    expect(mob.threat.has(pid)).toBe(false); // a real fresh pull, no restore
+    expect(inst.combatExitMemory.size).toBe(0); // the lapsed record was consumed, not left dangling
   });
 
   it('descending a floor clears any dangling combat-exit memory from the cleared floor', () => {

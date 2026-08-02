@@ -23,6 +23,7 @@ import {
 import { layoutColliders } from '../dungeon_layout';
 import { createGroundObject, createMob } from '../entity';
 import {
+  COMBAT_EXIT_MEMORY_SECONDS,
   type CombatExitThreatEntry,
   recordCombatExit,
   takeCombatExit,
@@ -463,8 +464,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   // any remembered mid-combat exit still holding their ids can never resolve
   // again once IDs are freed, but the map is inert only because `nextId` is
   // monotonic. Clear it explicitly so a new floor's freshly spawned mobs can
-  // never accidentally collide with a stale entry (belt-and-suspenders with
-  // the evadeEpoch guard in resumeRememberedCombat above).
+  // never accidentally collide with a stale entry.
   inst.combatExitMemory = new Map();
 }
 
@@ -679,6 +679,9 @@ export function enterRift(
         : (ctx.riftEvents.find((candidate) => candidate.eventId === eventId)?.upgrade ?? null);
     inst.seed = seed >>> 0;
     inst.baseLevel = Math.max(1, Math.min(60, Math.round(baseLevel)));
+    // Belt-and-suspenders with freeRiftInstance's clear: a freshly claimed slot
+    // must never carry a stale exit memory from whoever last held it.
+    inst.combatExitMemory = new Map();
     inst.floorIndex = 0;
     inst.floorCount = floorForInstance(inst, 0).floorCount;
     // Return spot: never inside the portal's walk-in radius, or leaving the
@@ -1386,7 +1389,17 @@ function snapshotCombatExit(ctx: SimContext, inst: RiftInstance, pid: number): v
     const mob = ctx.entities.get(id);
     if (!mob || mob.dead || !mob.inCombat) continue;
     const threat = mob.threat.get(pid);
-    if (threat !== undefined && threat > 0) mobThreat.push([id, threat, mob.evadeEpoch]);
+    if (threat !== undefined && threat > 0) {
+      mobThreat.push([id, threat, mob.evadeEpoch]);
+      // Hold this mob's evade-home reset open until the memory window lapses
+      // (issue #2653), same as the dungeon-door scrub: the leash break that is
+      // about to happen must not heal or clear the hate table out from under a
+      // same-run re-entry. Extends rather than shortens an already-live hold.
+      mob.combatExitHoldUntil = Math.max(
+        mob.combatExitHoldUntil,
+        ctx.time + COMBAT_EXIT_MEMORY_SECONDS,
+      );
+    }
   }
   recordCombatExit(inst.combatExitMemory, pid, ctx.time, mobThreat);
 }
@@ -1396,16 +1409,17 @@ function snapshotCombatExit(ctx: SimContext, inst: RiftInstance, pid: number): v
 // at the beacon/exit and force any mob that lost its target back into the fight,
 // instead of leaving it idle/evading until manually re-pulled. A lapsed or
 // absent memory entry is a no-op: the run resets exactly as before.
+//
+// Safe to restore unconditionally (no evadeEpoch check needed): resetEvadingMob
+// defers on `combatExitHoldUntil` for exactly this window, so a mob this snapshot
+// covers cannot have evade-reset or been re-pulled by anyone else in the meantime
+// (an 'evade' mob is damage-immune, see combat/damage.ts).
 function resumeRememberedCombat(ctx: SimContext, inst: RiftInstance, pid: number): void {
   const rec = takeCombatExit(inst.combatExitMemory, pid, ctx.time);
   if (!rec) return;
-  for (const [mobId, threat, evadeEpoch] of rec.mobThreat) {
+  for (const [mobId, threat] of rec.mobThreat) {
     const mob = ctx.entities.get(mobId);
     if (!mob || mob.dead) continue;
-    // The mob fully evade-reset since this snapshot was taken: it is a
-    // different pull now (possibly someone else's fresh one), so the old
-    // threat value must not be grafted onto it (issue #2653 follow-up).
-    if (mob.evadeEpoch !== evadeEpoch) continue;
     mob.threat.set(pid, threat);
     if (mob.aggroTargetId === null) retargetMob(ctx, mob);
   }
