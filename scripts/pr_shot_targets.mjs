@@ -3312,6 +3312,93 @@ export const TARGETS = [
     },
   },
   {
+    key: 'vendor-buy-count',
+    label: 'Vendor goods: the 1x/5x/10x/custom purchase control row (phase 21)',
+    when: [
+      'ui/hud/vendor/vendor_view',
+      'ui/hud/vendor/vendor_window',
+      'ui/hud/vendor/buy_quantity_prompt',
+      'sim/vendor_buy_stack',
+    ],
+    // Trader Wilkes stocks the staple food/potion counter, the count verb's
+    // home case: bread rows show the x5 chip beside a whole-count total while
+    // the Buy Stack tile keeps its own bulk read next to them. The frame is
+    // shot with the 5x multiple SELECTED through a real click on the control,
+    // so the pressed state, the re-priced rows, and the count-tracking
+    // disable state are all live behavior, not staged DOM.
+    //
+    // On the base tree the control row does not exist: the click finds no
+    // button, `shipped` stays false, and the plain window is the correct
+    // BEFORE frame; every after-side assertion is gated on shipped.
+    variants: [
+      { key: 'desktop', charClass: 'warrior', charName: 'Stackbuyer' },
+      { key: 'mobile', charClass: 'warrior', charName: 'Stackbuyer', mobile: true },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      // One evaluate for state + open, the vendor-tool-gate precedent: the
+      // HUD closes the vendor once the player drifts from the merchant, so
+      // the teleport and the open must land against the same ticking frame.
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes');
+        if (!wilkes) return { ok: false, reason: 'no trader_wilkes entity' };
+        const p = sim.player;
+        if (!p?.pos) return { ok: false, reason: 'no player' };
+        p.pos.x = wilkes.pos.x + 2;
+        p.pos.z = wilkes.pos.z;
+        p.prevPos = { ...p.pos };
+        sim.copper = 100000;
+        const el = document.querySelector('#vendor-window');
+        if (el) el.style.display = 'none';
+        game.hud.openVendor(wilkes.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`vendor-buy-count setup failed: ${setup.reason}`);
+      if (!(await pollForSize(page, '#vendor-window'))) {
+        throw new Error('vendor window did not open');
+      }
+      await wait(200);
+      // Select the 5x multiple through the REAL control (never a hud call):
+      // the click re-renders the window, so the pressed state and the count
+      // rows in the frame are the wired path end to end.
+      const state = await page.evaluate(() => {
+        const btn = document.querySelector(
+          '#vendor-window .vendor-qty-btn[data-focus-key="qty:5"]',
+        );
+        btn?.click();
+        return { shipped: Boolean(btn) };
+      });
+      await wait(200);
+      if (state.shipped) {
+        const after = await page.evaluate(() => {
+          const pressed = document.querySelector(
+            '#vendor-window .vendor-qty-btn[data-focus-key="qty:5"]',
+          );
+          const chips = [...document.querySelectorAll('#vendor-window .vendor-item .vi-qty')];
+          const chipRow = chips[0]?.closest('.vendor-item');
+          return {
+            pressed: pressed?.getAttribute('aria-pressed') === 'true',
+            chipCount: chips.length,
+            ariaNamesCount: (chipRow?.getAttribute('aria-label') ?? '').includes('5'),
+          };
+        });
+        if (!after.pressed) throw new Error('the 5x control did not take the pressed state');
+        if (after.chipCount === 0) throw new Error('no goods row carries the x5 count chip');
+        if (!after.ariaNamesCount) throw new Error('a count row aria-label does not name the qty');
+      }
+      return { clip: '#vendor-window' };
+    },
+  },
+  {
     key: 'train-window',
     label: 'Train view: station-master recipe training ladder',
     when: ['ui/hud/vendor/train_view', 'ui/hud/vendor/train_window'],
