@@ -541,6 +541,215 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     expect(meta.copper).toBe(40 * 20);
   });
 
+  it('buyItem count N buys N row units atomically at the per-unit price (phase 21)', () => {
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    // Food row: 5 purchases of the 5-unit bread stack, 25 units at 25c each.
+    meta.copper = 1_000;
+    items.buyItem(ctx, wilkes.id, 'baked_bread', pid, { count: 5 });
+    expect(sim.countItem('baked_bread', pid)).toBe(25);
+    expect(meta.copper).toBe(1_000 - 25 * 25);
+    // Single-unit row: 3 potions at 40c each.
+    meta.copper = 200;
+    items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid, { count: 3 });
+    expect(sim.countItem('minor_healing_potion', pid)).toBe(3);
+    expect(meta.copper).toBe(200 - 3 * 40);
+  });
+
+  it('buyItem count 1 and an empty options bag reproduce the plain buy exactly (acceptance a)', () => {
+    const runs = [undefined, {}, { count: 1 }] as const;
+    const results = runs.map((opts) => {
+      const sim = makeWorld();
+      const { pid, wilkes, meta } = vendorPlayer(sim);
+      meta.copper = 500;
+      items.buyItem(ctxOf(sim), wilkes.id, 'baked_bread', pid, opts);
+      return { count: sim.countItem('baked_bread', pid), copper: meta.copper };
+    });
+    for (const r of results) expect(r).toEqual({ count: 5, copper: 500 - 125 });
+  });
+
+  it('buyItem count with insufficient funds refuses WHOLE with the money toast (Q20)', () => {
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    // One copper short of the 5-count total: nothing is granted, nothing
+    // debited. A clamp-to-affordable here would be the bulk verb's semantics
+    // leaking into the count path.
+    meta.copper = 25 * 25 - 1;
+    sim.drainEvents();
+    items.buyItem(ctx, wilkes.id, 'baked_bread', pid, { count: 5 });
+    expect(errorTexts(sim.drainEvents())).toContain('Not enough money.');
+    expect(sim.countItem('baked_bread', pid)).toBe(0);
+    expect(meta.copper).toBe(25 * 25 - 1);
+  });
+
+  it('buyItem count with partial bag fit refuses WHOLE with the bags-full toast (Q20)', () => {
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    meta.copper = 10_000;
+    // Leave exactly one free slot: 25 bread units need 2 (stack 20 + 5), so
+    // 20 would fit and 5 would not; the buy must refuse whole, not grant 20.
+    meta.inventory = Array.from({ length: 15 }, () => ({ itemId: 'worn_sword', count: 1 }));
+    sim.drainEvents();
+    items.buyItem(ctx, wilkes.id, 'baked_bread', pid, { count: 5 });
+    expect(errorTexts(sim.drainEvents())).toContain('Your bags are full.');
+    expect(sim.countItem('baked_bread', pid)).toBe(0);
+    expect(meta.copper).toBe(10_000);
+  });
+
+  it('buyItem denies every hostile count with a toast and zero state change (Q20, acceptance c)', () => {
+    for (const hostile of [0, -1, Number.NaN, Number.POSITIVE_INFINITY, 2.5]) {
+      const sim = makeWorld();
+      const { pid, wilkes, meta } = vendorPlayer(sim);
+      meta.copper = 1_000;
+      sim.drainEvents();
+      items.buyItem(ctxOf(sim), wilkes.id, 'baked_bread', pid, { count: hostile });
+      expect(errorTexts(sim.drainEvents()), `count ${hostile}`).toContain(
+        'That item is not for sale.',
+      );
+      expect(sim.countItem('baked_bread', pid), `count ${hostile}`).toBe(0);
+      expect(meta.copper, `count ${hostile}`).toBe(1_000);
+    }
+  });
+
+  it('buyItem denies a safe-integer magnitude attack at the overflow guard, before any compare', () => {
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    // 1e15 passes sanitize (a safe integer), then 25c x 5e15 units overflows
+    // the safe range and the totals guard refuses with the money toast: no
+    // mint, no overflowed compare, no grant past capacity.
+    meta.copper = 1_000;
+    sim.drainEvents();
+    items.buyItem(ctxOf(sim), wilkes.id, 'baked_bread', pid, { count: 1e15 });
+    expect(errorTexts(sim.drainEvents())).toContain('Not enough money.');
+    expect(sim.countItem('baked_bread', pid)).toBe(0);
+    expect(meta.copper).toBe(1_000);
+  });
+
+  it('buyItem bulk wins over count on a crafted frame carrying both (the shipped verb)', () => {
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    // Bulk semantics: floor(250 / 40) = 6 potions for 240c. The count-5 path
+    // would have bought 5 for 200c, so both outcomes distinguish the arms.
+    meta.copper = 250;
+    items.buyItem(ctxOf(sim), wilkes.id, 'minor_healing_potion', pid, { bulk: true, count: 5 });
+    expect(sim.countItem('minor_healing_potion', pid)).toBe(6);
+    expect(meta.copper).toBe(250 - 6 * 40);
+  });
+
+  it('buyItem count on an Honor-priced row is forced to one purchase (Q23)', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'HonorCountBuyer');
+    const meta = sim.meta(pid)!;
+    const fury = [...sim.entities.values()].find((entity) => entity.templateId === 'fury')!;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = fury.pos.x;
+    player.pos.z = fury.pos.z;
+    meta.inventory.length = 0;
+    meta.honor = 10_000;
+
+    items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid, { count: 5 });
+
+    // One purchase, one per-purchase honor debit: never 5 x 800.
+    expect(sim.countItem('final_argument_greatblade', pid)).toBe(1);
+    expect(meta.honor).toBe(10_000 - 800);
+  });
+
+  it('buyItem count on a dual-price row is forced to one purchase charging both currencies once', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'DualPriceCountBuyer');
+    const meta = sim.meta(pid)!;
+    const fury = [...sim.entities.values()].find((entity) => entity.templateId === 'fury')!;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = fury.pos.x;
+    player.pos.z = fury.pos.z;
+    meta.inventory.length = 0;
+    const testId = 'test_warfare_rations_count';
+    ITEMS[testId] = {
+      id: testId,
+      name: 'Test Warfare Rations Count',
+      kind: 'food',
+      foodHp: 100,
+      buyValue: 10,
+      priceHonor: 7,
+      sellValue: 1,
+    };
+    fury.vendorItems.push(testId);
+    try {
+      meta.copper = 500;
+      meta.honor = 70;
+      items.buyItem(ctxOf(sim), fury.id, testId, pid, { count: 5 });
+      // Forced to one purchase: 5 food units, 50 copper (10 x 5 units), 7
+      // honor (per purchase, once). A multiplied honor debit here is the
+      // duplicate-soulbound class Q23 exists to prevent.
+      expect(sim.countItem(testId, pid)).toBe(5);
+      expect(meta.copper).toBe(500 - 50);
+      expect(meta.honor).toBe(70 - 7);
+    } finally {
+      fury.vendorItems.splice(fury.vendorItems.indexOf(testId), 1);
+      delete ITEMS[testId];
+    }
+  });
+
+  it('buyItem count never buys more than one mount (Q23)', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'MountCountBuyer');
+    sim.setPlayerLevel(20);
+    const meta = sim.meta(pid)!;
+    meta.inventory.length = 0;
+    meta.ridingTrained = true;
+    meta.copper = 100_000_000;
+    const marla = [...sim.entities.values()].find(
+      (e) => e.kind === 'npc' && e.templateId === 'stablemaster_marla',
+    )!;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = marla.pos.x;
+    player.pos.z = marla.pos.z;
+
+    items.buyItem(ctxOf(sim), marla.id, 'reins_valorsteed', pid, { count: 5 });
+
+    expect(sim.countItem('reins_valorsteed', pid)).toBe(1);
+    expect(meta.copper).toBe(100_000_000 - 100_000);
+  });
+
+  it('buyback stays one unit per click beside the count path (Q18 exclusion)', () => {
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    meta.copper = 1_000;
+    items.buyItem(ctx, wilkes.id, 'baked_bread', pid);
+    items.sellItem(ctx, 'baked_bread', 5, pid);
+    expect(sim.countItem('baked_bread', pid)).toBe(0);
+    // One redemption call restores exactly ONE unit off the 5-count row: the
+    // count widening must not leak into the index-addressed buyback shape.
+    items.buyBackItem(ctx, 'baked_bread', 0, pid);
+    expect(sim.countItem('baked_bread', pid)).toBe(1);
+    expect(meta.vendorBuyback[0]?.count).toBe(4);
+  });
+
+  it('buyItem count drive is deterministic: two same-seed sims land identical state', () => {
+    const run = () => {
+      const sim = makeWorld();
+      const { pid, wilkes, meta } = vendorPlayer(sim);
+      const ctx = ctxOf(sim);
+      meta.copper = 5_000;
+      items.buyItem(ctx, wilkes.id, 'baked_bread', pid, { count: 3 });
+      items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid, { count: 7 });
+      items.buyItem(ctx, wilkes.id, 'baked_bread', pid, { count: 999 }); // refused whole (unaffordable)
+      items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid);
+      return {
+        copper: meta.copper,
+        inventory: JSON.parse(JSON.stringify(meta.inventory)) as unknown,
+      };
+    };
+    const a = run();
+    const b = run();
+    expect(a).toEqual(b);
+    expect(a.copper).toBe(5_000 - 3 * 125 - 7 * 40 - 40);
+  });
+
   it('sellAllJunk bulk-sells only gray items, records each stack, emits one summary line', () => {
     const sim = makeWorld();
     const { pid, meta } = vendorPlayer(sim);

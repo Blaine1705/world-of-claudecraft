@@ -117,4 +117,17 @@ describe('mobile window layout CSS', () => {
     expect(mobileCss).not.toMatch(/body\.mobile-touch \.mkt-(?:search|filter) \{[^}]*\bflex:/);
     expect(mobileCss).not.toContain('body.mobile-touch .mkt-filters {');
   });
+
+  it('floors the vendor purchase-quantity controls at 40px under a coarse pointer (phase 21)', () => {
+    // The control row lives in components.css beside the rest of the vendor
+    // family; the coarse-pointer floor is the mobile tap-target contract the
+    // desktop chip size must never squeeze away.
+    const components = readFileSync(
+      new URL('../src/styles/components.css', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    expect(components).toMatch(
+      /@media \(pointer: coarse\) \{\s*\.vendor-qty-btn \{[^}]*min-width: 40px;[^}]*min-height: 40px;/,
+    );
+  });
 });

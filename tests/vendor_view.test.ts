@@ -277,3 +277,61 @@ describe('sellJunkButtonState', () => {
     expect(sellJunkButtonState([], table(keeper))).toEqual({ enabled: false, proceeds: 0 });
   });
 });
+
+describe('buildVendorView count multiples (phase 21)', () => {
+  it('the default build is 1x with no count fields, exactly the pre-phase shape', () => {
+    const items = table(item('bread', { buyValue: 5, kind: 'food' }));
+    const view = buildVendorView(['bread'], [], items, RICH);
+    expect(view.multiple).toBe(1);
+    expect(view.goods[0].countBuy).toBeUndefined();
+    expect(view.goods[0].customBuy).toBeUndefined();
+  });
+
+  it('a fixed multiple carries the whole-count total and count on eligible rows', () => {
+    const items = table(item('bread', { buyValue: 5, kind: 'food' }));
+    const view = buildVendorView(['bread'], [], items, RICH, 5);
+    expect(view.multiple).toBe(5);
+    // Food row unit is 5 units at 5c each: 25c per purchase, 125c for 5.
+    expect(view.goods[0].price).toEqual({ copper: 25, honor: 0 });
+    expect(view.goods[0].countBuy).toEqual({ count: 5, copper: 125, affordable: true });
+  });
+
+  it('affordability tracks the SELECTED multiple, not the 1x baseline', () => {
+    const items = table(item('potion', { buyValue: 40, kind: 'potion' }));
+    const poor = { copper: 100, honor: 0, gatheringProficiency: RICH.gatheringProficiency };
+    // 1x affordable (40 <= 100)...
+    const at1 = buildVendorView(['potion'], [], items, poor);
+    expect(at1.goods[0].affordable).toBe(true);
+    // ...but the 10x total is not (400 > 100): the row must disable on the
+    // count total while the baseline field stays the honest 1x read.
+    const at10 = buildVendorView(['potion'], [], items, poor, 10);
+    expect(at10.goods[0].affordable).toBe(true);
+    expect(at10.goods[0].countBuy).toEqual({ count: 10, copper: 400, affordable: false });
+  });
+
+  it('force-1 rows never grow count fields at any multiple (Q23)', () => {
+    const items = table(
+      item('marks_blade', { priceHonor: 800 }),
+      item('bound_tabard', { buyValue: 50 }),
+    );
+    (items.bound_tabard as { soulbound?: boolean }).soulbound = true;
+    const view = buildVendorView(['marks_blade', 'bound_tabard'], [], items, RICH, 10);
+    for (const row of view.goods) {
+      expect(row.countBuy, row.itemId).toBeUndefined();
+      expect(row.customBuy, row.itemId).toBeUndefined();
+    }
+  });
+
+  it("the 'custom' multiple flags eligible rows and keeps 1x affordability", () => {
+    const items = table(
+      item('bread', { buyValue: 5, kind: 'food' }),
+      item('marks_blade', { priceHonor: 800 }),
+    );
+    const view = buildVendorView(['bread', 'marks_blade'], [], items, RICH, 'custom');
+    expect(view.multiple).toBe('custom');
+    expect(view.goods[0].customBuy).toBe(true);
+    expect(view.goods[0].countBuy).toBeUndefined();
+    expect(view.goods[0].affordable).toBe(true);
+    expect(view.goods[1].customBuy).toBeUndefined();
+  });
+});

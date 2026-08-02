@@ -53,6 +53,36 @@ describe('ptr dev vendor', () => {
     }
   });
 
+  it('a free-vendor count purchase grants count x stack for nothing, capacity still gating (phase 21)', () => {
+    // The devVendor count arm, defined so freeVendor never becomes an
+    // untested leaf of the count path: costs stay zero at any count, the
+    // grant multiplies, sanitize still refuses hostile counts, and the
+    // capacity pre-check still refuses whole.
+    const sim = new Sim({ seed: 5, playerClass: 'warrior', autoEquip: false, devCommands: true });
+    sim.setPlayerLevel(20);
+    sim.chat('/dev vendor');
+    sim.tick();
+    const vendor = [...sim.entities.values()].find(
+      (e: Entity) => e.kind === 'npc' && (e as { devVendor?: boolean }).devVendor,
+    )!;
+    // A non-soulbound epic: soulbound rows are Q23 force-1 and would hide the
+    // multiplication this arm exists to pin.
+    const epic = vendor.vendorItems.find((id) => ITEMS[id].soulbound !== true)!;
+    const rig = sim as unknown as {
+      buyItem(npc: number, item: string, opts?: { count?: number }, pid?: number): void;
+      meta(pid?: number): { copper: number; inventory: unknown[] };
+    };
+    const copperBefore = rig.meta(sim.playerId).copper;
+
+    rig.buyItem(vendor.id, epic, { count: 3 }, sim.playerId);
+    expect(sim.countItem(epic)).toBe(3);
+    expect(rig.meta(sim.playerId).copper).toBe(copperBefore);
+
+    // Hostile count still denies on a free vendor: free never means unsanitized.
+    rig.buyItem(vendor.id, epic, { count: -5 }, sim.playerId);
+    expect(sim.countItem(epic)).toBe(3);
+  });
+
   it('is inert on a production realm: /dev vendor does nothing without devCommands', () => {
     const sim = new Sim({ seed: 5, playerClass: 'warrior', autoEquip: true, devCommands: false });
     sim.setPlayerLevel(20);

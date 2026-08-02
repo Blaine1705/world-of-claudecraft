@@ -807,3 +807,212 @@ describe('vendor window family: hud.ts focus-management wiring (WCAG 2.4.3)', ()
     expect(closeVendorBody).toContain('if (this.openVendorNpcId === null) return;');
   });
 });
+
+describe('renderVendorWindow: the 1x/5x/10x/custom control row (phase 21)', () => {
+  function goodsRow(itemId: string, over: Partial<VendorGoodsRow> = {}): VendorGoodsRow {
+    return {
+      itemId,
+      item: item(itemId),
+      price: { copper: 25, honor: 0 },
+      quantity: 1,
+      affordable: true,
+      requirementUnmet: false,
+      ...over,
+    };
+  }
+  function view(goods: VendorGoodsRow[], multiple: VendorView['multiple']): VendorView {
+    return { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple };
+  }
+
+  it('renders the four controls with focus keys and aria-pressed on the selection', () => {
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view([goodsRow('bread')], 5), deps());
+    const btns = [...el.querySelectorAll<HTMLButtonElement>('.vendor-qty-btn')];
+    expect(btns.map((b) => b.dataset.focusKey)).toEqual([
+      'qty:1',
+      'qty:5',
+      'qty:10',
+      'qty:custom',
+    ]);
+    expect(btns.map((b) => b.getAttribute('aria-pressed'))).toEqual([
+      'false',
+      'true',
+      'false',
+      'false',
+    ]);
+    // The strip is a named group for screen readers.
+    const row = el.querySelector('.vendor-qty-row');
+    expect(row?.getAttribute('role')).toBe('group');
+    expect(row?.getAttribute('aria-label')).toBeTruthy();
+  });
+
+  it('clicking a control reports the multiple through onQtyChange', () => {
+    const el = document.createElement('div');
+    const picked: unknown[] = [];
+    renderVendorWindow(
+      el,
+      'Vendor',
+      view([goodsRow('bread')], 1),
+      deps({ onQtyChange: (m) => picked.push(m) }),
+    );
+    const btns = [...el.querySelectorAll<HTMLButtonElement>('.vendor-qty-btn')];
+    for (const b of btns) b.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(picked).toEqual([1, 5, 10, 'custom']);
+  });
+
+  it('renders no control row when the vendor has no goods', () => {
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view([], 1), deps());
+    expect(el.querySelector('.vendor-qty-row')).toBeNull();
+  });
+
+  it('a count row shows the count chip and whole-count total, and disables on the count total', () => {
+    const el = document.createElement('div');
+    renderVendorWindow(
+      el,
+      'Vendor',
+      view(
+        [
+          goodsRow('bread', { countBuy: { count: 5, copper: 125, affordable: true } }),
+          goodsRow('water', { countBuy: { count: 5, copper: 250, affordable: false } }),
+        ],
+        5,
+      ),
+      deps(),
+    );
+    const rows = [...el.querySelectorAll<HTMLButtonElement>('.vendor-item')];
+    expect(rows[0].querySelector('.vi-qty')?.textContent).toContain('5');
+    expect(rows[0].querySelector('.vi-price')?.textContent).toContain('125');
+    expect(rows[0].disabled).toBe(false);
+    // The second row is 1x-affordable (the baseline field says true) but the
+    // 5x total is not: the disable state must track the SELECTED multiple.
+    expect(rows[1].disabled).toBe(true);
+    // The accessible name states qty and TOTAL price (acceptance f): the
+    // 125c count total renders through the money formatter as 1s 25c, which
+    // also pins that the aria carries the formatted read, not raw copper.
+    expect(rows[0].getAttribute('aria-label')).toContain('5');
+    expect(rows[0].getAttribute('aria-label')).toContain('1s 25c');
+  });
+
+  it('a count row click sends the count; ctrl/cmd still wins with bulk; 1x rows stay plain', () => {
+    const el = document.createElement('div');
+    const calls: [string, VendorBuyOptions | undefined][] = [];
+    renderVendorWindow(
+      el,
+      'Vendor',
+      view([goodsRow('bread', { countBuy: { count: 5, copper: 125, affordable: true } })], 5),
+      deps({ onBuy: (id, opts) => calls.push([id, opts]) }),
+    );
+    const row = el.querySelector<HTMLButtonElement>('.vendor-item')!;
+    row.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    row.dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }));
+    expect(calls).toEqual([
+      ['bread', { count: 5 }],
+      ['bread', { bulk: true }],
+    ]);
+  });
+
+  it('a force-1 row at a fixed multiple keeps its plain 1x rendering (no chip, no count aria)', () => {
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view([goodsRow('marks_blade')], 5), deps());
+    const row = el.querySelector<HTMLButtonElement>('.vendor-item')!;
+    expect(row.querySelector('.vi-qty')).toBeNull();
+    expect(row.getAttribute('aria-label')).toContain('marks_blade');
+  });
+});
+
+describe('renderVendorWindow: the custom-amount prompt (phase 21, Q19)', () => {
+  function customRow(itemId: string): VendorGoodsRow {
+    return {
+      itemId,
+      item: item(itemId),
+      price: { copper: 25, honor: 0 },
+      quantity: 1,
+      affordable: true,
+      requirementUnmet: false,
+      customBuy: true,
+    };
+  }
+  function mountStack(): HTMLElement {
+    document.querySelectorAll('#prompt-stack').forEach((n) => n.remove());
+    const stack = document.createElement('div');
+    stack.id = 'prompt-stack';
+    document.body.appendChild(stack);
+    return stack;
+  }
+
+  it('a custom row click opens the capped prompt instead of buying', () => {
+    const stack = mountStack();
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    const calls: unknown[] = [];
+    renderVendorWindow(
+      el,
+      'Vendor',
+      { goods: [customRow('bread')], buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 'custom' },
+      deps({ onBuy: (id, opts) => calls.push([id, opts]), buyCustomMax: () => 64 }),
+    );
+    el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
+      new MouseEvent('click', { bubbles: true }),
+    );
+    expect(calls).toEqual([]);
+    const prompt = stack.querySelector('.buy-quantity-prompt');
+    expect(prompt).not.toBeNull();
+    // The computed max is shown in the title and caps the input (Q19).
+    expect(prompt?.querySelector('.prompt-text')?.textContent).toContain('64');
+    const input = prompt?.querySelector<HTMLInputElement>('.prompt-number');
+    expect(input?.max).toBe('64');
+    // The window behind the modal is inert while it is open (the shared recipe).
+    expect(el.inert).toBe(true);
+    // Confirm submits the typed count through the same onBuy seam and clears inert.
+    input!.value = '12';
+    (prompt?.querySelectorAll('button')[0] as HTMLButtonElement).click();
+    expect(calls).toEqual([['bread', { count: 12 }]]);
+    expect(el.inert).toBe(false);
+    expect(stack.querySelector('.buy-quantity-prompt')).toBeNull();
+    el.remove();
+    stack.remove();
+  });
+
+  it('a zero-fit cap floors to 1 so a full-bag attempt reaches the server refusal honestly', () => {
+    const stack = mountStack();
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    renderVendorWindow(
+      el,
+      'Vendor',
+      { goods: [customRow('bread')], buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 'custom' },
+      deps({ buyCustomMax: () => 0 }),
+    );
+    el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
+      new MouseEvent('click', { bubbles: true }),
+    );
+    const input = stack.querySelector<HTMLInputElement>('.buy-quantity-prompt .prompt-number');
+    expect(input?.max).toBe('1');
+    el.remove();
+    stack.remove();
+  });
+
+  it('the typed amount is clamped to the cap at submit, never sent past it', () => {
+    const stack = mountStack();
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    const calls: unknown[] = [];
+    renderVendorWindow(
+      el,
+      'Vendor',
+      { goods: [customRow('bread')], buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 'custom' },
+      deps({ onBuy: (id, opts) => calls.push([id, opts]), buyCustomMax: () => 10 }),
+    );
+    el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
+      new MouseEvent('click', { bubbles: true }),
+    );
+    const prompt = stack.querySelector('.buy-quantity-prompt')!;
+    const input = prompt.querySelector<HTMLInputElement>('.prompt-number')!;
+    input.value = '999';
+    (prompt.querySelectorAll('button')[0] as HTMLButtonElement).click();
+    expect(calls).toEqual([['bread', { count: 10 }]]);
+    el.remove();
+    stack.remove();
+  });
+});
