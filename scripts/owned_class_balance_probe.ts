@@ -40,6 +40,9 @@ export interface OwnedClassCombatOutcomes {
   parry: number;
   block: number;
   resist: number;
+  // main's leash rework added an 'evade' outcome kind; probes must be able to
+  // tally it or the DamageEventKind index below stops typechecking.
+  evade: number;
   crit: number;
 }
 
@@ -817,6 +820,7 @@ export function runOwnedClassDpsProbe(
     parry: 0,
     block: 0,
     resist: 0,
+    evade: 0,
     crit: 0,
   };
   let totalDamage = 0;
@@ -912,6 +916,7 @@ export function averageOwnedClassDpsProbe(
       parry: average(runs.map((run) => run.outcomes.parry)),
       block: average(runs.map((run) => run.outcomes.block)),
       resist: average(runs.map((run) => run.outcomes.resist)),
+      evade: average(runs.map((run) => run.outcomes.evade)),
       crit: average(runs.map((run) => run.outcomes.crit)),
     },
   };

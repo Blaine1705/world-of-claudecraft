@@ -22,6 +22,7 @@ export function resurrectDeadGroupMembers(
   ctx: SimContext,
   caster: Entity,
   hpFrac: number,
+  abilityId: string,
   school: AbilityDef['school'] = 'arcane',
 ): void {
   const party = ctx.partyOf(caster.id);
@@ -39,6 +40,7 @@ export function resurrectDeadGroupMembers(
       school,
       fx: 'nova',
       radius: 2,
+      ability: abilityId,
     });
   }
 }

@@ -29,8 +29,9 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
-import { lockNormalDungeonResetOnBossKill } from '../instances/dungeons';
+import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
 import { pvpDamageMultiplier } from '../pvp';
+import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -88,7 +89,10 @@ import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
-const CORPSE_DURATION = 60;
+// Exported so the respawn policy's guard can check it against the zone tiers:
+// updateMob defers an in-place respawn while a corpse is still lootable, so the
+// effective delay is max(tier, this). See tests/respawn_policy.test.ts.
+export const CORPSE_DURATION = 60;
 // Self attack-speed buff a wounded frenzyOnHit mob gains; sole user maybeFrenzyOnHit.
 const BLOOD_FRENZY_AURA_ID = 'blood_frenzy';
 const VICTORY_RUSH_WINDOW = 20;
@@ -147,7 +151,29 @@ export function dealDamage(
     !canDetectStealthedTarget(source, target, PET_STEALTH_DETECTION_RADIUS)
   )
     return 0;
-  if (target.gm || target.devGod) return 0; // GMs and /dev god are invulnerable (every damage path funnels here)
+  if (target.gm || target.devGod) {
+    // GMs and /dev god are invulnerable (every damage path funnels here). For
+    // /dev god under ALLOW_DEV_COMMANDS the hit still EMITS as a zero-damage
+    // event: the renderer keys attacker swing animations and FCT off damage
+    // events, so a silent return made every melee mob look like it "follows
+    // but never attacks" during god-mode playtests (the live-test report).
+    // Presentation only, no threat, procs, deed counters, or rng. Real GMs
+    // (production, no devCommands) stay fully silent as before.
+    if (target.devGod && ctx.devCommands && source) {
+      ctx.emit({
+        type: 'damage',
+        sourceId: source.id,
+        targetId: target.id,
+        amount: 0,
+        crit: false,
+        school,
+        ability,
+        kind,
+        ...(attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
+      });
+    }
+    return 0;
+  }
   // Ice Block (Cold Coffin): while encased in stasis the mage is FULLY immune to
   // damage (owner 2026-07-13), so nothing gets through until it is cancelled or
   // expires. Every damage path funnels here, so this covers melee, spells, and DoTs.
@@ -157,7 +183,25 @@ export function dealDamage(
   // Classic mechanics make it immune while it retreats, so it can't be chipped
   // down or killed outright for a risk-free kill. Owned pets use pet AI, not
   // wild-mob leash recovery, and must not inherit this immunity from stale state.
-  if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return 0;
+  // Direct attacks report an Evade result (FCT word + combat log line); DoT and
+  // reflect ticks stay silent so a dotted evader does not spam a word per tick.
+  // The early return keeps every downstream effect off: no threat, no combat
+  // entry, no stealth break, no tap.
+  if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) {
+    if (direct && source) {
+      ctx.emit({
+        type: 'damage',
+        sourceId: source.id,
+        targetId: target.id,
+        amount: 0,
+        crit: false,
+        school,
+        ability,
+        kind: 'evade',
+      });
+    }
+    return 0;
+  }
   amount = Math.max(0, amount);
   const attackAnimation = attackAnimationStarted ? { attackAnimationStarted: true as const } : {};
 
@@ -514,12 +558,21 @@ export function dealDamage(
     }
   }
 
-  // duels end at 1 hp, nobody dies
+  // duels end at 1 hp, nobody dies. A duel that already ended earlier THIS
+  // SAME tick (endDuel defers the ctx.duels delete to tick-tail, see
+  // social/duel.ts) still matches here on purpose: a reciprocal lethal hit
+  // against the other duelist, resolving later in the same tick, must be
+  // clamped too instead of producing a real death on a simultaneous double-kill.
+  // Keyed purely on lifetime (still live, or ended this very tick) rather than
+  // `duel.state === 'active'`: state is never flipped when a duel ends, so an
+  // ended entry that outlives its own tick (only reachable today via
+  // Sim.removePlayer ending a duel outside a tick) would otherwise still clamp
+  // for one extra tick.
   const duel = target.kind === 'player' ? ctx.duels.get(target.id) : undefined;
   if (
     guardianWardRestore === 0 &&
     duel &&
-    duel.state === 'active' &&
+    (duel.endedTick === undefined || duel.endedTick === ctx.tickCount) &&
     sourcePlayer &&
     (sourcePlayer.id === duel.a || sourcePlayer.id === duel.b)
   ) {
@@ -1199,9 +1252,14 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     }
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
-    e.respawnTimer =
-      template?.respawnSeconds ??
-      ctx.cfg.respawnSeconds * (template?.respawnMult ?? (template?.rare ? 4 : 1));
+    // Respawn cadence is the zone's, not one flat world timer: the policy leaf
+    // reads the mob's SPAWN point so a corpse dragged across a border still
+    // returns on its home band's schedule. Draws no rng.
+    // A run-scoped mob (an escort ambush wave) was never placed by a camp, so it
+    // has no home to return to and never respawns in place; its run drops it.
+    e.respawnTimer = e.runScoped
+      ? Number.POSITIVE_INFINITY
+      : resolveRespawnSeconds(template, e.spawnPos, ctx.cfg.respawnSeconds);
     // A fixed respawn also caps corpse decay so the mob returns on schedule whether
     // or not its loot was looted (training dummy: 10s).
     if (template?.respawnSeconds !== undefined) {
@@ -1403,6 +1461,9 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
     ctx.awardHeroicMarks(e, heroicRewardRecipients);
+    // A bossExitPortal dungeon opens its far-end exit the moment the final
+    // boss falls (both difficulties; no-op everywhere else).
+    spawnBossExitPortal(ctx, e);
     // Nythraxis normal and heroic raid lockouts use a wider room sweep than
     // generic dungeon claims. Run it after heroic settlement so its lock stamp
     // cannot make first-clear participants look previously rewarded.
