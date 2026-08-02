@@ -2,6 +2,9 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
+const packageJson = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+) as { packageManager?: string };
 const gate = readFileSync(new URL('../scripts/gate.mjs', import.meta.url), 'utf8');
 const viteConfig = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
 const balancedSequencer = readFileSync(
@@ -12,6 +15,16 @@ const shardPartition = readFileSync(
   new URL('../scripts/ci_shard_partition.mjs', import.meta.url),
   'utf8',
 );
+
+// Exact pnpm version pinned in package.json packageManager (e.g. pnpm@10.34.5).
+const PNPM_VERSION = (() => {
+  const field = packageJson.packageManager ?? '';
+  const match = field.match(/^pnpm@(\d+\.\d+\.\d+)$/);
+  if (!match) {
+    throw new Error(`package.json packageManager must be pnpm@X.Y.Z, got ${JSON.stringify(field)}`);
+  }
+  return match[1];
+})();
 
 // Locked shard count for pr-gate and release-gate matrices (CI speed packet).
 // Supersedes the prior toolchain N=4 on this surface. Both test jobs share this
@@ -82,6 +95,26 @@ function jobSource(name: string): string {
 }
 
 describe('CI workflow parity', () => {
+  it('installs with pnpm frozen-lockfile and pins the packageManager version', () => {
+    // Full migration: no npm ci install path, cache and install are pnpm-only,
+    // and every pnpm/action-setup version matches package.json packageManager so
+    // CI cannot silently lag the local pin.
+    expect(workflow).not.toContain('run: npm ci');
+    expect(workflow).not.toContain('cache: npm');
+    expect(workflow).toContain('cache: pnpm');
+    expect(workflow).toContain('run: pnpm install --frozen-lockfile');
+    expect(workflow).toContain('uses: pnpm/action-setup@v4');
+    expect(workflow).toContain(`version: ${PNPM_VERSION}`);
+    const setupPins = workflow.match(/uses: pnpm\/action-setup@v4\n {8}with:\n {10}version: [^\n]+/g);
+    expect(setupPins?.length).toBeGreaterThanOrEqual(4);
+    for (const pin of setupPins ?? []) {
+      expect(pin).toContain(`version: ${PNPM_VERSION}`);
+    }
+    // Lockfile path filter + tsc cache keys must hash pnpm-lock.yaml only.
+    expect(workflow).toContain('pnpm-lock.yaml');
+    expect(workflow).not.toContain('package-lock.json');
+  });
+
   it('cancels a superseded PR run without letting PR traffic cancel release pushes', () => {
     // Anchored above the first job so a future job named "concurrency" cannot
     // be mistaken for this block. D4: group includes event_name so pull_request

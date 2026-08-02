@@ -88,8 +88,10 @@ Create an account, create a character, and enter the live world. To run that sam
 Offline mode is a local single-player world with no account and no server authority, so it ships in development builds only. Run the dev server and it appears in the mode picker:
 
 ```bash
-npm install
-npm run dev        # then open http://localhost:5173 and choose Play Offline
+# once per machine (match package.json packageManager; Corepack not required)
+npm install -g pnpm@10.34.5
+pnpm install --frozen-lockfile
+pnpm run dev       # then open http://localhost:5173 and choose Play Offline
 ```
 
 Name your character, pick any of the nine classes, and you start in **Eastbrook Vale** (levels 1-7), a market town ringed by hubs: wolf runs to the north, boar meadows east, the Sableweb woods west, Mirror Lake northwest, a burrower-ridden copper dig southwest, and a ruined chapel of restless dead northeast, with Gorrak's bandit camp to the southeast. The north road climbs a mountain pass into **Mirefen Marsh** (6-13, hub Fenbridge) and on up to **Thornpeak Heights** (13-20, hub Highwatch). The world seed is fixed in `src/main.ts`, so it is the same place every visit.
@@ -129,12 +131,13 @@ For **remote hosting**, put the compose stack on any VPS, set a real `POSTGRES_P
 ### Develop online with hot reload
 
 ```bash
-npm install
+npm install -g pnpm@10.34.5   # once per machine; match package.json packageManager
+pnpm install --frozen-lockfile
 cp .env.example .env
 # set POSTGRES_PASSWORD and point DATABASE_URL at the same password
-npm run db:up        # postgres 16 in docker (port 5433, volume-persisted)
-npm run server       # authoritative game server on :8787 (REST + WebSocket)
-npm run dev          # client dev server on :5173 (proxies /api, /admin/api, and /ws)
+pnpm run db:up       # postgres 16 in docker (port 5433, volume-persisted)
+pnpm run server      # authoritative game server on :8787 (REST + WebSocket)
+pnpm run dev         # client dev server on :5173 (proxies /api, /admin/api, and /ws)
 ```
 
 Open http://localhost:5173, choose **Play Online**, create an account, create a character, and Enter World. The character-select screen shows the latest release news in its News & Updates panel, with NEW badges for anything you have not seen. Open a second tab and log in again to see each other in town. `Enter` opens chat. The player wiki is the in-repo Guide, served at http://localhost:5173/wiki and at `/wiki` in production; its content is generated from current game data by `npm run wiki:content`.
