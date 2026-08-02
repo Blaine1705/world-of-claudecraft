@@ -195,12 +195,17 @@ describe('Nythraxis matrix DPS rotations', () => {
   });
 
   it('normalizes the legacy matrix fixtures through the canonical talent allocation', () => {
-    expect(source).toContain('const canonical = benchmarkAllocation(');
+    // The allocation is named `allocation`, not `canonical`, since the v0.31
+    // waves gave ensureTalents two plan shapes (an overhauled spec pins its own
+    // six rows; a benchmark spec overlays benchmarkRows on the default build).
+    // Pin the whole call and both of its consumers so a rename cannot quietly
+    // let an unvalidated or unapplied build through.
+    expect(source).toContain('const allocation = benchmarkAllocation(');
     expect(source).toContain('defaultBuild(spec.cls, 20)');
     expect(source).toContain("spec.talents.spec ?? ''");
     expect(source).toContain('spec.benchmarkRows');
-    expect(source).toContain('validateAllocation(spec.cls, canonical');
-    expect(source).toContain('sim.applyTalents(canonical, pid)');
+    expect(source).toContain('validateAllocation(spec.cls, allocation');
+    expect(source).toContain('sim.applyTalents(allocation, pid)');
     expect(source.match(/benchmarkRows: WARLOCK_BENCHMARK_ROWS/g)).toHaveLength(3);
   });
 
@@ -210,7 +215,11 @@ describe('Nythraxis matrix DPS rotations', () => {
     expect(source).toContain(
       'dpsSet: [...plan.baselineDps.map(specForKey), specForKey(plan.comparedKey)]',
     );
-    expect(source).toContain('for (const seed of seeds)');
+    // Monte Carlo mode draws its own 1..N sample, so the seed loop reads
+    // `runSeeds` rather than `seeds` directly; both modes still run every
+    // selected plan once per seed.
+    expect(source).toContain('const runSeeds =');
+    expect(source).toContain('for (const [seedIndex, seed] of runSeeds.entries())');
   });
 
   it('builds complete paired raids and separates setup time from combat time', () => {
