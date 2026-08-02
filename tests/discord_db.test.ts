@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   accountForDiscord,
   claimSwag,
@@ -14,10 +14,17 @@ import {
   linkDiscordToAccount,
   loadRewardState,
   peekDiscordPendingLogin,
+  setDiscordGuildMember,
   setDiscordLinkEmail,
   setDiscordMemberMetaBulk,
+  unlinkDiscord,
 } from '../server/discord_db';
 import { drainLinkChanges } from '../server/discord_link_changes';
+import {
+  configureDiscordStatusCache,
+  readDiscordStatusCore,
+  resetDiscordStatusCacheForTests,
+} from '../server/discord_status_cache';
 
 // discord_db functions take the pg `pool` as an argument, so a fake pool (no
 // vi.mock needed) drives every branch. The fake routes by normalized SQL and
@@ -558,7 +565,7 @@ describe('setDiscordMemberMetaBulk', () => {
       '(dl.discord_username, dl.discord_joined_at, dl.discord_role) IS DISTINCT FROM (COALESCE(i.nickname, dl.discord_username), COALESCE(i.joined_at, dl.discord_joined_at), i.role_key) AS will_change',
     );
     expect(sql).toContain(
-      'WHERE dl.discord_user_id = i.discord_user_id AND (dl.discord_username, dl.discord_joined_at, dl.discord_role) IS DISTINCT FROM (COALESCE(i.nickname, dl.discord_username), COALESCE(i.joined_at, dl.discord_joined_at), i.role_key) RETURNING 1',
+      'WHERE dl.discord_user_id = i.discord_user_id AND (dl.discord_username, dl.discord_joined_at, dl.discord_role) IS DISTINCT FROM (COALESCE(i.nickname, dl.discord_username), COALESCE(i.joined_at, dl.discord_joined_at), i.role_key) RETURNING dl.account_id',
     );
     expect(sql).not.toContain('<>');
     expect(sql).not.toContain('IS NOT DISTINCT FROM');
@@ -566,6 +573,14 @@ describe('setDiscordMemberMetaBulk', () => {
     // matters, so a third copy added later must not slip past assertions that only
     // ask whether each of the two known clauses is present.
     expect(sql.split('IS DISTINCT FROM')).toHaveLength(3);
+    // Phase 9: the /api/discord status bust reads the changed rows' account ids
+    // off the SAME statement (RETURNING dl.account_id above feeds this
+    // aggregate), so the write and the bust population cannot drift apart.
+    // Anchored with its FROM clause: `updated` is the only CTE aggregated here,
+    // and the alias is what setDiscordMemberMetaBulk parses.
+    expect(sql).toContain(
+      '(SELECT COALESCE(array_agg(account_id), ARRAY[]::int[]) FROM updated) AS changed_account_ids',
+    );
     // The comparison must be against the value that would actually be STORED, so
     // the COALESCE rules appear on both the write and the compare.
     expect(sql).toContain(
@@ -941,5 +956,233 @@ describe('discord pending logins', () => {
     expect(live.didRun('DELETE FROM discord_pending_logins')).toBe(true);
     const dead = makePool(() => NONE);
     expect(await consumeDiscordPendingLogin(dead.pool, 'tok')).toBeNull();
+  });
+});
+
+describe('/api/discord status cache busts ride the real write paths (Phase 9)', () => {
+  // Every case drives the REAL discord_db write function; the assertion is the
+  // per-account refresh COUNT on an installed counting reader, which proves the
+  // bust fired through the write's own code path (calling bust() directly would
+  // prove only that bust() exists). Negative arms per site: the no-op /refusal
+  // shapes must NOT evict a healthy snapshot (busts ride real writes only).
+  const reads = new Map<number, number>();
+
+  beforeEach(() => {
+    reads.clear();
+    configureDiscordStatusCache(async (accountId) => {
+      reads.set(accountId, (reads.get(accountId) ?? 0) + 1);
+      return { link: null, points: 0, lifetimePoints: 0, claimedSwagIds: [], passwordSet: true };
+    });
+    resetDiscordStatusCacheForTests();
+  });
+  afterEach(() => {
+    resetDiscordStatusCacheForTests();
+  });
+
+  const warm = (id: number) => readDiscordStatusCore(id);
+  const readsFor = (id: number) => reads.get(id) ?? 0;
+
+  it('grantRewardPoints busts the granted account on a real balance write', async () => {
+    const { pool } = makePool((s) => {
+      if (s.includes('INSERT INTO reward_points'))
+        return { rows: [{ points: '10', lifetime_points: '10' }], rowCount: 1 };
+      return NONE;
+    });
+    await warm(42);
+    await warm(43);
+    await grantRewardPoints(pool, 42, 10, 'test');
+    await warm(42);
+    await warm(43);
+    expect(readsFor(42)).toBe(2);
+    // Cross-account isolation through a real write: 43's entry survives 42's bust.
+    expect(readsFor(43)).toBe(1);
+  });
+
+  it('a dedupe-key replay and a zero delta leave the cached entry alone', async () => {
+    const replay = makePool((s) => {
+      if (s.includes('ON CONFLICT (account_id, dedupe_key)')) return NONE; // already granted
+      if (s.includes('SELECT points, lifetime_points'))
+        return { rows: [{ points: '5', lifetime_points: '5' }], rowCount: 1 };
+      return NONE;
+    });
+    await warm(42);
+    await grantRewardPoints(replay.pool, 42, 10, 'test', 'key1');
+    await warm(42);
+    expect(readsFor(42)).toBe(1);
+
+    const zero = makePool((s) => {
+      if (s.includes('SELECT points, lifetime_points'))
+        return { rows: [{ points: '5', lifetime_points: '5' }], rowCount: 1 };
+      return NONE;
+    });
+    await grantRewardPoints(zero.pool, 42, 0, 'test');
+    await warm(42);
+    expect(readsFor(42)).toBe(1);
+  });
+
+  it('claimSwag busts on EVERY successful claim, the cost-0 arm included', async () => {
+    const priced = makePool((s) => {
+      if (s.includes('INSERT INTO swag_claims')) return { rows: [{ id: 1 }], rowCount: 1 };
+      if (s.includes('UPDATE reward_points SET points = points -'))
+        return { rows: [{ points: '1' }], rowCount: 1 };
+      return NONE;
+    });
+    await warm(42);
+    expect((await claimSwag(priced.pool, 42, 'hat', 100)).ok).toBe(true);
+    await warm(42);
+    expect(readsFor(42)).toBe(2);
+
+    // A free claim moves no points (no feed enqueue) but still adds a
+    // claimedSwagIds entry, which is a payload field, so it must bust too.
+    const free = makePool((s) => {
+      if (s.includes('INSERT INTO swag_claims')) return { rows: [{ id: 2 }], rowCount: 1 };
+      if (s.includes('SELECT points FROM reward_points'))
+        return { rows: [{ points: '3' }], rowCount: 1 };
+      return NONE;
+    });
+    expect((await claimSwag(free.pool, 42, 'title', 0)).ok).toBe(true);
+    await warm(42);
+    expect(readsFor(42)).toBe(3);
+  });
+
+  it('claimSwag refusal arms (already claimed, cannot afford) never bust', async () => {
+    const claimed = makePool((s) => {
+      if (s.includes('INSERT INTO swag_claims')) return NONE; // ON CONFLICT DO NOTHING hit
+      return NONE;
+    });
+    await warm(42);
+    expect((await claimSwag(claimed.pool, 42, 'hat', 100)).ok).toBe(false);
+    await warm(42);
+    expect(readsFor(42)).toBe(1);
+
+    const broke = makePool((s) => {
+      if (s.includes('INSERT INTO swag_claims')) return { rows: [{ id: 3 }], rowCount: 1 };
+      if (s.includes('UPDATE reward_points SET points = points -')) return NONE; // points < cost
+      return NONE;
+    });
+    expect((await claimSwag(broke.pool, 42, 'hat', 100)).ok).toBe(false);
+    await warm(42);
+    expect(readsFor(42)).toBe(1);
+  });
+
+  it('linkDiscordToAccount busts on a landed upsert, never on the owned-by-other refusal', async () => {
+    const info = {
+      discordUserId: '80351110224678912',
+      username: 'maxp',
+      avatar: null,
+      email: null,
+      guildMember: true,
+    };
+    const ok = makePool((s) => {
+      if (s.includes('SELECT account_id FROM discord_links WHERE discord_user_id')) return NONE;
+      return NONE;
+    });
+    await warm(42);
+    expect(await linkDiscordToAccount(ok.pool, 42, info)).toBe(true);
+    await warm(42);
+    expect(readsFor(42)).toBe(2);
+
+    const owned = makePool((s) => {
+      if (s.includes('SELECT account_id FROM discord_links WHERE discord_user_id'))
+        return { rows: [{ account_id: 99 }], rowCount: 1 };
+      return NONE;
+    });
+    expect(await linkDiscordToAccount(owned.pool, 42, info)).toBe(false);
+    await warm(42);
+    expect(readsFor(42)).toBe(2);
+  });
+
+  it('unlinkDiscord busts only when a row was really deleted', async () => {
+    const deleted = makePool((s) =>
+      s.includes('DELETE FROM discord_links') ? { rows: [], rowCount: 1 } : NONE,
+    );
+    await warm(42);
+    await unlinkDiscord(deleted.pool, 42);
+    await warm(42);
+    expect(readsFor(42)).toBe(2);
+
+    // The repeat unlink matches nothing: an idempotent no-op must not evict.
+    const repeat = makePool(() => NONE);
+    await unlinkDiscord(repeat.pool, 42);
+    await warm(42);
+    expect(readsFor(42)).toBe(2);
+  });
+
+  it('setDiscordGuildMember busts on a matched row, not for an account with no link', async () => {
+    const matched = makePool((s) =>
+      s.includes('UPDATE discord_links SET guild_member') ? { rows: [], rowCount: 1 } : NONE,
+    );
+    await warm(42);
+    await setDiscordGuildMember(matched.pool, 42, true);
+    await warm(42);
+    expect(readsFor(42)).toBe(2);
+
+    const unmatched = makePool(() => NONE);
+    await setDiscordGuildMember(unmatched.pool, 42, true);
+    await warm(42);
+    expect(readsFor(42)).toBe(2);
+  });
+
+  it('setDiscordMemberMetaBulk busts exactly the changed accounts off the RETURNING', async () => {
+    const { pool } = makePool(() => ({
+      rows: [{ changed: '1', skipped: '1', unapplied: [], changed_account_ids: [42] }],
+      rowCount: 1,
+    }));
+    await warm(42);
+    await warm(43);
+    await setDiscordMemberMetaBulk(pool, [
+      metaRecord({ discordUserId: 'u42' }),
+      metaRecord({ discordUserId: 'u43' }),
+    ]);
+    await warm(42);
+    await warm(43);
+    // The changed account refreshes; the skipped one keeps its snapshot.
+    expect(readsFor(42)).toBe(2);
+    expect(readsFor(43)).toBe(1);
+  });
+
+  it('setDiscordMemberMetaBulk tolerates a row without changed_account_ids and busts nothing', async () => {
+    // Defensive-parse arm, same shape as the unapplied guard: a router (or a
+    // future statement variant) that omits the aggregate must not throw or bust.
+    // With changed = 0 the missing aggregate is legitimate silence: the warn
+    // below is reserved for the rows-changed-but-population-lost shape.
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const { pool } = makePool(() => ({
+        rows: [{ changed: '0', skipped: '1', unapplied: [] }],
+        rowCount: 1,
+      }));
+      await warm(42);
+      const result = await setDiscordMemberMetaBulk(pool, [metaRecord()]);
+      expect(result).toEqual({ changed: 0, skipped: 1, unapplied: [] });
+      await warm(42);
+      expect(readsFor(42)).toBe(1);
+      expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it('setDiscordMemberMetaBulk warns once when rows changed but the aggregate is missing', async () => {
+    // The invisible-staleness hole the warn exists for: the UPDATE wrote rows,
+    // but the bust population was lost, so nothing is busted AND the log says
+    // so. Both directions asserted: the warn fires exactly once, and the warm
+    // entry is NOT evicted (no id to bust with).
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const { pool } = makePool(() => ({
+        rows: [{ changed: '1', skipped: '0', unapplied: [] }],
+        rowCount: 1,
+      }));
+      await warm(42);
+      const result = await setDiscordMemberMetaBulk(pool, [metaRecord()]);
+      expect(result).toEqual({ changed: 1, skipped: 0, unapplied: [] });
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      expect(String(warnSpy.mock.calls[0][0])).toContain('changed_account_ids missing');
+      await warm(42);
+      expect(readsFor(42)).toBe(1);
+    } finally {
+      warnSpy.mockRestore();
+    }
   });
 });

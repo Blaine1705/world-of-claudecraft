@@ -24,6 +24,11 @@ import {
   discordLinksForAccounts,
   setDiscordMemberMetaBulk,
 } from '../server/discord_db';
+import {
+  configureDiscordStatusCache,
+  readDiscordStatusCore,
+  resetDiscordStatusCacheForTests,
+} from '../server/discord_status_cache';
 
 const DB_URL = process.env.TEST_DATABASE_URL;
 const SCHEMA = 'discord_db_integration_test';
@@ -143,6 +148,49 @@ describeDb('discord set-based statements (real Postgres)', () => {
         { discord_user_id: 'changes', discord_username: 'New' },
         { discord_user_id: 'identical', discord_username: 'Same' },
       ]);
+    });
+
+    it('busts exactly the CHANGED accounts /api/discord status cores (Phase 9), executed', async () => {
+      // The bust population rides `RETURNING dl.account_id` off the UPDATE CTE,
+      // a column this file must execute for real: the DB-free suite can only
+      // pin the SQL text and parse a scripted row (novel SQL needs an executed
+      // test). The status cache itself is in-memory, so installing a counting
+      // reader here observes the busts the real statement produced.
+      await seedLink(1, 'changes', { username: 'Old', role: null });
+      await seedLink(2, 'identical', {
+        username: 'Same',
+        joinedAt: '2023-11-14T22:13:20.000Z',
+        role: 'mods',
+      });
+      const reads = new Map<number, number>();
+      configureDiscordStatusCache(async (accountId) => {
+        reads.set(accountId, (reads.get(accountId) ?? 0) + 1);
+        return { link: null, points: 0, lifetimePoints: 0, claimedSwagIds: [], passwordSet: true };
+      });
+      resetDiscordStatusCacheForTests();
+      try {
+        await readDiscordStatusCore(1);
+        await readDiscordStatusCore(2);
+        const result = await setDiscordMemberMetaBulk(pool, [
+          { discordUserId: 'changes', nickname: 'New', joinedAtMs: null, roleKey: null },
+          {
+            discordUserId: 'identical',
+            nickname: 'Same',
+            joinedAtMs: 1_700_000_000_000,
+            roleKey: 'mods',
+          },
+          { discordUserId: 'nolink', nickname: 'Ghost', joinedAtMs: null, roleKey: null },
+        ]);
+        expect(result).toEqual({ changed: 1, skipped: 1, unapplied: ['nolink'] });
+        await readDiscordStatusCore(1);
+        await readDiscordStatusCore(2);
+        // The changed row's account refreshed; the skipped account kept its
+        // snapshot (the statement returned account id 1 and only 1).
+        expect(reads.get(1)).toBe(2);
+        expect(reads.get(2)).toBe(1);
+      } finally {
+        resetDiscordStatusCacheForTests();
+      }
     });
 
     it('writes NO row version when the incoming values already match', async () => {

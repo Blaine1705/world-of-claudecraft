@@ -18,6 +18,7 @@ vi.mock('pg', () => ({
 }));
 
 import { hashPassword } from '../server/auth';
+import { consumePasswordResetRequest } from '../server/db';
 import {
   handleDiscordCallback,
   handleDiscordLoginLink,
@@ -27,8 +28,10 @@ import {
   handleDiscordUnlink,
   handleNativeDiscordExchange,
   handleSwagClaim,
+  setDiscordPresenceCache,
 } from '../server/discord';
 import { drainLinkChanges } from '../server/discord_link_changes';
+import { resetDiscordStatusCacheForTests } from '../server/discord_status_cache';
 import { resetNativeDiscordHandoffsForTest } from '../server/native_discord_handoff';
 import { resetAuthFailures, resetDiscordRateLimits } from '../server/ratelimit';
 
@@ -138,6 +141,10 @@ beforeEach(() => {
   // The link/unlink handlers and the reward grants they trigger write into the
   // module-global linked-member change feed; start every test with an empty queue.
   drainLinkChanges();
+  // The /api/discord status core is cached per account (Phase 9); drop the
+  // cache so no case inherits another's snapshot (the daily-rewards suites'
+  // beforeEach bust pattern).
+  resetDiscordStatusCacheForTests();
   dbMock.query.mockReset();
   dbMock.query.mockImplementation((sql: string) => Promise.resolve(defaultRouter(sql)));
 });
@@ -301,6 +308,182 @@ describe('GET /api/discord (status)', () => {
     const res = makeRes();
     await handleDiscordStatus(makeReq(), res, 1);
     expect(parse(res).data.passwordSet).toBe(true);
+  });
+});
+
+describe('GET /api/discord status cache (Phase 9)', () => {
+  // These arms drive the REAL handlers over the pg mock, so the query spy's
+  // call count is the statement counter: a cache hit must add ZERO queries.
+  const LINKED_ROW = {
+    account_id: 1,
+    discord_user_id: '80351110224678912',
+    discord_username: 'maxp',
+    discord_avatar: null,
+    guild_member: true,
+    linked_at: 'now',
+  };
+
+  it('serves the second read inside the TTL with zero payload queries and an identical body', async () => {
+    linkRow = [LINKED_ROW];
+    rewardRows = [{ points: '1500', lifetime_points: '2500' }];
+    swagClaimRows = [{ swag_id: 'title_discordian' }];
+    accountByIdRows = [{ id: 1, username: 'maxp', password_set: true }];
+    const first = makeRes();
+    await handleDiscordStatus(makeReq(), first, 1);
+    const queriesAfterMiss = dbMock.query.mock.calls.length;
+    // The miss costs exactly the four payload reads (link, reward state, swag
+    // claims, account row): the incident's per-request cost, now paid per TTL.
+    expect(queriesAfterMiss).toBe(4);
+    const second = makeRes();
+    await handleDiscordStatus(makeReq(), second, 1);
+    expect(dbMock.query.mock.calls.length).toBe(queriesAfterMiss);
+    expect(second.body).toBe(first.body);
+    expect(parse(second).data.linked).toBe(true);
+  });
+
+  it('composes presence fresh per request while the payload core stays cached (R10)', async () => {
+    linkRow = [LINKED_ROW];
+    rewardRows = [{ points: '10', lifetime_points: '10' }];
+    accountByIdRows = [{ id: 1, username: 'maxp', password_set: true }];
+    await handleDiscordStatus(makeReq(), makeRes(), 1);
+    const before = dbMock.query.mock.calls.length;
+    setDiscordPresenceCache({
+      onlineCount: 7,
+      memberTotal: 44,
+      voiceChannelName: 'Tavern',
+      voice: [{ id: 'v1', name: 'Max', speaking: true, selfMute: false }],
+    });
+    const res = makeRes();
+    await handleDiscordStatus(makeReq(), res, 1);
+    // Still a cache hit (zero new queries), yet the presence block moved: the
+    // presence read is never frozen behind the payload TTL.
+    expect(dbMock.query.mock.calls.length).toBe(before);
+    const { data } = parse(res);
+    expect(data.presence).toEqual({
+      onlineCount: 7,
+      memberTotal: 44,
+      voiceChannelName: 'Tavern',
+      voice: [{ id: 'v1', name: 'Max', speaking: true, selfMute: false }],
+    });
+    expect(data.points).toBe(10);
+    // Restore the module-global presence snapshot for later cases.
+    setDiscordPresenceCache({ onlineCount: 0, memberTotal: 0, voiceChannelName: null, voice: [] });
+  });
+
+  it('a user who unlinks and immediately reloads sees linked:false (bust through the real path)', async () => {
+    linkRow = [LINKED_ROW];
+    accountByIdRows = [{ id: 1, username: 'maxp', password_set: true }];
+    dbMock.query.mockImplementation((sql: string) => {
+      const s = String(sql).replace(/\s+/g, ' ').trim();
+      // The default router answers the unlink DELETE with rowCount 0; a real
+      // deletion is what this arm is about.
+      if (s.includes('DELETE FROM discord_links WHERE account_id'))
+        return Promise.resolve({ rows: [], rowCount: 1 });
+      return Promise.resolve(defaultRouter(sql));
+    });
+    const first = makeRes();
+    await handleDiscordStatus(makeReq(), first, 1);
+    expect(parse(first).data.linked).toBe(true);
+    const del = makeRes();
+    await handleDiscordUnlink(makeReq(), del, 1);
+    expect(parse(del).status).toBe(200);
+    // The row is gone; only a post-bust refresh (not the 15s TTL) can reveal it.
+    linkRow = [];
+    const after = makeRes();
+    await handleDiscordStatus(makeReq(), after, 1);
+    expect(parse(after).data.linked).toBe(false);
+  });
+
+  it('setting a password during unlink flips passwordSet on the very next status read', async () => {
+    linkRow = [LINKED_ROW];
+    accountByIdRows = [{ id: 1, username: 'disc123', password_set: false }];
+    dbMock.query.mockImplementation((sql: string) => {
+      const s = String(sql).replace(/\s+/g, ' ').trim();
+      if (s.includes('UPDATE accounts SET password_hash'))
+        return Promise.resolve({ rows: [], rowCount: 1 });
+      if (s.includes('DELETE FROM discord_links WHERE account_id'))
+        return Promise.resolve({ rows: [], rowCount: 1 });
+      return Promise.resolve(defaultRouter(sql));
+    });
+    const first = makeRes();
+    await handleDiscordStatus(makeReq(), first, 1);
+    expect(parse(first).data.passwordSet).toBe(false);
+    const del = makeRes();
+    await handleDiscordUnlink(makeReq({ body: { password: 'hunter2pass' } }), del, 1);
+    expect(parse(del).status).toBe(200);
+    accountByIdRows = [{ id: 1, username: 'disc123', password_set: true }];
+    linkRow = [];
+    const after = makeRes();
+    await handleDiscordStatus(makeReq(), after, 1);
+    // Both writes in the flow (updatePasswordHash, unlinkDiscord) busted: the
+    // next read reflects the password AND the removed link.
+    expect(parse(after).data.passwordSet).toBe(true);
+    expect(parse(after).data.linked).toBe(false);
+  });
+
+  it('a forgot-password reset busts the account status core after COMMIT', async () => {
+    accountByIdRows = [{ id: 7, username: 'maxp', password_set: false }];
+    const first = makeRes();
+    await handleDiscordStatus(makeReq(), first, 7);
+    expect(parse(first).data.passwordSet).toBe(false);
+    dbMock.query.mockImplementation((sql: string) => {
+      const s = String(sql).replace(/\s+/g, ' ').trim();
+      if (s.includes('UPDATE password_reset_requests'))
+        return Promise.resolve({ rows: [{ account_id: 7 }], rowCount: 1 });
+      return Promise.resolve(defaultRouter(sql));
+    });
+    await expect(consumePasswordResetRequest('tokenhash', 'newhash')).resolves.toEqual({
+      accountId: 7,
+    });
+    accountByIdRows = [{ id: 7, username: 'maxp', password_set: true }];
+    const after = makeRes();
+    await handleDiscordStatus(makeReq(), after, 7);
+    expect(parse(after).data.passwordSet).toBe(true);
+  });
+
+  it('an expired or replayed reset token leaves the cached entry alone', async () => {
+    accountByIdRows = [{ id: 7, username: 'maxp', password_set: false }];
+    await handleDiscordStatus(makeReq(), makeRes(), 7);
+    dbMock.query.mockImplementation((sql: string) => {
+      const s = String(sql).replace(/\s+/g, ' ').trim();
+      if (s.includes('UPDATE password_reset_requests'))
+        return Promise.resolve({ rows: [], rowCount: 0 });
+      return Promise.resolve(defaultRouter(sql));
+    });
+    await expect(consumePasswordResetRequest('tokenhash', 'newhash')).resolves.toBeNull();
+    const before = dbMock.query.mock.calls.length;
+    const res = makeRes();
+    await handleDiscordStatus(makeReq(), res, 7);
+    // No bust on the write-nothing arm: the read is still a zero-query hit.
+    expect(dbMock.query.mock.calls.length).toBe(before);
+    expect(parse(res).data.passwordSet).toBe(false);
+  });
+
+  it('never serves account A its neighbor account B payload (per-account keying)', async () => {
+    dbMock.query.mockImplementation((sql: string, params?: unknown[]) => {
+      const s = String(sql).replace(/\s+/g, ' ').trim();
+      // Param-aware link routing: only account 1 is linked.
+      if (s.includes('FROM discord_links WHERE account_id'))
+        return Promise.resolve(
+          params?.[0] === 1 ? { rows: [LINKED_ROW], rowCount: 1 } : { rows: [], rowCount: 0 },
+        );
+      return Promise.resolve(defaultRouter(sql));
+    });
+    const a = makeRes();
+    await handleDiscordStatus(makeReq(), a, 1);
+    const b = makeRes();
+    await handleDiscordStatus(makeReq(), b, 2);
+    expect(parse(a).data.linked).toBe(true);
+    expect(parse(a).data.username).toBe('maxp');
+    expect(parse(b).data.linked).toBe(false);
+    expect(parse(b).data.username).toBeNull();
+    // Warm re-reads keep each account's OWN snapshot.
+    const a2 = makeRes();
+    await handleDiscordStatus(makeReq(), a2, 1);
+    const b2 = makeRes();
+    await handleDiscordStatus(makeReq(), b2, 2);
+    expect(parse(a2).data.username).toBe('maxp');
+    expect(parse(b2).data.linked).toBe(false);
   });
 });
 
