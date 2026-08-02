@@ -206,6 +206,11 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'a moderation reason is required (500 chars max)': 'error.guildReasonInvalid',
   'guild member limit exceeded': 'error.guildMemberLimit',
   'guild name must be 3-24 letters with single spaces': 'error.guildNameInvalid',
+  // The guild list's 503 single-flight busy path (the one guild prose the
+  // release left unmapped; surfaced by the merge-audit gate run). Mapped to
+  // the same key the guild directory already renders for ANY failed list
+  // read, so a localized operator sees exactly what the release shipped.
+  'guild list busy, try again': 'guilds.loadFailed',
   'invalid streamer link': 'error.invalidStreamerLink',
   'admin accounts cannot be chat muted': 'error.cannotChatMuteAdmin',
   'tier must be "soft" or "hard"': 'error.invalidWordTier',
