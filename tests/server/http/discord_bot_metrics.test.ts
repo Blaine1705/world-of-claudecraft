@@ -70,6 +70,28 @@ afterEach(() => {
 });
 
 describe('registerDiscordBotMetrics', () => {
+  it('pins every exported series name to its literal', () => {
+    // Every other assertion in this file reads the names through the same
+    // constants production uses, so renaming a constant's VALUE moves both
+    // sides together and the suite stays green while DEPLOY.md's documented
+    // series and every dashboard query break. The literals are the ops
+    // contract; this block is the game_metrics.test.ts convention applied here.
+    expect(WOC_DISCORD_BOT_REQUESTS_TOTAL).toBe('woc_discord_bot_requests_total');
+    expect(WOC_DISCORD_BOT_RATE_LIMITED_TOTAL).toBe('woc_discord_bot_rate_limited_total');
+    expect(WOC_DISCORD_BOT_GLOBAL_PAUSES_TOTAL).toBe('woc_discord_bot_global_pauses_total');
+    expect(WOC_DISCORD_BOT_BAN_PAUSES_TOTAL).toBe('woc_discord_bot_ban_pauses_total');
+    expect(WOC_DISCORD_BOT_BREAKER_OPENS_TOTAL).toBe('woc_discord_bot_breaker_opens_total');
+    expect(WOC_DISCORD_BOT_FORBIDDEN_BLOCKS_TOTAL).toBe('woc_discord_bot_forbidden_blocks_total');
+    expect(WOC_DISCORD_BOT_BREAKER_BLOCKS_TOTAL).toBe('woc_discord_bot_breaker_blocks_total');
+    expect(WOC_DISCORD_BOT_QUEUE_DEPTH).toBe('woc_discord_bot_queue_depth');
+    expect(WOC_DISCORD_BOT_TRACKED_BUCKETS).toBe('woc_discord_bot_tracked_buckets');
+    expect(WOC_DISCORD_BOT_TRACKED_ROUTES).toBe('woc_discord_bot_tracked_routes');
+    expect(WOC_DISCORD_BOT_ACTIVE_QUEUES).toBe('woc_discord_bot_active_queues');
+    expect(WOC_DISCORD_BOT_FORBIDDEN_ENTRIES).toBe('woc_discord_bot_forbidden_entries');
+    expect(WOC_DISCORD_BOT_BREAKER_STATE).toBe('woc_discord_bot_breaker_state');
+    expect(WOC_DISCORD_BOT_PUSH_AGE_SECONDS).toBe('woc_discord_bot_push_age_seconds');
+  });
+
   it('renders every series at its zero state before the bot has pushed anything', async () => {
     const registry = new Registry();
     const clock = syntheticClock(T0);
@@ -203,6 +225,22 @@ describe('registerDiscordBotMetrics', () => {
     expect(sample(text, WOC_DISCORD_BOT_BREAKER_OPENS_TOTAL)).toBe('5');
     expect(sample(text, WOC_DISCORD_BOT_FORBIDDEN_BLOCKS_TOTAL)).toBe('21');
     expect(sample(text, WOC_DISCORD_BOT_BREAKER_BLOCKS_TOTAL)).toBe('13');
+
+    // A SECOND restart behaves like the first: the guard is per-push
+    // bookkeeping, not a one-shot latch. 40 up to 55 is an ordinary +15 delta,
+    // then 55 down to 3 is another restart adding its whole 3.
+    await clock.advanceBy(60_000);
+    setDiscordBotCounters(
+      push({ requests: 55, rateLimitedByScope: { user: 2, global: 0, shared: 0, unknown: 0 } }),
+      clock.now(),
+    );
+    await clock.advanceBy(60_000);
+    setDiscordBotCounters(
+      push({ requests: 3, rateLimitedByScope: { user: 0, global: 0, shared: 0, unknown: 0 } }),
+      clock.now(),
+    );
+    const after = await registry.metrics();
+    expect(sample(after, WOC_DISCORD_BOT_REQUESTS_TOTAL)).toBe('1808');
   });
 
   it('zeroes the live gauges and the breaker state once the push goes stale, keeping the totals', async () => {
@@ -235,6 +273,36 @@ describe('registerDiscordBotMetrics', () => {
     expect(sample(text, WOC_DISCORD_BOT_REQUESTS_TOTAL)).toBe('1000');
     expect(sample(text, WOC_DISCORD_BOT_RATE_LIMITED_TOTAL, 'scope="user"')).toBe('11');
     expect(sample(text, WOC_DISCORD_BOT_PUSH_AGE_SECONDS)).toBe('300.001');
+
+    // A push arriving AFTER the stale window increments by DELTA and revives the
+    // gauges. The exporter's lastSeen bookkeeping lives in its closure, so
+    // staleness (which zeroes the cache READ) must not reset it: a refactor that
+    // re-derived lastSeen from the stale read would render 1000 + 1200 here.
+    setDiscordBotCounters(push({ requests: 1200 }), clock.now());
+    const revived = await registry.metrics();
+    expect(sample(revived, WOC_DISCORD_BOT_REQUESTS_TOTAL)).toBe('1200');
+    expect(sample(revived, WOC_DISCORD_BOT_QUEUE_DEPTH)).toBe('12');
+    expect(sample(revived, WOC_DISCORD_BOT_BREAKER_STATE, 'state="half-open"')).toBe('1');
+    expect(sample(revived, WOC_DISCORD_BOT_PUSH_AGE_SECONDS)).toBe('0');
+  });
+
+  it('renders NO breaker claim for a stored null state', async () => {
+    // The sanitizer stores null for an unrecognized pushed state; the one-hot
+    // gauge must answer exactly like staleness does, all three series 0, rather
+    // than inventing an affirmative closed.
+    const registry = new Registry();
+    const clock = syntheticClock(T0);
+    registerDiscordBotMetrics(registry, clock.now);
+
+    setDiscordBotCounters(push({ breakerState: null }), clock.now());
+
+    const text = await registry.metrics();
+    for (const state of ['closed', 'open', 'half-open']) {
+      expect(sample(text, WOC_DISCORD_BOT_BREAKER_STATE, `state="${state}"`)).toBe('0');
+    }
+    // The rest of the push still renders: no-claim is per-field, not per-push.
+    expect(sample(text, WOC_DISCORD_BOT_QUEUE_DEPTH)).toBe('12');
+    expect(sample(text, WOC_DISCORD_BOT_REQUESTS_TOTAL)).toBe('1000');
   });
 
   it('never turns a pushed scope key into a label: only the fixed four render', async () => {
@@ -266,18 +334,31 @@ describe('registerDiscordBotMetrics', () => {
   it('works on the DEFAULT clock, the one production actually runs on', async () => {
     // main.ts calls registerDiscordBotMetrics(registry) with no clock, so the
     // default `now = Date.now` is the production path; every other case here
-    // injects the synthetic clock, and a broken default (say `() => 0`) would
-    // make staleness unreachable and the push age nonsense in production while
-    // the injected-clock suite stayed green.
+    // injects the synthetic clock. Decisive only through the STALE branch: a
+    // fresh-push assertion is satisfied by a broken default too (`() => 0`
+    // reads any real epoch stamp as fresh and an age of max(0, negative) = 0),
+    // so the arm plants a push stamped just past the window and demands the
+    // stale render, which only a real clock can produce.
     const registry = new Registry();
     registerDiscordBotMetrics(registry);
 
-    setDiscordBotCounters(push(), Date.now());
+    setDiscordBotCounters(push(), Date.now() - DISCORD_BOT_COUNTERS_STALE_MS - 1);
 
-    const text = await registry.metrics();
-    expect(sample(text, WOC_DISCORD_BOT_QUEUE_DEPTH)).toBe('12');
-    const age = Number(sample(text, WOC_DISCORD_BOT_PUSH_AGE_SECONDS));
-    expect(age).toBeGreaterThanOrEqual(0);
-    expect(age).toBeLessThan(1);
+    const stale = await registry.metrics();
+    expect(sample(stale, WOC_DISCORD_BOT_QUEUE_DEPTH)).toBe('0');
+    for (const state of ['closed', 'open', 'half-open']) {
+      expect(sample(stale, WOC_DISCORD_BOT_BREAKER_STATE, `state="${state}"`)).toBe('0');
+    }
+    const age = Number(sample(stale, WOC_DISCORD_BOT_PUSH_AGE_SECONDS));
+    expect(age).toBeGreaterThanOrEqual(300);
+    expect(age).toBeLessThan(301);
+
+    // And a fresh push on the same default clock reads live again.
+    setDiscordBotCounters(push(), Date.now());
+    const fresh = await registry.metrics();
+    expect(sample(fresh, WOC_DISCORD_BOT_QUEUE_DEPTH)).toBe('12');
+    const freshAge = Number(sample(fresh, WOC_DISCORD_BOT_PUSH_AGE_SECONDS));
+    expect(freshAge).toBeGreaterThanOrEqual(0);
+    expect(freshAge).toBeLessThan(1);
   });
 });

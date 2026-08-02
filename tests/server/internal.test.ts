@@ -605,7 +605,7 @@ describe('discord/presence bot counters', () => {
       rateLimitedByScope: { user: 1_000_000_000, global: 0, shared: 0, unknown: 0 },
       globalPauses: 0,
       banPauses: 0,
-      breakerState: 'closed',
+      breakerState: null,
       breakerOpens: 12,
       queueDepth: 0,
       trackedBuckets: 0,
@@ -614,6 +614,74 @@ describe('discord/presence bot counters', () => {
       forbiddenEntries: 0,
       forbiddenBlocks: 0,
       breakerBlocks: 0,
+    });
+  });
+
+  it('caps EVERY numeric slot independently, not just the two the mixed case hits', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+
+    // 2e9 in all sixteen numeric slots at once. Per-field, because the clamp is
+    // one `count` closure today but nothing stops a later edit from unrolling a
+    // single field ("trackedRoutes: Math.trunc(Number(v) || 0)") and quietly
+    // shipping it uncapped while the two-field case above stayed green.
+    await runRoute('POST', '/internal/discord/presence', {
+      headers: DISCORD_HEADERS,
+      body: {
+        counters: {
+          requests: 2e9,
+          rateLimited: 2e9,
+          rateLimitedByScope: { user: 2e9, global: 2e9, shared: 2e9, unknown: 2e9 },
+          globalPauses: 2e9,
+          banPauses: 2e9,
+          breakerState: 'open',
+          breakerOpens: 2e9,
+          queueDepth: 2e9,
+          trackedBuckets: 2e9,
+          trackedRoutes: 2e9,
+          activeQueues: 2e9,
+          forbiddenEntries: 2e9,
+          forbiddenBlocks: 2e9,
+          breakerBlocks: 2e9,
+        },
+      },
+    });
+
+    const cap = 1_000_000_000;
+    expect(storedCounters()).toEqual({
+      requests: cap,
+      rateLimited: cap,
+      rateLimitedByScope: { user: cap, global: cap, shared: cap, unknown: cap },
+      globalPauses: cap,
+      banPauses: cap,
+      breakerState: 'open',
+      breakerOpens: cap,
+      queueDepth: cap,
+      trackedBuckets: cap,
+      trackedRoutes: cap,
+      activeQueues: cap,
+      forbiddenEntries: cap,
+      forbiddenBlocks: cap,
+      breakerBlocks: cap,
+    });
+  });
+
+  it('stores all four scopes as zero when the scope record is an array', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+
+    // An array is typeof 'object'; without its own guard it would slide past the
+    // record check and index as undefined. The top-level counters block already
+    // rejects an array, and the nested record must be symmetric.
+    await runRoute('POST', '/internal/discord/presence', {
+      headers: DISCORD_HEADERS,
+      body: { counters: { requests: 5, rateLimitedByScope: [7, 8, 9] } },
+    });
+
+    expect(storedCounters().requests).toBe(5);
+    expect(storedCounters().rateLimitedByScope).toEqual({
+      user: 0,
+      global: 0,
+      shared: 0,
+      unknown: 0,
     });
   });
 
@@ -657,6 +725,30 @@ describe('discord/presence bot counters', () => {
     ]);
   });
 
+  it('stores NULL for a breaker state outside the allowlist, never an invented closed', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+
+    // A corrupted state field must render as NO claim (all three one-hot series
+    // 0), the same shape staleness takes. Mapping garbage to 'closed' would
+    // paint a breaker that may in fact be open as healthy, which suppresses the
+    // exact 2am signal this phase exists to carry.
+    const hostiles = ['OPEN', 'tripped', '', 7, { state: 'open' }, ['open']];
+    for (const breakerState of hostiles) {
+      await runRoute('POST', '/internal/discord/presence', {
+        headers: DISCORD_HEADERS,
+        body: { counters: { ...BOT_COUNTERS, breakerState } },
+      });
+    }
+
+    expect(vi.mocked(setDiscordBotCounters)).toHaveBeenCalledTimes(hostiles.length);
+    for (let i = 0; i < hostiles.length; i++) {
+      expect(storedCounters(i).breakerState).toBe(null);
+      // The rest of the push survives: refusing the one field is not refusing
+      // the block.
+      expect(storedCounters(i).requests).toBe(1000);
+    }
+  });
+
   it('leaves the counters cache alone when the block is absent or not an object', async () => {
     process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
 
@@ -679,6 +771,35 @@ describe('discord/presence bot counters', () => {
       voiceChannelName: null,
       voice: [],
     });
+  });
+
+  it('leaves the counters cache alone on the LEGACY arm too for an absent or non-object block', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+
+    // The skip-the-cache guard is two independent code paths (the RouteDef
+    // handler and the frozen ladder), so the loop above pins only one of them:
+    // a legacy arm that stored a null-coalesced snapshot would overwrite live
+    // counters with zeroes on every old-bot push while every RouteDef case
+    // stayed green.
+    for (const counters of [undefined, 'nope', [BOT_COUNTERS]]) {
+      const req = makeReq({
+        method: 'POST',
+        url: '/internal/discord/presence',
+        headers: DISCORD_HEADERS,
+        body: { onlineCount: 4, memberTotal: 9, counters },
+      });
+      const res = new FakeRes();
+      await handleInternalApi(req, res as unknown as http.ServerResponse, null as never);
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body)).toEqual({
+        success: true,
+        data: { received: true },
+        error: null,
+      });
+    }
+
+    expect(vi.mocked(setDiscordBotCounters)).not.toHaveBeenCalled();
+    expect(vi.mocked(setDiscordPresenceCache)).toHaveBeenCalledTimes(3);
   });
 
   it('does not disturb the presence fields when counters ride along', async () => {
@@ -745,7 +866,7 @@ describe('discord/presence bot counters', () => {
       rateLimitedByScope: { user: 11, global: 7, shared: 9, unknown: 3 },
       globalPauses: 4,
       banPauses: 2,
-      breakerState: 'closed',
+      breakerState: null,
       breakerOpens: 5,
       queueDepth: 12,
       trackedBuckets: 40,
@@ -758,6 +879,16 @@ describe('discord/presence bot counters', () => {
     expect(storedCounters(0)).toEqual(expected);
     expect(storedCounters(1)).toEqual(storedCounters(0));
     expect(Object.keys(storedCounters(1))).toEqual(BOT_COUNTER_FIELDS);
+
+    // BOTH arms stamp the real push time. The snapshots matching says nothing
+    // about the stamps: a legacy arm passing 0 would park every one of its
+    // pushes permanently stale (all five live gauges 0 in production) while the
+    // snapshot comparison above stayed green.
+    for (const call of [0, 1]) {
+      const stamp = vi.mocked(setDiscordBotCounters).mock.calls[call][1];
+      expect(stamp).toBeGreaterThan(Date.now() - 5000);
+      expect(stamp).toBeLessThanOrEqual(Date.now());
+    }
   });
 });
 

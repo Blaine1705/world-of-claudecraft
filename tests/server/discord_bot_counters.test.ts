@@ -113,6 +113,18 @@ describe('discordBotCounters staleness', () => {
       updatedAt: stale,
     });
   });
+
+  it('serves a stored NULL breaker state through a FRESH read as null', () => {
+    // A push whose state field the sanitizer refused arrives as null. A fresh
+    // read must pass it through as no-claim rather than reviving a default:
+    // the null is data (an untrustworthy pusher), not an artifact of staleness.
+    setDiscordBotCounters({ ...pushed(), breakerState: null }, T0);
+
+    const read = discordBotCounters(T0 + 1000);
+    expect(read.breakerState).toBeNull();
+    expect(read.queueDepth).toBe(12);
+    expect(read.updatedAt).toBe(T0);
+  });
 });
 
 describe('discordBotCounters copy semantics', () => {

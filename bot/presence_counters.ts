@@ -73,7 +73,13 @@ function normalizeBreakerState(value: unknown): PresenceCounters['breakerState']
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
-  return typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : null;
+  // An array is typeof 'object' but is not a record; treating one as a snapshot
+  // would read every field as undefined and ship an all-zero block as if the
+  // governor had reported it. The server-side sanitizer rejects arrays the same
+  // way, so the two sides stay symmetric.
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
 }
 
 /**

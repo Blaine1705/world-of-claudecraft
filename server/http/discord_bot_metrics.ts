@@ -259,8 +259,9 @@ export function registerDiscordBotMetrics(registry: Registry, now: () => number 
     labelNames: ['state'],
     registers: [registry],
     collect() {
-      // Null (never pushed, or stale) leaves every state at 0: nothing is
-      // reporting, which is not the same claim as "the breaker is closed".
+      // Null (never pushed, stale, or a push whose state field the sanitizer
+      // refused) leaves every state at 0: nothing is reporting, which is not
+      // the same claim as "the breaker is closed".
       const state = discordBotCounters(now()).breakerState;
       for (const candidate of DISCORD_BOT_BREAKER_STATES) {
         this.set({ state: candidate }, candidate === state ? 1 : 0);

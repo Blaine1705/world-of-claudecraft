@@ -39,7 +39,9 @@ export type DiscordBotRateLimitScope = (typeof DISCORD_BOT_RATE_LIMIT_SCOPES)[nu
  * the four scope buckets, globalPauses, banPauses, breakerOpens, forbiddenBlocks,
  * breakerBlocks. Live gauges: queueDepth, trackedBuckets, trackedRoutes,
  * activeQueues, forbiddenEntries. A bot restart makes the cumulative values go
- * DOWN (a fresh process starts at 0); consumers must expect that.
+ * DOWN (a fresh process starts at 0); consumers must expect that. A null
+ * breakerState is a push whose state field was unrecognized: the sanitizer
+ * refuses to invent a claim, and the exporter renders no state at all.
  */
 export interface DiscordBotCountersSnapshot {
   requests: number;
@@ -47,7 +49,7 @@ export interface DiscordBotCountersSnapshot {
   rateLimitedByScope: Record<DiscordBotRateLimitScope, number>;
   globalPauses: number;
   banPauses: number;
-  breakerState: DiscordBotBreakerState;
+  breakerState: DiscordBotBreakerState | null;
   breakerOpens: number;
   queueDepth: number;
   trackedBuckets: number;
@@ -60,7 +62,10 @@ export interface DiscordBotCountersSnapshot {
 
 /** What a read returns: the stored snapshot plus its age, staleness applied. */
 export interface DiscordBotCountersRead extends Omit<DiscordBotCountersSnapshot, 'breakerState'> {
-  /** null when no bot is currently reporting a state (never pushed, or stale). */
+  /**
+   * null when no bot is currently reporting a state: never pushed, stale, or the
+   * last push's state field was unrecognized and stored as no-claim.
+   */
   breakerState: DiscordBotBreakerState | null;
   /** Epoch millis of the last push; 0 when never pushed or stale. */
   updatedAt: number;

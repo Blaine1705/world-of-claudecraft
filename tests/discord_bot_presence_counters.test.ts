@@ -168,6 +168,8 @@ describe('collectPresenceCounters normalization', () => {
     { name: 'a boolean', field: 'trackedRoutes', value: true },
     { name: 'an object', field: 'activeQueues', value: {} },
     { name: 'a fraction below one', field: 'forbiddenEntries', value: 0.9 },
+    { name: 'NaN on the second-to-last field', field: 'forbiddenBlocks', value: Number.NaN },
+    { name: 'a negative on the last field', field: 'breakerBlocks', value: -1 },
   ];
 
   for (const arm of ARMS) {
@@ -179,8 +181,10 @@ describe('collectPresenceCounters normalization', () => {
 
       expect(out[arm.field]).toBe(0);
       // And only that field moved: a normalizer that zeroed the whole block on
-      // one bad value would throw away every good counter beside it.
-      expect(out.breakerBlocks).toBe(112);
+      // one bad value would throw away every good counter beside it. The
+      // control is a field this arm did not touch.
+      if (arm.field === 'breakerBlocks') expect(out.forbiddenBlocks).toBe(111);
+      else expect(out.breakerBlocks).toBe(112);
     });
   }
 
@@ -213,8 +217,10 @@ describe('collectPresenceCounters normalization', () => {
     expect(out.rateLimitedByScope).toEqual({ user: 4, global: 0, shared: 6, unknown: 0 });
   });
 
-  it('reports an all-zero scope record when the scope field is not an object', () => {
-    for (const scope of [null, undefined, 'user', 3]) {
+  it('reports an all-zero scope record when the scope field is not a record', () => {
+    // The array is typeof 'object' and would index as undefined; the collector
+    // must refuse it like any other non-record, matching the server sanitizer.
+    for (const scope of [null, undefined, 'user', 3, [201, 202]]) {
       const out = collectPresenceCounters(
         readerFor({ ...distinctSnapshot(), rateLimitedByScope: scope }),
       ) as PresenceCounters;
@@ -253,8 +259,10 @@ describe('collectPresenceCounters totality', () => {
     ).toBe(null);
   });
 
-  it('answers null when the reader hands back something that is not an object', () => {
-    for (const value of [null, undefined, 'counters', 42, true]) {
+  it('answers null when the reader hands back something that is not a record', () => {
+    // An array included: it is typeof 'object', and reading it as a snapshot
+    // would ship an all-zero block as if the governor had reported one.
+    for (const value of [null, undefined, 'counters', 42, true, [distinctSnapshot()]]) {
       expect(collectPresenceCounters(readerFor(value))).toBe(null);
     }
   });
@@ -292,7 +300,25 @@ describe('withPresenceCounters', () => {
       'voice',
       'counters',
     ]);
-    expect(out.counters).toEqual(collectPresenceCounters(() => distinctSnapshot()));
+    // A fresh literal, never `collectPresenceCounters(...)` itself: comparing
+    // the attach seam against the function under test is a self-comparison
+    // that a transposed pair of fields would satisfy on both sides.
+    expect(out.counters).toEqual({
+      requests: 101,
+      rateLimited: 102,
+      rateLimitedByScope: { user: 201, global: 202, shared: 203, unknown: 204 },
+      globalPauses: 103,
+      banPauses: 104,
+      breakerState: 'half-open',
+      breakerOpens: 105,
+      queueDepth: 106,
+      trackedBuckets: 107,
+      trackedRoutes: 108,
+      activeQueues: 109,
+      forbiddenEntries: 110,
+      forbiddenBlocks: 111,
+      breakerBlocks: 112,
+    });
   });
 
   it('leaves the body untouched, with no counters key, when the reader throws', () => {

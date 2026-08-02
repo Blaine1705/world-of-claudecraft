@@ -585,7 +585,9 @@ function sanitizeBotCounters(value: unknown): DiscordBotCountersSnapshot | null 
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const o = value as Record<string, unknown>;
   const scopes =
-    o.rateLimitedByScope && typeof o.rateLimitedByScope === 'object'
+    o.rateLimitedByScope &&
+    typeof o.rateLimitedByScope === 'object' &&
+    !Array.isArray(o.rateLimitedByScope)
       ? (o.rateLimitedByScope as Record<string, unknown>)
       : {};
   const count = (v: unknown): number => clampInt(v, 0, BOT_COUNTER_MAX);
@@ -612,9 +614,14 @@ function sanitizeBotCounters(value: unknown): DiscordBotCountersSnapshot | null 
   };
 }
 
-/** The pushed breaker state if it is one of the three known ones, else 'closed'. */
-function botBreakerState(value: unknown): DiscordBotBreakerState {
-  return DISCORD_BOT_BREAKER_STATES.find((state) => state === value) ?? 'closed';
+/**
+ * The pushed breaker state if it is one of the three known ones, else null. Null
+ * renders as NO claim (all three one-hot series 0), the same shape staleness
+ * takes: a corrupted state field must never render an affirmative "closed" for a
+ * breaker that may in fact be open.
+ */
+function botBreakerState(value: unknown): DiscordBotBreakerState | null {
+  return DISCORD_BOT_BREAKER_STATES.find((state) => state === value) ?? null;
 }
 
 function sanitizeVoiceMember(m: unknown): {
