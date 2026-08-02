@@ -51,6 +51,7 @@ import { withErrors } from '../../server/http/middleware/with_errors';
 import { apiRegistry } from '../../server/http/registry';
 import type { Method, Middleware } from '../../server/http/types';
 import {
+  authFailureCount,
   rateLimited,
   resetAuthFailures,
   resetRateLimitClock,
@@ -582,6 +583,130 @@ describe('POST /admin/api/login', () => {
         permissions: ['analytics.read', 'accounts.read', 'support.read', 'moderation.read'],
       },
       error: null,
+    });
+  });
+
+  // Regression coverage for BUG #15: admin login checked only password + staff
+  // role and never the account's TOTP second factor (unlike POST /api/login,
+  // server/auth_routes.ts loginHandler), so an operator with 2FA enabled could
+  // sign into the highest-privilege surface in the app with a bare password.
+  describe('two-factor', () => {
+    it('returns twoFactorRequired without a token when 2FA is on and no code is supplied', async () => {
+      const saveToken = vi.fn(async () => {});
+      const verifyLoginTwoFactor = vi.fn(async () => true);
+      setDb({
+        rateLimited: allowedRateLimit,
+        findAccount: async () =>
+          ({
+            id: 9,
+            username: 'bob',
+            password_hash: 'h',
+            totp_enabled_at: '2020-01-01T00:00:00.000Z',
+          }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+        verifyLoginTwoFactor,
+        saveToken,
+      });
+      const r = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bob', password: 'pw' },
+      });
+      expect(r.status).toBe(200);
+      expect(r.body).toEqual({ success: true, data: { twoFactorRequired: true }, error: null });
+      // No code + no recovery code: the verifier is never consulted and no token issues.
+      expect(verifyLoginTwoFactor).not.toHaveBeenCalled();
+      expect(saveToken).not.toHaveBeenCalled();
+    });
+
+    it('401s an invalid 2FA code and records a failure', async () => {
+      const verifyLoginTwoFactor = vi.fn(async () => false);
+      setDb({
+        rateLimited: allowedRateLimit,
+        findAccount: async () =>
+          ({
+            id: 9,
+            username: 'bob',
+            password_hash: 'h',
+            totp_enabled_at: '2020-01-01T00:00:00.000Z',
+          }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+        verifyLoginTwoFactor,
+      });
+      const r = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bob', password: 'pw', code: '000000' },
+      });
+      expect(r.status).toBe(401);
+      expect(r.body).toEqual({
+        success: false,
+        data: null,
+        error: 'invalid authentication code',
+      });
+      expect(verifyLoginTwoFactor).toHaveBeenCalledTimes(1);
+      expect(authFailureCount()).toBe(1);
+    });
+
+    it('200s and issues a token for a good 2FA code', async () => {
+      setDb({
+        rateLimited: allowedRateLimit,
+        findAccount: async () =>
+          ({
+            id: 9,
+            username: 'bob',
+            password_hash: 'h',
+            totp_enabled_at: '2020-01-01T00:00:00.000Z',
+          }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+        verifyLoginTwoFactor: async () => true,
+        touchLogin: async () => {},
+        newToken: () => 'tok789',
+        saveToken: async () => {},
+      });
+      const r = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bob', password: 'pw', code: '123456' },
+      });
+      expect(r.status).toBe(200);
+      expect(r.body).toEqual({
+        success: true,
+        data: {
+          token: 'tok789',
+          username: 'bob',
+          roles: ['viewer'],
+          permissions: ['analytics.read', 'accounts.read', 'support.read', 'moderation.read'],
+        },
+        error: null,
+      });
+    });
+
+    it('accepts a recovery code in place of a live TOTP code', async () => {
+      const verifyLoginTwoFactor = vi.fn(async () => true);
+      setDb({
+        rateLimited: allowedRateLimit,
+        findAccount: async () =>
+          ({
+            id: 9,
+            username: 'bob',
+            password_hash: 'h',
+            totp_enabled_at: '2020-01-01T00:00:00.000Z',
+          }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+        verifyLoginTwoFactor,
+        touchLogin: async () => {},
+        newToken: () => 'tokRecovery',
+        saveToken: async () => {},
+      });
+      const r = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bob', password: 'pw', recoveryCode: 'ABCD-EFGH' },
+      });
+      expect(r.status).toBe(200);
+      expect((r.body as { data: { token: string } }).data.token).toBe('tokRecovery');
+      expect(verifyLoginTwoFactor).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 9 }),
+        '',
+        'ABCD-EFGH',
+      );
     });
   });
 });
