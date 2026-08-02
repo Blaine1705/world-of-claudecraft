@@ -4462,6 +4462,68 @@ marked as a maintainer item.
    consumers in the same change, behavior-preserving, per the repo's
    extraction rule.
 
+## Phase 21 build record (2026-08-02)
+
+Built in ~/wt/prof-packet off the zero-drift entry above, per the phase
+text as reconciled. Commits, in order: the entry-sync and
+reconciliation doc block; the sim seam (the vendor_buy_stack widening
+with sanitizeBuyCount, vendorCountForced, buyPurchaseTotals,
+maxBuyCount, and VendorBuyOptions; items.buyItem's count path;
+the one options-bag buyItem shape across the facet, Sim, ClientWorld,
+and the server dispatch, with all nine legacy positional call sites
+updated compile-loud); the shared prompt-dialog extraction
+(src/ui/prompt_dialog.ts, bags and bank as thin delegates, source pins
+following the recipe with per-window delegation pins); the vendor UI
+(the control row, count-aware rows, the capped custom prompt in
+src/ui/hud/vendor/buy_quantity_prompt.ts, the Hud selection state
+resetting to 1x per vendor open, the coarse-pointer 40px floors, the
+focus-visible ring group membership, and the itemUi.vendor.* keys with
+real zh_CN/zh_TW/ja_JP/ko_KR/ru_RU fills for the six M16-wordy leaves,
+bundles regenerated in the same commit); the test slice; the
+screenshot pairs (docs/screenshots/vendor-buy-count, desktop and
+mobile, shot through a new change-aware vendor-buy-count target with
+the 5x multiple selected by a real click, the before side served from
+an isolated base worktree); and the biome settlement.
+
+Acceptance, checked in-session: (a) count absent, an empty bag, and
+count 1 reproduce today's behavior (state-equality test) and the
+default frame's exact wire key set is pinned sender-side; (b) count N
+buys N row units atomically with the copper/honor asymmetry explicit,
+checks before any debit; (c) every hostile shape denies with a
+registered toast and zero state change, per-dimension, and the 1e15
+magnitude denies at the overflow guard; (d) the old-client frame is
+the count-less frame by construction (the dispatch treats a missing
+count as 1) and the OTA-ahead degrade is the ignored-field one the
+bulk verb already shipped; (e) COMMAND_NAMES, command_schema, and
+world_api_parity ran with ZERO edits; (f) desktop and mobile expose
+the row with 40px coarse floors, focus keys, pressed states, and
+count-and-total arias (painter suite plus the by-eye screenshot
+check); (g) all new strings are t() keys, the S3 guard green, zero new
+sim strings; (h) `npm run gate` PASS is the build's exit condition,
+with the run and its result recorded in the phase 21 session memory
+alongside this block.
+
+Judgments recorded (veto-able): the drafted vendor_purchase.ts /
+vendor_purchase.test.ts artifact names landed as the widened
+vendor_buy_stack.ts and its test file per reconciliation item 4; the
+devVendor count arm lives in tests/ptr_dev_vendor.test.ts (the rig
+that owns the dev realm) rather than items.test.ts; the buyback
+exclusion pin is behavioral in items.test.ts plus dispatch source pins
+in tests/vendor_buy_count.test.ts; the hostile-count toast is 'That
+item is not for sale.' with overflow as 'Not enough money.' per
+reconciliation item 3; the control-row selection resets to 1x on every
+vendor open (least surprise across shop visits); and the count chip
+reuses the bags stackCount key rather than minting a new one.
+
+Recorded, not fixed (carried forward): the positional slot-ladder
+fallback still skews by one button when a bulk tile appears or
+vanishes mid-session (the phase 20 entry-sync record; the control row
+sits outside the goods grid, so the qty buttons restore by exact key
+and do not add to that skew); the bulk cap's bag-fit blindness and the
+Q19 convergence question stay the maintainer's (reconciliation item
+5); the Q21 redundancy (a 5x control beside a Buy Stack tile) and the
+Q23 one-model re-rule stay open maintainer items (items 6 and 7).
+
 ---
 
 ## Post-packet scoping (2026-08-01): proposed phases 19 to 21
