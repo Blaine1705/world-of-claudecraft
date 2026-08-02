@@ -20,7 +20,7 @@
 | Phase 7 QA | complete | 2026-08-02 | 2026-08-02 |
 | Phase 8: Observability | built | 2026-08-02 | 2026-08-02 |
 | Phase 8 QA | complete | 2026-08-02 | 2026-08-02 |
-| Phase 9: /api/discord caching | not started | | |
+| Phase 9: /api/discord caching | built | 2026-08-02 | 2026-08-02 |
 | Phase 9 QA (packet close) | not started | | |
 
 ## Deliverable checklists
@@ -89,10 +89,10 @@
 - [x] Clamp/render/staleness tests
 
 ### Phase 9
-- [ ] `/api/discord` payload behind keyed `createCachedRead` + moderation busts
-- [ ] Legacy-arm status checked and honored
-- [ ] Cache-hit zero-query assertion; rate guard intact
-- [ ] Hit/miss/bust/TTL tests
+- [x] `/api/discord` payload behind keyed `createCachedRead` + moderation busts
+- [x] Legacy-arm status checked and honored
+- [x] Cache-hit zero-query assertion; rate guard intact
+- [x] Hit/miss/bust/TTL tests
 
 ## Per-phase notes
 
@@ -1542,3 +1542,77 @@ Deferral: none. Handoff to Phase 9: base is `f2651a358` on
 feature/discord-bot-stability; the counters surface is frozen and pinned;
 Phase 9 owns /api/discord caching per R10/R11 and the D11-retirement notes in
 the Phase 5 record.
+
+### Phase 9 (2026-08-02)
+
+Release sync: merged `origin/release/v0.34.0` at `8209e69ad` (one commit, the
+terrain-culling perf change from PR #2780, `src/render/terrain.ts` plus its
+streaming test) as merge `36162b5a3`. `release-merge-audit` ran clean: zero
+branch-authored overlap (both files byte-identical to the release side), no
+route, injection, workflow, or planning-doc contact, no new db mocks; the
+touched suite passed 11/11 and `tsc` was clean on the merged tree. The CI
+workflow was untouched, re-measured anyway per the Phase 8 handoff: pr-checks
+and release-checks still 13 named steps each with the bot build ungated, the
+two gate jobs 4 steps, zero `matrix.shard == 1` anywhere.
+
+Built: `server/discord_status_cache.ts` (the R11 keyed bounded module: one
+`CachedRead` per account over `createCachedRead`, LRU eviction at
+`DISCORD_STATUS_CACHE_MAX_ENTRIES` default 2000, TTL
+`DISCORD_STATUS_CACHE_TTL_MS` default 15000, lazily built singleton with the
+reader injected from `server/discord.ts`, so no clock or env binds at module
+load). `discordStatusPayload` now composes a cached core plus fresh presence
+and fresh env config per request (R10); both `/api/discord` arms share it by
+construction, pinned structurally in the new test file. Busts wired inside the
+shared write functions per the enumeration recorded in state.md (eight sites,
+two of them in `server/db.ts`); `setDiscordMemberMetaBulk` gained
+`RETURNING dl.account_id` plus a `changed_account_ids` aggregate so the bust
+population rides the same statement as the write, with the reported result
+shape unchanged (the members-meta response body the bot parses is untouched).
+The game compose service gained the two-key passthrough (the Phase 7
+inert-env-key lesson applied to the game service; pinned by the new
+`tests/deploy_discord_status_cache.test.ts`), and DEPLOY.md gained the two
+operator bullets.
+
+Validation at build close: `npx tsc --noEmit` clean; the new module suite
+17/17; `tests/discord_db.test.ts` 56/56; `tests/discord_server.test.ts` 67/67
+(seven new handler-level arms: zero-query hit with byte-identical body, the
+four-query miss pin, presence-fresh-through-warm-cache, unlink and
+password-set busts through the real handlers, the reset-token negative arm,
+per-account isolation); `tests/server/internal.test.ts`, `tests/server/discord.test.ts`
+and the http spine 490/490 combined; `tests/discord_db_integration.test.ts`
+16/16 EXECUTED against a throwaway zonky Postgres 16 (the new RETURNING and
+aggregate parse, plan, and produce the right account ids; the new executed
+bust arm proves changed-account busts and skipped-account isolation);
+`npm run build:server` green; `npm run ci:changed` exit 0.
+
+Review round (privacy-security-review plus database-performance-reviewer, both
+fresh over the combined uncommitted diff, dispatched per the matrix): ZERO
+blocking on the security side (cross-account keying, eviction aliasing, bust
+ids, staleness-as-authz, and the rate guard all verified against code); the
+db-performance verdict's BLOCK was its any-unresolved-finding template rule,
+with no P0/P1. Every finding was applied or resolved with a reason:
+- Applied: the cached link is now a four-field PROJECTION (DiscordStatusLink),
+  so discord_email never sits in the cache and setDiscordLinkEmail is
+  structurally incapable of staling it (this was both reviewers' top finding);
+  the changed_account_ids parse warns when rows changed but the aggregate is
+  missing, and guards Number.isFinite before busting; the bulk over-bust on
+  role/joined-only changes is recorded as deliberate at the site; the module
+  header and DEPLOY.md now state the brownout contract (warm entries
+  stale-serve 200 where the pre-cache endpoint 500ed, cold entries still
+  error, stale-serving sheds no load) and the honest cost floor (a hit removes
+  the four payload queries; the auth-guard reads remain, so the drop is the
+  payload share, not 100 percent); KeyedCachedRead gained stats() (reads,
+  refreshes, evictions, busts, entries; the DailyRewardBoardCache wire-up-later
+  shape) exposed as discordStatusCacheStats(), with a counter test arm.
+- Proven on a throwaway zonky Postgres 16 at the FULL 1000-record cap:
+  the modified CTE's ModifyTable executes once (Actual Loops 1, Actual Rows
+  1000) in both the old and new form, so the changed_account_ids aggregate
+  cannot re-run the UPDATE; wall clock 6.18 ms new vs 5.69 ms old (planning
+  0.31 vs 0.14 ms), parity within noise; the aggregate arrives as a
+  1000-element JS number array.
+- Resolved with reasons (recorded in state.md): unbounded stale-serve age is
+  the house cached_read contract (a max-stale bound or counter needs the
+  shared seam, follow-up); deleteUnusedFederatedProvision needs no bust (its
+  WHERE admits only never-authenticated accounts, so no entry can exist);
+  .env.example fills stay maintainer-owed (harness-blocked); the eviction
+  thrash shape needs 2000+ authenticated accounts against the 15/min guard.

@@ -1,7 +1,7 @@
 # State: Discord Bot Stability (cross-phase cheat sheet)
 
-Current phase: Phases 1 to 8 built and QA'd (Phase 8 QA closed 2026-08-02). Next:
-Phase 9 (/api/discord caching).
+Current phase: Phases 1 to 8 built and QA'd, Phase 9 built (2026-08-02). Next:
+Phase 9 QA, the packet-close session.
 The packet's sync target is `origin/release/v0.34.0` (the maintainer's retarget call,
 relayed in the Phase 6 handoff). Phase 6 QA's sync merged the admin guild backoffice
 (PR #2590, 7 commits) as `50883ce3d`; the three Phase 5 feed sites in `server/db.ts`
@@ -882,6 +882,126 @@ because dropping the one word is otherwise silent),
       named steps each); the auto-merge had left it behind a never-true
       `matrix.shard == 1` in release-checks, caught only by re-measuring the
       merged workflow by hand.
+- Phase 9 (/api/discord caching, built 2026-08-02; QA session, the packet
+  close, still owed):
+  - Release sync at phase start: `origin/release/v0.34.0` at `8209e69ad` (one
+    render-only commit, PR #2780) merged as `36162b5a3`; release-merge-audit
+    clean, CI workflow untouched and re-measured (shape unchanged from the
+    Phase 8 record above).
+  - New module: `server/discord_status_cache.ts` (R11): the exported
+    `KeyedCachedRead<T>` class (a bounded Map of per-key `createCachedRead`
+    entries; LRU by re-insert-on-read, eviction of the coldest key AT the cap,
+    constructor throws on a non-positive ttl or cap) plus the process
+    singleton behind `configureDiscordStatusCache(reader)` /
+    `readDiscordStatusCore` / `bustDiscordStatus` / `bustAllDiscordStatus` /
+    `discordStatusCacheSize` / `resetDiscordStatusCacheForTests(overrides?)`.
+    The reader is injected by `server/discord.ts` at module load (the
+    configure-runtime idiom, so the bust callers in discord_db.ts/db.ts form
+    no import cycle) and the cache builds LAZILY on first read, so no clock or
+    env value binds before a test can inject its own. bust(key) DROPS the
+    entry rather than delegating to `CachedRead.bust()`: instance replacement
+    gives post-bust readers a fresh flight (the same joiner refusal the epoch
+    guard provides) and releases the cap slot; the module header records the
+    equivalence, and the in-flight joiner arm is pinned at this layer.
+  - `discordStatusPayload` composes: cached `DiscordStatusCore` (link row,
+    points, lifetimePoints, claimedSwagIds, passwordSet) + FRESH
+    `discordPresenceCache()` + FRESH env config per request (R10). Response
+    shape unchanged, both arms share it by construction (structural pins in
+    `tests/server/discord_status_cache.test.ts`); the 15/min rate guard is
+    untouched on both arms.
+  - New env keys (SERVER keys, read by the game service): `DISCORD_STATUS_CACHE_TTL_MS`
+    (default 15000) and `DISCORD_STATUS_CACHE_MAX_ENTRIES` (default 2000), parsed by
+    the module's exported `positiveIntFromEnv` (empty, non-numeric, non-positive all
+    fall back; defaults pinned to literals). THREE places landed: the module, the
+    game-service compose passthrough (the game service is an explicit allowlist, so
+    an unforwarded key is inert, the Phase 7 lesson; pinned by
+    `tests/deploy_discord_status_cache.test.ts`), and the DEPLOY.md operator bullets.
+    The bot-side four-place rule does NOT apply (not bot keys). OWED to the
+    maintainer like the Phase 3/6/7 fills (.env.example is harness-blocked):
+    `#DISCORD_STATUS_CACHE_TTL_MS=15000`, `#DISCORD_STATUS_CACHE_MAX_ENTRIES=2000`,
+    commented, beside the game-side Discord block; the deploy test deliberately
+    carries no .env.example pin until that lands.
+  - The winners-cache D11-retirement note in the Phase 5 record (drop
+    `DAILY_REWARD_WINNERS_CACHE_LIMIT` to `OUTBOX_WINNER_DAY_LIMIT`) stays with
+    the D11-retirement follow-up, NOT this phase, per the Phase 8 handoff.
+  - Peer-process staleness: the TTL (15s default) is the only bound for writes
+    a peer realm process made, the same tradeoff every board cache records; in
+    the one-process-per-realm deployment there is no peer writer for these
+    account-scoped rows in practice.
+  - New tests: `tests/server/discord_status_cache.test.ts` (18: mechanism,
+    stats counters, singleton, env keys live by literal name, defaults pinned
+    to literals, dual-arm structural pins incl. the legacy arm's rate-guard
+    adjacency), `tests/deploy_discord_status_cache.test.ts` (3),
+    the bust-arm describe in `tests/discord_db.test.ts` (9 cases over the real
+    write functions with per-site negative arms), seven handler-level arms in
+    `tests/discord_server.test.ts` (zero-query hit + byte-identical body, the
+    4-query miss pin, presence-fresh R10 arm, unlink and password-set busts
+    through the real handlers, reset-token negative, per-account isolation),
+    and the EXECUTED changed-account bust arm in
+    `tests/discord_db_integration.test.ts`.
+  - Review round (2026-08-02, privacy-security + database-performance, both
+    fresh over the uncommitted diff): zero true blocking; every finding
+    applied or resolved. Applied: `DiscordStatusLink`, the four-field cached
+    PROJECTION of the link row (discord_email can never sit in the cache, and
+    `setDiscordLinkEmail` is structurally bust-free, recorded at that site);
+    the `changed_account_ids` parse warns on missing-with-changed>0 and
+    guards `Number.isFinite`; the bulk over-bust on role/joined-only changes
+    recorded as deliberate; brownout contract and honest cost floor written
+    in the module header and DEPLOY.md (a warm entry stale-serves 200 where
+    the endpoint used to 500; a hit removes the four payload queries, the
+    auth-guard reads remain); `KeyedCachedRead.stats()` +
+    `discordStatusCacheStats()` (reads/refreshes/evictions/busts/entries,
+    the boardCache wire-up-later shape). Executed proof at the 1000 cap on
+    throwaway PG16: ModifyTable Actual Loops 1 / Rows 1000 in both statement
+    forms (the aggregate cannot re-run the UPDATE), wall 6.18 ms vs 5.69 ms.
+  - Declared residuals for the Phase 9 QA session, each with its reason:
+    stale-serve age is UNBOUNDED by the house cached_read contract (a
+    max-stale ceiling or a stale-serve counter needs the shared
+    `cached_read.ts` seam every board cache shares, so it is a follow-up,
+    not this phase; the one visible signal is cached_read's once-per-streak
+    console.warn); `deleteUnusedFederatedProvision` deliberately has no bust
+    (its WHERE admits only password-less, token-less, link-less accounts, so
+    no authenticated caller can ever have populated an entry; a bust there
+    would be dead code); prom export of the new stats() surface is
+    wire-up-later like the boardCache counters; the eviction-thrash shape
+    (2000+ authenticated accounts churning the cap to strip a victim's
+    entry) is bounded by the 15/min guard and account cost, accepted.
+
+## Phase 9 bust-site enumeration (the /api/discord staleness contract)
+
+The payload's database-backed inputs and every write that can change them,
+derived independently twice (context sweep + a dedicated enumeration agent
+re-deriving write sets from the SQL) and cross-checked. If a future change adds
+a NEW writer of `discord_links`, `reward_points`, `swag_claims`, or
+`accounts.password_set`, it must call `bustDiscordStatus(accountId)` in the
+same change, inside the shared write function, never at a route entry.
+
+Wired sites (8), each with a real-code-path test:
+
+| # | site | payload fields | placement |
+|---|---|---|---|
+| 1 | `linkDiscordToAccount` (discord_db.ts) | linked, username, avatar, guildMember, statusTier | return-true arm only; refusal + TOCTOU arms write nothing |
+| 2 | `unlinkDiscord` (discord_db.ts) | all link-derived fields | rowCount-gated: a repeat unlink is a no-op and must not evict |
+| 3 | `setDiscordGuildMember` (discord_db.ts) | guildMember | rowCount-gated (no-link accounts skip); same-value rewrite over-bust accepted, callers are per-event |
+| 4 | `setDiscordMemberMetaBulk` (discord_db.ts) | username (discord_username via nickname COALESCE) | per changed account via `RETURNING dl.account_id` + `changed_account_ids` aggregate; skipped/unapplied bust nothing; result shape unchanged |
+| 5 | `grantRewardPoints` (discord_db.ts) | points, lifetimePoints, statusTier | post-COMMIT beside the Phase 5 enqueue; zero/non-finite and dedupe-replay arms excluded |
+| 6 | `claimSwag` (discord_db.ts) | claimedSwagIds (+ points when priced) | post-COMMIT on EVERY ok, cost-0 included (unlike the feed enqueue, which is priced-only); refusal arms roll back |
+| 7 | `updatePasswordHash` (db.ts) | passwordSet | rowCount-gated; one chokepoint covers account.ts password change, the unlink pre-set, and the admin reset |
+| 8 | `consumePasswordResetRequest` (db.ts) | passwordSet | post-COMMIT success arm (writes password_set in its OWN transaction, never through site 7); expired/replayed token busts nothing |
+
+Deliberately NOT wired, with reasons (do not re-litigate without new facts):
+- `setDiscordLinkEmail`: discord_email is not a payload field.
+- Presence pushes (`setDiscordPresenceCache`): never cached, composed fresh (R10).
+- Account creation (`createAccount`, provisioning arms): a fresh serial id can
+  have no pre-existing cache entry.
+- `deleteUnusedFederatedProvision`: its WHERE admits only password-less,
+  token-less, link-less accounts, so no authenticated caller can hold an entry.
+- `reward_ledger` inserts: audit-only, never read by the payload.
+- OAuth state / pending-login / auth_tokens writes: not payload inputs.
+- Moderation writes: none touch the four tables (verified by SQL grep); the
+  admin password reset rides site 7.
+- Retention: no prune exists on discord_links / reward_points / swag_claims.
+
 ## Phase 5 feed-site enumeration (the linked-member change feed contract)
 
 Every server-side site where a linked account's flex-relevant state changes (level, class,
