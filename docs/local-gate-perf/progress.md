@@ -1,0 +1,97 @@
+# Progress: local gate performance
+
+Status: not-started / in-progress / blocked / complete / dropped
+
+## Status table
+
+| Phase | Title | Status | Started | Completed | Notes |
+|---|---|---|---|---|---|
+| 1 | Baseline harness and machine-tier protocol | not-started | | | |
+| 2 | Gate orchestration dedupe | not-started | | | |
+| 3 | Tiered local gate + tier worker presets | not-started | | | |
+| 4 | Vitest warm path | not-started | | | |
+| 5 | happy-dom for DOM tests | not-started | | | |
+| 6 | Pool, projects, isolation experiments | not-started | | | |
+| 7 | pnpm + shared store for worktrees | not-started | | | |
+| 8 | Task cache (turbo or wireit) | not-started | | | |
+| 9 | Suite cost reduction | not-started | | | |
+| 10 | Experimental runners spike | not-started | | | |
+| 11 | Cross-platform and tier matrix | not-started | | | |
+| 12 | Final QA and packet close | not-started | | | |
+
+## Per-phase deliverables
+
+### Phase 1 - Baseline harness and machine-tier protocol
+- [ ] Measurement script or documented commands that time each gate step
+- [ ] Top-N slowest vitest files captured (JSON reporter or equivalent)
+- [ ] Machine tier table started in `baselines.md` (at least one machine fully filled)
+- [ ] `experiment-log.md` header + first baseline row
+- [ ] No product behavior change required; docs + tooling only is OK
+- [ ] Tests for any new pure helpers under `scripts/` or `tests/`
+
+### Phase 2 - Gate orchestration dedupe
+- [ ] One gate run does not triple-regenerate i18n/wiki without need
+- [ ] pretest / gate / build interaction documented
+- [ ] Before/after wall for gate steps that regenerate artifacts
+- [ ] Full gate green
+
+### Phase 3 - Tiered local gate + tier worker presets
+- [ ] Documented `gate:fast` (or equivalent) for agents/day-to-day
+- [ ] Full gate still the merge bar
+- [ ] Tier presets or docs for GATE_MAX_WORKERS (low/medium/high)
+- [ ] Cross-platform notes for scripts
+- [ ] Pins/tests for new scripts as needed
+
+### Phase 4 - Vitest warm path
+- [ ] fsModuleCache (or measured drop if harmful) decision recorded
+- [ ] `test:related` / changed helper scripts
+- [ ] Warm re-run numbers in baselines
+- [ ] Optional @vitest/ui only if it does not bloat default install path badly
+
+### Phase 5 - happy-dom
+- [ ] happy-dom dependency added if experiment kept
+- [ ] jsdom pragma migration strategy (all or subset)
+- [ ] DOM suite green; full suite green if adopted
+- [ ] Keep or drop logged
+
+### Phase 6 - Pool / projects / isolation
+- [ ] At least one pool experiment measured (threads vs forks)
+- [ ] Optional vitest projects split evaluated
+- [ ] isolate:false only on proven-safe project if at all
+- [ ] Keep/drop log; full suite green for anything kept
+
+### Phase 7 - pnpm
+- [ ] Multi-worktree install timing before/after
+- [ ] Windows/macOS/Linux install notes
+- [ ] CI and CONTRIBUTING policy updated if migration kept
+- [ ] Fallback plan if dropped
+- [ ] Full gate green under chosen package manager
+
+### Phase 8 - Task cache
+- [ ] turbo or wireit chosen with rationale
+- [ ] Cacheable steps listed (i18n, types, builds, not blind test skip)
+- [ ] Cold vs warm gate numbers
+- [ ] Full correctness still enforced when inputs change
+
+### Phase 9 - Suite cost reduction
+- [ ] Profiling-driven fixture or split changes
+- [ ] Top heavies improved or justified defer
+- [ ] Architecture/scan cost considered if it is a top offender
+- [ ] Full suite green
+
+### Phase 10 - Experimental runners
+- [ ] turbo-test spike numbers + pass rate
+- [ ] Optional Bun microbench
+- [ ] Explicit decision: not default / dual-run / adopt
+- [ ] No default gate swap without owner sign-off in state.md
+
+### Phase 11 - Cross-platform and tier matrix
+- [ ] Validation matrix filled for Windows, macOS, Linux (as available)
+- [ ] Low/medium/high guidance in CONTRIBUTING or docs
+- [ ] Agent workflow docs (worktree + store + gate:fast)
+
+### Phase 12 - Final QA and close
+- [ ] `npm run gate` (or evolved) green on worktree
+- [ ] Docs synced (qa-gate.md, CONTRIBUTING as needed)
+- [ ] experiment-log complete
+- [ ] Teardown offer recorded; packet kept or slimmed
