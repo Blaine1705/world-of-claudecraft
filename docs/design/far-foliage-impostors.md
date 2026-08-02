@@ -99,6 +99,42 @@ and the fog wall. Measured at the fixed probe spots
   the loading screen) into one mip-mapped texture, 2048px on desktop tiers,
   halved cells under `GFX.constrainedMemory`.
 
+## The fog-free vista (second stage)
+
+The outdoor fog is REMOVED on the vista tiers (medium and up, memory
+permitting): scene fog parks past the camera far plane where it occludes
+nothing (its color still feeds the sky tint), and the whole world renders
+from anywhere. What makes that affordable:
+
+- a whole-world far-terrain layer (`src/render/far_terrain.ts` +
+  `far_terrain_core.ts`, ported from the shelved far-render branch): about a
+  dozen static Lambert vertex-color tiles, built once across idle slots from
+  the same heightfield and the shared `terrain_palette.ts`, with
+  crest-preserving sampling (`farVertexHeight`, a half-cell max) so ridge
+  silhouettes stay truthful and trees behind a crest stay hidden;
+- the sprites run to the whole-world envelope, merged into ONE InstancedMesh
+  per category (3 draws, ~5.8k quads world-wide): per-instance windows do
+  the culling, and past the detail envelope each sprite eases down by its
+  precomputed shortfall against the far-mesh surface (plus a small settle)
+  so bases stay planted on the coarse ground;
+- every detail subsystem culls at `FOGLESS_DETAIL_FAR` (700, exactly the
+  widest cull the fogged clear realms ever ran, residency-eased as before),
+  so no subsystem draws farther than it ever did; the camera far plane and
+  the water apron grow with the tier plan (`farVistaPlan`).
+
+The lean arm (low tier, weak iGPU, constrained memory) keeps classic fog
+byte-for-byte: its render model needs the wall, and it ships no vista and no
+sprites. Interior and rift fogs are untouched everywhere (enclosed-space
+mood, no draw distance behind them). The murk realms lose their fog walls by
+design here: realm mood now lives in light grades and sky alone.
+
+Measured (fixed probe spots, high tier): the light coastal vantages sit
+within a few percent of the fogged game; the densest mid-strip vantage (the
+old marsh wall at 165u) now draws the whole strip at about 1070 calls and
+15M submitted triangles, holding 90 to 115 fps on an Apple-silicon high
+tier. The far layer itself costs about 12 tile draws plus 3 sprite draws
+and 11.5k sprite triangles for the entire world.
+
 ## Known tradeoffs
 
 - One sprite covers bark and canopy, so the whole picture takes the dominant
@@ -109,3 +145,8 @@ and the fog wall. Measured at the fixed probe spots
   read.
 - Sprites neither cast nor receive shadows; the shadow pass keeps its
   build-time radius, inside every sprite band.
+- Fog-free extras: zone features and props still cull at the detail horizon
+  (a building pops at 700u, about 15px, exactly where the old clear-realm
+  fog swallowed it); the sun and moon sprites draw depth-free and can burn
+  through the far ridge line near the horizon; the far mesh drops sub-cell
+  features (roads, hub discs), so distant ground reads as pure biome color.

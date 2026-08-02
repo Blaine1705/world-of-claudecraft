@@ -26,6 +26,9 @@
 // renders during the loading screen) and lives as one mip-mapped texture.
 
 import * as THREE from 'three';
+import { WORLD_MIN_X, WORLD_MIN_Z } from '../sim/data';
+import { terrainHeight } from '../sim/world';
+import { FAR_MESH_DROP, FAR_WORLD_MARGIN, farVertexHeight, farVistaPlan } from './far_terrain_core';
 import { collapseWindowUniforms } from './foliage_collapse';
 import {
   IMPOSTOR_ATLAS_MAX,
@@ -109,7 +112,7 @@ export interface ImpostorRegistration {
 export interface ImpostorSession {
   registerArchetype(category: ImpostorCategory, key: string, parts: BakePart[]): number;
   bucket(category: ImpostorCategory, x: number, z: number, radius: number): ImpostorBucketHandle;
-  finalize(webgl: THREE.WebGLRenderer, parent: THREE.Group): ImpostorRegistration[];
+  finalize(webgl: THREE.WebGLRenderer, parent: THREE.Group, seed: number): ImpostorRegistration[];
 }
 
 /** Sprites ship on the same arm the cone impostors did. */
@@ -224,11 +227,12 @@ function bakeAtlas(
     // render target bound, three ignores the renderer-level setViewport (that
     // state belongs to the canvas) and reads renderTarget.viewport each
     // render call. The clear alpha is 0 (the alpha test carves sprites from
-    // it) but the clear RGB is a foliage green: the MSAA resolve and the mip
-    // chain average edge texels toward the clear color, and a black surround
-    // rims every sprite dark where green disappears into the canopy.
+    // it) but the clear RGB is a mid-canopy green: the MSAA resolve and the
+    // mip chain average edge texels toward the clear color, so distant
+    // sprites (deep mips are mostly such averages) tint toward foliage
+    // instead of collapsing to near-black silhouettes.
     bakeTarget.scissorTest = true;
-    webgl.setClearColor(0x33502c, 0);
+    webgl.setClearColor(0x86a868, 0);
     webgl.autoClear = false;
 
     archetypes.forEach((arch, ai) => {
@@ -378,6 +382,7 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
     shader.uniforms.uImpSwap = swap;
     shader.uniforms.uImpFade = u.uFade;
     shader.uniforms.uImpSpriteFar = u.uSpriteFar;
+    shader.uniforms.uImpSinkStart = u.uFogCull;
     shader.uniforms.uImpViews = { value: CATEGORY_VIEWS[category] };
     shader.uniforms.uImpWind = { value: windStrength };
     shader.vertexShader = shader.vertexShader
@@ -390,8 +395,10 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         uniform float uImpSpriteFar;
         uniform float uImpViews;
         uniform float uImpWind;
+        uniform float uImpSinkStart;
         attribute vec4 aImpostorCell;
         attribute float aImpostorWind;
+        attribute float aImpostorSink;
         varying vec2 vImpUvA;
         varying vec2 vImpUvB;
         varying float vImpBlend;`,
@@ -428,6 +435,14 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         vec3 impFwd = vec3(impToCam.x, 0.0, impToCam.y) / max(impDist, 1e-4);
         vec3 impRight = normalize(cross(vec3(0.0, 1.0, 0.0), impFwd));
         vec3 impOff = impRight * (position.x * impSx) + vec3(0.0, 1.0, 0.0) * (position.y * impSy);
+        // Past the detail envelope the ground under a sprite is the coarse
+        // far-tile mesh, which can sit below the true heightfield, so far
+        // sprites ease down by their own precomputed shortfall plus a small
+        // universal settle (a distant tree buried 2u reads planted; a tree
+        // floating 2u reads broken, so the bias runs downhill). Zero
+        // anywhere real geometry could stand next to them, so the handoff
+        // stays exact.
+        impOff.y -= (aImpostorSink + 2.0) * clamp((impDist - uImpSinkStart) / 240.0, 0.0, 1.0);
         ${IMPOSTOR_WIND_GLSL}
         impOff.x += windAmt;
         impOff.z += windAmt * 0.6;
@@ -464,6 +479,39 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
 // ---------------------------------------------------------------------------
 // Session
 // ---------------------------------------------------------------------------
+
+// How far the coarse far-tile surface sits BELOW a sprite's true base: its
+// safety drop plus the crest chord error of the tier's sampling grid,
+// bilinearly reconstructed the way the far mesh itself samples. Sprites past
+// the detail envelope ease down by this much so their bases stay planted on
+// the vista instead of floating over shaved ridge crests.
+const farCornerCache = new Map<string, number>();
+function farCornerHeight(x: number, z: number, spacing: number, seed: number): number {
+  const key = `${x}:${z}`;
+  const cached = farCornerCache.get(key);
+  if (cached !== undefined) return cached;
+  const y = farVertexHeight(x, z, spacing, seed);
+  farCornerCache.set(key, y);
+  return y;
+}
+
+function farMeshShortfall(x: number, z: number, baseY: number, seed: number): number {
+  const vista = farVistaPlan(GFX.tier, GFX.constrainedMemory);
+  if (!vista.enabled) return 0;
+  const spacing = vista.spacing;
+  const originX = WORLD_MIN_X - FAR_WORLD_MARGIN;
+  const originZ = WORLD_MIN_Z - FAR_WORLD_MARGIN;
+  const x0 = originX + Math.floor((x - originX) / spacing) * spacing;
+  const z0 = originZ + Math.floor((z - originZ) / spacing) * spacing;
+  const tx = (x - x0) / spacing;
+  const tz = (z - z0) / spacing;
+  const h00 = farCornerHeight(x0, z0, spacing, seed);
+  const h10 = farCornerHeight(x0 + spacing, z0, spacing, seed);
+  const h01 = farCornerHeight(x0, z0 + spacing, spacing, seed);
+  const h11 = farCornerHeight(x0 + spacing, z0 + spacing, spacing, seed);
+  const farY = (h00 * (1 - tx) + h10 * tx) * (1 - tz) + (h01 * (1 - tx) + h11 * tx) * tz;
+  return Math.max(0, baseY - (farY - FAR_MESH_DROP));
+}
 
 const scratchMatrix = new THREE.Matrix4();
 const scratchQuat = new THREE.Quaternion();
@@ -526,25 +574,48 @@ export function createImpostorSession(): ImpostorSession | null {
       };
     },
 
-    finalize(webgl, parent) {
+    finalize(webgl, parent, seed) {
       if (archetypes.length === 0) return [];
       const { target, rects } = bakeAtlas(webgl, archetypes);
       adoptAtlas(target);
       const texture = target.texture;
       const registrations: ImpostorRegistration[] = [];
+      // One mesh per CATEGORY for the whole world, not per bucket: sprites
+      // run to the view horizon now (the outdoor fog is gone), so nearly
+      // every bucket row would be live anyway and the merge turns ~90 draws
+      // into 3. The per-instance shader windows are the real cull; the
+      // merged row's registry entry only sheds the whole layer when the
+      // camera leaves the world (an interior).
+      const merged = new Map<ImpostorCategory, { items: SpriteInstance[]; minX: number; maxX: number; minZ: number; maxZ: number }>();
       for (const acc of buckets) {
         if (acc.items.length === 0) continue;
+        let entry = merged.get(acc.category);
+        if (!entry) {
+          entry = {
+            items: [],
+            minX: Infinity,
+            maxX: -Infinity,
+            minZ: Infinity,
+            maxZ: -Infinity,
+          };
+          merged.set(acc.category, entry);
+        }
+        entry.items.push(...acc.items);
+        entry.minX = Math.min(entry.minX, acc.x - acc.radius);
+        entry.maxX = Math.max(entry.maxX, acc.x + acc.radius);
+        entry.minZ = Math.min(entry.minZ, acc.z - acc.radius);
+        entry.maxZ = Math.max(entry.maxZ, acc.z + acc.radius);
+      }
+      for (const [category, entry] of merged) {
+        const { items } = entry;
         const geo = impostorQuadGeo().clone();
-        const mesh = new THREE.InstancedMesh(
-          geo,
-          impostorMaterial(acc.category, texture),
-          acc.items.length,
-        );
-        mesh.name = `foliage-impostor-${acc.category}`;
-        const cell = new Float32Array(acc.items.length * 4);
-        const wind = new Float32Array(acc.items.length);
+        const mesh = new THREE.InstancedMesh(geo, impostorMaterial(category, texture), items.length);
+        mesh.name = `foliage-impostor-${category}`;
+        const cell = new Float32Array(items.length * 4);
+        const wind = new Float32Array(items.length);
+        const sink = new Float32Array(items.length);
         let maxHeight = 0;
-        acc.items.forEach((item, i) => {
+        items.forEach((item, i) => {
           scratchQuat.setFromAxisAngle(UP, item.yaw);
           scratchMatrix.compose(
             scratchPos.set(item.x, item.y, item.z),
@@ -560,10 +631,12 @@ export function createImpostorSession(): ImpostorSession | null {
           cell[i * 4 + 2] = rect.u1 - rect.u0;
           cell[i * 4 + 3] = rect.v1 - rect.v0;
           wind[i] = item.windScale;
+          sink[i] = farMeshShortfall(item.x, item.z, item.y, seed);
           maxHeight = Math.max(maxHeight, item.height, arch.width * 0.5);
         });
         geo.setAttribute('aImpostorCell', new THREE.InstancedBufferAttribute(cell, 4));
         geo.setAttribute('aImpostorWind', new THREE.InstancedBufferAttribute(wind, 1));
+        geo.setAttribute('aImpostorSink', new THREE.InstancedBufferAttribute(sink, 1));
         mesh.instanceMatrix.needsUpdate = true;
         if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
         mesh.castShadow = false;
@@ -573,10 +646,10 @@ export function createImpostorSession(): ImpostorSession | null {
         parent.add(mesh);
         registrations.push({
           mesh,
-          x: acc.x,
-          z: acc.z,
-          radius: acc.radius,
-          category: acc.category,
+          x: (entry.minX + entry.maxX) / 2,
+          z: (entry.minZ + entry.maxZ) / 2,
+          radius: Math.hypot(entry.maxX - entry.minX, entry.maxZ - entry.minZ) / 2 + 20,
+          category,
         });
       }
       return registrations;
@@ -603,6 +676,10 @@ export function impostorPrewarmMeshes(): THREE.Object3D[] {
     mesh.geometry.setAttribute(
       'aImpostorWind',
       new THREE.InstancedBufferAttribute(new Float32Array([1]), 1),
+    );
+    mesh.geometry.setAttribute(
+      'aImpostorSink',
+      new THREE.InstancedBufferAttribute(new Float32Array([0]), 1),
     );
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;

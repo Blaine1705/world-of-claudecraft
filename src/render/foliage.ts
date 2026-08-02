@@ -3194,7 +3194,7 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
     try {
       // One atlas bake, then one quad InstancedMesh per (bucket, category):
       // the whole far field costs a handful of draws and 2 triangles per plant.
-      for (const reg of session.finalize(webgl, group)) {
+      for (const reg of session.finalize(webgl, group, seed)) {
         bucketMeshes.push({
           mesh: reg.mesh,
           x: reg.x,
@@ -3304,7 +3304,11 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
       collapseWindows.dressMax = spritesOn ? dressSwap : fogLimit;
       collapseWindows.fogCull = fogLimit;
       collapseWindows.fade = spritesOn ? IMPOSTOR_SWAP_FADE : 0;
-      collapseWindows.spriteFar = fogFar;
+      // Sprites run to the view horizon: with outdoor fog gone the renderer
+      // passes the whole-world envelope through atmosFogFar, so the far
+      // field carries every tree to the world rim; under a live fog (an
+      // interior, the lean arm) the wall still bounds them.
+      collapseWindows.spriteFar = Math.max(fogFar, atmosFogFar);
       updateCollapseUniforms(collapseWindows);
       modelVisibleBuckets = 0;
       modelVisibleDraws = 0;
@@ -3340,7 +3344,7 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
         bucketWindow.fogLimit = fogLimit;
         bucketWindow.spriteRow = b.lod === 'impostor';
         bucketWindow.swapFade = collapseWindows.fade;
-        bucketWindow.spriteFar = fogFar;
+        bucketWindow.spriteFar = collapseWindows.spriteFar;
         b.mesh.visible = bucketVisible(bucketWindow);
         // "Visible" counts SUBMITTED instances: shader-collapsed ones still
         // count here (the collapse saves raster work, not submission).
