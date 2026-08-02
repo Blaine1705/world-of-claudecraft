@@ -378,6 +378,29 @@ For off-box safety, sync the directory to S3 occasionally:
   and `/readyz` need no token, but they are for the container healthcheck and the
   host watchdog, which read them locally and never through Caddy; nothing on the
   public internet needs them.
+- **Discord bot series (Grafana)**: the bot reports its rate-limit governor
+  counters on the presence push it already sends, so `/metrics` carries them with
+  no extra scrape target and no bot-side endpoint. Cumulative counters
+  (`rate()` and `increase()` apply; the server accumulates across bot restarts, so
+  rendered totals never go backwards): `woc_discord_bot_requests_total`,
+  `woc_discord_bot_rate_limited_total` (labeled `scope` over `user`, `global`,
+  `shared`, `unknown`), `woc_discord_bot_global_pauses_total`,
+  `woc_discord_bot_ban_pauses_total`, `woc_discord_bot_breaker_opens_total`,
+  `woc_discord_bot_forbidden_blocks_total`, `woc_discord_bot_breaker_blocks_total`.
+  Live gauges: `woc_discord_bot_queue_depth`, `woc_discord_bot_tracked_buckets`,
+  `woc_discord_bot_tracked_routes`, `woc_discord_bot_active_queues`,
+  `woc_discord_bot_forbidden_entries`, `woc_discord_bot_breaker_state` (labeled
+  `state` over `closed`, `open`, `half-open`; 1 on the active state), and
+  `woc_discord_bot_push_age_seconds` (time since the last bot push). The two
+  signals worth alerting on at 2am: **breaker opens** (any increase of
+  `woc_discord_bot_breaker_opens_total` means the bot tripped its own circuit
+  breaker; any open at all is worth an alert) and the **429 rate**
+  (`sum(rate(woc_discord_bot_rate_limited_total[5m]))`; after the stability
+  packet, normal is near zero, so a sustained climb is the next storm forming).
+  The gauges and the breaker state read zero five minutes after the bot stops
+  pushing (the same staleness rule the presence snapshot uses) while the
+  cumulative counters hold their totals; read `woc_discord_bot_push_age_seconds`
+  to tell a quiet bot from a dead one.
 - **Game watchdog (wedge recovery)**: `deploy/game_watchdog.sh`, installed as
   `/usr/local/bin/eastbrook-watchdog` and fired every minute from
   `/etc/cron.d/eastbrook-watchdog`. Docker's `restart: unless-stopped` only acts when

@@ -18,7 +18,7 @@
 | Phase 6 QA | complete | 2026-08-01 | 2026-08-01 |
 | Phase 7: Supervision + deploy hardening | built | 2026-08-01 | 2026-08-01 |
 | Phase 7 QA | complete | 2026-08-02 | 2026-08-02 |
-| Phase 8: Observability | not started | | |
+| Phase 8: Observability | built | 2026-08-02 | 2026-08-02 |
 | Phase 8 QA | not started | | |
 | Phase 9: /api/discord caching | not started | | |
 | Phase 9 QA (packet close) | not started | | |
@@ -83,10 +83,10 @@
       L6 bot-specific tsconfig
 
 ### Phase 8
-- [ ] Counters ride presence POST (both arms), clamped server-side
-- [ ] Prom lines on the existing metrics path with staleness zeroing
-- [ ] Grafana note in DEPLOY.md
-- [ ] Clamp/render/staleness tests
+- [x] Counters ride presence POST (both arms), clamped server-side
+- [x] Prom lines on the existing metrics path with staleness zeroing
+- [x] Grafana note in DEPLOY.md
+- [x] Clamp/render/staleness tests
 
 ### Phase 9
 - [ ] `/api/discord` payload behind keyed `createCachedRead` + moderation busts
@@ -1383,3 +1383,70 @@ clean; 300+ tests green across the ten bot and deploy suites; `npm run
 build:bot` bundles; `npm run ci:changed` exit 0 with zero errors (the one
 format error it caught mid-round was fixed scoped); full `npm run gate` PASS
 end to end, the packet's first since the worktree false-positive began.
+
+### Phase 8 (2026-08-02)
+
+Release sync: `origin/release/v0.34.0` measured 111 ahead / 2 behind at session
+start; the two-commit delta (gate vitest worker memory clamp, native
+app-lifecycle zombie WebSocket recovery) merged clean as `0fb599b02`. No overlap
+with packet files; `tests/ci_workflow.test.ts` was not in the delta, so the
+workflow re-measure trap did not apply; the `scripts/gate.mjs` auto-merge was
+verified to keep both the new worker clamp and the branch's bot-build step, and
+the gate_workers + ci_workflow suites ran green post-merge.
+
+Built as two parallel Agent slices (bot, server) per the phase file, with the
+cross-slice contract fixed by the orchestrator up front and recorded as R18 to
+R22 in state.md before implementation started: the 14-field wire shape and key
+order, cumulative totals on the wire (R19), the hybrid Counter/Gauge rendering
+(R18), the four-value scope allowlist (R20, code over the phase prose's three),
+the staleness field split with the closure-held push age (R21), and the
+sweep-durations / outbox-drain-sizes trim (R22, no accessor exists and adding
+one is out of scope). The idle-without-report delivery trap struck the Explore
+context loader (one nudge recovered the full report); both implementation
+agents reported unprompted.
+
+What shipped, beyond the checklist headline:
+
+- `bot/presence_counters.ts`: a pure TOTAL collector (throwing or hostile
+  governor reads yield no `counters` key, never a failed presence push), fresh
+  literal in pinned wire order, plus `withPresenceCounters` as the attach seam
+  in `pushPresence`. A real-governor guard test compares the live snapshot key
+  set against the wire contract so a future governor counter cannot go silently
+  unreported.
+- Both presence arms share `sanitizeBotCounters` (clamp to [0, 1e9], scope
+  record rebuilt from the fixed four keys, three-state breaker allowlist,
+  unknown fields dropped, non-object skips the cache so an old bot keeps
+  working), pinned identical by a dual-arm test; no known_deviations row
+  needed. The presence handler stays db-free, preserving the parity suite's
+  premise.
+- `server/discord_bot_counters.ts` (injected clock throughout, unlike its
+  presence twin) and `server/http/discord_bot_metrics.ts`: 14 metric names, 19
+  series, all rendering at zero from registration; counters advance at push
+  time by delta with the bot-restart guard, gauges read the cache at scrape.
+- Worst-case presence body with the counters block: 7214 bytes against the
+  64 KiB readBody cap (the block alone is 443 bytes).
+- No new env keys, no .env.example debt added, no new route, no SQL.
+- Both slices ran mutation checks (wrapper deletion, field transposition,
+  trunc-to-round plus cap removal plus key reorder, restart guard to plain
+  subtraction, staleness > to >=, allowlist passthrough, sanitizer input
+  spread): every mutant killed by a named test.
+
+Validation at close: `npx tsc --noEmit` clean; 795 tests green across the 15
+bot, server, spine, and deploy-doc suites; `npm run build:bot` and
+`npm run build:server` pass; `npm run ci:changed` exit 0.
+
+Review round (privacy-security-review plus test-coverage-auditor, both fresh
+over the combined diff): security ZERO blocking; coverage ONE blocking plus
+four should-fix, all closed in-round. The blocking finding was real and
+mutation-shaped: nothing pinned `registerDiscordBotMetrics` into the server
+boot, so deleting the one wiring line left all 168 new tests green while
+/metrics rendered none of the series; it is now a source pin in
+`tests/server/game_boot_order.test.ts` beside the liveness pin it copies.
+Also closed: the absent-scope-record 500 arm, the bounded push-timestamp pin
+(a Date.now-to-0 mutant survived the typeof pin), the exporter's default-clock
+arm, the scope-level real-governor guard, the envelope byte pin now built
+through the production attach seam, and the stale-read copy pin. The security
+review's one should-fix became a stated trust model in the metrics module
+header (secret holders are trusted for metric integrity; memory, series count
+and labels stay hard-bounded); the remaining notes are declared residuals in
+state.md for the QA session.

@@ -767,6 +767,85 @@ because dropping the one word is otherwise silent),
       bound, ruling upheld) / 1 real gap (the exit default, fixed and re-proven
       9/9 in the fix-round pass). Fresh-eyes round over the fixes: 4 nits, all
       applied.
+- Phase 8 (observability, built 2026-08-02; QA session still owed; decisions
+  recorded as R18 to R22 in the rulings section):
+  - New modules: `bot/presence_counters.ts` (pure and TOTAL: `PresenceCounters`
+    is the 14-field wire contract, deliberately declared separately from
+    `GovernorCounters` so the wire changes only on purpose;
+    `PRESENCE_COUNTER_CAP` 1e9; `collectPresenceCounters(read)` answers null for
+    anything untrustworthy; `withPresenceCounters(body, read)` is the attach
+    seam, and a failed collection returns the ORIGINAL body with no `counters`
+    key at all, so telemetry can never fail a presence push);
+    `server/discord_bot_counters.ts` (process-local cache; every entry point
+    takes injected nowMs, unlike its presence twin in `server/discord.ts`;
+    `DISCORD_BOT_COUNTERS_STALE_MS` 5 min; a single-slot
+    `onDiscordBotCountersPush` listener notified AFTER store inside try/catch,
+    so a metrics bug cannot fail a presence push; a second register call in one
+    process would steal the feed from the first registry, fine while main.ts
+    registers once at boot); `server/http/discord_bot_metrics.ts`
+    (`registerDiscordBotMetrics(registry, now = Date.now)`, wired at boot beside
+    the game-state and business registrations).
+  - Both presence arms gained the IDENTICAL sanitize-and-set lines via the
+    shared `sanitizeBotCounters` (`BOT_COUNTER_MAX` 1e9; a non-object `counters`
+    skips the cache entirely, so an absent block from an old bot means "no
+    sample", never "zeroed governor"); the response body is unchanged and the
+    handler stays db-free, preserving the parity suite's premise. No
+    known_deviations row, no surface_inventory change, no new route.
+  - Series (14 metric names, 19 series, every one rendering at zero from
+    registration): counters `woc_discord_bot_requests_total`,
+    `woc_discord_bot_rate_limited_total{scope}` (four fixed scopes),
+    `woc_discord_bot_global_pauses_total`, `woc_discord_bot_ban_pauses_total`,
+    `woc_discord_bot_breaker_opens_total`,
+    `woc_discord_bot_forbidden_blocks_total`,
+    `woc_discord_bot_breaker_blocks_total`; gauges
+    `woc_discord_bot_queue_depth`, `woc_discord_bot_tracked_buckets`,
+    `woc_discord_bot_tracked_routes`, `woc_discord_bot_active_queues`,
+    `woc_discord_bot_forbidden_entries`,
+    `woc_discord_bot_breaker_state{state}` (three fixed states), and
+    `woc_discord_bot_push_age_seconds`. The plain `rateLimited` field is cached
+    but has no series (the scope series sum to it, R18).
+  - The wire contract is declared twice BY DESIGN (bot `PresenceCounters`,
+    server sanitizer), and each side pins its own exact 14-key set: the bot
+    suite pins Object.keys order plus a real-governor key-set guard (a counter
+    the governor grows later reds the suite, forcing a widen-or-record
+    decision), the server suite pins exact Object.keys on the sanitizer output.
+    A one-sided edit reds its own side; nothing cross-checks the two files
+    directly.
+  - No new env keys, so no new `.env.example` debt (the owed Phase 3, 6, and 7
+    fills stand unchanged).
+  - Review round (privacy-security-review plus test-coverage-auditor, both fresh
+    over the combined uncommitted diff): security ZERO blocking (trust boundary,
+    label-injection impossibility, bounded memory, both auth gates each verified
+    against code); coverage ONE blocking plus four should-fix, ALL closed in the
+    same round: `tests/server/game_boot_order.test.ts` now pins
+    `registerDiscordBotMetrics(httpMetrics.registry)` as an ACTIVE boot call
+    (deleting that one wiring line had left all 168 tests green while /metrics
+    rendered nothing); the absent-scope-record arm (counters with no
+    `rateLimitedByScope` must store four zeros, not 500 the presence push) and a
+    BOUNDED push-timestamp pin (a `Date.now()` to `0` mutant had survived the
+    typeof pin and would park every push permanently stale) landed in
+    `tests/server/internal.test.ts`; the exporter's DEFAULT `Date.now` clock is
+    driven once (`bot/CLAUDE.md`'s default-path rule applied server-side); the
+    real-governor guard now covers the scope record one level down (a fifth
+    `RateLimitScope` would have type-checked and silently vanished from the
+    wire); the with-counters envelope row now builds its body through
+    `withPresenceCounters`, so the byte pin sees the PRODUCTION key order; and
+    the stale-read defensive copy is pinned.
+  - Declared residuals for the Phase 8 QA session, judged not worth code this
+    round: the restart guard is NOT an anti-abuse bound, a `DISCORD_BOT_SECRET`
+    holder can inflate the counter series (alternating high/low pushes, or just
+    honestly huge totals); the trust model is now stated in the metrics module
+    header (secret holders are trusted for metric integrity; memory, series
+    count and label values stay hard-bounded regardless of the caller). A
+    garbage `breakerState` from a non-current pusher sanitizes to an
+    affirmative 'closed' rather than to null (the current bot normalizes
+    bot-side, so only a broken or hostile pusher can hit the arm; QA may weigh
+    null-for-garbage). `BOT_COUNTER_MAX` and `PRESENCE_COUNTER_CAP` are the
+    same 1e9 declared on both sides of the trust boundary with no shared pin
+    (the server clamp is the authoritative one, the bot clamp is defense in
+    depth, and drift in either direction is harmless). The push-age
+    `Math.max(0, ...)` arm is unreachable without a backwards clock
+    (no-change-needed).
 ## Phase 5 feed-site enumeration (the linked-member change feed contract)
 
 Every server-side site where a linked account's flex-relevant state changes (level, class,
@@ -992,6 +1071,53 @@ being ruled; do not re-litigate without new facts.
   step commented out, by `|| true`, by `continue-on-error`, and by an `if:` slipped
   between the name and the run line. Keep the whitespace in such a pin tolerant so a
   biome re-wrap does not red it falsely.
+- R18 (settled in Phase 8, answering R13's delegated question): the rendering shape
+  for pushed bot counters is HYBRID, following the two house patterns. The eight
+  cumulative fields render as real prom-client Counters incremented at push time by a
+  computed delta with a restart guard (a pushed value below the last seen means the
+  bot restarted, so the increment is the new total, never negative), in the style of
+  the event-driven `GameMetricsCounters`. The five gauge fields plus breaker state
+  render as Gauges with collect() reading the cached snapshot. Reasoning: the two
+  alert signals are rates, and true Counters keep TYPE counter with textbook
+  rate()/increase() semantics while R13's deliberate crash loops accumulate honestly
+  server-side instead of sawtoothing; the gauge-natured fields go down, so they can
+  never be Counters. The plain `rateLimited` total is accepted and cached but NOT
+  rendered: the four scope series sum to it, and Prometheus convention is to not
+  pre-aggregate.
+- R19 (settled in Phase 8): the bot sends CUMULATIVE totals, not per-interval deltas.
+  The bot stays stateless (no last-pushed bookkeeping and no reset-on-ack logic, which
+  `pushPresence`'s null-not-throw contract would make lossy), debounce folding and
+  dropped pushes lose nothing, and the wire shape matches `RateGovernor.snapshot()`
+  verbatim. The restart consequence (values go down when the bot restarts) is handled
+  entirely server-side by R18's delta guard.
+- R20 (settled in Phase 8): the 429 scope label allowlist is the governor's actual
+  four-value enum (`user`, `global`, `shared`, `unknown`), not the three values the
+  phase prose lists: `RateLimitScope` has four members and
+  `tests/discord_bot_governor_counters.test.ts` pins all four buckets. Code over
+  prose. Unrecognized keys in a pushed scope record are DROPPED, never a label value;
+  exposition labels only ever come from the fixed list iterated in server code.
+- R21 (settled in Phase 8): counters staleness mirrors the presence rule's field
+  split. Five minutes after the last push, the five gauge fields zero and breaker
+  state renders no claim (all three labeled series 0), while the eight cumulative
+  totals persist: zeroing a total would fabricate a counter reset at every quiet
+  spell. The window is `DISCORD_BOT_COUNTERS_STALE_MS`, a constant mirroring the
+  presence cache's hardcoded five minutes and deliberately NOT env-configurable (a
+  recorded D13 deviation: making one window configurable but not its mirror invites
+  drift, and neither has ever needed tuning). The never-written cache is not stale,
+  matching the presence `updatedAt &&` guard's behavior (implemented as a stored-slot
+  null check so a push stamped at epoch 0 still ages normally). The push-age gauge
+  reads a closure-held last-push time, NOT the cache's updatedAt, because staleness
+  zeroing clears updatedAt and would freeze the age exactly when it matters; before
+  the first push the unlabeled gauge renders 0 per the phase's
+  every-series-at-zero acceptance rule, so a never-pushed bot reads age 0 and the
+  all-zero counters are what distinguish it.
+- R22 (settled in Phase 8): D16's "sweep durations" and "outbox drain sizes" are
+  TRIMMED from this phase. Neither has an accessor today (the scheduler exposes only
+  `size` and `intervalMs()`; `runOutboxPoll` returns a bare didWork boolean), and
+  adding one changes what those modules count, which the phase's out-of-scope line
+  forbids; a run-duration counter additionally needs a clock seam the scheduler
+  deliberately lacks. Deferred to a follow-up if operators ask; the governor block
+  fully serves both alert-worthy signals (breaker opens, 429 rate).
 
 ## OPEN items
 
