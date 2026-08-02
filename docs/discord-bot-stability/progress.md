@@ -19,7 +19,7 @@
 | Phase 7: Supervision + deploy hardening | built | 2026-08-01 | 2026-08-01 |
 | Phase 7 QA | complete | 2026-08-02 | 2026-08-02 |
 | Phase 8: Observability | built | 2026-08-02 | 2026-08-02 |
-| Phase 8 QA | not started | | |
+| Phase 8 QA | complete | 2026-08-02 | 2026-08-02 |
 | Phase 9: /api/discord caching | not started | | |
 | Phase 9 QA (packet close) | not started | | |
 
@@ -1450,3 +1450,95 @@ review's one should-fix became a stated trust model in the metrics module
 header (secret holders are trusted for metric integrity; memory, series count
 and labels stay hard-bounded); the remaining notes are declared residuals in
 state.md for the QA session.
+
+### Phase 8 QA (2026-08-02)
+
+Verdict: PASS. Head `f2651a358` at close; the QA session's own commits are the
+release sync `e6448562e`, the fix round `a174d2963`, the doc corrections
+`f582ce7bd`, and the fresh-eyes round `f2651a358`.
+
+Release sync: `origin/release/v0.34.0` measured 31 behind / 116 ahead at
+session start (the CI speed packet, PR #2737). The merge CONFLICTED in
+`.github/workflows/ci.yml` and `tests/ci_workflow.test.ts`, and the auto-merge
+would have shipped a live defect: it parked the release-tier bot build inside
+the new UNSHARDED `release-checks` job still carrying `if: matrix.shard == 1`,
+which is never true there and would have silently disabled the step (the exact
+trap the branch's own test comment predicted). Resolved by hand: `build:bot`
+joined the shared CHECK_RUN_STEPS pin list, both check jobs measure 13 named
+steps with anchored-adjacency bot pins, both test jobs are tests-only at 4
+steps over an 8-shard matrix, and `matrix.shard == 1` no longer appears in the
+workflow. release-merge-audit clean (no bot/server source in the delta; gate.mjs
+and daily_rewards_routes auto-merges verified against both parents; one
+planning-doc premise correction folded into state.md). The superseded 10/14/13
+workflow counts from the Phase 7 record are re-measured and corrected there.
+
+Audit: ultracode Workflow, 5 coverage finders (correctness, test-coverage-
+auditor, dead-code, privacy-security-review, qa-checklist) with every finding
+independently confirmed by a skeptic with the file open (28 agents total).
+23 raw findings, 22 confirmed, 1 refuted, 0 uncertain: 1 blocking, 4
+should-fix, 7 nice-to-have, 10 nits. The blocking finding was the
+constant-self-comparison trap in series-name form: every woc_discord_bot_*
+name was asserted only through the exported constant production also uses, so
+renaming a constant's VALUE moved the wire and the test together while
+DEPLOY.md's documented series and both alert expressions broke. Three of the
+build session's four declared residuals resurfaced independently and were
+ruled: null-for-garbage TAKEN (see below), trust model UPHELD, twin-caps and
+push-age Math.max(0) UPHELD as recorded.
+
+Fixed (all severities, per the standing rule): the 14 series names are pinned
+to literals (game_metrics.test.ts convention); an unrecognized pushed
+breakerState now stores NULL and renders no claim (all three one-hot series 0,
+the staleness shape) instead of an invented 'closed'; both sanitizers reject
+arrays where records are expected; the default-clock arm now drives the STALE
+branch only a real clock can reach (the old fresh-only arm passed for a
+`() => 0` default, the exact mutant its own comment named); the legacy
+presence arm gained its own absent-block and bounded push-stamp pins (both
+previously RouteDef-only); every one of the 16 numeric slots has an
+independent over-cap arm; the exporter is pinned across push-after-staleness
+and a second restart; forbiddenBlocks/breakerBlocks gained hostile arms; the
+attach-seam expectation is a fresh literal; DEPLOY.md's push-age prose was
+rewritten (it grows through staleness, reads 0 in a never-pushed server
+process, and cannot distinguish a quiet guild from a dead bot, so liveness
+belongs to the container healthcheck); state.md's D16 records the R22 trim.
+
+Judged not defects, recorded with reasons (do not re-litigate without new
+facts): the boot-order pin cannot prove liveness beyond an active-call regex
+(a unit test cannot boot the server; accepted limit); the cumulative half of
+the cache READ is production-unread by design (counters ride the push
+listener, the read serves tests and future consumers); the two extra exported
+types are self-documenting API (LinkChangeKind precedent); a counter freezing
+at BOT_COUNTER_MAX is the clamp doing its job (1e9 is far past any honest
+process); a listener that throws before ever succeeding leaves push age 0,
+narrow window, logged, and the swallow is the design (telemetry never fails
+presence); the presence fields' own all-zero-on-malformed behavior is
+pre-existing and out of scope; sanitizeBotCounters stays in internal.ts beside
+sanitizeVoiceMember (route-boundary sanitizers live with the routes).
+
+Mutation passes, isolated worktree, all with rc!=0 plus named failing tests
+plus the Test Files summary line: spec pass 12/12 killed (clamp widen, clamp
+delete, legacy-arm drop, rendered-series drop, staleness invert, threshold
+shift, boundary off-by-one, registration-touch delete, sanitizer scope
+spread-through, exporter scope-key iteration, restart-guard delete, frozen
+gauge read). Fix-round pass 4/4 killed (null-for-garbage revert, legacy stamp
+0, constant value rename, broken default clock), proving each new pin family
+is the discriminator. Notable: the exporter hostile-scope pin kills the
+defense-in-depth layer independently of the sanitizer, and the counters
+suite's boundary test moves WITH the staleness constant, so the metrics
+suite's absolute-window test is what pins the 5-minute value.
+
+Fresh-eyes round over the fix round: 4 findings (1 should-fix, 3 smaller),
+all applied: the stale state.md residual now records null-for-garbage as
+taken with the bot-side normalizer as the surviving residual; the collector
+header and bot/CLAUDE.md no longer overstate totality (a wrong-typed FIELD
+normalizes to 0, only a non-record snapshot drops the block); the
+default-clock age ceilings widened against GC-pause flakes.
+
+Validation at close: `npx tsc --noEmit` clean; the 14 bot, server, spine, and
+counter suites green (744 pre-fix, 236 in the touched files post-fix);
+`npm run build:bot` and `npm run build:server` green; `npm run ci:changed`
+exit 0; full `npm run gate` PASS at the closing head.
+
+Deferral: none. Handoff to Phase 9: base is `f2651a358` on
+feature/discord-bot-stability; the counters surface is frozen and pinned;
+Phase 9 owns /api/discord caching per R10/R11 and the D11-retirement notes in
+the Phase 5 record.

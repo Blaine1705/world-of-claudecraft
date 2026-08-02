@@ -857,6 +857,31 @@ because dropping the one word is otherwise silent),
     one, the bot clamp is defense in depth, and drift in either direction is
     harmless); UPHELD, no pin. The push-age `Math.max(0, ...)` arm is
     unreachable without a backwards clock (no-change-needed); UPHELD.
+  - Phase 8 QA session (2026-08-02, verdict PASS; full narrative in
+    progress.md). What a later phase must know:
+    - `DiscordBotCountersSnapshot.breakerState` is now `DiscordBotBreakerState
+      | null`: the sanitizer stores null for an unrecognized pushed state and
+      the one-hot gauge renders no claim (all three series 0), the same shape
+      staleness takes. The BOT-side normalizer still reports 'closed' for
+      garbage, deliberately (typed same-process input, non-null wire field,
+      envelope-pin churn for a hostile-only arm; the surviving residual above).
+    - The 14 series names are pinned to literals in
+      tests/server/http/discord_bot_metrics.test.ts; a new series needs its
+      literal row there AND its DEPLOY.md mention, or the two drift.
+    - Pin facts the mutation passes taught: the counters suite's staleness
+      boundary test computes its times FROM the exported constant, so a
+      shifted window is caught only by the metrics suite's absolute-window
+      test; the exporter's hostile-scope pin kills the defense-in-depth layer
+      independently of the sanitizer (both layers are real); the dual-arm
+      snapshot-equality pin says nothing about the STAMPS, which now carry
+      their own bounded pins per arm.
+    - Mutation tallies: spec pass 12/12 killed, fix-round pass 4/4 killed, all
+      with rc!=0 plus named failing tests plus the Test Files summary line.
+    - The v0.34.0 CI-speed sync merged here (`e6448562e`): the bot build now
+      lives ungated on the unsharded `pr-checks` and `release-checks` jobs (13
+      named steps each); the auto-merge had left it behind a never-true
+      `matrix.shard == 1` in release-checks, caught only by re-measuring the
+      merged workflow by hand.
 ## Phase 5 feed-site enumeration (the linked-member change feed contract)
 
 Every server-side site where a linked account's flex-relevant state changes (level, class,
@@ -1695,6 +1720,19 @@ Recorded with the reasoning so a later round does not spend agents rediscovering
   that emits a fatal close through a hand-built `Gateway` must inject the sixth
   constructor argument or it takes the vitest worker down with it; the suite's `rig()`
   injects it in every arm, not only the fatal ones.
+- **A pin that reads a wire or ops NAME through the same exported constant production
+  uses is a self-comparison.** Renaming the constant's VALUE moves the rendered series
+  and the test expectation together, so the suite stays green while every dashboard
+  query and documented alert breaks. Pin each name constant to its literal once (the
+  tests/server/http/game_metrics.test.ts convention). Struck as the one BLOCKING
+  finding of Phase 8 QA; the constant-rename mutant proved the literal block is the
+  sole discriminator.
+- **A default-clock test is decisive only through a state a broken default cannot
+  reproduce.** Phase 8's fresh-push default-clock arm passed verbatim for the
+  `() => 0` default its own comment claimed to catch (any real epoch stamp reads
+  fresh, and max(0, negative age) is 0). Drive the STALE branch with a stamp minted
+  past the window: only a real clock renders it stale. Same family as the
+  vacuous-bound trap, in clock form.
 - **A documentation-table pin needs the ROW form, because keys echo in prose.** A
   DEPLOY.md env key appears both as its table row and in incident-guidance prose, so
   `toContain('\`KEY\`')` survives the row's deletion on the prose echo: proved by
