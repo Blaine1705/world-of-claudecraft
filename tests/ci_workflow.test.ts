@@ -153,13 +153,14 @@ describe('CI workflow parity', () => {
     // ...while release-gate keeps its serialized checks and builds on exactly
     // one shard each (they are not partitionable and must not run four times):
     // i18n:gen, the freshness diff, the coverage summary, the malware gate,
-    // typecheck, and the three builds. Every new non-test step added to
-    // release-gate needs the same single-shard condition, and this count.
-    expect(releaseGate.match(/if: matrix\.shard == 1/g)).toHaveLength(8);
+    // the tsc buildinfo cache restore, typecheck, and the three builds. Every
+    // new non-test step added to release-gate needs the same single-shard
+    // condition, and this count.
+    expect(releaseGate.match(/if: matrix\.shard == 1/g)).toHaveLength(9);
     // The release TEST step itself must stay un-gated (run on every shard):
     // name-to-run adjacency proves no if: line sits between them, so a
     // compensating double-edit (gate the test step, un-gate a build; count
-    // still 8) cannot silently shrink the release tier to a quarter of the
+    // still 9) cannot silently shrink the release tier to a quarter of the
     // suite.
     expect(releaseGate).toMatch(
       /- name: Run tests \(release tier[^\n]*\n {8}run: npm test -- --shard=\$\{\{ matrix\.shard \}\}\/4/,
@@ -170,6 +171,6 @@ describe('CI workflow parity', () => {
     // run four times per release push; pr-gate stays exactly checkout,
     // setup-node, npm ci, and the sharded test run).
     expect(prGate.match(/\n {6}- name: /g)).toHaveLength(4);
-    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(12);
+    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(13);
   });
 });
