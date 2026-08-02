@@ -135,9 +135,9 @@ suites can overlap; sum of file times exceeds suite wall).
 | 4 warm path | M1 | n/a (vitest focus) | cold 252.8 / warm 241.3 | ~11s warm full-suite; multi-file transform 3.1s -> 0.45s | keep |
 | 5 happy-dom | M1 | n/a (DOM focus) | DOM cold 14.7 / warm 10.5; full suite recheck separate | DOM subset env 31s -> 14.5s; partial keep | partial keep |
 | 6 pool/projects | M1 | n/a (no keep) | forks 443s green / threads 434s red (chdir); isolate:false pure red | drop all; status quo forks+isolate | drop |
-| 7 | | | | | |
-| 8 cold/warm | | | | | |
-| 9 | | | | | |
+| 7 | M1 | n/a (install focus) | n/a | 2nd worktree ~4x faster (59s npm -> 14s pnpm) | keep |
+| 8 cold/warm | M1 | 411.8 (load) | n/a (vitest always) | pure multi-task 24s -> 87ms warm | keep |
+| 9 suite cost | M1 | n/a (file-level) | see Phase 9 table | top heavies 7-50x faster per file | keep |
 | 10 | | | | | |
 
 ## Target bands (aspirational, not hard CI fail)
@@ -391,4 +391,43 @@ slice (i18n/wiki/sfx/types/builds), not the suite. See `task-cache.md`.
 | M1 | 4 | 411.8 | 2026-08-02; pure steps cache hit (i18n/wiki/sfx/types/builds FULL TURBO); vitest always ran; multi-session machine |
 
 Warm pure multi-task alone: 87ms FULL TURBO (7/7). Catalog touch forces i18n miss.
+
+## Phase 9 - suite cost reduction (subsystem worlds)
+
+Measured 2026-08-02 on M1 (darwin/arm64, Node 26.5, vitest 4.1.10, `WOC_SKIP_PRETEST=1`).
+Durations are per-file wall from vitest JSON (`endTime - startTime`). Assertions
+unchanged; only `Sim` construction `world:` fixtures.
+
+**Decision:** Keep EMPTY/STABLE subsystem worlds on the listed suites. Drop
+corpse_harvest empty world (seed pin breakage). Drop architecture scan rewrite
+(not a top offender).
+
+### File-level before/after
+
+| File | Before ms | After ms | Notes |
+|---|---:|---:|---|
+| tests/professions_trend_guild_letter.test.ts | 54029 | ~1080 | EMPTY via `professions_trend_util` |
+| tests/professions_trend_delivery_kind.test.ts | 26306 | ~675 | same util |
+| tests/mail_expiry.test.ts | 40557 | ~1437 | EMPTY; mailboxes from services |
+| tests/mail_instance.test.ts | ~18194 (Phase 1) | ~2765 | EMPTY |
+| tests/tank_crit_immunity_warrior_pair.test.ts | 31430 | ~773 | EMPTY via util; 240s sim window |
+| tests/tank_crit_immunity_paladin_pair.test.ts | ~23257 (P1) | ~740 | same util |
+| tests/tank_crit_immunity_druid_pair.test.ts | ~23583 (P1) | ~790 | same util |
+| tests/stable_yard.test.ts | 12713 | ~700-830 | stable_horse camps only |
+
+Sum of the Phase 1 top heavies touched here drops from roughly **230+ s of
+per-file worker time** to under **10 s** on the same machine (parallel suite
+wall is lower than the sum). Full-suite re-profile deferred; day-loop and
+shard balance both benefit immediately.
+
+### Dropped experiments
+
+| Experiment | Why |
+|---|---|
+| `corpse_harvest_sim` + EMPTY_TEST_WORLD | 36 failures: hunted seeds and #2514 yield pins depend on full-world construction rng |
+| architecture/malware double-walk rewrite | architecture file ~0.5s; walks are one per root already |
+
+Raw JSON (gitignored): `tmp/phase9-before.json`, `tmp/phase9-after.json`,
+`tmp/phase9-final.json`, `tmp/phase9-stable-before.json`,
+`tmp/phase9-stable-after.json`.
 

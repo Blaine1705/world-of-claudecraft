@@ -2,8 +2,8 @@
 
 Resume point for the next session. Keep current after every phase.
 
-**Current phase:** Phase 8 complete.  
-**Next action:** run Phase 9 starter prompt (`phase-09-suite-cost-reduction.md`).  
+**Current phase:** Phase 9 complete.  
+**Next action:** run Phase 10 starter prompt (`phase-10-experimental-runners.md`).  
 **Worktree:** `/Users/fernando/Documents/wocc-gate-perf-research`  
 **Branch:** `feature/local-gate-perf`  
 **Base:** always `origin/release/v0.34.0`
@@ -111,7 +111,13 @@ Fill as phases ship:
   `build:env`, `build:server`, `build:bundle`. Never cache: full vitest, browser
   tests, malware, changed-file biome; i18n freshness always `git diff`. Docs:
   `docs/local-gate-perf/task-cache.md`.
-- (Phase 9) suite splits / fixtures:
+- (Phase 9) suite splits / fixtures: **subsystem-world fixtures kept** on
+  professions Guild-letter (`EMPTY_TEST_WORLD` via `professions_trend_util`),
+  tank crit immunity (`EMPTY_TEST_WORLD` via util), mail expiry/instance
+  (`EMPTY_TEST_WORLD`), stable_yard (`STABLE_TEST_WORLD` = stable_horse camps
+  only). File wall wins 7-50x. Dropped: corpse_harvest empty world (seed pins);
+  architecture scan rewrite (not a top offender). No mega-file splits this phase
+  (prior CI splits already applied; cost was ambient tick load, not file size).
 - (Phase 10) experimental runner outcome:
 - (Phase 11) tier matrix doc path:
 - (Phase 12) teardown:

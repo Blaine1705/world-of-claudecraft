@@ -76,10 +76,10 @@ Status: not-started / in-progress / blocked / complete / dropped
 - [x] Full correctness still enforced when inputs change (catalog bust + freshness + tests always run)
 
 ### Phase 9 - Suite cost reduction
-- [ ] Profiling-driven fixture or split changes
-- [ ] Top heavies improved or justified defer
-- [ ] Architecture/scan cost considered if it is a top offender
-- [ ] Full suite green
+- [x] Profiling-driven fixture or split changes (EMPTY/STABLE subsystem worlds on top heavies)
+- [x] Top heavies improved or justified defer (guild letter, mail, tank_crit, stable_yard kept; corpse empty dropped)
+- [x] Architecture/scan cost considered if it is a top offender (0.5s; drop rewrite)
+- [x] Touched suites green twice (68 tests); corpse green after revert; full suite optional re-profile deferred
 
 ### Phase 10 - Experimental runners
 - [ ] turbo-test spike numbers + pass rate

@@ -24,6 +24,12 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 | 2026-08-02 | 6 | fileParallelism / maxWorkers note | defaults true; gate passes --maxWorkers | no config change | M1 | drop (no change) | gate_workers remains sole worker policy |
 | 2026-08-02 | 7 | pnpm full migration + shared store | secondary npm ci ~59s | 2nd worktree pnpm hoisted ~14s (~4x); CI on pnpm frozen-lockfile | M1 darwin/arm64 Node 26.5 pnpm 10.34.5 | keep | Option A single lockfile; Corepack not required; see detail |
 | 2026-08-02 | 8 | turbo task cache for pure gate artifacts | no task cache; pure steps always re-run (~24s multi-task cold) | warm pure multi-task 87ms FULL TURBO; catalog touch misses i18n | M1 darwin/arm64 Node 26.5 pnpm 10.34.5 turbo 2.10.8 | keep | wireit dropped; tests never cached; see detail |
+| 2026-08-02 | 9 | EMPTY_TEST_WORLD for professions Guild-letter suites | guild_letter 54.0s; delivery_kind 26.3s | 1.1s; 0.7s | M1 vitest 4.1.10 | keep | reuse sim_shared EMPTY; same assertions |
+| 2026-08-02 | 9 | EMPTY_TEST_WORLD for tank crit-immunity fights | warrior pair 31.4s | 0.8s (all three pairs ~0.7-0.8s) | M1 vitest 4.1.10 | keep | 240s tick window, hand-spawned wolf only |
+| 2026-08-02 | 9 | EMPTY_TEST_WORLD for mail expiry + instance | mail_expiry 40.6s; instance ~18s (P1) | 1.4s; 2.8s | M1 vitest 4.1.10 | keep | mailboxes via BUILTIN services |
+| 2026-08-02 | 9 | stable_horse-only world for stable_yard | 12.7s | 0.7s | M1 vitest 4.1.10 | keep | 200s wander without continent AI |
+| 2026-08-02 | 9 | EMPTY_TEST_WORLD for corpse_harvest_sim | 14.2s | n/a (reverted) | M1 | drop | breaks hunted seed pins / concentration literals |
+| 2026-08-02 | 9 | architecture/malware scan double-walk pass | architecture 0.5s | no change | M1 | drop (not a top offender) | separate roots once each; no double walk |
 
 ## Detail template (copy below for long notes)
 
@@ -329,4 +335,50 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
   Phase 7); full gate green under `GATE_MAX_WORKERS=4`
 - Decision: **keep**
 - Follow-ups: Phase 9 suite cost; optional remote turbo cache is out of scope
+
+---
+
+### 2026-08-02 - Phase 9 - suite cost reduction (subsystem worlds)
+
+- Hypothesis: Phase 1 top slow files spend most wall time on full-world Sim
+  construction and continent-wide AI during long tick windows (90s mail, 240s
+  tank fights, 200s horse wander). The established subsystem-world pattern
+  (`EMPTY_TEST_WORLD` in `tests/sim_shared.ts`, social/dot/combo suites) can
+  cut that without weakening assertions when tests only need PostOffice,
+  hand-spawned mobs, or ambient horses.
+- Change (kept):
+  - `tests/professions_trend_util.ts` `makeWorld()` -> `EMPTY_TEST_WORLD`
+  - `tests/tank_crit_immunity_util.ts` `critsTaken()` -> `EMPTY_TEST_WORLD`
+  - `tests/mail_expiry.test.ts` + `tests/mail_instance.test.ts` -> `EMPTY_TEST_WORLD`
+  - `tests/stable_yard.test.ts` -> `STABLE_TEST_WORLD` (stable_horse camps only)
+- Dropped:
+  - `corpse_harvest_sim.test.ts` empty world: 36 pin failures (hunted seeds and
+    #2514 concentration literals depend on full-world construction rng draws)
+  - architecture scan rewrite: file ~0.5s, not a top-20 offender; walks are
+    per-root once, not double walks of the same tree
+- Commands:
+  - Before: `WOC_SKIP_PRETEST=1 npx vitest run` on guild_letter, delivery_kind,
+    mail_expiry, tank_crit warrior (JSON `tmp/phase9-before.json`)
+  - After + flake: same files twice, plus all professions_trend_* + all three
+    tank pairs + stable_yard + mail_instance (`tmp/phase9-final.json`)
+- Before/after file wall (M1, unloaded-ish single-file/group runs):
+
+  | File | Before ms | After ms | Ratio |
+  |---|---:|---:|---:|
+  | professions_trend_guild_letter | 54029 | ~1080 | ~50x |
+  | professions_trend_delivery_kind | 26306 | ~675 | ~39x |
+  | mail_expiry | 40557 | ~1437 | ~28x |
+  | mail_instance | ~18194 (P1) | ~2765 | ~7x |
+  | tank_crit_immunity_warrior_pair | 31430 | ~773 | ~41x |
+  | tank_crit paladin/druid pairs | ~23s (P1) | ~740-790 | ~30x |
+  | stable_yard | 12713 | ~700-830 | ~16x |
+
+- Pass/fail: 68 tests across touched suites green twice; corpse suite green after
+  revert (100 tests); architecture 488ms (no code change)
+- Decision: **keep** subsystem-world fixtures above; **drop** corpse empty world
+  and architecture rework
+- Follow-ups: Phase 10 experimental runners; optional later re-hunt corpse pins
+  on empty world if someone wants that mega-file win; full-suite wall sample
+  deferred (file-level wins already decisive)
+
 
