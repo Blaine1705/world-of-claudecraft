@@ -586,7 +586,10 @@ export function createImpostorSession(): ImpostorSession | null {
       // into 3. The per-instance shader windows are the real cull; the
       // merged row's registry entry only sheds the whole layer when the
       // camera leaves the world (an interior).
-      const merged = new Map<ImpostorCategory, { items: SpriteInstance[]; minX: number; maxX: number; minZ: number; maxZ: number }>();
+      const merged = new Map<
+        ImpostorCategory,
+        { items: SpriteInstance[]; minX: number; maxX: number; minZ: number; maxZ: number }
+      >();
       for (const acc of buckets) {
         if (acc.items.length === 0) continue;
         let entry = merged.get(acc.category);
@@ -609,7 +612,11 @@ export function createImpostorSession(): ImpostorSession | null {
       for (const [category, entry] of merged) {
         const { items } = entry;
         const geo = impostorQuadGeo().clone();
-        const mesh = new THREE.InstancedMesh(geo, impostorMaterial(category, texture), items.length);
+        const mesh = new THREE.InstancedMesh(
+          geo,
+          impostorMaterial(category, texture),
+          items.length,
+        );
         mesh.name = `foliage-impostor-${category}`;
         const cell = new Float32Array(items.length * 4);
         const wind = new Float32Array(items.length);

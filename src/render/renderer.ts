@@ -175,8 +175,8 @@ import { buildFarTerrain, type FarTerrainView } from './far_terrain';
 import {
   detailCullFar,
   type FarVistaPlan,
-  farVistaPlan,
   FOGLESS_DETAIL_FAR,
+  farVistaPlan,
 } from './far_terrain_core';
 import { buildFarshoreFeatures } from './farshore_features';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
@@ -7675,9 +7675,7 @@ export class Renderer {
       // stream in; the far mesh stands beneath, so an unbuilt chunk reads as
       // coarse ground, never a hole.
       const vista = this.farVista.enabled;
-      const requestedFar = vista
-        ? FOGLESS_DETAIL_FAR
-        : preset.far * (this.lowGfx ? 1 : g.farScale);
+      const requestedFar = vista ? FOGLESS_DETAIL_FAR : preset.far * (this.lowGfx ? 1 : g.farScale);
       this.lastRequestedFogFar = requestedFar;
       this.lastRequestedFogNear = preset.near;
       // Residency is read per CHUNK, through the terrain view's own accessor.

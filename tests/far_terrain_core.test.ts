@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   CLASSIC_CAMERA_FAR,
-  FOGLESS_DETAIL_FAR,
   createFarTileBuilder,
   detailCullFar,
   FAR_MESH_DROP,
@@ -10,6 +9,7 @@ import {
   FAR_TILE_SIZE,
   FAR_WORLD_MARGIN,
   type FarTile,
+  FOGLESS_DETAIL_FAR,
   farGridIndices,
   farGridSide,
   farGroundColor,
