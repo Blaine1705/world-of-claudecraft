@@ -14,6 +14,9 @@ const rows: CharacterRow[] = [
     level: 60,
     accountId: 1,
     username: 'viggo',
+    guildId: 8,
+    guildName: 'The Fellowship',
+    guildRank: 'leader',
     copper: 12345,
     xp: 999,
     createdAt: '2026-01-01T00:00:00Z',
@@ -31,6 +34,11 @@ describe('CharactersTable', () => {
       onInspectProfessions: () => {},
     });
     expect(screen.getByText('Aragorn')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'The Fellowship' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('page=guilds&guildId=8'),
+    );
+    expect(screen.getByText(t('guilds.rank.leader'))).toBeInTheDocument();
     expect(screen.getByText(/▼/)).toBeInTheDocument();
   });
 

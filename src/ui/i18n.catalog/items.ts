@@ -129,6 +129,10 @@ const itemStringsEn = {
       // concatenated t() results; {requirement} receives the already
       // localized "Requires {craft} {skill}" line.
       buyAriaWithRequirement: 'Buy {item} for {price}. {requirement}',
+      // Bulk purchase (#2374): a ctrl/cmd-click on the row or this always-visible
+      // control buys the largest affordable stack in one purchase.
+      buyStack: 'Buy {count}',
+      buyStackAria: 'Buy {count} {item} for {price}',
     },
     market: {
       title: 'The World Market',
@@ -335,6 +339,11 @@ export const itemStrings = {
         close: 'Cerrar vendedor',
         hint: 'Haz clic en un objeto de tus bolsas para venderlo mientras esta ventana esté abierta.',
         buyAria: 'Comprar {item} por {price}',
+        // English text carried through: never translated because the pending resolved
+        // table drives the UI regardless (itemStrings.es is not consumed at runtime,
+        // see i18n.catalog/index.ts), so a real translation here would be inert.
+        buyStack: itemStringsEn.itemUi.vendor.buyStack,
+        buyStackAria: itemStringsEn.itemUi.vendor.buyStackAria,
       },
       market: {
         ...itemStringsEn.itemUi.market,
@@ -498,6 +507,11 @@ export const itemStrings = {
         close: 'Fermer le vendeur',
         hint: 'Cliquez sur un objet dans vos sacs pour le vendre tant que cette fenêtre est ouverte.',
         buyAria: 'Acheter {item} pour {price}',
+        // English text carried through: never translated because the pending resolved
+        // table drives the UI regardless (itemStrings.fr is not consumed at runtime,
+        // see i18n.catalog/index.ts), so a real translation here would be inert.
+        buyStack: itemStringsEn.itemUi.vendor.buyStack,
+        buyStackAria: itemStringsEn.itemUi.vendor.buyStackAria,
       },
       market: {
         ...itemStringsEn.itemUi.market,

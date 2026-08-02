@@ -10,6 +10,8 @@ import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ActionBarLayout } from '../src/world_api/action_bar';
+import { bustAdminGuildListReads } from './admin_guilds_read';
+import { ADMIN_GUILDS_SCHEMA } from './admin_guilds_schema';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import { validCharName } from './auth';
 import type { BankBonusFacts } from './bank_entitlements';
@@ -1176,6 +1178,7 @@ export async function ensureSchema(): Promise<void> {
     // fresh database SCHEMA alone could not create it.
     await client.query(DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL);
     await client.query(SOCIAL_SCHEMA);
+    await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(OAUTH_SCHEMA);
     // Discord integration tables (links, oauth states, pending logins, reward
     // economy). FK-references accounts(id), so it runs after SCHEMA. Applied
@@ -2984,6 +2987,7 @@ export async function reclaimDeactivatedName(name: string): Promise<{
       [row.id, freed],
     );
     await client.query('COMMIT');
+    bustAdminGuildListReads();
     // The caller must rekey the freed name's world state (market, mail, the
     // orphan's own signed item instances) to the archived identity, exactly
     // like a rename: a reclaim IS a rename of the orphaned holder, and the
@@ -3010,7 +3014,9 @@ export async function deleteCharacter(accountId: number, characterId: number): P
     'DELETE FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
     [characterId, accountId, REALM],
   );
-  return (res.rowCount ?? 0) > 0;
+  const deleted = (res.rowCount ?? 0) > 0;
+  if (deleted) bustAdminGuildListReads();
+  return deleted;
 }
 
 // How many characters this account has on each realm, deliberately NOT
@@ -3063,7 +3069,9 @@ export async function renameCharacter(
      RETURNING id, account_id, name, class, level, state, is_gm, force_rename`,
     [characterId, accountId, name, REALM],
   );
-  return res.rows[0] ?? null;
+  const renamed = res.rows[0] ?? null;
+  if (renamed) bustAdminGuildListReads();
+  return renamed;
 }
 
 // Persist a character row. Returns true when the write landed. When a leaseNonce is

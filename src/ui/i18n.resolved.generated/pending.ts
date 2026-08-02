@@ -81,6 +81,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -127,6 +129,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ],
   "es_ES": [
@@ -201,6 +205,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -247,6 +253,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ],
   "fr_FR": [
@@ -321,6 +329,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -367,6 +377,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ],
   "fr_CA": [
@@ -441,6 +453,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -487,6 +501,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ],
   "en_CA": [],
@@ -562,6 +578,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -608,6 +626,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ],
   "de_DE": [
@@ -682,6 +702,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -728,27 +750,37 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ],
   "zh_CN": [
     "guide.profPages.colWield",
     "guide.profPages.wieldNone",
-    "hudChrome.gathering.respawnClock"
+    "hudChrome.gathering.respawnClock",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "zh_TW": [
     "guide.profPages.colWield",
     "guide.profPages.wieldNone",
-    "hudChrome.gathering.respawnClock"
+    "hudChrome.gathering.respawnClock",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "ko_KR": [
     "guide.profPages.colWield",
     "guide.profPages.wieldNone",
-    "hudChrome.gathering.respawnClock"
+    "hudChrome.gathering.respawnClock",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "ja_JP": [
     "guide.profPages.colWield",
     "guide.profPages.wieldNone",
-    "hudChrome.gathering.respawnClock"
+    "hudChrome.gathering.respawnClock",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "pt_BR": [
     "entities.items.artisans_eye.name",
@@ -822,6 +854,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -868,12 +902,16 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaInstanced",
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ],
   "ru_RU": [
     "guide.profPages.colWield",
     "guide.profPages.wieldNone",
-    "hudChrome.gathering.respawnClock"
+    "hudChrome.gathering.respawnClock",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "cs_CZ": [
     "entities.items.artisans_eye.name",
@@ -947,6 +985,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -994,6 +1034,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
     "itemUi.vendor.buyAriaWithRequirement",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ],
   "nl_NL": [
@@ -1068,6 +1110,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -1115,6 +1159,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
     "itemUi.vendor.buyAriaWithRequirement",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ],
   "pl_PL": [
@@ -1189,6 +1235,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -1236,6 +1284,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
     "itemUi.vendor.buyAriaWithRequirement",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ],
   "id_ID": [
@@ -1310,6 +1360,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -1357,6 +1409,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
     "itemUi.vendor.buyAriaWithRequirement",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ],
   "tr_TR": [
@@ -1431,6 +1485,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -1478,6 +1534,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
     "itemUi.vendor.buyAriaWithRequirement",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ],
   "sv_SE": [
@@ -1552,6 +1610,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -1599,6 +1659,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
     "itemUi.vendor.buyAriaWithRequirement",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ],
   "vi_VN": [
@@ -1673,6 +1735,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -1720,6 +1784,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
     "itemUi.vendor.buyAriaWithRequirement",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ],
   "da_DK": [
@@ -1794,6 +1860,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.archetypesBody",
     "guide.professions.startBody",
     "guide.professions.whatBody",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bags.filterTool",
     "hudChrome.crafting.reagentFineSub",
     "hudChrome.deeds.broadcastsLabel",
@@ -1841,6 +1909,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaMasterwork",
     "itemUi.kind.fineMaterial",
     "itemUi.vendor.buyAriaWithRequirement",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria",
     "questUi.tracker.unknownQuest"
   ]
 };

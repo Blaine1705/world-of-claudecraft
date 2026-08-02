@@ -1799,6 +1799,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.joinParty': '加入队伍',
   'hud.prompts.guildInvite': '{name} 邀请你加入 {guild}。',
   'hud.prompts.joinGuild': '加入公会',
+  'hud.prompts.guildInviteCancelled': '由于公会已重命名，一项待处理的公会邀请已取消。',
+  'hud.prompts.guildRenamed': '你的公会已被管理团队重命名为 {name}。',
   'hud.prompts.tradeRequest': '{name} 想与你交易。',
   'hud.prompts.openTrade': '打开交易',
   'hud.prompts.duelRequest': '{name} 向你发起了决斗挑战！',

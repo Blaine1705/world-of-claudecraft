@@ -1324,6 +1324,7 @@ export class Hud {
   private releaseSpiritBtnEl = $('#release-btn');
   private ghostPromptEl = $('#ghost-prompt');
   private resurrectionPromptEl: HTMLElement | null = null;
+  private guildInvitePromptEl: HTMLElement | null = null;
   private promptSequence = 0;
   private resurrectCorpseBtnEl = $('#resurrect-corpse-btn');
   private resurrectHealerBtnEl = $('#resurrect-healer-btn');
@@ -1422,6 +1423,12 @@ export class Hud {
     startRace: () => this.sim.mountRaceStart(),
     cancelRace: () => this.sim.mountRaceCancel(),
   });
+  // Non-trapping focus capture/return for the shared #vendor-window container
+  // (the bank companion shape, NOT windowFocus's Tab trap: vendor is a bags
+  // companion, not modal). One field covers both tenants (the copper vendor
+  // and the Heroic Quartermaster), since they share the container and are
+  // mutually exclusive.
+  private vendorOpenerFocus: HTMLElement | null = null;
   private openTrainNpcId: number | null = null;
   // Learn flights + confirmed-grant overlay for the train window (issue
   // #2342): begin on click (the double-submit guard), resolve on the
@@ -1842,8 +1849,8 @@ export class Hud {
       itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
       attachTooltip: (element, html) => this.attachTooltip(element, html),
       openChronicles: () => this.openDeeds('chronicle'),
-      openVendor: (npcId) => this.openVendor(npcId),
-      openHeroicVendor: (npcId) => this.openHeroicVendor(npcId),
+      openVendor: (npcId, opener) => this.openVendor(npcId, opener),
+      openHeroicVendor: (npcId, opener) => this.openHeroicVendor(npcId, opener),
       openTrain: (npcId) => this.openTrain(npcId),
       openUnbind: (npcId) => this.openUnbind(npcId),
       openMarket: () => this.openMarket(),
@@ -7770,7 +7777,8 @@ export class Hud {
     // its remaining duration are the only way to react to a DoT/curse/CC), so this paints every
     // frame on every graphics preset. The visible-count cap (auraVisibleCap, still tiered) is
     // applied inside the painter and is debuff-priority (a shed slot is always a buff, never a
-    // debuff). Only the TARGET (non-self) debuffs strip below stays on the tiered ~4Hz cadence.
+    // debuff). The TARGET (non-self) debuffs strip below is likewise never tier-gated (see the
+    // paint call for why).
     this.buffBarPainter.paint(this.buffBarView.tick(p));
     this.debuffBarPainter.paint(this.debuffBarView.tick(p));
 
@@ -11164,16 +11172,42 @@ export class Hud {
           break;
         case 'guildInvite':
           audio.levelUp();
-          this.showPrompt(
+          this.guildInvitePromptEl?.remove();
+          this.guildInvitePromptEl = this.showPrompt(
             t('hud.prompts.guildInvite', {
               name: `<b>${esc(ev.fromName)}</b>`,
               guild: `<span class="gold">&lt;${esc(ev.guildName)}&gt;</span>`,
             }),
             t('hud.prompts.joinGuild'),
-            () => this.sim.guildAccept(),
-            () => this.sim.guildDecline(),
+            () => {
+              this.guildInvitePromptEl = null;
+              this.sim.guildAccept();
+            },
+            () => {
+              this.guildInvitePromptEl = null;
+              this.sim.guildDecline();
+            },
+            t('hud.prompts.decline'),
+            () => {
+              this.guildInvitePromptEl = null;
+              this.sim.guildDecline();
+            },
           );
           break;
+        case 'guildInviteCancelled': {
+          this.guildInvitePromptEl?.remove();
+          this.guildInvitePromptEl = null;
+          const message = t('hud.prompts.guildInviteCancelled');
+          this.showBanner(message);
+          this.log(message, '#dcd29f');
+          break;
+        }
+        case 'guildRenamed': {
+          const message = t('hud.prompts.guildRenamed', { name: ev.newName });
+          this.showBanner(message);
+          this.log(message, '#dcd29f');
+          break;
+        }
         case 'tradeRequest':
           audio.click();
           this.showPrompt(
@@ -12988,13 +13022,24 @@ export class Hud {
   // Vendor
   // -------------------------------------------------------------------------
 
-  openVendor(npcId: number): void {
+  // opener: the element to return focus to on close. Reachable from the quest
+  // dialog's "Browse Goods" route, which hides #quest-dialog (display:none)
+  // BEFORE calling this, so document.activeElement would already be
+  // disconnected from layout by the time activeFocusable() ran here; the
+  // caller must capture it beforehand and hand it in. Omitted (not merely
+  // null) falls back to activeFocusable() for any other opener whose element
+  // is still visible/connected at call time.
+  openVendor(npcId: number, opener?: HTMLElement | null): void {
     this.closeOtherWindows(['#vendor-window', '#bags']);
     // The bags companion is exclusive (see openBank): close the bank cluster
     // through the painter so onBankClosed clears body.bank-open before the
     // vendor pairing takes over.
     if (this.bankWindowOpen) this.closeBank();
     this.openHeroicVendorNpcId = null; // the marks shop shares the container
+    // Non-trapping focus capture/return (WCAG 2.4.3), matching the bank
+    // companion: NOT windowFocus, which would install a Tab trap and break
+    // the vendor + bags cluster.
+    this.vendorOpenerFocus = opener !== undefined ? opener : this.focusManager.activeFocusable();
     this.openVendorNpcId = npcId;
     document.body.classList.add('vendor-open');
     this.renderVendor();
@@ -13038,7 +13083,7 @@ export class Hud {
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
-        onBuy: (itemId) => buyAndRefresh(() => this.sim.buyItem(npc.id, itemId)),
+        onBuy: (itemId, bulk) => buyAndRefresh(() => this.sim.buyItem(npc.id, itemId, bulk)),
         onBuyBack: (itemId, index, instance, craftedRecipeId) =>
           buyAndRefresh(() => this.sim.buyBackItem(itemId, index, instance, craftedRecipeId)),
         onSellJunk: () => buyAndRefresh(() => this.sim.sellAllJunk()),
@@ -13048,13 +13093,19 @@ export class Hud {
     );
   }
 
-  openHeroicVendor(npcId: number): void {
+  // opener: see openVendor's comment; same handoff need for the Heroic
+  // Quartermaster route out of the quest dialog.
+  openHeroicVendor(npcId: number, opener?: HTMLElement | null): void {
     this.closeOtherWindows('#vendor-window');
     // The bags companion is exclusive (see openBank): close the bank cluster
     // through the painter so onBankClosed clears body.bank-open before the
     // marks shop takes the container.
     if (this.bankWindowOpen) this.closeBank();
     this.openVendorNpcId = null; // shares the container with the copper vendor
+    // Non-trapping focus capture/return (WCAG 2.4.3), matching the bank
+    // companion: NOT windowFocus, which would install a Tab trap and break
+    // the vendor + bags cluster.
+    this.vendorOpenerFocus = opener !== undefined ? opener : this.focusManager.activeFocusable();
     this.openHeroicVendorNpcId = npcId;
     this.renderHeroicVendor();
   }
@@ -13084,15 +13135,29 @@ export class Hud {
     $('#vendor-window').style.display = 'none';
     this.openHeroicVendorNpcId = null;
     this.hideTooltip();
+    // Return focus to the opener (WCAG 2.4.3); mirrors closeVendor below.
+    this.focusManager.restore(this.vendorOpenerFocus);
+    this.vendorOpenerFocus = null;
   }
 
   closeVendor(): void {
+    // Guard, matching closeHeroicVendor: closeManagedWindow('vendor-window') calls both
+    // close methods unconditionally since either tenant can hold the shared container, so
+    // this must be a no-op when the copper vendor isn't the one open. Otherwise this still
+    // ran when only the heroic tenant was open, clearing the shared vendorOpenerFocus (and
+    // firing hideTooltip/mobile-bags teardown) before closeHeroicVendor got a chance to
+    // restore it, dropping the WCAG 2.4.3 focus return on the Esc/generic close path.
+    if (this.openVendorNpcId === null) return;
     const closeMobileBags =
       document.body.classList.contains('mobile-touch') && $('#bags').style.display !== 'none';
     $('#vendor-window').style.display = 'none';
     this.openVendorNpcId = null;
     document.body.classList.remove('vendor-open'); // bags (if still open) re-centres
     this.hideTooltip();
+    // Return focus to the opener (WCAG 2.4.3); non-trapping, matching the bank
+    // companion (no Tab trap was ever installed for vendor).
+    this.focusManager.restore(this.vendorOpenerFocus);
+    this.vendorOpenerFocus = null;
     if (closeMobileBags) {
       // Mirror BagsWindow.close()'s teardown backstop: a discard/sell prompt may hold
       // #bags inert (installPromptDialog) and this mobile path hides the grid without

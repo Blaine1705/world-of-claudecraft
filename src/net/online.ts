@@ -1,6 +1,8 @@
 // Online play: REST auth client + WebSocket world mirror.
 
-import { apiUrl, DESKTOP_API_ORIGIN, NATIVE_API_ORIGIN } from '../client_origin';
+import { App } from '@capacitor/app';
+import type { PluginListenerHandle } from '@capacitor/core';
+import { apiUrl, DESKTOP_API_ORIGIN, NATIVE_API_ORIGIN, NATIVE_APP } from '../client_origin';
 import { normalizeOrigin, runtimeWebSocketUrl } from '../runtime';
 import {
   hasStreamerLink,
@@ -1326,6 +1328,8 @@ function blankEntity(id: number): Entity {
     leashAnchor: null,
     evadeStall: 0,
     chaseStall: 0,
+    evadeEpoch: 0,
+    combatExitHoldUntil: 0,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
@@ -1704,6 +1708,10 @@ export class ClientWorld implements IWorld {
   // set by close() and by a server 'error' frame: the session is over for
   // good, so a subsequent socket close must not schedule a reconnect
   private sessionEnded = false;
+  // The native app-lifecycle listener handle (see handleAppStateChange below),
+  // resolved asynchronously by Capacitor's addListener. Undefined until it
+  // resolves, and also whenever NATIVE_APP is false.
+  private nativeLifecycleHandle: PluginListenerHandle | undefined;
   readonly characterId: number;
 
   // assigned by openSocket() from the ctor, and reassigned on every reconnect
@@ -1777,6 +1785,39 @@ export class ClientWorld implements IWorld {
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
+    // Inside a Capacitor WebView, document.visibilitychange above is the ONLY
+    // signal driving the zombie-socket recovery below, but it is an indirect
+    // one the WebView itself must derive and forward: real-world Android/iOS
+    // WebViews are documented as inconsistent about firing it on every
+    // OS-level backgrounding path (task-switcher swipe, home button, OEM
+    // battery-management kills), unlike a browser tab, which gets first-party
+    // engineering behind the event. Capacitor's App plugin exists precisely
+    // for this: 'appStateChange' is wired directly to the native
+    // Activity.onPause/onResume (Android) and UIApplication background/
+    // foreground notifications (iOS), so it fires reliably where
+    // visibilitychange might not. Reported as frequent mobile disconnects
+    // "no matter how good the network is": the trigger to recover was
+    // missing, not the connection. Drives the exact same recovery path as the
+    // DOM listener; harmless to run both when visibilitychange also fires.
+    if (NATIVE_APP) {
+      void App.addListener('appStateChange', ({ isActive }) => {
+        this.handleForegroundBackground(isActive);
+      })
+        .then((handle) => {
+          // The session may have already ended by the time this resolves
+          // (addListener is async); don't leak a listener onto a dead world.
+          if (this.sessionEnded) {
+            void handle.remove().catch((err) => {
+              console.error('[net] could not remove native lifecycle listener', err);
+            });
+          } else {
+            this.nativeLifecycleHandle = handle;
+          }
+        })
+        .catch((err) => {
+          console.error('[net] could not install native lifecycle listener', err);
+        });
+    }
   }
 
   // Mobile browsers suspend JS timers AND the network stack together while a
@@ -1790,8 +1831,22 @@ export class ClientWorld implements IWorld {
   // disconnects even though most drops are really just late reconnects. On
   // resume, force a real state check and retry immediately instead of
   // waiting for a close event or the rest of the backoff delay.
+  //
+  // `!== 'visible'` (equivalently `=== 'hidden'`, the only other value the
+  // DocumentVisibilityState spec defines today) rather than `=== 'hidden'`
+  // explicitly: a no-op difference now, but it means a future third state
+  // would also flush on entering it, matching the "flush on anything not
+  // foregrounded" intent instead of silently skipping the flush.
   private readonly handleVisibilityChange = (): void => {
-    if (document.visibilityState === 'hidden') {
+    this.handleForegroundBackground(document.visibilityState === 'visible');
+  };
+
+  // Shared foreground/background handler driven by BOTH the DOM
+  // visibilitychange listener and (NATIVE_APP) the Capacitor App
+  // 'appStateChange' listener above, so a native app recovers a zombie socket
+  // on the native lifecycle signal even when visibilitychange never fires.
+  private handleForegroundBackground(visible: boolean): void {
+    if (!visible) {
       // Backgrounding (tab switch, tab close, phone lock) is the last reliable
       // beat to get an in-flight debounced layout edit to the server while the
       // socket is still open, so a "rearrange then close the tab" never strands
@@ -1801,7 +1856,6 @@ export class ClientWorld implements IWorld {
       this.flushActionBarLayoutSave();
       return;
     }
-    if (document.visibilityState !== 'visible') return;
     if (this.sessionEnded) return;
     if (this.ws.readyState === WebSocket.OPEN) return;
     if (this.reconnectTimer !== undefined) {
@@ -1827,7 +1881,7 @@ export class ClientWorld implements IWorld {
     // never delivered while suspended (the zombie-socket case). Drive the
     // same path a real close would have.
     if (this.connected) this.socketClosed();
-  };
+  }
 
   private openSocket(): void {
     // when a realm was picked, connect to that realm's origin; otherwise the
@@ -1905,6 +1959,15 @@ export class ClientWorld implements IWorld {
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
     if (typeof document !== 'undefined') {
       document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    }
+    // If the App.addListener promise in the constructor has not resolved yet,
+    // its .then() callback checks sessionEnded itself and removes the handle
+    // as soon as it lands; this covers the already-resolved case.
+    if (this.nativeLifecycleHandle) {
+      void this.nativeLifecycleHandle.remove().catch((err) => {
+        console.error('[net] could not remove native lifecycle listener', err);
+      });
+      this.nativeLifecycleHandle = undefined;
     }
   }
 
@@ -2238,6 +2301,7 @@ export class ClientWorld implements IWorld {
         this.applyChatFlairEvent(ev as SimEvent);
         this.applyUnstuckEvent(ev as SimEvent);
         this.applyPrestigeEvent(ev as SimEvent);
+        this.applyGuildRenamedEvent(ev as SimEvent);
         this.eventQueue.push(ev as SimEvent);
       }
       return;
@@ -2314,6 +2378,18 @@ export class ClientWorld implements IWorld {
     const v = this.socialDirty;
     this.socialDirty = false;
     return v;
+  }
+
+  private applyGuildRenamedEvent(ev: SimEvent): void {
+    if (
+      ev.type !== 'guildRenamed' ||
+      !this.socialInfo?.guild ||
+      this.socialInfo.guild.id !== ev.guildId
+    ) {
+      return;
+    }
+    this.socialInfo.guild.name = ev.newName;
+    this.socialDirty = true;
   }
 
   consumeProfanityChanged(): boolean {
@@ -3624,8 +3700,14 @@ export class ClientWorld implements IWorld {
   discardItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'discard', item: itemId, count });
   }
-  buyItem(npcId: number, itemId: string): void {
-    this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
+  buyItem(npcId: number, itemId: string, bulk?: boolean): void {
+    // `bulk` rides the wire only when true (the craftItem `commission` idiom
+    // above): an ordinary buy stays byte-identical to the pre-#2374 message.
+    if (bulk === true) {
+      this.cmd({ cmd: 'buy', npc: npcId, item: itemId, bulk: true });
+    } else {
+      this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
+    }
   }
   // `confirmEffectUse` (R40): the per-use consent for a 'prompt'-mode tool
   // effect slot, sent ONLY when true (the craftItem `commission` precedent)
