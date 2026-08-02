@@ -4099,17 +4099,21 @@ path filters for PR jobs, an N=8 vitest shard matrix, nine test-file
 renames, the tank_crit_immunity split into a shared util plus three
 per-class pair suites, and the professions_trend split into five
 suites plus a util. Zero conflicts, and the audit's zero-conflict
-reasoning is corrected here at the QA round: three of the four
-apparently-both-sides files (.github/workflows/ci.yml, scripts/gate.mjs,
-tests/ci_workflow.test.ts) carry an EMPTY branch-side diff against the
-merge base (their apparent branch-side changes are release-lineage
-inherited through the earlier syncs), so for them the merged result is
-the release side verbatim; tests/professions_deeds_playthrough.test.ts
-is the opposite case, carrying real branch-own edits (the koi literal,
-the silverstream rod add, and the 706bec2d21 re-record), and its merged
-result is the branch side plus the release's single anchor-rename line.
-Either way the merge preserved both sides and nothing was dropped; only
-this record's original no-branch-edits characterization was wrong.
+reasoning is re-derived here at the QA round: against the true merge
+base (0420f31ebd), exactly ONE file changed on both sides,
+tests/professions_deeds_playthrough.test.ts, whose branch-own edits
+(the silverstream rod add, the harvestNode arity update, and the
+706bec2d21 re-record's koi literal) merged as the branch side plus the
+release's single anchor-rename line. The other three files the original
+record called both-sides (.github/workflows/ci.yml, scripts/gate.mjs,
+tests/ci_workflow.test.ts) carry an EMPTY branch-side diff against that
+base (their apparent branch-side changes are release-lineage inherited
+through the earlier syncs), so for them the merged result is the
+release side verbatim. One adaptation happened INSIDE the merge commit
+and the original record did not note it: the release-side new
+tests/deeds_sites_pin.test.ts had its station fixture seed changed from
+thorium_ore to fine_iron_ore. Nothing on either side was dropped; only
+this record's original characterization was wrong, twice.
 
 Audit: the release-merge-audit skill ran as a 17-agent workflow (five
 domain auditors, adversarial verification per finding, completeness
@@ -4119,11 +4123,12 @@ tests passing, and a block-count proof that the professions_trend and
 tank_crit splits preserved every original test case, 26 and 6). Verdict
 CLEAN: no blockers, no should-fix. Fixes applied in the same stroke,
 all of them stale test-filename anchors the release's own rename sweep
-missed, seven citation sites across five files
+missed, seven citation sites across five files, every one a
+release-side rename miss fixed locally
 (docs/healing-monte-carlo-analysis.md, three src/sim/world.ts
 comment anchors and one in src/sim/content/wraithwood.ts, the
-eastbrook visual-acceptance automatedEvidence row, and the branch-owned
-professions_trend precedent citation in
+eastbrook visual-acceptance automatedEvidence row, and the
+professions_trend precedent citation in the branch-modified
 tests/professions_mastery_reset.test.ts; the a380151f66 commit message
 undercounts these as six sites with two world.ts anchors, corrected
 here at the QA round).
@@ -4272,6 +4277,87 @@ pass on 2026-08-02 make an artless deed red the gate, and this build
 session has no image generation access. The deeds land the moment the
 six rasters are generated per the provenance spec; nothing else in the
 phase depends on them.
+
+### Phase 20 QA record (2026-08-02)
+
+Verdict: PASS. The QA session re-verified the phase from scratch at the
+build tip (96afe57f96): acceptance (1) to (6) all hold, every recorded
+number reproduced independently at least twice (the coverage auditor's
+own esbuild rig, the measurement lens, the database reviewer's byte
+model, and the frontend reviewer's content parser all re-derived the
+freeboards, road distances, coverage percentages, byte forms, and
+render pins exactly), and the named suites plus the parity goldens ran
+green with no golden re-minted. Method: five fresh domain reviewers
+(qa-checklist READY, test-coverage-auditor, architecture, frontend, and
+the database-performance-reviewer the phase text conditions on the
+persist-ceiling move, dispatched after the completeness critic caught
+its omission from the roster), a five-lens finding workflow with
+two-skeptic adversarial verification and a completeness critic, a
+16-mutant ledger plus 3 fix-validation mutants in an isolated worktree
+with its own npm ci (19 of 19 KILLED, tests proven to have run), a
+scratch-state audit of the Q26 deeds patch, and a by-eye screenshot
+review. Zero blocking findings anywhere; every should-fix and nit was
+applied or explicitly judged, and the fixes themselves were reviewed by
+a fresh reviewer whose own findings were then applied.
+
+QA changes on the branch: the pin-gap fix round (the wire legacy arm
+now builds its two-decimal worst case, the same size as the persist
+form at 4,116 bytes, and carries the lower bracket that makes its 8192
+raise load-bearing; the per-lake sweep pins its 61-lake census; the
+decorative-lake census gains a Mirror Tarn positive control; the
+open-sea deny and hub-flood counter-arms assert their premises; the
+vacuous Lawnmere distance bracket retired in favor of the rect
+literals; a new world-wide arm pins every node level to the
+ceil-midpoint rule, now also stated in the GatherNodeDef doc;
+nodeHarvestableByMeFor adopts the O(1) id-map membership read), the
+farshore screenshot re-shoot, and a comment and record precision pass.
+The farshore pair as built was non-evidence: from the original vantage
+the vein at its 1.50yd freeboard hides below the ridge crest, and the
+only pixel delta was mob pose. Re-shot from the shore side with both
+sides gated on a live content token; note for pixel-diff readers that
+the pair carries roughly a 74px vertical framing drift between sides
+(the vein delta itself is unmistakable), and that all three pairs are
+existence proofs that the props place and render, not demonstrations
+of the density ramp. Q26 closed mid-QA: a concurrent session generated
+the six crests and landed the held patch (with the icon follow-ups),
+so the .claude-scratch patch and APPLY_README are stale copies of
+applied work and can be deleted by the next session.
+
+Corrections this record makes to earlier prose, each re-derived
+against git: the incremental sync's anchor fix covered seven citation
+sites across five files (three in src/sim/world.ts), all release-side
+rename misses; against the true merge base exactly one file changed on
+both sides of the CI-speed merge (professions_deeds_playthrough), the
+three workflow files were release-verbatim, and one release-side new
+file was adapted inside the merge (deeds_sites_pin's station fixture
+seed, thorium_ore to fine_iron_ore). The database review passed with
+no findings and corrects one premise for the record: the reason a real
+player cannot hold all 156 cooldown entries is geography (the nodes
+span fourteen zones and the densest holds 18), not cast cadence, since
+the tooled cast floor of 1.5s alone would allow roughly 160 harvests
+inside one 240s respawn window.
+
+Recorded for the +132 full-D5 follow-on, one list so none is
+rediscovered: the wire arm takes its third ceiling move near 8,850
+bytes (the build record's premise correction); the per-frame and
+per-redraw sweeps that scale with GATHER_NODES want an index or memo
+before the count doubles again (minimap_markers and gathering_view as
+already recorded, plus cliff_scree_core's per-candidate scan inside
+the scree placement budget and the unmemoized gatherNodeClusters pass
+behind the open map window); nothing pins render-batch spatial extent
+(the max batch half-diagonal grew 101 to 122.5yd this phase); and
+server/db.ts topArenaRatings is the one read whose cost tracks total
+state-blob size across the whole table, so it is where the next
+ceiling move surfaces first. Judgments recorded as veto-able: the
+bottom-zone map glance closed on the cluster re-derivations (two
+independent), the strip's shipped precedent at identical density, and
+clean map renders (gather circles are quest-objective overlays, absent
+without an active work order); the low-preset capture was skipped
+because gather props carry no tier gate (verified by two reviewers);
+and the parity suite's green is scope-limited to non-perturbation of
+existing scenarios (the nearest scenario anchor sits 182.7yd from any
+new node), with in-zone correctness owned by the placement suite's
+world-wide physical arms.
 
 ---
 

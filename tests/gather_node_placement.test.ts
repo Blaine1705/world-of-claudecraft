@@ -1370,7 +1370,8 @@ describe('gather node placement: every node sits on ground a player can work', (
   it('every node level equals its zone authored level (the ceil-midpoint rule)', () => {
     // The one GatherNodeDef field no other arm pinned (the QA round): level
     // feeds the profession-XP green/gray curve (gatherActionXp in
-    // src/sim/professions/gathering.ts), and the GatherNodeDef doc in
+    // src/sim/professions/profession_xp.ts, called from gathering.ts), and
+    // the GatherNodeDef doc in
     // src/sim/types.ts states the authoring rule this arm enforces: every
     // node of every tier carries the ceil of its zone levelRange midpoint
     // (willowfen and galecrest 20, farshore_isle 5, the strip 4/10/17).

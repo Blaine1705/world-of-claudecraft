@@ -1214,7 +1214,12 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
     expect(measured).toBe(14);
     expect(worstZone).toBe('galecrest');
     expect(worst).toBeLessThanOrEqual(240);
-    expect(worst).toBeGreaterThan(200); // the ceiling bites, per the prose above
+    // The ceiling bites, per the prose above. Subsumption note (the QA
+    // round): while the worstZone pin and the probe literals stand, the
+    // geometry bounds any galecrest probe above 213yd, so this lower bracket
+    // can only fail after the worstZone pin does; it stays as the record of
+    // the acceptance, not as an independent tripwire.
+    expect(worst).toBeGreaterThan(200);
   });
 
   // Walkable-dry for the hub-shore floods below: above the WORLD sea plane

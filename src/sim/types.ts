@@ -2515,7 +2515,9 @@ export interface GatherNodeDef {
   pos: { x: number; z: number };
   // Effective content level for the profession-XP green/gray curve
   // (professions/profession_xp.ts gatherActionXp), snapshotted at authoring
-  // time from the node's zone levelRange midpoint rather than looked up live.
+  // time as the CEIL of the node's zone levelRange midpoint rather than
+  // looked up live (every shipped node follows the ceil form, pinned by the
+  // level arm in tests/gather_node_placement.test.ts).
   level: number;
   // Access tier (Professions 2.0), 1 = bare-hands: gated via
   // canGatherTier against the player's best WIELDABLE matching tool (R22:

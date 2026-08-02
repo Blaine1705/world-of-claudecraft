@@ -312,9 +312,13 @@ describe('ncd on the legacy per-tick arm', () => {
     // 8192 since the phase 20 density pass, with the stable arm above. The
     // legacy remaining-seconds form is narrower than the thirty-day
     // absolute-deadline form, so the same ceiling bounds both, and at two
-    // decimals it is byte-for-byte the persist two-decimal record (4,116 at
-    // 156 nodes): over the old 4096 pin, so this arm's raise is load-bearing
-    // too, not slack inherited from the stable arm.
+    // decimals it is the same SIZE as the persist two-decimal record (4,116
+    // bytes at 156 nodes; equal length, not equal bytes, since persist
+    // key-sorts and this arm serializes in content order): 20 bytes over the
+    // old 4096 pin, so this arm's raise is load-bearing too, not slack
+    // inherited from the stable arm. The thin margin is deliberate; an
+    // id-shortening sweep or a small node-count drop reds the lower bracket
+    // as a signal to re-measure, not as a defect.
     expect(payload.length).toBeGreaterThan(4096);
     expect(payload.length).toBeLessThanOrEqual(8192);
     // This payload repeats per player per tick at 20 Hz for a pre-stable

@@ -163,7 +163,9 @@ describe('the write ceiling, the load clamp, and the record bound stay coupled',
     // Form ordering, kept live (the QA round): the integer bound above is
     // strictly subsumed by the two-decimal bound, and this is the assertion
     // that says so, so the wider-form premise behind the wire twin's
-    // plus-four-bytes-per-entry arithmetic cannot rot silently.
+    // plus-four-bytes-per-entry arithmetic cannot rot silently. Holds while
+    // every respawnSeconds stays integral; a fractional respawn would
+    // genuinely break the premise, and this line is what says so.
     expect(twoDecimalBytes).toBeGreaterThan(JSON.stringify(all).length);
     // The load side must survive the same scale: no cap, break, or dedupe may
     // shrink a full record on the way back in.
