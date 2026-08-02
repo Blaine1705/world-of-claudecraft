@@ -7699,7 +7699,8 @@ export class Hud {
     // its remaining duration are the only way to react to a DoT/curse/CC), so this paints every
     // frame on every graphics preset. The visible-count cap (auraVisibleCap, still tiered) is
     // applied inside the painter and is debuff-priority (a shed slot is always a buff, never a
-    // debuff). Only the TARGET (non-self) debuffs strip below stays on the tiered ~4Hz cadence.
+    // debuff). The TARGET (non-self) debuffs strip below is likewise never tier-gated (see the
+    // paint call for why).
     this.buffBarPainter.paint(this.buffBarView.tick(p));
     this.debuffBarPainter.paint(this.debuffBarView.tick(p));
 
