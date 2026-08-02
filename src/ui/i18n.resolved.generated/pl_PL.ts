@@ -1724,6 +1724,7 @@ export const pl_PL: EnTranslations = {
       "filterArmor": "Pancerz",
       "filterConsumable": "Konsumpcyjne",
       "filterMaterial": "Surowce",
+      "filterTool": "Tools",
       "filterQuest": "Zadania",
       "filterMount": "Wierzchowce",
       "sortAria": "Sortuj przedmioty w torbie",

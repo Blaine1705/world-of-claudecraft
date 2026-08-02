@@ -1724,6 +1724,7 @@ export const da_DK: EnTranslations = {
       "filterArmor": "Rustning",
       "filterConsumable": "Forbrugsvarer",
       "filterMaterial": "Materialer",
+      "filterTool": "Tools",
       "filterQuest": "Quest",
       "filterMount": "Ridedyr",
       "sortAria": "Sortér taskegenstande",

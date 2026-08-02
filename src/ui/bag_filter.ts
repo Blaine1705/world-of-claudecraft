@@ -1,3 +1,4 @@
+import { isMaterialItem } from '../sim/material_taxonomy';
 import type { InvSlot, ItemDef } from '../sim/types';
 
 // Pure, DOM-free core for the modular bag filtering system. The HUD is a thin
@@ -12,6 +13,7 @@ export const BAG_CATEGORIES = [
   'armor',
   'consumable',
   'material',
+  'tool',
   'quest',
   'mount',
 ] as const;
@@ -45,12 +47,19 @@ export function bagOrderIsManual(filter: BagFilterState): boolean {
   return filter.sort === 'recent' && bagFilterIsDefault(filter);
 }
 
-// Look up an item definition by id. Injected so the pure core never imports the
-// live ITEMS table (and tests can supply a synthetic one).
+// Look up an item definition by id. Injected for the kind/name/quality arms so
+// tests can supply a synthetic table; the 'material' arm is the one exception,
+// answering from content-derived set membership on the def's id
+// (src/sim/material_taxonomy.ts), so a material fixture must carry a REAL
+// catalog id no matter what table the caller injects.
 export type ItemLookup = (itemId: string) => ItemDef | undefined;
 
 // Shared with the bank filter (bank_filter.ts): the bank reuses the same category
 // predicate so a "material"/"weapon"/... chip means the same thing in both windows.
+// 'material' is the honest derived taxonomy (src/sim/material_taxonomy.ts), not a
+// kind test: grey vendor trash and the unclassified trophies match only 'all', and
+// the implements/charms/cosmetic tokens the old junk-or-tool predicate swept in
+// live under the 'tool' chip instead.
 export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
   switch (category) {
     case 'all':
@@ -67,7 +76,9 @@ export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
         item.kind === 'elixir'
       );
     case 'material':
-      return item.kind === 'junk' || item.kind === 'tool';
+      return isMaterialItem(item);
+    case 'tool':
+      return item.kind === 'tool';
     case 'quest':
       return item.kind === 'quest';
     case 'mount':

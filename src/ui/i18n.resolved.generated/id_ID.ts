@@ -1724,6 +1724,7 @@ export const id_ID: EnTranslations = {
       "filterArmor": "Zirah",
       "filterConsumable": "Konsumsi",
       "filterMaterial": "Bahan",
+      "filterTool": "Tools",
       "filterQuest": "Misi",
       "filterMount": "Tunggangan",
       "sortAria": "Urutkan barang tas",

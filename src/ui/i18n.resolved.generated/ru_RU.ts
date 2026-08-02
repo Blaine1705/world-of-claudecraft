@@ -1724,6 +1724,7 @@ export const ru_RU: EnTranslations = {
       "filterArmor": "Броня",
       "filterConsumable": "Расходники",
       "filterMaterial": "Материалы",
+      "filterTool": "Инструменты",
       "filterQuest": "Задания",
       "filterMount": "Транспорт",
       "sortAria": "Сортировать предметы в сумках",

@@ -1724,6 +1724,7 @@ export const nl_NL: EnTranslations = {
       "filterArmor": "Pantser",
       "filterConsumable": "Verbruiksartikelen",
       "filterMaterial": "Materialen",
+      "filterTool": "Tools",
       "filterQuest": "Quest",
       "filterMount": "Rijdieren",
       "sortAria": "Tasitems sorteren",

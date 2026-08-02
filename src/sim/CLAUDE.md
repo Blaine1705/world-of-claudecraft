@@ -144,7 +144,10 @@ oldest-due drain; stamped per-spawn by `rift/runs.ts`, consumed by the
 `market_listing_ids.ts` (the World Market's id allocator: the reserved house band plus
 the load-time reissue that keeps one row per id),
 `vendor_stack.ts`, `loot_master.ts`, `aura_classify.ts` (buff-vs-debuff, shared with the
-HUD), `resurrection.ts` (both sicknesses, The Keeper's Toll and the shorter Unstuck one,
+HUD), `material_taxonomy.ts` (the honest depositable/browsable material set, derived
+from the node-yield/grade/harvest/salvage/reagent content tables; consumed ONLY by
+`src/ui`, never by the sim itself, and no `src/sim` file may import it, see its header),
+`resurrection.ts` (both sicknesses, The Keeper's Toll and the shorter Unstuck one,
 shared by every death site), and the combat
 leaves `spell_resist.ts`/`ranged_shot.ts`/`aura_stacking.ts`/`aura_cancel.ts`/
 `exclusive_aura.ts`/`form_swing.ts`, `jail.ts` (moderation-jail cage layout, gate

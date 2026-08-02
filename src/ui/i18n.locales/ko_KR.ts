@@ -5604,6 +5604,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': '방어구',
   'hudChrome.bags.filterConsumable': '소모품',
   'hudChrome.bags.filterMaterial': '재료',
+  'hudChrome.bags.filterTool': '도구',
   'hudChrome.bags.filterMount': '탈것',
   'hudChrome.bags.filterQuest': '퀘스트',
   'hudChrome.bags.sortAria': '가방 아이템 정렬',

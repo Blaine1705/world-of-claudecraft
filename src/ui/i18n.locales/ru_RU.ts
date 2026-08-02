@@ -5671,6 +5671,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Броня',
   'hudChrome.bags.filterConsumable': 'Расходники',
   'hudChrome.bags.filterMaterial': 'Материалы',
+  'hudChrome.bags.filterTool': 'Инструменты',
   'hudChrome.bags.filterMount': 'Транспорт',
   'hudChrome.bags.filterQuest': 'Задания',
   'hudChrome.bags.sortAria': 'Сортировать предметы в сумках',

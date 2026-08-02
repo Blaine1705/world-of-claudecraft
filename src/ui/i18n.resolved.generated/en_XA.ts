@@ -1724,6 +1724,7 @@ export const en_XA: EnTranslations = {
       "filterArmor": "[Áŕɱóŕ]",
       "filterConsumable": "[Çóñšúɱáƀļéš]",
       "filterMaterial": "[Ɱáţéŕíáļš]",
+      "filterTool": "[Ţóóļš]",
       "filterQuest": "[Ɋúéšţ]",
       "filterMount": "[Ɱóúñţš]",
       "sortAria": "[Šóŕţ ƀáĝ íţéɱš]",

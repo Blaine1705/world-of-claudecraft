@@ -1724,6 +1724,7 @@ export const es_ES: EnTranslations = {
       "filterArmor": "Armadura",
       "filterConsumable": "Consumibles",
       "filterMaterial": "Materiales",
+      "filterTool": "Tools",
       "filterQuest": "Misión",
       "filterMount": "Monturas",
       "sortAria": "Ordenar objetos de la bolsa",

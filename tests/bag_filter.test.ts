@@ -33,6 +33,9 @@ const ITEMS: Record<string, ItemDef> = {
   bread: { id: 'bread', name: 'Crusty Bread', kind: 'food', quality: 'common' },
   pelt: { id: 'pelt', name: 'Wolf Pelt', kind: 'junk', quality: 'poor' },
   rod: { id: 'rod', name: 'Fishing Rod', kind: 'tool', quality: 'common' },
+  // A REAL catalog id: the material chip is honest-taxonomy set membership
+  // (src/sim/material_taxonomy.ts), so a synthetic id can never match it.
+  iron_ore: { id: 'iron_ore', name: 'Iron Ore', kind: 'junk', quality: 'common' },
   keystone: { id: 'keystone', name: 'Crypt Keystone', kind: 'quest', quality: 'common' },
   relic: { id: 'relic', name: 'Ancient Relic', kind: 'armor', slot: 'chest', quality: 'legendary' },
   reins: {
@@ -84,9 +87,29 @@ describe('applyBagFilter — category filtering', () => {
     expect(ids(out)).toEqual(['potion', 'bread']);
   });
 
-  it('keeps junk and tools as materials', () => {
-    const out = applyBagFilter(INV, lookup, { category: 'material', sort: 'recent', search: '' });
-    expect(ids(out)).toEqual(['pelt', 'rod']);
+  it('keeps only honest materials: grey junk and tools no longer match the chip', () => {
+    // The material chip narrowed from junk-or-tool to the derived taxonomy
+    // (phase 19): the real material matches; the grey pelt and the tool are
+    // out (the tool moves to its own chip below).
+    const inv: InvSlot[] = [
+      { itemId: 'pelt', count: 5 },
+      { itemId: 'iron_ore', count: 2 },
+      { itemId: 'rod', count: 1 },
+      { itemId: 'blade', count: 1 },
+    ];
+    const out = applyBagFilter(inv, lookup, { category: 'material', sort: 'recent', search: '' });
+    expect(ids(out)).toEqual(['iron_ore']);
+  });
+
+  it('keeps only tools under the tool chip (the displaced implements)', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'pelt', count: 5 },
+      { itemId: 'iron_ore', count: 2 },
+      { itemId: 'rod', count: 1 },
+      { itemId: 'blade', count: 1 },
+    ];
+    const out = applyBagFilter(inv, lookup, { category: 'tool', sort: 'recent', search: '' });
+    expect(ids(out)).toEqual(['rod']);
   });
 
   it('keeps only quest items', () => {
@@ -259,6 +282,19 @@ describe('BAG_CATEGORIES', () => {
 
   it('includes the mounts category', () => {
     expect(BAG_CATEGORIES).toContain('mount');
+  });
+
+  it('pins the whole chip row, in order', () => {
+    expect([...BAG_CATEGORIES]).toEqual([
+      'all',
+      'weapon',
+      'armor',
+      'consumable',
+      'material',
+      'tool',
+      'quest',
+      'mount',
+    ]);
   });
 });
 

@@ -1724,6 +1724,7 @@ export const sv_SE: EnTranslations = {
       "filterArmor": "Rustning",
       "filterConsumable": "Förbrukningsvaror",
       "filterMaterial": "Material",
+      "filterTool": "Tools",
       "filterQuest": "Uppdrag",
       "filterMount": "Riddjur",
       "sortAria": "Sortera väskföremål",

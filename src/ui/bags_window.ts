@@ -136,6 +136,7 @@ const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   armor: 'hudChrome.bags.filterArmor',
   consumable: 'hudChrome.bags.filterConsumable',
   material: 'hudChrome.bags.filterMaterial',
+  tool: 'hudChrome.bags.filterTool',
   quest: 'hudChrome.bags.filterQuest',
   mount: 'hudChrome.bags.filterMount',
 };

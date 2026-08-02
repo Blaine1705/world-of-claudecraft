@@ -1724,6 +1724,7 @@ export const ja_JP: EnTranslations = {
       "filterArmor": "防具",
       "filterConsumable": "消耗品",
       "filterMaterial": "素材",
+      "filterTool": "道具",
       "filterQuest": "クエスト",
       "filterMount": "マウント",
       "sortAria": "バッグのアイテムを並べ替える",

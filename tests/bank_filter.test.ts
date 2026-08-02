@@ -24,6 +24,9 @@ const ITEMS: Record<string, ItemDef> = {
   potion: { id: 'potion', name: 'Minor Healing Potion', kind: 'potion', quality: 'common' },
   pelt: { id: 'pelt', name: 'Wolf Pelt', kind: 'junk', quality: 'poor' },
   rod: { id: 'rod', name: 'Fishing Rod', kind: 'tool', quality: 'common' },
+  // A REAL catalog id: the material chip is honest-taxonomy set membership
+  // (src/sim/material_taxonomy.ts), so a synthetic id can never match it.
+  iron_ore: { id: 'iron_ore', name: 'Iron Ore', kind: 'junk', quality: 'common' },
   keystone: { id: 'keystone', name: 'Crypt Keystone', kind: 'quest', quality: 'common' },
   relic: { id: 'relic', name: 'Ancient Relic', kind: 'armor', slot: 'chest', quality: 'legendary' },
 } as unknown as Record<string, ItemDef>;
@@ -41,6 +44,7 @@ const LOCALIZED: Record<string, string> = {
   rod: 'Hengel',
   keystone: 'Sleutelsteen',
   relic: 'Relikwie',
+  iron_ore: 'Ysterets',
 };
 const nameOf = (id: string): string => LOCALIZED[id] ?? id;
 
@@ -92,9 +96,21 @@ describe('filterBankSlots: category', () => {
     );
   });
 
-  it('keeps junk and tools as materials', () => {
-    expect(ids(filterBankSlots(MODELS, lookup, state({ category: 'material' }), nameOf))).toEqual([
-      'pelt',
+  it('keeps only honest materials: grey junk and tools no longer match the chip', () => {
+    // The material chip narrowed from junk-or-tool to the derived taxonomy
+    // (phase 19): only the real material matches; the grey pelt and the rod
+    // fall out of MODELS entirely, and the rod moves to the tool chip below.
+    const models: BankSlotModel[] = [
+      { slotIndex: 4, itemId: 'iron_ore', count: 2, showCount: true, qualityKey: 'common' },
+      ...MODELS,
+    ];
+    expect(ids(filterBankSlots(models, lookup, state({ category: 'material' }), nameOf))).toEqual([
+      'iron_ore',
+    ]);
+  });
+
+  it('keeps only tools under the tool chip (the displaced implements)', () => {
+    expect(ids(filterBankSlots(MODELS, lookup, state({ category: 'tool' }), nameOf))).toEqual([
       'rod',
     ]);
   });
@@ -124,9 +140,7 @@ describe('filterBankSlots: search matches the LOCALIZED name, not item.name', ()
 
   it('combines search with a category', () => {
     expect(
-      ids(
-        filterBankSlots(MODELS, lookup, state({ category: 'material', search: 'hengel' }), nameOf),
-      ),
+      ids(filterBankSlots(MODELS, lookup, state({ category: 'tool', search: 'hengel' }), nameOf)),
     ).toEqual(['rod']);
   });
 

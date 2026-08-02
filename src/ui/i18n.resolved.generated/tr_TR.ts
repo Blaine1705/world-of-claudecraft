@@ -1724,6 +1724,7 @@ export const tr_TR: EnTranslations = {
       "filterArmor": "Zırh",
       "filterConsumable": "Sarf Malzemeleri",
       "filterMaterial": "Malzemeler",
+      "filterTool": "Tools",
       "filterQuest": "Görev",
       "filterMount": "Binekler",
       "sortAria": "Çanta ögelerini sırala",

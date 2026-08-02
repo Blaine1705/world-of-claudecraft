@@ -1724,6 +1724,7 @@ export const cs_CZ: EnTranslations = {
       "filterArmor": "Brnění",
       "filterConsumable": "Spotřební",
       "filterMaterial": "Materiály",
+      "filterTool": "Tools",
       "filterQuest": "Úkolové",
       "filterMount": "Jezdecká zvířata",
       "sortAria": "Řadit předměty v batozích",

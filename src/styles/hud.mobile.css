@@ -3341,7 +3341,7 @@
     border-bottom-left-radius: 0;
     border-left: 0;
   }
-  /* The six category chips wrap to two rows at half-viewport width and eat the grid,
+  /* The category chips wrap to two rows at half-viewport width and eat the grid,
      so keep them one horizontally scrollable row inside the cluster (the bank pairing
      does the same); nothing is hidden and every chip keeps its full tap height. */
   body.mobile-touch.char-bags-paired #bags .bag-chips {
@@ -3758,7 +3758,7 @@
     border-bottom-right-radius: 0;
     border-right-width: 1px;
   }
-  /* Short landscape phones: the six category chips wrap to two rows at half-viewport
+  /* Short landscape phones: the category chips wrap to two rows at half-viewport
      width and eat the grid (a sub-row sliver at 360px tall). Keep them one
      horizontally scrollable row inside the bank AND market clusters (both panels, so
      each pair stays visually consistent; the vendor cluster and standalone bags keep

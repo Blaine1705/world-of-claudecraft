@@ -5409,6 +5409,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': '护甲',
   'hudChrome.bags.filterConsumable': '消耗品',
   'hudChrome.bags.filterMaterial': '材料',
+  'hudChrome.bags.filterTool': '工具',
   'hudChrome.bags.filterMount': '坐骑',
   'hudChrome.bags.filterQuest': '任务',
   'hudChrome.bags.sortAria': '排序背包物品',

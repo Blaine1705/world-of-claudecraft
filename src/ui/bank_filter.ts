@@ -9,10 +9,12 @@
 // injected resolver (the bank searches the displayed name, unlike bags which
 // matches the raw English item.name today; that divergence is intentional).
 //
-// Bare-named like bag_filter.ts, so it escapes the architecture.test.ts *_view /
-// *_core on-disk sweep and needs no UI_PURE_CORES registration (verified against
-// the sweep's /_(?:view|core)\.ts$/ regex + the BARE_NAMED forward-completeness
-// cross-check, which only lists REGISTERED bare cores).
+// Bare-named, so it escapes the architecture.test.ts *_view / *_core on-disk
+// sweep and needs no UI_PURE_CORES registration (verified against the sweep's
+// /_(?:view|core)\.ts$/ regex + the BARE_NAMED forward-completeness cross-check,
+// which only lists REGISTERED bare cores). bag_filter.ts, once in the same
+// boat, IS registered now: phase 19 gave it a runtime sim import
+// (material_taxonomy), so its purity is scanned.
 
 import {
   type BagFilterState,

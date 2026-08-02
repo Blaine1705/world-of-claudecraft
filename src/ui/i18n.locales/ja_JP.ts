@@ -5616,6 +5616,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': '防具',
   'hudChrome.bags.filterConsumable': '消耗品',
   'hudChrome.bags.filterMaterial': '素材',
+  'hudChrome.bags.filterTool': '道具',
   'hudChrome.bags.filterMount': 'マウント',
   'hudChrome.bags.filterQuest': 'クエスト',
   'hudChrome.bags.sortAria': 'バッグのアイテムを並べ替える',

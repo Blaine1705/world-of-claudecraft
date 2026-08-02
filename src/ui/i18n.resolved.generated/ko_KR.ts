@@ -1724,6 +1724,7 @@ export const ko_KR: EnTranslations = {
       "filterArmor": "방어구",
       "filterConsumable": "소모품",
       "filterMaterial": "재료",
+      "filterTool": "도구",
       "filterQuest": "퀘스트",
       "filterMount": "탈것",
       "sortAria": "가방 아이템 정렬",

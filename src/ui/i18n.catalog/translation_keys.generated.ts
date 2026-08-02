@@ -6259,6 +6259,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.bags.filterMaterial'
   | 'hudChrome.bags.filterMount'
   | 'hudChrome.bags.filterQuest'
+  | 'hudChrome.bags.filterTool'
   | 'hudChrome.bags.filterWeapon'
   | 'hudChrome.bags.itemAriaBound'
   | 'hudChrome.bags.itemAriaEnchanted'

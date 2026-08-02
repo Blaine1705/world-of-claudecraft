@@ -1724,6 +1724,7 @@ export const vi_VN: EnTranslations = {
       "filterArmor": "Giáp",
       "filterConsumable": "Vật phẩm tiêu hao",
       "filterMaterial": "Nguyên liệu",
+      "filterTool": "Tools",
       "filterQuest": "Nhiệm vụ",
       "filterMount": "Vật cưỡi",
       "sortAria": "Sắp xếp vật phẩm trong túi",

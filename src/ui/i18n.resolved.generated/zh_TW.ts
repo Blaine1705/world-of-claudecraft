@@ -1724,6 +1724,7 @@ export const zh_TW: EnTranslations = {
       "filterArmor": "護甲",
       "filterConsumable": "消耗品",
       "filterMaterial": "材料",
+      "filterTool": "工具",
       "filterQuest": "任務",
       "filterMount": "坐騎",
       "sortAria": "排序背包物品",
