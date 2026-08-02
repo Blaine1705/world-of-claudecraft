@@ -53,6 +53,12 @@ vi.mock('../../server/discord', () => ({
   discordFlexForAccounts: vi.fn(),
   setDiscordPresenceCache: vi.fn(),
 }));
+// Only the cache WRITE is faked: the real module supplies the fixed breaker-state
+// list the sanitizer validates against, so a change to that list is felt here.
+vi.mock('../../server/discord_bot_counters', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../server/discord_bot_counters')>()),
+  setDiscordBotCounters: vi.fn(),
+}));
 vi.mock('../../server/discord_activity', () => ({
   drainActivity: vi.fn(),
   requeueActivity: vi.fn(),
@@ -78,6 +84,10 @@ import {
 } from '../../server/discord';
 import type { QueuedActivity } from '../../server/discord_activity';
 import { drainActivity, requeueActivity } from '../../server/discord_activity';
+import {
+  type DiscordBotCountersSnapshot,
+  setDiscordBotCounters,
+} from '../../server/discord_bot_counters';
 import type { DiscordLinkRow, DiscordMemberMetaRecord } from '../../server/discord_db';
 import {
   accountForDiscord,
@@ -461,6 +471,293 @@ describe('discord/presence', () => {
     expect(arg.voice).toHaveLength(50);
     expect(arg.voice[0]).toEqual({ id: '', name: '', speaking: false, selfMute: false });
     expect(arg.voice[1]).toEqual({ id: 'v1', name: 'Voice One', speaking: true, selfMute: true });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 5b. discord/presence bot counters: the OPTIONAL block the bot rides in on the
+// same push. Sanitized into a fixed 14-field shape (every number clamped, the
+// scope record rebuilt from exactly four keys, the breaker state allowlisted),
+// then handed to the process-local counters cache. Both presence arms carry the
+// identical two lines, so the dual-arm case below pins them together.
+// ---------------------------------------------------------------------------
+
+/** What a healthy bot pushes: a distinct value per field, so no pin is ambiguous. */
+const BOT_COUNTERS = {
+  requests: 1000,
+  rateLimited: 30,
+  rateLimitedByScope: { user: 11, global: 7, shared: 9, unknown: 3 },
+  globalPauses: 4,
+  banPauses: 2,
+  breakerState: 'open',
+  breakerOpens: 5,
+  queueDepth: 12,
+  trackedBuckets: 40,
+  trackedRoutes: 60,
+  activeQueues: 6,
+  forbiddenEntries: 8,
+  forbiddenBlocks: 21,
+  breakerBlocks: 13,
+};
+
+/** The 14 stored fields, in the order the wire contract declares them. */
+const BOT_COUNTER_FIELDS = [
+  'requests',
+  'rateLimited',
+  'rateLimitedByScope',
+  'globalPauses',
+  'banPauses',
+  'breakerState',
+  'breakerOpens',
+  'queueDepth',
+  'trackedBuckets',
+  'trackedRoutes',
+  'activeQueues',
+  'forbiddenEntries',
+  'forbiddenBlocks',
+  'breakerBlocks',
+];
+
+/** The snapshot the arm stored on call `index`, or a loud failure if it stored none. */
+function storedCounters(index = 0): DiscordBotCountersSnapshot {
+  const calls = vi.mocked(setDiscordBotCounters).mock.calls;
+  if (calls.length <= index) throw new Error(`no counters push at index ${index}`);
+  return calls[index][0];
+}
+
+describe('discord/presence bot counters', () => {
+  it('stores a fresh fixed-shape snapshot, dropping every unknown field', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+
+    const r = await runRoute('POST', '/internal/discord/presence', {
+      headers: DISCORD_HEADERS,
+      body: {
+        onlineCount: 3,
+        counters: {
+          ...BOT_COUNTERS,
+          // A scope the fixed four does not carry, and a top-level field the
+          // contract does not carry: neither may reach the cache (and so neither
+          // can ever become a Prometheus label or series).
+          rateLimitedByScope: { ...BOT_COUNTERS.rateLimitedByScope, evil: 5 },
+          somethingNew: 'x',
+          voice: ['nope'],
+        },
+      },
+    });
+
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true, data: { received: true }, error: null });
+    expect(vi.mocked(setDiscordBotCounters)).toHaveBeenCalledTimes(1);
+
+    const stored = storedCounters();
+    expect(Object.keys(stored)).toEqual(BOT_COUNTER_FIELDS);
+    expect(Object.keys(stored.rateLimitedByScope)).toEqual(['user', 'global', 'shared', 'unknown']);
+    expect(stored).toEqual({
+      requests: 1000,
+      rateLimited: 30,
+      rateLimitedByScope: { user: 11, global: 7, shared: 9, unknown: 3 },
+      globalPauses: 4,
+      banPauses: 2,
+      breakerState: 'open',
+      breakerOpens: 5,
+      queueDepth: 12,
+      trackedBuckets: 40,
+      trackedRoutes: 60,
+      activeQueues: 6,
+      forbiddenEntries: 8,
+      forbiddenBlocks: 21,
+      breakerBlocks: 13,
+    });
+    // Stamped with the REAL push time, so the cache can age it out. A bounded
+    // window rather than a typeof: a handler stamping 0 (or any fixed literal)
+    // would park every push permanently stale, with all five live gauges
+    // reading 0 in production while a typeof pin stayed green.
+    const stamp = vi.mocked(setDiscordBotCounters).mock.calls[0][1];
+    expect(stamp).toBeGreaterThan(Date.now() - 5000);
+    expect(stamp).toBeLessThanOrEqual(Date.now());
+  });
+
+  it('clamps every numeric field and zeroes anything that is not a finite number', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+
+    await runRoute('POST', '/internal/discord/presence', {
+      headers: DISCORD_HEADERS,
+      body: {
+        counters: {
+          requests: 2e9,
+          rateLimited: -5,
+          rateLimitedByScope: { user: 2e9, global: '3', shared: true },
+          globalPauses: '7',
+          banPauses: null,
+          breakerState: 'weird',
+          breakerOpens: 12.9,
+          queueDepth: [4],
+          trackedBuckets: { n: 1 },
+          // trackedRoutes, activeQueues, forbiddenEntries, forbiddenBlocks and
+          // breakerBlocks are absent entirely.
+        },
+      },
+    });
+
+    expect(storedCounters()).toEqual({
+      requests: 1_000_000_000,
+      rateLimited: 0,
+      rateLimitedByScope: { user: 1_000_000_000, global: 0, shared: 0, unknown: 0 },
+      globalPauses: 0,
+      banPauses: 0,
+      breakerState: 'closed',
+      breakerOpens: 12,
+      queueDepth: 0,
+      trackedBuckets: 0,
+      trackedRoutes: 0,
+      activeQueues: 0,
+      forbiddenEntries: 0,
+      forbiddenBlocks: 0,
+      breakerBlocks: 0,
+    });
+  });
+
+  it('stores all four scopes as zero when the scope record is absent entirely', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+
+    // A block with no rateLimitedByScope at all must not throw inside the
+    // handler: a malformed telemetry block turning the presence push into a
+    // 500 is exactly the coupling the optional counters design forbids.
+    const r = await runRoute('POST', '/internal/discord/presence', {
+      headers: DISCORD_HEADERS,
+      body: { counters: { requests: 5 } },
+    });
+
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true, data: { received: true }, error: null });
+    expect(storedCounters().requests).toBe(5);
+    expect(storedCounters().rateLimitedByScope).toEqual({
+      user: 0,
+      global: 0,
+      shared: 0,
+      unknown: 0,
+    });
+  });
+
+  it('passes through each of the three allowed breaker states verbatim', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+
+    for (const state of ['closed', 'open', 'half-open']) {
+      await runRoute('POST', '/internal/discord/presence', {
+        headers: DISCORD_HEADERS,
+        body: { counters: { ...BOT_COUNTERS, breakerState: state } },
+      });
+    }
+
+    expect(vi.mocked(setDiscordBotCounters)).toHaveBeenCalledTimes(3);
+    expect([0, 1, 2].map((i) => storedCounters(i).breakerState)).toEqual([
+      'closed',
+      'open',
+      'half-open',
+    ]);
+  });
+
+  it('leaves the counters cache alone when the block is absent or not an object', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+
+    for (const counters of [undefined, null, 'nope', 7, [BOT_COUNTERS]]) {
+      const r = await runRoute('POST', '/internal/discord/presence', {
+        headers: DISCORD_HEADERS,
+        body: { onlineCount: 4, memberTotal: 9, counters },
+      });
+      expect(r.body).toEqual({ success: true, data: { received: true }, error: null });
+    }
+
+    // An older bot that pushes no counters keeps working: its presence still
+    // lands, and the counters cache is left to age out on its own rather than
+    // being overwritten with zeroes.
+    expect(vi.mocked(setDiscordBotCounters)).not.toHaveBeenCalled();
+    expect(vi.mocked(setDiscordPresenceCache)).toHaveBeenCalledTimes(5);
+    expect(vi.mocked(setDiscordPresenceCache).mock.calls[0][0]).toEqual({
+      onlineCount: 4,
+      memberTotal: 9,
+      voiceChannelName: null,
+      voice: [],
+    });
+  });
+
+  it('does not disturb the presence fields when counters ride along', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+
+    await runRoute('POST', '/internal/discord/presence', {
+      headers: DISCORD_HEADERS,
+      body: {
+        onlineCount: 12,
+        memberTotal: 400,
+        voiceChannelName: 'General',
+        voice: [{ id: 'v1', name: 'Voice One', speaking: true, selfMute: false }],
+        counters: BOT_COUNTERS,
+      },
+    });
+
+    expect(vi.mocked(setDiscordPresenceCache)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(setDiscordPresenceCache).mock.calls[0][0]).toEqual({
+      onlineCount: 12,
+      memberTotal: 400,
+      voiceChannelName: 'General',
+      voice: [{ id: 'v1', name: 'Voice One', speaking: true, selfMute: false }],
+    });
+    expect(vi.mocked(setDiscordBotCounters)).toHaveBeenCalledTimes(1);
+  });
+
+  it('sanitizes identically on the legacy ladder arm and the RouteDef arm', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    const body = {
+      onlineCount: 12,
+      counters: {
+        ...BOT_COUNTERS,
+        requests: 2e9,
+        breakerState: 'nonsense',
+        rateLimitedByScope: { ...BOT_COUNTERS.rateLimitedByScope, evil: 5 },
+        somethingNew: 'x',
+      },
+    };
+
+    const viaRouteDef = await runRoute('POST', '/internal/discord/presence', {
+      headers: DISCORD_HEADERS,
+      body,
+    });
+
+    const req = makeReq({
+      method: 'POST',
+      url: '/internal/discord/presence',
+      headers: DISCORD_HEADERS,
+      body,
+    });
+    const res = new FakeRes();
+    await handleInternalApi(req, res as unknown as http.ServerResponse, null as never);
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toEqual(viaRouteDef.body);
+    expect(vi.mocked(setDiscordBotCounters)).toHaveBeenCalledTimes(2);
+
+    // Both arms stored the same snapshot AS each other, and both match the one
+    // expected literal (comparing the two calls alone would pass for two arms
+    // that are identically wrong).
+    const expected = {
+      requests: 1_000_000_000,
+      rateLimited: 30,
+      rateLimitedByScope: { user: 11, global: 7, shared: 9, unknown: 3 },
+      globalPauses: 4,
+      banPauses: 2,
+      breakerState: 'closed',
+      breakerOpens: 5,
+      queueDepth: 12,
+      trackedBuckets: 40,
+      trackedRoutes: 60,
+      activeQueues: 6,
+      forbiddenEntries: 8,
+      forbiddenBlocks: 21,
+      breakerBlocks: 13,
+    };
+    expect(storedCounters(0)).toEqual(expected);
+    expect(storedCounters(1)).toEqual(storedCounters(0));
+    expect(Object.keys(storedCounters(1))).toEqual(BOT_COUNTER_FIELDS);
   });
 });
 
