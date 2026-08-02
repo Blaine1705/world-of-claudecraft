@@ -309,4 +309,45 @@ describe('shield block', () => {
     expect(rogueHit?.kind).toBe('hit');
     expect(rogueHit?.amount).toBe(20);
   });
+  it('a Paladin shield aimed at offhand keeps block stats after stat recalculation', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true });
+    sim.addItem('eastbrook_buckler', 1);
+
+    sim.equipItemToSlot('eastbrook_buckler', 'offhand');
+
+    expect(sim.player.offhandItemId).toBe('eastbrook_buckler');
+    expect(sim.player.equippedItems.offhand).toBe('eastbrook_buckler');
+    expect(sim.player.stats.armor).toBeGreaterThan(0);
+    expect(sim.player.stats.sta).toBeGreaterThan(0);
+    expect(sim.player.blockChance).toBe(SHIELD_BLOCK_BASE);
+    expect(sim.player.blockValue).toBe(6);
+    sim.tick();
+    expect(sim.player.blockChance).toBe(SHIELD_BLOCK_BASE);
+    expect(sim.player.blockValue).toBe(6);
+  });
+
+  it('Paladin with a shield blocks a frontal mob swing without gaining Warrior parry', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true }) as AnySim;
+    const player = sim.player;
+    sim.addItem('eastbrook_buckler', 1);
+    sim.equipItem('eastbrook_buckler');
+    const mob = spawnMobInFront(sim, player);
+    player.dodgeChance = 0;
+    player.stats.armor = 0;
+    expect(player.blockChance).toBe(SHIELD_BLOCK_BASE);
+    expect(player.blockValue).toBe(6);
+    mob.weapon = { min: 20, max: 20, speed: 2 };
+    mob.attackPower = 0;
+    // Paladin has no Warrior parry band. This roll is above miss and dodge,
+    // then inside the Paladin shield block window.
+    sim.rng.next = () => 0.08;
+
+    player.facing = 0;
+    sim.drainEvents();
+    sim.mobSwing(mob, player);
+
+    const block = damageEvents(sim.drainEvents()).find((e) => e.sourceId === mob.id);
+    expect(block?.kind).toBe('block');
+    expect(block?.amount).toBe(14);
+  });
 });

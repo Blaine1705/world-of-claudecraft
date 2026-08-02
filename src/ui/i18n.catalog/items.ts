@@ -2223,6 +2223,10 @@ const ITEM_ENTITY_IDS = [
   'wildheart_tuskblade',
   'wildheart_hexwood_staff',
   'wildheart_fangknife',
+  'fanglords_beastspear',
+  'bloodmane_warleggings',
+  'vineclaw_stalking_breeches',
+  'sunbone_ritual_sarong',
   'thick_winter_pelt',
   'aurora_mote',
   'hearth_ember_cache',
@@ -2279,6 +2283,7 @@ const ITEM_ENTITY_IDS = [
   'saltforged_grips',
   'mantle_of_the_unbroken_shore',
   'last_keep_signet',
+  'reins_terrorspark_groundshaker',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2314,6 +2319,10 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   wildheart_tuskblade: 'Wildheart Tuskblade',
   wildheart_hexwood_staff: 'Hexwood Staff of the Basin',
   wildheart_fangknife: 'Fangknife of Zulgar',
+  fanglords_beastspear: "Fanglord's Beastspear",
+  bloodmane_warleggings: 'Bloodmane Warleggings',
+  vineclaw_stalking_breeches: 'Vineclaw Stalking Breeches',
+  sunbone_ritual_sarong: 'Sunbone Ritual Sarong',
   thick_winter_pelt: 'Thick Winter Pelt',
   aurora_mote: 'Aurora Mote',
   hearth_ember_cache: 'Ember Cache',
@@ -2370,6 +2379,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   saltforged_grips: 'Saltforged Grips',
   mantle_of_the_unbroken_shore: 'Mantle of the Unbroken Shore',
   last_keep_signet: 'Signet of the Last Keep',
+  reins_terrorspark_groundshaker: 'Ignition Key: Terrorspark Groundshaker',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

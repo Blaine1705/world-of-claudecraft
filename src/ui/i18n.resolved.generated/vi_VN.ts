@@ -896,6 +896,13 @@ export const vi_VN: EnTranslations = {
       "heroicName": "{name} Anh Hùng",
       "heroicLocked": "Bạn đang bị khóa với {name} Anh Hùng."
     },
+    "riftTracker": {
+      "title": "Rạn Nứt",
+      "floor": "Tầng {current}/{total}",
+      "closesIn": "Đóng sau {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "B",
       "NE": "ĐB",
@@ -923,6 +930,23 @@ export const vi_VN: EnTranslations = {
       "dock": "Đưa thước đo này trở lại cửa sổ thước đo",
       "separate": "Tách {meter}",
       "regroup": "Ghép lại {meter}"
+    },
+    "targetAuras": {
+      "title": "Hào Quang Mục Tiêu",
+      "keybindLabel": "Buff và Debuff Mục Tiêu",
+      "all": "Tất cả",
+      "debuffs": "Debuff",
+      "buffs": "Buff",
+      "unlock": "Di chuyển cửa sổ hào quang mục tiêu",
+      "lock": "Khóa cửa sổ hào quang mục tiêu",
+      "configureRows": "Cấu hình hào quang mục tiêu",
+      "fewerRows": "Ưu tiên ít hàng hào quang hơn",
+      "moreRows": "Ưu tiên nhiều hàng hào quang hơn",
+      "visibleRows": "Số hàng hào quang mong muốn: {count}",
+      "showSources": "Hiện nguồn hào quang",
+      "hideSources": "Ẩn nguồn hào quang",
+      "ownAura": "Hào quang của bạn",
+      "opacity": "Độ mờ hào quang: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Thú cưng đang đầy máu",
@@ -967,13 +991,15 @@ export const vi_VN: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Cóc Nhảy Bóng Tối",
       "name_stormfeather_griffin": "Stormfeather Vươn Trời",
       "name_thunderstrut_gobbler": "Thunderstrut, Gà Tây Vĩ Đại",
+      "name_terrorspark_groundshaker": "Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất",
       "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_stalkglider_snail": "Một chú ốc sên bền bỉ, dẻo dai, giúp tăng tốc độ di chuyển.",
       "desc_aether_hover_cycle": "Một cỗ xe phép thuật cơ khí mạnh mẽ, được thiết kế để di chuyển nhanh và lướt sát mặt đất trong chiến đấu.",
       "desc_shadowjump_toad": "Một con cóc khổng lồ, bước chân vững chãi, được huấn luyện những cú nhảy bóng tối nhanh như chớp có thể vượt qua mọi địa hình.",
       "desc_stormfeather_griffin": "Một con sư tử đầu chim bão uy nghi, rảo bước trên mặt đất bằng những móng vuốt được bọc rune, đôi cánh xếp gọn.",
-      "desc_thunderstrut_gobbler": "Một con gà tây khổng lồ nở ra từ giông bão, sải bước xuống từ Đỉnh Tỉnh Thức, đuôi xòe rộng như đám mây giông."
+      "desc_thunderstrut_gobbler": "Một con gà tây khổng lồ nở ra từ giông bão, sải bước xuống từ Đỉnh Tỉnh Thức, đuôi xòe rộng như đám mây giông.",
+      "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ."
     },
     "mountTraining": {
       "mountPrompt": "Nhấn {key} để cưỡi Valorsteed huấn luyện.",
@@ -1279,6 +1305,51 @@ export const vi_VN: EnTranslations = {
       "badges": {
         "backgrounded": "Chạy Nền",
         "offline": "Ngoại Tuyến"
+      }
+    },
+    "auraOverlay": {
+      "title": "Hào Quang",
+      "currentClass": "Lớp hiện tại: {class}",
+      "previewHint": "Dùng Thiết lập vị trí để di chuyển hào quang mà không che menu.",
+      "noProcs": "Không có proc được hỗ trợ nào khả dụng cho nhân vật này.",
+      "enabled": "Hiện hào quang",
+      "icon": "Biểu tượng phép",
+      "arcs": "Vành trăng bên",
+      "groundRing": "Vòng mặt đất",
+      "groundRingSpellOrder": "Vòng mặt đất: thứ tự phép",
+      "crescentsSpellOrder": "Vành trăng bên: thứ tự phép",
+      "size": "Kích thước",
+      "iconSize": "Kích thước biểu tượng",
+      "crescentBlockSize": "Kích thước khối vành trăng",
+      "groundRingBlockSize": "Kích thước khối vòng mặt đất",
+      "opacity": "Độ mờ",
+      "color": "Màu sắc",
+      "allOn": "Bật tất cả",
+      "allOff": "Tắt tất cả",
+      "reposition": "Thiết lập vị trí",
+      "positioning": "Định vị: {aura}",
+      "selectAura": "Hào quang",
+      "done": "Xong",
+      "moveLeft": "Di chuyển sang trái",
+      "moveUp": "Di chuyển lên",
+      "moveDown": "Di chuyển xuống",
+      "moveRight": "Di chuyển sang phải",
+      "moveEarlier": "Di chuyển phép vào trong",
+      "moveLater": "Di chuyển phép ra ngoài",
+      "screenPosition": "Vị trí trên màn hình",
+      "spellOrder": "Thứ tự phép",
+      "reset": "Đặt Lại Vị Trí",
+      "spellPosition": "Thứ tự phép {position} / {count}",
+      "procs": {
+        "revenge": "Phục Thù!",
+        "battleTrance": "Nhập Định Chiến Đấu",
+        "overpowerCharge": "Tăng Cường Bàn Tay Đẫm Máu",
+        "suddenDeath": "Đột Tử",
+        "victoryRush": "Đà Chiến Thắng",
+        "enrage": "Cuồng Loạn: Phẫn Nộ",
+        "heatingUp": "Đang Nóng Lên",
+        "arcaneCharge": "Điện Tích Bí Thuật",
+        "aetherRush": "Dòng Ê-te"
       }
     },
     "playerCard": {
@@ -2088,6 +2159,14 @@ export const vi_VN: EnTranslations = {
       "benefits": "Hãy liên kết tài khoản Steam từ ứng dụng máy tính để các kỳ công bạn lập được đồng bộ thành thành tựu Steam.",
       "noTicket": "Steam không cung cấp vé liên kết. Hãy khởi động Steam rồi thử lại."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Liên kết Epic",
+      "unlink": "Hủy liên kết Epic",
+      "linked": "Đã liên kết với tài khoản Epic {id}",
+      "benefits": "Liên kết tài khoản Epic của bạn từ ứng dụng máy tính Epic để phản chiếu các kỳ công bạn đạt được thành thành tựu Epic.",
+      "noProof": "Epic không cung cấp bằng chứng liên kết. Hãy khởi chạy từ Epic Games Store rồi thử lại."
+    },
     "mailbox": {
       "title": "Hòm Thư",
       "subtitle": "Bưu Quạ",
@@ -2132,6 +2211,7 @@ export const vi_VN: EnTranslations = {
         "noRecipient": "Không ai mang tên đó có hòm thư ở đây.",
         "tooManyParcels": "Một lá thư chở tối đa {count} bưu kiện.",
         "noMailQuestItems": "Bạn không thể gửi vật phẩm nhiệm vụ qua thư.",
+        "noMailBound": "Vật phẩm đó đã bị ràng buộc và không thể gửi qua thư.",
         "notEnoughItems": "Bạn không có đủ số lượng đó để gửi.",
         "cantAffordPostage": "Bạn không đủ tiền trả bưu phí.",
         "recipientBoxFull": "Hòm thư của người nhận đã đầy.",
@@ -2938,6 +3018,14 @@ export const vi_VN: EnTranslations = {
       "account_taken": "Tài khoản Steam đó đã được liên kết với một tài khoản khác.",
       "upstream": "Steam không phản hồi. Hãy thử lại sau giây lát."
     },
+    "epic": {
+      "disabled": "Hiện không thể liên kết Epic.",
+      "invalid_token": "Epic không thể xác minh yêu cầu liên kết này. Hãy thử lại từ ứng dụng máy tính.",
+      "banned": "Không thể liên kết tài khoản Epic đó.",
+      "already_linked": "Tài khoản của bạn đã liên kết với một tài khoản Epic.",
+      "account_taken": "Tài khoản Epic đó đã được liên kết với một tài khoản khác.",
+      "upstream": "Epic không phản hồi. Hãy thử lại sau giây lát."
+    },
     "wallet": {
       "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại."
     },
@@ -3551,14 +3639,6 @@ export const vi_VN: EnTranslations = {
       "reptile": {
         "name": "Bò Sát",
         "desc": "Những thợ săn máu lạnh với tiếng rít và cú đớp rất riêng của chúng, khác biệt hoàn toàn so với các dã thú máu nóng."
-      },
-      "murloc": {
-        "name": "Vây Ộp Oạp",
-        "desc": "Giống người cá biết kêu ộp oạp sống ở bờ hồ và vũng nước triều, nhanh chóng vây lấy bất cứ thứ gì lội đến quá gần."
-      },
-      "kobold": {
-        "name": "Tiểu Yêu",
-        "desc": "Những kẻ nhặt nhạnh lăng xăng và tinh linh của bãi cỏ, bờ giậu, phiền toái nhiều hơn là nguy hiểm, cho đến khi chúng tụ tập đông đảo."
       },
       "demon": {
         "name": "Ác Ma",
@@ -6211,11 +6291,15 @@ export const vi_VN: EnTranslations = {
       "graphicsPresetMedium": "Trung Bình",
       "graphicsPresetHigh": "Cao",
       "graphicsPresetUltra": "Cực Cao",
+      "graphicsPresetInsane": "Cực Đại",
       "graphicsPresetAdvanced": "Nâng Cao",
       "terrainDetail": "Chi Tiết Địa Hình",
       "foliageDensity": "Mật Độ Cây Cỏ",
       "effectsQuality": "Hiệu Ứng & Ánh Sáng",
       "shadowQuality": "Chất Lượng Bóng Đổ",
+      "surfaceDetail": "Chi Tiết Bề Mặt",
+      "surfaceDetailBasic": "Cơ Bản",
+      "surfaceDetailFull": "Đầy Đủ",
       "terrainLow": "Thấp",
       "terrainHigh": "Cao",
       "touchOpacity": "Độ Mờ Điều Khiển Cảm Ứng",
@@ -6392,6 +6476,7 @@ export const vi_VN: EnTranslations = {
       "floatingDodge": "Né",
       "floatingParry": "Gạt Đòn",
       "floatingResist": "Kháng",
+      "floatingEvade": "Lẩn Tránh",
       "floatingHealFull": "Đầy",
       "floatingHealAbsorbed": "Hấp Thụ",
       "cannotMove": "Không thể di chuyển!",
@@ -6404,6 +6489,7 @@ export const vi_VN: EnTranslations = {
       "dodged": "{ability} của bạn bị {target} né.",
       "parried": "{ability} của bạn bị {target} gạt đòn.",
       "resisted": "{target} kháng lại {ability} của bạn.",
+      "evaded": "{target} lẩn tránh {ability} của bạn.",
       "healSelf": "{ability} của bạn hồi {amount} máu cho bạn.",
       "healSelfCrit": "{ability} của bạn chí mạng hồi {amount} máu cho bạn.",
       "healOther": "{ability} của bạn hồi {amount} máu cho {target}.",
@@ -6501,10 +6587,12 @@ export const vi_VN: EnTranslations = {
       "arenaQueueTrading": "Hãy hoàn tất giao dịch trước khi xếp hàng.",
       "arenaQueueInstance": "Bạn không thể xếp hàng khi đang ở trong hầm ngục.",
       "tradeInProgress": "Một giao dịch đang diễn ra.",
+      "tradeAlreadyTrading": "Người chơi đó đang giao dịch.",
       "tradeTooFar": "Mục tiêu ở quá xa để giao dịch.",
       "tradeExpired": "Yêu cầu giao dịch đã hết hạn.",
       "tradeFailed": "Giao dịch thất bại: vật phẩm hoặc tiền không còn khả dụng.",
-      "tradeBound": "Vật phẩm đó đã bị ràng buộc và không thể giao dịch."
+      "tradeBound": "Vật phẩm đó đã bị ràng buộc và không thể giao dịch.",
+      "marketListBound": "Vật phẩm đó đã bị ràng buộc và không thể rao bán."
     },
     "logs": {
       "standUp": "Bạn đứng dậy.",
@@ -7250,7 +7338,7 @@ export const vi_VN: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Tàng Hình Cao Cấp",
-        "description": "Biến mất trong 20 giây: xóa 2 hiệu ứng sát thương theo thời gian và bạn nhận ít hơn 90% sát thương khi đang tàng hình và trong chốc lát sau đó. (tài năng pháp sư)"
+        "description": "Biến mất trong 20 giây và gỡ bỏ 2 hiệu ứng gây sát thương theo thời gian. Khi tàng hình kết thúc, bạn nhận ít hơn 90% sát thương trong 2 giây. (tài năng pháp sư)"
       },
       "hot_streak": {
         "name": "Chuỗi Nóng",
@@ -9701,6 +9789,18 @@ export const vi_VN: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Dao Nanh Của Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Thương Săn Thú Của Lãnh Chúa Nanh"
+      },
+      "bloodmane_warleggings": {
+        "name": "Quần Chiến Bờm Máu"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Quần Rình Rập Vuốt Dây Leo"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Xà Rông Nghi Lễ Xương Mặt Trời"
+      },
       "thick_winter_pelt": {
         "name": "Da Lông Mùa Đông Dày"
       },
@@ -9868,6 +9968,9 @@ export const vi_VN: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Nhẫn Ấn Của The Last Keep"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Chìa Khóa Khởi Động: Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
@@ -10444,6 +10547,24 @@ export const vi_VN: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Quấn Tay Hợp Ca Long"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Áo Chẽn Kẻ Rình Rập Vùng Trũng"
+      },
+      "verdant_heart_vestment": {
+        "name": "Lễ Phục Trái Tim Xanh Tươi"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Áo Giáp Lưới Nghi Lễ Xương Mặt Trời"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Nanh Lớn Của Vùng Trũng"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Vương Miện Tiên Tri Xương Mặt Trời"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Giáp Chân Chiến Bờm Máu"
       },
       "deathless_greatblade": {
         "name": "Đại Kiếm Bất Tử"
