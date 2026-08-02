@@ -3973,6 +3973,122 @@ bump-at-ship cadence):
 
 ---
 
+## Phase 20 entry sync (merge de682bd5de, 2026-08-02) and its audit record
+
+The per-phase sync preamble, run at the phase 20 build start (the build
+itself was then deferred to a fresh session; this block records the
+completed sync so that session starts on a settled base). Merge
+de682bd5de brought origin/release/v0.34.0 at 0420f31ebd, 41 commits,
+into the branch at 588bcea844 (the phase 19 QA tip): the admin guild
+backoffice, admin TOTP 2FA, the vendor buy-stack (PR 2661), vendor
+window focus management, dungeon and rift mid-combat exit memory with
+the evade epoch, per-zone mob respawn tiers and the July coin curve,
+and the gate speedups (worker clamp, node_modules drift fail-fast,
+incremental check:ts). 63 conflicted paths: the 49 generated i18n
+bundles were regenerated via `npm run i18n:gen` (byte-identical to a
+scratch regeneration, verified by the audit), and 14 source files were
+hand-resolved as unions of the branch's R35 GM tooling and R22 vendor
+advisory against the release's additions. Five release-authored
+vendor_view tests gained the branch's required
+`VendorBalances.gatheringProficiency` via the RICH fixture and six
+painter tests gained `requirementUnmet: false`; nothing else on either
+side was adapted.
+
+Audit: the release-merge-audit skill ran as a 19-agent workflow (six
+domain auditors over the 127-file both-sides overlap plus the skill's
+steps, adversarial verification per finding, completeness critic).
+Verdict: the merge is a verified union everywhere; both hand-resolved
+sim families survived (profession-session teardown fires on every
+displacement path, the release's combat-exit memory is intact), every
+`buyItem` call site across Sim, ClientWorld, hud, and server passes
+the widened facet's arity (the structural-typing trap did not bite),
+and the recomputed pins hold (IWORLD 280, COMMAND_NAMES 187,
+ALL_DELTA_KEYS 63; the surface corpus gained the release's guild and
+TOTP rows and carries no literal row-count pin). All seven new release
+surfaces are covered on the branch's architecture (four guild admin
+routes with surface-inventory rows, the TOTP login fields, the WS buy
+command's optional bulk flag, two guild social events). No legacy-arm
+divergence: the release's vendor changes landed directly in the
+branch-owned extracted modules, and the delta has zero touches to
+bag_filter, bank_view, or the deposit paths. One audit claim was
+REFUTED and is recorded as such: the four guild routes need no
+NOAUTH_ADMIN_REQUESTS parity rows, because twelve prior release-era
+admin arrivals demonstrate no such convention exists.
+
+Fixes applied (commit c453ebc041): the four hand-resolved import
+unions the merge left unsorted (instances/dungeons, rift/runs,
+vendor_view, the admin server test), which red biome ci while both
+parents check clean, an instance class worth grepping for after any
+future union resolution; and the release's Buy Stack tile gained its
+own `data-focus-key` plus a mutation-proven painter test, because a
+keyboard bulk buy rebuilt the grid under the finger and dropped focus
+to body under the branch's own focus-restore contract. The gate's full-suite run then surfaced one
+merged-tree-only red the audit's targeted runs missed (the db-mock
+trap's class: only the full gate sees it): the branch's admin prose
+guard in tests/admin/professions_restore.test.ts sweeps every fail()
+prose in server/admin.ts, and the release's guild-list 503
+single-flight busy path shipped unmapped; the follow-up fix commit
+adds the reverse-map row, mapped to the release's own
+guilds.loadFailed key so a localized operator sees exactly what the
+release shipped for a failed list read. Recorded, not fixed: the
+positional slot-ladder fallback is skewed by one button when a
+purchase crosses the bulkQuantity threshold and a bulk tile appears
+or vanishes mid-session (the exact-key arm is unaffected).
+
+Phase 20 premises: NONE invalidated. The net delta contains zero
+changes under `src/sim/content/`; the per-zone respawn-tier commit is
+mob-only and net-zero in this merge (its substantive changes arrived
+with the earlier re-target). Re-verified on the merged tree: 120
+nodes at 102/12/6 by tier, both 4096 pins and the 9728 blob-growth
+ceiling in place, ore_evergarden_1 still at (358,784), and the
+measured byte forms reproduce the phase text exactly (persist
+two-decimal 3,144 B before and 4,116 B after, wire thirty-day 3,624 B
+before and 4,740 B after, integer form 3,648 B after; the road-band
+census reproduces the nine in-band expansion nodes). The +36 set, the
+8192 raise, and the circuit and coverage numbers stand as written.
+
+Phase 21 premise corrections from the buy-stack landing (ALL
+record-only; the phase 21 session reconciles before building):
+- The structural-typing trap note is now DANGEROUS as written:
+  `Sim.buyItem` runtime-disambiguates its third slot by typeof, so the
+  prescribed (npcId, itemId, count, pid?) order would route every
+  offline count into pid. A count widening must subsume the boolean
+  bulk overloads into one explicit shape and update the server
+  dispatch (which now passes bulk fourth) in the same change.
+- Q21 is contradicted by shipped surfaces: a ctrl/cmd modifier-click
+  path and an always-visible per-row Buy Stack tile both exist; the
+  single-control-row ruling needs a maintainer re-rule or a stated
+  reconciliation.
+- The wire baseline is stale: the buy frame legally carries an
+  optional `bulk: true` (send-only-when-non-default), so the count
+  field must be specified against it (precedence or mutual exclusion)
+  and acceptance (a)/(d) re-baseline byte-identity post-PR-2661.
+- Q20 is restated as governing the future count path only: the
+  shipped bulk verb clamps to the largest affordable stack by design
+  (whole-refusal on capacity only); do not "fix" it to refuse-whole.
+- `src/sim/vendor_buy_stack.ts` is an existing pure quantity seam the
+  planned count sanitizer must reuse, not land beside; the
+  vendor_stack.ts stale-header item remains open.
+- Q19: the shipped bulk cap is stack-size-plus-affordability and
+  ignores bag fit (the tile can promise a quantity the server then
+  refuses whole with the bags-full toast); the phase decides whether
+  both converge on countFit.
+- Q23: the bulk axis is unit-based (a bulk food buy can grant a
+  non-multiple of the 5-unit row unit) while the planned count axis
+  stays row-unit-based; needs a carve-out or a one-model re-rule.
+  Q22 and Q25 are satisfied-by-release for the bulk path; Q24's
+  gamepad limitation now has a partial affordance (the tile's focus
+  key). Still open for the build: the 1x/5x/10x/custom control row,
+  the countFit-capped custom prompt, count-path refuse-whole and
+  toast-deny, the overflow guard, the count sender-byte pin, and the
+  Marks-shop and buyback exclusion pins.
+
+Gate: `npm run gate` PASS on this tree, fix round and this block
+staged, is the sync's exit condition; the run and its result are
+recorded in the session memory alongside this block.
+
+---
+
 ## Post-packet scoping (2026-08-01): proposed phases 19 to 21
 
 Run after the v0.34.0 re-target sync above, entry verified at the same
