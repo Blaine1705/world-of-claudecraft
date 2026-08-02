@@ -1473,7 +1473,7 @@ describe('settlement expiry', () => {
 describe('buy now', () => {
   it('locks, settles at the buy-now price, refuses a rival, cancels the standing bid on delivery', async () => {
     const h = makeHarness();
-    const listing = await listEpic(h, { format: 'auction_buy_now', buyNowCents: 8000 });
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
     const standing = await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
 
     const buy = unwrap(
@@ -1536,9 +1536,9 @@ describe('buy now', () => {
     });
   });
 
-  it('lapses an abandoned buy-now lock on the sweep and leaves the auction live', async () => {
+  it('lapses an abandoned buy-now lock on the sweep and leaves the listing live', async () => {
     const h = makeHarness();
-    const listing = await listEpic(h, { format: 'auction_buy_now', buyNowCents: 8000 });
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
     const buy = unwrap(
       await h.service.buyNow({
         account: BUYER_B,
@@ -1740,7 +1740,7 @@ describe('bond lapse', () => {
 describe('adminSuspendListing', () => {
   it('cancels open bids, refunds held bonds, expires the live settlement, and returns the item', async () => {
     const h = makeHarness();
-    const listing = await listEpic(h, { format: 'auction_buy_now', buyNowCents: 8000 });
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
     const standing = await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
     const buy = unwrap(
       await h.service.buyNow({

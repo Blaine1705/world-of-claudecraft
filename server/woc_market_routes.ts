@@ -349,7 +349,11 @@ async function statusHandler(ctx: Ctx): Promise<void> {
 }
 
 const BROWSE_SORTS = new Set(['ending', 'newest', 'price_asc', 'price_desc']);
-const FORMATS = new Set(['auction', 'buy_now', 'auction_buy_now']);
+// Two sets, deliberately different. Browsing must still find the combined
+// listings that already exist; creating one is no longer allowed. Narrowing the
+// browse filter as well would hide live listings from search.
+const BROWSE_FORMATS = new Set(['auction', 'buy_now', 'auction_buy_now']);
+const CREATABLE_FORMATS = new Set(['auction', 'buy_now']);
 const QUALITIES = new Set(['epic', 'legendary']);
 
 async function browseHandler(ctx: Ctx): Promise<void> {
@@ -360,7 +364,7 @@ async function browseHandler(ctx: Ctx): Promise<void> {
   const formatRaw = one(ctx.query.format);
   if (!BROWSE_SORTS.has(sortRaw)) invalid();
   if (qualityRaw !== null && !QUALITIES.has(qualityRaw)) invalid();
-  if (formatRaw !== null && !FORMATS.has(formatRaw)) invalid();
+  if (formatRaw !== null && !BROWSE_FORMATS.has(formatRaw)) invalid();
   const itemIdsRaw = one(ctx.query.itemIds);
   const itemIds =
     itemIdsRaw === null
@@ -425,7 +429,7 @@ async function createListingHandler(ctx: Ctx): Promise<void> {
       ...(expectInstance === undefined ? {} : { expectInstance }),
     },
     params: {
-      format: FORMATS.has(String(body.format))
+      format: CREATABLE_FORMATS.has(String(body.format))
         ? (body.format as WocListingFormat)
         : (invalid() as never),
       startCents: intField(body.startCents, WOC_MARKET_MIN_PRICE_CENTS, WOC_MARKET_MAX_PRICE_CENTS),

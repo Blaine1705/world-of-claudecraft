@@ -147,10 +147,12 @@ describe('woc_market_window: i18n and escaping discipline', () => {
     // must pass through esc(); a bare English aria-label would also dodge the
     // i18n catalog entirely.
     const segments = painter.split('aria-label="').slice(1);
-    // AT the real count (11), not "> 0", which one surviving attribute
+    // AT the real count (10), not "> 0", which one surviving attribute
     // satisfied. A floor rather than an exact count so adding a labelled
-    // control does not red the suite, while deleting ten still does.
-    expect(segments.length).toBeGreaterThanOrEqual(11);
+    // control does not red the suite, while deleting nine still does. It dropped
+    // from 11 when the sell tab's per-item buttons became a labelled dropdown,
+    // whose search box and select are named by their own <label> instead.
+    expect(segments.length).toBeGreaterThanOrEqual(10);
     for (const segment of segments) {
       expect(segment.startsWith('${esc(')).toBe(true);
       // And the WHOLE value, not just its prefix: `${esc(a)} ${raw}` passed a
@@ -275,12 +277,7 @@ describe('woc_market_window: every class it emits is actually styled', () => {
     // Pins the hole itself closed. Each of these is reachable only through a
     // `${...}` hole, so all four were invisible to the original regex.
     expect(emitted()).toEqual(
-      expect.arrayContaining([
-        'wm-reserve-met',
-        'wm-reserve-not_met',
-        'wm-row-selected',
-        'wm-sell-selected',
-      ]),
+      expect.arrayContaining(['wm-reserve-met', 'wm-reserve-not_met', 'wm-row-selected']),
     );
   });
 
@@ -356,7 +353,8 @@ describe('woc_market_window: the item inspector on hover', () => {
     for (const key of [
       '`browse:${r.id}`',
       '`detail:${d.row.id}`',
-      '`sell:${r.index}`',
+      // The sell tab keys off the CHOSEN row now, not a row in a rendered list.
+      '`sell:${selected.index}`',
       '`activity:${l.id}`',
     ]) {
       expect(painter, `missing tooltip key ${key}`).toContain(key);
@@ -408,5 +406,133 @@ describe('woc_market_window: the item inspector on hover', () => {
     for (const token of ['getBoundingClientRect', 'offsetWidth', 'offsetHeight', 'clientWidth']) {
       expect(painter.includes(token), `forced-reflow read: ${token}`).toBe(false);
     }
+  });
+});
+
+describe('woc_market_window: the sell tab is a searchable picker', () => {
+  it('offers a search box and a select, not a button per bag item', () => {
+    // A full bag is 70+ tradable items; the old wrapped grid pushed the whole
+    // form below the fold before a seller could reach it.
+    expect(painter).toContain('data-field="sell-search"');
+    expect(painter).toContain('data-field="sell-item"');
+    // No per-item selection button survives.
+    expect(painter).not.toContain('data-action="sell-select"');
+    expect(painter).not.toContain('class="wm-sell-item');
+  });
+
+  it('filters on the item NAME, case-insensitively', () => {
+    const sell = between('private sellHtml(', 'private activityHtml(');
+    expect(sell).toContain('this.sellSearch.trim().toLowerCase()');
+    expect(sell).toContain('this.itemName(r.itemId).toLowerCase().includes(query)');
+  });
+
+  it('keeps the search text in painter state, not only in the input', () => {
+    // form_draft carries text inputs across a rebuild, but the filter is applied
+    // while BUILDING the option list, so the value has to be readable there too.
+    expect(painter).toContain('private sellSearch = ');
+    const onChange = between(
+      'private onChange(e: Event): void {',
+      'private async reloadBrowseOnly(',
+    );
+    expect(onChange).toContain("field === 'sell-search'");
+    expect(onChange).toContain('this.sellSearch = ');
+  });
+
+  it('the empty prompt option CLEARS the selection rather than picking index 0', () => {
+    // '' coerces to 0 through Number(), which would silently select the first bag
+    // slot the moment a seller chose the prompt.
+    const onChange = between(
+      'private onChange(e: Event): void {',
+      'private async reloadBrowseOnly(',
+    );
+    expect(onChange).toContain("this.sellIndex = raw === '' ? null : Number(raw)");
+  });
+
+  it('still renders the chosen item as a hoverable cell', () => {
+    // A native <option> cannot carry a tooltip, so the inspector would have been
+    // lost on this tab without a real cell for the selection.
+    const sell = between('private sellHtml(', 'private activityHtml(');
+    expect(sell).toContain('wm-sell-chosen');
+    expect(sell).toContain('`sell:${selected.index}`');
+  });
+
+  it('tells the seller when a search matches nothing', () => {
+    expect(painter).toContain('hudChrome.wocMarket.sellNoMatches');
+  });
+});
+
+describe('woc_market_window: the combined format is no longer offered', () => {
+  it('drops auction_buy_now from the format selector', () => {
+    const sell = between('private sellHtml(', 'private activityHtml(');
+    expect(sell).toContain('value="auction"');
+    expect(sell).toContain('value="buy_now"');
+    expect(sell).not.toContain('auction_buy_now');
+  });
+
+  it('narrows the painter’s format state to the two creatable values', () => {
+    expect(painter).toContain("private sellFormat: 'auction' | 'buy_now' = 'auction'");
+    // And the change handler will not accept the retired value back. Matched as
+    // a COMPARISON, not as bare text: the handler's comment names the retired
+    // format to explain why it is absent.
+    const onChange = between(
+      'private onChange(e: Event): void {',
+      'private async reloadBrowseOnly(',
+    );
+    expect(onChange).not.toContain("=== 'auction_buy_now'");
+    expect(onChange).toContain("value === 'auction' || value === 'buy_now'");
+  });
+
+  it('still RENDERS an existing combined listing: read and write differ', () => {
+    // 13 listings already carry the format. Removing creation must not make them
+    // unreadable, so the view model's format union keeps all three.
+    const view = readFileSync(new URL('../src/ui/woc_market_view.ts', import.meta.url), 'utf8');
+    expect(view).toContain("'auction' | 'buy_now' | 'auction_buy_now'");
+  });
+});
+
+describe('woc_market_window: buy-now must beat the starting bid', () => {
+  it('refuses on the client before a round trip, and says which rule failed', () => {
+    const submit = between(
+      'private async submitListing(): Promise<void> {',
+      'private async payBond(',
+    );
+    expect(submit).toContain('const floor = Math.max(startCents, reserveCents ?? 0)');
+    expect(submit).toContain('buyNowCents <= floor');
+    expect(submit).toContain('hudChrome.wocMarket.sellBuyNowAboveStart');
+  });
+
+  it('compares against the RESERVE too, not just the start', () => {
+    // A buy-now under a hidden reserve could never sell: the reserve would block
+    // every bid at or below it while the buy-now invited exactly that price.
+    const submit = between(
+      'private async submitListing(): Promise<void> {',
+      'private async payBond(',
+    );
+    expect(submit).toContain('reserveCents ?? 0');
+  });
+});
+
+describe('woc_market_window: the picker prompt counts correctly', () => {
+  it('renders the count through tPlural, so one item is never "1 items"', () => {
+    // A flat '{count} items' template is wrong at 1 in English and wrong in more
+    // places in locales with several plural categories.
+    expect(painter).toContain("tPlural('hudChrome.plurals.wocMarketSellChoose'");
+    expect(painter).not.toContain('sellChoosePrompt');
+  });
+
+  it('declares every CLDR category the base needs in English', () => {
+    // tPlural falls back to `.other`, so a missing `one` would silently render the
+    // plural form for a single item rather than failing.
+    const catalog = readFileSync(
+      new URL('../src/ui/i18n.catalog/hud_chrome.ts', import.meta.url),
+      'utf8',
+    );
+    const block = catalog.slice(catalog.indexOf('wocMarketSellChoose: {'));
+    const decl = block.slice(0, block.indexOf('},'));
+    for (const cat of ['one', 'few', 'many', 'other']) {
+      expect(decl, `plural category ${cat}`).toContain(`${cat}:`);
+    }
+    // And the singular really is singular.
+    expect(decl).toContain("one: 'Choose from {count} item'");
   });
 });

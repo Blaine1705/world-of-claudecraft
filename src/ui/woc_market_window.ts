@@ -31,7 +31,7 @@ import { esc } from './esc';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
 import type { TranslationKey } from './i18n';
-import { formatDateTime, formatDuration, formatNumber, t } from './i18n';
+import { formatDateTime, formatDuration, formatNumber, t, tPlural } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
@@ -118,7 +118,10 @@ export class WocMarketWindow {
   // least once a minute while any tab is open) would silently reset a select or
   // checkbox and submit would then read the reset value. On a money surface
   // that means listing with the wrong format, duration, or terms flag.
-  private sellFormat: 'auction' | 'buy_now' | 'auction_buy_now' = 'auction';
+  private sellFormat: 'auction' | 'buy_now' = 'auction';
+  /** Sell-tab search text. Painter state as well as a text input, because the
+   *  filter is applied while BUILDING the option list, not read back from it. */
+  private sellSearch = '';
   private sellDurationHours: number | null = null;
   private sellOfferNext = false;
   private acceptTerms = false;
@@ -638,16 +641,49 @@ export class WocMarketWindow {
     if (model.sell.rows.length === 0) {
       return `<div class="wm-status">${esc(t('hudChrome.wocMarket.sellEmpty'))}</div>`;
     }
-    const rows = model.sell.rows
+    // A searchable dropdown, not a grid of buttons: a full bag is 70+ tradable
+    // items and the flat list pushed the form off the screen. Native <select>
+    // rather than a custom combobox, so keyboard and mobile behaviour come for
+    // free; the search box narrows the option set.
+    const query = this.sellSearch.trim().toLowerCase();
+    const matches = model.sell.rows.filter(
+      (r) => query === '' || this.itemName(r.itemId).toLowerCase().includes(query),
+    );
+    const selected = model.sell.rows.find((r) => r.index === this.sellIndex) ?? null;
+    const options = matches
       .map(
         (r) =>
-          `<button type="button" class="wm-sell-item ${this.sellIndex === r.index ? 'wm-sell-selected' : ''}" ` +
-          `data-action="sell-select" data-index="${r.index}" ` +
-          `aria-label="${esc(t('hudChrome.wocMarket.sellSelectAria', { item: this.itemName(r.itemId) }))}" ` +
-          `data-focus-key="wm-sell-${r.index}">${this.itemCellHtml(r.itemId, r.quality, `sell:${r.index}`, r.instance)}</button>`,
+          `<option value="${r.index}" ${r.index === this.sellIndex ? 'selected' : ''}>${esc(
+            this.itemName(r.itemId),
+          )}</option>`,
       )
       .join('');
-    const selected = model.sell.rows.find((r) => r.index === this.sellIndex) ?? null;
+    const picker =
+      `<label class="wm-sell-search">${esc(t('hudChrome.wocMarket.sellSearch'))}` +
+      `<input type="text" data-field="sell-search" data-focus-key="wm-sell-search" ` +
+      `placeholder="${esc(t('hudChrome.wocMarket.sellSearchPlaceholder'))}" ` +
+      `value="${esc(this.sellSearch)}" /></label>` +
+      `<label class="wm-sell-pick">${esc(t('hudChrome.wocMarket.sellChoose'))}` +
+      `<select data-field="sell-item" data-focus-key="wm-sell-item" size="1">` +
+      `<option value="">${esc(
+        matches.length === 0
+          ? t('hudChrome.wocMarket.sellNoMatches')
+          : // tPlural, not a flat key: "Choose from 1 items" is what a
+            // {count} template produces, and the plural category differs per locale.
+            tPlural('hudChrome.plurals.wocMarketSellChoose', matches.length, {
+              count: formatNumber(matches.length),
+            }),
+      )}</option>${options}</select></label>` +
+      // The chosen item still renders as a real cell so the hover inspector
+      // survives the switch: a native <option> cannot carry a tooltip.
+      (selected
+        ? `<div class="wm-sell-chosen">${this.itemCellHtml(
+            selected.itemId,
+            selected.quality,
+            `sell:${selected.index}`,
+            selected.instance,
+          )}</div>`
+        : '');
     // Selected BY VALUE from painter state (never by index: a server-side
     // reorder of the allowlist would otherwise silently change the default).
     const chosenDuration =
@@ -666,7 +702,6 @@ export class WocMarketWindow {
         `<select data-field="sell-format" data-focus-key="wm-sell-format">` +
         `<option value="auction" ${this.sellFormat === 'auction' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sellFormatAuction'))}</option>` +
         `<option value="buy_now" ${this.sellFormat === 'buy_now' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sellFormatBuyNow'))}</option>` +
-        `<option value="auction_buy_now" ${this.sellFormat === 'auction_buy_now' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sellFormatAuctionBuyNow'))}</option>` +
         `</select></label>` +
         `<label>${esc(t('hudChrome.wocMarket.sellStart'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-start" data-focus-key="wm-sell-start" /></label>` +
         `<label>${esc(t('hudChrome.wocMarket.sellReserve'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-reserve" data-focus-key="wm-sell-reserve" /></label>` +
@@ -681,7 +716,7 @@ export class WocMarketWindow {
         `aria-label="${esc(t('hudChrome.wocMarket.sellSubmitAria', { item: this.itemName(selected.itemId) }))}" data-focus-key="wm-sell-submit">` +
         `${esc(t('hudChrome.wocMarket.sellSubmit'))}</button></div>`
       : '';
-    return `<div class="wm-sell"><h3>${esc(t('hudChrome.wocMarket.sellTitle'))}</h3><div class="wm-sell-list">${rows}</div>${form}</div>`;
+    return `<div class="wm-sell"><h3>${esc(t('hudChrome.wocMarket.sellTitle'))}</h3><div class="wm-sell-list">${picker}</div>${form}</div>`;
   }
 
   private activityHtml(model: Extract<WocMarketViewModel, { kind: 'ready' }>): string {
@@ -882,10 +917,24 @@ export class WocMarketWindow {
     const field = target.getAttribute('data-field');
     if (field === 'sell-format') {
       const value = (target as HTMLSelectElement).value;
-      if (value === 'auction' || value === 'buy_now' || value === 'auction_buy_now') {
+      // 'auction_buy_now' is deliberately absent: a combined listing is no
+      // longer creatable (existing ones still render and settle).
+      if (value === 'auction' || value === 'buy_now') {
         this.sellFormat = value;
         this.render();
       }
+      return;
+    }
+    if (field === 'sell-search') {
+      this.sellSearch = (target as HTMLInputElement).value;
+      this.render();
+      return;
+    }
+    if (field === 'sell-item') {
+      const raw = (target as HTMLSelectElement).value;
+      // The empty prompt option clears the selection rather than selecting index 0.
+      this.sellIndex = raw === '' ? null : Number(raw);
+      this.render();
       return;
     }
     if (field === 'sell-duration') {
@@ -1118,7 +1167,18 @@ export class WocMarketWindow {
       this.render();
       return;
     }
-    if (format !== 'auction' && format !== 'buy_now' && format !== 'auction_buy_now') return;
+    if (format !== 'auction' && format !== 'buy_now') return;
+    // The buy-now price has to beat the starting bid, and the reserve if one is
+    // set. Checked here so the seller is told which field is wrong before a round
+    // trip; validListingParams re-checks it server-side, which is the authority.
+    if (buyNowCents !== null) {
+      const floor = Math.max(startCents, reserveCents ?? 0);
+      if (buyNowCents <= floor) {
+        this.notice = { text: t('hudChrome.wocMarket.sellBuyNowAboveStart'), error: true };
+        this.render();
+        return;
+      }
+    }
     await this.withBusy('hudChrome.wocMarket.confirming', async () => {
       const out = await hooks.client.createListing({
         characterId: hooks.characterId(),

@@ -133,7 +133,10 @@ export interface CreateListingRequest {
   itemIndex: number;
   itemId: string;
   expectInstance: ItemInstancePayload | null;
-  format: 'auction' | 'buy_now' | 'auction_buy_now';
+  /** No 'auction_buy_now': the combined format is no longer creatable. The READ
+   *  type (WocListingView.format) still carries it, because listings created
+   *  before the change keep rendering, taking bids, and settling. */
+  format: 'auction' | 'buy_now';
   startCents: number;
   reserveCents: number | null;
   buyNowCents: number | null;

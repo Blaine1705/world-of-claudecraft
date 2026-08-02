@@ -1868,6 +1868,12 @@ export const zh_TW: EnTranslations = {
         "many": "你是{rank}，{count}名成員",
         "other": "你是{rank}，{count}名成員"
       },
+      "wocMarketSellChoose": {
+        "one": "從 {count} 件物品中選擇",
+        "few": "從 {count} 件物品中選擇",
+        "many": "從 {count} 件物品中選擇",
+        "other": "從 {count} 件物品中選擇"
+      },
       "finderPartySize": {
         "one": "{count} 名玩家",
         "few": "{count} 名玩家",
@@ -3811,7 +3817,7 @@ export const zh_TW: EnTranslations = {
       "buyNowLockedBadge": "購買進行中",
       "pagePrev": "上一頁",
       "pageNext": "下一頁",
-      "pageStatus": "第 {current} 頁，共 {total} 頁",
+      "pageNumber": "第 {current} 頁",
       "sortLabel": "排序",
       "sortEnding": "即將結束",
       "sortNewest": "最新上架",
@@ -3856,6 +3862,7 @@ export const zh_TW: EnTranslations = {
       "quoteBondFor": "你 {usd} 出價的保證金",
       "quoteSettlementFor": "{item} 的結算：{usd}",
       "signing": "等待錢包確認...",
+      "signFailed": "你的錢包未能完成付款。請檢查錢包後重試。",
       "confirming": "正在鏈上確認...",
       "bidPlacedStanding": "你的出價已生效，你是目前最高出價者。",
       "bidPlacedOutbid": "你的保證金已確認，但有人搶先出了更高的價。",
@@ -3865,6 +3872,11 @@ export const zh_TW: EnTranslations = {
       "sellTitle": "建立掛單",
       "sellEmpty": "背包中沒有符合條件的物品。交易所只接受未綁定的史詩或更高品質裝備。",
       "sellSelectAria": "選擇要掛單的 {item}",
+      "sellSearch": "尋找物品",
+      "sellSearchPlaceholder": "輸入以篩選背包",
+      "sellChoose": "要上架的物品",
+      "sellNoMatches": "沒有物品符合該搜尋",
+      "sellBuyNowAboveStart": "一口價必須高於起標價。",
       "sellFormat": "形式",
       "sellFormatAuction": "拍賣",
       "sellFormatBuyNow": "僅直購價",

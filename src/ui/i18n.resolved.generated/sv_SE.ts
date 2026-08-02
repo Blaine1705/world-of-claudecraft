@@ -1868,6 +1868,12 @@ export const sv_SE: EnTranslations = {
         "many": "du är {rank}, {count} medlemmar",
         "other": "du är {rank}, {count} medlemmar"
       },
+      "wocMarketSellChoose": {
+        "one": "Choose from {count} item",
+        "few": "Choose from {count} items",
+        "many": "Choose from {count} items",
+        "other": "Choose from {count} items"
+      },
       "finderPartySize": {
         "one": "{count} spelare",
         "few": "{count} spelare",
@@ -3811,7 +3817,7 @@ export const sv_SE: EnTranslations = {
       "buyNowLockedBadge": "Purchase in progress",
       "pagePrev": "Previous page",
       "pageNext": "Next page",
-      "pageStatus": "Page {current} of {total}",
+      "pageNumber": "Page {current}",
       "sortLabel": "Sort",
       "sortEnding": "Ending soonest",
       "sortNewest": "Newest",
@@ -3856,6 +3862,7 @@ export const sv_SE: EnTranslations = {
       "quoteBondFor": "Bid bond for your {usd} bid",
       "quoteSettlementFor": "Settlement for {item}: {usd}",
       "signing": "Waiting for your wallet...",
+      "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
       "confirming": "Confirming on chain...",
       "bidPlacedStanding": "Your bid stands. You are the high bidder.",
       "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
@@ -3865,6 +3872,11 @@ export const sv_SE: EnTranslations = {
       "sellTitle": "Create a listing",
       "sellEmpty": "No eligible items in your bags. The Exchange takes non-soulbound equipment of epic quality or better.",
       "sellSelectAria": "Select {item} to list",
+      "sellSearch": "Find an item",
+      "sellSearchPlaceholder": "Type to filter your bags",
+      "sellChoose": "Item to list",
+      "sellNoMatches": "No items match that search",
+      "sellBuyNowAboveStart": "The buy-now price must be higher than the starting bid.",
       "sellFormat": "Format",
       "sellFormatAuction": "Auction",
       "sellFormatBuyNow": "Buy now only",

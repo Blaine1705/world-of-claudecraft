@@ -1868,6 +1868,12 @@ export const ko_KR: EnTranslations = {
         "many": "당신은 {rank}, {count}명 회원",
         "other": "당신은 {rank}, {count}명 회원"
       },
+      "wocMarketSellChoose": {
+        "one": "{count}개 중에서 선택",
+        "few": "{count}개 중에서 선택",
+        "many": "{count}개 중에서 선택",
+        "other": "{count}개 중에서 선택"
+      },
       "finderPartySize": {
         "one": "{count}인",
         "few": "{count}인",
@@ -3811,7 +3817,7 @@ export const ko_KR: EnTranslations = {
       "buyNowLockedBadge": "구매 진행 중",
       "pagePrev": "이전 페이지",
       "pageNext": "다음 페이지",
-      "pageStatus": "{total}페이지 중 {current}페이지",
+      "pageNumber": "{current}페이지",
       "sortLabel": "정렬",
       "sortEnding": "종료 임박순",
       "sortNewest": "최신순",
@@ -3856,6 +3862,7 @@ export const ko_KR: EnTranslations = {
       "quoteBondFor": "{usd} 입찰에 대한 보증금",
       "quoteSettlementFor": "{item} 정산: {usd}",
       "signing": "지갑 승인을 기다리는 중...",
+      "signFailed": "지갑이 결제를 완료하지 못했습니다. 지갑을 확인한 뒤 다시 시도하세요.",
       "confirming": "체인에서 확인 중...",
       "bidPlacedStanding": "입찰이 확정되었습니다. 현재 최고 입찰자입니다.",
       "bidPlacedOutbid": "보증금은 확인되었지만 더 높은 입찰이 먼저 들어왔습니다.",
@@ -3865,6 +3872,11 @@ export const ko_KR: EnTranslations = {
       "sellTitle": "등록 만들기",
       "sellEmpty": "가방에 등록 가능한 아이템이 없습니다. 거래소는 귀속되지 않은 영웅 등급 이상의 장비만 취급합니다.",
       "sellSelectAria": "{item} 선택하여 등록",
+      "sellSearch": "아이템 찾기",
+      "sellSearchPlaceholder": "입력해 가방 필터링",
+      "sellChoose": "등록할 아이템",
+      "sellNoMatches": "검색과 일치하는 아이템이 없습니다",
+      "sellBuyNowAboveStart": "즉시 구매가는 시작 입찰가보다 높아야 합니다.",
       "sellFormat": "형식",
       "sellFormatAuction": "경매",
       "sellFormatBuyNow": "즉시 구매만",

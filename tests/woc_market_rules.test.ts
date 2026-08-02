@@ -201,9 +201,27 @@ describe('validListingParams', () => {
       ok: false,
       reason: 'bad_buy_now',
     });
-    expect(validListingParams(params({ format: 'auction_buy_now', buyNowCents: null }))).toEqual({
+  });
+
+  it('refuses the retired combined format outright', () => {
+    // 'auction_buy_now' is no longer creatable: an auction already ends early on
+    // a buy-now and a plain buy-now covers the fixed-price case. Refused at the
+    // FORMAT gate, before any price check, so the seller is told the format is
+    // gone rather than being sent to fix prices on a listing they cannot make.
+    expect(
+      validListingParams(
+        params({
+          format: 'auction_buy_now' as never,
+          startCents: 1000,
+          reserveCents: 2000,
+          buyNowCents: 3000,
+        }),
+      ),
+    ).toEqual({ ok: false, reason: 'bad_format' });
+    // Even a perfectly formed one.
+    expect(validListingParams(params({ format: 'auction_buy_now' as never }))).toEqual({
       ok: false,
-      reason: 'bad_buy_now',
+      reason: 'bad_format',
     });
   });
 
@@ -214,20 +232,22 @@ describe('validListingParams', () => {
     });
   });
 
-  it('refuses a buy-now price below max(start, reserve)', () => {
+  it('refuses a buy-now price at or below the starting bid', () => {
+    // STRICTLY above, not merely at it. A buy-now equal to the start is not a
+    // price, it is the same number twice: the opening bid would already match it.
     expect(
-      validListingParams(
-        params({
-          format: 'auction_buy_now',
-          startCents: 1000,
-          reserveCents: 2000,
-          buyNowCents: 1500,
-        }),
-      ),
+      validListingParams(params({ format: 'buy_now', startCents: 1000, buyNowCents: 1000 })),
+    ).toEqual({ ok: false, reason: 'bad_buy_now' });
+    expect(
+      validListingParams(params({ format: 'buy_now', startCents: 1000, buyNowCents: 999 })),
     ).toEqual({ ok: false, reason: 'bad_buy_now' });
     expect(
       validListingParams(params({ format: 'buy_now', startCents: 1000, buyNowCents: 500 })),
     ).toEqual({ ok: false, reason: 'bad_buy_now' });
+    // One cent above is the boundary, and it is accepted.
+    expect(
+      validListingParams(params({ format: 'buy_now', startCents: 1000, buyNowCents: 1001 })),
+    ).toEqual({ ok: true });
   });
 
   it('refuses a reserve below the starting bid', () => {
@@ -249,26 +269,30 @@ describe('validListingParams', () => {
     expect(validListingParams(params({ reserveCents: 2500 }))).toEqual({ ok: true });
   });
 
-  it('accepts a pure buy-now listing (no reserve, price at the start floor)', () => {
+  it('accepts a pure buy-now listing priced above the start', () => {
     expect(
       validListingParams(
-        params({ format: 'buy_now', startCents: 1000, buyNowCents: 1000, durationHours: 12 }),
+        params({ format: 'buy_now', startCents: 1000, buyNowCents: 2500, durationHours: 12 }),
       ),
     ).toEqual({ ok: true });
   });
 
-  it('accepts an auction with buy-now at or above both the start and the reserve', () => {
-    expect(
-      validListingParams(
-        params({
-          format: 'auction_buy_now',
-          startCents: 1000,
-          reserveCents: 2000,
-          buyNowCents: 2000,
-          durationHours: 168,
-        }),
-      ),
-    ).toEqual({ ok: true });
+  it('only auction and buy_now are creatable', () => {
+    // The whole creatable set, pinned. A third format reappearing (or one of
+    // these disappearing) should fail here rather than in a UI review.
+    for (const format of ['auction', 'buy_now'] as const) {
+      const p =
+        format === 'buy_now'
+          ? params({ format, startCents: 1000, buyNowCents: 2000 })
+          : params({ format, startCents: 1000 });
+      expect(validListingParams(p), format).toEqual({ ok: true });
+    }
+    for (const format of ['auction_buy_now', 'dutch', '', 'AUCTION']) {
+      expect(validListingParams(params({ format: format as never })), format).toEqual({
+        ok: false,
+        reason: 'bad_format',
+      });
+    }
   });
 });
 

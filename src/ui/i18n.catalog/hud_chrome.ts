@@ -2019,6 +2019,12 @@ export const hudChromeStrings = {
       many: 'your guild rank is {rank}; {count} members',
       other: 'your guild rank is {rank}; {count} members',
     },
+    wocMarketSellChoose: {
+      one: 'Choose from {count} item',
+      few: 'Choose from {count} items',
+      many: 'Choose from {count} items',
+      other: 'Choose from {count} items',
+    },
     finderPartySize: {
       one: '{count} player',
       few: '{count} players',
@@ -5017,6 +5023,11 @@ export const hudChromeStrings = {
     sellEmpty:
       'No eligible items in your bags. The Exchange takes non-soulbound equipment of epic quality or better.',
     sellSelectAria: 'Select {item} to list',
+    sellSearch: 'Find an item',
+    sellSearchPlaceholder: 'Type to filter your bags',
+    sellChoose: 'Item to list',
+    sellNoMatches: 'No items match that search',
+    sellBuyNowAboveStart: 'The buy-now price must be higher than the starting bid.',
     sellFormat: 'Format',
     sellFormatAuction: 'Auction',
     sellFormatBuyNow: 'Buy now only',

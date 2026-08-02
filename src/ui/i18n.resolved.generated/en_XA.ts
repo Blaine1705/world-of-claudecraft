@@ -1868,6 +1868,12 @@ export const en_XA: EnTranslations = {
         "many": "[ýóúŕ ĝúíļð ŕáñķ íš {rank}; {count} ɱéɱƀéŕš]",
         "other": "[ýóúŕ ĝúíļð ŕáñķ íš {rank}; {count} ɱéɱƀéŕš]"
       },
+      "wocMarketSellChoose": {
+        "one": "[Çĥóóšé ƒŕóɱ {count} íţéɱ]",
+        "few": "[Çĥóóšé ƒŕóɱ {count} íţéɱš]",
+        "many": "[Çĥóóšé ƒŕóɱ {count} íţéɱš]",
+        "other": "[Çĥóóšé ƒŕóɱ {count} íţéɱš]"
+      },
       "finderPartySize": {
         "one": "[{count} þļáýéŕ]",
         "few": "[{count} þļáýéŕš]",
@@ -3811,7 +3817,7 @@ export const en_XA: EnTranslations = {
       "buyNowLockedBadge": "[Þúŕçĥášé íñ þŕóĝŕéšš]",
       "pagePrev": "[Þŕéʋíóúš þáĝé]",
       "pageNext": "[Ñéẋţ þáĝé]",
-      "pageStatus": "[Þáĝé {current} óƒ {total}]",
+      "pageNumber": "[Þáĝé {current}]",
       "sortLabel": "[Šóŕţ]",
       "sortEnding": "[Éñðíñĝ šóóñéšţ]",
       "sortNewest": "[Ñéŵéšţ]",
@@ -3856,6 +3862,7 @@ export const en_XA: EnTranslations = {
       "quoteBondFor": "[Ɓíð ƀóñð ƒóŕ ýóúŕ {usd} ƀíð]",
       "quoteSettlementFor": "[Šéţţļéɱéñţ ƒóŕ {item}: {usd}]",
       "signing": "[Ŵáíţíñĝ ƒóŕ ýóúŕ ŵáļļéţ...]",
+      "signFailed": "[Ýóúŕ ŵáļļéţ ðíð ñóţ çóɱþļéţé ţĥé þáýɱéñţ. Çĥéçķ ţĥé ŵáļļéţ áñð ţŕý áĝáíñ.]",
       "confirming": "[Çóñƒíŕɱíñĝ óñ çĥáíñ...]",
       "bidPlacedStanding": "[Ýóúŕ ƀíð šţáñðš. Ýóú áŕé ţĥé ĥíĝĥ ƀíððéŕ.]",
       "bidPlacedOutbid": "[Ýóúŕ ƀóñð çóñƒíŕɱéð, ƀúţ á ĥíĝĥéŕ ƀíð ļáñðéð ƒíŕšţ.]",
@@ -3865,6 +3872,11 @@ export const en_XA: EnTranslations = {
       "sellTitle": "[Çŕéáţé á ļíšţíñĝ]",
       "sellEmpty": "[Ñó éļíĝíƀļé íţéɱš íñ ýóúŕ ƀáĝš. Ţĥé Éẋçĥáñĝé ţáķéš ñóñ-šóúļƀóúñð éɋúíþɱéñţ óƒ éþíç ɋúáļíţý óŕ ƀéţţéŕ.]",
       "sellSelectAria": "[Šéļéçţ {item} ţó ļíšţ]",
+      "sellSearch": "[Ƒíñð áñ íţéɱ]",
+      "sellSearchPlaceholder": "[Ţýþé ţó ƒíļţéŕ ýóúŕ ƀáĝš]",
+      "sellChoose": "[Íţéɱ ţó ļíšţ]",
+      "sellNoMatches": "[Ñó íţéɱš ɱáţçĥ ţĥáţ šéáŕçĥ]",
+      "sellBuyNowAboveStart": "[Ţĥé ƀúý-ñóŵ þŕíçé ɱúšţ ƀé ĥíĝĥéŕ ţĥáñ ţĥé šţáŕţíñĝ ƀíð.]",
       "sellFormat": "[Ƒóŕɱáţ]",
       "sellFormatAuction": "[Áúçţíóñ]",
       "sellFormatBuyNow": "[Ɓúý ñóŵ óñļý]",

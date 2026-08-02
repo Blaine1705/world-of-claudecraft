@@ -16029,8 +16029,7 @@
   }
   /* The row activator is a table cell wearing a button, so it opts back out of
      the chrome above (its own rule below restores the transparent cell look). */
-  #woc-market-window button.wm-row-open,
-  #woc-market-window button.wm-sell-item {
+  #woc-market-window button.wm-row-open {
     padding: 0;
     font-family: inherit;
     font-size: inherit;
@@ -16096,6 +16095,23 @@
     min-height: 0;
     font-variant-numeric: tabular-nums;
   }
+  /* Cancel is destructive and belongs to the LISTING, not to the bid form it
+     followed; it was butted straight against that content with no separation.
+     A rule plus generous space makes it read as its own action. */
+  #woc-market-window .wm-detail button[data-action="cancel-listing"] {
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--gold-dim);
+    border-radius: 0;
+    width: 100%;
+    background: none;
+  }
+  #woc-market-window .wm-detail button[data-action="cancel-listing"]:hover:enabled {
+    color: var(--color-text-error);
+    border-color: var(--gold-dim);
+  }
   #woc-market-window .wm-bid-form,
   #woc-market-window .wm-sell-form,
   #woc-market-window .wm-quote {
@@ -16116,20 +16132,32 @@
     color: var(--color-text-muted);
     font-size: 12px;
   }
+  /* Search box, dropdown, then the chosen item. Stacked rather than the old
+     wrapped grid of every bag item: a full bag is 70+ tradable pieces and the
+     grid pushed the whole form below the fold. */
   #woc-market-window .wm-sell-list {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 8px;
   }
-  #woc-market-window .wm-sell-item {
-    min-width: 40px;
-    min-height: 40px;
+  #woc-market-window .wm-sell-search,
+  #woc-market-window .wm-sell-pick {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+  }
+  /* The chosen item, rendered as a real cell so the hover inspector still works:
+     a native <option> cannot carry a tooltip. */
+  #woc-market-window .wm-sell-chosen {
     display: flex;
     align-items: center;
     gap: 6px;
-  }
-  #woc-market-window .wm-sell-selected {
-    outline: 1px solid var(--gold);
+    min-height: 40px;
+    padding: 6px 8px;
+    border: 1px solid var(--gold);
+    border-radius: 6px;
+    background: var(--panel-bg);
   }
   #woc-market-window .wm-activity ul {
     list-style: none;
@@ -16233,7 +16261,6 @@
   #woc-market-window button.wm-tab:focus-visible,
   #woc-market-window button.wm-primary:focus-visible,
   #woc-market-window .wm-row-open:focus-visible,
-  #woc-market-window .wm-sell-item:focus-visible,
   #woc-market-window button:not(.x-btn):focus-visible,
   #woc-market-window input:focus-visible,
   #woc-market-window select:focus-visible {

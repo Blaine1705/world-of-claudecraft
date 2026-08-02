@@ -140,14 +140,19 @@ const isCents = (v: number): boolean =>
 export function validListingParams(
   p: WocListingParams,
 ): { ok: true } | { ok: false; reason: ListingParamsRefusal } {
-  if (p.format !== 'auction' && p.format !== 'buy_now' && p.format !== 'auction_buy_now') {
+  // 'auction_buy_now' is NOT creatable. A combined listing was redundant: an
+  // auction already ends early on a buy-now, and a plain buy-now covers the
+  // fixed-price case. Existing rows keep their format and continue to render,
+  // bid, and settle; only creation is refused, so no data migration is implied
+  // and the database CHECK deliberately stays permissive.
+  if (p.format !== 'auction' && p.format !== 'buy_now') {
     return { ok: false, reason: 'bad_format' };
   }
   if (!isCents(p.startCents)) return { ok: false, reason: 'bad_start' };
   if (!(WOC_MARKET_DURATION_HOURS as readonly number[]).includes(p.durationHours)) {
     return { ok: false, reason: 'bad_duration' };
   }
-  const wantsBuyNow = p.format === 'buy_now' || p.format === 'auction_buy_now';
+  const wantsBuyNow = p.format === 'buy_now';
   if (wantsBuyNow !== (p.buyNowCents !== null)) return { ok: false, reason: 'bad_buy_now' };
   if (p.format === 'buy_now' && p.reserveCents !== null)
     return { ok: false, reason: 'bad_reserve' };
@@ -158,7 +163,10 @@ export function validListingParams(
   }
   if (p.buyNowCents !== null) {
     const floor = Math.max(p.startCents, p.reserveCents ?? 0);
-    if (!isCents(p.buyNowCents) || p.buyNowCents < floor) {
+    // STRICTLY above the floor, not at it. A buy-now equal to the starting bid
+    // is not a price, it is the same number twice: the first bid would match it
+    // and the listing's two prices would say different things about one sale.
+    if (!isCents(p.buyNowCents) || p.buyNowCents <= floor) {
       return { ok: false, reason: 'bad_buy_now' };
     }
   }

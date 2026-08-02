@@ -1868,6 +1868,12 @@ export const ru_RU: EnTranslations = {
         "many": "вы {rank}, {count} участников",
         "other": "вы {rank}, {count} участника"
       },
+      "wocMarketSellChoose": {
+        "one": "Выберите из {count} предмета",
+        "few": "Выберите из {count} предметов",
+        "many": "Выберите из {count} предметов",
+        "other": "Выберите из {count} предметов"
+      },
       "finderPartySize": {
         "one": "{count} игрок",
         "few": "{count} игрока",
@@ -3811,7 +3817,7 @@ export const ru_RU: EnTranslations = {
       "buyNowLockedBadge": "Идёт покупка",
       "pagePrev": "Предыдущая страница",
       "pageNext": "Следующая страница",
-      "pageStatus": "Страница {current} из {total}",
+      "pageNumber": "Страница {current}",
       "sortLabel": "Сортировка",
       "sortEnding": "Скоро завершатся",
       "sortNewest": "Новые",
@@ -3856,6 +3862,7 @@ export const ru_RU: EnTranslations = {
       "quoteBondFor": "Залог для вашей ставки {usd}",
       "quoteSettlementFor": "Расчёт за {item}: {usd}",
       "signing": "Ожидание вашего кошелька...",
+      "signFailed": "Ваш кошелёк не завершил оплату. Проверьте кошелёк и попробуйте снова.",
       "confirming": "Подтверждение в сети...",
       "bidPlacedStanding": "Ваша ставка принята. Вы лидируете в торгах.",
       "bidPlacedOutbid": "Ваш залог подтверждён, но кто-то успел поставить больше.",
@@ -3865,6 +3872,11 @@ export const ru_RU: EnTranslations = {
       "sellTitle": "Создание лота",
       "sellEmpty": "В сумках нет подходящих предметов. Биржа принимает только неприсоединённую экипировку эпического качества и выше.",
       "sellSelectAria": "Выбрать {item} для выставления",
+      "sellSearch": "Найти предмет",
+      "sellSearchPlaceholder": "Введите текст для фильтра сумок",
+      "sellChoose": "Предмет для продажи",
+      "sellNoMatches": "Нет предметов по этому запросу",
+      "sellBuyNowAboveStart": "Цена немедленной покупки должна быть выше начальной ставки.",
       "sellFormat": "Формат",
       "sellFormatAuction": "Аукцион",
       "sellFormatBuyNow": "Только выкуп",

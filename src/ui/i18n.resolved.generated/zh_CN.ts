@@ -1868,6 +1868,12 @@ export const zh_CN: EnTranslations = {
         "many": "你是{rank}，{count}名成员",
         "other": "你是{rank}，{count}名成员"
       },
+      "wocMarketSellChoose": {
+        "one": "从 {count} 件物品中选择",
+        "few": "从 {count} 件物品中选择",
+        "many": "从 {count} 件物品中选择",
+        "other": "从 {count} 件物品中选择"
+      },
       "finderPartySize": {
         "one": "{count} 名玩家",
         "few": "{count} 名玩家",
@@ -3811,7 +3817,7 @@ export const zh_CN: EnTranslations = {
       "buyNowLockedBadge": "购买进行中",
       "pagePrev": "上一页",
       "pageNext": "下一页",
-      "pageStatus": "第 {current} 页，共 {total} 页",
+      "pageNumber": "第 {current} 页",
       "sortLabel": "排序",
       "sortEnding": "即将结束",
       "sortNewest": "最新上架",
@@ -3856,6 +3862,7 @@ export const zh_CN: EnTranslations = {
       "quoteBondFor": "你 {usd} 出价的保证金",
       "quoteSettlementFor": "{item} 的结算：{usd}",
       "signing": "等待钱包确认...",
+      "signFailed": "你的钱包未能完成付款。请检查钱包后重试。",
       "confirming": "正在链上确认...",
       "bidPlacedStanding": "你的出价已生效，你是当前最高出价者。",
       "bidPlacedOutbid": "你的保证金已确认，但有人抢先出了更高的价。",
@@ -3865,6 +3872,11 @@ export const zh_CN: EnTranslations = {
       "sellTitle": "创建挂单",
       "sellEmpty": "背包中没有符合条件的物品。交易所只接受未绑定的史诗或更高品质装备。",
       "sellSelectAria": "选择要挂单的 {item}",
+      "sellSearch": "查找物品",
+      "sellSearchPlaceholder": "输入以筛选背包",
+      "sellChoose": "要上架的物品",
+      "sellNoMatches": "没有物品符合该搜索",
+      "sellBuyNowAboveStart": "一口价必须高于起拍价。",
       "sellFormat": "形式",
       "sellFormatAuction": "拍卖",
       "sellFormatBuyNow": "仅一口价",

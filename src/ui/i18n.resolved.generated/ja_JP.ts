@@ -1868,6 +1868,12 @@ export const ja_JP: EnTranslations = {
         "many": "あなたは{rank}、{count}人のメンバー",
         "other": "あなたは{rank}、{count}人のメンバー"
       },
+      "wocMarketSellChoose": {
+        "one": "{count} 件から選択",
+        "few": "{count} 件から選択",
+        "many": "{count} 件から選択",
+        "other": "{count} 件から選択"
+      },
       "finderPartySize": {
         "one": "{count} 人",
         "few": "{count} 人",
@@ -3811,7 +3817,7 @@ export const ja_JP: EnTranslations = {
       "buyNowLockedBadge": "購入手続き中",
       "pagePrev": "前のページ",
       "pageNext": "次のページ",
-      "pageStatus": "{total} ページ中 {current} ページ",
+      "pageNumber": "{current} ページ",
       "sortLabel": "並べ替え",
       "sortEnding": "終了が近い順",
       "sortNewest": "新着順",
@@ -3856,6 +3862,7 @@ export const ja_JP: EnTranslations = {
       "quoteBondFor": "{usd} の入札に対する保証金",
       "quoteSettlementFor": "{item} の決済: {usd}",
       "signing": "ウォレットの承認を待っています...",
+      "signFailed": "ウォレットが支払いを完了できませんでした。ウォレットを確認して、もう一度お試しください。",
       "confirming": "チェーン上で確認中...",
       "bidPlacedStanding": "入札が有効になりました。あなたが現在の最高入札者です。",
       "bidPlacedOutbid": "保証金は確認されましたが、先により高い入札が入りました。",
@@ -3865,6 +3872,11 @@ export const ja_JP: EnTranslations = {
       "sellTitle": "出品を作成",
       "sellEmpty": "バッグに出品できるアイテムがありません。取引所はソウルバウンドでないエピック以上の装備のみ扱います。",
       "sellSelectAria": "{item} を選択して出品する",
+      "sellSearch": "アイテムを検索",
+      "sellSearchPlaceholder": "入力してバッグを絞り込む",
+      "sellChoose": "出品するアイテム",
+      "sellNoMatches": "該当するアイテムがありません",
+      "sellBuyNowAboveStart": "即決価格は開始価格より高く設定してください。",
       "sellFormat": "形式",
       "sellFormatAuction": "オークション",
       "sellFormatBuyNow": "即決のみ",
