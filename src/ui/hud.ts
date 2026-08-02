@@ -12758,7 +12758,7 @@ export class Hud {
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
-        onBuy: (itemId) => buyAndRefresh(() => this.sim.buyItem(npc.id, itemId)),
+        onBuy: (itemId, bulk) => buyAndRefresh(() => this.sim.buyItem(npc.id, itemId, bulk)),
         onBuyBack: (itemId, index, instance, craftedRecipeId) =>
           buyAndRefresh(() => this.sim.buyBackItem(itemId, index, instance, craftedRecipeId)),
         onSellJunk: () => buyAndRefresh(() => this.sim.sellAllJunk()),
