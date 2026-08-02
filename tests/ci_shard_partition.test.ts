@@ -52,6 +52,49 @@ describe('ci_shard_partition (D11 path-matrix)', () => {
     expect(new Set(firstKeys).size).toBe(4);
   });
 
+  it('assertPartitionCompleteness fails on missing, duplicate, and unknown keys', () => {
+    const items = [
+      { id: 1, key: 'a', weight: 1 },
+      { id: 2, key: 'b', weight: 1 },
+      { id: 3, key: 'c', weight: 1 },
+    ];
+    const missing = assertPartitionCompleteness(items, [[{ id: 1, key: 'a', weight: 1 }]]);
+    expect(missing.ok).toBe(false);
+    if (!missing.ok) expect(missing.reason).toMatch(/missing/);
+
+    const dup = assertPartitionCompleteness(items, [
+      [
+        { id: 1, key: 'a', weight: 1 },
+        { id: 1, key: 'a', weight: 1 },
+      ],
+      [{ id: 2, key: 'b', weight: 1 }],
+      [{ id: 3, key: 'c', weight: 1 }],
+    ]);
+    expect(dup.ok).toBe(false);
+    if (!dup.ok) expect(dup.reason).toMatch(/duplicate/);
+
+    const unknown = assertPartitionCompleteness(items, [
+      [
+        { id: 1, key: 'a', weight: 1 },
+        { id: 9, key: 'z', weight: 1 },
+      ],
+      [{ id: 2, key: 'b', weight: 1 }],
+      [{ id: 3, key: 'c', weight: 1 }],
+    ]);
+    expect(unknown.ok).toBe(false);
+    if (!unknown.ok) expect(unknown.reason).toMatch(/unknown/);
+  });
+
+  it('returns empty packs for an empty input and trailing empties when items < count', () => {
+    const empty = partitionByLpt([], 3);
+    expect(empty).toHaveLength(3);
+    expect(empty.every((p) => p.length === 0)).toBe(true);
+    const one = partitionByLpt([{ id: 1, key: 'only', weight: 5 }], 3);
+    expect(one).toHaveLength(3);
+    expect(one.filter((p) => p.length > 0)).toHaveLength(1);
+    expect(one.flat().map((x) => x.key)).toEqual(['only']);
+  });
+
   it('rejects a non-positive shard count', () => {
     expect(() => partitionByLpt([], 0)).toThrow(/positive integer/);
     expect(() => partitionByLpt([], -1)).toThrow(/positive integer/);
@@ -118,9 +161,9 @@ describe('ci_shard_partition (D11 path-matrix)', () => {
 
   it('applies the duration overlay for known Phase 3 monsters', () => {
     const base = weightForTestFile('tests/mail_expiry.test.ts', '', 1000);
-    const withoutOverlay = 1000 + 1000; // BASE + size only when body empty
-    expect(base).toBeGreaterThan(withoutOverlay);
-    expect(DURATION_WEIGHT_OVERLAY['tests/mail_expiry.test.ts']).toBeGreaterThan(0);
+    // BASE 1000 + size 1000 + overlay 80_000
+    expect(DURATION_WEIGHT_OVERLAY['tests/mail_expiry.test.ts']).toBe(80_000);
+    expect(base).toBe(82_000);
   });
 
   it('partitions the real tests/ tree into N complete packs (suite completeness)', () => {

@@ -417,5 +417,7 @@ describe('CI workflow parity', () => {
     // Workflow comments must not re-claim sha1 as the live pack strategy.
     expect(workflow).toContain('ci_balanced_sequencer.mjs');
     expect(workflow).toMatch(/LPT-balanced|import-cost weights/);
+    // Empty packs under a broken sequencer must fail the job (privacy review).
+    expect(viteConfig).toContain('passWithNoTests: false');
   });
 });

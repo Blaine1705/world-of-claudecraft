@@ -384,6 +384,9 @@ export default defineConfig({
     sequence: {
       sequencer: BalancedSequencer,
     },
+    // A broken custom sequencer that returns empty packs must fail the job
+    // (not green with zero tests). Vitest defaults passWithNoTests to true.
+    passWithNoTests: false,
     globalSetup: ['./tests/global_setup.ts'],
     // Runs per test file (unlike globalSetup, which runs once outside any
     // jsdom environment); see the file for why this is needed on Node 22+.
