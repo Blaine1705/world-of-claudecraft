@@ -98,7 +98,12 @@ export function farVistaPlan(
   if (tier === 'ultra') {
     return { enabled: true, spacing: 10, envelopeFar: 3200, cameraFar: 3600 };
   }
-  return { enabled: true, spacing: 8, envelopeFar: 3200, cameraFar: 3600 };
+  if (tier === 'insane') {
+    return { enabled: true, spacing: 8, envelopeFar: 3200, cameraFar: 3600 };
+  }
+  // Unknown tier (a partial GFX in a unit test, a future addition that has
+  // not chosen a plan): the classic fogged renderer, never a silent vista.
+  return { enabled: false, spacing: 0, envelopeFar: 0, cameraFar: CLASSIC_CAMERA_FAR };
 }
 
 /** The distance the classic subsystems cull against: the residency-eased

@@ -518,9 +518,9 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       // reads foam as depth/slope, and a constant slope of 1 against the real
       // shelf depths out here (~1.5 yards) lands inside the surf band and would
       // paint foam across open water.
-      const columns = APRON_SEGMENTS + 1;
-      const dx = (2 * 3000) / APRON_SEGMENTS;
-      const dz = (2 * span) / APRON_SEGMENTS;
+      const columns = apronSegments + 1;
+      const dx = (2 * width) / apronSegments;
+      const dz = (2 * span) / apronSegments;
       for (let i = 0; i < pos.count; i++) {
         const row = Math.floor(i / columns);
         const col = i % columns;

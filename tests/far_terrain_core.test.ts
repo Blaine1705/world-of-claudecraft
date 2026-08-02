@@ -15,6 +15,7 @@ import {
   farGroundColor,
   farTileBuildOrder,
   farTileVisible,
+  farVertexHeight,
   farVistaPlan,
   planFarTiles,
   srgbHexToLinear,
@@ -195,7 +196,7 @@ describe('createFarTileBuilder: real heights, deterministic, incremental', () =>
     return b.result();
   };
 
-  it('positions carry the true sim height minus the anti-poke drop', () => {
+  it('positions carry the crest-preserving height minus the anti-poke drop', () => {
     const data = buildAll(64);
     const side = farGridSide(tile.size, SPACING);
     expect(data.positions.length).toBe(side * side * 3);
@@ -210,7 +211,15 @@ describe('createFarTileBuilder: real heights, deterministic, incremental', () =>
       const z = tile.z0 + iz * SPACING;
       expect(data.positions[vi]).toBe(x);
       expect(data.positions[vi + 2]).toBe(z);
-      expect(data.positions[vi + 1]).toBeCloseTo(terrainHeight(x, z, SEED) - FAR_MESH_DROP, 4);
+      // farVertexHeight, not the raw point sample: the crest max keeps ridge
+      // silhouettes truthful now that no fog hides the shaving.
+      expect(data.positions[vi + 1]).toBeCloseTo(
+        farVertexHeight(x, z, SPACING, SEED) - FAR_MESH_DROP,
+        4,
+      );
+      expect(data.positions[vi + 1]).toBeGreaterThanOrEqual(
+        terrainHeight(x, z, SEED) - FAR_MESH_DROP - 1e-4,
+      );
     }
     expect(data.minY).toBeLessThanOrEqual(data.maxY);
   });
