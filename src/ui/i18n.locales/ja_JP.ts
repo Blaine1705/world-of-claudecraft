@@ -2404,6 +2404,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellQuantityInput': '売却する数量',
   'itemUi.vendor.sellQuantityConfirm': '売却',
   'itemUi.vendor.sellQuantityCancel': 'キャンセル',
+  'itemUi.vendor.qtyRowAria': '購入数量',
+  'itemUi.vendor.qtyMultipleAria': '一度に{count}個ずつ購入',
+  'itemUi.vendor.qtyCustom': 'カスタム',
+  'itemUi.vendor.qtyCustomAria': '購入数を自分で指定',
+  'itemUi.vendor.buyQuantityTitle': '{item}をいくつ購入しますか？最大{max}。',
+  'itemUi.vendor.buyQuantityInput': '購入する数量',
   'itemUi.vendor.sellJunk': '不要品を売却',
   'itemUi.vendor.sellJunkAria': '{price}ですべての不要品を売却',
   'itemUi.vendor.sellJunkHint':

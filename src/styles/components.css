@@ -5197,6 +5197,48 @@
   .vendor-item-bulk .vi-name {
     color: var(--gold);
   }
+  /* The 1x/5x/10x/custom purchase control row (phase 21): one strip of
+     toggle chips above the goods grid. The selected state rides
+     aria-pressed (the same attribute the painter sets), so style and
+     semantics cannot drift apart. */
+  .vendor-qty-row {
+    display: flex;
+    gap: 4px;
+    margin: 4px 0 6px;
+  }
+  .vendor-qty-btn {
+    flex: 0 0 auto;
+    min-width: 34px;
+    padding: 3px 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+    background: transparent;
+    color: inherit;
+    font-family: var(--ui-font);
+    font-size: 11px;
+  }
+  .vendor-qty-btn:hover {
+    background: #ffffff20;
+  }
+  .vendor-qty-btn[aria-pressed="true"] {
+    border-color: var(--gold-dim);
+    background: #ffffff20;
+    color: var(--gold);
+  }
+  /* The count chip on a multiplied row: the same muted stack-count read as
+     the bags, sitting just before the whole-count price. */
+  .vendor-item .vi-qty {
+    margin-right: 4px;
+    opacity: 0.85;
+  }
+  @media (pointer: coarse) {
+    .vendor-qty-btn {
+      min-width: 40px;
+      min-height: 40px;
+      box-sizing: border-box;
+    }
+  }
   .vendor-sell-junk {
     display: flex;
     align-items: center;

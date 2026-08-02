@@ -133,6 +133,25 @@ const itemStringsEn = {
       // control buys the largest affordable stack in one purchase.
       buyStack: 'Buy {count}',
       buyStackAria: 'Buy {count} {item} for {price}',
+      // The 1x/5x/10x/custom purchase control row (phase 21). qtyMultiple is
+      // the visible chip label; the arias name the action for screen readers.
+      qtyRowAria: 'Purchase quantity',
+      qtyMultiple: '{count}x',
+      qtyMultipleAria: 'Buy {count} at a time',
+      qtyCustom: 'Custom',
+      qtyCustomAria: 'Choose a custom amount to buy',
+      // The count-aware row labels (acceptance: aria names qty and total
+      // price). The requirement sibling folds the R22 advisory into the name
+      // exactly like buyAriaWithRequirement: one combined key, never two
+      // concatenated t() results.
+      buyCountAria: 'Buy {count} of {item} for {price}',
+      buyCountAriaWithRequirement: 'Buy {count} of {item} for {price}. {requirement}',
+      // The custom-amount prompt (the sell-split prompt family): the title
+      // shows the countFit-derived maximum so the cap is never a surprise;
+      // the cancel label reuses sellQuantityCancel like the deposit prompt.
+      buyQuantityTitle: 'Buy how many {item}? Up to {max}.',
+      buyQuantityInput: 'Quantity to buy',
+      buyQuantityConfirm: 'Buy',
     },
     market: {
       title: 'The World Market',

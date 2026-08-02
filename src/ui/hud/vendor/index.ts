@@ -1,3 +1,4 @@
+export * from './buy_quantity_prompt';
 export * from './heroic_vendor_view';
 export * from './heroic_vendor_window';
 export * from './train_learn_core';

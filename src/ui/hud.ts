@@ -111,6 +111,7 @@ import {
   xpUntilNextPrestige,
 } from '../sim/types';
 import { isAtSowfield } from '../sim/vale_cup_layout';
+import { maxBuyCount } from '../sim/vendor_buy_stack';
 import { worldBossIdFromLockout } from '../sim/world_boss';
 import {
   type CharacterProfile,
@@ -376,7 +377,12 @@ import { buildTrainView, isRecipeKnownForViewer } from './hud/vendor/train_view'
 import { renderTrainWindow } from './hud/vendor/train_window';
 import { buildUnbindView } from './hud/vendor/unbind_view';
 import { renderUnbindWindow } from './hud/vendor/unbind_window';
-import { buildVendorView, sellJunkButtonState } from './hud/vendor/vendor_view';
+import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt';
+import {
+  buildVendorView,
+  sellJunkButtonState,
+  type VendorMultiple,
+} from './hud/vendor/vendor_view';
 import { renderVendorWindow } from './hud/vendor/vendor_window';
 import {
   formatMoney as formatLocalizedMoney,
@@ -1429,6 +1435,11 @@ export class Hud {
   // and the Heroic Quartermaster), since they share the container and are
   // mutually exclusive.
   private vendorOpenerFocus: HTMLElement | null = null;
+  // The 1x/5x/10x/custom control-row selection (phase 21). Hud state, not the
+  // painter's, because the buy-driven rebuild replaces the whole window DOM
+  // and the selection must survive it; reset to 1x on every vendor open so a
+  // multiple never lingers surprisingly into the next shop visit.
+  private vendorQtyMultiple: VendorMultiple = 1;
   private openTrainNpcId: number | null = null;
   // Learn flights + confirmed-grant overlay for the train window (issue
   // #2342): begin on click (the double-submit guard), resolve on the
@@ -13041,6 +13052,7 @@ export class Hud {
     // the vendor + bags cluster.
     this.vendorOpenerFocus = opener !== undefined ? opener : this.focusManager.activeFocusable();
     this.openVendorNpcId = npcId;
+    this.vendorQtyMultiple = 1;
     document.body.classList.add('vendor-open');
     this.renderVendor();
     this.renderBags();
@@ -13070,20 +13082,38 @@ export class Hud {
     renderVendorWindow(
       $('#vendor-window'),
       entityDisplayName(npc),
-      buildVendorView(npc.vendorItems, this.sim.vendorBuyback, ITEMS, {
-        copper: this.sim.copper,
-        honor: this.sim.honor,
-        // The advisory half of the vendor row gate. An IWorld member both
-        // worlds already implement (Sim reads PlayerMeta, ClientWorld mirrors
-        // the self-delta), so the locked state resolves client-side with no
-        // new wire field, exactly as the delve shop resolves its lock badge
-        // from the mirrored clears map.
-        gatheringProficiency: this.sim.gatheringProficiency,
-      }),
+      buildVendorView(
+        npc.vendorItems,
+        this.sim.vendorBuyback,
+        ITEMS,
+        {
+          copper: this.sim.copper,
+          honor: this.sim.honor,
+          // The advisory half of the vendor row gate. An IWorld member both
+          // worlds already implement (Sim reads PlayerMeta, ClientWorld mirrors
+          // the self-delta), so the locked state resolves client-side with no
+          // new wire field, exactly as the delve shop resolves its lock badge
+          // from the mirrored clears map.
+          gatheringProficiency: this.sim.gatheringProficiency,
+        },
+        this.vendorQtyMultiple,
+      ),
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
         onBuy: (itemId, opts) => buyAndRefresh(() => this.sim.buyItem(npc.id, itemId, opts)),
+        onQtyChange: (multiple) => {
+          this.vendorQtyMultiple = multiple;
+          this.renderVendor();
+        },
+        // The custom prompt's cap (Q19): the sim's own bag-fit math in row
+        // units, read from the live IWorld inventory at click time. An
+        // unknown id (a stale bundle behind the server) caps at 0 and the
+        // prompt's floor-of-1 lets the server answer honestly.
+        buyCustomMax: (itemId) => {
+          const def = ITEMS[itemId];
+          return def ? maxBuyCount(this.sim.inventory, this.sim.bagCapacity, def) : 0;
+        },
         onBuyBack: (itemId, index, instance, craftedRecipeId) =>
           buyAndRefresh(() => this.sim.buyBackItem(itemId, index, instance, craftedRecipeId)),
         onSellJunk: () => buyAndRefresh(() => this.sim.sellAllJunk()),
@@ -13150,6 +13180,11 @@ export class Hud {
     if (this.openVendorNpcId === null) return;
     const closeMobileBags =
       document.body.classList.contains('mobile-touch') && $('#bags').style.display !== 'none';
+    // Force-close backstop for the custom-amount prompt (the shared modal
+    // recipe's contract): a close under an open prompt must remove the prompt
+    // node and clear the window inert it holds, or a hidden #vendor-window
+    // stays inert and the orphaned aria-modal keeps gating game keys.
+    dismissBuyQuantityPrompts($('#vendor-window'));
     $('#vendor-window').style.display = 'none';
     this.openVendorNpcId = null;
     document.body.classList.remove('vendor-open'); // bags (if still open) re-centres

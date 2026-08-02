@@ -963,6 +963,7 @@ describe('axe: vendor window advisory rows', () => {
       buyback: [],
       honorBalance: 0,
       hasHonorGoods: false,
+      multiple: 1 as const,
     };
     // A literal vendor NAME: the painter interpolates it into the
     // goodsTitle key itself, so passing a t() result here would nest the
@@ -974,6 +975,8 @@ describe('axe: vendor window advisory rows', () => {
       attachTooltip: () => {},
       hideTooltip: () => {},
       onBuy: () => {},
+      onQtyChange: () => {},
+      buyCustomMax: () => 0,
       onBuyBack: () => {},
       onSellJunk: () => {},
       onClose: () => {},

@@ -13,9 +13,18 @@ import { stackSizeOf } from '../../../sim/bags';
 import { resolveVendorRowGate, type VendorRowGate } from '../../../sim/content/vendor_row_gates';
 import { junkSellableSlot } from '../../../sim/items';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
-import { bulkBuyQuantity } from '../../../sim/vendor_buy_stack';
+import { bulkBuyQuantity, vendorCountForced } from '../../../sim/vendor_buy_stack';
 import { vendorStackSize } from '../../../sim/vendor_stack';
 import { knownItemDef } from '../../known_item';
+
+/** The vendor window's selected purchase multiple (the 1x/5x/10x/custom
+ *  control row, phase 21): a fixed row-unit count, or 'custom' where a row
+ *  click opens the countFit-capped amount prompt. Lives on Hud (it must
+ *  survive the buy-driven rebuild) and is passed into the build so every
+ *  row's disable state tracks the SELECTED multiple, not the 1x baseline. */
+export type VendorMultiple = 1 | 5 | 10 | 'custom';
+
+export const VENDOR_MULTIPLES: readonly VendorMultiple[] = [1, 5, 10, 'custom'];
 
 export interface VendorGoodsRow {
   itemId: string;
@@ -50,6 +59,21 @@ export interface VendorGoodsRow {
    *  5-unit price the player cannot afford can still offer a smaller,
    *  affordable bulk purchase. Undefined whenever `bulkQuantity` is. */
   bulkAffordable?: boolean;
+  /** Present when a fixed multiple above 1 is selected AND the row takes a
+   *  count (never on the Q23 force-1 rows: honor-priced, soulbound, mount,
+   *  riding service, which keep their 1x baseline fields whatever the row
+   *  selection). One click buys `count` row units for `copper` total; the
+   *  painter disables the row on `affordable`, which tracks the SELECTED
+   *  multiple. Advisory only, the buy path rechecks everything. */
+  countBuy?: {
+    count: number;
+    copper: number;
+    affordable: boolean;
+  };
+  /** True when 'custom' is selected and the row takes a count: a click opens
+   *  the countFit-capped amount prompt instead of buying. The row keeps its
+   *  1x affordability (the typed amount decides the rest). */
+  customBuy?: boolean;
 }
 
 export interface VendorPrice {
@@ -94,6 +118,9 @@ export interface VendorView {
   buyback: VendorBuybackRow[];
   honorBalance: number;
   hasHonorGoods: boolean;
+  /** The selected control-row multiple this view was built for, so the
+   *  painter renders the pressed state from the same source of truth. */
+  multiple: VendorMultiple;
 }
 
 /**
@@ -116,6 +143,7 @@ export function buildVendorView(
   buybackSlots: readonly InvSlot[],
   items: Record<string, ItemDef>,
   balances: VendorBalances,
+  multiple: VendorMultiple = 1,
 ): VendorView {
   const goods: VendorGoodsRow[] = [];
   for (const itemId of vendorItemIds) {
@@ -143,6 +171,20 @@ export function buildVendorView(
     const bulkQuantity = bulkEligible
       ? Math.max(1, bulkBuyQuantity(item, unitCopper, balances.copper))
       : undefined;
+    // The count axis (phase 21): the sim leaf's force-1 predicate decides
+    // eligibility so the control row can never promise a multiple the buy
+    // path would collapse back to 1. Eligible rows at a fixed multiple carry
+    // the whole-count total and an affordability that TRACKS the selection;
+    // at 'custom' they only flag that a click opens the capped prompt.
+    const countable = !vendorCountForced(item);
+    const countBuy =
+      countable && multiple !== 'custom' && multiple > 1
+        ? {
+            count: multiple,
+            copper: price.copper * multiple,
+            affordable: balances.copper >= price.copper * multiple,
+          }
+        : undefined;
     goods.push({
       itemId,
       item,
@@ -155,6 +197,8 @@ export function buildVendorView(
         bulkQuantity,
         bulkAffordable: balances.copper >= unitCopper * bulkQuantity,
       }),
+      ...(countBuy && { countBuy }),
+      ...(countable && multiple === 'custom' && { customBuy: true }),
     });
   }
   const buyback: VendorBuybackRow[] = [];
@@ -176,6 +220,7 @@ export function buildVendorView(
     buyback,
     honorBalance: Math.max(0, Math.floor(balances.honor)),
     hasHonorGoods: goods.some((row) => row.price.honor > 0),
+    multiple,
   };
 }
 

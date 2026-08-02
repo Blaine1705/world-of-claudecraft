@@ -16,7 +16,14 @@ import { gatheringProfessionNameKey } from '../../gathering_profession_name';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
-import type { VendorGoodsRow, VendorPrice, VendorView } from './vendor_view';
+import { showBuyQuantityPrompt } from './buy_quantity_prompt';
+import {
+  VENDOR_MULTIPLES,
+  type VendorGoodsRow,
+  type VendorMultiple,
+  type VendorPrice,
+  type VendorView,
+} from './vendor_view';
 
 /**
  * Hud-supplied glue. The icon/money/tooltip painters are the shared
@@ -33,6 +40,13 @@ export interface VendorWindowDeps extends PainterHostPresentation {
    *  multiple or a confirmed custom amount (N row units, phase 21). At most
    *  one field is ever set; a plain click passes undefined. */
   onBuy(itemId: string, opts?: VendorBuyOptions): void;
+  /** Control-row selection (phase 21). Hud owns the selected multiple (it must
+   *  survive the buy-driven rebuild) and re-renders with the new value. */
+  onQtyChange(multiple: VendorMultiple): void;
+  /** The countFit-derived row-unit cap for the custom prompt (Q19), resolved
+   *  through the live world inventory at click time so the shown max is never
+   *  stale by a purchase. */
+  buyCustomMax(itemId: string): number;
   onBuyBack(
     itemId: string,
     index: number,
@@ -130,6 +144,37 @@ export function renderVendorWindow(
     el.appendChild(balance);
   }
 
+  // The 1x/5x/10x/custom purchase control row (phase 21, Q21: the ONE count
+  // trigger surface). aria-pressed marks the selection; each button carries
+  // its own focus key so the ladder and gamepad reach it across the rebuild
+  // (the fixed multiples are the gamepad-complete path, Q24).
+  if (view.goods.length > 0) {
+    const qtyRow = document.createElement('div');
+    qtyRow.className = 'vendor-qty-row';
+    qtyRow.setAttribute('role', 'group');
+    qtyRow.setAttribute('aria-label', t('itemUi.vendor.qtyRowAria'));
+    for (const m of VENDOR_MULTIPLES) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'vendor-qty-btn';
+      const selected = view.multiple === m;
+      btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      if (selected) btn.classList.add('vendor-qty-selected');
+      if (m === 'custom') {
+        btn.textContent = t('itemUi.vendor.qtyCustom');
+        btn.setAttribute('aria-label', t('itemUi.vendor.qtyCustomAria'));
+      } else {
+        const count = formatNumber(m, { maximumFractionDigits: 0 });
+        btn.textContent = t('itemUi.vendor.qtyMultiple', { count });
+        btn.setAttribute('aria-label', t('itemUi.vendor.qtyMultipleAria', { count }));
+      }
+      btn.dataset.focusKey = `qty:${m}`;
+      btn.addEventListener('click', () => deps.onQtyChange(m));
+      qtyRow.appendChild(btn);
+    }
+    el.appendChild(qtyRow);
+  }
+
   // Landscape layout: goods tile up in a multi-column grid instead of one
   // full-width row per item (see .vendor-goods-grid in components.css).
   const goodsGrid = document.createElement('div');
@@ -145,8 +190,12 @@ export function renderVendorWindow(
     // than decoration. Never disabled for it: the sale is real, the gate is
     // at the harvest.
     row.className = goods.requirementUnmet ? 'vendor-item vendor-locked' : 'vendor-item';
-    row.disabled = !goods.affordable;
-    const price = goodsPriceText(goods.price);
+    // The disable state tracks the SELECTED multiple (phase 21): a count row
+    // gates on the whole-count total; force-1 and custom rows keep the 1x
+    // baseline (the custom prompt's typed amount decides the rest).
+    const countBuy = goods.countBuy;
+    row.disabled = countBuy ? !countBuy.affordable : !goods.affordable;
+    const price = countBuy ? formatLocalizedMoney(countBuy.copper) : goodsPriceText(goods.price);
     const itemName = itemDisplayName(item);
     const stack =
       quantity > 1
@@ -158,25 +207,61 @@ export function renderVendorWindow(
     // content as its accessible name: a requirement-unmet row must fold the
     // advisory into the name itself or screen-reader users never hear what
     // the sighted sub-line says. One combined key, never two concatenated
-    // t() results.
+    // t() results. A count row's name states qty and TOTAL price
+    // (acceptance f), through the same combined-key rule.
+    const countText = countBuy
+      ? formatNumber(countBuy.count, { maximumFractionDigits: 0 })
+      : undefined;
     row.setAttribute(
       'aria-label',
-      requirement
-        ? t('itemUi.vendor.buyAriaWithRequirement', {
-            item: `${itemName}${stack}`,
-            price,
-            requirement,
-          })
-        : t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
+      countBuy
+        ? requirement
+          ? t('itemUi.vendor.buyCountAriaWithRequirement', {
+              count: countText as string,
+              item: `${itemName}${stack}`,
+              price,
+              requirement,
+            })
+          : t('itemUi.vendor.buyCountAria', {
+              count: countText as string,
+              item: `${itemName}${stack}`,
+              price,
+            })
+        : requirement
+          ? t('itemUi.vendor.buyAriaWithRequirement', {
+              item: `${itemName}${stack}`,
+              price,
+              requirement,
+            })
+          : t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
     );
-    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${esc(stack)}${requirement ? `<span class="vi-sub">${esc(requirement)}</span>` : ''}</span><span class="vi-price">${goodsPriceHtml(goods, deps)}</span>`;
+    // The count chip reuses the bags stack-count key (x{count}); the price
+    // cell shows the whole-count total the click will charge.
+    const qtyChip = countBuy
+      ? `<span class="vi-qty">${esc(t('itemUi.bags.stackCount', { count: countText as string }))}</span>`
+      : '';
+    const priceHtml = countBuy ? deps.moneyHtml(countBuy.copper) : goodsPriceHtml(goods, deps);
+    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${esc(stack)}${requirement ? `<span class="vi-sub">${esc(requirement)}</span>` : ''}</span><span class="vi-price">${qtyChip}${priceHtml}</span>`;
     row.dataset.focusKey = `buy:${itemId}`;
-    // Ctrl/Cmd-click requests a bulk purchase (#2374), the desktop mirror of
+    // Ctrl/Cmd-click requests a bulk purchase (#2374) and wins over the
+    // selected multiple (an explicit stack request), the desktop mirror of
     // the "Buy Stack" tile below; both funnel through the same
-    // onBuy(itemId, { bulk: true }).
-    row.addEventListener('click', (ev) =>
-      deps.onBuy(itemId, ev.ctrlKey || ev.metaKey ? { bulk: true } : undefined),
-    );
+    // onBuy(itemId, { bulk: true }). Otherwise the click follows the
+    // selection: a fixed multiple sends its count, 'custom' opens the
+    // countFit-capped prompt (Q19), and 1x stays the plain buy.
+    row.addEventListener('click', (ev) => {
+      if (ev.ctrlKey || ev.metaKey) {
+        deps.onBuy(itemId, { bulk: true });
+      } else if (countBuy) {
+        deps.onBuy(itemId, { count: countBuy.count });
+      } else if (goods.customBuy) {
+        showBuyQuantityPrompt(el, item, deps.buyCustomMax(itemId), (count) =>
+          deps.onBuy(itemId, { count }),
+        );
+      } else {
+        deps.onBuy(itemId, undefined);
+      }
+    });
     // No appended requirement line in the tooltip: the shared item tooltip
     // (deps.itemTooltip -> gatherToolTooltipLines) already renders the same
     // "Requires {craft} {skill}" sentence on every requirement-carrying

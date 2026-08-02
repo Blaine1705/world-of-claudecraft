@@ -42,6 +42,8 @@ function deps(overrides: Partial<VendorWindowDeps> = {}): VendorWindowDeps {
     attachTooltip: () => {},
     hideTooltip: () => {},
     onBuy: () => {},
+    onQtyChange: () => {},
+    buyCustomMax: () => 0,
     onBuyBack: () => {},
     onSellJunk: () => {},
     onClose: () => {},
@@ -83,7 +85,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         requirementUnmet: false,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -98,7 +100,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     const buyback: VendorBuybackRow[] = [
       { itemId: 'sword', item: item('sword'), count: 1, price: 100, index: 0 },
     ];
-    const view: VendorView = { goods: [], buyback, honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods: [], buyback, honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -125,7 +127,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         requirement: { professionId: 'mining', proficiency: 40 },
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -164,7 +166,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         requirement: { professionId: 'not_a_profession' as never, proficiency: 40 },
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -196,7 +198,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         requirement: { professionId: 'mining', proficiency: 40 },
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     renderVendorWindow(
       el,
@@ -232,7 +234,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         requirementUnmet: false,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     renderVendorWindow(
       el,
@@ -262,7 +264,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         requirementUnmet: false,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -286,7 +288,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         requirementUnmet: false,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -298,7 +300,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
   });
 
   it('appends no empty .vendor-goods-grid when both sections are empty', () => {
-    const view: VendorView = { goods: [], buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods: [], buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -320,7 +322,7 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
         requirementUnmet: false,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -340,7 +342,7 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
         bulkQuantity: 1,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -360,7 +362,7 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
         bulkQuantity: 20,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     let bulkCalled: [string, VendorBuyOptions | undefined] | undefined;
     renderVendorWindow(
@@ -394,7 +396,7 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
         bulkAffordable: false,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -415,7 +417,7 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
         bulkAffordable: true,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -437,7 +439,7 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
         bulkQuantity: 20,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
     const el = document.createElement('div');
     const calls: (VendorBuyOptions | undefined)[] = [];
     renderVendorWindow(el, 'Vendor', view, deps({ onBuy: (_itemId, opts) => calls.push(opts) }));
@@ -549,6 +551,7 @@ describe('renderVendorWindow: focus across the rebuild (the R22 advisory widenin
       buyback: [],
       honorBalance: 0,
       hasHonorGoods: false,
+      multiple: 1,
     };
     const el = document.createElement('div');
     document.body.appendChild(el);
@@ -578,6 +581,7 @@ describe('renderVendorWindow: focus across the rebuild (the R22 advisory widenin
       buyback: [],
       honorBalance: 0,
       hasHonorGoods: false,
+      multiple: 1,
     };
     const el = document.createElement('div');
     document.body.appendChild(el);
@@ -608,6 +612,7 @@ describe('renderVendorWindow: focus across the rebuild (the R22 advisory widenin
       buyback: [],
       honorBalance: 0,
       hasHonorGoods: false,
+      multiple: 1,
     };
     const after: VendorView = {
       ...before,
@@ -634,6 +639,7 @@ describe('renderVendorWindow: focus across the rebuild (the R22 advisory widenin
       buyback: [],
       honorBalance: 0,
       hasHonorGoods: false,
+      multiple: 1,
     };
     const one: VendorView = { ...two, goods: [goodsRow('bread')] };
     const el = document.createElement('div');
@@ -660,6 +666,7 @@ describe('renderVendorWindow: focus across the rebuild (the R22 advisory widenin
       buyback: [],
       honorBalance: 0,
       hasHonorGoods: false,
+      multiple: 1,
     };
     const after: VendorView = { ...before, goods: [] };
     const el = document.createElement('div');
@@ -683,6 +690,7 @@ describe('renderVendorWindow: focus across the rebuild (the R22 advisory widenin
       buyback: [],
       honorBalance: 0,
       hasHonorGoods: false,
+      multiple: 1,
     };
     const el = document.createElement('div');
     const outside = document.createElement('button');
@@ -710,6 +718,7 @@ describe('renderVendorWindow: focus across the rebuild (the R22 advisory widenin
       buyback: [sword, shield],
       honorBalance: 0,
       hasHonorGoods: false,
+      multiple: 1,
     };
     const after: VendorView = {
       ...before,
