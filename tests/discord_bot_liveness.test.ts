@@ -150,6 +150,31 @@ describe('writeHeartbeatFile', () => {
     expect(errors[0][0]).toBe('[bot] heartbeat write to /proc/nope/heartbeat failed');
   });
 
+  it('settles false on a SYNCHRONOUSLY throwing writer, not only a rejecting one', async () => {
+    // The arm that distinguishes the landed `try { await io.writeFile } catch`
+    // from an `io.writeFile(...).then(...).catch(...)` refactor: a promise-chain
+    // catch never sees a sync throw, which would escape into the scheduler task
+    // and become the unsettled-run hole the never-rejects contract exists to
+    // close. The seam's type says Promise, but nothing stops an implementation
+    // from throwing before it returns one.
+    const errors: unknown[][] = [];
+    vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      errors.push(args);
+    });
+    const io: HeartbeatIo = {
+      writeFile: (() => {
+        throw new Error('sync boom');
+      }) as unknown as HeartbeatIo['writeFile'],
+      now: () => 7,
+    };
+
+    const ok = await writeHeartbeatFile('/x/heartbeat', io);
+
+    expect(ok).toBe(false);
+    expect(errors.length).toBe(1);
+    expect(errors[0][0]).toBe('[bot] heartbeat write to /x/heartbeat failed');
+  });
+
   it('defaults to a real node:fs write, and produces a file the freshness rule accepts', async () => {
     // The DEFAULT-path arm the bot's injection convention requires of every shell.
     // Driven end to end on a real temp file, because the two halves of this module
