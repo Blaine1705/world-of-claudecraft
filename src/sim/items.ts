@@ -58,7 +58,6 @@ import {
   type VendorBuyOptions,
   vendorCountForced,
 } from './vendor_buy_stack';
-import { vendorStackSize } from './vendor_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
 
@@ -752,18 +751,6 @@ export function buyItem(
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
-  // Count sanitize, before any state-changing branch: a present count must
-  // already be a legal integer request or the whole command is denied (Q20's
-  // toast-deny; never sell's silent swallow, and never coercion, which would
-  // charge for a quantity no legitimate client sent). Bulk wins on a crafted
-  // frame carrying both fields (the shipped verb's precedence, decided here
-  // once so all three hosts agree); the client never sends both.
-  const bulk = opts?.bulk === true;
-  const count = sanitizeBuyCount(bulk ? undefined : opts?.count);
-  if (count === null) {
-    ctx.error(meta.entityId, 'That item is not for sale.');
-    return;
-  }
   // Dead players (released ghosts included) cannot buy, matching the rest of
   // the vendor family (sellItem / sellAllJunk / buyBackItem below).
   if (p.dead) {
@@ -826,6 +813,22 @@ export function buyItem(
   // (Q20). The Q23 force-1 rows never multiply, and the totals are
   // overflow-guarded BEFORE the balance compares below so those compares can
   // never run on a non-safe integer.
+  //
+  // Sanitize sits AFTER the shared vendor gates, so a dead or out-of-range
+  // buyer hears the same refusal a legit frame gets, and the riding/mount
+  // delegations above stay pure force-1 (a count on them is simply ignored,
+  // never a second deny). A present count must already be a legal integer
+  // request or the whole command is denied (Q20's toast-deny; never sell's
+  // silent swallow, and never coercion, which would charge for a quantity no
+  // legitimate client sent). Bulk wins on a crafted frame carrying both
+  // fields (the shipped verb's precedence, decided here once so all three
+  // hosts agree); the client never sends both.
+  const bulk = opts?.bulk === true;
+  const count = sanitizeBuyCount(bulk ? undefined : opts?.count);
+  if (count === null) {
+    ctx.error(meta.entityId, 'That item is not for sale.');
+    return;
+  }
   const bulkEligible = bulk && hasCopperPrice && !hasHonorPrice && def.kind !== 'mount';
   let qty: number;
   let copperCost: number;

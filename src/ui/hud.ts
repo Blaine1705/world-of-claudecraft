@@ -13051,6 +13051,11 @@ export class Hud {
     // companion: NOT windowFocus, which would install a Tab trap and break
     // the vendor + bags cluster.
     this.vendorOpenerFocus = opener !== undefined ? opener : this.focusManager.activeFocusable();
+    // Re-entry backstop: opening a (second) vendor over a live custom-amount
+    // prompt must tear the prompt down first, or its stale onBuy closure
+    // still aims at the previous merchant and the window repaints under a
+    // held inert.
+    dismissBuyQuantityPrompts($('#vendor-window'));
     this.openVendorNpcId = npcId;
     this.vendorQtyMultiple = 1;
     document.body.classList.add('vendor-open');
@@ -13136,6 +13141,13 @@ export class Hud {
     // companion: NOT windowFocus, which would install a Tab trap and break
     // the vendor + bags cluster.
     this.vendorOpenerFocus = opener !== undefined ? opener : this.focusManager.activeFocusable();
+    // The marks shop takes the shared #vendor-window container WITHOUT going
+    // through closeVendor (openVendorNpcId is nulled directly above), so the
+    // copper vendor's custom-amount prompt backstop must run here too: without
+    // it the container repaints inert (unclickable, screen-reader invisible)
+    // under an orphaned aria-modal that keeps gating every game key, and the
+    // later closeVendor early-returns on its null guard without recovering.
+    dismissBuyQuantityPrompts($('#vendor-window'));
     this.openHeroicVendorNpcId = npcId;
     this.renderHeroicVendor();
   }

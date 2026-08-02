@@ -3709,10 +3709,20 @@ export class ClientWorld implements IWorld {
     // fields: bulk's two affordances and the count control row are separate
     // surfaces, and the server's bulk-wins precedence only ever decides
     // hand-crafted frames.
+    //
+    // Facet parity on a HOSTILE count (nothing in this client sends one; the
+    // control row emits 5/10 and the prompt floors at 1): a finite non-1
+    // value rides the wire as-is so the authoritative sanitize denies it
+    // with the same toast the offline Sim gives; a non-finite value cannot
+    // ride JSON at all (NaN/Infinity serialize to null and would silently
+    // buy 1), so it is dropped here, the one place it can be. Either way a
+    // hostile count never becomes a purchase in either world.
     if (opts?.bulk === true) {
       this.cmd({ cmd: 'buy', npc: npcId, item: itemId, bulk: true });
-    } else if (opts?.count !== undefined && opts.count > 1) {
-      this.cmd({ cmd: 'buy', npc: npcId, item: itemId, count: opts.count });
+    } else if (opts?.count !== undefined && opts.count !== 1) {
+      if (Number.isFinite(opts.count)) {
+        this.cmd({ cmd: 'buy', npc: npcId, item: itemId, count: opts.count });
+      }
     } else {
       this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
     }

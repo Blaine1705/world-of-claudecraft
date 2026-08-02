@@ -614,18 +614,38 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     }
   });
 
-  it('buyItem denies a safe-integer magnitude attack at the overflow guard, before any compare', () => {
+  it('buyItem denies a safe-integer magnitude attack with the money toast, minting nothing', () => {
     const sim = makeWorld();
     const { pid, wilkes, meta } = vendorPlayer(sim);
     // 1e15 passes sanitize (a safe integer), then 25c x 5e15 units overflows
     // the safe range and the totals guard refuses with the money toast: no
-    // mint, no overflowed compare, no grant past capacity.
+    // mint, no grant. This arm alone cannot distinguish the guard from the
+    // plain balance compare (both answer the same toast here); the DECISIVE
+    // guard arm is the free-vendor units overflow in
+    // tests/ptr_dev_vendor.test.ts, where the two paths answer differently.
     meta.copper = 1_000;
     sim.drainEvents();
     items.buyItem(ctxOf(sim), wilkes.id, 'baked_bread', pid, { count: 1e15 });
     expect(errorTexts(sim.drainEvents())).toContain('Not enough money.');
     expect(sim.countItem('baked_bread', pid)).toBe(0);
     expect(meta.copper).toBe(1_000);
+  });
+
+  it('buyItem count on a non-stacking row buys N copies into N slots (the row-unit model)', () => {
+    // Q23's settled model is row-unit purchases with an enumerated force-1
+    // set (honor, soulbound, mount, riding); stackability is NOT in it, so a
+    // 3x handaxe click is 3 one-unit purchases, unlike the bulk verb, which
+    // deliberately requires a stacking row. Pinned so the choice is explicit
+    // behavior, not an accident; whether non-stackables should join force-1
+    // is recorded as an open maintainer item in the phase 21 build record.
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    meta.copper = 100;
+    items.buyItem(ctxOf(sim), wilkes.id, 'handaxe', pid, { count: 3 });
+    expect(sim.countItem('handaxe', pid)).toBe(3);
+    // Three one-per-slot copies, not one stack of three.
+    expect(meta.inventory.filter((s) => s.itemId === 'handaxe').length).toBe(3);
+    expect(meta.copper).toBe(100 - 3 * 20);
   });
 
   it('buyItem bulk wins over count on a crafted frame carrying both (the shipped verb)', () => {
@@ -729,7 +749,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     expect(meta.vendorBuyback[0]?.count).toBe(4);
   });
 
-  it('buyItem count drive is deterministic: two same-seed sims land identical state', () => {
+  it('buyItem count drive lands identical state across two same-seed sims (stability smoke)', () => {
     const run = () => {
       const sim = makeWorld();
       const { pid, wilkes, meta } = vendorPlayer(sim);

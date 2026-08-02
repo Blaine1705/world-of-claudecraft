@@ -157,9 +157,9 @@ export function renderVendorWindow(
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'vendor-qty-btn';
-      const selected = view.multiple === m;
-      btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
-      if (selected) btn.classList.add('vendor-qty-selected');
+      // The selected state rides aria-pressed alone; the stylesheet keys off
+      // the attribute so style and semantics cannot drift apart.
+      btn.setAttribute('aria-pressed', view.multiple === m ? 'true' : 'false');
       if (m === 'custom') {
         btn.textContent = t('itemUi.vendor.qtyCustom');
         btn.setAttribute('aria-label', t('itemUi.vendor.qtyCustomAria'));

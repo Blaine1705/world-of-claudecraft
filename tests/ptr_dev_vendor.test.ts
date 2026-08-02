@@ -83,6 +83,40 @@ describe('ptr dev vendor', () => {
     expect(sim.countItem(epic)).toBe(3);
   });
 
+  it('the units overflow guard denies BEFORE the capacity check (the decisive free-vendor arm)', () => {
+    // The one place the guard and the unguarded flow answer DIFFERENTLY: on a
+    // free stacking row, copper is 0 at any count, so a units product past
+    // safe-integer range is refused by the totals guard with the money toast,
+    // while the unguarded flow would sail through both balance compares and
+    // answer 'Your bags are full.' from canAddItem instead. The paid-path
+    // magnitude arm in tests/items.test.ts cannot make this distinction.
+    const sim = new Sim({ seed: 5, playerClass: 'warrior', autoEquip: false, devCommands: true });
+    sim.setPlayerLevel(20);
+    sim.chat('/dev vendor');
+    sim.tick();
+    const vendor = [...sim.entities.values()].find(
+      (e: Entity) => e.kind === 'npc' && (e as { devVendor?: boolean }).devVendor,
+    )!;
+    // A stacking (food) row on the free vendor: 2e15 purchases of the 5-unit
+    // stack is 1e16 units, past 2 ** 53 - 1, while 2e15 itself sanitizes fine.
+    vendor.vendorItems.push('baked_bread');
+    const rig = sim as unknown as {
+      buyItem(npc: number, item: string, opts?: { count?: number }, pid?: number): void;
+    };
+    // The starting kit already carries bread, so the no-grant claim is a
+    // delta, not an absolute count.
+    const breadBefore = sim.countItem('baked_bread');
+    sim.drainEvents();
+    rig.buyItem(vendor.id, 'baked_bread', { count: 2e15 }, sim.playerId);
+    const errors = sim
+      .drainEvents()
+      .map((e) => ('text' in e && e.type === 'error' ? e.text : null))
+      .filter((t): t is string => t !== null);
+    expect(errors).toContain('Not enough money.');
+    expect(errors).not.toContain('Your bags are full.');
+    expect(sim.countItem('baked_bread')).toBe(breadBefore);
+  });
+
   it('is inert on a production realm: /dev vendor does nothing without devCommands', () => {
     const sim = new Sim({ seed: 5, playerClass: 'warrior', autoEquip: true, devCommands: false });
     sim.setPlayerLevel(20);

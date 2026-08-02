@@ -866,6 +866,47 @@ describe('economy telemetry counters at their emission sites', () => {
     server.stop();
   });
 
+  it('books a count purchase as ONE whole-count spend; a non-number count degrades to one unit', () => {
+    // The phase 21 telemetry claim, driven through the REAL dispatch: a
+    // count-N frame books one larger vendor delta with zero telemetry
+    // change, and the dispatch drops a non-number count the way sell's
+    // does (the typeof filter), degrading to the ordinary single purchase
+    // rather than a deny. This is also the one runtime pin on the buy arm's
+    // count forwarding, complementing the source pins in
+    // tests/vendor_buy_count.test.ts.
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+    const meta = server.sim.meta(session.pid) as unknown as Record<string, any>;
+    placeOnNpc(server, session.pid, 'trader_wilkes');
+    meta.copper = 500;
+    const npcId = [...(server.sim as unknown as Record<string, any>).entities.values()].find(
+      (e: any) => e.templateId === 'trader_wilkes',
+    ).id;
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'buy', npc: npcId, item: 'copper_mining_pick', count: 3 }),
+    );
+    const paidTriple = 500 - (meta.copper as number);
+    expect(paidTriple).toBe(3 * (ITEMS.copper_mining_pick.buyValue as number));
+    expect(rec.spent).toEqual([['vendor', paidTriple]]);
+
+    meta.copper = 500;
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'buy', npc: npcId, item: 'copper_mining_pick', count: '5' }),
+    );
+    const paidSingle = 500 - (meta.copper as number);
+    expect(paidSingle).toBe(ITEMS.copper_mining_pick.buyValue);
+    expect(rec.spent).toEqual([
+      ['vendor', paidTriple],
+      ['vendor', paidSingle],
+    ]);
+    server.stop();
+  });
+
   it('books nothing at all when a command moves no copper', () => {
     const server = new GameServer();
     const rec = recordingSink();

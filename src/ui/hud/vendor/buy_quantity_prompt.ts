@@ -15,6 +15,7 @@
 import type { ItemDef } from '../../../sim/types';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
+import { restoreFirstEnabled } from '../../focus_restore';
 import { formatNumber, t } from '../../i18n';
 import { installPromptDialog } from '../../prompt_dialog';
 
@@ -71,17 +72,47 @@ export function showBuyQuantityPrompt(
     inertRoot: vendorRoot,
     idPrefix: 'vendor-prompt-title',
   });
+  // Focus landing net for EVERY teardown path. The window's own restore
+  // ladder cannot help here: it only runs when the pre-rebuild focus was
+  // INSIDE the window (focusedWithin), and this prompt's focus lives in
+  // #prompt-stack. And the recipe's opener return can silently no-op: any
+  // renderVendor while the prompt is open (an inventory delta, a party
+  // loot) detaches the captured row, and focusing a detached node does
+  // nothing. When the recipe's return already landed inside the window,
+  // this is a no-op; otherwise it re-lands by the opener's focus KEY on
+  // the rebuilt DOM, then the always-present close (the bank prompt's
+  // land-on-[data-close] precedent, keyed instead of hardcoded).
+  const openerKey = opener?.dataset.focusKey;
+  const landFocus = () => {
+    const active = document.activeElement;
+    if (active instanceof HTMLElement && active.isConnected && vendorRoot.contains(active)) return;
+    const keyed = [...vendorRoot.querySelectorAll<HTMLElement>('[data-focus-key]')];
+    restoreFirstEnabled([
+      openerKey ? keyed.find((b) => b.dataset.focusKey === openerKey) : undefined,
+      keyed.find((b) => b.dataset.focusKey === 'close'),
+    ]);
+  };
   const submit = () => {
     const count = Math.max(1, Math.min(cap, Math.floor(Number(input.value) || 0)));
     dismiss();
     // Submit AFTER dismiss: onBuy rebuilds the vendor window, and the rebuild
     // must not run under a still-inert root. The buy replaces the opener row
-    // node, so the focus restore is the window's own focus-key ladder, not a
-    // stale-node focus here (cancel and Escape return via dismissAndReturn).
+    // node, so the landing net below re-finds it by key on the fresh DOM.
     onSubmit(count);
+    landFocus();
   };
   confirm.addEventListener('click', submit);
-  cancel.addEventListener('click', dismissAndReturn);
+  cancel.addEventListener('click', () => {
+    dismissAndReturn();
+    landFocus();
+  });
+  // Registered AFTER installPromptDialog's own keydown listener on the same
+  // element, so the recipe's Escape teardown (dismissAndReturn) has already
+  // run when this fires; stopPropagation does not stop same-element
+  // listeners, only the bubble.
+  prompt.addEventListener('keydown', (e) => {
+    if ((e as KeyboardEvent).key === 'Escape') landFocus();
+  });
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') submit();
   });

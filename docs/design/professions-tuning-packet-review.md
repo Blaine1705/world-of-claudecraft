@@ -4515,14 +4515,50 @@ reconciliation item 3; the control-row selection resets to 1x on every
 vendor open (least surprise across shop visits); and the count chip
 reuses the bags stackCount key rather than minting a new one.
 
+Build-session review round: a fresh coverage reviewer over the whole
+diff returned one blocking finding (the UI-module classification gate,
+already fixed mid-gate when the full suite surfaced it), seven
+should-fix, and nine nits; ALL were applied or explicitly judged. The
+substantive fixes: a focus landing net on every custom-prompt teardown
+path (the window ladder cannot see focus that lives in #prompt-stack,
+and an inventory-delta rebuild detaches the captured opener, so the
+net re-lands by focus KEY with the close button as the last rung); the
+prompt backstop now also runs on openVendor re-entry and on the marks
+shop taking over the shared container (which bypasses closeVendor and
+would otherwise strand the window inert under an orphaned aria-modal);
+the ClientWorld sender forwards finite hostile counts so the
+authoritative sanitize denies them with the same toast offline gives,
+and drops only non-finite values (JSON would serialize them to null
+and silently buy one), pinned; the sim's count sanitize moved below
+the shared vendor gates so dead/range refusals keep their order and
+the riding/mount delegations stay pure force-1; the items-level
+overflow test was joined by the DECISIVE free-vendor units arm (the
+one flow where guard and no-guard answer different toasts); a runtime
+dispatch arm in the telemetry suite pins the one-delta count spend and
+the non-number-count degrade; and the dead vendorStackSize import and
+the unused vendor-qty-selected class were removed. Judged with the
+file open rather than fixed: non-stackable rows STAY countable, now
+pinned as explicit behavior (Q23's settled row-unit model enumerates
+force-1 and has no stackability carve-out; whether tools/bags/rods
+should join force-1 is a NEW open maintainer item, since a 10x
+mis-click on a no-confirm counter spends tenfold); the determinism
+smoke was retitled to its honest claim; the control row still renders
+on an all-force-1 (pure honor) counter, a cosmetic follow-up; the
+food-row double x5 (units per purchase beside purchases) is flagged to
+the Q23 wording owner; the shot target's when-list deliberately omits
+styles paths (a components.css substring would over-trigger on every
+unrelated CSS change); and the fractional-buyValue rejection is latent
+only (no content item carries one).
+
 Recorded, not fixed (carried forward): the positional slot-ladder
 fallback still skews by one button when a bulk tile appears or
 vanishes mid-session (the phase 20 entry-sync record; the control row
 sits outside the goods grid, so the qty buttons restore by exact key
 and do not add to that skew); the bulk cap's bag-fit blindness and the
 Q19 convergence question stay the maintainer's (reconciliation item
-5); the Q21 redundancy (a 5x control beside a Buy Stack tile) and the
-Q23 one-model re-rule stay open maintainer items (items 6 and 7).
+5); the Q21 redundancy (a 5x control beside a Buy Stack tile), the
+Q23 one-model re-rule, and the new non-stackable force-1 question stay
+open maintainer items.
 
 ---
 

@@ -57,6 +57,25 @@ describe('ClientWorld.buyItem count/bulk wire form (sender)', () => {
     expect('count' in sent[1]).toBe(false);
     expect('count' in sent[2]).toBe(false);
   });
+
+  it('a hostile count never becomes a purchase in either world (facet parity)', () => {
+    const { client, sent } = rig();
+    // Finite hostiles ride the wire as-is so the authoritative sanitize
+    // denies them with the same toast the offline Sim gives...
+    client.buyItem(7, 'baked_bread', { count: 0 });
+    client.buyItem(7, 'baked_bread', { count: -3 });
+    client.buyItem(7, 'baked_bread', { count: 2.5 });
+    expect(sent).toEqual([
+      { cmd: 'buy', npc: 7, item: 'baked_bread', count: 0 },
+      { cmd: 'buy', npc: 7, item: 'baked_bread', count: -3 },
+      { cmd: 'buy', npc: 7, item: 'baked_bread', count: 2.5 },
+    ]);
+    // ...while a non-finite value would serialize to null and silently buy 1,
+    // so the sender drops the command entirely, the one place it can.
+    client.buyItem(7, 'baked_bread', { count: Number.NaN });
+    client.buyItem(7, 'baked_bread', { count: Number.POSITIVE_INFINITY });
+    expect(sent).toHaveLength(3);
+  });
 });
 
 describe('count stays a plain-vendor verb (Q17/Q18 exclusion pins)', () => {
