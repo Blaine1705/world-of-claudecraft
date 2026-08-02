@@ -154,6 +154,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.doomMeterLock': '고통 자원 막대 고정',
   'hudChrome.warlock.doomEmptyStatus': '단죄 {value}/{max}.',
   'hudChrome.warlock.doomStatus': '단죄 {value}/{max}, 남은 시간 {remaining}.',
+  'hudChrome.warlock.fateThreadsStatus': '운명의 실타래 {value}/{max}.',
+  'hudChrome.warlock.fateThreadsConsumeReady':
+    '운명의 실타래 3개: 집어삼키기로 추가 단죄를 자아낼 수 있습니다.',
+  'hudChrome.warlock.fateThreadsSentenceReady':
+    '운명의 실타래 3개: 선고로 소모하면 피해가 18% 증가합니다.',
+  'hudChrome.procOverlay.ruinStatus': '파멸 {value}/{max}',
   'hudChrome.procOverlay.soulFragmentsMeter': '영혼 조각',
   'guide.abilityHook.evil_eye': '적 하나를 지정해 그 행동과 고통으로 단죄를 축적합니다.',
   'entities.abilities.evil_eye.description':
@@ -176,6 +182,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.umbral_anchor.name': '암영 닻',
   'entities.abilities.umbral_anchor.description':
     '처음 사용하면 발밑에 5분 동안 암영 닻을 설치합니다. 40미터 안에서 다시 사용하면 닻으로 돌아가며, 닻을 소모하고 45초의 재사용 대기시간이 시작됩니다.',
+  'entities.abilities.soulwell.name': '영혼샘',
+  'entities.abilities.soulwell.description':
+    '영혼샘을 3분 동안 소환합니다. 전투 중이 아니면 파티원이 영혼석을 3개까지 채울 수 있습니다. 영혼석은 최대 생명력의 25%를 회복하며 물약과 재사용 대기시간을 공유합니다.',
   'entities.abilities.hex_of_violence.name': '폭력의 주술',
   'entities.abilities.hex_of_violence.description':
     '적을 8초 동안 저주합니다. 대상의 다음 3회 공격 행동은 각각 단죄를 7 생성하고 22의 암흑 피해를 되돌려 받습니다.',
@@ -198,6 +207,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.soul_harvest.name': '정수 수확',
   'entities.abilities.soul_harvest.description':
     '적의 영혼을 찢어 {damage}의 암흑 피해를 입히고 영혼 조각 1개를 생성합니다. 최대 5개.',
+  'entities.abilities.soul_lance.name': '영혼 창',
+  'entities.abilities.soul_lance.description':
+    '유령의 창을 던져 {damage}의 암흑 피해를 입힙니다. 자신의 납골 표식이 있는 대상에게는 그 피해의 50%가 표식에 더해집니다.',
   'entities.abilities.raise_graveguard.name': '무덤수호병 일으키기',
   'entities.abilities.raise_graveguard.description':
     '영구적인 방어형 동료를 일으킵니다. 무덤수호병은 자동으로 도발하고 무덤 지배로 당신이 받는 피해의 20%를 대신 받으며, 수확 명령 시 도발하고 4초 동안 받는 피해가 30% 감소합니다.',
@@ -216,6 +228,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.funeral_harvest.name': '장송 수확',
   'entities.abilities.funeral_harvest.description':
     '자신이나 자신의 언데드가 최근 피해를 준 적이 죽으면 영혼 조각 1개를 얻습니다. 3초에 한 번만 발동합니다.',
+  'entities.abilities.ossuary_mark.name': '납골 표식',
+  'entities.abilities.ossuary_mark.description':
+    '적에게 12초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6미터 안에서 폭발하고 영혼 조각 1개를 생성합니다.',
   'entities.abilities.unholy_command.name': '부정한 명령',
   'entities.abilities.unholy_command.description':
     '모든 언데드에게 명령해 12초 동안 공격력을 25%, 행동 속도를 20% 증가시킵니다.',
@@ -360,7 +375,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blink.name': '섬광걸음',
   'entities.abilities.bloodlust.name': '전쟁 북',
   'entities.abilities.chain_lightning.name': '하늘가지',
+  'entities.abilities.abyssal_rift.name': '심연의 균열',
+  'entities.abilities.abyssal_rift.description':
+    '지정한 위치에 균열을 열어 8미터 안의 적을 중심으로 끌어당기고 {damage}의 암흑 피해를 입히며 2초 동안 기절시킵니다. 우두머리는 피해를 받지만 끌어당김과 기절에는 저항합니다.',
   'entities.abilities.chaos_bolt.name': '파멸 화살',
+  'entities.abilities.dark_pact.name': '피의 서약',
+  'entities.abilities.dark_pact.description':
+    '현재 생명력의 10%를 희생해 8초 동안 최대 생명력의 30%에 해당하는 피해를 흡수합니다.',
   'entities.abilities.cloak_of_shadows.name': '그림자망토',
   'entities.abilities.cone_of_cold.name': '서리휩쓸기',
   'entities.abilities.curse_of_exhaustion.name': '납빛 저주',
@@ -418,6 +439,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thieves_chorus.name': '도적의 합창',
   'entities.abilities.thieves_chorus.description':
     '휘파람 신호가 파티를 고무시켜 10초 동안 공격, 시전, 정신 집중 속도를 10% 증가시킵니다. 최근 파티 가속 효과를 받은 아군은 너무 지쳐 효과를 받을 수 없습니다. (도적 특성)',
+  'entities.abilities.sacrilegious_march.name': '신성모독 행군',
+  'entities.abilities.sacrilegious_march.description':
+    '이동 속도가 35% 증가하지만 매초 최대 생명력의 2%를 잃습니다. 다시 시전하면 해제됩니다. 생명력이 20%가 되면 자동으로 꺼집니다.',
   'entities.abilities.spellsteal.name': '마법 훔치기',
   'entities.abilities.spellsteal.description':
     '적의 이로운 마법 효과 하나를 훔쳐 자신에게 옮깁니다.',
@@ -2607,6 +2631,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useFishing': '사용: 가까운 물가에서 낚시합니다.',
   'itemUi.tooltip.useHealingPotion':
     '사용: 즉시 생명력을 {amount} 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.',
+  'itemUi.tooltip.useHealingPotionPct':
+    '사용: 즉시 최대 생명력의 {percent}%를 회복합니다. 전투 중 사용 가능. 재사용 대기시간 2분.',
   'itemUi.tooltip.useManaPotion':
     '사용: 즉시 마나를 {amount} 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.',
   'itemUi.tooltip.clickUseInstant': '클릭하여 전투 중 즉시 사용',
@@ -3147,6 +3173,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.name': '황혼불꽃',
   'entities.abilities.shadowburn.description':
     '즉시 대상에게 타오르는 어둠을 폭발시켜 {damage}의 암흑 피해를 입힙니다.',
+  'entities.abilities.ruinous_brand.name': '파멸의 낙인',
+  'entities.abilities.ruinous_brand.description':
+    '적에게 15초 동안 낙인을 새깁니다. 다음 3회의 직접 주문은 낙인이 새겨진 적에게 25%의 피해로 메아리치며, 다른 대상에게 시전하면 그 피해의 50%를 낙인이 새겨진 적에게도 입힙니다.',
   'entities.abilities.wrath.name': '야생 벼락',
   'entities.abilities.wrath.description':
     '자연 에너지의 화살을 던져 {damage}의 자연 피해를 입힙니다.',
@@ -9813,6 +9842,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.waterJetTitle': '물 분사',
   'hud.pet.waterJetDesc':
     '물의 정령에게 3초 동안 적을 느리게 하는 물줄기를 집중하도록 명령합니다. 재사용 대기시간은 8초입니다. 우클릭하면 사용 가능할 때마다 자동 시전합니다.',
+  'hud.pet.felbolt': '지옥불 화살',
+  'hud.pet.felboltTitle': '지옥불 화살',
+  'hud.pet.felboltDesc':
+    '불씨족에게 당신의 대상을 향해 지옥불 투사체를 하나 더 발사하도록 명령합니다. 재사용 대기시간은 8초입니다. 우클릭하거나 길게 누르거나 Shift+Enter를 누르면 자동 시전을 전환합니다.',
+  'hud.pet.abyssalChain': '심연의 사슬',
+  'hud.pet.abyssalChainTitle': '심연의 사슬',
+  'hud.pet.abyssalChainDesc':
+    '어스름망령에게 8미터보다 멀고 20미터 이내에 있는 일반 적을 자신에게 끌어오도록 명령합니다. 우두머리는 끌어올 수 없습니다. 재사용 대기시간은 15초입니다. 우클릭하거나 길게 누르거나 Shift+Enter를 누르면 자동 시전을 전환합니다.',
+  'hud.pet.autocastOn': '자동 시전 켜짐. 우클릭하거나 길게 누르거나 Shift+Enter를 누르면 끕니다.',
+  'hud.pet.autocastOff': '자동 시전 꺼짐. 우클릭하거나 길게 누르거나 Shift+Enter를 누르면 켭니다.',
   'entities.abilities.ice_lance.name': '얼음창',
   'entities.abilities.ice_lance.description':
     '얼음창을 던져 {damage}의 냉기 피해를 입힙니다. 얼어붙은 대상에게는 피해가 세 배로 증가합니다. 서리의 손가락 또는 혹한의 추위 한 충전을 소모하면 대상을 얼어붙은 것으로 간주합니다. (냉기)',
@@ -9863,6 +9902,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 순수한 비전 마력을 흘려보내 {damage}의 피해를 입힙니다. 시전할 때마다 비전 충전이 남아 다음 에테르 쇄도의 피해와 시전 속도가 증가하지만(충전당 5% 빨라짐), 마나 소모량도 크게 증가합니다. 최대 4회 중첩됩니다. 에테르 화살은 충전을 소모합니다. 또한 시전할 때 에테르 질주가 준비되어 다음 에테르 쇄도의 마나 소모가 사라지고 시전 속도가 두 배가 될 수 있습니다.',
   'entities.items.conjured_bread4.name': '창조된 연회빵',
   'entities.items.conjured_water4.name': '창조된 샘물',
+  'entities.items.soul_stone.name': '영혼석',
   'entities.abilities.blazing_barrier.name': '이글거리는 방벽',
   'entities.abilities.blazing_barrier.description':
     '자신을 불길로 감싸 {damage}의 피해를 흡수합니다. 60초 동안 지속됩니다. (화염)',

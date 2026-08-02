@@ -160,6 +160,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.doomMeterLock': 'Закрепить шкалу ресурсов Колдовства',
   'hudChrome.warlock.doomEmptyStatus': 'Осуждение: {value} из {max}.',
   'hudChrome.warlock.doomStatus': 'Осуждение: {value} из {max}; осталось {remaining}.',
+  'hudChrome.warlock.fateThreadsStatus': 'Нити судьбы: {value} из {max}.',
+  'hudChrome.warlock.fateThreadsConsumeReady':
+    'Три Нити судьбы: «Поглощение» может сплести их в дополнительное Осуждение.',
+  'hudChrome.warlock.fateThreadsSentenceReady':
+    'Три Нити судьбы: «Приговор» может израсходовать их ради 18% дополнительного урона.',
+  'hudChrome.procOverlay.ruinStatus': 'Гибель: {value} из {max}',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Осколки душ',
   'guide.abilityHook.evil_eye':
     'Отмечает врага, чьи действия и страдания будут накапливать ваше Осуждение.',
@@ -183,6 +189,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.umbral_anchor.name': 'Сумрачный якорь',
   'entities.abilities.umbral_anchor.description':
     'Первое применение устанавливает у ваших ног теневой якорь на 5 мин. Повторное применение в пределах 40 м возвращает к нему, расходует якорь и запускает восстановление на 45 сек.',
+  'entities.abilities.soulwell.name': 'Колодец душ',
+  'entities.abilities.soulwell.description':
+    'Призывает Колодец душ на 3 мин. Вне боя участники группы могут пополнить свои Камни души до 3 штук. Камень души восстанавливает 25% максимального здоровья и имеет общее восстановление с зельями.',
   'entities.abilities.hex_of_violence.name': 'Проклятие насилия',
   'entities.abilities.hex_of_violence.description':
     'Проклинает врага на 8 сек. Следующие 3 наносящих урон действия цели создают по 7 ед. Осуждения и наносят ей 22 ед. урона от Тьмы.',
@@ -205,6 +214,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.soul_harvest.name': 'Жатва сущности',
   'entities.abilities.soul_harvest.description':
     'Терзает душу противника, нанося {damage} ед. урона от темной магии, и создает 1 осколок души, максимум 5.',
+  'entities.abilities.soul_lance.name': 'Копьё душ',
+  'entities.abilities.soul_lance.description':
+    'Метает призрачное копьё, нанося {damage} ед. урона от темной магии. По цели с вашей Меткой оссуария 50% этого урона добавляется к метке.',
   'entities.abilities.raise_graveguard.name': 'Поднять могильного стража',
   'entities.abilities.raise_graveguard.description':
     'Поднимает постоянного защитного спутника. Могильный страж автоматически провоцирует врагов и принимает 20% вашего урона благодаря Власти могил. Команда жатвы заставляет его провоцировать и на 4 сек. снижает получаемый им урон на 30%.',
@@ -223,6 +235,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.funeral_harvest.name': 'Погребальная жатва',
   'entities.abilities.funeral_harvest.description':
     'Когда погибает противник, которому недавно нанесли урон вы или ваши мертвецы, вы получаете 1 осколок души. Эффект срабатывает не чаще раза в 3 сек.',
+  'entities.abilities.ossuary_mark.name': 'Метка оссуария',
+  'entities.abilities.ossuary_mark.description':
+    'Отмечает противника на 12 сек., накапливая 20% урона, нанесённого вами и вашими мертвецами. Повторное применение подрывает метку. Если отмеченный противник погибает, она взрывается в радиусе 6 м и создаёт 1 осколок души.',
   'entities.abilities.unholy_command.name': 'Нечестивый приказ',
   'entities.abilities.unholy_command.description':
     'Приказывает всем вашим мертвецам наносить на 25% больше урона и действовать на 20% быстрее в течение 12 сек.',
@@ -365,7 +380,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blink.name': 'Мерцающий шаг',
   'entities.abilities.bloodlust.name': 'Боевые барабаны',
   'entities.abilities.chain_lightning.name': 'Небесная ветвь',
+  'entities.abilities.abyssal_rift.name': 'Бездонный разлом',
+  'entities.abilities.abyssal_rift.description':
+    'Разрывает пространство в выбранной точке, притягивая противников в радиусе 8 м к её центру, нанося {damage} ед. урона от Тьмы и оглушая их на 2 сек. Боссы получают урон, но сопротивляются притяжению и оглушению.',
   'entities.abilities.chaos_bolt.name': 'Стрела погибели',
+  'entities.abilities.dark_pact.name': 'Кровавый завет',
+  'entities.abilities.dark_pact.description':
+    'Жертвует 10% текущего здоровья и на 8 сек. поглощает урон в размере 30% максимального здоровья.',
   'entities.abilities.cloak_of_shadows.name': 'Плащ теней',
   'entities.abilities.cone_of_cold.name': 'Ледяной взмах',
   'entities.abilities.curse_of_exhaustion.name': 'Свинцовое проклятие',
@@ -421,6 +442,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thieves_chorus.name': 'Хор воров',
   'entities.abilities.thieves_chorus.description':
     'Условный свист подстегивает вашу группу, увеличивая скорость атаки, произнесения заклинаний и поддержания на 10% на 10 сек. Союзники, недавно получившие групповое ускорение, слишком истощены, чтобы получить эффект. (талант разбойника)',
+  'entities.abilities.sacrilegious_march.name': 'Кощунственный марш',
+  'entities.abilities.sacrilegious_march.description':
+    'Повышает скорость передвижения на 35%, но каждую секунду отнимает 2% максимального здоровья. Повторное применение отменяет эффект. При 20% здоровья он отключается.',
   'entities.abilities.spellsteal.name': 'Похищение чар',
   'entities.abilities.spellsteal.description':
     'Похищает один положительный магический эффект у противника и переносит его на вас.',
@@ -2656,6 +2680,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useFishing': 'Использование: ловите рыбу в ближайшей воде.',
   'itemUi.tooltip.useHealingPotion':
     'Использование: мгновенно восстанавливает {amount} здоровья. Можно использовать в бою. Восстановление 1 мин.',
+  'itemUi.tooltip.useHealingPotionPct':
+    'Использование: мгновенно восстанавливает {percent}% максимального здоровья. Можно использовать в бою. Восстановление 2 мин.',
   'itemUi.tooltip.useManaPotion':
     'Использование: мгновенно восстанавливает {amount} маны. Можно использовать в бою. Восстановление 1 мин.',
   'itemUi.tooltip.clickUseInstant': 'Нажмите, чтобы мгновенно использовать в бою',
@@ -3200,6 +3226,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.name': 'Сумеречный огонь',
   'entities.abilities.shadowburn.description':
     'Мгновенно поражает цель жгучей тьмой, нанося {damage} ед. урона от тёмной магии.',
+  'entities.abilities.ruinous_brand.name': 'Губительное клеймо',
+  'entities.abilities.ruinous_brand.description':
+    'Ставит клеймо на противника на 15 сек. Ваши следующие 3 прямых заклинания повторяются по заклеймённому противнику с 25% урона, а при применении по другой цели переносят на него 50% урона.',
   'entities.abilities.wrath.name': 'Дикая стрела',
   'entities.abilities.wrath.description':
     'Метает сгусток природной энергии, нанося {damage} ед. урона от сил природы.',
@@ -9971,6 +10000,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.pet.waterJetTitle': 'Струя воды',
   'hud.pet.waterJetDesc':
     'Приказывает элементалю воды в течение 3 сек. поддерживать замедляющий поток. Восстановление: 8 сек. Щёлкните правой кнопкой, чтобы он применял способность автоматически, когда она готова.',
+  'hud.pet.felbolt': 'Стрела Скверны',
+  'hud.pet.felboltTitle': 'Стрела Скверны',
+  'hud.pet.felboltDesc':
+    'Приказывает Угольку выпустить по вашей цели дополнительный снаряд Скверны. Восстановление: 8 сек. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы переключить автоприменение.',
+  'hud.pet.abyssalChain': 'Цепь бездны',
+  'hud.pet.abyssalChainTitle': 'Цепь бездны',
+  'hud.pet.abyssalChainDesc':
+    'Приказывает Мрачной тени притянуть к себе обычного противника, находящегося дальше 8 и не далее 20 м. Боссов притянуть нельзя. Восстановление: 15 сек. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы переключить автоприменение.',
+  'hud.pet.autocastOn':
+    'Автоприменение включено. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы выключить его.',
+  'hud.pet.autocastOff':
+    'Автоприменение выключено. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы включить его.',
   'entities.abilities.ice_lance.name': 'Ледяное копьё',
   'entities.abilities.ice_lance.description':
     'Бросает ледяное копьё, наносящее {damage} ед. урона от магии льда, втрое больше по замороженной цели. Расходует «Ледяные пальцы» или заряд «Зимней стужи», чтобы считать цель замороженной. (ветка «Лёд»)',
@@ -10021,6 +10062,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Направляет в противника поток чистой тайной энергии, нанося {damage} ед. урона. Каждое применение оставляет чародейский заряд, повышающий урон и скорость произнесения следующего «Эфирного всплеска» (на 5% за заряд), но резко увеличивающий расход маны. Суммируется до 4 раз; «Эфирные стрелы» расходуют заряды. Применение также может подготовить «Эфирный рывок», и следующий «Эфирный всплеск» не потребует маны и будет произнесён вдвое быстрее.',
   'entities.items.conjured_bread4.name': 'Сотворённый хлеб для пира',
   'entities.items.conjured_water4.name': 'Сотворённая родниковая вода',
+  'entities.items.soul_stone.name': 'Камень души',
   'entities.abilities.blazing_barrier.name': 'Пылающая преграда',
   'entities.abilities.blazing_barrier.description':
     'Окутывает вас пламенем, поглощая {damage} ед. урона в течение 60 сек. (ветка «Огонь»)',

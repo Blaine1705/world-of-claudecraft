@@ -328,14 +328,14 @@ export const ru_RU: EnTranslations = {
       "doomMeterLock": "Закрепить шкалу ресурсов Колдовства",
       "doomEmptyStatus": "Осуждение: {value} из {max}.",
       "doomStatus": "Осуждение: {value} из {max}; осталось {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Fate Threads.",
-      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
-      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+      "fateThreadsStatus": "Нити судьбы: {value} из {max}.",
+      "fateThreadsConsumeReady": "Три Нити судьбы: «Поглощение» может сплести их в дополнительное Осуждение.",
+      "fateThreadsSentenceReady": "Три Нити судьбы: «Приговор» может израсходовать их ради 18% дополнительного урона."
     },
     "procOverlay": {
       "soulFragmentsMeter": "Осколки душ",
       "ruinMeter": "Ruin",
-      "ruinStatus": "{value} of {max} Ruin"
+      "ruinStatus": "Гибель: {value} из {max}"
     },
     "spectate": {
       "banner": "Наблюдение за {name}"
@@ -6769,10 +6769,10 @@ export const ru_RU: EnTranslations = {
     "pet": {
       "attack": "Атаковать",
       "waterJet": "Струя воды",
-      "felbolt": "Felbolt",
-      "abyssalChain": "Abyssal Chain",
-      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
-      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
+      "felbolt": "Стрела Скверны",
+      "abyssalChain": "Цепь бездны",
+      "autocastOn": "Автоприменение включено. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы выключить его.",
+      "autocastOff": "Автоприменение выключено. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы включить его.",
       "taunt": "Провокация",
       "healDemon": "Исцелить демона",
       "healPet": "Исцелить питомца",
@@ -6783,10 +6783,10 @@ export const ru_RU: EnTranslations = {
       "petAttackDesc": "Прикажите питомцу атаковать вашу текущую враждебную цель.",
       "waterJetTitle": "Струя воды",
       "waterJetDesc": "Приказывает элементалю воды в течение 3 сек. поддерживать замедляющий поток. Восстановление: 8 сек. Щёлкните правой кнопкой, чтобы он применял способность автоматически, когда она готова.",
-      "felboltTitle": "Felbolt",
-      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
-      "abyssalChainTitle": "Abyssal Chain",
-      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "felboltTitle": "Стрела Скверны",
+      "felboltDesc": "Приказывает Угольку выпустить по вашей цели дополнительный снаряд Скверны. Восстановление: 8 сек. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы переключить автоприменение.",
+      "abyssalChainTitle": "Цепь бездны",
+      "abyssalChainDesc": "Приказывает Мрачной тени притянуть к себе обычного противника, находящегося дальше 8 и не далее 20 м. Боссов притянуть нельзя. Восстановление: 15 сек. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы переключить автоприменение.",
       "petTauntTitle": "Провокация питомца",
       "petTauntDesc": "Прикажите питомцу вступить в бой и применить Рык в радиусе действия. Восстановление 10 секунд.",
       "healDemonDesc": "Потратьте ману, чтобы направлять исцеление в демона 5 секунд.",
@@ -7152,7 +7152,7 @@ export const ru_RU: EnTranslations = {
       "clickDestroy": "Нажмите, чтобы уничтожить",
       "useFishing": "Использование: ловите рыбу в ближайшей воде.",
       "useHealingPotion": "Использование: мгновенно восстанавливает {amount} здоровья. Можно использовать в бою. Восстановление 1 мин.",
-      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "Использование: мгновенно восстанавливает {percent}% максимального здоровья. Можно использовать в бою. Восстановление 2 мин.",
       "useManaPotion": "Использование: мгновенно восстанавливает {amount} маны. Можно использовать в бою. Восстановление 1 мин.",
       "clickUseInstant": "Нажмите, чтобы мгновенно использовать в бою",
       "clickUse": "Нажмите, чтобы использовать",
@@ -8113,8 +8113,8 @@ export const ru_RU: EnTranslations = {
         "description": "Первое применение устанавливает у ваших ног теневой якорь на 5 мин. Повторное применение в пределах 40 м возвращает к нему, расходует якорь и запускает восстановление на 45 сек."
       },
       "soulwell": {
-        "name": "Soulwell",
-        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+        "name": "Колодец душ",
+        "description": "Призывает Колодец душ на 3 мин. Вне боя участники группы могут пополнить свои Камни души до 3 штук. Камень души восстанавливает 25% максимального здоровья и имеет общее восстановление с зельями."
       },
       "hex_of_violence": {
         "name": "Проклятие насилия",
@@ -8153,8 +8153,8 @@ export const ru_RU: EnTranslations = {
         "description": "Мгновенно поражает цель жгучей тьмой, нанося {damage} ед. урона от тёмной магии."
       },
       "ruinous_brand": {
-        "name": "Ruinous Brand",
-        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
+        "name": "Губительное клеймо",
+        "description": "Ставит клеймо на противника на 15 сек. Ваши следующие 3 прямых заклинания повторяются по заклеймённому противнику с 25% урона, а при применении по другой цели переносят на него 50% урона."
       },
       "wrath": {
         "name": "Дикая стрела",
@@ -8351,8 +8351,8 @@ export const ru_RU: EnTranslations = {
         "description": "Терзает душу противника, нанося {damage} ед. урона от темной магии, и создает 1 осколок души, максимум 5."
       },
       "soul_lance": {
-        "name": "Soul Lance",
-        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+        "name": "Копьё душ",
+        "description": "Метает призрачное копьё, нанося {damage} ед. урона от темной магии. По цели с вашей Меткой оссуария 50% этого урона добавляется к метке."
       },
       "raise_graveguard": {
         "name": "Поднять могильного стража",
@@ -8379,8 +8379,8 @@ export const ru_RU: EnTranslations = {
         "description": "Когда погибает противник, которому недавно нанесли урон вы или ваши мертвецы, вы получаете 1 осколок души. Эффект срабатывает не чаще раза в 3 сек."
       },
       "ossuary_mark": {
-        "name": "Ossuary Mark",
-        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "name": "Метка оссуария",
+        "description": "Отмечает противника на 12 сек., накапливая 20% урона, нанесённого вами и вашими мертвецами. Повторное применение подрывает метку. Если отмеченный противник погибает, она взрывается в радиусе 6 м и создаёт 1 осколок души."
       },
       "unholy_command": {
         "name": "Нечестивый приказ",
@@ -8683,16 +8683,16 @@ export const ru_RU: EnTranslations = {
         "description": "Поражает цель и перескакивает еще на 2 противников в радиусе 10 м, нанося каждому {damage} ед. урона от сил природы. При попадании заклинание дает 1 заряд Грома за все применение, а не за каждую цель. Урон повышается от силы заклинаний. Изначальное мастерство может сделать заклинание мгновенным, а Изначальное возвышение вдвое сокращает время произнесения. (Громовержец)"
       },
       "abyssal_rift": {
-        "name": "Abyssal Rift",
-        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+        "name": "Бездонный разлом",
+        "description": "Разрывает пространство в выбранной точке, притягивая противников в радиусе 8 м к её центру, нанося {damage} ед. урона от Тьмы и оглушая их на 2 сек. Боссы получают урон, но сопротивляются притяжению и оглушению."
       },
       "chaos_bolt": {
         "name": "Стрела погибели",
         "description": "Выпускает сгусток хаотического огня, наносящий {damage} ед. урона от Огня. (талант чернокнижника)"
       },
       "dark_pact": {
-        "name": "Sanguine Covenant",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
+        "name": "Кровавый завет",
+        "description": "Жертвует 10% текущего здоровья и на 8 сек. поглощает урон в размере 30% максимального здоровья."
       },
       "cloak_of_shadows": {
         "name": "Плащ теней",
@@ -8883,8 +8883,8 @@ export const ru_RU: EnTranslations = {
         "description": "Вы скрываетесь в облаке дыма, повышая шанс уклонения на 30% на 8 сек."
       },
       "sacrilegious_march": {
-        "name": "Sacrilegious March",
-        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
+        "name": "Кощунственный марш",
+        "description": "Повышает скорость передвижения на 35%, но каждую секунду отнимает 2% максимального здоровья. Повторное применение отменяет эффект. При 20% здоровья он отключается."
       },
       "spellsteal": {
         "name": "Похищение чар",
@@ -10427,7 +10427,7 @@ export const ru_RU: EnTranslations = {
         "name": "Сотворённый хлеб для пира"
       },
       "soul_stone": {
-        "name": "Soul Stone"
+        "name": "Камень души"
       },
       "bristleback_maul": {
         "name": "Молот Гэллоугласа"

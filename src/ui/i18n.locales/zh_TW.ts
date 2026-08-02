@@ -148,6 +148,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.doomMeterLock': '鎖定痛苦資源條',
   'hudChrome.warlock.doomEmptyStatus': '{value}/{max} 譴罪。',
   'hudChrome.warlock.doomStatus': '{value}/{max} 譴罪；剩餘 {remaining}。',
+  'hudChrome.warlock.fateThreadsStatus': '{value}/{max} 命運絲線。',
+  'hudChrome.warlock.fateThreadsConsumeReady': '三層命運絲線：吞噬可將其編織為額外的譴罪。',
+  'hudChrome.warlock.fateThreadsSentenceReady': '三層命運絲線：裁決可消耗它們以提高18%的傷害。',
+  'hudChrome.procOverlay.ruinStatus': '毀滅 {value}/{max}',
   'hudChrome.procOverlay.soulFragmentsMeter': '靈魂碎片',
   'guide.abilityHook.evil_eye': '標記一名敵人，使其行動與承受的苦難為你累積譴罪。',
   'entities.abilities.evil_eye.description':
@@ -170,6 +174,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.umbral_anchor.name': '暗影錨',
   'entities.abilities.umbral_anchor.description':
     '首次施放：在腳下錨定暗影，持續5分鐘。在40碼內再次施放可返回錨點，消耗錨點並觸發45秒冷卻。',
+  'entities.abilities.soulwell.name': '靈魂之井',
+  'entities.abilities.soulwell.description':
+    '召喚一口靈魂之井，持續3分鐘。脫離戰鬥時，隊伍成員最多可補充3枚靈魂石。靈魂石可恢復最大生命值的25%，並與藥水共用冷卻。',
   'entities.abilities.hex_of_violence.name': '暴行咒',
   'entities.abilities.hex_of_violence.description':
     '詛咒敵人8秒。其接下來的3次傷害行動各產生7點譴罪，並反噬22點暗影傷害。',
@@ -192,6 +199,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.soul_harvest.name': '精華收割',
   'entities.abilities.soul_harvest.description':
     '撕裂敵人的靈魂，造成 {damage} 點暗影傷害，並產生 1 枚靈魂碎片，最多 5 枚。',
+  'entities.abilities.soul_lance.name': '靈魂之槍',
+  'entities.abilities.soul_lance.description':
+    '擲出一柄幽魂之槍，造成 {damage} 點暗影傷害。對帶有你的骸骨印記的目標，其中50%的傷害會累積至印記。',
   'entities.abilities.raise_graveguard.name': '喚醒墓衛',
   'entities.abilities.raise_graveguard.description':
     '喚醒一名永久的防禦型夥伴。墓衛會自動嘲諷，透過墓域為你攔截20%的傷害；收割號令會使其嘲諷並在4秒內受到的傷害降低30%。',
@@ -209,6 +219,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.funeral_harvest.name': '葬魂收割',
   'entities.abilities.funeral_harvest.description':
     '當一個近期被你或你的亡靈傷害過的敵人死亡時，你獲得1枚靈魂碎片。每3秒最多觸發一次。',
+  'entities.abilities.ossuary_mark.name': '骸骨印記',
+  'entities.abilities.ossuary_mark.description':
+    '為敵人標記12秒，儲存你與你的亡靈所造成傷害的20%。再次施放可將其引爆。若被標記的敵人死亡，印記會在6碼內爆炸，並產生1枚靈魂碎片。',
   'entities.abilities.unholy_command.name': '邪穢號令',
   'entities.abilities.unholy_command.description':
     '號令所有亡靈，使其傷害提高 25%、行動速度提高 20%，持續 12 秒。',
@@ -353,7 +366,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blink.name': '閃爍步',
   'entities.abilities.bloodlust.name': '戰鼓',
   'entities.abilities.chain_lightning.name': '天穹分枝',
+  'entities.abilities.abyssal_rift.name': '深淵裂隙',
+  'entities.abilities.abyssal_rift.description':
+    '在選定地點撕開一道裂隙，將8碼內的敵人拉向其中心，造成{damage}點暗影傷害，並使其昏迷2秒。首領會受到傷害，但可抵抗拉扯與昏迷。',
   'entities.abilities.chaos_bolt.name': '毀滅箭',
+  'entities.abilities.dark_pact.name': '血契',
+  'entities.abilities.dark_pact.description':
+    '犧牲當前生命值的10%，在8秒內吸收相當於最大生命值30%的傷害。',
   'entities.abilities.cloak_of_shadows.name': '暗影斗篷',
   'entities.abilities.cone_of_cold.name': '寒霜橫掃',
   'entities.abilities.curse_of_exhaustion.name': '鉛沉妖咒',
@@ -407,6 +426,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thieves_chorus.name': '盜賊合唱',
   'entities.abilities.thieves_chorus.description':
     '一聲呼哨激勵你的隊伍，使攻擊、施法和引導速度提高10%，持續10秒。近期受過群體加速激勵的盟友過於疲憊，無法受益。（潛行者天賦）',
+  'entities.abilities.sacrilegious_march.name': '褻瀆行軍',
+  'entities.abilities.sacrilegious_march.description':
+    '移動速度提高35%，但每秒犧牲最大生命值的2%。再次施放可取消。生命值降至20%時會自動關閉。',
   'entities.abilities.spellsteal.name': '奪法',
   'entities.abilities.spellsteal.description': '從敵人身上竊取一個有益魔法效果並轉移到自己身上。',
   'entities.abilities.startle_shot.name': '驚擾射擊',
@@ -2514,6 +2536,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.clickDestroy': '點擊摧毀',
   'itemUi.tooltip.useFishing': '使用：在附近水域釣魚。',
   'itemUi.tooltip.useHealingPotion': '使用：立即恢復 {amount} 點生命值。戰鬥中可用。1 分鐘冷卻。',
+  'itemUi.tooltip.useHealingPotionPct':
+    '使用：立即恢復最大生命值的 {percent}%。戰鬥中可用。2 分鐘冷卻。',
   'itemUi.tooltip.useManaPotion': '使用：立即恢復 {amount} 點法力值。戰鬥中可用。1 分鐘冷卻。',
   'itemUi.tooltip.clickUseInstant': '點擊在戰鬥中立即使用',
   'itemUi.tooltip.clickUse': '點擊使用',
@@ -3031,6 +3055,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '以痛苦烈焰灼燒敵人，造成 {damage} 點火焰傷害。施法迅速。',
   'entities.abilities.shadowburn.name': '暮焰',
   'entities.abilities.shadowburn.description': '立即以灼燒暗影轟擊目標，造成 {damage} 點暗影傷害。',
+  'entities.abilities.ruinous_brand.name': '毀滅烙印',
+  'entities.abilities.ruinous_brand.description':
+    '為敵人烙印15秒。你接下來的3個直接法術會對被烙印的敵人回響25%的傷害；若對其他目標施放，則會向其複製50%的傷害。',
   'entities.abilities.wrath.name': '狂野奔雷',
   'entities.abilities.wrath.description': '投擲一道自然能量箭，造成 {damage} 點自然傷害。',
   'entities.abilities.wrath.specNote_balance':
@@ -9355,6 +9382,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.pet.waterJetTitle': '水流噴射',
   'hud.pet.waterJetDesc':
     '命令你的水元素引導緩速水流，持續 3 秒。冷卻時間 8 秒。按右鍵可在冷卻結束後自動施放。',
+  'hud.pet.felbolt': '邪能箭',
+  'hud.pet.felboltTitle': '邪能箭',
+  'hud.pet.felboltDesc':
+    '命令燼裔向你的目標額外發射一枚邪能彈。冷卻時間 8 秒。按右鍵、長按或按 Shift+Enter 可切換自動施放。',
+  'hud.pet.abyssalChain': '深淵鎖鏈',
+  'hud.pet.abyssalChainTitle': '深淵鎖鏈',
+  'hud.pet.abyssalChainDesc':
+    '命令幽蔭將 8 碼以外、20 碼以內的普通敵人拖回自己身邊。首領無法被拖曳。冷卻時間 15 秒。按右鍵、長按或按 Shift+Enter 可切換自動施放。',
+  'hud.pet.autocastOn': '自動施放已開啟。按右鍵、長按或按 Shift+Enter 可關閉。',
+  'hud.pet.autocastOff': '自動施放已關閉。按右鍵、長按或按 Shift+Enter 可開啟。',
   'entities.abilities.ice_lance.name': '冰槍術',
   'entities.abilities.ice_lance.description':
     '投擲一枚冰刺，造成 {damage} 點冰霜傷害；對凍結目標造成三倍傷害。消耗寒冰指或一層凜冬之寒，使目標視為已凍結。（冰霜）',
@@ -9405,6 +9442,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '以原始秘法能量衝擊敵人，造成 {damage} 點傷害。每次施放都會留下秘法充能，使你的下一次以太湧動傷害提高、施法加快（每層快 5%），但法力消耗也會急遽提高，最多堆疊 4 層；以太飛矢會消耗這些充能。每次施放還有機會觸發以太奔流，使你的下一次以太湧動不消耗法力且施法速度加倍。',
   'entities.items.conjured_bread4.name': '魔法盛宴麵包',
   'entities.items.conjured_water4.name': '魔法泉水',
+  'entities.items.soul_stone.name': '靈魂石',
   'entities.abilities.blazing_barrier.name': '烈焰屏障',
   'entities.abilities.blazing_barrier.description':
     '以烈焰環繞自身，吸收 {damage} 點傷害，持續 60 秒。（火焰）',

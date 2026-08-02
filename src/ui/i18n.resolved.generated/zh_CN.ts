@@ -328,14 +328,14 @@ export const zh_CN: EnTranslations = {
       "doomMeterLock": "锁定痛苦资源条",
       "doomEmptyStatus": "{value}/{max} 谴罪。",
       "doomStatus": "{value}/{max} 谴罪；剩余 {remaining}。",
-      "fateThreadsStatus": "{value} of {max} Fate Threads.",
-      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
-      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+      "fateThreadsStatus": "{value}/{max} 命运丝线。",
+      "fateThreadsConsumeReady": "三层命运丝线：吞噬可将其编织为额外的谴罪。",
+      "fateThreadsSentenceReady": "三层命运丝线：裁决可消耗它们以提高18%的伤害。"
     },
     "procOverlay": {
       "soulFragmentsMeter": "灵魂碎片",
       "ruinMeter": "Ruin",
-      "ruinStatus": "{value} of {max} Ruin"
+      "ruinStatus": "毁灭 {value}/{max}"
     },
     "spectate": {
       "banner": "正在观察 {name}"
@@ -6769,10 +6769,10 @@ export const zh_CN: EnTranslations = {
     "pet": {
       "attack": "攻击",
       "waterJet": "水流喷射",
-      "felbolt": "Felbolt",
-      "abyssalChain": "Abyssal Chain",
-      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
-      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
+      "felbolt": "邪能箭",
+      "abyssalChain": "深渊锁链",
+      "autocastOn": "自动施放已开启。右键点击、长按或按 Shift+Enter 可关闭。",
+      "autocastOff": "自动施放已关闭。右键点击、长按或按 Shift+Enter 可开启。",
       "taunt": "嘲讽",
       "healDemon": "治疗恶魔",
       "healPet": "治疗宠物",
@@ -6783,10 +6783,10 @@ export const zh_CN: EnTranslations = {
       "petAttackDesc": "命令你的宠物攻击当前敌对目标。",
       "waterJetTitle": "水流喷射",
       "waterJetDesc": "命令你的水元素引导减速水流，持续 3 秒。冷却时间 8 秒。右键点击可在冷却结束后自动施放。",
-      "felboltTitle": "Felbolt",
-      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
-      "abyssalChainTitle": "Abyssal Chain",
-      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "felboltTitle": "邪能箭",
+      "felboltDesc": "命令烬裔向你的目标额外发射一枚邪能弹。冷却时间 8 秒。右键点击、长按或按 Shift+Enter 可切换自动施放。",
+      "abyssalChainTitle": "深渊锁链",
+      "abyssalChainDesc": "命令幽影将 8 码以外、20 码以内的普通敌人拖回自己身边。首领无法被拖拽。冷却时间 15 秒。右键点击、长按或按 Shift+Enter 可切换自动施放。",
       "petTauntTitle": "宠物嘲讽",
       "petTauntDesc": "命令你的宠物接战，并在进入范围时使用低吼。10 秒冷却。",
       "healDemonDesc": "消耗法力，在 5 秒内向你的恶魔引导治疗。",
@@ -7152,7 +7152,7 @@ export const zh_CN: EnTranslations = {
       "clickDestroy": "点击摧毁",
       "useFishing": "使用：在附近水域钓鱼。",
       "useHealingPotion": "使用：立即恢复 {amount} 点生命值。战斗中可用。1 分钟冷却。",
-      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "使用：立即恢复最大生命值的 {percent}%。战斗中可用。2 分钟冷却。",
       "useManaPotion": "使用：立即恢复 {amount} 点法力值。战斗中可用。1 分钟冷却。",
       "clickUseInstant": "点击在战斗中立即使用",
       "clickUse": "点击使用",
@@ -8113,8 +8113,8 @@ export const zh_CN: EnTranslations = {
         "description": "首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，消耗锚点并触发45秒冷却。"
       },
       "soulwell": {
-        "name": "Soulwell",
-        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+        "name": "灵魂之井",
+        "description": "召唤一口灵魂之井，持续3分钟。脱离战斗时，小队成员最多可补充3枚灵魂石。灵魂石可恢复最大生命值的25%，并与药水共享冷却。"
       },
       "hex_of_violence": {
         "name": "暴行咒",
@@ -8153,8 +8153,8 @@ export const zh_CN: EnTranslations = {
         "description": "立即以灼热暗影轰击目标，造成 {damage} 点暗影伤害。"
       },
       "ruinous_brand": {
-        "name": "Ruinous Brand",
-        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
+        "name": "毁灭烙印",
+        "description": "为敌人烙印15秒。你接下来的3个直接法术会对被烙印的敌人回响25%的伤害；若对其他目标施放，则会向其复制50%的伤害。"
       },
       "wrath": {
         "name": "野性弹",
@@ -8351,8 +8351,8 @@ export const zh_CN: EnTranslations = {
         "description": "撕扯敌人的灵魂，造成 {damage} 点暗影伤害，并生成 1 枚灵魂碎片，最多 5 枚。"
       },
       "soul_lance": {
-        "name": "Soul Lance",
-        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+        "name": "灵魂之枪",
+        "description": "掷出一柄幽魂之枪，造成 {damage} 点暗影伤害。对带有你的骸骨印记的目标，其中50%的伤害会累积至印记。"
       },
       "raise_graveguard": {
         "name": "唤醒墓卫",
@@ -8379,8 +8379,8 @@ export const zh_CN: EnTranslations = {
         "description": "当一个近期被你或你的亡灵伤害过的敌人死亡时，你获得1枚灵魂碎片。每3秒最多触发一次。"
       },
       "ossuary_mark": {
-        "name": "Ossuary Mark",
-        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "name": "骸骨印记",
+        "description": "为敌人标记12秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。"
       },
       "unholy_command": {
         "name": "邪秽号令",
@@ -8683,16 +8683,16 @@ export const zh_CN: EnTranslations = {
         "description": "攻击目标，并跳向10码内最多2名敌人，对每个目标造成{damage}点自然伤害。命中时整次施法获得1层雷霆，而不是每个目标各获得1层。伤害随法术强度提高。原始掌控可使其瞬发，原始升华会使其施法时间缩短一半。（唤雷者）"
       },
       "abyssal_rift": {
-        "name": "Abyssal Rift",
-        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+        "name": "深渊裂隙",
+        "description": "在选定地点撕开一道裂隙，将8码内的敌人拉向其中心，造成{damage}点暗影伤害，并使其昏迷2秒。首领会受到伤害，但可抵抗拉扯与昏迷。"
       },
       "chaos_bolt": {
         "name": "毁灭箭",
         "description": "投掷一枚混沌火焰弹，造成{damage}点火焰伤害。（术士天赋）"
       },
       "dark_pact": {
-        "name": "Sanguine Covenant",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
+        "name": "血契",
+        "description": "牺牲当前生命值的10%，在8秒内吸收相当于最大生命值30%的伤害。"
       },
       "cloak_of_shadows": {
         "name": "暗影斗篷",
@@ -8883,8 +8883,8 @@ export const zh_CN: EnTranslations = {
         "description": "遁入烟雾之中，使你的躲闪几率提高30%，持续8秒。"
       },
       "sacrilegious_march": {
-        "name": "Sacrilegious March",
-        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
+        "name": "亵渎行军",
+        "description": "移动速度提高35%，但每秒牺牲最大生命值的2%。再次施放可取消。生命值降至20%时会自动关闭。"
       },
       "spellsteal": {
         "name": "夺法",
@@ -10427,7 +10427,7 @@ export const zh_CN: EnTranslations = {
         "name": "魔法盛宴面包"
       },
       "soul_stone": {
-        "name": "Soul Stone"
+        "name": "灵魂石"
       },
       "bristleback_maul": {
         "name": "加洛格拉斯之锤"

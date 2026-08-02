@@ -328,14 +328,14 @@ export const ja_JP: EnTranslations = {
       "doomMeterLock": "苦痛リソースバーを固定",
       "doomEmptyStatus": "断罪 {value}/{max}。",
       "doomStatus": "断罪 {value}/{max}、残り {remaining}。",
-      "fateThreadsStatus": "{value} of {max} Fate Threads.",
-      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
-      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+      "fateThreadsStatus": "運命の糸 {value}/{max}。",
+      "fateThreadsConsumeReady": "運命の糸が3本: 喰らうで追加の断罪へ紡げます。",
+      "fateThreadsSentenceReady": "運命の糸が3本: 宣告で消費するとダメージが18%増加します。"
     },
     "procOverlay": {
       "soulFragmentsMeter": "魂の欠片",
       "ruinMeter": "Ruin",
-      "ruinStatus": "{value} of {max} Ruin"
+      "ruinStatus": "破滅 {value}/{max}"
     },
     "spectate": {
       "banner": "{name}を観戦中"
@@ -6769,10 +6769,10 @@ export const ja_JP: EnTranslations = {
     "pet": {
       "attack": "攻撃",
       "waterJet": "ウォータージェット",
-      "felbolt": "Felbolt",
-      "abyssalChain": "Abyssal Chain",
-      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
-      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
+      "felbolt": "フェルボルト",
+      "abyssalChain": "深淵の鎖",
+      "autocastOn": "自動発動オン。右クリック、タッチ長押し、またはShift+Enterでオフにします。",
+      "autocastOff": "自動発動オフ。右クリック、タッチ長押し、またはShift+Enterでオンにします。",
       "taunt": "挑発",
       "healDemon": "悪魔を治癒",
       "healPet": "ペットを治癒",
@@ -6783,10 +6783,10 @@ export const ja_JP: EnTranslations = {
       "petAttackDesc": "現在の敵対対象を攻撃するようペットに命令します。",
       "waterJetTitle": "ウォータージェット",
       "waterJetDesc": "ウォーターエレメンタルに、3秒間敵を減速させる水流を放つよう命令します。クールダウン8秒。右クリックすると、使用可能になるたびに自動で発動します。",
-      "felboltTitle": "Felbolt",
-      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
-      "abyssalChainTitle": "Abyssal Chain",
-      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "felboltTitle": "フェルボルト",
+      "felboltDesc": "エンバーキンに、対象へ追加の邪悪な弾を放つよう命令します。クールダウン8秒。右クリック、タッチ長押し、またはShift+Enterで自動発動を切り替えます。",
+      "abyssalChainTitle": "深淵の鎖",
+      "abyssalChainDesc": "グルームシェイドに、8ヤードより遠く20ヤードまでの通常の敵を自分の元へ引き寄せるよう命令します。ボスは引き寄せられません。クールダウン15秒。右クリック、タッチ長押し、またはShift+Enterで自動発動を切り替えます。",
       "petTauntTitle": "ペット挑発",
       "petTauntDesc": "ペットに交戦を命じ、射程内でグロウルを使わせます。クールダウン10秒。",
       "healDemonDesc": "マナを消費し、5秒かけて悪魔へ治癒をチャネルします。",
@@ -7152,7 +7152,7 @@ export const ja_JP: EnTranslations = {
       "clickDestroy": "クリックして破棄",
       "useFishing": "使用: 近くの水辺で釣りをします。",
       "useHealingPotion": "使用: 即座に体力を{amount}回復します。戦闘中に使用可能。クールダウン1分。",
-      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "使用: 即座に最大体力の{percent}%を回復します。戦闘中に使用可能。クールダウン2分。",
       "useManaPotion": "使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。",
       "clickUseInstant": "クリックして戦闘中に即使用",
       "clickUse": "クリックして使用",
@@ -8113,8 +8113,8 @@ export const ja_JP: EnTranslations = {
         "description": "初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。"
       },
       "soulwell": {
-        "name": "Soulwell",
-        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+        "name": "魂の泉",
+        "description": "魂の泉を3分間召喚します。戦闘外であれば、グループメンバーは魂の石を3個まで補充できます。魂の石は最大体力の25%を回復し、ポーションとクールダウンを共有します。"
       },
       "hex_of_violence": {
         "name": "暴虐の呪い",
@@ -8153,8 +8153,8 @@ export const ja_JP: EnTranslations = {
         "description": "対象に灼ける影を即座に叩き込み、{damage} の暗黒ダメージを与えます。"
       },
       "ruinous_brand": {
-        "name": "Ruinous Brand",
-        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
+        "name": "破滅の烙印",
+        "description": "敵に15秒間の烙印を刻みます。次の3回の直接呪文は、烙印のついた敵に対して25%のダメージで反響し、別の対象に使用した場合はその敵へ50%のダメージを複製します。"
       },
       "wrath": {
         "name": "野生の稲妻",
@@ -8351,8 +8351,8 @@ export const ja_JP: EnTranslations = {
         "description": "敵の魂を切り裂いて{damage}のシャドウダメージを与え、魂の欠片を1個生成する。最大5個。"
       },
       "soul_lance": {
-        "name": "Soul Lance",
-        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+        "name": "魂の槍",
+        "description": "幽体の槍を投げ、{damage}のシャドウダメージを与える。納骨の印がついた対象には、そのダメージの50%が印へ蓄積される。"
       },
       "raise_graveguard": {
         "name": "墓守の召喚",
@@ -8379,8 +8379,8 @@ export const ja_JP: EnTranslations = {
         "description": "自分または自分のアンデッドが最近ダメージを与えた敵が死亡すると、魂の欠片を1個獲得します。発動は3秒に1回までです。"
       },
       "ossuary_mark": {
-        "name": "Ossuary Mark",
-        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "name": "納骨の印",
+        "description": "敵に12秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。"
       },
       "unholy_command": {
         "name": "不浄の号令",
@@ -8683,16 +8683,16 @@ export const ja_JP: EnTranslations = {
         "description": "対象を攻撃し、10ヤード以内の敵最大2体へ跳び移り、それぞれに{damage}の自然ダメージを与える。命中すると、対象ごとではなく詠唱全体で雷霆を1つ得る。ダメージはスペルパワーで増加する。原始の熟達で即時発動になり、原始の高揚で詠唱時間が半分になる。（雷呼び）"
       },
       "abyssal_rift": {
-        "name": "Abyssal Rift",
-        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+        "name": "深淵の裂け目",
+        "description": "選択した地点に裂け目を開き、8ヤード以内の敵を中心へ引き寄せて{damage}の影ダメージを与え、2秒間スタンさせます。ボスはダメージを受けますが、引き寄せとスタンには抵抗します。"
       },
       "chaos_bolt": {
         "name": "破滅の矢",
         "description": "混沌の炎を放ち、{damage}の火属性ダメージを与える。（ウォーロックのタレント）"
       },
       "dark_pact": {
-        "name": "Sanguine Covenant",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
+        "name": "血の盟約",
+        "description": "現在の体力の10%を捧げ、8秒間、最大体力の30%に相当するダメージを吸収します。"
       },
       "cloak_of_shadows": {
         "name": "影まとい",
@@ -8883,8 +8883,8 @@ export const ja_JP: EnTranslations = {
         "description": "煙幕に紛れ、8秒間、回避率を30%上昇させる。"
       },
       "sacrilegious_march": {
-        "name": "Sacrilegious March",
-        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
+        "name": "冒涜の行軍",
+        "description": "移動速度が35%上昇しますが、毎秒、最大体力の2%を失います。もう一度使用すると解除されます。体力が20%になると自動的に切れます。"
       },
       "spellsteal": {
         "name": "魔法奪取",
@@ -10427,7 +10427,7 @@ export const ja_JP: EnTranslations = {
         "name": "魔法の祝宴パン"
       },
       "soul_stone": {
-        "name": "Soul Stone"
+        "name": "魂の石"
       },
       "bristleback_maul": {
         "name": "ギャロウグラスの大槌"

@@ -328,14 +328,14 @@ export const ko_KR: EnTranslations = {
       "doomMeterLock": "고통 자원 막대 고정",
       "doomEmptyStatus": "단죄 {value}/{max}.",
       "doomStatus": "단죄 {value}/{max}, 남은 시간 {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Fate Threads.",
-      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
-      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+      "fateThreadsStatus": "운명의 실타래 {value}/{max}.",
+      "fateThreadsConsumeReady": "운명의 실타래 3개: 집어삼키기로 추가 단죄를 자아낼 수 있습니다.",
+      "fateThreadsSentenceReady": "운명의 실타래 3개: 선고로 소모하면 피해가 18% 증가합니다."
     },
     "procOverlay": {
       "soulFragmentsMeter": "영혼 조각",
       "ruinMeter": "Ruin",
-      "ruinStatus": "{value} of {max} Ruin"
+      "ruinStatus": "파멸 {value}/{max}"
     },
     "spectate": {
       "banner": "{name} 관전 중"
@@ -6769,10 +6769,10 @@ export const ko_KR: EnTranslations = {
     "pet": {
       "attack": "공격",
       "waterJet": "물 분사",
-      "felbolt": "Felbolt",
-      "abyssalChain": "Abyssal Chain",
-      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
-      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
+      "felbolt": "지옥불 화살",
+      "abyssalChain": "심연의 사슬",
+      "autocastOn": "자동 시전 켜짐. 우클릭하거나 길게 누르거나 Shift+Enter를 누르면 끕니다.",
+      "autocastOff": "자동 시전 꺼짐. 우클릭하거나 길게 누르거나 Shift+Enter를 누르면 켭니다.",
       "taunt": "도발",
       "healDemon": "악마 치유",
       "healPet": "소환수 치유",
@@ -6783,10 +6783,10 @@ export const ko_KR: EnTranslations = {
       "petAttackDesc": "현재 적대적인 대상에게 소환수가 공격하도록 명령합니다.",
       "waterJetTitle": "물 분사",
       "waterJetDesc": "물의 정령에게 3초 동안 적을 느리게 하는 물줄기를 집중하도록 명령합니다. 재사용 대기시간은 8초입니다. 우클릭하면 사용 가능할 때마다 자동 시전합니다.",
-      "felboltTitle": "Felbolt",
-      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
-      "abyssalChainTitle": "Abyssal Chain",
-      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "felboltTitle": "지옥불 화살",
+      "felboltDesc": "불씨족에게 당신의 대상을 향해 지옥불 투사체를 하나 더 발사하도록 명령합니다. 재사용 대기시간은 8초입니다. 우클릭하거나 길게 누르거나 Shift+Enter를 누르면 자동 시전을 전환합니다.",
+      "abyssalChainTitle": "심연의 사슬",
+      "abyssalChainDesc": "어스름망령에게 8미터보다 멀고 20미터 이내에 있는 일반 적을 자신에게 끌어오도록 명령합니다. 우두머리는 끌어올 수 없습니다. 재사용 대기시간은 15초입니다. 우클릭하거나 길게 누르거나 Shift+Enter를 누르면 자동 시전을 전환합니다.",
       "petTauntTitle": "소환수 도발",
       "petTauntDesc": "소환수에게 교전하고 사거리 안에서 으르렁거리도록 명령합니다. 재사용 대기시간 10초.",
       "healDemonDesc": "마나를 소비해 5초 동안 악마에게 치유를 집중합니다.",
@@ -7152,7 +7152,7 @@ export const ko_KR: EnTranslations = {
       "clickDestroy": "클릭하여 파괴",
       "useFishing": "사용: 가까운 물가에서 낚시합니다.",
       "useHealingPotion": "사용: 즉시 생명력을 {amount} 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.",
-      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "사용: 즉시 최대 생명력의 {percent}%를 회복합니다. 전투 중 사용 가능. 재사용 대기시간 2분.",
       "useManaPotion": "사용: 즉시 마나를 {amount} 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.",
       "clickUseInstant": "클릭하여 전투 중 즉시 사용",
       "clickUse": "클릭하여 사용",
@@ -8113,8 +8113,8 @@ export const ko_KR: EnTranslations = {
         "description": "처음 사용하면 발밑에 5분 동안 암영 닻을 설치합니다. 40미터 안에서 다시 사용하면 닻으로 돌아가며, 닻을 소모하고 45초의 재사용 대기시간이 시작됩니다."
       },
       "soulwell": {
-        "name": "Soulwell",
-        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+        "name": "영혼샘",
+        "description": "영혼샘을 3분 동안 소환합니다. 전투 중이 아니면 파티원이 영혼석을 3개까지 채울 수 있습니다. 영혼석은 최대 생명력의 25%를 회복하며 물약과 재사용 대기시간을 공유합니다."
       },
       "hex_of_violence": {
         "name": "폭력의 주술",
@@ -8153,8 +8153,8 @@ export const ko_KR: EnTranslations = {
         "description": "즉시 대상에게 타오르는 어둠을 폭발시켜 {damage}의 암흑 피해를 입힙니다."
       },
       "ruinous_brand": {
-        "name": "Ruinous Brand",
-        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
+        "name": "파멸의 낙인",
+        "description": "적에게 15초 동안 낙인을 새깁니다. 다음 3회의 직접 주문은 낙인이 새겨진 적에게 25%의 피해로 메아리치며, 다른 대상에게 시전하면 그 피해의 50%를 낙인이 새겨진 적에게도 입힙니다."
       },
       "wrath": {
         "name": "야생 벼락",
@@ -8351,8 +8351,8 @@ export const ko_KR: EnTranslations = {
         "description": "적의 영혼을 찢어 {damage}의 암흑 피해를 입히고 영혼 조각 1개를 생성합니다. 최대 5개."
       },
       "soul_lance": {
-        "name": "Soul Lance",
-        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+        "name": "영혼 창",
+        "description": "유령의 창을 던져 {damage}의 암흑 피해를 입힙니다. 자신의 납골 표식이 있는 대상에게는 그 피해의 50%가 표식에 더해집니다."
       },
       "raise_graveguard": {
         "name": "무덤수호병 일으키기",
@@ -8379,8 +8379,8 @@ export const ko_KR: EnTranslations = {
         "description": "자신이나 자신의 언데드가 최근 피해를 준 적이 죽으면 영혼 조각 1개를 얻습니다. 3초에 한 번만 발동합니다."
       },
       "ossuary_mark": {
-        "name": "Ossuary Mark",
-        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "name": "납골 표식",
+        "description": "적에게 12초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6미터 안에서 폭발하고 영혼 조각 1개를 생성합니다."
       },
       "unholy_command": {
         "name": "부정한 명령",
@@ -8683,16 +8683,16 @@ export const ko_KR: EnTranslations = {
         "description": "대상을 공격한 뒤 10미터 안의 적 최대 2명에게 번져 각각 {damage}의 자연 피해를 입힙니다. 적중하면 대상마다가 아니라 시전 전체에서 천둥 1개를 얻습니다. 피해는 주문력에 따라 증가합니다. 원시 숙련은 이 주문을 즉시 시전하게 할 수 있고, 원시 고양은 시전 시간을 절반으로 줄입니다. (천둥소환사)"
       },
       "abyssal_rift": {
-        "name": "Abyssal Rift",
-        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+        "name": "심연의 균열",
+        "description": "지정한 위치에 균열을 열어 8미터 안의 적을 중심으로 끌어당기고 {damage}의 암흑 피해를 입히며 2초 동안 기절시킵니다. 우두머리는 피해를 받지만 끌어당김과 기절에는 저항합니다."
       },
       "chaos_bolt": {
         "name": "파멸 화살",
         "description": "혼돈의 불꽃 화살을 던져 {damage}의 화염 피해를 입힙니다. (흑마법사 특성)"
       },
       "dark_pact": {
-        "name": "Sanguine Covenant",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
+        "name": "피의 서약",
+        "description": "현재 생명력의 10%를 희생해 8초 동안 최대 생명력의 30%에 해당하는 피해를 흡수합니다."
       },
       "cloak_of_shadows": {
         "name": "그림자망토",
@@ -8883,8 +8883,8 @@ export const ko_KR: EnTranslations = {
         "description": "연기 속으로 몸을 숨겨 8초 동안 회피율을 30%만큼 증가시킵니다."
       },
       "sacrilegious_march": {
-        "name": "Sacrilegious March",
-        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
+        "name": "신성모독 행군",
+        "description": "이동 속도가 35% 증가하지만 매초 최대 생명력의 2%를 잃습니다. 다시 시전하면 해제됩니다. 생명력이 20%가 되면 자동으로 꺼집니다."
       },
       "spellsteal": {
         "name": "마법 훔치기",
@@ -10427,7 +10427,7 @@ export const ko_KR: EnTranslations = {
         "name": "창조된 연회빵"
       },
       "soul_stone": {
-        "name": "Soul Stone"
+        "name": "영혼석"
       },
       "bristleback_maul": {
         "name": "갤로글래스 망치"

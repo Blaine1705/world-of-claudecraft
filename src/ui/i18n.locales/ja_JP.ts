@@ -152,6 +152,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.doomMeterLock': '苦痛リソースバーを固定',
   'hudChrome.warlock.doomEmptyStatus': '断罪 {value}/{max}。',
   'hudChrome.warlock.doomStatus': '断罪 {value}/{max}、残り {remaining}。',
+  'hudChrome.warlock.fateThreadsStatus': '運命の糸 {value}/{max}。',
+  'hudChrome.warlock.fateThreadsConsumeReady': '運命の糸が3本: 喰らうで追加の断罪へ紡げます。',
+  'hudChrome.warlock.fateThreadsSentenceReady':
+    '運命の糸が3本: 宣告で消費するとダメージが18%増加します。',
+  'hudChrome.procOverlay.ruinStatus': '破滅 {value}/{max}',
   'hudChrome.procOverlay.soulFragmentsMeter': '魂の欠片',
   'guide.abilityHook.evil_eye': '敵を一体指定し、その行動と苦痛から断罪を蓄積します。',
   'entities.abilities.evil_eye.description':
@@ -174,6 +179,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.umbral_anchor.name': '影の錨',
   'entities.abilities.umbral_anchor.description':
     '初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。',
+  'entities.abilities.soulwell.name': '魂の泉',
+  'entities.abilities.soulwell.description':
+    '魂の泉を3分間召喚します。戦闘外であれば、グループメンバーは魂の石を3個まで補充できます。魂の石は最大体力の25%を回復し、ポーションとクールダウンを共有します。',
   'entities.abilities.hex_of_violence.name': '暴虐の呪い',
   'entities.abilities.hex_of_violence.description':
     '敵を8秒間呪います。次の3回の攻撃行動ごとに断罪を7生成し、22の影ダメージで反撃します。',
@@ -196,6 +204,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.soul_harvest.name': '霊魂刈り',
   'entities.abilities.soul_harvest.description':
     '敵の魂を切り裂いて{damage}のシャドウダメージを与え、魂の欠片を1個生成する。最大5個。',
+  'entities.abilities.soul_lance.name': '魂の槍',
+  'entities.abilities.soul_lance.description':
+    '幽体の槍を投げ、{damage}のシャドウダメージを与える。納骨の印がついた対象には、そのダメージの50%が印へ蓄積される。',
   'entities.abilities.raise_graveguard.name': '墓守の召喚',
   'entities.abilities.raise_graveguard.description':
     '永続する防御型の相棒を呼び起こす。墓守は自動で挑発し、墓所の支配であなたへのダメージの20%を肩代わりする。リーピング・コマンドでは挑発し、4秒間受けるダメージが30%減少する。',
@@ -214,6 +225,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.funeral_harvest.name': '葬送の収穫',
   'entities.abilities.funeral_harvest.description':
     '自分または自分のアンデッドが最近ダメージを与えた敵が死亡すると、魂の欠片を1個獲得します。発動は3秒に1回までです。',
+  'entities.abilities.ossuary_mark.name': '納骨の印',
+  'entities.abilities.ossuary_mark.description':
+    '敵に12秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。',
   'entities.abilities.unholy_command.name': '不浄の号令',
   'entities.abilities.unholy_command.description':
     'すべてのアンデッドに号令を下し、12秒間、与えるダメージを25%、行動速度を20%上昇させる。',
@@ -358,7 +372,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blink.name': '瞬き歩み',
   'entities.abilities.bloodlust.name': '戦の太鼓',
   'entities.abilities.chain_lightning.name': '天枝の雷',
+  'entities.abilities.abyssal_rift.name': '深淵の裂け目',
+  'entities.abilities.abyssal_rift.description':
+    '選択した地点に裂け目を開き、8ヤード以内の敵を中心へ引き寄せて{damage}の影ダメージを与え、2秒間スタンさせます。ボスはダメージを受けますが、引き寄せとスタンには抵抗します。',
   'entities.abilities.chaos_bolt.name': '破滅の矢',
+  'entities.abilities.dark_pact.name': '血の盟約',
+  'entities.abilities.dark_pact.description':
+    '現在の体力の10%を捧げ、8秒間、最大体力の30%に相当するダメージを吸収します。',
   'entities.abilities.cloak_of_shadows.name': '影まとい',
   'entities.abilities.cone_of_cold.name': '霜払い',
   'entities.abilities.curse_of_exhaustion.name': '鉛の呪い',
@@ -414,6 +434,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thieves_chorus.name': '盗賊の合唱',
   'entities.abilities.thieves_chorus.description':
     '口笛の合図でグループを鼓舞し、10秒間、攻撃・詠唱・チャネリング速度を10%上昇させる。最近グループ速度上昇を受けた味方は疲労しており、効果を受けられない。（ローグのタレント）',
+  'entities.abilities.sacrilegious_march.name': '冒涜の行軍',
+  'entities.abilities.sacrilegious_march.description':
+    '移動速度が35%上昇しますが、毎秒、最大体力の2%を失います。もう一度使用すると解除されます。体力が20%になると自動的に切れます。',
   'entities.abilities.spellsteal.name': '魔法奪取',
   'entities.abilities.spellsteal.description': '敵の有益な魔法効果を1つ奪い、自分へ移す。',
   'entities.abilities.startle_shot.name': '驚愕射撃',
@@ -2623,6 +2646,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useFishing': '使用: 近くの水辺で釣りをします。',
   'itemUi.tooltip.useHealingPotion':
     '使用: 即座に体力を{amount}回復します。戦闘中に使用可能。クールダウン1分。',
+  'itemUi.tooltip.useHealingPotionPct':
+    '使用: 即座に最大体力の{percent}%を回復します。戦闘中に使用可能。クールダウン2分。',
   'itemUi.tooltip.useManaPotion':
     '使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。',
   'itemUi.tooltip.clickUseInstant': 'クリックして戦闘中に即使用',
@@ -3166,6 +3191,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.name': '黄昏の火',
   'entities.abilities.shadowburn.description':
     '対象に灼ける影を即座に叩き込み、{damage} の暗黒ダメージを与えます。',
+  'entities.abilities.ruinous_brand.name': '破滅の烙印',
+  'entities.abilities.ruinous_brand.description':
+    '敵に15秒間の烙印を刻みます。次の3回の直接呪文は、烙印のついた敵に対して25%のダメージで反響し、別の対象に使用した場合はその敵へ50%のダメージを複製します。',
   'entities.abilities.wrath.name': '野生の稲妻',
   'entities.abilities.wrath.description':
     '自然エネルギーの矢を放ち、{damage}の自然ダメージを与える。',
@@ -9815,6 +9843,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.pet.waterJetTitle': 'ウォータージェット',
   'hud.pet.waterJetDesc':
     'ウォーターエレメンタルに、3秒間敵を減速させる水流を放つよう命令します。クールダウン8秒。右クリックすると、使用可能になるたびに自動で発動します。',
+  'hud.pet.felbolt': 'フェルボルト',
+  'hud.pet.felboltTitle': 'フェルボルト',
+  'hud.pet.felboltDesc':
+    'エンバーキンに、対象へ追加の邪悪な弾を放つよう命令します。クールダウン8秒。右クリック、タッチ長押し、またはShift+Enterで自動発動を切り替えます。',
+  'hud.pet.abyssalChain': '深淵の鎖',
+  'hud.pet.abyssalChainTitle': '深淵の鎖',
+  'hud.pet.abyssalChainDesc':
+    'グルームシェイドに、8ヤードより遠く20ヤードまでの通常の敵を自分の元へ引き寄せるよう命令します。ボスは引き寄せられません。クールダウン15秒。右クリック、タッチ長押し、またはShift+Enterで自動発動を切り替えます。',
+  'hud.pet.autocastOn': '自動発動オン。右クリック、タッチ長押し、またはShift+Enterでオフにします。',
+  'hud.pet.autocastOff':
+    '自動発動オフ。右クリック、タッチ長押し、またはShift+Enterでオンにします。',
   'entities.abilities.ice_lance.name': 'アイスランス',
   'entities.abilities.ice_lance.description':
     '氷の槍を投げ、{damage}の氷ダメージを与えます。凍結した対象には3倍のダメージを与えます。フィンガーズ・オブ・フロストまたはウィンターズ・チルを1チャージ消費すると、対象を凍結状態として扱います。（氷）',
@@ -9865,6 +9904,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '生の秘術エネルギーを敵に流し込み、{damage}のダメージを与えます。発動するたびに秘術チャージが残り、次のエーテルサージのダメージと詠唱速度が上昇します（1つにつき5%高速化）が、マナ消費も大幅に増えます。最大4チャージ。エーテルダーツはチャージを消費します。また発動時にエーテルラッシュが準備されることがあり、次のエーテルサージのマナ消費がなくなり、詠唱速度が2倍になります。',
   'entities.items.conjured_bread4.name': '魔法の祝宴パン',
   'entities.items.conjured_water4.name': '魔法の湧き水',
+  'entities.items.soul_stone.name': '魂の石',
   'entities.abilities.blazing_barrier.name': 'ブレイジングバリア',
   'entities.abilities.blazing_barrier.description':
     '自身を炎で包み、{damage}ダメージを吸収します。60秒間持続します。（火）',
