@@ -609,15 +609,15 @@ function readJsonFile<T>(filePath: string): T {
 }
 
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
-  '2b3772c4da8bb3526350bb5a5d5ac8606838121d3afd72d1c7cb7da52135bedf';
+  '48fba1090fa3455234b82e011f4cd099d50ace9070470fd74c717f07ba78b7dd';
 const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'ddd70abcc37cf8224124bbd4c9c5d0a927e20d6822cc8d118be8a2825ce7c9cd';
+  'f6e0a7284a46b063bbb6e80e1996b33f531106bbecc7eff6404ea103e909ec64';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '0fd0da65d403278b600e98143ba25b062065a66acfd51daf74c0f3ee0b2320cf';
+  '78fb1ac247561d54e8e92e28385bd42604dcb20e82d7d84ee63cc5475173b0fc';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1479,7 +1479,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Every measured value (frame timings, draw stats, triangle and scenario
     // numbers) is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '2c8c7085720b1431b07794d1c94d995da4a0a4513bc68b1cb9be802c916c68a7',
+      'c9abb989ed94c9e77c1bf7d7dfc6694e97471f24dde5319e3f31129ec5697eb3',
     );
   });
 

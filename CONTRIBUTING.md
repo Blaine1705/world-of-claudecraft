@@ -37,24 +37,34 @@ There's a place for everyone here:
 
 ## Getting started
 
-You'll need [Node.js 26](https://nodejs.org/) and npm, the versions CI and the
-production image use. Older majors are untested. For the multiplayer server
-you'll also want [Docker](https://www.docker.com/) to run Postgres.
+You'll need [Node.js 26](https://nodejs.org/) and **pnpm 10.14.x** (pinned via
+`packageManager` in `package.json`). Older Node majors are untested. For the
+multiplayer server you'll also want [Docker](https://www.docker.com/) to run
+Postgres.
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<your-username>/world-of-claudecraft.git
 cd world-of-claudecraft
 
-# 2. Install dependencies
-npm ci
+# 2. Enable pnpm (prefer Corepack; some nvm builds omit it)
+corepack enable
+corepack prepare pnpm@10.14.0 --activate
+# Fallback when corepack is missing: npm install -g pnpm@10.14.0
 
-# 3. Point git at the repository hooks (once per clone)
+# 3. Install dependencies (uses the global content-addressable store)
+pnpm install --frozen-lockfile
+
+# 4. Point git at the repository hooks (once per clone)
 git config core.hooksPath .githooks
 
-# 4. Run the offline client (no server or database needed)
-npm run dev          # open the URL it prints (usually http://localhost:5173)
+# 5. Run the offline client (no server or database needed)
+pnpm run dev         # open the URL it prints (usually http://localhost:5173)
 ```
+
+`npm run <script>` still works after a pnpm install (Node ships npm), but
+**install and lockfile updates must go through pnpm**. Do not commit a
+`package-lock.json`; the single source of truth is `pnpm-lock.yaml`.
 
 That's enough to play the offline world and work on most things. To run the full
 online stack you need a database password in your environment first:
@@ -62,25 +72,58 @@ online stack you need a database password in your environment first:
 ```bash
 cp .env.example .env
 # set POSTGRES_PASSWORD and point DATABASE_URL at the same password
-npm run db:up        # start Postgres 16 in Docker (dev DB on port 5433)
-npm run server       # build and run the authoritative game server on :8787
-npm run dev          # in another terminal; the client proxies to the server
+pnpm run db:up       # start Postgres 16 in Docker (dev DB on port 5433)
+pnpm run server      # build and run the authoritative game server on :8787
+pnpm run dev         # in another terminal; the client proxies to the server
 ```
 
 If you plan to run the full gate below, install the browser it drives once:
-`npx playwright install chromium`.
+`pnpm exec playwright install chromium`.
 
 The [README](README.md) has the full host, develop, and play guide, and the
 `CLAUDE.md` files throughout the repo document the conventions for each area.
 
+### Multi-worktree installs (agents and parallel branches)
+
+pnpm stores packages once under a shared content-addressable store (default:
+`~/Library/pnpm/store` on macOS, `~/.local/share/pnpm/store` on Linux,
+`%LOCALAPPDATA%\pnpm\store` on Windows). Each worktree only links into that
+store, so spinning a second (or twentieth) worktree is much cheaper than a full
+`npm ci` copy.
+
+```bash
+git worktree add ../wocc-my-task -b feature/my-task origin/release/v0.34.0
+cd ../wocc-my-task
+pnpm install --frozen-lockfile   # links from the shared store
+pnpm run gate:fast               # day-loop; full gate remains the merge bar
+```
+
+Override the store path if needed: `pnpm config set store-dir /path/to/store`
+(or `PNPM_STORE_DIR`). Keep one pnpm major across machines so the store layout
+matches (`packageManager` pins 10.14.0).
+
+**Windows notes.** Use the same Corepack path, or install pnpm via
+`npm install -g pnpm@10.14.0`. Git Bash, PowerShell, and cmd all work; pnpm
+invokes scripts with the platform shell. If a script fails to find `.cmd`
+shims, set `script-shell` only as a last resort (`pnpm config set script-shell
+"C:\\Windows\\System32\\cmd.exe"`). Prefer not to run from a path that needs
+Developer Mode for symlinks; pnpm falls back to junctions/copies when
+symlinks are blocked, at a small install-time cost.
+
+**Native / optional platform packages.** Install scripts are allowlisted in
+`package.json` under `pnpm.onlyBuiltDependencies` (esbuild, sharp,
+ffmpeg-static, ffprobe-static, bufferutil, utf-8-validate, and a few others).
+If a scripts-skipped or incomplete install leaves binaries missing, reinstall
+with `pnpm install --frozen-lockfile` rather than hand-running install.js.
+
 ### TypeScript toolchain
 
-Type checking runs on TypeScript 7, the native compiler: `npx tsc --noEmit` works
-exactly as before and a full repo check now takes a few seconds instead of tens of
-seconds. The install is the official dual alias: the `typescript` package resolves
-the TypeScript 6 JS API (via the `@typescript/typescript6` wrapper) because
-`svelte-check` still consumes that API, while `@typescript/native` provides the
-`tsc` binary. Things to know:
+Type checking runs on TypeScript 7, the native compiler: `pnpm exec tsc --noEmit`
+(or `npx tsc --noEmit`) works exactly as before and a full repo check now takes
+a few seconds instead of tens of seconds. The install is the official dual
+alias: the `typescript` package resolves the TypeScript 6 JS API (via the
+`@typescript/typescript6` wrapper) because `svelte-check` still consumes that
+API, while `@typescript/native` provides the `tsc` binary. Things to know:
 
 - **Editors.** VS Code needs the "TypeScript 7" marketplace extension
   (`TypeScriptTeam.native-preview`) for native language service support until the
@@ -96,12 +139,15 @@ the TypeScript 6 JS API (via the `@typescript/typescript6` wrapper) because
   since more is not always faster. `--singleThreaded` disables all parallelism.
   Checking a single file ad hoc (`npx tsc somefile.ts`) errors when the directory
   has a `tsconfig.json`; pass `--ignoreConfig` for the old behavior.
-- **Lockfile.** Regenerate `package-lock.json` only with
-  `npx npm@10 install --package-lock-only`: the file uses npm-10 semantics, and
-  newer npm majors (including the npm 11 that CI's Node 26 bundles) silently drop
-  `svelte-check`'s nested optional-peer entries, which desyncs `npm ci` in CI.
-  Plain `npm ci` is safe under any npm major. After regenerating, confirm
-  `npm ci --dry-run` is in sync under both npm 10 and your workstation's npm.
+- **Lockfile.** The lockfile is `pnpm-lock.yaml` (pnpm 10 / lockfileVersion 9).
+  Update it only with `pnpm install` or `pnpm add` / `pnpm update` from this
+  repo root (never hand-edit). Commit `pnpm-lock.yaml` together with
+  `package.json` changes. CI installs with `pnpm install --frozen-lockfile`; a
+  stale lockfile fails closed. Do not introduce a second lockfile
+  (`package-lock.json` / yarn.lock): dual lockfiles diverge silently and are
+  forbidden. Peer dependency noise from optional wallet/solana trees is
+  tolerated via `.npmrc` (`strict-peer-dependencies=false`); do not loosen that
+  further without measuring.
 - **When to revisit.** Collapse the dual alias back to a single `typescript`
   dependency once BOTH hold: the TypeScript 7.1 stable JS API has shipped
   (TypeScript 7.0 ships no JS API at all; the replacement is tracked in

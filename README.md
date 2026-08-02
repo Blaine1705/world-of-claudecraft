@@ -344,7 +344,7 @@ Every FFmpeg path the gate and the audio tests exercise resolves the bundled
 `ffmpeg-static`/`ffprobe-static` npm packages, so a normal contribution needs no system
 FFmpeg install. The conformance-measuring paths (`npm run sfx:check`, the audio tests, the
 Studio's export validation) bind to the static binaries directly, with no `PATH` fallback:
-rerun `npm ci` if a scripts-skipped install left them missing. The Studio's playback and
+rerun `pnpm install --frozen-lockfile` if a scripts-skipped install left them missing. The Studio's playback and
 encode spawns and the `npm run gate` preflight resolve via `scripts/sfx/ffmpeg_paths.mjs`,
 which does fall back to `PATH`. Some standalone audio generator scripts (for example
 `scripts/gen_ui_sfx.mjs`) still default to `PATH` `ffmpeg`.

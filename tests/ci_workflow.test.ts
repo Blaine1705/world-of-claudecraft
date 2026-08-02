@@ -55,7 +55,7 @@ const CODE_PATH_GLOBS = [
   'bot/*',
   'scripts/*',
   'package.json',
-  'package-lock.json',
+  'pnpm-lock.yaml',
   'tsconfig.json',
   'tsconfig.admin.json',
   'vite.config.ts',
@@ -250,11 +250,12 @@ describe('CI workflow parity', () => {
       expect(releaseChecks).toContain(step);
       expect(releaseGate).not.toContain(step);
     }
-    // Named-step count: checkout, setup-node, npm ci, plus nine check steps
-    // (i18n gen/summary/freshness, malware, tsc cache, typecheck, three builds).
-    // An accidental extra step on the checks job would otherwise stay green.
-    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(12);
-    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(12);
+    // Named-step count: checkout, setup-pnpm, setup-node, pnpm install, plus nine
+    // check steps (i18n gen/summary/freshness, malware, tsc cache, typecheck,
+    // three builds). An accidental extra step on the checks job would otherwise
+    // stay green.
+    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(13);
+    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(13);
     // tsc incremental cache (#2758) must land on both check jobs, never on a
     // matrixed test job (would N-way cache thrash or reintroduce shard-1 gates).
     for (const job of [releaseChecks, jobSource('pr-checks')]) {
@@ -391,11 +392,11 @@ describe('CI workflow parity', () => {
         String.raw`- name: Run tests \(release tier[^\n]*\n {8}run: npm test -- --shard=\$\{\{ matrix\.shard \}\}\/${SHARD_N}`,
       ),
     );
-    // Structural step counts: each test job is exactly checkout, setup-node,
-    // npm ci, and the sharded test run. An unconditioned addition would run
-    // N times per push; a dropped step shrinks the job silently.
-    expect(prGate.match(/\n {6}- name: /g)).toHaveLength(4);
-    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(4);
+    // Structural step counts: each test job is exactly checkout, setup-pnpm,
+    // setup-node, pnpm install, and the sharded test run. An unconditioned
+    // addition would run N times per push; a dropped step shrinks the job silently.
+    expect(prGate.match(/\n {6}- name: /g)).toHaveLength(5);
+    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(5);
   });
 
   it('keeps D11 path-matrix tooling available but unwired after two MISS approaches', () => {

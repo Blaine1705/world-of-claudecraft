@@ -18,8 +18,8 @@ const ASSET_PATH = path.join(REPO_ROOT, 'public/models/mounts/terrorspark_ground
 // shipped KTX2 GLB so the pin stays honest about size as well as content.
 const SHIPPING_BUDGET = 1200 * 1024;
 const EXPECTED_SOURCE_FINGERPRINT =
-  'a2ecb9e366318b48cf7e18c66b42e806579b9a401b764cec73fb814794d3521b';
-const EXPECTED_ASSET_SHA256 = 'e5e20e44efdcaa6165b87ca1c9b3ccbd9e8f3da29e891abe7104e1be6c0467b0';
+  '6646e4ae2eef8da291197ee91981009ce63e2620695b35b3e676f71b21d57254';
+const EXPECTED_ASSET_SHA256 = '9a93310bbce45c9196c9e9353c293c9de5ec2b0c7e722b964317ac15d030e0c6';
 /** Midtone the ORM map's roughness and metalness channels encode; the material
  *  factors divide the authored target by it. */
 const ORM_CENTER = 230 / 255;
@@ -40,7 +40,7 @@ describe('tank mount asset pipeline', () => {
       'scripts/assets/terrorspark_groundshaker/source_fingerprint.mjs',
       'scripts/assets/specs/terrorspark_groundshaker.json',
       'scripts/assets/build_assets.mjs',
-      'package-lock.json',
+      'pnpm-lock.yaml',
     ]);
     expect(tankSourceFingerprint(REPO_ROOT)).toBe(EXPECTED_SOURCE_FINGERPRINT);
     expect(

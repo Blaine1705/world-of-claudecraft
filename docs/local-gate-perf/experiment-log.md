@@ -22,6 +22,7 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 | 2026-08-02 | 6 | isolate:false pure-approx (904 no-sim-import files) | isolate true 115.4s green | isolate false 70.0s, 71 files fail + worker crash | M1 | drop | Faster but unsafe; not a proven pure project |
 | 2026-08-02 | 6 | isolate:false 20 pure helper files | isolate true 1.69s | isolate false 1.17s green | M1 | drop (too small) | ~0.5s absolute; not worth projects scaffold |
 | 2026-08-02 | 6 | fileParallelism / maxWorkers note | defaults true; gate passes --maxWorkers | no config change | M1 | drop (no change) | gate_workers remains sole worker policy |
+| 2026-08-02 | 7 | pnpm full migration + shared store | secondary npm ci ~59s | 2nd worktree pnpm hoisted ~14s (~4x); CI on pnpm frozen-lockfile | M1 darwin/arm64 Node 26.5 pnpm 10.14 | keep | Option A single lockfile; see detail |
 
 ## Detail template (copy below for long notes)
 
@@ -256,3 +257,33 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
   - Phase 9 suite cost (top heavies) still the real wall lever
   - Optional later: rewrite `env_bootstrap` tests off `process.chdir` if threads is
     re-opened; dual projects only if a **proven** pure set survives isolate:false audit
+
+### 2026-08-02 - Phase 7 - pnpm + shared store for worktrees
+
+- Hypothesis: pnpm content-addressable store makes multi-worktree installs much
+  cheaper than per-worktree `npm ci`, and a deliberate full migration keeps CI
+  and lockfile policy single-source.
+- Change (keep):
+  - `packageManager: pnpm@10.14.0`; `pnpm-lock.yaml` only (removed `package-lock.json`)
+  - `.npmrc`: `node-linker=hoisted`, `auto-install-peers=true`,
+    `strict-peer-dependencies=false`
+  - `package.json` `pnpm.onlyBuiltDependencies` for native/binary install scripts
+  - CI: `pnpm/action-setup@v4` + `cache: pnpm` + `pnpm install --frozen-lockfile`
+  - Gate dep-sync / SFX messages point at `pnpm install --frozen-lockfile`
+  - `release_version` no longer rewrites a lockfile version field (pnpm has none)
+  - malware scan accepts `pnpm-lock.yaml` (YAML line scan for non-registry sources)
+  - CONTRIBUTING multi-worktree + Windows notes; DEPLOY docker type-check uses pnpm
+  - Fingerprint leaf `package-lock.json` -> `pnpm-lock.yaml`; size-preserving GLB
+    remint + polish seal re-pins
+- Dropped mid-experiment: default isolated linker (broke `@gltf-transform/core` /
+  `meshoptimizer` transitive imports used by asset scripts). Hoisted linker keeps
+  the shared store win.
+- Commands:
+  - secondary `npm ci` timing; `pnpm import`; multi-worktree `pnpm install --frozen-lockfile`
+  - targeted vitest for CI/release/assets/dep-sync; full gate under pnpm
+- Before metrics: secondary npm ci ~59s (warm cache)
+- After metrics: second worktree pnpm (hoisted, warm store) ~14s
+- Pass/fail: phase test set green; full `pnpm run gate` green with GATE_MAX_WORKERS=4 (~682s, multi-session machine; 8-worker runs hit timeout flakes under concurrent load, same free-mem clamp story)
+- Decision: keep
+- Follow-ups: Phase 8 task cache; agents without corepack use `npm i -g pnpm@10.14.0`
+

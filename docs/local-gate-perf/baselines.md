@@ -351,3 +351,19 @@ threads or isolate:false win on a proven set; both failed the keep rules.
 `scripts/gate.mjs` and `scripts/gate_fast.mjs` pass `--maxWorkers=${workers}` from
 `computeGateWorkers`. No interaction required a config change; serial
 `fileParallelism: false` would only hurt wall on multi-file runs.
+
+## Phase 7 - package install / multi-worktree (M1)
+
+Measured 2026-08-02 on M1 (darwin/arm64, Node 26.5, warm npm cache / warm pnpm
+store as noted). Secondary worktrees under `/tmp/wocc-pnpm-*`.
+
+| Scenario | Manager | Wall s | Notes |
+|---|---|---:|---|
+| Secondary worktree, empty node_modules, warm npm cache | `npm ci` | 58.95 | Baseline; 1042 packages; node_modules ~1.2G |
+| First pnpm install (populate store + link), isolated linker | `pnpm install --frozen-lockfile` | 29.55 | Build scripts later allowlisted |
+| Second worktree, shared store warm, isolated linker | `pnpm install --frozen-lockfile` | 38.82 | Still faster than npm; layout broke transitive imports |
+| Research worktree install, `node-linker=hoisted`, warm store | `pnpm install --frozen-lockfile` | 23.17 | Chosen layout: flat node_modules + shared store |
+| Second worktree, hoisted, warm store | `pnpm install --frozen-lockfile` | 14.10 | **~4.2x vs npm ci secondary** (59s -> 14s) |
+
+Decision: keep full pnpm migration. Store path default
+`~/Library/pnpm/store/v10` on this host (`pnpm store path`).

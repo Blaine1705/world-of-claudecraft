@@ -2,8 +2,8 @@
 
 Resume point for the next session. Keep current after every phase.
 
-**Current phase:** Phase 6 complete.  
-**Next action:** run Phase 7 starter prompt (`phase-07-pnpm-worktrees.md`).  
+**Current phase:** Phase 7 complete.  
+**Next action:** run Phase 8 starter prompt (`phase-08-task-cache.md`).  
 **Worktree:** `/Users/fernando/Documents/wocc-gate-perf-research`  
 **Branch:** `feature/local-gate-perf`  
 **Base:** always `origin/release/v0.34.0`
@@ -86,7 +86,7 @@ Always before calling a phase complete:
 | `vitest.browser.config.ts` | Browser suite |
 | `.github/workflows/ci.yml` | CI shards and checks |
 | `docs/qa-gate.md` | QA contract docs |
-| `CONTRIBUTING.md` | npm lockfile policy |
+| `CONTRIBUTING.md` | pnpm lockfile + multi-worktree install policy |
 | `docs/local-gate-perf/*` | This packet |
 
 ## Ledger (created by this packet)
@@ -99,7 +99,7 @@ Fill as phases ship:
 - (Phase 4) vitest cache flags: `test.experimental.fsModuleCache: true` in `vite.config.ts` (store under `node_modules/.experimental-vitest-cache`); scripts `test:related`, `test:changed`; `@vitest/ui` dropped
 - (Phase 5) happy-dom adoption scope: **partial keep** `happy-dom@^20.11.1`; 103/112 DOM files use `// @vitest-environment happy-dom`; 9 files stay on jsdom (see experiment-log / baselines); jsdom kept as dep; lockfile change re-stamped Eastbrook asset source fingerprints (sizes unchanged)
 - (Phase 6) pool/projects kept: **none** (drop). Keep Vitest 4.1 defaults `pool: forks`, `isolate: true`, no projects, `fileParallelism: true`. Threads ~2% faster but fails `process.chdir` in `env_bootstrap` tests. isolate:false on 904 no-sim-import files red (71 files + worker crash). Projects not justified without a measured pure set.
-- (Phase 7) package manager decision:
+- (Phase 7) package manager decision: **full pnpm migration (Option A)**. `packageManager: pnpm@10.14.0`, single lockfile `pnpm-lock.yaml` (removed `package-lock.json`). CI uses `pnpm/action-setup@v4` + `pnpm install --frozen-lockfile` + `cache: pnpm`. Local multi-worktree shares content-addressable store (`node-linker=hoisted` for npm-compatible layout). `pnpm.onlyBuiltDependencies` allowlists native install scripts. No dual lockfiles.
 - (Phase 8) task cache tool:
 - (Phase 9) suite splits / fixtures:
 - (Phase 10) experimental runner outcome:
@@ -108,9 +108,9 @@ Fill as phases ship:
 
 ## OPEN items
 
-1. Whether CI stays on `npm ci` while local uses pnpm, or full migration.
+1. ~~Whether CI stays on `npm ci` while local uses pnpm, or full migration.~~ **Closed: full migration.**
 2. Whether local multi-shard full gate is worth supporting on high-tier only.
 3. Owner sign-off if `gate:fast` is ever allowed as pre-push instead of full gate
    (default: no; pre-push floor stays as today).
-4. Cold empty-store install and second-worktree install timings (deferred to Phase 7).
+4. ~~Cold empty-store install and second-worktree install timings (deferred to Phase 7).~~ **Closed: see baselines.**
 5. Low/medium tier machine baselines still empty (only M1 high-tier filled).

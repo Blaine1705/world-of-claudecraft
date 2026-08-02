@@ -40,14 +40,15 @@ const workers = computeGateWorkers({
 // npm/npx resolve to .cmd files on Windows, which spawnSync only finds via a shell.
 const shell = process.platform === 'win32';
 
-// Verify node_modules is what package-lock.json actually pins, BEFORE any other
-// step. `npm ci` always resets this in CI, so CI never sees drift; a long-lived
-// local checkout can drift silently (a stray `npm install <pkg>`, or just going
-// stale) and the first symptom is usually a confusing tsc or build failure many
-// minutes into the gate that looks like a real regression in the change under
-// test. `npm ls --depth=0 --json` costs under a second and names the actual
-// problem instead of a downstream symptom. No CI job runs this script (CI always
-// starts from a fresh `npm ci`), so nothing else catches a false-positive block;
+// Verify node_modules is what pnpm-lock.yaml actually pins, BEFORE any other
+// step. CI always resets this with `pnpm install --frozen-lockfile`, so CI never
+// sees drift; a long-lived local checkout can drift silently (a stray
+// `pnpm add <pkg>`, or just going stale) and the first symptom is usually a
+// confusing tsc or build failure many minutes into the gate that looks like a
+// real regression in the change under test. `npm ls --depth=0 --json` still
+// works under pnpm's layout, costs under a second, and names the actual problem
+// instead of a downstream symptom. No CI job runs this script (CI always starts
+// from a fresh frozen install), so nothing else catches a false-positive block;
 // WOC_SKIP_DEP_SYNC=1 is the escape hatch for a checkout this check gets wrong,
 // and other preflights that need to test their OWN failure mode in isolation
 // (tests/sfx_gate_preflight.test.ts) set it explicitly rather than relying on the
@@ -88,8 +89,10 @@ if (missingAudioTools.length > 0) {
   console.error(
     `[gate] missing required SFX audio tooling: ${missingAudioTools.map(([name]) => name).join(', ')}\n` +
       '[gate] the bundled ffmpeg-static/ffprobe-static binaries are absent or broken (a\n' +
-      '[gate] scripts-skipped install leaves them missing): reinstall with npm ci, or\n' +
-      '[gate] install FFmpeg (including ffprobe) on PATH, then re-run npm run gate',
+      '[gate] scripts-skipped install leaves them missing): reinstall with\n' +
+      '[gate] pnpm install --frozen-lockfile (ensure onlyBuiltDependencies allows\n' +
+      '[gate] ffmpeg-static/ffprobe-static), or install FFmpeg (including ffprobe) on PATH,\n' +
+      '[gate] then re-run pnpm run gate',
   );
   process.exit(1);
 }

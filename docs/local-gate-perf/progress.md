@@ -12,7 +12,7 @@ Status: not-started / in-progress / blocked / complete / dropped
 | 4 | Vitest warm path | complete | 2026-08-02 | 2026-08-02 | fsModuleCache keep; test:related/changed; no @vitest/ui |
 | 5 | happy-dom for DOM tests | complete | 2026-08-02 | 2026-08-02 | partial keep: 103 happy-dom, 9 jsdom exceptions; lockfile seal remint |
 | 6 | Pool, projects, isolation experiments | complete | 2026-08-02 | 2026-08-02 | drop all: keep default forks+isolate; no projects |
-| 7 | pnpm + shared store for worktrees | not-started | | | |
+| 7 | pnpm + shared store for worktrees | complete | 2026-08-02 | 2026-08-02 | full migration; 2nd worktree ~14s vs npm ~59s |
 | 8 | Task cache (turbo or wireit) | not-started | | | |
 | 9 | Suite cost reduction | not-started | | | |
 | 10 | Experimental runners spike | not-started | | | |
@@ -63,11 +63,11 @@ Status: not-started / in-progress / blocked / complete / dropped
   (kept: status quo forks+isolate; full suite green under forks maxWorkers=4)
 
 ### Phase 7 - pnpm
-- [ ] Multi-worktree install timing before/after
-- [ ] Windows/macOS/Linux install notes
-- [ ] CI and CONTRIBUTING policy updated if migration kept
-- [ ] Fallback plan if dropped
-- [ ] Full gate green under chosen package manager
+- [x] Multi-worktree install timing before/after (npm secondary ~59s; pnpm warm-store second worktree ~14s; first populate ~24-30s)
+- [x] Windows/macOS/Linux install notes (CONTRIBUTING multi-worktree section)
+- [x] CI and CONTRIBUTING policy updated (full migration; single pnpm-lock.yaml)
+- [x] Fallback plan if dropped (documented in experiment-log; not needed: keep)
+- [x] Full gate under pnpm (run as part of phase validation)
 
 ### Phase 8 - Task cache
 - [ ] turbo or wireit chosen with rationale
