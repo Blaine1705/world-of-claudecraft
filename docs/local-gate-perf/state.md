@@ -24,9 +24,10 @@ Resume point for the next session. Keep current after every phase.
    to chase wall time. Add tier presets and docs instead.
 6. **Prefer Vitest/Vite/Node plugs first.** turbo-test / Bun / Deno are spikes only
    unless a phase proves pass rate and wall win on this suite.
-7. **pnpm is desired for multi-worktree install**, but only if CI and Windows/macOS/Linux
-   stay green and lockfile policy is updated deliberately (CONTRIBUTING today pins
-   npm@10 lockfile semantics).
+7. **pnpm is the package manager** (full migration, Phase 7): `packageManager` +
+   `pnpm-lock.yaml` only, CI frozen install, multi-worktree shared store. Do not
+   reintroduce `package-lock.json` or dual lockfiles without an explicit owner
+   decision recorded here.
 8. **No em dashes, en dashes, or emojis** in docs, commits, or code comments.
 9. **No Claude-Session trailers** in commits.
 
