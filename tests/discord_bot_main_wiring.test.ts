@@ -444,4 +444,22 @@ describe('bot/main.ts loop wiring', () => {
       /name: 'presence-push',[\s\S]{0,120}?mode: 'debounce'[\s\S]{0,120}?cfg\.presenceDebounceMs/,
     );
   });
+
+  it('rides the governor counters on the presence push, read through a thunk', () => {
+    // The Phase 8 telemetry has no loop of its own: it exists only because the
+    // presence body is wrapped here. Dropping the wrapper leaves every counters
+    // test green (the module is pure and still passes its own suite) while the
+    // bot ships nothing at all, which is precisely the class of wiring failure
+    // this file exists for.
+    const source = mainSource();
+    expect(source.length).toBeGreaterThan(5000);
+    // A THUNK, like the outbox breaker gate above and for the same reason: a
+    // captured discord.counters() would freeze the boot-time snapshot, which is
+    // all zeroes, and every push would report an idle governor forever.
+    expect(source).toMatch(
+      /server\.pushPresence\(\s*withPresenceCounters\(((?!\);)[\s\S]){0,600}?\(\) => discord\.counters\(\)/,
+    );
+    // One wrap site, so a second presence path cannot grow beside it unwrapped.
+    expect((source.match(/withPresenceCounters\(/g) ?? []).length).toBe(1);
+  });
 });

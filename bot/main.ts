@@ -55,6 +55,7 @@ import {
   writeMemberNickname,
 } from './member_writes';
 import { outboxIoFor, runOutboxPoll } from './outbox_consumer';
+import { withPresenceCounters } from './presence_counters';
 import { LoopScheduler } from './scheduler';
 import { ServerClient, type VoiceMemberPush } from './server_client';
 
@@ -215,12 +216,20 @@ async function main(): Promise<void> {
     const voice: VoiceMemberPush[] = cfg.voiceChannelId
       ? voiceMembersForChannel([...voiceStates.values()], cfg.voiceChannelId, nameOf)
       : [];
-    await server.pushPresence({
-      onlineCount: onlineUsers.size,
-      memberTotal,
-      voiceChannelName: cfg.voiceChannelId ? (voiceChannelName ?? 'Voice') : null,
-      voice,
-    });
+    // The governor's counters ride this push rather than a loop of their own,
+    // and `withPresenceCounters` is what makes that free: a snapshot it cannot
+    // read is simply absent from the body, never a failed presence push.
+    await server.pushPresence(
+      withPresenceCounters(
+        {
+          onlineCount: onlineUsers.size,
+          memberTotal,
+          voiceChannelName: cfg.voiceChannelId ? (voiceChannelName ?? 'Voice') : null,
+          voice,
+        },
+        () => discord.counters(),
+      ),
+    );
   };
   // A `debounce` task, which is the presenceTimer guard this replaces expressed on
   // the scheduler: the first kick opens one window, every kick inside it folds in,

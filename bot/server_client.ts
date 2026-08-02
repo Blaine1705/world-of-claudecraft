@@ -2,6 +2,7 @@
 // bot reads flex/role data and pushes presence + reward grants; it authenticates
 // with the shared DISCORD_BOT_SECRET (x-woc-discord-secret), NOT a user bearer.
 import type { ActivityItem, DailyRewardWinnersDay, FlexData, RelayItem } from './logic';
+import type { PresenceCounters } from './presence_counters';
 
 interface Envelope<T> {
   success: boolean;
@@ -217,11 +218,19 @@ export class ServerClient {
     );
   }
 
+  /**
+   * Presence, plus the rate-governor counters when the caller could collect
+   * them. The counters field is OPTIONAL on the wire, not nullable: a push that
+   * could not read a snapshot omits the key entirely (see
+   * `withPresenceCounters`), so the server keeps parsing the exact pre-Phase-8
+   * body and telemetry can never be the reason presence fails.
+   */
   pushPresence(snapshot: {
     onlineCount: number;
     memberTotal: number;
     voiceChannelName: string | null;
     voice: VoiceMemberPush[];
+    counters?: PresenceCounters;
   }): Promise<unknown> {
     return this.call('POST', '/internal/discord/presence', snapshot);
   }

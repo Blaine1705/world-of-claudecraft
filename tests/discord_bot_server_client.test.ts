@@ -5,6 +5,7 @@
 // block constructs the client the way bot/main.ts does (two arguments) to prove
 // the production defaults are still the real globals.
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { type PresenceCounters, withPresenceCounters } from '../bot/presence_counters';
 import {
   DEFAULT_OUTBOX_TIMEOUT_MS,
   FLEX_BATCH_LIMIT,
@@ -190,6 +191,36 @@ describe('ServerClient request envelope', () => {
   });
 });
 
+/**
+ * One filled counters block, every numeric field distinct so a payload that
+ * transposed two of them cannot match the byte pin below.
+ */
+const PRESENCE_COUNTERS: PresenceCounters = {
+  requests: 101,
+  rateLimited: 102,
+  rateLimitedByScope: { user: 201, global: 202, shared: 203, unknown: 204 },
+  globalPauses: 103,
+  banPauses: 104,
+  breakerState: 'half-open',
+  breakerOpens: 105,
+  queueDepth: 106,
+  trackedBuckets: 107,
+  trackedRoutes: 108,
+  activeQueues: 109,
+  forbiddenEntries: 110,
+  forbiddenBlocks: 111,
+  breakerBlocks: 112,
+};
+
+/**
+ * The presence POST body, byte for byte, with the counters attached. Written
+ * out as a literal rather than derived from the constant above: a pin computed
+ * from the same object it is checking would agree with any key order at all,
+ * and key order is half of what this pins.
+ */
+const PRESENCE_BODY_WITH_COUNTERS =
+  '{"onlineCount":3,"memberTotal":9,"voiceChannelName":null,"voice":[],"counters":{"requests":101,"rateLimited":102,"rateLimitedByScope":{"user":201,"global":202,"shared":203,"unknown":204},"globalPauses":103,"banPauses":104,"breakerState":"half-open","breakerOpens":105,"queueDepth":106,"trackedBuckets":107,"trackedRoutes":108,"activeQueues":109,"forbiddenEntries":110,"forbiddenBlocks":111,"breakerBlocks":112}}';
+
 const ROUTE_ROWS: {
   name: string;
   methodName: string;
@@ -233,13 +264,38 @@ const ROUTE_ROWS: {
     data: {},
   },
   {
-    name: 'pushPresence',
+    // Presence WITHOUT counters, which is not a legacy shape: the Phase 8 seam
+    // omits the key entirely whenever the governor snapshot could not be read,
+    // so this exact byte string is what the server still has to accept.
+    name: 'pushPresence (no counters)',
     methodName: 'pushPresence',
     drive: (c) =>
       c.pushPresence({ onlineCount: 3, memberTotal: 9, voiceChannelName: null, voice: [] }),
     method: 'POST',
     path: '/internal/discord/presence',
     body: '{"onlineCount":3,"memberTotal":9,"voiceChannelName":null,"voice":[]}',
+    data: {},
+  },
+  {
+    // And with them. The counters block is a wire contract the server pins too,
+    // so what is pinned here is the whole serialized payload: field order
+    // included, because JSON.stringify follows source order. The body is built
+    // through the PRODUCTION attach seam (withPresenceCounters reading a
+    // governor-shaped snapshot), so the key order this byte string pins is the
+    // one bot/presence_counters.ts actually emits: a reordered literal there is
+    // a different payload and reds this row.
+    name: 'pushPresence (with counters)',
+    methodName: 'pushPresence',
+    drive: (c) =>
+      c.pushPresence(
+        withPresenceCounters(
+          { onlineCount: 3, memberTotal: 9, voiceChannelName: null, voice: [] },
+          () => PRESENCE_COUNTERS,
+        ),
+      ),
+    method: 'POST',
+    path: '/internal/discord/presence',
+    body: PRESENCE_BODY_WITH_COUNTERS,
     data: {},
   },
   {
