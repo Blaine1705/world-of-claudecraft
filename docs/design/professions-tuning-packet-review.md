@@ -4560,6 +4560,27 @@ Q19 convergence question stay the maintainer's (reconciliation item
 Q23 one-model re-rule, and the new non-stackable force-1 question stay
 open maintainer items.
 
+## Phase 21 QA sync (2026-08-02, merge 82d9e93091)
+
+The per-phase sync preamble, run at the phase 21 QA entry. The release
+moved by exactly ONE commit past the build's zero-drift entry:
+8209e69ad0 (perf(render): cache high-tier terrain culling, PR 2780),
+touching only src/render/terrain.ts and tests/terrain_streaming.test.ts.
+Merged clean as 82d9e93091. The release-merge-audit ran over the merge:
+the branch-owned intersection is EMPTY (the packet never touched either
+file), no routes or endpoints arrived, the changed update() keeps its
+signature so no injection site needs re-binding, no new db-mock sites,
+and no packet premise depends on terrain culling (the committed
+screenshot pairs predate the merge and acceptance (a)/(d) byte-identity
+is a wire property, not a pixel one). The fogFar=0 arm is
+behavior-preserving (hypot < 0 was always false; the new fogFar > 0
+gate keeps those chunks invisible). tests/terrain_streaming.test.ts
+solo-run green (11 passed), npx tsc --noEmit clean, and `npm run gate`
+PASS all 11 steps on the merged tree. Housekeeping: the six stale
+phase 20 QA scratch scripts (p20_*.mjs, p20_fishing_census.ts,
+phase20_measure.ts) were deleted from .claude-scratch, nothing
+referenced them.
+
 ---
 
 ## Post-packet scoping (2026-08-01): proposed phases 19 to 21
