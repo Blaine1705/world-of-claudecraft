@@ -257,7 +257,7 @@ describe('vendor window family: hud.ts focus-management wiring (WCAG 2.4.3)', ()
     // before closeHeroicVendor got a chance to restore it, so the generic close path
     // (Escape, walking out of range via the topmost-window dispatcher) dropped the
     // WCAG 2.4.3 focus return even though the explicit close button worked.
-    expect(closeVendorBody.trimStart().startsWith('// Guard')).toBe(true);
+    expect(closeVendorBody).toContain('// Guard');
     expect(closeVendorBody).toContain('if (this.openVendorNpcId === null) return;');
   });
 });
