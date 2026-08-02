@@ -1,0 +1,581 @@
+// Far-foliage sprite impostors: the Three side.
+//
+// At world build time this module bakes every foliage archetype (each tree
+// species variant, each rock colorway variant, the bush kinds) into one
+// texture atlas by rendering the REAL extracted GLB parts from a ring of yaw
+// angles under a neutral hemisphere rig. The far field then draws one
+// InstancedMesh of camera-facing quads per (bucket, category): each instance
+// picks the two atlas views bracketing its camera bearing (offset by its own
+// placement yaw, so a forest never shows one repeated silhouette) and blends
+// them, so orbiting the camera never snaps. Lighting is the live Lambert
+// pipeline over the quad's up normal, the exact response the ground plane
+// has, so day-night grades, biome light and fog all land on the sprite the
+// way they land on the terrain under it.
+//
+// The handoff against the real meshes is per instance and jittered: the real
+// side collapses each tree at swap - fade * jitter (foliage_collapse.ts) and
+// the sprite side starts it at the same distance, computed from the same
+// GLSL (foliage_impostor_core.ts), so every tree is drawn by exactly one of
+// the two representations at every distance.
+//
+// COST MODEL: a sprite is 2 triangles and every category in a bucket is one
+// draw call, against the old per-species cone meshes (28 to 80 triangles per
+// instance, up to 8 draws per bucket) and, above all, against the real
+// geometry the budget no longer draws between the swap and the fog wall.
+// The atlas is baked once per world build (a few hundred tiny offscreen
+// renders during the loading screen) and lives as one mip-mapped texture.
+
+import * as THREE from 'three';
+import { collapseWindowUniforms } from './foliage_collapse';
+import {
+  IMPOSTOR_ATLAS_MAX,
+  IMPOSTOR_JITTER_GLSL,
+  type ImpostorArchetypeSpec,
+  type ImpostorCellRect,
+  packImpostorAtlas,
+} from './foliage_impostor_core';
+import { GFX, sharedUniforms } from './gfx';
+
+export type ImpostorCategory = 'tree' | 'rock' | 'dress';
+
+const CATEGORY_VIEWS: Record<ImpostorCategory, number> = { tree: 12, rock: 6, dress: 8 };
+
+function categoryCellPx(category: ImpostorCategory): number {
+  const scale = GFX.constrainedMemory ? 0.5 : 1;
+  const base = category === 'tree' ? 128 : 64;
+  return Math.max(32, Math.round(base * scale));
+}
+
+interface BakePart {
+  geometry: THREE.BufferGeometry;
+  material: THREE.Material;
+  isLeaf: boolean;
+}
+
+interface Archetype {
+  spec: ImpostorArchetypeSpec;
+  parts: BakePart[];
+  /** model-space framing captured for the quad reconstruction */
+  minY: number;
+  height: number;
+  width: number;
+}
+
+interface SpriteInstance {
+  archetype: number;
+  x: number;
+  y: number;
+  z: number;
+  yaw: number;
+  /** world quad width and height (already include the placement scale) */
+  width: number;
+  height: number;
+  tint: number; // packed rgb 0..1 floats via Color
+  tintG: number;
+  tintB: number;
+  /** the real instance's uniform scale, for wind amplitude parity */
+  windScale: number;
+}
+
+interface BucketAcc {
+  category: ImpostorCategory;
+  x: number;
+  z: number;
+  radius: number;
+  items: SpriteInstance[];
+}
+
+export interface ImpostorBucketHandle {
+  add(
+    archetype: number,
+    x: number,
+    y: number,
+    z: number,
+    yaw: number,
+    scale: number,
+    heightJitter: number,
+    tint: THREE.Color,
+  ): void;
+}
+
+export interface ImpostorRegistration {
+  mesh: THREE.InstancedMesh;
+  x: number;
+  z: number;
+  radius: number;
+  category: ImpostorCategory;
+}
+
+export interface ImpostorSession {
+  registerArchetype(category: ImpostorCategory, key: string, parts: BakePart[]): number;
+  bucket(category: ImpostorCategory, x: number, z: number, radius: number): ImpostorBucketHandle;
+  finalize(webgl: THREE.WebGLRenderer, parent: THREE.Group): ImpostorRegistration[];
+}
+
+/** Sprites ship on the same arm the cone impostors did. */
+export function impostorsActive(): boolean {
+  return GFX.standardMaterials && !GFX.leanFoliage;
+}
+
+// ---------------------------------------------------------------------------
+// Bake
+// ---------------------------------------------------------------------------
+
+// Neutral, yaw-agnostic studio rig: a hemisphere gives the bake its top-down
+// volume (canopy crowns brighter than skirts) without stamping a sun
+// direction into a sprite that must read correctly from every bearing at
+// every hour. Absolute level is close to 1 so the live Lambert lighting
+// supplies the actual brightness.
+const BAKE_SKY = 1.15;
+const BAKE_GROUND = 0.62;
+
+const bakeMaterialCache = new Map<THREE.Material, THREE.Material>();
+
+function bakeMaterialFor(src: THREE.Material, isLeaf: boolean): THREE.Material {
+  const cached = bakeMaterialCache.get(src);
+  if (cached) return cached;
+  const s = src as THREE.MeshStandardMaterial;
+  const mat = new THREE.MeshLambertMaterial({
+    map: s.map ?? null,
+    color: s.color ? s.color.clone() : new THREE.Color(1, 1, 1),
+    vertexColors: s.vertexColors === true,
+    alphaTest: isLeaf ? 0.4 : 0,
+    side: isLeaf ? THREE.DoubleSide : THREE.FrontSide,
+    toneMapped: false,
+    fog: false,
+  });
+  bakeMaterialCache.set(src, mat);
+  return mat;
+}
+
+function archetypeBounds(parts: BakePart[]): { minY: number; height: number; radius: number } {
+  let minY = Infinity;
+  let maxY = -Infinity;
+  let radius = 0;
+  const box = new THREE.Box3();
+  for (const part of parts) {
+    part.geometry.computeBoundingBox();
+    const bb = part.geometry.boundingBox;
+    if (!bb) continue;
+    box.copy(bb);
+    minY = Math.min(minY, box.min.y);
+    maxY = Math.max(maxY, box.max.y);
+    // the bake spins the model, so frame the worst-case horizontal reach
+    radius = Math.max(
+      radius,
+      Math.hypot(box.min.x, box.min.z),
+      Math.hypot(box.min.x, box.max.z),
+      Math.hypot(box.max.x, box.min.z),
+      Math.hypot(box.max.x, box.max.z),
+    );
+  }
+  if (!Number.isFinite(minY)) {
+    minY = 0;
+    maxY = 1;
+    radius = 0.5;
+  }
+  return { minY, height: Math.max(0.1, maxY - minY), radius: Math.max(0.1, radius) };
+}
+
+function bakeAtlas(
+  webgl: THREE.WebGLRenderer,
+  archetypes: Archetype[],
+): { texture: THREE.Texture; rects: ImpostorCellRect[]; size: number } {
+  const placement = packImpostorAtlas(
+    archetypes.map((a) => a.spec),
+    GFX.constrainedMemory ? 2048 : IMPOSTOR_ATLAS_MAX,
+  );
+  const size = placement.size;
+
+  const bakeTarget = new THREE.WebGLRenderTarget(size, size, {
+    depthBuffer: true,
+    samples: 4,
+    generateMipmaps: false,
+    minFilter: THREE.LinearFilter,
+    magFilter: THREE.LinearFilter,
+  });
+  const scene = new THREE.Scene();
+  const hemi = new THREE.HemisphereLight(0xffffff, 0xffffff, BAKE_SKY);
+  (hemi.groundColor as THREE.Color).setScalar(BAKE_GROUND / BAKE_SKY);
+  scene.add(hemi);
+  const holder = new THREE.Group();
+  scene.add(holder);
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+
+  const prevTarget = webgl.getRenderTarget();
+  const prevClearColor = new THREE.Color();
+  webgl.getClearColor(prevClearColor);
+  const prevClearAlpha = webgl.getClearAlpha();
+  const prevAutoClear = webgl.autoClear;
+
+  // Cell addressing goes through the TARGET's viewport/scissor: with a render
+  // target bound, three ignores the renderer-level setViewport (that state
+  // belongs to the canvas) and reads renderTarget.viewport each render call.
+  bakeTarget.scissorTest = true;
+  webgl.setClearColor(0x000000, 0);
+  webgl.autoClear = false;
+
+  archetypes.forEach((arch, ai) => {
+    while (holder.children.length > 0) holder.remove(holder.children[0]);
+    for (const part of arch.parts) {
+      holder.add(new THREE.Mesh(part.geometry, bakeMaterialFor(part.material, part.isLeaf)));
+    }
+    const minY = arch.minY;
+    const height = arch.height;
+    const radius = arch.width / 2;
+    camera.left = -radius;
+    camera.right = radius;
+    camera.top = minY + height;
+    camera.bottom = minY;
+    camera.near = 0.1;
+    camera.far = radius * 4 + 1;
+    camera.position.set(0, 0, radius * 2 + 0.5);
+    camera.lookAt(0, 0, 0);
+    camera.updateProjectionMatrix();
+
+    const rect = placement.origin[ai];
+    const cellPx = Math.round((rect.u1 - rect.u0) * size);
+    const y0 = Math.round(rect.v0 * size);
+    for (let view = 0; view < arch.spec.views; view++) {
+      // Bake convention: view k shows the model spun by +k/views turns, i.e.
+      // the picture of the model seen from bearing -k. The draw shader's rel
+      // angle below must invert the same way; calibrated by the parity test.
+      holder.rotation.y = (view / arch.spec.views) * Math.PI * 2;
+      holder.updateMatrixWorld(true);
+      const x0 = Math.round(rect.u0 * size) + view * cellPx;
+      bakeTarget.viewport.set(x0, y0, cellPx, cellPx);
+      bakeTarget.scissor.set(x0, y0, cellPx, cellPx);
+      webgl.setRenderTarget(bakeTarget);
+      webgl.clear(true, true, false);
+      webgl.render(scene, camera);
+    }
+  });
+
+  // Resolve the multisampled bake into a plain mip-mapped texture and drop
+  // the bake target (its depth buffer alone is size^2 * 4 bytes).
+  const finalTarget = new THREE.WebGLRenderTarget(size, size, {
+    depthBuffer: false,
+    generateMipmaps: true,
+    minFilter: THREE.LinearMipmapLinearFilter,
+    magFilter: THREE.LinearFilter,
+  });
+  const blitScene = new THREE.Scene();
+  // transparent + NoBlending: a straight RGBA copy. A default opaque material
+  // compiles with the OPAQUE define and force-writes alpha 1 over the whole
+  // atlas, which turns every sprite into a full rectangle downstream (the
+  // alpha test has nothing left to cut).
+  const blitMat = new THREE.MeshBasicMaterial({
+    map: bakeTarget.texture,
+    toneMapped: false,
+    transparent: true,
+    blending: THREE.NoBlending,
+    depthTest: false,
+    depthWrite: false,
+  });
+  const blitQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), blitMat);
+  blitScene.add(blitQuad);
+  const blitCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  webgl.setRenderTarget(finalTarget);
+  webgl.clear(true, false, false);
+  webgl.render(blitScene, blitCam);
+
+  webgl.setRenderTarget(prevTarget);
+  webgl.setClearColor(prevClearColor, prevClearAlpha);
+  webgl.autoClear = prevAutoClear;
+
+  blitQuad.geometry.dispose();
+  blitMat.dispose();
+  bakeTarget.dispose();
+  for (const mat of bakeMaterialCache.values()) mat.dispose();
+  bakeMaterialCache.clear();
+
+  finalTarget.texture.anisotropy = Math.min(4, webgl.capabilities.getMaxAnisotropy());
+  return { texture: finalTarget.texture, rects: placement.origin, size };
+}
+
+// ---------------------------------------------------------------------------
+// Draw material
+// ---------------------------------------------------------------------------
+
+// One unit quad shared by every impostor mesh: x centered, base at y 0, up
+// normals so the live Lambert lighting gives the sprite the ground plane's
+// response (see the module header).
+let quadGeo: THREE.BufferGeometry | null = null;
+function impostorQuadGeo(): THREE.BufferGeometry {
+  if (quadGeo) return quadGeo;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array([-0.5, 0, 0, 0.5, 0, 0, -0.5, 1, 0, 0.5, 1, 0]);
+  const nrm = new Float32Array([0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0]);
+  const uv = new Float32Array([0, 0, 1, 0, 0, 1, 1, 1]);
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('normal', new THREE.BufferAttribute(nrm, 3));
+  geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  geo.setIndex([0, 1, 2, 2, 1, 3]);
+  quadGeo = geo;
+  return geo;
+}
+
+// The same travelling gust the canopies ride (addWind in foliage.ts, its
+// second use): amplitude parity keeps a tree's sway continuous across the
+// handoff instead of freezing at the swap line.
+const IMPOSTOR_WIND_GLSL = `
+  float windPhase = collapseOrigin.x * 0.15 + collapseOrigin.y * 0.17;
+  float windGust = 0.6 + 0.4 * sin(uTime * 0.6 + collapseOrigin.x * 0.05 + collapseOrigin.y * 0.04);
+  float windAmt = (sin(uTime * 1.7 + windPhase) + 0.5 * sin(uTime * 3.1 + windPhase * 1.3))
+    * windGust * uImpWind * aImpostorWind * smoothstep(0.0, 0.15, position.y);`;
+
+const materialCache = new Map<ImpostorCategory, THREE.MeshLambertMaterial>();
+
+function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THREE.Material {
+  const cached = materialCache.get(category);
+  if (cached) {
+    cached.map = atlas;
+    return cached;
+  }
+  const u = collapseWindowUniforms();
+  const swap = category === 'rock' ? u.uRockMax : category === 'dress' ? u.uDressMax : u.uTreeMax;
+  const mat = new THREE.MeshLambertMaterial({
+    map: atlas,
+    alphaTest: 0.35,
+    side: THREE.DoubleSide,
+    fog: true,
+  });
+  mat.name = `foliage:impostor-${category}`;
+  // wind only sways what waves in the real kit: trees and bushes, not rocks
+  const windStrength = category === 'rock' || !GFX.windSway ? 0 : category === 'tree' ? 0.35 : 0.18;
+  mat.onBeforeCompile = (shader) => {
+    shader.uniforms.uTime = sharedUniforms.uTime;
+    shader.uniforms.uImpSwap = swap;
+    shader.uniforms.uImpFade = u.uFade;
+    shader.uniforms.uImpSpriteFar = u.uSpriteFar;
+    shader.uniforms.uImpViews = { value: CATEGORY_VIEWS[category] };
+    shader.uniforms.uImpWind = { value: windStrength };
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        uniform float uTime;
+        uniform float uImpSwap;
+        uniform float uImpFade;
+        uniform float uImpSpriteFar;
+        uniform float uImpViews;
+        uniform float uImpWind;
+        attribute vec4 aImpostorCell;
+        attribute float aImpostorWind;
+        varying vec2 vImpUvA;
+        varying vec2 vImpUvB;
+        varying float vImpBlend;`,
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `vec3 impOrigin = vec3(instanceMatrix[3][0], instanceMatrix[3][1], instanceMatrix[3][2]);
+        vec2 collapseOrigin = impOrigin.xz;
+        float impDist = distance(collapseOrigin, cameraPosition.xz);
+        float impJitter = ${IMPOSTOR_JITTER_GLSL};
+        float impBegin = uImpSwap - uImpFade * impJitter;
+        float impKeep = step(impBegin, impDist) * (1.0 - step(uImpSpriteFar, impDist));
+        if (impKeep == 0.0) {
+          gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+          return;
+        }
+        float impSx = length(instanceMatrix[0].xyz);
+        float impSy = length(instanceMatrix[1].xyz);
+        float impSz = max(length(instanceMatrix[2].xyz), 1e-6);
+        float impYaw = atan(-instanceMatrix[0].z, instanceMatrix[0].x);
+        vec2 impToCam = cameraPosition.xz - collapseOrigin;
+        // bearing of the camera as seen from the instance, same wrap as the bake
+        float impViewAng = atan(impToCam.x, impToCam.y);
+        float impRel = fract((impYaw - impViewAng) / 6.2831853 + 1.0);
+        float impViewPos = impRel * uImpViews;
+        float impV0 = floor(impViewPos);
+        vImpBlend = impViewPos - impV0;
+        float impV1 = impV0 + 1.0;
+        if (impV1 >= uImpViews) impV1 = 0.0;
+        float impCellW = aImpostorCell.z;
+        float impCellH = aImpostorCell.w;
+        vImpUvA = vec2(aImpostorCell.x + (impV0 + uv.x) * impCellW, aImpostorCell.y + uv.y * impCellH);
+        vImpUvB = vec2(aImpostorCell.x + (impV1 + uv.x) * impCellW, aImpostorCell.y + uv.y * impCellH);
+        vec3 impFwd = vec3(impToCam.x, 0.0, impToCam.y) / max(impDist, 1e-4);
+        vec3 impRight = normalize(cross(vec3(0.0, 1.0, 0.0), impFwd));
+        vec3 impOff = impRight * (position.x * impSx) + vec3(0.0, 1.0, 0.0) * (position.y * impSy);
+        ${IMPOSTOR_WIND_GLSL}
+        impOff.x += windAmt;
+        impOff.z += windAmt * 0.6;
+        // undo the instance rotation and scale so the stock instancing chunk
+        // (project_vertex applies instanceMatrix) lands the quad exactly on
+        // the billboarded world offsets computed above
+        float impC = cos(impYaw);
+        float impS = sin(impYaw);
+        vec3 transformed = vec3(impC * impOff.x - impS * impOff.z, impOff.y, impS * impOff.x + impC * impOff.z)
+          / vec3(impSx, impSy, impSz);`,
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        varying vec2 vImpUvA;
+        varying vec2 vImpUvB;
+        varying float vImpBlend;`,
+      )
+      .replace(
+        '#include <map_fragment>',
+        `{
+          vec4 impA = texture2D( map, vImpUvA );
+          vec4 impB = texture2D( map, vImpUvB );
+          diffuseColor *= mix( impA, impB, vImpBlend );
+        }`,
+      );
+  };
+  mat.customProgramCacheKey = () => `foliage-impostor-${CATEGORY_VIEWS[category]}`;
+  materialCache.set(category, mat);
+  return mat;
+}
+
+// ---------------------------------------------------------------------------
+// Session
+// ---------------------------------------------------------------------------
+
+const scratchMatrix = new THREE.Matrix4();
+const scratchQuat = new THREE.Quaternion();
+const scratchPos = new THREE.Vector3();
+const scratchScale = new THREE.Vector3();
+const scratchColor = new THREE.Color();
+const UP = new THREE.Vector3(0, 1, 0);
+
+export function createImpostorSession(): ImpostorSession | null {
+  if (!impostorsActive()) return null;
+  const archetypes: Archetype[] = [];
+  const archetypeIndex = new Map<string, number>();
+  const buckets: BucketAcc[] = [];
+
+  return {
+    registerArchetype(category, key, parts) {
+      const cacheKey = `${category}:${key}`;
+      const existing = archetypeIndex.get(cacheKey);
+      if (existing !== undefined) return existing;
+      const { minY, height, radius } = archetypeBounds(parts);
+      const index = archetypes.length;
+      archetypes.push({
+        spec: {
+          id: cacheKey,
+          worldWidth: radius * 2,
+          worldHeight: height,
+          worldBaseY: minY,
+          views: CATEGORY_VIEWS[category],
+          cellPx: categoryCellPx(category),
+        },
+        parts,
+        minY,
+        height,
+        width: radius * 2,
+      });
+      archetypeIndex.set(cacheKey, index);
+      return index;
+    },
+
+    bucket(category, x, z, radius) {
+      const acc: BucketAcc = { category, x, z, radius, items: [] };
+      buckets.push(acc);
+      return {
+        add(archetype, ax, ay, az, yaw, scale, heightJitter, tint) {
+          const arch = archetypes[archetype];
+          acc.items.push({
+            archetype,
+            x: ax,
+            y: ay + arch.minY * scale * heightJitter,
+            z: az,
+            yaw,
+            width: arch.width * scale,
+            height: arch.height * scale * heightJitter,
+            tint: tint.r,
+            tintG: tint.g,
+            tintB: tint.b,
+            windScale: scale,
+          });
+        },
+      };
+    },
+
+    finalize(webgl, parent) {
+      if (archetypes.length === 0) return [];
+      const { texture, rects } = bakeAtlas(webgl, archetypes);
+      const registrations: ImpostorRegistration[] = [];
+      for (const acc of buckets) {
+        if (acc.items.length === 0) continue;
+        const geo = impostorQuadGeo().clone();
+        const mesh = new THREE.InstancedMesh(
+          geo,
+          impostorMaterial(acc.category, texture),
+          acc.items.length,
+        );
+        mesh.name = `foliage-impostor-${acc.category}`;
+        const cell = new Float32Array(acc.items.length * 4);
+        const wind = new Float32Array(acc.items.length);
+        let maxHeight = 0;
+        acc.items.forEach((item, i) => {
+          scratchQuat.setFromAxisAngle(UP, item.yaw);
+          scratchMatrix.compose(
+            scratchPos.set(item.x, item.y, item.z),
+            scratchQuat,
+            scratchScale.set(item.width, item.height, 1),
+          );
+          mesh.setMatrixAt(i, scratchMatrix);
+          mesh.setColorAt(i, scratchColor.setRGB(item.tint, item.tintG, item.tintB));
+          const arch = archetypes[item.archetype];
+          const rect = rects[item.archetype];
+          cell[i * 4] = rect.u0;
+          cell[i * 4 + 1] = rect.v0;
+          cell[i * 4 + 2] = rect.u1 - rect.u0;
+          cell[i * 4 + 3] = rect.v1 - rect.v0;
+          wind[i] = item.windScale;
+          maxHeight = Math.max(maxHeight, item.height, arch.width * 0.5);
+        });
+        geo.setAttribute('aImpostorCell', new THREE.InstancedBufferAttribute(cell, 4));
+        geo.setAttribute('aImpostorWind', new THREE.InstancedBufferAttribute(wind, 1));
+        mesh.instanceMatrix.needsUpdate = true;
+        if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+        mesh.castShadow = false;
+        mesh.receiveShadow = false;
+        mesh.computeBoundingSphere();
+        if (mesh.boundingSphere) mesh.boundingSphere.radius += maxHeight;
+        parent.add(mesh);
+        registrations.push({
+          mesh,
+          x: acc.x,
+          z: acc.z,
+          radius: acc.radius,
+          category: acc.category,
+        });
+      }
+      return registrations;
+    },
+  };
+}
+
+/**
+ * One 1-instance mesh per impostor material for the shader prewarm pass
+ * (buildFoliageMaterialPrewarmGroup in foliage.ts): links the exact programs
+ * the live buckets use, attributes included. Empty when the sprite arm is
+ * off or the atlas has not been baked yet.
+ */
+export function impostorPrewarmMeshes(): THREE.Object3D[] {
+  const out: THREE.Object3D[] = [];
+  for (const mat of materialCache.values()) {
+    const mesh = new THREE.InstancedMesh(impostorQuadGeo().clone(), mat, 1);
+    mesh.setMatrixAt(0, new THREE.Matrix4());
+    mesh.setColorAt(0, new THREE.Color(1, 1, 1));
+    mesh.geometry.setAttribute(
+      'aImpostorCell',
+      new THREE.InstancedBufferAttribute(new Float32Array([0, 0, 0.1, 0.1]), 4),
+    );
+    mesh.geometry.setAttribute(
+      'aImpostorWind',
+      new THREE.InstancedBufferAttribute(new Float32Array([1]), 1),
+    );
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    mesh.frustumCulled = false;
+    out.push(mesh);
+  }
+  return out;
+}

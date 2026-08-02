@@ -2121,7 +2121,7 @@ export class Renderer {
     freezeStaticSubtreeMatrices(this.waterView.group); // water animates via uniforms, never transforms
     bd('water');
 
-    this.foliage = buildFoliage(this.sim.cfg.seed);
+    this.foliage = buildFoliage(this.sim.cfg.seed, this.webgl);
     setRenderCategory(this.foliage.group, 'foliage');
     this.scene.add(this.foliage.group);
     bd('foliage');
