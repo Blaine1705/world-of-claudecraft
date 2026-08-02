@@ -525,7 +525,7 @@ export class AbilityVfxRibbons {
     slot.glow.setHex(colorHex);
     slot.colorHex = colorHex;
     slot.coreHex = slot.core.getHex();
-    slot.headCoreHex = opts.coreHex ?? 0x16091f;
+    slot.headCoreHex = opts.coreHex ?? (opts.style === 'felLance' ? 0x0b3d1b : 0x16091f);
     slot.accentHex = opts.accentHex ?? 0xb896e8;
     slot.head.copy(from);
     slot.samplePos.copy(from);
@@ -967,9 +967,10 @@ export class AbilityVfxRibbons {
         }
         case 'felLance': {
           // Ruinbolt's directional head: a white-hot forward fang, dense
-          // toxic core, and two dark-green swept-back jaws. The offsets ride
-          // the actual travel vector, so the front remains readable through
-          // turns instead of collapsing into a generic glowing sphere.
+          // toxic core, and two spec-dark swept-back jaws (legacy fel green
+          // when no core is authored). The offsets ride the actual travel
+          // vector, so the front remains readable through turns instead of
+          // collapsing into a generic glowing sphere.
           const sideX = -t.dir.z;
           const sideZ = t.dir.x;
           sink(
@@ -989,7 +990,7 @@ export class AbilityVfxRibbons {
               h.x - t.dir.x * 0.28 * hs + sideX * side * 0.2 * hs,
               h.y - t.dir.y * 0.28 * hs + side * 0.06 * hs,
               h.z - t.dir.z * 0.28 * hs + sideZ * side * 0.2 * hs,
-              0x0b3d1b,
+              t.headCoreHex,
               0.3 * hs,
               OVERLAY_CELL.glow,
               0.82,

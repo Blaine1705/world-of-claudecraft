@@ -70,6 +70,7 @@ export const NECROMANCY_MOBS: Record<string, MobTemplate> = {
     petRanged: {
       range: 25,
       school: 'shadow',
+      ability: 'bone_mage_shadow_bolt',
       spellVuln: { amp: 0.05, duration: 6 },
     },
   },

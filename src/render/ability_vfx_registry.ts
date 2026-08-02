@@ -22,6 +22,8 @@ import {
 import {
   ARMY_OF_THE_DEAD_VFX_FULL_SPEC,
   ARMY_OF_THE_DEAD_VFX_SPEC,
+  BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC,
+  BONE_MAGE_SHADOW_BOLT_VFX_SPEC,
   CORPSE_EXPLOSION_VFX_FULL_SPEC,
   CORPSE_EXPLOSION_VFX_SPEC,
   DEATH_ECHO_VFX_FULL_SPEC,
@@ -50,6 +52,7 @@ import { ABYSSAL_RIFT_VFX_FULL_SPEC, ABYSSAL_RIFT_VFX_SPEC } from './warlock_vfx
 export function abilityVfxSpec(abilityId: string): AbilityVfxSpec | undefined {
   if (abilityId === 'emberkin_felbolt') return EMBERKIN_FELBOLT_VFX_SPEC;
   if (abilityId === 'gloomshade_abyssal_chain') return GLOOMSHADE_ABYSSAL_CHAIN_VFX_SPEC;
+  if (abilityId === 'bone_mage_shadow_bolt') return BONE_MAGE_SHADOW_BOLT_VFX_SPEC;
   if (abilityId === 'shadow_bolt') return GLOOM_BOLT_VFX_SPEC;
   if (abilityId === 'chaos_bolt') return RUINBOLT_VFX_SPEC;
   if (abilityId === 'immolate') return BURNING_PACT_VFX_SPEC;
@@ -73,6 +76,7 @@ export function abilityVfxSpec(abilityId: string): AbilityVfxSpec | undefined {
 export function abilityVfxFullSpec(abilityId: string): AbilityVfxFullSpec | undefined {
   if (abilityId === 'emberkin_felbolt') return EMBERKIN_FELBOLT_VFX_FULL_SPEC;
   if (abilityId === 'gloomshade_abyssal_chain') return GLOOMSHADE_ABYSSAL_CHAIN_VFX_FULL_SPEC;
+  if (abilityId === 'bone_mage_shadow_bolt') return BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC;
   if (abilityId === 'shadow_bolt') return GLOOM_BOLT_VFX_FULL_SPEC;
   if (abilityId === 'chaos_bolt') return RUINBOLT_VFX_FULL_SPEC;
   if (abilityId === 'immolate') return BURNING_PACT_VFX_FULL_SPEC;
