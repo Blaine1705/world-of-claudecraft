@@ -15,8 +15,8 @@
     "cancelCast fishing arm via dealDamage (FISHING_CAST_ID, not pushback)",
     "multi-class casters: mage/priest/warlock"
   ],
-  "draws": 1916,
-  "drawDigest": "f966da6c",
+  "draws": 1924,
+  "drawDigest": "abb5997d",
   "frames": [
     {
       "tick": 0,
@@ -647,7 +647,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 835,
-      "state": "9513f06b",
+      "state": "31bb75a6",
       "events": "741638a5",
       "rng": {
         "draws": 296,
@@ -658,7 +658,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 835,
-      "state": "d8d7edc8",
+      "state": "b86129a1",
       "events": "3890649a",
       "rng": {
         "draws": 339,
@@ -669,7 +669,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 835,
-      "state": "cbc28491",
+      "state": "afe87e04",
       "events": "741638a5",
       "rng": {
         "draws": 386,
@@ -680,7 +680,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 835,
-      "state": "4cdf473d",
+      "state": "96855d9c",
       "events": "741638a5",
       "rng": {
         "draws": 453,
@@ -691,7 +691,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 835,
-      "state": "39938357",
+      "state": "dbd65f82",
       "events": "741638a5",
       "rng": {
         "draws": 492,
@@ -702,7 +702,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 835,
-      "state": "9d13e386",
+      "state": "db4507ef",
       "events": "741638a5",
       "rng": {
         "draws": 530,
@@ -713,7 +713,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 835,
-      "state": "9e5876a7",
+      "state": "1e55ede2",
       "events": "741638a5",
       "rng": {
         "draws": 574,
@@ -724,7 +724,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 835,
-      "state": "45af9c16",
+      "state": "cfd5f10b",
       "events": "98f2b48c",
       "rng": {
         "draws": 631,
@@ -735,7 +735,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 835,
-      "state": "3a5f595e",
+      "state": "87298d45",
       "events": "741638a5",
       "rng": {
         "draws": 702,
@@ -1876,55 +1876,55 @@
       "tick": 200,
       "time": 10,
       "nextId": 835,
-      "state": "fdd889a7",
-      "events": "20fd7d23",
+      "state": "daf3f53a",
+      "events": "4c9969cb",
       "rng": {
-        "draws": 1674,
-        "digest": "ed672428"
+        "draws": 1675,
+        "digest": "f635955c"
       }
     },
     {
       "tick": 205,
       "time": 10.25,
       "nextId": 835,
-      "state": "349be588",
-      "events": "3890649a",
+      "state": "b7007544",
+      "events": "8ee592ae",
       "rng": {
-        "draws": 1699,
-        "digest": "274d407d"
+        "draws": 1702,
+        "digest": "6a122bf0"
       }
     },
     {
       "tick": 210,
       "time": 10.5,
       "nextId": 835,
-      "state": "3286a543",
+      "state": "221eff8b",
       "events": "741638a5",
       "rng": {
-        "draws": 1735,
-        "digest": "9af88ecb"
+        "draws": 1739,
+        "digest": "12c0f98b"
       }
     },
     {
       "tick": 215,
       "time": 10.75,
       "nextId": 835,
-      "state": "fa31a20b",
-      "events": "fcefe0b6",
+      "state": "184da500",
+      "events": "741638a5",
       "rng": {
-        "draws": 1773,
-        "digest": "c674c85c"
+        "draws": 1778,
+        "digest": "cd8ca8d0"
       }
     },
     {
       "tick": 217,
       "time": 10.85,
       "nextId": 835,
-      "state": "447fbb79",
+      "state": "8cc176cd",
       "events": "2f2b7262",
       "rng": {
-        "draws": 1790,
-        "digest": "ff2ed751"
+        "draws": 1795,
+        "digest": "f2e4e55d"
       },
       "label": "warlock-channel-pushback",
       "players": [
@@ -1944,7 +1944,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 139,
-            "damageTaken": 65
+            "damageTaken": 76
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -2096,12 +2096,15 @@
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {
+            "damageDealt": 15,
             "damageTaken": 40
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
-            "counters": {},
+            "counters": {
+              "damageDealt": 15
+            },
             "dungeonClears": {},
             "itemsDiscovered": [
               "apprentice_robe",
@@ -2162,11 +2165,11 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "castRemaining": 0.7,
+          "castRemaining": 1.2,
           "castTargetId": 834,
-          "castTotal": 2.5,
+          "castTotal": 3,
           "castingAbility": "fireball",
-          "combatTimer": 1.7,
+          "combatTimer": 0.75,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -2174,7 +2177,7 @@
           "facing": 0.56413,
           "fallStartY": -0.371544,
           "fiveSecondRule": 1.85,
-          "hp": 19935,
+          "hp": 19924,
           "id": 831,
           "inCombat": true,
           "kind": "player",
@@ -2192,7 +2195,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 889,
+          "resource": 895,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -2281,13 +2284,13 @@
         {
           "aiState": "idle",
           "attackPower": 11,
-          "castRemaining": 2.65,
+          "castRemaining": 1.15,
           "castTargetId": 834,
-          "castTotal": 5,
+          "castTotal": 3,
           "castingAbility": "drain_life",
           "channelTickEvery": 1,
-          "channelTickTimer": 0.9,
-          "channelTicksLeft": 4,
+          "channelTickTimer": 0.95,
+          "channelTicksLeft": 1,
           "channeling": true,
           "comboUntil": -1,
           "critChance": 0.056,
@@ -2297,7 +2300,7 @@
           "fallStartY": -0.20935,
           "fiveSecondRule": 1.1,
           "gcdRemaining": 0.4,
-          "hp": 19470,
+          "hp": 19471,
           "id": 833,
           "inCombat": true,
           "kind": "player",
@@ -2315,7 +2318,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 890,
+          "resource": 906,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -2364,7 +2367,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199861,
+          "hp": 199846,
           "id": 834,
           "inCombat": true,
           "kind": "mob",
@@ -2400,6 +2403,10 @@
             [
               831,
               140
+            ],
+            [
+              833,
+              20.5
             ]
           ],
           "wanderTarget": {
@@ -2420,33 +2427,33 @@
       "tick": 220,
       "time": 11,
       "nextId": 835,
-      "state": "b94ff99f",
-      "events": "262987cd",
+      "state": "8a507113",
+      "events": "b0d31fe1",
       "rng": {
-        "draws": 1815,
-        "digest": "7a3219de"
+        "draws": 1821,
+        "digest": "beac990d"
       }
     },
     {
       "tick": 225,
       "time": 11.25,
       "nextId": 835,
-      "state": "fe4ce466",
+      "state": "e8f0ce2c",
       "events": "98f2b48c",
       "rng": {
-        "draws": 1856,
-        "digest": "940276e1"
+        "draws": 1863,
+        "digest": "1229f954"
       }
     },
     {
       "tick": 225,
       "time": 11.25,
       "nextId": 835,
-      "state": "2205fc0c",
+      "state": "dbf764cf",
       "events": "3782c67f",
       "rng": {
-        "draws": 1856,
-        "digest": "940276e1"
+        "draws": 1863,
+        "digest": "1229f954"
       },
       "label": "warlock-fishing-cancel",
       "players": [
@@ -2466,7 +2473,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 141,
-            "damageTaken": 65
+            "damageTaken": 76
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -2618,14 +2625,14 @@
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 13,
+            "damageDealt": 30,
             "damageTaken": 60
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 13
+              "damageDealt": 30
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2687,9 +2694,9 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "castRemaining": 0.3,
+          "castRemaining": 0.8,
           "castTargetId": 834,
-          "castTotal": 2.5,
+          "castTotal": 3,
           "castingAbility": "fireball",
           "combatTimer": 0.1,
           "comboUntil": -1,
@@ -2699,7 +2706,7 @@
           "facing": 0.56413,
           "fallStartY": -0.371544,
           "fiveSecondRule": 2.25,
-          "hp": 19935,
+          "hp": 19924,
           "id": 831,
           "inCombat": true,
           "kind": "player",
@@ -2717,7 +2724,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 889,
+          "resource": 895,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -2807,7 +2814,7 @@
           "attackPower": 11,
           "castTotal": 5,
           "channelTickEvery": 1,
-          "channelTickTimer": 0.5,
+          "channelTickTimer": 0.55,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -2815,7 +2822,7 @@
           "facing": -0.889048,
           "fallStartY": -0.20935,
           "fiveSecondRule": 1.5,
-          "hp": 19463,
+          "hp": 19462,
           "id": 833,
           "inCombat": true,
           "kind": "player",
@@ -2833,7 +2840,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 890,
+          "resource": 906,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -2882,7 +2889,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199846,
+          "hp": 199829,
           "id": 834,
           "inCombat": true,
           "kind": "mob",
@@ -2921,7 +2928,7 @@
             ],
             [
               833,
-              19.5
+              41
             ]
           ],
           "wanderTarget": {
@@ -2942,22 +2949,22 @@
       "tick": 230,
       "time": 11.5,
       "nextId": 835,
-      "state": "a022c9e2",
+      "state": "fb764efb",
       "events": "741638a5",
       "rng": {
-        "draws": 1916,
-        "digest": "f966da6c"
+        "draws": 1924,
+        "digest": "abb5997d"
       }
     },
     {
       "tick": 230,
       "time": 11.5,
       "nextId": 835,
-      "state": "a022c9e2",
+      "state": "fb764efb",
       "events": "741638a5",
       "rng": {
-        "draws": 1916,
-        "digest": "f966da6c"
+        "draws": 1924,
+        "digest": "abb5997d"
       },
       "label": "final",
       "players": [
@@ -2977,7 +2984,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 141,
-            "damageTaken": 65
+            "damageTaken": 76
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -3129,14 +3136,14 @@
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 13,
+            "damageDealt": 30,
             "damageTaken": 60
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 13
+              "damageDealt": 30
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -3198,9 +3205,9 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "castRemaining": 0.05,
+          "castRemaining": 0.55,
           "castTargetId": 834,
-          "castTotal": 2.5,
+          "castTotal": 3,
           "castingAbility": "fireball",
           "combatTimer": 0.35,
           "comboUntil": -1,
@@ -3210,7 +3217,7 @@
           "facing": 0.56413,
           "fallStartY": -0.371544,
           "fiveSecondRule": 2.5,
-          "hp": 19935,
+          "hp": 19924,
           "id": 831,
           "inCombat": true,
           "kind": "player",
@@ -3228,7 +3235,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 889,
+          "resource": 895,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -3318,7 +3325,7 @@
           "attackPower": 11,
           "castTotal": 5,
           "channelTickEvery": 1,
-          "channelTickTimer": 0.5,
+          "channelTickTimer": 0.55,
           "combatTimer": 0.25,
           "comboUntil": -1,
           "critChance": 0.056,
@@ -3327,7 +3334,7 @@
           "facing": -0.889048,
           "fallStartY": -0.20935,
           "fiveSecondRule": 1.75,
-          "hp": 19463,
+          "hp": 19462,
           "id": 833,
           "inCombat": true,
           "kind": "player",
@@ -3345,7 +3352,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 890,
+          "resource": 906,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -3395,7 +3402,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199846,
+          "hp": 199829,
           "id": 834,
           "inCombat": true,
           "kind": "mob",
@@ -3434,7 +3441,7 @@
             ],
             [
               833,
-              19.5
+              41
             ]
           ],
           "wanderTarget": {

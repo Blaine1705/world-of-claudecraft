@@ -193,7 +193,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 834,
-      "state": "1ec22456",
+      "state": "34d5aee1",
       "events": "6527aeaa",
       "rng": {
         "draws": 682,
@@ -204,7 +204,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 834,
-      "state": "42b06509",
+      "state": "c7c5800a",
       "events": "5d3372df",
       "rng": {
         "draws": 888,
@@ -215,7 +215,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 834,
-      "state": "7192c853",
+      "state": "b71e8fd4",
       "events": "242ec2c1",
       "rng": {
         "draws": 1140,
@@ -226,7 +226,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 834,
-      "state": "a0f8290d",
+      "state": "975fe8b0",
       "events": "4f3d2e33",
       "rng": {
         "draws": 1406,
@@ -237,7 +237,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 834,
-      "state": "3b6aaad2",
+      "state": "1643395a",
       "events": "3d0abc0e",
       "rng": {
         "draws": 1672,
@@ -248,7 +248,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 834,
-      "state": "7eb40809",
+      "state": "f8ead5a9",
       "events": "c2141616",
       "rng": {
         "draws": 1844,
@@ -259,7 +259,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 834,
-      "state": "9c5813e5",
+      "state": "93a2a905",
       "events": "741638a5",
       "rng": {
         "draws": 1844,
@@ -378,7 +378,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 845,
+          "resource": 863,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -519,7 +519,7 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 834,
-      "state": "baae88f6",
+      "state": "d7711916",
       "events": "e8801df0",
       "rng": {
         "draws": 1889,
@@ -638,7 +638,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 845,
+          "resource": 863,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
