@@ -515,6 +515,56 @@ export const TARGETS = [
     },
   },
   {
+    key: 'bank-chips',
+    label: 'Bank window with its bags companion: category chips and Deposit materials',
+    when: ['ui/bank', 'ui/bag_filter', 'sim/material_taxonomy'],
+    // Full frame: the bank docks the bags companion beside it and a
+    // single-selector clip cannot union the two windows.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        // One representative per taxonomy class, so the Materials and Tools
+        // chips and the Deposit materials button all have honest content:
+        // node yield, harvest component, vendor staple, implement, grey
+        // trash, trophy oddment, raw fish, and a consumable control.
+        const ids = [
+          'iron_ore',
+          'rough_hide',
+          'arcanite_bar',
+          'simple_fishing_pole',
+          'amber_hide',
+          'guardian_core',
+          'raw_river_perch',
+          'baked_bread',
+        ];
+        for (const id of ids) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        // Stand beside the banker so the proximity-gated bank snapshot is
+        // live (bankInfo is null out of reach and the window reports away).
+        try {
+          for (const e of sim.entities.values()) {
+            if (e.kind === 'npc' && e.templateId === 'bursar_fernando') {
+              const p = sim.entities.get(sim.playerId);
+              p.pos = { ...e.pos };
+              p.prevPos = { ...p.pos };
+              sim.rebucket(p);
+              break;
+            }
+          }
+        } catch {}
+        game?.hud?.openBank?.();
+      });
+      await pollForSize(page, '#bank-window');
+      await wait(700);
+      return {};
+    },
+  },
+  {
     key: 'fishing-rod-ladder',
     label: 'The rod ladder in the bags, with the top rung hovered',
     when: ['professions/fishing', 'fishing_zones', 'gather_tool_tooltip', 'content/recipes'],
