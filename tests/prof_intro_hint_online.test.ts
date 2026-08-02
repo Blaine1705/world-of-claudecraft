@@ -135,6 +135,7 @@ describe('prof intro hint veteran refinement, online host', () => {
       attunedPairs: ['weaponcrafting+armorcrafting'],
       switchCount: 0,
       amendsProgress: 0,
+      isJackOfAllTrades: false,
     };
 
     broadcast(server);
