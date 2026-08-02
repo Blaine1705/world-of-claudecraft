@@ -30,6 +30,12 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 | 2026-08-02 | 9 | stable_horse-only world for stable_yard | 12.7s | 0.7s | M1 vitest 4.1.10 | keep | 200s wander without continent AI |
 | 2026-08-02 | 9 | EMPTY_TEST_WORLD for corpse_harvest_sim | 14.2s | n/a (reverted) | M1 | drop | breaks hunted seed pins / concentration literals |
 | 2026-08-02 | 9 | architecture/malware scan double-walk pass | architecture 0.5s | no change | M1 | drop (not a top offender) | separate roots once each; no double walk |
+| 2026-08-02 | 10 | turbo-test 0.3.14 full suite --jobs 8 | vitest ~241-401s green (hist/contended) | turbo wall 126s, 14954 pass / 1775 fail / 511 load-err | M1 darwin/arm64 16c Node 26.5 | drop (not default) | ~2x wall but ~41% files red; bare V8 Node gaps |
+| 2026-08-02 | 10 | turbo-test pure gate helpers (5 files) | vitest 72/72 in 0.91s | 46 pass, 3 load-err, wall 20ms | M1 | drop as default | fast but incomplete Node ESM/mjs |
+| 2026-08-02 | 10 | pin turbo-test in pnpm-lock | green fingerprints | Eastbrook/tank fingerprint fails | M1 | drop (no permanent dep) | lockfile is asset fingerprint leaf; use npx --yes only |
+| 2026-08-02 | 10 | Bun 1.3.14 native `bun test` pure helpers | vitest 0.91s | 72/72 in 65ms | M1 | drop as default | works on pure unit; not full suite |
+| 2026-08-02 | 10 | bunx vitest pure set (12 files) | node vitest 2.20s | bunx 2.50s both 128/128 | M1 | drop | no wall win as vitest host |
+| 2026-08-02 | 10 | Deno as runner | n/a | not installed on host | M1 | drop | expected skip |
 
 ## Detail template (copy below for long notes)
 
@@ -380,5 +386,80 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 - Follow-ups: Phase 10 experimental runners; optional later re-hunt corpse pins
   on empty world if someone wants that mega-file win; full-suite wall sample
   deferred (file-level wins already decisive)
+
+---
+
+### 2026-08-02 - Phase 10 - experimental runners (turbo-test / Bun)
+
+- Hypothesis: A Vitest-shaped native runner (turbo-test) or Bun might cut full-suite
+  wall enough to justify dual-run or adopt, given author claims of 5-12x on React+jsdom
+  suites. This suite is Node + Sim heavy; expected fit is weak.
+- Change:
+  - Spiked `@miaskiewicz/turbo-test@0.3.14` as a temporary devDependency, then
+    **removed it** so `pnpm-lock.yaml` stays out of shipping asset fingerprints
+  - Optional experimental scripts only (default `test` / gate unchanged):
+    - `npm run test:turbo` -> `scripts/test_turbo_experimental.mjs` (`npx --yes` pin)
+    - `npm run test:bun` -> `scripts/test_bun_experimental.mjs` (local `bun` binary)
+  - Deno not available on the measurement host; dropped without install
+- Commands:
+  - `pnpm add -D @miaskiewicz/turbo-test@0.3.14` then later `pnpm remove ...`
+  - `npx turbo-test --jobs 8 --reporter json` (full suite)
+  - `WOC_SKIP_PRETEST=1 npx vitest run --maxWorkers=8` (same machine comparison)
+  - Pure pilots: 5 gate helper files under vitest, turbo-test, `bun test`, `bunx vitest`
+  - Failure sample: 20 known-red files under default turbo-test reporter
+- Before metrics (Vitest, same host, maxWorkers=8, WOC_SKIP_PRETEST=1):
+  - Contended full suite during spike: **401.1s real**, Duration 400.4s,
+    1939 pass / 7 fail files (failures were lockfile fingerprint pins while
+    turbo-test was temporarily in the lockfile; after remove, those pins green)
+  - Historical quiet walls on this packet: Phase 4 cold 252.8s / warm 241.3s;
+    Phase 1 277.5s
+- After metrics (turbo-test 0.3.14, --jobs 8):
+  - Full suite wall **125.95s real** (summary wall 125725 ms)
+  - **1960 files** | **14954 passed** | **1775 failed** | **511 load-errors**
+  - File statuses: **1149 passed** / **300 failed** / **511 error** (811 red files,
+    ~41% of files not clean green)
+  - Test-level pass rate among executed cases ~89% (14954/16729), but discovery
+    and load differ from vitest (~24.7k tests on vitest), so not a 1:1 case map
+  - Pure pilot (5 gate helpers): vitest 72/72 in 0.91s real; turbo 46 pass +
+    3 entry load-errors in 0.20s real
+- First 20 failure signatures (sample re-run + stderr buckets):
+
+  1. `cjs compile failed: *.svelte :: SyntaxError: Unexpected token '<'` (admin Svelte;
+     also `@testing-library/svelte-core` wrapper)
+  2. `cjs compile failed: *.mjs :: SyntaxError: Cannot use 'import.meta' outside a module`
+  3. `cjs compile failed: scripts/asset_pipeline/lib/env.mjs :: Identifier '__dirname' has already been declared`
+  4. `ERROR ... (entry load failed)` with empty JSON message (511 files)
+  5. `Cannot read properties of undefined (reading 'PROD')` (import.meta.env / Vite define)
+  6. `Buffer.byteLength is not a function` (bare V8 Buffer surface; admin/server suites)
+  7. `import_node_fs.default.mkdtempSync is not a function` (Node fs shim gaps)
+  8. action_bar / admin / ai_review assertion chains fail after the above runtime gaps
+  9. same PROD undefined across moderation_actions, daily_reward_event_log, navigation
+  10. admin.test.ts mass fail (81 failures) dominated by Buffer.byteLength
+  11. Svelte component graph never loads under CJS transform
+  12. ESM scripts under `scripts/` fail CJS rewrite (`import.meta`)
+  13. load-error cluster on client/HUD painters and account client modules
+  14. JSON reporter omits assertion messages for error-status files
+  15. Work-stealing finishes wall early relative to vitest but correctness is not close
+  16. Temporary lockfile pin of turbo-test broke Eastbrook/tank sourceFingerprint tests
+  17. No dual-run value: red rate too high for CI signal
+  18. Author benches (React+jsdom 5-12x) do not transfer to Node+Sim+Svelte suite
+  19. Isolate reuse not measured; base isolation already far from green
+  20. Deno: not on PATH; skipped (expected drop)
+
+- Bun metrics:
+  - `bun test` pure 5 gate helpers: **72/72 in 65ms** real 0.07s
+  - `bun test` ability_damage + utils: green (small pure units)
+  - `bunx vitest run` 12 pure files: 128/128 in 2.50s vs node vitest 2.20s (no win)
+  - Full-suite `bun test` not adopted; native runner is not a vitest config drop-in
+    for the whole tree (and no wall win when hosting vitest)
+- Pass/fail: default vitest path restored green for asset fingerprint suite after
+  removing the temporary turbo-test dep; experimental scripts only
+- Decision: **not default** (drop as gate/CI runner; trying and measuring is success)
+  - Do **not** dual-run in CI
+  - Do **not** switch `package.json` `test` or `gate.mjs`
+  - Keep optional experimental scripts for future re-spikes without lockfile noise
+- Follow-ups:
+  - Phase 11 tier matrix
+  - Owner would need a near-100% green turbo-test or Bun story before reopening adopt
 
 

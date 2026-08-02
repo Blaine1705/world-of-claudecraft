@@ -14,8 +14,8 @@ Status: not-started / in-progress / blocked / complete / dropped
 | 6 | Pool, projects, isolation experiments | complete | 2026-08-02 | 2026-08-02 | drop all: keep default forks+isolate; no projects |
 | 7 | pnpm + shared store for worktrees | complete | 2026-08-02 | 2026-08-02 | full migration; 2nd worktree ~14s vs npm ~59s |
 | 8 | Task cache (turbo or wireit) | complete | 2026-08-02 | 2026-08-02 | turbo 2.10.8 keep; warm pure steps FULL TURBO ~87ms |
-| 9 | Suite cost reduction | not-started | | | |
-| 10 | Experimental runners spike | not-started | | | |
+| 9 | Suite cost reduction | complete | 2026-08-02 | 2026-08-02 | EMPTY/STABLE subsystem worlds keep; corpse empty drop |
+| 10 | Experimental runners spike | complete | 2026-08-02 | 2026-08-02 | not default: turbo-test wall win, pass rate fail; Bun pure only |
 | 11 | Cross-platform and tier matrix | not-started | | | |
 | 12 | Final QA and packet close | not-started | | | |
 
@@ -82,10 +82,10 @@ Status: not-started / in-progress / blocked / complete / dropped
 - [x] Touched suites green twice (68 tests); corpse green after revert; full suite optional re-profile deferred
 
 ### Phase 10 - Experimental runners
-- [ ] turbo-test spike numbers + pass rate
-- [ ] Optional Bun microbench
-- [ ] Explicit decision: not default / dual-run / adopt
-- [ ] No default gate swap without owner sign-off in state.md
+- [x] turbo-test spike numbers + pass rate (~126s wall, 811/1960 files red)
+- [x] Optional Bun microbench (pure green; bunx vitest no win)
+- [x] Explicit decision: **not default** (drop dual-run and adopt)
+- [x] No default gate swap; locked in state.md; experimental `test:turbo` / `test:bun` only
 
 ### Phase 11 - Cross-platform and tier matrix
 - [ ] Validation matrix filled for Windows, macOS, Linux (as available)

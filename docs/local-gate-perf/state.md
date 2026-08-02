@@ -2,8 +2,8 @@
 
 Resume point for the next session. Keep current after every phase.
 
-**Current phase:** Phase 9 complete.  
-**Next action:** run Phase 10 starter prompt (`phase-10-experimental-runners.md`).  
+**Current phase:** Phase 10 complete.  
+**Next action:** run Phase 11 starter prompt (`phase-11-cross-platform-tier-matrix.md`).  
 **Worktree:** `/Users/fernando/Documents/wocc-gate-perf-research`  
 **Branch:** `feature/local-gate-perf`  
 **Base:** always `origin/release/v0.34.0`
@@ -24,6 +24,10 @@ Resume point for the next session. Keep current after every phase.
    to chase wall time. Add tier presets and docs instead.
 6. **Prefer Vitest/Vite/Node plugs first.** turbo-test / Bun / Deno are spikes only
    unless a phase proves pass rate and wall win on this suite.
+   **Phase 10 locked:** experimental runners stay **not default**. Do not switch
+   `package.json` `test`, `scripts/gate.mjs`, or CI to turbo-test/Bun/Deno without
+   a new owner line here. Optional scripts `test:turbo` / `test:bun` are re-spike
+   hooks only (on-demand npx / local bun; no permanent turbo-test lockfile pin).
 7. **pnpm is the package manager** (full migration, Phase 7): `packageManager` +
    `pnpm-lock.yaml` only, CI frozen install, multi-worktree shared store. Do not
    reintroduce `package-lock.json` or dual lockfiles without an explicit owner
@@ -86,7 +90,9 @@ Always before calling a phase complete:
 | `scripts/gate_profile.mjs` | Phase 1 measurement CLI (timed steps + slow files) |
 | `scripts/lib/gate_profile.mjs` | Pure helpers for gate_profile (tested) |
 | `docs/local-gate-perf/tier-workers.md` | Cross-OS worker tier guidance |
-| `package.json` | scripts: test, test:related, test:changed, pretest, gate, gate:fast, build, build:bundle, check:types |
+| `package.json` | scripts: test, test:related, test:changed, test:turbo (exp), test:bun (exp), pretest, gate, gate:fast, build, build:bundle, check:types |
+| `scripts/test_turbo_experimental.mjs` | Phase 10 experimental turbo-test launcher (npx --yes; not default) |
+| `scripts/test_bun_experimental.mjs` | Phase 10 experimental bun launcher (not default) |
 | `vite.config.ts` | Vitest `test` block (`experimental.fsModuleCache`) |
 | `vitest.browser.config.ts` | Browser suite |
 | `.github/workflows/ci.yml` | CI shards and checks |
@@ -118,7 +124,11 @@ Fill as phases ship:
   only). File wall wins 7-50x. Dropped: corpse_harvest empty world (seed pins);
   architecture scan rewrite (not a top offender). No mega-file splits this phase
   (prior CI splits already applied; cost was ambient tick load, not file size).
-- (Phase 10) experimental runner outcome:
+- (Phase 10) experimental runner outcome: **not default (drop)**. turbo-test
+  0.3.14 full suite ~126s wall vs vitest ~241-401s, but 811/1960 files red
+  (1775 fails + 511 load-errors). Bun native green on pure helpers, no full-suite
+  adopt path; bunx vitest no faster. Deno skipped. No CI dual-run. No permanent
+  turbo-test dep (fingerprint lockfile leaf). Scripts: `test:turbo`, `test:bun`.
 - (Phase 11) tier matrix doc path:
 - (Phase 12) teardown:
 

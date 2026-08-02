@@ -138,7 +138,7 @@ suites can overlap; sum of file times exceeds suite wall).
 | 7 | M1 | n/a (install focus) | n/a | 2nd worktree ~4x faster (59s npm -> 14s pnpm) | keep |
 | 8 cold/warm | M1 | 411.8 (load) | n/a (vitest always) | pure multi-task 24s -> 87ms warm | keep |
 | 9 suite cost | M1 | n/a (file-level) | see Phase 9 table | top heavies 7-50x faster per file | keep |
-| 10 | | | | | |
+| 10 runners | M1 | n/a (no default swap) | turbo 126s red; vitest ~241-401s | not default; 811/1960 files red under turbo-test | drop |
 
 ## Target bands (aspirational, not hard CI fail)
 
@@ -430,4 +430,51 @@ shard balance both benefit immediately.
 Raw JSON (gitignored): `tmp/phase9-before.json`, `tmp/phase9-after.json`,
 `tmp/phase9-final.json`, `tmp/phase9-stable-before.json`,
 `tmp/phase9-stable-after.json`.
+
+## Phase 10 - experimental runners (not default)
+
+Measured 2026-08-02 on M1 (darwin/arm64, 16 logical CPUs, 128 GiB, Node 26.5.0,
+pnpm 10.34.5, vitest 4.1.10, Bun 1.3.14). SHA during spike: `eed68b938e`.
+
+**Decision: not default.** Keep Vitest as `npm test` / full gate. Optional
+scripts `test:turbo` and `test:bun` are experimental only. No CI dual-run. No
+permanent `@miaskiewicz/turbo-test` dependency (lockfile is an asset fingerprint
+leaf).
+
+### Full suite A/B (maxWorkers / jobs = 8)
+
+| Runner | Real wall s | Files | Tests pass/fail (reported) | Result |
+|---|---:|---|---|---|
+| Vitest 4.1.10 (historical quiet, Phase 4 warm) | ~241 | ~1945 | ~24693 pass | green |
+| Vitest 4.1.10 (contended, with temporary turbo-test in lockfile) | 401.1 | 1939 pass / 7 fail | 24693 pass / 9 fail | fingerprint red only |
+| turbo-test 0.3.14 `--jobs 8` | **126.0** | 1149 pass / 300 fail / 511 error | 14954 pass / 1775 fail + 511 load-err | **not adopt** |
+
+turbo-test is roughly **2x faster wall** than a quiet vitest full suite on this
+machine, but **~41% of files** are not clean green. That is not dual-run quality.
+
+### Pure helper pilot (5 gate_* files, 72 tests)
+
+| Runner | Real s | Pass/fail |
+|---|---:|---|
+| vitest --maxWorkers=8 | 0.91 | 72/72 |
+| turbo-test --jobs 8 | 0.20 | 46 pass + 3 load-errors |
+| bun test | 0.07 | 72/72 |
+
+### Bun as vitest host (12 pure-ish files, 128 tests, maxWorkers=4)
+
+| Host | Real s | Result |
+|---|---:|---|
+| node + npx vitest | 2.20 | 128/128 |
+| bunx vitest | 2.50 | 128/128 |
+
+No wall win hosting Vitest under Bun on this set.
+
+### Deno
+
+Not installed on measurement host. Dropped without install (expected).
+
+### Artifact paths (gitignored)
+
+`tmp/phase10/turbo-full.json`, `tmp/phase10/turbo-full.stderr`,
+`tmp/phase10/vitest-full.log`, pure pilot logs under `tmp/phase10/`.
 
