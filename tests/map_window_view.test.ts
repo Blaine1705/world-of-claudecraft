@@ -13,13 +13,10 @@ import { describe, expect, it } from 'vitest';
 import {
   CAMPS,
   DELVE_X_MIN,
-  DUNGEON_LIST,
   PROPS,
   QUESTS,
   STRIP_MAX_X,
   STRIP_MIN_X,
-  WORLD_MAX_X,
-  WORLD_MIN_X,
   ZONES,
 } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
@@ -117,6 +114,25 @@ function makeOverworldWorld(
     questState: (q: string) => (q === GIVER_QUEST.id ? 'available' : 'unavailable'),
     questLog,
   } as unknown as IWorld;
+}
+
+/** makeOverworldWorld plus a party roster (issue 2652): self (pid 1, must draw
+ *  no marker), one alive member inside the zone/view, one dead member inside
+ *  the zone/view, and one member well outside the committed zone. */
+function makeOverworldWorldWithParty(shape: 'sim' | 'client'): IWorld {
+  const world = makeOverworldWorld(shape) as unknown as { partyInfo: unknown };
+  world.partyInfo = {
+    leader: 1,
+    raid: false,
+    master: { enabled: false, looter: 0, threshold: 'uncommon' },
+    members: [
+      { pid: 1, name: 'Me', cls: 'warrior', dead: 0, x: 0, z: ZONE_CZ },
+      { pid: 5, name: 'Ally', cls: 'mage', dead: 0, x: 15, z: ZONE_CZ },
+      { pid: 6, name: 'Fallen', cls: 'priest', dead: 1, x: -15, z: ZONE_CZ },
+      { pid: 7, name: 'FarAway', cls: 'rogue', dead: 0, x: ZONE_MAX_X + 50, z: ZONE_CZ },
+    ],
+  };
+  return world as unknown as IWorld;
 }
 
 function makeDelveWorld(shape: 'sim' | 'client'): IWorld {
@@ -419,6 +435,19 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     expect(npcMarkerAt([], glyph.mx, glyph.my)).toBeNull();
   });
 
+  it('still shows the quest-giver glyph when the npc entity is not mirrored (online interest-radius parity)', () => {
+    // Online, ClientWorld.entities only carries entities inside the ~120-130yd
+    // interest radius, so a distant quest giver is never mirrored into it. The
+    // glyph must resolve from static NPCS content regardless, exactly like the
+    // quest-area blobs already do (documented at the top of this file).
+    const world = makeOverworldWorld('client') as unknown as { entities: Map<number, unknown> };
+    world.entities.delete(2); // the seeded giver npc; only the player remains
+    const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+    expect(model.npcs).toHaveLength(1);
+    expect(model.npcs[0].ready).toBe(false);
+    expect(model.npcs[0].quests).toEqual([{ questId: GIVER_QUEST.id, ready: false }]);
+  });
+
   it("marks the glyph ready when a turn-in is ready (the '?' branch, not '!')", () => {
     const world = makeOverworldWorld('client') as unknown as {
       entities: Map<number, { templateId: string; questIds: string[] }>;
@@ -458,10 +487,73 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     expect(model.allies.map((a) => a.name)).toEqual(['FriendA', 'GuildB']);
   });
 
-  it('drops player, NPC, and ally markers outside the committed zone', () => {
+  it('is empty solo / with no party formed', () => {
+    const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), LABELS_ZOOM));
+    expect(model.party).toEqual([]);
+  });
+
+  describe('party markers (issue 2652)', () => {
+    it('projects one marker per member, excluding self and a member outside the committed zone', () => {
+      const model = buildOverworldMapModel(input(makeOverworldWorldWithParty('sim'), LABELS_ZOOM));
+      expect(model.party.map((m) => m.name)).toEqual(['Ally', 'Fallen']);
+    });
+
+    it('carries only cls/dead/name identity, no resolved color, at the same projection every other marker uses', () => {
+      const model = buildOverworldMapModel(input(makeOverworldWorldWithParty('sim'), LABELS_ZOOM));
+      const ally = model.party.find((m) => m.name === 'Ally');
+      expect(ally).toBeDefined();
+      if (!ally) return;
+      expect(Object.keys(ally).sort()).toEqual(['cls', 'dead', 'mx', 'my', 'name'].sort());
+      expect(ally.cls).toBe('mage');
+      expect(ally.dead).toBe(false);
+      const r = model.region;
+      expect(ally.mx).toBeCloseTo(((r.maxX - 15) / (r.maxX - r.minX)) * CANVAS, 6);
+      expect(ally.my).toBeCloseTo(((r.maxZ - ZONE_CZ) / (r.maxZ - r.minZ)) * CANVAS, 6);
+    });
+
+    it('marks a dead member dead, distinctly from an alive one', () => {
+      const model = buildOverworldMapModel(input(makeOverworldWorldWithParty('sim'), LABELS_ZOOM));
+      const fallen = model.party.find((m) => m.name === 'Fallen');
+      expect(fallen?.dead).toBe(true);
+      expect(fallen?.cls).toBe('priest');
+    });
+
+    it('drops a member outside the committed zone, like every other marker kind', () => {
+      const model = buildOverworldMapModel(input(makeOverworldWorldWithParty('sim'), LABELS_ZOOM));
+      expect(model.party.some((m) => m.name === 'FarAway')).toBe(false);
+    });
+
+    it('Sim-shaped and ClientWorld-mirror-shaped stubs render an identical party array', () => {
+      const fromSim = buildOverworldMapModel(
+        input(makeOverworldWorldWithParty('sim'), LABELS_ZOOM),
+      );
+      const fromClient = buildOverworldMapModel(
+        input(makeOverworldWorldWithParty('client'), LABELS_ZOOM),
+      );
+      expect(fromSim.party).toEqual(fromClient.party);
+    });
+
+    it('draws a party member who is also an online friend once, as the party marker, not twice', () => {
+      const world = makeOverworldWorldWithParty('sim') as unknown as {
+        socialInfo: {
+          friends: { id: number; name: string; online: boolean; x: number; z: number }[];
+        };
+      };
+      // 'Ally' is party pid 5 at x=15; also list them as an online friend at the
+      // same spot, the common case of partying with someone on your friends list.
+      world.socialInfo.friends.push({ id: 99, name: 'Ally', online: true, x: 15, z: ZONE_CZ });
+      const model = buildOverworldMapModel(input(world as unknown as IWorld, LABELS_ZOOM));
+      expect(model.party.filter((m) => m.name === 'Ally')).toHaveLength(1);
+      expect(model.allies.filter((a) => a.name === 'Ally')).toHaveLength(0);
+    });
+  });
+
+  // NPC quest-giver glyphs get their own zone-culling coverage below: they
+  // resolve from static NPCS content, not the entity mirror, so they are not
+  // interest-radius limited the way the player/ally markers here are.
+  it('drops player and ally markers outside the committed zone', () => {
     const world = makeOverworldWorld('client') as unknown as {
       player: { pos: { x: number; z: number } };
-      entities: Map<number, { pos: { x: number; z: number } }>;
       socialInfo: {
         friends: { x?: number; z?: number }[];
         guild: { members: { x?: number; z?: number }[] };
@@ -469,15 +561,49 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     };
     const outsideX = ZONE_MAX_X + 50;
     world.player.pos.x = outsideX;
-    const npc = world.entities.get(2);
-    if (!npc) throw new Error('expected seeded npc');
-    npc.pos.x = outsideX;
     for (const friend of world.socialInfo.friends) friend.x = outsideX;
     for (const member of world.socialInfo.guild.members) member.x = outsideX;
     const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
     expect(model.player).toBeNull();
-    expect(model.npcs).toEqual([]);
     expect(model.allies).toEqual([]);
+  });
+
+  it('drops an npc quest-giver glyph outside the committed zone z-band (static content, not entity-scoped)', () => {
+    // questGiverNpcMarkers resolves from static NPCS content, so unlike the
+    // player/ally markers above it is never interest-radius limited, but it
+    // is still zone-scoped the same way every other marker family is: the
+    // shared inZone/inView(x,z) test, not z alone.
+    const world = makeOverworldWorld('client');
+    const outsideZone = { ...ZONE, zMin: ZONE.zMax + 1000, zMax: ZONE.zMax + 2000 };
+    const model = buildOverworldMapModel({
+      world,
+      props: PROPS,
+      zone: outsideZone,
+      zoom: 1,
+      center: null,
+      canvasSize: CANVAS,
+      decorations: NO_DECOR,
+    });
+    expect(model.npcs).toEqual([]);
+  });
+
+  it('drops an npc quest-giver glyph inside the zone z-band but outside its x-range', () => {
+    // Zones are not z-disjoint (a z band can hold multiple zones side by
+    // side), so the x test is load bearing: a giver whose z falls inside
+    // this zone's band but whose x falls outside its x-range must still be
+    // culled, not just projected off-canvas.
+    const world = makeOverworldWorld('client');
+    const outsideXZone = { ...ZONE, xMin: ZONE_MAX_X + 1000, xMax: ZONE_MAX_X + 2000 };
+    const model = buildOverworldMapModel({
+      world,
+      props: PROPS,
+      zone: outsideXZone,
+      zoom: 1,
+      center: null,
+      canvasSize: CANVAS,
+      decorations: NO_DECOR,
+    });
+    expect(model.npcs).toEqual([]);
   });
 
   it('uses a rectangular column zone as the sole frame, with ocean letterboxing', () => {

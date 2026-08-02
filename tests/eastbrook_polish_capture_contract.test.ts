@@ -6,6 +6,7 @@ const captureContract =
   // @ts-expect-error The executable capture contract intentionally ships as plain Node ESM.
   await import('../scripts/assets/eastbrook_grand_armoury/capture_contract.mjs');
 const {
+  assertTownCaptureMetadata,
   assertTownAttributionTargetState,
   assertTownMotionEvidence,
   assertTownNpcFacingOverlay,
@@ -254,7 +255,7 @@ describe('Eastbrook polish capture contract', () => {
       layoutId: 'eastbrook_civic_layout_v2',
       sourceComparison: 'polish-v2-worktree',
       placementInventory: EASTBROOK_TOWN_POLISH_V2_PLACEMENT_INVENTORY,
-      townTriangles: 28_330,
+      townTriangles: 29_110,
       attributionTargets: [
         {
           key: 'town-root',
@@ -359,13 +360,15 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned for the v0.32.1 main catch-up merge: the seal
-      // fingerprints src/render/renderer.ts, so it re-mints whenever the
-      // renderer coordinator moves. The class-overhaul and release renderer
-      // deltas fold together here; every Eastbrook line in renderer.ts is
-      // byte-identical across that delta, so the accepted evidence still
-      // depicts this tree. No recapture.
-      fingerprint: '412e5f8360cc63bdb356ad33c44978f8673b88f3ea2fe1cd48e21f78291117b6',
+      // Deliberately re-pinned. Four independent causes now stack: the 0.33.0
+      // version sync moved every GLB source-fingerprint leaf (#2729), the
+      // graphics overhaul and the ability-VFX integration each changed the
+      // renderer-integration and view-priority leaves, and this branch edits
+      // src/render/renderer.ts for the compile gates. So the composite mints
+      // fresh and matches no parent's literal. No pipeline input or geometry
+      // value changed, and no capture was retaken (the five per-asset seal
+      // suites stay green untouched).
+      fingerprint: '2172d6960ce3057f6b64d2a1d178ab2b7df5f6802636010b1fa06e57a452106a',
       components: {
         captureContract: {
           id: 'polish-v2',
@@ -579,8 +582,52 @@ describe('Eastbrook polish capture contract', () => {
     expect(() => assertPerf(29_644)).not.toThrow();
     expect(() => assertPerf(29_644, 'rebuild-v1')).not.toThrow();
     expect(() => assertPerf(29_644, 'polish-baseline')).not.toThrow();
-    expect(() => assertPerf(28_330, 'polish-v2')).not.toThrow();
+    expect(() => assertPerf(29_110, 'polish-v2')).not.toThrow();
     expect(() => assertPerf(29_644, 'polish-v2')).toThrow('draw stats');
+  });
+
+  it('rejects mismatched historical capture and performance snapshots before validation', () => {
+    const mismatchedSnapshot = structuredClone(EASTBROOK_TOWN_CAPTURE_CONTRACTS['polish-v2']);
+    mismatchedSnapshot.id = 'rebuild-v1';
+    expect(() =>
+      assertTownCaptureMetadata({
+        metadata: {
+          schemaVersion: 2,
+          captureScope: 'town',
+          townContract: { id: 'polish-v2' },
+        },
+        contractId: 'polish-v2',
+        captureContractSnapshot: mismatchedSnapshot,
+      }),
+    ).toThrow('town capture contract snapshot id does not match the requested contract');
+    expect(() =>
+      assertTownPerformanceBlockState({
+        raw: {},
+        label: 'mismatched-snapshot',
+        rootVisible: true,
+        shadowEnabled: true,
+        contractId: 'polish-v2',
+        captureContractSnapshot: mismatchedSnapshot,
+      }),
+    ).toThrow('town performance contract snapshot id does not match the requested contract');
+    expect(() => expectedTownPlacementInventory(true, 'polish-v2', mismatchedSnapshot)).toThrow(
+      'town placement contract snapshot id does not match the requested contract',
+    );
+    expect(() =>
+      assertTownAttributionTargetState({
+        targets: [],
+        contractId: 'polish-v2',
+        requestedVisible: true,
+        captureContractSnapshot: mismatchedSnapshot,
+      }),
+    ).toThrow('town attribution contract snapshot id does not match the requested contract');
+    expect(() =>
+      assertTownMotionEvidence({
+        evidence: null,
+        contractId: 'polish-v2',
+        captureContractSnapshot: mismatchedSnapshot,
+      }),
+    ).toThrow('town motion contract snapshot id does not match the requested contract');
   });
 
   it('aims every added view at a collision-clear point beside its stable layout subject', () => {
@@ -847,6 +894,27 @@ describe('Eastbrook polish capture contract', () => {
     const unsharedAtlas = validPolishAttributionTargets();
     unsharedAtlas[2].surfaceAtlas.textureUuid = 'different-atlas';
     expect(() => assertTargets(unsharedAtlas)).toThrow('share one atlas texture identity');
+
+    const snapshot = structuredClone(EASTBROOK_TOWN_CAPTURE_CONTRACTS['polish-v2']);
+    snapshot.attributionTargets[0].key = 'historical-town-root';
+    const snapshotTargets = validPolishAttributionTargets();
+    snapshotTargets[0].key = 'historical-town-root';
+    expect(() =>
+      assertTownAttributionTargetState({
+        targets: snapshotTargets,
+        contractId: 'polish-v2',
+        requestedVisible: false,
+        captureContractSnapshot: snapshot,
+      }),
+    ).not.toThrow();
+    expect(() =>
+      assertTownAttributionTargetState({
+        targets,
+        contractId: 'polish-v2',
+        requestedVisible: false,
+        captureContractSnapshot: snapshot,
+      }),
+    ).toThrow('stable layout ids');
   });
 
   it('validates NPC-facing arrows as stable layout records', () => {

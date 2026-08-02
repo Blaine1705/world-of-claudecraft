@@ -383,6 +383,11 @@ CREATE TABLE IF NOT EXISTS email_change_requests (
 );
 CREATE INDEX IF NOT EXISTS email_change_requests_token ON email_change_requests(token_hash);
 CREATE INDEX IF NOT EXISTS email_change_requests_account ON email_change_requests(account_id);
+-- Retention: the per-account supersede DELETE in createEmailChangeRequest below
+-- removes only a duplicate still-PENDING row, never a consumed or abandoned one,
+-- so it does not bound this table's growth. pruneEmailChangeRequestsBatch (the
+-- EMAIL_CHANGE_REQUEST_RETENTION_DAYS sweep table) is what ages rows out.
+CREATE INDEX IF NOT EXISTS email_change_requests_created ON email_change_requests(created_at);
 -- Pending self-service password resets. Same posture as email_change_requests:
 -- only the SHA-256 of the token is stored (a DB leak cannot be replayed into a
 -- takeover), each row is single-use (consumed_at) and time-boxed (expires_at).
@@ -397,8 +402,15 @@ CREATE TABLE IF NOT EXISTS password_reset_requests (
 );
 CREATE INDEX IF NOT EXISTS password_reset_requests_token ON password_reset_requests(token_hash);
 CREATE INDEX IF NOT EXISTS password_reset_requests_account ON password_reset_requests(account_id);
+-- Retention: same caveat as email_change_requests above, mirrored here. The
+-- per-account supersede DELETE in createPasswordResetRequest below only removes
+-- a duplicate still-PENDING row; prunePasswordResetRequestsBatch
+-- (PASSWORD_RESET_REQUEST_RETENTION_DAYS) is what ages rows out.
+CREATE INDEX IF NOT EXISTS password_reset_requests_created ON password_reset_requests(created_at);
 -- Audit trail for every outbound email attempt (success or failure). Doubles as
--- the source for any future per-account send rate limiting.
+-- the source for any future per-account send rate limiting. Retention:
+-- pruneEmailLogBatch (EMAIL_LOG_RETENTION_DAYS) ages rows out; nothing else
+-- bounds this table.
 CREATE TABLE IF NOT EXISTS email_log (
   id BIGSERIAL PRIMARY KEY,
   account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
@@ -410,6 +422,9 @@ CREATE TABLE IF NOT EXISTS email_log (
   sent_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS email_log_account ON email_log(account_id, sent_at DESC);
+-- email_log_account leads on account_id, so it cannot serve pruneEmailLogBatch's
+-- account-agnostic age scan; this plain sent_at index is the one that does.
+CREATE INDEX IF NOT EXISTS email_log_sent ON email_log(sent_at);
 -- Optional TOTP two-factor auth. totp_secret holds the confirmed base32 secret
 -- (NULL until 2FA is fully enabled); totp_pending_secret holds a secret minted
 -- by setup but not yet confirmed with a live code, so a botched enrolment never
@@ -756,6 +771,19 @@ CREATE INDEX IF NOT EXISTS wallet_link_challenges_account ON wallet_link_challen
 CREATE TABLE IF NOT EXISTS steam_links (
   account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
   steam_id TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- Epic account links (the deeds achievement mirror). Copies the steam_links
+-- shape: one Epic account per WoCC account (account_id is the PK) and one
+-- WoCC account per Epic id (epic_account_id is UNIQUE). A row is a cosmetic-
+-- mirror pointer only, proven by a server-verified link proof at link time
+-- (server/epic/): it is NEVER an identity or session source, and login stays
+-- email + Discord only. Accessors live in server/epic/epic_db.ts. Purely
+-- additive leaf: a pre-Epic rollback binary never references it, and the
+-- CASCADE keeps account deletion consistent even under old code.
+CREATE TABLE IF NOT EXISTS epic_links (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  epic_account_id TEXT NOT NULL UNIQUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE TABLE IF NOT EXISTS daily_reward_days (
@@ -1831,7 +1859,10 @@ export async function createEmailChangeRequest(
 ): Promise<void> {
   // Invalidate any still-pending request for this account first: only the most
   // recent change link should be live (a user who re-requests supersedes the
-  // old address), and this keeps the table from accumulating dead rows.
+  // old address). This bounds duplicate PENDING rows per account, nothing more:
+  // a consumed or abandoned-and-expired row is untouched here and would grow
+  // the table forever without pruneEmailChangeRequestsBatch (the retention
+  // sweep table registered in main.ts).
   await pool.query(
     'DELETE FROM email_change_requests WHERE account_id = $1 AND consumed_at IS NULL',
     [accountId],
@@ -1891,7 +1922,10 @@ export async function createPasswordResetRequest(
   ttlHours: number,
 ): Promise<void> {
   // Invalidate any still-pending reset for this account first: only the most
-  // recent link stays live, and this keeps the table from accumulating dead rows.
+  // recent link stays live. This bounds duplicate PENDING rows per account,
+  // nothing more: a consumed or abandoned-and-expired row is untouched here
+  // and would grow the table forever without prunePasswordResetRequestsBatch
+  // (the retention sweep table registered in main.ts).
   await pool.query(
     'DELETE FROM password_reset_requests WHERE account_id = $1 AND consumed_at IS NULL',
     [accountId],
@@ -1962,6 +1996,78 @@ export async function recordEmailLog(entry: EmailLogEntry): Promise<void> {
      VALUES ($1, $2, $3, $4, $5, $6)`,
     [entry.accountId, entry.event, entry.toEmail, entry.category, entry.ok, entry.error ?? null],
   );
+}
+
+// Keeps password_reset_requests bounded. PASSWORD_RESET_REQUEST_RETENTION_DAYS=0
+// disables pruning. The per-account supersede DELETE in createPasswordResetRequest
+// above only removes a duplicate PENDING row, never a consumed or
+// abandoned-and-expired one, so this is the only thing that actually bounds the
+// table. One bounded batch per call: the caller (the retention sweep) drives
+// iteration, so each DELETE is a short autocommit statement on the default
+// statement timeout, riding password_reset_requests_created via the
+// oldest-first ORDER BY.
+export async function prunePasswordResetRequestsBatch(
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM password_reset_requests
+      WHERE id IN (
+        SELECT id FROM password_reset_requests
+         WHERE created_at < now() - ($1 || ' days')::interval
+         ORDER BY created_at
+         LIMIT $2)`,
+    [String(days), Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
+}
+
+// Keeps email_change_requests bounded. EMAIL_CHANGE_REQUEST_RETENTION_DAYS=0
+// disables pruning. Same rationale as prunePasswordResetRequestsBatch above: the
+// per-account supersede DELETE in createEmailChangeRequest only bounds duplicate
+// PENDING rows, so this is the only thing that bounds the table, riding
+// email_change_requests_created via the oldest-first ORDER BY.
+export async function pruneEmailChangeRequestsBatch(
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM email_change_requests
+      WHERE id IN (
+        SELECT id FROM email_change_requests
+         WHERE created_at < now() - ($1 || ' days')::interval
+         ORDER BY created_at
+         LIMIT $2)`,
+    [String(days), Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
+}
+
+// Keeps email_log bounded. EMAIL_LOG_RETENTION_DAYS=0 disables pruning. Nothing
+// else prunes this table (every outbound email attempt writes one row via
+// recordEmailLog and none are ever superseded), so without this the audit trail
+// grows forever. Ages on sent_at (the table has no created_at column), riding
+// email_log_sent via the oldest-first ORDER BY.
+export async function pruneEmailLogBatch(
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM email_log
+      WHERE id IN (
+        SELECT id FROM email_log
+         WHERE sent_at < now() - ($1 || ' days')::interval
+         ORDER BY sent_at
+         LIMIT $2)`,
+    [String(days), Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
 }
 
 // ── Two-factor auth (TOTP) ──────────────────────────────────────────────────
@@ -3068,7 +3174,23 @@ export interface LifetimeXpLeaderRow {
   // The selected Book of Deeds title (a deed id the client localizes; never
   // English), null when untitled. The charactersForDeedsBoard read shape.
   activeTitle: string | null;
+  // The character's guild display name, null when unguilded. Shown beside the
+  // name on both ranked surfaces (the home-page board and the in-game panel),
+  // the same `<Guild>` treatment the nameplate already uses.
+  guild: string | null;
 }
+
+// Guild display name per ranked character, as a SELECT-list scalar subquery so
+// the ranking itself is untouched: the WHERE / ORDER BY still key on the bare
+// LIFETIME_XP_EXPR, so the expression indexes keep serving both arms. Correlated
+// on characters.id, which is guild_members' primary key (a character sits in at
+// most one guild), so the lookup is a single index probe per ranked row and the
+// membership row alone decides the guild (no realm predicate needed: the global
+// arm ranks characters from every realm).
+const LEADER_GUILD_NAME_SQL = `(SELECT g.name
+                  FROM guild_members gm
+                  JOIN guilds g ON g.id = gm.guild_id
+                 WHERE gm.character_id = characters.id) AS guild_name`;
 
 // `global: true` ranks across every realm (for the home-page board); otherwise
 // it is scoped to this process's realm (the in-game panel). Both paths filter
@@ -3088,7 +3210,8 @@ export async function topLifetimeXp(
           `SELECT name, class, level, realm,
                 COALESCE((state->>'lifetimeXp')::bigint, 0) AS lifetime_xp,
                 COALESCE((state->>'prestigeRank')::int, 0)  AS prestige_rank,
-                state->>'activeTitle' AS active_title
+                state->>'activeTitle' AS active_title,
+                ${LEADER_GUILD_NAME_SQL}
            FROM characters
           WHERE state IS NOT NULL
             AND ${LIFETIME_XP_EXPR} > 0
@@ -3102,7 +3225,8 @@ export async function topLifetimeXp(
           `SELECT name, class, level, realm,
                 COALESCE((state->>'lifetimeXp')::bigint, 0) AS lifetime_xp,
                 COALESCE((state->>'prestigeRank')::int, 0)  AS prestige_rank,
-                state->>'activeTitle' AS active_title
+                state->>'activeTitle' AS active_title,
+                ${LEADER_GUILD_NAME_SQL}
            FROM characters
           WHERE realm = $1 AND state IS NOT NULL
             AND ${LIFETIME_XP_EXPR} > 0
@@ -3123,6 +3247,8 @@ export async function topLifetimeXp(
     // Normalized like charactersForDeedsBoard: a non-empty string or null.
     activeTitle:
       typeof r.active_title === 'string' && r.active_title !== '' ? r.active_title : null,
+    // Same normalization: the subquery yields NULL for an unguilded character.
+    guild: typeof r.guild_name === 'string' && r.guild_name !== '' ? r.guild_name : null,
   }));
 }
 
