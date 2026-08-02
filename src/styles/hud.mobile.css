@@ -3341,9 +3341,11 @@
     border-bottom-left-radius: 0;
     border-left: 0;
   }
-  /* The category chips wrap to two rows at half-viewport width and eat the grid,
-     so keep them one horizontally scrollable row inside the cluster (the bank pairing
-     does the same); nothing is hidden and every chip keeps its full tap height. */
+  /* One horizontally scrollable chip row, like everywhere on mobile: the base
+     .bag-chips rule near the top of this layer already forces nowrap + scroll for
+     every mobile chip row, and this restates it for the paired cluster so the
+     containment survives if the base rule ever narrows (the bank pairing does the
+     same); nothing is hidden and every chip keeps its full tap height. */
   body.mobile-touch.char-bags-paired #bags .bag-chips {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -3758,12 +3760,11 @@
     border-bottom-right-radius: 0;
     border-right-width: 1px;
   }
-  /* Short landscape phones: the category chips wrap to two rows at half-viewport
-     width and eat the grid (a sub-row sliver at 360px tall). Keep them one
-     horizontally scrollable row inside the bank AND market clusters (both panels, so
-     each pair stays visually consistent; the vendor cluster and standalone bags keep
-     the family wrap). Nothing is hidden: every chip stays reachable by scroll and
-     keeps its full tap height. */
+  /* Short landscape phones: one horizontally scrollable chip row inside the bank
+     AND market clusters, like everywhere on mobile (the base .bag-chips rule near
+     the top of this layer already forces nowrap + scroll); restated per cluster so
+     both panels of each pair keep identical scroll containment. Nothing is hidden:
+     every chip stays reachable by scroll and keeps its full tap height. */
   body.mobile-touch #bank-window .bag-chips,
   body.mobile-touch.bank-open #bags .bag-chips,
   body.mobile-touch.market-open #bags .bag-chips {

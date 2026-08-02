@@ -389,6 +389,24 @@ describe('planDepositAllMaterials: selection and order (synthetic lookup)', () =
     });
   });
 
+  it('the quest belt is live: a quest-kind def is skipped even when its id is in the taxonomy', () => {
+    // Contrived on purpose: no real catalog id is both quest-kind and a set
+    // member (the set filters to kind junk), so this lookup dresses a member
+    // id in a quest kind to prove the plan's own guard acts rather than
+    // free-riding on the taxonomy. The button gate has no such belt by
+    // design: it answers from the taxonomy alone, and the second assertion
+    // pins that asymmetry.
+    const questLookup: ItemLookup = (id) =>
+      id === 'copper_ore' ? ({ id, kind: 'quest' } as ItemDef) : lookup(id);
+    const inv: InvSlot[] = [{ itemId: 'copper_ore', count: 3 }];
+    expect(planDepositAllMaterials(inv, [], 24, questLookup)).toEqual({
+      sends: [],
+      stacks: 0,
+      full: false,
+    });
+    expect(hasDepositableMaterials(inv, questLookup)).toBe(true);
+  });
+
   it('reports the bank already full: nothing sent but full is set', () => {
     const inv: InvSlot[] = [{ itemId: 'copper_ore', count: 1 }];
     const plan = planDepositAllMaterials(inv, [{ itemId: 'gear', count: 1 }], 1, lookup);
@@ -639,6 +657,26 @@ describe('deposit-all narrows to the honest taxonomy (phase 19)', () => {
     }
     for (const id of INCLUDED) expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
     for (const id of EXCLUDED) expect(MATERIAL_ITEM_IDS.has(id), id).toBe(false);
+    // Each EXCLUDED fixture must keep representing its ruled class: a content
+    // re-authoring that changed a kind would silently hollow out the replay's
+    // per-class coverage while the behavior assertions stayed green.
+    const EXCLUDED_CLASS: Record<(typeof EXCLUDED)[number], { kind: string; quality?: string }> = {
+      simple_fishing_pole: { kind: 'tool' },
+      gatherers_cache: { kind: 'tool' },
+      amber_hide: { kind: 'junk', quality: 'poor' },
+      guardian_core: { kind: 'junk' },
+      raw_river_perch: { kind: 'food' },
+      boar_hide: { kind: 'quest' },
+      linen_pouch: { kind: 'bag' },
+      reins_valorsteed: { kind: 'mount' },
+      event_skin_token: { kind: 'tool' },
+      worn_sword: { kind: 'weapon' },
+    };
+    for (const id of EXCLUDED) {
+      const want = EXCLUDED_CLASS[id];
+      expect(REAL_ITEMS[id]?.kind, id).toBe(want.kind);
+      if (want.quality) expect(REAL_ITEMS[id]?.quality, id).toBe(want.quality);
+    }
   });
 
   it('plans exactly the included classes and replays against a real Sim with zero errors', () => {

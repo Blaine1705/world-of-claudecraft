@@ -559,7 +559,21 @@ export const TARGETS = [
         } catch {}
         game?.hud?.openBank?.();
       });
-      await pollForSize(page, '#bank-window');
+      // Loud failure over a silent full-frame shot: the addItem/teleport steps
+      // above are try/catch-swallowed and openBank is optional-chained, so this
+      // poll is the only place a broken recipe can surface.
+      if (!(await pollForSize(page, '#bank-window'))) {
+        throw new Error('bank window did not open');
+      }
+      // Deposit-all fills the vault, which mounts the bank's OWN chip row and
+      // toolbar (an empty bank renders chipless), so the shot shows both
+      // windows' chips AND the narrowed sweep itself: only the honest
+      // materials cross while the pole, grey hide, trophy, and raw fish stay
+      // in the bags. The bank_mobile_buyrow_check.mjs recipe.
+      await page.evaluate(() => document.querySelector('#bank-window .bank-deposit-all')?.click());
+      if (!(await pollForSize(page, '#bank-window .bag-chips'))) {
+        throw new Error('bank chip row did not mount after deposit-all');
+      }
       await wait(700);
       return {};
     },

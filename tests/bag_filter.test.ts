@@ -1,4 +1,8 @@
 import { describe, expect, it } from 'vitest';
+// Aliased: this file declares a small synthetic ITEMS table for the filter
+// arms, so the real merged catalog (needed for the reachability census) comes
+// in renamed.
+import { ITEMS as REAL_ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import {
   applyBagFilter,
@@ -7,6 +11,7 @@ import {
   bagFilterIsDefault,
   bagOrderIsManual,
   DEFAULT_BAG_FILTER,
+  matchesCategory,
   parseBagFilter,
   serializeBagFilter,
 } from '../src/ui/bag_filter';
@@ -66,7 +71,7 @@ function ids(slots: InvSlot[]): string[] {
   return slots.map((s) => s.itemId);
 }
 
-describe('applyBagFilter — category filtering', () => {
+describe('applyBagFilter: category filtering', () => {
   it('returns everything (insertion order) for "all" + "recent"', () => {
     const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'recent', search: '' });
     expect(ids(out)).toEqual(ids(INV));
@@ -158,7 +163,7 @@ describe('applyBagFilter — category filtering', () => {
   });
 });
 
-describe('applyBagFilter — search', () => {
+describe('applyBagFilter: search', () => {
   it('matches a case-insensitive name substring', () => {
     const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'recent', search: 'red' });
     expect(ids(out)).toEqual(['blade']);
@@ -179,7 +184,7 @@ describe('applyBagFilter — search', () => {
   });
 });
 
-describe('applyBagFilter — sorting', () => {
+describe('applyBagFilter: sorting', () => {
   it('sorts by quality descending (legendary first, poor last), ties keep insertion order', () => {
     const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'quality', search: '' });
     expect(ids(out)).toEqual([
@@ -328,5 +333,57 @@ describe('bagOrderIsManual (the reorder gate)', () => {
     expect(bagOrderIsManual({ category: 'all', sort: 'name', search: '' })).toBe(false);
     expect(bagOrderIsManual({ category: 'weapon', sort: 'recent', search: '' })).toBe(false);
     expect(bagOrderIsManual({ category: 'all', sort: 'recent', search: 'clo' })).toBe(false);
+  });
+});
+
+describe('chip reachability census: the All-only set, pinned', () => {
+  // The market pins "no item reachable only through All" as a doctrine
+  // (tests/market_filters.test.ts); the bags/bank chips deliberately do NOT
+  // carry it: the 2026-08-01 settlement ruled grey trash and the five trophy
+  // oddments out of every chip (Q3/Q4), and the six bag-kind items matched no
+  // chip before the narrowing either. This census makes the ruling
+  // enforceable: a chip or taxonomy edit that strands MORE items (or quietly
+  // rescues one the settlement excluded) reds an exact-set diff naming it.
+  const ALL_ONLY = [
+    'amber_hide',
+    'bandit_bandana',
+    'bogiron_nugget',
+    'briny_idol',
+    'chipped_tusk',
+    'cracked_fetish',
+    'cracked_ogre_tusk',
+    'cracked_wyrm_scale',
+    'deepfen_pearl',
+    'emberwing_cinderscale',
+    'frayed_prayer_beads',
+    'gleamstag_charm',
+    'gravewoven_bag',
+    'guardian_core',
+    'inert_storm_shard',
+    'last_keep_signet',
+    'linen_pouch',
+    'mistcallers_duffel',
+    'moonpale_scale',
+    'mudfin_scale',
+    'ogre_toe_ring',
+    'old_cragmaws_pelt',
+    'pale_pearl',
+    'silkspun_satchel',
+    'soft_down',
+    'soggy_boot',
+    'soggy_moccasin',
+    'stag_antler',
+    'tallow_candle',
+    'tangled_weed',
+    'travelers_knapsack',
+    'wolfhide_satchel',
+  ] as const;
+
+  it('exactly the ruled 26 junk items plus the 6 bag-kind items match no chip', () => {
+    const allOnly = Object.values(REAL_ITEMS)
+      .filter((def) => !BAG_CATEGORIES.some((c) => c !== 'all' && matchesCategory(def, c)))
+      .map((d) => d.id)
+      .sort();
+    expect(allOnly).toEqual([...ALL_ONLY]);
   });
 });

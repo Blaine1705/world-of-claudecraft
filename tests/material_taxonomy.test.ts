@@ -21,7 +21,16 @@ import {
 // content/recipes: if data.ts ever merges a second recipe source, the
 // inclusion arm must ride the same table or it silently tests a subset.
 import { ALL_RECIPES, ITEMS } from '../src/sim/data';
-import { isMaterialItem, MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
+import {
+  deriveMaterialItemIds,
+  isMaterialItem,
+  MATERIAL_ITEM_IDS,
+  type MaterialSourceTables,
+} from '../src/sim/material_taxonomy';
+import {
+  ARMOR_SECONDARY_BY_TYPE,
+  DISENCHANT_MATERIAL_BY_QUALITY,
+} from '../src/sim/professions/disenchant_reagents';
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { SALVAGE_MATERIAL_BY_QUALITY } from '../src/sim/professions/salvage';
@@ -152,10 +161,15 @@ describe('MATERIAL_ITEM_IDS: class exclusions, keyed on KIND against the live ca
   });
 
   it('excludes every quality-poor item (grey trash deposits only by hand)', () => {
+    let poor = 0;
     for (const def of Object.values(ITEMS)) {
       if (def.quality !== 'poor') continue;
+      poor++;
       expect(MATERIAL_ITEM_IDS.has(def.id), def.id).toBe(false);
     }
+    // Non-vacuity: a rename of the 'poor' quality token must not leave this
+    // sweep iterating nothing (21 poor items at authoring time).
+    expect(poor).toBeGreaterThan(15);
   });
 
   it('excludes the named settlement cases: implements, charms, cosmetics, fish, oddments', () => {
@@ -239,6 +253,120 @@ describe('MATERIAL_ITEM_IDS: every source table is fully represented', () => {
     // Non-vacuity: the junk slice of the reagent union is most of the set.
     expect(junkReagents).toBeGreaterThan(30);
   });
+
+  it('contains every disenchant output (the one source reached only via the reagent union)', () => {
+    // The derive deliberately does not union the disenchant tables: the
+    // no-dead-end rule in disenchant_reagents.ts says every output is consumed
+    // by some enchant, so they all arrive as reagents. This arm keeps that
+    // chain honest with failure locality: if an enchant rework orphans an
+    // output, the red names the id instead of an opaque exact-set diff.
+    const outputs = new Set<string>([
+      ...Object.values(DISENCHANT_MATERIAL_BY_QUALITY),
+      ...Object.values(ARMOR_SECONDARY_BY_TYPE),
+      'resonant_timber', // the two weapon secondaries typedSecondaryFor yields
+      'resonant_steel', // as literals, outside the two tables above
+    ]);
+    let rows = 0;
+    for (const id of outputs) {
+      rows++;
+      expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
+    }
+    expect(rows).toBeGreaterThan(5);
+  });
+});
+
+describe('deriveMaterialItemIds: every source table is actually consulted (injection pins)', () => {
+  // Several sources fully overlap the reagent union on today's content (every
+  // node yield, harvest component, specimen, and salvage return is also some
+  // recipe or enchant reagent), so deleting one of those derive loops changes
+  // nothing observable on the live tables and no black-box census can catch
+  // it. These arms pin each loop the only way that can: inject a synthetic
+  // junk-kind id into exactly ONE source table and prove it derives IN.
+  const PROBE = 'zzz_taxonomy_probe';
+  const BASE: MaterialSourceTables = {
+    nodeMaterialTable: NODE_MATERIAL_TABLE,
+    materialGrades: MATERIAL_GRADES,
+    harvestComponentItems: HARVEST_COMPONENT_ITEMS,
+    harvestComponentSpecimens: HARVEST_COMPONENT_SPECIMENS,
+    salvageMaterialByQuality: SALVAGE_MATERIAL_BY_QUALITY,
+    recipes: ALL_RECIPES,
+    enchants: ENCHANTS,
+    items: ITEMS,
+  };
+  // The probe def rides the real catalog so the junk-kind filter sees it.
+  const itemsWithProbe: typeof ITEMS = {
+    ...ITEMS,
+    [PROBE]: { ...ITEMS.iron_ore, id: PROBE, name: 'Taxonomy Probe' },
+  };
+
+  it('baseline sanity: the probe id is in no source and derives OUT', () => {
+    expect(deriveMaterialItemIds({ ...BASE, items: itemsWithProbe }).has(PROBE)).toBe(false);
+  });
+
+  const anyOreRow = Object.values(NODE_MATERIAL_TABLE.ore)[0];
+  const anyGradeRow = Object.values(MATERIAL_GRADES)[0];
+  const anyEnchant = Object.values(ENCHANTS)[0];
+  const CASES: ReadonlyArray<[string, Partial<MaterialSourceTables>]> = [
+    [
+      'node yield',
+      {
+        nodeMaterialTable: {
+          ...NODE_MATERIAL_TABLE,
+          ore: { ...NODE_MATERIAL_TABLE.ore, zzz_probe_zone: { ...anyOreRow, itemId: PROBE } },
+        },
+      },
+    ],
+    [
+      'fine grade',
+      { materialGrades: { ...MATERIAL_GRADES, [PROBE]: { ...anyGradeRow, fineItemId: PROBE } } },
+    ],
+    [
+      'harvest component',
+      { harvestComponentItems: { ...HARVEST_COMPONENT_ITEMS, zzz_probe_part: PROBE } },
+    ],
+    [
+      'pristine specimen',
+      { harvestComponentSpecimens: { ...HARVEST_COMPONENT_SPECIMENS, zzz_probe_part: PROBE } },
+    ],
+    [
+      'salvage return',
+      { salvageMaterialByQuality: { ...SALVAGE_MATERIAL_BY_QUALITY, zzz_probe_quality: PROBE } },
+    ],
+    [
+      'recipe reagent',
+      { recipes: [...ALL_RECIPES, { ...ALL_RECIPES[0], reagents: [{ itemId: PROBE, count: 1 }] }] },
+    ],
+    [
+      'enchant reagent',
+      {
+        enchants: {
+          ...ENCHANTS,
+          zzz_probe_enchant: { ...anyEnchant, reagents: [{ itemId: PROBE, count: 1 }] },
+        },
+      },
+    ],
+  ];
+  for (const [source, override] of CASES) {
+    it(`a junk-kind id authored only as a ${source} row derives IN`, () => {
+      const derived = deriveMaterialItemIds({ ...BASE, ...override, items: itemsWithProbe });
+      expect(derived.has(PROBE)).toBe(true);
+      // The injection is additive: every live member still derives.
+      expect(HONEST_MATERIALS.every((id) => derived.has(id))).toBe(true);
+    });
+  }
+
+  it('the kind filter applies to every source: a non-junk probe derives OUT everywhere', () => {
+    const toolProbe: typeof ITEMS = {
+      ...ITEMS,
+      [PROBE]: { ...ITEMS.simple_fishing_pole, id: PROBE, name: 'Taxonomy Probe' },
+    };
+    for (const [source, override] of CASES) {
+      expect(
+        deriveMaterialItemIds({ ...BASE, ...override, items: toolProbe }).has(PROBE),
+        source,
+      ).toBe(false);
+    }
+  });
 });
 
 describe('completeness tripwire: unclassified non-poor junk', () => {
@@ -261,43 +389,81 @@ describe('isMaterialItem', () => {
 });
 
 describe('no src/sim importer (the module-evaluation hard rule)', () => {
+  // Matches import SPECIFIERS in every realistic form: from clauses (single or
+  // multi-line), bare side-effect imports, dynamic import(), export-from
+  // re-exports, and an optional .js/.ts suffix. The scan reads raw file text,
+  // so a comment QUOTING a full import form would also match; that is accepted
+  // over-matching for a fatal-class rule (prose mentions without a quoted
+  // specifier, like this sentence or the module header's, do not match).
+  const IMPORTER_RE = /(?:from|import)\s*\(?\s*['"][^'"]*material_taxonomy(?:\.[jt]s)?['"]/;
+
+  it('the scan regex has teeth: it matches every importer form and skips prose', () => {
+    // Positive control for the sweep below, so a future typo in the regex
+    // cannot leave it permanently, invisibly green: it must match the LIVE
+    // importer outside src/sim and every forbidden form, and stay quiet on
+    // prose mentions.
+    const bagFilterSource = readFileSync(
+      fileURLToPath(new URL('../src/ui/bag_filter.ts', import.meta.url)),
+      'utf8',
+    );
+    expect(IMPORTER_RE.test(bagFilterSource)).toBe(true);
+    const forbidden = [
+      "import { isMaterialItem } from '../sim/material_taxonomy';",
+      'import { MATERIAL_ITEM_IDS } from "./material_taxonomy";',
+      "import '../material_taxonomy';",
+      "const lazy = await import('./material_taxonomy');",
+      "export * from './material_taxonomy';",
+      "export { isMaterialItem } from './material_taxonomy.js';",
+      "import probe from\n  './material_taxonomy.ts';",
+    ];
+    for (const form of forbidden) expect(IMPORTER_RE.test(form), form).toBe(true);
+    const prose = [
+      '// material_taxonomy.ts is a pure sim leaf',
+      '// see tests/material_taxonomy.test.ts for the census pins',
+      "const label = 'material_taxonomy';",
+    ];
+    for (const text of prose) expect(IMPORTER_RE.test(text), text).toBe(false);
+  });
+
   it('no src/sim file other than the module itself imports material_taxonomy', () => {
     // MATERIAL_ITEM_IDS derives at module evaluation by reading the merged
-    // ITEMS table; a sim-side importer would pull that derive inside data.ts's
-    // evaluation cycle, where load order decides between a crash and a clean
-    // run (the module header states the rule), so only a static scan catches
-    // it reliably. The regex matches import SPECIFIERS in every form (from
-    // clauses, bare side-effect imports, dynamic import()), never a prose
-    // mention in a comment.
+    // ITEMS table; a content-side importer would pull that derive inside
+    // data.ts's evaluation cycle, where load order decides between a crash and
+    // a clean run (the module header states the rule), so only a static scan
+    // catches it reliably.
     const simRoot = fileURLToPath(new URL('../src/sim', import.meta.url));
     const moduleSelf = join(simRoot, 'material_taxonomy.ts');
     const offenders: string[] = [];
     const scanned: string[] = [];
+    const symlinked: string[] = [];
     const walk = (dir: string): void => {
       for (const entry of readdirSync(dir, { withFileTypes: true })) {
         const full = join(dir, entry.name);
+        // A symlinked subtree would silently escape isDirectory(); none exists
+        // under src/sim today, and this trips if one ever lands so the walk is
+        // extended deliberately instead of skipping it.
+        if (entry.isSymbolicLink()) symlinked.push(full);
         if (entry.isDirectory()) {
           walk(full);
         } else if (entry.name.endsWith('.ts')) {
           scanned.push(full);
           if (full === moduleSelf) continue;
-          if (
-            /(?:from|import)\s*\(?\s*['"][^'"]*material_taxonomy['"]/.test(
-              readFileSync(full, 'utf8'),
-            )
-          ) {
+          if (IMPORTER_RE.test(readFileSync(full, 'utf8'))) {
             offenders.push(full);
           }
         }
       }
     };
     walk(simRoot);
-    // Non-vacuity BOTH ways: the sweep saw a real population AND actually
-    // recursed (117 files sit at the src/sim root, so a count floor alone
-    // cannot prove the nested directories were walked).
-    expect(scanned.length).toBeGreaterThan(100);
-    expect(scanned.some((f) => f.includes(join(simRoot, 'professions') + '/'))).toBe(true);
+    // Non-vacuity BOTH ways: the population floor sits ABOVE the flat root
+    // count (117 files at the src/sim root, 359 in the whole tree, so a walk
+    // that lost recursion cannot clear 300), AND the sweep must have reached
+    // the two biggest nested directories by name.
+    expect(scanned.length).toBeGreaterThan(300);
+    expect(scanned.some((f) => f.includes(`${join(simRoot, 'professions')}/`))).toBe(true);
+    expect(scanned.some((f) => f.includes(`${join(simRoot, 'content')}/`))).toBe(true);
     expect(scanned).toContain(moduleSelf);
+    expect(symlinked).toEqual([]);
     expect(offenders).toEqual([]);
   });
 });
