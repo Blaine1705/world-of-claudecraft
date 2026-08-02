@@ -134,7 +134,7 @@ suites can overlap; sum of file times exceeds suite wall).
 | 3 | M1 | n/a (day-loop focus) | n/a | gate:fast 25.4s vs full ~291s | keep |
 | 4 warm path | M1 | n/a (vitest focus) | cold 252.8 / warm 241.3 | ~11s warm full-suite; multi-file transform 3.1s -> 0.45s | keep |
 | 5 happy-dom | M1 | n/a (DOM focus) | DOM cold 14.7 / warm 10.5; full suite recheck separate | DOM subset env 31s -> 14.5s; partial keep | partial keep |
-| 6 | | | | | |
+| 6 pool/projects | M1 | n/a (no keep) | forks 443s green / threads 434s red (chdir); isolate:false pure red | drop all; status quo forks+isolate | drop |
 | 7 | | | | | |
 | 8 cold/warm | | | | | |
 | 9 | | | | | |
@@ -313,3 +313,41 @@ on Node 22+.
 | Result | Duration s | Notes |
 |---|---:|---|
 | PASS 1945 files / 24693 tests (8 skipped files, 74 skipped tests) | 347.0 | Machine load high (user ~2533s); not comparable to Phase 4 241-253s quiet wall. Correctness green only. |
+
+## Phase 6 - pool / projects / isolation (after)
+
+**Decision:** Drop all experimental config. Keep Vitest 4.1 defaults:
+`pool: 'forks'`, `isolate: true`, no projects split, `fileParallelism: true`.
+Worker count remains solely from `scripts/lib/gate_workers.mjs` (free-mem clamp kept).
+
+### Full suite A/B (M1, maxWorkers=4 pinned, WOC_SKIP_PRETEST=1, vitest 4.1.10)
+
+| Pool | Duration s | Real s | Result | Notes |
+|---|---:|---:|---|---|
+| forks (default) | 443.15 | 443.91 | PASS 1945 files / 24693 tests | setup 172s, import 449s, tests 1006s |
+| threads | 434.11 | 434.98 | FAIL 1 file / 2 tests | `process.chdir` in `tests/server/env_bootstrap.test.ts`; ~2% faster only |
+
+### isolate:false probes (forks, maxWorkers=4)
+
+| Scope | isolate true | isolate false | Decision |
+|---|---:|---:|---|
+| 20 pure helpers | 1.69s green | 1.17s green | drop (absolute win too small for projects) |
+| 904 no-sim-import files | 115.4s green | 70.0s, 71 files fail + worker crash | drop (not pure enough) |
+
+### Projects
+
+Not implemented. Dual unit/integration projects would only pay for themselves with a
+threads or isolate:false win on a proven set; both failed the keep rules.
+
+### Heavy top-10 flake watch (default forks)
+
+| Pass | Result | Notes |
+|---|---|---|
+| 1 | PASS 10/10 in 154.5s | maxWorkers=4 |
+| 2 | timeouts under loadavg ~47-60 | mail_expiry, eastbrook, sfx_export; environment contention, not a kept config change |
+
+### fileParallelism / gate_workers
+
+`scripts/gate.mjs` and `scripts/gate_fast.mjs` pass `--maxWorkers=${workers}` from
+`computeGateWorkers`. No interaction required a config change; serial
+`fileParallelism: false` would only hurt wall on multi-file runs.

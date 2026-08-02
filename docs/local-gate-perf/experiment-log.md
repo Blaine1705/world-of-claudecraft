@@ -17,6 +17,11 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 | 2026-08-02 | 5 | migrate remaining jsdom pragmas to happy-dom | 112 jsdom files | 103 happy-dom + 9 jsdom exceptions | M1 | partial keep | Per-file pragmas (repo pattern); see exceptions in baselines |
 | 2026-08-02 | 5 | localStorage setup under happy-dom | Node 22+ broken global | setup still green | M1 | keep | No setup change required beyond comment |
 | 2026-08-02 | 5 | package-lock asset source-fingerprint remint | seal suites red after lock add | fingerprint-only GLB stamp + pin sweep green | M1 | keep (required side effect) | Sizes unchanged; not a geometry rebuild |
+| 2026-08-02 | 6 | pool threads vs forks (full suite, maxWorkers=4) | forks 443.2s green | threads 434.1s, 2 fails (process.chdir) | M1 vitest 4.1.10 | drop | ~2% wall, correctness break; keep default forks |
+| 2026-08-02 | 6 | vitest projects unit vs integration | n/a | not justified | M1 | drop | No measured full-suite win after threads/isolate drops |
+| 2026-08-02 | 6 | isolate:false pure-approx (904 no-sim-import files) | isolate true 115.4s green | isolate false 70.0s, 71 files fail + worker crash | M1 | drop | Faster but unsafe; not a proven pure project |
+| 2026-08-02 | 6 | isolate:false 20 pure helper files | isolate true 1.69s | isolate false 1.17s green | M1 | drop (too small) | ~0.5s absolute; not worth projects scaffold |
+| 2026-08-02 | 6 | fileParallelism / maxWorkers note | defaults true; gate passes --maxWorkers | no config change | M1 | drop (no change) | gate_workers remains sole worker policy |
 
 ## Detail template (copy below for long notes)
 
@@ -200,3 +205,54 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
   - Phase 6 pool/projects/isolation
   - Optional later: polyfill `window.confirm`/`alert` or selector gaps to shrink exceptions
   - Full gate remains merge bar; happy-dom is not a merge-bar change by itself
+
+---
+
+### 2026-08-02 - Phase 6 - pool / projects / isolation
+
+- Hypothesis: Vitest 4.1 `pool: 'threads'`, optional projects split, and carefully
+  scoped `isolate: false` can cut full-suite or pure-unit wall without flakes.
+- Change attempted: **none kept.** Default remains `pool: 'forks'` (Vitest 4.1
+  default), `isolate: true`, no `projects` array, `fileParallelism` default true.
+  Free-mem clamp in `computeGateWorkers` unchanged. No dead experimental config left
+  in `vite.config.ts`.
+- Vitest 4.1 APIs used (current docs): `--pool=threads|forks` (default forks);
+  `--isolate` / `--no-isolate`; `--fileParallelism` / `--no-file-parallelism`;
+  multi-pool routing is via **projects** (not legacy `poolMatchGlobs`). Threads
+  cannot use `process.chdir()`; native modules (e.g. sharp in some tests) prefer forks.
+- Commands (all under `WOC_SKIP_PRETEST=1`, pinned `maxWorkers=4` for A/B fairness
+  while free RAM was low at start):
+  - Full suite forks: `npx vitest run --pool=forks --maxWorkers=4`
+  - Full suite threads: `npx vitest run --pool=threads --maxWorkers=4`
+  - Pure-approx 904 files (no `src/sim/` import, no DOM pragma): isolate true/false
+  - 20 pure helpers: isolate true/false on forks and threads
+  - Phase 1 top-10 heavies x2 under default forks
+- Before metrics (forks full suite, maxWorkers=4):
+  - Duration **443.15s**, real **443.91s**, PASS 1945 files / 24693 tests
+  - transform 10.84s, setup 171.92s, import 448.67s, tests 1006.18s, env 12.47s
+- After metrics (threads full suite, maxWorkers=4):
+  - Duration **434.11s**, real **434.98s**, **FAIL** 1 file / 2 tests
+  - Failure: `tests/server/env_bootstrap.test.ts` (`process.chdir` not supported in workers)
+  - setup 138.67s, import 424.03s slightly better; ~**9 s / ~2%** wall
+- Pure-approx isolate:
+  - true: **115.39s** PASS (896+8 skip)
+  - false: **69.95s** wall but **71 failed files / 602 failed tests** + worker crash
+  - 20-file pure helpers: 1.69s -> 1.17s green (too small for projects)
+- Heavy top-10 (default forks):
+  - Run 1: **154.5s** PASS 10/10
+  - Run 2 under loadavg ~47-60: timeouts on mail_expiry / eastbrook / sfx_export;
+    solo retries still timed out. Treated as **machine contention**, not pool
+    regression (full suite forks earlier was green; no config kept that could flake).
+- fileParallelism: gate and gate:fast already pass `--maxWorkers=${workers}` from
+  `computeGateWorkers` (CPU/2, free-mem clamp, optional `GATE_WORKER_TIER` cap,
+  `GATE_MAX_WORKERS` override). With default `fileParallelism: true`, maxWorkers is
+  the concurrent file-worker count. No measured reason to force serial files.
+- Pass/fail: kept config (status quo) full suite green under forks; experimental
+  arms dropped on correctness or insufficient win.
+- Decision: **drop all Phase 6 config changes**; ledger = keep Vitest defaults +
+  existing gate worker policy.
+- Follow-ups:
+  - Phase 7 pnpm / shared store
+  - Phase 9 suite cost (top heavies) still the real wall lever
+  - Optional later: rewrite `env_bootstrap` tests off `process.chdir` if threads is
+    re-opened; dual projects only if a **proven** pure set survives isolate:false audit

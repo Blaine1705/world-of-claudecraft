@@ -11,7 +11,7 @@ Status: not-started / in-progress / blocked / complete / dropped
 | 3 | Tiered local gate + tier worker presets | complete | 2026-08-02 | 2026-08-02 | gate:fast ~25s day-loop; full gate still merge bar |
 | 4 | Vitest warm path | complete | 2026-08-02 | 2026-08-02 | fsModuleCache keep; test:related/changed; no @vitest/ui |
 | 5 | happy-dom for DOM tests | complete | 2026-08-02 | 2026-08-02 | partial keep: 103 happy-dom, 9 jsdom exceptions; lockfile seal remint |
-| 6 | Pool, projects, isolation experiments | not-started | | | |
+| 6 | Pool, projects, isolation experiments | complete | 2026-08-02 | 2026-08-02 | drop all: keep default forks+isolate; no projects |
 | 7 | pnpm + shared store for worktrees | not-started | | | |
 | 8 | Task cache (turbo or wireit) | not-started | | | |
 | 9 | Suite cost reduction | not-started | | | |
@@ -56,10 +56,11 @@ Status: not-started / in-progress / blocked / complete / dropped
 - [x] Keep or drop logged (partial keep)
 
 ### Phase 6 - Pool / projects / isolation
-- [ ] At least one pool experiment measured (threads vs forks)
-- [ ] Optional vitest projects split evaluated
-- [ ] isolate:false only on proven-safe project if at all
-- [ ] Keep/drop log; full suite green for anything kept
+- [x] At least one pool experiment measured (threads vs forks)
+- [x] Optional vitest projects split evaluated
+- [x] isolate:false only on proven-safe project if at all
+- [x] Keep/drop log; full suite green for anything kept
+  (kept: status quo forks+isolate; full suite green under forks maxWorkers=4)
 
 ### Phase 7 - pnpm
 - [ ] Multi-worktree install timing before/after

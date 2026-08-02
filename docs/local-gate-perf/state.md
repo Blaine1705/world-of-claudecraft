@@ -2,8 +2,8 @@
 
 Resume point for the next session. Keep current after every phase.
 
-**Current phase:** Phase 5 complete.  
-**Next action:** run Phase 6 starter prompt (`phase-06-pool-projects-isolation.md`).  
+**Current phase:** Phase 6 complete.  
+**Next action:** run Phase 7 starter prompt (`phase-07-pnpm-worktrees.md`).  
 **Worktree:** `/Users/fernando/Documents/wocc-gate-perf-research`  
 **Branch:** `feature/local-gate-perf`  
 **Base:** always `origin/release/v0.34.0`
@@ -98,7 +98,7 @@ Fill as phases ship:
 - (Phase 3) new scripts: `gate:fast` (`scripts/gate_fast.mjs` + `lib/gate_fast_plan.mjs`); worker tiers via `GATE_WORKER_TIER` + `GATE_WORKER_TIER_CAPS` in `lib/gate_workers.mjs`; docs `docs/local-gate-perf/tier-workers.md`, `docs/qa-gate.md`, CONTRIBUTING pointer
 - (Phase 4) vitest cache flags: `test.experimental.fsModuleCache: true` in `vite.config.ts` (store under `node_modules/.experimental-vitest-cache`); scripts `test:related`, `test:changed`; `@vitest/ui` dropped
 - (Phase 5) happy-dom adoption scope: **partial keep** `happy-dom@^20.11.1`; 103/112 DOM files use `// @vitest-environment happy-dom`; 9 files stay on jsdom (see experiment-log / baselines); jsdom kept as dep; lockfile change re-stamped Eastbrook asset source fingerprints (sizes unchanged)
-- (Phase 6) pool/projects kept:
+- (Phase 6) pool/projects kept: **none** (drop). Keep Vitest 4.1 defaults `pool: forks`, `isolate: true`, no projects, `fileParallelism: true`. Threads ~2% faster but fails `process.chdir` in `env_bootstrap` tests. isolate:false on 904 no-sim-import files red (71 files + worker crash). Projects not justified without a measured pure set.
 - (Phase 7) package manager decision:
 - (Phase 8) task cache tool:
 - (Phase 9) suite splits / fixtures:
