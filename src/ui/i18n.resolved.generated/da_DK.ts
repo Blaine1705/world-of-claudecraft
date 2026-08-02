@@ -6783,6 +6783,7 @@ export const da_DK: EnTranslations = {
       "attackRemoveHint": "Højreklik for at fjerne den fra bjælken og frigøre pladsen.",
       "emptySlot": "Tom plads",
       "slotAria": "Handlingsplads {slot}: {ability}",
+      "procSlotAria": "Action slot {slot}: {ability}, special effect active",
       "emptySlotAria": "Handlingsplads {slot}: tom",
       "clearHint": "Shift-højreklik eller Shift-Delete for at rydde",
       "itemInBags": "I tasker: {count}",

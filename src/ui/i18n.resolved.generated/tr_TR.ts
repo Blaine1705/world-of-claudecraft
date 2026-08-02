@@ -6783,6 +6783,7 @@ export const tr_TR: EnTranslations = {
       "attackRemoveHint": "Çubuktan kaldırıp yuvayı serbest bırakmak için sağ tıkla.",
       "emptySlot": "Boş yuva",
       "slotAria": "Eylem yuvası {slot}: {ability}",
+      "procSlotAria": "Action slot {slot}: {ability}, special effect active",
       "emptySlotAria": "Eylem yuvası {slot}: boş",
       "clearHint": "Temizlemek için Shift+sağ tık veya Shift+Delete",
       "itemInBags": "Çantalarda: {count}",

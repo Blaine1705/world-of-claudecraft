@@ -6783,6 +6783,7 @@ export const id_ID: EnTranslations = {
       "attackRemoveHint": "Klik kanan untuk menghapusnya dari bilah dan mengosongkan slot.",
       "emptySlot": "Slot kosong",
       "slotAria": "Slot aksi {slot}: {ability}",
+      "procSlotAria": "Action slot {slot}: {ability}, special effect active",
       "emptySlotAria": "Slot aksi {slot}: kosong",
       "clearHint": "Shift-klik kanan atau Shift-Delete untuk mengosongkan",
       "itemInBags": "Di dalam tas: {count}",

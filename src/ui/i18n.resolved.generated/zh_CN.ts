@@ -6783,6 +6783,7 @@ export const zh_CN: EnTranslations = {
       "attackRemoveHint": "右键点击可将其从动作栏移除并空出栏位。",
       "emptySlot": "空栏位",
       "slotAria": "动作栏位 {slot}：{ability}",
+      "procSlotAria": "动作栏位 {slot}：{ability}，特殊效果已激活",
       "emptySlotAria": "动作栏位 {slot}：空",
       "clearHint": "Shift-右键或 Shift-Delete 清除",
       "itemInBags": "背包中：{count}",

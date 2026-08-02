@@ -3518,6 +3518,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Activa o desactiva el autoataque sobre tu objetivo. Hacer clic derecho en un enemigo también ataca.',
   'abilityUi.actionBar.emptySlot': 'Ranura vacía',
   'abilityUi.actionBar.slotAria': 'Ranura de acción {slot}: {ability}',
+  'abilityUi.actionBar.procSlotAria': 'Ranura de acción {slot}: {ability}, efecto especial activo',
   'abilityUi.actionBar.emptySlotAria': 'Ranura de acción {slot}: vacía',
   'abilityUi.actionBar.clearHint': 'Mayús-clic derecho o Mayús-Supr para vaciar',
   'abilityUi.actionBar.itemInBags': 'En bolsas: {count}',

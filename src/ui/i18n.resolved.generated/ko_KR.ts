@@ -6783,6 +6783,7 @@ export const ko_KR: EnTranslations = {
       "attackRemoveHint": "우클릭하면 바에서 제거하고 칸을 비웁니다.",
       "emptySlot": "빈 칸",
       "slotAria": "행동 칸 {slot}: {ability}",
+      "procSlotAria": "행동 칸 {slot}: {ability}, 특수 효과 활성화",
       "emptySlotAria": "행동 칸 {slot}: 비어 있음",
       "clearHint": "Shift-우클릭 또는 Shift-Delete로 비우기",
       "itemInBags": "가방 보유: {count}",

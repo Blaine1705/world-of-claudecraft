@@ -435,6 +435,37 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
 });
 
 describe('actionBarView: free-cost proc glow + kill-window (procGlow / usable)', () => {
+  it('glows Aether Darts only at four Arcane Charges', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('arcane_missiles', { cost: 105 }) }),
+        slot(2, { ability: ability('arcane_surge', { cost: 16 }) }),
+      ),
+      fakeDeps(),
+    );
+
+    const atThree = view.tick(
+      world({ auras: [{ kind: 'arcane_charge', value: 3, stacks: 3 }] }),
+    ).slots;
+    expect(atThree[0].procGlow).toBe(false);
+    expect(atThree[1].procGlow).toBe(false);
+    expect(atThree[0].ariaLabel).toBe(
+      'abilityUi.actionBar.slotAria(slot=2,ability=ability:arcane_missiles)',
+    );
+
+    const atFour = view.tick(
+      world({ auras: [{ kind: 'arcane_charge', value: 4, stacks: 4 }] }),
+    ).slots;
+    expect(atFour[0].procGlow).toBe(true);
+    expect(atFour[1].procGlow).toBe(false);
+    expect(atFour[0].ariaLabel).toBe(
+      'abilityUi.actionBar.procSlotAria(slot=2,ability=ability:arcane_missiles)',
+    );
+    expect(atFour[1].ariaLabel).toBe(
+      'abilityUi.actionBar.slotAria(slot=3,ability=ability:arcane_surge)',
+    );
+  });
+
   it('a Battle Trance proc glows and frees exactly the scoped abilities at zero rage', () => {
     const view = createActionBarView(
       descriptor(
@@ -754,6 +785,22 @@ describe('actionBarView: the aria-label is resolved in the core via the injected
     });
     expect(view.tick(world()).slots[0].ariaLabel).toBe(expected);
     expect(view.tick(world()).slots[0].ariaLabel).not.toContain('abilityUi.actionBar');
+  });
+
+  it('the proc aria key exists in the real catalog and announces the ready state', () => {
+    const view = createActionBarView(
+      descriptor(slot(0, { ability: ability('arcane_missiles', { cost: 105 }) })),
+      { ...fakeDeps(), t: realT },
+    );
+    const label = view.tick(world({ auras: [{ kind: 'arcane_charge', value: 4, stacks: 4 }] }))
+      .slots[0].ariaLabel;
+    expect(label).toBe(
+      realT('abilityUi.actionBar.procSlotAria', {
+        slot: '1',
+        ability: 'ability:arcane_missiles',
+      }),
+    );
+    expect(label).toContain('special effect active');
   });
 });
 

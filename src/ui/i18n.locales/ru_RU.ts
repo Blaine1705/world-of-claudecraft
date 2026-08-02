@@ -2196,6 +2196,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Щёлкните правой кнопкой, чтобы убрать её с панели и освободить ячейку.',
   'abilityUi.actionBar.emptySlot': 'Пустая ячейка',
   'abilityUi.actionBar.slotAria': 'Ячейка действия {slot}: {ability}',
+  'abilityUi.actionBar.procSlotAria':
+    'Ячейка действия {slot}: {ability}, особый эффект активен',
   'abilityUi.actionBar.emptySlotAria': 'Ячейка действия {slot}: пусто',
   'abilityUi.actionBar.clearHint': 'Shift-правый щелчок или Shift-Delete, чтобы очистить',
   'abilityUi.actionBar.itemInBags': 'В сумках: {count}',

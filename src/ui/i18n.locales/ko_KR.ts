@@ -2155,6 +2155,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.actionBar.attackRemoveHint': '우클릭하면 바에서 제거하고 칸을 비웁니다.',
   'abilityUi.actionBar.emptySlot': '빈 칸',
   'abilityUi.actionBar.slotAria': '행동 칸 {slot}: {ability}',
+  'abilityUi.actionBar.procSlotAria': '행동 칸 {slot}: {ability}, 특수 효과 활성화',
   'abilityUi.actionBar.emptySlotAria': '행동 칸 {slot}: 비어 있음',
   'abilityUi.actionBar.clearHint': 'Shift-우클릭 또는 Shift-Delete로 비우기',
   'abilityUi.actionBar.itemInBags': '가방 보유: {count}',

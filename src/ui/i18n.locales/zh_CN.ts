@@ -2073,6 +2073,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.actionBar.attackRemoveHint': '右键点击可将其从动作栏移除并空出栏位。',
   'abilityUi.actionBar.emptySlot': '空栏位',
   'abilityUi.actionBar.slotAria': '动作栏位 {slot}：{ability}',
+  'abilityUi.actionBar.procSlotAria': '动作栏位 {slot}：{ability}，特殊效果已激活',
   'abilityUi.actionBar.emptySlotAria': '动作栏位 {slot}：空',
   'abilityUi.actionBar.clearHint': 'Shift-右键或 Shift-Delete 清除',
   'abilityUi.actionBar.itemInBags': '背包中：{count}',

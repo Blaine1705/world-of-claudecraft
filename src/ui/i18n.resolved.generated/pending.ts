@@ -22,12 +22,14 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.buyStackAria"
   ],
   "fr_FR": [
+    "abilityUi.actionBar.procSlotAria",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "fr_CA": [
+    "abilityUi.actionBar.procSlotAria",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -35,12 +37,14 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "abilityUi.actionBar.procSlotAria",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "de_DE": [
+    "abilityUi.actionBar.procSlotAria",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -63,6 +67,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.buyStackAria"
   ],
   "pt_BR": [
+    "abilityUi.actionBar.procSlotAria",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -73,48 +78,56 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.buyStackAria"
   ],
   "cs_CZ": [
+    "abilityUi.actionBar.procSlotAria",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "nl_NL": [
+    "abilityUi.actionBar.procSlotAria",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "pl_PL": [
+    "abilityUi.actionBar.procSlotAria",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "id_ID": [
+    "abilityUi.actionBar.procSlotAria",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "tr_TR": [
+    "abilityUi.actionBar.procSlotAria",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "sv_SE": [
+    "abilityUi.actionBar.procSlotAria",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "vi_VN": [
+    "abilityUi.actionBar.procSlotAria",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "da_DK": [
+    "abilityUi.actionBar.procSlotAria",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",

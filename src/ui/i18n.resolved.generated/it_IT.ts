@@ -6783,6 +6783,7 @@ export const it_IT: EnTranslations = {
       "attackRemoveHint": "Clic destro per rimuoverlo dalla barra e liberare lo slot.",
       "emptySlot": "Slot vuoto",
       "slotAria": "Slot azione {slot}: {ability}",
+      "procSlotAria": "Action slot {slot}: {ability}, special effect active",
       "emptySlotAria": "Slot azione {slot}: vuoto",
       "clearHint": "Maiusc-clic destro o Maiusc-Canc per svuotare",
       "itemInBags": "Nelle borse: {count}",

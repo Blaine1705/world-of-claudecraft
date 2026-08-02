@@ -6783,6 +6783,7 @@ export const de_DE: EnTranslations = {
       "attackRemoveHint": "Rechtsklick, um es von der Leiste zu entfernen und den Slot freizugeben.",
       "emptySlot": "Leerer Platz",
       "slotAria": "Aktionsplatz {slot}: {ability}",
+      "procSlotAria": "Action slot {slot}: {ability}, special effect active",
       "emptySlotAria": "Aktionsplatz {slot}: leer",
       "clearHint": "Umschalt-Rechtsklick oder Umschalt-Entf zum Leeren",
       "itemInBags": "In Taschen: {count}",

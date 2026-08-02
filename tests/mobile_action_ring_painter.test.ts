@@ -27,6 +27,12 @@ import { MobileActionRingPainter } from '../src/ui/hud/action_bar/mobile_action_
 import { makeWriterFacet, type PainterHostWriters } from '../src/ui/painter_host';
 import { assertAllocationStable } from './util/alloc_probe';
 
+const HUD_CSS = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+const MOBILE_HUD_CSS = readFileSync(
+  new URL('../src/styles/hud.mobile.css', import.meta.url),
+  'utf8',
+);
+
 type Call = { m: keyof PainterHostWriters; args: unknown[] };
 
 function recordingFacet() {
@@ -192,6 +198,30 @@ describe('mobile action ring: source-slot state per page', () => {
     const view = createActionBarView({ slots: ringDescriptor(pageBox, new Map()) }, fakeDeps());
     const state = view.tick(idleWorld());
     expect(state.slots[1].kind).toBe('empty');
+  });
+});
+
+describe('mobile action ring: proc state remains perceptible', () => {
+  it('renders the shared proc class on touch as well as desktop', () => {
+    expect(HUD_CSS).toMatch(/\.action-btn\.proc\s*\{[^}]*abtn-proc-pulse/s);
+    expect(MOBILE_HUD_CSS).toMatch(
+      /body\.mobile-touch #mobile-action-ring button\.proc\s*\{[^}]*abtn-proc-pulse/s,
+    );
+  });
+
+  it('uses a double system-color border as the forced-colors shape cue', () => {
+    expect(HUD_CSS).toMatch(
+      /@media \(forced-colors: active\)[\s\S]*?\.action-btn\.proc\s*\{[^}]*border:\s*3px double Highlight/,
+    );
+    expect(MOBILE_HUD_CSS).toMatch(
+      /@media \(forced-colors: active\)[\s\S]*?button\.proc\s*\{[^}]*border:\s*3px double Highlight/,
+    );
+  });
+
+  it('stops the touch proc pulse under reduced motion', () => {
+    expect(HUD_CSS).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?body\.mobile-touch #mobile-action-ring button\.proc,[\s\S]*?animation:\s*none/,
+    );
   });
 });
 

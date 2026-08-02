@@ -6783,6 +6783,7 @@ export const es: EnTranslations = {
       "attackRemoveHint": "Clic derecho para quitarlo de la barra y liberar el espacio.",
       "emptySlot": "Ranura vacía",
       "slotAria": "Ranura de acción {slot}: {ability}",
+      "procSlotAria": "Ranura de acción {slot}: {ability}, efecto especial activo",
       "emptySlotAria": "Ranura de acción {slot}: vacía",
       "clearHint": "Mayús-clic derecho o Mayús-Supr para vaciar",
       "itemInBags": "En bolsas: {count}",

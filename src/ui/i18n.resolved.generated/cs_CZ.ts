@@ -6783,6 +6783,7 @@ export const cs_CZ: EnTranslations = {
       "attackRemoveHint": "Klikni pravým tlačítkem pro odebrání z lišty a uvolnění slotu.",
       "emptySlot": "Prázdný slot",
       "slotAria": "Akční slot {slot}: {ability}",
+      "procSlotAria": "Action slot {slot}: {ability}, special effect active",
       "emptySlotAria": "Akční slot {slot}: prázdný",
       "clearHint": "Shift + pravé kliknutí nebo Shift + Delete pro vymazání",
       "itemInBags": "V batozích: {count}",

@@ -73,6 +73,33 @@ describe('Cascada echo window', () => {
 });
 
 describe('Aether Darts full-charge barrage', () => {
+  it('resolves the level-20 builder and spender at rank 4', () => {
+    const surge = ABILITIES.arcane_surge;
+    expect([
+      { rank: 1, level: surge.learnLevel, cost: surge.cost, effects: surge.effects },
+      ...(surge.ranks ?? []),
+    ]).toMatchObject([
+      { rank: 1, level: 5, cost: 16, effects: [{ type: 'directDamage', min: 10, max: 13 }] },
+      { rank: 2, level: 10, cost: 16, effects: [{ type: 'directDamage', min: 11, max: 14 }] },
+      { rank: 3, level: 15, cost: 16, effects: [{ type: 'directDamage', min: 12, max: 15 }] },
+      { rank: 4, level: 20, cost: 16, effects: [{ type: 'directDamage', min: 13, max: 15 }] },
+    ]);
+
+    const darts = ABILITIES.arcane_missiles;
+    expect([
+      { rank: 1, level: darts.learnLevel, cost: darts.cost, effects: darts.effects },
+      ...(darts.ranks ?? []),
+    ]).toMatchObject([
+      { rank: 1, level: 5, cost: 50, effects: [{ type: 'directDamage', min: 8, max: 8 }] },
+      { rank: 2, level: 14, cost: 75, effects: [{ type: 'directDamage', min: 14, max: 14 }] },
+      { rank: 3, level: 18, cost: 90, effects: [{ type: 'directDamage', min: 18, max: 18 }] },
+      { rank: 4, level: 20, cost: 105, effects: [{ type: 'directDamage', min: 22, max: 22 }] },
+    ]);
+
+    expect(chronoMage(20).sim.resolvedAbility('arcane_surge')?.rank).toBe(4);
+    expect(chronoMage(20).sim.resolvedAbility('arcane_missiles')?.rank).toBe(4);
+  });
+
   it('fires 5 missiles at max charges, 3 otherwise (channelStart hook)', () => {
     const { p } = chronoMage();
     // No charges: default (0 => casting_lifecycle keeps the ability's 3 ticks).

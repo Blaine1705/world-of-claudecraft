@@ -898,6 +898,20 @@
       0 0 12px #ffd100aa,
       inset 0 0 0 1px #ffd10077;
   }
+  /* The shared painter toggles the same proc class on desktop and touch.
+     Keep the actionable steady glow even when reduced motion stops the pulse. */
+  body.mobile-touch #mobile-action-ring button.proc {
+    border-color: #ffd97a;
+    box-shadow:
+      0 0 12px #ffcf40e6,
+      inset 0 0 6px #ffcf4066;
+    animation: abtn-proc-pulse 1.1s ease-in-out infinite alternate;
+  }
+  @media (forced-colors: active) {
+    body.mobile-touch #mobile-action-ring button.proc {
+      border: 3px double Highlight;
+    }
+  }
   body.mobile-touch #mobile-action-ring button.empowered {
     border-color: var(--gold);
     box-shadow:

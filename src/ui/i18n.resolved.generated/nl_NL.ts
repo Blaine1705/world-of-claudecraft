@@ -6783,6 +6783,7 @@ export const nl_NL: EnTranslations = {
       "attackRemoveHint": "Klik met rechts om het van de balk te verwijderen en de plek vrij te maken.",
       "emptySlot": "Lege sleuf",
       "slotAria": "Actiesleuf {slot}: {ability}",
+      "procSlotAria": "Action slot {slot}: {ability}, special effect active",
       "emptySlotAria": "Actiesleuf {slot}: leeg",
       "clearHint": "Shift-rechtsklik of Shift-Delete om te wissen",
       "itemInBags": "In tassen: {count}",

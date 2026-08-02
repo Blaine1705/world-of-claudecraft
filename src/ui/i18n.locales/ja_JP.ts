@@ -2172,6 +2172,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.actionBar.attackRemoveHint': '右クリックでバーから外し、スロットを空けます。',
   'abilityUi.actionBar.emptySlot': '空きスロット',
   'abilityUi.actionBar.slotAria': 'アクションスロット {slot}: {ability}',
+  'abilityUi.actionBar.procSlotAria': 'アクションスロット {slot}: {ability}、特殊効果が発動中',
   'abilityUi.actionBar.emptySlotAria': 'アクションスロット {slot}: 空き',
   'abilityUi.actionBar.clearHint': 'Shift-右クリックまたはShift-Deleteで消去',
   'abilityUi.actionBar.itemInBags': 'バッグ内: {count}',

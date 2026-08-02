@@ -1800,6 +1800,13 @@
       inset 0 0 6px #ffcf4066;
     animation: abtn-proc-pulse 1.1s ease-in-out infinite alternate;
   }
+  /* The proc is actionable state, so forced palettes get a shape cue instead
+     of relying on the gold color and shadow that the OS removes. */
+  @media (forced-colors: active) {
+    .action-btn.proc {
+      border: 3px double Highlight;
+    }
+  }
   @keyframes abtn-proc-pulse {
     from {
       box-shadow:
@@ -1837,6 +1844,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .action-btn.proc,
+    body.mobile-touch #mobile-action-ring button.proc,
     .action-btn.empowered {
       animation: none;
     }

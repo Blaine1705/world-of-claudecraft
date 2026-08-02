@@ -23,6 +23,7 @@ export type TranslationKeyFlat =
   | 'abilityUi.actionBar.emptySlotAria'
   | 'abilityUi.actionBar.itemInBags'
   | 'abilityUi.actionBar.itemNoneInBags'
+  | 'abilityUi.actionBar.procSlotAria'
   | 'abilityUi.actionBar.slotAria'
   | 'abilityUi.cast.demonHeal'
   | 'abilityUi.cast.fishing'

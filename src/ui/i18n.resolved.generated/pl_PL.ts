@@ -6783,6 +6783,7 @@ export const pl_PL: EnTranslations = {
       "attackRemoveHint": "Kliknij prawym przyciskiem, aby usunąć z paska i zwolnić miejsce.",
       "emptySlot": "Puste pole",
       "slotAria": "Pole akcji {slot}: {ability}",
+      "procSlotAria": "Action slot {slot}: {ability}, special effect active",
       "emptySlotAria": "Pole akcji {slot}: puste",
       "clearHint": "Shift+prawy przycisk lub Shift+Delete, aby wyczyścić",
       "itemInBags": "W torbach: {count}",

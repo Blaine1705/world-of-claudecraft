@@ -6783,6 +6783,7 @@ export const sv_SE: EnTranslations = {
       "attackRemoveHint": "Högerklicka för att ta bort det från fältet och frigöra platsen.",
       "emptySlot": "Tom plats",
       "slotAria": "Handlingsplats {slot}: {ability}",
+      "procSlotAria": "Action slot {slot}: {ability}, special effect active",
       "emptySlotAria": "Handlingsplats {slot}: tom",
       "clearHint": "Skift-högerklicka eller Skift-Delete för att rensa",
       "itemInBags": "I väskor: {count}",

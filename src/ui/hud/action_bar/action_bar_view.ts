@@ -24,6 +24,7 @@
 // the offline Sim and the online ClientWorld mirror expose (player.cooldowns is a
 // Map, inventory is InvSlot[]); the core never reaches for a Sim-only field.
 
+import { aetherDartsProcGlowActive } from '../../../sim/combat/chronomancy';
 import { freeCostAuraActive } from '../../../sim/combat/empower_next';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
 import {
@@ -68,6 +69,7 @@ const NEXT_CAST_CHEAP: AuraKind = 'next_cast_cheap';
 
 // The i18n keys the core renders. They already exist in i18n.catalog/abilities.ts.
 const SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.slotAria';
+const PROC_SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.procSlotAria';
 const EMPTY_SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.emptySlotAria';
 const ATTACK_NAME_KEY: TranslationKey = 'abilityUi.actionBar.attackName';
 
@@ -507,12 +509,16 @@ export function createActionBarView(
           (tgtDist > (def.range > 0 ? def.range : MELEE_RANGE) ||
             (def.minRange !== undefined && tgtDist < def.minRange));
         slot.queued = player.queuedOnSwing === def.id;
-        // Frost procs (combat/frost_mage.ts): Ice Lance glows on a banked
-        // Fingers of Frost, Flurry on an armed Brain Freeze (the same shared
-        // sim predicate idiom as freeCostAuraActive above).
-        slot.procGlow = freeByProc || windowGlow || frostProcGlowActive(player.auras ?? [], def.id);
+        // Spec resources/procs share pure sim predicates so the bar and combat
+        // agree: Frost lights Ice Lance/Flurry, while a full Chronomancy charge
+        // bank lights Aether Darts as the actionable spender.
+        slot.procGlow =
+          freeByProc ||
+          windowGlow ||
+          frostProcGlowActive(player.auras ?? [], def.id) ||
+          aetherDartsProcGlowActive(player.auras ?? [], def.id);
         slot.empowered = hasEmpoweringAura(player.auras, ability);
-        slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
+        slot.ariaLabel = deps.t(slot.procGlow ? PROC_SLOT_ARIA_KEY : SLOT_ARIA_KEY, {
           slot: slotLabel,
           ability: deps.abilityName(def),
         });

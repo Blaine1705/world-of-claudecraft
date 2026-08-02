@@ -6783,6 +6783,7 @@ export const fr_FR: EnTranslations = {
       "attackRemoveHint": "Clic droit pour le retirer de la barre et libérer l'emplacement.",
       "emptySlot": "Emplacement vide",
       "slotAria": "Emplacement d'action {slot}: {ability}",
+      "procSlotAria": "Action slot {slot}: {ability}, special effect active",
       "emptySlotAria": "Emplacement d'action {slot}: vide",
       "clearHint": "Maj-clic droit ou Maj-Suppr pour vider",
       "itemInBags": "Dans les sacs : {count}",

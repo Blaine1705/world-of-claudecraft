@@ -6783,6 +6783,7 @@ export const pt_BR: EnTranslations = {
       "attackRemoveHint": "Clique com o botão direito para removê-lo da barra e liberar o espaço.",
       "emptySlot": "Espaço vazio",
       "slotAria": "Espaço de ação {slot}: {ability}",
+      "procSlotAria": "Action slot {slot}: {ability}, special effect active",
       "emptySlotAria": "Espaço de ação {slot}: vazio",
       "clearHint": "Shift-clique direito ou Shift-Delete para limpar",
       "itemInBags": "Nas bolsas: {count}",

@@ -6783,6 +6783,7 @@ export const ja_JP: EnTranslations = {
       "attackRemoveHint": "右クリックでバーから外し、スロットを空けます。",
       "emptySlot": "空きスロット",
       "slotAria": "アクションスロット {slot}: {ability}",
+      "procSlotAria": "アクションスロット {slot}: {ability}、特殊効果が発動中",
       "emptySlotAria": "アクションスロット {slot}: 空き",
       "clearHint": "Shift-右クリックまたはShift-Deleteで消去",
       "itemInBags": "バッグ内: {count}",

@@ -6783,6 +6783,7 @@ export const en_XA: EnTranslations = {
       "attackRemoveHint": "[Ŕíĝĥţ-çļíçķ ţó ŕéɱóʋé íţ ƒŕóɱ ţĥé ƀáŕ áñð ƒŕéé ţĥé šļóţ.]",
       "emptySlot": "[Éɱþţý šļóţ]",
       "slotAria": "[Áçţíóñ šļóţ {slot}: {ability}]",
+      "procSlotAria": "[Áçţíóñ šļóţ {slot}: {ability}, šþéçíáļ éƒƒéçţ áçţíʋé]",
       "emptySlotAria": "[Áçţíóñ šļóţ {slot}: éɱþţý]",
       "clearHint": "[Šĥíƒţ-ŕíĝĥţ-çļíçķ óŕ Šĥíƒţ-Ðéļéţé ţó çļéáŕ]",
       "itemInBags": "[Íñ ƀáĝš: {count}]",

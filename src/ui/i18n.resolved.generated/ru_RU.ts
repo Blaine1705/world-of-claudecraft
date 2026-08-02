@@ -6783,6 +6783,7 @@ export const ru_RU: EnTranslations = {
       "attackRemoveHint": "Щёлкните правой кнопкой, чтобы убрать её с панели и освободить ячейку.",
       "emptySlot": "Пустая ячейка",
       "slotAria": "Ячейка действия {slot}: {ability}",
+      "procSlotAria": "Ячейка действия {slot}: {ability}, особый эффект активен",
       "emptySlotAria": "Ячейка действия {slot}: пусто",
       "clearHint": "Shift-правый щелчок или Shift-Delete, чтобы очистить",
       "itemInBags": "В сумках: {count}",

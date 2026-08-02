@@ -6783,6 +6783,7 @@ export const vi_VN: EnTranslations = {
       "attackRemoveHint": "Nhấp chuột phải để gỡ khỏi thanh và giải phóng ô trống.",
       "emptySlot": "Ô trống",
       "slotAria": "Ô hành động {slot}: {ability}",
+      "procSlotAria": "Action slot {slot}: {ability}, special effect active",
       "emptySlotAria": "Ô hành động {slot}: trống",
       "clearHint": "Shift-chuột phải hoặc Shift-Delete để xóa",
       "itemInBags": "Trong túi: {count}",
