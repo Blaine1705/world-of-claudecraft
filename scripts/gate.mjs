@@ -14,11 +14,48 @@
 // Keep the step list in sync with .github/workflows/ci.yml (and vice versa).
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
+import {
+  formatInstallSyncFailure,
+  parseInstallProblems,
+  shouldCheckInstallSync,
+} from './lib/npm_install_sync.mjs';
 import { FFMPEG_PATH, FFPROBE_PATH } from './sfx/ffmpeg_paths.mjs';
 
 const workers = Math.max(1, Math.floor(os.availableParallelism() / 2));
 // npm/npx resolve to .cmd files on Windows, which spawnSync only finds via a shell.
 const shell = process.platform === 'win32';
+
+// Verify node_modules is what package-lock.json actually pins, BEFORE any other
+// step. `npm ci` always resets this in CI, so CI never sees drift; a long-lived
+// local checkout can drift silently (a stray `npm install <pkg>`, or just going
+// stale) and the first symptom is usually a confusing tsc or build failure many
+// minutes into the gate that looks like a real regression in the change under
+// test. `npm ls --depth=0 --json` costs under a second and names the actual
+// problem instead of a downstream symptom. No CI job runs this script (CI always
+// starts from a fresh `npm ci`), so nothing else catches a false-positive block;
+// WOC_SKIP_DEP_SYNC=1 is the escape hatch for a checkout this check gets wrong,
+// and other preflights that need to test their OWN failure mode in isolation
+// (tests/sfx_gate_preflight.test.ts) set it explicitly rather than relying on the
+// side effect of an empty PATH also making `npm` itself unspawnable.
+if (process.env.WOC_SKIP_DEP_SYNC !== '1') {
+  const npmLs = spawnSync('npm', ['ls', '--depth=0', '--json'], { encoding: 'utf8', shell });
+  if (shouldCheckInstallSync(npmLs)) {
+    try {
+      const installProblems = parseInstallProblems(npmLs.stdout);
+      if (installProblems.length > 0) {
+        console.error(
+          `[gate] FAIL at "dependency sync"\n${formatInstallSyncFailure(installProblems)}`,
+        );
+        process.exit(1);
+      }
+    } catch (err) {
+      // npm ran but did not produce parseable JSON: a problem with the check
+      // itself, not evidence of drift, so warn and let the gate continue rather
+      // than fail on output we cannot interpret.
+      console.error(`[gate] WARN: dependency sync check skipped: ${err.message}`);
+    }
+  }
+}
 
 // Probe the resolved binaries BY EXECUTION: the ffmpeg-static/ffprobe-static
 // packages download their binary via an allowlisted install script, so a
