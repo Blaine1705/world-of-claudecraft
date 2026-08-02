@@ -131,6 +131,13 @@ import { packCommandError } from './hunter_packlord';
 import { cancelRecedingShell, noteHunterFocusSpend } from './hunter_shared';
 import { hasDeadGroupMember, isMassResurrectionAbility } from './mass_resurrection';
 import {
+  hasActiveOssuaryMark,
+  necromancyCastError,
+  OSSUARY_MARK_ABILITY_ID,
+  soulFragmentCount,
+  spendSoulFragments,
+} from './necromancy';
+import {
   cleanupPaladinAegis,
   completePaladinAegis,
   startPaladinAegis,
@@ -159,13 +166,6 @@ import { combineCostMultipliers, duskCostMultiplier } from './rogue_talents';
 import { onShamanManaSpent, shamanCastTimeMultiplier, shamanManaCost } from './shaman_talents';
 import { resolveUnleashWeaponTarget, unleashWeaponCastError } from './shaman_unleash_weapon';
 import { onStormcastConsumed, STORMCAST_CHEAP_ID, STORMCAST_ID } from './shaman_warspirit';
-import {
-  hasActiveOssuaryMark,
-  necromancyCastError,
-  OSSUARY_MARK_ABILITY_ID,
-  soulFragmentCount,
-  spendSoulFragments,
-} from './necromancy';
 import {
   hasCastShield,
   noteSpellHit,
@@ -821,7 +821,8 @@ export function castAbility(
     !brainFreezeBypassesCooldown(p, ability.id) &&
     !canUseForbiddenReflection(p, ability.id) &&
     !(ability.id === OSSUARY_MARK_ABILITY_ID && hasActiveOssuaryMark(ctx, p.id)) &&
-    !dawnsWrathHammerActive(p, ability.id)
+    !dawnsWrathHammerActive(p, ability.id) &&
+    !solarReprisalBypassesCooldown(p, ability.id)
   ) {
     ctx.error(p.id, 'That ability is not ready yet.');
     return;

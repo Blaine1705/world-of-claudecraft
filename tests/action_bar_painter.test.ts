@@ -143,9 +143,11 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
       { m: 'toggleClass', args: [el.btn, 'proc', true] },
       { m: 'toggleClass', args: [el.btn, 'empowered', true] },
       { m: 'toggleClass', args: [el.btn, 'ascension-spender', true] },
-      { m: 'setAttr', args: [el.btn, 'data-ascension-cost', '-1'] },
       { m: 'toggleClass', args: [el.btn, 'fate-consume-ready', true] },
       { m: 'toggleClass', args: [el.btn, 'fate-sentence-ready', false] },
+      // Every toggleClass first, then every setAttr: the painter batches by
+      // writer so a frame touches classList once and the attribute map once.
+      { m: 'setAttr', args: [el.btn, 'data-ascension-cost', '-1'] },
       { m: 'setAttr', args: [el.btn, 'aria-label', 'aria1'] },
       { m: 'setAttr', args: [el.btn, 'aria-description', ''] },
       { m: 'setAttr', args: [el.btn, 'aria-disabled', 'true'] },

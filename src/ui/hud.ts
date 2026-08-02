@@ -73,6 +73,7 @@ import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import { junkSellableSlot } from '../sim/items';
 import type { Ante, PickAction } from '../sim/lockpick';
+import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
 import { FOCUS_POINT_BUDGET, isInTownZone } from '../sim/professions/focus';
 import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/stations';
@@ -369,7 +370,6 @@ import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
 import { LootWindowController } from './hud/loot/loot_window_controller';
-import { primaryOwnedPet } from './hud/pet_bar_core';
 import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
 import { QuestDialogController } from './hud/quest/quest_dialog_controller';
@@ -7215,7 +7215,19 @@ export class Hud {
 
   private ownPet(): Entity | null {
     for (const e of this.sim.entities.values()) {
-      if (isControllableOwnedPet(e, this.sim.playerId) && !isNecromancyUndead(e)) return e;
+      // Both exclusions are load-bearing and each comes from a different wave:
+      // isPrimaryOwnedPetEntity is the sim's own petOf rule (it drops the
+      // Destruction Pyre Colossus, which explicitly does NOT replace the
+      // controlled demon, and the temporary Necromancy undead), and
+      // isControllableOwnedPet drops the guardian_* templates. The PERMANENT
+      // graveguard is a real pet and must stay: tests/pet_bar_core.test.ts pins
+      // it, so do not add a blanket isNecromancyUndead exclusion here.
+      if (
+        isPrimaryOwnedPetEntity(e, this.sim.playerId) &&
+        isControllableOwnedPet(e, this.sim.playerId)
+      ) {
+        return e;
+      }
     }
     return null;
   }
