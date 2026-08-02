@@ -16,6 +16,7 @@ import type { Pool } from 'pg';
 import { discordStatusIndexForPoints } from '../src/sim/discord_tier';
 import { enqueueLinkChange } from './discord_link_changes';
 import { discordAvatarUrl } from './discord_oauth';
+import { bustDiscordStatus } from './discord_status_cache';
 import { isUniqueViolation } from './http_util';
 
 export const DISCORD_SCHEMA = `
@@ -249,17 +250,30 @@ export async function linkDiscordToAccount(
     if (isUniqueViolation(err)) return false;
     throw err;
   }
+  // The upsert landed (link, relink, or repoint, always for this accountId), so
+  // the cached /api/discord core is stale. The refusal arms above write nothing
+  // and must not evict a healthy snapshot.
+  bustDiscordStatus(accountId);
   return true;
 }
 
 export async function unlinkDiscord(pool: Pool, accountId: number): Promise<void> {
-  await pool.query('DELETE FROM discord_links WHERE account_id = $1', [accountId]);
+  const res = await pool.query('DELETE FROM discord_links WHERE account_id = $1', [accountId]);
+  // Bust only when a row was really deleted: a repeat unlink is an idempotent
+  // no-op and must not evict a healthy /api/discord snapshot (busts ride real
+  // writes only). A user who unlinks and immediately reloads must see
+  // linked:false, which this bust guarantees within this process.
+  if ((res.rowCount ?? 0) > 0) bustDiscordStatus(accountId);
 }
 
 // Update just the captured Discord email on an existing link, e.g. when a
 // returning user re-consents and grants the email scope for the first time. A
 // no-op when the grant carried no email, so it never wipes a previously captured
 // address (the account's own recovery email is handled separately).
+// No bustDiscordStatus here, STRUCTURALLY: discord_email is neither served by
+// /api/discord nor present in its cached core (DiscordStatusCore.link is a
+// narrowed projection that cannot carry it). If email ever joins that payload,
+// widen the projection and add this writer's bust in the same change.
 export async function setDiscordLinkEmail(
   pool: Pool,
   accountId: number,
@@ -277,10 +291,15 @@ export async function setDiscordGuildMember(
   accountId: number,
   guildMember: boolean,
 ): Promise<void> {
-  await pool.query('UPDATE discord_links SET guild_member = $2 WHERE account_id = $1', [
+  const res = await pool.query('UPDATE discord_links SET guild_member = $2 WHERE account_id = $1', [
     accountId,
     guildMember,
   ]);
+  // guildMember rides the /api/discord payload. A matched row is a real write
+  // (callers are login/link flows and the internal member route, each a genuine
+  // membership event, so a same-value rewrite over-busting one account costs at
+  // most one refresh); an account with no link row writes nothing and skips it.
+  if ((res.rowCount ?? 0) > 0) bustDiscordStatus(accountId);
 }
 
 // ── OAuth state (mirrors wallet_link_challenges) ──────────────────────────────
@@ -502,8 +521,11 @@ export async function grantRewardPoints(
     // balance write: the zero/non-finite early return and the dedupe-key replay both
     // return above without touching reward_points. After COMMIT, never mid-
     // transaction. Unlinked accounts enqueue too (the playtime grant path); the
-    // outbox drain is what filters by linkage.
+    // outbox drain is what filters by linkage. The /api/discord status bust rides
+    // the same real-write placement (points/lifetimePoints/statusTier are payload
+    // fields), and like the enqueue it must never fire on the no-op arms above.
     enqueueLinkChange({ accountId, kinds: ['points'] }, Date.now());
+    bustDiscordStatus(accountId);
     return rowToRewardState(upd.rows[0]);
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -569,6 +591,9 @@ export async function claimSwag(
     // balance and leaves it untouched, so it is not a points transition. The refusal
     // arms (already claimed, cannot afford) roll back above and never reach here.
     if (price > 0) enqueueLinkChange({ accountId, kinds: ['points'] }, Date.now());
+    // Unlike the feed above, the status bust fires on EVERY successful claim: a
+    // cost-0 claim still adds a claimedSwagIds entry, which is a payload field.
+    bustDiscordStatus(accountId);
     return { ok: true, reason: 'ok', points };
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -786,7 +811,7 @@ export async function setDiscordMemberMetaBulk(
               (COALESCE(i.nickname, dl.discord_username),
                COALESCE(i.joined_at, dl.discord_joined_at),
                i.role_key)
-      RETURNING 1
+      RETURNING dl.account_id
      )
      SELECT (SELECT count(*) FROM updated) AS changed,
             (SELECT count(*) FROM matched WHERE NOT will_change) AS skipped,
@@ -794,10 +819,35 @@ export async function setDiscordMemberMetaBulk(
                FROM input i
               WHERE NOT EXISTS (
                 SELECT 1 FROM matched m WHERE m.discord_user_id = i.discord_user_id
-              )) AS unapplied`,
+              )) AS unapplied,
+            (SELECT COALESCE(array_agg(account_id), ARRAY[]::int[])
+               FROM updated) AS changed_account_ids`,
     [ids, nicknames, joinedAt, roleKeys],
   );
   const row = res.rows[0];
+  // A changed row can move discord_username, which the /api/discord payload
+  // serves, so every account whose row the UPDATE really wrote is busted; the
+  // skipped and unapplied populations wrote nothing. account_id (not the pushed
+  // discord id) because the status cache is keyed by account. Internal use only:
+  // the reported result shape is unchanged, so the members-meta response body
+  // the bot parses stays byte-identical. Deliberate over-bust: a change to
+  // discord_role or discord_joined_at alone (columns the status payload does
+  // not serve) still busts that account, costing one refresh; splitting the
+  // RETURNING by column is not worth the statement complexity. A missing or
+  // unparsed aggregate must not fail the push, but silently skipping busts
+  // while rows changed would be an invisible staleness hole, so it warns.
+  const changedAccountIds = Array.isArray(row?.changed_account_ids)
+    ? row.changed_account_ids
+    : null;
+  if (changedAccountIds === null) {
+    if (Number(row?.changed ?? 0) > 0)
+      console.warn('setDiscordMemberMetaBulk: changed_account_ids missing; status busts skipped');
+  } else {
+    for (const accountId of changedAccountIds) {
+      const id = Number(accountId);
+      if (Number.isFinite(id)) bustDiscordStatus(id);
+    }
+  }
   return {
     changed: Number(row?.changed ?? 0),
     skipped: Number(row?.skipped ?? 0),

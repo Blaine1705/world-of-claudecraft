@@ -570,6 +570,30 @@ For off-box safety, sync the directory to S3 occasionally:
   also performs the largest fold it will ever do (the whole backlog, budget-
   capped per night), so the deploy-time catch-up guidance above applies with
   extra weight.
+- **`/api/discord` status cache** (game service). The account-scoped part of the
+  `GET /api/discord` payload is served from a per-account in-memory cache; every
+  in-process write (link, unlink, grants, swag claims, password set, guild-member
+  and pushed-meta updates) evicts the affected account immediately, so the TTL only
+  bounds staleness for writes a PEER realm process made. Honest cost accounting: a
+  cache hit removes the four PAYLOAD queries; the request still pays its auth reads
+  (bearer-token resolve plus moderation status) like every authenticated endpoint,
+  so the incident's per-request database cost drops by the payload share, not to
+  zero. Brownout behavior changed with the cache: a warm account now answers 200
+  with the last good payload while the PAYLOAD queries are failing but the auth
+  reads still resolve (each such read still attempts a refresh first, and
+  cached_read warns once per failure streak in the game log); a cold account
+  still errors, and a total database outage still fails every request at auth,
+  before the cache is ever consulted. Two keys, both following the "empty,
+  non-numeric, or non-positive means the DEFAULT" contract:
+  - `DISCORD_STATUS_CACHE_TTL_MS=` (empty) means the default 15000 (15 seconds).
+    Raising it saves little (a cache hit is already free of payload queries) and
+    widens the cross-process staleness window; lowering it toward 0 is not possible
+    (a non-positive value reads as the default, never as caching off).
+  - `DISCORD_STATUS_CACHE_MAX_ENTRIES=` (empty) means the default 2000 accounts
+    (double the 1,000-concurrent-player design envelope; a few hundred bytes per
+    entry, unserved columns are kept out of the cached shape). Past the cap the
+    least-recently-read account is evicted and its next status read costs one
+    extra set of payload queries, never an error.
 - Logs: `sudo docker compose -f /opt/eastbrook/docker-compose.yml logs -f game`.
 - If the instance ever feels tight, stop, change instance type,
   start. Everything lives in Docker plus one EBS volume, so nothing

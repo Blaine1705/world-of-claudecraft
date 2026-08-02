@@ -70,6 +70,11 @@ import {
   parseTokenResponse,
   pkceChallengeFromVerifier,
 } from './discord_oauth';
+import {
+  configureDiscordStatusCache,
+  type DiscordStatusCore,
+  readDiscordStatusCore,
+} from './discord_status_cache';
 import { deleteUnusedFederatedProvision } from './federated_auth_db';
 import { ctxAccountId } from './http/context';
 import type { ErrorCode } from './http/error_codes';
@@ -834,13 +839,53 @@ export async function handleDiscordStatus(
   return json(res, 200, await discordStatusPayload(accountId));
 }
 
-export async function discordStatusPayload(accountId: number): Promise<Record<string, unknown>> {
+/**
+ * The database-backed part of the status payload, refreshed on a cache miss.
+ * Every field a write can change funnels through here, and every such write
+ * site busts the account's entry (see the bust wiring in discord_db.ts/db.ts),
+ * so a caller is never served stale data after a change it just made.
+ */
+async function fetchDiscordStatusCore(accountId: number): Promise<DiscordStatusCore> {
   const [link, reward, claimedSwagIds, acct] = await Promise.all([
     discordForAccount(pool, accountId),
     loadRewardState(pool, accountId),
     listSwagClaims(pool, accountId),
     accountById(accountId),
   ]);
+  return {
+    // Projected to the fields the payload serves (DiscordStatusLink): the full
+    // row's discord_email must never sit in the cache (see the module header).
+    link: link
+      ? {
+          discordUserId: link.discord_user_id,
+          username: link.discord_username,
+          avatar: link.discord_avatar,
+          guildMember: link.guild_member,
+        }
+      : null,
+    points: reward.points,
+    lifetimePoints: reward.lifetimePoints,
+    claimedSwagIds,
+    // Whether the account has a real (owner-chosen) password. The client reads this
+    // to decide whether unlinking must first set one (a Discord-only account with no
+    // usable password would otherwise be stranded). Defaults true if the account row
+    // is somehow missing, so we never wrongly demand a password.
+    passwordSet: acct?.password_set ?? true,
+  };
+}
+// Installed at module load; the cache itself builds lazily on the first status
+// read, so no clock or env value binds before a test can inject its own.
+configureDiscordStatusCache(fetchDiscordStatusCore);
+
+// Shared by BOTH /api/discord arms (the RouteDef handler and the frozen legacy
+// arm in server/main.ts), which is what keeps the cache and the response
+// parity-identical by construction (D9 needs no dual edit here). Only the
+// database-backed core above is cached (D17); presence and the env-derived
+// config fields are composed fresh on EVERY request, so the presence block is
+// never frozen behind the payload TTL (ruling R10).
+export async function discordStatusPayload(accountId: number): Promise<Record<string, unknown>> {
+  const core = await readDiscordStatusCore(accountId);
+  const link = core.link;
   const presence = discordPresenceCache();
   const cfg = discordConfig();
   return {
@@ -850,21 +895,17 @@ export async function discordStatusPayload(accountId: number): Promise<Record<st
     // Discord. Null when no guild is configured.
     widgetUrl: cfg?.guildId ? `https://discord.com/widget?id=${cfg.guildId}&theme=dark` : null,
     linked: link !== null,
-    // Whether the account has a real (owner-chosen) password. The client reads this
-    // to decide whether unlinking must first set one (a Discord-only account with no
-    // usable password would otherwise be stranded). Defaults true if the account row
-    // is somehow missing, so we never wrongly demand a password.
-    passwordSet: acct?.password_set ?? true,
-    username: link?.discord_username ?? null,
+    passwordSet: core.passwordSet,
+    username: link?.username ?? null,
     // Discord profile picture (CDN), shown in the HUD widget. Null for a default
     // (avatar-less) Discord account.
-    avatar: link ? discordAvatarUrl(link.discord_user_id, link.discord_avatar, 64) : null,
-    guildMember: link?.guild_member ?? false,
-    points: reward.points,
-    lifetimePoints: reward.lifetimePoints,
+    avatar: link ? discordAvatarUrl(link.discordUserId, link.avatar, 64) : null,
+    guildMember: link?.guildMember ?? false,
+    points: core.points,
+    lifetimePoints: core.lifetimePoints,
     // Unlinked accounts are unranked (tier 0); only a linked account climbs rungs.
-    statusTier: link ? discordStatusIndexForPoints(reward.lifetimePoints) : 0,
-    claimedSwagIds,
+    statusTier: link ? discordStatusIndexForPoints(core.lifetimePoints) : 0,
+    claimedSwagIds: core.claimedSwagIds,
     inviteUrl: discordInviteUrl(),
     presence: {
       onlineCount: presence.onlineCount,

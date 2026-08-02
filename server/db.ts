@@ -29,6 +29,7 @@ import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
 import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
+import { bustDiscordStatus } from './discord_status_cache';
 import { GITHUB_SCHEMA } from './github_db';
 import { isUniqueViolation } from './http_util';
 import { MAPS_SCHEMA } from './maps_db';
@@ -1691,10 +1692,14 @@ export async function updatePasswordHash(accountId: number, passwordHash: string
   // Setting a password always makes it a real, owner-chosen one, so mark the
   // account usable (a no-op for accounts that were already password_set = TRUE,
   // and the conversion step for a Discord-provisioned account).
-  await pool.query('UPDATE accounts SET password_hash = $2, password_set = TRUE WHERE id = $1', [
-    accountId,
-    passwordHash,
-  ]);
+  const res = await pool.query(
+    'UPDATE accounts SET password_hash = $2, password_set = TRUE WHERE id = $1',
+    [accountId, passwordHash],
+  );
+  // password_set rides the /api/discord payload (the unlink flow's "set a
+  // password first" gate reads it), so a real write busts the cached status
+  // core here, covering every caller of this chokepoint at once.
+  if ((res.rowCount ?? 0) > 0) bustDiscordStatus(accountId);
 }
 
 // Revoke every token for an account except (optionally) the one in hand.
@@ -1980,6 +1985,11 @@ export async function consumePasswordResetRequest(
     );
     await client.query('DELETE FROM auth_tokens WHERE account_id = $1', [row.account_id]);
     await client.query('COMMIT');
+    // This path writes password_set = TRUE in its OWN transaction (it does not
+    // call updatePasswordHash), so it carries its own /api/discord status bust,
+    // after COMMIT like the discord_db.ts sites. The expired/replayed-token arm
+    // returns above without writing and must not evict a healthy snapshot.
+    bustDiscordStatus(row.account_id);
     return { accountId: row.account_id };
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});

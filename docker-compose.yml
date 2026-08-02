@@ -109,6 +109,11 @@ services:
       # Runtime: the game server uses the bot token to auto-join a linking player to
       # the official guild (guilds.join). Empty disables auto-join (verify-only).
       DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      # Runtime: the /api/discord status cache levers (server/discord_status_cache.ts;
+      # operator rows in DEPLOY.md). Empty, non-numeric, or non-positive reads as the
+      # in-code default (15000 ms TTL, 2000 entries), so an unset key is always safe.
+      DISCORD_STATUS_CACHE_TTL_MS: ${DISCORD_STATUS_CACHE_TTL_MS:-}
+      DISCORD_STATUS_CACHE_MAX_ENTRIES: ${DISCORD_STATUS_CACHE_MAX_ENTRIES:-}
       # Runtime: GitHub OAuth for the in-game developer badge. Both id+secret must be
       # set to enable "Link GitHub"; empty hides it exactly like Discord. GITHUB_REPO
       # selects which repo's contributor stats back the badge (code default:
