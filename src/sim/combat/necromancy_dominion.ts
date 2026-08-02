@@ -19,6 +19,13 @@ export interface OwnedDominionServant extends DominionServant {
   ownerId?: number | null;
 }
 
+export interface CorpseExplosionServant extends DominionServant {
+  id: number;
+  hp: number;
+  maxHp: number;
+  despawnTimer?: number;
+}
+
 export type DominionSummonBlock = 'duplicate' | 'full' | null;
 
 export function isDominionTemplateId(
@@ -29,6 +36,34 @@ export function isDominionTemplateId(
 
 export function livingDominionServants(servants: readonly DominionServant[]): DominionServant[] {
   return servants.filter((servant) => !servant.dead && isDominionTemplateId(servant.templateId));
+}
+
+export function selectCorpseExplosionServant<T extends CorpseExplosionServant>(
+  servants: readonly T[],
+): T | null {
+  const eligible = servants.filter(
+    (servant) => !servant.dead && isDominionTemplateId(servant.templateId),
+  );
+  eligible.sort((a, b) => {
+    const priority = (servant: CorpseExplosionServant): number => {
+      if (servant.templateId === 'necromancy_bone_mage') return 0;
+      if (servant.templateId === 'necromancy_skeletal_warrior') return 1;
+      return 2;
+    };
+    const priorityDifference = priority(a) - priority(b);
+    if (priorityDifference !== 0) return priorityDifference;
+    const aTimer = Number.isFinite(a.despawnTimer)
+      ? (a.despawnTimer ?? Number.POSITIVE_INFINITY)
+      : Number.POSITIVE_INFINITY;
+    const bTimer = Number.isFinite(b.despawnTimer)
+      ? (b.despawnTimer ?? Number.POSITIVE_INFINITY)
+      : Number.POSITIVE_INFINITY;
+    const aHealth = a.maxHp > 0 ? a.hp / a.maxHp : 0;
+    const bHealth = b.maxHp > 0 ? b.hp / b.maxHp : 0;
+    if (aTimer !== bTimer) return aTimer - bTimer;
+    return aHealth - bHealth || a.id - b.id;
+  });
+  return eligible[0] ?? null;
 }
 
 export function dominionSummonBlock(

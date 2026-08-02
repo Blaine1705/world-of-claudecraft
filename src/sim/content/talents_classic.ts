@@ -331,9 +331,14 @@ const WARLOCK_SPECS: SpecDef[] = [
     '*',
     'A curse-weaver who turns enemy and allied actions into Condemnation.',
     'evil_eye',
-    'Hex of Anguish',
-    'Increases spell damage by 10%.',
-    { global: { spellDmgPct: 0.1 } },
+    'Sentence',
+    'Increases Needle of Fate and Sentence damage by 10%.',
+    {
+      ability: [
+        { ability: 'needle_of_fate', dmgPct: 0.1 },
+        { ability: 'sentence', dmgPct: 0.1 },
+      ],
+    },
   ),
   spec(
     'demonology',

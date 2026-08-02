@@ -70,7 +70,7 @@ remain live for Affliction, Necromancy, and Destruction.
 | 11 | Survival | Pact Deepened strengthens Fiendhide; Sanguine Covenant trades 10% current health for a 30% maximum-health absorb; Deep Hunger grants 15% damage reduction and damage-pushback immunity while channeling Consume. Deep Hunger needs a Necromancy replacement now that Consume is not part of that kit. |
 | 14 | Resource behavior | Deepened Hex discounts the active spec's generator; Blood Credit improves Hard Bargain's mana return; Shadow Credit grants one or two free generators when at least 40% or 80% of the specialization resource is spent at once. |
 | 17 | Major offense | Grand Malediction shortens the active spec's signature setup cooldown; Ashen Focus shortens generator casts by 20% after standing still for 1 sec; Hexstorm periodically makes the next generator instant. |
-| 20 | Capstone utility | Unbroken Ritual turns casting time into shared-class cooldown recovery; Forbidden Reflection permits one repeat of the first shared cooldown used in each 60 sec window; Abyssal Rift pulls enemies within 8 yards, deals heavy Shadow damage, and stuns non-bosses for 2 sec. |
+| 20 | Capstone utility | Unbroken Ritual turns casting time into class and specialization cooldown recovery; Forbidden Reflection permits one repeat of the first eligible Warlock cooldown used in each 60 sec window, excluding Soulwell and Army of the Dead; Abyssal Rift pulls enemies within 8 yards, deals heavy Shadow damage, and stuns non-bosses for 2 sec. |
 
 Stable `wlk_r*` option identifiers are retained so persisted allocations repair to the
 new class-wide behavior instead of losing their row selections.
@@ -102,7 +102,8 @@ maintaining a checklist of periodic effects.
 - Enemy attacks, Consume, Cursed Accomplice, Hex of Violence, Cruel Pact, Vicarious
   Suffering, and Coven all provide distinct ways to generate Condemnation.
 - Sentence requires the primary Evil Eye and consumes the entire pool. Its damage and
-  extra effects escalate at 20, 50, 80, and 100 Condemnation.
+  extra effects escalate at 20, 50, 80, and 100 Condemnation. To contain endgame burst,
+  its level scaling flattens after level 16 and reaches a 0.8 multiplier at level 20.
 - Coven is the deliberate multi-target cooldown: it creates up to four temporary
   secondary Eyes, which generate at half strength and receive Sentence echoes.
 
@@ -113,14 +114,14 @@ maintaining a checklist of periodic effects.
 | 5 | Evil Eye | 15 | Instant | 1 sec | 30 | Moves the single primary Eye. Does not generate or refresh Condemnation. |
 | 5 | Maledict Gaze | Passive | -- | -- | 30 | The companion attacks the selected primary Eye for 5/9/14 Shadow damage at levels 5/12/20. Possession halves its 2.5 sec attack interval. |
 | 5 | Needle of Fate | 25/30/35 | 1.5 sec | None | 30 | Deals 18-22, 32-38, or 48-56 Shadow damage at levels 5, 12, and 20. Generates 5 on the primary Eye. |
-| 5 | Sentence | 40 | Instant | None | 30 | Requires at least 20 and the primary Eye. Consumes the full pool, deals 138/400/750/1100 base damage at 20/50/80/100 at level 20, and generates 35% of normal threat. |
+| 5 | Sentence | 40 | Instant | None | 30 | Requires at least 20 and the primary Eye. Consumes the full pool, uses 138/400/750/1100 base damage at 20/50/80/100, flattens its scaling after level 16, and generates 35% of normal threat. |
 | 7 | Cursed Accomplice | 40 | Instant | None | 40 | With no allied player selected, links the Maledict Eye and its Gaze generates 2. With an allied player selected, their damage to an Eye generates 3. One link; at most once every 2 sec. |
 | 9 | Consume | 40/55/70 | 5 sec channel | None | 20 | Shared Warlock spell with five ticks for 7/12/17 damage at levels 9, 14, and 20. It transfers 70% of that damage as health; Affliction transfers the full amount and generates 2 Condemnation per primary-Eye tick plus 5 on completion. |
 | 11 | Litany of Guilt | 50/65 | Instant | 20 sec | 30 | For 8 sec, Condemnation gains damage up to four other enemies within 8 yards of the primary Eye, at most once per second. |
 | 12 | Hex of Violence | 55 | Instant | 15 sec | 30 | For 8 sec, the enemy's next three damaging actions each generate 7 and retaliate for 22 Shadow damage. |
 | 14 | Cruel Pact | 0 | Instant | 20 sec | Self | Replaces Hard Bargain for Affliction. Sacrifices 12% maximum health, restores 15% maximum mana, and generates 20 Condemnation. Unusable at or below 20% health. |
 | 16 | Vicarious Suffering | 50 | Instant | 30 sec | 40 | Marks self or an ally for 8 sec. Hostile hits generate 3 each, up to 15 total. Self-casts reduce damage by 20%; allied casts redirect up to 20% without taking the Warlock below 15% health. |
-| 18 | Possess the Evil Eye | 75 | Instant, off GCD | 45 sec | 30 | Grants 35 Condemnation and possesses the primary Eye for 15 sec. Needle casts in 1 sec and generates 2 extra, Consume can move, and Sentence deals 25% more damage and releases a delayed echo for 60%. |
+| 13 | Possess the Evil Eye | 75 | Instant, off GCD | 45 sec | 30 | Grants 35 Condemnation and possesses the primary Eye for 15 sec. Needle casts in 1 sec and generates 2 extra, Consume can move, and Sentence deals 25% more damage. Its 60% delayed echo tapers to 30% across levels 17-20. |
 | 20 | Hour of Judgment | 0 | Instant, off GCD | 90 sec | 30 | Grants 40 Condemnation and three Fate Threads, activates Possession for 15 sec, doubles primary-Eye generation, increases Sentence damage by 20%, and makes the first Sentence refund 50 Condemnation. |
 | 20 | Coven | 120 | Instant | 90 sec | 30 | Requires the primary Eye. Adds up to four secondary Eyes for 15 sec within 15 yards. |
 
@@ -190,9 +191,9 @@ power window instead of playing as another direct-damage caster.
   target in unison, retaining each servant's cleave profile.
 - Dominion servants persist until slain, sacrificed, dismissed, or the specialization
   changes. They have no upkeep timer.
-- Army of the Dead is the level-20 assault summon. It tears open a grave portal for 20
-  seconds and temporarily raises only the Warrior, Bone Mage, or Gravewing archetypes
-  missing from the current Dominion. The chosen servants remain afterward.
+- Army of the Dead is the level-16 assault summon. It tears open a grave portal and
+  raises a temporary Warrior, Bone Mage, and Gravewing for 20 seconds in addition to
+  the current Dominion. The chosen servants remain afterward.
 - Keep the owner kit focused: Gloom Bolt, Burning Pact, Blackrot, Hex of Anguish,
   Consume, and Sear are not available to committed Necromancy.
 - Soul Lance enters at level 9 as an 8 sec caster-owned nuke. It costs mana, not
@@ -200,6 +201,10 @@ power window instead of playing as another direct-damage caster.
 - Ossuary Mark enters at level 12. It stores 20% of landed damage from the
   Necromancer and their undead for 12 sec, can be detonated early, and turns a
   marked death into a 6 yard burst plus one Soul Fragment.
+- Corpse Explosion is an 8 sec ground-targeted conversion. It sacrifices Bone Mage
+  first, Skeletal Warrior second, and Gravewing only as a last resort. Duplicates of the
+  same archetype are ordered by remaining duration, health percentage, and entity ID.
+  Graveguard is never eligible. The open Dominion slot can be filled by any archetype.
 - Let minion choice or talent choices alter the damage profile.
 - Redirect part of incoming damage to the persistent guardian.
 - Sacrifice a minion for health, mana, defense, or immediate damage.
@@ -232,10 +237,11 @@ The tree should offer equally viable paths for:
 
 ### Technical limits
 
-Avoid an unlimited permanent army. Keep one persistent guardian, exactly two bounded
-Dominion slots, one servant per archetype, and only the missing archetypes temporarily
-added by Army of the Dead. Confirm pathfinding, target selection, owner death behavior,
-threat, network snapshots, and entity cleanup in tests.
+Avoid an unlimited permanent army. Keep one persistent guardian and exactly two bounded
+Dominion slots with one servant per archetype. Army of the Dead adds one complete
+temporary wave for 20 seconds without altering those persistent slots. Confirm
+pathfinding, target selection, owner death behavior, threat, network snapshots, and
+entity cleanup in tests.
 
 ## Destruction
 

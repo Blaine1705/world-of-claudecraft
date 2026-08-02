@@ -11,10 +11,12 @@ import {
   gainDoom,
   JUDGMENT_SENTENCE_DAMAGE_MULT,
   maledictGazeDamage,
+  possessedSentenceEchoMultiplier,
   resolveNeedleOfFate,
   resolveSentence,
   SENTENCE_THREAT_MULT,
   sentenceBaseDamage,
+  sentenceEndgameDamageMultiplier,
 } from '../src/sim/combat/affliction';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { emptyModifiers } from '../src/sim/content/talents';
@@ -128,7 +130,7 @@ describe('Affliction Warlock', () => {
     expect(at(7)).toContain('cursed_accomplice');
     expect(at(6)).not.toContain('drain_life');
     expect(at(7)).toContain('drain_life');
-    expect(at(7)).toContain('searing_pain');
+    expect(at(7)).not.toContain('searing_pain');
     expect(at(7)).not.toContain('litany_of_guilt');
     expect(at(8)).toContain('litany_of_guilt');
     expect(at(9)).toContain('cruel_pact');
@@ -142,6 +144,7 @@ describe('Affliction Warlock', () => {
     expect(at(17)).toContain('coven');
     expect(at(19)).not.toContain('hour_of_judgment');
     expect(at(20)).toContain('hour_of_judgment');
+    expect(at(20)).not.toContain('curse_of_agony');
     expect(at(20)).not.toEqual(
       expect.arrayContaining([
         'shadow_bolt',
@@ -197,7 +200,7 @@ describe('Affliction Warlock', () => {
       expect.arrayContaining([expect.objectContaining({ type: 'afflictionLitany', damage: 14 })]),
     );
     expect(litany?.duration).toBe(8);
-    expect(litany?.value).toBe(15);
+    expect(litany?.value).toBe(14);
     expect(litany?.value2).toBe(8);
     expect(litany?.value3).toBe(4);
     const friendly = addTarget(sim, 11.5);
@@ -218,7 +221,7 @@ describe('Affliction Warlock', () => {
 
     expect(doomValue(sim.player)).toBe(5);
     expect(litanyHits).toHaveLength(4);
-    expect(new Set(litanyHits.map((event) => event.amount))).toEqual(new Set([15]));
+    expect(new Set(litanyHits.map((event) => event.amount))).toEqual(new Set([14]));
     expect(new Set(litanyHits.map((event) => event.targetId))).toEqual(
       new Set(nearby.slice(0, 4).map((target) => target.id)),
     );
@@ -566,7 +569,7 @@ describe('Affliction Warlock', () => {
     expect(sim.player.castingAbility).toBe('drain_life');
   });
 
-  it('delays a 60% Sentence discharge without rebounding it through Coven', () => {
+  it('delays the level-scaled Sentence discharge without rebounding it through Coven', () => {
     const sim = makeAffliction();
     const primary = addTarget(sim, 8);
     const secondary = addTarget(sim, 10);
@@ -611,7 +614,7 @@ describe('Affliction Warlock', () => {
             event.ability === 'Demonic Sentence',
         )
         .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0),
-    ).toBe(Math.round(initialPrimaryDamage * 0.6));
+    ).toBe(Math.round(initialPrimaryDamage * possessedSentenceEchoMultiplier(sim.player.level)));
     expect(secondary.hp).toBe(secondaryAfterSentence);
     expect(sentenceBursts(delayedEvents)).toHaveLength(0);
   });
@@ -1309,7 +1312,51 @@ describe('Affliction Warlock', () => {
       expect(doomValue(sim.player)).toBe(0);
     }
 
-    expect(losses).toEqual([152, 440, 825, 1210]);
+    expect(losses).toEqual([121, 352, 660, 968]);
+  });
+
+  it('compresses Sentence and its demonic echo only across levels 17 to 20', () => {
+    expect([5, 13, 16].map(sentenceEndgameDamageMultiplier)).toEqual([1, 1, 1]);
+    expect([17, 18, 19, 20].map(sentenceEndgameDamageMultiplier)).toEqual([0.95, 0.9, 0.85, 0.8]);
+    expect([5, 13, 16].map(possessedSentenceEchoMultiplier)).toEqual([0.6, 0.6, 0.6]);
+    expect([17, 18, 19, 20].map(possessedSentenceEchoMultiplier)).toEqual([
+      0.525, 0.45, 0.375, 0.3,
+    ]);
+  });
+
+  it('applies every endgame compression step to real Sentence and demonic echo damage', () => {
+    const observed = [17, 18, 19].map((level) => {
+      const sim = new Sim({ seed: 1900 + level, playerClass: 'warlock', autoEquip: true });
+      sim.setPlayerLevel(level);
+      expect(sim.setSpec('affliction')).toBe(true);
+      sim.player.resource = sim.player.maxResource;
+      sim.player.hitBonus = 1;
+      const target = addTarget(sim, 8);
+      target.level = level;
+      finishCast(sim, 'evil_eye', target);
+      finishCast(sim, 'possess_evil_eye', target);
+      consumeDoom(ctx(sim), sim.player);
+      gainDoom(ctx(sim), sim.player, 50);
+      const hpBefore = target.hp;
+
+      resolveSentence(ctx(sim), sim.player, target, 'Sentence');
+      const primary = hpBefore - target.hp;
+      let echo = 0;
+      for (let tick = 0; tick < 20; tick++) {
+        echo += sim
+          .tick()
+          .filter((event) => event.type === 'damage' && event.ability === 'Demonic Sentence')
+          .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0);
+      }
+
+      return { level, primary, echo };
+    });
+
+    expect(observed).toEqual([
+      { level: 17, primary: 404, echo: 212 },
+      { level: 18, primary: 405, echo: 182 },
+      { level: 19, primary: 404, echo: 152 },
+    ]);
   });
 
   it('routes Sentence through the Evil Eye at 35% of normal threat', () => {
@@ -1409,7 +1456,7 @@ describe('Affliction Warlock', () => {
     healingSim.player.hp = 1;
     gainDoom(ctx(healingSim), healingSim.player, 50);
     finishCast(healingSim, 'sentence', healingTarget);
-    expect(healingSim.player.hp).toBe(89);
+    expect(healingSim.player.hp).toBe(71);
 
     const splashSim = makeAffliction(502);
     const splashTarget = addTarget(splashSim, 8);
@@ -1420,7 +1467,7 @@ describe('Affliction Warlock', () => {
     const nearHp = nearby.hp;
     const farHp = distant.hp;
     finishCast(splashSim, 'sentence', splashTarget);
-    expect(nearHp - nearby.hp).toBe(289);
+    expect(nearHp - nearby.hp).toBe(231);
     expect(distant.hp).toBe(farHp);
 
     const bossSim = makeAffliction(503);
@@ -1445,9 +1492,9 @@ describe('Affliction Warlock', () => {
             event.type === 'damage' && event.targetId === boss.id && event.ability === 'Sentence',
         )
         .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0),
-    ).toBe(1452);
+    ).toBe(1162);
     expect(boss.hp).toBeLessThan(bossHp);
-    expect(bossNearbyHp - bossNearby.hp).toBe(424);
+    expect(bossNearbyHp - bossNearby.hp).toBe(339);
 
     const executeSim = makeAffliction(504);
     const executeTarget = addTarget(executeSim);
@@ -1610,7 +1657,7 @@ describe('Affliction Warlock', () => {
     gainDoom(ctx(sim), sim.player, 16);
     const secondaryHp = secondary.hp;
     const events = finishCast(sim, 'sentence', primary);
-    expect(secondaryHp - secondary.hp).toBe(53);
+    expect(secondaryHp - secondary.hp).toBe(42);
     expect(sentenceBursts(events)).toHaveLength(1);
   });
 
@@ -1638,7 +1685,7 @@ describe('Affliction Warlock', () => {
     // Coven echoes 35% of the shared mastery-adjusted verdict, not 35% of the
     // boss-only 20% amplified primary hit. Moving it out of the splash radius
     // isolates the Coven component.
-    expect(secondaryHp - secondary.hp).toBe(424);
+    expect(secondaryHp - secondary.hp).toBe(339);
   });
 
   it('requires the primary Evil Eye for Sentence and preserves resources on a secondary Eye', () => {

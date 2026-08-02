@@ -30,6 +30,7 @@ function masteryOnly(cls: PlayerClass, specId: string) {
 
 function known(cls: PlayerClass, id: string, spec?: string): KnownAbility {
   const mods = spec ? masteryOnly(cls, spec) : undefined;
+  if (mods && spec) mods.spec = spec;
   const ability = abilitiesKnownAt(cls, 20, mods).find((a) => a.def.id === id);
   if (!ability) throw new Error(`missing ${cls} ability ${id}`);
   return ability;
@@ -68,8 +69,13 @@ describe('spec masteries', () => {
         { ability: 'healing_wave', costPct: -0.2 },
       ],
     });
-    expect(TALENTS.warlock?.specs.find((s) => s.id === 'affliction')?.mastery.effect).toEqual({
-      global: { spellDmgPct: 0.1 },
+    const afflictionMastery = TALENTS.warlock?.specs.find((s) => s.id === 'affliction')?.mastery;
+    expect(afflictionMastery?.name).toBe('Sentence');
+    expect(afflictionMastery?.effect).toEqual({
+      ability: [
+        { ability: 'needle_of_fate', dmgPct: 0.1 },
+        { ability: 'sentence', dmgPct: 0.1 },
+      ],
     });
     // Mage rework (owner leveling pass 2026-07-14): Fire's mastery is Ignition, a
     // crit-triggered burn (ignitionPct) plus a static +2% crit chance, not the old
@@ -173,7 +179,13 @@ describe('spec masteries', () => {
 
   it('bakes DoT, HoT, absorb, cost, and melee damage mastery fields into abilities', () => {
     expect(effect(known('warlock', 'corruption'), 'dot').total).toBe(85);
-    expect(mastery('warlock', 'affliction').global.spellDmgPct).toBeCloseTo(0.1);
+    expect(effect(known('warlock', 'needle_of_fate', 'affliction'), 'directDamage')).toMatchObject({
+      min: 66,
+      max: 77,
+    });
+    expect(effect(known('warlock', 'sentence', 'affliction'), 'afflictionSentence')).toMatchObject({
+      damageMult: 1.1,
+    });
 
     expect(effect(known('druid', 'rejuvenation'), 'hot').total).toBe(168);
     expect(effect(known('druid', 'rejuvenation', 'restoration'), 'hot').total).toBe(210);
@@ -422,7 +434,7 @@ describe('spec masteries', () => {
         restoration: { abilities: ['chain_heal', 'healing_wave'], costPct: -0.2 },
       },
       warlock: {
-        affliction: { global: 'spellDmgPct', value: 0.1 },
+        affliction: { abilities: ['needle_of_fate', 'sentence'], dmgPct: 0.1 },
         demonology: { global: 'petDmgSharePct', value: 0.2 },
       },
       druid: {

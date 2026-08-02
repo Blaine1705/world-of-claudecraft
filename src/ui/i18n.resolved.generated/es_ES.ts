@@ -1811,7 +1811,7 @@ export const es_ES: EnTranslations = {
       "cooldownCap": "Has usado {used} de {cap} s de reducción de reutilización en esta ventana",
       "funeralHarvestLock": "Cosecha funeraria aún no puede crear otro fragmento de alma",
       "leadenHexLock": "Maleficio plomizo aún no puede volver a inmovilizar a este objetivo",
-      "forbiddenReflectionReady": "Puedes volver a usar tu próxima facultad compartida de brujo con reutilización",
+      "forbiddenReflectionReady": "Puedes volver a usar tu próxima facultad de brujo con reutilización que cumpla los requisitos",
       "forbiddenReflectionLock": "Reflejo prohibido aún no puede volver a prepararse",
       "internalCooldown": "Este efecto no puede volver a activarse hasta que termine el temporizador",
       "battleStance": "Actitud de Combate: un 10% más de generación de ira",
@@ -1931,9 +1931,9 @@ export const es_ES: EnTranslations = {
       "afflictionLitany": "Obtener Condena inflige {damage} de daño de las Sombras a hasta {targets} enemigos en {radius} m, una vez por segundo",
       "afflictionFateThreads": "{stacks} Hilos del destino: Sentencia inflige un {sentencePct}% más, o Drenar vida genera {doom} de Condena extra por pulso",
       "afflictionConsumeThreads": "Drenar vida consume {stacks} Hilos del destino para generar {doom} de Condena extra por pulso",
-      "necromancyHarvestMark": "La muerte puede crear 1 fragmento de alma y deja un Eco de muerte para Explosión de cadáver",
+      "necromancyHarvestMark": "La muerte puede crear 1 fragmento de alma",
       "necromancyOssuaryMark": "Almacena un {storedPct}% de tu daño y el de tus no-muertos, más un {lancePct}% del daño de Lanza de alma; vuelve a lanzar para detonar. Al morir, explota en {radius} m y crea 1 fragmento de alma",
-      "necromancyDeathEcho": "Explosión de cadáver puede consumir este eco a {radius} m del punto de mira",
+      "necromancyDeathEcho": "Eco de muerte heredado; ninguna habilidad actual lo consume",
       "warlockAnchor": "Vuelve a lanzar a menos de {range} m para regresar aquí y consumir el ancla",
       "formMetamorph": "Forma demoníaca: tamaño aumentado un {pct}%; las demás ventajas aparecen como beneficios separados",
       "energyRegen": "Aumenta la regeneración de energía un {pct}%",
@@ -8082,7 +8082,7 @@ export const es_ES: EnTranslations = {
       },
       "sentence": {
         "name": "Sentencia",
-        "description": "Consume toda la Condena para sentenciar al enemigo. El daño y los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena."
+        "description": "Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Cada Hilo aumenta el daño un 6%. Los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena. El escalado de daño se aplana después del nivel 16."
       },
       "life_tap": {
         "name": "Trato Amargo",
@@ -8130,7 +8130,7 @@ export const es_ES: EnTranslations = {
       },
       "possess_evil_eye": {
         "name": "Poseer el Mal de ojo",
-        "description": "El maldictor posee tu Mal de ojo principal durante 15 s y genera 35 de Condena. Aguja del destino se lanza en 1 s y genera 2 de Condena adicionales, Consumir se puede canalizar en movimiento, y Sentencia inflige un 25% más de daño y libera un eco retardado del 60% del daño."
+        "description": "El maldictor posee tu Mal de ojo principal durante 15 s y genera 35 de Condena. Aguja del destino se lanza en 1 s y genera 2 de Condena adicionales, Consumir se puede canalizar en movimiento, y Sentencia inflige un 25% más de daño y libera un eco retardado del 60%, que se reduce al 30% entre los niveles 17 y 20."
       },
       "hour_of_judgment": {
         "name": "Hora del juicio",
@@ -8372,7 +8372,7 @@ export const es_ES: EnTranslations = {
       },
       "corpse_explosion": {
         "name": "Explosión de cadáver",
-        "description": "Gasta 2 fragmentos de alma para hacer estallar energía de muerte en la ubicación elegida e infligir {damage} de daño de Sombras a los enemigos cercanos."
+        "description": "Sacrifica primero a un Mago de huesos, después a un Guerrero esquelético y solo usa un Ala de tumba como último recurso. Entre duplicados elige al de menor duración restante y luego al más débil para infligir {damage} de daño de Sombras en la ubicación elegida."
       },
       "funeral_harvest": {
         "name": "Cosecha fúnebre",
@@ -8384,7 +8384,7 @@ export const es_ES: EnTranslations = {
       },
       "unholy_command": {
         "name": "Mandato profano",
-        "description": "Ordena a todos tus no muertos que inflijan un 25% más de daño y actúen un 20% más rápido durante 12 s."
+        "description": "Gasta 3 fragmentos de alma para ordenar a todos tus no muertos que inflijan un 25% más de daño y actúen un 20% más rápido durante 12 s."
       },
       "reaping_command": {
         "name": "Mandato: siega",
@@ -8400,7 +8400,7 @@ export const es_ES: EnTranslations = {
       },
       "army_of_the_dead": {
         "name": "Ejército de los muertos",
-        "description": "Abre un portal sepulcral durante 20 s y alza temporalmente cada arquetipo de Dominio que aún no te sirva. Tus sirvientes elegidos permanecen cuando se cierra el portal."
+        "description": "Abre un portal sepulcral para alzar un Guerrero esquelético, un Mago de huesos y un Ala de tumba temporales durante 20 s, además de tus sirvientes de Dominio elegidos."
       },
       "metamorphosis": {
         "name": "Metamorfosis",

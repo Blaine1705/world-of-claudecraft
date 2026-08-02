@@ -164,7 +164,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '刺穿敌人，造成{damage}点暗影伤害。若目标带有你的邪眼，则生成5点谴罪；若不存在邪眼，则先标记目标。',
   'entities.abilities.sentence.name': '裁决',
   'entities.abilities.sentence.description':
-    '消耗全部谴罪裁决敌人。伤害与附加效果会在20、50、80和100点谴罪时提升。',
+    '消耗全部谴罪与命运丝线裁决敌人。每条丝线使伤害提高6%，附加效果会在20、50、80和100点谴罪时提升。16级后伤害成长趋于平缓。',
   'entities.abilities.cursed_accomplice.name': '受咒同谋',
   'entities.abilities.cursed_accomplice.description':
     '未选择友方玩家时连接你的咒眼，使其凝视生成2点谴罪；连接友方玩家时，该玩家对邪眼目标造成伤害会生成3点。每2秒最多触发一次。',
@@ -188,7 +188,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '连接苦痛8秒，受到敌对攻击时最多生成15点谴罪。对自己使用时受到的伤害降低20%；对盟友使用时最多将20%的伤害转移给你，但不会使你的生命值降至15%以下。',
   'entities.abilities.possess_evil_eye.name': '附身邪眼',
   'entities.abilities.possess_evil_eye.description':
-    '咒术者附身你的主要邪眼15秒，并生成35点谴罪。命运之针施法时间变为1秒并额外生成2点谴罪；吞噬可在移动中引导；裁决造成的伤害提高25%，并在延迟后追加60%的伤害。',
+    '咒术者附身你的主要邪眼15秒，并生成35点谴罪。命运之针施法时间变为1秒并额外生成2点谴罪；吞噬可在移动中引导；裁决造成的伤害提高25%。延迟回响造成60%的伤害，并在17至20级间逐步降至30%。',
   'entities.abilities.hour_of_judgment.name': '审判时刻',
   'entities.abilities.hour_of_judgment.description':
     '对你的主要邪眼降下持续15秒的审判，获得40点谴罪和3层命运丝线，激活附身，使通过主要邪眼生成的谴罪翻倍，并使裁决伤害提高20%。第一次裁决返还50点谴罪。',
@@ -215,7 +215,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bone_armor.description': '以骸骨环绕自身，吸收相当于最大生命值 20% 的伤害。',
   'entities.abilities.corpse_explosion.name': '尸骸爆裂',
   'entities.abilities.corpse_explosion.description':
-    '消耗 2 枚灵魂碎片，在目标地点引爆死亡能量，对附近敌人造成 {damage} 点暗影伤害。',
+    '优先牺牲骸骨法师，其次是骷髅战士，只有在别无选择时才牺牲墓翼。同类仆从中先选择剩余持续时间最短者，再选择最虚弱者，对目标地点的敌人造成 {damage} 点暗影伤害。',
   'entities.abilities.funeral_harvest.name': '葬魂收割',
   'entities.abilities.funeral_harvest.description':
     '当一个近期被你或你的亡灵伤害过的敌人死亡时，你获得1枚灵魂碎片。每3秒最多触发一次。',
@@ -224,7 +224,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '为敌人标记12秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。',
   'entities.abilities.unholy_command.name': '邪秽号令',
   'entities.abilities.unholy_command.description':
-    '号令所有亡灵，使其伤害提高 25%、行动速度提高 20%，持续 12 秒。',
+    '消耗 3 枚灵魂碎片号令所有亡灵，使其伤害提高 25%、行动速度提高 20%，持续 12 秒。',
   'entities.abilities.reaping_command.name': '收割号令',
   'entities.abilities.reaping_command.description':
     '消耗2枚灵魂碎片，命令所有亡灵仆从同时攻击。墓卫嘲讽并防御，骷髅战士牵制目标，骸骨法师暴露魔法防御，墓翼撕裂所有被击中的敌人。',
@@ -235,7 +235,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '消耗2枚灵魂碎片，将一只永久墓翼加入你的2槽统御。只能有一只为你效命。它每5秒对附近敌人造成65%的顺劈伤害，收割号令使所有被击中的敌人在5秒内受到的伤害提高8%。',
   'entities.abilities.army_of_the_dead.name': '亡者军团',
   'entities.abilities.army_of_the_dead.description':
-    '开启一座持续20秒的墓穴传送门，暂时唤醒尚未为你效命的所有统御原型。传送门关闭后，你选择的仆从仍会留下。',
+    '开启墓穴传送门，在你选择的统御仆从之外额外召唤一名骷髅战士、骸骨法师和墓翼，持续 20 秒。',
   'entities.abilities.cinderhide.name': '熔渣皮肤',
   'entities.abilities.cinderhide.description':
     '使皮肤硬化为冷却的熔渣，持续10秒，受到的所有伤害降低25%。',
@@ -7236,7 +7236,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.cooldownCap': '此时间窗已使用 {used}/{cap} 秒冷却缩减',
   'hudChrome.auraEffect.funeralHarvestLock': '葬礼收割暂时无法再次生成灵魂碎片',
   'hudChrome.auraEffect.leadenHexLock': '铅沉妖术暂时无法再次定身此目标',
-  'hudChrome.auraEffect.forbiddenReflectionReady': '下一个符合条件的术士通用冷却技能可再次施放',
+  'hudChrome.auraEffect.forbiddenReflectionReady': '下一个符合条件的术士冷却技能可再次施放',
   'hudChrome.auraEffect.forbiddenReflectionLock': '禁忌映像暂时无法再次准备',
   'hudChrome.auraEffect.internalCooldown': '计时结束前此效果无法再次触发',
   'hudChrome.auraEffect.enrage':
@@ -7278,11 +7278,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '{stacks} 层命运丝线：宣判伤害提高 {sentencePct}%，或使吸取生命每跳额外产生 {doom} 点定罪值',
   'hudChrome.auraEffect.afflictionConsumeThreads':
     '吸取生命正在消耗 {stacks} 层命运丝线，每跳额外产生 {doom} 点定罪值',
-  'hudChrome.auraEffect.necromancyHarvestMark':
-    '目标死亡时可生成 1 个灵魂碎片，并留下可供尸体爆炸使用的死亡回响',
+  'hudChrome.auraEffect.necromancyHarvestMark': '目标死亡时可生成 1 个灵魂碎片',
   'hudChrome.auraEffect.necromancyOssuaryMark':
     '储存你和亡灵造成伤害的 {storedPct}%，并额外储存灵魂长枪伤害的 {lancePct}%；再次施放引爆。目标死亡时在 {radius} 码内爆炸并生成 1 个灵魂碎片',
-  'hudChrome.auraEffect.necromancyDeathEcho': '尸体爆炸可消耗瞄准点 {radius} 码内的此回响',
+  'hudChrome.auraEffect.necromancyDeathEcho': '旧版本遗留的死亡回响；当前没有技能会消耗它',
   'hudChrome.auraEffect.warlockAnchor': '在 {range} 码内再次施放可返回此处并消耗锚点',
   'hudChrome.auraEffect.formMetamorph': '恶魔形态：体型增大 {pct}%；其他加成由独立增益提供',
   'hudChrome.auraEffect.energyRegen': '能量恢复速度提高 {pct}%',

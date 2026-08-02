@@ -169,7 +169,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を5生成し、邪眼がなければ先に対象を指定します。',
   'entities.abilities.sentence.name': '宣告',
   'entities.abilities.sentence.description':
-    '断罪をすべて消費して敵に宣告を下します。ダメージと追加効果は断罪20、50、80、100で強化されます。',
+    '断罪と運命の糸をすべて消費して敵に宣告を下します。糸1本につきダメージが6%増加し、追加効果は断罪20、50、80、100で強化されます。レベル16以降はダメージの伸びが緩やかになります。',
   'entities.abilities.cursed_accomplice.name': '呪われた共犯者',
   'entities.abilities.cursed_accomplice.description':
     '味方プレイヤーを選択していない場合は呪眼と結び、その凝視で断罪を2生成します。味方と結ぶと、その味方が邪眼対象へ与えるダメージで3生成します。発動は2秒に1回までです。',
@@ -193,7 +193,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '8秒間苦痛を結び、敵の攻撃から最大15の断罪を生成します。自分に使うと受けるダメージが20%減少します。味方に使うと、そのダメージの最大20%を自分へ移しますが、体力が15%未満になることはありません。',
   'entities.abilities.possess_evil_eye.name': '邪眼憑依',
   'entities.abilities.possess_evil_eye.description':
-    '呪術師が主要な邪眼へ15秒間憑依し、断罪を35生成します。運命の針は詠唱1秒になり断罪をさらに2生成し、吸命は移動中も維持でき、宣告は25%多くダメージを与えて遅れて60%の追加ダメージを放ちます。',
+    '呪術師が主要な邪眼へ15秒間憑依し、断罪を35生成します。運命の針は詠唱1秒になり断罪をさらに2生成し、吸命は移動中も維持でき、宣告は25%多くダメージを与えます。遅延反響は60%のダメージを与え、レベル17から20にかけて30%まで低下します。',
   'entities.abilities.hour_of_judgment.name': '審判の刻',
   'entities.abilities.hour_of_judgment.description':
     '主要な邪眼へ15秒間の審判を下し、断罪を40と運命の糸を3獲得して憑依を発動し、主要な邪眼を通じて生成する断罪を2倍にして、宣告のダメージを20%増加させます。最初の宣告は断罪を50返還します。',
@@ -221,7 +221,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '骨で身を包み、最大体力の20%に相当するダメージを吸収する。',
   'entities.abilities.corpse_explosion.name': '骸の爆裂',
   'entities.abilities.corpse_explosion.description':
-    '魂の欠片を2個消費し、指定地点で死の力を炸裂させ、周囲の敵に{damage}のシャドウダメージを与える。',
+    'まずボーン・メイジ、次にスケルタル・ウォリアーを生贄にし、グレイヴウィングは最後の手段としてのみ選ぶ。同系統が複数いる場合は残り時間が最も短いもの、次に最も弱いものを選び、指定地点の敵に{damage}のシャドウダメージを与える。',
   'entities.abilities.funeral_harvest.name': '葬送の収穫',
   'entities.abilities.funeral_harvest.description':
     '自分または自分のアンデッドが最近ダメージを与えた敵が死亡すると、魂の欠片を1個獲得します。発動は3秒に1回までです。',
@@ -230,7 +230,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵に12秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。',
   'entities.abilities.unholy_command.name': '不浄の号令',
   'entities.abilities.unholy_command.description':
-    'すべてのアンデッドに号令を下し、12秒間、与えるダメージを25%、行動速度を20%上昇させる。',
+    '魂の欠片を3個消費してすべてのアンデッドに号令を下し、12秒間、与えるダメージを25%、行動速度を20%上昇させる。',
   'entities.abilities.reaping_command.name': '刈り取りの号令',
   'entities.abilities.reaping_command.description':
     '魂の欠片を2個消費し、すべてのアンデッドの従者に一斉攻撃させる。墓守は挑発して身を固め、骸骨戦士は足止めし、骨魔導士は魔法防御を暴き、墓翼は命中した全敵を引き裂く。',
@@ -245,7 +245,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cinderhide.description':
     '皮膚を冷えた鉱滓のように10秒間硬化させ、受けるすべてのダメージを25%減少させる。',
   'entities.abilities.army_of_the_dead.description':
-    '墓所の門を20秒間開き、まだ従えていない全ドミニオン系統を一時的に呼び起こす。選んだ従者は門が閉じた後も残る。',
+    '墓所の門を開き、選んだドミニオンの従者に加えて、スケルタル・ウォリアー、ボーン・メイジ、グレイヴウィングを20秒間召喚する。',
   'entities.mobs.graveguard.name': '墓守',
   'entities.mobs.necromancy_skeletal_warrior.name': '骸骨戦士',
   'entities.mobs.necromancy_bone_mage.name': '骨魔導士',
@@ -7555,7 +7555,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'フューネラル・ハーベストはまだ次の魂の欠片を生成できない',
   'hudChrome.auraEffect.leadenHexLock': 'レドン・ヘックスはまだこの対象を再び移動不能にできない',
   'hudChrome.auraEffect.forbiddenReflectionReady':
-    '次の対象となるウォーロック共通クールダウンを再使用できる',
+    '次の対象となるウォーロックのクールダウンを再使用できる',
   'hudChrome.auraEffect.forbiddenReflectionLock':
     'フォービドゥン・リフレクションはまだ再準備できない',
   'hudChrome.auraEffect.internalCooldown': 'タイマー終了までこの効果は再発動しない',
@@ -7601,12 +7601,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '運命の糸{stacks}：センテンスのダメージが{sentencePct}%増加、またはドレイン・ライフの各ティックが断罪を{doom}追加生成する',
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'ドレイン・ライフが運命の糸{stacks}を消費し、各ティックで断罪を{doom}追加生成する',
-  'hudChrome.auraEffect.necromancyHarvestMark':
-    '死亡時に魂の欠片を1個生成し、コープス・エクスプロージョン用のデス・エコーを残すことがある',
+  'hudChrome.auraEffect.necromancyHarvestMark': '死亡時に魂の欠片を1個生成することがある',
   'hudChrome.auraEffect.necromancyOssuaryMark':
     'あなたとアンデッドのダメージの{storedPct}%、ソウル・ランスはさらに{lancePct}%を蓄積する。再使用で爆発。死亡時は{radius}ヤード内で爆発し魂の欠片を1個生成する',
   'hudChrome.auraEffect.necromancyDeathEcho':
-    'コープス・エクスプロージョンは照準地点から{radius}ヤード以内のこの残響を消費できる',
+    '旧仕様のデス・エコー。現在これを消費するアビリティはない',
   'hudChrome.auraEffect.warlockAnchor':
     '{range}ヤード以内で再使用するとここへ戻り、アンカーを消費する',
   'hudChrome.auraEffect.formMetamorph':

@@ -7,8 +7,8 @@ import { clearThreat } from '../threat';
 import { type AbilityDef, armorReduction, type Entity } from '../types';
 import {
   dominionSummonBlock,
-  missingDominionTemplates,
   NECROMANCY_DOMINION_CAP,
+  selectCorpseExplosionServant,
 } from './necromancy_dominion';
 
 export const SOUL_FRAGMENT_CAP = 5;
@@ -268,13 +268,13 @@ export function necromancyCastError(
   ctx: SimContext,
   owner: Entity,
   ability: AbilityDef,
-  aim?: { x: number; z: number } | null,
+  _aim?: { x: number; z: number } | null,
 ): string | null {
   if (
     ability.id === 'corpse_explosion' &&
-    !nearestDeathEcho(owner, aim ?? owner.castAim ?? owner.pos)
+    !selectCorpseExplosionServant(ownedNecromancyUndead(ctx, owner.id))
   ) {
-    return 'Corpse Explosion requires a nearby Death Echo.';
+    return 'That ability is not ready yet.';
   }
   const temporarySummon = ability.effects.find(
     (effect) => effect.type === 'summonUndead' && effect.temporary,
@@ -335,7 +335,7 @@ function createUndead(
       : ctx.groundPos(owner.pos.x + Math.cos(angle) * 2, owner.pos.z + Math.sin(angle) * 2),
   );
   pet.ownerId = owner.id;
-  pet.petMode = 'defensive';
+  pet.petMode = ctx.petOf(owner.id, true)?.petMode ?? 'defensive';
   pet.petAutoTaunt = template.petCanTaunt === true;
   pet.petAutoWaterJet = false;
   pet.petSkillTimer = 0;
@@ -751,10 +751,7 @@ export function detonateOssuaryMark(
     );
   }
   if (deliberate) healOssuaryDetonation(ctx, owner, storedDamage);
-  if (!target.dead) {
-    if (storedDamage > 0) createDeathEcho(ctx, owner, target.pos);
-    return;
-  }
+  if (!target.dead) return;
   ossuaryDeathBurst(ctx, owner, target, storedDamage, aura.value3 ?? 6);
   if (soulFragmentCount(owner) === fragmentsBefore) grantOssuaryDeathFragment(ctx, owner);
 }
@@ -850,7 +847,6 @@ export function markFuneralHarvestDamage(
 
 export function necromancyOnDeath(ctx: SimContext, target: Entity): void {
   const ossuaryOwners = new Set<number>();
-  const echoOwners = new Set<number>();
   for (const marker of [...target.auras]) {
     if (marker.id !== OSSUARY_MARK_ABILITY_ID || marker.kind !== 'necromancy_ossuary_mark') {
       continue;
@@ -862,13 +858,11 @@ export function necromancyOnDeath(ctx: SimContext, target: Entity): void {
     ossuaryDeathBurst(ctx, owner, target, storedDamage, marker.value3 ?? 6);
     grantOssuaryDeathFragment(ctx, owner);
     ossuaryOwners.add(owner.id);
-    echoOwners.add(owner.id);
   }
   for (const marker of target.auras) {
     if (marker.kind !== 'necromancy_harvest_mark') continue;
     const owner = ctx.entities.get(marker.sourceId);
     if (!owner || !funeralHarvestOwner(ctx, owner)) continue;
-    echoOwners.add(owner.id);
     if (ossuaryOwners.has(owner.id)) continue;
     if (soulFragmentCount(owner) >= SOUL_FRAGMENT_CAP) continue;
     if (owner.auras.some((aura) => aura.id === 'funeral_harvest_lockout')) continue;
@@ -884,11 +878,22 @@ export function necromancyOnDeath(ctx: SimContext, target: Entity): void {
       school: 'shadow',
     });
   }
-  if (target.kind !== 'mob' || target.ownerId !== null) return;
-  for (const ownerId of echoOwners) {
-    const owner = ctx.entities.get(ownerId);
-    if (owner && !owner.dead) createDeathEcho(ctx, owner, target.pos);
-  }
+}
+
+export function sacrificeDominionForCorpseExplosion(ctx: SimContext, owner: Entity): Entity | null {
+  const victim = selectCorpseExplosionServant(ownedNecromancyUndead(ctx, owner.id));
+  if (!victim) return null;
+  ctx.emit({
+    type: 'spellfxAt',
+    x: victim.pos.x,
+    z: victim.pos.z,
+    school: 'shadow',
+    fx: 'burst',
+    sourceId: owner.id,
+    ability: 'corpse_explosion_sacrifice',
+  });
+  ctx.despawnPet(victim);
+  return victim;
 }
 
 export function sacrificeUndead(
@@ -946,9 +951,7 @@ export function raiseArmyOfDead(ctx: SimContext, owner: Entity, duration: number
     ['necromancy_bone_mage', 0],
     ['necromancy_gravewing', 1.15],
   ] as const;
-  const missing = new Set(missingDominionTemplates(ownedNecromancyUndead(ctx, owner.id)));
   for (const [templateId, lateral] of formation) {
-    if (!missing.has(templateId)) continue;
     summonUndead(
       ctx,
       owner,

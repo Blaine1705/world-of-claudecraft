@@ -110,7 +110,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Perfora al enemigo e inflige {damage} de daño de las Sombras. Genera 5 de Condena si porta tu Mal de ojo; si no existe ninguno, primero marca al objetivo.',
   'entities.abilities.sentence.name': 'Sentencia',
   'entities.abilities.sentence.description':
-    'Consume toda la Condena para sentenciar al enemigo. El daño y los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena.',
+    'Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Cada Hilo aumenta el daño un 6%. Los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena. El escalado de daño se aplana después del nivel 16.',
   'entities.abilities.cursed_accomplice.name': 'Cómplice maldito',
   'entities.abilities.cursed_accomplice.description':
     'Si no seleccionas a un jugador aliado, enlaza tu ojo maléfico y hace que su Mirada genere 2 de Condena. Al enlazar a un aliado, su daño al objetivo de Mal de ojo genera 3. Solo puede activarse una vez cada 2 s.',
@@ -131,7 +131,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Enlaza el sufrimiento durante 8 s y genera hasta 15 de Condena con golpes hostiles. Sobre ti reduce un 20% el daño recibido. Sobre un aliado redirige hasta un 20% hacia ti sin bajarte del 15% de salud.',
   'entities.abilities.possess_evil_eye.name': 'Poseer el Mal de ojo',
   'entities.abilities.possess_evil_eye.description':
-    'El maldictor posee tu Mal de ojo principal durante 15 s y genera 35 de Condena. Aguja del destino se lanza en 1 s y genera 2 de Condena adicionales, Consumir se puede canalizar en movimiento, y Sentencia inflige un 25% más de daño y libera un eco retardado del 60% del daño.',
+    'El maldictor posee tu Mal de ojo principal durante 15 s y genera 35 de Condena. Aguja del destino se lanza en 1 s y genera 2 de Condena adicionales, Consumir se puede canalizar en movimiento, y Sentencia inflige un 25% más de daño y libera un eco retardado del 60%, que se reduce al 30% entre los niveles 17 y 20.',
   'entities.abilities.hour_of_judgment.name': 'Hora del juicio',
   'entities.abilities.hour_of_judgment.description':
     'Desata el juicio sobre tu Mal de ojo principal durante 15 s: obtienes 40 de Condena y 3 Hilos del destino, activas Posesión, duplicas la Condena generada mediante el Mal de ojo principal y aumentas un 20% el daño de Sentencia. La primera Sentencia devuelve 50 de Condena.',
@@ -156,13 +156,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Te envuelve en huesos y absorbe una cantidad de daño equivalente al 20% de tu salud máxima.',
   'entities.abilities.corpse_explosion.name': 'Explosión de cadáver',
   'entities.abilities.corpse_explosion.description':
-    'Gasta 2 fragmentos de alma para hacer estallar energía de muerte en la ubicación elegida e infligir {damage} de daño de Sombras a los enemigos cercanos.',
+    'Sacrifica primero a un Mago de huesos, después a un Guerrero esquelético y solo usa un Ala de tumba como último recurso. Entre duplicados elige al de menor duración restante y luego al más débil para infligir {damage} de daño de Sombras en la ubicación elegida.',
   'entities.abilities.funeral_harvest.name': 'Cosecha fúnebre',
   'entities.abilities.funeral_harvest.description':
     'Cuando muere un enemigo dañado recientemente por ti o por tus no muertos, obtienes 1 fragmento de alma. Solo puede ocurrir una vez cada 3 s.',
   'entities.abilities.unholy_command.name': 'Mandato profano',
   'entities.abilities.unholy_command.description':
-    'Ordena a todos tus no muertos que inflijan un 25% más de daño y actúen un 20% más rápido durante 12 s.',
+    'Gasta 3 fragmentos de alma para ordenar a todos tus no muertos que inflijan un 25% más de daño y actúen un 20% más rápido durante 12 s.',
   'entities.abilities.reaping_command.name': 'Mandato: siega',
   'entities.abilities.reaping_command.description':
     'Gasta 2 fragmentos de alma para ordenar a todos tus sirvientes no muertos que golpeen al unísono. Los guardianes provocan y se protegen, los guerreros inmovilizan, los magos óseos exponen las defensas mágicas y el alatumba desgarra a todos los enemigos golpeados.',
@@ -174,7 +174,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Gasta 2 fragmentos de alma para añadir un alatumba persistente a tu Dominio de 2 huecos. Solo puede servirte uno. Golpea en barrido por un 65% de daño cada 5 s, y Mandato: siega hace que cada enemigo golpeado reciba un 8% más de daño durante 5 s.',
   'entities.abilities.army_of_the_dead.name': 'Ejército de los muertos',
   'entities.abilities.army_of_the_dead.description':
-    'Abre un portal sepulcral durante 20 s y alza temporalmente cada arquetipo de Dominio que aún no te sirva. Tus sirvientes elegidos permanecen cuando se cierra el portal.',
+    'Abre un portal sepulcral para alzar un Guerrero esquelético, un Mago de huesos y un Ala de tumba temporales durante 20 s, además de tus sirvientes de Dominio elegidos.',
   'entities.abilities.cinderhide.name': 'Piel de escoria',
   'entities.abilities.cinderhide.description':
     'Endurece tu piel como escoria enfriada durante 10 s y reduce todo el daño recibido un 25%.',
@@ -725,7 +725,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.leadenHexLock':
     'Maleficio plomizo aún no puede volver a inmovilizar a este objetivo',
   'hudChrome.auraEffect.forbiddenReflectionReady':
-    'Puedes volver a usar tu próxima facultad compartida de brujo con reutilización',
+    'Puedes volver a usar tu próxima facultad de brujo con reutilización que cumpla los requisitos',
   'hudChrome.auraEffect.forbiddenReflectionLock':
     'Reflejo prohibido aún no puede volver a prepararse',
   'hudChrome.auraEffect.internalCooldown':
@@ -776,12 +776,11 @@ export const es: Partial<Record<TranslationKey, string>> = {
     '{stacks} Hilos del destino: Sentencia inflige un {sentencePct}% más, o Drenar vida genera {doom} de Condena extra por pulso',
   'hudChrome.auraEffect.afflictionConsumeThreads':
     'Drenar vida consume {stacks} Hilos del destino para generar {doom} de Condena extra por pulso',
-  'hudChrome.auraEffect.necromancyHarvestMark':
-    'La muerte puede crear 1 fragmento de alma y deja un Eco de muerte para Explosión de cadáver',
+  'hudChrome.auraEffect.necromancyHarvestMark': 'La muerte puede crear 1 fragmento de alma',
   'hudChrome.auraEffect.necromancyOssuaryMark':
     'Almacena un {storedPct}% de tu daño y el de tus no-muertos, más un {lancePct}% del daño de Lanza de alma; vuelve a lanzar para detonar. Al morir, explota en {radius} m y crea 1 fragmento de alma',
   'hudChrome.auraEffect.necromancyDeathEcho':
-    'Explosión de cadáver puede consumir este eco a {radius} m del punto de mira',
+    'Eco de muerte heredado; ninguna habilidad actual lo consume',
   'hudChrome.auraEffect.warlockAnchor':
     'Vuelve a lanzar a menos de {range} m para regresar aquí y consumir el ancla',
   'hudChrome.auraEffect.formMetamorph':

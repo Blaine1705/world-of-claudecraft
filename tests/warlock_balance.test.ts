@@ -134,9 +134,13 @@ describe('warlock low-level sustained damage tuning', () => {
   });
 
   it('keeps mastery tuning and the shared generator-resource row canonical', () => {
-    // Hexcraft strengthens active Shadow casts while Condemnation owns its
-    // rotation. Destruction's identity lives in the Desolation mechanic.
-    expect(spec('affliction').mastery.effect.global?.spellDmgPct).toBe(0.1);
+    // Hexcraft strengthens its generator and payoff while Condemnation owns
+    // the rotation. Destruction's identity lives in the Desolation mechanic.
+    expect(spec('affliction').mastery.effect.ability).toEqual([
+      { ability: 'needle_of_fate', dmgPct: 0.1 },
+      { ability: 'sentence', dmgPct: 0.1 },
+    ]);
+    expect(spec('affliction').mastery.effect.global?.spellDmgPct).toBeUndefined();
     expect(spec('affliction').mastery.effect.global?.dotDmgPct).toBeUndefined();
     expect(spec('destruction').mastery.effect.global?.critDmgSpellPct).toBeUndefined();
     expect(spec('destruction').mastery.effect).toEqual({});
@@ -153,7 +157,9 @@ describe('warlock low-level sustained damage tuning', () => {
       20,
     );
     expect(amplified.global.dotDmgPct).toBe(0);
-    expect(amplified.global.spellDmgPct).toBe(0.1);
+    expect(amplified.global.spellDmgPct).toBe(0);
+    expect(amplified.abilities.needle_of_fate?.dmgPct).toBeCloseTo(0.18);
+    expect(amplified.abilities.sentence?.dmgPct).toBeCloseTo(0.1);
     expect(amplified.abilities.needle_of_fate?.costPct).toBe(-0.33);
     expect(amplified.abilities.soul_harvest?.costPct).toBe(-0.25);
     expect(amplified.abilities.shadow_bolt?.costPct).toBe(-0.25);

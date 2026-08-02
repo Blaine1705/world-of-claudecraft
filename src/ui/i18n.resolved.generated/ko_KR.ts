@@ -1811,7 +1811,7 @@ export const ko_KR: EnTranslations = {
       "cooldownCap": "이 구간에서 재사용 대기시간 감소 {used}/{cap}초를 사용했습니다",
       "funeralHarvestLock": "장례 수확이 아직 다음 영혼 조각을 생성할 수 없습니다",
       "leadenHexLock": "납빛 주술이 아직 이 대상을 다시 이동 불가로 만들 수 없습니다",
-      "forbiddenReflectionReady": "다음 적용 가능한 흑마법사 공용 재사용 기술을 다시 사용할 수 있습니다",
+      "forbiddenReflectionReady": "다음 적용 가능한 흑마법사 재사용 기술을 다시 사용할 수 있습니다",
       "forbiddenReflectionLock": "금지된 반영을 아직 다시 준비할 수 없습니다",
       "internalCooldown": "타이머가 끝날 때까지 이 효과가 다시 발동하지 않습니다",
       "battleStance": "전투 태세: 분노 생성 10% 증가",
@@ -1931,9 +1931,9 @@ export const ko_KR: EnTranslations = {
       "afflictionLitany": "규탄을 얻을 때 {radius}미터 내 최대 {targets}명에게 {damage}의 암흑 피해를 줍니다. 초당 한 번만 발동합니다",
       "afflictionFateThreads": "운명의 실 {stacks}중첩: 선고 피해가 {sentencePct}% 증가하거나 생명력 흡수 매 틱이 규탄을 {doom} 추가 생성합니다",
       "afflictionConsumeThreads": "생명력 흡수가 운명의 실 {stacks}중첩을 소모해 매 틱 규탄을 {doom} 추가 생성합니다",
-      "necromancyHarvestMark": "대상이 죽으면 영혼 조각 1개를 생성하고 시체 폭발용 죽음의 메아리를 남길 수 있습니다",
+      "necromancyHarvestMark": "대상이 죽으면 영혼 조각 1개를 생성할 수 있습니다",
       "necromancyOssuaryMark": "당신과 언데드가 준 피해의 {storedPct}%와 영혼 창 피해의 추가 {lancePct}%를 저장합니다. 다시 사용하면 폭발합니다. 죽으면 {radius}미터 내에서 폭발하고 영혼 조각 1개를 생성합니다",
-      "necromancyDeathEcho": "시체 폭발이 조준 지점 {radius}미터 안의 이 메아리를 소모할 수 있습니다",
+      "necromancyDeathEcho": "이전 버전의 죽음의 메아리입니다. 현재 어떤 능력도 이를 소모하지 않습니다",
       "warlockAnchor": "{range}미터 안에서 다시 사용하면 이곳으로 돌아오고 닻을 소모합니다",
       "formMetamorph": "악마 형상: 몸집이 {pct}% 커지며 다른 보너스는 별도 강화 효과로 표시됩니다",
       "energyRegen": "기력 회복 속도가 {pct}% 증가합니다",
@@ -8082,7 +8082,7 @@ export const ko_KR: EnTranslations = {
       },
       "sentence": {
         "name": "선고",
-        "description": "모든 단죄를 소모해 적에게 선고를 내립니다. 피해와 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다."
+        "description": "모든 단죄와 운명의 실을 소모해 적에게 선고를 내립니다. 실 하나당 피해가 6% 증가하고, 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다. 16레벨 이후 피해 증가폭이 완만해집니다."
       },
       "life_tap": {
         "name": "가혹한 거래",
@@ -8130,7 +8130,7 @@ export const ko_KR: EnTranslations = {
       },
       "possess_evil_eye": {
         "name": "사안 빙의",
-        "description": "저주술사가 주 사안에 15초 동안 빙의하고 단죄를 35 생성합니다. 운명의 바늘은 시전 시간이 1초가 되고 단죄를 2 더 생성하며, 흡명은 이동 중에도 정신 집중할 수 있고, 선고는 피해가 25% 증가하며 지연 후 60%의 추가 피해를 줍니다."
+        "description": "저주술사가 주 사안에 15초 동안 빙의하고 단죄를 35 생성합니다. 운명의 바늘은 시전 시간이 1초가 되고 단죄를 2 더 생성하며, 흡명은 이동 중에도 정신 집중할 수 있고, 선고는 피해가 25% 증가합니다. 지연 반향은 60%의 피해를 주며 17레벨부터 20레벨까지 30%로 감소합니다."
       },
       "hour_of_judgment": {
         "name": "심판의 시간",
@@ -8372,7 +8372,7 @@ export const ko_KR: EnTranslations = {
       },
       "corpse_explosion": {
         "name": "시체 폭발",
-        "description": "영혼 조각 2개를 소모해 지정한 위치의 죽음 에너지를 폭발시키고 주위 적에게 {damage}의 암흑 피해를 입힙니다."
+        "description": "뼈 마법사를 먼저, 해골 전사를 다음으로 희생하며 무덤날개는 최후의 수단으로만 선택합니다. 같은 유형이 여러 마리면 남은 지속시간이 가장 짧은 대상, 그다음 가장 약한 대상을 골라 지정한 위치의 적에게 {damage}의 암흑 피해를 입힙니다."
       },
       "funeral_harvest": {
         "name": "장송 수확",
@@ -8384,7 +8384,7 @@ export const ko_KR: EnTranslations = {
       },
       "unholy_command": {
         "name": "부정한 명령",
-        "description": "모든 언데드에게 명령해 12초 동안 공격력을 25%, 행동 속도를 20% 증가시킵니다."
+        "description": "영혼 조각 3개를 소모해 모든 언데드에게 명령하고 12초 동안 공격력을 25%, 행동 속도를 20% 증가시킵니다."
       },
       "reaping_command": {
         "name": "수확의 명령",
@@ -8400,7 +8400,7 @@ export const ko_KR: EnTranslations = {
       },
       "army_of_the_dead": {
         "name": "망자의 군세",
-        "description": "무덤 차원문을 20초 동안 열어 아직 섬기지 않는 모든 지배 유형을 임시로 일으킵니다. 선택한 하수인은 차원문이 닫힌 뒤에도 남습니다."
+        "description": "무덤 차원문을 열어 선택한 지배 하수인에 더해 해골 전사, 뼈 마법사, 무덤날개를 20초 동안 임시로 일으킵니다."
       },
       "metamorphosis": {
         "name": "악마 변신",

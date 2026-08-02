@@ -50,7 +50,7 @@ const REFLECTION_LOCK = 60;
 const BLACKTIDE_SPEED_ID = 'wlk_blacktide_speed';
 const BLACKTIDE_SPEED_DURATION = 4;
 const LEVEL_20_ABILITY_IDS = new Set(['abyssal_rift']);
-const FORBIDDEN_REFLECTION_EXCLUDED_IDS = new Set(['soulwell']);
+const FORBIDDEN_REFLECTION_EXCLUDED_IDS = new Set(['soulwell', 'army_of_the_dead']);
 
 function warlockMods(ctx: SimContext, player: Entity) {
   const meta = ctx.players.get(player.id);
@@ -251,14 +251,8 @@ export function ashenFocusCastTimeMult(
   return (player.procState?.counters[ASHEN_SECONDS_KEY] ?? 0) >= 1 ? 0.8 : 1;
 }
 
-function isSharedWarlockAbility(ability: AbilityDef): boolean {
-  return (
-    ability.class === 'warlock' &&
-    ability.specs === undefined &&
-    ability.excludeSpecs === undefined &&
-    !ability.passive &&
-    !LEVEL_20_ABILITY_IDS.has(ability.id)
-  );
+function isEligibleWarlockCooldownAbility(ability: AbilityDef): boolean {
+  return ability.class === 'warlock' && !ability.passive && !LEVEL_20_ABILITY_IDS.has(ability.id);
 }
 
 export function tickUnbrokenRitual(ctx: SimContext, player: Entity, meta: PlayerMeta): void {
@@ -266,7 +260,7 @@ export function tickUnbrokenRitual(ctx: SimContext, player: Entity, meta: Player
   const refund = DT * 0.5;
   for (const [abilityId, remaining] of player.cooldowns) {
     const resolved = ctx.resolvedAbility(abilityId, player.id);
-    if (!resolved || !isSharedWarlockAbility(resolved.def)) continue;
+    if (!resolved || !isEligibleWarlockCooldownAbility(resolved.def)) continue;
     const next = remaining - refund;
     if (next <= 0) player.cooldowns.delete(abilityId);
     else player.cooldowns.set(abilityId, next);
@@ -309,7 +303,7 @@ export function armForbiddenReflection(
     cooldown <= 0 ||
     meta.cls !== 'warlock' ||
     ctx.playerMods(meta).global.warlockForbiddenReflection <= 0 ||
-    !isSharedWarlockAbility(ability) ||
+    !isEligibleWarlockCooldownAbility(ability) ||
     FORBIDDEN_REFLECTION_EXCLUDED_IDS.has(ability.id) ||
     player.auras.some((aura) => aura.id === REFLECTION_LOCK_ID)
   ) {

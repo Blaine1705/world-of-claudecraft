@@ -126,7 +126,7 @@ describe('Necromancy Warlock', () => {
     expect(at(1)).toEqual(expect.arrayContaining(['soul_harvest', 'raise_graveguard']));
     expect(at(4)).not.toContain('raise_skeletal_warrior');
     expect(at(5)).toEqual(expect.arrayContaining(['raise_skeletal_warrior', 'funeral_harvest']));
-    expect(at(7)).toContain('searing_pain');
+    expect(at(7)).not.toContain('searing_pain');
     expect(at(6)).not.toContain('sacrifice_undead');
     expect(at(8)).toEqual(expect.arrayContaining(['raise_bone_mage', 'bone_armor']));
     expect(at(9)).toContain('soul_lance');
@@ -189,8 +189,10 @@ describe('Necromancy Warlock', () => {
     expect(ABILITIES.raise_bone_mage.description).toContain('raises that weakness to 8%');
     expect(ABILITIES.raise_gravewing.description).toContain('65% damage every 5 sec');
     expect(ABILITIES.raise_gravewing.description).toContain('take 8% more damage for 5 sec');
-    expect(ABILITIES.army_of_the_dead.description).toContain('not already serving you');
-    expect(ABILITIES.army_of_the_dead.description).toContain('chosen servants remain');
+    expect(ABILITIES.army_of_the_dead.description).toContain(
+      'temporary Skeletal Warrior, Bone Mage, and Gravewing',
+    );
+    expect(ABILITIES.army_of_the_dead.description).toContain('in addition to your chosen');
     expect(ABILITIES.sacrifice_undead.description).toContain('Dominion servant');
   });
 
@@ -525,6 +527,7 @@ describe('Necromancy Warlock', () => {
     expect(victim.dead).toBe(true);
     expect(nearby.hp).toBe(nearby.maxHp - 40);
     expect(fragmentCount(sim.player)).toBe(1);
+    expect(deathEchoes(sim.player)).toHaveLength(0);
     expect(drain(sim)).toContainEqual({
       type: 'spellfxAt',
       x: victim.pos.x,
@@ -1001,16 +1004,18 @@ describe('Necromancy Warlock', () => {
     expect(warrior?.petAutoTaunt).toBe(false);
   });
 
-  it('rejects Unholy Command without undead and empowers every owned undead for 12 sec', () => {
+  it('spends 3 Soul Fragments and empowers every owned undead for 12 sec', () => {
     const empty = makeNecromancer();
+    addSoulFragments(empty.ctx, empty.player, 3);
     const manaBefore = empty.player.resource;
     empty.castAbility('unholy_command');
     expect(empty.player.resource).toBe(manaBefore);
+    expect(fragmentCount(empty.player)).toBe(3);
     expect(empty.player.cooldowns.has('unholy_command')).toBe(false);
 
     const sim = makeNecromancer();
     addTarget(sim);
-    addSoulFragments(sim as unknown as SimContext, sim.player, 1);
+    addSoulFragments(sim as unknown as SimContext, sim.player, 4);
     finishCast(sim, 'raise_graveguard');
     finishCast(sim, 'raise_skeletal_warrior');
     sim.player.gcdRemaining = 0;
@@ -1018,6 +1023,8 @@ describe('Necromancy Warlock', () => {
 
     sim.castAbility('unholy_command');
 
+    expect(ABILITIES.unholy_command.soulFragmentCost).toBe(3);
+    expect(fragmentCount(sim.player)).toBe(0);
     const undead = ownedUndead(sim);
     expect(undead).toHaveLength(2);
     for (const servant of undead) {
@@ -1126,41 +1133,89 @@ describe('Necromancy Warlock', () => {
     expect(secondary.hp).toBe(hpBefore);
   });
 
-  it('lets the Bone Mage expose targets to increased spell damage', () => {
-    const sim = makeNecromancer();
-    const target = addTarget(sim);
-    for (let attempt = 0; attempt < 5 && fragmentCount(sim.player) < 2; attempt++) {
-      finishCast(sim, 'soul_harvest');
-    }
-    finishCast(sim, 'raise_bone_mage');
-    const mage = ownedUndead(sim).find((undead) => undead.templateId === 'necromancy_bone_mage');
-    if (!mage) throw new Error('Expected a Bone Mage');
-    const ranged = MOBS.necromancy_bone_mage.petRanged;
-    if (!ranged) throw new Error('Expected Bone Mage ranged tuning');
-    target.auras = target.auras.filter((aura) => aura.id !== 'raise_bone_mage');
+  it('lets the Bone Mage expose targets without changing its ranged shot timing or damage', () => {
+    const runShot = (ability: string | undefined) => {
+      const sim = makeNecromancer();
+      const target = addTarget(sim);
+      for (let attempt = 0; attempt < 5 && fragmentCount(sim.player) < 2; attempt++) {
+        finishCast(sim, 'soul_harvest');
+      }
+      finishCast(sim, 'raise_bone_mage');
+      const mage = ownedUndead(sim).find((undead) => undead.templateId === 'necromancy_bone_mage');
+      if (!mage) throw new Error('Expected a Bone Mage');
+      const ranged = MOBS.necromancy_bone_mage.petRanged;
+      if (!ranged) throw new Error('Expected Bone Mage ranged tuning');
+      target.auras = target.auras.filter((aura) => aura.id !== 'raise_bone_mage');
+      const hpBefore = target.hp;
+      const ctx = (sim as unknown as { ctx: Parameters<typeof petRangedAttack>[0] }).ctx;
+      const pendingBefore = ctx.pendingProjectiles.length;
 
-    petRangedAttack(
-      (sim as unknown as { ctx: Parameters<typeof petRangedAttack>[0] }).ctx,
-      mage,
-      target,
-      ranged,
-    );
-    for (
-      let tick = 0;
-      tick < 80 && !target.auras.some((aura) => aura.id === 'raise_bone_mage');
-      tick++
-    ) {
-      sim.tick();
-    }
+      petRangedAttack(ctx, mage, target, { ...ranged, ability });
+      const immediateDamage = hpBefore - target.hp;
+      const pendingAtLaunch = ctx.pendingProjectiles.length - pendingBefore;
+      let launchAbility: string | undefined;
+      let landingTick: number | undefined;
+      for (let tick = 1; tick <= 80; tick++) {
+        const events = sim.tick();
+        const launchEvent = events.find(
+          (event) =>
+            event.type === 'spellfx' &&
+            event.sourceId === mage.id &&
+            event.targetId === target.id &&
+            event.school === 'shadow' &&
+            event.fx === 'projectile',
+        );
+        if (launchEvent?.type === 'spellfx') launchAbility = launchEvent.ability;
+        if (landingTick === undefined && target.hp < hpBefore) landingTick = tick;
+        if (
+          landingTick !== undefined &&
+          target.auras.some((aura) => aura.id === 'raise_bone_mage') &&
+          ctx.pendingProjectiles.length === pendingBefore
+        ) {
+          break;
+        }
+      }
+      const aura = target.auras.find(
+        (candidate) => candidate.id === 'raise_bone_mage' && candidate.kind === 'spellvuln',
+      );
 
-    expect(
-      target.auras.find((aura) => aura.id === 'raise_bone_mage' && aura.kind === 'spellvuln'),
-    ).toMatchObject({
-      value: 0.05,
-      duration: 6,
-      sourceId: sim.playerId,
-      school: 'shadow',
+      return {
+        launchAbility,
+        outcome: {
+          immediateDamage,
+          pendingAtLaunch,
+          landingTick,
+          damage: hpBefore - target.hp,
+          pendingAfter: ctx.pendingProjectiles.length - pendingBefore,
+          aura: aura && {
+            value: aura.value,
+            duration: aura.duration,
+            sourceIsOwner: aura.sourceId === sim.playerId,
+            school: aura.school,
+          },
+        },
+      };
+    };
+
+    const authored = runShot('bone_mage_shadow_bolt');
+    const legacy = runShot(undefined);
+
+    expect(authored.launchAbility).toBe('bone_mage_shadow_bolt');
+    expect(legacy.launchAbility).toBeUndefined();
+    expect(authored.outcome).toEqual(legacy.outcome);
+    expect(authored.outcome).toMatchObject({
+      immediateDamage: 0,
+      pendingAtLaunch: 1,
+      pendingAfter: 0,
+      aura: {
+        value: 0.05,
+        duration: 6,
+        sourceIsOwner: true,
+        school: 'shadow',
+      },
     });
+    expect(authored.outcome.landingTick).toBeGreaterThan(0);
+    expect(authored.outcome.damage).toBeGreaterThan(0);
   });
 
   it('uses Bone Armor as a max-health shield', () => {
@@ -1322,88 +1377,94 @@ describe('Necromancy Warlock', () => {
     ).toBeDefined();
   });
 
-  it('marks Corpse Explosion so the renderer can leave a desecrated zone', () => {
+  it('sacrifices a Dominion servant and explodes at the chosen location without a Death Echo', () => {
     const sim = makeNecromancer();
-    const corpse = addTarget(sim);
-    corpse.maxHp = 100;
-    corpse.hp = 100;
-    const corpsePos = { ...corpse.pos };
-    sim.dealDamage(sim.player, corpse, 100, false, 'shadow', 'Prepare Echo', 'hit');
     const target = addTarget(sim);
-    target.pos.x = corpsePos.x;
-    target.pos.z = corpsePos.z;
-    target.prevPos = { ...target.pos };
-    sim.ctx.rebucket(target);
-    finishCast(sim, 'metamorphosis');
-    const fragmentsBeforeExplosion = fragmentCount(sim.player);
-    expect(fragmentsBeforeExplosion).toBeGreaterThanOrEqual(3);
-    drain(sim);
-    const hpBefore = target.hp;
-
-    sim.castAbilityAt('corpse_explosion', corpsePos);
-    const event = drain(sim).find(
-      (candidate) =>
-        candidate.type === 'spellfxAt' &&
-        candidate.fx === 'nova' &&
-        candidate.ability === 'corpse_explosion',
+    const chosenLocation = { x: target.pos.x, z: target.pos.z };
+    addSoulFragments(sim.ctx, sim.player, 5);
+    finishCast(sim, 'raise_skeletal_warrior');
+    finishCast(sim, 'raise_bone_mage');
+    const warrior = ownedUndead(sim).find(
+      (servant) => servant.templateId === 'necromancy_skeletal_warrior',
     );
-
-    expect(event).toMatchObject({
-      type: 'spellfxAt',
-      x: corpsePos.x,
-      z: corpsePos.z,
-      school: 'shadow',
-      radius: 8,
-      ability: 'corpse_explosion',
+    const mage = ownedUndead(sim).find((servant) => servant.templateId === 'necromancy_bone_mage');
+    if (!warrior || !mage) throw new Error('Expected a full Dominion');
+    warrior.hp = 1;
+    mage.despawnTimer = 3;
+    const magePosition = { ...mage.pos };
+    const fragmentsBefore = fragmentCount(sim.player);
+    const hpBefore = target.hp;
+    sim.player.resource = sim.player.maxResource;
+    const manaBefore = sim.player.resource;
+    sim.ctx.applyAura(sim.player, {
+      id: 'legacy_death_echo',
+      name: 'Death Echo',
+      kind: 'necromancy_death_echo',
+      remaining: 10,
+      duration: 10,
+      value: chosenLocation.x,
+      value2: chosenLocation.z,
       sourceId: sim.playerId,
+      school: 'shadow',
     });
+    drain(sim);
+
+    sim.castAbilityAt('corpse_explosion', chosenLocation);
+    const events = drain(sim);
+
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfxAt',
+        x: chosenLocation.x,
+        z: chosenLocation.z,
+        fx: 'nova',
+        ability: 'corpse_explosion',
+      }),
+    );
+    expect(events).toContainEqual({
+      type: 'spellfxAt',
+      x: magePosition.x,
+      z: magePosition.z,
+      school: 'shadow',
+      fx: 'burst',
+      sourceId: sim.playerId,
+      ability: 'corpse_explosion_sacrifice',
+    });
+    const sacrificeIndex = events.findIndex(
+      (event) => event.type === 'spellfxAt' && event.ability === 'corpse_explosion_sacrifice',
+    );
+    const explosionIndex = events.findIndex(
+      (event) => event.type === 'spellfxAt' && event.ability === 'corpse_explosion',
+    );
+    const damageIndex = events.findIndex(
+      (event) => event.type === 'damage' && event.targetId === target.id,
+    );
+    expect(sacrificeIndex).toBeGreaterThanOrEqual(0);
+    expect(explosionIndex).toBeGreaterThan(sacrificeIndex);
+    expect(damageIndex).toBeGreaterThan(explosionIndex);
     expect(target.hp).toBeLessThan(hpBefore);
-    expect(fragmentCount(sim.player)).toBe(fragmentsBeforeExplosion);
+    expect(sim.player.resource).toBe(manaBefore - 30);
+    expect(fragmentCount(sim.player)).toBe(fragmentsBefore);
+    expect(sim.entities.has(mage.id)).toBe(false);
+    expect(sim.entities.has(warrior.id)).toBe(true);
+    expect(deathEchoes(sim.player)).toEqual([expect.objectContaining({ id: 'legacy_death_echo' })]);
+    expect(sim.player.cooldowns.get('corpse_explosion')).toBeGreaterThan(0);
+    expect(ABILITIES.corpse_explosion.cooldown).toBe(8);
+  });
+
+  it('keeps Funeral Harvest fragment generation without creating obsolete Death Echoes', () => {
+    const sim = makeNecromancer();
+    const target = addTarget(sim);
+    target.maxHp = 100;
+    target.hp = 100;
+
+    sim.dealDamage(sim.player, target, 100, false, 'shadow', 'Harvest', 'hit');
+
+    expect(fragmentCount(sim.player)).toBe(1);
     expect(deathEchoes(sim.player)).toHaveLength(0);
   });
 
-  it('turns recent enemy deaths into three capped, positioned Death Echoes', () => {
-    const sim = makeNecromancer();
-    const positions = [
-      { x: 1, z: 7 },
-      { x: 3, z: 9 },
-      { x: 5, z: 11 },
-      { x: 7, z: 13 },
-    ];
-
-    for (const position of positions) {
-      const target = addTarget(sim);
-      target.pos.x = sim.player.pos.x + position.x;
-      target.pos.z = sim.player.pos.z + position.z;
-      target.prevPos = { ...target.pos };
-      target.maxHp = 100;
-      target.hp = 100;
-      sim.ctx.rebucket(target);
-      sim.dealDamage(sim.player, target, 100, false, 'shadow', 'Harvest Echo', 'hit');
-      sim.tick();
-    }
-
-    const echoes = deathEchoes(sim.player);
-    expect(echoes).toHaveLength(3);
-    expect(echoes.map((aura) => [aura.value, aura.value2])).toEqual([
-      [sim.player.pos.x + 7, sim.player.pos.z + 13],
-      [sim.player.pos.x + 3, sim.player.pos.z + 9],
-      [sim.player.pos.x + 5, sim.player.pos.z + 11],
-    ]);
-    expect(echoes).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: 'necromancy_death_echo_0',
-          name: 'Death Echo',
-          kind: 'necromancy_death_echo',
-          duration: 15,
-          school: 'shadow',
-        }),
-      ]),
-    );
-  });
-
-  it('requires a nearby Death Echo for Corpse Explosion without spending fragments', () => {
+  it('requires a living Dominion servant for Corpse Explosion without spending mana or GCD', () => {
     const sim = makeNecromancer();
     const target = addTarget(sim);
     const hpBefore = target.hp;
@@ -1414,7 +1475,7 @@ describe('Necromancy Warlock', () => {
       expect.arrayContaining([
         expect.objectContaining({
           type: 'error',
-          text: 'Corpse Explosion requires a nearby Death Echo.',
+          text: 'That ability is not ready yet.',
         }),
       ]),
     );
@@ -1422,6 +1483,30 @@ describe('Necromancy Warlock', () => {
     expect(sim.player.resource).toBe(manaBefore);
     expect(sim.player.gcdRemaining).toBe(0);
     expect(ABILITIES.corpse_explosion.soulFragmentCost).toBeUndefined();
+  });
+
+  it('does not treat Graveguard as a Corpse Explosion sacrifice', () => {
+    const sim = makeNecromancer();
+    const target = addTarget(sim);
+    finishCast(sim, 'raise_graveguard');
+    const graveguard = sim.petOf(sim.playerId);
+    if (!graveguard) throw new Error('Expected Graveguard');
+    const hpBefore = target.hp;
+    const manaBefore = sim.player.resource;
+    drain(sim);
+
+    sim.castAbilityAt('corpse_explosion', { x: target.pos.x, z: target.pos.z });
+    const events = drain(sim);
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'error', text: 'That ability is not ready yet.' }),
+    );
+    expect(events.some((event) => event.type === 'damage')).toBe(false);
+    expect(sim.entities.has(graveguard.id)).toBe(true);
+    expect(target.hp).toBe(hpBefore);
+    expect(sim.player.resource).toBe(manaBefore);
+    expect(sim.player.gcdRemaining).toBe(0);
+    expect(sim.player.cooldowns.has('corpse_explosion')).toBe(false);
   });
 
   it('passes the active Lich Form empowerment to undead raised during the form', () => {
@@ -1492,7 +1577,7 @@ describe('Necromancy Warlock', () => {
     });
   });
 
-  it('Army of the Dead preserves Dominion and temporarily fills its missing archetype', () => {
+  it('Army of the Dead preserves a full Dominion and always adds a complete temporary wave', () => {
     const sim = makeNecromancer();
     addTarget(sim);
     addSoulFragments(sim.ctx, sim.player, 5);
@@ -1505,20 +1590,15 @@ describe('Necromancy Warlock', () => {
     finishCast(sim, 'army_of_the_dead');
 
     const duringArmy = ownedUndead(sim).filter((servant) => servant.templateId !== 'graveguard');
-    expect(duringArmy.map((servant) => servant.templateId)).toEqual([
+    const temporary = duringArmy.filter((servant) => servant.despawnTimer !== undefined);
+    expect(temporary.map((servant) => servant.templateId)).toEqual([
       'necromancy_skeletal_warrior',
       'necromancy_bone_mage',
       'necromancy_gravewing',
     ]);
     expect(dominionIds.every((id) => sim.entities.has(id))).toBe(true);
-    expect(
-      duringArmy.find((servant) => servant.templateId === 'necromancy_gravewing')?.despawnTimer,
-    ).toBeGreaterThan(0);
-    expect(
-      duringArmy
-        .filter((servant) => servant.templateId !== 'necromancy_gravewing')
-        .every((servant) => servant.despawnTimer === undefined),
-    ).toBe(true);
+    expect(temporary.every((servant) => servant.despawnTimer === 20)).toBe(true);
+    expect(duringArmy).toHaveLength(5);
 
     for (let tick = 0; tick < 20 * 21; tick++) sim.tick();
     expect(
@@ -1529,7 +1609,7 @@ describe('Necromancy Warlock', () => {
     expect(dominionIds.every((id) => sim.entities.has(id))).toBe(true);
   });
 
-  it('Army of the Dead fills both missing archetypes around one chosen servant', () => {
+  it('Army of the Dead adds all three temporary archetypes around one chosen servant', () => {
     const sim = makeNecromancer();
     addTarget(sim);
     addSoulFragments(sim.ctx, sim.player, 2);
@@ -1542,17 +1622,14 @@ describe('Necromancy Warlock', () => {
     finishCast(sim, 'army_of_the_dead');
 
     const army = ownedUndead(sim).filter((servant) => servant.templateId !== 'graveguard');
-    expect(army.map((servant) => servant.templateId)).toEqual([
-      'necromancy_gravewing',
+    const temporary = army.filter((servant) => servant.despawnTimer !== undefined);
+    expect(temporary.map((servant) => servant.templateId)).toEqual([
       'necromancy_skeletal_warrior',
       'necromancy_bone_mage',
+      'necromancy_gravewing',
     ]);
     expect(chosen.despawnTimer).toBeUndefined();
-    expect(
-      army
-        .filter((servant) => servant.id !== chosen.id)
-        .every((servant) => (servant.despawnTimer ?? 0) > 0),
-    ).toBe(true);
+    expect(temporary.every((servant) => servant.despawnTimer === 20)).toBe(true);
   });
 
   it.each([
@@ -1663,6 +1740,35 @@ describe('Necromancy Warlock', () => {
 
     expect(gravewing.aggroTargetId).toBe(target.id);
     expect(graveguard.aggroTargetId).toBe(target.id);
+  });
+
+  it('applies the primary pet stance to existing and newly raised Dominion servants', () => {
+    const sim = makeNecromancer();
+    const target = addTarget(sim);
+    finishCast(sim, 'raise_graveguard');
+    addSoulFragments(sim.ctx, sim.player, 1);
+    finishCast(sim, 'raise_skeletal_warrior');
+
+    for (const servant of ownedUndead(sim)) {
+      servant.aggroTargetId = target.id;
+      servant.inCombat = true;
+      servant.autoAttack = true;
+    }
+    sim.setPetMode('passive');
+
+    expect(ownedUndead(sim)).not.toHaveLength(0);
+    for (const servant of ownedUndead(sim)) {
+      expect(servant.petMode).toBe('passive');
+      expect(servant.aggroTargetId).toBeNull();
+      expect(servant.inCombat).toBe(false);
+      expect(servant.autoAttack).toBe(false);
+    }
+
+    finishCast(sim, 'army_of_the_dead');
+    expect(
+      ownedUndead(sim).filter((servant) => servant.templateId !== 'graveguard'),
+    ).not.toHaveLength(0);
+    expect(ownedUndead(sim).every((servant) => servant.petMode === 'passive')).toBe(true);
   });
 
   it('Sacrifice Undead consumes a Dominion servant and restores health', () => {

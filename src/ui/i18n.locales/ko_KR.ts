@@ -172,7 +172,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 5 생성하고, 사안이 없으면 먼저 대상을 지정합니다.',
   'entities.abilities.sentence.name': '선고',
   'entities.abilities.sentence.description':
-    '모든 단죄를 소모해 적에게 선고를 내립니다. 피해와 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다.',
+    '모든 단죄와 운명의 실을 소모해 적에게 선고를 내립니다. 실 하나당 피해가 6% 증가하고, 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다. 16레벨 이후 피해 증가폭이 완만해집니다.',
   'entities.abilities.cursed_accomplice.name': '저주받은 공모자',
   'entities.abilities.cursed_accomplice.description':
     '아군 플레이어를 선택하지 않았다면 저주의 눈과 연결해 응시가 단죄를 2 생성하게 합니다. 아군과 연결하면 그 아군이 사안 대상에게 피해를 줄 때 3을 생성합니다. 2초에 한 번만 발동합니다.',
@@ -196,7 +196,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '8초 동안 고통을 연결해 적의 공격으로 최대 15의 단죄를 생성합니다. 자신에게 사용하면 받는 피해가 20% 감소합니다. 아군에게 사용하면 피해의 최대 20%를 자신에게 옮기지만 생명력이 15% 아래로 내려가지는 않습니다.',
   'entities.abilities.possess_evil_eye.name': '사안 빙의',
   'entities.abilities.possess_evil_eye.description':
-    '저주술사가 주 사안에 15초 동안 빙의하고 단죄를 35 생성합니다. 운명의 바늘은 시전 시간이 1초가 되고 단죄를 2 더 생성하며, 흡명은 이동 중에도 정신 집중할 수 있고, 선고는 피해가 25% 증가하며 지연 후 60%의 추가 피해를 줍니다.',
+    '저주술사가 주 사안에 15초 동안 빙의하고 단죄를 35 생성합니다. 운명의 바늘은 시전 시간이 1초가 되고 단죄를 2 더 생성하며, 흡명은 이동 중에도 정신 집중할 수 있고, 선고는 피해가 25% 증가합니다. 지연 반향은 60%의 피해를 주며 17레벨부터 20레벨까지 30%로 감소합니다.',
   'entities.abilities.hour_of_judgment.name': '심판의 시간',
   'entities.abilities.hour_of_judgment.description':
     '15초 동안 주 사안에 심판을 내려 단죄 40과 운명의 실 3개를 얻고 빙의를 활성화하며, 주 사안을 통해 생성되는 단죄를 두 배로 만들고 선고의 피해를 20% 증가시킵니다. 첫 번째 선고는 단죄 50을 돌려받습니다.',
@@ -224,7 +224,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '뼈로 몸을 감싸 최대 생명력의 20%에 해당하는 피해를 흡수합니다.',
   'entities.abilities.corpse_explosion.name': '시체 폭발',
   'entities.abilities.corpse_explosion.description':
-    '영혼 조각 2개를 소모해 지정한 위치의 죽음 에너지를 폭발시키고 주위 적에게 {damage}의 암흑 피해를 입힙니다.',
+    '뼈 마법사를 먼저, 해골 전사를 다음으로 희생하며 무덤날개는 최후의 수단으로만 선택합니다. 같은 유형이 여러 마리면 남은 지속시간이 가장 짧은 대상, 그다음 가장 약한 대상을 골라 지정한 위치의 적에게 {damage}의 암흑 피해를 입힙니다.',
   'entities.abilities.funeral_harvest.name': '장송 수확',
   'entities.abilities.funeral_harvest.description':
     '자신이나 자신의 언데드가 최근 피해를 준 적이 죽으면 영혼 조각 1개를 얻습니다. 3초에 한 번만 발동합니다.',
@@ -233,7 +233,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 12초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6미터 안에서 폭발하고 영혼 조각 1개를 생성합니다.',
   'entities.abilities.unholy_command.name': '부정한 명령',
   'entities.abilities.unholy_command.description':
-    '모든 언데드에게 명령해 12초 동안 공격력을 25%, 행동 속도를 20% 증가시킵니다.',
+    '영혼 조각 3개를 소모해 모든 언데드에게 명령하고 12초 동안 공격력을 25%, 행동 속도를 20% 증가시킵니다.',
   'entities.abilities.reaping_command.name': '수확의 명령',
   'entities.abilities.reaping_command.description':
     '영혼 조각 2개를 소모해 모든 언데드 하수인이 일제히 공격하게 합니다. 무덤수호병은 도발하고 방어하며, 해골 전사는 발을 묶고, 뼈 마법사는 마법 방어를 노출하며, 무덤날개는 적중한 모든 적을 찢습니다.',
@@ -248,7 +248,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cinderhide.description':
     '피부를 식은 용암 찌꺼기처럼 10초 동안 굳혀 받는 모든 피해를 25% 감소시킵니다.',
   'entities.abilities.army_of_the_dead.description':
-    '무덤 차원문을 20초 동안 열어 아직 섬기지 않는 모든 지배 유형을 임시로 일으킵니다. 선택한 하수인은 차원문이 닫힌 뒤에도 남습니다.',
+    '무덤 차원문을 열어 선택한 지배 하수인에 더해 해골 전사, 뼈 마법사, 무덤날개를 20초 동안 임시로 일으킵니다.',
   'entities.mobs.graveguard.name': '무덤수호병',
   'entities.mobs.necromancy_skeletal_warrior.name': '해골 전사',
   'entities.mobs.necromancy_bone_mage.name': '뼈 마법사',
@@ -7564,7 +7564,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.leadenHexLock':
     '납빛 주술이 아직 이 대상을 다시 이동 불가로 만들 수 없습니다',
   'hudChrome.auraEffect.forbiddenReflectionReady':
-    '다음 적용 가능한 흑마법사 공용 재사용 기술을 다시 사용할 수 있습니다',
+    '다음 적용 가능한 흑마법사 재사용 기술을 다시 사용할 수 있습니다',
   'hudChrome.auraEffect.forbiddenReflectionLock': '금지된 반영을 아직 다시 준비할 수 없습니다',
   'hudChrome.auraEffect.internalCooldown': '타이머가 끝날 때까지 이 효과가 다시 발동하지 않습니다',
   'hudChrome.auraEffect.enrage':
@@ -7609,12 +7609,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '운명의 실 {stacks}중첩: 선고 피해가 {sentencePct}% 증가하거나 생명력 흡수 매 틱이 규탄을 {doom} 추가 생성합니다',
   'hudChrome.auraEffect.afflictionConsumeThreads':
     '생명력 흡수가 운명의 실 {stacks}중첩을 소모해 매 틱 규탄을 {doom} 추가 생성합니다',
-  'hudChrome.auraEffect.necromancyHarvestMark':
-    '대상이 죽으면 영혼 조각 1개를 생성하고 시체 폭발용 죽음의 메아리를 남길 수 있습니다',
+  'hudChrome.auraEffect.necromancyHarvestMark': '대상이 죽으면 영혼 조각 1개를 생성할 수 있습니다',
   'hudChrome.auraEffect.necromancyOssuaryMark':
     '당신과 언데드가 준 피해의 {storedPct}%와 영혼 창 피해의 추가 {lancePct}%를 저장합니다. 다시 사용하면 폭발합니다. 죽으면 {radius}미터 내에서 폭발하고 영혼 조각 1개를 생성합니다',
   'hudChrome.auraEffect.necromancyDeathEcho':
-    '시체 폭발이 조준 지점 {radius}미터 안의 이 메아리를 소모할 수 있습니다',
+    '이전 버전의 죽음의 메아리입니다. 현재 어떤 능력도 이를 소모하지 않습니다',
   'hudChrome.auraEffect.warlockAnchor':
     '{range}미터 안에서 다시 사용하면 이곳으로 돌아오고 닻을 소모합니다',
   'hudChrome.auraEffect.formMetamorph':

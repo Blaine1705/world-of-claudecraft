@@ -338,6 +338,7 @@ undead kit. Its non-summon additions are:
 | | 2 | 14 | 50 | 1.6s, 8cd | 50-60 Shadow; same rider |
 | | 3 | 20 | 65 | 1.6s, 8cd | 74-88 Shadow; same rider |
 | `ossuary_mark` | 1 | 12 | 30 | instant, 20cd | 12s mark; stores 20% owner and undead damage; recast detonates; marked death bursts in 6 yards and creates 1 Soul Fragment |
+| `unholy_command` | 1 | 13 | 40 / 3 fragments | instant, 45cd | All owned undead deal 25% more damage and act 20% faster for 12s |
 
 The summon ladder uses two persistent Dominion slots. Only one servant of each
 archetype may serve at a time, and blocked summons spend no mana or Soul Fragments.
@@ -348,7 +349,7 @@ archetype may serve at a time, and blocked summons spend no mana or Soul Fragmen
 | `raise_skeletal_warrior` | 5 | 20 / 1 | instant | Persistent melee choice; cleaves for 45% every 6s and Reaping slows by 40% for 4s |
 | `raise_bone_mage` | 8 | 35 / 2 | instant | Persistent ranged choice; attacks apply 5% magic vulnerability for 6s and Reaping raises it to 8% |
 | `raise_gravewing` | 17 | 45 / 2 | instant | Persistent area choice; cleaves for 65% every 5s and Reaping applies 8% general vulnerability for 5s |
-| `army_of_the_dead` | 20 | 100 / 0 | 1.5s, 120cd | For 20s, temporarily fills every missing Dominion archetype; chosen servants persist afterward |
+| `army_of_the_dead` | 16 | 100 / 0 | 1.5s, 120cd | Adds one temporary Warrior, Bone Mage, and Gravewing for 20s; chosen servants persist afterward |
 
 ## DRUID
 
