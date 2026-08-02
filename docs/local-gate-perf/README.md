@@ -22,6 +22,7 @@ offers to tear it down (or keep a short permanent note under `docs/`) before mer
 | `baselines.md` | Machine-tier baseline numbers (filled by Phase 1, updated each phase) |
 | `experiment-log.md` | Try / measure / keep or drop log (MISS is expected and fine) |
 | `tier-workers.md` | Machine-tier worker presets + `gate:fast` vs full gate (Windows/macOS/Linux) |
+| `task-cache.md` | Turborepo pure-step cache for full gate (Phase 8) |
 | `phase-01-...` through `phase-12-...` | Self-contained starter prompts |
 
 ## Worktree (canonical)

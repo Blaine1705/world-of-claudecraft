@@ -261,6 +261,14 @@ and `npm run test:changed` (optional git base after `--`). Prefer those or
 `gate:fast` while iterating; warm re-runs benefit from Vitest
 `experimental.fsModuleCache` (see `docs/local-gate-perf/`).
 
+The full gate also uses **Turborepo** for pure artifact steps (i18n gen, wiki
+content, SFX check, typecheck, env/server/client builds). On an unchanged tree a
+second `pnpm run gate` replays those from the local `.turbo/` cache; vitest,
+browser tests, malware, and changed-file Biome still always run. See
+[`docs/local-gate-perf/task-cache.md`](docs/local-gate-perf/task-cache.md).
+Clear the cache with `rm -rf .turbo` or force a task with
+`npx turbo run <task> --force`.
+
 You can also run a single suite (`npx vitest run tests/sim.test.ts`) and
 `npm run ci:changed` for formatting; `npm test` runs everything, and the suite map
 is in `tests/CLAUDE.md`. The full `npm run gate` covers generated-artifact

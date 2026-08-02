@@ -1,11 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { buildFullGateSteps } from '../scripts/lib/gate_steps.mjs';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const packageJson = JSON.parse(
   readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
 ) as { packageManager?: string };
 const gate = readFileSync(new URL('../scripts/gate.mjs', import.meta.url), 'utf8');
+// Shared step list (Phase 8): gate.mjs delegates here; pins below use both.
+const gateSteps = buildFullGateSteps(8);
 const viteConfig = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
 const balancedSequencer = readFileSync(
   new URL('../scripts/ci_balanced_sequencer.mjs', import.meta.url),
@@ -105,7 +108,9 @@ describe('CI workflow parity', () => {
     expect(workflow).toContain('run: pnpm install --frozen-lockfile');
     expect(workflow).toContain('uses: pnpm/action-setup@v4');
     expect(workflow).toContain(`version: ${PNPM_VERSION}`);
-    const setupPins = workflow.match(/uses: pnpm\/action-setup@v4\n {8}with:\n {10}version: [^\n]+/g);
+    const setupPins = workflow.match(
+      /uses: pnpm\/action-setup@v4\n {8}with:\n {10}version: [^\n]+/g,
+    );
     expect(setupPins?.length).toBeGreaterThanOrEqual(4);
     for (const pin of setupPins ?? []) {
       expect(pin).toContain(`version: ${PNPM_VERSION}`);
@@ -134,7 +139,12 @@ describe('CI workflow parity', () => {
     expect(jobSource('pr-gate')).not.toContain('run: npm run check:types');
     expect(jobSource('release-gate')).not.toContain('run: npm run check:types');
     expect(workflow).not.toContain('run: npx tsc --noEmit');
-    expect(gate).toContain("['typecheck', 'npm', ['run', 'check:types']]");
+    // Local gate runs typecheck through turbo (Phase 8); CI still uses npm run check:types.
+    expect(gate).toContain('buildFullGateSteps');
+    expect(gateSteps.some((s) => s.name === 'typecheck + env/server builds')).toBe(true);
+    expect(gateSteps.find((s) => s.name === 'typecheck + env/server builds')?.args).toEqual(
+      expect.arrayContaining(['turbo', 'run', 'check:types']),
+    );
   });
 
   it('provisions FFmpeg from the static npm packages instead of apt', () => {
@@ -152,7 +162,9 @@ describe('CI workflow parity', () => {
     const browserGate = jobSource('browser-gate');
     expect(browserGate).toContain('run: npx playwright install --with-deps chromium');
     expect(browserGate).toContain('run: npm run test:browser');
-    expect(gate).toContain("['browser regressions', 'npm', ['run', 'test:browser']]");
+    const browser = gateSteps.find((s) => s.name === 'browser regressions');
+    expect(browser?.cmd).toBe('npm');
+    expect(browser?.args).toEqual(['run', 'test:browser']);
   });
 
   it('keeps lint shallow, cancels superseded PR runs, and caches Playwright Chromium', () => {
@@ -406,8 +418,13 @@ describe('CI workflow parity', () => {
     // silently drop tests from the gate entirely, and dropping the worker
     // bound would reintroduce the documented core-contention flake mode.
     expect(gate).not.toContain('--shard');
-    expect(gate).toContain("'vitest (full suite)'");
-    expect(gate).toContain('--maxWorkers=');
+    const vitest = gateSteps.find((s) => s.name === 'vitest (full suite)');
+    expect(vitest?.cmd).toBe('npm');
+    expect(vitest?.args).toEqual(['test', '--', '--maxWorkers=8']);
+    expect(vitest?.env).toEqual({ WOC_SKIP_PRETEST: '1' });
+    // gate.mjs still binds workers into the shared step builder.
+    expect(gate).toContain('buildFullGateSteps(workers)');
+    expect(gate).toContain('computeGateWorkers');
     // Both check jobs stay single unsharded jobs: serialized checks run once.
     for (const job of [prChecks, releaseChecks]) {
       expect(job).not.toContain('strategy:');

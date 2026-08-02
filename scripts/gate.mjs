@@ -12,9 +12,14 @@
 // other work shares the machine (failing files that then pass in isolation).
 // Steps run sequentially with inherited stdio and stop at the first failure.
 // Keep the step list in sync with .github/workflows/ci.yml (and vice versa).
+//
+// Phase 2: generate-once i18n + wiki; vitest skips pretest; client uses
+// build:bundle (no triple gen). Phase 8: pure artifact steps go through turbo
+// (local disk cache + parallel typecheck/env/server). Tests, malware, and
+// changed-file biome are never treated as cacheable "green forever".
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
-import { gateVitestSkipPretestEnv } from './lib/gate_artifact_skip.mjs';
+import { buildFullGateSteps } from './lib/gate_steps.mjs';
 import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers.mjs';
 import {
   formatInstallSyncFailure,
@@ -103,50 +108,14 @@ const releaseTier = branch.startsWith('release/');
 // Base env for every step. Per-step overlays (e.g. pretest skip on vitest) merge on top.
 const baseEnv = releaseTier ? { ...process.env, I18N_RELEASE_TIER: '1' } : { ...process.env };
 
-const I18N_ARTIFACTS = [
-  'src/ui/i18n.resolved.generated',
-  'src/admin/i18n.resolved.generated',
-  'src/ui/i18n.catalog/translation_keys.generated.ts',
-];
-
-// Generate-once orchestration (Phase 2): i18n + wiki run here, pretest and the
-// client build do not regenerate them. Freshness still fails the gate on drift.
-// Standalone `npm test` / `npm run build` keep full regeneration (no skip env /
-// still invoke i18n:gen + wiki via build).
-// Each step: [name, cmd, args, hint?, envOverlay?]
-const steps = [
-  ['i18n artifacts', 'npm', ['run', 'i18n:gen']],
-  [
-    'i18n freshness',
-    'git',
-    ['diff', '--exit-code', '--', ...I18N_ARTIFACTS],
-    'the regenerated i18n artifacts differ from the staged/committed copies: stage them ' +
-      `(git add ${I18N_ARTIFACTS.join(' ')}) and re-run`,
-  ],
-  ['wiki content', 'npm', ['run', 'wiki:content']],
-  ['malware scan', 'npm', ['run', 'security:gate']],
-  ['biome (changed files)', 'npm', ['run', 'ci:changed']],
-  ['sfx check', 'npm', ['run', 'sfx:check']],
-  [
-    'vitest (full suite)',
-    'npm',
-    ['test', '--', `--maxWorkers=${workers}`],
-    undefined,
-    gateVitestSkipPretestEnv(),
-  ],
-  ['browser regressions', 'npm', ['run', 'test:browser']],
-  ['typecheck', 'npm', ['run', 'check:types']],
-  ['env build', 'npm', ['run', 'build:env']],
-  ['server build', 'npm', ['run', 'build:server']],
-  // build:bundle assumes i18n + wiki already exist from the steps above.
-  ['client build', 'npm', ['run', 'build:bundle']],
-];
+// Shared step list (Phase 2 generate-once + Phase 8 turbo cacheable pure steps).
+const steps = buildFullGateSteps(workers);
 
 if (releaseTier) {
   console.log(`[gate] release branch "${branch}": running release-tier (I18N_RELEASE_TIER=1)`);
 }
 
-for (const [name, cmd, args, hint, envOverlay] of steps) {
+for (const { name, cmd, args, hint, env: envOverlay } of steps) {
   console.log(`\n[gate] ${name}: ${cmd} ${args.join(' ')}`);
   const env = envOverlay ? { ...baseEnv, ...envOverlay } : baseEnv;
   const res = spawnSync(cmd, args, { stdio: 'inherit', env, shell });

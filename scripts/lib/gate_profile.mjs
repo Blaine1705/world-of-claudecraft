@@ -3,6 +3,8 @@
 // slow-file ranking without spawning the full gate. The entry script owns spawn,
 // stdio, and wall-clock collection.
 
+import { buildFullGateSteps } from './gate_steps.mjs';
+
 /** GiB used by gate.mjs's free-mem worker clamp; re-exported for docs only. */
 export const GATE_BYTES_PER_WORKER = 768 * 1024 * 1024;
 
@@ -216,9 +218,9 @@ export function parseGateProfileArgs(argv) {
 }
 
 /**
- * Gate step list aligned with scripts/gate.mjs (names + npm/git commands).
+ * Gate step list aligned with scripts/gate.mjs (names + turbo/npm/git commands).
  * Preflights (dep sync, ffmpeg) are measured separately by the entry script.
- * Generate-once: i18n + wiki once; vitest skips pretest; client uses build:bundle.
+ * Generate-once + turbo cacheable pure steps live in buildFullGateSteps.
  *
  * @param {number} workers
  * @param {{
@@ -230,47 +232,7 @@ export function parseGateProfileArgs(argv) {
  * @returns {Array<{ name: string, cmd: string, args: string[], env?: Record<string, string> }>}
  */
 export function buildGateProfileSteps(workers, opts = {}) {
-  const I18N_ARTIFACTS = [
-    'src/ui/i18n.resolved.generated',
-    'src/admin/i18n.resolved.generated',
-    'src/ui/i18n.catalog/translation_keys.generated.ts',
-  ];
-  /** @type {Array<{ name: string, cmd: string, args: string[], env?: Record<string, string> }>} */
-  const steps = [
-    { name: 'i18n artifacts', cmd: 'npm', args: ['run', 'i18n:gen'] },
-    {
-      name: 'i18n freshness',
-      cmd: 'git',
-      args: ['diff', '--exit-code', '--', ...I18N_ARTIFACTS],
-    },
-    { name: 'wiki content', cmd: 'npm', args: ['run', 'wiki:content'] },
-    { name: 'malware scan', cmd: 'npm', args: ['run', 'security:gate'] },
-    { name: 'biome (changed files)', cmd: 'npm', args: ['run', 'ci:changed'] },
-    { name: 'sfx check', cmd: 'npm', args: ['run', 'sfx:check'] },
-  ];
-  if (!opts.skipVitest) {
-    steps.push({
-      name: 'vitest (full suite)',
-      cmd: 'npm',
-      args: ['test', '--', `--maxWorkers=${workers}`],
-      // Mirror gate.mjs: skip pretest after generate-once (i18n + wiki above).
-      env: { WOC_SKIP_PRETEST: '1' },
-    });
-  }
-  if (!opts.skipBrowser) {
-    steps.push({ name: 'browser regressions', cmd: 'npm', args: ['run', 'test:browser'] });
-  }
-  if (!opts.skipTypes) {
-    steps.push({ name: 'typecheck', cmd: 'npm', args: ['run', 'check:types'] });
-  }
-  if (!opts.skipBuilds) {
-    steps.push(
-      { name: 'env build', cmd: 'npm', args: ['run', 'build:env'] },
-      { name: 'server build', cmd: 'npm', args: ['run', 'build:server'] },
-      { name: 'client build', cmd: 'npm', args: ['run', 'build:bundle'] },
-    );
-  }
-  return steps;
+  return buildFullGateSteps(workers, opts);
 }
 
 /** Human-readable machine facts block. */

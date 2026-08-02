@@ -360,10 +360,10 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned after the pnpm migration (local-gate perf Phase 7). pnpm-lock.yaml is a hashed leaf of every Eastbrook-era
+      // Deliberately re-pinned after the turbo task-cache (local-gate perf Phase 8); lockfile/package.json remains a hashed leaf. pnpm-lock.yaml is a hashed leaf of every Eastbrook-era
       // source fingerprint, so the composite mints fresh with no geometry or
       // capture change. Fingerprint-only GLB stamps kept shipping sizes identical.
-      fingerprint: '78fb1ac247561d54e8e92e28385bd42604dcb20e82d7d84ee63cc5475173b0fc',
+      fingerprint: '80151ab5cdd28fa4cf68f6f0952aa1241594c3c11906b899864a1563c4de226a',
       components: {
         captureContract: {
           id: 'polish-v2',

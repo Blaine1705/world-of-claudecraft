@@ -79,14 +79,22 @@ Phase 5). Default environment remains `node`.
 
 ### Full local gate
 
-`npm run gate` is the **merge and "done" contract**. It mirrors CI: generated i18n
-freshness, malware scanning, changed-file formatting, the SFX conformance check, the
-full test suite, the browser regression suite (`npm run test:browser`, which drives
-Chromium through Playwright), the typecheck, and env, server, and client builds.
+`npm run gate` (or `pnpm run gate`) is the **merge and "done" contract**. It mirrors CI:
+generated i18n freshness, malware scanning, changed-file formatting, the SFX conformance
+check, the full test suite, the browser regression suite (`npm run test:browser`, which
+drives Chromium through Playwright), the typecheck, and env, server, and client builds.
 Release branches use the release i18n tier. It stops at the first failure and bounds
 Vitest workers to avoid load flakes on shared machines. It resolves FFmpeg (`ffmpeg`
 and `ffprobe`) from the bundled `ffmpeg-static`/`ffprobe-static` npm packages, falling
 back to PATH, and refuses to run when neither source yields a working binary.
+
+**Task cache (Turborepo):** pure artifact steps (`i18n:gen`, `wiki:content`, `sfx:check`,
+`check:types`, `build:env`, `build:server`, `build:bundle`) run through `npx turbo run`
+with inputs/outputs in root `turbo.json`. A warm second gate on an unchanged tree
+replays those steps from `.turbo/` (often under a second). Full vitest, browser tests,
+malware, changed-file Biome, and the i18n freshness `git diff` always run (they are not
+cached as "passed"). Catalog edits under `src/ui/i18n.catalog/**` invalidate `i18n:gen`.
+Contributor detail: [`docs/local-gate-perf/task-cache.md`](local-gate-perf/task-cache.md).
 
 Use this command instead of an ad hoc shell pipeline, and always before calling a change
 ready or opening a mergeable PR. Piping a test run can hide its exit status, and

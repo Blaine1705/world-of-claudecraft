@@ -367,3 +367,28 @@ store as noted). Secondary worktrees under `/tmp/wocc-pnpm-*`.
 
 Decision: keep full pnpm migration. Store path default
 `~/Library/pnpm/store/v10` on this host (`pnpm store path`).
+
+## Phase 8 - task cache turbo (M1)
+
+Measured 2026-08-02 on M1 (darwin/arm64, Node 26.5, pnpm 10.34.5, turbo 2.10.8).
+
+| Scenario | Command | Wall s | Notes |
+|---|---|---:|---|
+| Pure artifacts cold (first full success after empty/partial `.turbo`) | `npx turbo run i18n:gen wiki:content sfx:check check:types build:env build:server build:bundle` | 24.37 | All miss or partial; real work |
+| Pure artifacts warm (unchanged tree) | same | **0.27** (turbo Time 87ms) | `Cached: 7/7` `FULL TURBO` |
+| i18n warm | `npx turbo run i18n:gen` | 0.02 | cache hit |
+| i18n after catalog touch | same after edit under `src/ui/i18n.catalog/**` | 2.57 | cache miss (invalidation OK) |
+| Types+env+server sequential force | three separate `--force` runs | ~6.3 sum | types 5.32 + env 0.41 + server 0.55 |
+| Types+env+server parallel force | one multi-task `--force` | 5.30 | ~1s wall win; types dominate |
+
+Full gate still dominated by vitest (always runs). Warm gate saves the pure-step
+slice (i18n/wiki/sfx/types/builds), not the suite. See `task-cache.md`.
+
+### Full gate with turbo warm pure steps (Phase 8)
+
+| Machine | Workers | Full gate s | Notes |
+|---|---:|---:|---|
+| M1 | 4 | 411.8 | 2026-08-02; pure steps cache hit (i18n/wiki/sfx/types/builds FULL TURBO); vitest always ran; multi-session machine |
+
+Warm pure multi-task alone: 87ms FULL TURBO (7/7). Catalog touch forces i18n miss.
+

@@ -234,6 +234,7 @@ describe('buildGateProfileSteps', () => {
   it('includes the full gate step list with worker-bound vitest args', () => {
     const steps = buildGateProfileSteps(8);
     const names = steps.map((s) => s.name);
+    // Phase 8: pure artifacts via turbo; typecheck + env/server parallel multi-task.
     expect(names).toEqual([
       'i18n artifacts',
       'i18n freshness',
@@ -243,17 +244,19 @@ describe('buildGateProfileSteps', () => {
       'sfx check',
       'vitest (full suite)',
       'browser regressions',
-      'typecheck',
-      'env build',
-      'server build',
+      'typecheck + env/server builds',
       'client build',
     ]);
     const vitest = steps.find((s) => s.name === 'vitest (full suite)');
     expect(vitest?.args).toEqual(['test', '--', '--maxWorkers=8']);
-    // Generate-once: skip pretest after i18n + wiki; client build is bundle-only.
+    // Generate-once: skip pretest after i18n + wiki; client build is turbo build:bundle.
     expect(vitest?.env).toEqual({ WOC_SKIP_PRETEST: '1' });
+    const i18n = steps.find((s) => s.name === 'i18n artifacts');
+    expect(i18n?.cmd).toBe('npx');
+    expect(i18n?.args).toEqual(expect.arrayContaining(['turbo', 'run', 'i18n:gen']));
     const client = steps.find((s) => s.name === 'client build');
-    expect(client?.args).toEqual(['run', 'build:bundle']);
+    expect(client?.cmd).toBe('npx');
+    expect(client?.args).toEqual(expect.arrayContaining(['turbo', 'run', 'build:bundle']));
   });
 
   it('honors skip flags without dropping unskipped steps', () => {

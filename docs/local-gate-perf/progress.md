@@ -13,7 +13,7 @@ Status: not-started / in-progress / blocked / complete / dropped
 | 5 | happy-dom for DOM tests | complete | 2026-08-02 | 2026-08-02 | partial keep: 103 happy-dom, 9 jsdom exceptions; lockfile seal remint |
 | 6 | Pool, projects, isolation experiments | complete | 2026-08-02 | 2026-08-02 | drop all: keep default forks+isolate; no projects |
 | 7 | pnpm + shared store for worktrees | complete | 2026-08-02 | 2026-08-02 | full migration; 2nd worktree ~14s vs npm ~59s |
-| 8 | Task cache (turbo or wireit) | not-started | | | |
+| 8 | Task cache (turbo or wireit) | complete | 2026-08-02 | 2026-08-02 | turbo 2.10.8 keep; warm pure steps FULL TURBO ~87ms |
 | 9 | Suite cost reduction | not-started | | | |
 | 10 | Experimental runners spike | not-started | | | |
 | 11 | Cross-platform and tier matrix | not-started | | | |
@@ -70,10 +70,10 @@ Status: not-started / in-progress / blocked / complete / dropped
 - [x] Full gate under pnpm (run as part of phase validation)
 
 ### Phase 8 - Task cache
-- [ ] turbo or wireit chosen with rationale
-- [ ] Cacheable steps listed (i18n, types, builds, not blind test skip)
-- [ ] Cold vs warm gate numbers
-- [ ] Full correctness still enforced when inputs change
+- [x] turbo or wireit chosen with rationale (turbo keep; wireit dropped)
+- [x] Cacheable steps listed (i18n, types, builds, not blind test skip)
+- [x] Cold vs warm gate numbers (pure multi-task 24s cold / 87ms warm FULL TURBO)
+- [x] Full correctness still enforced when inputs change (catalog bust + freshness + tests always run)
 
 ### Phase 9 - Suite cost reduction
 - [ ] Profiling-driven fixture or split changes

@@ -22,8 +22,8 @@ import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resourc
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/props/eastbrook_noticeboard.glb');
 const ASSET_BYTES = 24_684;
-const ASSET_SHA256 = '0713fea8729488448af7e19c6f9cea55cc082fa81bfba9f8bbf7024f95a60597';
-const SOURCE_FINGERPRINT = '5301d7afc2df7e92b2a551b5d80deec18cf4f944eb2364198becda09814cbaa9';
+const ASSET_SHA256 = '765ac43c5be4942921aa48b9796a70681b030aa8f6882632a4ba5c6e6f6a97d6';
+const SOURCE_FINGERPRINT = '0517cc8bd05d333786105323fcb13bed8b3c1f00820633be568bc6098133f00c';
 const ORIGINAL_STANDARD_MATERIALS = GFX.standardMaterials;
 
 function coloredBox(

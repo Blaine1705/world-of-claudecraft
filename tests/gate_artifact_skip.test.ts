@@ -28,24 +28,12 @@ describe('shouldSkipPretest', () => {
 });
 
 describe('gate generate-once orchestration pins', () => {
-  it('generates wiki once, skips pretest on vitest, and builds via build:bundle', () => {
-    // Ordering: i18n before freshness before wiki before vitest; client uses
-    // the bundle-only script so full npm run build does not re-gen i18n/wiki.
-    // Freshness is a multi-line step tuple, so pin the name string alone.
-    const i18nIdx = gate.indexOf("'i18n artifacts'");
-    const freshnessIdx = gate.indexOf("'i18n freshness'");
-    const wikiIdx = gate.indexOf("'wiki content'");
-    const vitestIdx = gate.indexOf("'vitest (full suite)'");
-    const clientIdx = gate.indexOf("'client build'");
-    expect(i18nIdx).toBeGreaterThan(-1);
-    expect(freshnessIdx).toBeGreaterThan(i18nIdx);
-    expect(wikiIdx).toBeGreaterThan(freshnessIdx);
-    expect(vitestIdx).toBeGreaterThan(wikiIdx);
-    expect(clientIdx).toBeGreaterThan(vitestIdx);
-
-    expect(gate).toContain('gateVitestSkipPretestEnv');
-    expect(gate).toContain("['run', 'build:bundle']");
-    // Full `npm run build` must not appear as a gate step (would re-gen gens).
+  it('delegates the step list so generate-once + turbo cache stay centralized', () => {
+    // Step names and turbo/npm wiring are pinned in tests/gate_task_cache.test.ts
+    // via buildFullGateSteps. gate.mjs must import that shared list (Phase 8).
+    expect(gate).toContain('buildFullGateSteps');
+    expect(gate).toContain("from './lib/gate_steps.mjs'");
+    // Full `npm run build` must not appear as an inline gate step (would re-gen gens).
     expect(gate).not.toMatch(/\['client build',\s*'npm',\s*\['run',\s*'build'\]/);
   });
 

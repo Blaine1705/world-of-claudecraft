@@ -23,6 +23,7 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 | 2026-08-02 | 6 | isolate:false 20 pure helper files | isolate true 1.69s | isolate false 1.17s green | M1 | drop (too small) | ~0.5s absolute; not worth projects scaffold |
 | 2026-08-02 | 6 | fileParallelism / maxWorkers note | defaults true; gate passes --maxWorkers | no config change | M1 | drop (no change) | gate_workers remains sole worker policy |
 | 2026-08-02 | 7 | pnpm full migration + shared store | secondary npm ci ~59s | 2nd worktree pnpm hoisted ~14s (~4x); CI on pnpm frozen-lockfile | M1 darwin/arm64 Node 26.5 pnpm 10.34.5 | keep | Option A single lockfile; Corepack not required; see detail |
+| 2026-08-02 | 8 | turbo task cache for pure gate artifacts | no task cache; pure steps always re-run (~24s multi-task cold) | warm pure multi-task 87ms FULL TURBO; catalog touch misses i18n | M1 darwin/arm64 Node 26.5 pnpm 10.34.5 turbo 2.10.8 | keep | wireit dropped; tests never cached; see detail |
 
 ## Detail template (copy below for long notes)
 
@@ -291,4 +292,41 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 - Decision: keep
 - Follow-ups: Phase 8 task cache; bump `packageManager` + CI pin together when
   moving pnpm versions
+
+### 2026-08-02 - Phase 8 - task cache (turbo)
+
+- Hypothesis: pure artifact gate steps (i18n, wiki, sfx check, types, builds)
+  can skip when inputs are unchanged via a task graph cache, while vitest and
+  security/biome always re-run so failures are never hidden.
+- Change (keep):
+  - **Tool: turbo 2.10.8** (not wireit). Rationale: multi-task parallel CLI,
+    precise inputs/outputs, local disk cache, no rewrite of every package.json
+    script to `"wireit"`. Wireit remains a valid lighter alternative if turbo
+    becomes a maintenance burden.
+  - Root `turbo.json` with cacheable tasks + `cache: false` on test/malware/biome
+  - `scripts/lib/gate_task_cache.mjs` inventory + `turboRunArgs`
+  - `scripts/lib/gate_steps.mjs` shared merge-bar step list (gate + profile)
+  - `scripts/gate.mjs` uses turbo for pure steps; parallel
+    `check:types` // `build:env` // `build:server`; vitest/malware/biome via npm
+  - Phase 2 generate-once preserved (WOC_SKIP_PRETEST, build:bundle, freshness)
+  - Docs: `docs/local-gate-perf/task-cache.md`, qa-gate + CONTRIBUTING pointers
+  - Tests: `tests/gate_task_cache.test.ts` + updated profile/artifact pins
+- Dropped: wireit (not installed).
+- Commands:
+  - `npx turbo run i18n:gen wiki:content sfx:check check:types build:env build:server build:bundle`
+  - catalog touch under `src/ui/i18n.catalog/**` then re-run `i18n:gen`
+  - unit: `npx vitest run tests/gate_task_cache.test.ts tests/gate_artifact_skip.test.ts tests/gate_profile.test.ts`
+  - full: `pnpm run gate`
+- Before metrics: pure multi-task always-execute ~24s cold wall (post-install machine)
+- After metrics:
+  - Warm pure multi-task: **87ms**, `Cached: 7/7`, `FULL TURBO`
+  - Cold pure multi-task (empty `.turbo` after prior partial populate): ~24s
+  - Catalog blank-line touch: `i18n:gen` **cache miss** (~2.6s) after prior hit (22ms)
+  - Parallel force `check:types build:env build:server` ~5.3s vs sequential sum
+    ~6.3s (~1s overlap; types dominate)
+- Pass/fail: unit pins green; typecheck green; cache bust correctness green;
+  asset fingerprint remint after `turbo`/`pnpm-lock` leaf change (same recipe as
+  Phase 7); full gate green under `GATE_MAX_WORKERS=4`
+- Decision: **keep**
+- Follow-ups: Phase 9 suite cost; optional remote turbo cache is out of scope
 

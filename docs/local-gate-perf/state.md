@@ -2,8 +2,8 @@
 
 Resume point for the next session. Keep current after every phase.
 
-**Current phase:** Phase 7 complete.  
-**Next action:** run Phase 8 starter prompt (`phase-08-task-cache.md`).  
+**Current phase:** Phase 8 complete.  
+**Next action:** run Phase 9 starter prompt (`phase-09-suite-cost-reduction.md`).  
 **Worktree:** `/Users/fernando/Documents/wocc-gate-perf-research`  
 **Branch:** `feature/local-gate-perf`  
 **Base:** always `origin/release/v0.34.0`
@@ -73,7 +73,11 @@ Always before calling a phase complete:
 
 | Path | Role |
 |---|---|
-| `scripts/gate.mjs` | Local full gate (merge bar; generate-once i18n/wiki; vitest skips pretest; client uses build:bundle) |
+| `scripts/gate.mjs` | Local full gate (merge bar; generate-once i18n/wiki; turbo pure-step cache; vitest skips pretest; client uses build:bundle) |
+| `turbo.json` | Turborepo task inputs/outputs for pure gate artifacts (Phase 8) |
+| `scripts/lib/gate_steps.mjs` | Shared full-gate step list (gate + gate_profile) |
+| `scripts/lib/gate_task_cache.mjs` | Cache inventory + turboRunArgs helpers |
+| `docs/local-gate-perf/task-cache.md` | Contributor task-cache guide |
 | `scripts/gate_fast.mjs` | Day-loop path only (`npm run gate:fast`); not merge bar |
 | `scripts/lib/gate_fast_plan.mjs` | Pure day-loop vitest plan (related vs skip; tested) |
 | `scripts/pretest.mjs` | `npm test` lifecycle; honors `WOC_SKIP_PRETEST=1` |
@@ -101,7 +105,12 @@ Fill as phases ship:
 - (Phase 5) happy-dom adoption scope: **partial keep** `happy-dom@^20.11.1`; 103/112 DOM files use `// @vitest-environment happy-dom`; 9 files stay on jsdom (see experiment-log / baselines); jsdom kept as dep; lockfile change re-stamped Eastbrook asset source fingerprints (sizes unchanged)
 - (Phase 6) pool/projects kept: **none** (drop). Keep Vitest 4.1 defaults `pool: forks`, `isolate: true`, no projects, `fileParallelism: true`. Threads ~2% faster but fails `process.chdir` in `env_bootstrap` tests. isolate:false on 904 no-sim-import files red (71 files + worker crash). Projects not justified without a measured pure set.
 - (Phase 7) package manager decision: **full pnpm migration (Option A)**. `packageManager: pnpm@10.34.5` (latest pnpm 10.x; not major 11), single lockfile `pnpm-lock.yaml` (removed `package-lock.json`). Install via `npm install -g pnpm@10.34.5` (Corepack not required; same on macOS/Linux/Windows). CI uses `pnpm/action-setup@v4` + `pnpm install --frozen-lockfile` + `cache: pnpm`. Local multi-worktree shares content-addressable store (`node-linker=hoisted` for npm-compatible layout). `pnpm.onlyBuiltDependencies` allowlists native install scripts. No dual lockfiles.
-- (Phase 8) task cache tool:
+- (Phase 8) task cache tool: **turbo 2.10.8** (not wireit). Root `turbo.json` +
+  `scripts/lib/gate_task_cache.mjs` inventory; `scripts/lib/gate_steps.mjs` shared
+  step list. Cacheable: `i18n:gen`, `wiki:content`, `sfx:check`, `check:types`,
+  `build:env`, `build:server`, `build:bundle`. Never cache: full vitest, browser
+  tests, malware, changed-file biome; i18n freshness always `git diff`. Docs:
+  `docs/local-gate-perf/task-cache.md`.
 - (Phase 9) suite splits / fixtures:
 - (Phase 10) experimental runner outcome:
 - (Phase 11) tier matrix doc path:

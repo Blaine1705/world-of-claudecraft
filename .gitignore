@@ -110,6 +110,9 @@ pr-assets-2fa
 .experimental-vitest-cache/
 node_modules/.experimental-vitest-cache/
 
+# Turborepo local task cache (Phase 8 gate pure-artifact steps)
+.turbo/
+
 # Discord app credentials + bot token, never commit it
 discord_bot_info.txt
 
