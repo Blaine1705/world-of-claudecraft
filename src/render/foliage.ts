@@ -1919,6 +1919,12 @@ function buildDressing(
     // higher ROI than adding more far canopy or post-processing work.
     const maxKinds = 4;
     const kept = [...byKind.entries()].sort((a, b) => b[1].length - a[1].length).slice(0, maxKinds);
+    // One shared dress sprite mesh per bucket: both bush kinds accumulate
+    // into it, so the far band stays a single draw.
+    const dressSprites =
+      session && dressRows && kept.some(([kind]) => kind === 'bush' || kind === 'bushFlowers')
+        ? session.bucket('dress', bx, bz, bRadius)
+        : null;
     for (const [kind, list] of kept) {
       // Bush kinds hand off to sprites at the dress swap; the sprite takes
       // the same per-spot tint the real instance takes (dressingSpotTint) so
@@ -1929,11 +1935,10 @@ function buildDressing(
           : dressRows && kind === 'bushFlowers'
             ? dressRows.bushFlowers
             : null;
-      if (session && spriteRow !== null) {
-        const sprites = session.bucket('dress', bx, bz, bRadius);
+      if (dressSprites && spriteRow !== null) {
         for (const spot of list) {
           const y = terrainHeight(spot.x, spot.z, seed);
-          sprites.add(
+          dressSprites.add(
             spriteRow,
             spot.x,
             y - 0.04 * spot.scale,
