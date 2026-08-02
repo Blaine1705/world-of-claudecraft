@@ -6,7 +6,7 @@ Status: not-started / in-progress / blocked / complete / dropped
 
 | Phase | Title | Status | Started | Completed | Notes |
 |---|---|---|---|---|---|
-| 1 | Baseline harness and machine-tier protocol | not-started | | | |
+| 1 | Baseline harness and machine-tier protocol | complete | 2026-08-02 | 2026-08-02 | M1 high-tier baseline 336.3s full gate |
 | 2 | Gate orchestration dedupe | not-started | | | |
 | 3 | Tiered local gate + tier worker presets | not-started | | | |
 | 4 | Vitest warm path | not-started | | | |
@@ -22,12 +22,12 @@ Status: not-started / in-progress / blocked / complete / dropped
 ## Per-phase deliverables
 
 ### Phase 1 - Baseline harness and machine-tier protocol
-- [ ] Measurement script or documented commands that time each gate step
-- [ ] Top-N slowest vitest files captured (JSON reporter or equivalent)
-- [ ] Machine tier table started in `baselines.md` (at least one machine fully filled)
-- [ ] `experiment-log.md` header + first baseline row
-- [ ] No product behavior change required; docs + tooling only is OK
-- [ ] Tests for any new pure helpers under `scripts/` or `tests/`
+- [x] Measurement script or documented commands that time each gate step
+- [x] Top-N slowest vitest files captured (JSON reporter or equivalent)
+- [x] Machine tier table started in `baselines.md` (at least one machine fully filled)
+- [x] `experiment-log.md` header + first baseline row
+- [x] No product behavior change required; docs + tooling only is OK
+- [x] Tests for any new pure helpers under `scripts/` or `tests/`
 
 ### Phase 2 - Gate orchestration dedupe
 - [ ] One gate run does not triple-regenerate i18n/wiki without need

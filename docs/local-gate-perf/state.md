@@ -2,8 +2,8 @@
 
 Resume point for the next session. Keep current after every phase.
 
-**Current phase:** not started (packet authored 2026-08-02).  
-**Next action:** run Phase 1 starter prompt (`phase-01-baseline-and-measurement.md`).  
+**Current phase:** Phase 1 complete.  
+**Next action:** run Phase 2 starter prompt (`phase-02-gate-orchestration-dedupe.md`).  
 **Worktree:** `/Users/fernando/Documents/wocc-gate-perf-research`  
 **Branch:** `feature/local-gate-perf`  
 **Base:** always `origin/release/v0.34.0`
@@ -74,6 +74,8 @@ Always before calling a phase complete:
 |---|---|
 | `scripts/gate.mjs` | Local full gate |
 | `scripts/lib/gate_workers.mjs` | Worker CPU/mem policy |
+| `scripts/gate_profile.mjs` | Phase 1 measurement CLI (timed steps + slow files) |
+| `scripts/lib/gate_profile.mjs` | Pure helpers for gate_profile (tested) |
 | `package.json` | scripts: test, pretest, gate, build, check:types |
 | `vite.config.ts` | Vitest `test` block |
 | `vitest.browser.config.ts` | Browser suite |
@@ -86,7 +88,7 @@ Always before calling a phase complete:
 
 Fill as phases ship:
 
-- (Phase 1) timing harness path:
+- (Phase 1) timing harness path: `scripts/gate_profile.mjs` + `scripts/lib/gate_profile.mjs` (tests: `tests/gate_profile.test.ts`); M1 baseline full gate 336.3s / vitest 277.5s / workers 8 at SHA 2a79ba8a0d
 - (Phase 2) gate dedupe approach:
 - (Phase 3) new scripts (`gate:fast`, ...):
 - (Phase 4) vitest cache flags:
@@ -105,3 +107,5 @@ Fill as phases ship:
 2. Whether local multi-shard full gate is worth supporting on high-tier only.
 3. Owner sign-off if `gate:fast` is ever allowed as pre-push instead of full gate
    (default: no; pre-push floor stays as today).
+4. Cold empty-store install and second-worktree install timings (deferred to Phase 7).
+5. Low/medium tier machine baselines still empty (only M1 high-tier filled).
