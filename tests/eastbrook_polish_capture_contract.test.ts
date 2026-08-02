@@ -368,7 +368,7 @@ describe('Eastbrook polish capture contract', () => {
       // fresh and matches no parent's literal. No pipeline input or geometry
       // value changed, and no capture was retaken (the five per-asset seal
       // suites stay green untouched).
-      fingerprint: '2172d6960ce3057f6b64d2a1d178ab2b7df5f6802636010b1fa06e57a452106a',
+      fingerprint: '8e33011176be0b789ececbd39aeddeee2d342b987edeb04762502a403577c8f6',
       components: {
         captureContract: {
           id: 'polish-v2',

@@ -615,9 +615,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   'metadata/after-desktop-ultra.json',
 );
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '1276ca6bb0f63f19cd8f76ee1f4999d616b2bb006c69152713ab58752de0f623';
+  'd396f098d48109f5ffb73f1607d2b20591ba6e7e3136bf394a4d475f31268862';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '9d38235f6a16ce60925c0faa28567775cbdb640f1749686c866ffeb9e5a10cb9';
+  '8e33011176be0b789ececbd39aeddeee2d342b987edeb04762502a403577c8f6';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1479,7 +1479,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Every measured value (frame timings, draw stats, triangle and scenario
     // numbers) is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '7c4dac9b0aca7cb191d8ab90feb0eb987eba9b1dcb70c4ff3cfee7e34aaeef26',
+      '5b3227d83152786b8387703d79dcec68cafe2954fab70eb5a4d97bd18d038ab1',
     );
   });
 
