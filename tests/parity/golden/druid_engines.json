@@ -9,13 +9,13 @@
     "Old Blood landed-strike bank across Wolf and Bruin with both payoffs",
     "Verdance completed-HoT bank and Overbloom harvest"
   ],
-  "draws": 10586,
-  "drawDigest": "fd543fb1",
+  "draws": 10693,
+  "drawDigest": "6d42321e",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 820,
+      "nextId": 831,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 824,
-      "state": "34f1377b",
-      "events": "8430f68c",
+      "nextId": 835,
+      "state": "339d4645",
+      "events": "f1bb7341",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -40,9 +40,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 824,
-      "state": "91144c9a",
-      "events": "8e285b91",
+      "nextId": 835,
+      "state": "b8d6bdb0",
+      "events": "37a7fb4b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -51,8 +51,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 824,
-      "state": "231c7c68",
+      "nextId": 835,
+      "state": "26db631a",
       "events": "741638a5",
       "rng": {
         "draws": 144,
@@ -62,9 +62,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 824,
-      "state": "f6c79cb9",
-      "events": "634c6616",
+      "nextId": 835,
+      "state": "1a15237d",
+      "events": "20c65126",
       "rng": {
         "draws": 329,
         "digest": "54d180fc"
@@ -73,9 +73,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 824,
-      "state": "aff4925c",
-      "events": "8e285b91",
+      "nextId": 835,
+      "state": "edba97dc",
+      "events": "37a7fb4b",
       "rng": {
         "draws": 499,
         "digest": "ea6961b5"
@@ -84,9 +84,9 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 824,
-      "state": "862182d3",
-      "events": "e363e88c",
+      "nextId": 835,
+      "state": "f16ece03",
+      "events": "e3532b02",
       "rng": {
         "draws": 698,
         "digest": "dfbc25d8"
@@ -95,9 +95,9 @@
     {
       "tick": 140,
       "time": 7,
-      "nextId": 824,
-      "state": "f0f94416",
-      "events": "8e285b91",
+      "nextId": 835,
+      "state": "b5607926",
+      "events": "37a7fb4b",
       "rng": {
         "draws": 941,
         "digest": "e68e1faa"
@@ -106,8 +106,8 @@
     {
       "tick": 160,
       "time": 8,
-      "nextId": 824,
-      "state": "cdd95290",
+      "nextId": 835,
+      "state": "7095fa38",
       "events": "741638a5",
       "rng": {
         "draws": 1157,
@@ -117,9 +117,9 @@
     {
       "tick": 180,
       "time": 9,
-      "nextId": 824,
-      "state": "72523085",
-      "events": "931594e2",
+      "nextId": 835,
+      "state": "786d4f45",
+      "events": "345f5724",
       "rng": {
         "draws": 1415,
         "digest": "0b6038ae"
@@ -128,9 +128,9 @@
     {
       "tick": 200,
       "time": 10,
-      "nextId": 824,
-      "state": "581cbd7f",
-      "events": "bdb2a32f",
+      "nextId": 835,
+      "state": "5575b93f",
+      "events": "3321033c",
       "rng": {
         "draws": 1671,
         "digest": "cbcbfc65"
@@ -139,9 +139,9 @@
     {
       "tick": 220,
       "time": 11,
-      "nextId": 824,
-      "state": "bbff003d",
-      "events": "8e285b91",
+      "nextId": 835,
+      "state": "9b25e741",
+      "events": "37a7fb4b",
       "rng": {
         "draws": 1836,
         "digest": "55d009f8"
@@ -150,9 +150,9 @@
     {
       "tick": 240,
       "time": 12,
-      "nextId": 824,
-      "state": "90c7a256",
-      "events": "8a595791",
+      "nextId": 835,
+      "state": "c44b3df6",
+      "events": "dd97a4c1",
       "rng": {
         "draws": 1980,
         "digest": "fb243d21"
@@ -161,9 +161,9 @@
     {
       "tick": 260,
       "time": 13,
-      "nextId": 824,
-      "state": "4e1b7319",
-      "events": "8e285b91",
+      "nextId": 835,
+      "state": "00f5db0d",
+      "events": "37a7fb4b",
       "rng": {
         "draws": 2149,
         "digest": "43b9d729"
@@ -172,8 +172,8 @@
     {
       "tick": 280,
       "time": 14,
-      "nextId": 824,
-      "state": "2456d177",
+      "nextId": 835,
+      "state": "0279a39b",
       "events": "741638a5",
       "rng": {
         "draws": 2321,
@@ -183,9 +183,9 @@
     {
       "tick": 300,
       "time": 15,
-      "nextId": 824,
-      "state": "d3f5f106",
-      "events": "08095f3d",
+      "nextId": 835,
+      "state": "8e1ddf3a",
+      "events": "c144298f",
       "rng": {
         "draws": 2473,
         "digest": "66d85696"
@@ -194,9 +194,9 @@
     {
       "tick": 320,
       "time": 16,
-      "nextId": 824,
-      "state": "154b7996",
-      "events": "8e285b91",
+      "nextId": 835,
+      "state": "7d6e7dde",
+      "events": "37a7fb4b",
       "rng": {
         "draws": 2645,
         "digest": "ea86ca61"
@@ -205,9 +205,9 @@
     {
       "tick": 340,
       "time": 17,
-      "nextId": 824,
-      "state": "797ed454",
-      "events": "a7177050",
+      "nextId": 835,
+      "state": "fc34d80c",
+      "events": "75e49cee",
       "rng": {
         "draws": 2852,
         "digest": "7ad76121"
@@ -216,9 +216,9 @@
     {
       "tick": 360,
       "time": 18,
-      "nextId": 824,
-      "state": "e24efcc8",
-      "events": "44cff9ca",
+      "nextId": 835,
+      "state": "07a7d286",
+      "events": "c11b3729",
       "rng": {
         "draws": 3051,
         "digest": "6dd99463"
@@ -227,8 +227,8 @@
     {
       "tick": 375,
       "time": 18.75,
-      "nextId": 824,
-      "state": "7351910e",
+      "nextId": 835,
+      "state": "656b798c",
       "events": "741638a5",
       "rng": {
         "draws": 3188,
@@ -306,7 +306,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 820,
+          "entityId": 831,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -397,7 +397,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 821,
+          "entityId": 832,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -488,7 +488,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 822,
+          "entityId": 833,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -530,7 +530,7 @@
               "name": "Moonwing Form",
               "remaining": 3581.25,
               "school": "arcane",
-              "sourceId": 820
+              "sourceId": 831
             },
             {
               "duration": 3600,
@@ -539,7 +539,7 @@
               "name": "Moontide",
               "remaining": 3600,
               "school": "nature",
-              "sourceId": 820
+              "sourceId": 831
             }
           ],
           "castTotal": 1.454545,
@@ -552,7 +552,7 @@
           "fiveSecondRule": 1,
           "gcdRemaining": 0.363636,
           "hp": 662,
-          "id": 820,
+          "id": 831,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -586,7 +586,7 @@
             "sta": 55,
             "str": 34
           },
-          "targetId": 823,
+          "targetId": 834,
           "templateId": "druid",
           "weapon": {
             "max": 6,
@@ -605,7 +605,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 117.75,
           "hp": 802,
-          "id": 821,
+          "id": 832,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -655,7 +655,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 117.75,
           "hp": 662,
-          "id": 822,
+          "id": 833,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -704,7 +704,7 @@
               "name": "Sunwake",
               "remaining": 8.1,
               "school": "nature",
-              "sourceId": 820,
+              "sourceId": 831,
               "tickInterval": 3,
               "tickTimer": 2.1,
               "value": 31
@@ -719,7 +719,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 998078,
-          "id": 823,
+          "id": 834,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -745,11 +745,11 @@
             "z": 1
           },
           "stats": {},
-          "tappedById": 820,
+          "tappedById": 831,
           "templateId": "training_dummy",
           "threat": [
             [
-              820,
+              831,
               1922
             ]
           ],
@@ -762,9 +762,9 @@
     {
       "tick": 380,
       "time": 19,
-      "nextId": 824,
-      "state": "7ccbd9f9",
-      "events": "e51d6f6c",
+      "nextId": 835,
+      "state": "936891df",
+      "events": "baa58ff3",
       "rng": {
         "draws": 3247,
         "digest": "b115f3b1"
@@ -773,8 +773,8 @@
     {
       "tick": 400,
       "time": 20,
-      "nextId": 824,
-      "state": "9fda15f9",
+      "nextId": 835,
+      "state": "4556828b",
       "events": "741638a5",
       "rng": {
         "draws": 3432,
@@ -784,9 +784,9 @@
     {
       "tick": 420,
       "time": 21,
-      "nextId": 824,
-      "state": "c452d4c9",
-      "events": "036eb6ea",
+      "nextId": 835,
+      "state": "4402bf17",
+      "events": "33ddb2da",
       "rng": {
         "draws": 3624,
         "digest": "8e318850"
@@ -795,8 +795,8 @@
     {
       "tick": 440,
       "time": 22,
-      "nextId": 824,
-      "state": "ab34bb4b",
+      "nextId": 835,
+      "state": "d382fd99",
       "events": "741638a5",
       "rng": {
         "draws": 3786,
@@ -806,320 +806,320 @@
     {
       "tick": 460,
       "time": 23,
-      "nextId": 824,
-      "state": "c942779c",
-      "events": "2c2903f0",
+      "nextId": 835,
+      "state": "ab094e6e",
+      "events": "a8076b8c",
       "rng": {
-        "draws": 3958,
-        "digest": "67ad98a7"
+        "draws": 3959,
+        "digest": "84e811ad"
       }
     },
     {
       "tick": 480,
       "time": 24,
-      "nextId": 824,
-      "state": "7b361bb6",
-      "events": "da34ae6a",
+      "nextId": 835,
+      "state": "c0236bec",
+      "events": "accd5cbe",
       "rng": {
-        "draws": 4119,
-        "digest": "15e7c96c"
+        "draws": 4113,
+        "digest": "2093ec0d"
       }
     },
     {
       "tick": 500,
       "time": 25,
-      "nextId": 824,
-      "state": "1922d629",
-      "events": "01d11671",
+      "nextId": 835,
+      "state": "fa83d4fe",
+      "events": "8c63771e",
       "rng": {
-        "draws": 4299,
-        "digest": "ace8ce1a"
+        "draws": 4303,
+        "digest": "c5ea81ea"
       }
     },
     {
       "tick": 520,
       "time": 26,
-      "nextId": 824,
-      "state": "78b17d23",
-      "events": "703f4ac4",
+      "nextId": 835,
+      "state": "90ae412b",
+      "events": "4ba08d0c",
       "rng": {
-        "draws": 4465,
-        "digest": "b9a27d89"
+        "draws": 4487,
+        "digest": "fe0f3b94"
       }
     },
     {
       "tick": 540,
       "time": 27,
-      "nextId": 824,
-      "state": "04db592e",
-      "events": "da86f246",
+      "nextId": 835,
+      "state": "4be10165",
+      "events": "5ea6a8da",
       "rng": {
-        "draws": 4624,
-        "digest": "927a97bd"
+        "draws": 4640,
+        "digest": "6e110264"
       }
     },
     {
       "tick": 560,
       "time": 28,
-      "nextId": 824,
-      "state": "a62fe32d",
-      "events": "b725c12b",
+      "nextId": 835,
+      "state": "750dd2fb",
+      "events": "3eba83aa",
       "rng": {
-        "draws": 4817,
-        "digest": "d4a39062"
+        "draws": 4823,
+        "digest": "3e0953ea"
       }
     },
     {
       "tick": 580,
       "time": 29,
-      "nextId": 824,
-      "state": "7839b479",
+      "nextId": 835,
+      "state": "4d4d7523",
       "events": "741638a5",
       "rng": {
-        "draws": 4998,
-        "digest": "062801d9"
+        "draws": 4984,
+        "digest": "c23b0707"
       }
     },
     {
       "tick": 600,
       "time": 30,
-      "nextId": 824,
-      "state": "6f7a7fd6",
-      "events": "f8ded3e2",
+      "nextId": 835,
+      "state": "470229cb",
+      "events": "2c0d02c3",
       "rng": {
-        "draws": 5183,
-        "digest": "28e26796"
+        "draws": 5176,
+        "digest": "9bc37e4d"
       }
     },
     {
       "tick": 620,
       "time": 31,
-      "nextId": 824,
-      "state": "ea4e7b10",
+      "nextId": 835,
+      "state": "f3aea5cd",
       "events": "741638a5",
       "rng": {
-        "draws": 5370,
-        "digest": "61cf3515"
+        "draws": 5355,
+        "digest": "38a43c2a"
       }
     },
     {
       "tick": 640,
       "time": 32,
-      "nextId": 824,
-      "state": "11127fde",
-      "events": "110d8166",
+      "nextId": 835,
+      "state": "b1dcf075",
+      "events": "4baf63c0",
       "rng": {
-        "draws": 5507,
-        "digest": "e076fea2"
+        "draws": 5502,
+        "digest": "025c14d2"
       }
     },
     {
       "tick": 660,
       "time": 33,
-      "nextId": 824,
-      "state": "94778261",
-      "events": "f8ded3e2",
+      "nextId": 835,
+      "state": "133dfac9",
+      "events": "e38fdcb9",
       "rng": {
-        "draws": 5694,
-        "digest": "65505095"
+        "draws": 5677,
+        "digest": "a83db30e"
       }
     },
     {
       "tick": 680,
       "time": 34,
-      "nextId": 824,
-      "state": "4ac1efbf",
+      "nextId": 835,
+      "state": "222ce383",
       "events": "741638a5",
       "rng": {
-        "draws": 5856,
-        "digest": "acbba4b6"
+        "draws": 5858,
+        "digest": "3947168f"
       }
     },
     {
       "tick": 700,
       "time": 35,
-      "nextId": 824,
-      "state": "c8492d39",
-      "events": "74d4bec3",
+      "nextId": 835,
+      "state": "7cd6018f",
+      "events": "52ddd7a6",
       "rng": {
-        "draws": 6023,
-        "digest": "c892db50"
+        "draws": 6063,
+        "digest": "40f02225"
       }
     },
     {
       "tick": 720,
       "time": 36,
-      "nextId": 824,
-      "state": "5fc425df",
+      "nextId": 835,
+      "state": "ae115d6d",
       "events": "741638a5",
       "rng": {
-        "draws": 6198,
-        "digest": "eb5b0104"
+        "draws": 6228,
+        "digest": "60d1f4f0"
       }
     },
     {
       "tick": 740,
       "time": 37,
-      "nextId": 824,
-      "state": "6e650dd1",
-      "events": "2c2903f0",
+      "nextId": 835,
+      "state": "9ca68938",
+      "events": "51016deb",
       "rng": {
-        "draws": 6369,
-        "digest": "7a5c3eb5"
+        "draws": 6411,
+        "digest": "a1b3483a"
       }
     },
     {
       "tick": 760,
       "time": 38,
-      "nextId": 824,
-      "state": "879fff6c",
+      "nextId": 835,
+      "state": "78f55cef",
       "events": "741638a5",
       "rng": {
-        "draws": 6541,
-        "digest": "f2663f81"
+        "draws": 6566,
+        "digest": "93f3b8c8"
       }
     },
     {
       "tick": 780,
       "time": 39,
-      "nextId": 824,
-      "state": "e05fafa0",
-      "events": "1c6332a7",
+      "nextId": 835,
+      "state": "a10366d3",
+      "events": "8728fe39",
       "rng": {
-        "draws": 6749,
-        "digest": "6d84ece6"
+        "draws": 6746,
+        "digest": "a7e8542d"
       }
     },
     {
       "tick": 800,
       "time": 40,
-      "nextId": 824,
-      "state": "00a8e1df",
+      "nextId": 835,
+      "state": "ec5157a8",
       "events": "741638a5",
       "rng": {
-        "draws": 6904,
-        "digest": "fce52cfa"
+        "draws": 6920,
+        "digest": "b8a1d262"
       }
     },
     {
       "tick": 820,
       "time": 41,
-      "nextId": 824,
-      "state": "223c12c7",
-      "events": "95f758e7",
+      "nextId": 835,
+      "state": "c27fc5c8",
+      "events": "6d8b6eaf",
       "rng": {
-        "draws": 7091,
-        "digest": "eb467e2c"
+        "draws": 7112,
+        "digest": "f85f4d63"
       }
     },
     {
       "tick": 840,
       "time": 42,
-      "nextId": 824,
-      "state": "51b33ea7",
-      "events": "d38a2e33",
+      "nextId": 835,
+      "state": "415a8818",
+      "events": "189ae8c0",
       "rng": {
-        "draws": 7244,
-        "digest": "f9c4b9c4"
+        "draws": 7284,
+        "digest": "8c8d7187"
       }
     },
     {
       "tick": 860,
       "time": 43,
-      "nextId": 824,
-      "state": "dfd3e2cf",
+      "nextId": 835,
+      "state": "388af0cc",
       "events": "741638a5",
       "rng": {
-        "draws": 7423,
-        "digest": "686dcce9"
+        "draws": 7464,
+        "digest": "60ce728a"
       }
     },
     {
       "tick": 880,
       "time": 44,
-      "nextId": 824,
-      "state": "99f98d41",
-      "events": "c2fbe364",
+      "nextId": 835,
+      "state": "e432f4be",
+      "events": "189ae8c0",
       "rng": {
-        "draws": 7618,
-        "digest": "96c31adb"
+        "draws": 7647,
+        "digest": "0f3a27bd"
       }
     },
     {
       "tick": 900,
       "time": 45,
-      "nextId": 824,
-      "state": "0f59e707",
+      "nextId": 835,
+      "state": "4e05d388",
       "events": "741638a5",
       "rng": {
-        "draws": 7749,
-        "digest": "fcf3b7be"
+        "draws": 7809,
+        "digest": "07c84447"
       }
     },
     {
       "tick": 920,
       "time": 46,
-      "nextId": 824,
-      "state": "83c8e0d7",
-      "events": "8921274c",
+      "nextId": 835,
+      "state": "64bcb7b2",
+      "events": "d7f3e1f3",
       "rng": {
-        "draws": 7940,
-        "digest": "712ff2eb"
+        "draws": 7989,
+        "digest": "681e8363"
       }
     },
     {
       "tick": 940,
       "time": 47,
-      "nextId": 824,
-      "state": "092c7771",
+      "nextId": 835,
+      "state": "bbb3d584",
       "events": "741638a5",
       "rng": {
-        "draws": 8118,
-        "digest": "258589ca"
+        "draws": 8157,
+        "digest": "d1f14a04"
       }
     },
     {
       "tick": 960,
       "time": 48,
-      "nextId": 824,
-      "state": "fa9755df",
-      "events": "b725c12b",
+      "nextId": 835,
+      "state": "ba9baef4",
+      "events": "d7f3e1f3",
       "rng": {
-        "draws": 8281,
-        "digest": "13b019a7"
+        "draws": 8326,
+        "digest": "9a96050b"
       }
     },
     {
       "tick": 980,
       "time": 49,
-      "nextId": 824,
-      "state": "6134866a",
-      "events": "32afc004",
+      "nextId": 835,
+      "state": "1152c95d",
+      "events": "10adf03b",
       "rng": {
-        "draws": 8478,
-        "digest": "af08021d"
+        "draws": 8535,
+        "digest": "d5918e7b"
       }
     },
     {
       "tick": 1000,
       "time": 50,
-      "nextId": 824,
-      "state": "2f1d66f2",
+      "nextId": 835,
+      "state": "86cd32dd",
       "events": "741638a5",
       "rng": {
-        "draws": 8655,
-        "digest": "4352d366"
+        "draws": 8696,
+        "digest": "97084f68"
       }
     },
     {
       "tick": 1015,
       "time": 50.75,
-      "nextId": 824,
-      "state": "c3bf85ef",
-      "events": "45ae0960",
+      "nextId": 835,
+      "state": "3b29e7a6",
+      "events": "4a8f285d",
       "rng": {
-        "draws": 8796,
-        "digest": "be4517a4"
+        "draws": 8821,
+        "digest": "8a796eb6"
       },
       "label": "wildfang-spend",
       "players": [
@@ -1193,7 +1193,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 820,
+          "entityId": 831,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -1237,13 +1237,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 3086
+            "damageDealt": 3114
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 3086
+              "dummyDamage": 3114
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1292,7 +1292,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 821,
+          "entityId": 832,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -1383,7 +1383,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 822,
+          "entityId": 833,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -1425,7 +1425,7 @@
               "name": "Moonwing Form",
               "remaining": 3549.25,
               "school": "arcane",
-              "sourceId": 820
+              "sourceId": 831
             },
             {
               "duration": 3600,
@@ -1434,7 +1434,7 @@
               "name": "Moontide",
               "remaining": 3600,
               "school": "nature",
-              "sourceId": 820
+              "sourceId": 831
             }
           ],
           "castTotal": 1.454545,
@@ -1446,7 +1446,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 33,
           "hp": 662,
-          "id": 820,
+          "id": 831,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1479,7 +1479,7 @@
             "sta": 55,
             "str": 34
           },
-          "targetId": 823,
+          "targetId": 834,
           "templateId": "druid",
           "weapon": {
             "max": 6,
@@ -1498,7 +1498,7 @@
               "name": "Bruin Form",
               "remaining": 3598,
               "school": "physical",
-              "sourceId": 821,
+              "sourceId": 832,
               "value": 0.65
             }
           ],
@@ -1512,7 +1512,7 @@
           "fiveSecondRule": 32,
           "gcdRemaining": 1.25,
           "hp": 692,
-          "id": 821,
+          "id": 832,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1521,7 +1521,7 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
-          "overpowerUntil": 45,
+          "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -1546,7 +1546,7 @@
             "sta": 69,
             "str": 34
           },
-          "targetId": 823,
+          "targetId": 834,
           "templateId": "druid",
           "weapon": {
             "max": 6,
@@ -1565,7 +1565,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 149.75,
           "hp": 662,
-          "id": 822,
+          "id": 833,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1614,8 +1614,8 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 994899,
-          "id": 823,
+          "hp": 994871,
+          "id": 834,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1641,16 +1641,16 @@
             "z": 1
           },
           "stats": {},
-          "tappedById": 820,
+          "tappedById": 831,
           "templateId": "training_dummy",
           "threat": [
             [
-              820,
+              831,
               2015
             ],
             [
-              821,
-              3947.706
+              832,
+              3639.496
             ]
           ],
           "weapon": {
@@ -1662,133 +1662,133 @@
     {
       "tick": 1020,
       "time": 51,
-      "nextId": 824,
-      "state": "5ed9800c",
-      "events": "8e9125ca",
+      "nextId": 835,
+      "state": "40fd1663",
+      "events": "bf890414",
       "rng": {
-        "draws": 8841,
-        "digest": "2210be8a"
+        "draws": 8861,
+        "digest": "f5dfc2f6"
       }
     },
     {
       "tick": 1040,
       "time": 52,
-      "nextId": 824,
-      "state": "567a281d",
+      "nextId": 835,
+      "state": "5e45638e",
       "events": "741638a5",
       "rng": {
-        "draws": 9006,
-        "digest": "7c7f1323"
+        "draws": 9051,
+        "digest": "3152d50c"
       }
     },
     {
       "tick": 1060,
       "time": 53,
-      "nextId": 824,
-      "state": "25452f72",
-      "events": "160c9e31",
+      "nextId": 835,
+      "state": "90aea245",
+      "events": "3dd6b99b",
       "rng": {
-        "draws": 9167,
-        "digest": "7c0f4d91"
+        "draws": 9220,
+        "digest": "1a51dd42"
       }
     },
     {
       "tick": 1080,
       "time": 54,
-      "nextId": 824,
-      "state": "48faf041",
-      "events": "e773a43c",
+      "nextId": 835,
+      "state": "f6fdc960",
+      "events": "f96ca6a8",
       "rng": {
-        "draws": 9340,
-        "digest": "dbd2cbe4"
+        "draws": 9410,
+        "digest": "97976527"
       }
     },
     {
       "tick": 1100,
       "time": 55,
-      "nextId": 824,
-      "state": "be583df7",
-      "events": "07977b7e",
+      "nextId": 835,
+      "state": "13d7cd6f",
+      "events": "26d327ca",
       "rng": {
-        "draws": 9494,
-        "digest": "da3a6e7f"
+        "draws": 9565,
+        "digest": "fae04bdf"
       }
     },
     {
       "tick": 1120,
       "time": 56,
-      "nextId": 824,
-      "state": "7b2b09c6",
-      "events": "e70c955e",
+      "nextId": 835,
+      "state": "9c312c74",
+      "events": "a7a21f80",
       "rng": {
-        "draws": 9656,
-        "digest": "78a2c633"
+        "draws": 9743,
+        "digest": "592197c0"
       }
     },
     {
       "tick": 1140,
       "time": 57,
-      "nextId": 824,
-      "state": "76e95417",
-      "events": "7be444e4",
+      "nextId": 835,
+      "state": "519b24c5",
+      "events": "8e048f46",
       "rng": {
-        "draws": 9808,
-        "digest": "72e290ff"
+        "draws": 9893,
+        "digest": "031bad5c"
       }
     },
     {
       "tick": 1160,
       "time": 58,
-      "nextId": 824,
-      "state": "3ce5fa29",
-      "events": "ba4e5acb",
+      "nextId": 835,
+      "state": "6e619791",
+      "events": "3ce28253",
       "rng": {
-        "draws": 9993,
-        "digest": "a07d27a6"
+        "draws": 10069,
+        "digest": "a614bd1f"
       }
     },
     {
       "tick": 1180,
       "time": 59,
-      "nextId": 824,
-      "state": "d510ff31",
-      "events": "0e47cc68",
+      "nextId": 835,
+      "state": "e6b464e5",
+      "events": "2ed90e7c",
       "rng": {
-        "draws": 10164,
-        "digest": "2b6d96db"
+        "draws": 10265,
+        "digest": "caf5a5c2"
       }
     },
     {
       "tick": 1200,
       "time": 60,
-      "nextId": 824,
-      "state": "6410727a",
-      "events": "7f1ffd3b",
+      "nextId": 835,
+      "state": "e2b91af4",
+      "events": "d51389a8",
       "rng": {
-        "draws": 10345,
-        "digest": "4571921e"
+        "draws": 10462,
+        "digest": "c4816818"
       }
     },
     {
       "tick": 1220,
       "time": 61,
-      "nextId": 824,
-      "state": "ed15b509",
-      "events": "0cfce687",
+      "nextId": 835,
+      "state": "94b122e7",
+      "events": "d6d9453f",
       "rng": {
-        "draws": 10544,
-        "digest": "bd5db364"
+        "draws": 10653,
+        "digest": "50b42acc"
       }
     },
     {
       "tick": 1225,
       "time": 61.25,
-      "nextId": 824,
-      "state": "41ac008b",
-      "events": "265e7500",
+      "nextId": 835,
+      "state": "e17e9f1c",
+      "events": "8ba520a4",
       "rng": {
-        "draws": 10586,
-        "digest": "fd543fb1"
+        "draws": 10693,
+        "digest": "6d42321e"
       },
       "label": "groveheart-harvest",
       "players": [
@@ -1862,7 +1862,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 820,
+          "entityId": 831,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -1906,13 +1906,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 3086
+            "damageDealt": 3114
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 3086
+              "dummyDamage": 3114
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1961,7 +1961,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 821,
+          "entityId": 832,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -2052,7 +2052,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 822,
+          "entityId": 833,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -2094,7 +2094,7 @@
               "name": "Moonwing Form",
               "remaining": 3538.75,
               "school": "arcane",
-              "sourceId": 820
+              "sourceId": 831
             },
             {
               "duration": 3600,
@@ -2103,7 +2103,7 @@
               "name": "Moontide",
               "remaining": 3600,
               "school": "nature",
-              "sourceId": 820
+              "sourceId": 831
             }
           ],
           "castTotal": 1.454545,
@@ -2115,7 +2115,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 43.5,
           "hp": 662,
-          "id": 820,
+          "id": 831,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2148,7 +2148,7 @@
             "sta": 55,
             "str": 34
           },
-          "targetId": 823,
+          "targetId": 834,
           "templateId": "druid",
           "weapon": {
             "max": 6,
@@ -2167,7 +2167,7 @@
               "name": "Bruin Form",
               "remaining": 3587.5,
               "school": "physical",
-              "sourceId": 821,
+              "sourceId": 832,
               "value": 0.65
             }
           ],
@@ -2180,7 +2180,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 42.5,
           "hp": 676,
-          "id": 821,
+          "id": 832,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2188,7 +2188,7 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
-          "overpowerUntil": 45,
+          "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -2213,7 +2213,7 @@
             "sta": 69,
             "str": 34
           },
-          "targetId": 823,
+          "targetId": 834,
           "templateId": "druid",
           "weapon": {
             "max": 6,
@@ -2232,7 +2232,7 @@
               "name": "Wildbloom",
               "remaining": 11.75,
               "school": "nature",
-              "sourceId": 822,
+              "sourceId": 833,
               "tickInterval": 3,
               "tickTimer": 2.75,
               "value": 81
@@ -2254,7 +2254,7 @@
           "fiveSecondRule": 0.25,
           "gcdRemaining": 1.25,
           "hp": 662,
-          "id": 822,
+          "id": 833,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2286,7 +2286,7 @@
             "sta": 55,
             "str": 34
           },
-          "targetId": 822,
+          "targetId": 833,
           "templateId": "druid",
           "weapon": {
             "max": 6,
@@ -2305,7 +2305,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1000000,
-          "id": 823,
+          "id": 834,
           "kind": "mob",
           "leashAnchor": {
             "x": 2,
@@ -2330,7 +2330,7 @@
             "z": 1
           },
           "stats": {},
-          "tappedById": 820,
+          "tappedById": 831,
           "templateId": "training_dummy",
           "weapon": {
             "speed": 2
@@ -2341,12 +2341,12 @@
     {
       "tick": 1225,
       "time": 61.25,
-      "nextId": 824,
-      "state": "41ac008b",
+      "nextId": 835,
+      "state": "e17e9f1c",
       "events": "741638a5",
       "rng": {
-        "draws": 10586,
-        "digest": "fd543fb1"
+        "draws": 10693,
+        "digest": "6d42321e"
       },
       "label": "final",
       "players": [
@@ -2420,7 +2420,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 820,
+          "entityId": 831,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -2464,13 +2464,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 3086
+            "damageDealt": 3114
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 3086
+              "dummyDamage": 3114
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2519,7 +2519,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 821,
+          "entityId": 832,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -2610,7 +2610,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 822,
+          "entityId": 833,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -2652,7 +2652,7 @@
               "name": "Moonwing Form",
               "remaining": 3538.75,
               "school": "arcane",
-              "sourceId": 820
+              "sourceId": 831
             },
             {
               "duration": 3600,
@@ -2661,7 +2661,7 @@
               "name": "Moontide",
               "remaining": 3600,
               "school": "nature",
-              "sourceId": 820
+              "sourceId": 831
             }
           ],
           "castTotal": 1.454545,
@@ -2673,7 +2673,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 43.5,
           "hp": 662,
-          "id": 820,
+          "id": 831,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2706,7 +2706,7 @@
             "sta": 55,
             "str": 34
           },
-          "targetId": 823,
+          "targetId": 834,
           "templateId": "druid",
           "weapon": {
             "max": 6,
@@ -2725,7 +2725,7 @@
               "name": "Bruin Form",
               "remaining": 3587.5,
               "school": "physical",
-              "sourceId": 821,
+              "sourceId": 832,
               "value": 0.65
             }
           ],
@@ -2738,7 +2738,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 42.5,
           "hp": 676,
-          "id": 821,
+          "id": 832,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2746,7 +2746,7 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
-          "overpowerUntil": 45,
+          "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -2771,7 +2771,7 @@
             "sta": 69,
             "str": 34
           },
-          "targetId": 823,
+          "targetId": 834,
           "templateId": "druid",
           "weapon": {
             "max": 6,
@@ -2790,7 +2790,7 @@
               "name": "Wildbloom",
               "remaining": 11.75,
               "school": "nature",
-              "sourceId": 822,
+              "sourceId": 833,
               "tickInterval": 3,
               "tickTimer": 2.75,
               "value": 81
@@ -2812,7 +2812,7 @@
           "fiveSecondRule": 0.25,
           "gcdRemaining": 1.25,
           "hp": 662,
-          "id": 822,
+          "id": 833,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2844,7 +2844,7 @@
             "sta": 55,
             "str": 34
           },
-          "targetId": 822,
+          "targetId": 833,
           "templateId": "druid",
           "weapon": {
             "max": 6,
@@ -2863,7 +2863,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1000000,
-          "id": 823,
+          "id": 834,
           "kind": "mob",
           "leashAnchor": {
             "x": 2,
@@ -2888,7 +2888,7 @@
             "z": 1
           },
           "stats": {},
-          "tappedById": 820,
+          "tappedById": 831,
           "templateId": "training_dummy",
           "weapon": {
             "speed": 2

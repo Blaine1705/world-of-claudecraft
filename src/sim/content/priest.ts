@@ -68,6 +68,11 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: false,
     requiresAuraKind: 'gloomtithe',
+    // Vespers consumes its OWN bank inside vespersAfterAbility (the summon
+    // scales off the stack count), so the generic cast-commit consume must not
+    // strip it first: doing so left summonTithefiend reading zero stacks and
+    // silently summoning nothing.
+    consumesRequiredAura: false,
     effects: [],
     description:
       'Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)',

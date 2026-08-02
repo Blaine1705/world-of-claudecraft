@@ -2027,7 +2027,13 @@ function applyAbility(
   // once its projectile lands (projectile_travel.ts); leaving the consume there
   // left the Icicles aura alive for a second castAbility press made in that
   // window, wrongly accepting a duplicate cast off the same stack (issue #2632).
-  if (ability.requiresAuraKind) consumeAuraKind(ctx, p, ability.requiresAuraKind);
+  // The class wave's `consumesRequiredAura: false` opt-out (Moonseed/Moonsurge,
+  // Sunwake) rides along to this relocated site: those spells REQUIRE the form
+  // aura but must not strip it, so the flag is honored here rather than at the
+  // old runEffects site.
+  if (ability.requiresAuraKind && ability.consumesRequiredAura !== false) {
+    consumeAuraKind(ctx, p, ability.requiresAuraKind);
+  }
 
   // helpful spells never miss
   if (
