@@ -371,7 +371,8 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
   // world-fixed here where the real mesh sways in its rotated model frame:
   // an accepted approximation, sub-pixel at every sprite distance. Rocks do
   // not wave in the real kit and take none.
-  const windStrength = category === 'rock' || !GFX.windSway ? 0 : category === 'tree' ? 0.08 : 0.096;
+  const windStrength =
+    category === 'rock' || !GFX.windSway ? 0 : category === 'tree' ? 0.08 : 0.096;
   mat.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = sharedUniforms.uTime;
     shader.uniforms.uImpSwap = swap;
