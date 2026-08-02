@@ -1327,6 +1327,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/quest/quest_dialog_controller.ts',
   'src/ui/hud/quest/quest_tracker_controller.ts',
   'src/ui/hud/quest/questlog_window.ts',
+  'src/ui/hud/vendor/buy_quantity_prompt.ts',
   'src/ui/hud/vendor/heroic_vendor_window.ts',
   'src/ui/hud/vendor/train_window.ts',
   'src/ui/hud/vendor/unbind_window.ts',
@@ -1366,6 +1367,7 @@ const UI_DOM_MODULES = [
   'src/ui/proc_overlay_drag.ts',
   'src/ui/profession_identity_card.ts',
   'src/ui/profession_tutorial_window.ts',
+  'src/ui/prompt_dialog.ts',
   // professions_window.ts is BACK on the ledger: the focus_restore move left
   // it host-free for a while, but armSentGuard's one-shot re-arm timer is a
   // real host reach, now spelled window.setTimeout so this sweep can see it

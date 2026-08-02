@@ -187,16 +187,27 @@ describe('diffChangedPaths', () => {
     expect(
       resolveTargets(['src/sim/content/vendor_row_gates.ts']).map((t: { key: string }) => t.key),
     ).toEqual(['vendor-tool-gate']);
-    // Both view halves resolve this target and ONLY this target. Worth pinning
-    // because it is easy to assume otherwise: the bags target lists 'ui/vendor'
-    // in its own `when`, but these modules live at src/ui/hud/vendor/, so that
-    // entry does not substring-match them and never shot this window.
+    // Both view halves resolve the advisory target AND the phase 21 count-row
+    // target (both windows change when either half changes), and nothing else.
+    // Worth pinning because it is easy to assume otherwise: the bags target
+    // lists 'ui/vendor' in its own `when`, but these modules live at
+    // src/ui/hud/vendor/, so that entry does not substring-match them and
+    // never shot this window.
     expect(
       resolveTargets(['src/ui/hud/vendor/vendor_view.ts']).map((t: { key: string }) => t.key),
-    ).toEqual(['vendor-tool-gate']);
+    ).toEqual(['vendor-tool-gate', 'vendor-buy-count']);
     expect(
       resolveTargets(['src/ui/hud/vendor/vendor_window.ts']).map((t: { key: string }) => t.key),
-    ).toEqual(['vendor-tool-gate']);
+    ).toEqual(['vendor-tool-gate', 'vendor-buy-count']);
+    // The count leaf and the prompt module reach ONLY the count-row target.
+    expect(
+      resolveTargets(['src/sim/vendor_buy_stack.ts']).map((t: { key: string }) => t.key),
+    ).toEqual(['vendor-buy-count']);
+    expect(
+      resolveTargets(['src/ui/hud/vendor/buy_quantity_prompt.ts']).map(
+        (t: { key: string }) => t.key,
+      ),
+    ).toEqual(['vendor-buy-count']);
     // A sim-only content change is still visual, because the gate changes what
     // the goods grid paints.
     expect(classifyDiff(['src/sim/content/vendor_row_gates.ts']).isVisual).toBe(true);
