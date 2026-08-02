@@ -389,18 +389,26 @@ For off-box safety, sync the directory to S3 occasionally:
   `woc_discord_bot_forbidden_blocks_total`, `woc_discord_bot_breaker_blocks_total`.
   Live gauges: `woc_discord_bot_queue_depth`, `woc_discord_bot_tracked_buckets`,
   `woc_discord_bot_tracked_routes`, `woc_discord_bot_active_queues`,
-  `woc_discord_bot_forbidden_entries`, `woc_discord_bot_breaker_state` (labeled
-  `state` over `closed`, `open`, `half-open`; 1 on the active state), and
-  `woc_discord_bot_push_age_seconds` (time since the last bot push). The two
+  `woc_discord_bot_forbidden_entries`, and `woc_discord_bot_breaker_state`
+  (labeled `state` over `closed`, `open`, `half-open`; 1 on the active state,
+  all three 0 when nothing is reporting a state: never pushed, stale, or the
+  last push carried an unrecognized state value). The two
   signals worth alerting on at 2am: **breaker opens** (any increase of
   `woc_discord_bot_breaker_opens_total` means the bot tripped its own circuit
   breaker; any open at all is worth an alert) and the **429 rate**
   (`sum(rate(woc_discord_bot_rate_limited_total[5m]))`; after the stability
   packet, normal is near zero, so a sustained climb is the next storm forming).
-  The gauges and the breaker state read zero five minutes after the bot stops
-  pushing (the same staleness rule the presence snapshot uses) while the
-  cumulative counters hold their totals; read `woc_discord_bot_push_age_seconds`
-  to tell a quiet bot from a dead one.
+  The five live gauges and the breaker state read zero five minutes after the
+  bot stops pushing (the same staleness rule the presence snapshot uses) while
+  the cumulative counters hold their totals. `woc_discord_bot_push_age_seconds`
+  (time since the last bot push) is neither: it keeps GROWING through
+  staleness, with two caveats to read it by. It renders 0 in a server process
+  that has never received a push, so a game-server restart while the bot is
+  down reads momentarily fresh (the all-zero counters beside it are the tell),
+  and the presence push is event-driven (a debounce over presence and voice
+  events), so a growing age can be a genuinely quiet guild as well as a dead
+  bot. Liveness belongs to the bot container's own healthcheck; the push age
+  says how old the numbers are, not whether the bot is alive.
 - **Game watchdog (wedge recovery)**: `deploy/game_watchdog.sh`, installed as
   `/usr/local/bin/eastbrook-watchdog` and fired every minute from
   `/etc/cron.d/eastbrook-watchdog`. Docker's `restart: unless-stopped` only acts when

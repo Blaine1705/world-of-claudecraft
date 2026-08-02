@@ -63,9 +63,11 @@ every phase start per the standing rules, never trust this line.
   `mem_limit`, `stop_grace_period`; fatal gateway close exits the process (nonzero) so
   `restart: unless-stopped` acts; Caddy 404s `/internal/*` alongside `/metrics`.
 - D16 Observability: bot counters (requests, 429s by scope, breaker state and opens,
-  queue depths, sweep durations, outbox drain sizes) piggyback on the existing presence
-  POST (both arms per D9), held in server memory, exposed as prom lines on the existing
-  metrics path. No new tables.
+  queue depths) piggyback on the existing presence POST (both arms per D9), held in
+  server memory, exposed as prom lines on the existing metrics path. No new tables.
+  The sweep-durations and outbox-drain-sizes items this decision originally listed
+  were TRIMMED by R22 (no accessor exists and adding one is out of the phase's
+  scope); the shipped surface is the 14-field governor snapshot.
 - D17 `/api/discord`: per-account short-TTL cached read via the `createCachedRead` seam
   with moderation busts wired in the same change; presence block stays as is.
 - D18 Scale envelope for design and assertions: 1,000 concurrent players, 5,000 guild
