@@ -7,6 +7,10 @@
 // equality, both directions), so a dropped file or an unwired id reds the suite.
 
 export const DEED_IMAGE_IDS: ReadonlySet<string> = new Set([
+  'chr_farshore_first_cast',
+  'chr_farshore_gatherer',
+  'chr_galecrest_first_cast',
+  'chr_galecrest_gatherer',
   'chr_gleamstag',
   'chr_hollow_rares',
   'chr_marsh_chapter_i',
@@ -36,6 +40,8 @@ export const DEED_IMAGE_IDS: ReadonlySet<string> = new Set([
   'chr_vale_gatherer',
   'chr_vale_packbreaker',
   'chr_vale_rares',
+  'chr_willowfen_first_cast',
+  'chr_willowfen_gatherer',
   'cmb_critical_eye',
   'cmb_first_blood',
   'cmb_first_fall',

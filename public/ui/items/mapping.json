@@ -980,14 +980,6 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
-      "itemId": "silkspun_satchel",
-      "name": "Silkspun Satchel",
-      "sourcePack": "woc_bags",
-      "sourceFile": "WoC_Bag_03.png (hue-shifted silk recolor of the linen_pouch conversion; dedicated art welcome)",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
       "itemId": "linen_scrap",
       "name": "Linen Scrap",
       "sourcePack": "generic100b",
@@ -2469,10 +2461,73 @@
       ]
     },
     {
-      "source": "World of ClaudeCraft procedural icon compositor (renderProceduralIconPng)",
+      "batchId": "release-v034-additional-art-silkspun-satchel-2026-08-02",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleReference": "in-game procedural icon recipe (icons.ts last_keep_signet: gold seal disc, ember gem)",
-      "commonPrompt": "not applicable: deterministic compositor render, no image model",
+      "styleReference": "Exact repository inputs and their roles are recorded in styleReferencesByItem; every reference is project-owned art and no external art was used.",
+      "styleReferencesByItem": {
+        "silkspun_satchel": [
+          {
+            "path": "public/ui/items/gravewoven_bag.webp",
+            "role": "style/material reference",
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "path": "public/ui/items/wolfhide_satchel.webp",
+            "role": "composition/safe-margin reference",
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "path": "public/ui/items/spider_silk.webp",
+            "role": "material reference",
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "path": "public/ui/items/goldleaf_herb.webp",
+            "role": "material/accent reference",
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          }
+        ]
+      },
+      "commonPrompt": "Create one fresh high-resolution square master for the World of ClaudeCraft inventory item Silkspun Satchel. Image 1 is a style/material reference for rich project bag rendering, Image 2 is a composition and safe-margin reference only, Image 3 is the spider-silk material reference, and Image 4 is the Goldleaf accent reference. Paint one tangible compact 10-slot tailoring satchel, centered in three-quarter view: a low crescent-mouthed soft field bag with folded charcoal-violet iridescent spider-silk panels, pale hand-bound thread seams, a sturdy asymmetrical flap, a small brass toggle, and restrained round-leaf gold embroidery worked into the fabric. Make its construction and silhouette entirely distinct from both referenced bags and from the current rectangular linen-pouch recolor; no sun emblem, bottles, dangling clutter, or copied strap layout. Opaque blue-black atmospheric vignette, top-left key light, restrained cool rim, strong silhouette at 28px, visual mass centered within 2px, 12-16px safe margin at 128px. No UI border, rarity frame, circular halo, text, watermark, mannequin, character, scenery, crop, excessive aura, or transparent background. Rarity comes from workmanship only.",
+      "itemIds": [
+        "silkspun_satchel"
+      ]
+    },
+    {
+      "batchId": "release-v034-additional-art-last-keep-signet-2026-08-02",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "Exact repository inputs and their roles are recorded in styleReferencesByItem; the CraftPix reference retains its licensed third-party lineage and is not called first-party.",
+      "styleReferencesByItem": {
+        "last_keep_signet": [
+          {
+            "path": "public/ui/items/kings_signet.webp",
+            "role": "ring composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/items/last_step_signet.webp",
+            "role": "dark-fantasy style reference",
+            "provenance": "World of ClaudeCraft project-generated OpenAI item art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/items/seal_of_the_nine_oaths.webp",
+            "role": "metalwork/detail reference",
+            "provenance": "World of ClaudeCraft project-generated OpenAI item art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          }
+        ]
+      },
+      "commonPrompt": "Create one fresh high-resolution square master for the World of ClaudeCraft inventory item Signet of the Last Keep. Image 1 is a ring composition reference, Image 2 is a dark-fantasy value/style reference, and Image 3 is a metalwork/detail reference; do not copy their gems, emblems, shapes, or aura layouts. Paint one tangible old garrison signet ring, centered in three-quarter view: a weighty worn antique-gold band with dark iron patina, a broad slightly irregular shield-shaped seal face engraved with an abstract crenellated gate and one closed portcullis, no letters or readable heraldry. Add a tiny ember-red wax trace caught in one groove, warm candle-amber key light from upper left, and a restrained cold blue-grey rim suggesting the silent Drakelands hall. It is a poignant floor-found keepsake, not royal treasure: no giant gemstone, spikes, skull, magical aura, or excessive ornament. Opaque charcoal/blue-black atmospheric vignette, strong silhouette at 28px, centered within 2px, 12-16px safe margin at 128px. No UI border, rarity frame, circular quality halo, text, watermark, hand, character, scene, crop, or transparent background.",
       "itemIds": [
         "last_keep_signet"
       ]

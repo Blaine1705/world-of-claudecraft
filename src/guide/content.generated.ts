@@ -4737,6 +4737,54 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 10,
     "feat": false,
     "crest": "/ui/deeds/chr_hollow_rares.webp"
+  },
+  {
+    "id": "chr_willowfen_gatherer",
+    "name": "Fenland Bounty",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_willowfen_gatherer.webp"
+  },
+  {
+    "id": "chr_willowfen_first_cast",
+    "name": "Ripples in the Lilymoors",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_willowfen_first_cast.webp"
+  },
+  {
+    "id": "chr_galecrest_gatherer",
+    "name": "Harvest on the Headland",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_galecrest_gatherer.webp"
+  },
+  {
+    "id": "chr_galecrest_first_cast",
+    "name": "A Line in the Mirror Tarn",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_galecrest_first_cast.webp"
+  },
+  {
+    "id": "chr_farshore_gatherer",
+    "name": "Island Provisions",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_farshore_gatherer.webp"
+  },
+  {
+    "id": "chr_farshore_first_cast",
+    "name": "What the Gulls Know",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_farshore_first_cast.webp"
   }
 ];
 

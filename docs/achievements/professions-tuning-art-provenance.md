@@ -60,3 +60,58 @@ The five shipping crests are gate-pinned for transparent padding, alpha bounds,
 center, coverage, dimensions, decoding, weight and byte uniqueness in
 `tests/deed_icons.test.ts`. The item gate literal-pins all 13 replacements and
 rejects the exact hashes of their retired placeholders.
+
+## Phase 20 bottom-map chronicle crests (2026-08-02)
+
+The phase 20 density pass appends the six bottom-map chronicle deeds
+(gatherer and first-cast pairs for the Willowfen, the Galecrest, and the
+Farshore). Their crests follow the same shared prompt contract above, one
+distinct OpenAI built-in image generation call per accepted asset, flat
+removable chroma exterior, keyed and centered to reviewed 512x512 RGBA
+sources, then
+`npm run assets:deeds -- tmp/imagegen/professions-deeds` for the committed
+128px WebP and the `src/ui/deed_image_ids.ts` regen.
+
+Per-crest subject direction and in-repository references:
+
+- `chr_willowfen_gatherer`: an equally readable triad of violet-banded ore, a
+  pale willow log, and one five-petal Sunpetal bloom against dark fen water
+  and reed silhouettes. Actual call references: `chr_marsh_gatherer`,
+  `thorium_ore`, `elderwood_log`, and `sunpetal_herb`.
+- `chr_willowfen_first_cast`: one silver trout rising through a ring of lily
+  pads under lantern light, restrained fen mist. References:
+  `chr_marsh_first_cast`, `chr_vale_first_cast`, and `raw_mirror_trout`.
+- `chr_galecrest_gatherer`: the same gatherer triad staged on windswept
+  headland grass with a low stone-wall hint. Actual call references:
+  `chr_peaks_gatherer`, `thorium_ore`, `elderwood_log`, and `sunpetal_herb`.
+- `chr_galecrest_first_cast`: a taut fishing line breaking one mirror-still
+  tarn circle beneath grey downs sky. References: `chr_peaks_glimmer_cast`,
+  `chr_vale_first_cast`, and `raw_river_perch`.
+- `chr_farshore_gatherer`: the gatherer triad of grey iron ore, an ash-pale
+  log, and one gold-leaf sprig against strand sand and causeway stones.
+  Actual call references: `chr_vale_gatherer`, `iron_ore`, `ashwood_log`, and
+  `goldleaf_herb`.
+- `chr_farshore_first_cast`: one koi-bright fish arcing over mere water with
+  two white gulls wheeling above. References: `chr_vale_first_cast`,
+  `chr_marsh_first_cast`, and `glimmerfin_koi`.
+
+The initial Willowfen proof pair was rejected because its cardinal points were
+too long. The second gatherer attempt was rejected because the Sunpetal had six
+petals; its separately generated third attempt has exactly five. The second
+first-cast attempt was accepted after tightening the common frame geometry.
+Useful rejected proofs remain in the gitignored worktree source area.
+
+The accepted masters were copied under
+`tmp/imagegen/release-v034-additions/masters/deeds/`. Their flat magenta
+exteriors were removed with the imagegen skill helper using `--auto-key border`,
+`--soft-matte`, `--transparent-threshold 24`, `--opaque-threshold 96`, and
+`--despill`. Original interior pixels were restored beneath a closed and eroded
+subject mask so magenta-like in-medallion accents remained opaque while the
+helper's soft, despilled edge was preserved. The resulting sources were
+centered deterministically in 512px sRGB canvases. The Galecrest first-cast
+cutout received a final uniform fit correction to keep its circular body and
+cardinal points centered after the alpha pass.
+
+Exact accepted prompts, repository-reference roles and licences, source and
+shipping hashes, alpha geometry, processing steps, and review sheets are
+recorded in `docs/achievements/release-v034-additional-art.json`.

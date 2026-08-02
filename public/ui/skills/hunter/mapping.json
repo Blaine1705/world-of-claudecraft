@@ -76,9 +76,34 @@
     },
     {
       "abilityId": "aspect_of_the_monkey",
-      "sourcePack": "_Missing_Icons_Hunter",
-      "sourceFile": "41.png",
-      "output": "aspect_of_the_monkey.webp"
+      "sourcePack": "woc_openai_release_v034_audit_2026_08_02",
+      "sourceFile": "tmp/imagegen/release-v034-additions/accepted/abilities/hunter/aspect_of_the_monkey.png",
+      "output": "aspect_of_the_monkey.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A lithe pine marten twisting through a near-miss in an S-curve of green-gold nature motion, depicting agility and dodge rather than stealth.",
+      "references": [
+        {
+          "path": "public/ui/skills/hunter/aspect_of_the_hawk.webp",
+          "role": "hunter class style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/hunter/aspect_of_the_wild.webp",
+          "role": "class palette/composition reference",
+          "provenance": "World of ClaudeCraft project-generated OpenAI ability art",
+          "license": "World of ClaudeCraft project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/skills/hunter/bestial_wrath.webp",
+          "role": "creature-feature action reference",
+          "provenance": "World of ClaudeCraft project-generated OpenAI ability art",
+          "license": "World of ClaudeCraft project asset, rights reserved"
+        }
+      ],
+      "generationPrompt": "Create one fresh distinct premium hand-painted dark-fantasy MMORPG Hunter ability icon for Marten's Guise (runtime id aspect_of_the_monkey). Image 1 is the Hunter class brushwork/style reference, Image 2 is the green-gold class palette and creature-composition reference, and Image 3 is a readable creature-action reference. Do not copy any animal, face, sun, ring, or layout from them. Canonical mechanic: a level-5 Nature aspect granting the Hunter 8% dodge for 30 minutes. Paint one anatomically coherent lithe pine marten in a full-body twisting leap, its long flexible torso forming a strong diagonal S-curve as a blurred claw strike or arrow passes just behind it, a clear near-miss that reads as supernatural agility and dodge, not stealth or aggression. Warm chestnut and cream fur, alert dark eyes, restrained green-gold leaf-stream motion, opaque deep forest atmospheric background. One dominant action; focal subject fills 78-86% with equivalent 8-14px safe margin at 128px; perfectly centered visual mass; crisp marten head, forepaws, and tail silhouette at 32px and 48px; deep values and controlled highlights. Must be visually unrelated to the existing golden-eyes Prowl icon. No text, letters, numbers, border, frame, badge, rarity chrome, watermark, modern graphic design, flat glyph, duplicated anatomy, extra animals, human figure, excessive bloom, or crop."
     },
     {
       "abilityId": "aspect_of_the_wild",
@@ -356,7 +381,7 @@
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for hunter\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Wyvern Sting (wyvern_sting)\nCanonical mechanic: Wyvern Sting incapacitates a target 8 to 30 yd away for up to 4 sec; damage breaks it; 60 sec cooldown.\nSubject: A winged serpent stinger piercing a closing eye with sleep vapor.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     }
   ],
-  "note": "5 beast/aspect-animal abilities lack art in the archer pack; they keep their procedural icons until a beast/companion pack is added.",
+  "note": "Every live Hunter ability has painted art. Existing procedural recipes remain available as runtime resilience if a static asset cannot load.",
   "deferredStayProcedural": {},
-  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 and woc_openai_release_v034_audit_2026_08_02 entries are project-generated and explicitly override it."
 }

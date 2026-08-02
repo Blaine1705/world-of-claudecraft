@@ -511,7 +511,7 @@ describe('missing painted deed and Heroic weapon integration', () => {
       'dgn_wildheart_basin_heroic',
       'pvp_card_duel_first_win',
     ]);
-    expect(DEED_ORDER).toHaveLength(226);
+    expect(DEED_ORDER).toHaveLength(232);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(
@@ -525,7 +525,7 @@ describe('missing painted deed and Heroic weapon integration', () => {
     const generatedRow = creditRows.find((line) =>
       line.startsWith('| Generated Book of Deeds additions'),
     );
-    expect(commissionedRow).toContain('excluding the eight generated additions listed next');
+    expect(commissionedRow).toContain('excluding the fourteen generated additions listed next');
     expect(generatedRow).toContain('World of ClaudeCraft');
     expect(generatedRow).toContain('OpenAI built-in image generation');
     for (const id of accepted.targetSets.deeds) {
@@ -539,6 +539,30 @@ describe('missing painted deed and Heroic weapon integration', () => {
       expect(iconDataUrl('crest', `deed_${id}`), `${id} Book/wiki URL`).toBe(
         `/ui/deeds/${id}.webp`,
       );
+    }
+    // The phase 20 bottom-map chronicle crests ride the professions-tuning
+    // provenance doc rather than this wave's manifest; pin their credit and
+    // lineage rows the same way (the review round: the "fourteen" count
+    // alone would stay green with all six ids deleted from the row).
+    const PHASE20_DEED_ART_IDS = [
+      'chr_willowfen_gatherer',
+      'chr_willowfen_first_cast',
+      'chr_galecrest_gatherer',
+      'chr_galecrest_first_cast',
+      'chr_farshore_gatherer',
+      'chr_farshore_first_cast',
+    ];
+    const tuningProvenance = readFileSync(
+      path.join(repoRoot, 'docs/achievements/professions-tuning-art-provenance.md'),
+      'utf8',
+    );
+    for (const id of PHASE20_DEED_ART_IDS) {
+      expect(generatedRow, `${id} generated credit owner`).toContain(`\`${id}\``);
+      expect(
+        creditRows.filter((line) => line.includes(`\`${id}\``)),
+        `${id} must occur in exactly one credit row`,
+      ).toHaveLength(1);
+      expect(tuningProvenance, `${id} prompt/lineage record`).toContain(`\`${id}\``);
     }
   });
 

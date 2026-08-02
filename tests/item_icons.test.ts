@@ -390,14 +390,22 @@ describe('item webp icons', () => {
       expect(batch.styleReference).toBeTruthy();
       expect(batch.commonPrompt).toBeTruthy();
     }
-    // The bag family is project-owned art, so each of its entries overrides the file-level
-    // CraftPix license. A bag icon silently inheriting the pack license would misattribute it.
-    for (const id of [...BAG_IDS, 'backpack']) {
+    // The legacy bag family is project-owned art, so each curated entry overrides the
+    // file-level CraftPix license. Silkspun Satchel is separately generated and therefore
+    // belongs only to generatedBatches, never to the ordinary CraftPix-governed entries.
+    for (const id of [...BAG_IDS.filter((bagId) => bagId !== 'silkspun_satchel'), 'backpack']) {
       const entry = m.entries.find((e) => e.itemId === id);
       expect(entry?.license, `${id} must carry its own license override`).toContain(
         'World of ClaudeCraft original art',
       );
     }
+    expect(m.entries.some((entry) => entry.itemId === 'silkspun_satchel')).toBe(false);
+    const silkspunOwners = (m.generatedBatches ?? []).filter((batch) =>
+      batch.itemIds.includes('silkspun_satchel'),
+    );
+    expect(silkspunOwners, 'silkspun_satchel generated-art owner').toHaveLength(1);
+    expect(silkspunOwners[0].source).toBe('OpenAI built-in image generation');
+    expect(silkspunOwners[0].license).toContain('project asset');
   });
 
   it('F2) ships the complete project-owned professions material art set', () => {

@@ -361,7 +361,7 @@ describe('Book of Deeds webp icons', () => {
     // catalog makes this loop empty, so the synthetic id below keeps the branch pinned.
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
     expect(artless, 'all live deeds must now resolve to painted art').toEqual([]);
-    expect(DEED_IMAGE_IDS.size, 'the complete live deed catalog is painted').toBe(226);
+    expect(DEED_IMAGE_IDS.size, 'the complete live deed catalog is painted').toBe(232);
     for (const id of artless) {
       const crestId = deedCrestId(id, DEEDS[id].category);
       expect(deedImageUrl(crestId), `${id} -> ${crestId} must have no committed image`).toBeNull();

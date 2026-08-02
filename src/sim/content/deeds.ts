@@ -2304,6 +2304,78 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'visits', markIds: ['slain:old_marrowshell', 'slain:aurelhorn'] },
   },
+  // The phase 20 density pass brought the three bottom-map zones to the
+  // strip's own gathering density (Q26 in
+  // docs/design/professions-tuning-packet-review.md): each gets the zone
+  // chronicle pair the strip zones carry, the gatherer chronicle (the R21
+  // line) and the first-cast deed. The gather marks have been written by
+  // completeGatherCast since the v0.32.0 starter kits shipped; the fish
+  // marks fire through ZONE_FISH rows listing the Vale-fallback draws these
+  // zones' waters actually yield until the zone-4 pass authors their own
+  // catch tables. Standalone chronicles with no chapter meta (the
+  // chr_peaks_gatherer precedent; shipped chapter triggers are frozen,
+  // authoring rule 9).
+  chr_willowfen_gatherer: {
+    id: 'chr_willowfen_gatherer',
+    name: 'Fenland Bounty',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Willowfen.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:willowfen:ore', 'gather:willowfen:wood', 'gather:willowfen:herb'],
+    },
+  },
+  chr_willowfen_first_cast: {
+    id: 'chr_willowfen_first_cast',
+    name: 'Ripples in the Lilymoors',
+    desc: 'Catch a fish from the waters of the Willowfen.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:willowfen' },
+  },
+  chr_galecrest_gatherer: {
+    id: 'chr_galecrest_gatherer',
+    name: 'Harvest on the Headland',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Galecrest.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:galecrest:ore', 'gather:galecrest:wood', 'gather:galecrest:herb'],
+    },
+  },
+  chr_galecrest_first_cast: {
+    id: 'chr_galecrest_first_cast',
+    name: 'A Line in the Mirror Tarn',
+    desc: 'Catch a fish from the waters of the Galecrest.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:galecrest' },
+  },
+  chr_farshore_gatherer: {
+    id: 'chr_farshore_gatherer',
+    name: 'Island Provisions',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch on the Farshore.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: [
+        'gather:farshore_isle:ore',
+        'gather:farshore_isle:wood',
+        'gather:farshore_isle:herb',
+      ],
+    },
+  },
+  chr_farshore_first_cast: {
+    id: 'chr_farshore_first_cast',
+    name: 'What the Gulls Know',
+    desc: 'Catch a fish from the waters of the Farshore.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:farshore_isle' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {
