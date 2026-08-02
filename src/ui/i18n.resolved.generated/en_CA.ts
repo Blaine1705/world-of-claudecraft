@@ -7038,6 +7038,8 @@ export const en_CA: EnTranslations = {
       "close": "Close vendor",
       "hint": "Click an item in your bags to sell it while this window is open.",
       "buyAria": "Buy {item} for {price}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Buyback",
       "buybackEmpty": "No items",
       "buybackAria": "Buy back {item} for {price}",

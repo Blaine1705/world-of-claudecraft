@@ -48,6 +48,9 @@ vi.mock('../server/auth', () => ({
   MIN_PASSWORD_LENGTH: 6,
   MAX_PASSWORD_LENGTH: 128,
 }));
+vi.mock('../server/account', () => ({
+  verifyLoginTwoFactor: vi.fn(async () => false),
+}));
 vi.mock('../server/moderation_db', () => ({
   forceCharacterRename: vi.fn(),
   moderationQueue: vi.fn(),
@@ -91,6 +94,7 @@ vi.mock('../server/staff_db', () => ({
   roleChangeHistory: vi.fn(async () => []),
 }));
 
+import { verifyLoginTwoFactor } from '../server/account';
 import {
   configureAdminPlayersCap,
   handleAdminApi,
@@ -152,7 +156,7 @@ import {
   recordPasswordReset,
   resetChatStrikesAudited,
 } from '../server/moderation_db';
-import { resetAuthFailures } from '../server/ratelimit';
+import { authFailureCount, resetAuthFailures } from '../server/ratelimit';
 import {
   adminRolesForAccount,
   listStaff,
@@ -2432,6 +2436,122 @@ describe('admin login: per-account failed-login throttle (distributed brute forc
       );
     }
     expect(lastRes.statusCode).toBe(401);
+  });
+});
+
+// Regression coverage for BUG #15: the legacy handleLogin arm verified only
+// password + staff role and skipped the account's TOTP second factor entirely
+// (unlike POST /api/login, server/auth_routes.ts loginHandler), so an operator
+// with 2FA enabled could sign into the highest-privilege surface in the app
+// with a bare password.
+describe('admin login: two-factor', () => {
+  it('returns twoFactorRequired without a token when 2FA is on and no code is supplied', async () => {
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 3,
+      username: 'alice',
+      password_hash: 'hash',
+      totp_enabled_at: '2020-01-01T00:00:00.000Z',
+    } as never);
+    vi.mocked(verifyPassword).mockResolvedValueOnce(true);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'alice', roles: ['viewer'] });
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        url: '/admin/api/login',
+        body: { username: 'alice', password: 'pw' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toEqual({ twoFactorRequired: true });
+    expect(verifyLoginTwoFactor).not.toHaveBeenCalled();
+  });
+
+  it('401s an invalid 2FA code and records a failure', async () => {
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 3,
+      username: 'alice',
+      password_hash: 'hash',
+      totp_enabled_at: '2020-01-01T00:00:00.000Z',
+    } as never);
+    vi.mocked(verifyPassword).mockResolvedValueOnce(true);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'alice', roles: ['viewer'] });
+    vi.mocked(verifyLoginTwoFactor).mockResolvedValueOnce(false);
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        url: '/admin/api/login',
+        body: { username: 'alice', password: 'pw', code: '000000' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(401);
+    expect(res.body.error).toBe('invalid authentication code');
+    expect(authFailureCount()).toBe(1);
+  });
+
+  it('200s and issues a token for a good 2FA code', async () => {
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 3,
+      username: 'alice',
+      password_hash: 'hash',
+      totp_enabled_at: '2020-01-01T00:00:00.000Z',
+    } as never);
+    vi.mocked(verifyPassword).mockResolvedValueOnce(true);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'alice', roles: ['viewer'] });
+    vi.mocked(verifyLoginTwoFactor).mockResolvedValueOnce(true);
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        url: '/admin/api/login',
+        body: { username: 'alice', password: 'pw', code: '123456' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toEqual({
+      token: 'b'.repeat(64),
+      username: 'alice',
+      roles: ['viewer'],
+      permissions: expect.arrayContaining(['analytics.read', 'support.read', 'accounts.read']),
+    });
+  });
+
+  it('never challenges a staff account without 2FA enabled (no regression)', async () => {
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 3,
+      username: 'alice',
+      password_hash: 'hash',
+    } as never);
+    vi.mocked(verifyPassword).mockResolvedValueOnce(true);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'alice', roles: ['viewer'] });
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        url: '/admin/api/login',
+        body: { username: 'alice', password: 'pw' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect((res.body.data as { token?: string }).token).toBe('b'.repeat(64));
+    expect(verifyLoginTwoFactor).not.toHaveBeenCalled();
   });
 });
 

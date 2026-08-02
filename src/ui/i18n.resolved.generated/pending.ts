@@ -11,68 +11,113 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "es_ES": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "fr_FR": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "fr_CA": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "en_CA": [],
   "it_IT": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "de_DE": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "zh_TW": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "ko_KR": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "ja_JP": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
   "pt_BR": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
   "cs_CZ": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "nl_NL": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "pl_PL": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "id_ID": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "tr_TR": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "sv_SE": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "vi_VN": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "da_DK": [
     "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed"
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ]
 };

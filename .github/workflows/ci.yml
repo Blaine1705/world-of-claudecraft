@@ -12,6 +12,18 @@ on:
 permissions:
   contents: read
 
+# A push to an open PR never cancelled its superseded run (no concurrency group), so a
+# quick follow-up push left the stale run's jobs occupying runner slots for the full 8 to
+# 14 minutes of `pr-gate` alongside the new run's own jobs, competing for this account's
+# shared concurrent-job pool and inflating queue time for every other run in flight, not
+# just this one. Grouping and cancelling by PR number fixes that; push events (main,
+# dev-*, release/**) fall back to `github.ref` and are NOT cancelled; those are typically
+# one push per merge, and losing an in-flight release-gate run to a fast follow-up push
+# is a worse trade than the queue time it would save.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 # Two-tier i18n gate, split by git ref in this one file:
 #
 #   pr-gate       cheap, English-only-legal tier. Runs on pull requests, on pushes
@@ -225,6 +237,19 @@ jobs:
       - name: Malicious-code gate
         run: npm run security:gate
 
+      # tsc's own incremental cache (node_modules/.cache/tsc/buildinfo.json, via
+      # check:ts's --incremental flag). Keyed on the lockfile and tsconfig so a
+      # dependency or compiler-option change starts clean; tsc still verifies
+      # every file's content hash against the cache, so a stale restore only
+      # saves the unchanged-file re-check, never hides a real type error.
+      - name: Cache tsc incremental buildinfo
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.cache/tsc
+          key: tsc-buildinfo-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json') }}-${{ github.sha }}
+          restore-keys: |
+            tsc-buildinfo-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json') }}-
+
       - name: Typecheck
         run: npm run check:types
 
@@ -310,6 +335,17 @@ jobs:
       # available cores, matching the bounded local gate.
       - name: Run tests (release tier - 21-locale + empty-pending, shard ${{ matrix.shard }} of 4)
         run: npm test -- --shard=${{ matrix.shard }}/4 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
+
+      # See the pr-checks job for the rationale (tsc still content-hashes every
+      # file against the restored cache, so a stale restore can't hide an error).
+      - name: Cache tsc incremental buildinfo
+        if: matrix.shard == 1
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.cache/tsc
+          key: tsc-buildinfo-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json') }}-${{ github.sha }}
+          restore-keys: |
+            tsc-buildinfo-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json') }}-
 
       - name: Typecheck
         if: matrix.shard == 1

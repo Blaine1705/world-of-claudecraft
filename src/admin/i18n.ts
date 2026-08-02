@@ -185,6 +185,7 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   'too many failed attempts, wait a few minutes and try again': 'error.tooManyFailedAttempts',
   'invalid username or password': 'error.invalidCredentials',
   'this account does not have admin access': 'error.noAdminAccess',
+  'invalid authentication code': 'error.invalidTwoFactorCode',
   'admin accounts cannot be suspended or banned': 'error.cannotModerateAdmin',
   'open report not found': 'error.reportNotFound',
   'account not found': 'error.accountNotFound',

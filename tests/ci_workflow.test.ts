@@ -24,6 +24,16 @@ function jobSource(name: string): string {
 }
 
 describe('CI workflow parity', () => {
+  it('cancels a superseded PR run but never a superseded push-to-branch run', () => {
+    // Anchored above the first job (`\n\njobs:`) so a future job named "concurrency"
+    // could never be mistaken for this block.
+    const concurrency = workflow.slice(0, workflow.indexOf('\njobs:'));
+    expect(concurrency).toContain(
+      'group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}',
+    );
+    expect(concurrency).toContain("cancel-in-progress: ${{ github.event_name == 'pull_request' }}");
+  });
+
   it('runs the canonical game and admin typecheck in CI and the local gate', () => {
     expect(workflow.match(/run: npm run check:types/g)).toHaveLength(2);
     expect(workflow).not.toContain('run: npx tsc --noEmit');
@@ -122,7 +132,7 @@ describe('CI workflow parity', () => {
     // ...and a structural count, the same backstop release-gate has: an added
     // or removed pr-checks step must consciously update this test rather than
     // slipping in beside the by-name pins above.
-    expect(prChecks.match(/\n {6}- name: /g)).toHaveLength(12);
+    expect(prChecks.match(/\n {6}- name: /g)).toHaveLength(13);
     // pr-checks is unsharded, so NO step in it may carry a condition: an
     // `if: matrix.shard == 1` copy-pasted here is never true and would disable
     // that step outright.
@@ -168,10 +178,10 @@ describe('CI workflow parity', () => {
     // ...while release-gate keeps its serialized checks and builds on exactly
     // one shard each (they are not partitionable and must not run four times):
     // i18n:gen, the freshness diff, the coverage summary, the malware gate,
-    // typecheck, and the four builds (env, server, bot, client). Every new
-    // non-test step added to release-gate needs the same single-shard
-    // condition, and this count.
-    expect(releaseGate.match(/if: matrix\.shard == 1/g)).toHaveLength(9);
+    // the tsc buildinfo cache restore, typecheck, and the four builds (env,
+    // server, bot, client). Every new non-test step added to release-gate
+    // needs the same single-shard condition, and this count.
+    expect(releaseGate.match(/if: matrix\.shard == 1/g)).toHaveLength(10);
     // The release TEST step itself must stay un-gated (run on every shard):
     // name-to-run adjacency proves no if: line sits between them, so a
     // compensating double-edit (gate the test step, un-gate a build; count
@@ -186,7 +196,7 @@ describe('CI workflow parity', () => {
     // run four times per release push; pr-gate stays exactly checkout,
     // setup-node, npm ci, and the sharded test run).
     expect(prGate.match(/\n {6}- name: /g)).toHaveLength(4);
-    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(13);
+    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(14);
     // ...and by NAME, because the two counts above are compensable: deleting a
     // build step and adding any other single-shard step keeps both totals and
     // would silently stop shipping that bundle from the release tier.
