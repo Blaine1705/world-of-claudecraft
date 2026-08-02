@@ -149,6 +149,11 @@ import {
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
 
+// The online mirror decodes terse legacy wire JSON. Runtime guards below narrow
+// individual fields as they are consumed; this alias keeps the decoder local.
+// biome-ignore lint/suspicious/noExplicitAny: legacy wire JSON is intentionally loose at the boundary.
+type LooseJson = any;
+
 interface ClientWireAura {
   id: string;
   name: string;
@@ -371,7 +376,7 @@ export class Api {
     }
   }
 
-  private async post(path: string, body: unknown, base = this.base): Promise<any> {
+  private async post<T = LooseJson>(path: string, body: unknown, base = this.base): Promise<T> {
     const res = await fetch(apiUrl(path, base), {
       method: 'POST',
       headers: {
@@ -382,19 +387,19 @@ export class Api {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw apiErrorFromBody(data, res.status);
-    return data;
+    return data as T;
   }
 
-  private async get(path: string): Promise<any> {
+  private async get<T = LooseJson>(path: string): Promise<T> {
     const res = await fetch(apiUrl(path, this.base), {
       headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw apiErrorFromBody(data, res.status);
-    return data;
+    return data as T;
   }
 
-  private async delete(path: string, body: unknown): Promise<any> {
+  private async delete<T = LooseJson>(path: string, body: unknown): Promise<T> {
     const res = await fetch(apiUrl(path, this.base), {
       method: 'DELETE',
       headers: {
@@ -405,7 +410,7 @@ export class Api {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw apiErrorFromBody(data, res.status);
-    return data;
+    return data as T;
   }
 
   async register(
@@ -951,12 +956,29 @@ export class Api {
     await this.delete('/api/github', {});
   }
 
+  // The /api/status capability adverts (steam, epic, dev commands) are read
+  // back to back on the same refresh paths, so concurrent reads collapse into
+  // ONE request. In-flight only, keyed by the realm base: nothing is memoized
+  // past settle, so every non-overlapping call still reads the server fresh,
+  // and a realm switch mid-flight never serves the old realm's document.
+  private statusDocInFlight: { base: string; doc: Promise<any> } | null = null;
+
+  private statusDoc(): Promise<any> {
+    const hit = this.statusDocInFlight;
+    if (hit !== null && hit.base === this.base) return hit.doc;
+    const doc = this.get('/api/status').finally(() => {
+      if (this.statusDocInFlight?.doc === doc) this.statusDocInFlight = null;
+    });
+    this.statusDocInFlight = { base: this.base, doc };
+    return doc;
+  }
+
   // ── Steam link (deed achievement mirror) ───────────────────────────────────
   // The public capability advert: whether this server has the Steam surface
   // lit. Read BEFORE any authed steam call so a dark server renders no link UI.
   async steamAdvert(): Promise<boolean> {
     try {
-      const data = await this.get('/api/status');
+      const data = await this.statusDoc();
       return (data.steam as { enabled?: boolean } | undefined)?.enabled === true;
     } catch {
       return false;
@@ -969,7 +991,7 @@ export class Api {
   // so a forged true opens an inert window. Fails closed on any error.
   async devCommandsAdvert(): Promise<boolean> {
     try {
-      const data = await this.get('/api/status');
+      const data = await this.statusDoc();
       return data.dev_commands === true;
     } catch {
       return false;
@@ -990,6 +1012,36 @@ export class Api {
   // Unlink Steam from the current account. Idempotent.
   async unlinkSteam(): Promise<void> {
     await this.delete('/api/steam/link', {});
+  }
+
+  // ── Epic link (deed achievement mirror) ────────────────────────────────────
+  // The public capability advert: whether this server has the Epic surface lit.
+  // Read BEFORE any authed epic call so a dark server renders no link UI (D3, D18).
+  // Rides the shared single-flight status read: the Steam and Epic refreshes
+  // run back to back on every login path, and one document serves both.
+  async epicAdvert(): Promise<boolean> {
+    try {
+      const data = await this.statusDoc();
+      return (data.epic as { enabled?: boolean } | undefined)?.enabled === true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Current account's Epic link status ({ enabled, linked, epicAccountId? }).
+  async epicStatus(): Promise<Record<string, unknown>> {
+    return this.get('/api/epic/status');
+  }
+
+  // Link via a desktop-shell proof; the server verifies it upstream and answers
+  // the verified id (never client-named; D11, D17).
+  async epicLink(proof: string): Promise<{ linked: boolean; epicAccountId: string }> {
+    return this.post('/api/epic/link', { proof });
+  }
+
+  // Unlink Epic from the current account. Idempotent.
+  async unlinkEpic(): Promise<void> {
+    await this.delete('/api/epic/link', {});
   }
 
   // ── Shareable player card + referrals ──────────────────────────────────────
@@ -1267,6 +1319,7 @@ function blankEntity(id: number): Entity {
     spawnPos: { x: 0, y: 0, z: 0 },
     leashAnchor: null,
     evadeStall: 0,
+    chaseStall: 0,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
@@ -1432,6 +1485,13 @@ export class ClientWorld implements IWorld {
   // Active procedural Rift floor, rebuilt from the riftState event (no snapshot
   // field). The renderer regenerates geometry/style from this descriptor.
   riftFloor: RiftFloorView | null = null;
+  // The riftState event's expiresAtMs mirrored verbatim: an epoch-ms deadline the
+  // server computed via ctx.lockoutNowMs() (real Date.now() on the live server, the
+  // same clock raidLockouts() already relies on). Null while riftFloor is null or
+  // the run has no backing event (a dev-spawned rift). riftEventMsRemaining()
+  // subtracts Date.now() fresh on every call, so the HUD's "closes in" countdown
+  // ticks locally without a snapshot round trip.
+  private riftEventExpiresAtMs: number | null = null;
   // Active lethal boss death zones, mirrored from riftDeathZoneSpawn events.
   // Each entry stores the zone geometry and the wall-clock expiry (ms, performance.now
   // scale). riftBossDeathZones() converts these to RiftBossDeathZoneView on demand.
@@ -1443,9 +1503,6 @@ export class ClientWorld implements IWorld {
     radius: number;
     expiresAtMs: number;
   }> = [];
-  // The online client never registers rift collision regions (the server owns
-  // collision); 0 keeps rift camera occlusion a no-op here.
-  readonly riftCollisionToken = 0;
   // Lockpicking: rebuilt from the lockpick* events (there is no snapshot field).
   // Holds only the fog-windowed cells the server discloses.
   lockpickState: LockpickView | null = null;
@@ -1634,6 +1691,7 @@ export class ClientWorld implements IWorld {
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
+  private counterfangWindowDeadlineMs = 0;
   // inventory deltas arrive in snapshots, separate from the event frames the
   // HUD redraws on — the frame loop polls this so open panels re-render
   private invChanged = false;
@@ -2013,10 +2071,10 @@ export class ClientWorld implements IWorld {
   }
 
   private onMessage(raw: string): void {
-    let msg: any;
+    let msg: LooseJson;
     const parseStart = performance.now();
     try {
-      msg = JSON.parse(raw);
+      msg = JSON.parse(raw) as LooseJson;
     } catch {
       return;
     }
@@ -2066,6 +2124,15 @@ export class ClientWorld implements IWorld {
         this.cfg.playerClass = this.ownPlayerClass;
         this.spectateFacingPending = false;
         this.pendingSpectateFacing = null;
+        // marketInfo is delta-omitted (s.market only streams when it changes),
+        // so the mirror otherwise still holds the pre-drop echo at the instant
+        // onReconnected() below fires: that echo was pushed and echoed back
+        // before the socket died, so it trivially matches the window's own
+        // query and the reconnect resync (issue #2416) would never detect the
+        // fresh-join reset. Nulling it here forces MarketWindow to treat the
+        // resync as pending until a genuinely post-reconnect market snapshot
+        // decodes.
+        this.marketInfo = null;
         this.onReconnected?.();
       }
       this.connected = true;
@@ -2337,7 +2404,7 @@ export class ClientWorld implements IWorld {
     }
   }
 
-  private applySnapshot(snap: any): void {
+  private applySnapshot(snap: LooseJson): void {
     const now = performance.now();
     if (typeof this.spectating === 'string' && typeof snap.self?.id === 'number') {
       this.playerId = snap.self.id;
@@ -2432,7 +2499,7 @@ export class ClientWorld implements IWorld {
       return typeof aura.rem === 'number' && Number.isFinite(aura.rem) ? aura.rem : 0;
     };
 
-    const applyWire = (w: any): Entity | null => {
+    const applyWire = (w: LooseJson): Entity | null => {
       let e = this.entities.get(w.id);
       // identity fields ride only in "full" records: first sight and changes
       const hasIdentity = w.k !== undefined;
@@ -2719,6 +2786,11 @@ export class ClientWorld implements IWorld {
     const s = snap.self;
     const e = s ? applyWire(s) : null;
     if (s && e) {
+      const counterfangRemaining =
+        typeof s.opRem === 'number' && Number.isFinite(s.opRem)
+          ? Math.min(5, Math.max(0, s.opRem))
+          : 0;
+      this.counterfangWindowDeadlineMs = now + counterfangRemaining * 1000;
       if (typeof this.spectating === 'string' && e.kind === 'player' && e.templateId in CLASSES) {
         this.cfg.playerClass = e.templateId as PlayerClass;
       }
@@ -3198,7 +3270,7 @@ export class ClientWorld implements IWorld {
     // computeQuestState here exactly as it does server-side (the offline Sim
     // re-derives the same set from live PlayerMeta.questCadence).
     const cadenceBlocked =
-      identity && identity.cadenceBlockedQuests && identity.cadenceBlockedQuests.length > 0
+      identity?.cadenceBlockedQuests && identity.cadenceBlockedQuests.length > 0
         ? new Set(identity.cadenceBlockedQuests)
         : undefined;
     return optimisticQuestState(
@@ -3276,6 +3348,11 @@ export class ClientWorld implements IWorld {
   }
 
   // --- IWorldCombat: ability casts, auto-attack, spirit release ---
+  reactiveAbilityWindowRemaining(abilityId: string): number {
+    return abilityId === 'mongoose_bite'
+      ? Math.max(0, (this.counterfangWindowDeadlineMs - performance.now()) / 1000)
+      : 0;
+  }
   castAbility(abilityId: string): void {
     if (this.deadTargetCast(this.known.find((k) => k.def.id === abilityId)?.def)) {
       this.eventQueue.push({ type: 'error', text: 'You have no target.', reason: 'target_dead' });
@@ -4211,6 +4288,12 @@ export class ClientWorld implements IWorld {
   marketList(itemId: string, count: number, price: number): void {
     this.cmd({ cmd: 'market_list', item: itemId, count, price });
   }
+  marketListInstance(itemId: string, price: number, instance: ItemInstancePayload): void {
+    // The payload is a SELECTOR, not content: the server re-resolves it against
+    // the sender's own inventory and escrows the actual held copy, so nothing
+    // here can mint state.
+    this.cmd({ cmd: 'market_list_instance', item: itemId, price, instance });
+  }
   marketBuy(listingId: number): void {
     this.cmd({ cmd: 'market_buy', id: listingId });
   }
@@ -4229,7 +4312,13 @@ export class ClientWorld implements IWorld {
       subject,
       body,
       copper,
-      items: items.map((s) => ({ itemId: s.itemId, count: s.count })),
+      items: items.map((s) => ({
+        itemId: s.itemId,
+        count: s.count,
+        // The payload is a SELECTOR (the market_list_instance rule): the
+        // server re-resolves it against the sender's own bags.
+        ...(s.instance ? { instance: s.instance } : {}),
+      })),
     });
   }
   mailTake(mailId: number): void {
@@ -4315,6 +4404,13 @@ export class ClientWorld implements IWorld {
     }
     return out;
   }
+  // Milliseconds remaining before the current rift's backing world event stops
+  // admitting new parties (null outside a rift, or for a dev-spawned rift). See the
+  // riftEventExpiresAtMs field above for the mirrored deadline this subtracts from.
+  riftEventMsRemaining(): number | null {
+    if (this.riftEventExpiresAtMs === null) return null;
+    return Math.max(0, this.riftEventExpiresAtMs - Date.now());
+  }
   // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
   // remaining time is derived locally so the countdown ticks down without traffic.
   private selfLockouts: Record<string, number> = {};
@@ -4390,6 +4486,7 @@ export class ClientWorld implements IWorld {
           tier: ev.tier,
         }
       : null;
+    this.riftEventExpiresAtMs = ev.active ? ev.expiresAtMs : null;
     // Clear death zones on rift exit / floor change so stale rings from a
     // previous run never bleed into a new floor.
     if (!ev.active) this.activeBossDeathZones = [];

@@ -45,6 +45,7 @@ import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { isStunned } from './cc';
 import { druidEngineOnBleedTick } from './druid_engines';
+import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
 import { priestOnAuraEnded } from './priest/talents';
 import { preservesGloomtithe, vespersOnDotTick } from './priest/vespers';
 import { tickMendingCurrent } from './shaman_spiritmend';
@@ -361,6 +362,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       priestOnAuraEnded(ctx, e, a);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
+      applyGreaterInvisibilityAftereffect(ctx, e, a);
       // A HoT that ran its FULL duration (this natural-expiry path, never a
       // dispel/overwrite) reports to the caster's talent procs. No rng.
       if (a.kind === 'hot') {

@@ -116,7 +116,6 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       queuedOnSwing: opts.queuedOnSwing ?? null,
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
       abilityCharges: opts.abilityCharges,
-      stealthed: opts.stealthed ?? false,
       auras: opts.auras ?? [],
     },
     target:
@@ -129,6 +128,7 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
             auras: opts.targetAuras,
           },
     inventory: opts.inventory ?? [],
+    stealthed: opts.stealthed ?? false,
   };
 }
 
