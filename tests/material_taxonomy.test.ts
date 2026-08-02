@@ -349,9 +349,9 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
   for (const [source, override] of CASES) {
     it(`a junk-kind id authored only as a ${source} row derives IN`, () => {
       const derived = deriveMaterialItemIds({ ...BASE, ...override, items: itemsWithProbe });
-      expect(derived.has(PROBE)).toBe(true);
-      // The injection is additive: every live member still derives.
-      expect(HONEST_MATERIALS.every((id) => derived.has(id))).toBe(true);
+      // Exact both ways with failure locality: the probe joined, nothing else
+      // moved, and a red names the id instead of a bare boolean.
+      expect([...derived].sort()).toEqual([...HONEST_MATERIALS, PROBE].sort());
     });
   }
 

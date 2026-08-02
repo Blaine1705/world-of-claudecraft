@@ -64,10 +64,15 @@ function onDiskCores(dir: string): string[] {
 // (a code comment that names Math.random, or "the search window") cannot create a
 // false positive. String literals are left intact: the dotted patterns matched
 // below (Math.random, window., ...) do not appear inside the sim's player text.
+// One alternation, so leftmost-first matching decides precedence: a line comment
+// whose text contains /* is consumed AS a line comment instead of opening a
+// bogus block that swallows everything to the next */ elsewhere in the file
+// (that ordering bug exempted most of data.ts, its 53 imports included, from
+// every scan below). The (^|[^:]) guard keeps protocol strings (http://) intact.
 function stripComments(src: string): string {
-  return src
-    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
-    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+  return src.replace(/\/\*[\s\S]*?\*\/|(^|[^:])\/\/[^\n]*/gm, (m, pre) =>
+    m.startsWith('/*') ? m.replace(/[^\n]/g, ' ') : (pre ?? ''),
+  );
 }
 
 // A specifier a host-agnostic sim file must never import. Returns the offending

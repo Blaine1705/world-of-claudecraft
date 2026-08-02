@@ -569,7 +569,15 @@ export const TARGETS = [
       // toolbar (an empty bank renders chipless), so the shot shows both
       // windows' chips AND the narrowed sweep itself: only the honest
       // materials cross while the pole, grey hide, trophy, and raw fish stay
-      // in the bags. The bank_mobile_buyrow_check.mjs recipe.
+      // in the bags. The bank_mobile_buyrow_check.mjs recipe. The button
+      // no-ops silently when disabled, so assert it is clickable first: a
+      // recipe drift that granted no materials would otherwise surface as the
+      // misleading chip-row error below.
+      const depositReady = await page.evaluate(() => {
+        const btn = document.querySelector('#bank-window .bank-deposit-all');
+        return !!btn && !btn.disabled;
+      });
+      if (!depositReady) throw new Error('deposit-all button missing or disabled');
       await page.evaluate(() => document.querySelector('#bank-window .bank-deposit-all')?.click());
       if (!(await pollForSize(page, '#bank-window .bag-chips'))) {
         throw new Error('bank chip row did not mount after deposit-all');

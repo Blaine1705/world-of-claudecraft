@@ -3760,11 +3760,12 @@
     border-bottom-right-radius: 0;
     border-right-width: 1px;
   }
-  /* Short landscape phones: one horizontally scrollable chip row inside the bank
-     AND market clusters, like everywhere on mobile (the base .bag-chips rule near
-     the top of this layer already forces nowrap + scroll); restated per cluster so
-     both panels of each pair keep identical scroll containment. Nothing is hidden:
-     every chip stays reachable by scroll and keeps its full tap height. */
+  /* One horizontally scrollable chip row inside the bank AND market clusters,
+     like everywhere on mobile (the base .bag-chips rule near the top of this
+     layer already forces nowrap + scroll, and like it this rule is
+     unconditioned, not media-scoped); restated per cluster so both panels of
+     each pair keep identical scroll containment. Nothing is hidden: every chip
+     stays reachable by scroll and keeps its full tap height. */
   body.mobile-touch #bank-window .bag-chips,
   body.mobile-touch.bank-open #bags .bag-chips,
   body.mobile-touch.market-open #bags .bag-chips {
