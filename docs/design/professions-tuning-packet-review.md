@@ -4359,6 +4359,109 @@ existing scenarios (the nearest scenario anchor sits 182.7yd from any
 new node), with in-zone correctness owned by the placement suite's
 world-wide physical arms.
 
+## Phase 21 entry sync (2026-08-02, zero drift) and premise reconciliation
+
+The per-phase sync preamble, run at the phase 21 build start. `git fetch
+origin` at entry measured ZERO drift: every commit of
+origin/release/v0.34.0 was already an ancestor of the branch tip
+728e336473 (the phase 20 QA close), so there is no merge commit, nothing
+for the release-merge-audit skill to run over, and the gate recorded
+green at this exact tip by the phase 20 QA record stands as the entry
+state. Housekeeping: the stale applied scratch copies
+(.claude-scratch/phase20_deeds_await_art.patch and its APPLY_README,
+landed on the branch as e566357c0f mid-QA) were deleted so nobody
+re-applies them.
+
+Premise reconciliation, each phase 20 entry-sync correction worked
+against the live post-PR-2661 code before building. Resolutions below
+are recorded as veto-able session defaults per packet convention unless
+marked as a maintainer item.
+
+1. One explicit `buyItem` shape (the structural-typing trap). Any
+   positional count slot is unsafe in BOTH directions: the drafted
+   (npcId, itemId, count, pid?) order routes every offline count into
+   pid through the typeof disambiguation, and the mirror order (npcId,
+   itemId, pid?, count?, bulk?) keeps the nine legacy pid-third call
+   sites compiling while an IWorld caller's count lands in pid, again
+   structurally green. Resolution: the widening subsumes both overloads
+   into ONE options-bag signature, `buyItem(npcId, itemId, opts?, pid?)`
+   with `opts: { count?: number; bulk?: boolean }` (exported as
+   `VendorBuyOptions` from the sim quantity leaf), and the facet becomes
+   `buyItem(npcId, itemId, opts?)`. This turns every stale positional
+   call site, the nine in tests today and any future release-merge
+   arrival, into a compile error instead of a silent count-into-pid
+   misroute, the exact class the correction flags as uncatchable. The
+   server dispatch passes the bag third and pid fourth in the same
+   change; the typeof-disambiguation comment block is deleted with the
+   overloads.
+2. Wire baseline (count against bulk). `count` rides the buy frame only
+   when greater than 1 (the confirmUse idiom); `bulk` is unchanged. The
+   sender never emits both: the control row sends count, the two stack
+   affordances send bulk, and the sender-byte pin asserts the mutual
+   exclusion. For a hand-crafted frame carrying both, the sim resolves
+   bulk-wins (the shipped verb takes precedence, count ignored), one
+   rule in items.buyItem so all three hosts agree. Acceptance (a)/(d)
+   re-baseline: byte-identity of the default frame is measured against
+   the post-PR-2661 form, which may legally carry `bulk: true`; the
+   count-less, bulk-less frame stays byte-identical to today's.
+3. Q20 restated. The count path refuses whole and toast-denies; the
+   shipped bulk verb keeps its clamp-to-affordable semantics untouched.
+   Toast choice (session default): a present count is accepted only when
+   it is already a legal integer request (safe integer, at least 1);
+   everything else (0, negative, NaN, Infinity, fractional) denies with
+   the registered 'That item is not for sale.' toast rather than being
+   coerced, deliberately stricter than the market's clamp-to-1 idiom
+   because coercing hostile input on a money path launders crafted
+   frames into charges no legitimate client requested. A safe-integer
+   magnitude attack (1e15) passes sanitize and denies at the overflow
+   guard with the registered 'Not enough money.' toast (literally true);
+   capacity shortfalls deny with the registered bags-full toast. Zero
+   new sim strings.
+4. The quantity seam. The count sanitizer, purchase totals with the
+   overflow guard, the force-1 predicate, and the row-unit fit cap all
+   land IN `src/sim/vendor_buy_stack.ts`, widening the release's
+   existing pure quantity leaf rather than minting a sibling
+   vendor_purchase.ts: one seam owns vendor purchase quantity math, and
+   the release-owned file keeps its identity for future merges. The
+   drafted tests/vendor_purchase.test.ts coverage lands as an extension
+   of tests/vendor_buy_stack.test.ts for the same reason. The stale
+   vendor_stack.ts header (it still claims the food/drink stack costs
+   one listed buyValue while the code charges per unit) is corrected in
+   the same change.
+5. Q19. The custom prompt's cap is countFit-derived in ROW UNITS
+   (unit fit divided by vendorStackSize, floored), with the computed max
+   shown, per the settlement. The shipped bulk cap (stack size plus
+   affordability, bag-fit blind) is left exactly as shipped this phase:
+   converging it onto countFit is a shipped-behavior change the Q20
+   restatement warns against making unilaterally. The
+   tile-promises-then-bags-full-toast case stays recorded, and the
+   convergence question is an open maintainer item.
+6. Q21 stated reconciliation (session default; the re-rule stays the
+   maintainer's). The settled single-control-row ruling governs the
+   COUNT trigger surface: this phase adds exactly one, the visible
+   1x/5x/10x/custom row, and no shift-click count path. The release's
+   ctrl/cmd modifier click and per-row Buy Stack tile are the BULK
+   verb's surfaces, shipped before the ruling could account for them,
+   and un-shipping release UI is not this branch's call, so they stay.
+   The visible redundancy (a 5x control beside a Buy Stack tile) is
+   recorded for the maintainer's re-rule.
+7. Q23 carve-out (session default; a one-model re-rule stays open). The
+   count axis is row-unit-based as settled: 5x on a food row is 5
+   purchases, 25 units, matching the wire. The bulk verb stays
+   unit-based as shipped and may grant a non-multiple of the row unit.
+   Q22 and Q25 are satisfied-by-release for bulk and adopted for count
+   (no confirm at any count, no summary line, the vendor SimEvent
+   unchanged); Q24 stands (the fixed row is the gamepad-complete path,
+   the custom prompt inherits the pointer/keyboard-only precedent as a
+   recorded limitation, and the Buy Stack tile's focus key remains the
+   partial gamepad bulk affordance).
+8. Rule of three (new this session). The vendor custom prompt is the
+   third consumer of the bags/bank `installPromptDialog` recipe (the two
+   existing copies differ only in inert root and id prefix), so the
+   recipe is extracted to one shared module and both windows become thin
+   consumers in the same change, behavior-preserving, per the repo's
+   extraction rule.
+
 ---
 
 ## Post-packet scoping (2026-08-01): proposed phases 19 to 21
