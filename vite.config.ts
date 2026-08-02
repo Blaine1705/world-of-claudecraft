@@ -7,9 +7,6 @@ import { svelteTesting } from '@testing-library/svelte/vite';
 import { browserslistToTargets } from 'lightningcss';
 import { defineConfig } from 'vite';
 import { loadBrowserslistFloors } from './scripts/browserslist_targets.mjs';
-// CI path-matrix equivalent: LPT packs for --shard=i/N (see scripts/ci_balanced_sequencer.mjs).
-// Untyped .mjs import, same convention as other scripts/* tools outside tsconfig include.
-import { BalancedSequencer } from './scripts/ci_balanced_sequencer.mjs';
 // Untyped zero-dep build helper (same convention as the other scripts/*.mjs tools).
 // vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
 import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
@@ -377,15 +374,13 @@ export default defineConfig({
       DATABASE_URL:
         process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
     },
-    // D11 path-matrix: replace vitest's default sha1-contiguous --shard packs
-    // with sha1-order stripe packs (approach 2; LPT import-proxy missed). Local
-    // unsharded runs ignore this (shard() only when --shard is set). gate.mjs
-    // stays unsharded.
-    sequence: {
-      sequencer: BalancedSequencer,
-    },
-    // A broken custom sequencer that returns empty packs must fail the job
-    // (not green with zero tests). Vitest defaults passWithNoTests to true.
+    // D11 path-matrix follow-on (2026-08-02): two pack strategies were tried
+    // under scripts/ci_balanced_sequencer.mjs (LPT import-proxy, then sha1-order
+    // stripe). Both greened with completeness 1939 but D11 MISS and worse
+    // critical-path Duration than Phase 3 residual (~1.32). Sequencer left
+    // unwired; default vitest sha1-contiguous --shard restored. See
+    // docs/ci-speed/phase-d11-path-matrix.md. passWithNoTests stays false as a
+    // cheap integrity guard if a future sequencer is re-wired.
     passWithNoTests: false,
     globalSetup: ['./tests/global_setup.ts'],
     // Runs per test file (unlike globalSetup, which runs once outside any

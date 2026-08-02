@@ -14,7 +14,7 @@
 | 4 QA | PASS | #2737 | privacy-security PASS; test-coverage PASS after pin harden; scoped checklist green; probe DEFER |
 | 5 Path filters + close | DONE | #2737 | Native `changes` job; no aggregator (skipped OK); teardown offered |
 | 5 QA | PASS-WITH-FOLLOWUPS | #2737 | Whole-packet; probe run ids below; OPEN item 6 release probe still DEFER |
-| D11 path-matrix | IN PROGRESS | #2737 | Owner OK; LPT BalancedSequencer under --shard=i/8; probes pending |
+| D11 path-matrix | STOPPED (2 MISS) | #2737 | A1 LPT 1.59; A2 stripe 1.64; sequencer unwired; residual ~1.32 default |
 
 ## Measurement log
 
@@ -33,6 +33,8 @@ Append-only. Each row: date, phase, run id, wall (s), worst shard (s), N, notes.
 | 2026-08-01 | p3-b2 | 30710958267 | 424 | 351 | 8 | after s5 heavy renames; green; files 1939; D11 FAIL 1.315 (need 1.20); wall UNDER 8 min (7.07); stretch MISS |
 | 2026-08-01 | p3-b3 | 30712431702 | 442 | 359 | 8 | s5 import-heavies renamed off; green; files 1939; D11 FAIL 1.327; wall UNDER (7.37); s5 still import-bound |
 | 2026-08-02 | d11-design | (local) | | | 8 | Owner OK path-matrix; design in phase-d11-path-matrix.md; LPT sequencer landed; CI probes TBD |
+| 2026-08-02 | d11-a1 | 30748073443 | 605 | 373 | 8 | Approach 1 LPT import-proxy: green files 1939; D11 FAIL 1.587 (s4 import 375s) |
+| 2026-08-02 | d11-a2 | 30748547591 | 653 | 422 | 8 | Approach 2 sha1 stripe: green files 1939; D11 FAIL 1.639 (s6 import 411s); STOP |
 
 ### Phase 2 N=6 detail (run 30707931452, green)
 
@@ -310,25 +312,21 @@ Phase 4 when ready. Path matrix only with owner OK if D11 must be hard-met.
 Owner path: (a) path-matrix with OK, (b) accept D11 MISS and Phase 4, (c) out-of-
 packet import hygiene later (D15).
 
-### D11 path-matrix implementation (owner OK, 2026-08-02)
+### D11 path-matrix implementation (owner OK, 2026-08-02) STOPPED
 
-**Chosen approach:** keep `npm test -- --shard=i/8` and N=8; replace vitest's
-default sha1-contiguous packs via `sequence.sequencer = BalancedSequencer`
-(`scripts/ci_balanced_sequencer.mjs` + pure `scripts/ci_shard_partition.mjs`).
+Two approaches, both complete + green, both D11 MISS (stopping rule):
 
-Weights: byte size + boosts for three/render/electron/server/sim/jsdom/admin/
-i18n/ui/net/game/parity + Phase 3 duration overlay for known monsters. LPT
-assigns each file to the lightest pack.
+1. **LPT + import-proxy weights** (run 30748073443): ratio **1.587**, s4
+   import-bound (375s). Static three/render/size proxy did not match real
+   import residual.
+2. **Sha1-order stripe** (run 30748547591): ratio **1.639**, s6 import-bound
+   (411s). Completeness 1939 both times.
 
-**CI shape unchanged:** fail-fast false, half-core maxWorkers, pretest via
-npm test, gate.mjs unsharded, Phase 5 path filters intact, release unfiltered,
-I18N_RELEASE_TIER job-level on release-gate.
+**Action taken:** unwire sequencer; restore default vitest sha1-contiguous
+`--shard=i/8` so wall does not stay worse than Phase 3 bank (424s/442s, D11
+~1.32). Keep partition modules + unit tests for a future measured-cost map.
 
-**Pins:** `tests/ci_shard_partition.test.ts` (completeness + balance);
-`tests/ci_workflow.test.ts` red-path for sequencer wire and no-sha1.
-
-**Probes:** three green PR walls with worst/median Duration ≤ 1.20 and files
-sum == suite; record run ids below when green.
+**Not claimed:** D11 PASS. No third approach. N stays 8. Path filters intact.
 
 Design write-up: `docs/ci-speed/phase-d11-path-matrix.md`.
 

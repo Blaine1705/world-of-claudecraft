@@ -398,24 +398,20 @@ describe('CI workflow parity', () => {
     expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(4);
   });
 
-  it('wires the D11 balanced path-matrix sequencer (not default sha1 contiguous packs)', () => {
-    // Red-path: dropping the custom sequencer reverts --shard to vitest's sha1
-    // contiguous slices and reopens the s5 import residual (D11 MISS ~1.32).
-    expect(viteConfig).toContain("from './scripts/ci_balanced_sequencer.mjs'");
-    expect(viteConfig).toContain('sequencer: BalancedSequencer');
-    expect(viteConfig).toMatch(/sequence:\s*\{\s*sequencer:\s*BalancedSequencer/);
-    // Sequencer must extend BaseSequencer and use the active CI partition
-    // (stripe after approach-1 LPT miss), not vitest contiguous slices alone.
-    expect(balancedSequencer).toContain("from 'vitest/node'");
+  it('keeps D11 path-matrix tooling available but unwired after two MISS approaches', () => {
+    // Both LPT and stripe greened with completeness but D11 MISS (ratios 1.59 /
+    // 1.64). Sequencer stays in-tree for a future measured-weight attempt; CI
+    // must not re-wire it without a green D11 probe. Default --shard is back.
+    expect(viteConfig).not.toContain('sequencer: BalancedSequencer');
+    expect(viteConfig).not.toContain("from './scripts/ci_balanced_sequencer.mjs'");
     expect(balancedSequencer).toContain('extends BaseSequencer');
     expect(balancedSequencer).toContain('partitionForCi');
     expect(shardPartition).toContain('export function partitionByStripe');
-    expect(shardPartition).toContain('export const partitionForCi = partitionByStripe');
+    expect(shardPartition).toContain('export function partitionByLpt');
     expect(shardPartition).toContain('export function weightForTestFile');
     expect(shardPartition).not.toContain("from 'vitest");
-    // Workflow comments document the balanced sequencer.
     expect(workflow).toContain('ci_balanced_sequencer.mjs');
-    // Empty packs under a broken sequencer must fail the job (privacy review).
+    // Integrity guard kept even with default packs.
     expect(viteConfig).toContain('passWithNoTests: false');
   });
 });

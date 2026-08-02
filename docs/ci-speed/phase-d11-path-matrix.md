@@ -85,3 +85,36 @@ worst ≤ median * 1.20. Wall should stay ≤ 8 min if worst drops.
 - bare `npx vitest` in CI
 - Deleting `docs/ci-speed/` (owner teardown only)
 - Deep app import-graph rewrites (D15)
+
+## Probe results (owner OK implement, 2026-08-02)
+
+Stopping rule: stop after two failed balance approaches; document residual.
+
+### Approach 1: LPT + import-proxy weights
+
+| Run | Wall s | Worst Duration | Median | D11 ratio | Files | Notes |
+|---|---|---|---|---|---|---|
+| 30748073443 (dispatch) | 605 | 372.52 (s4) | 234.76 | **1.587 FAIL** | 1939 | s4 import 375s; green |
+
+Worse than Phase 3 residual (1.327). Static import proxies (three/render/
+electron/size) did not track real vitest import cumulative.
+
+### Approach 2: sha1-order stripe (round-robin)
+
+| Run | Wall s | Worst Duration | Median | D11 ratio | Files | Notes |
+|---|---|---|---|---|---|---|
+| 30748547591 (dispatch) | 653 | 422.02 (s6) | 257.48 | **1.639 FAIL** | 1939 | s6 import 411s; green |
+
+Also worse. Stripe broke contiguous slices but still left one import-bound
+shard. Completeness held both times.
+
+### Residual accepted
+
+- Default vitest sha1-contiguous `--shard=i/8` **restored** (sequencer unwired)
+  so CI wall does not stay regressing.
+- Tooling kept: `scripts/ci_shard_partition.mjs`, `scripts/ci_balanced_sequencer.mjs`,
+  unit tests. Re-wire only with a **measured** per-file cost map from CI
+  (import + Duration), not static proxies.
+- Phase 3 bank still stands: wall samples UNDER 8 min (424s / 442s) with D11
+  residual ~1.32 on default packs.
+- No third pack strategy in this session.
