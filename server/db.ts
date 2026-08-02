@@ -727,6 +727,39 @@ CREATE INDEX IF NOT EXISTS client_perf_reports_created ON client_perf_reports(cr
 CREATE INDEX IF NOT EXISTS client_perf_reports_release_created ON client_perf_reports(release_version, created_at DESC);
 CREATE INDEX IF NOT EXISTS client_perf_reports_gpu_created ON client_perf_reports(gl_renderer_bucket, created_at DESC);
 CREATE INDEX IF NOT EXISTS client_perf_reports_session_created ON client_perf_reports(session_id, created_at DESC);
+-- gfx_tier deliberately has NO dedicated index (issue #2482, evaluated
+-- against the query pattern issue #2480 / PR #2754 adds: an eighth
+-- GROUPING SETS arm for gfx_tier on clientPerfSummary, server/admin_db.ts).
+-- That statement windows on created_at first, then computes every
+-- dimension, gfx_tier included, as GROUPING SETS in ONE pass over that
+-- window: it never issues a 'WHERE gfx_tier = ...' predicate a leading-
+-- column index could serve. EXPLAIN (ANALYZE, BUFFERS) against a seeded
+-- 1,000,000-row table spanning the full 168 h (7 day) cleanHours max
+-- (client_perf_summary_shape.ts) confirms the planner drives both the
+-- current 7-arm statement and PR #2754's 8-arm one from
+-- client_perf_reports_created alone (a Bitmap Heap Scan at 24 h, a Seq Scan
+-- at 168 h once the window covers most of the table) with every grouped
+-- column, gfx_tier included, folded into hash keys of the SAME aggregate
+-- pass; with a candidate (gfx_tier, created_at DESC) index present it is
+-- never touched, at either window. graphics_preset, browser_family,
+-- os_family, zone_or_scenario, and crowd_bucket sit in that exact same
+-- combined pass and are unindexed for the identical structural reason
+-- (gl_renderer_bucket has its own index, client_perf_reports_gpu_created,
+-- for a different reader, and EXPLAIN shows the summary statement does not
+-- use that one either), so gfx_tier following them is precedent, not an
+-- oversight. Every added index is also paid on every insert, and this
+-- table's insert rate scales with concurrent players (each client posts at
+-- 75 s then every 5 min, src/game/perf_reporter.ts): the candidate index
+-- measured 30 MB at 1,000,000 rows, and a read path that structurally
+-- cannot use it makes that a pure ongoing cost. A direct
+-- 'WHERE gfx_tier = ... AND created_at > ...' probe against the same
+-- seeded table DOES use a (gfx_tier, created_at DESC) index (a fast Bitmap
+-- Index Scan), so the index is not useless in general, only for this
+-- statement: if a genuine per-gfx_tier drill-down reader is ever built,
+-- THAT reader is what earns it, the way a future worst-10s fleet-view
+-- reader is anticipated by the R7 ruling below. Add it through the
+-- CONCURRENT_INDEX_MIGRATIONS seam (server/client_perf_indexes.ts), never
+-- here, and re-EXPLAIN it first since row/window shape may have moved on.
 -- Packet 0 report dimensions (rulings R3-R7). crowd_bucket keeps the summary
 -- statement's GROUPING-bits contract (every grouped column TEXT NOT NULL
 -- DEFAULT ''; pre-column rows fold to 'unknown' in the read-time mapper). The
