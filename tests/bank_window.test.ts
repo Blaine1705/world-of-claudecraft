@@ -9,6 +9,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const painter = readFileSync(new URL('../src/ui/bank_window.ts', import.meta.url), 'utf8');
+const promptDialog = readFileSync(new URL('../src/ui/prompt_dialog.ts', import.meta.url), 'utf8');
 const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 const components = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
 const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
@@ -91,22 +92,30 @@ describe('bank_window: load-bearing behaviors preserved', () => {
 });
 
 describe('bank_window: modal prompt a11y contract', () => {
+  // The modal recipe lives in the shared module (src/ui/prompt_dialog.ts) since
+  // the rule-of-three extraction; the recipe pins scan it there, and the
+  // delegation pin below keeps this window on the recipe with its own root.
   it('the prompt is a labelled modal dialog', () => {
-    expect(painter).toContain("setAttribute('role', 'dialog')");
-    expect(painter).toContain("setAttribute('aria-modal', 'true')");
+    expect(promptDialog).toContain("setAttribute('role', 'dialog')");
+    expect(promptDialog).toContain("setAttribute('aria-modal', 'true')");
   });
 
   it('traps Tab inside the prompt via the one canonical focusable set', () => {
-    expect(painter).toContain("import { FOCUSABLE_SELECTOR } from './focus_manager'");
-    expect(painter).toContain('FOCUSABLE_SELECTOR');
+    expect(promptDialog).toContain("import { FOCUSABLE_SELECTOR } from './focus_manager'");
+    expect(promptDialog).toContain('querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)');
   });
 
   it('sets and clears the parent-window inert on every teardown path', () => {
-    expect(painter).toContain('.inert = true');
     // Each arm is pinned in its own body slice so deleting either one reds this:
-    // dismiss() (the shared prompt teardown) clears the inert it set...
-    const dismissBody = painter.slice(painter.indexOf('const dismiss = ('));
+    // the shared recipe sets inert on the handed-in root and dismiss() (the one
+    // teardown chokepoint) clears it...
+    expect(promptDialog).toContain('inertRoot.inert = true');
+    const dismissBody = promptDialog.slice(promptDialog.indexOf('const dismiss = ('));
     expect(dismissBody).toContain('inert = false');
+    // ...this window hands the recipe ITS root...
+    expect(painter).toMatch(
+      /installModalPromptDialog\(prompt, opener, close, \{\s*inertRoot: this\.deps\.root\(\),/,
+    );
     // ...and the force-close backstop in close() BOTH tears open prompts down and
     // clears inert (Esc/keybind can close the window out from under a prompt).
     const closeBody = painter.slice(
@@ -118,11 +127,11 @@ describe('bank_window: modal prompt a11y contract', () => {
   });
 
   it('Escape dismisses the prompt and returns focus without reaching the global escape', () => {
-    expect(painter).toMatch(/'Escape'[\s\S]{0,160}dismissAndReturn\(\)/);
+    expect(promptDialog).toMatch(/'Escape'[\s\S]{0,160}dismissAndReturn\(\)/);
     // stopPropagation keeps the keypress from bubbling to the input layer's window
     // keydown, whose escape action would ALSO run closeAll and close the whole bank
     // window in the same keypress (prompt buttons are not tag-exempt like inputs).
-    expect(painter).toMatch(/ke\.preventDefault\(\);\s*ke\.stopPropagation\(\);/);
+    expect(promptDialog).toMatch(/ke\.preventDefault\(\);\s*ke\.stopPropagation\(\);/);
   });
 
   it('confirm lands focus on the always-present close button; cancel returns to the opener', () => {
@@ -132,7 +141,7 @@ describe('bank_window: modal prompt a11y contract', () => {
       painter.match(/querySelector\('\[data-close\]'\) as HTMLElement \| null\)\?\.focus\(\)/g) ??
       [];
     expect(landings.length).toBeGreaterThanOrEqual(3);
-    expect(painter).toMatch(
+    expect(promptDialog).toMatch(
       /const dismissAndReturn = \(\): void => \{\s*dismiss\(\);\s*opener\?\.focus\(\);/,
     );
   });
@@ -611,8 +620,9 @@ describe('bank_window: keyboard a11y (non-modal activation + prompt Enter)', () 
     // The prompt's own keydown listener must stop the bubble, and once the prompt
     // was detached mid-dispatch it must ALSO cancel the default (or the browser
     // runs the activation against the re-landed focus, Enter ghost-clicking
-    // [data-close]). The older Escape-only handling must red this.
-    expect(painter).toMatch(
+    // [data-close]). The older Escape-only handling must red this. The handler
+    // lives in the shared recipe; the delegation pin rides the inert test above.
+    expect(promptDialog).toMatch(
       /if \(ke\.key === 'Enter' \|\| ke\.key === ' ' \|\| ke\.code === 'Space'\) \{\s*ke\.stopPropagation\(\);\s*if \(!prompt\.isConnected\) ke\.preventDefault\(\);\s*return;\s*\}/,
     );
   });

@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 // load-bearing behaviors: reusing bag_filter via buildBagGrid (not re-deriving the
 // filter) and preserving the .bag-grid scroll offset across a rebuild.
 const painter = readFileSync(new URL('../src/ui/bags_window.ts', import.meta.url), 'utf8');
+const promptDialog = readFileSync(new URL('../src/ui/prompt_dialog.ts', import.meta.url), 'utf8');
 const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 const components = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
@@ -63,7 +64,13 @@ describe('bags_window: load-bearing behaviors preserved', () => {
     // Without stopPropagation the keypress bubbles to the input layer's window
     // keydown, whose escape action runs closeAll: one Escape on a prompt BUTTON
     // (not tag-exempt like inputs) would dismiss the prompt AND close the bags.
-    expect(painter).toMatch(/ke\.preventDefault\(\);\s*ke\.stopPropagation\(\);/);
+    // The recipe lives in the shared module (prompt_dialog.ts) since the
+    // rule-of-three extraction; the window must still delegate to it with its
+    // own root, or the recipe protects nothing here.
+    expect(promptDialog).toMatch(/ke\.preventDefault\(\);\s*ke\.stopPropagation\(\);/);
+    expect(painter).toMatch(
+      /installModalPromptDialog\(prompt, opener, close, \{\s*inertRoot: this\.deps\.root\(\),/,
+    );
   });
 });
 
@@ -222,8 +229,10 @@ describe('bags_window: touch peek + bank-cluster close', () => {
     // bind steals the WCAG 2.4.3 focus return. The prompt's own keydown listener
     // stops the bubble, and once the prompt was detached mid-dispatch it must ALSO
     // cancel the default (or the activation ghost-clicks the re-landed focus).
-    // The older Escape-only handling reds this.
-    expect(painter).toMatch(
+    // The older Escape-only handling reds this. The handler lives in the
+    // shared recipe (prompt_dialog.ts); the delegation pin rides the Escape
+    // test above.
+    expect(promptDialog).toMatch(
       /if \(ke\.key === 'Enter' \|\| ke\.key === ' ' \|\| ke\.code === 'Space'\) \{\s*ke\.stopPropagation\(\);\s*if \(!prompt\.isConnected\) ke\.preventDefault\(\);\s*return;\s*\}/,
     );
   });

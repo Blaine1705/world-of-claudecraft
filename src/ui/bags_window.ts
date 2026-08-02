@@ -54,7 +54,6 @@ import {
 import { itemDisplayName } from './entity_i18n';
 import { isPaperdollDraggable } from './equip_drop_core';
 import { esc } from './esc';
-import { FOCUSABLE_SELECTOR } from './focus_manager';
 import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hud/action_bar/hotbar';
 import { formatNumber, type TranslationKey, t } from './i18n';
@@ -64,6 +63,10 @@ import { resolveDropTargetAt } from './item_drop_hit_test';
 import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
+import {
+  installPromptDialog as installModalPromptDialog,
+  type PromptDialogHandle,
+} from './prompt_dialog';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
 import { svgIcon, type UiIconName } from './ui_icons';
@@ -72,10 +75,6 @@ import { totalHeldCount } from './vendor_sell_quantity';
 import { dropOnWorld } from './world_drop_target';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
-
-// Monotonic id source for the ad-hoc prompt dialogs' aria-labelledby target, so the
-// id never couples to class ordering (was prompt.classList[last]).
-let promptDialogSeq = 0;
 
 // The ad-hoc discard / sell / bank-deposit quantity prompts mount into #prompt-stack
 // (outside #bags). A window-level close() removes any that are open so it never leaves
@@ -1373,97 +1372,20 @@ export class BagsWindow {
     }
   }
 
-  // WCAG 2.2 AA: the ad-hoc bag prompts (discard / sell quantity) are modal
-  // dialogs but carried no role/name, no keyboard trap, and no focus return. This wires
-  // role=dialog + aria-modal + aria-labelledby (the prompt text), a self-contained Tab
-  // cycle among the prompt's controls (these prompts are appended to #prompt-stack,
-  // outside the bag window's reach, so they own their own trap), an Escape close, and
-  // focus return to the element that opened the prompt. Returns a close-and-return fn.
+  // WCAG 2.2 AA modal prompt wiring, the shared recipe (src/ui/prompt_dialog.ts):
+  // #bags is the inert root while a prompt is open, and if the bags window itself
+  // is force-closed out from under an open prompt, close() clears inert as a
+  // teardown backstop, so #bags is never left inert while hidden. This single
+  // chokepoint covers the discard, sell, and bank-deposit prompts.
   private installPromptDialog(
     prompt: HTMLElement,
     opener: HTMLElement | null,
     close: () => void,
-  ): { dismiss: () => void; dismissAndReturn: () => void } {
-    prompt.setAttribute('role', 'dialog');
-    prompt.setAttribute('aria-modal', 'true');
-    // Mark the bag grid behind the modal prompt inert while it is open, so a screen
-    // reader / Tab cannot reach the now-blocked inventory underneath. EVERY prompt
-    // teardown path (confirm/submit, cancel, Escape) routes through dismiss(), which
-    // clears inert before the prompt is removed; and if the bags window itself is
-    // force-closed out from under an open prompt, close() clears inert as a teardown
-    // backstop, so #bags is never left inert while hidden. The focus-returning variant
-    // clears inert BEFORE refocusing (a focus into a still-inert subtree is silently
-    // dropped, and the openers live inside #bags). This single chokepoint covers BOTH the
-    // discard and sell prompts.
-    const bagsRoot = this.deps.root();
-    bagsRoot.inert = true;
-    const titleEl = prompt.querySelector('.prompt-text') as HTMLElement | null;
-    if (titleEl) {
-      if (!titleEl.id) titleEl.id = `bags-prompt-title-${promptDialogSeq++}`;
-      prompt.setAttribute('aria-labelledby', titleEl.id);
-      // Name an unlabeled quantity field by the prompt's own question (the same titled
-      // text, e.g. "Destroy how many Linen Cloth?") so a number input is never anonymous
-      // (WCAG 1.3.1 / 4.1.2). The discard prompt's input had no name (the new bags axe
-      // case caught it); the sell prompt's input already carries a dedicated aria-label,
-      // so leave that one alone (aria-labelledby would otherwise shadow the better name).
-      const numInput = prompt.querySelector('.prompt-number');
-      if (numInput && !numInput.hasAttribute('aria-label')) {
-        numInput.setAttribute('aria-labelledby', titleEl.id);
-      }
-    }
-    // Clear inert THEN remove the prompt; the only teardown both the confirm and the
-    // cancel paths share, so routing every close through it guarantees inert never leaks.
-    const dismiss = (): void => {
-      bagsRoot.inert = false;
-      close();
-    };
-    const dismissAndReturn = (): void => {
-      dismiss();
-      opener?.focus();
-    };
-    prompt.addEventListener('keydown', (e) => {
-      const ke = e as KeyboardEvent;
-      // Escape: stopPropagation, not just preventDefault. The input layer's
-      // window-level keydown runs the global escape action (closeAll) regardless of
-      // defaultPrevented, and prompt BUTTONS are not tag-exempt like inputs, so
-      // without it one keypress dismisses the prompt AND closes the whole window.
-      if (ke.key === 'Escape') {
-        ke.preventDefault();
-        ke.stopPropagation();
-        dismissAndReturn();
-        return;
-      }
-      // Enter / Space: stopPropagation for the same reason, keeping the default so
-      // native activation (Enter/Space on the confirm and cancel buttons) survives.
-      // A submit handler on the quantity input runs at the target phase and removes
-      // the prompt DURING this keydown, so a window-level gate keyed on the prompt's
-      // presence runs too late: without the stop, the same press hits the global
-      // chat/jump bind and steals the WCAG 2.4.3 focus return. The event path is
-      // fixed at dispatch, so this listener still runs after the detach; only THEN
-      // cancel the default too, or the browser runs the key's activation against
-      // the freshly re-landed focus (Enter ghost-clicking [data-close] and closing
-      // the whole window).
-      if (ke.key === 'Enter' || ke.key === ' ' || ke.code === 'Space') {
-        ke.stopPropagation();
-        if (!prompt.isConnected) ke.preventDefault();
-        return;
-      }
-      if (ke.key !== 'Tab') return;
-      // Reuse the one canonical focusable set so a prompt that ever
-      // gains an [href] / [tabindex] control stays inside the trap.
-      const f = Array.from(prompt.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
-      if (f.length === 0) return;
-      const first = f[0];
-      const last = f[f.length - 1];
-      if (ke.shiftKey && document.activeElement === first) {
-        ke.preventDefault();
-        last.focus();
-      } else if (!ke.shiftKey && document.activeElement === last) {
-        ke.preventDefault();
-        first.focus();
-      }
+  ): PromptDialogHandle {
+    return installModalPromptDialog(prompt, opener, close, {
+      inertRoot: this.deps.root(),
+      idPrefix: 'bags-prompt-title',
     });
-    return { dismiss, dismissAndReturn };
   }
 
   private showDiscardItemPrompt(itemId: string, maxCount: number): void {
