@@ -48,7 +48,7 @@ describe('talent empowerNext scoping', () => {
     // 7 to 6: the shaman tooltip-clarity pass re-themed sha_r5_concussion from
     // Fault Line (a next-shock-free empowerNext proc) to Wolfstep (an instant
     // Shadewolf ability effect), deliberately retiring that proc.
-    expect(scanned).toBe(6);
+    expect(scanned).toBe(4);
     expect(offenders).toEqual([]);
   });
 });

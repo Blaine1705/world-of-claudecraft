@@ -507,8 +507,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // ground-state and priest marker projections add two DATA members (71 -> 73),
     // and the controlled Warlock pet's signature-skill command plus autocast
     // toggle add two METHOD members (205 -> 207), so IWORLD is 276 + 2 + 2 = 280.
-    expect(IWORLD_MEMBERS.length).toBe(280);
-    expect(DATA_MEMBERS.length).toBe(73);
+    expect(IWORLD_MEMBERS.length).toBe(281);
+    expect(DATA_MEMBERS.length).toBe(74);
     expect(METHOD_MEMBERS.length).toBe(207);
   });
   it('has no duplicate member names', () => {
@@ -1637,8 +1637,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(278);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(278);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(281);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(281);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

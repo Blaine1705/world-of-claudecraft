@@ -386,6 +386,63 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'shows the combo-point row for energy users, through the elided writer',
   },
   {
+    call: 'this.writerFacet.setAttr',
+    band: 'frame',
+    gate: "p.resourceType === 'energy'",
+    sites: 4,
+    surface: 'chrome',
+    why: 'combo-row a11y state (aria hidden/valuenow/valuetext/label), elided writer',
+  },
+  {
+    call: 'this.writerFacet.setAttr',
+    band: 'frame',
+    gate: "!(p.resourceType === 'energy')",
+    surface: 'chrome',
+    why: 'hides the combo row for non-energy classes, through the elided writer',
+  },
+  {
+    call: 'this.doomMeter.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'write-elided Warlock Doom meter driven by its own view core',
+  },
+  {
+    call: 'this.procOverlayPainter.paintNecromancyCharges',
+    band: 'frame',
+    gate: "this.sim.talentSpec === 'demonology'",
+    surface: 'chrome',
+    why: 'Demonology necromancy charge pips on the proc overlay',
+  },
+  {
+    call: 'this.procOverlayPainter.paintDestructionMarks',
+    band: 'frame',
+    gate: "!(this.sim.talentSpec === 'demonology') && this.sim.talentSpec === 'destruction'",
+    surface: 'chrome',
+    why: 'Destruction burn marks on the proc overlay',
+  },
+  {
+    call: 'this.procOverlayPainter.paintChronoCharges',
+    band: 'frame',
+    gate: "!(this.sim.talentSpec === 'demonology') && !(this.sim.talentSpec === 'destruction') && this.sim.talentSpec === 'arcane'",
+    surface: 'chrome',
+    why: 'Chronomancy charge pips on the proc overlay',
+  },
+  {
+    call: 'this.procOverlayPainter.paintFrostCharges',
+    band: 'frame',
+    gate: "!(this.sim.talentSpec === 'demonology') && !(this.sim.talentSpec === 'destruction') && !(this.sim.talentSpec === 'arcane') && this.sim.talentSpec === 'frost'",
+    surface: 'chrome',
+    why: 'Frost icicle pips on the proc overlay',
+  },
+  {
+    call: 'this.procOverlayPainter.paint',
+    band: 'frame',
+    gate: "!(this.sim.talentSpec === 'demonology') && !(this.sim.talentSpec === 'destruction') && !(this.sim.talentSpec === 'arcane') && !(this.sim.talentSpec === 'frost')",
+    surface: 'chrome',
+    why: 'the generic proc overlay for every spec without its own charge readout',
+  },
+  {
     call: 'this.comboRowEl.appendChild',
     band: 'frame',
     gate: "p.resourceType === 'energy' && this.comboRowEl.children.length !== COMBO_PIP_COUNT",
@@ -566,27 +623,6 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: "!this.procOverlayPreviewed && this.sim.talentSpec === 'fire'",
     surface: 'chrome',
     why: 'clears that preview after 8 s; a one-shot behind the same latch, not a repeating driver',
-  },
-  {
-    call: 'this.procOverlayPainter.paintChronoCharges',
-    band: 'frame',
-    gate: "this.sim.talentSpec === 'arcane'",
-    surface: 'chrome',
-    why: 'the proc overlay driven by Aether Surge charges',
-  },
-  {
-    call: 'this.procOverlayPainter.paintFrostCharges',
-    band: 'frame',
-    gate: "!(this.sim.talentSpec === 'arcane') && this.sim.talentSpec === 'frost'",
-    surface: 'chrome',
-    why: 'the frost arm of the same overlay',
-  },
-  {
-    call: 'this.procOverlayPainter.paint',
-    band: 'frame',
-    gate: "!(this.sim.talentSpec === 'arcane') && !(this.sim.talentSpec === 'frost')",
-    surface: 'chrome',
-    why: 'the Heating Up / Hot Streak arm, the default for every other spec',
   },
   {
     call: 'this.auraOverlayController.paint',
@@ -1419,7 +1455,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 41, chrome: 72, none: 16 });
+    ).toEqual({ window: 41, chrome: 77, none: 16 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
