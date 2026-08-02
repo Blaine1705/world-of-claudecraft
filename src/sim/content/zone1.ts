@@ -1627,7 +1627,6 @@ export const ZONE1_PROPS: ZonePropsDef = {
       z: EASTBROOK_LAYOUT.civic.wellBeacon.position.z,
       r: EASTBROOK_LAYOUT.civic.wellBeacon.radius,
       height: EASTBROOK_LAYOUT.civic.wellBeacon.height,
-      camGhost: false,
     },
   ],
   stalls: EASTBROOK_LAYOUT.market.stalls.map((stall) => ({
@@ -1641,7 +1640,6 @@ export const ZONE1_PROPS: ZonePropsDef = {
     d: stall.depth,
     height: stall.height,
     canopyVariant: stall.canopyVariant,
-    camGhost: false,
   })),
   mines: [{ x: -88, z: -68, rot: 0.8 }],
   docks: [{ x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],
@@ -1693,7 +1691,6 @@ export const ZONE1_PROPS: ZonePropsDef = {
     d: bench.depth,
     rot: bench.rotation,
     height: 1,
-    camGhost: false,
   })),
   walls: EASTBROOK_LAYOUT.wall.segments.map((segment) => ({
     id: segment.id,
@@ -1704,7 +1701,6 @@ export const ZONE1_PROPS: ZonePropsDef = {
     d: segment.footprint.halfDepth * 2,
     rot: segment.footprint.rotation,
     height: segment.height,
-    camGhost: false,
     // The wing's tall lantern pillar sits gate-side on mirrored segments;
     // the collider builder places the pylon colliders from this.
     ...(wallSegmentMirrored(segment) ? { mirrored: true as const } : {}),

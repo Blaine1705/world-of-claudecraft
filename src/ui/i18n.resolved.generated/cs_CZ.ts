@@ -901,6 +901,13 @@ export const cs_CZ: EnTranslations = {
       "heroicName": "{name} (hrdinská)",
       "heroicLocked": "Jsi uzamčen(a) k hrdinské verzi {name}."
     },
+    "riftTracker": {
+      "title": "Trhlina",
+      "floor": "Patro {current} z {total}",
+      "closesIn": "Zavře se za {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "S",
       "NE": "SV",
@@ -928,6 +935,23 @@ export const cs_CZ: EnTranslations = {
       "dock": "Vrátit tento měřič zpět do okna měřičů",
       "separate": "Oddělit {meter}",
       "regroup": "Znovu seskupit {meter}"
+    },
+    "targetAuras": {
+      "title": "Aury cíle",
+      "keybindLabel": "Buffy a debuffy cíle",
+      "all": "Vše",
+      "debuffs": "Debuffy",
+      "buffs": "Buffy",
+      "unlock": "Přesunout okno aur cíle",
+      "lock": "Zamknout okno aur cíle",
+      "configureRows": "Nastavit aury cíle",
+      "fewerRows": "Upřednostnit méně řad aur",
+      "moreRows": "Upřednostnit více řad aur",
+      "visibleRows": "Preferované řady aur: {count}",
+      "showSources": "Zobrazit zdroje aur",
+      "hideSources": "Skrýt zdroje aur",
+      "ownAura": "Tvá aura",
+      "opacity": "Neprůhlednost aur: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Mazlíček má plné zdraví",
@@ -972,13 +996,15 @@ export const cs_CZ: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, stínoskákací ropucha",
       "name_stormfeather_griffin": "Nebeský Bouřepero",
       "name_thunderstrut_gobbler": "Hromokrok, Velký krocan",
+      "name_terrorspark_groundshaker": "Hrůzojiskra, otřásač země",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
       "desc_stalkglider_snail": "Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.",
       "desc_aether_hover_cycle": "Výkonné magitechnické kolo navržené pro rychlý, nízko se vznášející pohyb v boji.",
       "desc_shadowjump_toad": "Mohutná, jistonohá obří ropucha, vycvičená v bleskurychlých stínových skocích, které zvládnou jakýkoli terén.",
       "desc_stormfeather_griffin": "Vznešený bouřný gryf, který se plíží po zemi na rounami okovaných spárech, se složenými křídly.",
-      "desc_thunderstrut_gobbler": "Kolosální krocan zrozený z bouře, který se hrdě prochází z Probouzejícího se vrcholu, s ocasem rozevřeným jako bouřkový mrak."
+      "desc_thunderstrut_gobbler": "Kolosální krocan zrozený z bouře, který se hrdě prochází z Probouzejícího se vrcholu, s ocasem rozevřeným jako bouřkový mrak.",
+      "desc_terrorspark_groundshaker": "Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty."
     },
     "mountTraining": {
       "mountPrompt": "Stiskni {key} pro nasednutí na cvičného Udatného oře.",
@@ -1284,6 +1310,51 @@ export const cs_CZ: EnTranslations = {
       "badges": {
         "backgrounded": "Na pozadí",
         "offline": "Offline"
+      }
+    },
+    "auraOverlay": {
+      "title": "Aury",
+      "currentClass": "Aktuální třída: {class}",
+      "previewHint": "Pomocí Nastavit pozice přesuň auru, aniž bys zakryl nabídku.",
+      "noProcs": "Pro tuto postavu není k dispozici žádný podporovaný proc.",
+      "enabled": "Zobrazit auru",
+      "icon": "Ikona kouzla",
+      "arcs": "Boční půlměsíce",
+      "groundRing": "Kruh na zemi",
+      "groundRingSpellOrder": "Kruh na zemi: pořadí kouzel",
+      "crescentsSpellOrder": "Boční půlměsíce: pořadí kouzel",
+      "size": "Velikost",
+      "iconSize": "Velikost ikony",
+      "crescentBlockSize": "Velikost bloku půlměsíce",
+      "groundRingBlockSize": "Velikost bloku kruhu na zemi",
+      "opacity": "Neprůhlednost",
+      "color": "Barva",
+      "allOn": "Vše zapnout",
+      "allOff": "Vše vypnout",
+      "reposition": "Nastavit pozice",
+      "positioning": "Umístění: {aura}",
+      "selectAura": "Aura",
+      "done": "Hotovo",
+      "moveLeft": "Posunout doleva",
+      "moveUp": "Posunout nahoru",
+      "moveDown": "Posunout dolů",
+      "moveRight": "Posunout doprava",
+      "moveEarlier": "Posunout kouzlo dovnitř",
+      "moveLater": "Posunout kouzlo ven",
+      "screenPosition": "Pozice na obrazovce",
+      "spellOrder": "Pořadí kouzel",
+      "reset": "Resetovat pozici",
+      "spellPosition": "Pořadí kouzel {position} / {count}",
+      "procs": {
+        "revenge": "Odveta!",
+        "battleTrance": "Bojový trans",
+        "overpowerCharge": "Posílení Rudé ruky",
+        "suddenDeath": "Náhlá smrt",
+        "victoryRush": "Vítězný nápor",
+        "enrage": "Vřava: rozzuřen",
+        "heatingUp": "Zahřívání",
+        "arcaneCharge": "Arkánové náboje",
+        "aetherRush": "Éterický nával"
       }
     },
     "playerCard": {
@@ -2105,6 +2176,14 @@ export const cs_CZ: EnTranslations = {
       "benefits": "Propoj svůj účet Steam z desktopové aplikace a skutky, které vykonáš, se budou zrcadlit do achievementů ve službě Steam.",
       "noTicket": "Steam nevydal propojovací tiket. Spusť Steam a zkus to znovu."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Propojit Epic",
+      "unlink": "Zrušit propojení s Epic",
+      "linked": "Propojeno s účtem Epic {id}",
+      "benefits": "Propoj svůj účet Epic z desktopové aplikace Epic, aby se tvé získané skutky promítly do úspěchů Epic.",
+      "noProof": "Epic neposkytl doklad o propojení. Spusť hru z Epic Games Store a zkus to znovu."
+    },
     "mailbox": {
       "title": "Poštovní schránka",
       "subtitle": "Havraní pošta",
@@ -2149,6 +2228,7 @@ export const cs_CZ: EnTranslations = {
         "noRecipient": "Nikdo s tímto jménem zde poštovní schránku nemá.",
         "tooManyParcels": "Dopis unese nejvýše {count} balíků.",
         "noMailQuestItems": "Úkolové předměty nelze posílat poštou.",
+        "noMailBound": "Tento předmět je vázaný a nelze ho poslat poštou.",
         "notEnoughItems": "Nemáš tolik kusů k odeslání.",
         "cantAffordPostage": "Nemůžeš si dovolit poštovné.",
         "recipientBoxFull": "Jejich poštovní schránka je plná.",
@@ -2955,6 +3035,14 @@ export const cs_CZ: EnTranslations = {
       "account_taken": "Tento účet Steam už je propojený s jiným účtem.",
       "upstream": "Steam neodpověděl. Zkus to za chvíli znovu."
     },
+    "epic": {
+      "disabled": "Propojení s Epic momentálně není k dispozici.",
+      "invalid_token": "Epic nemohl ověřit tento požadavek na propojení. Zkus to znovu z desktopové aplikace.",
+      "banned": "Tento účet Epic nelze propojit.",
+      "already_linked": "Tvůj účet již má propojený účet Epic.",
+      "account_taken": "Tento účet Epic je již propojen s jiným účtem.",
+      "upstream": "Epic neodpověděl. Zkus to za chvíli znovu."
+    },
     "wallet": {
       "handoff_invalid": "Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu."
     },
@@ -3582,14 +3670,6 @@ export const cs_CZ: EnTranslations = {
       "reptile": {
         "name": "Plazi",
         "desc": "Studenokrevní lovci s vlastním syčením a lupem čelistí, odlišní od teplokrevných bestií."
-      },
-      "murloc": {
-        "name": "Kvákoploutví",
-        "desc": "Kvákající rybí lid jezerních břehů a přílivových tůní, rychle se hrnoucí na cokoliv, co se přiblíží příliš blízko."
-      },
-      "kobold": {
-        "name": "Skrčci",
-        "desc": "Pobíhající mrchožrouti a víly mýtin a živých plotů, spíš otrava než hrozba, dokud se nesejdou ve velkém počtu."
       },
       "demon": {
         "name": "Démoni",
@@ -6243,11 +6323,15 @@ export const cs_CZ: EnTranslations = {
       "graphicsPresetMedium": "Střední",
       "graphicsPresetHigh": "Vysoká",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Extrémní",
       "graphicsPresetAdvanced": "Pokročilé",
       "terrainDetail": "Detail terénu",
       "foliageDensity": "Hustota vegetace",
       "effectsQuality": "Efekty a osvětlení",
       "shadowQuality": "Kvalita stínů",
+      "surfaceDetail": "Detail povrchů",
+      "surfaceDetailBasic": "Základní",
+      "surfaceDetailFull": "Plný",
       "terrainLow": "Nízký",
       "terrainHigh": "Vysoký",
       "touchOpacity": "Krytí dotykového ovládání",
@@ -6424,6 +6508,7 @@ export const cs_CZ: EnTranslations = {
       "floatingDodge": "Vyhnutí",
       "floatingParry": "Odraženo",
       "floatingResist": "Odoláno",
+      "floatingEvade": "Uniknutí",
       "floatingHealFull": "Plné",
       "floatingHealAbsorbed": "Pohlceno",
       "cannotMove": "Nemůžeš se hýbat!",
@@ -6436,6 +6521,7 @@ export const cs_CZ: EnTranslations = {
       "dodged": "{target} se vyhýbá tvé schopnosti {ability}.",
       "parried": "{target} odráží tvoji schopnost {ability}.",
       "resisted": "{target} odolává tvé schopnosti {ability}.",
+      "evaded": "{target} uniká tvé schopnosti {ability}.",
       "healSelf": "Tvoje {ability} tě léčí za {amount}.",
       "healSelfCrit": "Tvoje {ability} tě kriticky léčí za {amount}.",
       "healOther": "Tvoje {ability} léčí {target} za {amount}.",
@@ -6533,10 +6619,12 @@ export const cs_CZ: EnTranslations = {
       "arenaQueueTrading": "Před zařazením do fronty dokonči obchod.",
       "arenaQueueInstance": "Z instance se nemůžeš zařadit do fronty.",
       "tradeInProgress": "Obchod už probíhá.",
+      "tradeAlreadyTrading": "Tento hráč už obchoduje.",
       "tradeTooFar": "Cíl je příliš daleko pro obchod.",
       "tradeExpired": "Žádost o obchod vypršela.",
       "tradeFailed": "Obchod selhal: předměty nebo peníze už nejsou dostupné.",
-      "tradeBound": "Tento předmět je vázaný a nelze ho vyměnit."
+      "tradeBound": "Tento předmět je vázaný a nelze ho vyměnit.",
+      "marketListBound": "Tento předmět je vázaný a nelze ho nabídnout k prodeji."
     },
     "logs": {
       "standUp": "Vstáváš.",
@@ -7336,7 +7424,7 @@ export const cs_CZ: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Dokonalá neviditelnost",
-        "description": "Na 20 s zmizíš: odstraní 2 efekty průběžného poškození a během neviditelnosti i krátce po ní utrpíš o 90 % méně poškození. (mágovský talent)"
+        "description": "Zmizíš na 20 s a odstraníš 2 efekty poškození v čase. Když neviditelnost skončí, utrpíš o 90% nižší poškození po dobu 2 s. (mágovský talent)"
       },
       "hot_streak": {
         "name": "Žhavá série",
@@ -9932,6 +10020,18 @@ export const cs_CZ: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Tesákový nůž Zulgara"
       },
+      "fanglords_beastspear": {
+        "name": "Zvířecí kopí Tesákopána"
+      },
+      "bloodmane_warleggings": {
+        "name": "Krvavohřívé válečné nohavice"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Liánodrápé plíživé kalhoty"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Slunečněkostní rituální sarong"
+      },
       "thick_winter_pelt": {
         "name": "Silná zimní kožešina"
       },
@@ -10099,6 +10199,9 @@ export const cs_CZ: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Signet Poslední tvrze"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Klíček zapalování: Hrůzojiskra, otřásač země"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
@@ -10675,6 +10778,24 @@ export const cs_CZ: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Omotávky dračího chóru"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunika plíživce z Kotliny"
+      },
+      "verdant_heart_vestment": {
+        "name": "Roucho zeleného srdce"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Slunečněkostní rituální hauberk"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Velký tesák Kotliny"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Slunečněkostní koruna orákula"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Krvavohřívé válečné chrániče nohou"
       },
       "deathless_greatblade": {
         "name": "Nesmrtelná velká čepel"

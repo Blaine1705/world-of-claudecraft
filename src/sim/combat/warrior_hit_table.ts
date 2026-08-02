@@ -1,6 +1,6 @@
-// Front-facing melee defense folded into the existing one-roll hit tables.
-// Warriors own Strength-scaled parry and baseline shield block. Protection
-// Paladins use the same block roll and may add a temporary Bastion Rite bonus.
+// Warrior and Paladin melee defense folded into the existing one-roll hit tables.
+// Warrior keeps the class parry identity; shield block is shared by shield tanks
+// that derive active block stats from an equipped, level-legal shield.
 import type { Entity } from '../types';
 import { angleTo, normAngle } from '../types';
 

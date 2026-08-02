@@ -3435,8 +3435,6 @@ const CREST_RECIPES: Record<string, IconRecipe> = {
   family_elemental: r('storm', 'sky', ['lightning'], ['glow']),
   family_dragonkin: r('fire', 'ember', ['claw_slash'], ['glow']),
   family_reptile: r('earth', 'leafGreen', ['fang']),
-  family_kobold: r('junk', 'gold', ['candle']),
-  family_murloc: r('drink', 'sky', ['droplet'], ['motion']),
   family_sheep: r('nature', 'silverWhite', ['sheep_head']),
   // status / interaction markers
   status_npc: r('parchment', 'gold', ['sigil_rune']),
@@ -4585,6 +4583,7 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_shadowjump_toad',
   'reins_stormfeather_griffin',
   'reins_thunderstrut_gobbler',
+  'reins_terrorspark_groundshaker',
 ]);
 
 // The grouped literals above preserve the curated catalog's provenance history. Derive the
@@ -4707,6 +4706,16 @@ export const ITEM_ART_PENDING = new Set<string>([
   'stormsunder_hood',
   'voidscar_handwraps',
   'voidweave_mantle',
+  // heroic_loot.ts (Wildheart Basin Tier-2 loot pass; armor art not commissioned yet)
+  'basin_stalkers_tunic',
+  'bloodmane_war_legguards',
+  'sunbone_oracles_crown',
+  'sunbone_ritual_hauberk',
+  'verdant_heart_vestment',
+  // wildheart.ts (Zulgar's guaranteed uncommon trio; armor art not commissioned yet)
+  'bloodmane_warleggings',
+  'sunbone_ritual_sarong',
+  'vineclaw_stalking_breeches',
   // willowfen.ts
   'bridgemere_toll_chest',
   'eelskin_mudwaders',

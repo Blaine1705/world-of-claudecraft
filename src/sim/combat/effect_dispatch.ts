@@ -90,7 +90,7 @@ import {
   druidMarrowbreakUsesGuard,
   resolveDruidOverbloom,
 } from './druid_engines';
-import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
+import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { fireGuaranteedCrit, personalBarrierIdForSpec } from './fire_mage';
@@ -103,6 +103,10 @@ import {
 } from './frost_mage';
 import { spawnFrozenOrb } from './frozen_orb';
 import { glacialFrontContains } from './glacial_front';
+import {
+  applyGreaterInvisibilityAftereffect,
+  GREATER_INVISIBILITY_DR_AURA_ID,
+} from './greater_invisibility';
 import { livingGroupRaidInRadius } from './group_targeting';
 import { applyGroupHaste } from './haste_burst';
 import { armHeroicLeap, relocateSwept } from './heroic_leap';
@@ -193,7 +197,7 @@ import {
   applyWarspiritPosture,
   stoneboundThreatMultiplier,
 } from './shaman_warspirit';
-import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
 
@@ -470,9 +474,12 @@ export function runEffects(
     }
   }
 
-  if (ability.requiresAuraKind && ability.consumesRequiredAura !== false) {
-    consumeAuraKind(ctx, p, ability.requiresAuraKind);
-  }
+  // requiresAuraKind (Glacial Spike's Icicles, Victory Rush's kill window) is now
+  // consumed atomically at cast commit in casting_lifecycle.ts's applyAbility,
+  // alongside spendAbilityCost/armAbilityCooldown, not here: a ranged ability's
+  // runEffects can run ticks after the cast committed (once its projectile
+  // lands), which used to leave the gating aura alive for a same-tick second
+  // cast attempt (issue #2632).
 
   let targetBuffIndex = 0;
   for (const eff of res.effects) {
@@ -793,6 +800,7 @@ export function runEffects(
                 targetId: target.id,
                 school: ability.school,
                 fx: 'projectile',
+                ability: ability.id,
               });
               scheduleProjectile(ctx, p, target, (src, tgt) => {
                 ctx.dealDamage(
@@ -1008,7 +1016,7 @@ export function runEffects(
         // combat/paladin_rite_of_many.ts). Same button, same cast, same body to
         // begin it over: only who stands up afterwards changes.
         if (riteAnswersTheWholeGroup(ability.id, mods.spec, p.level)) {
-          resurrectDeadGroupMembers(ctx, p, eff.hpFrac);
+          resurrectDeadGroupMembers(ctx, p, eff.hpFrac, ability.id, ability.school);
           ctx.emit({
             type: 'spellfx',
             sourceId: p.id,
@@ -1025,11 +1033,12 @@ export function runEffects(
           targetId: ally.id,
           school: 'arcane',
           fx: 'temporalGlyph',
+          ability: ability.id,
         });
         break;
       }
       case 'massResurrectGroup': {
-        resurrectDeadGroupMembers(ctx, p, eff.hpFrac, ability.school);
+        resurrectDeadGroupMembers(ctx, p, eff.hpFrac, ability.id, ability.school);
         break;
       }
       case 'perfectMoment': {
@@ -1189,6 +1198,7 @@ export function runEffects(
             targetId: chain[i].id,
             school: ability.school,
             fx: 'chainHeal',
+            ability: ability.id,
           });
           const hopAmount = Math.max(1, Math.round(baseAmount * eff.falloff ** i));
           if (ctx.applyHeal(p, chain[i], hopAmount, ability.name, ability.id) > 0) {
@@ -1313,14 +1323,16 @@ export function runEffects(
         const scriptedChannel = interruptedDef
           ? undefined
           : SCRIPTED_INTERRUPTIBLE_CHANNELS[target.castingAbility];
+        // `school` is undefined exactly when BOTH lookups came up empty (both
+        // carry a required school field), so this guard is the old
+        // `!interruptedDef && !scriptedChannel` immunity check.
+        const school = interruptedDef?.school ?? scriptedChannel?.school;
         if (
-          (!interruptedDef && !scriptedChannel) ||
+          school === undefined ||
           interruptedDef?.school === 'physical' ||
           interruptedDef?.uninterruptible
         )
           break;
-        const school = interruptedDef?.school ?? scriptedChannel?.school;
-        if (!school) break;
         const remaining = ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.lockout);
         ctx.cancelCast(target);
         if (eff.rageOnInterrupt && meta.cls === 'warrior' && p.resourceType === 'rage') {
@@ -1354,6 +1366,10 @@ export function runEffects(
           ctx.applyNonPlayerStatAura(target, aura, -1);
           target.auras.splice(index, 1);
           ctx.emit({ type: 'aura', targetId: target.id, name: aura.name, gained: false });
+          if (aura.kind === 'stealth') {
+            target.stealthed = target.auras.some((entry) => entry.kind === 'stealth');
+          }
+          applyGreaterInvisibilityAftereffect(ctx, target, aura);
           if (eff.steal && offensive) {
             ctx.applyAura(p, { ...aura, sourceId: p.id });
           }
@@ -1401,6 +1417,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'nova',
+          ability: ability.id,
         });
         const fearBreakPct = mods.global.fearBreakPct;
         let feared = 0;
@@ -1535,6 +1552,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'echoBurst',
+          ability: ability.id,
         });
         break;
       }
@@ -1718,6 +1736,7 @@ export function runEffects(
           targetId: target.id,
           school: dot.school,
           fx: 'detonate',
+          ability: ability.id,
         });
         if (remainingDamage > 0) {
           ctx.dealDamage(
@@ -1926,6 +1945,9 @@ export function runEffects(
             range: eff.radius,
           });
         } else if (p.castAim) {
+          // sourceId attributes the landing to its caster so the renderer can
+          // fly the ability's authored projectile volley from the caster's
+          // hands to the aimed point (Splitshot's fan of arrows).
           ctx.emit({
             type: 'spellfxAt',
             x: aoeCenter.x,
@@ -1933,6 +1955,8 @@ export function runEffects(
             school: ability.school,
             fx: 'nova',
             radius: eff.radius,
+            ability: ability.id,
+            sourceId: p.id,
           });
         } else {
           ctx.emit({
@@ -1941,6 +1965,7 @@ export function runEffects(
             targetId: p.id,
             school: ability.school,
             fx: 'nova',
+            ability: ability.id,
           });
         }
         const aoeSpBonus = directHitBonus(
@@ -1990,7 +2015,7 @@ export function runEffects(
           if (aoeCrit)
             dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
           // Armor only mitigates physical damage, mirroring the single-target
-          // path above — spell-school AoE (Arcane Explosion, Consecration) is
+          // path above - spell-school AoE (Arcane Explosion, Consecration) is
           // not reduced by the target's armor.
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
           // Soft-cap scale (Revenge above 5 targets): applied after the roll and
@@ -2180,9 +2205,9 @@ export function runEffects(
             targetId: m.id,
             school: ability.school,
             fx: sunwardDisc ? 'paladinSunwardDisc' : 'projectile',
+            ability: ability.id,
             ...(sunwardDisc
               ? {
-                  ability: ability.id,
                   level: i + 1,
                   count: hitList.length + 1,
                 }
@@ -2224,6 +2249,7 @@ export function runEffects(
           targetId: center.id,
           school: ability.school,
           fx: 'nova',
+          ability: ability.id,
         });
         // AoE heals take the same per-target coefficient penalty as AoE damage.
         const aoeHealBonus = directHealBonus(p.spellPower, res.castTime, true);
@@ -2272,6 +2298,7 @@ export function runEffects(
           p,
           eff,
           ability.name,
+          ability.id,
           directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
         );
         break;
@@ -2293,6 +2320,7 @@ export function runEffects(
           tickTimer: eff.interval,
           school: ability.school,
           ability: ability.name,
+          abilityId: ability.id,
           // Each pulse is an AoE hit; scale per tick off the school's rating
           // (Spell Power, Ranged AP, or melee Attack Power for physical pulses).
           spBonus:
@@ -2332,6 +2360,7 @@ export function runEffects(
             fx: 'meteorFall',
             radius: eff.radius,
             duration: eff.interval,
+            ability: ability.id,
           });
         }
         if (eff.allyBuffPct) {
@@ -2343,6 +2372,7 @@ export function runEffects(
             fx: 'runeCircle',
             radius: eff.radius,
             duration: eff.duration,
+            ability: ability.id,
           });
         }
         // A snaring frost zone (Blizzard) snows over its area for its life.
@@ -2355,6 +2385,7 @@ export function runEffects(
             fx: 'snowZone',
             radius: eff.radius,
             duration: eff.duration,
+            ability: ability.id,
           });
         }
         if (p.castAim) {
@@ -2365,6 +2396,7 @@ export function runEffects(
             school: ability.school,
             fx: 'nova',
             radius: eff.radius,
+            ability: ability.id,
           });
         } else {
           ctx.emit({
@@ -2373,6 +2405,7 @@ export function runEffects(
             targetId: p.id,
             school: ability.school,
             fx: 'nova',
+            ability: ability.id,
           });
         }
         // A delayed zone (Meteor's fall) skips the on-cast pulse: its first
@@ -2385,6 +2418,7 @@ export function runEffects(
           // slows, ignites, or another Echoing Elements trigger.
           ctx.groundAoEs.push({
             sourceId: p.id,
+            abilityId: ability.id,
             pos: { ...zoneCenter },
             radius: eff.radius,
             min: Math.max(1, Math.round(groundEffect.min * 0.4)),
@@ -2463,6 +2497,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'nova',
+          ability: ability.id,
         });
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (m.dead) continue;
@@ -2496,6 +2531,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx,
+          ability: ability.id,
           range: stage.range,
           angle,
           level,
@@ -2692,11 +2728,17 @@ export function runEffects(
         break;
       }
       case 'greaterInvisibility': {
-        // One dispatch applies the whole package so the two self-auras carry
-        // distinct ids (the selfBuff case keys auras by the ability id alone):
-        // strip up to N DoTs (newest first), vanish via the stealth machinery
-        // (applyAura sets stealthed), and a buff_dr cut that outlives the
-        // vanish by `linger` so it survives an early break. Draws no rng.
+        // Strip up to N DoTs (newest first), then vanish through the shared
+        // stealth machinery. value2/value3 carry the configured defensive
+        // aftereffect so whichever normal path ends the vanish applies it once.
+        // A reset-assisted recast may have just ended the previous vanish, so
+        // clear that aftereffect before entering invisibility again.
+        const existingDr = p.auras.findIndex((a) => a.id === GREATER_INVISIBILITY_DR_AURA_ID);
+        if (existingDr >= 0) {
+          const gone = p.auras[existingDr];
+          p.auras.splice(existingDr, 1);
+          ctx.emit({ type: 'aura', targetId: p.id, name: gone.name, gained: false });
+        }
         let removed = 0;
         for (let i = p.auras.length - 1; i >= 0 && removed < eff.removeDotCount; i--) {
           if (p.auras[i].kind !== 'dot') continue;
@@ -2715,16 +2757,8 @@ export function runEffects(
           remaining: eff.duration,
           duration: eff.duration,
           value: 1,
-          sourceId: p.id,
-          school: ability.school,
-        });
-        ctx.applyAura(p, {
-          id: `${ability.id}_dr`,
-          name: ability.name,
-          kind: 'buff_dr',
-          remaining: eff.duration + eff.linger,
-          duration: eff.duration + eff.linger,
-          value: eff.drValue,
+          value2: eff.drValue,
+          value3: eff.afterDuration,
           sourceId: p.id,
           school: ability.school,
         });
@@ -2768,6 +2802,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'nova',
+          ability: ability.id,
         });
         // Materialize before movement so displacement cannot perturb iteration.
         for (const hostile of [...ctx.hostilesInRadius(p, p.pos, eff.radius)]) {
@@ -2811,6 +2846,7 @@ export function runEffects(
             school: ability.school,
             fx: 'nova',
             radius: eff.radius,
+            ability: ability.id,
           });
         } else {
           ctx.emit({
@@ -2819,6 +2855,7 @@ export function runEffects(
             targetId: p.id,
             school: ability.school,
             fx: 'nova',
+            ability: ability.id,
           });
         }
         // Control-only roots (for example Frost Trap) must not turn spell power
@@ -2944,7 +2981,10 @@ export function runEffects(
         break;
       }
       case 'breakRoots': {
-        removeRootAuras(ctx, p);
+        // Self-cast only: a personal barrier laid on a friendly TARGET (the
+        // Chronomancy Temporal Barrier can shield an ally) must not cleanse
+        // the caster's own root just because they cast the spell.
+        if (!target || target === p) removeRootAuras(ctx, p);
         break;
       }
       case 'breakControl': {
@@ -3007,6 +3047,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'blinkStep',
+          ability: ability.id,
         });
         break;
       }
