@@ -62,7 +62,7 @@ vi.mock('ws', () => ({ WebSocket: FakeSocket }));
 
 // Imported AFTER the mock declaration; vi.mock is hoisted, so bot/gateway.ts
 // binds to FakeSocket rather than the real client.
-const { Gateway } = await import('../bot/gateway');
+const { Gateway, EXIT_DRAIN_BACKSTOP_MS } = await import('../bot/gateway');
 
 function noopHandlers() {
   return { onDispatch: () => {} };
@@ -228,6 +228,79 @@ describe('Gateway production defaults', () => {
     expect(terminations()).toBe(0);
     await vi.advanceTimersByTimeAsync(60_000);
     expect(terminations()).toBe(0);
+  });
+
+  it('exits through the REAL default seam on a fatal close: staged exitCode, drain, then exit 1', () => {
+    // The exit seam is the one default every other arm injects (rig() must, or
+    // the real process.exit takes the vitest worker down), so nothing else in
+    // the suite ever runs it, and production runs ONLY it: bot/main.ts
+    // constructs with three arguments. A no-op default, a bare
+    // `process.exit(code)` (the drain dropped), and an exit code of 0 all have
+    // to fail here, because in production each one is invisible until the next
+    // incident.
+    //
+    // Constructed BEFORE the globals are stubbed, per R16: the default forwards
+    // to process.exit and process.stderr.write at CALL time, so the stubs
+    // installed after construction are still seen; stub-then-construct would
+    // pass for a capturing default and guard nothing.
+    const gateway = new Gateway('tok', 'wss://gateway.discord.gg', noopHandlers());
+    vi.useFakeTimers();
+    gateway.connect(false);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const order: string[] = [];
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
+      order.push(`exit:${code}`);
+      return undefined as never;
+    }) as never);
+    const writeSpy = vi.spyOn(process.stderr, 'write').mockImplementation(((
+      _chunk: unknown,
+      cb?: unknown,
+    ) => {
+      order.push('drain');
+      if (typeof cb === 'function') (cb as () => void)();
+      return true;
+    }) as never);
+    const prevExitCode = process.exitCode;
+
+    constructed[0].socket.emit('close', 4004);
+
+    // exitCode is staged FIRST so any other loop end still exits nonzero, then
+    // the drain hands the queued close-code line to the pipe, then the exit.
+    // The order array is the pin: a drain-less default reads ['exit:1'].
+    expect(process.exitCode).toBe(1);
+    expect(order).toEqual(['drain', 'exit:1']);
+    expect(writeSpy).toHaveBeenCalledTimes(1);
+    expect(exitSpy).toHaveBeenCalledTimes(1);
+    process.exitCode = prevExitCode;
+  });
+
+  it('exits anyway after EXIT_DRAIN_BACKSTOP_MS when the stderr drain never completes', async () => {
+    // stderr in the container is a pipe to the docker daemon; a pipe nobody
+    // drains defers the write callback forever. Without the backstop the
+    // process would keep running with a dead gateway while the heartbeat task
+    // keeps the healthcheck green: the silent zombie, wearing a green light.
+    const gateway = new Gateway('tok', 'wss://gateway.discord.gg', noopHandlers());
+    vi.useFakeTimers();
+    gateway.connect(false);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const exits: (number | undefined)[] = [];
+    vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
+      exits.push(code);
+      return undefined as never;
+    }) as never);
+    // The blocked pipe: the write is accepted but its callback never runs.
+    vi.spyOn(process.stderr, 'write').mockImplementation((() => true) as never);
+    const prevExitCode = process.exitCode;
+
+    constructed[0].socket.emit('close', 4014);
+
+    expect(process.exitCode).toBe(1); // staged even while the drain hangs
+    expect(exits).toEqual([]);
+    await vi.advanceTimersByTimeAsync(EXIT_DRAIN_BACKSTOP_MS - 1);
+    expect(exits).toEqual([]); // one tick early: the bound is exact, not fuzzy
+    await vi.advanceTimersByTimeAsync(1);
+    expect(exits).toEqual([1]); // the log line is lost, the exit is not
+    process.exitCode = prevExitCode;
   });
 });
 

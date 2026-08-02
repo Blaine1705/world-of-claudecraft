@@ -1,13 +1,16 @@
 // The bot's own liveness signal: a file whose modification time says the run
 // loop is still turning (D15).
 //
-// A Discord bot has no port to probe. It can be wedged in every way that
-// matters, a gateway that never reconnected, a scheduler task claimed by a run
-// that never settled, and still look perfectly healthy from the outside: the
-// process is up and the container is running. So the bot writes a file on a
-// cadence, and the container healthcheck compares its mtime against now. What
-// that proves is exactly what a healthcheck should prove and no more: the
-// scheduler is still driving tasks, because the write is one of its tasks.
+// A Discord bot has no port to probe, so the bot writes a file on a cadence and
+// the container healthcheck compares its mtime against now. What that proves is
+// exactly what a healthcheck should prove and no more: the scheduler is still
+// driving tasks, because the write is one of them. The wedges it catches are
+// whole-process ones, an event loop starved by a hot spin, a scheduler whose
+// driver died, an exit that never fired. It does NOT catch a single OTHER task
+// claimed by a run that never settled (task chains are independent, so this one
+// keeps stamping), and it says nothing about gateway state (the gateway is not
+// on the scheduler): per-task wedges are covered structurally instead, by the
+// L10/L17 deadlines both IO shells now carry.
 //
 // This is an IO shell, thin on purpose: the freshness DECISION is the pure
 // helper below, unit-tested on its own, and the writer is the only part that

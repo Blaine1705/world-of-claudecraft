@@ -16,6 +16,11 @@ export interface GatewayHandlers {
   onDispatch(type: string, data: Record<string, unknown>): void;
 }
 
+/** How long the default exit seam waits for the stderr drain before exiting
+ *  anyway. Named and exported (the SERVER_CALL_TIMEOUT_MS pattern) so the suite
+ *  pins the bound against a literal instead of re-reading the source. */
+export const EXIT_DRAIN_BACKSTOP_MS = 1000;
+
 /** Opens the gateway socket. Injected so tests can hand the Gateway a fake
  *  socket; production is the `ws` client this file already imports. The return
  *  type is `ws`'s own WebSocket so the `on('message'|'close'|'error', ...)`
@@ -61,8 +66,17 @@ export class Gateway {
     // and process.exit() discards queued writes, so a bare exit can eat the very
     // close-code line the crash loop's diagnosability depends on. Stream writes
     // settle in order, so the empty write's callback runs only after the queued
-    // log line has been handed to the pipe.
+    // log line has been handed to the pipe. The drain is BOUNDED: stderr is a
+    // pipe to the docker daemon, and a pipe nobody drains defers the callback
+    // forever, which would leave a live process with a dead gateway while the
+    // heartbeat task keeps the healthcheck green, the exact zombie this exit
+    // exists to end. So exitCode is staged first (any other loop end still
+    // exits nonzero) and an unref'd backstop timer exits with the log line
+    // lost rather than not exiting at all.
     private exitProcess: (code: number) => void = (code) => {
+      process.exitCode = code;
+      const backstop = setTimeout(() => process.exit(code), EXIT_DRAIN_BACKSTOP_MS);
+      (backstop as unknown as { unref?: () => void }).unref?.();
       process.stderr.write('', () => process.exit(code));
     },
   ) {}
