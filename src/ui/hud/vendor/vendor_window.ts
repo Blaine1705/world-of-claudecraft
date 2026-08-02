@@ -8,6 +8,7 @@
 // one panel and reports clicks back through the injected callbacks.
 
 import type { ItemInstancePayload } from '../../../sim/types';
+import type { VendorBuyOptions } from '../../../sim/vendor_buy_stack';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
@@ -26,10 +27,12 @@ import type { VendorGoodsRow, VendorPrice, VendorView } from './vendor_view';
  */
 export interface VendorWindowDeps extends PainterHostPresentation {
   hideTooltip(): void;
-  /** `bulk` (#2374): true for a ctrl/cmd-click on the row or a click on its
-   *  "Buy Stack" control, requesting the largest affordable stack instead of
-   *  the ordinary single unit. */
-  onBuy(itemId: string, bulk?: boolean): void;
+  /** The one explicit purchase shape (VendorBuyOptions): `{ bulk: true }` for
+   *  a ctrl/cmd-click on the row or a click on its "Buy Stack" control (the
+   *  largest affordable stack, #2374), `{ count: N }` for a control-row
+   *  multiple or a confirmed custom amount (N row units, phase 21). At most
+   *  one field is ever set; a plain click passes undefined. */
+  onBuy(itemId: string, opts?: VendorBuyOptions): void;
   onBuyBack(
     itemId: string,
     index: number,
@@ -169,8 +172,11 @@ export function renderVendorWindow(
     row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${esc(stack)}${requirement ? `<span class="vi-sub">${esc(requirement)}</span>` : ''}</span><span class="vi-price">${goodsPriceHtml(goods, deps)}</span>`;
     row.dataset.focusKey = `buy:${itemId}`;
     // Ctrl/Cmd-click requests a bulk purchase (#2374), the desktop mirror of
-    // the "Buy Stack" tile below; both funnel through the same onBuy(itemId, true).
-    row.addEventListener('click', (ev) => deps.onBuy(itemId, ev.ctrlKey || ev.metaKey));
+    // the "Buy Stack" tile below; both funnel through the same
+    // onBuy(itemId, { bulk: true }).
+    row.addEventListener('click', (ev) =>
+      deps.onBuy(itemId, ev.ctrlKey || ev.metaKey ? { bulk: true } : undefined),
+    );
     // No appended requirement line in the tooltip: the shared item tooltip
     // (deps.itemTooltip -> gatherToolTooltipLines) already renders the same
     // "Requires {craft} {skill}" sentence on every requirement-carrying
@@ -204,7 +210,7 @@ export function renderVendorWindow(
       // finger exactly like the ordinary row's buy, and without a key the
       // restore ladder cannot find the tile again (focus fell to <body>).
       bulkRow.dataset.focusKey = `buy-stack:${itemId}`;
-      bulkRow.addEventListener('click', () => deps.onBuy(itemId, true));
+      bulkRow.addEventListener('click', () => deps.onBuy(itemId, { bulk: true }));
       deps.attachTooltip(
         bulkRow,
         () =>

@@ -38,11 +38,11 @@ describe('ptr dev vendor', () => {
     expect(vendor, 'vendor spawned').toBeTruthy();
     expect(vendor!.vendorItems.length).toBeGreaterThan(50);
     const epic = vendor!.vendorItems[0];
-    (sim as unknown as { buyItem(npc: number, item: string, pid?: number): void }).buyItem(
-      vendor!.id,
-      epic,
-      sim.playerId,
-    );
+    (
+      sim as unknown as {
+        buyItem(npc: number, item: string, opts?: { count?: number }, pid?: number): void;
+      }
+    ).buyItem(vendor!.id, epic, undefined, sim.playerId);
     // got the item, paid nothing
     expect(sim.countItem(epic)).toBeGreaterThan(0);
     if (copperBefore !== undefined) {

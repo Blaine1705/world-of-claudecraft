@@ -673,6 +673,7 @@ import {
   type WorldContent,
   xpToReachLevel,
 } from './types';
+import type { VendorBuyOptions } from './vendor_buy_stack';
 import * as weaponStowMod from './weapon_stow';
 import {
   crossesGardenHedge,
@@ -8045,32 +8046,14 @@ export class Sim {
     return items.useItem(this.ctx, itemId, pid);
   }
 
-  // Two overloads, same trick as buyBackItem below: the IWorld shape UI/production
-  // code calls (npcId, itemId, bulk?) versus the legacy test/server shape that
-  // already threads a pid positionally in the third slot (npcId, itemId, pid?).
-  // Disambiguated by typeof so every existing `sim.buyItem(npc, item, pid)` call
-  // site keeps working unchanged.
-  buyItem(npcId: number, itemId: string, bulk?: boolean): void;
-  buyItem(npcId: number, itemId: string, pid?: number, bulk?: boolean): void;
-  buyItem(
-    npcId: number,
-    itemId: string,
-    bulkOrPid?: boolean | number,
-    pidOrBulk?: number | boolean,
-  ): void {
-    const pid =
-      typeof bulkOrPid === 'number'
-        ? bulkOrPid
-        : typeof pidOrBulk === 'number'
-          ? pidOrBulk
-          : undefined;
-    const bulk =
-      typeof bulkOrPid === 'boolean'
-        ? bulkOrPid
-        : typeof pidOrBulk === 'boolean'
-          ? pidOrBulk
-          : undefined;
-    items.buyItem(this.ctx, npcId, itemId, pid, bulk);
+  // ONE explicit shape, no overloads (phase 21): the request rides an options
+  // bag (VendorBuyOptions) because any positional count or bulk slot beside
+  // the optional numeric pid compiles green under structural typing while
+  // misrouting a count into pid or a pid into count; the bag makes every
+  // stale positional call site a compile error instead. pid stays last, the
+  // per-player thread every sibling command shares.
+  buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions, pid?: number): void {
+    items.buyItem(this.ctx, npcId, itemId, pid, opts);
   }
 
   sellItem(itemId: string, count = 1, pid?: number): void {

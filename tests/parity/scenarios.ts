@@ -4158,9 +4158,9 @@ function inventoryVendor(): Scenario {
       rec.snapshot('iv-setup');
 
       // 1) buy a food, a drink, and a potion from the merchant (copper - buyValue each).
-      sim.buyItem(wilkes.id, 'baked_bread', buyer);
-      sim.buyItem(wilkes.id, 'spring_water', buyer);
-      sim.buyItem(wilkes.id, 'minor_healing_potion', buyer);
+      sim.buyItem(wilkes.id, 'baked_bread', undefined, buyer);
+      sim.buyItem(wilkes.id, 'spring_water', undefined, buyer);
+      sim.buyItem(wilkes.id, 'minor_healing_potion', undefined, buyer);
       rec.snapshot('bought');
 
       // 2) equip a helmet into the empty slot, then a second helmet to force a SWAP

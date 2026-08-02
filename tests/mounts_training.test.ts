@@ -468,13 +468,13 @@ describe('new-player path: buy riding at Marla, then complete the lesson', () =>
     // (b) buyItem riding_training deducts exactly 800_000
     //     and grants ridingTrained; leaves exactly 10_000 copper.
     standAtMarla(sim);
-    sim.buyItem(marla.id, 'riding_training', sim.playerId);
+    sim.buyItem(marla.id, 'riding_training', undefined, sim.playerId);
     sim.tick();
     expect(meta.ridingTrained).toBe(true);
     expect(meta.copper).toBe(10_000);
 
     // (c) Buying riding_training again is refused (already trained); no copper change.
-    sim.buyItem(marla.id, 'riding_training', sim.playerId);
+    sim.buyItem(marla.id, 'riding_training', undefined, sim.playerId);
     const alreadyEvents = sim.tick();
     expect(alreadyEvents.some((e) => e.type === 'error')).toBe(true);
     expect(meta.copper).toBe(10_000);
@@ -494,7 +494,7 @@ describe('new-player path: buy riding at Marla, then complete the lesson', () =>
 
     // (f) reins_valorsteed costs 100_000 but we only have 10_000: need +90_000.
     meta.copper += 90_000; // now 100_000
-    sim.buyItem(marla.id, 'reins_valorsteed', sim.playerId);
+    sim.buyItem(marla.id, 'reins_valorsteed', undefined, sim.playerId);
     sim.tick();
     expect(meta.copper).toBe(0);
     expect(meta.inventory.some((s) => s.itemId === 'reins_valorsteed')).toBe(true);

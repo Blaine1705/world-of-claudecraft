@@ -11,6 +11,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { ItemDef } from '../src/sim/types';
+import type { VendorBuyOptions } from '../src/sim/vendor_buy_stack';
 import type { HeroicShopRow, HeroicShopView } from '../src/ui/hud/vendor/heroic_vendor_view';
 import { renderHeroicVendorWindow } from '../src/ui/hud/vendor/heroic_vendor_window';
 import type {
@@ -361,12 +362,12 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
     ];
     const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
     const el = document.createElement('div');
-    let bulkCalled: [string, boolean | undefined] | undefined;
+    let bulkCalled: [string, VendorBuyOptions | undefined] | undefined;
     renderVendorWindow(
       el,
       'Vendor',
       view,
-      deps({ onBuy: (itemId, bulk) => (bulkCalled = [itemId, bulk]) }),
+      deps({ onBuy: (itemId, opts) => (bulkCalled = [itemId, opts]) }),
     );
 
     const rows = el.querySelectorAll('.vendor-item');
@@ -377,7 +378,7 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
     expect(bulkRow?.getAttribute('aria-label')).toContain('20');
 
     bulkRow?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(bulkCalled).toEqual(['thread', true]);
+    expect(bulkCalled).toEqual(['thread', { bulk: true }]);
   });
 
   it('the Buy Stack tile is disabled whenever the bulk purchase itself is unaffordable', () => {
@@ -438,15 +439,15 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
     ];
     const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
     const el = document.createElement('div');
-    const calls: (boolean | undefined)[] = [];
-    renderVendorWindow(el, 'Vendor', view, deps({ onBuy: (_itemId, bulk) => calls.push(bulk) }));
+    const calls: (VendorBuyOptions | undefined)[] = [];
+    renderVendorWindow(el, 'Vendor', view, deps({ onBuy: (_itemId, opts) => calls.push(opts) }));
 
     const mainRow = el.querySelector('.vendor-item:not(.vendor-item-bulk)') as HTMLButtonElement;
     mainRow.dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }));
     mainRow.dispatchEvent(new MouseEvent('click', { bubbles: true, metaKey: true }));
     mainRow.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
-    expect(calls).toEqual([true, true, false]);
+    expect(calls).toEqual([{ bulk: true }, { bulk: true }, undefined]);
   });
 });
 

@@ -448,7 +448,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     const ctx = ctxOf(sim);
     // minor_healing_potion: buyValue 40, no explicit stackSize (default 20).
     meta.copper = 40 * 20;
-    items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid, true);
+    items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid, { bulk: true });
     expect(sim.countItem('minor_healing_potion', pid)).toBe(20);
     expect(meta.copper).toBe(0);
   });
@@ -458,7 +458,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     const { pid, wilkes, meta } = vendorPlayer(sim);
     const ctx = ctxOf(sim);
     meta.copper = 250; // floor(250 / 40) = 6
-    items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid, true);
+    items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid, { bulk: true });
     expect(sim.countItem('minor_healing_potion', pid)).toBe(6);
     expect(meta.copper).toBe(250 - 6 * 40); // 10
   });
@@ -469,7 +469,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     const ctx = ctxOf(sim);
     meta.copper = 5; // less than the 40-copper unit price
     sim.drainEvents();
-    items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid, true);
+    items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid, { bulk: true });
     expect(errorTexts(sim.drainEvents())).toContain('Not enough money.');
     expect(sim.countItem('minor_healing_potion', pid)).toBe(0);
     expect(meta.copper).toBe(5);
@@ -480,7 +480,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     const { pid, wilkes, meta } = vendorPlayer(sim);
     const ctx = ctxOf(sim);
     meta.copper = 100_000;
-    items.buyItem(ctx, wilkes.id, 'baked_bread', pid, true);
+    items.buyItem(ctx, wilkes.id, 'baked_bread', pid, { bulk: true });
     // baked_bread: buyValue 25, kind food (vendorStackSize 5 normally, but a
     // bulk request overrides that with the real bag stack size, DEFAULT_STACK
     // 20), paid per-unit at the same listed price either way.
@@ -499,7 +499,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     meta.inventory.length = 0;
     meta.honor = 10_000;
 
-    items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid, true);
+    items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid, { bulk: true });
 
     expect(sim.countItem('final_argument_greatblade', pid)).toBe(1);
     expect(meta.honor).toBe(10_000 - 800);
@@ -520,7 +520,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     player.pos.x = marla.pos.x;
     player.pos.z = marla.pos.z;
 
-    items.buyItem(ctxOf(sim), marla.id, 'reins_valorsteed', pid, true);
+    items.buyItem(ctxOf(sim), marla.id, 'reins_valorsteed', pid, { bulk: true });
 
     expect(sim.countItem('reins_valorsteed', pid)).toBe(1);
     expect(meta.copper).toBe(100_000_000 - 100_000); // reins_valorsteed buyValue 100_000
@@ -535,7 +535,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     // a fresh minor_healing_potion stack.
     meta.inventory = Array.from({ length: 16 }, () => ({ itemId: 'worn_sword', count: 1 }));
     sim.drainEvents();
-    items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid, true);
+    items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid, { bulk: true });
     expect(errorTexts(sim.drainEvents())).toContain('Your bags are full.');
     expect(sim.countItem('minor_healing_potion', pid)).toBe(0);
     expect(meta.copper).toBe(40 * 20);

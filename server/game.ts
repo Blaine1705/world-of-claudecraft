@@ -4677,8 +4677,19 @@ export class GameServer {
         }
         break;
       case 'buy':
+        // The options bag third, pid fourth (the one explicit shape; see
+        // Sim.buyItem). A non-number count is dropped like sell's, a hostile
+        // number reaches the sim's sanitize and denies there.
         if (typeof msg.npc === 'number' && typeof msg.item === 'string')
-          sim.buyItem(msg.npc, msg.item, pid, msg.bulk === true);
+          sim.buyItem(
+            msg.npc,
+            msg.item,
+            {
+              count: typeof msg.count === 'number' ? msg.count : undefined,
+              bulk: msg.bulk === true,
+            },
+            pid,
+          );
         break;
       case 'sell':
         if (typeof msg.item === 'string') {

@@ -76,6 +76,7 @@ import {
   type VcNationId,
   type WeaponSkinType,
 } from '../sim/types';
+import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
 import { WORLD_SEED } from '../sim/world_seed';
 import {
   type AccountCosmetics,
@@ -3700,11 +3701,18 @@ export class ClientWorld implements IWorld {
   discardItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'discard', item: itemId, count });
   }
-  buyItem(npcId: number, itemId: string, bulk?: boolean): void {
-    // `bulk` rides the wire only when true (the craftItem `commission` idiom
-    // above): an ordinary buy stays byte-identical to the pre-#2374 message.
-    if (bulk === true) {
+  buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions): void {
+    // `bulk` and `count` each ride the wire only when non-default (the
+    // craftItem `commission` idiom above): an ordinary buy stays
+    // byte-identical to the pre-#2374 message, and a count of 1 stays
+    // byte-identical to the bulk-era frame. The sender never emits both
+    // fields: bulk's two affordances and the count control row are separate
+    // surfaces, and the server's bulk-wins precedence only ever decides
+    // hand-crafted frames.
+    if (opts?.bulk === true) {
       this.cmd({ cmd: 'buy', npc: npcId, item: itemId, bulk: true });
+    } else if (opts?.count !== undefined && opts.count > 1) {
+      this.cmd({ cmd: 'buy', npc: npcId, item: itemId, count: opts.count });
     } else {
       this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
     }

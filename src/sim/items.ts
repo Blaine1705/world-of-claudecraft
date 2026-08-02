@@ -51,7 +51,13 @@ import {
   isNonSpellCast,
   POTION_COOLDOWN,
 } from './types';
-import { bulkBuyQuantity } from './vendor_buy_stack';
+import {
+  buyPurchaseTotals,
+  bulkBuyQuantity,
+  sanitizeBuyCount,
+  type VendorBuyOptions,
+  vendorCountForced,
+} from './vendor_buy_stack';
 import { vendorStackSize } from './vendor_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
@@ -714,7 +720,7 @@ export function buyItem(
   npcId: number,
   itemId: string,
   pid?: number,
-  bulk?: boolean,
+  opts?: VendorBuyOptions,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -743,6 +749,18 @@ export function buyItem(
   const hasCopperPrice = copperUnitPrice > 0;
   const hasHonorPrice = honorPrice > 0;
   if (!def || (!freeVendor && !hasCopperPrice && !hasHonorPrice)) {
+    ctx.error(meta.entityId, 'That item is not for sale.');
+    return;
+  }
+  // Count sanitize, before any state-changing branch: a present count must
+  // already be a legal integer request or the whole command is denied (Q20's
+  // toast-deny; never sell's silent swallow, and never coercion, which would
+  // charge for a quantity no legitimate client sent). Bulk wins on a crafted
+  // frame carrying both fields (the shipped verb's precedence, decided here
+  // once so all three hosts agree); the client never sends both.
+  const bulk = opts?.bulk === true;
+  const count = sanitizeBuyCount(bulk ? undefined : opts?.count);
+  if (count === null) {
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
@@ -802,12 +820,36 @@ export function buyItem(
   // guards against a SECOND purchase, not a bulk quantity within this one). The
   // result is floored at 1 so an unaffordable bulk request still hits the normal
   // "Not enough money" check below instead of silently buying zero.
-  const bulkEligible = bulk === true && hasCopperPrice && !hasHonorPrice && def.kind !== 'mount';
-  const qty = bulkEligible
-    ? Math.max(1, bulkBuyQuantity(def, freeVendor ? 0 : copperUnitPrice, meta.copper))
-    : vendorStackSize(def);
-  const copperCost = freeVendor ? 0 : copperUnitPrice * qty;
-  const honorCost = freeVendor ? 0 : honorPrice;
+  //
+  // Count purchase (the 1x/5x/10x/custom control row): count N is N ordinary
+  // row-unit purchases resolved atomically, refuse-whole on any shortfall
+  // (Q20). The Q23 force-1 rows never multiply, and the totals are
+  // overflow-guarded BEFORE the balance compares below so those compares can
+  // never run on a non-safe integer.
+  const bulkEligible = bulk && hasCopperPrice && !hasHonorPrice && def.kind !== 'mount';
+  let qty: number;
+  let copperCost: number;
+  let honorCost: number;
+  if (bulkEligible) {
+    qty = Math.max(1, bulkBuyQuantity(def, freeVendor ? 0 : copperUnitPrice, meta.copper));
+    copperCost = freeVendor ? 0 : copperUnitPrice * qty;
+    honorCost = freeVendor ? 0 : honorPrice;
+  } else {
+    const appliedCount = vendorCountForced(def) ? 1 : count;
+    const totals = buyPurchaseTotals(
+      def,
+      freeVendor ? 0 : copperUnitPrice,
+      freeVendor ? 0 : honorPrice,
+      appliedCount,
+    );
+    if (totals === null) {
+      ctx.error(meta.entityId, 'Not enough money.');
+      return;
+    }
+    qty = totals.units;
+    copperCost = totals.copper;
+    honorCost = totals.honor;
+  }
   if (meta.copper < copperCost) {
     ctx.error(meta.entityId, 'Not enough money.');
     return;

@@ -865,7 +865,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     const buyerMeta = sim.meta(first);
     if (!buyerMeta) throw new Error('missing buyer metadata');
     buyerMeta.copper = 10_000;
-    sim.buyItem(trader.id, 'baked_bread', first);
+    sim.buyItem(trader.id, 'baked_bread', undefined, first);
     expect(sim.countItem('baked_bread', first)).toBeGreaterThan(0);
 
     const marshal = npcEntity(sim, 'marshal_redbrook');
