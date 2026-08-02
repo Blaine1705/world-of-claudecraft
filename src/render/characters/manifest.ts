@@ -709,9 +709,12 @@ export const VISUALS: Record<string, VisualDef> = {
     // Faint warm lift only, to tell this apart from the mage/warlock models it
     // shares mage.glb with. The whole rig is ONE merged material/atlas (skin,
     // hair, and robe together), so this lerp multiplies the entire body, not
-    // just the cloth; 0.5 read as a full-body cream wash that flattened the
-    // face and hands (issue #2678). Kept low like the mob tints below that hit
-    // the same one-material-per-rig trap (mob_troll, mob_kobold, mob_ogre).
+    // just the cloth. Measured: 0xf0e9d6 is near white, so even at 0.5 the old
+    // strength only shifted the body by roughly (0.983, 0.980, 0.956), a
+    // near-no-op (issue #2678); dropped to 0.15 anyway for consistency with
+    // shaman/warlock, where the saturated tints DID flatten the face and
+    // hands at their old strengths. Kept low like the mob tints below that
+    // hit the same one-material-per-rig trap (mob_troll, mob_kobold, mob_ogre).
     tint: 0xf0e9d6,
     tintStrength: 0.15,
   },

@@ -42,7 +42,21 @@ const bundled = await esbuild.build({
   bundle: true,
   format: 'iife',
   platform: 'browser',
-  define: { 'import.meta.env.DEV': 'true', 'import.meta.env.PROD': 'false' },
+  define: {
+    'import.meta.env.DEV': 'true',
+    'import.meta.env.PROD': 'false',
+    // src/client_origin.ts and src/runtime.ts (pulled in transitively via the guide
+    // viewer's asset chain) also read import.meta.env at module scope; esbuild replaces
+    // the whole import.meta object with {} for a non-ESM output format, so an undefined
+    // field access here throws in the browser page rather than failing this build step
+    // (the assert below only catches a literal `import.meta` surviving the bundle, not
+    // an unmatched member access on the now-empty stand-in object).
+    'import.meta.env.VITE_NATIVE_APP': '""',
+    'import.meta.env.VITE_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_APP': '""',
+    'import.meta.env.VITE_DESKTOP_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_RELATIVE_API': '""',
+  },
   write: false,
   logLevel: 'silent',
 });
