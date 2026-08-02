@@ -7,12 +7,12 @@ import { svelteTesting } from '@testing-library/svelte/vite';
 import { browserslistToTargets } from 'lightningcss';
 import { defineConfig } from 'vite';
 import { loadBrowserslistFloors } from './scripts/browserslist_targets.mjs';
-// Untyped zero-dep build helper (same convention as the other scripts/*.mjs tools).
-// vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
-import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
 // CI path-matrix equivalent: LPT packs for --shard=i/N (see scripts/ci_balanced_sequencer.mjs).
 // Untyped .mjs import, same convention as other scripts/* tools outside tsconfig include.
 import { BalancedSequencer } from './scripts/ci_balanced_sequencer.mjs';
+// Untyped zero-dep build helper (same convention as the other scripts/*.mjs tools).
+// vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
+import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
 
