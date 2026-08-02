@@ -16,6 +16,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': '전체',
   'hudChrome.warlock.doomLabel': '단죄',
   'hudChrome.warlock.fateThreadsLabel': '운명의 실타래',
+  'hudChrome.warlock.doomMeterUnlock': '고통 자원 막대 이동',
+  'hudChrome.warlock.doomMeterLock': '고통 자원 막대 고정',
   'hudChrome.warlock.doomEmptyStatus': '단죄 {value}/{max}.',
   'hudChrome.warlock.doomStatus': '단죄 {value}/{max}, 남은 시간 {remaining}.',
   'hudChrome.procOverlay.soulFragmentsMeter': '영혼 조각',

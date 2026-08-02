@@ -8100,6 +8100,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.warfare.reasons.fiestaWin'
   | 'hudChrome.warlock.doomEmptyStatus'
   | 'hudChrome.warlock.doomLabel'
+  | 'hudChrome.warlock.doomMeterLock'
+  | 'hudChrome.warlock.doomMeterUnlock'
   | 'hudChrome.warlock.doomStatus'
   | 'hudChrome.warlock.fateThreadsConsumeReady'
   | 'hudChrome.warlock.fateThreadsLabel'

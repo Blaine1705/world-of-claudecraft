@@ -319,6 +319,8 @@ export const es_ES: EnTranslations = {
     "warlock": {
       "doomLabel": "Condena",
       "fateThreadsLabel": "Hilos del destino",
+      "doomMeterUnlock": "Move Affliction resource bar",
+      "doomMeterLock": "Lock Affliction resource bar",
       "doomEmptyStatus": "{value} de {max} de Condena.",
       "doomStatus": "{value} de {max} de Condena; quedan {remaining}.",
       "fateThreadsStatus": "{value} of {max} Fate Threads.",

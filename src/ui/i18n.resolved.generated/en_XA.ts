@@ -319,6 +319,8 @@ export const en_XA: EnTranslations = {
     "warlock": {
       "doomLabel": "[Çóñðéɱñáţíóñ]",
       "fateThreadsLabel": "[Ƒáţé Ţĥŕéáðš]",
+      "doomMeterUnlock": "[Ɱóʋé Áƒƒļíçţíóñ ŕéšóúŕçé ƀáŕ]",
+      "doomMeterLock": "[Ļóçķ Áƒƒļíçţíóñ ŕéšóúŕçé ƀáŕ]",
       "doomEmptyStatus": "[{value} óƒ {max} Çóñðéɱñáţíóñ.]",
       "doomStatus": "[{value} óƒ {max} Çóñðéɱñáţíóñ; {remaining}.]",
       "fateThreadsStatus": "[{value} óƒ {max} Ƒáţé Ţĥŕéáðš.]",

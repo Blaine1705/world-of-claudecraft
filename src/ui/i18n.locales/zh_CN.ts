@@ -16,6 +16,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': '全部',
   'hudChrome.warlock.doomLabel': '谴罪',
   'hudChrome.warlock.fateThreadsLabel': '命运丝线',
+  'hudChrome.warlock.doomMeterUnlock': '移动痛苦资源条',
+  'hudChrome.warlock.doomMeterLock': '锁定痛苦资源条',
   'hudChrome.warlock.doomEmptyStatus': '{value}/{max} 谴罪。',
   'hudChrome.warlock.doomStatus': '{value}/{max} 谴罪；剩余 {remaining}。',
   'hudChrome.procOverlay.soulFragmentsMeter': '灵魂碎片',

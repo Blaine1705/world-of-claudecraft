@@ -3203,6 +3203,7 @@ export class Hud {
     this.targetFrameMover?.reset();
     this.playerFrameMover?.reset();
     this.partyFrameMover?.reset();
+    this.doomMeter.resetPosition();
   }
 
   /** Repaint persisted visual-space geometry after a live UI Scale change. */
@@ -3211,6 +3212,7 @@ export class Hud {
     this.targetFrameMover?.reapplyPosition();
     this.playerFrameMover?.reapplyPosition();
     this.partyFrameMover?.reapplyPosition();
+    this.doomMeter.reapplyPosition();
   }
 
   // The player frame docks inside #actionbar-stack, whose #bottom-bar ancestor
@@ -3589,6 +3591,10 @@ export class Hud {
       fateThreadsLabel: () => t('hudChrome.warlock.fateThreadsLabel'),
       formatFateThreadsStatus: (value, max) =>
         t('hudChrome.warlock.fateThreadsStatus', { value, max }),
+    },
+    {
+      detachedParent: $('#ui'),
+      isMobileLayout: () => this.isMobileLayout(),
     },
   );
   private readonly delvePainter = new DelveMapPainter(this.writerFacet, classCss);

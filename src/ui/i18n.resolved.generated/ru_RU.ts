@@ -319,6 +319,8 @@ export const ru_RU: EnTranslations = {
     "warlock": {
       "doomLabel": "Осуждение",
       "fateThreadsLabel": "Нити судьбы",
+      "doomMeterUnlock": "Переместить шкалу ресурсов Колдовства",
+      "doomMeterLock": "Закрепить шкалу ресурсов Колдовства",
       "doomEmptyStatus": "Осуждение: {value} из {max}.",
       "doomStatus": "Осуждение: {value} из {max}; осталось {remaining}.",
       "fateThreadsStatus": "{value} of {max} Fate Threads.",

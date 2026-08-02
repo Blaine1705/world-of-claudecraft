@@ -16,6 +16,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': 'すべて',
   'hudChrome.warlock.doomLabel': '断罪',
   'hudChrome.warlock.fateThreadsLabel': '運命の糸',
+  'hudChrome.warlock.doomMeterUnlock': '苦痛リソースバーを移動',
+  'hudChrome.warlock.doomMeterLock': '苦痛リソースバーを固定',
   'hudChrome.warlock.doomEmptyStatus': '断罪 {value}/{max}。',
   'hudChrome.warlock.doomStatus': '断罪 {value}/{max}、残り {remaining}。',
   'hudChrome.procOverlay.soulFragmentsMeter': '魂の欠片',

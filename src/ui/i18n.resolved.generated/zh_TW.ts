@@ -319,6 +319,8 @@ export const zh_TW: EnTranslations = {
     "warlock": {
       "doomLabel": "譴罪",
       "fateThreadsLabel": "命運絲線",
+      "doomMeterUnlock": "移動痛苦資源條",
+      "doomMeterLock": "鎖定痛苦資源條",
       "doomEmptyStatus": "{value}/{max} 譴罪。",
       "doomStatus": "{value}/{max} 譴罪；剩餘 {remaining}。",
       "fateThreadsStatus": "{value} of {max} Fate Threads.",

@@ -565,6 +565,7 @@
     justify-content: center;
   }
   .warlock-doom-frame {
+    position: relative;
     display: none;
     flex-direction: column;
     align-items: center;
@@ -572,6 +573,18 @@
     width: 100%;
     height: 48px;
     margin-bottom: 3px;
+    pointer-events: none;
+  }
+  .warlock-doom-frame.doom-detached {
+    position: absolute;
+    z-index: 21;
+    width: 300px;
+    height: 48px;
+    margin: 0;
+  }
+  /* #ui > * enables interaction for ordinary HUD children. A locked detached
+     resource meter must remain click-through except for its explicit move button. */
+  #ui > .warlock-doom-frame:not(.tf-unlocked) {
     pointer-events: none;
   }
   .warlock-doom {
@@ -981,7 +994,8 @@
      corner like the rest badge, so it never overlaps the portrait or bars. The
      glyph is a mask: move arrows while LOCKED (press to move), a padlock while
      UNLOCKED (press to fix). Desktop only (hidden on mobile-touch). */
-  .unitframe .tf-move-btn {
+  .unitframe .tf-move-btn,
+  .warlock-doom-frame > .tf-move-btn {
     position: absolute;
     top: -10px;
     right: -10px;
@@ -1002,7 +1016,13 @@
       border-color 0.12s ease,
       color 0.12s ease;
   }
-  .unitframe .tf-move-btn::before {
+  .warlock-doom-frame > .tf-move-btn {
+    top: -8px;
+    right: calc(50% - 160px);
+    pointer-events: auto;
+  }
+  .unitframe .tf-move-btn::before,
+  .warlock-doom-frame > .tf-move-btn::before {
     content: "";
     position: absolute;
     inset: 5px;
@@ -1014,23 +1034,27 @@
       url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%201.5%208.5%205H11v6H5V8.5L1.5%2012%205%2015.5V13h6v6H8.5L12%2022.5%2015.5%2019H13v-6h6v2.5L22.5%2012%2019%208.5V11h-6V5h2.5z'/%3E%3C/svg%3E")
       center / contain no-repeat;
   }
-  .unitframe .tf-move-btn:hover {
+  .unitframe .tf-move-btn:hover,
+  .warlock-doom-frame > .tf-move-btn:hover {
     opacity: 1;
     border-color: var(--gold);
     color: var(--gold);
   }
-  .unitframe .tf-move-btn:focus-visible {
+  .unitframe .tf-move-btn:focus-visible,
+  .warlock-doom-frame > .tf-move-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
     opacity: 1;
   }
   /* Unlocked (move mode): highlight the button gold and swap to the padlock glyph. */
-  .unitframe .tf-move-btn.active {
+  .unitframe .tf-move-btn.active,
+  .warlock-doom-frame > .tf-move-btn.active {
     opacity: 1;
     border-color: var(--gold);
     color: var(--gold);
   }
-  .unitframe .tf-move-btn.active::before {
+  .unitframe .tf-move-btn.active::before,
+  .warlock-doom-frame > .tf-move-btn.active::before {
     -webkit-mask:
       url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M7%2010V7a5%205%200%200%201%2010%200v3h1.2A1.8%201.8%200%200%201%2020%2011.8v7.4A1.8%201.8%200%200%201%2018.2%2021H5.8A1.8%201.8%200%200%201%204%2019.2v-7.4A1.8%201.8%200%200%201%205.8%2010H7zm2%200h6V7a3%203%200%200%200-6%200v3z'/%3E%3C/svg%3E")
       center / contain no-repeat;
@@ -1039,19 +1063,26 @@
       center / contain no-repeat;
   }
   /* The frame while unlocked: a dashed gold hint and a move cursor over the body. */
-  .unitframe.tf-unlocked {
+  .unitframe.tf-unlocked,
+  .warlock-doom-frame.tf-unlocked {
     cursor: move;
     outline: 1px dashed var(--gold);
     outline-offset: 2px;
     touch-action: none;
   }
+  .warlock-doom-frame.tf-unlocked {
+    pointer-events: auto;
+  }
   body.target-frame-dragging,
   body.target-frame-dragging *,
   body.player-frame-dragging,
-  body.player-frame-dragging * {
+  body.player-frame-dragging *,
+  body.warlock-doom-frame-dragging,
+  body.warlock-doom-frame-dragging * {
     user-select: none;
   }
-  body.mobile-touch .unitframe .tf-move-btn {
+  body.mobile-touch .unitframe .tf-move-btn,
+  body.mobile-touch .warlock-doom-frame > .tf-move-btn {
     display: none;
   }
   .portrait-wrap {

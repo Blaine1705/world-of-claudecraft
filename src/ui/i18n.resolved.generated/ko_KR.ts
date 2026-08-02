@@ -319,6 +319,8 @@ export const ko_KR: EnTranslations = {
     "warlock": {
       "doomLabel": "단죄",
       "fateThreadsLabel": "운명의 실타래",
+      "doomMeterUnlock": "고통 자원 막대 이동",
+      "doomMeterLock": "고통 자원 막대 고정",
       "doomEmptyStatus": "단죄 {value}/{max}.",
       "doomStatus": "단죄 {value}/{max}, 남은 시간 {remaining}.",
       "fateThreadsStatus": "{value} of {max} Fate Threads.",

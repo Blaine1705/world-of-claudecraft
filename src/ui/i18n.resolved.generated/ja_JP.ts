@@ -319,6 +319,8 @@ export const ja_JP: EnTranslations = {
     "warlock": {
       "doomLabel": "断罪",
       "fateThreadsLabel": "運命の糸",
+      "doomMeterUnlock": "苦痛リソースバーを移動",
+      "doomMeterLock": "苦痛リソースバーを固定",
       "doomEmptyStatus": "断罪 {value}/{max}。",
       "doomStatus": "断罪 {value}/{max}、残り {remaining}。",
       "fateThreadsStatus": "{value} of {max} Fate Threads.",

@@ -3991,6 +3991,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'cruel_pact',
   'vicarious_suffering',
   'possess_evil_eye',
+  'hour_of_judgment',
   'coven',
   'soul_lance',
   'litany_of_guilt',
@@ -4001,6 +4002,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'raise_graveguard',
   'raise_skeletal_warrior',
   'raise_bone_mage',
+  'raise_gravewing',
   'bone_armor',
   'corpse_explosion',
   'funeral_harvest',
@@ -4021,6 +4023,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'curse_of_exhaustion',
   'death_coil',
   'chaos_bolt',
+  'cinderhide',
   // Choice-row talents use their own images instead of borrowing spell art.
   ...WARLOCK_TALENT_IMAGE_IDS,
   // rogue (CraftPix premium "RPG Thief skill icons" pack). garrote/sap/expose_armor/blind

@@ -1,10 +1,15 @@
+import { MovableFrame, type MovableFrameConfig } from '../../movable_frame';
 import type { PainterHostWriters } from '../../painter_host';
 import { DoomMeterPainter } from './doom_meter_painter';
 import { type DoomMeterInput, doomMeterState } from './doom_meter_view';
 
+export const WARLOCK_DOOM_FRAME_POS_KEY = 'woc_warlock_doom_frame_pos';
+
 export interface DoomMeter {
   paint(input: DoomMeterInput): void;
   relocalize(): void;
+  reapplyPosition(): void;
+  resetPosition(): void;
 }
 
 export interface DoomMeterStrings {
@@ -16,12 +21,25 @@ export interface DoomMeterStrings {
   formatFateThreadsStatus(value: string, max: string): string;
 }
 
+interface DoomMeterMover {
+  relocalize(): void;
+  reapplyPosition(): void;
+  reset(): void;
+}
+
+export interface DoomMeterMovement {
+  detachedParent: HTMLElement;
+  isMobileLayout(): boolean;
+  createMover?(config: MovableFrameConfig): DoomMeterMover;
+}
+
 export function createDoomMeter(
   doc: Document,
   parent: HTMLElement,
   before: HTMLElement,
   writers: PainterHostWriters,
   strings: DoomMeterStrings,
+  movement?: DoomMeterMovement,
 ): DoomMeter {
   const frame = doc.createElement('div');
   frame.id = 'warlock-doom-frame';
@@ -67,6 +85,29 @@ export function createDoomMeter(
   frame.append(root, fateThreadsRoot);
   parent.insertBefore(frame, before);
 
+  const createMover = movement?.createMover ?? ((config) => new MovableFrame(config));
+  const mover = movement
+    ? createMover({
+        frame,
+        storageKey: WARLOCK_DOOM_FRAME_POS_KEY,
+        unlockLabelKey: 'hudChrome.warlock.doomMeterUnlock',
+        lockLabelKey: 'hudChrome.warlock.doomMeterLock',
+        draggingBodyClass: 'warlock-doom-frame-dragging',
+        fallbackSize: { w: 300, h: 48 },
+        isMobileLayout: movement.isMobileLayout,
+        onPositioned(active): void {
+          frame.classList.toggle('doom-detached', active);
+          if (active) {
+            if (frame.parentElement !== movement.detachedParent) {
+              movement.detachedParent.appendChild(frame);
+            }
+          } else if (frame.parentElement !== parent || frame.nextElementSibling !== before) {
+            parent.insertBefore(frame, before);
+          }
+        },
+      })
+    : null;
+
   const painter = new DoomMeterPainter(
     writers,
     frame,
@@ -95,6 +136,13 @@ export function createDoomMeter(
     relocalize(): void {
       writers.setAttr(root, 'aria-label', strings.label());
       writers.setAttr(fateThreadsRoot, 'aria-label', strings.fateThreadsLabel());
+      mover?.relocalize();
+    },
+    reapplyPosition(): void {
+      mover?.reapplyPosition();
+    },
+    resetPosition(): void {
+      mover?.reset();
     },
   };
 }

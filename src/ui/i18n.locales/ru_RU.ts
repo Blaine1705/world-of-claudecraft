@@ -16,6 +16,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': 'Все',
   'hudChrome.warlock.doomLabel': 'Осуждение',
   'hudChrome.warlock.fateThreadsLabel': 'Нити судьбы',
+  'hudChrome.warlock.doomMeterUnlock': 'Переместить шкалу ресурсов Колдовства',
+  'hudChrome.warlock.doomMeterLock': 'Закрепить шкалу ресурсов Колдовства',
   'hudChrome.warlock.doomEmptyStatus': 'Осуждение: {value} из {max}.',
   'hudChrome.warlock.doomStatus': 'Осуждение: {value} из {max}; осталось {remaining}.',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Осколки душ',

@@ -191,6 +191,12 @@
       "generator": "OpenAI built-in image generation",
       "artDirection": "Original low-poly fantasy MMORPG Soulwell with dark faceted stone, green basin energy, violet soul wisps, and three orbiting stones; no text, border, logo, or copied franchise design",
       "abilityIds": ["soulwell"]
+    },
+    {
+      "name": "warlock-final-kit-completion",
+      "generator": "OpenAI built-in image generation",
+      "artDirection": "Original painted dark-fantasy MMORPG icons with high-contrast Warlock silhouettes, no text, border, logo, or copied franchise design",
+      "abilityIds": ["hour_of_judgment", "cinderhide", "raise_gravewing"]
     }
   ]
 }
