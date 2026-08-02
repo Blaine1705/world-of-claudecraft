@@ -8,6 +8,7 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 |---|---|---|---|---|---|---|---|
 | 2026-08-02 | 1 | baseline capture + gate_profile harness | n/a | full gate 336.3s, vitest 277.5s, workers 8 | M1 darwin/arm64 16c/128GiB Node 26.5 npm 11.17 SHA 2a79ba8a0d | keep | Required foundation; see baselines.md and detail below |
 | 2026-08-02 | 2 | gate i18n/wiki generate-once + pretest skip + build:bundle | triple i18n / double wiki; full gate 336.3s | single gen path; ~5s artifact save; composite gate 291.5s | M1 darwin/arm64 16c/128GiB | keep | Option C+B; see detail below |
+| 2026-08-02 | 3 | gate:fast + GATE_WORKER_TIER presets | day-loop ~= full gate 291.5s or ad-hoc | gate:fast 25.4s; full gate still merge bar | M1 darwin/arm64 16c/128GiB | keep | related not --changed default; see detail |
 
 ## Detail template (copy below for long notes)
 
@@ -85,3 +86,34 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 - Follow-ups:
   - Phase 3: tiered gate:fast
   - Optional: CI shard pretest still multiplies i18n gens (out of Phase 2 local scope)
+
+---
+
+### 2026-08-02 - Phase 3 - tiered local gate + worker presets
+
+- Hypothesis: Agents need a high-signal day-loop path under a few minutes, while
+  full gate stays the obvious merge bar; low/medium machines need documented worker
+  caps that never remove the free-mem clamp.
+- Change:
+  - `npm run gate:fast` -> `scripts/gate_fast.mjs` (malware, biome changed, architecture
+    + localization guards, incremental `check:ts`, vitest related to dirty sources/tests)
+  - Pure plan in `scripts/lib/gate_fast_plan.mjs` (classify paths; skip package.json
+    expansion; opt-in `GATE_FAST_BASE` for branch-wide `--changed`)
+  - `GATE_WORKER_TIER=low|medium|high` caps in `computeGateWorkers` after free-mem clamp
+  - Docs: `docs/qa-gate.md`, `docs/local-gate-perf/tier-workers.md`, CONTRIBUTING pointer
+  - Pins: `tests/gate_workers.test.ts`, `tests/gate_fast_plan.test.ts`
+- Commands:
+  - `npx vitest run tests/gate_workers.test.ts tests/gate_fast_plan.test.ts`
+  - `npm run gate:fast` (timed)
+  - Rejected probe: default `--changed` vs release / bare `--changed` with dirty package.json
+- Before metrics: day-loop effectively full gate ~291.5s (Phase 2) or ad-hoc pre-push
+- After metrics (M1):
+  - gate:fast **25.4s** PASS (workers 8; related mode; package.json not expanded)
+  - Rejected default using vitest `--changed` ~241s (~full suite) when package.json dirty
+- Pass/fail: unit tests green; gate:fast green; full gate not re-run this phase
+  (Phase 2 composite still the full-gate reference; labeled partial)
+- Decision: keep
+- Follow-ups:
+  - Phase 4: vitest warm path / fsModuleCache / related helper polish
+  - Owner OPEN: gate:fast never replaces pre-push or merge bar without state.md sign-off
+  - Optional: time full `npm run gate` once after Phase 3 lands on a quiet machine

@@ -171,13 +171,28 @@ fix.
 
 ## Before you open a pull request
 
-Run the repository gate locally. It is the same contract CI enforces:
+Run the **full** repository gate locally. It is the same contract CI enforces and
+the only local command that counts as the pre-merge bar:
 
 ```bash
 npm run gate
 ```
 
-While iterating, run a single suite (`npx vitest run tests/sim.test.ts`) and
+While iterating (especially on mid/low-tier machines or in agent day-loops), you can
+use the fast path, which is **not** a substitute for the full gate:
+
+```bash
+npm run gate:fast
+```
+
+`gate:fast` runs malware, changed-file Biome, architecture + localization guards,
+incremental `check:ts`, and Vitest related to git changes. It skips the full suite,
+browser tests, SFX check, i18n freshness, and production builds. Details and worker
+tier presets (`GATE_WORKER_TIER`, `GATE_MAX_WORKERS`) are in
+[`docs/qa-gate.md`](docs/qa-gate.md) and
+[`docs/local-gate-perf/tier-workers.md`](docs/local-gate-perf/tier-workers.md).
+
+You can also run a single suite (`npx vitest run tests/sim.test.ts`) and
 `npm run ci:changed` for formatting; `npm test` runs everything, and the suite map
 is in `tests/CLAUDE.md`. The full `npm run gate` covers generated-artifact
 freshness, the malware scan, formatting on changed files, the sound-effect

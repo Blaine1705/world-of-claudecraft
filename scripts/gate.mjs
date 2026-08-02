@@ -15,7 +15,7 @@
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import { gateVitestSkipPretestEnv } from './lib/gate_artifact_skip.mjs';
-import { computeGateWorkers } from './lib/gate_workers.mjs';
+import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers.mjs';
 import {
   formatInstallSyncFailure,
   parseInstallProblems,
@@ -27,13 +27,15 @@ import { FFMPEG_PATH, FFPROBE_PATH } from './sfx/ffmpeg_paths.mjs';
 // second `npm run gate` (or any other heavy vitest run) is happening in a sibling
 // worktree on the same machine, which this repo's own parallel-worktree workflow makes
 // routine. computeGateWorkers additionally clamps to available memory, since a vitest
-// fork worker that starts swapping presents as a flaky failure, not a slow one. Override
-// with GATE_MAX_WORKERS=<n> when you know better than the heuristic (e.g. deliberately
-// running several gates at once and want each one to take a smaller share).
+// fork worker that starts swapping presents as a flaky failure, not a slow one. Optional
+// GATE_WORKER_TIER=low|medium|high applies a further cap AFTER the free-mem clamp (never
+// instead of it). GATE_MAX_WORKERS=<n> remains the expert absolute override when you
+// deliberately share the machine or raise workers on a quiet high-tier host.
 const workers = computeGateWorkers({
   cpuCount: os.availableParallelism(),
   freeMemBytes: os.freemem(),
   envOverride: process.env.GATE_MAX_WORKERS,
+  tierCap: resolveGateWorkerTierCap(process.env.GATE_WORKER_TIER),
 });
 // npm/npx resolve to .cmd files on Windows, which spawnSync only finds via a shell.
 const shell = process.platform === 'win32';

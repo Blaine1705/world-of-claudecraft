@@ -49,6 +49,7 @@
     "test": "vitest run",
     "test:browser": "vitest run --config vitest.browser.config.ts",
     "gate": "node scripts/gate.mjs",
+    "gate:fast": "node scripts/gate_fast.mjs",
     "security:scan": "node scripts/malware_scan.mjs",
     "security:gate": "node scripts/malware_scan.mjs --gate",
     "new:endpoint": "node scripts/new_endpoint.mjs",

@@ -2,8 +2,8 @@
 
 Resume point for the next session. Keep current after every phase.
 
-**Current phase:** Phase 2 complete.  
-**Next action:** run Phase 3 starter prompt (`phase-03-tiered-local-gate.md`).  
+**Current phase:** Phase 3 complete.  
+**Next action:** run Phase 4 starter prompt (`phase-04-vitest-warm-path.md`).  
 **Worktree:** `/Users/fernando/Documents/wocc-gate-perf-research`  
 **Branch:** `feature/local-gate-perf`  
 **Base:** always `origin/release/v0.34.0`
@@ -72,13 +72,16 @@ Always before calling a phase complete:
 
 | Path | Role |
 |---|---|
-| `scripts/gate.mjs` | Local full gate (generate-once i18n/wiki; vitest skips pretest; client uses build:bundle) |
+| `scripts/gate.mjs` | Local full gate (merge bar; generate-once i18n/wiki; vitest skips pretest; client uses build:bundle) |
+| `scripts/gate_fast.mjs` | Day-loop path only (`npm run gate:fast`); not merge bar |
+| `scripts/lib/gate_fast_plan.mjs` | Pure day-loop vitest plan (related vs skip; tested) |
 | `scripts/pretest.mjs` | `npm test` lifecycle; honors `WOC_SKIP_PRETEST=1` |
 | `scripts/lib/gate_artifact_skip.mjs` | Pure skip helper for pretest (tested) |
-| `scripts/lib/gate_workers.mjs` | Worker CPU/mem policy |
+| `scripts/lib/gate_workers.mjs` | Worker CPU/mem policy + `GATE_WORKER_TIER` caps (free-mem clamp kept) |
 | `scripts/gate_profile.mjs` | Phase 1 measurement CLI (timed steps + slow files) |
 | `scripts/lib/gate_profile.mjs` | Pure helpers for gate_profile (tested) |
-| `package.json` | scripts: test, pretest, gate, build, build:bundle, check:types |
+| `docs/local-gate-perf/tier-workers.md` | Cross-OS worker tier guidance |
+| `package.json` | scripts: test, pretest, gate, gate:fast, build, build:bundle, check:types |
 | `vite.config.ts` | Vitest `test` block |
 | `vitest.browser.config.ts` | Browser suite |
 | `.github/workflows/ci.yml` | CI shards and checks |
@@ -92,7 +95,7 @@ Fill as phases ship:
 
 - (Phase 1) timing harness path: `scripts/gate_profile.mjs` + `scripts/lib/gate_profile.mjs` (tests: `tests/gate_profile.test.ts`); M1 baseline full gate 336.3s / vitest 277.5s / workers 8 at SHA 2a79ba8a0d
 - (Phase 2) gate dedupe approach: **Option C + B** generate-once in gate (`i18n:gen` + freshness + `wiki:content`), vitest step sets `WOC_SKIP_PRETEST=1` (`scripts/pretest.mjs` no-op), client step runs `build:bundle` (no re-gen). Standalone `npm test` / `npm run build` still full regen.
-- (Phase 3) new scripts (`gate:fast`, ...):
+- (Phase 3) new scripts: `gate:fast` (`scripts/gate_fast.mjs` + `lib/gate_fast_plan.mjs`); worker tiers via `GATE_WORKER_TIER` + `GATE_WORKER_TIER_CAPS` in `lib/gate_workers.mjs`; docs `docs/local-gate-perf/tier-workers.md`, `docs/qa-gate.md`, CONTRIBUTING pointer
 - (Phase 4) vitest cache flags:
 - (Phase 5) happy-dom adoption scope:
 - (Phase 6) pool/projects kept:

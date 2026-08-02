@@ -131,7 +131,7 @@ suites can overlap; sum of file times exceeds suite wall).
 |---|---|---:|---:|---|---|
 | 1 (baseline) | M1 | 336.3 | 277.5 | 0 | keep (foundation) |
 | 2 | M1 | 291.5 (composite) | 245.4 | -44.8 (see notes) | keep |
-| 3 | | | | | |
+| 3 | M1 | n/a (day-loop focus) | n/a | gate:fast 25.4s vs full ~291s | keep |
 | 4 warm related | | | | | |
 | 5 | | | | | |
 | 6 | | | | | |
@@ -194,3 +194,29 @@ and the solid ~5 s artifact win.
 
 Raw JSON: `tmp/gate-profile-phase2.json` (vitest path; typecheck failed pre-fix),
 `tmp/gate-profile-phase2-rest.json` (skip-vitest full green tail).
+
+## Phase 3 - tiered local gate + worker presets (after)
+
+**Decision:** Keep additive `npm run gate:fast` + `GATE_WORKER_TIER` caps. Full
+`npm run gate` remains the merge bar (generate-once from Phase 2 unchanged).
+
+### Day-loop wall (M1, 2026-08-02T17:07Z UTC, SHA 612cccc9cf + Phase 3 WIP)
+
+| Path | Seconds | Notes |
+|---|---:|---|
+| Naive day-loop = full gate (Phase 2 composite) | 291.5 | Before tiered path existed |
+| `gate:fast` with vitest `--changed` vs release (rejected default) | ~241 | package.json dirtiness expanded to ~1945 files; dropped as default |
+| **`npm run gate:fast` (kept)** | **25.4** | malware + biome + guards + check:ts + `vitest related` on dirty sources (5 scripts + 2 tests); package.json skipped for related expansion |
+| Full `npm run gate` | not re-timed | Still merge bar; Phase 2 composite 291.5s stands |
+
+### Worker presets
+
+| `GATE_WORKER_TIER` | Cap after free-mem clamp |
+|---|---:|
+| low | 2 |
+| medium | 4 |
+| high | 8 |
+| unset | CPU/2 + free-mem only |
+
+`GATE_MAX_WORKERS` remains expert absolute override. Free-mem clamp never removed.
+Cross-OS notes: `docs/local-gate-perf/tier-workers.md`.

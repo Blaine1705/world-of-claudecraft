@@ -21,6 +21,7 @@ offers to tear it down (or keep a short permanent note under `docs/`) before mer
 | `progress.md` | Status table + per-phase checklists |
 | `baselines.md` | Machine-tier baseline numbers (filled by Phase 1, updated each phase) |
 | `experiment-log.md` | Try / measure / keep or drop log (MISS is expected and fine) |
+| `tier-workers.md` | Machine-tier worker presets + `gate:fast` vs full gate (Windows/macOS/Linux) |
 | `phase-01-...` through `phase-12-...` | Self-contained starter prompts |
 
 ## Worktree (canonical)
@@ -62,5 +63,6 @@ Trying many levers is encouraged. Rules:
 
 - CI speed packet (PR #2737): N=8 shards, path filters, release-checks split
 - Local gate: memory-aware workers (`GATE_MAX_WORKERS`, `computeGateWorkers`)
+- Phase 3: `npm run gate:fast` day-loop path + `GATE_WORKER_TIER` caps (see `tier-workers.md`)
 - Incremental `check:ts` buildinfo cache
 - Dependency-sync preflight and malware `.worktrees` skip

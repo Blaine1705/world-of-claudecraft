@@ -8,7 +8,7 @@ Status: not-started / in-progress / blocked / complete / dropped
 |---|---|---|---|---|---|
 | 1 | Baseline harness and machine-tier protocol | complete | 2026-08-02 | 2026-08-02 | M1 high-tier baseline 336.3s full gate |
 | 2 | Gate orchestration dedupe | complete | 2026-08-02 | 2026-08-02 | generate-once + pretest skip + build:bundle |
-| 3 | Tiered local gate + tier worker presets | not-started | | | |
+| 3 | Tiered local gate + tier worker presets | complete | 2026-08-02 | 2026-08-02 | gate:fast ~25s day-loop; full gate still merge bar |
 | 4 | Vitest warm path | not-started | | | |
 | 5 | happy-dom for DOM tests | not-started | | | |
 | 6 | Pool, projects, isolation experiments | not-started | | | |
@@ -36,11 +36,11 @@ Status: not-started / in-progress / blocked / complete / dropped
 - [x] Full gate green (see baselines.md / experiment-log; profile JSON under tmp/)
 
 ### Phase 3 - Tiered local gate + tier worker presets
-- [ ] Documented `gate:fast` (or equivalent) for agents/day-to-day
-- [ ] Full gate still the merge bar
-- [ ] Tier presets or docs for GATE_MAX_WORKERS (low/medium/high)
-- [ ] Cross-platform notes for scripts
-- [ ] Pins/tests for new scripts as needed
+- [x] Documented `gate:fast` (or equivalent) for agents/day-to-day
+- [x] Full gate still the merge bar
+- [x] Tier presets or docs for GATE_MAX_WORKERS (low/medium/high)
+- [x] Cross-platform notes for scripts
+- [x] Pins/tests for new scripts as needed
 
 ### Phase 4 - Vitest warm path
 - [ ] fsModuleCache (or measured drop if harmful) decision recorded

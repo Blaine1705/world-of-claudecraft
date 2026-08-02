@@ -20,7 +20,7 @@ import {
   parseGateProfileArgs,
   rankSlowestFiles,
 } from './lib/gate_profile.mjs';
-import { computeGateWorkers } from './lib/gate_workers.mjs';
+import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers.mjs';
 import {
   formatInstallSyncFailure,
   parseInstallProblems,
@@ -51,6 +51,7 @@ const workers =
     cpuCount: facts.cpuCount,
     freeMemBytes: facts.freeMemBytes,
     envOverride: process.env.GATE_MAX_WORKERS,
+    tierCap: resolveGateWorkerTierCap(process.env.GATE_WORKER_TIER),
   });
 
 const gitSha = runCapture('git', ['rev-parse', 'HEAD']) ?? 'unknown';
