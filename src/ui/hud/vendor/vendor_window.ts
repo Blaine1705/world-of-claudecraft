@@ -200,6 +200,10 @@ export function renderVendorWindow(
         t('itemUi.vendor.buyStackAria', { item: itemName, count: bulkCount, price: bulkPrice }),
       );
       bulkRow.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(t('itemUi.vendor.buyStack', { count: bulkCount }))}</span><span class="vi-price">${deps.moneyHtml(bulkCopper)}</span>`;
+      // Its own focus key: a keyboard bulk buy rebuilds the grid under the
+      // finger exactly like the ordinary row's buy, and without a key the
+      // restore ladder cannot find the tile again (focus fell to <body>).
+      bulkRow.dataset.focusKey = `buy-stack:${itemId}`;
       bulkRow.addEventListener('click', () => deps.onBuy(itemId, true));
       deps.attachTooltip(
         bulkRow,

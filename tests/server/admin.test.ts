@@ -44,8 +44,8 @@ import {
   routes,
   setAdminDbForTests,
 } from '../../server/admin';
-import { characterProfessionsSheet } from '../../server/character_professions';
 import { resetAdminGuildListReadsForTests } from '../../server/admin_guilds_read';
+import { characterProfessionsSheet } from '../../server/character_professions';
 import { pool } from '../../server/db';
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';

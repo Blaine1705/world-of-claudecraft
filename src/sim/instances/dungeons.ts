@@ -18,7 +18,6 @@
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '../data';
 import { createGroundObject, createMob } from '../entity';
-import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import {
   COMBAT_EXIT_MEMORY_SECONDS,
   type CombatExitThreatEntry,
@@ -26,6 +25,7 @@ import {
   takeCombatExit,
 } from '../instance_exit_memory';
 import { retargetMob } from '../mob/targeting';
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { arenaQueueLeave } from '../social/arena';

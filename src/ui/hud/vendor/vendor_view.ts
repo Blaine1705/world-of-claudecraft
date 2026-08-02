@@ -9,9 +9,9 @@
 //
 // DOM-free and i18n-free so tests/vendor_view.test.ts can drive it directly.
 
+import { stackSizeOf } from '../../../sim/bags';
 import { resolveVendorRowGate, type VendorRowGate } from '../../../sim/content/vendor_row_gates';
 import { junkSellableSlot } from '../../../sim/items';
-import { stackSizeOf } from '../../../sim/bags';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import { bulkBuyQuantity } from '../../../sim/vendor_buy_stack';
 import { vendorStackSize } from '../../../sim/vendor_stack';

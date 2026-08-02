@@ -30,8 +30,8 @@ import {
 } from '../instance_exit_memory';
 import type { LootTier } from '../lockpick';
 import { RIFT_MECHANIC_SPACING_SEC } from '../mob/mechanic_spacing';
-import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import { retargetMob } from '../mob/targeting';
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';

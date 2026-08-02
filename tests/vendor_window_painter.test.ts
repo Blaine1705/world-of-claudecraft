@@ -567,6 +567,35 @@ describe('renderVendorWindow: focus across the rebuild (the R22 advisory widenin
     }
   });
 
+  it('a focused Buy Stack tile keeps focus when the rebuild repaints it (the merge seam)', () => {
+    // The release's bulk tile (#2374) landed beside this branch's
+    // focus-across-a-rebuild contract without a focus key, so a keyboard
+    // bulk buy dropped focus to <body> on the repaint its own purchase
+    // triggers: exactly the defect class the ordinary row already guards.
+    const view: VendorView = {
+      goods: [{ ...goodsRow('thread'), bulkQuantity: 20, bulkAffordable: true }],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+    };
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    try {
+      renderVendorWindow(el, 'Vendor', view, deps());
+      const tile = el.querySelector<HTMLButtonElement>('[data-focus-key="buy-stack:thread"]');
+      expect(tile, 'the bulk tile must carry its own focus key').not.toBeNull();
+      tile?.focus();
+      expect(document.activeElement).toBe(tile);
+      renderVendorWindow(el, 'Vendor', view, deps());
+      const rebuilt = el.querySelector<HTMLButtonElement>('[data-focus-key="buy-stack:thread"]');
+      expect(rebuilt).not.toBeNull();
+      expect(rebuilt).not.toBe(tile); // genuinely a fresh element
+      expect(document.activeElement).toBe(rebuilt);
+    } finally {
+      el.remove();
+    }
+  });
+
   it('a row that comes back DISABLED yields to its enabled grid neighbor (the last-stack buy)', () => {
     // The primary degradation the focus_restore family documents: buying the
     // last affordable stack drains copper, so the SAME row returns from the
